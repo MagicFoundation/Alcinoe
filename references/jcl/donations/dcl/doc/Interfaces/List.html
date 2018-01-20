@@ -1,0 +1,123 @@
+<html>
+<!-- Creation date: 21/01/2002 -->
+<head>
+<title></title>
+<meta name="Description" content="">
+<meta name="Keywords" content="">
+<meta name="Author" content="RANDOM">
+<meta name="Generator" content="AceHTML 4 Pro">
+<link href="../SeldonWeb.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<center><h1>IIntfList/IStrList/IList</h1></center>
+
+<h2>Unit</h2>
+	DCL_intf
+
+<h2>Inheritance</h2>
+	<p>Derived from <a href="Collection.html">IIntfCollection/IStrCollection/ICollection</a></p>
+	<p>Inerited by <a href="Array.html">IIntfArray/IStrArray/IArray</a></p>
+<h2>Methods</h2>
+<h3>IIntfList</h3>
+<code>
+    <b>procedure</b> Add(Index: Integer; AObject: IInterface); <b>overload</b>;<br>
+    <b>function</b> AddAll(Index: Integer; ACollection: IIntfCollection): Boolean; <b>overload</b>;<br>
+    <b>function</b> GetObject(Index: Integer): IInterface;<br>
+    <b>function</b> IndexOf(AObject: IInterface): Integer;<br>
+    <b>function</b> LastIndexOf(AObject: IInterface): Integer;<br>
+    <b>function</b> Remove(Index: Integer): IInterface; <b>overload</b>;<br>
+    <b>function</b> SetObject(Index: Integer; AObject: IInterface): IInterface;<br>
+    <b>function</b> SubList(Start, Finish: Integer): IIntfList;<br>
+</code>
+	
+<h3>IStrList</h3>
+<code>
+    <b>procedure</b> Add(Index: Integer; <b>const</b> AString: <b>string</b>); <b>overload</b>;<br>
+    <b>function</b> AddAll(Index: Integer; ACollection: IStrCollection): Boolean; <b>overload</b>;<br>
+    <b>function</b> GetString(Index: Integer): <b>string</b>;<br>
+    <b>function</b> IndexOf(<b>const</b> AString: <b>string</b>): Integer;<br>
+    <b>function</b> LastIndexOf(<b>const</b> AString: <b>string</b>): Integer;<br>
+    <b>function</b> Remove(Index: Integer): <b>string</b>; <b>overload</b>;<br>
+    <b>procedure</b> SetString(Index: Integer; <b>const</b> AString: <b>string</b>);<br>
+    <b>function</b> SubList(First, Count: Integer): IStrList;<br>
+</code>
+<h3>IList</h3>
+<code>
+    <b>procedure</b> Add(Index: Integer; AObject: TObject); <b>overload</b>;<br>
+    <b>function</b> AddAll(Index: Integer; ACollection: ICollection): Boolean; <b>overload</b>;<br>
+    <b>function</b> GetObject(Index: Integer): TObject;<br>
+    <b>function</b> IndexOf(AObject: TObject): Integer;<br>
+    <b>function</b> LastIndexOf(AObject: TObject): Integer;<br>
+    <b>function</b> Remove(Index: Integer): TObject; <b>overload</b>;<br>
+    <b>function</b> SetObject(Index: Integer; AObject: TObject): TObject;<br>
+    <b>function</b> SubList(Start, Finish: Integer): IList;<br>
+</code>
+
+<h2>Description</h2>
+
+<p>A list is a sequence of objects like array, linked list or vector.</p>
+
+<table border="1" width="80%" align="center" bgcolor="white" cellpadding="5" cellspacing="0">
+  <tr>
+  	<th bgcolor="silver"> Method	</td>
+	<th bgcolor="silver"> Description </td>
+  </tr>
+  <tr>
+    <td>Add</td>
+    <td>
+		Add <i>AObject</i> at position <i>Index</i> in the list.
+	</td>
+  </tr>
+  <tr>
+    <td>AddAll</td>
+    <td>
+		Add all objetcs from <i>ACollection</i> at position Index in the list. Return True if the method succeeds.
+	</td>
+  </tr>
+  <tr>
+    <td>GetObject</td>
+    <td>
+		Return the object at the position <i>Index</i> from the list.	
+	</td>
+  </tr>
+  <tr>
+    <td>IndexOf</td>
+    <td>
+		Return the index of <i>AObject</i> from the list.	
+	</td>
+  </tr>
+  <tr>
+    <td>LastIndexOf</td>
+    <td>
+		Return the last index of <i>AObject</i> from the list. 	
+	</td>
+  </tr>
+  <tr>
+    <td>Remove</td>
+    <td>
+		Remove the object at the position <i>Index</i> from the list. Return the removed object.	
+	</td>
+  </tr>
+  <tr>
+    <td>SetObject</td>
+    <td>
+		Set <i>AObject</i> at the position <i>Index</i> in the list. Return the set object; 	
+	</td>
+  </tr>
+  <tr>
+    <td>SubList</td>
+    <td>
+		Return a sublist from <i>Start</i> to <i>Finish</i> Index from the list.
+	</td>
+</table>
+
+<h2>Implemented By</h2>
+	<ul>
+		<li> <a href="../Classes/ArrayList.html">ArrayList</a>
+		<li> <a href="../Classes/LinkedList.html">LinkedList</a>
+		<li> <a href="../Classes/Vector.html">Vector</a>
+	</ul>
+
+</body>
+</body>
+</html>

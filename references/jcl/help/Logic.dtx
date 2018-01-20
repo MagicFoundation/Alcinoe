@@ -1,0 +1,532 @@
+@@OrdinalMathandLogic.Arithmetic
+<GROUP OrdinalMathandLogic>
+<TITLE Arithmetic>
+<TOPICORDER 100>
+--------------------------------------------------------------------------------
+@@OrdinalMathandLogic.BitManipulation
+<GROUP OrdinalMathandLogic>
+<TITLE Bit Manipulation>
+<TOPICORDER 200>
+--------------------------------------------------------------------------------
+@@OrdinalMathandLogic.Conversion
+<GROUP OrdinalMathandLogic>
+<TITLE Conversion>
+<TOPICORDER 300>
+--------------------------------------------------------------------------------
+@@OrdToBinary
+<GROUP OrdinalMathandLogic.Conversion>
+Summary:
+  Returns the supplied value in its binary form.
+Description:
+  OrdToBinary returns a string representation of the specified value in its
+  binary form. That is, a string of '1' and '0' characters representing the bits
+  in the supplied value. The resulting string length is always equal to the number
+  of bits in the supplied value (leading 0's aren't stripped).
+Parameters:
+  Value - The value whose binary string representation to retrieve.
+Result:
+  Binary string representation of the supplied value. The string has a length equal
+  to the number of bits in the supplied value and each character in the string
+  represents a single bit. The highest bit is placed in Result[1] and the lowest
+  bit in Result[Length(Result)].
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@BitsHighest
+<GROUP OrdinalMathandLogic.BitManipulation>
+Summary:
+  Returns the highest bit set in the supplied value.
+Description:
+  BitsHighest returns the index of the highest bit which is set in the supplied
+  value. Note that bits are numbered right to left starting with 0. For example,
+  BitsHighest(5) returns 2 (5 equals 00000101 in binary).
+Parameters:
+  X - The value for which to return the highest set bit.
+Result:
+  The index of the highest bit set, or -1 if no bits are set.
+See also:
+  BitsLowest
+  CountBitsSet
+Donator:
+  Michael Schnell
+--------------------------------------------------------------------------------
+@@BitsLowest
+<GROUP OrdinalMathandLogic.BitManipulation>
+Summary:
+  Returns the lowest bit set in the supplied value.
+Description:
+  BitsLowest returns the index of the lowest bit which is set in the supplied
+  value. Note that bits are numbered right to left starting with 0. For example,
+  BitsLowest(9) returns 2 (9 is 00001100 in binary).
+Parameters:
+  X - The value for which to return the lowest set bit.
+Result:
+  The index of the lowest bit set, or -1 if no bits are set.
+See also:
+  BitsHighest
+  CountBitsSet
+Donator:
+  Michael Schnell
+--------------------------------------------------------------------------------
+@@ClearBit
+<GROUP OrdinalMathandLogic.BitManipulation>
+Summary:
+  Clears a bit in an integer-type value.
+Description:
+  ClearBit clears the specified bit position of the passed integer typed variable.
+  In other words, it sets the bit at position Bit for Value to 0. This function
+  exists in 7 different forms, one for each integer type.
+Parameters:
+  Value - The integer-typed variable for which to clear a bit.
+  Bit - The 0 based bit position of the bit to clear. This is a modulo N bit position where N is the number of bits in the Value parameter. For example, if Value is a Byte, then Bit position is interpreted as Bit mod 8.
+Result:
+  Copy of Value with the bit at position Bit cleared.
+See also:
+  TestBit
+  TestBits
+  ToggleBit
+  SetBit
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@CountBitsSet
+<GROUP OrdinalMathandLogic.BitManipulation>
+Summary:
+  Returns the number of set bits in the passed value.
+Description:
+  CountBitsSet returns the number of bits that are set (value 1) in the binary
+  representation of the supplied Value. For example, CountBitsSet(1) returns 1,
+  CountBitsSet(3) returns 2 etc. Note that signed integers are stored in two's
+  complement form and therefore, for example, CountBitsSet(-1) will return 32!
+Parameters:
+  X - The value for which to determine the number of bits that are set.
+Result:
+  The number of set bits or 0 if no bits are set.
+See also:
+  BitsLowest
+  BitsHighest
+Donator:
+  Michael Schnell
+--------------------------------------------------------------------------------
+@@CountBitsCleared
+<GROUP OrdinalMathandLogic.BitManipulation>
+Summary:
+  Returns the number of cleared bits in the supplied value.
+Description:
+  CountBitsCleared returns the number of bits that are cleared (value 0) in the binary
+  representation of the supplied Value. Note that signed integers are stored in two's
+  complement form and therefore, for example, CountBitsCleared(Integer(-1)) will
+  return 0!
+Parameters:
+  X - The value for which to determine the number of bits that are cleared. This can be an Integer, Cardinal, Byte, Word or Int64.
+Result:
+  The number of cleared bits or 0 if no bits are cleared.
+See also:
+  BitsLowest
+  BitsHighest
+Donator:
+  Robert Marquardt
+--------------------------------------------------------------------------------
+@@LRot
+<GROUP OrdinalMathandLogic.BitManipulation>
+Summary:
+  Left rotates bits.
+Description:
+  LRot shifts the bits in Value the specified number (Count) of times to the left.
+  On each shift the bit in the highest bit position wraps around into the lowest.
+Parameters:
+  Value - The Value whose bits to rotate.
+  Mask - The number of times to rotate.
+Result:
+  The resulting integer after the rotation is performed.
+See also:
+  RRot
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@ReverseBits
+<GROUP OrdinalMathandLogic.BitManipulation>
+Summary:
+  Reverses the bits of Value.
+Description:
+  ReverseBits reverses the bits in the passed parameter. That is, assuming a byte,
+  bit 0 is swapped with bit 7, bit 1 is swapped with bit 6 and so on. This function
+  exists in 5 forms, one for each Integer type. The last overload is a generalisation
+  of this which reverses the bits in the supplied buffer. Note that all overloads
+  use a table based approach to reversing the bits. The simple types overloads use
+  only a 15 byte table while the pointer overload uses a 255 byte table. Due to
+  this the pointer overload is much faster when used on large buffers.
+Parameters:
+  Value - The integer type whose bits to reverse.
+  P - Address of a buffer whose bits to reverse.
+  Count - Size of the buffer, in bytes, specified by P.
+Result:
+  Copy of Value with it's bits reversed.
+Notes:
+  Warning Keep in mind that some of the ReverseBits overloads accept signed integers as their argument but that reversing the bits of a signed integer is somewhat akward. Be sure that you understand the meaning of reversing the bits in a signed integer and that's what you want.
+  The pointer returned by the Pointer overload points to the same buffer passed in as it's argument, iow it's not a newly allocated buffer.
+  The ReverseBits(Pointer, Integer) overload was originally written by Mike Lischke.
+  Reversing is not the same as toggling. To toggle bits use the ToggleBit function.
+Donator:
+  Team JCL
+--------------------------------------------------------------------------------
+@@RRot
+<GROUP OrdinalMathandLogic.BitManipulation>
+Summary:
+  Right rotates bits.
+Description:
+  RRot shifts the bits in Value the specified number (Count) of times to the right.
+  On each shift the bit in the lowest bit position wraps around into the highest.
+Parameters:
+  Value - The Value whose bits to rotate.
+  Mask - The number of times to rotate.
+Result:
+  The resulting integer after the rotation is performed.
+See also:
+  LRot
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@Sar
+<GROUP OrdinalMathandLogic.BitManipulation>
+Summary:
+  Performs an arithmetic right shift.
+Description:
+  Sar performs an arithmetic right shift on the operand. An arithmetic right shift
+  is similar to a logical right shift (shr) except that shr operates on unsigned
+  values while Sar operates on signed values (and as such preserves the sign).
+Parameters:
+  Value - The Value whose bits to arithmetically shift.
+  Count - Number of positions to right shift.
+Result:
+  A copy of value after the arithmetic right shift operation.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@SetBit
+<GROUP OrdinalMathandLogic.BitManipulation>
+Summary:
+  Sets a bit in an integer-type value.
+Description:
+  SetBit sets the specified bit position of the supplied integer typed variable.
+  In other words it sets the bit at position Bit for Value to 1.
+Parameters:
+  Value - The integer-typed variable for which to set a bit.
+  Bit - The 0 based bit position of the bit to set. This is a modulo N bit position where N is the number of bits in the Value parameter. For example, if Value is a Byte, then Bit position is interpreted as Bit mod 8.
+Result:
+  Copy of Value with the bit at position Bit set.
+See also:
+  TestBit
+  ClearBit
+  ToggleBit
+  TestBits
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TestBit
+<GROUP OrdinalMathandLogic.BitManipulation>
+Summary:
+  Tests a bit in an integer-type value.
+Description:
+  TestBit tests the specified bit position of the passed integer typed variable.
+  In other words if the bit at the specified position is 1 then the function returns
+  True, if it is 0 the function returns False.
+Parameters:
+  Value - The integer-typed variable for which to test a bit.
+  Bit - The 0 based bit position of the bit to test. This is a modulo N bit position where N is the number of bits in the Value parameter. For example, if Value is a Byte then Bit position is interpreted as Bit mod 8. Warning: When calling this function you must cast a value passed to this parameter to a TBitRange as in: "TestBit(Value, TBitRange(1))" otherwise Delphi will incorrectly use the TestBit(Byte, TBitRange) overload instead of the correct overload. This is a known problem in the compiler, not an error in the JCL.
+Result:
+  True if the bit at the specified position is set, False if it is cleared.
+See also:
+  TestBits
+  ClearBit
+  ToggleBit
+  SetBit
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TestBits
+<GROUP OrdinalMathandLogic.BitManipulation>
+Summary:
+  Test multiple bits.
+Description:
+  TestBits performs a bitwise and operation on Value and Mask. This in effect tests
+  whether all bits that are set in Mask are also set in Value.
+Parameters:
+  Value - The Value whose bits to test.
+  Mask - The Mask containing the bits to test.
+Result:
+  If all the bits in the Mask are also set in Value the result is True, otherwise it's False.
+See also:
+  TestBit
+  ClearBit
+  ToggleBit
+  SetBit
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@ToggleBit
+<GROUP OrdinalMathandLogic.BitManipulation>
+Summary:
+  Toggles a bit in an integer-type value.
+Description:
+  ToggleBit toggles the specified bit position of the supplied integer typed variable.
+  In other words, if the bit at the specified position is 0, then it is set to 1, if
+  it's 1 then it is set to 0.
+Parameters:
+  Value - The integer-typed variable for which to toggle a bit.
+  Bit - The 0 based bit position of the bit to toggle. This is a modulo N bit position where N is the number of bits in the Value parameter. For example, if Value is a Byte then Bit position is interpreted as Bit mod 8.
+Result:
+  Copy of Value with the bit at position Bit toggled.
+See also:
+  TestBit
+  ClearBit
+  TestBits
+  SetBit
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@BooleansToBits
+<GROUP OrdinalMathandLogic.BitManipulation>
+Summary:
+  Packs an array of booleans into a set of bits.
+Description:
+  BooleansToBits packs the array of booleans into a set of bits. Each boolean in
+  the array which is set to True results in a 1 bit in the Dest variable while
+  each False valued boolean results in a 0 bit. The BitsToBooleans
+  routine performs the inverse operation. Note that if the array contains more
+  elements than can fit into the destination variable, the elements in the array
+  with index larger than the highest bit (i.e. 7 for a byte) in the destination
+  variable will be ignored.
+Parameters:
+  Dest - Integer type variable in which the appropriate bits are set/cleared.
+  B - The array of Booleans to pack into a set of bits. Note that the upper bound of this array must not be larger then the size of the Dest parameters, in bits. Thus, for the Byte variant this array must not be larger then 8 elements.
+See also:
+  BitsToBooleans
+Donator:
+  Robert Marquardt
+--------------------------------------------------------------------------------
+@@BitsToBooleans
+<GROUP OrdinalMathandLogic.BitManipulation>
+Summary:
+  Unpacks a set of bits into an array of booleans.
+Description:
+  BitsToBooleans unpacks a set of bits into an array of Booleans. Each set bit in
+  the Bits parameter results in a True valued Boolean while each cleared bit
+  results in a False valued boolean. The resulting array has one element for each
+  bit in the Bits parameter where bit 0 corresponds to B[0], bit 1 to B[1] etc.
+  See also BooleansToBits for the inverse operation. If the AllBits
+  parameter is True, the number of elements in the resulting array is the same as
+  the number of bits in the Bits parameter, if set to False (the default) the
+  resulting array has only as many elements as is required to hold the highest
+  set bit position. For example, if Bits equals 2 than the highest set bit is bit 1
+  and the resulting array has only two elements: [True, False].
+Parameters:
+  Bits - The set of bits to unpack to an array of Booleans.
+  B - Array which receives the bits in Bits unpacked as Booleans.
+  AllBits - If set to True the number of elements in the resulting array equals the number of bits in the Bits parameter (ie 8 for Byte, 16 for Word, etc). If False the number of elements in the resulting array equals the position of the highest set bit.
+See also:
+  BooleansToBits
+Donator:
+  Robert Marquardt
+--------------------------------------------------------------------------------
+@@BitsNeeded
+<GROUP OrdinalMathandLogic.BitManipulation>
+Summary:
+  Returns the number of Bits needed to represent a given positive integer.
+Description:
+  Returns the number of Bits needed to represent a given positive integer.
+Parameters:
+  X - The value for which you want to now how many bits are needed to represent it.
+Result:
+  The number of bits needed to represent the value.
+See also:
+  Digits
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@Digits
+<GROUP OrdinalMathandLogic.BitManipulation>
+Summary:
+  Returns the number of digits in a given positive integer.
+Description:
+  Returns the number of digits in a given positive integer.
+Parameters:
+  X - The value for which you want to know how many digits it has.
+Result:
+  The number of digits in the specified value.
+See also:
+  BitsNeeded
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@ReverseBytes
+<GROUP OrdinalMathandLogic.BitManipulation>
+Summary:
+  Reverses the bytes of Value.
+Description:
+  ReverseBytes reverses the bytes in the supplied parameter. That is, assuming an Integer,
+  byte 0 is swapped with byte 3, byte 1 is swapped with byte 2. This function
+  exists in 5 forms, one for each Integer type. The last overload is a generalisation
+  of this which reverses the bytes in the supplied buffer.
+Parameters:
+  Value - The integer type whose bytes to reverse.
+  P - Address of a buffer whose bytes to reverse.
+  Count - Size of the buffer, in bytes, specified by P.
+Result:
+  Copy of Value with it's bits reversed.
+Notes:
+  The pointer returned by the Pointer overload points to the same buffer passed in as it's argument, iow it's not a newly allocated buffer.
+  The ReverseBytes function was inspired by code from Liran Shahar
+Donator:
+  Team JCL
+--------------------------------------------------------------------------------
+@@SwapOrd
+<GROUP OrdinalMathandLogic.Arithmetic>
+Summary:
+  Swaps two integer-typed variables.
+Description:
+  The Swap function swaps the two supplied arguments. When the function returns
+  I has the value of J and J has the value of I. This function exist in 7 forms,
+  one for each Integer type. A function to swap floating point values exists as well
+  in the JclMath unit, see SwapFloat.
+Parameters:
+  I - First of the two variables to swap.
+  J - Second of the two variables to swap.
+Result:
+  At the end of this routine I will contain the original value of J and J will contain the original value of I.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@IncLimit
+<GROUP OrdinalMathandLogic.Arithmetic>
+Summary:
+  Increments an ordinal up to limit.
+Description:
+  IncLimit increments the specified ordinal variable by the specified value if and
+  only if the operation will not increment beyond the limit. For example, suppose
+  that X equals 5, now calling IncLimit(X, 10, 2) will increment X by 2 leaving it
+  with 7 on return. However, calling IncLimit(X, 10, 6) will not increment X by 6
+  because that would increment X beyond the limit. On return X still contains 5.
+Parameters:
+  B - The value to conditionally increment.
+  Limit - The incrementation limit.
+  Incr - The amount to increment.
+Result:
+  B contains the incremented value if within limit, otherwise it contains the original value.
+  This same value is returned as the function result.
+See also:
+  DecLimit
+  DecLimitClamp
+  IncLimitClamp
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@DecLimit
+<GROUP OrdinalMathandLogic.Arithmetic>
+Summary:
+  Decrements an ordinal up to limit.
+Description:
+  DecLimit decrements the specified ordinal variable by the specified value if and
+  only if the operation will not decrement beyond the limit. For example, suppose
+  that X equals 10, now calling DecLimit(X, 5, 2) will decrement X by 2 leaving it
+  with 8 on return. However, calling DecLimit(X, 5, 6) will not decrement X by 6
+  because that would decrement X beyond the limit. On return X still contains 10.
+Parameters:
+  B - The value to conditionally decrement.
+  Limit - The decrementation limit, this is inclusive.
+  Decr - The amount to decrement.
+Result:
+  B contains the decremented value if within limit, otherwise it contains the original value.
+  This same value is returned as the function result.
+See also:
+  IncLimit
+  IncLimitClamp
+  DecLimitClamp
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@DecLimitClamp
+<GROUP OrdinalMathandLogic.Arithmetic>
+Summary:
+  Decrements an ordinal up to limit.
+Description:
+  DecLimitClamp decrements the specified ordinal variable by the specified value. If
+  this decrement would decrease the value beyond the specified limit, the variable is
+  clamped to the limit. For example, suppose
+  that X equals 10, now calling DecLimitClamp(X, 5, 2) will decrement X by 2 leaving it
+  with 8 on return. However, calling DecLimitClamp(X, 5, 6) will not decrement X by 6
+  because that would decrement X beyond the limit. X is set to 5 (the limit) instead.
+Parameters:
+  B - The value to conditionally decrement.
+  Limit - The decrementation limit, this is inclusive.
+  Decr - The amount to decrement.
+Result:
+  B contains the decremented value if within limit, otherwise it is set to the limit
+  value. This same value is returned as the function result.
+Notes:
+  If upon entry the B variable is already smaller than the limit the variable is set to Limit.
+See also:
+  IncLimit
+  DecLimit
+  IncLimitClamp
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@IncLimitClamp
+<GROUP OrdinalMathandLogic.Arithmetic>
+Summary:
+  Increments an ordinal up to limit.
+Description:
+  IncLimitClamp increments the specified ordinal variable by the specified value. If
+  this increment would increase the value beyond the specified limit, the variable is
+  clamped to the limit. For example, suppose
+  that X equals 5, now calling IncLimitClamp(X, 10, 2) will increment X by 2 leaving it
+  with 7 on return. However, calling IncLimitClamp(X, 10, 6) will not increment X by 6
+  because that would increment X beyond the limit. X is set to 10 (the limit) instead.
+Parameters:
+  B - The value to conditionally increment.
+  Limit - The incrementation limit.
+  Incr - The amount to increment.
+Result:
+  B contains the incremented value if within limit, otherwise it is set to the limit
+  value. This same value is returned as the function result.
+Notes:
+  If upon entry the B variable is already larger than the limit the variable is set to Limit.
+See also:
+  DecLimit
+  IncLimit
+  DecLimitClamp
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@Max
+<GROUP OrdinalMathandLogic.Arithmetic>
+Summary:
+  Returns the larger of two values.
+Description:
+  Max returns the larger of the two passed values.
+Parameters:
+  B1 - The first value.
+  B2 - The second value.
+Result:
+  The larger of the two values.
+See also:
+  Min
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@Min
+<GROUP OrdinalMathandLogic.Arithmetic>
+Summary:
+  Returns the smaller of two values.
+Description:
+  Min returns the smaller of the two passed values.
+Parameters:
+  B1 - The first value.
+  B2 - The second value.
+Result:
+  The smaller of the two values.
+See also:
+  Max
+Donator:
+  ESB Consultancy

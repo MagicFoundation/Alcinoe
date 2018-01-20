@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Package Name="JclRepositoryExpertDLL" Type="L">
+  <Description>JCL Package containing repository wizards</Description>
+  <GUID>{D93FF823-44C6-49D4-B9B3-30F1F60082F5}</GUID>
+  <C6PFlags>-LUdesignide</C6PFlags>
+  <C6Libs/>
+  <CompilerDefines>RELEASE</CompilerDefines>
+  <ImageBase>58180000</ImageBase>
+  <Requires>
+    <Package Name="rtl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="vcl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="designide" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="Jcl-R" Targets="all" Condition=""/>
+    <Package Name="JclContainers-R" Targets="all" Condition=""/>
+    <Package Name="JclBaseExpert-D" Targets="all" Condition=""/>
+    <Package Name="JclDeveloperTools-R" Targets="all" Condition=""/>
+  </Requires>
+  <Contains>
+    <File Name="..\..\experts\repository\JclOtaRepositoryUtils.pas" Targets="runtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\repository\JclOtaRepositoryReg.pas" Targets="runtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgRepository.pas" Targets="runtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgWizard.pas" Targets="runtimeIDE" Formname="JclOtaExcDlgForm" Condition=""/>
+    <File Name="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgFileFrame.pas" Targets="runtimeIDE" Formname="JclOtaExcDlgFilePage: TFrame" Condition=""/>
+    <File Name="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgFormFrame.pas" Targets="runtimeIDE" Formname="JclOtaExcDlgFormPage: TFrame" Condition=""/>
+    <File Name="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgSystemFrame.pas" Targets="runtimeIDE" Formname="JclOtaExcDlgSystemPage: TFrame" Condition=""/>
+    <File Name="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgLogFrame.pas" Targets="runtimeIDE" Formname="JclOtaExcDlgLogPage: TFrame" Condition=""/>
+    <File Name="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgTraceFrame.pas" Targets="runtimeIDE" Formname="JclOtaExcDlgTracePage: TFrame" Condition=""/>
+    <File Name="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgThreadFrame.pas" Targets="runtimeIDE" Formname="JclOtaExcDlgThreadPage: TFrame" Condition=""/>
+    <File Name="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgIgnoreFrame.pas" Targets="runtimeIDE" Formname="JclOtaExcDlgIgnorePage: TFrame" Condition=""/>
+  </Contains>
+</Package>

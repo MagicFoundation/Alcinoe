@@ -1,0 +1,42 @@
+package StackTraceViewerHelloWorldExample;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  vcl,
+  JclStackTraceViewerExpert,
+  vclx,
+  vclactnband,
+  xmlrtl,
+  JclBaseExpert,
+  Jcl,
+  designide;
+
+contains
+  StackTraceViewerHelloWorldExampleReg in 'StackTraceViewerHelloWorldExampleReg.pas',
+  HelloWorldFrame in 'HelloWorldFrame.pas' {frmHelloWorld: TFrame};
+
+end.

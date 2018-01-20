@@ -1,0 +1,75 @@
+JEDI Code Library v 2.7 Installation
+
+Supported development tools versions:
+
+- Delphi 10.2 (Win32 and Win64) and C++Builder 10.2 (Win32 and Win64)
+- Delphi 10.1 (Win32 and Win64) and C++Builder 10.1 (Win32 and Win64)
+- Delphi 10 (Win32 and Win64) and C++Builder 10 (Win32 and Win64)
+- Delphi XE8 (Win32 and Win64) and C++Builder XE8 (Win32 and Win64)
+- Delphi XE7 (Win32 and Win64) and C++Builder XE7 (Win32 and Win64)
+- Delphi XE6 (Win32 and Win64) and C++Builder XE6 (Win32 and Win64)
+- Delphi XE5 (Win32 and Win64) and C++Builder XE5 (Win32 and Win64)
+- Delphi XE4 (Win32 and Win64) and C++Builder XE4 (Win32 and Win64)
+- Delphi XE3 (Win32 and Win64) and C++Builder XE3 (Win32 and Win64)
+- Delphi XE2 and C++Builder XE2;
+- Delphi XE and C++Builder XE;
+- Delphi 2010 and C++Builder 2010;
+- Delphi 2009 and C++Builder 2009;
+- CodeGear RAD Studio 2007 (also known as Delphi 2007 for Win32, C++Builder 2007);
+- Borland Developer Studio 2006 (also known as Delphi 2006, C++Builder 2006);
+- Borland Delphi 2005;
+- Borland Delphi 7;
+- Borland Delphi 6 Update Pack #2 (including Personal Edition);
+- Borland C++ Builder 6;
+- FreePascal 2.2.
+
+For more detailed information, see docs\Readme.html.
+
+Please make sure you have installed latest update packs. You can download them
+from CodeGear Support web page: 
+  
+Delphi: http://support.codegear.com/delphi
+C++Builder: http://support.codegear.com/cppbuilder
+
+******************************* IMPORTANT **************************************
+*                                                                              *
+* If you have installed any previous version of the JCL/JVCL you have to       *
+* delete them.                                                                 *
+*                                                                              *
+*                                                                              *
+* It is also necessary to remove all installed JCL/JVCL packages from the IDE. *
+* Do not mix files or compiled packages from older versions of the JCL with    *
+* current version.                                                             *
+*                                                                              *
+********************************************************************************
+
+JEDI INSTALLER
+==============
+
+Helps you to integrate JCL with Delphi/BCB IDE. Currently it assists with:
+
+- Compiling library units (release and debug versions)
+- Compiling packages and installing design-time packages to the IDE
+- Adding sample JCL Debug extension dialogs to Object Repository
+- Adding JCL directories to Library Path / Browsing Path in Environment Options
+- Adding JCL debug .dcu directory to Debug DCU Path in Debugger Options
+- Integrating JCL help file to the IDE.
+- in undoing above changes to the IDE settings ("Uninstall", new in 1.94 final).
+
+To execute for
+
+1) Win32 and Win64
+- click on "Install.bat" file in the JCL root directory.
+
+  Note:	If you have Delphi 8 for Microsoft .NET installed, you probably will have 
+        to specify the root directory of the make.exe to use for JCL installation; 
+        on the commandline, type (for example):
+
+        >install "C:\Program Files\Borland\Delphi6"
+
+        or
+
+        >install d6
+
+--------------------------------
+Document last updated 2017-03-31

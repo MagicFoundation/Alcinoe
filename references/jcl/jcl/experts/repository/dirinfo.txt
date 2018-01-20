@@ -1,0 +1,1 @@
+This is the directory where shared units for object repository reside.

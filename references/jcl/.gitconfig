@@ -1,0 +1,3 @@
+[filter "rcs-keywords"]
+	clean=.git_filters/rcs-keywords.clean
+	smudge=.git_filters/rcs-keywords.smudge %f

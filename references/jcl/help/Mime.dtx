@@ -1,0 +1,220 @@
+@@EJclMimeError
+<GROUP MIME>
+Summary:
+  Base class for exceptions raised in response to MIME encoding/decoding errors.
+Description:
+  The EJclMimeError class is the exception class that is raised when an error occurs
+  within one of MIME-routines.
+Donator:
+  Ralf Junker
+--------------------------------------------------------------------------------
+@@MimeEncodeString
+<GROUP MIME>
+Summary:
+  MIME-Encodes a string.
+Description:
+  MimeEncodeString encodes the supplied string with a MIME64 encoding algorithm.
+Parameters:
+  s - String to be encoded.
+Result:
+  MIME encoded string.
+See also:
+  MimeDecodeString
+  MimeEncodeStream
+  MimeEncode
+  MimeEncodedSize
+Donator:
+  Ralf Junker
+--------------------------------------------------------------------------------
+@@MimeDecodeString
+<GROUP MIME>
+Summary:
+  MIME-Decodes a string.
+Description:
+  MimeDecodeString decodes the supplied MIME64-encoded string.
+Parameters:
+  s - MIME64-encoded string to be decoded.
+Result:
+  Decoded string.
+See also:
+  MimeEncodeString
+  MimeDecodeStream
+  MimeDecode
+  MimeDecodedSize
+Donator:
+  Ralf Junker
+--------------------------------------------------------------------------------
+@@MimeEncodeStream
+<GROUP MIME>
+Summary:
+  MIME-Encodes a stream.
+Description:
+  MimeEncodeStream encodes InputStream starting at the current position up to the
+  end and writes the result to OutputStream, again starting at the current
+  position. When done, it will not reset either stream's positions, but leave
+  InputStream at the last read position (i.e. the end) and OutputStream at the
+  last write position (which can, but is not always the end).
+  To encode the entire InputStream from beginning to end, make sure that its
+  offset is positioned at the beginning of the stream. You can force this by
+  issuing Seek (0, soFromBeginning) before calling this function.
+Parameters:
+  InputStream - Input stream to be encoded.
+  OutputStream - Output stream.
+See also:
+  MimeDecodeStream
+  MimeEncodeString
+  MimeEncode
+  MimeEncodedSize
+Donator:
+  Ralf Junker
+--------------------------------------------------------------------------------
+@@MimeDecodeStream
+<GROUP MIME>
+Summary:
+  Decodes a MIME-encoded stream.
+Description:
+  MimeDecodeStream decodes InputStream starting at the current position up to the
+  end and writes the result to OutputStream, again starting at the current
+  position. When done, it will not reset either stream's positions, but leave
+  InputStream at the last read position (i.e. the end) and OutputStream at the
+  last write position (which can, but is not always the end).
+  To decode the entire InputStream from beginning to end, make sure that its
+  offset is positioned at the beginning of the stream. You can force this by
+  issuing Seek (0, soFromBeginning) before calling this function.
+Parameters:
+  InputStream - Input stream to be decoded.
+  OutputStream - Output stream.
+See also:
+  MimeEncodeStream
+  MimeDecodeString
+  MimeDecode
+  MimeDecodedSize
+Donator:
+  Ralf Junker
+--------------------------------------------------------------------------------
+@@MimeEncodedSize
+<GROUP MIME>
+Summary:
+  Calculates the output size for encoding.
+Description:
+  MimeEncodedSize calculates the output size of I MimeEncoded bytes. Use for MimeEncode only.
+Parameters:
+  I - Number of bytes to encode.
+Result:
+  Number of bytes needed for encoding.
+See also:
+  MimeEncode
+  MimeDecodedSize
+Donator:
+  Ralf Junker
+--------------------------------------------------------------------------------
+@@MimeDecodedSize
+<GROUP MIME>
+Summary:
+  Calculates the output size for decoding.
+Description:
+  MimeDecodedSize calculates the maximum output size of I MimeDecoded bytes. You
+  may use it for MimeDecode to calculate the maximum amount of memory required for
+  decoding in one single pass.
+Parameters:
+  I - Number of bytes to decode.
+Result:
+  Maximum number of bytes needed for decoding.
+See also:
+  MimeDecode
+  MimeEncodedSize
+Donator:
+  Ralf Junker
+--------------------------------------------------------------------------------
+@@MimeEncode
+<GROUP MIME>
+Summary:
+  The primary Mime encoding routine.
+Description:
+  MimeEncode is the primary MIME-encoding routine and is used by MimeEncodeString
+  and MimeEncodeStream but can also be used directly.
+  CAUTION: OutputBuffer must have enough memory allocated to take all encoded
+  output. MimeEncodedSize(InputBytesCount) calculates this amount in bytes.
+  MimeEncode will then fill the entire OutputBuffer, so there is no
+  OutputBytesCount result for this procedure. Preallocating all memory at once (as
+  required by MimeEncode) avoids the time-consuming process of reallocation.
+Parameters:
+  InputBuffer - Points to the memory block to encode.
+  InputByteCount - Number of bytes to encode.
+  OutputBuffer - Points to the output buffer.
+Notes:
+  If not all data fits into memory at once, you can use MimeEncode multiple times, but you must be very careful about the size of the InputBuffer. It should be set to a number that is a multiple of 3.
+See also:
+  MimeEncodedSize
+  MimeDecode
+Donator:
+  Ralf Junker
+--------------------------------------------------------------------------------
+@@MimeDecode
+<GROUP MIME>
+Summary:
+  The primary Mime decoding routine.
+Description:
+  MimeDecode is the primary MIME-decoding routine and can also be used directly.
+  CAUTION: OutputBuffer must have enough memory allocated to take all
+  output. MimeDecodedSize(InputBytesCount) calculates this amount in bytes. There is no
+  guarantee that all output will be filled after decoding. MimeDecode therefore
+  returns the actual number of bytes written to OutputBuffer. Preallocating all
+  memory at once (as is required by MimeDecode) avoids the time-consuming process
+  of reallocation. After calling MimeDecode, simply cut the allocated memory down
+  to OutputBytesCount, i.e. SetLength(OutString, OutputBytesCount).
+Parameters:
+  InputBuffer - Points to the memory block to encode.
+  InputBytesCount - Number of bytes to encode.
+  OutputBuffer - Points to the output buffer.
+Result:
+  Number of bytes actually written to the OutputBuffer.
+See also:
+  MimeDecodedSize
+  MimeEncode
+Donator:
+  Ralf Junker
+--------------------------------------------------------------------------------
+@@MimeDecodePartial
+<GROUP MIME>
+Summary:
+  MIME decode a chunk of data in a multi-phase decoding routine.
+Description:
+  MIME decodes a chunk of data in a mutli-phase decoding routine. It is used
+  within MimeDecodeString, MimeDecodeStream, and MimeDecode, but can also be used
+  directly.
+Parameters:
+  InputBuffer - Buffer to decode.
+  InputBytesCount - Number of bytes to decode.
+  OutputBuffer - Points to the output buffer.
+  ByteBuffer - Bytes of buffer from previous call.
+  ByteBufferSpace - Number of bytes to read before ByteBuffer is full.
+Result:
+  Number of bytes actually written to the OutputBuffer.
+Notes:
+  On first call ByteBuffer should be 0 (zero) and ByteBufferSpace should be 4. The values returned in these parameters should be used in the next call to MimeDecodePartial or MimeDecodePartialEnd.
+See also:
+  MimeDecodePartialEnd
+Donator:
+  Ralf Junker
+--------------------------------------------------------------------------------
+@@MimeDecodePartialEnd
+<GROUP MIME>
+Summary:
+  MIME decode the last chunk of data in a multi-phase decoding routine.
+Description:
+  MIME decodes the last chunk of data in a mutli-phase decoding routine. It is
+  used within MimeDecodeString, MimeDecodeStream, and MimeDecode, but can also be
+  used directly.
+Parameters:
+  OutputBuffer - Points to the output buffer.
+  ByteBuffer - Bytes of buffer from previous call.
+  ByteBufferSpace - Number of bytes to read before ByteBuffer is full
+Result:
+  Number of bytes actually written to the OutputBuffer.
+Notes:
+  ByteBuffer and ByteBufferSpace are the values returned in the last call to MimeDecodePartial.
+See also:
+  MimeDecodePartial
+Donator:
+  Ralf Junker

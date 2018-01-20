@@ -1,0 +1,17 @@
+USEUNIT("..\..\experts\stacktraceviewer\JclStackTraceViewerImpl.pas");
+USEUNIT("..\..\experts\stacktraceviewer\JclStackTraceViewerExceptInfoFrame.pas");
+USEUNIT("..\..\experts\stacktraceviewer\JclStackTraceViewerStackFrame.pas");
+USEUNIT("..\..\experts\stacktraceviewer\JclStackTraceViewerThreadFrame.pas");
+USEUNIT("..\..\experts\stacktraceviewer\JclStackTraceViewerModuleFrame.pas");
+USEUNIT("..\..\experts\stacktraceviewer\JclStackTraceViewerMainFormDelphi.pas");
+USEUNIT("..\..\experts\stacktraceviewer\JclStackTraceViewerMainFrame.pas");
+USEUNIT("..\..\experts\stacktraceviewer\JclStackTraceViewerConfigFrame.pas");
+USEUNIT("..\..\experts\stacktraceviewer\JclStackTraceViewerClasses.pas");
+USEUNIT("..\..\experts\stacktraceviewer\JclStackTraceViewerStackCodeUtils.pas");
+USEUNIT("..\..\experts\stacktraceviewer\JclStackTraceViewerOptions.pas");
+USEUNIT("..\..\experts\stacktraceviewer\JclStackTraceViewerAPIImpl.pas");
+USEUNIT("..\..\experts\stacktraceviewer\JclStackTraceViewerAPI.pas");
+USEUNIT("..\..\experts\stacktraceviewer\JclStackTraceViewerStackUtils.pas");
+USEDEF("JclStackTraceViewerExpertDLL.def");
+Project file
+DllEntryPoint

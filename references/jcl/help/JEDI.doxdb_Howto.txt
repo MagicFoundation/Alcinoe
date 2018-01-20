@@ -1,0 +1,5 @@
+To create JEDI.doxdb, compile and execute XmlLinks.exe, its project file is located at http://projectjedi.svn.sf.net/viewvc/projectjedi/trunk/helpsync/DocOMaticTools/xmllinks/
+
+Compile the Doc-o-Matic help project JEDI.dox located http://projectjedi.svn.sf.net/viewvc/projectjedi/trunk/shared/help/
+
+Then execute: XMLLinks JEDI.dox XML "JEDI_Help:%id"

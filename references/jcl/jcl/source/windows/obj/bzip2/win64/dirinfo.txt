@@ -1,0 +1,1 @@
+This is the directory where object files of bzip (http://www.bzip.org) for win64 reside.

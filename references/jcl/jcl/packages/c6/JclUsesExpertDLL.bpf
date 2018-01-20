@@ -1,0 +1,6 @@
+USEUNIT("..\..\experts\useswizard\JCLUsesWizard.pas");
+USEUNIT("..\..\experts\useswizard\JCLOptionsFrame.pas");
+USEUNIT("..\..\experts\useswizard\JclUsesDialog.pas");
+USEDEF("JclUsesExpertDLL.def");
+Project file
+DllEntryPoint

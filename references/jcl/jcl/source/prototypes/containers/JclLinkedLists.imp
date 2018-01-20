@@ -1,0 +1,968 @@
+(*$JPPDEFINEMACRO JCLLINKEDLISTITRIMP(SELFCLASSNAME, ITRINTERFACENAME, LISTCLASSNAME, EQUALITYCOMPARERINTERFACENAME,
+  ITEMCLASSNAME, CONSTKEYWORD, PARAMETERNAME, TYPENAME, DEFAULTVALUE, GETTERFUNCTIONNAME, SETTERPROCEDURENAME, RELEASERCALL)
+//=== { SELFCLASSNAME } ============================================================
+
+constructor SELFCLASSNAME.Create(AOwnList: LISTCLASSNAME; ACursor: ITEMCLASSNAME; AValid: Boolean; AStart: TItrStart);
+begin
+  inherited Create(AValid);
+  FCursor := ACursor;
+  FOwnList := AOwnList;
+  FStart := AStart;
+  FEqualityComparer := AOwnList as EQUALITYCOMPARERINTERFACENAME;
+end;
+
+function SELFCLASSNAME.Add(CONSTKEYWORDPARAMETERNAME: TYPENAME): Boolean;
+begin
+  Result := FOwnList.Add(PARAMETERNAME);
+end;
+
+procedure SELFCLASSNAME.AssignPropertiesTo(Dest: TJclAbstractIterator);
+var
+  ADest: SELFCLASSNAME;
+begin
+  inherited AssignPropertiesTo(Dest);
+  if Dest is SELFCLASSNAME then
+  begin
+    ADest := SELFCLASSNAME(Dest);
+    ADest.FCursor := FCursor;
+    ADest.FOwnList := FOwnList;
+    ADest.FEqualityComparer := FEqualityComparer;
+    ADest.FStart := FStart;
+  end;
+end;
+
+function SELFCLASSNAME.CreateEmptyIterator: TJclAbstractIterator;
+begin
+  Result := SELFCLASSNAME.Create(FOwnList, FCursor, Valid, FStart);
+end;
+
+procedure SELFCLASSNAME.Extract;
+var
+  OldCursor: ITEMCLASSNAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO DELEGATELOCK(FOwnList)}
+    CheckValid;
+    Valid := False;
+    if FCursor <> nil then
+    begin
+      if FCursor.Next <> nil then
+        FCursor.Next.Previous := FCursor.Previous;
+      if FCursor.Previous <> nil then
+        FCursor.Previous.Next := FCursor.Next;
+      OldCursor := FCursor;
+      FCursor := FCursor.Next;
+      OldCursor.Free;
+    end;
+  {$JPPEXPANDMACRO DELEGATEUNLOCK(FOwnList)}
+end;
+
+function SELFCLASSNAME.GETTERFUNCTIONNAME: TYPENAME;
+begin
+  CheckValid;
+  Result := DEFAULTVALUE;
+  if FCursor <> nil then
+    Result := FCursor.Value
+  else
+  if not FOwnList.ReturnDefaultElements then
+    raise EJclNoSuchElementError.Create('');
+end;
+
+function SELFCLASSNAME.HasNext: Boolean;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO DELEGATELOCK(FOwnList)}
+    if Valid then
+      Result := (FCursor <> nil) and (FCursor.Next <> nil)
+    else
+      Result := FCursor <> nil;
+  {$JPPEXPANDMACRO DELEGATEUNLOCK(FOwnList)}
+end;
+
+function SELFCLASSNAME.HasPrevious: Boolean;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO DELEGATELOCK(FOwnList)}
+    if Valid then
+      Result := (FCursor <> nil) and (FCursor.Previous <> nil)
+    else
+      Result := FCursor <> nil;
+  {$JPPEXPANDMACRO DELEGATEUNLOCK(FOwnList)}
+end;
+
+function SELFCLASSNAME.Insert(CONSTKEYWORDPARAMETERNAME: TYPENAME): Boolean;
+var
+  NewCursor: ITEMCLASSNAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO DELEGATELOCK(FOwnList)}
+    CheckValid;
+    Result := FCursor <> nil;
+    if Result then
+    begin
+      Result := FOwnList.AllowDefaultElements or not FEqualityComparer.ItemsEqual(PARAMETERNAME, DEFAULTVALUE);
+      if Result then
+      begin
+        case FOwnList.Duplicates of
+          dupIgnore:
+            Result := not FOwnList.Contains(PARAMETERNAME);
+          dupAccept:
+            Result := True;
+          dupError:
+            begin
+              Result := FOwnList.Contains(PARAMETERNAME);
+              if not Result then
+                raise EJclDuplicateElementError.Create;
+            end;
+        end;
+        if Result then
+        begin
+          NewCursor := ITEMCLASSNAME.Create;
+          NewCursor.Value := PARAMETERNAME;
+          NewCursor.Next := FCursor;
+          NewCursor.Previous := FCursor.Previous;
+          if FCursor.Previous <> nil then
+            FCursor.Previous.Next := NewCursor;
+          FCursor.Previous := NewCursor;
+          FCursor := NewCursor;
+        end;
+      end;
+    end;
+  {$JPPEXPANDMACRO DELEGATEUNLOCK(FOwnList)}
+end;
+
+function SELFCLASSNAME.IteratorEquals(const AIterator: ITRINTERFACENAME): Boolean;
+var
+  Obj: TObject;
+  ItrObj: SELFCLASSNAME;
+begin
+  Result := False;
+  if AIterator = nil then
+    Exit;
+  Obj := AIterator.GetIteratorReference;
+  if Obj is SELFCLASSNAME then
+  begin
+    ItrObj := SELFCLASSNAME(Obj);
+    Result := (FOwnList = ItrObj.FOwnList) and (FCursor = ItrObj.FCursor) and (Valid = ItrObj.Valid);
+  end;
+end;
+
+{$IFDEF SUPPORTS_FOR_IN}
+function SELFCLASSNAME.MoveNext: Boolean;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO DELEGATELOCK(FOwnList)}
+    if Valid and (FCursor <> nil) then
+      FCursor := FCursor.Next
+    else
+      Valid := True;
+    Result := FCursor <> nil;
+  {$JPPEXPANDMACRO DELEGATEUNLOCK(FOwnList)}
+end;
+{$ENDIF SUPPORTS_FOR_IN}
+
+function SELFCLASSNAME.Next: TYPENAME;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO DELEGATELOCK(FOwnList)}
+    if Valid and (FCursor <> nil) then
+      FCursor := FCursor.Next
+    else
+      Valid := True;
+    if FCursor <> nil then
+      Result := FCursor.Value
+    else
+      Result := DEFAULTVALUE;
+  {$JPPEXPANDMACRO DELEGATEUNLOCK(FOwnList)}
+end;
+
+function SELFCLASSNAME.NextIndex: Integer;
+begin
+  // No Index
+  raise EJclOperationNotSupportedError.Create;
+end;
+
+function SELFCLASSNAME.Previous: TYPENAME;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO DELEGATELOCK(FOwnList)}
+    if Valid and (FCursor <> nil) then
+      FCursor := FCursor.Previous
+    else
+      Valid := True;
+    if FCursor <> nil then
+      Result := FCursor.Value
+    else
+      Result := DEFAULTVALUE;
+  {$JPPEXPANDMACRO DELEGATEUNLOCK(FOwnList)}
+end;
+
+function SELFCLASSNAME.PreviousIndex: Integer;
+begin
+  // No Index
+  raise EJclOperationNotSupportedError.Create;
+end;
+
+procedure SELFCLASSNAME.Remove;
+var
+  OldCursor: ITEMCLASSNAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO DELEGATELOCK(FOwnList)}
+    CheckValid;
+    Valid := False;
+    if FCursor <> nil then
+    begin
+      RELEASERCALL
+      if FCursor.Next <> nil then
+        FCursor.Next.Previous := FCursor.Previous;
+      if FCursor.Previous <> nil then
+        FCursor.Previous.Next := FCursor.Next;
+      OldCursor := FCursor;
+      FCursor := FCursor.Next;
+      OldCursor.Free;
+    end;
+  {$JPPEXPANDMACRO DELEGATEUNLOCK(FOwnList)}
+end;
+
+procedure SELFCLASSNAME.Reset;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO DELEGATELOCK(FOwnList)}
+    Valid := False;
+    case FStart of
+      isFirst:
+        begin
+          while (FCursor <> nil) and (FCursor.Previous <> nil) do
+            FCursor := FCursor.Previous;
+        end;
+      isLast:
+        begin
+          while (FCursor <> nil) and (FCursor.Next <> nil) do
+            FCursor := FCursor.Next;
+        end;
+    end;
+  {$JPPEXPANDMACRO DELEGATEUNLOCK(FOwnList)}
+end;
+
+procedure SELFCLASSNAME.SETTERPROCEDURENAME(CONSTKEYWORDPARAMETERNAME: TYPENAME);
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO DELEGATELOCK(FOwnList)}
+    CheckValid;
+    RELEASERCALL
+    FCursor.Value := PARAMETERNAME;
+  {$JPPEXPANDMACRO DELEGATEUNLOCK(FOwnList)}
+end;*)
+(*$JPPDEFINEMACRO JCLLINKEDLISTIMP(SELFCLASSNAME, ITEMCLASSNAME, COLLECTIONINTERFACENAME, LISTINTERFACENAME, ITRINTERFACENAME, ITRCLASSNAME,
+  OWNERSHIPDECLARATION, OWNERSHIPPARAMETERNAME,
+  CONSTKEYWORD, PARAMETERNAME, TYPENAME, DEFAULTVALUE, GETTERFUNCTIONNAME, SETTERPROCEDURENAME, RELEASERFUNCTIONNAME)
+//=== { SELFCLASSNAME } ==================================================
+
+constructor SELFCLASSNAME.Create(const ACollection: COLLECTIONINTERFACENAMEOWNERSHIPDECLARATION);
+begin
+  inherited Create(OWNERSHIPPARAMETERNAME);
+  FStart := nil;
+  FEnd := nil;
+  if ACollection <> nil then
+    AddAll(ACollection);
+end;
+
+destructor SELFCLASSNAME.Destroy;
+begin
+  FReadOnly := False;
+  Clear;
+  inherited Destroy;
+end;
+
+function SELFCLASSNAME.Add(CONSTKEYWORDPARAMETERNAME: TYPENAME): Boolean;
+var
+  NewItem: ITEMCLASSNAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := FAllowDefaultElements or not ItemsEqual(PARAMETERNAME, DEFAULTVALUE);
+    if Result then
+    begin
+      if FDuplicates <> dupAccept then
+      begin
+        NewItem := FStart;
+        while NewItem <> nil do
+        begin
+          if ItemsEqual(PARAMETERNAME, NewItem.Value) then
+          begin
+            Result := CheckDuplicate;
+            Break;
+          end;
+          NewItem := NewItem.Next;
+        end;
+      end;
+      if Result then
+      begin
+        NewItem := ITEMCLASSNAME.Create;
+        NewItem.Value := PARAMETERNAME;
+        if FStart <> nil then
+        begin
+          NewItem.Next := nil;
+          NewItem.Previous := FEnd;
+          FEnd.Next := NewItem;
+          FEnd := NewItem;
+        end
+        else
+        begin
+          FStart := NewItem;
+          FEnd := NewItem;
+        end;
+        Inc(FSize);
+      end;
+    end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.AddAll(const ACollection: COLLECTIONINTERFACENAME): Boolean;
+var
+  It: ITRINTERFACENAME;
+  Item: TYPENAME;
+  AddItem: Boolean;
+  NewItem: ITEMCLASSNAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := False;
+    if ACollection = nil then
+      Exit;
+    Result := True;
+    It := ACollection.First;
+    while It.HasNext do
+    begin
+      Item := It.Next;
+      AddItem := FAllowDefaultElements or not ItemsEqual(Item, DEFAULTVALUE);
+      if AddItem then
+      begin
+        if FDuplicates <> dupAccept then
+        begin
+          NewItem := FStart;
+          while NewItem <> nil do
+          begin
+            if ItemsEqual(Item, NewItem.Value) then
+            begin
+              AddItem := CheckDuplicate;
+              Break;
+            end;
+            NewItem := NewItem.Next;
+          end;
+        end;
+        if AddItem then
+        begin
+          NewItem := ITEMCLASSNAME.Create;
+          NewItem.Value := Item;
+          if FStart <> nil then
+          begin
+            NewItem.Next := nil;
+            NewItem.Previous := FEnd;
+            FEnd.Next := NewItem;
+            FEnd := NewItem;
+          end
+          else
+          begin
+            FStart := NewItem;
+            FEnd := NewItem;
+          end;
+          Inc(FSize);
+        end;
+      end;
+      Result := AddItem and Result;
+    end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+procedure SELFCLASSNAME.AssignDataTo(Dest: TJclAbstractContainerBase);
+var
+  ACollection: COLLECTIONINTERFACENAME;
+begin
+  inherited AssignDataTo(Dest);
+  if Supports(IInterface(Dest), COLLECTIONINTERFACENAME, ACollection) then
+  begin
+    ACollection.Clear;
+    ACollection.AddAll(Self);
+  end;
+end;
+
+procedure SELFCLASSNAME.Clear;
+var
+  Old, Current: ITEMCLASSNAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Current := FStart;
+    while Current <> nil do
+    begin
+      RELEASERFUNCTIONNAME(Current.Value);
+      Old := Current;
+      Current := Current.Next;
+      Old.Free;
+    end;
+    FSize := 0;
+
+    //Daniele Teti 27/12/2004
+    FStart := nil;
+    FEnd := nil;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.CollectionEquals(const ACollection: COLLECTIONINTERFACENAME): Boolean;
+var
+  It, ItSelf: ITRINTERFACENAME;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := False;
+    if ACollection = nil then
+      Exit;
+    if FSize <> ACollection.Size then
+      Exit;
+    Result := True;
+    It := ACollection.First;
+    ItSelf := First;
+    while ItSelf.HasNext and It.HasNext do
+      if not ItemsEqual(ItSelf.Next, It.Next) then
+      begin
+        Result := False;
+        Break;
+      end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.Contains(CONSTKEYWORDPARAMETERNAME: TYPENAME): Boolean;
+var
+  Current: ITEMCLASSNAME;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := False;
+    Current := FStart;
+    while Current <> nil do
+    begin
+      if ItemsEqual(Current.Value, PARAMETERNAME) then
+      begin
+        Result := True;
+        Break;
+      end;
+      Current := Current.Next;
+    end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.ContainsAll(const ACollection: COLLECTIONINTERFACENAME): Boolean;
+var
+  It: ITRINTERFACENAME;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := False;
+    if ACollection = nil then
+      Exit;
+    Result := True;
+    It := ACollection.First;
+    while Result and It.HasNext do
+      Result := Contains(It.Next);
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.Delete(Index: Integer): TYPENAME;
+var
+  Current: ITEMCLASSNAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := DEFAULTVALUE;
+    if (Index >= 0) and (Index < FSize) then
+    begin
+      Current := FStart;
+      while Current <> nil do
+      begin
+        if Index = 0 then
+        begin
+          if Current.Previous <> nil then
+            Current.Previous.Next := Current.Next
+          else
+            FStart := Current.Next;
+          if Current.Next <> nil then
+            Current.Next.Previous := Current.Previous
+          else
+            FEnd := Current.Previous;
+          Result := RELEASERFUNCTIONNAME(Current.Value);
+          Current.Free;
+          Dec(FSize);
+          Break;
+        end;
+        Dec(Index);
+        Current := Current.Next;
+      end;
+    end
+    else
+      raise EJclOutOfBoundsError.Create;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.Extract(CONSTKEYWORDPARAMETERNAME: TYPENAME): Boolean;
+var
+  Current: ITEMCLASSNAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := False;
+    Current := FStart;
+    while Current <> nil do
+    begin
+      if ItemsEqual(Current.Value, PARAMETERNAME) then
+      begin
+        if Current.Previous <> nil then
+          Current.Previous.Next := Current.Next
+        else
+          FStart := Current.Next;
+        if Current.Next <> nil then
+          Current.Next.Previous := Current.Previous
+        else
+          FEnd := Current.Previous;
+        Current.Value := DEFAULTVALUE;
+        Current.Free;
+        Dec(FSize);
+        Result := True;
+        if FRemoveSingleElement then
+          Break;
+      end;
+      Current := Current.Next;
+    end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.ExtractAll(const ACollection: COLLECTIONINTERFACENAME): Boolean;
+var
+  It: ITRINTERFACENAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := True;
+    if ACollection = nil then
+      Exit;
+    It := ACollection.First;
+    while It.HasNext do
+      Result := Extract(It.Next) and Result;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.ExtractIndex(Index: Integer): TYPENAME;
+var
+  Current: ITEMCLASSNAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := DEFAULTVALUE;
+    if (Index >= 0) and (Index < FSize) then
+    begin
+      Current := FStart;
+      while Current <> nil do
+      begin
+        if Index = 0 then
+        begin
+          if Current.Previous <> nil then
+            Current.Previous.Next := Current.Next
+          else
+            FStart := Current.Next;
+          if Current.Next <> nil then
+            Current.Next.Previous := Current.Previous
+          else
+            FEnd := Current.Previous;
+          Result := Current.Value;
+          Current.Free;
+          Dec(FSize);
+          Break;
+        end;
+        Dec(Index);
+        Current := Current.Next;
+      end;
+    end
+    else
+      raise EJclOutOfBoundsError.Create;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.First: ITRINTERFACENAME;
+begin
+  Result := ITRCLASSNAME.Create(Self, FStart, False, isFirst);
+end;
+
+{$IFDEF SUPPORTS_FOR_IN}
+function SELFCLASSNAME.GetEnumerator: ITRINTERFACENAME;
+begin
+  Result := ITRCLASSNAME.Create(Self, FStart, False, isFirst);
+end;
+{$ENDIF SUPPORTS_FOR_IN}
+
+function SELFCLASSNAME.GETTERFUNCTIONNAME(Index: Integer): TYPENAME;
+var
+  Current: ITEMCLASSNAME;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := DEFAULTVALUE;
+    Current := FStart;
+    while (Current <> nil) and (Index > 0) do
+    begin
+      Current := Current.Next;
+      Dec(Index);
+    end;
+    if Current <> nil then
+      Result := Current.Value
+    else
+    if not FReturnDefaultElements then
+      raise EJclNoSuchElementError.Create('');
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.IndexOf(CONSTKEYWORDPARAMETERNAME: TYPENAME): Integer;
+var
+  Current: ITEMCLASSNAME;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO LOCK}
+    Current := FStart;
+    Result := 0;
+    while (Current <> nil) and not ItemsEqual(Current.Value, PARAMETERNAME) do
+    begin
+      Inc(Result);
+      Current := Current.Next;
+    end;
+    if Current = nil then
+      Result := -1;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.Insert(Index: Integer; CONSTKEYWORDPARAMETERNAME: TYPENAME): Boolean;
+var
+  Current, NewItem: ITEMCLASSNAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := FAllowDefaultElements or not ItemsEqual(PARAMETERNAME, DEFAULTVALUE);
+    if (Index < 0) or (Index > FSize) then
+      raise EJclOutOfBoundsError.Create;
+    if Result then
+    begin
+      if FDuplicates <> dupAccept then
+      begin
+        Current := FStart;
+        while Current <> nil do
+        begin
+          if ItemsEqual(PARAMETERNAME, Current.Value) then
+          begin
+            Result := CheckDuplicate;
+            Break;
+          end;
+          Current := Current.Next;
+        end;
+      end;
+      if Result then
+      begin
+        NewItem := ITEMCLASSNAME.Create;
+        NewItem.Value := PARAMETERNAME;
+        if Index = 0 then
+        begin
+          NewItem.Next := FStart;
+          if FStart <> nil then
+            FStart.Previous := NewItem;
+          FStart := NewItem;
+          if FSize = 0 then
+            FEnd := NewItem;
+          Inc(FSize);
+        end
+        else
+        if Index = FSize then
+        begin
+          NewItem.Previous := FEnd;
+          FEnd.Next := NewItem;
+          FEnd := NewItem;
+          Inc(FSize);
+        end
+        else
+        begin
+          Current := FStart;
+          while (Current <> nil) and (Index > 0) do
+          begin
+            Current := Current.Next;
+            Dec(Index);
+          end;
+          if Current <> nil then
+          begin
+            NewItem.Next := Current;
+            NewItem.Previous := Current.Previous;
+            if Current.Previous <> nil then
+              Current.Previous.Next := NewItem;
+            Current.Previous := NewItem;
+            Inc(FSize);
+          end;
+        end;
+      end;
+    end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.InsertAll(Index: Integer; const ACollection: COLLECTIONINTERFACENAME): Boolean;
+var
+  It: ITRINTERFACENAME;
+  Current, NewItem, Test: ITEMCLASSNAME;
+  AddItem: Boolean;
+  Item: TYPENAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := False;
+    if (Index < 0) or (Index > FSize) then
+      raise EJclOutOfBoundsError.Create;
+    if ACollection = nil then
+      Exit;
+    Result := True;
+    if Index = 0 then
+    begin
+      It := ACollection.Last;
+      while It.HasPrevious do
+      begin
+        Item := It.Previous;
+        AddItem := FAllowDefaultElements or not ItemsEqual(Item, DEFAULTVALUE);
+        if AddItem then
+        begin
+          if FDuplicates <> dupAccept then
+          begin
+            Test := FStart;
+            while Test <> nil do
+            begin
+              if ItemsEqual(Item, Test.Value) then
+              begin
+                Result := CheckDuplicate;
+                Break;
+              end;
+              Test := Test.Next;
+            end;
+          end;
+          if AddItem then
+          begin
+            NewItem := ITEMCLASSNAME.Create;
+            NewItem.Value := Item;
+            NewItem.Next := FStart;
+            if FStart <> nil then
+              FStart.Previous := NewItem;
+            FStart := NewItem;
+            if FSize = 0 then
+              FEnd := NewItem;
+            Inc(FSize);
+          end;
+        end;
+        Result := Result and AddItem;
+      end;
+    end
+    else
+    if Index = Size then
+    begin
+      It := ACollection.First;
+      while It.HasNext do
+      begin
+        Item := It.Next;
+        AddItem := FAllowDefaultElements or not ItemsEqual(Item, DEFAULTVALUE);
+        if AddItem then
+        begin
+          if FDuplicates <> dupAccept then
+          begin
+            Test := FStart;
+            while Test <> nil do
+            begin
+              if ItemsEqual(Item, Test.Value) then
+              begin
+                Result := CheckDuplicate;
+                Break;
+              end;
+              Test := Test.Next;
+            end;
+          end;
+          if AddItem then
+          begin
+            NewItem := ITEMCLASSNAME.Create;
+            NewItem.Value := Item;
+            NewItem.Previous := FEnd;
+            if FEnd <> nil then
+              FEnd.Next := NewItem;
+            FEnd := NewItem;
+            Inc(FSize);
+          end;
+        end;
+        Result := Result and AddItem;
+      end;
+    end
+    else
+    begin
+      Current := FStart;
+      while (Current <> nil) and (Index > 0) do
+      begin
+        Current := Current.Next;
+        Dec(Index);
+      end;
+      if Current <> nil then
+      begin
+        It := ACollection.First;
+        while It.HasNext do
+        begin
+          Item := It.Next;
+          AddItem := FAllowDefaultElements or not ItemsEqual(Item, DEFAULTVALUE);
+          if AddItem then
+          begin
+            if FDuplicates <> dupAccept then
+            begin
+              Test := FStart;
+              while Test <> nil do
+              begin
+                if ItemsEqual(Item, Test.Value) then
+                begin
+                  Result := CheckDuplicate;
+                  Break;
+                end;
+                Test := Test.Next;
+              end;
+            end;
+            if AddItem then
+            begin
+              NewItem := ITEMCLASSNAME.Create;
+              NewItem.Value := Item;
+              NewItem.Next := Current;
+              NewItem.Previous := Current.Previous;
+              if Current.Previous <> nil then
+                Current.Previous.Next := NewItem;
+              Current.Previous := NewItem;
+              Inc(FSize);
+            end;
+          end;
+          Result := Result and AddItem;
+        end;
+      end;
+    end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.IsEmpty: Boolean;
+begin
+  Result := FSize = 0;
+end;
+
+function SELFCLASSNAME.Last: ITRINTERFACENAME;
+begin
+  Result := ITRCLASSNAME.Create(Self, FEnd, False, isLast);
+end;
+
+function SELFCLASSNAME.LastIndexOf(CONSTKEYWORDPARAMETERNAME: TYPENAME): Integer;
+var
+  Current: ITEMCLASSNAME;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := -1;
+    if FEnd <> nil then
+    begin
+      Current := FEnd;
+      Result := FSize - 1;
+      while (Current <> nil) and not ItemsEqual(Current.Value, PARAMETERNAME) do
+      begin
+        Dec(Result);
+        Current := Current.Previous;
+      end;
+      if Current = nil then
+        Result := -1;
+    end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.Remove(CONSTKEYWORDPARAMETERNAME: TYPENAME): Boolean;
+var
+  Extracted: TYPENAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := Extract(PARAMETERNAME);
+    if Result then
+    begin
+      Extracted := PARAMETERNAME;
+      RELEASERFUNCTIONNAME(Extracted);
+    end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.RemoveAll(const ACollection: COLLECTIONINTERFACENAME): Boolean;
+var
+  It: ITRINTERFACENAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := True;
+    if ACollection = nil then
+      Exit;
+    It := ACollection.First;
+    while It.HasNext do
+      Result := Remove(It.Next) and Result;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.RetainAll(const ACollection: COLLECTIONINTERFACENAME): Boolean;
+var
+  It: ITRINTERFACENAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := False;
+    if ACollection = nil then
+      Exit;
+    Result := True;
+    It := First;
+    while It.HasNext do
+      if not ACollection.Contains(It.Next) then
+        It.Remove;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+procedure SELFCLASSNAME.SETTERPROCEDURENAME(Index: Integer; CONSTKEYWORDPARAMETERNAME: TYPENAME);
+var
+  Current: ITEMCLASSNAME;
+  ReplaceItem: Boolean;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    ReplaceItem := FAllowDefaultElements or not ItemsEqual(PARAMETERNAME, DEFAULTVALUE);
+    if ReplaceItem then
+    begin
+      if FDuplicates <> dupAccept then
+      begin
+        Current := FStart;
+        while Current <> nil do
+        begin
+          if ItemsEqual(PARAMETERNAME, Current.Value) then
+          begin
+            ReplaceItem := CheckDuplicate;
+            Break;
+          end;
+          Current := Current.Next;
+        end;
+      end;
+      if ReplaceItem then
+      begin
+        Current := FStart;
+        while Current <> nil do
+        begin
+          if Index = 0 then
+          begin
+            RELEASERFUNCTIONNAME(Current.Value);
+            Current.Value := PARAMETERNAME;
+            Break;
+          end;
+          Dec(Index);
+          Current := Current.Next;
+        end;
+      end;
+    end;
+    if not ReplaceItem then
+      Delete(Index);
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.Size: Integer;
+begin
+  Result := FSize;
+end;
+
+function SELFCLASSNAME.SubList(First, Count: Integer): LISTINTERFACENAME;
+var
+  Current: ITEMCLASSNAME;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := CreateEmptyContainer as LISTINTERFACENAME;
+    Current := FStart;
+    while (Current <> nil) and (First > 0) do
+    begin
+      Dec(First);
+      Current := Current.Next;
+    end;
+    while (Current <> nil) and (Count > 0) do
+    begin
+      Result.Add(Current.Value);
+      Dec(Count);
+      Current := Current.Next;
+    end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;*)

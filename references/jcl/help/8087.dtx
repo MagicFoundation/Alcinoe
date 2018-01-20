@@ -1,0 +1,445 @@
+@@Jcl8087.pas
+Summary:
+  Unit Jcl8087 contains various routine for manipulating the math coprocessor.
+  This includes such things as querying and setting the rounding precision of
+  floating point operations and retrieving the coprocessor's status word.
+--------------------------------------------------------------------------------
+@@MathRoutines.Hardware
+<GROUP MathRoutines>
+<TITLE Hardware>
+<TOPICORDER 600>
+--------------------------------------------------------------------------------
+@@T8087Exception
+Summary:
+  An enumeration describing the set of available FPU exception masks.
+Description:
+  An enumeration which describes the set of available FPU
+  exception masks. Note that you can use the All8087Exceptions
+  constant whenever you need a set which includes all exception
+  flags.
+Donator:
+  Robert Rossmair
+@@T8087Exception.emInvalidOp
+  Invalid operation mask.
+@@T8087Exception.emDenormalizedOperand
+  Denormalized operation mask.
+@@T8087Exception.emZeroDivide
+  Division by zero mask.
+@@T8087Exception.emOverflow
+  Overflow mask.
+@@T8087Exception.emUnderflow
+  Underflow mask.
+@@T8087Exception.emPrecision
+  Precision error mask.
+@@T8087Exceptions
+<COMBINE T8087Exception>
+<GROUP MathRoutines.Hardware>
+--------------------------------------------------------------------------------
+@@All8087Exceptions
+Summary:
+  A set containing all FPU exception flags.
+Description:
+  All8087Exceptions is a pre-initialized set which contains all
+  of the available FPU exception flags (from the T8087Exception enumeration).
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@ClearPending8087Exceptions
+<GROUP MathRoutines.Hardware>
+Summary:
+  Clears all pending FPU exceptions.
+Description:
+  The ClearPending8087Exceptions function clears all pending FPU exceptions.
+Result:
+  The result is the set of exception flags that were set before the entire mask was cleared.
+See also:
+  T8087Exceptions
+  GetPending8087Exceptions
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@GetPending8087Exceptions
+Summary:
+  Returns a set of pending FPU exception flags.
+Description:
+  The GetPending8087Exceptions routine returns a set of flags
+  representing the pending FPU exceptions. Note that the
+  pending exceptions are not cleared. To get the pending
+  exceptions and clear them use the ClearPending8087Exceptions
+  routine.
+Result:
+  The result is the set of pending FPU exceptions.
+See also:
+  T8087Exceptions
+  ClearPending8087Exceptions
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@GetMasked8087Exceptions
+<GROUP MathRoutines.Hardware>
+Summary:
+  Returns the set of masked FPU exceptions.
+Description:
+  GetMasked8087Exceptions returns a set of flags representing the FPU exceptions
+  that are currently masked (i.e. the exceptions ignored by the FPU).
+Result:
+  The result is the set of masked FPU exceptions.
+See also
+  T8087Exceptions
+  SetMasked8087Exceptions
+  Unmask8087Exceptions
+  Mask8087Exceptions
+Donator
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@SetMasked8087Exceptions
+Summary:
+  Sets the FPU exception mask.
+Description
+  The SetMasked8087Exceptions routine sets the masked exception
+  flags of the FPU's control word. In effect this means that
+  afterwards the FPU no longer raises an exception of the kind
+  included in the Exceptions parameter, instead it ignores the
+  error situation. Note that by default exceptions previously
+  masked are cleared if they do not appear in the Exception
+  parameter.
+Parameters:
+  Exceptions  - Set of exceptions to mask.
+  ClearBefore - If set to True the routine clears pending exceptions, if any, before modifying the
+                exception mask. This is the default behavior. If set to False the routine does not
+                clear pending exceptions.
+Result:
+  The result is the exception mask before it was modified.
+See also:
+  T8087Exceptions
+  GetMasked8087Exceptions
+  Unmask8087Exceptions
+  Mask8087Exceptions
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@Mask8087Exceptions
+Summary:
+  Masks additional exceptions.
+Description:
+  Mask8087Exceptions masks the exceptions specified by the
+  Exceptions parameter. Unlike SetMasked8087Exceptions
+  the original exception mask is left intact. For example, if
+  the current exception mask equals [emInvalidOp,
+  emDenormalizedOperand], and you call
+  Mask8087Exceptions([emZeroDivide]), then upon return the
+  exception mask equals [emInvalidOp, emDenormalizedOperand,
+  emZeroDivide].
+Parameters:
+  Exceptions - Exceptions to be masked.
+Result:
+  The set of exceptions that were masked upon routine entry.
+  Upon exit the set of masked exceptions equals Result plus
+  Exceptions.
+See also:
+  T8087Exceptions
+  Unmask8087Exceptions
+  GetMasked8087Exceptions
+  SetMasked8087Exceptions
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@Unmask8087Exceptions
+Summary:
+  Unmasks the specified exceptions.
+Description:
+  The Unmask8087Exceptions routine unmasks the exceptions
+  specified by the Exceptions parameter. Note that exceptions
+  not included in the Exceptions parameter are left unchanged,
+  unlike SetMasked8087Exceptions which modifies the entire mask.
+Parameters:
+  Exceptions  - Exceptions to be unmasked.
+  ClearBefore - If set to True any pending exceptions are
+                cleared before the routine returns, if set to
+                False pending exceptions are not cleared.
+Result:
+  The set of exceptions that were masked upon routine entry.
+  Upon exit the set of masked exceptions equals Result minus
+  Exceptions.
+See also:
+  T8087Exceptions
+  Mask8087Exceptions
+  GetMasked8087Exceptions
+  SetMasked8087Exceptions
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@T8087Precision
+<GROUP MathRoutines.Hardware>
+Summary:
+  Used for retrieving and setting the FPU precision control.
+Description:
+  T8087Precision is an enumeration used to set and retrieve the FPU precision control.
+Donator:
+  Marcel van Brakel
+@@T8087Precision.pcSingle
+  Single precision (short).
+@@T8087Precision.pcReserved
+  Reserved, never actually used (convenience).
+@@T8087Precision.pcDouble
+  Double precision (long).
+@@T8087Precision.pcExtended
+  Extended precision (temporary).
+--------------------------------------------------------------------------------
+@@T8087Rounding
+<GROUP MathRoutines.Hardware>
+Summary:
+  Enumeration used for retrieving and setting the FPU rounding control.
+Description:
+  T8087Rounding is an enumeration used to set and retrieve the FPU rounding control.
+See also:
+  Get8087Rounding
+  Set8087Rounding
+Donator:
+  Marcel van Brakel
+@@T8087Rounding.rcNearestOrEven
+  Rounds to the nearest or even.
+@@T8087Rounding.rcDownInfinity
+  Rounds down towards negative infinity.
+@@T8087Rounding.rcUpInfinity
+  Rounds up towards positive infinity.
+@@T8087Rounding.rcChopOrTruncate
+  Chops or truncates towards zero.
+--------------------------------------------------------------------------------
+@@T8087Infinity
+<GROUP MathRoutines.Hardware>
+Summary:
+  Enumeration used for retrieving and setting the FPU infinity control.
+Description:
+  T8087Infinity is an enumeration used to set and retrieve the FPU infinity control.
+See also:
+  Set8087Infinity
+  Set8087Precision
+Donator:
+  Marcel van Brakel
+@@T8087Infinity.icProjective
+  Infinity is always assumed to be unsigned.
+@@T8087Infinity.icAffine
+  Allows positive and negative infinity.
+--------------------------------------------------------------------------------
+@@Set8087Infinity
+Description:
+  Set8087Infinity adjusts the infinity control setting of the
+  mathematical coprocessor.
+Summary:
+  Sets the infinity control of the FPU.
+Notes:
+  This setting doesn't actually affect the way the FPU works.
+  The infinity control flag is provided for compatibility with the
+  Intel 287 Math Coprocessor; it is not meaningful for later
+  version x87 FPU coprocessors or 32 bit Intel architecture
+  processors.
+Parameters:
+  Infinity - New value for the infinity control of the FPU. See
+             T8087Infinity for the possible values and their meaning.
+Result:
+  Returns the previous infinity setting of the FPU.
+See also:
+  Set8087Precision
+  Set8087Rounding
+  Get8087Infinity
+  Get8087Precision
+  Get8087Rounding
+  Get8087ControlWord
+  Set8087ControlWord
+Donator
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@Set8087Precision
+Summary:
+  Sets the precision control of the FPU.
+Description:
+  Set8087Precision adjusts the precision control setting of the
+  mathematical coprocessor.
+Parameters:
+  Precision - New value for the precision control of the FPU.
+              See T8087Precision for the possible values
+              and their meaning.
+Result:
+  Returns the previous precision setting of the FPU.
+See also:
+  Set8087Infinity
+  Set8087Rounding
+  Get8087Infinity
+  Get8087Precision
+  Get8087Rounding
+  Get8087ControlWord
+  Set8087ControlWord
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@Set8087Rounding
+Summary:
+  Sets the rounding control of the FPU.
+Description:
+  Set8087Rounding adjusts the rounding control setting of the
+  mathematical coprocessor.
+Parameters:
+  Rounding - New value for the rounding control of the FPU.
+             See T8087Rounding for the possible values and
+             their meaning.
+Result:
+  Returns the previous rounding setting of the FPU.
+See also:
+  Set8087Infinity
+  Set8087Precision
+  Get8087Infinity
+  Get8087Precision
+  Get8087Rounding
+  Get8087ControlWord
+  Set8087ControlWord
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@Get8087Infinity
+Summary:
+  Returns the infinity setting of the FPU.
+Description:
+  Get8087Infinity returns the infinity control setting of the
+  mathematical coprocessor. The infinity setting controls how
+  the FPU interprets infinity values.
+Result:
+  Returns the infinity setting of the FPU in the form of an enumerated
+  type. See T8087Infinity for the possible values and their meaning.
+See also:
+  Get8087Precision
+  Get8087Rounding
+  Set8087Infinity
+  Set8087Precision
+  Set8087Rounding
+  Get8087ControlWord
+  Set8087ControlWord
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@Get8087Precision
+Summary:
+  Returns the precision setting of the FPU.
+Description:
+  Get8087Precision returns the precision control setting of the
+  mathematical coprocessor.
+Result:
+  Returns the precision setting of the FPU. See T8087Precision
+  for the possible values and their meaning.
+See also:
+  Get8087Infinity
+  Get8087Rounding
+  Set8087Infinity
+  Set8087Precision
+  Set8087Rounding
+  Get8087ControlWord
+  Set8087ControlWord
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@Get8087Rounding
+Summary:
+  Returns the rounding setting of the FPU.
+Description:
+  Get8087Rounding returns the rounding control setting of the
+  mathematical coprocessor.
+Result:
+  Returns the rounding setting of the FPU. See T8087Rounding for
+  more information about the possible values and their meaning.
+See also:
+  Get8087Infinity
+  Get8087Precision
+  Set8087Infinity
+  Set8087Precision
+  Set8087Rounding
+  Get8087ControlWord
+  Set8087ControlWord
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@Set8087ControlWord
+Summary:
+  Sets the 80x87 control word.
+Description:
+  Set8087ControlWord sets the 80x87 control word (register).
+  See Get8087ControlWord for details on the individual
+  bits of the Control parameter.
+Parameters:
+  Control - New value for the 80x87 control word.
+Result:
+  Returns the previous value of the control word.
+See also:
+  Get8087ControlWord
+  Get8087StatusWord
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@Get8087ControlWord
+Summary:
+  Returns the 80x87 control word.
+Description:
+  Get8087ControlWord returns the 80x87 control word (register).
+  This is the FPU's register that controls how the FPU operates
+  with regard to things such as precision, rounding and
+  infinity control. See the table below for the meaning of the
+  individual bits. Note that although this routine might be
+  handy at times, the Get8087Infinity, Get8087Precision
+  and Get8087Rounding functions are preferred as they
+  shield you from the low level bit manipulation.
+<TABLE>
+Bit(s)       Description
+-----------  ----------------------------------------------------
+0 (IM)       Invalid operation mask
+1 (DM)       Denormalized operand mask
+2 (ZM)       Division by zero mask
+3 (OM)       Overflow mask
+4 (UM)       Underflow mask
+5 (PM)       Precision error mask
+8,9 (PC)     Precision control * 00 Single precision * 01
+             Reserved * 10 Double precision * 11 Extended
+             precision
+10,11 (RC)   Rounding control * 00 Round to nearest or even * 01
+             Round down * 10 Round up * Chop or truncate toward 0
+12 (IC)      Infinity control * 0 projective * 1 affine
+</TABLE>
+Result:
+  Returns the 80x87 control word.
+See also:
+  Get8087StatusWord
+  Set8087ControlWord
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@Get8087StatusWord
+<GROUP MathRoutines.Hardware>
+Summary:
+  Returns the 80x87 status word.
+Description:
+  Get8087StatusWord returns the 80x87 status word. This is the FPU's register that
+  reflects it's overall status. The meaning of the individual bits are documented
+  in the table below.
+Parameters:
+  ClearExceptions - If True the function clears any pending floating point exceptions before returning the status word. If False the function does not clear pending exceptions (it's the difference between using FSTSW and FNSTSW).
+Result:
+  Returns the contents of the 80x87 status word.
+<TABLE>
+Bit(s)               Description
+-------------------  ---------------------------------------------------------------------------------------------------------------------------------------------------
+0 (IE)               Invalid error such as stack overflow/underflow.
+1 (DE)               Denormalized error meaning at least one operand was denormalized.
+2 (ZE)               Zero error indicates the divisor was 0 while the dividend was non-zero or non-infinity.
+3 (OE)               Overflow error indicating the result of an operation was too large to be represented. If overflow error is masked a result of infinity was returned.
+4 (UE)               Underflow error indicating the result of an operation was too small to be represented.
+5 (PE)               Precision error indicating an operand or the result exceeds the selected precision.
+6 (SF)               Used in some newer coprocessors to denote overflow or underflow.
+7 (ES)               Error summary is set if any of the unmasked error bits is set.
+8-10, 14 (C0-C2,C3)  Condition code bits indicate certain conditions such as NAN. These are opcode dependent. See the Intel reference.
+11-13 (TOP)          Stack top pointer. Register which functions as top of stack, usually 0.
+15 (B)               Busy bit indicating the coprocessor is performing some task.
+</TABLE>
+See also:
+  Set8087ControlWord
+  Get8087ControlWord
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------

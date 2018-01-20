@@ -1,0 +1,5 @@
+common\multimedia\MidiOutExample.dpr=spin.dcu
+common\numformat\NumFormatExample.dpr=spin.dcu
+windows\debug\sourceloc\SourceLocExample.dpr=spin.dcu
+windows\delphitools\peviewer\PeViewer.dpr=spin.dcu
+windows\tasks\TaskDemo.dpr=MsHtml.dcu

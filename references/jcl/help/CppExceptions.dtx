@@ -1,0 +1,201 @@
+﻿
+@@JclInstallCppExceptionFilter
+Summary
+Installs the C++ exception filter.
+Description
+Calling the function JclInstallCppExceptionFilter() installs
+an exception filter which generates wrapper exceptions of
+type EJclCppStdException for external C++ exceptions. Returns
+true if the installation was successful, false otherwise.
+
+
+
+\NOTE: This function requires that JclHookExceptions from
+JclHookExcept.pas has been called before. It will fail if
+this is not the case; it will not set up the required hooks
+implicitly! 
+
+@@JclCppExceptionFilterInstalled
+Summary
+Determines whether the C++ exception filter is installed.
+Description
+Determines whether the C++ exception filter has been
+installed properly by calling JclInstallCppExceptionFilter.
+
+@@JclUninstallCppExceptionFilter
+Summary
+Removes the C++ exception filter.
+Description
+Removes the C++ exception filter installed by
+JclInstallCppExceptionFilter.
+
+@@JclCppException.pas
+Summary
+JclCppException.pas contains utilities to handle C++
+\exceptions in Delphi.
+Description
+Calling the function JclInstallCppExceptionFilter() installs
+an exception filter which generates wrapper exceptions of
+type EJclCppStdException for external C++ exceptions. This is
+similar to Delphi's own mechanism of generating wrapper
+\objects for unknown external exceptions.
+
+
+
+An extensive discussion of the problem of C++ exceptions
+leaking into Delphi code, possible workarounds and the
+solution presented here can be read in the following article:
+
+
+
+<extlink http://www.audacia-software.de/en/bcb/external-exception-eefface.htm>External
+Exception EEFFACE</extlink>
+See Also
+EJclCppException
+
+EJclCppStdException
+
+JclInstallCppExceptionFilter
+
+JclUninstallCppExceptionFilter
+
+JclCppExceptionFilterInstalled
+
+JclCppExceptionFlags
+
+@@EJclCppException.IsCppClass
+Summary
+\Returns True if the underlying C++ exception object is a
+class.
+Description
+C++ permits to throw exceptions of any type, even scalar
+types or raw pointers. This function allows to distinguish
+them from exceptions which are C++ classes.
+
+@@EJclCppException.GetCppExceptionObject
+Summary
+\Returns an untyped pointer to the C++ exception object being
+wrapped.
+Description
+
+@@EJclCppException.AsCppClass
+Summary
+(C++ only) Returns a pointer to the underlying exception
+\object.
+Description
+This function is useful to access the original exception
+type. Example:
+
+
+
+<c>const char* msg = TheException-\>AsCppClass\<std::exception\>
+()-\>what ();</c>
+
+
+
+Supported in C++Builder XE and higher only. 
+
+@@EJclCppException.AsCppClass@AnsiString
+Summary
+(C++ only) Returns a pointer to the underlying exception
+\object.
+Description
+This function is useful to access the original exception
+type. Example:
+
+
+
+<c>const char* msg = static_cast\<std::exception*\>
+(TheException-\>AsCppClass ("std::exception"))-\>what ();</c>
+
+
+
+Users of C++Builder XE or higher releases should consider
+using EJclCppException.AsCppClass\<\> instead because it
+avoids explicit string literals and type casting. 
+
+@@EJclCppException
+Summary
+Exception wrapper object created for C++ exceptions.
+Description
+To make them usable in Delphi code, the C++ exceptions are
+wrapped into Delphi exceptions, the ECppException class and
+the ECppStdException class (the latter one for exception
+classes derived from std::exception).
+
+@@EJclCppException.ThrowFile
+Summary
+\Returns the source file name from which the exception has
+been thrown.
+Description
+This only works if position information is enabled; look up
+the "-xp" switch in the <extlink http://docwiki.embarcadero.com/RADStudio/en/C%2B%2B_Compiler>compiler
+command line</extlink>.
+
+@@EJclCppException.ThrowLine
+Summary
+\Returns the source line on which the exception has been
+thrown.
+Description
+This only works if position information is enabled; look up
+the "-xp" switch in the <extlink http://docwiki.embarcadero.com/RADStudio/en/C%2B%2B_Compiler>compiler
+command line</extlink>.
+
+@@EJclCppException.TypeName
+Summary
+\Returns the typeid().name() of the C++ exception object
+being wrapped.
+Description
+
+@@EJclCppStdException
+Summary
+Exception wrapper object created for C++ exceptions which
+inherit from std::exception.
+Description
+If a C++ exception object derives from std::exception, we
+have a common base class which simplifies things a lot. In
+this case, the exception filter creates a wrapper object of
+type ECppStdException, which itself inherits from
+EJclCppException and provides one more property:
+EJclCppStdException.StdException.
+
+
+
+The exception message generated for objects of this type
+propagates the original exception message returned by
+std::exception::what().
+
+@@EJclCppStdException.StdException
+Summary
+\Returns a pointer of type std::exception* which points to
+the actual exception object. (Useful in C++ only.)
+Description
+Use dynamic_cast\<\> to dispatch the pointer provided by this
+property.
+
+@@TJclCppExceptionFlags
+Summary
+Controls the creation of Delphi exception wrapper objects for
+C++ exceptions.
+Description
+The following values are defined:
+
+
+
+\* cefPrependCppClassName - specifies whether the name of the
+C++ class is to be included in the exception message. For
+\example, a std::runtime_error will generate the error
+message "[std::runtime_error] \<exception message\>". This
+may be helpful for error diagnosis during development, but it
+should not be in the final application because users will
+find the cryptic prefix irritating. Note that the original
+class name can still be retrieved using
+EJclCppException.TypeName.
+
+@@JclCppExceptionFlags
+Summary
+Controls the creation of Delphi exception wrapper objects for
+C++ exceptions.
+Description
+See the description of TJclCppExceptionFlags for a list of
+\options.

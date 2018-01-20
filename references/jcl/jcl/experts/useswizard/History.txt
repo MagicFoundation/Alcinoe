@@ -1,0 +1,25 @@
+06-JUN-2002 TOndrej
+  - fixed bug in TUsesList.IndexOf
+  - added JCL identifier lists
+
+22-JAN-2002 TOndrej
+  - merged changes by Robert Marquardt
+  - resourcestrings for SelectDirectory captions
+  - disabled unit platform warnings in JCLOptionsFrame.pas
+  - localized dcc32.exe strings
+  - fixed loading from registry:
+    - open with KEY_READ acces
+    - try HKEY_LOCAL_MACHINE in case HKEY_CURRENT_USER fails
+
+21-JAN-2002 Robert Marquardt
+  - coding style changes
+  - FrameJCLOptions tab order
+  - Delphi 5 compatibility
+
+20-JAN-2002 TOndrej
+  - initial source code
+    - wizard
+    - notifier
+    - options tab sheet
+    - parsing of compiler messages
+

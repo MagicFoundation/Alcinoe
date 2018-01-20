@@ -1,0 +1,33 @@
+#------------------------------------------------------------------------------
+VERSION = BWS.01
+#------------------------------------------------------------------------------
+!ifndef ROOT
+ROOT = $(MAKEDIR)\..
+!endif
+#------------------------------------------------------------------------------
+MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
+DCC = $(ROOT)\bin\dcc32.exe $**
+BRCC = $(ROOT)\bin\brcc32.exe $**
+#------------------------------------------------------------------------------
+PROJECTS = StackTrackDLLsExample.exe StackTrackDLLsStaticLibrary.dll \
+  StackTrackDLLsDynamicLibrary.dll StackTrackDLLsComLibrary.dll StackTrackExample.exe
+#------------------------------------------------------------------------------
+default: $(PROJECTS)
+#------------------------------------------------------------------------------
+
+StackTrackDLLsExample.exe: windows\debug\stacktrack\StackTrackDLLsExample.dpr
+  $(DCC)
+
+StackTrackDLLsStaticLibrary.dll: windows\debug\stacktrack\StackTrackDLLsStaticLibrary.dpr
+  $(DCC)
+
+StackTrackDLLsDynamicLibrary.dll: windows\debug\stacktrack\StackTrackDLLsDynamicLibrary.dpr
+  $(DCC)
+
+StackTrackDLLsComLibrary.dll: windows\debug\stacktrack\StackTrackDLLsComLibrary.dpr
+  $(DCC)
+
+StackTrackExample.exe: windows\debug\stacktrack\StackTrackExample.dpr
+  $(DCC)
+
+

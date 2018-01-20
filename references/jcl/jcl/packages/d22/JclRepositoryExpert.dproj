@@ -1,0 +1,192 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{2B548932-6654-4E44-8B06-3288D7A884C4}</ProjectGuid>
+        <MainSource>JclRepositoryExpert.dpk</MainSource>
+        <ProjectVersion>17.2</ProjectVersion>
+        <Config Condition="'$(Config)'==''">Release</Config>
+        <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+        <DCC_Define>BCB;WIN32;CONDITIONALEXPRESSIONS;VER290;RELEASE</DCC_Define>
+        <Base>True</Base>
+        <AppType>Package</AppType>
+        <FrameworkType>None</FrameworkType>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <TargetedPlatforms>3</TargetedPlatforms>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+        <Cfg_2_Win32>true</Cfg_2_Win32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <SanitizedProjectName>JclRepositoryExpert</SanitizedProjectName>
+        <VerInfo_MajorVer>2</VerInfo_MajorVer>
+        <VerInfo_Build>5300</VerInfo_Build>
+        <VerInfo_Release>0</VerInfo_Release>
+        <VerInfo_MinorVer>7</VerInfo_MinorVer>
+        <VerInfo_Keys>CompanyName=Project JEDI;FileDescription=JCL Package containing repository wizards;FileVersion=2.7.0.5300;InternalName=JclRepositoryExpert;LegalCopyright=Copyright (C) 1999, 2014 Project JEDI;OriginalFilename=JclRepositoryExpert220.bpl;ProductName=JEDI Code Library;ProductVersion=2.7.0.5300</VerInfo_Keys>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <DCC_Namespace>System;System.Win;WinApi;Vcl;Vcl.Imaging;$(DCC_Namespace)</DCC_Namespace>
+        <DesignOnlyPackage>true</DesignOnlyPackage>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_Description>JCL Package containing repository wizards</DCC_Description>
+        <DCC_Define>BCB;BCB;WIN32;CONDITIONALEXPRESSIONS;VER290;RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_WriteableConstants>true</DCC_WriteableConstants>
+        <DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
+        <DllSuffix>220</DllSuffix>
+        <GenDll>true</GenDll>
+        <GenPackage>true</GenPackage>
+        <DCC_ImageBase>$58180000</DCC_ImageBase>
+        <DCC_UsePackage>rtl;vcl;designide;Jcl;JclContainers;JclBaseExpert;JclDeveloperTools;$(DCC_UsePackage)</DCC_UsePackage>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+        <DCC_LocalDebugSymbols>True</DCC_LocalDebugSymbols>
+        <DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <DCC_DcuOutput>..\..\lib\d22\win32\debug</DCC_DcuOutput>
+        <DCC_ObjOutput>..\..\lib\d22\win32\debug</DCC_ObjOutput>
+        <DCC_HppOutput>..\..\lib\d22\win32\debug</DCC_HppOutput>
+        <DCC_DcpOutput>..\..\lib\d22\win32\debug</DCC_DcpOutput>
+        <DCC_UnitSearchPath>..\..\lib\d22\win32\debug;..\..\source\include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_ResourcePath>..\..\lib\d22\win32\debug;..\..\source\include;$(DCC_ResourcePath)</DCC_ResourcePath>
+        <DCC_ObjPath>..\..\lib\d22\win32\debug;..\..\source\include;$(DCC_ObjPath)</DCC_ObjPath>
+        <DCC_IncludePath>..\..\lib\d22\win32\debug;..\..\source\include;$(DCC_IncludePath)</DCC_IncludePath>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_AssertionsAtRuntime>false</DCC_AssertionsAtRuntime>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+        <DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <DCC_DcuOutput>..\..\lib\d22\win32</DCC_DcuOutput>
+        <DCC_ObjOutput>..\..\lib\d22\win32</DCC_ObjOutput>
+        <DCC_HppOutput>..\..\lib\d22\win32</DCC_HppOutput>
+        <DCC_DcpOutput>..\..\lib\d22\win32</DCC_DcpOutput>
+        <DCC_UnitSearchPath>..\..\lib\d22\win32;..\..\source\include;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_ResourcePath>..\..\lib\d22\win32;..\..\source\include;$(DCC_ResourcePath)</DCC_ResourcePath>
+        <DCC_ObjPath>..\..\lib\d22\win32;..\..\source\include;$(DCC_ObjPath)</DCC_ObjPath>
+        <DCC_IncludePath>..\..\lib\d22\win32;..\..\source\include;$(DCC_IncludePath)</DCC_IncludePath>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="rtl.dcp"/>
+        <DCCReference Include="vcl.dcp"/>
+        <DCCReference Include="designide.dcp"/>
+        <DCCReference Include="Jcl.dcp"/>
+        <DCCReference Include="JclContainers.dcp"/>
+        <DCCReference Include="JclBaseExpert.dcp"/>
+        <DCCReference Include="JclDeveloperTools.dcp"/>
+        <DCCReference Include="..\..\experts\repository\JclOtaRepositoryUtils.pas"/>
+        <DCCReference Include="..\..\experts\repository\JclOtaRepositoryReg.pas"/>
+        <DCCReference Include="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgRepository.pas"/>
+        <DCCReference Include="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgWizard.pas"/>
+        <DCCReference Include="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgFileFrame.pas"/>
+        <DCCReference Include="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgFormFrame.pas"/>
+        <DCCReference Include="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgSystemFrame.pas"/>
+        <DCCReference Include="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgLogFrame.pas"/>
+        <DCCReference Include="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgTraceFrame.pas"/>
+        <DCCReference Include="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgThreadFrame.pas"/>
+        <DCCReference Include="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgIgnoreFrame.pas"/>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType>Package</Borland.ProjectType>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Parameters/>
+                <VersionInfo>
+                    <VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+                    <VersionInfo Name="AutoIncBuild">False</VersionInfo>
+                    <VersionInfo Name="MajorVer">2</VersionInfo>
+                    <VersionInfo Name="MinorVer">7</VersionInfo>
+                    <VersionInfo Name="Release">0</VersionInfo>
+                    <VersionInfo Name="Build">5300</VersionInfo>
+                    <VersionInfo Name="Debug">False</VersionInfo>
+                    <VersionInfo Name="PreRelease">False</VersionInfo>
+                    <VersionInfo Name="Special">False</VersionInfo>
+                    <VersionInfo Name="Private">False</VersionInfo>
+                    <VersionInfo Name="DLL">False</VersionInfo>
+                    <VersionInfo Name="Locale">1033</VersionInfo>
+                    <VersionInfo Name="CodePage">1252</VersionInfo>
+                </VersionInfo>
+                <VersionInfoKeys>
+                    <VersionInfoKeys Name="CompanyName">Project JEDI</VersionInfoKeys>
+                    <VersionInfoKeys Name="FileDescription">JCL Package containing repository wizards</VersionInfoKeys>
+                    <VersionInfoKeys Name="FileVersion">2.7.0.5300</VersionInfoKeys>
+                    <VersionInfoKeys Name="InternalName">JclRepositoryExpert</VersionInfoKeys>
+                    <VersionInfoKeys Name="LegalCopyright">Copyright (C) 1999, 2014 Project JEDI</VersionInfoKeys>
+                    <VersionInfoKeys Name="LegalTrademarks"/>
+                    <VersionInfoKeys Name="OriginalFilename">JclRepositoryExpert220.bpl</VersionInfoKeys>
+                    <VersionInfoKeys Name="ProductName">JEDI Code Library</VersionInfoKeys>
+                    <VersionInfoKeys Name="ProductVersion">2.7.0.5300</VersionInfoKeys>
+                </VersionInfoKeys>
+                <Source>
+                    <Source Name="MainSource">JclRepositoryExpert.dpk</Source>
+                </Source>
+                <Excluded_Packages/>
+            </Delphi.Personality>
+            <Deployment/>
+            <Platforms>
+                <Platform value="OSX32">False</Platform>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
+    <Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+</Project>

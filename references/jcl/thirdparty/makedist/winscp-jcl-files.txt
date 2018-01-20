@@ -1,0 +1,7 @@
+option batch continue
+option confirm off
+option transfer binary
+open jcl.frs.sourceforge.net
+synchronize remote C:\dev\jcl\thirdparty\makedist\files "/home/pfs/project/j/jc/jcl/JCL Releases/JCL 2.5 Build 4572"
+close
+exit

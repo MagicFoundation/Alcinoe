@@ -1,0 +1,40 @@
+package StackTraceViewerDummyExample;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS OFF}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST ON}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $58060000}
+{$DESCRIPTION 'JCL Stack Trace Viewer API Dummy Example'}
+{$LIBSUFFIX '120'}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  vcl,
+  JclStackTraceViewerExpert;
+
+contains
+  StackTraceViewerDummyExampleReg in 'StackTraceViewerDummyExampleReg.pas',
+  DummyLineNumberTranslator in 'DummyLineNumberTranslator.pas',
+  DummyRevisionProvider in 'DummyRevisionProvider.pas';
+
+end.

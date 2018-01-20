@@ -1,0 +1,15 @@
+1/  In WinSCP: create a session that connects to host web.sourceforge.net with login "username,jcl";
+2/  Save this session as "jcl.web.sourceforge.net";
+3/  Set environment variable "DCC2006" to the compilator of Delphi 2006 or RAD Studio 2007;
+4/  Set environment variable "DMCC" to Doc-o-matic command line compiler;
+5/  Set environment variable "SVN" to up-to-date subversion executable;
+6/  Set environment variable "WINSCP" to WinSCP executable;
+7/  Set environment variable "JEDIHELP" to the directory containing JEDI help project (jedi/shared/help);
+8/  Copy 7z.dll from sevenzip distribution to trunk/thirdparty/makedist/
+9/  Compile makedist.exe
+10/ Execute the following commands in planified tasks:
+
+MakeDist.exe /c=JclTesting.xml /s=jcl-weekly-h2,jcl-weekly-hlp,jcl-weekly-chm /x
+MakeDist.exe /c=JclTesting.xml /s=jcl-daily-source /x
+
+These actions complete in less than an hour.

@@ -1,0 +1,303 @@
+(*$JPPDEFINEMACRO MOVEARRAYIMP(MOVEARRAYPROCEDURENAME, DYNARRAYTYPENAME, DEFAULTVALUE, PREFIX, OVERLOAD)
+{$IFDEF GENERIC}
+procedure PREFIXMOVEARRAYPROCEDURENAME(var List: DYNARRAYTYPENAME; FromIndex, ToIndex, Count: SizeInt);OVERLOAD
+var
+  I: SizeInt;
+begin
+  if FromIndex < ToIndex then
+  begin
+    for I := Count - 1 downto 0 do
+      List[ToIndex + I] := List[FromIndex + I];
+
+    if (ToIndex - FromIndex) < Count then
+      // overlapped source and target
+      for I := 0 to ToIndex - FromIndex - 1 do
+        List[FromIndex + I] := DEFAULTVALUE
+    else
+      // independant
+      for I := 0 to Count - 1 do
+        List[FromIndex + I] := DEFAULTVALUE;
+  end
+  else
+  begin
+    for I := 0 to Count - 1 do
+      List[ToIndex + I] := List[FromIndex + I];
+
+    if (FromIndex - ToIndex) < Count then
+      // overlapped source and target
+      for I := Count - FromIndex + ToIndex to Count - 1 do
+        List[FromIndex + I] := DEFAULTVALUE
+    else
+      // independant
+      for I := 0 to Count - 1 do
+        List[FromIndex + I] := DEFAULTVALUE;
+  end; 
+end;
+{$ELSE ~GENERIC}
+{$IFDEF REFCOUNTED}
+procedure PREFIXFinalizeArrayBeforeMove(var List: DYNARRAYTYPENAME; FromIndex, ToIndex, Count: SizeInt);OVERLOAD
+begin
+  Assert(Count > 0);
+  if FromIndex < ToIndex then
+  begin
+    if Count > (ToIndex - FromIndex) then
+      Finalize(List[FromIndex + Count], ToIndex - FromIndex)
+    else
+      Finalize(List[ToIndex], Count);
+  end
+  else
+  if FromIndex > ToIndex then
+  begin
+    if Count > (FromIndex - ToIndex) then
+      Count := FromIndex - ToIndex;
+    Finalize(List[ToIndex], Count)
+  end;
+end;
+
+procedure PREFIXInitializeArray(var List: DYNARRAYTYPENAME; FromIndex, Count: SizeInt);OVERLOAD
+begin
+  {$IFDEF FPC}
+  while Count > 0 do
+  begin
+    Initialize(List[FromIndex]);
+    Inc(FromIndex);
+    Dec(Count);
+  end;
+  {$ELSE ~FPC}
+  Initialize(List[FromIndex], Count);
+  {$ENDIF ~FPC}
+end;
+
+procedure PREFIXInitializeArrayAfterMove(var List: DYNARRAYTYPENAME; FromIndex, ToIndex, Count: SizeInt);OVERLOAD
+begin
+  { Keep reference counting working }
+  if FromIndex < ToIndex then
+  begin
+    if (ToIndex - FromIndex) < Count then
+      Count := ToIndex - FromIndex;
+    InitializeArray(List, FromIndex, Count);
+  end
+  else
+  if FromIndex > ToIndex then
+  begin
+    if (FromIndex - ToIndex) < Count then
+      InitializeArray(List, ToIndex + Count, FromIndex - ToIndex)
+    else
+      InitializeArray(List, FromIndex, Count);
+  end;
+end;
+{$ELSE ~REFCOUNTED}
+{$IFDEF ZEROINIT}
+procedure PREFIXInitializeArrayAfterMove(var List: DYNARRAYTYPENAME; FromIndex, ToIndex, Count: SizeInt);OVERLOAD
+begin
+  { Clean array }
+  if FromIndex < ToIndex then
+  begin
+    if (ToIndex - FromIndex) < Count then
+      Count := ToIndex - FromIndex;
+    FillChar(List[FromIndex], Count * SizeOf(List[0]), 0);
+  end
+  else
+  if FromIndex > ToIndex then
+  begin
+    if (FromIndex - ToIndex) < Count then
+      FillChar(List[ToIndex + Count], (FromIndex - ToIndex) * SizeOf(List[0]), 0)
+    else
+     FillChar(List[FromIndex], Count * SizeOf(List[0]), 0);
+  end;
+end;
+
+{$ENDIF ZEROINIT}
+{$ENDIF ~REFCOUNTED}
+procedure PREFIXMOVEARRAYPROCEDURENAME(var List: DYNARRAYTYPENAME; FromIndex, ToIndex, Count: SizeInt);OVERLOAD
+begin
+  if Count > 0 then
+  begin
+{$IFDEF REFCOUNTED}    FinalizeArrayBeforeMove(List, FromIndex, ToIndex, Count);{$ENDIF REFCOUNTED}
+    Move(List[FromIndex], List[ToIndex], Count * SizeOf(List[0]));
+{$IFDEF REFCOUNTED}    InitializeArrayAfterMove(List, FromIndex, ToIndex, Count);
+{$ELSE ~REFCOUNTED}{$IFDEF ZEROINIT}    InitializeArrayAfterMove(List, FromIndex, ToIndex, Count);{$ENDIF ZEROINIT}{$ENDIF ~REFCOUNTED}
+  end;
+end;{$ENDIF ~GENERIC}*)
+(*$JPPDEFINEMACRO ITERATEIMP(ITERATEPROCEDURENAME, ITRINTERFACENAME, ITERATEPROCEDURETYPENAME)
+procedure ITERATEPROCEDURENAME(const First: ITRINTERFACENAME; Count: Integer; F: ITERATEPROCEDURETYPENAME);
+var
+  I: Integer;
+begin
+  for I := Count - 1 downto 0 do
+    if First.HasNext then
+      F(First.Next)
+    else
+      Break;
+end;*)
+(*$JPPDEFINEMACRO APPLYIMP(APPLYPROCEDURENAME, ITRINTERFACENAME, APPLYFUNCTIONTYPENAME, SETTERPROCEDURENAME)
+procedure APPLYPROCEDURENAME(const First: ITRINTERFACENAME; Count: Integer; F: APPLYFUNCTIONTYPENAME);
+var
+  I: Integer;
+begin
+  for I := Count - 1 downto 0 do
+    if First.HasNext then
+      First.SETTERPROCEDURENAME(F(First.Next))
+    else
+      Break;
+end;*)
+(*$JPPDEFINEMACRO FINDIMP(FINDFUNCTIONNAME, ITRINTERFACENAME, CONSTKEYWORD, PARAMETERNAME, COMPAREFUNCTIONTYPENAME, TYPENAME)
+function FINDFUNCTIONNAME(const First: ITRINTERFACENAME; Count: Integer;
+  CONSTKEYWORDPARAMETERNAME: TYPENAME; AComparator: COMPAREFUNCTIONTYPENAME): ITRINTERFACENAME;
+var
+  I: Integer;
+begin
+  Result := nil;
+  for I := Count - 1 downto 0 do
+    if First.HasNext then
+    begin
+      if AComparator(First.Next, PARAMETERNAME) = 0 then
+      begin
+        Result := First;
+        Break;
+      end;
+    end
+    else
+      Break;
+end;*)
+(*$JPPDEFINEMACRO FINDEQIMP(FINDFUNCTIONNAME, ITRINTERFACENAME, CONSTKEYWORD, PARAMETERNAME, EQUALITYCOMPAREFUNCTIONTYPENAME, TYPENAME)
+function FINDFUNCTIONNAME(const First: ITRINTERFACENAME; Count: Integer;
+  CONSTKEYWORDPARAMETERNAME: TYPENAME; AEqualityComparator: EQUALITYCOMPAREFUNCTIONTYPENAME): ITRINTERFACENAME;
+var
+  I: Integer;
+begin
+  Result := nil;
+  for I := Count - 1 downto 0 do
+    if First.HasNext then
+    begin
+      if AEqualityComparator(First.Next, PARAMETERNAME) then
+      begin
+        Result := First;
+        Break;
+      end;
+    end
+    else
+      Break;
+end;*)
+(*$JPPDEFINEMACRO COUNTOBJECTIMP(COUNTOBJECTFUNCTIONNAME, ITRINTERFACENAME, CONSTKEYWORD, PARAMETERNAME, COMPAREFUNCTIONTYPENAME, TYPENAME)
+function COUNTOBJECTFUNCTIONNAME(const First: ITRINTERFACENAME; Count: Integer;
+  CONSTKEYWORDPARAMETERNAME: TYPENAME; AComparator: COMPAREFUNCTIONTYPENAME): Integer;
+var
+  I: Integer;
+begin
+  Result := 0;
+  for I := Count - 1 downto 0 do
+    if First.HasNext then
+      Inc(Result, Ord(AComparator(First.Next, PARAMETERNAME) = 0))
+    else
+      Break;
+end;*)
+(*$JPPDEFINEMACRO COUNTOBJECTEQIMP(COUNTOBJECTFUNCTIONNAME, ITRINTERFACENAME, CONSTKEYWORD, PARAMETERNAME, EQUALITYCOMPAREFUNCTIONTYPENAME, TYPENAME)
+function COUNTOBJECTFUNCTIONNAME(const First: ITRINTERFACENAME; Count: Integer;
+  CONSTKEYWORDPARAMETERNAME: TYPENAME; AEqualityComparator: EQUALITYCOMPAREFUNCTIONTYPENAME): Integer;
+var
+  I: Integer;
+begin
+  Result := 0;
+  for I := Count - 1 downto 0 do
+    if First.HasNext then
+      Inc(Result, Ord(AEqualityComparator(First.Next, PARAMETERNAME)))
+    else
+      Break;
+end;*)
+(*$JPPDEFINEMACRO COPYIMP(COPYPROCEDURENAME, ITRINTERFACENAME, SETTERPROCEDURENAME)
+procedure COPYPROCEDURENAME(const First: ITRINTERFACENAME; Count: Integer;
+  const Output: ITRINTERFACENAME);
+var
+  I: Integer;
+begin
+  for I := Count - 1 downto 0 do
+    if Output.HasNext and First.HasNext then
+    begin
+      Output.Next;
+      Output.SETTERPROCEDURENAME(First.Next);
+    end
+    else
+      Break;
+end;*)
+(*$JPPDEFINEMACRO GENERATEIMP(GENERATEPROCEDURENAME, LISTINTERFACENAME, CONSTKEYWORD, PARAMETERNAME, TYPENAME)
+procedure GENERATEPROCEDURENAME(const List: LISTINTERFACENAME; Count: Integer;
+  CONSTKEYWORDPARAMETERNAME: TYPENAME);
+var
+  I: Integer;
+begin
+  List.Clear;
+  for I := 0 to Count - 1 do
+    List.Add(PARAMETERNAME);
+end;*)
+(*$JPPDEFINEMACRO FILLIMP(FILLPROCEDURENAME, ITRINTERFACENAME, CONSTKEYWORD, PARAMETERNAME, TYPENAME, SETTERPROCEDURENAME)
+procedure FILLPROCEDURENAME(const First: ITRINTERFACENAME; Count: Integer;
+  CONSTKEYWORDPARAMETERNAME: TYPENAME);
+var
+  I: Integer;
+begin
+  for I := Count - 1 downto 0 do
+    if First.HasNext then
+    begin
+      First.Next;
+      First.SETTERPROCEDURENAME(PARAMETERNAME);
+    end
+    else
+      Break;
+end;*)
+(*$JPPDEFINEMACRO REVERSEIMP(REVERSEPROCEDURENAME, ITRINTERFACENAME, TYPENAME, GETTERFUNCTIONNAME, SETTERPROCEDURENAME)
+procedure REVERSEPROCEDURENAME(const First, Last: ITRINTERFACENAME);
+var
+  Obj: TYPENAME;
+begin
+  if not First.HasNext then
+    Exit;
+  if not Last.HasPrevious then
+    Exit;
+  while First.NextIndex < Last.PreviousIndex do
+  begin
+    Obj := First.Next;
+    Last.Previous;
+    First.SETTERPROCEDURENAME(Last.GETTERFUNCTIONNAME);
+    Last.SETTERPROCEDURENAME(Obj);
+  end;
+end;*)
+(*$JPPDEFINEMACRO QUICKSORTIMP(QUICKSORTPROCEDURENAME, LISTINTERFACENAME, LEFT, RIGHT, COMPAREFUNCTIONTYPENAME, TYPENAME, GETTERFUNCTIONNAME, SETTERPROCEDURENAME)
+procedure QUICKSORTPROCEDURENAME(const AList: LISTINTERFACENAME; LEFT, RIGHT: Integer;
+  AComparator: COMPAREFUNCTIONTYPENAME);
+var
+  I, J, P: Integer;
+  Obj: TYPENAME;
+begin
+  repeat
+    I := L;
+    J := R;
+    P := (LEFT + RIGHT) shr 1;
+    repeat
+      Obj := AList.GETTERFUNCTIONNAME(P);
+      while AComparator(AList.GETTERFUNCTIONNAME(I), Obj) < 0 do
+        Inc(I);
+      while AComparator(AList.GETTERFUNCTIONNAME(J), Obj) > 0 do
+        Dec(J);
+      if I <= J then
+      begin
+        if I <> J then
+        begin
+          Obj := AList.GETTERFUNCTIONNAME(I);
+          AList.SETTERPROCEDURENAME(I, AList.GETTERFUNCTIONNAME(J));
+          AList.SETTERPROCEDURENAME(J, Obj);
+        end;
+        if P = I then
+          P := J
+        else
+        if P = J then
+          P := I;
+        Inc(I);
+        Dec(J);
+      end;
+    until I > J;
+    if LEFT < J then
+      QUICKSORTPROCEDURENAME(AList, LEFT, J, AComparator);
+    L := I;
+  until I >= RIGHT;
+end;*)

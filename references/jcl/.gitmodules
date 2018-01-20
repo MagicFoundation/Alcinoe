@@ -1,0 +1,4 @@
+[submodule "jcl/source/include/jedi"]
+	path = jcl/source/include/jedi
+	url = ../jedi.git
+	branch = master

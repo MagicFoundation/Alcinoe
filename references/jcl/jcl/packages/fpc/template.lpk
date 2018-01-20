@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <Package Version="3">
+    <PathDelim Value="\"/>
+    <Name Value="%NAME%"/>
+    <AddToProjectUsesSection Value="False"/>
+    <Author Value="Project JEDI"/>
+    <AutoUpdate Value="OnRebuildingAll"/>
+    <CompilerOptions>
+      <Version Value="9"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <IncludeFiles Value="..\..\source\include\"/>
+        <OtherUnitFiles Value="%PATHPAS%;..\..\lib\fpc\$(TargetCPU)-$(TargetOS)"/>
+        <UnitOutputDirectory Value="..\..\lib\fpc\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+      <Parsing>
+        <Style Value="1"/>
+        <SyntaxOptions>
+          <SyntaxMode Value="Delphi"/>
+          <CStyleOperator Value="False"/>
+          <UseAnsiStrings Value="False"/>
+        </SyntaxOptions>
+      </Parsing>
+      <CodeGeneration>
+        <Optimizations>
+          <VariablesInRegisters Value="True"/>
+          <OptimizationLevel Value="3"/>
+        </Optimizations>
+      </CodeGeneration>
+      <Linking>
+        <Debugging>
+          <UseLineInfoUnit Value="False"/>
+        </Debugging>
+      </Linking>
+      <Other>
+        <CompilerPath Value="$(CompPath)"/>
+      </Other>
+    </CompilerOptions>
+    <Description Value="%DESCRIPTION%"/>
+    <License Value="%COPYRIGHT%"/>
+    <Version Major="%VERSION_MAJOR_NUMBER%" Minor="%VERSION_MINOR_NUMBER%" Release="%RELEASE_NUMBER%" Build="%BUILD_NUMBER%"/>
+    <Files Count="%CONTAINCOUNT%">
+<%%% START FILES %%%>
+      <Item%INDEX%>
+        <Filename Value="%FILENAME%"/>
+        <UnitName Value="%UNITNAME%"/>
+      </Item%INDEX%>
+<%%% END FILES %%%>
+    </Files>
+    <RequiredPkgs Count="%REQUIRECOUNT%">
+<%%% START REQUIRES %%%>
+      <Item%INDEX%>
+        <PackageName Value="%NAME%"/>
+      </Item%INDEX%>
+<%%% END REQUIRES %%%>
+    </RequiredPkgs>
+    <UsageOptions>
+      <IncludePath Value="..\..\source\include\"/>
+      <LibraryPath Value="$(PkgOutDir)\"/>
+      <ObjectPath Value="..\..\lib\fpc\$(TargetCPU)-$(TargetOS)\"/>
+      <UnitPath Value="$(PkgOutDir)\"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <IgnoreBinaries Value="False"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

@@ -1,0 +1,62 @@
+﻿; This is a Doc-O-Matic version 6.5.1.1382 project file.
+; This file is maintained by Doc-O-Matic, do not edit manually.
+
+[*Control*]
+MasterFile=..\..\..\help\JclTemplate.dox
+
+[Configurations\CHM\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\Compatibility]
+ContentFile=JclContainerscontents.html
+IndexFile=JclContainersidx.html
+
+[Configurations\H2\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\Compatibility]
+ContentFile=JclContainerscontents.html
+IndexFile=JclContainersidx.html
+
+[Configurations\H2\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\HTMLHelp]
+Help2Collection=JclContainers_COL_MASTER.HxC
+Help2ID=JclContainers
+HTMLHelp2Filename=..\..\help\JclContainers.HxS
+
+[Configurations\HLP\{C81B476F-5DE3-416C-A73A-9674B8ECC110}\Basic]
+HLPFilename=..\..\help\JclContainers.hlp
+
+[Configurations\HTML\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\Compatibility]
+ContentFile=JclContainerscontents.html
+IndexFile=JclContainersidx.html
+
+[Project Database Files]
+Count=3
+File0=..\..\..\help\VCL.doxdb
+File1=..\..\..\help\JEDI.doxdb
+File2=Jcl.doxdb
+
+[Source Files]
+Count=20
+File0=..\..\source\common\JclAbstractContainers.pas
+File1=..\..\source\common\JclAlgorithms.pas
+File2=..\..\source\common\JclArrayLists.pas
+File3=..\..\source\common\JclArraySets.pas
+File4=..\..\source\common\JclBinaryTrees.pas
+File5=..\..\source\common\JclContainerIntf.pas
+File6=..\..\source\common\JclHashMaps.pas
+File7=..\..\source\common\JclHashSets.pas
+File8=..\..\source\common\JclLinkedLists.pas
+File9=..\..\source\common\JclQueues.pas
+File10=..\..\source\common\JclSortedMaps.pas
+File11=..\..\source\common\JclStacks.pas
+File12=..\..\source\common\JclStrHashMap.pas
+File13=..\..\source\common\JclTrees.pas
+File14=..\..\source\common\JclVectors.pas
+File15=..\..\..\help\Common.dtx
+File16=..\..\..\help\ContainerCopies.dtx
+File17=..\..\..\help\Containers.dtx
+File18=..\..\..\help\JclContainers.dtx
+File19=..\..\..\help\StrHashMap.dtx
+
+[General]
+Copyright=Copyright (C) 1999, 2014 Project JEDI
+Summary=Documentation of the JEDI Code Library Containers package
+Title=JEDI Code Library Containers package
+VersionBuild=5300
+VersionMajor=2
+VersionMinor=7

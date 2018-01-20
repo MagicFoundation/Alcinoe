@@ -1,0 +1,33 @@
+#------------------------------------------------------------------------------
+VERSION = BWS.01
+#------------------------------------------------------------------------------
+!ifndef ROOT
+ROOT = $(MAKEDIR)\..
+!endif
+#------------------------------------------------------------------------------
+MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
+DCC = $(ROOT)\bin\dcc32.exe $**
+BRCC = $(ROOT)\bin\brcc32.exe $**
+#------------------------------------------------------------------------------
+PROJECTS = DependView.exe PeViewer.exe ToolHelpViewer.exe ResFix.exe \
+  ScreenJPG.exe
+#------------------------------------------------------------------------------
+default: $(PROJECTS)
+#------------------------------------------------------------------------------
+
+DependView.exe: DependencyViewer\DependView.dpr
+  $(DCC)
+
+PeViewer.exe: PeViewer\PeViewer.dpr
+  $(DCC)
+
+ToolHelpViewer.exe: ToolHelpView\ToolHelpViewer.dpr
+  $(DCC)
+
+ResFix.exe: ResFix\ResFix.dpr
+  $(DCC)
+
+ScreenJPG.exe: ScreenJPG\ScreenJPG.dpr
+  $(DCC)
+
+

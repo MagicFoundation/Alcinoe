@@ -1,0 +1,11 @@
+EJclCliInstructionError
+EJclCliInstructionStreamInvalid
+TJclBinaryInstruction
+TJclClrILGenerator
+TJclInstruction
+TJclUnaryInstruction
+TJclInstructionDumpILOption
+TJclInstructionParamType
+TJclOpCode
+TJclInstructionDumpILOptions
+InstructionDumpILAllOption

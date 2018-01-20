@@ -1,0 +1,8 @@
+TCoords
+TRectCoord
+ComplexPrecision
+EpsilonSqr
+MaxTerm
+TComplex_VERSION
+TComplexKind
+TJclComplex

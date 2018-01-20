@@ -1,0 +1,6 @@
+EJclStructStorageError
+TJclStructStorageFolder
+TJclStructStorageStream
+CoMallocFree
+TJclStructStorageAccessMode
+TJclStructStorageAccessModes

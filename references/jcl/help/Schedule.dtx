@@ -1,0 +1,883 @@
+@@DateandTime.Scheduling
+<GROUP DateandTime>
+<TITLE Scheduling>
+<TOPICORDER 180>
+----------------------------------------------------------------------------------------------------
+@@DateandTime.Scheduling.Types
+<GROUP DateandTime.Scheduling>
+<TITLE Types>
+<TOPICORDER 90>
+----------------------------------------------------------------------------------------------------
+@@DateandTime.Scheduling.IJclSchedule
+<GROUP DateandTime.Scheduling>
+<TITLE IJclSchedule>
+<TOPICORDER 100>
+----------------------------------------------------------------------------------------------------
+@@DateandTime.Scheduling.IJclScheduleDayFrequency
+<GROUP DateandTime.Scheduling>
+<TITLE IJclScheduleDayFrequency>
+<TOPICORDER 200>
+----------------------------------------------------------------------------------------------------
+@@DateandTime.Scheduling.IJclDailySchedule
+<GROUP DateandTime.Scheduling>
+<TITLE IJclDailySchedule>
+<TOPICORDER 300>
+----------------------------------------------------------------------------------------------------
+@@DateandTime.Scheduling.IJclWeeklySchedule
+<GROUP DateandTime.Scheduling>
+<TITLE IJclWeeklySchedule>
+<TOPICORDER 400>
+----------------------------------------------------------------------------------------------------
+@@DateandTime.Scheduling.IJclMonthlySchedule
+<GROUP DateandTime.Scheduling>
+<TITLE IJclMonthlySchedule>
+<TOPICORDER 500>
+----------------------------------------------------------------------------------------------------
+@@DateandTime.Scheduling.IJclYearlySchedule
+<GROUP DateandTime.Scheduling>
+<TITLE IJclYearlySchedule>
+<TOPICORDER 600>
+----------------------------------------------------------------------------------------------------
+@@DateandTime.Scheduling.Aux
+<GROUP DateandTime.Scheduling>
+<TITLE Auxilary routines>
+<TOPICORDER 600>
+----------------------------------------------------------------------------------------------------
+@@TScheduleRecurringKind
+<GROUP DateandTime.Scheduling.Types>
+Summary:
+  Type to specify the schedule recurring type.
+Description:
+  TScheduleRecurringKind is the type used to specify what type of recurring schedule is used.
+See also:
+  IJclSchedule.RecurringType
+Donator:
+  Marcel Bestebroer
+@@TScheduleRecurringKind.srkOneShot
+  The schedule is a one shot. Only one fire event will be generated on the specified start 
+  date/time. The schedule object doesn't support any additional interfaces.
+@@TScheduleRecurringKind.srkDaily
+  The schedule is a recurring schedule with an interval specified in days. The schedule object
+  supports both the IJclScheduleDayFrequency as well as the IJclDailySchedule interface.
+@@TScheduleRecurringKind.srkWeekly
+  The schedule is a recurring schedule with an interval specified in weeks. The schedule object
+  supports both the IJclScheduleDayFrequency as well as the IJclWeeklySchedule interface.
+@@TScheduleRecurringKind.srkMonthly
+  The schedule is a recurring schedule with an interval specified in months. The schedule object
+  supports both the IJclScheduleDayFrequency as well as the IJclMonthlySchedule interface.
+@@TScheduleRecurringKind.srkYearly
+  The schedule is a recurring schedule with an interval specified in years. The schedule object
+  supports both the IJclScheduleDayFrequency as well as the IJclYearlySchedule interface.
+----------------------------------------------------------------------------------------------------
+@@TScheduleEndKind
+<GROUP DateandTime.Scheduling.Types>
+Summary:
+  Type used to specify the schedule end type.
+Description:
+  TScheduleEndKind is the type used to specify the end type of the schedule.
+See also:
+  IJclSchedule.EndType
+Donator:
+  Marcel Bestebroer
+@@TScheduleEndKind.sekNone
+  The schedule never ends or is a one shot.
+@@TScheduleEndKind.sekDate
+  The schedule ends at a specific date and time, specified by IJclSchedule.EndDate.
+@@TScheduleEndKind.sekTriggerCount
+  The schedule ends after n events have passed. n is specified by 
+  IJclSchedule.EndCount.
+@@TScheduleEndKind.sekDayCount
+  The schedule ends after n days on which events where processed. n is specified by 
+  IJclSchedule.EndCount.
+----------------------------------------------------------------------------------------------------
+@@TScheduleWeekDay
+<GROUP DateandTime.Scheduling.Types>
+Summary:
+  Type used when specifying on which days an event should be generated whn using a weekly schedule.
+Description:
+  TScheduleWeekDay is the schedule used to specify on which days an event should be generated. It is
+  used by the weekly schedule.
+See also:
+  IJclWeeklySchedule.DaysOfWeek
+Donator:
+  Marcel Bestebroer
+@@TScheduleWeekDay.swdMonday
+  Event should be generated on a monday.
+@@TScheduleWeekDay.swdTuesday
+  Event should be generated on a tuesday.
+@@TScheduleWeekDay.swdWednesday
+  Event should be generated on a wednesday.
+@@TScheduleWeekDay.swdThursday
+  Event should be generated on a thursday.
+@@TScheduleWeekDay.swdFriday
+  Event should be generated on a friday.
+@@TScheduleWeekDay.swdSaturday
+  Event should be generated on a saturday.
+@@TScheduleWeekDay.swdSunday
+  Event should be generated on a sunday.
+----------------------------------------------------------------------------------------------------
+@@TScheduleWeekDays
+<COMBINEWITH TScheduleWeekDay>
+----------------------------------------------------------------------------------------------------
+@@TScheduleIndexKind
+<GROUP DateandTime.Scheduling.Types>
+Summary:
+  Type used to specify the index kind of the month and year schedules.
+Description:
+  TScheduleIndexKind is the type used to specify the index type of the month and year schedules.
+See also:
+  IJclMonthlySchedule.IndexKind, IJclYearlySchedule.IndexKind
+Donator:
+  Marcel Bestebroer
+@@TScheduleIndexKind.sikNone
+  No indexing.
+@@TScheduleIndexKind.sikDay
+  The index specifies the nth day.
+@@TScheduleIndexKind.sikWeekDay
+  The index specifies the nth week day (monday - friday).
+@@TScheduleIndexKind.sikWeekendDay
+  The index specifies the nth weekend day (saturday and sunday).
+@@TScheduleIndexKind.sikMonday
+  The index specifies the nth monday.
+@@TScheduleIndexKind.sikTuesday
+  The index specifies the nth tuesday.
+@@TScheduleIndexKind.sikWednesday
+  The index specifies the nth wednesday.
+@@TScheduleIndexKind.sikThursday
+  The index specifies the nth thursday.
+@@TScheduleIndexKind.sikFriday
+  The index specifies the nth friday.
+@@TScheduleIndexKind.sikSaturday
+  The index specifies the nth saturday.
+@@TScheduleIndexKind.sikSunday
+  The index specifies the nth sunday.
+----------------------------------------------------------------------------------------------------
+@@ESchedule
+<GROUP DateandTime.Scheduling.Types>
+Summary:
+  Exception raised for schedule related errors.
+Description:
+  ESchedule is the exception class used for schedule related exceptions.
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Main schedule interface.
+Description:
+  IJclSchedule is the main schedule interface that is returned by CreateSchedule. Through this 
+  interface you can control all generic settings of the schedule, as well as obtain references to
+  the supporting interfaces, provided they are available with the current settings.
+See also:
+  CreateSchedule
+  IJclScheduleDayFrequency
+  IJclDailySchedule
+  IJclWeeklySchedule
+  IJclMonthlySchedule
+  IJclYearlySchedule
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.DayCount
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Number of days on which events are generated.
+Description:
+  DayCount retrieves the number of days on which events have been generated. Every succesfull call
+  from NextEvent, NextEventFrom or NextEventFromNow that jumps to a new day will increase this
+  counter.
+See also:
+  NextEvent
+  NextEventFrom
+  NextEventFromNow
+  TriggerCount
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.EndCount
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Determines the number of days or events after which the schedule stops.
+Description:
+  EndCount determines the number of days (EndType = sekDayCount) or events (EndType =
+  sekTriggerCount) after which the schedule ends. EndCount is ignored if EndType is not set to
+  either sekDayCount or sekTriggerCount.
+See also:
+  EndType
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.EndDate
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Determines the date and time after which the schedule stops.
+Description:
+  EndDate determines the date and time after which the schedule ends. EndDate is ignored if EndType
+  is not set to sekDate.
+See also:
+  EndType
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.EndType
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Determines how the end of the schedule is determined.
+Description:
+  EndType determines how the end of the schedule is determined. EndType is ignored for "one shot"
+  schedules. See TScheduleEndKind for information on the possible values.
+See also:
+  EndCount, EndDate
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.GetEndCount
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Property getter for EndCount.
+Description:
+  GetEndCount is the property getter for EndCount.
+See also:
+  EndCount
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.GetEndDate
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Property getter for EndDate.
+Description:
+  GetEndDate is the property getter for EndDate.
+See also:
+  EndDate
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.GetEndType
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Property getter for EndType.
+Description:
+  GetEndType is the property getter for EndType.
+See also:
+  EndType
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.GetRecurringType
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Property getter for RecurringType.
+Description:
+  GetRecurringType is the property getter for RecurringType.
+See also:
+  RecurringType
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.GetStartDate
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Property getter for StartDate.
+Description:
+  GetStartDate is the property getter for StartDate.
+See also:
+  StartDate
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.InitToSavedState
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Initializes the schedule to a specific (saved) state.
+Description:
+  InitToSavedState initializes the schedule to a specific (saved) state. To save the state you
+  should retrieve the value of LastTriggered, TriggerCount and DayCount and store them somewhere
+  (ie. in the registry or a INI-file).
+  
+  For restoring you can then retrieve the saved values and feed them to this method to have the
+  schedule continue where it left of.
+Parameters:
+  LastTriggerStamp - The value for LastTriggered.
+  LastTriggerCount - The value for TriggerCount.
+  LastDayCount     - The value for DayCount.
+See also:
+  DayCount
+  LastTriggered
+  Reset
+  TriggerCount
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.LastTriggered
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Retrieves the time stamp of the last event.
+Description:
+  LastTriggered retrieves the time stamp of the last generated event. This can be the last time a
+  call to NextEvent, NextEventFrom or NextEventFromNow was issued, or the timestamp specified by
+  a call to InitToSavedState.
+See also:
+  InitToSavedState
+  NextEvent
+  NextEventFrom
+  NextEventFromNow
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.NextEvent
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Retrieves the timestamp for the next event.
+Description:
+  NextEvent retrieves the timestamp for the next event. If the schedule has ended, NextEvent will
+  return a null timestamp (NullStamp).
+  
+  Calling NextEvent is the same as calling NextEventFrom(LastTriggered).
+Parameters:
+  CountMissedEvents - Flag to indicate if missed events should be counted. When set to True, any
+                      events that should have occured between the last generated event and the
+                      returned event are counted. If this leads to the end of the schedule, a null
+                      timestamp will be returned.
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.NextEventFrom
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Retrieves the timestamp for the next event given a starting timestamp.
+Description:
+  NextEventFrom retrieves the timestamp for the next event given a starting timestamp. If the
+  schedule has ended, NextEventFrom will return a null timestamp (NullStamp).
+Parameters:
+  FromEvent         - Timestamp from which the next event is to be determined.
+  CountMissedEvents - Flag to indicate if missed events should be counted. When set to True, any
+                      events that should have occured between the last generated event and the
+                      returned event are counted. If this leads to the end of the schedule, a null
+                      timestamp will be returned.
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.NextEventFromNow
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Retrieves the timestamp for the next event starting from the current date/time.
+Description:
+  NextEventFromNow retrieves the timestamp for the next event starting from the current date/time.
+  If the schedule has ended, NextEventFromNow will return a null timestamp (NullStamp).
+Parameters:
+  CountMissedEvents - Flag to indicate if missed events should be counted. When set to True, any
+                      events that should have occured between the last generated event and the
+                      returned event are counted. If this leads to the end of the schedule, a null
+                      timestamp will be returned.
+
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.RecurringType
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Indicates the schedules recurring type.
+Description:
+  RecurringType indicates the schedules recurring type. For more information on the possible values,
+  see TScheduleRecurringKind.
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.Reset
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Resets the schedule.
+Description:
+  Reset will reset the schedule. As a result DayCount and TriggerCount are set to 0 and
+  LastTriggered is set to a null time stamp (NullStamp).
+  
+  After calling reset the next call to NextEvent, NextEventFrom or NextEventFromNow will restart
+  the schedule.
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.SetEndCount
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Property setter for EndCount.
+Description:
+  SetEndCount is the property setter for EndCount.
+See also:
+  EndCount
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.SetEndDate
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Property setter for EndDate.
+Description:
+  SetEndDate is the property setter for EndDate.
+See also:
+  EndDate
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.SetEndType
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Property setter for EndType.
+Description:
+  SetEndType is the property setter for EndType.
+See also:
+  EndType
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.SetRecurringType
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Property setter for RecurringType.
+Description:
+  SetRecurringType is the property setter for RecurringType.
+See also:
+  RecurringType
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.SetStartDate
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Property Setter for StartDate.
+Description:
+  SetStartDate is the property setter for StartDate.
+See also:
+  StartDate
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.StartDate
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Indicates the starting date of the schedule.
+Description:
+  StartDate indicates the start date and time of the schedule.
+  
+  If this is a "one shot" schedule, StartDate is the date and time of the generated event.
+  
+  In all other cases StartDate determines the earliest possible event. Other properties of the
+  schedule may infact determine the actual earliest event lies at a later date/time than the one
+  specified by StartDate.
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclSchedule.TriggerCount
+<GROUP DateandTime.Scheduling.IJclSchedule>
+Summary:
+  Number of events generated.
+Description:
+  TriggerCount retrieves the number of events that have been generated. Every succesfull call from
+  NextEvent, NextEventFrom or NextEventFromNow will increase this counter.
+See also:
+  DayCount
+  NextEvent
+  NextEventFrom
+  NextEventFromNow
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclScheduleDayFrequency
+<GROUP DateandTime.Scheduling.IJclScheduleDayFrequency>
+Summary:
+  Interface to the daily frequency.
+Description:
+  IJclScheduleDayFrequency is the interface to the daily frequency. The daily frequency determines
+  at which time(s) of every valid event date an event will be generated. The schedule allows you to
+  set the start and end times, as well as specify an interval. To specify the schedule should use
+  only one time for each valid date, make the end time equal to the start time or set Interval to 0.
+  
+  This interface is supported for all schedules except one shots (RecurringType = srkOneShot).
+See also:
+  IJclSchedule
+  IJclSchedule.RecurringType
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclScheduleDayFrequency.StartTime
+<GROUP DateandTime.Scheduling.IJclScheduleDayFrequency>
+Summary:
+  The start time in milliseconds.
+Description:
+  StartTime determines the first time of the day on which an event will be generated. The time is
+  expressed in milliseconds since midnight.
+See also:
+  EndTime
+  Interval
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclScheduleDayFrequency.EndTime
+<GROUP DateandTime.Scheduling.IJclScheduleDayFrequency>
+Summary:
+  The end time in milliseconds.
+Description:
+  EndTime determines the last possible time of the day on which an event will be generated. The time
+  is expressed in milliseconds since midnight. There's no guarantee that an event will be generated
+  at that time. The actual last event might be sooner, depending on the value of StartTime and 
+  Interval.
+See also:
+  Interval
+  StartTime
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclScheduleDayFrequency.Interval
+<GROUP DateandTime.Scheduling.IJclScheduleDayFrequency>
+Summary:
+  The interval in milliseconds.
+Description:
+  Interval determines the interval between two events on the same day. The interval is expressed in
+  milliseconds.
+  
+  Setting Interval to 0 results in EndTime being set to the StartTime, resulting in a daily one
+  shot.
+See also:
+  EndTime
+  StartTime
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclDailySchedule
+<GROUP DateandTime.Scheduling.IJclDailySchedule>
+Summary:
+  Interface to the daily schedule.
+Description:
+  IJclDailySchedule is the interface to the daily schedule. With the daily schedule you can specify
+  the number of days to skip between events or that events only occur on weekdays.
+  
+  This interface is supported for schedule with IJclSchedule.RecurringType set to srkDaily.
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclDailySchedule.EveryWeekDay
+<GROUP DateandTime.Scheduling.IJclDailySchedule>
+Summary:
+  Specifies if events should be generated on every weekday.
+Description:
+  EveryWeekDay specifies if events should be generated on every weekday or not.
+  
+  Setting EveryWeekDay to True will generate events on every weekday. Reading Interval will return
+  0 (zero), but the original value is preserved.
+  
+  Setting EveryWeekDay to False will generate events every n days, where n is
+  specified by Interval. Setting Interval will also result in EveryWeekDay being set to False.
+See also:
+  Interval
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclDailySchedule.Interval
+<GROUP DateandTime.Scheduling.IJclDailySchedule>
+Summary:
+  Specifies the number of days between events.
+Description:
+  Interval specifies the number of days between events. Interval must be greater than 0.
+  
+  Setting Interval will result in EveryWeekDay being set to False.
+See also:
+  EveryWeekDay
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclWeeklySchedule
+<GROUP DateandTime.Scheduling.IJclWeeklySchedule>
+Summary:
+  Interface to the weekly schedule.
+Description:
+  IJclWeeklySchedule is the interface to the weekly schedule. With the weekly schedule you can
+  specify the days of a week and the number of weeks to skip between events.
+  
+  This interface is supported for schedule with IJclSchedule.RecurringType set to srkWeekly.
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclWeeklySchedule.DaysOfWeek
+<GROUP DateandTime.Scheduling.IJclWeeklySchedule>
+Summary:
+  Specifies on which days of the week an event should be generated.
+Description:
+  DaysOfWeek specifies on which days of the week an event should be generated. At least 1 day should
+  be set.
+See also:
+  Interval
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclWeeklySchedule.Interval
+<GROUP DateandTime.Scheduling.IJclWeeklySchedule>
+Summary:
+  Specifies the number of weeks between events.
+Description:
+  Interval specifies the number of weeks between events. Interval must be greater than 0.
+See also:
+  DaysOfWeek
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclMonthlySchedule
+<GROUP DateandTime.Scheduling.IJclMonthlySchedule>
+Summary:
+  Interface to the monthly schedule.
+Description:
+  IJclMonthlySchedule is the interface to the monthly schedule. With the monthly schedule you can
+  specify the day and number of months to skip between events.
+  
+  The setting of the day allows you to select the nth/last weekday, weekendday, day of the
+  week or day of the month.
+  
+  This interface is supported for schedule with IJclSchedule.RecurringType set to srkMonthly.
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclMonthlySchedule.Day
+<GROUP DateandTime.Scheduling.IJclMonthlySchedule>
+Summary:
+  Specifies the day of the month on which the event is to be generated.
+Description:
+  Day specifies on which day of the month an event is to be generated. If the specified day is
+  higher than the number of days in the month the event is generated, it will default to the last
+  day of that month (eg. if Day is set to 31 and an event is to be generated in February 2010, an
+  event will be generated on February 28th).
+  
+  Day is only supported when IndexKind is set to either sikNone.
+See also:
+  IndexKind
+  Interval
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclMonthlySchedule.IndexKind
+<GROUP DateandTime.Scheduling.IJclMonthlySchedule>
+Summary:
+  Specifies the meaning of IndexValue.
+Description:
+  IndexKind specifies the meaning of IndexValue. 
+  
+  The IndexValue/IndexKind combination allows you to select the nth weekday, weekendday or
+  day of the week, where n can be either negative (ie. relative to the end of the month) or
+  positive (ie. relative to the start of the month). See TScheduleInkexKind for more information on
+  the possible values.
+See also:
+  Day
+  IndexValue
+  Interval
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclMonthlySchedule.IndexValue
+<GROUP DateandTime.Scheduling.IJclMonthlySchedule>
+Summary:
+  Specifies the day, weekday, weekendday or day of the week.
+Description:
+  IndexValue specifies which day, weekday, weekendday or day of the week an event should occur.
+  
+  Setting IndexValue to a positive value results in the IndexValueth occurance of the day
+  specified by IndexKind (either a day of the month, weekday, weekendday or day of the week). If the
+  requested occurance is not available (ie. the specified value is to large), the last occurance
+  will be used instead.
+  
+  Setting IndexValue to a negative value results in the Abs(IndexValue)th occurance of
+  the day specified by IndexKind (either a day of the month, weekday, weekendday or day of the week)
+  from the end of the month. If the requested occurance is not available (ie. the specified
+  value is to small), the first occurance will be used instead.
+  
+  IndexValue can be set only when IndexKind is not set to sikNone.
+See also:
+  Day
+  IndexKind
+  Interval
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclMonthlySchedule.Interval
+<GROUP DateandTime.Scheduling.IJclMonthlySchedule>
+Summary:
+  Specifies the number of months between two events.
+Description:
+  Interval specifies the number of months between two events. Interval must be greater than 0.
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclYearlySchedule
+<GROUP DateandTime.Scheduling.IJclYearlySchedule>
+Summary:
+  Interface to the yearly schedule.
+Description:
+  IJclYearlySchedule is the interface to the yearly schedule. With the yearly schedule you can
+  specify the day, month and number of years to skip between events.
+  
+  The setting of the day allows you to select the nth weekday, weekendday, day of the
+  week or day of the month from either the start or the end of the month.
+  
+  This interface is supported for schedule with IJclSchedule.RecurringType set to srkYearly.
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclYearlySchedule.Day
+<GROUP DateandTime.Scheduling.IJclYearlySchedule>
+Summary:
+  Specifies the day of the month on which the event is to be generated.
+Description:
+  Day specifies on which day of the month an event is to be generated. If the specified day is
+  higher than the number of days in the month the event is generated, it will default to the last
+  day of that month (eg. if Day is set to 31 and an event is to be generated in February 2010, an
+  event will be generated on February 28th).
+  
+  Day is only supported when IndexKind is set to either sikNone.
+See also:
+  IndexKind
+  Interval
+  Month
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclYearlySchedule.IndexKind
+<GROUP DateandTime.Scheduling.IJclYearlySchedule>
+Summary:
+  Specifies the meaning of IndexValue.
+Description:
+  IndexKind specifies the meaning of IndexValue. 
+  
+  The IndexValue/IndexKind combination allows you to select the nth weekday, weekendday or
+  day of the week, where n can be either negative (ie. relative to the end of the month) or
+  positive (ie. relative to the start of the month). See TScheduleInkexKind for more information on
+  the possible values.
+See also:
+  Day
+  IndexValue
+  Interval
+  Month
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclYearlySchedule.IndexValue
+<GROUP DateandTime.Scheduling.IJclYearlySchedule>
+Summary:
+  Specifies the day, weekday, weekendday or day of the week.
+Description:
+  IndexValue specifies which day, weekday, weekendday or day of the week an event should occur.
+  
+  Setting IndexValue to a positive value results in the IndexValueth occurance of the day
+  specified by IndexKind (either a day of the month, weekday, weekendday or day of the week). If the
+  requested occurance is not available (ie. the specified value is to large), the last occurance
+  will be used instead.
+  
+  Setting IndexValue to a negative value results in the Abs(IndexValue)th occurance of
+  the day specified by IndexKind (either a day of the month, weekday, weekendday or day of the week)
+  from the end of the month. If the requested occurance is not available (ie. the specified
+  value is to small), the first occurance will be used instead.
+  
+  IndexValue can be set only when IndexKind is not set to sikNone.
+See also:
+  Day
+  IndexKind
+  Interval
+  Month
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclYearlySchedule.Interval
+<GROUP DateandTime.Scheduling.IJclYearlySchedule>
+Summary:
+  Specifies the number of months between two events.
+Description:
+  Interval specifies the number of months between two events. Interval must be greater than 0.
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IJclYearlySchedule.Month
+<GROUP DateandTime.Scheduling.IJclYearlySchedule>
+Summary:
+  Specifies on which month an event is to be generated.
+Description:
+  Month specifies on which month an event is to be generated.
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@CreateSchedule
+<GROUP DateandTime.Scheduling>
+Summary:
+  Creates and initializes a new schedule instance.
+Description:
+  CreateSchedule creates, initializes and returns a new schedule instance. As the schedule is
+  returned as an interface, you don't have to worry about freeing the instance. As soon as the last
+  reference to the schedule goes out of scope (or a new value is assigned to a variable holding the
+  reference) the instance will be freed.
+See also:
+  IJclSchedule
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@NullStamp
+<GROUP DateandTime.Scheduling.Aux>
+Summary:
+  Creates a null time stamp
+Description:
+  NullStamp creates a "null" time stamp. It accomplish this by setting the time member to -1, which
+  is not allowed under normal circumstances.
+  
+  The null stamp is returned by NextEvent, NextEventFrom and NextEventFromNow if there are no more
+  events to be generated. You can use IsNullTimeStamp to check for this result.
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@CompareTimeStamps
+<GROUP DateandTime.Scheduling.Aux>
+Summary:
+  Compares two time stamps.
+Description:
+  CompareTimeStamps compares two timestamps and returns the result of the comparison:
+  
+  <TABLE>
+  Value   Meaning
+  -----   -------
+  < 0    Stamp1 is earlier than Stamp2.
+  0       Stamp1 and Stamp2 are equal.
+  > 0    Stamp1 is later than Stamp2.
+  </TABLE>
+Parameters:
+  Stamp1 - First time stamp to compare.
+  Stamp2 - Second time stamp to compare.
+See also:
+  EqualTimeStamps
+  IsNullTimeStamp
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@EqualTimeStamps
+<GROUP DateandTime.Scheduling.Aux>
+Summary:
+  Determines if two timestamps are equal.
+Description:
+  EqualTimeStamps determines if the two specified time stamps are equal.
+Parameters:
+  Stamp1 - First time stamp to compare.
+  Stamp2 - Second time stamp to compare.
+See also:
+  CompareTimeStamps
+  IsNullTimeStamp
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------
+@@IsNullTimeStamp
+<GROUP DateandTime.Scheduling.Aux>
+Summary:
+  Determines if a time stamp is a null stamp.
+Description:
+  IsNullTimeStamp determines if the given time stamp is the "null" time stamp.
+  
+  IsNullTimeStamp is the same as calling EqualTimeStamps(Stamp, NullStamp).
+See also:
+  CompareTimeStamps
+  EqualTimeStamps
+  NullStamp
+Donator:
+  Marcel Bestebroer
+----------------------------------------------------------------------------------------------------

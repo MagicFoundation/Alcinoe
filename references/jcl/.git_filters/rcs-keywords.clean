@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+# commun sub program to generate keyword content
+sub generate_keyword {
+	# pattern as in the raw source file
+	$pattern = $_[0];
+
+	# extract pattern start
+	$start = substr($pattern,0,2);
+	if ($start eq "::") {
+		# if it start with "::", the pattern length must be preserved
+		return "::" . (' ' x (length($pattern) - 2));
+	} else {
+		# return default content without length concern
+		return "";
+	}
+}
+
+# main processing loop
+
+while (<STDIN>) {
+	# replace keyword "Date"
+	s/\$([Dd][Aa][Tt][Ee])([^\$]*)\$/"\$" . $1 . generate_keyword($2) . "\$"/eg;
+
+	# replace keyword "Author"
+	s/\$([Aa][Uu][Tt][Hh][Oo][Rr])([^\$]*)\$/"\$" . $1 . generate_keyword($2) . "\$"/eg;
+
+	# replace keyword "Id"
+	s/\$([Ii][Dd])([^\$]*)\$/"\$" . $1 . generate_keyword($2) . "\$"/eg;
+
+	# replace keyword "Url"
+	s/\$([Uu][Rr][Ll])([^\$]*)\$/"\$" . $1 . generate_keyword($2) . "\$"/eg;
+
+	# replace keyword "File"
+	s/\$([Ff][Ii][Ll][Ee])([^\$]*)\$/"\$" . $1 . generate_keyword($2) . "\$"/eg;
+
+	# replace keywords "Revision" and "Rev"
+	s/\$([Rr][Ee][Vv][Ii][Ss][Ii][Oo][Nn])([^\$]*)\$/"\$" . $1 . generate_keyword($2) . "\$"/eg;
+	s/\$([Rr][Ee][Vv])([^Ii][^\$]*|)\$/"\$" . $1 . generate_keyword($2) . "\$"/eg;
+} continue {
+	print
+}

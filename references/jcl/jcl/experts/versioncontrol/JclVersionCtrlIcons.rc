@@ -1,0 +1,37 @@
+/****************************************************************************************************
+
+  Icons for version control actions
+
+****************************************************************************************************/
+
+CONTEXTMENU	ICON	"icons\ContextMenu.ico"
+EXPLORE		ICON	"icons\Explore.ico"
+FILEADD		ICON	"icons\FileAdd.ico"
+FILEBLAME	ICON	"icons\FileBlame.ico"
+FILEBRANCH	ICON	"icons\FileBranch.ico"
+FILECOMMIT	ICON	"icons\FileCommit.ico"
+FILEDIFF	ICON	"icons\FileDiff.ico"
+FILEGRAPH	ICON	"icons\FileGraph.ico"
+FILELOCK	ICON	"icons\FileLock.ico"
+FILELOG		ICON	"icons\FileLog.ico"
+FILEMERGE	ICON	"icons\FileMerge.ico"
+FILERENAME	ICON	"icons\FileRename.ico"
+FILEREVERT	ICON	"icons\FileRevert.ico"
+FILETAG		ICON	"icons\FileTag.ico"
+FILEUNLOCK	ICON	"icons\FileUnlock.ico"
+FILEUPDATE	ICON	"icons\FileUpdate.ico"
+PROPERTIES	ICON	"icons\Properties.ico"
+REPOBROWSER	ICON	"icons\RepoBrowser.ico"
+SANDBOXADD	ICON	"icons\SandboxAdd.ico"
+SANDBOXBRANCH	ICON	"icons\SandboxBranch.ico"
+SANDBOXCHECKOUT	ICON	"icons\SandboxCheckout.ico"
+SANDBOXCOMMIT	ICON	"icons\SandboxCommit.ico"
+SANDBOXLOCK	ICON	"icons\SandboxLock.ico"
+SANDBOXLOG	ICON	"icons\SandboxLog.ico"
+SANDBOXMERGE	ICON	"icons\SandboxMerge.ico"
+SANDBOXRENAME	ICON	"icons\SandboxRename.ico"
+SANDBOXREVERT	ICON	"icons\SandboxRevert.ico"
+SANDBOXTAG	ICON	"icons\SandboxTag.ico"
+SANDBOXUNLOCK	ICON	"icons\SandboxUnlock.ico"
+SANDBOXUPDATE	ICON	"icons\SandboxUpdate.ico"
+STATUS		ICON	"icons\Status.ico"

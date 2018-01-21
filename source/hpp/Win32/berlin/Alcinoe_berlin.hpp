@@ -158,6 +158,7 @@
 #include <Xml.Win.msxmldom.hpp>	// (xmlrtl)
 #include <Xml.xmldom.hpp>	// (xmlrtl)
 #include <ToolsAPI.hpp>	// (designide)
+#include <System.NetEncoding.hpp>	// (rtl)
 #include <Proxies.hpp>	// (designide)
 #include <DesignEditors.hpp>	// (designide)
 #include <FMX.ScrollBox.Style.hpp>	// (fmx)

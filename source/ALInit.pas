@@ -9,4 +9,7 @@ uses ALString;
 initialization
   ALStringInitialization;
 
+finalization
+  ALStringFinalization;
+
 end.

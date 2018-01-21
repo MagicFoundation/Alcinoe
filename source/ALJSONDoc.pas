@@ -1148,7 +1148,6 @@ uses System.Math,
      System.DateUtils,
      ALquickSortList,
      AlHTML,
-     ALMime,
      ALCommon;
 
 {$IFNDEF NEXTGEN}

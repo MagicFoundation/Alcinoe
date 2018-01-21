@@ -882,7 +882,9 @@ var
   size     : Integer;
   c        : AnsiChar;
 begin
+  {$IF CompilerVersion <= 31} {Delphi berlin}
   result := 0;
+  {$ENDIF}
 
   position := inStream.Position;
 

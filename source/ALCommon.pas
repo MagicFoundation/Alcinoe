@@ -57,6 +57,38 @@ const ALMAXUInt64: UInt64 = 18446744073709551615;
                          // samevalue to compare
                          // https://stackoverflow.com/questions/41779801/single-double-and-precision
 
+{$IFDEF MSWINDOWS}
+
+type
+  /// the potential features, retrieved from an Intel CPU
+  // - see https://en.wikipedia.org/wiki/CPUID#EAX.3D1:_Processor_Info_and_Feature_Bits
+  TALIntelCpuFeature =
+   ( { in EDX }
+   cfFPU, cfVME, cfDE, cfPSE, cfTSC, cfMSR, cfPAE, cfMCE,
+   cfCX8, cfAPIC, cf_d10, cfSEP, cfMTRR, cfPGE, cfMCA, cfCMOV,
+   cfPAT, cfPSE36, cfPSN, cfCLFSH, cf_d20, cfDS, cfACPI, cfMMX,
+   cfFXSR, cfSSE, cfSSE2, cfSS, cfHTT, cfTM, cfIA64, cfPBE,
+   { in ECX }
+   cfSSE3, cfCLMUL, cfDS64, cfMON, cfDSCPL, cfVMX, cfSMX, cfEST,
+   cfTM2, cfSSSE3, cfCID, cfSDBG, cfFMA, cfCX16, cfXTPR, cfPDCM,
+   cf_c16, cfPCID, cfDCA, cfSSE41, cfSSE42, cfX2A, cfMOVBE, cfPOPCNT,
+   cfTSC2, cfAESNI, cfXS, cfOSXS, cfAVX, cfF16C, cfRAND, cfHYP,
+   { extended features in EBX, ECX }
+   cfFSGS, cf_b01, cfSGX, cfBMI1, cfHLE, cfAVX2, cf_b06, cfSMEP, cfBMI2,
+   cfERMS, cfINVPCID, cfRTM, cfPQM, cf_b13, cfMPX, cfPQE, cfAVX512F,
+   cfAVX512DQ, cfRDSEED, cfADX, cfSMAP, cfAVX512IFMA, cfPCOMMIT,
+   cfCLFLUSH, cfCLWB, cfIPT, cfAVX512PF, cfAVX512ER, cfAVX512CD,
+   cfSHA, cfAVX512BW, cfAVX512VL, cfPREFW1, cfAVX512VBMI);
+
+  /// all features, as retrieved from an Intel CPU
+  TALIntelCpuFeatures = set of TALIntelCpuFeature;
+
+var
+  /// the available CPU features, as recognized at program startup
+  ALCpuFeatures: TALIntelCpuFeatures;
+
+{$ENDIF}
+
 implementation
 
 uses system.Classes,
@@ -254,7 +286,96 @@ begin
   {$ENDIF}
 end;
 
+
+//
+// Taken from https://github.com/synopse/mORMot.git
+// https://synopse.info
+// http://mormot.net
+//
+
+{$IF CompilerVersion > 32} // tokyo
+  {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
+{$IFEND}
+
+{$IFDEF MSWINDOWS}
+
+{**}
+type
+ TRegisters = record
+   eax,ebx,ecx,edx: cardinal;
+ end;
+
+{***************************************************************}
+procedure _GetCPUID(Param: Cardinal; var Registers: _TRegisters);
+{$IF defined(CPU64BITS)}
+asm // ecx=param, rdx=Registers (Linux: edi,rsi)
+  .NOFRAME
+  mov     eax, ecx
+  mov     r9, rdx
+  mov     r10, rbx // preserve rbx
+  xor     ebx, ebx
+  xor     ecx, ecx
+  xor     edx, edx
+  cpuid
+  mov     _TRegisters(r9).&eax, eax
+  mov     _TRegisters(r9).&ebx, ebx
+  mov     _TRegisters(r9).&ecx, ecx
+  mov     _TRegisters(r9).&edx, edx
+  mov     rbx, r10
+end;
+{$else}
+asm
+  push    esi
+  push    edi
+  mov     esi, edx
+  mov     edi, eax
+  pushfd
+  pop     eax
+  mov     edx, eax
+  xor     eax, $200000
+  push    eax
+  popfd
+  pushfd
+  pop     eax
+  xor     eax, edx
+  jz      @nocpuid
+  push    ebx
+  mov     eax, edi
+  xor     ecx, ecx
+  cpuid
+  mov     _TRegisters(esi).&eax, eax
+  mov     _TRegisters(esi).&ebx, ebx
+  mov     _TRegisters(esi).&ecx, ecx
+  mov     _TRegisters(esi).&edx, edx
+  pop     ebx
+@nocpuid:
+  pop     edi
+  pop     esi
+end;
+{$ifend}
+
+{******************************}
+procedure _TestIntelCpuFeatures;
+var regs: _TRegisters;
+begin
+  regs.edx := 0;
+  regs.ecx := 0;
+  _GetCPUID(1,regs);
+  PIntegerArray(@ALCpuFeatures)^[0] := regs.edx;
+  PIntegerArray(@ALCpuFeatures)^[1] := regs.ecx;
+  _GetCPUID(7,regs);
+  PIntegerArray(@ALCpuFeatures)^[2] := regs.ebx;
+  PByteArray(@ALCpuFeatures)^[12] := regs.ecx;
+end;
+
+{$ENDIF}
+
 initialization
+
+  {$IFDEF MSWINDOWS}
+  _TestIntelCpuFeatures;
+  {$ENDIF}
+
   ALCustomDelayedFreeObjectProc := nil;
   {$IFDEF DEBUG}
   ALFreeAndNilRefCountWarn := False;

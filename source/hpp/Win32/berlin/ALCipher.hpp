@@ -77,6 +77,7 @@ public:
 #pragma pack(pop)
 
 
+#pragma pack(push,1)
 struct DECLSPEC_DRECORD TALCipherRDLVector
 {
 	
@@ -94,6 +95,7 @@ public:
 		
 	};
 };
+#pragma pack(pop)
 
 
 typedef System::StaticArray<System::Byte, 16> TALCipherRDLBlock;
@@ -181,6 +183,10 @@ extern DELPHI_PACKAGE System::AnsiString __fastcall ALStreamHashSHA1(System::Cla
 extern DELPHI_PACKAGE void __fastcall ALStringHashSHA1(TALCipherSHA1Digest &Digest, const System::AnsiString Str)/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALStringHashSHA1(const System::AnsiString Str, const bool HexEncode = true)/* overload */;
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALStringHashSHA1U(const System::UnicodeString Str, System::Sysutils::TEncoding* const encoding);
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALBCryptHashPassword(const System::AnsiString password, int cost);
+extern DELPHI_PACKAGE bool __fastcall ALBCryptCheckPassword(const System::AnsiString password, const System::AnsiString expectedHashString, /* out */ bool &PasswordRehashNeeded);
+extern DELPHI_PACKAGE bool __fastcall ALBCryptPasswordRehashNeeded(const System::AnsiString HashString);
+extern DELPHI_PACKAGE bool __fastcall ALBCryptSelfTest(void);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALCalcHMACSHA1(const System::AnsiString Str, const System::AnsiString Key);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALCalcHMACMD5(const System::AnsiString Str, const System::AnsiString Key);
 extern DELPHI_PACKAGE void __fastcall ALCipherEncryptRDL(const TALCipherRDLContext &Context, TALCipherRDLBlock &Block);
@@ -232,6 +238,7 @@ extern "C" System::LongBool __stdcall CryptAcquireContextW(PHCRYPTPROV phProv, S
 extern "C" System::LongBool __stdcall CryptReleaseContext(NativeUInt hProv, unsigned dwFlags);
 extern "C" System::LongBool __stdcall CryptGenRandom(NativeUInt hProv, unsigned dwLen, System::PByte pbBuffer);
 extern DELPHI_PACKAGE System::DynamicArray<System::Byte> __fastcall ALRandomBytes(const unsigned Len);
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALRandomByteStr(const unsigned Len);
 extern DELPHI_PACKAGE unsigned __fastcall ALRandom32(const unsigned ARange);
 extern DELPHI_PACKAGE unsigned __int64 __fastcall ALRandom64(const unsigned __int64 ARange);
 extern DELPHI_PACKAGE unsigned __fastcall ALCrc32cfastBytes(unsigned crc, System::PByte buf, unsigned len)/* overload */;

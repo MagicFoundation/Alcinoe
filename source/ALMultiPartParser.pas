@@ -618,7 +618,7 @@ procedure TALMultiPartBaseContent.LoadDataFromFileBase64Encode(const aFileName: 
 Var Buffer: AnsiString;
 begin
   TMemoryStream(FDataStream).clear;
-  Buffer := ALMimeEncodeString(AlGetStringFromFile(aFileName));
+  Buffer := ALBase64EncodeStringMIME(AlGetStringFromFile(aFileName));
   FDataStream.WriteBuffer(pointer(Buffer)^, length(Buffer));
   FDataStream.Position := 0;
   ContentType := ALGetDefaultMIMEContentTypeFromExt(ALExtractFileExt(aFileName));
@@ -639,7 +639,7 @@ Begin
   aStream.Position := 0;
   SetLength(Buffer,aStream.size);
   aStream.ReadBuffer(pointer(Buffer)^,aStream.size);
-  Buffer := ALMimeEncodeString(Buffer);
+  Buffer := ALBase64EncodeStringMIME(Buffer);
   TMemoryStream(FDataStream).clear;
   FDataStream.WriteBuffer(pointer(Buffer)^, length(Buffer));
   FDataStream.Position := 0;
@@ -665,7 +665,7 @@ begin
   FDataStream.Position := 0;
   SetLength(Buffer,FdataStream.size);
   FDataStream.ReadBuffer(pointer(Buffer)^,FdataStream.size);
-  AlSaveStringToFile(ALMimeDecodeString(Buffer),aFileName);
+  AlSaveStringToFile(ALBase64DecodeStringMIME(Buffer),aFileName);
 end;
 
 {*******************************************************************************}
@@ -675,7 +675,7 @@ begin
   FDataStream.Position := 0;
   SetLength(Buffer,FdataStream.size);
   FDataStream.ReadBuffer(pointer(Buffer)^,FdataStream.size);
-  Buffer := ALMimeDecodeString(Buffer);
+  Buffer := ALBase64DecodeStringMIME(Buffer);
   aStream.WriteBuffer(pointer(Buffer)^, Length(Buffer));
 end;
 

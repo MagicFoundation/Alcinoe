@@ -473,8 +473,10 @@ function  ALIntToBit(value: Integer; digits: integer): ansistring;
 function  AlBitToInt(Value: ansiString): Integer;
 function  AlInt2BaseN(NumIn: UInt64; const charset: array of ansiChar): ansistring;
 function  AlBaseN2Int(const Str: ansiString; const charset: array of ansiChar): UInt64;
-var       ALBase64EncodeString: function(const S: AnsiString): AnsiString;
-var       ALBase64DecodeString: function(const S: AnsiString): AnsiString;
+function  ALBase64EncodeString(const S: AnsiString): AnsiString;
+function  ALBase64EncodeStringMIME(const S: AnsiString): AnsiString;
+function  ALBase64DecodeStringMIME(const S: AnsiString): AnsiString;
+function  ALBase64DecodeString(const S: AnsiString): AnsiString;
 function  ALIsDecimal(const S: AnsiString; const RejectPlusMinusSign: boolean = False): boolean;
 Function  ALIsInt64 (const S: AnsiString): Boolean;
 Function  ALIsInteger (const S: AnsiString): Boolean;
@@ -582,10 +584,10 @@ Function  ALTryBinToHexU(const aBin; aBinSize : Cardinal; out Value: String): bo
 Function  ALBinToHexU(const aBin; aBinSize : Cardinal): String; overload;
 Function  ALTryHexToBinU(const aHex: String; out Value: Tbytes): boolean;
 Function  ALHexToBinU(const aHex: String): Tbytes;
-var       ALBase64EncodeStringU: function(const S: String; const AEncoding: TEncoding = nil): String;
-var       ALBase64DecodeStringU: function(const S: String; const AEncoding: TEncoding = nil): String;
-var       ALBase64EncodeBytesU: function(const Bytes: Tbytes): String;
-var       ALBase64DecodeBytesU: function(const S: String): Tbytes;
+Function  ALBase64EncodeStringU(const S: String; const AEncoding: TEncoding = nil): String;
+Function  ALBase64DecodeStringU(const S: String; const AEncoding: TEncoding = nil): String;
+Function  ALBase64EncodeBytesU(const Bytes: Tbytes): String;
+Function  ALBase64DecodeBytesU(const S: String): Tbytes;
 function  ALIsDecimalU(const S: String; const RejectPlusMinusSign: boolean = False): boolean;
 Function  ALIsInt64U(const S: String): Boolean;
 Function  ALIsIntegerU(const S: String): Boolean;
@@ -821,6 +823,7 @@ Const cAlUTF8Bom = ansiString(#$EF) + ansiString(#$BB) + ansiString(#$BF);
 {$ENDIF}
 
 Procedure ALStringInitialization;
+procedure ALStringFinalization;
 
 implementation
 
@@ -829,13 +832,15 @@ uses System.SysConst,
      System.StrUtils,
      System.RegularExpressionsAPI,
      System.RegularExpressionsConsts,
+     {$IF CompilerVersion >= 31} // berlin
+     system.netencoding,
+     {$IFEND}
      {$IFNDEF NEXTGEN}
      System.Ansistrings,
      {$ENDIF}
      System.Character,
      System.Math,
-     ALcommon,
-     ALMime;
+     ALcommon;
 
 {$IFNDEF NEXTGEN}
 
@@ -6811,6 +6816,312 @@ begin
 
 end;
 
+/////////////////////////////////
+////// Base64 (ansiString) //////
+/////////////////////////////////
+
+//
+// Taken from https://github.com/synopse/mORMot.git
+// https://synopse.info
+// http://mormot.net
+//
+// NOTE: the original function was different from the Unicode in the way that it's
+//       don't ignore Characters outside alphabet (and even don't raise any exception)
+//       also the purepascal implementation seam to be 2x more faster than the
+//       ASM implementation. So i decide to remove the ASM implementation
+//       and i make that Base64decode crash with invalid chars
+//       https://synopse.info/forum/viewtopic.php?pid=26173#p26173
+//
+
+{$IF CompilerVersion > 32} // tokyo
+  {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
+{$IFEND}
+
+type
+  TBase64Enc = array[0..63] of AnsiChar;
+  TBase64Dec = array[AnsiChar] of shortint;
+const
+  b64enc: TBase64Enc =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+
+var
+  /// a conversion table from Base64 text into binary data
+  // - used by Base64ToBin/IsBase64 functions
+  // - contains -1 for invalid char, -2 for '=', 0..63 for b64enc[] chars
+  ConvertBase64ToBin: TBase64Dec;
+
+const
+  sInvalidbase64String = 'Invalid base64 string';
+
+{********************************************************************************************}
+function Base64AnyDecode(const decode: TBase64Dec; sp,rp: PAnsiChar; len: NativeInt): boolean;
+var c, ch: NativeInt;
+begin
+  result := false;
+  while len>=4 do begin
+    c := decode[sp[0]];
+    if c<0 then
+      exit;
+    c := c shl 6;
+    ch := decode[sp[1]];
+    if ch<0 then
+      exit;
+    c := (c or ch) shl 6;
+    ch := decode[sp[2]];
+    if ch<0 then
+      exit;
+    c := (c or ch) shl 6;
+    ch := decode[sp[3]];
+    if ch<0 then
+      exit;
+    c := c or ch;
+    rp[2] := AnsiChar(c);
+    c := c shr 8;
+    rp[1] := AnsiChar(c);
+    c := c shr 8;
+    rp[0] := AnsiChar(c);
+    dec(len,4);
+    inc(rp,3);
+    inc(sp,4);
+  end;
+  if len>=2 then begin
+    c := decode[sp[0]];
+    if c<0 then
+      exit;
+    c := c shl 6;
+    ch := decode[sp[1]];
+    if ch<0 then
+      exit;
+    if len=2 then
+      rp[0] := AnsiChar((c or ch) shr 4) else begin
+      c := (c or ch) shl 6;
+      ch := decode[sp[2]];
+      if ch<0 then
+        exit;
+      c := (c or ch) shr 2;
+      rp[1] := AnsiChar(c);
+      rp[0] := AnsiChar(c shr 8);
+    end;
+  end;
+  result := true;
+end;
+
+{*******************************************************************}
+function Base64EncodeMain(rp, sp: PAnsiChar; len: cardinal): integer;
+var i: integer;
+    c: cardinal;
+begin
+  result := len div 3;
+  for i := 1 to result do begin
+    c := ord(sp[0]) shl 16 + ord(sp[1]) shl 8 + ord(sp[2]);
+    rp[0] := b64enc[(c shr 18) and $3f];
+    rp[1] := b64enc[(c shr 12) and $3f];
+    rp[2] := b64enc[(c shr 6) and $3f];
+    rp[3] := b64enc[c and $3f];
+    inc(rp,4);
+    inc(sp,3);
+  end;
+end;
+
+{*******************************************************}
+procedure Base64Decode(sp,rp: PAnsiChar; len: NativeInt);
+begin
+  len := len shl 2; // len was the number of 4 chars chunks in sp
+  if (len>0) and (ConvertBase64ToBin[sp[len-2]]>=0) then
+    if ConvertBase64ToBin[sp[len-1]]>=0 then else
+      dec(len) else
+      dec(len,2); // adjust for Base64AnyDecode() algorithm
+  if not Base64AnyDecode(ConvertBase64ToBin,sp,rp,len) then
+    raise Exception.Create(sInvalidbase64String);
+end;
+
+{***********************************************************************}
+procedure Base64EncodeTrailing(rp, sp: PAnsiChar; len: cardinal); inline;
+var c: cardinal;
+begin
+  case len of
+    1: begin
+      c := ord(sp[0]) shl 4;
+      rp[0] := b64enc[(c shr 6) and $3f];
+      rp[1] := b64enc[c and $3f];
+      rp[2] := '=';
+      rp[3] := '=';
+    end;
+    2: begin
+      c := ord(sp[0]) shl 10 + ord(sp[1]) shl 2;
+      rp[0] := b64enc[(c shr 12) and $3f];
+      rp[1] := b64enc[(c shr 6) and $3f];
+      rp[2] := b64enc[c and $3f];
+      rp[3] := '=';
+    end;
+  end;
+end;
+
+{*******************************************************}
+procedure Base64Encode(rp, sp: PAnsiChar; len: cardinal);
+var main: cardinal;
+begin
+  main := Base64EncodeMain(rp,sp,len);
+  Base64EncodeTrailing(rp+main*4,sp+main*3,len-main*3);
+end;
+
+{******************************************************}
+function BinToBase64Length(len: NativeUInt): NativeUInt;
+begin
+  result := ((len+2)div 3)*4;
+end;
+
+{*******************************************************************}
+function Base64ToBinLength(sp: PAnsiChar; len: NativeInt): NativeInt;
+begin
+  result := 0;
+  if (len=0) then exit;
+  if (len and 3<>0) then raise Exception.Create(sInvalidbase64String);
+  if ConvertBase64ToBin[sp[len-2]]>=0 then
+    if ConvertBase64ToBin[sp[len-1]]>=0 then
+      result := 0 else
+      result := 1 else
+      result := 2;
+  result := (len shr 2)*3-result;
+end;
+
+{***************************************************************************}
+procedure Base64ToBin(sp: PAnsiChar; len: NativeInt; var result: AnsiString);
+var resultLen: NativeInt;
+begin
+  resultLen := Base64ToBinLength(sp,len);
+  if resultLen=0 then
+    result := '' else begin
+    SetString(result,nil,resultLen);
+    Base64Decode(sp,pointer(result),len shr 2);
+  end;
+end;
+
+{**************************************************************}
+function  ALBase64EncodeString(const S: AnsiString): AnsiString;
+var len: integer;
+begin
+  result := '';
+  len := length(s);
+  if len=0 then exit;
+  SetLength(result,BinToBase64Length(len));
+  Base64Encode(pointer(result),pointer(s),len);
+end;
+
+{**************************************************************}
+function  ALBase64DecodeString(const S: AnsiString): AnsiString;
+begin
+  Base64ToBin(pointer(s),length(s),result);
+end;
+
+{*********************}
+{$ZEROBASEDSTRINGS OFF} // << the guy who introduce zero base string in delphi is just a mix of a Monkey and a Donkey !
+function  ALBase64EncodeStringMIME(const S: AnsiString): AnsiString;
+var Ln: integer;
+    CountOfCRLF: integer;
+    CurrentPos: integer;
+    TmpStr: AnsiString;
+    i: integer;
+const maximumLineLength = 76;
+begin
+
+  //https://en.wikipedia.org/wiki/Base64
+  //MIME does not specify a fixed length for Base64-encoded lines, but it does specify a maximum line length of
+  //76 characters. Additionally it specifies that any extra-alphabetic characters must be ignored by a
+  //compliant decoder, although most implementations use a CR/LF newline pair to delimit encoded lines.
+
+  result := ALBase64EncodeString(s);
+  Ln := length(result);
+  CountOfCRLF := (ln div maximumLineLength);
+  if (ln mod maximumLineLength) = 0 then dec(CountOfCRLF);
+  if CountOfCRLF > 0 then begin
+    setlength(TmpStr, ln + (CountOfCRLF * 2));
+    CurrentPos := 0;
+    for I := 0 to CountOfCRLF - 1 do begin
+      AlMove(pbyte(result)[CurrentPos], pbyte(TmpStr)[CurrentPos + (i * 2)], maximumLineLength); // pbyte(Result) to not jump inside uniqueString (Result is already unique thanks to previous SetLength))
+      currentPos := currentPos + maximumLineLength;
+      pbyte(TmpStr)[CurrentPos + (i * 2)] := 13;
+      pbyte(TmpStr)[CurrentPos + (i * 2) +1] := 10;
+    end;
+    AlMove(pbyte(result)[CurrentPos], pbyte(TmpStr)[CurrentPos + (CountOfCRLF * 2)], ln-CurrentPos);
+    result := TmpStr;
+  end;
+
+end;
+{$IF defined(_ZEROBASEDSTRINGS_ON)}
+  {$ZEROBASEDSTRINGS ON}
+{$IFEND}
+
+{******************************************************************}
+function  ALBase64DecodeStringMIME(const S: AnsiString): AnsiString;
+begin
+
+  //https://en.wikipedia.org/wiki/Base64
+  //MIME specifies that any extra-alphabetic characters must be ignored by a
+  //compliant decoder, but here we just ignore the #13#10
+
+  result := ALBase64DecodeString(AlStringReplace(s, #13#10, '', [rfReplaceAll]));
+
+end;
+
+////////////////////////////////////
+////// Base64 (UnicodeString) //////
+////////////////////////////////////
+
+{$ENDIF !NEXTGEN}
+{$IF CompilerVersion >= 31} // berlin
+
+{*}
+var
+  _Base64Encoding: TBase64Encoding;
+
+{****************************************}
+function _GetBase64Encoding: TNetEncoding;
+var LEncoding: TBase64Encoding;
+begin
+  if _Base64Encoding = nil then begin
+    LEncoding := TBase64Encoding.Create(0); // this constructor to omits line breaks
+    if AtomicCmpExchange(Pointer(_Base64Encoding), Pointer(LEncoding), nil) <> nil then ALFreeAndNil(LEncoding)
+    {$IFDEF AUTOREFCOUNT}
+    else _Base64Encoding.__ObjAddRef;
+    {$ENDIF AUTOREFCOUNT}
+  end;
+  Result := _Base64Encoding;
+end;
+
+{*****************************************************************************************}
+Function  ALBase64EncodeStringU(const S: String; const AEncoding: TEncoding = nil): String;
+var BufIn: TBytes;
+begin
+  if assigned(AEncoding) then BufIn := AEncoding.GetBytes(S)
+  else BufIn := TEncoding.unicode.GetBytes(S);
+  result := _GetBase64Encoding.EncodeBytesToString(BufIn);
+end;
+
+{*****************************************************************************************}
+Function  ALBase64DecodeStringU(const S: String; const AEncoding: TEncoding = nil): String;
+var BufOut: TBytes;
+begin
+  BufOut := _GetBase64Encoding.DecodeStringToBytes(S);
+  if assigned(AEncoding) then result := AEncoding.GetString(BufOut)
+  else result := TEncoding.unicode.GetString(BufOut);
+end;
+
+{**********************************************************}
+Function  ALBase64EncodeBytesU(const Bytes: Tbytes): String;
+begin
+  result := _GetBase64Encoding.EncodeBytesToString(Bytes);
+end;
+
+{******************************************************}
+Function  ALBase64DecodeBytesU(const S: String): Tbytes;
+begin
+  result := _GetBase64Encoding.DecodeStringToBytes(S);
+end;
+
+{$IFEND CompilerVersion >= 31}
+{$IFNDEF NEXTGEN}
+
 {*********************************************************************************************}
 function ALIsDecimal(const S: AnsiString; const RejectPlusMinusSign: boolean = False): boolean;
 var i: integer;
@@ -12173,7 +12484,33 @@ end;
 
 {*******************************}
 Procedure ALStringInitialization;
+{$IFNDEF NEXTGEN}
+var i: integer;
+{$ENDIF}
 begin
+
+  {$IFNDEF NEXTGEN}
+
+  //
+  // Taken from https://github.com/synopse/mORMot.git
+  // https://synopse.info
+  // http://mormot.net
+  //
+
+  {$IF CompilerVersion > 32} // tokyo
+    {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
+  {$IFEND}
+
+  Fillchar(ConvertBase64ToBin,256,255); // invalid value set to -1
+  for i := 0 to high(b64enc) do
+    ConvertBase64ToBin[b64enc[i]] := i;
+  ConvertBase64ToBin['='] := -2; // special value for '='
+
+  {$ENDIF}
+
+  {$IF CompilerVersion >= 31} // berlin
+  _Base64Encoding := nil;
+  {$IFEND}
 
   {$IFNDEF NEXTGEN}
   ALPosExIgnoreCaseInitialiseLookupTable;
@@ -12192,8 +12529,6 @@ begin
   ALSameText := system.AnsiStrings.SameText;
   ALMatchText := System.AnsiStrings.MatchText;
   ALMatchStr := System.AnsiStrings.MatchStr;
-  ALBase64EncodeString := ALMimeEncodeStringNoCRLF;
-  ALBase64DecodeString := ALMimeDecodeString;
   {$ENDIF}
 
   ALDateToStrU := system.sysutils.DateToStr;
@@ -12219,10 +12554,6 @@ begin
   ALCurrToStrU := system.sysutils.CurrToStr;
   ALFormatFloatU := system.sysutils.FormatFloat;
   ALFormatCurrU := system.sysutils.FormatCurr;
-  ALBase64EncodeStringU := ALMimeEncodeStringNoCRLFU;
-  ALBase64DecodeStringU := ALMimeDecodeStringU;
-  ALBase64EncodeBytesU := ALMimeEncodeBytesNoCRLFU;
-  ALBase64DecodeBytesU := ALMimeDecodeBytesU;
   ALStrToFloatU := system.sysutils.StrToFloat;
   ALStrToFloatDefU := system.sysutils.StrToFloatDef;
   ALStrToCurrU := system.sysutils.StrToCurr;
@@ -12243,6 +12574,16 @@ begin
   ALDequotedStrU := system.sysutils.AnsiDequotedStr;
   ALLastDelimiterU := system.sysutils.LastDelimiter;
   ALStringReplaceU := system.sysutils.StringReplace;
+
+end;
+
+{*****************************}
+Procedure ALStringFinalization;
+begin
+
+  {$IF CompilerVersion >= 31} // berlin
+  AlFreeAndNil(_Base64Encoding);
+  {$IFEND}
 
 end;
 

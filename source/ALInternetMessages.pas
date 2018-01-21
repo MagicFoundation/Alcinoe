@@ -150,7 +150,6 @@ implementation
 uses system.Sysutils,
      {$IFNDEF NEXTGEN}
      ALHttpClient,
-     ALMime,
      ALWinsock,
      {$ENDIF}
      ALString;

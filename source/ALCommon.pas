@@ -51,6 +51,11 @@ const ALMAXUInt64: UInt64 = 18446744073709551615;
                          // dt := encodedatetime(1899,12,30,12,00,00,000);
                          // writeln(formatFloat('0.0', dt));                    => 0.5
                          // writeln(DateTimeToStr(dt));                         => 1899/12/30 12:00:00.000
+                         //
+                         // also -0.5 have the advantage to be in the form
+                         // m*2^e (-1*2^-1) with mean we don't need to use
+                         // samevalue to compare
+                         // https://stackoverflow.com/questions/41779801/single-double-and-precision
 
 implementation
 

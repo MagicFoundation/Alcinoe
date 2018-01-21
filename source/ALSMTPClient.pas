@@ -114,7 +114,6 @@ implementation
 Uses Winapi.Windows,
      System.Classes,
      System.SysUtils,
-     ALMime,
      ALWinsock,
      ALString;
 
@@ -298,7 +297,7 @@ Function TAlSmtpClient.Auth(const AUserName, APassword: AnsiString; aAuthType: T
   begin
     If aUserName='' then raise EALException.Create('UserName is empty');
     If aPassword='' then raise EALException.Create('Password is empty');
-    aAuthPlain := ALMimeEncodeStringNoCRLF(aUserName + #0 + aUserName + #0 + aPassword);
+    aAuthPlain := ALBase64EncodeString(aUserName + #0 + aUserName + #0 + aPassword);
     Result := SendCmd('AUTH PLAIN ' + aAuthPlain,[235]);
   end;
 
@@ -308,8 +307,8 @@ Function TAlSmtpClient.Auth(const AUserName, APassword: AnsiString; aAuthType: T
     If aUserName='' then raise EALException.Create('UserName is empty');
     If aPassword='' then raise EALException.Create('Password is empty');
     SendCmd('AUTH LOGIN',[334]);
-    SendCmd(ALMimeEncodeStringNoCRLF(aUsername),[334]);
-    Result := SendCmd(ALMimeEncodeStringNoCRLF(aPassword),[235]);
+    SendCmd(ALBase64EncodeString(aUsername),[334]);
+    Result := SendCmd(ALBase64EncodeString(aPassword),[235]);
   end;
 
 var tmpAuthType: TAlSmtpClientAuthType;

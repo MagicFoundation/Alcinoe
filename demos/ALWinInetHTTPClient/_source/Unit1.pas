@@ -145,7 +145,6 @@ Uses DateUtils,
      ALMultiPartParser,
      AlCommon,
      AlFiles,
-     AlMime,
      ALString,
      AlStringList,
      AlHTTPClient;

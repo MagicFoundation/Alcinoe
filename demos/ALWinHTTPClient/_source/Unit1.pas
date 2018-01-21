@@ -136,7 +136,6 @@ Uses system.AnsiStrings,
      ALMultiPartParser,
      AlFiles,
      AlCommon,
-     AlMime,
      ALString,
      ALStringList,
      AlHttpClient;

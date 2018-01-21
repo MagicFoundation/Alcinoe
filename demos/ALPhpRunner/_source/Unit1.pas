@@ -96,7 +96,6 @@ Uses ALMultiPartParser,
      AlFiles,
      AlCommon,
      ALString,
-     AlMime,
      AlHttpClient;
 
 {$R *.dfm}

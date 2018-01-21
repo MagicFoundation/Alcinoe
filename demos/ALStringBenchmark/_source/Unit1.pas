@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StrUtils, ExtCtrls, StdCtrls, Shellapi, Soap.EncdDecd,
-  System.Diagnostics, ALMime, system.NetEncoding;
+  System.Diagnostics, system.NetEncoding;
 
 type
   TForm1 = class(TForm)

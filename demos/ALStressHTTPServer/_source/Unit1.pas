@@ -202,7 +202,6 @@ Uses Math,
      AlCommon,
      ALWindows,
      AlHtml,
-     AlMime,
      ALString;
 
 {$R *.dfm}

@@ -57,7 +57,7 @@ const ALMAXUInt64: UInt64 = 18446744073709551615;
                          // samevalue to compare
                          // https://stackoverflow.com/questions/41779801/single-double-and-precision
 
-{$IFDEF MSWINDOWS}
+{$IFNDEF NEXTGEN}
 
 type
   /// the potential features, retrieved from an Intel CPU
@@ -297,7 +297,7 @@ end;
   {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
 {$IFEND}
 
-{$IFDEF MSWINDOWS}
+{$IFNDEF NEXTGEN}
 
 {**}
 type
@@ -305,75 +305,76 @@ type
    eax,ebx,ecx,edx: cardinal;
  end;
 
-{***************************************************************}
-procedure _GetCPUID(Param: Cardinal; var Registers: _TRegisters);
+{*************************************************************}
+procedure GetCPUID(Param: Cardinal; var Registers: TRegisters);
 {$IF defined(CPU64BITS)}
 asm // ecx=param, rdx=Registers (Linux: edi,rsi)
-  .NOFRAME
-  mov     eax, ecx
-  mov     r9, rdx
-  mov     r10, rbx // preserve rbx
-  xor     ebx, ebx
-  xor     ecx, ecx
-  xor     edx, edx
-  cpuid
-  mov     _TRegisters(r9).&eax, eax
-  mov     _TRegisters(r9).&ebx, ebx
-  mov     _TRegisters(r9).&ecx, ecx
-  mov     _TRegisters(r9).&edx, edx
-  mov     rbx, r10
+        .NOFRAME
+        mov     eax, ecx
+        mov     r9, rdx
+        mov     r10, rbx // preserve rbx
+        xor     ebx, ebx
+        xor     ecx, ecx
+        xor     edx, edx
+        cpuid
+        mov     TRegisters(r9).&eax, eax
+        mov     TRegisters(r9).&ebx, ebx
+        mov     TRegisters(r9).&ecx, ecx
+        mov     TRegisters(r9).&edx, edx
+        mov     rbx, r10
 end;
 {$else}
 asm
-  push    esi
-  push    edi
-  mov     esi, edx
-  mov     edi, eax
-  pushfd
-  pop     eax
-  mov     edx, eax
-  xor     eax, $200000
-  push    eax
-  popfd
-  pushfd
-  pop     eax
-  xor     eax, edx
-  jz      @nocpuid
-  push    ebx
-  mov     eax, edi
-  xor     ecx, ecx
-  cpuid
-  mov     _TRegisters(esi).&eax, eax
-  mov     _TRegisters(esi).&ebx, ebx
-  mov     _TRegisters(esi).&ecx, ecx
-  mov     _TRegisters(esi).&edx, edx
-  pop     ebx
+        push    esi
+        push    edi
+        mov     esi, edx
+        mov     edi, eax
+        pushfd
+        pop     eax
+        mov     edx, eax
+        xor     eax, $200000
+        push    eax
+        popfd
+        pushfd
+        pop     eax
+        xor     eax, edx
+        jz      @nocpuid
+        push    ebx
+        mov     eax, edi
+        xor     ecx, ecx
+        cpuid
+        mov     TRegisters(esi).&eax, eax
+        mov     TRegisters(esi).&ebx, ebx
+        mov     TRegisters(esi).&ecx, ecx
+        mov     TRegisters(esi).&edx, edx
+        pop     ebx
 @nocpuid:
-  pop     edi
-  pop     esi
+        pop     edi
+        pop     esi
 end;
 {$ifend}
 
-{******************************}
-procedure _TestIntelCpuFeatures;
-var regs: _TRegisters;
+{*****************************}
+procedure TestIntelCpuFeatures;
+var regs: TRegisters;
 begin
   regs.edx := 0;
   regs.ecx := 0;
-  _GetCPUID(1,regs);
+  GetCPUID(1,regs);
   PIntegerArray(@ALCpuFeatures)^[0] := regs.edx;
   PIntegerArray(@ALCpuFeatures)^[1] := regs.ecx;
-  _GetCPUID(7,regs);
+  GetCPUID(7,regs);
   PIntegerArray(@ALCpuFeatures)^[2] := regs.ebx;
-  PByteArray(@ALCpuFeatures)^[12] := regs.ecx;
+  PIntegerArray(@ALCpuFeatures)^[3] := regs.ecx;
+  PByte(@PIntegerArray(@ALCpuFeatures)^[4])^ := regs.edx;
 end;
 
 {$ENDIF}
 
 initialization
 
-  {$IFDEF MSWINDOWS}
-  _TestIntelCpuFeatures;
+  {$IFNDEF NEXTGEN}
+  TestIntelCpuFeatures;
   {$ENDIF}
 
   ALCustomDelayedFreeObjectProc := nil;

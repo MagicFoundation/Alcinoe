@@ -498,8 +498,6 @@ extern DELPHI_PACKAGE TALFormatSettings ALDefaultFormatSettings;
 extern DELPHI_PACKAGE System::Sysutils::TFormatSettings ALDefaultFormatSettingsU;
 static const System::Int8 cALPerlRegExMAXSUBEXPRESSIONS = System::Int8(0x63);
 extern DELPHI_PACKAGE void __fastcall (*ALMove)(const void *Source, void *Dest, NativeInt Count);
-extern DELPHI_PACKAGE System::AnsiString __fastcall (*ALBase64EncodeString)(const System::AnsiString S);
-extern DELPHI_PACKAGE System::AnsiString __fastcall (*ALBase64DecodeString)(const System::AnsiString S);
 extern DELPHI_PACKAGE int __fastcall (*ALPosEx)(const System::AnsiString SubStr, const System::AnsiString S, int Offset/* = 0x1*/);
 extern DELPHI_PACKAGE System::AnsiString __fastcall (*AlUpperCase)(const System::AnsiString S);
 extern DELPHI_PACKAGE System::AnsiString __fastcall (*AlLowerCase)(const System::AnsiString S);
@@ -527,10 +525,6 @@ extern DELPHI_PACKAGE __int64 __fastcall (*ALStrToInt64DefU)(const System::Unico
 extern DELPHI_PACKAGE unsigned __int64 __fastcall (*ALStrToUInt64U)(const System::UnicodeString S);
 extern DELPHI_PACKAGE unsigned __int64 __fastcall (*ALStrToUInt64DefU)(const System::UnicodeString S, const unsigned __int64 Default);
 extern DELPHI_PACKAGE bool __fastcall (*ALTryStrToUInt64U)(const System::UnicodeString S, /* out */ unsigned __int64 &Value);
-extern DELPHI_PACKAGE System::UnicodeString __fastcall (*ALBase64EncodeStringU)(const System::UnicodeString S, System::Sysutils::TEncoding* const AEncoding/* = (System::Sysutils::TEncoding*)(0x0)*/);
-extern DELPHI_PACKAGE System::UnicodeString __fastcall (*ALBase64DecodeStringU)(const System::UnicodeString S, System::Sysutils::TEncoding* const AEncoding/* = (System::Sysutils::TEncoding*)(0x0)*/);
-extern DELPHI_PACKAGE System::UnicodeString __fastcall (*ALBase64EncodeBytesU)(const System::DynamicArray<System::Byte> Bytes);
-extern DELPHI_PACKAGE System::DynamicArray<System::Byte> __fastcall (*ALBase64DecodeBytesU)(const System::UnicodeString S);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall (*ALCurrToStrU)(System::Currency Value, const System::Sysutils::TFormatSettings &AFormatSettings);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall (*ALFormatFloatU)(const System::UnicodeString Format, System::Extended Value, const System::Sysutils::TFormatSettings &AFormatSettings);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall (*ALFormatCurrU)(const System::UnicodeString Format, System::Currency Value, const System::Sysutils::TFormatSettings &AFormatSettings);
@@ -645,6 +639,14 @@ extern DELPHI_PACKAGE System::AnsiString __fastcall ALIntToBit(int value, int di
 extern DELPHI_PACKAGE int __fastcall AlBitToInt(System::AnsiString Value);
 extern DELPHI_PACKAGE System::AnsiString __fastcall AlInt2BaseN(unsigned __int64 NumIn, const char *charset, const int charset_High);
 extern DELPHI_PACKAGE unsigned __int64 __fastcall AlBaseN2Int(const System::AnsiString Str, const char *charset, const int charset_High);
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALBase64EncodeString(const System::AnsiString S);
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALBase64DecodeString(const System::AnsiString S);
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALBase64EncodeStringMIME(const System::AnsiString S);
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALBase64DecodeStringMIME(const System::AnsiString S);
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALBase64EncodeStringU(const System::UnicodeString S, System::Sysutils::TEncoding* const AEncoding = (System::Sysutils::TEncoding*)(0x0));
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALBase64DecodeStringU(const System::UnicodeString S, System::Sysutils::TEncoding* const AEncoding = (System::Sysutils::TEncoding*)(0x0));
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALBase64EncodeBytesU(const System::DynamicArray<System::Byte> Bytes);
+extern DELPHI_PACKAGE System::DynamicArray<System::Byte> __fastcall ALBase64DecodeBytesU(const System::UnicodeString S);
 extern DELPHI_PACKAGE bool __fastcall ALIsDecimal(const System::AnsiString S, const bool RejectPlusMinusSign = false);
 extern DELPHI_PACKAGE bool __fastcall ALIsInteger(const System::AnsiString S);
 extern DELPHI_PACKAGE bool __fastcall ALIsInt64(const System::AnsiString S);
@@ -777,6 +779,7 @@ extern DELPHI_PACKAGE void __fastcall ALExtractHeaderFieldsWithQuoteEscaped(cons
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALHTTPDecodeU(const System::UnicodeString AStr);
 extern DELPHI_PACKAGE void __fastcall ALExtractHeaderFieldsWithQuoteEscapedU(const System::Sysutils::TSysCharSet &Separators, const System::Sysutils::TSysCharSet &WhiteSpace, const System::Sysutils::TSysCharSet &Quotes, System::WideChar * Content, Alstringlist::TALStringsU* Strings, bool HttpDecode, bool StripQuotes = false);
 extern DELPHI_PACKAGE void __fastcall ALStringInitialization(void);
+extern DELPHI_PACKAGE void __fastcall ALStringFinalization(void);
 }	/* namespace Alstring */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALSTRING)
 using namespace Alstring;

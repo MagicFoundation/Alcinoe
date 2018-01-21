@@ -1,9 +1,4 @@
 ﻿{*************************************************************
-Author(s):    John O'Harrow (john@elmcrest.demon.co.uk)
-              Charalabos Michael (chmichael@creationpower.com)
-              Aleksandr Sharahov
-              Dennis Kjaer Christensen
-
 Description:  Powerfull stringreplace, Pos, Move, comparetext,
               uppercase, lowercase function. Also a powerfull
               FastTagReplace function To replace in string tag
@@ -54,15 +49,15 @@ interface
 {$IFEND}
 
 uses {$IFDEF MSWINDOWS}
-       Winapi.Windows,
+     Winapi.Windows,
      {$ENDIF}
      System.SysUtils,
      System.Classes,
      {$IFNDEF NEXTGEN}
-       System.Contnrs,
+     System.Contnrs,
      {$ENDIF}
      {$IFDEF MACOS}
-       Macapi.CoreFoundation,
+     Macapi.CoreFoundation,
      {$ENDIF MACOS}
      ALInit,
      ALStringList;
@@ -72,6 +67,10 @@ resourcestring
   SALArgumentMissing = 'No argument for format ''%s''';
 
 type
+
+  {$IF CompilerVersion > 32} // tokyo
+    {$MESSAGE WARN 'Check if System.SysUtils.TFormatSettings is still the same and adjust the IFDEF'}
+  {$IFEND}
 
   {$IFNDEF NEXTGEN}
   pALFormatSettings = ^TALFormatSettings;

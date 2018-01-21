@@ -4,7 +4,7 @@ interface
 
 uses Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
      StdCtrls, ALString, ALJsonDoc, ExtCtrls,
-     ALStringList, Shellapi, ALMime, Vcl.Dialogs,
+     ALStringList, Shellapi, Vcl.Dialogs,
      Contnrs, alFiles, diagnostics, superobject, DBXJSON, DBXplatform, IOUtils,
      dwsJSON, Execute.JSON, system.Generics.collections,
      system.UITypes, system.JSON;

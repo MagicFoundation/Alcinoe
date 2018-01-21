@@ -14,6 +14,12 @@ If you plan to use native control on android (like TALEdit) then you
 will need to include lib\jar\alcinoe\alcinoe.jar in 
 project manager > target plateform > android > Libraries
 
+You can see the demo of firemonkey controls here: demos/ALFmxControls/ 
+and the compiled apk of the demo: https://tinyurl.com/yda8nr6g
+
+If you encounter some problems to compile the demo, please contact me on 
+Skype so that i can help you and update this doc.
+
 
 WHAT ARE THE ALCINOE FIREMONKEY CONTROLS:
 -----------------------------------------

@@ -94,6 +94,7 @@ uses FileCtrl,
      Masks,
      UrlMon,
      AlFiles,
+     ALMime,
      ALString;
 
 Const SplitDirectoryAmount = 5000;

@@ -16,6 +16,7 @@
 #include <SysInit.hpp>
 #include <System.SysUtils.hpp>
 #include <Winapi.Windows.hpp>
+#include <System.Hash.hpp>
 #include <System.Classes.hpp>
 #include <ALString.hpp>
 
@@ -28,7 +29,6 @@ class DELPHICLASS EALCipherException;
 struct TALCipherBFContext;
 struct TALCipherRDLVector;
 struct TALCipherRDLContext;
-struct TALCipherSHA1Context;
 //-- type declarations -------------------------------------------------------
 #pragma pack(push,4)
 class PASCALIMPLEMENTATION EALCipherException : public Alstring::EALException
@@ -120,22 +120,9 @@ public:
 #pragma pack(pop)
 
 
-typedef System::StaticArray<System::Byte, 16> TALCipherMD5Digest;
-
-typedef System::StaticArray<System::Byte, 88> TALCipherMD5Context;
+typedef TALCipherKey128 TALCipherMD5Digest;
 
 typedef System::StaticArray<System::Byte, 20> TALCipherSHA1Digest;
-
-struct DECLSPEC_DRECORD TALCipherSHA1Context
-{
-public:
-	unsigned sdHi;
-	unsigned sdLo;
-	unsigned sdIndex;
-	System::StaticArray<unsigned, 5> sdHash;
-	System::StaticArray<System::Byte, 64> sdBuf;
-};
-
 
 typedef unsigned __fastcall (*TALStringHashCrc32)(const System::AnsiString str);
 
@@ -152,26 +139,18 @@ static const System::Int8 CRYPT_NEWKEYSET = System::Int8(0x8);
 static const System::Int8 PROV_RSA_FULL = System::Int8(0x1);
 #define MS_ENHANCED_PROV_A "Microsoft Enhanced Cryptographic Provider v1.0"
 #define MS_ENHANCED_PROV_W L"Microsoft Enhanced Cryptographic Provider v1.0"
-extern DELPHI_PACKAGE void __fastcall ALCipherInitMD5(TALCipherMD5Context &Context);
-extern DELPHI_PACKAGE void __fastcall ALCipherUpdateMD5(TALCipherMD5Context &Context, const void *Buf, int BufSize);
-extern DELPHI_PACKAGE void __fastcall ALCipherFinalizeMD5(TALCipherMD5Context &Context, TALCipherMD5Digest &Digest);
-extern DELPHI_PACKAGE void __fastcall ALCipherHashMD5(TALCipherMD5Digest &Digest, const void *Buf, int BufSize);
-extern DELPHI_PACKAGE void __fastcall ALStreamHashMD5(TALCipherMD5Digest &Digest, System::Classes::TStream* AStream)/* overload */;
-extern DELPHI_PACKAGE System::AnsiString __fastcall ALStreamHashMD5(System::Classes::TStream* AStream)/* overload */;
-extern DELPHI_PACKAGE void __fastcall ALStringHashMD5(TALCipherMD5Digest &Digest, const System::AnsiString Str)/* overload */;
+extern DELPHI_PACKAGE void __fastcall ALStringHashMD5(TALCipherKey128 &Digest, const System::AnsiString Str)/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALStringHashMD5(const System::AnsiString Str, const bool HexEncode = true)/* overload */;
-extern DELPHI_PACKAGE System::UnicodeString __fastcall ALStringHashMD5U(const System::UnicodeString Str, System::Sysutils::TEncoding* const encoding);
-extern DELPHI_PACKAGE void __fastcall ALCipherGenerateMD5Key(TALCipherKey128 &Key, const System::AnsiString Str);
-extern DELPHI_PACKAGE void __fastcall ALCipherGenerateMD5KeyU(TALCipherKey128 &Key, const System::UnicodeString Str, System::Sysutils::TEncoding* const encoding);
-extern DELPHI_PACKAGE void __fastcall ALCipherHashSHA1(TALCipherSHA1Digest &Digest, const void *Buf, int BufSize);
-extern DELPHI_PACKAGE void __fastcall ALCipherInitSHA1(TALCipherSHA1Context &Context);
-extern DELPHI_PACKAGE void __fastcall ALCipherUpdateSHA1(TALCipherSHA1Context &Context, const void *Buf, int BufSize);
-extern DELPHI_PACKAGE void __fastcall ALCipherFinalizeSHA1(TALCipherSHA1Context &Context, TALCipherSHA1Digest &Digest);
-extern DELPHI_PACKAGE void __fastcall ALStreamHashSHA1(TALCipherSHA1Digest &Digest, System::Classes::TStream* AStream)/* overload */;
-extern DELPHI_PACKAGE System::AnsiString __fastcall ALStreamHashSHA1(System::Classes::TStream* AStream)/* overload */;
+extern DELPHI_PACKAGE void __fastcall ALStringHashMD5U(TALCipherKey128 &Digest, const System::UnicodeString Str, System::Sysutils::TEncoding* const encoding)/* overload */;
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALStringHashMD5U(const System::UnicodeString Str, System::Sysutils::TEncoding* const encoding)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALStringHashSHA1(TALCipherSHA1Digest &Digest, const System::AnsiString Str)/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALStringHashSHA1(const System::AnsiString Str, const bool HexEncode = true)/* overload */;
-extern DELPHI_PACKAGE System::UnicodeString __fastcall ALStringHashSHA1U(const System::UnicodeString Str, System::Sysutils::TEncoding* const encoding);
+extern DELPHI_PACKAGE void __fastcall ALStringHashSHA1U(TALCipherSHA1Digest &Digest, const System::UnicodeString Str, System::Sysutils::TEncoding* const encoding)/* overload */;
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALStringHashSHA1U(const System::UnicodeString Str, System::Sysutils::TEncoding* const encoding)/* overload */;
+extern DELPHI_PACKAGE void __fastcall ALStringHashSHA2(System::DynamicArray<System::Byte> &Digest, const System::AnsiString Str, const System::Hash::THashSHA2::TSHA2Version AHashVersion = (System::Hash::THashSHA2::TSHA2Version)(0x1))/* overload */;
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALStringHashSHA2(const System::AnsiString Str, const System::Hash::THashSHA2::TSHA2Version AHashVersion = (System::Hash::THashSHA2::TSHA2Version)(0x1), const bool HexEncode = true)/* overload */;
+extern DELPHI_PACKAGE void __fastcall ALStringHashSHA2U(System::DynamicArray<System::Byte> &Digest, const System::UnicodeString Str, System::Sysutils::TEncoding* const encoding, const System::Hash::THashSHA2::TSHA2Version AHashVersion = (System::Hash::THashSHA2::TSHA2Version)(0x1))/* overload */;
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALStringHashSHA2U(const System::UnicodeString Str, System::Sysutils::TEncoding* const encoding, const System::Hash::THashSHA2::TSHA2Version AHashVersion = (System::Hash::THashSHA2::TSHA2Version)(0x1))/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALBCryptHashPassword(const System::AnsiString password, int cost);
 extern DELPHI_PACKAGE bool __fastcall ALBCryptCheckPassword(const System::AnsiString password, const System::AnsiString expectedHashString, /* out */ bool &PasswordRehashNeeded);
 extern DELPHI_PACKAGE bool __fastcall ALBCryptPasswordRehashNeeded(const System::AnsiString HashString);

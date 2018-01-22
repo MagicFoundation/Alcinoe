@@ -7163,18 +7163,14 @@ end;
 
 {**********************************************************}
 function ALBase64EncodeBytesU(const Bytes: Tbytes): String;
-var StrBuf: String;
 begin
-  StrBuf := StringOf(Bytes);
-  result := String(ALBase64EncodeString(AnsiString(StrBuf)));
+  result := String(ALBase64EncodeString(AnsiString(StringOf(Bytes))));
 end;
 
 {******************************************************}
 function ALBase64DecodeBytesU(const S: String): Tbytes;
-var StrBuf: String;
 begin
-  StrBuf := String(ALBase64DecodeString(AnsiString(S)));
-  result := BytesOf(StrBuf);
+  result := BytesOf(String(ALBase64DecodeString(AnsiString(S))));
 end;
 
 {$IFEND}

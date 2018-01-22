@@ -358,6 +358,7 @@ end;
 procedure TestIntelCpuFeatures;
 var regs: TRegisters;
 begin
+  {$R-} // this code require range check error OFF
   regs.edx := 0;
   regs.ecx := 0;
   GetCPUID(1,regs);
@@ -367,6 +368,7 @@ begin
   PIntegerArray(@ALCpuFeatures)^[2] := regs.ebx;
   PIntegerArray(@ALCpuFeatures)^[3] := regs.ecx;
   PByte(@PIntegerArray(@ALCpuFeatures)^[4])^ := regs.edx;
+  {$R+} // enable back the {$R+}
 end;
 
 {$ENDIF}

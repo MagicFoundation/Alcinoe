@@ -7144,18 +7144,11 @@ begin
 end;
 
 {$IFEND CompilerVersion >= 31}
+
 {$IFNDEF NEXTGEN}
 
+{$IF CompilerVersion <= 30} // seattle
 
-// NOTE - ALBase64xxxU
-// The following versions of
-//  ALBase64EncodeStringU
-//  ALBase64DecodeStringU
-//  ALBase64EncodeBytesU
-//  ALBase64DecodeBytesU
-// are here for compatibility reasons. Normally they are just an aliases of
-// standard AnsiString functions and data is explicitly casting before and after
-// the calling.
 {*****************************************************************************************}
 function ALBase64EncodeStringU(const S: String; const AEncoding: TEncoding = nil): String;
 begin
@@ -7183,10 +7176,8 @@ begin
   StrBuf := String(ALBase64DecodeString(AnsiString(S)));
   result := BytesOf(StrBuf);
 end;
-// NOTE - ALBase64xxxU - END
 
-
-
+{$IFEND}
 
 {*********************************************************************************************}
 function ALIsDecimal(const S: AnsiString; const RejectPlusMinusSign: boolean = False): boolean;

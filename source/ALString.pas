@@ -6576,13 +6576,27 @@ begin
   Result := _ALIntToHex(Value, digits);
 end;
 
+{**************************************************************************}
+procedure _ALBinToHex(Buffer: PAnsiChar; Text: PAnsiChar; BufSize: Integer); overload;
+const
+  Convert: array[0..15] of AnsiChar = AnsiString('0123456789abcdef');
+var
+  I: Integer;
+begin
+  for I := 0 to BufSize - 1 do
+  begin
+    Text[0] := Convert[Byte(Buffer[I]) shr 4];
+    Text[1] := Convert[Byte(Buffer[I]) and $F];
+    Inc(Text, 2);
+  end;
+end;
+
 {******************************************************************************}
 Function  ALTryBinToHex(const aBin: AnsiString; out Value: AnsiString): boolean;
 begin
   if aBin = '' then exit(false);
   setlength(Value,length(aBin) * 2);
-  BintoHex(PansiChar(aBin),pansiChar(Value),length(aBin));
-  Value := ALlowerCase(Value);
+  _ALBinToHex(PansiChar(aBin),pansiChar(Value),length(aBin));
   result := true;
 end;
 
@@ -6598,8 +6612,7 @@ Function  ALTryBinToHex(const aBin; aBinSize : Cardinal; out Value: AnsiString):
 begin
   if aBinSize = 0 then exit(false);
   setlength(Value, aBinSize * 2);
-  BintoHex(@aBin,pansiChar(Value),aBinSize);
-  Value := ALlowerCase(Value);
+  _ALBinToHex(@aBin,pansiChar(Value),aBinSize);
   result := true;
 end;
 
@@ -6629,19 +6642,32 @@ end;
 
 {$ENDIF !NEXTGEN}
 
+{*********************************************************************************************************************}
+procedure _ALBinToHex(const Buffer: TBytes; BufOffset: Integer; var Text: TBytes; TextOffset: Integer; Count: Integer); overload;
+const
+  B2HConvert: array[0..15] of Byte = ($30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $61, $62, $63, $64, $65, $66);
+var
+  I: Integer;
+begin
+  for I := 0  to Count - 1 do
+  begin
+    Text[TextOffset + I * 2] := B2HConvert[Buffer[BufOffset + I] shr 4];
+    Text[TextOffset + I * 2 + 1] := B2HConvert[Buffer[BufOffset + I] and $0F];
+  end;
+end;
+
 {***********************************************************************}
 Function  ALTryBinToHexU(const aBin: TBytes; out Value: String): boolean;
 var bufOut: TBytes;
 begin
   if length(aBin) = 0 then exit(false);
   setlength(bufOut,length(aBin) * 2);
-  BintoHex(aBin, // Buffer: TBytes
-           0, // BufOffset: Integer;
-           bufOut, // Text: TBytes;
-           0, // TextOffset: Integer;
-           length(aBin)); // Count: Integer
+  _ALBintoHex(aBin, // Buffer: TBytes
+              0, // BufOffset: Integer;
+              bufOut, // Text: TBytes;
+              0, // TextOffset: Integer;
+              length(aBin)); // Count: Integer
   Value := Tencoding.UTF8.GetString(bufOut); // UTF8 is good because bufOut must contain only low ascii chars
-  Value := AlLowerCaseU(Value);
   result := true;
 end;
 
@@ -6658,13 +6684,12 @@ var bufOut: TBytes;
 begin
   if aBinSize = 0 then exit(false);
   setlength(bufOut,aBinSize * 2);
-  BintoHex(Tbytes(@aBin), // Buffer: TBytes
-           0, // BufOffset: Integer;
-           bufOut, // Text: TBytes;
-           0, // TextOffset: Integer;
-           aBinSize); // Count: Integer
+  _ALBintoHex(Tbytes(@aBin), // Buffer: TBytes
+              0, // BufOffset: Integer;
+              bufOut, // Text: TBytes;
+              0, // TextOffset: Integer;
+              aBinSize); // Count: Integer
   Value := Tencoding.UTF8.GetString(bufOut); // UTF8 is good because bufOut must contain only low ascii chars
-  Value := AlLowerCaseU(Value);
   result := true;
 end;
 

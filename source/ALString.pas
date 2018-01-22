@@ -7146,6 +7146,48 @@ end;
 {$IFEND CompilerVersion >= 31}
 {$IFNDEF NEXTGEN}
 
+
+// NOTE - ALBase64xxxU
+// The following versions of
+//  ALBase64EncodeStringU
+//  ALBase64DecodeStringU
+//  ALBase64EncodeBytesU
+//  ALBase64DecodeBytesU
+// are here for compatibility reasons. Normally they are just an aliases of
+// standard AnsiString functions and data is explicitly casting before and after
+// the calling.
+{*****************************************************************************************}
+function ALBase64EncodeStringU(const S: String; const AEncoding: TEncoding = nil): String;
+begin
+  result := String(ALBase64EncodeString(AnsiString(S)));
+end;
+
+{*****************************************************************************************}
+function ALBase64DecodeStringU(const S: String; const AEncoding: TEncoding = nil): String;
+begin
+  result := String(ALBase64DecodeString(AnsiString(S)));
+end;
+
+{**********************************************************}
+function ALBase64EncodeBytesU(const Bytes: Tbytes): String;
+var StrBuf: String;
+begin
+  StrBuf := StringOf(Bytes);
+  result := String(ALBase64EncodeString(AnsiString(StrBuf)));
+end;
+
+{******************************************************}
+function ALBase64DecodeBytesU(const S: String): Tbytes;
+var StrBuf: String;
+begin
+  StrBuf := String(ALBase64DecodeString(AnsiString(S)));
+  result := BytesOf(StrBuf);
+end;
+// NOTE - ALBase64xxxU - END
+
+
+
+
 {*********************************************************************************************}
 function ALIsDecimal(const S: AnsiString; const RejectPlusMinusSign: boolean = False): boolean;
 var i: integer;

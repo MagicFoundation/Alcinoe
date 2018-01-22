@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 442
   Top = 108
   Caption = 'Form1'
-  ClientHeight = 760
+  ClientHeight = 790
   ClientWidth = 1034
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,7 +15,7 @@ object Form1: TForm1
   TextHeight = 13
   object Label1: TLabel
     Left = 24
-    Top = 262
+    Top = 285
     Width = 22
     Height = 13
     Caption = 'Key'
@@ -28,7 +28,7 @@ object Form1: TForm1
   end
   object Label2: TLabel
     Left = 24
-    Top = 321
+    Top = 344
     Width = 104
     Height = 13
     Caption = 'Unencrypted Data'
@@ -41,7 +41,7 @@ object Form1: TForm1
   end
   object Label3: TLabel
     Left = 384
-    Top = 321
+    Top = 344
     Width = 187
     Height = 13
     Caption = 'Crypted Data (BASE64 Encoded)'
@@ -54,7 +54,7 @@ object Form1: TForm1
   end
   object Label4: TLabel
     Left = 24
-    Top = 517
+    Top = 540
     Width = 54
     Height = 13
     Caption = 'Collisions'
@@ -67,13 +67,12 @@ object Form1: TForm1
   end
   object PaintBox1: TPaintBox
     Left = 0
-    Top = 240
+    Top = 264
     Width = 1034
-    Height = 501
+    Height = 507
     Align = alBottom
     Anchors = [akLeft, akTop, akRight, akBottom]
     Visible = False
-    ExplicitTop = 234
   end
   object ALButton1: TButton
     Left = 24
@@ -86,7 +85,7 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 741
+    Top = 771
     Width = 1034
     Height = 19
     Panels = <
@@ -126,14 +125,14 @@ object Form1: TForm1
   end
   object EditKey: TEdit
     Left = 24
-    Top = 281
+    Top = 304
     Width = 345
     Height = 21
     TabOrder = 4
   end
   object ALMemoDecryptedData: TMemo
     Left = 24
-    Top = 340
+    Top = 363
     Width = 345
     Height = 165
     Font.Charset = DEFAULT_CHARSET
@@ -147,7 +146,7 @@ object Form1: TForm1
   end
   object ALMemoCryptedData: TMemo
     Left = 384
-    Top = 340
+    Top = 363
     Width = 631
     Height = 165
     Font.Charset = DEFAULT_CHARSET
@@ -196,20 +195,20 @@ object Form1: TForm1
     OnClick = ALButton7Click
   end
   object ALButton10: TButton
-    Left = 490
+    Left = 413
     Top = 47
-    Width = 136
+    Width = 225
     Height = 25
-    Caption = 'Bench ALMD5'
+    Caption = 'Bench ALMD5 (ansiString)'
     TabOrder = 11
     OnClick = ALButton10Click
   end
   object ALButton11: TButton
-    Left = 490
+    Left = 413
     Top = 109
-    Width = 136
+    Width = 225
     Height = 25
-    Caption = 'Bench ALSHA1'
+    Caption = 'Bench ALSHA1 (ansiString)'
     TabOrder = 12
     OnClick = ALButton11Click
   end
@@ -250,25 +249,25 @@ object Form1: TForm1
     OnClick = ALButton13Click
   end
   object Button1: TButton
-    Left = 490
-    Top = 140
-    Width = 134
+    Left = 24
+    Top = 109
+    Width = 140
     Height = 25
     Caption = 'Bench CRC32 (Zlib)'
     TabOrder = 17
     OnClick = Button1Click
   end
   object Button2: TButton
-    Left = 490
-    Top = 171
-    Width = 134
+    Left = 24
+    Top = 140
+    Width = 140
     Height = 25
     Caption = 'Bench ALCRC32'
     TabOrder = 18
     OnClick = Button2Click
   end
   object Button3: TButton
-    Left = 640
+    Left = 651
     Top = 140
     Width = 136
     Height = 25
@@ -278,7 +277,7 @@ object Form1: TForm1
   end
   object ALMemoCollisions: TMemo
     Left = 24
-    Top = 536
+    Top = 559
     Width = 991
     Height = 189
     Font.Charset = DEFAULT_CHARSET
@@ -292,25 +291,25 @@ object Form1: TForm1
     OnChange = ALMemoCollisionsChange
   end
   object Button4: TButton
-    Left = 640
+    Left = 651
     Top = 109
     Width = 136
     Height = 25
-    Caption = 'Bench FNV-1a (int64)'
+    Caption = 'Bench ALFNV-1a (int64)'
     TabOrder = 21
     OnClick = Button4Click
   end
   object Button5: TButton
-    Left = 640
+    Left = 651
     Top = 78
     Width = 136
     Height = 25
-    Caption = 'Bench FNV-1a (int32)'
+    Caption = 'Bench ALFNV-1a (int32)'
     TabOrder = 22
     OnClick = Button5Click
   end
   object Button6: TButton
-    Left = 640
+    Left = 651
     Top = 16
     Width = 136
     Height = 25
@@ -319,7 +318,7 @@ object Form1: TForm1
     OnClick = Button6Click
   end
   object Button7: TButton
-    Left = 640
+    Left = 651
     Top = 47
     Width = 136
     Height = 25
@@ -329,65 +328,92 @@ object Form1: TForm1
   end
   object Button8: TButton
     Left = 176
-    Top = 78
-    Width = 225
+    Top = 140
+    Width = 226
     Height = 25
-    Caption = 'Bench BCrypt (12)'
+    Caption = 'Bench BCrypt(12) (ansiString)'
     TabOrder = 25
     OnClick = Button8Click
   end
-  object Button9: TButton
+  object Button10: TButton
     Left = 176
-    Top = 109
+    Top = 16
     Width = 225
     Height = 25
-    Caption = 'Generate BCrypt (12) Hash'
+    Caption = 'Bench ALBase64Encode (ansiString)'
     TabOrder = 26
-    OnClick = Button9Click
+    OnClick = Button10Click
   end
-  object Button10: TButton
+  object Button11: TButton
+    Left = 176
+    Top = 78
+    Width = 225
+    Height = 25
+    Caption = 'Bench HexEncode (ansiString)'
+    TabOrder = 27
+    OnClick = Button11Click
+  end
+  object Button13: TButton
+    Left = 413
+    Top = 16
+    Width = 225
+    Height = 25
+    Caption = 'Bench ALMD5 (Unicode)'
+    TabOrder = 28
+    OnClick = Button13Click
+  end
+  object Button15: TButton
     Left = 176
     Top = 47
     Width = 225
     Height = 25
-    Caption = 'Bench ALBase64Encode (ansiString)'
-    TabOrder = 27
-    OnClick = Button10Click
-  end
-  object Button11: TButton
-    Left = 24
-    Top = 109
-    Width = 140
-    Height = 25
-    Caption = 'Bench HexEncode'
-    TabOrder = 28
-    OnClick = Button11Click
-  end
-  object Button13: TButton
-    Left = 490
-    Top = 16
-    Width = 136
-    Height = 25
-    Caption = 'Bench MD5'
+    Caption = 'Bench ALBase64EncodeU (UNICODE)'
     TabOrder = 29
-    OnClick = Button13Click
+    OnClick = Button15Click
+  end
+  object Button12: TButton
+    Left = 414
+    Top = 171
+    Width = 224
+    Height = 25
+    Caption = 'Bench ALSHA2 256 (ansiString)'
+    TabOrder = 30
+    OnClick = Button12Click
+  end
+  object Button16: TButton
+    Left = 414
+    Top = 202
+    Width = 224
+    Height = 25
+    Caption = 'Bench ALSHA2 512 (ansiString)'
+    TabOrder = 31
+    OnClick = Button16Click
   end
   object Button14: TButton
-    Left = 490
+    Left = 414
     Top = 78
-    Width = 136
-    Height = 25
-    Caption = 'Bench SHA1'
-    TabOrder = 30
-    OnClick = Button14Click
-  end
-  object Button15: TButton
-    Left = 176
-    Top = 16
     Width = 225
     Height = 25
-    Caption = 'Bench ALBase64EncodeU (UnicodeString)'
-    TabOrder = 31
-    OnClick = Button15Click
+    Caption = 'Bench ALSHA1 (Unicode)'
+    TabOrder = 32
+    OnClick = Button14Click
+  end
+  object Button17: TButton
+    Left = 414
+    Top = 140
+    Width = 224
+    Height = 25
+    Caption = 'Bench ALSHA2 256 (Unicode)'
+    TabOrder = 33
+    OnClick = Button17Click
+  end
+  object Button18: TButton
+    Left = 176
+    Top = 109
+    Width = 225
+    Height = 25
+    Caption = 'Bench HexEncode (UNICODE)'
+    TabOrder = 34
+    OnClick = Button18Click
   end
 end

@@ -40,12 +40,15 @@ type
     Button7: TButton;
     PaintBox1: TPaintBox;
     Button8: TButton;
-    Button9: TButton;
     Button10: TButton;
     Button11: TButton;
     Button13: TButton;
-    Button14: TButton;
     Button15: TButton;
+    Button12: TButton;
+    Button16: TButton;
+    Button14: TButton;
+    Button17: TButton;
+    Button18: TButton;
     procedure ALButton1Click(Sender: TObject);
     procedure ALButton3Click(Sender: TObject);
     procedure ALButton4Click(Sender: TObject);
@@ -68,13 +71,16 @@ type
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);
     procedure Button8Click(Sender: TObject);
-    procedure Button9Click(Sender: TObject);
     procedure Button10Click(Sender: TObject);
     procedure Button11Click(Sender: TObject);
     procedure Button13Click(Sender: TObject);
-    procedure Button14Click(Sender: TObject);
     procedure Button15Click(Sender: TObject);
     procedure ALMemoCollisionsChange(Sender: TObject);
+    procedure Button12Click(Sender: TObject);
+    procedure Button16Click(Sender: TObject);
+    procedure Button17Click(Sender: TObject);
+    procedure Button14Click(Sender: TObject);
+    procedure Button18Click(Sender: TObject);
   private
   public
   end;
@@ -111,19 +117,23 @@ Var aData: AnsiString;
     aHash: ansiString;
     aCounter: integer;
     aStopWatch: TstopWatch;
-    aLastGUIUpdate: Extended;
+    aLastGUIUpdate: TDateTime;
     aDictionary: TDictionary<ansiString,ansistring>;
     aCollision: integer;
 begin
   if (Sender as TButton).Tag = 1 then begin
     (Sender as TButton).Tag := 0;
-    (Sender as TButton).Caption := 'Bench ALMD5';
+    (Sender as TButton).Caption := 'Bench ALMD5 (ansiString)';
     exit;
   end;
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
-  StatusBar1.Panels[0].Text := 'ALMD5';
+
+  if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
+  ALMemoCryptedData.Lines.Text := string(ALStringHashMD5(ansiString(ALMemoDecryptedData.Lines.Text), true{hexEncode}));
+
+  StatusBar1.Panels[0].Text := 'ALMD5 (ansiString)';
   StatusBar1.Panels[1].Text := '';
   StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
   StatusBar1.Panels[3].Text := '';
@@ -138,7 +148,7 @@ begin
     while True do begin
       aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
-      aHash := ALStringHashMD5(aData, false);
+      aHash := ALStringHashMD5(aData, true{hexEncode});
       aStopWatch.Stop;
       if aDictionary.TryGetValue(aHash, aTmpData) then begin
         if aTmpData <> aData then begin
@@ -169,19 +179,23 @@ Var aData: AnsiString;
     aHash: ansiString;
     aCounter: integer;
     aStopWatch: TstopWatch;
-    aLastGUIUpdate: Extended;
+    aLastGUIUpdate: TDateTime;
     aDictionary: TDictionary<ansiString,ansistring>;
     aCollision: integer;
 begin
   if (Sender as TButton).Tag = 1 then begin
     (Sender as TButton).Tag := 0;
-    (Sender as TButton).Caption := 'Bench ALSHA1';
+    (Sender as TButton).Caption := 'Bench ALSHA1 (ansiString)';
     exit;
   end;
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
-  StatusBar1.Panels[0].Text := 'ALSHA1';
+
+  if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
+  ALMemoCryptedData.Lines.Text := string(ALStringHashSHA1(ansiString(ALMemoDecryptedData.Lines.Text), true{hexEncode}));
+
+  StatusBar1.Panels[0].Text := 'ALSHA1 (ansiString)';
   StatusBar1.Panels[1].Text := '';
   StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
   StatusBar1.Panels[3].Text := '';
@@ -196,7 +210,7 @@ begin
     while True do begin
       aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
-      aHash := ALStringHashSHA1(aData, false);
+      aHash := ALStringHashSHA1(aData, true{hexEncode});
       aStopWatch.Stop;
       if aDictionary.TryGetValue(aHash, aTmpData) then begin
         if aTmpData <> aData then begin
@@ -248,6 +262,10 @@ begin
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
+
+  ALMemoCryptedData.Lines.Text := '';
+  ALMemoDecryptedData.Lines.Text := '';
+
   Counter := 0;
   StatusBar1.Panels[0].Text := '';
   StatusBar1.Panels[1].Text := '';
@@ -286,6 +304,10 @@ begin
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
+
+  ALMemoCryptedData.Lines.Text := '';
+  ALMemoDecryptedData.Lines.Text := '';
+
   Counter := 0;
   StatusBar1.Panels[0].Text := '';
   StatusBar1.Panels[1].Text := '';
@@ -324,6 +346,10 @@ begin
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
+
+  ALMemoCryptedData.Lines.Text := '';
+  ALMemoDecryptedData.Lines.Text := '';
+
   Counter := 0;
   StatusBar1.Panels[0].Text := '';
   StatusBar1.Panels[1].Text := '';
@@ -396,7 +422,7 @@ procedure TForm1.Button10Click(Sender: TObject);
 Var aData: AnsiString;
     aCounter: integer;
     aStopWatch: TstopWatch;
-    aLastGUIUpdate: Extended;
+    aLastGUIUpdate: TDateTime;
 begin
   if (Sender as TButton).Tag = 1 then begin
     (Sender as TButton).Tag := 0;
@@ -407,7 +433,7 @@ begin
   (Sender as TButton).Caption := 'Stop';
   randomize;
 
-  ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,' + '&"''(-_)=$*%!:;,' + '&"''(-_)=$*%!:;,' + '&"''(-_)=$*%!:;,' + '&"''(-_)=$*%!:;,' + '&"''(-_)=$*%!:;,' + '&"''(-_)=$*%!:;,' + '&"''(-_)=$*%!:;,';
+  if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
   ALMemoCryptedData.Lines.Text := string(ALBase64EncodeString(ansiString(ALMemoDecryptedData.Lines.Text)));
   ALMemoDecryptedData.Lines.Text := string(ALBase64DecodeString(ansiString(ALMemoCryptedData.Lines.Text)));
 
@@ -442,19 +468,24 @@ Var aData: AnsiString;
     aHash: ansiString;
     aCounter: integer;
     aStopWatch: TstopWatch;
-    aLastGUIUpdate: Extended;
+    aLastGUIUpdate: TDateTime;
 begin
   if (Sender as TButton).Tag = 1 then begin
     (Sender as TButton).Tag := 0;
-    (Sender as TButton).Caption := 'Bench HexEncode';
+    (Sender as TButton).Caption := 'Bench HexEncode (ansiString)';
     exit;
   end;
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
-  StatusBar1.Panels[0].Text := 'Bench HexEncode';
+
+  if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
+  ALMemoCryptedData.Lines.Text := string(ALBinToHex(ansiString(ALMemoDecryptedData.Lines.Text)));
+  ALMemoDecryptedData.Lines.Text := string(ALHexToBin(ansiString(ALMemoCryptedData.Lines.Text)));
+
+  StatusBar1.Panels[0].Text := 'Bench HexEncode (ansiString)';
   StatusBar1.Panels[1].Text := '';
-  StatusBar1.Panels[2].Text := 'Input: 1 to 255 bytes';
+  StatusBar1.Panels[2].Text := 'Input: 1 to 4096 bytes';
   StatusBar1.Panels[3].Text := '';
   StatusBar1.Panels[4].Text := '';
   ALMemoCollisions.Lines.Clear;
@@ -462,7 +493,7 @@ begin
   aLastGUIUpdate := now;
   aStopWatch := TstopWatch.Create;
   while True do begin
-    aData := ALRandomByteStr(1+random(255));
+    aData := ALRandomByteStr(1+random(4096));
     aStopWatch.Start;
     aHash := ALBinToHex(aData);
     aStopWatch.Stop;
@@ -478,25 +509,90 @@ begin
   end;
 end;
 
+procedure TForm1.Button12Click(Sender: TObject);
+Var aData: ansiString;
+    aTmpData: ansiString;
+    aHash: ansiString;
+    aCounter: integer;
+    aStopWatch: TstopWatch;
+    aLastGUIUpdate: TDateTime;
+    aDictionary: TDictionary<ansiString,ansistring>;
+    aCollision: integer;
+begin
+  if (Sender as TButton).Tag = 1 then begin
+    (Sender as TButton).Tag := 0;
+    (Sender as TButton).Caption := 'Bench ALSHA2 256 (ansiString)';
+    exit;
+  end;
+  (Sender as TButton).Tag := 1;
+  (Sender as TButton).Caption := 'Stop';
+  randomize;
+
+  if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
+  ALMemoCryptedData.Lines.Text := string(ALStringHashSHA2(ansistring(ALMemoDecryptedData.Lines.Text), THashSHA2.TSHA2Version.SHA256, true{hexEncode}));
+
+  StatusBar1.Panels[0].Text := 'ALSHA2 256 (ansiString)';
+  StatusBar1.Panels[1].Text := '';
+  StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
+  StatusBar1.Panels[3].Text := '';
+  StatusBar1.Panels[4].Text := '';
+  ALMemoCollisions.Lines.Clear;
+  aDictionary := TDictionary<ansiString,ansistring>.create;
+  try
+    aCounter := 0;
+    aCollision := 0;
+    aLastGUIUpdate := now;
+    aStopWatch := TstopWatch.Create;
+    while True do begin
+      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aStopWatch.Start;
+      aHash := ALStringHashSHA2(aData, THashSHA2.TSHA2Version.SHA256, true{hexEncode});
+      aStopWatch.Stop;
+      if aDictionary.TryGetValue(aHash, aTmpData) then begin
+        if aTmpData <> aData then begin
+          ALMemoCollisions.Lines.Add(string(aTmpData + '  =  ' + aData));
+          inc(aCollision);
+        end;
+      end
+      else aDictionary.Add(aHash, aData);
+      inc(acounter);
+      if millisecondsbetween(now, aLastGUIUpdate) > 200 then begin
+        aLastGUIUpdate := now;
+        StatusBar1.Panels[1].Text := FormatFloat('#,.', (acounter / (aStopWatch.Elapsed.TotalMilliseconds / 1000))) + ' keys/s ('+ FormatFloat('0,.######', ((aStopWatch.Elapsed.TotalMilliseconds / acounter))) + ' ms/key)';
+        StatusBar1.Panels[3].Text := inttostr(aCollision) + ' collisions';
+        StatusBar1.Panels[4].Text := FormatFloat('#,.', aDictionary.Count) + ' keys';
+        if (Sender as TButton).Tag = 0 then break;
+        application.ProcessMessages;
+      end;
+    end;
+  finally
+    aDictionary.free;
+  end;
+end;
+
 procedure TForm1.Button13Click(Sender: TObject);
 Var aData: String;
     aTmpData: String;
     aHash: String;
     aCounter: integer;
     aStopWatch: TstopWatch;
-    aLastGUIUpdate: Extended;
+    aLastGUIUpdate: TDateTime;
     aDictionary: TDictionary<String,string>;
     aCollision: integer;
 begin
   if (Sender as TButton).Tag = 1 then begin
     (Sender as TButton).Tag := 0;
-    (Sender as TButton).Caption := 'Bench MD5';
+    (Sender as TButton).Caption := 'Bench ALMD5 (Unicode)';
     exit;
   end;
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
-  StatusBar1.Panels[0].Text := 'MD5';
+
+  if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
+  ALMemoCryptedData.Lines.Text := ALStringHashMD5U(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8);
+
+  StatusBar1.Panels[0].Text := 'ALMD5 (Unicode)';
   StatusBar1.Panels[1].Text := '';
   StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
   StatusBar1.Panels[3].Text := '';
@@ -511,7 +607,7 @@ begin
     while True do begin
       aData := ALRandomStrU(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
-      aHash := THashMD5.GetHashString(aData);
+      aHash := ALStringHashMD5U(aData, Tencoding.UTF8);
       aStopWatch.Stop;
       if aDictionary.TryGetValue(aHash, aTmpData) then begin
         if aTmpData <> aData then begin
@@ -541,19 +637,23 @@ Var aData: String;
     aHash: String;
     aCounter: integer;
     aStopWatch: TstopWatch;
-    aLastGUIUpdate: Extended;
+    aLastGUIUpdate: TDateTime;
     aDictionary: TDictionary<String,string>;
     aCollision: integer;
 begin
   if (Sender as TButton).Tag = 1 then begin
     (Sender as TButton).Tag := 0;
-    (Sender as TButton).Caption := 'Bench SHA1';
+    (Sender as TButton).Caption := 'Bench ALSHA1 (Unicode)';
     exit;
   end;
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
-  StatusBar1.Panels[0].Text := 'SHA1';
+
+  if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
+  ALMemoCryptedData.Lines.Text := ALStringHashSHA1U(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8);
+
+  StatusBar1.Panels[0].Text := 'ALSHA1 (Unicode)';
   StatusBar1.Panels[1].Text := '';
   StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
   StatusBar1.Panels[3].Text := '';
@@ -568,7 +668,7 @@ begin
     while True do begin
       aData := ALRandomStrU(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
-      aHash := THashSHA1.GetHashString(aData);
+      aHash := ALStringHashSHA1U(aData, Tencoding.UTF8);
       aStopWatch.Stop;
       if aDictionary.TryGetValue(aHash, aTmpData) then begin
         if aTmpData <> aData then begin
@@ -596,22 +696,22 @@ procedure TForm1.Button15Click(Sender: TObject);
 Var aData: String;
     aCounter: integer;
     aStopWatch: TstopWatch;
-    aLastGUIUpdate: Extended;
+    aLastGUIUpdate: TDateTime;
 begin
   if (Sender as TButton).Tag = 1 then begin
     (Sender as TButton).Tag := 0;
-    (Sender as TButton).Caption := 'Bench ALBase64EncodeU (UnicodeString)';
+    (Sender as TButton).Caption := 'Bench ALBase64EncodeU (UNICODE)';
     exit;
   end;
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
 
-  ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,' + '&"''(-_)=$*%!:;,' + '&"''(-_)=$*%!:;,' + '&"''(-_)=$*%!:;,' + '&"''(-_)=$*%!:;,' + '&"''(-_)=$*%!:;,' + '&"''(-_)=$*%!:;,' + '&"''(-_)=$*%!:;,';
+  if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
   ALMemoCryptedData.Lines.Text := ALBase64EncodeStringU(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8);
   ALMemoDecryptedData.Lines.Text := ALBase64DecodeStringU(ALMemoCryptedData.Lines.Text, Tencoding.UTF8);
 
-  StatusBar1.Panels[0].Text := 'Bench ALBase64EncodeU (UnicodeString)';
+  StatusBar1.Panels[0].Text := 'Bench ALBase64EncodeU (UNICODE)';
   StatusBar1.Panels[1].Text := '';
   StatusBar1.Panels[2].Text := 'Input: 1 to 4096 bytes';
   StatusBar1.Panels[3].Text := '';
@@ -637,13 +737,181 @@ begin
   end;
 end;
 
+procedure TForm1.Button16Click(Sender: TObject);
+Var aData: ansiString;
+    aTmpData: ansiString;
+    aHash: ansiString;
+    aCounter: integer;
+    aStopWatch: TstopWatch;
+    aLastGUIUpdate: TDateTime;
+    aDictionary: TDictionary<ansiString,ansistring>;
+    aCollision: integer;
+begin
+  if (Sender as TButton).Tag = 1 then begin
+    (Sender as TButton).Tag := 0;
+    (Sender as TButton).Caption := 'Bench ALSHA2 512 (ansiString)';
+    exit;
+  end;
+  (Sender as TButton).Tag := 1;
+  (Sender as TButton).Caption := 'Stop';
+  randomize;
+
+  if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
+  ALMemoCryptedData.Lines.Text := string(ALStringHashSHA2(ansistring(ALMemoDecryptedData.Lines.Text), THashSHA2.TSHA2Version.SHA512, true{hexEncode}));
+
+  StatusBar1.Panels[0].Text := 'ALSHA2 512 (ansiString)';
+  StatusBar1.Panels[1].Text := '';
+  StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
+  StatusBar1.Panels[3].Text := '';
+  StatusBar1.Panels[4].Text := '';
+  ALMemoCollisions.Lines.Clear;
+  aDictionary := TDictionary<ansiString,ansistring>.create;
+  try
+    aCounter := 0;
+    aCollision := 0;
+    aLastGUIUpdate := now;
+    aStopWatch := TstopWatch.Create;
+    while True do begin
+      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aStopWatch.Start;
+      aHash := ALStringHashSHA2(aData, THashSHA2.TSHA2Version.SHA512, true{hexEncode});
+      aStopWatch.Stop;
+      if aDictionary.TryGetValue(aHash, aTmpData) then begin
+        if aTmpData <> aData then begin
+          ALMemoCollisions.Lines.Add(string(aTmpData + '  =  ' + aData));
+          inc(aCollision);
+        end;
+      end
+      else aDictionary.Add(aHash, aData);
+      inc(acounter);
+      if millisecondsbetween(now, aLastGUIUpdate) > 200 then begin
+        aLastGUIUpdate := now;
+        StatusBar1.Panels[1].Text := FormatFloat('#,.', (acounter / (aStopWatch.Elapsed.TotalMilliseconds / 1000))) + ' keys/s ('+ FormatFloat('0,.######', ((aStopWatch.Elapsed.TotalMilliseconds / acounter))) + ' ms/key)';
+        StatusBar1.Panels[3].Text := inttostr(aCollision) + ' collisions';
+        StatusBar1.Panels[4].Text := FormatFloat('#,.', aDictionary.Count) + ' keys';
+        if (Sender as TButton).Tag = 0 then break;
+        application.ProcessMessages;
+      end;
+    end;
+  finally
+    aDictionary.free;
+  end;
+end;
+
+procedure TForm1.Button17Click(Sender: TObject);
+Var aData: String;
+    aTmpData: String;
+    aHash: String;
+    aCounter: integer;
+    aStopWatch: TstopWatch;
+    aLastGUIUpdate: TDateTime;
+    aDictionary: TDictionary<String,string>;
+    aCollision: integer;
+begin
+  if (Sender as TButton).Tag = 1 then begin
+    (Sender as TButton).Tag := 0;
+    (Sender as TButton).Caption := 'Bench ALSHA2 256 (Unicode)';
+    exit;
+  end;
+  (Sender as TButton).Tag := 1;
+  (Sender as TButton).Caption := 'Stop';
+  randomize;
+
+  if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
+  ALMemoCryptedData.Lines.Text := ALStringHashSHA2U(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8, THashSHA2.TSHA2Version.SHA256);
+
+  StatusBar1.Panels[0].Text := 'ALSHA2 256 (Unicode)';
+  StatusBar1.Panels[1].Text := '';
+  StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
+  StatusBar1.Panels[3].Text := '';
+  StatusBar1.Panels[4].Text := '';
+  ALMemoCollisions.Lines.Clear;
+  aDictionary := TDictionary<String,string>.create;
+  try
+    aCounter := 0;
+    aCollision := 0;
+    aLastGUIUpdate := now;
+    aStopWatch := TstopWatch.Create;
+    while True do begin
+      aData := ALRandomStrU(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aStopWatch.Start;
+      aHash := ALStringHashSHA2U(aData, Tencoding.UTF8, THashSHA2.TSHA2Version.SHA256);
+      aStopWatch.Stop;
+      if aDictionary.TryGetValue(aHash, aTmpData) then begin
+        if aTmpData <> aData then begin
+          ALMemoCollisions.Lines.Add(string(aTmpData + '  =  ' + aData));
+          inc(aCollision);
+        end;
+      end
+      else aDictionary.Add(aHash, aData);
+      inc(acounter);
+      if millisecondsbetween(now, aLastGUIUpdate) > 200 then begin
+        aLastGUIUpdate := now;
+        StatusBar1.Panels[1].Text := FormatFloat('#,.', (acounter / (aStopWatch.Elapsed.TotalMilliseconds / 1000))) + ' keys/s ('+ FormatFloat('0,.######', ((aStopWatch.Elapsed.TotalMilliseconds / acounter))) + ' ms/key)';
+        StatusBar1.Panels[3].Text := inttostr(aCollision) + ' collisions';
+        StatusBar1.Panels[4].Text := FormatFloat('#,.', aDictionary.Count) + ' keys';
+        if (Sender as TButton).Tag = 0 then break;
+        application.ProcessMessages;
+      end;
+    end;
+  finally
+    aDictionary.free;
+  end;
+end;
+
+procedure TForm1.Button18Click(Sender: TObject);
+Var aData: Tbytes;
+    aHash: String;
+    aCounter: integer;
+    aStopWatch: TstopWatch;
+    aLastGUIUpdate: TDateTime;
+begin
+  if (Sender as TButton).Tag = 1 then begin
+    (Sender as TButton).Tag := 0;
+    (Sender as TButton).Caption := 'Bench HexEncode (UNICODE)';
+    exit;
+  end;
+  (Sender as TButton).Tag := 1;
+  (Sender as TButton).Caption := 'Stop';
+  randomize;
+
+  if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
+  ALMemoCryptedData.Lines.Text := ALBinToHexU(Tencoding.UTF8.GetBytes(ALMemoDecryptedData.Lines.Text));
+  ALMemoDecryptedData.Lines.Text := Tencoding.UTF8.GetString(ALHexToBinU(ALMemoCryptedData.Lines.Text));
+
+  StatusBar1.Panels[0].Text := 'Bench HexEncode (UNICODE)';
+  StatusBar1.Panels[1].Text := '';
+  StatusBar1.Panels[2].Text := 'Input: 1 to 4096 bytes';
+  StatusBar1.Panels[3].Text := '';
+  StatusBar1.Panels[4].Text := '';
+  ALMemoCollisions.Lines.Clear;
+  aCounter := 0;
+  aLastGUIUpdate := now;
+  aStopWatch := TstopWatch.Create;
+  while True do begin
+    aData := ALRandomBytes(1+random(4096));
+    aStopWatch.Start;
+    aHash := ALBinToHexU(aData);
+    aStopWatch.Stop;
+    inc(acounter);
+    if millisecondsbetween(now, aLastGUIUpdate) > 200 then begin
+      aLastGUIUpdate := now;
+      StatusBar1.Panels[1].Text := FormatFloat('#,.', (acounter / (aStopWatch.Elapsed.TotalMilliseconds / 1000))) + ' keys/s ('+ FormatFloat('0,.######', ((aStopWatch.Elapsed.TotalMilliseconds / acounter))) + ' ms/key)';
+      StatusBar1.Panels[3].Text := '';
+      StatusBar1.Panels[4].Text := '';
+      if (Sender as TButton).Tag = 0 then break;
+      application.ProcessMessages;
+    end;
+  end;
+end;
+
 procedure TForm1.Button1Click(Sender: TObject);
 Var aData: AnsiString;
     aTmpData: ansiString;
     aHash: integer;
     aCounter: integer;
     aStopWatch: TstopWatch;
-    aLastGUIUpdate: Extended;
+    aLastGUIUpdate: TDateTime;
     aDictionary: TDictionary<integer,ansistring>;
     aCollision: integer;
 begin
@@ -655,6 +923,10 @@ begin
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
+
+  ALMemoCryptedData.Lines.Text := '';
+  ALMemoDecryptedData.Lines.Text := '';
+
   StatusBar1.Panels[0].Text := 'CRC32 (Zlib)';
   StatusBar1.Panels[1].Text := '';
   StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
@@ -701,7 +973,7 @@ Var aData: AnsiString;
     aHash: integer;
     aCounter: integer;
     aStopWatch: TstopWatch;
-    aLastGUIUpdate: Extended;
+    aLastGUIUpdate: TDateTime;
     aDictionary: TDictionary<integer,ansistring>;
     aCollision: integer;
 begin
@@ -713,6 +985,10 @@ begin
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
+
+  ALMemoCryptedData.Lines.Text := '';
+  ALMemoDecryptedData.Lines.Text := '';
+
   StatusBar1.Panels[0].Text := 'ALCRC32';
   StatusBar1.Panels[1].Text := '';
   StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
@@ -760,7 +1036,7 @@ Var aData: AnsiString;
     aHash: integer;
     aCounter: integer;
     aStopWatch: TstopWatch;
-    aLastGUIUpdate: Extended;
+    aLastGUIUpdate: TDateTime;
     aDictionary: TDictionary<integer,ansistring>;
     aCollision: integer;
 begin
@@ -772,6 +1048,10 @@ begin
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
+
+  ALMemoCryptedData.Lines.Text := '';
+  ALMemoDecryptedData.Lines.Text := '';
+
   StatusBar1.Panels[0].Text := 'BobJenkinsHash';
   StatusBar1.Panels[1].Text := '';
   StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
@@ -818,19 +1098,23 @@ Var aData: AnsiString;
     aHash: int64;
     aCounter: integer;
     aStopWatch: TstopWatch;
-    aLastGUIUpdate: Extended;
+    aLastGUIUpdate: TDateTime;
     aDictionary: TDictionary<int64,ansistring>;
     aCollision: integer;
 begin
   if (Sender as TButton).Tag = 1 then begin
     (Sender as TButton).Tag := 0;
-    (Sender as TButton).Caption := 'Bench FNV-1a (int64)';
+    (Sender as TButton).Caption := 'Bench ALFNV-1a (int64)';
     exit;
   end;
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
-  StatusBar1.Panels[0].Text := 'FNV-1a (int64)';
+
+  ALMemoCryptedData.Lines.Text := '';
+  ALMemoDecryptedData.Lines.Text := '';
+
+  StatusBar1.Panels[0].Text := 'ALFNV-1a (int64)';
   StatusBar1.Panels[1].Text := '';
   StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
   StatusBar1.Panels[3].Text := '';
@@ -876,19 +1160,23 @@ Var aData: AnsiString;
     aHash: integer;
     aCounter: integer;
     aStopWatch: TstopWatch;
-    aLastGUIUpdate: Extended;
+    aLastGUIUpdate: TDateTime;
     aDictionary: TDictionary<integer,ansistring>;
     aCollision: integer;
 begin
   if (Sender as TButton).Tag = 1 then begin
     (Sender as TButton).Tag := 0;
-    (Sender as TButton).Caption := 'Bench FNV-1a (int32)';
+    (Sender as TButton).Caption := 'Bench ALFNV-1a (int32)';
     exit;
   end;
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
-  StatusBar1.Panels[0].Text := 'FNV-1a (int32)';
+
+  ALMemoCryptedData.Lines.Text := '';
+  ALMemoDecryptedData.Lines.Text := '';
+
+  StatusBar1.Panels[0].Text := 'ALFNV-1a (int32)';
   StatusBar1.Panels[1].Text := '';
   StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
   StatusBar1.Panels[3].Text := '';
@@ -932,7 +1220,7 @@ procedure TForm1.Button6Click(Sender: TObject);
 Var aHash: int32;
     aCounter: integer;
     aStopWatch: TstopWatch;
-    aLastGUIUpdate: Extended;
+    aLastGUIUpdate: TDateTime;
     P, x, y: integer;
 begin
   if (Sender as TButton).Tag = 1 then begin
@@ -942,6 +1230,10 @@ begin
   end;
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
+
+  ALMemoCryptedData.Lines.Text := '';
+  ALMemoDecryptedData.Lines.Text := '';
+
   StatusBar1.Panels[0].Text := 'ALRandom32';
   StatusBar1.Panels[1].Text := '';
   StatusBar1.Panels[2].Text := '';
@@ -1003,7 +1295,7 @@ procedure TForm1.Button7Click(Sender: TObject);
 Var aHash: int64;
     aCounter: integer;
     aStopWatch: TstopWatch;
-    aLastGUIUpdate: Extended;
+    aLastGUIUpdate: TDateTime;
     P, x, y: integer;
 begin
   if (Sender as TButton).Tag = 1 then begin
@@ -1013,6 +1305,10 @@ begin
   end;
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
+
+  ALMemoCryptedData.Lines.Text := '';
+  ALMemoDecryptedData.Lines.Text := '';
+
   StatusBar1.Panels[0].Text := 'ALRandom64';
   StatusBar1.Panels[1].Text := '';
   StatusBar1.Panels[2].Text := '';
@@ -1068,20 +1364,26 @@ Var aData: AnsiString;
     aHash: ansiString;
     aCounter: integer;
     aStopWatch: TstopWatch;
-    aLastGUIUpdate: Extended;
+    aLastGUIUpdate: TDateTime;
     aDictionary: TDictionary<ansiString,ansistring>;
     aCollision: integer;
 begin
   if (Sender as TButton).Tag = 1 then begin
     (Sender as TButton).Tag := 0;
-    (Sender as TButton).Caption := 'Bench Bcrypt (12)';
+    (Sender as TButton).Caption := 'Bench BCrypt(12) (ansiString)';
     exit;
   end;
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
+  {$IFDEF DEBUG}
   if not ALBCryptSelfTest then raise Exception.Create('ALBCryptSelfTest Failed!');
+  {$ENDIF}
   randomize;
-  StatusBar1.Panels[0].Text := 'Bcrypt (12)';
+
+  if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
+  ALMemoCryptedData.Lines.Text := String(ALBCryptHashPassword(ansiString(ALMemoDecryptedData.Lines.Text), 12));
+
+  StatusBar1.Panels[0].Text := 'Bcrypt(12) (ansiString)';
   StatusBar1.Panels[1].Text := '';
   StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
   StatusBar1.Panels[3].Text := '';
@@ -1096,7 +1398,7 @@ begin
     while True do begin
       aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
-      aHash := ALBCryptHashPassword(aData, 11);
+      aHash := ALBCryptHashPassword(aData, 12);
       aStopWatch.Stop;
       if aDictionary.TryGetValue(aHash, aTmpData) then begin
         if aTmpData <> aData then begin
@@ -1118,11 +1420,6 @@ begin
   finally
     aDictionary.free;
   end;
-end;
-
-procedure TForm1.Button9Click(Sender: TObject);
-begin
-  ALMemoCryptedData.Lines.Text := String(ALBCryptHashPassword(ansiString(ALMemoDecryptedData.Lines.Text), 11));
 end;
 
 {$WARN SYMBOL_DEPRECATED ON}

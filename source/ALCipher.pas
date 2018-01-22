@@ -310,7 +310,8 @@ function CryptGenRandom(hProv: HCRYPTPROV;
                         dwLen: DWORD;
                         pbBuffer: PBYTE): BOOL; stdcall;
 
-function ALRandomBytes(const Len: Cardinal): TBytes;
+procedure ALRandomBytes(const Dest: Pbyte; const Len: Cardinal); overload;
+function ALRandomBytes(const Len: Cardinal): TBytes; overload;
 function ALRandomByteStr(const Len: Cardinal): ansiString;
 function ALRandom32(const ARange: Cardinal): cardinal;
 function ALRandom64(const ARange: UInt64): UInt64;
@@ -4270,6 +4271,27 @@ function CryptReleaseContext; external ADVAPI32 name 'CryptReleaseContext';
 
 {***************************************************************}
 function CryptGenRandom; external ADVAPI32 name 'CryptGenRandom';
+
+{**************************************************************}
+procedure ALRandomBytes(const Dest: Pbyte; const Len: Cardinal);
+var hProv: HCRYPTPROV;
+begin
+  if (not CryptAcquireContextA(@hProv,
+                               nil,
+                               MS_ENHANCED_PROV_A,
+                               PROV_RSA_FULL,
+                               CRYPT_VERIFYCONTEXT)) and
+     (not CryptAcquireContextA(@hProv,
+                               nil,
+                               MS_ENHANCED_PROV_A,
+                               PROV_RSA_FULL,
+                               CRYPT_NEWKEYSET + CRYPT_VERIFYCONTEXT)) then raiselastOsError;
+  try
+    if not CryptGenRandom(hProv,Len,Dest) then raiselastOsError;
+  finally
+    CryptReleaseContext(hProv,0);
+  end;
+end;
 
 {**************************************************}
 function ALRandomBytes(const Len: Cardinal): TBytes;

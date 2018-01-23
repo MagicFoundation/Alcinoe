@@ -231,7 +231,7 @@ function  ALStringHashSHA2U(const Str: String; Const encoding: Tencoding; const 
 //
 
 {$IFDEF MSWINDOWS}
-function ALBCryptHashPassword(const password: AnsiString; cost: Integer): AnsiString;
+function ALBCryptHashPassword(const password: AnsiString; cost: Integer; const MCFEncode: boolean = True): AnsiString;
 function ALBCryptCheckPassword(const password: AnsiString; const expectedHashString: AnsiString; out PasswordRehashNeeded: Boolean): Boolean;
 function ALBCryptPasswordRehashNeeded(const HashString: AnsiString): Boolean;
 function ALBCryptSelfTest: Boolean;
@@ -310,7 +310,7 @@ function CryptGenRandom(hProv: HCRYPTPROV;
                         dwLen: DWORD;
                         pbBuffer: PBYTE): BOOL; stdcall;
 
-procedure ALRandomBytes(const Dest: Pbyte; const Len: Cardinal); overload;
+procedure ALRandomBytes(const Dest; const Len: Cardinal); overload;
 function ALRandomBytes(const Len: Cardinal): TBytes; overload;
 function ALRandomByteStr(const Len: Cardinal): ansiString;
 function ALRandom32(const ARange: Cardinal): cardinal;
@@ -417,6 +417,28 @@ asm
   pop  esi
 end;
 {$ifend}
+
+
+
+
+/////////////////
+////// MD5 //////
+/////////////////
+
+{$REGION ' CompilerVersion < 32'}
+{$IF CompilerVersion < 32} // tokyo
+
+{ message digest context types }
+type
+  TALCipherMD5Context  = array [0..87] of Byte;        { MD5 }
+
+type
+  pALCipherMD5ContextEx = ^TALCipherMD5ContextEx;
+  TALCipherMD5ContextEx = packed record
+    Count : array [0..1] of DWord;  {number of bits handled mod 2^64}
+    State : array [0..3] of DWord;  {scratch buffer}
+    Buf   : array [0..63] of Byte;    {input buffer}
+  end;
 
 {******************************************}
 function ALCipherRolX(I, C : DWord) : DWord;
@@ -568,27 +590,6 @@ begin
 
   ALMove(Buf, Buffer, SizeOf(Buffer));
 end;
-
-
-
-/////////////////
-////// MD5 //////
-/////////////////
-
-{$REGION ' CompilerVersion < 32'}
-{$IF CompilerVersion < 32} // tokyo
-
-{ message digest context types }
-type
-  TALCipherMD5Context  = array [0..87] of Byte;        { MD5 }
-
-type
-  pALCipherMD5ContextEx = ^TALCipherMD5ContextEx;
-  TALCipherMD5ContextEx = packed record
-    Count : array [0..1] of DWord;  {number of bits handled mod 2^64}
-    State : array [0..3] of DWord;  {scratch buffer}
-    Buf   : array [0..63] of Byte;    {input buffer}
-  end;
 
 {***********************************************************}
 procedure ALCipherInitMD5(var Context : TALCipherMD5Context);
@@ -1214,14 +1215,17 @@ type
 
 	TBCrypt = class(TObject)
 	private
-		class function TryParseHashString(const hashString: AnsiString; out version: AnsiString; out Cost: Integer; out Salt: TBytes): Boolean;
+		class function TryParseHashString(const hashString: AnsiString; out version: byte; out Cost: byte; out Salt: TBytes; out MCFEncoded: boolean): Boolean;
     class procedure BlowfishEncryptECB(const Data: TBlowfishData; InData, OutData: Pointer);
 	protected
+    class function IntVersionToBsdStr(const version: byte): ansiString;
+    class function BsdStrVersionToInt(const version: ansiString): Byte;
 		class function EksBlowfishSetup(const Cost: Integer; salt, key: array of Byte): TBlowfishData;
 		class procedure ExpandKey(var state: TBlowfishData; salt, key: array of Byte);
 		class function CryptCore(const Cost: Integer; Key: array of Byte; salt: array of Byte): TBytes;
-		class function FormatPasswordHashForBsd(const Version: AnsiString; const cost: Integer; const salt: array of Byte; const hash: array of Byte): AnsiString;
-		class function BsdBase64Encode(const data: array of Byte; BytesToEncode: Integer): AnsiString;
+		class function FormatPasswordHashForBsd(const Version: byte; const cost: integer; const salt: array of Byte; const hash: array of Byte): AnsiString;
+    class function FormatPasswordHashForBin(const Version: byte; const cost: byte; const salt, hash: TBytes): AnsiString;
+    class function BsdBase64Encode(const data: array of Byte; BytesToEncode: Integer): AnsiString;
 		class function BsdBase64Decode(const s: AnsiString): TBytes;
 		class function SelfTestA: Boolean; //known test vectors
 		class function SelfTestB: Boolean; //BSD's base64 encoder/decoder
@@ -1233,13 +1237,12 @@ type
 		class function GetModernCost(SampleCost: Integer; SampleHashDurationMS: Real): Integer;
 		class function GetModernCost_Benchmark: Integer;
 		class function TimingSafeSameString(const Safe, User: AnsiString): Boolean;
-		class function PasswordRehashNeededCore(const Version: AnsiString; const Cost: Integer; SampleCost: Integer; SampleHashDurationMS: Real): Boolean;
+		class function PasswordRehashNeededCore(const Version: byte; const Cost: integer; SampleCost: integer; SampleHashDurationMS: Real): Boolean;
 	public
-		class function HashPassword(const password: AnsiString): AnsiString; overload;
-		class function HashPassword(const password: AnsiString; cost: Integer): AnsiString; overload;
+		class function HashPassword(const password: AnsiString; const MCFEncode: boolean = True): AnsiString; overload;
+		class function HashPassword(const password: AnsiString; cost: Integer; const MCFEncode: boolean = True): AnsiString; overload;
 		class function HashPassword(const password: AnsiString; const salt: array of Byte; const cost: Integer): TBytes; overload;
 		class function CheckPassword(const password: AnsiString; const expectedHashString: AnsiString; out PasswordRehashNeeded: Boolean): Boolean; overload;
-		class function CheckPassword(const password: AnsiString; const salt, hash: array of Byte; const Cost: Integer; out PasswordRehashNeeded: Boolean): Boolean; overload;
 		class function GenerateSalt: TBytes;
 		class function PasswordRehashNeeded(const HashString: AnsiString): Boolean;
 		class function SelfTest: Boolean;
@@ -1272,6 +1275,12 @@ const
 
 	BCRYPT_SALT_LEN = 16; //bcrypt uses 128-bit (16-byte) salt (This isn't an adjustable parameter, just a name for a constant)
 	BCRYPT_MaxKeyLen = 72; //72 bytes ==> 71 ansi charcters + null terminator
+
+  BCRYPT_version_2 = 1;     //
+  BCRYPT_version_2a = 2;    // WARNING: if you change one of theses values, it's must never be 36 ($)
+  BCRYPT_version_2x = 3;    // because we use this char to detect if MCFEncoded or not
+  BCRYPT_version_2y = 4;    //
+  BCRYPT_version_2b = 5;    //
 
 	BsdBase64EncodeTable: array[0..63] of ansiChar =
 			{ 0:} './'+
@@ -1323,8 +1332,8 @@ const
 	SSaltLengthError = 'Salt must be 16 bytes';
 	SInvalidLength = 'Invalid length';
 
-{**************************************************************************}
-class function TBCrypt.HashPassword(const password: AnsiString): AnsiString;
+{***********************************************************************************************************}
+class function TBCrypt.HashPassword(const password: AnsiString; const MCFEncode: boolean = True): AnsiString;
 var cost: Integer;
 begin
 
@@ -1358,15 +1367,14 @@ begin
 
 	cost := TBCrypt.GetModernCost_Benchmark;
 	if cost < BCRYPT_COST then cost := BCRYPT_COST;
-	Result := TBCrypt.HashPassword(password, cost);
+	Result := TBCrypt.HashPassword(password, cost, MCFEncode);
 
 end;
 
-{*****************************************************************************************}
-class function TBCrypt.HashPassword(const password: AnsiString; cost: Integer): AnsiString;
-var
-	salt: TBytes;
-	hash: TBytes;
+{**************************************************************************************************************************}
+class function TBCrypt.HashPassword(const password: AnsiString; cost: Integer; const MCFEncode: boolean = True): AnsiString;
+var salt: TBytes;
+	  hash: TBytes;
 begin
 
   //
@@ -1378,11 +1386,16 @@ begin
 	salt := GenerateSalt();
 	hash := TBCrypt.HashPassword(password, salt, cost);
 
+  //
 	//20151010  I don't want to emit 2b just yet. The previous bcrypt would fail on anything besides 2a.
 	//This version handles any single letter suffix. But if we have cross system authentication, and an older system
 	//tries to validate a 2b password it will fail.
 	//Wait a year or so until everyone has the new bcrypt
-	Result := FormatPasswordHashForBsd('2a', cost, salt, hash);
+  //
+  //20180101 maybe it's time to emit 2b ;)
+  //
+	if MCFEncode then Result := FormatPasswordHashForBsd(BCRYPT_version_2b, cost, salt, hash)
+  else Result := FormatPasswordHashForBin(BCRYPT_version_2b, cost, salt, hash);
 
 end;
 
@@ -1819,8 +1832,8 @@ begin
 
 end;
 
-{*********************************************************************************************************************************************}
-class function TBCrypt.TryParseHashString(const hashString: AnsiString; out version: AnsiString; out Cost: Integer; out Salt: TBytes): Boolean;
+{*************************************************************************************************************************************************************}
+class function TBCrypt.TryParseHashString(const hashString: AnsiString; out version: byte; out Cost: byte; out Salt: TBytes; out MCFEncoded: boolean): Boolean;
 var s: AnsiString;
 	  n: Integer; //current index
 
@@ -1852,92 +1865,82 @@ begin
 
 	Result := False;
 
-	//
-	//	Pick apart our specially formatted hash string
-  //
-	//		$2a$nn$[22 character salt, b64 encoded][32 character hash, b64 encoded]
-  //
-	//	We also need to accept version 2, the original version
-  //
-	//		$2$nn$[22 character salt, b64 encoded][32 character hash, b64 encoded]
-	//
+  //bin format
+  if (length(hashString) >= 4) and
+     (Pbyte(hashString)[0] <> 36) then begin
 
-	if Length(hashString) < 27 then Exit; //"$2$4$" + 22 = 27
+    MCFEncoded := False;
+    ALMove(pointer(hashString)^, version, sizeof(Version));
+    ALMove(pbyte(hashString)[sizeof(Version)], Cost, sizeof(Cost));
+    Setlength(Salt, BCRYPT_SALT_LEN);
+    ALMove(pbyte(hashString)[sizeof(Version) + sizeof(Cost)], Pbyte(salt)^, length(salt));
 
-	//Get version token
-	n := 1;
-	Version := GetNextToken({var}n);
-	if Version = '' then Exit;
-	if Version[1] <> '2' then Exit;
-	if Length(Version) > 1 then begin
-		if Length(Version) > 2 then Exit; //we only comprehend "2c", where c is a character
-		if not CharInSet(Version[2], ['A'..'Z', 'a'..'z']) then Exit;
-	end;
+  end
 
-	//Get cost token
-	s := GetNextToken({var}n);
-	Cost := ALStrToIntDef(s, -1);
-	if Cost <= 0 then Exit;
+  //MCF format
+  else begin
 
-	//Get remaining 22 character salt
-	s := GetNextToken({var}n);
-	s := Copy(s, 1, 22);
-	if Length(s) < 22 then Exit;
-	try
-		Salt := BsdBase64Decode(s); //salt is always 16 bytes (16 bytes * 4/3 --> 22 base64 characters)
-	except
-		on EBCryptException do Exit; //E.g. invalid base64 string
-	end;
+    //set MCFEncoded
+    MCFEncoded := True;
+
+    //
+    //	Pick apart our specially formatted hash string
+    //	$2a$nn$[22 character salt, b64 encoded][32 character hash, b64 encoded]
+    //	We also need to accept version 2, the original version
+    //	$2$nn$[22 character salt, b64 encoded][32 character hash, b64 encoded]
+    //
+
+    if Length(hashString) < 27 then Exit; //"$2$4$" + 22 = 27
+
+    //Get version token
+    n := 1;
+    s := GetNextToken({var}n);
+    version := BsdStrVersionToInt(s);
+    if version = 0 then exit;
+
+    //Get cost token
+    s := GetNextToken({var}n);
+    Cost := ALStrToIntDef(s, -1);
+    if Cost <= 0 then Exit;
+
+    //Get remaining 22 character salt
+    s := GetNextToken({var}n);
+    s := Copy(s, 1, 22);
+    if Length(s) < 22 then Exit;
+    try
+      Salt := BsdBase64Decode(s); //salt is always 16 bytes (16 bytes * 4/3 --> 22 base64 characters)
+    except
+      on EBCryptException do Exit; //E.g. invalid base64 string
+    end;
+
+  end;
 
 	Result := True;
 
 end;
 
-{*****************************************************************************************************************************************************************}
-class function TBCrypt.CheckPassword(const password: AnsiString; const salt, hash: array of Byte; const Cost: Integer; out PasswordRehashNeeded: Boolean): Boolean;
-var candidateHash: TBytes;
-	  len: Integer;
-    freq, t1, t2: Int64;
-begin
-
-	Result := False;
-  PasswordRehashNeeded := False;
-
-  if not QueryPerformanceFrequency({var}freq) then freq := -1; //avoid a division by zero
-  if not QueryPerformanceCounter(t1) then t1 := 0;
-	candidateHash := TBCrypt.HashPassword(password, salt, cost);
-  if not QueryPerformanceCounter(t2) then t2 := 0;
-
-	len := Length(hash);
-	if Length(candidateHash) <> len then Exit;
-
-	Result := CompareMem(@candidateHash[0], @hash[0], len);
-
-	//Based on how long it took to hash the password, see if a rehash is needed to increase the cost
-	PasswordRehashNeeded := TBcrypt.PasswordRehashNeededCore('2a', cost, cost, (t2-t1)/freq*1000);
-
-end;
-
 {*************************************************************************************************************************************************}
 class function TBCrypt.CheckPassword(const password: AnsiString; const expectedHashString: AnsiString; out PasswordRehashNeeded: Boolean): Boolean;
-var version: AnsiString;
-    cost: Integer;
+var version: byte;
+    cost: byte;
     salt: TBytes;
     hash: TBytes;
     actualHashString: AnsiString;
+    mcfEncoded: boolean;
     freq, t1, t2: Int64;
 begin
 	PasswordRehashNeeded := False;
 
 	if not QueryPerformanceFrequency({var}freq) then freq := -1; //avoid a division by zero
 
-	if not TryParseHashString(expectedHashString, {out}version, {out}cost, {out}salt) then raise Exception.Create(SInvalidHashString);
+	if not TryParseHashString(expectedHashString, {out}version, {out}cost, {out}salt, {mcfEncoded}mcfEncoded) then raise Exception.Create(SInvalidHashString);
 
 	if not QueryPerformanceCounter(t1) then t1 := 0;
 	hash := TBCrypt.HashPassword(password, salt, cost);
 	if not QueryPerformanceCounter(t2) then t2 := 0;
 
-	actualHashString := FormatPasswordHashForBsd(version, cost, salt, hash);
+	if mcfEncoded then actualHashString := FormatPasswordHashForBsd(version, cost, salt, hash)
+  else actualHashString := FormatPasswordHashForBin(version, cost, salt, hash);
 
 	//Result := (actualHashString = expectedHashString);
 	Result := TBcrypt.TimingSafeSameString(actualHashString, expectedHashString);
@@ -1946,8 +1949,42 @@ begin
 	PasswordRehashNeeded := TBcrypt.PasswordRehashNeededCore(version, cost, cost, (t2-t1)/freq*1000);
 end;
 
-{*******************************************************************************************************************************************}
-class function TBCrypt.FormatPasswordHashForBsd(const Version: AnsiString; const cost: Integer; const salt, hash: array of Byte): AnsiString;
+{*************************************************************************}
+class function TBCrypt.IntVersionToBsdStr(const version: byte): ansiString;
+begin
+  case version of
+    BCrypt_Version_2: result := '2';
+    BCrypt_Version_2a: result := '2a';
+    BCrypt_Version_2x: result := '2x';
+    BCrypt_Version_2y: result := '2y';
+    BCrypt_Version_2b: result := '2b';
+    else result := '';
+  end;
+end;
+
+{*************************************************************************}
+class function TBCrypt.BsdStrVersionToInt(const version: ansiString): Byte;
+begin
+  if alSameText(version, '2') then result := BCrypt_Version_2
+  else if alSameText(version, '2a') then result := BCrypt_Version_2a
+  else if alSameText(version, '2x') then result := BCrypt_Version_2x
+  else if alSameText(version, '2y') then result := BCrypt_Version_2y
+  else if alSameText(version, '2b') then result := BCrypt_Version_2b
+  else result := 0;
+end;
+
+{***************************************************************************************************************************}
+class function TBCrypt.FormatPasswordHashForBin(const Version: byte; const cost: byte; const salt, hash: TBytes): AnsiString;
+begin
+  Setlength(result, sizeOf(Version) + sizeOf(Cost) + length(salt) + length(hash));
+  ALMove(Version, pointer(result)^, sizeof(Version));
+  ALMove(Cost, pbyte(result)[sizeof(Version)], sizeof(Cost));
+  ALMove(Pbyte(salt)^, pbyte(result)[sizeof(Version) + sizeof(Cost)], length(salt));
+  ALMove(Pbyte(hash)^, pbyte(result)[sizeof(Version) + sizeof(Cost) + length(salt)], length(hash));
+end;
+
+{*************************************************************************************************************************************}
+class function TBCrypt.FormatPasswordHashForBsd(const Version: byte; const cost: integer; const salt, hash: array of Byte): AnsiString;
 var saltString: AnsiString;
 	  hashString: AnsiString;
 begin
@@ -1955,7 +1992,7 @@ begin
 	hashString := BsdBase64Encode(hash, Length(hash)-1); //Yes, everything except the last byte.
                                                        //OpenBSD, in the pseudo-base64 implementation, doesn't include the last byte of the hash
                                                        //Nobody knows why, but that's what all existing tests do - so it's what i do
-	Result := ALFormat('$%s$%.2d$%s%s', [Version, cost, saltString, hashString]);
+	Result := ALFormat('$%s$%.2d$%s%s', [IntVersionToBsdStr(Version), cost, saltString, hashString]);
 end;
 
 {****************************************************************************************************}
@@ -2165,9 +2202,10 @@ end;
 {*********************************************************************************}
 class function TBCrypt.PasswordRehashNeeded(const HashString: AnsiString): Boolean;
 var idealCost: Integer;
-    version: AnsiString;
-    cost: Integer;
+    version: Byte;
+    cost: Byte;
     salt: TBytes;
+    mcfEncoded: Boolean;
 begin
 
 	//
@@ -2179,7 +2217,7 @@ begin
 	//	known good password.
 	//
 
-	if not TBCrypt.TryParseHashString(hashString, {out}version, {out}cost, {out}salt) then begin
+	if not TBCrypt.TryParseHashString(hashString, {out}version, {out}cost, {out}salt, {mcfEncoded}mcfEncoded) then begin
 		Result := True; //if they expected it to be a valid BCrypt hash, and it's not, then they definitely need to rehash something
 		Exit;
 	end;
@@ -2195,8 +2233,8 @@ begin
 
 end;
 
-{********************************************************************************************************************************************************}
-class function TBCrypt.PasswordRehashNeededCore(const Version: AnsiString; const Cost: Integer; SampleCost: Integer; SampleHashDurationMS: Real): Boolean;
+{**************************************************************************************************************************************************}
+class function TBCrypt.PasswordRehashNeededCore(const Version: byte; const Cost: integer; SampleCost: integer; SampleHashDurationMS: Real): Boolean;
 var idealCost: Integer;
 begin
 
@@ -2210,12 +2248,11 @@ begin
 		Exit;
 	end;
 
-	if ALSameText(version, '2') //original spec, that didn't define UTF-8 or what to do with a null terminator
-			or ALSameText(version, '2x') //hashes generated by a buggy version of crypt_blowfish; didn't handle unicode correctly
-			or ALSameText(version, '2y') //fixed version of crypt_blowfish
-      //or AnsiSameText(version, '2a') //buggy version of OpenBSD that stored password length in a Byte
-  then begin
-		//It should be version 2a. (eventually will be moved to 2b)
+	if (version = BCRYPT_version_2) or //original spec, that didn't define UTF-8 or what to do with a null terminator
+     (version = BCRYPT_version_2a) or //buggy version of OpenBSD that stored password length in a Byte
+		 (version = BCRYPT_version_2x) or //hashes generated by a buggy version of crypt_blowfish; didn't handle unicode correctly
+		 (version = BCRYPT_version_2y) then begin //fixed version of crypt_blowfish
+		//It should be version 2b
 		Result := True;
 		Exit;
 	end;
@@ -2280,14 +2317,15 @@ var
 
 	procedure t(const password: AnsiString; const HashSalt: AnsiString; const ExpectedHashString: AnsiString);
 	var
-		version: AnsiString;
-		cost: Integer;
+		version: Byte;
+		cost: Byte;
 		salt: TBytes;
 		hash: TBytes;
 		actualHashString: AnsiString;
+    mcfEncoded: boolean;
 	begin
 		//Extract "$2a$06$If6bvum7DFjUnE9p2uDeDu" rounds and base64 salt from the HashSalt
-		if not TBCrypt.TryParseHashString(HashSalt, {out}version, {out}cost, {out}salt) then
+		if not TBCrypt.TryParseHashString(HashSalt, {out}version, {out}cost, {out}salt, {mcfEncoded}mcfEncoded) then
 			raise Exception.Create('bcrypt self-test failed: invalid versionsalt "'+string(HashSalt)+'"');
 
 		hash := TBCrypt.HashPassword(password, salt, cost);
@@ -2469,10 +2507,10 @@ begin
 
 end;
 
-{***********************************************************************************}
-function ALBCryptHashPassword(const password: AnsiString; cost: Integer): AnsiString;
+{********************************************************************************************************************}
+function ALBCryptHashPassword(const password: AnsiString; cost: Integer; const MCFEncode: boolean = True): AnsiString;
 begin
-  Result := TBCrypt.HashPassword(password, cost);
+  Result := TBCrypt.HashPassword(password, cost, MCFEncode);
 end;
 
 {*******************************************************************************************************************************************}
@@ -4272,8 +4310,8 @@ function CryptReleaseContext; external ADVAPI32 name 'CryptReleaseContext';
 {***************************************************************}
 function CryptGenRandom; external ADVAPI32 name 'CryptGenRandom';
 
-{**************************************************************}
-procedure ALRandomBytes(const Dest: Pbyte; const Len: Cardinal);
+{*******************************************************}
+procedure ALRandomBytes(const Dest; const Len: Cardinal);
 var hProv: HCRYPTPROV;
 begin
   if (not CryptAcquireContextA(@hProv,
@@ -4287,7 +4325,7 @@ begin
                                PROV_RSA_FULL,
                                CRYPT_NEWKEYSET + CRYPT_VERIFYCONTEXT)) then raiselastOsError;
   try
-    if not CryptGenRandom(hProv,Len,Dest) then raiselastOsError;
+    if not CryptGenRandom(hProv,Len,@Dest) then raiselastOsError;
   finally
     CryptReleaseContext(hProv,0);
   end;

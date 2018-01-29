@@ -36,7 +36,7 @@ extern DELPHI_PACKAGE unsigned __int64 ALMAXUInt64;
 extern DELPHI_PACKAGE __int64 ALMAXInt64;
 extern DELPHI_PACKAGE unsigned ALMAXUInt;
 extern DELPHI_PACKAGE int ALMAXInt;
-#define ALNullDate  (-5.000000E-01)
+static const System::Int8 ALNullDate = System::Int8(0x0);
 extern DELPHI_PACKAGE TALIntelCpuFeatures ALCpuFeatures;
 extern DELPHI_PACKAGE void __fastcall ALLog(const System::UnicodeString Tag, const System::UnicodeString msg, const TalLogType _type = (TalLogType)(0x2));
 extern DELPHI_PACKAGE int __fastcall AlBoolToInt(bool Value);

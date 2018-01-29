@@ -12,12 +12,17 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
+{$IF CompilerVersion > 32} // tokyo
+  {$MESSAGE WARN 'Check if Web.Win.IsapiHTTPpas / Web.HTTPApp was not updated and adjust the IFDEF'}
+{$IFEND}
+
 uses System.SysUtils,
      System.Classes,
      Winapi.Isapi2,
      ALMultiPartParser,
      ALHttpClient,
-     ALStringList;
+     ALStringList,
+     ALString;
 
 type
 
@@ -47,7 +52,7 @@ type
     function GetStringVariable(Index: Integer): AnsiString; virtual; abstract;
     function GetDateVariable(Index: Integer): TDateTime; virtual; abstract;
     function GetIntegerVariable(Index: Integer): Integer; virtual; abstract;
-    function GetContentStream: Tstream; virtual; abstract; // [added from TwebRequest]
+    function GetContentStream: TALStringStream; virtual; abstract; // [added from TwebRequest]
   public
     // [Deleted from TwebRequest] procedure ExtractFields(Separators, _WhiteSpace: TSysCharSet; Content: PAnsiChar; Strings: TALStrings); overload; // Utility to extract fields from a given string buffer
     // [Deleted from TwebRequest] procedure ExtractFields(Separators, _WhiteSpace: TSysCharSet; const Content: AnsiString; Strings: TALStrings); overload;
@@ -99,7 +104,7 @@ type
     property ContentLength: Integer index 16 read GetIntegerVariable;
     property ContentVersion: AnsiString index 17 read GetStringVariable;
     Property Content: AnsiString Read GetContent;
-    Property ContentStream: Tstream Read GetContentStream; // [added from TwebRequest]
+    Property ContentStream: TALStringStream Read GetContentStream; // [added from TwebRequest]
     Property MaxContentSize: Integer Read FMaxContentSize Write FMaxContentSize; // [added from TwebRequest]
     property Connection: AnsiString index 26 read GetStringVariable;
     property DerivedFrom: AnsiString index 18 read GetStringVariable;
@@ -115,14 +120,14 @@ type
   TALISAPIRequest = class(TALWebRequest)
   private
     FECB: PEXTENSION_CONTROL_BLOCK;
-    FcontentStream: TStream;
+    FcontentStream: TALStringStream;
     function GetHost: AnsiString;
   protected
     // [Deleted from TwebRequest] function GetRawPathInfo: AnsiString; override;
     function GetStringVariable(Index: Integer): AnsiString; override;
     function GetDateVariable(Index: Integer): TDateTime; override;
     function GetIntegerVariable(Index: Integer): Integer; override;
-    function GetContentStream: Tstream; override; // [added from TwebRequest]
+    function GetContentStream: TALStringStream; override; // [added from TwebRequest]
   public
     constructor Create(AECB: PEXTENSION_CONTROL_BLOCK);
     destructor Destroy; override;
@@ -139,9 +144,9 @@ type
   {-----------------------------}
   TALWebResponse = class(TObject)
   private
-    // [Deleted from TwebRequest] function GetUnicodeContent: AnsiString;
-    // [Deleted from TwebRequest] procedure SetUnicodeContent(const AValue: AnsiString);
-    FFreeContentStream: Boolean;
+    // [Deleted from TWebResponse] function GetUnicodeContent: AnsiString;
+    // [Deleted from TWebResponse] procedure SetUnicodeContent(const AValue: AnsiString);
+    // [Deleted from TWebResponse] FFreeContentStream: Boolean;
     FContentStream: TStream;
     FCookies: TALHttpCookieCollection;
     procedure SetCustomHeaders(Value: TALStrings);
@@ -164,7 +169,7 @@ type
     procedure SetLogMessage(const Value: AnsiString); virtual; abstract;
     function FormatAuthenticate: AnsiString;
   public
-    // [Deleted from TwebRequest] property RawContent: AnsiString read GetContent write SetContent;
+    // [Deleted from TWebResponse] property RawContent: AnsiString read GetContent write SetContent;
     constructor Create(HTTPRequest: TALWebRequest);
     destructor Destroy; override;
     function GetCustomHeader(const Name: AnsiString): AnsiString;
@@ -172,7 +177,11 @@ type
     procedure SendRedirect(const URI: AnsiString); virtual; abstract;
     procedure SendStream(AStream: TStream); virtual; abstract;
     function Sent: Boolean; virtual;
-    procedure SetCookieField(Values: TALStrings; const ADomain, APath: AnsiString; AExpires: TDateTime; ASecure: Boolean);
+    procedure SetCookieField(Values: TALStrings;
+                             const ADomain, APath: AnsiString;
+                             AExpires: TDateTime;
+                             ASecure: Boolean;
+                             const AHttpOnly: Boolean = False);
     procedure SetCustomHeader(const Name, Value: AnsiString);
     property Cookies: TALHttpCookieCollection read FCookies;
     property HTTPRequest: TALWebRequest read FHTTPRequest;
@@ -189,7 +198,7 @@ type
     property DerivedFrom: AnsiString index 10 read GetStringVariable write SetStringVariable;
     property Title: AnsiString index 11 read GetStringVariable write SetStringVariable;
     property StatusCode: Integer read GetStatusCode write SetStatusCode;
-    property ContentLength: Integer index 0 read GetIntegerVariable write SetIntegerVariable;
+    // [Deleted from TwebRequest] property ContentLength: Integer index 0 read GetIntegerVariable write SetIntegerVariable;
     property Date: TDateTime index 0 read GetDateVariable write SetDateVariable;
     property Expires: TDateTime index 1 read GetDateVariable write SetDateVariable;
     property LastModified: TDateTime index 2 read GetDateVariable write SetDateVariable;
@@ -197,7 +206,7 @@ type
     property ContentStream: TStream read FContentStream write SetContentStream;
     property LogMessage: AnsiString read GetLogMessage write SetLogMessage;
     property CustomHeaders: TALStrings read FCustomHeaders write SetCustomHeaders;
-    property FreeContentStream: Boolean read FFreeContentStream write FFreeContentStream;
+    // [Deleted from TWebResponse] property FreeContentStream: Boolean read FFreeContentStream write FFreeContentStream;
   end;
 
   {--------------------------------------}
@@ -208,7 +217,10 @@ type
     FIntegerVariables: array[0..0] of Integer;
     FDateVariables: array[0..2] of TDateTime;
     FContent: AnsiString;
+    FTransmitFileInfo: THSE_TF_INFO;
     FSent: Boolean;
+    fSentInAsync: Boolean;
+    function getTransmitFileInfo: PHSE_TF_INFO;
   protected
     function GetContent: AnsiString; override;
     function GetDateVariable(Index: Integer): TDateTime; override;
@@ -229,48 +241,63 @@ type
     procedure SendRedirect(const URI: AnsiString); override;
     procedure SendStream(AStream: TStream); override;
     function Sent: Boolean; override;
+    property SentInAsync: Boolean read fSentInAsync;
+    property TransmitFileInfo: PHSE_TF_INFO read getTransmitFileInfo;
   end;
 
 function ALIsapiHttpStatusString(StatusCode: Integer): AnsiString;
+
+//
+// Flags for IO Functions, supported for IO Funcs.
+//  TF means ServerSupportFunction( HSE_REQ_TRANSMIT_FILE)
+//
+
+const
+
+  HSE_IO_SYNC                      = $00000001;   // for WriteClient
+  HSE_IO_ASYNC                     = $00000002;   // for WriteClient/TF
+  HSE_IO_DISCONNECT_AFTER_SEND     = $00000004;   // for TF
+  HSE_IO_SEND_HEADERS              = $00000008;   // for TF
 
 implementation
 
 uses Winapi.Windows,
      System.DateUtils,
      System.Ansistrings,
-     ALString;
+     System.math,
+     ALCommon;
 
 const
-  CALWebRequestServerVariables: array[0..28] of AnsiString = ('',
-                                                              'SERVER_PROTOCOL',
-                                                              'URL',
-                                                              '',
-                                                              '',
-                                                              '',
-                                                              'HTTP_CACHE_CONTROL',
-                                                              'HTTP_DATE',
-                                                              'HTTP_ACCEPT',
-                                                              'HTTP_FROM',
-                                                              'HTTP_HOST',
-                                                              'HTTP_IF_MODIFIED_SINCE',
-                                                              'HTTP_REFERER',
-                                                              'HTTP_USER_AGENT',
-                                                              'HTTP_CONTENT_ENCODING',
-                                                              'CONTENT_TYPE',
-                                                              'CONTENT_LENGTH',
-                                                              'HTTP_CONTENT_VERSION',
-                                                              'HTTP_DERIVED_FROM',
-                                                              'HTTP_EXPIRES',
-                                                              'HTTP_TITLE',
-                                                              'REMOTE_ADDR',
-                                                              'REMOTE_HOST',
-                                                              'SCRIPT_NAME',
-                                                              'SERVER_PORT',
-                                                              '',
-                                                              'HTTP_CONNECTION',
-                                                              'HTTP_COOKIE',
-                                                              'HTTP_AUTHORIZATION');
-
+  ALWebRequestServerVariables: array[0..28] of AnsiString = (
+    '',
+    'SERVER_PROTOCOL',
+    'URL',
+    '',
+    '',
+    '',
+    'HTTP_CACHE_CONTROL',
+    'HTTP_DATE',
+    'HTTP_ACCEPT',
+    'HTTP_FROM',
+    'HTTP_HOST',
+    'HTTP_IF_MODIFIED_SINCE',
+    'HTTP_REFERER',
+    'HTTP_USER_AGENT',
+    'HTTP_CONTENT_ENCODING',
+    'CONTENT_TYPE',
+    'CONTENT_LENGTH',
+    'HTTP_CONTENT_VERSION',
+    'HTTP_DERIVED_FROM',
+    'HTTP_EXPIRES',
+    'HTTP_TITLE',
+    'REMOTE_ADDR',
+    'REMOTE_HOST',
+    'SCRIPT_NAME',
+    'SERVER_PORT',
+    '',
+    'HTTP_CONNECTION',
+    'HTTP_COOKIE',
+    'HTTP_AUTHORIZATION');
 
 {*******************************}
 constructor TALWebRequest.Create;
@@ -335,18 +362,14 @@ begin
                                      Fields,
                                      Files);
   Finally
-    aMultipartFormDataDecoder.free;
+    AlFreeAndNil(aMultipartFormDataDecoder);
   End;
 end;
 
 {********************************************}
 function TALWebRequest.GetContent: AnsiString;
 begin
-  With contentStream do begin
-    Position := 0;
-    SetLength(Result,Size);
-    if Size > 0 then Read(Result[1],size);
-  end;
+  result := contentStream.DataString;
 end;
 
 {**************************************************}
@@ -374,7 +397,7 @@ end;
 {*********************************}
 destructor TALISAPIRequest.Destroy;
 begin
-  If Assigned(FcontentStream) then FcontentStream.Free;
+  AlFreeAndNil(FcontentStream);
   inherited;
 end;
 
@@ -408,8 +431,7 @@ begin
     4: Result := ECB.lpszPathInfo;
     5: Result := ECB.lpszPathTranslated;
     10: Result := GetHost;
-    1..2, 6..9, 11..24, 26..28: Result := GetFieldByName(CALWebRequestServerVariables[Index]);
-    25: if ECB.cbAvailable > 0 then SetString(Result, PAnsiChar(ECB.lpbData), ECB.cbAvailable);
+    1..2, 6..9, 11..24, 26..28: Result := GetFieldByName(ALWebRequestServerVariables[Index]);
     else Result := '';
   end;
 end;
@@ -425,16 +447,16 @@ begin
   if I > 0 then Delete(Result, I, MaxInt);
 end;
 
-{*************************************************}
-function TALISAPIRequest.GetContentStream: Tstream;
+{*********************************************************}
+function TALISAPIRequest.GetContentStream: TALStringStream;
 var aByteRead: Integer;
 begin
   if not assigned(FcontentStream) then begin
 
     If (FMaxContentSize > -1) and (ECB.cbTotalBytes > DWord(FMaxContentSize)) then
-      Raise EALIsapiRequestContentSizeTooBig.create('Content size ('+inttostr(ECB.cbTotalBytes)+' bytes) is bigger than the maximum allowed size ('+IntToStr(FMaxContentSize)+' bytes)');
+      Raise EALIsapiRequestContentSizeTooBig.createFmt('Content size (%d bytes) is bigger than the maximum allowed size (%d bytes)', [ECB.cbTotalBytes, FMaxContentSize]);
 
-    FcontentStream := TmemoryStream.Create;
+    FcontentStream := TALStringStream.Create('');
     FcontentStream.Size := ECB.cbTotalBytes; // cbTotalBytes The total number of bytes to be received from the client.
                                              // This is equivalent to the CGI variable CONTENT_LENGTH
     if ECB.cbAvailable > 0 then FcontentStream.WriteBuffer(ECB.lpbData^, ECB.cbAvailable); // The available number of bytes (out of a total of cbTotalBytes) in the buffer pointed to by lpbData.
@@ -443,7 +465,7 @@ begin
                                                                                            // of data received. The ISAPI extensions will then need to use the callback function ReadClient to read
                                                                                            // the rest of the data (beginning from an offset of cbAvailable).
     while FcontentStream.Position < FcontentStream.Size do begin
-      aByteRead := ReadClient(Pointer(Longint(TMemoryStream(FcontentStream).Memory) + FcontentStream.Position)^, FcontentStream.Size - FcontentStream.Position);
+      aByteRead := ReadClient(Pbyte(FcontentStream.DataString)[FcontentStream.Position], FcontentStream.Size - FcontentStream.Position);
       if aByteRead <= 0 then break;  // The doc of Delphi say "If no more content is available, ReadClient returns -1."
                                      // but it's false !!
                                      // http://msdn.microsoft.com/en-us/library/ms525214(v=vs.90).aspx
@@ -454,9 +476,10 @@ begin
     FcontentStream.Position := 0;
 
     if ContentLength > FcontentStream.Size then
-      raise EALIsapiRequestConnectionDropped.Create('Client Dropped Connection.'#13#10 +
-        'Total Bytes indicated by Header: ' + IntToStr(ContentLength) + #13#10 +
-        'Total Bytes Read: ' + IntToStr(FcontentStream.Size));
+      raise EALIsapiRequestConnectionDropped.Createfmt('Client Dropped Connection.'#13#10 +
+        'Total Bytes indicated by Header: %d' + #13#10 +
+        'Total Bytes Read: %d',
+        [ContentLength, FcontentStream.Size]);
 
   end;
   Result := FcontentStream;
@@ -484,7 +507,7 @@ end;
 function TALISAPIRequest.ReadClient(var Buffer; Count: Integer): Integer;
 begin
   Result := Count;
-  if not ECB.ReadClient(ECB.ConnID, @Buffer, DWORD(Result)) then Result := -1;
+  if not ECB.ReadClient(ECB.ConnID, @Buffer, DWORD(Result)) then RaiseLastOsError;
 end;
 
 {**************************************************************}
@@ -502,21 +525,21 @@ function TALISAPIRequest.TranslateURI(const URI: AnsiString): AnsiString;
 var PathBuffer: array[0..1023] of AnsiChar;
     Size: Integer;
 begin
-  {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrCopy(PathBuffer, PAnsiChar(URI));
+  System.Ansistrings.StrCopy(PathBuffer, PAnsiChar(URI));
   Size := SizeOf(PathBuffer);
-  if ECB.ServerSupportFunction(ECB.ConnID,
-                               HSE_REQ_MAP_URL_TO_PATH,
-                               @PathBuffer,
-                               @Size,
-                               nil) then Result := PathBuffer
-  else Result := '';
+  if not ECB.ServerSupportFunction(ECB.ConnID,
+                                   HSE_REQ_MAP_URL_TO_PATH,
+                                   @PathBuffer,
+                                   @Size,
+                                   nil) then raiseLastOsError;
+  Result := PathBuffer;
 end;
 
 {************************************************************************}
 function TALISAPIRequest.WriteClient(var Buffer; Count: Integer): Integer;
 begin
   Result := Count;
-  if not ECB.WriteClient(ECB.ConnID, @Buffer, DWORD(Result), 0) then Result := -1;
+  if not ECB.WriteClient(ECB.ConnID, @Buffer, DWORD(Result), 0) then raiseLastOsError;
 end;
 
 {***********************************************************************}
@@ -527,16 +550,15 @@ end;
 
 {********************************************************}
 function TALISAPIRequest.WriteHeaders(StatusCode: Integer;
-                                      const StatusString,
-                                            Headers: AnsiString): Boolean;
+                                      const StatusString, Headers: AnsiString): Boolean;
 begin
   TALISAPIRequest(Self).ECB.dwHttpStatusCode := StatusCode;
   with TALISAPIRequest(Self) do
-    ECB.ServerSupportFunction(ECB.ConnID,
-                              HSE_REQ_SEND_RESPONSE_HEADER,
-                              PAnsiChar(StatusString),
-                              nil,
-                              LPDWORD(Headers));
+    if not ECB.ServerSupportFunction(ECB.ConnID,
+                                     HSE_REQ_SEND_RESPONSE_HEADER,
+                                     PAnsiChar(StatusString),
+                                     nil,
+                                     LPDWORD(Headers)) then raiseLastOsError;
   Result := True;
 end;
 
@@ -547,16 +569,14 @@ begin
   FHTTPRequest := HTTPRequest;
   FCustomHeaders := TALStringList.Create;
   FCookies := TALHttpCookieCollection.Create(TALHttpCookie);
-  FFreeContentStream := True;
 end;
 
 {********************************}
 destructor TALWebResponse.Destroy;
 begin
-  if FreeContentStream then FContentStream.Free
-  else FContentStream := nil;
-  FCustomHeaders.Free;
-  FCookies.Free;
+  AlFreeAndNil(FContentStream);
+  AlFreeAndNil(FCustomHeaders);
+  AlFreeAndNil(FCookies);
   inherited Destroy;
 end;
 
@@ -588,19 +608,17 @@ end;
 procedure TALWebResponse.SetContentStream(Value: TStream);
 begin
   if Value <> FContentStream then begin
-    FContentStream.Free;
+    AlFreeAndNil(FContentStream);
     FContentStream := Value;
-    if FContentStream <> nil then ContentLength := FContentStream.Size
-    else ContentLength := Length(Content);
   end;
 end;
 
 {*********************************************************}
 procedure TALWebResponse.SetCookieField(Values: TALStrings;
-                                        const ADomain,
-                                              APath: AnsiString;
+                                        const ADomain, APath: AnsiString;
                                         AExpires: TDateTime;
-                                        ASecure: Boolean);
+                                        ASecure: Boolean;
+                                        const AHttpOnly: Boolean = False);
 var
   I: Integer;
 begin
@@ -612,6 +630,7 @@ begin
       Path := APath;
       Expires := AExpires;
       Secure := ASecure;
+      HttpOnly := AHttpOnly;
     end;
 end;
 
@@ -680,6 +699,8 @@ end;
 constructor TALISAPIResponse.Create(HTTPRequest: TALWebRequest);
 begin
   inherited Create(HTTPRequest);
+  FTransmitFileInfo.hFile := INVALID_HANDLE_VALUE;
+  fSentInAsync := False;
   InitResponse;
 end;
 
@@ -743,7 +764,6 @@ end;
 procedure TALISAPIResponse.SetContent(const Value: AnsiString);
 begin
   FContent := Value;
-  if ContentStream = nil then ContentLength := Length(FContent);
 end;
 
 {*********************************************************************************}
@@ -764,12 +784,15 @@ end;
 
 {****************************************************************}
 procedure TALISAPIResponse.SetLogMessage(const Value: AnsiString);
+var LLen: Integer;
 begin
-  {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrPLCopy(TALISAPIRequest(HTTPRequest).ECB.lpszLogData, Value, HSE_LOG_BUFFER_LEN - 1);
+  LLen := Length(TALISAPIRequest(HTTPRequest).ECB.lpszLogData);
+  LLen := Min(LLen, Length(Value) + 1);    // + 1 to include null terminator
+  Move(Value[Low(Value)], TALISAPIRequest(HTTPRequest).ECB.lpszLogData[0], LLen);
+  TALISAPIRequest(HTTPRequest).ECB.lpszLogData[LLen-1] := Char(0);
 end;
 
-{**********************************}
-{+ ! Strings not to be resourced !!}
+{*******************************************************}
 procedure TALISAPIResponse.SetStatusCode(Value: Integer);
 begin
   if FStatusCode <> Value then begin
@@ -799,6 +822,7 @@ var StatusString: AnsiString;
   end;
 
 begin
+
   if HTTPRequest.ProtocolVersion <> '' then begin
     if (ReasonString <> '') and (StatusCode > 0) then StatusString := ALFormat('%d %s', [StatusCode, ReasonString])
     else StatusString := '200 OK';
@@ -807,45 +831,59 @@ begin
     for I := 0 to Cookies.Count - 1 do
       AddHeaderItem(Cookies[I].HeaderValue, 'Set-Cookie: %s'#13#10);
     AddHeaderItem(DerivedFrom, 'Derived-From: %s'#13#10);
-    if Expires > 0 then AddHeaderItem(ALFormat(ALFormatDateTime('"%s", dd "%s" yyyy hh:nn:ss "GMT"',
-                                                                Expires,
-                                                                ALDefaultFormatSettings),
-                                               [CAlRfc822DayOfWeekNames[DayOfWeek(Expires)],
-                                                CALRfc822MonthOfTheYearNames[MonthOf(Expires)]]),
-                                      'Expires: %s'#13#10);
-    if LastModified > 0 then AddHeaderItem(ALFormat(ALFormatDateTime('"%s", dd "%s" yyyy hh:nn:ss "GMT"',
-                                                                     LastModified,
-                                                                     ALDefaultFormatSettings),
-                                                    [CAlRfc822DayOfWeekNames[DayOfWeek(LastModified)],
-                                                     CALRfc822MonthOfTheYearNames[MonthOf(LastModified)]]),
-                                           'Last-Modified: %s'#13#10);
+    if Expires > 0 then
+      AddHeaderItem(ALFormat(ALFormatDateTime('"%s", dd "%s" yyyy hh":"nn":"ss "GMT"',
+                                              Expires,
+                                              ALDefaultFormatSettings),
+                             [AlRfc822DayOfWeekNames[DayOfWeek(Expires)],
+                              ALRfc822MonthOfTheYearNames[MonthOf(Expires)]]),
+                    'Expires: %s'#13#10);
+    if LastModified > 0 then
+      AddHeaderItem(ALFormat(ALFormatDateTime('"%s", dd "%s" yyyy hh":"nn":"ss "GMT"',
+                                              LastModified,
+                                              ALDefaultFormatSettings),
+                             [AlRfc822DayOfWeekNames[DayOfWeek(LastModified)],
+                              ALRfc822MonthOfTheYearNames[MonthOf(LastModified)]]),
+                    'Last-Modified: %s'#13#10);
     AddHeaderItem(Title, 'Title: %s'#13#10);
     AddHeaderItem(FormatAuthenticate, 'WWW-Authenticate: %s'#13#10);
     AddCustomHeaders(Headers);
     AddHeaderItem(ContentVersion, 'Content-Version: %s'#13#10);
     AddHeaderItem(ContentEncoding, 'Content-Encoding: %s'#13#10);
     AddHeaderItem(ContentType, 'Content-Type: %s'#13#10);
-    if (Content <> '') or (ContentStream <> nil) then AddHeaderItem(ALIntToStr(ContentLength), 'Content-Length: %s'#13#10);
     Headers := Headers + #13#10;
     HTTPRequest.WriteHeaders(StatusCode, StatusString, Headers);
   end;
-  if ContentStream = nil then HTTPRequest.WriteString(Content)
+
+  fSentInAsync := False;
+  if fTransmitFileInfo.hFile <> Invalid_handle_value then begin
+    with TALISAPIRequest(FHTTPRequest) do
+      if not ECB.ServerSupportFunction(ECB.ConnID,
+                                       HSE_REQ_TRANSMIT_FILE,
+                                       @fTransmitFileInfo,
+                                       nil,
+                                       nil) then raiseLastOsError;
+    fSentInAsync := True;
+  end
+  else if ContentStream = nil then HTTPRequest.WriteString(Content)
   else if ContentStream <> nil then begin
     SendStream(ContentStream);
     ContentStream := nil; // Drop the stream
   end;
+
   FSent := True;
+
 end;
 
 {*************************************************************}
 procedure TALISAPIResponse.SendRedirect(const URI: AnsiString);
 begin
   with TALISAPIRequest(FHTTPRequest) do
-    ECB.ServerSupportFunction(ECB.ConnID,
-                              HSE_REQ_SEND_URL_REDIRECT_RESP,
-                              PAnsiChar(URI),
-                              nil,
-                              nil);
+    if not ECB.ServerSupportFunction(ECB.ConnID,
+                                     HSE_REQ_SEND_URL_REDIRECT_RESP,
+                                     PAnsiChar(URI),
+                                     nil,
+                                     nil) then raiseLastOsError;
   FSent := True;
 end;
 
@@ -858,6 +896,12 @@ begin
     BytesToSend := AStream.Read(Buffer, SizeOf(Buffer));
     FHTTPRequest.WriteClient(Buffer, BytesToSend);
   end;
+end;
+
+{**********************************************************}
+function TALISAPIResponse.getTransmitFileInfo: PHSE_TF_INFO;
+begin
+  result := @FTransmitFileInfo;
 end;
 
 end.

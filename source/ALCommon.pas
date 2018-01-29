@@ -43,19 +43,23 @@ const ALMAXUInt64: UInt64 = 18446744073709551615;
       ALMAXInt64: Int64 = 9223372036854775807;
       ALMAXUInt: cardinal = 4294967295;
       ALMAXInt: int32 = 2147483647;
-      ALNullDate = -0.5; // There are no TDateTime values from –1 through 0
-                         // dt := -0.5;
-                         // writeln(formatFloat('0.0', dt));                    => -0.5
-                         // writeln(DateTimeToStr(dt));                         => 1899/12/30 12:00:00.000
-                         //
-                         // dt := encodedatetime(1899,12,30,12,00,00,000);
-                         // writeln(formatFloat('0.0', dt));                    => 0.5
-                         // writeln(DateTimeToStr(dt));                         => 1899/12/30 12:00:00.000
-                         //
-                         // also -0.5 have the advantage to be in the form
-                         // m*2^e (-1*2^-1) with mean we don't need to use
-                         // samevalue to compare
-                         // https://stackoverflow.com/questions/41779801/single-double-and-precision
+      ALNullDate = 0; // There are no TDateTime values from –1 through 0
+                      // dt := -0.5;
+                      // writeln(formatFloat('0.0', dt));                    => -0.5
+                      // writeln(DateTimeToStr(dt));                         => 1899/12/30 12:00:00.000
+                      //
+                      // dt := encodedatetime(1899,12,30,12,00,00,000);
+                      // writeln(formatFloat('0.0', dt));                    => 0.5
+                      // writeln(DateTimeToStr(dt));                         => 1899/12/30 12:00:00.000
+                      //
+                      // also -0.5 have the advantage to be in the form
+                      // m*2^e (-1*2^-1) with mean we don't need to use
+                      // samevalue to compare
+                      // https://stackoverflow.com/questions/41779801/single-double-and-precision
+                      //
+                      // but finally -0.5 have a big drawback, if you convert it to string and back
+                      // to datetime then you will obtain 0.5 ! same if you convert it to unix and
+                      // back to datetime :( so i decide that 0 if more suitable than -0.5
 
 {$IFNDEF NEXTGEN}
 

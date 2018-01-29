@@ -151,7 +151,7 @@ extern DELPHI_PACKAGE void __fastcall ALStringHashSHA2(System::DynamicArray<Syst
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALStringHashSHA2(const System::AnsiString Str, const System::Hash::THashSHA2::TSHA2Version AHashVersion = (System::Hash::THashSHA2::TSHA2Version)(0x1), const bool HexEncode = true)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALStringHashSHA2U(System::DynamicArray<System::Byte> &Digest, const System::UnicodeString Str, System::Sysutils::TEncoding* const encoding, const System::Hash::THashSHA2::TSHA2Version AHashVersion = (System::Hash::THashSHA2::TSHA2Version)(0x1))/* overload */;
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALStringHashSHA2U(const System::UnicodeString Str, System::Sysutils::TEncoding* const encoding, const System::Hash::THashSHA2::TSHA2Version AHashVersion = (System::Hash::THashSHA2::TSHA2Version)(0x1))/* overload */;
-extern DELPHI_PACKAGE System::AnsiString __fastcall ALBCryptHashPassword(const System::AnsiString password, int cost);
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALBCryptHashPassword(const System::AnsiString password, int cost, const bool MCFEncode = true);
 extern DELPHI_PACKAGE bool __fastcall ALBCryptCheckPassword(const System::AnsiString password, const System::AnsiString expectedHashString, /* out */ bool &PasswordRehashNeeded);
 extern DELPHI_PACKAGE bool __fastcall ALBCryptPasswordRehashNeeded(const System::AnsiString HashString);
 extern DELPHI_PACKAGE bool __fastcall ALBCryptSelfTest(void);
@@ -201,7 +201,8 @@ extern "C" System::LongBool __stdcall CryptAcquireContextA(PHCRYPTPROV phProv, c
 extern "C" System::LongBool __stdcall CryptAcquireContextW(PHCRYPTPROV phProv, System::WideChar * pszContainer, System::WideChar * pszProvider, unsigned dwProvType, unsigned dwFlags);
 extern "C" System::LongBool __stdcall CryptReleaseContext(NativeUInt hProv, unsigned dwFlags);
 extern "C" System::LongBool __stdcall CryptGenRandom(NativeUInt hProv, unsigned dwLen, System::PByte pbBuffer);
-extern DELPHI_PACKAGE System::DynamicArray<System::Byte> __fastcall ALRandomBytes(const unsigned Len);
+extern DELPHI_PACKAGE void __fastcall ALRandomBytes(const void *Dest, const unsigned Len)/* overload */;
+extern DELPHI_PACKAGE System::DynamicArray<System::Byte> __fastcall ALRandomBytes(const unsigned Len)/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALRandomByteStr(const unsigned Len);
 extern DELPHI_PACKAGE unsigned __fastcall ALRandom32(const unsigned ARange);
 extern DELPHI_PACKAGE unsigned __int64 __fastcall ALRandom64(const unsigned __int64 ARange);

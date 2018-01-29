@@ -872,7 +872,7 @@ begin
   // because in original we will have a call to uniqueString on FDataString :(
   // https://forums.embarcadero.com/thread.jspa?threadID=119103
   // ALMove(PAnsiChar(@FDataString[FPosition + SizeOf(AnsiChar)])^, Buffer, Result * SizeOf(AnsiChar));
-  ALMove(Pbyte(FDataString)[FPosition + SizeOf(AnsiChar) - 1], Buffer, Result * SizeOf(AnsiChar));
+  ALMove(Pbyte(FDataString)[FPosition], Buffer, Result * SizeOf(AnsiChar));
 
   Inc(FPosition, Result);
 end;

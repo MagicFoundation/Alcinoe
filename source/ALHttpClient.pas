@@ -150,6 +150,7 @@ type
     FDomain: AnsiString;
     FExpires: TDateTime;
     FSecure: Boolean;
+    FHttpOnly: Boolean;
   protected
     function GetHeaderValue: AnsiString;
     procedure SetHeaderValue(Const aValue: AnsiString);
@@ -163,6 +164,7 @@ type
     property Expires: TDateTime read FExpires write FExpires;
     property Secure: Boolean read FSecure write FSecure;
     property HeaderValue: AnsiString read GetHeaderValue write SetHeaderValue;
+    property HttpOnly: Boolean read FHttpOnly write FHttpOnly;
   end;
 
   {--TALCookieCollection--}
@@ -449,26 +451,26 @@ Function  AlCombineUrl(const RelativeUrl,
 {$ENDIF}
 
 const
-  CAlRfc822DayOfWeekNames: array[1..7] of AnsiString = ('Sun',
-                                                        'Mon',
-                                                        'Tue',
-                                                        'Wed',
-                                                        'Thu',
-                                                        'Fri',
-                                                        'Sat');
+  AlRfc822DayOfWeekNames: array[1..7] of AnsiString = ('Sun',
+                                                       'Mon',
+                                                       'Tue',
+                                                       'Wed',
+                                                       'Thu',
+                                                       'Fri',
+                                                       'Sat');
 
-  CALRfc822MonthOfTheYearNames: array[1..12] of AnsiString = ('Jan',
-                                                              'Feb',
-                                                              'Mar',
-                                                              'Apr',
-                                                              'May',
-                                                              'Jun',
-                                                              'Jul',
-                                                              'Aug',
-                                                              'Sep',
-                                                              'Oct',
-                                                              'Nov',
-                                                              'Dec');
+  ALRfc822MonthOfTheYearNames: array[1..12] of AnsiString = ('Jan',
+                                                             'Feb',
+                                                             'Mar',
+                                                             'Apr',
+                                                             'May',
+                                                             'Jun',
+                                                             'Jul',
+                                                             'Aug',
+                                                             'Sep',
+                                                             'Oct',
+                                                             'Nov',
+                                                             'Dec');
 
 function ALGmtDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
 {$IFDEF MSWINDOWS}
@@ -552,6 +554,7 @@ begin
       Path := Self.FPath;
       Expires := Self.FExpires;
       Secure := Self.FSecure;
+      HttpOnly := Self.FHttpOnly;
     end
     else inherited AssignTo(Dest);
 end;
@@ -562,14 +565,14 @@ begin
   Result := ALFormat('%s=%s; ', [ALHTTPEncode(FName), ALHTTPEncode(FValue)]);
   if Domain <> '' then Result := Result + ALFormat('domain=%s; ', [Domain]);
   if Path <> '' then Result := Result + ALFormat('path=%s; ', [Path]);
-  if Expires <> ALNullDate then begin
+  if Expires <> ALNullDate then
     Result := Result + ALFormat(ALFormatDateTime('"expires=%s, "dd"-%s-"yyyy" "hh":"nn":"ss" GMT; "',
                                                  Expires,
                                                  ALDefaultFormatSettings),
-                                [CAlRfc822DayOfWeekNames[DayOfWeek(Expires)],
-                                 CALRfc822MonthOfTheYearNames[MonthOf(Expires)]]);
-  end;
+                                [AlRfc822DayOfWeekNames[DayOfWeek(Expires)],
+                                 ALRfc822MonthOfTheYearNames[MonthOf(Expires)]]);
   if Secure then Result := Result + 'secure';
+  if HttpOnly then Result := Result + 'httponly';
   if ALCopyStr(Result, Length(Result) - 1, MaxInt) = '; ' then SetLength(Result, Length(Result) - 2);
 end;
 
@@ -1486,9 +1489,9 @@ begin
              aDay);
 
   Result := ALFormat('%s, %.2d %s %.4d %s %s',
-                     [CAlRfc822DayOfWeekNames[DayOfWeek(aValue)],
+                     [AlRfc822DayOfWeekNames[DayOfWeek(aValue)],
                       aDay,
-                      CALRfc822MonthOfTheYearNames[aMonth],
+                      ALRfc822MonthOfTheYearNames[aMonth],
                       aYear,
                       ALFormatDateTime('hh":"nn":"ss', aValue, ALDefaultFormatSettings),
                       'GMT']);
@@ -1587,7 +1590,7 @@ Begin
                                     // Mon
                                     // Aug
     P1 := 1;
-    While (p1 <= 12) and (not ALSameText(CALRfc822MonthOfTheYearNames[P1],aMonthLabel)) do inc(P1);
+    While (p1 <= 12) and (not ALSameText(ALRfc822MonthOfTheYearNames[P1],aMonthLabel)) do inc(P1);
     If P1 > 12 then begin
       Result := False;
       Exit;

@@ -40,6 +40,7 @@ type
   JChoreographer_FrameCallback = interface;
   JALBroadcastReceiverListener = interface;
   JALBroadcastReceiver = interface;
+  JRuntime = interface;
 
   {****************************************}
   JALFileUtilClass = interface(JObjectClass)
@@ -348,6 +349,42 @@ type
   end;
   TJALBroadcastReceiver = class(TJavaGenericImport<JALBroadcastReceiverClass, JALBroadcastReceiver>) end;
 
+  {*************************************}
+  JRuntimeClass = interface(JObjectClass)
+    ['{5F789EE2-7243-47D9-B950-F8B638DD3076}']
+    {class} function getRuntime: JRuntime; cdecl;
+  end;
+
+  {**********************************}
+  [JavaSignature('java/lang/Runtime')]
+  JRuntime = interface(JObject)
+    ['{D56F91EA-6432-4391-ABBA-885F22C2E21A}']
+    //function exec(progArray: TJavaObjectArray<JString>): Jlang_Process; cdecl; overload;
+    //function exec(progArray: TJavaObjectArray<JString>; envp: TJavaObjectArray<JString>): Jlang_Process; cdecl; overload;
+    //function exec(progArray: TJavaObjectArray<JString>; envp: TJavaObjectArray<JString>; directory: JFile): Jlang_Process; cdecl; overload;
+    //function exec(prog: JString): Jlang_Process; cdecl; overload;
+    //function exec(prog: JString; envp: TJavaObjectArray<JString>): Jlang_Process; cdecl; overload;
+    //function exec(prog: JString; envp: TJavaObjectArray<JString>; directory: JFile): Jlang_Process; cdecl; overload;
+    procedure exit(code: Integer); cdecl;
+    procedure gc; cdecl;
+    procedure load(absolutePath: JString); cdecl;
+    procedure loadLibrary(nickname: JString); cdecl;
+    procedure runFinalization; cdecl;
+    procedure runFinalizersOnExit(run: Boolean); cdecl; deprecated;
+    procedure traceInstructions(enable: Boolean); cdecl;
+    procedure traceMethodCalls(enable: Boolean); cdecl;
+    function getLocalizedInputStream(stream: JInputStream): JInputStream; cdecl; deprecated;
+    function getLocalizedOutputStream(stream: JOutputStream): JOutputStream; cdecl; deprecated;
+    procedure addShutdownHook(hook: JThread); cdecl;
+    function removeShutdownHook(hook: JThread): Boolean; cdecl;
+    procedure halt(code: Integer); cdecl;
+    function availableProcessors: Integer; cdecl;
+    function freeMemory: Int64; cdecl;
+    function totalMemory: Int64; cdecl;
+    function maxMemory: Int64; cdecl;
+  end;
+  TJRuntime = class(TJavaGenericImport<JRuntimeClass, JRuntime>) end;
+
 implementation
 
 procedure RegisterTypes;
@@ -369,6 +406,7 @@ begin
   TRegTypes.RegisterType('ALAndroidApi.JChoreographer_FrameCallback', TypeInfo(ALAndroidApi.JChoreographer_FrameCallback));
   TRegTypes.RegisterType('ALAndroidApi.JALBroadcastReceiverListener', TypeInfo(ALAndroidApi.JALBroadcastReceiverListener));
   TRegTypes.RegisterType('ALAndroidApi.JALBroadcastReceiver', TypeInfo(ALAndroidApi.JALBroadcastReceiver));
+  TRegTypes.RegisterType('ALAndroidApi.JRuntime', TypeInfo(ALAndroidApi.JRuntime));
 end;
 
 initialization

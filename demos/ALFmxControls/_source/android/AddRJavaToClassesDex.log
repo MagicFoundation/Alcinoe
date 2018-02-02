@@ -5,8 +5,8 @@ JavaDxPath="C:\SDKs\android-sdk-windows\build-tools\25.0.3\dx.bat"
 JavaDxJarPath=C:\SDKs\android-sdk-windows\build-tools\25.0.3\lib\dx.jar 
 JDKPath="C:\Program Files\Java\jdk1.8.0_131"\bin 
 JDKPath1_7="C:\Program Files\Java\jdk1.7.0_80\bin" 
-OutputPath=C:\Dev\Alcinoe\demos\ALFmxControls\Android\tokyo\Release\classes.dex 
-APKPath=C:\Dev\Alcinoe\demos\ALFmxControls\Android\tokyo\Release\ALFmxControls_tokyo\bin\ALFmxControls_tokyo.apk 
+OutputPath=C:\Dev\Alcinoe\demos\ALFmxControls\Android\Release\classes.dex 
+APKPath=C:\Dev\Alcinoe\demos\ALFmxControls\Android\Release\ALFmxControls\bin\ALFmxControls.apk 
  
 Create R.java - com.alcinoe 
 "C:\SDKs\android-sdk-windows\build-tools\25.0.3\aapt.exe" package -f -m -M C:\Dev\Alcinoe\demos\ALFmxControls\_source\android\libraries\com.alcinoe\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-25\android.jar" -S "C:\Dev\Alcinoe\demos\ALFmxControls\_source"\android\res -J "C:\Dev\Alcinoe\demos\ALFmxControls\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "C:\Dev\Alcinoe\demos\ALFmxControls\_source"\android\ 
@@ -18,11 +18,11 @@ Build a classes.dex that include the R$ classes
 call "C:\SDKs\android-sdk-windows\build-tools\25.0.3\dx.bat" --dex --output="C:\Dev\Alcinoe\demos\ALFmxControls\_source"\android\tmp\classes.dex "C:\Dev\Alcinoe\demos\ALFmxControls\_source"\android\tmp\obj 
  
 Merge the classes.dex 
-"C:\Program Files\Java\jdk1.8.0_131"\bin\java -cp C:\SDKs\android-sdk-windows\build-tools\25.0.3\lib\dx.jar com.android.dx.merge.DexMerger "C:\Dev\Alcinoe\demos\ALFmxControls\_source"\android\tmp\final_classes.dex "C:\Dev\Alcinoe\demos\ALFmxControls\_source"\android\tmp\classes.dex C:\Dev\Alcinoe\demos\ALFmxControls\Android\tokyo\Release\classes.dex 
-Result compacted from 4232.1KiB to 2712.6KiB to save 1519.5KiB
+"C:\Program Files\Java\jdk1.8.0_131"\bin\java -cp C:\SDKs\android-sdk-windows\build-tools\25.0.3\lib\dx.jar com.android.dx.merge.DexMerger "C:\Dev\Alcinoe\demos\ALFmxControls\_source"\android\tmp\final_classes.dex "C:\Dev\Alcinoe\demos\ALFmxControls\_source"\android\tmp\classes.dex C:\Dev\Alcinoe\demos\ALFmxControls\Android\Release\classes.dex 
+Result compacted from 5979.2KiB to 3764.0KiB to save 2215.2KiB
 Merged dex #1 (10 defs/6.5KiB)
-Merged dex #2 (2686 defs/3372.0KiB)
-Result is 2696 defs/2712.6KiB. Took 0.5s
+Merged dex #2 (3458 defs/4709.7KiB)
+Result is 3468 defs/3764.0KiB. Took 0.7s
  
 Move the classes.dex 
         1 file(s) copied.
@@ -30,7 +30,7 @@ Move the classes.dex
 remove the tmp dir 
  
 R.txt - You can compare against the output of: 
-"C:\SDKs\android-sdk-windows\build-tools\25.0.3\aapt.exe" dump resources C:\Dev\Alcinoe\demos\ALFmxControls\Android\tokyo\Release\ALFmxControls_tokyo\bin\ALFmxControls_tokyo.apk 
+"C:\SDKs\android-sdk-windows\build-tools\25.0.3\aapt.exe" dump resources C:\Dev\Alcinoe\demos\ALFmxControls\Android\Release\ALFmxControls\bin\ALFmxControls.apk 
  
 int attr BlueBGTextViewStyle 0x7f010000
 int attr alfloatingToolbarCloseDrawable 0x7f010001

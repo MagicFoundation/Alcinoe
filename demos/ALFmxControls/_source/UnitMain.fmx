@@ -278,7 +278,7 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 2805.367187500000000000
+      Position.Y = 2821.406250000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
@@ -295,9 +295,9 @@ object Form1: TForm1
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 15.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 2609.484375000000000000
+      Position.Y = 2641.484375000000000000
       Size.Width = 288.000000000000000000
-      Size.Height = 47.882812500000000000
+      Size.Height = 31.921875000000000000
       Size.PlatformDefault = False
       Text = 
         'Note that the verticalscrollbar is deactivated when you move lef' +
@@ -342,7 +342,7 @@ object Form1: TForm1
     object ALRectangle9: TALRectangle
       Align = Top
       Fill.Color = claWhite
-      Position.Y = 2294.484375000000000000
+      Position.Y = 2326.484375000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 300.000000000000000000
       Size.PlatformDefault = False
@@ -547,7 +547,7 @@ object Form1: TForm1
       Margins.Top = 8.000000000000000000
       Margins.Right = 25.000000000000000000
       Position.X = 25.000000000000000000
-      Position.Y = 2761.367187500000000000
+      Position.Y = 2777.406250000000000000
       Size.Width = 270.000000000000000000
       Size.Height = 36.000000000000000000
       Size.PlatformDefault = False
@@ -580,7 +580,7 @@ object Form1: TForm1
       Margins.Left = 25.000000000000000000
       Margins.Right = 25.000000000000000000
       Position.X = 25.000000000000000000
-      Position.Y = 2672.367187500000000000
+      Position.Y = 2688.406250000000000000
       Size.Width = 270.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
@@ -590,7 +590,7 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 2712.367187500000000000
+      Position.Y = 2728.406250000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
@@ -630,7 +630,7 @@ object Form1: TForm1
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 15.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 2861.367187500000000000
+      Position.Y = 2877.406250000000000000
       Size.Width = 288.000000000000000000
       Size.Height = 160.000000000000000000
       Size.PlatformDefault = False
@@ -716,6 +716,7 @@ object Form1: TForm1
       Size.Height = 300.000000000000000000
       Size.PlatformDefault = False
       OnClick = ALVideoPlayerSurface1DblClick
+      onVideoSizeChanged = ALVideoPlayerSurface1VideoSizeChanged
       object Text12: TText
         Align = Top
         HitTest = False
@@ -813,7 +814,7 @@ object Form1: TForm1
       Position.X = 15.000000000000000000
       Position.Y = 2023.484375000000000000
       Size.Width = 290.000000000000000000
-      Size.Height = 256.000000000000000000
+      Size.Height = 288.000000000000000000
       Size.PlatformDefault = False
       Text = 
         'This video player is fully integrated in the form because it'#39's <' +
@@ -828,7 +829,9 @@ object Form1: TForm1
         'n the video to see the effect in action ... <b>Note: </b> Delphi' +
         ' berlin do not support GL_TEXTURE_EXTERNAL_OES (requiered by and' +
         'roid), so we must update the original delphi source code (only f' +
-        'ew lines of code is neccessary to make it working)'
+        'ew lines of code is neccessary to make it working). Also note th' +
+        'at this video player support <b>adaptative streaming (HLS)</b> o' +
+        'n Android/iOs'
       TextSettings.WordWrap = True
       TextSettings.HorzAlign = Center
       TextIsHtml = True
@@ -898,7 +901,7 @@ object Form1: TForm1
     object ALRectangle3: TALRectangle
       Align = Top
       Fill.Color = claWhite
-      Position.Y = 3181.367187500000000000
+      Position.Y = 3197.406250000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
@@ -1075,7 +1078,7 @@ object Form1: TForm1
       Padding.Right = 8.000000000000000000
       Padding.Bottom = 8.000000000000000000
       Margins.Bottom = 25.000000000000000000
-      Position.Y = 3036.367187500000000000
+      Position.Y = 3052.406250000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 120.000000000000000000
       Size.PlatformDefault = False

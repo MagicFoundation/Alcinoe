@@ -151,33 +151,25 @@ CHDIR ..
 
 CHDIR demos\
 FOR /R %%J IN (*.dproj) DO (	
-  Echo.%%J | findstr /C:"ALFmxControls_">nul && (
-    REM do not compile ALFmxControls_xxx right now
-  ) || (
-    echo %%J			
-    MSBuild %%J /p:Config=Release /p:Platform=Win32 /t:Build
-    IF ERRORLEVEL 1 PAUSE
-    MSBuild %%J /p:Config=Release /p:Platform=Win64 /t:Build
-    IF ERRORLEVEL 1 PAUSE
-  )
+  echo %%J			
+  MSBuild %%J /p:Config=Release /p:Platform=Win32 /t:Build
+  IF ERRORLEVEL 1 PAUSE
+  MSBuild %%J /p:Config=Release /p:Platform=Win64 /t:Build
+  IF ERRORLEVEL 1 PAUSE
 )
 CHDIR ..
 
 CHDIR demos\
-MSBuild ALFmxControls\_source\ALFmxControls_tokyo.dproj /p:Config=Release /p:Platform=Win32 /t:Build
+MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=Android /t:Build
+MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=Android /t:Deploy
 IF ERRORLEVEL 1 PAUSE
-MSBuild ALFmxControls\_source\ALFmxControls_tokyo.dproj /p:Config=Release /p:Platform=Win64 /t:Build
+MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=iOSSimulator /t:Build
 IF ERRORLEVEL 1 PAUSE
-MSBuild ALFmxControls\_source\ALFmxControls_tokyo.dproj /p:Config=Release /p:Platform=Android /t:Build
-MSBuild ALFmxControls\_source\ALFmxControls_tokyo.dproj /p:Config=Release /p:Platform=Android /t:Deploy
+MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=iOSDevice32 /t:Build
 IF ERRORLEVEL 1 PAUSE
-MSBuild ALFmxControls\_source\ALFmxControls_tokyo.dproj /p:Config=Release /p:Platform=iOSSimulator /t:Build
+MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
 IF ERRORLEVEL 1 PAUSE
-MSBuild ALFmxControls\_source\ALFmxControls_tokyo.dproj /p:Config=Release /p:Platform=iOSDevice32 /t:Build
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFmxControls\_source\ALFmxControls_tokyo.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFmxControls\_source\ALFmxControls_tokyo.dproj /p:Config=Release /p:Platform=OSX32 /t:Build
+MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=OSX32 /t:Build
 IF ERRORLEVEL 1 PAUSE
 CHDIR ..
 

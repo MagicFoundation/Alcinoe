@@ -534,8 +534,8 @@ implementation
 
 procedure RegisterTypes;
 begin
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JALAppInviteInvitationResultListener', TypeInfo(ALAndroidFacebookApi.JALFacebookDeferredAppLinkDataResultListener));
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JALAppInviteInvitationResult', TypeInfo(ALAndroidFacebookApi.JALFacebookDeferredAppLinkDataResult));
+  TRegTypes.RegisterType('ALAndroidFacebookApi.JALFacebookDeferredAppLinkDataResultListener', TypeInfo(ALAndroidFacebookApi.JALFacebookDeferredAppLinkDataResultListener));
+  TRegTypes.RegisterType('ALAndroidFacebookApi.JALFacebookDeferredAppLinkDataResult', TypeInfo(ALAndroidFacebookApi.JALFacebookDeferredAppLinkDataResult));
   TRegTypes.RegisterType('ALAndroidFacebookApi.JALFacebookAppInviteDialog', TypeInfo(ALAndroidFacebookApi.JALFacebookAppInviteDialog));
   TRegTypes.RegisterType('ALAndroidFacebookApi.JALFacebookShareLinkDialog', TypeInfo(ALAndroidFacebookApi.JALFacebookShareLinkDialog));
   TRegTypes.RegisterType('ALAndroidFacebookApi.JAppEventsLogger', TypeInfo(ALAndroidFacebookApi.JAppEventsLogger));

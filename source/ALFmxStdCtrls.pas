@@ -805,10 +805,10 @@ begin
 
     fBufBitmapRect := LocalRect;
     {$IFDEF ALDPK}
-    if aFileName <> '' then fBufBitmap := ALLoadResizeAndFitFileImageV3(aFileName, Width * (fframeCount div fRowCount) * FScreenScale, Height * fRowCount * FScreenScale)
+    if aFileName <> '' then fBufBitmap := ALLoadFitIntoFileImageV3(aFileName, Width * (fframeCount div fRowCount) * FScreenScale, Height * fRowCount * FScreenScale)
     else fBufBitmap := nil;
     {$ELSE}
-    fBufBitmap := ALLoadResizeAndFitResourceImageV3(fResourceName, Width * (fframeCount div fRowCount) * FScreenScale, Height * fRowCount * FScreenScale);
+    fBufBitmap := ALLoadFitIntoResourceImageV3(fResourceName, Width * (fframeCount div fRowCount) * FScreenScale, Height * fRowCount * FScreenScale);
     {$ENDIF}
     result := fBufBitmap;
 
@@ -2002,10 +2002,10 @@ begin
         begin
           fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
           {$IFDEF ALDPK}
-          if aFileName <> '' then fBufBitmap := ALLoadResizeAndFitFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+          if aFileName <> '' then fBufBitmap := ALLoadFitIntoFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
           else fBufBitmap := nil;
           {$ELSE}
-          fBufBitmap := ALLoadResizeAndFitResourceImageV3(aResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+          fBufBitmap := ALLoadFitIntoResourceImageV3(aResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
           {$ENDIF}
           result := fBufBitmap;
           if result <> nil then fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).
@@ -2057,10 +2057,10 @@ begin
         begin
           fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
           {$IFDEF ALDPK}
-          if aFileName <> '' then fBufBitmap := ALLoadResizeAndCropFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+          if aFileName <> '' then fBufBitmap := ALLoadFitIntoAndCropFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
           else fBufBitmap := nil;
           {$ELSE}
-          fBufBitmap := ALLoadResizeAndCropResourceImageV3(aResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+          fBufBitmap := ALLoadFitIntoAndCropResourceImageV3(aResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
           {$ENDIF}
           result := fBufBitmap;
           if result <> nil then fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).

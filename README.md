@@ -4,7 +4,8 @@ Alcinoe is a library visual and non-visual components for Delphi. The components
 be used in commercial as well as shareware and freeware and open source projects 
 without cost.
 
-### Full opengl video player for firemonkey ###
+
+## Full opengl video player for firemonkey ##
 
 ALVideoPlayer will render a video on a TEXTURE. this is really important because you can fully integrate the video in
 the delphi form and you can place any controls you want on the top of it as it's support Z-ORDER. Official delphi video player
@@ -19,9 +20,23 @@ SmoothStreaming and Common Encryption, which are not supported by MediaPlayer. I
 Under Ios i use AVPlayer with support also HLS like exoplayer do.
 
 
-### Firemonkey native ios and android TEdit and TMemo ### 
+## Firemonkey native ios and android TEdit and TMemo ##
 
-### Fast/doublebuffered with native draw firemonkey controls ### 
+The spirit is to mix firemonkey control with native platform control
+when the fonctionality on such control start to be very hard to
+implement (like webbrowser, edit, memo, datepicker, etc.). But it's
+not to make several distinct form for several platform like 
+offer for exemple http://www.turbococoa.com/ (but this option is
+also a good alternative in some way, it's up to you to decide)
+
+In delphi (berlin) their is already IOS platform control that was 
+quite well implemented but close to none android platform control 
+and so i start to build native android/ios controls like TEdit. 
+These control work mostly like some windows that are placed on The
+top of the form (so off course no z-order with firemonkey control)
+
+
+## Fast/doublebuffered with native draw firemonkey controls ## 
 
 * Rectangle
 * Circle
@@ -29,7 +44,7 @@ Under Ios i use AVPlayer with support also HLS like exoplayer do.
 * Glyph
 * etc.
 
-#### the fact ####
+### the fact ###
 
 Painting of Firmonkey controls can be sometime slow, or say 
 differently, not sufficiently fast for a fluid scrolling. For exemple if 
@@ -41,7 +56,7 @@ tcheckbox, etc..). After it's just math, take 100ms to repaint the screen,
 so you can only do around 10 frames per seconds (in reality you will have 
 much less even) so the scrolling can't be fluid :(
 
-#### the solution #### 
+### the solution ### 
  
 I didn't want to rebuild the firemonkey controls, it's too 
 huge job for me, and instead I try to find an intermediate solution. 
@@ -52,14 +67,14 @@ on a "buffer" that I store directly in the GPU memory (through TTexture),
 and when the system ask me to repaint the controls instead of calling 
 again the paint algorithm i simply redraw the buffer TTexture.
 
-#### the results ####  
+### the results ###  
 
 As I say before it's took 3 ms just to paint a simple 
 Trectangle with round corners. With my doublebuffered property 
 it's take now around 0.1 ms ! so now the scroll look much more 
 fluid! 
 
-#### opengl draw => replaced by native ios/android draw #### 
+### opengl draw => replaced by native ios/android draw ###
 
 Most of the basic shape (like Trectangle, Tcircle, etc.) use openGL to 
 draw. it's not very efficient, for example to draw a circle under 
@@ -79,7 +94,7 @@ To resolve this, i build the buffer of my control using NATIVE
 ANDROID/IOS API. In this way we will have a high quality draw at also
 a high speed without being dependant of the form.quality
 
-#### why i don't like firemonkey style ####
+### why i don't like firemonkey style ###
 
 I don't like the style in firmonkey, when it's not buggy and not 
 licenced, it's very hard to construct (the editor is just a mess) 
@@ -93,21 +108,21 @@ this why i avoid any components that descend from styledcontrol,
 in fact the dfm/fmx are already a good templating system to 
 setup all the properties of your controls 
 
-### Improuved firemonkey controls ### 
+## Improuved firemonkey controls ## 
 
 * ScrollBox
 * TabControl
 * RangeTrackBar
 
-### Firebase clound messaging ### 
+## Firebase clound messaging ## 
 
 A cross-platform method of using Firebase Cloud Messaging (FCM) to receive push notifications
 
-### Firebase crash analytics ### 
+## Firebase crash analytics ## 
 
-### Android/ios facebook sdk login ### 
+## Android/ios facebook sdk login ## 
 
-### Json Parser ###
+## Json Parser ##
 
 TALJsonDocument is a Delphi parser/writer for JSON / BSON data
 format. it's support DOM and SAX parser, support BSON format,
@@ -240,7 +255,7 @@ MyJsonDoc.onParseText := procedure (Sender: TObject;
 MyJsonDoc.LoadFromJSON(AJsonStr, true{saxMode});
 
 
-### MongoDb client ###
+## MongoDb client ##
 
 Delphi Client for MongoDB database.
 A Delphi driver (with connection pool) to access a
@@ -321,7 +336,7 @@ aMongoDBTailMonitoringThread := TAlMongoDBTailMonitoringThread.Create(aDBHost,
 aMongoDBTailMonitoringThread.free;
 
 
-### Fast TStringList ###
+## Fast TStringList ##
 
 TALStringList Work the same as Delphi TstringList except that it's
 allow to search a name=value using a quicksort algorithm when the
@@ -346,7 +361,7 @@ is lower than TALStringList because of the cost to calculate the
 hash)
 
 
-### PHP runner ###
+## PHP runner ##
 
 ALPHPRunnerEngine is a simple but useful component for
 easily use php (any version) as a scripting language
@@ -356,7 +371,7 @@ a WebServer. ALPHPRunnerEngine use the CGI/FastCGI
 interface (php-cgi.exe) of PHP to communicate with PHP engine.
 
 
-### Memcached Client ###
+## Memcached Client ##
 
 Delphi Client for memcached database.
 
@@ -373,7 +388,7 @@ Memcached is simple yet powerful. Its simple design promotes
 quick deployment, ease of development, and solves many
 problems facing large data caches.
 
-### GSM compoment ###
+## GSM compoment ##
 
 The TAlGSMComm component implements SMS text messaging
 through the text-mode interface defined in the GSM
@@ -400,7 +415,7 @@ should contain a "1", indicating that it supports text-mode.
 If both of these tests pass, then your phone meets the basic
 requirements.
 
-### And also ### 
+## And also ## 
 
 * CGI runner 
 * Http Client (WinInet/WinHTTP)
@@ -431,23 +446,6 @@ and the compiled apk of the demo: https://tinyurl.com/yda8nr6g
 
 If you encounter some problems to compile the demo, please contact me on 
 Skype so that i can help you and update this doc.
-
-
-## ABOUT TRUE NATIVE CONTROL LIKE TEDIT ##
-
-The spirit is to mix firemonkey control with native platform control
-when the fonctionality on such control start to be very hard to
-implement (like webbrowser, edit, memo, datepicker, etc.). But it's
-not to make several distinct form for several platform like 
-offer for exemple http://www.turbococoa.com/ (but this option is
-also a good alternative in some way, it's up to you to decide)
-
-In delphi (berlin) their is already IOS platform control that was 
-quite well implemented but close to none android platform control 
-and so i start to build native android/ios controls like TEdit. 
-These control work mostly like some windows that are placed on The
-top of the form (so off course no z-order with firemonkey control)
-
 
 ## WIN64 ##
 

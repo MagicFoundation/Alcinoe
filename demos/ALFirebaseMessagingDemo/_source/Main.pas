@@ -236,7 +236,7 @@ begin
 
             if (aHTTPResponse.StatusCode = 200) and
                (aStream.size > 0) then begin
-              aLargeIconBitmap := ALResizeAndCropImageV2(aStream,
+              aLargeIconBitmap := ALFitIntoAndCropImageV2(aStream,
                                                          function(const aOriginalSize: TPointF): TpointF
                                                          begin
                                                            if aOriginalSize.x > aOriginalSize.y then result := TpointF.create(aOriginalSize.Y, aOriginalSize.Y)

@@ -723,11 +723,11 @@ begin
       TALImageWrapMode.Fit:
         begin
           {$IFDEF ALDPK}
-          if aFileName <> '' then fBufBitmap := ALLoadResizeAndFitFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+          if aFileName <> '' then fBufBitmap := ALLoadFitIntoFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
           else fBufBitmap := nil;
           {$ELSE}
-          if fResourceName <> '' then fBufBitmap := ALLoadResizeAndFitResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
-          else fBufBitmap := ALLoadResizeAndFitFileImageV3(fFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+          if fResourceName <> '' then fBufBitmap := ALLoadFitIntoResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+          else fBufBitmap := ALLoadFitIntoFileImageV3(fFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
           {$ENDIF}
           result := fBufBitmap;
         end;
@@ -736,11 +736,11 @@ begin
       TALImageWrapMode.Stretch:
         begin
           {$IFDEF ALDPK}
-          if aFileName <> '' then fBufBitmap := ALLoadResizeAndStretchFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+          if aFileName <> '' then fBufBitmap := ALLoadStretchFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
           else fBufBitmap := nil;
           {$ELSE}
-          if fResourceName <> '' then fBufBitmap := ALLoadResizeAndStretchResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
-          else fBufBitmap := ALLoadResizeAndStretchFileImageV3(fFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+          if fResourceName <> '' then fBufBitmap := ALLoadStretchResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+          else fBufBitmap := ALLoadStretchFileImageV3(fFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
           {$ENDIF}
           result := fBufBitmap;
         end;
@@ -783,11 +783,11 @@ begin
       TALImageWrapMode.FitAndCrop:
         begin
           {$IFDEF ALDPK}
-          if aFileName <> '' then fBufBitmap := ALLoadResizeAndCropFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+          if aFileName <> '' then fBufBitmap := ALLoadFitIntoAndCropFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
           else fBufBitmap := nil;
           {$ELSE}
-          if fResourceName <> '' then fBufBitmap := ALLoadResizeAndCropResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
-          else fBufBitmap := ALLoadResizeAndCropFileImageV3(fFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+          if fResourceName <> '' then fBufBitmap := ALLoadFitIntoAndCropResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+          else fBufBitmap := ALLoadFitIntoAndCropFileImageV3(fFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
           {$ENDIF}
           result := fBufBitmap;
         end;

@@ -35,6 +35,10 @@ and so i start to build native android/ios controls like TEdit.
 These control work mostly like some windows that are placed on The
 top of the form (so off course no z-order with firemonkey control)
 
+![](//a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-3.png/1)
+![](//a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-4.png/1)
+![](//a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-2.png/1)
+![](//a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-8.png/1)
 
 ## Fast/doublebuffered with native draw firemonkey controls ## 
 

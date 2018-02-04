@@ -35,6 +35,8 @@ and so i start to build native android/ios controls like TEdit.
 These control work mostly like some windows that are placed on The
 top of the form (so off course no z-order with firemonkey control)
 
+<img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-3.png/1" alt="Drawing" style="width: 100px;"/>
+
 ![screenshot 1](https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-3.png/1 =100x)
 
 ![screenshot 2](https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-4.png/1)

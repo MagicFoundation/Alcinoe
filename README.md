@@ -122,7 +122,8 @@ A cross-platform method of using Firebase Cloud Messaging (FCM) to receive push 
 
 ## Android/ios facebook sdk login ## 
 
-## Json Parser ##
+Json Parser
+-----------
 
 TALJsonDocument is a Delphi parser/writer for JSON / BSON data
 format. it's support DOM and SAX parser, support BSON format,
@@ -132,9 +133,9 @@ TALJsonDocument can also export Json / Bson data in TALStringList.
 When it deals with parsing some (textual) content, two directions
 are usually envisaged. In the JSON world, you have usually to
 make a choice between:
-- A DOM parser, which creates an in-memory tree structure of
+* A DOM parser, which creates an in-memory tree structure of
   objects mapping the JSON content;
-- A SAX parser, which reads the JSON content, then call pre-defined
+* A SAX parser, which reads the JSON content, then call pre-defined
   events for each JSON content element.
 
 In fact, DOM parsers use internally a SAX parser to read the JSON
@@ -157,105 +158,102 @@ to TALXMLdocument / TXMLDocument
 
 exemple :
 
-{
-  _id: 1,
-  name: { first: "John", last: "Backus" },
-  birth: new Date('1999-10-21T21:04:54.234Z'),
-  contribs: [ "Fortran", "ALGOL", "Backus-Naur Form", "FP" ],
-  awards: [
-            { award: "National Medal of Science",
-              year: 1975,
-              by: "National Science Foundation" },
-            { award: "Turing Award",
-              year: 1977,
-              by: "ACM" }
-          ],
-  spouse: "",
-  address: {},
-  phones: []
-}
+    {
+      _id: 1,
+      name: { first: "John", last: "Backus" },
+      birth: new Date('1999-10-21T21:04:54.234Z'),
+      contribs: [ "Fortran", "ALGOL", "Backus-Naur Form", "FP" ],
+      awards: [
+                { award: "National Medal of Science",
+                  year: 1975,
+                  by: "National Science Foundation" },
+                { award: "Turing Award",
+                  year: 1977,
+                  by: "ACM" }
+              ],
+      spouse: "",
+      address: {},
+      phones: []
+    }
 
-------------------------------
 To access the document nodes :
 
-MyJsonDoc.loadFromJson(AJsonStr, False);
-MyJsonDoc.childnodes['_id'].int32;
-MyJsonDoc.childnodes['name'].childnodes['first'].text;
-MyJsonDoc.childnodes['name'].childnodes['last'].text;
-MyJsonDoc.childnodes['birth'].datetime;
-for i := 0 to MyJsonDoc.childnodes['contribs'].ChildNodes.count - 1 do
-  MyJsonDoc.childnodes['contribs'].childnodes[i].text;
-for i := 0 to MyJsonDoc.childnodes['awards'].ChildNodes.count - 1 do begin
-  MyJsonDoc.childnodes['awards'].childnodes[i].childnodes['award'].text;
-  MyJsonDoc.childnodes['awards'].childnodes[i].childnodes['year'].text;
-  MyJsonDoc.childnodes['awards'].childnodes[i].childnodes['by'].text;
-end;
+    MyJsonDoc.loadFromJson(AJsonStr, False);
+    MyJsonDoc.childnodes['_id'].int32;
+    MyJsonDoc.childnodes['name'].childnodes['first'].text;
+    MyJsonDoc.childnodes['name'].childnodes['last'].text;
+    MyJsonDoc.childnodes['birth'].datetime;
+    for i := 0 to MyJsonDoc.childnodes['contribs'].ChildNodes.count - 1 do
+      MyJsonDoc.childnodes['contribs'].childnodes[i].text;
+    for i := 0 to MyJsonDoc.childnodes['awards'].ChildNodes.count - 1 do begin
+      MyJsonDoc.childnodes['awards'].childnodes[i].childnodes['award'].text;
+      MyJsonDoc.childnodes['awards'].childnodes[i].childnodes['year'].text;
+      MyJsonDoc.childnodes['awards'].childnodes[i].childnodes['by'].text;
+    end;
 
-------------------------------
 To create the document nodes :
 
-MyJsonDoc.addchild('_id').int32 := 1;
-with MyJsonDoc.addchild('name', ntObject) do begin
-  addchild('first').text := 'John';
-  addchild('last').text := 'Backus';
-end;
-MyJsonDoc.addchild('birth').dateTime := Now;
-with MyJsonDoc.addchild('contribs', ntArray) do begin
-  addchild.text := 'Fortran';
-  addchild.text := 'ALGOL';
-  addchild.text := 'Backus-Naur Form';
-  addchild.text := 'FP';
-end;
-with MyJsonDoc.addchild('awards', ntArray) do begin
-  with addchild(ntObject) do begin
-    addchild('award').text := 'National Medal of Science';
-    addchild('year').int32 := 1975;
-    addchild('by').text := 'National Science Foundation';
-  end;
-  with addchild(ntObject) do begin
-    addchild('award').text := 'Turing Award';
-    addchild('year').int32 := 1977;
-    addchild('by').text := 'ACM';
-  end;
-end;
-MyJsonDoc.addchild('spouse');
-MyJsonDoc.addchild('address', ntObject);
-MyJsonDoc.addchild('phones', ntArray);
+    MyJsonDoc.addchild('_id').int32 := 1;
+    with MyJsonDoc.addchild('name', ntObject) do begin
+      addchild('first').text := 'John';
+      addchild('last').text := 'Backus';
+    end;
+    MyJsonDoc.addchild('birth').dateTime := Now;
+    with MyJsonDoc.addchild('contribs', ntArray) do begin
+      addchild.text := 'Fortran';
+      addchild.text := 'ALGOL';
+      addchild.text := 'Backus-Naur Form';
+      addchild.text := 'FP';
+    end;
+    with MyJsonDoc.addchild('awards', ntArray) do begin
+      with addchild(ntObject) do begin
+        addchild('award').text := 'National Medal of Science';
+        addchild('year').int32 := 1975;
+        addchild('by').text := 'National Science Foundation';
+      end;
+      with addchild(ntObject) do begin
+        addchild('award').text := 'Turing Award';
+        addchild('year').int32 := 1977;
+        addchild('by').text := 'ACM';
+      end;
+    end;
+    MyJsonDoc.addchild('spouse');
+    MyJsonDoc.addchild('address', ntObject);
+    MyJsonDoc.addchild('phones', ntArray);
 
-----------------------------
 To load and save from BSON :
 
-MyJsonDoc.LoadFromFile(aBSONFileName, False{saxMode}, True{BSON});
-MyJsonDoc.SaveToFile(aBSONFileName, False{saxMode}, True{BSON});
+    MyJsonDoc.LoadFromFile(aBSONFileName, False{saxMode}, True{BSON});
+    MyJsonDoc.SaveToFile(aBSONFileName, False{saxMode}, True{BSON});
 
----------------------------------------
 To parse an JSON document in Sax Mode :
 
-MyJsonDoc.onParseText := procedure (Sender: TObject;
-                                    const Path: AnsiString;
-                                    const name: AnsiString;
-                                    const Args: array of const;
-                                    NodeSubType: TALJSONNodeSubType)
-                         begin
-                           case NodeSubType of
-                             nstFloat: Writeln(Path + '=' + ALFloatToStr(Args[0].VExtended^, ALDefaultFormatSettings));
-                             nstText: Writeln(Path + '=' + ansiString(Args[0].VAnsiString));
-                             nstObjectID: Writeln(Path + '=' + 'ObjectId("'+ALBinToHex(ansiString(Args[0].VAnsiString))+'")');
-                             nstBoolean: Writeln(Path + '=' + ALBoolToStr(Args[0].VBoolean,'true','false'));
-                             nstDateTime: Writeln(Path + '=' + ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettings));
-                             nstNull: Writeln(Path + '=' + 'null');
-                             nstRegEx: Writeln(Path + '=' + ansiString(Args[0].VAnsiString));
-                             nstBinary: Writeln(Path + '=' + 'BinData('+inttostr(Args[1].VInteger)+', "'+ansiString(ALBase64EncodeStringNoCRLF(ansiString(Args[0].VAnsiString)))+'")');
-                             nstJavascript: Writeln(Path + '=' + ansiString(Args[0].VAnsiString));
-                             nstInt32: Writeln(Path + '=' + 'NumberInt('+inttostr(Args[0].VInteger)+')');
-                             nstTimestamp: Writeln(Path + '=' + 'Timestamp('+inttostr(int64(cardinal(Args[0].VInteger)))+', '+inttostr(int64(cardinal(Args[1].VInteger)))+')');
-                             nstInt64: Writeln(Path + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
-                           end;
-                         end;
-MyJsonDoc.LoadFromJSON(AJsonStr, true{saxMode});
+    MyJsonDoc.onParseText := procedure (Sender: TObject;
+                                        const Path: AnsiString;
+                                        const name: AnsiString;
+                                        const Args: array of const;
+                                        NodeSubType: TALJSONNodeSubType)
+                             begin
+                               case NodeSubType of
+                                 nstFloat: Writeln(Path + '=' + ALFloatToStr(Args[0].VExtended^, ALDefaultFormatSettings));
+                                 nstText: Writeln(Path + '=' + ansiString(Args[0].VAnsiString));
+                                 nstObjectID: Writeln(Path + '=' + 'ObjectId("'+ALBinToHex(ansiString(Args[0].VAnsiString))+'")');
+                                 nstBoolean: Writeln(Path + '=' + ALBoolToStr(Args[0].VBoolean,'true','false'));
+                                 nstDateTime: Writeln(Path + '=' + ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettings));
+                                 nstNull: Writeln(Path + '=' + 'null');
+                                 nstRegEx: Writeln(Path + '=' + ansiString(Args[0].VAnsiString));
+                                 nstBinary: Writeln(Path + '=' + 'BinData('+inttostr(Args[1].VInteger)+', "'+ansiString(ALBase64EncodeStringNoCRLF(ansiString(Args[0].VAnsiString)))+'")');
+                                 nstJavascript: Writeln(Path + '=' + ansiString(Args[0].VAnsiString));
+                                 nstInt32: Writeln(Path + '=' + 'NumberInt('+inttostr(Args[0].VInteger)+')');
+                                 nstTimestamp: Writeln(Path + '=' + 'Timestamp('+inttostr(int64(cardinal(Args[0].VInteger)))+', '+inttostr(int64(cardinal(Args[1].VInteger)))+')');
+                                 nstInt64: Writeln(Path + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
+                               end;
+                             end;
+    MyJsonDoc.LoadFromJSON(AJsonStr, true{saxMode});
 
 
-## MongoDb client ##
+MongoDb client
+--------------
 
 Delphi Client for MongoDB database.
 A Delphi driver (with connection pool) to access a
@@ -270,73 +268,69 @@ added to the pool. Connection pooling also cuts down on the
 amount of time a user must wait to establish a connection
 to the database.
 
----------
 Exemple :
 
-aJSONDoc := TALJSONDocument.create;
-aMongoDBClient := TAlMongoDBClient.create;
-try
-  aMongoDBClient.Connect('', 0);
-  aMongoDBClient.SelectData('test.exemple',
-                            '{fieldA:123}', // the query
-                            '{fieldA:1, fieldB:1}', // the return fields selector
-                            aJSONDoc.node);
-  aMongoDBClient.disconnect;
-  for i := 0 to aJSONDoc.node.childnodes.count - 1 do
-    with aJSONDoc.node.childnodes[i] do
-      writeln(aJSONDoc.node.childnodes[i].nodename + '=' + aJSONDoc.node.childnodes[i].text)
-finally
-  aMongoDBClient.free;
-  aJSONDoc.free;
-end;
+    aJSONDoc := TALJSONDocument.create;
+    aMongoDBClient := TAlMongoDBClient.create;
+    try
+      aMongoDBClient.Connect('', 0);
+      aMongoDBClient.SelectData('test.exemple',
+                                '{fieldA:123}', // the query
+                                '{fieldA:1, fieldB:1}', // the return fields selector
+                                aJSONDoc.node);
+      aMongoDBClient.disconnect;
+      for i := 0 to aJSONDoc.node.childnodes.count - 1 do
+        with aJSONDoc.node.childnodes[i] do
+          writeln(aJSONDoc.node.childnodes[i].nodename + '=' + aJSONDoc.node.childnodes[i].text)
+    finally
+      aMongoDBClient.free;
+      aJSONDoc.free;
+    end;
 
-
-------------------------------
 Exemple with connection pool :
 
-aMongoDBConnectionPoolClient := TAlMongoDBConnectionPoolClient.create(aDBHost, aDBPort);
-try
+    aMongoDBConnectionPoolClient := TAlMongoDBConnectionPoolClient.create(aDBHost, aDBPort);
+    try
+    
+      ::Thread1::
+      aMongoDBConnectionPoolClient.SelectData('test.exemple',
+                                              '{fieldA:123}', // the query
+                                              '{fieldA:1, fieldB:1}', // the return fields selector
+                                              aLocalVarJSONDOC.node);
+    
+      ::Thread2::
+      aMongoDBConnectionPoolClient.SelectData('test.exemple',
+                                              '{fieldA:999}', // the query
+                                              '{fieldA:1, fieldB:1}', // the return fields selector
+                                              aLocalVarJSONDOC.node);
+    
+    finally
+      aMongoDBClient.free;
+    end;
 
-  ::Thread1::
-  aMongoDBConnectionPoolClient.SelectData('test.exemple',
-                                          '{fieldA:123}', // the query
-                                          '{fieldA:1, fieldB:1}', // the return fields selector
-                                          aLocalVarJSONDOC.node);
-
-  ::Thread2::
-  aMongoDBConnectionPoolClient.SelectData('test.exemple',
-                                          '{fieldA:999}', // the query
-                                          '{fieldA:1, fieldB:1}', // the return fields selector
-                                          aLocalVarJSONDOC.node);
-
-finally
-  aMongoDBClient.free;
-end;
-
-
--------------------------
 Exemple tail monitoring :
 
-aMongoDBTailMonitoringThread := TAlMongoDBTailMonitoringThread.Create(aDBHost,
-                                                                      aDBPort,
-                                                                      'test.cappedCollectionExemple'
-                                                                      '{}', // the query
-                                                                      '{fieldA:1, fieldB:1}', // the return fields selector
+    aMongoDBTailMonitoringThread := TAlMongoDBTailMonitoringThread.Create(aDBHost,
+                                                                          aDBPort,
+                                                                          'test.cappedCollectionExemple'
+                                                                          '{}', // the query
+                                                                          '{fieldA:1, fieldB:1}', // the return fields selector
+    
+                                                                          Procedure (Sender: TObject; JSONRowData: TALJSONNode)
+                                                                          begin
+                                                                            writeln('New item added in cappedCollectionExemple: ' + JSONRowData.childnodes['fieldA'].text);
+                                                                          end,
+    
+                                                                          procedure (Sender: TObject; Error: Exception)
+                                                                          begin
+                                                                            writeln(Error.message);
+                                                                          end);
+    ....
+    aMongoDBTailMonitoringThread.free;
 
-                                                                      Procedure (Sender: TObject; JSONRowData: TALJSONNode)
-                                                                      begin
-                                                                        writeln('New item added in cappedCollectionExemple: ' + JSONRowData.childnodes['fieldA'].text);
-                                                                      end,
 
-                                                                      procedure (Sender: TObject; Error: Exception)
-                                                                      begin
-                                                                        writeln(Error.message);
-                                                                      end);
-....
-aMongoDBTailMonitoringThread.free;
-
-
-## Fast TStringList ##
+Fast TStringList
+----------------
 
 TALStringList Work the same as Delphi TstringList except that it's
 allow to search a name=value using a quicksort algorithm when the

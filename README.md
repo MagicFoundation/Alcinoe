@@ -461,7 +461,7 @@ http://alcinoe.svn.sourceforge.net/viewvc/alcinoe/
 ### GIT ###
 
 You can also find the last version on github at 
-https://github.com/Zeus5100/alcinoe
+https://github.com/Zeus64/alcinoe
 
 
 DEMOS
@@ -496,8 +496,8 @@ their compiler will produce code that can compete
 with handly optimized ASM
 
 
-ABOUT DELPHI D2009+ (UNICODE)
------------------------------
+DELPHI D2009+ (UNICODE)
+-----------------------
 
 No mistake, Unicode was necessary for a product like Delphi. 
 But the way embarcadero decide to implement it’s questionable! 

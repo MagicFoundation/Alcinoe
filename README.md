@@ -28,9 +28,9 @@ compiled demo
 
 #### Android #### 
 
-* https://tinyurl.com/zoxavr9
-* https://tinyurl.com/yd7c4ofk
-* https://tinyurl.com/y9gzos9f
+* https://tinyurl.com/zoxavr9 (alFmxControl.apk)
+* https://tinyurl.com/yd7c4ofk (ALFirebaseMessagingDemo.apk)
+* https://tinyurl.com/y9gzos9f (ALFacebookLogin.apk)
 
 #### iOS #### 
 

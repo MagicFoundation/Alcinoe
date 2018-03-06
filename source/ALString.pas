@@ -447,6 +447,9 @@ function  ALStrToDateTime(const S: AnsiString; const AFormatSettings: TALFormatS
 function  ALTryStrToInt(const S: AnsiString; out Value: Integer): Boolean;
 function  ALStrToInt(const S: AnsiString): Integer;
 function  ALStrToIntDef(const S: AnsiString; Default: Integer): Integer;
+function  ALTryStrToUInt(const S: AnsiString; out Value: Cardinal): Boolean;
+function  ALStrToUInt(const S: AnsiString): Cardinal;
+function  ALStrToUIntDef(const S: Ansistring; Default: Cardinal): Cardinal;
 function  ALTryStrToInt64(const S: AnsiString; out Value: Int64): Boolean;
 function  ALStrToInt64(const S: AnsiString): Int64;
 function  ALStrToInt64Def(const S: AnsiString; const Default: Int64): Int64;
@@ -776,7 +779,7 @@ function  ALExtractExpression(const S: AnsiString;
                               Const EscapeQuoteChar: ansiChar; // ex: '\' or #0 to ignore
                               var StartPos: integer;
                               var EndPos: integer): boolean;
-function  ALHTTPEncode(const AStr: AnsiString): AnsiString; inline;
+function  ALHTTPEncode(const AStr: AnsiString): AnsiString;
 function  ALHTTPDecode(const AStr: AnsiString): AnsiString;
 procedure ALExtractHeaderFields(Separators,
                                 WhiteSpace,
@@ -802,6 +805,7 @@ function  ALGetStringFromFileU(const filename: String; const ADefaultEncoding: T
 procedure ALSaveStringtoFileU(const Str: String; const filename: String; AEncoding: TEncoding; const WriteBOM: boolean = False);
 function  ALRandomStrU(const aLength: Longint; const aCharset: Array of Char): String; overload;
 function  ALRandomStrU(const aLength: Longint): String; overload;
+function  ALHTTPEncodeU(const AStr: String): String; inline;
 function  ALHTTPDecodeU(const AStr: String): String;
 {$WARN SYMBOL_DEPRECATED OFF}
 procedure ALExtractHeaderFieldsWithQuoteEscapedU(Separators,
@@ -6177,6 +6181,42 @@ var
 begin
   Result := _ALValLong(S, E);
   if E <> 0 then Result := Default;
+end;
+
+{**************************************************************************}
+function  ALTryStrToUInt(const S: AnsiString; out Value: Cardinal): Boolean;
+var
+  I64: Int64;
+  E: Integer;
+begin
+  I64 := _ALValInt64(S, E);
+  Value := I64;
+  Result := (E = 0) and (Cardinal.MinValue <= I64) and (I64 <= Cardinal.MaxValue);
+end;
+
+{***************************************************}
+function  ALStrToUInt(const S: AnsiString): Cardinal;
+var
+  I64: Int64;
+  E: Integer;
+begin
+  I64 := _ALValInt64(S, E);
+  if (E <> 0) or not((Cardinal.MinValue <= I64) and (I64 <= Cardinal.MaxValue)) then
+    raise EConvertError.CreateResFmt(@System.SysConst.SInvalidInteger, [S]);
+  Result := I64;
+end;
+
+{*************************************************************************}
+function  ALStrToUIntDef(const S: Ansistring; Default: Cardinal): Cardinal;
+var
+  I64: Int64;
+  E: Integer;
+begin
+  I64 := _ALValInt64(S, E);
+  if (E <> 0) or not((Cardinal.MinValue <= I64) and (I64 <= Cardinal.MaxValue)) then
+    Result := Default
+  else
+    Result := I64;
 end;
 
 {***********************************************************************}
@@ -12378,6 +12418,37 @@ Begin
 end;
 
 {$ENDIF}
+
+{**************************************************}
+function  ALHTTPEncodeU(const AStr: String): String;
+// The NoConversion set contains characters as specificed in RFC 1738 and
+// should not be modified unless the standard changes.
+const
+  NoConversion = [Ord('A')..Ord('Z'),Ord('a')..Ord('z'),Ord('*'),Ord('@'),Ord('.'),Ord('_'),Ord('-'),
+                  Ord('0')..Ord('9'),Ord('$'),Ord('!'),Ord(''''),Ord('('),Ord(')')];
+var
+  Sp, Rp: PChar;
+begin
+  SetLength(Result, Length(AStr) * 3);
+  Sp := PChar(AStr);
+  Rp := PChar(Result);
+  while Sp^ <> #0 do
+  begin
+    if ord(Sp^) in NoConversion then
+      Rp^ := Sp^
+    else
+      if Sp^ = ' ' then
+        Rp^ := '+'
+      else
+      begin
+        FormatBuf(Rp, 3, String('%%%.2x'), 6, [Ord(Sp^)]);
+        Inc(Rp,2);
+      end;
+    Inc(Rp);
+    Inc(Sp);
+  end;
+  SetLength(Result, Rp - PChar(Result));
+end;
 
 {************************************************************}
 //the difference between this function and the delphi function

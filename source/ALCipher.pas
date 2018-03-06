@@ -265,12 +265,14 @@ function  ALCalcHMACMD5(const Str, Key : AnsiString): AnsiString;
 
 type
   TALStringHashCrc32 = function(Const str: AnsiString): cardinal;
+  TALHashCrc32 = function(buf: PAnsiChar; len: cardinal): cardinal;
 
 var
   /// compute CRC32C checksum on the supplied buffer
   // - this variable will use the fastest mean available, e.g. SSE 4.2
   // - you should use this function instead of ALCrc32cfast() nor Crc32csse42()
   ALStringHashCrc32: TALStringHashCrc32;
+  ALHashCrc32: TALHashCrc32;
 
 {$ENDIF}
 
@@ -4574,6 +4576,12 @@ begin
    Result:=Crc32csse42(0, Pointer(@str[1]), Length(str));
 end;
 
+{**************************************************************}
+function Crc32csse42_3(buf: PAnsiChar; len: cardinal): cardinal;
+begin
+   Result:=Crc32csse42(0, buf, len);
+end;
+
 {*******************************************************************}
 /// compute CRC32C checksum on the supplied buffer using x86/x64 code
 // - result is compatible with SSE 4.2 based hardware accelerated instruction
@@ -4710,6 +4718,12 @@ begin
    Result:=Crc32cfast(0, Pointer(@str[1]), Length(str));
 end;
 
+{*************************************************************}
+function Crc32cfast_3(buf: PAnsiChar; len: cardinal): cardinal;
+begin
+   Result:=Crc32cfast(0, buf, len);
+end;
+
 {$ENDIF}
 
 
@@ -4815,9 +4829,12 @@ begin
   end;
   if cfSSE42 in ALCpuFeatures then begin
     ALStringHashCrc32 := @Crc32csse42_2;
-  end else
+    ALHashCrc32 := @Crc32csse42_3;
+  end
+  else begin
     ALStringHashCrc32 := @Crc32cfast_2;
-
+    ALHashCrc32 := @Crc32cfast_3;
+  end;
   {$ENDIF}
 
 end;

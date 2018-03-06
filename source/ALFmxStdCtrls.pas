@@ -698,6 +698,7 @@ uses System.SysUtils,
      FMX.Platform,
      fmx.consts,
      fmx.utils,
+     alGraphics,
      AlCommon,
      ALFmxCommon;
 

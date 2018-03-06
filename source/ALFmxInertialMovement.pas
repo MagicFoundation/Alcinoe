@@ -36,7 +36,7 @@ uses System.Types,
      ALAndroidApi,
      {$ENDIF}
      FMX.Types,
-     ALFmxCommon;
+     ALCommon;
 
 type
 
@@ -348,7 +348,6 @@ uses System.SysUtils,
      System.Math,
      System.RTLConsts,
      System.Math.Vectors,
-     ALCommon,
      {$IFDEF DEBUG}
      AlString,
      {$ENDIF}

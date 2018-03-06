@@ -1,64 +1,159 @@
-{*************************************************************
-Author(s):    Darin Dimitrov (darin_dimitrov@hotmail.com)
-product:      Alcinoe Windows HTTP Services (WinHTTP) API Interface Unit
-Description:  Microsoft® Windows® HTTP Services (WinHTTP) provides
-              developers with a server-supported, high-level interface
-              to the HTTP/1.1 Internet protocol. WinHTTP is designed
-              to be used primarily in server-based scenarios by server
-              applications that communicate with HTTP servers. WinHTTP
-              is also designed for use in system services and HTTP-based
-              client applications. WinHTTP is more secure and robust than
-              WinInet. However, single-user applications that need FTP or
-              gopher functionality, cookie persistence, caching, automatic
-              credential dialog handling, Internet Explorer compatibility,
-              or downlevel platform support should still consider
-              using WinInet.
-
-Link:         http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnanchor/html/winhttp.asp
-**************************************************************}
-
 unit ALWinHttpWrapper;
 
+{$IF CompilerVersion > 32} // tokyo
+  {$MESSAGE WARN 'Check if Winapi.WinHTTP.pas was not updated and adjust the IFDEF'}
+{$ENDIF}
+
+
+{$ALIGN ON}
+{$MINENUMSIZE 4}
 {$WEAKPACKAGEUNIT}
+
+{$HPPEMIT ''}
+{$HPPEMIT '#include "winhttp.h"'}
+{$HPPEMIT '#pragma comment(lib, "winhttp")'}
+{$HPPEMIT ''}
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
+uses Winapi.Windows, Winapi.Winsock2;
 
-uses Winapi.Windows;
-
-{$HPPEMIT '#include <winhttp.h>'}
-
-{$IF CompilerVersion < 18.5}
-Type
-  DWORD_PTR = DWORD;
-{$IFEND}
+{ types }
 
 type
   HINTERNET = Pointer;
   {$EXTERNALSYM HINTERNET}
-  PHINTERNET = ^HINTERNET;
-  LPHINTERNET = PHINTERNET;
+  LPHINTERNET = ^HINTERNET;
   {$EXTERNALSYM LPHINTERNET}
 
   INTERNET_PORT = Word;
   {$EXTERNALSYM INTERNET_PORT}
+  LPINTERNET_PORT = ^INTERNET_PORT;
+  {$EXTERNALSYM LPINTERNET_PORT}
+  TInternetPort = INTERNET_PORT;
+  PInternetPort = ^TInternetPort;
 
+
+{ manifests }
+
+
+const
+  INTERNET_DEFAULT_PORT = 0;                    { use the protocol-specific default }
+  {$EXTERNALSYM INTERNET_DEFAULT_PORT}
+  INTERNET_DEFAULT_HTTP_PORT = 80;              {    "     "  HTTP   " }
+  {$EXTERNALSYM INTERNET_DEFAULT_HTTP_PORT}
+  INTERNET_DEFAULT_HTTPS_PORT = 443;            {    "     "  HTTPS  " }
+  {$EXTERNALSYM INTERNET_DEFAULT_HTTPS_PORT}
+
+{ flags for WinHttpOpen(): }
+  WINHTTP_FLAG_ASYNC = $10000000;               { this session is asynchronous (where supported) }
+  {$EXTERNALSYM WINHTTP_FLAG_ASYNC}
+
+{ flags for WinHttpOpenRequest(): }
+  WINHTTP_FLAG_SECURE = $00800000;                 { use SSL if applicable (HTTPS) }
+  {$EXTERNALSYM WINHTTP_FLAG_SECURE}
+  WINHTTP_FLAG_ESCAPE_PERCENT = $00000004;         { if escaping enabled, escape percent as well }
+  {$EXTERNALSYM WINHTTP_FLAG_ESCAPE_PERCENT}
+  WINHTTP_FLAG_NULL_CODEPAGE = $00000008;          { assume all symbols are ASCII, use fast convertion }
+  {$EXTERNALSYM WINHTTP_FLAG_NULL_CODEPAGE}
+  WINHTTP_FLAG_BYPASS_PROXY_CACHE = $00000100;    { add "pragma: no-cache" request header }
+  {$EXTERNALSYM WINHTTP_FLAG_BYPASS_PROXY_CACHE}
+  WINHTTP_FLAG_REFRESH = WINHTTP_FLAG_BYPASS_PROXY_CACHE;
+  {$EXTERNALSYM WINHTTP_FLAG_REFRESH}
+  WINHTTP_FLAG_ESCAPE_DISABLE = $00000040;         { disable escaping }
+  {$EXTERNALSYM WINHTTP_FLAG_ESCAPE_DISABLE}
+  WINHTTP_FLAG_ESCAPE_DISABLE_QUERY = $00000080;   { if escaping enabled escape path part, but do not escape query }
+  {$EXTERNALSYM WINHTTP_FLAG_ESCAPE_DISABLE_QUERY}
+
+
+  SECURITY_FLAG_IGNORE_UNKNOWN_CA = $00000100;
+  {$EXTERNALSYM SECURITY_FLAG_IGNORE_UNKNOWN_CA}
+  SECURITY_FLAG_IGNORE_CERT_DATE_INVALID = $00002000;  { expired X509 Cert. }
+  {$EXTERNALSYM SECURITY_FLAG_IGNORE_CERT_DATE_INVALID}
+  SECURITY_FLAG_IGNORE_CERT_CN_INVALID = $00001000;    { bad common name in X509 Cert. }
+  {$EXTERNALSYM SECURITY_FLAG_IGNORE_CERT_CN_INVALID}
+  SECURITY_FLAG_IGNORE_CERT_WRONG_USAGE = $00000200;
+  {$EXTERNALSYM SECURITY_FLAG_IGNORE_CERT_WRONG_USAGE}
+
+
+
+{ WINHTTP_ASYNC_RESULT - this structure is returned to the application via }
+{ the callback with WINHTTP_CALLBACK_STATUS_REQUEST_COMPLETE. It is not sufficient to }
+{ just return the result of the async operation. If the API failed then the }
+{ app cannot call GetLastError() because the thread context will be incorrect. }
+{ Both the value returned by the async API and any resultant error code are }
+{ made available. The app need not check dwError if dwResult indicates that }
+{ the API succeeded (in this case dwError will be ERROR_SUCCESS) }
+
+
+type
+  WINHTTP_ASYNC_RESULT = record
+    dwResult: DWORD_PTR; { indicates which async API has encountered an error }
+    dwError: DWORD;      { the error code if the API failed }
+  end;
+  {$EXTERNALSYM WINHTTP_ASYNC_RESULT}
+  LPWINHTTP_ASYNC_RESULT = ^WINHTTP_ASYNC_RESULT;
+  {$EXTERNALSYM LPWINHTTP_ASYNC_RESULT}
+  TWinHttpAsyncResult = WINHTTP_ASYNC_RESULT;
+  PWinHttpAsyncResult = ^TWinHttpAsyncResult;
+
+
+{ HTTP_VERSION_INFO - query or set global HTTP version (1.0 or 1.1) }
+
+  HTTP_VERSION_INFO = record
+    dwMajorVersion: DWORD;
+    dwMinorVersion: DWORD;
+  end;
+  {$EXTERNALSYM HTTP_VERSION_INFO}
+  LPHTTP_VERSION_INFO = ^HTTP_VERSION_INFO;
+  {$EXTERNALSYM LPHTTP_VERSION_INFO}
+  THttpVersionInfo = HTTP_VERSION_INFO;
+  PHttpVersionInfo = ^THttpVersionInfo;
+
+
+{ INTERNET_SCHEME - URL scheme type }
+
+  INTERNET_SCHEME = Integer;
+  LPINTERNET_SCHEME = ^INTERNET_SCHEME;
+  {$EXTERNALSYM LPINTERNET_SCHEME}
+  {$EXTERNALSYM INTERNET_SCHEME}
+  TInternetScheme = INTERNET_SCHEME;
   PInternetScheme = ^TInternetScheme;
-  TInternetScheme = Integer;
 
-  PURLComponents = ^URL_COMPONENTS;
-  URL_COMPONENTS = record
+const
+  INTERNET_SCHEME_HTTP = (1);
+  {$EXTERNALSYM INTERNET_SCHEME_HTTP}
+  INTERNET_SCHEME_HTTPS = (2);
+  {$EXTERNALSYM INTERNET_SCHEME_HTTPS}
+
+
+
+{ URL_COMPONENTS - the constituent parts of an URL. Used in WinHttpCrackUrl() }
+{ and WinHttpCreateUrl() }
+
+{ For WinHttpCrackUrl(), if a pointer field and its corresponding length field }
+{ are both 0 then that component is not returned. If the pointer field is NULL }
+{ but the length field is not zero, then both the pointer and length fields are }
+{ returned if both pointer and corresponding length fields are non-zero then }
+{ the pointer field points to a buffer where the component is copied. The }
+{ component may be un-escaped, depending on dwFlags }
+
+{ For WinHttpCreateUrl(), the pointer fields should be NULL if the component }
+{ is not required. If the corresponding length field is zero then the pointer }
+{ field is the address of a zero-terminated string. If the length field is not }
+{ zero then it is the string length of the corresponding pointer field }
+
+
+
+type
+  _URL_COMPONENTS = record
     dwStructSize: DWORD;        { size of this structure. Used in version check }
     lpszScheme: LPWSTR;         { pointer to scheme name }
     dwSchemeLength: DWORD;      { length of scheme name }
-    nScheme: TInternetScheme;    { enumerated scheme type (if known) }
+    nScheme: INTERNET_SCHEME;   { enumerated scheme type (if known) }
     lpszHostName: LPWSTR;       { pointer to host name }
     dwHostNameLength: DWORD;    { length of host name }
     nPort: INTERNET_PORT;       { converted port number }
-    pad: WORD;                  { force correct allignment regardless of comp. flags}
     lpszUserName: LPWSTR;       { pointer to user name }
     dwUserNameLength: DWORD;    { length of user name }
     lpszPassword: LPWSTR;       { pointer to password }
@@ -68,114 +163,264 @@ type
     lpszExtraInfo: LPWSTR;      { pointer to extra information (e.g. ?foo or #foo) }
     dwExtraInfoLength: DWORD;   { length of extra information }
   end;
-
+  URL_COMPONENTS = _URL_COMPONENTS;
   {$EXTERNALSYM URL_COMPONENTS}
-  TURLComponents = URL_COMPONENTS;
-  LPURL_COMPONENTS = PURLComponents;
+  LPURL_COMPONENTS = ^URL_COMPONENTS;
   {$EXTERNALSYM LPURL_COMPONENTS}
+  TURLComponents = URL_COMPONENTS;
+  PURLComponents = ^TURLComponents;
+
+  URL_COMPONENTSW = URL_COMPONENTS;
+  {$EXTERNALSYM URL_COMPONENTSW}
+  LPURL_COMPONENTSW = LPURL_COMPONENTS;
+  {$EXTERNALSYM LPURL_COMPONENTSW}
+  TURLComponentsW = URL_COMPONENTS;
+  PURLComponentsW = ^TURLComponents;
 
 
-  PWINHTTP_PROXY_INFO = ^WINHTTP_PROXY_INFO;
+
+{ WINHTTP_PROXY_INFO - structure supplied with WINHTTP_OPTION_PROXY to get/ }
+{ set proxy information on a WinHttpOpen() handle }
+
+
   WINHTTP_PROXY_INFO = record
-    dwAccessType: DWORD;
-    lpszProxy: LPWSTR;
-    lpszProxyBypass: LPWSTR;
+    dwAccessType: DWORD;      { see WINHTTP_ACCESS_* types below }
+    lpszProxy: LPWSTR;        { proxy server list }
+    lpszProxyBypass: LPWSTR;  { proxy bypass list }
   end;
   {$EXTERNALSYM WINHTTP_PROXY_INFO}
-  TWINHTTP_PROXY_INFO = WINHTTP_PROXY_INFO;
-  LPWINHTTP_PROXY_INFO = PWINHTTP_PROXY_INFO;
+  LPWINHTTP_PROXY_INFO = ^WINHTTP_PROXY_INFO;
   {$EXTERNALSYM LPWINHTTP_PROXY_INFO}
+  PWINHTTP_PROXY_INFO = ^WINHTTP_PROXY_INFO;
+  TWinHttpProxyInfo = WINHTTP_PROXY_INFO;
+  PWinHttpProxyInfo = ^TWinHttpProxyInfo;
 
-  PWINHTTP_CURRENT_USER_IE_PROXY_CONFIG = ^WINHTTP_CURRENT_USER_IE_PROXY_CONFIG;
-  WINHTTP_CURRENT_USER_IE_PROXY_CONFIG = record
-    fAutoDetect: BOOL;
-    lpszAutoConfigUrl: LPWSTR; 
-    lpszProxy: LPWSTR;
-    lpszProxyBypass: LPWSTR;
+
+  WINHTTP_PROXY_INFOW = WINHTTP_PROXY_INFO;
+  {$EXTERNALSYM WINHTTP_PROXY_INFOW}
+  LPWINHTTP_PROXY_INFOW = LPWINHTTP_PROXY_INFO;
+  {$EXTERNALSYM LPWINHTTP_PROXY_INFOW}
+  TWinHttpProxyInfoW = WINHTTP_PROXY_INFO;
+  PWinHttpProxyInfoW = ^TWinHttpProxyInfo;
+
+
+  WINHTTP_AUTOPROXY_OPTIONS = record
+    dwFlags: DWORD;
+    dwAutoDetectFlags: DWORD;
+    lpszAutoConfigUrl: LPCWSTR;
+    lpvReserved: Pointer;
+    dwReserved: DWORD;
+    fAutoLogonIfChallenged: BOOL;
   end;
-  {$EXTERNALSYM WINHTTP_PROXY_INFO}
-  TWINHTTP_CURRENT_USER_IE_PROXY_CONFIG = WINHTTP_CURRENT_USER_IE_PROXY_CONFIG;
-  LPWINHTTP_CURRENT_USER_IE_PROXY_CONFIG = PWINHTTP_CURRENT_USER_IE_PROXY_CONFIG;
-  {$EXTERNALSYM LPWINHTTP_CURRENT_USER_IE_PROXY_CONFIG}
+  {$EXTERNALSYM WINHTTP_AUTOPROXY_OPTIONS}
+  PWINHTTP_AUTOPROXY_OPTIONS = ^WINHTTP_AUTOPROXY_OPTIONS;
+  TWinHttpAutoProxyOptions = WINHTTP_AUTOPROXY_OPTIONS;
+  PWinHttpAutoProxyOptions = ^TWinHttpAutoProxyOptions;
 
 
 const
-  INTERNET_DEFAULT_PORT = 0;
-  {$EXTERNALSYM INTERNET_DEFAULT_PORT}
-  INTERNET_DEFAULT_HTTP_PORT = 80;
-  {$EXTERNALSYM INTERNET_DEFAULT_HTTP_PORT}
-  INTERNET_DEFAULT_HTTPS_PORT = 443;
-  {$EXTERNALSYM INTERNET_DEFAULT_HTTPS_PORT}
-  WINHTTP_FLAG_ASYNC = $10000000;
-  {$EXTERNALSYM WINHTTP_FLAG_ASYNC}
-  WINHTTP_FLAG_SECURE = $00800000;
-  {$EXTERNALSYM WINHTTP_FLAG_SECURE}
-  WINHTTP_FLAG_ESCAPE_PERCENT = $00000004;
-  {$EXTERNALSYM WINHTTP_FLAG_ESCAPE_PERCENT}
-  WINHTTP_FLAG_nil_CODEPAGE = $00000008;
-  {$EXTERNALSYM WINHTTP_FLAG_nil_CODEPAGE}
-  WINHTTP_FLAG_BYPASS_PROXY_CACHE = $00000100;
-  {$EXTERNALSYM WINHTTP_FLAG_BYPASS_PROXY_CACHE}
-  WINHTTP_FLAG_REFRESH = WINHTTP_FLAG_BYPASS_PROXY_CACHE;
-  {$EXTERNALSYM WINHTTP_FLAG_REFRESH}
-  WINHTTP_FLAG_ESCAPE_DISABLE = $00000040;
-  {$EXTERNALSYM WINHTTP_FLAG_ESCAPE_DISABLE}
-  WINHTTP_FLAG_ESCAPE_DISABLE_QUERY = $00000080;
-  {$EXTERNALSYM WINHTTP_FLAG_ESCAPE_DISABLE_QUERY}
-  SECURITY_FLAG_IGNORE_UNKNOWN_CA = $00000100;
-  {$EXTERNALSYM SECURITY_FLAG_IGNORE_UNKNOWN_CA}
-  SECURITY_FLAG_IGNORE_CERT_DATE_INVALID = $00002000;
-  {$EXTERNALSYM SECURITY_FLAG_IGNORE_CERT_DATE_INVALID}
-  SECURITY_FLAG_IGNORE_CERT_CN_INVALID = $00001000;
-  {$EXTERNALSYM SECURITY_FLAG_IGNORE_CERT_CN_INVALID}
-  SECURITY_FLAG_IGNORE_CERT_WRONG_USAGE = $00000200;
-  {$EXTERNALSYM SECURITY_FLAG_IGNORE_CERT_WRONG_USAGE}
-  INTERNET_SCHEME_HTTP = (1);
-  {$EXTERNALSYM INTERNET_SCHEME_HTTP}
-  INTERNET_SCHEME_HTTPS = (2);
-  {$EXTERNALSYM INTERNET_SCHEME_HTTPS}
   WINHTTP_AUTOPROXY_AUTO_DETECT = $00000001;
   {$EXTERNALSYM WINHTTP_AUTOPROXY_AUTO_DETECT}
   WINHTTP_AUTOPROXY_CONFIG_URL = $00000002;
   {$EXTERNALSYM WINHTTP_AUTOPROXY_CONFIG_URL}
+  WINHTTP_AUTOPROXY_HOST_KEEPCASE = $00000004;
+  {$EXTERNALSYM WINHTTP_AUTOPROXY_HOST_KEEPCASE}
+  WINHTTP_AUTOPROXY_HOST_LOWERCASE = $00000008;
+  {$EXTERNALSYM WINHTTP_AUTOPROXY_HOST_LOWERCASE}
   WINHTTP_AUTOPROXY_RUN_INPROCESS = $00010000;
   {$EXTERNALSYM WINHTTP_AUTOPROXY_RUN_INPROCESS}
   WINHTTP_AUTOPROXY_RUN_OUTPROCESS_ONLY = $00020000;
   {$EXTERNALSYM WINHTTP_AUTOPROXY_RUN_OUTPROCESS_ONLY}
+
+
+{ Flags for dwAutoDetectFlags }
+
   WINHTTP_AUTO_DETECT_TYPE_DHCP = $00000001;
   {$EXTERNALSYM WINHTTP_AUTO_DETECT_TYPE_DHCP}
   WINHTTP_AUTO_DETECT_TYPE_DNS_A = $00000002;
   {$EXTERNALSYM WINHTTP_AUTO_DETECT_TYPE_DNS_A}
+
+
+{ WINHTTP_CERTIFICATE_INFO lpBuffer - contains the certificate returned from }
+{ the server }
+
+
+type
+  WINHTTP_CERTIFICATE_INFO = record { ftExpiry - date the certificate expires. }
+
+    ftExpiry: FILETIME;
+
+    { ftStart - date the certificate becomes valid. }
+    ftStart: FILETIME;
+
+    { lpszSubjectInfo - the name of organization, site, and server }
+    {   the cert. was issued for. }
+    lpszSubjectInfo: LPWSTR;
+
+    { lpszIssuerInfo - the name of orgainzation, site, and server }
+    {   the cert was issues by. }
+    lpszIssuerInfo: LPWSTR;
+
+    { lpszProtocolName - the name of the protocol used to provide the secure }
+    {   connection. }
+    lpszProtocolName: LPWSTR;
+
+    { lpszSignatureAlgName - the name of the algorithm used for signing }
+    {  the certificate. }
+    lpszSignatureAlgName: LPWSTR;
+
+    { lpszEncryptionAlgName - the name of the algorithm used for }
+    {  doing encryption over the secure channel (SSL) connection. }
+    lpszEncryptionAlgName: LPWSTR;
+
+    { dwKeySize - size of the key. }
+    dwKeySize: DWORD;
+  end;
+  {$EXTERNALSYM WINHTTP_CERTIFICATE_INFO}
+  TWinHttpCertificateInfo = WINHTTP_CERTIFICATE_INFO;
+  PWinHttpCertificateInfo = ^TWinHttpCertificateInfo;
+
+
+  WINHTTP_CONNECTION_INFO = record
+    cbSize: DWORD;
+    LocalAddress: SOCKADDR_STORAGE; { local ip, local port }
+    RemoteAddress: SOCKADDR_STORAGE;{ remote ip, remote port }
+  end;
+  {$EXTERNALSYM WINHTTP_CONNECTION_INFO}
+  TWinHttpConnectionInfo = WINHTTP_CONNECTION_INFO;
+  PWinHttpConnectionInfo = ^TWinHttpConnectionInfo;
+
+
+{ prototypes }
+
+{ constants for WinHttpTimeFromSystemTime }
+
+const
   WINHTTP_TIME_FORMAT_BUFSIZE = 62;
   {$EXTERNALSYM WINHTTP_TIME_FORMAT_BUFSIZE}
-  ICU_NO_ENCODE = $20000000;
+
+function WinHttpTimeFromSystemTime(var pst: TSystemTime; pwszTime: LPWSTR): BOOL; stdcall;
+{$EXTERNALSYM WinHttpTimeFromSystemTime}
+
+function WinHttpTimeToSystemTime(pwszTime: LPCWSTR; out pst: TSystemTime): BOOL; stdcall;
+{$EXTERNALSYM WinHttpTimeToSystemTime}
+
+{ flags for CrackUrl() and CombineUrl() }
+
+
+const
+  ICU_NO_ENCODE = $20000000;    { Don't convert unsafe characters to escape sequence }
   {$EXTERNALSYM ICU_NO_ENCODE}
-  ICU_DECODE = $10000000;
+  ICU_DECODE = $10000000;       { Convert %XX escape sequences to characters }
   {$EXTERNALSYM ICU_DECODE}
-  ICU_NO_META = $08000000;
+  ICU_NO_META = $08000000;      { Don't convert .. etc. meta path sequences }
   {$EXTERNALSYM ICU_NO_META}
-  ICU_ENCODE_SPACES_ONLY = $04000000;
+  ICU_ENCODE_SPACES_ONLY = $04000000;  { Encode spaces only }
   {$EXTERNALSYM ICU_ENCODE_SPACES_ONLY}
-  ICU_BROWSER_MODE = $02000000;
+  ICU_BROWSER_MODE = $02000000; { Special encode/decode rules for browser }
   {$EXTERNALSYM ICU_BROWSER_MODE}
-  ICU_ENCODE_PERCENT = $00001000;
+  ICU_ENCODE_PERCENT = $00001000;           { Encode any percent (ASCII25) }
   {$EXTERNALSYM ICU_ENCODE_PERCENT}
-  ICU_ESCAPE = $80000000;
+
+        { signs encountered, default is to not encode percent. }
+
+
+function WinHttpCrackUrl(pwszUrl: LPCWSTR; dwUrlLength: DWORD; dwFlags: DWORD;
+  var lpUrlComponents: TURLComponents): BOOL; stdcall;
+{$EXTERNALSYM WinHttpCrackUrl}
+
+function WinHttpCreateUrl(var lpUrlComponents: TURLComponents; dwFlags: DWORD; pwszUrl: LPWSTR;
+  var pdwUrlLength: DWORD): BOOL; stdcall;
+{$EXTERNALSYM WinHttpCreateUrl}
+
+
+{ flags for WinHttpCrackUrl() and WinHttpCreateUrl() }
+
+const
+  ICU_ESCAPE = $80000000;       { (un)escape URL characters }
   {$EXTERNALSYM ICU_ESCAPE}
+  ICU_ESCAPE_AUTHORITY = $00002000; { causes InternetCreateUrlA to escape chars in authority components (user, pwd, host) }
+  {$EXTERNALSYM ICU_ESCAPE_AUTHORITY}
+  ICU_REJECT_USERPWD = $00004000;   { rejects usrls whick have username/pwd sections }
+  {$EXTERNALSYM ICU_REJECT_USERPWD}
+
+function WinHttpCheckPlatform: BOOL; stdcall;
+{$EXTERNALSYM WinHttpCheckPlatform}
+
+
+function WinHttpGetDefaultProxyConfiguration(var pProxyInfo: TWinHttpProxyInfo): BOOL; stdcall;
+{$EXTERNALSYM WinHttpGetDefaultProxyConfiguration}
+function WinHttpSetDefaultProxyConfiguration(var pProxyInfo: TWinHttpProxyInfo): BOOL; stdcall;
+{$EXTERNALSYM WinHttpSetDefaultProxyConfiguration}
+
+function WinHttpOpen(pszAgentW: LPCWSTR; dwAccessType: DWORD; pszProxyW: LPCWSTR; pszProxyBypassW: LPCWSTR;
+  dwFlags: DWORD): HINTERNET; stdcall;
+{$EXTERNALSYM WinHttpOpen}
+
+{ WinHttpOpen dwAccessType values (also for WINHTTP_PROXY_INFO::dwAccessType) }
+const
   WINHTTP_ACCESS_TYPE_DEFAULT_PROXY = 0;
   {$EXTERNALSYM WINHTTP_ACCESS_TYPE_DEFAULT_PROXY}
   WINHTTP_ACCESS_TYPE_NO_PROXY = 1;
   {$EXTERNALSYM WINHTTP_ACCESS_TYPE_NO_PROXY}
   WINHTTP_ACCESS_TYPE_NAMED_PROXY = 3;
   {$EXTERNALSYM WINHTTP_ACCESS_TYPE_NAMED_PROXY}
+
+{ WinHttpOpen prettifiers for optional parameters }
   WINHTTP_NO_PROXY_NAME = nil;
   {$EXTERNALSYM WINHTTP_NO_PROXY_NAME}
   WINHTTP_NO_PROXY_BYPASS = nil;
   {$EXTERNALSYM WINHTTP_NO_PROXY_BYPASS}
+
+function WinHttpCloseHandle(hInternet: HINTERNET): BOOL; stdcall;
+{$EXTERNALSYM WinHttpCloseHandle}
+
+
+function WinHttpConnect(hSession: HINTERNET; pswzServerName: LPCWSTR; nServerPort: INTERNET_PORT;
+  dwReserved: DWORD): HINTERNET; stdcall;
+{$EXTERNALSYM WinHttpConnect}
+
+
+function WinHttpReadData(hRequest: HINTERNET; out lpBuffer; dwNumberOfBytesToRead: DWORD;
+  lpdwNumberOfBytesRead: LPDWORD): BOOL; stdcall;
+{$EXTERNALSYM WinHttpReadData}
+
+function WinHttpWriteData(hRequest: HINTERNET; const lpBuffer; dwNumberOfBytesToWrite: DWORD;
+  lpdwNumberOfBytesWritten: LPDWORD): BOOL; stdcall;
+{$EXTERNALSYM WinHttpWriteData}
+
+
+function WinHttpQueryDataAvailable(hRequest: HINTERNET;
+  lpdwNumberOfBytesAvailable: LPDWORD): BOOL; stdcall;
+{$EXTERNALSYM WinHttpQueryDataAvailable}
+
+
+function WinHttpQueryOption(hInternet: HINTERNET; dwOption: DWORD; out lpBuffer; var lpdwBufferLength: DWORD): BOOL; stdcall;
+{$EXTERNALSYM WinHttpQueryOption}
+
+const
+  WINHTTP_NO_CLIENT_CERT_CONTEXT = nil;
+  {$EXTERNALSYM WINHTTP_NO_CLIENT_CERT_CONTEXT}
+
+function WinHttpSetOption(hInternet: HINTERNET; dwOption: DWORD;
+  lpBuffer: Pointer; dwBufferLength: DWORD): BOOL; stdcall;
+{$EXTERNALSYM WinHttpSetOption}
+
+function WinHttpSetTimeouts(hInternet: HINTERNET; nResolveTimeout: Integer; nConnectTimeout: Integer;
+  nSendTimeout: Integer; nReceiveTimeout: Integer): BOOL; stdcall;
+{$EXTERNALSYM WinHttpSetTimeouts}
+
+function WinHttpIsHostInProxyBypassList(var pProxyInfo: TWinHttpProxyInfo; pwszHost: LPCWSTR;
+  tScheme: TInternetScheme; nPort: TInternetPort; out pfIsInBypassList: BOOL): DWORD; stdcall;
+{$EXTERNALSYM WinHttpIsHostInProxyBypassList}
+
+
+{ options manifests for WinHttp(Query|Set)Option }
+
+
+const
   WINHTTP_OPTION_CALLBACK = 1;
   {$EXTERNALSYM WINHTTP_OPTION_CALLBACK}
-  WINHTTP_FIRST_OPTION = WINHTTP_OPTION_CALLBACK;
-  {$EXTERNALSYM WINHTTP_FIRST_OPTION}
   WINHTTP_OPTION_RESOLVE_TIMEOUT = 2;
   {$EXTERNALSYM WINHTTP_OPTION_RESOLVE_TIMEOUT}
   WINHTTP_OPTION_CONNECT_TIMEOUT = 3;
@@ -208,6 +453,8 @@ const
   {$EXTERNALSYM WINHTTP_OPTION_SECURITY_KEY_BITNESS}
   WINHTTP_OPTION_PROXY = 38;
   {$EXTERNALSYM WINHTTP_OPTION_PROXY}
+
+
   WINHTTP_OPTION_USER_AGENT = 41;
   {$EXTERNALSYM WINHTTP_OPTION_USER_AGENT}
   WINHTTP_OPTION_CONTEXT_VALUE = 45;
@@ -220,6 +467,7 @@ const
   {$EXTERNALSYM WINHTTP_OPTION_HTTP_VERSION}
   WINHTTP_OPTION_DISABLE_FEATURE = 63;
   {$EXTERNALSYM WINHTTP_OPTION_DISABLE_FEATURE}
+
   WINHTTP_OPTION_CODEPAGE = 68;
   {$EXTERNALSYM WINHTTP_OPTION_CODEPAGE}
   WINHTTP_OPTION_MAX_CONNS_PER_SERVER = 73;
@@ -258,8 +506,47 @@ const
   {$EXTERNALSYM WINHTTP_OPTION_MAX_RESPONSE_HEADER_SIZE}
   WINHTTP_OPTION_MAX_RESPONSE_DRAIN_SIZE = 92;
   {$EXTERNALSYM WINHTTP_OPTION_MAX_RESPONSE_DRAIN_SIZE}
-  WINHTTP_LAST_OPTION = WINHTTP_OPTION_MAX_RESPONSE_DRAIN_SIZE;
+  WINHTTP_OPTION_CONNECTION_INFO = 93;
+  {$EXTERNALSYM WINHTTP_OPTION_CONNECTION_INFO}
+  WINHTTP_OPTION_CLIENT_CERT_ISSUER_LIST = 94;
+  {$EXTERNALSYM WINHTTP_OPTION_CLIENT_CERT_ISSUER_LIST}
+  WINHTTP_OPTION_SPN = 96;
+  {$EXTERNALSYM WINHTTP_OPTION_SPN}
+
+  WINHTTP_OPTION_GLOBAL_PROXY_CREDS = 97;
+  {$EXTERNALSYM WINHTTP_OPTION_GLOBAL_PROXY_CREDS}
+  WINHTTP_OPTION_GLOBAL_SERVER_CREDS = 98;
+  {$EXTERNALSYM WINHTTP_OPTION_GLOBAL_SERVER_CREDS}
+
+  WINHTTP_OPTION_UNLOAD_NOTIFY_EVENT = 99;
+  {$EXTERNALSYM WINHTTP_OPTION_UNLOAD_NOTIFY_EVENT}
+  WINHTTP_OPTION_REJECT_USERPWD_IN_URL = 100;
+  {$EXTERNALSYM WINHTTP_OPTION_REJECT_USERPWD_IN_URL}
+  WINHTTP_OPTION_USE_GLOBAL_SERVER_CREDENTIALS = 101;
+  {$EXTERNALSYM WINHTTP_OPTION_USE_GLOBAL_SERVER_CREDENTIALS}
+
+
+  WINHTTP_OPTION_RECEIVE_PROXY_CONNECT_RESPONSE = 103;
+  {$EXTERNALSYM WINHTTP_OPTION_RECEIVE_PROXY_CONNECT_RESPONSE}
+  WINHTTP_OPTION_IS_PROXY_CONNECT_RESPONSE = 104;
+  {$EXTERNALSYM WINHTTP_OPTION_IS_PROXY_CONNECT_RESPONSE}
+
+
+  WINHTTP_OPTION_SERVER_SPN_USED = 106;
+  {$EXTERNALSYM WINHTTP_OPTION_SERVER_SPN_USED}
+  WINHTTP_OPTION_PROXY_SPN_USED = 107;
+  {$EXTERNALSYM WINHTTP_OPTION_PROXY_SPN_USED}
+
+  WINHTTP_OPTION_SERVER_CBT = 108;
+  {$EXTERNALSYM WINHTTP_OPTION_SERVER_CBT}
+
+
+  WINHTTP_FIRST_OPTION = WINHTTP_OPTION_CALLBACK;
+  {$EXTERNALSYM WINHTTP_FIRST_OPTION}
+
+  WINHTTP_LAST_OPTION = WINHTTP_OPTION_SERVER_CBT;
   {$EXTERNALSYM WINHTTP_LAST_OPTION}
+
   WINHTTP_OPTION_USERNAME = $1000;
   {$EXTERNALSYM WINHTTP_OPTION_USERNAME}
   WINHTTP_OPTION_PASSWORD = $1001;
@@ -268,26 +555,37 @@ const
   {$EXTERNALSYM WINHTTP_OPTION_PROXY_USERNAME}
   WINHTTP_OPTION_PROXY_PASSWORD = $1003;
   {$EXTERNALSYM WINHTTP_OPTION_PROXY_PASSWORD}
+
+
+{ manifest value for WINHTTP_OPTION_MAX_CONNS_PER_SERVER and WINHTTP_OPTION_MAX_CONNS_PER_1_0_SERVER }
   WINHTTP_CONNS_PER_SERVER_UNLIMITED = $FFFFFFFF;
   {$EXTERNALSYM WINHTTP_CONNS_PER_SERVER_UNLIMITED}
+
+
+{ values for WINHTTP_OPTION_AUTOLOGON_POLICY }
   WINHTTP_AUTOLOGON_SECURITY_LEVEL_MEDIUM = 0;
   {$EXTERNALSYM WINHTTP_AUTOLOGON_SECURITY_LEVEL_MEDIUM}
   WINHTTP_AUTOLOGON_SECURITY_LEVEL_LOW = 1;
   {$EXTERNALSYM WINHTTP_AUTOLOGON_SECURITY_LEVEL_LOW}
   WINHTTP_AUTOLOGON_SECURITY_LEVEL_HIGH = 2;
   {$EXTERNALSYM WINHTTP_AUTOLOGON_SECURITY_LEVEL_HIGH}
+
   WINHTTP_AUTOLOGON_SECURITY_LEVEL_DEFAULT = WINHTTP_AUTOLOGON_SECURITY_LEVEL_MEDIUM;
   {$EXTERNALSYM WINHTTP_AUTOLOGON_SECURITY_LEVEL_DEFAULT}
+
+{ values for WINHTTP_OPTION_REDIRECT_POLICY }
   WINHTTP_OPTION_REDIRECT_POLICY_NEVER = 0;
   {$EXTERNALSYM WINHTTP_OPTION_REDIRECT_POLICY_NEVER}
   WINHTTP_OPTION_REDIRECT_POLICY_DISALLOW_HTTPS_TO_HTTP = 1;
   {$EXTERNALSYM WINHTTP_OPTION_REDIRECT_POLICY_DISALLOW_HTTPS_TO_HTTP}
   WINHTTP_OPTION_REDIRECT_POLICY_ALWAYS = 2;
   {$EXTERNALSYM WINHTTP_OPTION_REDIRECT_POLICY_ALWAYS}
+
   WINHTTP_OPTION_REDIRECT_POLICY_LAST = WINHTTP_OPTION_REDIRECT_POLICY_ALWAYS;
   {$EXTERNALSYM WINHTTP_OPTION_REDIRECT_POLICY_LAST}
   WINHTTP_OPTION_REDIRECT_POLICY_DEFAULT = WINHTTP_OPTION_REDIRECT_POLICY_DISALLOW_HTTPS_TO_HTTP;
   {$EXTERNALSYM WINHTTP_OPTION_REDIRECT_POLICY_DEFAULT}
+
   WINHTTP_DISABLE_PASSPORT_AUTH = $00000000;
   {$EXTERNALSYM WINHTTP_DISABLE_PASSPORT_AUTH}
   WINHTTP_ENABLE_PASSPORT_AUTH = $10000000;
@@ -296,6 +594,9 @@ const
   {$EXTERNALSYM WINHTTP_DISABLE_PASSPORT_KEYRING}
   WINHTTP_ENABLE_PASSPORT_KEYRING = $40000000;
   {$EXTERNALSYM WINHTTP_ENABLE_PASSPORT_KEYRING}
+
+
+{ values for WINHTTP_OPTION_DISABLE_FEATURE }
   WINHTTP_DISABLE_COOKIES = $00000001;
   {$EXTERNALSYM WINHTTP_DISABLE_COOKIES}
   WINHTTP_DISABLE_REDIRECTS = $00000002;
@@ -304,16 +605,69 @@ const
   {$EXTERNALSYM WINHTTP_DISABLE_AUTHENTICATION}
   WINHTTP_DISABLE_KEEP_ALIVE = $00000008;
   {$EXTERNALSYM WINHTTP_DISABLE_KEEP_ALIVE}
+
+{ values for WINHTTP_OPTION_ENABLE_FEATURE }
   WINHTTP_ENABLE_SSL_REVOCATION = $00000001;
   {$EXTERNALSYM WINHTTP_ENABLE_SSL_REVOCATION}
   WINHTTP_ENABLE_SSL_REVERT_IMPERSONATION = $00000002;
   {$EXTERNALSYM WINHTTP_ENABLE_SSL_REVERT_IMPERSONATION}
+
+{ values for WINHTTP_OPTION_SPN }
+  WINHTTP_DISABLE_SPN_SERVER_PORT = $00000000;
+  {$EXTERNALSYM WINHTTP_DISABLE_SPN_SERVER_PORT}
+  WINHTTP_ENABLE_SPN_SERVER_PORT = $00000001;
+  {$EXTERNALSYM WINHTTP_ENABLE_SPN_SERVER_PORT}
+  WINHTTP_OPTION_SPN_MASK = WINHTTP_ENABLE_SPN_SERVER_PORT;
+  {$EXTERNALSYM WINHTTP_OPTION_SPN_MASK}
+
+type
+  PWINHTTP_CREDS = ^WINHTTP_CREDS;
+  WINHTTP_CREDS = record
+    lpszUserName: LPSTR;
+    lpszPassword: LPSTR;
+    lpszRealm: LPSTR;
+    dwAuthScheme: DWORD;
+    lpszHostName: LPSTR;
+    dwPort: DWORD;
+  end;
+  tagWINHTTP_CREDS = WINHTTP_CREDS;
+  {$EXTERNALSYM WINHTTP_CREDS}
+  {$EXTERNALSYM PWINHTTP_CREDS}
+  TWinHttpCreds = WINHTTP_CREDS;
+  PWinHttpCreds = ^TWinHttpCreds;
+
+{ structure for WINHTTP_OPTION_GLOBAL_SERVER_CREDS and }
+{ WINHTTP_OPTION_GLOBAL_PROXY_CREDS }
+  PWINHTTP_CREDS_EX = ^WINHTTP_CREDS_EX;
+  WINHTTP_CREDS_EX = record
+    lpszUserName: LPSTR;
+    lpszPassword: LPSTR;
+    lpszRealm: LPSTR;
+    dwAuthScheme: DWORD;
+    lpszHostName: LPSTR;
+    dwPort: DWORD;
+    lpszUrl: LPSTR;
+  end;
+  tagWINHTTP_CREDS_EX = WINHTTP_CREDS_EX;
+  {$EXTERNALSYM WINHTTP_CREDS_EX}
+  {$EXTERNALSYM PWINHTTP_CREDS_EX}
+  TWinHttpCredsEx = WINHTTP_CREDS_EX;
+  PWinHttpCredsEx = ^TWinHttpCredsEx;
+
+
+{ winhttp handle types }
+
+const
   WINHTTP_HANDLE_TYPE_SESSION = 1;
   {$EXTERNALSYM WINHTTP_HANDLE_TYPE_SESSION}
   WINHTTP_HANDLE_TYPE_CONNECT = 2;
   {$EXTERNALSYM WINHTTP_HANDLE_TYPE_CONNECT}
   WINHTTP_HANDLE_TYPE_REQUEST = 3;
   {$EXTERNALSYM WINHTTP_HANDLE_TYPE_REQUEST}
+
+
+{ values for auth schemes }
+
   WINHTTP_AUTH_SCHEME_BASIC = $00000001;
   {$EXTERNALSYM WINHTTP_AUTH_SCHEME_BASIC}
   WINHTTP_AUTH_SCHEME_NTLM = $00000002;
@@ -324,11 +678,20 @@ const
   {$EXTERNALSYM WINHTTP_AUTH_SCHEME_DIGEST}
   WINHTTP_AUTH_SCHEME_NEGOTIATE = $00000010;
   {$EXTERNALSYM WINHTTP_AUTH_SCHEME_NEGOTIATE}
+
+{ WinHttp supported Authentication Targets }
+
   WINHTTP_AUTH_TARGET_SERVER = $00000000;
   {$EXTERNALSYM WINHTTP_AUTH_TARGET_SERVER}
   WINHTTP_AUTH_TARGET_PROXY = $00000001;
   {$EXTERNALSYM WINHTTP_AUTH_TARGET_PROXY}
-  SECURITY_FLAG_SECURE = $00000001;
+
+
+{ values for WINHTTP_OPTION_SECURITY_FLAGS }
+
+
+{ query only }
+  SECURITY_FLAG_SECURE = $00000001;                    { can query only }
   {$EXTERNALSYM SECURITY_FLAG_SECURE}
   SECURITY_FLAG_STRENGTH_WEAK = $10000000;
   {$EXTERNALSYM SECURITY_FLAG_STRENGTH_WEAK}
@@ -336,6 +699,10 @@ const
   {$EXTERNALSYM SECURITY_FLAG_STRENGTH_MEDIUM}
   SECURITY_FLAG_STRENGTH_STRONG = $20000000;
   {$EXTERNALSYM SECURITY_FLAG_STRENGTH_STRONG}
+
+
+
+{ Secure connection error status flags }
   WINHTTP_CALLBACK_STATUS_FLAG_CERT_REV_FAILED = $00000001;
   {$EXTERNALSYM WINHTTP_CALLBACK_STATUS_FLAG_CERT_REV_FAILED}
   WINHTTP_CALLBACK_STATUS_FLAG_INVALID_CERT = $00000002;
@@ -352,14 +719,50 @@ const
   {$EXTERNALSYM WINHTTP_CALLBACK_STATUS_FLAG_CERT_WRONG_USAGE}
   WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR = $80000000;
   {$EXTERNALSYM WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR}
+
+
   WINHTTP_FLAG_SECURE_PROTOCOL_SSL2 = $00000008;
   {$EXTERNALSYM WINHTTP_FLAG_SECURE_PROTOCOL_SSL2}
   WINHTTP_FLAG_SECURE_PROTOCOL_SSL3 = $00000020;
   {$EXTERNALSYM WINHTTP_FLAG_SECURE_PROTOCOL_SSL3}
   WINHTTP_FLAG_SECURE_PROTOCOL_TLS1 = $00000080;
   {$EXTERNALSYM WINHTTP_FLAG_SECURE_PROTOCOL_TLS1}
-  WINHTTP_FLAG_SECURE_PROTOCOL_ALL = (WINHTTP_FLAG_SECURE_PROTOCOL_SSL2 + WINHTTP_FLAG_SECURE_PROTOCOL_SSL3 + WINHTTP_FLAG_SECURE_PROTOCOL_TLS1);
+  WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_1 = $00000200;
+  {$EXTERNALSYM WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_1}
+  WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_2 = $00000800;
+  {$EXTERNALSYM WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_2}
+  WINHTTP_FLAG_SECURE_PROTOCOL_ALL = WINHTTP_FLAG_SECURE_PROTOCOL_SSL2 or
+                                             WINHTTP_FLAG_SECURE_PROTOCOL_SSL3 or
+                                             WINHTTP_FLAG_SECURE_PROTOCOL_TLS1;
   {$EXTERNALSYM WINHTTP_FLAG_SECURE_PROTOCOL_ALL}
+
+
+
+{ callback function for WinHttpSetStatusCallback }
+
+
+type
+  LPWINHTTP_STATUS_CALLBACK = ^WINHTTP_STATUS_CALLBACK;
+  WINHTTP_STATUS_CALLBACK = procedure(hInternet: HINTERNET; dwContext: Pointer; dwInternetStatus: DWORD;
+    lpvStatusInformation: Pointer; dwStatusInformationLength: DWORD); stdcall;
+{$EXTERNALSYM WINHTTP_STATUS_CALLBACK}
+{$EXTERNALSYM LPWINHTTP_STATUS_CALLBACK}
+  TWinHttpStatusCallback = WINHTTP_STATUS_CALLBACK;
+  PWinHttpStatusCallback = ^TWinHttpStatusCallback;
+
+
+
+function WinHttpSetStatusCallback(hInternet: HINTERNET;
+  lpfnInternetCallback: TWinHttpStatusCallback; dwNotificationFlags: DWORD;
+  dwReserved: NativeUInt): TWinHttpStatusCallback; stdcall;
+{$EXTERNALSYM WinHttpSetStatusCallback}
+
+
+
+{ status manifests for WinHttp status callback }
+
+
+const
   WINHTTP_CALLBACK_STATUS_RESOLVING_NAME = $00000001;
   {$EXTERNALSYM WINHTTP_CALLBACK_STATUS_RESOLVING_NAME}
   WINHTTP_CALLBACK_STATUS_NAME_RESOLVED = $00000002;
@@ -404,6 +807,9 @@ const
   {$EXTERNALSYM WINHTTP_CALLBACK_STATUS_REQUEST_ERROR}
   WINHTTP_CALLBACK_STATUS_SENDREQUEST_COMPLETE = $00400000;
   {$EXTERNALSYM WINHTTP_CALLBACK_STATUS_SENDREQUEST_COMPLETE}
+
+
+{ API Enums for WINHTTP_CALLBACK_STATUS_REQUEST_ERROR: }
   API_RECEIVE_RESPONSE = (1);
   {$EXTERNALSYM API_RECEIVE_RESPONSE}
   API_QUERY_DATA_AVAILABLE = (2);
@@ -414,17 +820,19 @@ const
   {$EXTERNALSYM API_WRITE_DATA}
   API_SEND_REQUEST = (5);
   {$EXTERNALSYM API_SEND_REQUEST}
-  WINHTTP_CALLBACK_FLAG_RESOLVE_NAME = (WINHTTP_CALLBACK_STATUS_RESOLVING_NAME + WINHTTP_CALLBACK_STATUS_NAME_RESOLVED);
+
+
+  WINHTTP_CALLBACK_FLAG_RESOLVE_NAME = WINHTTP_CALLBACK_STATUS_RESOLVING_NAME or WINHTTP_CALLBACK_STATUS_NAME_RESOLVED;
   {$EXTERNALSYM WINHTTP_CALLBACK_FLAG_RESOLVE_NAME}
-  WINHTTP_CALLBACK_FLAG_CONNECT_TO_SERVER = (WINHTTP_CALLBACK_STATUS_CONNECTING_TO_SERVER + WINHTTP_CALLBACK_STATUS_CONNECTED_TO_SERVER);
+  WINHTTP_CALLBACK_FLAG_CONNECT_TO_SERVER = WINHTTP_CALLBACK_STATUS_CONNECTING_TO_SERVER or WINHTTP_CALLBACK_STATUS_CONNECTED_TO_SERVER;
   {$EXTERNALSYM WINHTTP_CALLBACK_FLAG_CONNECT_TO_SERVER}
-  WINHTTP_CALLBACK_FLAG_SEND_REQUEST = (WINHTTP_CALLBACK_STATUS_SENDING_REQUEST + WINHTTP_CALLBACK_STATUS_REQUEST_SENT);
+  WINHTTP_CALLBACK_FLAG_SEND_REQUEST = WINHTTP_CALLBACK_STATUS_SENDING_REQUEST or WINHTTP_CALLBACK_STATUS_REQUEST_SENT;
   {$EXTERNALSYM WINHTTP_CALLBACK_FLAG_SEND_REQUEST}
-  WINHTTP_CALLBACK_FLAG_RECEIVE_RESPONSE = (WINHTTP_CALLBACK_STATUS_RECEIVING_RESPONSE + WINHTTP_CALLBACK_STATUS_RESPONSE_RECEIVED);
+  WINHTTP_CALLBACK_FLAG_RECEIVE_RESPONSE = WINHTTP_CALLBACK_STATUS_RECEIVING_RESPONSE or WINHTTP_CALLBACK_STATUS_RESPONSE_RECEIVED;
   {$EXTERNALSYM WINHTTP_CALLBACK_FLAG_RECEIVE_RESPONSE}
-  WINHTTP_CALLBACK_FLAG_CLOSE_CONNECTION = (WINHTTP_CALLBACK_STATUS_CLOSING_CONNECTION + WINHTTP_CALLBACK_STATUS_CONNECTION_CLOSED);
+  WINHTTP_CALLBACK_FLAG_CLOSE_CONNECTION = WINHTTP_CALLBACK_STATUS_CLOSING_CONNECTION or WINHTTP_CALLBACK_STATUS_CONNECTION_CLOSED;
   {$EXTERNALSYM WINHTTP_CALLBACK_FLAG_CLOSE_CONNECTION}
-  WINHTTP_CALLBACK_FLAG_HANDLES = (WINHTTP_CALLBACK_STATUS_HANDLE_CREATED + WINHTTP_CALLBACK_STATUS_HANDLE_CLOSING);
+  WINHTTP_CALLBACK_FLAG_HANDLES = WINHTTP_CALLBACK_STATUS_HANDLE_CREATED or WINHTTP_CALLBACK_STATUS_HANDLE_CLOSING;
   {$EXTERNALSYM WINHTTP_CALLBACK_FLAG_HANDLES}
   WINHTTP_CALLBACK_FLAG_DETECTING_PROXY = WINHTTP_CALLBACK_STATUS_DETECTING_PROXY;
   {$EXTERNALSYM WINHTTP_CALLBACK_FLAG_DETECTING_PROXY}
@@ -446,12 +854,37 @@ const
   {$EXTERNALSYM WINHTTP_CALLBACK_FLAG_WRITE_COMPLETE}
   WINHTTP_CALLBACK_FLAG_REQUEST_ERROR = WINHTTP_CALLBACK_STATUS_REQUEST_ERROR;
   {$EXTERNALSYM WINHTTP_CALLBACK_FLAG_REQUEST_ERROR}
-  WINHTTP_CALLBACK_FLAG_ALL_COMPLETIONS = (WINHTTP_CALLBACK_STATUS_SENDREQUEST_COMPLETE + WINHTTP_CALLBACK_STATUS_HEADERS_AVAILABLE + WINHTTP_CALLBACK_STATUS_DATA_AVAILABLE + WINHTTP_CALLBACK_STATUS_READ_COMPLETE + WINHTTP_CALLBACK_STATUS_WRITE_COMPLETE + WINHTTP_CALLBACK_STATUS_REQUEST_ERROR);
+
+
+  WINHTTP_CALLBACK_FLAG_ALL_COMPLETIONS = WINHTTP_CALLBACK_STATUS_SENDREQUEST_COMPLETE
+                                                        or WINHTTP_CALLBACK_STATUS_HEADERS_AVAILABLE
+                                                        or WINHTTP_CALLBACK_STATUS_DATA_AVAILABLE
+                                                        or WINHTTP_CALLBACK_STATUS_READ_COMPLETE
+                                                        or WINHTTP_CALLBACK_STATUS_WRITE_COMPLETE
+                                                        or WINHTTP_CALLBACK_STATUS_REQUEST_ERROR;
   {$EXTERNALSYM WINHTTP_CALLBACK_FLAG_ALL_COMPLETIONS}
   WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS = $ffffffff;
   {$EXTERNALSYM WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS}
-  WINHTTP_INVALID_STATUS_CALLBACK = (-1);
+
+
+{ if the following value is returned by WinHttpSetStatusCallback, then }
+{ probably an invalid (non-code) address was supplied for the callback }
+
+
+  WINHTTP_INVALID_STATUS_CALLBACK: TWinHttpStatusCallback = Pointer(-1);
   {$EXTERNALSYM WINHTTP_INVALID_STATUS_CALLBACK}
+
+
+
+{ WinHttpQueryHeaders info levels. Generally, there is one info level }
+{ for each potential RFC822/HTTP/MIME header that an HTTP server }
+{ may send as part of a request response. }
+
+{ The WINHTTP_QUERY_RAW_HEADERS info level is provided for clients }
+{ that choose to perform their own header parsing. }
+
+
+
   WINHTTP_QUERY_MIME_VERSION = 0;
   {$EXTERNALSYM WINHTTP_QUERY_MIME_VERSION}
   WINHTTP_QUERY_CONTENT_TYPE = 1;
@@ -488,15 +921,15 @@ const
   {$EXTERNALSYM WINHTTP_QUERY_LINK}
   WINHTTP_QUERY_PRAGMA = 17;
   {$EXTERNALSYM WINHTTP_QUERY_PRAGMA}
-  WINHTTP_QUERY_VERSION = 18;
+  WINHTTP_QUERY_VERSION = 18;                      { special: part of status line }
   {$EXTERNALSYM WINHTTP_QUERY_VERSION}
-  WINHTTP_QUERY_STATUS_CODE = 19;
+  WINHTTP_QUERY_STATUS_CODE = 19;                  { special: part of status line }
   {$EXTERNALSYM WINHTTP_QUERY_STATUS_CODE}
-  WINHTTP_QUERY_STATUS_TEXT = 20;
+  WINHTTP_QUERY_STATUS_TEXT = 20;                  { special: part of status line }
   {$EXTERNALSYM WINHTTP_QUERY_STATUS_TEXT}
-  WINHTTP_QUERY_RAW_HEADERS = 21;
+  WINHTTP_QUERY_RAW_HEADERS = 21;                  { special: all headers as ASCIIZ }
   {$EXTERNALSYM WINHTTP_QUERY_RAW_HEADERS}
-  WINHTTP_QUERY_RAW_HEADERS_CRLF = 22;
+  WINHTTP_QUERY_RAW_HEADERS_CRLF = 22;             { special: all headers }
   {$EXTERNALSYM WINHTTP_QUERY_RAW_HEADERS_CRLF}
   WINHTTP_QUERY_CONNECTION = 23;
   {$EXTERNALSYM WINHTTP_QUERY_CONNECTION}
@@ -542,12 +975,17 @@ const
   {$EXTERNALSYM WINHTTP_QUERY_SET_COOKIE}
   WINHTTP_QUERY_COOKIE = 44;
   {$EXTERNALSYM WINHTTP_QUERY_COOKIE}
-  WINHTTP_QUERY_REQUEST_METHOD = 45;
+  WINHTTP_QUERY_REQUEST_METHOD = 45;               { special: GET/POST etc. }
   {$EXTERNALSYM WINHTTP_QUERY_REQUEST_METHOD}
   WINHTTP_QUERY_REFRESH = 46;
   {$EXTERNALSYM WINHTTP_QUERY_REFRESH}
   WINHTTP_QUERY_CONTENT_DISPOSITION = 47;
   {$EXTERNALSYM WINHTTP_QUERY_CONTENT_DISPOSITION}
+
+
+{ HTTP 1.1 defined headers }
+
+
   WINHTTP_QUERY_AGE = 48;
   {$EXTERNALSYM WINHTTP_QUERY_AGE}
   WINHTTP_QUERY_CACHE_CONTROL = 49;
@@ -594,6 +1032,9 @@ const
   {$EXTERNALSYM WINHTTP_QUERY_PROXY_CONNECTION}
   WINHTTP_QUERY_UNLESS_MODIFIED_SINCE = 70;
   {$EXTERNALSYM WINHTTP_QUERY_UNLESS_MODIFIED_SINCE}
+
+
+
   WINHTTP_QUERY_PROXY_SUPPORT = 75;
   {$EXTERNALSYM WINHTTP_QUERY_PROXY_SUPPORT}
   WINHTTP_QUERY_AUTHENTICATION_INFO = 76;
@@ -602,366 +1043,467 @@ const
   {$EXTERNALSYM WINHTTP_QUERY_PASSPORT_URLS}
   WINHTTP_QUERY_PASSPORT_CONFIG = 78;
   {$EXTERNALSYM WINHTTP_QUERY_PASSPORT_CONFIG}
+
   WINHTTP_QUERY_MAX = 78;
   {$EXTERNALSYM WINHTTP_QUERY_MAX}
+
+
+{ WINHTTP_QUERY_CUSTOM - if this special value is supplied as the dwInfoLevel }
+{ parameter of WinHttpQueryHeaders() then the lpBuffer parameter contains the name }
+{ of the header we are to query }
+
+
   WINHTTP_QUERY_CUSTOM = 65535;
   {$EXTERNALSYM WINHTTP_QUERY_CUSTOM}
+
+
+{ WINHTTP_QUERY_FLAG_REQUEST_HEADERS - if this bit is set in the dwInfoLevel }
+{ parameter of WinHttpQueryHeaders() then the request headers will be queried for the }
+{ request information }
+
+
   WINHTTP_QUERY_FLAG_REQUEST_HEADERS = $80000000;
   {$EXTERNALSYM WINHTTP_QUERY_FLAG_REQUEST_HEADERS}
+
+
+{ WINHTTP_QUERY_FLAG_SYSTEMTIME - if this bit is set in the dwInfoLevel parameter }
+{ of WinHttpQueryHeaders() AND the header being queried contains date information, }
+{ e.g. the "Expires:" header then lpBuffer will contain a SYSTEMTIME structure }
+{ containing the date and time information converted from the header string }
+
+
   WINHTTP_QUERY_FLAG_SYSTEMTIME = $40000000;
   {$EXTERNALSYM WINHTTP_QUERY_FLAG_SYSTEMTIME}
+
+
+{ WINHTTP_QUERY_FLAG_NUMBER - if this bit is set in the dwInfoLevel parameter of }
+{ HttpQueryHeader(), then the value of the header will be converted to a number }
+{ before being returned to the caller, if applicable }
+
+
   WINHTTP_QUERY_FLAG_NUMBER = $20000000;
   {$EXTERNALSYM WINHTTP_QUERY_FLAG_NUMBER}
-  HTTP_STATUS_CONTINUE = 100;
+
+
+
+
+{ HTTP Response Status Codes: }
+
+
+  HTTP_STATUS_CONTINUE = 100;           { OK to continue with request }
   {$EXTERNALSYM HTTP_STATUS_CONTINUE}
-  HTTP_STATUS_SWITCH_PROTOCOLS = 101;
+  HTTP_STATUS_SWITCH_PROTOCOLS = 101;   { server has switched protocols in upgrade header }
   {$EXTERNALSYM HTTP_STATUS_SWITCH_PROTOCOLS}
-  HTTP_STATUS_OK = 200;
+
+  HTTP_STATUS_OK = 200;                 { request completed }
   {$EXTERNALSYM HTTP_STATUS_OK}
-  HTTP_STATUS_CREATED = 201;
+  HTTP_STATUS_CREATED = 201;            { object created, reason = new URI }
   {$EXTERNALSYM HTTP_STATUS_CREATED}
-  HTTP_STATUS_ACCEPTED = 202;
+  HTTP_STATUS_ACCEPTED = 202;           { async completion (TBS) }
   {$EXTERNALSYM HTTP_STATUS_ACCEPTED}
-  HTTP_STATUS_PARTIAL = 203;
+  HTTP_STATUS_PARTIAL = 203;            { partial completion }
   {$EXTERNALSYM HTTP_STATUS_PARTIAL}
-  HTTP_STATUS_NO_CONTENT = 204;
+  HTTP_STATUS_NO_CONTENT = 204;         { no info to return }
   {$EXTERNALSYM HTTP_STATUS_NO_CONTENT}
-  HTTP_STATUS_RESET_CONTENT = 205;
+  HTTP_STATUS_RESET_CONTENT = 205;      { request completed, but clear form }
   {$EXTERNALSYM HTTP_STATUS_RESET_CONTENT}
-  HTTP_STATUS_PARTIAL_CONTENT = 206;
+  HTTP_STATUS_PARTIAL_CONTENT = 206;    { partial GET fulfilled }
   {$EXTERNALSYM HTTP_STATUS_PARTIAL_CONTENT}
-  HTTP_STATUS_WEBDAV_MULTI_STATUS = 207;
+  HTTP_STATUS_WEBDAV_MULTI_STATUS = 207; { WebDAV Multi-Status }
   {$EXTERNALSYM HTTP_STATUS_WEBDAV_MULTI_STATUS}
-  HTTP_STATUS_AMBIGUOUS = 300;
+
+  HTTP_STATUS_AMBIGUOUS = 300;          { server couldn't decide what to return }
   {$EXTERNALSYM HTTP_STATUS_AMBIGUOUS}
-  HTTP_STATUS_MOVED = 301;
+  HTTP_STATUS_MOVED = 301;              { object permanently moved }
   {$EXTERNALSYM HTTP_STATUS_MOVED}
-  HTTP_STATUS_REDIRECT = 302;
+  HTTP_STATUS_REDIRECT = 302;           { object temporarily moved }
   {$EXTERNALSYM HTTP_STATUS_REDIRECT}
-  HTTP_STATUS_REDIRECT_METHOD = 303;
+  HTTP_STATUS_REDIRECT_METHOD = 303;    { redirection w/ new access method }
   {$EXTERNALSYM HTTP_STATUS_REDIRECT_METHOD}
-  HTTP_STATUS_NOT_MODIFIED = 304;
+  HTTP_STATUS_NOT_MODIFIED = 304;       { if-modified-since was not modified }
   {$EXTERNALSYM HTTP_STATUS_NOT_MODIFIED}
-  HTTP_STATUS_USE_PROXY = 305;
+  HTTP_STATUS_USE_PROXY = 305;          { redirection to proxy, location header specifies proxy to use }
   {$EXTERNALSYM HTTP_STATUS_USE_PROXY}
-  HTTP_STATUS_REDIRECT_KEEP_VERB = 307;
+  HTTP_STATUS_REDIRECT_KEEP_VERB = 307; { HTTP/1.1: keep same verb }
   {$EXTERNALSYM HTTP_STATUS_REDIRECT_KEEP_VERB}
-  HTTP_STATUS_BAD_REQUEST = 400;
+
+  HTTP_STATUS_BAD_REQUEST = 400;        { invalid syntax }
   {$EXTERNALSYM HTTP_STATUS_BAD_REQUEST}
-  HTTP_STATUS_DENIED = 401;
+  HTTP_STATUS_DENIED = 401;             { access denied }
   {$EXTERNALSYM HTTP_STATUS_DENIED}
-  HTTP_STATUS_PAYMENT_REQ = 402;
+  HTTP_STATUS_PAYMENT_REQ = 402;        { payment required }
   {$EXTERNALSYM HTTP_STATUS_PAYMENT_REQ}
-  HTTP_STATUS_FORBIDDEN = 403;
+  HTTP_STATUS_FORBIDDEN = 403;          { request forbidden }
   {$EXTERNALSYM HTTP_STATUS_FORBIDDEN}
-  HTTP_STATUS_NOT_FOUND = 404;
+  HTTP_STATUS_NOT_FOUND = 404;          { object not found }
   {$EXTERNALSYM HTTP_STATUS_NOT_FOUND}
-  HTTP_STATUS_BAD_METHOD = 405;
+  HTTP_STATUS_BAD_METHOD = 405;         { method is not allowed }
   {$EXTERNALSYM HTTP_STATUS_BAD_METHOD}
-  HTTP_STATUS_NONE_ACCEPTABLE = 406;
+  HTTP_STATUS_NONE_ACCEPTABLE = 406;    { no response acceptable to client found }
   {$EXTERNALSYM HTTP_STATUS_NONE_ACCEPTABLE}
-  HTTP_STATUS_PROXY_AUTH_REQ = 407;
+  HTTP_STATUS_PROXY_AUTH_REQ = 407;     { proxy authentication required }
   {$EXTERNALSYM HTTP_STATUS_PROXY_AUTH_REQ}
-  HTTP_STATUS_REQUEST_TIMEOUT = 408;
+  HTTP_STATUS_REQUEST_TIMEOUT = 408;    { server timed out waiting for request }
   {$EXTERNALSYM HTTP_STATUS_REQUEST_TIMEOUT}
-  HTTP_STATUS_CONFLICT = 409;
+  HTTP_STATUS_CONFLICT = 409;           { user should resubmit with more info }
   {$EXTERNALSYM HTTP_STATUS_CONFLICT}
-  HTTP_STATUS_GONE = 410;
+  HTTP_STATUS_GONE = 410;               { the resource is no longer available }
   {$EXTERNALSYM HTTP_STATUS_GONE}
-  HTTP_STATUS_LENGTH_REQUIRED = 411;
+  HTTP_STATUS_LENGTH_REQUIRED = 411;    { the server refused to accept request w/o a length }
   {$EXTERNALSYM HTTP_STATUS_LENGTH_REQUIRED}
-  HTTP_STATUS_PRECOND_FAILED = 412;
+  HTTP_STATUS_PRECOND_FAILED = 412;     { precondition given in request failed }
   {$EXTERNALSYM HTTP_STATUS_PRECOND_FAILED}
-  HTTP_STATUS_REQUEST_TOO_LARGE = 413;
+  HTTP_STATUS_REQUEST_TOO_LARGE = 413;  { request entity was too large }
   {$EXTERNALSYM HTTP_STATUS_REQUEST_TOO_LARGE}
-  HTTP_STATUS_URI_TOO_LONG = 414;
+  HTTP_STATUS_URI_TOO_LONG = 414;       { request URI too long }
   {$EXTERNALSYM HTTP_STATUS_URI_TOO_LONG}
-  HTTP_STATUS_UNSUPPORTED_MEDIA = 415;
+  HTTP_STATUS_UNSUPPORTED_MEDIA = 415;  { unsupported media type }
   {$EXTERNALSYM HTTP_STATUS_UNSUPPORTED_MEDIA}
-  HTTP_STATUS_RETRY_WITH = 449;
+  HTTP_STATUS_RETRY_WITH = 449;         { retry after doing the appropriate action. }
   {$EXTERNALSYM HTTP_STATUS_RETRY_WITH}
-  HTTP_STATUS_SERVER_ERROR = 500;
+
+  HTTP_STATUS_SERVER_ERROR = 500;       { internal server error }
   {$EXTERNALSYM HTTP_STATUS_SERVER_ERROR}
-  HTTP_STATUS_NOT_SUPPORTED = 501;
+  HTTP_STATUS_NOT_SUPPORTED = 501;      { required not supported }
   {$EXTERNALSYM HTTP_STATUS_NOT_SUPPORTED}
-  HTTP_STATUS_BAD_GATEWAY = 502;
+  HTTP_STATUS_BAD_GATEWAY = 502;        { error response received from gateway }
   {$EXTERNALSYM HTTP_STATUS_BAD_GATEWAY}
-  HTTP_STATUS_SERVICE_UNAVAIL = 503;
+  HTTP_STATUS_SERVICE_UNAVAIL = 503;    { temporarily overloaded }
   {$EXTERNALSYM HTTP_STATUS_SERVICE_UNAVAIL}
-  HTTP_STATUS_GATEWAY_TIMEOUT = 504;
+  HTTP_STATUS_GATEWAY_TIMEOUT = 504;    { timed out waiting for gateway }
   {$EXTERNALSYM HTTP_STATUS_GATEWAY_TIMEOUT}
-  HTTP_STATUS_VERSION_NOT_SUP = 505;
+  HTTP_STATUS_VERSION_NOT_SUP = 505;    { HTTP version not supported }
   {$EXTERNALSYM HTTP_STATUS_VERSION_NOT_SUP}
+
   HTTP_STATUS_FIRST = HTTP_STATUS_CONTINUE;
   {$EXTERNALSYM HTTP_STATUS_FIRST}
   HTTP_STATUS_LAST = HTTP_STATUS_VERSION_NOT_SUP;
   {$EXTERNALSYM HTTP_STATUS_LAST}
+
+
+{ prototypes }
+
+
+function WinHttpOpenRequest(hConnect: HINTERNET; pwszVerb: LPCWSTR; pwszObjectName: LPCWSTR; pwszVersion: LPCWSTR;
+  pwszReferrer: LPCWSTR; ppwszAcceptTypes: PLPWSTR; dwFlags: DWORD): HINTERNET; stdcall;
+{$EXTERNALSYM WinHttpOpenRequest}
+
+{ WinHttpOpenRequest prettifers for optional parameters }
+const
   WINHTTP_NO_REFERER = nil;
   {$EXTERNALSYM WINHTTP_NO_REFERER}
   WINHTTP_DEFAULT_ACCEPT_TYPES = nil;
   {$EXTERNALSYM WINHTTP_DEFAULT_ACCEPT_TYPES}
+
+function WinHttpAddRequestHeaders(hRequest: HINTERNET; pwszHeaders: LPCWSTR; dwHeadersLength: DWORD;
+  dwModifiers: DWORD): BOOL; stdcall;
+{$EXTERNALSYM WinHttpAddRequestHeaders}
+
+
+{ values for dwModifiers parameter of WinHttpAddRequestHeaders() }
+
+
+const
   WINHTTP_ADDREQ_INDEX_MASK = $0000FFFF;
   {$EXTERNALSYM WINHTTP_ADDREQ_INDEX_MASK}
   WINHTTP_ADDREQ_FLAGS_MASK = $FFFF0000;
   {$EXTERNALSYM WINHTTP_ADDREQ_FLAGS_MASK}
+
+
+{ WINHTTP_ADDREQ_FLAG_ADD_IF_NEW - the header will only be added if it doesn't }
+{ already exist }
+
+
   WINHTTP_ADDREQ_FLAG_ADD_IF_NEW = $10000000;
   {$EXTERNALSYM WINHTTP_ADDREQ_FLAG_ADD_IF_NEW}
+
+
+{ WINHTTP_ADDREQ_FLAG_ADD - if WINHTTP_ADDREQ_FLAG_REPLACE is set but the header is }
+{ not found then if this flag is set, the header is added anyway, so long as }
+{ there is a valid header-value }
+
+
   WINHTTP_ADDREQ_FLAG_ADD = $20000000;
   {$EXTERNALSYM WINHTTP_ADDREQ_FLAG_ADD}
+
+
+{ WINHTTP_ADDREQ_FLAG_COALESCE - coalesce headers with same name. e.g. }
+{ "Accept: text/*" and "Accept: audio/*" with this flag results in a single }
+{ header: "Accept: text/*, audio/*" }
+
+
   WINHTTP_ADDREQ_FLAG_COALESCE_WITH_COMMA = $40000000;
   {$EXTERNALSYM WINHTTP_ADDREQ_FLAG_COALESCE_WITH_COMMA}
   WINHTTP_ADDREQ_FLAG_COALESCE_WITH_SEMICOLON = $01000000;
   {$EXTERNALSYM WINHTTP_ADDREQ_FLAG_COALESCE_WITH_SEMICOLON}
   WINHTTP_ADDREQ_FLAG_COALESCE = WINHTTP_ADDREQ_FLAG_COALESCE_WITH_COMMA;
   {$EXTERNALSYM WINHTTP_ADDREQ_FLAG_COALESCE}
+
+
+{ WINHTTP_ADDREQ_FLAG_REPLACE - replaces the specified header. Only one header can }
+{ be supplied in the buffer. If the header to be replaced is not the first }
+{ in a list of headers with the same name, then the relative index should be }
+{ supplied in the low 8 bits of the dwModifiers parameter. If the header-value }
+{ part is missing, then the header is removed }
+
+
   WINHTTP_ADDREQ_FLAG_REPLACE = $80000000;
   {$EXTERNALSYM WINHTTP_ADDREQ_FLAG_REPLACE}
+
+  WINHTTP_IGNORE_REQUEST_TOTAL_LENGTH = 0;
+  {$EXTERNALSYM WINHTTP_IGNORE_REQUEST_TOTAL_LENGTH}
+
+function WinHttpSendRequest(hRequest: HINTERNET; lpszHeaders: LPCWSTR;
+  dwHeadersLength: DWORD; lpOptional: Pointer; dwOptionalLength: DWORD;
+  dwTotalLength: DWORD; dwContext: DWORD_PTR): BOOL; stdcall;
+{$EXTERNALSYM WinHttpSendRequest}
+
+{ WinHttpSendRequest prettifiers for optional parameters. }
+const
   WINHTTP_NO_ADDITIONAL_HEADERS = nil;
   {$EXTERNALSYM WINHTTP_NO_ADDITIONAL_HEADERS}
   WINHTTP_NO_REQUEST_DATA = nil;
   {$EXTERNALSYM WINHTTP_NO_REQUEST_DATA}
+
+
+function WinHttpSetCredentials(hRequest: HINTERNET; AuthTargets: DWORD; AuthScheme: DWORD; pwszUserName: LPCWSTR;
+  pwszPassword: LPCWSTR; pAuthParams: Pointer): BOOL; stdcall;
+{$EXTERNALSYM WinHttpSetCredentials}
+
+
+function WinHttpQueryAuthSchemes(hRequest: HINTERNET; out lpdwSupportedSchemes: DWORD; out lpdwFirstScheme: DWORD;
+  out pdwAuthTarget: DWORD): BOOL; stdcall;
+{$EXTERNALSYM WinHttpQueryAuthSchemes}
+
+function WinHttpQueryAuthParams(hRequest: HINTERNET; AuthScheme: DWORD; out pAuthParams: Pointer): BOOL; stdcall;
+{$EXTERNALSYM WinHttpQueryAuthParams}
+
+
+function WinHttpReceiveResponse(hRequest: HINTERNET; lpReserved: Pointer): BOOL; stdcall;
+{$EXTERNALSYM WinHttpReceiveResponse}
+
+function WinHttpQueryHeaders(hRequest: HINTERNET; dwInfoLevel: DWORD; pwszName: LPCWSTR; lpBuffer: Pointer;
+  var lpdwBufferLength: DWORD; lpdwIndex: LPDWORD): BOOL; stdcall;
+{$EXTERNALSYM WinHttpQueryHeaders}
+
+{ WinHttpQueryHeaders prettifiers for optional parameters. }
+const
   WINHTTP_HEADER_NAME_BY_INDEX = nil;
   {$EXTERNALSYM WINHTTP_HEADER_NAME_BY_INDEX}
   WINHTTP_NO_OUTPUT_BUFFER = nil;
   {$EXTERNALSYM WINHTTP_NO_OUTPUT_BUFFER}
   WINHTTP_NO_HEADER_INDEX = nil;
   {$EXTERNALSYM WINHTTP_NO_HEADER_INDEX}
+
+
+function WinHttpDetectAutoProxyConfigUrl(dwAutoDetectFlags: DWORD; ppwstrAutoConfigUrl: PLPWSTR): BOOL; stdcall;
+{$EXTERNALSYM WinHttpDetectAutoProxyConfigUrl}
+
+
+{
+Warning:
+pProxyInfo param is a pointer to a WINHTTP_PROXY_INFO(TWinHttpProxyInfo) structure that receives the proxy setting.
+This structure is then applied to the request handle using the WINHTTP_OPTION_PROXY(TWinHttpProxyInfo) option.
+Free the lpszProxy and lpszProxyBypass strings contained in this structure (if they are non-NULL)
+using the GlobalFree function.
+}
+function WinHttpGetProxyForUrl(hSession: HINTERNET; lpcwszUrl: LPCWSTR; var pAutoProxyOptions: TWinHttpAutoProxyOptions;
+  var pProxyInfo: TWinHttpProxyInfo): BOOL; stdcall;
+{$EXTERNALSYM WinHttpGetProxyForUrl}
+
+
+type
+  WINHTTP_CURRENT_USER_IE_PROXY_CONFIG = record
+    fAutoDetect: BOOL;
+    lpszAutoConfigUrl: LPWSTR;
+    lpszProxy: LPWSTR;
+    lpszProxyBypass: LPWSTR;
+  end;
+  {$EXTERNALSYM WINHTTP_CURRENT_USER_IE_PROXY_CONFIG}
+  PWINHTTP_CURRENT_USER_IE_PROXY_CONFIG = ^WINHTTP_CURRENT_USER_IE_PROXY_CONFIG;
+  TWinHttpCurrentUserIEProxyConfig = WINHTTP_CURRENT_USER_IE_PROXY_CONFIG;
+  PWinHttpCurrentUserIEProxyConfig = ^TWinHttpCurrentUserIEProxyConfig;
+
+
+function WinHttpGetIEProxyConfigForCurrentUser(var pProxyConfig: TWinHttpCurrentUserIEProxyConfig): BOOL; stdcall;
+{$EXTERNALSYM WinHttpGetIEProxyConfigForCurrentUser}
+
+
+
+{ WinHttp API error returns }
+
+
+const
   WINHTTP_ERROR_BASE = 12000;
   {$EXTERNALSYM WINHTTP_ERROR_BASE}
-  ERROR_WINHTTP_OUT_OF_HANDLES = (WINHTTP_ERROR_BASE + 1);
+
+  ERROR_WINHTTP_OUT_OF_HANDLES = WINHTTP_ERROR_BASE + 1;
   {$EXTERNALSYM ERROR_WINHTTP_OUT_OF_HANDLES}
-  ERROR_WINHTTP_TIMEOUT = (WINHTTP_ERROR_BASE + 2);
+  ERROR_WINHTTP_TIMEOUT = WINHTTP_ERROR_BASE + 2;
   {$EXTERNALSYM ERROR_WINHTTP_TIMEOUT}
-  ERROR_WINHTTP_INTERNAL_ERROR = (WINHTTP_ERROR_BASE + 4);
+  ERROR_WINHTTP_INTERNAL_ERROR = WINHTTP_ERROR_BASE + 4;
   {$EXTERNALSYM ERROR_WINHTTP_INTERNAL_ERROR}
-  ERROR_WINHTTP_INVALID_URL = (WINHTTP_ERROR_BASE + 5);
+  ERROR_WINHTTP_INVALID_URL = WINHTTP_ERROR_BASE + 5;
   {$EXTERNALSYM ERROR_WINHTTP_INVALID_URL}
-  ERROR_WINHTTP_UNRECOGNIZED_SCHEME = (WINHTTP_ERROR_BASE + 6);
+  ERROR_WINHTTP_UNRECOGNIZED_SCHEME = WINHTTP_ERROR_BASE + 6;
   {$EXTERNALSYM ERROR_WINHTTP_UNRECOGNIZED_SCHEME}
-  ERROR_WINHTTP_NAME_NOT_RESOLVED = (WINHTTP_ERROR_BASE + 7);
+  ERROR_WINHTTP_NAME_NOT_RESOLVED = WINHTTP_ERROR_BASE + 7;
   {$EXTERNALSYM ERROR_WINHTTP_NAME_NOT_RESOLVED}
-  ERROR_WINHTTP_INVALID_OPTION = (WINHTTP_ERROR_BASE + 9);
+  ERROR_WINHTTP_INVALID_OPTION = WINHTTP_ERROR_BASE + 9;
   {$EXTERNALSYM ERROR_WINHTTP_INVALID_OPTION}
-  ERROR_WINHTTP_OPTION_NOT_SETTABLE = (WINHTTP_ERROR_BASE + 11);
+  ERROR_WINHTTP_OPTION_NOT_SETTABLE = WINHTTP_ERROR_BASE + 11;
   {$EXTERNALSYM ERROR_WINHTTP_OPTION_NOT_SETTABLE}
-  ERROR_WINHTTP_SHUTDOWN = (WINHTTP_ERROR_BASE + 12);
+  ERROR_WINHTTP_SHUTDOWN = WINHTTP_ERROR_BASE + 12;
   {$EXTERNALSYM ERROR_WINHTTP_SHUTDOWN}
-  ERROR_WINHTTP_LOGIN_FAILURE = (WINHTTP_ERROR_BASE + 15);
+
+
+  ERROR_WINHTTP_LOGIN_FAILURE = WINHTTP_ERROR_BASE + 15;
   {$EXTERNALSYM ERROR_WINHTTP_LOGIN_FAILURE}
-  ERROR_WINHTTP_OPERATION_CANCELLED = (WINHTTP_ERROR_BASE + 17);
+  ERROR_WINHTTP_OPERATION_CANCELLED = WINHTTP_ERROR_BASE + 17;
   {$EXTERNALSYM ERROR_WINHTTP_OPERATION_CANCELLED}
-  ERROR_WINHTTP_INCORRECT_HANDLE_TYPE = (WINHTTP_ERROR_BASE + 18);
+  ERROR_WINHTTP_INCORRECT_HANDLE_TYPE = WINHTTP_ERROR_BASE + 18;
   {$EXTERNALSYM ERROR_WINHTTP_INCORRECT_HANDLE_TYPE}
-  ERROR_WINHTTP_INCORRECT_HANDLE_STATE = (WINHTTP_ERROR_BASE + 19);
+  ERROR_WINHTTP_INCORRECT_HANDLE_STATE = WINHTTP_ERROR_BASE + 19;
   {$EXTERNALSYM ERROR_WINHTTP_INCORRECT_HANDLE_STATE}
-  ERROR_WINHTTP_CANNOT_CONNECT = (WINHTTP_ERROR_BASE + 29);
+  ERROR_WINHTTP_CANNOT_CONNECT = WINHTTP_ERROR_BASE + 29;
   {$EXTERNALSYM ERROR_WINHTTP_CANNOT_CONNECT}
-  ERROR_WINHTTP_CONNECTION_ERROR = (WINHTTP_ERROR_BASE + 30);
+  ERROR_WINHTTP_CONNECTION_ERROR = WINHTTP_ERROR_BASE + 30;
   {$EXTERNALSYM ERROR_WINHTTP_CONNECTION_ERROR}
-  ERROR_WINHTTP_RESEND_REQUEST = (WINHTTP_ERROR_BASE + 32);
+  ERROR_WINHTTP_RESEND_REQUEST = WINHTTP_ERROR_BASE + 32;
   {$EXTERNALSYM ERROR_WINHTTP_RESEND_REQUEST}
-  ERROR_WINHTTP_CLIENT_AUTH_CERT_NEEDED = (WINHTTP_ERROR_BASE + 44);
+
+  ERROR_WINHTTP_CLIENT_AUTH_CERT_NEEDED = WINHTTP_ERROR_BASE + 44;
   {$EXTERNALSYM ERROR_WINHTTP_CLIENT_AUTH_CERT_NEEDED}
-  ERROR_WINHTTP_CANNOT_CALL_BEFORE_OPEN	= (WINHTTP_ERROR_BASE + 100);
-  {$EXTERNALSYM ERROR_WINHTTP_CANNOT_CALL_BEFORE_OPEN	=}
-  ERROR_WINHTTP_CANNOT_CALL_BEFORE_SEND	= (WINHTTP_ERROR_BASE + 101);
-  {$EXTERNALSYM ERROR_WINHTTP_CANNOT_CALL_BEFORE_SEND	=}
-  ERROR_WINHTTP_CANNOT_CALL_AFTER_SEND = (WINHTTP_ERROR_BASE + 102);
+
+
+{ WinHttpRequest Component errors }
+
+  ERROR_WINHTTP_CANNOT_CALL_BEFORE_OPEN = WINHTTP_ERROR_BASE + 100;
+  {$EXTERNALSYM ERROR_WINHTTP_CANNOT_CALL_BEFORE_OPEN}
+  ERROR_WINHTTP_CANNOT_CALL_BEFORE_SEND = WINHTTP_ERROR_BASE + 101;
+  {$EXTERNALSYM ERROR_WINHTTP_CANNOT_CALL_BEFORE_SEND}
+  ERROR_WINHTTP_CANNOT_CALL_AFTER_SEND = WINHTTP_ERROR_BASE + 102;
   {$EXTERNALSYM ERROR_WINHTTP_CANNOT_CALL_AFTER_SEND}
-  ERROR_WINHTTP_CANNOT_CALL_AFTER_OPEN = (WINHTTP_ERROR_BASE + 103);
+  ERROR_WINHTTP_CANNOT_CALL_AFTER_OPEN = WINHTTP_ERROR_BASE + 103;
   {$EXTERNALSYM ERROR_WINHTTP_CANNOT_CALL_AFTER_OPEN}
-  ERROR_WINHTTP_HEADER_NOT_FOUND = (WINHTTP_ERROR_BASE + 150);
+
+
+
+{ HTTP API errors }
+
+
+  ERROR_WINHTTP_HEADER_NOT_FOUND = WINHTTP_ERROR_BASE + 150;
   {$EXTERNALSYM ERROR_WINHTTP_HEADER_NOT_FOUND}
-  ERROR_WINHTTP_INVALID_SERVER_RESPONSE = (WINHTTP_ERROR_BASE + 152);
+  ERROR_WINHTTP_INVALID_SERVER_RESPONSE = WINHTTP_ERROR_BASE + 152;
   {$EXTERNALSYM ERROR_WINHTTP_INVALID_SERVER_RESPONSE}
-  ERROR_WINHTTP_INVALID_QUERY_REQUEST = (WINHTTP_ERROR_BASE + 154);
+  ERROR_WINHTTP_INVALID_HEADER = WINHTTP_ERROR_BASE + 153;
+  {$EXTERNALSYM ERROR_WINHTTP_INVALID_HEADER}
+  ERROR_WINHTTP_INVALID_QUERY_REQUEST = WINHTTP_ERROR_BASE + 154;
   {$EXTERNALSYM ERROR_WINHTTP_INVALID_QUERY_REQUEST}
-  ERROR_WINHTTP_HEADER_ALREADY_EXISTS = (WINHTTP_ERROR_BASE + 155);
+  ERROR_WINHTTP_HEADER_ALREADY_EXISTS = WINHTTP_ERROR_BASE + 155;
   {$EXTERNALSYM ERROR_WINHTTP_HEADER_ALREADY_EXISTS}
-  ERROR_WINHTTP_REDIRECT_FAILED = (WINHTTP_ERROR_BASE + 156);
+  ERROR_WINHTTP_REDIRECT_FAILED = WINHTTP_ERROR_BASE + 156;
   {$EXTERNALSYM ERROR_WINHTTP_REDIRECT_FAILED}
-  ERROR_WINHTTP_AUTO_PROXY_SERVICE_ERROR = (WINHTTP_ERROR_BASE + 178);
+
+
+
+
+{ additional WinHttp API error codes }
+
+
+
+{ additional WinHttp API error codes }
+
+  ERROR_WINHTTP_AUTO_PROXY_SERVICE_ERROR = WINHTTP_ERROR_BASE + 178;
   {$EXTERNALSYM ERROR_WINHTTP_AUTO_PROXY_SERVICE_ERROR}
-  ERROR_WINHTTP_BAD_AUTO_PROXY_SCRIPT = (WINHTTP_ERROR_BASE + 166);
+  ERROR_WINHTTP_BAD_AUTO_PROXY_SCRIPT = WINHTTP_ERROR_BASE + 166;
   {$EXTERNALSYM ERROR_WINHTTP_BAD_AUTO_PROXY_SCRIPT}
-  ERROR_WINHTTP_UNABLE_TO_DOWNLOAD_SCRIPT = (WINHTTP_ERROR_BASE + 167);
+  ERROR_WINHTTP_UNABLE_TO_DOWNLOAD_SCRIPT = WINHTTP_ERROR_BASE + 167;
   {$EXTERNALSYM ERROR_WINHTTP_UNABLE_TO_DOWNLOAD_SCRIPT}
-  ERROR_WINHTTP_NOT_INITIALIZED = (WINHTTP_ERROR_BASE + 172);
+
+  ERROR_WINHTTP_NOT_INITIALIZED = WINHTTP_ERROR_BASE + 172;
   {$EXTERNALSYM ERROR_WINHTTP_NOT_INITIALIZED}
-  ERROR_WINHTTP_SECURE_FAILURE = (WINHTTP_ERROR_BASE + 175);
+  ERROR_WINHTTP_SECURE_FAILURE = WINHTTP_ERROR_BASE + 175;
   {$EXTERNALSYM ERROR_WINHTTP_SECURE_FAILURE}
-  ERROR_WINHTTP_SECURE_CERT_DATE_INVALID = (WINHTTP_ERROR_BASE + 37);
+
+
+
+{ Certificate security errors. These are raised only by the WinHttpRequest }
+{ component. The WinHTTP Win32 API will return ERROR_WINHTTP_SECURE_FAILE and }
+{ provide additional information via the WINHTTP_CALLBACK_STATUS_SECURE_FAILURE }
+{ callback notification. }
+
+  ERROR_WINHTTP_SECURE_CERT_DATE_INVALID = WINHTTP_ERROR_BASE + 37;
   {$EXTERNALSYM ERROR_WINHTTP_SECURE_CERT_DATE_INVALID}
-  ERROR_WINHTTP_SECURE_CERT_CN_INVALID = (WINHTTP_ERROR_BASE + 38);
+  ERROR_WINHTTP_SECURE_CERT_CN_INVALID = WINHTTP_ERROR_BASE + 38;
   {$EXTERNALSYM ERROR_WINHTTP_SECURE_CERT_CN_INVALID}
-  ERROR_WINHTTP_SECURE_INVALID_CA = (WINHTTP_ERROR_BASE + 45);
+  ERROR_WINHTTP_SECURE_INVALID_CA = WINHTTP_ERROR_BASE + 45;
   {$EXTERNALSYM ERROR_WINHTTP_SECURE_INVALID_CA}
-  ERROR_WINHTTP_SECURE_CERT_REV_FAILED = (WINHTTP_ERROR_BASE + 57);
+  ERROR_WINHTTP_SECURE_CERT_REV_FAILED = WINHTTP_ERROR_BASE + 57;
   {$EXTERNALSYM ERROR_WINHTTP_SECURE_CERT_REV_FAILED}
-  ERROR_WINHTTP_SECURE_CHANNEL_ERROR = (WINHTTP_ERROR_BASE + 157);
+  ERROR_WINHTTP_SECURE_CHANNEL_ERROR = WINHTTP_ERROR_BASE + 157;
   {$EXTERNALSYM ERROR_WINHTTP_SECURE_CHANNEL_ERROR}
-  ERROR_WINHTTP_SECURE_INVALID_CERT = (WINHTTP_ERROR_BASE + 169);
+  ERROR_WINHTTP_SECURE_INVALID_CERT = WINHTTP_ERROR_BASE + 169;
   {$EXTERNALSYM ERROR_WINHTTP_SECURE_INVALID_CERT}
-  ERROR_WINHTTP_SECURE_CERT_REVOKED = (WINHTTP_ERROR_BASE + 170);
+  ERROR_WINHTTP_SECURE_CERT_REVOKED = WINHTTP_ERROR_BASE + 170;
   {$EXTERNALSYM ERROR_WINHTTP_SECURE_CERT_REVOKED}
-  ERROR_WINHTTP_SECURE_CERT_WRONG_USAGE = (WINHTTP_ERROR_BASE + 179);
+  ERROR_WINHTTP_SECURE_CERT_WRONG_USAGE = WINHTTP_ERROR_BASE + 179;
   {$EXTERNALSYM ERROR_WINHTTP_SECURE_CERT_WRONG_USAGE}
-  ERROR_WINHTTP_AUTODETECTION_FAILED = (WINHTTP_ERROR_BASE + 180);
+
+
+  ERROR_WINHTTP_AUTODETECTION_FAILED = WINHTTP_ERROR_BASE + 180;
   {$EXTERNALSYM ERROR_WINHTTP_AUTODETECTION_FAILED}
-  ERROR_WINHTTP_HEADER_COUNT_EXCEEDED = (WINHTTP_ERROR_BASE + 181);
+  ERROR_WINHTTP_HEADER_COUNT_EXCEEDED = WINHTTP_ERROR_BASE + 181;
   {$EXTERNALSYM ERROR_WINHTTP_HEADER_COUNT_EXCEEDED}
-  ERROR_WINHTTP_HEADER_SIZE_OVERFLOW = (WINHTTP_ERROR_BASE + 182);
+  ERROR_WINHTTP_HEADER_SIZE_OVERFLOW = WINHTTP_ERROR_BASE + 182;
   {$EXTERNALSYM ERROR_WINHTTP_HEADER_SIZE_OVERFLOW}
-  ERROR_WINHTTP_CHUNKED_ENCODING_HEADER_SIZE_OVERFLOW = (WINHTTP_ERROR_BASE + 183);
+  ERROR_WINHTTP_CHUNKED_ENCODING_HEADER_SIZE_OVERFLOW = WINHTTP_ERROR_BASE + 183;
   {$EXTERNALSYM ERROR_WINHTTP_CHUNKED_ENCODING_HEADER_SIZE_OVERFLOW}
-  ERROR_WINHTTP_RESPONSE_DRAIN_OVERFLOW = (WINHTTP_ERROR_BASE + 184);
+  ERROR_WINHTTP_RESPONSE_DRAIN_OVERFLOW = WINHTTP_ERROR_BASE + 184;
   {$EXTERNALSYM ERROR_WINHTTP_RESPONSE_DRAIN_OVERFLOW}
-  WINHTTP_ERROR_LAST = (WINHTTP_ERROR_BASE + 184);
+  ERROR_WINHTTP_CLIENT_CERT_NO_PRIVATE_KEY = WINHTTP_ERROR_BASE + 185;
+  {$EXTERNALSYM ERROR_WINHTTP_CLIENT_CERT_NO_PRIVATE_KEY}
+  ERROR_WINHTTP_CLIENT_CERT_NO_ACCESS_PRIVATE_KEY = WINHTTP_ERROR_BASE + 186;
+  {$EXTERNALSYM ERROR_WINHTTP_CLIENT_CERT_NO_ACCESS_PRIVATE_KEY}
+
+  WINHTTP_ERROR_LAST = WINHTTP_ERROR_BASE + 186;
   {$EXTERNALSYM WINHTTP_ERROR_LAST}
-  WINHTTP_FLAG_NULL_CODEPAGE = $00000008;
-  {$EXTERNALSYM WINHTTP_FLAG_NULL_CODEPAGE}
 
-{ prototypes }
-
-function WinHttpQueryOption(hInet: HINTERNET; dwOption: DWORD;
-  lpBuffer: Pointer; var lpdwBufferLength: DWORD): BOOL; stdcall;
-  {$EXTERNALSYM WinHttpQueryOption}
-
-function WinHttpSetOption(hInet: HINTERNET; dwOption: DWORD;
-  lpBuffer: Pointer; dwBufferLength: DWORD): BOOL; stdcall;
-  {$EXTERNALSYM WinHttpSetOption}
-
-function WinHttpAddRequestHeaders(hRequest: HINTERNET;
-  pwszHeaders: PWideChar; dwHeadersLength: DWORD;
-  dwModifiers: DWORD): BOOL; stdcall;
-  {$EXTERNALSYM WinHttpAddRequestHeaders}
-
-function WinHttpCrackUrl(pwszUrl: PWideChar;
-  dwUrlLength, dwFlags: DWORD;
-  var lpUrlComponents: TURLComponents): BOOL; stdcall;
-  {$EXTERNALSYM WinHttpCrackUrl}
-
-function WinHttpCreateUrl(var lpUrlComponents: TURLComponents;
-  dwFlags: DWORD; pwszUrl: PWideChar;
-  var lpdwUrlLength: DWORD): BOOL; stdcall;
-  {$EXTERNALSYM WinHttpCreateUrl}
-
-function WinHttpDetectAutoProxyConfigUrl(dwAutoDetectFlags: DWORD;
-  var ppwszAutoConfigUrl: LPWSTR): BOOL; stdcall;
-  {$EXTERNALSYM WinHttpDetectAutoProxyConfigUrl}
-
-function WinHttpGetDefaultProxyConfiguration(
-  var pProxyInfo: TWINHTTP_PROXY_INFO): BOOL; stdcall;
-  {$EXTERNALSYM WinHttpGetDefaultProxyConfiguration}
-
-function WinHttpGetIEProxyConfigForCurrentUser(
-  var pProxyInfo: TWINHTTP_CURRENT_USER_IE_PROXY_CONFIG): BOOL; stdcall;
-  {$EXTERNALSYM WinHttpGetIEProxyConfigForCurrentUser}
-
-function WinHttpCheckPlatform: BOOL; stdcall;
-  {$EXTERNALSYM WinHttpCheckPlatform}
-
-function WinHttpOpen(pwszUserAgent: PWideChar; dwAccessType: DWORD;
-  pwszProxyName, pwszProxyBypass: PWideChar; dwFlags: DWORD): HINTERNET; stdcall;
-  {$EXTERNALSYM WinHttpOpen}
-
-function WinHttpSetTimeouts(hInternet: HINTERNET; dwResolveTimeout: Integer;
-  dwConnectTimeout: Integer; dwSendTimeout: Integer;
-  dwReceiveTimeout: Integer): BOOL; stdcall;
-  {$EXTERNALSYM WinHttpSetTimeouts}
-
-function WinHttpConnect(hSession: HINTERNET; pswzServerName: PWideChar;
-  nServerPort: INTERNET_PORT; dwReserved: DWORD): HINTERNET; stdcall;
-  {$EXTERNALSYM WinHttpConnect}
-
-function WinHttpOpenRequest(hConnect: HINTERNET; pwszVerb: PWideChar;
-  pwszObjectName: PWideChar; pwszVersion: PWideChar; pwszReferer: PWideChar;
-  ppwszAcceptTypes: PLPWSTR; dwFlags: DWORD): HINTERNET; stdcall;
-  {$EXTERNALSYM WinHttpOpenRequest}
-
-function WinHttpQueryAuthSchemes(hRequest: HINTERNET;
-  var lpdwSupportedSchemes: DWORD; var lpdwFirstScheme: DWORD;
-  var pdwAuthTarget: DWORD): BOOL; stdcall;
-  {$EXTERNALSYM WinHttpQueryAuthSchemes}
-
-function WinHttpSetCredentials(hRequest: HINTERNET;
-  AuthTargets: DWORD; AuthScheme: DWORD; pwszUserName: PWideChar;
-  pwszPassword: PWideChar; pAuthParams: Pointer): BOOL; stdcall;
-  {$EXTERNALSYM WinHttpSetCredentials}
-
-function WinHttpSendRequest(hRequest: HINTERNET; pwszHeaders: PWideChar;
-  dwHeadersLength: DWORD; lpOptional: Pointer;
-  dwOptionalLength: DWORD; dwTotalLength: DWORD;
-  dwContext: DWORD_PTR): BOOL; stdcall;
-  {$EXTERNALSYM WinHttpSendRequest}
-
-function WinHttpWriteData(hRequest: HINTERNET; lpBuffer: Pointer;
-  dwNumberOfBytesToWrite: DWORD; var lpdwNumberOfBytesWritten: DWORD): BOOL; stdcall;
-  {$EXTERNALSYM WinHttpWriteData}
-
-function WinHttpReceiveResponse(hRequest: HINTERNET;
-  lpReserved: Pointer): BOOL; stdcall;
-  {$EXTERNALSYM WinHttpReceiveResponse}
-
-function WinHttpQueryHeaders(hRequest: HINTERNET;
-  dwInfoLevel: DWORD; pwszName: PWideChar; lpBuffer: Pointer;
-  var lpdwBufferLength: DWORD; lpdwIndex: Pointer): BOOL; stdcall;
-  {$EXTERNALSYM WinHttpQueryHeaders}
-
-function WinHttpQueryDataAvailable(hRequest: HINTERNET;
-  var lpdwNumberOfBytesAvailable: DWORD): BOOL; stdcall;
-
-function WinHttpReadData(hRequest: HINTERNET; lpBuffer: Pointer;
-  dwNumberOfBytesToRead: DWORD; var lpdwNumberOfBytesRead: DWORD): BOOL; stdcall;
-  {$EXTERNALSYM WinHttpReadData}
-
-function WinHttpCloseHandle(hInternet: HINTERNET): BOOL; stdcall;
-  {$EXTERNALSYM WinHttpCloseHandle}
-
-
-{ callback function for InternetSetStatusCallback }
-type
-
-  WINHTTP_STATUS_CALLBACK = TFarProc;
-
-  {$EXTERNALSYM WINHTTP_STATUS_CALLBACK}
-  TFNWinHttpStatusCallback = WINHTTP_STATUS_CALLBACK;
-  PFNWinHttpStatusCallback = ^TFNWinHttpStatusCallback;
-  LPWINHTTP_STATUS_CALLBACK = PFNWinHttpStatusCallback;
-  {$EXTERNALSYM LPWINHTTP_STATUS_CALLBACK}
-
-
-function WinHttpSetStatusCallback(hInternet: HINTERNET;
-  lpfnInternetCallback: PFNWinHttpStatusCallback; dwNotificationFlags: Dword; dwReserved: DWORD): PFNWinHttpStatusCallback; stdcall;
-  {$EXTERNALSYM WinHttpSetStatusCallback}
 
 implementation
 
 const
-  winhttpdll = 'winhttp.dll';
+  Winhttpapi = 'winhttp.dll';
 
-function WinHttpQueryOption;                    external winhttpdll name 'WinHttpQueryOption';
-function WinHttpSetOption;                      external winhttpdll name 'WinHttpSetOption';
-function WinHttpAddRequestHeaders;              external winhttpdll name 'WinHttpAddRequestHeaders';
-function WinHttpCrackUrl;                       external winhttpdll name 'WinHttpCrackUrl';
-function WinHttpCreateUrl;                      external winhttpdll name 'WinHttpCreateUrl';
-function WinHttpDetectAutoProxyConfigUrl;       external winhttpdll name 'WinHttpDetectAutoProxyConfigUrl';
-function WinHttpGetDefaultProxyConfiguration;   external winhttpdll name 'WinHttpGetDefaultProxyConfiguration';
-function WinHttpGetIEProxyConfigForCurrentUser; external winhttpdll name 'WinHttpGetIEProxyConfigForCurrentUser';
-function WinHttpCheckPlatform;                  external winhttpdll name 'WinHttpCheckPlatform';
-function WinHttpOpen;                           external winhttpdll name 'WinHttpOpen';
-function WinHttpSetTimeouts;                    external winhttpdll name 'WinHttpSetTimeouts';
-function WinHttpConnect;                        external winhttpdll name 'WinHttpConnect';
-function WinHttpOpenRequest;                    external winhttpdll name 'WinHttpOpenRequest';
-function WinHttpQueryAuthSchemes;               external winhttpdll name 'WinHttpQueryAuthSchemes';
-function WinHttpSetCredentials;                 external winhttpdll name 'WinHttpSetCredentials';
-function WinHttpSendRequest;                    external winhttpdll name 'WinHttpSendRequest';
-function WinHttpWriteData;                      external winhttpdll name 'WinHttpWriteData';
-function WinHttpReceiveResponse;                external winhttpdll name 'WinHttpReceiveResponse';
-function WinHttpQueryHeaders;                   external winhttpdll name 'WinHttpQueryHeaders';
-function WinHttpQueryDataAvailable;             external winhttpdll name 'WinHttpQueryDataAvailable';
-function WinHttpReadData;                       external winhttpdll name 'WinHttpReadData';
-function WinHttpCloseHandle;                    external winhttpdll name 'WinHttpCloseHandle';
-function WinHttpSetStatusCallback;              external winhttpdll name 'WinHttpSetStatusCallback';
+{$WARN SYMBOL_PLATFORM OFF}
+function WinHttpAddRequestHeaders; external Winhttpapi name 'WinHttpAddRequestHeaders';// delayed;
+function WinHttpCheckPlatform; external Winhttpapi name 'WinHttpCheckPlatform';// delayed;
+function WinHttpCloseHandle; external Winhttpapi name 'WinHttpCloseHandle';// delayed;
+function WinHttpConnect; external Winhttpapi name 'WinHttpConnect';// delayed;
+function WinHttpCrackUrl; external Winhttpapi name 'WinHttpCrackUrl';// delayed;
+function WinHttpCreateUrl; external Winhttpapi name 'WinHttpCreateUrl';// delayed;
+function WinHttpDetectAutoProxyConfigUrl; external Winhttpapi name 'WinHttpDetectAutoProxyConfigUrl';// delayed;
+function WinHttpGetDefaultProxyConfiguration; external Winhttpapi name 'WinHttpGetDefaultProxyConfiguration';// delayed;
+function WinHttpGetIEProxyConfigForCurrentUser; external Winhttpapi name 'WinHttpGetIEProxyConfigForCurrentUser';// delayed;
+function WinHttpGetProxyForUrl; external Winhttpapi name 'WinHttpGetProxyForUrl';// delayed;
+function WinHttpIsHostInProxyBypassList; external Winhttpapi name 'WinHttpIsHostInProxyBypassList';// delayed;
+function WinHttpOpen; external Winhttpapi name 'WinHttpOpen';// delayed;
+function WinHttpOpenRequest; external Winhttpapi name 'WinHttpOpenRequest';// delayed;
+function WinHttpQueryAuthParams; external Winhttpapi name 'WinHttpQueryAuthParams';// delayed;
+function WinHttpQueryAuthSchemes; external Winhttpapi name 'WinHttpQueryAuthSchemes';// delayed;
+function WinHttpQueryDataAvailable; external Winhttpapi name 'WinHttpQueryDataAvailable';// delayed;
+function WinHttpQueryHeaders; external Winhttpapi name 'WinHttpQueryHeaders';// delayed;
+function WinHttpQueryOption; external Winhttpapi name 'WinHttpQueryOption';// delayed;
+function WinHttpReadData; external Winhttpapi name 'WinHttpReadData';// delayed;
+function WinHttpReceiveResponse; external Winhttpapi name 'WinHttpReceiveResponse';// delayed;
+function WinHttpSendRequest; external Winhttpapi name 'WinHttpSendRequest';// delayed;
+function WinHttpSetCredentials; external Winhttpapi name 'WinHttpSetCredentials';// delayed;
+function WinHttpSetDefaultProxyConfiguration; external Winhttpapi name 'WinHttpSetDefaultProxyConfiguration';// delayed;
+function WinHttpSetOption; external Winhttpapi name 'WinHttpSetOption';// delayed;
+function WinHttpSetStatusCallback; external Winhttpapi name 'WinHttpSetStatusCallback';// delayed;
+function WinHttpSetTimeouts; external Winhttpapi name 'WinHttpSetTimeouts';// delayed;
+function WinHttpTimeFromSystemTime; external Winhttpapi name 'WinHttpTimeFromSystemTime';// delayed;
+function WinHttpTimeToSystemTime; external Winhttpapi name 'WinHttpTimeToSystemTime';// delayed;
+function WinHttpWriteData; external Winhttpapi name 'WinHttpWriteData';// delayed;
 
 end.

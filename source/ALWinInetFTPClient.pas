@@ -7,19 +7,10 @@ unit ALWinInetFTPClient;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
 uses WinApi.Windows,
      System.Classes,
      Winapi.WinInet,
      ALFTPClient;
-
-{$IF CompilerVersion < 18.5}
-Type
-  DWORD_PTR = DWORD;
-{$IFEND}
 
 type
 
@@ -153,13 +144,13 @@ type
     Function  GetCurrentDirectory: AnsiString; override;
     Procedure GetFile(const RemoteFile: AnsiString;
                       const LocalFile: AnsiString;
-                      FailIfExists: Boolean); overload; override; // warning: The onprogress will not work in that case !
+                      const FailIfExists: Boolean); overload; override; // warning: The onprogress will not work in that case !
     Procedure GetFile(const RemoteFile: AnsiString;
-                      DataStream: Tstream); overload; override;
+                      const DataStream: Tstream); overload; override;
     Function  GetFileSize(const filename: AnsiString): Longword; override;
     Procedure PutFile(const LocalFile: AnsiString;
                       const Remotefile: AnsiString); overload; override;
-    Procedure PutFile(DataStream: TStream;
+    Procedure PutFile(const DataStream: TStream;
                       const Remotefile: AnsiString); overload; override;
     Procedure RemoveDirectory(const Directory: AnsiString); override;
     Procedure RenameFile(const ExistingFile: AnsiString;
@@ -177,6 +168,7 @@ implementation
 
 uses System.SysUtils,
      System.Ansistrings,
+     ALCommon,
      ALString;
 
 {********************************************************************}
@@ -239,7 +231,7 @@ var ErrCode: DWord;
                      PAnsiChar(ErrMsg),
                      Length(ErrMsg),
                      nil);
-      SetLength(ErrMsg, {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLen(PAnsiChar(ErrMsg)));
+      SetLength(ErrMsg, System.Ansistrings.StrLen(PAnsiChar(ErrMsg)));
     end;
 
 begin
@@ -257,11 +249,11 @@ begin
           InternetGetLastResponseInfoA(ErrCode,
                                        PAnsiChar(ErrMsg),
                                        ErrMsgln);
-          SetLength(ErrMsg, {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLen(PAnsiChar(ErrMsg)));
+          SetLength(ErrMsg, System.Ansistrings.StrLen(PAnsiChar(ErrMsg)));
         end
         else internalFormatMessageFromErrCode;
       end
-      else SetLength(ErrMsg, {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLen(PAnsiChar(ErrMsg)));
+      else SetLength(ErrMsg, System.Ansistrings.StrLen(PAnsiChar(ErrMsg)));
     end
     else internalFormatMessageFromErrCode;
 
@@ -507,7 +499,7 @@ end;
 
 {*****************************************************************}
 procedure TALWinInetFTPClient.GetFile(const RemoteFile: AnsiString;
-                                      DataStream: Tstream);
+                                      const DataStream: Tstream);
 
   {------------------------------------------}
   Function InternalGetFtpOpenFileFlags: DWord;
@@ -574,7 +566,7 @@ end;
 {*****************************************************************}
 procedure TALWinInetFTPClient.GetFile(const RemoteFile: AnsiString;
                                       const LocalFile: AnsiString;
-                                      FailIfExists: Boolean);
+                                      const FailIfExists: Boolean);
 
   {-----------------------------------------}
   Function InternalGetFtpGetFileFlags: DWord;
@@ -633,8 +625,8 @@ begin
   end;
 end;
 
-{********************************************************}
-procedure TALWinInetFTPClient.PutFile(DataStream: TStream;
+{**************************************************************}
+procedure TALWinInetFTPClient.PutFile(const DataStream: TStream;
                                       const Remotefile: AnsiString);
 
   {------------------------------------------}
@@ -691,7 +683,7 @@ begin
     end;
 
   finally
-    Buffer.Free;
+    AlFreeAndNil(Buffer);
     InternetCloseHandle(hFile);
   end;
 

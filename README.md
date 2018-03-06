@@ -11,26 +11,26 @@ compiled demo
 
 #### Win32 #### 
 
-https://svn.code.sf.net/p/alcinoe/code/demos/ALWinHTTPClient/win32/ALWinHTTPClientDemo.exe
-https://svn.code.sf.net/p/alcinoe/code/demos/ALWinInetHTTPClient/win32/ALWinInetHTTPClientDemo.exe
-https://svn.code.sf.net/p/alcinoe/code/demos/ALSortedListBenchmark/win32/ALSortedListBenchmark.exe
-https://svn.code.sf.net/p/alcinoe/code/demos/ALCipherDemo/win32/ALCipherDemo.exe
-https://svn.code.sf.net/p/alcinoe/code/demos/ALJsonDoc/win32/AljsonDocDemo.exe
-https://svn.code.sf.net/p/alcinoe/code/demos/ALNNTPClient/win32/ALNNTPClientDemo.exe
-https://svn.code.sf.net/p/alcinoe/code/demos/ALPhpRunner/win32/ALPhpRunnerDemo.exe
-https://svn.code.sf.net/p/alcinoe/code/demos/ALPOP3Client/win32/POP3ClientDemo.exe
-https://svn.code.sf.net/p/alcinoe/code/demos/ALSMTPClient/win32/ALSMTPClientDemo.exe
-https://svn.code.sf.net/p/alcinoe/code/demos/ALSqlite3Client/win32/ALSqlite3clientDemo.exe
-https://svn.code.sf.net/p/alcinoe/code/demos/ALStressHTTPServer/win32/ALStressHTTPServer.exe
-https://svn.code.sf.net/p/alcinoe/code/demos/ALStringBenchmark/win32/ALStringBenchmark.exe
-https://svn.code.sf.net/p/alcinoe/code/demos/ALWebSpider/win32/ALWebSpiderDemo.exe
-https://svn.code.sf.net/p/alcinoe/code/demos/ALXmlDoc/win32/AlXmlDocDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/demos/ALWinHTTPClient/win32/ALWinHTTPClientDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/demos/ALWinInetHTTPClient/win32/ALWinInetHTTPClientDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/demos/ALSortedListBenchmark/win32/ALSortedListBenchmark.exe
+* https://svn.code.sf.net/p/alcinoe/code/demos/ALCipherDemo/win32/ALCipherDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/demos/ALJsonDoc/win32/AljsonDocDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/demos/ALNNTPClient/win32/ALNNTPClientDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/demos/ALPhpRunner/win32/ALPhpRunnerDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/demos/ALPOP3Client/win32/POP3ClientDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/demos/ALSMTPClient/win32/ALSMTPClientDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/demos/ALSqlite3Client/win32/ALSqlite3clientDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/demos/ALStressHTTPServer/win32/ALStressHTTPServer.exe
+* https://svn.code.sf.net/p/alcinoe/code/demos/ALStringBenchmark/win32/ALStringBenchmark.exe
+* https://svn.code.sf.net/p/alcinoe/code/demos/ALWebSpider/win32/ALWebSpiderDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/demos/ALXmlDoc/win32/AlXmlDocDemo.exe
 
 #### Android #### 
 
-https://tinyurl.com/zoxavr9
-https://tinyurl.com/yd7c4ofk
-https://tinyurl.com/y9gzos9f
+* https://tinyurl.com/zoxavr9
+* https://tinyurl.com/yd7c4ofk
+* https://tinyurl.com/y9gzos9f
 
 #### iOS #### 
 
@@ -87,7 +87,7 @@ Fast/doublebuffered firemonkey controls with native draw
 
 ![screenshot 4](https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-8.png/1)
 
-### The fact ###
+#### The fact ####
 
 Painting of Firmonkey controls can be sometime slow, or say 
 differently, not sufficiently fast for a fluid scrolling. For exemple if 
@@ -99,7 +99,7 @@ tcheckbox, etc..). After it's just math, take 100ms to repaint the screen,
 so you can only do around 10 frames per seconds (in reality you will have 
 much less even) so the scrolling can't be fluid :(
 
-### The solution ### 
+#### The solution #### 
  
 I didn't want to rebuild the firemonkey controls, it's too 
 huge job for me, and instead I try to find an intermediate solution. 
@@ -110,14 +110,14 @@ on a "buffer" that I store directly in the GPU memory (through TTexture),
 and when the system ask me to repaint the controls instead of calling 
 again the paint algorithm i simply redraw the buffer TTexture.
 
-### The results ###  
+#### The results ####  
 
 As I say before it's took 3 ms just to paint a simple 
 Trectangle with round corners. With my doublebuffered property 
 it's take now around 0.1 ms ! so now the scroll look much more 
 fluid! 
 
-### OpenGL draw => Replaced by native ios/android draw ###
+#### OpenGL draw => Replaced by native ios/android draw ####
 
 Most of the basic shape (like Trectangle, Tcircle, etc.) use openGL to 
 draw. it's not very efficient, for example to draw a circle under 
@@ -530,14 +530,14 @@ And much more
 Where can I get it?
 -------------------
 
-### SVN ###
+#### SVN ####
 
 you can access the last svn version at:
 svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code 
 or with a web browser at:
 http://alcinoe.svn.sourceforge.net/viewvc/alcinoe/
 
-### GIT ###
+#### GIT ####
 
 You can also find the last version on github at 
 https://github.com/Zeus64/alcinoe

@@ -37,7 +37,6 @@ type
     procedure ALButtonSqlLite3VacuumClick(Sender: TObject);
     procedure ALEditSqlite3DatabaseButtonClick(Sender: TObject);
     procedure ALEditSqlite3LibButtonClick(Sender: TObject);
-    procedure cxWwwArkadiaComLabelClick(Sender: TObject);
   private
   public
   end;
@@ -65,12 +64,6 @@ end;
 procedure TForm1.ALEditSqlite3LibButtonClick(Sender: TObject);
 begin
   If OpenDialog2.Execute then ALEditSqlite3Lib.Text := OpenDialog2.FileName;
-end;
-
-{**********************************************************}
-procedure TForm1.cxWwwArkadiaComLabelClick(Sender: TObject);
-begin
-  ShellExecute(Application.Handle,'open','http://www.arkadia.com',nil,nil, SW_SHOWNORMAL);
 end;
 
 {***********************************************************}
@@ -136,14 +129,14 @@ begin
       LstSql.Text := ALTrim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
 
       //do the job
-      aStartDate := ALGetTickCount64;
+      aStartDate := GetTickCount64;
       aSqlite3Client.TransactionStart;
       try
         aSqlite3Client.UpdateData(LstSql);
-        aEndDate := ALGetTickCount64;
-        aStartCommitDate := ALGetTickCount64;
+        aEndDate := GetTickCount64;
+        aStartCommitDate := GetTickCount64;
         aSqlite3Client.TransactionCommit;
-        aendCommitDate := ALGetTickCount64;
+        aendCommitDate := GetTickCount64;
       Except
         aSqlite3Client.TransactionRollBack;
         raise;
@@ -231,14 +224,14 @@ begin
           else break;
         end;
 
-        aStartDate := ALGetTickCount64;
+        aStartDate := GetTickCount64;
         aSqlite3Client.SelectData(S1,
                                   'rec',
                                    0,
                                    200,
                                   aXMLDATA.DocumentElement,
                                   aFormatSettings);
-        aEndDate := ALGetTickCount64;
+        aEndDate := GetTickCount64;
 
         ALMemoResult.Lines.Text := 'Time Taken to select the data: ' + IntToStr(aEndDate - aStartDate) + ' ms' + #13#10 +
                                    #13#10 +
@@ -304,9 +297,9 @@ begin
       end;
 
       //do the job
-      aStartDate := ALGetTickCount64;
+      aStartDate := GetTickCount64;
       aSqlite3Client.UpdateData('VACUUM');
-      aEndDate := ALGetTickCount64;
+      aEndDate := GetTickCount64;
 
       ALMemoResult.Lines.clear;
       ALMemoResult.Lines.add('Time Taken to VACUUM the database: ' + IntToStr(aEndDate - aStartDate) + ' ms');

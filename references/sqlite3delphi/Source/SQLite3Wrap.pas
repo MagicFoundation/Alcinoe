@@ -58,7 +58,7 @@ type
     constructor Create;
     destructor Destroy; override;
 
-    procedure Open(const FileName: WideString);
+    procedure Open(const FileName: WideString; Flags: Integer = 0);
     procedure Close;
 
     procedure Execute(const SQL: WideString);
@@ -236,10 +236,13 @@ begin
   Result := sqlite3_last_insert_rowid(FHandle);
 end;
 
-procedure TSQLite3Database.Open(const FileName: WideString);
+procedure TSQLite3Database.Open(const FileName: WideString; Flags: Integer);
 begin
   Close;
-  Check(sqlite3_open(PAnsiChar(StrToUTF8(FileName)), FHandle));
+  if Flags = 0 then
+    Check(sqlite3_open(PAnsiChar(StrToUTF8(FileName)), FHandle))
+  else
+    Check(sqlite3_open_v2(PAnsiChar(StrToUTF8(FileName)), FHandle, Flags, nil));
 end;
 
 function TSQLite3Database.Prepare(const SQL: WideString): TSQLite3Statement;

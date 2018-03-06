@@ -109,7 +109,6 @@ type
     procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems5GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
     procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems3GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
     procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems0GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
-    procedure cxWwwArkadiaComLabelClick(Sender: TObject);
   private
     procedure WMUpdateGUI(var Msg: TMessage); message WM_UpdateGUI;
     procedure initHttpClientParams;
@@ -375,9 +374,9 @@ begin
       if (BytesRead > 0) and (ReceiveTimeTaken > 0) then TableViewThread.DataController.SetValue(Rank-1,TableViewThreadDownloadSpeed.Index,Round((BytesRead / 1024) /  (ReceiveTimeTaken / 1000)))
       else  TableViewThread.DataController.SetValue(Rank-1,TableViewThreadDownloadSpeed.Index,null);
 
-      if ALGetTickCount64 - LastUpdateStatusBar > 1000  then begin
-        LastUpdateStatusBar := ALGetTickCount64;
-        aTimeElapsed := ALGetTickCount64 - StartTime;
+      if GetTickCount64 - LastUpdateStatusBar > 1000  then begin
+        LastUpdateStatusBar := GetTickCount64;
+        aTimeElapsed := GetTickCount64 - StartTime;
         aTotalRequestCount := 0;
         for I := 0 to TableViewThread.DataController.RecordCount - 1 do
           aTotalRequestCount := aTotalRequestCount + TableViewThread.DataController.GetValue(I,TableViewThreadRequestCount.Index);
@@ -422,8 +421,8 @@ begin
   TableViewThread.DataController.RecordCount := StrToInt(EditNbThread.Text);
   initHttpClientParams;
   NBActiveThread := 0;
-  LastUpdateStatusBar := ALGetTickCount64;
-  StartTime := ALGetTickCount64;
+  LastUpdateStatusBar := GetTickCount64;
+  StartTime := GetTickCount64;
   ToTalBytesRead := 0;
   TotalDNScount := 0;
   TotalDNSTimeTaken := 0;
@@ -482,7 +481,7 @@ begin
   FSendTimeTaken := 0;
   FWaitTimeTaken := 0;
   FReceiveTimeTaken := 0;
-  FHttpStatusStartTime := AlGetTickCount64;
+  FHttpStatusStartTime := GetTickCount64;
 end;
 
 {***********************************}
@@ -535,7 +534,7 @@ begin
     FSendTimeTaken := -1;
     FWaitTimeTaken := -1;
     FReceiveTimeTaken := -1;
-    FHttpStatusStartTime := AlGetTickCount64;
+    FHttpStatusStartTime := GetTickCount64;
     try
 
       aHttpClient := TaLWinHttpClient.Create;
@@ -672,43 +671,37 @@ procedure TStressHttpThread.OnHttpStatusChange(sender: Tobject;
                                                StatusInformation: Pointer;
                                                StatusInformationLength: DWord);
 begin
-  if InternetStatus = WINHTTP_CALLBACK_STATUS_RESOLVING_NAME then FHttpStatusStartTime := ALGetTickCount64
+  if InternetStatus = WINHTTP_CALLBACK_STATUS_RESOLVING_NAME then FHttpStatusStartTime := GettickCount64
   else if InternetStatus = WINHTTP_CALLBACK_STATUS_NAME_RESOLVED then begin
-    FDNSTimeTaken := ALGetTickCount64 - FHttpStatusStartTime;
-    FHttpStatusStartTime := ALGetTickCount64;
+    FDNSTimeTaken := GettickCount64 - FHttpStatusStartTime;
+    FHttpStatusStartTime := GettickCount64;
   end
 
-  else if InternetStatus = WINHTTP_CALLBACK_STATUS_CONNECTING_TO_SERVER then FHttpStatusStartTime := ALGetTickCount64
+  else if InternetStatus = WINHTTP_CALLBACK_STATUS_CONNECTING_TO_SERVER then FHttpStatusStartTime := GettickCount64
   else if InternetStatus = WINHTTP_CALLBACK_STATUS_CONNECTED_TO_SERVER then begin
-    FConnectTimeTaken := ALGetTickCount64 - FHttpStatusStartTime;
-    FHttpStatusStartTime := ALGetTickCount64;
+    FConnectTimeTaken := GettickCount64 - FHttpStatusStartTime;
+    FHttpStatusStartTime := GettickCount64;
   end
 
-  else if InternetStatus = WINHTTP_CALLBACK_STATUS_SENDING_REQUEST then FHttpStatusStartTime := ALGetTickCount64
+  else if InternetStatus = WINHTTP_CALLBACK_STATUS_SENDING_REQUEST then FHttpStatusStartTime := GettickCount64
   else if InternetStatus = WINHTTP_CALLBACK_STATUS_REQUEST_SENT then begin
-    FSendTimeTaken := ALGetTickCount64 - FHttpStatusStartTime;
-    FHttpStatusStartTime := ALGetTickCount64;
+    FSendTimeTaken := GettickCount64 - FHttpStatusStartTime;
+    FHttpStatusStartTime := GettickCount64;
   end
 
-  else if InternetStatus = WINHTTP_CALLBACK_STATUS_RECEIVING_RESPONSE then FHttpStatusStartTime := ALGetTickCount64
+  else if InternetStatus = WINHTTP_CALLBACK_STATUS_RECEIVING_RESPONSE then FHttpStatusStartTime := GettickCount64
   else if InternetStatus = WINHTTP_CALLBACK_STATUS_RESPONSE_RECEIVED then begin
-    FWaitTimeTaken := ALGetTickCount64 - FHttpStatusStartTime;
-    FHttpStatusStartTime := ALGetTickCount64;
+    FWaitTimeTaken := GettickCount64 - FHttpStatusStartTime;
+    FHttpStatusStartTime := GettickCount64;
   end
 
-  else if InternetStatus = WINHTTP_CALLBACK_STATUS_HANDLE_CLOSING then FReceiveTimeTaken := ALGetTickCount64 - FHttpStatusStartTime;
+  else if InternetStatus = WINHTTP_CALLBACK_STATUS_HANDLE_CLOSING then FReceiveTimeTaken := GettickCount64 - FHttpStatusStartTime;
 end;
 
 {*******************************************}
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   NBActiveThread := 0;
-end;
-
-{**********************************************************}
-procedure TForm1.cxWwwArkadiaComLabelClick(Sender: TObject);
-begin
-  ShellExecute(Application.Handle,'open','http://www.arkadia.com',nil,nil, SW_SHOWNORMAL);
 end;
 
 initialization

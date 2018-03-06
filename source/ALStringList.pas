@@ -33,10 +33,6 @@ unit ALStringList;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
 Uses System.Classes,
      System.Sysutils,
      {$IFNDEF NEXTGEN}
@@ -551,7 +547,10 @@ type
     property Current: String read GetCurrent;
   end;
 
-  {------------------------------}
+  {------------------------}
+  {$IF CompilerVersion > 32} // tokyo
+    {$MESSAGE WARN 'Check if System.classes.TStrings didn't change and adjust the IFDEF'}
+  {$IFEND}
   TALStringsU = class(TPersistent)
   private
     //[deleted from Tstrings] procedure SetStringsAdapter(const Value: IStringsAdapter);
@@ -678,7 +677,10 @@ type
   TALStringItemListU = array of TALStringItemU;
   TALStringListSortCompareU = reference to function(List: TALStringListU; Index1, Index2: Integer): Integer;
 
-  {---------------------------------}
+  {------------------------}
+  {$IF CompilerVersion > 32} // tokyo
+    {$MESSAGE WARN 'Check if System.classes.TStringList didn't change and adjust the IFDEF'}
+  {$IFEND}
   TALStringListU = class(TALStringsU)
   private
     FList: TALStringItemListU;

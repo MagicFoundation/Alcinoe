@@ -35,6 +35,7 @@ uses System.Classes,
      FMX.textlayout,
      FMX.graphics,
      FMX.objects,
+     alGraphics,
      ALFmxCommon;
 
 type

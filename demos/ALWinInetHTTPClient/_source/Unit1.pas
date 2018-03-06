@@ -98,13 +98,11 @@ type
     Label1: TcxLabel;
     ButtonPost: TcxButton;
     ButtonGet: TcxButton;
-    CheckBoxHttpEncodePostData: TcxCheckBox;
     ButtonHead: TcxButton;
     CheckBoxUrlEncodePostData: TcxCheckBox;
     ButtonTrace: TcxButton;
     dxSkinController1: TdxSkinController;
     Panel3: TPanel;
-    Panel4: TPanel;
     Panel5: TPanel;
     Panel6: TPanel;
     Label2: TcxLabel;
@@ -112,6 +110,7 @@ type
     cxSplitter1: TcxSplitter;
     Label3: TcxLabel;
     MemoContentBody: TcxMemo;
+    cxSplitter2: TcxSplitter;
     procedure ButtonGetClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -120,7 +119,6 @@ type
     procedure ButtonTraceClick(Sender: TObject);
     procedure OnCfgEditCHange(Sender: TObject);
     procedure OnCfgEditKeyPress(Sender: TObject; var Key: Char);
-    procedure cxWwwArkadiaComLabelClick(Sender: TObject);
   private
     FWinInetHttpClient: TalWinInetHttpClient;
     FDownloadSpeedStartTime: TdateTime;
@@ -145,6 +143,7 @@ Uses DateUtils,
      ALMultiPartParser,
      AlCommon,
      AlFiles,
+     ALMime,
      ALString,
      AlStringList,
      AlHTTPClient;
@@ -373,12 +372,6 @@ begin
   end;
 end;
 
-{**********************************************************}
-procedure TForm1.cxWwwArkadiaComLabelClick(Sender: TObject);
-begin
-  ShellExecute(Application.Handle,'open','http://www.arkadia.com',nil,nil, SW_SHOWNORMAL);
-end;
-
 {************************************************}
 procedure TForm1.OnCfgEditCHange(Sender: TObject);
 begin
@@ -425,23 +418,32 @@ begin
           AMultiPartFormDataFiles.Add(AMultiPartFormDataFile);
         end;
 
-      if AMultiPartFormDataFiles.Count > 0 then
+      if (AMultiPartFormDataFiles.Count > 0) and (CheckBoxURLEncodePostData.Checked) then
         FWinInetHttpClient.PostMultiPartFormData(AnsiString(editURL.Text),
                                                  aTmpPostDataString,
                                                  AMultiPartFormDataFiles,
                                                  AHTTPResponseStream,
                                                  AHTTPResponseHeader)
 
+      else if (AMultiPartFormDataFiles.Count > 0) then begin
+
+        FWinInetHttpClient.post(AnsiString(editURL.Text),
+                                AMultiPartFormDataFiles.Items[0].DataStream,
+                                AHTTPResponseStream,
+                                AHTTPResponseHeader);
+
+      end
+
       else if aTmpPostDataString.Count > 0 then begin
-        if not CheckBoxURLEncodePostData.Checked then FWinInetHttpClient.PostURLEncoded(AnsiString(editURL.Text),
-                                                                                        aTmpPostDataString,
-                                                                                        AHTTPResponseStream,
-                                                                                        AHTTPResponseHeader,
-                                                                                        CheckBoxHTTPEncodePostData.Checked)
+        if CheckBoxURLEncodePostData.Checked then FWinInetHttpClient.PostURLEncoded(AnsiString(editURL.Text),
+                                                                                    aTmpPostDataString,
+                                                                                    AHTTPResponseStream,
+                                                                                    AHTTPResponseHeader,
+                                                                                    TALNameValueArray.Create(),
+                                                                                    True)
         else begin
 
-          if CheckBoxHTTPEncodePostData.Checked then ARawPostDatastream := TALStringStream.create(ALHTTPEncode(aTmpPostDataString.text))
-          else ARawPostDatastream := TALStringStream.create(aTmpPostDataString.text);
+          ARawPostDatastream := TALStringStream.create(aTmpPostDataString.text);
           try
 
             FWinInetHttpClient.post(AnsiString(editURL.Text),
@@ -488,6 +490,8 @@ begin
     OnUploadProgress := OnHttpUploadProgress;
     MemoRequestRawHeader.Text := String(RequestHeader.RawHeaderText);
   end;
+  MemoResponseRawHeader.Height := MemoResponseRawHeader.Parent.Height - MemoResponseRawHeader.top - 6;
+  MemoContentBody.Height := MemoContentBody.Parent.Height - MemoContentBody.top - 6;
 end;
 
 initialization

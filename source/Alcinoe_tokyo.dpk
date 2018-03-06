@@ -54,7 +54,8 @@ contains
   ALCipher in 'ALCipher.pas',
   ALAVLBinaryTree in 'ALAVLBinaryTree.pas',
   ALVideoPlayer in 'ALVideoPlayer.pas',
-  ALFmxMemo in 'ALFmxMemo.pas';
+  ALFmxMemo in 'ALFmxMemo.pas',
+  ALGraphics in 'ALGraphics.pas';
 
 end.
 

@@ -3071,7 +3071,7 @@ end;
 
 function TALFBXBaseLibrary.Loaded: Boolean;
 begin
-  Result := FGDS32Lib > HINSTANCE_ERROR;
+  Result := FGDS32Lib <> 0;
 end;
 
 function TALFBXBaseLibrary.Unload: Boolean;

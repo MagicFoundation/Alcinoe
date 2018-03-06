@@ -46,7 +46,6 @@ type
     procedure ALButton2Click(Sender: TObject);
     procedure ALEditFirebirdLibButtonClick(Sender: TObject);
     procedure ALEditFirebirdDatabaseButtonClick(Sender: TObject);
-    procedure cxWwwArkadiaComLabelClick(Sender: TObject);
   private
     { Private declarations }
     fEventThread: TALFBXEventThread;
@@ -123,12 +122,6 @@ end;
 procedure TForm1.ALEditFirebirdLibButtonClick(Sender: TObject);
 begin
   If OpenDialog1.Execute then (Sender as TEdit).Text := OpenDialog1.FileName;
-end;
-
-{**********************************************************}
-procedure TForm1.cxWwwArkadiaComLabelClick(Sender: TObject);
-begin
-  ShellExecute(Application.Handle,'open','http://www.arkadia.com',nil,nil, SW_SHOWNORMAL);
 end;
 
 {******************************************************************}

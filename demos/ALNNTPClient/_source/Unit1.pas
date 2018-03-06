@@ -71,7 +71,6 @@ type
     procedure StatByIDButtonClick(Sender: TObject);
     procedure ButtonLastClick(Sender: TObject);
     procedure ButtonPostClick(Sender: TObject);
-    procedure cxWwwArkadiaComLabelClick(Sender: TObject);
   private
     FNNTPCLient: TALNNTPCLient;
   end;
@@ -104,12 +103,6 @@ end;
 procedure TForm1.ConnectButtonClick(Sender: TObject);
 begin
   DisplayMemo.Lines.Add(String(ALTrim(FNNTPClient.Connect(AnsiString(HostEdit.Text), StrToInt(PortEdit.Text)))));
-end;
-
-{**********************************************************}
-procedure TForm1.cxWwwArkadiaComLabelClick(Sender: TObject);
-begin
-  ShellExecute(Application.Handle,'open','http://www.arkadia.com',nil,nil, SW_SHOWNORMAL);
 end;
 
 {************************************************}

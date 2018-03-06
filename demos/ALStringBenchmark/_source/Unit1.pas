@@ -106,7 +106,6 @@ type
     procedure ALButton45Click(Sender: TObject);
     procedure ALButton47Click(Sender: TObject);
     procedure ALButton46Click(Sender: TObject);
-    procedure cxWwwArkadiaComLabelClick(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
   private
@@ -1018,12 +1017,6 @@ begin
   end;
   StopWatch.Stop;
   Showmessage('50,000 Base64Encode in: ' + formatFloat('0.,',StopWatch.Elapsed.TotalMilliseconds) + ' ms');
-end;
-
-{**********************************************************}
-procedure TForm1.cxWwwArkadiaComLabelClick(Sender: TObject);
-begin
-  ShellExecute(Application.Handle,'open','http://www.arkadia.com',nil,nil, SW_SHOWNORMAL);
 end;
 
 procedure TForm1.ALButton10Click(Sender: TObject);

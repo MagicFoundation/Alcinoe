@@ -21,7 +21,7 @@
 #include <System.Messaging.hpp>
 #include <System.TypInfo.hpp>
 #include <FMX.Types.hpp>
-#include <ALFmxCommon.hpp>
+#include <ALCommon.hpp>
 #include <System.Generics.Defaults.hpp>
 #include <System.SysUtils.hpp>
 
@@ -64,7 +64,7 @@ public:
 	{
 	public:
 		TALAniCalculations::TTargetType TargetType;
-		Alfmxcommon::TALPointD Point;
+		Alcommon::TALPointD Point;
 	};
 	
 	
@@ -73,7 +73,7 @@ private:
 	struct DECLSPEC_DRECORD TPointTime
 	{
 	public:
-		Alfmxcommon::TALPointD Point;
+		Alcommon::TALPointD Point;
 		System::TDateTime Time;
 	};
 	
@@ -90,9 +90,9 @@ private:
 	bool FInTimerProc;
 	System::Uitypes::TTouchTracking FTouchTracking;
 	System::Word FInterval;
-	Alfmxcommon::TALPointD FCurrentVelocity;
-	Alfmxcommon::TALPointD FUpVelocity;
-	Alfmxcommon::TALPointD FUpPosition;
+	Alcommon::TALPointD FCurrentVelocity;
+	Alcommon::TALPointD FUpVelocity;
+	Alcommon::TALPointD FUpPosition;
 	System::TDateTime FUpDownTime;
 	System::TDateTime FLastTimeCalc;
 	System::Classes::TPersistent* FOwner;
@@ -111,11 +111,11 @@ private:
 	System::Classes::TNotifyEvent FOnStop;
 	bool FDown;
 	bool FAnimation;
-	Alfmxcommon::TALPointD FViewportPosition;
+	Alcommon::TALPointD FViewportPosition;
 	bool FLowChanged;
 	System::TDateTime FLastTimeChanged;
-	Alfmxcommon::TALPointD FDownPoint;
-	Alfmxcommon::TALPointD FDownPosition;
+	Alcommon::TALPointD FDownPoint;
+	Alcommon::TALPointD FDownPosition;
 	System::Int8 FUpdateTimerCount;
 	double FElasticity;
 	double FDecelerationRate;
@@ -167,11 +167,11 @@ private:
 	void __fastcall SetViewportPositionF(const System::Types::TPointF &Value);
 	void __fastcall SetMouseTarget(const TTarget &Value);
 	System::Uitypes::TTouchTracking __fastcall GetInternalTouchTracking(void);
-	Alfmxcommon::TALPointD __fastcall GetPositions(const int Index);
+	Alcommon::TALPointD __fastcall GetPositions(const int Index);
 	int __fastcall GetPositionCount(void);
 	System::TDateTime __fastcall GetPositionTimes(const int Index);
-	Alfmxcommon::TALPointD __fastcall PosToView(const Alfmxcommon::TALPointD &APosition);
-	void __fastcall SetViewportPosition(const Alfmxcommon::TALPointD &Value);
+	Alcommon::TALPointD __fastcall PosToView(const Alcommon::TALPointD &APosition);
+	void __fastcall SetViewportPosition(const Alcommon::TALPointD &Value);
 	float __fastcall GetOpacity(void);
 	bool __fastcall GetLowVelocity(void);
 	TPointTime __fastcall AddPointTime(const double X, const double Y, const System::TDateTime Time = 0.000000E+00);
@@ -180,22 +180,22 @@ private:
 	bool __fastcall DoStopScrolling(System::TDateTime CurrentTime = 0.000000E+00);
 	
 protected:
-	bool __fastcall IsSmall(const Alfmxcommon::TALPointD &P, const double Epsilon)/* overload */;
-	bool __fastcall IsSmall(const Alfmxcommon::TALPointD &P)/* overload */;
+	bool __fastcall IsSmall(const Alcommon::TALPointD &P, const double Epsilon)/* overload */;
+	bool __fastcall IsSmall(const Alcommon::TALPointD &P)/* overload */;
 	DYNAMIC System::Classes::TPersistent* __fastcall GetOwner(void);
 	virtual void __fastcall DoStart(void);
 	virtual void __fastcall DoChanged(void);
 	virtual void __fastcall DoStop(void);
-	virtual void __fastcall DoCalc(const double DeltaTime, Alfmxcommon::TALPointD &NewPoint, Alfmxcommon::TALPointD &NewVelocity, bool &Done);
+	virtual void __fastcall DoCalc(const double DeltaTime, Alcommon::TALPointD &NewPoint, Alcommon::TALPointD &NewVelocity, bool &Done);
 	__property bool Enabled = {read=FEnabled, write=SetEnabled, nodefault};
 	__property bool Shown = {read=FShown, write=SetShown, nodefault};
 	__property TTarget MouseTarget = {read=FMouseTarget, write=SetMouseTarget};
 	__property System::Uitypes::TTouchTracking InternalTouchTracking = {read=GetInternalTouchTracking, nodefault};
-	__property Alfmxcommon::TALPointD Positions[const int index] = {read=GetPositions};
+	__property Alcommon::TALPointD Positions[const int index] = {read=GetPositions};
 	__property System::TDateTime PositionTimes[const int index] = {read=GetPositionTimes};
 	__property int PositionCount = {read=GetPositionCount, nodefault};
-	__property Alfmxcommon::TALPointD UpVelocity = {read=FUpVelocity};
-	__property Alfmxcommon::TALPointD UpPosition = {read=FUpPosition};
+	__property Alcommon::TALPointD UpVelocity = {read=FUpVelocity};
+	__property Alcommon::TALPointD UpPosition = {read=FUpPosition};
 	__property System::TDateTime UpDownTime = {read=FUpDownTime};
 	__property TTarget Target = {read=FTarget};
 	__property int MinVelocity = {read=FMinVelocity, write=FMinVelocity, default=10};
@@ -227,10 +227,10 @@ public:
 	__property TTarget MinTarget = {read=FMinTarget};
 	__property TTarget MaxTarget = {read=FMaxTarget};
 	void __fastcall UpdatePosImmediately(const bool Force = false);
-	__property Alfmxcommon::TALPointD CurrentVelocity = {read=FCurrentVelocity, write=FCurrentVelocity};
-	__property Alfmxcommon::TALPointD ViewportPosition = {read=FViewportPosition, write=SetViewportPosition};
+	__property Alcommon::TALPointD CurrentVelocity = {read=FCurrentVelocity, write=FCurrentVelocity};
+	__property Alcommon::TALPointD ViewportPosition = {read=FViewportPosition, write=SetViewportPosition};
 	__property System::Types::TPointF ViewportPositionF = {read=GetViewportPositionF, write=SetViewportPositionF};
-	__property Alfmxcommon::TALPointD DownPosition = {read=FDownPosition, write=FDownPosition};
+	__property Alcommon::TALPointD DownPosition = {read=FDownPosition, write=FDownPosition};
 	__property System::TDateTime LastTimeCalc = {read=FLastTimeCalc};
 	__property bool Down = {read=FDown, write=SetDown, nodefault};
 	__property float Opacity = {read=GetOpacity};

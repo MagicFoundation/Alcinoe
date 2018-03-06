@@ -7,10 +7,6 @@ unit ALFTPClient;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
 uses Winapi.Windows,
      System.SysUtils,
      System.Classes;
@@ -103,13 +99,13 @@ type
     Function  GetCurrentDirectory: AnsiString; virtual;
     Procedure GetFile(const RemoteFile: AnsiString;
                       const LocalFile: AnsiString;
-                      FailIfExists: Boolean); overload; virtual;
+                      const FailIfExists: Boolean); overload; virtual;
     Procedure GetFile(const RemoteFile: AnsiString;
-                      DataStream: Tstream); overload; virtual;
+                      const DataStream: Tstream); overload; virtual;
     Function  GetFileSize(const filename: AnsiString): Longword; virtual;
     Procedure PutFile(const LocalFile: AnsiString;
                       const Remotefile: AnsiString); overload; virtual;
-    Procedure PutFile(DataStream: TStream;
+    Procedure PutFile(const DataStream: TStream;
                       const Remotefile: AnsiString); overload; virtual;
     Procedure RemoveDirectory(const Directory: AnsiString); virtual;
     Procedure RenameFile(const ExistingFile: AnsiString;
@@ -137,6 +133,8 @@ ResourceString
 
 implementation
 
+uses ALCommon;
+
 {******************************}
 constructor TALFTPClient.Create;
 begin
@@ -158,7 +156,7 @@ end;
 {*******************************}
 destructor TALFTPClient.Destroy;
 begin
-  FProxyParams.free;
+  AlFreeAndNil(FProxyParams);
   inherited;
 end;
 
@@ -241,7 +239,7 @@ end;
 
 {**********************************************************}
 procedure TALFTPClient.GetFile(const RemoteFile: AnsiString;
-                               DataStream: Tstream);
+                               const DataStream: Tstream);
 begin
   //virtual
 end;
@@ -249,7 +247,7 @@ end;
 {**********************************************************}
 procedure TALFTPClient.GetFile(const RemoteFile: AnsiString;
                                const LocalFile: AnsiString;
-                               FailIfExists: Boolean);
+                               const FailIfExists: Boolean);
 begin
 //virtual
 end;
@@ -261,8 +259,8 @@ begin
   Result := 0;
 end;
 
-{*************************************************}
-procedure TALFTPClient.PutFile(DataStream: TStream;
+{*******************************************************}
+procedure TALFTPClient.PutFile(const DataStream: TStream;
                                const Remotefile: AnsiString);
 begin
 //virtual

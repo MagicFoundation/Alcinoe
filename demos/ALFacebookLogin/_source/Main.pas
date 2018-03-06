@@ -9,7 +9,6 @@ uses
   {$IF Defined(IOS) or Defined(ANDROID)}
   Grijjy.ErrorReporting,
   {$ENDIF}
-  system.net.httpClient,
   system.Messaging,
   alString,
   alStringList,

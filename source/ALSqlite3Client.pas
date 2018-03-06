@@ -1,48 +1,33 @@
-{*************************************************************
+{************************************************************
 product:      ALSqlite3Client
 Description:  An object to query Sqlite3 database and get
-              the result In Xml stream
-
-              SQLite is a software library that implements a self-contained,
-              serverless, zero-configuration, transactional SQL database
-              engine. The source code for SQLite is in the public domain and
-              is thus free for use for any purpose, commercial or private.
-              SQLite is the most widely deployed SQL database engine
-              in the world.
-
-Link :        http://www.sqlite.org/
-**************************************************************}
+              the result In Xml format or in Json/Bson format
+*************************************************************}
 
 unit AlSqlite3Client;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
 Uses System.SysUtils,
      System.Contnrs,
      System.SyncObjs,
      AlXmlDoc,
+     ALJsonDoc,
      AlSqlite3Wrapper,
      ALString,
      ALStringList;
 
 Type
 
-  {--------------------------------------}
-  {$IF CompilerVersion >= 23} {Delphi XE2}
-  TalSqlite3ClientSelectDataOnNewRowFunct = reference to Procedure(XMLRowData: TalXmlNode;
-                                                                   const ViewTag: AnsiString;
-                                                                   ExtData: Pointer;
-                                                                   Var Continue: Boolean);
-  {$ELSE}
-  TalSqlite3ClientSelectDataOnNewRowFunct = Procedure(XMLRowData: TalXmlNode;
-                                                      const ViewTag: AnsiString;
-                                                      ExtData: Pointer;
-                                                      Var Continue: Boolean);
-  {$IFEND}
+  {-----------------------------------------------------------------------------------------}
+  TalSqlite3ClientSelectXMLDataOnNewRowFunct = reference to Procedure(XMLRowData: TalXmlNode;
+                                                                      const ViewTag: AnsiString;
+                                                                      ExtData: Pointer;
+                                                                      Var Continue: Boolean);
+  TalSqlite3ClientSelectJSONDataOnNewRowFunct = reference to Procedure(JSONRowData: TALJSONNode;
+                                                                       const ViewTag: AnsiString;
+                                                                       ExtData: Pointer;
+                                                                       Var Continue: Boolean);
 
   {--------------------------------}
   EALSqlite3Error = class(Exception)
@@ -58,7 +43,7 @@ Type
   private
     fLibrary: TALSqlite3Library;
     FownLibrary: Boolean;
-    fSqlite3: PSQLite3;
+    fSqlite3: SQLite3;
     fNullString: AnsiString;
     finTransaction: Boolean;
     function  GetConnected: Boolean;
@@ -70,9 +55,6 @@ Type
                               const CacheThreshold: integer;
                               const DataStr: ansiString); virtual;
     procedure CheckAPIError(Error: Boolean);
-    Function  GetFieldValue(aSqlite3stmt: PSQLite3Stmt;
-                            aIndex: Integer;
-                            const aFormatSettings: TALFormatSettings): AnsiString;
     procedure initObject; virtual;
     procedure OnSelectDataDone(const SQL: AnsiString;
                                const RowTag: AnsiString;
@@ -104,18 +86,46 @@ Type
                          First: Integer; // used only if value is > 0
                          CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
                                                    // cache or not. Values <= 0 deactivate the cache
+                         JSONDATA: TALJSONNode;
+                         OnNewRowFunct: TalSqlite3ClientSelectJSONDataOnNewRowFunct;
+                         ExtData: Pointer); overload; virtual;
+    Procedure SelectData(const SQL: AnsiString;
+                         Skip: integer;
+                         First: Integer;
+                         OnNewRowFunct: TalSqlite3ClientSelectJsonDataOnNewRowFunct;
+                         ExtData: Pointer); overload; virtual;
+    Procedure SelectData(const SQL: AnsiString;
+                         OnNewRowFunct: TalSqlite3ClientSelectJsonDataOnNewRowFunct;
+                         ExtData: Pointer); overload; virtual;
+    Procedure SelectData(const SQL: AnsiString;
+                         const RowTag: AnsiString;
+                         Skip: integer;
+                         First: Integer;
+                         JsonDATA: TalJsonNode); overload; virtual;
+    Procedure SelectData(const SQL: AnsiString;
+                         const RowTag: AnsiString;
+                         JsonDATA: TalJsonNode); overload; virtual;
+    Procedure SelectData(const SQL: AnsiString;
+                         JsonDATA: TalJsonNode); overload; virtual;
+    Procedure SelectData(const SQL: AnsiString;
+                         const RowTag: AnsiString;
+                         const ViewTag: AnsiString;
+                         Skip: integer;  // used only if value is > 0
+                         First: Integer; // used only if value is > 0
+                         CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                                   // cache or not. Values <= 0 deactivate the cache
                          XMLDATA: TalXMLNode;
-                         OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                         OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
                          ExtData: Pointer;
                          const FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          Skip: integer;
                          First: Integer;
-                         OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                         OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
                          ExtData: Pointer;
                          const FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
-                         OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                         OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
                          ExtData: Pointer;
                          const FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
@@ -142,8 +152,8 @@ Type
 
   {----------------------------------------}
   TalSqlite3ConnectionPoolContainer = record
-    ConnectionHandle: PSQLite3;
-    LastAccessDate: int64;
+    ConnectionHandle: SQLite3;
+    LastAccessDate: UInt64;
   End;
   TalSqlite3ConnectionPool = array of TalSqlite3ConnectionPoolContainer;
 
@@ -160,7 +170,7 @@ Type
     FDatabaseWriteLocked: Boolean;
     FWorkingConnectionCount: Integer;
     FReleasingAllconnections: Boolean;
-    FLastConnectionGarbage: Int64;
+    FLastConnectionGarbage: UInt64;
     FConnectionMaxIdleTime: integer;
     FDataBaseName: AnsiString;
     FOpenConnectionFlags: integer;
@@ -172,16 +182,13 @@ Type
     Procedure SaveDataToCache(const Key: ansiString;
                               const CacheThreshold: integer;
                               const DataStr: ansiString); virtual;
-    procedure CheckAPIError(ConnectionHandle: PSQLite3; Error: Boolean);
+    procedure CheckAPIError(ConnectionHandle: SQLite3; Error: Boolean);
     function  GetDataBaseName: AnsiString; virtual;
-    Function  GetFieldValue(aSqlite3stmt: PSQLite3Stmt;
-                            aIndex: Integer;
-                            const aFormatSettings: TALFormatSettings): AnsiString; virtual;
     procedure initObject(const aDataBaseName: AnsiString;
                          const aOpenConnectionFlags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE;
                          const aOpenConnectionPragmaStatements: AnsiString = ''); virtual;
-    Function  AcquireConnection(const readonly: boolean = False): PSQLite3; virtual;
-    Procedure ReleaseConnection(var ConnectionHandle: PSQLite3;
+    Function  AcquireConnection(const readonly: boolean = False): SQLite3; virtual;
+    Procedure ReleaseConnection(var ConnectionHandle: SQLite3;
                                 const CloseConnection: Boolean = False); virtual;
     procedure OnSelectDataDone(const SQL: AnsiString;
                                const RowTag: AnsiString;
@@ -208,10 +215,10 @@ Type
     procedure shutdown;   //can not be put in the create because config can/must be call after shutdown
     procedure enable_shared_cache(enable: boolean);
     Procedure ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True); virtual;
-    Procedure TransactionStart(Var ConnectionHandle: PSQLite3; const ReadOnly: boolean = False); virtual;
-    Procedure TransactionCommit(var ConnectionHandle: PSQLite3;
+    Procedure TransactionStart(Var ConnectionHandle: SQLite3; const ReadOnly: boolean = False); virtual;
+    Procedure TransactionCommit(var ConnectionHandle: SQLite3;
                                 const CloseConnection: Boolean = False); virtual;
-    Procedure TransactionRollback(var ConnectionHandle: PSQLite3;
+    Procedure TransactionRollback(var ConnectionHandle: SQLite3;
                                   const CloseConnection: Boolean = False); virtual;
     Procedure SelectData(const SQL: AnsiString;
                          const RowTag: AnsiString;
@@ -220,46 +227,79 @@ Type
                          First: Integer; // used only if value is > 0
                          CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
                                                    // cache or not. Values <= 0 deactivate the cache
-
-                         XMLDATA: TalXMLNode;
-                         OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                         JSONDATA: TALJSONNode;
+                         OnNewRowFunct: TalSqlite3ClientSelectJSONDataOnNewRowFunct;
                          ExtData: Pointer;
-                         const FormatSettings: TALFormatSettings;
-                         const ConnectionHandle: PSQLite3 = nil); overload; virtual;
+                         const ConnectionHandle: SQLite3 = nil); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          Skip: integer;
                          First: Integer;
-                         OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                         OnNewRowFunct: TalSqlite3ClientSelectJsonDataOnNewRowFunct;
                          ExtData: Pointer;
-                         const FormatSettings: TALFormatSettings;
-                         const ConnectionHandle: PSQLite3 = nil); overload; virtual;
+                         const ConnectionHandle: SQLite3 = nil); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
-                         OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                         OnNewRowFunct: TalSqlite3ClientSelectJsonDataOnNewRowFunct;
+                         ExtData: Pointer;
+                         const ConnectionHandle: SQLite3 = nil); overload; virtual;
+    Procedure SelectData(const SQL: AnsiString;
+                         const RowTag: AnsiString;
+                         Skip: integer;
+                         First: Integer;
+                         JsonDATA: TalJsonNode;
+                         const ConnectionHandle: SQLite3 = nil); overload; virtual;
+    Procedure SelectData(const SQL: AnsiString;
+                         const RowTag: AnsiString;
+                         JsonDATA: TalJsonNode;
+                         const ConnectionHandle: SQLite3 = nil); overload; virtual;
+    Procedure SelectData(const SQL: AnsiString;
+                         JsonDATA: TalJsonNode;
+                         const ConnectionHandle: SQLite3 = nil); overload; virtual;
+    Procedure SelectData(const SQL: AnsiString;
+                         const RowTag: AnsiString;
+                         const ViewTag: AnsiString;
+                         Skip: integer;  // used only if value is > 0
+                         First: Integer; // used only if value is > 0
+                         CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                                   // cache or not. Values <= 0 deactivate the cache
+                         XMLDATA: TalXMLNode;
+                         OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
                          ExtData: Pointer;
                          const FormatSettings: TALFormatSettings;
-                         const ConnectionHandle: PSQLite3 = nil); overload; virtual;
+                         const ConnectionHandle: SQLite3 = nil); overload; virtual;
+    Procedure SelectData(const SQL: AnsiString;
+                         Skip: integer;
+                         First: Integer;
+                         OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
+                         ExtData: Pointer;
+                         const FormatSettings: TALFormatSettings;
+                         const ConnectionHandle: SQLite3 = nil); overload; virtual;
+    Procedure SelectData(const SQL: AnsiString;
+                         OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
+                         ExtData: Pointer;
+                         const FormatSettings: TALFormatSettings;
+                         const ConnectionHandle: SQLite3 = nil); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          const RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
                          XMLDATA: TalXMLNode;
                          const FormatSettings: TALFormatSettings;
-                         const ConnectionHandle: PSQLite3 = nil); overload; virtual;
+                         const ConnectionHandle: SQLite3 = nil); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          const RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
                          const FormatSettings: TALFormatSettings;
-                         const ConnectionHandle: PSQLite3 = nil); overload; virtual;
+                         const ConnectionHandle: SQLite3 = nil); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          XMLDATA: TalXMLNode;
                          const FormatSettings: TALFormatSettings;
-                         const ConnectionHandle: PSQLite3 = nil); overload; virtual;
+                         const ConnectionHandle: SQLite3 = nil); overload; virtual;
     procedure UpdateData(SQLs: TALStrings;
-                         const ConnectionHandle: PSQLite3 = nil); overload; virtual;
+                         const ConnectionHandle: SQLite3 = nil); overload; virtual;
     procedure UpdateData(const SQL: AnsiString;
-                         const ConnectionHandle: PSQLite3 = nil); overload; virtual;
+                         const ConnectionHandle: SQLite3 = nil); overload; virtual;
     procedure UpdateData(const SQLs: array of AnsiString;
-                         const ConnectionHandle: PSQLite3 = nil); overload; virtual;
+                         const ConnectionHandle: SQLite3 = nil); overload; virtual;
     Function  ConnectionCount: Integer;
     Function  WorkingConnectionCount: Integer;
     property  DataBaseName: AnsiString read GetDataBaseName;
@@ -270,7 +310,8 @@ Type
 
 implementation
 
-Uses System.classes,
+Uses Winapi.Windows,
+     System.classes,
      System.Diagnostics,
      ALCipher,
      ALWindows;
@@ -315,21 +356,6 @@ Begin
   if Error then begin
     if assigned(Fsqlite3) then raise EALSqlite3Error.Create(AnsiString(fLibrary.sqlite3_errmsg(Fsqlite3)), fLibrary.sqlite3_errcode(Fsqlite3)) // !! take care that sqlite3_errmsg(Fsqlite3) return an UTF8 !!
     else raise EALSqlite3Error.Create('Sqlite3 error', -1);
-  end;
-end;
-
-{*****************************************************************}
-function TalSqlite3Client.GetFieldValue(aSqlite3stmt: PSQLite3Stmt;
-                                        aIndex: Integer;
-                                        const aFormatSettings: TALFormatSettings): AnsiString;
-begin
-  Case FLibrary.sqlite3_column_type(aSqlite3stmt, aIndex) of
-    SQLITE_FLOAT: Result := ALFloattostr(FLibrary.sqlite3_column_double(aSqlite3stmt, aIndex), aFormatSettings);
-    SQLITE_INTEGER,
-    SQLITE3_TEXT: result :=  AnsiString(FLibrary.sqlite3_column_text(aSqlite3stmt, aIndex)); // Strings returned by sqlite3_column_text() and sqlite3_column_text16(), even
-                                                                                             // empty strings, are always zero-terminated.
-    SQLITE_NULL: result := fNullString;
-    else raise Exception.Create('Unsupported column type');
   end;
 end;
 
@@ -617,19 +643,304 @@ begin
 end;
 
 {**********************************************************}
-procedure TalSqlite3Client.SelectData(const SQL: AnsiString;
+Procedure TalSqlite3Client.SelectData(const SQL: AnsiString;
                                       const RowTag: AnsiString;
                                       const ViewTag: AnsiString;
                                       Skip: integer;  // used only if value is > 0
                                       First: Integer; // used only if value is > 0
                                       CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
                                                                 // cache or not. Values <= 0 deactivate the cache
+                                      JSONDATA: TALJSONNode;
+                                      OnNewRowFunct: TalSqlite3ClientSelectJSONDataOnNewRowFunct;
+                                      ExtData: Pointer);
 
+Var astmt: SQLite3_Stmt;
+    aStepResult: integer;
+    aColumnCount: Integer;
+    aColumnIndex: integer;
+    aColumnNames: Array of AnsiString;
+    aNewRec: TalJsonNode;
+    aValueRec: TalJsonNode;
+    aViewRec: TalJsonNode;
+    aRecIndex: integer;
+    aRecAdded: integer;
+    aContinue: Boolean;
+    aJsonDocument: TalJsonDocument;
+    aUpdateRowTagByFieldValue: Boolean;
+    aStopWatch: TStopWatch;
+    aCacheKey: ansiString;
+    aCacheStr: ansiString;
+    aTmpRowTag: ansiString;
+
+begin
+
+  //Error if we are not connected
+  If not connected then raise Exception.Create('Not connected');
+
+  //only OnNewRowFunct / JsonDATA can be used
+  if assigned(OnNewRowFunct) then JsonDATA := nil;
+
+  //clear the JsonDATA
+  if assigned(JsonDATA) then aJsonDocument := Nil
+  else begin
+    aJsonDocument := TALJsonDocument.create;
+    JsonDATA := aJsonDocument.Node;
+  end;
+
+  try
+
+    //init the TstopWatch
+    aStopWatch := TstopWatch.Create;
+
+    //Handle the CacheThreshold
+    aCacheKey := '';
+    If (CacheThreshold > 0) and
+       (not assigned(aJsonDocument)) and
+       ((Jsondata.ChildNodes.Count = 0) or  // else the save will not work
+        (ViewTag <> '')) then begin
+
+      //try to load from from cache
+      aCacheKey := ALStringHashSHA1(AlFormat('BSON#%s#%s#%s#%s', [RowTag,
+                                                                  alinttostr(Skip),
+                                                                  alinttostr(First),
+                                                                  SQL]));
+      if loadcachedData(aCacheKey, aCacheStr) then begin
+
+        //init the aViewRec
+        if (ViewTag <> '') then aViewRec := Jsondata.AddChild(ViewTag, ntObject)
+        else aViewRec := Jsondata;
+
+        //assign the tmp data to the JsonData
+        aViewRec.LoadFromBsonString(aCacheStr, false{ClearChildNodes});
+
+        //exit
+        exit;
+
+      end;
+
+    end;
+
+    //start the TstopWatch
+    aStopWatch.Reset;
+    aStopWatch.Start;
+
+    //prepare the query
+    astmt := nil;
+    CheckAPIError(FLibrary.sqlite3_prepare_v2(FSqlite3, PAnsiChar(SQL), length(SQL), astmt, nil) <> SQLITE_OK);
+    Try
+
+      //Return the number of columns in the result set returned by the
+      //prepared statement. This routine returns 0 if pStmt is an SQL statement
+      //that does not return data (for example an UPDATE).
+      aColumnCount := FLibrary.sqlite3_column_count(astmt);
+
+      //init the aColumnNames array
+      setlength(aColumnNames,aColumnCount);
+      For aColumnIndex := 0 to aColumnCount - 1 do
+        aColumnNames[aColumnIndex] := FLibrary.sqlite3_column_name(astmt, aColumnIndex);
+
+      //init the aViewRec
+      if (ViewTag <> '') and (not assigned(aJsonDocument)) then aViewRec := Jsondata.AddChild(ViewTag, ntObject)
+      else aViewRec := Jsondata;
+
+      //init aUpdateRowTagByFieldValue
+      if AlPos('&>',RowTag) = 1 then begin
+        aTmpRowTag := ALcopyStr(RowTag,3,maxint);
+        aUpdateRowTagByFieldValue := aTmpRowTag <> '';
+      end
+      else begin
+        aTmpRowTag := RowTag;
+        aUpdateRowTagByFieldValue := False;
+      end;
+
+      //loop throught all row
+      aRecIndex := 0;
+      aRecAdded := 0;
+      while True do begin
+
+        //retrieve the next row
+        aStepResult := FLibrary.sqlite3_step(astmt);
+
+        //break if no more row
+        if aStepResult = SQLITE_DONE then break
+
+        //download the row
+        else if aStepResult = SQLITE_ROW then begin
+
+          //process if > Skip
+          inc(aRecIndex);
+          If aRecIndex > Skip then begin
+
+            //init NewRec
+            if (aTmpRowTag <> '') and (not assigned(aJsonDocument)) then aNewRec := aViewRec.AddChild(aTmpRowTag, ntObject)
+            Else aNewRec := aViewRec;
+
+            //loop throught all column
+            For aColumnIndex := 0 to aColumnCount - 1 do begin
+              aValueRec := aNewRec.AddChild(ALlowercase(aColumnNames[aColumnIndex]));
+              Case FLibrary.sqlite3_column_type(astmt, aColumnIndex) of
+                SQLITE_INTEGER: aValueRec.int64 := FLibrary.sqlite3_column_int64(astmt, aColumnIndex);
+                SQLITE_FLOAT: aValueRec.Float := FLibrary.sqlite3_column_double(astmt, aColumnIndex);
+                SQLITE_TEXT: aValueRec.Text :=  AnsiString(FLibrary.sqlite3_column_text(astmt, aColumnIndex)); // Strings returned by sqlite3_column_text() and sqlite3_column_text16(), even empty strings, are always zero-terminated.
+                SQLITE_NULL: aValueRec.Null := true;
+                //SQLITE_BLOB: todo
+                else raise Exception.Create('Unsupported column type');
+              end;
+              if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
+            end;
+
+            //handle OnNewRowFunct
+            if assigned(OnNewRowFunct) then begin
+              aContinue := True;
+              OnNewRowFunct(aNewRec, ViewTag, ExtData, aContinue);
+              if Not aContinue then Break;
+            end;
+
+            //free the node if aJsonDocument
+            if assigned(aJsonDocument) then aJsonDocument.Node.ChildNodes.Clear;
+
+            //handle the First
+            inc(aRecAdded);
+            If (First > 0) and (aRecAdded >= First) then Break;
+
+          end;
+
+        end
+
+        //misc error, raise an exception
+        else CheckAPIError(True);
+
+      end;
+
+    Finally
+      //free the memory used by the API
+      CheckAPIError(FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
+    End;
+
+    //do the OnSelectDataDone
+    aStopWatch.Stop;
+    OnSelectDataDone(SQL,
+                     RowTag,
+                     ViewTag,
+                     Skip,
+                     First,
+                     CacheThreshold,
+                     aStopWatch.Elapsed.TotalMilliseconds);
+
+    //save to the cache
+    If aCacheKey <> '' then begin
+
+      //save the data
+      aViewRec.SaveToBsonString(aCacheStr);
+      SaveDataToCache(aCacheKey,
+                      CacheThreshold,
+                      aCacheStr);
+
+    end;
+
+  Finally
+    if assigned(aJsonDocument) then aJsonDocument.free;
+  End;
+
+end;
+
+{**********************************************************}
+procedure TalSqlite3Client.SelectData(const SQL: AnsiString;
+                                      Skip: Integer;
+                                      First: Integer;
+                                      OnNewRowFunct: TalSqlite3ClientSelectJsonDataOnNewRowFunct;
+                                      ExtData: Pointer);
+begin
+  SelectData(SQL,
+             '', // RowTag,
+             '', // ViewTag,
+             Skip,
+             First,
+             -1, // CacheThreshold,
+             nil, // JsonDATA,
+             OnNewRowFunct,
+             ExtData);
+end;
+
+{**********************************************************}
+procedure TalSqlite3Client.SelectData(const SQL: AnsiString;
+                                      OnNewRowFunct: TalSqlite3ClientSelectJsonDataOnNewRowFunct;
+                                      ExtData: Pointer);
+begin
+  SelectData(SQL,
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             nil, // JsonDATA,
+             OnNewRowFunct,
+             ExtData);
+end;
+
+{**********************************************************}
+procedure TalSqlite3Client.SelectData(const SQL: AnsiString;
+                                      const RowTag: AnsiString;
+                                      Skip: Integer;
+                                      First: Integer;
+                                      JsonDATA: TalJsonNode);
+begin
+  SelectData(SQL,
+             RowTag,
+             '', // ViewTag,
+             Skip,
+             First,
+             -1, // CacheThreshold,
+             JsonDATA,
+             nil, // OnNewRowFunct,
+             nil); // ExtData,
+end;
+
+{**********************************************************}
+procedure TalSqlite3Client.SelectData(const SQL: AnsiString;
+                                      const RowTag: AnsiString;
+                                      JsonDATA: TalJsonNode);
+begin
+  SelectData(SQL,
+             RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             JsonDATA,
+             nil, // OnNewRowFunct,
+             nil); // ExtData,
+end;
+
+{**********************************************************}
+procedure TalSqlite3Client.SelectData(const SQL: AnsiString;
+                                      JsonDATA: TalJsonNode);
+begin
+  SelectData(SQL,
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             JsonDATA,
+             nil, // OnNewRowFunct,
+             nil); // ExtData,
+end;
+
+{**********************************************************}
+procedure TalSqlite3Client.SelectData(const SQL: AnsiString;
+                                      const RowTag: AnsiString;
+                                      const ViewTag: AnsiString;
+                                      Skip: integer;  // used only if value is > 0
+                                      First: Integer; // used only if value is > 0
+                                      CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                                               // cache or not. Values <= 0 deactivate the cache
                                       XMLDATA: TalXMLNode;
-                                      OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                                      OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
                                       ExtData: Pointer;
                                       const FormatSettings: TALFormatSettings);
-Var astmt: PSQLite3Stmt;
+
+Var astmt: SQLite3_Stmt;
     aStepResult: integer;
     aColumnCount: Integer;
     aColumnIndex: integer;
@@ -675,11 +986,11 @@ begin
         (ViewTag <> '')) then begin
 
       //try to load from from cache
-      aCacheKey := ALStringHashSHA1(RowTag + '#' +
-                                    alinttostr(Skip) + '#' +
-                                    alinttostr(First) + '#' +
-                                    ALGetFormatSettingsID(FormatSettings) + '#' +
-                                    SQL);
+      aCacheKey := ALStringHashSHA1(AlFormat('XML#%s#%s#%s#%s#%s', [RowTag,
+                                                                    alinttostr(Skip),
+                                                                    alinttostr(First),
+                                                                    ALGetFormatSettingsID(FormatSettings),
+                                                                    SQL]));
       if loadcachedData(aCacheKey, aCacheStr) then begin
 
         //init the aViewRec
@@ -754,9 +1065,14 @@ begin
             //loop throught all column
             For aColumnIndex := 0 to aColumnCount - 1 do begin
               aValueRec := aNewRec.AddChild(ALlowercase(aColumnNames[aColumnIndex]));
-              aValueRec.Text := GetFieldValue(astmt,
-                                              aColumnIndex,
-                                              FormatSettings);
+              Case FLibrary.sqlite3_column_type(astmt, aColumnIndex) of
+                SQLITE_FLOAT: aValueRec.Text := ALFloattostr(FLibrary.sqlite3_column_double(astmt, aColumnIndex), FormatSettings);
+                SQLITE_INTEGER,
+                SQLITE3_TEXT: aValueRec.Text :=  AnsiString(FLibrary.sqlite3_column_text(astmt, aColumnIndex)); // Strings returned by sqlite3_column_text() and sqlite3_column_text16(), even empty strings, are always zero-terminated.
+                SQLITE_NULL: aValueRec.Text := fNullString;
+                //SQLITE_BLOB: todo
+                else raise Exception.Create('Unsupported column type');
+              end;
               if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
             end;
 
@@ -819,7 +1135,7 @@ end;
 procedure TalSqlite3Client.SelectData(const SQL: AnsiString;
                                       Skip: Integer;
                                       First: Integer;
-                                      OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                                      OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
                                       ExtData: Pointer;
                                       const FormatSettings: TALFormatSettings);
 begin
@@ -837,7 +1153,7 @@ end;
 
 {**********************************************************}
 procedure TalSqlite3Client.SelectData(const SQL: AnsiString;
-                                      OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                                      OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
                                       ExtData: Pointer;
                                       const FormatSettings: TALFormatSettings);
 begin
@@ -910,7 +1226,7 @@ end;
 
 {***********************************************************}
 procedure TalSqlite3Client.UpdateData(const SQL: AnsiString);
-Var astmt: PSQLite3Stmt;
+Var astmt: SQLite3_Stmt;
     aStopWatch: TStopWatch;
 begin
 
@@ -959,8 +1275,8 @@ begin
     UpdateData(SQLs[i]);
 end;
 
-{*************************************************************************************************}
-procedure TalSqlite3ConnectionPoolClient.CheckAPIError(ConnectionHandle: PSQLite3; Error: Boolean);
+{************************************************************************************************}
+procedure TalSqlite3ConnectionPoolClient.CheckAPIError(ConnectionHandle: SQLite3; Error: Boolean);
 begin
   if Error then begin
     if assigned(ConnectionHandle) then raise EALSqlite3Error.Create(AnsiString(fLibrary.sqlite3_errmsg(ConnectionHandle)), fLibrary.sqlite3_errcode(ConnectionHandle)) // !! take care that sqlite3_errmsg(Fsqlite3) return an UTF8 !!
@@ -974,21 +1290,6 @@ begin
   result := FdatabaseName;
 end;
 
-{*******************************************************************************}
-function TalSqlite3ConnectionPoolClient.GetFieldValue(aSqlite3stmt: PSQLite3Stmt;
-                                                      aIndex: Integer;
-                                                      const aFormatSettings: TALFormatSettings): AnsiString;
-begin
-  Case FLibrary.sqlite3_column_type(aSqlite3stmt, aIndex) of
-    SQLITE_FLOAT: Result := ALFloattostr(FLibrary.sqlite3_column_double(aSqlite3stmt, aIndex), aFormatSettings);
-    SQLITE_INTEGER,
-    SQLITE3_TEXT: result :=  AnsiString(FLibrary.sqlite3_column_text(aSqlite3stmt, aIndex)); // Strings returned by sqlite3_column_text(), even empty strings, are always zero terminated
-                                                                                             // Note: what's happen if #0 is inside the string ?
-    SQLITE_NULL: result := fNullString;
-    else raise Exception.Create('Unsupported column type');
-  end;
-end;
-
 {**********************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.initObject(const aDataBaseName: AnsiString;
                                                     const aOpenConnectionFlags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE;
@@ -997,7 +1298,8 @@ begin
   FDataBaseName:= aDataBaseName;
   FOpenConnectionFlags := aOpenConnectionFlags;
   FOpenConnectionPragmaStatements := TALStringList.Create;
-  FOpenConnectionPragmaStatements.Text := ALTrim(AlStringReplace(aOpenConnectionPragmaStatements,';',#13#10,[rfReplaceAll]));
+  FOpenConnectionPragmaStatements.LineBreak := ';';
+  FOpenConnectionPragmaStatements.Text := aOpenConnectionPragmaStatements;
   setlength(FConnectionPool,0);
   FConnectionPoolCount := 0;
   FConnectionPoolCapacity := 0;
@@ -1006,7 +1308,7 @@ begin
   FDatabaseWriteLocked := False;
   FWorkingConnectionCount:= 0;
   FReleasingAllconnections := False;
-  FLastConnectionGarbage := ALGettickCount64;
+  FLastConnectionGarbage := GettickCount64;
   FConnectionMaxIdleTime := 1200000; // 1000 * 60 * 20 = 20 min
   FNullString := '';
 end;
@@ -1105,9 +1407,9 @@ begin
   else CheckAPIError(nil, FLibrary.sqlite3_enable_shared_cache(0) <> SQLITE_OK);
 end;
 
-{***************************************************************************************************}
-function TalSqlite3ConnectionPoolClient.AcquireConnection(const readonly: boolean = False): PSQLite3;
-Var aTickCount: int64;
+{**************************************************************************************************}
+function TalSqlite3ConnectionPoolClient.AcquireConnection(const readonly: boolean = False): SQLite3;
+Var aTickCount: UInt64;
     aDoPragma: Boolean;
 Begin
 
@@ -1122,7 +1424,7 @@ Begin
     if FReleasingAllconnections then raise exception.Create('Can not acquire connection: currently releasing all connections');
 
     //delete the old unused connection
-    aTickCount := ALGetTickCount64;
+    aTickCount := GetTickCount64;
     if aTickCount - fLastConnectionGarbage > (60000 {every minutes})  then begin
 
       while FConnectionPoolCount > 0 do begin
@@ -1221,7 +1523,7 @@ End;
  BLOB handles, then it returns SQLITE_BUSY.
  If sqlite3_close() is invoked while a transaction is open, the transaction is
  automatically rolled back.}
-procedure TalSqlite3ConnectionPoolClient.ReleaseConnection(var ConnectionHandle: PSQLite3;
+procedure TalSqlite3ConnectionPoolClient.ReleaseConnection(var ConnectionHandle: SQLite3;
                                                            const CloseConnection: Boolean = False);
 begin
 
@@ -1241,7 +1543,7 @@ begin
         SetLength(FConnectionPool, FConnectionPoolCapacity);
       end;
       FConnectionPool[FConnectionPoolCount].ConnectionHandle := ConnectionHandle;
-      FConnectionPool[FConnectionPoolCount].LastAccessDate := ALGetTickCount64;
+      FConnectionPool[FConnectionPoolCount].LastAccessDate := GetTickCount64;
       Inc(FConnectionPoolCount);
     end
 
@@ -1306,7 +1608,7 @@ begin
         End;
         Dec(FConnectionPoolCount);
       end;
-      FLastConnectionGarbage := ALGetTickCount64;
+      FLastConnectionGarbage := GetTickCount64;
     finally
       FConnectionPoolCS.Release;
     end;
@@ -1318,8 +1620,8 @@ begin
 
 end;
 
-{***************************************************************************************}
-procedure TalSqlite3ConnectionPoolClient.TransactionStart(Var ConnectionHandle: PSQLite3;
+{**************************************************************************************}
+procedure TalSqlite3ConnectionPoolClient.TransactionStart(Var ConnectionHandle: SQLite3;
                                                           const ReadOnly: boolean = False);
 begin
 
@@ -1340,8 +1642,8 @@ begin
 
 end;
 
-{****************************************************************************************}
-procedure TalSqlite3ConnectionPoolClient.TransactionCommit(var ConnectionHandle: PSQLite3;
+{***************************************************************************************}
+procedure TalSqlite3ConnectionPoolClient.TransactionCommit(var ConnectionHandle: SQLite3;
                                                            const CloseConnection: Boolean = False);
 begin
 
@@ -1356,8 +1658,8 @@ begin
 
 end;
 
-{******************************************************************************************}
-procedure TalSqlite3ConnectionPoolClient.TransactionRollback(var ConnectionHandle: PSQLite3;
+{*****************************************************************************************}
+procedure TalSqlite3ConnectionPoolClient.TransactionRollback(var ConnectionHandle: SQLite3;
                                                              const CloseConnection: Boolean = False);
 var aTmpCloseConnection: Boolean;
 begin
@@ -1407,6 +1709,322 @@ begin
 end;
 
 {************************************************************************}
+Procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
+                                                    const RowTag: AnsiString;
+                                                    const ViewTag: AnsiString;
+                                                    Skip: integer;  // used only if value is > 0
+                                                    First: Integer; // used only if value is > 0
+                                                    CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                                                              // cache or not. Values <= 0 deactivate the cache
+                                                    JSONDATA: TALJSONNode;
+                                                    OnNewRowFunct: TalSqlite3ClientSelectJSONDataOnNewRowFunct;
+                                                    ExtData: Pointer;
+                                                    const ConnectionHandle: SQLite3 = nil);
+
+Var astmt: SQLite3_Stmt;
+    aStepResult: integer;
+    aColumnCount: Integer;
+    aColumnIndex: integer;
+    aColumnNames: Array of AnsiString;
+    aNewRec: TalJsonNode;
+    aValueRec: TalJsonNode;
+    aViewRec: TalJsonNode;
+    aRecIndex: integer;
+    aRecAdded: integer;
+    aTmpConnectionHandle: SQLite3;
+    aOwnConnection: Boolean;
+    aContinue: Boolean;
+    aJsonDocument: TalJsonDocument;
+    aUpdateRowTagByFieldValue: Boolean;
+    aStopWatch: TStopWatch;
+    aCacheKey: ansiString;
+    aCacheStr: ansiString;
+    aTmpRowTag: ansiString;
+
+begin
+
+  //only OnNewRowFunct / JsonDATA can be used
+  if assigned(OnNewRowFunct) then JsonDATA := nil;
+
+  //clear the JsonDATA
+  if assigned(JsonDATA) then aJsonDocument := Nil
+  else begin
+    aJsonDocument := TALJsonDocument.create;
+    JsonDATA := aJsonDocument.Node;
+  end;
+
+  try
+
+    //init the TstopWatch
+    aStopWatch := TstopWatch.Create;
+
+    //Handle the CacheThreshold
+    aCacheKey := '';
+    If (CacheThreshold > 0) and
+       (not assigned(aJsonDocument)) and
+       ((Jsondata.ChildNodes.Count = 0) or  // else the save will not work
+        (ViewTag <> '')) then begin
+
+      //try to load from from cache
+      aCacheKey := ALStringHashSHA1(AlFormat('BSON#%s#%s#%s#%s', [RowTag,
+                                                                  alinttostr(Skip),
+                                                                  alinttostr(First),
+                                                                  SQL]));
+      if loadcachedData(aCacheKey, aCacheStr) then begin
+
+        //init the aViewRec
+        if (ViewTag <> '') then aViewRec := Jsondata.AddChild(ViewTag, ntObject)
+        else aViewRec := Jsondata;
+
+        //assign the tmp data to the JsonData
+        aViewRec.LoadFromBsonString(aCacheStr, false{ClearChildNodes});
+
+        //exit
+        exit;
+
+      end;
+
+    end;
+
+    //acquire a connection and start the transaction if necessary
+    aTmpConnectionHandle := ConnectionHandle;
+    aOwnConnection := (not assigned(ConnectionHandle));
+    if aOwnConnection then TransactionStart(aTmpConnectionHandle, True);
+    Try
+
+      //start the TstopWatch
+      aStopWatch.Reset;
+      aStopWatch.Start;
+
+      //prepare the query
+      astmt := nil;
+      CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_prepare_v2(aTmpConnectionHandle, PAnsiChar(SQL), length(SQL), astmt, nil) <> SQLITE_OK);
+      Try
+
+        //Return the number of columns in the result set returned by the
+        //prepared statement. This routine returns 0 if pStmt is an SQL statement
+        //that does not return data (for example an UPDATE).
+        aColumnCount := FLibrary.sqlite3_column_count(astmt);
+
+        //init the aColumnNames array
+        setlength(aColumnNames,aColumnCount);
+        For aColumnIndex := 0 to aColumnCount - 1 do
+          aColumnNames[aColumnIndex] := FLibrary.sqlite3_column_name(astmt, aColumnIndex);
+
+        //init the aViewRec
+        if (ViewTag <> '') and (not assigned(aJsonDocument))  then aViewRec := Jsondata.AddChild(ViewTag, ntObject)
+        else aViewRec := Jsondata;
+
+        //init aUpdateRowTagByFieldValue
+        if AlPos('&>',RowTag) = 1 then begin
+          aTmpRowTag := ALcopyStr(RowTag,3,maxint);
+          aUpdateRowTagByFieldValue := aTmpRowTag <> '';
+        end
+        else begin
+          aTmpRowTag := RowTag;
+          aUpdateRowTagByFieldValue := False;
+        end;
+
+        //loop throught all row
+        aRecIndex := 0;
+        aRecAdded := 0;
+        while True do begin
+
+          //retrieve the next row
+          aStepResult := FLibrary.sqlite3_step(astmt);
+
+          //break if no more row
+          if aStepResult = SQLITE_DONE then break
+
+          //download the row
+          else if aStepResult = SQLITE_ROW then begin
+
+            //process if > Skip
+            inc(aRecIndex);
+            If aRecIndex > Skip then begin
+
+              //init NewRec
+              if (aTmpRowTag <> '') and (not assigned(aJsonDocument))  then aNewRec := aViewRec.AddChild(aTmpRowTag, ntobject)
+              Else aNewRec := aViewRec;
+
+              //loop throught all column
+              For aColumnIndex := 0 to aColumnCount - 1 do begin
+                aValueRec := aNewRec.AddChild(ALlowercase(aColumnNames[aColumnIndex]));
+                Case FLibrary.sqlite3_column_type(astmt, aColumnIndex) of
+                  SQLITE_INTEGER: aValueRec.int64 := FLibrary.sqlite3_column_int64(astmt, aColumnIndex);
+                  SQLITE_FLOAT: aValueRec.Float := FLibrary.sqlite3_column_double(astmt, aColumnIndex);
+                  SQLITE_TEXT: aValueRec.Text :=  AnsiString(FLibrary.sqlite3_column_text(astmt, aColumnIndex)); // Strings returned by sqlite3_column_text() and sqlite3_column_text16(), even empty strings, are always zero-terminated.
+                  SQLITE_NULL: aValueRec.Null := true;
+                  //SQLITE_BLOB: todo
+                  else raise Exception.Create('Unsupported column type');
+                end;
+                if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
+              end;
+
+              //handle OnNewRowFunct
+              if assigned(OnNewRowFunct) then begin
+                aContinue := True;
+                OnNewRowFunct(aNewRec, ViewTag, ExtData, aContinue);
+                if Not aContinue then Break;
+              end;
+
+              //free the node if aJsonDocument
+              if assigned(aJsonDocument) then aJsonDocument.Node.ChildNodes.Clear;
+
+              //handle the First
+              inc(aRecAdded);
+              If (First > 0) and (aRecAdded >= First) then Break;
+
+            end;
+
+          end
+
+          //misc error, raise an exception
+          else CheckAPIError(aTmpConnectionHandle, True);
+
+        end;
+
+      Finally
+        //free the memory used by the API
+        CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
+      End;
+
+      //do the OnSelectDataDone
+      aStopWatch.Stop;
+      OnSelectDataDone(SQL,
+                       RowTag,
+                       ViewTag,
+                       Skip,
+                       First,
+                       CacheThreshold,
+                       aStopWatch.Elapsed.TotalMilliseconds);
+
+      //save to the cache
+      If aCacheKey <> '' then begin
+
+        //save the data
+        aViewRec.SaveToBsonString(aCacheStr);
+        SaveDataToCache(aCacheKey,
+                        CacheThreshold,
+                        aCacheStr);
+
+      end;
+
+      //commit the transaction and release the connection if owned
+      if aOwnConnection then TransactionCommit(aTmpConnectionHandle);
+
+    except
+      On E: Exception do begin
+
+        //rollback the transaction and release the connection if owned
+        if aOwnConnection then TransactionRollback(aTmpConnectionHandle, true);
+
+        //raise the error
+        raise;
+
+      end;
+    end;
+
+  finally
+    if assigned(aJsonDocument) then aJsonDocument.free;
+  end;
+
+end;
+
+{************************************************************************}
+procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
+                                                    Skip: Integer;
+                                                    First: Integer;
+                                                    OnNewRowFunct: TalSqlite3ClientSelectJsonDataOnNewRowFunct;
+                                                    ExtData: Pointer;
+                                                    const ConnectionHandle: SQLite3 = nil);
+begin
+  SelectData(SQL,
+             '', // RowTag,
+             '', // ViewTag,
+             Skip,
+             First,
+             -1, // CacheThreshold,
+             nil, // JsonDATA,
+             OnNewRowFunct,
+             ExtData,
+             ConnectionHandle);
+end;
+
+{************************************************************************}
+procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
+                                                    OnNewRowFunct: TalSqlite3ClientSelectJsonDataOnNewRowFunct;
+                                                    ExtData: Pointer;
+                                                    const ConnectionHandle: SQLite3 = nil);
+begin
+  SelectData(SQL,
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             nil, // JsonDATA,
+             OnNewRowFunct,
+             ExtData,
+             ConnectionHandle);
+end;
+
+{************************************************************************}
+procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
+                                                    const RowTag: AnsiString;
+                                                    Skip: Integer;
+                                                    First: Integer;
+                                                    JsonDATA: TalJsonNode;
+                                                    const ConnectionHandle: SQLite3 = nil);
+begin
+  SelectData(SQL,
+             RowTag,
+             '', // ViewTag,
+             Skip,
+             First,
+             -1, // CacheThreshold,
+             JsonDATA,
+             nil, // OnNewRowFunct,
+             nil, // ExtData,
+             ConnectionHandle);
+end;
+
+{************************************************************************}
+procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
+                                                    const RowTag: AnsiString;
+                                                    JsonDATA: TalJsonNode;
+                                                    const ConnectionHandle: SQLite3 = nil);
+begin
+  SelectData(SQL,
+             RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             JsonDATA,
+             nil, // OnNewRowFunct,
+             nil, // ExtData,
+             ConnectionHandle);
+end;
+
+{************************************************************************}
+procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
+                                                    JsonDATA: TalJsonNode;
+                                                    const ConnectionHandle: SQLite3 = nil);
+begin
+  SelectData(SQL,
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             JsonDATA,
+             nil, // OnNewRowFunct,
+             nil, // ExtData,
+             ConnectionHandle);
+end;
+
+{************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                     const RowTag: AnsiString;
                                                     const ViewTag: AnsiString;
@@ -1415,12 +2033,12 @@ procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                     CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
                                                                               // cache or not. Values <= 0 deactivate the cache
                                                     XMLDATA: TalXMLNode;
-                                                    OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                                                    OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
                                                     ExtData: Pointer;
                                                     const FormatSettings: TALFormatSettings;
-                                                    const ConnectionHandle: PSQLite3 = nil);
+                                                    const ConnectionHandle: SQLite3 = nil);
 
-Var astmt: PSQLite3Stmt;
+Var astmt: SQLite3_Stmt;
     aStepResult: integer;
     aColumnCount: Integer;
     aColumnIndex: integer;
@@ -1430,7 +2048,7 @@ Var astmt: PSQLite3Stmt;
     aViewRec: TalXmlNode;
     aRecIndex: integer;
     aRecAdded: integer;
-    aTmpConnectionHandle: PSQLite3;
+    aTmpConnectionHandle: SQLite3;
     aOwnConnection: Boolean;
     aContinue: Boolean;
     aXmlDocument: TalXmlDocument;
@@ -1465,11 +2083,11 @@ begin
         (ViewTag <> '')) then begin
 
       //try to load from from cache
-      aCacheKey := ALStringHashSHA1(RowTag + '#' +
-                                    alinttostr(Skip) + '#' +
-                                    alinttostr(First) + '#' +
-                                    ALGetFormatSettingsID(FormatSettings) + '#' +
-                                    SQL);
+      aCacheKey := ALStringHashSHA1(AlFormat('XML#%s#%s#%s#%s#%s', [RowTag,
+                                                                    alinttostr(Skip),
+                                                                    alinttostr(First),
+                                                                    ALGetFormatSettingsID(FormatSettings),
+                                                                    SQL]));
       if loadcachedData(aCacheKey, aCacheStr) then begin
 
         //init the aViewRec
@@ -1550,9 +2168,14 @@ begin
               //loop throught all column
               For aColumnIndex := 0 to aColumnCount - 1 do begin
                 aValueRec := aNewRec.AddChild(ALlowercase(aColumnNames[aColumnIndex]));
-                aValueRec.Text := GetFieldValue(astmt,
-                                                aColumnIndex,
-                                                FormatSettings);
+                Case FLibrary.sqlite3_column_type(astmt, aColumnIndex) of
+                  SQLITE_FLOAT: aValueRec.Text := ALFloattostr(FLibrary.sqlite3_column_double(astmt, aColumnIndex), FormatSettings);
+                  SQLITE_INTEGER,
+                  SQLITE3_TEXT: aValueRec.Text :=  AnsiString(FLibrary.sqlite3_column_text(astmt, aColumnIndex)); // Strings returned by sqlite3_column_text() and sqlite3_column_text16(), even empty strings, are always zero-terminated.
+                  SQLITE_NULL: aValueRec.Text := fNullString;
+                  //SQLITE_BLOB: todo
+                  else raise Exception.Create('Unsupported column type');
+                end;
                 if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
               end;
 
@@ -1630,10 +2253,10 @@ end;
 procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                     Skip: Integer;
                                                     First: Integer;
-                                                    OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                                                    OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
                                                     ExtData: Pointer;
                                                     const FormatSettings: TALFormatSettings;
-                                                    const ConnectionHandle: PSQLite3 = nil);
+                                                    const ConnectionHandle: SQLite3 = nil);
 begin
   SelectData(SQL,
              '', // RowTag,
@@ -1650,10 +2273,10 @@ end;
 
 {************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
-                                                    OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                                                    OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
                                                     ExtData: Pointer;
                                                     const FormatSettings: TALFormatSettings;
-                                                    const ConnectionHandle: PSQLite3 = nil);
+                                                    const ConnectionHandle: SQLite3 = nil);
 begin
   SelectData(SQL,
              '', // RowTag,
@@ -1675,7 +2298,7 @@ procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                     First: Integer;
                                                     XMLDATA: TalXMLNode;
                                                     const FormatSettings: TALFormatSettings;
-                                                    const ConnectionHandle: PSQLite3 = nil);
+                                                    const ConnectionHandle: SQLite3 = nil);
 begin
   SelectData(SQL,
              RowTag,
@@ -1695,7 +2318,7 @@ procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                     const RowTag: AnsiString;
                                                     XMLDATA: TalXMLNode;
                                                     const FormatSettings: TALFormatSettings;
-                                                    const ConnectionHandle: PSQLite3 = nil);
+                                                    const ConnectionHandle: SQLite3 = nil);
 begin
   SelectData(SQL,
              RowTag,
@@ -1714,7 +2337,7 @@ end;
 procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                     XMLDATA: TalXMLNode;
                                                     const FormatSettings: TALFormatSettings;
-                                                    const ConnectionHandle: PSQLite3 = nil);
+                                                    const ConnectionHandle: SQLite3 = nil);
 begin
   SelectData(SQL,
              '', // RowTag,
@@ -1731,9 +2354,9 @@ end;
 
 {************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.UpdateData(const SQL: AnsiString;
-                                                    const ConnectionHandle: PSQLite3 = nil);
-Var astmt: PSQLite3Stmt;
-    aTmpConnectionHandle: PSQLite3;
+                                                    const ConnectionHandle: SQLite3 = nil);
+Var astmt: SQLite3_Stmt;
+    aTmpConnectionHandle: SQLite3;
     aOwnConnection: Boolean;
     aStopWatch: TStopWatch;
 begin
@@ -1787,8 +2410,8 @@ end;
 
 {**********************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.UpdateData(const SQLs: array of AnsiString;
-                                                    const ConnectionHandle: PSQLite3 = nil);
-Var aTmpConnectionHandle: PSQLite3;
+                                                    const ConnectionHandle: SQLite3 = nil);
+Var aTmpConnectionHandle: SQLite3;
     aOwnConnection: Boolean;
     i: integer;
 begin
@@ -1823,8 +2446,8 @@ end;
 
 {*******************************************************************}
 procedure TalSqlite3ConnectionPoolClient.UpdateData(SQLs: TALStrings;
-                                                    const ConnectionHandle: PSQLite3 = nil);
-Var aTmpConnectionHandle: PSQLite3;
+                                                    const ConnectionHandle: SQLite3 = nil);
+Var aTmpConnectionHandle: SQLite3;
     aOwnConnection: Boolean;
     i: integer;
 begin

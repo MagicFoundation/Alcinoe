@@ -24,6 +24,7 @@
 #include <FMX.TextLayout.hpp>
 #include <FMX.Graphics.hpp>
 #include <FMX.Objects.hpp>
+#include <ALGraphics.hpp>
 #include <ALFmxCommon.hpp>
 
 //-- user supplied -----------------------------------------------------------
@@ -45,7 +46,7 @@ class PASCALIMPLEMENTATION TalImage : public Fmx::Controls::TControl
 	typedef Fmx::Controls::TControl inherited;
 	
 private:
-	Alfmxcommon::TalExifOrientationInfo fExifOrientationInfo;
+	Algraphics::TalExifOrientationInfo fExifOrientationInfo;
 	bool fRotateAccordingToExifOrientation;
 	System::UnicodeString fFileName;
 	System::UnicodeString fResourceName;

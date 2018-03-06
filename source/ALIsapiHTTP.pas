@@ -18,6 +18,7 @@ interface
 
 uses System.SysUtils,
      System.Classes,
+     System.Types,
      Winapi.Isapi2,
      ALMultiPartParser,
      ALHttpClient,
@@ -44,6 +45,7 @@ type
     FMaxContentSize: integer; // [added from TwebRequest]
     function GetContent: AnsiString; // [added from TwebRequest]
     function GetMethodType: TALHTTPMethod; // [added from TwebRequest]
+    function GetBytesRange: TInt64DynArray; // [added from TwebRequest]
   protected
     // [Deleted from TwebRequest] function GetRemoteIP: AnsiString; virtual;
     // [Deleted from TwebRequest] function GetRawPathInfo: AnsiString; virtual;
@@ -114,6 +116,7 @@ type
     property RemoteHost: AnsiString index 22 read GetStringVariable;
     property ScriptName: AnsiString index 23 read GetStringVariable;
     property ServerPort: Integer index 24 read GetIntegerVariable;
+    property BytesRange: TInt64DynArray read GetBytesRange; // [added from TwebRequest]
   end;
 
   {------------------------------------}
@@ -131,6 +134,7 @@ type
   public
     constructor Create(AECB: PEXTENSION_CONTROL_BLOCK);
     destructor Destroy; override;
+    procedure ReadClientToStream(const aStream: TStream);
     function GetFieldByName(const Name: AnsiString): AnsiString; override;
     function ReadClient(var Buffer; Count: Integer): Integer; override; // if you use readClient then you need to avoid to use ContentStream
     function ReadString(Count: Integer): AnsiString; override;          // if you use ReadString then you need to avoid to use ContentStream
@@ -386,6 +390,63 @@ begin
   else raise Exception.Create('Unknown method type');
 end;
 
+{***************************************************}
+function TALWebRequest.GetBytesRange: TInt64DynArray;
+var aRangeHeader: ansiString;
+    aList: TalStringList;
+    aStr: ansiString;
+    i: integer;
+begin
+
+  //
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range
+  //
+
+  //clear the result
+  setlength(Result, 0);
+
+  //get aRangeHeader
+  aRangeHeader := GetFieldByName('Range');
+  if aRangeHeader = '' then Exit;
+
+  //check that unit is bytes
+  //Range: bytes=200-1000, 2000-6576, 19000-
+  i := ALPos('=', aRangeHeader); // bytes=200-1000, 2000-6576, 19000-
+  if i <= 0 then exit;
+  if not ALSameText(alTrim(alcopyStr(aRangeHeader,1,i-1)), 'bytes') then exit;  // bytes
+  aRangeHeader := alcopyStr(aRangeHeader, i+1, maxint); // 200-1000, 2000-6576, 19000-
+
+  //move all ranges in result
+  //200-1000, 2000-6576, 19000- => [200,1000,2000,6576,19000,-1]
+  //200-1000, 2000-6576, -19000 => [200,1000,2000,6576,-1,19000]
+  aList := TalStringList.Create;
+  try
+    aList.LineBreak := ',';
+    aList.NameValueSeparator := '-';
+    aList.Text := aRangeHeader;
+    setlength(result, aList.Count * 2);
+    for I := 0 to aList.Count - 1 do begin
+
+      aStr := alTrim(aList.Names[i]);
+      if aStr = '' then result[i*2] := -1
+      else if not alTryStrToint64(aStr, result[i*2]) then raise Exception.Create('Bad range header');
+      //----
+      aStr := alTrim(aList.ValueFromIndex[i]);
+      if aStr = '' then result[(i*2)+1] := -1
+      else if not alTryStrToint64(aStr, result[(i*2)+1]) then raise Exception.Create('Bad range header');
+      //----
+      if ((result[i*2] = -1) and
+          (result[(i*2)+1] = -1)) or
+         ((result[(i*2)+1] <> -1) and
+          (result[(i*2)+1] < result[i*2])) then raise Exception.Create('Bad range header');
+
+    end;
+  finally
+    aList.Free;
+  end;
+
+end;
+
 {*****************************************************************}
 constructor TALISAPIRequest.Create(AECB: PEXTENSION_CONTROL_BLOCK);
 begin
@@ -447,40 +508,60 @@ begin
   if I > 0 then Delete(Result, I, MaxInt);
 end;
 
-{*********************************************************}
-function TALISAPIRequest.GetContentStream: TALStringStream;
+{*******************************************************************}
+procedure TALISAPIRequest.ReadClientToStream(const aStream: TStream);
 var aByteRead: Integer;
+    aBuffer: array[0..8191] of Byte;
 begin
-  if not assigned(FcontentStream) then begin
 
-    If (FMaxContentSize > -1) and (ECB.cbTotalBytes > DWord(FMaxContentSize)) then
-      Raise EALIsapiRequestContentSizeTooBig.createFmt('Content size (%d bytes) is bigger than the maximum allowed size (%d bytes)', [ECB.cbTotalBytes, FMaxContentSize]);
+  If (FMaxContentSize > -1) and (ECB.cbTotalBytes > DWord(FMaxContentSize)) then
+    Raise EALIsapiRequestContentSizeTooBig.createFmt('Content size (%d bytes) is bigger than the maximum allowed size (%d bytes)', [ECB.cbTotalBytes, FMaxContentSize]);
 
-    FcontentStream := TALStringStream.Create('');
-    FcontentStream.Size := ECB.cbTotalBytes; // cbTotalBytes The total number of bytes to be received from the client.
-                                             // This is equivalent to the CGI variable CONTENT_LENGTH
-    if ECB.cbAvailable > 0 then FcontentStream.WriteBuffer(ECB.lpbData^, ECB.cbAvailable); // The available number of bytes (out of a total of cbTotalBytes) in the buffer pointed to by lpbData.
-                                                                                           // If cbTotalBytes is the same as cbAvailable, the lpbData variable will point to a buffer that contains
-                                                                                           // all the data as sent by the client. Otherwise, cbTotalBytes will contain the total number of bytes
-                                                                                           // of data received. The ISAPI extensions will then need to use the callback function ReadClient to read
-                                                                                           // the rest of the data (beginning from an offset of cbAvailable).
-    while FcontentStream.Position < FcontentStream.Size do begin
-      aByteRead := ReadClient(Pbyte(FcontentStream.DataString)[FcontentStream.Position], FcontentStream.Size - FcontentStream.Position);
+  aStream.Size := ECB.cbTotalBytes; // cbTotalBytes The total number of bytes to be received from the client.
+                                    // This is equivalent to the CGI variable CONTENT_LENGTH
+  aStream.Position := 0;
+  if ECB.cbAvailable > 0 then aStream.WriteBuffer(ECB.lpbData^, ECB.cbAvailable); // The available number of bytes (out of a total of cbTotalBytes) in the buffer pointed to by lpbData.
+                                                                                  // If cbTotalBytes is the same as cbAvailable, the lpbData variable will point to a buffer that contains
+                                                                                  // all the data as sent by the client. Otherwise, cbTotalBytes will contain the total number of bytes
+                                                                                  // of data received. The ISAPI extensions will then need to use the callback function ReadClient to read
+                                                                                  // the rest of the data (beginning from an offset of cbAvailable).
+  if aStream is TALStringStream then begin
+    while aStream.Position < aStream.Size do begin
+      aByteRead := ReadClient(Pbyte(TALStringStream(aStream).DataString)[aStream.Position], aStream.Size - aStream.Position);
       if aByteRead <= 0 then break;  // The doc of Delphi say "If no more content is available, ReadClient returns -1."
                                      // but it's false !!
                                      // http://msdn.microsoft.com/en-us/library/ms525214(v=vs.90).aspx
                                      // If the socket on which the server is listening to the client is closed, ReadClient will return TRUE, but with zero bytes read.
-      FcontentStream.Position := FcontentStream.Position + aByteRead;
+      aStream.Position := aStream.Position + aByteRead;
     end;
-    FcontentStream.Size := FcontentStream.Position;
-    FcontentStream.Position := 0;
+  end
+  else begin
+    while aStream.Position < aStream.Size do begin
+      aByteRead := ReadClient(aBuffer[0], length(aBuffer));
+      if aByteRead <= 0 then break;  // The doc of Delphi say "If no more content is available, ReadClient returns -1."
+                                     // but it's false !!
+                                     // http://msdn.microsoft.com/en-us/library/ms525214(v=vs.90).aspx
+                                     // If the socket on which the server is listening to the client is closed, ReadClient will return TRUE, but with zero bytes read.
+      aStream.WriteBuffer(aBuffer[0], aByteRead);
+    end;
+  end;
+  aStream.Size := aStream.Position;
+  aStream.Position := 0;
 
-    if ContentLength > FcontentStream.Size then
-      raise EALIsapiRequestConnectionDropped.Createfmt('Client Dropped Connection.'#13#10 +
-        'Total Bytes indicated by Header: %d' + #13#10 +
-        'Total Bytes Read: %d',
-        [ContentLength, FcontentStream.Size]);
+  if ContentLength > aStream.Size then
+    raise EALIsapiRequestConnectionDropped.Createfmt('Client Dropped Connection.'#13#10 +
+      'Total Bytes indicated by Header: %d' + #13#10 +
+      'Total Bytes Read: %d',
+      [ContentLength, aStream.Size]);
 
+end;
+
+{*********************************************************}
+function TALISAPIRequest.GetContentStream: TALStringStream;
+begin
+  if not assigned(FcontentStream) then begin
+    FcontentStream := TALStringStream.Create('');
+    ReadClientToStream(FcontentStream);
   end;
   Result := FcontentStream;
 end;

@@ -69,7 +69,6 @@ type
     procedure ButtonInitAndPostClick(Sender: TObject);
     procedure ButtonBenchClick(Sender: TObject);
     procedure ButtonExecuteClick(Sender: TObject);
-    procedure cxWwwArkadiaComLabelClick(Sender: TObject);
   private
     FThreadCount: Integer;
     FstartTime: dWord;
@@ -195,12 +194,6 @@ begin
   AFullPath := ALGetModulePath + '~tmp.html';
   MemoContentBody.Lines.SaveToFile(String(AFullPath));
   ShellExecuteA(0,'OPEN',PAnsiChar(AFullPath),nil,nil,SW_SHOW)
-end;
-
-{**********************************************************}
-procedure TForm1.cxWwwArkadiaComLabelClick(Sender: TObject);
-begin
-  ShellExecute(Application.Handle,'open','http://www.arkadia.com',nil,nil, SW_SHOWNORMAL);
 end;
 
 {*******************************************************}

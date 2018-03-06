@@ -87,12 +87,10 @@ type
     CheckBoxInternetOption_KEEP_CONNECTION: TcxCheckBox;
     CheckBoxInternetOption_NO_COOKIES: TcxCheckBox;
     CheckBoxInternetOption_NO_AUTO_REDIRECT: TcxCheckBox;
-    CheckBoxHttpEncodePostData: TcxCheckBox;
     ButtonHead: TcxButton;
     CheckBoxUrlEncodePostData: TcxCheckBox;
     ButtonTrace: TcxButton;
     dxSkinController1: TdxSkinController;
-    Panel3: TPanel;
     Panel4: TPanel;
     GroupBox10: TcxGroupBox;
     Panel5: TPanel;
@@ -102,6 +100,7 @@ type
     Label3: TcxLabel;
     MemoContentBody: TcxMemo;
     cxSplitter1: TcxSplitter;
+    cxSplitter2: TcxSplitter;
     procedure ButtonGetClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -110,7 +109,6 @@ type
     procedure ButtonTraceClick(Sender: TObject);
     procedure OnCfgEditChange(Sender: TObject);
     procedure OnCfgEditKeyPress(Sender: TObject; var Key: Char);
-    procedure cxWwwArkadiaComLabelClick(Sender: TObject);
   private
     FWinHttpClient: TalWinHttpClient;
     FDownloadSpeedStartTime: TdateTime;
@@ -137,6 +135,7 @@ Uses system.AnsiStrings,
      AlFiles,
      AlCommon,
      ALString,
+     ALMime,
      ALStringList,
      AlHttpClient;
 
@@ -351,12 +350,6 @@ begin
   end;
 end;
 
-{**********************************************************}
-procedure TForm1.cxWwwArkadiaComLabelClick(Sender: TObject);
-begin
-  ShellExecute(Application.Handle,'open','http://www.arkadia.com',nil,nil, SW_SHOWNORMAL);
-end;
-
 {************************************************}
 procedure TForm1.ButtonPostClick(Sender: TObject);
 Var AHTTPResponseHeader: TALHTTPResponseHeader;
@@ -391,23 +384,32 @@ begin
           AMultiPartFormDataFiles.Add(AMultiPartFormDataFile);
         end;
 
-      if AMultiPartFormDataFiles.Count > 0 then
+      if (AMultiPartFormDataFiles.Count > 0) and (CheckBoxURLEncodePostData.Checked) then
         FWinHttpClient.PostMultiPartFormData(AnsiString(editURL.Text),
                                              aTmpPostDataString,
                                              AMultiPartFormDataFiles,
                                              AHTTPResponseStream,
                                              AHTTPResponseHeader)
 
+      else if (AMultiPartFormDataFiles.Count > 0) then begin
+
+        FWinHttpClient.post(AnsiString(editURL.Text),
+                            AMultiPartFormDataFiles.Items[0].DataStream,
+                            AHTTPResponseStream,
+                            AHTTPResponseHeader);
+
+      end
+
       else if aTmpPostDataString.Count > 0 then begin
         if CheckBoxUrlEncodePostData.Checked then FWinHttpClient.PostURLEncoded(AnsiString(editURL.Text),
                                                                                 aTmpPostDataString,
                                                                                 AHTTPResponseStream,
                                                                                 AHTTPResponseHeader,
-                                                                                CheckBoxHTTPEncodePostData.Checked)
+                                                                                TALNameValueArray.Create(),
+                                                                                True)
         else begin
 
-          if CheckBoxHTTPEncodePostData.Checked then ARawPostDatastream := TALStringStream.create(ALHTTPEncode(aTmpPostDataString.text))
-          else ARawPostDatastream := TALStringStream.create(aTmpPostDataString.text);
+          ARawPostDatastream := TALStringStream.create(aTmpPostDataString.text);
           try
 
             FWinHttpClient.post(AnsiString(editURL.Text),
@@ -466,6 +468,8 @@ begin
     OnUploadProgress := OnHttpUploadProgress;
     MemoRequestRawHeader.Text := String(RequestHeader.RawHeaderText);
   end;
+  MemoResponseRawHeader.Height := MemoResponseRawHeader.Parent.Height - MemoResponseRawHeader.top - 6;
+  MemoContentBody.Height := MemoContentBody.Parent.Height - MemoContentBody.top - 6;
 end;
 
 initialization

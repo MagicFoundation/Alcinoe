@@ -33,6 +33,7 @@
 #include <ALAVLBinaryTree.hpp>
 #include <ALVideoPlayer.hpp>
 #include <ALFmxMemo.hpp>
+#include <ALGraphics.hpp>
 #include <System.UITypes.hpp>	// (rtl)
 #include <Winapi.Windows.hpp>	// (rtl)
 #include <Winapi.PsAPI.hpp>	// (rtl)
@@ -125,6 +126,7 @@
 #include <FMX.Platform.hpp>	// (fmx)
 #include <FMX.Types.hpp>	// (fmx)
 #include <FMX.Layouts.hpp>	// (fmx)
+#include <System.NetEncoding.hpp>	// (rtl)
 #include <System.Win.Registry.hpp>	// (rtl)
 #include <Vcl.Graphics.hpp>	// (vcl)
 #include <Vcl.ActnList.hpp>	// (vcl)
@@ -165,7 +167,6 @@
 #include <Xml.Win.msxmldom.hpp>	// (xmlrtl)
 #include <Xml.xmldom.hpp>	// (xmlrtl)
 #include <ToolsAPI.hpp>	// (designide)
-#include <System.NetEncoding.hpp>	// (rtl)
 #include <Proxies.hpp>	// (designide)
 #include <DesignEditors.hpp>	// (designide)
 #include <FMX.ScrollBox.Style.hpp>	// (fmx)

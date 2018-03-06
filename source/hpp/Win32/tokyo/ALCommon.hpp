@@ -14,13 +14,199 @@
 #pragma pack(push,8)
 #include <System.hpp>
 #include <SysInit.hpp>
+#include <System.Types.hpp>
 
 //-- user supplied -----------------------------------------------------------
 
 namespace Alcommon
 {
 //-- forward type declarations -----------------------------------------------
+struct TALPointD;
+struct TALSizeD;
+struct TALRectD;
 //-- type declarations -------------------------------------------------------
+typedef System::StaticArray<double, 2> TALPointDType;
+
+typedef TALPointD *PALPointD;
+
+struct DECLSPEC_DRECORD TALPointD
+{
+public:
+	static TALPointD __fastcall Create(const double AX, const double AY)/* overload */;
+	static TALPointD __fastcall Create(const System::Types::TPoint &APoint)/* overload */;
+	static TALPointD __fastcall Create(const System::Types::TPointF &APoint)/* overload */;
+	static TALPointD __fastcall _op_Addition(const TALPointD &APoint1, const TALPointD &APoint2);
+	static TALPointD __fastcall _op_Subtraction(const TALPointD &APoint1, const TALPointD &APoint2);
+	static bool __fastcall _op_Equality(const TALPointD &APoint1, const TALPointD &APoint2);
+	static bool __fastcall _op_Inequality(const TALPointD &APoint1, const TALPointD &APoint2);
+	static TALPointD __fastcall _op_Implicit(const System::Types::TPoint &APoint);
+	TALPointD& __fastcall operator=(const System::Types::TPoint &APoint) { *this = TALPointD::_op_Implicit(APoint); return *this; };
+	static TALPointD __fastcall _op_UnaryNegation(const TALPointD &APoint);
+	static TALPointD __fastcall _op_Multiply(const TALPointD &APoint1, const TALPointD &APoint2);
+	static TALPointD __fastcall _op_Multiply(const TALPointD &APoint, const double AFactor);
+	static TALPointD __fastcall _op_Multiply(const double AFactor, const TALPointD &APoint);
+	static TALPointD __fastcall _op_Division(const TALPointD &APoint, const double AFactor);
+	static bool __fastcall PointInCircle(const TALPointD &Point, const TALPointD &Center, const int Radius);
+	static TALPointD __fastcall Zero();
+	double __fastcall Distance(const TALPointD &APoint);
+	double __fastcall CrossProduct(const TALPointD &APoint);
+	double __fastcall DotProduct(const TALPointD &APoint);
+	void __fastcall Offset(const TALPointD &APoint)/* overload */;
+	void __fastcall Offset(const double ADeltaX, const double ADeltaY)/* overload */;
+	void __fastcall Offset(const System::Types::TPoint &APoint)/* overload */;
+	void __fastcall SetLocation _DEPRECATED_ATTRIBUTE1("Use \":=\" assignment instead") (const double X, const double Y)/* overload */;
+	void __fastcall SetLocation _DEPRECATED_ATTRIBUTE1("Use \":=\" assignment instead") (const TALPointD &P)/* overload */;
+	void __fastcall SetLocation _DEPRECATED_ATTRIBUTE1("Use \":=\" assignment instead") (const System::Types::TPoint &P)/* overload */;
+	TALPointD __fastcall Subtract _DEPRECATED_ATTRIBUTE1("Use TALPointD.Offset instead") (const TALPointD &Point)/* overload */;
+	TALPointD __fastcall Subtract _DEPRECATED_ATTRIBUTE1("Use TALPointD.Offset instead") (const System::Types::TPoint &Point)/* overload */;
+	TALPointD __fastcall Add _DEPRECATED_ATTRIBUTE1("Use TALPointD.Offset instead") (const TALPointD &Point)/* overload */;
+	TALPointD __fastcall Add _DEPRECATED_ATTRIBUTE1("Use TALPointD.Offset instead") (const System::Types::TPoint &Point)/* overload */;
+	TALPointD __fastcall Scale _DEPRECATED_ATTRIBUTE0 (const double AFactor);
+	bool __fastcall EqualsTo(const TALPointD &Point, const double Epsilon = 0.000000E+00);
+	bool __fastcall IsZero(void);
+	System::Types::TPoint __fastcall Ceiling(void);
+	System::Types::TPoint __fastcall Truncate(void);
+	System::Types::TPoint __fastcall Round(void);
+	TALPointD __fastcall SnapToPixel(const double AScale, const bool APlaceBetweenPixels = true);
+	TALPointD __fastcall Normalize(void);
+	double __fastcall Length(void);
+	TALPointD __fastcall Rotate(const double AAngle);
+	TALPointD __fastcall Reflect(const TALPointD &APoint);
+	TALPointD __fastcall MidPoint(const TALPointD &APoint);
+	double __fastcall AngleCosine(const TALPointD &APoint);
+	double __fastcall Angle(const TALPointD &APoint);
+	double __fastcall Abs(void);
+	
+public:
+	union
+	{
+		struct 
+		{
+			double X;
+			double Y;
+		};
+		struct 
+		{
+			TALPointDType V;
+		};
+		
+	};
+};
+
+
+typedef TALSizeD *PALSizeD;
+
+struct DECLSPEC_DRECORD TALSizeD
+{
+public:
+	double cx;
+	double cy;
+	__fastcall TALSizeD(const TALSizeD &P)/* overload */;
+	__fastcall TALSizeD(const double X, const double Y)/* overload */;
+	static bool __fastcall _op_Equality(const TALSizeD &Lhs, const TALSizeD &Rhs);
+	static bool __fastcall _op_Inequality(const TALSizeD &Lhs, const TALSizeD &Rhs);
+	static TALSizeD __fastcall _op_Addition(const TALSizeD &Lhs, const TALSizeD &Rhs);
+	static TALSizeD __fastcall _op_Subtraction(const TALSizeD &Lhs, const TALSizeD &Rhs);
+	__fastcall operator TALPointD();
+	static TALSizeD __fastcall _op_Implicit(const TALPointD &Point);
+	TALSizeD& __fastcall operator=(const TALPointD &Point) { *this = TALSizeD::_op_Implicit(Point); return *this; };
+	static TALSizeD __fastcall _op_Implicit(const System::Types::TSize &Size);
+	TALSizeD& __fastcall operator=(const System::Types::TSize &Size) { *this = TALSizeD::_op_Implicit(Size); return *this; };
+	System::Types::TSize __fastcall Ceiling(void);
+	System::Types::TSize __fastcall Truncate(void);
+	System::Types::TSize __fastcall Round(void);
+	TALSizeD __fastcall Add(const TALSizeD &Point);
+	TALSizeD __fastcall Subtract(const TALSizeD &Point);
+	double __fastcall Distance(const TALSizeD &P2);
+	bool __fastcall IsZero(void);
+	TALSizeD __fastcall SwapDimensions(void);
+	__property double Width = {read=cx, write=cx};
+	__property double Height = {read=cy, write=cy};
+	TALSizeD() {}
+};
+
+
+typedef TALRectD *PALRectD;
+
+struct DECLSPEC_DRECORD TALRectD
+{
+private:
+	double __fastcall GetWidth(void);
+	void __fastcall SetWidth(const double Value);
+	double __fastcall GetHeight(void);
+	void __fastcall SetHeight(const double Value);
+	TALSizeD __fastcall GetSize(void);
+	void __fastcall SetSize(const TALSizeD &Value);
+	TALPointD __fastcall GetLocation(void);
+	
+public:
+	__fastcall TALRectD(const TALPointD &Origin)/* overload */;
+	__fastcall TALRectD(const TALPointD &Origin, const double Width, const double Height)/* overload */;
+	__fastcall TALRectD(const double Left, const double Top, const double Right, const double Bottom)/* overload */;
+	__fastcall TALRectD(const TALPointD &P1, const TALPointD &P2, bool Normalize)/* overload */;
+	__fastcall TALRectD(const TALRectD &R, bool Normalize)/* overload */;
+	__fastcall TALRectD(const System::Types::TRect &R, bool Normalize)/* overload */;
+	static bool __fastcall _op_Equality(const TALRectD &Lhs, const TALRectD &Rhs);
+	static bool __fastcall _op_Inequality(const TALRectD &Lhs, const TALRectD &Rhs);
+	static TALRectD __fastcall _op_Implicit(const System::Types::TRect &Source);
+	TALRectD& __fastcall operator=(const System::Types::TRect &Source) { *this = TALRectD::_op_Implicit(Source); return *this; };
+	static TALRectD __fastcall _op_Addition(const TALRectD &Lhs, const TALRectD &Rhs);
+	static TALRectD __fastcall _op_Multiply(const TALRectD &Lhs, const TALRectD &Rhs);
+	static TALRectD __fastcall Empty();
+	double __fastcall Fit(const TALRectD &BoundsRect);
+	TALRectD __fastcall FitInto(const TALRectD &ADesignatedArea, /* out */ double &Ratio)/* overload */;
+	TALRectD __fastcall FitInto(const TALRectD &ADesignatedArea)/* overload */;
+	TALRectD __fastcall CenterAt(const TALRectD &ADesignatedArea);
+	TALRectD __fastcall PlaceInto(const TALRectD &ADesignatedArea, const System::Types::THorzRectAlign AHorzAlign = (System::Types::THorzRectAlign)(0x0), const System::Types::TVertRectAlign AVertAlign = (System::Types::TVertRectAlign)(0x0));
+	TALRectD __fastcall SnapToPixel(const double AScale, const bool APlaceBetweenPixels = true);
+	void __fastcall NormalizeRect(void);
+	bool __fastcall IsEmpty(void);
+	bool __fastcall Contains(const TALPointD &Pt)/* overload */;
+	bool __fastcall Contains(const System::Types::TPointF &Pt)/* overload */;
+	bool __fastcall Contains(const TALRectD &R)/* overload */;
+	bool __fastcall IntersectsWith(const TALRectD &R);
+	static TALRectD __fastcall Intersect(const TALRectD &R1, const TALRectD &R2)/* overload */;
+	void __fastcall Intersect(const TALRectD &R)/* overload */;
+	static TALRectD __fastcall Union(const TALRectD &R1, const TALRectD &R2)/* overload */;
+	void __fastcall Union(const TALRectD &R)/* overload */;
+	static TALRectD __fastcall Union(const TALPointD *Points, const int Points_High)/* overload */;
+	void __fastcall Offset(const double DX, const double DY)/* overload */;
+	void __fastcall Offset(const TALPointD &Point)/* overload */;
+	void __fastcall SetLocation(const double X, const double Y)/* overload */;
+	void __fastcall SetLocation(const TALPointD &Point)/* overload */;
+	void __fastcall Inflate(const double DX, const double DY)/* overload */;
+	void __fastcall Inflate(const double DL, const double DT, const double DR, const double DB)/* overload */;
+	TALPointD __fastcall CenterPoint(void);
+	System::Types::TRect __fastcall Ceiling(void);
+	System::Types::TRect __fastcall Truncate(void);
+	System::Types::TRect __fastcall Round(void);
+	bool __fastcall EqualsTo(const TALRectD &R, const double Epsilon = 0.000000E+00);
+	__property double Width = {read=GetWidth, write=SetWidth};
+	__property double Height = {read=GetHeight, write=SetHeight};
+	__property TALSizeD Size = {read=GetSize, write=SetSize};
+	__property TALPointD Location = {read=GetLocation, write=SetLocation};
+	TALRectD() {}
+	
+public:
+	union
+	{
+		struct 
+		{
+			TALPointD TopLeft;
+			TALPointD BottomRight;
+		};
+		struct 
+		{
+			double Left;
+			double Top;
+			double Right;
+			double Bottom;
+		};
+		
+	};
+};
+
+
 enum DECLSPEC_DENUM TalLogType : unsigned char { VERBOSE, DEBUG, INFO, WARN, ERROR, ASSERT };
 
 typedef void __fastcall (__closure *TALCustomDelayedFreeObjectProc)(System::TObject* &aObject);
@@ -38,6 +224,24 @@ extern DELPHI_PACKAGE unsigned ALMAXUInt;
 extern DELPHI_PACKAGE int ALMAXInt;
 static const System::Int8 ALNullDate = System::Int8(0x0);
 extern DELPHI_PACKAGE TALIntelCpuFeatures ALCpuFeatures;
+extern DELPHI_PACKAGE int __fastcall ALRectWidth(const System::Types::TRect &Rect)/* overload */;
+extern DELPHI_PACKAGE float __fastcall ALRectWidth(const System::Types::TRectF &Rect)/* overload */;
+extern DELPHI_PACKAGE double __fastcall ALRectWidth(const TALRectD &Rect)/* overload */;
+extern DELPHI_PACKAGE int __fastcall ALRectHeight(const System::Types::TRect &Rect)/* overload */;
+extern DELPHI_PACKAGE float __fastcall ALRectHeight(const System::Types::TRectF &Rect)/* overload */;
+extern DELPHI_PACKAGE double __fastcall ALRectHeight(const TALRectD &Rect)/* overload */;
+extern DELPHI_PACKAGE System::Types::TRect __fastcall ALRectCenter(System::Types::TRect &R, const System::Types::TRect &Bounds)/* overload */;
+extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectCenter(System::Types::TRectF &R, const System::Types::TRectF &Bounds)/* overload */;
+extern DELPHI_PACKAGE TALRectD __fastcall ALRectCenter(TALRectD &R, const TALRectD &Bounds)/* overload */;
+extern DELPHI_PACKAGE bool __fastcall ALOffsetRect(System::Types::TRect &R, int DX, int DY)/* overload */;
+extern DELPHI_PACKAGE bool __fastcall ALOffsetRect(System::Types::TRectF &R, float DX, float DY)/* overload */;
+extern DELPHI_PACKAGE bool __fastcall ALOffsetRect(TALRectD &R, double DX, double DY)/* overload */;
+extern DELPHI_PACKAGE bool __fastcall ALIntersectRect(/* out */ TALRectD &Rect, const TALRectD &R1, const TALRectD &R2);
+extern DELPHI_PACKAGE bool __fastcall ALUnionRect(/* out */ TALRectD &Rect, const TALRectD &R1, const TALRectD &R2);
+extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectFitInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt, /* out */ float &Ratio)/* overload */;
+extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectFitInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt)/* overload */;
+extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectPlaceInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt, /* out */ float &Ratio)/* overload */;
+extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectPlaceInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALLog(const System::UnicodeString Tag, const System::UnicodeString msg, const TalLogType _type = (TalLogType)(0x2));
 extern DELPHI_PACKAGE int __fastcall AlBoolToInt(bool Value);
 extern DELPHI_PACKAGE bool __fastcall AlIntToBool(int Value);

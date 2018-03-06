@@ -259,7 +259,7 @@ Type
   {---------------------------------------------------------------------}
   TALFBXConnectionStatementPoolBinTree = class(TALStringKeyAVLBinaryTree)
   Public
-    LastGarbage: Int64;
+    LastGarbage: UInt64;
     Constructor Create; override;
   end;
 
@@ -327,14 +327,14 @@ Type
     FReadTransactionPool: TALStringKeyAVLBinaryTree;     // pool of READ ONLY READ COMMITED TRANSACTION
     FReadTransactionPoolCS: TCriticalSection;
     FWorkingReadTransactionCount: Integer;
-    FLastReadTransactionGarbage: Int64;
+    FLastReadTransactionGarbage: UInt64;
     //--READ TRANSACTION POOL--
 
     //--READ STATEMENT POOL--
     FReadStatementPool: TALStringKeyAVLBinaryTree;       // pool of STATEMENT with READ ONLY READ COMMITED TRANSACTION
     FReadStatementPoolCS: TCriticalSection;
     FWorkingReadStatementCount: Integer;
-    FLastReadStatementGarbage: Int64;
+    FLastReadStatementGarbage: UInt64;
     //--READ STATEMENT POOL--
 
     FReleasingAllconnections: Boolean;
@@ -2476,7 +2476,7 @@ begin
   FConnectionWithStmtPool:= TObjectList.Create(True);
   FConnectionWithStmtPoolCS:= TCriticalSection.create;
   FWorkingConnectionWithStmtCount:= 0;
-  FLastConnectionWithStmtGarbage:= ALGettickCount64;
+  FLastConnectionWithStmtGarbage:= GetTickCount64;
   FConnectionWithoutStmtPool:= TObjectList.Create(True);
   FConnectionWithoutStmtPoolCS:= TCriticalSection.create;
   FReadTransactionPool:= TALStringKeyAVLBinaryTree.Create;
@@ -2487,9 +2487,9 @@ begin
   FWorkingReadTransactionCount:= 0;
   FWorkingReadStatementCount:= 0;
   FReleasingAllconnections := False;
-  FLastConnectionWithoutStmtGarbage := ALGettickCount64;
-  FLastReadTransactionGarbage := ALGettickCount64;
-  FLastReadStatementGarbage := ALGettickCount64;
+  FLastConnectionWithoutStmtGarbage := GetTickCount64;
+  FLastReadTransactionGarbage := GetTickCount64;
+  FLastReadStatementGarbage := GetTickCount64;
   FConnectionMaxIdleTime := 1200000; // 1000 * 60 * 20 = 20 min
   FTransactionMaxIdleTime := 300000; // 1000 * 60 * 5 = 5 min
   FStatementMaxIdleTime := 300000; // 1000 * 60 * 5 = 5 min
@@ -2682,7 +2682,7 @@ Begin
     if FReleasingAllconnections then raise exception.Create('Can not acquire connection: currently releasing all connections');
 
     //delete the old unused connection
-    aTickCount := ALGetTickCount64;
+    aTickCount := GetTickCount64;
     if aTickCount - FLastConnectionWithStmtGarbage > (60000 {every minutes})  then begin
       while FConnectionWithStmtPool.Count > 0 do begin
         aConnectionWithStmtPoolContainer := TALFBXConnectionWithStmtPoolContainer(FConnectionWithStmtPool[0]);
@@ -2705,7 +2705,7 @@ Begin
         end
         else break;
       end;
-      FLastConnectionWithStmtGarbage := ALGetTickCount64;
+      FLastConnectionWithStmtGarbage := GetTickCount64;
     end;
 
     //acquire the new connection from the pool
@@ -2735,7 +2735,7 @@ Begin
   end;
 
   // delete the old unused statements
-  if ALGetTickCount64 - StatementPool.LastGarbage > (60000 {every minutes})  then begin
+  if GetTickCount64 - StatementPool.LastGarbage > (60000 {every minutes})  then begin
 
     //create aExtData.LstNodeToDelete
     aConnectionStatementPoolIterateExtData.LstBinaryTreeNodeToDelete := TObjectlist.Create(False);
@@ -2743,7 +2743,7 @@ Begin
 
       //init aExtData.ConnectionPoolClient and aExtData.TickCount
       aConnectionStatementPoolIterateExtData.ConnectionPoolClient := Self;
-      aConnectionStatementPoolIterateExtData.TickCountCurrentdate := ALGetTickCount64;
+      aConnectionStatementPoolIterateExtData.TickCountCurrentdate := GetTickCount64;
 
       //iterate all StatementPool node
       StatementPool.Iterate(ALFBXConnectionPoolClient_ConnectionStatementPoolIterateFunct,
@@ -2755,7 +2755,7 @@ Begin
         StatementPool.DeleteNode(TALFBXStringKeyPoolBinTreeNode(aConnectionStatementPoolIterateExtData.LstBinaryTreeNodeToDelete[i]).id);
 
       //init the StatementPool.LastGarbage
-      StatementPool.LastGarbage := ALGetTickCount64;
+      StatementPool.LastGarbage := GetTickCount64;
 
     Finally
       aConnectionStatementPoolIterateExtData.LstBinaryTreeNodeToDelete.Free;
@@ -2785,7 +2785,7 @@ begin
       aConnectionWithStmtPoolContainer := TALFBXConnectionWithStmtPoolContainer.Create;
       aConnectionWithStmtPoolContainer.DBHandle := DBHandle;
       aConnectionWithStmtPoolContainer.StatementPool:= StatementPool;
-      aConnectionWithStmtPoolContainer.LastAccessDate := ALGetTickCount64;
+      aConnectionWithStmtPoolContainer.LastAccessDate := GetTickCount64;
       FConnectionWithStmtPool.add(aConnectionWithStmtPoolContainer);
     end
 
@@ -2831,7 +2831,7 @@ Begin
     if FReleasingAllconnections then raise exception.Create('Can not acquire connection: currently releasing all connections');
 
     //delete the old unused connection
-    aTickCount := ALGetTickCount64;
+    aTickCount := GetTickCount64;
     if aTickCount - FLastConnectionWithoutStmtGarbage > (60000 {every minutes})  then begin
       while FConnectionWithoutStmtPool.Count > 0 do begin
         aConnectionWithoutStmtPoolContainer := TALFBXConnectionWithoutStmtPoolContainer(FConnectionWithoutStmtPool[0]);
@@ -2851,7 +2851,7 @@ Begin
         end
         else break;
       end;
-      FLastConnectionWithoutStmtGarbage := ALGetTickCount64;
+      FLastConnectionWithoutStmtGarbage := GetTickCount64;
     end;
 
     //acquire the new connection from the pool
@@ -2896,7 +2896,7 @@ begin
     If (not CloseConnection) and (not FReleasingAllconnections) then begin
       aConnectionWithoutStmtPoolContainer := TALFBXConnectionWithoutStmtPoolContainer.Create;
       aConnectionWithoutStmtPoolContainer.DBHandle := DBHandle;
-      aConnectionWithoutStmtPoolContainer.LastAccessDate := ALGetTickCount64;
+      aConnectionWithoutStmtPoolContainer.LastAccessDate := GetTickCount64;
       FConnectionWithoutStmtPool.add(aConnectionWithoutStmtPoolContainer);
     end
 
@@ -3024,7 +3024,7 @@ Begin
     if FReleasingAllconnections then raise exception.Create('Can not acquire transaction: currently releasing all connections');
 
     //delete the old unused Transaction
-    if ALGetTickCount64 - FLastReadTransactionGarbage > (60000 {every minutes})  then begin
+    if GetTickCount64 - FLastReadTransactionGarbage > (60000 {every minutes})  then begin
 
       //create aExtData.LstNodeToDelete
       aReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete := TObjectlist.Create(False);
@@ -3032,7 +3032,7 @@ Begin
 
         //init aExtData.ConnectionPoolClient and aExtData.TickCount
         aReadTransactionPoolIterateExtData.ConnectionPoolClient := Self;
-        aReadTransactionPoolIterateExtData.TickCountCurrentdate := ALGetTickCount64;
+        aReadTransactionPoolIterateExtData.TickCountCurrentdate := GetTickCount64;
 
         //iterate all FReadTransactionPool node
         FReadTransactionPool.Iterate(ALFBXConnectionPoolClient_ReadTransactionPoolIterateFunct,
@@ -3044,7 +3044,7 @@ Begin
           FReadTransactionPool.DeleteNode(TALFBXStringKeyPoolBinTreeNode(aReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete[i]).id);
 
         //init the FLastReadTransactionGarbage
-        FLastReadTransactionGarbage := ALGetTickCount64;
+        FLastReadTransactionGarbage := GetTickCount64;
 
       Finally
         aReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete.Free;
@@ -3130,7 +3130,7 @@ begin
       aReadTransactionPoolContainer := TalFBXReadTransactionPoolContainer.Create;
       aReadTransactionPoolContainer.DBHandle := DBHandle;
       aReadTransactionPoolContainer.TraHandle := TraHandle;
-      aReadTransactionPoolContainer.LastAccessDate := ALGetTickCount64;
+      aReadTransactionPoolContainer.LastAccessDate := GetTickCount64;
       TALFBXStringKeyPoolBinTreeNode(aStringKeyPoolBinTreeNode).Pool.add(aReadTransactionPoolContainer);
 
     end
@@ -3290,7 +3290,7 @@ Begin
     if FReleasingAllconnections then raise exception.Create('Can not acquire Statement: currently releasing all connections');
 
     //delete the old unused Statement
-    if ALGetTickCount64 - FLastReadStatementGarbage > (60000 {every minutes})  then begin
+    if GetTickCount64 - FLastReadStatementGarbage > (60000 {every minutes})  then begin
 
       //create aExtData.LstNodeToDelete
       aReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete := TObjectlist.Create(False);
@@ -3298,7 +3298,7 @@ Begin
 
         //init aExtData.ConnectionPoolClient and aExtData.TickCount
         aReadStatementPoolIterateExtData.ConnectionPoolClient := Self;
-        aReadStatementPoolIterateExtData.TickCountCurrentdate := ALGetTickCount64;
+        aReadStatementPoolIterateExtData.TickCountCurrentdate := GetTickCount64;
 
         //iterate all FReadStatementPool node
         FReadStatementPool.Iterate(ALFBXConnectionPoolClient_ReadStatementPoolIterateFunct,
@@ -3310,7 +3310,7 @@ Begin
           FReadStatementPool.DeleteNode(TALFBXStringKeyPoolBinTreeNode(aReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete[i]).id);
 
         //init the FLastReadStatementGarbage
-        FLastReadStatementGarbage := ALGetTickCount64;
+        FLastReadStatementGarbage := GetTickCount64;
 
       Finally
         aReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete.Free;
@@ -3417,7 +3417,7 @@ begin
       aReadStatementPoolContainer.TraHandle := TraHandle;
       aReadStatementPoolContainer.StmtHandle := StmtHandle;
       aReadStatementPoolContainer.Sqlda := Sqlda;
-      aReadStatementPoolContainer.LastAccessDate := ALGetTickCount64;
+      aReadStatementPoolContainer.LastAccessDate := GetTickCount64;
       TALFBXStringKeyPoolBinTreeNode(aStringKeyPoolBinTreeNode).Pool.add(aReadStatementPoolContainer);
 
     end
@@ -3521,7 +3521,7 @@ begin
           FReadStatementPool.DeleteNode(TALFBXStringKeyPoolBinTreeNode(aReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete[i]).id);
 
         //init the FLastReadStatementGarbage
-        FLastReadStatementGarbage := ALGetTickCount64;
+        FLastReadStatementGarbage := GetTickCount64;
 
       Finally
         aReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete.Free;
@@ -3572,7 +3572,7 @@ begin
           FReadTransactionPool.DeleteNode(TALFBXStringKeyPoolBinTreeNode(aReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete[i]).id);
 
         //init the FLastReadTransactionGarbage
-        FLastReadTransactionGarbage := ALGetTickCount64;
+        FLastReadTransactionGarbage := GetTickCount64;
 
       Finally
         aReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete.Free;
@@ -3625,7 +3625,7 @@ begin
         FConnectionWithStmtPool.Delete(FConnectionWithStmtPool.count - 1);
 
       end;
-      FLastConnectionWithStmtGarbage := ALGetTickCount64;
+      FLastConnectionWithStmtGarbage := GetTickCount64;
     finally
       FConnectionWithStmtPoolCS.Release;
     end;
@@ -3670,7 +3670,7 @@ begin
         FConnectionWithoutStmtPool.Delete(FConnectionWithoutStmtPool.count - 1);
 
       end;
-      FLastConnectionWithoutStmtGarbage := ALGetTickCount64;
+      FLastConnectionWithoutStmtGarbage := GetTickCount64;
     finally
       FConnectionWithoutStmtPoolCS.Release;
     end;
@@ -4439,7 +4439,7 @@ begin
               end;
 
               //if the statement was already in the pool, simply update it LastAccessDate
-              if assigned(aTmpStatementPoolNode) then TALFBXConnectionStatementPoolBinTreeNode(aTmpStatementPoolNode).LastAccessDate := AlGetTickCount64
+              if assigned(aTmpStatementPoolNode) then TALFBXConnectionStatementPoolBinTreeNode(aTmpStatementPoolNode).LastAccessDate := GetTickCount64
 
               //else add it to the statement pool
               else begin
@@ -5022,7 +5022,7 @@ begin
           {$IFDEF undef}{$REGION 'drop or pool the statement'}{$ENDIF}
 
           //if the statement was already in the pool, simply update it LastAccessDate
-          if assigned(aTmpStatementPoolNode) then TALFBXConnectionStatementPoolBinTreeNode(aTmpStatementPoolNode).LastAccessDate := AlGetTickCount64
+          if assigned(aTmpStatementPoolNode) then TALFBXConnectionStatementPoolBinTreeNode(aTmpStatementPoolNode).LastAccessDate := GetTickCount64
 
           //else add it to the statement pool OR DROP it
           else begin
@@ -5310,7 +5310,7 @@ begin
   Lib := nil;
   StmtHandle := nil;
   Sqlda  := nil;
-  LastAccessDate := alGetTickCount64;
+  LastAccessDate := GetTickCount64;
   OwnsObjects := True;
 
 end;
@@ -5342,7 +5342,7 @@ end;
 constructor TALFBXConnectionStatementPoolBinTree.Create;
 begin
   inherited;
-  LastGarbage := AlGetTickCount64;
+  LastGarbage := GetTickCount64;
 end;
 
 {********************************************************}

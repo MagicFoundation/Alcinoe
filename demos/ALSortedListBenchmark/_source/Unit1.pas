@@ -27,7 +27,6 @@ type
     CheckBoxALIntegerList: TCheckBox;
     CheckBoxALNvStringList: TCheckBox;
     Series6: TBarSeries;
-    procedure cxWwwArkadiaComLabelClick(Sender: TObject);
     procedure Button4Click(Sender: TObject);
   private
   public
@@ -43,12 +42,6 @@ uses ALString,
      alavlBinaryTree;
 
 {$R *.dfm}
-
-{**********************************************************}
-procedure TForm1.cxWwwArkadiaComLabelClick(Sender: TObject);
-begin
-  ShellExecute(Application.Handle,'open','http://www.arkadia.com',nil,nil, SW_SHOWNORMAL);
-end;
 
 {*********************************************}
 procedure TForm1.Button4Click(Sender: TObject);

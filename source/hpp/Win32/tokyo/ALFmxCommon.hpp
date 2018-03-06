@@ -33,10 +33,6 @@ namespace Alfmxcommon
 {
 //-- forward type declarations -----------------------------------------------
 class DELPHICLASS TALShadow;
-struct TALSizeD;
-struct TALRectD;
-__interface TALResizeImageGetDestSizeFunct;
-typedef System::DelphiInterface<TALResizeImageGetDestSizeFunct> _di_TALResizeImageGetDestSizeFunct;
 class DELPHICLASS TALBreakTextItem;
 class DELPHICLASS TALBreakTextItems;
 struct TAlTextElement;
@@ -81,131 +77,7 @@ public:
 };
 
 
-typedef System::StaticArray<double, 2> TALPointDType;
-
-typedef TALPointD *PALPointD;
-
-typedef TALSizeD *PALSizeD;
-
-struct DECLSPEC_DRECORD TALSizeD
-{
-public:
-	double cx;
-	double cy;
-	__fastcall TALSizeD(const TALSizeD &P)/* overload */;
-	__fastcall TALSizeD(const double X, const double Y)/* overload */;
-	static bool __fastcall _op_Equality(const TALSizeD &Lhs, const TALSizeD &Rhs);
-	static bool __fastcall _op_Inequality(const TALSizeD &Lhs, const TALSizeD &Rhs);
-	static TALSizeD __fastcall _op_Addition(const TALSizeD &Lhs, const TALSizeD &Rhs);
-	static TALSizeD __fastcall _op_Subtraction(const TALSizeD &Lhs, const TALSizeD &Rhs);
-	__fastcall operator TALPointD();
-	static TALSizeD __fastcall _op_Implicit(const TALPointD &Point);
-	TALSizeD& __fastcall operator=(const TALPointD &Point) { *this = TALSizeD::_op_Implicit(Point); return *this; };
-	static TALSizeD __fastcall _op_Implicit(const System::Types::TSize &Size);
-	TALSizeD& __fastcall operator=(const System::Types::TSize &Size) { *this = TALSizeD::_op_Implicit(Size); return *this; };
-	System::Types::TSize __fastcall Ceiling(void);
-	System::Types::TSize __fastcall Truncate(void);
-	System::Types::TSize __fastcall Round(void);
-	TALSizeD __fastcall Add(const TALSizeD &Point);
-	TALSizeD __fastcall Subtract(const TALSizeD &Point);
-	double __fastcall Distance(const TALSizeD &P2);
-	bool __fastcall IsZero(void);
-	TALSizeD __fastcall SwapDimensions(void);
-	__property double Width = {read=cx, write=cx};
-	__property double Height = {read=cy, write=cy};
-	TALSizeD() {}
-};
-
-
-typedef TALRectD *PALRectD;
-
-struct DECLSPEC_DRECORD TALRectD
-{
-private:
-	double __fastcall GetWidth(void);
-	void __fastcall SetWidth(const double Value);
-	double __fastcall GetHeight(void);
-	void __fastcall SetHeight(const double Value);
-	TALSizeD __fastcall GetSize(void);
-	void __fastcall SetSize(const TALSizeD &Value);
-	TALPointD __fastcall GetLocation(void);
-	
-public:
-	__fastcall TALRectD(const TALPointD &Origin)/* overload */;
-	__fastcall TALRectD(const TALPointD &Origin, const double Width, const double Height)/* overload */;
-	__fastcall TALRectD(const double Left, const double Top, const double Right, const double Bottom)/* overload */;
-	__fastcall TALRectD(const TALPointD &P1, const TALPointD &P2, bool Normalize)/* overload */;
-	__fastcall TALRectD(const TALRectD &R, bool Normalize)/* overload */;
-	__fastcall TALRectD(const System::Types::TRect &R, bool Normalize)/* overload */;
-	static bool __fastcall _op_Equality(const TALRectD &Lhs, const TALRectD &Rhs);
-	static bool __fastcall _op_Inequality(const TALRectD &Lhs, const TALRectD &Rhs);
-	static TALRectD __fastcall _op_Implicit(const System::Types::TRect &Source);
-	TALRectD& __fastcall operator=(const System::Types::TRect &Source) { *this = TALRectD::_op_Implicit(Source); return *this; };
-	static TALRectD __fastcall _op_Addition(const TALRectD &Lhs, const TALRectD &Rhs);
-	static TALRectD __fastcall _op_Multiply(const TALRectD &Lhs, const TALRectD &Rhs);
-	static TALRectD __fastcall Empty();
-	double __fastcall Fit(const TALRectD &BoundsRect);
-	TALRectD __fastcall FitInto(const TALRectD &ADesignatedArea, /* out */ double &Ratio)/* overload */;
-	TALRectD __fastcall FitInto(const TALRectD &ADesignatedArea)/* overload */;
-	TALRectD __fastcall CenterAt(const TALRectD &ADesignatedArea);
-	TALRectD __fastcall PlaceInto(const TALRectD &ADesignatedArea, const System::Types::THorzRectAlign AHorzAlign = (System::Types::THorzRectAlign)(0x0), const System::Types::TVertRectAlign AVertAlign = (System::Types::TVertRectAlign)(0x0));
-	TALRectD __fastcall SnapToPixel(const double AScale, const bool APlaceBetweenPixels = true);
-	void __fastcall NormalizeRect(void);
-	bool __fastcall IsEmpty(void);
-	bool __fastcall Contains(const TALPointD &Pt)/* overload */;
-	bool __fastcall Contains(const System::Types::TPointF &Pt)/* overload */;
-	bool __fastcall Contains(const TALRectD &R)/* overload */;
-	bool __fastcall IntersectsWith(const TALRectD &R);
-	static TALRectD __fastcall Intersect(const TALRectD &R1, const TALRectD &R2)/* overload */;
-	void __fastcall Intersect(const TALRectD &R)/* overload */;
-	static TALRectD __fastcall Union(const TALRectD &R1, const TALRectD &R2)/* overload */;
-	void __fastcall Union(const TALRectD &R)/* overload */;
-	static TALRectD __fastcall Union(const TALPointD *Points, const int Points_High)/* overload */;
-	void __fastcall Offset(const double DX, const double DY)/* overload */;
-	void __fastcall Offset(const TALPointD &Point)/* overload */;
-	void __fastcall SetLocation(const double X, const double Y)/* overload */;
-	void __fastcall SetLocation(const TALPointD &Point)/* overload */;
-	void __fastcall Inflate(const double DX, const double DY)/* overload */;
-	void __fastcall Inflate(const double DL, const double DT, const double DR, const double DB)/* overload */;
-	TALPointD __fastcall CenterPoint(void);
-	System::Types::TRect __fastcall Ceiling(void);
-	System::Types::TRect __fastcall Truncate(void);
-	System::Types::TRect __fastcall Round(void);
-	bool __fastcall EqualsTo(const TALRectD &R, const double Epsilon = 0.000000E+00);
-	__property double Width = {read=GetWidth, write=SetWidth};
-	__property double Height = {read=GetHeight, write=SetHeight};
-	__property TALSizeD Size = {read=GetSize, write=SetSize};
-	__property TALPointD Location = {read=GetLocation, write=SetLocation};
-	TALRectD() {}
-	
-public:
-	union
-	{
-		struct 
-		{
-			TALPointD TopLeft;
-			TALPointD BottomRight;
-		};
-		struct 
-		{
-			double Left;
-			double Top;
-			double Right;
-			double Bottom;
-		};
-		
-	};
-};
-
-
 typedef System::Uitypes::TFontName __fastcall (*TALCustomConvertFontFamilyProc)(const System::Uitypes::TFontName AFamily, const System::Uitypes::TFontStyles aFontStyles);
-
-__interface TALResizeImageGetDestSizeFunct  : public System::IInterface 
-{
-	virtual System::Types::TPointF __fastcall Invoke(const System::Types::TPointF &aOriginalSize) = 0 ;
-};
-
-enum DECLSPEC_DENUM TalExifOrientationInfo : unsigned char { FLIP_HORIZONTAL, FLIP_VERTICAL, NORMAL, ROTATE_180, ROTATE_270, ROTATE_90, TRANSPOSE, TRANSVERSE, UNDEFINED };
 
 #pragma pack(push,4)
 class PASCALIMPLEMENTATION TALBreakTextItem : public System::TObject
@@ -487,24 +359,9 @@ public:
 
 //-- var, const, procedure ---------------------------------------------------
 extern DELPHI_PACKAGE TALCustomConvertFontFamilyProc ALCustomConvertFontFamilyProc;
-extern DELPHI_PACKAGE int __fastcall ALRectWidth(const System::Types::TRect &Rect)/* overload */;
-extern DELPHI_PACKAGE float __fastcall ALRectWidth(const System::Types::TRectF &Rect)/* overload */;
-extern DELPHI_PACKAGE double __fastcall ALRectWidth(const TALRectD &Rect)/* overload */;
-extern DELPHI_PACKAGE int __fastcall ALRectHeight(const System::Types::TRect &Rect)/* overload */;
-extern DELPHI_PACKAGE float __fastcall ALRectHeight(const System::Types::TRectF &Rect)/* overload */;
-extern DELPHI_PACKAGE double __fastcall ALRectHeight(const TALRectD &Rect)/* overload */;
-extern DELPHI_PACKAGE System::Types::TRect __fastcall ALRectCenter(System::Types::TRect &R, const System::Types::TRect &Bounds)/* overload */;
-extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectCenter(System::Types::TRectF &R, const System::Types::TRectF &Bounds)/* overload */;
-extern DELPHI_PACKAGE TALRectD __fastcall ALRectCenter(TALRectD &R, const TALRectD &Bounds)/* overload */;
-extern DELPHI_PACKAGE bool __fastcall ALOffsetRect(System::Types::TRect &R, int DX, int DY)/* overload */;
-extern DELPHI_PACKAGE bool __fastcall ALOffsetRect(System::Types::TRectF &R, float DX, float DY)/* overload */;
-extern DELPHI_PACKAGE bool __fastcall ALOffsetRect(TALRectD &R, double DX, double DY)/* overload */;
-extern DELPHI_PACKAGE bool __fastcall ALIntersectRect(/* out */ TALRectD &Rect, const TALRectD &R1, const TALRectD &R2);
-extern DELPHI_PACKAGE bool __fastcall ALUnionRect(/* out */ TALRectD &Rect, const TALRectD &R1, const TALRectD &R2);
 extern DELPHI_PACKAGE System::Uitypes::TFontName __fastcall ALConvertFontFamily(const System::Uitypes::TFontName AFamily, const System::Uitypes::TFontStyles aFontStyles);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALTranslate(const System::UnicodeString AText);
 extern DELPHI_PACKAGE void __fastcall ALFmxMakeBufBitmaps(Fmx::Controls::TControl* const aControl);
-extern DELPHI_PACKAGE System::Uitypes::TAlphaColor __fastcall ALPrepareColor(const System::Uitypes::TAlphaColor SrcColor, const float Opacity);
 extern DELPHI_PACKAGE System::Types::TPointF __fastcall ALAlignAbsolutePointToPixelRound(const System::Types::TPointF &Point, const float Scale);
 extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALAlignDimensionToPixelRound(const System::Types::TRectF &Rect, const float Scale)/* overload */;
 extern DELPHI_PACKAGE float __fastcall ALAlignDimensionToPixelRound(const float Dimension, const float Scale)/* overload */;
@@ -525,108 +382,6 @@ extern DELPHI_PACKAGE void __fastcall ALPaintRectangle(Fmx::Graphics::TCanvas* c
 extern DELPHI_PACKAGE void __fastcall ALPaintCircle(Fmx::Graphics::TCanvas* const aCanvas, const System::Types::TRectF &dstRect, Fmx::Graphics::TBrush* const Fill, Fmx::Graphics::TStrokeBrush* const Stroke, TALShadow* const Shadow = (TALShadow*)(0x0));
 extern DELPHI_PACKAGE void __fastcall ALCreateDrawingSurface(Fmx::Graphics::TBitmap* &aBitmap, const bool aClearBitmap, const int w, const int h);
 extern DELPHI_PACKAGE void __fastcall ALFreeDrawingSurface(Fmx::Graphics::TBitmap* &aBitmap);
-extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectFitInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt, /* out */ float &Ratio)/* overload */;
-extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectFitInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt)/* overload */;
-extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectPlaceInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt, /* out */ float &Ratio, const System::Types::THorzRectAlign AHorzAlign = (System::Types::THorzRectAlign)(0x0), const System::Types::TVertRectAlign AVertAlign = (System::Types::TVertRectAlign)(0x0))/* overload */;
-extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectPlaceInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt)/* overload */;
-extern DELPHI_PACKAGE System::UnicodeString __fastcall AlDetectImageExtensionU(const System::UnicodeString aFileName);
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsRoundRectImageV1(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const float XRadius, const float YRadius, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsMaskImageV1(System::Classes::TCustomMemoryStream* const aStream, Fmx::Graphics::TBitmap* const aMask, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsMaskImageV1(System::Classes::TCustomMemoryStream* const aStream, Fmx::Graphics::TBitmap* const aMask)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsMaskImageV2(System::Classes::TCustomMemoryStream* const aStream, Fmx::Graphics::TBitmap* const aMask, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsMaskImageV2(System::Classes::TCustomMemoryStream* const aStream, Fmx::Graphics::TBitmap* const aMask)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsMaskImageV3(System::Classes::TCustomMemoryStream* const aStream, Fmx::Graphics::TBitmap* const aMask, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsMaskImageV3(System::Classes::TCustomMemoryStream* const aStream, Fmx::Graphics::TBitmap* const aMask)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropResourceAsMaskImageV1(const System::UnicodeString aResName, Fmx::Graphics::TBitmap* const aMask, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropResourceAsMaskImageV1(const System::UnicodeString aResName, Fmx::Graphics::TBitmap* const aMask)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropResourceAsMaskImageV2(const System::UnicodeString aResName, Fmx::Graphics::TBitmap* const aMask, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropResourceAsMaskImageV2(const System::UnicodeString aResName, Fmx::Graphics::TBitmap* const aMask)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropResourceAsMaskImageV3(const System::UnicodeString aResName, Fmx::Graphics::TBitmap* const aMask, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropResourceAsMaskImageV3(const System::UnicodeString aResName, Fmx::Graphics::TBitmap* const aMask)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsRoundRectImageV1(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const float XRadius, const float YRadius)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsRoundRectImageV2(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const float XRadius, const float YRadius, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsRoundRectImageV2(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const float XRadius, const float YRadius)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsRoundRectImageV3(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const float XRadius, const float YRadius, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsRoundRectImageV3(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const float XRadius, const float YRadius)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsCircleImageV1(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsCircleImageV1(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsCircleImageV2(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsCircleImageV2(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsCircleImageV3(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsCircleImageV3(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropResourceAsCircleImageV1(const System::UnicodeString aResName, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropResourceAsCircleImageV1(const System::UnicodeString aResName, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropResourceAsCircleImageV2(const System::UnicodeString aResName, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropResourceAsCircleImageV2(const System::UnicodeString aResName, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropResourceAsCircleImageV3(const System::UnicodeString aResName, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropResourceAsCircleImageV3(const System::UnicodeString aResName, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropImageV1(System::Classes::TCustomMemoryStream* const aStream, const _di_TALResizeImageGetDestSizeFunct aGetDestSizeFunct, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropImageV1(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropImageV1(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropImageV2(System::Classes::TCustomMemoryStream* const aStream, const _di_TALResizeImageGetDestSizeFunct aGetDestSizeFunct, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropImageV2(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropImageV2(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropImageV3(System::Classes::TCustomMemoryStream* const aStream, const _di_TALResizeImageGetDestSizeFunct aGetDestSizeFunct, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropImageV3(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropImageV3(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropResourceImageV1(const System::UnicodeString aResName, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropResourceImageV1(const System::UnicodeString aResName, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropResourceImageV2(const System::UnicodeString aResName, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropResourceImageV2(const System::UnicodeString aResName, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropResourceImageV3(const System::UnicodeString aResName, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropResourceImageV3(const System::UnicodeString aResName, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropFileImageV1(const System::UnicodeString aFileName, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropFileImageV1(const System::UnicodeString aFileName, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropFileImageV2(const System::UnicodeString aFileName, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropFileImageV2(const System::UnicodeString aFileName, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropFileImageV3(const System::UnicodeString aFileName, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoAndCropFileImageV3(const System::UnicodeString aFileName, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALPlaceIntoAndCropImageV1(System::Classes::TCustomMemoryStream* const aStream, const _di_TALResizeImageGetDestSizeFunct aGetDestSizeFunct, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALPlaceIntoAndCropImageV1(System::Classes::TCustomMemoryStream* const aStream, float W, float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALPlaceIntoAndCropImageV1(System::Classes::TCustomMemoryStream* const aStream, float W, float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALPlaceIntoAndCropImageV2(System::Classes::TCustomMemoryStream* const aStream, const _di_TALResizeImageGetDestSizeFunct aGetDestSizeFunct, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALPlaceIntoAndCropImageV2(System::Classes::TCustomMemoryStream* const aStream, float W, float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALPlaceIntoAndCropImageV2(System::Classes::TCustomMemoryStream* const aStream, float W, float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALPlaceIntoAndCropImageV3(System::Classes::TCustomMemoryStream* const aStream, const _di_TALResizeImageGetDestSizeFunct aGetDestSizeFunct, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALPlaceIntoAndCropImageV3(System::Classes::TCustomMemoryStream* const aStream, float W, float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALPlaceIntoAndCropImageV3(System::Classes::TCustomMemoryStream* const aStream, float W, float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadPlaceIntoAndCropResourceImageV1(const System::UnicodeString aResName, float W, float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadPlaceIntoAndCropResourceImageV1(const System::UnicodeString aResName, float W, float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadPlaceIntoAndCropResourceImageV2(const System::UnicodeString aResName, float W, float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadPlaceIntoAndCropResourceImageV2(const System::UnicodeString aResName, float W, float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadPlaceIntoAndCropResourceImageV3(const System::UnicodeString aResName, float W, float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadPlaceIntoAndCropResourceImageV3(const System::UnicodeString aResName, float W, float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadPlaceIntoAndCropFileImageV1(const System::UnicodeString aFileName, float W, float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadPlaceIntoAndCropFileImageV1(const System::UnicodeString aFileName, float W, float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadPlaceIntoAndCropFileImageV2(const System::UnicodeString aFileName, float W, float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadPlaceIntoAndCropFileImageV2(const System::UnicodeString aFileName, float W, float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadPlaceIntoAndCropFileImageV3(const System::UnicodeString aFileName, float W, float H, const System::Types::TPointF &aCropCenter)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadPlaceIntoAndCropFileImageV3(const System::UnicodeString aFileName, float W, float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoImageV1(System::Classes::TCustomMemoryStream* const aStream, const _di_TALResizeImageGetDestSizeFunct aGetDestSizeFunct)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoImageV1(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoImageV2(System::Classes::TCustomMemoryStream* const aStream, const _di_TALResizeImageGetDestSizeFunct aGetDestSizeFunct)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoImageV2(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoImageV3(System::Classes::TCustomMemoryStream* const aStream, const _di_TALResizeImageGetDestSizeFunct aGetDestSizeFunct)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoImageV3(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoResourceImageV1(const System::UnicodeString aResName, const float W, const float H);
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoResourceImageV2(const System::UnicodeString aResName, const float W, const float H);
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoResourceImageV3(const System::UnicodeString aResName, const float W, const float H);
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoFileImageV1(const System::UnicodeString aFileName, const float W, const float H);
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoFileImageV2(const System::UnicodeString aFileName, const float W, const float H);
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadFitIntoFileImageV3(const System::UnicodeString aFileName, const float W, const float H);
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALStretchImageV1(System::Classes::TCustomMemoryStream* const aStream, const _di_TALResizeImageGetDestSizeFunct aGetDestSizeFunct)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALStretchImageV1(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALStretchImageV2(System::Classes::TCustomMemoryStream* const aStream, const _di_TALResizeImageGetDestSizeFunct aGetDestSizeFunct)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALStretchImageV2(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALStretchImageV3(System::Classes::TCustomMemoryStream* const aStream, const _di_TALResizeImageGetDestSizeFunct aGetDestSizeFunct)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALStretchImageV3(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadStretchResourceImageV1(const System::UnicodeString aResName, const float W, const float H);
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadStretchResourceImageV2(const System::UnicodeString aResName, const float W, const float H);
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadStretchResourceImageV3(const System::UnicodeString aResName, const float W, const float H);
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadStretchFileImageV1(const System::UnicodeString aFileName, const float W, const float H);
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadStretchFileImageV2(const System::UnicodeString aFileName, const float W, const float H);
-extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadStretchFileImageV3(const System::UnicodeString aFileName, const float W, const float H);
-extern DELPHI_PACKAGE TalExifOrientationInfo __fastcall AlGetExifOrientationInfo(const System::UnicodeString aFilename);
 }	/* namespace Alfmxcommon */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALFMXCOMMON)
 using namespace Alfmxcommon;

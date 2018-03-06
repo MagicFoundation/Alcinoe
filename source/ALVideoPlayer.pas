@@ -459,6 +459,7 @@ uses system.SysUtils,
      androidapi.jni.net,
      FMX.Canvas.GPU,
      AlString,
+     ALGraphics,
      {$ENDIF}
      {$IF defined(IOS)}
      System.RTLConsts,
@@ -471,6 +472,7 @@ uses system.SysUtils,
      FMX.Context.GLES.iOS,
      FMX.Types3D,
      AlString,
+     ALGraphics,
      {$ENDIF}
      fmx.controls,
      AlCommon;
@@ -778,34 +780,6 @@ begin
   {$ENDIF}
 end;
 
-{************************************************************************************************************}
-//https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found
-Procedure _ALAndroidVideoPlayerReleaseListener(aOnFrameAvailableListener: TALAndroidVideoPlayer.TALFrameAvailableListener;
-                                               aEventListener: TALAndroidVideoPlayer.TALEventListener;
-                                               aVideoListener: TALAndroidVideoPlayer.TALVideoListener);
-begin
-
-  aOnFrameAvailableListener.FVideoPlayerControl := nil;
-  aEventListener.FVideoPlayerControl := nil;
-  aVideoListener.FVideoPlayerControl := nil;
-
-  {$IF CompilerVersion > 32} // tokyo
-    {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-19864 is not yet implemented and adjust the IFDEF'}
-  {$ENDIF}
-  TThread.CreateAnonymousThread(
-    Procedure
-    Begin
-      Sleep(250);
-      TThread.Queue(nil,
-        Procedure
-        Begin
-          alfreeAndNil(aOnFrameAvailableListener);
-          alFreeAndNil(aEventListener);
-          alFreeAndNil(aVideoListener);
-        end);
-    end).Start;
-
-end;
 
 {***************************************}
 destructor TALAndroidVideoPlayer.Destroy;
@@ -818,9 +792,16 @@ begin
   {$ENDIF}
 
   //-----
-  fSimpleExoPlayer.stop;
+  //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found?noredirect=1#comment84156414_48577801
+  fOnFrameAvailableListener.FVideoPlayerControl := nil;
+  fEventListener.FVideoPlayerControl := nil;
+  fVideoListener.FVideoPlayerControl := nil;
+  fSurfaceTexture.setOnFrameAvailableListener(nil);
   fSimpleExoPlayer.removeVideoListener(fVideoListener);
   fSimpleExoPlayer.removeListener(fEventListener);
+
+  //-----
+  fSimpleExoPlayer.stop;
   fSimpleExoPlayer.clearVideoSurface;
   fSimpleExoPlayer.release;
   fSimpleExoPlayer := nil;
@@ -829,7 +810,6 @@ begin
   fDataSourceFactory := nil;
 
   //----
-  fSurfaceTexture.setOnFrameAvailableListener(nil);
   fSurface.release;
   fSurface := nil;
   fSurfaceTexture.release;
@@ -837,9 +817,9 @@ begin
   alFreeandNil(fbitmap);
 
   //-----
-  _ALAndroidVideoPlayerReleaseListener(fOnFrameAvailableListener,
-                                       fEventListener,
-                                       fVideoListener);
+  alfreeAndNil(fOnFrameAvailableListener);
+  alFreeAndNil(fEventListener);
+  alFreeAndNil(fVideoListener);
 
   //-----
   fHandler := nil;

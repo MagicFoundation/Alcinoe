@@ -1012,12 +1012,12 @@ end;
 {*********************************************************************************}
 function TALPhpNamedPipeFastCgiRunnerEngine.IORead(var buf; len: Integer): Integer;
 Var lpNumberOfBytesRead: DWORD;
-    StartTickCount: Int64;
+    StartTickCount: UInt64;
 begin
   //Ok i don't found any other way than this loop to do a timeout !
   //timeout are neccessary if the php-cgi.exe dead suddenly for exemple
   //in the way without timout the readfile will never return freezing the application
-  StartTickCount := ALGetTickCount64;
+  StartTickCount := GetTickCount64;
   Repeat
     CheckError(not PeekNamedPipe(FClientPipe,            // handle to pipe to copy from
                                  nil,                    // pointer to data buffer
@@ -1032,7 +1032,7 @@ begin
     end
     else result := 0;
     sleep(1); // this is neccessary to not use 100% CPU usage
-  Until ALGetTickCount64 - StartTickCount > fTimeout;
+  Until GetTickCount64 - StartTickCount > fTimeout;
 end;
 
 {*********************************************************************************************************************************}

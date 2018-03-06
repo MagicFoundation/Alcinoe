@@ -52,11 +52,13 @@ function AlGetEnvironmentString: AnsiString;
 function ALWinExec(const aCommandLine: AnsiString;
                    const aCurrentDirectory: AnsiString;
                    const aEnvironment: AnsiString;
-                   aInputStream: Tstream;
-                   aOutputStream: TStream): Dword; overload;
+                   const aInputStream: Tstream;
+                   const aOutputStream: TStream;
+                   const aOwnerThread: TThread = nil): Dword; overload;
 function ALWinExec(const aCommandLine: AnsiString;
-                   aInputStream: Tstream;
-                   aOutputStream: TStream): Dword; overload;
+                   const aInputStream: Tstream;
+                   const aOutputStream: TStream;
+                   const aOwnerThread: TThread = nil): Dword; overload;
 procedure ALWinExec(const aCommandLine: AnsiString;
                     const aCurrentDirectory: AnsiString); overload;
 procedure ALWinExec(const aUserName: ANSIString;
@@ -121,8 +123,9 @@ end;
 function ALWinExec(const aCommandLine: AnsiString;
                    const aCurrentDirectory: AnsiString;
                    const aEnvironment: AnsiString;
-                   aInputStream: Tstream;
-                   aOutputStream: TStream): Dword;
+                   const aInputStream: Tstream;
+                   const aOutputStream: TStream;
+                   const aOwnerThread: TThread = nil): Dword;
 
 var aOutputReadPipe,aOutputWritePipe: THANDLE;
     aInputReadPipe,aInputWritePipe: THANDLE;
@@ -130,20 +133,22 @@ var aOutputReadPipe,aOutputWritePipe: THANDLE;
   {-----------------------------}
   procedure InternalProcessInput;
   var aBytesWritten: Dword;
-      aStrBuffer: AnsiString;
+      aBuffer: Tbytes;
+      P: cardinal;
   begin
-    If aInputStream.size > 0 then begin
-      SetLength(aStrBuffer,aInputStream.size);
-      aInputStream.readBuffer(pointer(aStrBuffer)^,aInputStream.size);
+    If (aInputStream <> nil) and (aInputStream.size > 0) then begin
+      SetLength(aBuffer,aInputStream.size);
+      aInputStream.readBuffer(pointer(aBuffer)^,aInputStream.size);
+      P := 0;
       While true do begin
-        if not WriteFile(aInputWritePipe,            // handle to file to write to
-                         aStrBuffer[1],              // pointer to data to write to file
-                         length(AstrBuffer),         // number of bytes to write
-                         aBytesWritten,              // pointer to number of bytes written
+        if (aOwnerThread <> nil) and (aOwnerThread.checkTerminated) then break;
+        if not WriteFile(aInputWritePipe,     // handle to file to write to
+                         aBuffer[P],          // pointer to data to write to file
+                         cardinal(length(ABuffer)) - P, // number of bytes to write
+                         aBytesWritten,       // pointer to number of bytes written
                          nil) then RaiseLastOSError; // pointer to structure needed for overlapped I/O
-
-        If aBytesWritten = Dword(length(AstrBuffer)) then break
-        else delete(aStrBuffer,1,aBytesWritten);
+        If aBytesWritten = Dword(length(ABuffer)) then break
+        else P := P + aBytesWritten;
       end;
     end;
   end;
@@ -152,26 +157,30 @@ var aOutputReadPipe,aOutputWritePipe: THANDLE;
   procedure InternalProcessOutput;
   var aBytesInPipe: Cardinal;
       aBytesRead: Dword;
-      aStrBuffer: AnsiString;
-  Const AstrBufferSize: Dword = 8192;
+      aBuffer: TBytes;
   begin
-    SetLength(aStrBuffer,AstrBufferSize);
     While true do begin
+
+      if (aOwnerThread <> nil) and (aOwnerThread.checkTerminated) then break;
+
       If not PeekNamedPipe(aOutputReadPipe,  // handle to pipe to copy from
                            nil,              // pointer to data buffer
                            0,                // size, in bytes, of data buffer
                            nil,              // pointer to number of bytes read
                            @aBytesInPipe,    // pointer to total number of bytes available
                            nil) then break;  // pointer to unread bytes in this message
+
       if aBytesInPipe > 0 then begin
+        SetLength(aBuffer, aBytesInPipe);
         if not ReadFile(aOutputReadPipe,             // handle of file to read
-                        aStrBuffer[1],               // address of buffer that receives data
-                        AstrBufferSize,              // number of bytes to read
+                        pointer(aBuffer)^,           // address of buffer that receives data
+                        aBytesInPipe,                // number of bytes to read
                         aBytesRead,                  // address of number of bytes read
                         nil) then RaiseLastOSError;  // address of structure for data
-        If aBytesRead > 0 then aOutputStream.WriteBuffer(pointer(aStrBuffer)^, aBytesRead);
+        If (aBytesRead > 0) and (aOutputStream <> nil) then aOutputStream.WriteBuffer(pointer(aBuffer)^, aBytesRead);
       end
       else break;
+
     end;
   end;
 
@@ -217,7 +226,6 @@ begin
       if aCurrentDirectory <> '' then aPCurrentDirectory := PAnsiChar(aCurrentDirectory)
       else aPCurrentDirectory := nil;
 
-
       // Launch the process that you want to redirect.
       if not CreateProcessA(nil,                     // pointer to name of executable module
                             PAnsiChar(aCommandLine), // pointer to command line string
@@ -228,45 +236,46 @@ begin
                             aPEnvironment,           // pointer to new environment block
                             aPCurrentDirectory,      // pointer to current directory name
                             aStartupInfo,            // pointer to STARTUPINFO
-                            aProcessInformation)     // pointer to PROCESS_INFORMATION
-      then RaiseLastOSError;
+                            aProcessInformation) then RaiseLastOSError; // pointer to PROCESS_INFORMATION
       Try
 
-        aInputStream.Position := 0;
         InternalProcessInput;
-        while (WaitForSingleObject(aProcessInformation.hProcess, 0) = WAIT_TIMEOUT) do begin
+        while (WaitForSingleObject(aProcessInformation.hProcess, 1{to not use 100% CPU usage}) = WAIT_TIMEOUT) do begin
           InternalProcessOutput;
-          sleep(1); // to not use 100% CPU usage
+          if (aOwnerThread <> nil) and (aOwnerThread.checkTerminated) then break;
         end;
         InternalProcessOutput;
-        GetExitCodeProcess(aProcessInformation.hProcess, Cardinal(Result));
+        if not GetExitCodeProcess(aProcessInformation.hProcess, Cardinal(Result)) then raiseLastOsError;
 
       finally
-        CloseHandle(aProcessInformation.hThread);
-        CloseHandle(aProcessInformation.hProcess);
+        if not CloseHandle(aProcessInformation.hThread) then raiseLastOsError;
+        if not CloseHandle(aProcessInformation.hProcess) then raiseLastOsError;
       end;
 
     Finally
-      CloseHandle(aInputReadPipe);
-      CloseHandle(aInputWritePipe);
+      if not CloseHandle(aInputReadPipe) then raiseLastOsError;
+      if not CloseHandle(aInputWritePipe) then raiseLastOsError;
     end;
 
   Finally
-    CloseHandle(aOutputReadPipe);
-    CloseHandle(aOutputWritePipe);
+    if not CloseHandle(aOutputReadPipe) then raiseLastOsError;
+    if not CloseHandle(aOutputWritePipe) then raiseLastOsError;
   end;
+
 end;
 
 {************************************************}
 function ALWinExec(const aCommandLine: AnsiString;
-                   aInputStream: Tstream;
-                   aOutputStream: TStream): Dword;
+                   const aInputStream: Tstream;
+                   const aOutputStream: TStream;
+                   const aOwnerThread: TThread = nil): Dword;
 Begin
   Result := ALWinExec(aCommandLine,
                       '',
                       '',
                       aInputStream,
-                      aOutputStream);
+                      aOutputStream,
+                      aOwnerThread);
 End;
 
 {************************************************}
@@ -331,17 +340,17 @@ begin
   aCommandLineW := String(aCommandLine);
 
   // try to create the process under specified user
-  if not ALCreateProcessWithLogonW(PWideChar(String(aUserName)), // The name of the user.
-                                   nil, // The name of the domain or server whose account database contains the lpUsername account
-                                   PWideChar(String(aPassword)), // The clear-text password for the lpUsername account.
-                                   aLogonFlags, // The logon option.
-                                   nil, // The name of the module to be executed.
-                                   PWideChar(aCommandLineW), // The command line to be executed.
-                                   0, // The flags that control how the process is created.
-                                   nil, // a pointer to an environment block for the new process. If this parameter is NULL, the new process uses an environment created from the profile of the user specified by lpUsername.
-                                   PwideChar(string(aCurrentDirectory)), // The full path to the current directory for the process.
-                                   aStartupInfo, // a pointer to a STARTUPINFO or STARTUPINFOEX structure.
-                                   aProcessInformation) // A pointer to a PROCESS_INFORMATION structure that receives identification information for the new process
+  if not CreateProcessWithLogonW(PWideChar(String(aUserName)), // The name of the user.
+                                 nil, // The name of the domain or server whose account database contains the lpUsername account
+                                 PWideChar(String(aPassword)), // The clear-text password for the lpUsername account.
+                                 aLogonFlags, // The logon option.
+                                 nil, // The name of the module to be executed.
+                                 PWideChar(aCommandLineW), // The command line to be executed.
+                                 0, // The flags that control how the process is created.
+                                 nil, // a pointer to an environment block for the new process. If this parameter is NULL, the new process uses an environment created from the profile of the user specified by lpUsername.
+                                 PwideChar(string(aCurrentDirectory)), // The full path to the current directory for the process.
+                                 aStartupInfo, // a pointer to a STARTUPINFO or STARTUPINFOEX structure.
+                                 aProcessInformation) // A pointer to a PROCESS_INFORMATION structure that receives identification information for the new process
   then raiseLastOsError;
   CloseHandle(aProcessInformation.hProcess);
   CloseHandle(aProcessInformation.hThread);

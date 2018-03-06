@@ -56,7 +56,6 @@ type
     procedure ButtonStopClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
-    procedure cxWwwArkadiaComLabelClick(Sender: TObject);
   private
     FPageDownloadedBinTree: TAlStringKeyAVLBinaryTree;
     FPageNotYetDownloadedBinTree: TAlStringKeyAVLBinaryTree;
@@ -189,12 +188,6 @@ end;
 procedure TForm1.ButtonStopClick(Sender: TObject);
 begin
   ButtonStop.Enabled := False;
-end;
-
-{**********************************************************}
-procedure TForm1.cxWwwArkadiaComLabelClick(Sender: TObject);
-begin
-  ShellExecute(Application.Handle,'open','http://www.arkadia.com',nil,nil, SW_SHOWNORMAL);
 end;
 
 {************************************************************}

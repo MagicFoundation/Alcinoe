@@ -45,7 +45,6 @@ type
     procedure ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Path, Name: AnsiString; Attributes: TALStrings);
     procedure ALXMLDocumentSaxModeParseText(Sender: TObject; const Path, Str: AnsiString);
     procedure ButtonParseXMLWithALXmlDocumentInSaxModeClick(Sender: TObject);
-    procedure cxWwwArkadiaComLabelClick(Sender: TObject);
   private
     FnodeCount: Integer;
     Function scrollAllNode(aNode: iXmlNode): Integer; overload;
@@ -380,12 +379,6 @@ begin
 
   end;
 
-end;
-
-{**********************************************************}
-procedure TForm1.cxWwwArkadiaComLabelClick(Sender: TObject);
-begin
-  ShellExecute(Application.Handle,'open','http://www.arkadia.com',nil,nil, SW_SHOWNORMAL);
 end;
 
 initialization

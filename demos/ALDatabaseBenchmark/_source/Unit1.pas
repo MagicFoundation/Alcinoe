@@ -270,7 +270,6 @@ type
     procedure ALButtonMongoDBLOOPINSERTClick(Sender: TObject);
     procedure ALButtonMongoDBLOOPUPDATEClick(Sender: TObject);
     procedure ALButtonMongoDBLOOPDELETEClick(Sender: TObject);
-    procedure cxWwwArkadiaComLabelClick(Sender: TObject);
   private
   public
     Sqlite3ConnectionPoolClient: TalSqlite3ConnectionPoolClient;
@@ -2044,12 +2043,6 @@ begin
   If OpenDialog1.Execute then (Sender as TcxButtonEdit).Text := OpenDialog1.FileName;
 end;
 
-{**********************************************************}
-procedure TForm1.cxWwwArkadiaComLabelClick(Sender: TObject);
-begin
-  ShellExecute(Application.Handle,'open','http://www.arkadia.com',nil,nil, SW_SHOWNORMAL);
-end;
-
 {******************************************}
 procedure TForm1.FormClick(Sender: TObject);
 begin
@@ -2091,7 +2084,7 @@ end;
 
 {****************************************}
 procedure TSqlite3BenchmarkThread.Execute;
-Var aconnectionHandle: PSQLite3;
+Var aconnectionHandle: SQLite3;
     aStopWatch: TStopWatch;
     aLoopIndex: integer;
     aCommitLoopIndex: integer;

@@ -61,7 +61,6 @@ type
     procedure ALButtonFirebirdPrepareClick(Sender: TObject);
     procedure ALButtonFirebirdCommitRetainingClick(Sender: TObject);
     procedure ALButtonFirebirdRollBackRetainingClick(Sender: TObject);
-    procedure cxWwwArkadiaComLabelClick(Sender: TObject);
   private
     fAlFbxClient: TalFBXclient;
   public
@@ -136,7 +135,7 @@ end;
 procedure TForm1.ALButtonFirebirdCreateDatabaseClick(Sender: TObject);
 Var aFBXClient: TalFBXClient;
     aFBAPiVersion: TALFBXVersion_API;
-    aTickCount: Int64;
+    aTickCount: UInt64;
 begin
 
   case ALComboBoxFirebirdapiVer.ItemIndex of
@@ -150,10 +149,10 @@ begin
   aFBXClient := TALFbxClient.Create(aFBAPiVersion,AnsiString(ALEditFirebirdLib.Text));
   Try
 
-    aTickCount := ALGetTickCount64;
+    aTickCount := GetTickCount64;
     aFBXClient.CreateDatabase(AnsiString(AlMemoFireBirdQuery.Lines.Text));
     ALMemoFirebirdStats.Clear;
-    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
+    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(GetTickCount64 - aTickCount) + ' ms');
 
     ALMemoFirebirdResult.Lines.Text := 'Create DataBase Done';
 
@@ -166,7 +165,7 @@ end;
 {********************************************************************}
 procedure TForm1.ALButtonFirebirdOpenConnectionClick(Sender: TObject);
 Var aFBAPiVersion: TALFBXVersion_API;
-    aTickCount: Int64;
+    aTickCount: UInt64;
 begin
 
   ALButtonFirebirdOpenConnection.Enabled := False;
@@ -194,14 +193,14 @@ begin
       fAlFbxClient := TALFbxClient.Create(aFBAPiVersion,AnsiString(ALEditFirebirdLib.Text));
       Try
 
-        aTickCount := ALGetTickCount64;
+        aTickCount := GetTickCount64;
         fAlFbxClient.connect(AnsiString(ALEditFireBirdDatabase.Text),
                              AnsiString(ALEditFireBirdLogin.text),
                              AnsiString(ALEditFireBirdPassword.text),
                              AnsiString(ALEditFireBirdCharset.Text),
                              StrtoInt(ALEditFireBirdNum_buffers.Text));
         ALMemoFirebirdStats.Clear;
-        ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
+        ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(GetTickCount64 - aTickCount) + ' ms');
 
         ALMemoFirebirdResult.Lines.Text := 'Open Connection Done';
 
@@ -237,7 +236,7 @@ Var aTPB: AnsiString;
     aIOStats_2: TALFBXClientMonitoringIOStats;
     aRecordStats_2: TALFBXClientMonitoringRecordStats;
     aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
-    aTickCount: Int64;
+    aTickCount: UInt64;
 begin
 
   ALButtonFirebirdOpenConnection.Enabled := False;
@@ -275,10 +274,10 @@ begin
                                     False,
                                     False,
                                     True);
-    aTickCount := ALGetTickCount64;
+    aTickCount := GetTickCount64;
     fAlFbxClient.TransactionStart(aTPB);
     ALMemoFirebirdStats.Clear;
-    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
+    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(GetTickCount64 - aTickCount) + ' ms');
     FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                     -1,
                                     '',
@@ -331,7 +330,7 @@ var aIOStats_1: TALFBXClientMonitoringIOStats;
     aIOStats_2: TALFBXClientMonitoringIOStats;
     aRecordStats_2: TALFBXClientMonitoringRecordStats;
     aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
-    aTickCount: Int64;
+    aTickCount: UInt64;
     aSQl: AnsiString;
     aLst: TALStringList;
 begin
@@ -357,10 +356,10 @@ begin
                                   False,
                                   False,
                                   True);
-  aTickCount := ALGetTickCount64;
+  aTickCount := GetTickCount64;
   FAlFBXClient.Prepare(aSQl);
   ALMemoFirebirdStats.Clear;
-  ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
+  ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(GetTickCount64 - aTickCount) + ' ms');
   FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                   -1,
                                   '',
@@ -401,7 +400,7 @@ var aXMLDATA: TalXmlDocument;
     aIOStats_2: TALFBXClientMonitoringIOStats;
     aRecordStats_2: TALFBXClientMonitoringRecordStats;
     aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
-    aTickCount: Int64;
+    aTickCount: UInt64;
     aLst1: TALStringList;
     i: integer;
 begin
@@ -460,12 +459,12 @@ begin
                                     False,
                                     False,
                                     True);
-    aTickCount := ALGetTickCount64;
+    aTickCount := GetTickCount64;
     FAlFBXClient.SelectData(aQuery,
                             aXMLDATA.DocumentElement,
                             aFormatSettings);
     ALMemoFirebirdStats.Clear;
-    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
+    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(GetTickCount64 - aTickCount) + ' ms');
     FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                     -1,
                                     '',
@@ -508,7 +507,7 @@ var aQuery: TALFBXClientUpdateDataQuery;
     aIOStats_2: TALFBXClientMonitoringIOStats;
     aRecordStats_2: TALFBXClientMonitoringRecordStats;
     aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
-    aTickCount: Int64;
+    aTickCount: UInt64;
     aLst1: TALStringList;
     i: integer;
 begin
@@ -553,10 +552,10 @@ begin
                                   False,
                                   False,
                                   True);
-  aTickCount := ALGetTickCount64;
+  aTickCount := GetTickCount64;
   FAlFBXClient.UpdateData(aQuery);
   ALMemoFirebirdStats.Clear;
-  ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
+  ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(GetTickCount64 - aTickCount) + ' ms');
   FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                   -1,
                                   '',
@@ -594,7 +593,7 @@ var aIOStats_1: TALFBXClientMonitoringIOStats;
     aIOStats_2: TALFBXClientMonitoringIOStats;
     aRecordStats_2: TALFBXClientMonitoringRecordStats;
     aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
-    aTickCount: Int64;
+    aTickCount: UInt64;
 begin
 
   ALButtonFirebirdOpenConnection.Enabled := False;
@@ -618,10 +617,10 @@ begin
                                     False,
                                     False,
                                     True);
-    aTickCount := ALGetTickCount64;
+    aTickCount := GetTickCount64;
     fAlFbxClient.TransactionCommit;
     ALMemoFirebirdStats.Clear;
-    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
+    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(GetTickCount64 - aTickCount) + ' ms');
     FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                     -1,
                                     '',
@@ -673,7 +672,7 @@ var aIOStats_1: TALFBXClientMonitoringIOStats;
     aIOStats_2: TALFBXClientMonitoringIOStats;
     aRecordStats_2: TALFBXClientMonitoringRecordStats;
     aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
-    aTickCount: Int64;
+    aTickCount: UInt64;
 begin
 
   FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
@@ -685,10 +684,10 @@ begin
                                   False,
                                   False,
                                   True);
-  aTickCount := ALGetTickCount64;
+  aTickCount := GetTickCount64;
   fAlFbxClient.TransactionCommitRetaining;
   ALMemoFirebirdStats.Clear;
-  ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
+  ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(GetTickCount64 - aTickCount) + ' ms');
   FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                   -1,
                                   '',
@@ -726,7 +725,7 @@ var aIOStats_1: TALFBXClientMonitoringIOStats;
     aIOStats_2: TALFBXClientMonitoringIOStats;
     aRecordStats_2: TALFBXClientMonitoringRecordStats;
     aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
-    aTickCount: Int64;
+    aTickCount: UInt64;
 begin
 
   ALButtonFirebirdOpenConnection.Enabled := False;
@@ -754,10 +753,10 @@ begin
     Except
       //hide the error
     End;
-    aTickCount := ALGetTickCount64;
+    aTickCount := GetTickCount64;
     fAlFbxClient.TransactionRollback;
     ALMemoFirebirdStats.Clear;
-    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
+    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(GetTickCount64 - aTickCount) + ' ms');
     Try
       FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                       -1,
@@ -813,7 +812,7 @@ var aIOStats_1: TALFBXClientMonitoringIOStats;
     aIOStats_2: TALFBXClientMonitoringIOStats;
     aRecordStats_2: TALFBXClientMonitoringRecordStats;
     aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
-    aTickCount: Int64;
+    aTickCount: UInt64;
 begin
 
   FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
@@ -825,10 +824,10 @@ begin
                                   False,
                                   False,
                                   True);
-  aTickCount := ALGetTickCount64;
+  aTickCount := GetTickCount64;
   fAlFbxClient.TransactionRollbackRetaining;
   ALMemoFirebirdStats.Clear;
-  ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
+  ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(GetTickCount64 - aTickCount) + ' ms');
   FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                   -1,
                                   '',
@@ -862,7 +861,7 @@ end;
 
 {*************************************************************}
 procedure TForm1.ALButtonCloseConnectionClick(Sender: TObject);
-var aTickCount: Int64;
+var aTickCount: UInt64;
 begin
 
   ALButtonFirebirdOpenConnection.Enabled := True;
@@ -878,10 +877,10 @@ begin
 
   try
 
-    aTickCount := ALGetTickCount64;
+    aTickCount := GetTickCount64;
     fAlFbxClient.Disconnect;
     ALMemoFirebirdStats.Clear;
-    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
+    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(GetTickCount64 - aTickCount) + ' ms');
 
     ALMemoFirebirdResult.Lines.Text := 'Close Transaction Done';
 
@@ -896,12 +895,6 @@ end;
 procedure TForm1.ALEditFirebirdLibButtonClick(Sender: TObject);
 begin
   if OpenDialog1.Execute then (Sender as TEdit).Text := OpenDialog1.FileName;
-end;
-
-{**********************************************************}
-procedure TForm1.cxWwwArkadiaComLabelClick(Sender: TObject);
-begin
-  ShellExecute(Application.Handle,'open','http://www.arkadia.com',nil,nil, SW_SHOWNORMAL);
 end;
 
 {********************************************************************}

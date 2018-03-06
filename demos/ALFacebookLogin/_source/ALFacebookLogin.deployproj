@@ -5,7 +5,7 @@
     </ProjectExtensions>
     <PropertyGroup>
         <DeviceId Condition="'$(Platform)'=='Android'"/>
-        <DeviceId Condition="'$(Platform)'=='iOSDevice32'">1269d5786e75bc1b4c1469f4bacd0b66bb640f13</DeviceId>
+        <DeviceId Condition="'$(Platform)'=='iOSDevice32'"/>
         <DeviceId Condition="'$(Platform)'=='iOSDevice64'"/>
         <DeviceId Condition="'$(Platform)'=='iOSSimulator'">iPhone5</DeviceId>
     </PropertyGroup>
@@ -377,6 +377,7 @@
             <Required>True</Required>
         </DeployFile>
     </ItemGroup>
+    <ItemGroup Condition="'$(Platform)'=='Linux64'"/>
     <ItemGroup Condition="'$(Platform)'=='OSX32'">
         <DeployFile Include="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib">
             <RemoteDir>ALFacebookLogin.app\Contents\MacOS\</RemoteDir>
@@ -398,6 +399,15 @@
         </DeployFile>
     </ItemGroup>
     <ItemGroup Condition="'$(Platform)'=='Android'">
+        <DeployFile Include="android\res\drawable-ldrtl-xxxhdpi-v17\abc_ic_menu_cut_mtrl_alpha.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\drawable-ldrtl-xxxhdpi-v17\</RemoteDir>
+            <RemoteName>abc_ic_menu_cut_mtrl_alpha.png</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="android\res\drawable-hdpi-v4\abc_btn_radio_to_on_mtrl_000.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-hdpi-v4\</RemoteDir>
             <RemoteName>abc_btn_radio_to_on_mtrl_000.png</RemoteName>
@@ -11254,6 +11264,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="android\res\values-hu\values-hu.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-hu\</RemoteDir>
+            <RemoteName>values-hu.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_btn_switch_to_on_mtrl_00001.9.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
             <RemoteName>abc_btn_switch_to_on_mtrl_00001.9.png</RemoteName>
@@ -11272,36 +11291,8 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-ldrtl-xxxhdpi-v17\abc_ic_menu_cut_mtrl_alpha.png" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable-ldrtl-xxxhdpi-v17\</RemoteDir>
-            <RemoteName>abc_ic_menu_cut_mtrl_alpha.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-hu\values-hu.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-hu\</RemoteDir>
-            <RemoteName>values-hu.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
     </ItemGroup>
     <ItemGroup Condition="'$(Platform)'=='iOSSimulator'">
-        <DeployFile Include="..\iOSSimulator\Debug\ALFacebookLogin" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
-            <RemoteName>ALFacebookLogin</RemoteName>
-            <DeployClass>ProjectOutput</DeployClass>
-            <Operation>1</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-            <Required>True</Required>
-        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin.app\</RemoteDir>
             <RemoteName>FM_ApplicationIcon_152x152.png</RemoteName>
@@ -11365,6 +11356,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_1125x2436.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>Default-812h@3x.png</RemoteName>
+            <DeployClass>iPhone_Launch1125</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageLandscape_1024x768.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin.app\</RemoteDir>
             <RemoteName>Default-Landscape~ipad.png</RemoteName>
@@ -11414,6 +11414,15 @@
             <RemoteDir>ALFacebookLogin.app\</RemoteDir>
             <RemoteName>Default-568h@2x.png</RemoteName>
             <DeployClass>iPhone_Launch640x1136</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="..\iOSSimulator\Debug\ALFacebookLogin.rsm" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>ALFacebookLogin.rsm</RemoteName>
+            <DeployClass>DebugSymbols</DeployClass>
             <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
@@ -11572,6 +11581,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2436x1125.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>Default-Landscape-812h@3x.png</RemoteName>
+            <DeployClass>iPhone_Launch2436</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin.app\</RemoteDir>
             <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
@@ -11643,6 +11661,16 @@
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="..\iOSSimulator\Debug\ALFacebookLogin" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>ALFacebookLogin</RemoteName>
+            <DeployClass>ProjectOutput</DeployClass>
+            <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+            <Required>True</Required>
         </DeployFile>
     </ItemGroup>
 </Project>

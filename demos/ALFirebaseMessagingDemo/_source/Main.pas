@@ -22,6 +22,7 @@ uses
   ALAndroidShortcutBadgerApi,
   ALAndroidFirebaseApi,
   ALAndroidApi,
+  ALGraphics,
   {$ENDIF}
   {$IF defined(IOS)}
   iOSapi.Foundation,
@@ -36,7 +37,6 @@ uses
   alString,
   alStringList,
   alFirebase,
-  alfmxCommon,
   alcommon;
 
 type

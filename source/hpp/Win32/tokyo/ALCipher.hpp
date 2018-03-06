@@ -126,6 +126,8 @@ typedef System::StaticArray<System::Byte, 20> TALCipherSHA1Digest;
 
 typedef unsigned __fastcall (*TALStringHashCrc32)(const System::AnsiString str);
 
+typedef unsigned __fastcall (*TALHashCrc32)(char * buf, unsigned len);
+
 typedef NativeUInt HCRYPTPROV;
 
 typedef NativeUInt *PHCRYPTPROV;
@@ -134,6 +136,7 @@ typedef NativeUInt *PHCRYPTPROV;
 static const System::Int8 cALCipherBFRounds = System::Int8(0x10);
 static const System::Int8 cALCipherMaxRDLRounds = System::Int8(0xe);
 extern DELPHI_PACKAGE TALStringHashCrc32 ALStringHashCrc32;
+extern DELPHI_PACKAGE TALHashCrc32 ALHashCrc32;
 static const unsigned CRYPT_VERIFYCONTEXT = unsigned(0xf0000000);
 static const System::Int8 CRYPT_NEWKEYSET = System::Int8(0x8);
 static const System::Int8 PROV_RSA_FULL = System::Int8(0x1);

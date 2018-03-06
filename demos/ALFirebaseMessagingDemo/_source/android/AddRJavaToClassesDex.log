@@ -28,7 +28,7 @@ Merge the classes.dex
 Result compacted from 3541.5KiB to 2195.4KiB to save 1346.1KiB
 Merged dex #1 (12 defs/3.0KiB)
 Merged dex #2 (2050 defs/2852.9KiB)
-Result is 2062 defs/2195.4KiB. Took 0.5s
+Result is 2062 defs/2195.4KiB. Took 0.4s
  
 Move the classes.dex 
         1 file(s) copied.

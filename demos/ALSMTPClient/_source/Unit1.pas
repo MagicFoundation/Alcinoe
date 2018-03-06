@@ -74,7 +74,6 @@ type
     procedure AuthButtonClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure AllInOneButtonClick(Sender: TObject);
-    procedure cxWwwArkadiaComLabelClick(Sender: TObject);
   private
     FSMTPCLient: TALSMTPCLient;
   end;
@@ -113,12 +112,6 @@ end;
 procedure TForm1.ConnectButtonClick(Sender: TObject);
 begin
   DisplayMemo.Lines.Add(String(ALTrim(FSmtpClient.Connect(AnsiString(HostEdit.Text), StrToInt(PortEdit.Text)))));
-end;
-
-{**********************************************************}
-procedure TForm1.cxWwwArkadiaComLabelClick(Sender: TObject);
-begin
-  ShellExecute(Application.Handle,'open','http://www.arkadia.com',nil,nil, SW_SHOWNORMAL);
 end;
 
 {************************************************}

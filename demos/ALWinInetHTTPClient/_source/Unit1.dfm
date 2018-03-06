@@ -82,7 +82,7 @@ object Form1: TForm1
         object Label6: TcxLabel
           Left = 8
           Top = 78
-          Caption = 'Format "name=value" if not URL Encode Post Data checked'
+          Caption = 'Format "name=value" if URL Encode Post Data checked'
           ParentFont = False
           Transparent = True
         end
@@ -124,11 +124,18 @@ object Form1: TForm1
         object MemoPostDataStrings: TcxMemo
           Left = 8
           Top = 94
+          Anchors = [akLeft, akTop, akBottom]
           ParentFont = False
           Properties.ScrollBars = ssVertical
           Properties.WordWrap = False
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clWindowText
+          Style.Font.Height = -13
+          Style.Font.Name = 'Courier New'
+          Style.Font.Style = []
+          Style.IsFontAssigned = True
           TabOrder = 1
-          Height = 73
+          Height = 80
           Width = 375
         end
         object MemoPostDataFiles: TcxMemo
@@ -138,8 +145,14 @@ object Form1: TForm1
           ParentFont = False
           Properties.ScrollBars = ssVertical
           Properties.WordWrap = False
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clWindowText
+          Style.Font.Height = -13
+          Style.Font.Name = 'Courier New'
+          Style.Font.Style = []
+          Style.IsFontAssigned = True
           TabOrder = 2
-          Height = 73
+          Height = 80
           Width = 384
         end
         object ButtonPost: TcxButton
@@ -172,21 +185,13 @@ object Form1: TForm1
           ParentFont = False
           OnClick = ButtonGetClick
         end
-        object CheckBoxHttpEncodePostData: TcxCheckBox
-          Left = 11
-          Top = 171
-          Caption = 'HTTP Encode Post Data'
-          ParentFont = False
-          TabOrder = 5
-          Transparent = True
-        end
         object ButtonHead: TcxButton
           Left = 462
           Top = 21
           Width = 50
           Height = 25
           Caption = 'Head'
-          TabOrder = 6
+          TabOrder = 5
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -11
@@ -196,11 +201,12 @@ object Form1: TForm1
           OnClick = ButtonHeadClick
         end
         object CheckBoxUrlEncodePostData: TcxCheckBox
-          Left = 169
-          Top = 171
+          Left = 648
+          Top = 69
           Caption = 'URL Encode Post Data'
           ParentFont = False
-          TabOrder = 7
+          State = cbsChecked
+          TabOrder = 6
           Transparent = True
         end
         object ButtonTrace: TcxButton
@@ -209,7 +215,7 @@ object Form1: TForm1
           Width = 50
           Height = 25
           Caption = 'Trace'
-          TabOrder = 8
+          TabOrder = 7
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -11
@@ -221,7 +227,7 @@ object Form1: TForm1
       end
       object GroupBox10: TcxGroupBox
         Left = 0
-        Top = 223
+        Top = 210
         Align = alClient
         Caption = 'RESPONSE'
         ParentFont = False
@@ -232,19 +238,19 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 1
-        Height = 334
+        Height = 347
         Width = 786
         object Panel5: TPanel
           Left = 3
           Top = 15
           Width = 267
-          Height = 310
+          Height = 323
           Align = alLeft
           BevelOuter = bvNone
           TabOrder = 0
           DesignSize = (
             267
-            310)
+            323)
           object Label2: TcxLabel
             Left = 5
             Top = 6
@@ -259,8 +265,14 @@ object Form1: TForm1
             ParentFont = False
             Properties.ScrollBars = ssBoth
             Properties.WordWrap = False
+            Style.Font.Charset = DEFAULT_CHARSET
+            Style.Font.Color = clWindowText
+            Style.Font.Height = -13
+            Style.Font.Name = 'Courier New'
+            Style.Font.Style = []
+            Style.IsFontAssigned = True
             TabOrder = 1
-            Height = 258
+            Height = 290
             Width = 260
           end
         end
@@ -268,14 +280,14 @@ object Form1: TForm1
           Left = 277
           Top = 15
           Width = 506
-          Height = 310
+          Height = 323
           Align = alClient
           BevelOuter = bvNone
           Caption = 'Panel5'
           TabOrder = 1
           DesignSize = (
             506
-            310)
+            323)
           object Label3: TcxLabel
             Left = 2
             Top = 6
@@ -290,16 +302,22 @@ object Form1: TForm1
             ParentFont = False
             Properties.ScrollBars = ssBoth
             Properties.WordWrap = False
+            Style.Font.Charset = DEFAULT_CHARSET
+            Style.Font.Color = clWindowText
+            Style.Font.Height = -13
+            Style.Font.Name = 'Courier New'
+            Style.Font.Style = []
+            Style.IsFontAssigned = True
             TabOrder = 1
-            Height = 258
-            Width = 484
+            Height = 290
+            Width = 497
           end
         end
         object cxSplitter1: TcxSplitter
           Left = 270
           Top = 15
           Width = 7
-          Height = 310
+          Height = 323
           Control = Panel5
         end
       end
@@ -314,21 +332,20 @@ object Form1: TForm1
         ParentCtl3D = False
         TabOrder = 2
       end
-      object Panel4: TPanel
+      object cxSplitter2: TcxSplitter
         Left = 0
         Top = 203
         Width = 786
-        Height = 20
-        Align = alTop
-        BevelOuter = bvNone
-        Ctl3D = False
-        ParentCtl3D = False
-        TabOrder = 3
+        Height = 7
+        AlignSplitter = salTop
       end
     end
     object TabSheet2: TcxTabSheet
       Caption = 'Configuration'
       ImageIndex = 1
+      DesignSize = (
+        786
+        557)
       object GroupBox3: TcxGroupBox
         Left = 7
         Top = 11
@@ -941,6 +958,7 @@ object Form1: TForm1
       object GroupBox8: TcxGroupBox
         Left = 472
         Top = 11
+        Anchors = [akLeft, akTop, akRight, akBottom]
         Caption = 'Request Raw Header '
         ParentFont = False
         Style.Font.Charset = DEFAULT_CHARSET
@@ -950,6 +968,9 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 7
+        DesignSize = (
+          313
+          528)
         Height = 534
         Width = 313
         object Label8: TcxLabel
@@ -962,9 +983,16 @@ object Form1: TForm1
         object MemoRequestRawHeader: TcxMemo
           Left = 9
           Top = 38
+          Anchors = [akLeft, akTop, akRight, akBottom]
           ParentFont = False
-          Properties.ScrollBars = ssVertical
+          Properties.ScrollBars = ssBoth
           Properties.OnChange = OnCfgEditCHange
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clWindowText
+          Style.Font.Height = -13
+          Style.Font.Name = 'Courier New'
+          Style.Font.Style = []
+          Style.IsFontAssigned = True
           TabOrder = 0
           OnClick = OnCfgEditCHange
           Height = 487

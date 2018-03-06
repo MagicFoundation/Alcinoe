@@ -602,6 +602,9 @@ extern DELPHI_PACKAGE System::TDateTime __fastcall ALStrToDateTime(const System:
 extern DELPHI_PACKAGE bool __fastcall ALTryStrToInt(const System::AnsiString S, /* out */ int &Value);
 extern DELPHI_PACKAGE int __fastcall ALStrToInt(const System::AnsiString S);
 extern DELPHI_PACKAGE int __fastcall ALStrToIntDef(const System::AnsiString S, int Default);
+extern DELPHI_PACKAGE bool __fastcall ALTryStrToUInt(const System::AnsiString S, /* out */ unsigned &Value);
+extern DELPHI_PACKAGE unsigned __fastcall ALStrToUInt(const System::AnsiString S);
+extern DELPHI_PACKAGE unsigned __fastcall ALStrToUIntDef(const System::AnsiString S, unsigned Default);
 extern DELPHI_PACKAGE bool __fastcall ALTryStrToInt64(const System::AnsiString S, /* out */ __int64 &Value);
 extern DELPHI_PACKAGE __int64 __fastcall ALStrToInt64(const System::AnsiString S);
 extern DELPHI_PACKAGE __int64 __fastcall ALStrToInt64Def(const System::AnsiString S, const __int64 Default);
@@ -776,6 +779,7 @@ extern DELPHI_PACKAGE System::AnsiString __fastcall ALHTTPEncode(const System::A
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALHTTPDecode(const System::AnsiString AStr);
 extern DELPHI_PACKAGE void __fastcall ALExtractHeaderFields(const System::Sysutils::TSysCharSet &Separators, const System::Sysutils::TSysCharSet &WhiteSpace, const System::Sysutils::TSysCharSet &Quotes, char * Content, Alstringlist::TALStrings* Strings, bool HttpDecode, bool StripQuotes = false);
 extern DELPHI_PACKAGE void __fastcall ALExtractHeaderFieldsWithQuoteEscaped(const System::Sysutils::TSysCharSet &Separators, const System::Sysutils::TSysCharSet &WhiteSpace, const System::Sysutils::TSysCharSet &Quotes, char * Content, Alstringlist::TALStrings* Strings, bool HttpDecode, bool StripQuotes = false);
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALHTTPEncodeU(const System::UnicodeString AStr);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALHTTPDecodeU(const System::UnicodeString AStr);
 extern DELPHI_PACKAGE void __fastcall ALExtractHeaderFieldsWithQuoteEscapedU(const System::Sysutils::TSysCharSet &Separators, const System::Sysutils::TSysCharSet &WhiteSpace, const System::Sysutils::TSysCharSet &Quotes, System::WideChar * Content, Alstringlist::TALStringsU* Strings, bool HttpDecode, bool StripQuotes = false);
 extern DELPHI_PACKAGE void __fastcall ALStringInitialization(void);

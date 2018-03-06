@@ -62,7 +62,6 @@ type
     procedure ALButton9Click(Sender: TObject);
     procedure ALButton12Click(Sender: TObject);
     procedure ALButton13Click(Sender: TObject);
-    procedure cxWwwArkadiaComLabelClick(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -1423,12 +1422,6 @@ begin
 end;
 
 {$WARN SYMBOL_DEPRECATED ON}
-
-{**********************************************************}
-procedure TForm1.cxWwwArkadiaComLabelClick(Sender: TObject);
-begin
-  ShellExecute(Application.Handle,'open','http://www.arkadia.com',nil,nil, SW_SHOWNORMAL);
-end;
 
 {***********************************************}
 procedure TForm1.ALButton2Click(Sender: TObject);

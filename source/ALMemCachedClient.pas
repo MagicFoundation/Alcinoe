@@ -1985,7 +1985,7 @@ Begin
     if FReleasingAllconnections then raise exception.Create('Can not acquire connection: currently releasing all connections');
 
     //delete the old unused connection
-    aTickCount := ALGetTickCount64;
+    aTickCount := GetTickCount64;
     if aTickCount - fLastConnectionGarbage > (60000 {every minutes})  then begin
       while FConnectionPoolCount > 0 do begin
         if aTickCount - FConnectionPool[0].Lastaccessdate > FConnectionMaxIdleTime then begin
@@ -2070,7 +2070,7 @@ begin
         SetLength(FConnectionPool, FConnectionPoolCapacity);
       end;
       FConnectionPool[FConnectionPoolCount].SocketDescriptor := SocketDescriptor;
-      FConnectionPool[FConnectionPoolCount].LastAccessDate := ALGetTickCount64;
+      FConnectionPool[FConnectionPoolCount].LastAccessDate := GetTickCount64;
       Inc(FConnectionPoolCount);
     end
 
@@ -2108,7 +2108,7 @@ begin
   FConnectionPoolCS:= TCriticalSection.create;
   FWorkingConnectionCount:= 0;
   FReleasingAllconnections := False;
-  FLastConnectionGarbage := ALGettickCount64;
+  FLastConnectionGarbage := GettickCount64;
   FConnectionMaxIdleTime := 1200000; // 1000 * 60 * 20 = 20 min
 end;
 
@@ -2152,7 +2152,7 @@ begin
         End;
         Dec(FConnectionPoolCount);
       end;
-      FLastConnectionGarbage := ALGetTickCount64;
+      FLastConnectionGarbage := GetTickCount64;
     finally
       FConnectionPoolCS.Release;
     end;

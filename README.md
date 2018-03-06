@@ -6,6 +6,37 @@ be used in commercial as well as shareware and freeware and open source projects
 without cost.
 
 
+compiled demo
+-------------
+
+### Win32 ### 
+
+https://svn.code.sf.net/p/alcinoe/code/demos/ALWinHTTPClient/win32/ALWinHTTPClientDemo.exe
+https://svn.code.sf.net/p/alcinoe/code/demos/ALWinInetHTTPClient/win32/ALWinInetHTTPClientDemo.exe
+https://svn.code.sf.net/p/alcinoe/code/demos/ALSortedListBenchmark/win32/ALSortedListBenchmark.exe
+https://svn.code.sf.net/p/alcinoe/code/demos/ALCipherDemo/win32/ALCipherDemo.exe
+https://svn.code.sf.net/p/alcinoe/code/demos/ALJsonDoc/win32/AljsonDocDemo.exe
+https://svn.code.sf.net/p/alcinoe/code/demos/ALNNTPClient/win32/ALNNTPClientDemo.exe
+https://svn.code.sf.net/p/alcinoe/code/demos/ALPhpRunner/win32/ALPhpRunnerDemo.exe
+https://svn.code.sf.net/p/alcinoe/code/demos/ALPOP3Client/win32/POP3ClientDemo.exe
+https://svn.code.sf.net/p/alcinoe/code/demos/ALSMTPClient/win32/ALSMTPClientDemo.exe
+https://svn.code.sf.net/p/alcinoe/code/demos/ALSqlite3Client/win32/ALSqlite3clientDemo.exe
+https://svn.code.sf.net/p/alcinoe/code/demos/ALStressHTTPServer/win32/ALStressHTTPServer.exe
+https://svn.code.sf.net/p/alcinoe/code/demos/ALStringBenchmark/win32/ALStringBenchmark.exe
+https://svn.code.sf.net/p/alcinoe/code/demos/ALWebSpider/win32/ALWebSpiderDemo.exe
+https://svn.code.sf.net/p/alcinoe/code/demos/ALXmlDoc/win32/AlXmlDocDemo.exe
+
+### Android ### 
+
+https://svn.code.sf.net/p/alcinoe/code/demos/ALFmxControls/Android/Release/ALFmxControls/bin/ALFmxControls.apk
+https://svn.code.sf.net/p/alcinoe/code/demos/ALFirebaseMessagingDemo/Android/Release/ALFirebaseMessagingDemo/bin/ALFirebaseMessagingDemo.apk
+https://svn.code.sf.net/p/alcinoe/code/demos/ALFacebookLogin/Android/Release/ALFacebookLogin/bin/ALFacebookLogin.apk
+
+### iOS ### 
+
+Please ask apple 
+
+
 Full opengl video player for firemonkey
 ---------------------------------------
 
@@ -271,6 +302,48 @@ To parse an JSON document in Sax Mode :
     MyJsonDoc.LoadFromJSON(AJsonStr, true{saxMode});
 
 
+ImageMagick wrapper for delphi
+---------------------------------------
+
+Use ImageMagick® to create, edit, compose, or convert bitmap 
+images. It can read and write images in a variety of formats 
+(over 200) including PNG, JPEG, GIF, HEIC, TIFF, DPX, EXR, 
+WebP, Postscript, PDF, and SVG. Use ImageMagick to resize, 
+flip, mirror, rotate, distort, shear and transform images, 
+adjust image colors, apply various special effects, or draw 
+text, lines, polygons, ellipses and Bézier curves.
+
+Exemple :
+
+    var aWand: PMagickWand;
+    begin
+    
+      //create the wand pointer
+      aWand := ALImageMagickLib.NewMagickWand;
+      try
+    
+        //load the image
+        if ALImageMagickLib.MagickReadImage(aWand, pansiChar(aInputFilename)) <> MagickTrue then RaiseLastWandError(aWand);
+        
+        //Set the compression quality
+        if ALImageMagickLib.MagickSetImageCompressionQuality(aWand,80) <> MagickTrue then RaiseLastWandError(aWand);
+    
+        //autorate the image
+        if ALImageMagickLib.MagickAutoOrientImage(aWand) <> MagickTrue then RaiseLastWandError(aWand);
+    
+        //Resize the image using the Lanczos filter
+        if ALImageMagickLib.MagickResizeImage(aWand, 640, 480, LanczosFilter) <> MagickTrue then RaiseLastWandError(aWand);
+           
+        //save the image
+        ALImageMagickLib.MagickWriteImage(aWand, pansiChar(aOutputFilename));
+    
+      finally
+        ALImageMagickLib.DestroyMagickWand(aWand);
+      end;
+    
+    end;
+
+
 MongoDb client
 --------------
 
@@ -434,6 +507,13 @@ If both of these tests pass, then your phone meets the basic
 requirements.
 
 
+SQLite3 Client
+--------------
+
+Query Sqlite3 database and get the result In Xml format 
+or in Json/Bson format. 
+
+
 And much more
 -------------
 
@@ -443,7 +523,6 @@ And much more
 * NNTP Client
 * POP3 Client
 * SMTP Client
-* SQLite3 Client 
 * Xml Parser 
 * etc ...
 

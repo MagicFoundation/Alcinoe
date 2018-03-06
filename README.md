@@ -34,7 +34,7 @@ compiled demo
 
 #### iOS #### 
 
-Please ask apple 
+Please ask apple how to do
 
 
 Full opengl video player for firemonkey
@@ -541,16 +541,6 @@ http://alcinoe.svn.sourceforge.net/viewvc/alcinoe/
 
 You can also find the last version on github at 
 https://github.com/Zeus64/alcinoe
-
-
-DEMOS
------
-
-You can see the demo of firemonkey controls here: demos/ALFmxControls/ 
-and the compiled apk of the demo: https://tinyurl.com/zoxavr9
-
-If you encounter some problems to compile the demo, please contact me on 
-Skype so that i can help you and update this doc.
 
 
 WIN64

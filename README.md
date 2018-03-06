@@ -9,7 +9,7 @@ without cost.
 compiled demo
 -------------
 
-### Win32 ### 
+#### Win32 #### 
 
 https://svn.code.sf.net/p/alcinoe/code/demos/ALWinHTTPClient/win32/ALWinHTTPClientDemo.exe
 https://svn.code.sf.net/p/alcinoe/code/demos/ALWinInetHTTPClient/win32/ALWinInetHTTPClientDemo.exe
@@ -26,13 +26,13 @@ https://svn.code.sf.net/p/alcinoe/code/demos/ALStringBenchmark/win32/ALStringBen
 https://svn.code.sf.net/p/alcinoe/code/demos/ALWebSpider/win32/ALWebSpiderDemo.exe
 https://svn.code.sf.net/p/alcinoe/code/demos/ALXmlDoc/win32/AlXmlDocDemo.exe
 
-### Android ### 
+#### Android #### 
 
-https://svn.code.sf.net/p/alcinoe/code/demos/ALFmxControls/Android/Release/ALFmxControls/bin/ALFmxControls.apk
-https://svn.code.sf.net/p/alcinoe/code/demos/ALFirebaseMessagingDemo/Android/Release/ALFirebaseMessagingDemo/bin/ALFirebaseMessagingDemo.apk
-https://svn.code.sf.net/p/alcinoe/code/demos/ALFacebookLogin/Android/Release/ALFacebookLogin/bin/ALFacebookLogin.apk
+https://tinyurl.com/zoxavr9
+https://tinyurl.com/yd7c4ofk
+https://tinyurl.com/y9gzos9f
 
-### iOS ### 
+#### iOS #### 
 
 Please ask apple 
 

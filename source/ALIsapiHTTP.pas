@@ -124,6 +124,7 @@ type
   private
     FECB: PEXTENSION_CONTROL_BLOCK;
     FcontentStream: TALStringStream;
+    fConnectionClosed: boolean;
     function GetHost: AnsiString;
   protected
     // [Deleted from TwebRequest] function GetRawPathInfo: AnsiString; override;
@@ -134,6 +135,7 @@ type
   public
     constructor Create(AECB: PEXTENSION_CONTROL_BLOCK);
     destructor Destroy; override;
+    procedure closeConnection;
     procedure ReadClientToStream(const aStream: TStream);
     function GetFieldByName(const Name: AnsiString): AnsiString; override;
     function ReadClient(var Buffer; Count: Integer): Integer; override; // if you use readClient then you need to avoid to use ContentStream
@@ -143,6 +145,7 @@ type
     function WriteString(const AString: AnsiString): Boolean; override;
     function WriteHeaders(StatusCode: Integer; const StatusString, Headers: AnsiString): Boolean; override;
     property ECB: PEXTENSION_CONTROL_BLOCK read FECB;
+    property ConnectionClosed: boolean read fConnectionClosed;
   end;
 
   {-----------------------------}
@@ -241,7 +244,6 @@ type
     procedure InitResponse; virtual;
   public
     constructor Create(HTTPRequest: TALWebRequest);
-    procedure closeConnection;
     procedure SendResponse; override;
     procedure SendRedirect(const URI: AnsiString); override;
     procedure SendStream(AStream: TStream); override;
@@ -455,6 +457,7 @@ constructor TALISAPIRequest.Create(AECB: PEXTENSION_CONTROL_BLOCK);
 begin
   FECB := AECB;
   FcontentStream := nil;
+  fConnectionClosed := False;
   inherited Create;
 end;
 
@@ -511,14 +514,32 @@ begin
   if I > 0 then Delete(Result, I, MaxInt);
 end;
 
+{****************************************}
+procedure TALISAPIRequest.closeConnection;
+begin
+
+  // HSE_REQ_CLOSE_CONNECTION closes the client socket connection immediately,
+  // but IIS takes a small amount of time to handle the threads in the thread pool
+  // before the connection can be completely removed.
+  if not ECB.ServerSupportFunction(ECB.ConnID,
+                                   HSE_REQ_CLOSE_CONNECTION,
+                                   nil,
+                                   nil,
+                                   nil) then raiseLastOsError;
+  fConnectionClosed := true;
+
+end;
+
 {*******************************************************************}
 procedure TALISAPIRequest.ReadClientToStream(const aStream: TStream);
 var aByteRead: Integer;
     aBuffer: array[0..8191] of Byte;
 begin
 
-  If (FMaxContentSize > -1) and (ECB.cbTotalBytes > DWord(FMaxContentSize)) then
+  If (FMaxContentSize > -1) and (ECB.cbTotalBytes > DWord(FMaxContentSize)) then begin
+    closeConnection; // if we don't close the connection IIS will continue to read all the bytes send by the client
     Raise EALIsapiRequestContentSizeTooBig.createFmt('Content size (%d bytes) is bigger than the maximum allowed size (%d bytes)', [ECB.cbTotalBytes, FMaxContentSize]);
+  end;
 
   aStream.Size := ECB.cbTotalBytes; // cbTotalBytes The total number of bytes to be received from the client.
                                     // This is equivalent to the CGI variable CONTENT_LENGTH
@@ -892,26 +913,6 @@ begin
     FStringVariables[Index] := Value;
 end;
 
-{*****************************************}
-procedure TALISAPIResponse.closeConnection;
-begin
-
-  // HSE_REQ_CLOSE_CONNECTION closes the client socket connection immediately,
-  // but IIS takes a small amount of time to handle the threads in the thread pool
-  // before the connection can be completely removed.
-  with TALISAPIRequest(FHTTPRequest) do
-    if not ECB.ServerSupportFunction(ECB.ConnID,
-                                     HSE_REQ_CLOSE_CONNECTION,
-                                     nil,
-                                     nil,
-                                     nil) then raiseLastOsError;
-
-  // Set fSent to true as their is no more any connection so no need to call
-  // later SendResponse
-  fSent := True;
-
-end;
-
 {**************************************}
 procedure TALISAPIResponse.SendResponse;
 
@@ -926,6 +927,8 @@ var StatusString: AnsiString;
   end;
 
 begin
+
+  if fSent or TALISAPIRequest(FHTTPRequest).ConnectionClosed then exit;
 
   if HTTPRequest.ProtocolVersion <> '' then begin
     if (ReasonString <> '') and (StatusCode > 0) then StatusString := ALFormat('%d %s', [StatusCode, ReasonString])

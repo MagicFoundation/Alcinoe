@@ -241,6 +241,7 @@ type
     procedure InitResponse; virtual;
   public
     constructor Create(HTTPRequest: TALWebRequest);
+    procedure closeConnection;
     procedure SendResponse; override;
     procedure SendRedirect(const URI: AnsiString); override;
     procedure SendStream(AStream: TStream); override;
@@ -257,11 +258,13 @@ function ALIsapiHttpStatusString(StatusCode: Integer): AnsiString;
 //
 
 const
-
   HSE_IO_SYNC                      = $00000001;   // for WriteClient
   HSE_IO_ASYNC                     = $00000002;   // for WriteClient/TF
   HSE_IO_DISCONNECT_AFTER_SEND     = $00000004;   // for TF
   HSE_IO_SEND_HEADERS              = $00000008;   // for TF
+
+const
+  HSE_REQ_CLOSE_CONNECTION = (HSE_REQ_END_RESERVED+17);
 
 implementation
 
@@ -887,6 +890,26 @@ procedure TALISAPIResponse.SetStringVariable(Index: Integer; const Value: AnsiSt
 begin
   if (Index >= Low(FStringVariables)) and (Index <= High(FStringVariables)) then
     FStringVariables[Index] := Value;
+end;
+
+{*****************************************}
+procedure TALISAPIResponse.closeConnection;
+begin
+
+  // HSE_REQ_CLOSE_CONNECTION closes the client socket connection immediately,
+  // but IIS takes a small amount of time to handle the threads in the thread pool
+  // before the connection can be completely removed.
+  with TALISAPIRequest(FHTTPRequest) do
+    if not ECB.ServerSupportFunction(ECB.ConnID,
+                                     HSE_REQ_CLOSE_CONNECTION,
+                                     nil,
+                                     nil,
+                                     nil) then raiseLastOsError;
+
+  // Set fSent to true as their is no more any connection so no need to call
+  // later SendResponse
+  fSent := True;
+
 end;
 
 {**************************************}

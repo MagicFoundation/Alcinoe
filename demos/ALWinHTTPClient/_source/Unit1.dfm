@@ -224,6 +224,51 @@ object Form1: TForm1
           ParentFont = False
           OnClick = ButtonTraceClick
         end
+        object ButtonOptions: TcxButton
+          Left = 574
+          Top = 21
+          Width = 50
+          Height = 25
+          Caption = 'Options'
+          TabOrder = 13
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+          OnClick = ButtonOptionsClick
+        end
+        object ButtonPut: TcxButton
+          Left = 630
+          Top = 21
+          Width = 50
+          Height = 25
+          Caption = 'Put'
+          TabOrder = 14
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+          OnClick = ButtonPutClick
+        end
+        object ButtonDelete: TcxButton
+          Left = 686
+          Top = 21
+          Width = 50
+          Height = 25
+          Caption = 'Delete'
+          TabOrder = 15
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+          OnClick = ButtonDeleteClick
+        end
       end
       object Panel4: TPanel
         Left = 0
@@ -284,7 +329,7 @@ object Form1: TForm1
             Style.Font.Style = []
             Style.IsFontAssigned = True
             TabOrder = 1
-            Height = 290
+            Height = 267
             Width = 260
           end
         end
@@ -322,8 +367,8 @@ object Form1: TForm1
             Style.Font.Style = []
             Style.IsFontAssigned = True
             TabOrder = 1
-            Height = 290
-            Width = 497
+            Height = 267
+            Width = 495
           end
         end
         object cxSplitter1: TcxSplitter
@@ -879,6 +924,6 @@ object Form1: TForm1
     NativeStyle = False
     SkinName = 'Foggy'
     Left = 704
-    Top = 56
+    Top = 112
   end
 end

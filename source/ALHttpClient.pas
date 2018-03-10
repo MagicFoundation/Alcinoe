@@ -37,7 +37,8 @@ type
                    HTTPmt_Head,
                    HTTPmt_Trace,
                    HTTPmt_Put,
-                   HTTPmt_Delete);
+                   HTTPmt_Delete,
+                   HTTPmt_Options);
 
   {--Request header--}
   TALHTTPRequestHeader = Class(TObject)
@@ -380,6 +381,13 @@ type
                      const ARequestHeaderValues: TALNameValueArray = nil); overload;
     function  Delete(const aURL: Ansistring;
                      const ARequestHeaderValues: TALNameValueArray = nil): AnsiString; overload;
+    //-----
+    procedure Options(const aUrl:AnsiString;
+                      const aResponseContent: TStream;
+                      const aResponseHeader: TALHTTPResponseHeader;
+                      const ARequestHeaderValues: TALNameValueArray = nil); overload;
+    function  Options(const aURL: Ansistring;
+                      const ARequestHeaderValues: TALNameValueArray = nil): AnsiString; overload;
     //-----
     property  ConnectTimeout: Integer read FConnectTimeout write FConnectTimeout default 0;
     property  SendTimeout: Integer read FSendTimeout write FSendTimeout default 0;
@@ -2365,6 +2373,37 @@ begin
            aResponseContent,
            nil,
            ARequestHeaderValues);
+    result := aResponseContent.DataString;
+  finally
+    AlFreeAndNil(aResponseContent);
+  end;
+end;
+
+{****************************************************}
+procedure TALHTTPClient.Options(const aUrl: AnsiString;
+                                const aResponseContent: TStream;
+                                const aResponseHeader: TALHTTPResponseHeader;
+                                const ARequestHeaderValues: TALNameValueArray = nil);
+begin
+  Execute(aURL,
+          HTTPmt_Options,
+          nil,
+          ARequestHeaderValues,
+          aResponseContent,
+          aResponseHeader);
+end;
+
+{****************************************************}
+function TALHTTPClient.Options(const aURL: Ansistring;
+                               const ARequestHeaderValues: TALNameValueArray = nil): AnsiString;
+var aResponseContent: TALStringStream;
+begin
+  aResponseContent := TALStringStream.Create('');
+  try
+    Options(aUrl,
+            aResponseContent,
+            nil,
+            ARequestHeaderValues);
     result := aResponseContent.DataString;
   finally
     AlFreeAndNil(aResponseContent);

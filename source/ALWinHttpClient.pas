@@ -463,12 +463,13 @@ begin
   If ProtocolVersion = HTTPpv_1_1 then StrProtocolVersion := 'HTTP/1.1'
   else StrProtocolVersion := 'HTTP/1.0';
 
-  if      aRequestMethod = HTTPmt_Post then   StrVerb := 'POST'
-  else if aRequestMethod = HTTPmt_Get then    StrVerb := 'GET'
-  else if aRequestMethod = HTTPmt_head then   StrVerb := 'HEAD'
-  else if aRequestMethod = HTTPmt_trace then  StrVerb := 'TRACE'
-  else if aRequestMethod = HTTPmt_Put then    StrVerb := 'PUT'
-  else if aRequestMethod = HTTPmt_Delete then StrVerb := 'DELETE'
+  if      aRequestMethod = HTTPmt_Post then    StrVerb := 'POST'
+  else if aRequestMethod = HTTPmt_Get then     StrVerb := 'GET'
+  else if aRequestMethod = HTTPmt_head then    StrVerb := 'HEAD'
+  else if aRequestMethod = HTTPmt_trace then   StrVerb := 'TRACE'
+  else if aRequestMethod = HTTPmt_Put then     StrVerb := 'PUT'
+  else if aRequestMethod = HTTPmt_Delete then  StrVerb := 'DELETE'
+  else if aRequestMethod = HTTPmt_Options then StrVerb := 'OPTIONS'
   else raise Exception.Create('Unknown Request Method');
 
   SetLength(AcceptTypes, 2);

@@ -125,6 +125,7 @@ type
     FECB: PEXTENSION_CONTROL_BLOCK;
     FcontentStream: TALStringStream;
     fConnectionClosed: boolean;
+    fClientDataExhausted: Boolean;
     function GetHost: AnsiString;
   protected
     // [Deleted from TwebRequest] function GetRawPathInfo: AnsiString; override;
@@ -146,6 +147,7 @@ type
     function WriteHeaders(StatusCode: Integer; const StatusString, Headers: AnsiString): Boolean; override;
     property ECB: PEXTENSION_CONTROL_BLOCK read FECB;
     property ConnectionClosed: boolean read fConnectionClosed;
+    property ClientDataExhausted: boolean read fClientDataExhausted;
   end;
 
   {-----------------------------}
@@ -458,6 +460,7 @@ begin
   FECB := AECB;
   FcontentStream := nil;
   fConnectionClosed := False;
+  fClientDataExhausted := ECB.cbTotalBytes <= ECB.cbAvailable;
   inherited Create;
 end;
 
@@ -521,6 +524,7 @@ begin
   // HSE_REQ_CLOSE_CONNECTION closes the client socket connection immediately,
   // but IIS takes a small amount of time to handle the threads in the thread pool
   // before the connection can be completely removed.
+  if fConnectionClosed then exit;
   if not ECB.ServerSupportFunction(ECB.ConnID,
                                    HSE_REQ_CLOSE_CONNECTION,
                                    nil,
@@ -613,6 +617,7 @@ function TALISAPIRequest.ReadClient(var Buffer; Count: Integer): Integer;
 begin
   Result := Count;
   if not ECB.ReadClient(ECB.ConnID, @Buffer, DWORD(Result)) then RaiseLastOsError;
+  if Result = 0 then fClientDataExhausted := True;
 end;
 
 {**************************************************************}

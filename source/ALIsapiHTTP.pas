@@ -573,6 +573,7 @@ begin
       aStream.WriteBuffer(aBuffer[0], aByteRead);
     end;
   end;
+  fClientDataExhausted := True;
   aStream.Size := aStream.Position;
   aStream.Position := 0;
 
@@ -617,7 +618,7 @@ function TALISAPIRequest.ReadClient(var Buffer; Count: Integer): Integer;
 begin
   Result := Count;
   if not ECB.ReadClient(ECB.ConnID, @Buffer, DWORD(Result)) then RaiseLastOsError;
-  if Result = 0 then fClientDataExhausted := True;
+  if Result <= 0 then fClientDataExhausted := True;
 end;
 
 {**************************************************************}

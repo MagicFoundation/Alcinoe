@@ -497,7 +497,8 @@ type
     //        length varies depending on the values of width, height, map, and type.
     MagickExportImagePixels: function(wand: PMagickWand; const x: ssize_t; const y: ssize_t; const columns: size_t; const rows: size_t; const map: pansichar; const storage: StorageType; pixels: pointer): MagickBooleanType; cdecl;
 
-    constructor Create(aImageMagickHome: String); virtual;
+    constructor Create(aImageMagickHome: String;
+                       const aThreadLimit: integer = -1); virtual;
     destructor Destroy; override;
   end;
 
@@ -505,7 +506,8 @@ Var
   ALImageMagickLib: TALImageMagickLibrary;
 
 {*******************************************************************}
-procedure alCreateImageMagickLibrary(const aImageMagickHome: String);
+procedure alCreateImageMagickLibrary(const aImageMagickHome: String;
+                                     const aThreadLimit: integer = -1);
 procedure alFreeImageMagickLibrary;
 procedure RaiseLastWandError(const wand: PMagickWand);
 
@@ -514,8 +516,9 @@ implementation
 uses system.sysutils,
      alCommon;
 
-{*****************************************************************}
-constructor TALImageMagickLibrary.Create(aImageMagickHome: String);
+{****************************************************************}
+constructor TALImageMagickLibrary.Create(aImageMagickHome: String;
+                                         const aThreadLimit: integer = -1);
 Var aPath: String;
 begin
 
@@ -528,6 +531,11 @@ begin
      (not setEnvironmentVariable(PChar('MAGICK_CONFIGURE_PATH'), pChar(aImageMagickHome))) or
      (not setEnvironmentVariable(PChar('MAGICK_CODER_FILTER_PATH'), pChar(aImageMagickHome + '\modules\filters'))) or
      (not setEnvironmentVariable(PChar('MAGICK_CODER_MODULE_PATH'), pChar(aImageMagickHome + '\modules\coders'))) then raiseLastOsError;
+
+  //https://www.imagemagick.org/discourse-server/viewtopic.php?f=6&t=33662
+  //https://stackoverflow.com/questions/49266246/imagemagick-wand-use-only-one-single-cpu
+  if (aThreadLimit > -1) and
+     (not setEnvironmentVariable(PChar('MAGICK_THREAD_LIMIT'), pChar(Inttostr(aThreadLimit)))) then raiseLastOsError;
 
   FlibMagickWand := LoadLibrary(pChar(aImageMagickHome + '\CORE_RL_MagickWand_.dll' ));
   if FlibMagickWand = 0 then raiseLastOsError;
@@ -577,6 +585,8 @@ destructor TALImageMagickLibrary.Destroy;
 begin
   if FlibMagickWand > 0 then begin
     MagickWandTerminus;
+    sleep(250); // << else when the imagemagick was heavy used just before the destroy
+                // << I receive an Access Violation in the FreeLibrary(FlibMagickWand)
     if not FreeLibrary(FlibMagickWand) then raiseLastOsError;
   end;
   inherited Destroy;
@@ -594,11 +604,12 @@ begin
   raise Exception.create(string(aDescription));
 end;
 
-{*******************************************************************}
-procedure alCreateImageMagickLibrary(const aImageMagickHome: String);
+{******************************************************************}
+procedure alCreateImageMagickLibrary(const aImageMagickHome: String;
+                                     const aThreadLimit: integer = -1);
 begin
   if assigned(ALImageMagickLib) then exit;
-  ALImageMagickLib := TALImageMagickLibrary.Create(aImageMagickHome);
+  ALImageMagickLib := TALImageMagickLibrary.Create(aImageMagickHome, aThreadLimit);
 end;
 
 {*********************************}

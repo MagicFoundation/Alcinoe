@@ -301,11 +301,17 @@ function ALUnionRect(out Rect: TALRectD; const R1, R2: TALRectD): Boolean;
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 function ALRectFitInto(const R: TRectf; const Bounds: TRectf; const CenterAt: TpointF; out Ratio: Single): TRectF; overload;
 function ALRectFitInto(const R: TRectf; const Bounds: TRectf; const CenterAt: TpointF): TRectF; overload;
+function ALRectFitInto(const R: TRectf; const Bounds: TRectF; out Ratio: Single): TRectF; overload;
+function ALRectFitInto(const R: TRectf; const Bounds: TRectF): TRectF; overload;
 function ALRectPlaceInto(const R: TRectf;
                          const Bounds: TRectf;
                          const CenterAt: TpointF;
                          out Ratio: Single): TRectF; overload;
 function ALRectPlaceInto(const R: TRectf; const Bounds: TRectf; const CenterAt: TpointF): TRectF; overload;
+function ALRectPlaceInto(const R: TRectf;
+                         const Bounds: TRectF;
+                         const AHorzAlign: THorzRectAlign = THorzRectAlign.Center;
+                         const AVertAlign: TVertRectAlign = TVertRectAlign.Center): TRectF; overload;
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 Type TalLogType = (VERBOSE, DEBUG, INFO, WARN, ERROR, ASSERT);
@@ -583,6 +589,34 @@ begin
   Result := ALRectFitInto(R, Bounds, CenterAt, Ratio);
 end;
 
+{******************************************************************************************************************}
+//this is the same as TRectf.fitInto but it is here for old delphi version (like xe4) with don't have it implemented
+function ALRectFitInto(const R: TRectf; const Bounds: TRectF; out Ratio: Single): TRectF;
+begin
+  if (Bounds.Width <= 0) or (Bounds.Height <= 0) then
+  begin
+    Ratio := 1;
+    Exit(R);
+  end;
+
+  if (R.Width / Bounds.Width) > (R.Height / Bounds.Height) then
+    Ratio := R.Width / Bounds.Width
+  else
+    Ratio := R.Height / Bounds.Height;
+
+  Result := TRectF.Create(0, 0, R.Width / Ratio, R.Height / Ratio);
+  RectCenter(Result, Bounds);
+end;
+
+{******************************************************************************************************************}
+//this is the same as TRectf.fitInto but it is here for old delphi version (like xe4) with don't have it implemented
+function ALRectFitInto(const R: TRectf; const Bounds: TRectF): TRectF;
+var
+  Ratio: Single;
+begin
+  Result := ALRectFitInto(R, Bounds, Ratio);
+end;
+
 {**************************************************************************************************************}
 //If any dimension of the current rectangle is greater than the corresponding dimension of the Bounds rectangle,
 //then the current rectangle is scaled down to best fit the Bounds rectangle. The obtained rectangle is aligned in Bounds.
@@ -618,6 +652,31 @@ var
   Ratio: Single;
 begin
   Result := ALRectPlaceInto(R, Bounds, CenterAt, Ratio);
+end;
+
+{********************************************************************************************************************}
+//this is the same as TRectf.PlaceInto but it is here for old delphi version (like xe4) with don't have it implemented
+function ALRectPlaceInto(const R: TRectf;
+                         const Bounds: TRectF;
+                         const AHorzAlign: THorzRectAlign = THorzRectAlign.Center;
+                         const AVertAlign: TVertRectAlign = TVertRectAlign.Center): TRectF;
+var
+  LLocation: TPointF;
+begin
+  Result := R;
+  if (R.Width > Bounds.Width) or (R.Height > Bounds.Height) then
+    Result := ALRectFitInto(Result, Bounds);
+ case AHorzAlign of
+   THorzRectAlign.Center: LLocation.X := (Bounds.Left + Bounds.Right - Result.Width) / 2;
+   THorzRectAlign.Left: LLocation.X := Bounds.Left;
+   THorzRectAlign.Right: LLocation.X := Bounds.Right - Result.Width;
+ end;
+ case AVertAlign of
+   TVertRectAlign.Center: LLocation.Y := (Bounds.Top + Bounds.Bottom - Result.Height) / 2;
+   TVertRectAlign.Top: LLocation.Y := Bounds.Top;
+   TVertRectAlign.Bottom: LLocation.Y := Bounds.Bottom - Result.Height;
+ end;
+ Result.SetLocation(LLocation);
 end;
 
 {***************************************************************}

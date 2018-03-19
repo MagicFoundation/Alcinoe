@@ -1698,6 +1698,9 @@ begin
                                              // aLstIpv6Part.Text := AlStringReplace(aIPv6Str, ':', #13#10, [rfReplaceALL]);
                                              // 21DA:D3:0000:2F3B:02AA:00FF:FE28:: => 21DA:D3:0000:2F3B:02AA:00FF:FE28:0
 
+  //https://howdoesinternetwork.com/2013/ipv6-zone-id
+  P1 := Alpos('%', aIPv6Str); // fe80:3438:7667:5c77:ce27%18
+  if (P1 > 0) then delete(aIPv6Str,P1,maxint); // fe80:3438:7667:5c77:ce27
 
   //----------
   aLstIpv6Part := TALStringList.Create;

@@ -475,10 +475,12 @@ function  ALIntToBit(value: Integer; digits: integer): ansistring;
 function  AlBitToInt(Value: ansiString): Integer;
 function  AlInt2BaseN(NumIn: UInt64; const charset: array of ansiChar): ansistring;
 function  AlBaseN2Int(const Str: ansiString; const charset: array of ansiChar): UInt64;
-function  ALBase64EncodeString(const S: AnsiString): AnsiString;
+function  ALBase64EncodeString(const P: PansiChar; const ln: Integer): AnsiString; overload;
+function  ALBase64EncodeString(const S: AnsiString): AnsiString; overload;
+function  ALBase64DecodeString(const P: PansiChar; const ln: Integer): AnsiString; overload;
+function  ALBase64DecodeString(const S: AnsiString): AnsiString; overload;
 function  ALBase64EncodeStringMIME(const S: AnsiString): AnsiString;
 function  ALBase64DecodeStringMIME(const S: AnsiString): AnsiString;
-function  ALBase64DecodeString(const S: AnsiString): AnsiString;
 function  ALIsDecimal(const S: AnsiString; const RejectPlusMinusSign: boolean = False): boolean;
 Function  ALIsInt64 (const S: AnsiString): Boolean;
 Function  ALIsInteger (const S: AnsiString): Boolean;
@@ -7061,6 +7063,15 @@ begin
   end;
 end;
 
+{********************************************************************************}
+function  ALBase64EncodeString(const P: PansiChar; const ln: Integer): AnsiString;
+begin
+  result := '';
+  if ln=0 then exit;
+  SetLength(result,BinToBase64Length(ln));
+  Base64Encode(pointer(result),P,ln);
+end;
+
 {**************************************************************}
 function  ALBase64EncodeString(const S: AnsiString): AnsiString;
 var len: integer;
@@ -7070,6 +7081,12 @@ begin
   if len=0 then exit;
   SetLength(result,BinToBase64Length(len));
   Base64Encode(pointer(result),pointer(s),len);
+end;
+
+{********************************************************************************}
+function  ALBase64DecodeString(const P: PansiChar; const ln: Integer): AnsiString;
+begin
+  Base64ToBin(P,ln,result);
 end;
 
 {**************************************************************}

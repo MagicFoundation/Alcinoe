@@ -807,7 +807,7 @@ function  ALGetStringFromFileU(const filename: String; const ADefaultEncoding: T
 procedure ALSaveStringtoFileU(const Str: String; const filename: String; AEncoding: TEncoding; const WriteBOM: boolean = False);
 function  ALRandomStrU(const aLength: Longint; const aCharset: Array of Char): String; overload;
 function  ALRandomStrU(const aLength: Longint): String; overload;
-function  ALHTTPEncodeU(const AStr: String): String; inline;
+function  ALHTTPEncodeU(const AStr: String): String;
 function  ALHTTPDecodeU(const AStr: String): String;
 {$WARN SYMBOL_DEPRECATED OFF}
 procedure ALExtractHeaderFieldsWithQuoteEscapedU(Separators,
@@ -12444,25 +12444,30 @@ const
   NoConversion = [Ord('A')..Ord('Z'),Ord('a')..Ord('z'),Ord('*'),Ord('@'),Ord('.'),Ord('_'),Ord('-'),
                   Ord('0')..Ord('9'),Ord('$'),Ord('!'),Ord(''''),Ord('('),Ord(')')];
 var
-  Sp, Rp: PChar;
+  Sb: Tbytes;
+  Rp: PChar;
+  ln: integer;
+  i: integer;
 begin
-  SetLength(Result, Length(AStr) * 3);
-  Sp := PChar(AStr);
+  Sb := Tencoding.UTF8.GetBytes(aStr);
+  ln := length(Sb);
+  SetLength(Result, ln * 3);
   Rp := PChar(Result);
-  while Sp^ <> #0 do
+  i := 0;
+  while i <= ln - 1 do
   begin
-    if ord(Sp^) in NoConversion then
-      Rp^ := Sp^
+    if Sb[i] in NoConversion then
+      Rp^ := Char(Sb[i])
     else
-      if Sp^ = ' ' then
+      if Sb[i] = Ord(' ') then
         Rp^ := '+'
       else
       begin
-        FormatBuf(Rp, 3, String('%%%.2x'), 6, [Ord(Sp^)]);
+        FormatBuf(Rp, 3, String('%%%.2x'), 6, [Sb[i]]);
         Inc(Rp,2);
       end;
     Inc(Rp);
-    Inc(Sp);
+    Inc(i);
   end;
   SetLength(Result, Rp - PChar(Result));
 end;
@@ -12473,22 +12478,24 @@ end;
 //error (EConvertError) when the url will contain % that
 //are not encoded
 function ALHTTPDecodeU(const AStr: String): String;
-var Sp, Rp, Cp, Tp: PChar;
+var Rb: Tbytes;
+    Sp, Cp, Tp: PChar;
     int: integer;
     S: String;
+    i: integer;
 begin
-  SetLength(Result, Length(AStr));
+  SetLength(Rb, Length(AStr));
   Sp := PChar(AStr);
-  Rp := PChar(Result);
+  i := 0;
   while Sp^ <> #0 do begin
     case Sp^ of
-      '+': Rp^ := ' ';
+      '+': Rb[i] := ord(' ');
       '%': begin
              Tp := Sp;
              Inc(Sp);
 
              //escaped % (%%)
-             if Sp^ = '%' then Rp^ := '%'
+             if Sp^ = '%' then Rb[i] := ord('%')
 
              // %<hex> encoded character
              else begin
@@ -12496,24 +12503,24 @@ begin
                Inc(Sp);
                if (Cp^ <> #0) and (Sp^ <> #0) then begin
                  S := Char('$') + Char(Cp^) + Char(Sp^);
-                 if ALTryStrToIntU(s,int) then Rp^ := Char(int)
+                 if ALTryStrToIntU(s,int) then Rb[i] := int
                  else begin
-                   Rp^ := '%';
+                   Rb[i] := ord('%');
                    Sp := Tp;
                  end;
                end
                else begin
-                 Rp^ := '%';
+                 Rb[i] := ord('%');
                  Sp := Tp;
                end;
              end;
            end;
-      else Rp^ := Sp^;
+      else Rb[i] := ord(Sp^);
     end;
-    Inc(Rp);
+    Inc(i);
     Inc(Sp);
   end;
-  SetLength(Result, Rp - PChar(Result));
+  result := Tencoding.Utf8.GetString(Rb, 0{ByteIndex}, i{ByteCount});
 end;
 
 {**************************************************************************************}

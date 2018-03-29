@@ -380,6 +380,7 @@ type
     procedure LoadFromBSONStream(const Stream: TStream; Const ClearChildNodes: Boolean = True);
     procedure LoadFromBSONFile(const FileName: AnsiString; Const ClearChildNodes: Boolean = True);
     property ChildNodes: TALJSONNodeList read GetChildNodes write SetChildNodes;
+    function GetChildNode(const nodeName: ansiString): TALJSONNode; overload;
     function GetChildNodeValueText(const nodeName: ansiString; const default: AnsiString): AnsiString; overload;
     function GetChildNodeValueFloat(const nodeName: ansiString; const default: Double): Double; overload;
     function GetChildNodeValueDateTime(const nodeName: ansiString; const default: TDateTime): TDateTime; overload;
@@ -393,6 +394,7 @@ type
     function GetChildNodeValueRegExOptions(const nodeName: ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
     function GetChildNodeValueBinary(const nodeName: ansiString; const default: AnsiString): AnsiString; overload;  // return a "byte" string
     function GetChildNodeValueBinarySubType(const nodeName: ansiString; const default: byte): byte; overload;
+    function GetChildNode(const path: array of ansiString): TALJSONNode; overload;
     function GetChildNodeValueText(const path: array of ansiString; const default: AnsiString): AnsiString; overload;
     function GetChildNodeValueFloat(const path: array of ansiString; const default: Double): Double; overload;
     function GetChildNodeValueDateTime(const path: array of ansiString; const default: TDateTime): TDateTime; overload;
@@ -848,6 +850,7 @@ type
     procedure LoadFromBSONStream(const Stream: TStream; Const ClearChildNodes: Boolean = True);
     procedure LoadFromBSONFile(const FileName: String; Const ClearChildNodes: Boolean = True);
     property ChildNodes: TALJSONNodeListU read GetChildNodes write SetChildNodes;
+    function GetChildNode(const nodeName: String): TALJSONNodeU; overload;
     function GetChildNodeValueText(const nodeName: String; const default: String): String; overload;
     function GetChildNodeValueFloat(const nodeName: String; const default: Double): Double; overload;
     function GetChildNodeValueDateTime(const nodeName: String; const default: TDateTime): TDateTime; overload;
@@ -861,6 +864,7 @@ type
     function GetChildNodeValueRegExOptions(const nodeName: String; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
     function GetChildNodeValueBinary(const nodeName: String; const default: String): String; overload;  // return a base64 encoded string
     function GetChildNodeValueBinarySubType(const nodeName: String; const default: byte): byte; overload;
+    function GetChildNode(const path: array of String): TALJSONNodeU; overload;
     function GetChildNodeValueText(const path: array of String; const default: String): String; overload;
     function GetChildNodeValueFloat(const path: array of String; const default: Double): Double; overload;
     function GetChildNodeValueDateTime(const path: array of String; const default: TDateTime): TDateTime; overload;
@@ -4248,6 +4252,12 @@ begin
   ALJsonDocError(CALJsonOperationError,GetNodeType)
 end;
 
+{*************************************************************************}
+function TALJSONNode.GetChildNode(const nodeName: ansiString): TALJSONNode;
+begin
+  result := ChildNodes.findNode(nodeName);
+end;
+
 {************************************************************************************************************}
 function TALJSONNode.GetChildNodeValueText(const nodeName: ansiString; const default: AnsiString): AnsiString;
 var aNode: TALJSONNode;
@@ -4363,6 +4373,17 @@ begin
   aNode := ChildNodes.findNode(nodeName);
   if (aNode = nil) then result := default
   else result := aNode.GetBinarySubType(default);
+end;
+
+{******************************************************************************}
+function TALJSONNode.GetChildNode(const path: array of ansiString): TALJSONNode;
+var i: integer;
+begin
+  result := Self;
+  for i := low(path) to high(path) do begin
+    result := result.ChildNodes.findNode(path[i]);
+    if (result = nil) then exit;
+  end;
 end;
 
 {*****************************************************************************************************************}
@@ -10456,6 +10477,12 @@ begin
   ALJSONDocErrorU(CALJsonOperationError,GetNodeType)
 end;
 
+{***********************************************************************}
+function TALJSONNodeU.GetChildNode(const nodeName: String): TALJSONNodeU;
+begin
+  result := ChildNodes.findNode(nodeName);
+end;
+
 {*************************************************************************************************}
 function TALJSONNodeU.GetChildNodeValueText(const nodeName: String; const default: String): String;
 var aNode: TALJSONNodeU;
@@ -10571,6 +10598,17 @@ begin
   aNode := ChildNodes.findNode(nodeName);
   if (aNode = nil) then result := default
   else result := aNode.GetBinarySubType(default);
+end;
+
+{****************************************************************************}
+function TALJSONNodeU.GetChildNode(const path: array of String): TALJSONNodeU;
+var i: integer;
+begin
+  result := Self;
+  for i := low(path) to high(path) do begin
+    result := result.ChildNodes.findNode(path[i]);
+    if (result = nil) then exit;
+  end;
 end;
 
 {******************************************************************************************************}

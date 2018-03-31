@@ -131,39 +131,39 @@ public class ALGeocoder {
             } 
             
             //if country
-            if ((country == "") && (typesArr.contains("country"))) { country = addressComponent.getString("short_name"); }
+            if ((country.equals("")) && (typesArr.contains("country"))) { country = addressComponent.getString("short_name"); }
 
             //if locality
-            else if ((city == "") && ((typesArr.contains("postal_town")) ||
+            else if ((city.equals("")) && ((typesArr.contains("postal_town")) ||
                                       (typesArr.contains("locality")) ||
                                       (typesArr.contains("administrative_area_level_3")))) { city = addressComponent.getString("long_name"); }
 
             //if neighborhood / sublocality
-            else if  ((district == "") && ((typesArr.contains("neighborhood")) ||
+            else if  ((district.equals("")) && ((typesArr.contains("neighborhood")) ||
                                            (typesArr.contains("sublocality"))))  { district = addressComponent.getString("long_name"); }
 
             //if postal_code
-            else if ((zip_code == "") && (typesArr.contains("postal_code"))) { zip_code = addressComponent.getString("long_name"); }
+            else if ((zip_code.equals("")) && (typesArr.contains("postal_code"))) { zip_code = addressComponent.getString("long_name"); }
 
             //if administrative_area_level_1
-            else if ((province == "") && (typesArr.contains("administrative_area_level_1"))) { province = addressComponent.getString("long_name"); }
+            else if ((province.equals("")) && (typesArr.contains("administrative_area_level_1"))) { province = addressComponent.getString("long_name"); }
 
             //if route
-            else if ((route == "") && (typesArr.contains("route"))) { route = addressComponent.getString("long_name"); }
+            else if ((route.equals("")) && (typesArr.contains("route"))) { route = addressComponent.getString("long_name"); }
 
             //if street_number
-            else if ((streetnumber == "") && (typesArr.contains("street_number"))) { streetnumber = addressComponent.getString("long_name"); }
+            else if ((streetnumber.equals("")) && (typesArr.contains("street_number"))) { streetnumber = addressComponent.getString("long_name"); }
 
           }
           
           //init the result
-          if ((country != "") ||
-              (city != "") ||
-              (district != "") ||
-              (zip_code != "") ||
-              (province != "") ||
-              (route != "") ||
-              (streetnumber != "")) {
+          if ((!country.equals("")) ||
+              (!city.equals("")) ||
+              (!district.equals("")) ||
+              (!zip_code.equals("")) ||
+              (!province.equals("")) ||
+              (!route.equals("")) ||
+              (!streetnumber.equals(""))) {
               
             address = new Address(new Locale(language));     
             address.setLatitude(latitude);

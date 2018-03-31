@@ -305,7 +305,7 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
           }
                 
           /* NO custom notification is present in data payload */
-          else if (pendingDataMessagesFilename != "") {
+          else if (!pendingDataMessagesFilename.equals("")) {
                 
             /* load the json */
             String jsonTxt = getPendingDataMessagesInternal();

@@ -2,6 +2,7 @@ package com.alcinoe.firebase.messaging;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.net.URL;
+import java.net.HttpURLConnection;
 import java.util.Map;
 import java.io.FileWriter;
 import java.io.File;
@@ -220,7 +221,10 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
                 //should be done synchronously because it's in its own background worker thread.
                 
                 URL url = new URL(data.get("notification.largeicon"));
-                Bitmap bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection(); 
+                httpURLConnection.setConnectTimeout(60000);
+                httpURLConnection.setReadTimeout(60000);  
+                Bitmap bitmap = BitmapFactory.decodeStream(httpURLConnection.getInputStream());
                 if (bitmap != null) {
       
                   int w;
@@ -323,7 +327,11 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
               newNode.put("gcm.sent_time", remoteMessage.getSentTime()); /* long */
               newNode.put("gcm.to", remoteMessage.getTo()); /* String */
               newNode.put("gcm.ttl", remoteMessage.getTtl()); /* int */
-              jsonRoot.accumulate("messages", newNode);
+              if (messagesNode == null) { 
+                messagesNode = new JSONArray();
+                jsonRoot.put("messages", messagesNode);
+              }
+              messagesNode.put(newNode);
                       
               /* save the json */
               FileWriter fw = new FileWriter(pendingDataMessagesFilename);

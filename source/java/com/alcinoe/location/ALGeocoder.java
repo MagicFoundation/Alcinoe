@@ -5,6 +5,7 @@ import android.location.Address;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import java.net.URL;
+import java.net.HttpURLConnection;
 import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -22,7 +23,10 @@ public class ALGeocoder {
       URL url = new URL("https://maps.googleapis.com/maps/api/geocode/json?"+
                           "latlng=" + Double.toString(latitude) + "," + Double.toString(longitude) + "&"+
                           "language="+language);
-      InputStream inputStream = url.openConnection().getInputStream();
+      HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection(); 
+      httpURLConnection.setConnectTimeout(60000);
+      httpURLConnection.setReadTimeout(60000);      
+      InputStream inputStream = httpURLConnection.getInputStream();
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
       byte[] buffer = new byte[1024];
       int length;

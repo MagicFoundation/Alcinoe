@@ -15,6 +15,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 
 public class ALLocationServices implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
+  private static final String TAG = "ALLocationServices";
   private GoogleApiClient mGoogleApiClient; 
   private ALLocationServicesListener mLocationServicesListener;
   private LocationRequest mLocationRequest;
@@ -32,7 +33,7 @@ public class ALLocationServices implements GoogleApiClient.ConnectionCallbacks, 
         .build();
     }
     else {
-      Log.w("ALLocationServices", "Google Play Services is unavailable");
+      Log.w(TAG, "Google Play Services is unavailable");
       this.mGoogleApiClient = null;
     }
   }   
@@ -44,7 +45,14 @@ public class ALLocationServices implements GoogleApiClient.ConnectionCallbacks, 
   private void doStartLocationUpdates() {        
     if (mStartWithLastKnownLocation) {
       Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient); 
-      onLocationChanged(location);
+      if (location == null) { 
+        // https://stackoverflow.com/questions/49599102/fusedlocationapi-getlastlocation-and-requestlocationupdates-take-very-long-time
+        // the problem is that the following requestLocationUpdates can take a very long time to return according to mLocationRequest
+        // so maybe we must for the very first update change the parameter of mLocationRequest to retrieve the very first Location
+        // as fast as possible ?
+        Log.w(TAG, "getLastLocation return null"); 
+      }
+      else { onLocationChanged(location); }
     }
     LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
   }
@@ -81,13 +89,13 @@ public class ALLocationServices implements GoogleApiClient.ConnectionCallbacks, 
  
   @Override
   public void onConnected(Bundle connectionHint) {   
-    Log.i("ALLocationServices", "GoogleApiClient connected");
+    Log.i(TAG, "GoogleApiClient connected");
     doStartLocationUpdates();
   }
 
   @Override
   public void onConnectionFailed(ConnectionResult result) {
-    Log.e("ALLocationServices", "GoogleApiClient connection failed: " + result.toString());
+    Log.e(TAG, "GoogleApiClient connection failed: " + result.toString());
     // i don't know what else i can do from here, as this object is used inside a service and start 
     // at device boot's up i guess it's bad idea to ask for resolution (service have no ui)
     // so silently skip this error
@@ -95,7 +103,7 @@ public class ALLocationServices implements GoogleApiClient.ConnectionCallbacks, 
 
   @Override
   public void onConnectionSuspended(int cause){
-    Log.w("ALLocationServices", "GoogleApiClient connection suspended");
+    Log.w(TAG, "GoogleApiClient connection suspended");
     //GoogleApiClient will automatically attempt to restore the connection. Applications should disable UI components 
     //that require the service, and wait for a call to onConnected(Bundle) to re-enable them.
   }

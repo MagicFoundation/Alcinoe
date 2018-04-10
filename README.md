@@ -155,15 +155,6 @@ You can send notification messages to drive user re-engagement and retention. Fo
 such as instant messaging, a message can transfer a payload of up to 4KB to a client app.
 
 
-Firebase crash analytics
-------------------------
-
-Crash Reporting creates detailed reports of the errors in your app. Errors are grouped into 
-issues based on having similar stack traces, and triaged by the severity of impact on your 
-users. In addition to automatic reports, you can log custom events to help capture the 
-steps leading up to a crash.
-
-
 Android/ios facebook sdk login
 ------------------------------
 

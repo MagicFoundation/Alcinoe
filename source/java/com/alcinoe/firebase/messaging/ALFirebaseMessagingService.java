@@ -170,6 +170,7 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
                 
             // actually i support these params, but nothing forbid to extends them
             // notification - Must be equal to 1 to activate showing of custom notification when no receiver
+            // notification.channel - on Android 0 The notification will be posted on this NotificationChannel. 
             // notification.tag - A string identifier for this notification. 
             // notification.color - The accent color to use
             // notification.text - Set the second line of text in the platform notification template.
@@ -202,7 +203,7 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
                                                                                                            control which unspecified parts of the intent that can 
                                                                                                            be supplied when the actual send happens. */
             
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, data.get("notification.channel"));
             if (data.containsKey("notification.color")) { 
               notificationBuilder = notificationBuilder.setColor(Integer.parseInt(data.get("notification.color")));
             }

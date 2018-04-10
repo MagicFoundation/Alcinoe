@@ -9,131 +9,7 @@ uses Macapi.ObjectiveC,
 
 {$M+}
 
-Type
-
-  // Specifies the privacy of a group
-  FBSDKAppInviteDestination = NSUInteger;
-
-const
-
-  // Deliver to Facebook.
-  FBSDKAppInviteDestinationFacebook = 0;
-  // Deliver to Messenger
-  FBSDKAppInviteDestinationMessenger = 1;
-
 type
-
-  {***************************************************************************}
-  // @interface FBSDKAppInviteContent : NSObject <FBSDKCopying, NSSecureCoding>
-  // A model for app invite.
-  FBSDKAppInviteContentClass = interface(NSObjectClass)
-  ['{59360868-F7EF-4514-8228-14AA8FE69F74}']
-  end;
-  FBSDKAppInviteContent = interface(NSObject)
-  ['{AF44BB41-ED41-45FC-ADDB-C22467D911C9}']
-
-    // A URL to a preview image that will be displayed with the app invite
-    // This is optional.  If you don't include it a fallback image will be used.
-    // @property (nonatomic, copy) NSURL *appInvitePreviewImageURL;
-    function appInvitePreviewImageURL: NSURL; cdecl;
-    procedure setAppInvitePreviewImageURL(appInvitePreviewImageURL: NSURL); cdecl;
-
-    // An app link target that will be used as a target when the user accept the invite.
-    // This is a requirement.
-    // @property (nonatomic, copy) NSURL *appLinkURL;
-    function appLinkURL: NSURL; cdecl;
-    procedure setAppLinkURL(appLinkURL: NSURL); cdecl;
-
-    // - Warning:Use `appInvitePreviewImageURL` instead.
-    // @property (nonatomic, copy) NSURL *previewImageURL __attribute__ ((deprecated("use appInvitePreviewImageURL instead")));
-
-    // Promotional code to be displayed while sending and receiving the invite.
-    // This is optional. This can be between 0 and 10 characters long and can contain
-    // alphanumeric characters only. To set a promo code, you need to set promo text.
-    // @property (nonatomic, copy) NSString *promotionCode;
-    function promotionCode:  NSString; cdecl;
-    procedure setPromotionCode(promotionCode: NSString); cdecl;
-
-    // Promotional text to be displayed while sending and receiving the invite.
-    // This is optional. This can be between 0 and 80 characters long and can contain
-    // alphanumeric and spaces only.
-    // @property (nonatomic, copy) NSString *promotionText;
-    function promotionText:  NSString; cdecl;
-    procedure setPromotionText(promotionText: NSString); cdecl;
-
-    // Destination for the app invite.
-    // This is optional and for declaring destination of the invite.
-    // @property FBSDKAppInviteDestination destination;
-    function destination: FBSDKAppInviteDestination; cdecl;
-    procedure setDestination(destination: FBSDKAppInviteDestination); cdecl;
-
-    // Compares the receiver to another app invite content.
-    //  - Parameter content: The other content
-    //  - Returns: YES if the receiver's values are equal to the other content's values; otherwise NO
-    // - (BOOL)isEqualToAppInviteContent:(FBSDKAppInviteContent *)content;
-    function isEqualToAppInviteContent(content: FBSDKAppInviteContent): Boolean; cdecl;
-
-  end;
-  TFBSDKAppInviteContent = class(TOCGenericImport<FBSDKAppInviteContentClass, FBSDKAppInviteContent>) end;
-
-  {*******************************************}
-  // @interface FBSDKAppInviteDialog : NSObject
-  // A dialog for sending App Invites.
-  FBSDKAppInviteDialogClass = interface(NSObjectClass)
-  ['{3290E4D2-9003-4141-960C-15FF94369CE4}']
-
-    {
-    // Convenience method to show a FBSDKAppInviteDialog
-    //  - Parameter viewController: A UIViewController to present the dialog from.
-    //  - Parameter content: The content for the app invite.
-    //  - Parameter delegate: The receiver's delegate.
-    // + (instancetype)showFromViewController:(UIViewController *)viewController
-    //                            withContent:(FBSDKAppInviteContent *)content
-    //                               delegate:(id<FBSDKAppInviteDialogDelegate>)delegate;
-
-    // - Warning:use showFromViewController:withContent:delegate: instead
-    // + (instancetype)showWithContent:(FBSDKAppInviteContent *)content delegate:(id<FBSDKAppInviteDialogDelegate>)delegate __attribute__ ((deprecated("use showFromViewController:withContent:delegate: instead")));
-    }
-
-  end;
-  FBSDKAppInviteDialog = interface(NSObject)
-  ['{F8BB14CF-103F-47C3-8508-C12FF1141630}']
-
-    // A UIViewController to present the dialog from.
-    // If not specified, the top most view controller will be automatically determined as best as possible.
-    // @property (nonatomic, weak) UIViewController *fromViewController;
-    function fromViewController: UIViewController; cdecl;
-    procedure setFromViewController(fromViewController: UIViewController); cdecl;
-
-    // The receiver's delegate or nil if it doesn't have a delegate.
-    // @property (nonatomic, weak) id<FBSDKAppInviteDialogDelegate> delegate;
-
-    // The content for app invite.
-    // @property (nonatomic, copy) FBSDKAppInviteContent *content;
-    function content: FBSDKAppInviteContent; cdecl;
-    procedure setContent(content: FBSDKAppInviteContent); cdecl;
-
-    // A Boolean value that indicates whether the receiver can initiate an app invite.
-    // May return NO if the appropriate Facebook app is not installed and is required or an access token is
-    // required but not available.  This method does not validate the content on the receiver, so this can be checked before
-    // building up the content.
-    //  - See:validateWithError:
-    //  - Returns: YES if the receiver can show the dialog, otherwise NO.
-    // - (BOOL)canShow;
-    function canShow: Boolean; cdecl;
-
-    // Begins the app invite from the receiver.
-    //  - Returns: YES if the receiver was able to show the dialog, otherwise NO.
-    // - (BOOL)show;
-    function show: Boolean; cdecl;
-
-    // Validates the content on the receiver.
-    //  - Parameter errorRef: If an error occurs, upon return contains an NSError object that describes the problem.
-    //  - Returns: YES if the content is valid, otherwise NO.
-    // - (BOOL)validateWithError:(NSError *__autoreleasing *)errorRef;
-
-  end;
-  TFBSDKAppInviteDialog = class(TOCGenericImport<FBSDKAppInviteDialogClass, FBSDKAppInviteDialog>) end;
 
   {*************************************************************}
   // @protocol FBSDKSharingContent <FBSDKCopying, NSSecureCoding>
@@ -170,6 +46,14 @@ type
     // - Returns: The ref for the content.
     // @property (nonatomic, copy) NSString *ref;
 
+    // For shares into Messenger, this pageID will be used to map the app to page and attach attribution to the share.
+    // - Returns: The ID of the Facebok page this share is associated with.
+    // @property (nonatomic, copy) NSString *pageID;
+
+    // A unique identifier for a share involving this content, useful for tracking purposes.
+    // - Returns: A unique string identifying this share data.
+    // @property (nonatomic, copy, readonly) NSString *shareUUID;
+
   end;
   TFBSDKSharingContent = class(TOCGenericImport<FBSDKSharingContentClass, FBSDKSharingContent>) end;
 
@@ -186,22 +70,25 @@ type
     // If not specified, this field is automatically populated by information scraped from the contentURL,
     // typically the title of the page.  This value may be discarded for specially handled links (ex: iTunes URLs).
     //  - Returns: The description of the link
-    // @property (nonatomic, copy) NSString *contentDescription;
-    function contentDescription: NSString; cdecl;
-    procedure setContentDescription(contentDescription: NSString); cdecl;
+    // @deprecated `contentDescription` is deprecated from Graph API 2.9.
+    // For more information, see https://developers.facebook.com/docs/apps/changelog#v2_9_deprecations.
+    // @property (nonatomic, readonly) NSString *contentDescription DEPRECATED_MSG_ATTRIBUTE("`contentDescription` is deprecated from Graph API 2.9");
+    function contentDescription: NSString; cdecl; deprecated 'contentDescription is deprecated from Graph API 2.9';
 
     // The title to display for this link.
-    //  This value may be discarded for specially handled links (ex: iTunes URLs).
-    //  - Returns: The link title
-    // @property (nonatomic, copy) NSString *contentTitle;
-    function contentTitle: NSString; cdecl;
-    procedure setContentTitle(contentTitle: NSString); cdecl;
+    // This value may be discarded for specially handled links (ex: iTunes URLs).
+    // - Returns: The link title
+    // @deprecated `contentTitle` is deprecated from Graph API 2.9.
+    // For more information, see https://developers.facebook.com/docs/apps/changelog#v2_9_deprecations
+    // @property (nonatomic, readonly) NSString *contentTitle DEPRECATED_MSG_ATTRIBUTE("`contentTitle` is deprecated from Graph API 2.9");
+    function contentTitle: NSString; cdecl; deprecated 'contentTitle is deprecated from Graph API 2.9';
 
     // The URL of a picture to attach to this content.
     //  - Returns: The network URL of an image
-    // @property (nonatomic, copy) NSURL *imageURL;
-    function imageURL: NSURL; cdecl;
-    procedure setImageURL(imageURL: NSURL); cdecl;
+    // @deprecated `imageURL` is deprecated from Graph API 2.9.
+    // For more information, see https://developers.facebook.com/docs/apps/changelog#v2_9_deprecations
+    // @property (nonatomic, readonly) NSURL *imageURL DEPRECATED_MSG_ATTRIBUTE("`imageURL` is deprecated from Graph API 2.9");
+    function imageURL: NSURL; cdecl; deprecated 'imageURL is deprecated from Graph API 2.9';
 
     // Some quote text of the link.
     // If specified, the quote text will render with custom styling on top of the link.
@@ -654,7 +541,7 @@ type
     [MethodName('application:openURL:sourceApplication:annotation:')]
     function applicationOpenURLSourceApplicationAnnotation(application: UIApplication; openURL: NSURL; sourceApplication: NSString; annotation: Pointer): Boolean; cdecl;
 
-    // #if __IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_9_3
+    // #if __IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_9_0
     // Call this method from the [UIApplicationDelegate application:openURL:options:] method
     // of the AppDelegate for your app. It should be invoked for the proper processing of responses during interaction
     // with the native Facebook app or Safari as part of SSO authorization flow or Facebook dialogs.
@@ -819,7 +706,7 @@ type
     procedure overrideVersionPartWith(version: NSString); cdecl;
 
   end;
-  TFBSDKGraphRequestConnection = class (TOCGenericImport<FBSDKGraphRequestConnectionClass, FBSDKGraphRequestConnection>) end;
+  TFBSDKGraphRequestConnection = class(TOCGenericImport<FBSDKGraphRequestConnectionClass, FBSDKGraphRequestConnection>) end;
 
   {************************************************}
   // Represents a request to the Facebook Graph API.
@@ -913,16 +800,20 @@ implementation
 
 {$IF defined(CPUARM)}
 
-procedure StubProc1; cdecl; external 'Bolts' name 'OBJC_CLASS_$_BFAppLink';
-procedure StubProc2; cdecl; external 'FBSDKCoreKit' name 'OBJC_CLASS_$_FBSDKAccessToken';
-procedure StubProc3; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKAppInviteContent';
-procedure StubProc4; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKAppInviteDialog';
-procedure StubProc5; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKSharingContent';
-procedure StubProc6; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKShareLinkContent';
-procedure StubProc7; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKSharing';
-procedure StubProc8; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKSharingDialog';
-procedure StubProc9; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKShareDialog';
-procedure StubProc10; cdecl; external 'FBSDKLoginKit' name 'OBJC_CLASS_$_FBSDKLoginManager';
+procedure StubProc1;  cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKSharingContent';
+procedure StubProc2;  cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKShareLinkContent';
+procedure StubProc3;  cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKSharing';
+procedure StubProc4;  cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKSharingDialog';
+procedure StubProc5;  cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKShareDialog';
+procedure StubProc6;  cdecl; external 'FBSDKCoreKit'  name 'OBJC_CLASS_$_FBSDKAccessToken';
+procedure StubProc7;  cdecl; external 'FBSDKLoginKit' name 'OBJC_CLASS_$_FBSDKLoginManagerLoginResult';
+procedure StubProc8;  cdecl; external 'FBSDKLoginKit' name 'OBJC_CLASS_$_FBSDKLoginManager';
+procedure StubProc9;  cdecl; external 'FBSDKCoreKit'  name 'OBJC_CLASS_$_FBSDKApplicationDelegate';
+procedure StubProc10; cdecl; external 'FBSDKCoreKit'  name 'OBJC_CLASS_$_FBSDKGraphRequestConnection';
+procedure StubProc11; cdecl; external 'FBSDKCoreKit'  name 'OBJC_CLASS_$_FBSDKGraphRequest';
+procedure StubProc12; cdecl; external 'Bolts'         name 'OBJC_CLASS_$_BFAppLink'; // else i have ld: b/bl/blx thumb2 branch out of range (16777216 max is +/-16MB): from -[FIRAAlarm runAfterDelay:withBlock:] (0x00032AA0) to _objc_msgSend.island (0x00E09DE4) for architecture armv7
+procedure StubProc13; cdecl; external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a' name '__isOSVersionAtLeast'; // << else I have Error: "___isOSVersionAtLeast", referenced from: ...
+
 
 {$ELSE}
 

@@ -68,6 +68,33 @@ end;
 {***********************************************************************}
 procedure Include(const ARootPath: String; const ASubPath: String = '\');
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function nodeIsAlreadyPresent(const aNodeToAdd: PXMLNode; const aDestXmlDoc: IXMLDocument): boolean;
+  var aNode, aAttributeNode: PXMLNode;
+  begin
+    result := false;
+    if aNodeToAdd.GetAttribute('name') = '' then exit;
+    aNode := nil;
+    while aDestXmlDoc.DocumentElement.GetNextChild(aNode) do begin
+      if aNode.GetAttribute('name') <> aNodeToAdd.GetAttribute('name') then continue;
+      //----
+      if aNode.NodeName <> aNodeToAdd.NodeName then continue;
+      //----
+      if aNode.NodeValue <> aNodeToAdd.NodeValue then
+        raise Exception.Create('Resource entry '+aNodeToAdd.GetAttribute('name')+' is already defined with a different value');
+      //----
+      if aNode.AttributeCount <> aNodeToAdd.AttributeCount then
+        raise Exception.Create('Resource entry '+aNodeToAdd.GetAttribute('name')+' is already defined with different attributes');
+      //----
+      for aAttributeNode in aNode.AttributeEnumerator do
+        if aAttributeNode.NodeValue <> aNodeToAdd.GetAttribute(aAttributeNode.NodeName) then
+          raise Exception.Create('Resource entry '+aNodeToAdd.GetAttribute('name')+' is already defined with different attributes');
+      //----
+      result := true;
+      break;
+    end;
+  end;
+
 var aSrcXmlDoc: IXMLDocument;
     aDestXmlDoc: IXMLDocument;
     aDestFileName: String;
@@ -75,6 +102,7 @@ var aSrcXmlDoc: IXMLDocument;
     sr: TSearchRec;
 
 begin
+  if not DirectoryExists(ARootPath + ASubPath) then raise Exception.Create('Directory '+ARootPath+ASubPath+' does not exist');
   if FindFirst(ARootPath + ASubPath + '*.*', faAnyFile, sr) = 0 then begin
     try
       repeat
@@ -122,7 +150,7 @@ begin
             aNode := nil;
             while aSrcXmlDoc.DocumentElement.GetNextChild(aNode) do begin
               aCloneNode := aNode.CloneNode(True, aDestXmlDoc);
-              aDestXmlDoc.DocumentElement.AppendChild(aCloneNode);
+              if (not nodeIsAlreadyPresent(aCloneNode, aDestXmlDoc)) then aDestXmlDoc.DocumentElement.AppendChild(aCloneNode);
             end;
 
             //-----

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">Πηγαίνετε στη διεύθυνση &lt;b>facebook.com/device&lt;/b> και εισαγάγετε τον παραπάνω κωδικό.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">Παρουσιάστηκε μη αναμενόμενο σφάλμα κατά τη λήψη μιας εικόνας.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">Για σύνδεση στην εφαρμογή WebView απαιτείται άδεια INTERNET</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">Σφάλμα AndroidManifest</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">Σας αρέσει</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">Μου αρέσει!</string>
+    <string gender="unknown" name="com_facebook_loading">Φόρτωση...</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">Ακύρωση</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">Σύνδεση</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Συνέχεια με το Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Συνδεθείτε μέσω Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">Αποσύνδεση</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">Αποσύνδεση</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">Έχετε συνδεθεί ως: %1$s</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Έγινε σύνδεση μέσω Facebook</string>
+    <string gender="unknown" name="com_facebook_send_button_text">Αποστολή</string>
+    <string gender="unknown" name="com_facebook_share_button_text">Κοινοποιήστε</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">Για να συνδέσετε το λογαριασμό σας, ανοίξτε την εφαρμογή Facebook στη φορητή συσκευή σας και ελέγξτε για ειδοποιήσεις.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- Ή -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">Δεν είστε εσείς;</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">Συνέχεια ως %1$s</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">Επιβεβαίωση σύνδεσης</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">Εσείς έχετε τον έλεγχο - επιλέξτε ποιες πληροφορίες θέλετε να κοινοποιείτε στις εφαρμογές.</string>
+</resources>

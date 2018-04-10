@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">&lt;b>facebook.com/device&lt;/b> adresine git ve yukarıda gösterilen kodu gir.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">Görüntü indirilirken beklenmedik bir hata oluştu.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">WebView girişi için İNTERNET izni gerekiyor</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">AndroidManifest Hatası</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">Beğendin</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">Beğen</string>
+    <string gender="unknown" name="com_facebook_loading">Yükleniyor...</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">İptal</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">Giriş yap</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Facebook ile Devam Et</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Facebook ile Giriş Yap</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">Çıkış Yap</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">Çıkış Yap</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">%1$s olarak giriş yapıldı</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Facebook ile giriş yapıldı</string>
+    <string gender="unknown" name="com_facebook_send_button_text">Gönder</string>
+    <string gender="unknown" name="com_facebook_share_button_text">Paylaş</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">Hesabını bağlamak için, mobil cihazında Facebook uygulamasını aç ve bildirimleri kontrol et.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- VEYA -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">Siz değil misiniz?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">%1$s olarak devam et</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">Girişi Onayla</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">Kontrol sende - uygulamalarla paylaşmak istediğin bilgileri seç.</string>
+</resources>

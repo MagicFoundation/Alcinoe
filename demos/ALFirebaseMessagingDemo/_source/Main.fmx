@@ -15,7 +15,7 @@ object Form1: TForm1
     Size.Width = 463.000000000000000000
     Size.Height = 65.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 2
+    TabOrder = 1
     Text = 'Show a Sample Notification'
     OnClick = ButtonShowSampleNotificationClick
   end
@@ -50,10 +50,8 @@ object Form1: TForm1
       '    "notification.text": "notification text",'
       '    "notification.title": "notification title",'
       
-        '    "notification.largeicon": "https://scontent.xx.fbcdn.net/v/t' +
-        '1.0-0/s640x640/15241923_10154381180856144_3095960088143766901_n.' +
-        'jpg?oh=06f49a585effcabd9c14c4e6a7fd8c2f&oe=59B433BE",           ' +
-        ' '
+        '    "notification.largeicon": "https://i.stack.imgur.com/EwPfY.j' +
+        'pg?s=64&g=1",            '
       '    "notification.smallicon": "notification_icon",   '
       '    "notification.ticker":"notification ticker",'
       '    "notification.vibrate": "default",        '
@@ -67,11 +65,11 @@ object Form1: TForm1
     TextSettings.WordWrap = True
     Align = Client
     Size.Width = 463.000000000000000000
-    Size.Height = 523.000000000000000000
+    Size.Height = 588.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 3
-    Viewport.Width = 443.000000000000000000
-    Viewport.Height = 519.000000000000000000
+    TabOrder = 2
+    Viewport.Width = 459.000000000000000000
+    Viewport.Height = 584.000000000000000000
   end
   object ButtonGetToken: TButton
     Align = Top
@@ -79,18 +77,8 @@ object Form1: TForm1
     Size.Width = 463.000000000000000000
     Size.Height = 65.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 1
+    TabOrder = 0
     Text = 'Get Token'
     OnClick = ButtonGetTokenClick
-  end
-  object ButtonMakeanExceptionforFireBaseCrash: TButton
-    Align = Top
-    Position.Y = 130.000000000000000000
-    Size.Width = 463.000000000000000000
-    Size.Height = 65.000000000000000000
-    Size.PlatformDefault = False
-    TabOrder = 0
-    Text = 'Make an Exception for FireBase Crash'
-    OnClick = ButtonMakeanExceptionforFireBaseCrashClick
   end
 end

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImageButton xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/al_floating_toolbar_menu_button_minimum_width"
+    android:layout_height="match_parent"
+    android:minWidth="@dimen/al_floating_toolbar_menu_button_minimum_width"
+    android:minHeight="@dimen/al_floating_toolbar_height"
+    android:src="?attr/alfloatingToolbarCloseDrawable"
+    android:contentDescription="@string/al_floating_toolbar_close_overflow_description"
+    android:background="?attr/alfloatingToolbarItemBackgroundBorderlessDrawable" />

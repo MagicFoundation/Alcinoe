@@ -22,4 +22,3 @@
     android:layout_height="@dimen/notification_large_icon_height"
     android:scaleType="centerCrop"
 />
-

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">Visita &lt;b>facebook.com/device&lt;/b> e inserisci il codice mostrato qui sotto.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">Errore imprevisto durante il download dell\'immagine.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">L\'accesso alla visualizzazione Web richiede le autorizzazioni Internet</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">Errore AndroidManifest</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">Ti piace</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">Mi piace</string>
+    <string gender="unknown" name="com_facebook_loading">Caricamento in corso...</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">Annulla</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">Accedi</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Continua con Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Accedi con Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">Esci</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">Esci</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">Accesso effettuato come %1$s</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Accesso effettuato tramite Facebook</string>
+    <string gender="unknown" name="com_facebook_send_button_text">Invia</string>
+    <string gender="unknown" name="com_facebook_share_button_text">Condividi</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">Per connettere il tuo account, apri l\'app Facebook dal tuo dispositivo mobile e controlla le notifiche.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- oppure -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">Non sei tu?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">Continua come %1$s</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">Conferma accesso</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">Il controllo è nelle tue mani: scegli quali informazioni condividere con le app.</string>
+</resources>

@@ -1,34 +1,63 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<resources>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
 
-    <string name="com_facebook_device_auth_instructions">Keresd fel a &lt;b>facebook.com/device&lt;/b> címet, és írd be a fent megjelenített kódot.</string>
-    <string name="com_facebook_image_download_unknown_error">Váratlan hiba történt egy kép betöltése közben.</string>
-    <string name="com_facebook_internet_permission_error_message">A webes bejelentkezéshez szükséges a jogosultság az internet használatára.</string>
-    <string name="com_facebook_internet_permission_error_title">AndroidManifest-hiba</string>
-    <string name="com_facebook_like_button_liked">Kedveled</string>
-    <string name="com_facebook_like_button_not_liked">Tetszik</string>
-    <string name="com_facebook_loading">Betöltés…</string>
-    <string name="com_facebook_loginview_cancel_action">Törlés</string>
-    <string name="com_facebook_loginview_log_in_button">Bejelentkezés</string>
-    <string name="com_facebook_loginview_log_in_button_continue">Folytatás a Facebookkal</string>
-    <string name="com_facebook_loginview_log_in_button_long">Bejelentkezés a Facebook használatával</string>
-    <string name="com_facebook_loginview_log_out_action">Kijelentkezés</string>
-    <string name="com_facebook_loginview_log_out_button">Kijelentkezés</string>
-    <string name="com_facebook_loginview_logged_in_as">Bejelentkezve %1$s néven</string>
-    <string name="com_facebook_loginview_logged_in_using_facebook">Bejelentkezve a Facebook használatával</string>
-    <string name="com_facebook_send_button_text">Küldés</string>
-    <string name="com_facebook_share_button_text">Megosztás</string>
-    <string name="com_facebook_smart_device_instructions">A fiók hozzákapcsolásához nyisd meg a Facebook alkalmazást a mobilkészülékeden, és nézd meg az értesítéseket.</string>
-    <string name="com_facebook_smart_device_instructions_or">- VAGY -</string>
-    <string name="com_facebook_smart_login_confirmation_cancel">Nem te vagy az?</string>
-    <string name="com_facebook_smart_login_confirmation_title">Bejelentkezés megerősítése</string>
-    <string name="com_facebook_tooltip_default">A döntés a kezedben van: kiválaszthatod, hogy milyen adatokat osztasz meg az alkalmazásokkal.</string>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">Keresd fel a &lt;b>facebook.com/device&lt;/b> címet, és írd be a fent megjelenített kódot.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">Váratlan hiba történt a kép letöltésekor.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">A WebView-bejelentkezéshez „INTERNET” jogosultság szükséges.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">AndroidManifest hiba</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">Kedvelt</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">Tetszik</string>
+    <string gender="unknown" name="com_facebook_loading">Betöltés…</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">Mégsem</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">Belépés</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Folytatás a Facebookkal</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Bejelentkezés Facebookkal</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">Kijelentkezés</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">Kijelentkezés</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">Bejelentkezve %1$s néven</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Bejelentkezve a Facebook használatával</string>
+    <string gender="unknown" name="com_facebook_send_button_text">Küldés</string>
+    <string gender="unknown" name="com_facebook_share_button_text">Megosztás</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">A fiók hozzákapcsolásához nyisd meg a mobilkészülékeden a Facebook alkalmazást, és nézd meg az értesítéseket.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- VAGY -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">Nem te vagy az?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">Folytatás mint %1$s</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">Bejelentkezés megerősítése</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">Te irányítasz – válaszd ki, milyen adatokat szeretnél megosztani az alkalmazásokkal.</string>
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+    <string msgid="2869576371154716097" name="status_bar_notification_info_overflow">"999+"</string>
 
 
 
     <string msgid="4600421777120114993" name="abc_action_bar_home_description">"Ugrás a főoldalra"</string>
-    <string msgid="1397052879051804371" name="abc_action_bar_home_description_format">"%1$s, %2$s"</string>
-    <string msgid="6623331958280229229" name="abc_action_bar_home_subtitle_description_format">"%1$s, %2$s, %3$s"</string>
     <string msgid="1594238315039666878" name="abc_action_bar_up_description">"Felfelé mozgatás"</string>
     <string msgid="3588849162933574182" name="abc_action_menu_overflow_description">"További lehetőségek"</string>
     <string msgid="4076576682505996667" name="abc_action_mode_done">"Kész"</string>
@@ -43,9 +72,8 @@
     <string msgid="8928215447528550784" name="abc_searchview_description_submit">"Lekérdezés küldése"</string>
     <string msgid="893419373245838918" name="abc_searchview_description_voice">"Hangalapú keresés"</string>
     <string msgid="3421042268587513524" name="abc_shareactionprovider_share_with">"Megosztás a következővel:"</string>
-    <string msgid="7165123711973476752" name="abc_shareactionprovider_share_with_application">"Megosztás a következővel: %s"</string>
+    <string msgid="3300176832234831527" name="abc_shareactionprovider_share_with_application">"Megosztás a következő alkalmazással: <ns1:g id="APPLICATION_NAME">%s</ns1:g>"</string>
     <string msgid="1603543279005712093" name="abc_toolbar_collapse_description">"Összecsukás"</string>
     <string msgid="146198913615257606" name="search_menu_title">"Keresés"</string>
-    <string msgid="2869576371154716097" name="status_bar_notification_info_overflow">"999+"</string>
 
 </resources>

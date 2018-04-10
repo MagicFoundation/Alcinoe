@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">&lt;b>facebook.com/device&lt;/b>にアクセスして、上のコードを入力してください。</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">画像のダウンロードで何らかのエラーが発生しました。</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">WebViewにログインするには、インターネットへのアクセスが必要です</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">AndroidManifestエラー</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">「いいね！」しました</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">いいね！</string>
+    <string gender="unknown" name="com_facebook_loading">読み込み中です…</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">キャンセル</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">ログイン</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Facebookでログイン</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Facebookでログイン</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">ログアウト</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">ログアウト</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">%1$sとしてログイン中</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Facebookでログイン中</string>
+    <string gender="unknown" name="com_facebook_send_button_text">送信</string>
+    <string gender="unknown" name="com_facebook_share_button_text">シェアする</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">アカウントをリンクするには、モバイル機器でFacebookアプリを開いて、お知らせをご確認ください。</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- または -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">別のアカウントでログイン</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">%1$sとしてログイン</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">ログインを実行</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">アプリと共有する情報をコントロールすることができます。</string>
+</resources>

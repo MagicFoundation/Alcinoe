@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="com_facebook_button_send_background_color">@color/com_facebook_messenger_blue</color>
+    <color name="com_facebook_button_send_background_color_pressed">#006fff</color>
+    <color name="com_facebook_messenger_blue">#0084ff</color>
+    <style name="com_facebook_button_send" parent="com_facebook_button">
+        <item name="android:background">@drawable/com_facebook_button_send_background</item>
+        <item name="android:drawableLeft">@drawable/com_facebook_send_button_icon</item>
+        <item name="android:text">@string/com_facebook_send_button_text</item>
+        <item name="android:textColor">@color/com_facebook_send_button_text_color</item>
+    </style>
+    <style name="com_facebook_button_share" parent="com_facebook_button">
+        <item name="android:drawableLeft">@drawable/com_facebook_button_icon</item>
+        <item name="android:text">@string/com_facebook_share_button_text</item>
+    </style>
+</resources>

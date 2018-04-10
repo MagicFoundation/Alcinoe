@@ -240,8 +240,11 @@ extern DELPHI_PACKAGE bool __fastcall ALIntersectRect(/* out */ TALRectD &Rect, 
 extern DELPHI_PACKAGE bool __fastcall ALUnionRect(/* out */ TALRectD &Rect, const TALRectD &R1, const TALRectD &R2);
 extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectFitInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt, /* out */ float &Ratio)/* overload */;
 extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectFitInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt)/* overload */;
+extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectFitInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, /* out */ float &Ratio)/* overload */;
+extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectFitInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds)/* overload */;
 extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectPlaceInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt, /* out */ float &Ratio)/* overload */;
 extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectPlaceInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt)/* overload */;
+extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectPlaceInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::THorzRectAlign AHorzAlign = (System::Types::THorzRectAlign)(0x0), const System::Types::TVertRectAlign AVertAlign = (System::Types::TVertRectAlign)(0x0))/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALLog(const System::UnicodeString Tag, const System::UnicodeString msg, const TalLogType _type = (TalLogType)(0x2));
 extern DELPHI_PACKAGE int __fastcall AlBoolToInt(bool Value);
 extern DELPHI_PACKAGE bool __fastcall AlIntToBool(int Value);

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">Consultez &lt;b>facebook.com/device&lt;/b> et entrez le code affiché ci-dessus.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">Une erreur inattendue s’est produite lors du téléchargement d’une image.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">La connexion à WebView nécessite une autorisation INTERNET</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">Erreur AndroidManifest</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">J’aime déjà</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">J’aime</string>
+    <string gender="unknown" name="com_facebook_loading">Chargement...</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">Annuler</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">Connectez-vous</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Continuer avec Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Se connecter avec Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">Déconnexion</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">Déconnexion</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">Connecté(e) en tant que : %1$s</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Connecté(e) avec Facebook</string>
+    <string gender="unknown" name="com_facebook_send_button_text">Envoyer</string>
+    <string gender="unknown" name="com_facebook_share_button_text">Publier</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">Pour associer votre compte, ouvrez l’app Facebook sur votre appareil mobile et vérifiez les notifications.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- OU -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">Ce n’est pas vous ?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">Continuer en tant que %1$s</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">Confirmer la connexion</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">Vous avez le contrôle - choisissez les informations que vous voulez partager avec les apps.</string>
+</resources>

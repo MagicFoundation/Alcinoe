@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">Siirry osoitteeseen &lt;b>facebook.com/device&lt;/b> ja anna oheinen koodi.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">Kuvaa ladattaessa tapahtui yllättävä virhe.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">WebView-sisäänkirjautuminen edellyttää Internet-lupaa</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">AndroidManifest-virhe</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">Tykätty</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">Tykkää</string>
+    <string gender="unknown" name="com_facebook_loading">Ladataan...</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">Peruuta</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">Kirjaudu sisään</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Jatka Facebookissa</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Kirjaudu Facebook-tunnuksilla</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">Kirjaudu ulos</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">Kirjaudu ulos</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">Kirjautunut sisään nimellä %1$s</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Kirjauduttu sisään Facebook-tunnuksilla</string>
+    <string gender="unknown" name="com_facebook_send_button_text">Lähetä</string>
+    <string gender="unknown" name="com_facebook_share_button_text">Jaa</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">Liitä tilisi avaamalla Facebook-sovellus matkapuhelimellasi ja tarkistamalla ilmoitukset.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- TAI -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">Etkö ole tämä henkilö?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">Jatka nimellä %1$s</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">Vahvista sisäänkirjautuminen</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">Sinä päätät - valitse mitkä tiedot haluat jakaa sovelluksille</string>
+</resources>

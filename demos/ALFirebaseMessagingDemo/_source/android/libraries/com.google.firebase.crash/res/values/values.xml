@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding='utf-8' standalone='no'?>
-<resources>
-<!-- java/com/google/android/gmscore/integ/client/crash/res/values/ids.xml -->
-<eat-comment/>
-
-<item name="crash_reporting_present" type="id"/>
-</resources>

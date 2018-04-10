@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">Kunjungi &lt;b>facebook.com/device&lt;/b> dan masukkan kode yang ditampilkan di bawah ini.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">Kesalahan tak terduga ketika mengunduh gambar.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">Masuk Tampilan Web memerlukan izin INTERNET</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">Terjadi Kesalahan AndroidManifest</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">Suka</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">Suka</string>
+    <string gender="unknown" name="com_facebook_loading">Memuat…</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">Batalkan</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">Masuk</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Lanjutkan dengan Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Masuk dengan Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">Keluar</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">Keluar</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">Masuk sebagai: %1$s</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Masuk menggunakan Facebook</string>
+    <string gender="unknown" name="com_facebook_send_button_text">Kirim</string>
+    <string gender="unknown" name="com_facebook_share_button_text">Bagikan</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">Untuk menghubungkan akun Anda, buka aplikasi Facebook di perangkat seluler Anda dan lihat pemberitahuan.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- ATAU -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">Bukan Anda?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">Lanjutkan sebagai %1$s</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">Konfirmasikan Masuk</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">Anda memegang kendali - pilih info apa yang ingin Anda bagikan dengan aplikasi.</string>
+</resources>

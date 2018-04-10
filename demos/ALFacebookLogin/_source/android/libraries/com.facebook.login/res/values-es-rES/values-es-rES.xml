@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">Visita &lt;b>facebook.com/device&lt;/b> e introduce el código que se muestra más arriba.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">Se ha producido un error inesperado al descargar una imagen.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">El inicio de sesión en WebView requiere permisos de INTERNET</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">Error de AndroidManifest</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">Te gusta</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">Me gusta</string>
+    <string gender="unknown" name="com_facebook_loading">Cargando…</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">Cancelar</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">Entrar</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Continuar con Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Inicia sesión con Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">Salir</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">Salir</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">Sesión iniciada como: %1$s</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Has iniciado sesión con Facebook</string>
+    <string gender="unknown" name="com_facebook_send_button_text">Enviar</string>
+    <string gender="unknown" name="com_facebook_share_button_text">Compartir</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">Para conectar tu cuenta, abre la aplicación de Facebook en tu dispositivo móvil y comprueba las notificaciones.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- O -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">¿No eres tú?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">Continuar como %1$s</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">Confirmar inicio de sesión</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">Tú decides qué información quieres compartir con las aplicaciones.</string>
+</resources>

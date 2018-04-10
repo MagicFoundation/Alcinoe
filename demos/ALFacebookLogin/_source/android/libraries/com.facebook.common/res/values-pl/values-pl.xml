@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">Odwiedź stronę &lt;b>facebook.com/device&lt;/b> i wprowadź powyższy kod.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">Nieoczekiwany błąd podczas pobierania obrazu.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">Logowanie WebView wymaga uprawnienia INTERNET</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">Błąd AndroidManifest</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">Lubisz to</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">Lubię to!</string>
+    <string gender="unknown" name="com_facebook_loading">Ładowanie…</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">Anuluj</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">Logowanie się</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Kontynuuj za pośrednictwem Facebooka</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Zaloguj się przez Facebooka</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">Wyloguj się</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">Wyloguj się</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">Zalogowano jako: %1$s</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Zalogowano przy użyciu Facebooka</string>
+    <string gender="unknown" name="com_facebook_send_button_text">Wyślij</string>
+    <string gender="unknown" name="com_facebook_share_button_text">Udostępnij</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">Aby połączyć konto, otwórz aplikację Facebook na urządzeniu mobilnym i sprawdź powiadomienia.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- LUB -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">To nie Ty?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">Kontynuuj jako %1$s</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">Potwierdź logowanie</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">Zachowujesz kontrolę — wybierz informacje, które chcesz udostępniać w aplikacjach.</string>
+</resources>

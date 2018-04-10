@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <color name="com_facebook_button_login_background_color">#4267b2</color>
+    <color name="com_facebook_button_login_silver_background_color">#f4f6f8</color>
+    <color name="com_facebook_button_login_silver_background_color_pressed">#e9eaf0</color>
+    <declare-styleable name="com_facebook_login_view"><attr format="boolean" name="com_facebook_confirm_logout"/><attr format="string" name="com_facebook_login_text"/><attr format="string" name="com_facebook_logout_text"/><attr name="com_facebook_tooltip_mode">
+            
+            <enum name="automatic" value="0"/>
+            <enum name="display_always" value="1"/>
+            <enum name="never_display" value="2"/>
+        </attr></declare-styleable>
+    <declare-styleable name="com_facebook_profile_picture_view"><attr name="com_facebook_preset_size">
+            
+            <enum name="small" value="-2"/>
+            <enum name="normal" value="-3"/>
+            <enum name="large" value="-4"/>
+        </attr><attr format="boolean" name="com_facebook_is_cropped"/></declare-styleable>
+    <dimen name="com_facebook_button_login_corner_radius">3dp</dimen>
+    <dimen name="com_facebook_profilepictureview_preset_size_large">180dp</dimen>
+    <dimen name="com_facebook_profilepictureview_preset_size_normal">100dp</dimen>
+    <dimen name="com_facebook_profilepictureview_preset_size_small">50dp</dimen>
+    <string name="com_facebook_device_auth_instructions">Visit &lt;b>facebook.com/device&lt;/b> and enter the code shown above.</string>
+    <string name="com_facebook_image_download_unknown_error">Unexpected error while downloading an image.</string>
+    <string name="com_facebook_internet_permission_error_message">WebView login requires INTERNET permission</string>
+    <string name="com_facebook_internet_permission_error_title">AndroidManifest Error</string>
+    <string name="com_facebook_like_button_liked">Liked</string>
+    <string name="com_facebook_like_button_not_liked">Like</string>
+    <string name="com_facebook_loading">Loading…</string>
+    <string name="com_facebook_loginview_cancel_action">Cancel</string>
+    <string name="com_facebook_loginview_log_in_button">Log in</string>
+    <string name="com_facebook_loginview_log_in_button_continue">Continue with Facebook</string>
+    <string name="com_facebook_loginview_log_in_button_long">Log in with Facebook</string>
+    <string name="com_facebook_loginview_log_out_action">Log out</string>
+    <string name="com_facebook_loginview_log_out_button">Log out</string>
+    <string name="com_facebook_loginview_logged_in_as">Logged in as: <ns1:g id="user name">%1$s</ns1:g></string>
+    <string name="com_facebook_loginview_logged_in_using_facebook">Logged in using Facebook</string>
+    <string name="com_facebook_send_button_text">Send</string>
+    <string name="com_facebook_share_button_text">Share</string>
+    <string name="com_facebook_smart_device_instructions">To connect your account, open the Facebook app on your mobile device and check for notifications.</string>
+    <string name="com_facebook_smart_device_instructions_or">- OR -</string>
+    <string name="com_facebook_smart_login_confirmation_cancel">Not you?</string>
+    <string name="com_facebook_smart_login_confirmation_continue_as">Continue as <ns1:g id="user name">%1$s</ns1:g></string>
+    <string name="com_facebook_smart_login_confirmation_title">Confirm Login</string>
+    <string name="com_facebook_tooltip_default">You\'re in control - choose what info you want to share with apps.</string>
+    <style name="com_facebook_loginview_default_style" parent="com_facebook_button">
+        <item name="android:background">@drawable/com_facebook_button_login_background</item>
+        <item name="android:drawablePadding">5dp</item>
+        <item name="android:paddingLeft">6dp</item>
+        <item name="android:paddingRight">6dp</item>
+        <item name="android:textSize">13.0dp</item>
+    </style>
+    <style name="com_facebook_loginview_silver_style" parent="com_facebook_loginview_default_style">
+        <item name="android:background">@drawable/com_facebook_button_login_silver_background</item>
+        <item name="android:drawableLeft">@null</item>
+        <item name="android:textColor">#4b5164</item>
+    </style>
+    <style name="tooltip_bubble_text">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:gravity">left</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:shadowDy">-1</item>
+        <item name="android:shadowRadius">0.25</item>
+        <item name="android:shadowColor">#40000000</item>
+    </style>
+</resources>

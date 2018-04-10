@@ -74,7 +74,7 @@
                     android:layout_gravity="end|bottom"
                     android:layout_marginTop="20dp">
                     <TextView android:id="@+id/info"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Notification.Info"
+                        android:textAppearance="@style/TextAppearance.Compat.Notification.Info"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:singleLine="true"

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">ไปที่ &lt;b>facebook.com/device&lt;/b> แล้วป้อนรหัสที่ปรากฏด้านล่าง</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">เกิดข้อผิดพลาดที่ไม่คาดคิดขณะดาวน์โหลดภาพ</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">การเข้าสู่ระบบ WebView ต้องได้รับสิทธิ์การอนุญาตอินเทอร์เน็ต</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">ข้อผิดพลาด AndroidManifest</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">ถูกใจแล้ว</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">ถูกใจ</string>
+    <string gender="unknown" name="com_facebook_loading">กำลังโหลด...</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">ยกเลิก</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">เข้าสู่ระบบ</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">ดำเนินการต่อด้วย Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">เข้าสู่ระบบด้วย Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">ออกจากระบบ</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">ออกจากระบบ</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">เข้าสู่ระบบแล้วในชื่อ %1$s</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">เข้าสู่ระบบแล้วโดยใช้ Facebook</string>
+    <string gender="unknown" name="com_facebook_send_button_text">ส่ง</string>
+    <string gender="unknown" name="com_facebook_share_button_text">แชร์</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">หากต้องการเชื่อมต่อกับบัญชีผู้ใช้ของคุณ ให้เปิดแอพ Facebook บนอุปกรณ์มือถือของคุณแล้วตรวจสอบการแจ้งเตือน</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- หรือ -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">ไม่ใช่คุณใช่ไหม</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">ดำเนินการต่อในชื่อ %1$s</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">ยืนยันการเข้าสู่ระบบ</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">คุณควบคุมได้ เลือกว่าคุณต้องการแชร์ข้อมูลใดกับแอพ</string>
+</resources>

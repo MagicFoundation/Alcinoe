@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <color name="al_foreground_material_dark">@android:color/white</color>
+  <color name="al_foreground_material_light">@android:color/black</color>
+  
+  <color name="al_secondary_text_default_material_light">#8a000000</color>
+  <color name="al_secondary_text_default_material_dark">#b3ffffff</color>
+  
+  <color name="al_background_floating_material_dark">@color/al_material_grey_800</color>
+  <color name="al_background_floating_material_light">@android:color/white</color>
+  
+  <color name="al_material_grey_800">#ff424242</color>
+    
+  <item name="al_disabled_alpha_material_light" format="float" type="dimen">0.26</item>
+  <item name="al_disabled_alpha_material_dark" format="float" type="dimen">0.30</item>
+
+  <item name="al_highlight_alpha_material_light" format="float" type="dimen">0.12</item>
+  <item name="al_highlight_alpha_material_dark" format="float" type="dimen">0.20</item>
+
+</resources>

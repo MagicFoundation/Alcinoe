@@ -32,6 +32,7 @@
 //  "data": {
 //
 //    "notification": "1",
+//    "notification.channel": "myChannelID",
 //    "notification.tag": "myTag",
 //    "notification.title": "TOTO",
 //    "notification.smallicon": "notification_icon",
@@ -54,6 +55,7 @@
 // actually for the notification alert i support these params, but nothing forbid to extends them
 //
 // notification - Must be equal to 1 to activate showing of custom notification when no receiver
+// notification.channel - on Android 0 The notification will be posted on this NotificationChannel. 
 // notification.tag - A string identifier for this notification.
 // notification.color - The accent color to use
 // notification.text - Set the second line of text in the platform notification template.
@@ -155,30 +157,6 @@ type
     {$ENDIF}
     {$ENDREGION}
 
-    {$REGION ' IOS'}
-    {$IF defined(IOS)}
-    type
-
-      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-      ITokenRefreshNotification = interface(NSObject)
-      ['{1AFBA293-4D77-41FD-8917-59E6C2E04002}']
-        procedure onTokenRefresh(notification: Pointer); cdecl;
-      end;
-
-      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-      TTokenRefreshNotificationListener = class(TOCLocal)
-      private
-        [Weak] fFirebaseInstanceIdClient: TALFirebaseInstanceIdClient;
-      protected
-        function GetObjectiveCClass: PTypeInfo; override;
-      public
-        constructor Create(const aFirebaseInstanceIdClient: TALFirebaseInstanceIdClient);
-        procedure onTokenRefresh(notification: Pointer); cdecl;
-      end;
-
-    {$ENDIF}
-    {$ENDREGION}
-
   private
 
     fOnTokenRefresh: TALFirebaseInstanceIdClientTokenRefreshEvent;
@@ -193,7 +171,6 @@ type
 
     {$REGION ' IOS'}
     {$IF defined(IOS)}
-    fTokenRefreshNotificationListener: TTokenRefreshNotificationListener;
     procedure FIRInstanceIDdeleteIDHandler(error: NSError);
     {$ENDIF}
     {$ENDREGION}
@@ -256,7 +233,10 @@ type
         [Weak] fFirebaseMessagingClient: TALFirebaseMessagingClient;
       public
         constructor Create(const aFirebaseMessagingClient: TALFirebaseMessagingClient);
-        procedure applicationReceivedRemoteMessage(remoteMessage: FIRMessagingRemoteMessage); cdecl;
+        [MethodName('messaging:didReceiveRegistrationToken:')]
+        procedure messagingDidReceiveRegistrationToken(messaging: FIRMessaging; didReceiveRegistrationToken: NSString); cdecl;
+        [MethodName('messaging:didReceiveMessage:')]
+        procedure messagingDidReceiveMessage(messaging: FIRMessaging; didReceiveMessage: FIRMessagingRemoteMessage); cdecl;
       end;
 
     {$ENDIF}
@@ -286,11 +266,10 @@ type
     fUserNotificationCenterDelegate: TUserNotificationCenterDelegate;
     fFIRMessagingDelegate: TFIRMessagingDelegate;
     procedure UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler(granted: Boolean; error: NSError);
-    procedure FIRMessagingConnectCompletionHandler(error: NSError);
     class procedure applicationDidFinishLaunchingRemoteNotificationKey(const Sender: TObject; const M: TMessage);
+    procedure HandleStartupNotificationMessage;
     procedure applicationDidReceiveRemoteNotification(const Sender: TObject; const M: TMessage);
     procedure applicationdidFailToRegisterForRemoteNotificationsWithError(const Sender: TObject; const M: TMessage);
-    procedure applicationEvent(const Sender: TObject; const M: TMessage);
     {$ENDIF}
     {$ENDREGION}
 
@@ -363,19 +342,8 @@ begin
     fBroadcastReceiver := TJALBroadcastReceiver.JavaClass.init();
     FBroadcastReceiverListener := TBroadcastReceiverListener.Create(Self);
     fBroadcastReceiver.setListener(FBroadcastReceiverListener);
-
-    {$IF CompilerVersion <= 31} // berlin
-    TUIThreadCaller.Call<JALBroadcastReceiver>(
-      procedure (fBroadcastReceiver: JALBroadcastReceiver)
-      begin
-    {$ENDIF}
-
-        aIntentFilter := TJIntentFilter.JavaClass.init(TJALFirebaseInstanceIdService.JavaClass.ACTION_TOKENREFRESHED);
-        TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).registerReceiver(fBroadcastReceiver, aIntentFilter);
-
-   {$IF CompilerVersion <= 31} // berlin
-      end, fBroadcastReceiver);
-   {$ENDIF}
+    aIntentFilter := TJIntentFilter.JavaClass.init(TJALFirebaseInstanceIdService.JavaClass.ACTION_TOKENREFRESHED);
+    TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).registerReceiver(fBroadcastReceiver, aIntentFilter);
 
   {$ENDIF}
   {$ENDREGION}
@@ -395,20 +363,6 @@ begin
     // 4) BecameActive event received
     TFIRApp.OCClass.configure;
 
-    // Monitor token generation
-    // You can access the token's updated value by adding an observer that listens to kFIRInstanceIDTokenRefreshNotification
-    // then retrieve the token from the observer's selector.
-    // The registration token may change when:
-    // * The app deletes Instance ID
-    // * The app is restored on a new device
-    // * The user uninstalls/reinstall the app
-    // * The user clears app data.
-    fTokenRefreshNotificationListener := TTokenRefreshNotificationListener.Create(Self);
-    TiOSHelper.DefaultNotificationCenter.addObserver(fTokenRefreshNotificationListener.GetObjectID, // notificationObserver: Pointer;
-                                                     sel_getUid('onTokenRefresh:'), // selector: SEL
-                                                     (kFIRInstanceIDTokenRefreshNotification as ILocalObject).GetObjectID, // name: Pointer
-                                                     nil); // &object: Pointer
-
   {$ENDIF}
   {$ENDREGION}
 
@@ -421,36 +375,10 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-    {$IF CompilerVersion <= 31} // berlin
-    FBroadcastReceiverListener.fFirebaseInstanceIdClient := nil;
-    TUIThreadCaller.Call<JALBroadcastReceiver>(
-      procedure (fBroadcastReceiver: JALBroadcastReceiver)
-      begin
-    {$ENDIF}
-
-        TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).unregisterReceiver(fBroadcastReceiver);
-        fBroadcastReceiver.setListener(nil);
-
-    {$IF CompilerVersion <= 31} // berlin
-      end, fBroadcastReceiver);
-    {$ENDIF}
-
-    {$IF CompilerVersion <= 31} // berlin
-    FBroadcastReceiverListener := nil; // << we can not free it because it's maybe used by the previous instruction
-                                       // << anyway it's not too much matter because with ARC it's will be free automatiquelly
-    {$ELSE} // tokyo+
+    TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).unregisterReceiver(fBroadcastReceiver);
+    fBroadcastReceiver.setListener(nil);
     alFreeAndNil(FBroadcastReceiverListener);
-    {$ENDIF}
     fBroadcastReceiver := Nil;
-
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION ' IOS'}
-  {$IF defined(IOS)}
-
-    TiOSHelper.DefaultNotificationCenter.removeObserver(fTokenRefreshNotificationListener.GetObjectID);
-    AlFreeAndNil(fTokenRefreshNotificationListener);
 
   {$ENDIF}
   {$ENDREGION}
@@ -500,18 +428,7 @@ begin
                                                                            ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
 
-  {$IF CompilerVersion <= 31} // berlin
-  TThread.queue(nil,
-    procedure
-    begin
-      if not assigned(fFirebaseInstanceIdClient) then exit;
-  {$ENDIF}
-
-      if assigned(fFirebaseInstanceIdClient.fOnTokenRefresh) then fFirebaseInstanceIdClient.fOnTokenRefresh(aToken);
-
-  {$IF CompilerVersion <= 31} // berlin
-    end);
-  {$ENDIF}
+  if assigned(fFirebaseInstanceIdClient.fOnTokenRefresh) then fFirebaseInstanceIdClient.fOnTokenRefresh(aToken);
 
 end;
 
@@ -520,44 +437,6 @@ end;
 
 {$REGION ' IOS'}
 {$IF defined(IOS)}
-
-{*********************************************************************************************************************************************}
-constructor TALFirebaseInstanceIdClient.TTokenRefreshNotificationListener.Create(const aFirebaseInstanceIdClient: TALFirebaseInstanceIdClient);
-begin
-  inherited Create;
-  fFirebaseInstanceIdClient := aFirebaseInstanceIdClient;
-end;
-
-{************************************************************************************************************}
-procedure TALFirebaseInstanceIdClient.TTokenRefreshNotificationListener.onTokenRefresh(notification: Pointer);
-var aToken: String;
-begin
-
-  // Note that this callback will be fired everytime a new token is generated, including the first
-  // time. So if you need to retrieve the token as soon as it is available this is where that
-  // should be done.
-
-  aToken := fFirebaseInstanceIdClient.getToken;
-  {$IFDEF DEBUG}
-  allog('TALFirebaseInstanceIdClient.TTokenRefreshNotificationListener.onTokenRefresh','Token: ' + aToken +
-                                                                                       ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
-  {$ENDIF}
-
-  // Connect again to FCM since connection may have failed when attempted before having a token.
-  if assigned(fFirebaseInstanceIdClient.fFirebaseMessagingClient) and
-     fFirebaseInstanceIdClient.fFirebaseMessagingClient.connected then fFirebaseInstanceIdClient.fFirebaseMessagingClient.connect;
-
-  //execute fOnTokenRefresh
-  if assigned(fFirebaseInstanceIdClient.fOnTokenRefresh) then
-    fFirebaseInstanceIdClient.fOnTokenRefresh(aToken);
-
-end;
-
-{***************************************************************************************************}
-function TALFirebaseInstanceIdClient.TTokenRefreshNotificationListener.GetObjectiveCClass: PTypeInfo;
-begin
-  Result := TypeInfo(ITokenRefreshNotification);
-end;
 
 {*********************************************************************************}
 procedure TALFirebaseInstanceIdClient.FIRInstanceIDdeleteIDHandler(error: NSError);
@@ -582,15 +461,6 @@ end;
 
 {**********************************************************************************************************}
 constructor TALFirebaseMessagingClient.Create(const aFirebaseInstanceIdClient: TalFirebaseInstanceIdClient);
-
-{$REGION ' IOS'}
-{$IF defined(IOS)}
-var aTypes: NSUInteger;
-    aOptions: UNAuthorizationOptions;
-    aSettings: UIUserNotificationSettings;
-{$ENDIF}
-{$ENDREGION}
-
 begin
 
   inherited Create;
@@ -626,11 +496,110 @@ begin
     //register message handler
     TMessageManager.DefaultManager.SubscribeToMessage(TPushRemoteNotificationMessage, applicationDidReceiveRemoteNotification);
     TMessageManager.DefaultManager.SubscribeToMessage(TPushFailToRegisterMessage, applicationdidFailToRegisterForRemoteNotificationsWithError);
-    TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, applicationEvent);
 
     //fUserNotificationCenterDelegate
     fUserNotificationCenterDelegate := nil;
-    fFIRMessagingDelegate := nil;
+
+    // For iOS 10 data message (sent via FCM)
+    if TOSVersion.Check(10) then begin // iOS 10 or later
+      fFIRMessagingDelegate := TFIRMessagingDelegate.Create(self);
+      TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).setDelegate(fFIRMessagingDelegate.GetObjectID);
+    end
+    else fFIRMessagingDelegate := nil;
+
+  {$ENDIF}
+  {$ENDREGION}
+
+end;
+
+{********************************************}
+destructor TALFirebaseMessagingClient.Destroy;
+begin
+
+  {$REGION ' ANDROID'}
+  {$IF defined(android)}
+
+    disconnect;
+
+    TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, applicationEvent);
+    TMessageManager.DefaultManager.Unsubscribe(TMessageReceivedNotification, notificationEvent);
+
+    fBroadcastReceiver.setListener(nil);
+    ALFreeAndNil(FBroadcastReceiverListener);
+    fBroadcastReceiver := Nil;
+
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION ' IOS'}
+  {$IF defined(IOS)}
+
+    disconnect;
+
+    TMessageManager.DefaultManager.Unsubscribe(TPushRemoteNotificationMessage, applicationDidReceiveRemoteNotification);
+    TMessageManager.DefaultManager.Unsubscribe(TPushFailToRegisterMessage, applicationdidFailToRegisterForRemoteNotificationsWithError);
+
+    if fUserNotificationCenterDelegate <> nil then begin
+      TUNUserNotificationCenter.OCClass.currentNotificationCenter.setdelegate(nil);
+      alfreeAndNil(fUserNotificationCenterDelegate);
+    end;
+
+    if fFIRMessagingDelegate <> nil then begin
+      TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).setDelegate(nil);
+      alFreeAndNil(fFIRMessagingDelegate);
+    end;
+
+  {$ENDIF}
+  {$ENDREGION}
+
+  fFirebaseInstanceIdClient.FirebaseMessagingClient := nil;
+  inherited Destroy;
+
+end;
+
+{*******************************************}
+procedure TALFirebaseMessagingClient.connect;
+
+{$REGION ' ANDROID'}
+{$IF defined(android)}
+var aIntentFilter: JIntentFilter;
+{$ENDIF}
+{$ENDREGION}
+
+{$REGION ' IOS'}
+{$IF defined(IOS)}
+var aTypes: NSUInteger;
+    aOptions: UNAuthorizationOptions;
+    aSettings: UIUserNotificationSettings;
+{$ENDIF}
+{$ENDREGION}
+
+begin
+
+  // set connected
+  fconnected := true;
+
+  {$REGION ' ANDROID'}
+  {$IF defined(android)}
+
+    if not fIsPhysicallyConnected then begin
+
+      fIsPhysicallyConnected := True;
+
+      aIntentFilter := TJIntentFilter.JavaClass.init(TJALFirebaseMessagingService.JavaClass.ACTION_MESSAGERECEIVED);
+      TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).registerReceiver(fBroadcastReceiver, aIntentFilter);
+
+      {$IFDEF DEBUG}
+      allog('TALFirebaseMessagingClient.connect', 'Physically connected', TalLogType.verbose);
+      {$ENDIF}
+
+    end;
+
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION ' IOS'}
+  {$IF defined(IOS)}
 
     // Register for remote notifications. This shows a permission dialog on first run, to
     // show the dialog at a more appropriate time move this registration accordingly.
@@ -643,10 +612,6 @@ begin
                   UNAuthorizationOptionAlert or
                   UNAuthorizationOptionBadge;
       TUNUserNotificationCenter.OCClass.currentNotificationCenter.requestAuthorizationWithOptions(aOptions{options}, UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler{completionHandler});
-
-      // For iOS 10 data message (sent via FCM)
-      fFIRMessagingDelegate := TFIRMessagingDelegate.Create(self);
-      TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).setRemoteMessageDelegate(fFIRMessagingDelegate.GetObjectID);
 
       // registerForRemoteNotifications
       SharedApplication.registerForRemoteNotifications;
@@ -671,118 +636,16 @@ begin
 
     end;
 
-  {$ENDIF}
-  {$ENDREGION}
+    // When set to `YES`, Firebase Messaging will automatically establish a socket-based, direct
+    // channel to the FCM server. Enable this only if you are sending upstream messages or
+    // receiving non-APNS, data-only messages in foregrounded apps.
+    TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).setShouldEstablishDirectChannel(true);
 
-end;
-
-{********************************************}
-destructor TALFirebaseMessagingClient.Destroy;
-begin
-
-  {$REGION ' ANDROID'}
-  {$IF defined(android)}
-
-    disconnect;
-
-    TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, applicationEvent);
-    TMessageManager.DefaultManager.Unsubscribe(TMessageReceivedNotification, notificationEvent);
-
-    fBroadcastReceiver.setListener(nil);
-    {$IF CompilerVersion <= 31} // berlin
-    FBroadcastReceiverListener.fFirebaseMessagingClient := nil;
-    FBroadcastReceiverListener := nil; // << we can not free it because it's maybe used by the previous instruction
-                                       // << anyway it's not too much matter because with ARC it's will be free automatiquelly
-    {$ELSE} // tokyo+
-    ALFreeAndNil(FBroadcastReceiverListener);
-    {$ENDIF}
-    fBroadcastReceiver := Nil;
-
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION ' IOS'}
-  {$IF defined(IOS)}
-
-    disconnect;
-
-    TMessageManager.DefaultManager.Unsubscribe(TPushRemoteNotificationMessage, applicationDidReceiveRemoteNotification);
-    TMessageManager.DefaultManager.Unsubscribe(TPushFailToRegisterMessage, applicationdidFailToRegisterForRemoteNotificationsWithError);
-    TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, applicationEvent);
-
-    if fUserNotificationCenterDelegate <> nil then begin
-      TUNUserNotificationCenter.OCClass.currentNotificationCenter.setdelegate(nil);
-      alfreeAndNil(fUserNotificationCenterDelegate);
-    end;
-
-    if fFIRMessagingDelegate <> nil then begin
-      TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).setRemoteMessageDelegate(nil);
-      alFreeAndNil(fFIRMessagingDelegate);
-    end;
-
-  {$ENDIF}
-  {$ENDREGION}
-
-  fFirebaseInstanceIdClient.FirebaseMessagingClient := nil;
-  inherited Destroy;
-
-end;
-
-{*******************************************}
-procedure TALFirebaseMessagingClient.connect;
-
-{$REGION ' ANDROID'}
-{$IF defined(android)}
-var aIntentFilter: JIntentFilter;
-{$ENDIF}
-{$ENDREGION}
-
-begin
-
-  // set connected
-  fconnected := true;
-
-  {$REGION ' ANDROID'}
-  {$IF defined(android)}
-
-    if not fIsPhysicallyConnected then begin
-
-      fIsPhysicallyConnected := True;
-
-      {$IF CompilerVersion <= 31} // berlin
-      TUIThreadCaller.Call<JALBroadcastReceiver>(
-        procedure (fBroadcastReceiver: JALBroadcastReceiver)
-        begin
-      {$ENDIF}
-
-          aIntentFilter := TJIntentFilter.JavaClass.init(TJALFirebaseMessagingService.JavaClass.ACTION_MESSAGERECEIVED);
-          TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).registerReceiver(fBroadcastReceiver, aIntentFilter);
-
-      {$IF CompilerVersion <= 31} // berlin
-        end, fBroadcastReceiver);
-      {$ENDIF}
-
-      {$IFDEF DEBUG}
-      allog('TALFirebaseMessagingClient.connect', 'Physically connected', TalLogType.verbose);
-      {$ENDIF}
-
-    end;
-
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION ' IOS'}
-  {$IF defined(IOS)}
-
-    // Won't connect since there is no token
-    //the connection will be done automatiquelly in onTokenRefresh
-    if fFirebaseInstanceIdClient.getToken = '' then exit;
-
-    // Disconnect previous FCM connection if it exists.
-    TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).disconnect;
-
-    // connect to the FCM connection
-    TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).connectWithCompletion(FIRMessagingConnectCompletionHandler);
+    // handle the TALFirebaseMessagingClient.StartupNotificationMessage
+    // i do it in ForceQueue because i don't want this event to be executed during
+    // the oncreate or the connect procedure, but in annother distinct synch loop
+    if not TOSVersion.Check(10) then
+      TThread.ForceQueue(nil, HandleStartupNotificationMessage);
 
   {$ENDIF}
   {$ENDREGION}
@@ -803,17 +666,7 @@ begin
 
       fIsPhysicallyConnected := False;
 
-      {$IF CompilerVersion <= 31} // berlin
-      TUIThreadCaller.Call<JALBroadcastReceiver>(
-        procedure (fBroadcastReceiver: JALBroadcastReceiver)
-        begin
-      {$ENDIF}
-
-          TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).unregisterReceiver(fBroadcastReceiver);
-
-      {$IF CompilerVersion <= 31} // berlin
-        end, fBroadcastReceiver);
-      {$ENDIF}
+      TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).unregisterReceiver(fBroadcastReceiver);
 
       {$IFDEF DEBUG}
       allog('TALFirebaseMessagingClient.connect', 'Physically disconnect', TalLogType.verbose);
@@ -827,8 +680,16 @@ begin
   {$REGION ' IOS'}
   {$IF defined(IOS)}
 
+    //unregisterForRemoteNotifications
+    //https://developer.apple.com/documentation/uikit/uiapplication/1623093-unregisterforremotenotifications?language=objc
+    //I thinks it's useless to unregisterForRemoteNotifications so skip it
+
     // Disconnect previous FCM connection if it exists.
-    TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).disconnect;
+    TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).setShouldEstablishDirectChannel(false);
+
+    //in case the event was not processed
+    if not TOSVersion.Check(10) then
+      TThread.RemoveQueuedEvents(nil, HandleStartupNotificationMessage);
 
   {$ENDIF}
   {$ENDREGION}
@@ -875,18 +736,7 @@ begin
   allog('TALFirebaseMessagingClient.TBroadcastReceiverListener.onReceive','ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
 
-  {$IF CompilerVersion <= 31} // berlin
-  TThread.queue(nil,
-    procedure
-    begin
-      if assigned(fFirebaseMessagingClient) then
-  {$ENDIF}
-
-        fFirebaseMessagingClient.HandleNotificationIntent(intent);
-
-  {$IF CompilerVersion <= 31} // berlin
-    end);
-  {$ENDIF}
+  fFirebaseMessagingClient.HandleNotificationIntent(intent);
 
 end;
 
@@ -1137,13 +987,40 @@ begin
   fFirebaseMessagingClient := aFirebaseMessagingClient;
 end;
 
-{**************************************************************}
-// iOS 10: Receive data message  while app is in the foreground.
-procedure TALFirebaseMessagingClient.TFIRMessagingDelegate.applicationReceivedRemoteMessage(remoteMessage: FIRMessagingRemoteMessage);
+{****************************************************************************************************************************}
+//This method will be called once a token is available, or has been refreshed. Typically it will be called once per app start,
+//but may be called more often, if token is invalidated or updated. In this method, you should perform operations such as:
+// * Uploading the FCM token to your application server, so targeted notifications can be sent.
+// * Subscribing to any topics.
+procedure TALFirebaseMessagingClient.TFIRMessagingDelegate.messagingDidReceiveRegistrationToken(messaging: FIRMessaging; didReceiveRegistrationToken: NSString);
+var aToken: String;
+begin
+
+  // On android, to monitor the Token registration need by firebase messaging, you must listen onTokenRefresh inside FirebaseMessagingService
+  // However on Ios to monitor the Token registration, you must listen messagingDidReceiveRegistrationToken inside a delegate assigned to  FirebaseMessaging
+  // https://stackoverflow.com/questions/49728761/why-on-android-token-are-monitored-in-firebaseinstanceid-and-in-ios-in-firebasem
+
+  aToken := NSStrToStr(didReceiveRegistrationToken);
+  {$IFDEF DEBUG}
+  allog('TALFirebaseMessagingClient.TFIRMessagingDelegate.messagingDidReceiveRegistrationToken','Token: ' + aToken +
+                                                                                                ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  {$ENDIF}
+
+  //execute fOnTokenRefresh
+  if assigned(fFirebaseMessagingClient.fFirebaseInstanceIdClient) and
+     assigned(fFirebaseMessagingClient.fFirebaseInstanceIdClient.fOnTokenRefresh) then
+    fFirebaseMessagingClient.fFirebaseInstanceIdClient.fOnTokenRefresh(aToken);
+
+end;
+
+{****************************************************************************************************************************}
+// This method is called on iOS 10 devices to handle data messages received via FCM through its direct channel (not via APNS).
+// For iOS 9 and below, the FCM data message is delivered via the UIApplicationDelegate’s -application:didReceiveRemoteNotification: method.
+procedure TALFirebaseMessagingClient.TFIRMessagingDelegate.messagingDidReceiveMessage(messaging: FIRMessaging; didReceiveMessage: FIRMessagingRemoteMessage);
 var aMessage: TPushRemoteNotificationMessage;
 begin
 
-  aMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(_NSDictionaryToJSON(remoteMessage.appData)));
+  aMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(_NSDictionaryToJSON(didReceiveMessage.appData)));
   {$IFDEF DEBUG}
   allog('TALFirebaseMessagingClient.TFIRMessagingDelegate.applicationReceivedRemoteMessage', aMessage.Value.Notification +
                                                                                              ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
@@ -1231,6 +1108,17 @@ begin
 
 end;
 
+{********************************************************************}
+procedure TALFirebaseMessagingClient.HandleStartupNotificationMessage;
+var aPushStartupNotificationMessage: TPushStartupNotificationMessage;
+begin
+  if TALFirebaseMessagingClient.StartupNotificationMessage <> '' then begin
+    aPushStartupNotificationMessage := TPushStartupNotificationMessage.Create(TPushNotificationData.Create(TALFirebaseMessagingClient.StartupNotificationMessage));
+    TALFirebaseMessagingClient.StartupNotificationMessage := '';
+    applicationDidReceiveRemoteNotification(Self, aPushStartupNotificationMessage);
+  end;
+end;
+
 {**************************************************************************************************************************************}
 class procedure TALFirebaseMessagingClient.applicationDidFinishLaunchingRemoteNotificationKey(const Sender: TObject; const M: TMessage);
 begin
@@ -1266,38 +1154,6 @@ begin
 
 end;
 
-{****************************************************************************************}
-procedure TALFirebaseMessagingClient.FIRMessagingConnectCompletionHandler(error: NSError);
-var aPushStartupNotificationMessage: TPushStartupNotificationMessage;
-begin
-
-  // The handler to be invoked once the connection is established.
-  // If the connection fails we invoke the handler with an
-  // appropriate error code letting you know why it failed. At
-  // the same time, FIRMessaging performs exponential backoff to retry
-  // establishing a connection and invoke the handler when successful.
-  //
-  // NOTE: i see FIRMessaging performs exponential backoff to retry
-  // establishing a connection but this event is not called again
-
-  {$IFDEF DEBUG}
-  if (error <> nil) then allog('TALFirebaseMessagingClient.FIRMessagingConnectCompletionHandler', 'Unable to connect to FCM - ' + NSStrToStr(error.localizedDescription) +
-                                                                                                  ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error)
-  else allog('TALFirebaseMessagingClient.FIRMessagingConnectCompletionHandler', 'Connected to FCM' +
-                                                                                ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
-  {$ENDIF}
-
-  // handle the TALFirebaseMessagingClient.StartupNotificationMessage
-  // i do it here because i don't want this event to be executed during
-  // the oncreate or the connect procedure, but in annother distinct synch loop
-  if TALFirebaseMessagingClient.StartupNotificationMessage <> '' then begin
-    aPushStartupNotificationMessage := TPushStartupNotificationMessage.Create(TPushNotificationData.Create(TALFirebaseMessagingClient.StartupNotificationMessage));
-    TALFirebaseMessagingClient.StartupNotificationMessage := '';
-    applicationDidReceiveRemoteNotification(Self, aPushStartupNotificationMessage);
-  end;
-
-end;
-
 {*****************************************************************************************************************************************}
 procedure TALFirebaseMessagingClient.applicationdidFailToRegisterForRemoteNotificationsWithError(const Sender: TObject; const M: TMessage);
 begin
@@ -1318,31 +1174,6 @@ begin
                                                                                                        ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
 
-end;
-
-{**********************************************************************************************}
-procedure TALFirebaseMessagingClient.applicationEvent(const Sender: TObject; const M: TMessage);
-begin
-  if M is TApplicationEventMessage then begin
-    case (M as TApplicationEventMessage).Value.Event of
-      TApplicationEvent.WillBecomeForeground,
-      TApplicationEvent.BecameActive: begin
-                                        if connected then connect;
-                                      end;
-      TApplicationEvent.EnteredBackground: begin
-                                              // Call this before `teardown` when your app is going to the background.
-                                              // Since the FIRMessaging connection won't be allowed to live when in background it is
-                                              // prudent to close the connection.
-                                              TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).disconnect;
-                                              {$IFDEF DEBUG}
-                                              allog('TALFirebaseMessagingClient.applicationEvent','Disconnected from FCM', TalLogType.VERBOSE);
-                                              {$ENDIF}
-                                            end;
-      TApplicationEvent.WillBecomeInactive:; // << don't do anything here, because this event is fired when for exemple we open notification center
-                                             // << NOTE: i notice that even calling disconnect from here don't really disconnect the FCM as we still
-                                             // <<       receive the notification in the app
-    end;
-  end;
 end;
 
 {$ENDIF}

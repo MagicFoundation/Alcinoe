@@ -19,16 +19,10 @@ public class ALFacebookShareLinkDialog {
    */
   public static void show(final Activity activity,
                           final Uri contentUrl,
-                          final String contentTitle,
-                          final String contentDescription,
-                          final Uri imageUrl,
                           final String quote) {
 
     ShareLinkContent linkContent = new ShareLinkContent.Builder()    
       .setContentUrl(contentUrl)
-      .setContentTitle(contentTitle)
-      .setContentDescription(contentDescription)
-      .setImageUrl(imageUrl)
       .setQuote(quote)
       .build();         
     ShareDialog.show(activity, linkContent);

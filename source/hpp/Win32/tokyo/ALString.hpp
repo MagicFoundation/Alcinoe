@@ -642,8 +642,10 @@ extern DELPHI_PACKAGE System::AnsiString __fastcall ALIntToBit(int value, int di
 extern DELPHI_PACKAGE int __fastcall AlBitToInt(System::AnsiString Value);
 extern DELPHI_PACKAGE System::AnsiString __fastcall AlInt2BaseN(unsigned __int64 NumIn, const char *charset, const int charset_High);
 extern DELPHI_PACKAGE unsigned __int64 __fastcall AlBaseN2Int(const System::AnsiString Str, const char *charset, const int charset_High);
-extern DELPHI_PACKAGE System::AnsiString __fastcall ALBase64EncodeString(const System::AnsiString S);
-extern DELPHI_PACKAGE System::AnsiString __fastcall ALBase64DecodeString(const System::AnsiString S);
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALBase64EncodeString(const char * P, const int ln)/* overload */;
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALBase64EncodeString(const System::AnsiString S)/* overload */;
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALBase64DecodeString(const char * P, const int ln)/* overload */;
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALBase64DecodeString(const System::AnsiString S)/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALBase64EncodeStringMIME(const System::AnsiString S);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALBase64DecodeStringMIME(const System::AnsiString S);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALBase64EncodeStringU(const System::UnicodeString S, System::Sysutils::TEncoding* const AEncoding = (System::Sysutils::TEncoding*)(0x0));

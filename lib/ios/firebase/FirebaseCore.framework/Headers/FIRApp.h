@@ -1,12 +1,32 @@
+/*
+ * Copyright 2017 Google
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #import <Foundation/Foundation.h>
+
+#if TARGET_OS_IOS
+// TODO: Remove UIKit import on next breaking change release
 #import <UIKit/UIKit.h>
+#endif
 
 @class FIROptions;
 
 NS_ASSUME_NONNULL_BEGIN
 
 /** A block that takes a BOOL and has no return value. */
-typedef void (^FIRAppVoidBoolCallback)(BOOL success);
+typedef void (^FIRAppVoidBoolCallback)(BOOL success) NS_SWIFT_NAME(FirebaseAppVoidBoolCallback);
 
 /**
  * The entry point of Firebase SDKs.
@@ -26,6 +46,7 @@ typedef void (^FIRAppVoidBoolCallback)(BOOL success);
  * It is also possible to change the default logging level in code by calling setLoggerLevel: on
  * the FIRConfiguration interface.
  */
+NS_SWIFT_NAME(FirebaseApp)
 @interface FIRApp : NSObject
 
 /**
@@ -42,7 +63,7 @@ typedef void (^FIRAppVoidBoolCallback)(BOOL success);
  *
  * @param options The Firebase application options used to configure the service.
  */
-+ (void)configureWithOptions:(FIROptions *)options;
++ (void)configureWithOptions:(FIROptions *)options NS_SWIFT_NAME(configure(options:));
 
 /**
  * Configures a Firebase app with the given name and options. Raises an exception if any
@@ -52,24 +73,35 @@ typedef void (^FIRAppVoidBoolCallback)(BOOL success);
                Letters, Numbers and Underscore.
  * @param options The Firebase application options used to configure the services.
  */
-+ (void)configureWithName:(NSString *)name options:(FIROptions *)options;
+// clang-format off
++ (void)configureWithName:(NSString *)name
+                  options:(FIROptions *)options NS_SWIFT_NAME(configure(name:options:));
+// clang-format on
 
 /**
  * Returns the default app, or nil if the default app does not exist.
  */
-+ (nullable FIRApp *)defaultApp NS_SWIFT_NAME(defaultApp());
++ (nullable FIRApp *)defaultApp NS_SWIFT_NAME(app());
 
 /**
  * Returns a previously created FIRApp instance with the given name, or nil if no such app exists.
  * This method is thread safe.
  */
-+ (nullable FIRApp *)appNamed:(NSString *)name;
++ (nullable FIRApp *)appNamed:(NSString *)name NS_SWIFT_NAME(app(name:));
 
+#if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
 /**
  * Returns the set of all extant FIRApp instances, or nil if there are no FIRApp instances. This
  * method is thread safe.
  */
-+ (nullable NSDictionary *)allApps;
+@property(class, readonly, nullable) NSDictionary<NSString *, FIRApp *> *allApps;
+#else
+/**
+ * Returns the set of all extant FIRApp instances, or nil if there are no FIRApp instances. This
+ * method is thread safe.
+ */
++ (nullable NSDictionary<NSString *, FIRApp *> *)allApps NS_SWIFT_NAME(allApps());
+#endif  // defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
 
 /**
  * Cleans up the current FIRApp, freeing associated data and returning its name to the pool for
@@ -89,9 +121,9 @@ typedef void (^FIRAppVoidBoolCallback)(BOOL success);
 @property(nonatomic, copy, readonly) NSString *name;
 
 /**
- * Gets the options for this app.
+ * Gets a copy of the options for this app. These are non-modifiable.
  */
-@property(nonatomic, readonly) FIROptions *options;
+@property(nonatomic, copy, readonly) FIROptions *options;
 
 @end
 

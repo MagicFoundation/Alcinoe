@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">Откройте &lt;b>facebook.com/device&lt;/b> и введите код, показанный выше.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">Неожиданная ошибка при скачивании изображения.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">Для входа через WebView необходимо разрешение INTERNET</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">Ошибка AndroidManifest</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">Нравится</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">Нравится</string>
+    <string gender="unknown" name="com_facebook_loading">Загрузка...</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">Отмена</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">Войти</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Продолжить с Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Вход через Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">Выйти</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">Выйти</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">Вы вошли как %1$s</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Выполнен вход через Facebook</string>
+    <string gender="unknown" name="com_facebook_send_button_text">Отправить</string>
+    <string gender="unknown" name="com_facebook_share_button_text">Поделиться</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">Чтобы привязать ваш аккаунт, откройте приложение Facebook на своем мобильном устройстве и проверьте уведомления.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- ИЛИ -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">Не Вы?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">Продолжить как %1$s</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">Подтвердите вход</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">Контроль над данными — выберите, какой информацией вы хотите делиться с приложениями.</string>
+</resources>

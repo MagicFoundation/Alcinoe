@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">&lt;b>facebook.com/device&lt;/b>에 방문하여 위 코드를 입력하세요.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">이미지를 다운로드하는 중 예기치 않은 오류가 발생했습니다.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">WebView 로그인에 인터넷 권한이 필요합니다</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">AndroidManifest 오류</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">좋아요</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">좋아요</string>
+    <string gender="unknown" name="com_facebook_loading">읽어들이는 중...</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">취소</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">로그인</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Facebook으로 계속하기</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Facebook으로 로그인</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">로그아웃</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">로그아웃</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">로그인 사용자: %1$s</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Facebook을 사용하여 로그인함</string>
+    <string gender="unknown" name="com_facebook_send_button_text">보내기</string>
+    <string gender="unknown" name="com_facebook_share_button_text">공유하기</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">계정에 연결하려면 모바일 기기에서 Facebook 앱을 열고 알림을 확인하세요.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- 또는 -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">회원님이 아닌가요?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">%1$s님으로 계속</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">로그인 확인</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">앱과 공유할 정보를 자유롭게 선택할 수 있습니다.</string>
+</resources>

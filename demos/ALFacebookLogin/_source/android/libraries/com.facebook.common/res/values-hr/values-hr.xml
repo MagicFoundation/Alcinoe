@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">Posjetitw &lt;b>facebook.com/device&lt;/b> i unesite gore prikazani kôd.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">Neočekivana pogreška prilikom preuzimanja slike.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">Prijava WebView zahtijeva dopuštenje za INTERNET</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">Pogreška AndroidManifest</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">Označeno sa \"sviđa mi se\"</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">Sviđa mi se</string>
+    <string gender="unknown" name="com_facebook_loading">Učitavanje...</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">Odustani</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">Prijava</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Nastavak uz Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Prijavi se putem Facebooka</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">Odjava</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">Odjava</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">Prijavljeni ste kao: %1$s</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Prijavljeni ste putem Facebooka</string>
+    <string gender="unknown" name="com_facebook_send_button_text">Pošalji</string>
+    <string gender="unknown" name="com_facebook_share_button_text">Podijeli</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">Za povezivanje svog računa otvorite aplikaciju Facebook na mobilnom uređaju i pročitajte obavijesti.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- ILI -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">Ovo niste vi?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">Nastavite kao %1$s</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">Potvrdi prijavu</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">Vi odlučujete – odaberite koje informacije želite podijeliti s aplikacijama.</string>
+</resources>

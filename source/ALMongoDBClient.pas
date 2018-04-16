@@ -834,8 +834,8 @@ constructor TAlBaseMongoDBClient.Create;
 var aWSAData: TWSAData;
 begin
   CheckError(WSAStartup(MAKEWORD(2,2), aWSAData) <> 0);
-  FSendTimeout := 60000; // 60 seconds
-  FReceiveTimeout := 60000; // 60 seconds
+  FSendTimeout := 1{h}*60{min}*60{s}*1000{ms}; // 1 hour
+  FReceiveTimeout := 1{h}*60{min}*60{s}*1000{ms}; // 1 hour
   FKeepAlive := True;
   fTCPNoDelay := True;
 end;

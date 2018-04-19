@@ -23,6 +23,11 @@ maven.google.com/<group_path>/<library>/<version>/<library>-<version>.<ext>
       
 *************************
 
+you can access all release notes (past and current) here:
+https://developers.google.com/android/guides/releases
+
+*************************
+
 to know all the dependancies needed by a libraries, create a android
 studio project, add the dependancies: 
 

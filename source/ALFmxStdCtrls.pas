@@ -1396,12 +1396,14 @@ end;
 {***************************************************}
 procedure TALCustomTrack.SetMax(const Value: Single);
 begin
+  if compareValue(Value, Min) < 0 then min := Value;
   FValueRange.Max := Value;
 end;
 
 {***************************************************}
 procedure TALCustomTrack.SetMin(const Value: Single);
 begin
+  if compareValue(Value, Max) > 0 then max := Value;
   FValueRange.Min := Value;
 end;
 
@@ -1810,6 +1812,7 @@ end;
 {*****************************************************}
 procedure TALRangeTrackBar.SetMax(const Value: Single);
 begin
+  if compareValue(Value, Min) < 0 then min := Value;
   inherited;
   FMaxValueRange.Max := Value;
 end;
@@ -1817,6 +1820,7 @@ end;
 {*****************************************************}
 procedure TALRangeTrackBar.SetMin(const Value: Single);
 begin
+  if compareValue(Value, Max) > 0 then max := Value;
   inherited;
   FMaxValueRange.Min := Value;
 end;

@@ -143,6 +143,7 @@ Type
     function  Push(Item: Integer): Integer;
     function  Pop: Integer; inline;
     function  Peek: Integer; inline;
+    function  ToArray: TArray<Integer>;
   end;
 
   {-----------------------------------------}
@@ -180,6 +181,7 @@ Type
     function  Push(Item: Cardinal): Cardinal;
     function  Pop: Cardinal; inline;
     function  Peek: Cardinal; inline;
+    function  ToArray: TArray<Cardinal>;
   end;
 
   {-----------------------------------}
@@ -217,6 +219,7 @@ Type
     function  Push(Item: Int64): Int64;
     function  Pop: Int64; inline;
     function  Peek: Int64; inline;
+    function  ToArray: TArray<Int64>;
   end;
 
   {-------------------------------------------}
@@ -254,6 +257,7 @@ Type
     function  Push(Item: NativeInt): NativeInt;
     function  Pop: NativeInt; inline;
     function  Peek: NativeInt; inline;
+    function  ToArray: TArray<NativeInt>;
   end;
 
   {-------------------------------------}
@@ -291,6 +295,7 @@ Type
     function  Push(Item: Double): Double;
     function  Pop: Double; inline;
     function  Peek: Double; inline;
+    function  ToArray: TArray<Double>;
   end;
 
   {------------------------}
@@ -916,6 +921,15 @@ begin
   Result := GetItem(Count-1);
 end;
 
+{***********************************************}
+function TALIntegerList.ToArray: TArray<Integer>;
+var i: integer;
+begin
+  SetLength(Result, Count);
+  for I := 0 to Count - 1 do
+    Result[i] := GetItem(i);
+end;
+
 {**********************************************************}
 function TALCardinalList.Add(const Item: Cardinal): Integer;
 begin
@@ -1114,6 +1128,15 @@ begin
   Result := GetItem(Count-1);
 end;
 
+{*************************************************}
+function TALCardinalList.ToArray: TArray<cardinal>;
+var i: integer;
+begin
+  SetLength(Result, Count);
+  for I := 0 to Count - 1 do
+    Result[i] := GetItem(i);
+end;
+
 {****************************************************}
 function TALInt64List.Add(const Item: Int64): Integer;
 begin
@@ -1295,6 +1318,15 @@ end;
 function TALInt64List.Peek: int64;
 begin
   Result := GetItem(Count-1);
+end;
+
+{*******************************************}
+function TALInt64List.ToArray: TArray<int64>;
+var i: integer;
+begin
+  SetLength(Result, Count);
+  for I := 0 to Count - 1 do
+    Result[i] := GetItem(i);
 end;
 
 {************************************************************}
@@ -1495,6 +1527,15 @@ begin
   Result := GetItem(Count-1);
 end;
 
+{***************************************************}
+function TALNativeIntList.ToArray: TArray<NativeInt>;
+var i: integer;
+begin
+  SetLength(Result, Count);
+  for I := 0 to Count - 1 do
+    Result[i] := GetItem(i);
+end;
+
 {******************************************************}
 function TALDoubleList.Add(const Item: Double): Integer;
 begin
@@ -1676,6 +1717,15 @@ end;
 function TALDoubleList.Peek: Double;
 begin
   Result := GetItem(Count-1);
+end;
+
+{*********************************************}
+function TALDoubleList.ToArray: TArray<Double>;
+var i: integer;
+begin
+  SetLength(Result, Count);
+  for I := 0 to Count - 1 do
+    Result[i] := GetItem(i);
 end;
 
 {***}

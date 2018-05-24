@@ -2328,10 +2328,10 @@ Var Buffer: AnsiString;
 
       //error if Paths.Count = 0 (mean one end object/array without any starting)
       if assigned(ObjectPaths) then begin
-        if (ObjectPaths.Count = 0) then ALJSONDocError(cALBSONParseError);
+        if (ObjectPaths.Count = 0) then ALJSONDocError(cALJSONParseError);
       end
       else begin
-        if (NamePaths.Count = 0) then ALJSONDocError(cALBSONParseError);
+        if (NamePaths.Count = 0) then ALJSONDocError(cALJSONParseError);
       end;
 
       //if we are not in sax mode
@@ -2346,7 +2346,7 @@ Var Buffer: AnsiString;
 
         //calculate anodeTypeInt
         aNodeType := aNode.NodeType;
-        if not (aNodeType in [ntObject, ntarray]) then ALJSONDocError(cALBSONParseError);
+        if not (aNodeType in [ntObject, ntarray]) then ALJSONDocError(cALJSONParseError);
 
         //check that the end object/array correspond to the aNodeType
         if ((c = '}') and
@@ -2380,7 +2380,7 @@ Var Buffer: AnsiString;
 
          //calculate anodeTypeInt
         aNodeType := TALJSONNodeType(NamePaths.Objects[NamePaths.Count - 1]);
-        if not (anodeType in [ntObject,ntarray]) then ALJSONDocError(cALBSONParseError);
+        if not (anodeType in [ntObject,ntarray]) then ALJSONDocError(cALJSONParseError);
 
         //check that the end object/array correspond to the aNodeType
         if ((c = '}') and
@@ -5258,7 +5258,10 @@ begin
     nstFloat: begin
                 PInt64(@aDouble)^ := GetNodeValueInt64;
                 aInt64 := trunc(aDouble);
-                if (aInt64 <> aDouble) or
+                if (aInt64 <> aDouble) or // https://stackoverflow.com/questions/41779801/single-double-and-precision
+                                          // Only values that are in form m*2^e, where m and e are integers can be stored in a floating point variable
+                                          // so all integer can be store in the form m*2^e (ie: m = m*2^0)
+                                          // so we can compare aInt64 <> aDouble without the need of samevalue
                    (aInt64 > system.int32.MaxValue) or
                    (aInt64 < system.int32.MinValue) then AlJSONDocError(cALJSONInvalidBSONNodeSubType);
                 result := aint64;
@@ -5298,7 +5301,10 @@ begin
     nstFloat: begin
                 PInt64(@aDouble)^ := GetNodeValueInt64;
                 result := trunc(aDouble);
-                if result <> aDouble then AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+                if result <> aDouble then AlJSONDocError(cALJSONInvalidBSONNodeSubType); // https://stackoverflow.com/questions/41779801/single-double-and-precision
+                                                                                         // Only values that are in form m*2^e, where m and e are integers can be stored in a floating point variable
+                                                                                         // so all integer can be store in the form m*2^e (ie: m = m*2^0)
+                                                                                         // so we can compare result <> aDouble without the need of samevalue
               end;
     nstInt32,
     nstInt64: Result := GetNodeValueInt64;
@@ -8645,10 +8651,10 @@ Var BufferLength: Integer;
 
       //error if Paths.Count = 0 (mean one end object/array without any starting)
       if assigned(ObjectPaths) then begin
-        if (ObjectPaths.Count = 0) then ALJSONDocErrorU(cALBSONParseError);
+        if (ObjectPaths.Count = 0) then ALJSONDocErrorU(cALJSONParseError);
       end
       else begin
-        if (NamePaths.Count = 0) then ALJSONDocErrorU(cALBSONParseError);
+        if (NamePaths.Count = 0) then ALJSONDocErrorU(cALJSONParseError);
       end;
 
       //if we are not in sax mode
@@ -8663,7 +8669,7 @@ Var BufferLength: Integer;
 
         //calculate anodeTypeInt
         aNodeType := aNode.NodeType;
-        if not (aNodeType in [ntObject, ntarray]) then ALJSONDocErrorU(cALBSONParseError);
+        if not (aNodeType in [ntObject, ntarray]) then ALJSONDocErrorU(cALJSONParseError);
 
         //check that the end object/array correspond to the aNodeType
         if ((c = '}') and
@@ -8697,7 +8703,7 @@ Var BufferLength: Integer;
 
          //calculate anodeTypeInt
         aNodeType := TALJSONNodeType(NamePaths.Objects[NamePaths.Count - 1]);
-        if not (anodeType in [ntObject,ntarray]) then ALJSONDocErrorU(cALBSONParseError);
+        if not (anodeType in [ntObject,ntarray]) then ALJSONDocErrorU(cALJSONParseError);
 
         //check that the end object/array correspond to the aNodeType
         if ((c = '}') and
@@ -11483,7 +11489,10 @@ begin
     nstFloat: begin
                 PInt64(@aDouble)^ := GetNodeValueInt64;
                 aInt64 := trunc(aDouble);
-                if (aInt64 <> aDouble) or
+                if (aInt64 <> aDouble) or // https://stackoverflow.com/questions/41779801/single-double-and-precision
+                                          // Only values that are in form m*2^e, where m and e are integers can be stored in a floating point variable
+                                          // so all integer can be store in the form m*2^e (ie: m = m*2^0)
+                                          // so we can compare aInt64 <> aDouble without the need of samevalue
                    (aInt64 > system.int32.MaxValue) or
                    (aInt64 < system.int32.MinValue) then ALJSONDocErrorU(cALJSONInvalidBSONNodeSubType);
                 result := aint64;
@@ -11523,7 +11532,10 @@ begin
     nstFloat: begin
                 PInt64(@aDouble)^ := GetNodeValueInt64;
                 result := trunc(aDouble);
-                if result <> aDouble then ALJSONDocErrorU(cALJSONInvalidBSONNodeSubType);
+                if result <> aDouble then ALJSONDocErrorU(cALJSONInvalidBSONNodeSubType); // https://stackoverflow.com/questions/41779801/single-double-and-precision
+                                                                                          // Only values that are in form m*2^e, where m and e are integers can be stored in a floating point variable
+                                                                                          // so all integer can be store in the form m*2^e (ie: m = m*2^0)
+                                                                                          // so we can compare result <> aDouble without the need of samevalue
               end;
     nstInt32,
     nstInt64: Result := GetNodeValueInt64;

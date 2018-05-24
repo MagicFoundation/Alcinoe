@@ -315,12 +315,11 @@ function CryptGenRandom(hProv: HCRYPTPROV;
 procedure ALRandomBytes(const Dest; const Len: Cardinal); overload;
 function ALRandomBytes(const Len: Cardinal): TBytes; overload;
 function ALRandomByteStr(const Len: Cardinal): ansiString;
-function ALRandom32(const ARange: Cardinal): cardinal;
-function ALRandom64(const ARange: UInt64): UInt64;
 
 {$ENDIF}
 
-
+function ALRandom32(const ARange: Cardinal): cardinal;
+function ALRandom64(const ARange: UInt64): UInt64;
 
 ///////////////////
 ////// Fnv1a //////
@@ -4406,14 +4405,22 @@ begin
   result := result mod ARange;
 end;
 
+{$ELSE}
+
+{****************************************************}
+function ALRandom32(const ARange: Cardinal): cardinal;
+begin
+  result := cardinal(Random(integer(ARange)));
+end;
+
+{$ENDIF}
+
 {************************************************}
 function ALRandom64(const ARange: UInt64): UInt64;
 begin
   Result := (UInt64(ALRandom32(ALMAXUInt)) shl 32) or ((UInt64(ALRandom32(ALMAXUInt)) shl 32) shr 32);
   result := result mod ARange;
 end;
-
-{$ENDIF}
 
 
 

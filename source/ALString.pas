@@ -7237,6 +7237,7 @@ function ALIsDecimal(const S: AnsiString; const RejectPlusMinusSign: boolean = F
 var i: integer;
 begin
   result := true;
+  if S = '' then Exit(false);
   for i := low(s) to high(S) do begin
     if (not RejectPlusMinusSign) and (i=low(s)) then begin
       if not (S[i] in ['0'..'9','-','+']) then begin
@@ -7277,6 +7278,7 @@ Function  ALIsFloat (const S: AnsiString; const AFormatSettings: TALFormatSettin
 var i: integer;
     aDouble: Double;
 begin
+  if S = '' then Exit(false);
   for i := low(s) to high(s) do begin
     if not (S[i] in ['0'..'9','-',AFormatSettings.DecimalSeparator]) then begin
       result := false;
@@ -7322,6 +7324,7 @@ function ALIsDecimalU(const S: String; const RejectPlusMinusSign: boolean = Fals
 var i: integer;
 begin
   result := true;
+  if S = '' then Exit(false);
   for i := low(s) to high(S) do begin
     if (not RejectPlusMinusSign) and (i=low(s)) then begin
       if not CharInSet(S[i], ['0'..'9','-','+']) then begin
@@ -7364,6 +7367,7 @@ Function  ALIsFloatU(const S: String; const AFormatSettings: TALFormatSettingsU)
 var i: integer;
     aDouble: Double;
 begin
+  if S = '' then Exit(false);
   for i := low(s) to high(s) do begin
     if not CharInSet(S[i], ['0'..'9','-',AFormatSettings.DecimalSeparator]) then begin
       result := false;

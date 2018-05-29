@@ -145,6 +145,7 @@ interface
 
 uses system.Classes,
      system.sysutils,
+     system.types,
      {$IFNDEF NEXTGEN}
        ALXmlDoc,
      {$ENDIF}
@@ -263,16 +264,16 @@ type
     function Extract(const index: integer): TALJSONNode; overload;
     function Extract(const Node: TALJSONNode): TALJSONNode; overload;
     procedure Exchange(Index1, Index2: Integer);
-    function FindNode(const NodeName: AnsiString): TALJSONNode; overload;
+    function FindNode(const NodeName: AnsiString; const Direction: TDirection = TDirection.FromBeginning): TALJSONNode; overload;
     function FindSibling(const Node: TALJSONNode; Delta: Integer): TALJSONNode;
     function First: TALJSONNode;
-    function IndexOf(const Name: AnsiString): Integer; overload;
-    function IndexOf(const Node: TALJSONNode): Integer; overload;
-    function IndexOfValue(const Value: ansiString): Integer; overload;
-    function IndexOfValue(const Value: integer): Integer; overload;
-    function IndexOfValue(const Value: int64): Integer; overload;
-    function IndexOfValue(const Value: Double): Integer; overload;
-    function IndexOfValue(const Value: TDateTime): Integer; overload;
+    function IndexOf(const Name: AnsiString; const Direction: TDirection = TDirection.FromBeginning): Integer; overload;
+    function IndexOf(const Node: TALJSONNode; const Direction: TDirection = TDirection.FromBeginning): Integer; overload;
+    function IndexOfValue(const Value: ansiString; const Direction: TDirection = TDirection.FromBeginning): Integer; overload;
+    function IndexOfValue(const Value: integer; const Direction: TDirection = TDirection.FromBeginning): Integer; overload;
+    function IndexOfValue(const Value: int64; const Direction: TDirection = TDirection.FromBeginning): Integer; overload;
+    function IndexOfValue(const Value: Double; const Direction: TDirection = TDirection.FromBeginning): Integer; overload;
+    function IndexOfValue(const Value: TDateTime; const Direction: TDirection = TDirection.FromBeginning): Integer; overload;
     function Last: TALJSONNode;
     function Remove(const Node: TALJSONNode): Integer;
     function ReplaceNode(const OldNode, NewNode: TALJSONNode): TALJSONNode;
@@ -364,6 +365,7 @@ type
     function GetBinarySubType: byte; overload;
     procedure SetBinarySubType(const Subtype: byte);
     function AddChild(const NodeName: AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode; overload;
+    function AddChild(const Path: array of AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode; overload;
     function AddChild(const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode; overload;
     function NextSibling: TALJSONNode;
     function PreviousSibling: TALJSONNode;
@@ -572,7 +574,8 @@ type
     destructor Destroy; override;
     procedure MultiThreadPrepare;
     procedure Clear;
-    function AddChild(const NodeName: AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode;
+    function AddChild(const NodeName: AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode; overload;
+    function AddChild(const Path: array of AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode; overload;
     function CreateNode(const NodeName: AnsiString; NodeType: TALJSONNodeType): TALJSONNode;
     function IsEmptyDoc: Boolean;
     procedure LoadFromJSONString(const Str: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
@@ -730,16 +733,16 @@ type
     function Extract(const index: integer): TALJSONNodeU; overload;
     function Extract(const Node: TALJSONNodeU): TALJSONNodeU; overload;
     procedure Exchange(Index1, Index2: Integer);
-    function FindNode(const NodeName: String): TALJSONNodeU; overload;
+    function FindNode(const NodeName: String; const Direction: TDirection = TDirection.FromBeginning): TALJSONNodeU; overload;
     function FindSibling(const Node: TALJSONNodeU; Delta: Integer): TALJSONNodeU;
     function First: TALJSONNodeU;
-    function IndexOf(const Name: String): Integer; overload;
-    function IndexOf(const Node: TALJSONNodeU): Integer; overload;
-    function IndexOfValue(const Value: String): Integer; overload;
-    function IndexOfValue(const Value: integer): Integer; overload;
-    function IndexOfValue(const Value: int64): Integer; overload;
-    function IndexOfValue(const Value: Double): Integer; overload;
-    function IndexOfValue(const Value: TDateTime): Integer; overload;
+    function IndexOf(const Name: String; const Direction: TDirection = TDirection.FromBeginning): Integer; overload;
+    function IndexOf(const Node: TALJSONNodeU; const Direction: TDirection = TDirection.FromBeginning): Integer; overload;
+    function IndexOfValue(const Value: String; const Direction: TDirection = TDirection.FromBeginning): Integer; overload;
+    function IndexOfValue(const Value: integer; const Direction: TDirection = TDirection.FromBeginning): Integer; overload;
+    function IndexOfValue(const Value: int64; const Direction: TDirection = TDirection.FromBeginning): Integer; overload;
+    function IndexOfValue(const Value: Double; const Direction: TDirection = TDirection.FromBeginning): Integer; overload;
+    function IndexOfValue(const Value: TDateTime; const Direction: TDirection = TDirection.FromBeginning): Integer; overload;
     function Last: TALJSONNodeU;
     function Remove(const Node: TALJSONNodeU): Integer;
     function ReplaceNode(const OldNode, NewNode: TALJSONNodeU): TALJSONNodeU;
@@ -832,6 +835,7 @@ type
     function GetBinarySubType: byte; overload;
     procedure SetBinarySubType(const Subtype: byte);
     function AddChild(const NodeName: String; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU; overload;
+    function AddChild(const Path: array of String; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU; overload;
     function AddChild(const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU; overload;
     function NextSibling: TALJSONNodeU;
     function PreviousSibling: TALJSONNodeU;
@@ -1040,7 +1044,8 @@ type
     destructor Destroy; override;
     procedure MultiThreadPrepare;
     procedure Clear;
-    function AddChild(const NodeName: String; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU;
+    function AddChild(const NodeName: String; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU; overload;
+    function AddChild(const Path: array of String; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU; overload;
     function CreateNode(const NodeName: String; NodeType: TALJSONNodeType): TALJSONNodeU;
     function IsEmptyDoc: Boolean;
     procedure LoadFromJSONString(const Str: String; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
@@ -4087,6 +4092,12 @@ begin
   Result := Node.AddChild(NodeName, NodeType, Index);
 end;
 
+{***************************************************************************************************************************************************}
+function TALJSONDocument.AddChild(const Path: array of AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode;
+begin
+  Result := Node.AddChild(Path, NodeType, Index);
+end;
+
 {******************************************************************************************************}
 function TALJSONDocument.CreateNode(const NodeName: AnsiString; NodeType: TALJSONNodeType): TALJSONNode;
 begin
@@ -5650,6 +5661,21 @@ begin
   end;
 end;
 
+{***********************************************************************************************************************************************}
+function TALJSONNode.AddChild(const Path: array of AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode;
+var aNode: TALJSONNode;
+    aTmpNode: TALJSONNode;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aTmpNode := aNode.ChildNodes.findNode(path[i], TDirection.FromEnd);
+    if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
+    else aNode := aTmpNode;
+  end;
+  result := aNode.addChild(path[high(path)], NodeType, Index);
+end;
+
 {**************************************************************************************************************}
 function TALJSONNode.AddChild(const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode;
 begin
@@ -6769,11 +6795,17 @@ end;
  *Node is the object node to locate.
  IndexOf returns the index of the specified node, where 0 is the index of the first node, 1 is the
  index of the second node, and so on. If the specified node is not in the list, IndexOf returns -1.}
-function TALJSONNodeList.IndexOf(const Node: TALJSONNode): Integer;
+function TALJSONNodeList.IndexOf(const Node: TALJSONNode; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
-  Result := 0;
-  while (Result < FCount) and (FList[Result] <> Node) do Inc(Result);
-  if Result = FCount then Result := -1;
+  if Direction = TDirection.FromBeginning then begin
+    for Result := 0 to Count - 1 do
+      if FList[Result] = Node then Exit;
+  end
+  else begin
+    for Result := Count - 1 downto 0 do
+      if FList[Result] = Node then Exit;
+  end;
+  Result := -1;
 end;
 
 {*************************************}
@@ -6782,50 +6814,86 @@ end;
  *Name is the NodeName property of the node to locate.
  IndexOf returns the index of the specified node, where 0 is the index of the first node, 1 is the
  index of the second node, and so on. If the specified node is not in the list, IndexOf returns -1.}
-function TALJSONNodeList.IndexOf(const Name: AnsiString): Integer;
+function TALJSONNodeList.IndexOf(const Name: AnsiString; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
-  for Result := 0 to Count - 1 do
-    if ALNodeMatches(Get(Result), Name) then Exit;
+  if Direction = TDirection.FromBeginning then begin
+    for Result := 0 to Count - 1 do
+      if ALNodeMatches(Get(Result), Name) then Exit;
+  end
+  else begin
+    for Result := Count - 1 downto 0 do
+      if ALNodeMatches(Get(Result), Name) then Exit;
+  end;
   Result := -1;
 end;
 
-{**********************************************************************}
-function TALJSONNodeList.IndexOfValue(const Value: ansiString): Integer;
+{******************************************************************************************************************************}
+function TALJSONNodeList.IndexOfValue(const Value: ansiString; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
-  for Result := 0 to Count - 1 do
-    if (Get(Result).Text = Value) then Exit;
+  if Direction = TDirection.FromBeginning then begin
+    for Result := 0 to Count - 1 do
+      if (Get(Result).Text = Value) then Exit;
+  end
+  else begin
+    for Result := Count - 1 downto 0 do
+      if (Get(Result).Text = Value) then Exit;
+  end;
   Result := -1;
 end;
 
-{*******************************************************************}
-function TALJSONNodeList.IndexOfValue(const Value: integer): Integer;
+{***************************************************************************************************************************}
+function TALJSONNodeList.IndexOfValue(const Value: integer; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
-  for Result := 0 to Count - 1 do
-    if (Get(Result).int32 = Value) then Exit;
+  if Direction = TDirection.FromBeginning then begin
+    for Result := 0 to Count - 1 do
+      if (Get(Result).int32 = Value) then Exit;
+  end
+  else begin
+    for Result := Count - 1 downto 0 do
+      if (Get(Result).int32 = Value) then Exit;
+  end;
   Result := -1;
 end;
 
-{*****************************************************************}
-function TALJSONNodeList.IndexOfValue(const Value: int64): Integer;
+{*************************************************************************************************************************}
+function TALJSONNodeList.IndexOfValue(const Value: int64; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
-  for Result := 0 to Count - 1 do
-    if (Get(Result).int64 = Value) then Exit;
+  if Direction = TDirection.FromBeginning then begin
+    for Result := 0 to Count - 1 do
+      if (Get(Result).int64 = Value) then Exit;
+  end
+  else begin
+    for Result := Count - 1 downto 0 do
+      if (Get(Result).int64 = Value) then Exit;
+  end;
   Result := -1;
 end;
 
-{******************************************************************}
-function TALJSONNodeList.IndexOfValue(const Value: Double): Integer;
+{**************************************************************************************************************************}
+function TALJSONNodeList.IndexOfValue(const Value: Double; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
-  for Result := 0 to Count - 1 do
-    if (Get(Result).float = Value) then Exit;
+  if Direction = TDirection.FromBeginning then begin
+    for Result := 0 to Count - 1 do
+      if (Get(Result).float = Value) then Exit;
+  end
+  else begin
+    for Result := Count - 1 downto 0 do
+      if (Get(Result).float = Value) then Exit;
+  end;
   Result := -1;
 end;
 
-{*********************************************************************}
-function TALJSONNodeList.IndexOfValue(const Value: TDateTime): Integer;
+{*****************************************************************************************************************************}
+function TALJSONNodeList.IndexOfValue(const Value: TDateTime; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
-  for Result := 0 to Count - 1 do
-    if (Get(Result).DateTime = Value) then Exit;
+  if Direction = TDirection.FromBeginning then begin
+    for Result := 0 to Count - 1 do
+      if (Get(Result).DateTime = Value) then Exit;
+  end
+  else begin
+    for Result := Count - 1 downto 0 do
+      if (Get(Result).DateTime = Value) then Exit;
+  end;
   Result := -1;
 end;
 
@@ -6835,10 +6903,10 @@ end;
  *NodeName is the node to access. It specifies the NodeName property of the desired node.
  FindNode returns the object of the node if it is in the list. If NodeName does not specify a node in the list,
  FindNode returns nil (Delphi) or NULL (C++).}
-function TALJSONNodeList.FindNode(const NodeName: AnsiString): TALJSONNode;
+function TALJSONNodeList.FindNode(const NodeName: AnsiString; const Direction: TDirection = TDirection.FromBeginning): TALJSONNode;
 var Index: Integer;
 begin
-  Index := IndexOf(NodeName);
+  Index := IndexOf(NodeName, Direction);
   if Index >= 0 then Result := Get(Index)
   else Result := nil;
 end;
@@ -10318,6 +10386,12 @@ begin
   Result := Node.AddChild(NodeName, NodeType, Index);
 end;
 
+{*************************************************************************************************************************************************}
+function TALJSONDocumentU.AddChild(const Path: array of String; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU;
+begin
+  Result := Node.AddChild(Path, NodeType, Index);
+end;
+
 {****************************************************************************************************}
 function TALJSONDocumentU.CreateNode(const NodeName: String; NodeType: TALJSONNodeType): TALJSONNodeU;
 begin
@@ -11881,6 +11955,21 @@ begin
   end;
 end;
 
+{*********************************************************************************************************************************************}
+function TALJSONNodeU.AddChild(const Path: array of String; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU;
+var aNode: TALJSONNodeU;
+    aTmpNode: TALJSONNodeU;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aTmpNode := aNode.ChildNodes.findNode(path[i], TDirection.FromEnd);
+    if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
+    else aNode := aTmpNode;
+  end;
+  result := aNode.addChild(path[high(path)], NodeType, Index);
+end;
+
 {****************************************************************************************************************}
 function TALJSONNodeU.AddChild(const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU;
 begin
@@ -13037,11 +13126,17 @@ end;
  *Node is the object node to locate.
  IndexOf returns the index of the specified node, where 0 is the index of the first node, 1 is the
  index of the second node, and so on. If the specified node is not in the list, IndexOf returns -1.}
-function TALJSONNodeListU.IndexOf(const Node: TALJSONNodeU): Integer;
+function TALJSONNodeListU.IndexOf(const Node: TALJSONNodeU; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
-  Result := 0;
-  while (Result < FCount) and (FList[Result] <> Node) do Inc(Result);
-  if Result = FCount then Result := -1;
+  if Direction = TDirection.FromBeginning then begin
+    for Result := 0 to Count - 1 do
+      if FList[Result] = Node then Exit;
+  end
+  else begin
+    for Result := Count - 1 downto 0 do
+      if FList[Result] = Node then Exit;
+  end;
+  Result := -1;
 end;
 
 {*************************************}
@@ -13050,50 +13145,86 @@ end;
  *Name is the NodeName property of the node to locate.
  IndexOf returns the index of the specified node, where 0 is the index of the first node, 1 is the
  index of the second node, and so on. If the specified node is not in the list, IndexOf returns -1.}
-function TALJSONNodeListU.IndexOf(const Name: String): Integer;
+function TALJSONNodeListU.IndexOf(const Name: String; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
-  for Result := 0 to Count - 1 do
-    if ALNodeMatchesU(Get(Result), Name) then Exit;
+  if Direction = TDirection.FromBeginning then begin
+    for Result := 0 to Count - 1 do
+      if ALNodeMatchesU(Get(Result), Name) then Exit;
+  end
+  else begin
+    for Result := Count - 1 downto 0 do
+      if ALNodeMatchesU(Get(Result), Name) then Exit;
+  end;
   Result := -1;
 end;
 
-{*******************************************************************}
-function TALJSONNodeListU.IndexOfValue(const Value: String): Integer;
+{***************************************************************************************************************************}
+function TALJSONNodeListU.IndexOfValue(const Value: String; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
-  for Result := 0 to Count - 1 do
-    if (Get(Result).Text = Value) then Exit;
+  if Direction = TDirection.FromBeginning then begin
+    for Result := 0 to Count - 1 do
+      if (Get(Result).Text = Value) then Exit;
+  end
+  else begin
+    for Result := Count - 1 downto 0 do
+      if (Get(Result).Text = Value) then Exit;
+  end;
   Result := -1;
 end;
 
-{********************************************************************}
-function TALJSONNodeListU.IndexOfValue(const Value: integer): Integer;
+{****************************************************************************************************************************}
+function TALJSONNodeListU.IndexOfValue(const Value: integer; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
-  for Result := 0 to Count - 1 do
-    if (Get(Result).int32 = Value) then Exit;
+  if Direction = TDirection.FromBeginning then begin
+    for Result := 0 to Count - 1 do
+      if (Get(Result).int32 = Value) then Exit;
+  end
+  else begin
+    for Result := Count - 1 downto 0 do
+      if (Get(Result).int32 = Value) then Exit;
+  end;
   Result := -1;
 end;
 
-{******************************************************************}
-function TALJSONNodeListU.IndexOfValue(const Value: int64): Integer;
+{**************************************************************************************************************************}
+function TALJSONNodeListU.IndexOfValue(const Value: int64; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
-  for Result := 0 to Count - 1 do
-    if (Get(Result).int64 = Value) then Exit;
+  if Direction = TDirection.FromBeginning then begin
+    for Result := 0 to Count - 1 do
+      if (Get(Result).int64 = Value) then Exit;
+  end
+  else begin
+    for Result := Count - 1 downto 0 do
+      if (Get(Result).int64 = Value) then Exit;
+  end;
   Result := -1;
 end;
 
-{*******************************************************************}
-function TALJSONNodeListU.IndexOfValue(const Value: Double): Integer;
+{***************************************************************************************************************************}
+function TALJSONNodeListU.IndexOfValue(const Value: Double; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
-  for Result := 0 to Count - 1 do
-    if (Get(Result).float = Value) then Exit;
+  if Direction = TDirection.FromBeginning then begin
+    for Result := 0 to Count - 1 do
+      if (Get(Result).float = Value) then Exit;
+  end
+  else begin
+    for Result := Count - 1 downto 0 do
+      if (Get(Result).float = Value) then Exit;
+  end;
   Result := -1;
 end;
 
-{**********************************************************************}
-function TALJSONNodeListU.IndexOfValue(const Value: TDateTime): Integer;
+{******************************************************************************************************************************}
+function TALJSONNodeListU.IndexOfValue(const Value: TDateTime; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
-  for Result := 0 to Count - 1 do
-    if (Get(Result).DateTime = Value) then Exit;
+  if Direction = TDirection.FromBeginning then begin
+    for Result := 0 to Count - 1 do
+      if (Get(Result).DateTime = Value) then Exit;
+  end
+  else begin
+    for Result := Count - 1 downto 0 do
+      if (Get(Result).DateTime = Value) then Exit;
+  end;
   Result := -1;
 end;
 
@@ -13103,10 +13234,10 @@ end;
  *NodeName is the node to access. It specifies the NodeName property of the desired node.
  FindNode returns the object of the node if it is in the list. If NodeName does not specify a node in the list,
  FindNode returns nil (Delphi) or NULL (C++).}
-function TALJSONNodeListU.FindNode(const NodeName: String): TALJSONNodeU;
+function TALJSONNodeListU.FindNode(const NodeName: String; const Direction: TDirection = TDirection.FromBeginning): TALJSONNodeU;
 var Index: Integer;
 begin
-  Index := IndexOf(NodeName);
+  Index := IndexOf(NodeName, Direction);
   if Index >= 0 then Result := Get(Index)
   else Result := nil;
 end;

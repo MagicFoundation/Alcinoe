@@ -134,6 +134,8 @@ Type
     function  IndexOfObject(AObject: TObject): Integer;
     function  Add(const Item: integer): Integer;
     Function  AddObject(const Item: integer; AObject: TObject): Integer;
+    function  TryAdd(const Item: integer): boolean;
+    Function  TryAddObject(const Item: integer; AObject: TObject): boolean;
     function  Find(item: Integer; var Index: Integer): Boolean;
     procedure Insert(Index: Integer; const item: integer);
     procedure InsertObject(Index: Integer; const item: integer; AObject: TObject);
@@ -172,6 +174,8 @@ Type
     function  IndexOfObject(AObject: TObject): Integer;
     function  Add(const Item: Cardinal): Integer;
     Function  AddObject(const Item: Cardinal; AObject: TObject): Integer;
+    function  TryAdd(const Item: Cardinal): boolean;
+    Function  TryAddObject(const Item: Cardinal; AObject: TObject): boolean;
     function  Find(item: Cardinal; var Index: Integer): Boolean;
     procedure Insert(Index: Integer; const item: Cardinal);
     procedure InsertObject(Index: Integer; const item: Cardinal; AObject: TObject);
@@ -210,6 +214,8 @@ Type
     function  IndexOfObject(AObject: TObject): Integer;
     function  Add(const Item: Int64): Integer;
     Function  AddObject(const Item: Int64; AObject: TObject): Integer;
+    function  TryAdd(const Item: Int64): boolean;
+    Function  TryAddObject(const Item: Int64; AObject: TObject): boolean;
     function  Find(item: Int64; var Index: Integer): Boolean;
     procedure Insert(Index: Integer; const item: Int64);
     procedure InsertObject(Index: Integer; const item: Int64; AObject: TObject);
@@ -248,6 +254,8 @@ Type
     function  IndexOfObject(AObject: TObject): Integer;
     function  Add(const Item: NativeInt): Integer;
     Function  AddObject(const Item: NativeInt; AObject: TObject): Integer;
+    function  TryAdd(const Item: NativeInt): boolean;
+    Function  TryAddObject(const Item: NativeInt; AObject: TObject): boolean;
     function  Find(item: NativeInt; var Index: Integer): Boolean;
     procedure Insert(Index: Integer; const item: NativeInt);
     procedure InsertObject(Index: Integer; const item: NativeInt; AObject: TObject);
@@ -286,6 +294,8 @@ Type
     function  IndexOfObject(AObject: TObject): Integer;
     function  Add(const Item: Double): Integer;
     Function  AddObject(const Item: Double; AObject: TObject): Integer;
+    function  TryAdd(const Item: Double): boolean;
+    Function  TryAddObject(const Item: Double; AObject: TObject): boolean;
     function  Find(item: Double; var Index: Integer): Boolean;
     procedure Insert(Index: Integer; const item: Double);
     procedure InsertObject(Index: Integer; const item: Double; AObject: TObject);
@@ -756,6 +766,26 @@ begin
   InsertItem(Result, Item, AObject);
 end;
 
+{***********************************************************}
+function TALIntegerList.TryAdd(const Item: integer): Boolean;
+begin
+  Result := TryAddObject(Item, nil);
+end;
+
+{***********************************************************************************}
+function TALIntegerList.TryAddObject(const Item: integer; AObject: TObject): Boolean;
+var aIndex: integer;
+begin
+  if not Sorted then aIndex := FCount
+  else if Find(Item, aIndex) then
+    case Duplicates of
+      dupIgnore,
+      dupError: Exit(False);
+    end;
+  InsertItem(aIndex, Item, AObject);
+  result := true;
+end;
+
 {*****************************************************************************************}
 procedure TALIntegerList.InsertItem(Index: Integer; const item: integer; AObject: TObject);
 Var aPALIntegerListItem: PALIntegerListItem;
@@ -946,6 +976,26 @@ begin
       dupError: Error(@SALDuplicateItem, 0);
     end;
   InsertItem(Result, Item, AObject);
+end;
+
+{*************************************************************}
+function TALCardinalList.TryAdd(const Item: Cardinal): Boolean;
+begin
+  Result := TryAddObject(Item, nil);
+end;
+
+{*************************************************************************************}
+function TALCardinalList.TryAddObject(const Item: Cardinal; AObject: TObject): Boolean;
+var aIndex: integer;
+begin
+  if not Sorted then aIndex := FCount
+  else if Find(Item, aIndex) then
+    case Duplicates of
+      dupIgnore,
+      dupError: Exit(False);
+    end;
+  InsertItem(aIndex, Item, AObject);
+  result := true;
 end;
 
 {*******************************************************************************************}
@@ -1155,6 +1205,26 @@ begin
   InsertItem(Result, Item, AObject);
 end;
 
+{*******************************************************}
+function TALInt64List.TryAdd(const Item: Int64): Boolean;
+begin
+  Result := TryAddObject(Item, nil);
+end;
+
+{*******************************************************************************}
+function TALInt64List.TryAddObject(const Item: Int64; AObject: TObject): Boolean;
+var aIndex: integer;
+begin
+  if not Sorted then aIndex := FCount
+  else if Find(Item, aIndex) then
+    case Duplicates of
+      dupIgnore,
+      dupError: Exit(False);
+    end;
+  InsertItem(aIndex, Item, AObject);
+  result := true;
+end;
+
 {*************************************************************************************}
 procedure TALInt64List.InsertItem(Index: Integer; const item: Int64; AObject: TObject);
 Var aPALInt64ListItem: PALInt64ListItem;
@@ -1345,6 +1415,26 @@ begin
       dupError: Error(@SALDuplicateItem, 0);
     end;
   InsertItem(Result, Item, AObject);
+end;
+
+{***************************************************************}
+function TALNativeIntList.TryAdd(const Item: NativeInt): Boolean;
+begin
+  Result := TryAddObject(Item, nil);
+end;
+
+{***************************************************************************************}
+function TALNativeIntList.TryAddObject(const Item: NativeInt; AObject: TObject): Boolean;
+var aIndex: integer;
+begin
+  if not Sorted then aIndex := FCount
+  else if Find(Item, aIndex) then
+    case Duplicates of
+      dupIgnore,
+      dupError: Exit(False);
+    end;
+  InsertItem(aIndex, Item, AObject);
+  result := true;
 end;
 
 {*********************************************************************************************}
@@ -1552,6 +1642,26 @@ begin
       dupError: Error(@SALDuplicateItem, 0);
     end;
   InsertItem(Result, Item, AObject);
+end;
+
+{*********************************************************}
+function TALDoubleList.TryAdd(const Item: Double): Boolean;
+begin
+  Result := TryAddObject(Item, nil);
+end;
+
+{*********************************************************************************}
+function TALDoubleList.TryAddObject(const Item: Double; AObject: TObject): Boolean;
+var aIndex: integer;
+begin
+  if not Sorted then aIndex := FCount
+  else if Find(Item, aIndex) then
+    case Duplicates of
+      dupIgnore,
+      dupError: Exit(False);
+    end;
+  InsertItem(aIndex, Item, AObject);
+  result := true;
 end;
 
 {***************************************************************************************}

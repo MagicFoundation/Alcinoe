@@ -90,10 +90,13 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
    * delete also the message from the queue.
    */  
   public static String getPendingDataMessages() {
+    
+    String jsonTxt = "";
+    
     lock.lock();
     try {
       
-      String jsonTxt = getPendingDataMessagesInternal();
+      jsonTxt = getPendingDataMessagesInternal();
 
       try{
         
@@ -102,12 +105,13 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
         
       } 
       catch (Throwable e){ Log.e(TAG, "getPendingDataMessages - Exception", e); }  
-   
-      return jsonTxt;
-      
+         
     } finally {
       lock.unlock();
     }
+
+    return jsonTxt;
+
   }
 
   /**
@@ -125,189 +129,189 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
     // and data payloads are treated as notification messages. The Firebase console always sends notification
     // messages. For more see: https://firebase.google.com/docs/cloud-messaging/concept-options
     
-    lock.lock();
-    try {
-
-      //Log
-      Log.v(TAG, "onMessageReceived");
+    //Log
+    Log.v(TAG, "onMessageReceived");
+    
+    //init data
+    Map<String, String> data = remoteMessage.getData();
+  
+    /* build the intent */
+    Intent intent = new Intent(ACTION_MESSAGERECEIVED);
+    for (Map.Entry<String, String> entry : data.entrySet()) {
+      intent.putExtra(entry.getKey(), entry.getValue()); /* String */
+    }    
+    intent.putExtra("gcm.from", remoteMessage.getFrom()); /* String */
+    intent.putExtra("gcm.message_id", remoteMessage.getMessageId()); /* String */
+    intent.putExtra("gcm.message_type", remoteMessage.getMessageType()); /* String */
+    intent.putExtra("gcm.sent_time", remoteMessage.getSentTime()); /* long */
+    intent.putExtra("gcm.to", remoteMessage.getTo()); /* String */
+    intent.putExtra("gcm.ttl", remoteMessage.getTtl()); /* int */
+    
+    /* send the data to registered receivers */
+    /* sendBroadcast() returns true if there was 1+ receivers, false otherwise */
+    boolean receveirIsPresent;
+    try{
+  
+      receveirIsPresent = LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+  
+    } catch (Throwable e){ 
+      Log.e(TAG, "onMessageReceived - Exception", e); 
+      receveirIsPresent = false; 
+    }  
+                   
+  
+    try{
+  
+      /* if no receveir and not a notification message */
+      if ((!receveirIsPresent) && 
+          (remoteMessage.getNotification() == null)) { 
       
-      //init data
-      Map<String, String> data = remoteMessage.getData();
-    
-      /* build the intent */
-      Intent intent = new Intent(ACTION_MESSAGERECEIVED);
-      for (Map.Entry<String, String> entry : data.entrySet()) {
-        intent.putExtra(entry.getKey(), entry.getValue()); /* String */
-      }    
-      intent.putExtra("gcm.from", remoteMessage.getFrom()); /* String */
-      intent.putExtra("gcm.message_id", remoteMessage.getMessageId()); /* String */
-      intent.putExtra("gcm.message_type", remoteMessage.getMessageType()); /* String */
-      intent.putExtra("gcm.sent_time", remoteMessage.getSentTime()); /* long */
-      intent.putExtra("gcm.to", remoteMessage.getTo()); /* String */
-      intent.putExtra("gcm.ttl", remoteMessage.getTtl()); /* int */
-      
-      /* send the data to registered receivers */
-      /* sendBroadcast() returns true if there was 1+ receivers, false otherwise */
-      boolean receveirIsPresent;
-      try{
-    
-        receveirIsPresent = LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-    
-      } catch (Throwable e){ 
-        Log.e(TAG, "onMessageReceived - Exception", e); 
-        receveirIsPresent = false; 
-      }  
-                     
-    
-      try{
-    
-        /* if no receveir and not a notification message */
-        if ((!receveirIsPresent) && 
-            (remoteMessage.getNotification() == null)) { 
-        
-          /* custom notification is present in data payload */
-          if (data.containsKey("notification") && data.get("notification").equals("1")) {
-                
-            // actually i support these params, but nothing forbid to extends them
-            // notification - Must be equal to 1 to activate showing of custom notification when no receiver
-            // notification.channel - on Android 0 The notification will be posted on this NotificationChannel. 
-            // notification.tag - A string identifier for this notification. 
-            // notification.color - The accent color to use
-            // notification.text - Set the second line of text in the platform notification template.
-            // notification.title - Set the first line of text in the platform notification template.
-            // notification.largeicon - url of the large icon to use - Add a large icon to the notification content view
-            // notification.number - must equal to "auto" to increase the number of items this notification represents.
-            // notification.onlyalertonce - Set this flag if you would only like the sound, vibrate and ticker to be played if the notification is not already showing.      
-            // notification.smallicon - The name of the desired resource. - Set the small icon resource, which will be used to represent the notification in the status bar.
-            // notification.ticker - Set the "ticker" text which is sent to accessibility services (The pop-up Text in Status Bar when the Notification is Called)
-            // notification.vibrate - must equal to 1 to activate the default vibration pattern (0, 1200)
-            // notification.visibility - Specify the value of visibility - One of VISIBILITY_PRIVATE (the default), VISIBILITY_SECRET, or VISIBILITY_PUBLIC.
-            // notification.priority - Relative priority for this notification
-            // notification.sound - Set the sound to play
-            // notification.badgecount - update the shortcut badge count with this number 
-                                 
-            int defaults = NotificationCompat.DEFAULT_LIGHTS;
-            
-            intent.putExtra("notification.presented", "1"); /* this to know in delphi code that it's a notification presented to the user (so if we receive mean he click it) */
-            intent.setClass(context, FMXNativeActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, /* context	Context: The Context in which this PendingIntent should start the activity. */
-                                                                    getUniqueID(), /* requestCode	int: Private request code for the sender */ 
-                                                                    intent, /* intents	Intent: Array of Intents of the activities to be launched. */
-                                                                    PendingIntent.FLAG_UPDATE_CURRENT); /* flags	int: May be FLAG_ONE_SHOT, - Flag indicating that this PendingIntent can be used only once. 
-                                                                                                                              FLAG_NO_CREATE, - Flag indicating that if the described PendingIntent does not already exist, then simply return null instead of creating it.
-                                                                                                                              FLAG_CANCEL_CURRENT, - Flag indicating that if the described PendingIntent already exists, the current one should be canceled before generating a new one. 
-                                                                                                                              FLAG_UPDATE_CURRENT, - Flag indicating that if the described PendingIntent already exists, then keep it but replace its extra data with what is in this new Intent.
-                                                                                                                              FLAG_IMMUTABLE - Flag indicating that the created PendingIntent should be immutable.
-                                                                                                           or any of the flags as supported by Intent.fillIn() to 
-                                                                                                           control which unspecified parts of the intent that can 
-                                                                                                           be supplied when the actual send happens. */
-            
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, data.get("notification.channel"));
-            if (data.containsKey("notification.color")) { 
-              notificationBuilder = notificationBuilder.setColor(Integer.parseInt(data.get("notification.color")));
-            }
-            if (data.containsKey("notification.text")) { 
-              notificationBuilder = notificationBuilder.setContentText(data.get("notification.text"));
-            }
-            if (data.containsKey("notification.title")) { 
-              notificationBuilder = notificationBuilder.setContentTitle(data.get("notification.title"));
-            }
-            if (data.containsKey("notification.largeicon")) { 
-              try {
+        /* custom notification is present in data payload */
+        if (data.containsKey("notification") && data.get("notification").equals("1")) {
               
-                //https://stackoverflow.com/questions/41067081/does-firebasemessagingservice-run-in-the-background-by-default
-                //FirebaseMessagingService's method onMessageReceived(RemoteMessage message) is called "in the background" 
-                //(not on the UI/Main thread). So all work that is done within onMessageReceived(RemoteMessage message) 
-                //should be done synchronously because it's in its own background worker thread.
-                
-                URL url = new URL(data.get("notification.largeicon"));
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection(); 
-                httpURLConnection.setConnectTimeout(60000);
-                httpURLConnection.setReadTimeout(60000);  
-                Bitmap bitmap = BitmapFactory.decodeStream(httpURLConnection.getInputStream());
-                if (bitmap != null) {
-      
-                  int w;
-                  if (bitmap.getWidth() < bitmap.getHeight()) { w = bitmap.getWidth(); }
-                  else { w = bitmap.getHeight(); }
-      
-                  Bitmap bitmapCropped = Bitmap.createBitmap(bitmap/*src*/, (bitmap.getWidth() - w) / 2/*X*/, (bitmap.getHeight() - w) / 2/*Y*/, w/*Width*/, w/*height*/, null/*m*/, true/*filter*/);
-                  if (!bitmap.sameAs(bitmapCropped)) { bitmap.recycle(); }
-                  
-                  notificationBuilder = notificationBuilder.setLargeIcon(bitmapCropped); 
-      
-                }
-              
-              } catch(Throwable e) { Log.e(TAG, "onMessageReceived - Exception", e); }
-            }
-            if (data.containsKey("notification.number") && 
-                data.containsKey("notification.tag") && 
-                data.get("notification.number").equals("auto")) { 
-              SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-              int currentCount = sp.getInt("notification.count_" + data.get("notification.tag"), 0);
-              SharedPreferences.Editor editor = sp.edit();
-              editor.putInt("notification.count_" + data.get("notification.tag"), currentCount + 1);
-              editor.commit();
-              if (currentCount > 0) { notificationBuilder = notificationBuilder.setNumber(currentCount + 1); }
-            }
-            else if (data.containsKey("notification.number")) {
-              notificationBuilder = notificationBuilder.setNumber(Integer.parseInt(data.get("notification.number")));  
-            }
-            if (data.containsKey("notification.onlyalertonce") && data.get("notification.onlyalertonce").equals("1")) { 
-              notificationBuilder = notificationBuilder.setOnlyAlertOnce(true);
-            } 
-            if (data.containsKey("notification.smallicon")) { 
-              notificationBuilder = notificationBuilder.setSmallIcon(
-                context.getApplicationContext().getResources().getIdentifier(
-                  data.get("notification.smallicon"), // name	String: The name of the desired resource.
-                  "drawable", // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
-                  context.getApplicationContext().getPackageName())); // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
-            }                  
-            if (data.containsKey("notification.ticker")) { 
-              notificationBuilder = notificationBuilder.setTicker(data.get("notification.ticker"));
-            }
-            if (data.containsKey("notification.vibrate")) { 
-              if (data.get("notification.vibrate").equals("default")) {
-                defaults = defaults | NotificationCompat.DEFAULT_VIBRATE;
-                notificationBuilder = notificationBuilder.setVibrate(new long[] { 0, 1200 });
-              }
-            } 
-            if (data.containsKey("notification.visibility")) { 
-              notificationBuilder = notificationBuilder.setVisibility(Integer.parseInt(data.get("notification.visibility")));
-            }
-            if (data.containsKey("notification.priority")) { 
-              notificationBuilder = notificationBuilder.setPriority(Integer.parseInt(data.get("notification.priority")));
-            }
-            if (data.containsKey("notification.sound")) { 
-              if (data.get("notification.sound").equals("default")) {
-                defaults = defaults | NotificationCompat.DEFAULT_SOUND;
-                notificationBuilder = notificationBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
-              }
-              else {
-                notificationBuilder = notificationBuilder.setSound(Uri.parse(data.get("notification.sound")));
-              }
-            }
-            notificationBuilder = notificationBuilder.setDefaults(defaults);
-            notificationBuilder = notificationBuilder.setWhen(System.currentTimeMillis());
-            notificationBuilder = notificationBuilder.setShowWhen(true);
-            notificationBuilder = notificationBuilder.setAutoCancel(true);
-            notificationBuilder = notificationBuilder.setContentIntent(pendingIntent);
-            
-            if (data.containsKey("notification.badgecount")) { 
-              ShortcutBadger.applyCount(context.getApplicationContext(), Integer.parseInt(data.get("notification.badgecount")));
-            } 
-        
-            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);    
-            notificationManager.notify(data.get("notification.tag"), /* tag	String: A string identifier for this notification. May be null. */ 
-                                       0, /* id	int: An identifier for this notification. The pair (tag, id) must be unique within your application. */  
-                                       notificationBuilder.build()); /* notification	Notification: A Notification object describing what to show the user. Must not be null. */  
+          // actually i support these params, but nothing forbid to extends them
+          // notification - Must be equal to 1 to activate showing of custom notification when no receiver
+          // notification.channel - on Android 0 The notification will be posted on this NotificationChannel. 
+          // notification.tag - A string identifier for this notification. 
+          // notification.color - The accent color to use
+          // notification.text - Set the second line of text in the platform notification template.
+          // notification.title - Set the first line of text in the platform notification template.
+          // notification.largeicon - url of the large icon to use - Add a large icon to the notification content view
+          // notification.number - must equal to "auto" to increase the number of items this notification represents.
+          // notification.onlyalertonce - Set this flag if you would only like the sound, vibrate and ticker to be played if the notification is not already showing.      
+          // notification.smallicon - The name of the desired resource. - Set the small icon resource, which will be used to represent the notification in the status bar.
+          // notification.ticker - Set the "ticker" text which is sent to accessibility services (The pop-up Text in Status Bar when the Notification is Called)
+          // notification.vibrate - must equal to 1 to activate the default vibration pattern (0, 1200)
+          // notification.visibility - Specify the value of visibility - One of VISIBILITY_PRIVATE (the default), VISIBILITY_SECRET, or VISIBILITY_PUBLIC.
+          // notification.priority - Relative priority for this notification
+          // notification.sound - Set the sound to play
+          // notification.badgecount - update the shortcut badge count with this number 
+                               
+          int defaults = NotificationCompat.DEFAULT_LIGHTS;
           
+          intent.putExtra("notification.presented", "1"); /* this to know in delphi code that it's a notification presented to the user (so if we receive mean he click it) */
+          intent.setClass(context, FMXNativeActivity.class);
+          intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+          PendingIntent pendingIntent = PendingIntent.getActivity(context, /* context	Context: The Context in which this PendingIntent should start the activity. */
+                                                                  getUniqueID(), /* requestCode	int: Private request code for the sender */ 
+                                                                  intent, /* intents	Intent: Array of Intents of the activities to be launched. */
+                                                                  PendingIntent.FLAG_UPDATE_CURRENT); /* flags	int: May be FLAG_ONE_SHOT, - Flag indicating that this PendingIntent can be used only once. 
+                                                                                                                            FLAG_NO_CREATE, - Flag indicating that if the described PendingIntent does not already exist, then simply return null instead of creating it.
+                                                                                                                            FLAG_CANCEL_CURRENT, - Flag indicating that if the described PendingIntent already exists, the current one should be canceled before generating a new one. 
+                                                                                                                            FLAG_UPDATE_CURRENT, - Flag indicating that if the described PendingIntent already exists, then keep it but replace its extra data with what is in this new Intent.
+                                                                                                                            FLAG_IMMUTABLE - Flag indicating that the created PendingIntent should be immutable.
+                                                                                                         or any of the flags as supported by Intent.fillIn() to 
+                                                                                                         control which unspecified parts of the intent that can 
+                                                                                                         be supplied when the actual send happens. */
+          
+          NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context, data.get("notification.channel"));
+          if (data.containsKey("notification.color")) { 
+            notificationBuilder = notificationBuilder.setColor(Integer.parseInt(data.get("notification.color")));
           }
+          if (data.containsKey("notification.text")) { 
+            notificationBuilder = notificationBuilder.setContentText(data.get("notification.text"));
+          }
+          if (data.containsKey("notification.title")) { 
+            notificationBuilder = notificationBuilder.setContentTitle(data.get("notification.title"));
+          }
+          if (data.containsKey("notification.largeicon")) { 
+            try {
+            
+              //https://stackoverflow.com/questions/41067081/does-firebasemessagingservice-run-in-the-background-by-default
+              //FirebaseMessagingService's method onMessageReceived(RemoteMessage message) is called "in the background" 
+              //(not on the UI/Main thread). So all work that is done within onMessageReceived(RemoteMessage message) 
+              //should be done synchronously because it's in its own background worker thread.
+              
+              URL url = new URL(data.get("notification.largeicon"));
+              HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection(); 
+              httpURLConnection.setConnectTimeout(15000);
+              httpURLConnection.setReadTimeout(15000);  
+              Bitmap bitmap = BitmapFactory.decodeStream(httpURLConnection.getInputStream());
+              if (bitmap != null) {
+    
+                int w;
+                if (bitmap.getWidth() < bitmap.getHeight()) { w = bitmap.getWidth(); }
+                else { w = bitmap.getHeight(); }
+    
+                Bitmap bitmapCropped = Bitmap.createBitmap(bitmap/*src*/, (bitmap.getWidth() - w) / 2/*X*/, (bitmap.getHeight() - w) / 2/*Y*/, w/*Width*/, w/*height*/, null/*m*/, true/*filter*/);
+                if (!bitmap.sameAs(bitmapCropped)) { bitmap.recycle(); }
                 
-          /* NO custom notification is present in data payload */
-          else if (!pendingDataMessagesFilename.equals("")) {
-                
+                notificationBuilder = notificationBuilder.setLargeIcon(bitmapCropped); 
+    
+              }
+            
+            } catch(Throwable e) { Log.e(TAG, "onMessageReceived - Exception", e); }
+          }
+          if (data.containsKey("notification.number") && 
+              data.containsKey("notification.tag") && 
+              data.get("notification.number").equals("auto")) { 
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+            int currentCount = sp.getInt("notification.count_" + data.get("notification.tag"), 0);
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putInt("notification.count_" + data.get("notification.tag"), currentCount + 1);
+            editor.commit();
+            if (currentCount > 0) { notificationBuilder = notificationBuilder.setNumber(currentCount + 1); }
+          }
+          else if (data.containsKey("notification.number")) {
+            notificationBuilder = notificationBuilder.setNumber(Integer.parseInt(data.get("notification.number")));  
+          }
+          if (data.containsKey("notification.onlyalertonce") && data.get("notification.onlyalertonce").equals("1")) { 
+            notificationBuilder = notificationBuilder.setOnlyAlertOnce(true);
+          } 
+          if (data.containsKey("notification.smallicon")) { 
+            notificationBuilder = notificationBuilder.setSmallIcon(
+              context.getApplicationContext().getResources().getIdentifier(
+                data.get("notification.smallicon"), // name	String: The name of the desired resource.
+                "drawable", // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
+                context.getApplicationContext().getPackageName())); // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
+          }                  
+          if (data.containsKey("notification.ticker")) { 
+            notificationBuilder = notificationBuilder.setTicker(data.get("notification.ticker"));
+          }
+          if (data.containsKey("notification.vibrate")) { 
+            if (data.get("notification.vibrate").equals("default")) {
+              defaults = defaults | NotificationCompat.DEFAULT_VIBRATE;
+              notificationBuilder = notificationBuilder.setVibrate(new long[] { 0, 1200 });
+            }
+          } 
+          if (data.containsKey("notification.visibility")) { 
+            notificationBuilder = notificationBuilder.setVisibility(Integer.parseInt(data.get("notification.visibility")));
+          }
+          if (data.containsKey("notification.priority")) { 
+            notificationBuilder = notificationBuilder.setPriority(Integer.parseInt(data.get("notification.priority")));
+          }
+          if (data.containsKey("notification.sound")) { 
+            if (data.get("notification.sound").equals("default")) {
+              defaults = defaults | NotificationCompat.DEFAULT_SOUND;
+              notificationBuilder = notificationBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+            }
+            else {
+              notificationBuilder = notificationBuilder.setSound(Uri.parse(data.get("notification.sound")));
+            }
+          }
+          notificationBuilder = notificationBuilder.setDefaults(defaults);
+          notificationBuilder = notificationBuilder.setWhen(System.currentTimeMillis());
+          notificationBuilder = notificationBuilder.setShowWhen(true);
+          notificationBuilder = notificationBuilder.setAutoCancel(true);
+          notificationBuilder = notificationBuilder.setContentIntent(pendingIntent);
+          
+          if (data.containsKey("notification.badgecount")) { 
+            ShortcutBadger.applyCount(context.getApplicationContext(), Integer.parseInt(data.get("notification.badgecount")));
+          } 
+      
+          NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);    
+          notificationManager.notify(data.get("notification.tag"), /* tag	String: A string identifier for this notification. May be null. */ 
+                                     0, /* id	int: An identifier for this notification. The pair (tag, id) must be unique within your application. */  
+                                     notificationBuilder.build()); /* notification	Notification: A Notification object describing what to show the user. Must not be null. */  
+        
+        }
+              
+        /* NO custom notification is present in data payload */
+        else if (!pendingDataMessagesFilename.equals("")) {
+              
+          lock.lock();
+          try {
+
             /* load the json */
             String jsonTxt = getPendingDataMessagesInternal();
             JSONObject jsonRoot = new JSONObject(jsonTxt);       
@@ -339,20 +343,20 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
               fw.write(jsonRoot.toString());
               fw.flush();
               fw.close();
-              
-            }
             
+            }
+          
+          } finally {
+            lock.unlock();
           }
           
         }
-      
-      } 
-      catch (Throwable e){ Log.e(TAG, "onMessageReceived - Exception", e); }  
         
-    } finally {
-      lock.unlock();
-    }
-  
+      }
+    
+    } 
+    catch (Throwable e){ Log.e(TAG, "onMessageReceived - Exception", e); }  
+        
   }
 
   /**

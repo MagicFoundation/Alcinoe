@@ -2,6 +2,8 @@ unit ALFiles;
 
 interface
 
+uses ALCommon;
+
 {$IF CompilerVersion >= 25} {Delphi XE4}
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
@@ -12,12 +14,12 @@ Function  AlEmptyDirectory(Directory: ansiString;
                            const IgnoreFiles: Array of AnsiString;
                            Const RemoveEmptySubDirectory: Boolean = True;
                            Const FileNameMask: ansiString = '*';
-                           Const MinFileAge: TdateTime = 0): Boolean; overload;
+                           Const MinFileAge: TdateTime = ALNullDate): Boolean; overload;
 Function  AlEmptyDirectory(const Directory: ansiString;
                            SubDirectory: Boolean;
                            Const RemoveEmptySubDirectory: Boolean = True;
                            Const FileNameMask: ansiString = '*';
-                           Const MinFileAge: TdateTime = 0): Boolean; overload;
+                           Const MinFileAge: TdateTime = ALNullDate): Boolean; overload;
 Function  AlCopyDirectory(SrcDirectory,
                           DestDirectory: ansiString;
                           SubDirectory: Boolean;
@@ -41,20 +43,32 @@ function  ALDeleteFile(const FileName: Ansistring): Boolean;
 function  ALRenameFile(const OldName, NewName: ansistring): Boolean;
 {$ENDIF}
 
+Function  AlEmptyDirectoryU(Directory: String;
+                            SubDirectory: Boolean;
+                            const IgnoreFiles: Array of String;
+                            Const RemoveEmptySubDirectory: Boolean = True;
+                            Const FileNameMask: String = '*';
+                            Const MinFileAge: TdateTime = ALNullDate): Boolean; overload;
+Function  AlEmptyDirectoryU(const Directory: String;
+                            SubDirectory: Boolean;
+                            Const RemoveEmptySubDirectory: Boolean = True;
+                            Const FileNameMask: String = '*';
+                            Const MinFileAge: TdateTime = ALNullDate): Boolean; overload;
 function  ALGetFileSizeU(const FileName : string): Int64;
 
 implementation
 
 uses System.Classes,
      System.sysutils,
+     System.Masks,
      {$IFNDEF NEXTGEN}
      Winapi.Windows,
      Winapi.ShLwApi,
-     System.Masks,
-     ALStringList,
-     ALString,
+     {$ELSE}
+     Posix.Unistd,
      {$ENDIF}
-     ALCommon;
+     ALString,
+     ALStringList;
 
 {$IFNDEF NEXTGEN}
 
@@ -64,13 +78,11 @@ Function  AlEmptyDirectory(Directory: ansiString;
                            const IgnoreFiles: Array of AnsiString;
                            const RemoveEmptySubDirectory: Boolean = True;
                            const FileNameMask: ansiString = '*';
-                           const MinFileAge: TdateTime = 0): Boolean;
+                           const MinFileAge: TdateTime = ALNullDate): Boolean;
 var sr: TSearchRec;
     aIgnoreFilesLst: TalStringList;
     i: integer;
 begin
-  {$WARN SYMBOL_DEPRECATED OFF}
-  {$WARN SYMBOL_PLATFORM OFF}
   if (Directory = '') or
      (Directory = '.') or
      (Directory = '..') then raise EALException.CreateFmt('Wrong directory ("%s")', [Directory]);
@@ -102,8 +114,8 @@ begin
             else If ((FileNameMask = '*') or
                      ALMatchesMask(AnsiString(sr.Name), FileNameMask))
                     and
-                    ((MinFileAge<=0) or
-                     (FileDateToDateTime(sr.Time) < MinFileAge))
+                    ((MinFileAge=ALNullDate) or
+                     (sr.TimeStamp < MinFileAge))
             then Result := System.sysutils.Deletefile(string(Directory) + sr.Name);
           end;
         until (not result) or (FindNext(sr) <> 0);
@@ -114,8 +126,6 @@ begin
   finally
     aIgnoreFilesLst.Free;
   end;
-  {$WARN SYMBOL_DEPRECATED ON}
-  {$WARN SYMBOL_PLATFORM ON}
 end;
 
 {****************************************************}
@@ -123,7 +133,7 @@ Function AlEmptyDirectory(const Directory: ansiString;
                           SubDirectory: Boolean;
                           Const RemoveEmptySubDirectory: Boolean = True;
                           Const FileNameMask: ansiString = '*';
-                          Const MinFileAge: TdateTime = 0): Boolean;
+                          Const MinFileAge: TdateTime = ALNullDate): Boolean;
 begin
   result := AlEmptyDirectory(Directory,
                              SubDirectory,
@@ -349,6 +359,77 @@ begin
 end;
 
 {$ENDIF}
+
+{********************************************}
+Function  AlEmptyDirectoryU(Directory: String;
+                            SubDirectory: Boolean;
+                            const IgnoreFiles: Array of String;
+                            const RemoveEmptySubDirectory: Boolean = True;
+                            const FileNameMask: String = '*';
+                            const MinFileAge: TdateTime = ALNullDate): Boolean;
+var sr: TSearchRec;
+    aIgnoreFilesLst: TalStringListU;
+    i: integer;
+begin
+  if (Directory = '') or
+     (Directory = '.') or
+     (Directory = '..') then raise EALExceptionU.CreateFmt('Wrong directory ("%s")', [Directory]);
+
+  Result := True;
+  Directory := ALIncludeTrailingPathDelimiterU(Directory);
+  aIgnoreFilesLst := TalStringListU.Create;
+  try
+    for I := 0 to length(IgnoreFiles) - 1 do aIgnoreFilesLst.Add(ALExcludeTrailingPathDelimiterU(IgnoreFiles[i]));
+    aIgnoreFilesLst.Duplicates := DupIgnore;
+    aIgnoreFilesLst.Sorted := True;
+    if System.sysutils.FindFirst(string(Directory) + '*', faAnyFile	, sr) = 0 then begin
+      Try
+        repeat
+          If (sr.Name <> '.') and
+             (sr.Name <> '..') and
+             (aIgnoreFilesLst.IndexOf(Directory + sr.Name) < 0) Then Begin
+            If ((sr.Attr and faDirectory) <> 0) then begin
+              If SubDirectory then begin
+                Result := AlEmptyDirectoryU(Directory + sr.Name,
+                                            True,
+                                            IgnoreFiles,
+                                            RemoveEmptySubDirectory,
+                                            fileNameMask,
+                                            MinFileAge);
+                If result and RemoveEmptySubDirectory then RemoveDir(string(Directory) + sr.Name);
+              end;
+            end
+            else If ((FileNameMask = '*') or
+                     MatchesMask(sr.Name, FileNameMask))
+                    and
+                    ((MinFileAge=ALNullDate) or
+                     (sr.TimeStamp < MinFileAge))
+            then Result := System.sysutils.Deletefile(string(Directory) + sr.Name);
+          end;
+        until (not result) or (FindNext(sr) <> 0);
+      finally
+        System.sysutils.FindClose(sr);
+      end;
+    end;
+  finally
+    aIgnoreFilesLst.Free;
+  end;
+end;
+
+{*************************************************}
+Function AlEmptyDirectoryU(const Directory: String;
+                           SubDirectory: Boolean;
+                           Const RemoveEmptySubDirectory: Boolean = True;
+                           Const FileNameMask: String = '*';
+                           Const MinFileAge: TdateTime = 0): Boolean;
+begin
+  result := AlEmptyDirectoryU(Directory,
+                              SubDirectory,
+                              [],
+                              RemoveEmptySubDirectory,
+                              FileNameMask,
+                              MinFileAge);
+end;
 
 {*******************************************************}
 function ALGetFileSizeU(const FileName : string) : Int64;

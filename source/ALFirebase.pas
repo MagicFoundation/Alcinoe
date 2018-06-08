@@ -94,9 +94,9 @@
 // IOS 9: data message                 + app in BACKGROUND / NO RUNNING : NO ALERT - NO BADGE - WHEN the app will BECAME FOREGROUND: we receive the data message via TALFirebaseMessagingClient.applicationDidReceiveRemoteNotification
 // IOS 9: data & notification message  + app BACKGROUND / NO RUNNING    : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message  via TALFirebaseMessagingClient.applicationDidReceiveRemoteNotification / TALFirebaseMessagingClient.applicationDidFinishLaunchingRemoteNotificationKey
 //
-// IOS 10: data message                + app in FOREGROUND              : NO ALERT - NO BADGE - we receive the data message                                      via TALFirebaseMessagingClient.TFIRMessagingDelegate.applicationReceivedRemoteMessage
+// IOS 10: data message                + app in FOREGROUND              : NO ALERT - NO BADGE - we receive the data message                                      via TALFirebaseMessagingClient.TFIRMessagingDelegate.messagingDidReceiveMessage
 // IOS 10: data & notification message + app FOREGROUND                 : NO ALERT - NO BADGE - we receive the data message                                      via TALFirebaseMessagingClient.TUserNotificationCenterDelegate.userNotificationCenterWillPresentNotificationWithCompletionHandler
-// IOS 10: data message                + app in BACKGROUND / NO RUNNING : NO ALERT - NO BADGE - WHEN the app will BECAME FOREGROUND: we receive the data message via TALFirebaseMessagingClient.TFIRMessagingDelegate.applicationReceivedRemoteMessage
+// IOS 10: data message                + app in BACKGROUND / NO RUNNING : NO ALERT - NO BADGE - WHEN the app will BECAME FOREGROUND: we receive the data message via TALFirebaseMessagingClient.TFIRMessagingDelegate.messagingDidReceiveMessage
 // IOS 10: data & notification message + app BACKGROUND / NO RUNNING    : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message  via TALFirebaseMessagingClient.TUserNotificationCenterDelegate.userNotificationCenterDidReceiveNotificationResponseWithCompletionHandler
 //
 // -----
@@ -1022,8 +1022,8 @@ begin
 
   aMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(_NSDictionaryToJSON(didReceiveMessage.appData)));
   {$IFDEF DEBUG}
-  allog('TALFirebaseMessagingClient.TFIRMessagingDelegate.applicationReceivedRemoteMessage', aMessage.Value.Notification +
-                                                                                             ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALFirebaseMessagingClient.TFIRMessagingDelegate.messagingDidReceiveMessage', aMessage.Value.Notification +
+                                                                                       ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
   TMessageManager.DefaultManager.SendMessage(nil, aMessage);
 

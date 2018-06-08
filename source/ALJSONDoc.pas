@@ -367,6 +367,8 @@ type
     function AddChild(const NodeName: AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode; overload;
     function AddChild(const Path: array of AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode; overload;
     function AddChild(const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode; overload;
+    function DeleteChild(const NodeName: AnsiString): boolean; overload;
+    function DeleteChild(const Path: array of AnsiString): boolean; overload;
     function NextSibling: TALJSONNode;
     function PreviousSibling: TALJSONNode;
     procedure SaveToJSONStream(const Stream: TStream);
@@ -837,6 +839,8 @@ type
     function AddChild(const NodeName: String; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU; overload;
     function AddChild(const Path: array of String; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU; overload;
     function AddChild(const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU; overload;
+    function DeleteChild(const NodeName: String): boolean; overload;
+    function DeleteChild(const Path: array of String): boolean; overload;
     function NextSibling: TALJSONNodeU;
     function PreviousSibling: TALJSONNodeU;
     procedure SaveToJSONStream(const Stream: TStream; const Encoding: TEncoding); overload;
@@ -5680,6 +5684,38 @@ end;
 function TALJSONNode.AddChild(const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode;
 begin
   Result := AddChild('', NodeType, Index);
+end;
+
+{********************************************************************}
+function TALJSONNode.DeleteChild(const NodeName: AnsiString): boolean;
+var i: integer;
+begin
+  I := ChildNodes.IndexOf(NodeName);
+  if i >= 0 then begin
+    ChildNodes.Delete(i);
+    result := True;
+  end
+  else result := False;
+end;
+
+{*************************************************************************}
+function TALJSONNode.DeleteChild(const Path: array of AnsiString): boolean;
+var aNode: TALJSONNode;
+    aTmpNode: TALJSONNode;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aTmpNode := aNode.ChildNodes.findNode(path[i]);
+    if (aTmpNode = nil) then exit(false)
+    else aNode := aTmpNode;
+  end;
+  I := aNode.ChildNodes.IndexOf(path[high(path)]);
+  if i >= 0 then begin
+    aNode.ChildNodes.Delete(i);
+    result := True;
+  end
+  else result := False;
 end;
 
 {******************************************}
@@ -11974,6 +12010,38 @@ end;
 function TALJSONNodeU.AddChild(const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU;
 begin
   Result := AddChild('', NodeType, Index);
+end;
+
+{*****************************************************************}
+function TALJSONNodeU.DeleteChild(const NodeName: String): boolean;
+var i: integer;
+begin
+  I := ChildNodes.IndexOf(NodeName);
+  if i >= 0 then begin
+    ChildNodes.Delete(i);
+    result := True;
+  end
+  else result := False;
+end;
+
+{**********************************************************************}
+function TALJSONNodeU.DeleteChild(const Path: array of String): boolean;
+var aNode: TALJSONNodeU;
+    aTmpNode: TALJSONNodeU;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aTmpNode := aNode.ChildNodes.findNode(path[i]);
+    if (aTmpNode = nil) then exit(false)
+    else aNode := aTmpNode;
+  end;
+  I := aNode.ChildNodes.IndexOf(path[high(path)]);
+  if i >= 0 then begin
+    aNode.ChildNodes.Delete(i);
+    result := True;
+  end
+  else result := False;
 end;
 
 {********************************************}

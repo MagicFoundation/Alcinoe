@@ -543,6 +543,7 @@ function  ALCopyStr(const aSourceString: AnsiString;
 function  ALStringReplace(const S, OldPattern, NewPattern: AnsiString; Flags: TReplaceFlags): AnsiString;
 {$ENDIF}
 
+Function  ALNewGUIDBytes: TBytes;
 function  ALGUIDToStringU(const Guid: TGUID; const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): string;
 Function  ALNewGUIDStringU(const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): String;
 function  ALIfThenU(AValue: Boolean; const ATrue: String; AFalse: String = ''): String; overload; inline;
@@ -1154,6 +1155,18 @@ Begin
 End;
 
 {$ENDIF !NEXTGEN}
+
+{*******************************}
+Function  ALNewGUIDBytes: TBytes;
+Var aGUID: TGUID;
+Begin
+  if CreateGUID(aGUID) <> S_OK then RaiseLastOSError;
+  SetLength(Result, 16);
+  ALMove(aGuid.D1, Result[0], 4); // D1: Cardinal;
+  ALMove(aGuid.D2, Result[4], 2); // D2: Word;
+  ALMove(aGuid.D3, Result[6], 2); // D3: Word;
+  ALMove(aGuid.D4[0], Result[8], 8); // D4: array[0..7] of Byte;
+End;
 
 {********************************************************************************************************************************}
 function  ALGUIDToStringU(const Guid: TGUID; const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): string;

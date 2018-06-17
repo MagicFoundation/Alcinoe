@@ -7570,7 +7570,10 @@ begin
     nstBinary:     result := ALJsonEncodeBinaryWithNodeSubTypeHelper(aValue);
     nstObjectID:   result := ALJsonEncodeObjectIDWithNodeSubTypeHelper(aValue);
     nstBoolean:    result := ALJsonEncodeBooleanWithNodeSubTypeHelper(ALStrToBool(aValue));
-    nstDateTime:   result := ALJsonEncodeDateTimeWithNodeSubTypeHelper(ALStrToDateTime(aValue, aFormatSettings));
+    nstDateTime:   begin
+                     if aValue = 'NOW' then result := ALJsonEncodeDateTimeWithNodeSubTypeHelper(ALUtcNow)
+                     else result := ALJsonEncodeDateTimeWithNodeSubTypeHelper(ALStrToDateTime(aValue, aFormatSettings));
+                   end;
     nstJavascript: result := ALJsonEncodeJavascriptWithNodeSubTypeHelper(aValue);
     nstInt32:      result := ALJsonEncodeInt32WithNodeSubTypeHelper(ALstrToInt(aValue));
     nstInt64:      result := ALJsonEncodeInt64WithNodeSubTypeHelper(ALstrToInt64(aValue));
@@ -13898,7 +13901,10 @@ begin
     nstBinary:     result := ALJsonEncodeBinaryWithNodeSubTypeHelperU(aValue);
     nstObjectID:   result := ALJsonEncodeObjectIDWithNodeSubTypeHelperU(aValue);
     nstBoolean:    result := ALJsonEncodeBooleanWithNodeSubTypeHelperU(ALStrToBoolU(aValue));
-    nstDateTime:   result := ALJsonEncodeDateTimeWithNodeSubTypeHelperU(ALStrToDateTimeU(aValue, aFormatSettings));
+    nstDateTime:   begin
+                     if aValue = 'NOW' then result := ALJsonEncodeDateTimeWithNodeSubTypeHelperU(ALUtcNow)
+                     else result := ALJsonEncodeDateTimeWithNodeSubTypeHelperU(ALStrToDateTimeU(aValue, aFormatSettings));
+                   end;
     nstJavascript: result := ALJsonEncodeJavascriptWithNodeSubTypeHelperU(aValue);
     nstInt32:      result := ALJsonEncodeInt32WithNodeSubTypeHelperU(ALstrToIntU(aValue));
     nstInt64:      result := ALJsonEncodeInt64WithNodeSubTypeHelperU(ALstrToInt64U(aValue));

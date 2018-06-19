@@ -2525,7 +2525,7 @@ procedure TALObjectDictionary<TKey,TValue>.KeyNotify(const Key: TKey; Action: TC
 begin
   inherited;
   if (Action = cnRemoved) and (doOwnsKeys in FOwnerships) then
-    ALFreeAndNil(PObject(@Key)^); // >> will call disposeOF if necessary
+    PObject(@Key)^.DisposeOf; // >> if i use ALFreeAndNil I will have an exception (tested under iOS)
 end;
 
 {***********************************************************************************************************}
@@ -2533,7 +2533,7 @@ procedure TALObjectDictionary<TKey,TValue>.ValueNotify(const Value: TValue; Acti
 begin
   inherited;
   if (Action = cnRemoved) and (doOwnsValues in FOwnerships) then
-    ALFreeAndNil(PObject(@Value)^); // >> will call disposeOF if necessary
+    PObject(@Value)^.DisposeOf; // >> if i use ALFreeAndNil I will have an exception (tested under iOS)
 end;
 
 {************************************************************************************}

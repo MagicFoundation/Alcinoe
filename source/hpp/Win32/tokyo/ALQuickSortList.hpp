@@ -126,6 +126,8 @@ public:
 	int __fastcall IndexOfObject(System::TObject* AObject);
 	int __fastcall Add(const int Item);
 	int __fastcall AddObject(const int Item, System::TObject* AObject);
+	bool __fastcall TryAdd(const int Item);
+	bool __fastcall TryAddObject(const int Item, System::TObject* AObject);
 	bool __fastcall Find(int item, int &Index);
 	HIDESBASE void __fastcall Insert(int Index, const int item);
 	void __fastcall InsertObject(int Index, const int item, System::TObject* AObject);
@@ -135,6 +137,7 @@ public:
 	int __fastcall Push(int Item);
 	int __fastcall Pop(void);
 	int __fastcall Peek(void);
+	System::DynamicArray<int> __fastcall ToArray(void);
 public:
 	/* TALBaseQuickSortList.Destroy */ inline __fastcall virtual ~TALIntegerList(void) { }
 	
@@ -179,6 +182,8 @@ public:
 	int __fastcall IndexOfObject(System::TObject* AObject);
 	int __fastcall Add(const unsigned Item);
 	int __fastcall AddObject(const unsigned Item, System::TObject* AObject);
+	bool __fastcall TryAdd(const unsigned Item);
+	bool __fastcall TryAddObject(const unsigned Item, System::TObject* AObject);
 	bool __fastcall Find(unsigned item, int &Index);
 	HIDESBASE void __fastcall Insert(int Index, const unsigned item);
 	void __fastcall InsertObject(int Index, const unsigned item, System::TObject* AObject);
@@ -188,6 +193,7 @@ public:
 	unsigned __fastcall Push(unsigned Item);
 	unsigned __fastcall Pop(void);
 	unsigned __fastcall Peek(void);
+	System::DynamicArray<unsigned> __fastcall ToArray(void);
 public:
 	/* TALBaseQuickSortList.Destroy */ inline __fastcall virtual ~TALCardinalList(void) { }
 	
@@ -232,6 +238,8 @@ public:
 	int __fastcall IndexOfObject(System::TObject* AObject);
 	int __fastcall Add(const __int64 Item);
 	int __fastcall AddObject(const __int64 Item, System::TObject* AObject);
+	bool __fastcall TryAdd(const __int64 Item);
+	bool __fastcall TryAddObject(const __int64 Item, System::TObject* AObject);
 	bool __fastcall Find(__int64 item, int &Index);
 	HIDESBASE void __fastcall Insert(int Index, const __int64 item);
 	void __fastcall InsertObject(int Index, const __int64 item, System::TObject* AObject);
@@ -241,6 +249,7 @@ public:
 	__int64 __fastcall Push(__int64 Item);
 	__int64 __fastcall Pop(void);
 	__int64 __fastcall Peek(void);
+	System::DynamicArray<__int64> __fastcall ToArray(void);
 public:
 	/* TALBaseQuickSortList.Destroy */ inline __fastcall virtual ~TALInt64List(void) { }
 	
@@ -285,6 +294,8 @@ public:
 	int __fastcall IndexOfObject(System::TObject* AObject);
 	int __fastcall Add(const NativeInt Item);
 	int __fastcall AddObject(const NativeInt Item, System::TObject* AObject);
+	bool __fastcall TryAdd(const NativeInt Item);
+	bool __fastcall TryAddObject(const NativeInt Item, System::TObject* AObject);
 	bool __fastcall Find(NativeInt item, int &Index);
 	HIDESBASE void __fastcall Insert(int Index, const NativeInt item);
 	void __fastcall InsertObject(int Index, const NativeInt item, System::TObject* AObject);
@@ -294,6 +305,7 @@ public:
 	NativeInt __fastcall Push(NativeInt Item);
 	NativeInt __fastcall Pop(void);
 	NativeInt __fastcall Peek(void);
+	System::DynamicArray<NativeInt> __fastcall ToArray(void);
 public:
 	/* TALBaseQuickSortList.Destroy */ inline __fastcall virtual ~TALNativeIntList(void) { }
 	
@@ -338,6 +350,8 @@ public:
 	int __fastcall IndexOfObject(System::TObject* AObject);
 	int __fastcall Add(const double Item);
 	int __fastcall AddObject(const double Item, System::TObject* AObject);
+	bool __fastcall TryAdd(const double Item);
+	bool __fastcall TryAddObject(const double Item, System::TObject* AObject);
 	bool __fastcall Find(double item, int &Index);
 	HIDESBASE void __fastcall Insert(int Index, const double item);
 	void __fastcall InsertObject(int Index, const double item, System::TObject* AObject);
@@ -347,6 +361,7 @@ public:
 	double __fastcall Push(double Item);
 	double __fastcall Pop(void);
 	double __fastcall Peek(void);
+	System::DynamicArray<double> __fastcall ToArray(void);
 public:
 	/* TALBaseQuickSortList.Destroy */ inline __fastcall virtual ~TALDoubleList(void) { }
 	

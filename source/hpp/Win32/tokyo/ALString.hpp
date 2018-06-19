@@ -559,6 +559,7 @@ extern DELPHI_PACKAGE System::AnsiString __fastcall ALGUIDToByteString(const GUI
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALNewGUIDByteString(void);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALGUIDToString(const GUID &Guid, const bool WithoutBracket = false, const bool WithoutHyphen = false);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALNewGUIDString(const bool WithoutBracket = false, const bool WithoutHyphen = false);
+extern DELPHI_PACKAGE System::DynamicArray<System::Byte> __fastcall ALNewGUIDBytes(void);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALGUIDToStringU(const GUID &Guid, const bool WithoutBracket = false, const bool WithoutHyphen = false);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALNewGUIDStringU(const bool WithoutBracket = false, const bool WithoutHyphen = false);
 extern DELPHI_PACKAGE bool __fastcall ALMatchesMask(const System::AnsiString Filename, const System::AnsiString Mask);

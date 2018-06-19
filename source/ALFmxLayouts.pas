@@ -658,9 +658,9 @@ procedure TALCustomScrollBox.DoRealign;
       finally
         fHScrollBar.ValueRange.EndUpdate;
       end;
-      fHScrollBar.SetBounds(fVScrollBar.Margins.left,
-                            height - fHScrollBar.Height - fVScrollBar.Margins.bottom,
-                            width - fVScrollBar.Margins.left - fVScrollBar.Margins.right,
+      fHScrollBar.SetBounds(fHScrollBar.Margins.left,
+                            height - fHScrollBar.Height - fHScrollBar.Margins.bottom,
+                            width - fHScrollBar.Margins.left - fHScrollBar.Margins.right,
                             fHScrollBar.Height);
     end;
   end;

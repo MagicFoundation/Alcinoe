@@ -53,9 +53,9 @@ to be easy to customize and extend. Under Ios i use AVPlayer with support
 also HLS like exoplayer do.
 
 <p align="left">
-  <img src="https://ibin.co/48dL5hFHyGDO.jpg" alt="video player for firemonkey" width="200" style="width:200px;"/>
-  <img src="https://ibin.co/48dLWXzZxpx0.jpg" alt="video player for firemonkey" width="200" style="width:200px;"/>
-  <img src="https://ibin.co/48dLe2ZZDdAU.jpg" alt="video player for firemonkey" width="200" style="width:200px;"/>
+  <img src="https://ibin.co/48dL5hFHyGDO.jpg" alt="video player for firemonkey" width="240" style="width:240px;"/>
+  <img src="https://ibin.co/48dLWXzZxpx0.jpg" alt="video player for firemonkey" width="240" style="width:240px;"/>
+  <img src="https://ibin.co/48dLe2ZZDdAU.jpg" alt="video player for firemonkey" width="240" style="width:240px;"/>
 </p>
 
 Firemonkey native ios/android TEdit and TMemo

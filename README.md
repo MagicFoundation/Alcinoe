@@ -92,6 +92,8 @@ Fast/doublebuffered firemonkey controls with native draw
 
 ![screenshot 4](https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-8.png/1)
 
+<img src="https://ibin.co/48koybA5oaWf.jpg" alt="TALCircle" />
+
 #### The fact ####
 
 Painting of Firmonkey controls can be sometime slow, or say 

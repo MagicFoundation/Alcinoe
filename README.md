@@ -92,7 +92,7 @@ Fast/doublebuffered firemonkey controls with native draw
 
 ![screenshot 4](https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-8.png/1)
 
-<img src="https://ibin.co/48koybA5oaWf.jpg" alt="TALCircle" />
+<img src="https://ibin.co/48kqTx3mBXPW.jpg" alt="TALRectangle" />
 
 #### The fact ####
 
@@ -144,6 +144,7 @@ To resolve this, i build the buffer of my control using NATIVE
 ANDROID/IOS API. In this way we will have a high quality draw at also
 a high speed without being dependant of the form.quality
 
+<img src="https://ibin.co/48koybA5oaWf.jpg" alt="TALCircle" />
 
 Improuved firemonkey controls
 -----------------------------
@@ -152,6 +153,9 @@ Improuved firemonkey controls
 * TabControl
 * RangeTrackBar
 
+<img src="https://ibin.co/48krCHpN6b6I.jpg" alt="RangeTrackBar" />
+
+<img src="https://ibin.co/48kre4eA0T0c.jpg" alt="TabControl" />
 
 Firebase clound messaging
 -------------------------

@@ -77,7 +77,7 @@ top of the form (so off course no z-order with firemonkey control)
 
 <p align="left">
   <img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-3.png/1" alt="Drawing" width="240" style="width:240px;"/>
-  &nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-2.png/1" alt="Drawing" width="240" style="width:240px;"/>
 </p>
 

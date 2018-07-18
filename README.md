@@ -96,9 +96,10 @@ Fast/doublebuffered firemonkey controls with native draw
 * Glyph
 * etc.
 
-![screenshot 4](https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-8.png/1)
+![screenshot 4]()
+<img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-8.png/1" alt="TALRectangle" width="550" style="width:550px;" />
 
-<img src="https://ibin.co/48kqTx3mBXPW.jpg" alt="TALRectangle" />
+<img src="https://ibin.co/48kqTx3mBXPW.jpg" alt="TALRectangle" width="550" style="width:550px;" />
 
 #### The fact ####
 

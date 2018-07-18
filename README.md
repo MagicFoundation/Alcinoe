@@ -74,11 +74,15 @@ and so i start to build native android/ios controls like TEdit/TMemo.
 These control work mostly like some windows that are placed on The
 top of the form (so off course no z-order with firemonkey control)
 
-<img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-3.png/1" alt="Drawing" width="240" style="width:240px;"/>
 
-<img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-4.png/1" alt="Drawing" width="427" style="width:427px;"/>
+<p align="left">
+  <img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-3.png/1" alt="Drawing" width="240" style="width:240px;"/>
+  <img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-2.png/1" alt="Drawing" width="240" style="width:240px;"/>
+  <img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-4.png/1" alt="Drawing" width="427" style="width:427px;"/>
+</p>
 
-<img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-2.png/1" alt="Drawing" width="240" style="width:240px;"/>
+
+
 
 
 Fast/doublebuffered firemonkey controls with native draw

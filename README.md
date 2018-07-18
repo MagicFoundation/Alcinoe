@@ -190,6 +190,20 @@ When people log into your app with Facebook they can grant permissions to your a
 you can retrieve information or perform actions on Facebook on their behalf.
 
 
+Photo Editor Filters for Android/Ios
+------------------------------------
+
+With TALColorAdjustEffect, gorgeous photo filters with one-tap auto 
+enhance, make your photos beautiful and expressive in just minutes! 
+
+<p align="left">
+  <img src="https://ibin.co/4990qrzOVrxq.jpg" alt="video player for firemonkey" width="320" style="width:320px;"/>
+  &nbsp;&nbsp;&nbsp;
+  <img src="https://ibin.co/4990yzHiND8k.jpg" alt="video player for firemonkey" width="320" style="width:320px;"/>
+</p>
+
+
+
 Json Parser
 -----------
 

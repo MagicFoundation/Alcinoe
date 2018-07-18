@@ -54,10 +54,9 @@ also HLS like exoplayer do.
 
 <p align="left">
   <img src="https://ibin.co/48dL5hFHyGDO.jpg" alt="video player for firemonkey" width="280" style="width:280px;"/>
-  &nbsp;&nbsp;&nbsp;
   <img src="https://ibin.co/48dLWXzZxpx0.jpg" alt="video player for firemonkey" width="280" style="width:280px;"/>
+  <img src="https://ibin.co/48dLe2ZZDdAU.jpg" alt="video player for firemonkey" width="280" style="width:280px;"/>
 </p>
-<img src="https://ibin.co/48dLe2ZZDdAU.jpg" alt="video player for firemonkey" width="280" style="width:280px;"/>
 
 Firemonkey native ios/android TEdit and TMemo
 ---------------------------------------------
@@ -78,9 +77,11 @@ top of the form (so off course no z-order with firemonkey control)
 
 <p align="left">
   <img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-3.png/1" alt="Drawing" width="240" style="width:240px;"/>
+  &nbsp;&nbsp;&nbsp;
   <img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-2.png/1" alt="Drawing" width="240" style="width:240px;"/>
-  <img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-4.png/1" alt="Drawing" width="427" style="width:427px;"/>
 </p>
+
+<img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-4.png/1" alt="Drawing" width="457" style="width:457px;"/>
 
 
 

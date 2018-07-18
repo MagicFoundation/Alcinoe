@@ -58,6 +58,8 @@ also HLS like exoplayer do.
   <img src="https://ibin.co/48dLe2ZZDdAU.jpg" alt="video player for firemonkey" width="280" style="width:280px;"/>
 </p>
 
+
+
 Firemonkey native ios/android TEdit and TMemo
 ---------------------------------------------
 
@@ -82,8 +84,6 @@ top of the form (so off course no z-order with firemonkey control)
 </p>
 
 <img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-4.png/1" alt="Drawing" width="457" style="width:457px;"/>
-
-
 
 
 
@@ -152,6 +152,8 @@ a high speed without being dependant of the form.quality
 
 <img src="https://ibin.co/48koybA5oaWf.jpg" alt="TALCircle" />
 
+
+
 Improuved firemonkey controls
 -----------------------------
 
@@ -161,7 +163,13 @@ Improuved firemonkey controls
 
 <img src="https://ibin.co/48krCHpN6b6I.jpg" alt="RangeTrackBar" />
 
-<img src="https://ibin.co/48kre4eA0T0c.jpg" alt="TabControl" />
+<p align="left">
+  <img src="https://ibin.co/4988ZmeSxThF.jpg" alt="video player for firemonkey" width="280" style="width:280px;"/>
+  <img src="https://ibin.co/4988nWNmG1HJ.jpg" alt="video player for firemonkey" width="280" style="width:280px;"/>
+  <img src="https://ibin.co/4988vdg67K7h.jpg" alt="video player for firemonkey" width="280" style="width:280px;"/>
+</p>
+
+
 
 Firebase clound messaging
 -------------------------

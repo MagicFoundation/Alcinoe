@@ -197,7 +197,7 @@ With TALColorAdjustEffect, gorgeous photo filters with one-tap auto
 enhance, make your photos beautiful and expressive in just minutes! 
 
 <p align="left">
-  <img src="https://ibin.co/4990qrzOVrxq.jpg" alt="video player for firemonkey" width="320" style="width:320px;"/>
+  <img src="https://ibin.co/4992QatP7BaV.jpg" alt="video player for firemonkey" width="320" style="width:320px;"/>
   &nbsp;&nbsp;&nbsp;
   <img src="https://ibin.co/4990yzHiND8k.jpg" alt="video player for firemonkey" width="320" style="width:320px;"/>
 </p>

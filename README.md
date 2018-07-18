@@ -161,11 +161,13 @@ Improuved firemonkey controls
 * TabControl
 * RangeTrackBar
 
-<img src="https://ibin.co/48krCHpN6b6I.jpg" alt="RangeTrackBar" />
+<img src="https://ibin.co/48krCHpN6b6I.jpg" alt="RangeTrackBar" width="600" style="width:600px;" />
 
 <p align="left">
   <img src="https://ibin.co/4988ZmeSxThF.jpg" alt="video player for firemonkey" width="280" style="width:280px;"/>
+  &nbsp;&nbsp;&nbsp;
   <img src="https://ibin.co/4988nWNmG1HJ.jpg" alt="video player for firemonkey" width="280" style="width:280px;"/>
+  &nbsp;&nbsp;&nbsp;
   <img src="https://ibin.co/4988vdg67K7h.jpg" alt="video player for firemonkey" width="280" style="width:280px;"/>
 </p>
 

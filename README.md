@@ -54,9 +54,10 @@ also HLS like exoplayer do.
 
 <p align="left">
   <img src="https://ibin.co/48dL5hFHyGDO.jpg" alt="video player for firemonkey" width="280" style="width:280px;"/>
+  &nbsp;&nbsp;&nbsp;
   <img src="https://ibin.co/48dLWXzZxpx0.jpg" alt="video player for firemonkey" width="280" style="width:280px;"/>
-  <img src="https://ibin.co/48dLe2ZZDdAU.jpg" alt="video player for firemonkey" width="280" style="width:280px;"/>
 </p>
+<img src="https://ibin.co/48dLe2ZZDdAU.jpg" alt="video player for firemonkey" width="280" style="width:280px;"/>
 
 Firemonkey native ios/android TEdit and TMemo
 ---------------------------------------------

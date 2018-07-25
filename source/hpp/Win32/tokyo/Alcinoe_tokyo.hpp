@@ -34,6 +34,7 @@
 #include <ALVideoPlayer.hpp>
 #include <ALFmxMemo.hpp>
 #include <ALGraphics.hpp>
+#include <ALFmxFilterEffects.hpp>
 #include <System.UITypes.hpp>	// (rtl)
 #include <Winapi.Windows.hpp>	// (rtl)
 #include <Winapi.PsAPI.hpp>	// (rtl)
@@ -175,6 +176,8 @@
 #include <FMX.Memo.Win.hpp>	// (fmx)
 #include <FMX.Memo.hpp>	// (fmx)
 #include <FMX.Memo.Style.hpp>	// (fmx)
+#include <FMX.Filter.Standard.hpp>	// (fmx)
+#include <FMX.Filter.Effects.hpp>	// (fmx)
 // PRG_EXT: .bpl
 // BPI_DIR: ..\lib\bpl\alcinoe\Win32\tokyo
 // OBJ_DIR: ..\lib\bpl\alcinoe\Win32\tokyo

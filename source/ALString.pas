@@ -591,7 +591,8 @@ Function  ALTryHexToBinU(const aHex: String; out Value: Tbytes): boolean;
 Function  ALHexToBinU(const aHex: String): Tbytes;
 Function  ALBase64EncodeStringU(const S: String; const AEncoding: TEncoding = nil): String;
 Function  ALBase64DecodeStringU(const S: String; const AEncoding: TEncoding = nil): String;
-Function  ALBase64EncodeBytesU(const Bytes: Tbytes): String;
+Function  ALBase64EncodeBytesU(const Bytes: Tbytes): String; overload;
+Function  ALBase64EncodeBytesU(const Bytes: pointer; const Size: Integer): String; overload;
 Function  ALBase64DecodeBytesU(const S: String): Tbytes;
 function  ALIsDecimalU(const S: String; const RejectPlusMinusSign: boolean = False): boolean;
 Function  ALIsInt64U(const S: String): Boolean;
@@ -733,6 +734,7 @@ function  ALNEVExtractName(const S: AnsiString): AnsiString;
 function  ALNEVExtractValue(const s: AnsiString): AnsiString;
 function  ALGetStringFromFile(const filename: AnsiString; const ShareMode: Word = fmShareDenyWrite): AnsiString;
 function  ALGetStringFromFileWithoutUTF8BOM(const filename: AnsiString; const ShareMode: Word = fmShareDenyWrite): AnsiString;
+procedure ALAppendStringToFile(const Str: AnsiString; const FileName: AnsiString);
 procedure ALSaveStringtoFile(const Str: AnsiString; const filename: AnsiString);
 {$IF defined(MSWINDOWS)}
 Function  ALWideNormalize(const S: Widestring;
@@ -7207,6 +7209,12 @@ begin
   result := _GetBase64Encoding.EncodeBytesToString(Bytes);
 end;
 
+{********************************************************************************}
+Function  ALBase64EncodeBytesU(const Bytes: pointer; const Size: Integer): String;
+begin
+  result := _GetBase64Encoding.EncodeBytesToString(Bytes, Size);
+end;
+
 {******************************************************}
 Function  ALBase64DecodeBytesU(const S: String): Tbytes;
 begin
@@ -10816,11 +10824,25 @@ begin
   end;
 end;
 
+{********************************************************************************}
+procedure ALAppendStringToFile(const Str: AnsiString; const FileName: AnsiString);
+var aFileStream: TFileStream;
+begin
+  if FileExists(String(FileName)) then aFileStream := TFileStream.Create(String(FileName), fmOpenReadWrite)
+  else                                 aFileStream := TFileStream.Create(String(FileName), fmCreate);
+  try
+    aFileStream.Position := aFileStream.Size;
+    aFileStream.WriteBuffer(Pointer(Str)^, Length(Str));
+  finally
+    aFileStream.Free;
+  end;
+end;
+
 {******************************************************************************}
 procedure ALSaveStringtoFile(const Str: AnsiString; const filename: AnsiString);
 Var AFileStream: TFileStream;
 begin
-  AFileStream := TFileStream.Create(String(filename),fmCreate);
+  AFileStream := TFileStream.Create(String(filename), fmCreate);
   try
     AFileStream.WriteBuffer(Pointer(Str)^, Length(Str));
   finally

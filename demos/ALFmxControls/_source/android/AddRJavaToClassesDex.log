@@ -19,10 +19,10 @@ call "C:\SDKs\android-sdk-windows\build-tools\27.0.3\dx.bat" --dex --output="C:\
  
 Merge the classes.dex 
 "C:\Program Files\Java\jdk1.8.0_131"\bin\java -cp C:\SDKs\android-sdk-windows\build-tools\27.0.3\lib\dx.jar com.android.dx.merge.DexMerger "C:\Dev\Alcinoe\demos\ALFmxControls\_source"\android\tmp\final_classes.dex "C:\Dev\Alcinoe\demos\ALFmxControls\_source"\android\tmp\classes.dex C:\Dev\Alcinoe\demos\ALFmxControls\Android\Release\classes.dex 
-Result compacted from 5974.7KiB to 3761.1KiB to save 2213.6KiB
+Result compacted from 5974.6KiB to 3761.1KiB to save 2213.6KiB
 Merged dex #1 (10 defs/6.5KiB)
 Merged dex #2 (3454 defs/4705.4KiB)
-Result is 3464 defs/3761.1KiB. Took 0.6s
+Result is 3464 defs/3761.1KiB. Took 0.7s
  
 Move the classes.dex 
         1 file(s) copied.

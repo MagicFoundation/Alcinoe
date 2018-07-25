@@ -73,10 +73,10 @@ call "C:\SDKs\android-sdk-windows\build-tools\27.0.3\dx.bat" --dex --output="C:\
  
 Merge the classes.dex 
 "C:\Program Files\Java\jdk1.8.0_131"\bin\java -cp C:\SDKs\android-sdk-windows\build-tools\27.0.3\lib\dx.jar com.android.dx.merge.DexMerger "C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\final_classes.dex "C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\classes.dex C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\Android\Release\classes.dex 
-Result compacted from 4162.9KiB to 2639.2KiB to save 1523.6KiB
+Result compacted from 4162.8KiB to 2639.2KiB to save 1523.6KiB
 Merged dex #1 (140 defs/286.8KiB)
 Merged dex #2 (2221 defs/3116.7KiB)
-Result is 2361 defs/2639.2KiB. Took 0.6s
+Result is 2361 defs/2639.2KiB. Took 0.5s
  
 Move the classes.dex 
         1 file(s) copied.

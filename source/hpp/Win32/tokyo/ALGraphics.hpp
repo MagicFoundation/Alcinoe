@@ -29,6 +29,8 @@ typedef System::DelphiInterface<TALResizeImageGetDestSizeFunct> _di_TALResizeIma
 __interface TALResizeAndBlurImageGetDestSizeFunct;
 typedef System::DelphiInterface<TALResizeAndBlurImageGetDestSizeFunct> _di_TALResizeAndBlurImageGetDestSizeFunct;
 //-- type declarations -------------------------------------------------------
+enum DECLSPEC_DENUM TalExifOrientationInfo : unsigned char { FLIP_HORIZONTAL, FLIP_VERTICAL, NORMAL, ROTATE_180, ROTATE_270, ROTATE_90, TRANSPOSE, TRANSVERSE, UNDEFINED };
+
 __interface TALResizeImageGetDestSizeFunct  : public System::IInterface 
 {
 	virtual System::Types::TPointF __fastcall Invoke(const System::Types::TPointF &aOriginalSize) = 0 ;
@@ -38,8 +40,6 @@ __interface TALResizeAndBlurImageGetDestSizeFunct  : public System::IInterface
 {
 	virtual System::Types::TPointF __fastcall Invoke(const System::Types::TPointF &aOriginalSize, float &aRadius) = 0 ;
 };
-
-enum DECLSPEC_DENUM TalExifOrientationInfo : unsigned char { FLIP_HORIZONTAL, FLIP_VERTICAL, NORMAL, ROTATE_180, ROTATE_270, ROTATE_90, TRANSPOSE, TRANSVERSE, UNDEFINED };
 
 //-- var, const, procedure ---------------------------------------------------
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALFitIntoAndCropAsRoundRectImageV1(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const float XRadius, const float YRadius, const System::Types::TPointF &aCropCenter)/* overload */;
@@ -159,8 +159,17 @@ extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadStretchResourceIm
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadStretchFileImageV1(const System::UnicodeString aFileName, const float W, const float H);
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadStretchFileImageV2(const System::UnicodeString aFileName, const float W, const float H);
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadStretchFileImageV3(const System::UnicodeString aFileName, const float W, const float H);
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadNormalizeOrientationImageV1(System::Classes::TCustomMemoryStream* const aStream, const TalExifOrientationInfo aExifOrientationInfo);
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadNormalizeOrientationImageV2(System::Classes::TCustomMemoryStream* const aStream, const TalExifOrientationInfo aExifOrientationInfo);
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadNormalizeOrientationImageV3(System::Classes::TCustomMemoryStream* const aStream, const TalExifOrientationInfo aExifOrientationInfo);
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadNormalizeOrientationFileImageV1(const System::UnicodeString aFileName);
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadNormalizeOrientationFileImageV2(const System::UnicodeString aFileName);
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadNormalizeOrientationFileImageV3(const System::UnicodeString aFileName);
 extern DELPHI_PACKAGE TalExifOrientationInfo __fastcall AlGetExifOrientationInfo(const System::UnicodeString aFilename);
-extern DELPHI_PACKAGE System::UnicodeString __fastcall AlDetectImageExtensionU(const System::UnicodeString aFileName);
+extern DELPHI_PACKAGE void __fastcall ALNormalizeImageOrientationV1(Fmx::Graphics::TBitmap* const aBitmap, const TalExifOrientationInfo aExifOrientationInfo);
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALNormalizeImageOrientationV2(Fmx::Graphics::TBitmap* const aBitmap, const TalExifOrientationInfo aExifOrientationInfo);
+extern DELPHI_PACKAGE System::UnicodeString __fastcall AlDetectImageExtensionU(System::Classes::TStream* const aStream)/* overload */;
+extern DELPHI_PACKAGE System::UnicodeString __fastcall AlDetectImageExtensionU(const System::UnicodeString aFileName)/* overload */;
 extern DELPHI_PACKAGE System::Uitypes::TAlphaColor __fastcall ALPrepareColor(const System::Uitypes::TAlphaColor SrcColor, const float Opacity);
 }	/* namespace Algraphics */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALGRAPHICS)

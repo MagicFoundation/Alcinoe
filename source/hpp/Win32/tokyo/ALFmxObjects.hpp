@@ -32,7 +32,7 @@
 namespace Alfmxobjects
 {
 //-- forward type declarations -----------------------------------------------
-class DELPHICLASS TalImage;
+class DELPHICLASS TALImage;
 class DELPHICLASS TALRectangle;
 class DELPHICLASS TALCircle;
 class DELPHICLASS TALLine;
@@ -41,7 +41,7 @@ class DELPHICLASS TALText;
 //-- type declarations -------------------------------------------------------
 enum DECLSPEC_DENUM TALImageWrapMode : unsigned char { Original, Fit, Stretch, Tile, Center, Place, FitAndCrop };
 
-class PASCALIMPLEMENTATION TalImage : public Fmx::Controls::TControl
+class PASCALIMPLEMENTATION TALImage : public Fmx::Controls::TControl
 {
 	typedef Fmx::Controls::TControl inherited;
 	
@@ -64,8 +64,8 @@ protected:
 	__property Fmx::Graphics::TBitmap* BufBitmap = {read=fBufBitmap};
 	
 public:
-	__fastcall virtual TalImage(System::Classes::TComponent* AOwner);
-	__fastcall virtual ~TalImage(void);
+	__fastcall virtual TALImage(System::Classes::TComponent* AOwner);
+	__fastcall virtual ~TALImage(void);
 	virtual Fmx::Graphics::TBitmap* __fastcall MakeBufBitmap(void);
 	virtual void __fastcall clearBufBitmap(void);
 	

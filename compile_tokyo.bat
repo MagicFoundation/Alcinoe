@@ -202,6 +202,20 @@ IF ERRORLEVEL 1 PAUSE
 CHDIR ..
 
 CHDIR demos\
+MSBuild ALFmxEffects\_source\ALFmxEffects.dproj /p:Config=Release /p:Platform=Android /t:Build
+MSBuild ALFmxEffects\_source\ALFmxEffects.dproj /p:Config=Release /p:Platform=Android /t:Deploy
+IF ERRORLEVEL 1 PAUSE
+MSBuild ALFmxEffects\_source\ALFmxEffects.dproj /p:Config=Release /p:Platform=iOSSimulator /t:Build
+IF ERRORLEVEL 1 PAUSE
+MSBuild ALFmxEffects\_source\ALFmxEffects.dproj /p:Config=Release /p:Platform=iOSDevice32 /t:Build
+IF ERRORLEVEL 1 PAUSE
+MSBuild ALFmxEffects\_source\ALFmxEffects.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
+IF ERRORLEVEL 1 PAUSE
+MSBuild ALFmxEffects\_source\ALFmxEffects.dproj /p:Config=Release /p:Platform=OSX32 /t:Build
+IF ERRORLEVEL 1 PAUSE
+CHDIR ..
+
+CHDIR demos\
 FOR /d /R %%J IN (Release) DO (	  
   Echo.%%J | findstr /C:"Android">nul && (
     IF EXIST %%J del %%J * /q     

@@ -651,7 +651,8 @@ extern DELPHI_PACKAGE System::AnsiString __fastcall ALBase64EncodeStringMIME(con
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALBase64DecodeStringMIME(const System::AnsiString S);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALBase64EncodeStringU(const System::UnicodeString S, System::Sysutils::TEncoding* const AEncoding = (System::Sysutils::TEncoding*)(0x0));
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALBase64DecodeStringU(const System::UnicodeString S, System::Sysutils::TEncoding* const AEncoding = (System::Sysutils::TEncoding*)(0x0));
-extern DELPHI_PACKAGE System::UnicodeString __fastcall ALBase64EncodeBytesU(const System::DynamicArray<System::Byte> Bytes);
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALBase64EncodeBytesU(const System::DynamicArray<System::Byte> Bytes)/* overload */;
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALBase64EncodeBytesU(const void * Bytes, const int Size)/* overload */;
 extern DELPHI_PACKAGE System::DynamicArray<System::Byte> __fastcall ALBase64DecodeBytesU(const System::UnicodeString S);
 extern DELPHI_PACKAGE bool __fastcall ALIsDecimal(const System::AnsiString S, const bool RejectPlusMinusSign = false);
 extern DELPHI_PACKAGE bool __fastcall ALIsInteger(const System::AnsiString S);
@@ -738,6 +739,7 @@ extern DELPHI_PACKAGE bool __fastcall ALExtractTagParams(const System::AnsiStrin
 extern DELPHI_PACKAGE void __fastcall ALSplitTextAndTag(const System::AnsiString SourceString, const System::AnsiString TagStart, const System::AnsiString TagEnd, Alstringlist::TALStrings* SplitTextAndTagLst, bool IgnoreCase);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALGetStringFromFile(const System::AnsiString filename, const System::Word ShareMode = (System::Word)(0x20));
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALGetStringFromFileWithoutUTF8BOM(const System::AnsiString filename, const System::Word ShareMode = (System::Word)(0x20));
+extern DELPHI_PACKAGE void __fastcall ALAppendStringToFile(const System::AnsiString Str, const System::AnsiString FileName);
 extern DELPHI_PACKAGE void __fastcall ALSaveStringtoFile(const System::AnsiString Str, const System::AnsiString filename);
 extern DELPHI_PACKAGE System::DynamicArray<System::Byte> __fastcall ALGetBytesFromStream(System::Classes::TStream* const aStream);
 extern DELPHI_PACKAGE System::DynamicArray<System::Byte> __fastcall ALGetBytesFromFileU(const System::UnicodeString filename, const System::Word ShareMode = (System::Word)(0x20));

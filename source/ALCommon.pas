@@ -323,6 +323,8 @@ var ALCustomDelayedFreeObjectProc: TALCustomDelayedFreeObjectProc;
 {$IFDEF DEBUG}
 var ALFreeAndNilRefCountWarn: boolean;
 threadvar ALCurThreadFreeAndNilNORefCountWarn: boolean;
+type TALFreeAndNilCanRefCountWarnProc = function(const aObject: Tobject): boolean of object;
+var ALFreeAndNilCanRefCountWarnProc: TALFreeAndNilCanRefCountWarnProc;
 {$ENDIF}
 Procedure ALFreeAndNil(var Obj; const adelayed: boolean = false); overload; {$IFNDEF DEBUG}inline;{$ENDIF}
 Procedure ALFreeAndNil(var Obj; const adelayed: boolean; const aRefCountWarn: Boolean); overload; {$IFNDEF DEBUG}inline;{$ENDIF}
@@ -466,7 +468,7 @@ end;
 function ALRectCenter(var R: TALRectD; const Bounds: TALRectD): TALRectD;
 begin
   ALOffsetRect(R, -R.Left, -R.Top);
-  ALOffsetRect(R, Round((ALRectWidth(Bounds) - ALRectWidth(R)) / 2), Round((ALRectHeight(Bounds) - ALRectHeight(R)) / 2));
+  ALOffsetRect(R, (ALRectWidth(Bounds) - ALRectWidth(R)) / 2, (ALRectHeight(Bounds) - ALRectHeight(R)) / 2);
   ALOffsetRect(R, Bounds.Left, Bounds.Top);
   Result := R;
 end;
@@ -1702,7 +1704,9 @@ begin
                       // other keeping themselves alive during whole application lifetime.
       {$IF defined(DEBUG)}
       if ALFreeAndNilRefCountWarn and
-        (not ALCurThreadFreeAndNilNORefCountWarn) then begin
+        (not ALCurThreadFreeAndNilNORefCountWarn) and
+        ((not assigned(ALFreeAndNilCanRefCountWarnProc)) or
+         (ALFreeAndNilCanRefCountWarnProc(Temp))) then begin
         if (Temp.RefCount - 1) and (not $40000000{Temp.objDisposedFlag}) <> 0 then
           ALLog('ALFreeAndNil', Temp.ClassName + ' | Refcount is not null (' + Inttostr((Temp.RefCount - 1) and (not $40000000{Temp.objDisposedFlag})) + ')', TalLogType.warn);
       end;
@@ -1833,6 +1837,7 @@ initialization
   ALCustomDelayedFreeObjectProc := nil;
   {$IFDEF DEBUG}
   ALFreeAndNilRefCountWarn := False;
+  ALFreeAndNilCanRefCountWarnProc := nil;
   {$ENDIF}
 
 end.

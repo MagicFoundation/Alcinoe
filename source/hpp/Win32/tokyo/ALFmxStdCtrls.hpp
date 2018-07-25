@@ -47,7 +47,7 @@ class DELPHICLASS TALTrackBar;
 class DELPHICLASS TALScrollBar;
 class DELPHICLASS TALRangeTrackBar;
 class DELPHICLASS TALCheckBox;
-class DELPHICLASS TAlRadioButton;
+class DELPHICLASS TALRadioButton;
 //-- type declarations -------------------------------------------------------
 class PASCALIMPLEMENTATION TALAniIndicator : public Fmx::Controls::TControl
 {
@@ -135,9 +135,9 @@ __published:
 };
 
 
-class PASCALIMPLEMENTATION TALTrackThumbGlyph : public Alfmxobjects::TalImage
+class PASCALIMPLEMENTATION TALTrackThumbGlyph : public Alfmxobjects::TALImage
 {
-	typedef Alfmxobjects::TalImage inherited;
+	typedef Alfmxobjects::TALImage inherited;
 	
 public:
 	__fastcall virtual TALTrackThumbGlyph(System::Classes::TComponent* AOwner);
@@ -147,7 +147,7 @@ __published:
 	__property Locked = {default=1};
 	__property HitTest = {default=0};
 public:
-	/* TalImage.Destroy */ inline __fastcall virtual ~TALTrackThumbGlyph(void) { }
+	/* TALImage.Destroy */ inline __fastcall virtual ~TALTrackThumbGlyph(void) { }
 	
 };
 
@@ -678,7 +678,7 @@ __published:
 };
 
 
-class PASCALIMPLEMENTATION TAlRadioButton : public TALCheckBox
+class PASCALIMPLEMENTATION TALRadioButton : public TALCheckBox
 {
 	typedef TALCheckBox inherited;
 	
@@ -696,8 +696,8 @@ protected:
 	virtual bool __fastcall ImageUncheckedResourceNameStored(void);
 	
 public:
-	__fastcall virtual TAlRadioButton(System::Classes::TComponent* AOwner);
-	__fastcall virtual ~TAlRadioButton(void);
+	__fastcall virtual TALRadioButton(System::Classes::TComponent* AOwner);
+	__fastcall virtual ~TALRadioButton(void);
 	
 __published:
 	__property System::UnicodeString GroupName = {read=GetGroupName, write=SetGroupName, stored=GroupNameStored};

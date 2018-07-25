@@ -101,7 +101,7 @@ type
   //also from smartphone to tablet i notice that to keep a good ratio i must increase all the font size, and image by 15%. So using multires
   //bitmap and if i want to avoid any resize (the purpose of multires bitmap as i understand) i must have 10 bitmaps per image !!
   //so all of this to say that multi-res bitmap is a fundamentally wrong concept
-  TalImage = class(TControl)
+  TALImage = class(TControl)
   private
     fExifOrientationInfo: TalExifOrientationInfo;
     fRotateAccordingToExifOrientation: Boolean;
@@ -929,7 +929,7 @@ end;
 {$ENDIF}
 
 {************************************************************}
-procedure TalImage.SetWrapMode(const Value: TALImageWrapMode);
+procedure TALImage.SetWrapMode(const Value: TALImageWrapMode);
 begin
   if FWrapMode <> Value then begin
     clearBufBitmap;
@@ -939,7 +939,7 @@ begin
 end;
 
 {**************************************************}
-procedure TalImage.setFileName(const Value: String);
+procedure TALImage.setFileName(const Value: String);
 begin
   if FFileName <> Value then begin
     clearBufBitmap;
@@ -949,7 +949,7 @@ begin
 end;
 
 {******************************************************}
-procedure TalImage.setResourceName(const Value: String);
+procedure TALImage.setResourceName(const Value: String);
 begin
   if FResourceName <> Value then begin
     clearBufBitmap;

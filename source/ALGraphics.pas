@@ -15,6 +15,7 @@ uses system.classes,
      system.uitypes,
      {$IF defined(ios)}
      iOSapi.CocoaTypes,
+     iOSapi.UIKit,
      fmx.surfaces,
      fmx.types3D,
      {$ENDIF}
@@ -24,6 +25,26 @@ uses system.classes,
      fmx.types3D,
      {$ENDIF}
      FMX.graphics;
+
+//get the oritation From Exif
+Type
+
+  TalExifOrientationInfo = (FLIP_HORIZONTAL,
+                            FLIP_VERTICAL,
+                            NORMAL,
+                            ROTATE_180,
+                            ROTATE_270,
+                            ROTATE_90,
+                            TRANSPOSE,
+                            TRANSVERSE,
+                            UNDEFINED);
+
+function  AlGetExifOrientationInfo(const aFilename: String): TalExifOrientationInfo;
+procedure ALNormalizeImageOrientationV1(const aBitmap: Tbitmap; const aExifOrientationInfo: TalExifOrientationInfo);
+function  ALNormalizeImageOrientationV2(const aBitmap: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const aExifOrientationInfo: TalExifOrientationInfo): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF};
+function  AlDetectImageExtensionU(const aStream: TStream): String; overload;
+function  AlDetectImageExtensionU(const aFileName: string): String; overload;
+function  ALPrepareColor(const SrcColor: TAlphaColor; const Opacity: Single): TAlphaColor;
 
 {$IF defined(ANDROID)}
 function ALJBitmaptoTexture(const aBitmap: Jbitmap; const aVolatileTexture: boolean = true): TTexture;
@@ -181,23 +202,14 @@ function  ALLoadStretchResourceImageV3(const aResName: String; const W, H: singl
 function  ALLoadStretchFileImageV1(const aFileName: String; const W, H: single): Tbitmap;
 function  ALLoadStretchFileImageV2(const aFileName: String; const W, H: single): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF};
 function  ALLoadStretchFileImageV3(const aFileName: String; const W, H: single{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
-
-//get the oritation From Exif
-Type
-
-  TalExifOrientationInfo = (FLIP_HORIZONTAL,
-                            FLIP_VERTICAL,
-                            NORMAL,
-                            ROTATE_180,
-                            ROTATE_270,
-                            ROTATE_90,
-                            TRANSPOSE,
-                            TRANSVERSE,
-                            UNDEFINED);
-
-function  AlGetExifOrientationInfo(const aFilename: String): TalExifOrientationInfo;
-function  AlDetectImageExtensionU(const aFileName: string): String;
-function  ALPrepareColor(const SrcColor: TAlphaColor; const Opacity: Single): TAlphaColor;
+//-----
+function  ALLoadNormalizeOrientationImageV1(const aStream: TCustomMemoryStream; const aExifOrientationInfo: TalExifOrientationInfo): Tbitmap;
+function  ALLoadNormalizeOrientationImageV2(const aStream: TCustomMemoryStream; const aExifOrientationInfo: TalExifOrientationInfo): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF};
+function  ALLoadNormalizeOrientationImageV3(const aStream: TCustomMemoryStream; const aExifOrientationInfo: TalExifOrientationInfo{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
+//-----
+function  ALLoadNormalizeOrientationFileImageV1(const aFileName: String): Tbitmap;
+function  ALLoadNormalizeOrientationFileImageV2(const aFileName: String): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF};
+function  ALLoadNormalizeOrientationFileImageV3(const aFileName: String{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
 
 {$IF defined(IOS)}
 type
@@ -242,7 +254,6 @@ uses system.sysutils,
      {$IF defined(IOS)}
      iOSapi.CoreGraphics,
      iOSapi.Foundation,
-     iOSapi.UIKit,
      iOSapi.CoreImage,
      Macapi.ObjectiveC,
      Macapi.CoreFoundation,
@@ -2467,10 +2478,10 @@ begin
       if Result.Canvas.BeginScene then
       try
         Result.Canvas.DrawBitmap(aBitmap, // const ABitmap: TBitmap;
-                                     aSrcRect, //const SrcRect,
-                                     aDestRect, //const DstRect: TRectF;
-                                     1, //const AOpacity: Single;
-                                     false); // const HighSpeed: Boolean => disable interpolation
+                                 aSrcRect, //const SrcRect,
+                                 aDestRect, //const DstRect: TRectF;
+                                 1, //const AOpacity: Single;
+                                 false); // const HighSpeed: Boolean => disable interpolation
       finally
         Result.Canvas.EndScene;
       end;
@@ -2505,10 +2516,10 @@ begin
       if Result.Canvas.BeginScene then
       try
         Result.Canvas.DrawBitmap(aBitmap, // const ABitmap: TBitmap;
-                                     aSrcRect, //const SrcRect,
-                                     aDestRect, //const DstRect: TRectF;
-                                     1, //const AOpacity: Single;
-                                     false); // const HighSpeed: Boolean => disable interpolation
+                                 aSrcRect, //const SrcRect,
+                                 aDestRect, //const DstRect: TRectF;
+                                 1, //const AOpacity: Single;
+                                 false); // const HighSpeed: Boolean => disable interpolation
       finally
         Result.Canvas.EndScene;
       end;
@@ -4849,10 +4860,10 @@ begin
       if Result.Canvas.BeginScene then
       try
         Result.Canvas.DrawBitmap(aBitmap, // const ABitmap: TBitmap;
-                                     aSrcRect, //const SrcRect,
-                                     aDestRect, //const DstRect: TRectF;
-                                     1, //const AOpacity: Single;
-                                     false); // const HighSpeed: Boolean => disable interpolation
+                                 aSrcRect, //const SrcRect,
+                                 aDestRect, //const DstRect: TRectF;
+                                 1, //const AOpacity: Single;
+                                 false); // const HighSpeed: Boolean => disable interpolation
       finally
         Result.Canvas.EndScene;
       end;
@@ -4891,10 +4902,10 @@ begin
       if Result.Canvas.BeginScene then
       try
         Result.Canvas.DrawBitmap(aBitmap, // const ABitmap: TBitmap;
-                                     aSrcRect, //const SrcRect,
-                                     aDestRect, //const DstRect: TRectF;
-                                     1, //const AOpacity: Single;
-                                     false); // const HighSpeed: Boolean => disable interpolation
+                                 aSrcRect, //const SrcRect,
+                                 aDestRect, //const DstRect: TRectF;
+                                 1, //const AOpacity: Single;
+                                 false); // const HighSpeed: Boolean => disable interpolation
       finally
         Result.Canvas.EndScene;
       end;
@@ -6242,6 +6253,330 @@ begin
   end;
 end;
 
+{*******************************************************************************************************************************************}
+function  ALLoadNormalizeOrientationImageV1(const aStream: TCustomMemoryStream; const aExifOrientationInfo: TalExifOrientationInfo): Tbitmap;
+begin
+  result := Tbitmap.CreateFromStream(aStream);
+  try
+    ALNormalizeImageOrientationV1(result, aExifOrientationInfo);
+  except
+    AlFreeAndNil(Result);
+    raise;
+  end;
+end;
+
+{***********************************************************************************************************************************************************************************************************************}
+function  ALLoadNormalizeOrientationImageV2(const aStream: TCustomMemoryStream; const aExifOrientationInfo: TalExifOrientationInfo): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF};
+
+{$REGION ' ANDROID'}
+{$IF defined(ANDROID)}
+var aArray: TJavaArray<Byte>;
+    aBitmap: Jbitmap;
+begin
+  aArray := TJavaArray<Byte>.Create(aStream.Size);
+  try
+    system.Move(aStream.Memory^, aArray.Data^, aStream.Size);
+    aBitmap := TJBitmapFactory.JavaClass.decodeByteArray(aArray, 0, aStream.Size);
+    if aBitmap = nil then Exit(nil);
+    try
+      result := ALNormalizeImageOrientationV2(aBitmap, aExifOrientationInfo);
+    finally
+      if not aBitmap.sameAs(result) then aBitmap.recycle;
+      aBitmap := nil;
+    end;
+  finally
+    ALfreeandNil(aArray);
+  end;
+end;
+{$ENDIF}
+{$ENDREGION}
+
+{$REGION ' IOS'}
+{$IF defined(IOS)}
+var aImage: UIimage;
+    aData: NSData;
+begin
+  result := nil;
+  aData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  try
+    if aData.length > 0 then begin
+      aImage := TUIImage.Wrap(TUIImage.alloc.initWithData(aData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      if aImage <> nil then begin
+        try
+          result := ALNormalizeImageOrientationV2(aImage.CGImage, aExifOrientationInfo);
+          if result = aImage.CGImage then CGImageRetain(result);
+        finally
+          aImage.release;
+        end;
+      end
+    end;
+  finally
+    aData.release;
+  end;
+end;
+{$ENDIF}
+{$ENDREGION}
+
+{$REGION ' MSWINDOWS / _MACOS'}
+{$IF defined(MSWINDOWS) or defined(_MACOS)}
+begin
+  result := ALLoadNormalizeOrientationImageV1(aStream, aExifOrientationInfo);
+end;
+{$ENDIF}
+{$ENDREGION}
+
+{************************************************************************************************************************************************************************************************************************************************************}
+function  ALLoadNormalizeOrientationImageV3(const aStream: TCustomMemoryStream; const aExifOrientationInfo: TalExifOrientationInfo{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
+
+{$REGION ' ANDROID'}
+{$IF defined(ANDROID)}
+var aTmpBitmap: Jbitmap;
+begin
+
+  //create the aTmpBitmap
+  aTmpBitmap := ALLoadNormalizeOrientationImageV2(aStream, aExifOrientationInfo);
+  if aTmpBitmap = nil then exit(nil);
+  try
+    result := ALJBitmaptoTexture(aTmpBitmap, aVolatileTexture);
+  finally
+    aTmpBitmap.recycle;
+    aTmpBitmap := nil;
+  end;
+
+end;
+{$ENDIF}
+{$ENDREGION}
+
+{$REGION ' IOS'}
+{$IF defined(IOS)}
+var aImage: UIimage;
+    aData: NSData;
+    aMatrix: CGAffineTransform;
+    aContext: CGContextRef;
+    aColorSpace: CGColorSpaceRef;
+    aBitmapSurface: TBitmapSurface;
+    w, h: Single;
+begin
+  result := nil;
+  aData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  try
+    if aData.length > 0 then begin
+      aImage := TUIImage.Wrap(TUIImage.alloc.initWithData(aData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      if aImage <> nil then begin
+        try
+          aBitmapSurface := TbitmapSurface.Create;
+          try
+
+            //-----
+            w := CGImageGetWidth(aImage.CGImage);
+            h := CGImageGetHeight(aImage.CGImage);
+            aMatrix := CGAffineTransformIdentity;
+            case aExifOrientationInfo of
+
+              //UIImageOrientationUp: The original pixel data matches the image's intended display orientation.
+              TalExifOrientationInfo.NORMAL: ;
+
+              //UIImageOrientationUpMirrored: The image has been horizontally flipped from the orientation of its original pixel data
+              TalExifOrientationInfo.FLIP_HORIZONTAL: begin
+                                                        //amatrix.setScale(-1, 1);
+                                                        aMatrix := CGAffineTransformTranslate(aMatrix, w, 0);
+                                                        aMatrix := CGAffineTransformScale(aMatrix, -1, 1);
+                                                      end;
+
+              //UIImageOrientationDown: The image has been rotated 180° from the orientation of its original pixel data.
+              TalExifOrientationInfo.ROTATE_180: begin
+                                                   //amatrix.setRotate(180);
+                                                   aMatrix := CGAffineTransformTranslate(aMatrix, w, h);
+                                                   aMatrix := CGAffineTransformRotate(aMatrix, degToRad(180));
+                                                 end;
+
+              //UIImageOrientationDownMirrored: The image has been vertically flipped from the orientation of its original pixel data.
+              TalExifOrientationInfo.FLIP_VERTICAL: begin
+                                                      //amatrix.setRotate(180);
+                                                      //amatrix.postScale(-1, 1);
+                                                      aMatrix := CGAffineTransformTranslate(aMatrix, w, h);
+                                                      aMatrix := CGAffineTransformRotate(aMatrix, degToRad(180));
+                                                      aMatrix := CGAffineTransformTranslate(aMatrix, w, 0);
+                                                      aMatrix := CGAffineTransformScale(aMatrix, -1, 1);
+                                                    end;
+
+              //UIImageOrientationLeftMirrored: The image has been rotated 90° clockwise and flipped horizontally from the orientation of its original pixel data.
+              TalExifOrientationInfo.TRANSPOSE: begin
+                                                  //amatrix.setRotate(90);
+                                                  //amatrix.postScale(-1, 1);
+                                                  aMatrix := CGAffineTransformTranslate(aMatrix, w, 0);
+                                                  aMatrix := CGAffineTransformRotate(aMatrix, degToRad(90));
+                                                  aMatrix := CGAffineTransformTranslate(aMatrix, h, 0);
+                                                  aMatrix := CGAffineTransformScale(aMatrix, -1, 1);
+                                                end;
+
+              //UIImageOrientationRight: The image has been rotated 90° clockwise from the orientation of its original pixel data.
+              TalExifOrientationInfo.ROTATE_90: begin
+                                                  //amatrix.setRotate(90);
+                                                  aMatrix := CGAffineTransformTranslate(aMatrix, 0, h);
+                                                  aMatrix := CGAffineTransformRotate(aMatrix, -degToRad(90));
+                                                end;
+
+              //UIImageOrientationRightMirrored: The image has been rotated 90° COUNTERclockwise and flipped horizontally from the orientation of its original pixel data.
+              TalExifOrientationInfo.TRANSVERSE: begin
+                                                   //amatrix.setRotate(-90);
+                                                   //amatrix.postScale(-1, 1);
+                                                   aMatrix := CGAffineTransformTranslate(aMatrix, 0, h);
+                                                   aMatrix := CGAffineTransformRotate(aMatrix, -degToRad(90));
+                                                   aMatrix := CGAffineTransformTranslate(aMatrix, h, 0);
+                                                   aMatrix := CGAffineTransformScale(aMatrix, -1, 1);
+                                                 end;
+
+              //UIImageOrientationLeft: The image has been rotated 90° COUNTERclockwise from the orientation of its original pixel data.
+              TalExifOrientationInfo.ROTATE_270: begin
+                                                   //amatrix.setRotate(-90);
+                                                   aMatrix := CGAffineTransformTranslate(aMatrix, w, 0);
+                                                   aMatrix := CGAffineTransformRotate(aMatrix, degToRad(90));
+                                                 end;
+
+              //UNDEFINED
+              TalExifOrientationInfo.UNDEFINED: ;
+
+            end;
+
+            //-----
+            if aExifOrientationInfo in [TalExifOrientationInfo.ROTATE_270, {UIImageOrientationLeft}
+                                        TalExifOrientationInfo.TRANSPOSE, {UIImageOrientationLeftMirrored}
+                                        TalExifOrientationInfo.ROTATE_90, {UIImageOrientationRight}
+                                        TalExifOrientationInfo.TRANSVERSE{UIImageOrientationRightMirrored}] then aBitmapSurface.SetSize(ceil(h), ceil(w))
+            else aBitmapSurface.SetSize(ceil(w), ceil(h));
+            //-----
+            aColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
+            if aColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
+              try
+                aContext := CGBitmapContextCreate(aBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                                       //       memory block should be at least (bytesPerRow*height) bytes.
+                                                                       //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                                       //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                                                  round(W), // width: The width, in pixels, of the required bitmap.
+                                                  round(H), // height: The height, in pixels, of the required bitmap.
+                                                  8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                                     //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                                     //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                                     //                   chapter of Quartz 2D Programming Guide.
+                                                     //                   we can also use CGImageGetBitsPerComponent(aImage.CGImage) but 8 it's what we need
+                                                  aBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                                        //              a value of 0 causes the value to be calculated automatically.
+                                                                        //              we could also use CGImageGetBytesPerRow(aImage.CGImage) or W * 4
+                                                  aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                                                        //             bitmap graphics contexts.
+                                                  kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                                    // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                                    // kCGImageAlphaPremultipliedNone =  For example, RGB
+                                                  kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                                            // kCGBitmapByteOrder32Little = Little-endian
+                                                                            // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                                            //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                                            //             values. The constants for specifying the alpha channel information are declared with the
+                                                                            //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                                            //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                                            //             and CGImageAlphaInfo constants.)
+                                                                            //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                                            //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                                            //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+                if aContext <> nil then begin
+                  try
+                    CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
+                    CGContextSetShouldAntialias(aContext, 1); // Sets anti-aliasing on or off for a graphics context.
+                    CGContextSetAllowsAntialiasing(aContext, 1); // Sets whether or not to allow anti-aliasing for a graphics context.
+                    CGContextConcatCTM(aContext, aMatrix);
+                    if aExifOrientationInfo in [TalExifOrientationInfo.ROTATE_270, {UIImageOrientationLeft}
+                                                TalExifOrientationInfo.TRANSPOSE, {UIImageOrientationLeftMirrored}
+                                                TalExifOrientationInfo.ROTATE_90, {UIImageOrientationRight}
+                                                TalExifOrientationInfo.TRANSVERSE{UIImageOrientationRightMirrored}] then CGContextDrawImage(aContext, // c: The graphics context in which to draw the image.
+                                                                                                                                            CGRectMake(0, 0, h, w), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                                                                                                                                            aImage.CGImage) // image The image to draw.
+                    else CGContextDrawImage(aContext, // c: The graphics context in which to draw the image.
+                                            CGRectMake(0, 0, w, h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                                            aImage.CGImage); // image The image to draw.
+                  finally
+                    CGContextRelease(aContext);
+                  end;
+
+                  result := TALTexture.Create(aVolatileTexture);
+                  try
+                    result.Assign(aBitmapSurface);
+                  except
+                    ALfreeandNil(result);
+                    raise;
+                  end;
+
+                end;
+              finally
+                CGColorSpaceRelease(aColorSpace);
+              end;
+            end;
+          finally
+            ALfreeandNil(aBitmapSurface);
+          end;
+        finally
+          aImage.release;
+        end;
+      end
+    end;
+  finally
+    aData.release;
+  end;
+end;
+{$ENDIF}
+{$ENDREGION}
+
+{$REGION ' MSWINDOWS / _MACOS'}
+{$IF defined(MSWINDOWS) or defined(_MACOS)}
+begin
+  result := ALLoadNormalizeOrientationImageV1(aStream, aExifOrientationInfo);
+end;
+{$ENDIF}
+{$ENDREGION}
+
+{********************************************************************************}
+function  ALLoadNormalizeOrientationFileImageV1(const aFileName: String): Tbitmap;
+var aStream: TMemoryStream;
+begin
+  aStream := TMemoryStream.Create;
+  try
+    aStream.LoadFromFile(aFileName);
+    result := ALLoadNormalizeOrientationImageV1(aStream, AlGetExifOrientationInfo(aFileName));
+  finally
+    ALfreeandNil(aStream);
+  end;
+end;
+
+{************************************************************************************************************************************************************}
+function  ALLoadNormalizeOrientationFileImageV2(const aFileName: String): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF};
+var aStream: TMemoryStream;
+begin
+  aStream := TMemoryStream.Create;
+  try
+    aStream.LoadFromFile(aFileName);
+    result := ALLoadNormalizeOrientationImageV2(aStream, AlGetExifOrientationInfo(aFileName));
+  finally
+    ALfreeandNil(aStream);
+  end;
+end;
+
+{*************************************************************************************************************************************************************************************************}
+function  ALLoadNormalizeOrientationFileImageV3(const aFileName: String{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
+var aStream: TMemoryStream;
+begin
+  aStream := TMemoryStream.Create;
+  try
+    aStream.LoadFromFile(aFileName);
+    result := ALLoadNormalizeOrientationImageV3(aStream, AlGetExifOrientationInfo(aFileName){$IFDEF _USE_TEXTURE}, aVolatileTexture{$ENDIF});
+  finally
+    ALfreeandNil(aStream);
+  end;
+end;
+
 {**********************************************************************************}
 function  AlGetExifOrientationInfo(const aFilename: String): TalExifOrientationInfo;
 
@@ -6287,30 +6622,42 @@ begin
         try
           aOrientation := TNSNumber.Wrap(CFDictionaryGetValue(aDictionaryRef, NSStringToID(kCGImagePropertyOrientation)));
           if aOrientation <> nil then begin
+
+            //typedef CF_ENUM(uint32_t, CGImagePropertyOrientation) {
+            //    kCGImagePropertyOrientationUp = 1,        // 0th row at top,    0th column on left   - default orientation
+            //    kCGImagePropertyOrientationUpMirrored,    // 0th row at top,    0th column on right  - horizontal flip
+            //    kCGImagePropertyOrientationDown,          // 0th row at bottom, 0th column on right  - 180 deg rotation
+            //    kCGImagePropertyOrientationDownMirrored,  // 0th row at bottom, 0th column on left   - vertical flip
+            //    kCGImagePropertyOrientationLeftMirrored,  // 0th row on left,   0th column at top
+            //    kCGImagePropertyOrientationRight,         // 0th row on right,  0th column at top    - 90 deg CW
+            //    kCGImagePropertyOrientationRightMirrored, // 0th row on right,  0th column on bottom
+            //    kCGImagePropertyOrientationLeft           // 0th row on left,   0th column at bottom - 90 deg CCW
+            //};
+
             case aOrientation.integerValue of
 
-              //Top, left
+              //Top, left (UIImageOrientationUp)
               1: result := TalExifOrientationInfo.NORMAL;
 
-              //Top, right
+              //Top, right (UIImageOrientationUpMirrored)
               2: result := TalExifOrientationInfo.FLIP_HORIZONTAL;
 
-              //Bottom, right
+              //Bottom, right (UIImageOrientationDown)
               3: result := TalExifOrientationInfo.ROTATE_180;
 
-              //Bottom, left
+              //Bottom, left (UIImageOrientationDownMirrored)
               4: result := TalExifOrientationInfo.FLIP_VERTICAL;
 
-              //Left, top
+              //Left, top (UIImageOrientationLeftMirrored)
               5: result := TalExifOrientationInfo.transpose;
 
-              //Right, top
+              //Right, top (UIImageOrientationRight)
               6: result := TalExifOrientationInfo.ROTATE_90;
 
-              //Right, bottom
+              //Right, bottom (UIImageOrientationRightMirrored)
               7: result := TalExifOrientationInfo.transverse;
 
-              //Left, bottom
+              //Left, bottom (UIImageOrientationLeft)
               8: result := TalExifOrientationInfo.ROTATE_270;
 
             end;
@@ -6335,39 +6682,261 @@ end;
 {$IF defined(MSWINDOWS) or defined(_MACOS)}
 begin
   result := TalExifOrientationInfo.NORMAL; // << todo - https://stackoverflow.com/questions/18622152/read-exif-gps-info-using-delphi
-                                           // << note: put a function in alcommon as it's will be a generic function not only use for
-                                           // << firemonkey
+end;
+{$ENDIF}
+{$ENDREGION}
+
+{******************************************************************************************************************}
+procedure ALNormalizeImageOrientationV1(const aBitmap: Tbitmap; const aExifOrientationInfo: TalExifOrientationInfo);
+begin
+  case aExifOrientationInfo of
+    TalExifOrientationInfo.NORMAL: exit;
+    TalExifOrientationInfo.FLIP_HORIZONTAL: aBitmap.FlipHorizontal;
+    TalExifOrientationInfo.ROTATE_180: aBitmap.Rotate(180);
+    TalExifOrientationInfo.FLIP_VERTICAL: aBitmap.FlipVertical;
+    TalExifOrientationInfo.TRANSPOSE: begin
+                                        aBitmap.Rotate(90);
+                                        aBitmap.FlipHorizontal;
+                                      end;
+    TalExifOrientationInfo.ROTATE_90: aBitmap.Rotate(90);
+    TalExifOrientationInfo.TRANSVERSE: begin
+                                         aBitmap.Rotate(-90);
+                                         aBitmap.FlipHorizontal;
+                                       end;
+    TalExifOrientationInfo.ROTATE_270: aBitmap.Rotate(270);
+    TalExifOrientationInfo.UNDEFINED: exit;
+    else exit;
+  end;
+end;
+
+{***********************************************************************************************************************************************************************************************************************************************************************************}
+function  ALNormalizeImageOrientationV2(const aBitmap: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const aExifOrientationInfo: TalExifOrientationInfo): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF};
+
+{$REGION ' ANDROID'}
+{$IF defined(ANDROID)}
+var aMatrix: JMatrix;
+begin
+  aMatrix := TJMatrix.JavaClass.init;
+  case aExifOrientationInfo of
+    TalExifOrientationInfo.NORMAL: exit(aBitmap);
+    TalExifOrientationInfo.FLIP_HORIZONTAL: amatrix.setScale(-1, 1);
+    TalExifOrientationInfo.ROTATE_180: amatrix.setRotate(180);
+    TalExifOrientationInfo.FLIP_VERTICAL: begin
+                                            amatrix.setRotate(180);
+                                            amatrix.postScale(-1, 1);
+                                          end;
+    TalExifOrientationInfo.TRANSPOSE: begin
+                                        amatrix.setRotate(90);
+                                        amatrix.postScale(-1, 1);
+                                      end;
+    TalExifOrientationInfo.ROTATE_90: amatrix.setRotate(90);
+    TalExifOrientationInfo.TRANSVERSE: begin
+                                         amatrix.setRotate(-90);
+                                         amatrix.postScale(-1, 1);
+                                       end;
+    TalExifOrientationInfo.ROTATE_270: amatrix.setRotate(-90);
+    TalExifOrientationInfo.UNDEFINED: exit(aBitmap);
+    else exit(aBitmap);
+  end;
+  result := TJBitmap.JavaClass.createBitmap(aBitmap{src}, 0{X}, 0{Y}, aBitmap.getwidth{Width}, aBitmap.getheight{height}, aMatrix{m}, True{filter});
+  aMatrix := nil;
+end;
+{$ENDIF}
+{$ENDREGION}
+
+{$REGION ' IOS'}
+{$IF defined(IOS)}
+var aMatrix: CGAffineTransform;
+    aContext: CGContextRef;
+    aColorSpace: CGColorSpaceRef;
+    w, h: Single;
+begin
+
+  //-----
+  result := aBitmap;
+  w := CGImageGetWidth(aBitmap);
+  h := CGImageGetHeight(aBitmap);
+  aMatrix := CGAffineTransformIdentity;
+  case aExifOrientationInfo of
+
+    //UIImageOrientationUp: The original pixel data matches the image's intended display orientation.
+    TalExifOrientationInfo.NORMAL: exit(aBitmap);
+
+    //UIImageOrientationUpMirrored: The image has been horizontally flipped from the orientation of its original pixel data
+    TalExifOrientationInfo.FLIP_HORIZONTAL: begin
+                                              //amatrix.setScale(-1, 1);
+                                              aMatrix := CGAffineTransformTranslate(aMatrix, w, 0);
+                                              aMatrix := CGAffineTransformScale(aMatrix, -1, 1);
+                                            end;
+
+    //UIImageOrientationDown: The image has been rotated 180° from the orientation of its original pixel data.
+    TalExifOrientationInfo.ROTATE_180: begin
+                                         //amatrix.setRotate(180);
+                                         aMatrix := CGAffineTransformTranslate(aMatrix, w, h);
+                                         aMatrix := CGAffineTransformRotate(aMatrix, degToRad(180));
+                                       end;
+
+    //UIImageOrientationDownMirrored: The image has been vertically flipped from the orientation of its original pixel data.
+    TalExifOrientationInfo.FLIP_VERTICAL: begin
+                                            //amatrix.setRotate(180);
+                                            //amatrix.postScale(-1, 1);
+                                            aMatrix := CGAffineTransformTranslate(aMatrix, w, h);
+                                            aMatrix := CGAffineTransformRotate(aMatrix, degToRad(180));
+                                            aMatrix := CGAffineTransformTranslate(aMatrix, w, 0);
+                                            aMatrix := CGAffineTransformScale(aMatrix, -1, 1);
+                                          end;
+
+    //UIImageOrientationLeftMirrored: The image has been rotated 90° clockwise and flipped horizontally from the orientation of its original pixel data.
+    TalExifOrientationInfo.TRANSPOSE: begin
+                                        //amatrix.setRotate(90);
+                                        //amatrix.postScale(-1, 1);
+                                        aMatrix := CGAffineTransformTranslate(aMatrix, w, 0);
+                                        aMatrix := CGAffineTransformRotate(aMatrix, degToRad(90));
+                                        aMatrix := CGAffineTransformTranslate(aMatrix, h, 0);
+                                        aMatrix := CGAffineTransformScale(aMatrix, -1, 1);
+                                      end;
+
+    //UIImageOrientationRight: The image has been rotated 90° clockwise from the orientation of its original pixel data.
+    TalExifOrientationInfo.ROTATE_90: begin
+                                        //amatrix.setRotate(90);
+                                        aMatrix := CGAffineTransformTranslate(aMatrix, 0, h);
+                                        aMatrix := CGAffineTransformRotate(aMatrix, -degToRad(90));
+                                      end;
+
+    //UIImageOrientationRightMirrored: The image has been rotated 90° COUNTERclockwise and flipped horizontally from the orientation of its original pixel data.
+    TalExifOrientationInfo.TRANSVERSE: begin
+                                         //amatrix.setRotate(-90);
+                                         //amatrix.postScale(-1, 1);
+                                         aMatrix := CGAffineTransformTranslate(aMatrix, 0, h);
+                                         aMatrix := CGAffineTransformRotate(aMatrix, -degToRad(90));
+                                         aMatrix := CGAffineTransformTranslate(aMatrix, h, 0);
+                                         aMatrix := CGAffineTransformScale(aMatrix, -1, 1);
+                                       end;
+
+    //UIImageOrientationLeft: The image has been rotated 90° COUNTERclockwise from the orientation of its original pixel data.
+    TalExifOrientationInfo.ROTATE_270: begin
+                                         //amatrix.setRotate(-90);
+                                         aMatrix := CGAffineTransformTranslate(aMatrix, w, 0);
+                                         aMatrix := CGAffineTransformRotate(aMatrix, degToRad(90));
+                                       end;
+
+    //UNDEFINED
+    TalExifOrientationInfo.UNDEFINED: exit(aBitmap);
+    else exit(aBitmap);
+
+  end;
+
+  //-----
+  aColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
+  if aColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
+    try
+      aContext := CGBitmapContextCreate(nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                             //       memory block should be at least (bytesPerRow*height) bytes.
+                                             //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                             //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                                        round(W), // width: The width, in pixels, of the required bitmap.
+                                        round(H), // height: The height, in pixels, of the required bitmap.
+                                        8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                           //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                           //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                           //                   chapter of Quartz 2D Programming Guide.
+                                           //                   we can also use CGImageGetBitsPerComponent(aImage.CGImage) but 8 it's what we need
+                                        0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                           //              a value of 0 causes the value to be calculated automatically.
+                                           //              we could also use CGImageGetBytesPerRow(aImage.CGImage) or W * 4
+                                        aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                                              //             bitmap graphics contexts.
+                                        kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                          // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                          // kCGImageAlphaPremultipliedNone =  For example, RGB
+                                        kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                                  // kCGBitmapByteOrder32Little = Little-endian
+                                                                  // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                                  //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                                  //             values. The constants for specifying the alpha channel information are declared with the
+                                                                  //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                                  //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                                  //             and CGImageAlphaInfo constants.)
+                                                                  //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                                  //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                                  //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+      if aContext <> nil then begin
+        try
+          CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
+          CGContextSetShouldAntialias(aContext, 1); // Sets anti-aliasing on or off for a graphics context.
+          CGContextSetAllowsAntialiasing(aContext, 1); // Sets whether or not to allow anti-aliasing for a graphics context.
+          CGContextConcatCTM(aContext, aMatrix);
+          if aExifOrientationInfo in [TalExifOrientationInfo.ROTATE_270, {UIImageOrientationLeft}
+                                      TalExifOrientationInfo.TRANSPOSE, {UIImageOrientationLeftMirrored}
+                                      TalExifOrientationInfo.ROTATE_90, {UIImageOrientationRight}
+                                      TalExifOrientationInfo.TRANSVERSE{UIImageOrientationRightMirrored}] then CGContextDrawImage(aContext, // c: The graphics context in which to draw the image.
+                                                                                                                                  CGRectMake(0, 0, h, w), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                                                                                                                                  abitmap) // image The image to draw.
+          else CGContextDrawImage(aContext, // c: The graphics context in which to draw the image.
+                                  CGRectMake(0, 0, w, h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                                  abitmap); // image The image to draw.
+          result := CGBitmapContextCreateImage(aContext); // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
+                                                          // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
+                                                          // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
+                                                          // data in the bitmap graphics context is modified. As a consequence, you may want to use the resulting
+                                                          // image and release it before you perform additional drawing into the bitmap graphics context. In this way,
+                                                          // you can avoid the actual physical copy of the data.
+        finally
+          CGContextRelease(aContext);
+        end;
+      end;
+    finally
+      CGColorSpaceRelease(aColorSpace);
+    end;
+  end;
+
+end;
+{$ENDIF}
+{$ENDREGION}
+
+{$REGION ' MSWINDOWS / _MACOS'}
+{$IF defined(MSWINDOWS) or defined(_MACOS)}
+begin
+  result := aBitmap;
+  ALNormalizeImageOrientationV1(result, aExifOrientationInfo);
 end;
 {$ENDIF}
 {$ENDREGION}
 
 {******************************************************}
 // https://en.wikipedia.org/wiki/List_of_file_signatures
+function  AlDetectImageExtensionU(const aStream: Tstream): String;
+var aFirstBytes: Tbytes;
+begin
+  aStream.Position := 0;
+  if aStream.Size < 8 then exit('');
+  SetLength(aFirstBytes, 8);
+  aStream.ReadBuffer(aFirstBytes[0], length(aFirstBytes));
+  if (aFirstBytes[0] = $FF) and
+     (aFirstBytes[1] = $D8) then result := 'jpg'  // ÿØ
+  else if (aFirstBytes[0] = $89) and
+          (aFirstBytes[1] = $50) and
+          (aFirstBytes[2] = $4E) and
+          (aFirstBytes[3] = $47) and
+          (aFirstBytes[4] = $0D) and
+          (aFirstBytes[5] = $0A) and
+          (aFirstBytes[6] = $1A ) and
+          (aFirstBytes[7] = $0A) then result := 'png' // .PNG....
+  else if (aFirstBytes[0] = $47) and
+          (aFirstBytes[1] = $49) and
+          (aFirstBytes[2] = $46) then result := 'gif' // GIF
+  else if (aFirstBytes[0] = $42) and
+          (aFirstBytes[1] = $4D) then result := 'bmp' // BM
+  else result := '';
+end;
+
+{*****************************************************************}
 function  AlDetectImageExtensionU(const aFileName: string): String;
 var aFileStream: TFileStream;
-    aFirstBytes: Tbytes;
 begin
   aFileStream := TFileStream.Create(aFileName, fmOpenRead);
   try
-    if aFileStream.Size < 8 then exit('');
-    SetLength(aFirstBytes, 8);
-    aFileStream.ReadBuffer(aFirstBytes[0], length(aFirstBytes));
-    if (aFirstBytes[0] = $FF) and
-       (aFirstBytes[1] = $D8) then result := 'jpg'  // ÿØ
-    else if (aFirstBytes[0] = $89) and
-            (aFirstBytes[1] = $50) and
-            (aFirstBytes[2] = $4E) and
-            (aFirstBytes[3] = $47) and
-            (aFirstBytes[4] = $0D) and
-            (aFirstBytes[5] = $0A) and
-            (aFirstBytes[6] = $1A ) and
-            (aFirstBytes[7] = $0A) then result := 'png' // .PNG....
-    else if (aFirstBytes[0] = $47) and
-            (aFirstBytes[1] = $49) and
-            (aFirstBytes[2] = $46) then result := 'gif' // GIF
-    else if (aFirstBytes[0] = $42) and
-            (aFirstBytes[1] = $4D) then result := 'bmp' // BM
-    else result := '';
+    result := AlDetectImageExtensionU(aFileStream);
   finally
     aFileStream.Free;
   end;

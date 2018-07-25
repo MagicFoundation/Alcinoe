@@ -651,7 +651,7 @@ type
   end;
 
   {*********************************}
-  TAlRadioButton = class(TALCheckBox)
+  TALRadioButton = class(TALCheckBox)
   private
     FGroupName: string;
     fMandatory: boolean;

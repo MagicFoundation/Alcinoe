@@ -118,7 +118,7 @@ end;
 {**********************************************************************************************}
 function TALCustomIniFile.ReadBool(const Section, Ident: AnsiString; Default: Boolean): Boolean;
 begin
-  Result := ReadInteger(Section, Ident, Ord(Default)) <> 0;
+  Result := ALStrToBool(ReadString(Section, Ident, ALBoolToStr(Default)));
 end;
 
 {*******************************************************************************************************************************************}
@@ -215,9 +215,8 @@ end;
 
 {*************************************************************************************}
 procedure TALCustomIniFile.WriteBool(const Section, Ident: AnsiString; Value: Boolean);
-const Values: array[Boolean] of AnsiString = ('0', '1');
 begin
-  WriteString(Section, Ident, Values[Value]);
+  WriteString(Section, Ident, ALBoolToStr(Value));
 end;
 
 {*******************************************************************************}

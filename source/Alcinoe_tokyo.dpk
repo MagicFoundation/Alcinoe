@@ -55,7 +55,8 @@ contains
   ALAVLBinaryTree in 'ALAVLBinaryTree.pas',
   ALVideoPlayer in 'ALVideoPlayer.pas',
   ALFmxMemo in 'ALFmxMemo.pas',
-  ALGraphics in 'ALGraphics.pas';
+  ALGraphics in 'ALGraphics.pas',
+  ALFmxFilterEffects in 'ALFmxFilterEffects.pas';
 
 end.
 

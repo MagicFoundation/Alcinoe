@@ -53,9 +53,9 @@ to be easy to customize and extend. Under Ios i use AVPlayer with support
 also HLS like exoplayer do.
 
 <p align="left">
-  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/Untitled-1.jpg?raw=true" alt="video player for firemonkey" width="280" style="width:280px;"/>
-  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/Untitled-2.jpg?raw=true" alt="video player for firemonkey" width="280" style="width:280px;"/>
-  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/Untitled-3.jpg?raw=true" alt="video player for firemonkey" width="280" style="width:280px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-1.jpg?raw=true" alt="video player for firemonkey" width="280" style="width:280px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-2.jpg?raw=true" alt="video player for firemonkey" width="280" style="width:280px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-3.jpg?raw=true" alt="video player for firemonkey" width="280" style="width:280px;"/>
 </p>
 
 
@@ -78,12 +78,12 @@ top of the form (so off course no z-order with firemonkey control)
 
 
 <p align="left">
-  <img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-3.png/1" alt="Drawing" width="240" style="width:240px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-20.png?raw=true" alt="Drawing" width="240" style="width:240px;"/>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-2.png/1" alt="Drawing" width="240" style="width:240px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-21.png?raw=true" alt="Drawing" width="240" style="width:240px;"/>
 </p>
 
-<img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-4.png/1" alt="Drawing" width="457" style="width:457px;"/>
+<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-22.png?raw=true" alt="Drawing" width="457" style="width:457px;"/>
 
 
 
@@ -96,9 +96,9 @@ Fast/doublebuffered firemonkey controls with native draw
 * Glyph
 * etc.
 
-<img src="https://a.fsdn.com/con/app/proj/alcinoe/screenshots/Untitled-8.png/1" alt="TALRectangle" width="600" style="width:600px;" />
+<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-23.png?raw=true" alt="TALRectangle" width="600" style="width:600px;" />
 
-<img src="https://ibin.co/48kqTx3mBXPW.jpg" alt="TALRectangle" width="600" style="width:600px;" />
+<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-8.jpg?raw=true" alt="TALRectangle" width="600" style="width:600px;" />
 
 #### The fact ####
 
@@ -150,7 +150,7 @@ To resolve this, i build the buffer of my control using NATIVE
 ANDROID/IOS API. In this way we will have a high quality draw at also
 a high speed without being dependant of the form.quality
 
-<img src="https://ibin.co/48koybA5oaWf.jpg" alt="TALCircle" />
+<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-9.jpg?raw=true" alt="TALCircle" />
 
 
 
@@ -161,14 +161,14 @@ Improuved firemonkey controls
 * TabControl
 * RangeTrackBar
 
-<img src="https://ibin.co/48krCHpN6b6I.jpg" alt="RangeTrackBar" width="600" style="width:600px;"  />
+<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-5.jpg?raw=true" alt="RangeTrackBar" width="600" style="width:600px;"  />
 
 <p align="left">
-  <img src="https://ibin.co/4988ZmeSxThF.jpg" alt="video player for firemonkey" width="280" style="width:280px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-15.jpg?raw=true" alt="video player for firemonkey" width="280" style="width:280px;"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="https://ibin.co/4988nWNmG1HJ.jpg" alt="video player for firemonkey" width="280" style="width:280px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-14.jpg?raw=true" alt="video player for firemonkey" width="280" style="width:280px;"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="https://ibin.co/4988vdg67K7h.jpg" alt="video player for firemonkey" width="280" style="width:280px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-16.jpg?raw=true" alt="video player for firemonkey" width="280" style="width:280px;"/>
 </p>
 
 
@@ -197,9 +197,9 @@ With TALColorAdjustEffect, gorgeous photo filters with one-tap auto
 enhance, make your photos beautiful and expressive in just minutes! 
 
 <p align="left">
-  <img src="https://ibin.co/4992QatP7BaV.jpg" alt="video player for firemonkey" width="320" style="width:320px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-18.jpg?raw=true" alt="video player for firemonkey" width="320" style="width:320px;"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="https://ibin.co/4990yzHiND8k.jpg" alt="video player for firemonkey" width="320" style="width:320px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-19.jpg?raw=true" alt="video player for firemonkey" width="320" style="width:320px;"/>
 </p>
 
 

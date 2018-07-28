@@ -898,7 +898,7 @@ end;
 {****************}
 {$IF defined(IOS)}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if  TTextLayoutCT.GetCTFontRef is still the same as below and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if  FMX.Canvas.Mac.TTextLayoutCT.GetCTFontRef is still the same as below and adjust the IFDEF'}
 {$ENDIF}
 function  ALGetCTFontRef(const AFontFamily: String; const aFontSize: single; const aFontStyle: TFontStyles): CTFontRef;
 
@@ -4203,7 +4203,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if GetDrawingShapeRectAndSetThickness still have the same implementation and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if FMX.Objects.GetDrawingShapeRectAndSetThickness still have the same implementation and adjust the IFDEF'}
 {$ENDIF}
 //duplicate of the private delphi function GetDrawingShapeRectAndSetThickness in FMX.Objects
 function ALGetDrawingShapeRectAndSetThickness(const Rect: TrectF;

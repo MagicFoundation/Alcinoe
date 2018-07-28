@@ -282,7 +282,7 @@ begin
   else begin
 
     {$IF CompilerVersion > 32} // tokyo
-      {$MESSAGE WARN 'Check if the full flow of TTexture.Assign is still the same as below and adjust the IFDEF'}
+      {$MESSAGE WARN 'Check if the full flow of FMX.Types3D.TTexture.Assign is still the same as below and adjust the IFDEF'}
     {$ENDIF}
     result := TALTexture.Create(aVolatileTexture);
     try

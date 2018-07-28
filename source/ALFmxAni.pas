@@ -7,6 +7,7 @@ unit ALFmxAni;
 interface
 
 uses System.Classes,
+     System.SyncObjs,
      FMX.Types;
 
 type
@@ -95,14 +96,50 @@ implementation
 
 uses System.SysUtils,
      System.Generics.Collections,
+     System.math,
      FMX.Platform,
      FMX.Ani,
      AlCommon;
 
 type
 
-  {**************************}
-  TALAniThread = class(TTimer)
+  {*****************************}
+  TALTimerThread = class(TThread)
+  private
+    FTimerEvent: TNotifyEvent;
+    FInterval: Cardinal;
+    FEnabled: Boolean;
+    FEnabledEvent: TEvent;
+    procedure SetEnabled(const Value: Boolean);
+    procedure SetInterval(const Value: Cardinal);
+  protected
+    procedure Execute; override;
+    procedure DoInterval;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    property Interval: Cardinal read FInterval write SetInterval;
+    property Enabled: Boolean read FEnabled write SetEnabled;
+    property OnTimer: TNotifyEvent read FTimerEvent write FTimerEvent;
+  end;
+
+  {****************************}
+  TALThreadTimer = class(TTimer)
+  private
+    FThread: TALTimerThread;
+  protected
+    procedure SetOnTimer(Value: TNotifyEvent); override;
+    procedure SetEnabled(Value: Boolean); override;
+    procedure SetInterval(Value: Cardinal); override;
+    procedure UpdateTimer; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  end;
+
+  {*********************************************************************}
+  TALAniThread = class({$IFDEF ANDROID}TALThreadTimer{$ELSE}TTimer{$ENDIF})
   private
     FAniList: TList<TALAnimation>;
     FTime, FDeltaTime: Double;
@@ -122,12 +159,10 @@ begin
   inherited Create(nil);
   if not TPlatformServices.Current.SupportsPlatformService(IFMXTimerService, FTimerService) then
     raise EUnsupportedPlatformService.Create('IFMXTimerService');
-  if TALAnimation.AniFrameRate < 5 then
-    TALAnimation.AniFrameRate := 5;
-  if TALAnimation.AniFrameRate > 100 then
-    TALAnimation.AniFrameRate := 100;
-  Interval := Trunc(1000 / TALAnimation.AniFrameRate / 10) * 10;
-  if (Interval <= 0) then Interval := 1;
+  TAnimation.AniFrameRate := EnsureRange(TAnimation.AniFrameRate, 5, 100);
+  Interval := Trunc(1000 / TAnimation.AniFrameRate / 10) * 10;
+  if (Interval <= 0) then
+    Interval := 1;
 
   OnTimer := DoSyncTimer;
   FAniList := TList<TALAnimation>.Create;
@@ -507,6 +542,104 @@ end;
 procedure TALFloatAnimation.ProcessAnimation;
 begin
   fCurrentFloat := FStartFloat + (FStopFloat - FStartFloat) * NormalizedTime;
+end;
+
+{********************************}
+constructor TALTimerThread.Create;
+begin
+  inherited;
+  FEnabledEvent := TEvent.Create;
+  Interval := 1;
+  FEnabled := False;
+end;
+
+{********************************}
+destructor TALTimerThread.Destroy;
+begin
+  FreeAndNil(FEnabledEvent);
+  inherited;
+end;
+
+{**********************************}
+procedure TALTimerThread.DoInterval;
+begin
+  if Assigned(FTimerEvent) then
+    FTimerEvent(Self);
+end;
+
+{*******************************}
+procedure TALTimerThread.Execute;
+begin
+  while not Terminated do
+  begin
+    Sleep(Interval);
+    TThread.Synchronize(nil,
+      procedure
+      begin
+        DoInterval;
+      end);
+    FEnabledEvent.WaitFor;
+  end;
+end;
+
+{********************************************************}
+procedure TALTimerThread.SetEnabled(const Value: Boolean);
+begin
+  if FEnabled <> Value then
+  begin
+    FEnabled := Value;
+    if FEnabled then
+      FEnabledEvent.SetEvent
+    else
+      FEnabledEvent.ResetEvent;
+  end;
+end;
+
+{**********************************************************}
+procedure TALTimerThread.SetInterval(const Value: Cardinal);
+begin
+  FInterval := Max(Value, 1);
+end;
+
+{****************************************************}
+constructor TALThreadTimer.Create(AOwner: TComponent);
+begin
+  inherited;
+  FThread := TALTimerThread.Create;
+end;
+
+{********************************}
+destructor TALThreadTimer.Destroy;
+begin
+  FreeAndNil(FThread);
+  inherited;
+end;
+
+{**************************************************}
+procedure TALThreadTimer.SetEnabled(Value: Boolean);
+begin
+  inherited;
+  FThread.Enabled := Value;
+end;
+
+{****************************************************}
+procedure TALThreadTimer.SetInterval(Value: Cardinal);
+begin
+  inherited;
+  FThread.Interval := Value;
+end;
+
+{*******************************************************}
+procedure TALThreadTimer.SetOnTimer(Value: TNotifyEvent);
+begin
+  inherited;
+  FThread.OnTimer := Value;
+end;
+
+{***********************************}
+procedure TALThreadTimer.UpdateTimer;
+begin
+  // Don't invoke inherited method, because we take care under alternative timer implementation with Thread.
 end;
 
 {************}

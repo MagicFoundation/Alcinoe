@@ -202,7 +202,7 @@ end;
 
 {*************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if TCustomContextOpenGL.DoInitializeTexture still has the same implementation and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if FMX.Context.GLES.TCustomContextOpenGL.DoInitializeTexture still has the same implementation and adjust the IFDEF'}
 {$ENDIF}
 {$IF defined(ANDROID)}
 procedure ALInitializeExternalOESTexture(const Texture: TALTexture);

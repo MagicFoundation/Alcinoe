@@ -2918,6 +2918,10 @@ function TRenderingCompare.Compare(const Left, Right: TControl3D): Integer;
 var
   LeftPosition, RightPosition: TPoint3D;
   LeftMaterial, RightMaterial: Pointer;
+  LeftLength: Single;
+  RightLenght: Single;
+  IsLeftLengthNan: Boolean;
+  IsRightLengthNan: Boolean;
 begin
   LeftMaterial := Left.GetMaterialForSorting;
   RightMaterial := Right.GetMaterialForSorting;
@@ -2933,7 +2937,19 @@ begin
         begin
           LeftPosition := TPoint3D(Left.AbsolutePosition) - TPoint3D(Left.Context.CurrentCameraMatrix.M[3]);
           RightPosition := TPoint3D(Right.AbsolutePosition) - TPoint3D(Left.Context.CurrentCameraMatrix.M[3]);
-          Result := Trunc(RightPosition.Length - LeftPosition.Length);
+          LeftLength := LeftPosition.Length;
+          RightLenght := RightPosition.Length;
+          IsLeftLengthNan := IsNan(LeftLength);
+          IsRightLengthNan := IsNan(RightLenght);
+          // There are can be NaN values if controls have 0 scales, we need to processing it correctly.
+          if IsLeftLengthNan and IsRightLengthNan then
+            Result := 0
+          else if not IsLeftLengthNan and IsRightLengthNan then
+            Result := 1
+          else if IsLeftLengthNan and not IsRightLengthNan then
+            Result := -1
+          else
+            Result := Trunc(RightLenght - LeftLength);
         end;
   end
   else if NativeUInt(LeftMaterial) < NativeUInt(RightMaterial) then

@@ -10,8 +10,6 @@ unit FMX.Memo.iOS;
 
 interface
 
-{$WARNINGS OFF}
-
 {$SCOPEDENUMS ON}
 
 uses

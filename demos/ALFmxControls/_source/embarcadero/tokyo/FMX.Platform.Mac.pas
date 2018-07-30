@@ -11,10 +11,6 @@ unit FMX.Platform.Mac;
 
 interface
 
-{$WARNINGS OFF}
-
-{$HINTS OFF}
-
 {$SCOPEDENUMS ON}
 
 uses

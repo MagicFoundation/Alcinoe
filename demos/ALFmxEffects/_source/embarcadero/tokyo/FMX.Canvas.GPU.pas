@@ -324,7 +324,7 @@ begin
   end;
   FContext := TContextManager.CreateFromWindow(AParent, AWidth, AHeight, Multisample, True);
   {$IFDEF MSWINDOWS}
-  if WindowHandleToPlatform(Parent).Form.Transparency then
+  if WindowHandleToPlatform(Parent).Transparency then
     WindowHandleToPlatform(Parent).CreateBuffer(Width, Height);
   {$ENDIF}
 end;
@@ -409,7 +409,7 @@ begin
   if FContext <> nil then
     FContext.SetSize(Width, Height);
   {$IFDEF MSWINDOWS}
-  if (Parent <> nil) and WindowHandleToPlatform(Parent).Form.Transparency then
+  if (Parent <> nil) and WindowHandleToPlatform(Parent).Transparency then
     WindowHandleToPlatform(Parent).ResizeBuffer(Width, Height);
   {$ENDIF}
 end;
@@ -536,7 +536,7 @@ begin
       FPrimitiveCountPerFrame := FCanvasHelper.PrimitiveCountPerFrame;
     end;
     {$IFDEF MSWINDOWS}
-    if (Parent <> nil) and WindowHandleToPlatform(Parent).Form.Transparency then
+    if (Parent <> nil) and WindowHandleToPlatform(Parent).Transparency then
       Context.CopyToBits(WindowHandleToPlatform(Parent).BufferBits, Width * 4, Rect(0, 0, Width, Height));
     {$ENDIF}
   end;

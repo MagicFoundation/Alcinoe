@@ -2857,6 +2857,9 @@ begin
   if FFontColor <> Value then
   begin
     FFontColor := Value;
+    {$IF defined(IOS)}        //
+    IsAdjustChanged := True;  // << https://quality.embarcadero.com/browse/RSP-20676
+    {$ENDIF}                  //
     Change;
   end;
 end;
@@ -5730,7 +5733,8 @@ end;
 
 destructor TCanvas.Destroy;
 begin
-  TMessageManager.DefaultManager.SendMessage(Self, TCanvasDestroyMessage.Create);
+  if TThread.Current.ThreadID = MainThreadID then  // << https://quality.embarcadero.com/browse/RSP-19673
+    TMessageManager.DefaultManager.SendMessage(Self, TCanvasDestroyMessage.Create); // TCanvasDestroyMessage seam to be used only in FMX.TextLayout
   UnInitialize;
   inherited;
 end;

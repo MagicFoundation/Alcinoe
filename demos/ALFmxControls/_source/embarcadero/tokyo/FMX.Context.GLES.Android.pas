@@ -12,7 +12,6 @@ unit FMX.Context.GLES.Android;
 interface
 
 {$HINTS OFF}
-
 {$SCOPEDENUMS ON}
 
 uses
@@ -226,8 +225,17 @@ begin
 end;
 
 class procedure TCustomAndroidContext.CreateSharedContext;
+
+  function IsAppNotTerminating: Boolean;
+  var
+    ApplicationService: IFMXApplicationService;
+  begin
+    Result := TPlatformServices.Current.SupportsPlatformService(IFMXApplicationService, ApplicationService) and
+              not ApplicationService.Terminating;
+  end;
+
 begin
-  if FSharedContext = nil then
+  if (FSharedContext = nil) and IsAppNotTerminating then
   begin
     FSharedDisplay := eglGetDisplay(EGL_DEFAULT_DISPLAY);
 

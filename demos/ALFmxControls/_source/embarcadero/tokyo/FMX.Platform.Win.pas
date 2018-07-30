@@ -252,6 +252,7 @@ type
     FDefaultTitle: string;
     FApplicationHWNDProc: TApplicationHWNDProc;
     FApplicationHWND: HWND;
+    FIsOutApplicationHWND: Boolean;
     FFullScreenSupport: TDictionary<TCommonCustomForm, TFullScreenParams>;
     FHandleCounter: TFmxHandle;
     FHMenuMap: TDictionary<TFmxHandle, TWin32MenuInfo>;
@@ -277,7 +278,7 @@ type
     procedure ThreadSync(var Msg: TMessage);
     procedure WakeMainThread(Sender: TObject);
     procedure RemoveChildHandles(const AMenu: IItemsContainer);
-    procedure CreateAppHandle;
+    function CreateAppHandle: HWND;
     procedure MinimizeApp;
     procedure RestoreApp;
     // Menu functions
@@ -311,6 +312,8 @@ type
     procedure UpdateAppTitle;
     procedure CaptionChangedHandler(const Sender: TObject; const Msg: System.Messaging.TMessage);
     function GetApplicationHWND: HWND;
+    procedure SetApplicationHWNDProc(const Value: TApplicationHWNDProc);
+    procedure UpdateApplicationHwnd;
 
     //IFMXKeyMappingService
     /// <summary>Registers a platform key as the given virtual key.</summary>
@@ -321,7 +324,6 @@ type
     function PlatformKeyToVirtualKey(const PlatformKey: Word; var KeyKind: TKeyKind): Word;
     /// <summary>Obtains the platform key from a given virtual key.</summary>
     function VirtualKeyToPlatformKey(const VirtualKey: Word): Word;
-
   public
     constructor Create;
     destructor Destroy; override;
@@ -337,6 +339,7 @@ type
     procedure Terminate;
     function GetVersionString: string;
     property ApplicationHWND: HWND read GetApplicationHWND;
+    property ApplicationHWNDProc: TApplicationHWNDProc read FApplicationHWNDProc write SetApplicationHWNDProc;
     { IFMXSystemFontService }
     function GetDefaultFontFamilyName: string;
     function GetDefaultFontSize: Single;
@@ -587,6 +590,7 @@ end;
 constructor TPlatformWin.Create;
 begin
   inherited;
+  FIsOutApplicationHWND := False;
   WindowAtomString := Format('FIREMONKEY%.8X', [GetCurrentProcessID]);
   WindowAtom := GlobalAddAtomW(PChar(WindowAtomString));
   DropAtomString := Format('FIREMONKEYDROP%.8X', [GetCurrentProcessID]);
@@ -679,7 +683,8 @@ begin
 
   FMultiTouchManager.Free; // release multitouch early so that it does not hold reference to services
 
-  if IsLibrary and (FApplicationHWND <> 0) then
+  // We don't need destroy application handle, if we receive it from out through ApplicationHWNDProc.
+  if IsLibrary and FIsOutApplicationHWND and (FApplicationHWND <> 0) then
   begin
     WinApi.Windows.DestroyWindow(FApplicationHWND);
     FApplicationHWND := 0;
@@ -746,6 +751,30 @@ begin
     Result := string.Empty;
 end;
 
+procedure TPlatformWin.UpdateApplicationHwnd;
+var
+  OldApplicationHandler: HWND;
+begin
+  OldApplicationHandler := FApplicationHWND;
+
+  // The first, we try to extract application handle from IDE.
+  if Assigned(FApplicationHWNDProc) then
+  begin
+    FApplicationHWND := FApplicationHWNDProc;
+    FIsOutApplicationHWND := FApplicationHWND <> 0;
+  end;
+
+  // If IDE or user doesn't set outter application handle, we create our own, if it wasn't created before.
+  if FApplicationHWND = 0 then
+  begin
+    FApplicationHWND := CreateAppHandle;
+    FIsOutApplicationHWND := False;
+  end;
+
+  if OldApplicationHandler <> FApplicationHWND then
+    UpdateAppTitle;
+end;
+
 procedure TPlatformWin.UpdateAppTitle;
 begin
   if FApplicationHWND <> 0 then
@@ -753,11 +782,11 @@ begin
     { Don't update the title when working in the IDE }
     if (Application <> nil) and (Application.MainForm <> nil) and ((FTitle = SAppDefault) or
       (FTitle = GetDefaultTitle)) then
-      SetWindowText(ApplicationHWND, PChar(Application.MainForm.Caption))
+      SetWindowText(FApplicationHWND, PChar(Application.MainForm.Caption))
     else if FTitle.IsEmpty then
-      SetWindowText(ApplicationHWND, PChar(GetDefaultTitle))
+      SetWindowText(FApplicationHWND, PChar(GetDefaultTitle))
     else
-      SetWindowText(ApplicationHWND, PChar(FTitle));
+      SetWindowText(FApplicationHWND, PChar(FTitle));
   end;
 end;
 
@@ -2820,15 +2849,12 @@ var
     lpszMenuName: nil;
     lpszClassName: 'TFMAppClass');
 
-procedure TPlatformWin.CreateAppHandle;
+function TPlatformWin.CreateAppHandle: HWND;
 var
   TempClass: TWndClass;
   P: PChar;
   ClassRegistered: Boolean;
   ModuleName: array [0 .. 255] of Char;
-  AtomName: string;
-  AppAtom: Word;
-  LApplicationTitle: string;
 begin
   GetModuleFileName(MainInstance, ModuleName, Length(ModuleName));
   P := AnsiStrRScan(ModuleName, '\');
@@ -2837,45 +2863,30 @@ begin
   P := AnsiStrScan(ModuleName, '.');
   if P <> nil then
     P^ := #0;
-  AtomName := ModuleName;
-  AppAtom := GlobalFindAtom(PChar(AtomName));
-  if AppAtom > 0 then
-    FApplicationHWND := 0
+  CharLower(CharNext(ModuleName));
+  FDefaultTitle := ModuleName;
+  if Application <> nil then
+    FTitle := Application.Title
   else
+    FTitle := FDefaultTitle;
+  FMAppClass.hInstance := hInstance;
+  ClassRegistered := GetClassInfo(hInstance, FMAppClass.lpszClassName, TempClass);
+  FMAppClass.hIcon := LoadIconW(MainInstance, PChar('MAINICON'));
+  if not ClassRegistered or (TempClass.lpfnWndProc <> @WndProc) then
   begin
-    CharLower(CharNext(ModuleName));
-    FDefaultTitle := ModuleName;
-    if Application <> nil then
-      LApplicationTitle := Application.Title
-    else
-      LApplicationTitle := FDefaultTitle;
-    FTitle := LApplicationTitle;
-    FMAppClass.hInstance := hInstance;
-    ClassRegistered := GetClassInfo(hInstance, FMAppClass.lpszClassName,
-      TempClass);
-    FMAppClass.hIcon := LoadIconW(MainInstance, PChar('MAINICON'));
-    if not ClassRegistered or (TempClass.lpfnWndProc <> @WndProc) then
-    begin
-      if ClassRegistered then
-        Winapi.Windows.UnregisterClass(FMAppClass.lpszClassName, hInstance);
-      Winapi.Windows.RegisterClass(FMAppClass);
-    end;
-    FApplicationHWND := CreateWindowEx(WS_EX_WINDOWEDGE or WS_EX_APPWINDOW, FMAppClass.lpszClassName,
-      PChar(LApplicationTitle), WS_POPUP or WS_GROUP, 0, 0, 0, 0, GetDesktopWindow, 0, hInstance, nil);
-    Winapi.Windows.ShowWindow(FApplicationHWND, SW_SHOWNORMAL);
+    if ClassRegistered then
+      Winapi.Windows.UnregisterClass(FMAppClass.lpszClassName, hInstance);
+    Winapi.Windows.RegisterClass(FMAppClass);
   end;
+  Result := CreateWindowEx(WS_EX_WINDOWEDGE or WS_EX_APPWINDOW, FMAppClass.lpszClassName, PChar(FTitle),
+                           WS_POPUP or WS_GROUP, 0, 0, 0, 0, GetDesktopWindow, 0, hInstance, nil);
+  Winapi.Windows.ShowWindow(Result, SW_SHOWNORMAL);
 end;
 
 function TPlatformWin.GetApplicationHWND: HWND;
 begin
-  if Assigned(FApplicationHWNDProc) then
-    Result := FApplicationHWNDProc
-  else
-  begin
-    if FApplicationHWND = 0 then
-      CreateAppHandle;
-    Result := FApplicationHWND;
-  end;
+  UpdateApplicationHwnd;
+  Result := FApplicationHWND;
 end;
 
 function TPlatformWin.CreateWindow(const AForm: TCommonCustomForm): TWindowHandle;
@@ -2994,9 +3005,6 @@ begin
     // If none parent then we use handle of Application
     if ParentWnd = 0 then
       ParentWnd := ApplicationHWND;
-    // If none parent then we use handle of first form
-    if (ParentWnd = 0) and (Screen <> nil) and (Screen.FormCount > 0) and (LForm <> Screen.Forms[0]) then
-      ParentWnd := FormToHWND(Screen.Forms[0]);
   end;
   Wnd := CheckWinapiHandle(CreateWindowEx(ExStyle, WindowClass.lpszClassName, PChar(LForm.Caption), style,
     Integer(CW_USEDEFAULT), Integer(CW_USEDEFAULT), Integer(CW_USEDEFAULT), Integer(CW_USEDEFAULT), ParentWnd, 0,
@@ -3208,6 +3216,15 @@ end;
 procedure TPlatformWin.ReleaseCapture(const AForm: TCommonCustomForm);
 begin
   Winapi.Windows.ReleaseCapture;
+end;
+
+procedure TPlatformWin.SetApplicationHWNDProc(const Value: TApplicationHWNDProc);
+begin
+  if @FApplicationHWNDProc <> @Value then
+  begin
+    FApplicationHWNDProc := Value;
+    UpdateApplicationHwnd;
+  end;
 end;
 
 procedure TPlatformWin.SetCapture(const AForm: TCommonCustomForm);
@@ -5292,7 +5309,7 @@ end;
 procedure RegisterApplicationHWNDProc(const Proc: TApplicationHWNDProc);
 begin
   if PlatformWin <> nil then
-    PlatformWin.FApplicationHWNDProc := Proc
+    PlatformWin.ApplicationHWNDProc := Proc
   else
     raise EArgumentNilException.Create(SArgumentNil);
 end;
@@ -5676,49 +5693,68 @@ begin
 end;
 
 procedure TVirtualKeyboardWin.vkbExecute(FormHandle: HWND);
+
+  function IsFileExisted(const AFileName: string): Boolean;
+  begin
+    if FileExists(AFileName) then
+      Exit(True);
+
+    TWow64Redirection.Current.Disable;
+    try
+      Result := FileExists(AFileName);
+    finally
+      TWow64Redirection.Current.Restore;
+    end;
+  end;
+
+  function LaunchVirtualKeyboardApp(const AFileName: string): HINST;
+  begin
+    TWow64Redirection.Current.Disable;
+    try
+      Result := ShellExecute(FormHandle, 'open', PChar(AFileName), nil, PChar(ExtractFileDir(AFileName)), SW_SHOWNOACTIVATE);
+    finally
+      TWow64Redirection.Current.Restore;
+    end;
+  end;
+
+  function WaitLaunchingVirtualKeyboardApp: Boolean;
+  const
+    StepPause = 40; //msec
+    MaxAttemptsCount = 100;
+  var
+    AttemptsCount: Integer;
+  begin
+    AttemptsCount := 0;
+    while (AttemptsCount < MaxAttemptsCount) and (vkbState = TvkbState.None) do
+    begin
+      Inc(AttemptsCount);
+      Sleep(StepPause);
+    end;
+    Result := AttemptsCount < MaxAttemptsCount;
+  end;
+
 var
-  S: string;
-  N: Integer;
+  VKAppFileName: string;
   H: HWND;
-  CMD: Integer;
 begin
   if FError then
     Exit;
   H := vkbHandle;
   if H = 0 then
   begin
-    S := IncludeTrailingPathDelimiter(Path);
-    S := S + ExeName;
-    if FileExists(S) then
-    begin
-      TWow64Redirection.Current.Disable;
-      try
-        CMD := SW_SHOWNOACTIVATE;
-        FInst := ShellExecute(FormHandle, 'open', PChar(S), nil, PChar(ExtractFileDir(S)), CMD);
-      finally
-        TWow64Redirection.Current.Restore;
-      end;
-      if FInst <= 32 then
-        FError := True
-      else
-      begin
-        N := 0;
-        while (N < 100) and (vkbState = TvkbState.None) do
-        begin
-          Inc(N);
-          Sleep(40);
-        end;
-        if N >= 100 then
-        begin
-          FInst := 0;
-          FError := True;
-        end;
-      end;
-    end
+    VKAppFileName := TPath.Combine(Path, ExeName);
+
+    if IsFileExisted(VKAppFileName) then
+      FInst := LaunchVirtualKeyboardApp(VKAppFileName)
     else
-    begin
-      FError := True;
       FInst := 0;
+
+    if FInst <= 32 then
+      FError := True
+    else if not WaitLaunchingVirtualKeyboardApp then
+    begin
+      FInst := 0;
+      FError := True;
     end;
   end;
 end;

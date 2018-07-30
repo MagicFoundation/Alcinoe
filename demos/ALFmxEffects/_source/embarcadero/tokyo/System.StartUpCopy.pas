@@ -259,8 +259,6 @@ begin
 end;
 {$ELSE !ANDROID}
 procedure CopyStartUpFiles;
-var
-  Source, Destination: string;
 
   procedure DoCopyFiles(const Src: string; const Dst: string);
   var
@@ -282,15 +280,16 @@ var
       else
       begin
         if not FileExists(Dst+SearchRec.Name) then
-        begin
           TFile.Copy(Src+SearchRec.Name, Dst+SearchRec.Name, False); // copy without overwriting.
-        end
       end;
       Res := FindNext(SearchRec);
     end;
+    FindClose(SearchRec);
   end;
-{$IFDEF MACOS}
+
 var
+  Source, Destination: string;
+{$IFDEF MACOS}
   Bundle: NSBundle;
 {$ENDIF}
 begin
@@ -311,7 +310,7 @@ begin
   if DirectoryExists(Source) then
     DoCopyFiles(Source, Destination);
 end;
-{$ENDIF ANDROID}
+{$ENDIF !ANDROID}
 
 initialization
 begin

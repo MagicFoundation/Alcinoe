@@ -7914,8 +7914,8 @@ begin
     TBitmapCodecManager.UnInitialize;
     TTextLayoutManager.UnInitialize;
     TCanvasManager.UnInitialize;
-    TContextManager.UnInitialize;
     TShaderManager.UnInitialize;
+    TContextManager.UnInitialize;
   end;
 end;
 

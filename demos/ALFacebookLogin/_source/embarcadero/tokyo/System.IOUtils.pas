@@ -10,7 +10,6 @@
 unit System.IOUtils;
 
 {$WARNINGS OFF}
-
 {$SCOPEDENUMS ON}
 
 interface

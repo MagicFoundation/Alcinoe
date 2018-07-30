@@ -13,7 +13,7 @@ interface
 {$IFEND}
 
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if Web.Win.IsapiHTTPpas / Web.HTTPApp was not updated and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if Web.Win.IsapiHTTP / Web.HTTPApp was not updated and adjust the IFDEF'}
 {$IFEND}
 
 uses System.SysUtils,

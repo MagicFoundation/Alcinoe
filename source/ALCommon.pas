@@ -468,7 +468,7 @@ end;
 function ALRectCenter(var R: TALRectD; const Bounds: TALRectD): TALRectD;
 begin
   ALOffsetRect(R, -R.Left, -R.Top);
-  ALOffsetRect(R, (ALRectWidth(Bounds) - ALRectWidth(R)) / 2, (ALRectHeight(Bounds) - ALRectHeight(R)) / 2);
+  ALOffsetRect(R, (ALRectWidth(Bounds)/2 - ALRectWidth(R)/2), (ALRectHeight(Bounds)/2 - ALRectHeight(R)/2));
   ALOffsetRect(R, Bounds.Left, Bounds.Top);
   Result := R;
 end;
@@ -573,13 +573,20 @@ begin
   else
     Ratio := R.Height / Bounds.Height;
 
-  Result := TRectF.Create(0, 0, R.Width / Ratio, R.Height / Ratio);
+  if Ratio = 0 then
+    Exit(R)
+  else
+  begin
 
-  system.types.OffsetRect(Result, -Result.Left, -Result.Top);
-  if (CenterAt.X < 0) or (CenterAt.y < 0) then system.types.OffsetRect(Result, max(0, (((Bounds.Width) / 100) * -CenterAt.x) - (Result.Width / 2)), max(0, (((Bounds.Height) / 100) * -CenterAt.Y) - (Result.height / 2)))
-  else system.types.OffsetRect(Result, max(0, CenterAt.x - (Result.Width / 2)), max(0, CenterAt.y - (Result.height / 2)));
-  system.types.OffsetRect(Result, -max(0, Result.Right - Bounds.Width), -max(0, Result.bottom - Bounds.height));
-  system.types.OffsetRect(Result, Bounds.Left, Bounds.Top);
+    Result := TRectF.Create(0, 0, R.Width / Ratio, R.Height / Ratio);
+
+    system.types.OffsetRect(Result, -Result.Left, -Result.Top);
+    if (CenterAt.X < 0) or (CenterAt.y < 0) then system.types.OffsetRect(Result, max(0, (((Bounds.Width) / 100) * -CenterAt.x) - (Result.Width / 2)), max(0, (((Bounds.Height) / 100) * -CenterAt.Y) - (Result.height / 2)))
+    else system.types.OffsetRect(Result, max(0, CenterAt.x - (Result.Width / 2)), max(0, CenterAt.y - (Result.height / 2)));
+    system.types.OffsetRect(Result, -max(0, Result.Right - Bounds.Width), -max(0, Result.bottom - Bounds.height));
+    system.types.OffsetRect(Result, Bounds.Left, Bounds.Top);
+
+  end;
 
 end;
 
@@ -606,8 +613,13 @@ begin
   else
     Ratio := R.Height / Bounds.Height;
 
-  Result := TRectF.Create(0, 0, R.Width / Ratio, R.Height / Ratio);
-  RectCenter(Result, Bounds);
+  if Ratio = 0 then
+    Exit(R)
+  else
+  begin
+    Result := TRectF.Create(0, 0, R.Width / Ratio, R.Height / Ratio);
+    RectCenter(Result, Bounds);
+  end;
 end;
 
 {******************************************************************************************************************}
@@ -1090,8 +1102,13 @@ begin
   else
     Ratio := Self.Height / ADesignatedArea.Height;
 
-  Result := TALRectD.Create(0, 0, Self.Width / Ratio, Self.Height / Ratio);
-  ALRectCenter(Result, ADesignatedArea);
+  if Ratio = 0 then
+    Exit(Self)
+  else
+  begin
+    Result := TALRectD.Create(0, 0, Self.Width / Ratio, Self.Height / Ratio);
+    ALRectCenter(Result, ADesignatedArea);
+  end;
 end;
 
 {*******************************************************************}

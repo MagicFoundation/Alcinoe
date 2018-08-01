@@ -1,82 +1,82 @@
-ProjectDir="C:\Dev\Alcinoe\demos\ALFacebookLogin\_source" 
+ProjectDir="c:\Dev\Alcinoe\demos\ALFacebookLogin\_source" 
 SDKAaptPath="C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" 
 SDKApiLevelPath="C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" 
 JavaDxPath="C:\SDKs\android-sdk-windows\build-tools\27.0.3\dx.bat" 
 JavaDxJarPath=C:\SDKs\android-sdk-windows\build-tools\27.0.3\lib\dx.jar 
 JDKPath="C:\Program Files\Java\jdk1.8.0_131"\bin 
 JDKPath1_7="C:\Program Files\Java\jdk1.7.0_80\bin" 
-OutputPath=C:\Dev\Alcinoe\demos\ALFacebookLogin\Android\Release\classes.dex 
-APKPath=C:\Dev\Alcinoe\demos\ALFacebookLogin\Android\Release\ALFacebookLogin\bin\ALFacebookLogin.apk 
+OutputPath=c:\Dev\Alcinoe\demos\ALFacebookLogin\Android\Release\classes.dex 
+APKPath=c:\Dev\Alcinoe\demos\ALFacebookLogin\Android\Release\ALFacebookLogin\bin\ALFacebookLogin.apk 
  
 Create R.java - android.support.compat 
-"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M C:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\android.support.compat\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
+"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M c:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\android.support.compat\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
  
 Compile R.java into R$ classes - android.support.compat 
-"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\android\support\compat\*.java 
+"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\android\support\compat\*.java 
  
 Create R.java - android.support.coreui 
-"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M C:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\android.support.coreui\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
+"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M c:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\android.support.coreui\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
  
 Compile R.java into R$ classes - android.support.coreui 
-"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\android\support\coreui\*.java 
+"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\android\support\coreui\*.java 
  
 Create R.java - android.support.customtabs 
-"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M C:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\android.support.customtabs\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
+"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M c:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\android.support.customtabs\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
  
 Compile R.java into R$ classes - android.support.customtabs 
-"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\android\support\customtabs\*.java 
+"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\android\support\customtabs\*.java 
  
 Create R.java - android.support.mediacompat 
-"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M C:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\android.support.mediacompat\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
+"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M c:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\android.support.mediacompat\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
  
 Compile R.java into R$ classes - android.support.mediacompat 
-"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\android\support\mediacompat\*.java 
+"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\android\support\mediacompat\*.java 
  
 Create R.java - android.support.v7.appcompat 
-"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M C:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\android.support.v7.appcompat\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
+"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M c:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\android.support.v7.appcompat\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
  
 Compile R.java into R$ classes - android.support.v7.appcompat 
-"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\android\support\v7\appcompat\*.java 
+"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\android\support\v7\appcompat\*.java 
  
 Create R.java - android.support.v7.cardview 
-"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M C:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\android.support.v7.cardview\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
+"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M c:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\android.support.v7.cardview\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
  
 Compile R.java into R$ classes - android.support.v7.cardview 
-"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\android\support\v7\cardview\*.java 
+"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\android\support\v7\cardview\*.java 
  
 Create R.java - com.alcinoe 
-"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M C:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\com.alcinoe\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
+"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M c:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\com.alcinoe\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
  
 Compile R.java into R$ classes - com.alcinoe 
-"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\com\alcinoe\*.java 
+"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\com\alcinoe\*.java 
  
 Create R.java - com.facebook.common 
-"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M C:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\com.facebook.common\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
+"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M c:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\com.facebook.common\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
  
 Compile R.java into R$ classes - com.facebook.common 
-"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\com\facebook\common\*.java 
+"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\com\facebook\common\*.java 
  
 Create R.java - com.facebook.login 
-"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M C:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\com.facebook.login\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
+"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M c:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\com.facebook.login\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
  
 Compile R.java into R$ classes - com.facebook.login 
-"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\com\facebook\login\*.java 
+"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\com\facebook\login\*.java 
  
 Create R.java - com.facebook.share 
-"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M C:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\com.facebook.share\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
+"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" package -f -m -M c:\Dev\Alcinoe\demos\ALFacebookLogin\_source\android\libraries\com.facebook.share\AndroidManifest.xml -I "C:\SDKs\android-sdk-windows\platforms\android-27\android.jar" -S "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\res -J "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\ 
  
 Compile R.java into R$ classes - com.facebook.share 
-"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\com\facebook\share\*.java 
+"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\src\com\facebook\share\*.java 
  
 Build a classes.dex that include the R$ classes 
-call "C:\SDKs\android-sdk-windows\build-tools\27.0.3\dx.bat" --dex --output="C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\classes.dex "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj 
+call "C:\SDKs\android-sdk-windows\build-tools\27.0.3\dx.bat" --dex --output="c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\classes.dex "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\obj 
  
 Merge the classes.dex 
-"C:\Program Files\Java\jdk1.8.0_131"\bin\java -cp C:\SDKs\android-sdk-windows\build-tools\27.0.3\lib\dx.jar com.android.dx.merge.DexMerger "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\final_classes.dex "C:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\classes.dex C:\Dev\Alcinoe\demos\ALFacebookLogin\Android\Release\classes.dex 
+"C:\Program Files\Java\jdk1.8.0_131"\bin\java -cp C:\SDKs\android-sdk-windows\build-tools\27.0.3\lib\dx.jar com.android.dx.merge.DexMerger "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\final_classes.dex "c:\Dev\Alcinoe\demos\ALFacebookLogin\_source"\android\tmp\classes.dex c:\Dev\Alcinoe\demos\ALFacebookLogin\Android\Release\classes.dex 
 Result compacted from 5269.8KiB to 3171.9KiB to save 2097.9KiB
 Merged dex #1 (140 defs/298.1KiB)
 Merged dex #2 (2310 defs/3899.3KiB)
-Result is 2450 defs/3171.9KiB. Took 0.6s
+Result is 2450 defs/3171.9KiB. Took 0.5s
  
 Move the classes.dex 
         1 file(s) copied.
@@ -84,7 +84,7 @@ Move the classes.dex
 remove the tmp dir 
  
 R.txt - You can compare against the output of: 
-"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" dump resources C:\Dev\Alcinoe\demos\ALFacebookLogin\Android\Release\ALFacebookLogin\bin\ALFacebookLogin.apk 
+"C:\SDKs\android-sdk-windows\build-tools\27.0.3\aapt.exe" dump resources c:\Dev\Alcinoe\demos\ALFacebookLogin\Android\Release\ALFacebookLogin\bin\ALFacebookLogin.apk 
  
 int anim abc_fade_in 0x7f050000
 int anim abc_fade_out 0x7f050001

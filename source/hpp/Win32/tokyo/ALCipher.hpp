@@ -26,9 +26,9 @@ namespace Alcipher
 {
 //-- forward type declarations -----------------------------------------------
 class DELPHICLASS EALCipherException;
-struct TALCipherBFContext;
-struct TALCipherRDLVector;
-struct TALCipherRDLContext;
+struct TALBFContext;
+struct TALRDLVector;
+struct TALRDLContext;
 //-- type declarations -------------------------------------------------------
 #pragma pack(push,4)
 class PASCALIMPLEMENTATION EALCipherException : public Alstring::EALException
@@ -60,10 +60,12 @@ typedef System::StaticArray<System::Byte, 16> TALCipherKey128;
 
 typedef TALCipherKey128 *PALCipherKey128;
 
-typedef System::StaticArray<int, 2> TALCipherBFBlock;
+enum DECLSPEC_DENUM TALkeyDerivationFunction : unsigned char { MD5, SHA2 };
+
+typedef System::StaticArray<int, 2> TALBFBlock;
 
 #pragma pack(push,1)
-struct DECLSPEC_DRECORD TALCipherBFContext
+struct DECLSPEC_DRECORD TALBFContext
 {
 public:
 	System::StaticArray<int, 18> PBox;
@@ -73,7 +75,7 @@ public:
 
 
 #pragma pack(push,1)
-struct DECLSPEC_DRECORD TALCipherRDLVector
+struct DECLSPEC_DRECORD TALRDLVector
 {
 	
 public:
@@ -93,10 +95,10 @@ public:
 #pragma pack(pop)
 
 
-typedef System::StaticArray<System::Byte, 16> TALCipherRDLBlock;
+typedef System::StaticArray<System::Byte, 16> TALRDLBlock;
 
 #pragma pack(push,1)
-struct DECLSPEC_DRECORD TALCipherRDLContext
+struct DECLSPEC_DRECORD TALRDLContext
 {
 public:
 	bool Encrypt;
@@ -112,7 +114,7 @@ public:
 		};
 		struct 
 		{
-			System::StaticArray<TALCipherRDLVector, 57> W;
+			System::StaticArray<TALRDLVector, 61> W;
 		};
 		
 	};
@@ -120,9 +122,9 @@ public:
 #pragma pack(pop)
 
 
-typedef TALCipherKey128 TALCipherMD5Digest;
+typedef TALCipherKey128 TALMD5Digest;
 
-typedef System::StaticArray<System::Byte, 20> TALCipherSHA1Digest;
+typedef System::StaticArray<System::Byte, 20> TALSHA1Digest;
 
 typedef unsigned __fastcall (*TALStringHashCrc32)(const System::AnsiString str);
 
@@ -133,8 +135,8 @@ typedef NativeUInt HCRYPTPROV;
 typedef NativeUInt *PHCRYPTPROV;
 
 //-- var, const, procedure ---------------------------------------------------
-static const System::Int8 cALCipherBFRounds = System::Int8(0x10);
-static const System::Int8 cALCipherMaxRDLRounds = System::Int8(0xe);
+static const System::Int8 cALBFRounds = System::Int8(0x10);
+static const System::Int8 cALMaxRDLRounds = System::Int8(0xe);
 extern DELPHI_PACKAGE TALStringHashCrc32 ALStringHashCrc32;
 extern DELPHI_PACKAGE TALHashCrc32 ALHashCrc32;
 static const unsigned CRYPT_VERIFYCONTEXT = unsigned(0xf0000000);
@@ -146,9 +148,9 @@ extern DELPHI_PACKAGE void __fastcall ALStringHashMD5(TALCipherKey128 &Digest, c
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALStringHashMD5(const System::AnsiString Str, const bool HexEncode = true)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALStringHashMD5U(TALCipherKey128 &Digest, const System::UnicodeString Str, System::Sysutils::TEncoding* const encoding)/* overload */;
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALStringHashMD5U(const System::UnicodeString Str, System::Sysutils::TEncoding* const encoding)/* overload */;
-extern DELPHI_PACKAGE void __fastcall ALStringHashSHA1(TALCipherSHA1Digest &Digest, const System::AnsiString Str)/* overload */;
+extern DELPHI_PACKAGE void __fastcall ALStringHashSHA1(TALSHA1Digest &Digest, const System::AnsiString Str)/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALStringHashSHA1(const System::AnsiString Str, const bool HexEncode = true)/* overload */;
-extern DELPHI_PACKAGE void __fastcall ALStringHashSHA1U(TALCipherSHA1Digest &Digest, const System::UnicodeString Str, System::Sysutils::TEncoding* const encoding)/* overload */;
+extern DELPHI_PACKAGE void __fastcall ALStringHashSHA1U(TALSHA1Digest &Digest, const System::UnicodeString Str, System::Sysutils::TEncoding* const encoding)/* overload */;
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALStringHashSHA1U(const System::UnicodeString Str, System::Sysutils::TEncoding* const encoding)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALStringHashSHA2(System::DynamicArray<System::Byte> &Digest, const System::AnsiString Str, const System::Hash::THashSHA2::TSHA2Version AHashVersion = (System::Hash::THashSHA2::TSHA2Version)(0x1))/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALStringHashSHA2(const System::AnsiString Str, const System::Hash::THashSHA2::TSHA2Version AHashVersion = (System::Hash::THashSHA2::TSHA2Version)(0x1), const bool HexEncode = true)/* overload */;
@@ -160,34 +162,34 @@ extern DELPHI_PACKAGE bool __fastcall ALBCryptPasswordRehashNeeded(const System:
 extern DELPHI_PACKAGE bool __fastcall ALBCryptSelfTest(void);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALCalcHMACSHA1(const System::AnsiString Str, const System::AnsiString Key);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALCalcHMACMD5(const System::AnsiString Str, const System::AnsiString Key);
-extern DELPHI_PACKAGE void __fastcall ALCipherEncryptRDL(const TALCipherRDLContext &Context, TALCipherRDLBlock &Block);
-extern DELPHI_PACKAGE void __fastcall ALCipherEncryptRDLCBC(const TALCipherRDLContext &Context, const TALCipherRDLBlock &Prev, TALCipherRDLBlock &Block);
-extern DELPHI_PACKAGE void __fastcall ALCipherInitEncryptRDL(const void *Key, const int KeySize, TALCipherRDLContext &Context, const bool Encrypt);
+extern DELPHI_PACKAGE void __fastcall ALEncryptRDL(const TALRDLContext &Context, TALRDLBlock &Block);
+extern DELPHI_PACKAGE void __fastcall ALEncryptRDLCBC(const TALRDLContext &Context, const TALRDLBlock &Prev, TALRDLBlock &Block);
+extern DELPHI_PACKAGE void __fastcall ALInitEncryptRDL(const void *Key, const int KeySize, TALRDLContext &Context, const bool Encrypt);
 extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStream(System::Classes::TStream* const InStream, System::Classes::TStream* const OutStream, const void *Key, const int KeySize, const bool Encrypt)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStreamCBC(System::Classes::TStream* const InStream, System::Classes::TStream* const OutStream, const void *Key, const int KeySize, const bool Encrypt)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALRDLEncryptString(const System::AnsiString InString, System::AnsiString &OutString, const void *Key, const int KeySize, const bool Encrypt)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStringCBC(const System::AnsiString InString, System::AnsiString &OutString, const void *Key, const int KeySize, const bool Encrypt)/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALRDLEncryptString(const System::AnsiString InString, const void *Key, const int KeySize, const bool Encrypt)/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALRDLEncryptStringCBC(const System::AnsiString InString, const void *Key, const int KeySize, const bool Encrypt)/* overload */;
-extern DELPHI_PACKAGE void __fastcall ALRDLEncryptString(const System::AnsiString InString, System::AnsiString &OutString, const System::AnsiString Key, const bool Encrypt)/* overload */;
-extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStringCBC(const System::AnsiString InString, System::AnsiString &OutString, const System::AnsiString Key, const bool Encrypt)/* overload */;
-extern DELPHI_PACKAGE System::AnsiString __fastcall ALRDLEncryptString(const System::AnsiString InString, const System::AnsiString Key, const bool Encrypt)/* overload */;
-extern DELPHI_PACKAGE System::AnsiString __fastcall ALRDLEncryptStringCBC(const System::AnsiString InString, const System::AnsiString Key, const bool Encrypt)/* overload */;
-extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStream(System::Classes::TStream* const InStream, System::Classes::TStream* const OutStream, const System::AnsiString Key, const bool Encrypt)/* overload */;
-extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStreamCBC(System::Classes::TStream* const InStream, System::Classes::TStream* const OutStream, const System::AnsiString Key, const bool Encrypt)/* overload */;
+extern DELPHI_PACKAGE void __fastcall ALRDLEncryptString(const System::AnsiString InString, System::AnsiString &OutString, const System::AnsiString Key, const TALkeyDerivationFunction KeyDerivationFunction, const bool Encrypt)/* overload */;
+extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStringCBC(const System::AnsiString InString, System::AnsiString &OutString, const System::AnsiString Key, const TALkeyDerivationFunction KeyDerivationFunction, const bool Encrypt)/* overload */;
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALRDLEncryptString(const System::AnsiString InString, const System::AnsiString Key, const TALkeyDerivationFunction KeyDerivationFunction, const bool Encrypt)/* overload */;
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALRDLEncryptStringCBC(const System::AnsiString InString, const System::AnsiString Key, const TALkeyDerivationFunction KeyDerivationFunction, const bool Encrypt)/* overload */;
+extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStream(System::Classes::TStream* const InStream, System::Classes::TStream* const OutStream, const System::AnsiString Key, const TALkeyDerivationFunction KeyDerivationFunction, const bool Encrypt)/* overload */;
+extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStreamCBC(System::Classes::TStream* const InStream, System::Classes::TStream* const OutStream, const System::AnsiString Key, const TALkeyDerivationFunction KeyDerivationFunction, const bool Encrypt)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStringU(const System::UnicodeString InString, System::UnicodeString &OutString, const void *Key, const int KeySize, const bool Encrypt, System::Sysutils::TEncoding* const encoding)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStringCBCU(const System::UnicodeString InString, System::UnicodeString &OutString, const void *Key, const int KeySize, const bool Encrypt, System::Sysutils::TEncoding* const encoding)/* overload */;
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALRDLEncryptStringU(const System::UnicodeString InString, const void *Key, const int KeySize, const bool Encrypt, System::Sysutils::TEncoding* const encoding)/* overload */;
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALRDLEncryptStringCBCU(const System::UnicodeString InString, const void *Key, const int KeySize, const bool Encrypt, System::Sysutils::TEncoding* const encoding)/* overload */;
-extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStringU(const System::UnicodeString InString, System::UnicodeString &OutString, const System::UnicodeString Key, const bool Encrypt, System::Sysutils::TEncoding* const encoding)/* overload */;
-extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStringCBCU(const System::UnicodeString InString, System::UnicodeString &OutString, const System::UnicodeString Key, const bool Encrypt, System::Sysutils::TEncoding* const encoding)/* overload */;
-extern DELPHI_PACKAGE System::UnicodeString __fastcall ALRDLEncryptStringU(const System::UnicodeString InString, const System::UnicodeString Key, const bool Encrypt, System::Sysutils::TEncoding* const encoding)/* overload */;
-extern DELPHI_PACKAGE System::UnicodeString __fastcall ALRDLEncryptStringCBCU(const System::UnicodeString InString, const System::UnicodeString Key, const bool Encrypt, System::Sysutils::TEncoding* const encoding)/* overload */;
-extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStreamU(System::Classes::TStream* const InStream, System::Classes::TStream* const OutStream, const System::UnicodeString Key, const bool Encrypt, System::Sysutils::TEncoding* const encoding)/* overload */;
-extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStreamCBCU(System::Classes::TStream* const InStream, System::Classes::TStream* const OutStream, const System::UnicodeString Key, const bool Encrypt, System::Sysutils::TEncoding* const encoding)/* overload */;
-extern DELPHI_PACKAGE void __fastcall ALCipherInitEncryptBF(const TALCipherKey128 &Key, TALCipherBFContext &Context);
-extern DELPHI_PACKAGE void __fastcall ALCipherEncryptBF(const TALCipherBFContext &Context, TALCipherBFBlock &Block, bool Encrypt);
-extern DELPHI_PACKAGE void __fastcall ALCipherEncryptBFCBC(const TALCipherBFContext &Context, const TALCipherBFBlock &Prev, TALCipherBFBlock &Block, bool Encrypt);
+extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStringU(const System::UnicodeString InString, System::UnicodeString &OutString, const System::UnicodeString Key, const TALkeyDerivationFunction KeyDerivationFunction, const bool Encrypt, System::Sysutils::TEncoding* const encoding)/* overload */;
+extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStringCBCU(const System::UnicodeString InString, System::UnicodeString &OutString, const System::UnicodeString Key, const TALkeyDerivationFunction KeyDerivationFunction, const bool Encrypt, System::Sysutils::TEncoding* const encoding)/* overload */;
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALRDLEncryptStringU(const System::UnicodeString InString, const System::UnicodeString Key, const TALkeyDerivationFunction KeyDerivationFunction, const bool Encrypt, System::Sysutils::TEncoding* const encoding)/* overload */;
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALRDLEncryptStringCBCU(const System::UnicodeString InString, const System::UnicodeString Key, const TALkeyDerivationFunction KeyDerivationFunction, const bool Encrypt, System::Sysutils::TEncoding* const encoding)/* overload */;
+extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStreamU(System::Classes::TStream* const InStream, System::Classes::TStream* const OutStream, const System::UnicodeString Key, const TALkeyDerivationFunction KeyDerivationFunction, const bool Encrypt, System::Sysutils::TEncoding* const encoding)/* overload */;
+extern DELPHI_PACKAGE void __fastcall ALRDLEncryptStreamCBCU(System::Classes::TStream* const InStream, System::Classes::TStream* const OutStream, const System::UnicodeString Key, const TALkeyDerivationFunction KeyDerivationFunction, const bool Encrypt, System::Sysutils::TEncoding* const encoding)/* overload */;
+extern DELPHI_PACKAGE void __fastcall ALInitEncryptBF(const TALCipherKey128 &Key, TALBFContext &Context);
+extern DELPHI_PACKAGE void __fastcall ALEncryptBF(const TALBFContext &Context, TALBFBlock &Block, bool Encrypt);
+extern DELPHI_PACKAGE void __fastcall ALEncryptBFCBC(const TALBFContext &Context, const TALBFBlock &Prev, TALBFBlock &Block, bool Encrypt);
 extern DELPHI_PACKAGE void __fastcall ALBFEncryptString(const System::AnsiString InString, System::AnsiString &OutString, const TALCipherKey128 &Key, bool Encrypt)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALBFEncryptStringCBC(const System::AnsiString InString, System::AnsiString &OutString, const TALCipherKey128 &Key, bool Encrypt)/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALBFEncryptString(const System::AnsiString InString, const TALCipherKey128 &Key, bool Encrypt)/* overload */;

@@ -14,7 +14,7 @@ import android.util.Log;
 
 public class ALGeocoder {
 
-  //update also the delphi implementation Win_GoogleMaps_FindAddressU when you update this functions
+  //when you update this function update also it's equivalent delphi implementation (look for keyword https://maps.googleapis.com/maps/api/geocode/json)
   public static Address getFromLocation (double latitude, double longitude, String language) {
     
     Address address = null;

@@ -5,6 +5,10 @@ Alcinoe is a library visual and non-visual components for Delphi. The components
 be used in commercial as well as shareware and freeware and open source projects 
 without cost.
 
+Please "star" (like) this project in ghitub! It's cost nothing but help
+to reference the code
+
+<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-24.jpg?raw=true" alt="like" />
 
 compiled demo
 -------------

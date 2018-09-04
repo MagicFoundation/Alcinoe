@@ -1529,6 +1529,45 @@ begin
            ((aMaxLines > 0) and (aTotalLines >= aMaxLines)) or
            (compareValue(aCurrLineY + aMetrics.descent, aMaxHeight, TEpsilon.position) > 0) then break;
 
+        //add the last empty row if their is one
+        if (ATextIdx >= ATextLn) and aLineEndWithBreakLine and (aEllipsisLine = nil) then begin
+
+          //init aBreakedText
+          aBreakTextItem := TalBreakTextItem.Create;
+          try
+
+            //update aBreakTextItem
+            aBreakTextItem.line := StringToJstring('');
+            case AHTextAlign of
+              TTextAlign.Center: begin
+                                   aBreakTextItem.pos := TpointF.create((aMaxWidth - aEllipsisLineLn - aLineIndent) / 2, aCurrLineY);
+                                 end;
+              TTextAlign.Leading: begin
+                                    aBreakTextItem.pos := TpointF.create(aLineIndent, aCurrLineY);
+                                  end;
+              TTextAlign.Trailing: begin
+                                     aBreakTextItem.pos := TpointF.create(aMaxWidth - aEllipsisLineLn, aCurrLineY);
+                                   end;
+            end;
+            aBreakTextItem.rect := Trectf.Create(TPointF.Create(aBreakTextItem.pos.x,
+                                                                aBreakTextItem.pos.Y - (-1*aMetrics.Ascent)),
+                                                 0,
+                                                 (-1*aMetrics.Ascent) + aMetrics.Descent);
+
+            // update aBreakTextItems
+            aBreakTextItems.Add(aBreakTextItem);
+
+          except
+            ALFreeAndNil(aBreakTextItem);
+            raise;
+          end;
+
+          //update aCurrLineY
+          aCurrLineY := aCurrLineY + aLineHeight;
+          inc(aTotalLines);
+
+        end;
+
       end;
 
     finally
@@ -3048,6 +3087,45 @@ begin
       if (not aWordWrap) or
          ((aMaxLines > 0) and (aTotalLines >= aMaxLines)) or
          (compareValue(aCurrLineY + aDescent, aMaxHeight, TEpsilon.position) > 0) then break;
+
+      //add the last empty row if their is one
+      if (ATextIdx >= ATextLn) and aLineEndWithBreakLine and (aEllipsisLine = '') then begin
+
+        //init aBreakedText
+        aBreakTextItem := TalBreakTextItem.Create;
+        try
+
+          //update aBreakTextItem
+          aBreakTextItem.line := '';
+          case AHTextAlign of
+            TTextAlign.Center: begin
+                                 aBreakTextItem.pos := TpointF.create((aMaxWidth - aEllipsisLineLn - aLineIndent) / 2, aCurrLineY);
+                               end;
+            TTextAlign.Leading: begin
+                                  aBreakTextItem.pos := TpointF.create(aLineIndent, aCurrLineY);
+                                end;
+            TTextAlign.Trailing: begin
+                                   aBreakTextItem.pos := TpointF.create(aMaxWidth - aEllipsisLineLn, aCurrLineY);
+                                 end;
+          end;
+          aBreakTextItem.rect := Trectf.Create(TPointF.Create(aBreakTextItem.pos.x,
+                                                              aBreakTextItem.pos.Y - (-1*aAscent)),
+                                               0,
+                                               (-1*aAscent) + aDescent);
+
+          // update aBreakTextItems
+          aBreakTextItems.Add(aBreakTextItem);
+
+        except
+          ALFreeAndNil(aBreakTextItem);
+          raise;
+        end;
+
+        //update aCurrLineY
+        aCurrLineY := aCurrLineY + aLineHeight;
+        inc(aTotalLines);
+
+      end;
 
     end;
 

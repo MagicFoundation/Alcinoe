@@ -246,6 +246,7 @@ type
 
     fOnMessageReceived: TALFirebaseMessagingClientMessageReceivedEvent;
     fOnAuthorizationRefused: TNotifyEvent;
+    fOnAuthorizationGranted: TNotifyEvent;
     [weak] fFirebaseInstanceIdClient: TALFirebaseInstanceIdClient;
     fConnected: Boolean;
 
@@ -289,6 +290,7 @@ type
     procedure setBadgeCount(const aNewValue: integer; const extData: pointer = nil); virtual;
     property OnMessageReceived: TALFirebaseMessagingClientMessageReceivedEvent read fOnMessageReceived write fOnMessageReceived;
     property OnAuthorizationRefused: TNotifyEvent read fOnAuthorizationRefused write fOnAuthorizationRefused;
+    property OnAuthorizationGranted: TNotifyEvent read fOnAuthorizationGranted write fOnAuthorizationGranted;
     property connected: boolean read fConnected;
   end;
 
@@ -467,6 +469,7 @@ begin
   fconnected := False;
   fOnMessageReceived := nil;
   fOnAuthorizationRefused := nil;
+  fOnAuthorizationGranted := nil;
   fFirebaseInstanceIdClient := aFirebaseInstanceIdClient;
   fFirebaseInstanceIdClient.FirebaseMessagingClient := Self;
 
@@ -1144,13 +1147,24 @@ begin
                                                                                                              ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
- if (not granted) and assigned(fOnAuthorizationRefused) then begin
-  TThread.Synchronize(nil, // << Strangely it's seam this function is not called from the mainThread
-    procedure
-    begin
-      fOnAuthorizationRefused(self);
-    end);
- end;
+ if (not granted) then begin
+   if assigned(fOnAuthorizationRefused) then begin
+     TThread.Synchronize(nil, // << Strangely it's seam this function is not called from the mainThread
+       procedure
+       begin
+         fOnAuthorizationRefused(self);
+       end);
+    end;
+  end
+  else begin
+   if assigned(fOnAuthorizationGranted) then begin
+     TThread.Synchronize(nil, // << Strangely it's seam this function is not called from the mainThread
+       procedure
+       begin
+         fOnAuthorizationGranted(self);
+       end);
+    end;
+  end;
 
 end;
 

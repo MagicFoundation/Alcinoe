@@ -89,6 +89,8 @@ type
         fFpsStopWatch: TstopWatch;
         {$ENDIF}
         [Weak] FVideoPlayerControl: TALAndroidVideoPlayer;
+        fSdkInt: integer;
+        procedure DoOnFrameAvailable(surfaceTexture: JSurfaceTexture);
       public
         constructor Create(const aVideoPlayerControl: TALAndroidVideoPlayer);
         procedure onFrameAvailable(surfaceTexture: JSurfaceTexture); cdecl;
@@ -489,10 +491,11 @@ begin
   fFpsStopWatch := TStopWatch.StartNew;
   {$ENDIF}
   fVideoPlayerControl := aVideoPlayerControl;
+  fSdkInt := TJBuild_VERSION.JavaClass.SDK_INT;
 end;
 
-{**********************************************************************************************************}
-procedure TALAndroidVideoPlayer.TALFrameAvailableListener.onFrameAvailable(surfaceTexture: JSurfaceTexture);
+{************************************************************************************************************}
+procedure TALAndroidVideoPlayer.TALFrameAvailableListener.DoOnFrameAvailable(surfaceTexture: JSurfaceTexture);
 {$IF defined(DEBUG)}
 var aStopWatch: TStopWatch;
 {$ENDIF}
@@ -511,20 +514,6 @@ begin
   end;
   inc(fTotalFramesProcessed);
   {$ENDIF}
-
-  // https://developer.android.com/reference/android/graphics/SurfaceTexture.html
-  // SurfaceTexture objects may be created on any thread. updateTexImage() may only be called on the
-  // thread with the OpenGL ES context that contains the texture object. The frame-available callback
-  // is called on an arbitrary thread, so unless special care is taken updateTexImage() should not be
-  // called directly from the callback.
-  // so i as understand i can call updateTexImage in other thread than the current thread, it's
-  // seam to be thread safe - i already make opengl multithread however the updateTexImage seam
-  // to take around 1ms only so their is no really purpose to run it in a different thread than
-  // the main thread (who already have the OpenGL ES context)
-  //
-  // NOTE: as i do setOnFrameAvailableListener(SurfaceTexture.OnFrameAvailableListener listener,Handler handler)
-  //       with handler = TJHandler.JavaClass.init(TJLooper.javaclass.getMainLooper()) then this event will be
-  //       always called from the main UI thread
 
   {$IF CompilerVersion > 32} // tokyo
     {$MESSAGE WARN 'Check if this is still true and adjust the IFDEF'}
@@ -560,6 +549,35 @@ begin
 
   if assigned(fVideoPlayerControl.fOnFrameAvailableEvent) then
     fVideoPlayerControl.fOnFrameAvailableEvent(fVideoPlayerControl);
+
+end;
+
+{**********************************************************************************************************}
+procedure TALAndroidVideoPlayer.TALFrameAvailableListener.onFrameAvailable(surfaceTexture: JSurfaceTexture);
+begin
+
+  // https://developer.android.com/reference/android/graphics/SurfaceTexture.html
+  // SurfaceTexture objects may be created on any thread. updateTexImage() may only be called on the
+  // thread with the OpenGL ES context that contains the texture object. The frame-available callback
+  // is called on an arbitrary thread, so unless special care is taken updateTexImage() should not be
+  // called directly from the callback.
+  // so i as understand i can call updateTexImage in other thread than the current thread, it's
+  // seam to be thread safe - i already make opengl multithread however the updateTexImage seam
+  // to take around 1ms only so their is no really purpose to run it in a different thread than
+  // the main thread (who already have the OpenGL ES context)
+  //
+  // NOTE: as i do setOnFrameAvailableListener(SurfaceTexture.OnFrameAvailableListener listener,Handler handler)
+  //       with handler = TJHandler.JavaClass.init(TJLooper.javaclass.getMainLooper()) then this event will be
+  //       always called from the main UI thread
+
+  if fSdkInt >= 21 {LOLLIPOP} then DoOnFrameAvailable(surfaceTexture)
+  else begin
+    TThread.Synchronize(nil,
+      Procedure
+      begin
+        DoOnFrameAvailable(surfaceTexture);
+      end);
+  end;
 
 end;
 
@@ -768,7 +786,8 @@ begin
   //-----
   fOnFrameAvailableEvent := nil;
   FOnFrameAvailableListener := TALFrameAvailableListener.Create(Self);
-  fSurfaceTexture.setOnFrameAvailableListener(FOnFrameAvailableListener, fHandler);
+  if (TJBuild_VERSION.JavaClass.SDK_INT >= 21 {LOLLIPOP}) then fSurfaceTexture.setOnFrameAvailableListener(FOnFrameAvailableListener, fHandler)
+  else fSurfaceTexture.setOnFrameAvailableListener(FOnFrameAvailableListener);
   //-----
   fSurface := TJSurface.JavaClass.init(fSurfaceTexture);
   fSimpleExoPlayer.setVideoSurface(fSurface);

@@ -417,6 +417,7 @@ type
     FStroke: TStrokeBrush;
     fLineSpacing: single;
     fTextIsHtml: boolean;
+    fMustCallResized: Boolean;
     procedure SetFill(const Value: TBrush);
     procedure SetStroke(const Value: TStrokeBrush);
     function IsCornersStored: Boolean;
@@ -470,6 +471,9 @@ type
     procedure DoRealign; override;
     procedure AdjustSize;
     procedure Resize; override;
+    {$IF CompilerVersion >= 32} // tokyo
+    procedure DoResized; override;
+    {$ENDIF}
     procedure Loaded; override;
     property Layout: TTextLayout read FLayout;
   public
@@ -484,6 +488,7 @@ type
     procedure clearBufBitmap; virtual;
     procedure BeginUpdate; override; // this is neccessary because the MakeBufBitmap is not only call during the paint,
     procedure EndUpdate; override;   // but also when any property changed because need to retrieve the dimension
+    function TextBreaked: Boolean;
     property Font: TFont read GetFont write SetFont;
     property Color: TAlphaColor read GetColor write SetColor;
     property HorzTextAlign: TTextAlign read GetHorzTextAlign write SetHorzTextAlign;
@@ -2225,6 +2230,7 @@ begin
   FSides := AllSides;
   fLineSpacing := 0;
   fTextIsHtml := False;
+  fMustCallResized := False;
   //-----
   HitTest := False;
   //-----
@@ -2567,6 +2573,15 @@ begin
   AdjustSize;
 end;
 
+{*************************}
+{$IF CompilerVersion >= 32} // tokyo
+procedure TALText.DoResized;
+begin
+  if not FDisableAlign then inherited DoResized
+  else fMustCallResized := True;
+end;
+{$endif}
+
 {***************************}
 procedure TALText.AdjustSize;
 var R: TRectF;
@@ -2583,9 +2598,13 @@ begin
      (Text <> '') and
      (scene <> nil) then begin
 
+    fMustCallResized := False;
     FDisableAlign := True;  // i don't understand why in the original delphi source code they do like this - but i feel lazzy to fully study why so i leave it
                             // this mean that we can't add aligned control inside the TalText because when we will update the size of the taltext via adjustsize
                             // then we will not realign all the childs
+                            // NOTE: as this fucking FDisableAlign piss me off because no way to resize the control inside the OnResize event (for exemple by changing the
+                            //       font size, I introduce fMustCallResized to call DoResized AFTER we release the FDisableAlign (because stupid to call resized when
+                            //       FDisableAlign := True
     try
 
       LHorzAlign := FLayout.HorizontalAlign;
@@ -2648,6 +2667,10 @@ begin
     finally
       FDisableAlign := False;
     end;
+
+    {$IF CompilerVersion >= 32} // tokyo
+    if fMustCallResized then DoResized;
+    {$ENDIF}
 
   end;
 end;
@@ -2791,6 +2814,14 @@ begin
                                                          // << need to redo the bufbitmap
   Layout.EndUpdate;
   inherited; // will call dorealign that will call AdjustSize
+end;
+
+{************************************}
+function TALText.TextBreaked: Boolean;
+begin
+  if not doubleBuffered then exit(false);
+  result := (TALdoubleBufferedTextLayout(fLayout).fbufBitmap <> nil) and
+            (TALdoubleBufferedTextLayout(fLayout).fBufTextBreaked);
 end;
 
 {*****************************************}

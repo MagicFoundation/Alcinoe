@@ -281,6 +281,7 @@ private:
 	Fmx::Graphics::TStrokeBrush* FStroke;
 	float fLineSpacing;
 	bool fTextIsHtml;
+	bool fMustCallResized;
 	void __fastcall SetFill(Fmx::Graphics::TBrush* const Value);
 	void __fastcall SetStroke(Fmx::Graphics::TStrokeBrush* const Value);
 	bool __fastcall IsCornersStored(void);
@@ -327,6 +328,7 @@ protected:
 	virtual void __fastcall DoRealign(void);
 	void __fastcall AdjustSize(void);
 	virtual void __fastcall Resize(void);
+	virtual void __fastcall DoResized(void);
 	virtual void __fastcall Loaded(void);
 	__property Fmx::Textlayout::TTextLayout* Layout = {read=FLayout};
 	
@@ -338,6 +340,7 @@ public:
 	virtual void __fastcall clearBufBitmap(void);
 	virtual void __fastcall BeginUpdate(void);
 	virtual void __fastcall EndUpdate(void);
+	bool __fastcall TextBreaked(void);
 	__property Fmx::Graphics::TFont* Font = {read=GetFont, write=SetFont};
 	__property System::Uitypes::TAlphaColor Color = {read=GetColor, write=SetColor, nodefault};
 	__property Fmx::Types::TTextAlign HorzTextAlign = {read=GetHorzTextAlign, write=SetHorzTextAlign, nodefault};

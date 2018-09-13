@@ -1132,15 +1132,15 @@ end;
 procedure TALFirebaseMessagingClient.UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler(granted: Boolean; error: NSError);
 begin
 
- // If the local or remote notifications of your app or app extension interact
- // with the user in any way, you must call this method to request authorization
- // for those interactions. The first time your app ever calls the method, the
- // system prompts the user to authorize the requested options. The user may
- // respond by granting or denying authorization, and the system stores the user’s
- // response so that subsequent calls to this method do not prompt the user again.
- // The user may change the allowed interactions at any time. Use the
- // getNotificationSettingsWithCompletionHandler: method to determine what your
- // app is allowed to do.
+  // If the local or remote notifications of your app or app extension interact
+  // with the user in any way, you must call this method to request authorization
+  // for those interactions. The first time your app ever calls the method, the
+  // system prompts the user to authorize the requested options. The user may
+  // respond by granting or denying authorization, and the system stores the user’s
+  // response so that subsequent calls to this method do not prompt the user again.
+  // The user may change the allowed interactions at any time. Use the
+  // getNotificationSettingsWithCompletionHandler: method to determine what your
+  // app is allowed to do.
 
   {$IFDEF DEBUG}
   allog('TALFirebaseMessagingClient.UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler', 'granted: ' + ALBoolToStrU(granted) +

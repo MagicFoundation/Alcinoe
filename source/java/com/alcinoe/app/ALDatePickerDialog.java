@@ -22,6 +22,16 @@ public class ALDatePickerDialog implements DialogInterface.OnClickListener {
     if (button_negative_text != null) { mDatePickerDialog.setButton(android.content.DialogInterface.BUTTON_NEGATIVE, button_negative_text, this/*listener*/); }
     if (button_neutral_text != null) { mDatePickerDialog.setButton(android.content.DialogInterface.BUTTON_NEUTRAL, button_neutral_text, this/*listener*/); }
         
+    mDatePickerDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+        @Override
+        public void onCancel(DialogInterface dialogInterface) {
+          if (mDatePickerDialogListener != null) { mDatePickerDialogListener.onBtnClick(0, 
+                                                                                        mDatePickerDialog.getDatePicker().getYear(),
+                                                                                        mDatePickerDialog.getDatePicker().getMonth(),
+                                                                                        mDatePickerDialog.getDatePicker().getDayOfMonth()); }  
+        }
+    });
+    
 	}
 
   public void setListener(ALDatePickerDialogListener listener) {

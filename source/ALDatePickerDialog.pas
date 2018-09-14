@@ -172,28 +172,17 @@ begin
   //                                                              ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
 
-  {$IF CompilerVersion <= 31} // berlin
-  TThread.queue(nil,
-    procedure
-    begin
-      if not assigned(fDatePickerDialog) then exit;
-  {$ENDIF}
+  if assigned(fDatePickerDialog.fOnClose) then begin
 
-      if assigned(fDatePickerDialog.fOnClose) then begin
+    if which = TJDialogInterface.javaclass.BUTTON_POSITIVE then AResult := mrOk
+    else if which = TJDialogInterface.javaclass.BUTTON_NEGATIVE then AResult := mrCancel
+    else if which = TJDialogInterface.javaclass.BUTTON_NEUTRAL then AResult := mrClear
+    else AResult := mrClose;
 
-        if which = TJDialogInterface.javaclass.BUTTON_POSITIVE then AResult := mrOk
-        else if which = TJDialogInterface.javaclass.BUTTON_NEGATIVE then AResult := mrCancel
-        else if which = TJDialogInterface.javaclass.BUTTON_NEUTRAL then AResult := mrClear
-        else AResult := mrClose; // << not possible normally
+    // Months are indexed starting at 0, so August is month 8, or index 7
+    fDatePickerDialog.fOnClose(fDatePickerDialog, AResult, year, month+1, dayOfMonth);
 
-        // Months are indexed starting at 0, so August is month 8, or index 7
-        fDatePickerDialog.fOnClose(fDatePickerDialog, AResult, year, month+1, dayOfMonth);
-
-      end;
-
-  {$IF CompilerVersion <= 31} // berlin
-    end);
-  {$ENDIF}
+  end;
 
 end;
 
@@ -262,23 +251,13 @@ begin
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
+
   fDatePickerDialogListener := TDatePickerDialogListener.Create(Self);
-
-  {$IF CompilerVersion <= 31} // berlin
-  TUIThreadCaller.Call<TDatePickerDialogListener>(
-    procedure (fDatePickerDialogListener: TDatePickerDialogListener)
-    begin
-  {$ENDIF}
-
-      fDatePickerDialog := TJALDatePickerDialog.JavaClass.init(TAndroidHelper.Context,
-                                                               StrToJCharSequence(aBtnOKCaption),
-                                                               StrToJCharSequence(aBtnCancelCaption),
-                                                               StrToJCharSequence(aBtnClearCaption));
-      fDatePickerDialog.setListener(fDatePickerDialogListener);
-
-  {$IF CompilerVersion <= 31} // berlin
-    end, fDatePickerDialogListener);
-  {$ENDIF}
+  fDatePickerDialog := TJALDatePickerDialog.JavaClass.init(TAndroidHelper.Context,
+                                                           StrToJCharSequence(aBtnOKCaption),
+                                                           StrToJCharSequence(aBtnCancelCaption),
+                                                           StrToJCharSequence(aBtnClearCaption));
+  fDatePickerDialog.setListener(fDatePickerDialogListener);
 
   {$ENDIF}
   {$ENDREGION}
@@ -414,31 +393,9 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  {$IF CompilerVersion <= 31} // berlin
-  fDatePickerDialogListener.fDatePickerDialog := nil;
-  TUIThreadCaller.Call<JALDatePickerDialog, TDatePickerDialogListener>(
-    procedure (fDatePickerDialog: JALDatePickerDialog; fDatePickerDialogListener: TDatePickerDialogListener)
-    begin
-  {$ENDIF}
-
-      fDatePickerDialog.setListener(nil);
-      fDatePickerDialog := nil;
-
-      {$IF CompilerVersion <= 31} // berlin
-      TThread.Queue(nil,
-        procedure
-        begin
-      {$ENDIF}
-
-          AlFreeAndNil(fDatePickerDialogListener);
-
-      {$IF CompilerVersion <= 31} // berlin
-        end);
-      {$ENDIF}
-
-  {$IF CompilerVersion <= 31} // berlin
-    end, fDatePickerDialog, fDatePickerDialogListener);
-  {$ENDIF}
+  fDatePickerDialog.setListener(nil);
+  fDatePickerDialog := nil;
+  AlFreeAndNil(fDatePickerDialogListener);
 
   {$ENDIF}
   {$ENDREGION}
@@ -487,18 +444,8 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  {$IF CompilerVersion <= 31} // berlin
-  CallinUiThread(
-    procedure
-    begin
-  {$ENDIF}
-
-      // Months are indexed starting at 0, so August is month 8, or index 7
-      fDatePickerDialog.show(aYear, aMonth - 1, aDayOfMonth);
-
-  {$IF CompilerVersion <= 31} // berlin
-    end);
-  {$ENDIF}
+  // Months are indexed starting at 0, so August is month 8, or index 7
+  fDatePickerDialog.show(aYear, aMonth - 1, aDayOfMonth);
 
   {$ENDIF}
   {$ENDREGION}

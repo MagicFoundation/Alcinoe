@@ -68,7 +68,7 @@
 // notification.vibrate - must equal to 1 to activate the default vibration pattern (0, 1200)
 // notification.visibility - Specify the value of visibility - One of VISIBILITY_PRIVATE (the default), VISIBILITY_SECRET, or VISIBILITY_PUBLIC.
 // notification.priority - Relative priority for this notification
-// notification.sound - Set the sound to play
+// notification.sound - Set the sound to play - use "default" for the default sound
 // notification.badgecount - update the shortcut badge count with this number
 // notification.present - only for IOS 10+, it's equal to 1 then even if the app is in foreground the notification will be presented to the end user
 //

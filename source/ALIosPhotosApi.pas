@@ -1024,7 +1024,7 @@ const
 
 implementation
 
-{$IF defined(IOS) and NOT defined(CPUARM)}
+// {$IF defined(IOS) and NOT defined(CPUARM)} => https://stackoverflow.com/questions/52475704/how-to-link-correctly-apple-ios-library
 
 uses
   Posix.Dlfcn;
@@ -1032,7 +1032,7 @@ uses
 var
   PhotosModule: THandle;
 
-{$ENDIF IOS}
+// {$ENDIF IOS} => https://stackoverflow.com/questions/52475704/how-to-link-correctly-apple-ios-library
 
 //function PHContentEditingInputResultIsInCloudKey: NSString;
 //begin
@@ -1099,7 +1099,7 @@ var
 //  Result := CocoaPointerConst(libPhotos, 'PHLivePhotoShouldRenderAtPlaybackTime');
 //end;
 
-{$IF defined(IOS) and NOT defined(CPUARM)}
+// {$IF defined(IOS) and NOT defined(CPUARM)} => https://stackoverflow.com/questions/52475704/how-to-link-correctly-apple-ios-library
 
 initialization
 
@@ -1109,6 +1109,6 @@ finalization
 
 dlclose(PhotosModule);
 
-{$ENDIF IOS}
+// {$ENDIF IOS} => https://stackoverflow.com/questions/52475704/how-to-link-correctly-apple-ios-library
 
 end.

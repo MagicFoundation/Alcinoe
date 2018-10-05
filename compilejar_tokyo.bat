@@ -5,19 +5,19 @@ setlocal
 REM -----------------------------------------------------
 REM
 REM Update the path below according to your system
-REM Please notice that we use the SDK of Oreo (27)
+REM Please notice that we use the SDK of Android P (28)
 REM instead of the default lollipop (22) used by Delphi.
 REM This because we want the text selection
 REM like https://developer.android.com/about/versions/marshmallow/android-6.0-changes.html#behavior-text-selection
 REM Please install the SDK build tools and the SDK Platform 
-REM of Oreo (27) using SDK Manager.exe
+REM of Android P (28) using SDK Manager.exe
 REM
 REM JDK 1.8/1.7 Compatibility Gotcha: http://www.draconianoverlord.com/2014/04/01/jdk-compatibility.html
 REM
 REM -----------------------------------------------------
 
 if x%ANDROID% == x set ANDROID="C:\SDKs\android-sdk-windows"
-set ANDROID_PLATFORM=%ANDROID%\platforms\android-27
+set ANDROID_PLATFORM=%ANDROID%\platforms\android-28
 set FMX_JAR="C:\Program Files (x86)\Embarcadero\Studio\19.0\lib\android\release\fmx.jar"
 set JDK_PATH="C:\Program Files\Java\jdk1.8.0_131\bin"
 set JDK_PATH1_7="C:\Program Files\Java\jdk1.7.0_80\bin"

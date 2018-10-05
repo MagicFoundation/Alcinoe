@@ -5,7 +5,8 @@ interface
 uses
   Macapi.ObjectiveC,
   iOSapi.CocoaTypes,
-  iOSapi.Foundation;
+  iOSapi.Foundation,
+  iOSapi.UIKit;
 
 {$M+}
 
@@ -29,6 +30,54 @@ const
 
   // User has authorized this application to access photos data.
   PHAuthorizationStatusAuthorized = 3;
+
+type
+
+    //typedef NS_ENUM(NSInteger, PHImageRequestOptionsDeliveryMode) {
+    PHImageRequestOptionsDeliveryMode = NSInteger;
+
+const
+
+  //client may get several image results when the call is asynchronous or will get one result when the call is synchronous
+  PHImageRequestOptionsDeliveryModeOpportunistic = 0;
+
+  //client will get one result only and it will be as asked or better than asked (sync requests are automatically processed this way regardless of the specified mode)
+  PHImageRequestOptionsDeliveryModeHighQualityFormat = 1;
+
+  //client will get one result only and it may be degraded
+  PHImageRequestOptionsDeliveryModeFastFormat = 2;
+
+type
+
+  //typedef NS_ENUM(NSInteger, PHImageRequestOptionsVersion) {
+  PHImageRequestOptionsVersion = NSInteger;
+
+const
+
+  // version with edits (aka adjustments) rendered or unadjusted version if there is no edits
+  PHImageRequestOptionsVersionCurrent = 0;
+
+  // original version without any adjustments
+  PHImageRequestOptionsVersionUnadjusted = 1;
+
+  // original version, in the case of a combined format the highest fidelity format will be returned (e.g. RAW for a RAW+JPG source image)
+  PHImageRequestOptionsVersionOriginal = 2;
+
+type
+
+  //typedef NS_ENUM(NSInteger, PHImageRequestOptionsResizeMode) {
+  PHImageRequestOptionsResizeMode = NSInteger;
+
+const
+
+  //no resize
+  PHImageRequestOptionsResizeModeNone = 0;
+
+  // use targetSize as a hint for optimal decoding when the source image is a compressed format (i.e. subsampling), the delivered image may be larger than targetSize
+  PHImageRequestOptionsResizeModeFast = 1;
+
+  // same as above but also guarantees the delivered image is exactly targetSize (must be set when a normalizedCropRect is specified)
+  PHImageRequestOptionsResizeModeExact = 2;
 
 
 //const
@@ -118,15 +167,6 @@ const
   //PHAssetResourceTypePairedVideo = 9;
   //PHAssetResourceTypeFullSizePairedVideo = 10;
   //PHAssetResourceTypeAdjustmentBasePairedVideo = 11;
-  //PHImageRequestOptionsVersionCurrent = 0;
-  //PHImageRequestOptionsVersionUnadjusted = 1;
-  //PHImageRequestOptionsVersionOriginal = 2;
-  //PHImageRequestOptionsDeliveryModeOpportunistic = 0;
-  //PHImageRequestOptionsDeliveryModeHighQualityFormat = 1;
-  //PHImageRequestOptionsDeliveryModeFastFormat = 2;
-  //PHImageRequestOptionsResizeModeNone = 0;
-  //PHImageRequestOptionsResizeModeFast = 1;
-  //PHImageRequestOptionsResizeModeExact = 2;
   //PHVideoRequestOptionsVersionCurrent = 0;
   //PHVideoRequestOptionsVersionOriginal = 1;
   //PHVideoRequestOptionsDeliveryModeAutomatic = 0;
@@ -142,14 +182,14 @@ type
 
   //PHAdjustmentData = interface;
   //PHPhotoLibrary = interface;
-  //PHObject = interface;
+  PHObject = interface;
   //PHObjectPlaceholder = interface;
-  //PHFetchResult = interface;
+  PHFetchResult = interface;
   //PHChange = interface;
   //PHPhotoLibraryChangeObserver = interface;
-  //PHFetchOptions = interface;
+  PHFetchOptions = interface;
   //PHAssetCollection = interface;
-  //PHAsset = interface;
+  PHAsset = interface;
   //PHContentEditingInput = interface;
   //PHContentEditingOutput = interface;
   //PHAssetResource = interface;
@@ -166,10 +206,10 @@ type
   //PHCollectionList = interface;
   //PHCollection = interface;
   //PHCollectionListChangeRequest = interface;
-  //PHImageRequestOptions = interface;
+  PHImageRequestOptions = interface;
   //PHLivePhotoRequestOptions = interface;
   //PHVideoRequestOptions = interface;
-  //PHImageManager = interface;
+  PHImageManager = interface;
   //PHCachingImageManager = interface;
   //PHLivePhotoFrame = interface;
   //PHLivePhotoEditingContext = interface;
@@ -195,7 +235,7 @@ type
   //PHAssetBurstSelectionType = NSUInteger;
   //PHAssetSourceType = NSUInteger;
   //PHAssetResourceType = NSInteger;
-  //ObjectType = Pointer;
+  ObjectType = Pointer;
   //PObjectType = ^ObjectType;
 
   //_NSRange = record
@@ -225,9 +265,6 @@ type
   //TPhotosDataReceivedHandler = procedure(param1: NSData) of object;
   //TPhotosCompletionHandler2 = procedure(param1: NSError) of object;
   //TPhotosHandler1 = procedure(param1: NSUInteger; param2: NSUInteger) of object;
-  //PHImageRequestOptionsVersion = NSInteger;
-  //PHImageRequestOptionsDeliveryMode = NSInteger;
-  //PHImageRequestOptionsResizeMode = NSInteger;
   //PHAssetImageProgressHandler = procedure(param1: Double; param2: NSError; param3: PBoolean; param4: NSDictionary) of object;
   //CGFloat = Single;
   //PCGFloat = ^CGFloat;
@@ -256,11 +293,17 @@ type
   //PHVideoRequestOptionsVersion = NSInteger;
   //PHVideoRequestOptionsDeliveryMode = NSInteger;
   //PHAssetVideoProgressHandler = procedure(param1: Double; param2: NSError; param3: PBoolean; param4: NSDictionary) of object;
-  //PHImageRequestID = Int32;
+
+  //typedef int32_t PHImageRequestID PHOTOS_AVAILABLE_IOS_TVOS(8_0, 10_0);
+  PHImageRequestID = Int32;
+
   //PPHImageRequestID = ^PHImageRequestID;
   //TPhotosResultHandler = procedure(param1: UIImage; param2: NSDictionary) of object;
   //UIImageOrientation = NSInteger;
-  //TPhotosResultHandler1 = procedure(param1: NSData; param2: NSString; param3: UIImageOrientation; param4: NSDictionary) of object;
+
+  //(void(^)(NSData *__nullable imageData, NSString *__nullable dataUTI, UIImageOrientation orientation, NSDictionary *__nullable info))
+  TPHImageManagerRequestImageDataForAssetResultHandler = procedure(imageData: NSData; dataUTI: NSString; orientation: UIImageOrientation; info: NSDictionary) of object;
+
   //TPhotosResultHandler2 = procedure(param1: PHLivePhoto; param2: NSDictionary) of object;
   //TPhotosResultHandler3 = procedure(param1: AVPlayerItem; param2: NSDictionary) of object;
   //TPhotosResultHandler4 = procedure(param1: AVAssetExportSession; param2: NSDictionary) of object;
@@ -344,19 +387,19 @@ type
   TPHPhotoLibrary = class(TOCGenericImport<PHPhotoLibraryClass, PHPhotoLibrary>) end;
   PPHPhotoLibrary = Pointer;
 
-  //PHObjectClass = interface(NSObjectClass)
-    //['{E2DD3131-D43F-4C65-8F21-AB5C9CBF7C63}']
-  //end;
+  PHObjectClass = interface(NSObjectClass)
+    ['{E2DD3131-D43F-4C65-8F21-AB5C9CBF7C63}']
+  end;
+  PHObject = interface(NSObject)
+    ['{7381DD09-4F11-4972-BDB8-45C535936AB3}']
 
-  //PHObject = interface(NSObject)
-    //['{7381DD09-4F11-4972-BDB8-45C535936AB3}']
+    // Returns an identifier which persistently identifies the object on a given device
+    //@property (nonatomic, copy, readonly) NSString *localIdentifier;
     //function localIdentifier: NSString; cdecl;
-  //end;
 
-  //TPHObject = class(TOCGenericImport<PHObjectClass, PHObject>)
-  //end;
-
-  //PPHObject = Pointer;
+  end;
+  TPHObject = class(TOCGenericImport<PHObjectClass, PHObject>) end;
+  PPHObject = Pointer;
 
   //PHObjectPlaceholderClass = interface(PHObjectClass)
     //['{7D2580D6-3BFC-45B1-A59F-08A078E51A6D}']
@@ -371,33 +414,56 @@ type
 
   //PPHObjectPlaceholder = Pointer;
 
-  //PHFetchResultClass = interface(NSObjectClass)
-    //['{81C40F03-EF47-42B7-8385-9113E0CC417C}']
-  //end;
+  PHFetchResultClass = interface(NSObjectClass)
+    ['{81C40F03-EF47-42B7-8385-9113E0CC417C}']
+  end;
+  PHFetchResult = interface(NSObject)
+    ['{4ACE8B3F-F2FC-40EB-B291-04B6EEF85CE2}']
 
-  //PHFetchResult = interface(NSObject)
-    //['{4ACE8B3F-F2FC-40EB-B291-04B6EEF85CE2}']
+    //@property (readonly) NSUInteger count;
     //function count: NSUInteger; cdecl;
+
+    //- (ObjectType)objectAtIndex:(NSUInteger)index;
     //function objectAtIndex(index: NSUInteger): ObjectType; cdecl;
+
+    //- (ObjectType)objectAtIndexedSubscript:(NSUInteger)idx;
     //function objectAtIndexedSubscript(idx: NSUInteger): ObjectType; cdecl;
+
+    //- (BOOL)containsObject:(ObjectType)anObject;
     //function containsObject(anObject: ObjectType): Boolean; cdecl;
+
+    //- (NSUInteger)indexOfObject:(ObjectType)anObject;
     //[MethodName('indexOfObject:')]
     //function indexOfObject(anObject: ObjectType): NSUInteger; cdecl;
+
+    //- (NSUInteger)indexOfObject:(ObjectType)anObject inRange:(NSRange)range;
     //[MethodName('indexOfObject:inRange:')]
     //function indexOfObjectInRange(anObject: ObjectType; inRange: NSRange): NSUInteger; cdecl;
-    //function firstObject: ObjectType; cdecl;
+
+    //@property (nonatomic, readonly, nullable) ObjectType firstObject;
+    function firstObject: ObjectType; cdecl;
+
+    //@property (nonatomic, readonly, nullable) ObjectType lastObject;
     //function lastObject: ObjectType; cdecl;
+
+    //- (NSArray<ObjectType> *)objectsAtIndexes:(NSIndexSet *)indexes;
     //function objectsAtIndexes(indexes: NSIndexSet): NSArray; cdecl;
+
+    //- (void)enumerateObjectsUsingBlock:(void (^)(ObjectType obj, NSUInteger idx, BOOL *stop))block;
     //procedure enumerateObjectsUsingBlock(block: TPhotosBlock); cdecl;
+
+    //- (void)enumerateObjectsWithOptions:(NSEnumerationOptions)opts usingBlock:(void (^)(ObjectType obj, NSUInteger idx, BOOL *stop))block;
     //procedure enumerateObjectsWithOptions(opts: NSEnumerationOptions; usingBlock: TPhotosBlock); cdecl;
+
+    //- (void)enumerateObjectsAtIndexes:(NSIndexSet *)s options:(NSEnumerationOptions)opts usingBlock:(void (^)(ObjectType obj, NSUInteger idx, BOOL *stop))block;
     //procedure enumerateObjectsAtIndexes(s: NSIndexSet; options: NSEnumerationOptions; usingBlock: TPhotosBlock); cdecl;
+
+    //- (NSUInteger)countOfAssetsWithMediaType:(PHAssetMediaType)mediaType;
     //function countOfAssetsWithMediaType(mediaType: PHAssetMediaType): NSUInteger; cdecl;
-  //end;
 
-  //TPHFetchResult = class(TOCGenericImport<PHFetchResultClass, PHFetchResult>)
-  //end;
-
-  //PPHFetchResult = Pointer;
+  end;
+  TPHFetchResult = class(TOCGenericImport<PHFetchResultClass, PHFetchResult>) end;
+  PPHFetchResult = Pointer;
 
   //PHChangeClass = interface(NSObjectClass)
     //['{D04929E2-B30F-45F9-9763-28FFEDD6270E}']
@@ -414,12 +480,11 @@ type
 
   //PPHChange = Pointer;
 
-  //PHFetchOptionsClass = interface(NSObjectClass)
-    //['{7D2F5AF9-4736-445F-80FC-7821109DDDD4}']
-  //end;
-
-  //PHFetchOptions = interface(NSObject)
-    //['{B94B68CA-5BE6-414D-957E-6EA506A15815}']
+  PHFetchOptionsClass = interface(NSObjectClass)
+    ['{7D2F5AF9-4736-445F-80FC-7821109DDDD4}']
+  end;
+  PHFetchOptions = interface(NSObject)
+    ['{B94B68CA-5BE6-414D-957E-6EA506A15815}']
     //procedure setPredicate(predicate: NSPredicate); cdecl;
     //function predicate: NSPredicate; cdecl;
     //procedure setSortDescriptors(sortDescriptors: NSArray); cdecl;
@@ -434,12 +499,9 @@ type
     //function fetchLimit: NSUInteger; cdecl;
     //procedure setWantsIncrementalChangeDetails(wantsIncrementalChangeDetails: Boolean); cdecl;
     //function wantsIncrementalChangeDetails: Boolean; cdecl;
-  //end;
-
-  //TPHFetchOptions = class(TOCGenericImport<PHFetchOptionsClass, PHFetchOptions>)
-  //end;
-
-  //PPHFetchOptions = Pointer;
+  end;
+  TPHFetchOptions = class(TOCGenericImport<PHFetchOptionsClass, PHFetchOptions>) end;
+  PPHFetchOptions = Pointer;
 
   //PHCollectionClass = interface(PHObjectClass)
     //['{A983FE41-FCEB-4AE1-A069-3DE7AD49AD4D}']
@@ -489,43 +551,92 @@ type
 
   //PPHAssetCollection = Pointer;
 
-  //PHAssetClass = interface(PHObjectClass)
-    //['{3697A99D-0346-4619-B6F5-5C1959EC144D}']
-    //{ class } function fetchAssetsInAssetCollection(assetCollection: PHAssetCollection; options: PHFetchOptions): PHFetchResult; cdecl;
-    //{ class } function fetchAssetsWithLocalIdentifiers(identifiers: NSArray; options: PHFetchOptions): PHFetchResult; cdecl;
-    //{ class } function fetchKeyAssetsInAssetCollection(assetCollection: PHAssetCollection; options: PHFetchOptions): PHFetchResult; cdecl;
-    //{ class } function fetchAssetsWithBurstIdentifier(burstIdentifier: NSString; options: PHFetchOptions): PHFetchResult; cdecl;
-    //{ class } function fetchAssetsWithOptions(options: PHFetchOptions): PHFetchResult; cdecl;
-    //{ class } function fetchAssetsWithMediaType(mediaType: PHAssetMediaType; options: PHFetchOptions): PHFetchResult; cdecl;
-    //{ class } function fetchAssetsWithALAssetURLs(assetURLs: NSArray; options: PHFetchOptions): PHFetchResult; cdecl;
-  //end;
+  PHAssetClass = interface(PHObjectClass)
+    ['{3697A99D-0346-4619-B6F5-5C1959EC144D}']
 
-  //PHAsset = interface(PHObject)
-    //['{904CFD36-D8E8-4F81-BEBC-F8B42021C446}']
+    //+ (PHFetchResult<PHAsset *> *)fetchAssetsInAssetCollection:(PHAssetCollection *)assetCollection options:(nullable PHFetchOptions *)options;
+    //{ class } function fetchAssetsInAssetCollection(assetCollection: PHAssetCollection; options: PHFetchOptions): PHFetchResult; cdecl;
+
+    //+ (PHFetchResult<PHAsset *> *)fetchAssetsWithLocalIdentifiers:(NSArray<NSString *> *)identifiers options:(nullable PHFetchOptions *)options; // includes hidden assets by default
+    //{ class } function fetchAssetsWithLocalIdentifiers(identifiers: NSArray; options: PHFetchOptions): PHFetchResult; cdecl;
+
+    //+ (nullable PHFetchResult<PHAsset *> *)fetchKeyAssetsInAssetCollection:(PHAssetCollection *)assetCollection options:(nullable PHFetchOptions *)options;
+    //{ class } function fetchKeyAssetsInAssetCollection(assetCollection: PHAssetCollection; options: PHFetchOptions): PHFetchResult; cdecl;
+
+    //+ (PHFetchResult<PHAsset *> *)fetchAssetsWithBurstIdentifier:(NSString *)burstIdentifier options:(nullable PHFetchOptions *)options;
+    //{ class } function fetchAssetsWithBurstIdentifier(burstIdentifier: NSString; options: PHFetchOptions): PHFetchResult; cdecl;
+
+    // Fetches PHAssetSourceTypeUserLibrary assets by default (use includeAssetSourceTypes option to override)
+    //+ (PHFetchResult<PHAsset *> *)fetchAssetsWithOptions:(nullable PHFetchOptions *)options;
+    //{ class } function fetchAssetsWithOptions(options: PHFetchOptions): PHFetchResult; cdecl;
+
+    //+ (PHFetchResult<PHAsset *> *)fetchAssetsWithMediaType:(PHAssetMediaType)mediaType options:(nullable PHFetchOptions *)options;
+    //{ class } function fetchAssetsWithMediaType(mediaType: PHAssetMediaType; options: PHFetchOptions): PHFetchResult; cdecl;
+
+    // assetURLs are URLs retrieved from ALAsset's ALAssetPropertyAssetURL
+    //+ (PHFetchResult<PHAsset *> *)fetchAssetsWithALAssetURLs:(NSArray<NSURL *> *)assetURLs options:(nullable PHFetchOptions *)options API_DEPRECATED("Will be removed in a future release", ios(8.0, 11.0), tvos(8.0, 11.0));
+    { class } function fetchAssetsWithALAssetURLs(assetURLs: NSArray; options: PHFetchOptions): PHFetchResult; cdecl;
+
+  end;
+  PHAsset = interface(PHObject)
+    ['{904CFD36-D8E8-4F81-BEBC-F8B42021C446}']
+
+    // Playback style describes how the asset should be presented to the user (regardless of the backing media for that asset).  Use this value to choose the type of view and the appropriate APIs on the PHImageManager to display this asset
+    //@property (nonatomic, assign, readonly) PHAssetPlaybackStyle playbackStyle PHOTOS_AVAILABLE_IOS_TVOS(11_0, 11_0);
     //function playbackStyle: PHAssetPlaybackStyle; cdecl;
+
+    //@property (nonatomic, assign, readonly) PHAssetMediaType mediaType;
     //function mediaType: PHAssetMediaType; cdecl;
+
+    //@property (nonatomic, assign, readonly) PHAssetMediaSubtype mediaSubtypes;
     //function mediaSubtypes: PHAssetMediaSubtype; cdecl;
+
+    //@property (nonatomic, assign, readonly) NSUInteger pixelWidth;
     //function pixelWidth: NSUInteger; cdecl;
+
+    //@property (nonatomic, assign, readonly) NSUInteger pixelHeight;
     //function pixelHeight: NSUInteger; cdecl;
+
+    //@property (nonatomic, strong, readonly, nullable) NSDate *creationDate;
     //function creationDate: NSDate; cdecl;
+
+    //@property (nonatomic, strong, readonly, nullable) NSDate *modificationDate;
     //function modificationDate: NSDate; cdecl;
+
+    //@property (nonatomic, strong, readonly, nullable) CLLocation *location;
     //function location: CLLocation; cdecl;
+
+    //@property (nonatomic, assign, readonly) NSTimeInterval duration;
     //function duration: NSTimeInterval; cdecl;
+
+    // a hidden asset will be excluded from moment collections, but may still be included in other smart or regular album collections
+    //@property (nonatomic, assign, readonly, getter=isHidden) BOOL hidden;
     //function isHidden: Boolean; cdecl;
+
+    //@property (nonatomic, assign, readonly, getter=isFavorite) BOOL favorite;
     //function isFavorite: Boolean; cdecl;
+
+    //@property (nonatomic, strong, readonly, nullable) NSString *burstIdentifier;
     //function burstIdentifier: NSString; cdecl;
+
+    //@property (nonatomic, assign, readonly) PHAssetBurstSelectionType burstSelectionTypes;
     //function burstSelectionTypes: PHAssetBurstSelectionType; cdecl;
+
+    //@property (nonatomic, assign, readonly) BOOL representsBurst;
     //function representsBurst: Boolean; cdecl;
+
+    //@property (nonatomic, assign, readonly) PHAssetSourceType sourceType PHOTOS_AVAILABLE_IOS_TVOS(9_0, 10_0);
     //function sourceType: PHAssetSourceType; cdecl;
+
+    //- (BOOL)canPerformEditOperation:(PHAssetEditOperation)editOperation;
     //function canPerformEditOperation(editOperation: PHAssetEditOperation): Boolean; cdecl;
+
     //function requestContentEditingInputWithOptions(options: PHContentEditingInputRequestOptions; completionHandler: TPhotosCompletionHandler1): PHContentEditingInputRequestID; cdecl;
     //procedure cancelContentEditingInputRequest(requestID: PHContentEditingInputRequestID); cdecl;
-  //end;
 
-  //TPHAsset = class(TOCGenericImport<PHAssetClass, PHAsset>)
-  //end;
-
-  //PPHAsset = Pointer;
+  end;
+  TPHAsset = class(TOCGenericImport<PHAssetClass, PHAsset>) end;
+  PPHAsset = Pointer;
 
   //PHContentEditingInputClass = interface(NSObjectClass)
     //['{3C936542-A12D-43F5-82D6-78EE99F6D217}']
@@ -852,32 +963,50 @@ type
 
   //PPHCollectionListChangeRequest = Pointer;
 
-  //PHImageRequestOptionsClass = interface(NSObjectClass)
-    //['{9A0FF6A8-59C4-4357-8FC8-6E6DB94D973A}']
-  //end;
+  PHImageRequestOptionsClass = interface(NSObjectClass)
+    ['{9A0FF6A8-59C4-4357-8FC8-6E6DB94D973A}']
+  end;
+  PHImageRequestOptions = interface(NSObject)
+    ['{5C6EC6D7-C7CD-4451-A56A-9D8568AAE29A}']
 
-  //PHImageRequestOptions = interface(NSObject)
-    //['{5C6EC6D7-C7CD-4451-A56A-9D8568AAE29A}']
-    //procedure setVersion(version: PHImageRequestOptionsVersion); cdecl;
-    //function version: PHImageRequestOptionsVersion; cdecl;
-    //procedure setDeliveryMode(deliveryMode: PHImageRequestOptionsDeliveryMode); cdecl;
-    //function deliveryMode: PHImageRequestOptionsDeliveryMode; cdecl;
-    //procedure setResizeMode(resizeMode: PHImageRequestOptionsResizeMode); cdecl;
-    //function resizeMode: PHImageRequestOptionsResizeMode; cdecl;
+    // version
+    //@property (nonatomic, assign) PHImageRequestOptionsVersion version;
+    procedure setVersion(version: PHImageRequestOptionsVersion); cdecl;
+    function version: PHImageRequestOptionsVersion; cdecl;
+
+    // delivery mode. Defaults to PHImageRequestOptionsDeliveryModeOpportunistic
+    //@property (nonatomic, assign) PHImageRequestOptionsDeliveryMode deliveryMode;
+    procedure setDeliveryMode(deliveryMode: PHImageRequestOptionsDeliveryMode); cdecl;
+    function deliveryMode: PHImageRequestOptionsDeliveryMode; cdecl;
+
+    // resize mode. Does not apply when size is PHImageManagerMaximumSize. Defaults to PHImageRequestOptionsResizeModeNone (or no resize)
+    //@property (nonatomic, assign) PHImageRequestOptionsResizeMode resizeMode;
+    procedure setResizeMode(resizeMode: PHImageRequestOptionsResizeMode); cdecl;
+    function resizeMode: PHImageRequestOptionsResizeMode; cdecl;
+
+    // specify crop rectangle in unit coordinates of the original image, such as a face. Defaults to CGRectZero (not applicable)
+    //@property (nonatomic, assign) CGRect normalizedCropRect;
     //procedure setNormalizedCropRect(normalizedCropRect: CGRect); cdecl;
     //function normalizedCropRect: CGRect; cdecl;
-    //procedure setNetworkAccessAllowed(networkAccessAllowed: Boolean); cdecl;
-    //function isNetworkAccessAllowed: Boolean; cdecl;
-    //procedure setSynchronous(synchronous: Boolean); cdecl;
-    //function isSynchronous: Boolean; cdecl;
+
+    // if necessary will download the image from iCloud (client can monitor or cancel using progressHandler). Defaults to NO (see start/stopCachingImagesForAssets)
+    //@property (nonatomic, assign, getter=isNetworkAccessAllowed) BOOL networkAccessAllowed;
+    procedure setNetworkAccessAllowed(networkAccessAllowed: Boolean); cdecl;
+    function isNetworkAccessAllowed: Boolean; cdecl;
+
+    // return only a single result, blocking until available (or failure). Defaults to NO
+    //@property (nonatomic, assign, getter=isSynchronous) BOOL synchronous;
+    procedure setSynchronous(synchronous: Boolean); cdecl;
+    function isSynchronous: Boolean; cdecl;
+
+    // provide caller a way to be told how much progress has been made prior to delivering the data when it comes from iCloud. Defaults to nil, shall be set by caller
+    //@property (nonatomic, copy, nullable) PHAssetImageProgressHandler progressHandler;
     //procedure setProgressHandler(progressHandler: PHAssetImageProgressHandler); cdecl;
     //function progressHandler: PHAssetImageProgressHandler; cdecl;
-  //end;
 
-  //TPHImageRequestOptions = class(TOCGenericImport<PHImageRequestOptionsClass, PHImageRequestOptions>)
-  //end;
-
-  //PPHImageRequestOptions = Pointer;
+  end;
+  TPHImageRequestOptions = class(TOCGenericImport<PHImageRequestOptionsClass, PHImageRequestOptions>) end;
+  PPHImageRequestOptions = Pointer;
 
   //PHLivePhotoRequestOptionsClass = interface(NSObjectClass)
     //['{F980E179-502A-4932-8601-1280B6A33AAD}']
@@ -921,26 +1050,58 @@ type
 
   //PPHVideoRequestOptions = Pointer;
 
-  //PHImageManagerClass = interface(NSObjectClass)
-    //['{A688D438-61FF-4043-91BC-4C95B4B237E1}']
-    //{ class } function defaultManager: PHImageManager; cdecl;
-  //end;
+  PHImageManagerClass = interface(NSObjectClass)
+    ['{A688D438-61FF-4043-91BC-4C95B4B237E1}']
 
-  //PHImageManager = interface(NSObject)
-    //['{B0094B28-33E2-4620-9181-FDE2B65C2AD2}']
+    //+ (PHImageManager *)defaultManager;
+    { class } function defaultManager: PHImageManager; cdecl;
+
+  end;
+  PHImageManager = interface(NSObject)
+    ['{B0094B28-33E2-4620-9181-FDE2B65C2AD2}']
+
+    // If the asset's aspect ratio does not match that of the given targetSize, contentMode determines how the image will be resized.
+    //      PHImageContentModeAspectFit: Fit the asked size by maintaining the aspect ratio, the delivered image may not necessarily be the asked targetSize (see PHImageRequestOptionsDeliveryMode and PHImageRequestOptionsResizeMode)
+    //      PHImageContentModeAspectFill: Fill the asked size, some portion of the content may be clipped, the delivered image may not necessarily be the asked targetSize (see PHImageRequestOptionsDeliveryMode && PHImageRequestOptionsResizeMode)
+    //      PHImageContentModeDefault: Use PHImageContentModeDefault when size is PHImageManagerMaximumSize (though no scaling/cropping will be done on the result)
+    // If -[PHImageRequestOptions isSynchronous] returns NO (or options is nil), resultHandler may be called 1 or more times.
+    //     Typically in this case, resultHandler will be called asynchronously on the main thread with the requested results.
+    //     However, if deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic, resultHandler may be called synchronously on the calling thread if any image data is immediately available. If the image data returned in this first pass is of insufficient quality, resultHandler will be called again, asychronously on the main thread at a later time with the "correct" results.
+    //     If the request is cancelled, resultHandler may not be called at all.
+    // If -[PHImageRequestOptions isSynchronous] returns YES, resultHandler will be called exactly once, synchronously and on the calling thread. Synchronous requests cannot be cancelled.
+    // resultHandler for asynchronous requests, always called on main thread
+    //- (PHImageRequestID)requestImageForAsset:(PHAsset *)asset targetSize:(CGSize)targetSize contentMode:(PHImageContentMode)contentMode options:(nullable PHImageRequestOptions *)options resultHandler:(void (^)(UIImage *__nullable result, NSDictionary *__nullable info))resultHandler;
     //function requestImageForAsset(asset: PHAsset; targetSize: CGSize; contentMode: PHImageContentMode; options: PHImageRequestOptions; resultHandler: TPhotosResultHandler): PHImageRequestID; cdecl;
-    //function requestImageDataForAsset(asset: PHAsset; options: PHImageRequestOptions; resultHandler: TPhotosResultHandler1): PHImageRequestID; cdecl;
+
+    // Request largest represented image as data bytes, resultHandler is called exactly once (deliveryMode is ignored).
+    //     If PHImageRequestOptionsVersionCurrent is requested and the asset has adjustments then the largest rendered image data is returned
+    //     In all other cases then the original image data is returned
+    // resultHandler for asynchronous requests, always called on main thread
+    //- (PHImageRequestID)requestImageDataForAsset:(PHAsset *)asset options:(nullable PHImageRequestOptions *)options resultHandler:(void(^)(NSData *__nullable imageData, NSString *__nullable dataUTI, UIImageOrientation orientation, NSDictionary *__nullable info))resultHandler;
+    function requestImageDataForAsset(asset: PHAsset; options: PHImageRequestOptions; resultHandler: TPHImageManagerRequestImageDataForAssetResultHandler): PHImageRequestID; cdecl;
+
+    //- (void)cancelImageRequest:(PHImageRequestID)requestID;
     //procedure cancelImageRequest(requestID: PHImageRequestID); cdecl;
+
+    // Requests a live photo representation of the asset. With PHImageRequestOptionsDeliveryModeOpportunistic (or if no options are specified), the resultHandler block may be called more than once (the first call may occur before the method returns). The PHImageResultIsDegradedKey key in the result handler's info parameter indicates when a temporary low-quality live photo is provided.
+    //- (PHImageRequestID)requestLivePhotoForAsset:(PHAsset *)asset targetSize:(CGSize)targetSize contentMode:(PHImageContentMode)contentMode options:(nullable PHLivePhotoRequestOptions *)options resultHandler:(void (^)(PHLivePhoto *__nullable livePhoto, NSDictionary *__nullable info))resultHandler PHOTOS_AVAILABLE_IOS_TVOS(9_1, 10_0);
     //function requestLivePhotoForAsset(asset: PHAsset; targetSize: CGSize; contentMode: PHImageContentMode; options: PHLivePhotoRequestOptions; resultHandler: TPhotosResultHandler2): PHImageRequestID; cdecl;
+
+    // Playback only. The result handler is called on an arbitrary queue.
+    //- (PHImageRequestID)requestPlayerItemForVideo:(PHAsset *)asset options:(nullable PHVideoRequestOptions *)options resultHandler:(void (^)(AVPlayerItem *__nullable playerItem, NSDictionary *__nullable info))resultHandler;
     //function requestPlayerItemForVideo(asset: PHAsset; options: PHVideoRequestOptions; resultHandler: TPhotosResultHandler3): PHImageRequestID; cdecl;
+
+    // Export. The result handler is called on an arbitrary queue.
+    //- (PHImageRequestID)requestExportSessionForVideo:(PHAsset *)asset options:(nullable PHVideoRequestOptions *)options exportPreset:(NSString *)exportPreset resultHandler:(void (^)(AVAssetExportSession *__nullable exportSession, NSDictionary *__nullable info))resultHandler;
     //function requestExportSessionForVideo(asset: PHAsset; options: PHVideoRequestOptions; exportPreset: NSString; resultHandler: TPhotosResultHandler4): PHImageRequestID; cdecl;
+
+    // Everything else. The result handler is called on an arbitrary queue.
+    //- (PHImageRequestID)requestAVAssetForVideo:(PHAsset *)asset options:(nullable PHVideoRequestOptions *)options resultHandler:(void (^)(AVAsset *__nullable asset, AVAudioMix *__nullable audioMix, NSDictionary *__nullable info))resultHandler;
     //function requestAVAssetForVideo(asset: PHAsset; options: PHVideoRequestOptions; resultHandler: TPhotosResultHandler5): PHImageRequestID; cdecl;
-  //end;
 
-  //TPHImageManager = class(TOCGenericImport<PHImageManagerClass, PHImageManager>)
-  //end;
-
-  //PPHImageManager = Pointer;
+  end;
+  TPHImageManager = class(TOCGenericImport<PHImageManagerClass, PHImageManager>) end;
+  PPHImageManager = Pointer;
 
   //PHCachingImageManagerClass = interface(PHImageManagerClass)
     //['{F6C15D70-802A-4F16-99BC-1C278F177C3C}']
@@ -1010,7 +1171,7 @@ type
 //function PHImageResultIsDegradedKey: NSString;
 //function PHImageResultRequestIDKey: NSString;
 //function PHImageCancelledKey: NSString;
-//function PHImageErrorKey: NSString;
+function PHImageErrorKey: NSString;
 //function PHLivePhotoInfoErrorKey: NSString;
 //function PHLivePhotoInfoIsDegradedKey: NSString;
 //function PHLivePhotoInfoCancelledKey: NSString;
@@ -1069,10 +1230,12 @@ var
 //  Result := CocoaNSStringConst(libPhotos, 'PHImageCancelledKey');
 //end;
 
-//function PHImageErrorKey: NSString;
-//begin
-//  Result := CocoaNSStringConst(libPhotos, 'PHImageErrorKey');
-//end;
+// key (NSError): NSFileManager or iCloud Photo Library errors
+//extern NSString *const PHImageErrorKey PHOTOS_AVAILABLE_IOS_TVOS(8_0, 10_0);
+function PHImageErrorKey: NSString;
+begin
+  Result := CocoaNSStringConst(libPhotos, 'PHImageErrorKey');
+end;
 
 //function PHLivePhotoInfoErrorKey: NSString;
 //begin

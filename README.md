@@ -10,7 +10,14 @@ to reference the code
 
 <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-24.jpg?raw=true" alt="like" />
 
-compiled demo
+App made with Alcinoe
+---------------------
+
+* https://itunes.apple.com/us/app/id1420049759
+* https://play.google.com/store/apps/details?id=club.kiskis.app&hl=en
+
+
+Compiled demo
 -------------
 
 #### Win32 #### 

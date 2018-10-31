@@ -13,8 +13,9 @@ to reference the code
 App made with Alcinoe
 ---------------------
 
-* https://itunes.apple.com/us/app/id1420049759
-* https://play.google.com/store/apps/details?id=club.kiskis.app&hl=en
+* Youtube: https://www.youtube.com/watch?v=WEsEhGfrW-g&vq=hd2160
+* iOS: https://itunes.apple.com/us/app/id1420049759
+* Android: https://play.google.com/store/apps/details?id=club.kiskis.app&hl=en
 
 
 Compiled demo

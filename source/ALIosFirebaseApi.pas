@@ -539,6 +539,9 @@ type
     // If you would like to set the type of the APNS token, rather than relying on
     // automatic detection, see: `-setAPNSToken:type:`.
     //@property(nonatomic, copy, nullable) NSData *APNSToken NS_SWIFT_NAME(apnsToken);
+    [MethodName('setAPNSToken:')]
+    procedure setAPNSToken(APNSToken: NSData); cdecl;
+    function APNSToken: NSData; cdecl;
 
     // Set APNS token for the application. This APNS token will be used to register
     // with Firebase Messaging using `FCMToken` or
@@ -549,6 +552,8 @@ type
     // FIRMessagingAPNSTokenTypeUnknown to have the type automatically
     // detected based on your provisioning profile.
     //- (void)setAPNSToken:(nonnull NSData *)apnsToken type:(FIRMessagingAPNSTokenType)type;
+    [MethodName('setAPNSToken:type:')]
+    procedure setAPNSTokenType(APNSToken: NSData; &type: FIRMessagingAPNSTokenType); cdecl;
 
     // #pragma mark - FCM Tokens
     // Is Firebase Messaging token auto generation enabled?  If this flag is disabled,
@@ -742,6 +747,122 @@ type
     // procedure applicationReceivedRemoteMessage(remoteMessage: FIRMessagingRemoteMessage); cdecl; deprecated 'Use FIRMessagingDelegate’s -messaging:didReceiveMessage:';
 
   end;
+
+  //The top level Firebase Analytics singleton that provides methods for logging events and setting
+  //user properties. See <a href="http://goo.gl/gz8SLz">the developer guides</a> for general
+  //information on using Firebase Analytics in your apps.
+  //NS_SWIFT_NAME(Analytics)
+  //@interface FIRAnalytics : NSObject
+  FIRAnalyticsClass = interface(NSObjectClass)
+    ['{0E46F730-2EC0-462F-BAF0-E56DA5E43CC7}']
+
+    //Logs an app event. The event can have up to 25 parameters. Events with the same name must have
+    //the same parameters. Up to 500 event names are supported. Using predefined events and/or
+    //parameters is recommended for optimal reporting.
+    //
+    //The following event names are reserved and cannot be used:
+    //<ul>
+    //    <li>ad_activeview</li>
+    //    <li>ad_click</li>
+    //    <li>ad_exposure</li>
+    //    <li>ad_impression</li>
+    //    <li>ad_query</li>
+    //    <li>adunit_exposure</li>
+    //    <li>app_clear_data</li>
+    //    <li>app_remove</li>
+    //    <li>app_update</li>
+    //    <li>error</li>
+    //    <li>first_open</li>
+    //    <li>in_app_purchase</li>
+    //    <li>notification_dismiss</li>
+    //    <li>notification_foreground</li>
+    //    <li>notification_open</li>
+    //    <li>notification_receive</li>
+    //    <li>os_update</li>
+    //    <li>screen_view</li>
+    //    <li>session_start</li>
+    //    <li>user_engagement</li>
+    //</ul>
+    //
+    //@param name The name of the event. Should contain 1 to 40 alphanumeric characters or
+    //    underscores. The name must start with an alphabetic character. Some event names are
+    //    reserved. See FIREventNames.h for the list of reserved event names. The "firebase_",
+    //    "google_", and "ga_" prefixes are reserved and should not be used. Note that event names are
+    //    case-sensitive and that logging two events whose names differ only in case will result in
+    //    two distinct events.
+    //@param parameters The dictionary of event parameters. Passing nil indicates that the event has
+    //    no parameters. Parameter names can be up to 40 characters long and must start with an
+    //    alphabetic character and contain only alphanumeric characters and underscores. Only NSString
+    //    and NSNumber (signed 64-bit integer and 64-bit floating-point number) parameter types are
+    //    supported. NSString parameter values can be up to 100 characters long. The "firebase_",
+    //    "google_", and "ga_" prefixes are reserved and should not be used for parameter names.
+    //+ (void)logEventWithName:(NSString *)name
+    //              parameters:(nullable NSDictionary<NSString *, id> *)parameters NS_SWIFT_NAME(logEvent(_:parameters:));
+    { class } procedure logEventWithName(name: NSString; parameters: NSDictionary); cdecl;
+
+    //Sets a user property to a given value. Up to 25 user property names are supported. Once set,
+    //user property values persist throughout the app lifecycle and across sessions.
+    //
+    //The following user property names are reserved and cannot be used:
+    //<ul>
+    //    <li>first_open_time</li>
+    //    <li>last_deep_link_referrer</li>
+    //    <li>user_id</li>
+    //</ul>
+    //
+    //@param value The value of the user property. Values can be up to 36 characters long. Setting the
+    //    value to nil removes the user property.
+    //@param name The name of the user property to set. Should contain 1 to 24 alphanumeric characters
+    //    or underscores and must start with an alphabetic character. The "firebase_", "google_", and
+    //    "ga_" prefixes are reserved and should not be used for user property names.
+    //+ (void)setUserPropertyString:(nullable NSString *)value forName:(NSString *)name NS_SWIFT_NAME(setUserProperty(_:forName:));
+    { class } procedure setUserPropertyString(value: NSString; forName: NSString); cdecl;
+
+
+    //Sets the user ID property. This feature must be used in accordance with
+    //<a href="https://www.google.com/policies/privacy">Google's Privacy Policy</a>
+    //
+    //@param userID The user ID to ascribe to the user of this app on this device, which must be
+    //    non-empty and no more than 256 characters long. Setting userID to nil removes the user ID.
+    //+ (void)setUserID:(nullable NSString *)userID;
+    { class } procedure setUserID(userID: NSString); cdecl;
+
+    //Sets the current screen name, which specifies the current visual context in your app. This helps
+    //identify the areas in your app where users spend their time and how they interact with your app.
+    //Must be called on the main thread.
+    //
+    //Note that screen reporting is enabled automatically and records the class name of the current
+    //UIViewController for you without requiring you to call this method. If you implement
+    //viewDidAppear in your UIViewController but do not call [super viewDidAppear:], that screen class
+    //will not be automatically tracked. The class name can optionally be overridden by calling this
+    //method in the viewDidAppear callback of your UIViewController and specifying the
+    //screenClassOverride parameter. setScreenName:screenClass: must be called after
+    //[super viewDidAppear:].
+    //
+    //If your app does not use a distinct UIViewController for each screen, you should call this
+    //method and specify a distinct screenName each time a new screen is presented to the user.
+    //
+    //The screen name and screen class remain in effect until the current UIViewController changes or
+    //a new call to setScreenName:screenClass: is made.
+    //
+    //@param screenName The name of the current screen. Should contain 1 to 100 characters. Set to nil
+    //    to clear the current screen name.
+    //@param screenClassOverride The name of the screen class. Should contain 1 to 100 characters. By
+    //    default this is the class name of the current UIViewController. Set to nil to revert to the
+    //    default class name.
+    //+ (void)setScreenName:(nullable NSString *)screenName
+    //          screenClass:(nullable NSString *)screenClassOverride;
+    { class } procedure setScreenName(screenName: NSString; screenClass: NSString); cdecl;
+
+    //The unique ID for this instance of the application.
+    //+ (NSString *)appInstanceID;
+    { class } function appInstanceID: NSString; cdecl;
+
+  end;
+  FIRAnalytics = interface(NSObject)
+    ['{3548840A-4932-4CB2-92CD-B9CA1AAFA966}']
+  end;
+  TFIRAnalytics = class(TOCGenericImport<FIRAnalyticsClass, FIRAnalytics>) end;
 
 implementation
 

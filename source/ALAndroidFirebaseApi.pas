@@ -5,7 +5,8 @@ interface
 uses Androidapi.JNIBridge,
      Androidapi.JNI.GraphicsContentViewText,
      Androidapi.JNI.JavaTypes,
-     Androidapi.JNI.App;
+     Androidapi.JNI.App,
+     Androidapi.JNI.Os;
 
 type
 
@@ -16,6 +17,7 @@ type
   JFirebaseInstanceId = interface;
   JALFirebaseMessagingService = interface;
   JALFirebaseInstanceIdService = interface;
+  JFirebaseAnalytics = interface;
 
   {*********************************************}
   JFirebaseOptionsClass = interface(JObjectClass)
@@ -134,6 +136,21 @@ type
   end;
   TJALFirebaseInstanceIdService = class(TJavaGenericImport<JALFirebaseInstanceIdServiceClass, JALFirebaseInstanceIdService>) end;
 
+  {***********************************************}
+  JFirebaseAnalyticsClass = interface(JObjectClass)
+    ['{19AA41AC-06A8-4D39-A37C-CA44DCA4EDAB}']
+    {class} function getInstance(context: JContext): JFirebaseAnalytics; cdecl;
+  end;
+
+  {****************************************************************}
+  [JavaSignature('com/google/firebase/analytics/FirebaseAnalytics')]
+  JFirebaseAnalytics = interface(JObject)
+    ['{536A10DE-A85D-4260-98AC-0311F43DC370}']
+    procedure logEvent(name: JString; params: JBundle); cdecl;
+    procedure setUserId(id: JString); cdecl;
+  end;
+  TJFirebaseAnalytics = class(TJavaGenericImport<JFirebaseAnalyticsClass, JFirebaseAnalytics>) end;
+
 implementation
 
 procedure RegisterTypes;
@@ -144,6 +161,7 @@ begin
   TRegTypes.RegisterType('ALAndroidFirebaseApi.JFirebaseInstanceId', TypeInfo(ALAndroidFirebaseApi.JFirebaseInstanceId));
   TRegTypes.RegisterType('ALAndroidFirebaseApi.JALFirebaseMessagingService', TypeInfo(ALAndroidFirebaseApi.JALFirebaseMessagingService));
   TRegTypes.RegisterType('ALAndroidFirebaseApi.JALFirebaseInstanceIdService', TypeInfo(ALAndroidFirebaseApi.JALFirebaseInstanceIdService));
+  TRegTypes.RegisterType('ALAndroidFirebaseApi.JFirebaseAnalytics', TypeInfo(ALAndroidFirebaseApi.JFirebaseAnalytics));
 end;
 
 initialization

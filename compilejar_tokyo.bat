@@ -19,10 +19,15 @@ REM -----------------------------------------------------
 if x%ANDROID% == x set ANDROID="C:\SDKs\android-sdk-windows"
 set ANDROID_PLATFORM=%ANDROID%\platforms\android-28
 set FMX_JAR="C:\Program Files (x86)\Embarcadero\Studio\19.0\lib\android\release\fmx.jar"
-set JDK_PATH="C:\Program Files\Java\jdk1.8.0_131\bin"
 set JDK_PATH1_7="C:\Program Files\Java\jdk1.7.0_80\bin"
+set JDK_PATH1_8="C:\Program Files\Java\jdk1.8.0_131\bin"
 set CONFIRM=%1
 if x%CONFIRM% == x set CONFIRM=on
+
+
+REM ---------------
+REM clean directory
+REM ---------------
 
 SET FileName=lib\jar\com.alcinoe\*.jar
 del %FileName% /s
@@ -32,14 +37,23 @@ SET FileName=lib\jar\com.alcinoe\res
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
+
+REM -----------------
+REM Build alcinoe.jar
+REM -----------------
+
+echo Building alcinoe.jar
+
 SET FileName=source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
-echo Compiling the Java Sources
 mkdir source\output 2> nul
-%JDK_PATH%\javac -source 1.7 -target 1.7 -bootclasspath %JDK_PATH1_7%\jre\lib\rt.jar -Xlint:unchecked -Xlint:deprecation -cp^
- %ANDROID_PLATFORM%\android.jar;%FMX_JAR%;^
+%JDK_PATH1_8%\javac^
+ -source 1.7 -target 1.7 -bootclasspath %JDK_PATH1_7%\jre\lib\rt.jar^
+ -Xlint:unchecked^
+ -Xlint:deprecation^
+ -cp %ANDROID_PLATFORM%\android.jar;%FMX_JAR%;^
 lib\jar\me.leolin\shortcutbadger.jar;^
 lib\jar\com.facebook.android\facebook-common.jar;^
 lib\jar\com.android.support\support-core-utils.jar;^
@@ -71,21 +85,87 @@ lib\jar\com.google.firebase\firebase-messaging.jar^
 IF ERRORLEVEL 1 goto ERROR
 
 SET FileName=source\output\com\alcinoe\*.class
-del %FileName%
+if exist %FileName% del %FileName%
 if exist %FileName% goto ERROR
 
-echo Creating jar containing the new classes
-%JDK_PATH1_7%\jar cf lib\jar\com.alcinoe\alcinoe.jar -C source\output com\alcinoe\
+%JDK_PATH1_8%\jar cf lib\jar\com.alcinoe\alcinoe.jar -C source\output com\alcinoe\
 IF ERRORLEVEL 1 goto ERROR
 
 SET FileName=source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
+
+REM ------------------------
+REM Build alcinoe-webrtc.jar
+REM ------------------------
+
+echo Build alcinoe-webrtc.jar
+
+SET FileName=source\output
+IF EXIST %FileName% rmdir /s /q %FileName%
+IF EXIST %FileName% goto ERROR
+
+mkdir source\output 2> nul
+%JDK_PATH1_8%\javac^
+ -Xlint:unchecked^
+ -Xlint:deprecation^
+ -cp %ANDROID_PLATFORM%\android.jar;lib\jar\org.webrtc\libwebrtc.jar^
+ -d source\output^
+ source\java\com\alcinoe\webrtc\*.java
+IF ERRORLEVEL 1 goto ERROR
+
+SET FileName=source\output\com\alcinoe\*.class
+if exist %FileName% del %FileName%
+if exist %FileName% goto ERROR
+
+%JDK_PATH1_8%\jar cf lib\jar\com.alcinoe\alcinoe-webrtc.jar -C source\output com\alcinoe\
+IF ERRORLEVEL 1 goto ERROR
+
+SET FileName=source\output
+IF EXIST %FileName% rmdir /s /q %FileName%
+IF EXIST %FileName% goto ERROR
+
+
+REM ---------------------------
+REM Build alcinoe-appsflyer.jar
+REM ---------------------------
+
+echo Build alcinoe-appsflyer.jar
+
+SET FileName=source\output
+IF EXIST %FileName% rmdir /s /q %FileName%
+IF EXIST %FileName% goto ERROR
+
+mkdir source\output 2> nul
+%JDK_PATH1_8%\javac^
+ -Xlint:unchecked^
+ -Xlint:deprecation^
+ -cp %ANDROID_PLATFORM%\android.jar;lib\jar\com.appsflyer\af-android-sdk.jar^
+ -d source\output^
+ source\java\com\alcinoe\appsflyer\*.java
+IF ERRORLEVEL 1 goto ERROR
+
+SET FileName=source\output\com\alcinoe\*.class
+if exist %FileName% del %FileName%
+if exist %FileName% goto ERROR
+
+%JDK_PATH1_8%\jar cf lib\jar\com.alcinoe\alcinoe-appsflyer.jar -C source\output com\alcinoe\
+IF ERRORLEVEL 1 goto ERROR
+
+SET FileName=source\output
+IF EXIST %FileName% rmdir /s /q %FileName%
+IF EXIST %FileName% goto ERROR
+
+
+REM -----------------------
+REM Build the res directory
+REM -----------------------
+
 xcopy source\data\android\res lib\jar\com.alcinoe\res\ /s
 IF ERRORLEVEL 1 goto ERROR
 
-echo Jar created successfully
+echo Jar(s) created successfully
 if x%CONFIRM% == xon PAUSE 
 goto EXIT
 

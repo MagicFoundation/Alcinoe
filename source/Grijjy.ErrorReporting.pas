@@ -164,7 +164,11 @@ type
     class procedure GlobalExceptHandler(ExceptObject: TObject; ExceptAddr: Pointer); static;
     class function GlobalGetExceptionStackInfo(P: PExceptionRecord): Pointer; static;
     class procedure GlobalCleanUpStackInfo(Info: Pointer); static;
+  private
+    function internalBuildExceptionReport(const AExceptionObject: TObject; const AExceptionAddress: Pointer): IgoExceptionReport; //https://github.com/grijjy/JustAddCode/issues/3
   {$ENDREGION 'Internal Declarations'}
+  public
+    class function BuildExceptionReport(const AExceptionObject: TObject; const AExceptionAddress: Pointer): IgoExceptionReport; //https://github.com/grijjy/JustAddCode/issues/3
   public
     { Don't call the constructor manually. This is a singleton. }
     constructor Create;
@@ -425,15 +429,53 @@ begin
   {$ENDIF}
 end;
 
-procedure TgoExceptionReporter.ReportException(const AExceptionObject: TObject;
-  const AExceptionAddress: Pointer);
+//https://github.com/grijjy/JustAddCode/issues/3
+function TgoExceptionReporter.internalBuildExceptionReport(const AExceptionObject: TObject; const AExceptionAddress: Pointer): IgoExceptionReport;
 var
   E: Exception;
   ExceptionMessage: String;
   CallStack: TgoCallStack;
   ExceptionLocation: TgoCallStackEntry;
-  Report: IgoExceptionReport;
   I: Integer;
+begin
+
+  CallStack := nil;
+  if (AExceptionObject = nil) then
+    ExceptionMessage := 'Unknown Error'
+  else if (AExceptionObject is Exception) then
+  begin
+    E := Exception(AExceptionObject);
+    ExceptionMessage := E.Message;
+    if (E.StackInfo <> nil) then
+    begin
+      CallStack := GetCallStack(E.StackInfo);
+      for I := 0 to Length(Callstack) - 1 do
+      begin
+        { If entry in call stack is for this module, then try to translate
+          the routine name to Pascal. }
+        if (CallStack[I].ModuleAddress = FModuleAddress) then
+          CallStack[I].RoutineName := goCppSymbolToPascal(CallStack[I].RoutineName);
+      end;
+    end;
+  end
+  else
+    ExceptionMessage := 'Unknown Error (' + AExceptionObject.ClassName + ')';
+
+  ExceptionLocation.Clear;
+  ExceptionLocation.CodeAddress := UIntPtr(AExceptionAddress);
+  GetCallStackEntry(ExceptionLocation);
+  if (ExceptionLocation.ModuleAddress = FModuleAddress) then
+    ExceptionLocation.RoutineName := goCppSymbolToPascal(ExceptionLocation.RoutineName);
+
+  result := TgoExceptionReport.Create(ExceptionMessage, ExceptionLocation, CallStack);
+
+end;
+
+//https://github.com/grijjy/JustAddCode/issues/3
+procedure TgoExceptionReporter.ReportException(const AExceptionObject: TObject;
+  const AExceptionAddress: Pointer);
+var
+  Report: IgoExceptionReport;
 begin
   { Ignore exception that occur while we are already reporting another
     exception. That can happen when the original exception left the application
@@ -443,35 +485,8 @@ begin
 
   FReportingException := True;
   try
-    CallStack := nil;
-    if (AExceptionObject = nil) then
-      ExceptionMessage := 'Unknown Error'
-    else if (AExceptionObject is Exception) then
-    begin
-      E := Exception(AExceptionObject);
-      ExceptionMessage := E.Message;
-      if (E.StackInfo <> nil) then
-      begin
-        CallStack := GetCallStack(E.StackInfo);
-        for I := 0 to Length(Callstack) - 1 do
-        begin
-          { If entry in call stack is for this module, then try to translate
-            the routine name to Pascal. }
-          if (CallStack[I].ModuleAddress = FModuleAddress) then
-            CallStack[I].RoutineName := goCppSymbolToPascal(CallStack[I].RoutineName);
-        end;
-      end;
-    end
-    else
-      ExceptionMessage := 'Unknown Error (' + AExceptionObject.ClassName + ')';
 
-    ExceptionLocation.Clear;
-    ExceptionLocation.CodeAddress := UIntPtr(AExceptionAddress);
-    GetCallStackEntry(ExceptionLocation);
-    if (ExceptionLocation.ModuleAddress = FModuleAddress) then
-      ExceptionLocation.RoutineName := goCppSymbolToPascal(ExceptionLocation.RoutineName);
-
-    Report := TgoExceptionReport.Create(ExceptionMessage, ExceptionLocation, CallStack);
+    Report := internalBuildExceptionReport(AExceptionObject, AExceptionAddress);
     try
       TMessageManager.DefaultManager.SendMessage(Self,
         TgoExceptionReportMessage.Create(Report));
@@ -481,6 +496,15 @@ begin
   finally
     FReportingException := False;
   end;
+end;
+
+//https://github.com/grijjy/JustAddCode/issues/3
+class function TgoExceptionReporter.BuildExceptionReport(const AExceptionObject: TObject; const AExceptionAddress: Pointer): IgoExceptionReport;
+begin
+  if Assigned(FInstance) then
+    result := FInstance.internalBuildExceptionReport(AExceptionObject, AExceptionAddress)
+  else
+    result := nil;
 end;
 
 class procedure TgoExceptionReporter.SetMaxCallStackDepth(const Value: Integer);

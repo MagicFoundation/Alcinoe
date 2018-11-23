@@ -2568,7 +2568,7 @@ begin
       result := TJBitmap.JavaClass.createBitmap(aBitmap{src}, aSrcRect.Left{X}, aSrcRect.top{Y}, aSrcRect.width{Width}, aSrcRect.height{height}, aMatrix{m}, True{filter});
       aMatrix := nil;
     finally
-      if not aBitmap.sameAs(result) then aBitmap.recycle;
+      if not aBitmap.equals(result) then aBitmap.recycle;
       aBitmap := nil;
     end;
   finally
@@ -2708,7 +2708,7 @@ begin
       result := TJBitmap.JavaClass.createBitmap(aBitmap{src}, aSrcRect.Left{X}, aSrcRect.top{Y}, aSrcRect.width{Width}, aSrcRect.height{height}, aMatrix{m}, True{filter});
       aMatrix := nil;
     finally
-      if not aBitmap.sameAs(result) then aBitmap.recycle;
+      if not aBitmap.equals(result) then aBitmap.recycle;
       aBitmap := nil;
     end;
   finally
@@ -3246,7 +3246,7 @@ begin
       aRS := nil;
 
     finally
-      if not aBitmap.sameAs(result) then aBitmap.recycle;
+      if not aBitmap.equals(result) then aBitmap.recycle;
       aBitmap := nil;
     end;
   finally
@@ -3439,7 +3439,7 @@ begin
       aRS := nil;
 
     finally
-      if not aBitmap.sameAs(result) then aBitmap.recycle;
+      if not aBitmap.equals(result) then aBitmap.recycle;
       aBitmap := nil;
     end;
   finally
@@ -4116,7 +4116,7 @@ begin
       result := TJBitmap.JavaClass.createBitmap(aBitmap{src}, aSrcRect.Left{X}, aSrcRect.top{Y}, aSrcRect.width{Width}, aSrcRect.height{height}, aMatrix{m}, True{filter});
       aMatrix := nil;
     finally
-      if not aBitmap.sameAs(result) then aBitmap.recycle;
+      if not aBitmap.equals(result) then aBitmap.recycle;
       aBitmap := nil;
     end;
   finally
@@ -4267,7 +4267,7 @@ begin
       result := TJBitmap.JavaClass.createBitmap(aBitmap{src}, aSrcRect.Left{X}, aSrcRect.top{Y}, aSrcRect.width{Width}, aSrcRect.height{height}, aMatrix{m}, True{filter});
       aMatrix := nil;
     finally
-      if not aBitmap.sameAs(result) then aBitmap.recycle;
+      if not aBitmap.equals(result) then aBitmap.recycle;
       aBitmap := nil;
     end;
   finally
@@ -4949,7 +4949,7 @@ begin
       result := TJBitmap.JavaClass.createBitmap(aBitmap{src}, round(aSrcRect.Left){X}, round(aSrcRect.top){Y}, round(aSrcRect.width){Width}, round(aSrcRect.height){height}, aMatrix{m}, True{filter});
       aMatrix := nil;
     finally
-      if not aBitmap.sameAs(result) then aBitmap.recycle;
+      if not aBitmap.equals(result) then aBitmap.recycle;
       aBitmap := nil;
     end;
   finally
@@ -5090,7 +5090,7 @@ begin
       result := TJBitmap.JavaClass.createBitmap(aBitmap{src}, round(aSrcRect.Left){X}, round(aSrcRect.top){Y}, round(aSrcRect.width){Width}, round(aSrcRect.height){height}, aMatrix{m}, True{filter});
       aMatrix := nil;
     finally
-      if not aBitmap.sameAs(result) then aBitmap.recycle;
+      if not aBitmap.equals(result) then aBitmap.recycle;
       aBitmap := nil;
     end;
   finally
@@ -5659,7 +5659,7 @@ begin
       result := TJBitmap.JavaClass.createBitmap(aBitmap{src}, round(aSrcRect.Left){X}, round(aSrcRect.top){Y}, round(aSrcRect.width){Width}, round(aSrcRect.height){height}, aMatrix{m}, True{filter});
       aMatrix := nil;
     finally
-      if not aBitmap.sameAs(result) then aBitmap.recycle;
+      if not aBitmap.equals(result) then aBitmap.recycle;
       aBitmap := nil;
     end;
   finally
@@ -5796,7 +5796,7 @@ begin
       result := TJBitmap.JavaClass.createBitmap(aBitmap{src}, round(aSrcRect.Left){X}, round(aSrcRect.top){Y}, round(aSrcRect.width){Width}, round(aSrcRect.height){height}, aMatrix{m}, True{filter});
       aMatrix := nil;
     finally
-      if not aBitmap.sameAs(result) then aBitmap.recycle;
+      if not aBitmap.equals(result) then aBitmap.recycle;
       aBitmap := nil;
     end;
   finally
@@ -6281,7 +6281,7 @@ begin
     try
       result := ALNormalizeImageOrientationV2(aBitmap, aExifOrientationInfo);
     finally
-      if not aBitmap.sameAs(result) then aBitmap.recycle;
+      if not aBitmap.equals(result) then aBitmap.recycle;
       aBitmap := nil;
     end;
   finally

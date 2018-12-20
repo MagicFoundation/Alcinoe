@@ -86,7 +86,7 @@ third-party software.
 TALWebRTC component makes it easy to add video and audio chat into 
 your applications, which opens up a whole new world of interactivity
 
-<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-25.jpg?raw=true" alt="Delphi WebRTC wrapper" width="280" style="width:280px;"/>
+<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-25.jpg?raw=true" alt="Delphi WebRTC wrapper" />
 
 
 

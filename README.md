@@ -73,6 +73,23 @@ also HLS like exoplayer do.
 
 
 
+WebRTC delphi wrapper
+---------------------
+
+WebRTC (Web Real-Time Communications) is a technology which enables Web applications and 
+sites to capture and optionally stream audio and/or video media, as well as to exchange 
+arbitrary data between browsers and mobile applications without requiring an intermediary. 
+The set of standards that comprises WebRTC makes it possible to share data and perform 
+teleconferencing peer-to-peer, without requiring that the user installs plug-ins or any other 
+third-party software.
+
+TALWebRTC component makes it easy to add video and audio chat into 
+your applications, which opens up a whole new world of interactivity
+
+<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-25.jpg?raw=true" alt="Delphi WebRTC wrapper" width="280" style="width:280px;"/>
+
+
+
 Firemonkey native ios/android TEdit and TMemo
 ---------------------------------------------
 

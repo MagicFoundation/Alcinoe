@@ -2,7 +2,7 @@
  * dummy class to make the jar compilation possible. We must contruct if 
  * when we build the apk
  */
-package com.alcinoe;
+package com.alcinoe.edittext;
 
 public class R {
 

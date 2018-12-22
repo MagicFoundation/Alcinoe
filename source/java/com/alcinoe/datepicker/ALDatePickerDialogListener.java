@@ -1,4 +1,4 @@
-package com.alcinoe.app;
+package com.alcinoe.datepicker;
 
 public interface ALDatePickerDialogListener {
   

@@ -58,7 +58,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.alcinoe.R;
+import com.alcinoe.edittext.R;
 import com.alcinoe.util.Size;
 import com.alcinoe.util.Preconditions;
 

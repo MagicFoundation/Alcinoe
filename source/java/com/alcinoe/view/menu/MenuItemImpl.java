@@ -32,7 +32,7 @@ import android.view.View;
 import android.view.ViewDebug;
 import android.widget.LinearLayout;
 
-import com.alcinoe.R;
+import com.alcinoe.edittext.R;
 
 /**
  * @hide

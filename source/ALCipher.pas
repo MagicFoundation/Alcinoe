@@ -3358,16 +3358,20 @@ procedure AlRDLEncryptString(const InString: AnsiString;
                              const KeyDerivationFunction: TALkeyDerivationFunction;
                              const Encrypt : Boolean);
 var aCipherKey128: TALCipherKey128;
+{$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
+{$IFEND}
 begin
   if keyDerivationFunction = MD5 then begin
     ALStringHashMD5(aCipherKey128, Key);
     AlRDLEncryptString(InString,OutString, aCipherKey128, 16, Encrypt);
   end
+  {$IF CompilerVersion >= 32} // tokyo
   else if keyDerivationFunction = SHA2 then begin
     ALStringHashSHA2(aCipherKey256, Key);
     AlRDLEncryptString(InString,OutString, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
+  {$IFEND}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
@@ -3378,16 +3382,20 @@ procedure AlRDLEncryptStringCBC(const InString: AnsiString;
                                 const KeyDerivationFunction: TALkeyDerivationFunction;
                                 const Encrypt : Boolean);
 var aCipherKey128: TALCipherKey128;
+{$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
+{$IFEND}
 begin
   if keyDerivationFunction = MD5 then begin
     ALStringHashMD5(aCipherKey128, Key);
     AlRDLEncryptStringCBC(InString, OutString, aCipherKey128, 16, Encrypt);
   end
+  {$IF CompilerVersion >= 32} // tokyo
   else if keyDerivationFunction = SHA2 then begin
     ALStringHashSHA2(aCipherKey256, Key);
     AlRDLEncryptStringCBC(InString, OutString, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
+  {$IFEND}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
@@ -3397,16 +3405,20 @@ function  AlRDLEncryptString(const InString: AnsiString;
                              const KeyDerivationFunction: TALkeyDerivationFunction;
                              const Encrypt : Boolean) : AnsiString;
 var aCipherKey128: TALCipherKey128;
+{$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
+{$IFEND}
 begin
   if keyDerivationFunction = MD5 then begin
     ALStringHashMD5(aCipherKey128, Key);
     Result := AlRDLEncryptString(InString, aCipherKey128, 16, Encrypt);
   end
+  {$IF CompilerVersion >= 32} // tokyo
   else if keyDerivationFunction = SHA2 then begin
     ALStringHashSHA2(aCipherKey256, Key);
     Result := AlRDLEncryptString(InString, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
+  {$IFEND}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
@@ -3416,16 +3428,20 @@ function  AlRDLEncryptStringCBC(const InString: AnsiString;
                                 const KeyDerivationFunction: TALkeyDerivationFunction;
                                 const Encrypt : Boolean) : AnsiString;
 var aCipherKey128: TALCipherKey128;
+{$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
+{$IFEND}
 begin
   if keyDerivationFunction = MD5 then begin
     ALStringHashMD5(aCipherKey128, Key);
     result := AlRDLEncryptStringCBC(InString, aCipherKey128, 16, Encrypt);
   end
+  {$IF CompilerVersion >= 32} // tokyo
   else if keyDerivationFunction = SHA2 then begin
     ALStringHashSHA2(aCipherKey256, Key);
     result := AlRDLEncryptStringCBC(InString, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
+  {$IFEND}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
@@ -3435,16 +3451,20 @@ procedure AlRDLEncryptStream(const InStream, OutStream: TStream;
                              const KeyDerivationFunction: TALkeyDerivationFunction;
                              const Encrypt : Boolean);
 var aCipherKey128: TALCipherKey128;
+{$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
+{$IFEND}
 begin
   if keyDerivationFunction = MD5 then begin
     ALStringHashMD5(aCipherKey128, Key);
     AlRDLEncryptStream(InStream, OutStream, aCipherKey128, 16, Encrypt);
   end
+  {$IF CompilerVersion >= 32} // tokyo
   else if keyDerivationFunction = SHA2 then begin
     ALStringHashSHA2(aCipherKey256, Key);
     AlRDLEncryptStream(InStream, OutStream, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
+  {$IFEND}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
@@ -3454,16 +3474,20 @@ procedure AlRDLEncryptStreamCBC(const InStream, OutStream: TStream;
                                 const KeyDerivationFunction: TALkeyDerivationFunction;
                                 const Encrypt : Boolean);
 var aCipherKey128: TALCipherKey128;
+{$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
+{$IFEND}
 begin
   if keyDerivationFunction = MD5 then begin
     ALStringHashMD5(aCipherKey128, Key);
     AlRDLEncryptStreamCBC(InStream, OutStream, aCipherKey128, 16, Encrypt);
   end
+  {$IF CompilerVersion >= 32} // tokyo
   else if keyDerivationFunction = SHA2 then begin
     ALStringHashSHA2(aCipherKey256, Key);
     AlRDLEncryptStreamCBC(InStream, OutStream, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
+  {$IFEND}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
@@ -3563,16 +3587,20 @@ procedure AlRDLEncryptStringU(const InString: String;
                               const Encrypt : Boolean;
                               const encoding: Tencoding);
 var aCipherKey128: TALCipherKey128;
+{$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
+{$IFEND}
 begin
   if keyDerivationFunction = MD5 then begin
     ALStringHashMD5U(aCipherKey128, Key, encoding);
     AlRDLEncryptStringU(InString,OutString, aCipherKey128, 16, Encrypt, encoding);
   end
+  {$IF CompilerVersion >= 32} // tokyo
   else if keyDerivationFunction = SHA2 then begin
     ALStringHashSHA2U(aCipherKey256, Key, encoding);
     AlRDLEncryptStringU(InString,OutString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding);
   end
+  {$IFEND}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
@@ -3584,16 +3612,20 @@ procedure AlRDLEncryptStringCBCU(const InString: String;
                                  const Encrypt : Boolean;
                                  const encoding: Tencoding);
 var aCipherKey128: TALCipherKey128;
+{$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
+{$IFEND}
 begin
   if keyDerivationFunction = MD5 then begin
     ALStringHashMD5U(aCipherKey128, Key, encoding);
     AlRDLEncryptStringCBCU(InString, OutString, aCipherKey128, 16, Encrypt, encoding);
   end
+  {$IF CompilerVersion >= 32} // tokyo
   else if keyDerivationFunction = SHA2 then begin
     ALStringHashSHA2U(aCipherKey256, Key, encoding);
     AlRDLEncryptStringCBCU(InString, OutString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding);
   end
+  {$IFEND}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
@@ -3604,16 +3636,20 @@ function  AlRDLEncryptStringU(const InString: String;
                               const Encrypt : Boolean;
                               const encoding: Tencoding) : String;
 var aCipherKey128: TALCipherKey128;
+{$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
+{$IFEND}
 begin
   if keyDerivationFunction = MD5 then begin
     ALStringHashMD5U(aCipherKey128, Key, encoding);
     Result := AlRDLEncryptStringU(InString, aCipherKey128, 16, Encrypt, encoding);
   end
+  {$IF CompilerVersion >= 32} // tokyo
   else if keyDerivationFunction = SHA2 then begin
     ALStringHashSHA2U(aCipherKey256, Key, encoding);
     Result := AlRDLEncryptStringU(InString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding);
   end
+  {$IFEND}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
@@ -3624,16 +3660,20 @@ function  AlRDLEncryptStringCBCU(const InString: String;
                                  const Encrypt : Boolean;
                                  const encoding: Tencoding) : String;
 var aCipherKey128: TALCipherKey128;
+{$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
+{$IFEND}
 begin
   if keyDerivationFunction = MD5 then begin
     ALStringHashMD5U(aCipherKey128, Key, encoding);
     result := AlRDLEncryptStringCBCU(InString, aCipherKey128, 16, Encrypt, encoding);
   end
+  {$IF CompilerVersion >= 32} // tokyo
   else if keyDerivationFunction = SHA2 then begin
     ALStringHashSHA2U(aCipherKey256, Key, encoding);
     result := AlRDLEncryptStringCBCU(InString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding);
   end
+  {$IFEND}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
@@ -3644,16 +3684,20 @@ procedure AlRDLEncryptStreamU(const InStream, OutStream: TStream;
                               const Encrypt : Boolean;
                               const encoding: Tencoding);
 var aCipherKey128: TALCipherKey128;
+{$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
+{$IFEND}
 begin
   if keyDerivationFunction = MD5 then begin
     ALStringHashMD5U(aCipherKey128, Key, encoding);
     AlRDLEncryptStream(InStream, OutStream, aCipherKey128, 16, Encrypt);
   end
+  {$IF CompilerVersion >= 32} // tokyo
   else if keyDerivationFunction = SHA2 then begin
     ALStringHashSHA2U(aCipherKey256, Key, encoding);
     AlRDLEncryptStream(InStream, OutStream, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
+  {$IFEND}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
@@ -3664,16 +3708,20 @@ procedure AlRDLEncryptStreamCBCU(const InStream, OutStream: TStream;
                                  const Encrypt : Boolean;
                                  const encoding: Tencoding);
 var aCipherKey128: TALCipherKey128;
+{$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
+{$IFEND}
 begin
   if keyDerivationFunction = MD5 then begin
     ALStringHashMD5U(aCipherKey128, Key, encoding);
     AlRDLEncryptStreamCBC(InStream, OutStream, aCipherKey128, 16, Encrypt);
   end
+  {$IF CompilerVersion >= 32} // tokyo
   else if keyDerivationFunction = SHA2 then begin
     ALStringHashSHA2U(aCipherKey256, Key, encoding);
     AlRDLEncryptStreamCBC(InStream, OutStream, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
+  {$IFEND}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 

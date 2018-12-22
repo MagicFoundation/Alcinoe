@@ -1,4 +1,4 @@
-package com.alcinoe.text.method;
+package com.alcinoe.edittext;
 
 import android.view.KeyEvent;
 

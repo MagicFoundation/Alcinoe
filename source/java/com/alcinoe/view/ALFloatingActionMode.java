@@ -26,7 +26,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.os.Build;
 
-import com.alcinoe.R;
+import com.alcinoe.edittext.R;
 import com.alcinoe.util.Preconditions;
 import com.alcinoe.view.menu.MenuBuilder;
 import com.alcinoe.widget.ALFloatingToolbar;

@@ -1,4 +1,4 @@
-package com.alcinoe.widget;
+package com.alcinoe.edittext;
 
 import android.widget.EditText;
 import android.util.AttributeSet;
@@ -23,8 +23,9 @@ import android.view.ViewTreeObserver.OnPreDrawListener;
 import android.text.InputFilter;
 import com.alcinoe.view.inputmethod.ALSoftInputListener;
 import com.alcinoe.view.ALFloatingActionMode;
-import com.alcinoe.text.method.ALKeyPreImeListener;
 import com.alcinoe.view.ALActionMode;
+import com.alcinoe.widget.ALFloatingToolbar;
+
 
 public class ALEditText extends EditText {
   private ALSoftInputListener mSoftInputListener;

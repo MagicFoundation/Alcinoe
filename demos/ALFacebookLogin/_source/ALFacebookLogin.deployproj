@@ -4,10 +4,10 @@
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>
     <PropertyGroup>
-        <DeviceId Condition="'$(Platform)'=='Android'">3204d0ab8ff96111</DeviceId>
-        <DeviceId Condition="'$(Platform)'=='iOSDevice32'"/>
-        <DeviceId Condition="'$(Platform)'=='iOSDevice64'"/>
-        <DeviceId Condition="'$(Platform)'=='iOSSimulator'">792B2D0C-99AD-42E6-98E5-40E068D473ED</DeviceId>
+        <DeviceId Condition="'$(Platform)'=='Android'">UEEDU18728001190</DeviceId>
+        <DeviceId Condition="'$(Platform)'=='iOSDevice32'">6914273922841a588ebde9ed00849d75c1793868</DeviceId>
+        <DeviceId Condition="'$(Platform)'=='iOSDevice64'">6914273922841a588ebde9ed00849d75c1793868</DeviceId>
+        <DeviceId Condition="'$(Platform)'=='iOSSimulator'">8B7C80D2-24B6-4168-A77A-9842FE73EDD4</DeviceId>
     </PropertyGroup>
     <ItemGroup Condition="'$(Platform)'=='iOSDevice64'"/>
     <ItemGroup Condition="'$(Platform)'=='Win64'"/>
@@ -399,15 +399,6 @@
         </DeployFile>
     </ItemGroup>
     <ItemGroup Condition="'$(Platform)'=='Android'">
-        <DeployFile Include="android\res\values-es\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-es\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-hu\values-hu.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\values-hu\</RemoteDir>
             <RemoteName>values-hu.xml</RemoteName>
@@ -453,18 +444,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable\al_floating_popup_background_dark.xml" Condition="'$(Config)'=='Debug'">
+        <DeployFile Include="android\res\drawable\tooltip_frame_light.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_floating_popup_background_dark.xml</RemoteName>
+            <RemoteName>tooltip_frame_light.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable\tooltip_frame_light.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>tooltip_frame_light.xml</RemoteName>
+        <DeployFile Include="android\res\values-eu\values-eu.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-eu\</RemoteDir>
+            <RemoteName>values-eu.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -507,15 +498,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-eu\values-eu.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-eu\</RemoteDir>
-            <RemoteName>values-eu.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xxxhdpi-v4\abc_ic_star_half_black_48dp.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxxhdpi-v4\</RemoteDir>
             <RemoteName>abc_ic_star_half_black_48dp.png</RemoteName>
@@ -537,15 +519,6 @@
         <DeployFile Include="android\res\drawable-mdpi-v4\abc_ic_menu_copy_mtrl_am_alpha.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>abc_ic_menu_copy_mtrl_am_alpha.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-sw600dp\dimens.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-sw600dp\</RemoteDir>
-            <RemoteName>dimens.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -660,15 +633,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\color\al_secondary_text_material_light.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
-            <RemoteName>al_secondary_text_material_light.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-hdpi-v4\com_facebook_button_send_icon_blue.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-hdpi-v4\</RemoteDir>
             <RemoteName>com_facebook_button_send_icon_blue.png</RemoteName>
@@ -714,15 +678,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable\al_ic_menu_moreoverflow_material_light.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_ic_menu_moreoverflow_material_light.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-mdpi-v4\abc_ic_star_black_36dp.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>abc_ic_star_black_36dp.png</RemoteName>
@@ -750,9 +705,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-ml-rIN\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-ml-rIN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
+        <DeployFile Include="android\res\values-ro\values-ro.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\values-ro\</RemoteDir>
+            <RemoteName>values-ro.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -768,27 +723,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable\al_ic_ab_back_material_light.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_ic_ab_back_material_light.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xhdpi-v4\abc_btn_check_to_on_mtrl_000.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xhdpi-v4\</RemoteDir>
             <RemoteName>abc_btn_check_to_on_mtrl_000.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ro\values-ro.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-ro\</RemoteDir>
-            <RemoteName>values-ro.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -957,15 +894,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values\attrs.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values\</RemoteDir>
-            <RemoteName>attrs.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-ldrtl-xxxhdpi-v17\abc_spinner_mtrl_am_alpha.9.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-ldrtl-xxxhdpi-v17\</RemoteDir>
             <RemoteName>abc_spinner_mtrl_am_alpha.9.png</RemoteName>
@@ -996,15 +924,6 @@
         <DeployFile Include="android\res\values-in\values-in.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\values-in\</RemoteDir>
             <RemoteName>values-in.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\color\al_ripple_material_dark.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
-            <RemoteName>al_ripple_material_dark.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1092,33 +1011,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\layout\al_floating_popup_close_overflow_button.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
-            <RemoteName>al_floating_popup_close_overflow_button.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-af\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-af\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-mn-rMN\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-mn-rMN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\color\abc_tint_edittext.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
             <RemoteName>abc_tint_edittext.xml</RemoteName>
@@ -1167,15 +1059,6 @@
         <DeployFile Include="android\res\drawable-mdpi-v4\abc_list_selector_disabled_holo_dark.9.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>abc_list_selector_disabled_holo_dark.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ta-rIN\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-ta-rIN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1254,9 +1137,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-mk-rMK\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-mk-rMK\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
+        <DeployFile Include="android\res\values-ne\values-ne.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\values-ne\</RemoteDir>
+            <RemoteName>values-ne.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1290,15 +1173,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-ne\values-ne.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-ne\</RemoteDir>
-            <RemoteName>values-ne.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\anim\abc_fade_in.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\anim\</RemoteDir>
             <RemoteName>abc_fade_in.xml</RemoteName>
@@ -1326,27 +1200,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-zh-rHK\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-zh-rHK\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\anim\abc_tooltip_enter.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\anim\</RemoteDir>
             <RemoteName>abc_tooltip_enter.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-cs\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-cs\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1425,36 +1281,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-iw\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-iw\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-hdpi-v4\notify_panel_notification_icon_bg.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-hdpi-v4\</RemoteDir>
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\drawable-v21\al_item_background_material_dark.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable-v21\</RemoteDir>
-            <RemoteName>al_item_background_material_dark.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\layout\al_floating_popup_container.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
-            <RemoteName>al_floating_popup_container.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1515,15 +1344,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\color\al_secondary_text_material_light.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
-            <RemoteName>al_secondary_text_material_light.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-hdpi-v4\abc_tab_indicator_mtrl_alpha.9.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-hdpi-v4\</RemoteDir>
             <RemoteName>abc_tab_indicator_mtrl_alpha.9.png</RemoteName>
@@ -1542,18 +1362,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\color\switch_thumb_material_dark.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
-            <RemoteName>switch_thumb_material_dark.xml</RemoteName>
+        <DeployFile Include="android\res\values-id\values-id.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-id\</RemoteDir>
+            <RemoteName>values-id.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-id\values-id.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-id\</RemoteDir>
-            <RemoteName>values-id.xml</RemoteName>
+        <DeployFile Include="android\res\color\switch_thumb_material_dark.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
+            <RemoteName>switch_thumb_material_dark.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1578,9 +1398,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-th\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-th\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
+        <DeployFile Include="android\res\values-v26\values-v26.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-v26\</RemoteDir>
+            <RemoteName>values-v26.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1599,15 +1419,6 @@
         <DeployFile Include="android\res\values-km\values-km.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\values-km\</RemoteDir>
             <RemoteName>values-km.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-v26\values-v26.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-v26\</RemoteDir>
-            <RemoteName>values-v26.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1635,15 +1446,6 @@
         <DeployFile Include="android\res\drawable-mdpi-v4\abc_btn_switch_to_on_mtrl_00001.9.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>abc_btn_switch_to_on_mtrl_00001.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ar\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-ar\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1722,36 +1524,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable\al_ic_ab_back_material_light.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_ic_ab_back_material_light.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-mdpi-v4\abc_textfield_search_default_mtrl_alpha.9.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>abc_textfield_search_default_mtrl_alpha.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\drawable\al_floating_popup_background_light.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_floating_popup_background_light.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\drawable\com_facebook_button_like_background.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>com_facebook_button_like_background.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1767,9 +1542,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-mdpi-v4\com_facebook_tooltip_blue_background.9.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
-            <RemoteName>com_facebook_tooltip_blue_background.9.png</RemoteName>
+        <DeployFile Include="android\res\drawable\com_facebook_button_like_background.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
+            <RemoteName>com_facebook_button_like_background.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1785,9 +1560,36 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="android\res\layout\abc_popup_menu_item_layout.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
+            <RemoteName>abc_popup_menu_item_layout.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="android\res\drawable-mdpi-v4\com_facebook_tooltip_blue_background.9.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
+            <RemoteName>com_facebook_tooltip_blue_background.9.png</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="android\res\layout\abc_dialog_title_material.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
             <RemoteName>abc_dialog_title_material.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="android\res\values-bn\values-bn.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-bn\</RemoteDir>
+            <RemoteName>values-bn.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1806,24 +1608,6 @@
         <DeployFile Include="android\res\color-v23\abc_tint_default.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\color-v23\</RemoteDir>
             <RemoteName>abc_tint_default.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\layout\abc_popup_menu_item_layout.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
-            <RemoteName>abc_popup_menu_item_layout.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-bn\values-bn.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-bn\</RemoteDir>
-            <RemoteName>values-bn.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1893,9 +1677,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-pt-rBR\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-pt-rBR\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
+        <DeployFile Include="android\res\values-watch-v20\values-watch-v20.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-watch-v20\</RemoteDir>
+            <RemoteName>values-watch-v20.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1923,15 +1707,6 @@
         <DeployFile Include="android\res\color-v23\abc_tint_edittext.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\color-v23\</RemoteDir>
             <RemoteName>abc_tint_edittext.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-watch-v20\values-watch-v20.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-watch-v20\</RemoteDir>
-            <RemoteName>values-watch-v20.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1992,15 +1767,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-sr\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-sr\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-mdpi-v4\com_facebook_button_like_icon_selected.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>com_facebook_button_like_icon_selected.png</RemoteName>
@@ -2049,15 +1815,6 @@
         <DeployFile Include="android\res\drawable-xxxhdpi-v4\abc_ic_star_black_48dp.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxxhdpi-v4\</RemoteDir>
             <RemoteName>abc_ic_star_black_48dp.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-hi\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-hi\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -2130,15 +1887,6 @@
         <DeployFile Include="android\res\drawable-hdpi-v4\abc_ic_menu_share_mtrl_alpha.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-hdpi-v4\</RemoteDir>
             <RemoteName>abc_ic_menu_share_mtrl_alpha.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-eu-rES\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-eu-rES\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -2307,15 +2055,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-ja\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-ja\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable\abc_ic_voice_search_api_material.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
             <RemoteName>abc_ic_voice_search_api_material.xml</RemoteName>
@@ -2373,15 +2112,6 @@
         <DeployFile Include="android\res\drawable\com_facebook_send_button_icon.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
             <RemoteName>com_facebook_send_button_icon.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-is-rIS\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-is-rIS\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -2478,9 +2208,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values\attrs.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values\</RemoteDir>
-            <RemoteName>attrs.xml</RemoteName>
+        <DeployFile Include="android\res\values-es\values-es.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-es\</RemoteDir>
+            <RemoteName>values-es.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -2499,15 +2229,6 @@
         <DeployFile Include="android\res\drawable-mdpi-v4\com_facebook_tooltip_blue_xout.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>com_facebook_tooltip_blue_xout.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-es\values-es.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-es\</RemoteDir>
-            <RemoteName>values-es.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -2604,27 +2325,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-bn-rBD\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-bn-rBD\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\color-v23\abc_tint_seek_thumb.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\color-v23\</RemoteDir>
             <RemoteName>abc_tint_seek_thumb.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values\styles.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values\</RemoteDir>
-            <RemoteName>styles.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -2775,15 +2478,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values\styles.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values\</RemoteDir>
-            <RemoteName>styles.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-ja\values-ja.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\values-ja\</RemoteDir>
             <RemoteName>values-ja.xml</RemoteName>
@@ -2793,18 +2487,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-mdpi-v4\abc_ab_share_pack_mtrl_alpha.9.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
-            <RemoteName>abc_ab_share_pack_mtrl_alpha.9.png</RemoteName>
+        <DeployFile Include="android\res\values-lt\values-lt.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\values-lt\</RemoteDir>
+            <RemoteName>values-lt.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-lt\values-lt.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-lt\</RemoteDir>
-            <RemoteName>values-lt.xml</RemoteName>
+        <DeployFile Include="android\res\drawable-mdpi-v4\abc_ab_share_pack_mtrl_alpha.9.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
+            <RemoteName>abc_ab_share_pack_mtrl_alpha.9.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -2841,15 +2535,6 @@
         <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_btn_switch_to_on_mtrl_00001.9.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
             <RemoteName>abc_btn_switch_to_on_mtrl_00001.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ml-rIN\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-ml-rIN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -2904,15 +2589,6 @@
         <DeployFile Include="android\res\values-xlarge-v4\values-xlarge-v4.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\values-xlarge-v4\</RemoteDir>
             <RemoteName>values-xlarge-v4.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-en-rIN\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-en-rIN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -3028,36 +2704,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-am\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-am\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values\ids.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values\</RemoteDir>
-            <RemoteName>ids.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-land\values-land.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-land\</RemoteDir>
             <RemoteName>values-land.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\drawable\al_item_background_material_dark.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_item_background_material_dark.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -3172,15 +2821,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-hr\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-hr\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-sl\values-sl.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-sl\</RemoteDir>
             <RemoteName>values-sl.xml</RemoteName>
@@ -3190,18 +2830,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\color\abc_secondary_text_material_light.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
-            <RemoteName>abc_secondary_text_material_light.xml</RemoteName>
+        <DeployFile Include="android\res\values-xlarge-v4\values-xlarge-v4.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\values-xlarge-v4\</RemoteDir>
+            <RemoteName>values-xlarge-v4.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-xlarge-v4\values-xlarge-v4.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-xlarge-v4\</RemoteDir>
-            <RemoteName>values-xlarge-v4.xml</RemoteName>
+        <DeployFile Include="android\res\color\abc_secondary_text_material_light.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
+            <RemoteName>abc_secondary_text_material_light.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -3317,15 +2957,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-bg\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-bg\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_textfield_search_activated_mtrl_alpha.9.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
             <RemoteName>abc_textfield_search_activated_mtrl_alpha.9.png</RemoteName>
@@ -3380,15 +3011,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-pt-rPT\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-pt-rPT\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-ldrtl-xxxhdpi-v17\abc_ic_menu_cut_mtrl_alpha.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-ldrtl-xxxhdpi-v17\</RemoteDir>
             <RemoteName>abc_ic_menu_cut_mtrl_alpha.png</RemoteName>
@@ -3401,15 +3023,6 @@
         <DeployFile Include="android\res\drawable-mdpi-v4\abc_list_divider_mtrl_alpha.9.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>abc_list_divider_mtrl_alpha.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-tr\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-tr\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -3434,36 +3047,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-fa\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-fa\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\layout-v21\notification_action_tombstone.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\layout-v21\</RemoteDir>
             <RemoteName>notification_action_tombstone.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\drawable\al_item_background_borderless_material_dark.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_item_background_borderless_material_dark.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-zh-rTW\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-zh-rTW\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -3542,15 +3128,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-bn-rBD\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-bn-rBD\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-nb\values-nb.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-nb\</RemoteDir>
             <RemoteName>values-nb.xml</RemoteName>
@@ -3623,15 +3200,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-da\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-da\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values\strings.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\values\</RemoteDir>
             <RemoteName>strings.xml</RemoteName>
@@ -3659,15 +3227,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-sw\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-sw\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="..\Android\Debug\AndroidManifest.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\</RemoteDir>
             <RemoteName>AndroidManifest.xml</RemoteName>
@@ -3677,9 +3236,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-v21\al_item_background_material_dark.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable-v21\</RemoteDir>
-            <RemoteName>al_item_background_material_dark.xml</RemoteName>
+        <DeployFile Include="android\res\drawable-xhdpi-v4\abc_btn_radio_to_on_mtrl_015.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\drawable-xhdpi-v4\</RemoteDir>
+            <RemoteName>abc_btn_radio_to_on_mtrl_015.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -3704,8 +3263,8 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-xhdpi-v4\abc_btn_radio_to_on_mtrl_015.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable-xhdpi-v4\</RemoteDir>
+        <DeployFile Include="android\res\drawable-xxxhdpi-v4\abc_btn_radio_to_on_mtrl_015.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\drawable-xxxhdpi-v4\</RemoteDir>
             <RemoteName>abc_btn_radio_to_on_mtrl_015.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
@@ -3722,9 +3281,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-xxxhdpi-v4\abc_btn_radio_to_on_mtrl_015.png" Condition="'$(Config)'=='Release'">
+        <DeployFile Include="android\res\drawable-xxxhdpi-v4\abc_ic_star_black_48dp.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxxhdpi-v4\</RemoteDir>
-            <RemoteName>abc_btn_radio_to_on_mtrl_015.png</RemoteName>
+            <RemoteName>abc_ic_star_black_48dp.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -3749,9 +3308,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-xxxhdpi-v4\abc_ic_star_black_48dp.png" Condition="'$(Config)'=='Release'">
+        <DeployFile Include="android\res\drawable-xxxhdpi-v4\abc_text_select_handle_right_mtrl_light.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxxhdpi-v4\</RemoteDir>
-            <RemoteName>abc_ic_star_black_48dp.png</RemoteName>
+            <RemoteName>abc_text_select_handle_right_mtrl_light.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -3803,15 +3362,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-xxxhdpi-v4\abc_text_select_handle_right_mtrl_light.png" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable-xxxhdpi-v4\</RemoteDir>
-            <RemoteName>abc_text_select_handle_right_mtrl_light.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\layout\notification_template_media_custom.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
             <RemoteName>notification_template_media_custom.xml</RemoteName>
@@ -3839,9 +3389,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-v21\al_item_background_borderless_material_dark.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable-v21\</RemoteDir>
-            <RemoteName>al_item_background_borderless_material_dark.xml</RemoteName>
+        <DeployFile Include="android\res\values-night-v8\values-night-v8.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\values-night-v8\</RemoteDir>
+            <RemoteName>values-night-v8.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -3857,9 +3407,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-es\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-es\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
+        <DeployFile Include="android\res\values-sr\values-sr.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-sr\</RemoteDir>
+            <RemoteName>values-sr.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -3878,15 +3428,6 @@
         <DeployFile Include="android\res\drawable-mdpi-v4\abc_textfield_activated_mtrl_alpha.9.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>abc_textfield_activated_mtrl_alpha.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-fi\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-fi\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -3920,36 +3461,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-night-v8\values-night-v8.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-night-v8\</RemoteDir>
-            <RemoteName>values-night-v8.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-sr\values-sr.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-sr\</RemoteDir>
-            <RemoteName>values-sr.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\color\abc_primary_text_material_light.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
             <RemoteName>abc_primary_text_material_light.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\drawable\al_floating_popup_background_dark.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_floating_popup_background_dark.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -3974,24 +3488,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\layout\al_floating_popup_open_overflow_button.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
-            <RemoteName>al_floating_popup_open_overflow_button.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-fr-rCA\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-fr-rCA\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_ic_star_black_36dp.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
             <RemoteName>abc_ic_star_black_36dp.png</RemoteName>
@@ -4004,15 +3500,6 @@
         <DeployFile Include="android\res\values-mr\values-mr.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\values-mr\</RemoteDir>
             <RemoteName>values-mr.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ca\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-ca\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -4049,15 +3536,6 @@
         <DeployFile Include="android\res\color\abc_primary_text_material_dark.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
             <RemoteName>abc_primary_text_material_dark.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-zu\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-zu\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -4154,54 +3632,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-az-rAZ\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-az-rAZ\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-mr-rIN\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-mr-rIN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-sw\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-sw\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-mdpi-v4\abc_cab_background_top_mtrl_alpha.9.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>abc_cab_background_top_mtrl_alpha.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\drawable\al_ic_menu_moreoverflow_material_dark.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_ic_menu_moreoverflow_material_dark.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-gl-rES\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-gl-rES\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -4256,15 +3689,6 @@
         <DeployFile Include="android\res\drawable\abc_btn_default_mtrl_shape.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
             <RemoteName>abc_btn_default_mtrl_shape.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\drawable\al_item_background_material_light.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_item_background_material_light.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -4343,24 +3767,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-de\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-de\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-pl\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-pl\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\layout\abc_action_menu_layout.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
             <RemoteName>abc_action_menu_layout.xml</RemoteName>
@@ -4433,24 +3839,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-es-rUS\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-es-rUS\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ko\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-ko\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-v16\values-v16.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-v16\</RemoteDir>
             <RemoteName>values-v16.xml</RemoteName>
@@ -4496,15 +3884,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-ka-rGE\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-ka-rGE\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xhdpi-v4\abc_textfield_search_activated_mtrl_alpha.9.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-xhdpi-v4\</RemoteDir>
             <RemoteName>abc_textfield_search_activated_mtrl_alpha.9.png</RemoteName>
@@ -4517,15 +3896,6 @@
         <DeployFile Include="android\res\drawable-xxxhdpi-v4\abc_ic_star_half_black_16dp.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxxhdpi-v4\</RemoteDir>
             <RemoteName>abc_ic_star_half_black_16dp.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ro\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-ro\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -4559,15 +3929,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-zh-rCN\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-zh-rCN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\anim\abc_shrink_fade_out_from_bottom.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\anim\</RemoteDir>
             <RemoteName>abc_shrink_fade_out_from_bottom.xml</RemoteName>
@@ -4595,15 +3956,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-pa-rIN\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-pa-rIN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xhdpi-v4\abc_text_select_handle_left_mtrl_dark.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-xhdpi-v4\</RemoteDir>
             <RemoteName>abc_text_select_handle_left_mtrl_dark.png</RemoteName>
@@ -4625,15 +3977,6 @@
         <DeployFile Include="android\res\drawable-xhdpi-v4\abc_popup_background_mtrl_mult.9.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-xhdpi-v4\</RemoteDir>
             <RemoteName>abc_popup_background_mtrl_mult.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-gl-rES\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-gl-rES\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -4688,15 +4031,6 @@
         <DeployFile Include="android\res\values-ml\values-ml.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-ml\</RemoteDir>
             <RemoteName>values-ml.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-my-rMM\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-my-rMM\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -4802,27 +4136,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-en-rIN\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-en-rIN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-hu\values-hu.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-hu\</RemoteDir>
             <RemoteName>values-hu.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\layout\al_floating_popup_overflow_list_item.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
-            <RemoteName>al_floating_popup_overflow_list_item.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -4847,18 +4163,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values\ids.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values\</RemoteDir>
-            <RemoteName>ids.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\color\al_ripple_material_light.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
-            <RemoteName>al_ripple_material_light.xml</RemoteName>
+        <DeployFile Include="android\res\values-kk\values-kk.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-kk\</RemoteDir>
+            <RemoteName>values-kk.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -4877,42 +4184,6 @@
         <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_textfield_activated_mtrl_alpha.9.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
             <RemoteName>abc_textfield_activated_mtrl_alpha.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-am\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-am\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-kk\values-kk.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-kk\</RemoteDir>
-            <RemoteName>values-kk.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-mr-rIN\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-mr-rIN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-te-rIN\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-te-rIN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -5018,24 +4289,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-hr\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-hr\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-pt-rPT\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-pt-rPT\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-gl\values-gl.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-gl\</RemoteDir>
             <RemoteName>values-gl.xml</RemoteName>
@@ -5045,36 +4298,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-de\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-de\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-iw\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-iw\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_scrubber_track_mtrl_alpha.9.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
             <RemoteName>abc_scrubber_track_mtrl_alpha.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-vi\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-vi\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -5207,15 +4433,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-gu-rIN\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-gu-rIN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_text_select_handle_left_mtrl_dark.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
             <RemoteName>abc_text_select_handle_left_mtrl_dark.png</RemoteName>
@@ -5228,15 +4445,6 @@
         <DeployFile Include="android\res\values-ka\values-ka.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-ka\</RemoteDir>
             <RemoteName>values-ka.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-pt\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-pt\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -5306,15 +4514,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-sl\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-sl\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-hdpi-v4\abc_ic_menu_share_mtrl_alpha.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-hdpi-v4\</RemoteDir>
             <RemoteName>abc_ic_menu_share_mtrl_alpha.png</RemoteName>
@@ -5351,15 +4550,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-v21\al_item_background_borderless_material_dark.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable-v21\</RemoteDir>
-            <RemoteName>al_item_background_borderless_material_dark.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\layout\notification_action.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
             <RemoteName>notification_action.xml</RemoteName>
@@ -5378,9 +4568,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\color\al_secondary_text_material_dark.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
-            <RemoteName>al_secondary_text_material_dark.xml</RemoteName>
+        <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_ic_star_black_16dp.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
+            <RemoteName>abc_ic_star_black_16dp.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -5405,18 +4595,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_ic_star_black_16dp.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
-            <RemoteName>abc_ic_star_black_16dp.png</RemoteName>
+        <DeployFile Include="android\res\values-et\values-et.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-et\</RemoteDir>
+            <RemoteName>values-et.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-et\values-et.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-et\</RemoteDir>
-            <RemoteName>values-et.xml</RemoteName>
+        <DeployFile Include="android\res\values-sq\values-sq.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\values-sq\</RemoteDir>
+            <RemoteName>values-sq.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -5435,15 +4625,6 @@
         <DeployFile Include="android\res\layout\select_dialog_multichoice_material.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
             <RemoteName>select_dialog_multichoice_material.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-sq\values-sq.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-sq\</RemoteDir>
-            <RemoteName>values-sq.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -5486,24 +4667,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-lt\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-lt\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-uk\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-uk\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-hdpi-v4\abc_ic_star_half_black_36dp.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-hdpi-v4\</RemoteDir>
             <RemoteName>abc_ic_star_half_black_36dp.png</RemoteName>
@@ -5540,15 +4703,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-nl\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-nl\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\anim\abc_popup_exit.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\anim\</RemoteDir>
             <RemoteName>abc_popup_exit.xml</RemoteName>
@@ -5570,15 +4724,6 @@
         <DeployFile Include="android\res\drawable-hdpi-v4\abc_btn_radio_to_on_mtrl_015.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-hdpi-v4\</RemoteDir>
             <RemoteName>abc_btn_radio_to_on_mtrl_015.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ne-rNP\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-ne-rNP\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -5630,15 +4775,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-mk-rMK\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-mk-rMK\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-pt\values-pt.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-pt\</RemoteDir>
             <RemoteName>values-pt.xml</RemoteName>
@@ -5666,36 +4802,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-ro\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-ro\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\drawable\al_item_background_material_dark.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_item_background_material_dark.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\color\abc_background_cache_hint_selector_material_dark.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
             <RemoteName>abc_background_cache_hint_selector_material_dark.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\drawable\al_item_background_material_light.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_item_background_material_light.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -5711,15 +4820,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-hdpi-v4\abc_ic_star_half_black_16dp.png" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable-hdpi-v4\</RemoteDir>
-            <RemoteName>abc_ic_star_half_black_16dp.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\layout\abc_action_mode_bar.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
             <RemoteName>abc_action_mode_bar.xml</RemoteName>
@@ -5729,9 +4829,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-mdpi-v4\abc_btn_check_to_on_mtrl_015.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
-            <RemoteName>abc_btn_check_to_on_mtrl_015.png</RemoteName>
+        <DeployFile Include="android\res\drawable-hdpi-v4\abc_ic_star_half_black_16dp.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\drawable-hdpi-v4\</RemoteDir>
+            <RemoteName>abc_ic_star_half_black_16dp.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -5747,9 +4847,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-az-rAZ\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-az-rAZ\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
+        <DeployFile Include="android\res\drawable-mdpi-v4\abc_btn_check_to_on_mtrl_015.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
+            <RemoteName>abc_btn_check_to_on_mtrl_015.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -5759,15 +4859,6 @@
         <DeployFile Include="android\res\drawable\abc_item_background_holo_light.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
             <RemoteName>abc_item_background_holo_light.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-et-rEE\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-et-rEE\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -5846,45 +4937,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-nb\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-nb\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-sq-rAL\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-sq-rAL\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-sq-rAL\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-sq-rAL\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_ic_star_half_black_48dp.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
             <RemoteName>abc_ic_star_half_black_48dp.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-pa-rIN\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-pa-rIN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -5903,15 +4958,6 @@
         <DeployFile Include="android\res\values-ko\values-ko.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-ko\</RemoteDir>
             <RemoteName>values-ko.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-el\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-el\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -5990,15 +5036,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable\al_item_background_borderless_material_dark.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_item_background_borderless_material_dark.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-hdpi-v4\abc_textfield_search_default_mtrl_alpha.9.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-hdpi-v4\</RemoteDir>
             <RemoteName>abc_textfield_search_default_mtrl_alpha.9.png</RemoteName>
@@ -6011,6 +5048,15 @@
         <DeployFile Include="android\res\values-sl\values-sl.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\values-sl\</RemoteDir>
             <RemoteName>values-sl.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="android\res\values-v18\values-v18.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\values-v18\</RemoteDir>
+            <RemoteName>values-v18.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6080,24 +5126,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-te-rIN\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-te-rIN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-v18\values-v18.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-v18\</RemoteDir>
-            <RemoteName>values-v18.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-mdpi-v4\com_facebook_tooltip_blue_xout.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>com_facebook_tooltip_blue_xout.png</RemoteName>
@@ -6125,27 +5153,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\layout\al_floating_popup_open_overflow_button.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
-            <RemoteName>al_floating_popup_open_overflow_button.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-lo\values-lo.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-lo\</RemoteDir>
             <RemoteName>values-lo.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-kn-rIN\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-kn-rIN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6287,24 +5297,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-sl\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-sl\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\color\al_secondary_text_material_dark.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
-            <RemoteName>al_secondary_text_material_dark.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable\notification_bg.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
             <RemoteName>notification_bg.xml</RemoteName>
@@ -6323,18 +5315,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-mdpi-v4\abc_scrubber_primary_mtrl_alpha.9.png" Condition="'$(Config)'=='Debug'">
+        <DeployFile Include="android\res\drawable-mdpi-v4\abc_text_select_handle_right_mtrl_dark.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
-            <RemoteName>abc_scrubber_primary_mtrl_alpha.9.png</RemoteName>
+            <RemoteName>abc_text_select_handle_right_mtrl_dark.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-mdpi-v4\abc_text_select_handle_right_mtrl_dark.png" Condition="'$(Config)'=='Debug'">
+        <DeployFile Include="android\res\drawable-mdpi-v4\abc_scrubber_primary_mtrl_alpha.9.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
-            <RemoteName>abc_text_select_handle_right_mtrl_dark.png</RemoteName>
+            <RemoteName>abc_scrubber_primary_mtrl_alpha.9.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6368,15 +5360,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-en-rGB\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-en-rGB\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xhdpi-v4\com_facebook_tooltip_blue_bottomnub.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xhdpi-v4\</RemoteDir>
             <RemoteName>com_facebook_tooltip_blue_bottomnub.png</RemoteName>
@@ -6395,15 +5378,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-kk-rKZ\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-kk-rKZ\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\layout\notification_template_big_media_narrow_custom.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
             <RemoteName>notification_template_big_media_narrow_custom.xml</RemoteName>
@@ -6413,9 +5387,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values\colors.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values\</RemoteDir>
-            <RemoteName>colors.xml</RemoteName>
+        <DeployFile Include="android\res\values-uz\values-uz.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-uz\</RemoteDir>
+            <RemoteName>values-uz.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6425,15 +5399,6 @@
         <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_spinner_mtrl_am_alpha.9.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
             <RemoteName>abc_spinner_mtrl_am_alpha.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-uz\values-uz.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-uz\</RemoteDir>
-            <RemoteName>values-uz.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6485,27 +5450,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-da\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-da\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_list_focused_holo.9.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
             <RemoteName>abc_list_focused_holo.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values\colors.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values\</RemoteDir>
-            <RemoteName>colors.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6692,24 +5639,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-eu-rES\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-eu-rES\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-fr\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-fr\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xhdpi-v4\abc_list_selector_disabled_holo_dark.9.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-xhdpi-v4\</RemoteDir>
             <RemoteName>abc_list_selector_disabled_holo_dark.9.png</RemoteName>
@@ -6800,36 +5729,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-lt\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-lt\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-uk\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-uk\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_ic_star_half_black_36dp.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
             <RemoteName>abc_ic_star_half_black_36dp.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ur-rPK\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-ur-rPK\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6893,15 +5795,6 @@
         <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_ic_menu_selectall_mtrl_alpha.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
             <RemoteName>abc_ic_menu_selectall_mtrl_alpha.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-zh-rTW\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-zh-rTW\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -7007,9 +5900,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable\al_ic_menu_moreoverflow_material_light.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_ic_menu_moreoverflow_material_light.xml</RemoteName>
+        <DeployFile Include="android\res\values-el\values-el.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\values-el\</RemoteDir>
+            <RemoteName>values-el.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -7019,15 +5912,6 @@
         <DeployFile Include="android\res\color\abc_hint_foreground_material_light.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
             <RemoteName>abc_hint_foreground_material_light.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-el\values-el.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-el\</RemoteDir>
-            <RemoteName>values-el.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -7295,9 +6179,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-cs\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-cs\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
+        <DeployFile Include="android\res\values-es\values-es.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\values-es\</RemoteDir>
+            <RemoteName>values-es.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -7322,9 +6206,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-es\values-es.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-es\</RemoteDir>
-            <RemoteName>values-es.xml</RemoteName>
+        <DeployFile Include="android\res\values-ja\values-ja.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\values-ja\</RemoteDir>
+            <RemoteName>values-ja.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -7349,36 +6233,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-ja\values-ja.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-ja\</RemoteDir>
-            <RemoteName>values-ja.xml</RemoteName>
+        <DeployFile Include="android\res\values-vi\values-vi.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-vi\</RemoteDir>
+            <RemoteName>values-vi.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-kk-rKZ\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-kk-rKZ\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ne-rNP\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-ne-rNP\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-sv\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-sv\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
+        <DeployFile Include="android\res\values-v23\values-v23.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\values-v23\</RemoteDir>
+            <RemoteName>values-v23.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -7406,24 +6272,6 @@
         <DeployFile Include="android\res\values-sw600dp-v13\values-sw600dp-v13.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-sw600dp-v13\</RemoteDir>
             <RemoteName>values-sw600dp-v13.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-v23\values-v23.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-v23\</RemoteDir>
-            <RemoteName>values-v23.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-vi\values-vi.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-vi\</RemoteDir>
-            <RemoteName>values-vi.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -7601,18 +6449,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-ur-rPK\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-ur-rPK\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\drawable\al_ic_ab_back_material_dark.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_ic_ab_back_material_dark.xml</RemoteName>
+        <DeployFile Include="android\res\values-tr\values-tr.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\values-tr\</RemoteDir>
+            <RemoteName>values-tr.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -7664,24 +6503,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-v21\al_item_background_material_light.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable-v21\</RemoteDir>
-            <RemoteName>al_item_background_material_light.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\drawable-mdpi-v4\abc_ab_share_pack_mtrl_alpha.9.png" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
-            <RemoteName>abc_ab_share_pack_mtrl_alpha.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xhdpi-v4\abc_text_select_handle_left_mtrl_dark.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xhdpi-v4\</RemoteDir>
             <RemoteName>abc_text_select_handle_left_mtrl_dark.png</RemoteName>
@@ -7691,18 +6512,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-tr\values-tr.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-tr\</RemoteDir>
-            <RemoteName>values-tr.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-si-rLK\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-si-rLK\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
+        <DeployFile Include="android\res\drawable-mdpi-v4\abc_ab_share_pack_mtrl_alpha.9.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
+            <RemoteName>abc_ab_share_pack_mtrl_alpha.9.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -7739,15 +6551,6 @@
         <DeployFile Include="android\res\drawable-hdpi-v4\abc_textfield_search_activated_mtrl_alpha.9.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-hdpi-v4\</RemoteDir>
             <RemoteName>abc_textfield_search_activated_mtrl_alpha.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\layout\al_floating_popup_menu_image_button.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
-            <RemoteName>al_floating_popup_menu_image_button.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -7862,15 +6665,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-zu\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-zu\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-hi\values-hi.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-hi\</RemoteDir>
             <RemoteName>values-hi.xml</RemoteName>
@@ -7961,27 +6755,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-v21\al_item_background_material_light.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable-v21\</RemoteDir>
-            <RemoteName>al_item_background_material_light.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xhdpi-v4\notification_bg_low_pressed.9.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-xhdpi-v4\</RemoteDir>
             <RemoteName>notification_bg_low_pressed.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\drawable-hdpi-v4\abc_text_select_handle_middle_mtrl_light.png" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable-hdpi-v4\</RemoteDir>
-            <RemoteName>abc_text_select_handle_middle_mtrl_light.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -7997,18 +6773,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-fr\values-fr.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-fr\</RemoteDir>
-            <RemoteName>values-fr.xml</RemoteName>
+        <DeployFile Include="android\res\drawable-hdpi-v4\abc_text_select_handle_middle_mtrl_light.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\drawable-hdpi-v4\</RemoteDir>
+            <RemoteName>abc_text_select_handle_middle_mtrl_light.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-ms-rMY\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-ms-rMY\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
+        <DeployFile Include="android\res\values-fr\values-fr.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-fr\</RemoteDir>
+            <RemoteName>values-fr.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8024,15 +6800,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-si-rLK\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-si-rLK\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable\abc_list_selector_holo_light.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
             <RemoteName>abc_list_selector_holo_light.xml</RemoteName>
@@ -8042,9 +6809,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\color\al_ripple_material_dark.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
-            <RemoteName>al_ripple_material_dark.xml</RemoteName>
+        <DeployFile Include="android\res\values-fa\values-fa.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-fa\</RemoteDir>
+            <RemoteName>values-fa.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8078,15 +6845,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-fa\values-fa.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-fa\</RemoteDir>
-            <RemoteName>values-fa.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_switch_track_mtrl_alpha.9.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
             <RemoteName>abc_switch_track_mtrl_alpha.9.png</RemoteName>
@@ -8099,15 +6857,6 @@
         <DeployFile Include="android\res\drawable-xxxhdpi-v4\abc_tab_indicator_mtrl_alpha.9.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxxhdpi-v4\</RemoteDir>
             <RemoteName>abc_tab_indicator_mtrl_alpha.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-vi\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-vi\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8195,15 +6944,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\layout\al_floating_popup_overflow_image_list_item.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
-            <RemoteName>al_floating_popup_overflow_image_list_item.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xhdpi-v4\com_facebook_tooltip_black_xout.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xhdpi-v4\</RemoteDir>
             <RemoteName>com_facebook_tooltip_black_xout.png</RemoteName>
@@ -8213,27 +6953,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-ko\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-ko\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-ur\values-ur.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\values-ur\</RemoteDir>
             <RemoteName>values-ur.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-uz-rUZ\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-uz-rUZ\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8294,9 +7016,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\layout\al_floating_popup_container.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
-            <RemoteName>al_floating_popup_container.xml</RemoteName>
+        <DeployFile Include="android\res\values-eu\values-eu.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\values-eu\</RemoteDir>
+            <RemoteName>values-eu.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8312,27 +7034,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\layout\al_floating_popup_menu_button.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
-            <RemoteName>al_floating_popup_menu_button.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\layout\notification_template_custom_big.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
             <RemoteName>notification_template_custom_big.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-bg\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-bg\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8393,24 +7097,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-af\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-af\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-eu\values-eu.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-eu\</RemoteDir>
-            <RemoteName>values-eu.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xhdpi-v4\abc_ic_star_half_black_16dp.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xhdpi-v4\</RemoteDir>
             <RemoteName>abc_ic_star_half_black_16dp.png</RemoteName>
@@ -8447,36 +7133,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-in\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-in\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-ldltr-v21\values-ldltr-v21.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-ldltr-v21\</RemoteDir>
             <RemoteName>values-ldltr-v21.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-pt-rBR\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-pt-rBR\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-zh-rHK\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-zh-rHK\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8495,24 +7154,6 @@
         <DeployFile Include="android\res\layout\notification_action_tombstone.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
             <RemoteName>notification_action_tombstone.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-en-rAU\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-en-rAU\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ru\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-ru\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8567,15 +7208,6 @@
         <DeployFile Include="android\res\layout\browser_actions_context_menu_page.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
             <RemoteName>browser_actions_context_menu_page.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-hi\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-hi\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8657,15 +7289,6 @@
         <DeployFile Include="android\res\values-en-rCA\values-en-rCA.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\values-en-rCA\</RemoteDir>
             <RemoteName>values-en-rCA.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\layout\al_floating_popup_menu_image_button.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
-            <RemoteName>al_floating_popup_menu_image_button.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8789,9 +7412,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-fr\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-fr\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
+        <DeployFile Include="android\res\values-hr\values-hr.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\values-hr\</RemoteDir>
+            <RemoteName>values-hr.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8807,15 +7430,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-hr\values-hr.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-hr\</RemoteDir>
-            <RemoteName>values-hr.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\color\abc_primary_text_material_dark.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
             <RemoteName>abc_primary_text_material_dark.xml</RemoteName>
@@ -8825,36 +7439,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-hu\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-hu\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\layout\abc_action_bar_up_container.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
             <RemoteName>abc_action_bar_up_container.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-hu\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-hu\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-kn-rIN\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-kn-rIN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8888,27 +7475,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-it\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-it\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-af\values-af.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-af\</RemoteDir>
             <RemoteName>values-af.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-km-rKH\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-km-rKH\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8936,24 +7505,6 @@
         <DeployFile Include="android\res\drawable\abc_ic_ab_back_material.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
             <RemoteName>abc_ic_ab_back_material.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values\dimens.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values\</RemoteDir>
-            <RemoteName>dimens.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-sw600dp\dimens.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-sw600dp\</RemoteDir>
-            <RemoteName>dimens.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8990,24 +7541,6 @@
         <DeployFile Include="android\res\values-fi\values-fi.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-fi\</RemoteDir>
             <RemoteName>values-fi.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-km-rKH\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-km-rKH\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-lv\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-lv\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -9080,15 +7613,6 @@
         <DeployFile Include="android\res\values-pt\values-pt.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\values-pt\</RemoteDir>
             <RemoteName>values-pt.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ja\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-ja\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -9302,15 +7826,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-tl\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-tl\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-hdpi-v4\com_facebook_tooltip_blue_background.9.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-hdpi-v4\</RemoteDir>
             <RemoteName>com_facebook_tooltip_blue_background.9.png</RemoteName>
@@ -9518,27 +8033,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\layout\al_floating_popup_menu_button.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
-            <RemoteName>al_floating_popup_menu_button.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-mdpi-v4\abc_text_select_handle_left_mtrl_dark.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>abc_text_select_handle_left_mtrl_dark.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-pt\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-pt\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -9572,15 +8069,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-in\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-in\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-v23\abc_control_background_material.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-v23\</RemoteDir>
             <RemoteName>abc_control_background_material.xml</RemoteName>
@@ -9602,15 +8090,6 @@
         <DeployFile Include="android\res\mipmap-xhdpi\ic_launcher.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\mipmap-xhdpi\</RemoteDir>
             <RemoteName>ic_launcher.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-land\dimens.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-land\</RemoteDir>
-            <RemoteName>dimens.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -9725,27 +8204,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable\al_ic_menu_moreoverflow_material_dark.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_ic_menu_moreoverflow_material_dark.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\layout\abc_action_mode_close_item_material.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
             <RemoteName>abc_action_mode_close_item_material.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-en-rAU\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-en-rAU\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -9782,15 +8243,6 @@
         <DeployFile Include="android\res\drawable-xhdpi-v4\abc_spinner_mtrl_am_alpha.9.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xhdpi-v4\</RemoteDir>
             <RemoteName>abc_spinner_mtrl_am_alpha.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\layout\al_floating_popup_overflow_list_item.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
-            <RemoteName>al_floating_popup_overflow_list_item.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -9878,15 +8330,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-mn-rMN\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-mn-rMN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\anim\abc_popup_exit.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\anim\</RemoteDir>
             <RemoteName>abc_popup_exit.xml</RemoteName>
@@ -9959,24 +8402,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-hy-rAM\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-hy-rAM\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-pl\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-pl\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-zh-rHK\values-zh-rHK.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\values-zh-rHK\</RemoteDir>
             <RemoteName>values-zh-rHK.xml</RemoteName>
@@ -10040,27 +8465,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-ru\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-ru\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-mdpi-v4\com_facebook_button_icon_white.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>com_facebook_button_icon_white.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-th\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-th\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -10088,15 +8495,6 @@
         <DeployFile Include="android\res\values-hr\values-hr.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\values-hr\</RemoteDir>
             <RemoteName>values-hr.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ky-rKG\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-ky-rKG\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -10151,15 +8549,6 @@
         <DeployFile Include="android\res\values-es-rES\values-es-rES.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\values-es-rES\</RemoteDir>
             <RemoteName>values-es-rES.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-it\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-it\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -10319,15 +8708,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-el\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-el\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-my\values-my.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-my\</RemoteDir>
             <RemoteName>values-my.xml</RemoteName>
@@ -10403,15 +8783,6 @@
         <DeployFile Include="android\res\values-mk\values-mk.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\values-mk\</RemoteDir>
             <RemoteName>values-mk.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-tr\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-tr\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -10634,15 +9005,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-sv\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-sv\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-mdpi-v4\abc_ic_star_black_16dp.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>abc_ic_star_black_16dp.png</RemoteName>
@@ -10682,24 +9044,6 @@
         <DeployFile Include="android\res\layout-v21\notification_template_custom_big.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\layout-v21\</RemoteDir>
             <RemoteName>notification_template_custom_big.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ar\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-ar\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ka-rGE\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-ka-rGE\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -10850,15 +9194,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values\dimens.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values\</RemoteDir>
-            <RemoteName>dimens.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable\abc_ic_voice_search_api_material.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
             <RemoteName>abc_ic_voice_search_api_material.xml</RemoteName>
@@ -10871,15 +9206,6 @@
         <DeployFile Include="android\res\drawable-mdpi-v4\notification_bg_normal.9.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>notification_bg_normal.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ky-rKG\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-ky-rKG\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -10913,9 +9239,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable\al_item_background_borderless_material_light.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_item_background_borderless_material_light.xml</RemoteName>
+        <DeployFile Include="android\res\values-v21\values-v21.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-v21\</RemoteDir>
+            <RemoteName>values-v21.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -10958,15 +9284,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-v21\values-v21.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-v21\</RemoteDir>
-            <RemoteName>values-v21.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-mdpi-v4\abc_ic_star_black_36dp.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>abc_ic_star_black_36dp.png</RemoteName>
@@ -10979,15 +9296,6 @@
         <DeployFile Include="android\res\values-fi\values-fi.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\values-fi\</RemoteDir>
             <RemoteName>values-fi.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-tl\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-tl\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -11030,15 +9338,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\layout\al_floating_popup_close_overflow_button.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
-            <RemoteName>al_floating_popup_close_overflow_button.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-pl\values-pl.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-pl\</RemoteDir>
             <RemoteName>values-pl.xml</RemoteName>
@@ -11048,27 +9347,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-hy-rAM\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-hy-rAM\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-sr\values-sr.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-sr\</RemoteDir>
             <RemoteName>values-sr.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-fa\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-fa\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -11105,15 +9386,6 @@
         <DeployFile Include="android\res\values-id\values-id.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-id\</RemoteDir>
             <RemoteName>values-id.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-zh-rCN\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-zh-rCN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -11192,9 +9464,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-gu-rIN\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-gu-rIN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
+        <DeployFile Include="android\res\values-v25\values-v25.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-v25\</RemoteDir>
+            <RemoteName>values-v25.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -11228,27 +9500,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-en-rGB\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-en-rGB\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_list_pressed_holo_light.9.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
             <RemoteName>abc_list_pressed_holo_light.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-v25\values-v25.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-v25\</RemoteDir>
-            <RemoteName>values-v25.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -11336,24 +9590,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-nl\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-nl\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\drawable\al_ic_ab_back_material_dark.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_ic_ab_back_material_dark.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-ldrtl-xxhdpi-v17\abc_spinner_mtrl_am_alpha.9.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable-ldrtl-xxhdpi-v17\</RemoteDir>
             <RemoteName>abc_spinner_mtrl_am_alpha.9.png</RemoteName>
@@ -11399,9 +9635,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-ca\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-ca\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
+        <DeployFile Include="android\res\values-ta\values-ta.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\values-ta\</RemoteDir>
+            <RemoteName>values-ta.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -11435,33 +9671,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\layout\al_floating_popup_overflow_image_list_item.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
-            <RemoteName>al_floating_popup_overflow_image_list_item.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-is-rIS\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-is-rIS\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-sr\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-sr\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xhdpi-v4\abc_btn_radio_to_on_mtrl_015.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xhdpi-v4\</RemoteDir>
             <RemoteName>abc_btn_radio_to_on_mtrl_015.png</RemoteName>
@@ -11480,18 +9689,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-my-rMM\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-my-rMM\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\color\al_ripple_material_light.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
-            <RemoteName>al_ripple_material_light.xml</RemoteName>
+        <DeployFile Include="android\res\values-zh-rCN\values-zh-rCN.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\values-zh-rCN\</RemoteDir>
+            <RemoteName>values-zh-rCN.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -11510,15 +9710,6 @@
         <DeployFile Include="android\res\color\com_facebook_send_button_text_color.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
             <RemoteName>com_facebook_send_button_text_color.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ta\values-ta.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-ta\</RemoteDir>
-            <RemoteName>values-ta.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -11633,45 +9824,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-land\dimens.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-land\</RemoteDir>
-            <RemoteName>dimens.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-lo-rLA\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-lo-rLA\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-zh-rCN\values-zh-rCN.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-zh-rCN\</RemoteDir>
-            <RemoteName>values-zh-rCN.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\color\abc_tint_switch_track.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
             <RemoteName>abc_tint_switch_track.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\drawable-v21\al_item_background_borderless_material_light.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable-v21\</RemoteDir>
-            <RemoteName>al_item_background_borderless_material_light.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -11690,15 +9845,6 @@
         <DeployFile Include="android\res\drawable-xhdpi-v4\abc_textfield_default_mtrl_alpha.9.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xhdpi-v4\</RemoteDir>
             <RemoteName>abc_textfield_default_mtrl_alpha.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-sk\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-sk\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -11777,27 +9923,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-fi\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-fi\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\layout\notification_template_big_media_narrow.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
             <RemoteName>notification_template_big_media_narrow.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ta-rIN\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-ta-rIN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -11876,9 +10004,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-es-rUS\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-es-rUS\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
+        <DeployFile Include="android\res\values-it\values-it.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-it\</RemoteDir>
+            <RemoteName>values-it.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -11897,15 +10025,6 @@
         <DeployFile Include="android\res\layout-v21\notification_action.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\layout-v21\</RemoteDir>
             <RemoteName>notification_action.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-it\values-it.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-it\</RemoteDir>
-            <RemoteName>values-it.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -12047,24 +10166,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-fr-rCA\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-fr-rCA\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-uz-rUZ\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-uz-rUZ\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable\abc_switch_thumb_material.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
             <RemoteName>abc_switch_thumb_material.xml</RemoteName>
@@ -12146,15 +10247,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\values-lv\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-lv\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-v26\values-v26.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-v26\</RemoteDir>
             <RemoteName>values-v26.xml</RemoteName>
@@ -12167,24 +10259,6 @@
         <DeployFile Include="android\res\color\abc_primary_text_material_light.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
             <RemoteName>abc_primary_text_material_light.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-lo-rLA\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-lo-rLA\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-nb\strings.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-nb\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -12227,24 +10301,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable\al_floating_popup_background_light.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_floating_popup_background_light.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\drawable-v21\al_item_background_borderless_material_light.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable-v21\</RemoteDir>
-            <RemoteName>al_item_background_borderless_material_light.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-v17\values-v17.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\values-v17\</RemoteDir>
             <RemoteName>values-v17.xml</RemoteName>
@@ -12257,15 +10313,6 @@
         <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_tab_indicator_mtrl_alpha.9.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
             <RemoteName>abc_tab_indicator_mtrl_alpha.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-et-rEE\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-et-rEE\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -12293,15 +10340,6 @@
         <DeployFile Include="android\res\color\com_facebook_send_button_text_color.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\color\</RemoteDir>
             <RemoteName>com_facebook_send_button_text_color.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-ms-rMY\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-ms-rMY\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -12560,15 +10598,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable\al_item_background_borderless_material_light.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable\</RemoteDir>
-            <RemoteName>al_item_background_borderless_material_light.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\drawable-xhdpi-v4\abc_ic_commit_search_api_mtrl_alpha.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-xhdpi-v4\</RemoteDir>
             <RemoteName>abc_ic_commit_search_api_mtrl_alpha.png</RemoteName>
@@ -12590,15 +10619,6 @@
         <DeployFile Include="android\res\drawable-mdpi-v4\abc_list_longpressed_holo.9.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>abc_list_longpressed_holo.9.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-sk\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\values-sk\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -12668,9 +10688,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-ldrtl-xxxhdpi-v17\abc_ic_menu_cut_mtrl_alpha.png" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable-ldrtl-xxxhdpi-v17\</RemoteDir>
-            <RemoteName>abc_ic_menu_cut_mtrl_alpha.png</RemoteName>
+        <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_btn_switch_to_on_mtrl_00001.9.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
+            <RemoteName>abc_btn_switch_to_on_mtrl_00001.9.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -12686,9 +10706,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_btn_switch_to_on_mtrl_00001.9.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
-            <RemoteName>abc_btn_switch_to_on_mtrl_00001.9.png</RemoteName>
+        <DeployFile Include="android\res\drawable-ldrtl-xxxhdpi-v17\abc_ic_menu_cut_mtrl_alpha.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\drawable-ldrtl-xxxhdpi-v17\</RemoteDir>
+            <RemoteName>abc_ic_menu_cut_mtrl_alpha.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>

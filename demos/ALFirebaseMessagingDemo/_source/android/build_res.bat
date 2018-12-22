@@ -6,7 +6,6 @@ mkdir .\res 2> nul
 "..\..\..\..\tools\xmlmerge\XmlMerge.exe"^
  .\res^
  .\libraries\com.ALFirebaseMessagingDemo.app\res^
- .\libraries\com.alcinoe\res^
  .\libraries\com.google.firebase.messaging\res^
  .\libraries\com.google.android.gms.base\res^
  .\libraries\com.google.android.gms\res^

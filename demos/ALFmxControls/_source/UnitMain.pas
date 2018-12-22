@@ -7,7 +7,7 @@ uses
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls,
   FMX.Controls.Presentation, FMX.Objects, ALFmxObjects, FMX.Layouts,
   ALFmxLayouts, fmx.types3D, ALFmxCommon, System.ImageList,
-  FMX.ImgList, ALFmxStdCtrls, FMX.TabControl, ALFmxTabControl,
+  FMX.ImgList, ALFmxStdCtrls, ALFmxTabControl,
   FMX.ScrollBox, FMX.Edit, ALFmxEdit, ALVideoPlayer, FMX.Effects,
   {$IF Defined(IOS) or Defined(ANDROID)}
   Grijjy.ErrorReporting,

@@ -1,0 +1,225 @@
+{**********************************************************}
+{                                                          }
+{           CodeGear Delphi Runtime Library                }
+{                                                          }
+{ Delphi-Objective-C Bridge                                }
+{ Interfaces for Cocoa framework CoreImage                 }
+{                                                          }
+{ Copyright (c) 2011, Apple Inc. All rights reserved.      }
+{                                                          }
+{ Translator: Embarcadero Technologies, Inc.               }
+{   Copyright(c) 2012-2017 Embarcadero Technologies, Inc.  }
+{              All rights reserved                         }
+{                                                          }
+{**********************************************************}
+
+unit iOSapi.CoreImage;
+
+interface
+
+uses
+  Posix.StdDef, Macapi.ObjectiveC, iOSapi.CocoaTypes, iOSapi.Foundation, iOSapi.OpenGLES, Macapi.CoreFoundation, iOSapi.CoreGraphics;
+
+
+// ===== External functions =====
+
+const
+  libCoreImage = '/System/Library/Frameworks/CoreImage.framework/CoreImage';
+
+// ===== Typedefs and structs =====
+type
+{$M+}
+  CIFormat = Integer;
+  CVImageBufferRef = IntPtr; // from CoreVideo
+  CVPixelBufferRef = CVImageBufferRef; // from CoreVideo
+
+
+type
+{$M+}
+// ===== Forward declarations =====
+
+  CIFeature = interface;
+  CIFilter = interface;
+  CIImage = interface;
+  CIVector = interface;
+  CIColor = interface;
+  CIContext = interface;
+  CIDetector = interface;
+  CIFaceFeature = interface;
+
+// ===== Interface declarations =====
+
+  CIFeatureClass = interface(NSObjectClass)
+    ['{D8B4E972-AE4D-4357-90DA-93C5D3635BFC}']
+  end;
+  CIFeature = interface(NSObject)
+    ['{A9AA408B-B7E4-409A-B573-3C9496FE73DB}']
+    function bounds: CGRect; cdecl;
+  end;
+  TCIFeature = class(TOCGenericImport<CIFeatureClass, CIFeature>)  end;
+
+  CIFilterClass = interface(NSObjectClass)
+    ['{63DC7C5A-11EF-4F75-9A57-60445EDB9735}']
+    {class} function filterNamesInCategories(categories: NSArray): NSArray; cdecl;
+    {class} function filterNamesInCategory(category: NSString): NSArray; cdecl;
+    {class} function filterWithName(name: NSString): Pointer; cdecl; overload;
+    {class} function filterWithName(name: NSString; keysAndValues: Pointer): Pointer; cdecl; overload;
+    {class} function localizedDescriptionForFilterName(filterName: NSString): NSString; cdecl;
+    {class} function localizedNameForCategory(category: NSString): NSString; cdecl;
+    {class} function localizedNameForFilterName(filterName: NSString): NSString; cdecl;
+    {class} function localizedReferenceDocumentationForFilterName(filterName: NSString): NSURL; cdecl;
+  end;
+  CIFilter = interface(NSObject)
+    ['{1E199DAF-0472-46AE-B6E1-AC6DE7C9B48C}']
+    function attributes: NSDictionary; cdecl;
+    function inputKeys: NSArray; cdecl;
+    function name: NSString; cdecl;
+    function outputImage: CIImage; cdecl;
+    function outputKeys: NSArray; cdecl;
+    procedure setDefaults; cdecl;
+  end;
+  TCIFilter = class(TOCGenericImport<CIFilterClass, CIFilter>)  end;
+
+  CIImageClass = interface(NSObjectClass)
+    ['{8116FB49-A1ED-4CDA-A20E-2F41A858B265}']
+    {class} function emptyImage: Pointer; cdecl;
+    {class} function imageWithBitmapData(d: NSData; bytesPerRow: size_t; size: CGSize; format: CIFormat; colorSpace: CGColorSpaceRef): Pointer; cdecl;
+    {class} function imageWithCGImage(image: CGImageRef): Pointer; cdecl; overload;
+    {class} function imageWithCGImage(image: CGImageRef; options: NSDictionary): Pointer; cdecl; overload;
+    {class} function imageWithCVPixelBuffer(buffer: CVPixelBufferRef): Pointer; cdecl; overload;
+    {class} function imageWithCVPixelBuffer(buffer: CVPixelBufferRef; options: NSDictionary): Pointer; cdecl; overload;
+    {class} function imageWithColor(color: CIColor): Pointer; cdecl;
+    {class} function imageWithContentsOfURL(url: NSURL): Pointer; cdecl; overload;
+    {class} function imageWithContentsOfURL(url: NSURL; options: NSDictionary): Pointer; cdecl; overload;
+    {class} function imageWithData(data: NSData): Pointer; cdecl; overload;
+    {class} function imageWithData(data: NSData; options: NSDictionary): Pointer; cdecl; overload;
+  end;
+  CIImage = interface(NSObject)
+    ['{1446FF5E-9128-4592-BDE4-2A89A22F1CA3}']
+    function autoAdjustmentFilters: NSArray; cdecl;
+    function autoAdjustmentFiltersWithOptions(dict: NSDictionary): NSArray; cdecl;
+    function extent: CGRect; cdecl;
+    function imageByApplyingTransform(matrix: CGAffineTransform): CIImage; cdecl;
+    function imageByCroppingToRect(r: CGRect): CIImage; cdecl;
+    function initWithBitmapData(d: NSData; bytesPerRow: size_t; size: CGSize; format: CIFormat; colorSpace: CGColorSpaceRef): Pointer; cdecl;
+    function initWithCGImage(image: CGImageRef): Pointer; cdecl; overload;
+    function initWithCGImage(image: CGImageRef; options: NSDictionary): Pointer; cdecl; overload;
+    function initWithCVPixelBuffer(buffer: CVPixelBufferRef): Pointer; cdecl; overload;
+    function initWithCVPixelBuffer(buffer: CVPixelBufferRef; options: NSDictionary): Pointer; cdecl; overload;
+    function initWithColor(color: CIColor): Pointer; cdecl;
+    function initWithContentsOfURL(url: NSURL): Pointer; cdecl; overload;
+    function initWithContentsOfURL(url: NSURL; options: NSDictionary): Pointer; cdecl; overload;
+    function initWithData(data: NSData): Pointer; cdecl; overload;
+    function initWithData(data: NSData; options: NSDictionary): Pointer; cdecl; overload;
+    function properties: NSDictionary; cdecl;
+  end;
+  TCIImage = class(TOCGenericImport<CIImageClass, CIImage>)  end;
+
+  CIVectorClass = interface(NSObjectClass)
+    ['{B57E8A70-0FCC-4784-958C-9A17EE7C2FBD}']
+    {class} function vectorWithCGAffineTransform(t: CGAffineTransform): Pointer; cdecl;
+    {class} function vectorWithCGPoint(p: CGPoint): Pointer; cdecl;
+    {class} function vectorWithCGRect(r: CGRect): Pointer; cdecl;
+    {class} function vectorWithString(representation: NSString): Pointer; cdecl;
+    {class} function vectorWithValues(values: PCGFloat; count: size_t): Pointer; cdecl;
+    {class} function vectorWithX(x: CGFloat): Pointer; cdecl; overload;
+    {class} function vectorWithX(x: CGFloat; Y: CGFloat): Pointer; cdecl; overload;
+    {class} function vectorWithX(x: CGFloat; Y: CGFloat; Z: CGFloat): Pointer; cdecl; overload;
+    {class} function vectorWithX(x: CGFloat; Y: CGFloat; Z: CGFloat; W: CGFloat): Pointer; cdecl; overload;
+  end;
+  CIVector = interface(NSObject)
+    ['{12FAEF98-27A1-45E1-A0A9-5ACB6B3F9BB9}']
+    function CGAffineTransformValue: CGAffineTransform; cdecl;
+    function CGPointValue: CGPoint; cdecl;
+    function CGRectValue: CGRect; cdecl;
+    function W: CGFloat; cdecl;
+    function X: CGFloat; cdecl;
+    function Y: CGFloat; cdecl;
+    function Z: CGFloat; cdecl;
+    function count: size_t; cdecl;
+    function initWithCGAffineTransform(r: CGAffineTransform): Pointer; cdecl;
+    function initWithCGPoint(p: CGPoint): Pointer; cdecl;
+    function initWithCGRect(r: CGRect): Pointer; cdecl;
+    function initWithString(representation: NSString): Pointer; cdecl;
+    function initWithValues(values: PCGFloat; count: size_t): Pointer; cdecl;
+    function initWithX(x: CGFloat): Pointer; cdecl; overload;
+    function initWithX(x: CGFloat; Y: CGFloat): Pointer; cdecl; overload;
+    function initWithX(x: CGFloat; Y: CGFloat; Z: CGFloat): Pointer; cdecl; overload;
+    function initWithX(x: CGFloat; Y: CGFloat; Z: CGFloat; W: CGFloat): Pointer; cdecl; overload;
+    function stringRepresentation: NSString; cdecl;
+    function valueAtIndex(index: size_t): CGFloat; cdecl;
+  end;
+  TCIVector = class(TOCGenericImport<CIVectorClass, CIVector>)  end;
+
+  CIColorClass = interface(NSObjectClass)
+    ['{77050FC9-0150-4054-8FA6-3872F5872EFE}']
+    {class} function colorWithCGColor(c: CGColorRef): Pointer; cdecl;
+    {class} function colorWithRed(r: CGFloat; green: CGFloat; blue: CGFloat): Pointer; cdecl; overload;
+    {class} function colorWithRed(r: CGFloat; green: CGFloat; blue: CGFloat; alpha: CGFloat): Pointer; cdecl; overload;
+    {class} function colorWithString(representation: NSString): Pointer; cdecl;
+  end;
+  CIColor = interface(NSObject)
+    ['{7982DEBA-D260-4F18-8AE9-832233CB60A1}']
+    function alpha: CGFloat; cdecl;
+    function blue: CGFloat; cdecl;
+    function colorSpace: CGColorSpaceRef; cdecl;
+    function components: PCGFloat; cdecl;
+    function green: CGFloat; cdecl;
+    function initWithCGColor(c: CGColorRef): Pointer; cdecl;
+    function numberOfComponents: size_t; cdecl;
+    function red: CGFloat; cdecl;
+    function stringRepresentation: NSString; cdecl;
+  end;
+  TCIColor = class(TOCGenericImport<CIColorClass, CIColor>)  end;
+
+  CIContextClass = interface(NSObjectClass)
+    ['{48CA9DD6-BDDF-47F1-9615-EA0B6EAAC4D2}']
+    {class} function contextWithEAGLContext(eaglContext: EAGLContext): Pointer; cdecl; overload;
+    {class} function contextWithEAGLContext(eaglContext: EAGLContext; options: NSDictionary): Pointer; cdecl; overload;
+    {class} function contextWithOptions(dict: NSDictionary): Pointer; cdecl;
+  end;
+  CIContext = interface(NSObject)
+    ['{662F7DD8-DAA6-4771-B2E8-458528D2A757}']
+    function createCGImage(im: CIImage; fromRect: CGRect): CGImageRef; cdecl; overload;
+    function createCGImage(im: CIImage; fromRect: CGRect; format: CIFormat; colorSpace: CGColorSpaceRef): CGImageRef; cdecl; overload;
+    function createCGLayerWithSize(size: CGSize; info: CFDictionaryRef): CGLayerRef; cdecl;
+    procedure drawImage(im: CIImage; atPoint: CGPoint; fromRect: CGRect); cdecl; overload;
+    procedure drawImage(im: CIImage; inRect: CGRect; fromRect: CGRect); cdecl; overload;
+    function inputImageMaximumSize: CGSize; cdecl;
+    function outputImageMaximumSize: CGSize; cdecl;
+    procedure render(im: CIImage; toBitmap: Pointer; rowBytes: ptrdiff_t; bounds: CGRect; format: CIFormat; colorSpace: CGColorSpaceRef); cdecl; overload;
+    procedure render(image: CIImage; toCVPixelBuffer: CVPixelBufferRef); cdecl; overload;
+    procedure render(image: CIImage; toCVPixelBuffer: CVPixelBufferRef; bounds: CGRect; colorSpace: CGColorSpaceRef); cdecl; overload;
+  end;
+  TCIContext = class(TOCGenericImport<CIContextClass, CIContext>)  end;
+
+  CIDetectorClass = interface(NSObjectClass)
+    ['{16F4A5B1-E411-429E-B309-EDD7AB08F155}']
+    {class} function detectorOfType(type_: NSString; context: CIContext; options: NSDictionary): Pointer; cdecl;
+  end;
+  CIDetector = interface(NSObject)
+    ['{465E3620-EA4E-4090-A821-115E489735E2}']
+    function featuresInImage(image: CIImage): NSArray; cdecl; overload;
+    function featuresInImage(image: CIImage; options: NSDictionary): NSArray; cdecl; overload;
+  end;
+  TCIDetector = class(TOCGenericImport<CIDetectorClass, CIDetector>)  end;
+
+  CIFaceFeatureClass = interface(CIFeatureClass)
+    ['{89F91151-B61E-4BE6-B9D7-C9259A777D0E}']
+  end;
+  CIFaceFeature = interface(CIFeature)
+    ['{F6D1BB62-9EEF-4883-A1C0-BC272E0DA9FB}']
+    function hasLeftEyePosition: Boolean; cdecl;
+    function hasMouthPosition: Boolean; cdecl;
+    function hasRightEyePosition: Boolean; cdecl;
+    function leftEyePosition: CGPoint; cdecl;
+    function mouthPosition: CGPoint; cdecl;
+    function rightEyePosition: CGPoint; cdecl;
+  end;
+  TCIFaceFeature = class(TOCGenericImport<CIFaceFeatureClass, CIFaceFeature>)  end;
+
+
+
+implementation
+
+end.

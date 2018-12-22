@@ -6,7 +6,6 @@ mkdir .\res 2> nul
 "..\..\..\..\tools\xmlmerge\XmlMerge.exe"^
  .\res^
  .\libraries\com.ALFacebookLogin.app\res^
- .\libraries\com.alcinoe\res^
  .\libraries\com.facebook.common\res^
  .\libraries\com.facebook.share\res^
  .\libraries\com.facebook.login\res^

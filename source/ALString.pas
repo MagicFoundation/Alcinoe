@@ -592,7 +592,9 @@ Function  ALHexToBinU(const aHex: String): Tbytes;
 Function  ALBase64EncodeStringU(const S: String; const AEncoding: TEncoding = nil): String;
 Function  ALBase64DecodeStringU(const S: String; const AEncoding: TEncoding = nil): String;
 Function  ALBase64EncodeBytesU(const Bytes: Tbytes): String; overload;
+{$IF CompilerVersion >= 31} // berlin
 Function  ALBase64EncodeBytesU(const Bytes: pointer; const Size: Integer): String; overload;
+{$IFEND}
 Function  ALBase64DecodeBytesU(const S: String): Tbytes;
 function  ALIsDecimalU(const S: String; const RejectPlusMinusSign: boolean = False): boolean;
 Function  ALIsInt64U(const S: String): Boolean;

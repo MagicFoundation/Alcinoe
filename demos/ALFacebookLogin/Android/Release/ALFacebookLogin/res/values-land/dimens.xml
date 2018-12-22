@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<resources>
-
-
-  <!-- Floating toolbar dimensions -->
-  <dimen name="al_floating_toolbar_preferred_width">544dp</dimen>
-
-
-</resources>

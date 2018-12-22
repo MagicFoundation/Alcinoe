@@ -70,8 +70,8 @@ type
     ['{3EDC638B-74FD-40D8-A09C-B92919C9D85B}']
   end;
 
-  {***********************************************************}
-  [JavaSignature('com/alcinoe/app/ALDatePickerDialogListener')]
+  {******************************************************************}
+  [JavaSignature('com/alcinoe/datepicker/ALDatePickerDialogListener')]
   JALDatePickerDialogListener = interface(IJavaInstance)
     ['{9A145783-462B-4E51-AAFC-48F68C79C3EA}']
     procedure onBtnClick(which: integer; year: integer; month: integer; dayOfMonth: integer); cdecl;
@@ -87,8 +87,8 @@ type
                           button_neutral_text: JCharSequence): JALDatePickerDialog; cdecl;
   end;
 
-  {***************************************************}
-  [JavaSignature('com/alcinoe/app/ALDatePickerDialog')]
+  {**********************************************************}
+  [JavaSignature('com/alcinoe/datepicker/ALDatePickerDialog')]
   JALDatePickerDialog = interface(JObject)
     ['{DF4E7117-15AA-4063-9150-EEEC2356FCD7}']
     procedure show(year: integer;
@@ -117,8 +117,8 @@ type
     ['{E01C70E2-4BBF-47CB-8713-5A73344E9EA9}']
   end;
 
-  {************************************************************}
-  [JavaSignature('com/alcinoe/text/method/ALKeyPreImeListener')]
+  {*********************************************************}
+  [JavaSignature('com/alcinoe/edittext/ALKeyPreImeListener')]
   JALKeyPreImeListener = interface(IJavaInstance)
     ['{343578E2-962A-461E-ADD7-47A1E4BAA1D9}']
     function onKeyPreIme(keyCode: Integer; event: JKeyEvent): Boolean; cdecl;
@@ -134,8 +134,8 @@ type
     {class} function init(context: JContext; attrs: JAttributeSet; defStyleAttr: Integer; defStyleRes: Integer): JALEditText; cdecl; overload;
   end;
 
-  {**********************************************}
-  [JavaSignature('com/alcinoe/widget/ALEditText')]
+  {************************************************}
+  [JavaSignature('com/alcinoe/edittext/ALEditText')]
   JALEditText = interface(JEditText)
     ['{A3E765A1-44EB-45C0-9AA5-19A38C029CE5}']
     procedure showSoftInput; cdecl;

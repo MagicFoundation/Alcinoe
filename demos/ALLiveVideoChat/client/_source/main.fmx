@@ -1,0 +1,66 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form2'
+  ClientHeight = 705
+  ClientWidth = 519
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnResize = FormResize
+  DesignerMasterStyle = 0
+  object RemoteCameraLayout: TALLayout
+    HitTest = True
+    Position.X = 192.000000000000000000
+    Position.Y = 120.000000000000000000
+    Size.Width = 150.000000000000000000
+    Size.Height = 150.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    OnPaint = RemoteCameraLayoutPaint
+  end
+  object LocalCameraLayout: TALLayout
+    HitTest = True
+    Position.X = 23.000000000000000000
+    Position.Y = 121.000000000000000000
+    Size.Width = 150.000000000000000000
+    Size.Height = 150.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    OnPaint = LocalCameraLayoutPaint
+  end
+  object ButtonCall: TButton
+    Margins.Bottom = 5.000000000000000000
+    Position.X = 24.000000000000000000
+    Position.Y = 16.000000000000000000
+    Size.Width = 81.000000000000000000
+    Size.Height = 35.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Text = 'Connect'
+    OnClick = ButtonCallClick
+  end
+  object ButtonHangUp: TButton
+    Enabled = False
+    Margins.Bottom = 5.000000000000000000
+    Position.X = 120.000000000000000000
+    Position.Y = 16.000000000000000000
+    Size.Width = 81.000000000000000000
+    Size.Height = 35.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+    Text = 'Hang-up'
+    OnClick = ButtonHangUpClick
+  end
+  object ServerUrlEdit: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 4
+    Position.X = 24.000000000000000000
+    Position.Y = 72.000000000000000000
+    Size.Width = 257.000000000000000000
+    Size.Height = 33.000000000000000000
+    Size.PlatformDefault = False
+    TextPrompt = 'Server url'
+  end
+end

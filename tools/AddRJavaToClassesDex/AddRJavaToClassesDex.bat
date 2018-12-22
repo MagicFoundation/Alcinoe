@@ -1,11 +1,10 @@
-cls
 @echo OFF
 setlocal enabledelayedexpansion
 
 REM ----------------------------------------------
 REM Add this Post Build event (android platform) :
-REM $(PROJECTDIR)\android\AddRJavaToClassesDex.bat "$(PROJECTDIR)" "$(OUTPUTPATH)" "$(SDKAaptPath)" "$(SDKApiLevelPath)" "$(JavaDxPath)" "$(JDKPath)"
-REM
+REM C:\Dev\Alcinoe\tools\AddRJavaToClassesDex\AddRJavaToClassesDex.bat "$(PROJECTDIR)" "$(OUTPUTPATH)" "$(SDKAaptPath)" "$(SDKApiLevelPath)" "$(JavaDxPath)" "$(JDKPath)"
+REM 
 REM Example of the generated content of each params : 
 REM $(PROJECTDIR) = C:\MyProject\_source
 REM $(OutputPath) = C:\MyProject\Android\Release\MyProject.so 
@@ -13,7 +12,7 @@ REM $(SDKAaptPath) = C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformS
 REM $(SDKApiLevelPath) = C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\platforms\android-23\android.jar
 REM $(JavaDxPath) = C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\build-tools\23.0.3\dx.bat
 REM $(JDKPath) = C:\Program Files\Java\jdk1.7.0_25
-REM
+REM 
 REM Your project must follow exactly this structure:
 REM $(PROJECTDIR)\android
 REM $(PROJECTDIR)\android\libraries
@@ -25,17 +24,18 @@ REM $(PROJECTDIR)\android\libraries\(library2_packagename_ex:com.facebook)\Andro
 REM $(PROJECTDIR)\android\libraries\(library2_packagename_ex:com.facebook)\res
 REM ....
 REM $(PROJECTDIR)\android\res
-REM
-REM You must also edit the instruction JDKPath1_7="C:\Program Files\Java\jdk1.7.0_80\bin"
-REM Below to point it to the directory of you JDK 1.7
-REM
+REM 
 REM ----------------------------------------------
 
-set logFile=%1\android\AddRJavaToClassesDex.log
-set outputTextSymbols=%1\android\
+
+set batchDir=%~dp0
+set batchDir=%batchDir:~0,-1%
+set logFile=%batchDir%\AddRJavaToClassesDex.log
+
+@echo CommandLine=%0 %* > %logFile%
 
 set ProjectDir=%1
-@echo ProjectDir=%ProjectDir% > %logFile%
+@echo ProjectDir=%ProjectDir% >> %logFile% 2>&1
 
 set SDKAaptPath=%3
 @echo SDKAaptPath=%SDKAaptPath% >> %logFile% 2>&1
@@ -56,9 +56,6 @@ set JavaDxJarPath=%PARENT%lib\dx.jar
 set JDKPath=%6\bin
 @echo JDKPath=%JDKPath% >> %logFile% 2>&1
 
-set JDKPath1_7="C:\Program Files\Java\jdk1.7.0_80\bin"
-@echo JDKPath1_7=%JDKPath1_7% >> %logFile% 2>&1
-
 set FOLDER=%2
 for /D %%D in (%FOLDER%) do (
     set PARENT=%%~dpD
@@ -71,7 +68,8 @@ set APKPath=%APKPath:~0,-3%
 set APKPath=%PARENT%%APKPath%\bin\%APKPath%.apk
 @echo APKPath=%APKPath% >> %logFile% 2>&1
 
-set TMPDir=%ProjectDir%\android\tmp
+set TMPDir=%batchDir%\tmp
+set outputTextSymbols=%TMPDir%\
 
 
 
@@ -115,8 +113,8 @@ for /d %%D in (*) do (
     set package=%%~nxD
     set package=!package:.=\!
 
-    @echo %JDKPath1_7%\javac -d %TMPDir%\obj %TMPDir%\src\!package!\*.java >> %logFile% 2>&1
-    %JDKPath1_7%\javac -d %TMPDir%\obj %TMPDir%\src\!package!\*.java >> %logFile% 2>&1
+    @echo %JDKPath%\javac -d %TMPDir%\obj %TMPDir%\src\!package!\*.java >> %logFile% 2>&1
+    %JDKPath%\javac -d %TMPDir%\obj %TMPDir%\src\!package!\*.java >> %logFile% 2>&1
     IF ERRORLEVEL 1 goto ERROR
 
   )
@@ -130,8 +128,10 @@ REM -------------------------------------------------------------------
 @echo Build a classes.dex that include the R$ classes >> %logFile% 2>&1
 REM -------------------------------------------------------------------
 
-@echo call %JavaDxPath% --dex --output=%TMPDir%\classes.dex %TMPDir%\obj >> %logFile% 2>&1
-call %JavaDxPath% --dex --output=%TMPDir%\classes.dex %TMPDir%\obj >> %logFile% 2>&1
+powershell.exe -nologo -noprofile -command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::CreateFromDirectory('%TMPDir%\obj', '%TMPDir%\obj.zip'); }"
+IF ERRORLEVEL 1 goto ERROR
+@echo call %JavaDxPath% --dex --output=%TMPDir%\classes.dex %TMPDir%\obj.zip >> %logFile% 2>&1
+call %JavaDxPath% --dex --output=%TMPDir%\classes.dex %TMPDir%\obj.zip >> %logFile% 2>&1
 IF ERRORLEVEL 1 goto ERROR
 
 
@@ -156,6 +156,15 @@ del %OutputPath% /q >> %logFile% 2>&1
 copy %TMPDir%\final_classes.dex %OutputPath% >> %logFile% 2>&1
 
 
+REM -------------------------
+@echo. >> %logFile% 2>&1
+@echo R.txt - You can compare against the output of: >> %logFile% 2>&1
+REM -------------------------
+
+@echo %SDKAaptPath% dump resources %APKPath% >> %logFile% 2>&1
+@echo. >> %logFile% 2>&1
+type %outputTextSymbols%R.txt >> %logFile%
+
 
 REM --------------------------------------
 @echo. >> %logFile% 2>&1
@@ -163,19 +172,6 @@ REM --------------------------------------
 REM --------------------------------------
 
 rmdir %TMPDir% /s /q >> %logFile% 2>&1
-
-
-
-REM -------------------------
-@echo. >> %logFile% 2>&1
-@echo R.txt - You can compare against the output of: >> %logFile% 2>&1
-@echo %SDKAaptPath% dump resources %APKPath% >> %logFile% 2>&1
-REM -------------------------
-
-@echo. >> %logFile% 2>&1
-type %outputTextSymbols%R.txt >> %logFile%
-del %outputTextSymbols%R.txt /q >> %logFile% 2>&1
-
 
 
 REM ----------------------------

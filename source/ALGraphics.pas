@@ -52,6 +52,9 @@ function ALJBitmaptoTexture(const aBitmap: Jbitmap; const aVolatileTexture: bool
 {$IF defined(ANDROID) or defined(IOS)}
 function ALBitmapSurfacetoTexture(const aBitmapSurface: TbitmapSurface; const aVolatileTexture: boolean = true): TTexture;
 {$ENDIF}
+{$IFDEF _USE_TEXTURE}
+function ALTransformBitmaptoTexture(var aBitmap: Tbitmap; const aVolatileTexture: boolean = true): TTexture;
+{$ENDIF}
 
 type
 
@@ -262,6 +265,9 @@ uses system.sysutils,
      ALFmxTypes3D,
      alFmxCommon,
      {$ENDIF}
+     {$IFDEF _USE_TEXTURE}
+     FMX.Canvas.GPU,
+     {$ENDIF}
      ALCommon;
 
 {********************}
@@ -358,6 +364,73 @@ begin
     ALFreeAndNil(result);
     raise;
   end;
+end;
+{$ENDIF}
+
+{*******************}
+{$IFDEF _USE_TEXTURE}
+function ALTransformBitmaptoTexture(var aBitmap: Tbitmap; const aVolatileTexture: boolean = true): TTexture;
+var aBitmapSurface: TbitmapSurface;
+    aPaintingTexture: TTexture;
+begin
+
+  //If TCustomCanvasGpu then simply move the textureID to the result
+  if aBitmap.CanvasClass.InheritsFrom(TCustomCanvasGpu) then begin
+
+    //TBitmap.image = TBitmapImage
+    //TBitmap.image.handle = TBitmapCtx (but casted as THandle)
+    aPaintingTexture := TBitmapCtx(aBitmap.Handle).PaintingTexture;
+    Result := TalTexture.Create(aVolatileTexture);
+    try
+
+      //assign aPaintingTexture to Result
+      {$IF CompilerVersion > 32} // tokyo
+        {$MESSAGE WARN 'Check if ALFMXTypes3D.TALTextureAccessPrivate still has the exact same fields and adjust the IFDEF'}
+      {$ENDIF}
+      TALTextureAccessPrivate(Result).FWidth := aPaintingTexture.width;
+      TALTextureAccessPrivate(Result).FHeight := aPaintingTexture.height;
+      TALTextureAccessPrivate(Result).FPixelFormat := aPaintingTexture.PixelFormat;
+      TALTextureAccessPrivate(Result).FHandle := aPaintingTexture.Handle;
+      TALTextureAccessPrivate(Result).FStyle := aPaintingTexture.Style;
+      TALTextureAccessPrivate(Result).FMagFilter := aPaintingTexture.MagFilter;
+      TALTextureAccessPrivate(Result).FMinFilter := aPaintingTexture.MinFilter;
+      TALTextureAccessPrivate(Result).FTextureScale := aPaintingTexture.TextureScale;
+      //FRequireInitializeAfterLost: Boolean;
+      //FBits: Pointer;
+      //FContextLostId: Integer;
+      //FContextResetId: Integer;
+
+      //set the handle of aTmpTexture to 0 to avoid the
+      //textureID to be deleted from OpenGL when we will free aBitmap
+      ITextureAccess(aPaintingTexture).Handle := 0;
+
+      {$IFDEF DEBUG}
+      if result.PixelFormat <> TPixelFormat.None then AtomicIncrement(TotalMemoryUsedByTextures, result.Width * result.Height * result.BytesPerPixel);
+      {$ENDIF}
+
+    except
+      ALFreeAndNil(Result);
+      raise;
+    end;
+
+  end
+
+  //else use a aBitmapSurface to transfert the bitmap to the texture
+  else begin
+
+    aBitmapSurface := TbitmapSurface.create;
+    try
+      aBitmapSurface.Assign(aBitmap);
+      result := ALBitmapSurfacetoTexture(aBitmapSurface);
+    finally
+      alfreeAndNil(aBitmapSurface);
+    end;
+
+  end;
+
+  //free the aBitmap as we extract the texture from it
+  alFreeAndNil(aBitmap);
+
 end;
 {$ENDIF}
 

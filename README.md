@@ -41,7 +41,7 @@ Compiled demo
 
 #### Android #### 
 
-* https://tinyurl.com/zoxavr9 (alFmxControl.apk)
+* https://tinyurl.com/zoxavr9 (ALFmxControl.apk)
 * https://tinyurl.com/yd7c4ofk (ALFirebaseMessagingDemo.apk)
 * https://tinyurl.com/y9gzos9f (ALFacebookLogin.apk)
 * https://tinyurl.com/yaft2wxr (ALFmxEffects.apk)

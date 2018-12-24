@@ -37,6 +37,7 @@ Compiled demo
 * https://svn.code.sf.net/p/alcinoe/code/demos/ALStringBenchmark/win32/ALStringBenchmark.exe
 * https://svn.code.sf.net/p/alcinoe/code/demos/ALWebSpider/win32/ALWebSpiderDemo.exe
 * https://svn.code.sf.net/p/alcinoe/code/demos/ALXmlDoc/win32/AlXmlDocDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/demos/ALLiveVideoChat/server/Win32/Release/ALLiveVideoChatServer.exe
 
 #### Android #### 
 
@@ -44,6 +45,7 @@ Compiled demo
 * https://tinyurl.com/yd7c4ofk (ALFirebaseMessagingDemo.apk)
 * https://tinyurl.com/y9gzos9f (ALFacebookLogin.apk)
 * https://tinyurl.com/yaft2wxr (ALFmxEffects.apk)
+* https://tinyurl.com/ydymo23w (ALLiveVideoChatClient.apk)
 
 #### iOS #### 
 

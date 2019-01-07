@@ -39,11 +39,10 @@ type
   {**************************}
   TALTexture = class(TTexture)
   private
-    fVolatile: Boolean;
     FisExternalOES: Boolean;
   protected
   public
-    constructor Create(const aVolatile: Boolean = {$IF CompilerVersion <= 31}{berlin}False{$ELSE}True{$ENDIF}); reintroduce; virtual;
+    constructor Create; override;
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     property isExternalOES: boolean read fisExternalOES write fisExternalOES;
@@ -69,7 +68,7 @@ type
     FFormat: TALTextureFormat;
   protected
   public
-    constructor Create(const aVolatile: Boolean = {$IF CompilerVersion <= 31}{berlin}False{$ELSE}True{$ENDIF}); override;
+    constructor Create; override;
     destructor Destroy; override;
     property SecondTexture: TTexture read FSecondTexture;
     property Format: TALTextureFormat read fformat write fformat;
@@ -83,7 +82,7 @@ type
     FFormat: TALTextureFormat;
   protected
   public
-    constructor Create(const aVolatile: Boolean = {$IF CompilerVersion <= 31}{berlin}False{$ELSE}True{$ENDIF}); override;
+    constructor Create; override;
     destructor Destroy; override;
     property SecondTexture: TTexture read FSecondTexture;
     property ThirdTexture: TTexture read FThirdTexture;
@@ -138,11 +137,6 @@ type
     property CrTexture: TTexture read FCrTexture write SetCrTexture;
   end;
 
-{$IFDEF DEBUG}
-var TotalMemoryUsedByTextures: int64;
-    LastTotalMemoryUsedByTexturesLog: int64;
-{$ENDIF}
-
 implementation
 
 uses system.sysutils,
@@ -159,17 +153,27 @@ uses system.sysutils,
      {$ENDIF}
      ALCommon;
 
-{******************************************************************}
-//aVolatile = true mean DO NOT COPY the bytes in an internal storage
-//to have the possibility to recreate later the texture if we lost the
-//context. From Tokyo we don't lost anymore the context when the app go
-//in background/foreground so it's useless to set it to false
-constructor TALTexture.Create(const aVolatile: Boolean = True);
+{$IFDEF DEBUG}
+var TotalMemoryUsedByTextures: int64;
+    LastTotalMemoryUsedByTexturesLog: int64;
+{$ENDIF}
+
+{****************************}
+constructor TALTexture.Create;
 begin
+
+   //inherited create
    inherited Create;
-   fVolatile := aVolatile;
-   if fVolatile then Style := Style + [TTextureStyle.Volatile];
+
+   //TTextureStyle.Volatile mean DO NOT COPY the bytes in an internal storage
+   //to have the possibility to recreate later the texture if we lost the
+   //context. From Berlin we don't lost anymore the context when the app go
+   //in background/foreground so it's useless to set it to false
+   Style := Style + [TTextureStyle.Volatile];
+
+   //init FisExternalOES
    FisExternalOES := False;
+
 end;
 
 {****************************}
@@ -221,8 +225,7 @@ begin
     {$ENDIF}
       if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
       PixelFormat := TBitmap(Source).PixelFormat;
-      Style := [TTextureStyle.Dynamic];
-      if fVolatile then Style := Style + [TTextureStyle.Volatile];
+      Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
       TALTextureAccessPrivate(self).fTextureScale := TBitmap(Source).BitmapScale;
       SetSize(TBitmap(Source).Width, TBitmap(Source).Height);
       if TBitmap(Source).Map(TMapAccess.Read, M) then
@@ -244,10 +247,34 @@ begin
     //try
     {$ENDIF}
       if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
-      Style := [TTextureStyle.Dynamic];
-      if fVolatile then Style := Style + [TTextureStyle.Volatile];
+      Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
       SetSize(TBitmapSurface(Source).Width, TBitmapSurface(Source).Height);
       UpdateTexture(TBitmapSurface(Source).Bits, TBitmapSurface(Source).Pitch);
+    {$IF CompilerVersion >= 32} // tokyo
+    //finally
+    //  TMonitor.exit(Self);
+    //end;
+    {$ENDIF}
+  end
+
+  else if Source is TTexture then begin
+    {$IF CompilerVersion >= 32} // tokyo
+    //TMonitor.Enter(Self);
+    //try
+    {$ENDIF}
+      if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
+      TALTextureAccessPrivate(self).FWidth := TTexture(Source).width;
+      TALTextureAccessPrivate(self).FHeight := TTexture(Source).height;
+      TALTextureAccessPrivate(self).FPixelFormat := TTexture(Source).PixelFormat;
+      TALTextureAccessPrivate(self).FHandle := TTexture(Source).Handle;
+      TALTextureAccessPrivate(self).FStyle := TTexture(Source).Style + [TTextureStyle.Volatile];
+      TALTextureAccessPrivate(self).FMagFilter := TTexture(Source).MagFilter;
+      TALTextureAccessPrivate(self).FMinFilter := TTexture(Source).MinFilter;
+      TALTextureAccessPrivate(self).FTextureScale := TTexture(Source).TextureScale;
+      //FRequireInitializeAfterLost: Boolean;
+      //FBits: Pointer;
+      //FContextLostId: Integer;
+      //FContextResetId: Integer;
     {$IF CompilerVersion >= 32} // tokyo
     //finally
     //  TMonitor.exit(Self);
@@ -269,11 +296,11 @@ begin
 
 end;
 
-{*********************************************************************}
-constructor TALBiPlanarTexture.Create(const aVolatile: Boolean = True);
+{************************************}
+constructor TALBiPlanarTexture.Create;
 begin
   inherited;
-  FSecondTexture := TALTexture.Create(aVolatile);
+  FSecondTexture := TALTexture.Create;
   FFormat := TALTextureFormat.f420YpCbCr8BiPlanarVideoRange;
 end;
 
@@ -284,12 +311,12 @@ begin
   inherited;
 end;
 
-{*******************************************************************}
-constructor TALPlanarTexture.Create(const aVolatile: Boolean = True);
+{**********************************}
+constructor TALPlanarTexture.Create;
 begin
   inherited;
-  FSecondTexture := TALTexture.Create(aVolatile);
-  FThirdTexture := TALTexture.Create(aVolatile);
+  FSecondTexture := TALTexture.Create;
+  FThirdTexture := TALTexture.Create;
   FFormat := TALTextureFormat.f420YpCbCr8Planar;
 end;
 

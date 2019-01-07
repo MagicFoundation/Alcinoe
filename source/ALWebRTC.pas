@@ -570,11 +570,11 @@ begin
   {$IF defined(android)}
 
 
-    fLocalbitmap := TALTexture.Create(true{aVolatile});
+    fLocalbitmap := TALTexture.Create;
     TALTexture(fLocalbitmap).isExternalOES := true;
     fLocalbitmap.Style := fLocalbitmap.Style - [TTextureStyle.MipMaps];
     //-----
-    fRemotebitmap := TALTexture.Create(true{aVolatile});
+    fRemotebitmap := TALTexture.Create;
     TALTexture(fRemotebitmap).isExternalOES := true;
     fRemotebitmap.Style := fRemotebitmap.Style - [TTextureStyle.MipMaps];
     //-----

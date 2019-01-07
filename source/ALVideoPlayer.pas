@@ -780,7 +780,7 @@ begin
   fEventListener := TALEventListener.Create(Self);
   fSimpleExoPlayer.AddListener(fEventListener);
   //-----
-  fBitmap := TalTexture.Create(true{aVolatile});
+  fBitmap := TalTexture.Create;
   ALInitializeEXTERNALOESTexture(fBitmap);
   fSurfaceTexture := TJSurfaceTexture.JavaClass.init(fBitmap.Handle);
   //-----
@@ -1233,7 +1233,7 @@ begin
   end;
 
   //-----
-  fBitmap := TalTexture.Create(true{aVolatile});
+  fBitmap := TalTexture.Create;
   fBitmap.PixelFormat := TCustomContextIOS.PixelFormat;
 
   //-----

@@ -240,7 +240,6 @@ uses system.sysutils,
      Androidapi.JNIBridge,
      Androidapi.JNI.JavaTypes,
      Androidapi.Helpers,
-     Androidapi.JNI.OpenGL,
      Androidapi.Gles2,
      Androidapi.JNI.Media,
      FMX.Context.GLES,
@@ -273,71 +272,14 @@ uses system.sysutils,
 {********************}
 {$IF defined(ANDROID)}
 function ALJBitmaptoTexture(const aBitmap: Jbitmap): TTexture;
-var Tex: GLuint;
 begin
-
-  {$IF CompilerVersion > 32} // tokyo
-    {$MESSAGE WARN 'Check if the full flow of FMX.Types3D.TTexture.Assign is still the same as below and adjust the IFDEF'}
-  {$ENDIF}
   result := TALTexture.Create;
   try
-    result.Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
-    result.SetSize(aBitmap.getWidth, aBitmap.getHeight);
-    if not (result.IsEmpty) then begin
-      if result.PixelFormat = TPixelFormat.None then result.PixelFormat := TCustomAndroidContext.PixelFormat;
-      {$IF CompilerVersion <= 31} // berlin
-      TCustomAndroidContext.SharedContext; // >> because stupidly CreateSharedContext is protected :(
-      if TCustomAndroidContext.IsContextAvailable then
-      {$ELSE} // Tokyo
-      if TCustomAndroidContext.Valid then
-      {$ENDIF}
-      begin
-        glActiveTexture(GL_TEXTURE0);
-        glGenTextures(1, @Tex);
-        glBindTexture(GL_TEXTURE_2D, Tex);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        case result.MagFilter of
-          TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-          TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        end;
-        if TTextureStyle.MipMaps in result.Style then
-        begin
-          case result.MinFilter of
-            TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-            TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-          end;
-        end
-        else
-        begin
-          case result.MinFilter of
-            TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          end;
-        end;
-        TJGLUtils.JavaClass.texImage2D(GL_TEXTURE_2D, // target: Integer;
-                                       0, // level: Integer;
-                                       aBitmap, // bitmap: JBitmap;
-                                       0); // border: Integer  => glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nil);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        ITextureAccess(result).Handle := Tex;
-        if (TCustomAndroidContext.GLHasAnyErrors()) then
-          RaiseContextExceptionFmt(@SCannotCreateTexture, ['TALTexture']);
-      end;
-    end;
+    TALTexture(result).Assign(aBitmap);
   except
     ALFreeAndNil(result);
     raise;
   end;
-
-  {$IFDEF DEBUG}
-  if result.PixelFormat <> TPixelFormat.None then AtomicIncrement(TotalMemoryUsedByTextures, result.Width * result.Height * result.BytesPerPixel);
-  if TThread.GetTickCount - AtomicCmpExchange(LastTotalMemoryUsedByTexturesLog, 0, 0) > 1000 then begin // every 1 sec
-    AtomicExchange(LastTotalMemoryUsedByTexturesLog, TThread.GetTickCount); // oki maybe 2 or 3 log can be show simultaneously. i will not died for this !
-    ALLog('TALTexture', 'TotalMemoryUsedByTextures: ' + ALFormatFloatU('0.##', AtomicCmpExchange(TotalMemoryUsedByTextures, 0, 0) / 1000000, ALDefaultFormatSettingsU) +' MB', TalLogType.verbose);
-  end;
-  {$ENDIF}
-
 end;
 {$ENDIF}
 

@@ -4,6 +4,7 @@ interface
 
 uses System.Classes,
      {$IFDEF ANDROID}
+     Androidapi.JNI.GraphicsContentViewText,
      FMX.Context.GLES.Android,
      {$ELSEIF defined(IOS)}
      FMX.Context.GLES.iOS,
@@ -44,7 +45,10 @@ type
   public
     constructor Create; override;
     destructor Destroy; override;
-    procedure Assign(Source: TPersistent); override;
+    procedure Assign(Source: TPersistent); overload; override;
+    {$IF defined(ANDROID)}
+    procedure Assign(Source: jbitmap); overload;
+    {$ENDIF}
     property isExternalOES: boolean read fisExternalOES write fisExternalOES;
   end;
 
@@ -141,6 +145,7 @@ implementation
 
 uses system.sysutils,
      {$IF defined(ANDROID)}
+     Androidapi.JNI.OpenGL,
      Androidapi.Gles2,
      Androidapi.Gles2ext,
      FMX.Context.GLES,
@@ -295,6 +300,85 @@ begin
   {$ENDIF}
 
 end;
+
+{********************}
+{$IF defined(ANDROID)}
+procedure TALTexture.Assign(Source: jbitmap);
+var Tex: GLuint;
+begin
+
+  {$IFDEF DEBUG}
+  if PixelFormat <> TPixelFormat.None then AtomicDecrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
+  {$ENDIF}
+
+  {$IF CompilerVersion > 32} // tokyo
+    {$MESSAGE WARN 'Check if the full flow of FMX.Types3D.TTexture.Assign is still the same as below and adjust the IFDEF'}
+  {$ENDIF}
+  {$IF CompilerVersion >= 32} // tokyo
+  //TMonitor.Enter(Self);
+  //try
+  {$ENDIF}
+    if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
+    Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
+    SetSize(Source.getWidth, Source.getHeight);
+    if not (IsEmpty) then begin
+      if PixelFormat = TPixelFormat.None then PixelFormat := TCustomAndroidContext.PixelFormat;
+      {$IF CompilerVersion <= 31} // berlin
+      TCustomAndroidContext.SharedContext; // >> because stupidly CreateSharedContext is protected :(
+      if TCustomAndroidContext.IsContextAvailable then
+      {$ELSE} // Tokyo
+      if TCustomAndroidContext.Valid then
+      {$ENDIF}
+      begin
+        glActiveTexture(GL_TEXTURE0);
+        glGenTextures(1, @Tex);
+        glBindTexture(GL_TEXTURE_2D, Tex);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        case MagFilter of
+          TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+          TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        end;
+        if TTextureStyle.MipMaps in Style then
+        begin
+          case MinFilter of
+            TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+            TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+          end;
+        end
+        else
+        begin
+          case MinFilter of
+            TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          end;
+        end;
+        TJGLUtils.JavaClass.texImage2D(GL_TEXTURE_2D, // target: Integer;
+                                       0, // level: Integer;
+                                       Source, // bitmap: JBitmap;
+                                       0); // border: Integer  => glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nil);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        ITextureAccess(self).Handle := Tex;
+        if (TCustomAndroidContext.GLHasAnyErrors()) then
+          RaiseContextExceptionFmt(@SCannotCreateTexture, ['TALTexture']);
+      end;
+    end;
+  {$IF CompilerVersion >= 32} // tokyo
+  //finally
+  //  TMonitor.exit(Self);
+  //end;
+  {$ENDIF}
+
+  {$IFDEF DEBUG}
+  if PixelFormat <> TPixelFormat.None then AtomicIncrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
+  if TThread.GetTickCount - AtomicCmpExchange(LastTotalMemoryUsedByTexturesLog, 0, 0) > 1000 then begin // every 1 sec
+    AtomicExchange(LastTotalMemoryUsedByTexturesLog, TThread.GetTickCount); // oki maybe 2 or 3 log can be show simultaneously. i will not died for this !
+    ALLog('TALTexture', 'TotalMemoryUsedByTextures: ' + ALFormatFloatU('0.##', AtomicCmpExchange(TotalMemoryUsedByTextures, 0, 0) / 1000000, ALDefaultFormatSettingsU) +' MB', TalLogType.verbose);
+  end;
+  {$ENDIF}
+
+end;
+{$ENDIF}
 
 {************************************}
 constructor TALBiPlanarTexture.Create;

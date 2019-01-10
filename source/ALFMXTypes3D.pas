@@ -47,7 +47,7 @@ type
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); overload; override;
     {$IF defined(ANDROID)}
-    procedure Assign(Source: jbitmap); overload;
+    procedure Assign(Source: jbitmap); reintroduce; overload;
     {$ENDIF}
     property isExternalOES: boolean read fisExternalOES write fisExternalOES;
   end;

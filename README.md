@@ -1,11 +1,11 @@
 Alcinoe
 =======
 
-Alcinoe is a library visual and non-visual components for Delphi. The components can 
+Alcinoe is a library of visual and non-visual components for Delphi. The components can 
 be used in commercial as well as shareware and freeware and open source projects 
 without cost.
 
-Please "star" (like) this project in Ghitub! It's cost nothing but help
+Please "star" (like) this project in GitHub! It's cost nothing but help
 to reference the code
 
 <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-24.jpg?raw=true" alt="like" />
@@ -13,7 +13,7 @@ to reference the code
 App made with Alcinoe
 ---------------------
 
-* Youtube: https://www.youtube.com/watch?v=WEsEhGfrW-g&vq=hd2160
+* YouTube: https://www.youtube.com/watch?v=WEsEhGfrW-g&vq=hd2160
 * iOS: https://itunes.apple.com/us/app/id1420049759
 * Android: https://play.google.com/store/apps/details?id=club.kiskis.app&hl=en
 
@@ -52,30 +52,30 @@ Compiled demo
 Please ask apple how to do
 
 
-Full opengl video player for firemonkey
+Full opengl video player for FireMonkey
 ---------------------------------------
 
 ALVideoPlayer will render a video to a TEXTURE. This is really important 
-because you can fully integrate the video in the delphi form and you can 
+because you can fully integrate the video in the Delphi form and you can 
 place any controls you want on the top of it as it's support Z-ORDER. 
-Official delphi video player are just native video player window on the top 
+Official Delphi video player are just native video player window on the top 
 of the form and thus not supporting Z-ORDER.
 
 Under android I use ExoPlayer. ExoPlayer supports features 
 like Dynamic adaptive streaming over HTTP (DASH), HLS, SmoothStreaming and 
 Common Encryption, which are not supported by MediaPlayer. It's designed 
-to be easy to customize and extend. Under Ios i use AVPlayer with support 
-also HLS like exoplayer do.
+to be easy to customize and extend. Under iOS I use AVPlayer with support 
+also HLS like ExoPlayer do.
 
 <p align="left">
-  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-1.jpg?raw=true" alt="video player for firemonkey" width="280" style="width:280px;"/>
-  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-2.jpg?raw=true" alt="video player for firemonkey" width="280" style="width:280px;"/>
-  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-3.jpg?raw=true" alt="video player for firemonkey" width="280" style="width:280px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-1.jpg?raw=true" alt="video player for FireMonkey" width="280" style="width:280px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-2.jpg?raw=true" alt="video player for FireMonkey" width="280" style="width:280px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-3.jpg?raw=true" alt="video player for FireMonkey" width="280" style="width:280px;"/>
 </p>
 
 
 
-WebRTC delphi wrapper
+WebRTC Delphi wrapper
 ---------------------
 
 WebRTC (Web Real-Time Communications) is a technology which enables Web applications and 
@@ -93,21 +93,21 @@ your applications, which opens up a whole new world of interactivity
 </p>
 
 
-Firemonkey native ios/android TEdit and TMemo
+Firemonkey native iOS/Android TEdit and TMemo
 ---------------------------------------------
 
-The spirit is to mix firemonkey control with native platform control
-when the fonctionality on such control start to be very hard to
+The spirit is to mix FireMonkey control with native platform control
+when the functionality on such control start to be very hard to
 implement (like webbrowser, edit, memo, datepicker, etc.). But it's
 not to make several distinct form for several platform like 
-offer for exemple http://www.turbococoa.com/ (but this option is
+offer for example http://www.turbococoa.com/ (but this option is
 also a good alternative in some way, it's up to you to decide)
 
-In delphi (berlin) their is already IOS platform control that was 
+In Delphi (berlin) their is already IOS platform control that was 
 quite well implemented but close to none android platform control 
-and so i start to build native android/ios controls like TEdit/TMemo. 
+and so I start to build native android/iOS controls like TEdit/TMemo. 
 These control work mostly like some windows that are placed on The
-top of the form (so off course no z-order with firemonkey control)
+top of the form (so off course no z-order with FireMonkey control)
 
 
 <p align="left">
@@ -120,12 +120,12 @@ top of the form (so off course no z-order with firemonkey control)
 
 
 
-Fast/doublebuffered firemonkey controls with native draw
+Fast/double-buffered FireMonkey controls with native draw
 --------------------------------------------------------
 
 * Rectangle
 * Circle
-* Text (Can also draw html text on ios/android/win/macos)
+* Text (Can also draw html text on iOS/android/win/macOS)
 * Glyph
 * etc.
 
@@ -135,59 +135,59 @@ Fast/doublebuffered firemonkey controls with native draw
 
 #### The fact ####
 
-Painting of Firmonkey controls can be sometime slow, or say 
-differently, not sufficiently fast for a fluid scrolling. For exemple if 
-you simply look the basic Trectangle with round corners, the paint procedure 
-can take around 3 ms! So if you have around 20 visible Trectangles on your 
-screen, then it's will cost you around 60 ms to repaint the full screen 
-(and normally you don't have only trectangle, you also have Tlabel, 
-tcheckbox, etc..). After it's just math, take 100ms to repaint the screen, 
+Painting of FireMonkey controls can be sometime slow, or say 
+differently, not sufficiently fast for a fluid scrolling. For example if 
+you simply look the basic TRectangle with round corners, the paint procedure 
+can take around 3ms! So if you have around 20 visible TRectangles on your 
+screen, then it's will cost you around 60ms to repaint the full screen 
+(and normally you don't have only TRectangle, you also have TLabel, 
+TCheckbox, etc..). After it's just math, take 100ms to repaint the screen, 
 so you can only do around 10 frames per seconds (in reality you will have 
 much less even) so the scrolling can't be fluid :(
 
 #### The solution #### 
  
-I didn't want to rebuild the firemonkey controls, it's too 
+I didn't want to rebuild the FireMonkey controls, it's too 
 huge job for me, and instead I try to find an intermediate solution. 
-This what I find by adding "doublebuffered" property to the firemonkey 
+This what I find by adding "double-buffered" property to the FireMonkey 
 controls. So instead to repaint and repaint (and repaint) the controls 
 for every single pixels move of the scrollbox, I first paint the control 
 on a "buffer" that I store directly in the GPU memory (through TTexture), 
 and when the system ask me to repaint the controls instead of calling 
-again the paint algorithm i simply redraw the buffer TTexture.
+again the paint algorithm I simply redraw the buffer TTexture.
 
 #### The results ####  
 
-As I say before it's took 3 ms just to paint a simple 
-Trectangle with round corners. With my doublebuffered property 
-it's take now around 0.1 ms ! so now the scroll look much more 
+As I say before it's took 3ms just to paint a simple 
+TRectangle with round corners. With my double-buffered property 
+it's take now around 0.1ms! So now the scroll looks much more 
 fluid! 
 
-#### OpenGL draw => Replaced by native ios/android draw ####
+#### OpenGL draw => Replaced by native iOS/android draw ####
 
-Most of the basic shape (like Trectangle, Tcircle, etc.) use openGL to 
+Most of the basic shape (like TRectangle, TCircle, etc.) use openGL to 
 draw. it's not very efficient, for example to draw a circle under 
 openGL you will in fact draw 50 triangles. This result often in poor 
 quality : https://quality.embarcadero.com/browse/RSP-15206
 For roundrect it's even worse because you must first calculate the 
-path and then later draw it (much more slow than Tcircle)
+path and then later draw it (much more slow than TCircle)
 
 Other problem is all of these draw depend of Form.quality. if you set 
-form.quality to highquality then everythink you will do on the
-canvas will be multisample like drawing an image for exemple and that 
+form.quality to highquality then everything you will do on the
+canvas will be multisample like drawing an image for example and that 
 could be problematic because the image will be anti-aliased. if you set 
 form.quality to highperformance then the draw will be very rough (no 
 anti aliasing). 
 
-To resolve this, i build the buffer of my control using NATIVE 
+To resolve this, I build the buffer of my control using NATIVE 
 ANDROID/IOS API. In this way we will have a high quality draw at also
-a high speed without being dependant of the form.quality
+a high speed without being dependent of the form.quality
 
 <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-9.jpg?raw=true" alt="TALCircle" />
 
 
 
-Improuved firemonkey controls
+Improved FireMonkey controls
 -----------------------------
 
 * ScrollBox
@@ -197,16 +197,16 @@ Improuved firemonkey controls
 <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-5.jpg?raw=true" alt="RangeTrackBar" width="600" style="width:600px;"  />
 
 <p align="left">
-  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-15.jpg?raw=true" alt="video player for firemonkey" width="280" style="width:280px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-15.jpg?raw=true" alt="video player for FireMonkey" width="280" style="width:280px;"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-14.jpg?raw=true" alt="video player for firemonkey" width="280" style="width:280px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-14.jpg?raw=true" alt="video player for FireMonkey" width="280" style="width:280px;"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-16.jpg?raw=true" alt="video player for firemonkey" width="280" style="width:280px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-16.jpg?raw=true" alt="video player for FireMonkey" width="280" style="width:280px;"/>
 </p>
 
 
 
-Firebase clound messaging
+Firebase cloud messaging
 -------------------------
 
 A cross-platform method of using Firebase Cloud Messaging (FCM) to receive push notifications
@@ -215,7 +215,7 @@ You can send notification messages to drive user re-engagement and retention. Fo
 such as instant messaging, a message can transfer a payload of up to 4KB to a client app.
 
 
-Android/ios facebook sdk login
+Android/iOS Facebook SDK login
 ------------------------------
 
 The Facebook SDK for Android enables people to sign into your app with Facebook Login. 
@@ -223,16 +223,16 @@ When people log into your app with Facebook they can grant permissions to your a
 you can retrieve information or perform actions on Facebook on their behalf.
 
 
-Photo Editor Filters for Android/Ios
+Photo Editor Filters for Android/iOS
 ------------------------------------
 
 With TALColorAdjustEffect, gorgeous photo filters with one-tap auto 
 enhance, make your photos beautiful and expressive in just minutes! 
 
 <p align="left">
-  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-18.jpg?raw=true" alt="video player for firemonkey" width="320" style="width:320px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-18.jpg?raw=true" alt="video player for FireMonkey" width="320" style="width:320px;"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-19.jpg?raw=true" alt="video player for firemonkey" width="320" style="width:320px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-19.jpg?raw=true" alt="video player for FireMonkey" width="320" style="width:320px;"/>
 </p>
 
 
@@ -271,7 +271,7 @@ implement DOM parser and also a SAX parser.
 TALJsonDocument syntax is very similar
 to TALXMLdocument / TXMLDocument
 
-exemple :
+Example :
 
     {
       _id: 1,
@@ -367,7 +367,7 @@ To parse an JSON document in Sax Mode :
     MyJsonDoc.LoadFromJSON(AJsonStr, true{saxMode});
 
 
-ImageMagick wrapper for delphi
+ImageMagick wrapper for Delphi
 ---------------------------------------
 
 Use ImageMagick® to create, edit, compose, or convert bitmap 
@@ -378,7 +378,7 @@ flip, mirror, rotate, distort, shear and transform images,
 adjust image colors, apply various special effects, or draw 
 text, lines, polygons, ellipses and Bézier curves.
 
-Exemple :
+Example :
 
     var aWand: PMagickWand;
     begin
@@ -425,7 +425,7 @@ added to the pool. Connection pooling also cuts down on the
 amount of time a user must wait to establish a connection
 to the database.
 
-Exemple :
+Example :
 
     aJSONDoc := TALJSONDocument.create;
     aMongoDBClient := TAlMongoDBClient.create;
@@ -444,19 +444,19 @@ Exemple :
       aJSONDoc.free;
     end;
 
-Exemple with connection pool :
+Example with connection pool :
 
     aMongoDBConnectionPoolClient := TAlMongoDBConnectionPoolClient.create(aDBHost, aDBPort);
     try
     
       ::Thread1::
-      aMongoDBConnectionPoolClient.SelectData('test.exemple',
+      aMongoDBConnectionPoolClient.SelectData('test.example',
                                               '{fieldA:123}', // the query
                                               '{fieldA:1, fieldB:1}', // the return fields selector
                                               aLocalVarJSONDOC.node);
     
       ::Thread2::
-      aMongoDBConnectionPoolClient.SelectData('test.exemple',
+      aMongoDBConnectionPoolClient.SelectData('test.example',
                                               '{fieldA:999}', // the query
                                               '{fieldA:1, fieldB:1}', // the return fields selector
                                               aLocalVarJSONDOC.node);
@@ -465,7 +465,7 @@ Exemple with connection pool :
       aMongoDBClient.free;
     end;
 
-Exemple tail monitoring :
+Example tail monitoring :
 
     aMongoDBTailMonitoringThread := TAlMongoDBTailMonitoringThread.Create(
                                       aDBHost,
@@ -490,17 +490,17 @@ Exemple tail monitoring :
 Fast TStringList
 ----------------
 
-TALStringList Work the same as Delphi TstringList except that it's
+TALStringList Work the same as Delphi TStringList except that it's
 allow to search a name=value using a quicksort algorithm when the
-list is sorted. Also TALStringList use a locale independant
-algorithme (based on the 8-bit ordinal value of each character)
+list is sorted. Also TALStringList use a locale independent
+algorithm (based on the 8-bit ordinal value of each character)
 instead of the AnsiCompareText and AnsiCompareStr used by the
-Delphi TstringList. at the end the sort in TALStringList is up to
-10x more faster than in Delphi TstringList. Also TALStringList is
-not an unicode TstringList but an 100% Ansi StringList
+Delphi TStringList. at the end the sort in TALStringList is up to
+10x more faster than in Delphi TStringList. Also TALStringList is
+not an Unicode TStringList but an 100% Ansi StringList
 
 TALNVStringList (NV for NameValue) is same as TALStringList (use
-also a quicksort algorithme) except that here optimisation is
+also a quicksort algorithm) except that here optimization is
 oriented for name/value list instead of string list.
 
 TALHashedStringList
@@ -543,7 +543,7 @@ quick deployment, ease of development, and solves many
 problems facing large data caches.
 
 
-GSM compoment
+GSM component
 -------------
 
 The TAlGSMComm component implements SMS text messaging
@@ -611,23 +611,23 @@ https://github.com/Zeus64/alcinoe
 WIN64
 -----
 
-Unfortunatly, in win64 we lost all the FastCode heritage. 
+Unfortunately, in win64 we lost all the FastCode heritage. 
 (that was mostly based on ASM). That mean that most of 
 the functions will be around 2x to 10x more slower. 
 you can try to launch /demo/ALStringBenchMark/
 in win64 and Win32 to see the difference in speed.
-This Unfortunatly make the Win64 support of Delphi
+Sadly this makes the Win64 support of Delphi
 like a "gadget", because most of the app demanding the
 win64 support are Server App (or dll) and this king 
 of app need all the power. I just Hope that 
-embarcadero will improuve the speed of the win64 
-functions, but i doubt they want to do them in asm 
-because they want to go in multi plateforme, and
+embarcadero will improve the speed of the win64 
+functions, but I doubt they want to do them in asm 
+because they want to go in multi platform, and
 they not really want to do dedicated ASM for
-every plateforme, they instead want to improuve 
-their compiler. but i thing it's an utopia that
-their compiler will produce code that can compete
-with handly optimized ASM
+every platform, they instead want to improve 
+their compiler. but I think it's unrealistic to think 
+that their compiler will produce code which can compete
+with hand-optimized ASM.
 
 
 DELPHI D2009+ (UNICODE)
@@ -649,11 +649,11 @@ This is still questionable when the strategy becomes to make
 Delphi a multi platform product. 
 
 So I was facing the need to choose: stay in D2007, move to 
-freepascal (that implement Unicode through UTF8) or migrate 
+FreePascal (that implement Unicode through UTF8) or migrate 
 to Unicode. After studying the Unicode migration and discover 
 that it’s will be very hard to do (even in the Delphi I 
 discover some bugs in their own source code due to the 
-migration from ansi to Unicode like for exemple 
+migration from ansi to Unicode like for example 
 http://qc.embarcadero.com/wc/qcmain.aspx?d=106424). 
 Also on lot of my applications the migration to Unicode was 
 really unnecessary, as they was already working in UTF8, 
@@ -666,7 +666,7 @@ most (if not all) of the input/output of most of the
 application will be done in 8bit string (ex: file storage, 
 client/server protocol, HTTP, Smtp, tcp, xml, html, database, 
 etc.). So I decide to go in Delphi Xe2 but to stay in 
-ansistring (8bit string). My first through was to replace 
+AnsiString (8bit string). My first through was to replace 
 everywhere in my code all the String by AnsiString. 
 Unfortunately,  most of the usefull and needed string function 
 in D2009+ are not available in 8bit string like inttostr, 
@@ -674,13 +674,13 @@ strtoint, strtofloat, Tstrings, TstringStream, etc. that
 simply unbelievable, in their way to go in 16bit string, 
 embarcadero remove the 8bit support ! of course we can still 
 do ansistring(inttostr(x)) but this is very pity (and slow).
-So i decide to make my component like a "framework" to help 
-the fully support of 8bit string (mostly in UTF8). 
+So I decided to make my component like a "framework" to help 
+fully support of 8bit string (mostly in UTF8). 
 
 I build a small application (available in /demo/ALStringToAnsiString/)
 to convert all string type and string function to their 
 ansistring equivalent. The conversion reflects my 
-programming style and quirks so you may need to tweek the 
+programming style and quirks so you may need to tweak the 
 output or modify the converter so you have the code. Will 
 this work for your code? Probably not out of the Non Box but 
 you may only be left requiring only few little tweaks.
@@ -692,9 +692,9 @@ in /demo/ALSortedList/ to see the benchmark of TALStringList
 of the Unicode function (when they are implemented correctly, 
 thanks to fastcode) will be close to the same speed as their 
 ansi equivalent. But no mistake, Unicode string will still 
-use 2x more memory and dependly of the application, this can 
-be not acceptable (exemple application that load huge list of 
-string in a TstringList or in an XML object).
+use 2x more memory and depending on the application, this may 
+be not acceptable (example application that load huge list of 
+string in a TStringList or in an XML object).
 
 Under D2009+, ansiString Have now a codepage, and some 
 transliteration (OldCodePage => UTF16 => NewCodePage) will 
@@ -703,8 +703,8 @@ to another ansistring with another codepage. To avoid this
 it’s important to always set project option to the code page 
 you want (eg. 65001 for UTF8) and also to call at the 
 beginning of the program SetMultiByteConversionCodePage(CP_UTF8); 
-Also it’s very important to avoid to use 2 differents 
-string type (eg UTF8string and aniString) even if they have 
+Also it’s very important to avoid using 2 different
+string types (eg UTF8string and aniString) even if they have 
 the same codepage, because compiler at compile time 
 don’t know that codepage is the same and will do a 
 transliteration (ex MyAnsiStringUTF8 := MyUTF8String will 
@@ -718,5 +718,5 @@ like UTF8string or other
 Also about the compiler warning, when he detect a 
 transliteration you will have a warning, but he can not 
 always detect the transliteration Ex: MyFunctionNeedPWideChar(Pointer(aPansiChar))
-Here unfortunatly you will not get any "warning" nor 
+Here unfortunately you will not get any "warning" nor 
 any "error" from the compiler.

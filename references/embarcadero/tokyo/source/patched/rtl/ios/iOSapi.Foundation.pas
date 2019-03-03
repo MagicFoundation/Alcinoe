@@ -5691,6 +5691,24 @@ begin
   end;
 end;
 
+//https://quality.embarcadero.com/browse/RSP-23241
+function GetFrameworkDic: TDictionary<string, THandle>;
+var
+  LFrameworkDic: TDictionary<string, THandle>;
+begin
+  if FrameworkDic = nil then
+  begin
+    LFrameworkDic := TDictionary<string, THandle>.Create;
+    if AtomicCmpExchange(Pointer(FrameworkDic), Pointer(LFrameworkDic), nil) <> nil then
+      LFrameworkDic.Free
+{$IFDEF AUTOREFCOUNT}
+    else
+      FrameworkDic.__ObjAddRef
+{$ENDIF AUTOREFCOUNT};
+  end;
+  Result := FrameworkDic;
+end;
+
 function CocoaIntegerConst(const Fwk: string; const ConstStr: string): Integer;
 var
   Obj: Pointer;
@@ -5705,18 +5723,22 @@ end;
 function CocoaPointerConst(const Fwk: string; const ConstStr: string): Pointer;
 var
   FrameworkMod: HMODULE;
+  LFrameworkDic: TDictionary<string, THandle>; //https://quality.embarcadero.com/browse/RSP-23241
 begin
-  if FrameworkDic = nil then
-    FrameworkDic := TDictionary<string, THandle>.Create;
-
   Result := nil;
   FrameworkMod := 0;
 
-  if not FrameworkDic.TryGetValue(Fwk, FrameworkMod) then
-  begin
-    FrameworkMod := LoadLibrary(PWideChar(Fwk));
-    FrameworkDic.Add(Fwk, FrameworkMod);
-  end;
+  LFrameworkDic := GetFrameworkDic; //
+  Tmonitor.Enter(LFrameworkDic);    //https://quality.embarcadero.com/browse/RSP-23241
+  try                               //
+    if not LFrameworkDic.TryGetValue(Fwk, FrameworkMod) then
+    begin
+      FrameworkMod := LoadLibrary(PWideChar(Fwk));
+      LFrameworkDic.Add(Fwk, FrameworkMod);
+    end;
+  finally                         //
+    Tmonitor.exit(LFrameworkDic); //https://quality.embarcadero.com/browse/RSP-23241
+  end;                            //
 
   if FrameworkMod <> 0 then
     Result := GetProcAddress(FrameworkMod, PWideChar(ConstStr));

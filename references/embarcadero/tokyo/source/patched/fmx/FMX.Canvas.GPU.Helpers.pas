@@ -59,9 +59,6 @@ type
     FBatchIndexBuffer: TBatchIndexBuffer;
     FFlushCountPerFrame: Integer;
     FTexMat: TCanvasTextureMaterial;
-    FExternalOESTexMat: TALCanvasExternalOESTextureMaterial; // << https://quality.embarcadero.com/browse/RSP-16830
-    F420YpCbCr8BiPlanarVideoRangeTexMat: TALCanvas420YpCbCr8BiPlanarVideoRangeTextureMaterial; // https://quality.embarcadero.com/browse/RSP-22947
-    F420YpCbCr8PlanarTexMat: TALCanvas420YpCbCr8PlanarTextureMaterial; // https://quality.embarcadero.com/browse/RSP-22947
     FSolidMat: TCanvasSolidMaterial;
     FGradientMat: TCanvasGradientMaterial;
     [Weak] FContext: TContext3D;
@@ -168,9 +165,6 @@ begin
   SetLength(TempIndices6, 6);
 
   FTexMat := TCanvasTextureMaterial.Create;
-  FExternalOESTexMat := TALCanvasExternalOESTextureMaterial.Create; // << https://quality.embarcadero.com/browse/RSP-16830
-  F420YpCbCr8BiPlanarVideoRangeTexMat := TALCanvas420YpCbCr8BiPlanarVideoRangeTextureMaterial.create; // https://quality.embarcadero.com/browse/RSP-22947
-  F420YpCbCr8PlanarTexMat := TALCanvas420YpCbCr8PlanarTextureMaterial.create; // https://quality.embarcadero.com/browse/RSP-22947
   FSolidMat := TCanvasSolidMaterial.Create;
   FGradientMat := TCanvasGradientMaterial.Create;
 end;
@@ -179,9 +173,6 @@ destructor TCanvasHelper.Destroy;
 begin
   FGradientMat.Free;
   FTexMat.Free;
-  FExternalOESTexMat.Free; // << https://quality.embarcadero.com/browse/RSP-16830
-  F420YpCbCr8BiPlanarVideoRangeTexMat.free; // << https://quality.embarcadero.com/browse/RSP-22947
-  F420YpCbCr8PlanarTexMat.free; // << https://quality.embarcadero.com/browse/RSP-22947
   FSolidMat.Free;
 
   inherited;
@@ -330,9 +321,7 @@ begin
   if Material <> nil then
     M := Material
   else if Texture <> nil then begin
-    if (Texture is TalTexture) and TalTexture(Texture).isExternalOES then M := FExternalOESTexMat  // << https://quality.embarcadero.com/browse/RSP-16830
-    else if (Texture is TALBiPlanarTexture) and (TALBiPlanarTexture(Texture).format = TALTextureFormat.f420YpCbCr8BiPlanarVideoRange) then M := F420YpCbCr8BiPlanarVideoRangeTexMat  // << https://quality.embarcadero.com/browse/RSP-22947
-    else if (Texture is TALPlanarTexture) and (TALPlanarTexture(Texture).format = TALTextureFormat.f420YpCbCr8Planar) then M := F420YpCbCr8PlanarTexMat  // << https://quality.embarcadero.com/browse/RSP-22947
+    if (Texture is TalTexture) and (TalTexture(Texture).material <> nil) then M := TalTexture(Texture).material  // https://quality.embarcadero.com/browse/RSP-23501
     else M := FTexMat
   end
   else
@@ -445,9 +434,7 @@ var
   SolidDecl: TVertexDeclaration;
 begin
   if (FCurrentMaterial = FTexMat) or
-     (FCurrentMaterial = FExternalOESTexMat) or // << https://quality.embarcadero.com/browse/RSP-16830
-     (FCurrentMaterial = F420YpCbCr8BiPlanarVideoRangeTexMat) or // << https://quality.embarcadero.com/browse/RSP-22947
-     (FCurrentMaterial = F420YpCbCr8PlanarTexMat) then begin // << https://quality.embarcadero.com/browse/RSP-22947
+     (FCurrentMaterial is TALCanvasTextureMaterial) then begin // https://quality.embarcadero.com/browse/RSP-23501
     SetLength(SolidDecl, 3);
     SolidDecl[0].Format := TVertexFormat.Vertex;
     SolidDecl[0].Offset := 0;
@@ -456,16 +443,7 @@ begin
     SolidDecl[2].Format := TVertexFormat.Color0;
     SolidDecl[2].Offset := 20;
     if (FCurrentMaterial = FTexMat) then FTexMat.Texture := FCurrentTexture
-    else if (FCurrentMaterial = FExternalOESTexMat) then FExternalOESTexMat.Texture := FCurrentTexture  // << https://quality.embarcadero.com/browse/RSP-16830
-    else if (FCurrentMaterial = F420YpCbCr8BiPlanarVideoRangeTexMat) then begin
-      F420YpCbCr8BiPlanarVideoRangeTexMat.Texture := FCurrentTexture;  // << https://quality.embarcadero.com/browse/RSP-22947
-      F420YpCbCr8BiPlanarVideoRangeTexMat.CBCRTexture := TALBiplanarTexture(FCurrentTexture).SecondTexture; // << https://quality.embarcadero.com/browse/RSP-22947
-    end
-    else begin
-      F420YpCbCr8PlanarTexMat.Texture := FCurrentTexture;  // << https://quality.embarcadero.com/browse/RSP-22947
-      F420YpCbCr8PlanarTexMat.CBTexture := TALplanarTexture(FCurrentTexture).SecondTexture; // << https://quality.embarcadero.com/browse/RSP-22947
-      F420YpCbCr8PlanarTexMat.CRTexture := TALplanarTexture(FCurrentTexture).ThirdTexture; // << https://quality.embarcadero.com/browse/RSP-22947
-    end;
+    else TALCanvasTextureMaterial(FCurrentMaterial).Texture := FCurrentTexture; // https://quality.embarcadero.com/browse/RSP-23501
     FContext.DrawPrimitives(TPrimitivesKind.Triangles, @FBatchVertexBuffer[0], @FBatchIndexBuffer[0], SolidDecl,
       SizeOf(TVertexBufferItem), FBatchedVertices, SizeOf(TIndexBufferItem), FBatchedIndices, FCurrentMaterial, 1);
   end else if FCurrentMaterial <> FSolidMat then

@@ -1222,7 +1222,7 @@ begin
           glBindTexture(GL_TEXTURE_2D, 0)
         else begin
           {$IF defined(ANDROID)}
-          if (Texture is TalTexture) and TalTexture(Texture).isExternalOES then glBindTexture(GL_TEXTURE_EXTERNAL_OES, Texture.Handle)  // << https://quality.embarcadero.com/browse/RSP-16830
+          if (Texture is TalTexture) and (TalTexture(Texture).material is TALCanvasExternalOESTextureMaterial) then glBindTexture(GL_TEXTURE_EXTERNAL_OES, Texture.Handle)  // << https://quality.embarcadero.com/browse/RSP-16830
         else
           {$ENDIF}
           glBindTexture(GL_TEXTURE_2D, Texture.Handle);

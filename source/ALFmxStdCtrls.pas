@@ -26,6 +26,7 @@ uses System.Classes,
      FMX.StdCtrls,
      FMX.actnlist,
      FMX.ImgList,
+     ALFmxAni,
      ALFmxInertialMovement,
      ALFmxObjects;
 
@@ -669,6 +670,127 @@ type
   published
     property GroupName: string read GetGroupName write SetGroupName stored GroupNameStored nodefault;
     property Mandatory: Boolean read fMandatory write fMandatory default false;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALSwitchThumb = class(TALRectangle)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property Locked default True;
+    property HitTest default false;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALSwitchBackground = class(TALRectangle)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property Locked default True;
+    property HitTest default false;
+  end;
+
+  {*************************}
+  TALSwitch = class(TControl)
+  public const
+    DefaultSwitchAnimationDuration = 0.2;
+    TrackingSensitivity = 3;
+  private
+    [Weak] FThumb: TALSwitchThumb;
+    [Weak] FBackGround: TALSwitchBackground;
+    FThumbRect: TrectF;
+    FPressed, FTracking: Boolean;
+    FPressedThumbPos, FSavedPos: TPointF;
+    FAnimation: TALFloatAnimation;
+    FIsChecked: Boolean;
+    FOnChange: TNotifyEvent;
+    FOnAnimationProcess: TNotifyEvent;
+    FOnAnimationFinish: TNotifyEvent;
+    FThumbSize: Single;
+    fAnimationDuration: Single;
+    procedure doAnimationProcess(Sender: TObject);
+    procedure DoAnimationEnd(Sender: TObject);
+    procedure SetThumbSize(const Value: Single);
+    function AnimationDurationStored: Boolean;
+  protected
+    function GetDefaultSize: TSizeF; override;
+    procedure AnimateTo(const Value: Boolean);
+    function GetThumbCenter: Single;
+    function GetThumbSize: Single;
+    function GetValueByMousePos(const X, Y: Single): Boolean;
+    function GetThumbRectByValue(const Value: Boolean): TRectF; virtual;
+    procedure DoChange;
+    procedure Resize; override;
+    procedure DoRealign; override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    property Pressed: Boolean read FPressed;
+    procedure SetIsChecked(const Value: Boolean);
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    function GetThumbValue: Single;
+    procedure SetIsCheckedWithAnimation(const Value: Boolean);
+    property Tracking: boolean read FTracking write FTracking default false;
+    property Animation: TALFloatAnimation read FAnimation;
+  published
+    property Action;
+    property Align;
+    property Anchors;
+    property ClipChildren default False;
+    property ClipParent default False;
+    property Cursor default crDefault;
+    property DragMode default TDragMode.dmManual;
+    property EnableDragHighlight default True;
+    property Enabled default True;
+    property Locked default False;
+    property Height;
+    property HitTest default False;
+    property Padding;
+    property Opacity;
+    property Margins;
+    property PopupMenu;
+    property Position;
+    property RotationAngle;
+    property RotationCenter;
+    property Scale;
+    property Size;
+    property TabOrder;
+    property TouchTargetExpansion;
+    property ThumbSize: Single read FThumbSize write SetThumbSize;
+    property Thumb: TALSwitchThumb read FThumb;
+    property BackGround: TALSwitchBackGround read FBackGround;
+    property IsChecked: Boolean read FIsChecked write SetIsChecked default false;
+    property AnimationDuration: single read fAnimationDuration write fAnimationDuration stored AnimationDurationStored;
+    property Visible default True;
+    property Width;
+    property OnApplyStyleLookup;
+    property OnDragEnter;
+    property OnDragLeave;
+    property OnDragOver;
+    property OnDragDrop;
+    property OnDragEnd;
+    property OnKeyDown;
+    property OnKeyUp;
+    property OnCanFocus;
+    property OnClick;
+    property OnDblClick;
+    property OnEnter;
+    property OnExit;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnMouseWheel;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnPainting;
+    property OnPaint;
+    property OnResize;
+    property OnResized;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property OnAnimationProcess: TNotifyEvent read FOnAnimationProcess write FOnAnimationProcess;
+    property OnAnimationFinish: TNotifyEvent read FOnAnimationFinish write FOnAnimationFinish;
   end;
 
 {$IFDEF debug}
@@ -1592,6 +1714,7 @@ begin
   FBackGround.Name := 'BackGround';
   FBackGround.Align := TalignLayout.VertCenter;
   FBackGround.Size.Height := 2;
+  FBackGround.Margins.DefaultValue := TrectF.Create(16,0,16,0);
   FBackGround.Margins.Left := 16;
   FBackGround.Margins.right := 16;
   FBackGround.Stroke.Kind := TBrushKind.None;
@@ -1664,6 +1787,7 @@ begin
   FBackGround.Name := 'BackGround';
   FBackGround.Align := TalignLayout.VertCenter;
   FBackGround.Size.Height := 2;
+  FBackGround.Margins.DefaultValue := TrectF.Create(16,0,16,0);
   FBackGround.Margins.Left := 16;
   FBackGround.Margins.right := 16;
   FBackGround.Stroke.Kind := TBrushKind.None;
@@ -2297,9 +2421,293 @@ begin
   if FGroupName <> S then FGroupName := Value;
 end;
 
+{****************************************************}
+constructor TALSwitchThumb.Create(AOwner: TComponent);
+begin
+  inherited;
+  Locked := True;
+  HitTest := False;
+end;
+
+{*********************************************************}
+constructor TALSwitchBackground.Create(AOwner: TComponent);
+begin
+  inherited;
+  Locked := True;
+  HitTest := False;
+end;
+
+{***********************************************}
+constructor TALSwitch.Create(AOwner: TComponent);
+begin
+  inherited;
+  CanFocus := True;
+  SetAcceptsControls(False);
+  AutoCapture := True;
+  //-----
+  FIsChecked := false;
+  FOnChange := nil;
+  FOnAnimationProcess := nil;
+  FOnAnimationFinish := nil;
+  FPressed := false;
+  FTracking := false;
+  FPressedThumbPos := TpointF.create(0,0);
+  FSavedPos := TpointF.create(0,0);
+  FThumbSize := 0;
+  FThumbRect := GetThumbRectByValue(FIsChecked);
+  fAnimationDuration := DefaultSwitchAnimationDuration;
+  //-----
+  FAnimation := TALFloatAnimation.Create;
+  FAnimation.AnimationType := TAnimationType.In;
+  FAnimation.Interpolation := TInterpolationType.Linear;
+  FAnimation.OnProcess := doAnimationProcess;
+  FAnimation.OnFinish := DoAnimationEnd;
+  FAnimation.Enabled := False;
+  //-----
+  FBackGround := TALSwitchBackGround.Create(self);
+  FBackGround.Parent := self;
+  FBackGround.Stored := False;
+  FBackGround.SetSubComponent(True);
+  FBackGround.Name := 'BackGround';
+  FBackGround.Align := TalignLayout.VertCenter;
+  FBackGround.Size.Height := 14;
+  FBackGround.Margins.DefaultValue := TrectF.Create(6,0,6,0);
+  FBackGround.Margins.Left := 6;
+  FBackGround.Margins.right := 6;
+  FBackGround.XRadius := 7;
+  FBackGround.yRadius := 7;
+  FBackGround.Stroke.Kind := TBrushKind.None;
+  fBackGround.Fill.Color := $ffc5c5c5;
+  fBackGround.HitTest := False;
+  //-----
+  FThumb := TALSwitchThumb.Create(self);
+  FThumb.Parent := self;
+  FThumb.Stored := False;
+  FThumb.SetSubComponent(True);
+  FThumb.Name := 'Thumb';
+  FThumb.Width := FThumbRect.Width;
+  FThumb.height := FThumbRect.height;
+  FThumb.XRadius := 11;
+  FThumb.yRadius := 11;
+  FThumb.Stroke.Kind := TBrushKind.solid;
+  fThumb.Stroke.Color := $ffd5d5d5;
+  FThumb.Fill.Color := $ffffffff;
+  FThumb.HitTest := False;
+end;
+
+{***************************}
+destructor TALSwitch.Destroy;
+begin
+  FAnimation.Enabled := False;
+  ALFreeAndNil(FAnimation);
+  inherited;
+end;
+
+{****************************************}
+function TALSwitch.GetDefaultSize: TSizeF;
+begin
+    Result := TSizeF.Create(44, 22);
+end;
+
+{***************************}
+procedure TALSwitch.DoChange;
+begin
+  if Assigned(FOnChange) then FOnChange(Self);
+end;
+
+{*************************}
+procedure TALSwitch.Resize;
+begin
+  inherited Resize;
+  fAnimation.Enabled := False;
+  FthumbRect := GetThumbRectByValue(FIsChecked);
+  realign;
+end;
+
+{******************************************************}
+procedure TALSwitch.doAnimationProcess(Sender: TObject);
+begin
+  FthumbRect.SetLocation(FAnimation.CurrentValue, FthumbRect.Top);
+  realign;
+  if Assigned(FOnAnimationProcess) then FOnAnimationProcess(Self);
+end;
+
+{**************************************************}
+procedure TALSwitch.DoAnimationEnd(Sender: TObject);
+begin
+  FAnimation.Enabled := False;
+  if Assigned(FOnAnimationFinish) then FOnAnimationFinish(Self);
+end;
+
+{**************************************************}
+procedure TALSwitch.AnimateTo(const Value: Boolean);
+var ElapsedDistance, AnimationDistance: Single;
+    R: TrectF;
+begin
+  FAnimation.Enabled := False;
+  if ([csLoading, csReading, csDestroying, csDesigning] * ComponentState <> []) or
+     (Parent = nil) or
+     (FDisablePaint) or
+     (FUpdating > 0) or
+     (not Visible) or
+     (not ParentedVisible) then begin
+    FThumbRect := GetThumbRectByValue(Value);
+    Realign;
+  end
+  else begin
+
+    FAnimation.StartValue := fThumbRect.left;
+    R := GetThumbRectByValue(Value);
+    FAnimation.StopValue := R.Left;
+    //-----
+    AnimationDistance := Width - R.Width;
+    ElapsedDistance := Abs(FAnimation.StopValue - FAnimation.StartValue);
+    //-----
+    if AnimationDistance > 0 then FAnimation.Duration := AnimationDuration * (ElapsedDistance / AnimationDistance)
+    else FAnimation.Duration := AnimationDuration;
+    //-----
+    FAnimation.Start;
+
+  end;
+end;
+
+{****************************************}
+function TALSwitch.GetThumbCenter: Single;
+begin
+  Result := (fThumbRect.Left + fThumbRect.Right) / 2;
+end;
+
+{**************************************}
+function TALSwitch.GetThumbSize: Single;
+begin
+  if SameValue(FThumbSize, 0.0, Epsilon) then Result := LocalRect.Height
+  else Result := FThumbSize;
+end;
+
+{*******************************************************************}
+function TALSwitch.GetThumbRectByValue(const Value: Boolean): TRectF;
+begin
+  result := LocalRect;
+  if not Value then Result.Right := result.Left + GetThumbSize
+  else Result.Left := result.Right - GetThumbSize;
+end;
+
+{***************************************}
+function TALSwitch.GetThumbValue: Single;
+begin
+  if fThumbRect.Left > 0 then Result := fThumbRect.Left / (Width - fThumbRect.Width)
+  else result := 0;
+end;
+
+{*****************************************************************}
+function TALSwitch.GetValueByMousePos(const X, Y: Single): Boolean;
+var HalfThumbWidth: Single;
+begin
+  HalfThumbWidth := fThumbRect.Width / 2;
+  if (X - FPressedThumbPos.X) + HalfThumbWidth < Width / 2 then Result := False
+  else Result := True;
+end;
+
+{************************************************************************************}
+procedure TALSwitch.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  inherited;
+  if (Button = TMouseButton.mbLeft) and (not Fanimation.Running) then begin
+    FPressed := True;
+    FSavedPos := TPointF.Create(X, Y);
+    FPressedThumbPos := FSavedPos - FThumbRect.TopLeft;
+  end;
+end;
+
+{**************************************************************}
+procedure TALSwitch.MouseMove(Shift: TShiftState; X, Y: Single);
+begin
+  inherited;
+  if FPressed then begin
+
+    if ((ssTouch in Shift) or (ssLeft in Shift)) and (Abs(X - FSavedPos.X) < TrackingSensitivity) then Exit;
+    //-----
+    FTracking := True;
+    //-----
+    FThumbRect.Offset(X - FSavedPos.X, 0);
+    if FThumbRect.Left < 0 then FThumbRect.Offset(-FThumbRect.Left, 0);
+    if FThumbRect.Right > Width then FThumbRect.Offset(-(FThumbRect.Right - Width), 0);
+    //-----
+    FSavedPos := TPointF.Create(X, Y);
+    //-----
+    realign;
+
+  end;
+end;
+
+{**********************************************************************************}
+procedure TALSwitch.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+var LIsChecked: Boolean;
+begin
+  inherited;
+  if FPressed then begin
+    FPressed := False;
+    if not FTracking then begin
+      LIsChecked := not FIsChecked;
+      AnimateTo(LIsChecked);
+      SetIsChecked(LIsChecked);
+    end
+    else begin
+      LIsChecked := GetValueByMousePos(X, Y);
+      AnimateTo(LIsChecked);
+      SetIsChecked(LIsChecked);
+    end;
+    FTracking := False;
+  end;
+end;
+
+{****************************}
+procedure TALSwitch.DoRealign;
+begin
+  inherited;
+  if FThumb <> nil then FThumb.BoundsRect := fThumbRect;
+end;
+
+{**************************************************}
+function TALSwitch.AnimationDurationStored: Boolean;
+begin
+  result := not sameValue(AnimationDuration, DefaultSwitchAnimationDuration, epsilon);
+end;
+
+{****************************************************}
+procedure TALSwitch.SetThumbSize(const Value: Single);
+begin
+  fAnimation.Enabled := False;
+  FThumbSize := Value;
+  FthumbRect := GetThumbRectByValue(FIsChecked);
+  realign;
+end;
+
+{*****************************************************}
+procedure TALSwitch.SetIsChecked(const Value: Boolean);
+begin
+  if FIsChecked <> Value then begin
+    FIsChecked := Value;
+    if not Fanimation.Running then begin
+      FThumbRect := GetThumbRectByValue(FIsChecked);
+      realign;
+    end;
+    DoChange;
+  end;
+end;
+
+{******************************************************************}
+procedure TALSwitch.SetIsCheckedWithAnimation(const Value: Boolean);
+begin
+  if FIsChecked <> Value then begin
+    AnimateTo(FIsChecked);
+    SetIsChecked(FIsChecked);
+  end;
+end;
+
 procedure Register;
 begin
-  RegisterComponents('Alcinoe', [TALAniIndicator, TALScrollBar, TALTrackBar, TALRangeTrackBar, TALCheckBox, TALRadioButton]);
+  RegisterComponents('Alcinoe', [TALAniIndicator, TALScrollBar, TALTrackBar, TALRangeTrackBar, TALCheckBox, TALRadioButton, TALSwitch]);
   {$IFDEF ALDPK}
   UnlistPublishedProperty(TALTrackThumbGlyph, 'Locked');
   UnlistPublishedProperty(TALTrackThumbGlyph, 'StyleName');
@@ -2343,11 +2751,38 @@ begin
   UnlistPublishedProperty(TALTrackHighlight, 'OnDragOver');
   UnlistPublishedProperty(TALTrackHighlight, 'OnDragDrop');
   UnlistPublishedProperty(TALTrackHighlight, 'EnableDragHighlight');
+  //-----
+  UnlistPublishedProperty(TALSwitchThumb, 'Locked');
+  UnlistPublishedProperty(TALSwitchThumb, 'StyleName');
+  UnlistPublishedProperty(TALSwitchThumb, 'Anchors'); // not work https://quality.embarcadero.com/browse/RSP-15684
+  UnlistPublishedProperty(TALSwitchThumb, 'Align');
+  UnlistPublishedProperty(TALSwitchThumb, 'Position');
+  UnlistPublishedProperty(TALSwitchThumb, 'Size');
+  UnlistPublishedProperty(TALSwitchThumb, 'PopupMenu');
+  UnlistPublishedProperty(TALSwitchThumb, 'DragMode');
+  UnlistPublishedProperty(TALSwitchThumb, 'OnDragEnd');
+  UnlistPublishedProperty(TALSwitchThumb, 'OnDragEnter');
+  UnlistPublishedProperty(TALSwitchThumb, 'OnDragLeave');
+  UnlistPublishedProperty(TALSwitchThumb, 'OnDragOver');
+  UnlistPublishedProperty(TALSwitchThumb, 'OnDragDrop');
+  UnlistPublishedProperty(TALSwitchThumb, 'EnableDragHighlight');
+  //-----
+  UnlistPublishedProperty(TALSwitchBackground, 'Locked');
+  UnlistPublishedProperty(TALSwitchBackground, 'StyleName');
+  UnlistPublishedProperty(TALSwitchBackground, 'PopupMenu');
+  UnlistPublishedProperty(TALSwitchBackground, 'DragMode');
+  UnlistPublishedProperty(TALSwitchBackground, 'OnDragEnd');
+  UnlistPublishedProperty(TALSwitchBackground, 'OnDragEnter');
+  UnlistPublishedProperty(TALSwitchBackground, 'OnDragLeave');
+  UnlistPublishedProperty(TALSwitchBackground, 'OnDragOver');
+  UnlistPublishedProperty(TALSwitchBackground, 'OnDragDrop');
+  UnlistPublishedProperty(TALSwitchBackground, 'EnableDragHighlight');
+  //-----
   {$ENDIF}
 end;
 
 initialization
-  RegisterFmxClasses([TALAniIndicator, TALCheckBox, TALRadioButton, TALScrollBar, TALTrackBar, TALRangeTrackBar]);
+  RegisterFmxClasses([TALAniIndicator, TALCheckBox, TALRadioButton, TALScrollBar, TALTrackBar, TALRangeTrackBar, TALSwitch]);
   {$IFDEF debug}
   AlDebugAniIndicatorMakeBufBitmapStopWatch := TstopWatch.Create;
   AlDebugCheckBoxMakeBufBitmapStopWatch := TstopWatch.Create;

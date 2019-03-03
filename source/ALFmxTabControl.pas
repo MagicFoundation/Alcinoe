@@ -14,7 +14,7 @@ uses System.Classes,
      System.Messaging,
      FMX.Types,
      FMX.Controls,
-     FMX.Ani,
+     ALFMXAni,
      ALFmxLayouts,
      ALFmxInertialMovement;
 
@@ -33,7 +33,7 @@ type
   TALTabAniTransitionInit = procedure(const sender: TObject;
                                       const ATransition: TALTabTransition;
                                       const aVelocity: Double;
-                                      const aAnimation: TFloatAnimation) of object;
+                                      const aAnimation: TALFloatPropertyAnimation) of object;
 
   {**************************}
   TALTabItem = class(TControl)
@@ -107,7 +107,7 @@ type
     FAniCalculations: TALAniCalculations;
     fLastViewportPosition: TpointF;
     FOnViewportPositionChange: TALTabPositionChangeEvent;
-    FAniTransition: TFloatAnimation;
+    FAniTransition: TALFloatPropertyAnimation;
     FAniTransitionOverlay: TALLayout;
     fOnAniTransitionInit: TALTabAniTransitionInit;
     fOnAniStart: TnotifyEvent;
@@ -172,7 +172,7 @@ type
     property TabCount: Integer read fTabCount;
     property Tabs[AIndex: Integer]: TALTabItem read GetTabItem;
     property AniCalculations: TALAniCalculations read FAniCalculations;
-    property AniTransition: TFloatAnimation read FAniTransition;
+    property AniTransition: TALFloatPropertyAnimation read FAniTransition;
     property DeadZoneBeforeAcquireScrolling: Integer read FDeadZoneBeforeAcquireScrolling write FDeadZoneBeforeAcquireScrolling default 16;
   published
     property Align;
@@ -441,7 +441,7 @@ constructor TALTabControl.Create(AOwner: TComponent);
 begin
   inherited;
   //-----
-  FAniTransition := TFloatAnimation.Create(Self);
+  FAniTransition := TALFloatPropertyAnimation.Create(Self);
   FAniTransitionOverlay := nil;
   fOnAniTransitionInit := nil;
   fOnAniStart := nil;
@@ -903,7 +903,7 @@ begin
   if not HasActiveTab then exit;
 
   //init aTargetTabItem
-  if (Sender <> nil) then aTargetTabItem := TALTabItem((Sender as TFloatAnimation).TagObject)
+  if (Sender <> nil) then aTargetTabItem := TALTabItem((Sender as TALFloatPropertyAnimation).TagObject)
   else aTargetTabItem := activeTab;
 
   //offset all the items before aTargetTabItem
@@ -968,7 +968,7 @@ procedure TALTabControl.AniTransitionFadeOutFinish(Sender: TObject);
 var aOldActiveTab: TalTabItem;
 begin
   aOldActiveTab := ActiveTab;
-  ActiveTab := TALTabItem(TfloatAnimation(Sender).TagObject);
+  ActiveTab := TALTabItem(TALFloatPropertyAnimation(Sender).TagObject);
   aOldActiveTab.Opacity := 1;
   ALFreeAndNil(FAniTransitionOverlay);
   if (assigned(fOnAniStop)) then

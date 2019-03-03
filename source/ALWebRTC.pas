@@ -38,6 +38,7 @@ uses System.sysUtils,
      Androidapi.JNIBridge,
      FMX.Types3D,
      ALAndroidWebRTCApi,
+     ALFmxTypes3D,
      {$ELSEIF defined(IOS)}
      System.syncObjs,
      System.generics.collections,
@@ -325,10 +326,10 @@ type
     {$IF defined(android)}
     fAndroidWebRTCListener: TAndroidWebRTCListener;
     fAndroidWebRTC: JALWebRTC;
-    fLocalBitmap: TTexture;
-    fRemoteBitmap: TTexture;
-    function getLocalBitmap: TTexture;
-    function getRemoteBitmap: TTexture;
+    fLocalBitmap: TALTexture;
+    fRemoteBitmap: TALTexture;
+    function getLocalBitmap: TALTexture;
+    function getRemoteBitmap: TALTexture;
     {$ENDIF}
     {$ENDREGION}
 
@@ -339,6 +340,13 @@ type
     fRemoteBitmap: TALPlanarTexture;
     function getLocalBitmap: TALBiPlanarTexture;
     function getRemoteBitmap: TALPlanarTexture;
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION ' MSWINDOWS / _MACOS'}
+    {$IF defined(MSWINDOWS) or defined(_MACOS)}
+    function getLocalBitmap: Tbitmap;
+    function getRemoteBitmap: Tbitmap;
     {$ENDIF}
     {$ENDREGION}
 
@@ -358,8 +366,8 @@ type
 
     {$REGION ' ANDROID'}
     {$IF defined(android)}
-    property LocalBitmap: TTexture read getLocalBitmap;
-    property RemoteBitmap: TTexture read getRemoteBitmap;
+    property LocalBitmap: TALTexture read getLocalBitmap;
+    property RemoteBitmap: TALTexture read getRemoteBitmap;
     {$ENDIF}
     {$ENDREGION}
 
@@ -369,6 +377,14 @@ type
     property RemoteBitmap: TALPlanarTexture read getRemoteBitmap;
     {$ENDIF}
     {$ENDREGION}
+
+    {$REGION ' MSWINDOWS / _MACOS'}
+    {$IF defined(MSWINDOWS) or defined(_MACOS)}
+    property LocalBitmap: Tbitmap read getLocalBitmap;
+    property RemoteBitmap: Tbitmap read getRemoteBitmap;
+    {$ENDIF}
+    {$ENDREGION}
+
 
   public
     constructor Create(const aIceServers: TALWebRTCIceServers; const aPeerConnectionParameters: TALWebRTCPeerConnectionParameters); virtual;
@@ -405,7 +421,6 @@ uses System.messaging,
      Androidapi.jni.App,
      Androidapi.Helpers,
      FMX.Context.GLES.Android,
-     ALFMXTypes3D,
      {$ELSEIF defined(IOS)}
      system.math,
      Macapi.Helpers,
@@ -571,11 +586,11 @@ begin
 
 
     fLocalbitmap := TALTexture.Create;
-    TALTexture(fLocalbitmap).isExternalOES := true;
+    fLocalbitmap.Material := TalTexture.DefExternalOESMaterial;
     fLocalbitmap.Style := fLocalbitmap.Style - [TTextureStyle.MipMaps];
     //-----
     fRemotebitmap := TALTexture.Create;
-    TALTexture(fRemotebitmap).isExternalOES := true;
+    fRemotebitmap.Material := TalTexture.DefExternalOESMaterial;
     fRemotebitmap.Style := fRemotebitmap.Style - [TTextureStyle.MipMaps];
     //-----
     fAndroidWebRTC := nil;
@@ -627,9 +642,9 @@ begin
   {$REGION ' IOS'}
   {$IF defined(ios)}
 
-    fLocalbitmap := TALBiPlanarTexture.Create(true{aVolatile});
+    fLocalbitmap := TALBiPlanarTexture.Create;
     //-----
-    fRemotebitmap := TALPlanarTexture.Create(true{aVolatile});
+    fRemotebitmap := TALPlanarTexture.Create;
     _InitTexture(fRemotebitmap);
     _InitTexture(fRemotebitmap.SecondTexture);
     _InitTexture(fRemotebitmap.ThirdTexture);
@@ -1145,15 +1160,15 @@ begin
 
 end;
 
-{******************************************}
-function TALWebRTC.getLocalBitmap: TTexture;
+{********************************************}
+function TALWebRTC.getLocalBitmap: TALTexture;
 begin
   if fLocalBitmap.Handle = 0 then result := nil
   else result := fLocalBitmap;
 end;
 
-{*******************************************}
-function TALWebRTC.getRemoteBitmap: TTexture;
+{*********************************************}
+function TALWebRTC.getRemoteBitmap: TALTexture;
 begin
   if fRemoteBitmap.Handle = 0 then result := nil
   else result := fRemoteBitmap;
@@ -2547,6 +2562,24 @@ function TALWebRTC.getRemoteBitmap: TALPlanarTexture;
 begin
   if (fRemoteBitmap.Handle = 0) or (fRemoteBitmap.width=0) or (fRemoteBitmap.Height=0) then result := nil
   else result := fRemoteBitmap;
+end;
+
+{$ENDIF}
+{$ENDREGION}
+
+{$REGION ' MSWINDOWS / _MACOS'}
+{$IF defined(MSWINDOWS) or defined(_MACOS)}
+
+{*****************************************}
+function TALWebRTC.getLocalBitmap: Tbitmap;
+begin
+  result := nil;
+end;
+
+{******************************************}
+function TALWebRTC.getRemoteBitmap: Tbitmap;
+begin
+  result := nil;
 end;
 
 {$ENDIF}

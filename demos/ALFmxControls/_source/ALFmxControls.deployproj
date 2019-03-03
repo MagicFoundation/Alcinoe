@@ -4,7 +4,7 @@
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>
     <PropertyGroup>
-        <DeviceId Condition="'$(Platform)'=='Android'"/>
+        <DeviceId Condition="'$(Platform)'=='Android'">UEEDU18728001190</DeviceId>
         <DeviceId Condition="'$(Platform)'=='iOSDevice32'"/>
         <DeviceId Condition="'$(Platform)'=='iOSDevice64'"/>
         <DeviceId Condition="'$(Platform)'=='iOSSimulator'">iPhone5</DeviceId>
@@ -1538,20 +1538,20 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable\al_ic_menu_moreoverflow_material_light.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFmxControls\res\drawable\</RemoteDir>
-            <RemoteName>al_ic_menu_moreoverflow_material_light.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFmxControls\res\drawable-mdpi\</RemoteDir>
             <RemoteName>ic_launcher.png</RemoteName>
             <DeployClass>Android_LauncherIcon48</DeployClass>
             <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="android\res\drawable\al_ic_menu_moreoverflow_material_light.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\res\drawable\</RemoteDir>
+            <RemoteName>al_ic_menu_moreoverflow_material_light.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -1700,24 +1700,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\layout\al_floating_popup_close_overflow_button.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFmxControls\res\layout\</RemoteDir>
-            <RemoteName>al_floating_popup_close_overflow_button.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-mn-rMN\strings.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFmxControls\res\values-mn-rMN\</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="android\res\values-af\strings.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxControls\res\values-af\</RemoteDir>
             <RemoteName>strings.xml</RemoteName>
@@ -1736,6 +1718,24 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
             <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="android\res\values-mn-rMN\strings.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFmxControls\res\values-mn-rMN\</RemoteDir>
+            <RemoteName>strings.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="android\res\layout\al_floating_popup_close_overflow_button.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\res\layout\</RemoteDir>
+            <RemoteName>al_floating_popup_close_overflow_button.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
         </DeployFile>
         <DeployFile Include="android\res\values-ta-rIN\strings.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFmxControls\res\values-ta-rIN\</RemoteDir>

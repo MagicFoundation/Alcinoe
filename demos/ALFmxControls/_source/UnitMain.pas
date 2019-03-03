@@ -12,7 +12,7 @@ uses
   {$IF Defined(IOS) or Defined(ANDROID)}
   Grijjy.ErrorReporting,
   {$ENDIF}
-  FMX.Filter.Effects, system.Messaging, FMX.ani, alFmxMemo;
+  FMX.Filter.Effects, system.Messaging, ALFMXAni, alFmxMemo;
 
 type
 
@@ -196,6 +196,9 @@ type
     Layout2: TLayout;
     Image5: TImage;
     ALMemo1: TALMemo;
+    Button11: TButton;
+    ALSwitch1: TALSwitch;
+    Layout5: TLayout;
     procedure Button2Click(Sender: TObject);
     procedure Button255Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
@@ -217,7 +220,7 @@ type
     procedure ALTabControl1AniTransitionInit(const sender: TObject;
                                              const ATransition: TALTabTransition;
                                              const aVelocity: Double;
-                                             const aAnimation: TFloatAnimation);
+                                             const aAnimation: TALFloatPropertyAnimation);
     procedure ALTabControl1Resize(Sender: TObject);
     procedure ALVertScrollBox1ScrollBarInit(const sender: TObject; const aScrollBar: TALScrollBoxBar);
     procedure VScrollBarThumbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
@@ -236,6 +239,8 @@ type
     procedure ALMemo1Exit(Sender: TObject);
     procedure ALVideoPlayerSurface1VideoSizeChanged(const Sender: TObject;
       const width, height: Integer);
+    procedure Button11Click(Sender: TObject);
+    procedure ALSwitch1Change(Sender: TObject);
   private
     fALcheckbox2: TALcheckboxStopWatch;
     fcheckbox2: TcheckboxStopWatch;
@@ -292,6 +297,21 @@ begin
  //
 end;
 
+procedure TForm1.ALSwitch1Change(Sender: TObject);
+begin
+  if ALSwitch1.IsChecked then begin
+    ALSwitch1.BackGround.Fill.Color := $fffbd7d7;
+    ALSwitch1.Thumb.Stroke.Color := $ffec6262;
+    ALSwitch1.Thumb.Fill.Color := $ffec6262;
+  end
+  else begin
+    ALSwitch1.BackGround.Fill.Color := $ffc5c5c5;
+    ALSwitch1.Thumb.Stroke.Color := $ffd5d5d5;
+    ALSwitch1.Thumb.Fill.Color := $ffffffff;
+  end;
+
+end;
+
 procedure TForm1.ALVertScrollBox1Click(Sender: TObject);
 begin
   SetFocused(nil);
@@ -300,7 +320,7 @@ end;
 procedure TForm1.ALTabControl1AniTransitionInit(const sender: TObject;
                                                 const ATransition: TALTabTransition;
                                                 const aVelocity: Double;
-                                                const aAnimation: TFloatAnimation);
+                                                const aAnimation: TALFloatPropertyAnimation);
 begin
   // aVelocity = pixels per seconds given by the anicalculations
   // ALTabControl1.Width - abs(ALTabControl1.activeTab.Position.X) = the number of pixel we need to scroll
@@ -562,6 +582,11 @@ begin
       (sender as TALTrackThumb).InvalidateRect(localrect);
     end;
   end;
+end;
+
+procedure TForm1.Button11Click(Sender: TObject);
+begin
+  ALSwitch1.IsChecked := not ALSwitch1.IsChecked;
 end;
 
 procedure TForm1.Button13Click(Sender: TObject);

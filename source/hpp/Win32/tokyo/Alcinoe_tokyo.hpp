@@ -35,6 +35,7 @@
 #include <ALFmxMemo.hpp>
 #include <ALGraphics.hpp>
 #include <ALFmxFilterEffects.hpp>
+#include <ALFmxAni.hpp>
 #include <System.UITypes.hpp>	// (rtl)
 #include <Winapi.Windows.hpp>	// (rtl)
 #include <Winapi.PsAPI.hpp>	// (rtl)
@@ -170,14 +171,14 @@
 #include <ToolsAPI.hpp>	// (designide)
 #include <Proxies.hpp>	// (designide)
 #include <DesignEditors.hpp>	// (designide)
+#include <FMX.Filter.Standard.hpp>	// (fmx)
+#include <FMX.Filter.Effects.hpp>	// (fmx)
 #include <FMX.ScrollBox.Style.hpp>	// (fmx)
 #include <FMX.ScrollBox.Win.hpp>	// (fmx)
 #include <FMX.ScrollBox.hpp>	// (fmx)
 #include <FMX.Memo.Win.hpp>	// (fmx)
 #include <FMX.Memo.hpp>	// (fmx)
 #include <FMX.Memo.Style.hpp>	// (fmx)
-#include <FMX.Filter.Standard.hpp>	// (fmx)
-#include <FMX.Filter.Effects.hpp>	// (fmx)
 // PRG_EXT: .bpl
 // BPI_DIR: ..\lib\bpl\alcinoe\Win32\tokyo
 // OBJ_DIR: ..\lib\bpl\alcinoe\Win32\tokyo

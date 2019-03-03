@@ -28,6 +28,7 @@
 #include <FMX.StdCtrls.hpp>
 #include <FMX.ActnList.hpp>
 #include <FMX.ImgList.hpp>
+#include <ALFmxAni.hpp>
 #include <ALFmxInertialMovement.hpp>
 #include <ALFmxObjects.hpp>
 #include <FMX.Objects.hpp>
@@ -48,6 +49,9 @@ class DELPHICLASS TALScrollBar;
 class DELPHICLASS TALRangeTrackBar;
 class DELPHICLASS TALCheckBox;
 class DELPHICLASS TALRadioButton;
+class DELPHICLASS TALSwitchThumb;
+class DELPHICLASS TALSwitchBackground;
+class DELPHICLASS TALSwitch;
 //-- type declarations -------------------------------------------------------
 class PASCALIMPLEMENTATION TALAniIndicator : public Fmx::Controls::TControl
 {
@@ -702,6 +706,152 @@ public:
 __published:
 	__property System::UnicodeString GroupName = {read=GetGroupName, write=SetGroupName, stored=GroupNameStored};
 	__property bool Mandatory = {read=fMandatory, write=fMandatory, default=0};
+};
+
+
+class PASCALIMPLEMENTATION TALSwitchThumb : public Alfmxobjects::TALRectangle
+{
+	typedef Alfmxobjects::TALRectangle inherited;
+	
+public:
+	__fastcall virtual TALSwitchThumb(System::Classes::TComponent* AOwner);
+	
+__published:
+	__property Locked = {default=1};
+	__property HitTest = {default=0};
+public:
+	/* TALRectangle.Destroy */ inline __fastcall virtual ~TALSwitchThumb(void) { }
+	
+};
+
+
+class PASCALIMPLEMENTATION TALSwitchBackground : public Alfmxobjects::TALRectangle
+{
+	typedef Alfmxobjects::TALRectangle inherited;
+	
+public:
+	__fastcall virtual TALSwitchBackground(System::Classes::TComponent* AOwner);
+	
+__published:
+	__property Locked = {default=1};
+	__property HitTest = {default=0};
+public:
+	/* TALRectangle.Destroy */ inline __fastcall virtual ~TALSwitchBackground(void) { }
+	
+};
+
+
+class PASCALIMPLEMENTATION TALSwitch : public Fmx::Controls::TControl
+{
+	typedef Fmx::Controls::TControl inherited;
+	
+public:
+	#define TALSwitch_DefaultSwitchAnimationDuration  (2.000000E-01)
+	
+	static const System::Int8 TrackingSensitivity = System::Int8(0x3);
+	
+	
+private:
+	TALSwitchThumb* FThumb;
+	TALSwitchBackground* FBackGround;
+	System::Types::TRectF FThumbRect;
+	bool FPressed;
+	bool FTracking;
+	System::Types::TPointF FPressedThumbPos;
+	System::Types::TPointF FSavedPos;
+	Alfmxani::TALFloatAnimation* FAnimation;
+	bool FIsChecked;
+	System::Classes::TNotifyEvent FOnChange;
+	System::Classes::TNotifyEvent FOnAnimationProcess;
+	System::Classes::TNotifyEvent FOnAnimationFinish;
+	float FThumbSize;
+	float fAnimationDuration;
+	void __fastcall doAnimationProcess(System::TObject* Sender);
+	void __fastcall DoAnimationEnd(System::TObject* Sender);
+	void __fastcall SetThumbSize(const float Value);
+	bool __fastcall AnimationDurationStored(void);
+	
+protected:
+	virtual System::Types::TSizeF __fastcall GetDefaultSize(void);
+	void __fastcall AnimateTo(const bool Value);
+	float __fastcall GetThumbCenter(void);
+	float __fastcall GetThumbSize(void);
+	bool __fastcall GetValueByMousePos(const float X, const float Y);
+	virtual System::Types::TRectF __fastcall GetThumbRectByValue(const bool Value);
+	void __fastcall DoChange(void);
+	virtual void __fastcall Resize(void);
+	virtual void __fastcall DoRealign(void);
+	virtual void __fastcall MouseDown(System::Uitypes::TMouseButton Button, System::Classes::TShiftState Shift, float X, float Y);
+	virtual void __fastcall MouseMove(System::Classes::TShiftState Shift, float X, float Y);
+	virtual void __fastcall MouseUp(System::Uitypes::TMouseButton Button, System::Classes::TShiftState Shift, float X, float Y);
+	__property bool Pressed = {read=FPressed, nodefault};
+	void __fastcall SetIsChecked(const bool Value);
+	
+public:
+	__fastcall virtual TALSwitch(System::Classes::TComponent* AOwner);
+	__fastcall virtual ~TALSwitch(void);
+	float __fastcall GetThumbValue(void);
+	void __fastcall SetIsCheckedWithAnimation(const bool Value);
+	__property bool Tracking = {read=FTracking, write=FTracking, default=0};
+	__property Alfmxani::TALFloatAnimation* Animation = {read=FAnimation};
+	
+__published:
+	__property Action;
+	__property Align = {default=0};
+	__property Anchors;
+	__property ClipChildren = {default=0};
+	__property ClipParent = {default=0};
+	__property Cursor = {default=0};
+	__property DragMode = {default=0};
+	__property EnableDragHighlight = {default=1};
+	__property Enabled = {default=1};
+	__property Locked = {default=0};
+	__property Height;
+	__property HitTest = {default=0};
+	__property Padding;
+	__property Opacity;
+	__property Margins;
+	__property PopupMenu;
+	__property Position;
+	__property RotationAngle = {default=0};
+	__property RotationCenter;
+	__property Scale;
+	__property Size;
+	__property TabOrder = {default=-1};
+	__property TouchTargetExpansion;
+	__property float ThumbSize = {read=FThumbSize, write=SetThumbSize};
+	__property TALSwitchThumb* Thumb = {read=FThumb};
+	__property TALSwitchBackground* BackGround = {read=FBackGround};
+	__property bool IsChecked = {read=FIsChecked, write=SetIsChecked, default=0};
+	__property float AnimationDuration = {read=fAnimationDuration, write=fAnimationDuration, stored=AnimationDurationStored};
+	__property Visible = {default=1};
+	__property Width;
+	__property OnApplyStyleLookup;
+	__property OnDragEnter;
+	__property OnDragLeave;
+	__property OnDragOver;
+	__property OnDragDrop;
+	__property OnDragEnd;
+	__property OnKeyDown;
+	__property OnKeyUp;
+	__property OnCanFocus;
+	__property OnClick;
+	__property OnDblClick;
+	__property OnEnter;
+	__property OnExit;
+	__property OnMouseDown;
+	__property OnMouseMove;
+	__property OnMouseUp;
+	__property OnMouseWheel;
+	__property OnMouseEnter;
+	__property OnMouseLeave;
+	__property OnPainting;
+	__property OnPaint;
+	__property OnResize;
+	__property OnResized;
+	__property System::Classes::TNotifyEvent OnChange = {read=FOnChange, write=FOnChange};
+	__property System::Classes::TNotifyEvent OnAnimationProcess = {read=FOnAnimationProcess, write=FOnAnimationProcess};
+	__property System::Classes::TNotifyEvent OnAnimationFinish = {read=FOnAnimationFinish, write=FOnAnimationFinish};
 };
 
 

@@ -56,7 +56,8 @@ contains
   ALVideoPlayer in 'ALVideoPlayer.pas',
   ALFmxMemo in 'ALFmxMemo.pas',
   ALGraphics in 'ALGraphics.pas',
-  ALFmxFilterEffects in 'ALFmxFilterEffects.pas';
+  ALFmxFilterEffects in 'ALFmxFilterEffects.pas',
+  ALFmxAni in 'ALFmxAni.pas';
 
 end.
 

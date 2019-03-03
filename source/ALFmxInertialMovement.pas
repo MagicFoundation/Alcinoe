@@ -79,25 +79,24 @@ type
       Time: TDateTime;
     end;
   {$IFDEF IOS}
+
   private type
+    IDisplayLinkListener = interface(NSObject)
+    ['{810AD3F0-265C-4A73-9B96-74103268884A}']
+      procedure displayLinkUpdated; cdecl;
+    end;
 
-      IDisplayLinkListener = interface(NSObject)
-      ['{810AD3F0-265C-4A73-9B96-74103268884A}']
-        procedure displayLinkUpdated; cdecl;
-      end;
-
-      TDisplayLinkListener = class(TOCLocal)
-      private
-        [Weak] fAniCalculations: TALAniCalculations;
-      protected
-        function GetObjectiveCClass: PTypeInfo; override;
-      public
-        constructor Create(const aAniCalculations: TALAniCalculations);
-        procedure displayLinkUpdated; cdecl;
-      end;
+    TDisplayLinkListener = class(TOCLocal)
+    private
+      [Weak] fAniCalculations: TALAniCalculations;
+    protected
+      function GetObjectiveCClass: PTypeInfo; override;
+    public
+      constructor Create(const aAniCalculations: TALAniCalculations);
+      procedure displayLinkUpdated; cdecl;
+    end;
 
   private
-
     fDisplayLink: CADisplayLink;
     fDisplayLinkListener: TDisplayLinkListener;
 
@@ -111,7 +110,8 @@ type
       constructor Create(const aAniCalculations: TALAniCalculations);
       procedure doFrame(frameTimeNanos: Int64); cdecl;
     end;
-  private var
+
+  private
     FChoreographer: JChoreographer;
     FChoreographerFrameCallback: TChoreographerFrameCallback;
 

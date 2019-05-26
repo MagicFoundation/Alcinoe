@@ -1,0 +1,8439 @@
+{**********************************************************}
+{                                                          }
+{           CodeGear Delphi Runtime Library                }
+{                                                          }
+{ Delphi-Objective-C Bridge                                }
+{ Interfaces for Cocoa framework UIKit                     }
+{                                                          }
+{ Copyright (c) 2005-2011, Apple Inc. All rights reserved. }
+{                                                          }
+{ Translator: Embarcadero Technologies, Inc.               }
+{   Copyright(c) 2012-2017 Embarcadero Technologies, Inc.  }
+{              All rights reserved                         }
+{                                                          }
+{**********************************************************}
+
+unit iOSapi.UIKit;
+
+interface
+
+uses
+  iOSapi.CocoaTypes, Macapi.CoreFoundation, iOSapi.Foundation, Macapi.ObjCRuntime, Macapi.ObjectiveC,
+  iOSapi.QuartzCore, iOSapi.CoreData, iOSapi.CoreGraphics, iOSapi.CoreImage, iOSapi.CoreText;
+
+const
+  NSUnderlineStyleNone = 0;
+  {$EXTERNALSYM NSUnderlineStyleNone}
+  NSUnderlineStyleSingle = 1;
+  {$EXTERNALSYM NSUnderlineStyleSingle}
+  NSUnderlineStyleThick = 2;
+  {$EXTERNALSYM NSUnderlineStyleThick}
+  NSUnderlineStyleDouble = 9;
+  {$EXTERNALSYM NSUnderlineStyleDouble}
+  NSUnderlinePatternSolid = 0;
+  {$EXTERNALSYM NSUnderlinePatternSolid}
+  NSUnderlinePatternDot = 256;
+  {$EXTERNALSYM NSUnderlinePatternDot}
+  NSUnderlinePatternDash = 512;
+  {$EXTERNALSYM NSUnderlinePatternDash}
+  NSUnderlinePatternDashDot = 768;
+  {$EXTERNALSYM NSUnderlinePatternDashDot}
+  NSUnderlinePatternDashDotDot = 1024;
+  {$EXTERNALSYM NSUnderlinePatternDashDotDot}
+  NSUnderlineByWord = 32768;
+  {$EXTERNALSYM NSUnderlineByWord}
+  NSTextWritingDirectionEmbedding = (0 shl 1);
+  {$EXTERNALSYM NSTextWritingDirectionEmbedding}
+  NSTextWritingDirectionOverride = (1 shl 1);
+  {$EXTERNALSYM NSTextWritingDirectionOverride}
+  UIRectEdgeNone = 0;
+  {$EXTERNALSYM UIRectEdgeNone}
+  UIRectEdgeTop = 1 shl 0;
+  {$EXTERNALSYM UIRectEdgeTop}
+  UIRectEdgeLeft = 1 shl 1;
+  {$EXTERNALSYM UIRectEdgeLeft}
+  UIRectEdgeBottom = 1 shl 2;
+  {$EXTERNALSYM UIRectEdgeBottom}
+  UIRectEdgeRight = 1 shl 3;
+  {$EXTERNALSYM UIRectEdgeRight}
+  UIRectEdgeAll = UIRectEdgeTop or UIRectEdgeLeft or UIRectEdgeBottom or
+    UIRectEdgeRight;
+  {$EXTERNALSYM UIRectEdgeAll}
+  NSLayoutRelationLessThanOrEqual = -1;
+  {$EXTERNALSYM NSLayoutRelationLessThanOrEqual}
+  NSLayoutRelationEqual = 0;
+  {$EXTERNALSYM NSLayoutRelationEqual}
+  NSLayoutRelationGreaterThanOrEqual = 1;
+  {$EXTERNALSYM NSLayoutRelationGreaterThanOrEqual}
+  NSLayoutAttributeLeft = 1;
+  {$EXTERNALSYM NSLayoutAttributeLeft}
+  NSLayoutAttributeRight = 2;
+  {$EXTERNALSYM NSLayoutAttributeRight}
+  NSLayoutAttributeTop = 3;
+  {$EXTERNALSYM NSLayoutAttributeTop}
+  NSLayoutAttributeBottom = 4;
+  {$EXTERNALSYM NSLayoutAttributeBottom}
+  NSLayoutAttributeLeading = 5;
+  {$EXTERNALSYM NSLayoutAttributeLeading}
+  NSLayoutAttributeTrailing = 6;
+  {$EXTERNALSYM NSLayoutAttributeTrailing}
+  NSLayoutAttributeWidth = 7;
+  {$EXTERNALSYM NSLayoutAttributeWidth}
+  NSLayoutAttributeHeight = 8;
+  {$EXTERNALSYM NSLayoutAttributeHeight}
+  NSLayoutAttributeCenterX = 9;
+  {$EXTERNALSYM NSLayoutAttributeCenterX}
+  NSLayoutAttributeCenterY = 10;
+  {$EXTERNALSYM NSLayoutAttributeCenterY}
+  NSLayoutAttributeBaseline = 11;
+  {$EXTERNALSYM NSLayoutAttributeBaseline}
+  NSLayoutAttributeLeftMargin = 13;
+  {$EXTERNALSYM NSLayoutAttributeLeftMargin}
+  NSLayoutAttributeRightMargin = 14;
+  {$EXTERNALSYM NSLayoutAttributeRightMargin}
+  NSLayoutAttributeTopMargin = 15;
+  {$EXTERNALSYM NSLayoutAttributeTopMargin}
+  NSLayoutAttributeBottomMargin = 16;
+  {$EXTERNALSYM NSLayoutAttributeBottomMargin}
+  NSLayoutAttributeLeadingMargin = 17;
+  {$EXTERNALSYM NSLayoutAttributeLeadingMargin}
+  NSLayoutAttributeTrailingMargin = 18;
+  {$EXTERNALSYM NSLayoutAttributeTrailingMargin}
+  NSLayoutAttributeCenterXWithinMargins = 19;
+  {$EXTERNALSYM NSLayoutAttributeCenterXWithinMargins}
+  NSLayoutAttributeCenterYWithinMargins = 20;
+  {$EXTERNALSYM NSLayoutAttributeCenterYWithinMargins}
+  NSLayoutAttributeNotAnAttribute = 0;
+  {$EXTERNALSYM NSLayoutAttributeNotAnAttribute}
+  NSLayoutFormatAlignAllLeft = (1 shl NSLayoutAttributeLeft);
+  {$EXTERNALSYM NSLayoutFormatAlignAllLeft}
+  NSLayoutFormatAlignAllRight = (1 shl NSLayoutAttributeRight);
+  {$EXTERNALSYM NSLayoutFormatAlignAllRight}
+  NSLayoutFormatAlignAllTop = (1 shl NSLayoutAttributeTop);
+  {$EXTERNALSYM NSLayoutFormatAlignAllTop}
+  NSLayoutFormatAlignAllBottom = (1 shl NSLayoutAttributeBottom);
+  {$EXTERNALSYM NSLayoutFormatAlignAllBottom}
+  NSLayoutFormatAlignAllLeading = (1 shl NSLayoutAttributeLeading);
+  {$EXTERNALSYM NSLayoutFormatAlignAllLeading}
+  NSLayoutFormatAlignAllTrailing = (1 shl NSLayoutAttributeTrailing);
+  {$EXTERNALSYM NSLayoutFormatAlignAllTrailing}
+  NSLayoutFormatAlignAllCenterX = (1 shl NSLayoutAttributeCenterX);
+  {$EXTERNALSYM NSLayoutFormatAlignAllCenterX}
+  NSLayoutFormatAlignAllCenterY = (1 shl NSLayoutAttributeCenterY);
+  {$EXTERNALSYM NSLayoutFormatAlignAllCenterY}
+  NSLayoutFormatAlignAllBaseline = (1 shl NSLayoutAttributeBaseline);
+  {$EXTERNALSYM NSLayoutFormatAlignAllBaseline}
+  NSLayoutFormatAlignmentMask = 65535;
+  {$EXTERNALSYM NSLayoutFormatAlignmentMask}
+  NSLayoutFormatDirectionLeadingToTrailing = 0 shl 16;
+  {$EXTERNALSYM NSLayoutFormatDirectionLeadingToTrailing}
+  NSLayoutFormatDirectionLeftToRight = 1 shl 16;
+  {$EXTERNALSYM NSLayoutFormatDirectionLeftToRight}
+  NSLayoutFormatDirectionRightToLeft = 2 shl 16;
+  {$EXTERNALSYM NSLayoutFormatDirectionRightToLeft}
+  NSLayoutFormatDirectionMask = 3 shl 16;
+  {$EXTERNALSYM NSLayoutFormatDirectionMask}
+  UILayoutPriorityRequired = 1000;
+  {$EXTERNALSYM UILayoutPriorityRequired}
+  UILayoutPriorityDefaultHigh = 750;
+  {$EXTERNALSYM UILayoutPriorityDefaultHigh}
+  UILayoutPriorityDefaultLow = 250;
+  {$EXTERNALSYM UILayoutPriorityDefaultLow}
+  UILayoutPriorityFittingSizeLevel = 50;
+  {$EXTERNALSYM UILayoutPriorityFittingSizeLevel}
+  NSTextStorageEditedAttributes = (1 shl 0);
+  {$EXTERNALSYM NSTextStorageEditedAttributes}
+  NSTextStorageEditedCharacters = (1 shl 1);
+  {$EXTERNALSYM NSTextStorageEditedCharacters}
+  UIFontDescriptorTraitItalic = 1 shl 0;
+  {$EXTERNALSYM UIFontDescriptorTraitItalic}
+  UIFontDescriptorTraitBold = 1 shl 1;
+  {$EXTERNALSYM UIFontDescriptorTraitBold}
+  UIFontDescriptorTraitExpanded = 1 shl 5;
+  {$EXTERNALSYM UIFontDescriptorTraitExpanded}
+  UIFontDescriptorTraitCondensed = 1 shl 6;
+  {$EXTERNALSYM UIFontDescriptorTraitCondensed}
+  UIFontDescriptorTraitMonoSpace = 1 shl 10;
+  {$EXTERNALSYM UIFontDescriptorTraitMonoSpace}
+  UIFontDescriptorTraitVertical = 1 shl 11;
+  {$EXTERNALSYM UIFontDescriptorTraitVertical}
+  UIFontDescriptorTraitUIOptimized = 1 shl 12;
+  {$EXTERNALSYM UIFontDescriptorTraitUIOptimized}
+  UIFontDescriptorTraitTightLeading = 1 shl 15;
+  {$EXTERNALSYM UIFontDescriptorTraitTightLeading}
+  UIFontDescriptorTraitLooseLeading = 1 shl 16;
+  {$EXTERNALSYM UIFontDescriptorTraitLooseLeading}
+  UIFontDescriptorClassMask = 4026531840;
+  {$EXTERNALSYM UIFontDescriptorClassMask}
+  UIFontDescriptorClassUnknown = 0 shl 28;
+  {$EXTERNALSYM UIFontDescriptorClassUnknown}
+  UIFontDescriptorClassOldStyleSerifs = 1 shl 28;
+  {$EXTERNALSYM UIFontDescriptorClassOldStyleSerifs}
+  UIFontDescriptorClassTransitionalSerifs = 2 shl 28;
+  {$EXTERNALSYM UIFontDescriptorClassTransitionalSerifs}
+  UIFontDescriptorClassModernSerifs = 3 shl 28;
+  {$EXTERNALSYM UIFontDescriptorClassModernSerifs}
+  UIFontDescriptorClassClarendonSerifs = 4 shl 28;
+  {$EXTERNALSYM UIFontDescriptorClassClarendonSerifs}
+  UIFontDescriptorClassSlabSerifs = 5 shl 28;
+  {$EXTERNALSYM UIFontDescriptorClassSlabSerifs}
+  UIFontDescriptorClassFreeformSerifs = 7 shl 28;
+  {$EXTERNALSYM UIFontDescriptorClassFreeformSerifs}
+  UIFontDescriptorClassSansSerif = 8 shl 28;
+  {$EXTERNALSYM UIFontDescriptorClassSansSerif}
+  UIFontDescriptorClassOrnamentals = 9 shl 28;
+  {$EXTERNALSYM UIFontDescriptorClassOrnamentals}
+  UIFontDescriptorClassScripts = 10 shl 28;
+  {$EXTERNALSYM UIFontDescriptorClassScripts}
+  UIFontDescriptorClassSymbolic = 12 shl 28;
+  {$EXTERNALSYM UIFontDescriptorClassSymbolic}
+  NSTextLayoutOrientationHorizontal = 0;
+  {$EXTERNALSYM NSTextLayoutOrientationHorizontal}
+  NSTextLayoutOrientationVertical = 1;
+  {$EXTERNALSYM NSTextLayoutOrientationVertical}
+  NSGlyphPropertyNull = (1 shl 0);
+  {$EXTERNALSYM NSGlyphPropertyNull}
+  NSGlyphPropertyControlCharacter = (1 shl 1);
+  {$EXTERNALSYM NSGlyphPropertyControlCharacter}
+  NSGlyphPropertyElastic = (1 shl 2);
+  {$EXTERNALSYM NSGlyphPropertyElastic}
+  NSGlyphPropertyNonBaseCharacter = (1 shl 3);
+  {$EXTERNALSYM NSGlyphPropertyNonBaseCharacter}
+  NSControlCharacterZeroAdvancementAction = (1 shl 0);
+  {$EXTERNALSYM NSControlCharacterZeroAdvancementAction}
+  NSControlCharacterWhitespaceAction = (1 shl 1);
+  {$EXTERNALSYM NSControlCharacterWhitespaceAction}
+  NSControlCharacterHorizontalTabAction = (1 shl 2);
+  {$EXTERNALSYM NSControlCharacterHorizontalTabAction}
+  NSControlCharacterLineBreakAction = (1 shl 3);
+  {$EXTERNALSYM NSControlCharacterLineBreakAction}
+  NSControlCharacterParagraphBreakAction = (1 shl 4);
+  {$EXTERNALSYM NSControlCharacterParagraphBreakAction}
+  NSControlCharacterContainerBreakAction = (1 shl 5);
+  {$EXTERNALSYM NSControlCharacterContainerBreakAction}
+  NSTextAlignmentLeft = 0;
+  {$EXTERNALSYM NSTextAlignmentLeft}
+  NSTextAlignmentCenter = 1;
+  {$EXTERNALSYM NSTextAlignmentCenter}
+  NSTextAlignmentRight = 2;
+  {$EXTERNALSYM NSTextAlignmentRight}
+  NSTextAlignmentJustified = 3;
+  {$EXTERNALSYM NSTextAlignmentJustified}
+  NSTextAlignmentNatural = 4;
+  {$EXTERNALSYM NSTextAlignmentNatural}
+  NSWritingDirectionNatural = -1;
+  {$EXTERNALSYM NSWritingDirectionNatural}
+  NSWritingDirectionLeftToRight = 0;
+  {$EXTERNALSYM NSWritingDirectionLeftToRight}
+  NSWritingDirectionRightToLeft = 1;
+  {$EXTERNALSYM NSWritingDirectionRightToLeft}
+  NSLineBreakByWordWrapping = 0;
+  {$EXTERNALSYM NSLineBreakByWordWrapping}
+  NSLineBreakByCharWrapping = 1;
+  {$EXTERNALSYM NSLineBreakByCharWrapping}
+  NSLineBreakByClipping = 2;
+  {$EXTERNALSYM NSLineBreakByClipping}
+  NSLineBreakByTruncatingHead = 3;
+  {$EXTERNALSYM NSLineBreakByTruncatingHead}
+  NSLineBreakByTruncatingTail = 4;
+  {$EXTERNALSYM NSLineBreakByTruncatingTail}
+  NSLineBreakByTruncatingMiddle = 5;
+  {$EXTERNALSYM NSLineBreakByTruncatingMiddle}
+  NSStringDrawingTruncatesLastVisibleLine = 1 shl 5;
+  {$EXTERNALSYM NSStringDrawingTruncatesLastVisibleLine}
+  NSStringDrawingUsesLineFragmentOrigin = 1 shl 0;
+  {$EXTERNALSYM NSStringDrawingUsesLineFragmentOrigin}
+  NSStringDrawingUsesFontLeading = 1 shl 1;
+  {$EXTERNALSYM NSStringDrawingUsesFontLeading}
+  NSStringDrawingUsesDeviceMetrics = 1 shl 3;
+  {$EXTERNALSYM NSStringDrawingUsesDeviceMetrics}
+  NSAttachmentCharacter = 65532;
+  {$EXTERNALSYM NSAttachmentCharacter}
+  UIRectCornerTopLeft = 1 shl 0;
+  {$EXTERNALSYM UIRectCornerTopLeft}
+  UIRectCornerTopRight = 1 shl 1;
+  {$EXTERNALSYM UIRectCornerTopRight}
+  UIRectCornerBottomLeft = 1 shl 2;
+  {$EXTERNALSYM UIRectCornerBottomLeft}
+  UIRectCornerBottomRight = 1 shl 3;
+  {$EXTERNALSYM UIRectCornerBottomRight}
+  UIRectCornerAllCorners = not 0;
+  {$EXTERNALSYM UIRectCornerAllCorners}
+  UIEventTypeTouches = 0;
+  {$EXTERNALSYM UIEventTypeTouches}
+  UIEventTypeMotion = 1;
+  {$EXTERNALSYM UIEventTypeMotion}
+  UIEventTypeRemoteControl = 2;
+  {$EXTERNALSYM UIEventTypeRemoteControl}
+  UIEventSubtypeNone = 0;
+  {$EXTERNALSYM UIEventSubtypeNone}
+  UIEventSubtypeMotionShake = 1;
+  {$EXTERNALSYM UIEventSubtypeMotionShake}
+  UIEventSubtypeRemoteControlPlay = 100;
+  {$EXTERNALSYM UIEventSubtypeRemoteControlPlay}
+  UIEventSubtypeRemoteControlPause = 101;
+  {$EXTERNALSYM UIEventSubtypeRemoteControlPause}
+  UIEventSubtypeRemoteControlStop = 102;
+  {$EXTERNALSYM UIEventSubtypeRemoteControlStop}
+  UIEventSubtypeRemoteControlTogglePlayPause = 103;
+  {$EXTERNALSYM UIEventSubtypeRemoteControlTogglePlayPause}
+  UIEventSubtypeRemoteControlNextTrack = 104;
+  {$EXTERNALSYM UIEventSubtypeRemoteControlNextTrack}
+  UIEventSubtypeRemoteControlPreviousTrack = 105;
+  {$EXTERNALSYM UIEventSubtypeRemoteControlPreviousTrack}
+  UIEventSubtypeRemoteControlBeginSeekingBackward = 106;
+  {$EXTERNALSYM UIEventSubtypeRemoteControlBeginSeekingBackward}
+  UIEventSubtypeRemoteControlEndSeekingBackward = 107;
+  {$EXTERNALSYM UIEventSubtypeRemoteControlEndSeekingBackward}
+  UIEventSubtypeRemoteControlBeginSeekingForward = 108;
+  {$EXTERNALSYM UIEventSubtypeRemoteControlBeginSeekingForward}
+  UIEventSubtypeRemoteControlEndSeekingForward = 109;
+  {$EXTERNALSYM UIEventSubtypeRemoteControlEndSeekingForward}
+  UIKeyModifierAlphaShift = 1 shl 16;
+  {$EXTERNALSYM UIKeyModifierAlphaShift}
+  UIKeyModifierShift = 1 shl 17;
+  {$EXTERNALSYM UIKeyModifierShift}
+  UIKeyModifierControl = 1 shl 18;
+  {$EXTERNALSYM UIKeyModifierControl}
+  UIKeyModifierAlternate = 1 shl 19;
+  {$EXTERNALSYM UIKeyModifierAlternate}
+  UIKeyModifierCommand = 1 shl 20;
+  {$EXTERNALSYM UIKeyModifierCommand}
+  UIKeyModifierNumericPad = 1 shl 21;
+  {$EXTERNALSYM UIKeyModifierNumericPad}
+  UIBarStyleDefault = 0;
+  {$EXTERNALSYM UIBarStyleDefault}
+  UIBarStyleBlack = 1;
+  {$EXTERNALSYM UIBarStyleBlack}
+  UIBarStyleBlackOpaque = 1;
+  {$EXTERNALSYM UIBarStyleBlackOpaque}
+  UIBarStyleBlackTranslucent = 2;
+  {$EXTERNALSYM UIBarStyleBlackTranslucent}
+  UIViewAnimationCurveEaseInOut = 0;
+  {$EXTERNALSYM UIViewAnimationCurveEaseInOut}
+  UIViewAnimationCurveEaseIn = 1;
+  {$EXTERNALSYM UIViewAnimationCurveEaseIn}
+  UIViewAnimationCurveEaseOut = 2;
+  {$EXTERNALSYM UIViewAnimationCurveEaseOut}
+  UIViewAnimationCurveLinear = 3;
+  {$EXTERNALSYM UIViewAnimationCurveLinear}
+  UIViewContentModeScaleToFill = 0;
+  {$EXTERNALSYM UIViewContentModeScaleToFill}
+  UIViewContentModeScaleAspectFit = 1;
+  {$EXTERNALSYM UIViewContentModeScaleAspectFit}
+  UIViewContentModeScaleAspectFill = 2;
+  {$EXTERNALSYM UIViewContentModeScaleAspectFill}
+  UIViewContentModeRedraw = 3;
+  {$EXTERNALSYM UIViewContentModeRedraw}
+  UIViewContentModeCenter = 4;
+  {$EXTERNALSYM UIViewContentModeCenter}
+  UIViewContentModeTop = 5;
+  {$EXTERNALSYM UIViewContentModeTop}
+  UIViewContentModeBottom = 6;
+  {$EXTERNALSYM UIViewContentModeBottom}
+  UIViewContentModeLeft = 7;
+  {$EXTERNALSYM UIViewContentModeLeft}
+  UIViewContentModeRight = 8;
+  {$EXTERNALSYM UIViewContentModeRight}
+  UIViewContentModeTopLeft = 9;
+  {$EXTERNALSYM UIViewContentModeTopLeft}
+  UIViewContentModeTopRight = 10;
+  {$EXTERNALSYM UIViewContentModeTopRight}
+  UIViewContentModeBottomLeft = 11;
+  {$EXTERNALSYM UIViewContentModeBottomLeft}
+  UIViewContentModeBottomRight = 12;
+  {$EXTERNALSYM UIViewContentModeBottomRight}
+  UIViewAnimationTransitionNone = 0;
+  {$EXTERNALSYM UIViewAnimationTransitionNone}
+  UIViewAnimationTransitionFlipFromLeft = 1;
+  {$EXTERNALSYM UIViewAnimationTransitionFlipFromLeft}
+  UIViewAnimationTransitionFlipFromRight = 2;
+  {$EXTERNALSYM UIViewAnimationTransitionFlipFromRight}
+  UIViewAnimationTransitionCurlUp = 3;
+  {$EXTERNALSYM UIViewAnimationTransitionCurlUp}
+  UIViewAnimationTransitionCurlDown = 4;
+  {$EXTERNALSYM UIViewAnimationTransitionCurlDown}
+  UIViewAutoresizingNone = 0;
+  {$EXTERNALSYM UIViewAutoresizingNone}
+  UIViewAutoresizingFlexibleLeftMargin = 1 shl 0;
+  {$EXTERNALSYM UIViewAutoresizingFlexibleLeftMargin}
+  UIViewAutoresizingFlexibleWidth = 1 shl 1;
+  {$EXTERNALSYM UIViewAutoresizingFlexibleWidth}
+  UIViewAutoresizingFlexibleRightMargin = 1 shl 2;
+  {$EXTERNALSYM UIViewAutoresizingFlexibleRightMargin}
+  UIViewAutoresizingFlexibleTopMargin = 1 shl 3;
+  {$EXTERNALSYM UIViewAutoresizingFlexibleTopMargin}
+  UIViewAutoresizingFlexibleHeight = 1 shl 4;
+  {$EXTERNALSYM UIViewAutoresizingFlexibleHeight}
+  UIViewAutoresizingFlexibleBottomMargin = 1 shl 5;
+  {$EXTERNALSYM UIViewAutoresizingFlexibleBottomMargin}
+  UIViewAnimationOptionLayoutSubviews = 1 shl 0;
+  {$EXTERNALSYM UIViewAnimationOptionLayoutSubviews}
+  UIViewAnimationOptionAllowUserInteraction = 1 shl 1;
+  {$EXTERNALSYM UIViewAnimationOptionAllowUserInteraction}
+  UIViewAnimationOptionBeginFromCurrentState = 1 shl 2;
+  {$EXTERNALSYM UIViewAnimationOptionBeginFromCurrentState}
+  UIViewAnimationOptionRepeat = 1 shl 3;
+  {$EXTERNALSYM UIViewAnimationOptionRepeat}
+  UIViewAnimationOptionAutoreverse = 1 shl 4;
+  {$EXTERNALSYM UIViewAnimationOptionAutoreverse}
+  UIViewAnimationOptionOverrideInheritedDuration = 1 shl 5;
+  {$EXTERNALSYM UIViewAnimationOptionOverrideInheritedDuration}
+  UIViewAnimationOptionOverrideInheritedCurve = 1 shl 6;
+  {$EXTERNALSYM UIViewAnimationOptionOverrideInheritedCurve}
+  UIViewAnimationOptionAllowAnimatedContent = 1 shl 7;
+  {$EXTERNALSYM UIViewAnimationOptionAllowAnimatedContent}
+  UIViewAnimationOptionShowHideTransitionViews = 1 shl 8;
+  {$EXTERNALSYM UIViewAnimationOptionShowHideTransitionViews}
+  UIViewAnimationOptionOverrideInheritedOptions = 1 shl 9;
+  {$EXTERNALSYM UIViewAnimationOptionOverrideInheritedOptions}
+  UIViewAnimationOptionCurveEaseInOut = 0 shl 16;
+  {$EXTERNALSYM UIViewAnimationOptionCurveEaseInOut}
+  UIViewAnimationOptionCurveEaseIn = 1 shl 16;
+  {$EXTERNALSYM UIViewAnimationOptionCurveEaseIn}
+  UIViewAnimationOptionCurveEaseOut = 2 shl 16;
+  {$EXTERNALSYM UIViewAnimationOptionCurveEaseOut}
+  UIViewAnimationOptionCurveLinear = 3 shl 16;
+  {$EXTERNALSYM UIViewAnimationOptionCurveLinear}
+  UIViewAnimationOptionTransitionNone = 0 shl 20;
+  {$EXTERNALSYM UIViewAnimationOptionTransitionNone}
+  UIViewAnimationOptionTransitionFlipFromLeft = 1 shl 20;
+  {$EXTERNALSYM UIViewAnimationOptionTransitionFlipFromLeft}
+  UIViewAnimationOptionTransitionFlipFromRight = 2 shl 20;
+  {$EXTERNALSYM UIViewAnimationOptionTransitionFlipFromRight}
+  UIViewAnimationOptionTransitionCurlUp = 3 shl 20;
+  {$EXTERNALSYM UIViewAnimationOptionTransitionCurlUp}
+  UIViewAnimationOptionTransitionCurlDown = 4 shl 20;
+  {$EXTERNALSYM UIViewAnimationOptionTransitionCurlDown}
+  UIViewAnimationOptionTransitionCrossDissolve = 5 shl 20;
+  {$EXTERNALSYM UIViewAnimationOptionTransitionCrossDissolve}
+  UIViewAnimationOptionTransitionFlipFromTop = 6 shl 20;
+  {$EXTERNALSYM UIViewAnimationOptionTransitionFlipFromTop}
+  UIViewAnimationOptionTransitionFlipFromBottom = 7 shl 20;
+  {$EXTERNALSYM UIViewAnimationOptionTransitionFlipFromBottom}
+  UIViewKeyframeAnimationOptionLayoutSubviews =
+  {$EXTERNALSYM UIViewKeyframeAnimationOptionLayoutSubviews}
+    UIViewAnimationOptionLayoutSubviews;
+  UIViewKeyframeAnimationOptionAllowUserInteraction =
+    UIViewAnimationOptionAllowUserInteraction;
+  {$EXTERNALSYM UIViewKeyframeAnimationOptionAllowUserInteraction}
+  UIViewKeyframeAnimationOptionBeginFromCurrentState =
+    UIViewAnimationOptionBeginFromCurrentState;
+  {$EXTERNALSYM UIViewKeyframeAnimationOptionBeginFromCurrentState}
+  UIViewKeyframeAnimationOptionRepeat = UIViewAnimationOptionRepeat;
+  {$EXTERNALSYM UIViewKeyframeAnimationOptionRepeat}
+  UIViewKeyframeAnimationOptionAutoreverse = UIViewAnimationOptionAutoreverse;
+  {$EXTERNALSYM UIViewKeyframeAnimationOptionAutoreverse}
+  UIViewKeyframeAnimationOptionOverrideInheritedDuration =
+    UIViewAnimationOptionOverrideInheritedDuration;
+  {$EXTERNALSYM UIViewKeyframeAnimationOptionOverrideInheritedDuration}
+  UIViewKeyframeAnimationOptionOverrideInheritedOptions =
+    UIViewAnimationOptionOverrideInheritedOptions;
+  {$EXTERNALSYM UIViewKeyframeAnimationOptionOverrideInheritedOptions}
+  UIViewKeyframeAnimationOptionCalculationModeLinear = 0 shl 10;
+  {$EXTERNALSYM UIViewKeyframeAnimationOptionCalculationModeLinear}
+  UIViewKeyframeAnimationOptionCalculationModeDiscrete = 1 shl 10;
+  {$EXTERNALSYM UIViewKeyframeAnimationOptionCalculationModeDiscrete}
+  UIViewKeyframeAnimationOptionCalculationModePaced = 2 shl 10;
+  {$EXTERNALSYM UIViewKeyframeAnimationOptionCalculationModePaced}
+  UIViewKeyframeAnimationOptionCalculationModeCubic = 3 shl 10;
+  {$EXTERNALSYM UIViewKeyframeAnimationOptionCalculationModeCubic}
+  UIViewKeyframeAnimationOptionCalculationModeCubicPaced = 4 shl 10;
+  {$EXTERNALSYM UIViewKeyframeAnimationOptionCalculationModeCubicPaced}
+  UISystemAnimationDelete = 0;
+  {$EXTERNALSYM UISystemAnimationDelete}
+  UIViewTintAdjustmentModeAutomatic = 0;
+  {$EXTERNALSYM UIViewTintAdjustmentModeAutomatic}
+  UIViewTintAdjustmentModeNormal = 1;
+  {$EXTERNALSYM UIViewTintAdjustmentModeNormal}
+  UIViewTintAdjustmentModeDimmed = 2;
+  {$EXTERNALSYM UIViewTintAdjustmentModeDimmed}
+  UILayoutConstraintAxisHorizontal = 0;
+  {$EXTERNALSYM UILayoutConstraintAxisHorizontal}
+  UILayoutConstraintAxisVertical = 1;
+  {$EXTERNALSYM UILayoutConstraintAxisVertical}
+  UIScrollViewIndicatorStyleDefault = 0;
+  {$EXTERNALSYM UIScrollViewIndicatorStyleDefault}
+  UIScrollViewIndicatorStyleBlack = 1;
+  {$EXTERNALSYM UIScrollViewIndicatorStyleBlack}
+  UIScrollViewIndicatorStyleWhite = 2;
+  {$EXTERNALSYM UIScrollViewIndicatorStyleWhite}
+  UIScrollViewKeyboardDismissModeNone = 0;
+  {$EXTERNALSYM UIScrollViewKeyboardDismissModeNone}
+  UIScrollViewKeyboardDismissModeOnDrag = 1;
+  {$EXTERNALSYM UIScrollViewKeyboardDismissModeOnDrag}
+  UIScrollViewKeyboardDismissModeInteractive = 2;
+  {$EXTERNALSYM UIScrollViewKeyboardDismissModeInteractive}
+  UIGestureRecognizerStatePossible = 0;
+  {$EXTERNALSYM UIGestureRecognizerStatePossible}
+  UIGestureRecognizerStateBegan = 1;
+  {$EXTERNALSYM UIGestureRecognizerStateBegan}
+  UIGestureRecognizerStateChanged = 2;
+  {$EXTERNALSYM UIGestureRecognizerStateChanged}
+  UIGestureRecognizerStateEnded = 3;
+  {$EXTERNALSYM UIGestureRecognizerStateEnded}
+  UIGestureRecognizerStateCancelled = 4;
+  {$EXTERNALSYM UIGestureRecognizerStateCancelled}
+  UIGestureRecognizerStateFailed = 5;
+  {$EXTERNALSYM UIGestureRecognizerStateFailed}
+  UIGestureRecognizerStateRecognized = UIGestureRecognizerStateEnded;
+  {$EXTERNALSYM UIGestureRecognizerStateRecognized}
+  UISwipeGestureRecognizerDirectionRight = 1 shl 0;
+  {$EXTERNALSYM UISwipeGestureRecognizerDirectionRight}
+  UISwipeGestureRecognizerDirectionLeft = 1 shl 1;
+  {$EXTERNALSYM UISwipeGestureRecognizerDirectionLeft}
+  UISwipeGestureRecognizerDirectionUp = 1 shl 2;
+  {$EXTERNALSYM UISwipeGestureRecognizerDirectionUp}
+  UISwipeGestureRecognizerDirectionDown = 1 shl 3;
+  {$EXTERNALSYM UISwipeGestureRecognizerDirectionDown}
+  UILineBreakModeWordWrap = 0;
+  {$EXTERNALSYM UILineBreakModeWordWrap}
+  UILineBreakModeCharacterWrap = 1;
+  {$EXTERNALSYM UILineBreakModeCharacterWrap}
+  UILineBreakModeClip = 2;
+  {$EXTERNALSYM UILineBreakModeClip}
+  UILineBreakModeHeadTruncation = 3;
+  {$EXTERNALSYM UILineBreakModeHeadTruncation}
+  UILineBreakModeTailTruncation = 4;
+  {$EXTERNALSYM UILineBreakModeTailTruncation}
+  UILineBreakModeMiddleTruncation = 5;
+  {$EXTERNALSYM UILineBreakModeMiddleTruncation}
+  UITextAlignmentLeft = 0;
+  {$EXTERNALSYM UITextAlignmentLeft}
+  UITextAlignmentCenter = 1;
+  {$EXTERNALSYM UITextAlignmentCenter}
+  UITextAlignmentRight = 2;
+  {$EXTERNALSYM UITextAlignmentRight}
+  UIBaselineAdjustmentAlignBaselines = 0;
+  {$EXTERNALSYM UIBaselineAdjustmentAlignBaselines}
+  UIBaselineAdjustmentAlignCenters = 1;
+  {$EXTERNALSYM UIBaselineAdjustmentAlignCenters}
+  UIBaselineAdjustmentNone = 2;
+  {$EXTERNALSYM UIBaselineAdjustmentNone}
+  UITableViewCellStyleDefault = 0;
+  {$EXTERNALSYM UITableViewCellStyleDefault}
+  UITableViewCellStyleValue1 = 1;
+  {$EXTERNALSYM UITableViewCellStyleValue1}
+  UITableViewCellStyleValue2 = 2;
+  {$EXTERNALSYM UITableViewCellStyleValue2}
+  UITableViewCellStyleSubtitle = 3;
+  {$EXTERNALSYM UITableViewCellStyleSubtitle}
+  UITableViewCellSeparatorStyleNone = 0;
+  {$EXTERNALSYM UITableViewCellSeparatorStyleNone}
+  UITableViewCellSeparatorStyleSingleLine = 1;
+  {$EXTERNALSYM UITableViewCellSeparatorStyleSingleLine}
+  UITableViewCellSeparatorStyleSingleLineEtched = 2;
+  {$EXTERNALSYM UITableViewCellSeparatorStyleSingleLineEtched}
+  UITableViewCellSelectionStyleNone = 0;
+  {$EXTERNALSYM UITableViewCellSelectionStyleNone}
+  UITableViewCellSelectionStyleBlue = 1;
+  {$EXTERNALSYM UITableViewCellSelectionStyleBlue}
+  UITableViewCellSelectionStyleGray = 2;
+  {$EXTERNALSYM UITableViewCellSelectionStyleGray}
+  UITableViewCellSelectionStyleDefault = 3;
+  {$EXTERNALSYM UITableViewCellSelectionStyleDefault}
+  UITableViewCellEditingStyleNone = 0;
+  {$EXTERNALSYM UITableViewCellEditingStyleNone}
+  UITableViewCellEditingStyleDelete = 1;
+  {$EXTERNALSYM UITableViewCellEditingStyleDelete}
+  UITableViewCellEditingStyleInsert = 2;
+  {$EXTERNALSYM UITableViewCellEditingStyleInsert}
+  UITableViewCellAccessoryNone = 0;
+  {$EXTERNALSYM UITableViewCellAccessoryNone}
+  UITableViewCellAccessoryDisclosureIndicator = 1;
+  {$EXTERNALSYM UITableViewCellAccessoryDisclosureIndicator}
+  UITableViewCellAccessoryDetailDisclosureButton = 2;
+  {$EXTERNALSYM UITableViewCellAccessoryDetailDisclosureButton}
+  UITableViewCellAccessoryCheckmark = 3;
+  {$EXTERNALSYM UITableViewCellAccessoryCheckmark}
+  UITableViewCellAccessoryDetailButton = 4;
+  {$EXTERNALSYM UITableViewCellAccessoryDetailButton}
+  UITableViewCellStateDefaultMask = 0;
+  {$EXTERNALSYM UITableViewCellStateDefaultMask}
+  UITableViewCellStateShowingEditControlMask = 1 shl 0;
+  {$EXTERNALSYM UITableViewCellStateShowingEditControlMask}
+  UITableViewCellStateShowingDeleteConfirmationMask = 1 shl 1;
+  {$EXTERNALSYM UITableViewCellStateShowingDeleteConfirmationMask}
+  UITableViewStylePlain = 0;
+  {$EXTERNALSYM UITableViewStylePlain}
+  UITableViewStyleGrouped = 1;
+  {$EXTERNALSYM UITableViewStyleGrouped}
+  UITableViewScrollPositionNone = 0;
+  {$EXTERNALSYM UITableViewScrollPositionNone}
+  UITableViewScrollPositionTop = 1;
+  {$EXTERNALSYM UITableViewScrollPositionTop}
+  UITableViewScrollPositionMiddle = 2;
+  {$EXTERNALSYM UITableViewScrollPositionMiddle}
+  UITableViewScrollPositionBottom = 3;
+  {$EXTERNALSYM UITableViewScrollPositionBottom}
+  UITableViewRowAnimationFade = 0;
+  {$EXTERNALSYM UITableViewRowAnimationFade}
+  UITableViewRowAnimationRight = 1;
+  {$EXTERNALSYM UITableViewRowAnimationRight}
+  UITableViewRowAnimationLeft = 2;
+  {$EXTERNALSYM UITableViewRowAnimationLeft}
+  UITableViewRowAnimationTop = 3;
+  {$EXTERNALSYM UITableViewRowAnimationTop}
+  UITableViewRowAnimationBottom = 4;
+  {$EXTERNALSYM UITableViewRowAnimationBottom}
+  UITableViewRowAnimationNone = 5;
+  {$EXTERNALSYM UITableViewRowAnimationNone}
+  UITableViewRowAnimationMiddle = 6;
+  {$EXTERNALSYM UITableViewRowAnimationMiddle}
+  UITableViewRowAnimationAutomatic = 100;
+  {$EXTERNALSYM UITableViewRowAnimationAutomatic}
+  UIImageOrientationUp = 0;
+  {$EXTERNALSYM UIImageOrientationUp}
+  UIImageOrientationDown = 1;
+  {$EXTERNALSYM UIImageOrientationDown}
+  UIImageOrientationLeft = 2;
+  {$EXTERNALSYM UIImageOrientationLeft}
+  UIImageOrientationRight = 3;
+  {$EXTERNALSYM UIImageOrientationRight}
+  UIImageOrientationUpMirrored = 4;
+  {$EXTERNALSYM UIImageOrientationUpMirrored}
+  UIImageOrientationDownMirrored = 5;
+  {$EXTERNALSYM UIImageOrientationDownMirrored}
+  UIImageOrientationLeftMirrored = 6;
+  {$EXTERNALSYM UIImageOrientationLeftMirrored}
+  UIImageOrientationRightMirrored = 7;
+  {$EXTERNALSYM UIImageOrientationRightMirrored}
+  UIImageResizingModeTile = 0;
+  {$EXTERNALSYM UIImageResizingModeTile}
+  UIImageResizingModeStretch = 1;
+  {$EXTERNALSYM UIImageResizingModeStretch}
+  UIImageRenderingModeAutomatic = 0;
+  {$EXTERNALSYM UIImageRenderingModeAutomatic}
+  UIImageRenderingModeAlwaysOriginal = 1;
+  {$EXTERNALSYM UIImageRenderingModeAlwaysOriginal}
+  UIImageRenderingModeAlwaysTemplate = 2;
+  {$EXTERNALSYM UIImageRenderingModeAlwaysTemplate}
+  UIAccessibilityZoomTypeInsertionPoint = 0;
+  {$EXTERNALSYM UIAccessibilityZoomTypeInsertionPoint}
+  UIGuidedAccessRestrictionStateAllow = 0;
+  {$EXTERNALSYM UIGuidedAccessRestrictionStateAllow}
+  UIGuidedAccessRestrictionStateDeny = 1;
+  {$EXTERNALSYM UIGuidedAccessRestrictionStateDeny}
+  UIAccessibilityScrollDirectionRight = 1;
+  {$EXTERNALSYM UIAccessibilityScrollDirectionRight}
+  UIAccessibilityScrollDirectionLeft = 2;
+  {$EXTERNALSYM UIAccessibilityScrollDirectionLeft}
+  UIAccessibilityScrollDirectionUp = 3;
+  {$EXTERNALSYM UIAccessibilityScrollDirectionUp}
+  UIAccessibilityScrollDirectionDown = 4;
+  {$EXTERNALSYM UIAccessibilityScrollDirectionDown}
+  UIAccessibilityScrollDirectionNext = 5;
+  {$EXTERNALSYM UIAccessibilityScrollDirectionNext}
+  UIAccessibilityScrollDirectionPrevious = 6;
+  {$EXTERNALSYM UIAccessibilityScrollDirectionPrevious}
+  UIControlEventTouchDown = 1 shl 0;
+  {$EXTERNALSYM UIControlEventTouchDown}
+  UIControlEventTouchDownRepeat = 1 shl 1;
+  {$EXTERNALSYM UIControlEventTouchDownRepeat}
+  UIControlEventTouchDragInside = 1 shl 2;
+  {$EXTERNALSYM UIControlEventTouchDragInside}
+  UIControlEventTouchDragOutside = 1 shl 3;
+  {$EXTERNALSYM UIControlEventTouchDragOutside}
+  UIControlEventTouchDragEnter = 1 shl 4;
+  {$EXTERNALSYM UIControlEventTouchDragEnter}
+  UIControlEventTouchDragExit = 1 shl 5;
+  {$EXTERNALSYM UIControlEventTouchDragExit}
+  UIControlEventTouchUpInside = 1 shl 6;
+  {$EXTERNALSYM UIControlEventTouchUpInside}
+  UIControlEventTouchUpOutside = 1 shl 7;
+  {$EXTERNALSYM UIControlEventTouchUpOutside}
+  UIControlEventTouchCancel = 1 shl 8;
+  {$EXTERNALSYM UIControlEventTouchCancel}
+  UIControlEventValueChanged = 1 shl 12;
+  {$EXTERNALSYM UIControlEventValueChanged}
+  UIControlEventEditingDidBegin = 1 shl 16;
+  {$EXTERNALSYM UIControlEventEditingDidBegin}
+  UIControlEventEditingChanged = 1 shl 17;
+  {$EXTERNALSYM UIControlEventEditingChanged}
+  UIControlEventEditingDidEnd = 1 shl 18;
+  {$EXTERNALSYM UIControlEventEditingDidEnd}
+  UIControlEventEditingDidEndOnExit = 1 shl 19;
+  {$EXTERNALSYM UIControlEventEditingDidEndOnExit}
+  UIControlEventAllTouchEvents = 4095;
+  {$EXTERNALSYM UIControlEventAllTouchEvents}
+  UIControlEventAllEditingEvents = 983040;
+  {$EXTERNALSYM UIControlEventAllEditingEvents}
+  UIControlEventApplicationReserved = 251658240;
+  {$EXTERNALSYM UIControlEventApplicationReserved}
+  UIControlEventSystemReserved = 4026531840;
+  {$EXTERNALSYM UIControlEventSystemReserved}
+  UIControlEventAllEvents = 4294967295;
+  {$EXTERNALSYM UIControlEventAllEvents}
+  UIControlContentVerticalAlignmentCenter = 0;
+  {$EXTERNALSYM UIControlContentVerticalAlignmentCenter}
+  UIControlContentVerticalAlignmentTop = 1;
+  {$EXTERNALSYM UIControlContentVerticalAlignmentTop}
+  UIControlContentVerticalAlignmentBottom = 2;
+  {$EXTERNALSYM UIControlContentVerticalAlignmentBottom}
+  UIControlContentVerticalAlignmentFill = 3;
+  {$EXTERNALSYM UIControlContentVerticalAlignmentFill}
+  UIControlContentHorizontalAlignmentCenter = 0;
+  {$EXTERNALSYM UIControlContentHorizontalAlignmentCenter}
+  UIControlContentHorizontalAlignmentLeft = 1;
+  {$EXTERNALSYM UIControlContentHorizontalAlignmentLeft}
+  UIControlContentHorizontalAlignmentRight = 2;
+  {$EXTERNALSYM UIControlContentHorizontalAlignmentRight}
+  UIControlContentHorizontalAlignmentFill = 3;
+  {$EXTERNALSYM UIControlContentHorizontalAlignmentFill}
+  UIControlStateNormal = 0;
+  {$EXTERNALSYM UIControlStateNormal}
+  UIControlStateHighlighted = 1 shl 0;
+  {$EXTERNALSYM UIControlStateHighlighted}
+  UIControlStateDisabled = 1 shl 1;
+  {$EXTERNALSYM UIControlStateDisabled}
+  UIControlStateSelected = 1 shl 2;
+  {$EXTERNALSYM UIControlStateSelected}
+  UIControlStateApplication = 16711680;
+  {$EXTERNALSYM UIControlStateApplication}
+  UIControlStateReserved = 4278190080;
+  {$EXTERNALSYM UIControlStateReserved}
+  UITextAutocapitalizationTypeNone = 0;
+  {$EXTERNALSYM UITextAutocapitalizationTypeNone}
+  UITextAutocapitalizationTypeWords = 1;
+  {$EXTERNALSYM UITextAutocapitalizationTypeWords}
+  UITextAutocapitalizationTypeSentences = 2;
+  {$EXTERNALSYM UITextAutocapitalizationTypeSentences}
+  UITextAutocapitalizationTypeAllCharacters = 3;
+  {$EXTERNALSYM UITextAutocapitalizationTypeAllCharacters}
+  UITextAutocorrectionTypeDefault = 0;
+  {$EXTERNALSYM UITextAutocorrectionTypeDefault}
+  UITextAutocorrectionTypeNo = 1;
+  {$EXTERNALSYM UITextAutocorrectionTypeNo}
+  UITextAutocorrectionTypeYes = 2;
+  {$EXTERNALSYM UITextAutocorrectionTypeYes}
+  UITextSpellCheckingTypeDefault = 0;
+  {$EXTERNALSYM UITextSpellCheckingTypeDefault}
+  UITextSpellCheckingTypeNo = 1;
+  {$EXTERNALSYM UITextSpellCheckingTypeNo}
+  UITextSpellCheckingTypeYes = 2;
+  {$EXTERNALSYM UITextSpellCheckingTypeYes}
+  UIKeyboardTypeDefault = 0;
+  {$EXTERNALSYM UIKeyboardTypeDefault}
+  UIKeyboardTypeASCIICapable = 1;
+  {$EXTERNALSYM UIKeyboardTypeASCIICapable}
+  UIKeyboardTypeNumbersAndPunctuation = 2;
+  {$EXTERNALSYM UIKeyboardTypeNumbersAndPunctuation}
+  UIKeyboardTypeURL = 3;
+  {$EXTERNALSYM UIKeyboardTypeURL}
+  UIKeyboardTypeNumberPad = 4;
+  {$EXTERNALSYM UIKeyboardTypeNumberPad}
+  UIKeyboardTypePhonePad = 5;
+  {$EXTERNALSYM UIKeyboardTypePhonePad}
+  UIKeyboardTypeNamePhonePad = 6;
+  {$EXTERNALSYM UIKeyboardTypeNamePhonePad}
+  UIKeyboardTypeEmailAddress = 7;
+  {$EXTERNALSYM UIKeyboardTypeEmailAddress}
+  UIKeyboardTypeDecimalPad = 8;
+  {$EXTERNALSYM UIKeyboardTypeDecimalPad}
+  UIKeyboardTypeTwitter = 9;
+  {$EXTERNALSYM UIKeyboardTypeTwitter}
+  UIKeyboardTypeWebSearch = 10;
+  {$EXTERNALSYM UIKeyboardTypeWebSearch}
+  UIKeyboardTypeAlphabet = UIKeyboardTypeASCIICapable;
+  {$EXTERNALSYM UIKeyboardTypeAlphabet}
+  UIKeyboardAppearanceDefault = 0;
+  {$EXTERNALSYM UIKeyboardAppearanceDefault}
+  UIKeyboardAppearanceDark = 1;
+  {$EXTERNALSYM UIKeyboardAppearanceDark}
+  UIKeyboardAppearanceLight = 2;
+  {$EXTERNALSYM UIKeyboardAppearanceLight}
+  UIKeyboardAppearanceAlert = UIKeyboardAppearanceDark;
+  {$EXTERNALSYM UIKeyboardAppearanceAlert}
+  UIReturnKeyDefault = 0;
+  {$EXTERNALSYM UIReturnKeyDefault}
+  UIReturnKeyGo = 1;
+  {$EXTERNALSYM UIReturnKeyGo}
+  UIReturnKeyGoogle = 2;
+  {$EXTERNALSYM UIReturnKeyGoogle}
+  UIReturnKeyJoin = 3;
+  {$EXTERNALSYM UIReturnKeyJoin}
+  UIReturnKeyNext = 4;
+  {$EXTERNALSYM UIReturnKeyNext}
+  UIReturnKeyRoute = 5;
+  {$EXTERNALSYM UIReturnKeyRoute}
+  UIReturnKeySearch = 6;
+  {$EXTERNALSYM UIReturnKeySearch}
+  UIReturnKeySend = 7;
+  {$EXTERNALSYM UIReturnKeySend}
+  UIReturnKeyYahoo = 8;
+  {$EXTERNALSYM UIReturnKeyYahoo}
+  UIReturnKeyDone = 9;
+  {$EXTERNALSYM UIReturnKeyDone}
+  UIReturnKeyEmergencyCall = 10;
+  {$EXTERNALSYM UIReturnKeyEmergencyCall}
+  UITextStorageDirectionForward = 0;
+  {$EXTERNALSYM UITextStorageDirectionForward}
+  UITextStorageDirectionBackward = 1;
+  {$EXTERNALSYM UITextStorageDirectionBackward}
+  UITextLayoutDirectionRight = 2;
+  {$EXTERNALSYM UITextLayoutDirectionRight}
+  UITextLayoutDirectionLeft = 3;
+  {$EXTERNALSYM UITextLayoutDirectionLeft}
+  UITextLayoutDirectionUp = 4;
+  {$EXTERNALSYM UITextLayoutDirectionUp}
+  UITextLayoutDirectionDown = 5;
+  {$EXTERNALSYM UITextLayoutDirectionDown}
+  UITextWritingDirectionNatural = -1;
+  {$EXTERNALSYM UITextWritingDirectionNatural}
+  UITextWritingDirectionLeftToRight = 0;
+  {$EXTERNALSYM UITextWritingDirectionLeftToRight}
+  UITextWritingDirectionRightToLeft = 1;
+  {$EXTERNALSYM UITextWritingDirectionRightToLeft}
+  UIToolbarPositionAny = 0;
+  {$EXTERNALSYM UIToolbarPositionAny}
+  UIToolbarPositionBottom = 1;
+  {$EXTERNALSYM UIToolbarPositionBottom}
+  UIToolbarPositionTop = 2;
+  {$EXTERNALSYM UIToolbarPositionTop}
+  UITextGranularityCharacter = 0;
+  {$EXTERNALSYM UITextGranularityCharacter}
+  UITextGranularityWord = 1;
+  {$EXTERNALSYM UITextGranularityWord}
+  UITextGranularitySentence = 2;
+  {$EXTERNALSYM UITextGranularitySentence}
+  UITextGranularityParagraph = 3;
+  {$EXTERNALSYM UITextGranularityParagraph}
+  UITextGranularityLine = 4;
+  {$EXTERNALSYM UITextGranularityLine}
+  UITextGranularityDocument = 5;
+  {$EXTERNALSYM UITextGranularityDocument}
+  UITextBorderStyleNone = 0;
+  {$EXTERNALSYM UITextBorderStyleNone}
+  UITextBorderStyleLine = 1;
+  {$EXTERNALSYM UITextBorderStyleLine}
+  UITextBorderStyleBezel = 2;
+  {$EXTERNALSYM UITextBorderStyleBezel}
+  UITextBorderStyleRoundedRect = 3;
+  {$EXTERNALSYM UITextBorderStyleRoundedRect}
+  UITextFieldViewModeNever = 0;
+  {$EXTERNALSYM UITextFieldViewModeNever}
+  UITextFieldViewModeWhileEditing = 1;
+  {$EXTERNALSYM UITextFieldViewModeWhileEditing}
+  UITextFieldViewModeUnlessEditing = 2;
+  {$EXTERNALSYM UITextFieldViewModeUnlessEditing}
+  UITextFieldViewModeAlways = 3;
+  {$EXTERNALSYM UITextFieldViewModeAlways}
+  UIActionSheetStyleAutomatic = -1;
+  {$EXTERNALSYM UIActionSheetStyleAutomatic}
+  UIActionSheetStyleDefault = UIBarStyleDefault;
+  {$EXTERNALSYM UIActionSheetStyleDefault}
+  UIActionSheetStyleBlackTranslucent = UIBarStyleBlackTranslucent;
+  {$EXTERNALSYM UIActionSheetStyleBlackTranslucent}
+  UIActionSheetStyleBlackOpaque = UIBarStyleBlackOpaque;
+  {$EXTERNALSYM UIActionSheetStyleBlackOpaque}
+  UIActivityCategoryAction = 0;
+  {$EXTERNALSYM UIActivityCategoryAction}
+  UIActivityCategoryShare = 1;
+  {$EXTERNALSYM UIActivityCategoryShare}
+  UIActivityIndicatorViewStyleWhiteLarge = 0;
+  {$EXTERNALSYM UIActivityIndicatorViewStyleWhiteLarge}
+  UIActivityIndicatorViewStyleWhite = 1;
+  {$EXTERNALSYM UIActivityIndicatorViewStyleWhite}
+  UIActivityIndicatorViewStyleGray = 2;
+  {$EXTERNALSYM UIActivityIndicatorViewStyleGray}
+  UIDeviceOrientationUnknown = 0;
+  {$EXTERNALSYM UIDeviceOrientationUnknown}
+  UIDeviceOrientationPortrait = 1;
+  {$EXTERNALSYM UIDeviceOrientationPortrait}
+  UIDeviceOrientationPortraitUpsideDown = 2;
+  {$EXTERNALSYM UIDeviceOrientationPortraitUpsideDown}
+  UIDeviceOrientationLandscapeLeft = 3;
+  {$EXTERNALSYM UIDeviceOrientationLandscapeLeft}
+  UIDeviceOrientationLandscapeRight = 4;
+  {$EXTERNALSYM UIDeviceOrientationLandscapeRight}
+  UIDeviceOrientationFaceUp = 5;
+  {$EXTERNALSYM UIDeviceOrientationFaceUp}
+  UIDeviceOrientationFaceDown = 6;
+  {$EXTERNALSYM UIDeviceOrientationFaceDown}
+  UIDeviceBatteryStateUnknown = 0;
+  {$EXTERNALSYM UIDeviceBatteryStateUnknown}
+  UIDeviceBatteryStateUnplugged = 1;
+  {$EXTERNALSYM UIDeviceBatteryStateUnplugged}
+  UIDeviceBatteryStateCharging = 2;
+  {$EXTERNALSYM UIDeviceBatteryStateCharging}
+  UIDeviceBatteryStateFull = 3;
+  {$EXTERNALSYM UIDeviceBatteryStateFull}
+  UIUserInterfaceIdiomPhone = 0;
+  {$EXTERNALSYM UIUserInterfaceIdiomPhone}
+  UIUserInterfaceIdiomPad = 1;
+  {$EXTERNALSYM UIUserInterfaceIdiomPad}
+  UIAlertViewStyleDefault = 0;
+  {$EXTERNALSYM UIAlertViewStyleDefault}
+  UIAlertViewStyleSecureTextInput = 1;
+  {$EXTERNALSYM UIAlertViewStyleSecureTextInput}
+  UIAlertViewStylePlainTextInput = 2;
+  {$EXTERNALSYM UIAlertViewStylePlainTextInput}
+  UIAlertViewStyleLoginAndPasswordInput = 3;
+  {$EXTERNALSYM UIAlertViewStyleLoginAndPasswordInput}
+  UIStatusBarStyleDefault = 0;
+  {$EXTERNALSYM UIStatusBarStyleDefault}
+  UIStatusBarStyleLightContent = 1;
+  {$EXTERNALSYM UIStatusBarStyleLightContent}
+  UIStatusBarStyleBlackTranslucent = 1;
+  {$EXTERNALSYM UIStatusBarStyleBlackTranslucent}
+  UIStatusBarStyleBlackOpaque = 2;
+  {$EXTERNALSYM UIStatusBarStyleBlackOpaque}
+  UIStatusBarAnimationNone = 0;
+  {$EXTERNALSYM UIStatusBarAnimationNone}
+  UIStatusBarAnimationFade = 1;
+  {$EXTERNALSYM UIStatusBarAnimationFade}
+  UIStatusBarAnimationSlide = 2;
+  {$EXTERNALSYM UIStatusBarAnimationSlide}
+  UIInterfaceOrientationPortrait = UIDeviceOrientationPortrait;
+  {$EXTERNALSYM UIInterfaceOrientationPortrait}
+  UIInterfaceOrientationPortraitUpsideDown =
+  {$EXTERNALSYM UIInterfaceOrientationPortraitUpsideDown}
+    UIDeviceOrientationPortraitUpsideDown;
+    {$EXTERNALSYM UIDeviceOrientationPortraitUpsideDown}
+  UIInterfaceOrientationLandscapeLeft = UIDeviceOrientationLandscapeRight;
+  {$EXTERNALSYM UIInterfaceOrientationLandscapeLeft}
+  UIInterfaceOrientationLandscapeRight = UIDeviceOrientationLandscapeLeft;
+  {$EXTERNALSYM UIInterfaceOrientationLandscapeRight}
+  UIInterfaceOrientationMaskPortrait = (1 shl UIInterfaceOrientationPortrait);
+  {$EXTERNALSYM UIInterfaceOrientationMaskPortrait}
+  UIInterfaceOrientationMaskLandscapeLeft =
+    (1 shl UIInterfaceOrientationLandscapeLeft);
+  {$EXTERNALSYM UIInterfaceOrientationMaskLandscapeLeft}
+  UIInterfaceOrientationMaskLandscapeRight =
+    (1 shl UIInterfaceOrientationLandscapeRight);
+  {$EXTERNALSYM UIInterfaceOrientationMaskLandscapeRight}
+  UIInterfaceOrientationMaskPortraitUpsideDown =
+    (1 shl UIInterfaceOrientationPortraitUpsideDown);
+  {$EXTERNALSYM UIInterfaceOrientationMaskPortraitUpsideDown}
+  UIInterfaceOrientationMaskLandscape =
+    (UIInterfaceOrientationMaskLandscapeLeft or
+    UIInterfaceOrientationMaskLandscapeRight);
+  {$EXTERNALSYM UIInterfaceOrientationMaskLandscape}
+  UIInterfaceOrientationMaskAll = (UIInterfaceOrientationMaskPortrait or
+    UIInterfaceOrientationMaskLandscapeLeft or
+    UIInterfaceOrientationMaskLandscapeRight or
+    UIInterfaceOrientationMaskPortraitUpsideDown);
+  {$EXTERNALSYM UIInterfaceOrientationMaskAll}
+  UIInterfaceOrientationMaskAllButUpsideDown =
+    (UIInterfaceOrientationMaskPortrait or
+    UIInterfaceOrientationMaskLandscapeLeft or
+    UIInterfaceOrientationMaskLandscapeRight);
+  {$EXTERNALSYM UIInterfaceOrientationMaskAllButUpsideDown}
+  UIRemoteNotificationTypeNone = 0;
+  {$EXTERNALSYM UIRemoteNotificationTypeNone}
+  UIRemoteNotificationTypeBadge = 1 shl 0;
+  {$EXTERNALSYM UIRemoteNotificationTypeBadge}
+  UIRemoteNotificationTypeSound = 1 shl 1;
+  {$EXTERNALSYM UIRemoteNotificationTypeSound}
+  UIRemoteNotificationTypeAlert = 1 shl 2;
+  {$EXTERNALSYM UIRemoteNotificationTypeAlert}
+  UIRemoteNotificationTypeNewsstandContentAvailability = 1 shl 3;
+  {$EXTERNALSYM UIRemoteNotificationTypeNewsstandContentAvailability}
+  UIBackgroundFetchResultNewData = 0;
+  {$EXTERNALSYM UIBackgroundFetchResultNewData}
+  UIBackgroundFetchResultNoData = 1;
+  {$EXTERNALSYM UIBackgroundFetchResultNoData}
+  UIBackgroundFetchResultFailed = 2;
+  {$EXTERNALSYM UIBackgroundFetchResultFailed}
+  UIBackgroundRefreshStatusRestricted = 0;
+  {$EXTERNALSYM UIBackgroundRefreshStatusRestricted}
+  UIBackgroundRefreshStatusDenied = 1;
+  {$EXTERNALSYM UIBackgroundRefreshStatusDenied}
+  UIBackgroundRefreshStatusAvailable = 2;
+  {$EXTERNALSYM UIBackgroundRefreshStatusAvailable}
+  UIApplicationStateActive = 0;
+  {$EXTERNALSYM UIApplicationStateActive}
+  UIApplicationStateInactive = 1;
+  {$EXTERNALSYM UIApplicationStateInactive}
+  UIApplicationStateBackground = 2;
+  {$EXTERNALSYM UIApplicationStateBackground}
+  UIUserInterfaceLayoutDirectionLeftToRight = 0;
+  {$EXTERNALSYM UIUserInterfaceLayoutDirectionLeftToRight}
+  UIUserInterfaceLayoutDirectionRightToLeft = 1;
+  {$EXTERNALSYM UIUserInterfaceLayoutDirectionRightToLeft}
+  UIModalTransitionStyleCoverVertical = 0;
+  {$EXTERNALSYM UIModalTransitionStyleCoverVertical}
+  UIModalTransitionStyleFlipHorizontal = 1;
+  {$EXTERNALSYM UIModalTransitionStyleFlipHorizontal}
+  UIModalTransitionStyleCrossDissolve = 2;
+  {$EXTERNALSYM UIModalTransitionStyleCrossDissolve}
+  UIModalTransitionStylePartialCurl = 3;
+  {$EXTERNALSYM UIModalTransitionStylePartialCurl}
+  UIModalPresentationFullScreen = 0;
+  {$EXTERNALSYM UIModalPresentationFullScreen}
+  UIModalPresentationPageSheet = 1;
+  {$EXTERNALSYM UIModalPresentationPageSheet}
+  UIModalPresentationFormSheet = 2;
+  {$EXTERNALSYM UIModalPresentationFormSheet}
+  UIModalPresentationCurrentContext = 3;
+  {$EXTERNALSYM UIModalPresentationCurrentContext}
+  UIModalPresentationCustom = 4;
+  {$EXTERNALSYM UIModalPresentationCustom}
+  UIModalPresentationNone = -1;
+  {$EXTERNALSYM UIModalPresentationNone}
+  UIAttachmentBehaviorTypeItems = 0;
+  {$EXTERNALSYM UIAttachmentBehaviorTypeItems}
+  UIAttachmentBehaviorTypeAnchor = 1;
+  {$EXTERNALSYM UIAttachmentBehaviorTypeAnchor}
+  UIBarMetricsDefault = 0;
+  {$EXTERNALSYM UIBarMetricsDefault}
+  UIBarMetricsLandscapePhone = 1;
+  {$EXTERNALSYM UIBarMetricsLandscapePhone}
+  UIBarMetricsDefaultPrompt = 101;
+  {$EXTERNALSYM UIBarMetricsDefaultPrompt}
+  UIBarMetricsLandscapePhonePrompt = 102;
+  {$EXTERNALSYM UIBarMetricsLandscapePhonePrompt}
+  UIBarPositionAny = 0;
+  {$EXTERNALSYM UIBarPositionAny}
+  UIBarPositionBottom = 1;
+  {$EXTERNALSYM UIBarPositionBottom}
+  UIBarPositionTop = 2;
+  {$EXTERNALSYM UIBarPositionTop}
+  UIBarPositionTopAttached = 3;
+  {$EXTERNALSYM UIBarPositionTopAttached}
+  UIBarButtonItemStylePlain = 0;
+  {$EXTERNALSYM UIBarButtonItemStylePlain}
+  UIBarButtonItemStyleBordered = 1;
+  {$EXTERNALSYM UIBarButtonItemStyleBordered}
+  UIBarButtonItemStyleDone = 2;
+  {$EXTERNALSYM UIBarButtonItemStyleDone}
+  UIBarButtonSystemItemDone = 0;
+  {$EXTERNALSYM UIBarButtonSystemItemDone}
+  UIBarButtonSystemItemCancel = 1;
+  {$EXTERNALSYM UIBarButtonSystemItemCancel}
+  UIBarButtonSystemItemEdit = 2;
+  {$EXTERNALSYM UIBarButtonSystemItemEdit}
+  UIBarButtonSystemItemSave = 3;
+  {$EXTERNALSYM UIBarButtonSystemItemSave}
+  UIBarButtonSystemItemAdd = 4;
+  {$EXTERNALSYM UIBarButtonSystemItemAdd}
+  UIBarButtonSystemItemFlexibleSpace = 5;
+  {$EXTERNALSYM UIBarButtonSystemItemFlexibleSpace}
+  UIBarButtonSystemItemFixedSpace = 6;
+  {$EXTERNALSYM UIBarButtonSystemItemFixedSpace}
+  UIBarButtonSystemItemCompose = 7;
+  {$EXTERNALSYM UIBarButtonSystemItemCompose}
+  UIBarButtonSystemItemReply = 8;
+  {$EXTERNALSYM UIBarButtonSystemItemReply}
+  UIBarButtonSystemItemAction = 9;
+  {$EXTERNALSYM UIBarButtonSystemItemAction}
+  UIBarButtonSystemItemOrganize = 10;
+  {$EXTERNALSYM UIBarButtonSystemItemOrganize}
+  UIBarButtonSystemItemBookmarks = 11;
+  {$EXTERNALSYM UIBarButtonSystemItemBookmarks}
+  UIBarButtonSystemItemSearch = 12;
+  {$EXTERNALSYM UIBarButtonSystemItemSearch}
+  UIBarButtonSystemItemRefresh = 13;
+  {$EXTERNALSYM UIBarButtonSystemItemRefresh}
+  UIBarButtonSystemItemStop = 14;
+  {$EXTERNALSYM UIBarButtonSystemItemStop}
+  UIBarButtonSystemItemCamera = 15;
+  {$EXTERNALSYM UIBarButtonSystemItemCamera}
+  UIBarButtonSystemItemTrash = 16;
+  {$EXTERNALSYM UIBarButtonSystemItemTrash}
+  UIBarButtonSystemItemPlay = 17;
+  {$EXTERNALSYM UIBarButtonSystemItemPlay}
+  UIBarButtonSystemItemPause = 18;
+  {$EXTERNALSYM UIBarButtonSystemItemPause}
+  UIBarButtonSystemItemRewind = 19;
+  {$EXTERNALSYM UIBarButtonSystemItemRewind}
+  UIBarButtonSystemItemFastForward = 20;
+  {$EXTERNALSYM UIBarButtonSystemItemFastForward}
+  UIBarButtonSystemItemUndo = 21;
+  {$EXTERNALSYM UIBarButtonSystemItemUndo}
+  UIBarButtonSystemItemRedo = 22;
+  {$EXTERNALSYM UIBarButtonSystemItemRedo}
+  UIBarButtonSystemItemPageCurl = 23;
+  {$EXTERNALSYM UIBarButtonSystemItemPageCurl}
+  UIButtonTypeCustom = 0;
+  {$EXTERNALSYM UIButtonTypeCustom}
+  UIButtonTypeSystem = 1;
+  {$EXTERNALSYM UIButtonTypeSystem}
+  UIButtonTypeDetailDisclosure = 2;
+  {$EXTERNALSYM UIButtonTypeDetailDisclosure}
+  UIButtonTypeInfoLight = 3;
+  {$EXTERNALSYM UIButtonTypeInfoLight}
+  UIButtonTypeInfoDark = 4;
+  {$EXTERNALSYM UIButtonTypeInfoDark}
+  UIButtonTypeContactAdd = 5;
+  {$EXTERNALSYM UIButtonTypeContactAdd}
+  UIButtonTypeRoundedRect = UIButtonTypeSystem;
+  {$EXTERNALSYM UIButtonTypeRoundedRect}
+  UICollectionViewScrollPositionNone = 0;
+  {$EXTERNALSYM UICollectionViewScrollPositionNone}
+  UICollectionViewScrollPositionTop = 1 shl 0;
+  {$EXTERNALSYM UICollectionViewScrollPositionTop}
+  UICollectionViewScrollPositionCenteredVertically = 1 shl 1;
+  {$EXTERNALSYM UICollectionViewScrollPositionCenteredVertically}
+  UICollectionViewScrollPositionBottom = 1 shl 2;
+  {$EXTERNALSYM UICollectionViewScrollPositionBottom}
+  UICollectionViewScrollPositionLeft = 1 shl 3;
+  {$EXTERNALSYM UICollectionViewScrollPositionLeft}
+  UICollectionViewScrollPositionCenteredHorizontally = 1 shl 4;
+  {$EXTERNALSYM UICollectionViewScrollPositionCenteredHorizontally}
+  UICollectionViewScrollPositionRight = 1 shl 5;
+  {$EXTERNALSYM UICollectionViewScrollPositionRight}
+  UICollectionElementCategoryCell = 0;
+  {$EXTERNALSYM UICollectionElementCategoryCell}
+  UICollectionElementCategorySupplementaryView = 1;
+  {$EXTERNALSYM UICollectionElementCategorySupplementaryView}
+  UICollectionElementCategoryDecorationView = 2;
+  {$EXTERNALSYM UICollectionElementCategoryDecorationView}
+  UICollectionUpdateActionInsert = 0;
+  {$EXTERNALSYM UICollectionUpdateActionInsert}
+  UICollectionUpdateActionDelete = 1;
+  {$EXTERNALSYM UICollectionUpdateActionDelete}
+  UICollectionUpdateActionReload = 2;
+  {$EXTERNALSYM UICollectionUpdateActionReload}
+  UICollectionUpdateActionMove = 3;
+  {$EXTERNALSYM UICollectionUpdateActionMove}
+  UICollectionUpdateActionNone = 4;
+  {$EXTERNALSYM UICollectionUpdateActionNone}
+  UICollectionViewScrollDirectionVertical = 0;
+  {$EXTERNALSYM UICollectionViewScrollDirectionVertical}
+  UICollectionViewScrollDirectionHorizontal = 1;
+  {$EXTERNALSYM UICollectionViewScrollDirectionHorizontal}
+  UIDataDetectorTypePhoneNumber = 1 shl 0;
+  {$EXTERNALSYM UIDataDetectorTypePhoneNumber}
+  UIDataDetectorTypeLink = 1 shl 1;
+  {$EXTERNALSYM UIDataDetectorTypeLink}
+  UIDataDetectorTypeAddress = 1 shl 2;
+  {$EXTERNALSYM UIDataDetectorTypeAddress}
+  UIDataDetectorTypeCalendarEvent = 1 shl 3;
+  {$EXTERNALSYM UIDataDetectorTypeCalendarEvent}
+  UIDataDetectorTypeNone = 0;
+  {$EXTERNALSYM UIDataDetectorTypeNone}
+  UIDataDetectorTypeAll = 4294967295;
+  {$EXTERNALSYM UIDataDetectorTypeAll}
+  UIDatePickerModeTime = 0;
+  {$EXTERNALSYM UIDatePickerModeTime}
+  UIDatePickerModeDate = 1;
+  {$EXTERNALSYM UIDatePickerModeDate}
+  UIDatePickerModeDateAndTime = 2;
+  {$EXTERNALSYM UIDatePickerModeDateAndTime}
+  UIDatePickerModeCountDownTimer = 3;
+  {$EXTERNALSYM UIDatePickerModeCountDownTimer}
+  UIDocumentChangeDone = 0;
+  {$EXTERNALSYM UIDocumentChangeDone}
+  UIDocumentChangeUndone = 1;
+  {$EXTERNALSYM UIDocumentChangeUndone}
+  UIDocumentChangeRedone = 2;
+  {$EXTERNALSYM UIDocumentChangeRedone}
+  UIDocumentChangeCleared = 3;
+  {$EXTERNALSYM UIDocumentChangeCleared}
+  UIDocumentSaveForCreating = 0;
+  {$EXTERNALSYM UIDocumentSaveForCreating}
+  UIDocumentSaveForOverwriting = 1;
+  {$EXTERNALSYM UIDocumentSaveForOverwriting}
+  UIDocumentStateNormal = 0;
+  {$EXTERNALSYM UIDocumentStateNormal}
+  UIDocumentStateClosed = 1 shl 0;
+  {$EXTERNALSYM UIDocumentStateClosed}
+  UIDocumentStateInConflict = 1 shl 1;
+  {$EXTERNALSYM UIDocumentStateInConflict}
+  UIDocumentStateSavingError = 1 shl 2;
+  {$EXTERNALSYM UIDocumentStateSavingError}
+  UIDocumentStateEditingDisabled = 1 shl 3;
+  {$EXTERNALSYM UIDocumentStateEditingDisabled}
+  UINavigationControllerOperationNone = 0;
+  {$EXTERNALSYM UINavigationControllerOperationNone}
+  UINavigationControllerOperationPush = 1;
+  {$EXTERNALSYM UINavigationControllerOperationPush}
+  UINavigationControllerOperationPop = 2;
+  {$EXTERNALSYM UINavigationControllerOperationPop}
+  UIImagePickerControllerSourceTypePhotoLibrary = 0;
+  {$EXTERNALSYM UIImagePickerControllerSourceTypePhotoLibrary}
+  UIImagePickerControllerSourceTypeCamera = 1;
+  {$EXTERNALSYM UIImagePickerControllerSourceTypeCamera}
+  UIImagePickerControllerSourceTypeSavedPhotosAlbum = 2;
+  {$EXTERNALSYM UIImagePickerControllerSourceTypeSavedPhotosAlbum}
+  UIImagePickerControllerQualityTypeHigh = 0;
+  {$EXTERNALSYM UIImagePickerControllerQualityTypeHigh}
+  UIImagePickerControllerQualityTypeMedium = 1;
+  {$EXTERNALSYM UIImagePickerControllerQualityTypeMedium}
+  UIImagePickerControllerQualityTypeLow = 2;
+  {$EXTERNALSYM UIImagePickerControllerQualityTypeLow}
+  UIImagePickerControllerQualityType640x480 = 3;
+  {$EXTERNALSYM UIImagePickerControllerQualityType640x480}
+  UIImagePickerControllerQualityTypeIFrame1280x720 = 4;
+  {$EXTERNALSYM UIImagePickerControllerQualityTypeIFrame1280x720}
+  UIImagePickerControllerQualityTypeIFrame960x540 = 5;
+  {$EXTERNALSYM UIImagePickerControllerQualityTypeIFrame960x540}
+  UIImagePickerControllerCameraCaptureModePhoto = 0;
+  {$EXTERNALSYM UIImagePickerControllerCameraCaptureModePhoto}
+  UIImagePickerControllerCameraCaptureModeVideo = 1;
+  {$EXTERNALSYM UIImagePickerControllerCameraCaptureModeVideo}
+  UIImagePickerControllerCameraDeviceRear = 0;
+  {$EXTERNALSYM UIImagePickerControllerCameraDeviceRear}
+  UIImagePickerControllerCameraDeviceFront = 1;
+  {$EXTERNALSYM UIImagePickerControllerCameraDeviceFront}
+  UIImagePickerControllerCameraFlashModeOff = -1;
+  {$EXTERNALSYM UIImagePickerControllerCameraFlashModeOff}
+  UIImagePickerControllerCameraFlashModeAuto = 0;
+  {$EXTERNALSYM UIImagePickerControllerCameraFlashModeAuto}
+  UIImagePickerControllerCameraFlashModeOn = 1;
+  {$EXTERNALSYM UIImagePickerControllerCameraFlashModeOn}
+  UIInputViewStyleDefault = 0;
+  {$EXTERNALSYM UIInputViewStyleDefault}
+  UIInputViewStyleKeyboard = 1;
+  {$EXTERNALSYM UIInputViewStyleKeyboard}
+  UIMenuControllerArrowDefault = 0;
+  {$EXTERNALSYM UIMenuControllerArrowDefault}
+  UIMenuControllerArrowUp = 1;
+  {$EXTERNALSYM UIMenuControllerArrowUp}
+  UIMenuControllerArrowDown = 2;
+  {$EXTERNALSYM UIMenuControllerArrowDown}
+  UIMenuControllerArrowLeft = 3;
+  {$EXTERNALSYM UIMenuControllerArrowLeft}
+  UIMenuControllerArrowRight = 4;
+  {$EXTERNALSYM UIMenuControllerArrowRight}
+  UIInterpolatingMotionEffectTypeTiltAlongHorizontalAxis = 0;
+  {$EXTERNALSYM UIInterpolatingMotionEffectTypeTiltAlongHorizontalAxis}
+  UIInterpolatingMotionEffectTypeTiltAlongVerticalAxis = 1;
+  {$EXTERNALSYM UIInterpolatingMotionEffectTypeTiltAlongVerticalAxis}
+  UIPageViewControllerNavigationOrientationHorizontal = 0;
+  {$EXTERNALSYM UIPageViewControllerNavigationOrientationHorizontal}
+  UIPageViewControllerNavigationOrientationVertical = 1;
+  {$EXTERNALSYM UIPageViewControllerNavigationOrientationVertical}
+  UIPageViewControllerSpineLocationNone = 0;
+  {$EXTERNALSYM UIPageViewControllerSpineLocationNone}
+  UIPageViewControllerSpineLocationMin = 1;
+  {$EXTERNALSYM UIPageViewControllerSpineLocationMin}
+  UIPageViewControllerSpineLocationMid = 2;
+  {$EXTERNALSYM UIPageViewControllerSpineLocationMid}
+  UIPageViewControllerSpineLocationMax = 3;
+  {$EXTERNALSYM UIPageViewControllerSpineLocationMax}
+  UIPageViewControllerNavigationDirectionForward = 0;
+  {$EXTERNALSYM UIPageViewControllerNavigationDirectionForward}
+  UIPageViewControllerNavigationDirectionReverse = 1;
+  {$EXTERNALSYM UIPageViewControllerNavigationDirectionReverse}
+  UIPageViewControllerTransitionStylePageCurl = 0;
+  {$EXTERNALSYM UIPageViewControllerTransitionStylePageCurl}
+  UIPageViewControllerTransitionStyleScroll = 1;
+  {$EXTERNALSYM UIPageViewControllerTransitionStyleScroll}
+  UIPopoverArrowDirectionUp = 1 shl 0;
+  {$EXTERNALSYM UIPopoverArrowDirectionUp}
+  UIPopoverArrowDirectionDown = 1 shl 1;
+  {$EXTERNALSYM UIPopoverArrowDirectionDown}
+  UIPopoverArrowDirectionLeft = 1 shl 2;
+  {$EXTERNALSYM UIPopoverArrowDirectionLeft}
+  UIPopoverArrowDirectionRight = 1 shl 3;
+  {$EXTERNALSYM UIPopoverArrowDirectionRight}
+  UIPopoverArrowDirectionAny = UIPopoverArrowDirectionUp or
+    UIPopoverArrowDirectionDown or UIPopoverArrowDirectionLeft or
+    UIPopoverArrowDirectionRight;
+  {$EXTERNALSYM UIPopoverArrowDirectionAny}
+  UIPopoverArrowDirectionUnknown = 4294967295;
+  {$EXTERNALSYM UIPopoverArrowDirectionUnknown}
+  UIPrintingNotAvailableError = 1;
+  {$EXTERNALSYM UIPrintingNotAvailableError}
+  UIPrintNoContentError = 2;
+  {$EXTERNALSYM UIPrintNoContentError}
+  UIPrintUnknownImageFormatError = 3;
+  {$EXTERNALSYM UIPrintUnknownImageFormatError}
+  UIPrintJobFailedError = 4;
+  {$EXTERNALSYM UIPrintJobFailedError}
+  UIPrintInfoOutputGeneral = 0;
+  {$EXTERNALSYM UIPrintInfoOutputGeneral}
+  UIPrintInfoOutputPhoto = 1;
+  {$EXTERNALSYM UIPrintInfoOutputPhoto}
+  UIPrintInfoOutputGrayscale = 2;
+  {$EXTERNALSYM UIPrintInfoOutputGrayscale}
+  UIPrintInfoOutputPhotoGrayscale = 3;
+  {$EXTERNALSYM UIPrintInfoOutputPhotoGrayscale}
+  UIPrintInfoOrientationPortrait = 0;
+  {$EXTERNALSYM UIPrintInfoOrientationPortrait}
+  UIPrintInfoOrientationLandscape = 1;
+  {$EXTERNALSYM UIPrintInfoOrientationLandscape}
+  UIPrintInfoDuplexNone = 0;
+  {$EXTERNALSYM UIPrintInfoDuplexNone}
+  UIPrintInfoDuplexLongEdge = 1;
+  {$EXTERNALSYM UIPrintInfoDuplexLongEdge}
+  UIPrintInfoDuplexShortEdge = 2;
+  {$EXTERNALSYM UIPrintInfoDuplexShortEdge}
+  UIProgressViewStyleDefault = 0;
+  {$EXTERNALSYM UIProgressViewStyleDefault}
+  UIProgressViewStyleBar = 1;
+  {$EXTERNALSYM UIProgressViewStyleBar}
+  UIScreenOverscanCompensationScale = 0;
+  {$EXTERNALSYM UIScreenOverscanCompensationScale}
+  UIScreenOverscanCompensationInsetBounds = 1;
+  {$EXTERNALSYM UIScreenOverscanCompensationInsetBounds}
+  UIScreenOverscanCompensationInsetApplicationFrame = 2;
+  {$EXTERNALSYM UIScreenOverscanCompensationInsetApplicationFrame}
+  UISearchBarIconSearch = 0;
+  {$EXTERNALSYM UISearchBarIconSearch}
+  UISearchBarIconClear = 1;
+  {$EXTERNALSYM UISearchBarIconClear}
+  UISearchBarIconBookmark = 2;
+  {$EXTERNALSYM UISearchBarIconBookmark}
+  UISearchBarIconResultsList = 3;
+  {$EXTERNALSYM UISearchBarIconResultsList}
+  UISearchBarStyleDefault = 0;
+  {$EXTERNALSYM UISearchBarStyleDefault}
+  UISearchBarStyleProminent = 1;
+  {$EXTERNALSYM UISearchBarStyleProminent}
+  UISearchBarStyleMinimal = 2;
+  {$EXTERNALSYM UISearchBarStyleMinimal}
+  UISegmentedControlStylePlain = 0;
+  {$EXTERNALSYM UISegmentedControlStylePlain}
+  UISegmentedControlStyleBordered = 1;
+  {$EXTERNALSYM UISegmentedControlStyleBordered}
+  UISegmentedControlStyleBar = 2;
+  {$EXTERNALSYM UISegmentedControlStyleBar}
+  UISegmentedControlStyleBezeled = 3;
+  {$EXTERNALSYM UISegmentedControlStyleBezeled}
+  UISegmentedControlNoSegment = -1;
+  {$EXTERNALSYM UISegmentedControlNoSegment}
+  UISegmentedControlSegmentAny = 0;
+  {$EXTERNALSYM UISegmentedControlSegmentAny}
+  UISegmentedControlSegmentLeft = 1;
+  {$EXTERNALSYM UISegmentedControlSegmentLeft}
+  UISegmentedControlSegmentCenter = 2;
+  {$EXTERNALSYM UISegmentedControlSegmentCenter}
+  UISegmentedControlSegmentRight = 3;
+  {$EXTERNALSYM UISegmentedControlSegmentRight}
+  UISegmentedControlSegmentAlone = 4;
+  {$EXTERNALSYM UISegmentedControlSegmentAlone}
+  UITabBarItemPositioningAutomatic = 0;
+  {$EXTERNALSYM UITabBarItemPositioningAutomatic}
+  UITabBarItemPositioningFill = 1;
+  {$EXTERNALSYM UITabBarItemPositioningFill}
+  UITabBarItemPositioningCentered = 2;
+  {$EXTERNALSYM UITabBarItemPositioningCentered}
+  UITabBarSystemItemMore = 0;
+  {$EXTERNALSYM UITabBarSystemItemMore}
+  UITabBarSystemItemFavorites = 1;
+  {$EXTERNALSYM UITabBarSystemItemFavorites}
+  UITabBarSystemItemFeatured = 2;
+  {$EXTERNALSYM UITabBarSystemItemFeatured}
+  UITabBarSystemItemTopRated = 3;
+  {$EXTERNALSYM UITabBarSystemItemTopRated}
+  UITabBarSystemItemRecents = 4;
+  {$EXTERNALSYM UITabBarSystemItemRecents}
+  UITabBarSystemItemContacts = 5;
+  {$EXTERNALSYM UITabBarSystemItemContacts}
+  UITabBarSystemItemHistory = 6;
+  {$EXTERNALSYM UITabBarSystemItemHistory}
+  UITabBarSystemItemBookmarks = 7;
+  {$EXTERNALSYM UITabBarSystemItemBookmarks}
+  UITabBarSystemItemSearch = 8;
+  {$EXTERNALSYM UITabBarSystemItemSearch}
+  UITabBarSystemItemDownloads = 9;
+  {$EXTERNALSYM UITabBarSystemItemDownloads}
+  UITabBarSystemItemMostRecent = 10;
+  {$EXTERNALSYM UITabBarSystemItemMostRecent}
+  UITabBarSystemItemMostViewed = 11;
+  {$EXTERNALSYM UITabBarSystemItemMostViewed}
+  UITouchPhaseBegan = 0;
+  {$EXTERNALSYM UITouchPhaseBegan}
+  UITouchPhaseMoved = 1;
+  {$EXTERNALSYM UITouchPhaseMoved}
+  UITouchPhaseStationary = 2;
+  {$EXTERNALSYM UITouchPhaseStationary}
+  UITouchPhaseEnded = 3;
+  {$EXTERNALSYM UITouchPhaseEnded}
+  UITouchPhaseCancelled = 4;
+  {$EXTERNALSYM UITouchPhaseCancelled}
+  UIWebViewNavigationTypeLinkClicked = 0;
+  {$EXTERNALSYM UIWebViewNavigationTypeLinkClicked}
+  UIWebViewNavigationTypeFormSubmitted = 1;
+  {$EXTERNALSYM UIWebViewNavigationTypeFormSubmitted}
+  UIWebViewNavigationTypeBackForward = 2;
+  {$EXTERNALSYM UIWebViewNavigationTypeBackForward}
+  UIWebViewNavigationTypeReload = 3;
+  {$EXTERNALSYM UIWebViewNavigationTypeReload}
+  UIWebViewNavigationTypeFormResubmitted = 4;
+  {$EXTERNALSYM UIWebViewNavigationTypeFormResubmitted}
+  UIWebViewNavigationTypeOther = 5;
+  {$EXTERNALSYM UIWebViewNavigationTypeOther}
+  UIWebPaginationModeUnpaginated = 0;
+  {$EXTERNALSYM UIWebPaginationModeUnpaginated}
+  UIWebPaginationModeLeftToRight = 1;
+  {$EXTERNALSYM UIWebPaginationModeLeftToRight}
+  UIWebPaginationModeTopToBottom = 2;
+  {$EXTERNALSYM UIWebPaginationModeTopToBottom}
+  UIWebPaginationModeBottomToTop = 3;
+  {$EXTERNALSYM UIWebPaginationModeBottomToTop}
+  UIWebPaginationModeRightToLeft = 4;
+  {$EXTERNALSYM UIWebPaginationModeRightToLeft}
+  UIWebPaginationBreakingModePage = 0;
+  {$EXTERNALSYM UIWebPaginationBreakingModePage}
+  UIWebPaginationBreakingModeColumn = 1;
+  {$EXTERNALSYM UIWebPaginationBreakingModeColumn}
+  UIPushBehaviorModeContinuous = 0;
+  {$EXTERNALSYM UIPushBehaviorModeContinuous}
+  UIPushBehaviorModeInstantaneous = 1;
+  {$EXTERNALSYM UIPushBehaviorModeInstantaneous}
+  UICollisionBehaviorModeItems = 1 shl 0;
+  {$EXTERNALSYM UICollisionBehaviorModeItems}
+  UICollisionBehaviorModeBoundaries = 1 shl 1;
+  {$EXTERNALSYM UICollisionBehaviorModeBoundaries}
+  UICollisionBehaviorModeEverything = 4294967295;
+  {$EXTERNALSYM UICollisionBehaviorModeEverything}
+  UIUserNotificationTypeNone = 0;
+  {$EXTERNALSYM UIUserNotificationTypeNone}
+  UIUserNotificationTypeBadge = 1 shl 0;
+  {$EXTERNALSYM UIUserNotificationTypeBadge}
+  UIUserNotificationTypeSound = 1 shl 1;
+  {$EXTERNALSYM UIUserNotificationTypeSound}
+  UIUserNotificationTypeAlert = 1 shl 2;
+  {$EXTERNALSYM UIUserNotificationTypeAlert}
+  UIUserInterfaceSizeClassUnspecified = 0;
+  {$EXTERNALSYM UIUserInterfaceSizeClassUnspecified}
+  UIUserInterfaceSizeClassCompact = 1;
+  {$EXTERNALSYM UIUserInterfaceSizeClassCompact}
+  UIUserInterfaceSizeClassRegular = 2;
+  {$EXTERNALSYM UIUserInterfaceSizeClassRegular}
+
+type
+  // ===== Forward declarations =====
+{$M+}
+  PUIImage = Pointer;
+  PNSData = Pointer;
+  NSLayoutConstraint = interface;
+  UILayoutSupport = interface;
+  NSLayoutManager = interface;
+  NSTextStorageDelegate = interface;
+  NSTextStorage = interface;
+  UIFontDescriptor = interface;
+  UIFont = interface;
+  NSTextContainer = interface;
+  UIColor = interface;
+  NSLayoutManagerDelegate = interface;
+  NSTextLayoutOrientationProvider = interface;
+  NSTextTab = interface;
+  NSParagraphStyle = interface;
+  NSMutableParagraphStyle = interface;
+  NSShadow = interface;
+  NSStringDrawingContext = interface;
+  UIImage = interface;
+  NSTextAttachmentContainer = interface;
+  NSTextAttachment = interface;
+  UIAccelerometerDelegate = interface;
+  UIAcceleration = interface;
+  UIAccelerometer = interface;
+  UIBezierPath = interface;
+  UIWindow = interface;
+  UIView = interface;
+  UIGestureRecognizer = interface;
+  UIEvent = interface;
+  UIResponder = interface;
+  UIKeyCommand = interface;
+  UITextInputMode = interface;
+  UIAppearanceContainer = interface;
+  UIAppearance = interface;
+  UIDynamicAnimator = interface;
+  UIDynamicItem = interface;
+  UIDynamicBehavior = interface;
+  UIViewController = interface;
+  UIMotionEffect = interface;
+  UIImageView = interface;
+  UIPanGestureRecognizer = interface;
+  UIPinchGestureRecognizer = interface;
+  UIScrollViewDelegate = interface;
+  UIScrollView = interface;
+  UIGestureRecognizerDelegate = interface;
+  UITouch = interface;
+  UISwipeGestureRecognizer = interface;
+  UILabel = interface;
+  UIButton = interface;
+  UITextField = interface;
+  UITableView = interface;
+  UILongPressGestureRecognizer = interface;
+  UITableViewCell = interface;
+  UINib = interface;
+  UITableViewDataSource = interface;
+  UITableViewHeaderFooterView = interface;
+  UIRefreshControl = interface;
+  UITableViewDelegate = interface;
+  UIPickerViewDataSource = interface;
+  UIPickerViewDelegate = interface;
+  UIPickerView = interface;
+  UIPickerViewAccessibilityDelegate = interface;
+  UIScrollViewAccessibilityDelegate = interface;
+  UIAccessibilityIdentification = interface;
+  UIAccessibilityElement = interface;
+  UIGuidedAccessRestrictionDelegate = interface;
+  UIAccessibilityReadingContent = interface;
+  UIControl = interface;
+  UITextInputTraits = interface;
+  UIKeyInput = interface;
+  UITextPosition = interface;
+  UITextRange = interface;
+  UITextSelectionRect = interface;
+  UITextInputTokenizer = interface;
+  UITextInputDelegate = interface;
+  UIDictationPhrase = interface;
+  UITextInput = interface;
+  UITextInputStringTokenizer = interface;
+  UIPopoverController = interface;
+  UITextFieldDelegate = interface;
+  UITextSelecting = interface;
+  UIActionSheetDelegate = interface;
+  UIToolbar = interface;
+  UITabBar = interface;
+  UIBarButtonItem = interface;
+  UIActionSheet = interface;
+  UIActivity = interface;
+  UIActivityIndicatorView = interface;
+  UIActivityViewController = interface;
+  UIActivityItemSource = interface;
+  UIActivityItemProvider = interface;
+  UIDevice = interface;
+  UIInputViewAudioFeedback = interface;
+  UIAlertViewDelegate = interface;
+  UIAlertView = interface;
+  UILocalNotification = interface;
+  UIApplicationDelegate = interface;
+  UIApplication = interface;
+  UIStateRestoring = interface;
+  UIViewControllerRestoration = interface;
+  UIDataSourceModelAssociation = interface;
+  UIObjectRestoration = interface;
+  UINavigationItem = interface;
+  UITabBarItem = interface;
+  UISearchDisplayController = interface;
+  UIStoryboard = interface;
+  UIStoryboardSegue = interface;
+  UIViewControllerTransitioningDelegate = interface;
+  UIAttachmentBehavior = interface;
+  UIBarItem = interface;
+  UIBarPositioning = interface;
+  UIBarPositioningDelegate = interface;
+  UICollectionView = interface;
+  UICollectionViewCell = interface;
+  UICollectionViewLayout = interface;
+  UICollectionViewTransitionLayout = interface;
+  UICollectionViewLayoutAttributes = interface;
+  UICollectionReusableView = interface;
+  UICollectionViewDataSource = interface;
+  UICollectionViewDelegate = interface;
+  UICollectionViewController = interface;
+  UICollectionViewUpdateItem = interface;
+  UICollectionViewLayoutInvalidationContext = interface;
+  UICollectionViewFlowLayoutInvalidationContext = interface;
+  UICollectionViewDelegateFlowLayout = interface;
+  UICollectionViewFlowLayout = interface;
+  UIDatePicker = interface;
+  UIDocument = interface;
+  UIDocumentInteractionControllerDelegate = interface;
+  UIDocumentInteractionController = interface;
+  UINavigationBar = interface;
+  UINavigationControllerDelegate = interface;
+  UINavigationController = interface;
+  UIViewControllerInteractiveTransitioning = interface;
+  UIViewControllerAnimatedTransitioning = interface;
+  UIImagePickerControllerDelegate = interface;
+  UIImagePickerController = interface;
+  UIInputView = interface;
+  UILocalizedIndexedCollation = interface;
+  UIManagedDocument = interface;
+  UIMenuController = interface;
+  UIMenuItem = interface;
+  UIInterpolatingMotionEffect = interface;
+  UIMotionEffectGroup = interface;
+  UINavigationBarDelegate = interface;
+  UIPageControl = interface;
+  UIPageViewControllerDelegate = interface;
+  UIPageViewControllerDataSource = interface;
+  UIPageViewController = interface;
+  UIPasteboard = interface;
+  UIPopoverControllerDelegate = interface;
+  UIPopoverBackgroundView = interface;
+  UIPrintPageRenderer = interface;
+  UIPrintFormatter = interface;
+  UISimpleTextPrintFormatter = interface;
+  UIMarkupTextPrintFormatter = interface;
+  UIViewPrintFormatter = interface;
+  UIPrintInfo = interface;
+  UIPrintInteractionController = interface;
+  UIPrintPaper = interface;
+  UIPrintInteractionControllerDelegate = interface;
+  UIProgressView = interface;
+  UIReferenceLibraryViewController = interface;
+  UIRotationGestureRecognizer = interface;
+  UIScreenMode = interface;
+  UIScreen = interface;
+  UIScreenEdgePanGestureRecognizer = interface;
+  UISearchBarDelegate = interface;
+  UISearchBar = interface;
+  UISearchDisplayDelegate = interface;
+  UISegmentedControl = interface;
+  UISlider = interface;
+  UISplitViewControllerDelegate = interface;
+  UISplitViewController = interface;
+  UIStepper = interface;
+  UIStoryboardPopoverSegue = interface;
+  UISwitch = interface;
+  UITabBarDelegate = interface;
+  UIViewControllerTransitionCoordinatorContext = interface;
+  UIViewControllerTransitionCoordinator = interface;
+  UIViewControllerContextTransitioning = interface;
+  UIPercentDrivenInteractiveTransition = interface;
+  UITabBarControllerDelegate = interface;
+  UITabBarController = interface;
+  UITableViewController = interface;
+  UITapGestureRecognizer = interface;
+  UITextChecker = interface;
+  UITextView = interface;
+  UITextViewDelegate = interface;
+  UIToolbarDelegate = interface;
+  UIVideoEditorControllerDelegate = interface;
+  UIVideoEditorController = interface;
+  UIWebViewDelegate = interface;
+  UIWebView = interface;
+  UIDynamicAnimatorDelegate = interface;
+  UIPushBehavior = interface;
+  UISnapBehavior = interface;
+  UIDynamicItemBehavior = interface;
+  UIGravityBehavior = interface;
+  UICollisionBehavior = interface;
+  UICollisionBehaviorDelegate = interface;
+  UITraitCollection = interface;
+  UIPrinter = interface;
+  UIPrinterPickerController = interface;
+
+  // ===== Framework typedefs =====
+{$M+}
+  NSUnderlineStyle = NSInteger;
+  NSTextWritingDirection = NSInteger;
+
+  UIEdgeInsets = record
+    top: CGFloat;
+    left: CGFloat;
+    bottom: CGFloat;
+    right: CGFloat;
+  end;
+
+  PUIEdgeInsets = ^UIEdgeInsets;
+
+  UIOffset = record
+    horizontal: CGFloat;
+    vertical: CGFloat;
+  end;
+
+  PUIOffset = ^UIOffset;
+  PUIApplication = Pointer;
+  UIRectEdge = NSUInteger;
+  NSLayoutRelation = NSInteger;
+  NSLayoutAttribute = NSInteger;
+  NSLayoutFormatOptions = NSUInteger;
+  UILayoutPriority = Single;
+  NSTextStorageEditActions = NSUInteger;
+  UIFontDescriptorSymbolicTraits = UInt32;
+  _UIFontDescriptorClass = NSUInteger;
+  NSTextLayoutOrientation = NSInteger;
+  NSGlyphProperty = NSInteger;
+  NSControlCharacterAction = NSInteger;
+  TUIKitUsingBlock = procedure(param1: CGRect; param2: CGRect; param3: NSTextContainer; param4: NSRange;
+    param5: Boolean) of object;
+  TUIKitUsingBlock1 = procedure(param1: CGRect; param2: Boolean) of object;
+  NSTextAlignment = NSInteger;
+  NSWritingDirection = NSInteger;
+  NSLineBreakMode = NSInteger;
+  NSStringDrawingOptions = NSInteger;
+  UIAccelerationValue = Double;
+  UIRectCorner = NSUInteger;
+  UIEventType = NSInteger;
+  UIEventSubtype = NSInteger;
+  UIKeyModifierFlags = NSInteger;
+  UIBarStyle = NSInteger;
+  TUIKitAction = procedure() of object;
+  UIViewAnimationCurve = NSInteger;
+  UIViewContentMode = NSInteger;
+  UIViewAnimationTransition = NSInteger;
+  UIViewAutoresizing = NSUInteger;
+  UIViewAnimationOptions = NSUInteger;
+  UIViewKeyframeAnimationOptions = NSUInteger;
+  UISystemAnimation = NSUInteger;
+  UIViewTintAdjustmentMode = NSInteger;
+  TUIKitCompletion = procedure(param1: Boolean) of object;
+  UILayoutConstraintAxis = NSInteger;
+  UIScrollViewIndicatorStyle = NSInteger;
+  UIScrollViewKeyboardDismissMode = NSInteger;
+  UIGestureRecognizerState = NSInteger;
+  UISwipeGestureRecognizerDirection = NSUInteger;
+  UILineBreakMode = NSInteger;
+  UITextAlignment = NSInteger;
+  UIBaselineAdjustment = NSInteger;
+  UITableViewCellStyle = NSInteger;
+  UITableViewCellSeparatorStyle = NSInteger;
+  UITableViewCellSelectionStyle = NSInteger;
+  UITableViewCellEditingStyle = NSInteger;
+  UITableViewCellAccessoryType = NSInteger;
+  UITableViewCellStateMask = NSUInteger;
+  UITableViewStyle = NSInteger;
+  UITableViewScrollPosition = NSInteger;
+  UITableViewRowAnimation = NSInteger;
+  UIAccessibilityTraits = UInt64;
+  UIAccessibilityNotifications = UInt32;
+  UIImageOrientation = NSInteger;
+  UIImageResizingMode = NSInteger;
+  UIImageRenderingMode = NSInteger;
+  UIAccessibilityZoomType = NSInteger;
+  UIGuidedAccessRestrictionState = NSInteger;
+  UIAccessibilityScrollDirection = NSInteger;
+  UIControlEvents = NSUInteger;
+  UIControlContentVerticalAlignment = NSInteger;
+  UIControlContentHorizontalAlignment = NSInteger;
+  UIControlState = NSUInteger;
+  UITextAutocapitalizationType = NSInteger;
+  UITextAutocorrectionType = NSInteger;
+  UITextSpellCheckingType = NSInteger;
+  UIKeyboardType = NSInteger;
+  UIKeyboardAppearance = NSInteger;
+  UIReturnKeyType = NSInteger;
+  UITextStorageDirection = NSInteger;
+  UITextLayoutDirection = NSInteger;
+  UITextDirection = NSInteger;
+  UITextWritingDirection = NSInteger;
+  UIToolbarPosition = NSUInteger;
+  UITextGranularity = NSInteger;
+  UITextBorderStyle = NSInteger;
+  UITextFieldViewMode = NSInteger;
+  UIActionSheetStyle = NSInteger;
+  UIActivityCategory = NSInteger;
+  UIActivityIndicatorViewStyle = NSInteger;
+  UIDeviceOrientation = NSInteger;
+  UIDeviceBatteryState = NSInteger;
+  UIUserInterfaceIdiom = NSInteger;
+  UIAlertViewStyle = NSInteger;
+  UIStatusBarStyle = NSInteger;
+  UIStatusBarAnimation = NSInteger;
+  UIInterfaceOrientation = NSInteger;
+  UIInterfaceOrientationMask = NSUInteger;
+  UIRemoteNotificationType = NSUInteger;
+  UIBackgroundFetchResult = NSUInteger;
+  UIBackgroundRefreshStatus = NSInteger;
+  UIApplicationState = NSInteger;
+  UIBackgroundTaskIdentifier = NSUInteger;
+  UIUserInterfaceLayoutDirection = NSInteger;
+  TUIKitCompletionHandler = procedure(param1: UIBackgroundFetchResult)
+    of object;
+  UIModalTransitionStyle = NSInteger;
+  UIModalPresentationStyle = NSInteger;
+  UIActivityViewControllerCompletionHandler = procedure(param1: NSString;
+    param2: Boolean) of object;
+  UIAttachmentBehaviorType = NSInteger;
+  UIBarMetrics = NSInteger;
+  UIBarPosition = NSInteger;
+  UIBarButtonItemStyle = NSInteger;
+  UIBarButtonSystemItem = NSInteger;
+  UIButtonType = NSInteger;
+  UICollectionViewScrollPosition = NSUInteger;
+  UICollectionViewLayoutInteractiveTransitionCompletion = procedure
+    (param1: Boolean; param2: Boolean) of object;
+  UICollectionElementCategory = NSUInteger;
+  UICollectionUpdateAction = NSInteger;
+  UICollectionViewScrollDirection = NSInteger;
+  UIDataDetectorTypes = NSUInteger;
+  UIDatePickerMode = NSInteger;
+  UIDocumentChangeKind = NSInteger;
+  UIDocumentSaveOperation = NSInteger;
+  UIDocumentState = NSUInteger;
+  UINavigationControllerOperation = NSInteger;
+  UIImagePickerControllerSourceType = NSInteger;
+  UIImagePickerControllerQualityType = NSInteger;
+  UIImagePickerControllerCameraCaptureMode = NSInteger;
+  UIImagePickerControllerCameraDevice = NSInteger;
+  UIImagePickerControllerCameraFlashMode = NSInteger;
+  UIInputViewStyle = NSInteger;
+  UIMenuControllerArrowDirection = NSInteger;
+  UIInterpolatingMotionEffectType = NSInteger;
+  UIPageViewControllerNavigationOrientation = NSInteger;
+  UIPageViewControllerSpineLocation = NSInteger;
+  UIPageViewControllerNavigationDirection = NSInteger;
+  UIPageViewControllerTransitionStyle = NSInteger;
+  UIPopoverArrowDirection = NSUInteger;
+  UIPrintInfoOutputType = NSInteger;
+  UIPrintInfoOrientation = NSInteger;
+  UIPrintInfoDuplex = NSInteger;
+  UIPrintInteractionCompletionHandler = procedure
+    (param1: UIPrintInteractionController; param2: Boolean; param3: NSError)
+    of object;
+  UIProgressViewStyle = NSInteger;
+  UIScreenOverscanCompensation = NSInteger;
+  UISearchBarIcon = NSInteger;
+  UISearchBarStyle = NSUInteger;
+  UISegmentedControlStyle = NSInteger;
+  UISegmentedControlSegment = NSInteger;
+  UITabBarItemPositioning = NSInteger;
+  TUIKitAnimation = procedure(param1: Pointer) of object;
+  UITabBarSystemItem = NSInteger;
+  UITouchPhase = NSInteger;
+  UIWebViewNavigationType = NSInteger;
+  UIWebPaginationMode = NSInteger;
+  UIWebPaginationBreakingMode = NSInteger;
+  UIWindowLevel = CGFloat;
+  UIPushBehaviorMode = NSInteger;
+  UICollisionBehaviorMode = NSUInteger;
+  UIUserNotificationType = NSUInteger;
+  UIUserInterfaceSizeClass = NSInteger;
+  {$EXTERNALSYM UIUserInterfaceSizeClass}
+  UIPrinterJobTypes = NSInteger;
+  {$EXTERNALSYM UIPrinterJobTypes}
+  UIPrinterPickerCompletionHandler = procedure(param1: UIPrinterPickerController; param2: Boolean; param3: NSError)
+    of object;
+
+  // ===== Interface declarations =====
+
+  NSLayoutConstraintClass = interface(NSObjectClass)
+    ['{87A9BD00-B352-4FF7-BF16-6131B4CD6DC0}']
+    {class} function constraintsWithVisualFormat(format: NSString;
+      opts: NSLayoutFormatOptions; metrics: NSDictionary; views: NSDictionary)
+      : NSArray; cdecl;
+    [MethodName('constraintWithItem:attribute:relatedBy:toItem:attribute:multiplier:constant:')]
+    {class} function constraintWithItem(view1: Pointer;
+      attr1: NSLayoutAttribute; relation: NSLayoutRelation; view2: Pointer;
+      attr2: NSLayoutAttribute; multiplier: CGFloat; c: CGFloat): Pointer; cdecl;
+    {class} procedure activateConstraints(constraints: NSArray); cdecl;
+    {class} procedure deactivateConstraints(constraints: NSArray); cdecl;
+  end;
+
+  NSLayoutConstraint = interface(NSObject)
+    ['{C182C818-64BB-480C-A0DA-EF97164A4A86}']
+    procedure setPriority(priority: UILayoutPriority); cdecl;
+    function priority: UILayoutPriority; cdecl;
+    procedure setShouldBeArchived(shouldBeArchived: Boolean); cdecl;
+    function shouldBeArchived: Boolean; cdecl;
+    function firstItem: Pointer; cdecl;
+    function firstAttribute: NSLayoutAttribute; cdecl;
+    function relation: NSLayoutRelation; cdecl;
+    function secondItem: Pointer; cdecl;
+    function secondAttribute: NSLayoutAttribute; cdecl;
+    function multiplier: CGFloat; cdecl;
+    procedure setConstant(constant: CGFloat); cdecl;
+    function constant: CGFloat; cdecl;
+    procedure setActive(active: Boolean); cdecl;
+    function isActive: Boolean; cdecl;
+    procedure setIdentifier(identifier: NSString); cdecl;
+    function identifier: NSString; cdecl;
+  end;
+
+  TNSLayoutConstraint = class(TOCGenericImport<NSLayoutConstraintClass,
+    NSLayoutConstraint>)
+  end;
+
+  NSLayoutManagerClass = interface(NSObjectClass)
+    ['{C53278EE-B363-4650-A941-D688606954C1}']
+  end;
+
+  NSLayoutManager = interface(NSObject)
+    ['{5F2ED907-ACAD-4EC2-A224-BFA0EBD15C00}']
+    procedure setTextStorage(textStorage: NSTextStorage); cdecl;
+    function textStorage: NSTextStorage; cdecl;
+    function textContainers: NSArray; cdecl;
+    procedure addTextContainer(container: NSTextContainer); cdecl;
+    procedure insertTextContainer(container: NSTextContainer; atIndex: NSUInteger); cdecl;
+    procedure removeTextContainerAtIndex(index: NSUInteger); cdecl;
+    procedure textContainerChangedGeometry(container: NSTextContainer); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    function delegate: Pointer; cdecl;
+    procedure setShowsInvisibleCharacters(showsInvisibleCharacters: Boolean); cdecl;
+    function showsInvisibleCharacters: Boolean; cdecl;
+    procedure setShowsControlCharacters(showsControlCharacters: Boolean); cdecl;
+    function showsControlCharacters: Boolean; cdecl;
+    procedure setHyphenationFactor(hyphenationFactor: CGFloat); cdecl;
+    function hyphenationFactor: CGFloat; cdecl;
+    procedure setUsesFontLeading(usesFontLeading: Boolean); cdecl;
+    function usesFontLeading: Boolean; cdecl;
+    procedure setAllowsNonContiguousLayout(allowsNonContiguousLayout: Boolean); cdecl;
+    function allowsNonContiguousLayout: Boolean; cdecl;
+    function hasNonContiguousLayout: Boolean; cdecl;
+    procedure invalidateGlyphsForCharacterRange(charRange: NSRange; changeInLength: NSInteger;
+      actualCharacterRange: PNSRange); cdecl;
+    procedure invalidateLayoutForCharacterRange(charRange: NSRange; actualCharacterRange: PNSRange); cdecl;
+    procedure invalidateDisplayForCharacterRange(charRange: NSRange); cdecl;
+    procedure invalidateDisplayForGlyphRange(glyphRange: NSRange); cdecl;
+    procedure processEditingForTextStorage(textStorage: NSTextStorage; edited: NSTextStorageEditActions; range: NSRange;
+      changeInLength: NSInteger; invalidatedRange: NSRange); cdecl;
+    procedure ensureGlyphsForCharacterRange(charRange: NSRange); cdecl;
+    procedure ensureGlyphsForGlyphRange(glyphRange: NSRange); cdecl;
+    procedure ensureLayoutForCharacterRange(charRange: NSRange); cdecl;
+    procedure ensureLayoutForGlyphRange(glyphRange: NSRange); cdecl;
+    procedure ensureLayoutForTextContainer(container: NSTextContainer); cdecl;
+    procedure ensureLayoutForBoundingRect(bounds: CGRect; inTextContainer: NSTextContainer); cdecl;
+    procedure setGlyphs(glyphs: CGGlyph; properties: NSGlyphProperty; characterIndexes: NSUInteger; font: UIFont;
+      forGlyphRange: NSRange); cdecl;
+    function numberOfGlyphs: NSUInteger; cdecl;
+    [MethodName('glyphAtIndex:isValidIndex:')]
+    function glyphAtIndexIsValidIndex(glyphIndex: NSUInteger; isValidIndex: Boolean): CGGlyph; cdecl;
+    [MethodName('glyphAtIndex:')]
+    function glyphAtIndex(glyphIndex: NSUInteger): CGGlyph; cdecl;
+    function isValidGlyphIndex(glyphIndex: NSUInteger): Boolean; cdecl;
+    function propertyForGlyphAtIndex(glyphIndex: NSUInteger): NSGlyphProperty; cdecl;
+    function characterIndexForGlyphAtIndex(glyphIndex: NSUInteger): NSUInteger; cdecl;
+    function glyphIndexForCharacterAtIndex(charIndex: NSUInteger): NSUInteger; cdecl;
+    function getGlyphsInRange(glyphRange: NSRange; glyphs: CGGlyph; properties: NSGlyphProperty;
+      characterIndexes: NSUInteger; bidiLevels: Byte): NSUInteger; cdecl;
+    procedure setTextContainer(container: NSTextContainer; forGlyphRange: NSRange); cdecl;
+    procedure setLineFragmentRect(fragmentRect: CGRect; forGlyphRange: NSRange; usedRect: CGRect); cdecl;
+    procedure setExtraLineFragmentRect(fragmentRect: CGRect; usedRect: CGRect; textContainer: NSTextContainer); cdecl;
+    procedure setLocation(location: CGPoint; forStartOfGlyphRange: NSRange); cdecl;
+    procedure setNotShownAttribute(flag: Boolean; forGlyphAtIndex: NSUInteger); cdecl;
+    procedure setDrawsOutsideLineFragment(flag: Boolean; forGlyphAtIndex: NSUInteger); cdecl;
+    procedure setAttachmentSize(attachmentSize: CGSize; forGlyphRange: NSRange); cdecl;
+    procedure getFirstUnlaidCharacterIndex(charIndex: NSUInteger; glyphIndex: NSUInteger); cdecl;
+    function firstUnlaidCharacterIndex: NSUInteger; cdecl;
+    function firstUnlaidGlyphIndex: NSUInteger; cdecl;
+    function textContainerForGlyphAtIndex(glyphIndex: NSUInteger; effectiveRange: PNSRange): NSTextContainer; cdecl;
+    function usedRectForTextContainer(container: NSTextContainer): CGRect; cdecl;
+    function lineFragmentRectForGlyphAtIndex(glyphIndex: NSUInteger; effectiveRange: PNSRange): CGRect; cdecl;
+    function lineFragmentUsedRectForGlyphAtIndex(glyphIndex: NSUInteger; effectiveRange: PNSRange): CGRect; cdecl;
+    function extraLineFragmentRect: CGRect; cdecl;
+    function extraLineFragmentUsedRect: CGRect; cdecl;
+    function extraLineFragmentTextContainer: NSTextContainer; cdecl;
+    function locationForGlyphAtIndex(glyphIndex: NSUInteger): CGPoint; cdecl;
+    function notShownAttributeForGlyphAtIndex(glyphIndex: NSUInteger): Boolean; cdecl;
+    function drawsOutsideLineFragmentForGlyphAtIndex(glyphIndex: NSUInteger): Boolean; cdecl;
+    function attachmentSizeForGlyphAtIndex(glyphIndex: NSUInteger): CGSize; cdecl;
+    function truncatedGlyphRangeInLineFragmentForGlyphAtIndex(glyphIndex: NSUInteger): NSRange; cdecl;
+    function glyphRangeForCharacterRange(charRange: NSRange; actualCharacterRange: PNSRange): NSRange; cdecl;
+    function characterRangeForGlyphRange(glyphRange: NSRange; actualGlyphRange: PNSRange): NSRange; cdecl;
+    function glyphRangeForTextContainer(container: NSTextContainer): NSRange; cdecl;
+    function rangeOfNominallySpacedGlyphsContainingIndex(glyphIndex: NSUInteger): NSRange; cdecl;
+    function boundingRectForGlyphRange(glyphRange: NSRange; inTextContainer: NSTextContainer): CGRect; cdecl;
+    function glyphRangeForBoundingRect(bounds: CGRect; inTextContainer: NSTextContainer): NSRange; cdecl;
+    function glyphRangeForBoundingRectWithoutAdditionalLayout(bounds: CGRect; inTextContainer: NSTextContainer)
+      : NSRange; cdecl;
+    [MethodName('glyphIndexForPoint:inTextContainer:fractionOfDistanceThroughGlyph:')]
+    function glyphIndexForPointInTextContainerFractionOfDistanceThroughGlyph(point: CGPoint;
+      inTextContainer: NSTextContainer; fractionOfDistanceThroughGlyph: PCGFloat): NSUInteger; cdecl;
+    [MethodName('glyphIndexForPoint:inTextContainer:')]
+    function glyphIndexForPointInTextContainer(point: CGPoint; inTextContainer: NSTextContainer): NSUInteger; cdecl;
+    function fractionOfDistanceThroughGlyphForPoint(point: CGPoint; inTextContainer: NSTextContainer): CGFloat; cdecl;
+    function characterIndexForPoint(point: CGPoint; inTextContainer: NSTextContainer;
+      fractionOfDistanceBetweenInsertionPoints: PCGFloat): NSUInteger; cdecl;
+    function getLineFragmentInsertionPointsForCharacterAtIndex(charIndex: NSUInteger; alternatePositions: Boolean;
+      inDisplayOrder: Boolean; positions: PCGFloat; characterIndexes: NSUInteger): NSUInteger; cdecl;
+    procedure enumerateLineFragmentsForGlyphRange(glyphRange: NSRange; usingBlock: TUIKitUsingBlock); cdecl;
+    procedure enumerateEnclosingRectsForGlyphRange(glyphRange: NSRange; withinSelectedGlyphRange: NSRange;
+      inTextContainer: NSTextContainer; usingBlock: TUIKitUsingBlock1); cdecl;
+    procedure drawBackgroundForGlyphRange(glyphsToShow: NSRange; atPoint: CGPoint); cdecl;
+    procedure drawGlyphsForGlyphRange(glyphsToShow: NSRange; atPoint: CGPoint); cdecl;
+    procedure showCGGlyphs(glyphs: CGGlyph; positions: Pointer; count: NSUInteger; font: UIFont;
+      matrix: CGAffineTransform; attributes: NSDictionary; inContext: CGContextRef); cdecl;
+    procedure fillBackgroundRectArray(rectArray: Pointer; count: NSUInteger; forCharacterRange: NSRange;
+      color: UIColor); cdecl;
+    procedure drawUnderlineForGlyphRange(glyphRange: NSRange; underlineType: NSUnderlineStyle; baselineOffset: CGFloat;
+      lineFragmentRect: CGRect; lineFragmentGlyphRange: NSRange; containerOrigin: CGPoint); cdecl;
+    procedure underlineGlyphRange(glyphRange: NSRange; underlineType: NSUnderlineStyle; lineFragmentRect: CGRect;
+      lineFragmentGlyphRange: NSRange; containerOrigin: CGPoint); cdecl;
+    procedure drawStrikethroughForGlyphRange(glyphRange: NSRange; strikethroughType: NSUnderlineStyle;
+      baselineOffset: CGFloat; lineFragmentRect: CGRect; lineFragmentGlyphRange: NSRange;
+      containerOrigin: CGPoint); cdecl;
+    procedure strikethroughGlyphRange(glyphRange: NSRange; strikethroughType: NSUnderlineStyle;
+      lineFragmentRect: CGRect; lineFragmentGlyphRange: NSRange; containerOrigin: CGPoint); cdecl;
+  end;
+
+  TNSLayoutManager = class(TOCGenericImport<NSLayoutManagerClass, NSLayoutManager>)
+  end;
+
+  NSTextStorageClass = interface(NSMutableAttributedStringClass)
+    ['{40E16D91-F8F4-4DE4-A9F4-119314FF11BB}']
+  end;
+
+  NSTextStorage = interface(NSMutableAttributedString)
+    ['{0D02BF68-4599-49C9-A8BE-5F09277A80F1}']
+    function layoutManagers: NSArray; cdecl;
+    procedure addLayoutManager(aLayoutManager: NSLayoutManager); cdecl;
+    procedure removeLayoutManager(aLayoutManager: NSLayoutManager); cdecl;
+    procedure setEditedMask(editedMask: NSTextStorageEditActions); cdecl;
+    function editedMask: NSTextStorageEditActions; cdecl;
+    procedure setEditedRange(editedRange: NSRange); cdecl;
+    function editedRange: NSRange; cdecl;
+    procedure setChangeInLength(changeInLength: NSInteger); cdecl;
+    function changeInLength: NSInteger; cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    function delegate: Pointer; cdecl;
+    procedure edited(editedMask: NSTextStorageEditActions; range: NSRange; changeInLength: NSInteger); cdecl;
+    procedure processEditing; cdecl;
+    function fixesAttributesLazily: Boolean; cdecl;
+    procedure invalidateAttributesInRange(range: NSRange); cdecl;
+    procedure ensureAttributesAreFixedInRange(range: NSRange); cdecl;
+  end;
+
+  TNSTextStorage = class(TOCGenericImport<NSTextStorageClass, NSTextStorage>)
+  end;
+
+  UIFontDescriptorClass = interface(NSObjectClass)
+    ['{CB4BF3A8-9509-47D8-8A44-C96903303564}']
+    {class} function fontDescriptorWithFontAttributes(attributes: NSDictionary): UIFontDescriptor; cdecl;
+    {class} [MethodName('fontDescriptorWithName:size:')]
+    function fontDescriptorWithNameSize(fontName: NSString; size: CGFloat): UIFontDescriptor; cdecl;
+    {class} [MethodName('fontDescriptorWithName:matrix:')]
+    function fontDescriptorWithNameMatrix(fontName: NSString; matrix: CGAffineTransform): UIFontDescriptor; cdecl;
+    {class} function preferredFontDescriptorWithTextStyle(style: NSString): UIFontDescriptor; cdecl;
+  end;
+
+  UIFontDescriptor = interface(NSObject)
+    ['{4E4A3072-20EE-468F-B5DD-897E00D7A3AE}']
+    function postscriptName: NSString; cdecl;
+    function pointSize: CGFloat; cdecl;
+    function matrix: CGAffineTransform; cdecl;
+    function symbolicTraits: UIFontDescriptorSymbolicTraits; cdecl;
+    function objectForKey(anAttribute: NSString): Pointer; cdecl;
+    function fontAttributes: NSDictionary; cdecl;
+    function matchingFontDescriptorsWithMandatoryKeys(mandatoryKeys: NSSet): NSArray; cdecl;
+    function initWithFontAttributes(attributes: NSDictionary): Pointer{instancetype}; cdecl;
+    function fontDescriptorByAddingAttributes(attributes: NSDictionary): UIFontDescriptor; cdecl;
+    function fontDescriptorWithSymbolicTraits(symbolicTraits: UIFontDescriptorSymbolicTraits): UIFontDescriptor; cdecl;
+    function fontDescriptorWithSize(newPointSize: CGFloat): UIFontDescriptor; cdecl;
+    function fontDescriptorWithMatrix(matrix: CGAffineTransform): UIFontDescriptor; cdecl;
+    function fontDescriptorWithFace(newFace: NSString): UIFontDescriptor; cdecl;
+    function fontDescriptorWithFamily(newFamily: NSString): UIFontDescriptor; cdecl;
+  end;
+
+  TUIFontDescriptor = class(TOCGenericImport<UIFontDescriptorClass, UIFontDescriptor>)
+  end;
+
+  NSTextContainerClass = interface(NSObjectClass)
+    ['{AE7FFB6F-7A06-4CCA-82E1-F7226513C7EB}']
+  end;
+
+  NSTextContainer = interface(NSObject)
+    ['{FA34E82A-0ED3-4915-AF0F-4558B6A07D38}']
+    function initWithSize(size: CGSize): Pointer; cdecl;
+    procedure setLayoutManager(layoutManager: NSLayoutManager); cdecl;
+    function layoutManager: NSLayoutManager; cdecl;
+    procedure setSize(size: CGSize); cdecl;
+    function size: CGSize; cdecl;
+    procedure setExclusionPaths(exclusionPaths: NSArray); cdecl;
+    function exclusionPaths: NSArray; cdecl;
+    procedure setLineBreakMode(lineBreakMode: NSLineBreakMode); cdecl;
+    function lineBreakMode: NSLineBreakMode; cdecl;
+    procedure setLineFragmentPadding(lineFragmentPadding: CGFloat); cdecl;
+    function lineFragmentPadding: CGFloat; cdecl;
+    procedure setMaximumNumberOfLines(maximumNumberOfLines: NSUInteger); cdecl;
+    function maximumNumberOfLines: NSUInteger; cdecl;
+    function lineFragmentRectForProposedRect(proposedRect: CGRect; atIndex: NSUInteger;
+      writingDirection: NSWritingDirection; remainingRect: Pointer): CGRect; cdecl;
+    procedure setWidthTracksTextView(widthTracksTextView: Boolean); cdecl;
+    function widthTracksTextView: Boolean; cdecl;
+    procedure setHeightTracksTextView(heightTracksTextView: Boolean); cdecl;
+    function heightTracksTextView: Boolean; cdecl;
+  end;
+
+  TNSTextContainer = class(TOCGenericImport<NSTextContainerClass, NSTextContainer>)
+  end;
+
+  NSTextTabClass = interface(NSObjectClass)
+    ['{31C9E00A-F635-4B50-B011-B0210DEECE16}']
+    {class} function columnTerminatorsForLocale(aLocale: NSLocale): NSCharacterSet; cdecl;
+  end;
+
+  NSTextTab = interface(NSObject)
+    ['{AA8D0423-FC3E-4CC2-973A-AD088AC3DBEA}']
+    function initWithTextAlignment(alignment: NSTextAlignment; location: CGFloat; options: NSDictionary): Pointer; cdecl;
+    function alignment: NSTextAlignment; cdecl;
+    function location: CGFloat; cdecl;
+    function options: NSDictionary; cdecl;
+  end;
+
+  TNSTextTab = class(TOCGenericImport<NSTextTabClass, NSTextTab>)
+  end;
+
+  NSParagraphStyleClass = interface(NSObjectClass)
+    ['{BAA1290B-2F73-4F5F-9719-7CB318B968A4}']
+    {class} function defaultParagraphStyle: NSParagraphStyle; cdecl;
+    {class} function defaultWritingDirectionForLanguage(languageName: NSString): NSWritingDirection; cdecl;
+  end;
+
+  NSParagraphStyle = interface(NSObject)
+    ['{58BB0261-CED3-4DB7-8C59-0939DAC99A5C}']
+    function lineSpacing: CGFloat; cdecl;
+    function paragraphSpacing: CGFloat; cdecl;
+    function alignment: NSTextAlignment; cdecl;
+    function headIndent: CGFloat; cdecl;
+    function tailIndent: CGFloat; cdecl;
+    function firstLineHeadIndent: CGFloat; cdecl;
+    function minimumLineHeight: CGFloat; cdecl;
+    function maximumLineHeight: CGFloat; cdecl;
+    function lineBreakMode: NSLineBreakMode; cdecl;
+    function baseWritingDirection: NSWritingDirection; cdecl;
+    function lineHeightMultiple: CGFloat; cdecl;
+    function paragraphSpacingBefore: CGFloat; cdecl;
+    function hyphenationFactor: CGFloat; cdecl;
+    function tabStops: NSArray; cdecl;
+    function defaultTabInterval: CGFloat; cdecl;
+  end;
+
+  TNSParagraphStyle = class(TOCGenericImport<NSParagraphStyleClass, NSParagraphStyle>)
+  end;
+
+  NSMutableParagraphStyleClass = interface(NSParagraphStyleClass)
+    ['{36CA88FB-1718-498B-9447-512393F9D615}']
+  end;
+
+  NSMutableParagraphStyle = interface(NSParagraphStyle)
+    ['{364C9ADC-1858-457C-A987-DF8454B463A2}']
+    procedure setLineSpacing(lineSpacing: CGFloat); cdecl;
+    function lineSpacing: CGFloat; cdecl;
+    procedure setParagraphSpacing(paragraphSpacing: CGFloat); cdecl;
+    function paragraphSpacing: CGFloat; cdecl;
+    procedure setAlignment(alignment: NSTextAlignment); cdecl;
+    function alignment: NSTextAlignment; cdecl;
+    procedure setFirstLineHeadIndent(firstLineHeadIndent: CGFloat); cdecl;
+    function firstLineHeadIndent: CGFloat; cdecl;
+    procedure setHeadIndent(headIndent: CGFloat); cdecl;
+    function headIndent: CGFloat; cdecl;
+    procedure setTailIndent(tailIndent: CGFloat); cdecl;
+    function tailIndent: CGFloat; cdecl;
+    procedure setLineBreakMode(lineBreakMode: NSLineBreakMode); cdecl;
+    function lineBreakMode: NSLineBreakMode; cdecl;
+    procedure setMinimumLineHeight(minimumLineHeight: CGFloat); cdecl;
+    function minimumLineHeight: CGFloat; cdecl;
+    procedure setMaximumLineHeight(maximumLineHeight: CGFloat); cdecl;
+    function maximumLineHeight: CGFloat; cdecl;
+    procedure setBaseWritingDirection(baseWritingDirection: NSWritingDirection); cdecl;
+    function baseWritingDirection: NSWritingDirection; cdecl;
+    procedure setLineHeightMultiple(lineHeightMultiple: CGFloat); cdecl;
+    function lineHeightMultiple: CGFloat; cdecl;
+    procedure setParagraphSpacingBefore(paragraphSpacingBefore: CGFloat); cdecl;
+    function paragraphSpacingBefore: CGFloat; cdecl;
+    procedure setHyphenationFactor(hyphenationFactor: CGFloat); cdecl;
+    function hyphenationFactor: CGFloat; cdecl;
+    procedure setTabStops(tabStops: NSArray); cdecl;
+    function tabStops: NSArray; cdecl;
+    procedure setDefaultTabInterval(defaultTabInterval: CGFloat); cdecl;
+    function defaultTabInterval: CGFloat; cdecl;
+  end;
+
+  TNSMutableParagraphStyle = class(TOCGenericImport<NSMutableParagraphStyleClass, NSMutableParagraphStyle>)
+  end;
+
+  NSShadowClass = interface(NSObjectClass)
+    ['{E99993D6-47DD-42BC-826E-613FA92D4DCA}']
+  end;
+
+  NSShadow = interface(NSObject)
+    ['{DD75575F-4191-4D8F-BDB3-96A9BA393A79}']
+    procedure setShadowOffset(shadowOffset: CGSize); cdecl;
+    function shadowOffset: CGSize; cdecl;
+    procedure setShadowBlurRadius(shadowBlurRadius: CGFloat); cdecl;
+    function shadowBlurRadius: CGFloat; cdecl;
+    procedure setShadowColor(shadowColor: Pointer); cdecl;
+    function shadowColor: Pointer; cdecl;
+  end;
+
+  TNSShadow = class(TOCGenericImport<NSShadowClass, NSShadow>)
+  end;
+
+  NSStringDrawingContextClass = interface(NSObjectClass)
+    ['{9D2B0D14-063A-437D-A56D-7E7397C6FA21}']
+  end;
+
+  NSStringDrawingContext = interface(NSObject)
+    ['{982AE15C-D76B-407B-89E2-A48DB0C465BB}']
+    procedure setMinimumScaleFactor(minimumScaleFactor: CGFloat); cdecl;
+    function minimumScaleFactor: CGFloat; cdecl;
+    procedure setMinimumTrackingAdjustment(minimumTrackingAdjustment: CGFloat); cdecl;
+    function minimumTrackingAdjustment: CGFloat; cdecl;
+    function actualScaleFactor: CGFloat; cdecl;
+    function actualTrackingAdjustment: CGFloat; cdecl;
+    function totalBounds: CGRect; cdecl;
+  end;
+
+  TNSStringDrawingContext = class(TOCGenericImport<NSStringDrawingContextClass, NSStringDrawingContext>)
+  end;
+
+  NSTextAttachmentClass = interface(NSObjectClass)
+    ['{3B7DC8E2-6BEB-4A5B-846B-F33D38FD40AF}']
+  end;
+
+  NSTextAttachment = interface(NSObject)
+    ['{45A6BFBF-48C9-4611-B920-EABB4B72FF0B}']
+    function initWithData(contentData: NSData; uti: NSString): Pointer; cdecl;
+    procedure setContents(contents: NSData); cdecl;
+    function contents: NSData; cdecl;
+    procedure setFileType(fileType: NSString); cdecl;
+    function fileType: NSString; cdecl;
+    procedure setFileWrapper(fileWrapper: NSFileWrapper); cdecl;
+    function fileWrapper: NSFileWrapper; cdecl;
+    procedure setImage(image: UIImage); cdecl;
+    function image: UIImage; cdecl;
+    procedure setBounds(bounds: CGRect); cdecl;
+    function bounds: CGRect; cdecl;
+  end;
+
+  TNSTextAttachment = class(TOCGenericImport<NSTextAttachmentClass, NSTextAttachment>)
+  end;
+
+  UIKeyCommandClass = interface(NSObjectClass)
+    ['{A63E10C2-E248-46F7-AE2B-8E57C274A99F}']
+    {class} function keyCommandWithInput(input: NSString; modifierFlags: UIKeyModifierFlags; action: SEL)
+      : UIKeyCommand; cdecl;
+  end;
+
+  UIKeyCommand = interface(NSObject)
+    ['{031CC277-0AFA-44AA-AF33-27653BF7ABAD}']
+    function input: NSString; cdecl;
+    function modifierFlags: UIKeyModifierFlags; cdecl;
+  end;
+
+  TUIKeyCommand = class(TOCGenericImport<UIKeyCommandClass, UIKeyCommand>)
+  end;
+
+  UITextInputModeClass = interface(NSObjectClass)
+    ['{231F5CCE-09F7-44E8-8B17-EB987D428BA9}']
+    {class} function activeInputModes: NSArray; cdecl;
+    {class} function currentInputMode: Pointer; cdecl;
+  end;
+  UITextInputMode = interface(NSObject)
+    ['{223FED6C-FFF2-46FE-B401-A87AD479EE49}']
+    function primaryLanguage: NSString; cdecl;
+  end;
+  TUITextInputMode = class(TOCGenericImport<UITextInputModeClass, UITextInputMode>)  end;
+
+
+  UIKitAdditions = interface(IObjectiveC)
+    ['{E30BC5C6-6047-4586-A88A-A01C7F198CFF}']
+    function initWithColor(color: UIColor): Pointer{instancetype}; cdecl;
+  end;
+
+  UITraitCollectionClass = interface(NSObjectClass)
+    ['{9E66DBC3-A676-4B4A-955A-326AFBD4F300}']
+    {class} function traitCollectionWithTraitsFromCollections(traitCollections: NSArray): UITraitCollection; cdecl;
+    {class} function traitCollectionWithUserInterfaceIdiom(idiom: UIUserInterfaceIdiom): UITraitCollection; cdecl;
+    {class} function traitCollectionWithDisplayScale(scale: CGFloat): UITraitCollection; cdecl;
+    {class} function traitCollectionWithHorizontalSizeClass(horizontalSizeClass: UIUserInterfaceSizeClass)
+      : UITraitCollection; cdecl;
+    {class} function traitCollectionWithVerticalSizeClass(verticalSizeClass: UIUserInterfaceSizeClass)
+      : UITraitCollection; cdecl;
+  end;
+  UITraitCollection = interface(NSObject)
+    ['{8939A7C6-9790-44B1-B1B9-0169E400C997}']
+    function containsTraitsInCollection(trait: UITraitCollection): Boolean; cdecl;
+    function userInterfaceIdiom: UIUserInterfaceIdiom; cdecl;
+    function displayScale: CGFloat; cdecl;
+    function horizontalSizeClass: UIUserInterfaceSizeClass; cdecl;
+    function verticalSizeClass: UIUserInterfaceSizeClass; cdecl;
+  end;
+  TUITraitCollection = class(TOCGenericImport<UITraitCollectionClass, UITraitCollection>)
+  end;
+  PUITraitCollection = Pointer;
+
+  UIDynamicAnimatorClass = interface(NSObjectClass)
+    ['{61F5DDE1-7D26-4CC6-BBAE-EFCBBEB5037D}']
+  end;
+  UIDynamicAnimator = interface(NSObject)
+    ['{B45E0388-8D78-47C5-AAAB-E97E92227292}']
+    function initWithReferenceView(view: UIView): Pointer{instancetype}; cdecl;
+    procedure addBehavior(behavior: UIDynamicBehavior); cdecl;
+    procedure removeBehavior(behavior: UIDynamicBehavior); cdecl;
+    procedure removeAllBehaviors; cdecl;
+    function referenceView: UIView; cdecl;
+    function behaviors: NSArray; cdecl;
+    function itemsInRect(rect: CGRect): NSArray; cdecl;
+    procedure updateItemUsingCurrentState(item: Pointer); cdecl;
+    function isRunning: Boolean; cdecl;
+    function elapsedTime: NSTimeInterval; cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    function delegate: Pointer; cdecl;
+    function initWithCollectionViewLayout(layout: UICollectionViewLayout): Pointer{instancetype}; cdecl;
+    function layoutAttributesForCellAtIndexPath(indexPath: NSIndexPath): UICollectionViewLayoutAttributes; cdecl;
+    function layoutAttributesForSupplementaryViewOfKind(kind: NSString; atIndexPath: NSIndexPath)
+      : UICollectionViewLayoutAttributes; cdecl;
+    function layoutAttributesForDecorationViewOfKind(decorationViewKind: NSString; atIndexPath: NSIndexPath)
+      : UICollectionViewLayoutAttributes; cdecl;
+  end;
+
+  TUIDynamicAnimator = class(TOCGenericImport<UIDynamicAnimatorClass, UIDynamicAnimator>)
+  end;
+  PUIDynamicAnimator = Pointer;
+
+  UIDynamicBehaviorClass = interface(NSObjectClass)
+    ['{F0310543-2484-4C83-844F-6686A40254F9}']
+  end;
+  UIDynamicBehavior = interface(NSObject)
+    ['{8AF19804-1F5C-4C88-939E-AA8F28AB985D}']
+    procedure addChildBehavior(behavior: UIDynamicBehavior); cdecl;
+    procedure removeChildBehavior(behavior: UIDynamicBehavior); cdecl;
+    function childBehaviors: NSArray; cdecl;
+    procedure setAction(action: TUIKitAction); cdecl;
+    function action: TUIKitAction; cdecl;
+    procedure willMoveToAnimator(dynamicAnimator: UIDynamicAnimator); cdecl;
+    function dynamicAnimator: UIDynamicAnimator; cdecl;
+  end;
+  TUIDynamicBehavior = class(TOCGenericImport<UIDynamicBehaviorClass, UIDynamicBehavior>)
+  end;
+  PUIDynamicBehavior = Pointer;
+
+  UIMenuItemClass = interface(NSObjectClass)
+    ['{6456BA57-C3C4-45EF-BF6B-A970C8CCD7C0}']
+  end;
+  UIMenuItem = interface(NSObject)
+    ['{8A757229-EB63-4B02-9B98-97D88C9E25E9}']
+    function action: SEL; cdecl;
+    function initWithTitle(title: NSString; action: SEL): Pointer; cdecl;
+    procedure setAction(action: SEL); cdecl;
+    procedure setTitle(title: NSString); cdecl;
+    function title: NSString; cdecl;
+  end;
+  TUIMenuItem = class(TOCGenericImport<UIMenuItemClass, UIMenuItem>)  end;
+
+  UIMenuControllerClass = interface(NSObjectClass)
+    ['{52CB7F2E-CB26-4121-979D-5020E934B090}']
+    {class} function sharedMenuController: Pointer; cdecl;
+  end;
+  UIMenuController = interface(NSObject)
+    ['{AC1666FB-0C58-483E-94AD-99F949FABAA8}']
+    function arrowDirection: UIMenuControllerArrowDirection; cdecl;
+    function isMenuVisible: Boolean; cdecl;
+    function menuFrame: CGRect; cdecl;
+    function menuItems: NSArray; cdecl;
+    procedure setArrowDirection(arrowDirection: UIMenuControllerArrowDirection); cdecl;
+    procedure setMenuItems(menuItems: NSArray); cdecl;
+    procedure setMenuVisible(menuVisible: Boolean); cdecl; overload;
+    procedure setMenuVisible(menuVisible: Boolean; animated: Boolean); cdecl; overload;
+    procedure setTargetRect(targetRect: CGRect; inView: UIView); cdecl;
+    procedure update; cdecl;
+  end;
+  TUIMenuController = class(TOCGenericImport<UIMenuControllerClass, UIMenuController>)  end;
+
+  UINibClass = interface(NSObjectClass)
+    ['{4073F6E2-6B97-4FE1-9573-89C8869CD29D}']
+    {class} function nibWithData(data: NSData; bundle: NSBundle): Pointer; cdecl;
+    {class} function nibWithNibName(name: NSString; bundle: NSBundle): Pointer; cdecl;
+  end;
+  UINib = interface(NSObject)
+    ['{985317B5-E3E7-4FCD-A93A-B30242802B57}']
+    function instantiateWithOwner(ownerOrNil: Pointer; options: NSDictionary): NSArray; cdecl;
+  end;
+  TUINib = class(TOCGenericImport<UINibClass, UINib>)  end;
+
+  UINavigationItemClass = interface(NSObjectClass)
+    ['{D15EAEB1-8D7B-42A0-94BF-CAC9B71B1D4F}']
+  end;
+  UINavigationItem = interface(NSObject)
+    ['{8F5F3832-12EC-4BD4-A271-E4CD6B2A8C7B}']
+    function backBarButtonItem: UIBarButtonItem; cdecl;
+    function hidesBackButton: Boolean; cdecl;
+    function initWithTitle(title: NSString): Pointer; cdecl;
+    function leftBarButtonItem: UIBarButtonItem; cdecl;
+    function leftBarButtonItems: NSArray; cdecl;
+    function leftItemsSupplementBackButton: Boolean; cdecl;
+    function prompt: NSString; cdecl;
+    function rightBarButtonItem: UIBarButtonItem; cdecl;
+    function rightBarButtonItems: NSArray; cdecl;
+    procedure setBackBarButtonItem(backBarButtonItem: UIBarButtonItem); cdecl;
+    procedure setHidesBackButton(hidesBackButton: Boolean); cdecl; overload;
+    procedure setHidesBackButton(hidesBackButton: Boolean; animated: Boolean); cdecl; overload;
+    procedure setLeftBarButtonItem(leftBarButtonItem: UIBarButtonItem); cdecl; overload;
+    procedure setLeftBarButtonItem(item: UIBarButtonItem; animated: Boolean); cdecl; overload;
+    procedure setLeftBarButtonItems(leftBarButtonItems: NSArray); cdecl; overload;
+    procedure setLeftBarButtonItems(items: NSArray; animated: Boolean); cdecl; overload;
+    procedure setLeftItemsSupplementBackButton(leftItemsSupplementBackButton: Boolean); cdecl;
+    procedure setPrompt(prompt: NSString); cdecl;
+    procedure setRightBarButtonItem(rightBarButtonItem: UIBarButtonItem); cdecl; overload;
+    procedure setRightBarButtonItem(item: UIBarButtonItem; animated: Boolean); cdecl; overload;
+    procedure setRightBarButtonItems(rightBarButtonItems: NSArray); cdecl; overload;
+    procedure setRightBarButtonItems(items: NSArray; animated: Boolean); cdecl; overload;
+    procedure setTitle(title: NSString); cdecl;
+    procedure setTitleView(titleView: UIView); cdecl;
+    function title: NSString; cdecl;
+    function titleView: UIView; cdecl;
+  end;
+  TUINavigationItem = class(TOCGenericImport<UINavigationItemClass, UINavigationItem>)  end;
+
+  UITextCheckerClass = interface(NSObjectClass)
+    ['{23C837B5-AFD9-4F1D-AD84-B5FA47F543D7}']
+    {class} function availableLanguages: NSArray; cdecl;
+    {class} function hasLearnedWord(word: NSString): Boolean; cdecl;
+    {class} procedure learnWord(word: NSString); cdecl;
+    {class} procedure unlearnWord(word: NSString); cdecl;
+  end;
+  UITextChecker = interface(NSObject)
+    ['{044966BA-33AD-48D8-BB77-6B1416C0F262}']
+    function completionsForPartialWordRange(range: NSRange; inString: NSString; language: NSString): NSArray; cdecl;
+    function guessesForWordRange(range: NSRange; inString: NSString; language: NSString): NSArray; cdecl;
+    procedure ignoreWord(wordToIgnore: NSString); cdecl;
+    function ignoredWords: NSArray; cdecl;
+    function rangeOfMisspelledWordInString(stringToCheck: NSString; range: NSRange; startingAt: NSInteger; wrap: Boolean; language: NSString): NSRange; cdecl;
+    procedure setIgnoredWords(words: NSArray); cdecl;
+  end;
+  TUITextChecker = class(TOCGenericImport<UITextCheckerClass, UITextChecker>)  end;
+
+  UILocalizedIndexedCollationClass = interface(NSObjectClass)
+    ['{CB8A0C1F-B8D9-4C16-A24C-6B12A2CA66C2}']
+    {class} function currentCollation: Pointer; cdecl;
+  end;
+  UILocalizedIndexedCollation = interface(NSObject)
+    ['{DAFD770B-86B8-4B35-8E08-C1BA4CB16584}']
+    function sectionForObject(object_: Pointer; collationStringSelector: SEL): NSInteger; cdecl;
+    function sectionForSectionIndexTitleAtIndex(indexTitleIndex: NSInteger): NSInteger; cdecl;
+    function sectionIndexTitles: NSArray; cdecl;
+    function sectionTitles: NSArray; cdecl;
+    function sortedArrayFromArray(array_: NSArray; collationStringSelector: SEL): NSArray; cdecl;
+  end;
+  TUILocalizedIndexedCollation = class(TOCGenericImport<UILocalizedIndexedCollationClass, UILocalizedIndexedCollation>)  end;
+
+  UIImageClass = interface(NSObjectClass)
+    ['{87E75615-9F27-4276-B747-7D5C8F3BAB5A}']
+    {class} function animatedImageNamed(name: NSString; duration: NSTimeInterval): Pointer; cdecl;
+    {class} function animatedImageWithImages(images: NSArray; duration: NSTimeInterval): Pointer; cdecl;
+    {class} function animatedResizableImageNamed(name: NSString; capInsets: UIEdgeInsets; duration: NSTimeInterval): Pointer; cdecl;
+    {class} function imageNamed(name: NSString): Pointer; cdecl;
+    {class} function imageWithCGImage(cgImage: CGImageRef): Pointer; cdecl; overload;
+    {class} function imageWithCGImage(cgImage: CGImageRef; scale: CGFloat; orientation: UIImageOrientation): Pointer; cdecl; overload;
+    {class} function imageWithCIImage(ciImage: CIImage): Pointer; cdecl;
+    {class} function imageWithContentsOfFile(path: NSString): Pointer; cdecl;
+    {class} function imageWithData(data: NSData): Pointer; cdecl;
+  end;
+  UIImage = interface(NSObject)
+    ['{65BCAAA8-4DB4-4884-B05E-B09DC6D271A9}']
+    function CGImage: CGImageRef; cdecl;
+    function CIImage: CIImage; cdecl;
+    function capInsets: UIEdgeInsets; cdecl;
+    procedure drawAsPatternInRect(rect: CGRect); cdecl;
+    procedure drawAtPoint(point: CGPoint); cdecl; overload;
+    procedure drawAtPoint(point: CGPoint; blendMode: CGBlendMode; alpha: CGFloat); cdecl; overload;
+    procedure drawInRect(rect: CGRect); cdecl; overload;
+    procedure drawInRect(rect: CGRect; blendMode: CGBlendMode; alpha: CGFloat); cdecl; overload;
+    function duration: NSTimeInterval; cdecl;
+    function imageOrientation: UIImageOrientation; cdecl;
+    function images: NSArray; cdecl;
+    function initWithCGImage(cgImage: CGImageRef): Pointer; cdecl; overload;
+    function initWithCGImage(cgImage: CGImageRef; scale: CGFloat; orientation: UIImageOrientation): Pointer; cdecl; overload;
+    function initWithCIImage(ciImage: CIImage): Pointer; cdecl;
+    function initWithContentsOfFile(path: NSString): Pointer; cdecl;
+    function initWithData(data: NSData): Pointer; cdecl;
+    function leftCapWidth: NSInteger; cdecl;
+    function resizableImageWithCapInsets(capInsets: UIEdgeInsets): UIImage; cdecl;
+    function scale: CGFloat; cdecl;
+    function size: CGSize; cdecl;
+    function stretchableImageWithLeftCapWidth(leftCapWidth: NSInteger; topCapHeight: NSInteger): UIImage; cdecl;
+    function topCapHeight: NSInteger; cdecl;
+  end;
+  TUIImage = class(TOCGenericImport<UIImageClass, UIImage>)  end;
+
+  UIGestureRecognizerClass = interface(NSObjectClass)
+    ['{EA6310B2-4446-44A2-9C1D-C37902A6FEC2}']
+  end;
+  UIGestureRecognizer = interface(NSObject)
+    ['{3384D59C-6A05-4AEC-AAE2-8B5CABBAD157}']
+    procedure addTarget(target: Pointer; action: SEL); cdecl;
+    function canBePreventedByGestureRecognizer(preventingGestureRecognizer: UIGestureRecognizer): Boolean; cdecl;
+    function canPreventGestureRecognizer(preventedGestureRecognizer: UIGestureRecognizer): Boolean; cdecl;
+    function cancelsTouchesInView: Boolean; cdecl;
+    function delaysTouchesBegan: Boolean; cdecl;
+    function delaysTouchesEnded: Boolean; cdecl;
+    function delegate: Pointer; cdecl;
+    procedure ignoreTouch(touch: UITouch; forEvent: UIEvent); cdecl;
+    function initWithTarget(target: Pointer; action: SEL): Pointer; cdecl;
+    function isEnabled: Boolean; cdecl;
+    function locationInView(view: UIView): CGPoint; cdecl;
+    function locationOfTouch(touchIndex: NSUInteger; inView: UIView): CGPoint; cdecl;
+    function numberOfTouches: NSUInteger; cdecl;
+    procedure removeTarget(target: Pointer; action: SEL); cdecl;
+    procedure requireGestureRecognizerToFail(otherGestureRecognizer: UIGestureRecognizer); cdecl;
+    procedure reset; cdecl;
+    procedure setCancelsTouchesInView(cancelsTouchesInView: Boolean); cdecl;
+    procedure setDelaysTouchesBegan(delaysTouchesBegan: Boolean); cdecl;
+    procedure setDelaysTouchesEnded(delaysTouchesEnded: Boolean); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setEnabled(enabled: Boolean); cdecl;
+    procedure setState(state: UIGestureRecognizerState); cdecl;
+    function state: UIGestureRecognizerState; cdecl;
+    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); cdecl;
+    function view: UIView; cdecl;
+  end;
+  TUIGestureRecognizer = class(TOCGenericImport<UIGestureRecognizerClass, UIGestureRecognizer>)  end;
+
+  UIFontClass = interface(NSObjectClass)
+    ['{EB22D6EF-BAAB-4448-8657-1FACB5BAD2B8}']
+    {class} function boldSystemFontOfSize(fontSize: CGFloat): Pointer; cdecl;
+    {class} function buttonFontSize: CGFloat; cdecl;
+    {class} function familyNames: NSArray; cdecl;
+    {class} function fontNamesForFamilyName(familyName: NSString): NSArray; cdecl;
+    {class} function fontWithName(fontName: NSString; size: CGFloat): Pointer; cdecl;
+    {class} function italicSystemFontOfSize(fontSize: CGFloat): Pointer; cdecl;
+    {class} function labelFontSize: CGFloat; cdecl;
+    {class} function smallSystemFontSize: CGFloat; cdecl;
+    {class} function systemFontOfSize(fontSize: CGFloat): Pointer; cdecl;
+    {class} function systemFontSize: CGFloat; cdecl;
+  end;
+  UIFont = interface(NSObject)
+    ['{B064BB36-A2A7-41B3-8BC8-A34E9401EDD6}']
+    function ascender: CGFloat; cdecl;
+    function capHeight: CGFloat; cdecl;
+    function descender: CGFloat; cdecl;
+    function familyName: NSString; cdecl;
+    function fontName: NSString; cdecl;
+    function fontWithSize(fontSize: CGFloat): UIFont; cdecl;
+    function leading: CGFloat; cdecl;
+    function lineHeight: CGFloat; cdecl;
+    function pointSize: CGFloat; cdecl;
+    function xHeight: CGFloat; cdecl;
+  end;
+  TUIFont = class(TOCGenericImport<UIFontClass, UIFont>)  end;
+
+  UILocalNotificationClass = interface(NSObjectClass)
+    ['{BD63AA5F-BF1C-442A-B72A-526358F5E448}']
+  end;
+  UILocalNotification = interface(NSObject)
+    ['{5289169B-7A4F-46BE-8716-C10A780CBD0E}']
+    function alertAction: NSString; cdecl;
+    function alertBody: NSString; cdecl;
+    function alertLaunchImage: NSString; cdecl;
+    function applicationIconBadgeNumber: NSInteger; cdecl;
+    function fireDate: NSDate; cdecl;
+    function hasAction: Boolean; cdecl;
+    function repeatCalendar: NSCalendar; cdecl;
+    function repeatInterval: NSCalendarUnit; cdecl;
+    procedure setAlertAction(alertAction: NSString); cdecl;
+    procedure setAlertBody(alertBody: NSString); cdecl;
+    procedure setAlertLaunchImage(alertLaunchImage: NSString); cdecl;
+    procedure setApplicationIconBadgeNumber(applicationIconBadgeNumber: NSInteger); cdecl;
+    procedure setFireDate(fireDate: NSDate); cdecl;
+    procedure setHasAction(hasAction: Boolean); cdecl;
+    procedure setRepeatCalendar(repeatCalendar: NSCalendar); cdecl;
+    procedure setRepeatInterval(repeatInterval: NSCalendarUnit); cdecl;
+    procedure setSoundName(soundName: NSString); cdecl;
+    procedure setTimeZone(timeZone: NSTimeZone); cdecl;
+    procedure setUserInfo(userInfo: NSDictionary); cdecl;
+    function soundName: NSString; cdecl;
+    function timeZone: NSTimeZone; cdecl;
+    function userInfo: NSDictionary; cdecl;
+  end;
+  TUILocalNotification = class(TOCGenericImport<UILocalNotificationClass, UILocalNotification>)  end;
+
+  UIUserNotificationSettingsClass = interface(NSObjectClass)
+    ['{B7142658-5285-4C9F-BC6C-74516DFEAD20}']
+    {class} function settingsForTypes(types: UIUserNotificationType; categories: NSSet): Pointer{instancetype}; cdecl;
+  end;
+  UIUserNotificationSettings = interface(NSObject)
+    ['{15F012FA-B58B-4A47-9E84-4D93D5BB6747}']
+    function types: UIUserNotificationType; cdecl;
+    function categories: NSSet; cdecl;
+  end;
+  TUIUserNotificationSettings = class(TOCGenericImport<UIUserNotificationSettingsClass, UIUserNotificationSettings>)
+  end;
+
+  UITextInputStringTokenizerClass = interface(NSObjectClass)
+    ['{8B90E087-EC9A-484C-9015-BE777FF3F861}']
+  end;
+  UITextInputStringTokenizer = interface(NSObject)
+    ['{A5A33069-7715-4E1B-AD69-F71C9294CDD3}']
+    function initWithTextInput(textInput: UIResponder): Pointer; cdecl;
+  end;
+  TUITextInputStringTokenizer = class(TOCGenericImport<UITextInputStringTokenizerClass, UITextInputStringTokenizer>)  end;
+
+  UITextRangeClass = interface(NSObjectClass)
+    ['{DABB3555-5B7F-4A3B-BF97-F43DAD3D5B42}']
+  end;
+  UITextRange = interface(NSObject)
+    ['{DD81F81D-99CB-4537-8245-13E633C1B8C0}']
+    function isEmpty: Boolean; cdecl;
+    function start: UITextPosition; cdecl;
+    function &end: UITextPosition; cdecl;
+  end;
+  TUITextRange = class(TOCGenericImport<UITextRangeClass, UITextRange>)  end;
+
+  UIScreenModeClass = interface(NSObjectClass)
+    ['{0CF607E1-7E08-4D61-AC23-656163E5D9B0}']
+  end;
+  UIScreenMode = interface(NSObject)
+    ['{C9AB92D8-C120-40CB-B3B4-F2FA1DC9C9B0}']
+    function pixelAspectRatio: CGFloat; cdecl;
+    function size: CGSize; cdecl;
+  end;
+  TUIScreenMode = class(TOCGenericImport<UIScreenModeClass, UIScreenMode>)  end;
+
+  UIScreenClass = interface(NSObjectClass)
+    ['{E3A65960-2A9F-4A4A-BACE-E00E491F6AB0}']
+    {class} function mainScreen: Pointer; cdecl;
+    {class} function screens: NSArray; cdecl;
+  end;
+  UIScreen = interface(NSObject)
+    ['{9D84B3DC-E2BC-49A3-B311-C0E55FD780B9}']
+    function applicationFrame: CGRect; cdecl;
+    function availableModes: NSArray; cdecl;
+    function bounds: CGRect; cdecl;
+    function brightness: CGFloat; cdecl;
+    function currentMode: UIScreenMode; cdecl;
+    function displayLinkWithTarget(target: Pointer; selector: SEL): CADisplayLink; cdecl;
+    function mirroredScreen: UIScreen; cdecl;
+    function overscanCompensation: UIScreenOverscanCompensation; cdecl;
+    function preferredMode: UIScreenMode; cdecl;
+    function scale: CGFloat; cdecl;
+    procedure setBrightness(brightness: CGFloat); cdecl;
+    procedure setCurrentMode(currentMode: UIScreenMode); cdecl;
+    procedure setOverscanCompensation(overscanCompensation: UIScreenOverscanCompensation); cdecl;
+    procedure setWantsSoftwareDimming(wantsSoftwareDimming: Boolean); cdecl;
+    function wantsSoftwareDimming: Boolean; cdecl;
+    function coordinateSpace: Pointer; cdecl;
+    function fixedCoordinateSpace: Pointer; cdecl;
+    function nativeBounds: CGRect; cdecl;
+    function nativeScale: CGFloat; cdecl;
+    function snapshotViewAfterScreenUpdates(afterUpdates: Boolean): UIView; cdecl;
+  end;
+  TUIScreen = class(TOCGenericImport<UIScreenClass, UIScreen>)  end;
+
+  UIResponderClass = interface(NSObjectClass)
+    ['{71125106-1FF5-44BD-BC31-72D31D04CF53}']
+  end;
+  UIResponder = interface(NSObject)
+    ['{3294BC42-563A-4D5A-BE0D-391D08B4346D}']
+    function becomeFirstResponder: Boolean; cdecl;
+    function canBecomeFirstResponder: Boolean; cdecl;
+    function canPerformAction(action: SEL; withSender: Pointer): Boolean; cdecl;
+    function canResignFirstResponder: Boolean; cdecl;
+    function inputAccessoryView: UIView; cdecl;
+    function inputView: UIView; cdecl;
+    function isFirstResponder: Boolean; cdecl;
+    procedure motionBegan(motion: UIEventSubtype; withEvent: UIEvent); cdecl;
+    procedure motionCancelled(motion: UIEventSubtype; withEvent: UIEvent); cdecl;
+    procedure motionEnded(motion: UIEventSubtype; withEvent: UIEvent); cdecl;
+    function nextResponder: UIResponder; cdecl;
+    procedure reloadInputViews; cdecl;
+    procedure remoteControlReceivedWithEvent(event: UIEvent); cdecl;
+    function resignFirstResponder: Boolean; cdecl;
+    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); cdecl;
+    function undoManager: NSUndoManager; cdecl;
+  end;
+  TUIResponder = class(TOCGenericImport<UIResponderClass, UIResponder>)  end;
+
+  UIStoryboardClass = interface(NSObjectClass)
+    ['{D99EC40A-1C3D-48E3-9C1E-5421C2AB4D2C}']
+    {class} function storyboardWithName(name: NSString; bundle: NSBundle): Pointer; cdecl;
+  end;
+  UIStoryboard = interface(NSObject)
+    ['{500AA1D9-5EDF-4AA4-90B8-66FB67F49B9D}']
+    function instantiateInitialViewController: Pointer; cdecl;
+    function instantiateViewControllerWithIdentifier(identifier: NSString): Pointer; cdecl;
+  end;
+  TUIStoryboard = class(TOCGenericImport<UIStoryboardClass, UIStoryboard>)  end;
+
+  UISearchDisplayControllerClass = interface(NSObjectClass)
+    ['{E80D1477-C651-41AD-B825-97125D6D3D43}']
+  end;
+  UISearchDisplayController = interface(NSObject)
+    ['{C2D8D1A0-0EF0-4417-A5FC-1962B858410F}']
+    function delegate: Pointer; cdecl;
+    function initWithSearchBar(searchBar: UISearchBar; contentsController: UIViewController): Pointer; cdecl;
+    function isActive: Boolean; cdecl;
+    function searchBar: UISearchBar; cdecl;
+    function searchContentsController: UIViewController; cdecl;
+    function searchResultsDataSource: Pointer; cdecl;
+    function searchResultsDelegate: Pointer; cdecl;
+    function searchResultsTableView: UITableView; cdecl;
+    function searchResultsTitle: NSString; cdecl;
+    procedure setActive(active: Boolean); cdecl; overload;
+    procedure setActive(visible: Boolean; animated: Boolean); cdecl; overload;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setSearchResultsDataSource(searchResultsDataSource: Pointer); cdecl;
+    procedure setSearchResultsDelegate(searchResultsDelegate: Pointer); cdecl;
+    procedure setSearchResultsTitle(searchResultsTitle: NSString); cdecl;
+  end;
+  TUISearchDisplayController = class(TOCGenericImport<UISearchDisplayControllerClass, UISearchDisplayController>)  end;
+
+  UIStoryboardSegueClass = interface(NSObjectClass)
+    ['{E0D7DDAF-F418-4884-8A9E-09A43DE685CD}']
+  end;
+  UIStoryboardSegue = interface(NSObject)
+    ['{38CD90EC-09B6-4A61-8FD5-59B08A111320}']
+    function destinationViewController: Pointer; cdecl;
+    function identifier: NSString; cdecl;
+    function initWithIdentifier(identifier: NSString; source: UIViewController; destination: UIViewController): Pointer; cdecl;
+    procedure perform; cdecl;
+    function sourceViewController: Pointer; cdecl;
+  end;
+  TUIStoryboardSegue = class(TOCGenericImport<UIStoryboardSegueClass, UIStoryboardSegue>)  end;
+
+  UIPresentationControllerClass = interface(NSObjectClass)
+    ['{2F65B178-F9A0-46E6-BCF3-07C925F709E2}']
+  end;
+  UIPresentationController = interface(NSObject)
+    ['{06A466C5-BCC7-4EBE-B82C-B3A1FA7F0D22}']
+    function presentingViewController: UIViewController; cdecl;
+    function presentedViewController: UIViewController; cdecl;
+    function presentationStyle: UIModalPresentationStyle; cdecl;
+    function containerView: UIView; cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    function delegate: Pointer; cdecl;
+    function initWithPresentedViewController(presentedViewController: UIViewController;
+      presentingViewController: UIViewController): Pointer{instancetype}; cdecl;
+    function adaptivePresentationStyle: UIModalPresentationStyle; cdecl;
+    procedure containerViewWillLayoutSubviews; cdecl;
+    procedure containerViewDidLayoutSubviews; cdecl;
+    function presentedView: UIView; cdecl;
+    function frameOfPresentedViewInContainerView: CGRect; cdecl;
+    function shouldPresentInFullscreen: Boolean; cdecl;
+    function shouldRemovePresentersView: Boolean; cdecl;
+    procedure presentationTransitionWillBegin; cdecl;
+    procedure presentationTransitionDidEnd(completed: Boolean); cdecl;
+    procedure dismissalTransitionWillBegin; cdecl;
+    procedure dismissalTransitionDidEnd(completed: Boolean); cdecl;
+    procedure setOverrideTraitCollection(overrideTraitCollection: UITraitCollection); cdecl;
+    function overrideTraitCollection: UITraitCollection; cdecl;
+  end;
+  TUIPresentationController = class(TOCGenericImport<UIPresentationControllerClass, UIPresentationController>)
+  end;
+  PUIPresentationController = Pointer;
+
+  UIPopoverPresentationControllerClass = interface(UIPresentationControllerClass)
+    ['{37EEE7ED-E821-4A9E-95BD-BE37F187AC4F}']
+  end;
+  UIPopoverPresentationController = interface(UIPresentationController)
+    ['{DEFE6AF8-800B-47BD-A89A-03435C76B965}']
+    procedure setDelegate(delegate: Pointer); cdecl;
+    function delegate: Pointer; cdecl;
+    procedure setPermittedArrowDirections(permittedArrowDirections: UIPopoverArrowDirection); cdecl;
+    function permittedArrowDirections: UIPopoverArrowDirection; cdecl;
+    procedure setSourceView(sourceView: UIView); cdecl;
+    function sourceView: UIView; cdecl;
+    procedure setSourceRect(sourceRect: CGRect); cdecl;
+    function sourceRect: CGRect; cdecl;
+    procedure setBarButtonItem(barButtonItem: UIBarButtonItem); cdecl;
+    function barButtonItem: UIBarButtonItem; cdecl;
+    function arrowDirection: UIPopoverArrowDirection; cdecl;
+    procedure setPassthroughViews(passthroughViews: NSArray); cdecl;
+    function passthroughViews: NSArray; cdecl;
+    procedure setBackgroundColor(backgroundColor: UIColor); cdecl;
+    function backgroundColor: UIColor; cdecl;
+    procedure setPopoverLayoutMargins(popoverLayoutMargins: UIEdgeInsets); cdecl;
+    function popoverLayoutMargins: UIEdgeInsets; cdecl;
+    procedure setPopoverBackgroundViewClass(popoverBackgroundViewClass: Pointer); cdecl;
+    function popoverBackgroundViewClass: Pointer; cdecl;
+  end;
+  TUIPopoverPresentationController = class(TOCGenericImport<UIPopoverPresentationControllerClass,
+    UIPopoverPresentationController>)
+  end;
+  PUIPopoverPresentationController = Pointer;
+
+  UIPrintPaperClass = interface(NSObjectClass)
+    ['{957ECB39-51E4-4BD4-9BC1-79312E8D168A}']
+    {class} function bestPaperForPageSize(contentSize: CGSize; withPapersFromArray: NSArray): Pointer; cdecl;
+  end;
+  UIPrintPaper = interface(NSObject)
+    ['{9B023BF3-6850-4469-A902-CFDEAEA60EAB}']
+    function paperSize: CGSize; cdecl;
+    function printRect: CGRect; cdecl;
+    function printableRect: CGRect; cdecl;
+  end;
+  TUIPrintPaper = class(TOCGenericImport<UIPrintPaperClass, UIPrintPaper>)  end;
+
+  UIPrintFormatterClass = interface(NSObjectClass)
+    ['{6D99085E-03D8-44DC-BDDD-2678A709CFD5}']
+  end;
+  UIPrintFormatter = interface(NSObject)
+    ['{6F423EB0-4080-4B9F-AEFE-47E3CD5C6037}']
+    function contentInsets: UIEdgeInsets; cdecl;
+    procedure drawInRect(rect: CGRect; forPageAtIndex: NSInteger); cdecl;
+    function maximumContentHeight: CGFloat; cdecl;
+    function maximumContentWidth: CGFloat; cdecl;
+    function pageCount: NSInteger; cdecl;
+    function printPageRenderer: UIPrintPageRenderer; cdecl;
+    function rectForPageAtIndex(pageIndex: NSInteger): CGRect; cdecl;
+    procedure removeFromPrintPageRenderer; cdecl;
+    procedure setContentInsets(contentInsets: UIEdgeInsets); cdecl;
+    procedure setMaximumContentHeight(maximumContentHeight: CGFloat); cdecl;
+    procedure setMaximumContentWidth(maximumContentWidth: CGFloat); cdecl;
+    procedure setStartPage(startPage: NSInteger); cdecl;
+    function startPage: NSInteger; cdecl;
+  end;
+  TUIPrintFormatter = class(TOCGenericImport<UIPrintFormatterClass, UIPrintFormatter>)  end;
+
+  UIPopoverControllerClass = interface(NSObjectClass)
+    ['{3ACDC1A9-123A-4BD7-A9D1-16E559B0F0AF}']
+  end;
+  UIPopoverController = interface(NSObject)
+    ['{576C3F52-A469-434C-9BB0-01429C74E258}']
+    function contentViewController: UIViewController; cdecl;
+    function delegate: Pointer; cdecl;
+    procedure dismissPopoverAnimated(animated: Boolean); cdecl;
+    function initWithContentViewController(viewController: UIViewController): Pointer; cdecl;
+    function isPopoverVisible: Boolean; cdecl;
+    function passthroughViews: NSArray; cdecl;
+    function popoverArrowDirection: UIPopoverArrowDirection; cdecl;
+    function popoverContentSize: CGSize; cdecl;
+    function popoverLayoutMargins: UIEdgeInsets; cdecl;
+    procedure presentPopoverFromBarButtonItem(item: UIBarButtonItem; permittedArrowDirections: UIPopoverArrowDirection; animated: Boolean); cdecl;
+    procedure presentPopoverFromRect(rect: CGRect; inView: UIView; permittedArrowDirections: UIPopoverArrowDirection; animated: Boolean); cdecl;
+    procedure setContentViewController(contentViewController: UIViewController); cdecl; overload;
+    procedure setContentViewController(viewController: UIViewController; animated: Boolean); cdecl; overload;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setPassthroughViews(passthroughViews: NSArray); cdecl;
+    procedure setPopoverBackgroundViewClass(popoverBackgroundViewClass: Pointer); cdecl;
+    procedure setPopoverContentSize(popoverContentSize: CGSize); cdecl; overload;
+    procedure setPopoverContentSize(size: CGSize; animated: Boolean); cdecl; overload;
+    procedure setPopoverLayoutMargins(popoverLayoutMargins: UIEdgeInsets); cdecl;
+  end;
+  TUIPopoverController = class(TOCGenericImport<UIPopoverControllerClass, UIPopoverController>)  end;
+
+  UIPasteboardClass = interface(NSObjectClass)
+    ['{C8C6F374-BE00-4141-9E05-5E9ABA81D828}']
+    {class} function generalPasteboard: Pointer; cdecl;
+    {class} function pasteboardWithName(pasteboardName: NSString; create: Boolean): Pointer; cdecl;
+    {class} function pasteboardWithUniqueName: Pointer; cdecl;
+    {class} procedure removePasteboardWithName(pasteboardName: NSString); cdecl;
+  end;
+  UIPasteboard = interface(NSObject)
+    ['{9B817EE3-BC7F-48BA-92E2-DA35D69F09CD}']
+    function URL: NSURL; cdecl;
+    function URLs: NSArray; cdecl;
+    procedure addItems(items: NSArray); cdecl;
+    function changeCount: NSInteger; cdecl;
+    function color: UIColor; cdecl;
+    function colors: NSArray; cdecl;
+    function containsPasteboardTypes(pasteboardTypes: NSArray): Boolean; cdecl; overload;
+    function containsPasteboardTypes(pasteboardTypes: NSArray; inItemSet: NSIndexSet): Boolean; cdecl; overload;
+    function dataForPasteboardType(pasteboardType: NSString): NSData; cdecl; overload;
+    function dataForPasteboardType(pasteboardType: NSString; inItemSet: NSIndexSet): NSArray; cdecl; overload;
+    function image: Pointer; cdecl;
+    function images: NSArray; cdecl;
+    function isPersistent: Boolean; cdecl;
+    function itemSetWithPasteboardTypes(pasteboardTypes: NSArray): NSIndexSet; cdecl;
+    function items: NSArray; cdecl;
+    function name: NSString; cdecl;
+    function numberOfItems: NSInteger; cdecl;
+    function pasteboardTypes: NSArray; cdecl;
+    function pasteboardTypesForItemSet(itemSet: NSIndexSet): NSArray; cdecl;
+    procedure setColor(color: UIColor); cdecl;
+    procedure setColors(colors: NSArray); cdecl;
+    procedure setData(data: NSData; forPasteboardType: NSString); cdecl;
+    procedure setImage(image: UIImage); cdecl;
+    procedure setImages(images: NSArray); cdecl;
+    procedure setItems(items: NSArray); cdecl;
+    procedure setPersistent(persistent: Boolean); cdecl;
+    procedure setString(string_: NSString); cdecl;
+    procedure setStrings(strings: NSArray); cdecl;
+    procedure setURL(URL: NSURL); cdecl;
+    procedure setURLs(URLs: NSArray); cdecl;
+    procedure setValue(value: Pointer; forPasteboardType: NSString); cdecl;
+    function &string: Pointer; cdecl;
+    function strings: Pointer; cdecl;
+    function valueForPasteboardType(pasteboardType: NSString): Pointer; cdecl;
+    function valuesForPasteboardType(pasteboardType: NSString; inItemSet: NSIndexSet): NSArray; cdecl;
+  end;
+  TUIPasteboard = class(TOCGenericImport<UIPasteboardClass, UIPasteboard>)  end;
+
+  UIViewClass = interface(UIResponderClass)
+    ['{BC6ED940-E934-477F-AF6A-0249A5095935}']
+    {class} function areAnimationsEnabled: Boolean; cdecl;
+    {class} procedure beginAnimations(animationID: Pointer; context: Pointer); cdecl;
+    {class} procedure commitAnimations; cdecl;
+    {class} procedure setAnimationBeginsFromCurrentState(fromCurrentState: Boolean); cdecl;
+    {class} procedure setAnimationCurve(curve: UIViewAnimationCurve); cdecl;
+    {class} procedure setAnimationDelay(delay: NSTimeInterval); cdecl;
+    {class} procedure setAnimationDelegate(delegate: Pointer); cdecl;
+    {class} procedure setAnimationDidStopSelector(selector: SEL); cdecl;
+    {class} procedure setAnimationDuration(duration: NSTimeInterval); cdecl;
+    {class} procedure setAnimationRepeatAutoreverses(repeatAutoreverses: Boolean); cdecl;
+    {class} procedure setAnimationRepeatCount(repeatCount: Single); cdecl;
+    {class} procedure setAnimationStartDate(startDate: NSDate); cdecl;
+    {class} procedure setAnimationTransition(transition: UIViewAnimationTransition; forView: UIView; cache: Boolean); cdecl;
+    {class} procedure setAnimationWillStartSelector(selector: SEL); cdecl;
+    {class} procedure setAnimationsEnabled(enabled: Boolean); cdecl;
+    {class} procedure performWithoutAnimation(actionsWithoutAnimation: TUIKitAction); cdecl;
+    [MethodName('animateWithDuration:delay:options:animations:completion:')]
+    {class} procedure animateWithDurationDelayOptionsAnimationsCompletion(duration: NSTimeInterval;
+      delay: NSTimeInterval; options: UIViewAnimationOptions; animations: TUIKitAction;
+      completion: TUIKitCompletion); cdecl;
+    [MethodName('animateWithDuration:animations:completion:')]
+    {class} procedure animateWithDurationAnimationsCompletion(duration: NSTimeInterval; animations: TUIKitAction;
+      completion: TUIKitCompletion); cdecl;
+    [MethodName('animateWithDuration:animations:')]
+    {class} procedure animateWithDurationAnimations(duration: NSTimeInterval; animations: TUIKitAction); cdecl;
+    [MethodName('animateWithDuration:delay:usingSpringWithDamping:initialSpringVelocity:options:animations:completion:')]
+    {class} procedure animateWithDurationDelayUsingSpringWithDampingInitialSpringVelocityOptionsAnimationsCompletion
+      (duration: NSTimeInterval; delay: NSTimeInterval; usingSpringWithDamping: CGFloat; initialSpringVelocity: CGFloat;
+      options: UIViewAnimationOptions; animations: TUIKitAction; completion: TUIKitCompletion); cdecl;
+    {class} procedure transitionWithView(view: UIView; duration: NSTimeInterval; options: UIViewAnimationOptions;
+      animations: TUIKitAction; completion: TUIKitCompletion); cdecl;
+    {class} procedure transitionFromView(fromView: UIView; toView: UIView; duration: NSTimeInterval;
+      options: UIViewAnimationOptions; completion: TUIKitCompletion); cdecl;
+    {class} procedure performSystemAnimation(animation: UISystemAnimation; onViews: NSArray;
+      options: UIViewAnimationOptions; animations: TUIKitAction; completion: TUIKitCompletion); cdecl;
+    {class} procedure animateKeyframesWithDuration(duration: NSTimeInterval; delay: NSTimeInterval;
+      options: UIViewKeyframeAnimationOptions; animations: TUIKitAction; completion: TUIKitCompletion); cdecl;
+    {class} procedure addKeyframeWithRelativeStartTime(frameStartTime: Double; relativeDuration: Double;
+      animations: TUIKitAction); cdecl;
+    {class} function requiresConstraintBasedLayout: Boolean; cdecl;
+  end;
+  UIView = interface(UIResponder)
+    ['{2DD827CB-85D2-4EE5-AA42-87941019F4B3}']
+    procedure addGestureRecognizer(gestureRecognizer: UIGestureRecognizer); cdecl;
+    procedure addSubview(view: UIView); cdecl;
+    procedure addConstraint(constraint: NSLayoutConstraint); cdecl;
+    procedure addConstraints(constraints: NSArray); cdecl;
+    procedure removeConstraint(constraint: NSLayoutConstraint); cdecl;
+    procedure removeConstraints(constraints: NSArray); cdecl;
+    procedure updateConstraintsIfNeeded; cdecl;
+    procedure updateConstraints; cdecl;
+    function needsUpdateConstraints: Boolean; cdecl;
+    procedure setNeedsUpdateConstraints; cdecl;
+    function translatesAutoresizingMaskIntoConstraints: Boolean; cdecl;
+    procedure setTranslatesAutoresizingMaskIntoConstraints(flag: Boolean); cdecl;
+    function alpha: CGFloat; cdecl;
+    function autoresizesSubviews: Boolean; cdecl;
+    function autoresizingMask: UIViewAutoresizing; cdecl;
+    function backgroundColor: UIColor; cdecl;
+    function bounds: CGRect; cdecl;
+    procedure bringSubviewToFront(view: UIView); cdecl;
+    function center: CGPoint; cdecl;
+    function clearsContextBeforeDrawing: Boolean; cdecl;
+    function clipsToBounds: Boolean; cdecl;
+    function contentMode: UIViewContentMode; cdecl;
+    function contentScaleFactor: CGFloat; cdecl;
+    function contentStretch: CGRect; cdecl;
+    function convertPoint(point: CGPoint; fromView: UIView): CGPoint; cdecl; overload;
+    [MethodName('convertPoint:toView:')]
+    function convertPointToView(point: CGPoint; toView: UIView): CGPoint; cdecl; overload;
+    function convertRect(rect: CGRect; fromView: UIView): CGRect; cdecl; overload;
+//    function convertRect(rect: CGRect; toView: UIView): CGRect; cdecl; overload;
+    function constraints: NSArray; cdecl;
+    procedure didAddSubview(subview: UIView); cdecl;
+    procedure didMoveToSuperview; cdecl;
+    procedure didMoveToWindow; cdecl;
+    procedure drawRect(rect: CGRect); cdecl; overload;
+    procedure drawRect(rect: CGRect; forViewPrintFormatter: UIViewPrintFormatter); cdecl; overload;
+    [MethodName('drawViewHierarchyInRect:afterScreenUpdates:')]
+    procedure drawViewHierarchyInRectAfterScreenUpdates(rect: CGRect; afterUpdates: Boolean); cdecl;
+    function endEditing(force: Boolean): Boolean; cdecl;
+    procedure exchangeSubviewAtIndex(index1: NSInteger; withSubviewAtIndex: NSInteger); cdecl;
+    function frame: CGRect; cdecl;
+    function gestureRecognizers: NSArray; cdecl;
+    function gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer): Boolean; cdecl;
+    function hitTest(point: CGPoint; withEvent: UIEvent): UIView; cdecl;
+    function initWithFrame(frame: CGRect): Pointer; cdecl;
+    procedure insertSubview(view: UIView; aboveSubview: UIView); cdecl; overload;
+    procedure insertSubview(view: UIView; atIndex: NSInteger); cdecl; overload;
+//    procedure insertSubview(view: UIView; belowSubview: UIView); cdecl; overload;
+    function isDescendantOfView(view: UIView): Boolean; cdecl;
+    function isExclusiveTouch: Boolean; cdecl;
+    function isHidden: Boolean; cdecl;
+    function isMultipleTouchEnabled: Boolean; cdecl;
+    function isOpaque: Boolean; cdecl;
+    function isUserInteractionEnabled: Boolean; cdecl;
+    function layer: CALayer; cdecl;
+    procedure layoutIfNeeded; cdecl;
+    procedure layoutSubviews; cdecl;
+    function pointInside(point: CGPoint; withEvent: UIEvent): Boolean; cdecl;
+    procedure removeFromSuperview; cdecl;
+    procedure removeGestureRecognizer(gestureRecognizer: UIGestureRecognizer); cdecl;
+    procedure sendSubviewToBack(view: UIView); cdecl;
+    procedure setAlpha(alpha: CGFloat); cdecl;
+    procedure setAutoresizesSubviews(autoresizesSubviews: Boolean); cdecl;
+    procedure setAutoresizingMask(autoresizingMask: UIViewAutoresizing); cdecl;
+    procedure setBackgroundColor(backgroundColor: UIColor); cdecl;
+    procedure setBounds(bounds: CGRect); cdecl;
+    procedure setCenter(center: CGPoint); cdecl;
+    procedure setClearsContextBeforeDrawing(clearsContextBeforeDrawing: Boolean); cdecl;
+    procedure setClipsToBounds(clipsToBounds: Boolean); cdecl;
+    procedure setContentMode(contentMode: UIViewContentMode); cdecl;
+    procedure setContentScaleFactor(contentScaleFactor: CGFloat); cdecl;
+    procedure setContentStretch(contentStretch: CGRect); cdecl;
+    procedure setExclusiveTouch(exclusiveTouch: Boolean); cdecl;
+    procedure setFrame(frame: CGRect); cdecl;
+    procedure setGestureRecognizers(gestureRecognizers: NSArray); cdecl;
+    procedure setHidden(hidden: Boolean); cdecl;
+    procedure setMultipleTouchEnabled(multipleTouchEnabled: Boolean); cdecl;
+    procedure setNeedsDisplay; cdecl;
+    procedure setNeedsDisplayInRect(rect: CGRect); cdecl;
+    procedure setNeedsLayout; cdecl;
+    procedure setOpaque(opaque: Boolean); cdecl;
+    procedure setTag(tag: NSInteger); cdecl;
+    procedure setTransform(transform: CGAffineTransform); cdecl;
+    procedure setTintColor(color: UIColor); cdecl;
+    procedure setUserInteractionEnabled(userInteractionEnabled: Boolean); cdecl;
+    function sizeThatFits(size: CGSize): CGSize; cdecl;
+    procedure sizeToFit; cdecl;
+    function subviews: NSArray; cdecl;
+    function superview: Pointer; cdecl;
+    function tag: NSInteger; cdecl;
+    function transform: CGAffineTransform; cdecl;
+    function tintColor: UIColor; cdecl;
+    function viewPrintFormatter: UIViewPrintFormatter; cdecl;
+    function viewWithTag(tag: NSInteger): UIView; cdecl;
+    procedure willMoveToSuperview(newSuperview: UIView); cdecl;
+    procedure willMoveToWindow(newWindow: UIWindow); cdecl;
+    procedure willRemoveSubview(subview: UIView); cdecl;
+    function window: UIWindow; cdecl;
+  end;
+  TUIView = class(TOCGenericImport<UIViewClass, UIView>)  end;
+
+  UIPrinterClass = interface(NSObjectClass)
+    ['{9FEB4EF1-7FBA-4325-B771-330FEDA416C5}']
+    {class} function printerWithURL(url: NSURL): UIPrinter; cdecl;
+  end;
+  UIPrinter = interface(NSObject)
+    ['{FA556E28-1622-43AD-9B23-7133D5245612}']
+    function url: NSURL; cdecl;
+    function displayName: NSString; cdecl;
+    function displayLocation: NSString; cdecl;
+    function supportedJobTypes: UIPrinterJobTypes; cdecl;
+    function makeAndModel: NSString; cdecl;
+    function supportsColor: Boolean; cdecl;
+    function supportsDuplex: Boolean; cdecl;
+    procedure contactPrinter(completionHandler: TUIKitCompletion); cdecl;
+  end;
+
+  TUIPrinter = class(TOCGenericImport<UIPrinterClass, UIPrinter>)
+  end;
+  PUIPrinter = Pointer;
+
+  UIPrinterPickerControllerClass = interface(NSObjectClass)
+    ['{D1F8498A-BEEC-4DCF-909C-44E66A0BDDBC}']
+    {class} function printerPickerControllerWithInitiallySelectedPrinter(printer: UIPrinter)
+      : UIPrinterPickerController; cdecl;
+  end;
+  UIPrinterPickerController = interface(NSObject)
+    ['{65BFCAC6-5146-4FFD-9A95-6AE4CF2B8F8C}']
+    function selectedPrinter: UIPrinter; cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    function delegate: Pointer; cdecl;
+    function presentAnimated(animated: Boolean; completionHandler: UIPrinterPickerCompletionHandler): Boolean; cdecl;
+    function presentFromRect(rect: CGRect; inView: UIView; animated: Boolean;
+      completionHandler: UIPrinterPickerCompletionHandler): Boolean; cdecl;
+    function presentFromBarButtonItem(item: UIBarButtonItem; animated: Boolean;
+      completionHandler: UIPrinterPickerCompletionHandler): Boolean; cdecl;
+    procedure dismissAnimated(animated: Boolean); cdecl;
+  end;
+  TUIPrinterPickerController = class(TOCGenericImport<UIPrinterPickerControllerClass, UIPrinterPickerController>)
+  end;
+  PUIPrinterPickerController = Pointer;
+
+  UIPrintPageRendererClass = interface(NSObjectClass)
+    ['{96A50B8F-2F32-4D42-AAF1-29DE9C2F98CD}']
+  end;
+  UIPrintPageRenderer = interface(NSObject)
+    ['{4E75D23D-3D4E-44B3-BF58-CCB68F0AD584}']
+    procedure addPrintFormatter(formatter: UIPrintFormatter; startingAtPageAtIndex: NSInteger); cdecl;
+    procedure drawContentForPageAtIndex(pageIndex: NSInteger; inRect: CGRect); cdecl;
+    procedure drawFooterForPageAtIndex(pageIndex: NSInteger; inRect: CGRect); cdecl;
+    procedure drawHeaderForPageAtIndex(pageIndex: NSInteger; inRect: CGRect); cdecl;
+    procedure drawPageAtIndex(pageIndex: NSInteger; inRect: CGRect); cdecl;
+    procedure drawPrintFormatter(printFormatter: UIPrintFormatter; forPageAtIndex: NSInteger); cdecl;
+    function footerHeight: CGFloat; cdecl;
+    function headerHeight: CGFloat; cdecl;
+    function numberOfPages: NSInteger; cdecl;
+    function paperRect: CGRect; cdecl;
+    procedure prepareForDrawingPages(range: NSRange); cdecl;
+    function printFormatters: NSArray; cdecl;
+    function printFormattersForPageAtIndex(pageIndex: NSInteger): NSArray; cdecl;
+    function printableRect: CGRect; cdecl;
+    procedure setFooterHeight(footerHeight: CGFloat); cdecl;
+    procedure setHeaderHeight(headerHeight: CGFloat); cdecl;
+    procedure setPrintFormatters(printFormatters: NSArray); cdecl;
+  end;
+  TUIPrintPageRenderer = class(TOCGenericImport<UIPrintPageRendererClass, UIPrintPageRenderer>)  end;
+
+  UIPrintInteractionControllerClass = interface(NSObjectClass)
+    ['{D3566B82-3014-40C6-B7E3-DFC22AF39319}']
+    {class} function canPrintData(data: NSData): Boolean; cdecl;
+    {class} function canPrintURL(url: NSURL): Boolean; cdecl;
+    {class} function isPrintingAvailable: Boolean; cdecl;
+    {class} function printableUTIs: NSSet; cdecl;
+    {class} function sharedPrintController: Pointer; cdecl;
+  end;
+  UIPrintInteractionController = interface(NSObject)
+    ['{0FEF6AA7-132B-41C8-BB12-045C43027D4B}']
+    function delegate: Pointer; cdecl;
+    procedure dismissAnimated(animated: Boolean); cdecl;
+    function printFormatter: UIPrintFormatter; cdecl;
+    function printInfo: UIPrintInfo; cdecl;
+    function printPageRenderer: UIPrintPageRenderer; cdecl;
+    function printPaper: UIPrintPaper; cdecl;
+    function printingItem: Pointer; cdecl;
+    function printingItems: NSArray; cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setPrintFormatter(printFormatter: UIPrintFormatter); cdecl;
+    procedure setPrintInfo(printInfo: UIPrintInfo); cdecl;
+    procedure setPrintPageRenderer(printPageRenderer: UIPrintPageRenderer); cdecl;
+    procedure setPrintingItem(printingItem: Pointer); cdecl;
+    procedure setPrintingItems(printingItems: NSArray); cdecl;
+    procedure setShowsPageRange(showsPageRange: Boolean); cdecl;
+    function showsPageRange: Boolean; cdecl;
+  end;
+  TUIPrintInteractionController = class(TOCGenericImport<UIPrintInteractionControllerClass, UIPrintInteractionController>)  end;
+
+  UIPrintInfoClass = interface(NSObjectClass)
+    ['{876A42C5-4D35-4DB0-BAC8-588C41A607A2}']
+    {class} function printInfo: Pointer; cdecl;
+    {class} function printInfoWithDictionary(dictionary: NSDictionary): Pointer; cdecl;
+  end;
+  UIPrintInfo = interface(NSObject)
+    ['{8628D24C-6D8D-4AA1-AF59-EE0C648DC9EF}']
+    function dictionaryRepresentation: NSDictionary; cdecl;
+    function duplex: UIPrintInfoDuplex; cdecl;
+    function jobName: NSString; cdecl;
+    function orientation: UIPrintInfoOrientation; cdecl;
+    function outputType: UIPrintInfoOutputType; cdecl;
+    function printerID: NSString; cdecl;
+    procedure setDuplex(duplex: UIPrintInfoDuplex); cdecl;
+    procedure setJobName(jobName: NSString); cdecl;
+    procedure setOrientation(orientation: UIPrintInfoOrientation); cdecl;
+    procedure setOutputType(outputType: UIPrintInfoOutputType); cdecl;
+    procedure setPrinterID(printerID: NSString); cdecl;
+  end;
+  TUIPrintInfo = class(TOCGenericImport<UIPrintInfoClass, UIPrintInfo>)  end;
+
+  UIBarItemClass = interface(NSObjectClass)
+    ['{B56F6316-68B0-4B43-9A83-9D440AB07D83}']
+  end;
+  UIBarItem = interface(NSObject)
+    ['{D2F7FB4F-12F3-41E4-8051-4252C65443D7}']
+    function image: UIImage; cdecl;
+    function imageInsets: UIEdgeInsets; cdecl;
+    function isEnabled: Boolean; cdecl;
+    function landscapeImagePhone: UIImage; cdecl;
+    function landscapeImagePhoneInsets: UIEdgeInsets; cdecl;
+    procedure setEnabled(enabled: Boolean); cdecl;
+    procedure setImage(image: UIImage); cdecl;
+    procedure setImageInsets(imageInsets: UIEdgeInsets); cdecl;
+    procedure setLandscapeImagePhone(landscapeImagePhone: UIImage); cdecl;
+    procedure setLandscapeImagePhoneInsets(landscapeImagePhoneInsets: UIEdgeInsets); cdecl;
+    procedure setTag(tag: NSInteger); cdecl;
+    procedure setTitle(title: NSString); cdecl;
+    procedure setTitleTextAttributes(attributes: NSDictionary; forState: UIControlState); cdecl;
+    function tag: NSInteger; cdecl;
+    function title: NSString; cdecl;
+    function titleTextAttributesForState(state: UIControlState): NSDictionary; cdecl;
+  end;
+  TUIBarItem = class(TOCGenericImport<UIBarItemClass, UIBarItem>)  end;
+
+  UIBezierPathClass = interface(NSObjectClass)
+    ['{471808BD-D532-44FE-9FAE-2F271EDBF91C}']
+    {class} function bezierPath: Pointer; cdecl;
+    {class} function bezierPathWithArcCenter(center: CGPoint; radius: CGFloat; startAngle: CGFloat; endAngle: CGFloat; clockwise: Boolean): Pointer; cdecl;
+    {class} function bezierPathWithCGPath(CGPath: CGPathRef): Pointer; cdecl;
+    {class} function bezierPathWithOvalInRect(rect: CGRect): Pointer; cdecl;
+    {class} function bezierPathWithRect(rect: CGRect): Pointer; cdecl;
+    {class} function bezierPathWithRoundedRect(rect: CGRect; byRoundingCorners: UIRectCorner; cornerRadii: CGSize): Pointer; cdecl; overload;
+    {class} function bezierPathWithRoundedRect(rect: CGRect; cornerRadius: CGFloat): Pointer; cdecl; overload;
+  end;
+  UIBezierPath = interface(NSObject)
+    ['{1C09BF52-8B2B-4EAE-8F63-3C88754FB694}']
+    function CGPath: CGPathRef; cdecl;
+    procedure addArcWithCenter(center: CGPoint; radius: CGFloat; startAngle: CGFloat; endAngle: CGFloat; clockwise: Boolean); cdecl;
+    procedure addClip; cdecl;
+    procedure addCurveToPoint(endPoint: CGPoint; controlPoint1: CGPoint; controlPoint2: CGPoint); cdecl;
+    procedure addLineToPoint(point: CGPoint); cdecl;
+    procedure addQuadCurveToPoint(endPoint: CGPoint; controlPoint: CGPoint); cdecl;
+    procedure appendPath(bezierPath: UIBezierPath); cdecl;
+    procedure applyTransform(transform: CGAffineTransform); cdecl;
+    function bounds: CGRect; cdecl;
+    procedure closePath; cdecl;
+    function containsPoint(point: CGPoint): Boolean; cdecl;
+    function currentPoint: CGPoint; cdecl;
+    procedure fill; cdecl;
+    procedure fillWithBlendMode(blendMode: CGBlendMode; alpha: CGFloat); cdecl;
+    function flatness: CGFloat; cdecl;
+    procedure getLineDash(pattern: PCGFloat; count: NSInteger; phase: PCGFloat); cdecl;
+    function isEmpty: Boolean; cdecl;
+    function lineCapStyle: CGLineCap; cdecl;
+    function lineJoinStyle: CGLineJoin; cdecl;
+    function lineWidth: CGFloat; cdecl;
+    function miterLimit: CGFloat; cdecl;
+    procedure moveToPoint(point: CGPoint); cdecl;
+    procedure removeAllPoints; cdecl;
+    procedure setCGPath(CGPath: CGPathRef); cdecl;
+    procedure setFlatness(flatness: CGFloat); cdecl;
+    procedure setLineCapStyle(lineCapStyle: CGLineCap); cdecl;
+    procedure setLineDash(pattern: PCGFloat; count: NSInteger; phase: CGFloat); cdecl;
+    procedure setLineJoinStyle(lineJoinStyle: CGLineJoin); cdecl;
+    procedure setLineWidth(lineWidth: CGFloat); cdecl;
+    procedure setMiterLimit(miterLimit: CGFloat); cdecl;
+    procedure setUsesEvenOddFillRule(usesEvenOddFillRule: Boolean); cdecl;
+    procedure stroke; cdecl;
+    procedure strokeWithBlendMode(blendMode: CGBlendMode; alpha: CGFloat); cdecl;
+    function usesEvenOddFillRule: Boolean; cdecl;
+  end;
+  TUIBezierPath = class(TOCGenericImport<UIBezierPathClass, UIBezierPath>)  end;
+
+  UIAccessibilityElementClass = interface(NSObjectClass)
+    ['{AC93733E-E033-4450-BC5D-8FDF69EFECA8}']
+  end;
+  UIAccessibilityElement = interface(NSObject)
+    ['{EE478997-636B-41A8-85EB-C3076B37D01B}']
+    function accessibilityContainer: Pointer; cdecl;
+    function accessibilityFrame: CGRect; cdecl;
+    function accessibilityHint: NSString; cdecl;
+    function accessibilityLabel: NSString; cdecl;
+    function accessibilityTraits: UIAccessibilityTraits; cdecl;
+    function accessibilityValue: NSString; cdecl;
+    function initWithAccessibilityContainer(container: Pointer): Pointer; cdecl;
+    function isAccessibilityElement: Boolean; cdecl;
+    procedure setAccessibilityContainer(accessibilityContainer: Pointer); cdecl;
+    procedure setAccessibilityFrame(accessibilityFrame: CGRect); cdecl;
+    procedure setAccessibilityHint(accessibilityHint: NSString); cdecl;
+    procedure setAccessibilityLabel(accessibilityLabel: NSString); cdecl;
+    procedure setAccessibilityTraits(accessibilityTraits: UIAccessibilityTraits); cdecl;
+    procedure setAccessibilityValue(accessibilityValue: NSString); cdecl;
+    procedure setIsAccessibilityElement(isAccessibilityElement: Boolean); cdecl;
+  end;
+  TUIAccessibilityElement = class(TOCGenericImport<UIAccessibilityElementClass, UIAccessibilityElement>)  end;
+
+  UIAccelerationClass = interface(NSObjectClass)
+    ['{88FA2AAF-47F1-44E6-AE56-E2D172B76C7F}']
+  end;
+  UIAcceleration = interface(NSObject)
+    ['{707BFB31-03FF-4258-912B-D963C644225C}']
+    function timestamp: NSTimeInterval; cdecl;
+    function x: UIAccelerationValue; cdecl;
+    function y: UIAccelerationValue; cdecl;
+    function z: UIAccelerationValue; cdecl;
+  end;
+  TUIAcceleration = class(TOCGenericImport<UIAccelerationClass, UIAcceleration>)  end;
+
+  UIAccelerometerClass = interface(NSObjectClass)
+    ['{D63171CF-FA0D-452B-801B-90B217F442B2}']
+    {class} function sharedAccelerometer: Pointer; cdecl;
+  end;
+  UIAccelerometer = interface(NSObject)
+    ['{87EEFC83-5AE2-451E-AC08-3E2E675A8073}']
+    function delegate: Pointer; cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setUpdateInterval(updateInterval: NSTimeInterval); cdecl;
+    function updateInterval: NSTimeInterval; cdecl;
+  end;
+  TUIAccelerometer = class(TOCGenericImport<UIAccelerometerClass, UIAccelerometer>)  end;
+
+  UIDeviceClass = interface(NSObjectClass)
+    ['{874EBFF8-FF0E-4298-8E11-EAC567414FAB}']
+    {class} function currentDevice: Pointer; cdecl;
+  end;
+  UIDevice = interface(NSObject)
+    ['{94056B60-4607-4AB2-B515-545041F12526}']
+    function batteryLevel: Single; cdecl;
+    function batteryState: UIDeviceBatteryState; cdecl;
+    procedure beginGeneratingDeviceOrientationNotifications; cdecl;
+    procedure endGeneratingDeviceOrientationNotifications; cdecl;
+    function isBatteryMonitoringEnabled: Boolean; cdecl;
+    function isGeneratingDeviceOrientationNotifications: Boolean; cdecl;
+    function isMultitaskingSupported: Boolean; cdecl;
+    function isProximityMonitoringEnabled: Boolean; cdecl;
+    function localizedModel: NSString; cdecl;
+    function model: NSString; cdecl;
+    function name: NSString; cdecl;
+    function orientation: UIDeviceOrientation; cdecl;
+    procedure playInputClick; cdecl;
+    function proximityState: Boolean; cdecl;
+    procedure setBatteryMonitoringEnabled(batteryMonitoringEnabled: Boolean); cdecl;
+    procedure setProximityMonitoringEnabled(proximityMonitoringEnabled: Boolean); cdecl;
+    function systemName: NSString; cdecl;
+    function systemVersion: NSString; cdecl;
+    function uniqueIdentifier: NSString; cdecl;
+    function userInterfaceIdiom: UIUserInterfaceIdiom; cdecl;
+    function identifierForVendor: NSUUID; cdecl;
+  end;
+  TUIDevice = class(TOCGenericImport<UIDeviceClass, UIDevice>)  end;
+
+  UIDocumentClass = interface(NSObjectClass)
+    ['{59DB4449-CE47-4FBE-8DBC-D979ADEA4832}']
+  end;
+  UIDocument = interface(NSObject)
+    ['{FF4EE4EC-E153-426F-A000-30DD3297CC55}']
+    function changeCountTokenForSaveOperation(saveOperation: UIDocumentSaveOperation): Pointer; cdecl;
+    function contentsForType(typeName: NSString; error: NSError): Pointer; cdecl;
+    procedure disableEditing; cdecl;
+    function documentState: UIDocumentState; cdecl;
+    procedure enableEditing; cdecl;
+    function fileAttributesToWriteToURL(url: NSURL; forSaveOperation: UIDocumentSaveOperation; error: NSError): NSDictionary; cdecl;
+    function fileModificationDate: NSDate; cdecl;
+    function fileNameExtensionForType(typeName: NSString; saveOperation: UIDocumentSaveOperation): NSString; cdecl;
+    function fileType: NSString; cdecl;
+    function fileURL: NSURL; cdecl;
+    procedure finishedHandlingError(error: NSError; recovered: Boolean); cdecl;
+    procedure handleError(error: NSError; userInteractionPermitted: Boolean); cdecl;
+    function hasUnsavedChanges: Boolean; cdecl;
+    function initWithFileURL(url: NSURL): Pointer; cdecl;
+    function loadFromContents(contents: Pointer; ofType: NSString; error: NSError): Boolean; cdecl;
+    function localizedName: NSString; cdecl;
+    function readFromURL(url: NSURL; error: NSError): Boolean; cdecl;
+    function savingFileType: NSString; cdecl;
+    procedure setFileModificationDate(fileModificationDate: NSDate); cdecl;
+    procedure setUndoManager(undoManager: NSUndoManager); cdecl;
+    function undoManager: NSUndoManager; cdecl;
+    procedure updateChangeCount(change: UIDocumentChangeKind); cdecl;
+    procedure updateChangeCountWithToken(changeCountToken: Pointer; forSaveOperation: UIDocumentSaveOperation); cdecl;
+    procedure userInteractionNoLongerPermittedForError(error: NSError); cdecl;
+    function writeContents(contents: Pointer; andAttributes: NSDictionary; safelyToURL: NSURL; forSaveOperation: UIDocumentSaveOperation; error: NSError): Boolean; cdecl; overload;
+    function writeContents(contents: Pointer; toURL: NSURL; forSaveOperation: UIDocumentSaveOperation; originalContentsURL: NSURL; error: NSError): Boolean; cdecl; overload;
+  end;
+  TUIDocument = class(TOCGenericImport<UIDocumentClass, UIDocument>)  end;
+
+  UIEventClass = interface(NSObjectClass)
+    ['{880C5B3F-C073-42B1-8C9D-8A6B70945125}']
+  end;
+  UIEvent = interface(NSObject)
+    ['{EEA6BDEF-5C24-4E2A-A1C7-9206864D0B2F}']
+    function allTouches: NSSet; cdecl;
+    function subtype: UIEventSubtype; cdecl;
+    function timestamp: NSTimeInterval; cdecl;
+    function touchesForGestureRecognizer(gesture: UIGestureRecognizer): NSSet; cdecl;
+    function touchesForView(view: UIView): NSSet; cdecl;
+    function touchesForWindow(window: UIWindow): NSSet; cdecl;
+  end;
+  TUIEvent = class(TOCGenericImport<UIEventClass, UIEvent>)  end;
+
+  UIDocumentInteractionControllerClass = interface(NSObjectClass)
+    ['{1AEC1ED2-F0F1-4D18-8044-F7529842F28A}']
+    {class} function interactionControllerWithURL(url: NSURL): Pointer; cdecl;
+  end;
+  UIDocumentInteractionController = interface(NSObject)
+    ['{CCDBD0CE-D6B9-4D2B-A2F3-66F6F722B8D4}']
+    function URL: NSURL; cdecl;
+    function UTI: NSString; cdecl;
+    function annotation: Pointer; cdecl;
+    function delegate: Pointer; cdecl;
+    procedure dismissMenuAnimated(animated: Boolean); cdecl;
+    procedure dismissPreviewAnimated(animated: Boolean); cdecl;
+    function gestureRecognizers: NSArray; cdecl;
+    function icons: NSArray; cdecl;
+    function name: NSString; cdecl;
+    function presentOpenInMenuFromBarButtonItem(item: UIBarButtonItem; animated: Boolean): Boolean; cdecl;
+    function presentOpenInMenuFromRect(rect: CGRect; inView: UIView; animated: Boolean): Boolean; cdecl;
+    function presentOptionsMenuFromBarButtonItem(item: UIBarButtonItem; animated: Boolean): Boolean; cdecl;
+    function presentOptionsMenuFromRect(rect: CGRect; inView: UIView; animated: Boolean): Boolean; cdecl;
+    function presentPreviewAnimated(animated: Boolean): Boolean; cdecl;
+    procedure setAnnotation(annotation: Pointer); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setName(name: NSString); cdecl;
+    procedure setURL(URL: NSURL); cdecl;
+    procedure setUTI(UTI: NSString); cdecl;
+  end;
+  TUIDocumentInteractionController = class(TOCGenericImport<UIDocumentInteractionControllerClass, UIDocumentInteractionController>)  end;
+
+  UITouchClass = interface(NSObjectClass)
+    ['{E0AE4AE6-6490-450C-87AB-9F2BCE1A6F45}']
+  end;
+  UITouch = interface(NSObject)
+    ['{990DEAF7-4A0D-4AEE-9D91-BA9EAC3331AD}']
+    function gestureRecognizers: NSArray; cdecl;
+    function locationInView(view: UIView): CGPoint; cdecl;
+    function phase: UITouchPhase; cdecl;
+    function previousLocationInView(view: UIView): CGPoint; cdecl;
+    function tapCount: NSUInteger; cdecl;
+    function timestamp: NSTimeInterval; cdecl;
+    function view: UIView; cdecl;
+    function window: UIWindow; cdecl;
+  end;
+  TUITouch = class(TOCGenericImport<UITouchClass, UITouch>)  end;
+
+  UIColorClass = interface(NSObjectClass)
+    ['{B2BBD854-5CA8-47C3-8CB5-8A1E016E9914}']
+    {class} function blackColor: Pointer; cdecl;
+    {class} function blueColor: Pointer; cdecl;
+    {class} function brownColor: Pointer; cdecl;
+    {class} function clearColor: Pointer; cdecl;
+    {class} function colorWithCGColor(cgColor: CGColorRef): Pointer; cdecl;
+    {class} function colorWithCIColor(ciColor: CIColor): Pointer; cdecl;
+    {class} function colorWithHue(hue: CGFloat; saturation: CGFloat; brightness: CGFloat; alpha: CGFloat): Pointer; cdecl;
+    {class} function colorWithPatternImage(image: UIImage): Pointer; cdecl;
+    {class} function colorWithRed(red: CGFloat; green: CGFloat; blue: CGFloat; alpha: CGFloat): Pointer; cdecl;
+    {class} function colorWithWhite(white: CGFloat; alpha: CGFloat): Pointer; cdecl;
+    {class} function cyanColor: Pointer; cdecl;
+    {class} function darkGrayColor: Pointer; cdecl;
+    {class} function darkTextColor: Pointer; cdecl;
+    {class} function grayColor: Pointer; cdecl;
+    {class} function greenColor: Pointer; cdecl;
+    {class} function groupTableViewBackgroundColor: Pointer; cdecl;
+    {class} function lightGrayColor: Pointer; cdecl;
+    {class} function lightTextColor: Pointer; cdecl;
+    {class} function magentaColor: Pointer; cdecl;
+    {class} function orangeColor: Pointer; cdecl;
+    {class} function purpleColor: Pointer; cdecl;
+    {class} function redColor: Pointer; cdecl;
+    {class} function scrollViewTexturedBackgroundColor: Pointer; cdecl;
+    {class} function underPageBackgroundColor: Pointer; cdecl;
+    {class} function viewFlipsideBackgroundColor: Pointer; cdecl;
+    {class} function whiteColor: Pointer; cdecl;
+    {class} function yellowColor: Pointer; cdecl;
+  end;
+  UIColor = interface(NSObject)
+    ['{34723B19-45A7-43C6-9587-D091CF58F602}']
+    function CGColor: CGColorRef; cdecl;
+    function CIColor: CIColor; cdecl;
+    function colorWithAlphaComponent(alpha: CGFloat): UIColor; cdecl;
+    function getHue(hue: PCGFloat; saturation: PCGFloat; brightness: PCGFloat; alpha: PCGFloat): Boolean; cdecl;
+    function getRed(red: PCGFloat; green: PCGFloat; blue: PCGFloat; alpha: PCGFloat): Boolean; cdecl;
+    function getWhite(white: PCGFloat; alpha: PCGFloat): Boolean; cdecl;
+    function initWithCGColor(cgColor: CGColorRef): UIColor; cdecl;
+    function initWithCIColor(ciColor: CIColor): UIColor; cdecl;
+    function initWithHue(hue: CGFloat; saturation: CGFloat; brightness: CGFloat; alpha: CGFloat): UIColor; cdecl;
+    function initWithPatternImage(image: UIImage): UIColor; cdecl;
+    function initWithRed(red: CGFloat; green: CGFloat; blue: CGFloat; alpha: CGFloat): UIColor; cdecl;
+    function initWithWhite(white: CGFloat; alpha: CGFloat): UIColor; cdecl;
+    procedure setFill; cdecl;
+    procedure setStroke; cdecl;
+  end;
+  TUIColor = class(TOCGenericImport<UIColorClass, UIColor>)  end;
+
+  UITabBarItemClass = interface(UIBarItemClass)
+    ['{01229171-8B2E-4A8C-B3B3-BDF2B4F318A0}']
+  end;
+  UITabBarItem = interface(UIBarItem)
+    ['{3F568C31-B6AC-4A32-964A-45E1115CD86E}']
+    function badgeValue: NSString; cdecl;
+    function finishedSelectedImage: UIImage; cdecl;
+    function finishedUnselectedImage: UIImage; cdecl;
+    function initWithTabBarSystemItem(systemItem: UITabBarSystemItem; tag: NSInteger): Pointer; cdecl;
+    function initWithTitle(title: NSString; image: UIImage; tag: NSInteger): Pointer; cdecl;
+    procedure setBadgeValue(badgeValue: NSString); cdecl;
+    procedure setFinishedSelectedImage(selectedImage: UIImage; withFinishedUnselectedImage: UIImage); cdecl;
+    procedure setTitlePositionAdjustment(adjustment: UIOffset); cdecl;
+    function titlePositionAdjustment: UIOffset; cdecl;
+  end;
+  TUITabBarItem = class(TOCGenericImport<UITabBarItemClass, UITabBarItem>)  end;
+
+  UIRotationGestureRecognizerClass = interface(UIGestureRecognizerClass)
+    ['{7BA89951-9958-438A-96FD-31AE70FDDC69}']
+  end;
+  UIRotationGestureRecognizer = interface(UIGestureRecognizer)
+    ['{7F1A0138-65D3-4D00-BDD0-193A7F68123C}']
+    function rotation: CGFloat; cdecl;
+    procedure setRotation(rotation: CGFloat); cdecl;
+    function velocity: CGFloat; cdecl;
+  end;
+  TUIRotationGestureRecognizer = class(TOCGenericImport<UIRotationGestureRecognizerClass, UIRotationGestureRecognizer>)  end;
+
+  UISwipeGestureRecognizerClass = interface(UIGestureRecognizerClass)
+    ['{CB16C222-B625-48D9-8710-3EE9789C06E0}']
+  end;
+  UISwipeGestureRecognizer = interface(UIGestureRecognizer)
+    ['{6ABB9B3E-CEB2-40A0-BCDD-EBA3BDE457CB}']
+    function direction: UISwipeGestureRecognizerDirection; cdecl;
+    function numberOfTouchesRequired: NSUInteger; cdecl;
+    procedure setDirection(direction: UISwipeGestureRecognizerDirection); cdecl;
+    procedure setNumberOfTouchesRequired(numberOfTouchesRequired: NSUInteger); cdecl;
+  end;
+  TUISwipeGestureRecognizer = class(TOCGenericImport<UISwipeGestureRecognizerClass, UISwipeGestureRecognizer>)  end;
+
+  UIPinchGestureRecognizerClass = interface(UIGestureRecognizerClass)
+    ['{24405DD9-36FB-4E69-A18C-ED2C0BBBEBE9}']
+  end;
+  UIPinchGestureRecognizer = interface(UIGestureRecognizer)
+    ['{54C67364-172A-48EC-8BF4-976954CB7815}']
+    function scale: CGFloat; cdecl;
+    procedure setScale(scale: CGFloat); cdecl;
+    function velocity: CGFloat; cdecl;
+  end;
+  TUIPinchGestureRecognizer = class(TOCGenericImport<UIPinchGestureRecognizerClass, UIPinchGestureRecognizer>)  end;
+
+  UIMarkupTextPrintFormatterClass = interface(UIPrintFormatterClass)
+    ['{CC233A69-E4E8-4D9D-BA7E-70B778B9C0DE}']
+  end;
+  UIMarkupTextPrintFormatter = interface(UIPrintFormatter)
+    ['{DD819284-024F-4002-90CF-649F63E9A5D5}']
+    function initWithMarkupText(markupText: NSString): Pointer; cdecl;
+    function markupText: NSString; cdecl;
+    procedure setMarkupText(markupText: NSString); cdecl;
+  end;
+  TUIMarkupTextPrintFormatter = class(TOCGenericImport<UIMarkupTextPrintFormatterClass, UIMarkupTextPrintFormatter>)  end;
+
+  TOnUIViewControllerCompletion = procedure of object;
+  UIViewControllerClass = interface(UIResponderClass)
+    ['{87E0A407-94C1-4DC4-AA14-FB3C3BC619D1}']
+    {class} procedure attemptRotationToDeviceOrientation; cdecl;
+  end;
+  UIViewController = interface(UIResponder)
+    ['{F7A5E372-3F4A-4F25-A2F9-C91D7CB5FC09}']
+    procedure addChildViewController(childController: UIViewController); cdecl;
+    function automaticallyForwardAppearanceAndRotationMethodsToChildViewControllers: Boolean; cdecl;
+    function childViewControllers: NSArray; cdecl;
+    function contentSizeForViewInPopover: CGSize; cdecl;
+    function definesPresentationContext: Boolean; cdecl;
+    procedure didAnimateFirstHalfOfRotationToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation); cdecl;
+    procedure didMoveToParentViewController(parent: UIViewController); cdecl;
+    procedure didReceiveMemoryWarning; cdecl;
+    procedure didRotateFromInterfaceOrientation(fromInterfaceOrientation: UIInterfaceOrientation); cdecl;
+    function disablesAutomaticKeyboardDismissal: Boolean; cdecl;
+    procedure dismissModalViewControllerAnimated(animated: Boolean); cdecl;
+    function editButtonItem: UIBarButtonItem; cdecl;
+    function hidesBottomBarWhenPushed: Boolean; cdecl;
+    function initWithNibName(nibNameOrNil: NSString; bundle: NSBundle): Pointer; cdecl;
+    function interfaceOrientation: UIInterfaceOrientation; cdecl;
+    function isBeingDismissed: Boolean; cdecl;
+    function isBeingPresented: Boolean; cdecl;
+    function isEditing: Boolean; cdecl;
+    function isModalInPopover: Boolean; cdecl;
+    function isMovingFromParentViewController: Boolean; cdecl;
+    function isMovingToParentViewController: Boolean; cdecl;
+    function isViewLoaded: Boolean; cdecl;
+    procedure loadView; cdecl;
+    function modalPresentationStyle: UIModalPresentationStyle; cdecl;
+    function modalTransitionStyle: UIModalTransitionStyle; cdecl;
+    function modalViewController: UIViewController; cdecl;
+    function navigationController: UINavigationController; cdecl;
+    function navigationItem: UINavigationItem; cdecl;
+    function nibBundle: NSBundle; cdecl;
+    function nibName: NSString; cdecl;
+    function parentViewController: UIViewController; cdecl;
+    procedure performSegueWithIdentifier(identifier: NSString; sender: Pointer); cdecl;
+    procedure prepareForSegue(segue: UIStoryboardSegue; sender: Pointer); cdecl;
+    procedure presentModalViewController(modalViewController: UIViewController; animated: Boolean); cdecl;
+    procedure presentViewController(viewControllerToPresent: UIViewController; animated: Boolean; completion: TOnUIViewControllerCompletion); cdecl; // Version >= IOS 5.0
+    procedure dismissViewControllerAnimated(flag: Boolean; completion: TOnUIViewControllerCompletion); cdecl;
+    function presentedViewController: UIViewController; cdecl;
+    function presentingViewController: UIViewController; cdecl;
+    function providesPresentationContextTransitionStyle: Boolean; cdecl;
+    procedure removeFromParentViewController; cdecl;
+    function rotatingFooterView: UIView; cdecl;
+    function rotatingHeaderView: UIView; cdecl;
+    function searchDisplayController: UISearchDisplayController; cdecl;
+    procedure setContentSizeForViewInPopover(contentSizeForViewInPopover: CGSize); cdecl;
+    procedure setDefinesPresentationContext(definesPresentationContext: Boolean); cdecl;
+    procedure setEditing(editing: Boolean); cdecl; overload;
+    procedure setEditing(editing: Boolean; animated: Boolean); cdecl; overload;
+    procedure setHidesBottomBarWhenPushed(hidesBottomBarWhenPushed: Boolean); cdecl;
+    procedure setModalInPopover(modalInPopover: Boolean); cdecl;
+    procedure setModalPresentationStyle(modalPresentationStyle: UIModalPresentationStyle); cdecl;
+    procedure setModalTransitionStyle(modalTransitionStyle: UIModalTransitionStyle); cdecl;
+    procedure setProvidesPresentationContextTransitionStyle(providesPresentationContextTransitionStyle: Boolean); cdecl;
+    procedure setNeedsStatusBarAppearanceUpdate; cdecl;
+    procedure setTabBarItem(tabBarItem: UITabBarItem); cdecl;
+    procedure setTitle(title: NSString); cdecl;
+    procedure setToolbarItems(toolbarItems: NSArray); cdecl; overload;
+    procedure setToolbarItems(toolbarItems: NSArray; animated: Boolean); cdecl; overload;
+    procedure setView(view: UIView); cdecl;
+    procedure setWantsFullScreenLayout(wantsFullScreenLayout: Boolean); cdecl;
+    function shouldAutorotateToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation): Boolean; cdecl;
+    function splitViewController: UISplitViewController; cdecl;
+    function storyboard: UIStoryboard; cdecl;
+    function tabBarController: UITabBarController; cdecl;
+    function tabBarItem: UITabBarItem; cdecl;
+    function title: NSString; cdecl;
+    function toolbarItems: NSArray; cdecl;
+    function view: UIView; cdecl;
+    procedure viewDidAppear(animated: Boolean); cdecl;
+    procedure viewDidDisappear(animated: Boolean); cdecl;
+    procedure viewDidLayoutSubviews; cdecl;
+    procedure viewDidLoad; cdecl;
+    procedure viewDidUnload; cdecl;
+    procedure viewWillAppear(animated: Boolean); cdecl;
+    procedure viewWillDisappear(animated: Boolean); cdecl;
+    procedure viewWillLayoutSubviews; cdecl;
+    procedure viewWillUnload; cdecl;
+    function wantsFullScreenLayout: Boolean; cdecl;
+    procedure willAnimateFirstHalfOfRotationToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation; duration: NSTimeInterval); cdecl;
+    procedure willAnimateRotationToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation; duration: NSTimeInterval); cdecl;
+    procedure willAnimateSecondHalfOfRotationFromInterfaceOrientation(fromInterfaceOrientation: UIInterfaceOrientation; duration: NSTimeInterval); cdecl;
+    procedure willMoveToParentViewController(parent: UIViewController); cdecl;
+    procedure willRotateToInterfaceOrientation(toInterfaceOrientation: UIInterfaceOrientation; duration: NSTimeInterval); cdecl;
+
+    function shouldPerformSegueWithIdentifier(identifier: NSString; sender: Pointer): Boolean; cdecl;
+    function canPerformUnwindSegueAction(action: SEL; fromViewController: UIViewController; withSender: Pointer)
+      : Boolean; cdecl;
+    function viewControllerForUnwindSegueAction(action: SEL; fromViewController: UIViewController; withSender: Pointer)
+      : UIViewController; cdecl;
+    function segueForUnwindingToViewController(toViewController: UIViewController; fromViewController: UIViewController;
+      identifier: NSString): UIStoryboardSegue; cdecl;
+    procedure setModalPresentationCapturesStatusBarAppearance(modalPresentationCapturesStatusBarAppearance
+      : Boolean); cdecl;
+    function modalPresentationCapturesStatusBarAppearance: Boolean; cdecl;
+    procedure setEdgesForExtendedLayout(edgesForExtendedLayout: UIRectEdge); cdecl;
+    function edgesForExtendedLayout: UIRectEdge; cdecl;
+    procedure setExtendedLayoutIncludesOpaqueBars(extendedLayoutIncludesOpaqueBars: Boolean); cdecl;
+    function extendedLayoutIncludesOpaqueBars: Boolean; cdecl;
+    procedure setAutomaticallyAdjustsScrollViewInsets(automaticallyAdjustsScrollViewInsets: Boolean); cdecl;
+    function automaticallyAdjustsScrollViewInsets: Boolean; cdecl;
+    procedure setPreferredContentSize(preferredContentSize: CGSize); cdecl;
+    function preferredContentSize: CGSize; cdecl;
+    function preferredStatusBarStyle: UIStatusBarStyle; cdecl;
+    function prefersStatusBarHidden: Boolean; cdecl;
+    function preferredStatusBarUpdateAnimation: UIStatusBarAnimation; cdecl;
+    function targetViewControllerForAction(action: SEL; sender: Pointer): UIViewController; cdecl;
+    procedure showViewController(vc: UIViewController; sender: Pointer); cdecl;
+    procedure showDetailViewController(vc: UIViewController; sender: Pointer); cdecl;
+    function shouldAutorotate: Boolean; cdecl;
+    function supportedInterfaceOrientations: NSUInteger; cdecl;
+    function preferredInterfaceOrientationForPresentation: UIInterfaceOrientation; cdecl;
+    procedure transitionFromViewController(fromViewController: UIViewController; toViewController: UIViewController;
+      duration: NSTimeInterval; options: UIViewAnimationOptions; animations: TUIKitAction;
+      completion: TUIKitCompletion); cdecl;
+    procedure beginAppearanceTransition(isAppearing: Boolean; animated: Boolean); cdecl;
+    procedure endAppearanceTransition; cdecl;
+    function childViewControllerForStatusBarStyle: UIViewController; cdecl;
+    function childViewControllerForStatusBarHidden: UIViewController; cdecl;
+    procedure setOverrideTraitCollection(collection: UITraitCollection;
+      forChildViewController: UIViewController); cdecl;
+    function overrideTraitCollectionForChildViewController(childViewController: UIViewController)
+      : UITraitCollection; cdecl;
+    function shouldAutomaticallyForwardRotationMethods: Boolean; cdecl;
+    function shouldAutomaticallyForwardAppearanceMethods: Boolean; cdecl;
+    procedure setRestorationIdentifier(restorationIdentifier: NSString); cdecl;
+    function restorationIdentifier: NSString; cdecl;
+    procedure setRestorationClass(restorationClass: Pointer); cdecl;
+    function restorationClass: Pointer; cdecl;
+    procedure encodeRestorableStateWithCoder(coder: NSCoder); cdecl;
+    procedure decodeRestorableStateWithCoder(coder: NSCoder); cdecl;
+    procedure applicationFinishedRestoringState; cdecl;
+    procedure updateViewConstraints; cdecl;
+    procedure setTransitioningDelegate(transitioningDelegate: Pointer); cdecl;
+    function transitioningDelegate: Pointer; cdecl;
+    function topLayoutGuide: Pointer; cdecl;
+    function bottomLayoutGuide: Pointer; cdecl;
+    function extensionContext: NSExtensionContext; cdecl;
+    function presentationController: UIPresentationController; cdecl;
+    function popoverPresentationController: UIPopoverPresentationController; cdecl;
+    function transitionCoordinator: Pointer; cdecl;
+    procedure collapseSecondaryViewController(secondaryViewController: UIViewController;
+      forSplitViewController: UISplitViewController); cdecl;
+    function separateSecondaryViewControllerForSplitViewController(splitViewController: UISplitViewController)
+      : UIViewController; cdecl;
+    { UIContentContainer }
+    procedure preferredContentSizeDidChangeForChildContentContainer(container: Pointer); cdecl;
+    procedure systemLayoutFittingSizeDidChangeForChildContentContainer(container: Pointer); cdecl;
+    function sizeForChildContentContainer(container: Pointer; withParentContainerSize: CGSize): CGSize; cdecl;
+    procedure viewWillTransitionToSize(size: CGSize; withTransitionCoordinator: UIViewControllerTransitionCoordinator); cdecl;
+    procedure willTransitionToTraitCollection(newCollection: UITraitCollection;
+      withTransitionCoordinator: Pointer); cdecl;
+  end;
+  TUIViewController = class(TOCGenericImport<UIViewControllerClass, UIViewController>)  end;
+
+  UIBarButtonItemClass = interface(UIBarItemClass)
+    ['{287CC128-E9B5-4B76-A63F-9D6632EF6950}']
+  end;
+  UIBarButtonItem = interface(UIBarItem)
+    ['{3C056056-41D4-44E8-A3B1-D16DA7666333}']
+    function action: SEL; cdecl;
+    function backButtonBackgroundImageForState(state: UIControlState; barMetrics: UIBarMetrics): UIImage; cdecl;
+    function backButtonBackgroundVerticalPositionAdjustmentForBarMetrics(barMetrics: UIBarMetrics): CGFloat; cdecl;
+    function backButtonTitlePositionAdjustmentForBarMetrics(barMetrics: UIBarMetrics): UIOffset; cdecl;
+    function backgroundImageForState(state: UIControlState; barMetrics: UIBarMetrics): UIImage; cdecl;
+    function backgroundVerticalPositionAdjustmentForBarMetrics(barMetrics: UIBarMetrics): CGFloat; cdecl;
+    function customView: UIView; cdecl;
+    function initWithBarButtonSystemItem(systemItem: UIBarButtonSystemItem; target: Pointer; action: SEL): Pointer; cdecl;
+    function initWithCustomView(customView: UIView): Pointer; cdecl;
+    function initWithImage(image: UIImage; landscapeImagePhone: UIImage; style: UIBarButtonItemStyle; target: Pointer; action: SEL): Pointer; cdecl; overload;
+    function initWithImage(image: UIImage; style: UIBarButtonItemStyle; target: Pointer; action: SEL): Pointer; cdecl; overload;
+    function initWithTitle(title: NSString; style: UIBarButtonItemStyle; target: Pointer; action: SEL): Pointer; cdecl;
+    function possibleTitles: NSSet; cdecl;
+    procedure setAction(action: SEL); cdecl;
+    procedure setBackButtonBackgroundImage(backgroundImage: UIImage; forState: UIControlState; barMetrics: UIBarMetrics); cdecl;
+    procedure setBackButtonBackgroundVerticalPositionAdjustment(adjustment: CGFloat; forBarMetrics: UIBarMetrics); cdecl;
+    procedure setBackButtonTitlePositionAdjustment(adjustment: UIOffset; forBarMetrics: UIBarMetrics); cdecl;
+    procedure setBackgroundImage(backgroundImage: UIImage; forState: UIControlState; barMetrics: UIBarMetrics); cdecl;
+    procedure setBackgroundVerticalPositionAdjustment(adjustment: CGFloat; forBarMetrics: UIBarMetrics); cdecl;
+    procedure setCustomView(customView: UIView); cdecl;
+    procedure setPossibleTitles(possibleTitles: NSSet); cdecl;
+    procedure setStyle(style: UIBarButtonItemStyle); cdecl;
+    procedure setTarget(target: Pointer); cdecl;
+    procedure setTintColor(tintColor: UIColor); cdecl;
+    procedure setTitlePositionAdjustment(adjustment: UIOffset; forBarMetrics: UIBarMetrics); cdecl;
+    procedure setWidth(width: CGFloat); cdecl;
+    function style: UIBarButtonItemStyle; cdecl;
+    function target: Pointer; cdecl;
+    function tintColor: UIColor; cdecl;
+    function titlePositionAdjustmentForBarMetrics(barMetrics: UIBarMetrics): UIOffset; cdecl;
+    function width: CGFloat; cdecl;
+  end;
+  TUIBarButtonItem = class(TOCGenericImport<UIBarButtonItemClass, UIBarButtonItem>)  end;
+
+  UILongPressGestureRecognizerClass = interface(UIGestureRecognizerClass)
+    ['{30C71FB1-FDCB-4BA7-A838-84E65721AA6F}']
+  end;
+  UILongPressGestureRecognizer = interface(UIGestureRecognizer)
+    ['{9A7D268A-9CE3-4FB7-9593-A1A3E9D26C58}']
+    function allowableMovement: CGFloat; cdecl;
+    function minimumPressDuration: CFTimeInterval; cdecl;
+    function numberOfTapsRequired: NSInteger; cdecl;
+    function numberOfTouchesRequired: NSInteger; cdecl;
+    procedure setAllowableMovement(allowableMovement: CGFloat); cdecl;
+    procedure setMinimumPressDuration(minimumPressDuration: CFTimeInterval); cdecl;
+    procedure setNumberOfTapsRequired(numberOfTapsRequired: NSInteger); cdecl;
+    procedure setNumberOfTouchesRequired(numberOfTouchesRequired: NSInteger); cdecl;
+  end;
+  TUILongPressGestureRecognizer = class(TOCGenericImport<UILongPressGestureRecognizerClass, UILongPressGestureRecognizer>)  end;
+
+  UIManagedDocumentClass = interface(UIDocumentClass)
+    ['{1711C743-A68F-4EC3-B47C-6C92F317095F}']
+    {class} function persistentStoreName: NSString; cdecl;
+  end;
+  UIManagedDocument = interface(UIDocument)
+    ['{CB729C37-3C01-48CB-8CA8-50FFEB780ABB}']
+    function additionalContentForURL(absoluteURL: NSURL; error: NSError): Pointer; cdecl;
+    function configurePersistentStoreCoordinatorForURL(storeURL: NSURL; ofType: NSString; modelConfiguration: NSString; storeOptions: NSDictionary; error: NSError): Boolean; cdecl;
+    function managedObjectContext: NSManagedObjectContext; cdecl;
+    function managedObjectModel: NSManagedObjectModel; cdecl;
+    function modelConfiguration: NSString; cdecl;
+    function persistentStoreOptions: NSDictionary; cdecl;
+    function persistentStoreTypeForFileType(fileType: NSString): NSString; cdecl;
+    function readAdditionalContentFromURL(absoluteURL: NSURL; error: NSError): Boolean; cdecl;
+    procedure setModelConfiguration(modelConfiguration: NSString); cdecl;
+    procedure setPersistentStoreOptions(persistentStoreOptions: NSDictionary); cdecl;
+    function writeAdditionalContent(content: Pointer; toURL: NSURL; originalContentsURL: NSURL; error: NSError): Boolean; cdecl;
+  end;
+  TUIManagedDocument = class(TOCGenericImport<UIManagedDocumentClass, UIManagedDocument>)  end;
+
+  UISimpleTextPrintFormatterClass = interface(UIPrintFormatterClass)
+    ['{23C73E69-9AF1-4080-93DA-E405E08B6FDD}']
+  end;
+  UISimpleTextPrintFormatter = interface(UIPrintFormatter)
+    ['{C0D1AFC9-347B-400B-B1F2-8F2420C4B41C}']
+    function color: UIColor; cdecl;
+    function font: UIFont; cdecl;
+    function initWithText(text: NSString): Pointer; cdecl;
+    procedure setColor(color: UIColor); cdecl;
+    procedure setFont(font: UIFont); cdecl;
+    procedure setText(text: NSString); cdecl;
+    procedure setTextAlignment(textAlignment: UITextAlignment); cdecl;
+    function text: NSString; cdecl;
+    function textAlignment: UITextAlignment; cdecl;
+  end;
+  TUISimpleTextPrintFormatter = class(TOCGenericImport<UISimpleTextPrintFormatterClass, UISimpleTextPrintFormatter>)  end;
+
+  UIPanGestureRecognizerClass = interface(UIGestureRecognizerClass)
+    ['{04F97651-346C-4F06-A92E-15FC47E9FB1A}']
+  end;
+  UIPanGestureRecognizer = interface(UIGestureRecognizer)
+    ['{AE52DAD1-5A76-41DF-8043-6A54236B4459}']
+    function maximumNumberOfTouches: NSUInteger; cdecl;
+    function minimumNumberOfTouches: NSUInteger; cdecl;
+    procedure setMaximumNumberOfTouches(maximumNumberOfTouches: NSUInteger); cdecl;
+    procedure setMinimumNumberOfTouches(minimumNumberOfTouches: NSUInteger); cdecl;
+    procedure setTranslation(translation: CGPoint; inView: UIView); cdecl;
+    function translationInView(view: UIView): CGPoint; cdecl;
+    function velocityInView(view: UIView): CGPoint; cdecl;
+  end;
+  TUIPanGestureRecognizer = class(TOCGenericImport<UIPanGestureRecognizerClass, UIPanGestureRecognizer>)  end;
+
+  UIStoryboardPopoverSegueClass = interface(UIStoryboardSegueClass)
+    ['{E2E1985B-A9CC-4313-A4DA-40365CAA63E8}']
+  end;
+  UIStoryboardPopoverSegue = interface(UIStoryboardSegue)
+    ['{D20BB5C9-6212-47B3-9ABF-2C8FEA565230}']
+    function popoverController: UIPopoverController; cdecl;
+  end;
+  TUIStoryboardPopoverSegue = class(TOCGenericImport<UIStoryboardPopoverSegueClass, UIStoryboardPopoverSegue>)  end;
+
+  TUIBackgroundTaskExpirationHandler = procedure of object; // https://quality.embarcadero.com/browse/RSP-18656
+  UIApplicationClass = interface(UIResponderClass)
+    ['{EB8D5CD5-75CA-469F-B1B9-3A32D640B450}']
+    {class} function sharedApplication: Pointer; cdecl;
+  end;
+  UIApplication = interface(UIResponder)
+    ['{BD1002BE-B8C1-45BE-9AB8-9720A9EB1102}']
+    function applicationIconBadgeNumber: NSInteger; cdecl;
+    function applicationState: NSInteger; cdecl;
+    function applicationSupportsShakeToEdit: Boolean; cdecl;
+    function backgroundTimeRemaining: NSTimeInterval; cdecl;
+    procedure beginIgnoringInteractionEvents; cdecl;
+    procedure beginReceivingRemoteControlEvents; cdecl;
+    function canOpenURL(url: NSURL): Boolean; cdecl;
+    procedure cancelAllLocalNotifications; cdecl;
+    procedure cancelLocalNotification(notification: UILocalNotification); cdecl;
+    procedure clearKeepAliveTimeout; cdecl;
+    function currentUserNotificationSettings: UIUserNotificationSettings; cdecl;
+    function delegate: UIApplicationDelegate; cdecl;
+    function enabledRemoteNotificationTypes: Pointer; cdecl;
+    procedure endBackgroundTask(identifier: UIBackgroundTaskIdentifier); cdecl; // https://quality.embarcadero.com/browse/RSP-18656
+    procedure endIgnoringInteractionEvents; cdecl;
+    procedure endReceivingRemoteControlEvents; cdecl;
+    function isIdleTimerDisabled: Boolean; cdecl;
+    function isIgnoringInteractionEvents: Boolean; cdecl;
+    function isNetworkActivityIndicatorVisible: Boolean; cdecl;
+    function isProtectedDataAvailable: Boolean; cdecl;
+    function isStatusBarHidden: Boolean; cdecl;
+    function keyWindow: UIWindow; cdecl;
+    function openURL(url: NSURL): Boolean; cdecl;
+    procedure presentLocalNotificationNow(notification: UILocalNotification); cdecl;
+    procedure registerForRemoteNotificationTypes(types: Pointer); cdecl;
+    procedure registerForRemoteNotifications; cdecl;
+    procedure registerUserNotificationSettings(notificationSettings: UIUserNotificationSettings); cdecl;
+    procedure scheduleLocalNotification(notification: UILocalNotification); cdecl;
+    function scheduledLocalNotifications: NSArray; cdecl;
+    procedure sendEvent(event: UIEvent); cdecl;
+    procedure setApplicationIconBadgeNumber(applicationIconBadgeNumber: NSInteger); cdecl;
+    procedure setApplicationSupportsShakeToEdit(applicationSupportsShakeToEdit: Boolean); cdecl;
+    procedure setDelegate(delegate: UIApplicationDelegate); cdecl;
+    procedure setIdleTimerDisabled(idleTimerDisabled: Boolean); cdecl;
+    procedure setNetworkActivityIndicatorVisible(networkActivityIndicatorVisible: Boolean); cdecl;
+    procedure setNewsstandIconImage(image: UIImage); cdecl;
+    procedure setScheduledLocalNotifications(scheduledLocalNotifications: NSArray); cdecl;
+    procedure setStatusBarHidden(statusBarHidden: Boolean); cdecl; overload;
+    procedure setStatusBarHidden(hidden: Boolean; withAnimation: UIStatusBarAnimation); cdecl; overload;
+    procedure setStatusBarOrientation(statusBarOrientation: UIInterfaceOrientation); cdecl; overload;
+    procedure setStatusBarOrientation(interfaceOrientation: UIInterfaceOrientation; animated: Boolean); cdecl; overload;
+    procedure setStatusBarStyle(statusBarStyle: UIStatusBarStyle); cdecl; overload;
+    procedure setStatusBarStyle(statusBarStyle: UIStatusBarStyle; animated: Boolean); cdecl; overload;
+    function statusBarFrame: CGRect; cdecl;
+    function statusBarOrientation: UIInterfaceOrientation; cdecl;
+    function statusBarOrientationAnimationDuration: NSTimeInterval; cdecl;
+    function statusBarStyle: UIStatusBarStyle; cdecl;
+    procedure unregisterForRemoteNotifications; cdecl;
+    function userInterfaceLayoutDirection: NSInteger; cdecl;
+    function windows: NSArray; cdecl;
+    procedure setMinimumBackgroundFetchInterval(minimumBackgroundFetchInterval: NSTimeInterval); cdecl; // https://quality.embarcadero.com/browse/RSP-18656
+    function beginBackgroundTaskWithExpirationHandler(handler: TUIBackgroundTaskExpirationHandler): UIBackgroundTaskIdentifier; cdecl; // https://quality.embarcadero.com/browse/RSP-18656
+    function isRegisteredForRemoteNotifications: boolean; cdecl; // https://quality.embarcadero.com/browse/RSP-18670
+  end;
+  TUIApplication = class(TOCGenericImport<UIApplicationClass, UIApplication>)  end;
+
+  UIViewPrintFormatterClass = interface(UIPrintFormatterClass)
+    ['{7D474AB7-6437-4258-9DA9-51BE7473D0AD}']
+  end;
+  UIViewPrintFormatter = interface(UIPrintFormatter)
+    ['{595E8B80-CC94-41BC-8B94-41BE7DF984A6}']
+    function view: UIView; cdecl;
+  end;
+  TUIViewPrintFormatter = class(TOCGenericImport<UIViewPrintFormatterClass, UIViewPrintFormatter>)  end;
+
+  UITapGestureRecognizerClass = interface(UIGestureRecognizerClass)
+    ['{B998245A-B96F-4BF8-B8D7-0FFC35E31DCA}']
+  end;
+  UITapGestureRecognizer = interface(UIGestureRecognizer)
+    ['{00DE2AD5-8E72-4513-BAEC-FD6E95D0B7AD}']
+    function numberOfTapsRequired: NSUInteger; cdecl;
+    function numberOfTouchesRequired: NSUInteger; cdecl;
+    procedure setNumberOfTapsRequired(numberOfTapsRequired: NSUInteger); cdecl;
+    procedure setNumberOfTouchesRequired(numberOfTouchesRequired: NSUInteger); cdecl;
+  end;
+  TUITapGestureRecognizer = class(TOCGenericImport<UITapGestureRecognizerClass, UITapGestureRecognizer>)  end;
+
+  UIWebViewClass = interface(UIViewClass)
+    ['{7A6BE447-0282-4E37-9DC8-64BC2417A6E9}']
+  end;
+  UIWebView = interface(UIView)
+    ['{787E0C18-F4B5-4A96-850F-B47D9122C74E}']
+    function allowsInlineMediaPlayback: Boolean; cdecl;
+    function canGoBack: Boolean; cdecl;
+    function canGoForward: Boolean; cdecl;
+    function dataDetectorTypes: UIDataDetectorTypes; cdecl;
+    function delegate: Pointer; cdecl;
+    function detectsPhoneNumbers: Boolean; cdecl;
+    procedure goBack; cdecl;
+    procedure goForward; cdecl;
+    function isLoading: Boolean; cdecl;
+    procedure loadData(data: NSData; MIMEType: NSString; textEncodingName: NSString; baseURL: NSURL); cdecl;
+    procedure loadHTMLString(string_: NSString; baseURL: NSURL); cdecl;
+    procedure loadRequest(request: NSURLRequest); cdecl;
+    function mediaPlaybackAllowsAirPlay: Boolean; cdecl;
+    function mediaPlaybackRequiresUserAction: Boolean; cdecl;
+    procedure reload; cdecl;
+    function request: NSURLRequest; cdecl;
+    function scalesPageToFit: Boolean; cdecl;
+    function scrollView: UIScrollView; cdecl;
+    procedure setAllowsInlineMediaPlayback(allowsInlineMediaPlayback: Boolean); cdecl;
+    procedure setDataDetectorTypes(dataDetectorTypes: UIDataDetectorTypes); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setDetectsPhoneNumbers(detectsPhoneNumbers: Boolean); cdecl;
+    procedure setMediaPlaybackAllowsAirPlay(mediaPlaybackAllowsAirPlay: Boolean); cdecl;
+    procedure setMediaPlaybackRequiresUserAction(mediaPlaybackRequiresUserAction: Boolean); cdecl;
+    procedure setScalesPageToFit(scalesPageToFit: Boolean); cdecl;
+    procedure stopLoading; cdecl;
+    function stringByEvaluatingJavaScriptFromString(script: NSString): NSString; cdecl;
+  end;
+  TUIWebView = class(TOCGenericImport<UIWebViewClass, UIWebView>)  end;
+
+  UITableViewControllerClass = interface(UIViewControllerClass)
+    ['{B81F488C-3A18-4EAC-9CA5-2901848AE908}']
+  end;
+  UITableViewController = interface(UIViewController)
+    ['{73CE7B2D-0C95-4D75-89CE-1330AD98D89C}']
+    function clearsSelectionOnViewWillAppear: Boolean; cdecl;
+    function initWithStyle(style: UITableViewStyle): Pointer; cdecl;
+    procedure setClearsSelectionOnViewWillAppear(clearsSelectionOnViewWillAppear: Boolean); cdecl;
+    procedure setTableView(tableView: UITableView); cdecl;
+    function tableView: UITableView; cdecl;
+  end;
+  TUITableViewController = class(TOCGenericImport<UITableViewControllerClass, UITableViewController>)  end;
+
+  UIToolbarClass = interface(UIViewClass)
+    ['{094FD093-09E3-4D09-BF6B-7CF1452750AB}']
+  end;
+  UIToolbar = interface(UIView)
+    ['{90062BBC-88E7-4427-B3A5-8BB14FA23677}']
+    function backgroundImageForToolbarPosition(topOrBottom: UIToolbarPosition; barMetrics: UIBarMetrics): UIImage; cdecl;
+    function barStyle: UIBarStyle; cdecl;
+    function isTranslucent: Boolean; cdecl;
+    function items: NSArray; cdecl;
+    procedure setBackgroundImage(backgroundImage: UIImage; forToolbarPosition: UIToolbarPosition; barMetrics: UIBarMetrics); cdecl;
+    procedure setBarStyle(barStyle: UIBarStyle); cdecl;
+    procedure setItems(items: NSArray); cdecl; overload;
+    procedure setItems(items: NSArray; animated: Boolean); cdecl; overload;
+    procedure setTintColor(tintColor: UIColor); cdecl;
+    procedure setTranslucent(translucent: Boolean); cdecl;
+    function tintColor: UIColor; cdecl;
+  end;
+  TUIToolbar = class(TOCGenericImport<UIToolbarClass, UIToolbar>)  end;
+
+  UITabBarClass = interface(UIViewClass)
+    ['{945AF986-A933-4C6C-AA37-D742F8FDBB9C}']
+  end;
+  UITabBar = interface(UIView)
+    ['{661BB52C-5607-48EF-A161-B1EE22B45A2D}']
+    function backgroundImage: UIImage; cdecl;
+    procedure beginCustomizingItems(items: NSArray); cdecl;
+    function delegate: Pointer; cdecl;
+    function endCustomizingAnimated(animated: Boolean): Boolean; cdecl;
+    function isCustomizing: Boolean; cdecl;
+    function items: NSArray; cdecl;
+    function selectedImageTintColor: UIColor; cdecl;
+    function selectedItem: UITabBarItem; cdecl;
+    function selectionIndicatorImage: UIImage; cdecl;
+    procedure setBackgroundImage(backgroundImage: UIImage); cdecl;
+    procedure setShadowImage(shadowImage: UIImage); cdecl;
+    procedure setBarTintColor(barTintColor: UIColor); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setItems(items: NSArray); cdecl; overload;
+    procedure setItems(items: NSArray; animated: Boolean); cdecl; overload;
+    procedure setSelectedImageTintColor(selectedImageTintColor: UIColor); cdecl;
+    procedure setSelectedItem(selectedItem: UITabBarItem); cdecl;
+    procedure setSelectionIndicatorImage(selectionIndicatorImage: UIImage); cdecl;
+    procedure setTintColor(tintColor: UIColor); cdecl;
+    function tintColor: UIColor; cdecl;
+    function shadowImage: UIImage; cdecl;
+  end;
+  TUITabBar = class(TOCGenericImport<UITabBarClass, UITabBar>)  end;
+
+  UITabBarControllerClass = interface(UIViewControllerClass)
+    ['{22ABB2F0-7BB4-47BB-95F5-FC3F2FDEC1A8}']
+  end;
+  UITabBarController = interface(UIViewController)
+    ['{C0FB9778-5DE5-4D8E-811E-D27566531604}']
+    function customizableViewControllers: NSArray; cdecl;
+    function delegate: Pointer; cdecl;
+    function moreNavigationController: UINavigationController; cdecl;
+    function selectedIndex: NSUInteger; cdecl;
+    function selectedViewController: UIViewController; cdecl;
+    procedure setCustomizableViewControllers(customizableViewControllers: NSArray); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setSelectedIndex(selectedIndex: NSUInteger); cdecl;
+    procedure setSelectedViewController(selectedViewController: UIViewController); cdecl;
+    procedure setViewControllers(viewControllers: NSArray); cdecl; overload;
+    procedure setViewControllers(viewControllers: NSArray; animated: Boolean); cdecl; overload;
+    function tabBar: UITabBar; cdecl;
+    function viewControllers: NSArray; cdecl;
+  end;
+  TUITabBarController = class(TOCGenericImport<UITabBarControllerClass, UITabBarController>)  end;
+
+  UIWindowClass = interface(UIViewClass)
+    ['{60E6214D-C7C2-43EE-BC3D-B3BA51DDA9C0}']
+  end;
+  UIWindow = interface(UIView)
+    ['{B2310880-6213-441B-913E-23711AA89558}']
+    procedure becomeKeyWindow; cdecl;
+    function convertPoint(point: CGPoint; fromWindow: UIWindow): CGPoint; cdecl; overload;
+//    function convertPoint(point: CGPoint; toWindow: UIWindow): CGPoint; cdecl; overload;
+    function convertRect(rect: CGRect; fromWindow: UIWindow): CGRect; cdecl; overload;
+//    function convertRect(rect: CGRect; toWindow: UIWindow): CGRect; cdecl; overload;
+    function isKeyWindow: Boolean; cdecl;
+    procedure makeKeyAndVisible; cdecl;
+    procedure makeKeyWindow; cdecl;
+    procedure resignKeyWindow; cdecl;
+    function rootViewController: UIViewController; cdecl;
+    function screen: UIScreen; cdecl;
+    procedure sendEvent(event: UIEvent); cdecl;
+    procedure setRootViewController(rootViewController: UIViewController); cdecl;
+    procedure setScreen(screen: UIScreen); cdecl;
+    procedure setWindowLevel(windowLevel: UIWindowLevel); cdecl;
+    function windowLevel: UIWindowLevel; cdecl;
+  end;
+  TUIWindow = class(TOCGenericImport<UIWindowClass, UIWindow>)  end;
+
+  UISplitViewControllerClass = interface(UIViewControllerClass)
+    ['{A0AD8EC5-25E9-46F4-9FA0-CF78BF8EA5C7}']
+  end;
+  UISplitViewController = interface(UIViewController)
+    ['{20EC4A04-B6DE-45A9-96E4-EAAAB5BAE28D}']
+    function delegate: Pointer; cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setViewControllers(viewControllers: NSArray); cdecl;
+    function viewControllers: NSArray; cdecl;
+  end;
+  TUISplitViewController = class(TOCGenericImport<UISplitViewControllerClass, UISplitViewController>)  end;
+
+  UINavigationBarClass = interface(UIViewClass)
+    ['{6BA964FE-C70D-4E0E-A53C-0C56E1A41084}']
+  end;
+  UINavigationBar = interface(UIView)
+    ['{107EA22D-E942-41DF-8B38-EFD0E6E832A2}']
+    function backItem: UINavigationItem; cdecl;
+    function backgroundImageForBarMetrics(barMetrics: UIBarMetrics): UIImage; cdecl;
+    function barStyle: UIBarStyle; cdecl;
+    function delegate: Pointer; cdecl;
+    function isTranslucent: Boolean; cdecl;
+    function items: NSArray; cdecl;
+    function popNavigationItemAnimated(animated: Boolean): UINavigationItem; cdecl;
+    procedure pushNavigationItem(item: UINavigationItem; animated: Boolean); cdecl;
+    procedure setBackgroundImage(backgroundImage: UIImage; forBarMetrics: UIBarMetrics); cdecl;
+    procedure setBarStyle(barStyle: UIBarStyle); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setItems(items: NSArray); cdecl; overload;
+    procedure setItems(items: NSArray; animated: Boolean); cdecl; overload;
+    procedure setTintColor(tintColor: UIColor); cdecl;
+    procedure setTitleTextAttributes(titleTextAttributes: NSDictionary); cdecl;
+    procedure setTitleVerticalPositionAdjustment(adjustment: CGFloat; forBarMetrics: UIBarMetrics); cdecl;
+    procedure setTranslucent(translucent: Boolean); cdecl;
+    function tintColor: UIColor; cdecl;
+    function titleTextAttributes: NSDictionary; cdecl;
+    function titleVerticalPositionAdjustmentForBarMetrics(barMetrics: UIBarMetrics): CGFloat; cdecl;
+    function topItem: UINavigationItem; cdecl;
+  end;
+  TUINavigationBar = class(TOCGenericImport<UINavigationBarClass, UINavigationBar>)  end;
+
+  UILabelClass = interface(UIViewClass)
+    ['{5E45EE6D-06A9-4392-9832-9570A05E2620}']
+  end;
+  UILabel = interface(UIView)
+    ['{28363ECE-382C-4450-AEA0-D4E3A7D71CFD}']
+    function adjustsFontSizeToFitWidth: Boolean; cdecl;
+    function baselineAdjustment: UIBaselineAdjustment; cdecl;
+    procedure drawTextInRect(rect: CGRect); cdecl;
+    function font: UIFont; cdecl;
+    function highlightedTextColor: UIColor; cdecl;
+    function isEnabled: Boolean; cdecl;
+    function isHighlighted: Boolean; cdecl;
+    function isUserInteractionEnabled: Boolean; cdecl;
+    function lineBreakMode: UILineBreakMode; cdecl;
+    function minimumFontSize: CGFloat; cdecl;
+    function numberOfLines: NSInteger; cdecl;
+    procedure setAdjustsFontSizeToFitWidth(adjustsFontSizeToFitWidth: Boolean); cdecl;
+    procedure setBaselineAdjustment(baselineAdjustment: UIBaselineAdjustment); cdecl;
+    procedure setEnabled(enabled: Boolean); cdecl;
+    procedure setFont(font: UIFont); cdecl;
+    procedure setHighlighted(highlighted: Boolean); cdecl;
+    procedure setHighlightedTextColor(highlightedTextColor: UIColor); cdecl;
+    procedure setLineBreakMode(lineBreakMode: UILineBreakMode); cdecl;
+    procedure setMinimumFontSize(minimumFontSize: CGFloat); cdecl;
+    procedure setNumberOfLines(numberOfLines: NSInteger); cdecl;
+    procedure setShadowColor(shadowColor: UIColor); cdecl;
+    procedure setShadowOffset(shadowOffset: CGSize); cdecl;
+    procedure setText(text: NSString); cdecl;
+    procedure setTextAlignment(textAlignment: UITextAlignment); cdecl;
+    procedure setTextColor(textColor: UIColor); cdecl;
+    procedure setUserInteractionEnabled(userInteractionEnabled: Boolean); cdecl;
+    function shadowColor: UIColor; cdecl;
+    function shadowOffset: CGSize; cdecl;
+    function text: NSString; cdecl;
+    function textAlignment: UITextAlignment; cdecl;
+    function textColor: UIColor; cdecl;
+    function textRectForBounds(bounds: CGRect; limitedToNumberOfLines: NSInteger): CGRect; cdecl;
+  end;
+  TUILabel = class(TOCGenericImport<UILabelClass, UILabel>)  end;
+
+  UINavigationControllerClass = interface(UIViewControllerClass)
+    ['{144258EB-46EF-4CE3-8399-26B585EE5D51}']
+  end;
+  UINavigationController = interface(UIViewController)
+    ['{BC0A62FD-B83A-4313-AABC-797C7BD64366}']
+    function delegate: Pointer; cdecl;
+    function initWithRootViewController(rootViewController: UIViewController): Pointer; cdecl;
+    function isNavigationBarHidden: Boolean; cdecl;
+    function isToolbarHidden: Boolean; cdecl;
+    function navigationBar: UINavigationBar; cdecl;
+    function popToRootViewControllerAnimated(animated: Boolean): NSArray; cdecl;
+    function popToViewController(viewController: UIViewController; animated: Boolean): NSArray; cdecl;
+    function popViewControllerAnimated(animated: Boolean): UIViewController; cdecl;
+    procedure pushViewController(viewController: UIViewController; animated: Boolean); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setNavigationBarHidden(navigationBarHidden: Boolean); cdecl; overload;
+    procedure setNavigationBarHidden(hidden: Boolean; animated: Boolean); cdecl; overload;
+    procedure setToolbarHidden(toolbarHidden: Boolean); cdecl; overload;
+    procedure setToolbarHidden(hidden: Boolean; animated: Boolean); cdecl; overload;
+    procedure setViewControllers(viewControllers: NSArray); cdecl; overload;
+    procedure setViewControllers(viewControllers: NSArray; animated: Boolean); cdecl; overload;
+    function toolbar: UIToolbar; cdecl;
+    function topViewController: UIViewController; cdecl;
+    function viewControllers: NSArray; cdecl;
+    function visibleViewController: UIViewController; cdecl;
+  end;
+  TUINavigationController = class(TOCGenericImport<UINavigationControllerClass, UINavigationController>)  end;
+
+  UIPickerViewClass = interface(UIViewClass)
+    ['{216F1E88-1CF4-470A-8AFB-45077FE5A750}']
+  end;
+  UIPickerView = interface(UIView)
+    ['{1CBB77B4-19C1-4D9F-9164-4EFCA630CBA8}']
+    function dataSource: Pointer; cdecl;
+    function delegate: Pointer; cdecl;
+    function numberOfComponents: NSInteger; cdecl;
+    function numberOfRowsInComponent(component: NSInteger): NSInteger; cdecl;
+    procedure reloadAllComponents; cdecl;
+    procedure reloadComponent(component: NSInteger); cdecl;
+    function rowSizeForComponent(component: NSInteger): CGSize; cdecl;
+    procedure selectRow(row: NSInteger; inComponent: NSInteger; animated: Boolean); cdecl;
+    function selectedRowInComponent(component: NSInteger): NSInteger; cdecl;
+    procedure setDataSource(dataSource: Pointer); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setShowsSelectionIndicator(showsSelectionIndicator: Boolean); cdecl;
+    function showsSelectionIndicator: Boolean; cdecl;
+    function viewForRow(row: NSInteger; forComponent: NSInteger): UIView; cdecl;
+  end;
+  TUIPickerView = class(TOCGenericImport<UIPickerViewClass, UIPickerView>)  end;
+
+  UIPageViewControllerClass = interface(UIViewControllerClass)
+    ['{02715341-10EC-43AA-8980-06D16913D9A0}']
+  end;
+  UIPageViewController = interface(UIViewController)
+    ['{BD8F4370-A8C4-4B5D-9001-CCAB87C3E446}']
+    function dataSource: Pointer; cdecl;
+    function delegate: Pointer; cdecl;
+    function gestureRecognizers: NSArray; cdecl;
+    function initWithTransitionStyle(style: UIPageViewControllerTransitionStyle; navigationOrientation: UIPageViewControllerNavigationOrientation; options: NSDictionary): Pointer; cdecl;
+    function isDoubleSided: Boolean; cdecl;
+    function navigationOrientation: UIPageViewControllerNavigationOrientation; cdecl;
+    procedure setDataSource(dataSource: Pointer); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setDoubleSided(doubleSided: Boolean); cdecl;
+    function spineLocation: UIPageViewControllerSpineLocation; cdecl;
+    function transitionStyle: UIPageViewControllerTransitionStyle; cdecl;
+    function viewControllers: NSArray; cdecl;
+  end;
+  TUIPageViewController = class(TOCGenericImport<UIPageViewControllerClass, UIPageViewController>)  end;
+
+  UIActivityIndicatorViewClass = interface(UIViewClass)
+    ['{653F48F6-391E-4456-8BEA-619D3DABF160}']
+  end;
+  UIActivityIndicatorView = interface(UIView)
+    ['{740BF207-534C-49E0-ACC7-842794A03DF8}']
+    function activityIndicatorViewStyle: UIActivityIndicatorViewStyle; cdecl;
+    function color: UIColor; cdecl;
+    function hidesWhenStopped: Boolean; cdecl;
+    function initWithActivityIndicatorStyle(style: UIActivityIndicatorViewStyle): Pointer; cdecl;
+    function isAnimating: Boolean; cdecl;
+    procedure setActivityIndicatorViewStyle(activityIndicatorViewStyle: UIActivityIndicatorViewStyle); cdecl;
+    procedure setColor(color: UIColor); cdecl;
+    procedure setHidesWhenStopped(hidesWhenStopped: Boolean); cdecl;
+    procedure startAnimating; cdecl;
+    procedure stopAnimating; cdecl;
+  end;
+  TUIActivityIndicatorView = class(TOCGenericImport<UIActivityIndicatorViewClass, UIActivityIndicatorView>)  end;
+
+  UIActionSheetClass = interface(UIViewClass)
+    ['{97C3C5FB-0D28-4DAB-B06C-41BF18F1667C}']
+  end;
+  UIActionSheet = interface(UIView)
+    ['{C59B1FB7-4258-4158-B4AE-24D5915FF901}']
+    function actionSheetStyle: UIActionSheetStyle; cdecl;
+    function addButtonWithTitle(title: NSString): NSInteger; cdecl;
+    function buttonTitleAtIndex(buttonIndex: NSInteger): NSString; cdecl;
+    function cancelButtonIndex: NSInteger; cdecl;
+    function delegate: Pointer; cdecl;
+    function destructiveButtonIndex: NSInteger; cdecl;
+    procedure dismissWithClickedButtonIndex(buttonIndex: NSInteger; animated: Boolean); cdecl;
+    function firstOtherButtonIndex: NSInteger; cdecl;
+    function initWithTitle(title: NSString; delegate: Pointer; cancelButtonTitle: NSString; destructiveButtonTitle: NSString; otherButtonTitles: NSString): Pointer; cdecl;
+    function isVisible: Boolean; cdecl;
+    function numberOfButtons: NSInteger; cdecl;
+    procedure setActionSheetStyle(actionSheetStyle: UIActionSheetStyle); cdecl;
+    procedure setCancelButtonIndex(cancelButtonIndex: NSInteger); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setDestructiveButtonIndex(destructiveButtonIndex: NSInteger); cdecl;
+    procedure setTitle(title: NSString); cdecl;
+    procedure showFromBarButtonItem(item: UIBarButtonItem; animated: Boolean); cdecl;
+    procedure showFromRect(rect: CGRect; inView: UIView; animated: Boolean); cdecl;
+    procedure showFromTabBar(view: UITabBar); cdecl;
+    procedure showFromToolbar(view: UIToolbar); cdecl;
+    procedure showInView(view: UIView); cdecl;
+    function title: NSString; cdecl;
+  end;
+  TUIActionSheet = class(TOCGenericImport<UIActionSheetClass, UIActionSheet>)  end;
+
+  UIActivityViewControllerClass = interface(UIViewControllerClass)
+    ['{B1BB6463-CC09-487B-9340-607FD6D0863B}']
+  end;
+  UIActivityViewController = interface(UIViewController)
+    ['{68BE3AE8-E14B-4086-B066-F90C5C527E32}']
+    function initWithActivityItems(activityItems: NSArray; applicationActivities: NSArray): Pointer; cdecl;
+    function completionHandler: UIActivityViewControllerCompletionHandler; cdecl;
+    procedure setCompletionHandler(completionHandler: UIActivityViewControllerCompletionHandler); cdecl;
+  end;
+  TUIActivityViewController = class(TOCGenericImport<UIActivityViewControllerClass, UIActivityViewController>)  end;
+
+  UIAlertViewClass = interface(UIViewClass)
+    ['{9B52F0F9-605B-46B0-A237-F309ECB3E7E7}']
+  end;
+  UIAlertView = interface(UIView)
+    ['{733868C3-9497-4A2E-8BE6-2A764EE2EFFD}']
+    function addButtonWithTitle(title: NSString): NSInteger; cdecl;
+    function alertViewStyle: UIAlertViewStyle; cdecl;
+    function buttonTitleAtIndex(buttonIndex: NSInteger): NSString; cdecl;
+    function cancelButtonIndex: NSInteger; cdecl;
+    function delegate: Pointer; cdecl;
+    procedure dismissWithClickedButtonIndex(buttonIndex: NSInteger; animated: Boolean); cdecl;
+    function firstOtherButtonIndex: NSInteger; cdecl;
+    function initWithTitle(title: NSString; message: NSString; delegate: Pointer; cancelButtonTitle: NSString; otherButtonTitles: NSString): Pointer; cdecl;
+    function isVisible: Boolean; cdecl;
+    function message: NSString; cdecl;
+    function numberOfButtons: NSInteger; cdecl;
+    procedure setAlertViewStyle(alertViewStyle: UIAlertViewStyle); cdecl;
+    procedure setCancelButtonIndex(cancelButtonIndex: NSInteger); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setMessage(message: NSString); cdecl;
+    procedure setTitle(title: NSString); cdecl;
+    procedure show; cdecl;
+    function textFieldAtIndex(textFieldIndex: NSInteger): Pointer; cdecl;
+    function title: NSString; cdecl;
+  end;
+  TUIAlertView = class(TOCGenericImport<UIAlertViewClass, UIAlertView>)  end;
+
+  UIImageViewClass = interface(UIViewClass)
+    ['{8AC2E4BA-C422-4312-AAB8-BAEE2F78D837}']
+  end;
+  UIImageView = interface(UIView)
+    ['{3C37E7BA-5B35-4AB5-B48B-B308F45EE3C2}']
+    function animationDuration: NSTimeInterval; cdecl;
+    function animationImages: NSArray; cdecl;
+    function animationRepeatCount: NSInteger; cdecl;
+    function highlightedAnimationImages: NSArray; cdecl;
+    function highlightedImage: UIImage; cdecl;
+    function image: UIImage; cdecl;
+    function initWithImage(image: UIImage): Pointer; cdecl; overload;
+    function initWithImage(image: UIImage; highlightedImage: UIImage): Pointer; cdecl; overload;
+    function isAnimating: Boolean; cdecl;
+    function isHighlighted: Boolean; cdecl;
+    function isUserInteractionEnabled: Boolean; cdecl;
+    procedure setAnimationDuration(animationDuration: NSTimeInterval); cdecl;
+    procedure setAnimationImages(animationImages: NSArray); cdecl;
+    procedure setAnimationRepeatCount(animationRepeatCount: NSInteger); cdecl;
+    procedure setHighlighted(highlighted: Boolean); cdecl;
+    procedure setHighlightedAnimationImages(highlightedAnimationImages: NSArray); cdecl;
+    procedure setHighlightedImage(highlightedImage: UIImage); cdecl;
+    procedure setImage(image: UIImage); cdecl;
+    procedure setUserInteractionEnabled(userInteractionEnabled: Boolean); cdecl;
+    procedure startAnimating; cdecl;
+    procedure stopAnimating; cdecl;
+  end;
+  TUIImageView = class(TOCGenericImport<UIImageViewClass, UIImageView>)  end;
+
+  UIControlClass = interface(UIViewClass)
+    ['{D6494AFD-75F0-4E86-BD61-A28EF623EFE9}']
+  end;
+  UIControl = interface(UIView)
+    ['{3577D075-1A6B-4614-A590-F4ACB559BDF3}']
+    function actionsForTarget(target: Pointer; forControlEvent: UIControlEvents): NSArray; cdecl;
+    procedure addTarget(target: Pointer; action: SEL; forControlEvents: UIControlEvents); cdecl;
+    function allControlEvents: UIControlEvents; cdecl;
+    function allTargets: NSSet; cdecl;
+    function beginTrackingWithTouch(touch: UITouch; withEvent: UIEvent): Boolean; cdecl;
+    procedure cancelTrackingWithEvent(event: UIEvent); cdecl;
+    function contentHorizontalAlignment: UIControlContentHorizontalAlignment; cdecl;
+    function contentVerticalAlignment: UIControlContentVerticalAlignment; cdecl;
+    function continueTrackingWithTouch(touch: UITouch; withEvent: UIEvent): Boolean; cdecl;
+    procedure endTrackingWithTouch(touch: UITouch; withEvent: UIEvent); cdecl;
+    function isEnabled: Boolean; cdecl;
+    function isHighlighted: Boolean; cdecl;
+    function isSelected: Boolean; cdecl;
+    function isTouchInside: Boolean; cdecl;
+    function isTracking: Boolean; cdecl;
+    procedure removeTarget(target: Pointer; action: SEL; forControlEvents: UIControlEvents); cdecl;
+    procedure sendActionsForControlEvents(controlEvents: UIControlEvents); cdecl;
+    procedure setContentHorizontalAlignment(contentHorizontalAlignment: UIControlContentHorizontalAlignment); cdecl;
+    procedure setContentVerticalAlignment(contentVerticalAlignment: UIControlContentVerticalAlignment); cdecl;
+    procedure setEnabled(enabled: Boolean); cdecl;
+    procedure setHighlighted(highlighted: Boolean); cdecl;
+    procedure setSelected(selected: Boolean); cdecl;
+    function state: UIControlState; cdecl;
+  end;
+  TUIControl = class(TOCGenericImport<UIControlClass, UIControl>)  end;
+
+  UIProgressViewClass = interface(UIViewClass)
+    ['{77B96B73-6425-4D5D-B318-77EB1A22F8B9}']
+  end;
+  UIProgressView = interface(UIView)
+    ['{6106703C-52EE-46CE-A99F-1F3CDE1E5906}']
+    function initWithProgressViewStyle(style: UIProgressViewStyle): Pointer; cdecl;
+    function progress: Single; cdecl;
+    function progressImage: UIImage; cdecl;
+    function progressTintColor: UIColor; cdecl;
+    function progressViewStyle: UIProgressViewStyle; cdecl;
+    procedure setProgress(progress: Single); cdecl; overload;
+    procedure setProgress(progress: Single; animated: Boolean); cdecl; overload;
+    procedure setProgressImage(progressImage: UIImage); cdecl;
+    procedure setProgressTintColor(progressTintColor: UIColor); cdecl;
+    procedure setProgressViewStyle(progressViewStyle: UIProgressViewStyle); cdecl;
+    procedure setTrackImage(trackImage: UIImage); cdecl;
+    procedure setTrackTintColor(trackTintColor: UIColor); cdecl;
+    function trackImage: UIImage; cdecl;
+    function trackTintColor: UIColor; cdecl;
+  end;
+  TUIProgressView = class(TOCGenericImport<UIProgressViewClass, UIProgressView>)  end;
+
+  UIScrollViewClass = interface(UIViewClass)
+    ['{9580E8CE-CF16-4AA4-A3AC-57E4BA6E7A30}']
+  end;
+  UIScrollView = interface(UIView)
+    ['{AC832A34-44A4-4269-8C3C-47F9F08BC243}']
+    function alwaysBounceHorizontal: Boolean; cdecl;
+    function alwaysBounceVertical: Boolean; cdecl;
+    function bounces: Boolean; cdecl;
+    function bouncesZoom: Boolean; cdecl;
+    function canCancelContentTouches: Boolean; cdecl;
+    function contentInset: UIEdgeInsets; cdecl;
+    function contentOffset: CGPoint; cdecl;
+    function contentSize: CGSize; cdecl;
+    function decelerationRate: CGFloat; cdecl;
+    function delaysContentTouches: Boolean; cdecl;
+    function delegate: Pointer; cdecl;
+    procedure flashScrollIndicators; cdecl;
+    function indicatorStyle: UIScrollViewIndicatorStyle; cdecl;
+    function isDecelerating: Boolean; cdecl;
+    function isDirectionalLockEnabled: Boolean; cdecl;
+    function isDragging: Boolean; cdecl;
+    function isPagingEnabled: Boolean; cdecl;
+    function isScrollEnabled: Boolean; cdecl;
+    function isTracking: Boolean; cdecl;
+    function isZoomBouncing: Boolean; cdecl;
+    function isZooming: Boolean; cdecl;
+    function maximumZoomScale: CGFloat; cdecl;
+    function minimumZoomScale: CGFloat; cdecl;
+    function panGestureRecognizer: UIPanGestureRecognizer; cdecl;
+    function pinchGestureRecognizer: UIPinchGestureRecognizer; cdecl;
+    function scrollIndicatorInsets: UIEdgeInsets; cdecl;
+    procedure scrollRectToVisible(rect: CGRect; animated: Boolean); cdecl;
+    function scrollsToTop: Boolean; cdecl;
+    procedure setAlwaysBounceHorizontal(alwaysBounceHorizontal: Boolean); cdecl;
+    procedure setAlwaysBounceVertical(alwaysBounceVertical: Boolean); cdecl;
+    procedure setBounces(bounces: Boolean); cdecl;
+    procedure setBouncesZoom(bouncesZoom: Boolean); cdecl;
+    procedure setCanCancelContentTouches(canCancelContentTouches: Boolean); cdecl;
+    procedure setContentInset(contentInset: UIEdgeInsets); cdecl;
+    procedure setContentOffset(contentOffset: CGPoint); cdecl; overload;
+    procedure setContentOffset(contentOffset: CGPoint; animated: Boolean); cdecl; overload;
+    procedure setContentSize(contentSize: CGSize); cdecl;
+    procedure setDecelerationRate(decelerationRate: CGFloat); cdecl;
+    procedure setDelaysContentTouches(delaysContentTouches: Boolean); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setDirectionalLockEnabled(directionalLockEnabled: Boolean); cdecl;
+    procedure setIndicatorStyle(indicatorStyle: UIScrollViewIndicatorStyle); cdecl;
+    procedure setMaximumZoomScale(maximumZoomScale: CGFloat); cdecl;
+    procedure setMinimumZoomScale(minimumZoomScale: CGFloat); cdecl;
+    procedure setPagingEnabled(pagingEnabled: Boolean); cdecl;
+    procedure setScrollEnabled(scrollEnabled: Boolean); cdecl;
+    procedure setScrollIndicatorInsets(scrollIndicatorInsets: UIEdgeInsets); cdecl;
+    procedure setScrollsToTop(scrollsToTop: Boolean); cdecl;
+    procedure setShowsHorizontalScrollIndicator(showsHorizontalScrollIndicator: Boolean); cdecl;
+    procedure setShowsVerticalScrollIndicator(showsVerticalScrollIndicator: Boolean); cdecl;
+    procedure setZoomScale(zoomScale: CGFloat); cdecl; overload;
+    procedure setZoomScale(scale: CGFloat; animated: Boolean); cdecl; overload;
+    function showsHorizontalScrollIndicator: Boolean; cdecl;
+    function showsVerticalScrollIndicator: Boolean; cdecl;
+    function touchesShouldBegin(touches: NSSet; withEvent: UIEvent; inContentView: UIView): Boolean; cdecl;
+    function touchesShouldCancelInContentView(view: UIView): Boolean; cdecl;
+    function zoomScale: CGFloat; cdecl;
+    procedure zoomToRect(rect: CGRect; animated: Boolean); cdecl;
+  end;
+  TUIScrollView = class(TOCGenericImport<UIScrollViewClass, UIScrollView>)  end;
+
+  UIReferenceLibraryViewControllerClass = interface(UIViewControllerClass)
+    ['{7BBEFE7F-28B1-4240-AC66-6AE2492E8B44}']
+    {class} function dictionaryHasDefinitionForTerm(term: NSString): Boolean; cdecl;
+  end;
+  UIReferenceLibraryViewController = interface(UIViewController)
+    ['{0FCD276F-73FF-4182-92A3-85525608FA41}']
+    function initWithTerm(term: NSString): Pointer; cdecl;
+  end;
+  TUIReferenceLibraryViewController = class(TOCGenericImport<UIReferenceLibraryViewControllerClass, UIReferenceLibraryViewController>)  end;
+
+  UIPopoverBackgroundViewClass = interface(UIViewClass)
+    ['{AFE7DCBF-E3C2-4F71-B5B7-2226161B21B6}']
+    {class} function arrowBase: CGFloat; cdecl;
+    {class} function arrowHeight: CGFloat; cdecl;
+    {class} function contentViewInsets: UIEdgeInsets; cdecl;
+  end;
+  UIPopoverBackgroundView = interface(UIView)
+    ['{8D894AFF-0033-476E-A2ED-74102DF91BBB}']
+    function arrowDirection: UIPopoverArrowDirection; cdecl;
+    function arrowOffset: CGFloat; cdecl;
+    procedure setArrowDirection(arrowDirection: UIPopoverArrowDirection); cdecl;
+    procedure setArrowOffset(arrowOffset: CGFloat); cdecl;
+  end;
+  TUIPopoverBackgroundView = class(TOCGenericImport<UIPopoverBackgroundViewClass, UIPopoverBackgroundView>)  end;
+
+  UISearchBarClass = interface(UIViewClass)
+    ['{E1BF33AF-6961-436C-BD4B-0E510228697D}']
+  end;
+  UISearchBar = interface(UIView)
+    ['{62830DEE-15CB-4560-858F-30E62B885A90}']
+    function autocapitalizationType: UITextAutocapitalizationType; cdecl;
+    function autocorrectionType: UITextAutocorrectionType; cdecl;
+    function backgroundImage: UIImage; cdecl;
+    function barStyle: UIBarStyle; cdecl;
+    function delegate: Pointer; cdecl;
+    function imageForSearchBarIcon(icon: UISearchBarIcon; state: UIControlState): UIImage; cdecl;
+    function isSearchResultsButtonSelected: Boolean; cdecl;
+    function isTranslucent: Boolean; cdecl;
+    function keyboardType: UIKeyboardType; cdecl;
+    function placeholder: NSString; cdecl;
+    function positionAdjustmentForSearchBarIcon(icon: UISearchBarIcon): UIOffset; cdecl;
+    function prompt: NSString; cdecl;
+    function scopeBarBackgroundImage: UIImage; cdecl;
+    function scopeBarButtonBackgroundImageForState(state: UIControlState): UIImage; cdecl;
+    function scopeBarButtonDividerImageForLeftSegmentState(leftState: UIControlState; rightSegmentState: UIControlState): UIImage; cdecl;
+    function scopeBarButtonTitleTextAttributesForState(state: UIControlState): NSDictionary; cdecl;
+    function scopeButtonTitles: NSArray; cdecl;
+    function searchFieldBackgroundImageForState(state: UIControlState): UIImage; cdecl;
+    function searchFieldBackgroundPositionAdjustment: UIOffset; cdecl;
+    function searchTextPositionAdjustment: UIOffset; cdecl;
+    function selectedScopeButtonIndex: NSInteger; cdecl;
+    procedure setAutocapitalizationType(autocapitalizationType: UITextAutocapitalizationType); cdecl;
+    procedure setAutocorrectionType(autocorrectionType: UITextAutocorrectionType); cdecl;
+    procedure setBackgroundImage(backgroundImage: UIImage); cdecl;
+    procedure setBarStyle(barStyle: UIBarStyle); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setImage(iconImage: UIImage; forSearchBarIcon: UISearchBarIcon; state: UIControlState); cdecl;
+    procedure setKeyboardType(keyboardType: UIKeyboardType); cdecl;
+    procedure setPlaceholder(placeholder: NSString); cdecl;
+    procedure setPositionAdjustment(adjustment: UIOffset; forSearchBarIcon: UISearchBarIcon); cdecl;
+    procedure setPrompt(prompt: NSString); cdecl;
+    procedure setScopeBarBackgroundImage(scopeBarBackgroundImage: UIImage); cdecl;
+    procedure setScopeBarButtonBackgroundImage(backgroundImage: UIImage; forState: UIControlState); cdecl;
+    procedure setScopeBarButtonDividerImage(dividerImage: UIImage; forLeftSegmentState: UIControlState; rightSegmentState: UIControlState); cdecl;
+    procedure setScopeBarButtonTitleTextAttributes(attributes: NSDictionary; forState: UIControlState); cdecl;
+    procedure setScopeButtonTitles(scopeButtonTitles: NSArray); cdecl;
+    procedure setSearchFieldBackgroundImage(backgroundImage: UIImage; forState: UIControlState); cdecl;
+    procedure setSearchFieldBackgroundPositionAdjustment(searchFieldBackgroundPositionAdjustment: UIOffset); cdecl;
+    procedure setSearchResultsButtonSelected(searchResultsButtonSelected: Boolean); cdecl;
+    procedure setSearchTextPositionAdjustment(searchTextPositionAdjustment: UIOffset); cdecl;
+    procedure setSelectedScopeButtonIndex(selectedScopeButtonIndex: NSInteger); cdecl;
+    procedure setShowsBookmarkButton(showsBookmarkButton: Boolean); cdecl;
+    procedure setShowsCancelButton(showsCancelButton: Boolean); cdecl; overload;
+    procedure setShowsCancelButton(showsCancelButton: Boolean; animated: Boolean); cdecl; overload;
+    procedure setShowsScopeBar(showsScopeBar: Boolean); cdecl;
+    procedure setShowsSearchResultsButton(showsSearchResultsButton: Boolean); cdecl;
+    procedure setSpellCheckingType(spellCheckingType: NSInteger); cdecl;
+    procedure setText(text: NSString); cdecl;
+    procedure setTintColor(tintColor: UIColor); cdecl;
+    procedure setTranslucent(translucent: Boolean); cdecl;
+    function showsBookmarkButton: Boolean; cdecl;
+    function showsCancelButton: Boolean; cdecl;
+    function showsScopeBar: Boolean; cdecl;
+    function showsSearchResultsButton: Boolean; cdecl;
+    function spellCheckingType: NSInteger; cdecl;
+    function text: NSString; cdecl;
+    function tintColor: UIColor; cdecl;
+  end;
+  TUISearchBar = class(TOCGenericImport<UISearchBarClass, UISearchBar>)  end;
+
+  UISearchControllerClass = interface(UIViewControllerClass)
+    ['{8C880875-52F8-4BE4-AF46-3FB7FF69DD65}']
+  end;
+  UISearchController = interface(UIViewController)
+    ['{0EBA9215-8451-4533-A1A1-993F074126F2}']
+    function initWithSearchResultsController(searchResultsController: UIViewController): Pointer{instancetype}; cdecl;
+    procedure setSearchResultsUpdater(searchResultsUpdater: Pointer); cdecl;
+    function searchResultsUpdater: Pointer; cdecl;
+    procedure setActive(active: Boolean); cdecl;
+    function isActive: Boolean; cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    function delegate: Pointer; cdecl;
+    procedure setDimsBackgroundDuringPresentation(dimsBackgroundDuringPresentation: Boolean); cdecl;
+    function dimsBackgroundDuringPresentation: Boolean; cdecl;
+    procedure setHidesNavigationBarDuringPresentation(hidesNavigationBarDuringPresentation: Boolean); cdecl;
+    function hidesNavigationBarDuringPresentation: Boolean; cdecl;
+    function searchResultsController: UIViewController; cdecl;
+    function searchBar: UISearchBar; cdecl;
+  end;
+  TUISearchController = class(TOCGenericImport<UISearchControllerClass, UISearchController>)
+  end;
+  PUISearchController = Pointer;
+
+  UIVideoEditorControllerClass = interface(UINavigationControllerClass)
+    ['{8C745044-2178-423C-9799-8933FFC7526B}']
+    {class} function canEditVideoAtPath(videoPath: NSString): Boolean; cdecl;
+  end;
+  UIVideoEditorController = interface(UINavigationController)
+    ['{6098EB7F-17EF-4E74-84AC-5434AAB6CE1F}']
+    function delegate: Pointer; cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setVideoMaximumDuration(videoMaximumDuration: NSTimeInterval); cdecl;
+    procedure setVideoPath(videoPath: NSString); cdecl;
+    procedure setVideoQuality(videoQuality: UIImagePickerControllerQualityType); cdecl;
+    function videoMaximumDuration: NSTimeInterval; cdecl;
+    function videoPath: NSString; cdecl;
+    function videoQuality: UIImagePickerControllerQualityType; cdecl;
+  end;
+  TUIVideoEditorController = class(TOCGenericImport<UIVideoEditorControllerClass, UIVideoEditorController>)  end;
+
+  UIButtonClass = interface(UIControlClass)
+    ['{183E87F4-3D08-43E6-911A-219EE6D46166}']
+    {class} function buttonWithType(buttonType: UIButtonType): Pointer; cdecl;
+  end;
+  UIButton = interface(UIControl)
+    ['{73F43D61-2EAC-4902-834E-11BBC2B84102}']
+    function adjustsImageWhenDisabled: Boolean; cdecl;
+    function adjustsImageWhenHighlighted: Boolean; cdecl;
+    function backgroundImageForState(state: UIControlState): UIImage; cdecl;
+    function backgroundRectForBounds(bounds: CGRect): CGRect; cdecl;
+    function buttonType: UIButtonType; cdecl;
+    function contentEdgeInsets: UIEdgeInsets; cdecl;
+    function contentRectForBounds(bounds: CGRect): CGRect; cdecl;
+    function currentBackgroundImage: UIImage; cdecl;
+    function currentImage: UIImage; cdecl;
+    function currentTitle: NSString; cdecl;
+    function currentTitleColor: UIColor; cdecl;
+    function currentTitleShadowColor: UIColor; cdecl;
+    function font: UIFont; cdecl;
+    function imageEdgeInsets: UIEdgeInsets; cdecl;
+    function imageForState(state: UIControlState): UIImage; cdecl;
+    function imageRectForContentRect(contentRect: CGRect): CGRect; cdecl;
+    function imageView: UIImageView; cdecl;
+    function lineBreakMode: UILineBreakMode; cdecl;
+    function reversesTitleShadowWhenHighlighted: Boolean; cdecl;
+    procedure setAdjustsImageWhenDisabled(adjustsImageWhenDisabled: Boolean); cdecl;
+    procedure setAdjustsImageWhenHighlighted(adjustsImageWhenHighlighted: Boolean); cdecl;
+    procedure setBackgroundImage(image: UIImage; forState: UIControlState); cdecl;
+    procedure setContentEdgeInsets(contentEdgeInsets: UIEdgeInsets); cdecl;
+    procedure setFont(font: UIFont); cdecl;
+    procedure setImage(image: UIImage; forState: UIControlState); cdecl;
+    procedure setImageEdgeInsets(imageEdgeInsets: UIEdgeInsets); cdecl;
+    procedure setLineBreakMode(lineBreakMode: UILineBreakMode); cdecl;
+    procedure setReversesTitleShadowWhenHighlighted(reversesTitleShadowWhenHighlighted: Boolean); cdecl;
+    procedure setShowsTouchWhenHighlighted(showsTouchWhenHighlighted: Boolean); cdecl;
+    procedure setTintColor(tintColor: UIColor); cdecl;
+    procedure setTitle(title: NSString; forState: UIControlState); cdecl;
+    procedure setTitleColor(color: UIColor; forState: UIControlState); cdecl;
+    procedure setTitleEdgeInsets(titleEdgeInsets: UIEdgeInsets); cdecl;
+    procedure setTitleShadowColor(color: UIColor; forState: UIControlState); cdecl;
+    procedure setTitleShadowOffset(titleShadowOffset: CGSize); cdecl;
+    function showsTouchWhenHighlighted: Boolean; cdecl;
+    function tintColor: UIColor; cdecl;
+    function titleColorForState(state: UIControlState): UIColor; cdecl;
+    function titleEdgeInsets: UIEdgeInsets; cdecl;
+    function titleForState(state: UIControlState): NSString; cdecl;
+    function titleLabel: UILabel; cdecl;
+    function titleRectForContentRect(contentRect: CGRect): CGRect; cdecl;
+    function titleShadowColorForState(state: UIControlState): UIColor; cdecl;
+    function titleShadowOffset: CGSize; cdecl;
+  end;
+  TUIButton = class(TOCGenericImport<UIButtonClass, UIButton>)  end;
+
+  UIStepperClass = interface(UIControlClass)
+    ['{98CFAF41-6DE2-458A-AD1C-3159198C8ABF}']
+  end;
+  UIStepper = interface(UIControl)
+    ['{C6CE3399-B896-4E50-8663-61637BFD791D}']
+    function autorepeat: Boolean; cdecl;
+    function isContinuous: Boolean; cdecl;
+    function maximumValue: double; cdecl;
+    function minimumValue: double; cdecl;
+    procedure setAutorepeat(autorepeat: Boolean); cdecl;
+    procedure setContinuous(continuous: Boolean); cdecl;
+    procedure setMaximumValue(maximumValue: double); cdecl;
+    procedure setMinimumValue(minimumValue: double); cdecl;
+    procedure setStepValue(stepValue: double); cdecl;
+    procedure setValue(value: double); cdecl;
+    procedure setWraps(wraps: Boolean); cdecl;
+    function stepValue: double; cdecl;
+    function value: double; cdecl;
+    function wraps: Boolean; cdecl;
+  end;
+  TUIStepper = class(TOCGenericImport<UIStepperClass, UIStepper>)  end;
+
+  UISliderClass = interface(UIControlClass)
+    ['{8F6BB419-10A7-4B89-88D8-A9CD27D427FE}']
+  end;
+  UISlider = interface(UIControl)
+    ['{50F62B14-EA25-41F4-BCC8-00587E789C15}']
+    function currentMaximumTrackImage: UIImage; cdecl;
+    function currentMinimumTrackImage: UIImage; cdecl;
+    function currentThumbImage: UIImage; cdecl;
+    function isContinuous: Boolean; cdecl;
+    function maximumTrackImageForState(state: UIControlState): UIImage; cdecl;
+    function maximumTrackTintColor: UIColor; cdecl;
+    function maximumValue: Single; cdecl;
+    function maximumValueImage: UIImage; cdecl;
+    function maximumValueImageRectForBounds(bounds: CGRect): CGRect; cdecl;
+    function minimumTrackImageForState(state: UIControlState): UIImage; cdecl;
+    function minimumTrackTintColor: UIColor; cdecl;
+    function minimumValue: Single; cdecl;
+    function minimumValueImage: UIImage; cdecl;
+    function minimumValueImageRectForBounds(bounds: CGRect): CGRect; cdecl;
+    procedure setContinuous(continuous: Boolean); cdecl;
+    procedure setMaximumTrackImage(image: UIImage; forState: UIControlState); cdecl;
+    procedure setMaximumTrackTintColor(maximumTrackTintColor: UIColor); cdecl;
+    procedure setMaximumValue(maximumValue: Single); cdecl;
+    procedure setMaximumValueImage(maximumValueImage: UIImage); cdecl;
+    procedure setMinimumTrackImage(image: UIImage; forState: UIControlState); cdecl;
+    procedure setMinimumTrackTintColor(minimumTrackTintColor: UIColor); cdecl;
+    procedure setMinimumValue(minimumValue: Single); cdecl;
+    procedure setMinimumValueImage(minimumValueImage: UIImage); cdecl;
+    procedure setThumbImage(image: UIImage; forState: UIControlState); cdecl;
+    procedure setThumbTintColor(thumbTintColor: UIColor); cdecl;
+    procedure setValue(value: Single); cdecl; overload;
+    procedure setValue(value: Single; animated: Boolean); cdecl; overload;
+    function thumbImageForState(state: UIControlState): UIImage; cdecl;
+    function thumbRectForBounds(bounds: CGRect; trackRect: CGRect; value: Single): CGRect; cdecl;
+    function thumbTintColor: UIColor; cdecl;
+    function trackRectForBounds(bounds: CGRect): CGRect; cdecl;
+    function value: Single; cdecl;
+  end;
+  TUISlider = class(TOCGenericImport<UISliderClass, UISlider>)  end;
+
+  UISegmentedControlClass = interface(UIControlClass)
+    ['{60EAB276-F080-4A4B-85CF-3877FADB5459}']
+  end;
+  UISegmentedControl = interface(UIControl)
+    ['{F8025182-9CC0-45A4-BF23-92D349F14062}']
+    function apportionsSegmentWidthsByContent: Boolean; cdecl;
+    function backgroundImageForState(state: UIControlState; barMetrics: UIBarMetrics): UIImage; cdecl;
+    function contentOffsetForSegmentAtIndex(segment: NSUInteger): CGSize; cdecl;
+    function contentPositionAdjustmentForSegmentType(leftCenterRightOrAlone: UISegmentedControlSegment; barMetrics: UIBarMetrics): UIOffset; cdecl;
+    function dividerImageForLeftSegmentState(leftState: UIControlState; rightSegmentState: UIControlState; barMetrics: UIBarMetrics): UIImage; cdecl;
+    function imageForSegmentAtIndex(segment: NSUInteger): UIImage; cdecl;
+    function initWithItems(items: NSArray): Pointer; cdecl;
+    procedure insertSegmentWithImage(image: UIImage; atIndex: NSUInteger; animated: Boolean); cdecl;
+    procedure insertSegmentWithTitle(title: NSString; atIndex: NSUInteger; animated: Boolean); cdecl;
+    function isEnabledForSegmentAtIndex(segment: NSUInteger): Boolean; cdecl;
+    function isMomentary: Boolean; cdecl;
+    function numberOfSegments: NSUInteger; cdecl;
+    procedure removeAllSegments; cdecl;
+    procedure removeSegmentAtIndex(segment: NSUInteger; animated: Boolean); cdecl;
+    function segmentedControlStyle: UISegmentedControlStyle; cdecl;
+    function selectedSegmentIndex: NSInteger; cdecl;
+    procedure setApportionsSegmentWidthsByContent(apportionsSegmentWidthsByContent: Boolean); cdecl;
+    procedure setBackgroundImage(backgroundImage: UIImage; forState: UIControlState; barMetrics: UIBarMetrics); cdecl;
+    procedure setContentOffset(offset: CGSize; forSegmentAtIndex: NSUInteger); cdecl;
+    procedure setContentPositionAdjustment(adjustment: UIOffset; forSegmentType: UISegmentedControlSegment; barMetrics: UIBarMetrics); cdecl;
+    procedure setDividerImage(dividerImage: UIImage; forLeftSegmentState: UIControlState; rightSegmentState: UIControlState; barMetrics: UIBarMetrics); cdecl;
+    procedure setEnabled(enabled: Boolean; forSegmentAtIndex: NSUInteger); cdecl;
+    procedure setImage(image: UIImage; forSegmentAtIndex: NSUInteger); cdecl;
+    procedure setMomentary(momentary: Boolean); cdecl;
+    procedure setSegmentedControlStyle(segmentedControlStyle: UISegmentedControlStyle); cdecl;
+    procedure setSelectedSegmentIndex(selectedSegmentIndex: NSInteger); cdecl;
+    procedure setTintColor(tintColor: UIColor); cdecl;
+    procedure setTitle(title: NSString; forSegmentAtIndex: NSUInteger); cdecl;
+    procedure setTitleTextAttributes(attributes: NSDictionary; forState: UIControlState); cdecl;
+    procedure setWidth(width: CGFloat; forSegmentAtIndex: NSUInteger); cdecl;
+    function tintColor: UIColor; cdecl;
+    function titleForSegmentAtIndex(segment: NSUInteger): NSString; cdecl;
+    function titleTextAttributesForState(state: UIControlState): NSDictionary; cdecl;
+    function widthForSegmentAtIndex(segment: NSUInteger): CGFloat; cdecl;
+  end;
+  TUISegmentedControl = class(TOCGenericImport<UISegmentedControlClass, UISegmentedControl>)  end;
+
+  UIDatePickerClass = interface(UIControlClass)
+    ['{FC89C5F2-AEFA-4D4E-AFEC-483F443A167B}']
+  end;
+  UIDatePicker = interface(UIControl)
+    ['{58D30B69-5CB3-4CB1-ABDB-CAC1783256FA}']
+    function calendar: NSCalendar; cdecl;
+    function countDownDuration: NSTimeInterval; cdecl;
+    function date: NSDate; cdecl;
+    function datePickerMode: UIDatePickerMode; cdecl;
+    function locale: NSLocale; cdecl;
+    function maximumDate: NSDate; cdecl;
+    function minimumDate: NSDate; cdecl;
+    function minuteInterval: NSInteger; cdecl;
+    procedure setCalendar(calendar: NSCalendar); cdecl;
+    procedure setCountDownDuration(countDownDuration: NSTimeInterval); cdecl;
+    procedure setDate(date: NSDate); cdecl; overload;
+    procedure setDate(date: NSDate; animated: Boolean); cdecl; overload;
+    procedure setDatePickerMode(datePickerMode: UIDatePickerMode); cdecl;
+    procedure setLocale(locale: NSLocale); cdecl;
+    procedure setMaximumDate(maximumDate: NSDate); cdecl;
+    procedure setMinimumDate(minimumDate: NSDate); cdecl;
+    procedure setMinuteInterval(minuteInterval: NSInteger); cdecl;
+    procedure setTimeZone(timeZone: NSTimeZone); cdecl;
+    function timeZone: NSTimeZone; cdecl;
+  end;
+  TUIDatePicker = class(TOCGenericImport<UIDatePickerClass, UIDatePicker>)  end;
+
+  UIPageControlClass = interface(UIControlClass)
+    ['{2D02A274-7CE8-409C-85F5-6E6EDA6A5C92}']
+  end;
+  UIPageControl = interface(UIControl)
+    ['{E99DE502-9B21-4E38-B1F1-A85B357D0E65}']
+    function currentPage: NSInteger; cdecl;
+    function defersCurrentPageDisplay: Boolean; cdecl;
+    function hidesForSinglePage: Boolean; cdecl;
+    function numberOfPages: NSInteger; cdecl;
+    procedure setCurrentPage(currentPage: NSInteger); cdecl;
+    procedure setDefersCurrentPageDisplay(defersCurrentPageDisplay: Boolean); cdecl;
+    procedure setHidesForSinglePage(hidesForSinglePage: Boolean); cdecl;
+    procedure setNumberOfPages(numberOfPages: NSInteger); cdecl;
+    function sizeForNumberOfPages(pageCount: NSInteger): CGSize; cdecl;
+    procedure updateCurrentPageDisplay; cdecl;
+  end;
+  TUIPageControl = class(TOCGenericImport<UIPageControlClass, UIPageControl>)  end;
+
+  UIImagePickerControllerClass = interface(UINavigationControllerClass)
+    ['{995609A0-E3FC-4083-AD2C-73EBB6DD2686}']
+    {class} function availableCaptureModesForCameraDevice(cameraDevice: UIImagePickerControllerCameraDevice): NSArray; cdecl;
+    {class} function availableMediaTypesForSourceType(sourceType: UIImagePickerControllerSourceType): NSArray; cdecl;
+    {class} function isCameraDeviceAvailable(cameraDevice: UIImagePickerControllerCameraDevice): Boolean; cdecl;
+    {class} function isFlashAvailableForCameraDevice(cameraDevice: UIImagePickerControllerCameraDevice): Boolean; cdecl;
+    {class} function isSourceTypeAvailable(sourceType: UIImagePickerControllerSourceType): Boolean; cdecl;
+  end;
+  UIImagePickerController = interface(UINavigationController)
+    ['{D53CD2AC-4FB2-454C-9BDB-BC4858778909}']
+    function allowsEditing: Boolean; cdecl;
+    function allowsImageEditing: Boolean; cdecl;
+    function cameraCaptureMode: UIImagePickerControllerCameraCaptureMode; cdecl;
+    function cameraDevice: UIImagePickerControllerCameraDevice; cdecl;
+    function cameraFlashMode: UIImagePickerControllerCameraFlashMode; cdecl;
+    function cameraOverlayView: UIView; cdecl;
+    function cameraViewTransform: CGAffineTransform; cdecl;
+    function delegate: Pointer; cdecl;
+    function mediaTypes: NSArray; cdecl;
+    procedure setAllowsEditing(allowsEditing: Boolean); cdecl;
+    procedure setAllowsImageEditing(allowsImageEditing: Boolean); cdecl;
+    procedure setCameraCaptureMode(cameraCaptureMode: UIImagePickerControllerCameraCaptureMode); cdecl;
+    procedure setCameraDevice(cameraDevice: UIImagePickerControllerCameraDevice); cdecl;
+    procedure setCameraFlashMode(cameraFlashMode: UIImagePickerControllerCameraFlashMode); cdecl;
+    procedure setCameraOverlayView(cameraOverlayView: UIView); cdecl;
+    procedure setCameraViewTransform(cameraViewTransform: CGAffineTransform); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setMediaTypes(mediaTypes: NSArray); cdecl;
+    procedure setShowsCameraControls(showsCameraControls: Boolean); cdecl;
+    procedure setSourceType(sourceType: UIImagePickerControllerSourceType); cdecl;
+    procedure setVideoMaximumDuration(videoMaximumDuration: NSTimeInterval); cdecl;
+    procedure setVideoQuality(videoQuality: UIImagePickerControllerQualityType); cdecl;
+    function showsCameraControls: Boolean; cdecl;
+    function sourceType: UIImagePickerControllerSourceType; cdecl;
+    function startVideoCapture: Boolean; cdecl;
+    procedure stopVideoCapture; cdecl;
+    procedure takePicture; cdecl;
+    function videoMaximumDuration: NSTimeInterval; cdecl;
+    function videoQuality: UIImagePickerControllerQualityType; cdecl;
+  end;
+  TUIImagePickerController = class(TOCGenericImport<UIImagePickerControllerClass, UIImagePickerController>)  end;
+
+  UITextViewClass = interface(UIScrollViewClass)
+    ['{9D221886-49F8-4614-A1DF-6EAACB1EDE92}']
+  end;
+  UITextView = interface(UIScrollView)
+    ['{1FAC7927-055D-4132-A7D3-913E303A4D6E}']
+    function dataDetectorTypes: UIDataDetectorTypes; cdecl;
+    function delegate: Pointer; cdecl;
+    function font: UIFont; cdecl;
+    function hasText: Boolean; cdecl;
+    function inputAccessoryView: UIView; cdecl;
+    function inputView: UIView; cdecl;
+    function isEditable: Boolean; cdecl;
+    procedure scrollRangeToVisible(range: NSRange); cdecl;
+    function selectedRange: NSRange; cdecl;
+    procedure setDataDetectorTypes(dataDetectorTypes: UIDataDetectorTypes); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setEditable(editable: Boolean); cdecl;
+    procedure setFont(font: UIFont); cdecl;
+    procedure setInputAccessoryView(inputAccessoryView: UIView); cdecl;
+    procedure setInputView(inputView: UIView); cdecl;
+    procedure setSelectedRange(selectedRange: NSRange); cdecl;
+    procedure setText(text: NSString); cdecl;
+    procedure setTextAlignment(textAlignment: UITextAlignment); cdecl;
+    procedure setTextColor(textColor: UIColor); cdecl;
+    procedure setAttributedText(attributedText: NSAttributedString); cdecl;
+    function text: NSString; cdecl;
+    function textAlignment: UITextAlignment; cdecl;
+    function textColor: UIColor; cdecl;
+    function attributedText: NSAttributedString; cdecl;
+    { UITextInputTraits }
+    function autocapitalizationType: UITextAutocapitalizationType; cdecl;
+    function autocorrectionType: UITextAutocorrectionType; cdecl;
+    function enablesReturnKeyAutomatically: Boolean; cdecl;
+    function isSecureTextEntry: Boolean; cdecl;
+    function keyboardAppearance: UIKeyboardAppearance; cdecl;
+    function keyboardType: UIKeyboardType; cdecl;
+    function returnKeyType: UIReturnKeyType; cdecl;
+    procedure setAutocapitalizationType(autocapitalizationType: UITextAutocapitalizationType); cdecl;
+    procedure setAutocorrectionType(autocorrectionType: UITextAutocorrectionType); cdecl;
+    procedure setEnablesReturnKeyAutomatically(enablesReturnKeyAutomatically: Boolean); cdecl;
+    procedure setKeyboardAppearance(keyboardAppearance: UIKeyboardAppearance); cdecl;
+    procedure setKeyboardType(keyboardType: UIKeyboardType); cdecl;
+    procedure setReturnKeyType(returnKeyType: UIReturnKeyType); cdecl;
+    procedure setSecureTextEntry(secureTextEntry: Boolean); cdecl;
+    procedure setSpellCheckingType(spellCheckingType: Integer); cdecl;
+    function spellCheckingType: Integer; cdecl;
+    procedure setSelectedTextRange(SelectedTextRange: UITextRange); cdecl;
+    procedure unmarkText; cdecl;
+    { UITextInput }
+    function markedTextRange: UITextRange; cdecl;
+    procedure setTextContainerInset(textContainerInset: UIEdgeInsets); cdecl; // << https://quality.embarcadero.com/browse/RSP-18314
+    function textContainerInset: UIEdgeInsets; cdecl; // << https://quality.embarcadero.com/browse/RSP-18314
+  end;
+  TUITextView = class(TOCGenericImport<UITextViewClass, UITextView>)  end;
+
+  UISwitchClass = interface(UIControlClass)
+    ['{BF60A5F6-0765-4BDF-9328-072D3CB9C92B}']
+  end;
+  UISwitch = interface(UIControl)
+    ['{CC5A762A-FE08-46A3-B994-444FC01C936D}']
+    function initWithFrame(frame: CGRect): Pointer; cdecl;
+    function isOn: Boolean; cdecl;
+    function onTintColor: UIColor; cdecl;
+    procedure setOn(on: Boolean); cdecl; overload;
+    procedure setOn(on: Boolean; animated: Boolean); cdecl; overload;
+    procedure setOnTintColor(onTintColor: UIColor); cdecl;
+  end;
+  TUISwitch = class(TOCGenericImport<UISwitchClass, UISwitch>)  end;
+
+// ===== Protocol declarations =====
+  UIActionSheetDelegate = interface(IObjectiveC)
+    ['{EEFD40E4-3A92-4775-BF34-728C122AF10F}']
+    procedure actionSheet(actionSheet: UIActionSheet; clickedButtonAtIndex: NSInteger); cdecl; //overload;
+//    procedure actionSheet(actionSheet: UIActionSheet; didDismissWithButtonIndex: NSInteger); cdecl; overload;
+//    procedure actionSheet(actionSheet: UIActionSheet; willDismissWithButtonIndex: NSInteger); cdecl; overload;
+    procedure actionSheetCancel(actionSheet: UIActionSheet); cdecl;
+    procedure didPresentActionSheet(actionSheet: UIActionSheet); cdecl;
+    procedure willPresentActionSheet(actionSheet: UIActionSheet); cdecl;
+  end;
+
+  UIAlertViewDelegate = interface(IObjectiveC)
+    ['{A52A64A0-AA7E-422E-B7A4-8EFCF2C20A49}']
+    procedure alertView(alertView: UIAlertView; clickedButtonAtIndex: NSInteger); cdecl; overload;
+    procedure alertViewCancel(alertView: UIAlertView); cdecl;
+    procedure didPresentAlertView(alertView: UIAlertView); cdecl;
+    [MethodName('alertView:didDismissWithButtonIndex:')]
+    procedure alertViewDidDismissWithButtonIndex(alertView: UIAlertView; didDismissWithButtonIndex: NSInteger); cdecl;
+  end;
+
+  UIApplicationDelegate = interface(IObjectiveC)
+    ['{C0474DD7-D5B4-462D-9A32-577497307259}']
+    procedure application(Sender: UIApplication; didChangeStatusBarFrame: CGRect); cdecl; overload;
+    procedure application(Sender: UIApplication; didChangeStatusBarOrientation: UIInterfaceOrientation); cdecl; overload;
+    procedure application(Sender: UIApplication; didFailToRegisterForRemoteNotificationsWithError: NSError); cdecl; overload;
+    function application(Sender: UIApplication; didFinishLaunchingWithOptions: NSDictionary): Boolean; cdecl; overload;
+    procedure application(Sender: UIApplication; didReceiveLocalNotification: UILocalNotification); cdecl; overload;
+//    procedure application(Sender: UIApplication; didReceiveRemoteNotification: NSDictionary); cdecl; overload;
+    procedure application(Sender: UIApplication; didRegisterForRemoteNotificationsWithDeviceToken: NSData); cdecl; overload;
+    function application(Sender: UIApplication; handleOpenURL: NSURL): Boolean; cdecl; overload;
+    function application(Sender: UIApplication; openURL: NSURL; sourceApplication: NSString; annotation: Pointer): Boolean; cdecl; overload;
+//    procedure application(Sender: UIApplication; willChangeStatusBarFrame: CGRect); cdecl; overload;
+    procedure application(Sender: UIApplication; willChangeStatusBarOrientation: UIInterfaceOrientation; duration: NSTimeInterval); cdecl; overload;
+    procedure applicationDidBecomeActive(Sender: UIApplication); cdecl;
+    procedure applicationDidEnterBackground(Sender: UIApplication); cdecl;
+//    procedure applicationDidFinishLaunching(Sender: UIApplication); cdecl; // deprecated
+    procedure applicationDidReceiveMemoryWarning(Sender: UIApplication); cdecl;
+    procedure applicationProtectedDataDidBecomeAvailable(Sender: UIApplication); cdecl;
+    procedure applicationProtectedDataWillBecomeUnavailable(Sender: UIApplication); cdecl;
+    procedure applicationSignificantTimeChange(Sender: UIApplication); cdecl;
+    procedure applicationWillEnterForeground(Sender: UIApplication); cdecl;
+    procedure applicationWillResignActive(Sender: UIApplication); cdecl;
+    procedure applicationWillTerminate(Sender: UIApplication); cdecl;
+    procedure setWindow(window: UIWindow); cdecl;
+    function window: UIWindow; cdecl;
+    [MethodName('application:didRegisterUserNotificationSettings:')]
+    procedure applicationDidRegisterUserNotificationSettings(application: UIApplication;
+      didRegisterUserNotificationSettings: UIUserNotificationSettings); cdecl;
+    [MethodName('application:didRegisterForRemoteNotificationsWithDeviceToken:')]
+    procedure applicationDidRegisterForRemoteNotificationsWithDeviceToken(application: UIApplication;
+      didRegisterForRemoteNotificationsWithDeviceToken: NSData); cdecl;
+    [MethodName('application:didFailToRegisterForRemoteNotificationsWithError:')]
+    procedure applicationDidFailToRegisterForRemoteNotificationsWithError(application: UIApplication;
+      didFailToRegisterForRemoteNotificationsWithError: NSError); cdecl;
+    [MethodName('application:didReceiveRemoteNotification:')]
+    procedure applicationDidReceiveRemoteNotification(application: UIApplication;
+      didReceiveRemoteNotification: NSDictionary); cdecl;
+    [MethodName('application:didReceiveLocalNotification:')]
+    procedure applicationDidReceiveLocalNotification(application: UIApplication;
+      didReceiveLocalNotification: UILocalNotification); cdecl;
+  end;
+
+  UIGestureRecognizerDelegate = interface(IObjectiveC)
+    ['{96522BE4-CA33-4F69-9581-494DFD050D01}']
+    function gestureRecognizer(gestureRecognizer: UIGestureRecognizer; shouldReceiveTouch: UITouch): Boolean; cdecl; overload;
+    function gestureRecognizer(gestureRecognizer: UIGestureRecognizer; shouldRecognizeSimultaneouslyWithGestureRecognizer: UIGestureRecognizer): Boolean; cdecl; overload;
+    function gestureRecognizerShouldBegin(gestureRecognizer: UIGestureRecognizer): Boolean; cdecl;
+  end;
+
+  UIImagePickerControllerDelegate = interface(IObjectiveC)
+    ['{EF6254E7-276D-41B4-8374-7C68142C4613}']
+    procedure imagePickerController(picker: UIImagePickerController; didFinishPickingImage: UIImage; editingInfo: NSDictionary); cdecl; overload;
+    procedure imagePickerController(picker: UIImagePickerController; didFinishPickingMediaWithInfo: NSDictionary); cdecl; overload;
+    procedure imagePickerControllerDidCancel(picker: UIImagePickerController); cdecl;
+  end;
+
+  UIPickerViewDataSource = interface(IObjectiveC)
+    ['{0FA66D5F-4FE4-47A6-B326-3E5AC9D191B0}']
+    function numberOfComponentsInPickerView(pickerView: UIPickerView): NSInteger; cdecl;
+    function pickerView(pickerView: UIPickerView; numberOfRowsInComponent: NSInteger): NSInteger; cdecl;
+  end;
+  UIPickerViewDelegate = interface(IObjectiveC)
+    ['{FAB79BDD-7094-41B0-B4C6-AF6C261EED91}']
+//    procedure pickerView(pickerView: UIPickerView; didSelectRow: NSInteger; inComponent: NSInteger); cdecl; overload;
+//    function pickerView(pickerView: UIPickerView; rowHeightForComponent: NSInteger): CGFloat; cdecl; overload;
+    function pickerView(pickerView: UIPickerView; titleForRow: NSInteger; forComponent: NSInteger): NSString; cdecl; overload;
+//    function pickerView(pickerView: UIPickerView; viewForRow: NSInteger; forComponent: NSInteger; reusingView: UIView): UIView; cdecl; overload;
+//    function pickerView(pickerView: UIPickerView; widthForComponent: NSInteger): CGFloat; cdecl; overload;
+  end;
+
+  UIPopoverControllerDelegate = interface(IObjectiveC)
+    ['{AA90B09A-9499-44CF-8B0E-31608EB2C548}']
+    procedure popoverControllerDidDismissPopover(popoverController: UIPopoverController); cdecl;
+    function popoverControllerShouldDismissPopover(popoverController: UIPopoverController): Boolean; cdecl;
+  end;
+
+  UITextSelecting = interface(IObjectiveC)
+    ['{5449FDE1-9A5D-4C67-BC30-512B07AD2716}']
+  end;
+
+  UITextFieldDelegate = interface(IObjectiveC)
+    ['{B76C73F8-2740-4580-9987-A040C245441A}']
+    function textField(textField: UITextField; shouldChangeCharactersInRange: NSRange; replacementString: NSString): Boolean; cdecl;
+    procedure textFieldDidBeginEditing(textField: UITextField); cdecl;
+    procedure textFieldDidEndEditing(textField: UITextField); cdecl;
+    function textFieldShouldBeginEditing(textField: UITextField): Boolean; cdecl;
+    function textFieldShouldClear(textField: UITextField): Boolean; cdecl;
+    function textFieldShouldEndEditing(textField: UITextField): Boolean; cdecl;
+    function textFieldShouldReturn(textField: UITextField): Boolean; cdecl;
+  end;
+
+  UITextInputTraits = interface(IObjectiveC)
+    ['{339F9183-3915-4915-88F4-1C0BAD43DEA8}']
+    function autocapitalizationType: UITextAutocapitalizationType; cdecl;
+    function autocorrectionType: UITextAutocorrectionType; cdecl;
+    function enablesReturnKeyAutomatically: Boolean; cdecl;
+    function isSecureTextEntry: Boolean; cdecl;
+    function keyboardAppearance: UIKeyboardAppearance; cdecl;
+    function keyboardType: UIKeyboardType; cdecl;
+    function returnKeyType: UIReturnKeyType; cdecl;
+    procedure setAutocapitalizationType(autocapitalizationType: UITextAutocapitalizationType); cdecl;
+    procedure setAutocorrectionType(autocorrectionType: UITextAutocorrectionType); cdecl;
+    procedure setEnablesReturnKeyAutomatically(enablesReturnKeyAutomatically: Boolean); cdecl;
+    procedure setKeyboardAppearance(keyboardAppearance: UIKeyboardAppearance); cdecl;
+    procedure setKeyboardType(keyboardType: UIKeyboardType); cdecl;
+    procedure setReturnKeyType(returnKeyType: UIReturnKeyType); cdecl;
+    procedure setSecureTextEntry(secureTextEntry: Boolean); cdecl;
+    procedure setSpellCheckingType(spellCheckingType: NSInteger); cdecl;
+    function spellCheckingType: NSInteger; cdecl;
+  end;
+  UIKeyInput = interface(UITextInputTraits)
+    ['{EC035971-A21F-43C6-ABF7-DB5973705897}']
+    procedure deleteBackward; cdecl;
+    function hasText: Boolean; cdecl;
+    procedure insertText(text: NSString); cdecl;
+  end;
+  UITextInput = interface(UIKeyInput)
+    ['{2DF76AA7-B045-44A4-8476-894BA616585C}']
+    function baseWritingDirectionForPosition(position: UITextPosition; inDirection: UITextStorageDirection): UITextWritingDirection; cdecl;
+    function beginningOfDocument: UITextPosition; cdecl;
+    function caretRectForPosition(position: UITextPosition): CGRect; cdecl;
+//    function characterOffsetOfPosition(position: UITextPosition; withinRange: UITextRange): NSInteger; cdecl;
+    function characterRangeAtPoint(point: CGPoint): UITextRange; cdecl;
+    function characterRangeByExtendingPosition(position: UITextPosition; inDirection: UITextLayoutDirection): UITextRange; cdecl;
+    function closestPositionToPoint(point: CGPoint): UITextPosition; cdecl; overload;
+    function closestPositionToPoint(point: CGPoint; withinRange: UITextRange): UITextPosition; cdecl; overload;
+    function comparePosition(position: UITextPosition; toPosition: UITextPosition): NSComparisonResult; cdecl;
+    function endOfDocument: UITextPosition; cdecl;
+    function firstRectForRange(range: UITextRange): CGRect; cdecl;
+    function inputDelegate: Pointer; cdecl;
+    function markedTextRange: UITextRange; cdecl;
+    function markedTextStyle: NSDictionary; cdecl;
+    function offsetFromPosition(from: UITextPosition; toPosition: UITextPosition): NSInteger; cdecl;
+    function positionFromPosition(position: UITextPosition; inDirection: UITextLayoutDirection; offset: NSInteger): UITextPosition; cdecl; overload;
+    function positionFromPosition(position: UITextPosition; offset: NSInteger): UITextPosition; cdecl; overload;
+//    function positionWithinRange(range: UITextRange; atCharacterOffset: NSInteger): UITextPosition; cdecl; overload;
+    function positionWithinRange(range: UITextRange; farthestInDirection: UITextLayoutDirection): UITextPosition; cdecl; //overload;
+    procedure replaceRange(range: UITextRange; withText: NSString); cdecl;
+    function selectedTextRange: UITextRange; cdecl;
+//    function selectionAffinity: UITextStorageDirection; cdecl;
+    procedure setBaseWritingDirection(writingDirection: UITextWritingDirection; forRange: UITextRange); cdecl;
+    procedure setInputDelegate(inputDelegate: UITextInputDelegate); cdecl;
+    procedure setMarkedText(markedText: NSString; selectedRange: NSRange); cdecl;
+    procedure setMarkedTextStyle(markedTextStyle: NSDictionary); cdecl;
+    procedure setSelectedTextRange(selectedTextRange: UITextRange); cdecl;
+//    procedure setSelectionAffinity(selectionAffinity: UITextStorageDirection); cdecl;
+    function textInRange(range: UITextRange): NSString; cdecl;
+//    function textInputView: UIView; cdecl;
+    function textRangeFromPosition(fromPosition: UITextPosition; toPosition: UITextPosition): UITextRange; cdecl;
+//    function textStylingAtPosition(position: UITextPosition; inDirection: UITextStorageDirection): NSDictionary; cdecl;
+    function tokenizer: Pointer; cdecl;
+    procedure unmarkText; cdecl;
+    { Dictation }
+//    procedure dictationRecordingDidEnd; cdecl;
+//    procedure dictationRecognitionFailed; cdecl;
+    procedure insertDictationResult(dictationResult: NSArray); cdecl;
+    function insertDictationResultPlaceholder: Pointer {id}; cdecl;
+    function frameForDictationResultPlaceholder(placeholder: Pointer {id}): CGRect; cdecl;
+    procedure removeDictationResultPlaceholder(placeholder: Pointer {id}; willInsertResult: Boolean); cdecl;
+  end;
+
+  UIWebViewDelegate = interface(IObjectiveC)
+    ['{25E7C20B-68A2-4011-9D7F-B97647BD48C0}']
+    procedure webView(webView: UIWebView; didFailLoadWithError: NSError); cdecl; overload;
+    function webView(webView: UIWebView; shouldStartLoadWithRequest: NSURLRequest; navigationType: UIWebViewNavigationType): Boolean; cdecl; overload;
+    procedure webViewDidFinishLoad(webView: UIWebView); cdecl;
+    procedure webViewDidStartLoad(webView: UIWebView); cdecl;
+  end;
+
+  UIMotionEffectClass = interface(NSObjectClass)
+    ['{D3443E1C-4B13-46E0-B5ED-4D36EE9D584A}']
+  end;
+
+  UIMotionEffect = interface(NSObject)
+    ['{6557C96B-FEE8-492C-9001-728428F1EDA4}']
+    function keyPathsAndRelativeValuesForViewerOffset(viewerOffset: UIOffset): NSDictionary; cdecl;
+  end;
+
+  TUIMotionEffect = class(TOCGenericImport<UIMotionEffectClass, UIMotionEffect>)
+  end;
+
+  UITextFieldClass = interface(UIControlClass)
+    ['{EF7B089F-A484-44E2-85A1-B0BAFCB31DAC}']
+  end;
+  UITextField = interface(UIControl)
+    ['{1BCFFC8A-8744-4A3F-A441-DB7B2124AB52}']
+    function adjustsFontSizeToFitWidth: Boolean; cdecl;
+    function background: UIImage; cdecl;
+    function borderRectForBounds(bounds: CGRect): CGRect; cdecl;
+    function borderStyle: UITextBorderStyle; cdecl;
+    function clearButtonMode: UITextFieldViewMode; cdecl;
+    function clearButtonRectForBounds(bounds: CGRect): CGRect; cdecl;
+    function clearsOnBeginEditing: Boolean; cdecl;
+    function delegate: Pointer; cdecl;
+    function disabledBackground: UIImage; cdecl;
+    procedure drawPlaceholderInRect(rect: CGRect); cdecl;
+    procedure drawTextInRect(rect: CGRect); cdecl;
+    function editingRectForBounds(bounds: CGRect): CGRect; cdecl;
+    function font: UIFont; cdecl;
+    function inputAccessoryView: UIView; cdecl;
+    function inputView: UIView; cdecl;
+    function isEditing: Boolean; cdecl;
+    function leftView: UIView; cdecl;
+    function leftViewMode: UITextFieldViewMode; cdecl;
+    function leftViewRectForBounds(bounds: CGRect): CGRect; cdecl;
+    function minimumFontSize: CGFloat; cdecl;
+    function placeholder: NSString; cdecl;
+    function placeholderRectForBounds(bounds: CGRect): CGRect; cdecl;
+    function rightView: UIView; cdecl;
+    function rightViewMode: UITextFieldViewMode; cdecl;
+    function rightViewRectForBounds(bounds: CGRect): CGRect; cdecl;
+    function selectedTextRange: UITextRange; cdecl;
+    procedure setAdjustsFontSizeToFitWidth(adjustsFontSizeToFitWidth: Boolean); cdecl;
+    procedure setBackground(background: UIImage); cdecl;
+    procedure setBorderStyle(borderStyle: UITextBorderStyle); cdecl;
+    procedure setClearButtonMode(clearButtonMode: UITextFieldViewMode); cdecl;
+    procedure setClearsOnBeginEditing(clearsOnBeginEditing: Boolean); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setDisabledBackground(disabledBackground: UIImage); cdecl;
+    procedure setFont(font: UIFont); cdecl;
+    procedure setInputAccessoryView(inputAccessoryView: UIView); cdecl;
+    procedure setInputView(inputView: UIView); cdecl;
+    procedure setLeftView(leftView: UIView); cdecl;
+    procedure setLeftViewMode(leftViewMode: UITextFieldViewMode); cdecl;
+    procedure setMinimumFontSize(minimumFontSize: CGFloat); cdecl;
+    procedure setPlaceholder(placeholder: NSString); cdecl;
+    procedure setRightView(rightView: UIView); cdecl;
+    procedure setRightViewMode(rightViewMode: UITextFieldViewMode); cdecl;
+    procedure setText(text: NSString); cdecl;
+    procedure setTextAlignment(textAlignment: UITextAlignment); cdecl;
+    procedure setTextColor(textColor: UIColor); cdecl;
+    procedure setTintAdjustmentMode(mode: UIViewTintAdjustmentMode); cdecl;
+    procedure setAttributedText(attributedText: NSAttributedString); cdecl;
+    procedure setDefaultTextAttributes(defaultTextAttributes: NSDictionary); cdecl; // https://quality.embarcadero.com/browse/RSP-16971
+    procedure setAttributedPlaceholder(attributedPlaceholder: NSAttributedString); cdecl; // https://quality.embarcadero.com/browse/RSP-16971
+    function text: Pointer; cdecl;
+    function textAlignment: UITextAlignment; cdecl;
+    function textColor: UIColor; cdecl;
+    function textRectForBounds(bounds: CGRect): CGRect; cdecl;
+    function attributedText: NSAttributedString; cdecl;
+    { UITextInputTraits }
+    function autocapitalizationType: UITextAutocapitalizationType; cdecl;
+    function autocorrectionType: UITextAutocorrectionType; cdecl;
+    function enablesReturnKeyAutomatically: Boolean; cdecl;
+    function isSecureTextEntry: Boolean; cdecl;
+    function keyboardAppearance: UIKeyboardAppearance; cdecl;
+    function keyboardType: UIKeyboardType; cdecl;
+    function returnKeyType: UIReturnKeyType; cdecl;
+    procedure setAutocapitalizationType(autocapitalizationType: UITextAutocapitalizationType); cdecl;
+    procedure setAutocorrectionType(autocorrectionType: UITextAutocorrectionType); cdecl;
+    procedure setEnablesReturnKeyAutomatically(enablesReturnKeyAutomatically: Boolean); cdecl;
+    procedure setKeyboardAppearance(keyboardAppearance: UIKeyboardAppearance); cdecl;
+    procedure setKeyboardType(keyboardType: UIKeyboardType); cdecl;
+    procedure setReturnKeyType(returnKeyType: UIReturnKeyType); cdecl;
+    procedure setSecureTextEntry(secureTextEntry: Boolean); cdecl;
+    procedure setSpellCheckingType(spellCheckingType: Integer); cdecl;
+    function spellCheckingType: Integer; cdecl;
+    procedure setSelectedTextRange(SelectedTextRange: UITextRange); cdecl;
+    procedure unmarkText; cdecl;
+    { UITextInput }
+    function beginningOfDocument: UITextPosition; cdecl;
+    function offsetFromPosition(from: UITextPosition; toPosition: UITextPosition): NSInteger; cdecl;
+    function endOfDocument: UITextPosition; cdecl;
+    function positionFromPosition(position: UITextPosition; offset: NSInteger): UITextPosition; cdecl; overload;
+    function textRangeFromPosition(fromPosition: UITextPosition; toPosition: UITextPosition): UITextRange; cdecl;
+  end;
+  TUITextField = class(TOCGenericImport<UITextFieldClass, UITextField>)  end;
+
+  UITableViewClass = interface(UIScrollViewClass)
+    ['{B4D99C03-D8EE-4C48-BC7E-E235C5E5AA62}']
+  end;
+
+  UITableView = interface(UIScrollView)
+    ['{01DD1629-AB00-4191-979E-9DF263C4CA98}']
+    function initWithFrame(frame: CGRect; style: UITableViewStyle): Pointer; cdecl;
+    function style: UITableViewStyle; cdecl;
+    procedure setDataSource(dataSource: Pointer); cdecl;
+    function dataSource: Pointer; cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    function delegate: Pointer; cdecl;
+    procedure setRowHeight(rowHeight: CGFloat); cdecl;
+    function rowHeight: CGFloat; cdecl;
+    procedure setSectionHeaderHeight(sectionHeaderHeight: CGFloat); cdecl;
+    function sectionHeaderHeight: CGFloat; cdecl;
+    procedure setSectionFooterHeight(sectionFooterHeight: CGFloat); cdecl;
+    function sectionFooterHeight: CGFloat; cdecl;
+    procedure setEstimatedRowHeight(estimatedRowHeight: CGFloat); cdecl;
+    function estimatedRowHeight: CGFloat; cdecl;
+    procedure setEstimatedSectionHeaderHeight(estimatedSectionHeaderHeight: CGFloat); cdecl;
+    function estimatedSectionHeaderHeight: CGFloat; cdecl;
+    procedure setEstimatedSectionFooterHeight(estimatedSectionFooterHeight: CGFloat); cdecl;
+    function estimatedSectionFooterHeight: CGFloat; cdecl;
+    procedure setSeparatorInset(separatorInset: UIEdgeInsets); cdecl;
+    function separatorInset: UIEdgeInsets; cdecl;
+    procedure setBackgroundView(backgroundView: UIView); cdecl;
+    function backgroundView: UIView; cdecl;
+    procedure reloadData; cdecl;
+    procedure reloadSectionIndexTitles; cdecl;
+    function numberOfSections: NSInteger; cdecl;
+    function numberOfRowsInSection(section: NSInteger): NSInteger; cdecl;
+    function rectForSection(section: NSInteger): CGRect; cdecl;
+    function rectForHeaderInSection(section: NSInteger): CGRect; cdecl;
+    function rectForFooterInSection(section: NSInteger): CGRect; cdecl;
+    function rectForRowAtIndexPath(indexPath: NSIndexPath): CGRect; cdecl;
+    function indexPathForRowAtPoint(point: CGPoint): NSIndexPath; cdecl;
+    function indexPathForCell(cell: UITableViewCell): NSIndexPath; cdecl;
+    function indexPathsForRowsInRect(rect: CGRect): NSArray; cdecl;
+    function cellForRowAtIndexPath(indexPath: NSIndexPath): UITableViewCell; cdecl;
+    function visibleCells: NSArray; cdecl;
+    function indexPathsForVisibleRows: NSArray; cdecl;
+    function headerViewForSection(section: NSInteger): UITableViewHeaderFooterView; cdecl;
+    function footerViewForSection(section: NSInteger): UITableViewHeaderFooterView; cdecl;
+    procedure scrollToRowAtIndexPath(indexPath: NSIndexPath; atScrollPosition: UITableViewScrollPosition;
+      animated: Boolean); cdecl;
+    procedure scrollToNearestSelectedRowAtScrollPosition(scrollPosition: UITableViewScrollPosition;
+      animated: Boolean); cdecl;
+    procedure beginUpdates; cdecl;
+    procedure endUpdates; cdecl;
+    procedure insertSections(sections: NSIndexSet; withRowAnimation: UITableViewRowAnimation); cdecl;
+    procedure deleteSections(sections: NSIndexSet; withRowAnimation: UITableViewRowAnimation); cdecl;
+    procedure reloadSections(sections: NSIndexSet; withRowAnimation: UITableViewRowAnimation); cdecl;
+    procedure moveSection(section: NSInteger; toSection: NSInteger); cdecl;
+    procedure insertRowsAtIndexPaths(indexPaths: NSArray; withRowAnimation: UITableViewRowAnimation); cdecl;
+    procedure deleteRowsAtIndexPaths(indexPaths: NSArray; withRowAnimation: UITableViewRowAnimation); cdecl;
+    procedure reloadRowsAtIndexPaths(indexPaths: NSArray; withRowAnimation: UITableViewRowAnimation); cdecl;
+    procedure moveRowAtIndexPath(indexPath: NSIndexPath; toIndexPath: NSIndexPath); cdecl;
+    [MethodName('setEditing:')]
+    procedure setEditing(editing: Boolean); cdecl;
+    function isEditing: Boolean; cdecl;
+    [MethodName('setEditing:animated:')]
+    procedure setEditingAnimated(editing: Boolean; animated: Boolean); cdecl;
+    procedure setAllowsSelection(allowsSelection: Boolean); cdecl;
+    function allowsSelection: Boolean; cdecl;
+    procedure setAllowsSelectionDuringEditing(allowsSelectionDuringEditing: Boolean); cdecl;
+    function allowsSelectionDuringEditing: Boolean; cdecl;
+    procedure setAllowsMultipleSelection(allowsMultipleSelection: Boolean); cdecl;
+    function allowsMultipleSelection: Boolean; cdecl;
+    procedure setAllowsMultipleSelectionDuringEditing(allowsMultipleSelectionDuringEditing: Boolean); cdecl;
+    function allowsMultipleSelectionDuringEditing: Boolean; cdecl;
+    function indexPathForSelectedRow: NSIndexPath; cdecl;
+    function indexPathsForSelectedRows: NSArray; cdecl;
+    procedure selectRowAtIndexPath(indexPath: NSIndexPath; animated: Boolean;
+      scrollPosition: UITableViewScrollPosition); cdecl;
+    procedure deselectRowAtIndexPath(indexPath: NSIndexPath; animated: Boolean); cdecl;
+    procedure setSectionIndexMinimumDisplayRowCount(sectionIndexMinimumDisplayRowCount: NSInteger); cdecl;
+    function sectionIndexMinimumDisplayRowCount: NSInteger; cdecl;
+    procedure setSectionIndexColor(sectionIndexColor: UIColor); cdecl;
+    function sectionIndexColor: UIColor; cdecl;
+    procedure setSectionIndexBackgroundColor(sectionIndexBackgroundColor: UIColor); cdecl;
+    function sectionIndexBackgroundColor: UIColor; cdecl;
+    procedure setSectionIndexTrackingBackgroundColor(sectionIndexTrackingBackgroundColor: UIColor); cdecl;
+    function sectionIndexTrackingBackgroundColor: UIColor; cdecl;
+    procedure setSeparatorStyle(separatorStyle: UITableViewCellSeparatorStyle); cdecl;
+    function separatorStyle: UITableViewCellSeparatorStyle; cdecl;
+    procedure setSeparatorColor(separatorColor: UIColor); cdecl;
+    function separatorColor: UIColor; cdecl;
+    procedure setTableHeaderView(tableHeaderView: UIView); cdecl;
+    function tableHeaderView: UIView; cdecl;
+    procedure setTableFooterView(tableFooterView: UIView); cdecl;
+    function tableFooterView: UIView; cdecl;
+    [MethodName('dequeueReusableCellWithIdentifier:')]
+    function dequeueReusableCellWithIdentifier(identifier: NSString): Pointer; cdecl;
+    [MethodName('dequeueReusableCellWithIdentifier:forIndexPath:')]
+    function dequeueReusableCellWithIdentifierForIndexPath(identifier: NSString; forIndexPath: NSIndexPath)
+      : Pointer; cdecl;
+    function dequeueReusableHeaderFooterViewWithIdentifier(identifier: NSString): Pointer; cdecl;
+    [MethodName('registerNib:forCellReuseIdentifier:')]
+    procedure registerNibForCellReuseIdentifier(nib: UINib; forCellReuseIdentifier: NSString); cdecl;
+    [MethodName('registerClass:forCellReuseIdentifier:')]
+    procedure registerClassForCellReuseIdentifier(cellClass: Pointer; forCellReuseIdentifier: NSString); cdecl;
+    [MethodName('registerNib:forHeaderFooterViewReuseIdentifier:')]
+    procedure registerNibForHeaderFooterViewReuseIdentifier(nib: UINib;
+      forHeaderFooterViewReuseIdentifier: NSString); cdecl;
+    [MethodName('registerClass:forHeaderFooterViewReuseIdentifier:')]
+    procedure registerClassForHeaderFooterViewReuseIdentifier(aClass: Pointer;
+      forHeaderFooterViewReuseIdentifier: NSString); cdecl;
+  end;
+
+  TUITableView = class(TOCGenericImport<UITableViewClass, UITableView>)
+  end;
+
+  UITableViewCellClass = interface(UIViewClass)
+    ['{884E0248-81B6-4CEF-9CD4-DD9FC4349B1E}']
+  end;
+
+  UITableViewCell = interface(UIView)
+    ['{95157E68-D744-4006-88DD-24048B5FCB28}']
+    function initWithStyle(style: UITableViewCellStyle; reuseIdentifier: NSString): Pointer; cdecl;
+    function imageView: UIImageView; cdecl;
+    function textLabel: UILabel; cdecl;
+    function detailTextLabel: UILabel; cdecl;
+    function contentView: UIView; cdecl;
+    procedure setBackgroundView(backgroundView: UIView); cdecl;
+    function backgroundView: UIView; cdecl;
+    procedure setSelectedBackgroundView(selectedBackgroundView: UIView); cdecl;
+    function selectedBackgroundView: UIView; cdecl;
+    procedure setMultipleSelectionBackgroundView(multipleSelectionBackgroundView: UIView); cdecl;
+    function multipleSelectionBackgroundView: UIView; cdecl;
+    function reuseIdentifier: NSString; cdecl;
+    procedure prepareForReuse; cdecl;
+    procedure setSelectionStyle(selectionStyle: UITableViewCellSelectionStyle); cdecl;
+    function selectionStyle: UITableViewCellSelectionStyle; cdecl;
+    [MethodName('setSelected:')]
+    procedure setSelected(selected: Boolean); cdecl;
+    function isSelected: Boolean; cdecl;
+    [MethodName('setHighlighted:')]
+    procedure setHighlighted(highlighted: Boolean); cdecl;
+    function isHighlighted: Boolean; cdecl;
+    [MethodName('setSelected:animated:')]
+    procedure setSelectedAnimated(selected: Boolean; animated: Boolean); cdecl;
+    [MethodName('setHighlighted:animated:')]
+    procedure setHighlightedAnimated(highlighted: Boolean; animated: Boolean); cdecl;
+    function editingStyle: UITableViewCellEditingStyle; cdecl;
+    procedure setShowsReorderControl(showsReorderControl: Boolean); cdecl;
+    function showsReorderControl: Boolean; cdecl;
+    procedure setShouldIndentWhileEditing(shouldIndentWhileEditing: Boolean); cdecl;
+    function shouldIndentWhileEditing: Boolean; cdecl;
+    procedure setAccessoryType(accessoryType: UITableViewCellAccessoryType); cdecl;
+    function accessoryType: UITableViewCellAccessoryType; cdecl;
+    procedure setAccessoryView(accessoryView: UIView); cdecl;
+    function accessoryView: UIView; cdecl;
+    procedure setEditingAccessoryType(editingAccessoryType: UITableViewCellAccessoryType); cdecl;
+    function editingAccessoryType: UITableViewCellAccessoryType; cdecl;
+    procedure setEditingAccessoryView(editingAccessoryView: UIView); cdecl;
+    function editingAccessoryView: UIView; cdecl;
+    procedure setIndentationLevel(indentationLevel: NSInteger); cdecl;
+    function indentationLevel: NSInteger; cdecl;
+    procedure setIndentationWidth(indentationWidth: CGFloat); cdecl;
+    function indentationWidth: CGFloat; cdecl;
+    procedure setSeparatorInset(separatorInset: UIEdgeInsets); cdecl;
+    function separatorInset: UIEdgeInsets; cdecl;
+    [MethodName('setEditing:')]
+    procedure setEditing(editing: Boolean); cdecl;
+    function isEditing: Boolean; cdecl;
+    [MethodName('setEditing:animated:')]
+    procedure setEditingAnimated(editing: Boolean; animated: Boolean); cdecl;
+    function showingDeleteConfirmation: Boolean; cdecl;
+    procedure willTransitionToState(state: UITableViewCellStateMask); cdecl;
+    procedure didTransitionToState(state: UITableViewCellStateMask); cdecl;
+    function initWithFrame(frame: CGRect; reuseIdentifier: NSString): Pointer; cdecl;
+    procedure setText(text: NSString); cdecl;
+    function text: NSString; cdecl;
+    procedure setFont(font: UIFont); cdecl;
+    function font: UIFont; cdecl;
+    procedure setTextAlignment(textAlignment: NSTextAlignment); cdecl;
+    function textAlignment: NSTextAlignment; cdecl;
+    procedure setLineBreakMode(lineBreakMode: NSLineBreakMode); cdecl;
+    function lineBreakMode: NSLineBreakMode; cdecl;
+    procedure setTextColor(textColor: UIColor); cdecl;
+    function textColor: UIColor; cdecl;
+    procedure setSelectedTextColor(selectedTextColor: UIColor); cdecl;
+    function selectedTextColor: UIColor; cdecl;
+    procedure setImage(image: UIImage); cdecl;
+    function image: UIImage; cdecl;
+    procedure setSelectedImage(selectedImage: UIImage); cdecl;
+    function selectedImage: UIImage; cdecl;
+    procedure setHidesAccessoryWhenEditing(hidesAccessoryWhenEditing: Boolean); cdecl;
+    function hidesAccessoryWhenEditing: Boolean; cdecl;
+    procedure setTarget(target: Pointer); cdecl;
+    function target: Pointer; cdecl;
+    procedure setEditAction(editAction: SEL); cdecl;
+    function editAction: SEL; cdecl;
+    procedure setAccessoryAction(accessoryAction: SEL); cdecl;
+    function accessoryAction: SEL; cdecl;
+  end;
+
+  TUITableViewCell = class(TOCGenericImport<UITableViewCellClass,
+    UITableViewCell>)
+  end;
+
+  UITableViewHeaderFooterViewClass = interface(UIViewClass)
+    ['{EDBA7674-8A12-4A75-826A-28685A6F5014}']
+  end;
+
+  UITableViewHeaderFooterView = interface(UIView)
+    ['{C26C9122-8ED4-4EB5-A68A-808ACE61F612}']
+    procedure setTintColor(tintColor: UIColor); cdecl;
+    function tintColor: UIColor; cdecl;
+    function textLabel: UILabel; cdecl;
+    function detailTextLabel: UILabel; cdecl;
+    function contentView: UIView; cdecl;
+    procedure setBackgroundView(backgroundView: UIView); cdecl;
+    function backgroundView: UIView; cdecl;
+    function reuseIdentifier: NSString; cdecl;
+    function initWithReuseIdentifier(reuseIdentifier: NSString): Pointer; cdecl;
+    procedure prepareForReuse; cdecl;
+  end;
+
+  TUITableViewHeaderFooterView = class
+    (TOCGenericImport<UITableViewHeaderFooterViewClass,
+    UITableViewHeaderFooterView>)
+  end;
+
+  UIRefreshControlClass = interface(UIControlClass)
+    ['{5DF576DE-534C-46C1-8834-D8DE06EA085B}']
+  end;
+
+  UIRefreshControl = interface(UIControl)
+    ['{F6235A35-C3DE-41E2-B099-9C180CA3D243}']
+    function init: Pointer; cdecl;
+    function isRefreshing: Boolean; cdecl;
+    procedure setTintColor(tintColor: UIColor); cdecl;
+    function tintColor: UIColor; cdecl;
+    procedure setAttributedTitle(attributedTitle: NSAttributedString); cdecl;
+    function attributedTitle: NSAttributedString; cdecl;
+    procedure beginRefreshing; cdecl;
+    procedure endRefreshing; cdecl;
+  end;
+
+  TUIRefreshControl = class(TOCGenericImport<UIRefreshControlClass,
+    UIRefreshControl>)
+  end;
+
+  NSValueClass = interface(NSObjectClass)
+    ['{32347938-7927-4C6F-8687-47D76753B5E7}']
+    {class} function valueWithCGPoint(point: CGPoint): Pointer; cdecl;
+    {class} function valueWithCGRect(rect: CGRect): Pointer; cdecl;
+    {class} function valueWithCGSize(size: CGSize): Pointer; cdecl;
+    {class} function valueWithUIEdgeInsets(insets: UIEdgeInsets): Pointer; cdecl;
+    {class} function valueWithUIOffset(insets: UIOffset): Pointer; cdecl;
+  end;
+  NSValue = interface(NSObject)
+    ['{0539B6F1-D277-4BCA-95B2-A283B46CB248}']
+    function CGPointValue: CGPoint; cdecl;
+    function CGRectValue: CGRect; cdecl;
+    function CGSizeValue: CGSize; cdecl;
+    function CGAffineTransformValue: CGAffineTransform; cdecl;
+    function UIEdgeInsetsValue: UIEdgeInsets; cdecl;
+    function UIOffsetValue: UIOffset; cdecl;
+  end;
+  TNSValue = class(TOCGenericImport<NSValueClass, NSValue>)  end;
+
+  UITextPositionClass = interface(NSObjectClass)
+    ['{F7091D12-BC73-4DC1-BDEE-0E543D088166}']
+  end;
+
+  UITextPosition = interface(NSObject)
+    ['{D3C0C93C-6471-4068-B58F-24CDFFD71DFB}']
+  end;
+
+  TUITextPosition = class(TOCGenericImport<UITextPositionClass, UITextPosition>)
+  end;
+
+  UITextSelectionRectClass = interface(NSObjectClass)
+    ['{99904725-C91C-4DAD-A5C7-90362CDCA20C}']
+  end;
+
+  UITextSelectionRect = interface(NSObject)
+    ['{531423A4-3DD8-4942-B989-ED6E2D4D0C52}']
+    function rect: CGRect; cdecl;
+    function writingDirection: UITextWritingDirection; cdecl;
+    function containsStart: Boolean; cdecl;
+    function containsEnd: Boolean; cdecl;
+    function isVertical: Boolean; cdecl;
+  end;
+
+  TUITextSelectionRect = class(TOCGenericImport<UITextSelectionRectClass,
+    UITextSelectionRect>)
+  end;
+
+  UIDictationPhraseClass = interface(NSObjectClass)
+    ['{3BC960E3-2108-4B5E-8DF3-204CC427BF64}']
+  end;
+
+  UIDictationPhrase = interface(NSObject)
+    ['{0F882345-0CA2-4722-B703-4B452A6A41BB}']
+    function text: NSString; cdecl;
+    function alternativeInterpretations: NSArray; cdecl;
+  end;
+
+  TUIDictationPhrase = class(TOCGenericImport<UIDictationPhraseClass,
+    UIDictationPhrase>)
+  end;
+
+  UIActivityClass = interface(NSObjectClass)
+    ['{FDC3C541-1D0D-4BA3-BCBC-16AA1F21954B}']
+    {class} function activityCategory: UIActivityCategory; cdecl;
+  end;
+
+  UIActivity = interface(NSObject)
+    ['{C3AEA2FC-F280-477C-AE17-A51E2980CAD2}']
+    function activityType: NSString; cdecl;
+    function activityTitle: NSString; cdecl;
+    function activityImage: UIImage; cdecl;
+    function canPerformWithActivityItems(activityItems: NSArray)
+      : Boolean; cdecl;
+    procedure prepareWithActivityItems(activityItems: NSArray); cdecl;
+    function activityViewController: UIViewController; cdecl;
+    procedure performActivity; cdecl;
+    procedure activityDidFinish(completed: Boolean); cdecl;
+  end;
+
+  TUIActivity = class(TOCGenericImport<UIActivityClass, UIActivity>)
+  end;
+
+  UIActivityItemProviderClass = interface(NSOperationClass)
+    ['{6ED5AF5B-44D7-443B-9698-B01A977C6E73}']
+  end;
+
+  UIActivityItemProvider = interface(NSOperation)
+    ['{1C50384B-723C-4F7D-A647-C699CAC6660C}']
+    function initWithPlaceholderItem(placeholderItem: Pointer): Pointer; cdecl;
+    function placeholderItem: Pointer; cdecl;
+    function activityType: NSString; cdecl;
+    function item: Pointer; cdecl;
+  end;
+
+  TUIActivityItemProvider = class(TOCGenericImport<UIActivityItemProviderClass,
+    UIActivityItemProvider>)
+  end;
+
+  UIAttachmentBehaviorClass = interface(UIDynamicBehaviorClass)
+    ['{DF2A9066-4CF0-4D2B-8621-34EAF2C91DAF}']
+  end;
+
+  UIAttachmentBehavior = interface(UIDynamicBehavior)
+    ['{ADC09523-5788-447F-BF8E-9BE0BACB9EA8}']
+    [MethodName('initWithItem:attachedToAnchor:')]
+    function initWithItemAttachedToAnchor(item: Pointer; attachedToAnchor: CGPoint): Pointer{instancetype}; cdecl;
+    [MethodName('initWithItem:offsetFromCenter:attachedToAnchor:')]
+    function initWithItemOffsetFromCenterAttachedToAnchor(item: Pointer; offsetFromCenter: UIOffset;
+      attachedToAnchor: CGPoint): Pointer{instancetype}; cdecl;
+    [MethodName('initWithItem:attachedToItem:')]
+    function initWithItemAttachedToItem(item1: Pointer; attachedToItem: Pointer): Pointer{instancetype}; cdecl;
+    [MethodName('initWithItem:offsetFromCenter:attachedToItem:offsetFromCenter:')]
+    function initWithItemOffsetFromCenterAttachedToItemOffsetFromCenter(item1: Pointer; offsetFromCenter: UIOffset;
+      attachedToItem: Pointer; offsetFromCenter1: UIOffset): Pointer{instancetype}; cdecl;
+    function items: NSArray; cdecl;
+    function attachedBehaviorType: UIAttachmentBehaviorType; cdecl;
+    procedure setAnchorPoint(anchorPoint: CGPoint); cdecl;
+    function anchorPoint: CGPoint; cdecl;
+    procedure setLength(length: CGFloat); cdecl;
+    function length: CGFloat; cdecl;
+    procedure setDamping(damping: CGFloat); cdecl;
+    function damping: CGFloat; cdecl;
+    procedure setFrequency(frequency: CGFloat); cdecl;
+    function frequency: CGFloat; cdecl;
+  end;
+
+  TUIAttachmentBehavior = class(TOCGenericImport<UIAttachmentBehaviorClass,
+    UIAttachmentBehavior>)
+  end;
+
+  UICollectionViewClass = interface(UIScrollViewClass)
+    ['{3C193BBE-6114-4E44-93AD-614D114D542D}']
+  end;
+
+  UICollectionView = interface(UIScrollView)
+    ['{36A67554-5D83-4FE1-B42F-C8BBF3804D52}']
+    function initWithFrame(frame: CGRect; collectionViewLayout: UICollectionViewLayout): Pointer; cdecl;
+    [MethodName('setCollectionViewLayout:')]
+    procedure setCollectionViewLayout(collectionViewLayout: UICollectionViewLayout); cdecl;
+    function collectionViewLayout: UICollectionViewLayout; cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    function delegate: Pointer; cdecl;
+    procedure setDataSource(dataSource: Pointer); cdecl;
+    function dataSource: Pointer; cdecl;
+    procedure setBackgroundView(backgroundView: UIView); cdecl;
+    function backgroundView: UIView; cdecl;
+    [MethodName('registerClass:forCellWithReuseIdentifier:')]
+    procedure registerClassForCellWithReuseIdentifier(cellClass: Pointer; forCellWithReuseIdentifier: NSString); cdecl;
+    [MethodName('registerNib:forCellWithReuseIdentifier:')]
+    procedure registerNibForCellWithReuseIdentifier(nib: UINib; forCellWithReuseIdentifier: NSString); cdecl;
+    [MethodName('registerClass:forSupplementaryViewOfKind:withReuseIdentifier:')]
+    procedure registerClassForSupplementaryViewOfKindWithReuseIdentifier(viewClass: Pointer;
+      forSupplementaryViewOfKind: NSString; withReuseIdentifier: NSString); cdecl;
+    [MethodName('registerNib:forSupplementaryViewOfKind:withReuseIdentifier:')]
+    procedure registerNibForSupplementaryViewOfKindWithReuseIdentifier(nib: UINib; forSupplementaryViewOfKind: NSString;
+      withReuseIdentifier: NSString); cdecl;
+    function dequeueReusableCellWithReuseIdentifier(identifier: NSString; forIndexPath: NSIndexPath): Pointer; cdecl;
+    function dequeueReusableSupplementaryViewOfKind(elementKind: NSString; withReuseIdentifier: NSString;
+      forIndexPath: NSIndexPath): Pointer; cdecl;
+    procedure setAllowsSelection(allowsSelection: Boolean); cdecl;
+    function allowsSelection: Boolean; cdecl;
+    procedure setAllowsMultipleSelection(allowsMultipleSelection: Boolean); cdecl;
+    function allowsMultipleSelection: Boolean; cdecl;
+    function indexPathsForSelectedItems: NSArray; cdecl;
+    procedure selectItemAtIndexPath(indexPath: NSIndexPath; animated: Boolean;
+      scrollPosition: UICollectionViewScrollPosition); cdecl;
+    procedure deselectItemAtIndexPath(indexPath: NSIndexPath; animated: Boolean); cdecl;
+    procedure reloadData; cdecl;
+    [MethodName('setCollectionViewLayout:animated:')]
+    procedure setCollectionViewLayoutAnimated(layout: UICollectionViewLayout; animated: Boolean); cdecl;
+    [MethodName('setCollectionViewLayout:animated:completion:')]
+    procedure setCollectionViewLayoutAnimatedCompletion(layout: UICollectionViewLayout; animated: Boolean;
+      completion: TUIKitCompletion); cdecl;
+    function startInteractiveTransitionToCollectionViewLayout(layout: UICollectionViewLayout;
+      completion: UICollectionViewLayoutInteractiveTransitionCompletion): UICollectionViewTransitionLayout; cdecl;
+    procedure finishInteractiveTransition; cdecl;
+    procedure cancelInteractiveTransition; cdecl;
+    function numberOfSections: NSInteger; cdecl;
+    function numberOfItemsInSection(section: NSInteger): NSInteger; cdecl;
+    function layoutAttributesForItemAtIndexPath(indexPath: NSIndexPath): UICollectionViewLayoutAttributes; cdecl;
+    function layoutAttributesForSupplementaryElementOfKind(kind: NSString;
+      atIndexPath: NSIndexPath): UICollectionViewLayoutAttributes; cdecl;
+    function indexPathForItemAtPoint(point: CGPoint): NSIndexPath; cdecl;
+    function indexPathForCell(cell: UICollectionViewCell): NSIndexPath; cdecl;
+    function cellForItemAtIndexPath(indexPath: NSIndexPath): UICollectionViewCell; cdecl;
+    function visibleCells: NSArray; cdecl;
+    function indexPathsForVisibleItems: NSArray; cdecl;
+    procedure scrollToItemAtIndexPath(indexPath: NSIndexPath; atScrollPosition: UICollectionViewScrollPosition;
+      animated: Boolean); cdecl;
+    procedure insertSections(sections: NSIndexSet); cdecl;
+    procedure deleteSections(sections: NSIndexSet); cdecl;
+    procedure reloadSections(sections: NSIndexSet); cdecl;
+    procedure moveSection(section: NSInteger; toSection: NSInteger); cdecl;
+    procedure insertItemsAtIndexPaths(indexPaths: NSArray); cdecl;
+    procedure deleteItemsAtIndexPaths(indexPaths: NSArray); cdecl;
+    procedure reloadItemsAtIndexPaths(indexPaths: NSArray); cdecl;
+    procedure moveItemAtIndexPath(indexPath: NSIndexPath; toIndexPath: NSIndexPath); cdecl;
+    procedure performBatchUpdates(updates: TUIKitAction; completion: TUIKitCompletion); cdecl;
+  end;
+
+  TUICollectionView = class(TOCGenericImport<UICollectionViewClass,
+    UICollectionView>)
+  end;
+
+  UICollectionReusableViewClass = interface(UIViewClass)
+    ['{6560C0A0-9E91-4C0E-826F-D147E96866B3}']
+  end;
+
+  UICollectionReusableView = interface(UIView)
+    ['{1F928B5D-F241-4F01-B725-EE0F21E8E7EF}']
+    function reuseIdentifier: NSString; cdecl;
+    procedure prepareForReuse; cdecl;
+    procedure applyLayoutAttributes(layoutAttributes: UICollectionViewLayoutAttributes); cdecl;
+    procedure willTransitionFromLayout(oldLayout: UICollectionViewLayout; toLayout: UICollectionViewLayout); cdecl;
+    procedure didTransitionFromLayout(oldLayout: UICollectionViewLayout; toLayout: UICollectionViewLayout); cdecl;
+  end;
+
+  TUICollectionReusableView = class
+    (TOCGenericImport<UICollectionReusableViewClass, UICollectionReusableView>)
+  end;
+
+  UICollectionViewCellClass = interface(UICollectionReusableViewClass)
+    ['{8D91C07D-AF1A-42F6-B25D-03BEFC1B3F87}']
+  end;
+
+  UICollectionViewCell = interface(UICollectionReusableView)
+    ['{21708BF5-FDD9-4DEE-ABE1-971F753182F0}']
+    function contentView: UIView; cdecl;
+    procedure setSelected(selected: Boolean); cdecl;
+    function isSelected: Boolean; cdecl;
+    procedure setHighlighted(highlighted: Boolean); cdecl;
+    function isHighlighted: Boolean; cdecl;
+    procedure setBackgroundView(backgroundView: UIView); cdecl;
+    function backgroundView: UIView; cdecl;
+    procedure setSelectedBackgroundView(selectedBackgroundView: UIView); cdecl;
+    function selectedBackgroundView: UIView; cdecl;
+  end;
+
+  TUICollectionViewCell = class(TOCGenericImport<UICollectionViewCellClass,
+    UICollectionViewCell>)
+  end;
+
+  UICollectionViewLayoutClass = interface(NSObjectClass)
+    ['{AA2146A8-68A0-4A6F-AFA3-B9D07D7C6ED0}']
+    {class} function layoutAttributesClass: Pointer; cdecl;
+    {class} function invalidationContextClass: Pointer; cdecl;
+  end;
+
+  UICollectionViewLayout = interface(NSObject)
+    ['{F5FF0DB7-EC28-41B7-9513-9E9E612E46B9}']
+    function collectionView: UICollectionView; cdecl;
+    procedure invalidateLayout; cdecl;
+    procedure invalidateLayoutWithContext(context: UICollectionViewLayoutInvalidationContext); cdecl;
+    procedure registerClass(viewClass: Pointer; forDecorationViewOfKind: NSString); cdecl;
+    procedure registerNib(nib: UINib; forDecorationViewOfKind: NSString); cdecl;
+    procedure prepareLayout; cdecl;
+    function layoutAttributesForElementsInRect(rect: CGRect): NSArray; cdecl;
+    function layoutAttributesForItemAtIndexPath(indexPath: NSIndexPath): UICollectionViewLayoutAttributes; cdecl;
+    function layoutAttributesForSupplementaryViewOfKind(kind: NSString;
+      atIndexPath: NSIndexPath): UICollectionViewLayoutAttributes; cdecl;
+    function layoutAttributesForDecorationViewOfKind(decorationViewKind: NSString;
+      atIndexPath: NSIndexPath): UICollectionViewLayoutAttributes; cdecl;
+    function shouldInvalidateLayoutForBoundsChange(newBounds: CGRect): Boolean; cdecl;
+    function invalidationContextForBoundsChange(newBounds: CGRect): UICollectionViewLayoutInvalidationContext; cdecl;
+    [MethodName('targetContentOffsetForProposedContentOffset:withScrollingVelocity:')]
+    function targetContentOffsetForProposedContentOffsetWithScrollingVelocity(proposedContentOffset: CGPoint;
+      withScrollingVelocity: CGPoint): CGPoint; cdecl;
+    [MethodName('targetContentOffsetForProposedContentOffset:')]
+    function targetContentOffsetForProposedContentOffset(proposedContentOffset: CGPoint): CGPoint; cdecl;
+    function collectionViewContentSize: CGSize; cdecl;
+    procedure prepareForCollectionViewUpdates(updateItems: NSArray); cdecl;
+    procedure finalizeCollectionViewUpdates; cdecl;
+    procedure prepareForAnimatedBoundsChange(oldBounds: CGRect); cdecl;
+    procedure finalizeAnimatedBoundsChange; cdecl;
+    procedure prepareForTransitionToLayout(newLayout: UICollectionViewLayout); cdecl;
+    procedure prepareForTransitionFromLayout(oldLayout: UICollectionViewLayout); cdecl;
+    procedure finalizeLayoutTransition; cdecl;
+    function initialLayoutAttributesForAppearingItemAtIndexPath(itemIndexPath: NSIndexPath)
+      : UICollectionViewLayoutAttributes; cdecl;
+    function finalLayoutAttributesForDisappearingItemAtIndexPath(itemIndexPath: NSIndexPath)
+      : UICollectionViewLayoutAttributes; cdecl;
+    function initialLayoutAttributesForAppearingSupplementaryElementOfKind(elementKind: NSString;
+      atIndexPath: NSIndexPath): UICollectionViewLayoutAttributes; cdecl;
+    function finalLayoutAttributesForDisappearingSupplementaryElementOfKind(elementKind: NSString;
+      atIndexPath: NSIndexPath): UICollectionViewLayoutAttributes; cdecl;
+    function initialLayoutAttributesForAppearingDecorationElementOfKind(elementKind: NSString; atIndexPath: NSIndexPath)
+      : UICollectionViewLayoutAttributes; cdecl;
+    function finalLayoutAttributesForDisappearingDecorationElementOfKind(elementKind: NSString;
+      atIndexPath: NSIndexPath): UICollectionViewLayoutAttributes; cdecl;
+    function indexPathsToDeleteForSupplementaryViewOfKind(kind: NSString): NSArray; cdecl;
+    function indexPathsToDeleteForDecorationViewOfKind(kind: NSString): NSArray; cdecl;
+    function indexPathsToInsertForSupplementaryViewOfKind(kind: NSString): NSArray; cdecl;
+    function indexPathsToInsertForDecorationViewOfKind(kind: NSString): NSArray; cdecl;
+  end;
+
+  TUICollectionViewLayout = class(TOCGenericImport<UICollectionViewLayoutClass,
+    UICollectionViewLayout>)
+  end;
+
+  UICollectionViewTransitionLayoutClass = interface(UICollectionViewLayoutClass)
+    ['{D29A6391-955B-4D84-9707-F9DA681DAEB5}']
+  end;
+
+  UICollectionViewTransitionLayout = interface(UICollectionViewLayout)
+    ['{20261023-16DA-4504-B0A2-3EDF7B017109}']
+    procedure setTransitionProgress(transitionProgress: CGFloat); cdecl;
+    function transitionProgress: CGFloat; cdecl;
+    function currentLayout: UICollectionViewLayout; cdecl;
+    function nextLayout: UICollectionViewLayout; cdecl;
+    function initWithCurrentLayout(currentLayout: UICollectionViewLayout;
+      nextLayout: UICollectionViewLayout): Pointer; cdecl;
+    procedure updateValue(value: CGFloat; forAnimatedKey: NSString); cdecl;
+    function valueForAnimatedKey(key: NSString): CGFloat; cdecl;
+  end;
+
+  TUICollectionViewTransitionLayout = class
+    (TOCGenericImport<UICollectionViewTransitionLayoutClass,
+    UICollectionViewTransitionLayout>)
+  end;
+
+  UICollectionViewLayoutAttributesClass = interface(NSObjectClass)
+    ['{DC65B4CD-7FD6-47F6-9190-A0A634D0F826}']
+    {class} function layoutAttributesForCellWithIndexPath(indexPath: NSIndexPath): Pointer{instancetype}; cdecl;
+    {class} function layoutAttributesForSupplementaryViewOfKind(elementKind: NSString;
+      withIndexPath: NSIndexPath): Pointer{instancetype}; cdecl;
+    {class} function layoutAttributesForDecorationViewOfKind(decorationViewKind: NSString;
+      withIndexPath: NSIndexPath): Pointer{instancetype}; cdecl;
+  end;
+
+  UICollectionViewLayoutAttributes = interface(NSObject)
+    ['{791D4D25-8E2A-4E50-B37E-81CBE79BB0C7}']
+    procedure setFrame(frame: CGRect); cdecl;
+    function frame: CGRect; cdecl;
+    procedure setCenter(center: CGPoint); cdecl;
+    function center: CGPoint; cdecl;
+    procedure setSize(size: CGSize); cdecl;
+    function size: CGSize; cdecl;
+    procedure setTransform3D(transform3D: CATransform3D); cdecl;
+    function transform3D: CATransform3D; cdecl;
+    procedure setBounds(bounds: CGRect); cdecl;
+    function bounds: CGRect; cdecl;
+    procedure setTransform(transform: CGAffineTransform); cdecl;
+    function transform: CGAffineTransform; cdecl;
+    procedure setAlpha(alpha: CGFloat); cdecl;
+    function alpha: CGFloat; cdecl;
+    procedure setZIndex(zIndex: NSInteger); cdecl;
+    function zIndex: NSInteger; cdecl;
+    procedure setHidden(hidden: Boolean); cdecl;
+    function isHidden: Boolean; cdecl;
+    procedure setIndexPath(indexPath: NSIndexPath); cdecl;
+    function indexPath: NSIndexPath; cdecl;
+    function representedElementCategory: UICollectionElementCategory; cdecl;
+    function representedElementKind: NSString; cdecl;
+  end;
+
+  TUICollectionViewLayoutAttributes = class
+    (TOCGenericImport<UICollectionViewLayoutAttributesClass,
+    UICollectionViewLayoutAttributes>)
+  end;
+
+  UICollectionViewControllerClass = interface(UIViewControllerClass)
+    ['{6BF98FAD-3D6E-45CF-8238-659BD83E687D}']
+  end;
+
+  UICollectionViewController = interface(UIViewController)
+    ['{BFBD8D2A-F355-45C1-B9CB-B897426D77DE}']
+    function initWithCollectionViewLayout(layout: UICollectionViewLayout): Pointer; cdecl;
+    procedure setCollectionView(collectionView: UICollectionView); cdecl;
+    function collectionView: UICollectionView; cdecl;
+    procedure setClearsSelectionOnViewWillAppear(clearsSelectionOnViewWillAppear: Boolean); cdecl;
+    function clearsSelectionOnViewWillAppear: Boolean; cdecl;
+    procedure setUseLayoutToLayoutNavigationTransitions(useLayoutToLayoutNavigationTransitions: Boolean); cdecl;
+    function useLayoutToLayoutNavigationTransitions: Boolean; cdecl;
+    function collectionViewLayout: UICollectionViewLayout; cdecl;
+  end;
+
+  TUICollectionViewController = class
+    (TOCGenericImport<UICollectionViewControllerClass,
+    UICollectionViewController>)
+  end;
+
+  UICollectionViewUpdateItemClass = interface(NSObjectClass)
+    ['{4CF76F00-8A20-4ABB-AD97-1621B8E62241}']
+  end;
+
+  UICollectionViewUpdateItem = interface(NSObject)
+    ['{6F974B65-2051-4A4D-A28C-9CD534EF9D1B}']
+    function indexPathBeforeUpdate: NSIndexPath; cdecl;
+    function indexPathAfterUpdate: NSIndexPath; cdecl;
+    function updateAction: UICollectionUpdateAction; cdecl;
+  end;
+
+  TUICollectionViewUpdateItem = class(TOCGenericImport<UICollectionViewUpdateItemClass, UICollectionViewUpdateItem>)
+  end;
+
+  UICollectionViewLayoutInvalidationContextClass = interface(NSObjectClass)
+    ['{33F79B9B-346E-4E4A-AB21-39B716FBABAE}']
+  end;
+
+  UICollectionViewLayoutInvalidationContext = interface(NSObject)
+    ['{911A1A76-6166-4345-8384-E971FD090830}']
+    function invalidateEverything: Boolean; cdecl;
+    function invalidateDataSourceCounts: Boolean; cdecl;
+  end;
+
+  TUICollectionViewLayoutInvalidationContext = class(TOCGenericImport<UICollectionViewLayoutInvalidationContextClass,
+    UICollectionViewLayoutInvalidationContext>)
+  end;
+
+  UICollectionViewFlowLayoutInvalidationContextClass = interface(UICollectionViewLayoutInvalidationContextClass)
+    ['{46B10E09-7799-4781-AB3A-63A58CD77946}']
+  end;
+
+  UICollectionViewFlowLayoutInvalidationContext = interface(UICollectionViewLayoutInvalidationContext)
+    ['{4264E9D9-9003-4D38-A8A0-67BB407894FC}']
+    procedure setInvalidateFlowLayoutDelegateMetrics(invalidateFlowLayoutDelegateMetrics: Boolean); cdecl;
+    function invalidateFlowLayoutDelegateMetrics: Boolean; cdecl;
+    procedure setInvalidateFlowLayoutAttributes(invalidateFlowLayoutAttributes: Boolean); cdecl;
+    function invalidateFlowLayoutAttributes: Boolean; cdecl;
+  end;
+
+  TUICollectionViewFlowLayoutInvalidationContext = class
+    (TOCGenericImport<UICollectionViewFlowLayoutInvalidationContextClass, UICollectionViewFlowLayoutInvalidationContext>)
+  end;
+
+  UICollectionViewFlowLayoutClass = interface(UICollectionViewLayoutClass)
+    ['{0117FC75-7F80-41F1-8B89-BD503F59026E}']
+  end;
+
+  UICollectionViewFlowLayout = interface(UICollectionViewLayout)
+    ['{E725AB6A-F9BF-43EB-B9B4-A9B5993AA09C}']
+    procedure setMinimumLineSpacing(minimumLineSpacing: CGFloat); cdecl;
+    function minimumLineSpacing: CGFloat; cdecl;
+    procedure setMinimumInteritemSpacing(minimumInteritemSpacing: CGFloat); cdecl;
+    function minimumInteritemSpacing: CGFloat; cdecl;
+    procedure setItemSize(itemSize: CGSize); cdecl;
+    function itemSize: CGSize; cdecl;
+    procedure setScrollDirection(scrollDirection: UICollectionViewScrollDirection); cdecl;
+    function scrollDirection: UICollectionViewScrollDirection; cdecl;
+    procedure setHeaderReferenceSize(headerReferenceSize: CGSize); cdecl;
+    function headerReferenceSize: CGSize; cdecl;
+    procedure setFooterReferenceSize(footerReferenceSize: CGSize); cdecl;
+    function footerReferenceSize: CGSize; cdecl;
+    procedure setSectionInset(sectionInset: UIEdgeInsets); cdecl;
+    function sectionInset: UIEdgeInsets; cdecl;
+  end;
+
+  TUICollectionViewFlowLayout = class(TOCGenericImport<UICollectionViewFlowLayoutClass, UICollectionViewFlowLayout>)
+  end;
+
+  UIInputViewClass = interface(UIViewClass)
+    ['{75A747B5-2C29-44F2-8A4C-2D998D303E78}']
+  end;
+
+  UIInputView = interface(UIView)
+    ['{35329E54-29EF-4047-8260-FC667589BAC9}']
+    function inputViewStyle: UIInputViewStyle; cdecl;
+    function initWithFrame(frame: CGRect; inputViewStyle: UIInputViewStyle): Pointer; cdecl;
+  end;
+
+  TUIInputView = class(TOCGenericImport<UIInputViewClass, UIInputView>)
+  end;
+
+  UIInterpolatingMotionEffectClass = interface(UIMotionEffectClass)
+    ['{7B62D662-4F69-4621-BB90-01717B09BDA3}']
+  end;
+
+  UIInterpolatingMotionEffect = interface(UIMotionEffect)
+    ['{B93069C3-334C-4E22-B1F2-61F0DC7BC8CC}']
+    function initWithKeyPath(keyPath: NSString; &type: UIInterpolatingMotionEffectType): Pointer{instancetype}; cdecl;
+    function keyPath: NSString; cdecl;
+    function &type: UIInterpolatingMotionEffectType; cdecl;
+    procedure setMinimumRelativeValue(minimumRelativeValue: Pointer); cdecl;
+    function minimumRelativeValue: Pointer; cdecl;
+    procedure setMaximumRelativeValue(maximumRelativeValue: Pointer); cdecl;
+    function maximumRelativeValue: Pointer; cdecl;
+  end;
+
+  TUIInterpolatingMotionEffect = class(TOCGenericImport<UIInterpolatingMotionEffectClass, UIInterpolatingMotionEffect>)
+  end;
+
+  UIMotionEffectGroupClass = interface(UIMotionEffectClass)
+    ['{B18F95E8-F774-4DC6-B0C6-F19245E870A0}']
+  end;
+
+  UIMotionEffectGroup = interface(UIMotionEffect)
+    ['{B8976777-FB31-41CC-B6B7-15150439F422}']
+    procedure setMotionEffects(motionEffects: NSArray); cdecl;
+    function motionEffects: NSArray; cdecl;
+  end;
+
+  TUIMotionEffectGroup = class(TOCGenericImport<UIMotionEffectGroupClass, UIMotionEffectGroup>)
+  end;
+
+  UIScreenEdgePanGestureRecognizerClass = interface(UIPanGestureRecognizerClass)
+    ['{C1D49297-E304-4D44-90A3-C326E7160A51}']
+  end;
+
+  UIScreenEdgePanGestureRecognizer = interface(UIPanGestureRecognizer)
+    ['{79935DE4-918F-495E-9D9A-4C1F6AF78148}']
+    procedure setEdges(edges: UIRectEdge); cdecl;
+    function edges: UIRectEdge; cdecl;
+  end;
+
+  TUIScreenEdgePanGestureRecognizer = class(TOCGenericImport<UIScreenEdgePanGestureRecognizerClass,
+    UIScreenEdgePanGestureRecognizer>)
+  end;
+
+  UIPercentDrivenInteractiveTransitionClass = interface(NSObjectClass)
+    ['{91087F13-8FE1-4366-AF81-7DA102BEA705}']
+  end;
+
+  UIPercentDrivenInteractiveTransition = interface(NSObject)
+    ['{351784D5-4446-408D-AF96-4DD15A60A860}']
+    function duration: CGFloat; cdecl;
+    function percentComplete: CGFloat; cdecl;
+    procedure setCompletionSpeed(completionSpeed: CGFloat); cdecl;
+    function completionSpeed: CGFloat; cdecl;
+    procedure setCompletionCurve(completionCurve: UIViewAnimationCurve); cdecl;
+    function completionCurve: UIViewAnimationCurve; cdecl;
+    procedure updateInteractiveTransition(percentComplete: CGFloat); cdecl;
+    procedure cancelInteractiveTransition; cdecl;
+    procedure finishInteractiveTransition; cdecl;
+  end;
+
+  TUIPercentDrivenInteractiveTransition = class(TOCGenericImport<UIPercentDrivenInteractiveTransitionClass,
+    UIPercentDrivenInteractiveTransition>)
+  end;
+
+  UIPushBehaviorClass = interface(UIDynamicBehaviorClass)
+    ['{760B4ED2-5FE7-4A2C-BAE7-4292CE9814CA}']
+  end;
+
+  UIPushBehavior = interface(UIDynamicBehavior)
+    ['{5CA9B06C-A462-4C10-A6AA-1A486E2142AA}']
+    function initWithItems(items: NSArray; mode: UIPushBehaviorMode): Pointer{instancetype}; cdecl;
+    procedure addItem(item: Pointer); cdecl;
+    procedure removeItem(item: Pointer); cdecl;
+    function items: NSArray; cdecl;
+    function targetOffsetFromCenterForItem(item: Pointer): UIOffset; cdecl;
+    procedure setTargetOffsetFromCenter(o: UIOffset; forItem: Pointer); cdecl;
+    function mode: UIPushBehaviorMode; cdecl;
+    procedure setActive(active: Boolean); cdecl;
+    function active: Boolean; cdecl;
+    [MethodName('setAngle:')]
+    procedure setAngle(angle: CGFloat); cdecl;
+    function angle: CGFloat; cdecl;
+    procedure setMagnitude(magnitude: CGFloat); cdecl;
+    function magnitude: CGFloat; cdecl;
+    procedure setPushDirection(pushDirection: CGVector); cdecl;
+    function pushDirection: CGVector; cdecl;
+    [MethodName('setAngle:magnitude:')]
+    procedure setAngleMagnitude(angle: CGFloat; magnitude: CGFloat); cdecl;
+  end;
+
+  TUIPushBehavior = class(TOCGenericImport<UIPushBehaviorClass, UIPushBehavior>)
+  end;
+
+  UISnapBehaviorClass = interface(UIDynamicBehaviorClass)
+    ['{7F2461BC-6BAF-49CF-8730-A5C1BE12085E}']
+  end;
+
+  UISnapBehavior = interface(UIDynamicBehavior)
+    ['{D612BA28-20F8-4229-BFB0-5EA0AAEDC5A2}']
+    function initWithItem(item: Pointer; snapToPoint: CGPoint): Pointer{instancetype}; cdecl;
+    procedure setDamping(damping: CGFloat); cdecl;
+    function damping: CGFloat; cdecl;
+  end;
+
+  TUISnapBehavior = class(TOCGenericImport<UISnapBehaviorClass, UISnapBehavior>)
+  end;
+
+  UIDynamicItemBehaviorClass = interface(UIDynamicBehaviorClass)
+    ['{BA78DD39-2BBD-4178-B2F2-45BFFAD1173E}']
+  end;
+
+  UIDynamicItemBehavior = interface(UIDynamicBehavior)
+    ['{3AE9A75B-C278-429E-84E5-A2FD54C9680A}']
+    function initWithItems(items: NSArray): Pointer{instancetype}; cdecl;
+    procedure addItem(item: Pointer); cdecl;
+    procedure removeItem(item: Pointer); cdecl;
+    function items: NSArray; cdecl;
+    procedure setElasticity(elasticity: CGFloat); cdecl;
+    function elasticity: CGFloat; cdecl;
+    procedure setFriction(friction: CGFloat); cdecl;
+    function friction: CGFloat; cdecl;
+    procedure setDensity(density: CGFloat); cdecl;
+    function density: CGFloat; cdecl;
+    procedure setResistance(resistance: CGFloat); cdecl;
+    function resistance: CGFloat; cdecl;
+    procedure setAngularResistance(angularResistance: CGFloat); cdecl;
+    function angularResistance: CGFloat; cdecl;
+    procedure setAllowsRotation(allowsRotation: Boolean); cdecl;
+    function allowsRotation: Boolean; cdecl;
+    procedure addLinearVelocity(velocity: CGPoint; forItem: Pointer); cdecl;
+    function linearVelocityForItem(item: Pointer): CGPoint; cdecl;
+    procedure addAngularVelocity(velocity: CGFloat; forItem: Pointer); cdecl;
+    function angularVelocityForItem(item: Pointer): CGFloat; cdecl;
+  end;
+
+  TUIDynamicItemBehavior = class(TOCGenericImport<UIDynamicItemBehaviorClass, UIDynamicItemBehavior>)
+  end;
+
+  UIGravityBehaviorClass = interface(UIDynamicBehaviorClass)
+    ['{8AA7EBC2-67CC-4F98-89F4-6F62B458E94E}']
+  end;
+
+  UIGravityBehavior = interface(UIDynamicBehavior)
+    ['{1C18CC48-BFEA-4839-86EB-1788606CA585}']
+    function initWithItems(items: NSArray): Pointer{instancetype}; cdecl;
+    procedure addItem(item: Pointer); cdecl;
+    procedure removeItem(item: Pointer); cdecl;
+    function items: NSArray; cdecl;
+    procedure setGravityDirection(gravityDirection: CGVector); cdecl;
+    function gravityDirection: CGVector; cdecl;
+    [MethodName('setAngle:')]
+    procedure setAngle(angle: CGFloat); cdecl;
+    function angle: CGFloat; cdecl;
+    procedure setMagnitude(magnitude: CGFloat); cdecl;
+    function magnitude: CGFloat; cdecl;
+    [MethodName('setAngle:magnitude:')]
+    procedure setAngleMagnitude(angle: CGFloat; magnitude: CGFloat); cdecl;
+  end;
+
+  TUIGravityBehavior = class(TOCGenericImport<UIGravityBehaviorClass, UIGravityBehavior>)
+  end;
+
+  UICollisionBehaviorClass = interface(UIDynamicBehaviorClass)
+    ['{5C52525A-064C-4D86-8D09-40967C735044}']
+  end;
+
+  UICollisionBehavior = interface(UIDynamicBehavior)
+    ['{5BEFAC2E-D356-4301-AAF6-CC95AFC4FBC6}']
+    function initWithItems(items: NSArray): Pointer{instancetype}; cdecl;
+    procedure addItem(item: Pointer); cdecl;
+    procedure removeItem(item: Pointer); cdecl;
+    function items: NSArray; cdecl;
+    procedure setCollisionMode(collisionMode: UICollisionBehaviorMode); cdecl;
+    function collisionMode: UICollisionBehaviorMode; cdecl;
+    procedure setTranslatesReferenceBoundsIntoBoundary(translatesReferenceBoundsIntoBoundary: Boolean); cdecl;
+    function translatesReferenceBoundsIntoBoundary: Boolean; cdecl;
+    procedure setTranslatesReferenceBoundsIntoBoundaryWithInsets(insets: UIEdgeInsets); cdecl;
+    [MethodName('addBoundaryWithIdentifier:forPath:')]
+    procedure addBoundaryWithIdentifierForPath(identifier: Pointer; forPath: UIBezierPath); cdecl;
+    [MethodName('addBoundaryWithIdentifier:fromPoint:toPoint:')]
+    procedure addBoundaryWithIdentifierFromPointToPoint(identifier: Pointer; fromPoint: CGPoint;
+      toPoint: CGPoint); cdecl;
+    function boundaryWithIdentifier(identifier: Pointer): UIBezierPath; cdecl;
+    procedure removeBoundaryWithIdentifier(identifier: Pointer); cdecl;
+    function boundaryIdentifiers: NSArray; cdecl;
+    procedure removeAllBoundaries; cdecl;
+    procedure setCollisionDelegate(collisionDelegate: Pointer); cdecl;
+    function collisionDelegate: Pointer; cdecl;
+  end;
+
+  TUICollisionBehavior = class(TOCGenericImport<UICollisionBehaviorClass, UICollisionBehavior>)
+  end;
+
+  // ===== Protocol declarations =====
+
+  UILayoutSupport = interface(IObjectiveC)
+    ['{2A1B5C8A-57CE-4423-A857-6BD6BCC61F77}']
+    function length: CGFloat; cdecl;
+  end;
+
+  NSTextStorageDelegate = interface(IObjectiveC)
+    ['{864FE62C-7E23-4FC1-B075-9224C6E2E7E7}']
+    [MethodName('textStorage:willProcessEditing:range:changeInLength:')]
+    procedure textStorageWillProcessEditingRangeChangeInLength(textStorage: NSTextStorage;
+      willProcessEditing: NSTextStorageEditActions; range: NSRange; changeInLength: NSInteger); cdecl;
+    [MethodName('textStorage:didProcessEditing:range:changeInLength:')]
+    procedure textStorageDidProcessEditingRangeChangeInLength(textStorage: NSTextStorage;
+      didProcessEditing: NSTextStorageEditActions; range: NSRange; changeInLength: NSInteger); cdecl;
+  end;
+
+  NSLayoutManagerDelegate = interface(IObjectiveC)
+    ['{BD66C85B-AB03-4AD7-8EF7-D86D1239A78F}']
+    [MethodName('layoutManager:shouldGenerateGlyphs:properties:characterIndexes:font:forGlyphRange:')]
+    function layoutManagerShouldGenerateGlyphsPropertiesCharacterIndexesFontForGlyphRange
+      (layoutManager: NSLayoutManager; shouldGenerateGlyphs: CGGlyph; properties: NSGlyphProperty;
+      characterIndexes: NSUInteger; font: UIFont; forGlyphRange: NSRange): NSUInteger; cdecl;
+    [MethodName('layoutManager:lineSpacingAfterGlyphAtIndex:withProposedLineFragmentRect:')]
+    function layoutManagerLineSpacingAfterGlyphAtIndexWithProposedLineFragmentRect(layoutManager: NSLayoutManager;
+      lineSpacingAfterGlyphAtIndex: NSUInteger; withProposedLineFragmentRect: CGRect): CGFloat; cdecl;
+    [MethodName('layoutManager:paragraphSpacingBeforeGlyphAtIndex:withProposedLineFragmentRect:')]
+    function layoutManagerParagraphSpacingBeforeGlyphAtIndexWithProposedLineFragmentRect(layoutManager: NSLayoutManager;
+      paragraphSpacingBeforeGlyphAtIndex: NSUInteger; withProposedLineFragmentRect: CGRect): CGFloat; cdecl;
+    [MethodName('layoutManager:paragraphSpacingAfterGlyphAtIndex:withProposedLineFragmentRect:')]
+    function layoutManagerParagraphSpacingAfterGlyphAtIndexWithProposedLineFragmentRect(layoutManager: NSLayoutManager;
+      paragraphSpacingAfterGlyphAtIndex: NSUInteger; withProposedLineFragmentRect: CGRect): CGFloat; cdecl;
+    [MethodName('layoutManager:shouldUseAction:forControlCharacterAtIndex:')]
+    function layoutManagerShouldUseActionForControlCharacterAtIndex(layoutManager: NSLayoutManager;
+      shouldUseAction: NSControlCharacterAction; forControlCharacterAtIndex: NSUInteger)
+      : NSControlCharacterAction; cdecl;
+    [MethodName('layoutManager:shouldBreakLineByWordBeforeCharacterAtIndex:')]
+    function layoutManagerShouldBreakLineByWordBeforeCharacterAtIndex(layoutManager: NSLayoutManager;
+      shouldBreakLineByWordBeforeCharacterAtIndex: NSUInteger): Boolean; cdecl;
+    [MethodName('layoutManager:shouldBreakLineByHyphenatingBeforeCharacterAtIndex:')]
+    function layoutManagerShouldBreakLineByHyphenatingBeforeCharacterAtIndex(layoutManager: NSLayoutManager;
+      shouldBreakLineByHyphenatingBeforeCharacterAtIndex: NSUInteger): Boolean; cdecl;
+    [MethodName
+      ('layoutManager:boundingBoxForControlGlyphAtIndex:forTextContainer:proposedLineFragment:glyphPosition:characterIndex:')
+      ]
+    function layoutManagerBoundingBoxForControlGlyphAtIndexForTextContainerProposedLineFragmentGlyphPositionCharacterIndex
+      (layoutManager: NSLayoutManager; boundingBoxForControlGlyphAtIndex: NSUInteger; forTextContainer: NSTextContainer;
+      proposedLineFragment: CGRect; glyphPosition: CGPoint; characterIndex: NSUInteger): CGRect; cdecl;
+    procedure layoutManagerDidInvalidateLayout(sender: NSLayoutManager); cdecl;
+    [MethodName('layoutManager:didCompleteLayoutForTextContainer:atEnd:')]
+    procedure layoutManagerDidCompleteLayoutForTextContainerAtEnd(layoutManager: NSLayoutManager;
+      didCompleteLayoutForTextContainer: NSTextContainer; atEnd: Boolean); cdecl;
+    [MethodName('layoutManager:textContainer:didChangeGeometryFromSize:')]
+    procedure layoutManagerTextContainerDidChangeGeometryFromSize(layoutManager: NSLayoutManager;
+      textContainer: NSTextContainer; didChangeGeometryFromSize: CGSize); cdecl;
+  end;
+
+  NSTextLayoutOrientationProvider = interface(IObjectiveC)
+    ['{CFED2F72-F80E-4179-BCD8-89F174AD2A6C}']
+    procedure setLayoutOrientation(layoutOrientation: NSTextLayoutOrientation); cdecl;
+    function layoutOrientation: NSTextLayoutOrientation; cdecl;
+  end;
+
+  NSTextAttachmentContainer = interface(IObjectiveC)
+    ['{4985C1EA-7959-4B50-BFE6-6CFBBD4C79B4}']
+    function imageForBounds(imageBounds: CGRect; textContainer: NSTextContainer; characterIndex: NSUInteger)
+      : UIImage; cdecl;
+    function attachmentBoundsForTextContainer(textContainer: NSTextContainer; proposedLineFragment: CGRect;
+      glyphPosition: CGPoint; characterIndex: NSUInteger): CGRect; cdecl;
+  end;
+
+  UIAccelerometerDelegate = interface(IObjectiveC)
+    ['{2ECAD696-6C20-4E0E-BC80-5E75345636BF}']
+    procedure accelerometer(accelerometer: UIAccelerometer; didAccelerate: UIAcceleration); cdecl;
+  end;
+
+  UIAppearanceContainer = interface(IObjectiveC)
+    ['{5B5AAC30-C7BC-4033-9388-73640526A3E1}']
+  end;
+
+  UIAppearance = interface(IObjectiveC)
+    ['{3CA77CF4-D712-4FBC-B517-3010BB559B11}']
+    function appearance: Pointer{instancetype}; cdecl;
+    function appearanceWhenContainedIn(ContainerClass: Pointer): Pointer{instancetype}; cdecl;
+  end;
+
+  UIDynamicItem = interface(IObjectiveC)
+    ['{5EF0F7FB-74A6-4BCF-9837-C2BB9FB7FF33}']
+    procedure setCenter(center: CGPoint); cdecl;
+    function center: CGPoint; cdecl;
+    function bounds: CGRect; cdecl;
+    procedure setTransform(transform: CGAffineTransform); cdecl;
+    function transform: CGAffineTransform; cdecl;
+  end;
+
+  UIScrollViewDelegate = interface(IObjectiveC)
+    ['{2DA8B00F-F141-48BC-9AD0-3313E4958831}']
+    procedure scrollViewDidScroll(scrollView: UIScrollView); cdecl;
+    procedure scrollViewDidZoom(scrollView: UIScrollView); cdecl;
+    procedure scrollViewWillBeginDragging(scrollView: UIScrollView); cdecl;
+    procedure scrollViewWillEndDragging(scrollView: UIScrollView; withVelocity: CGPoint;
+      targetContentOffset: Pointer); cdecl;
+    procedure scrollViewDidEndDragging(scrollView: UIScrollView; willDecelerate: Boolean); cdecl;
+    procedure scrollViewWillBeginDecelerating(scrollView: UIScrollView); cdecl;
+    procedure scrollViewDidEndDecelerating(scrollView: UIScrollView); cdecl;
+    procedure scrollViewDidEndScrollingAnimation(scrollView: UIScrollView); cdecl;
+    function viewForZoomingInScrollView(scrollView: UIScrollView): UIView; cdecl;
+    procedure scrollViewWillBeginZooming(scrollView: UIScrollView; withView: UIView); cdecl;
+    procedure scrollViewDidEndZooming(scrollView: UIScrollView; withView: UIView; atScale: CGFloat); cdecl;
+    function scrollViewShouldScrollToTop(scrollView: UIScrollView): Boolean; cdecl;
+    procedure scrollViewDidScrollToTop(scrollView: UIScrollView); cdecl;
+  end;
+
+  UITableViewDataSource = interface(IObjectiveC)
+    ['{2464BC90-EB86-42B9-8747-9CCFE8F1AA98}']
+    [MethodName('tableView:numberOfRowsInSection:')]
+    function tableViewNumberOfRowsInSection(tableView: UITableView; numberOfRowsInSection: NSInteger): NSInteger; cdecl;
+    [MethodName('tableView:cellForRowAtIndexPath:')]
+    function tableViewCellForRowAtIndexPath(tableView: UITableView; cellForRowAtIndexPath: NSIndexPath)
+      : UITableViewCell; cdecl;
+    function numberOfSectionsInTableView(tableView: UITableView): NSInteger; cdecl;
+    [MethodName('tableView:titleForHeaderInSection:')]
+    function tableViewTitleForHeaderInSection(tableView: UITableView; titleForHeaderInSection: NSInteger)
+      : NSString; cdecl;
+    [MethodName('tableView:titleForFooterInSection:')]
+    function tableViewTitleForFooterInSection(tableView: UITableView; titleForFooterInSection: NSInteger)
+      : NSString; cdecl;
+    [MethodName('tableView:canEditRowAtIndexPath:')]
+    function tableViewCanEditRowAtIndexPath(tableView: UITableView; canEditRowAtIndexPath: NSIndexPath): Boolean; cdecl;
+    [MethodName('tableView:canMoveRowAtIndexPath:')]
+    function tableViewCanMoveRowAtIndexPath(tableView: UITableView; canMoveRowAtIndexPath: NSIndexPath): Boolean; cdecl;
+    function sectionIndexTitlesForTableView(tableView: UITableView): NSArray; cdecl;
+    [MethodName('tableView:sectionForSectionIndexTitle:atIndex:')]
+    function tableViewSectionForSectionIndexTitleAtIndex(tableView: UITableView; sectionForSectionIndexTitle: NSString;
+      atIndex: NSInteger): NSInteger; cdecl;
+    [MethodName('tableView:commitEditingStyle:forRowAtIndexPath:')]
+    procedure tableViewCommitEditingStyleForRowAtIndexPath(tableView: UITableView;
+      commitEditingStyle: UITableViewCellEditingStyle; forRowAtIndexPath: NSIndexPath); cdecl;
+    [MethodName('tableView:moveRowAtIndexPath:toIndexPath:')]
+    procedure tableViewMoveRowAtIndexPathToIndexPath(tableView: UITableView; moveRowAtIndexPath: NSIndexPath;
+      toIndexPath: NSIndexPath); cdecl;
+  end;
+
+  UITableViewDelegate = interface(IObjectiveC)
+    ['{6F3B09F8-FD6E-4053-9F83-A52982090A41}']
+    [MethodName('tableView:willDisplayCell:forRowAtIndexPath:')]
+    procedure tableViewWillDisplayCellForRowAtIndexPath(tableView: UITableView; willDisplayCell: UITableViewCell;
+      forRowAtIndexPath: NSIndexPath); cdecl;
+    [MethodName('tableView:willDisplayHeaderView:forSection:')]
+    procedure tableViewWillDisplayHeaderViewForSection(tableView: UITableView; willDisplayHeaderView: UIView;
+      forSection: NSInteger); cdecl;
+    [MethodName('tableView:willDisplayFooterView:forSection:')]
+    procedure tableViewWillDisplayFooterViewForSection(tableView: UITableView; willDisplayFooterView: UIView;
+      forSection: NSInteger); cdecl;
+    [MethodName('tableView:didEndDisplayingCell:forRowAtIndexPath:')]
+    procedure tableViewDidEndDisplayingCellForRowAtIndexPath(tableView: UITableView;
+      didEndDisplayingCell: UITableViewCell; forRowAtIndexPath: NSIndexPath); cdecl;
+    [MethodName('tableView:didEndDisplayingHeaderView:forSection:')]
+    procedure tableViewDidEndDisplayingHeaderViewForSection(tableView: UITableView; didEndDisplayingHeaderView: UIView;
+      forSection: NSInteger); cdecl;
+    [MethodName('tableView:didEndDisplayingFooterView:forSection:')]
+    procedure tableViewDidEndDisplayingFooterViewForSection(tableView: UITableView; didEndDisplayingFooterView: UIView;
+      forSection: NSInteger); cdecl;
+    [MethodName('tableView:heightForRowAtIndexPath:')]
+    function tableViewHeightForRowAtIndexPath(tableView: UITableView; heightForRowAtIndexPath: NSIndexPath)
+      : CGFloat; cdecl;
+    [MethodName('tableView:heightForHeaderInSection:')]
+    function tableViewHeightForHeaderInSection(tableView: UITableView; heightForHeaderInSection: NSInteger)
+      : CGFloat; cdecl;
+    [MethodName('tableView:heightForFooterInSection:')]
+    function tableViewHeightForFooterInSection(tableView: UITableView; heightForFooterInSection: NSInteger)
+      : CGFloat; cdecl;
+    [MethodName('tableView:estimatedHeightForRowAtIndexPath:')]
+    function tableViewEstimatedHeightForRowAtIndexPath(tableView: UITableView;
+      estimatedHeightForRowAtIndexPath: NSIndexPath): CGFloat; cdecl;
+    [MethodName('tableView:estimatedHeightForHeaderInSection:')]
+    function tableViewEstimatedHeightForHeaderInSection(tableView: UITableView;
+      estimatedHeightForHeaderInSection: NSInteger): CGFloat; cdecl;
+    [MethodName('tableView:estimatedHeightForFooterInSection:')]
+    function tableViewEstimatedHeightForFooterInSection(tableView: UITableView;
+      estimatedHeightForFooterInSection: NSInteger): CGFloat; cdecl;
+    [MethodName('tableView:viewForHeaderInSection:')]
+    function tableViewViewForHeaderInSection(tableView: UITableView; viewForHeaderInSection: NSInteger): UIView; cdecl;
+    [MethodName('tableView:viewForFooterInSection:')]
+    function tableViewViewForFooterInSection(tableView: UITableView; viewForFooterInSection: NSInteger): UIView; cdecl;
+    [MethodName('tableView:accessoryTypeForRowWithIndexPath:')]
+    function tableViewAccessoryTypeForRowWithIndexPath(tableView: UITableView;
+      accessoryTypeForRowWithIndexPath: NSIndexPath): UITableViewCellAccessoryType; cdecl;
+    [MethodName('tableView:accessoryButtonTappedForRowWithIndexPath:')]
+    procedure tableViewAccessoryButtonTappedForRowWithIndexPath(tableView: UITableView;
+      accessoryButtonTappedForRowWithIndexPath: NSIndexPath); cdecl;
+    [MethodName('tableView:shouldHighlightRowAtIndexPath:')]
+    function tableViewShouldHighlightRowAtIndexPath(tableView: UITableView; shouldHighlightRowAtIndexPath: NSIndexPath)
+      : Boolean; cdecl;
+    [MethodName('tableView:didHighlightRowAtIndexPath:')]
+    procedure tableViewDidHighlightRowAtIndexPath(tableView: UITableView;
+      didHighlightRowAtIndexPath: NSIndexPath); cdecl;
+    [MethodName('tableView:didUnhighlightRowAtIndexPath:')]
+    procedure tableViewDidUnhighlightRowAtIndexPath(tableView: UITableView;
+      didUnhighlightRowAtIndexPath: NSIndexPath); cdecl;
+    [MethodName('tableView:willSelectRowAtIndexPath:')]
+    function tableViewWillSelectRowAtIndexPath(tableView: UITableView; willSelectRowAtIndexPath: NSIndexPath)
+      : NSIndexPath; cdecl;
+    [MethodName('tableView:willDeselectRowAtIndexPath:')]
+    function tableViewWillDeselectRowAtIndexPath(tableView: UITableView; willDeselectRowAtIndexPath: NSIndexPath)
+      : NSIndexPath; cdecl;
+    [MethodName('tableView:didSelectRowAtIndexPath:')]
+    procedure tableViewDidSelectRowAtIndexPath(tableView: UITableView; didSelectRowAtIndexPath: NSIndexPath); cdecl;
+    [MethodName('tableView:didDeselectRowAtIndexPath:')]
+    procedure tableViewDidDeselectRowAtIndexPath(tableView: UITableView; didDeselectRowAtIndexPath: NSIndexPath); cdecl;
+    [MethodName('tableView:editingStyleForRowAtIndexPath:')]
+    function tableViewEditingStyleForRowAtIndexPath(tableView: UITableView; editingStyleForRowAtIndexPath: NSIndexPath)
+      : UITableViewCellEditingStyle; cdecl;
+    [MethodName('tableView:titleForDeleteConfirmationButtonForRowAtIndexPath:')]
+    function tableViewTitleForDeleteConfirmationButtonForRowAtIndexPath(tableView: UITableView;
+      titleForDeleteConfirmationButtonForRowAtIndexPath: NSIndexPath): NSString; cdecl;
+    [MethodName('tableView:shouldIndentWhileEditingRowAtIndexPath:')]
+    function tableViewShouldIndentWhileEditingRowAtIndexPath(tableView: UITableView;
+      shouldIndentWhileEditingRowAtIndexPath: NSIndexPath): Boolean; cdecl;
+    [MethodName('tableView:willBeginEditingRowAtIndexPath:')]
+    procedure tableViewWillBeginEditingRowAtIndexPath(tableView: UITableView;
+      willBeginEditingRowAtIndexPath: NSIndexPath); cdecl;
+    [MethodName('tableView:didEndEditingRowAtIndexPath:')]
+    procedure tableViewDidEndEditingRowAtIndexPath(tableView: UITableView;
+      didEndEditingRowAtIndexPath: NSIndexPath); cdecl;
+    [MethodName('tableView:targetIndexPathForMoveFromRowAtIndexPath:toProposedIndexPath:')]
+    function tableViewTargetIndexPathForMoveFromRowAtIndexPathToProposedIndexPath(tableView: UITableView;
+      targetIndexPathForMoveFromRowAtIndexPath: NSIndexPath; toProposedIndexPath: NSIndexPath): NSIndexPath; cdecl;
+    [MethodName('tableView:indentationLevelForRowAtIndexPath:')]
+    function tableViewIndentationLevelForRowAtIndexPath(tableView: UITableView;
+      indentationLevelForRowAtIndexPath: NSIndexPath): NSInteger; cdecl;
+    [MethodName('tableView:shouldShowMenuForRowAtIndexPath:')]
+    function tableViewShouldShowMenuForRowAtIndexPath(tableView: UITableView;
+      shouldShowMenuForRowAtIndexPath: NSIndexPath): Boolean; cdecl;
+    [MethodName('tableView:canPerformAction:forRowAtIndexPath:withSender:')]
+    function tableViewCanPerformActionForRowAtIndexPathWithSender(tableView: UITableView; canPerformAction: SEL;
+      forRowAtIndexPath: NSIndexPath; withSender: Pointer): Boolean; cdecl;
+    [MethodName('tableView:performAction:forRowAtIndexPath:withSender:')]
+    procedure tableViewPerformActionForRowAtIndexPathWithSender(tableView: UITableView; performAction: SEL;
+      forRowAtIndexPath: NSIndexPath; withSender: Pointer); cdecl;
+  end;
+
+  UIPickerViewAccessibilityDelegate = interface(IObjectiveC)
+    ['{4F06B548-6BBD-4AAC-9B83-1156532069BA}']
+    [MethodName('pickerView:accessibilityLabelForComponent:')]
+    function pickerViewAccessibilityLabelForComponent(pickerView: UIPickerView;
+      accessibilityLabelForComponent: NSInteger): NSString; cdecl;
+    [MethodName('pickerView:accessibilityHintForComponent:')]
+    function pickerViewAccessibilityHintForComponent(pickerView: UIPickerView; accessibilityHintForComponent: NSInteger)
+      : NSString; cdecl;
+  end;
+
+  UIScrollViewAccessibilityDelegate = interface(IObjectiveC)
+    ['{EEB6B631-889F-409C-B7EE-5AA432B8BC30}']
+    function accessibilityScrollStatusForScrollView(scrollView: UIScrollView): NSString; cdecl;
+  end;
+
+  UIAccessibilityIdentification = interface(IObjectiveC)
+    ['{0ABA3B1A-3A18-4B1F-A7C0-59FF25C9F098}']
+    procedure setAccessibilityIdentifier(accessibilityIdentifier: NSString); cdecl;
+    function accessibilityIdentifier: NSString; cdecl;
+  end;
+
+  UIGuidedAccessRestrictionDelegate = interface(IObjectiveC)
+    ['{1A216388-5C3C-4C46-A1ED-FD02D7674DDE}']
+    function guidedAccessRestrictionIdentifiers: NSArray; cdecl;
+    procedure guidedAccessRestrictionWithIdentifier(restrictionIdentifier: NSString;
+      didChangeState: UIGuidedAccessRestrictionState); cdecl;
+    function textForGuidedAccessRestrictionWithIdentifier(restrictionIdentifier: NSString): NSString; cdecl;
+    function detailTextForGuidedAccessRestrictionWithIdentifier(restrictionIdentifier: NSString): NSString; cdecl;
+  end;
+
+  UIAccessibilityReadingContent = interface(IObjectiveC)
+    ['{79B2425F-02C8-4FBF-AB51-5188B117A058}']
+    function accessibilityLineNumberForPoint(point: CGPoint): NSInteger; cdecl;
+    function accessibilityContentForLineNumber(lineNumber: NSInteger): NSString; cdecl;
+    function accessibilityFrameForLineNumber(lineNumber: NSInteger): CGRect; cdecl;
+    function accessibilityPageContent: NSString; cdecl;
+  end;
+
+  UITextInputTokenizer = interface(IObjectiveC)
+    ['{E7BE0DB1-72C2-4608-B2A5-74AD3130074C}']
+    function rangeEnclosingPosition(position: UITextPosition; withGranularity: UITextGranularity;
+      inDirection: UITextDirection): UITextRange; cdecl;
+    [MethodName('isPosition:atBoundary:inDirection:')]
+    function isPositionAtBoundaryInDirection(position: UITextPosition; atBoundary: UITextGranularity;
+      inDirection: UITextDirection): Boolean; cdecl;
+    function positionFromPosition(position: UITextPosition; toBoundary: UITextGranularity; inDirection: UITextDirection)
+      : UITextPosition; cdecl;
+    [MethodName('isPosition:withinTextUnit:inDirection:')]
+    function isPositionWithinTextUnitInDirection(position: UITextPosition; withinTextUnit: UITextGranularity;
+      inDirection: UITextDirection): Boolean; cdecl;
+  end;
+
+  UITextInputDelegate = interface(IObjectiveC)
+    ['{8027D137-22AC-4095-8B59-4BD3F06B98D4}']
+    procedure selectionWillChange(textInput: Pointer); cdecl;
+    procedure selectionDidChange(textInput: Pointer); cdecl;
+    procedure textWillChange(textInput: Pointer); cdecl;
+    procedure textDidChange(textInput: Pointer); cdecl;
+  end;
+
+  UIActivityItemSource = interface(IObjectiveC)
+    ['{DA87A484-146F-4A3D-84CA-09C1F3B86BD4}']
+    function activityViewControllerPlaceholderItem(activityViewController: UIActivityViewController): Pointer; cdecl;
+    [MethodName('activityViewController:itemForActivityType:')]
+    function activityViewControllerItemForActivityType(activityViewController: UIActivityViewController;
+      itemForActivityType: NSString): Pointer; cdecl;
+    [MethodName('activityViewController:subjectForActivityType:')]
+    function activityViewControllerSubjectForActivityType(activityViewController: UIActivityViewController;
+      subjectForActivityType: NSString): NSString; cdecl;
+    [MethodName('activityViewController:dataTypeIdentifierForActivityType:')]
+    function activityViewControllerDataTypeIdentifierForActivityType(activityViewController: UIActivityViewController;
+      dataTypeIdentifierForActivityType: NSString): NSString; cdecl;
+    [MethodName('activityViewController:thumbnailImageForActivityType:suggestedSize:')]
+    function activityViewControllerThumbnailImageForActivityTypeSuggestedSize(activityViewController
+      : UIActivityViewController; thumbnailImageForActivityType: NSString; suggestedSize: CGSize): UIImage; cdecl;
+  end;
+
+  UIInputViewAudioFeedback = interface(IObjectiveC)
+    ['{15045B0D-B9E8-497D-961D-996C5D4ABC1D}']
+    function enableInputClicksWhenVisible: Boolean; cdecl;
+  end;
+
+  UIStateRestoring = interface(IObjectiveC)
+    ['{96419605-F83B-4F7A-ABEB-1F4F9368F00B}']
+    function restorationParent: Pointer; cdecl;
+    function objectRestorationClass: Pointer; cdecl;
+    procedure encodeRestorableStateWithCoder(coder: NSCoder); cdecl;
+    procedure decodeRestorableStateWithCoder(coder: NSCoder); cdecl;
+    procedure applicationFinishedRestoringState; cdecl;
+  end;
+
+  UIViewControllerRestoration = interface(IObjectiveC)
+    ['{7473D680-E494-4387-9F35-41C2B07A4FF1}']
+    function viewControllerWithRestorationIdentifierPath(identifierComponents: NSArray; coder: NSCoder)
+      : UIViewController; cdecl;
+  end;
+
+  UIDataSourceModelAssociation = interface(IObjectiveC)
+    ['{CEA7A538-0E78-40A0-9EF1-01B193BE4915}']
+    function modelIdentifierForElementAtIndexPath(idx: NSIndexPath; inView: UIView): NSString; cdecl;
+    function indexPathForElementWithModelIdentifier(identifier: NSString; inView: UIView): NSIndexPath; cdecl;
+  end;
+
+  UIObjectRestoration = interface(IObjectiveC)
+    ['{8969FBAE-1327-480E-991C-FF04EBBA55E9}']
+    function objectWithRestorationIdentifierPath(identifierComponents: NSArray; coder: NSCoder): Pointer; cdecl;
+  end;
+
+  UIViewControllerTransitioningDelegate = interface(IObjectiveC)
+    ['{922C9E8B-4C1F-4789-A416-BA41BE33F90B}']
+    function animationControllerForPresentedController(presented: UIViewController;
+      presentingController: UIViewController; sourceController: UIViewController): Pointer; cdecl;
+    function animationControllerForDismissedController(dismissed: UIViewController): Pointer; cdecl;
+    function interactionControllerForPresentation(animator: Pointer): Pointer; cdecl;
+    function interactionControllerForDismissal(animator: Pointer): Pointer; cdecl;
+    function presentationControllerForPresentedViewController(presented: UIViewController;
+      presentingViewController: UIViewController; sourceViewController: UIViewController): UIPresentationController; cdecl;
+  end;
+
+  UIBarPositioning = interface(IObjectiveC)
+    ['{DF4074D3-6A13-4867-ABC0-B313E407EBD0}']
+    function barPosition: UIBarPosition; cdecl;
+  end;
+
+  UIBarPositioningDelegate = interface(IObjectiveC)
+    ['{42ACE160-C992-4334-A1AD-5309724E1C3F}']
+    function positionForBar(bar: Pointer): UIBarPosition; cdecl;
+  end;
+
+  UICollectionViewDataSource = interface(IObjectiveC)
+    ['{BBFAC156-DFC5-437B-A320-AC9C43C853B3}']
+    [MethodName('collectionView:numberOfItemsInSection:')]
+    function collectionViewNumberOfItemsInSection(collectionView: UICollectionView; numberOfItemsInSection: NSInteger)
+      : NSInteger; cdecl;
+    [MethodName('collectionView:cellForItemAtIndexPath:')]
+    function collectionViewCellForItemAtIndexPath(collectionView: UICollectionView; cellForItemAtIndexPath: NSIndexPath)
+      : UICollectionViewCell; cdecl;
+    function numberOfSectionsInCollectionView(collectionView: UICollectionView): NSInteger; cdecl;
+    [MethodName('collectionView:viewForSupplementaryElementOfKind:atIndexPath:')]
+    function collectionViewViewForSupplementaryElementOfKindAtIndexPath(collectionView: UICollectionView;
+      viewForSupplementaryElementOfKind: NSString; atIndexPath: NSIndexPath): UICollectionReusableView; cdecl;
+  end;
+
+  UICollectionViewDelegate = interface(IObjectiveC)
+    ['{F25A1FE1-A89B-4DA6-9E8C-3BE4B3557993}']
+    [MethodName('collectionView:shouldHighlightItemAtIndexPath:')]
+    function collectionViewShouldHighlightItemAtIndexPath(collectionView: UICollectionView;
+      shouldHighlightItemAtIndexPath: NSIndexPath): Boolean; cdecl;
+    [MethodName('collectionView:didHighlightItemAtIndexPath:')]
+    procedure collectionViewDidHighlightItemAtIndexPath(collectionView: UICollectionView;
+      didHighlightItemAtIndexPath: NSIndexPath); cdecl;
+    [MethodName('collectionView:didUnhighlightItemAtIndexPath:')]
+    procedure collectionViewDidUnhighlightItemAtIndexPath(collectionView: UICollectionView;
+      didUnhighlightItemAtIndexPath: NSIndexPath); cdecl;
+    [MethodName('collectionView:shouldSelectItemAtIndexPath:')]
+    function collectionViewShouldSelectItemAtIndexPath(collectionView: UICollectionView;
+      shouldSelectItemAtIndexPath: NSIndexPath): Boolean; cdecl;
+    [MethodName('collectionView:shouldDeselectItemAtIndexPath:')]
+    function collectionViewShouldDeselectItemAtIndexPath(collectionView: UICollectionView;
+      shouldDeselectItemAtIndexPath: NSIndexPath): Boolean; cdecl;
+    [MethodName('collectionView:didSelectItemAtIndexPath:')]
+    procedure collectionViewDidSelectItemAtIndexPath(collectionView: UICollectionView;
+      didSelectItemAtIndexPath: NSIndexPath); cdecl;
+    [MethodName('collectionView:didDeselectItemAtIndexPath:')]
+    procedure collectionViewDidDeselectItemAtIndexPath(collectionView: UICollectionView;
+      didDeselectItemAtIndexPath: NSIndexPath); cdecl;
+    [MethodName('collectionView:didEndDisplayingCell:forItemAtIndexPath:')]
+    procedure collectionViewDidEndDisplayingCellForItemAtIndexPath(collectionView: UICollectionView;
+      didEndDisplayingCell: UICollectionViewCell; forItemAtIndexPath: NSIndexPath); cdecl;
+    [MethodName('collectionView:didEndDisplayingSupplementaryView:forElementOfKind:atIndexPath:')]
+    procedure collectionViewDidEndDisplayingSupplementaryViewForElementOfKindAtIndexPath
+      (collectionView: UICollectionView; didEndDisplayingSupplementaryView: UICollectionReusableView;
+      forElementOfKind: NSString; atIndexPath: NSIndexPath); cdecl;
+    [MethodName('collectionView:shouldShowMenuForItemAtIndexPath:')]
+    function collectionViewShouldShowMenuForItemAtIndexPath(collectionView: UICollectionView;
+      shouldShowMenuForItemAtIndexPath: NSIndexPath): Boolean; cdecl;
+    [MethodName('collectionView:canPerformAction:forItemAtIndexPath:withSender:')]
+    function collectionViewCanPerformActionForItemAtIndexPathWithSender(collectionView: UICollectionView;
+      canPerformAction: SEL; forItemAtIndexPath: NSIndexPath; withSender: Pointer): Boolean; cdecl;
+    [MethodName('collectionView:performAction:forItemAtIndexPath:withSender:')]
+    procedure collectionViewPerformActionForItemAtIndexPathWithSender(collectionView: UICollectionView;
+      performAction: SEL; forItemAtIndexPath: NSIndexPath; withSender: Pointer); cdecl;
+    [MethodName('collectionView:transitionLayoutForOldLayout:newLayout:')]
+    function collectionViewTransitionLayoutForOldLayoutNewLayout(collectionView: UICollectionView;
+      transitionLayoutForOldLayout: UICollectionViewLayout; newLayout: UICollectionViewLayout)
+      : UICollectionViewTransitionLayout; cdecl;
+  end;
+
+  UICollectionViewDelegateFlowLayout = interface(IObjectiveC)
+    ['{BA93BCB0-3750-426F-9AFA-14541A08FC10}']
+    [MethodName('collectionView:layout:sizeForItemAtIndexPath:')]
+    function collectionViewLayoutSizeForItemAtIndexPath(collectionView: UICollectionView;
+      layout: UICollectionViewLayout; sizeForItemAtIndexPath: NSIndexPath): CGSize; cdecl;
+    [MethodName('collectionView:layout:insetForSectionAtIndex:')]
+    function collectionViewLayoutInsetForSectionAtIndex(collectionView: UICollectionView;
+      layout: UICollectionViewLayout; insetForSectionAtIndex: NSInteger): UIEdgeInsets; cdecl;
+    [MethodName('collectionView:layout:minimumLineSpacingForSectionAtIndex:')]
+    function collectionViewLayoutMinimumLineSpacingForSectionAtIndex(collectionView: UICollectionView;
+      layout: UICollectionViewLayout; minimumLineSpacingForSectionAtIndex: NSInteger): CGFloat; cdecl;
+    [MethodName('collectionView:layout:minimumInteritemSpacingForSectionAtIndex:')]
+    function collectionViewLayoutMinimumInteritemSpacingForSectionAtIndex(collectionView: UICollectionView;
+      layout: UICollectionViewLayout; minimumInteritemSpacingForSectionAtIndex: NSInteger): CGFloat; cdecl;
+    [MethodName('collectionView:layout:referenceSizeForHeaderInSection:')]
+    function collectionViewLayoutReferenceSizeForHeaderInSection(collectionView: UICollectionView;
+      layout: UICollectionViewLayout; referenceSizeForHeaderInSection: NSInteger): CGSize; cdecl;
+    [MethodName('collectionView:layout:referenceSizeForFooterInSection:')]
+    function collectionViewLayoutReferenceSizeForFooterInSection(collectionView: UICollectionView;
+      layout: UICollectionViewLayout; referenceSizeForFooterInSection: NSInteger): CGSize; cdecl;
+  end;
+
+  UIDocumentInteractionControllerDelegate = interface(IObjectiveC)
+    ['{F529FE94-2D8A-4C20-BF2A-ED14C7A00CB1}']
+    function documentInteractionControllerViewControllerForPreview(controller: UIDocumentInteractionController)
+      : UIViewController; cdecl;
+    function documentInteractionControllerRectForPreview(controller: UIDocumentInteractionController): CGRect; cdecl;
+    function documentInteractionControllerViewForPreview(controller: UIDocumentInteractionController): UIView; cdecl;
+    procedure documentInteractionControllerWillBeginPreview(controller: UIDocumentInteractionController); cdecl;
+    procedure documentInteractionControllerDidEndPreview(controller: UIDocumentInteractionController); cdecl;
+    procedure documentInteractionControllerWillPresentOptionsMenu(controller: UIDocumentInteractionController); cdecl;
+    procedure documentInteractionControllerDidDismissOptionsMenu(controller: UIDocumentInteractionController); cdecl;
+    procedure documentInteractionControllerWillPresentOpenInMenu(controller: UIDocumentInteractionController); cdecl;
+    procedure documentInteractionControllerDidDismissOpenInMenu(controller: UIDocumentInteractionController); cdecl;
+    [MethodName('documentInteractionController:willBeginSendingToApplication:')]
+    procedure documentInteractionControllerWillBeginSendingToApplication(controller: UIDocumentInteractionController;
+      willBeginSendingToApplication: NSString); cdecl;
+    [MethodName('documentInteractionController:didEndSendingToApplication:')]
+    procedure documentInteractionControllerDidEndSendingToApplication(controller: UIDocumentInteractionController;
+      didEndSendingToApplication: NSString); cdecl;
+    [MethodName('documentInteractionController:canPerformAction:')]
+    function documentInteractionControllerCanPerformAction(controller: UIDocumentInteractionController;
+      canPerformAction: SEL): Boolean; cdecl;
+    [MethodName('documentInteractionController:performAction:')]
+    function documentInteractionControllerPerformAction(controller: UIDocumentInteractionController; performAction: SEL)
+      : Boolean; cdecl;
+  end;
+
+  UINavigationControllerDelegate = interface(IObjectiveC)
+    ['{02302349-DF18-4FCD-9621-3A3C80A96FBB}']
+    [MethodName('navigationController:willShowViewController:animated:')]
+    procedure navigationControllerWillShowViewControllerAnimated(navigationController: UINavigationController;
+      willShowViewController: UIViewController; animated: Boolean); cdecl;
+    [MethodName('navigationController:didShowViewController:animated:')]
+    procedure navigationControllerDidShowViewControllerAnimated(navigationController: UINavigationController;
+      didShowViewController: UIViewController; animated: Boolean); cdecl;
+    function navigationControllerSupportedInterfaceOrientations(navigationController: UINavigationController)
+      : NSUInteger; cdecl;
+    function navigationControllerPreferredInterfaceOrientationForPresentation(navigationController
+      : UINavigationController): UIInterfaceOrientation; cdecl;
+    [MethodName('navigationController:interactionControllerForAnimationController:')]
+    function navigationControllerInteractionControllerForAnimationController(navigationController
+      : UINavigationController; interactionControllerForAnimationController: Pointer): Pointer; cdecl;
+    [MethodName('navigationController:animationControllerForOperation:fromViewController:toViewController:')]
+    function navigationControllerAnimationControllerForOperationFromViewControllerToViewController
+      (navigationController: UINavigationController; animationControllerForOperation: UINavigationControllerOperation;
+      fromViewController: UIViewController; toViewController: UIViewController): Pointer; cdecl;
+  end;
+
+  UIViewControllerInteractiveTransitioning = interface(IObjectiveC)
+    ['{A370851F-9D20-46CD-B047-4618A77D9391}']
+    procedure startInteractiveTransition(transitionContext: Pointer); cdecl;
+    function completionSpeed: CGFloat; cdecl;
+    function completionCurve: UIViewAnimationCurve; cdecl;
+  end;
+
+  UIViewControllerAnimatedTransitioning = interface(IObjectiveC)
+    ['{0B020D70-DF9E-43AC-ACED-C4A29EDC2DCA}']
+    function transitionDuration(transitionContext: Pointer): NSTimeInterval; cdecl;
+    procedure animateTransition(transitionContext: Pointer); cdecl;
+    procedure animationEnded(transitionCompleted: Boolean); cdecl;
+  end;
+
+  UINavigationBarDelegate = interface(IObjectiveC)
+    ['{8765B7AA-89D6-4DF3-9518-8BEAEF783B0C}']
+    [MethodName('navigationBar:shouldPushItem:')]
+    function navigationBarShouldPushItem(navigationBar: UINavigationBar; shouldPushItem: UINavigationItem)
+      : Boolean; cdecl;
+    [MethodName('navigationBar:didPushItem:')]
+    procedure navigationBarDidPushItem(navigationBar: UINavigationBar; didPushItem: UINavigationItem); cdecl;
+    [MethodName('navigationBar:shouldPopItem:')]
+    function navigationBarShouldPopItem(navigationBar: UINavigationBar; shouldPopItem: UINavigationItem)
+      : Boolean; cdecl;
+    [MethodName('navigationBar:didPopItem:')]
+    procedure navigationBarDidPopItem(navigationBar: UINavigationBar; didPopItem: UINavigationItem); cdecl;
+  end;
+
+  UIPageViewControllerDelegate = interface(IObjectiveC)
+    ['{0E6B148B-3E36-43D2-9472-F81635E92A5D}']
+    [MethodName('pageViewController:willTransitionToViewControllers:')]
+    procedure pageViewControllerWillTransitionToViewControllers(pageViewController: UIPageViewController;
+      willTransitionToViewControllers: NSArray); cdecl;
+    [MethodName('pageViewController:didFinishAnimating:previousViewControllers:transitionCompleted:')]
+    procedure pageViewControllerDidFinishAnimatingPreviousViewControllersTransitionCompleted
+      (pageViewController: UIPageViewController; didFinishAnimating: Boolean; previousViewControllers: NSArray;
+      transitionCompleted: Boolean); cdecl;
+    [MethodName('pageViewController:spineLocationForInterfaceOrientation:')]
+    function pageViewControllerSpineLocationForInterfaceOrientation(pageViewController: UIPageViewController;
+      spineLocationForInterfaceOrientation: UIInterfaceOrientation): UIPageViewControllerSpineLocation; cdecl;
+    function pageViewControllerSupportedInterfaceOrientations(pageViewController: UIPageViewController)
+      : NSUInteger; cdecl;
+    function pageViewControllerPreferredInterfaceOrientationForPresentation(pageViewController: UIPageViewController)
+      : UIInterfaceOrientation; cdecl;
+  end;
+
+  UIPageViewControllerDataSource = interface(IObjectiveC)
+    ['{54722E32-E25B-441E-BC5D-BD462C50CFA9}']
+    [MethodName('pageViewController:viewControllerBeforeViewController:')]
+    function pageViewControllerViewControllerBeforeViewController(pageViewController: UIPageViewController;
+      viewControllerBeforeViewController: UIViewController): UIViewController; cdecl;
+    [MethodName('pageViewController:viewControllerAfterViewController:')]
+    function pageViewControllerViewControllerAfterViewController(pageViewController: UIPageViewController;
+      viewControllerAfterViewController: UIViewController): UIViewController; cdecl;
+    function presentationCountForPageViewController(pageViewController: UIPageViewController): NSInteger; cdecl;
+    function presentationIndexForPageViewController(pageViewController: UIPageViewController): NSInteger; cdecl;
+  end;
+
+  UIPrintInteractionControllerDelegate = interface(IObjectiveC)
+    ['{19029A2D-F062-42B2-8D9A-08CCBE376508}']
+    function printInteractionControllerParentViewController(printInteractionController: UIPrintInteractionController)
+      : UIViewController; cdecl;
+    [MethodName('printInteractionController:choosePaper:')]
+    function printInteractionControllerChoosePaper(printInteractionController: UIPrintInteractionController;
+      choosePaper: NSArray): UIPrintPaper; cdecl;
+    procedure printInteractionControllerWillPresentPrinterOptions(printInteractionController
+      : UIPrintInteractionController); cdecl;
+    procedure printInteractionControllerDidPresentPrinterOptions(printInteractionController
+      : UIPrintInteractionController); cdecl;
+    procedure printInteractionControllerWillDismissPrinterOptions(printInteractionController
+      : UIPrintInteractionController); cdecl;
+    procedure printInteractionControllerDidDismissPrinterOptions(printInteractionController
+      : UIPrintInteractionController); cdecl;
+    procedure printInteractionControllerWillStartJob(printInteractionController: UIPrintInteractionController); cdecl;
+    procedure printInteractionControllerDidFinishJob(printInteractionController: UIPrintInteractionController); cdecl;
+    [MethodName('printInteractionController:cutLengthForPaper:')]
+    function printInteractionControllerCutLengthForPaper(printInteractionController: UIPrintInteractionController;
+      cutLengthForPaper: UIPrintPaper): CGFloat; cdecl;
+  end;
+
+  UISearchBarDelegate = interface(IObjectiveC)
+    ['{3BC2936D-3FEF-4B05-BF8A-8E3E12AD7BB8}']
+    function searchBarShouldBeginEditing(searchBar: UISearchBar): Boolean; cdecl;
+    procedure searchBarTextDidBeginEditing(searchBar: UISearchBar); cdecl;
+    function searchBarShouldEndEditing(searchBar: UISearchBar): Boolean; cdecl;
+    procedure searchBarTextDidEndEditing(searchBar: UISearchBar); cdecl;
+    [MethodName('searchBar:textDidChange:')]
+    procedure searchBarTextDidChange(searchBar: UISearchBar; textDidChange: NSString); cdecl;
+    [MethodName('searchBar:shouldChangeTextInRange:replacementText:')]
+    function searchBarShouldChangeTextInRangeReplacementText(searchBar: UISearchBar; shouldChangeTextInRange: NSRange;
+      replacementText: NSString): Boolean; cdecl;
+    procedure searchBarSearchButtonClicked(searchBar: UISearchBar); cdecl;
+    procedure searchBarBookmarkButtonClicked(searchBar: UISearchBar); cdecl;
+    procedure searchBarCancelButtonClicked(searchBar: UISearchBar); cdecl;
+    procedure searchBarResultsListButtonClicked(searchBar: UISearchBar); cdecl;
+    [MethodName('searchBar:selectedScopeButtonIndexDidChange:')]
+    procedure searchBarSelectedScopeButtonIndexDidChange(searchBar: UISearchBar;
+      selectedScopeButtonIndexDidChange: NSInteger); cdecl;
+  end;
+
+  UISearchDisplayDelegate = interface(IObjectiveC)
+    ['{04DA4B86-FE96-4345-B9F3-E75AE64480A6}']
+    procedure searchDisplayControllerWillBeginSearch(controller: UISearchDisplayController); cdecl;
+    procedure searchDisplayControllerDidBeginSearch(controller: UISearchDisplayController); cdecl;
+    procedure searchDisplayControllerWillEndSearch(controller: UISearchDisplayController); cdecl;
+    procedure searchDisplayControllerDidEndSearch(controller: UISearchDisplayController); cdecl;
+    [MethodName('searchDisplayController:didLoadSearchResultsTableView:')]
+    procedure searchDisplayControllerDidLoadSearchResultsTableView(controller: UISearchDisplayController;
+      didLoadSearchResultsTableView: UITableView); cdecl;
+    [MethodName('searchDisplayController:willUnloadSearchResultsTableView:')]
+    procedure searchDisplayControllerWillUnloadSearchResultsTableView(controller: UISearchDisplayController;
+      willUnloadSearchResultsTableView: UITableView); cdecl;
+    [MethodName('searchDisplayController:willShowSearchResultsTableView:')]
+    procedure searchDisplayControllerWillShowSearchResultsTableView(controller: UISearchDisplayController;
+      willShowSearchResultsTableView: UITableView); cdecl;
+    [MethodName('searchDisplayController:didShowSearchResultsTableView:')]
+    procedure searchDisplayControllerDidShowSearchResultsTableView(controller: UISearchDisplayController;
+      didShowSearchResultsTableView: UITableView); cdecl;
+    [MethodName('searchDisplayController:willHideSearchResultsTableView:')]
+    procedure searchDisplayControllerWillHideSearchResultsTableView(controller: UISearchDisplayController;
+      willHideSearchResultsTableView: UITableView); cdecl;
+    [MethodName('searchDisplayController:didHideSearchResultsTableView:')]
+    procedure searchDisplayControllerDidHideSearchResultsTableView(controller: UISearchDisplayController;
+      didHideSearchResultsTableView: UITableView); cdecl;
+    [MethodName('searchDisplayController:shouldReloadTableForSearchString:')]
+    function searchDisplayControllerShouldReloadTableForSearchString(controller: UISearchDisplayController;
+      shouldReloadTableForSearchString: NSString): Boolean; cdecl;
+    [MethodName('searchDisplayController:shouldReloadTableForSearchScope:')]
+    function searchDisplayControllerShouldReloadTableForSearchScope(controller: UISearchDisplayController;
+      shouldReloadTableForSearchScope: NSInteger): Boolean; cdecl;
+  end;
+
+  UISplitViewControllerDelegate = interface(IObjectiveC)
+    ['{6188711E-51CB-4400-9DC9-207DE7200AE6}']
+    [MethodName('splitViewController:willHideViewController:withBarButtonItem:forPopoverController:')]
+    procedure splitViewControllerWillHideViewControllerWithBarButtonItemForPopoverController(svc: UISplitViewController;
+      willHideViewController: UIViewController; withBarButtonItem: UIBarButtonItem;
+      forPopoverController: UIPopoverController); cdecl;
+    [MethodName('splitViewController:willShowViewController:invalidatingBarButtonItem:')]
+    procedure splitViewControllerWillShowViewControllerInvalidatingBarButtonItem(svc: UISplitViewController;
+      willShowViewController: UIViewController; invalidatingBarButtonItem: UIBarButtonItem); cdecl;
+    [MethodName('splitViewController:popoverController:willPresentViewController:')]
+    procedure splitViewControllerPopoverControllerWillPresentViewController(svc: UISplitViewController;
+      popoverController: UIPopoverController; willPresentViewController: UIViewController); cdecl;
+    [MethodName('splitViewController:shouldHideViewController:inOrientation:')]
+    function splitViewControllerShouldHideViewControllerInOrientation(svc: UISplitViewController;
+      shouldHideViewController: UIViewController; inOrientation: UIInterfaceOrientation): Boolean; cdecl;
+    function splitViewControllerSupportedInterfaceOrientations(splitViewController: UISplitViewController)
+      : NSUInteger; cdecl;
+    function splitViewControllerPreferredInterfaceOrientationForPresentation(splitViewController: UISplitViewController)
+      : UIInterfaceOrientation; cdecl;
+  end;
+
+  UITabBarDelegate = interface(IObjectiveC)
+    ['{D6BA6D3E-3DAE-4D48-B3D2-001EFFA98D91}']
+    [MethodName('tabBar:didSelectItem:')]
+    procedure tabBarDidSelectItem(tabBar: UITabBar; didSelectItem: UITabBarItem); cdecl;
+    [MethodName('tabBar:willBeginCustomizingItems:')]
+    procedure tabBarWillBeginCustomizingItems(tabBar: UITabBar; willBeginCustomizingItems: NSArray); cdecl;
+    [MethodName('tabBar:didBeginCustomizingItems:')]
+    procedure tabBarDidBeginCustomizingItems(tabBar: UITabBar; didBeginCustomizingItems: NSArray); cdecl;
+    [MethodName('tabBar:willEndCustomizingItems:changed:')]
+    procedure tabBarWillEndCustomizingItemsChanged(tabBar: UITabBar; willEndCustomizingItems: NSArray;
+      changed: Boolean); cdecl;
+    [MethodName('tabBar:didEndCustomizingItems:changed:')]
+    procedure tabBarDidEndCustomizingItemsChanged(tabBar: UITabBar; didEndCustomizingItems: NSArray;
+      changed: Boolean); cdecl;
+  end;
+
+  UIViewControllerTransitionCoordinatorContext = interface(IObjectiveC)
+    ['{D63FF74B-237B-4E4E-B389-278F10FDBB66}']
+    function isAnimated: Boolean; cdecl;
+    function presentationStyle: UIModalPresentationStyle; cdecl;
+    function initiallyInteractive: Boolean; cdecl;
+    function isInteractive: Boolean; cdecl;
+    function isCancelled: Boolean; cdecl;
+    function transitionDuration: NSTimeInterval; cdecl;
+    function percentComplete: CGFloat; cdecl;
+    function completionVelocity: CGFloat; cdecl;
+    function completionCurve: UIViewAnimationCurve; cdecl;
+    function viewControllerForKey(key: NSString): UIViewController; cdecl;
+    function containerView: UIView; cdecl;
+  end;
+
+  UIViewControllerTransitionCoordinator = interface(IObjectiveC)
+    ['{53044E27-FFC8-4209-94E4-61CFBF746678}']
+    function animateAlongsideTransition(animation: TUIKitAnimation; completion: TUIKitAnimation): Boolean; cdecl;
+    function animateAlongsideTransitionInView(view: UIView; animation: TUIKitAnimation; completion: TUIKitAnimation)
+      : Boolean; cdecl;
+    procedure notifyWhenInteractionEndsUsingBlock(handler: TUIKitAnimation); cdecl;
+  end;
+
+  UIViewControllerContextTransitioning = interface(IObjectiveC)
+    ['{043C224D-E785-4013-8463-9E4DA49A9088}']
+    function containerView: UIView; cdecl;
+    function isAnimated: Boolean; cdecl;
+    function isInteractive: Boolean; cdecl;
+    function transitionWasCancelled: Boolean; cdecl;
+    function presentationStyle: UIModalPresentationStyle; cdecl;
+    procedure updateInteractiveTransition(percentComplete: CGFloat); cdecl;
+    procedure finishInteractiveTransition; cdecl;
+    procedure cancelInteractiveTransition; cdecl;
+    procedure completeTransition(didComplete: Boolean); cdecl;
+    function viewControllerForKey(key: NSString): UIViewController; cdecl;
+    function initialFrameForViewController(vc: UIViewController): CGRect; cdecl;
+    function finalFrameForViewController(vc: UIViewController): CGRect; cdecl;
+  end;
+
+  UITabBarControllerDelegate = interface(IObjectiveC)
+    ['{82184D7D-ECFF-498C-A431-AA7294EB54D6}']
+    [MethodName('tabBarController:shouldSelectViewController:')]
+    function tabBarControllerShouldSelectViewController(tabBarController: UITabBarController;
+      shouldSelectViewController: UIViewController): Boolean; cdecl;
+    [MethodName('tabBarController:didSelectViewController:')]
+    procedure tabBarControllerDidSelectViewController(tabBarController: UITabBarController;
+      didSelectViewController: UIViewController); cdecl;
+    [MethodName('tabBarController:willBeginCustomizingViewControllers:')]
+    procedure tabBarControllerWillBeginCustomizingViewControllers(tabBarController: UITabBarController;
+      willBeginCustomizingViewControllers: NSArray); cdecl;
+    [MethodName('tabBarController:willEndCustomizingViewControllers:changed:')]
+    procedure tabBarControllerWillEndCustomizingViewControllersChanged(tabBarController: UITabBarController;
+      willEndCustomizingViewControllers: NSArray; changed: Boolean); cdecl;
+    [MethodName('tabBarController:didEndCustomizingViewControllers:changed:')]
+    procedure tabBarControllerDidEndCustomizingViewControllersChanged(tabBarController: UITabBarController;
+      didEndCustomizingViewControllers: NSArray; changed: Boolean); cdecl;
+    function tabBarControllerSupportedInterfaceOrientations(tabBarController: UITabBarController): NSUInteger; cdecl;
+    function tabBarControllerPreferredInterfaceOrientationForPresentation(tabBarController: UITabBarController)
+      : UIInterfaceOrientation; cdecl;
+    [MethodName('tabBarController:interactionControllerForAnimationController:')]
+    function tabBarControllerInteractionControllerForAnimationController(tabBarController: UITabBarController;
+      interactionControllerForAnimationController: Pointer): Pointer; cdecl;
+    [MethodName('tabBarController:animationControllerForTransitionFromViewController:toViewController:')]
+    function tabBarControllerAnimationControllerForTransitionFromViewControllerToViewController
+      (tabBarController: UITabBarController; animationControllerForTransitionFromViewController: UIViewController;
+      toViewController: UIViewController): Pointer; cdecl;
+  end;
+
+  UITextViewDelegate = interface(IObjectiveC)
+    ['{D22276B3-5E9C-49F4-8A63-0062F9221EC2}']
+    function textViewShouldBeginEditing(textView: UITextView): Boolean; cdecl;
+    function textViewShouldEndEditing(textView: UITextView): Boolean; cdecl;
+    procedure textViewDidBeginEditing(textView: UITextView); cdecl;
+    procedure textViewDidEndEditing(textView: UITextView); cdecl;
+    [MethodName('textView:shouldChangeTextInRange:replacementText:')]
+    function textViewShouldChangeTextInRangeReplacementText(textView: UITextView; shouldChangeTextInRange: NSRange;
+      replacementText: NSString): Boolean; cdecl;
+    procedure textViewDidChange(textView: UITextView); cdecl;
+    procedure textViewDidChangeSelection(textView: UITextView); cdecl;
+    [MethodName('textView:shouldInteractWithURL:inRange:')]
+    function textViewShouldInteractWithURLInRange(textView: UITextView; shouldInteractWithURL: NSURL; inRange: NSRange)
+      : Boolean; cdecl;
+    [MethodName('textView:shouldInteractWithTextAttachment:inRange:')]
+    function textViewShouldInteractWithTextAttachmentInRange(textView: UITextView;
+      shouldInteractWithTextAttachment: NSTextAttachment; inRange: NSRange): Boolean; cdecl;
+  end;
+
+  UIToolbarDelegate = interface(IObjectiveC)
+    ['{6A6F83DF-0E08-4919-9093-6868B94C8385}']
+  end;
+
+  UIVideoEditorControllerDelegate = interface(IObjectiveC)
+    ['{54092293-E863-425F-ABF0-6D4AD90B1680}']
+    [MethodName('videoEditorController:didSaveEditedVideoToPath:')]
+    procedure videoEditorControllerDidSaveEditedVideoToPath(editor: UIVideoEditorController;
+      didSaveEditedVideoToPath: NSString); cdecl;
+    [MethodName('videoEditorController:didFailWithError:')]
+    procedure videoEditorControllerDidFailWithError(editor: UIVideoEditorController; didFailWithError: NSError); cdecl;
+    procedure videoEditorControllerDidCancel(editor: UIVideoEditorController); cdecl;
+  end;
+
+  UIDynamicAnimatorDelegate = interface(IObjectiveC)
+    ['{9F542F74-4B8D-4CE4-97F8-0AA5EB1D4A8D}']
+    procedure dynamicAnimatorWillResume(animator: UIDynamicAnimator); cdecl;
+    procedure dynamicAnimatorDidPause(animator: UIDynamicAnimator); cdecl;
+  end;
+
+  UICollisionBehaviorDelegate = interface(IObjectiveC)
+    ['{8EBC2DEB-836B-4D88-B901-5116ED953162}']
+    [MethodName('collisionBehavior:beganContactForItem:withItem:atPoint:')]
+    procedure collisionBehaviorBeganContactForItemWithItemAtPoint(behavior: UICollisionBehavior;
+      beganContactForItem: Pointer; withItem: Pointer; atPoint: CGPoint); cdecl;
+    [MethodName('collisionBehavior:endedContactForItem:withItem:')]
+    procedure collisionBehaviorEndedContactForItemWithItem(behavior: UICollisionBehavior; endedContactForItem: Pointer;
+      withItem: Pointer); cdecl;
+    [MethodName('collisionBehavior:beganContactForItem:withBoundaryIdentifier:atPoint:')]
+    procedure collisionBehaviorBeganContactForItemWithBoundaryIdentifierAtPoint(behavior: UICollisionBehavior;
+      beganContactForItem: Pointer; withBoundaryIdentifier: Pointer; atPoint: CGPoint); cdecl;
+    [MethodName('collisionBehavior:endedContactForItem:withBoundaryIdentifier:')]
+    procedure collisionBehaviorEndedContactForItemWithBoundaryIdentifier(behavior: UICollisionBehavior;
+      endedContactForItem: Pointer; withBoundaryIdentifier: Pointer); cdecl;
+  end;
+
+  UIContentContainer = interface(IObjectiveC)
+    ['{9ADE9E52-71BE-4967-9615-C15BED273D7A}']
+    function preferredContentSize: CGSize; cdecl;
+    procedure preferredContentSizeDidChangeForChildContentContainer(container: Pointer); cdecl;
+    procedure systemLayoutFittingSizeDidChangeForChildContentContainer(container: Pointer); cdecl;
+    function sizeForChildContentContainer(container: Pointer; withParentContainerSize: CGSize): CGSize; cdecl;
+    procedure viewWillTransitionToSize(size: CGSize; withTransitionCoordinator: Pointer); cdecl;
+    procedure willTransitionToTraitCollection(newCollection: UITraitCollection;
+      withTransitionCoordinator: Pointer); cdecl;
+  end;
+
+  UITextDocumentProxy = interface(IObjectiveC)
+    ['{4F479854-D7A2-4516-BECE-BBA2800323FF}']
+    function documentContextBeforeInput: NSString; cdecl;
+    function documentContextAfterInput: NSString; cdecl;
+    procedure adjustTextPositionByCharacterOffset(offset: NSInteger); cdecl;
+  end;
+
+  UIPopoverBackgroundViewMethods = interface(IObjectiveC)
+    ['{3B1C6A10-8ED0-410D-A77F-A8FF4C2E7840}']
+    function arrowBase: CGFloat; cdecl;
+    function contentViewInsets: UIEdgeInsets; cdecl;
+    function arrowHeight: CGFloat; cdecl;
+  end;
+
+  UIPrinterPickerControllerDelegate = interface(IObjectiveC)
+    ['{847C96D6-609B-4BBE-8D37-49108E3AE969}']
+    function printerPickerControllerParentViewController(printerPickerController: UIPrinterPickerController)
+      : UIViewController; cdecl;
+    function printerPickerController(printerPickerController: UIPrinterPickerController; shouldShowPrinter: UIPrinter)
+      : Boolean; cdecl;
+    procedure printerPickerControllerWillPresent(printerPickerController: UIPrinterPickerController); cdecl;
+    procedure printerPickerControllerDidPresent(printerPickerController: UIPrinterPickerController); cdecl;
+    procedure printerPickerControllerWillDismiss(printerPickerController: UIPrinterPickerController); cdecl;
+    procedure printerPickerControllerDidDismiss(printerPickerController: UIPrinterPickerController); cdecl;
+    procedure printerPickerControllerDidSelectPrinter(printerPickerController: UIPrinterPickerController); cdecl;
+  end;
+
+  UIAdaptivePresentationControllerDelegate = interface(IObjectiveC)
+    ['{173BB3F6-ED9D-4C00-84BC-37E7A245B6A1}']
+    function adaptivePresentationStyleForPresentationController(controller: UIPresentationController)
+      : UIModalPresentationStyle; cdecl;
+    function presentationController(controller: UIPresentationController;
+      viewControllerForAdaptivePresentationStyle: UIModalPresentationStyle): UIViewController; cdecl;
+  end;
+
+  UISearchControllerDelegate = interface(IObjectiveC)
+    ['{3A8C75D8-C5B6-4B76-8445-74A60C85DEED}']
+    procedure willPresentSearchController(searchController: UISearchController); cdecl;
+    procedure didPresentSearchController(searchController: UISearchController); cdecl;
+    procedure willDismissSearchController(searchController: UISearchController); cdecl;
+    procedure didDismissSearchController(searchController: UISearchController); cdecl;
+    procedure presentSearchController(searchController: UISearchController); cdecl;
+  end;
+
+  UISearchResultsUpdating = interface(IObjectiveC)
+    ['{B00A93D8-CF2E-4375-829D-E681D67DAD3A}']
+    procedure updateSearchResultsForSearchController(searchController: UISearchController); cdecl;
+  end;
+
+  UIPopoverPresentationControllerDelegate = interface(IObjectiveC)
+    ['{505779DC-D04C-45E2-A085-57FE8585E8A6}']
+    procedure prepareForPopoverPresentation(popoverPresentationController: UIPopoverPresentationController); cdecl;
+    function popoverPresentationControllerShouldDismissPopover(popoverPresentationController
+      : UIPopoverPresentationController): Boolean; cdecl;
+    procedure popoverPresentationControllerDidDismissPopover(popoverPresentationController
+      : UIPopoverPresentationController); cdecl;
+    procedure popoverPresentationController(popoverPresentationController: UIPopoverPresentationController;
+      willRepositionPopoverToRect: Pointer; inView: UIView); cdecl;
+  end;
+
+  // ===== Exported string consts =====
+
+function NSFontAttributeName: NSString;
+function NSParagraphStyleAttributeName: NSString;
+function NSForegroundColorAttributeName: NSString;
+function NSBackgroundColorAttributeName: NSString;
+function NSLigatureAttributeName: NSString;
+function NSKernAttributeName: NSString;
+function NSStrikethroughStyleAttributeName: NSString;
+function NSUnderlineStyleAttributeName: NSString;
+function NSStrokeColorAttributeName: NSString;
+function NSStrokeWidthAttributeName: NSString;
+function NSShadowAttributeName: NSString;
+function NSTextEffectAttributeName: NSString;
+function NSAttachmentAttributeName: NSString;
+function NSLinkAttributeName: NSString;
+function NSBaselineOffsetAttributeName: NSString;
+function NSUnderlineColorAttributeName: NSString;
+function NSStrikethroughColorAttributeName: NSString;
+function NSObliquenessAttributeName: NSString;
+function NSExpansionAttributeName: NSString;
+function NSWritingDirectionAttributeName: NSString;
+function NSVerticalGlyphFormAttributeName: NSString;
+function NSTextEffectLetterpressStyle: NSString;
+function NSPlainTextDocumentType: NSString;
+function NSRTFTextDocumentType: NSString;
+function NSRTFDTextDocumentType: NSString;
+function NSHTMLTextDocumentType: NSString;
+function NSTextLayoutSectionOrientation: NSString;
+function NSTextLayoutSectionRange: NSString;
+function NSDocumentTypeDocumentAttribute: NSString;
+function NSCharacterEncodingDocumentAttribute: NSString;
+function NSDefaultAttributesDocumentAttribute: NSString;
+function NSPaperSizeDocumentAttribute: NSString;
+function NSPaperMarginDocumentAttribute: NSString;
+function NSViewSizeDocumentAttribute: NSString;
+function NSViewZoomDocumentAttribute: NSString;
+function NSViewModeDocumentAttribute: NSString;
+function NSReadOnlyDocumentAttribute: NSString;
+function NSBackgroundColorDocumentAttribute: NSString;
+function NSHyphenationFactorDocumentAttribute: NSString;
+function NSDefaultTabIntervalDocumentAttribute: NSString;
+function NSTextLayoutSectionsAttribute: NSString;
+function NSTextStorageWillProcessEditingNotification: NSString;
+function NSTextStorageDidProcessEditingNotification: NSString;
+function UIFontDescriptorFamilyAttribute: NSString;
+function UIFontDescriptorNameAttribute: NSString;
+function UIFontDescriptorFaceAttribute: NSString;
+function UIFontDescriptorSizeAttribute: NSString;
+function UIFontDescriptorVisibleNameAttribute: NSString;
+function UIFontDescriptorMatrixAttribute: NSString;
+function UIFontDescriptorCharacterSetAttribute: NSString;
+function UIFontDescriptorCascadeListAttribute: NSString;
+function UIFontDescriptorTraitsAttribute: NSString;
+function UIFontDescriptorFixedAdvanceAttribute: NSString;
+function UIFontDescriptorFeatureSettingsAttribute: NSString;
+function UIFontDescriptorTextStyleAttribute: NSString;
+function UIFontSymbolicTrait: NSString;
+function UIFontWeightTrait: NSString;
+function UIFontWidthTrait: NSString;
+function UIFontSlantTrait: NSString;
+function UIFontFeatureTypeIdentifierKey: NSString;
+function UIFontFeatureSelectorIdentifierKey: NSString;
+function UIFontTextStyleHeadline: NSString;
+function UIFontTextStyleBody: NSString;
+function UIFontTextStyleSubheadline: NSString;
+function UIFontTextStyleFootnote: NSString;
+function UIFontTextStyleCaption1: NSString;
+function UIFontTextStyleCaption2: NSString;
+function NSTabColumnTerminatorsAttributeName: NSString;
+function UIKeyInputUpArrow: NSString;
+function UIKeyInputDownArrow: NSString;
+function UIKeyInputLeftArrow: NSString;
+function UIKeyInputRightArrow: NSString;
+function UIKeyInputEscape: NSString;
+function UITextAttributeFont: NSString;
+function UITextAttributeTextColor: NSString;
+function UITextAttributeTextShadowColor: NSString;
+function UITextAttributeTextShadowOffset: NSString;
+function UITableViewIndexSearch: NSString;
+function UITableViewSelectionDidChangeNotification: NSString;
+function UIAccessibilityAnnouncementDidFinishNotification: NSString;
+function UIAccessibilityAnnouncementKeyStringValue: NSString;
+function UIAccessibilityAnnouncementKeyWasSuccessful: NSString;
+function UIAccessibilitySpeechAttributePunctuation: NSString;
+function UIAccessibilitySpeechAttributeLanguage: NSString;
+function UIAccessibilitySpeechAttributePitch: NSString;
+function UIAccessibilityVoiceOverStatusChanged: NSString;
+function UIAccessibilityMonoAudioStatusDidChangeNotification: NSString;
+function UIAccessibilityClosedCaptioningStatusDidChangeNotification: NSString;
+function UIAccessibilityInvertColorsStatusDidChangeNotification: NSString;
+function UIAccessibilityGuidedAccessStatusDidChangeNotification: NSString;
+function UITextInputTextBackgroundColorKey: NSString;
+function UITextInputTextColorKey: NSString;
+function UITextInputTextFontKey: NSString;
+function UITextInputCurrentInputModeDidChangeNotification: NSString;
+function UITextFieldTextDidBeginEditingNotification: NSString;
+function UITextFieldTextDidEndEditingNotification: NSString;
+function UITextFieldTextDidChangeNotification: NSString;
+function UIActivityTypePostToFacebook: NSString;
+function UIActivityTypePostToTwitter: NSString;
+function UIActivityTypePostToWeibo: NSString;
+function UIActivityTypeMessage: NSString;
+function UIActivityTypeMail: NSString;
+function UIActivityTypePrint: NSString;
+function UIActivityTypeCopyToPasteboard: NSString;
+function UIActivityTypeAssignToContact: NSString;
+function UIActivityTypeSaveToCameraRoll: NSString;
+function UIActivityTypeAddToReadingList: NSString;
+function UIActivityTypePostToFlickr: NSString;
+function UIActivityTypePostToVimeo: NSString;
+function UIActivityTypePostToTencentWeibo: NSString;
+function UIActivityTypeAirDrop: NSString;
+function UIDeviceOrientationDidChangeNotification: NSString;
+function UIDeviceBatteryStateDidChangeNotification: NSString;
+function UIDeviceBatteryLevelDidChangeNotification: NSString;
+function UIDeviceProximityStateDidChangeNotification: NSString;
+function UIApplicationInvalidInterfaceOrientationException: NSString;
+function UITrackingRunLoopMode: NSString;
+function UIApplicationDidEnterBackgroundNotification: NSString;
+function UIApplicationWillEnterForegroundNotification: NSString;
+function UIApplicationDidFinishLaunchingNotification: NSString;
+function UIApplicationDidBecomeActiveNotification: NSString;
+function UIApplicationWillResignActiveNotification: NSString;
+function UIApplicationDidReceiveMemoryWarningNotification: NSString;
+function UIApplicationWillTerminateNotification: NSString;
+function UIApplicationSignificantTimeChangeNotification: NSString;
+function UIApplicationWillChangeStatusBarOrientationNotification: NSString;
+function UIApplicationDidChangeStatusBarOrientationNotification: NSString;
+function UIApplicationStatusBarOrientationUserInfoKey: NSString;
+function UIApplicationWillChangeStatusBarFrameNotification: NSString;
+function UIApplicationDidChangeStatusBarFrameNotification: NSString;
+function UIApplicationStatusBarFrameUserInfoKey: NSString;
+function UIApplicationBackgroundRefreshStatusDidChangeNotification: NSString;
+function UIApplicationLaunchOptionsURLKey: NSString;
+function UIApplicationLaunchOptionsSourceApplicationKey: NSString;
+function UIApplicationLaunchOptionsRemoteNotificationKey: NSString;
+function UIApplicationLaunchOptionsLocalNotificationKey: NSString;
+function UIApplicationLaunchOptionsAnnotationKey: NSString;
+function UIApplicationProtectedDataWillBecomeUnavailable: NSString;
+function UIApplicationProtectedDataDidBecomeAvailable: NSString;
+function UIApplicationLaunchOptionsLocationKey: NSString;
+function UIApplicationLaunchOptionsNewsstandDownloadsKey: NSString;
+function UIApplicationLaunchOptionsBluetoothCentralsKey: NSString;
+function UIApplicationLaunchOptionsBluetoothPeripheralsKey: NSString;
+function UIContentSizeCategoryExtraSmall: NSString;
+function UIContentSizeCategorySmall: NSString;
+function UIContentSizeCategoryMedium: NSString;
+function UIContentSizeCategoryLarge: NSString;
+function UIContentSizeCategoryExtraLarge: NSString;
+function UIContentSizeCategoryExtraExtraLarge: NSString;
+function UIContentSizeCategoryExtraExtraExtraLarge: NSString;
+function UIContentSizeCategoryAccessibilityMedium: NSString;
+function UIContentSizeCategoryAccessibilityLarge: NSString;
+function UIContentSizeCategoryAccessibilityExtraLarge: NSString;
+function UIContentSizeCategoryAccessibilityExtraExtraLarge: NSString;
+function UIContentSizeCategoryAccessibilityExtraExtraExtraLarge: NSString;
+function UIContentSizeCategoryDidChangeNotification: NSString;
+function UIContentSizeCategoryNewValueKey: NSString;
+function UIApplicationUserDidTakeScreenshotNotification: NSString;
+function UIStateRestorationViewControllerStoryboardKey: NSString;
+function UIApplicationStateRestorationBundleVersionKey: NSString;
+function UIApplicationStateRestorationUserInterfaceIdiomKey: NSString;
+function UIApplicationStateRestorationTimestampKey: NSString;
+function UIApplicationStateRestorationSystemVersionKey: NSString;
+function UIViewControllerHierarchyInconsistencyException: NSString;
+function UICollectionElementKindSectionHeader: NSString;
+function UICollectionElementKindSectionFooter: NSString;
+function UIDocumentStateChangedNotification: NSString;
+function UIImagePickerControllerMediaType: NSString;
+function UIImagePickerControllerOriginalImage: NSString;
+function UIImagePickerControllerEditedImage: NSString;
+function UIImagePickerControllerCropRect: NSString;
+function UIImagePickerControllerMediaURL: NSString;
+function UIImagePickerControllerReferenceURL: NSString;
+function UIImagePickerControllerMediaMetadata: NSString;
+function UILocalNotificationDefaultSoundName: NSString;
+function UIMenuControllerWillShowMenuNotification: NSString;
+function UIMenuControllerDidShowMenuNotification: NSString;
+function UIMenuControllerWillHideMenuNotification: NSString;
+function UIMenuControllerDidHideMenuNotification: NSString;
+function UIMenuControllerMenuFrameDidChangeNotification: NSString;
+function UINibExternalObjects: NSString;
+function UINibProxiedObjectsKey: NSString;
+function UIPageViewControllerOptionSpineLocationKey: NSString;
+function UIPageViewControllerOptionInterPageSpacingKey: NSString;
+function UIPasteboardNameGeneral: NSString;
+function UIPasteboardNameFind: NSString;
+function UIPasteboardChangedNotification: NSString;
+function UIPasteboardChangedTypesAddedKey: NSString;
+function UIPasteboardChangedTypesRemovedKey: NSString;
+function UIPasteboardRemovedNotification: NSString;
+function UIPrintErrorDomain: NSString;
+function UIScreenDidConnectNotification: NSString;
+function UIScreenDidDisconnectNotification: NSString;
+function UIScreenModeDidChangeNotification: NSString;
+function UIScreenBrightnessDidChangeNotification: NSString;
+function UITransitionContextFromViewControllerKey: NSString;
+function UITransitionContextToViewControllerKey: NSString;
+function UITextViewTextDidBeginEditingNotification: NSString;
+function UITextViewTextDidChangeNotification: NSString;
+function UITextViewTextDidEndEditingNotification: NSString;
+function UIWindowDidBecomeVisibleNotification: NSString;
+function UIWindowDidBecomeHiddenNotification: NSString;
+function UIWindowDidBecomeKeyNotification: NSString;
+function UIWindowDidResignKeyNotification: NSString;
+function UIKeyboardWillShowNotification: NSString;
+function UIKeyboardDidShowNotification: NSString;
+function UIKeyboardWillHideNotification: NSString;
+function UIKeyboardDidHideNotification: NSString;
+function UIKeyboardFrameBeginUserInfoKey: NSString;
+function UIKeyboardFrameEndUserInfoKey: NSString;
+function UIKeyboardAnimationDurationUserInfoKey: NSString;
+function UIKeyboardAnimationCurveUserInfoKey: NSString;
+function UIKeyboardWillChangeFrameNotification: NSString;
+function UIKeyboardDidChangeFrameNotification: NSString;
+function UIKeyboardCenterBeginUserInfoKey: NSString;
+function UIKeyboardCenterEndUserInfoKey: NSString;
+function UIKeyboardBoundsUserInfoKey: NSString;
+function UIApplicationOpenURLOptionsAnnotationKey: NSString;  // https://quality.embarcadero.com/browse/RSP-18013
+function UIApplicationOpenURLOptionsSourceApplicationKey: NSString; // https://quality.embarcadero.com/browse/RSP-18013
+function UIApplicationOpenSettingsURLString: NSString; // https://quality.embarcadero.com/browse/RSP-18013
+function UIBackgroundTaskInvalid: UIBackgroundTaskIdentifier; // https://quality.embarcadero.com/browse/RSP-18656
+function UIApplicationBackgroundFetchIntervalNever: NSTimeInterval; // https://quality.embarcadero.com/browse/RSP-18662
+function UIApplicationBackgroundFetchIntervalMinimum: NSTimeInterval; // https://quality.embarcadero.com/browse/RSP-18662
+function UIImagePickerControllerPHAsset: NSString; // https://quality.embarcadero.com/browse/RSP-21373
+
+// ===== External functions =====
+const
+  libUIKit = '/System/Library/Frameworks/UIKit.framework/UIKit';
+
+function UIEdgeInsetsMake(top: CGFloat; left: CGFloat; bottom: CGFloat; right: CGFloat): UIEdgeInsets; cdecl;
+  external libUIKit name _PU + 'UIEdgeInsetsMake';
+function UIEdgeInsetsInsetRect(rect: CGRect; insets: UIEdgeInsets): CGRect; cdecl;
+  external libUIKit name _PU + 'UIEdgeInsetsInsetRect';
+function UIOffsetMake(horizontal: CGFloat; vertical: CGFloat): UIOffset; cdecl;
+  external libUIKit name _PU + 'UIOffsetMake';
+function UIEdgeInsetsEqualToEdgeInsets(insets1: UIEdgeInsets; insets2: UIEdgeInsets): Boolean; cdecl;
+  external libUIKit name _PU + 'UIEdgeInsetsEqualToEdgeInsets';
+function UIOffsetEqualToOffset(offset1: UIOffset; offset2: UIOffset): Boolean; cdecl;
+  external libUIKit name _PU + 'UIOffsetEqualToOffset';
+function NSStringFromCGPoint(point: CGPoint): Pointer {NSString}; cdecl;
+  external libUIKit name _PU + 'NSStringFromCGPoint';
+function NSStringFromCGVector(vector: CGVector): Pointer {NSString}; cdecl;
+  external libUIKit name _PU + 'NSStringFromCGVector';
+function NSStringFromCGSize(size: CGSize): Pointer {NSString}; cdecl; external libUIKit name _PU + 'NSStringFromCGSize';
+function NSStringFromCGRect(rect: CGRect): Pointer {NSString}; cdecl; external libUIKit name _PU + 'NSStringFromCGRect';
+function NSStringFromCGAffineTransform(transform: CGAffineTransform): Pointer {NSString}; cdecl;
+  external libUIKit name _PU + 'NSStringFromCGAffineTransform';
+function NSStringFromUIEdgeInsets(insets: UIEdgeInsets): Pointer {NSString}; cdecl;
+  external libUIKit name _PU + 'NSStringFromUIEdgeInsets';
+function NSStringFromUIOffset(offset: UIOffset): Pointer {NSString}; cdecl;
+  external libUIKit name _PU + 'NSStringFromUIOffset';
+function CGPointFromString(&string: Pointer {NSString}): CGPoint; cdecl;
+  external libUIKit name _PU + 'CGPointFromString';
+function CGVectorFromString(&string: Pointer {NSString}): CGVector; cdecl;
+  external libUIKit name _PU + 'CGVectorFromString';
+function CGSizeFromString(&string: Pointer {NSString}): CGSize; cdecl; external libUIKit name _PU + 'CGSizeFromString';
+function CGRectFromString(&string: Pointer {NSString}): CGRect; cdecl; external libUIKit name _PU + 'CGRectFromString';
+function CGAffineTransformFromString(&string: Pointer {NSString}): CGAffineTransform; cdecl;
+  external libUIKit name _PU + 'CGAffineTransformFromString';
+function UIEdgeInsetsFromString(&string: Pointer {NSString}): UIEdgeInsets; cdecl;
+  external libUIKit name _PU + 'UIEdgeInsetsFromString';
+function UIOffsetFromString(&string: Pointer {NSString}): UIOffset; cdecl;
+  external libUIKit name _PU + 'UIOffsetFromString';
+function _NSDictionaryOfVariableBindings(commaSeparatedKeysString: Pointer {NSString}; firstValue: Pointer)
+  : Pointer {NSDictionary}; cdecl; external libUIKit name _PU + '_NSDictionaryOfVariableBindings';
+function NSTextAlignmentToCTTextAlignment(NSTextAlignment: NSTextAlignment): CTTextAlignment; cdecl;
+  external libUIKit name _PU + 'NSTextAlignmentToCTTextAlignment';
+function NSTextAlignmentFromCTTextAlignment(CTTextAlignment: CTTextAlignment): NSTextAlignment; cdecl;
+  external libUIKit name _PU + 'NSTextAlignmentFromCTTextAlignment';
+function UIImagePNGRepresentation(image: Pointer {UIImage}): Pointer {NSData}; cdecl;
+  external libUIKit name _PU + 'UIImagePNGRepresentation';
+function UIImageJPEGRepresentation(image: Pointer {UIImage}; compressionQuality: CGFloat): Pointer {NSData}; cdecl;
+  external libUIKit name _PU + 'UIImageJPEGRepresentation';
+procedure UIAccessibilityZoomFocusChanged(&type: UIAccessibilityZoomType; frame: CGRect; view: Pointer {UIView}); cdecl;
+  external libUIKit name _PU + 'UIAccessibilityZoomFocusChanged';
+procedure UIAccessibilityRegisterGestureConflictWithZoom; cdecl;
+  external libUIKit name _PU + 'UIAccessibilityRegisterGestureConflictWithZoom';
+function UIGuidedAccessRestrictionStateForIdentifier(restrictionIdentifier: Pointer {NSString})
+  : UIGuidedAccessRestrictionState; cdecl; external libUIKit name _PU + 'UIGuidedAccessRestrictionStateForIdentifier';
+function UIAccessibilityConvertFrameToScreenCoordinates(rect: CGRect; view: Pointer {UIView}): CGRect; cdecl;
+  external libUIKit name _PU + 'UIAccessibilityConvertFrameToScreenCoordinates';
+function UIAccessibilityConvertPathToScreenCoordinates(path: Pointer {UIBezierPath}; view: Pointer {UIView})
+  : Pointer {UIBezierPath}; cdecl; external libUIKit name _PU + 'UIAccessibilityConvertPathToScreenCoordinates';
+procedure UIAccessibilityPostNotification(notification: UIAccessibilityNotifications; argument: Pointer); cdecl;
+  external libUIKit name _PU + 'UIAccessibilityPostNotification';
+function UIAccessibilityIsVoiceOverRunning: Boolean; cdecl;
+  external libUIKit name _PU + 'UIAccessibilityIsVoiceOverRunning';
+function UIAccessibilityIsMonoAudioEnabled: Boolean; cdecl;
+  external libUIKit name _PU + 'UIAccessibilityIsMonoAudioEnabled';
+function UIAccessibilityIsClosedCaptioningEnabled: Boolean; cdecl;
+  external libUIKit name _PU + 'UIAccessibilityIsClosedCaptioningEnabled';
+function UIAccessibilityIsInvertColorsEnabled: Boolean; cdecl;
+  external libUIKit name _PU + 'UIAccessibilityIsInvertColorsEnabled';
+function UIAccessibilityIsGuidedAccessEnabled: Boolean; cdecl;
+  external libUIKit name _PU + 'UIAccessibilityIsGuidedAccessEnabled';
+function UIAccessibilityIsBoldTextEnabled: Boolean; cdecl;
+  external libUIKit name _PU + 'UIAccessibilityIsBoldTextEnabled';
+function UIAccessibilityIsGrayscaleEnabled: Boolean; cdecl;
+  external libUIKit name _PU + 'UIAccessibilityIsGrayscaleEnabled';
+function UIAccessibilityIsReduceTransparencyEnabled: Boolean; cdecl;
+  external libUIKit name _PU + 'UIAccessibilityIsReduceTransparencyEnabled';
+function UIAccessibilityIsReduceMotionEnabled: Boolean; cdecl;
+  external libUIKit name _PU + 'UIAccessibilityIsReduceMotionEnabled';
+function UIAccessibilityDarkerSystemColorsEnabled: Boolean; cdecl;
+  external libUIKit name _PU + 'UIAccessibilityDarkerSystemColorsEnabled';
+function UIAccessibilityIsSwitchControlRunning: Boolean; cdecl;
+  external libUIKit name _PU + 'UIAccessibilityIsSwitchControlRunning';
+function UIAccessibilityIsSpeakSelectionEnabled: Boolean; cdecl;
+  external libUIKit name _PU + 'UIAccessibilityIsSpeakSelectionEnabled';
+function UIAccessibilityIsSpeakScreenEnabled: Boolean; cdecl;
+  external libUIKit name _PU + 'UIAccessibilityIsSpeakScreenEnabled';
+procedure UIAccessibilityRequestGuidedAccessSession(enable: Boolean; completionHandler: TUIKitCompletion); cdecl;
+  external libUIKit name _PU + 'UIAccessibilityRequestGuidedAccessSession';
+function UIApplicationMain(argc: Integer; argv: PMarshaledAString; principalClassName: Pointer;
+  delegateClassName: Pointer): Integer; cdecl; external libUIKit name _PU + 'UIApplicationMain';
+{$EXTERNALSYM UIApplicationMain}
+function UIGraphicsGetCurrentContext: CGContextRef; cdecl; external libUIKit name _PU + 'UIGraphicsGetCurrentContext';
+procedure UIGraphicsPushContext(context: CGContextRef); cdecl; external libUIKit name _PU + 'UIGraphicsPushContext';
+procedure UIGraphicsPopContext; cdecl; external libUIKit name _PU + 'UIGraphicsPopContext';
+procedure UIRectFillUsingBlendMode(rect: CGRect; blendMode: CGBlendMode); cdecl;
+  external libUIKit name _PU + 'UIRectFillUsingBlendMode';
+procedure UIRectFill(rect: CGRect); cdecl; external libUIKit name _PU + 'UIRectFill';
+procedure UIRectFrameUsingBlendMode(rect: CGRect; blendMode: CGBlendMode); cdecl;
+  external libUIKit name _PU + 'UIRectFrameUsingBlendMode';
+procedure UIRectFrame(rect: CGRect); cdecl; external libUIKit name _PU + 'UIRectFrame';
+procedure UIRectClip(rect: CGRect); cdecl; external libUIKit name _PU + 'UIRectClip';
+procedure UIGraphicsBeginImageContext(size: CGSize); cdecl; external libUIKit name _PU + 'UIGraphicsBeginImageContext';
+procedure UIGraphicsBeginImageContextWithOptions(size: CGSize; opaque: Boolean; scale: CGFloat); cdecl;
+  external libUIKit name _PU + 'UIGraphicsBeginImageContextWithOptions';
+function UIGraphicsGetImageFromCurrentImageContext: Pointer {UIImage}; cdecl;
+  external libUIKit name _PU + 'UIGraphicsGetImageFromCurrentImageContext';
+procedure UIGraphicsEndImageContext; cdecl; external libUIKit name _PU + 'UIGraphicsEndImageContext';
+function UIGraphicsBeginPDFContextToFile(path: Pointer {NSString}; bounds: CGRect; documentInfo: Pointer {NSDictionary})
+  : Boolean; cdecl; external libUIKit name _PU + 'UIGraphicsBeginPDFContextToFile';
+procedure UIGraphicsBeginPDFContextToData(data: Pointer {NSMutableData}; bounds: CGRect;
+  documentInfo: Pointer {NSDictionary}); cdecl; external libUIKit name _PU + 'UIGraphicsBeginPDFContextToData';
+procedure UIGraphicsEndPDFContext; cdecl; external libUIKit name _PU + 'UIGraphicsEndPDFContext';
+procedure UIGraphicsBeginPDFPage; cdecl; external libUIKit name _PU + 'UIGraphicsBeginPDFPage';
+procedure UIGraphicsBeginPDFPageWithInfo(bounds: CGRect; pageInfo: Pointer {NSDictionary}); cdecl;
+  external libUIKit name _PU + 'UIGraphicsBeginPDFPageWithInfo';
+function UIGraphicsGetPDFContextBounds: CGRect; cdecl; external libUIKit name _PU + 'UIGraphicsGetPDFContextBounds';
+procedure UIGraphicsSetPDFContextURLForRect(url: Pointer {NSURL}; rect: CGRect); cdecl;
+  external libUIKit name _PU + 'UIGraphicsSetPDFContextURLForRect';
+procedure UIGraphicsAddPDFContextDestinationAtPoint(name: Pointer {NSString}; point: CGPoint); cdecl;
+  external libUIKit name _PU + 'UIGraphicsAddPDFContextDestinationAtPoint';
+procedure UIGraphicsSetPDFContextDestinationForRect(name: Pointer {NSString}; rect: CGRect); cdecl;
+  external libUIKit name _PU + 'UIGraphicsSetPDFContextDestinationForRect';
+procedure UIImageWriteToSavedPhotosAlbum(image: Pointer {UIImage}; completionTarget: Pointer; completionSelector: SEL;
+  contextInfo: Pointer); cdecl; external libUIKit name _PU + 'UIImageWriteToSavedPhotosAlbum';
+function UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(videoPath: Pointer {NSString}): Boolean; cdecl;
+  external libUIKit name _PU + 'UIVideoAtPathIsCompatibleWithSavedPhotosAlbum';
+procedure UISaveVideoAtPathToSavedPhotosAlbum(videoPath: Pointer {NSString}; completionTarget: Pointer;
+  completionSelector: SEL; contextInfo: Pointer); cdecl;
+  external libUIKit name _PU + 'UISaveVideoAtPathToSavedPhotosAlbum';
+
+implementation
+
+{$IF defined(IOS) and NOT defined(CPUARM)}
+
+uses
+  System.SysUtils,
+  Posix.Dlfcn;
+
+var
+  UIKitModule: THandle;
+
+{$ELSE}
+
+uses
+  System.SysUtils;
+
+{$ENDIF IOS}
+
+const
+  UIKitFwk: string = '/System/Library/Frameworks/UIKit.framework/UIKit';
+
+function NSFontAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSFontAttributeName');
+end;
+
+function NSParagraphStyleAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSParagraphStyleAttributeName');
+end;
+
+function NSForegroundColorAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSForegroundColorAttributeName');
+end;
+
+function NSBackgroundColorAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSBackgroundColorAttributeName');
+end;
+
+function NSLigatureAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSLigatureAttributeName');
+end;
+
+function NSKernAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSKernAttributeName');
+end;
+
+function NSStrikethroughStyleAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSStrikethroughStyleAttributeName');
+end;
+
+function NSUnderlineStyleAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSUnderlineStyleAttributeName');
+end;
+
+function NSStrokeColorAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSStrokeColorAttributeName');
+end;
+
+function NSStrokeWidthAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSStrokeWidthAttributeName');
+end;
+
+function NSShadowAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSShadowAttributeName');
+end;
+
+function NSTextEffectAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSTextEffectAttributeName');
+end;
+
+function NSAttachmentAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSAttachmentAttributeName');
+end;
+
+function NSLinkAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSLinkAttributeName');
+end;
+
+function NSBaselineOffsetAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSBaselineOffsetAttributeName');
+end;
+
+function NSUnderlineColorAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSUnderlineColorAttributeName');
+end;
+
+function NSStrikethroughColorAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSStrikethroughColorAttributeName');
+end;
+
+function NSObliquenessAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSObliquenessAttributeName');
+end;
+
+function NSExpansionAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSExpansionAttributeName');
+end;
+
+function NSWritingDirectionAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSWritingDirectionAttributeName');
+end;
+
+function NSVerticalGlyphFormAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSVerticalGlyphFormAttributeName');
+end;
+
+function NSTextEffectLetterpressStyle: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSTextEffectLetterpressStyle');
+end;
+
+function NSPlainTextDocumentType: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSPlainTextDocumentType');
+end;
+
+function NSRTFTextDocumentType: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSRTFTextDocumentType');
+end;
+
+function NSRTFDTextDocumentType: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSRTFDTextDocumentType');
+end;
+
+function NSHTMLTextDocumentType: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSHTMLTextDocumentType');
+end;
+
+function NSTextLayoutSectionOrientation: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSTextLayoutSectionOrientation');
+end;
+
+function NSTextLayoutSectionRange: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSTextLayoutSectionRange');
+end;
+
+function NSDocumentTypeDocumentAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSDocumentTypeDocumentAttribute');
+end;
+
+function NSCharacterEncodingDocumentAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'NSCharacterEncodingDocumentAttribute');
+end;
+
+function NSDefaultAttributesDocumentAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'NSDefaultAttributesDocumentAttribute');
+end;
+
+function NSPaperSizeDocumentAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSPaperSizeDocumentAttribute');
+end;
+
+function NSPaperMarginDocumentAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSPaperMarginDocumentAttribute');
+end;
+
+function NSViewSizeDocumentAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSViewSizeDocumentAttribute');
+end;
+
+function NSViewZoomDocumentAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSViewZoomDocumentAttribute');
+end;
+
+function NSViewModeDocumentAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSViewModeDocumentAttribute');
+end;
+
+function NSReadOnlyDocumentAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSReadOnlyDocumentAttribute');
+end;
+
+function NSBackgroundColorDocumentAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSBackgroundColorDocumentAttribute');
+end;
+
+function NSHyphenationFactorDocumentAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'NSHyphenationFactorDocumentAttribute');
+end;
+
+function NSDefaultTabIntervalDocumentAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'NSDefaultTabIntervalDocumentAttribute');
+end;
+
+function NSTextLayoutSectionsAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSTextLayoutSectionsAttribute');
+end;
+
+function NSTextStorageWillProcessEditingNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'NSTextStorageWillProcessEditingNotification');
+end;
+
+function NSTextStorageDidProcessEditingNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'NSTextStorageDidProcessEditingNotification');
+end;
+
+function UIFontDescriptorFamilyAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontDescriptorFamilyAttribute');
+end;
+
+function UIFontDescriptorNameAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontDescriptorNameAttribute');
+end;
+
+function UIFontDescriptorFaceAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontDescriptorFaceAttribute');
+end;
+
+function UIFontDescriptorSizeAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontDescriptorSizeAttribute');
+end;
+
+function UIFontDescriptorVisibleNameAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIFontDescriptorVisibleNameAttribute');
+end;
+
+function UIFontDescriptorMatrixAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontDescriptorMatrixAttribute');
+end;
+
+function UIFontDescriptorCharacterSetAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIFontDescriptorCharacterSetAttribute');
+end;
+
+function UIFontDescriptorCascadeListAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIFontDescriptorCascadeListAttribute');
+end;
+
+function UIFontDescriptorTraitsAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontDescriptorTraitsAttribute');
+end;
+
+function UIFontDescriptorFixedAdvanceAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIFontDescriptorFixedAdvanceAttribute');
+end;
+
+function UIFontDescriptorFeatureSettingsAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIFontDescriptorFeatureSettingsAttribute');
+end;
+
+function UIFontDescriptorTextStyleAttribute: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontDescriptorTextStyleAttribute');
+end;
+
+function UIFontSymbolicTrait: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontSymbolicTrait');
+end;
+
+function UIFontWeightTrait: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontWeightTrait');
+end;
+
+function UIFontWidthTrait: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontWidthTrait');
+end;
+
+function UIFontSlantTrait: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontSlantTrait');
+end;
+
+function UIFontFeatureTypeIdentifierKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontFeatureTypeIdentifierKey');
+end;
+
+function UIFontFeatureSelectorIdentifierKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontFeatureSelectorIdentifierKey');
+end;
+
+function UIFontTextStyleHeadline: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontTextStyleHeadline');
+end;
+
+function UIFontTextStyleBody: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontTextStyleBody');
+end;
+
+function UIFontTextStyleSubheadline: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontTextStyleSubheadline');
+end;
+
+function UIFontTextStyleFootnote: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontTextStyleFootnote');
+end;
+
+function UIFontTextStyleCaption1: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontTextStyleCaption1');
+end;
+
+function UIFontTextStyleCaption2: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIFontTextStyleCaption2');
+end;
+
+function NSTabColumnTerminatorsAttributeName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'NSTabColumnTerminatorsAttributeName');
+end;
+
+function UIKeyInputUpArrow: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIKeyInputUpArrow');
+end;
+
+function UIKeyInputDownArrow: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIKeyInputDownArrow');
+end;
+
+function UIKeyInputLeftArrow: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIKeyInputLeftArrow');
+end;
+
+function UIKeyInputRightArrow: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIKeyInputRightArrow');
+end;
+
+function UIKeyInputEscape: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIKeyInputEscape');
+end;
+
+function UITextAttributeFont: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UITextAttributeFont');
+end;
+
+function UITextAttributeTextColor: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UITextAttributeTextColor');
+end;
+
+function UITextAttributeTextShadowColor: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UITextAttributeTextShadowColor');
+end;
+
+function UITextAttributeTextShadowOffset: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UITextAttributeTextShadowOffset');
+end;
+
+function UITableViewIndexSearch: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UITableViewIndexSearch');
+end;
+
+function UITableViewSelectionDidChangeNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UITableViewSelectionDidChangeNotification');
+end;
+
+function UIAccessibilityAnnouncementDidFinishNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIAccessibilityAnnouncementDidFinishNotification');
+end;
+
+function UIAccessibilityAnnouncementKeyStringValue: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIAccessibilityAnnouncementKeyStringValue');
+end;
+
+function UIAccessibilityAnnouncementKeyWasSuccessful: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIAccessibilityAnnouncementKeyWasSuccessful');
+end;
+
+function UIAccessibilitySpeechAttributePunctuation: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIAccessibilitySpeechAttributePunctuation');
+end;
+
+function UIAccessibilitySpeechAttributeLanguage: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIAccessibilitySpeechAttributeLanguage');
+end;
+
+function UIAccessibilitySpeechAttributePitch: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIAccessibilitySpeechAttributePitch');
+end;
+
+function UIAccessibilityVoiceOverStatusChanged: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIAccessibilityVoiceOverStatusChanged');
+end;
+
+function UIAccessibilityMonoAudioStatusDidChangeNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIAccessibilityMonoAudioStatusDidChangeNotification');
+end;
+
+function UIAccessibilityClosedCaptioningStatusDidChangeNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIAccessibilityClosedCaptioningStatusDidChangeNotification');
+end;
+
+function UIAccessibilityInvertColorsStatusDidChangeNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIAccessibilityInvertColorsStatusDidChangeNotification');
+end;
+
+function UIAccessibilityGuidedAccessStatusDidChangeNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIAccessibilityGuidedAccessStatusDidChangeNotification');
+end;
+
+function UITextInputTextBackgroundColorKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UITextInputTextBackgroundColorKey');
+end;
+
+function UITextInputTextColorKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UITextInputTextColorKey');
+end;
+
+function UITextInputTextFontKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UITextInputTextFontKey');
+end;
+
+function UITextInputCurrentInputModeDidChangeNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UITextInputCurrentInputModeDidChangeNotification');
+end;
+
+function UITextFieldTextDidBeginEditingNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UITextFieldTextDidBeginEditingNotification');
+end;
+
+function UITextFieldTextDidEndEditingNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UITextFieldTextDidEndEditingNotification');
+end;
+
+function UITextFieldTextDidChangeNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UITextFieldTextDidChangeNotification');
+end;
+
+function UIActivityTypePostToFacebook: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIActivityTypePostToFacebook');
+end;
+
+function UIActivityTypePostToTwitter: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIActivityTypePostToTwitter');
+end;
+
+function UIActivityTypePostToWeibo: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIActivityTypePostToWeibo');
+end;
+
+function UIActivityTypeMessage: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIActivityTypeMessage');
+end;
+
+function UIActivityTypeMail: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIActivityTypeMail');
+end;
+
+function UIActivityTypePrint: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIActivityTypePrint');
+end;
+
+function UIActivityTypeCopyToPasteboard: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIActivityTypeCopyToPasteboard');
+end;
+
+function UIActivityTypeAssignToContact: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIActivityTypeAssignToContact');
+end;
+
+function UIActivityTypeSaveToCameraRoll: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIActivityTypeSaveToCameraRoll');
+end;
+
+function UIActivityTypeAddToReadingList: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIActivityTypeAddToReadingList');
+end;
+
+function UIActivityTypePostToFlickr: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIActivityTypePostToFlickr');
+end;
+
+function UIActivityTypePostToVimeo: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIActivityTypePostToVimeo');
+end;
+
+function UIActivityTypePostToTencentWeibo: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIActivityTypePostToTencentWeibo');
+end;
+
+function UIActivityTypeAirDrop: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIActivityTypeAirDrop');
+end;
+
+function UIDeviceOrientationDidChangeNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIDeviceOrientationDidChangeNotification');
+end;
+
+function UIDeviceBatteryStateDidChangeNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIDeviceBatteryStateDidChangeNotification');
+end;
+
+function UIDeviceBatteryLevelDidChangeNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIDeviceBatteryLevelDidChangeNotification');
+end;
+
+function UIDeviceProximityStateDidChangeNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIDeviceProximityStateDidChangeNotification');
+end;
+
+function UIApplicationInvalidInterfaceOrientationException: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationInvalidInterfaceOrientationException');
+end;
+
+function UITrackingRunLoopMode: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UITrackingRunLoopMode');
+end;
+
+function UIApplicationDidEnterBackgroundNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationDidEnterBackgroundNotification');
+end;
+
+function UIApplicationWillEnterForegroundNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationWillEnterForegroundNotification');
+end;
+
+function UIApplicationDidFinishLaunchingNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationDidFinishLaunchingNotification');
+end;
+
+function UIApplicationDidBecomeActiveNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationDidBecomeActiveNotification');
+end;
+
+function UIApplicationWillResignActiveNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationWillResignActiveNotification');
+end;
+
+function UIApplicationDidReceiveMemoryWarningNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationDidReceiveMemoryWarningNotification');
+end;
+
+function UIApplicationWillTerminateNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationWillTerminateNotification');
+end;
+
+function UIApplicationSignificantTimeChangeNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationSignificantTimeChangeNotification');
+end;
+
+function UIApplicationWillChangeStatusBarOrientationNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationWillChangeStatusBarOrientationNotification');
+end;
+
+function UIApplicationDidChangeStatusBarOrientationNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationDidChangeStatusBarOrientationNotification');
+end;
+
+function UIApplicationStatusBarOrientationUserInfoKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationStatusBarOrientationUserInfoKey');
+end;
+
+function UIApplicationWillChangeStatusBarFrameNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationWillChangeStatusBarFrameNotification');
+end;
+
+function UIApplicationDidChangeStatusBarFrameNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationDidChangeStatusBarFrameNotification');
+end;
+
+function UIApplicationStatusBarFrameUserInfoKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationStatusBarFrameUserInfoKey');
+end;
+
+function UIApplicationBackgroundRefreshStatusDidChangeNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationBackgroundRefreshStatusDidChangeNotification');
+end;
+
+function UIApplicationLaunchOptionsURLKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIApplicationLaunchOptionsURLKey');
+end;
+
+function UIApplicationLaunchOptionsSourceApplicationKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationLaunchOptionsSourceApplicationKey');
+end;
+
+function UIApplicationLaunchOptionsRemoteNotificationKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationLaunchOptionsRemoteNotificationKey');
+end;
+
+function UIApplicationLaunchOptionsLocalNotificationKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationLaunchOptionsLocalNotificationKey');
+end;
+
+function UIApplicationLaunchOptionsAnnotationKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationLaunchOptionsAnnotationKey');
+end;
+
+function UIApplicationProtectedDataWillBecomeUnavailable: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationProtectedDataWillBecomeUnavailable');
+end;
+
+function UIApplicationProtectedDataDidBecomeAvailable: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationProtectedDataDidBecomeAvailable');
+end;
+
+function UIApplicationLaunchOptionsLocationKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationLaunchOptionsLocationKey');
+end;
+
+function UIApplicationLaunchOptionsNewsstandDownloadsKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationLaunchOptionsNewsstandDownloadsKey');
+end;
+
+function UIApplicationLaunchOptionsBluetoothCentralsKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationLaunchOptionsBluetoothCentralsKey');
+end;
+
+function UIApplicationLaunchOptionsBluetoothPeripheralsKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationLaunchOptionsBluetoothPeripheralsKey');
+end;
+
+function UIContentSizeCategoryExtraSmall: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIContentSizeCategoryExtraSmall');
+end;
+
+function UIContentSizeCategorySmall: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIContentSizeCategorySmall');
+end;
+
+function UIContentSizeCategoryMedium: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIContentSizeCategoryMedium');
+end;
+
+function UIContentSizeCategoryLarge: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIContentSizeCategoryLarge');
+end;
+
+function UIContentSizeCategoryExtraLarge: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIContentSizeCategoryExtraLarge');
+end;
+
+function UIContentSizeCategoryExtraExtraLarge: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIContentSizeCategoryExtraExtraLarge');
+end;
+
+function UIContentSizeCategoryExtraExtraExtraLarge: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIContentSizeCategoryExtraExtraExtraLarge');
+end;
+
+function UIContentSizeCategoryAccessibilityMedium: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIContentSizeCategoryAccessibilityMedium');
+end;
+
+function UIContentSizeCategoryAccessibilityLarge: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIContentSizeCategoryAccessibilityLarge');
+end;
+
+function UIContentSizeCategoryAccessibilityExtraLarge: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIContentSizeCategoryAccessibilityExtraLarge');
+end;
+
+function UIContentSizeCategoryAccessibilityExtraExtraLarge: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIContentSizeCategoryAccessibilityExtraExtraLarge');
+end;
+
+function UIContentSizeCategoryAccessibilityExtraExtraExtraLarge: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIContentSizeCategoryAccessibilityExtraExtraExtraLarge');
+end;
+
+function UIContentSizeCategoryDidChangeNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIContentSizeCategoryDidChangeNotification');
+end;
+
+function UIContentSizeCategoryNewValueKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIContentSizeCategoryNewValueKey');
+end;
+
+function UIApplicationUserDidTakeScreenshotNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationUserDidTakeScreenshotNotification');
+end;
+
+function UIStateRestorationViewControllerStoryboardKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIStateRestorationViewControllerStoryboardKey');
+end;
+
+function UIApplicationStateRestorationBundleVersionKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationStateRestorationBundleVersionKey');
+end;
+
+function UIApplicationStateRestorationUserInterfaceIdiomKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationStateRestorationUserInterfaceIdiomKey');
+end;
+
+function UIApplicationStateRestorationTimestampKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationStateRestorationTimestampKey');
+end;
+
+function UIApplicationStateRestorationSystemVersionKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIApplicationStateRestorationSystemVersionKey');
+end;
+
+function UIViewControllerHierarchyInconsistencyException: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIViewControllerHierarchyInconsistencyException');
+end;
+
+function UICollectionElementKindSectionHeader: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UICollectionElementKindSectionHeader');
+end;
+
+function UICollectionElementKindSectionFooter: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UICollectionElementKindSectionFooter');
+end;
+
+function UIDocumentStateChangedNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIDocumentStateChangedNotification');
+end;
+
+function UIImagePickerControllerMediaType: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIImagePickerControllerMediaType');
+end;
+
+function UIImagePickerControllerOriginalImage: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIImagePickerControllerOriginalImage');
+end;
+
+function UIImagePickerControllerEditedImage: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIImagePickerControllerEditedImage');
+end;
+
+function UIImagePickerControllerCropRect: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIImagePickerControllerCropRect');
+end;
+
+function UIImagePickerControllerMediaURL: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIImagePickerControllerMediaURL');
+end;
+
+function UIImagePickerControllerReferenceURL: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIImagePickerControllerReferenceURL');
+end;
+
+function UIImagePickerControllerMediaMetadata: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIImagePickerControllerMediaMetadata');
+end;
+
+function UILocalNotificationDefaultSoundName: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UILocalNotificationDefaultSoundName');
+end;
+
+function UIMenuControllerWillShowMenuNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIMenuControllerWillShowMenuNotification');
+end;
+
+function UIMenuControllerDidShowMenuNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIMenuControllerDidShowMenuNotification');
+end;
+
+function UIMenuControllerWillHideMenuNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIMenuControllerWillHideMenuNotification');
+end;
+
+function UIMenuControllerDidHideMenuNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIMenuControllerDidHideMenuNotification');
+end;
+
+function UIMenuControllerMenuFrameDidChangeNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIMenuControllerMenuFrameDidChangeNotification');
+end;
+
+function UINibExternalObjects: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UINibExternalObjects');
+end;
+
+function UINibProxiedObjectsKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UINibProxiedObjectsKey');
+end;
+
+function UIPageViewControllerOptionSpineLocationKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIPageViewControllerOptionSpineLocationKey');
+end;
+
+function UIPageViewControllerOptionInterPageSpacingKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIPageViewControllerOptionInterPageSpacingKey');
+end;
+
+function UIPasteboardNameGeneral: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIPasteboardNameGeneral');
+end;
+
+function UIPasteboardNameFind: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIPasteboardNameFind');
+end;
+
+function UIPasteboardChangedNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIPasteboardChangedNotification');
+end;
+
+function UIPasteboardChangedTypesAddedKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIPasteboardChangedTypesAddedKey');
+end;
+
+function UIPasteboardChangedTypesRemovedKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIPasteboardChangedTypesRemovedKey');
+end;
+
+function UIPasteboardRemovedNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIPasteboardRemovedNotification');
+end;
+
+function UIPrintErrorDomain: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIPrintErrorDomain');
+end;
+
+function UIScreenDidConnectNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIScreenDidConnectNotification');
+end;
+
+function UIScreenDidDisconnectNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIScreenDidDisconnectNotification');
+end;
+
+function UIScreenModeDidChangeNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIScreenModeDidChangeNotification');
+end;
+
+function UIScreenBrightnessDidChangeNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIScreenBrightnessDidChangeNotification');
+end;
+
+function UITransitionContextFromViewControllerKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UITransitionContextFromViewControllerKey');
+end;
+
+function UITransitionContextToViewControllerKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UITransitionContextToViewControllerKey');
+end;
+
+function UITextViewTextDidBeginEditingNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UITextViewTextDidBeginEditingNotification');
+end;
+
+function UITextViewTextDidChangeNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UITextViewTextDidChangeNotification');
+end;
+
+function UITextViewTextDidEndEditingNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UITextViewTextDidEndEditingNotification');
+end;
+
+function UIWindowDidBecomeVisibleNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk,
+    'UIWindowDidBecomeVisibleNotification');
+end;
+
+function UIWindowDidBecomeHiddenNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIWindowDidBecomeHiddenNotification');
+end;
+
+function UIWindowDidBecomeKeyNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIWindowDidBecomeKeyNotification');
+end;
+
+function UIWindowDidResignKeyNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIWindowDidResignKeyNotification');
+end;
+
+function UIKeyboardWillShowNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIKeyboardWillShowNotification');
+end;
+
+function UIKeyboardDidShowNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIKeyboardDidShowNotification');
+end;
+
+function UIKeyboardWillHideNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIKeyboardWillHideNotification');
+end;
+
+function UIKeyboardDidHideNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIKeyboardDidHideNotification');
+end;
+
+function UIKeyboardFrameBeginUserInfoKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIKeyboardFrameBeginUserInfoKey');
+end;
+
+function UIKeyboardFrameEndUserInfoKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIKeyboardFrameEndUserInfoKey');
+end;
+
+function UIKeyboardAnimationDurationUserInfoKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIKeyboardAnimationDurationUserInfoKey');
+end;
+
+function UIKeyboardAnimationCurveUserInfoKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIKeyboardAnimationCurveUserInfoKey');
+end;
+
+function UIKeyboardWillChangeFrameNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIKeyboardWillChangeFrameNotification');
+end;
+
+function UIKeyboardDidChangeFrameNotification: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIKeyboardDidChangeFrameNotification');
+end;
+
+function UIKeyboardCenterBeginUserInfoKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIKeyboardCenterBeginUserInfoKey');
+end;
+
+function UIKeyboardCenterEndUserInfoKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIKeyboardCenterEndUserInfoKey');
+end;
+
+function UIKeyboardBoundsUserInfoKey: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIKeyboardBoundsUserInfoKey');
+end;
+
+// https://quality.embarcadero.com/browse/RSP-18013
+function UIApplicationOpenURLOptionsAnnotationKey: NSString;
+begin
+  if (TOSVersion.Check(9, 0)) then
+    Result := CocoaNSStringConst(UIKitFwk, 'UIApplicationOpenURLOptionsAnnotationKey')
+  else
+    Result := nil;
+end;
+
+// https://quality.embarcadero.com/browse/RSP-18013
+function UIApplicationOpenURLOptionsSourceApplicationKey: NSString;
+begin
+  if (TOSVersion.Check(9, 0)) then
+    Result := CocoaNSStringConst(UIKitFwk, 'UIApplicationOpenURLOptionsSourceApplicationKey')
+  else
+    Result := nil;
+end;
+
+// https://quality.embarcadero.com/browse/RSP-18013
+function UIApplicationOpenSettingsURLString: NSString;
+begin
+  if (TOSVersion.Check(8, 0)) then
+    Result := CocoaNSStringConst(UIKitFwk, 'UIApplicationOpenSettingsURLString')
+  else
+    Result := nil;
+end;
+
+// https://quality.embarcadero.com/browse/RSP-18656
+function UIBackgroundTaskInvalid: UIBackgroundTaskIdentifier;
+begin
+  Result := CocoaIntegerConst(UIKitFwk, 'UIBackgroundTaskInvalid');
+end;
+
+// https://quality.embarcadero.com/browse/RSP-18662
+function UIApplicationBackgroundFetchIntervalNever: NSTimeInterval;
+var Obj: Pointer;
+begin
+  Obj := CocoaPointerConst(UIKitFwk, 'UIApplicationBackgroundFetchIntervalNever');
+  if Obj <> nil then
+    Result := double(Obj^)
+  else
+    Result := 0;
+end;
+
+// https://quality.embarcadero.com/browse/RSP-18662
+function UIApplicationBackgroundFetchIntervalMinimum: NSTimeInterval;
+var Obj: Pointer;
+begin
+  Obj := CocoaPointerConst(UIKitFwk, 'UIApplicationBackgroundFetchIntervalMinimum');
+  if Obj <> nil then
+    Result := double(Obj^)
+  else
+    Result := 0;
+end;
+
+// https://quality.embarcadero.com/browse/RSP-21373
+function UIImagePickerControllerPHAsset: NSString;
+begin
+  Result := CocoaNSStringConst(UIKitFwk, 'UIImagePickerControllerPHAsset');
+end;
+
+{$IF defined(IOS) and NOT defined(CPUARM)}
+
+initialization
+
+UIKitModule := dlopen(MarshaledAString(libUIKit), RTLD_LAZY);
+
+finalization
+
+dlclose(UIKitModule);
+{$ENDIF IOS}
+
+end.

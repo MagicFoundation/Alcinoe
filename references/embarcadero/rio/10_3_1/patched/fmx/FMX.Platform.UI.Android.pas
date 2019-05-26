@@ -1,0 +1,2543 @@
+{*******************************************************}
+{                                                       }
+{              Delphi FireMonkey Platform               }
+{                                                       }
+{ Copyright(c) 2018 Embarcadero Technologies, Inc.      }
+{              All rights reserved                      }
+{                                                       }
+{*******************************************************}
+
+unit FMX.Platform.UI.Android;
+
+interface
+
+{$SCOPEDENUMS ON}
+
+uses
+  System.Types, System.UITypes, System.Messaging, System.Classes, System.Generics.Collections, Androidapi.JNIBridge,
+  Androidapi.JNI.Embarcadero, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Widget, Androidapi.JNI.JavaTypes,
+  Androidapi.Input, Androidapi.NativeActivity, Androidapi.Helpers, FMX.Forms, FMX.Types, FMX.Types3D, FMX.KeyMapping,
+  FMX.Helpers.Android, FMX.Controls, FMX.Text, FMX.Graphics, FMX.Gestures, FMX.VirtualKeyboard, FMX.Consts, FMX.Utils,
+  FMX.Platform, FMX.MultiTouch.Android, FMX.ZOrder.Android, FMX.Platform.Text.Android;
+
+type
+
+  TAndroidWindowHandle = class;
+  TWindowServiceAndroid = class;
+  TAndroidMotionManager = class;
+  TTextServiceAndroid = class;
+
+  /// <summary>Render of form. It is responsible for drawing FireMonkey form on native Surface.</summary>
+  TFormRender = class(TJavaLocal, JRunnable)
+  private
+    [Weak] FHandle: TAndroidWindowHandle;
+    FIsNeededUpdate: Boolean;
+    { System message handler }
+    procedure ApplicationEventHandler(const Sender: TObject; const AMessage: TMessage);
+  public
+    constructor Create(const AHandle: TAndroidWindowHandle);
+    destructor Destroy; override;
+
+    { JRunnable }
+    procedure run; cdecl;
+
+    /// <summary>Renders form Immediately.</summary>
+    procedure Render;
+    /// <summary>Posts event to event bus for future rendering.</summary>
+    procedure PostRender;
+  end;
+
+  /// <summary>Android's SurfaceView supports only 2 level of ZOrder. First we use for normal FireMonkey forms.
+  /// Second we use for Popup forms. Because only one normal form can be displayed on the screen, when we display it,
+  /// we hide the others that the SurfaceView of the displayed form did not conflict with other normal forms.
+  /// This manager does this work.
+  /// </summary>
+  TFormManager = class
+  private
+    FZOrderForms: TList<Pointer>;
+    FDelayedHideForm: TList<Pointer>;
+    procedure RefreshFormsVisibility;
+    function IsSurfaceAttached(const AHandle: TAndroidWindowHandle): Boolean;
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    procedure RemoveForm(const AForm: TCommonCustomForm);
+
+    procedure ShowForm(const AForm: TCommonCustomForm);
+    procedure HideForm(const AForm: TCommonCustomForm);
+
+    procedure BringToFront(const AForm: TCommonCustomForm);
+    procedure SendToBack(const AForm: TCommonCustomForm);
+  end;
+
+  TAndroidWindowHandle = class(TWindowHandle)
+  private type
+    TFormViewListener = class(TJavaLocal, JFormViewListener)
+    private
+      [Weak] FOwner: TAndroidWindowHandle;
+    public
+      constructor Create(const AOwner: TAndroidWindowHandle);
+      { JFormViewListener }
+      function onTouchEvent(event: JMotionEvent): Boolean; cdecl;
+      procedure onSizeChanged(w, h, oldw, oldh: Integer); cdecl;
+    end;
+
+    /// <summary>This observer is responsible for determining the moment when the form is already displayed on
+    /// the screen.</summary>
+    TSurfaceFlingerRenderingObserver = class(TJavaLocal, JChoreographer_FrameCallback)
+    private
+      [Weak] FForm: TCommonCustomForm;
+    public
+      constructor Create(const AForm: TCommonCustomForm);
+      procedure doFrame(frameTimeNanos: Int64); cdecl;
+    end;
+
+    TSurfaceViewListener = class(TJavaLocal, JSurfaceHolder_Callback)
+    private
+      [Weak] FOwner: TAndroidWindowHandle;
+      FSurfaceFlingerRenderingObserver: TSurfaceFlingerRenderingObserver;
+    public
+      constructor Create(const AOwner: TAndroidWindowHandle);
+      destructor Destroy; override;
+
+      { JSurfaceHolder_Callback }
+      procedure surfaceCreated(holder: JSurfaceHolder); cdecl;
+      procedure surfaceChanged(holder: JSurfaceHolder; format: Integer; width: Integer; height: Integer); cdecl;
+      procedure surfaceDestroyed(holder: JSurfaceHolder); cdecl;
+    end;
+  private
+    FWasFormRealignedFirstTime: Boolean;
+  strict private
+    FFormLayout: JViewGroup;
+    FView: JFormView;
+    [Weak] FForm: TCommonCustomForm;
+    FListener: TFormViewListener;
+    FSurfaceListener: TSurfaceViewListener;
+    FHolder: JSurfaceHolder;
+    FZOrderManager: TAndroidZOrderManager;
+    FMultiTouchManager: TMultiTouchManagerAndroid;
+    FMotionManager: TAndroidMotionManager;
+    FRender: TFormRender;
+    FFormBounds: TRectF;
+    procedure SetBounds(const AValue: TRectF);
+    function GetBounds: TRectF;
+    function GetZOrderManager: TAndroidZOrderManager;
+    function GetMultiTouchManager: TMultiTouchManagerAndroid;
+    function GetMotionManager: TAndroidMotionManager;
+  private
+    procedure HandleMultiTouch(const ATouches: TTouches; const AAction: TTouchAction; const AEnabledGestures: TInteractiveGestures);
+  protected
+    function GetScale: Single; override;
+  public
+    constructor Create(const AForm: TCommonCustomForm);
+    destructor Destroy; override;
+    function IsPopupForm: Boolean;
+    procedure Hide;
+    procedure Show;
+    /// <summary>Marks form's view as dirty for future redrawing.</summary>
+    procedure Invalidate;
+    /// <summary>True - the Android have already realigned the form after launch.</summary>
+    /// <remarks>When the application is being loaded, we don't know about the bounds of the native form, because
+    /// android realigns the form's view later in the nearest layout pass. But it's good if the developer can know about
+    /// the client rect in the OnShow or OnCreate event. For this purpose, until android doesn't realign form's view we
+    /// return an estimated size. Note that we cannot define exactly the rect of the form, because it depends on the
+    /// android theme, and how android places the system status bar, system software buttons and etc. So we can only
+    /// estimate the size.</remarks>
+    property WasFormRealignedFirstTime: Boolean read FWasFormRealignedFirstTime;
+    /// <summary>Bounds of form's view.</summary>
+    property Bounds: TRectF read GetBounds write SetBounds;
+    /// <summary>Current form.</summary>
+    property Form: TCommonCustomForm read FForm;
+    /// <summary>The surface on which the form is drawn. Can be nil, if Surface is not created.</summary>
+    property Holder: JSurfaceHolder read FHolder;
+    /// <summary>ViewGroup for all child native views.</summary>
+    property FormLayout: JViewGroup read FFormLayout;
+    /// <summary>Form view.</summary>
+    property View: JFormView read FView write FView;
+    /// <summary>Z-Order manager of form.</summary>
+    property ZOrderManager: TAndroidZOrderManager read GetZOrderManager;
+    /// <summary>MultiTouch manager of form.</summary>
+    property MultiTouchManager: TMultiTouchManagerAndroid read GetMultiTouchManager;
+    /// <summary>MotionManager of form.</summary>
+    property MotionManager: TAndroidMotionManager read GetMotionManager;
+    property Render: TFormRender read FRender;
+  end;
+
+  TWindowServiceAndroid = class(TInterfacedObject, IFreeNotification, IFMXWindowService, IFMXMouseService)
+  private type
+
+    TActivityInsetsChangedListener = class(TJavaLocal, JOnActivityInsetsChangedListener)
+    private
+      [Weak] FWindowService: TWindowServiceAndroid;
+    public
+      constructor Create(const AWindowServiceAndroid: TWindowServiceAndroid);
+      { JOnActivityInsetsChangedListener}
+      procedure insetsChanged(Inset: JRect); cdecl;
+    end;
+
+  private
+    FTimerService: IFMXTimerService;
+    FVirtualKeyboard: IFMXVirtualKeyboardService;
+    [Weak] FGestureControl: TComponent;
+    [Weak] FMouseDownControl: TControl;
+    FScale: Single;
+    FScreenMousePos: TPointF;
+    //Text editing
+    FFocusedControl: IControl;
+    [Weak] FCapturedForm: TCommonCustomForm;
+    FSelectionInProgress: Boolean;
+    FContextMenu: TAndroidTextInputContextMenu;
+    FFormManager: TFormManager;
+    FActivityInsetsChangedListener: TActivityInsetsChangedListener;
+    FStatusBarHeight: Single;
+    procedure ShowContextMenu;
+    procedure HideContextMenu;
+    function DefineDefaultStatusBarHeight: Single;
+    { Popup }
+    procedure PrepareClosePopups(const ASaveForm: TCommonCustomForm);
+    procedure ClosePopups;
+    { IFreeNotification }
+    procedure FreeNotification(AObject: TObject);
+  protected
+    function HasStatusBar(const AForm: TCommonCustomForm): Boolean;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    class function IsPopupForm(const AForm: TCommonCustomForm): Boolean;
+    function PixelToPoint(const APixel: TPointF): TPointF;
+    function PointToPixel(const APixel: TPointF): TPointF;
+    { IFMXWindowService }
+    function FindForm(const AHandle: TWindowHandle): TCommonCustomForm;
+    function CreateWindow(const AForm: TCommonCustomForm): TWindowHandle;
+    procedure DestroyWindow(const AForm: TCommonCustomForm);
+    procedure ReleaseWindow(const AForm: TCommonCustomForm);
+    procedure ShowWindow(const AForm: TCommonCustomForm);
+    procedure HideWindow(const AForm: TCommonCustomForm);
+    procedure BringToFront(const AForm: TCommonCustomForm);
+    procedure SendToBack(const AForm: TCommonCustomForm);
+    procedure Activate(const AForm: TCommonCustomForm);
+    function ShowWindowModal(const AForm: TCommonCustomForm): TModalResult;
+    function CanShowModal: Boolean;
+    procedure InvalidateWindowRect(const AForm: TCommonCustomForm; ARect: TRectF);
+    procedure InvalidateImmediately(const AForm: TCommonCustomForm);
+    procedure SetWindowRect(const AForm: TCommonCustomForm; ARect: TRectF);
+    function GetWindowRect(const AForm: TCommonCustomForm): TRectF;
+    function GetClientSize(const AForm: TCommonCustomForm): TPointF;
+    procedure SetClientSize(const AForm: TCommonCustomForm; const ASize: TPointF);
+    procedure SetWindowCaption(const AForm: TCommonCustomForm; const ACaption: string);
+    procedure SetCapture(const AForm: TCommonCustomForm);
+    procedure SetWindowState(const AForm: TCommonCustomForm; const AState: TWindowState);
+    procedure ReleaseCapture(const AForm: TCommonCustomForm);
+    function ClientToScreen(const AForm: TCommonCustomForm; const ALocalFormPoint: TPointF): TPointF;
+    function ScreenToClient(const AForm: TCommonCustomForm; const AScreenPoint: TPointF): TPointF; overload;
+    function GetWindowScale(const AForm: TCommonCustomForm): Single;
+    { IFMXMouseService }
+    function GetMousePos: TPointF;
+    { Mouse handlers }
+    procedure MouseDown(const AForm: TCommonCustomForm; const AButton: TMouseButton; const AShift: TShiftState;
+                        const AClientPoint: TPointF);
+    procedure MouseMove(const AForm: TCommonCustomForm; const AShift: TShiftState; const AClientPoint: TPointF);
+    procedure MouseUp(const AForm: TCommonCustomForm; const AButton: TMouseButton; const AShift: TShiftState;
+                      const AClientPoint: TPointF; const ADoClick: Boolean = True);
+    { Gestures }
+    function SendCMGestureMessage(AForm: TCommonCustomForm; AEventInfo: TGestureEventInfo): Boolean;
+    { Text }
+    procedure BeginSelection;
+    procedure EndSelection;
+    function GetTextService: TTextServiceAndroid;
+    procedure SetFocusedControl(const AControl: IControl);
+  public
+    property Scale: Single read FScale;
+    property StatusBarHeight: Single read FStatusBarHeight;
+    property FormManager: TFormManager read FFormManager;
+    property ScreenMousePos: TPointF read FScreenMousePos write FScreenMousePos;
+  end;
+
+  TAndroidMotionManager = class(TInterfacedObject, IFMXGestureRecognizersService)
+  private const
+    DblTapDelay = 300; //delay between the 2 taps
+    LongTapDuration = 500;
+    LongTapMovement = 10; //10 pixels - use scale to transform to points to use on each device
+  private type
+    TMotionEvent = record
+      Position: TPointF;
+      EventAction: Int32;
+      Shift: TShiftState;
+    end;
+    TMotionEvents = TList<TMotionEvent>;
+  private
+    { Gestures }
+    FEnabledInteractiveGestures: TInteractiveGestures;
+    FMotionEvents: TMotionEvents;
+    FDoubleTapTimer: TFmxHandle;
+    FLongTapTimer: TFmxHandle;
+    FDblClickFirstMouseUp: Boolean;
+    FOldPoint1, FOldPoint2: TPointF;
+    FRotationAngle: Single;
+    FGestureEnded: Boolean;
+    { Mouse }
+    FMouseCoord: TPointF;
+    FMouseDownCoordinates: TPointF;
+    [Weak] FHandle: TAndroidWindowHandle;
+    { Double Tap }
+    procedure CreateDoubleTapTimer;
+    procedure DestroyDoubleTapTimer;
+    procedure DoubleTapTimerCall;
+    { Long Tap }
+    procedure CreateLongTapTimer;
+    procedure DestroyLongTapTimer;
+    procedure LongTapTimerCall;
+    function GetLongTapAllowedMovement: Single;
+    procedure HandleMultiTouch;
+  protected
+    function CreateGestureEventInfo(const AGesture: TInteractiveGesture; const AGestureEnded: Boolean = False): TGestureEventInfo;
+  public
+    constructor Create(const AHandle: TAndroidWindowHandle);
+    destructor Destroy; override;
+    procedure ProcessAndroidGestureEvents;
+    procedure ProcessAndroidMouseEvents;
+    function HandleMotionEvent(const AEvent: JMotionEvent): Boolean;
+    { IFMXGestureRecognizersService }
+    procedure AddRecognizer(const AGesture: TInteractiveGesture; const AForm: TCommonCustomForm);
+    procedure RemoveRecognizer(const AGesture: TInteractiveGesture; const AForm: TCommonCustomForm);
+  end;
+
+  TAndroidTextInputManager = class(TInterfacedObject, IFMXKeyMappingService, IFMXTextService)
+  private
+    FVirtualKeyboard: IFMXVirtualKeyboardService;
+    FKeyMapping: TKeyMapping;
+    FKeyCharacterMap: JKeyCharacterMap;
+    FDownKey: Word;
+    FDownKeyChar: System.WideChar;
+    FKeyDownHandled: Boolean;
+    FEditText: JFMXEditText;
+    function ObtainKeyCharacterMap(DeviceId: Integer): JKeyCharacterMap;
+    function ShiftStateFromMetaState(const AMetaState: Integer): TShiftState;
+  protected
+    function FindActiveForm: TCommonCustomForm;
+    procedure KeyDown(var AKey: Word; var AKeyChar: System.WideChar; const AShift: TShiftState);
+    procedure KeyUp(var AKey: Word; var AKeyChar: System.WideChar; const AShift: TShiftState;
+                    const AKeyDownHandled: Boolean);
+  public
+    constructor Create;
+    destructor Destroy; override;
+
+    function HandleAndroidKeyEvent(AEvent: PAInputEvent): Int32;
+    { Android view for IME }
+    function GetEditText: JFMXEditText;
+    { IFMXTextService }
+    function GetTextServiceClass: TTextServiceClass;
+    { IFMXKeyMappingService }
+    /// <summary>Registers a platform key as the given virtual key.</summary>
+    function RegisterKeyMapping(const PlatformKey, VirtualKey: Word; const KeyKind: TKeyKind): Boolean;
+    /// <summary>Unegisters a platform key as the given virtual key.</summary>
+    function UnregisterKeyMapping(const PlatformKey: Word): Boolean;
+    /// <summary>Obtains the virtual key from a given platform key.</summary>
+    function PlatformKeyToVirtualKey(const PlatformKey: Word; var KeyKind: TKeyKind): Word;
+    /// <summary>Obtains the platform key from a given virtual key.</summary>
+    function VirtualKeyToPlatformKey(const VirtualKey: Word): Word;
+  end;
+
+  TFMXTextListener = class(TJavaLocal, JFMXTextListener)
+  strict private
+    [Weak] FTextService: TTextServiceAndroid;
+  public
+    constructor Create(const ATextService: TTextServiceAndroid); overload;
+    { JFMXTextListener }
+    procedure onTextUpdated(text: JCharSequence; caretPosition: Integer); cdecl;
+    procedure onComposingText(beginPosition: Integer; endPosition: Integer); cdecl;
+    procedure onEditorAction(actionCode: Integer); cdecl;
+  end;
+
+  TTextServiceAndroid = class(TTextService)
+  private
+    FCaretPosition: TPoint;
+    FText : string;
+    FImeMode: TImeMode;
+    FTextView: JFMXEditText;
+    FTextListener: TFMXTextListener;
+    FComposingBegin: Integer;
+    FComposingEnd: Integer;
+    FLines: TStrings;
+    FInternalUpdate: Boolean;
+    procedure ReadLines;
+    procedure CalculateSelectionBounds(out ASelectionStart, ASelectionEnd: Integer);
+    function IsFocused: Boolean;
+    { System message handler }
+    procedure ApplicationEventHandler(const Sender: TObject; const AMessage: TMessage);
+  protected
+    function GetText: string; override;
+    procedure SetText(const AValue: string); override;
+    function GetCaretPosition: TPoint; override;
+    procedure SetCaretPosition(const AValue: TPoint); override;
+    procedure SetMaxLength(const AValue: Integer); override;
+    procedure SetCharCase(const AValue: TEditCharCase); override;
+    procedure SetFilterChar(const AValue: string); override;
+  public
+    procedure InternalUpdate;
+    procedure InternalUpdateSelection;
+
+    function CombinedText: string; override;
+    function TargetClausePosition: TPoint; override;
+
+    procedure EnterControl(const AFormHandle: TWindowHandle); override;
+    procedure ExitControl(const AFormHandle: TWindowHandle); override;
+
+    procedure DrawSingleLine(const ACanvas: TCanvas;
+      const ARect: TRectF; const AFirstVisibleChar: integer; const AFont: TFont;
+      const AOpacity: Single; const AFlags: TFillTextFlags; const ATextAlign: TTextAlign;
+      const AVTextAlign: TTextAlign = TTextAlign.Center;
+      const AWordWrap: Boolean = False); overload;  override;
+
+    procedure DrawSingleLine(const ACanvas: TCanvas;
+      const S: string;
+      const ARect: TRectF;
+      const AFont: TFont;
+      const AOpacity: Single; const AFlags: TFillTextFlags; const ATextAlign: TTextAlign;
+      const AVTextAlign: TTextAlign = TTextAlign.Center;
+      const AWordWrap: Boolean = False); overload; override;
+
+    function HasMarkedText: Boolean; override;
+
+    function GetImeMode: TImeMode; override;
+    procedure SetImeMode(const AValue: TImeMode); override;
+
+    { Selection }
+    procedure BeginSelection; override;
+    procedure EndSelection; override;
+    procedure ProcessUpdate(const APos: Integer; AText: string);
+  public
+    constructor Create(const Owner: IControl; ASupportMultiLine: Boolean); override;
+    destructor Destroy; override;
+  end;
+
+function ConvertPixelToPoint(const APixel: TPointF): TPointF;
+function ConvertPointToPixel(const APoint: TPointF): TPointF;
+
+implementation
+
+uses
+  System.SysUtils, System.Math, System.Rtti, System.RTLConsts, System.DateUtils, System.Diagnostics,
+  AndroidApi.JNI.App, AndroidApi.JNI.Os,
+  FMX.Maps, FMX.Presentation.Style, FMX.Platform.Android, FMX.Gestures.Android, FMX.TextLayout, FMX.Canvas.GPU,
+  ALFmxInertialMovement;
+
+function ConvertPixelToPoint(const APixel: TPointF): TPointF;
+begin
+  Result := PlatformAndroid.WindowService.PixelToPoint(APixel);
+end;
+
+function ConvertPointToPixel(const APoint: TPointF): TPointF;
+begin
+  Result := PlatformAndroid.WindowService.PointToPixel(APoint);
+end;
+
+procedure RaiseIfNil(const AObject: TObject; const AArgumentName: string);
+begin
+  if AObject = nil then
+    raise EArgumentException.CreateFmt(SParamIsNil, [AArgumentName]);
+end;
+
+{ TWindowServiceAndroid }
+
+constructor TWindowServiceAndroid.Create;
+var
+  ScreenService: IFMXScreenService;
+begin
+  inherited Create;
+  ALAniCalcTimerProcs := Tlist<TALAniCalculations>.create; // added to support ALFmxInertialMovement
+  if not TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, ScreenService) then
+    raise Exception.CreateFmt(SUnsupportedPlatformService, ['IFMXScreenService']);
+
+  FScale := ScreenService.GetScreenScale;
+  if not TPlatformServices.Current.SupportsPlatformService(IFMXTimerService, FTimerService) then
+    raise Exception.CreateFmt(SUnsupportedPlatformService, ['IFMXTimerService']);
+
+  TPlatformServices.Current.SupportsPlatformService(IFMXVirtualKeyboardService, FVirtualKeyboard);
+  FContextMenu := TAndroidTextInputContextMenu.Create;
+  FFormManager := TFormManager.Create;
+  FActivityInsetsChangedListener := TActivityInsetsChangedListener.Create(Self);
+  MainActivity.setOnActivityInsetsChangedListener(FActivityInsetsChangedListener);
+  FStatusBarHeight := DefineDefaultStatusBarHeight;
+end;
+
+function TWindowServiceAndroid.CreateWindow(const AForm: TCommonCustomForm): TWindowHandle;
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  Result := TAndroidWindowHandle.Create(AForm);
+end;
+
+destructor TWindowServiceAndroid.Destroy;
+begin
+  MainActivity.setOnActivityInsetsChangedListener(nil);
+  FreeAndNil(FActivityInsetsChangedListener);
+  FreeAndNil(FFormManager);
+  FreeAndNil(FContextMenu);
+  FVirtualKeyboard := nil;
+  SetFocusedControl(nil);
+  FMouseDownControl := nil;
+  ALAniCalcTimerProcs.Free; // added to support ALFmxInertialMovement
+  ALAniCalcTimerProcs := nil;
+  inherited;
+end;
+
+procedure TWindowServiceAndroid.DestroyWindow(const AForm: TCommonCustomForm);
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  FFormManager.RemoveForm(AForm);
+  FMouseDownControl := nil;
+  SetFocusedControl(nil);
+  FGestureControl := nil;
+end;
+
+procedure TWindowServiceAndroid.EndSelection;
+begin
+  FSelectionInProgress := False;
+end;
+
+procedure TWindowServiceAndroid.BeginSelection;
+begin
+  FSelectionInProgress := True;
+end;
+
+procedure TWindowServiceAndroid.Activate(const AForm: TCommonCustomForm);
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  FFormManager.ShowForm(AForm);
+end;
+
+procedure TWindowServiceAndroid.BringToFront(const AForm: TCommonCustomForm);
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  FFormManager.BringToFront(AForm);
+end;
+
+function TWindowServiceAndroid.ScreenToClient(const AForm: TCommonCustomForm; const AScreenPoint: TPointF): TPointF;
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  if not AForm.IsHandleAllocated then
+    Exit(AScreenPoint);
+
+  Result := AScreenPoint - TAndroidWindowHandle(AForm.Handle).Bounds.TopLeft;
+  if HasStatusBar(AForm) or IsPopupForm(AForm) then
+    Result.Y := Result.Y - StatusBarHeight;
+end;
+
+function TWindowServiceAndroid.SendCMGestureMessage(AForm: TCommonCustomForm; AEventInfo: TGestureEventInfo): Boolean;
+var
+  Obj, LFocusedControl: IControl;
+  OldGestureControl: TComponent;
+  TmpControl: TFmxObject;
+  GObj: IGestureControl;
+  TextInput: ITextInput;
+  TextActions: ITextActions;
+const
+  LGestureMap: array [igiZoom .. igiDoubleTap] of TInteractiveGesture =
+    (TInteractiveGesture.Zoom, TInteractiveGesture.Pan,
+    TInteractiveGesture.Rotate, TInteractiveGesture.TwoFingerTap,
+    TInteractiveGesture.PressAndtap, TInteractiveGesture.LongTap,
+    TInteractiveGesture.DoubleTap);
+begin
+  Result := False;
+  OldGestureControl := nil;
+
+  if TInteractiveGestureFlag.gfBegin in AEventInfo.Flags then
+  begin
+    // find the control from under the gesture
+    Obj := AForm.ObjectAtPoint(AForm.ClientToScreen(AEventInfo.Location));
+    if FGestureControl <> nil then
+      OldGestureControl := FGestureControl;
+    if Obj <> nil then
+      FGestureControl := Obj.GetObject
+    else
+      FGestureControl := AForm;
+
+    if Supports(FGestureControl, IGestureControl, GObj) then
+      FGestureControl := GObj.GetFirstControlWithGesture(LGestureMap[AEventInfo.GestureID])
+    else
+      FGestureControl := nil;
+  end;
+
+  if not FSelectionInProgress then
+    if AForm.Focused <> nil then
+    begin
+      LFocusedControl := AForm.Focused;
+      if LFocusedControl is TStyledPresentation then
+        LFocusedControl := TStyledPresentation(LFocusedControl).PresentedControl;
+      if AForm.Focused <> LFocusedControl then
+        SetFocusedControl(LFocusedControl);
+    end
+    else if FFocusedControl <> nil then
+      SetFocusedControl(nil);
+
+  if FGestureControl <> nil then
+  begin
+    if Supports(FGestureControl, IGestureControl, GObj) then
+      try
+        GObj.CMGesture(AEventInfo);
+      except
+        Application.HandleException(FGestureControl);
+      end;
+
+    if not FSelectionInProgress then
+    begin
+      Obj := AForm.ObjectAtPoint(AForm.ClientToScreen(AEventInfo.Location));
+      if Obj <> nil then
+        TmpControl := Obj.GetObject
+      else
+        TmpControl := AForm;
+
+      if TmpControl is TStyledPresentation then
+        TmpControl := TStyledPresentation(TmpControl).PresentedControl;
+
+      if (AEventInfo.GestureID = igiLongTap) and Supports(TmpControl, ITextInput, TextInput) and
+        Supports(TmpControl, ITextActions, TextActions) then
+      begin
+        TextActions.SelectWord;
+        TTextServiceAndroid(TextInput.GetTextService).InternalUpdateSelection;
+      end;
+
+      if AEventInfo.GestureID = igiDoubleTap then
+      begin
+        while (TmpControl <> nil) and
+          not (Supports(TmpControl, ITextInput, TextInput) and Supports(TmpControl, ITextActions, TextActions)) do
+          TmpControl := TmpControl.Parent;
+        if (TextInput <> nil) and (TextActions <> nil) then
+        begin
+          TTextServiceAndroid(TextInput.GetTextService).InternalUpdateSelection;
+          if not TextInput.GetSelection.IsEmpty then
+            ShowContextMenu;
+        end;
+      end;
+    end;
+    Result := True;
+  end
+  else
+    FGestureControl := OldGestureControl;
+
+  if TInteractiveGestureFlag.gfEnd in AEventInfo.Flags then
+    FGestureControl := nil;
+end;
+
+procedure TWindowServiceAndroid.SendToBack(const AForm: TCommonCustomForm);
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  FFormManager.SendToBack(AForm);
+end;
+
+function TWindowServiceAndroid.FindForm(const AHandle: TWindowHandle): TCommonCustomForm;
+begin
+  RaiseIfNil(AHandle, 'AHandle');
+
+  Result := TAndroidWindowHandle(AHandle).Form;
+end;
+
+procedure TWindowServiceAndroid.FreeNotification(AObject: TObject);
+begin
+  FFocusedControl := nil;
+end;
+
+function TWindowServiceAndroid.GetClientSize(const AForm: TCommonCustomForm): TPointF;
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  Result := GetWindowRect(AForm).Size;
+end;
+
+function TWindowServiceAndroid.DefineDefaultStatusBarHeight: Single;
+var
+  ResourceId: Integer;
+begin
+  ResourceId := TAndroidHelper.Context.getResources.getIdentifier(StringToJString('status_bar_height'),
+    StringToJString('dimen'), StringToJString('android'));
+  if ResourceId > 0 then
+    Result := TAndroidHelper.Activity.getResources.getDimensionPixelSize(ResourceId) / FScale
+  else
+    Result := 0;
+end;
+
+function TWindowServiceAndroid.GetMousePos: TPointF;
+begin
+  Result := FScreenMousePos;
+end;
+
+function TWindowServiceAndroid.GetWindowRect(const AForm: TCommonCustomForm): TRectF;
+var
+  Handle: TAndroidWindowHandle;
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  if AForm.IsHandleAllocated then
+  begin
+    Handle := TAndroidWindowHandle(AForm.Handle);
+
+    // See comments for WasFormRealignedFirstTime
+    if Handle.WasFormRealignedFirstTime then
+      Result := Handle.Bounds
+    else
+      if IsPopupForm(AForm) then
+      begin
+        Result := Handle.Bounds;
+        Result.Offset(0, StatusBarHeight);
+      end
+      else
+        Result := TRectF.Create(0, 0, Screen.Width, Screen.Height - StatusBarHeight);
+  end
+  else
+    Result := TRectF.Create(0, 0, AForm.Width, AForm.Height);
+end;
+
+function TWindowServiceAndroid.GetWindowScale(const AForm: TCommonCustomForm): Single;
+begin
+  Result := Scale;
+end;
+
+function TWindowServiceAndroid.GetTextService: TTextServiceAndroid;
+var
+  TextInput: ITextInput;
+begin
+  Result := nil;
+  if Supports(FFocusedControl, ITextInput, TextInput) then
+    Result := TTextServiceAndroid(TextInput.GetTextService);
+end;
+
+procedure TWindowServiceAndroid.PrepareClosePopups(const ASaveForm: TCommonCustomForm);
+begin
+  if Screen <> nil then
+    if ASaveForm <> nil then
+      Screen.PrepareClosePopups(ASaveForm)
+    else
+      Screen.PrepareClosePopups(nil);
+end;
+
+function TWindowServiceAndroid.CanShowModal: Boolean;
+begin
+  Result := False;
+end;
+
+function TWindowServiceAndroid.ClientToScreen(const AForm: TCommonCustomForm; const ALocalFormPoint: TPointF): TPointF;
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  if not AForm.IsHandleAllocated then
+    Exit(ALocalFormPoint);
+
+  Result := ALocalFormPoint + TAndroidWindowHandle(AForm.Handle).Bounds.TopLeft;
+  if HasStatusBar(AForm) or IsPopupForm(AForm) then
+    Result.Y := Result.Y + StatusBarHeight;
+end;
+
+procedure TWindowServiceAndroid.ClosePopups;
+begin
+  if Screen <> nil then
+    Screen.ClosePopupForms;
+end;
+
+procedure TWindowServiceAndroid.MouseDown(const AForm: TCommonCustomForm; const AButton: TMouseButton;
+  const AShift: TShiftState; const AClientPoint: TPointF);
+var
+  Obj: IControl;
+  GObj: IGestureControl;
+begin
+  PrepareClosePopups(AForm);
+  try
+    AForm.MouseMove([ssTouch], AClientPoint.X, AClientPoint.Y);
+    AForm.MouseMove([], AClientPoint.X, AClientPoint.Y); // Required for correct IsMouseOver handling
+    AForm.MouseDown(TMouseButton.mbLeft, AShift, AClientPoint.X, AClientPoint.Y);
+  except
+    Application.HandleException(AForm);
+  end;
+
+  // find the control from under the gesture
+  Obj := AForm.ObjectAtPoint(AForm.ClientToScreen(AClientPoint));
+  if Obj <> nil then
+    FGestureControl := Obj.GetObject
+  else
+    FGestureControl := AForm;
+
+  if FGestureControl is TControl then
+    FMouseDownControl := TControl(FGestureControl);
+  if FMouseDownControl is TStyledPresentation then
+    FMouseDownControl := TStyledPresentation(FMouseDownControl).PresentedControl;
+
+  HideContextMenu;
+
+  if Supports(FGestureControl, IGestureControl, GObj) then
+    FGestureControl := GObj.GetFirstControlWithGestureEngine;
+
+  if Supports(FGestureControl, IGestureControl, GObj) then
+  begin
+    TPlatformGestureEngine(GObj.TouchManager.GestureEngine).InitialPoint := AClientPoint;
+
+    // Retain the points/touches.
+    TPlatformGestureEngine(GObj.TouchManager.GestureEngine).ClearPoints;
+    TPlatformGestureEngine(GObj.TouchManager.GestureEngine).AddPoint(AClientPoint.X, AClientPoint.Y);
+  end;
+end;
+
+procedure TWindowServiceAndroid.MouseMove(const AForm: TCommonCustomForm; const AShift: TShiftState;
+  const AClientPoint: TPointF);
+var
+  GObj: IGestureControl;
+  Form: TCommonCustomForm;
+begin
+  if FCapturedForm <> nil then
+    Form := FCapturedForm
+  else
+    Form := AForm;
+
+  try
+    Form.MouseMove(AShift, AClientPoint.X, AClientPoint.Y);
+  except
+    Application.HandleException(AForm);
+  end;
+  if Supports(FGestureControl, IGestureControl, GObj) and (GObj.TouchManager.GestureEngine <> nil) then
+    TPlatformGestureEngine(GObj.TouchManager.GestureEngine).AddPoint(AClientPoint.X, AClientPoint.Y);
+end;
+
+procedure TWindowServiceAndroid.MouseUp(const AForm: TCommonCustomForm; const AButton: TMouseButton;
+  const AShift: TShiftState; const AClientPoint: TPointF; const ADoClick: Boolean);
+const
+  LGestureTypes: TGestureTypes = [TGestureType.Standard, TGestureType.Recorded, TGestureType.Registered];
+var
+  EventInfo: TGestureEventInfo;
+  GObj: IGestureControl;
+  Form: TCommonCustomForm;
+begin
+  if FCapturedForm <> nil then
+    Form := FCapturedForm
+  else
+    Form := AForm;
+  try
+    Form.MouseUp(TMouseButton.mbLeft, AShift, AClientPoint.X, AClientPoint.Y, ADoClick);
+    if Form <> nil then
+      Form.MouseLeave; // Require for correct IsMouseOver handle
+    ClosePopups;
+  except
+    Application.HandleException(Form);
+  end;
+  if Supports(FGestureControl, IGestureControl, GObj) then
+    if GObj.TouchManager.GestureEngine <> nil then
+    begin
+      if TPlatformGestureEngine(GObj.TouchManager.GestureEngine).PointCount > 1 then
+      begin
+        FillChar(EventInfo, Sizeof(EventInfo), 0);
+        if TPlatformGestureEngine.IsGesture
+          (TPlatformGestureEngine(GObj.TouchManager.GestureEngine).Points,
+          TPlatformGestureEngine(GObj.TouchManager.GestureEngine).GestureList, LGestureTypes, EventInfo) then
+          TPlatformGestureEngine(GObj.TouchManager.GestureEngine).BroadcastGesture(FGestureControl, EventInfo);
+      end;
+    end;
+end;
+
+function TWindowServiceAndroid.PixelToPoint(const APixel: TPointF): TPointF;
+begin
+  Result := TPointF.Create(APixel.X / FScale, APixel.Y / FScale);
+end;
+
+function TWindowServiceAndroid.PointToPixel(const APixel: TPointF): TPointF;
+begin
+  Result := TPointF.Create(APixel.X * FScale, APixel.Y * FScale);
+end;
+
+procedure TWindowServiceAndroid.ReleaseCapture(const AForm: TCommonCustomForm);
+begin
+  FCapturedForm := nil;
+end;
+
+procedure TWindowServiceAndroid.ReleaseWindow(const AForm: TCommonCustomForm);
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  FFormManager.RemoveForm(AForm);
+  FMouseDownControl := nil;
+  SetFocusedControl(nil);
+  FGestureControl := nil;
+end;
+
+procedure TWindowServiceAndroid.SetCapture(const AForm: TCommonCustomForm);
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  FCapturedForm := AForm;
+end;
+
+procedure TWindowServiceAndroid.SetClientSize(const AForm: TCommonCustomForm; const ASize: TPointF);
+var
+  Bounds: TRectF;
+  Handle: TAndroidWindowHandle;
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  if IsPopupForm(AForm) then
+  begin
+    Handle := TAndroidWindowHandle(AForm.Handle);
+    Bounds := Handle.Bounds;
+    Handle.Bounds := TRectF.Create(Bounds.TopLeft, ASize.X, ASize.Y);
+  end;
+end;
+
+procedure TWindowServiceAndroid.SetFocusedControl(const AControl: IControl);
+begin
+  if FFocusedControl <> AControl then
+  begin
+    if FFocusedControl <> nil then
+      FFocusedControl.RemoveFreeNotify(Self);
+    FFocusedControl := AControl;
+    if FFocusedControl <> nil then
+      FFocusedControl.AddFreeNotify(Self);
+  end;
+end;
+
+procedure TWindowServiceAndroid.SetWindowCaption(const AForm: TCommonCustomForm; const ACaption: string);
+begin
+  // NOP on Android
+end;
+
+procedure TWindowServiceAndroid.SetWindowRect(const AForm: TCommonCustomForm; ARect: TRectF);
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  if AForm.IsHandleAllocated then
+  begin
+    // Form's view is placed in content view. Which doesn't fill all screen (there are status bar). But ARect contains
+    // rectangle in screen coordinate system. For this purpose we make offset.
+    ARect.Offset(0, -StatusBarHeight);
+
+    TAndroidWindowHandle(AForm.Handle).Bounds := ARect;
+  end;
+end;
+
+procedure TWindowServiceAndroid.SetWindowState(const AForm: TCommonCustomForm; const AState: TWindowState);
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  if AForm.Visible and (AState = TWindowState.wsMinimized) then
+    AForm.Visible := False;
+  if AForm.Visible then
+    if TAndroidWindowHandle(AForm.Handle).IsPopupForm then
+      AForm.WindowState := TWindowState.wsNormal
+    else
+      AForm.WindowState := TWindowState.wsMaximized
+  else
+    AForm.WindowState := TWindowState.wsMinimized;
+end;
+
+procedure TWindowServiceAndroid.ShowContextMenu;
+var
+  TextInput: ITextInput;
+begin
+  if Supports(FFocusedControl, ITextInput, TextInput) and not FSelectionInProgress then
+    FContextMenu.Show(FFocusedControl);
+end;
+
+procedure TWindowServiceAndroid.ShowWindow(const AForm: TCommonCustomForm);
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  if AForm.IsHandleAllocated then
+  begin
+    FFormManager.ShowForm(AForm);
+
+    if IsPopupForm(AForm) then
+      AForm.WindowState := TWindowState.wsNormal
+    else
+    begin
+      AForm.WindowState := TWindowState.wsMaximized;
+      if AForm.BorderStyle = TFmxFormBorderStyle.None then
+        MainActivity.getFullScreenManager.setStatusBarVisibility(False)
+      else
+        MainActivity.getFullScreenManager.setStatusBarVisibility(True);
+    end;
+  end;
+end;
+
+function TWindowServiceAndroid.ShowWindowModal(const AForm: TCommonCustomForm): TModalResult;
+begin
+  raise ENotImplemented.CreateFmt(SNotImplementedOnPlatform, ['ShowModal']);
+end;
+
+function TWindowServiceAndroid.HasStatusBar(const AForm: TCommonCustomForm): Boolean;
+begin
+  Result := (AForm.BorderStyle <> TFmxFormBorderStyle.None) and not AForm.FullScreen;
+end;
+
+procedure TWindowServiceAndroid.HideContextMenu;
+begin
+  FContextMenu.Hide;
+end;
+
+procedure TWindowServiceAndroid.HideWindow(const AForm: TCommonCustomForm);
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  if AForm.IsHandleAllocated then
+  begin
+    FFormManager.HideForm(AForm);
+
+    AForm.WindowState := TWindowState.wsMinimized;
+  end;
+end;
+
+procedure TWindowServiceAndroid.InvalidateImmediately(const AForm: TCommonCustomForm);
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  if AForm.IsHandleAllocated then
+    TAndroidWindowHandle(AForm.Handle).Render.Render;
+end;
+
+procedure TWindowServiceAndroid.InvalidateWindowRect(const AForm: TCommonCustomForm; ARect: TRectF);
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  if AForm.IsHandleAllocated then
+    TAndroidWindowHandle(AForm.Handle).Invalidate;
+end;
+
+class function TWindowServiceAndroid.IsPopupForm(const AForm: TCommonCustomForm): Boolean;
+begin
+  Result := (AForm <> nil) and ((AForm.FormStyle = TFormStyle.Popup) or (AForm.Owner is TPopup) or (AForm is TCustomPopupForm));
+end;
+
+{ TAndroidWindowHandle.TFormViewListener }
+
+constructor TAndroidWindowHandle.TFormViewListener.Create(const AOwner: TAndroidWindowHandle);
+begin
+  RaiseIfNil(AOwner, 'AOwner');
+
+  inherited Create;
+  FOwner := AOwner;
+end;
+
+procedure TAndroidWindowHandle.TFormViewListener.onSizeChanged(w, h, oldw, oldh: Integer);
+var
+  FormBounds: TRect;
+begin
+  FOwner.FWasFormRealignedFirstTime := True;
+  FOwner.FFormBounds.Width := w / PlatformAndroid.WindowService.Scale;
+  FOwner.FFormBounds.Height:= h / PlatformAndroid.WindowService.Scale;
+
+  FormBounds := FOwner.Bounds.Truncate;
+  FOwner.Form.SetBounds(FormBounds.Left, FormBounds.Top, FormBounds.Width, FormBounds.Height);
+end;
+
+function TAndroidWindowHandle.TFormViewListener.onTouchEvent(event: JMotionEvent): Boolean;
+begin
+  Result := FOwner.MotionManager.HandleMotionEvent(event);
+end;
+
+{ TAndroidWindowHandle.TSurfaceViewListener }
+
+constructor TAndroidWindowHandle.TSurfaceViewListener.Create(const AOwner: TAndroidWindowHandle);
+begin
+  RaiseIfNil(AOwner, 'AOwner');
+
+  inherited Create;
+  FOwner := AOwner;
+  FSurfaceFlingerRenderingObserver := TSurfaceFlingerRenderingObserver.Create(FOwner.Form);
+end;
+
+destructor TAndroidWindowHandle.TSurfaceViewListener.Destroy;
+begin
+  TJChoreographer.JavaClass.getInstance.removeFrameCallback(FSurfaceFlingerRenderingObserver);
+  FreeAndNil(FSurfaceFlingerRenderingObserver);
+  inherited;
+end;
+
+procedure TAndroidWindowHandle.TSurfaceViewListener.surfaceChanged(holder: JSurfaceHolder; format: Integer; width: Integer; height: Integer);
+begin
+  FOwner.Form.RecreateResources;
+  FOwner.Render.Render;
+end;
+
+procedure TAndroidWindowHandle.TSurfaceViewListener.surfaceCreated(holder: JSurfaceHolder);
+begin
+  holder.setFormat(TJPixelFormat.JavaClass.TRANSLUCENT);
+  FOwner.FHolder := holder;
+  FOwner.Form.RecreateResources;
+  TJChoreographer.JavaClass.getInstance.postFrameCallback(FSurfaceFlingerRenderingObserver);
+end;
+
+procedure TAndroidWindowHandle.TSurfaceViewListener.surfaceDestroyed(holder: JSurfaceHolder);
+begin
+  FOwner.FHolder := nil;
+  TJChoreographer.JavaClass.getInstance.removeFrameCallback(FSurfaceFlingerRenderingObserver);
+end;
+
+{ TAndroidWindowHandle }
+
+constructor TAndroidWindowHandle.Create(const AForm: TCommonCustomForm);
+var
+  FormViewParams: JRelativeLayout_LayoutParams;
+  FormLayoutParams: JRelativeLayout_LayoutParams;
+begin
+  RaiseIfNil(AForm, 'AForm');
+
+  inherited Create;
+  FRender := TFormRender.Create(Self);
+  FForm := AForm;
+  FWasFormRealignedFirstTime := False;
+  FFormBounds := TRectF.Create(0, 0, Screen.Width, Screen.Height);
+
+  // Creates Form's view
+  FListener := TFormViewListener.Create(Self);
+  FSurfaceListener := TSurfaceViewListener.Create(Self);
+
+  FView := TJFormView.JavaClass.init(TAndroidHelper.Context);
+  if IsPopupForm then
+    FView.setZOrderMediaOverlay(True);
+  FView.setListener(FListener);
+  FView.getHolder.addCallback(FSurfaceListener);
+  FView.setFocusable(True);
+  FView.setFocusableInTouchMode(True);
+
+  // Root Layout for Form. It contains form View
+  FFormLayout := TJRelativeLayout.JavaClass.init(TAndroidHelper.Activity);
+  FFormLayout.setTag(StringToJString('FMXForm'));
+  FormViewParams := TJRelativeLayout_LayoutParams.JavaClass.init(TJViewGroup_LayoutParams.JavaClass.MATCH_PARENT,
+                                                                 TJViewGroup_LayoutParams.JavaClass.MATCH_PARENT);
+  FFormLayout.addView(FView, FormViewParams);
+
+  // Embed Form Root into Activity Content
+  FormLayoutParams := TJRelativeLayout_LayoutParams.JavaClass.init(TJViewGroup_LayoutParams.JavaClass.MATCH_PARENT,
+                                                                   TJViewGroup_LayoutParams.JavaClass.MATCH_PARENT);
+  MainActivity.getViewGroup.addView(FFormLayout, FormLayoutParams);
+
+  FFormLayout.setVisibility(TJView.JavaClass.GONE);
+  Invalidate;
+end;
+
+destructor TAndroidWindowHandle.Destroy;
+begin
+  FView.setListener(nil);
+  FView.getHolder.removeCallback(FSurfaceListener);
+  FSurfaceListener.Free;
+  FListener.Free;
+  FRender.Free;
+  FMotionManager.Free;
+  FMultiTouchManager.Free;
+  FZOrderManager.Free;
+  FView := nil;
+  FFormLayout := nil;
+  inherited;
+end;
+
+function TAndroidWindowHandle.IsPopupForm: Boolean;
+begin
+  Result := (FForm.FormStyle = TFormStyle.Popup) or (FForm.Owner is TPopup);
+end;
+
+procedure TAndroidWindowHandle.HandleMultiTouch(const ATouches: TTouches; const AAction: TTouchAction;
+  const AEnabledGestures: TInteractiveGestures);
+var
+  Control: IControl;
+  I: Integer;
+begin
+  if Length(ATouches) = 1 then
+    Control := FForm.ObjectAtPoint(FForm.ClientToScreen(ATouches[0].Location))
+  else if Length(ATouches) = 2 then
+    Control := FForm.ObjectAtPoint(FForm.ClientToScreen(ATouches[0].Location.MidPoint(ATouches[1].Location)))
+  else
+    Control := nil;
+
+  for I := 0 to Length(ATouches) - 1 do
+    ATouches[I].Location := ATouches[I].Location;
+
+  MultiTouchManager.SetEnabledGestures(AEnabledGestures);
+  MultiTouchManager.HandleTouches(ATouches, AAction, Control);
+end;
+
+procedure TAndroidWindowHandle.Hide;
+begin
+  FormLayout.setVisibility(TJView.JavaClass.GONE);
+  View.setVisibility(TJView.JavaClass.GONE);
+end;
+
+procedure TAndroidWindowHandle.SetBounds(const AValue: TRectF);
+var
+  LayoutParams: JRelativeLayout_LayoutParams;
+begin
+  LayoutParams := TJRelativeLayout_LayoutParams.Wrap(FFormLayout.getLayoutParams);
+  if IsPopupForm then
+  begin
+    FFormBounds := AValue;
+    LayoutParams.leftMargin := Trunc(AValue.Left * Scale);
+    LayoutParams.topMargin := Trunc(AValue.Top * Scale);
+    LayoutParams.width := Trunc(AValue.Width * Scale);
+    LayoutParams.height := Trunc(AValue.Height * Scale);
+  end
+  else
+  begin
+    if FWasFormRealignedFirstTime then
+      FFormBounds := TRectF.Create(0, 0, FormLayout.getWidth / Scale, FormLayout.getHeight / Scale)
+    else
+      FFormBounds := TRectF.Create(0, 0, Screen.Width, Screen.Height - PlatformAndroid.WindowService.StatusBarHeight);
+    LayoutParams.leftMargin := 0;
+    LayoutParams.topMargin := 0;
+    LayoutParams.width := TJViewGroup_LayoutParams.JavaClass.MATCH_PARENT;
+    LayoutParams.height := TJViewGroup_LayoutParams.JavaClass.MATCH_PARENT;
+  end;
+  MainActivity.getViewGroup.updateViewLayout(FFormLayout, LayoutParams);
+end;
+
+procedure TAndroidWindowHandle.Show;
+begin
+  FormLayout.setVisibility(TJView.JavaClass.VISIBLE);
+  View.setVisibility(TJView.JavaClass.VISIBLE);
+  FRender.Render;
+end;
+
+function TAndroidWindowHandle.GetBounds: TRectF;
+var
+  LayoutParams: JRelativeLayout_LayoutParams;
+begin
+  if IsPopupForm then
+  begin
+    LayoutParams := TJRelativeLayout_LayoutParams.Wrap(FFormLayout.getLayoutParams);
+    Result := TRectF.Create(LayoutParams.leftMargin / Scale,
+                            LayoutParams.topMargin / Scale,
+                           (LayoutParams.leftMargin + LayoutParams.width) / Scale,
+                           (LayoutParams.topMargin + LayoutParams.height) / Scale)
+  end
+  else
+  begin
+    // See comment for WasFormRealignedFirstTime
+    if FWasFormRealignedFirstTime then
+      Result := FFormBounds
+    else
+      Result := TRectF.Create(0, 0, Screen.Width, Screen.Height);
+  end;
+end;
+
+function TAndroidWindowHandle.GetMotionManager: TAndroidMotionManager;
+begin
+  if FMotionManager = nil then
+    FMotionManager := TAndroidMotionManager.Create(Self);
+  Result := FMotionManager;
+end;
+
+function TAndroidWindowHandle.GetMultiTouchManager: TMultiTouchManagerAndroid;
+begin
+  if FMultiTouchManager = nil then
+    FMultiTouchManager := TMultiTouchManagerAndroid.Create(FForm);
+  Result := FMultiTouchManager;
+end;
+
+function TAndroidWindowHandle.GetScale: Single;
+begin
+  Result := PlatformAndroid.WindowService.Scale;
+end;
+
+function TAndroidWindowHandle.GetZOrderManager: TAndroidZOrderManager;
+begin
+  if FZOrderManager = nil then
+    FZOrderManager := TAndroidZOrderManager.Create(Self);
+  Result := FZOrderManager;
+end;
+
+procedure TAndroidWindowHandle.Invalidate;
+begin
+  FRender.PostRender;
+end;
+
+{ TTextServiceAndroid }
+
+constructor TTextServiceAndroid.Create(const Owner: IControl; ASupportMultiLine: Boolean);
+begin
+  FLines := TStringList.Create;
+  FComposingBegin := -1;
+  FComposingEnd := -1;
+  inherited Create(Owner, ASupportMultiLine);
+  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
+end;
+
+destructor TTextServiceAndroid.Destroy;
+begin
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
+  FLines.Free;
+  inherited;
+end;
+
+procedure TTextServiceAndroid.ApplicationEventHandler(const Sender: TObject; const AMessage: TMessage);
+const
+  WhenHideFocusApplicationStates: set of TApplicationEvent = [TApplicationEvent.WillBecomeInactive,
+    TApplicationEvent.EnteredBackground, TApplicationEvent.WillTerminate];
+var
+  EventData: TApplicationEventData;
+begin
+  if AMessage is TApplicationEventMessage then
+  begin
+    EventData := TApplicationEventMessage(AMessage).Value;
+    if Owner.IsFocused and (Owner.GetObject.Root <> nil) and (EventData.Event in WhenHideFocusApplicationStates) then
+      Owner.GetObject.Root.Focused := nil;
+  end;
+end;
+
+procedure TTextServiceAndroid.BeginSelection;
+begin
+  PlatformAndroid.WindowService.BeginSelection;
+  PlatformAndroid.WindowService.HideContextMenu;
+end;
+
+procedure TTextServiceAndroid.EndSelection;
+begin
+  PlatformAndroid.WindowService.EndSelection;
+  InternalUpdateSelection;
+  PlatformAndroid.WindowService.ShowContextMenu;
+end;
+
+function TTextServiceAndroid.CombinedText: string;
+var
+  I, TextLength: Integer;
+  Builder: TStringBuilder;
+begin
+  TextLength := 0;
+  for I := 0 to FLines.Count - 1 do
+  begin
+    if I > 0 then
+      Inc(TextLength);
+    Inc(TextLength, FLines[I].Length);
+  end;
+  Builder := TStringBuilder.Create(TextLength);
+  try
+    for I := 0 to FLines.Count - 1 do
+    begin
+      if I > 0 then
+        Builder.Append(FLines.LineBreak);
+      Builder.Append(FLines[I]);
+    end;
+    Result := Builder.ToString(True);
+  finally
+    Builder.Free;
+  end;
+end;
+
+procedure TTextServiceAndroid.DrawSingleLine(const ACanvas: TCanvas; const ARect: TRectF; const AFirstVisibleChar: integer;
+  const AFont: TFont; const AOpacity: Single; const AFlags: TFillTextFlags; const ATextAlign: TTextAlign;
+  const AVTextAlign: TTextAlign = TTextAlign.Center; const AWordWrap: Boolean = False);
+var
+  I, Shift: Integer;
+  S: string;
+  Layout: TTextLayout;
+  Region: TRegion;
+begin
+  Layout := TTextLayoutManager.TextLayoutByCanvas(ACanvas.ClassType).Create;
+  try
+    Layout.BeginUpdate;
+    Layout.TopLeft := ARect.TopLeft;
+    Layout.MaxSize := PointF(ARect.Width, ARect.Height);
+    Layout.WordWrap := AWordWrap;
+    Layout.HorizontalAlign := ATextAlign;
+    Layout.VerticalAlign := AVTextAlign;
+    Layout.Font := AFont;
+    Layout.Color := ACanvas.Fill.Color;
+    Layout.Opacity := AOpacity;
+    Layout.RightToLeft := TFillTextFlag.RightToLeft in AFlags;
+    if FLines.Count > 0 then
+      S := FLines[FCaretPosition.Y]
+    else
+      S := '';
+    Layout.Text := S.Substring(AFirstVisibleChar - 1, S.Length - AFirstVisibleChar + 1);
+    Layout.EndUpdate;
+    Layout.RenderLayout(ACanvas);
+
+    if (FComposingBegin >= 0) and (FComposingEnd >= 0) and (FComposingBegin < FComposingEnd) and IsFocused then
+    begin
+      Shift := 0;
+      if FLines.Count > 0 then
+        for I := 0 to FCaretPosition.Y - 1 do
+          Inc(Shift, FLines[I].Length + FLines.LineBreak.Length);
+
+      ACanvas.Stroke.Assign(ACanvas.Fill);
+      ACanvas.Stroke.Thickness := 1;
+      ACanvas.Stroke.Dash := TStrokeDash.Solid;
+
+      Region := Layout.RegionForRange(TTextRange.Create(FComposingBegin - Shift - (AFirstVisibleChar - 1), FComposingEnd - FComposingBegin));
+      for I := Low(Region) to High(Region) do
+        ACanvas.DrawLine(
+          PointF(Region[I].Left, Region[I].Bottom),
+          PointF(Region[I].Right, Region[I].Bottom),
+          AOpacity, ACanvas.Stroke);
+    end;
+  finally
+    FreeAndNil(Layout);
+  end;
+end;
+
+procedure TTextServiceAndroid.DrawSingleLine(const ACanvas: TCanvas; const S: string; const ARect: TRectF; const AFont: TFont;
+  const AOpacity: Single; const AFlags: TFillTextFlags; const ATextAlign: TTextAlign;
+  const AVTextAlign: TTextAlign = TTextAlign.Center; const AWordWrap: Boolean = False);
+var
+  I: Integer;
+  Layout: TTextLayout;
+  Region: TRegion;
+begin
+  Layout := TTextLayoutManager.TextLayoutByCanvas(ACanvas.ClassType).Create;
+  try
+    Layout.BeginUpdate;
+    try
+      Layout.TopLeft := ARect.TopLeft;
+      Layout.MaxSize := PointF(ARect.Width, ARect.Height);
+      Layout.WordWrap := AWordWrap;
+      Layout.HorizontalAlign := ATextAlign;
+      Layout.VerticalAlign := AVTextAlign;
+      Layout.Font := AFont;
+      Layout.Color := ACanvas.Fill.Color;
+      Layout.Opacity := AOpacity;
+      Layout.RightToLeft := TFillTextFlag.RightToLeft in AFlags;
+      Layout.Text := S;
+    finally
+      Layout.EndUpdate;
+    end;
+    Layout.RenderLayout(ACanvas);
+
+    if (FComposingBegin >= 0) and (FComposingEnd >= 0) and (FComposingBegin < FComposingEnd) then
+    begin
+      ACanvas.Stroke.Assign(ACanvas.Fill);
+      ACanvas.Stroke.Thickness := 1;
+      ACanvas.Stroke.Dash := TStrokeDash.Solid;
+
+      Region := Layout.RegionForRange(TTextRange.Create(FComposingBegin, FComposingEnd - FComposingBegin));
+      for I := Low(Region) to High(Region) do
+        ACanvas.DrawLine(
+          PointF(Region[I].Left, Region[I].Bottom),
+          PointF(Region[I].Right, Region[I].Bottom),
+          AOpacity, ACanvas.Stroke);
+    end;
+  finally
+    FreeAndNil(Layout);
+  end;
+end;
+
+{ TFMXTextListener }
+
+constructor TFMXTextListener.Create(const ATextService: TTextServiceAndroid);
+begin
+  RaiseIfNil(ATextService, 'ATextService');
+
+  inherited Create;
+  FTextService := ATextService;
+end;
+
+procedure TFMXTextListener.onTextUpdated(text: JCharSequence; caretPosition: Integer);
+begin
+  FTextService.ProcessUpdate(caretPosition, JCharSequenceToStr(text));
+  PlatformAndroid.WindowService.HideContextMenu;
+  PlatformAndroid.InternalProcessMessages;
+end;
+
+procedure TFMXTextListener.onComposingText(beginPosition: Integer; endPosition: Integer);
+begin
+  FTextService.FComposingBegin := beginPosition;
+  FTextService.FComposingEnd := endPosition;
+end;
+
+procedure TFMXTextListener.onEditorAction(actionCode: Integer);
+var
+  KeyCode: Word;
+  KeyChar: Char;
+begin
+  if FTextService.Multiline then
+    Exit;
+
+  if actionCode = TJEditorInfo.JavaClass.IME_ACTION_NEXT then
+    KeyCode := vkTab
+  else
+    KeyCode := vkReturn;
+  KeyChar := #0;
+  PlatformAndroid.TextInputManager.KeyDown(KeyCode, KeyChar, []);
+  PlatformAndroid.TextInputManager.KeyUp(KeyCode, KeyChar, [], (KeyCode = 0) and (KeyChar = #0));
+end;
+
+type
+
+  TReturnKeyTypeHelper = record helper for TReturnKeyType
+    function ToJReturnKeyType: JReturnKeyType;
+  end;
+
+{ TReturnKeyTypeHelper }
+
+function TReturnKeyTypeHelper.ToJReturnKeyType: JReturnKeyType;
+begin
+  case Self of
+    TReturnKeyType.Default:
+      Result := TJReturnKeyType.JavaClass.ENTER;
+    TReturnKeyType.Done:
+      Result := TJReturnKeyType.JavaClass.DONE;
+    TReturnKeyType.Go:
+      Result := TJReturnKeyType.JavaClass.GO;
+    TReturnKeyType.Next:
+      Result := TJReturnKeyType.JavaClass.NEXT;
+    TReturnKeyType.Search:
+      Result := TJReturnKeyType.JavaClass.SEARCH;
+    TReturnKeyType.Send:
+      Result := TJReturnKeyType.JavaClass.SEND;
+  else
+    raise Exception.Create('Unknown TReturnKeyType value.');
+  end;
+end;
+
+type
+
+  TVirtualKeyboardTypeHelper = record helper for TVirtualKeyboardType
+    function ToJVirtualKeyboardType: JVirtualKeyboardType;
+  end;
+
+{ TVirtualKeyboardTypeHelper }
+
+function TVirtualKeyboardTypeHelper.ToJVirtualKeyboardType: JVirtualKeyboardType;
+begin
+  case Self of
+    TVirtualKeyboardType.Default:
+      Result := TJVirtualKeyboardType.JavaClass.TEXT;
+    TVirtualKeyboardType.NumbersAndPunctuation:
+      Result := TJVirtualKeyboardType.JavaClass.NUMBER_AND_PUNCTUATION;
+    TVirtualKeyboardType.NumberPad:
+      Result := TJVirtualKeyboardType.JavaClass.NUMBER;
+    TVirtualKeyboardType.PhonePad:
+      Result := TJVirtualKeyboardType.JavaClass.PHONE;
+    TVirtualKeyboardType.Alphabet:
+      Result := TJVirtualKeyboardType.JavaClass.ALPHABET;
+    TVirtualKeyboardType.URL:
+      Result := TJVirtualKeyboardType.JavaClass.URL;
+    TVirtualKeyboardType.NamePhonePad:
+      Result := TJVirtualKeyboardType.JavaClass.PHONE;
+    TVirtualKeyboardType.EmailAddress:
+      Result := TJVirtualKeyboardType.JavaClass.EMAIL_ADDRESS;
+    TVirtualKeyboardType.DecimalNumberPad:
+      Result := TJVirtualKeyboardType.JavaClass.NUMBER_DECIMAL;
+  else
+    raise Exception.Create('Unknown TVirtualKeyboardType value.');
+  end;
+end;
+
+type
+
+  TEditCharCaseHelper = record helper for TEditCharCase
+    function ToJCharCase: JCharCase;
+  end;
+
+{ TEditCharCaseHelper }
+
+function TEditCharCaseHelper.ToJCharCase: JCharCase;
+begin
+  case Self of
+    TEditCharCase.ecNormal:
+      Result := TJCharCase.JavaClass.NORMAL;
+    TEditCharCase.ecUpperCase:
+      Result := TJCharCase.JavaClass.UPPER_CASE;
+    TEditCharCase.ecLowerCase:
+      Result := TJCharCase.JavaClass.LOWER_CASE;
+  else
+    raise Exception.Create('Unknown TEditCharCase value.');
+  end;
+end;
+
+procedure TTextServiceAndroid.EnterControl(const AFormHandle: TWindowHandle);
+var
+  VirtKBControl: IVirtualKeyboardControl;
+  KbType: JVirtualKeyboardType;
+  RKType: JReturnKeyType;
+  SelStart, SelEnd: Integer;
+  ReadOnly, Password: Boolean;
+  LReadOnly: IReadOnly;
+begin
+  if (AFormHandle is TAndroidWindowHandle) and (TAndroidWindowHandle(AFormHandle).Form.Focused <> nil) then
+  begin
+    if Supports(TAndroidWindowHandle(AFormHandle).Form.Focused, IVirtualKeyboardControl, VirtKBControl) then
+    begin
+      PlatformAndroid.WindowService.SetFocusedControl(TAndroidWindowHandle(AFormHandle).Form.Focused);
+
+      RKType := VirtKBControl.ReturnKeyType.ToJReturnKeyType;
+      KbType := VirtKBControl.KeyboardType.ToJVirtualKeyboardType;
+      Password := VirtKBControl.IsPassword;
+    end
+    else
+    begin
+      KbType := TJVirtualKeyboardType.JavaClass.TEXT;
+      RKType := TJReturnKeyType.JavaClass.ENTER;
+      Password := False;
+    end;
+
+    if Supports(TAndroidWindowHandle(AFormHandle).Form.Focused, IReadOnly, LReadOnly) then
+    try
+      ReadOnly := LReadOnly.ReadOnly;
+    finally
+      LReadOnly := nil;
+    end
+    else
+      ReadOnly := True;
+
+    if FTextView = nil then
+      FTextView := PlatformAndroid.TextInputManager.GetEditText;
+
+    if FTextView <> nil then
+    begin
+      if FTextListener = nil then
+        FTextListener := TFMXTextListener.Create(Self);
+      CalculateSelectionBounds(SelStart, SelEnd);
+
+      FTextView.setMaxLength(MaxLength);
+      FTextView.setCharCase(CharCase.ToJCharCase);
+      FTextView.setFilterChars(StringToJString(FilterChar));
+      FTextView.setMultiline(MultiLine);
+      FTextView.setReadOnly(ReadOnly);
+      FTextView.setKeyboardType(KbType);
+      FTextView.setPassword(Password);
+      FTextView.setText(StrToJCharSequence(FText), TJTextView_BufferType.JavaClass.EDITABLE);
+      FTextView.setReturnKeyType(RKType);
+      if SelEnd - SelStart > 0 then
+        FTextView.setSelection(SelStart, SelEnd)
+      else
+        FTextView.setSelection(CaretPosition.X);
+      FTextView.addTextListener(FTextListener);
+
+      TAndroidWindowHandle(AFormHandle).ZOrderManager.AddOrSetLink(TControl(Owner.GetObject), FTextView, nil);
+      TAndroidWindowHandle(AFormHandle).ZOrderManager.UpdateOrderAndBounds(TControl(Owner.GetObject));
+
+      FTextView.setNeededToShowSoftKeyboardOnTouch(TVirtualKeyboardState.AutoShow in PlatformAndroid.VirtualKeyboard.VirtualKeyboardState);
+      FTextView.requestFocus;
+    end;
+  end;
+end;
+
+procedure TTextServiceAndroid.ExitControl(const AFormHandle: TWindowHandle);
+begin
+  if (FTextView <> nil) and (FTextListener <> nil) then
+  begin
+    FComposingBegin := -1;
+    FComposingEnd := -1;
+    FTextView.setSelection(FCaretPosition.X);
+    FTextView.removeTextListener(FTextListener);
+    FTextView.clearFocus;
+    FTextView := nil;
+    PlatformAndroid.WindowService.HideContextMenu;
+    FTextListener := nil;
+    // It's important to remove link before clearing focus. because it correctly hides the virtual keyboard. If you do
+    // this before the focus is reset, the Android will not hide the virtual keyboard.
+    TAndroidWindowHandle(AFormHandle).ZOrderManager.RemoveLink(TControl(Owner.GetObject));
+  end;
+end;
+
+function TTextServiceAndroid.GetCaretPosition: TPoint;
+begin
+  Result := FCaretPosition;
+end;
+
+procedure TTextServiceAndroid.SetCaretPosition(const AValue: TPoint);
+var
+  SelStart, SelEnd: Integer;
+begin
+  FCaretPosition := AValue;
+  CalculateSelectionBounds(SelStart, SelEnd);
+  if (FTextView <> nil) and not FInternalUpdate then
+    if (SelEnd - SelStart) > 0 then
+      FTextView.setSelection(SelStart, SelEnd)
+    else
+      FTextView.setSelection(CaretPosition.X);
+end;
+
+procedure TTextServiceAndroid.SetMaxLength(const AValue: Integer);
+begin
+  inherited;
+  if FTextView <> nil then
+    FTextView.setMaxLength(AValue);
+end;
+
+procedure TTextServiceAndroid.SetCharCase(const AValue: TEditCharCase);
+begin
+  inherited;
+  if FTextView <> nil then
+    FTextView.setCharCase(AValue.ToJCharCase);
+end;
+
+procedure TTextServiceAndroid.SetFilterChar(const AValue: string);
+begin
+  inherited;
+  if FTextView <> nil then
+    FTextView.setFilterChars(StringToJString(AValue));
+end;
+
+function TTextServiceAndroid.GetText: string;
+begin
+  Result := FText;
+end;
+
+procedure TTextServiceAndroid.SetText(const AValue: string);
+begin
+  if not SameStr(FText, AValue) then
+  begin
+    FText := AValue;
+    ReadLines;
+    if FTextView <> nil then
+      FTextView.setText(StrToJCharSequence(AValue), TJTextView_BufferType.JavaClass.EDITABLE);
+  end;
+end;
+
+function TTextServiceAndroid.HasMarkedText: Boolean;
+begin
+  Result := (FComposingBegin >= 0) and (FComposingEnd >= 0) and (FComposingBegin < FComposingEnd);
+end;
+
+function TTextServiceAndroid.GetImeMode: TImeMode;
+begin
+  Result := FImeMode;
+end;
+
+procedure TTextServiceAndroid.CalculateSelectionBounds(out ASelectionStart, ASelectionEnd: Integer);
+var
+  TextInput: ITextInput;
+  I: Integer;
+  SelBounds: TRect;
+  TopLeft, BottomRight: TPoint;
+begin
+  if (FLines <> nil) and Supports(Owner, ITextInput, TextInput) then
+  begin
+    if FLines.Count > 0 then
+    begin
+      SelBounds := TextInput.GetSelectionBounds;
+      if (SelBounds.Top > SelBounds.Bottom) or ((SelBounds.Height = 0) and (SelBounds.Left > SelBounds.Right)) then
+      begin
+        TopLeft := SelBounds.BottomRight;
+        BottomRight := SelBounds.TopLeft;
+      end
+      else
+      begin
+        TopLeft := SelBounds.TopLeft;
+        BottomRight := SelBounds.BottomRight;
+      end;
+
+      ASelectionStart := TopLeft.X;
+      for I := 0 to Min(TopLeft.Y - 1, FLines.Count - 1) do
+        Inc(ASelectionStart, FLines[I].Length + FLines.LineBreak.Length);
+      ASelectionEnd := SelBounds.Right + (ASelectionStart - SelBounds.Left);
+      for I := Min(TopLeft.Y, FLines.Count - 1) to Min(BottomRight.Y - 1, FLines.Count - 1) do
+        Inc(ASelectionEnd, FLines[I].Length + FLines.LineBreak.Length);
+    end
+    else
+    begin
+      ASelectionStart := FCaretPosition.X;
+      ASelectionEnd := FCaretPosition.X;
+    end
+  end
+  else
+  begin
+    ASelectionStart := FCaretPosition.X;
+    ASelectionEnd := FCaretPosition.X;
+  end;
+end;
+
+procedure TTextServiceAndroid.SetImeMode(const AValue: TImeMode);
+begin
+  FImeMode := AValue;
+end;
+
+procedure TTextServiceAndroid.InternalUpdate;
+var
+  TextInput: ITextInput;
+begin
+  if Supports(Owner, ITextInput, TextInput) then
+  begin
+    FInternalUpdate := True;
+    try
+      TextInput.IMEStateUpdated;
+    finally
+      FInternalUpdate := False;
+    end;
+  end;
+end;
+
+procedure TTextServiceAndroid.InternalUpdateSelection;
+var
+  SelStart, SelEnd: Integer;
+begin
+  CalculateSelectionBounds(SelStart, SelEnd);
+  if FTextView <> nil then
+    FTextView.setSelection(SelStart, SelEnd);
+end;
+
+function TTextServiceAndroid.IsFocused: Boolean;
+begin
+  Result := False;
+  if FTextView <> nil then
+    Result := FTextView.isFocused;
+end;
+
+procedure TTextServiceAndroid.ProcessUpdate(const APos: Integer; AText: string);
+begin
+  FText := AText;
+  ReadLines;
+  FCaretPosition.X := APos;
+  InternalUpdate;
+end;
+
+function TTextServiceAndroid.TargetClausePosition: TPoint;
+begin
+  Result := CaretPosition;
+end;
+
+procedure TTextServiceAndroid.ReadLines;
+var
+  LText: string;
+begin
+  FLines.Clear;
+  LText := FText;
+  if LText.EndsWith(FLines.LineBreak) and not LText.IsEmpty then
+    LText := LText + FLines.LineBreak;
+
+  FLines.Text := LText;
+end;
+
+{ TAndroidMotionManager }
+
+constructor TAndroidMotionManager.Create(const AHandle: TAndroidWindowHandle);
+begin
+  RaiseIfNil(AHandle, 'AHandle');
+
+  inherited Create;
+  FHandle := AHandle;
+  FMotionEvents := TMotionEvents.Create;
+end;
+
+procedure TAndroidMotionManager.CreateDoubleTapTimer;
+begin
+  if FDoubleTapTimer = 0 then
+    FDoubleTapTimer := PlatformAndroid.TimerManager.CreateTimer(DblTapDelay, DoubleTapTimerCall);
+end;
+
+function TAndroidMotionManager.CreateGestureEventInfo(const AGesture: TInteractiveGesture;
+  const AGestureEnded: Boolean): TGestureEventInfo;
+begin
+  FillChar(Result, Sizeof(Result), 0);
+  Result.Location := FMouseCoord;
+  Result.GestureID := igiZoom + Ord(AGesture);
+
+  if not (AGesture in FHandle.MultiTouchManager.ActiveInteractiveGestures) then
+    Result.Flags := [TInteractiveGestureFlag.gfBegin];
+  if AGestureEnded then
+    Result.Flags := [TInteractiveGestureFlag.gfEnd];
+
+  if AGesture = TInteractiveGesture.LongTap then
+    Result.Location := FMouseDownCoordinates;
+end;
+
+procedure TAndroidMotionManager.CreateLongTapTimer;
+begin
+  if FLongTapTimer = 0  then
+    FLongTapTimer := PlatformAndroid.TimerManager.CreateTimer(LongTapDuration, LongTapTimerCall);
+end;
+
+destructor TAndroidMotionManager.Destroy;
+begin
+  DestroyDoubleTapTimer;
+  DestroyLongTapTimer;
+  FMotionEvents.Free;
+  inherited;
+end;
+
+procedure TAndroidMotionManager.DestroyDoubleTapTimer;
+begin
+  if FDoubleTapTimer <> 0 then
+    PlatformAndroid.TimerManager.DestroyTimer(FDoubleTapTimer);
+  FDoubleTapTimer := 0;
+  FDblClickFirstMouseUp := False;
+end;
+
+procedure TAndroidMotionManager.DestroyLongTapTimer;
+begin
+  if FLongTapTimer <> 0 then
+    PlatformAndroid.TimerManager.DestroyTimer(FLongTapTimer);
+  FLongTapTimer := 0;
+end;
+
+procedure TAndroidMotionManager.DoubleTapTimerCall;
+begin
+  //no double tap was made
+  DestroyDoubleTapTimer;
+end;
+
+function TAndroidMotionManager.GetLongTapAllowedMovement: Single;
+begin
+  Result := LongTapMovement / PlatformAndroid.WindowService.Scale;
+end;
+
+function TAndroidMotionManager.HandleMotionEvent(const AEvent: JMotionEvent): Boolean;
+var
+  I: Integer;
+  MotionEvent: TMotionEvent;
+  MousePos: TPointF;
+begin
+  FMotionEvents.Clear;
+  for I := 0 to AEvent.getPointerCount - 1 do
+  begin
+    MotionEvent.EventAction := AEvent.getActionMasked();
+    MotionEvent.Position := PlatformAndroid.WindowService.PixelToPoint(TPointF.Create(AEvent.getX(I), AEvent.getY(I)));
+    MotionEvent.Shift := [ssLeft];
+    if AEvent.getToolType(I) <> TJMotionEvent.JavaClass.TOOL_TYPE_MOUSE then
+      Include(MotionEvent.Shift, ssTouch);
+    FMotionEvents.Add(MotionEvent);
+  end;
+
+  if FMotionEvents.Count > 0 then
+  begin
+    MousePos := FMotionEvents.First.Position;
+    MousePos := PlatformAndroid.WindowService.ClientToScreen(FHandle.Form, MousePos);
+    PlatformAndroid.WindowService.ScreenMousePos := MousePos;
+  end;
+
+  HandleMultiTouch;
+
+  if (FHandle.MultiTouchManager.ActiveInteractiveGestures = []) or (FMotionEvents.Count = 1) then
+    ProcessAndroidMouseEvents;
+  ProcessAndroidGestureEvents;
+
+  Result := True;
+end;
+
+procedure TAndroidMotionManager.HandleMultiTouch;
+var
+  Touches: TTouches;
+  TouchAction: TTouchAction;
+  I: Integer;
+begin
+  if FMotionEvents.Count > 0 then
+  begin
+    SetLength(Touches, FMotionEvents.Count);
+    for I := 0 to FMotionEvents.Count - 1 do
+      Touches[I].Location := FMotionEvents[I].Position;
+
+    case FMotionEvents[0].EventAction of
+      AMOTION_EVENT_ACTION_DOWN:
+        TouchAction := TTouchAction.Down;
+      AMOTION_EVENT_ACTION_UP:
+        TouchAction := TTouchAction.Up;
+      AMOTION_EVENT_ACTION_MOVE:
+        TouchAction := TTouchAction.Move;
+      AMOTION_EVENT_ACTION_CANCEL:
+        TouchAction := TTouchAction.Cancel;
+      AMOTION_EVENT_ACTION_POINTER_DOWN:
+        TouchAction := TTouchAction.Down;
+      AMOTION_EVENT_ACTION_POINTER_UP:
+        TouchAction := TTouchAction.Up;
+      else
+      begin
+        TouchAction := TTouchAction.None;
+      end;
+    end;
+    FHandle.HandleMultiTouch(Touches, TouchAction, FEnabledInteractiveGestures);
+  end;
+end;
+
+procedure TAndroidMotionManager.LongTapTimerCall;
+begin
+  //a long press was recognized
+  DestroyLongTapTimer;
+  PlatformAndroid.WindowService.SendCMGestureMessage(FHandle.Form, CreateGestureEventInfo(TInteractiveGesture.LongTap));
+end;
+
+procedure TAndroidMotionManager.ProcessAndroidGestureEvents;
+var
+  SecondPointer: TPointF;
+begin
+  if FMotionEvents.Count < 1 then
+    Exit;
+
+  FMouseCoord := FMotionEvents[0].Position;
+
+  if FMotionEvents.Count > 1 then
+    SecondPointer := FMotionEvents[1].Position
+  else
+    SecondPointer := TPointF.Zero;
+
+  case (FMotionEvents[0].EventAction and AMOTION_EVENT_ACTION_MASK) of
+    AMOTION_EVENT_ACTION_DOWN:
+      begin
+        if FDoubleTapTimer = 0 then
+          if (TInteractiveGesture.DoubleTap in FEnabledInteractiveGestures) and (FMotionEvents.Count = 1) then
+            CreateDoubleTapTimer;
+
+        if (TInteractiveGesture.LongTap in FEnabledInteractiveGestures)  and (FMotionEvents.Count = 1) then
+          CreateLongTapTimer;
+      end;
+    AMOTION_EVENT_ACTION_UP:
+      begin
+        if FDoubleTapTimer <> 0 then
+          if not FDblClickFirstMouseUp then
+            FDblClickFirstMouseUp := True
+          else
+          begin
+            DestroyDoubleTapTimer;
+            FDblClickFirstMouseUp := False;
+            PlatformAndroid.WindowService.SendCMGestureMessage(FHandle.Form,
+                                                               CreateGestureEventInfo(TInteractiveGesture.DoubleTap));
+          end;
+
+        //stop longtap timer
+        DestroyLongTapTimer;
+      end;
+    AMOTION_EVENT_ACTION_MOVE:
+      begin
+        // Stop longtap and double tap timers only if the coordinates did not change (much) since the last event.
+        // Allow for some slight finger movement.
+        if FMotionEvents.Count = 1 then
+        begin
+          if FMouseCoord.Distance(FOldPoint1) > GetLongTapAllowedMovement then
+          begin
+            DestroyLongTapTimer;
+            DestroyDoubleTapTimer;
+          end;
+
+          FOldPoint2 := TPointF.Zero;
+        end;
+      end;
+    AMOTION_EVENT_ACTION_CANCEL:
+      begin
+        DestroyLongTapTimer;
+        DestroyDoubleTapTimer;
+        FRotationAngle := 0;
+        FOldPoint1 := TPointF.Zero;
+        FOldPoint2 := TPointF.Zero;
+        FMouseDownCoordinates := TPointF.Zero;
+      end;
+    AMOTION_EVENT_ACTION_POINTER_DOWN:
+      begin
+        //stop timers
+        DestroyLongTapTimer;
+        DestroyDoubleTapTimer;
+        if FMotionEvents.Count = 2 then
+          FOldPoint2 := SecondPointer;
+      end;
+    AMOTION_EVENT_ACTION_POINTER_UP:
+      begin
+        //from 2 pointers now, there will be only 1 pointer
+        if FMotionEvents.Count = 2 then
+          FOldPoint2 := TPointF.Zero;
+      end;
+  end;
+
+  FOldPoint1 := FMotionEvents[0].Position;
+  FOldPoint2 := SecondPointer;
+end;
+
+procedure TAndroidMotionManager.ProcessAndroidMouseEvents;
+var
+  MotionEvent: TMotionEvent;
+begin
+  if FMotionEvents.Count > 0 then
+  begin
+    MotionEvent := FMotionEvents[0];
+    case MotionEvent.EventAction of
+      AMOTION_EVENT_ACTION_DOWN:
+      begin
+        PlatformAndroid.WindowService.MouseDown(FHandle.Form, TMouseButton.mbLeft, MotionEvent.Shift, MotionEvent.Position);
+        FMouseDownCoordinates := MotionEvent.Position;
+      end;
+
+      AMOTION_EVENT_ACTION_UP:
+      begin
+        PlatformAndroid.WindowService.MouseUp(FHandle.Form, TMouseButton.mbLeft, MotionEvent.Shift, MotionEvent.Position, not FGestureEnded);
+        FGestureEnded := False;
+      end;
+
+      AMOTION_EVENT_ACTION_MOVE:
+        PlatformAndroid.WindowService.MouseMove(FHandle.Form, MotionEvent.Shift, MotionEvent.Position);
+    end;
+
+    FMouseCoord := MotionEvent.Position;
+  end;
+end;
+
+procedure TAndroidMotionManager.AddRecognizer(const AGesture: TInteractiveGesture; const AForm: TCommonCustomForm);
+begin
+  Include(FEnabledInteractiveGestures, AGesture);
+end;
+
+procedure TAndroidMotionManager.RemoveRecognizer(const AGesture: TInteractiveGesture; const AForm: TCommonCustomForm);
+begin
+  Exclude(FEnabledInteractiveGestures, AGesture);
+end;
+
+{ TAndroidTextInputManager }
+
+constructor TAndroidTextInputManager.Create;
+var
+  InputDeviceID: Integer;
+begin
+  inherited;
+  TPlatformServices.Current.SupportsPlatformService(IFMXVirtualKeyboardService, FVirtualKeyboard);
+  FKeyMapping := TKeyMapping.Create;
+  if TOSVersion.Check(3, 0) then
+    InputDeviceID := TJKeyCharacterMap.JavaClass.VIRTUAL_KEYBOARD
+  else
+    InputDeviceID := TJKeyCharacterMap.JavaClass.BUILT_IN_KEYBOARD;
+  FKeyCharacterMap := TJKeyCharacterMap.JavaClass.load(InputDeviceID);
+end;
+
+destructor TAndroidTextInputManager.Destroy;
+begin
+  FKeyMapping.Free;
+  inherited;
+end;
+
+function TAndroidTextInputManager.FindActiveForm: TCommonCustomForm;
+var
+  I: Integer;
+begin
+  Result := Screen.ActiveForm;
+  if Result = nil then
+    for I := Screen.FormCount - 1 downto 0 do
+      if Screen.Forms[I].Visible then
+        Exit(Screen.Forms[I]);
+end;
+
+function TAndroidTextInputManager.GetEditText: JFMXEditText;
+begin
+  if FEditText = nil then
+  begin
+    FEditText := MainActivity.getEditText;
+    FEditText.setAlpha(0);
+  end;
+  Result := FEditText;
+end;
+
+function TAndroidTextInputManager.GetTextServiceClass: TTextServiceClass;
+begin
+  Result := TTextServiceAndroid;
+end;
+
+function TAndroidTextInputManager.HandleAndroidKeyEvent(AEvent: PAInputEvent): Int32;
+var
+  KeyCode, vkKeyCode: Word;
+  MetaState: Integer;
+  KeyChar: Char;
+  KeyEvent: JKeyEvent;
+  KeyEventChars: string;
+  C: WideChar;
+  LKeyDownHandled: Boolean;
+  KeyKind: TKeyKind;
+  DeviceId: Integer;
+begin
+  Result := 0;
+
+  KeyCode := AKeyEvent_getKeyCode(AEvent);
+  MetaState := AKeyEvent_getMetaState(AEvent);
+  DeviceId := AInputEvent_getDeviceId(AEvent);
+  KeyChar := #0;
+
+  vkKeyCode := PlatformKeyToVirtualKey(KeyCode, KeyKind);
+  if (vkKeyCode <> 0) and (KeyKind <> TKeyKind.Usual) then
+  begin
+    KeyCode := vkKeyCode;
+    if KeyCode in [vkEscape] then
+      KeyChar := Char(KeyCode);
+  end
+  else
+  begin
+    if FKeyCharacterMap <> nil then
+    begin
+      KeyChar := Char(ObtainKeyCharacterMap(DeviceId).get(KeyCode, MetaState));
+      if KeyChar <> #0 then
+        KeyCode := 0
+      else
+        KeyCode := vkKeyCode;
+    end;
+  end;
+
+  case AKeyEvent_getAction(AEvent) of
+    AKEY_EVENT_ACTION_DOWN:
+      begin
+        if (KeyCode = vkHardwareBack) and (KeyChar = #0) and (FVirtualKeyboard <> nil) and
+          (FVirtualKeyboard.VirtualKeyboardState * [TVirtualKeyboardState.Visible] <> []) then
+        begin
+          FDownKey := 0;
+          FDownKeyChar := #0;
+        end
+        else
+        begin
+          FDownKey := KeyCode;
+          FDownKeyChar := KeyChar;
+          KeyDown(KeyCode, KeyChar, ShiftStateFromMetaState(MetaState));
+        end;
+        FKeyDownHandled := (KeyCode = 0) and (KeyChar = #0);
+        if FKeyDownHandled then
+          Result := 1;
+      end;
+    AKEY_EVENT_ACTION_UP:
+      begin
+        LKeyDownHandled := (FDownKey = KeyCode) and (FDownKeyChar = KeyChar) and FKeyDownHandled;
+        KeyUp(KeyCode, KeyChar, ShiftStateFromMetaState(MetaState), LKeyDownHandled);
+        if (KeyCode = 0) and (KeyChar = #0) then
+          Result := 1; // indicate that we have handled the event
+      end;
+    AKEY_EVENT_ACTION_MULTIPLE:
+      begin
+        KeyEvent := JFMXNativeActivity(MainActivity).getLastEvent;
+        if KeyEvent <> nil then
+        begin
+          KeyEventChars := JStringToString(KeyEvent.getCharacters);
+          KeyCode := 0;
+          for C in KeyEventChars do
+          begin
+            FDownKey := KeyCode;
+            FDownKeyChar := C;
+            KeyDown(KeyCode, FDownKeyChar, ShiftStateFromMetaState(MetaState));
+            FKeyDownHandled := (KeyCode = 0) and (FDownKeyChar = #0);
+          end;
+          Result := 1;
+        end;
+      end;
+  end;
+end;
+
+procedure TAndroidTextInputManager.KeyDown(var AKey: Word; var AKeyChar: System.WideChar; const AShift: TShiftState);
+var
+  Form: TCommonCustomForm;
+begin
+  PlatformAndroid.WindowService.HideContextMenu;
+  Form := FindActiveForm;
+  if Form <> nil then
+    try
+      Form.KeyDown(AKey, AKeyChar, AShift);
+    except
+      Application.HandleException(Form);
+    end;
+end;
+
+procedure TAndroidTextInputManager.KeyUp(var AKey: Word; var AKeyChar: System.WideChar; const AShift: TShiftState;
+  const AKeyDownHandled: Boolean);
+var
+  Form: TCommonCustomForm;
+
+  function HideVKB: Boolean;
+  begin
+    if FVirtualKeyboard <> nil then
+    begin
+      Result := FVirtualKeyboard.GetVirtualKeyboardState * [TVirtualKeyboardState.Visible] <> [];
+      if Result then
+      begin
+        AKey := 0;
+        AKeyChar := #0;
+        Screen.ActiveForm.Focused := nil;
+        FVirtualKeyboard.HideVirtualKeyboard
+      end;
+    end
+    else
+      Result := True;
+  end;
+
+begin
+  Form := FindActiveForm;
+  if Form <> nil then
+    try
+      Form.KeyUp(AKey, AKeyChar, AShift);
+    except
+      Application.HandleException(Form);
+    end;
+  // some actions by default
+  if AKeyDownHandled and (AKey = vkHardwareBack) then // If you press of key was processed
+    HideVKB
+  else // If you press of key wasn't processed
+    case AKey of
+      vkHardwareBack:
+        begin
+          if not HideVKB and (Form <> nil) then
+          begin
+            try
+              AKey := 0;
+              AKeyChar := #0;
+              Form.Close;
+            except
+              Application.HandleException(Form);
+            end;
+
+            if Application.MainForm = Form then
+              Application.Terminate;  //we have close the main form
+          end;
+        end
+    end;
+end;
+
+function TAndroidTextInputManager.ObtainKeyCharacterMap(DeviceId: Integer): JKeyCharacterMap;
+begin
+  Result := TJKeyCharacterMap.JavaClass.load(DeviceId)
+end;
+
+function TAndroidTextInputManager.PlatformKeyToVirtualKey(const PlatformKey: Word; var KeyKind: TKeyKind): Word;
+begin
+  Result := FKeyMapping.PlatformKeyToVirtualKey(PlatformKey, KeyKind);
+end;
+
+function TAndroidTextInputManager.RegisterKeyMapping(const PlatformKey, VirtualKey: Word;
+  const KeyKind: TKeyKind): Boolean;
+begin
+  Result := FKeyMapping.RegisterKeyMapping(PlatformKey, VirtualKey, KeyKind);
+end;
+
+function TAndroidTextInputManager.ShiftStateFromMetaState(const AMetaState: Integer): TShiftState;
+begin
+  Result := [];
+  if (AMetaState and AMETA_SHIFT_ON) > 0 then
+    Result := Result + [ssShift];
+  if (AMetaState and AMETA_ALT_ON) > 0 then
+    Result := Result + [ssAlt];
+end;
+
+function TAndroidTextInputManager.UnregisterKeyMapping(const PlatformKey: Word): Boolean;
+begin
+  Result := FKeyMapping.UnregisterKeyMapping(PlatformKey);
+end;
+
+function TAndroidTextInputManager.VirtualKeyToPlatformKey(const VirtualKey: Word): Word;
+begin
+  Result := FKeyMapping.VirtualKeyToPlatformKey(VirtualKey);
+end;
+
+{ TFormRender }
+
+procedure TFormRender.ApplicationEventHandler(const Sender: TObject; const AMessage: TMessage);
+begin
+  if (AMessage is TApplicationEventMessage) and (TApplicationEventMessage(AMessage).Value.Event = TApplicationEvent.BecameActive) then
+    Render;
+end;
+
+constructor TFormRender.Create(const AHandle: TAndroidWindowHandle);
+begin
+  RaiseIfNil(AHandle, 'AHandle');
+
+  inherited Create;
+  FHandle := AHandle;
+  FIsNeededUpdate := False;
+  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
+end;
+
+destructor TFormRender.Destroy;
+begin
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
+  TAndroidHelper.MainHandler.removeCallbacks(Self);
+  inherited;
+end;
+
+procedure TFormRender.Render;
+var
+  PaintControl: IPaintControl;
+  i: integer;
+begin
+  // If SurfaceHolder is not created, we need to skip rendering.
+  if FHandle.Holder = nil then
+    Exit;
+
+  //process all the pending input event
+  //NOTE: when the mouse is down, MouseMove is continuously firing
+  for i := ALAniCalcTimerProcs.Count - 1 downto 0 do
+    if (ALAniCalcTimerProcs[i].Down) and
+       (not ALAniCalcTimerProcs[i].mouseEventReceived) then exit;
+
+  if Supports(FHandle.Form, IPaintControl, PaintControl) then
+    try
+      PaintControl.PaintRects([FHandle.Form.ClientRect]);
+    except
+      Application.HandleException(FHandle.Form);
+    end;
+end;
+
+procedure TFormRender.run;
+begin
+  Render;
+  FIsNeededUpdate := False;
+end;
+
+procedure TFormRender.PostRender;
+begin
+  if not FIsNeededUpdate then
+  begin
+    FIsNeededUpdate := True;
+    TAndroidHelper.MainHandler.post(Self);
+  end;
+end;
+
+{ TAndroidWindowHandle.TFrameSynchHandler }
+
+constructor TAndroidWindowHandle.TSurfaceFlingerRenderingObserver.Create(const AForm: TCommonCustomForm);
+begin
+  inherited Create;
+
+  FForm := AForm;
+end;
+
+procedure TAndroidWindowHandle.TSurfaceFlingerRenderingObserver.doFrame(frameTimeNanos: Int64);
+begin
+  PlatformAndroid.WindowService.FormManager.RefreshFormsVisibility;
+end;
+
+{ TFormManager }
+
+procedure TFormManager.BringToFront(const AForm: TCommonCustomForm);
+var
+  FormHandle: TAndroidWindowHandle;
+begin
+  if AForm.IsHandleAllocated then
+  begin
+    FZOrderForms.Remove(AForm);
+    FZOrderForms.Add(AForm);
+
+    FormHandle := TAndroidWindowHandle(AForm.Handle);
+    FormHandle.FormLayout.bringToFront;
+    // If form has already had initialized surface, we can immideatly hide all other forms.
+    if not TWindowServiceAndroid.IsPopupForm(AForm) and IsSurfaceAttached(FormHandle) then
+      RefreshFormsVisibility;
+  end;
+end;
+
+constructor TFormManager.Create;
+begin
+  FZOrderForms := TList<Pointer>.Create;
+  FDelayedHideForm := TList<Pointer>.Create;
+end;
+
+destructor TFormManager.Destroy;
+begin
+  FreeAndNil(FDelayedHideForm);
+  FreeAndNil(FZOrderForms);
+  inherited;
+end;
+
+procedure TFormManager.HideForm(const AForm: TCommonCustomForm);
+var
+  TopMostFormHandle: TAndroidWindowHandle;
+  FormHandle: TAndroidWindowHandle;
+begin
+  if AForm.IsHandleAllocated then
+  begin
+    FZOrderForms.Remove(AForm);
+
+    FormHandle := TAndroidWindowHandle(AForm.Handle);
+    if (FZOrderForms.Count = 0) or TWindowServiceAndroid.IsPopupForm(AForm) then
+      FormHandle.Hide;
+
+    // Otherwise, we show previous form and AForm will hidden physically later, when previous form is shown.
+    if FZOrderForms.Count > 0 then
+    begin
+      TopMostFormHandle := TAndroidWindowHandle(TCommonCustomForm(FZOrderForms.Last).Handle);
+      TopMostFormHandle.Show;
+      // We activate previous form, as it is required for form functionality like a caret, etc. 
+      // Since Android doesn't know anything about our form activation, we need to do that manually.
+      TopMostFormHandle.Form.Activate;
+      // If previous form doesn't have allocated surface holder, we should wait when form will take it
+      // and after hide current form.
+      if TopMostFormHandle.Holder = nil then
+        FDelayedHideForm.Add(AForm)
+      else
+        FormHandle.Hide;
+    end;
+  end;
+end;
+
+function TFormManager.IsSurfaceAttached(const AHandle: TAndroidWindowHandle): Boolean;
+begin
+  Result := AHandle.Holder <> nil;
+end;
+
+procedure TFormManager.RefreshFormsVisibility;
+var
+  I: Integer;
+  Form: TCommonCustomForm;
+  IsNormalFormShown: Boolean;
+begin
+  IsNormalFormShown := False;
+  for I := FZOrderForms.Count - 1 downto 0 do
+  begin
+    Form := TCommonCustomForm(FZOrderForms[I]);
+    if TWindowServiceAndroid.IsPopupForm(Form) then
+      Continue
+    else if not IsNormalFormShown then
+      IsNormalFormShown := True
+    else if Form.IsHandleAllocated then
+      TAndroidWindowHandle(Form.Handle).Hide;
+  end;
+
+  for I := 0 to FDelayedHideForm.Count - 1 do
+  begin
+    Form := TCommonCustomForm(FDelayedHideForm[I]);
+    if Form.IsHandleAllocated then
+      TAndroidWindowHandle(Form.Handle).Hide;
+  end;
+  FDelayedHideForm.Clear;
+end;
+
+procedure TFormManager.SendToBack(const AForm: TCommonCustomForm);
+var
+  FormLayout: JViewGroup;
+  Parent: JViewGroup;
+begin
+  if AForm.IsHandleAllocated then
+  begin
+    FZOrderForms.Remove(AForm);
+    FZOrderForms.Insert(0, AForm);
+
+    FormLayout := TAndroidWindowHandle(AForm.Handle).FormLayout;
+    Parent := MainActivity.getViewGroup;
+    if Parent.indexOfChild(FormLayout) <> -1 then
+    begin
+      Parent.removeView(FormLayout);
+      Parent.addView(FormLayout, 0);
+    end;
+
+    RefreshFormsVisibility;
+  end;
+end;
+
+procedure TFormManager.ShowForm(const AForm: TCommonCustomForm);
+var
+  FormHandle: TAndroidWindowHandle;
+begin
+  if AForm.IsHandleAllocated then
+  begin
+    FZOrderForms.Remove(AForm);
+    FZOrderForms.Add(AForm);
+
+    FormHandle := TAndroidWindowHandle(AForm.Handle);
+    FormHandle.Show;
+    FormHandle.FormLayout.bringToFront;
+    // If form has already had initialized surface, we must immideatly hide all other forms.
+    if not TWindowServiceAndroid.IsPopupForm(AForm) and IsSurfaceAttached(FormHandle) then
+      RefreshFormsVisibility;
+  end;
+end;
+
+procedure TFormManager.RemoveForm(const AForm: TCommonCustomForm);
+var
+  FormHandle: TAndroidWindowHandle;
+begin
+  FZOrderForms.Remove(AForm);
+  FDelayedHideForm.Remove(AForm);
+
+  if AForm.IsHandleAllocated then
+  begin
+    FormHandle := TAndroidWindowHandle(AForm.Handle);
+    if FormHandle.FormLayout.getParent <> nil then
+      MainActivity.getViewGroup.removeView(FormHandle.FormLayout);
+  end;
+end;
+
+{ TWindowServiceAndroid.TActivityInsetsChangedListener }
+
+constructor TWindowServiceAndroid.TActivityInsetsChangedListener.Create(const AWindowServiceAndroid: TWindowServiceAndroid);
+begin
+  inherited Create;
+  FWindowService := AWindowServiceAndroid;
+end;
+
+procedure TWindowServiceAndroid.TActivityInsetsChangedListener.insetsChanged(Inset: JRect);
+begin
+  FWindowService.FStatusBarHeight := Inset.Top / FWindowService.Scale;
+end;
+
+end.

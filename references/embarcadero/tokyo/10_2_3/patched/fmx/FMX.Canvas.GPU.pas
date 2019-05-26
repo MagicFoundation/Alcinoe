@@ -1,0 +1,1202 @@
+{*******************************************************}
+{                                                       }
+{              Delphi FireMonkey Platform               }
+{                                                       }
+{ Copyright(c) 2011-2017 Embarcadero Technologies, Inc. }
+{              All rights reserved                      }
+{                                                       }
+{*******************************************************}
+
+unit FMX.Canvas.GPU;
+
+interface
+
+{$SCOPEDENUMS ON}
+
+uses
+  System.Types, System.UITypes, System.UIConsts, System.Classes, System.Generics.Collections, System.Messaging, FMX.Types,
+  FMX.Types3D, FMX.Graphics, FMX.Canvas.GPU.Helpers;
+
+type
+  TCustomCanvasGpu = class;
+
+  TBitmapCtx = class
+  private
+    [Weak] FCanvas: TCustomCanvasGpu;
+    FTexture: TTexture;
+    FRenderTarget: TTexture;
+    FAccess: TMapAccess;
+    FData: Pointer;
+    FWidth: Integer;
+    FHeight: Integer;
+    FBitmapScale: Single;
+    FBytesPerLine: Integer;
+    FPixelFormat: TPixelFormat;
+    function GetTexture: TTexture;
+    function GetRenderTarget: TTexture;
+    function GetPaintingTexture: TTexture;
+    procedure CreateBuffer;
+    procedure FreeBuffer;
+  public
+    constructor Create(const AWidth, AHeight: Integer; const AScale: Single);
+    destructor Destroy; override;
+    property Access: TMapAccess read FAccess write FAccess;
+    property Canvas: TCustomCanvasGpu read FCanvas write FCanvas;
+    property Texture: TTexture read GetTexture;
+    property BytesPerLine: Integer read FBytesPerLine;
+    property RenderTarget: TTexture read GetRenderTarget;
+    property PaintingTexture: TTexture read GetPaintingTexture;
+    property PixelFormat: TPixelFormat read FPixelFormat;
+    property Height: Integer read FHeight;
+    property Width: Integer read FWidth;
+  end;
+
+  TCustomCanvasGpu = class(TCanvas)
+  private
+  class var
+    FModulateColor: TAlphaColor;
+    FAlignToPixels: Boolean;
+    FFlushCountPerFrame: Integer;
+    FPrimitiveCountPerFrame: Integer;
+  private
+    FContext: TContext3D;
+  public
+    procedure DrawTexture(const ARect, ATexRect: TRectF; const AColor: TAlphaColor;
+      const ATexture: TTexture); virtual; abstract;
+    class property ModulateColor: TAlphaColor read FModulateColor write FModulateColor;
+    class property AlignToPixels: Boolean read FAlignToPixels write FAlignToPixels;
+    class property FlushCountPerFrame: Integer read FFlushCountPerFrame;
+    class property PrimitiveCountPerFrame: Integer read FPrimitiveCountPerFrame;
+    property Context: TContext3D read FContext;
+  end;
+
+procedure RegisterCanvasClasses;
+procedure UnregisterCanvasClasses;
+
+function CanvasHelper: TCanvasHelper; // << https://quality.embarcadero.com/browse/RSP-18797
+
+implementation
+
+uses
+  {$IFDEF MSWINDOWS}
+  FMX.Platform.Win,
+  {$ENDIF}
+  System.Math, FMX.Consts, FMX.Platform, FMX.Forms, FMX.TextLayout, FMX.TextLayout.GPU, FMX.StrokeBuilder,
+  System.Math.Vectors;
+
+const
+  MinValidAlphaValue = 1 / 256;
+
+type
+  TCanvasSaveStateCtx = class(TCanvasSaveState)
+  private
+    FClippingEnabled: Boolean;
+    FSavedClipRect: TRect;
+  protected
+    procedure AssignTo(Dest: TPersistent); override;
+  public
+    procedure Assign(Source: TPersistent); override;
+    property SavedClipRect: TRect read FSavedClipRect;
+  end;
+
+  TCanvasGpu = class(TCustomCanvasGpu, IModulateCanvas)
+  private class var
+    FCurrentCanvas: TCanvasGpu;
+    FGlobalBeginScene: Integer;
+    FCanvasHelper: TCanvasHelper;
+    FStrokeBuilder: TStrokeBuilder;
+  private
+    [weak] FSaveCanvas: TCanvasGpu;
+    FSavedScissorRect: TRect;
+    FClippingEnabled: Boolean;
+    FCurrentClipRect: TRect;
+    procedure InternalFillPolygon(const Points: TPolygon; const AOpacity: Single; const ABrush: TBrush;
+      const PolyBounds: TRectF);
+    class procedure CreateResources;
+    class procedure FreeResources;
+  private
+    procedure AlignToPixel(var Point: TPointF); inline;
+    function TransformBounds(const Bounds: TCornersF): TCornersF; inline;
+    procedure TransformCallback(var Position: TPointF);
+    { IModulateCanvas }
+    function GetModulateColor: TAlphaColor;
+    procedure SetModulateColor(const AColor: TAlphaColor);
+  protected
+    function TransformPoint(const P: TPointF): TPointF; reintroduce; inline;
+    function TransformRect(const Rect: TRectF): TRectF; reintroduce; inline;
+
+    function CreateSaveState: TCanvasSaveState; override;
+    { begin and }
+    function DoBeginScene(const AClipRects: PClipRects = nil; AContextHandle: THandle = 0): Boolean; override;
+    procedure DoEndScene; override;
+    procedure DoFlush; override;
+    { creation }
+    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
+      const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
+    constructor CreateFromBitmap(const ABitmap: TBitmap; const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
+    constructor CreateFromPrinter(const APrinter: TAbstractPrinter); override;
+    { Bitmaps }
+    class function DoInitializeBitmap(const Width, Height: Integer; const Scale: Single; var PixelFormat: TPixelFormat): THandle; override;
+    class procedure DoFinalizeBitmap(var Bitmap: THandle); override;
+    class function DoMapBitmap(const Bitmap: THandle; const Access: TMapAccess; var Data: TBitmapData): Boolean; override;
+    class procedure DoUnmapBitmap(const Bitmap: THandle; var Data: TBitmapData); override;
+    { states }
+    procedure DoBlendingChanged; override;
+    { drawing }
+    procedure DoFillRect(const ARect: TRectF; const AOpacity: Single; const ABrush: TBrush); override;
+    procedure DoFillPath(const APath: TPathData; const AOpacity: Single; const ABrush: TBrush); override;
+    procedure DoFillEllipse(const ARect: TRectF; const AOpacity: Single; const ABrush: TBrush); override;
+    function DoFillPolygon(const Points: TPolygon; const AOpacity: Single; const ABrush: TBrush): Boolean; override;
+    procedure DoDrawBitmap(const ABitmap: TBitmap; const SrcRect, DstRect: TRectF; const AOpacity: Single;
+      const HighSpeed: Boolean = False); override;
+    procedure DoDrawLine(const APt1, APt2: TPointF; const AOpacity: Single; const ABrush: TStrokeBrush); override;
+    procedure DoDrawRect(const ARect: TRectF; const AOpacity: Single; const ABrush: TStrokeBrush); override;
+    function DoDrawPolygon(const Points: TPolygon; const AOpacity: Single; const ABrush: TStrokeBrush): Boolean; override;
+    procedure DoDrawPath(const APath: TPathData; const AOpacity: Single; const ABrush: TStrokeBrush); override;
+    procedure DoDrawEllipse(const ARect: TRectF; const AOpacity: Single; const ABrush: TStrokeBrush); override;
+  public
+    destructor Destroy; override;
+    { caps }
+    class function GetCanvasStyle: TCanvasStyles; override;
+    class function GetAttribute(const Value: TCanvasAttribute): Integer; override;
+    { buffer }
+    procedure SetSize(const AWidth, AHeight: Integer); override;
+    procedure Clear(const Color: TAlphaColor); override;
+    procedure ClearRect(const ARect: TRectF; const AColor: TAlphaColor = 0); override;
+    { cliping }
+    procedure IntersectClipRect(const ARect: TRectF); override;
+    procedure ExcludeClipRect(const ARect: TRectF); override;
+    { drawing }
+    procedure MeasureLines(const ALines: TLineMetricInfo; const ARect: TRectF; const AText: string; const WordWrap: Boolean;
+      const Flags: TFillTextFlags; const ATextAlign: TTextAlign; const AVTextAlign: TTextAlign = TTextAlign.Center); override;
+    function PtInPath(const APoint: TPointF; const APath: TPathData): Boolean; override;
+    { external }
+    procedure DrawTexture(const DstRect, SrcRect: TRectF; const AColor: TAlphaColor; const ATexture: TTexture); override;
+  end;
+
+{ TCanvasSaveStateCtx }
+
+procedure TCanvasSaveStateCtx.Assign(Source: TPersistent);
+var
+  LSource: TCanvasGpu;
+begin
+  inherited Assign(Source);
+  if Source is TCanvasGpu then
+  begin
+    LSource := TCanvasGpu(Source);
+    FClippingEnabled := LSource.FClippingEnabled;
+    FSavedClipRect := LSource.FCurrentClipRect;
+  end;
+end;
+
+procedure TCanvasSaveStateCtx.AssignTo(Dest: TPersistent);
+var
+  LDest: TCanvasGpu;
+begin
+  if Dest is TCanvasGpu then
+  begin
+    LDest := TCanvasGpu(Dest);
+    LDest.FClippingEnabled := FClippingEnabled;
+    LDest.FCurrentClipRect := FSavedClipRect;
+    if FClippingEnabled then
+      LDest.FCanvasHelper.ScissorRect := FSavedClipRect
+    else begin
+      LDest.FCanvasHelper.ResetScissorRect;
+      LDest.FCanvasHelper.SetScissorRectWithoutUpdate(FSavedClipRect);
+    end;
+  end;
+  inherited AssignTo(Dest);
+end;
+
+{ TBitmapCtx }
+
+constructor TBitmapCtx.Create(const AWidth, AHeight: Integer; const AScale: Single);
+begin
+  inherited Create;
+  FHeight := AHeight;
+  FWidth := AWidth;
+  FBitmapScale := AScale;
+  FPixelFormat := TContextManager.DefaultContextClass.PixelFormat;
+  if FPixelFormat = TPixelFormat.None then
+    raise ECannotFindSuitablePixelFormat.CreateResFmt(@SCannotFindSuitablePixelFormat, [ClassName]);
+  FBytesPerLine := FWidth * PixelFormatBytes[FPixelFormat];
+  FAccess := TMapAccess.Read;
+end;
+
+destructor TBitmapCtx.Destroy;
+begin
+  if (TCanvasGpu.FCanvasHelper <> nil) and (TCanvasGpu.FGlobalBeginScene > 0) then
+    TCanvasGpu.FCanvasHelper.Flush;
+  if FRenderTarget <> nil then
+    FRenderTarget.DisposeOf;
+  if FTexture <> nil then
+    FTexture.DisposeOf;
+  FreeBuffer;
+  inherited;
+end;
+
+procedure TBitmapCtx.CreateBuffer;
+begin
+  if FData = nil then
+    GetMem(FData, FHeight * FBytesPerLine);
+end;
+
+procedure TBitmapCtx.FreeBuffer;
+begin
+  if FData <> nil then
+  begin
+    FreeMem(FData);
+    FData := nil;
+  end;
+end;
+
+function TBitmapCtx.GetPaintingTexture: TTexture;
+begin
+  if FRenderTarget <> nil then
+    Result := FRenderTarget
+  else
+    Result := Texture;
+end;
+
+function TBitmapCtx.GetRenderTarget: TTexture;
+begin
+  if FRenderTarget = nil then
+  begin
+    FRenderTarget := TTexture.Create;
+    FRenderTarget.SetSize(FWidth, FHeight);
+    FRenderTarget.Style := [TTextureStyle.RenderTarget];
+    ITextureAccess(FRenderTarget).TextureScale := FBitmapScale;
+    if FData <> nil then
+    begin
+      FRenderTarget.Initialize;
+      FRenderTarget.UpdateTexture(FData, FBytesPerLine);
+    end;
+    if FTexture <> nil then
+    begin
+      FTexture.DisposeOf;
+      FTexture := nil;
+    end;
+  end;
+  Result := FRenderTarget;
+end;
+
+function TBitmapCtx.GetTexture: TTexture;
+begin
+  if FTexture = nil then
+  begin
+    FTexture := TTexture.Create;
+    FTexture.SetSize(FWidth, FHeight);
+    FTexture.Style := [TTextureStyle.Dynamic];
+    if FData <> nil then
+      FTexture.UpdateTexture(FData, FBytesPerLine);
+  end;
+  Result := FTexture;
+end;
+
+{ TCanvasGpu }
+
+function PrepareColor(const SrcColor: TAlphaColor; const Opacity: Single): TAlphaColor;
+begin
+  if Opacity < 1 then
+  begin
+    TAlphaColorRec(Result).R := Round(TAlphaColorRec(SrcColor).R * Opacity);
+    TAlphaColorRec(Result).G := Round(TAlphaColorRec(SrcColor).G * Opacity);
+    TAlphaColorRec(Result).B := Round(TAlphaColorRec(SrcColor).B * Opacity);
+    TAlphaColorRec(Result).A := Round(TAlphaColorRec(SrcColor).A * Opacity);
+  end
+  else if (TAlphaColorRec(SrcColor).A < $FF) then
+    Result := PremultiplyAlpha(SrcColor)
+  else
+    Result := SrcColor;
+end;
+
+constructor TCanvasGpu.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
+  const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault);
+var
+  Multisample: TMultisample;
+begin
+  inherited CreateFromWindow(AParent, AWidth, AHeight, AQuality);
+  case Quality of
+    TCanvasQuality.HighPerformance: Multisample := TMultisample.None;
+    TCanvasQuality.HighQuality: Multisample := TMultisample.FourSamples;
+  else
+    Multisample := TMultisample.None;
+  end;
+  FContext := TContextManager.CreateFromWindow(AParent, AWidth, AHeight, Multisample, True);
+  {$IFDEF MSWINDOWS}
+  if WindowHandleToPlatform(Parent).Transparency then
+    WindowHandleToPlatform(Parent).CreateBuffer(Width, Height);
+  {$ENDIF}
+end;
+
+constructor TCanvasGpu.CreateFromBitmap(const ABitmap: TBitmap;
+  const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault);
+var
+  Multisample: TMultisample;
+  H: TBitmapCtx;
+begin
+  inherited CreateFromBitmap(ABitmap, AQuality);
+  if not Bitmap.HandleAllocated then
+    raise ECanvasException.Create('Handle not allocated');
+  case Quality of
+    TCanvasQuality.HighPerformance: Multisample := TMultisample.None;
+    TCanvasQuality.HighQuality: Multisample := TMultisample.FourSamples;
+  else
+    Multisample := TMultisample.None;
+  end;
+  H := TBitmapCtx(Bitmap.Handle);
+  FContext := TContextManager.CreateFromTexture(H.RenderTarget, Multisample, True);
+  H.Canvas := Self;
+end;
+
+constructor TCanvasGpu.CreateFromPrinter(const APrinter: TAbstractPrinter);
+begin
+  // Just a stub implementation - not used.
+end;
+
+destructor TCanvasGpu.Destroy;
+begin
+  if Bitmap <> nil then
+    TBitmapCtx(Bitmap.Handle).Canvas := nil;
+  FContext.DisposeOf;
+  inherited Destroy;
+end;
+
+class function TCanvasGpu.GetCanvasStyle: TCanvasStyles;
+begin
+  Result := [TCanvasStyle.NeedGPUSurface];
+end;
+
+class function TCanvasGpu.GetAttribute(const Value: TCanvasAttribute): Integer;
+begin
+  case Value of
+    TCanvasAttribute.MaxBitmapSize:
+      Result := TContextManager.DefaultContextClass.MaxTextureSize;
+  else
+    Result := inherited;
+  end;
+end;
+
+function TCanvasGpu.CreateSaveState: TCanvasSaveState;
+begin
+  Result := TCanvasSaveStateCtx.Create;
+end;
+
+procedure TCanvasGpu.Clear(const Color: TAlphaColor);
+begin
+  if FContext <> nil then
+  begin
+    FCanvasHelper.Flush;
+    FContext.Clear([TClearTarget.Color, TClearTarget.Depth, TClearTarget.Stencil], Color, 1, 0);
+  end;
+end;
+
+procedure TCanvasGpu.ClearRect(const ARect: TRectF; const AColor: TAlphaColor);
+begin
+  FCanvasHelper.Flush;
+  try
+    FContext.SetContextState(TContextState.csAlphaBlendOff);
+    FCanvasHelper.FillRect(TransformBounds(CornersF(ARect)), AColor);
+    FCanvasHelper.Flush;
+  finally
+    FContext.SetContextState(TContextState.csAlphaBlendOn);
+  end;
+end;
+
+procedure TCanvasGpu.SetSize(const AWidth, AHeight: Integer);
+begin
+  inherited;
+  if FContext <> nil then
+    FContext.SetSize(Width, Height);
+  {$IFDEF MSWINDOWS}
+  if (Parent <> nil) and WindowHandleToPlatform(Parent).Transparency then
+    WindowHandleToPlatform(Parent).ResizeBuffer(Width, Height);
+  {$ENDIF}
+end;
+
+procedure TCanvasGpu.AlignToPixel(var Point: TPointF);
+
+  procedure AlignValue(var Value: Single; const Scale: Single); inline;
+  begin
+    Value := Trunc(Value * Scale) / Scale;
+  end;
+
+begin
+  AlignValue(Point.X, Scale);
+  AlignValue(Point.Y, Scale);
+end;
+
+function TCanvasGpu.TransformBounds(const Bounds: TCornersF): TCornersF;
+begin
+  case MatrixMeaning of
+    TMatrixMeaning.Unknown:
+      begin
+        Result[0] := Bounds[0] * Matrix;
+        Result[1] := Bounds[1] * Matrix;
+        Result[2] := Bounds[2] * Matrix;
+        Result[3] := Bounds[3] * Matrix;
+      end;
+
+    TMatrixMeaning.Identity:
+      Result := Bounds;
+
+    TMatrixMeaning.Translate:
+      begin
+        Result[0] := Bounds[0] + MatrixTranslate;
+        Result[1] := Bounds[1] + MatrixTranslate;
+        Result[2] := Bounds[2] + MatrixTranslate;
+        Result[3] := Bounds[3] + MatrixTranslate;
+      end;
+  end;
+
+  if FAlignToPixels then
+  begin
+    AlignToPixel(Result[0]);
+    AlignToPixel(Result[1]);
+    AlignToPixel(Result[2]);
+    AlignToPixel(Result[3]);
+  end;
+end;
+
+function TCanvasGpu.TransformPoint(const P: TPointF): TPointF;
+begin
+  Result := inherited;
+
+  if FAlignToPixels then
+    AlignToPixel(Result);
+end;
+
+function TCanvasGpu.TransformRect(const Rect: TRectF): TRectF;
+begin
+  Result := inherited;
+
+  if FAlignToPixels then
+  begin
+    AlignToPixel(Result.TopLeft);
+    AlignToPixel(Result.BottomRight);
+  end;
+end;
+
+function TCanvasGpu.DoBeginScene(const AClipRects: PClipRects; AContextHandle: THandle): Boolean;
+begin
+  if FGlobalBeginScene = 0 then
+  begin
+    FCanvasHelper.SetContext(Context);
+    FCanvasHelper.BeginRender;
+    TTextLayoutNG.BeginRender;
+  end
+  else
+  begin
+    FCanvasHelper.Flush;
+    FCanvasHelper.SetContext(Context);
+
+    FContext.SetMatrix(TMatrix3D.Identity);
+    FContext.SetContextState(TContextState.cs2DScene);
+    FContext.SetContextState(TContextState.csAllFace);
+    FContext.SetContextState(TContextState.csZWriteOff);
+    FContext.SetContextState(TContextState.csZTestOff);
+  end;
+  Inc(FGlobalBeginScene);
+  FSaveCanvas := FCurrentCanvas;
+  if (FSaveCanvas <> nil) and FSaveCanvas.FClippingEnabled then
+    FSavedScissorRect := FCanvasHelper.ScissorRect;
+
+  FCurrentCanvas := Self;
+
+  Result := inherited DoBeginScene(AClipRects) and (FContext <> nil) and FContext.BeginScene;
+  if Result then
+  begin
+    FClippingEnabled := False;
+    FCurrentClipRect := TRect.Create(0, 0, Width, Height);
+    FCanvasHelper.ResetScissorRect;
+    FCanvasHelper.UpdateDrawingMode;
+  end;
+end;
+
+procedure TCanvasGpu.DoEndScene;
+begin
+  if FContext <> nil then
+  begin
+    FCanvasHelper.Flush;
+    FContext.EndScene;
+    if FSaveCanvas <> nil then
+    begin
+      FCanvasHelper.SetContext(FSaveCanvas.FContext);
+      if FSaveCanvas.FClippingEnabled then
+        FCanvasHelper.ScissorRect := FSavedScissorRect;
+    end;
+    FCurrentCanvas := FSaveCanvas;
+    FSaveCanvas := nil;
+    Dec(FGlobalBeginScene);
+    if FGlobalBeginScene = 0 then
+    begin
+      FCanvasHelper.EndRender;
+      TTextLayoutNG.EndRender;
+      FFlushCountPerFrame := FCanvasHelper.FlushCountPerFrame;
+      FPrimitiveCountPerFrame := FCanvasHelper.PrimitiveCountPerFrame;
+    end;
+    {$IFDEF MSWINDOWS}
+    if (Parent <> nil) and WindowHandleToPlatform(Parent).Transparency then
+      Context.CopyToBits(WindowHandleToPlatform(Parent).BufferBits, Width * 4, Rect(0, 0, Width, Height));
+    {$ENDIF}
+  end;
+  inherited;
+end;
+
+procedure TCanvasGpu.DoBlendingChanged;
+begin
+  inherited;
+  if FContext <> nil then
+  begin
+    FCanvasHelper.Flush;
+    if Blending then
+      FContext.SetContextState(TContextState.csAlphaBlendOn)
+    else
+      FContext.SetContextState(TContextState.csAlphaBlendOff);
+  end;
+end;
+
+procedure TCanvasGpu.IntersectClipRect(const ARect: TRectF);
+var
+  Intersection: TRect;
+  TopLeft, BottomRight: TPointF;
+begin
+  FClippingEnabled := True;
+  TopLeft := ARect.TopLeft * Matrix;
+  BottomRight := ARect.BottomRight * Matrix;
+
+  Intersection := TRect.Intersect(FCurrentClipRect, Rect(Trunc(TopLeft.X), Trunc(TopLeft.Y), Round(BottomRight.X),
+    Round(BottomRight.Y)));
+  FCurrentClipRect := Intersection;
+
+  FCanvasHelper.ScissorRect := Intersection;
+end;
+
+procedure TCanvasGpu.ExcludeClipRect(const ARect: TRectF);
+begin
+end;
+
+class procedure TCanvasGpu.CreateResources;
+begin
+  FCanvasHelper := TCanvasHelper.Create;
+  FStrokeBuilder := TStrokeBuilder.Create;
+end;
+
+procedure TCanvasGpu.DoFlush;
+begin
+  if FCanvasHelper <> nil then
+    FCanvasHelper.Flush;
+end;
+
+class procedure TCanvasGpu.FreeResources;
+begin
+  FStrokeBuilder.Free;
+  FCanvasHelper.Free;
+end;
+
+function GetStrokeOpacity(const AOpacity: Single; const ABrush: TStrokeBrush): Single;
+const
+  MinValidStrokeThickness = 2 / 256;
+begin
+  if ABrush.Thickness < 1 then
+    if ABrush.Thickness < MinValidStrokeThickness then
+      Result := 0
+    else
+      Result := AOpacity * (ABrush.Thickness - MinValidStrokeThickness) / (1 - MinValidStrokeThickness)
+  else
+    Result := AOpacity;
+end;
+
+procedure TCanvasGpu.DoDrawLine(const APt1, APt2: TPointF; const AOpacity: Single; const ABrush: TStrokeBrush);
+var
+  LOpacity: Single;
+begin
+  LOpacity := GetStrokeOpacity(AOpacity, ABrush);
+  if LOpacity >= MinValidAlphaValue then
+  begin
+    FStrokeBuilder.Matrix := Matrix;
+    FStrokeBuilder.Brush := ABrush;
+
+    FStrokeBuilder.BuildLine(APt1, APt2, LOpacity);
+
+    if Length(FStrokeBuilder.Indices) > 2 then
+    begin
+      FCanvasHelper.FillTriangles(FStrokeBuilder.Vertices, FStrokeBuilder.Colors, FStrokeBuilder.Indices,
+        Length(FStrokeBuilder.Vertices), Length(FStrokeBuilder.Indices) div 3);
+      Inc(FPrimitiveCountPerFrame);
+    end;
+  end;
+end;
+
+procedure TCanvasGpu.DoDrawRect(const ARect: TRectF; const AOpacity: Single; const ABrush: TStrokeBrush);
+var
+  LOpacity: Single;
+begin
+  LOpacity := GetStrokeOpacity(AOpacity, ABrush);
+  if LOpacity >= MinValidAlphaValue then
+  begin
+    FStrokeBuilder.Matrix := Matrix;
+    FStrokeBuilder.Brush := ABrush;
+
+    FStrokeBuilder.BuildLine(ARect.TopLeft, ARect.TopLeft + PointF(ARect.Width, 0.0), LOpacity);
+
+    if Length(FStrokeBuilder.Indices) > 2 then
+    begin
+      FCanvasHelper.FillTriangles(FStrokeBuilder.Vertices, FStrokeBuilder.Colors, FStrokeBuilder.Indices,
+        Length(FStrokeBuilder.Vertices), Length(FStrokeBuilder.Indices) div 3);
+      Inc(FPrimitiveCountPerFrame);
+    end;
+
+    FStrokeBuilder.BuildLine(ARect.TopLeft + PointF(ARect.Width, 0.0), ARect.BottomRight, LOpacity);
+
+    if Length(FStrokeBuilder.Indices) > 2 then
+    begin
+      FCanvasHelper.FillTriangles(FStrokeBuilder.Vertices, FStrokeBuilder.Colors, FStrokeBuilder.Indices,
+        Length(FStrokeBuilder.Vertices), Length(FStrokeBuilder.Indices) div 3);
+      Inc(FPrimitiveCountPerFrame);
+    end;
+
+    FStrokeBuilder.BuildLine(ARect.BottomRight, ARect.TopLeft + PointF(0.0, ARect.Height), LOpacity);
+
+    if Length(FStrokeBuilder.Indices) > 2 then
+    begin
+      FCanvasHelper.FillTriangles(FStrokeBuilder.Vertices, FStrokeBuilder.Colors, FStrokeBuilder.Indices,
+        Length(FStrokeBuilder.Vertices), Length(FStrokeBuilder.Indices) div 3);
+      Inc(FPrimitiveCountPerFrame);
+    end;
+
+    FStrokeBuilder.BuildLine(ARect.TopLeft + PointF(0.0, ARect.Height), ARect.TopLeft, LOpacity);
+
+    if Length(FStrokeBuilder.Indices) > 2 then
+    begin
+      FCanvasHelper.FillTriangles(FStrokeBuilder.Vertices, FStrokeBuilder.Colors, FStrokeBuilder.Indices,
+        Length(FStrokeBuilder.Vertices), Length(FStrokeBuilder.Indices) div 3);
+      Inc(FPrimitiveCountPerFrame);
+    end;
+  end;
+end;
+
+procedure TCanvasGpu.DoDrawEllipse(const ARect: TRectF; const AOpacity: Single; const ABrush: TStrokeBrush);
+var
+  LOpacity: Single;
+  Center, Radius: TPointF;
+begin
+  LOpacity := GetStrokeOpacity(AOpacity, ABrush);
+  if LOpacity >= MinValidAlphaValue then
+  begin
+    if (ARect.Width >= 0) and (ARect.Height >= 0) then
+    begin
+      FStrokeBuilder.Matrix := Matrix;
+      FStrokeBuilder.Brush := ABrush;
+
+      Center.X := (ARect.Left + ARect.Right) / 2;
+      Center.Y := (ARect.Top + ARect.Bottom) / 2;
+
+      Radius.X := ARect.Width / 2;
+      Radius.Y := ARect.Height / 2;
+
+      if (ABrush.Dash <> TStrokeDash.Solid) and (ABrush.Dash <> TStrokeDash.Custom) then
+        FStrokeBuilder.BuildIntermEllipse(Center, Radius, LOpacity)
+      else
+        FStrokeBuilder.BuildSolidEllipse(Center, Radius, LOpacity);
+
+      if Length(FStrokeBuilder.Indices) > 2 then
+      begin
+        FCanvasHelper.FillTriangles(FStrokeBuilder.Vertices, FStrokeBuilder.Colors, FStrokeBuilder.Indices,
+          Length(FStrokeBuilder.Vertices), Length(FStrokeBuilder.Indices) div 3);
+        Inc(FPrimitiveCountPerFrame);
+      end;
+    end;
+  end;
+end;
+
+function TCanvasGpu.DoDrawPolygon(const Points: TPolygon; const AOpacity: Single; const ABrush: TStrokeBrush): Boolean;
+var
+  LOpacity: Single;
+begin
+  LOpacity := GetStrokeOpacity(AOpacity, ABrush);
+  if LOpacity >= MinValidAlphaValue then
+  begin
+    FStrokeBuilder.Matrix := Matrix;
+    FStrokeBuilder.Brush := ABrush;
+
+    if (ABrush.Dash <> TStrokeDash.Solid) and (ABrush.Dash <> TStrokeDash.Custom) then
+      FStrokeBuilder.BuildIntermPolygon(Points, LOpacity)
+    else
+      FStrokeBuilder.BuildSolidPolygon(Points, LOpacity);
+
+    if Length(FStrokeBuilder.Indices) > 2 then
+    begin
+      FCanvasHelper.FillTriangles(FStrokeBuilder.Vertices, FStrokeBuilder.Colors, FStrokeBuilder.Indices,
+        Length(FStrokeBuilder.Vertices), Length(FStrokeBuilder.Indices) div 3);
+      Inc(FPrimitiveCountPerFrame);
+    end;
+  end;
+  Result := True;
+end;
+
+procedure TCanvasGpu.DoDrawPath(const APath: TPathData; const AOpacity: Single; const ABrush: TStrokeBrush);
+var
+  LOpacity: Single;
+begin
+  LOpacity := GetStrokeOpacity(AOpacity, ABrush);
+  if LOpacity >= MinValidAlphaValue then
+  begin
+    FStrokeBuilder.Matrix := Matrix;
+    FStrokeBuilder.Brush := ABrush;
+
+    if (ABrush.Dash <> TStrokeDash.Solid) and (ABrush.Dash <> TStrokeDash.Custom) then
+      FStrokeBuilder.BuildIntermPath(APath, LOpacity)
+    else
+      FStrokeBuilder.BuildSolidPath(APath, LOpacity);
+
+    if Length(FStrokeBuilder.Indices) > 2 then
+    begin
+      FCanvasHelper.FillTriangles(FStrokeBuilder.Vertices, FStrokeBuilder.Colors, FStrokeBuilder.Indices,
+        Length(FStrokeBuilder.Vertices), Length(FStrokeBuilder.Indices) div 3);
+      Inc(FPrimitiveCountPerFrame);
+    end;
+  end;
+end;
+
+procedure TCanvasGpu.DoFillRect(const ARect: TRectF; const AOpacity: Single; const ABrush: TBrush);
+var
+  B: TBitmapCtx;
+  Bmp: TBitmap;
+  DstRect: TRectF;
+  Gradient: TGradient;
+begin
+  if FContext <> nil then
+  begin
+    if ABrush.Kind = TBrushKind.Gradient then
+    begin
+      if AOpacity < 1 then
+      begin
+        Gradient := TGradient.Create;
+        Gradient.Assign(ABrush.Gradient);
+        Gradient.ApplyOpacity(AOpacity);
+        FCanvasHelper.GradientRect(TransformBounds(CornersF(ARect)), Gradient);
+        Gradient.Free;
+      end else
+        FCanvasHelper.GradientRect(TransformBounds(CornersF(ARect)), ABrush.Gradient);
+    end else if ABrush.Kind = TBrushKind.Bitmap then
+    begin
+      Bmp := ABrush.Bitmap.Bitmap;
+      if Bmp.HandleAllocated then
+      begin
+        B := TBitmapCtx(Bmp.Handle);
+        case ABrush.Bitmap.WrapMode of
+          TWrapMode.Tile:
+            FCanvasHelper.TexQuad(TransformPoint(PointF(ARect.Left, ARect.Top)), TransformPoint(PointF(ARect.Right, ARect.Top)),
+              TransformPoint(PointF(ARect.Right, ARect.Bottom)), TransformPoint(PointF(ARect.Left, ARect.Bottom)), PointF(0, 0),
+              PointF(ARect.Width / Bmp.Width, 0), PointF(ARect.Width / Bmp.Width, ARect.Height / Bmp.Height),
+              PointF(0, ARect.Height / Bmp.Height), PrepareColor(FModulateColor, AOpacity), B.PaintingTexture);
+          TWrapMode.TileOriginal:
+            begin
+              DstRect := RectF(0, 0, Bmp.Width, Bmp.Height);
+              IntersectRect(DstRect, DstRect, ARect);
+              FCanvasHelper.TexRect(TransformBounds(CornersF(DstRect)), CornersF(DstRect), B.PaintingTexture,
+                PrepareColor(FModulateColor, AOpacity));
+            end;
+          TWrapMode.TileStretch:
+            FCanvasHelper.TexRect(TransformBounds(CornersF(ARect)), B.PaintingTexture, PrepareColor(FModulateColor, AOpacity));
+        end;
+      end;
+    end
+    else
+      FCanvasHelper.FillRect(TransformBounds(CornersF(ARect)), PrepareColor(ABrush.Color, AOpacity));
+  end;
+end;
+
+procedure TCanvasGpu.TransformCallback(var Position: TPointF);
+begin
+  Position := TransformPoint(Position);
+end;
+
+procedure TCanvasGpu.DoFillEllipse(const ARect: TRectF; const AOpacity: Single; const ABrush: TBrush);
+var
+  B: TBitmapCtx;
+  Bmp: TBitmap;
+  DstRect: TRectF;
+  Gradient: TGradient;
+begin
+  if (ARect.Width >= 0) and (ARect.Height >= 0) and (FContext <> nil) then
+  begin
+    if ABrush.Kind = TBrushKind.Gradient then
+    begin
+      if AOpacity < 1 then
+      begin
+        Gradient := TGradient.Create;
+        Gradient.Assign(ABrush.Gradient);
+        Gradient.ApplyOpacity(AOpacity);
+        FCanvasHelper.GradientEllipse(ARect, Gradient, TransformCallback);
+        Gradient.Free;
+      end
+      else
+        FCanvasHelper.GradientEllipse(ARect, ABrush.Gradient, TransformCallback);
+    end
+    else if ABrush.Kind = TBrushKind.Bitmap then
+    begin
+      Bmp := ABrush.Bitmap.Bitmap;
+      if Bmp.HandleAllocated then
+      begin
+        B := TBitmapCtx(Bmp.Handle);
+        case ABrush.Bitmap.WrapMode of
+          TWrapMode.Tile:
+            FCanvasHelper.TexEllipse(ARect, TRectF.Create(0, 0, ARect.Width / Bmp.Width, ARect.Height / Bmp.Height),
+              PrepareColor(FModulateColor, AOpacity), B.PaintingTexture, TransformCallback);
+          TWrapMode.TileOriginal:
+            begin
+              DstRect := TRectF.Create(0, 0, Bmp.Width, Bmp.Height);
+              IntersectRect(DstRect, DstRect, ARect);
+              FCanvasHelper.TexEllipse(ARect, RectF(0, 0, ARect.Width / DstRect.Width, ARect.Height / DstRect.Height),
+                PrepareColor(FModulateColor, AOpacity), B.PaintingTexture, TransformCallback);
+            end;
+          TWrapMode.TileStretch:
+            FCanvasHelper.TexEllipse(ARect, PrepareColor(FModulateColor, AOpacity), B.PaintingTexture,
+              TransformCallback);
+        end;
+      end;
+    end
+    else
+      FCanvasHelper.FillEllipse(ARect, PrepareColor(ABrush.Color, AOpacity), TransformCallback);
+  end;
+end;
+
+procedure TCanvasGpu.MeasureLines(const ALines: TLineMetricInfo; const ARect: TRectF; const AText: string;
+  const WordWrap: Boolean; const Flags: TFillTextFlags; const ATextAlign: TTextAlign; const AVTextAlign: TTextAlign);
+begin
+end;
+
+{ Bitmaps }
+
+class function TCanvasGpu.DoInitializeBitmap(const Width, Height: Integer; const Scale: Single; var PixelFormat: TPixelFormat): THandle;
+var
+  H: TBitmapCtx;
+begin
+  H := TBitmapCtx.Create(Width, Height, Scale);
+{$IFDEF AUTOREFCOUNT}
+  H.__ObjAddRef;
+{$ENDIF}
+  Result := THandle(H);
+  PixelFormat := H.PixelFormat;
+end;
+
+class procedure TCanvasGpu.DoFinalizeBitmap(var Bitmap: THandle);
+var
+  H: TBitmapCtx;
+begin
+  H := TBitmapCtx(Bitmap);
+{$IFDEF AUTOREFCOUNT}
+  H.__ObjRelease;
+{$ENDIF}
+  H.DisposeOf;
+end;
+
+class function TCanvasGpu.DoMapBitmap(const Bitmap: THandle; const Access: TMapAccess; var Data: TBitmapData): Boolean;
+var
+  Handle: TBitmapCtx;
+  Context: TContext3D;
+begin
+  Handle := TBitmapCtx(Bitmap);
+  Handle.FAccess := Access;
+  Handle.CreateBuffer;
+
+  Data.Data := Handle.FData;
+  Data.Pitch := Handle.FBytesPerLine;
+  if Access <> TMapAccess.Write then
+  begin
+    if Handle.Canvas <> nil then
+      TCanvasGpu(Handle.Canvas).Context.CopyToBits(Data.Data, Data.Pitch, TRect.Create(0, 0, Handle.Width, Handle.Height))
+    else if Handle.FRenderTarget <> nil then
+    begin
+      Context := TContextManager.CreateFromTexture(Handle.FRenderTarget, TMultisample.None, False);
+      try
+        Context.CopyToBits(Data.Data, Data.Pitch, Rect(0, 0, Handle.Width, Handle.Height))
+      finally
+        Context.DisposeOf;
+      end;
+    end;
+  end;
+
+  if Access <> TMapAccess.Read then
+  begin
+    if Handle.FTexture <> nil then
+      Handle.FTexture.DisposeOf;
+    Handle.FTexture := nil;
+  end;
+  Result := True;
+end;
+
+class procedure TCanvasGpu.DoUnmapBitmap(const Bitmap: THandle; var Data: TBitmapData);
+var
+  H: TBitmapCtx;
+begin
+  H := TBitmapCtx(Bitmap);
+  if (H.Access <> TMapAccess.Read) and (H.FRenderTarget <> nil) then
+    H.FRenderTarget.UpdateTexture(H.FData, H.FBytesPerLine);
+  if H.FRenderTarget <> nil then
+    H.FreeBuffer;
+end;
+
+procedure TCanvasGpu.DrawTexture(const DstRect, SrcRect: TRectF; const AColor: TAlphaColor; const ATexture: TTexture);
+begin
+  FCanvasHelper.TexRect(TransformBounds(CornersF(DstRect)), CornersF(SrcRect.Left, SrcRect.Top, SrcRect.Width,
+    SrcRect.Height), ATexture, AColor);
+end;
+
+procedure TCanvasGpu.DoDrawBitmap(const ABitmap: TBitmap; const SrcRect, DstRect: TRectF; const AOpacity: Single;
+  const HighSpeed: Boolean);
+var
+  B: TBitmapCtx;
+  Bmp: TBitmap;
+begin
+  if FContext <> nil then
+  begin
+    Bmp := ABitmap;
+    if Bmp.HandleAllocated then
+    begin
+      B := TBitmapCtx(Bmp.Handle);
+      FCanvasHelper.TexRect(TransformBounds(CornersF(DstRect)), CornersF(SrcRect.Left, SrcRect.Top, SrcRect.Width,
+        SrcRect.Height), B.PaintingTexture, PrepareColor(FModulateColor, AOpacity));
+    end;
+  end;
+end;
+
+{ Path }
+
+function TCanvasGpu.PtInPath(const APoint: TPointF; const APath: TPathData): Boolean;
+var
+  Polygon: TPolygon;
+  I, PointCount: Integer;
+  Temp1, Temp2: TPointF;
+begin
+  Result := False;
+  if APath = nil then
+    Exit;
+
+  APath.FlattenToPolygon(Polygon, 1);
+
+  PointCount := Length(Polygon);
+  if PointCount < 3 then
+    Exit;
+
+  Temp1 := Polygon[0];
+
+  for I := 0 to PointCount - 1 do
+  begin
+    Temp2 := Polygon[(I + 1) mod PointCount];
+
+    if APoint.Y > Min(Temp1.Y, Temp2.Y) then
+      if APoint.Y <= Max(Temp1.Y, Temp2.Y) then
+        if APoint.X <= Max(Temp1.X, Temp2.X) then
+          if not SameValue(Temp1.Y, Temp2.Y, TEpsilon.Vector) then
+          begin
+            if SameValue(Temp1.X, Temp2.X, TEpsilon.Vector) or (APoint.X <= (APoint.Y - Temp1.Y) * (Temp2.X -
+              Temp1.X) / (Temp2.Y - Temp1.Y) + Temp1.X) then
+              Result := not Result;
+          end;
+
+    Temp1 := Temp2;
+  end;
+end;
+
+procedure TCanvasGpu.InternalFillPolygon(const Points: TPolygon; const AOpacity: Single; const ABrush: TBrush;
+  const PolyBounds: TRectF);
+var
+  DstRect: TRectF;
+  Vertices: TCanvasHelper.TVertexArray;
+  Colors: TCanvasHelper.TAlphaColorArray;
+  FillColors: TCanvasHelper.TAlphaColorArray;
+  TexCoords: TCanvasHelper.TVertexArray;
+  Indices: TCanvasHelper.TIndexArray;
+  Point: TPointF;
+  InitIndex, CurIndex, PrevIndex, PlaceAt: Integer;
+  PrevMode: TDrawingMode;
+  B: TBitmapCtx;
+  Bmp: TBitmap;
+  Gradient: TGradient;
+begin
+  InitIndex := -1;
+  PrevIndex := -1;
+  CurIndex := 0;
+
+  SetLength(Vertices, 0);
+  SetLength(Colors, 0);
+  SetLength(Indices, 0);
+  SetLength(TexCoords, 0);
+
+  Bmp := nil;
+  if ABrush.Kind = TBrushKind.Bitmap then
+    Bmp := ABrush.Bitmap.Bitmap;
+  for Point in Points do
+  begin
+    if (Point.X < $FFFF) and (Point.Y < $FFFF) then
+    begin
+      PlaceAt := Length(Vertices);
+      SetLength(Vertices, PlaceAt + 1);
+      Vertices[PlaceAt] := TransformPoint(Point);
+
+      PlaceAt := Length(Colors);
+      SetLength(Colors, PlaceAt + 1);
+      Colors[PlaceAt] := PrepareColor($FFFFFFFF, AOpacity);
+      SetLength(FillColors, PlaceAt + 1);
+      FillColors[PlaceAt] := PrepareColor(ABrush.Color, AOpacity);
+
+      SetLength(TexCoords, PlaceAt + 1);
+      if (ABrush.Kind = TBrushKind.Bitmap) and (ABrush.Bitmap.WrapMode = TWrapMode.Tile) and (Bmp <> nil) and
+        not Bmp.IsEmpty then
+        TexCoords[PlaceAt] := TPointF.Create((Point.X - PolyBounds.Left) / Bmp.Width, (Point.Y - PolyBounds.Top) /
+          Bmp.Height)
+      else
+        TexCoords[PlaceAt] := TPointF.Create((Point.X - PolyBounds.Left) / PolyBounds.Width, (Point.Y -
+          PolyBounds.Top) / PolyBounds.Height);
+
+      if InitIndex = -1 then
+        InitIndex := CurIndex;
+
+      if (InitIndex <> -1) and (PrevIndex <> -1) and (InitIndex <> PrevIndex) then
+      begin
+        PlaceAt := Length(Indices);
+        SetLength(Indices, PlaceAt + 3);
+
+        Indices[PlaceAt] := InitIndex;
+        Indices[PlaceAt + 1] := PrevIndex;
+        Indices[PlaceAt + 2] := CurIndex;
+      end;
+
+      PrevIndex := CurIndex;
+      Inc(CurIndex);
+    end
+    else
+    begin
+      InitIndex := -1;
+      PrevIndex := -1;
+    end;
+  end;
+
+  PrevMode := FCanvasHelper.DrawingMode;
+
+  if Bitmap <> nil then
+  begin
+    // Clear working stencil surface before drawing shape.
+    FCanvasHelper.DrawingMode := TDrawingMode.ClearStencil;
+    FCanvasHelper.FillTriangles(Vertices, Colors, Indices, Length(Vertices), Length(Indices) div 3);
+  end;
+
+  FCanvasHelper.DrawingMode := TDrawingMode.WriteStencilInvert;
+  FCanvasHelper.FillTriangles(Vertices, Colors, Indices, Length(Vertices), Length(Indices) div 3);
+
+  FCanvasHelper.DrawingMode := TDrawingMode.ReadStencil;
+  if ABrush.Kind = TBrushKind.Gradient then
+  begin
+    if AOpacity < 1 then
+    begin
+      Gradient := TGradient.Create;
+      Gradient.Assign(ABrush.Gradient);
+      Gradient.ApplyOpacity(AOpacity);
+      FCanvasHelper.GradientTriangles(Gradient, Vertices, TexCoords, Indices, Length(Vertices), Length(Indices) div 3);
+      Gradient.Free;
+    end
+    else
+      FCanvasHelper.GradientTriangles(ABrush.Gradient, Vertices, TexCoords, Indices, Length(Vertices),
+        Length(Indices) div 3)
+  end
+  else if (ABrush.Kind = TBrushKind.Bitmap) and (Bmp <> nil) and Bmp.HandleAllocated then
+  begin
+    B := TBitmapCtx(Bmp.Handle);
+    case ABrush.Bitmap.WrapMode of
+      TWrapMode.Tile:
+        FCanvasHelper.TexTriangles(B.PaintingTexture, Vertices, TexCoords, Colors, Indices, Length(Vertices),
+          Length(Indices) div 3);
+      TWrapMode.TileOriginal:
+        begin
+          DstRect := TRectF.Create(0, 0, Bmp.Width, Bmp.Height);
+          IntersectRect(DstRect, DstRect, PolyBounds);
+          FCanvasHelper.TexRect(TransformBounds(CornersF(DstRect)), CornersF(DstRect), B.PaintingTexture,
+            PrepareColor(FModulateColor, AOpacity));
+        end;
+      TWrapMode.TileStretch:
+        FCanvasHelper.TexTriangles(B.PaintingTexture, Vertices, TexCoords, Colors, Indices, Length(Vertices),
+          Length(Indices) div 3);
+    end;
+  end
+  else
+    FCanvasHelper.FillTriangles(Vertices, FillColors, Indices, Length(Vertices), Length(Indices) div 3);
+
+  FCanvasHelper.DrawingMode := TDrawingMode.ClearStencil;
+  FCanvasHelper.FillTriangles(Vertices, Colors, Indices, Length(Vertices), Length(Indices) div 3);
+
+  FCanvasHelper.DrawingMode := PrevMode;
+end;
+
+function TCanvasGpu.DoFillPolygon(const Points: TPolygon; const AOpacity: Single; const ABrush: TBrush): Boolean;
+
+  function ComputeBounds(const Points: TPolygon): TRectF;
+  var
+    P: TPointF;
+  begin
+    if Length(Points) > 0 then
+    begin
+      Result.Left := High(Integer);
+      Result.Top := High(Integer);
+      Result.Right := Low(Integer);
+      Result.Bottom := Low(Integer);
+
+      for P in Points do
+      begin
+        Result.Left := Min(Result.Left, P.X);
+        Result.Top := Min(Result.Top, P.Y);
+        Result.Right := Max(Result.Right, P.X);
+        Result.Bottom := Max(Result.Bottom, P.Y);
+      end;
+    end
+    else
+      Result := TRectF.Create(0, 0, 0, 0);
+  end;
+
+begin
+  InternalFillPolygon(Points, AOpacity, ABrush, ComputeBounds(Points));
+  Result := True;
+end;
+
+procedure TCanvasGpu.DoFillPath(const APath: TPathData; const AOpacity: Single; const ABrush: TBrush);
+var
+  Points: TPolygon;
+begin
+  APath.FlattenToPolygon(Points, 1);
+  InternalFillPolygon(Points, AOpacity, ABrush, APath.GetBounds);
+end;
+
+function TCanvasGpu.GetModulateColor: TAlphaColor;
+begin
+  Result := FModulateColor;
+end;
+
+procedure TCanvasGpu.SetModulateColor(const AColor: TAlphaColor);
+begin
+  FModulateColor := AColor;
+end;
+
+procedure RegisterCanvasClasses;
+begin
+  TCanvasManager.RegisterCanvas(TCanvasGpu, True, False);
+  TTextLayoutManager.RegisterTextLayout(TTextLayoutNG, TCanvasGpu);
+  TCanvasGpu.CreateResources;
+end;
+
+procedure UnregisterCanvasClasses;
+begin
+  TCanvasGpu.FreeResources;
+end;
+
+//https://quality.embarcadero.com/browse/RSP-18797
+function CanvasHelper: TCanvasHelper;
+begin
+  result := TCanvasGpu.FCanvasHelper;
+end;
+
+initialization
+  TCustomCanvasGpu.ModulateColor := $FFFFFFFF;
+  TCustomCanvasGpu.AlignToPixels := False;
+end.

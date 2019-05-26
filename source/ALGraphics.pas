@@ -11,6 +11,7 @@ interface
 {$ENDIF}
 
 uses system.classes,
+     system.sysutils,
      system.types,
      system.uitypes,
      {$IF defined(ios)}
@@ -42,6 +43,8 @@ Type
 function  AlGetExifOrientationInfo(const aFilename: String): TalExifOrientationInfo;
 procedure ALNormalizeImageOrientationV1(const aBitmap: Tbitmap; const aExifOrientationInfo: TalExifOrientationInfo);
 function  ALNormalizeImageOrientationV2(const aBitmap: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const aExifOrientationInfo: TalExifOrientationInfo): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF};
+function  AlGetImageSignature(const aStream: TStream): Tbytes; overload;
+function  AlGetImageSignature(const aFileName: string): Tbytes; overload;
 function  AlDetectImageExtensionU(const aStream: TStream): String; overload;
 function  AlDetectImageExtensionU(const aFileName: string): String; overload;
 function  ALPrepareColor(const SrcColor: TAlphaColor; const Opacity: Single): TAlphaColor;
@@ -231,8 +234,7 @@ procedure ALGradientEvaluateCallback(info: Pointer; inData: PCGFloat; outData: P
 
 implementation
 
-uses system.sysutils,
-     system.math,
+uses system.math,
      System.UIConsts,
      FMX.types,
      {$IF defined(ANDROID)}
@@ -6888,15 +6890,43 @@ end;
 {$ENDIF}
 {$ENDREGION}
 
+{************************************************************}
+function  AlGetImageSignature(const aStream: TStream): Tbytes;
+var i: integer;
+begin
+  aStream.Position := 0;
+  SetLength(result, 12);
+  if aStream.Size < 12 then begin
+    for I := Low(result) to High(result) do
+      result[i] := $00;
+    exit;
+  end;
+  aStream.ReadBuffer(result[0], length(result));
+end;
+
+{*************************************************************}
+function  AlGetImageSignature(const aFileName: string): Tbytes;
+var aFileStream: TFileStream;
+begin
+  aFileStream := TFileStream.Create(aFileName, fmOpenRead);
+  try
+    result := AlGetImageSignature(aFileStream);
+  finally
+    aFileStream.Free;
+  end;
+end;
+
 {******************************************************}
 // https://en.wikipedia.org/wiki/List_of_file_signatures
+// https://github.com/strukturag/libheif/issues/83
+// https://nokiatech.github.io/heif/technical.html
 function  AlDetectImageExtensionU(const aStream: Tstream): String;
 var aFirstBytes: Tbytes;
 begin
-  aStream.Position := 0;
-  if aStream.Size < 8 then exit('');
-  SetLength(aFirstBytes, 8);
-  aStream.ReadBuffer(aFirstBytes[0], length(aFirstBytes));
+
+  aFirstBytes := AlGetImageSignature(aStream);
+  if length(aFirstBytes) < 12 then exit('');
+
   if (aFirstBytes[0] = $FF) and
      (aFirstBytes[1] = $D8) then result := 'jpg'  // ÿØ
   else if (aFirstBytes[0] = $89) and
@@ -6912,7 +6942,33 @@ begin
           (aFirstBytes[2] = $46) then result := 'gif' // GIF
   else if (aFirstBytes[0] = $42) and
           (aFirstBytes[1] = $4D) then result := 'bmp' // BM
+  else if (aFirstBytes[0] = $00) and
+          (aFirstBytes[1] = $00) and
+          (aFirstBytes[2] = $00) and
+          (aFirstBytes[3] = $18) and
+          (aFirstBytes[4] = $66) and
+          (aFirstBytes[5] = $74) and
+          (aFirstBytes[6] = $79) and
+          (aFirstBytes[7] = $70) and
+          (aFirstBytes[8] = $68) and
+          (aFirstBytes[9] = $65) and
+          (aFirstBytes[10] = $69) and
+          ((aFirstBytes[11] = $63{c}) or
+           (aFirstBytes[11] = $78{x})) then result := 'heic' // ftypheic or ftypheix....
+  else if (aFirstBytes[0] = $00) and
+          (aFirstBytes[1] = $00) and
+          (aFirstBytes[2] = $00) and
+          (aFirstBytes[3] = $18) and
+          (aFirstBytes[4] = $66) and
+          (aFirstBytes[5] = $74) and
+          (aFirstBytes[6] = $79) and
+          (aFirstBytes[7] = $70) and
+          (aFirstBytes[8] = $6D) and
+          (aFirstBytes[9] = $69) and
+          (aFirstBytes[10] = $66) and
+          (aFirstBytes[11] = $31) then result := 'heif' // ftypmif1....
   else result := '';
+
 end;
 
 {*****************************************************************}

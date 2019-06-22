@@ -54,6 +54,7 @@ public:
 	__fastcall virtual ~TALAniThread(void);
 	void __fastcall AddAnimation(TALAnimation* const Ani);
 	void __fastcall RemoveAnimation(TALAnimation* const Ani);
+	void __fastcall WakeUpTimer(void);
 };
 
 
@@ -67,7 +68,7 @@ public:
 	static int AniFrameRate;
 	
 private:
-	static Fmx::Types::TTimer* FAniThread;
+	static TALAniThread* FAniThread;
 	__int64 FTag;
 	System::TObject* FTagObject;
 	double FTagFloat;
@@ -100,6 +101,7 @@ protected:
 	virtual void __fastcall DoFinish(void);
 	
 public:
+	__classmethod void __fastcall WakeUpTimer();
 	__fastcall virtual TALAnimation(void);
 	__fastcall virtual ~TALAnimation(void);
 	virtual void __fastcall Start(void);
@@ -122,7 +124,7 @@ public:
 	__property System::Classes::TNotifyEvent OnProcess = {read=FOnProcess, write=FOnProcess};
 	__property System::Classes::TNotifyEvent OnFinish = {read=FOnFinish, write=FOnFinish};
 	__property float Overshoot = {read=fOvershoot, write=fOvershoot};
-	/* static */ __property Fmx::Types::TTimer* AniThread = {read=FAniThread};
+	/* static */ __property TALAniThread* AniThread = {read=FAniThread};
 	__property __int64 Tag = {read=FTag, write=FTag, default=0};
 	__property System::TObject* TagObject = {read=FTagObject, write=FTagObject};
 	__property double TagFloat = {read=FTagFloat, write=FTagFloat};

@@ -6,9 +6,9 @@
           android:versionName="1.0.0"
           android:installLocation="auto">
    
-    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="14" /> <!-- This is the platform API where NativeActivity was introduced. -->
+    <uses-sdk android:minSdkVersion="19" android:targetSdkVersion="28" /> <!-- This is the platform API where NativeActivity was introduced. -->
    
-        <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -29,7 +29,9 @@
                  android:largeHeap="False"
                  android:icon="@drawable/ic_launcher"
                  android:theme="@style/AppTheme"
-                 android:hardwareAccelerated="true"> <!-- android:theme="@style/AppTheme" instead of android:theme="@android:style/Theme.NoTitleBar" -->
+                 android:hardwareAccelerated="true"
+                 android:usesCleartextTraffic="true"
+                 android:resizeableActivity="false">
    
         
 		

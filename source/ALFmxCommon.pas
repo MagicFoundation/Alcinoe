@@ -458,7 +458,7 @@ function ALNSSetToStrings(const ANSSet: NSSet): TArray<String>;
 
 Type
 
-  {$IF CompilerVersion > 32} // tokyo
+  {$IF CompilerVersion > 33} // rio
     {$MESSAGE WARN 'Check if FMX.Controls.TControl still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALControlAccessPrivate = class(TFmxObject)
@@ -563,6 +563,9 @@ Type
     FPressedPosition: TPointF;
     FDoubleClick: Boolean;
     FParentShowHint: Boolean;
+    {$IF CompilerVersion >= 33}  // rio
+    FCustomSceneAddRect: TCustomSceneAddRectEvent;
+    {$ENDIF}
     FScene: IScene;
     FLastHeight: Single;
     FLastWidth: Single;
@@ -603,7 +606,7 @@ Type
     FExplicitHeight: Single;
   end;
 
-  {$IF CompilerVersion > 32} // tokyo
+  {$IF CompilerVersion > 33} // rio
     {$MESSAGE WARN 'Check if FMX.TextLayout.TTextLayout still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALTextLayoutAccessPrivate = class abstract
@@ -634,11 +637,6 @@ var ALViewStackCount: integer;
 {$ENDIF}
 
 {$IFDEF ANDROID}
-function ALControlNeedKeyboard(const aControl: IControl): Boolean;
-procedure ALObtainKeyboardRect(var aBounds: TRect);
-{$ENDIF}
-
-{$IFDEF ANDROID}
 function getRenderScript: JRenderScript;
 {$ENDIF}
 
@@ -653,6 +651,7 @@ uses system.SysUtils,
      Androidapi.JNI.Os,
      Androidapi.Bitmap,
      FMX.platForm.android,
+     FMX.Platform.UI.Android,
      FMX.forms,
      alFmxEdit,
      {$ENDIF}
@@ -897,7 +896,7 @@ end;
 
 {****************}
 {$IF defined(IOS)}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if  FMX.Canvas.Mac.TTextLayoutCT.GetCTFontRef is still the same as below and adjust the IFDEF'}
 {$ENDIF}
 function  ALGetCTFontRef(const AFontFamily: String; const aFontSize: single; const aFontStyle: TFontStyles): CTFontRef;
@@ -1075,13 +1074,13 @@ var aBreakTextItemsStartCount: integer;
       //-----
       aSavedColor := TAlphaColorRec.Null; // stupid warning
       if aEllipsisFontColor <> TAlphaColorRec.Null then begin
-        aSavedColor := aPaint.getColor;
-        aPaint.setColor(aEllipsisFontColor);
+        aSavedColor := Cardinal(aPaint.getColor);
+        aPaint.setColor(integer(aEllipsisFontColor));
       end;
       //-----
       aEllipsisLineLn := aPaint.measureText(aEllipsisLine);
       if aEllipsisFontName <> '' then aPaint.setTypeface(aSavedTypeFace);
-      if aEllipsisFontColor <> TAlphaColorRec.Null then aPaint.setColor(aSavedColor);
+      if aEllipsisFontColor <> TAlphaColorRec.Null then aPaint.setColor(integer(aSavedColor));
       //-----
       case AHTextAlign of
         TTextAlign.Center: begin
@@ -3593,7 +3592,7 @@ begin
 
             //init aPaint
             {$IF defined(ANDROID)}
-            aPaint.setColor(aFontColor);
+            aPaint.setColor(integer(aFontColor));
             JStr1 := StringToJString(aOptions.FontName); // << https://quality.embarcadero.com/browse/RSP-14187
             aTypeface := TJTypeface.JavaClass.create(JStr1, aStyle);
             aPaint.setTypeface(aTypeface);
@@ -3925,7 +3924,7 @@ begin
             end;
           end
           else begin
-            aPaint.setColor(aBreakedTextItem.fontColor);
+            aPaint.setColor(integer(aBreakedTextItem.fontColor));
             //-----
             JStr1 := StringToJString(aOptions.FontName); // << https://quality.embarcadero.com/browse/RSP-14187
             aTypeface := TJTypeface.JavaClass.create(JStr1, aBreakedTextItem.fontStyle);
@@ -4280,7 +4279,7 @@ end;
 {$ENDIF}
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if FMX.Objects.GetDrawingShapeRectAndSetThickness still have the same implementation and adjust the IFDEF'}
 {$ENDIF}
 //duplicate of the private delphi function GetDrawingShapeRectAndSetThickness in FMX.Objects
@@ -4372,7 +4371,7 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
       //-----
       if (not aDrawOnlyBorder) and
          (Shadow <> nil) and
-         (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, Shadow.ShadowColor{shadowColor});
+         (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.ShadowColor){shadowColor});
 
       aJRect := TJRectf.JavaClass.init(aRect.left, aRect.top, aRect.right, aRect.bottom);
       aCanvas.drawRoundRect(aJRect{rect},
@@ -4395,7 +4394,7 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
       //-----
       if (not aDrawOnlyBorder) and
          (Shadow <> nil) and
-         (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, Shadow.ShadowColor{shadowColor});
+         (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.ShadowColor){shadowColor});
 
       aCanvas.drawRect(aRect.left{left},
                        aRect.top{top},
@@ -4552,7 +4551,7 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
       //-----
       if (not aDrawOnlyBorder) and
          (Shadow <> nil) and
-         (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, Shadow.ShadowColor{shadowColor});
+         (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.ShadowColor){shadowColor});
 
       aCanvas.drawPath(apath,aPaint);
       aPath := nil;
@@ -4910,7 +4909,7 @@ begin
 
     //fill with solid color
     else if Fill.Kind = TBrushKind.Solid then begin
-      aPaint.setColor(Fill.Color);
+      aPaint.setColor(integer(Fill.Color));
       _drawRect(aCanvas, aPaint, aRect, false{aDrawOnlyBorder});
     end;
 
@@ -4925,7 +4924,7 @@ begin
 
     //stroke with solid color
     if Stroke.Kind = TBrushKind.Solid then begin
-      aPaint.setColor(Stroke.Color);
+      aPaint.setColor(integer(Stroke.Color));
       _drawRect(aCanvas, aPaint, aRect, true{aDrawOnlyBorder});
     end;
 
@@ -5290,7 +5289,7 @@ begin
         aShader := TJRadialGradient.JavaClass.init(aRect.CenterPoint.x{x}, aRect.CenterPoint.y{y}, aRect.width / 2{radius},  aColors, aStops, TJShader_TileMode.JavaClass.CLAMP{tile});
         aPaint.setShader(aShader);
         if (Shadow <> nil) and
-           (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, Shadow.ShadowColor{shadowColor});
+           (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.ShadowColor){shadowColor});
         aCanvas.drawCircle(aRect.CenterPoint.x{cx}, aRect.CenterPoint.y{cy}, aRect.width / 2{radius}, apaint);
         if (Shadow <> nil) and
            (Shadow.enabled) then aPaint.clearShadowLayer;
@@ -5328,7 +5327,7 @@ begin
           aJSrcRect := TJRect.JavaClass.init(0, 0, fill.Bitmap.Bitmap.Width, fill.Bitmap.Bitmap.height);
           aPaint.setXfermode(aPorterDuffXfermode);
           if (Shadow <> nil) and
-             (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, Shadow.ShadowColor{shadowColor});
+             (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.ShadowColor){shadowColor});
           aCanvas.drawBitmap(aTMPBitmap, aJSrcRect, aJDestRectf, apaint);
           if (Shadow <> nil) and
              (Shadow.enabled) then aPaint.clearShadowLayer;
@@ -5346,9 +5345,9 @@ begin
 
     //fill with solid color
     else if Fill.Kind = TBrushKind.Solid then begin
-      aPaint.setColor(Fill.Color);
+      aPaint.setColor(integer(Fill.Color));
       if (Shadow <> nil) and
-         (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, Shadow.ShadowColor{shadowColor});
+         (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.ShadowColor){shadowColor});
       aCanvas.drawCircle(aRect.CenterPoint.x{cx}, aRect.CenterPoint.y{cy}, aRect.width / 2{radius}, apaint);
       if (Shadow <> nil) and
          (Shadow.enabled) then aPaint.clearShadowLayer;
@@ -5365,7 +5364,7 @@ begin
 
     //stroke with solid color
     if Stroke.Kind = TBrushKind.Solid then begin
-      aPaint.setColor(Stroke.Color);
+      aPaint.setColor(integer(Stroke.Color));
       aCanvas.drawCircle(aRect.CenterPoint.x{cx}, aRect.CenterPoint.y{cy}, aRect.width / 2{radius}, apaint);
     end;
 
@@ -5927,29 +5926,6 @@ begin
   CGContextRelease(aContext);
   ALFreeAndNil(aBitmapSurface);
 
-end;
-{$ENDIF}
-
-{**************}
-{$IFDEF ANDROID}
-function ALControlNeedKeyboard(const aControl: IControl): Boolean;
-begin
-  result := (aControl <> nil) and
-            (aControl is TALAndroidEdit);
-end;
-{$ENDIF}
-
-{**************}
-{$IFDEF ANDROID}
-procedure ALObtainKeyboardRect(var aBounds: TRect);
-var aContentRect, aTotalRect: JRect;
-begin
-  aContentRect := TJRect.Create;
-  aTotalRect := TJRect.Create;
-  MainActivity.getWindow.getDecorView.getWindowVisibleDisplayFrame(aContentRect);
-  MainActivity.getWindow.getDecorView.getDrawingRect(aTotalRect);
-  aBounds := TRectF.Create(ConvertPixelToPoint(TPointF.Create(aTotalRect.left, aContentRect.bottom)), // topleft
-                           ConvertPixelToPoint(TPointF.Create(aTotalRect.right, aTotalRect.bottom))).Truncate;  //bottomRight
 end;
 {$ENDIF}
 

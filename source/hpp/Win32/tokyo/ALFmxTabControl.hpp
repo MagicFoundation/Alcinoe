@@ -116,7 +116,6 @@ public:
 private:
 	int FTabCount;
 	bool FMouseEvents;
-	bool fGestureEvents;
 	bool FchildreenChanging;
 	int FTabIndex;
 	bool FRealigningTabs;
@@ -146,6 +145,10 @@ private:
 	void __fastcall AniTransitionFadeOutFinish(System::TObject* Sender);
 	int __fastcall GetItemsCount(void);
 	Fmx::Types::TFmxObject* __fastcall GetItem(const int AIndex);
+	void __fastcall internalMouseDown(System::Uitypes::TMouseButton Button, System::Classes::TShiftState Shift, float X, float Y);
+	void __fastcall internalMouseMove(System::Classes::TShiftState Shift, float X, float Y);
+	void __fastcall internalMouseUp(System::Uitypes::TMouseButton Button, System::Classes::TShiftState Shift, float X, float Y);
+	void __fastcall internalMouseLeave(void);
 	
 protected:
 	virtual void __fastcall Paint(void);
@@ -158,7 +161,6 @@ protected:
 	virtual void __fastcall DoRemoveObject(Fmx::Types::TFmxObject* const AObject);
 	virtual void __fastcall DoDeleteChildren(void);
 	virtual void __fastcall DoChange(void);
-	virtual void __fastcall CMGesture(Fmx::Types::TGestureEventInfo &EventInfo);
 	virtual void __fastcall MouseDown(System::Uitypes::TMouseButton Button, System::Classes::TShiftState Shift, float X, float Y);
 	virtual void __fastcall MouseMove(System::Classes::TShiftState Shift, float X, float Y);
 	virtual void __fastcall MouseUp(System::Uitypes::TMouseButton Button, System::Classes::TShiftState Shift, float X, float Y);

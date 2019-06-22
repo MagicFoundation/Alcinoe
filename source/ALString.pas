@@ -68,7 +68,7 @@ resourcestring
 
 type
 
-  {$IF CompilerVersion > 32} // tokyo
+  {$IF CompilerVersion > 33} // rio
     {$MESSAGE WARN 'Check if System.SysUtils.TFormatSettings is still the same and adjust the IFDEF'}
   {$IFEND}
 
@@ -171,9 +171,10 @@ type
 
   {$IFNDEF NEXTGEN}
 
-  //
-  //TALMask is taken from delphi seattle upd1
-  //
+  {************************}
+  {$IF CompilerVersion > 33} // rio
+    {$MESSAGE WARN 'Check if System.Masks is still the same and adjust the IFDEF'}
+  {$IFEND}
 
   EALMaskException = class(Exception);
 
@@ -223,6 +224,12 @@ type
     preNoAutoCapture   // (group) is a non-capturing group; only named groups capture
   );
 
+// TALPerlRegEx is not supported anymore after Tokyo, you can use instead
+// TPerlRegEx (unicode). TALPerlRegEx is hard to maintain and the win in
+// performance (mostly to avoid to do a conversion from ansiString to Unicode)
+// seam to be low (I didn't do any test, but i suppose)
+{$IF (not defined(NEXTGEN)) and (CompilerVersion <= 32)}{Delphi Tokyo}
+
 type
   TALPerlRegExState = set of (
     preNotBOL,         // Not Beginning Of Line: ^ does not match at the start of Subject
@@ -240,7 +247,6 @@ const
 // All implicit string casts have been verified to be correct
 { $WARN IMPLICIT_STRING_CAST OFF}
 
-{$IFNDEF NEXTGEN}
 type
   TALPerlRegExReplaceEvent = procedure(Sender: TObject; var ReplaceWith: AnsiString) of object;
 
@@ -409,7 +415,7 @@ type
   end;
 
   ERegularExpressionError = class(Exception);
-{$ENDIF}
+{$IFEND}
 
 var ALMove: procedure (const Source; var Dest; Count: NativeInt);
 function  ALIfThen(AValue: Boolean; const ATrue: Integer; const AFalse: Integer): Integer; overload; inline;
@@ -840,8 +846,10 @@ implementation
 uses System.SysConst,
      System.RTLConsts,
      System.StrUtils,
+     {$IF (not defined(NEXTGEN)) and (CompilerVersion <= 32)}{Delphi Tokyo}
      System.RegularExpressionsAPI,
      System.RegularExpressionsConsts,
+     {$IFEND}
      {$IF CompilerVersion >= 31} // berlin
      system.netencoding,
      {$IFEND}
@@ -1491,6 +1499,10 @@ begin
     CMask.Free;
   end;
 end;
+
+{$ENDIF !NEXTGEN}
+
+{$IF (not defined(NEXTGEN)) and (CompilerVersion <= 32)}{Delphi Tokyo}
 
 {****************************************************}
 function ALPerlRegExFirstCap(const S: string): string;
@@ -2375,6 +2387,10 @@ begin
   ARegEx.Start := FStart;
 end;
 
+{$IFEND}
+
+{$IFNDEF NEXTGEN}
+
 {***********************************************************************************************}
 function ALIfThen(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString;
 begin
@@ -2464,7 +2480,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if System.SysUtils.FormatError is still the same and adjust the IFDEF'}
 {$IFEND}
 procedure ALFormatError(ErrorCode: Integer; Format: PChar; FmtLen: Cardinal);
@@ -2483,7 +2499,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if System.SysUtils.AnsiFormatError is still the same and adjust the IFDEF'}
 {$IFEND}
 procedure ALAnsiFormatError(ErrorCode: Integer; Format: PAnsiChar; FmtLen: Cardinal);
@@ -2495,7 +2511,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if System.SysUtils.FormatVarToStr is still the same and adjust the IFDEF'}
 {$IFEND}
 procedure ALFormatVarToStr(var S: AnsiString; const V: TVarData);
@@ -2507,7 +2523,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if System.AnsiStrings.FormatClearStr is still the same and adjust the IFDEF'}
 {$IFEND}
 procedure ALFormatClearStr(var S: AnsiString);
@@ -2516,10 +2532,10 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if System.SysUtils.GetGOT is still the same and adjust the IFDEF'}
 {$IFEND}
-{$IF not defined(ANDROID) and not defined(LINUX64) and not Defined(CPUARM)}
+{$IFDEF X86ASM}
 {$IFDEF PIC}
 { Do not remove export or the begin block. }
 function ALGetGOT: Pointer;
@@ -2529,14 +2545,14 @@ begin
   end;
 end;
 {$ENDIF}
-{$IFEND ANDROID}
+{$ENDIF X86ASM}
 
 {***}
 const
   cALDCon10: Integer = 10;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if System.SysUtils.PutExponent is still the same and adjust the IFDEF'}
 {$IFEND}
 {$IFDEF X86ASM}
@@ -2616,7 +2632,7 @@ end;
 {$ENDIF X86ASM}
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if System.SysUtils.InternalFloatToText is still the same and adjust the IFDEF'}
 {$IFEND}
 {$IFDEF PUREPASCAL}
@@ -3006,7 +3022,7 @@ end;
 {$ENDIF PUREPASCAL}
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if System.AnsiStrings.FloatToText is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALFloatToText(BufferArg: PAnsiChar; const Value; ValueType: TFloatValue;
@@ -3405,7 +3421,7 @@ end;
 {$ENDIF !PUREPASCAL}
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if System.SysUtils.CvtInt is still the same and adjust the IFDEF'}
 {$IFEND}
 {$IFDEF X86ASM}
@@ -3464,7 +3480,7 @@ end;
 {$ENDIF X86ASM}
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if System.SysUtils.CvtInt64 is still the same and adjust the IFDEF'}
 {$IFEND}
 {$IFDEF X86ASM}
@@ -3568,7 +3584,7 @@ end;
 {$ENDIF X86ASM}
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if System.AnsiStrings.FormatBuf is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALFormatBuf(var Buffer; BufLen: Cardinal; const Format;
@@ -4513,7 +4529,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if System.AnsiStrings.FmtStr is still the same and adjust the IFDEF'}
 {$IFEND}
 procedure ALFmtStr(var Result: AnsiString; const Format: AnsiString;
@@ -4776,7 +4792,7 @@ end;
 {$ENDIF MACOS}
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.SysUtils.DateTimeToString is still the same and adjust the IFDEF'}
 {$IFEND}
 procedure ALDateTimeToString(var Result: AnsiString; const Format: AnsiString;
@@ -5341,7 +5357,7 @@ type
   TALDateOrder = (doMDY, doDMY, doYMD);
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.SysUtils.ScanBlanks is still the same and adjust the IFDEF'}
 {$IFEND}
 procedure ALScanBlanks(const S: AnsiString; var Pos: Integer);
@@ -5354,7 +5370,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.SysUtils.ScanNumber is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALScanNumber(const S: AnsiString; var Pos: Integer;
@@ -5383,7 +5399,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.SysUtils.ScanString is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALScanString(const S: AnsiString; var Pos: Integer;
@@ -5403,7 +5419,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.SysUtils.ScanChar is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALScanChar(const S: AnsiString; var Pos: Integer; Ch: AnsiChar): Boolean;
@@ -5418,7 +5434,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.SysUtils.GetDateOrder is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALGetDateOrder(const DateFormat: AnsiString): TALDateOrder;
@@ -5443,7 +5459,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.SysUtils.ScanToNumber is still the same and adjust the IFDEF'}
 {$IFEND}
 procedure ALScanToNumber(const S: AnsiString; var Pos: Integer);
@@ -5458,7 +5474,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.SysUtils.ScanDate is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALScanDate(const S: AnsiString; var Pos: Integer; var Date: TDateTime;
@@ -5553,7 +5569,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.SysUtils.ScanTime is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALScanTime(const S: AnsiString; var Pos: Integer; var Time: TDateTime;
@@ -5637,7 +5653,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.SysUtils.TryStrToDateTime is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALTryStrToDateTime(const S: AnsiString; out Value: TDateTime;
@@ -5744,7 +5760,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system._ValLong is still the same and adjust the IFDEF'}
 {$IFEND}
 // Hex : ( '$' | 'X' | 'x' | '0X' | '0x' ) [0-9A-Fa-f]*
@@ -5992,7 +6008,7 @@ end;
 {$ENDIF}
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system._ValInt64 is still the same and adjust the IFDEF'}
 {$IFEND}
 function _ALValInt64(const s: AnsiString; var code: Integer): Int64;
@@ -6087,7 +6103,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system._ValUInt64 is still the same and adjust the IFDEF'}
 {$IFEND}
 function _ALValUInt64(const s: ansistring; var code: Integer): UInt64;
@@ -6280,7 +6296,7 @@ const
      '90','91','92','93','94','95','96','97','98','99');
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.SysUtils._IntToStr32 is still the same and adjust the IFDEF'}
 {$IFEND}
 function _ALIntToStr32(Value: Cardinal; Negative: Boolean): AnsiString;
@@ -6325,7 +6341,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.SysUtils._IntToStr64 is still the same and adjust the IFDEF'}
 {$IFEND}
 function _ALIntToStr64(Value: UInt64; Negative: Boolean): AnsiString;
@@ -6916,7 +6932,7 @@ end;
 //       https://synopse.info/forum/viewtopic.php?pid=26173#p26173
 //
 
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
 {$IFEND}
 
@@ -7425,7 +7441,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if declaration below in system.Sysutils is still the same and adjust the IFDEF'}
 {$IFEND}
 const
@@ -7461,7 +7477,7 @@ const
 {$ENDIF CPUX64}
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.SysUtils.TestAndClearFPUExceptions is still the same and adjust the IFDEF'}
 {$IFEND}
 {$IFDEF CPUX86}
@@ -7485,11 +7501,11 @@ end;
 {$ENDIF CPUX86}
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.SysUtils.TestAndClearSSEExceptions is still the same and adjust the IFDEF'}
 {$IFEND}
 {$WARN SYMBOL_PLATFORM OFF}
-{$IFDEF CPUX64}
+{$IF Defined(CPUX64) and not Defined(EXTERNALLINKER)}
 function ALTestAndClearSSEExceptions(AExceptionMask: UInt32): Boolean;
 var
   MXCSR: UInt32;
@@ -7498,11 +7514,11 @@ begin
   Result := ((MXCSR and $003F) and AExceptionMask) = 0;
   ResetMXCSR;
 end;
-{$ENDIF CPUX64}
+{$IFEND CPUX64}
 {$WARN SYMBOL_PLATFORM ON}
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.SysUtils.InternalTextToExtended is still the same and adjust the IFDEF'}
 {$IFEND}
 //this function is not threadsafe because of Set8087CW
@@ -7517,18 +7533,18 @@ const
   CMaxExponent = 4999;
 {$ELSE !EXTENDEDHAS10BYTES}
   CMaxExponent = 1024;
-{$ENDIF EXTENDEDHAS10BYTES}
+{$ENDIF !EXTENDEDHAS10BYTES}
 
   CExponent = 'E'; // DO NOT LOCALIZE;
   CPlus = '+';     // DO NOT LOCALIZE;
   CMinus = '-';    // DO NOT LOCALIZE;
 
 var
-{$IFDEF NEXTGEN}
+{$IFDEF EXTERNALLINKER}
 //  SavedRoundMode: Int32;
 //  LSavedFlags: Word;
 //  LDummyFlags: Word;
-{$ELSE !NEXTGEN}
+{$ELSE !EXTERNALLINKER}
 {$IFDEF CPUX86}
   LSavedCtrlWord: Word;
 {$ENDIF CPUX86}
@@ -7600,31 +7616,33 @@ var
     Result := Result * LSign;
   end;
 
+var
+  IntPart, FracPart: Integer;
 begin
   { Prepare }
   Result := False;
   NextChar();
 
-{$IFDEF NEXTGEN}
+{$IFDEF EXTERNALLINKER}
 
 //  FEnvGetExceptFlag(LSavedFlags, fe_ALL_EXCEPT);
 //  FEnvSetExceptFlag(LSavedFlags, fe_ALL_EXCEPT);
 //  SavedRoundMode := FEnvGetRound;
 //  FEnvSetRound(fe_TONEAREST);
-{$ELSE  NEXTGEN}
+{$ELSE  EXTERNALLINKER}
 {$IFDEF CPUX86}
   { Prepare the FPU }
   LSavedCtrlWord := Get8087CW();
   ALTestAndClearFPUExceptions(0);
   Set8087CW(CWNear);
 {$ENDIF CPUX86}
-{$IFDEF CPUX64}
+{$IF Defined(CPUX64)}
   { Prepare the FPU }
   LSavedMXCSR := GetMXCSR;
   ALTestAndClearSSEExceptions(0);
   SetMXCSR(MXCSRNear);
-{$ENDIF CPUX64}
-{$ENDIF NEXTGEN}
+{$IFEND Defined(CPUX64)}
+{$ENDIF EXTERNALLINKER}
 
   { Skip white spaces }
   SkipWhitespace();
@@ -7640,11 +7658,14 @@ begin
       LResult := 0;
 
       { Read the integer and fractionary parts }
-      ReadNumber(LResult);
+      IntPart := ReadNumber(LResult);
+      FracPart := 0;
+
       if LCurrChar = AFormatSettings.DecimalSeparator then
       begin
         NextChar();
-        LPower := -ReadNumber(LResult);
+        FracPart := ReadNumber(LResult);
+        LPower := -FracPart;
       end else
         LPower := 0;
 
@@ -7655,6 +7676,9 @@ begin
         Inc(LPower, ReadExponent());
       end;
 
+      if (IntPart = 0) and (FracPart = 0) then
+        exit; // Reject "E3" or ".E1" case.
+
       { Skip white spaces }
       SkipWhitespace();
 
@@ -7662,7 +7686,7 @@ begin
       if LCurrChar = #0 then
       begin
         { Calculate the final number }
-      {$IFDEF NEXTGEN}
+      {$IFDEF EXTERNALLINKER}
         try
           LResult := Power10(LResult, LPower) * LSign;
           AValue := LResult;
@@ -7670,17 +7694,17 @@ begin
         except
           Result := False;
         end;
-      {$ELSE  NEXTGEN}
+      {$ELSE !EXTERNALLINKER}
         LResult := Power10(LResult, LPower) * LSign;
         AValue := LResult;
-      {$ENDIF NEXTGEN}
+      {$ENDIF EXTERNALLINKER}
 
 
-{$IFDEF NEXTGEN}
+{$IFDEF EXTERNALLINKER}
 
 
 //        Result := True;
-{$ELSE  NEXTGEN}
+{$ELSE !EXTERNALLINKER}
 {$IFDEF CPUX86}
         { Final check that everything went OK }
         Result := ALTestAndClearFPUExceptions(mIE + mOE);
@@ -7689,29 +7713,29 @@ begin
         { Final check that everything went OK }
         Result := ALTestAndClearSSEExceptions(mIE + mOE);
 {$ENDIF CPUX64}
-{$ENDIF NEXTGEN}
+{$ENDIF EXTERNALLINKER}
       end;
     end;
   end;
 
   { Clear Math Exceptions }
-{$IFDEF NEXTGEN}
+{$IFDEF EXTERNALLINKER}
 
 //  FEnvSetRound(SavedRoundMode);
 //  FEnvSetExceptFlag(LDummyFlags, LSavedFlags);
-{$ELSE  NEXTGEN}
+{$ELSE  EXTERNALLINKER}
 {$IFDEF CPUX86}
   Set8087CW(LSavedCtrlWord);
 {$ENDIF CPUX86}
 {$IFDEF CPUX64}
   SetMXCSR(LSavedMXCSR);
 {$ENDIF CPUX64}
-{$ENDIF NEXTGEN}
+{$ENDIF EXTERNALLINKER}
 end;
 {$WARN SYMBOL_PLATFORM ON}
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.SysUtils.InternalTextToCurrency is still the same and adjust the IFDEF'}
 {$IFEND}
 //this function is not threadsafe because of Set8087CW
@@ -7720,20 +7744,24 @@ function ALInternalTextToCurrency(
   ABuffer: PansiChar;
   var AValue: Currency;
   const AFormatSettings: TALFormatSettings): Boolean;
-{$IFDEF EXTENDEDHAS10BYTES}
+{$IF Defined(EXTENDEDHAS10BYTES) and not Defined(Linux64)}
 const
   CMaxExponent = 4999;
   CExponent = 'E'; // DO NOT LOCALIZE;
   CPlus = '+';     // DO NOT LOCALIZE;
   CMinus = '-';    // DO NOT LOCALIZE;
 var
-{$IFDEF NEXTGEN}
+{$IFDEF EXTERNALLINKER}
 
-{$ELSE !NEXTGEN}
+{$ELSE  EXTERNALLINKER}
 {$IFDEF CPUX86}
+{$IF defined(CPUX86) and not defined(EXTENDEDHAS10BYTES)}
   LSavedCtrlWord: Word;
+{$IFEND CPUX86 and !EXTENDEDHAS10BYTES}
+{$ELSE}
+  {$MESSAGE ERROR 'Unknown platform'}
 {$ENDIF CPUX86}
-{$ENDIF NEXTGEN}
+{$ENDIF EXTERNALLINKER}
   LPower: Integer;
   LSign: SmallInt;
   LResult: Extended;
@@ -7796,21 +7824,25 @@ var
     Result := Result * LSign;
   end;
 
+var
+  IntPart, FracPart: Integer;
 begin
   { Prepare }
   Result := False;
   NextChar();
 
-{$IFDEF NEXTGEN}
+{$IFDEF EXTENDEDHAS10BYTES}
 
-{$ELSE  NEXTGEN}
+{$ELSE !EXTENDEDHAS10BYTES}
 {$IFDEF CPUX86}
   { Prepare the FPU }
   LSavedCtrlWord := Get8087CW();
   ALTestAndClearFPUExceptions(0);
   Set8087CW(CWNear);
+{$ELSE}
+  {$MESSAGE ERROR 'Unknown platform'}
 {$ENDIF CPUX86}
-{$ENDIF NEXTGEN}
+{$ENDIF EXTENDEDHAS10BYTES}
 
   { Skip white spaces }
   SkipWhitespace();
@@ -7826,11 +7858,14 @@ begin
       LResult := 0;
 
       { Read the integer and fractionary parts }
-      ReadNumber(LResult);
+      IntPart := ReadNumber(LResult);
+      FracPart := 0;
+
       if LCurrChar = AFormatSettings.DecimalSeparator then
       begin
         NextChar();
-        LPower := -ReadNumber(LResult);
+        FracPart := ReadNumber(LResult);
+        LPower := -FracPart;
       end else
         LPower := 0;
 
@@ -7840,6 +7875,9 @@ begin
         NextChar();
         Inc(LPower, ReadExponent());
       end;
+
+      if (IntPart = 0) and (FracPart = 0) then
+        exit; // Reject "E3" or ".E1" case.
 
       { Skip white spaces }
       SkipWhitespace();
@@ -7852,39 +7890,41 @@ begin
 
         Currency(AValue) := LResult;
 
-{$IFDEF NEXTGEN}
+{$IFDEF EXTENDEDHAS10BYTES}
 
 
         Result := true;
-{$ELSE  NEXTGEN}
+{$ELSE !EXTENDEDHAS10BYTES}
 {$IFDEF CPUX86}
         { Final check that everything went OK }
         Result := ALTestAndClearFPUExceptions(mIE + mOE);
+{$ELSE}
+  {$MESSAGE ERROR 'Unknown platform'}
 {$ENDIF CPUX86}
-{$ENDIF NEXTGEN}
+{$ENDIF EXTENDEDHAS10BYTES}
       end;
     end;
   end;
 
   { Clear Math Exceptions }
-{$IFDEF NEXTGEN}
+{$IFDEF EXTENDEDHAS10BYTES}
 
-{$ELSE  NEXTGEN}
+{$ELSE !EXTENDEDHAS10BYTES}
 {$IFDEF CPUX86}
   Set8087CW(LSavedCtrlWord);
+{$ELSE}
+  {$MESSAGE ERROR 'Unknown platform'}
 {$ENDIF CPUX86}
-{$ENDIF NEXTGEN}
+{$ENDIF EXTENDEDHAS10BYTES}
 end;
 {$ELSE !EXTENDEDHAS10BYTES}
 const
   CExponent = 'E'; // DO NOT LOCALIZE;
   CPlus = '+';     // DO NOT LOCALIZE;
   CMinus = '-';    // DO NOT LOCALIZE;
-  Int64MaxDiv10 = $CCCCCCCCCCCCCCC;
 var
   LPower: Integer;
   LSign: SmallInt;
-  LValue: UInt64;
   BufIndex: Integer;
 
   procedure SkipWhitespace;
@@ -7906,19 +7946,12 @@ var
     end;
   end;
 
-  function ReadNumber(var aValue: UInt64): Integer;
+  function ReadNumberPart: ansistring;
   begin
-    Result := 0;
+    Result := '';
     while ABuffer[BufIndex] in ['0'..'9'] do
     begin
-      if aValue >= Int64MaxDiv10 then
-      begin
-        if aValue > Int64MaxDiv10 then break
-        else if ABuffer[BufIndex] > '7' then break
-      end;
-      aValue := aValue * 10;
-      aValue := aValue + Ord(ABuffer[BufIndex]) - Ord('0');
-      Inc(Result);
+      Result := Result + ABuffer[BufIndex];
       Inc(BufIndex);
     end;
     // Skip remaining numbers.
@@ -7941,6 +7974,11 @@ var
     Result := Result * LSign;
   end;
 
+var
+  I: Integer;
+  U64: UInt64;
+  RoundUp: Boolean;
+  IntPart, FracPart: ansistring;
 begin
   { Prepare }
   BufIndex := 0;
@@ -7955,24 +7993,24 @@ begin
     LSign := ReadSign;
     if ABuffer[BufIndex] <> #0 then
     begin
-      { De result }
-      LValue := 0;
-
       { Read the integer and fractionary parts }
-      ReadNumber(LValue);
+      IntPart := ReadNumberPart;
       if ABuffer[BufIndex] = AFormatSettings.DecimalSeparator then
       begin
         Inc(BufIndex);
-        LPower := -ReadNumber(LValue);
-      end else
-        LPower := 0;
+        FracPart := ReadNumberPart;
+      end;
 
+      LPower := 0;
       { Read the exponent and adjust the power }
       if Char(Word(ABuffer[BufIndex]) and $FFDF) = CExponent then
       begin
         Inc(BufIndex);
-        Inc(LPower, ReadExponent);
+        LPower := ReadExponent;
       end;
+
+      if (IntPart = '') and (FracPart = '') then
+        Exit;
 
       { Skip white spaces }
       SkipWhitespace();
@@ -7983,33 +8021,64 @@ begin
         { Calculate the final number }
         LPower := LPower + 4; // Add Currency's offset digit
 
-        while LPower > 0 do
+        if LPower > 0 then
         begin
-          if LValue > Int64MaxDiv10 then
-            Exit(False); // overflow.
-          LValue := LValue * 10;
-          Dec(LPower);
-        end;
-        while LPower < 0 do
+          if Length(FracPart) < LPower then
+            FracPart := FracPart + StringOfChar(AnsiChar('0'), LPower);
+          IntPart := IntPart + Copy(FracPart, Low(ansiString), LPower);
+          FracPart := Copy(FracPart, Low(ansiString) + LPower);
+        end
+        else if LPower < 0 then
         begin
-          LValue := LValue div 10;
-          Inc(LPower);
+          LPower := - LPower;
+          if Length(IntPart) < LPower then
+            IntPart := StringOfChar(AnsiChar('0'), LPower) + IntPart;
+          FracPart := Copy(IntPart, Low(ansiString) + (Length(IntPart) - LPower), LPower) + FracPart;
+          IntPart := Copy(IntPart, Low(ansiString), Length(IntPart) - LPower);
         end;
 
-        PUInt64(@AValue)^ := LValue;
+        if IntPart = '' then
+          IntPart := '0';
+        U64 := _ALValInt64(IntPart, I);
+        if I <> 0 then Exit; // error.
+        if U64 > UInt64(Int64.MaxValue)+1 then Exit; // overflow error
+
+        if (FracPart <> '') and (FracPart[low(FracPart)] >= '5') then
+        begin
+          RoundUp := True;
+          if (FracPart[low(FracPart)] = '5') then
+          begin
+            RoundUp := False;
+            for I := low(FracPart) + 1 to high(FracPart) do
+              if IntPart[I] <> '0' then
+              begin
+                RoundUp := True;
+                Break;
+              end;
+            // exact half -> False / not half -> True
+            RoundUp := RoundUp or (IntPart[length(IntPart)] in ['1','3','5','7','9']);
+          end;
+          if RoundUp then
+            Inc(U64); // U64 is UInt64. no overflow.
+        end;
 
         if LSign < 0 then
-          AValue := -AValue;
-
+        begin
+          if U64 > UInt64(Int64.MaxValue)+1 then Exit;
+          U64 := (not U64) + 1; // nagate;
+        end
+        else
+          if U64 > Int64.MaxValue then Exit;
+        PUInt64(@AValue)^ := U64;
         Result := True;
       end;
     end;
   end;
 end;
-{$ENDIF EXTENDEDHAS10BYTES}
+{$IFEND !EXTENDEDHAS10BYTES}
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.SysUtils.TextToFloat is still the same and adjust the IFDEF'}
 {$IFEND}
 {$WARN SYMBOL_DEPRECATED OFF}
@@ -8197,7 +8266,7 @@ end;
 {$WARN SYMBOL_DEPRECATED ON}
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.SysUtils.InternalFloatToTextFmt is still the same and adjust the IFDEF'}
 {$IFEND}
 {$IFDEF PUREPASCAL}
@@ -8688,7 +8757,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if system.sysUtils.FloatToTextFmt is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALFloatToTextFmt(Buf: PAnsiChar; const Value; ValueType: TFloatValue;
@@ -12686,7 +12755,7 @@ begin
   // http://mormot.net
   //
 
-  {$IF CompilerVersion > 32} // tokyo
+  {$IF CompilerVersion > 33} // rio
     {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
   {$IFEND}
 

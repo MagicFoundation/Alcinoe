@@ -94,6 +94,7 @@ private:
 	Alcommon::TALPointD FUpVelocity;
 	Alcommon::TALPointD FUpPosition;
 	System::TDateTime FUpDownTime;
+	double FlastTickCalc;
 	System::TDateTime FLastTimeCalc;
 	System::Classes::TPersistent* FOwner;
 	Fmx::Types::_di_IFMXTimerService FPlatformTimer;
@@ -116,7 +117,7 @@ private:
 	System::TDateTime FLastTimeChanged;
 	Alcommon::TALPointD FDownPoint;
 	Alcommon::TALPointD FDownPosition;
-	System::Int8 FUpdateTimerCount;
+	int FUpdateTimerCount;
 	double FElasticity;
 	double FDecelerationRate;
 	double FStorageTime;
@@ -235,6 +236,7 @@ public:
 	__property bool Down = {read=FDown, write=SetDown, nodefault};
 	__property float Opacity = {read=GetOpacity};
 	__property bool InTimerProc = {read=FInTimerProc, nodefault};
+	void __fastcall WakeUpTimer(void);
 	void __fastcall Calculate(void);
 	__property bool Moved = {read=FMoved, nodefault};
 	__property bool LowVelocity = {read=GetLowVelocity, nodefault};

@@ -11,6 +11,7 @@ unit FMX.Platform.iOS;
 
 interface
 
+{$WARNINGS OFF}
 {$SCOPEDENUMS ON}
 
 uses

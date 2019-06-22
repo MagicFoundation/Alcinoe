@@ -26,10 +26,8 @@ type
   JALFileUtil = interface;
   JALDatePickerDialogListener = interface;
   JALDatePickerDialog = interface;
-  JALSoftInputListener = interface;
   JALKeyPreImeListener = interface;
   JALEditText = interface;
-  JALControlHostLayout = interface;
   JLog = interface;
   JStatFs = interface;
   JLocalBroadcastManager = interface;
@@ -99,20 +97,6 @@ type
   TJALDatePickerDialog = class(TJavaGenericImport<JALDatePickerDialogClass, JALDatePickerDialog>) end;
 
   {***********************************************}
-  JALSoftInputListenerClass = interface(IJavaClass)
-    ['{30390DEB-3807-4FD3-B0A9-5D53A3CC000A}']
-  end;
-
-  {*****************************************************************}
-  [JavaSignature('com/alcinoe/view/inputmethod/ALSoftInputListener')]
-  JALSoftInputListener = interface(IJavaInstance)
-    ['{674AD1A1-0A33-4519-978D-171D00176930}']
-    procedure onSoftInputShown; cdecl;
-    procedure onSoftInputHidden; cdecl;
-  end;
-  TJALSoftInputListener = class(TJavaGenericImport<JALSoftInputListenerClass, JALSoftInputListener>) end;
-
-  {***********************************************}
   JALKeyPreImeListenerClass = interface(IJavaClass)
     ['{E01C70E2-4BBF-47CB-8713-5A73344E9EA9}']
   end;
@@ -138,30 +122,10 @@ type
   [JavaSignature('com/alcinoe/edittext/ALEditText')]
   JALEditText = interface(JEditText)
     ['{A3E765A1-44EB-45C0-9AA5-19A38C029CE5}']
-    procedure showSoftInput; cdecl;
-    procedure hideSoftInput; cdecl;
-    procedure setSoftInputListener(listener: JALSoftInputListener); cdecl;
     procedure setKeyPreImeListener(listener: JALKeyPreImeListener); cdecl;
     procedure setMaxLength(value: integer); cdecl;
   end;
   TJALEditText = class(TJavaGenericImport<JALEditTextClass, JALEditText>) end;
-
-  {*******************************************************}
-  JALControlHostLayoutClass = interface(JLinearLayoutClass)
-    ['{4BB0539E-F89F-4C09-BE60-9AD04F4BBA57}']
-    {class} function init(context: JContext): JALControlHostLayout; cdecl; overload;
-    {class} function init(context: JContext; attrs: JAttributeSet): JALControlHostLayout; cdecl; overload;
-    {class} function init(context: JContext; attrs: JAttributeSet; defStyleAttr: Integer): JALControlHostLayout; cdecl; overload;
-    {class} function init(context: JContext; attrs: JAttributeSet; defStyleAttr: Integer; defStyleRes: Integer): JALControlHostLayout; cdecl; overload;
-  end;
-
-  {*******************************************************}
-  [JavaSignature('com/alcinoe/widget/ALControlHostLayout')]
-  JALControlHostLayout = interface(JLinearLayout)
-    ['{601855E2-9BCF-4FB6-8438-FD26D55FFD8D}']
-    function disableMoveAnimations: boolean; cdecl;
-  end;
-  TJALControlHostLayout = class(TJavaGenericImport<JALControlHostLayoutClass, JALControlHostLayout>) end;
 
   {*********************************}
   JLogClass = interface(JObjectClass)
@@ -846,10 +810,8 @@ begin
   TRegTypes.RegisterType('ALAndroidApi.JALFileUtil', TypeInfo(ALAndroidApi.JALFileUtil));
   TRegTypes.RegisterType('ALAndroidApi.JALDatePickerDialogListener', TypeInfo(ALAndroidApi.JALDatePickerDialogListener));
   TRegTypes.RegisterType('ALAndroidApi.JALDatePickerDialog', TypeInfo(ALAndroidApi.JALDatePickerDialog));
-  TRegTypes.RegisterType('ALAndroidApi.JALSoftInputListener', TypeInfo(ALAndroidApi.JALSoftInputListener));
   TRegTypes.RegisterType('ALAndroidApi.JALKeyPreImeListener', TypeInfo(ALAndroidApi.JALKeyPreImeListener));
   TRegTypes.RegisterType('ALAndroidApi.JALEditText', TypeInfo(ALAndroidApi.JALEditText));
-  TRegTypes.RegisterType('ALAndroidApi.JALControlHostLayout', TypeInfo(ALAndroidApi.JALControlHostLayout));
   TRegTypes.RegisterType('ALAndroidApi.JLog', TypeInfo(ALAndroidApi.JLog));
   TRegTypes.RegisterType('ALAndroidApi.JStatFs', TypeInfo(ALAndroidApi.JStatFs));
   TRegTypes.RegisterType('ALAndroidApi.JLocalBroadcastManager', TypeInfo(ALAndroidApi.JLocalBroadcastManager));

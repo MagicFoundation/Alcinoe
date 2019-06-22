@@ -1,6 +1,5 @@
 @SET BDS=C:\Program Files (x86)\Embarcadero\Studio\19.0
 @SET FrameworkDir=C:\Windows\Microsoft.NET\Framework\v3.5
-@SET FrameworkVersion=v3.5
 @SET PATH=%FrameworkDir%;%PATH%
 
 @echo off
@@ -50,7 +49,7 @@ mkdir %FileName%
 MSBuild source\Alcinoe_tokyo.dproj /p:Config=Release /p:Platform=Win32
 IF ERRORLEVEL 1 goto ERROR
 
-call compilejar_tokyo.bat off
+call compilejar.bat off
 
 if "%INPUT%"=="Y" goto BUILD_DEMOS
 if "%INPUT%"=="y" goto BUILD_DEMOS

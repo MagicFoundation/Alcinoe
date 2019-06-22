@@ -15,6 +15,7 @@
 #include <System.hpp>
 #include <SysInit.hpp>
 #include <System.Classes.hpp>
+#include <System.SysUtils.hpp>
 #include <System.Types.hpp>
 #include <System.UITypes.hpp>
 #include <FMX.Graphics.hpp>
@@ -168,6 +169,8 @@ extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadNormalizeOrientat
 extern DELPHI_PACKAGE TalExifOrientationInfo __fastcall AlGetExifOrientationInfo(const System::UnicodeString aFilename);
 extern DELPHI_PACKAGE void __fastcall ALNormalizeImageOrientationV1(Fmx::Graphics::TBitmap* const aBitmap, const TalExifOrientationInfo aExifOrientationInfo);
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALNormalizeImageOrientationV2(Fmx::Graphics::TBitmap* const aBitmap, const TalExifOrientationInfo aExifOrientationInfo);
+extern DELPHI_PACKAGE System::DynamicArray<System::Byte> __fastcall AlGetImageSignature(System::Classes::TStream* const aStream)/* overload */;
+extern DELPHI_PACKAGE System::DynamicArray<System::Byte> __fastcall AlGetImageSignature(const System::UnicodeString aFileName)/* overload */;
 extern DELPHI_PACKAGE System::UnicodeString __fastcall AlDetectImageExtensionU(System::Classes::TStream* const aStream)/* overload */;
 extern DELPHI_PACKAGE System::UnicodeString __fastcall AlDetectImageExtensionU(const System::UnicodeString aFileName)/* overload */;
 extern DELPHI_PACKAGE System::Uitypes::TAlphaColor __fastcall ALPrepareColor(const System::Uitypes::TAlphaColor SrcColor, const float Opacity);

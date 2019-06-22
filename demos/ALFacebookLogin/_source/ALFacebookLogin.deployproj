@@ -4,14 +4,32 @@
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>
     <PropertyGroup>
-        <DeviceId Condition="'$(Platform)'=='Android'">UEEDU18728001190</DeviceId>
-        <DeviceId Condition="'$(Platform)'=='iOSDevice32'">6914273922841a588ebde9ed00849d75c1793868</DeviceId>
-        <DeviceId Condition="'$(Platform)'=='iOSDevice64'">6914273922841a588ebde9ed00849d75c1793868</DeviceId>
+        <DeviceId Condition="'$(Platform)'=='Android'"/>
+        <DeviceId Condition="'$(Platform)'=='iOSDevice32'">1269d5786e75bc1b4c1469f4bacd0b66bb640f13</DeviceId>
+        <DeviceId Condition="'$(Platform)'=='iOSDevice64'">1269d5786e75bc1b4c1469f4bacd0b66bb640f13</DeviceId>
         <DeviceId Condition="'$(Platform)'=='iOSSimulator'">8B7C80D2-24B6-4168-A77A-9842FE73EDD4</DeviceId>
     </PropertyGroup>
     <ItemGroup Condition="'$(Platform)'=='iOSDevice64'"/>
     <ItemGroup Condition="'$(Platform)'=='Win64'"/>
     <ItemGroup Condition="'$(Platform)'=='iOSDevice32'">
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageLandscape_2224x1668.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>Default-Landscape-1668w-2224h@2x~ipad.png</RemoteName>
+            <DeployClass>iPad_Launch2224</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageLandscape_2388x1668.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>Default-Landscape-1668w-2388h@2x~ipad.png</RemoteName>
+            <DeployClass>iPad_Launch2388x1668</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin.app\</RemoteDir>
             <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
@@ -34,6 +52,24 @@
             <RemoteDir>ALFacebookLogin.app\</RemoteDir>
             <RemoteName>FM_SettingIcon_29x29.png</RemoteName>
             <DeployClass>iPad_Setting29</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>FM_SpotlightSearchIcon_120x120.png</RemoteName>
+            <DeployClass>iPhone_Spotlight120</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_1136x640.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>Default-Landscape-640w-1136h@2x.png</RemoteName>
+            <DeployClass>iPhone_Launch1136x640</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
@@ -70,6 +106,15 @@
             <RemoteDir>ALFacebookLogin.app\</RemoteDir>
             <RemoteName>FM_ApplicationIcon_120x120.png</RemoteName>
             <DeployClass>iPhone_AppIcon120</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>FM_ApplicationIcon_167x167.png</RemoteName>
+            <DeployClass>iPad_AppIcon167</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
@@ -129,6 +174,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_1125x2436.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>Default-1125w-2436h@3x.png</RemoteName>
+            <DeployClass>iPhone_Launch1125</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_58x58.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin.app\</RemoteDir>
             <RemoteName>FM_SpotlightSearchIcon_58x58.png</RemoteName>
@@ -143,6 +197,42 @@
             <RemoteName>Default-Landscape.png</RemoteName>
             <DeployClass>iPad_Launch1024</DeployClass>
             <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImagePortrait_1668x2388.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>Default-1668w-2388h@2x~ipad.png</RemoteName>
+            <DeployClass>iPad_Launch1668x2388</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_1242x2688.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>Default-1242w-2688h@3x.png</RemoteName>
+            <DeployClass>iPhone_Launch1242x2688</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_1334x750.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>Default-Landscape-750w-1334h@2x.png</RemoteName>
+            <DeployClass>iPhone_Launch1334</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_1792x828.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>Default-Landscape-828w-1792h@2x.png</RemoteName>
+            <DeployClass>iPhone_Launch1792</DeployClass>
+            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -193,11 +283,29 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImagePortrait_1668x2224.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>Default-1668w-2224h@2x~ipad.png</RemoteName>
+            <DeployClass>iPad_Launch1668</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageLandscape_2048x1496.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin.app\</RemoteDir>
             <RemoteName>Default-Landscape@2x.png</RemoteName>
             <DeployClass>iPad_Launch2048</DeployClass>
             <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2688x1242.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>Default-Landscape-1242w-2688h@3x.png</RemoteName>
+            <DeployClass>iPhone_Launch2688x1242</DeployClass>
+            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -247,6 +355,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2436x1125.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>Default-Landscape-1125w-2436h@3x.png</RemoteName>
+            <DeployClass>iPhone_Launch2436</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_57x57.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin.app\</RemoteDir>
             <RemoteName>FM_ApplicationIcon_57x57.png</RemoteName>
@@ -265,11 +382,38 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageLandscape_2732x2048.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>Default-Landscape-2048w-2732h@2x~ipad.png</RemoteName>
+            <DeployClass>iPad_Launch2732x2048</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImagePortrait_2048x2732.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>Default-2048w-2732h@2x~ipad.png</RemoteName>
+            <DeployClass>iPad_Launch2048x2732</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="..\iOSDevice32\Debug\ALFacebookLogin.entitlements" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin.app\..\</RemoteDir>
             <RemoteName>ALFacebookLogin.entitlements</RemoteName>
             <DeployClass>ProjectiOSEntitlements</DeployClass>
             <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_828x1792.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>Default-828w-1792h@2x.png</RemoteName>
+            <DeployClass>iPhone_Launch828</DeployClass>
+            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -305,6 +449,15 @@
             <RemoteDir>ALFacebookLogin.app\</RemoteDir>
             <RemoteName>FM_ApplicationIcon_60x60.png</RemoteName>
             <DeployClass>iPhone_AppIcon60</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_83.5x83.5.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>FM_ApplicationIcon_83.5x83.5.png</RemoteName>
+            <DeployClass>iPad_AppIcon83_5</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
@@ -399,9 +552,9 @@
         </DeployFile>
     </ItemGroup>
     <ItemGroup Condition="'$(Platform)'=='Android'">
-        <DeployFile Include="android\res\values-hu\values-hu.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-hu\</RemoteDir>
-            <RemoteName>values-hu.xml</RemoteName>
+        <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_btn_switch_to_on_mtrl_00001.9.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
+            <RemoteName>abc_btn_switch_to_on_mtrl_00001.9.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -543,6 +696,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="android\res\values-te\values-te.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-te\</RemoteDir>
+            <RemoteName>values-te.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="android\res\layout\notification_template_big_media.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFacebookLogin\res\layout\</RemoteDir>
             <RemoteName>notification_template_big_media.xml</RemoteName>
@@ -555,15 +717,6 @@
         <DeployFile Include="android\res\values-sw600dp-v13\values-sw600dp-v13.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFacebookLogin\res\values-sw600dp-v13\</RemoteDir>
             <RemoteName>values-sw600dp-v13.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="android\res\values-te\values-te.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\values-te\</RemoteDir>
-            <RemoteName>values-te.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -10688,9 +10841,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-xxhdpi-v4\abc_btn_switch_to_on_mtrl_00001.9.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFacebookLogin\res\drawable-xxhdpi-v4\</RemoteDir>
-            <RemoteName>abc_btn_switch_to_on_mtrl_00001.9.png</RemoteName>
+        <DeployFile Include="android\res\drawable-ldrtl-xxxhdpi-v17\abc_ic_menu_cut_mtrl_alpha.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\drawable-ldrtl-xxxhdpi-v17\</RemoteDir>
+            <RemoteName>abc_ic_menu_cut_mtrl_alpha.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -10706,9 +10859,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-ldrtl-xxxhdpi-v17\abc_ic_menu_cut_mtrl_alpha.png" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFacebookLogin\res\drawable-ldrtl-xxxhdpi-v17\</RemoteDir>
-            <RemoteName>abc_ic_menu_cut_mtrl_alpha.png</RemoteName>
+        <DeployFile Include="android\res\values-hu\values-hu.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFacebookLogin\res\values-hu\</RemoteDir>
+            <RemoteName>values-hu.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -11028,6 +11181,15 @@
             <RemoteName>FM_ApplicationIcon_57x57.png</RemoteName>
             <DeployClass>iPhone_AppIcon57</DeployClass>
             <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\Redist\iossimulator\libpcre.dylib">
+            <RemoteDir>ALFacebookLogin.app\</RemoteDir>
+            <RemoteName>libpcre.dylib</RemoteName>
+            <DeployClass>DependencyModule</DeployClass>
+            <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>

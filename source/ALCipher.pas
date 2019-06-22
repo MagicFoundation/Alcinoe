@@ -12,7 +12,7 @@ interface
   {$IF defined(CPUX64)} // The CPU supports the x86-64 instruction set, and is in a 64-bit environment. *New* in XE2/x64
     {$DEFINE CPU64BITS} // The CPU is in a 64-bit environment, such as DCC64.EXE. *New* in XE8
   {$ENDIF}
-  {$IF defined(CPUX86)} // 	The CPU supports the x86-64 instruction set, and is in a 64-bit environment. *New* in XE2/x64
+  {$IF defined(CPUX86)} //   The CPU supports the x86-64 instruction set, and is in a 64-bit environment. *New* in XE2/x64
     {$DEFINE CPU32BITS} // The CPU is in a 32-bit environment, such as DCC32.EXE. *New* in XE8
   {$ENDIF}
 {$ENDIF}
@@ -110,17 +110,14 @@ procedure ALBFEncryptStreamCBC(InStream, OutStream: TStream; const Key: AnsiStri
 ////////////////////////////
 
 type
-
-  {$IF CompilerVersion > 32} // tokyo
-    {$MESSAGE WARN 'Check if in ios64 we still need the packed keyword and adjust the IFDEF'}
-  {$IFEND}
-  TALRDLVector = packed record // << https://quality.embarcadero.com/browse/RSP-20976
-                               // << without the keyword packed i have under tokyo ios64 compiler this strange error:
-                               // << Backend error: Function return type does not match operand type of return inst!
-                               // <<   ret void
-                               // << i64Function return type does not match operand type of return inst!
-                               // <<   ret void
-                               // << i64
+  TALRDLVector = {$IF CompilerVersion <= 32} packed {$IFEND} record // << under tokyo :
+                                                                    // << https://quality.embarcadero.com/browse/RSP-20976
+                                                                    // << without the keyword packed i have under tokyo ios64 compiler this strange error:
+                                                                    // << Backend error: Function return type does not match operand type of return inst!
+                                                                    // <<   ret void
+                                                                    // << i64Function return type does not match operand type of return inst!
+                                                                    // <<   ret void
+                                                                    // << i64
     case Byte of
       0 : (dw : DWord);
       1 : (bt : array[0..3] of Byte);
@@ -1203,7 +1200,7 @@ end;
 // Taken from https://github.com/JackTrapper/bcrypt-for-delphi
 //
 
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if https://github.com/JackTrapper/bcrypt-for-delphi bcrypt.pas was not updated from references\bcrypt-for-delphi\Bcrypt.pas and adjust the IFDEF'}
 {$IFEND}
 
@@ -1211,75 +1208,82 @@ end;
 
 type
 
-	TBlowfishData= record
-		InitBlock: array[0..7] of Byte;    { initial IV }
-		LastBlock: array[0..7] of Byte;    { current IV }
-		SBoxM: array[0..3, 0..255] of DWORD;
-		PBoxM: array[0..17] of DWORD;
-	end;
+  TBlowfishData= record
+    InitBlock: array[0..7] of Byte;    { initial IV }
+    LastBlock: array[0..7] of Byte;    { current IV }
+    SBoxM: array[0..3, 0..255] of DWORD;
+    PBoxM: array[0..17] of DWORD;
+  end;
 
-	TBCrypt = class(TObject)
-	private
-		class function TryParseHashString(const hashString: AnsiString; out version: byte; out Cost: byte; out Salt: TBytes; out MCFEncoded: boolean): Boolean;
+  TBCrypt = class(TObject)
+  private
+    class function TryParseHashString(const hashString: AnsiString; out version: byte; out Cost: byte; out Salt: TBytes; out MCFEncoded: boolean): Boolean;
     class procedure BlowfishEncryptECB(const Data: TBlowfishData; InData, OutData: Pointer);
-	protected
+  protected
     class function IntVersionToBsdStr(const version: byte): ansiString;
     class function BsdStrVersionToInt(const version: ansiString): Byte;
-		class function EksBlowfishSetup(const Cost: Integer; salt, key: array of Byte): TBlowfishData;
-		class procedure ExpandKey(var state: TBlowfishData; salt, key: array of Byte);
-		class function CryptCore(const Cost: Integer; Key: array of Byte; salt: array of Byte): TBytes;
-		class function FormatPasswordHashForBsd(const Version: byte; const cost: integer; const salt: array of Byte; const hash: array of Byte): AnsiString;
+    class function EksBlowfishSetup(const Cost: Integer; salt, key: array of Byte): TBlowfishData;
+    class procedure ExpandKey(var state: TBlowfishData; salt, key: array of Byte);
+    class function CryptCore(const Cost: Integer; Key: array of Byte; salt: array of Byte): TBytes;
+    class function FormatPasswordHashForBsd(const Version: byte; const cost: integer; const salt: array of Byte; const hash: array of Byte): AnsiString;
     class function FormatPasswordHashForBin(const Version: byte; const cost: byte; const salt, hash: TBytes): AnsiString;
     class function BsdBase64Encode(const data: array of Byte; BytesToEncode: Integer): AnsiString;
-		class function BsdBase64Decode(const s: AnsiString): TBytes;
-		class function SelfTestA: Boolean; //known test vectors
-		class function SelfTestB: Boolean; //BSD's base64 encoder/decoder
-		class function SelfTestD: Boolean; //different length passwords
-		class function SelfTestE: Boolean; //salt rng
-		class function SelfTestF: Boolean; //correctbatteryhorsestapler
-		class function SelfTestG: Boolean; //check that we support up to 72 characters
-		class function SelfTestH: Boolean; //check that we don't limit our passwords to 256 characters (as OpenBSD did)
-		class function GetModernCost(SampleCost: Integer; SampleHashDurationMS: Real): Integer;
-		class function GetModernCost_Benchmark: Integer;
-		class function TimingSafeSameString(const Safe, User: AnsiString): Boolean;
-		class function PasswordRehashNeededCore(const Version: byte; const Cost: integer; SampleCost: integer; SampleHashDurationMS: Real): Boolean;
-	public
-		class function HashPassword(const password: AnsiString; const MCFEncode: boolean = True): AnsiString; overload;
-		class function HashPassword(const password: AnsiString; cost: Integer; const MCFEncode: boolean = True): AnsiString; overload;
-		class function HashPassword(const password: AnsiString; const salt: array of Byte; const cost: Integer): TBytes; overload;
-		class function CheckPassword(const password: AnsiString; const expectedHashString: AnsiString; out PasswordRehashNeeded: Boolean): Boolean; overload;
-		class function GenerateSalt: TBytes;
-		class function PasswordRehashNeeded(const HashString: AnsiString): Boolean;
-		class function SelfTest: Boolean;
-	end;
+    class function BsdBase64Decode(const s: AnsiString): TBytes;
+    class function SelfTestA: Boolean; //known test vectors
+    class function SelfTestB: Boolean; //BSD's base64 encoder/decoder
+    class function SelfTestD: Boolean; //different length passwords
+    class function SelfTestE: Boolean; //salt rng
+    class function SelfTestF: Boolean; //correctbatteryhorsestapler
+    class function SelfTestG: Boolean; //check that we support up to 72 characters
+    class function SelfTestH: Boolean; //check that we don't limit our passwords to 256 characters (as OpenBSD did)
+    class function GetModernCost(SampleCost: Integer; SampleHashDurationMS: Real): Integer;
+    class function GetModernCost_Benchmark: Integer;
+    class function TimingSafeSameString(const Safe, User: AnsiString): Boolean;
+    class function PasswordRehashNeededCore(const Version: byte; const Cost: integer; SampleCost: integer; SampleHashDurationMS: Real): Boolean;
+  public
+    class function HashPassword(const password: AnsiString; const MCFEncode: boolean = True): AnsiString; overload;
+    class function HashPassword(const password: AnsiString; cost: Integer; const MCFEncode: boolean = True): AnsiString; overload;
+    class function HashPassword(const password: AnsiString; const salt: array of Byte; const cost: Integer): TBytes; overload;
+    class function CheckPassword(const password: AnsiString; const expectedHashString: AnsiString; out PasswordRehashNeeded: Boolean): Boolean; overload;
+    class function GenerateSalt: TBytes;
+    class function PasswordRehashNeeded(const HashString: AnsiString): Boolean;
+    class function SelfTest: Boolean;
+  end;
 
-	EBCryptException = class(Exception);
+  EBCryptException = class(Exception);
 
 const
-	BCRYPT_COST = 11; //cost determintes the number of rounds. 11 = 2^11 rounds (2,048)
-	//
-	//	| Cost | Iterations        | E6300        | E5-2620     | i5-2500    | i7-2700K    |
-	//	|                          |      2006-Q3 |     2012-Q1 |    2011-Q1 |     2011-Q4 |
-	//	|                          |     1.86 GHz |       2 GHz |    3.3 GHz |     3.5 GHz |
-	//	|------|-------------------|--------------|-------------|------------|-------------|
-	//	|    8 |    256 iterations |     61.65 ms |     48.8 ms |    21.7 ms |     20.8 ms |  <-- minimum allowed by BCrypt
-	//	|    9 |    512 iterations |    126.09 ms |     77.7 ms |    43.3 ms |     41.5 ms |
-	//	|   10 |  1,024 iterations |    249.10 ms |    128.8 ms |    85.5 ms |     83.2 ms |
-	//	|   11 |  2,048 iterations |    449.23 ms |    250.1 ms |   173.3 ms |    166.8 ms |  <-- current default (BCRYPT_COST=11)
-	//	|   12 |  4,096 iterations |  1,007.05 ms |    498.8 ms |   345.6 ms |    333.4 ms |
-	//	|   13 |  8,192 iterations |  1,995.48 ms |    999.1 ms |   694.3 ms |    667.9 ms |
-	//	|   14 | 16,384 iterations |  4,006.78 ms |  1,997.6 ms | 1,390.5 ms |  1,336.5 ms |
-	//	|   15 | 32,768 iterations |  8,027.05 ms |  3,999.9 ms | 2,781.4 ms |  2,670.5 ms |
-	//	|   16 | 65,536 iterations | 15,982.14 ms |  8,008.2 ms | 5,564.9 ms |  5,342.8 ms |
+  BCRYPT_COST = 11; //cost determintes the number of rounds. 11 = 2^11 rounds (2,048)
   //
-	//	In 1977, on a VAX-11/780, crypt (MD5) could be evaluated about 3.6 times per second.
-	//		-->  277 ms per password
-	//	277 ms per hash would mean a range of 180ms-360ms
-	//	We want to target between 250-500ms per hash.
+  //  | Cost | Iterations        | E6300        | E5-2620     | i5-2500    | i7-2700K    |
+  //  |                          |      2006-Q3 |     2012-Q1 |    2011-Q1 |     2011-Q4 |
+  //  |                          |     1.86 GHz |       2 GHz |    3.3 GHz |     3.5 GHz |
+  //  |------|-------------------|--------------|-------------|------------|-------------|
+  //  |    8 |    256 iterations |     61.65 ms |     48.8 ms |    21.7 ms |     20.8 ms |  <-- minimum allowed by BCrypt
+  //  |    9 |    512 iterations |    126.09 ms |     77.7 ms |    43.3 ms |     41.5 ms |
+  //  |   10 |  1,024 iterations |    249.10 ms |    128.8 ms |    85.5 ms |     83.2 ms |
+  //  |   11 |  2,048 iterations |    449.23 ms |    250.1 ms |   173.3 ms |    166.8 ms |  <-- current default (BCRYPT_COST=11)
+  //  |   12 |  4,096 iterations |  1,007.05 ms |    498.8 ms |   345.6 ms |    333.4 ms |
+  //  |   13 |  8,192 iterations |  1,995.48 ms |    999.1 ms |   694.3 ms |    667.9 ms |
+  //  |   14 | 16,384 iterations |  4,006.78 ms |  1,997.6 ms | 1,390.5 ms |  1,336.5 ms |
+  //  |   15 | 32,768 iterations |  8,027.05 ms |  3,999.9 ms | 2,781.4 ms |  2,670.5 ms |
+  //  |   16 | 65,536 iterations | 15,982.14 ms |  8,008.2 ms | 5,564.9 ms |  5,342.8 ms |
+  //
+  //  At the time of deployment in 1976, crypt could hash fewer than 4 passwords per second. (250 ms per password)
+  //   In 1977, on a VAX-11/780, crypt (MD5) could be evaluated about 3.6 times per second.   (277 ms per password)
+  //   If 277 ms per hash was our target, it would mean a range of 180 ms..360 ms.
+  //
+  //   At the time of publication of BCrypt (1999) the default costs were:
+  //     - Normal User: 6
+  //     - the Superuser: 8
+  //
+  //     "Of course, whatever cost people choose should be reevaluated from time to time."
+  //
+  //   We want to target between 250-500ms per hash.
   //
 
-	BCRYPT_SALT_LEN = 16; //bcrypt uses 128-bit (16-byte) salt (This isn't an adjustable parameter, just a name for a constant)
-	BCRYPT_MaxKeyLen = 72; //72 bytes ==> 71 ansi charcters + null terminator
+  BCRYPT_SALT_LEN = 16; //bcrypt uses 128-bit (16-byte) salt (This isn't an adjustable parameter, just a name for a constant)
+  BCRYPT_MaxKeyLen = 72; //72 bytes ==> 71 ansi charcters + null terminator
 
   BCRYPT_version_2 = 1;     //
   BCRYPT_version_2a = 2;    // WARNING: if you change one of theses values, it's must never be 36 ($)
@@ -1287,55 +1291,55 @@ const
   BCRYPT_version_2y = 4;    //
   BCRYPT_version_2b = 5;    //
 
-	BsdBase64EncodeTable: array[0..63] of ansiChar =
-			{ 0:} './'+
-			{ 2:} 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'+
-			{28:} 'abcdefghijklmnopqrstuvwxyz'+
-			{54:} '0123456789';
+  BsdBase64EncodeTable: array[0..63] of ansiChar =
+      { 0:} './'+
+      { 2:} 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'+
+      {28:} 'abcdefghijklmnopqrstuvwxyz'+
+      {54:} '0123456789';
 
-			//the traditional base64 encode table:
-			//'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
-			//'abcdefghijklmnopqrstuvwxyz' +
-			//'0123456789+/';
+      //the traditional base64 encode table:
+      //'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
+      //'abcdefghijklmnopqrstuvwxyz' +
+      //'0123456789+/';
 
-	BsdBase64DecodeTable: array[#0..#127] of Integer = (
-			{  0:} -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  // ________________
-			{ 16:} -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  // ________________
-			{ 32:} -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  0,  1,  // ______________./
-			{ 48:} 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, -1, -1, -1, -1, -1, -1,  // 0123456789______
-			{ 64:} -1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16,  // _ABCDEFGHIJKLMNO
-			{ 80:} 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, -1, -1, -1, -1,  // PQRSTUVWXYZ_____
-			{ 96:} -1, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,  // _abcdefghijklmno
-			{113:} 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, -1, -1, -1, -1, -1); // pqrstuvwxyz_____
+  BsdBase64DecodeTable: array[#0..#127] of Integer = (
+      {  0:} -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  // ________________
+      { 16:} -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  // ________________
+      { 32:} -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  0,  1,  // ______________./
+      { 48:} 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, -1, -1, -1, -1, -1, -1,  // 0123456789______
+      { 64:} -1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16,  // _ABCDEFGHIJKLMNO
+      { 80:} 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, -1, -1, -1, -1, -1,  // PQRSTUVWXYZ_____
+      { 96:} -1, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,  // _abcdefghijklmno
+      {113:} 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, -1, -1, -1, -1, -1); // pqrstuvwxyz_____
 
-	TestVectors: array[1..20, 1..3] of AnsiString = (
-			('',                                   '$2a$06$DCq7YPn5Rq63x1Lad4cll.',    '$2a$06$DCq7YPn5Rq63x1Lad4cll.TV4S6ytwfsfvkgY8jIucDrjc8deX1s.'),
-			('',                                   '$2a$08$HqWuK6/Ng6sg9gQzbLrgb.',    '$2a$08$HqWuK6/Ng6sg9gQzbLrgb.Tl.ZHfXLhvt/SgVyWhQqgqcZ7ZuUtye'),
-			('',                                   '$2a$10$k1wbIrmNyFAPwPVPSVa/ze',    '$2a$10$k1wbIrmNyFAPwPVPSVa/zecw2BCEnBwVS2GbrmgzxFUOqW9dk4TCW'),
-			('',                                   '$2a$12$k42ZFHFWqBp3vWli.nIn8u',    '$2a$12$k42ZFHFWqBp3vWli.nIn8uYyIkbvYRvodzbfbK18SSsY.CsIQPlxO'),
-			('a',                                  '$2a$06$m0CrhHm10qJ3lXRY.5zDGO',    '$2a$06$m0CrhHm10qJ3lXRY.5zDGO3rS2KdeeWLuGmsfGlMfOxih58VYVfxe'),
-			('a',                                  '$2a$08$cfcvVd2aQ8CMvoMpP2EBfe',    '$2a$08$cfcvVd2aQ8CMvoMpP2EBfeodLEkkFJ9umNEfPD18.hUF62qqlC/V.'),
-			('a',                                  '$2a$10$k87L/MF28Q673VKh8/cPi.',    '$2a$10$k87L/MF28Q673VKh8/cPi.SUl7MU/rWuSiIDDFayrKk/1tBsSQu4u'),
-			('a',                                  '$2a$12$8NJH3LsPrANStV6XtBakCe',    '$2a$12$8NJH3LsPrANStV6XtBakCez0cKHXVxmvxIlcz785vxAIZrihHZpeS'),
-			('abc',                                '$2a$06$If6bvum7DFjUnE9p2uDeDu',    '$2a$06$If6bvum7DFjUnE9p2uDeDu0YHzrHM6tf.iqN8.yx.jNN1ILEf7h0i'),
-			('abc',                                '$2a$08$Ro0CUfOqk6cXEKf3dyaM7O',    '$2a$08$Ro0CUfOqk6cXEKf3dyaM7OhSCvnwM9s4wIX9JeLapehKK5YdLxKcm'),
-			('abc',                                '$2a$10$WvvTPHKwdBJ3uk0Z37EMR.',    '$2a$10$WvvTPHKwdBJ3uk0Z37EMR.hLA2W6N9AEBhEgrAOljy2Ae5MtaSIUi'),
-			('abc',                                '$2a$12$EXRkfkdmXn2gzds2SSitu.',    '$2a$12$EXRkfkdmXn2gzds2SSitu.MW9.gAVqa9eLS1//RYtYCmB1eLHg.9q'),
-			('abcdefghijklmnopqrstuvwxyz',         '$2a$06$.rCVZVOThsIa97pEDOxvGu',    '$2a$06$.rCVZVOThsIa97pEDOxvGuRRgzG64bvtJ0938xuqzv18d3ZpQhstC'),
-			('abcdefghijklmnopqrstuvwxyz',         '$2a$08$aTsUwsyowQuzRrDqFflhge',    '$2a$08$aTsUwsyowQuzRrDqFflhgekJ8d9/7Z3GV3UcgvzQW3J5zMyrTvlz.'),
-			('abcdefghijklmnopqrstuvwxyz',         '$2a$10$fVH8e28OQRj9tqiDXs1e1u',    '$2a$10$fVH8e28OQRj9tqiDXs1e1uxpsjN0c7II7YPKXua2NAKYvM6iQk7dq'),
-			('abcdefghijklmnopqrstuvwxyz',         '$2a$12$D4G5f18o7aMMfwasBL7Gpu',    '$2a$12$D4G5f18o7aMMfwasBL7GpuQWuP3pkrZrOAnqP.bmezbMng.QwJ/pG'),
-			('~!@#$%^&*()      ~!@#$%^&*()PNBFRD', '$2a$06$fPIsBO8qRqkjj273rfaOI.',    '$2a$06$fPIsBO8qRqkjj273rfaOI.HtSV9jLDpTbZn782DC6/t7qT67P6FfO'),
-			('~!@#$%^&*()      ~!@#$%^&*()PNBFRD', '$2a$08$Eq2r4G/76Wv39MzSX262hu',    '$2a$08$Eq2r4G/76Wv39MzSX262huzPz612MZiYHVUJe/OcOql2jo4.9UxTW'),
-			('~!@#$%^&*()      ~!@#$%^&*()PNBFRD', '$2a$10$LgfYWkbzEvQ4JakH7rOvHe',    '$2a$10$LgfYWkbzEvQ4JakH7rOvHe0y8pHKF9OaFgwUZ2q7W2FFZmZzJYlfS'),
-			('~!@#$%^&*()      ~!@#$%^&*()PNBFRD', '$2a$12$WApznUOJfkEGSmYRfnkrPO',    '$2a$12$WApznUOJfkEGSmYRfnkrPOr466oFDCaj4b6HY3EXGvfxm43seyhgC')
-	);
+  TestVectors: array[1..20, 1..3] of AnsiString = (
+      ('',                                   '$2a$06$DCq7YPn5Rq63x1Lad4cll.',    '$2a$06$DCq7YPn5Rq63x1Lad4cll.TV4S6ytwfsfvkgY8jIucDrjc8deX1s.'),
+      ('',                                   '$2a$08$HqWuK6/Ng6sg9gQzbLrgb.',    '$2a$08$HqWuK6/Ng6sg9gQzbLrgb.Tl.ZHfXLhvt/SgVyWhQqgqcZ7ZuUtye'),
+      ('',                                   '$2a$10$k1wbIrmNyFAPwPVPSVa/ze',    '$2a$10$k1wbIrmNyFAPwPVPSVa/zecw2BCEnBwVS2GbrmgzxFUOqW9dk4TCW'),
+      ('',                                   '$2a$12$k42ZFHFWqBp3vWli.nIn8u',    '$2a$12$k42ZFHFWqBp3vWli.nIn8uYyIkbvYRvodzbfbK18SSsY.CsIQPlxO'),
+      ('a',                                  '$2a$06$m0CrhHm10qJ3lXRY.5zDGO',    '$2a$06$m0CrhHm10qJ3lXRY.5zDGO3rS2KdeeWLuGmsfGlMfOxih58VYVfxe'),
+      ('a',                                  '$2a$08$cfcvVd2aQ8CMvoMpP2EBfe',    '$2a$08$cfcvVd2aQ8CMvoMpP2EBfeodLEkkFJ9umNEfPD18.hUF62qqlC/V.'),
+      ('a',                                  '$2a$10$k87L/MF28Q673VKh8/cPi.',    '$2a$10$k87L/MF28Q673VKh8/cPi.SUl7MU/rWuSiIDDFayrKk/1tBsSQu4u'),
+      ('a',                                  '$2a$12$8NJH3LsPrANStV6XtBakCe',    '$2a$12$8NJH3LsPrANStV6XtBakCez0cKHXVxmvxIlcz785vxAIZrihHZpeS'),
+      ('abc',                                '$2a$06$If6bvum7DFjUnE9p2uDeDu',    '$2a$06$If6bvum7DFjUnE9p2uDeDu0YHzrHM6tf.iqN8.yx.jNN1ILEf7h0i'),
+      ('abc',                                '$2a$08$Ro0CUfOqk6cXEKf3dyaM7O',    '$2a$08$Ro0CUfOqk6cXEKf3dyaM7OhSCvnwM9s4wIX9JeLapehKK5YdLxKcm'),
+      ('abc',                                '$2a$10$WvvTPHKwdBJ3uk0Z37EMR.',    '$2a$10$WvvTPHKwdBJ3uk0Z37EMR.hLA2W6N9AEBhEgrAOljy2Ae5MtaSIUi'),
+      ('abc',                                '$2a$12$EXRkfkdmXn2gzds2SSitu.',    '$2a$12$EXRkfkdmXn2gzds2SSitu.MW9.gAVqa9eLS1//RYtYCmB1eLHg.9q'),
+      ('abcdefghijklmnopqrstuvwxyz',         '$2a$06$.rCVZVOThsIa97pEDOxvGu',    '$2a$06$.rCVZVOThsIa97pEDOxvGuRRgzG64bvtJ0938xuqzv18d3ZpQhstC'),
+      ('abcdefghijklmnopqrstuvwxyz',         '$2a$08$aTsUwsyowQuzRrDqFflhge',    '$2a$08$aTsUwsyowQuzRrDqFflhgekJ8d9/7Z3GV3UcgvzQW3J5zMyrTvlz.'),
+      ('abcdefghijklmnopqrstuvwxyz',         '$2a$10$fVH8e28OQRj9tqiDXs1e1u',    '$2a$10$fVH8e28OQRj9tqiDXs1e1uxpsjN0c7II7YPKXua2NAKYvM6iQk7dq'),
+      ('abcdefghijklmnopqrstuvwxyz',         '$2a$12$D4G5f18o7aMMfwasBL7Gpu',    '$2a$12$D4G5f18o7aMMfwasBL7GpuQWuP3pkrZrOAnqP.bmezbMng.QwJ/pG'),
+      ('~!@#$%^&*()      ~!@#$%^&*()PNBFRD', '$2a$06$fPIsBO8qRqkjj273rfaOI.',    '$2a$06$fPIsBO8qRqkjj273rfaOI.HtSV9jLDpTbZn782DC6/t7qT67P6FfO'),
+      ('~!@#$%^&*()      ~!@#$%^&*()PNBFRD', '$2a$08$Eq2r4G/76Wv39MzSX262hu',    '$2a$08$Eq2r4G/76Wv39MzSX262huzPz612MZiYHVUJe/OcOql2jo4.9UxTW'),
+      ('~!@#$%^&*()      ~!@#$%^&*()PNBFRD', '$2a$10$LgfYWkbzEvQ4JakH7rOvHe',    '$2a$10$LgfYWkbzEvQ4JakH7rOvHe0y8pHKF9OaFgwUZ2q7W2FFZmZzJYlfS'),
+      ('~!@#$%^&*()      ~!@#$%^&*()PNBFRD', '$2a$12$WApznUOJfkEGSmYRfnkrPO',    '$2a$12$WApznUOJfkEGSmYRfnkrPOr466oFDCaj4b6HY3EXGvfxm43seyhgC')
+  );
 
-	SInvalidHashString = 'Invalid base64 hash string';
-	SBcryptCostRangeError = 'BCrypt cost factor must be between 4..31 (%d)';
-	SKeyRangeError = 'Key must be between 1 and 72 bytes long (%d)';
-	SSaltLengthError = 'Salt must be 16 bytes';
-	SInvalidLength = 'Invalid length';
+  SInvalidHashString = 'Invalid base64 hash string';
+  SBcryptCostRangeError = 'BCrypt cost factor must be between 4..31 (%d)';
+  SKeyRangeError = 'Key must be between 1 and 72 bytes long (%d)';
+  SSaltLengthError = 'Salt must be 16 bytes';
+  SInvalidLength = 'Invalid length';
 
 {***********************************************************************************************************}
 class function TBCrypt.HashPassword(const password: AnsiString; const MCFEncode: boolean = True): AnsiString;
@@ -1343,63 +1347,63 @@ var cost: Integer;
 begin
 
   //
-	// Generate a hash for the specified password using the default cost.
+  // Generate a hash for the specified password using the default cost.
   //
-	// Sample Usage:
+  // Sample Usage:
   // hash := TBCrypt.HashPassword('correct horse battery stample');
   //
   //
-	// Rather than using a fixed default cost, use a self-adjusting cost.
-	// We give ourselves two methods:
+  // Rather than using a fixed default cost, use a self-adjusting cost.
+  // We give ourselves two methods:
   //
-	// 	- Moore's Law sliding constant
-	// 	- Benchmark
+  //   - Moore's Law sliding constant
+  //   - Benchmark
   //
-	// The problem with using Moore's Law is that it's falling behind for single-core performance.
-	// Since 2004, single-core performance is only going up 21% per year, rather than the 26% of Moore's Law.
+  // The problem with using Moore's Law is that it's falling behind for single-core performance.
+  // Since 2004, single-core performance is only going up 21% per year, rather than the 26% of Moore's Law.
   //
-	// 		26%/year ==> doubles every 18 months
-	// 		21%/year ==> doubles every 44 months
+  //     26%/year ==> doubles every 18 months
+  //     21%/year ==> doubles every 44 months
   //
-	// So i could use a more practical variation of Moore's Law. Knowing that it is now doubling every 44 months,
-	// and that i want the target speed to be between 500-750ms, i could use the new value.
+  // So i could use a more practical variation of Moore's Law. Knowing that it is now doubling every 44 months,
+  // and that i want the target speed to be between 500-750ms, i could use the new value.
   //
-	// The alternative is to run a quick benchmark. It only takes 1.8ms to do a cost=4 hash. Use it benchmark the computer.
+  // The alternative is to run a quick benchmark. It only takes 1.8ms to do a cost=4 hash. Use it benchmark the computer.
   //
-	// The 3rd alternative would be to run the hash as normal, and time it. If it takes less than 500ms to calculate, then
-	// do it again with a cost of BCRYPT_COST+1.
-	//
+  // The 3rd alternative would be to run the hash as normal, and time it. If it takes less than 500ms to calculate, then
+  // do it again with a cost of BCRYPT_COST+1.
+  //
 
-	cost := TBCrypt.GetModernCost_Benchmark;
-	if cost < BCRYPT_COST then cost := BCRYPT_COST;
-	Result := TBCrypt.HashPassword(password, cost, MCFEncode);
+  cost := TBCrypt.GetModernCost_Benchmark;
+  if cost < BCRYPT_COST then cost := BCRYPT_COST;
+  Result := TBCrypt.HashPassword(password, cost, MCFEncode);
 
 end;
 
 {**************************************************************************************************************************}
 class function TBCrypt.HashPassword(const password: AnsiString; cost: Integer; const MCFEncode: boolean = True): AnsiString;
 var salt: TBytes;
-	  hash: TBytes;
+    hash: TBytes;
 begin
 
   //
-	// Generate a hash for the supplied password using the specified cost.
-	// Sample usage:
+  // Generate a hash for the supplied password using the specified cost.
+  // Sample usage:
   //   hash := TBCrypt.HashPassword('Correct battery Horse staple', 13); //Cost factor 13
-	//
+  //
 
-	salt := GenerateSalt();
-	hash := TBCrypt.HashPassword(password, salt, cost);
+  salt := GenerateSalt();
+  hash := TBCrypt.HashPassword(password, salt, cost);
 
   //
-	//20151010  I don't want to emit 2b just yet. The previous bcrypt would fail on anything besides 2a.
-	//This version handles any single letter suffix. But if we have cross system authentication, and an older system
-	//tries to validate a 2b password it will fail.
-	//Wait a year or so until everyone has the new bcrypt
+  //20151010  I don't want to emit 2b just yet. The previous bcrypt would fail on anything besides 2a.
+  //This version handles any single letter suffix. But if we have cross system authentication, and an older system
+  //tries to validate a 2b password it will fail.
+  //Wait a year or so until everyone has the new bcrypt
   //
   //20180101 maybe it's time to emit 2b ;)
   //
-	if MCFEncode then Result := FormatPasswordHashForBsd(BCRYPT_version_2b, cost, salt, hash)
+  if MCFEncode then Result := FormatPasswordHashForBsd(BCRYPT_version_2b, cost, salt, hash)
   else Result := FormatPasswordHashForBin(BCRYPT_version_2b, cost, salt, hash);
 
 end;
@@ -1411,8 +1415,8 @@ var key: TBytes;
 begin
 
   //
-	// The canonical BSD algorithm expects a null-terminated UTF8 key.
-	// If the key is longer than 72 bytes, they truncate the array of bytes to 72.
+  // The canonical BSD algorithm expects a null-terminated UTF8 key.
+  // If the key is longer than 72 bytes, they truncate the array of bytes to 72.
   // Yes, this does mean that can can lose the null terminator, and we can chop a multi-byte utf8 code point into an invalid character.
   //
 
@@ -1420,64 +1424,64 @@ begin
   SetLength(key, ln+1); //+1 for the null terminator
   Move(Pointer(password)^, Pointer(key)^, ln);
   key[ln] := 0; //Set the null terminator
-	try
+  try
 
-		if Length(key) > BCRYPT_MaxKeyLen then begin
-			ZeroMemory(@key[BCRYPT_MaxKeyLen], Length(key)-BCRYPT_MaxKeyLen);
-			SetLength(key,BCRYPT_MaxKeyLen);
-		end;
-		Result := TBCrypt.CryptCore(cost, key, salt);
+    if Length(key) > BCRYPT_MaxKeyLen then begin
+      ZeroMemory(@key[BCRYPT_MaxKeyLen], Length(key)-BCRYPT_MaxKeyLen);
+      SetLength(key,BCRYPT_MaxKeyLen);
+    end;
+    Result := TBCrypt.CryptCore(cost, key, salt);
 
-	finally
-		if Length(key) > 0 then begin
-			ZeroMemory(@key[0], Length(key));
-			SetLength(key, 0);
-		end;
-	end;
+  finally
+    if Length(key) > 0 then begin
+      ZeroMemory(@key[0], Length(key));
+      SetLength(key, 0);
+    end;
+  end;
 
 end;
 
 {******************************************}
 class function TBCrypt.GenerateSalt: TBytes;
 begin
-	//Salt is a 128-bit (16 byte) random value
+  //Salt is a 128-bit (16 byte) random value
   result := ALRandomBytes(BCRYPT_SALT_LEN);
 end;
 
 {**********************************************************************************************}
 class procedure TBCrypt.BlowfishEncryptECB(const Data: TBlowfishData; InData, OutData: Pointer);
 var
-	xL, xR: LongWord;
+  xL, xR: LongWord;
 begin
-	xL := PLongWord(InData)^;
-	xR := PLongWord(UIntPtr(InData)+4)^;
+  xL := PLongWord(InData)^;
+  xR := PLongWord(UIntPtr(InData)+4)^;
 
-	xL := (xL shr 24) or ((xL shr 8) and $FF00) or ((xL shl 8) and $FF0000) or (xL shl 24);
-	xR := (xR shr 24) or ((xR shr 8) and $FF00) or ((xR shl 8) and $FF0000) or (xR shl 24);
-	xL := xL xor Data.PBoxM[0];
-	xR := xR xor (((Data.SBoxM[0, (xL shr 24) and $FF] + Data.SBoxM[1, (xL shr 16) and $FF]) xor Data.SBoxM[2, (xL shr 8) and $FF]) + Data.SBoxM[3, xL and $FF]) xor Data.PBoxM[1];
-	xL := xL xor (((Data.SBoxM[0, (xR shr 24) and $FF] + Data.SBoxM[1, (xR shr 16) and $FF]) xor Data.SBoxM[2, (xR shr 8) and $FF]) + Data.SBoxM[3, xR and $FF]) xor Data.PBoxM[2];
-	xR := xR xor (((Data.SBoxM[0, (xL shr 24) and $FF] + Data.SBoxM[1, (xL shr 16) and $FF]) xor Data.SBoxM[2, (xL shr 8) and $FF]) + Data.SBoxM[3, xL and $FF]) xor Data.PBoxM[3];
-	xL := xL xor (((Data.SBoxM[0, (xR shr 24) and $FF] + Data.SBoxM[1, (xR shr 16) and $FF]) xor Data.SBoxM[2, (xR shr 8) and $FF]) + Data.SBoxM[3, xR and $FF]) xor Data.PBoxM[4];
-	xR := xR xor (((Data.SBoxM[0, (xL shr 24) and $FF] + Data.SBoxM[1, (xL shr 16) and $FF]) xor Data.SBoxM[2, (xL shr 8) and $FF]) + Data.SBoxM[3, xL and $FF]) xor Data.PBoxM[5];
-	xL := xL xor (((Data.SBoxM[0, (xR shr 24) and $FF] + Data.SBoxM[1, (xR shr 16) and $FF]) xor Data.SBoxM[2, (xR shr 8) and $FF]) + Data.SBoxM[3, xR and $FF]) xor Data.PBoxM[6];
-	xR := xR xor (((Data.SBoxM[0, (xL shr 24) and $FF] + Data.SBoxM[1, (xL shr 16) and $FF]) xor Data.SBoxM[2, (xL shr 8) and $FF]) + Data.SBoxM[3, xL and $FF]) xor Data.PBoxM[7];
-	xL := xL xor (((Data.SBoxM[0, (xR shr 24) and $FF] + Data.SBoxM[1, (xR shr 16) and $FF]) xor Data.SBoxM[2, (xR shr 8) and $FF]) + Data.SBoxM[3, xR and $FF]) xor Data.PBoxM[8];
-	xR := xR xor (((Data.SBoxM[0, (xL shr 24) and $FF] + Data.SBoxM[1, (xL shr 16) and $FF]) xor Data.SBoxM[2, (xL shr 8) and $FF]) + Data.SBoxM[3, xL and $FF]) xor Data.PBoxM[9];
-	xL := xL xor (((Data.SBoxM[0, (xR shr 24) and $FF] + Data.SBoxM[1, (xR shr 16) and $FF]) xor Data.SBoxM[2, (xR shr 8) and $FF]) + Data.SBoxM[3, xR and $FF]) xor Data.PBoxM[10];
-	xR := xR xor (((Data.SBoxM[0, (xL shr 24) and $FF] + Data.SBoxM[1, (xL shr 16) and $FF]) xor Data.SBoxM[2, (xL shr 8) and $FF]) + Data.SBoxM[3, xL and $FF]) xor Data.PBoxM[11];
-	xL := xL xor (((Data.SBoxM[0, (xR shr 24) and $FF] + Data.SBoxM[1, (xR shr 16) and $FF]) xor Data.SBoxM[2, (xR shr 8) and $FF]) + Data.SBoxM[3, xR and $FF]) xor Data.PBoxM[12];
-	xR := xR xor (((Data.SBoxM[0, (xL shr 24) and $FF] + Data.SBoxM[1, (xL shr 16) and $FF]) xor Data.SBoxM[2, (xL shr 8) and $FF]) + Data.SBoxM[3, xL and $FF]) xor Data.PBoxM[13];
-	xL := xL xor (((Data.SBoxM[0, (xR shr 24) and $FF] + Data.SBoxM[1, (xR shr 16) and $FF]) xor Data.SBoxM[2, (xR shr 8) and $FF]) + Data.SBoxM[3, xR and $FF]) xor Data.PBoxM[14];
-	xR := xR xor (((Data.SBoxM[0, (xL shr 24) and $FF] + Data.SBoxM[1, (xL shr 16) and $FF]) xor Data.SBoxM[2, (xL shr 8) and $FF]) + Data.SBoxM[3, xL and $FF]) xor Data.PBoxM[15];
-	xL := xL xor (((Data.SBoxM[0, (xR shr 24) and $FF] + Data.SBoxM[1, (xR shr 16) and $FF]) xor Data.SBoxM[2, (xR shr 8) and $FF]) + Data.SBoxM[3, xR and $FF]) xor Data.PBoxM[16];
-	xR := xR xor Data.PBoxM[17];
-	xL := (xL shr 24) or ((xL shr 8) and $FF00) or ((xL shl 8) and $FF0000) or (xL shl 24);
-	xR := (xR shr 24) or ((xR shr 8) and $FF00) or ((xR shl 8) and $FF0000) or (xR shl 24);
+  xL := (xL shr 24) or ((xL shr 8) and $FF00) or ((xL shl 8) and $FF0000) or (xL shl 24);
+  xR := (xR shr 24) or ((xR shr 8) and $FF00) or ((xR shl 8) and $FF0000) or (xR shl 24);
+  xL := xL xor Data.PBoxM[0];
+  xR := xR xor (((Data.SBoxM[0, (xL shr 24) and $FF] + Data.SBoxM[1, (xL shr 16) and $FF]) xor Data.SBoxM[2, (xL shr 8) and $FF]) + Data.SBoxM[3, xL and $FF]) xor Data.PBoxM[1];
+  xL := xL xor (((Data.SBoxM[0, (xR shr 24) and $FF] + Data.SBoxM[1, (xR shr 16) and $FF]) xor Data.SBoxM[2, (xR shr 8) and $FF]) + Data.SBoxM[3, xR and $FF]) xor Data.PBoxM[2];
+  xR := xR xor (((Data.SBoxM[0, (xL shr 24) and $FF] + Data.SBoxM[1, (xL shr 16) and $FF]) xor Data.SBoxM[2, (xL shr 8) and $FF]) + Data.SBoxM[3, xL and $FF]) xor Data.PBoxM[3];
+  xL := xL xor (((Data.SBoxM[0, (xR shr 24) and $FF] + Data.SBoxM[1, (xR shr 16) and $FF]) xor Data.SBoxM[2, (xR shr 8) and $FF]) + Data.SBoxM[3, xR and $FF]) xor Data.PBoxM[4];
+  xR := xR xor (((Data.SBoxM[0, (xL shr 24) and $FF] + Data.SBoxM[1, (xL shr 16) and $FF]) xor Data.SBoxM[2, (xL shr 8) and $FF]) + Data.SBoxM[3, xL and $FF]) xor Data.PBoxM[5];
+  xL := xL xor (((Data.SBoxM[0, (xR shr 24) and $FF] + Data.SBoxM[1, (xR shr 16) and $FF]) xor Data.SBoxM[2, (xR shr 8) and $FF]) + Data.SBoxM[3, xR and $FF]) xor Data.PBoxM[6];
+  xR := xR xor (((Data.SBoxM[0, (xL shr 24) and $FF] + Data.SBoxM[1, (xL shr 16) and $FF]) xor Data.SBoxM[2, (xL shr 8) and $FF]) + Data.SBoxM[3, xL and $FF]) xor Data.PBoxM[7];
+  xL := xL xor (((Data.SBoxM[0, (xR shr 24) and $FF] + Data.SBoxM[1, (xR shr 16) and $FF]) xor Data.SBoxM[2, (xR shr 8) and $FF]) + Data.SBoxM[3, xR and $FF]) xor Data.PBoxM[8];
+  xR := xR xor (((Data.SBoxM[0, (xL shr 24) and $FF] + Data.SBoxM[1, (xL shr 16) and $FF]) xor Data.SBoxM[2, (xL shr 8) and $FF]) + Data.SBoxM[3, xL and $FF]) xor Data.PBoxM[9];
+  xL := xL xor (((Data.SBoxM[0, (xR shr 24) and $FF] + Data.SBoxM[1, (xR shr 16) and $FF]) xor Data.SBoxM[2, (xR shr 8) and $FF]) + Data.SBoxM[3, xR and $FF]) xor Data.PBoxM[10];
+  xR := xR xor (((Data.SBoxM[0, (xL shr 24) and $FF] + Data.SBoxM[1, (xL shr 16) and $FF]) xor Data.SBoxM[2, (xL shr 8) and $FF]) + Data.SBoxM[3, xL and $FF]) xor Data.PBoxM[11];
+  xL := xL xor (((Data.SBoxM[0, (xR shr 24) and $FF] + Data.SBoxM[1, (xR shr 16) and $FF]) xor Data.SBoxM[2, (xR shr 8) and $FF]) + Data.SBoxM[3, xR and $FF]) xor Data.PBoxM[12];
+  xR := xR xor (((Data.SBoxM[0, (xL shr 24) and $FF] + Data.SBoxM[1, (xL shr 16) and $FF]) xor Data.SBoxM[2, (xL shr 8) and $FF]) + Data.SBoxM[3, xL and $FF]) xor Data.PBoxM[13];
+  xL := xL xor (((Data.SBoxM[0, (xR shr 24) and $FF] + Data.SBoxM[1, (xR shr 16) and $FF]) xor Data.SBoxM[2, (xR shr 8) and $FF]) + Data.SBoxM[3, xR and $FF]) xor Data.PBoxM[14];
+  xR := xR xor (((Data.SBoxM[0, (xL shr 24) and $FF] + Data.SBoxM[1, (xL shr 16) and $FF]) xor Data.SBoxM[2, (xL shr 8) and $FF]) + Data.SBoxM[3, xL and $FF]) xor Data.PBoxM[15];
+  xL := xL xor (((Data.SBoxM[0, (xR shr 24) and $FF] + Data.SBoxM[1, (xR shr 16) and $FF]) xor Data.SBoxM[2, (xR shr 8) and $FF]) + Data.SBoxM[3, xR and $FF]) xor Data.PBoxM[16];
+  xR := xR xor Data.PBoxM[17];
+  xL := (xL shr 24) or ((xL shr 8) and $FF00) or ((xL shl 8) and $FF0000) or (xL shl 24);
+  xR := (xR shr 24) or ((xR shr 8) and $FF00) or ((xR shl 8) and $FF0000) or (xR shl 24);
 
-	//Got rid of the moves
-	PLongWord(OutData)^ := xR;
-	PLongWord(UIntPtr(OutData)+4)^ := xL;
+  //Got rid of the moves
+  PLongWord(OutData)^ := xR;
+  PLongWord(UIntPtr(OutData)+4)^ := xL;
 end;
 
 {**************************************************************************************}
@@ -1489,34 +1493,34 @@ var state: TBlowfishData;
 const magicText: AnsiString = 'OrpheanBeholderScryDoubt'; //the 24-byte data we will be encrypting 64 times
 begin
 
-	try
+  try
 
-		state := TBCrypt.EksBlowfishSetup(cost, salt, key);
+    state := TBCrypt.EksBlowfishSetup(cost, salt, key);
 
-		//Conceptually we are encrypting "OrpheanBeholderScryDoubt" 64 times
-		Move(magicText[1], plainText[0], 24);
+    //Conceptually we are encrypting "OrpheanBeholderScryDoubt" 64 times
+    Move(magicText[1], plainText[0], 24);
 
-		for i := 1 to 64 do begin
-			//The painful thing is that the plaintext is 24 bytes long; this is three 8-byte blocks.
-			//Which means we have to do the EBC encryption on 3 separate sections.
-			BlowfishEncryptECB(state, Pointer(@plainText[ 0]), Pointer(@cipherText[ 0]));
-			BlowfishEncryptECB(state, Pointer(@plainText[ 8]), Pointer(@cipherText[ 8]));
-			BlowfishEncryptECB(state, Pointer(@plainText[16]), Pointer(@cipherText[16]));
-			Move(cipherText[0], plainText[0], 24);
-		end;
+    for i := 1 to 64 do begin
+      //The painful thing is that the plaintext is 24 bytes long; this is three 8-byte blocks.
+      //Which means we have to do the EBC encryption on 3 separate sections.
+      BlowfishEncryptECB(state, Pointer(@plainText[ 0]), Pointer(@cipherText[ 0]));
+      BlowfishEncryptECB(state, Pointer(@plainText[ 8]), Pointer(@cipherText[ 8]));
+      BlowfishEncryptECB(state, Pointer(@plainText[16]), Pointer(@cipherText[16]));
+      Move(cipherText[0], plainText[0], 24);
+    end;
 
-		//Copy final cipherText to Result
-		SetLength(Result, 24);
-		Move(cipherText[0], Result[0], 24);
+    //Copy final cipherText to Result
+    SetLength(Result, 24);
+    Move(cipherText[0], Result[0], 24);
 
-	finally
+  finally
 
-		//Burn cipher state
-		FillChar(state, SizeOf(state), 0);
-		FillChar(plainText[0], SizeOf(plainText), 0);
-		FillChar(cipherText[0], 24, 0);
+    //Burn cipher state
+    FillChar(state, SizeOf(state), 0);
+    FillChar(plainText[0], SizeOf(plainText), 0);
+    FillChar(cipherText[0], 24, 0);
 
-	end;
+  end;
 
 end;
 
@@ -1526,18 +1530,18 @@ var rounds: Cardinal; //rounds = 2^cost
     i: Cardinal;
     Len: Integer;
 const
-	zero: array[0..15] of Byte = (0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0);
+  zero: array[0..15] of Byte = (0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0);
 
-	//SBLOCKS ARE THE HEX DIGITS OF PI.
-	//The amount of hex digits can be increased if you want to experiment with more rounds and longer key lengths
-	PBox: array[0..17] of DWORD = (
-				$243f6a88, $85a308d3, $13198a2e, $03707344, $a4093822, $299f31d0,
-				$082efa98, $ec4e6c89, $452821e6, $38d01377, $be5466cf, $34e90c6c,
-				$c0ac29b7, $c97c50dd, $3f84d5b5, $b5470917, $9216d5d9, $8979fb1b);
+  //SBLOCKS ARE THE HEX DIGITS OF PI.
+  //The amount of hex digits can be increased if you want to experiment with more rounds and longer key lengths
+  PBox: array[0..17] of DWORD = (
+        $243f6a88, $85a308d3, $13198a2e, $03707344, $a4093822, $299f31d0,
+        $082efa98, $ec4e6c89, $452821e6, $38d01377, $be5466cf, $34e90c6c,
+        $c0ac29b7, $c97c50dd, $3f84d5b5, $b5470917, $9216d5d9, $8979fb1b);
 
-	SBox: array[0..3, 0..255] of DWORD = (
-			//SBox[0]
-			(
+  SBox: array[0..3, 0..255] of DWORD = (
+      //SBox[0]
+      (
         $d1310ba6, $98dfb5ac, $2ffd72db, $d01adfb7, $b8e1afed, $6a267e96,
         $ba7c9045, $f12c7f99, $24a19947, $b3916cf7, $0801f2e2, $858efc16,
         $636920d8, $71574e69, $a458fea3, $f4933d7e, $0d95748f, $728eb658,
@@ -1581,9 +1585,9 @@ const
         $d60f573f, $bc9bc6e4, $2b60a476, $81e67400, $08ba6fb5, $571be91f,
         $f296ec6b, $2a0dd915, $b6636521, $e7b9f9b6, $ff34052e, $c5855664,
         $53b02d5d, $a99f8fa1, $08ba4799, $6e85076a
-			),
-			//SBox[1]
-			(
+      ),
+      //SBox[1]
+      (
         $4b7a70e9, $b5b32944, $db75092e, $c4192623, $ad6ea6b0, $49a7df7d,
         $9cee60b8, $8fedb266, $ecaa8c71, $699a17ff, $5664526c, $c2b19ee1,
         $193602a5, $75094c29, $a0591340, $e4183a3e, $3f54989a, $5b429d65,
@@ -1627,9 +1631,9 @@ const
         $9e447a2e, $c3453484, $fdd56705, $0e1e9ec9, $db73dbd3, $105588cd,
         $675fda79, $e3674340, $c5c43465, $713e38d8, $3d28f89e, $f16dff20,
         $153e21e7, $8fb03d4a, $e6e39f2b, $db83adf7
-				),
-				//SBox[2]
-				(
+        ),
+        //SBox[2]
+        (
           $e93d5a68, $948140f7, $f64c261c, $94692934, $411520f7, $7602d4f7,
           $bcf46b2e, $d4a20068, $d4082471, $3320f46a, $43b7d4b7, $500061af,
           $1e39f62e, $97244546, $14214f74, $bf8b8840, $4d95fc1d, $96b591af,
@@ -1673,9 +1677,9 @@ const
           $ed545578, $08fca5b5, $d83d7cd3, $4dad0fc4, $1e50ef5e, $b161e6f8,
           $a28514d9, $6c51133c, $6fd5c7e7, $56e14ec4, $362abfce, $ddc6c837,
           $d79a3234, $92638212, $670efa8e, $406000e0
-				),
-				//SBox[3]
-				(
+        ),
+        //SBox[3]
+        (
           $3a39ce37, $d3faf5cf, $abc27737, $5ac52d1b, $5cb0679e, $4fa33742,
           $d3822740, $99bc9bbe, $d5118e9d, $bf0f7315, $d62d1c7e, $c700c47b,
           $b78c1b6b, $21a19045, $b26eb1be, $6a366eb4, $5748ab2f, $bc946e79,
@@ -1719,37 +1723,37 @@ const
           $85cbfe4e, $8ae88dd8, $7aaaf9b0, $4cf9aa7e, $1948c25c, $02fb8a8c,
           $01c36ae4, $d6ebe1f9, $90d4f869, $a65cdea0, $3f09252d, $c208e69f,
           $b74e6132, $ce77e25b, $578fdfe3, $3ac372e6
-				)
-			);
+        )
+      );
 begin
 
-	//Expensive key setup
-	if (cost < 4) or (cost > 31) then
-		raise EBCryptException.CreateFmt(SBcryptCostRangeError, [cost]); //'BCrypt cost factor must be between 4..31 (%d)'
+  //Expensive key setup
+  if (cost < 4) or (cost > 31) then
+    raise EBCryptException.CreateFmt(SBcryptCostRangeError, [cost]); //'BCrypt cost factor must be between 4..31 (%d)'
 
-	Len := Length(key);
-	if (Len > BCRYPT_MaxKeyLen) then //maximum of 72 bytes
-		raise EBCryptException.CreateFmt(SKeyRangeError, [Len]); //'Key must be between 1 and 72 bytes long (%d)'
+  Len := Length(key);
+  if (Len > BCRYPT_MaxKeyLen) then //maximum of 72 bytes
+    raise EBCryptException.CreateFmt(SKeyRangeError, [Len]); //'Key must be between 1 and 72 bytes long (%d)'
 
-	if Length(salt) <> BCRYPT_SALT_LEN then
-		raise EBCryptException.Create(SSaltLengthError); //'Salt must be 16 bytes'
+  if Length(salt) <> BCRYPT_SALT_LEN then
+    raise EBCryptException.Create(SSaltLengthError); //'Salt must be 16 bytes'
 
-	//Copy S and P boxes into local state
-	Move(SBox, Result.SBoxM, Sizeof(SBox));
-	Move(PBox, Result.PBoxM, Sizeof(PBox));
+  //Copy S and P boxes into local state
+  Move(SBox, Result.SBoxM, Sizeof(SBox));
+  Move(PBox, Result.PBoxM, Sizeof(PBox));
 
-	Self.ExpandKey(Result, salt, key);
+  Self.ExpandKey({var} Result, salt, key);
 
-	//rounds = 2^cost
-	rounds := 1 shl cost;
+  //rounds = 2^cost
+  rounds := 1 shl cost;
 
-	for i := 1 to rounds do
-	begin
-		Self.ExpandKey(Result, zero, key);
-		Self.ExpandKey(Result, zero, salt);
-	end;
+  for i := 1 to rounds do
+  begin
+    Self.ExpandKey({var} Result, zero, key);
+    Self.ExpandKey({var} Result, zero, salt);
+  end;
 
-	//Result := what it is
+  //Result := what it is
 
 end;
 
@@ -1763,112 +1767,112 @@ var i, j, k: Integer;
     saltHalfIndex: Integer;
 begin
 
-	//TODO: burn all stack variables
+  //TODO: burn all stack variables
 
-	//ExpandKey phase of the Expensive key setup
-	len := Length(key);
-	if (len > BCRYPT_MaxKeyLen) then
-		raise EBCryptException.CreateFmt(SKeyRangeError, [len]); //'Key must be between 1 and 72 bytes long (%d)'
+  //ExpandKey phase of the Expensive key setup
+  len := Length(key);
+  if (len > BCRYPT_MaxKeyLen) then
+    raise EBCryptException.CreateFmt(SKeyRangeError, [len]); //'Key must be between 1 and 72 bytes long (%d)'
 
-	//
-	//	XOR all the subkeys in the P-array with the encryption key
-	//	The first 32 bits of the key are XORed with P1, the next 32 bits with P2, and so on.
-	//	The key is viewed as being cyclic; when the process reaches the end of the key,
-	//	it starts reusing bits from the beginning to XOR with subkeys.
-	//
-	if len > 0 then begin
-		KeyB := PByteArray(@key[0]);
-		k := 0;
-		for i := 0 to 17 do begin
-			A :=      KeyB[(k+3) mod len];
-			A := A + (KeyB[(k+2) mod len] shl 8);
-			A := A + (KeyB[(k+1) mod len] shl 16);
-			A := A + (KeyB[k]             shl 24);
-			State.PBoxM[i] := State.PBoxM[i] xor A;
-			k := (k+4) mod len;
-		end;
-	end;
+  //
+  //  XOR all the subkeys in the P-array with the encryption key
+  //  The first 32 bits of the key are XORed with P1, the next 32 bits with P2, and so on.
+  //  The key is viewed as being cyclic; when the process reaches the end of the key,
+  //  it starts reusing bits from the beginning to XOR with subkeys.
+  //
+  if len > 0 then begin
+    KeyB := PByteArray(@key[0]);
+    k := 0;
+    for i := 0 to 17 do begin
+      A :=      KeyB[(k+3) mod len];
+      A := A + (KeyB[(k+2) mod len] shl 8);
+      A := A + (KeyB[(k+1) mod len] shl 16);
+      A := A + (KeyB[k]             shl 24);
+      State.PBoxM[i] := State.PBoxM[i] xor A;
+      k := (k+4) mod len;
+    end;
+  end;
 
-	//Blowfsh-encrypt the first 64 bits of its salt argument using the current state of the key schedule.
-	BlowfishEncryptECB(State, @salt[0], @Block);
+  //Blowfsh-encrypt the first 64 bits of its salt argument using the current state of the key schedule.
+  BlowfishEncryptECB(State, @salt[0], @Block);
 
-	//The resulting ciphertext replaces subkeys P1 and P2.
-	State.PBoxM[0] := Block[3] + (Block[2] shl 8) + (Block[1] shl 16) + (Block[0] shl 24);
-	State.PBoxM[1] := Block[7] + (Block[6] shl 8) + (Block[5] shl 16) + (Block[4] shl 24);
+  //The resulting ciphertext replaces subkeys P1 and P2.
+  State.PBoxM[0] := Block[3] + (Block[2] shl 8) + (Block[1] shl 16) + (Block[0] shl 24);
+  State.PBoxM[1] := Block[7] + (Block[6] shl 8) + (Block[5] shl 16) + (Block[4] shl 24);
 
-	saltHalfIndex := 8;
-	for i := 1 to 8 do begin
-		//That same ciphertext is also XORed with the second 64-bits of salt
+  saltHalfIndex := 8;
+  for i := 1 to 8 do begin
+    //That same ciphertext is also XORed with the second 64-bits of salt
 
-		//Delphi compiler is not worth its salt; it doesn't do hoisting ("Any compiler worth its salt will hoist" - Eric Brumer C++ compiler team)
-		//Salt is 0..15 (0..7 is first block, 8..15 is second block)
-		PLongWord(@block[0])^ := PLongWord(@block[0])^ xor PLongWord(@salt[saltHalfIndex  ])^;
-		PLongWord(@block[4])^ := PLongWord(@block[4])^ xor PLongWord(@salt[saltHalfIndex+4])^;
+    //Delphi compiler is not worth its salt; it doesn't do hoisting ("Any compiler worth its salt will hoist" - Eric Brumer C++ compiler team)
+    //Salt is 0..15 (0..7 is first block, 8..15 is second block)
+    PLongWord(@block[0])^ := PLongWord(@block[0])^ xor PLongWord(@salt[saltHalfIndex  ])^;
+    PLongWord(@block[4])^ := PLongWord(@block[4])^ xor PLongWord(@salt[saltHalfIndex+4])^;
 
-		saltHalfIndex := saltHalfIndex xor 8;
+    saltHalfIndex := saltHalfIndex xor 8;
 
-		//and the result encrypted with the new state of the key schedule
-		BlowfishEncryptECB(State, @Block, @Block);
+    //and the result encrypted with the new state of the key schedule
+    BlowfishEncryptECB(State, @Block, @Block);
 
-		// The output of the second encryption replaces subkeys P3 and P4. (P[2] and P[3])
-		State.PBoxM[i*2] :=   Block[3] + (Block[2] shl 8) + (Block[1] shl 16) + (Block[0] shl 24);
-		State.PBoxM[i*2+1] := Block[7] + (Block[6] shl 8) + (Block[5] shl 16) + (Block[4] shl 24);
-	end;
+    // The output of the second encryption replaces subkeys P3 and P4. (P[2] and P[3])
+    State.PBoxM[i*2] :=   Block[3] + (Block[2] shl 8) + (Block[1] shl 16) + (Block[0] shl 24);
+    State.PBoxM[i*2+1] := Block[7] + (Block[6] shl 8) + (Block[5] shl 16) + (Block[4] shl 24);
+  end;
 
-	//When ExpandKey finishes replacing entries in the P-Array, it continues on replacing S-box entries two at a time.
-	for j := 0 to 3 do begin
-		for i := 0 to 127 do begin
-			//That same ciphertext is also XORed with the second 64-bits of salt
-			//Delphi compiler is not worth its salt; it doesn't do hoisting ("Any compiler worth its salt will hoist" - Eric Brumer C++ compiler team)
-			//Salt is 0..15 (0..7 is first block, 8..15 is second block)
-			PLongWord(@block[0])^ := PLongWord(@block[0])^ xor PLongWord(@salt[saltHalfIndex  ])^;
-			PLongWord(@block[4])^ := PLongWord(@block[4])^ xor PLongWord(@salt[saltHalfIndex+4])^;
+  //When ExpandKey finishes replacing entries in the P-Array, it continues on replacing S-box entries two at a time.
+  for j := 0 to 3 do begin
+    for i := 0 to 127 do begin
+      //That same ciphertext is also XORed with the second 64-bits of salt
+      //Delphi compiler is not worth its salt; it doesn't do hoisting ("Any compiler worth its salt will hoist" - Eric Brumer C++ compiler team)
+      //Salt is 0..15 (0..7 is first block, 8..15 is second block)
+      PLongWord(@block[0])^ := PLongWord(@block[0])^ xor PLongWord(@salt[saltHalfIndex  ])^;
+      PLongWord(@block[4])^ := PLongWord(@block[4])^ xor PLongWord(@salt[saltHalfIndex+4])^;
 
-			saltHalfIndex := saltHalfIndex xor 8;
+      saltHalfIndex := saltHalfIndex xor 8;
 
-			//and the result encrypted with the new state of the key schedule
-			BlowfishEncryptECB(State, @Block, @Block);
+      //and the result encrypted with the new state of the key schedule
+      BlowfishEncryptECB(State, @Block, @Block);
 
-			// The output of the second encryption replaces subkeys S1 and P2. (S[0] and S[1])
-			State.SBoxM[j, i*2  ] := Block[3] + (Block[2] shl 8) + (Block[1] shl 16) + (Block[0] shl 24);
-			State.SBoxM[j, i*2+1] := Block[7] + (Block[6] shl 8) + (Block[5] shl 16) + (Block[4] shl 24);
-		end;
-	end;
+      // The output of the second encryption replaces subkeys S1 and P2. (S[0] and S[1])
+      State.SBoxM[j, i*2  ] := Block[3] + (Block[2] shl 8) + (Block[1] shl 16) + (Block[0] shl 24);
+      State.SBoxM[j, i*2+1] := Block[7] + (Block[6] shl 8) + (Block[5] shl 16) + (Block[4] shl 24);
+    end;
+  end;
 
 end;
 
 {*************************************************************************************************************************************************************}
 class function TBCrypt.TryParseHashString(const hashString: AnsiString; out version: byte; out Cost: byte; out Salt: TBytes; out MCFEncoded: boolean): Boolean;
 var s: AnsiString;
-	  n: Integer; //current index
+    n: Integer; //current index
 
-	function GetNextToken(var index: Integer): AnsiString;
-	var maxLen: Integer;
-	   	startIndex, copyLen: Integer;
-	begin
-		Result := '';
-		maxLen := Length(hashString);
-		if (index > maxLen) then Exit;
+  function GetNextToken(var index: Integer): AnsiString;
+  var maxLen: Integer;
+       startIndex, copyLen: Integer;
+  begin
+    Result := '';
+    maxLen := Length(hashString);
+    if (index > maxLen) then Exit;
 
-		//Make sure we start on a "$" token divider
-		if hashString[index] <> '$' then Exit;
+    //Make sure we start on a "$" token divider
+    if hashString[index] <> '$' then Exit;
 
-		//Move past the "$" into the token value
-		Inc(index);
+    //Move past the "$" into the token value
+    Inc(index);
 
-		startIndex := index;
-		copyLen := 0;
+    startIndex := index;
+    copyLen := 0;
 
-		while (index <= maxLen) and (hashString[index] <> '$') do begin
-			Inc(index);
-			Inc(copyLen);
-		end;
-		if copyLen > 0 then Result := Copy(hashString, startIndex, copyLen);
-	end;
+    while (index <= maxLen) and (hashString[index] <> '$') do begin
+      Inc(index);
+      Inc(copyLen);
+    end;
+    if copyLen > 0 then Result := Copy(hashString, startIndex, copyLen);
+  end;
 
 begin
 
-	Result := False;
+  Result := False;
 
   //bin format
   if (length(hashString) >= 4) and
@@ -1889,10 +1893,10 @@ begin
     MCFEncoded := True;
 
     //
-    //	Pick apart our specially formatted hash string
-    //	$2a$nn$[22 character salt, b64 encoded][32 character hash, b64 encoded]
-    //	We also need to accept version 2, the original version
-    //	$2$nn$[22 character salt, b64 encoded][32 character hash, b64 encoded]
+    //  Pick apart our specially formatted hash string
+    //  $2a$nn$[22 character salt, b64 encoded][32 character hash, b64 encoded]
+    //  We also need to accept version 2, the original version
+    //  $2$nn$[22 character salt, b64 encoded][32 character hash, b64 encoded]
     //
 
     if Length(hashString) < 27 then Exit; //"$2$4$" + 22 = 27
@@ -1920,7 +1924,7 @@ begin
 
   end;
 
-	Result := True;
+  Result := True;
 
 end;
 
@@ -1934,24 +1938,25 @@ var version: byte;
     mcfEncoded: boolean;
     freq, t1, t2: Int64;
 begin
-	PasswordRehashNeeded := False;
+  PasswordRehashNeeded := False;
 
-	if not QueryPerformanceFrequency({var}freq) then freq := -1; //avoid a division by zero
+  if not QueryPerformanceFrequency({var}freq) then freq := -1; //avoid a division by zero
 
-	if not TryParseHashString(expectedHashString, {out}version, {out}cost, {out}salt, {mcfEncoded}mcfEncoded) then raise Exception.Create(SInvalidHashString);
+  if not TryParseHashString(expectedHashString, {out}version, {out}cost, {out}salt, {mcfEncoded}mcfEncoded) then raise Exception.Create(SInvalidHashString);
 
-	if not QueryPerformanceCounter(t1) then t1 := 0;
-	hash := TBCrypt.HashPassword(password, salt, cost);
-	if not QueryPerformanceCounter(t2) then t2 := 0;
+  //Measure how long it takes to run the hash. If it's too quick, it's time to increase the cost
+  if not QueryPerformanceCounter(t1) then t1 := 0;
+  hash := TBCrypt.HashPassword(password, salt, cost);
+  if not QueryPerformanceCounter(t2) then t2 := 0;
 
-	if mcfEncoded then actualHashString := FormatPasswordHashForBsd(version, cost, salt, hash)
+  if mcfEncoded then actualHashString := FormatPasswordHashForBsd(version, cost, salt, hash)
   else actualHashString := FormatPasswordHashForBin(version, cost, salt, hash);
 
-	//Result := (actualHashString = expectedHashString);
-	Result := TBcrypt.TimingSafeSameString(actualHashString, expectedHashString);
+  //Result := (actualHashString = expectedHashString);
+  Result := TBcrypt.TimingSafeSameString(actualHashString, expectedHashString);
 
-	//Based on how long it took to hash the password, see if a rehash is needed to increase the cost
-	PasswordRehashNeeded := TBcrypt.PasswordRehashNeededCore(version, cost, cost, (t2-t1)/freq*1000);
+  //Based on how long it took to hash the password, see if a rehash is needed to increase the cost
+  PasswordRehashNeeded := TBcrypt.PasswordRehashNeededCore(version, cost, cost, (t2-t1)/freq*1000);
 end;
 
 {*************************************************************************}
@@ -1991,186 +1996,219 @@ end;
 {*************************************************************************************************************************************}
 class function TBCrypt.FormatPasswordHashForBsd(const Version: byte; const cost: integer; const salt, hash: array of Byte): AnsiString;
 var saltString: AnsiString;
-	  hashString: AnsiString;
+    hashString: AnsiString;
 begin
-	saltString := BsdBase64Encode(salt, Length(salt));
-	hashString := BsdBase64Encode(hash, Length(hash)-1); //Yes, everything except the last byte.
+  saltString := BsdBase64Encode(salt, Length(salt));
+  hashString := BsdBase64Encode(hash, Length(hash)-1); //Yes, everything except the last byte.
                                                        //OpenBSD, in the pseudo-base64 implementation, doesn't include the last byte of the hash
                                                        //Nobody knows why, but that's what all existing tests do - so it's what i do
-	Result := ALFormat('$%s$%.2d$%s%s', [IntVersionToBsdStr(Version), cost, saltString, hashString]);
+  Result := ALFormat('$%s$%.2d$%s%s', [IntVersionToBsdStr(Version), cost, saltString, hashString]);
 end;
 
 {****************************************************************************************************}
 class function TBCrypt.BsdBase64Encode(const data: array of Byte; BytesToEncode: Integer): AnsiString;
 
-	function EncodePacket(b1, b2, b3: Byte; Len: Integer): AnsiString;
-	begin
-		Result := '';
+  function EncodePacket(b1, b2, b3: Byte; Len: Integer): AnsiString;
+  begin
+    Result := '';
 
-		Result := Result + BsdBase64EncodeTable[b1 shr 2];
-		Result := Result + BsdBase64EncodeTable[((b1 and $03) shl 4) or (b2 shr 4)];
-		if Len < 2 then Exit;
+    Result := Result + BsdBase64EncodeTable[b1 shr 2];
+    Result := Result + BsdBase64EncodeTable[((b1 and $03) shl 4) or (b2 shr 4)];
+    if Len < 2 then Exit;
 
-		Result := Result + BsdBase64EncodeTable[((b2 and $0f) shl 2) or (b3 shr 6)];
-		if Len < 3 then Exit;
+    Result := Result + BsdBase64EncodeTable[((b2 and $0f) shl 2) or (b3 shr 6)];
+    if Len < 3 then Exit;
 
-		Result := Result + BsdBase64EncodeTable[b3 and $3f];
-	end;
+    Result := Result + BsdBase64EncodeTable[b3 and $3f];
+  end;
 
 var i: Integer;
-	  len: Integer;
-	  b1, b2: Integer;
+    len: Integer;
+    b1, b2: Integer;
 begin
-	Result := '';
+  Result := '';
 
-	len := BytesToEncode;
-	if len = 0 then Exit;
+  len := BytesToEncode;
+  if len = 0 then Exit;
 
-	if len > Length(data) then
-		raise EBCryptException.Create(SInvalidLength);
+  if len > Length(data) then
+    raise EBCryptException.Create(SInvalidLength);
 
-	//encode whole 3-byte chunks  TV4S 6ytw fsfv kgY8 jIuc Drjc 8deX 1s.
-	i := Low(data);
-	while len >= 3 do begin
-		Result := Result+EncodePacket(data[i], data[i+1], data[i+2], 3);
-		Inc(i, 3);
-		Dec(len, 3);
-	end;
+  //encode whole 3-byte chunks  TV4S 6ytw fsfv kgY8 jIuc Drjc 8deX 1s.
+  i := Low(data);
+  while len >= 3 do begin
+    Result := Result+EncodePacket(data[i], data[i+1], data[i+2], 3);
+    Inc(i, 3);
+    Dec(len, 3);
+  end;
 
-	if len = 0 then Exit;
+  if len = 0 then Exit;
 
-	//encode partial final chunk
-	System.Assert(len < 3);
-	if len >= 1 then
-		b1 := data[i]
-	else
-		b1 := 0;
-	if len >= 2 then
-		b2 := data[i+1]
-	else
-		b2 := 0;
-	Result := Result+EncodePacket(b1, b2, 0, len);
+  //encode partial final chunk
+  System.Assert(len < 3);
+  if len >= 1 then
+    b1 := data[i]
+  else
+    b1 := 0;
+  if len >= 2 then
+    b2 := data[i+1]
+  else
+    b2 := 0;
+  Result := Result+EncodePacket(b1, b2, 0, len);
 end;
 
 {******************************************************************}
 class function TBCrypt.BsdBase64Decode(const s: AnsiString): TBytes;
 
-	function Char64(character: ansiChar): Integer;
-	begin
-		if (Ord(character) > Length(BsdBase64DecodeTable)) then begin
-			Result := -1;
-			Exit;
-		end;
-		Result := BsdBase64DecodeTable[character];
-	end;
+  function Char64(character: ansiChar): Integer;
+  begin
+    if (Ord(character) > Length(BsdBase64DecodeTable)) then begin
+      Result := -1;
+      Exit;
+    end;
+    Result := BsdBase64DecodeTable[character];
+  end;
 
-	procedure Append(value: Byte);
-	var i: Integer;
-	begin
-		i := Length(Result);
-		SetLength(Result, i+1);
-		Result[i] := value;
-	end;
+  procedure Append(value: Byte);
+  var i: Integer;
+  begin
+    i := Length(Result);
+    SetLength(Result, i+1);
+    Result[i] := value;
+  end;
 
 var i: Integer;
     len: Integer;
     c1, c2, c3, c4: Integer;
 begin
-	SetLength(Result, 0);
-	len := Length(s);
-	i := 1;
-	while i <= len do begin
+  SetLength(Result, 0);
+  len := Length(s);
+  i := 1;
+  while i <= len do begin
 
-		// We'll need to have at least 2 character to form one byte.
-		// Anything less is invalid
-		if (i+1) > len then begin
-			raise EBCryptException.Create(SInvalidHashString); //'Invalid base64 hash string'
-		end;
+    // We'll need to have at least 2 character to form one byte.
+    // Anything less is invalid
+    if (i+1) > len then begin
+      raise EBCryptException.Create(SInvalidHashString); //'Invalid base64 hash string'
+    end;
 
-		c1 := Char64(s[i]);
-		Inc(i);
-		c2 := Char64(s[i]);
-		Inc(i);
+    c1 := Char64(s[i]);
+    Inc(i);
+    c2 := Char64(s[i]);
+    Inc(i);
 
-		if (c1 = -1) or (c2 = -1) then begin
-			raise EBCryptException.Create(SInvalidHashString); //'Invalid base64 hash string'
-		end;
+    if (c1 = -1) or (c2 = -1) then begin
+      raise EBCryptException.Create(SInvalidHashString); //'Invalid base64 hash string'
+    end;
 
-		//Now we have at least one byte in c1|c2
-		// c1 = ..111111
-		// c2 = ..112222
-		Append( ((c1 and $3f) shl 2) or (c2 shr 4) );
+    //Now we have at least one byte in c1|c2
+    // c1 = ..111111
+    // c2 = ..112222
+    Append( ((c1 and $3f) shl 2) or (c2 shr 4) );
 
-		//If there's a 3rd character, then we can use c2|c3 to form the second byte
-		if (i > len) then Break;
-		c3 := Char64(s[i]);
-		Inc(i);
+    //If there's a 3rd character, then we can use c2|c3 to form the second byte
+    if (i > len) then Break;
+    c3 := Char64(s[i]);
+    Inc(i);
 
-		if (c3 = -1) then begin
-			raise EBCryptException.Create(SInvalidHashString); //'Invalid base64 hash string'
-		end;
+    if (c3 = -1) then begin
+      raise EBCryptException.Create(SInvalidHashString); //'Invalid base64 hash string'
+    end;
 
-		//Now we have the next byte in c2|c3
-		// c2 = ..112222
-		// c3 = ..222233
-		Append( ((c2 and $0f) shl 4) or (c3 shr 2) );
+    //Now we have the next byte in c2|c3
+    // c2 = ..112222
+    // c3 = ..222233
+    Append( ((c2 and $0f) shl 4) or (c3 shr 2) );
 
-		//If there's a 4th caracter, then we can use c3|c4 to form the third byte
-		if i > len then Break;
-		c4 := Char64(s[i]);
-		Inc(i);
+    //If there's a 4th caracter, then we can use c3|c4 to form the third byte
+    if i > len then Break;
+    c4 := Char64(s[i]);
+    Inc(i);
 
-		if (c4 = -1) then begin
-			raise EBCryptException.Create(SInvalidHashString); //'Invalid base64 hash string'
-		end;
+    if (c4 = -1) then begin
+      raise EBCryptException.Create(SInvalidHashString); //'Invalid base64 hash string'
+    end;
 
-		//Now we have the next byte in c3|c4
-		// c3 = ..222233
-		// c4 = ..333333
-		Append( ((c3 and $03) shl 6) or c4 );
-	end;
+    //Now we have the next byte in c3|c4
+    // c3 = ..222233
+    // c4 = ..333333
+    Append( ((c3 and $03) shl 6) or c4 );
+  end;
 end;
 
 {*********************************************************************************************}
 class function TBCrypt.GetModernCost(SampleCost: Integer; SampleHashDurationMS: Real): Integer;
 begin
 
-	//
-	//	Given a Cost factor, and how long it took to compute the hash, figure out the cost needed to get a hashing duration
-	//	between 250ms - 500ms. Maybe 200-400. It probably needs some discussion.
   //
-	//	In 1977, on a VAX-11/780, crypt (MD5) could be evaluated about 3.6 times per second.
-	//		-->  277 ms per password
+  // Given a Cost factor, and how long it took to compute the hash, figure out the cost needed to get a hashing duration
+  // between 250ms - 500ms. Maybe 200-400. It probably needs some discussion.
   //
-	//	In 1999, at the time of publication of BCrypt, the default cost is 6 for a normal user and 8 for the superuser.
+  // This function is used not only as part of the benchmark to decide on a cost for new passwords, but we
+  // also use it to measure how long it took to check an existing password, and decide if it was too quick
+  // and the password hash needs to be upgraded.
   //
-	//	We would like to target 300ms as the calculation time, but not exceed 500ms.
-	//	So if our time was less than 250ms, then we can double it.
+  // What speed to use?
+  // ==================
   //
-	//	For a 5-digit pin (59,049 combinations):
-	//			200 ms --> 3.2 hours
-	//			250 ms --> 4.1 hours
-	//			400 ms --> 6.6 hours
-	//			500 ms --> 8.2 hours
-	//
+  // At the time of deployment in 1976, crypt could hash fewer than 4 passwords per second. (250 ms per password)
+  // In 1977, on a VAX-11/780, crypt (MD5) could be evaluated about 3.6 times per second.   (277 ms per password)
+  //
+  // At the time of publication of BCrypt (1999) the default costs were:
+  // - Normal User: 6
+  // - the Superuser: 8
+  //
+  // "Of course, whatever cost people choose should be reevaluated from time to time."
+  //
+  // Speed tests from the paper from 1999 for Cost 5
+  // - OpenBSD 2.3, P5 133 MHz:     156.2 ms  (6.4 crypts/sec)
+  // - x86 assembler, P5 133 MHz:     4.4 ms  (22.5 crypts/sec)
+  // - Alpha 21164A 600 MHz:          1.6 ms  (62.5 crypts/sec)
+  //
+  // That means that these speeds would for Cost 6 be:
+  // - OpenBSD 2.3, P5 133 MHz:     312.5 ms
+  // - x86 assembler, P5 133 MHz:     8.9 ms
+  // - Alpha 21164A 600 MHz:          3.2 ms
+  //
+  // For cost 8 (superuser) these would be:
+  // - OpenBSD 2.3, P5 133 MHz:   1,250.0 ms
+  // - x86 assembler, P5 133 MHz:    35.6 ms
+  // - Alpha 21164A 600 MHz:         12.8 ms
+  //
+  //
+  // For regular users we want to target between 250-500ms per hash (i.e. no more than 500 ms, no less than 250 ms)
+  // We would like to target 300ms as the calculation time, but not exceed 500ms.
+  //
+  // - if our calculation time was less than 250ms, then we can double it
+  // - if our calculation time was more than 500ms, then we can half it
+  //
+  // Speed of pins
+  // =============
+  //
+  // For a 5-digit pin (59,049 combinations) the time to exhaust all combinations is:
+  //     200 ms --> 3.2 hours
+  //     250 ms --> 4.1 hours
+  //     400 ms --> 6.6 hours
+  //     500 ms --> 8.2 hours
+  //
 
-	Result := BCRYPT_COST; //never recommend lower than the fixed BCRYPT_COST
+  Result := BCRYPT_COST; //never recommend lower than the fixed BCRYPT_COST
 
-	if (SampleCost <=0 ) or (SampleHashDurationMS <= 0) then Exit;
+  if (SampleCost <=0 ) or (SampleHashDurationMS <= 0) then Exit;
 
-	//while the duration is too low, double it
-	while SampleHashDurationMS < 250 do begin
-		Inc(SampleCost);
-		SampleHashDurationMS := SampleHashDurationMS*2;
-	end;
+  //while the duration is too low, double it
+  while SampleHashDurationMS < 250 do begin
+    Inc(SampleCost);
+    SampleHashDurationMS := SampleHashDurationMS*2;
+  end;
 
-	//if the duration is too high, halve it (as long as we are still above the minumum cost)
-	while (SampleHashDurationMS > 500) and (SampleCost > BCRYPT_COST) do begin
-		Dec(SampleCost);
-		SampleHashDurationMS := SampleHashDurationMS / 2;
-	end;
+  //if the duration is too high, halve it (as long as we are still above the minumum cost)
+  while (SampleHashDurationMS > 500) and (SampleCost > BCRYPT_COST) do begin
+    Dec(SampleCost);
+    SampleHashDurationMS := SampleHashDurationMS / 2;
+  end;
 
-	Result := SampleCost;
+  Result := SampleCost;
 
 end;
 
@@ -2180,27 +2218,27 @@ var t1, t2, freq: Int64;
 const testCost = 5; //4;
 begin
 
-	//
-	//	Run a quick benchmark on the current machine to see how fast this PC is.
-	//	A cost of 4 is the lowest we allow, so we will hash with that.
   //
-	//	The problem with the Moore's Law approach, is that Moore's Law failed in 2004:
-	//			http://preshing.com/20120208/a-look-back-at-single-threaded-cpu-performance/
-	//			http://preshing.com/images/float-point-perf.png
-	//
+  //  Run a quick benchmark on the current machine to see how fast this PC is.
+  //  A cost of 4 is the lowest we allow, so we will hash with that.
+  //
+  //  The problem with the Moore's Law approach, is that Moore's Law failed in 2004:
+  //      http://preshing.com/20120208/a-look-back-at-single-threaded-cpu-performance/
+  //      http://preshing.com/images/float-point-perf.png
+  //
 
-	Result := BCRYPT_COST; //don't ever go less than the default cost
+  Result := BCRYPT_COST; //don't ever go less than the default cost
 
-	if not QueryPerformanceFrequency({var}freq) then Exit;
-	if (freq = 0) then Exit;
+  if not QueryPerformanceFrequency({var}freq) then Exit;
+  if (freq = 0) then Exit;
 
-	if not QueryPerformanceCounter(t1) then Exit;
-	if (t1 = 0) then Exit;
-	TBCrypt.HashPassword('Benchmark', testCost);
-	if not QueryPerformanceCounter(t2) then Exit;
-	if t2=0 then Exit;
+  if not QueryPerformanceCounter(t1) then Exit;
+  if (t1 = 0) then Exit;
+  TBCrypt.HashPassword('Benchmark', testCost);
+  if not QueryPerformanceCounter(t2) then Exit;
+  if t2=0 then Exit;
 
-	Result := TBCrypt.GetModernCost(testCost, (t2-t1)/freq * 1000);
+  Result := TBCrypt.GetModernCost(testCost, (t2-t1)/freq * 1000);
 
 end;
 
@@ -2213,28 +2251,28 @@ var idealCost: Integer;
     mcfEncoded: Boolean;
 begin
 
-	//
-	//	As computing power increases, we might from time to time need to increase the cost factor.
-	//	Run a microbenchmark to get the desired cost factor, and compare it to the cost factor stored in the Hash.
   //
-	//	If the desired cost is higher, then we need to rehash.
-	//	The time to do this is after we have validated the user's credentials. This way we can silently rehash their
-	//	known good password.
-	//
+  //  As computing power increases, we might from time to time need to increase the cost factor.
+  //  Run a microbenchmark to get the desired cost factor, and compare it to the cost factor stored in the Hash.
+  //
+  //  If the desired cost is higher, then we need to rehash.
+  //  The time to do this is after we have validated the user's credentials. This way we can silently rehash their
+  //  known good password.
+  //
 
-	if not TBCrypt.TryParseHashString(hashString, {out}version, {out}cost, {out}salt, {mcfEncoded}mcfEncoded) then begin
-		Result := True; //if they expected it to be a valid BCrypt hash, and it's not, then they definitely need to rehash something
-		Exit;
-	end;
+  if not TBCrypt.TryParseHashString(hashString, {out}version, {out}cost, {out}salt, {mcfEncoded}mcfEncoded) then begin
+    Result := True; //if they expected it to be a valid BCrypt hash, and it's not, then they definitely need to rehash something
+    Exit;
+  end;
 
-	idealCost := TBCrypt.GetModernCost_Benchmark;
+  idealCost := TBCrypt.GetModernCost_Benchmark;
 
-	if (cost < idealCost) then begin
-		Result := True;
-		Exit;
-	end;
+  if (cost < idealCost) then begin
+    Result := True;
+    Exit;
+  end;
 
-	Result := False;
+  Result := False;
 
 end;
 
@@ -2243,35 +2281,35 @@ class function TBCrypt.PasswordRehashNeededCore(const Version: byte; const Cost:
 var idealCost: Integer;
 begin
 
-	//
-	//	This core routine is used by two paths:
-	//		- checking a real password, where we are passed the actual cost
-	//
-	//If the cost is lower than our hard-coded minimum, then they need to rehash
-	if Cost < BCRYPT_COST then begin
-		Result := True;
-		Exit;
-	end;
+  //
+  //  This core routine is used by two paths:
+  //    - checking a real password, where we are passed the actual cost
+  //
+  //If the cost is lower than our hard-coded minimum, then they need to rehash
+  if Cost < BCRYPT_COST then begin
+    Result := True;
+    Exit;
+  end;
 
-	if (version = BCRYPT_version_2) or //original spec, that didn't define UTF-8 or what to do with a null terminator
+  if (version = BCRYPT_version_2) or //original spec, that didn't define UTF-8 or what to do with a null terminator
      (version = BCRYPT_version_2a) or //buggy version of OpenBSD that stored password length in a Byte
-		 (version = BCRYPT_version_2x) or //hashes generated by a buggy version of crypt_blowfish; didn't handle unicode correctly
-		 (version = BCRYPT_version_2y) then begin //fixed version of crypt_blowfish
-		//It should be version 2b
-		Result := True;
-		Exit;
-	end;
+     (version = BCRYPT_version_2x) or //hashes generated by a buggy version of crypt_blowfish; didn't handle unicode correctly
+     (version = BCRYPT_version_2y) then begin //fixed version of crypt_blowfish
+    //It should be version 2b
+    Result := True;
+    Exit;
+  end;
 
-	//Use the supplied hashing time as a benchmark
-	if (SampleCost > 0) and (SampleHashDurationMS > 0) then begin
-		idealCost := GetModernCost(SampleCost, SampleHashDurationMS);
-		if (idealCost > Cost) then begin
-			Result := True;
-			Exit;
-		end;
-	end;
+  //Use the supplied hashing time as a benchmark
+  if (SampleCost > 0) and (SampleHashDurationMS > 0) then begin
+    idealCost := GetModernCost(SampleCost, SampleHashDurationMS);
+    if (idealCost > Cost) then begin
+      Result := True;
+      Exit;
+    end;
+  end;
 
-	Result := False; //no rehash needed
+  Result := False; //no rehash needed
 
 end;
 
@@ -2282,233 +2320,248 @@ var i: Integer;
     nDiff: Integer;
 begin
 
-	//
-	//	A timing safe equals comparison
   //
-	//	To prevent leaking length information, it is important that user input is always used as the second parameter.
+  //  A timing safe equals comparison
   //
-	//		safe The internal (safe) value to be checked
-	//		user The user submitted (unsafe) value
+  //  To prevent leaking length information, it is important that user input is always used as the second parameter.
   //
-	//	Returns True if the two strings are identical.
-	//
-	safeLen := Length(Safe);
-	userLen := Length(User);
+  //    safe The internal (safe) value to be checked
+  //    user The user submitted (unsafe) value
+  //
+  //  Returns True if the two strings are identical.
+  //
+  safeLen := Length(Safe);
+  userLen := Length(User);
 
-	// Set the result to the difference between the lengths
-	nDiff := safeLen - userLen;
+  // Set the result to the difference between the lengths
+  nDiff := safeLen - userLen;
 
-	// Note that we ALWAYS iterate over the user-supplied length
-	// This is to prevent leaking length information
-	for i := 0 to userLen-1 do begin
-		// Using mod here is a trick to prevent notices.
-		// It's safe, since if the lengths are different nDiff is already non-zero
-		nDiff := nDiff or (
-				Ord(Safe[(i mod safeLen) + 1])
-				xor
-				Ord(User[i+1])
-		);
-	end;
+  // Note that we ALWAYS iterate over the user-supplied length
+  // This is to prevent leaking length information
+  for i := 0 to userLen-1 do begin
+    // Using mod here is a trick to prevent notices.
+    // It's safe, since if the lengths are different nDiff is already non-zero
+    nDiff := nDiff or (
+        Ord(Safe[(i mod safeLen) + 1])
+        xor
+        Ord(User[i+1])
+    );
+  end;
 
-	 // They are only identical strings if nDiff is exactly zero
-	Result := (nDiff = 0);
+   // They are only identical strings if nDiff is exactly zero
+  Result := (nDiff = 0);
 
 end;
 
 {****************************************}
 class function TBCrypt.SelfTestA: Boolean;
 var
-	i: Integer;
+  i: Integer;
 
-	procedure t(const password: AnsiString; const HashSalt: AnsiString; const ExpectedHashString: AnsiString);
-	var
-		version: Byte;
-		cost: Byte;
-		salt: TBytes;
-		hash: TBytes;
-		actualHashString: AnsiString;
+  procedure t(const password: AnsiString; const HashSalt: AnsiString; const ExpectedHashString: AnsiString);
+  var
+    version: Byte;
+    cost: Byte;
+    salt: TBytes;
+    hash: TBytes;
+    actualHashString: AnsiString;
     mcfEncoded: boolean;
-	begin
-		//Extract "$2a$06$If6bvum7DFjUnE9p2uDeDu" rounds and base64 salt from the HashSalt
-		if not TBCrypt.TryParseHashString(HashSalt, {out}version, {out}cost, {out}salt, {mcfEncoded}mcfEncoded) then
-			raise Exception.Create('bcrypt self-test failed: invalid versionsalt "'+string(HashSalt)+'"');
+  begin
+    //Extract "$2a$06$If6bvum7DFjUnE9p2uDeDu" rounds and base64 salt from the HashSalt
+    if not TBCrypt.TryParseHashString(HashSalt, {out}version, {out}cost, {out}salt, {mcfEncoded}mcfEncoded) then
+      raise Exception.Create('bcrypt self-test failed: invalid versionsalt "'+string(HashSalt)+'"');
 
-		hash := TBCrypt.HashPassword(password, salt, cost);
-		actualHashString := TBCrypt.FormatPasswordHashForBsd(version, cost, salt, hash);
+    hash := TBCrypt.HashPassword(password, salt, cost);
+    actualHashString := TBCrypt.FormatPasswordHashForBsd(version, cost, salt, hash);
 
-		if actualHashString <> ExpectedHashString then
-			raise Exception.CreateFmt('bcrypt self-test failed. Password: "%s". Actual hash "%s". Expected hash: "%s"', [password, actualHashString, ExpectedHashString]);
-	end;
+    if actualHashString <> ExpectedHashString then
+      raise Exception.CreateFmt('bcrypt self-test failed. Password: "%s". Actual hash "%s". Expected hash: "%s"', [password, actualHashString, ExpectedHashString]);
+  end;
 
 begin
-	for i := Low(TestVectors) to High(TestVectors) do
-	begin
-		t(TestVectors[i,1], TestVectors[i,2], TestVectors[i,3] );
-	end;
+  for i := Low(TestVectors) to High(TestVectors) do
+  begin
+    t(TestVectors[i,1], TestVectors[i,2], TestVectors[i,3] );
+  end;
 
-	Result := True;
+  Result := True;
 end;
 
 {****************************************}
 class function TBCrypt.SelfTestB: Boolean;
 var
-	i: Integer;
-	salt: AnsiString;
-	encoded: AnsiString;
-	data: TBytes;
-	recoded: AnsiString;
+  i: Integer;
+  salt: AnsiString;
+  encoded: AnsiString;
+  data: TBytes;
+  recoded: AnsiString;
 const
-	SSelfTestFailed = 'BSDBase64 encoder self-test failed';
+  SSelfTestFailed = 'BSDBase64 encoder self-test failed';
 begin
-	for i := Low(TestVectors) to High(TestVectors) do
-	begin
-		salt := TestVectors[i,2];
+  for i := Low(TestVectors) to High(TestVectors) do
+  begin
+    salt := TestVectors[i,2];
 
-		encoded := Copy(salt, 8, 22); //salt is always 22 characters
+    encoded := Copy(salt, 8, 22); //salt is always 22 characters
 
-		data := TBCrypt.BsdBase64Decode(encoded);
+    data := TBCrypt.BsdBase64Decode(encoded);
 
-		recoded := TBCrypt.BsdBase64Encode(data, Length(data));
-		if (recoded <> encoded) then
-			raise Exception.Create(SSelfTestFailed);
-	end;
+    recoded := TBCrypt.BsdBase64Encode(data, Length(data));
+    if (recoded <> encoded) then
+      raise Exception.Create(SSelfTestFailed);
+  end;
 
-	Result := True;
+  Result := True;
 end;
 
 {****************************************}
 class function TBCrypt.SelfTestD: Boolean;
 var
-	i: Integer;
-	password: AnsiString;
-	hash: AnsiString;
+  i: Integer;
+  password: AnsiString;
+  hash: AnsiString;
 begin
-	for i := 0 to 56 do
-	begin
-		password := ALCopyStr('The quick brown fox jumped over the lazy dog then sat on a log', 1, i);
-		hash := TBCrypt.HashPassword(password, 4);
-		if (hash = '') then
-			raise Exception.Create('hash creation failed');
-	end;
+  for i := 0 to 56 do
+  begin
+    password := ALCopyStr('The quick brown fox jumped over the lazy dog then sat on a log', 1, i);
+    hash := TBCrypt.HashPassword(password, 4);
+    if (hash = '') then
+      raise Exception.Create('hash creation failed');
+  end;
 
-	Result := True;
+  Result := True;
 end;
 
 {****************************************}
 class function TBCrypt.SelfTestE: Boolean;
 var
-	salt: TBytes;
+  salt: TBytes;
 begin
-	{
-		Ensure that the salt generator creates salt, and it is of the correct length.
-	}
-	salt := TBCrypt.GenerateSalt;
-	if Length(salt) <> BCRYPT_SALT_LEN then
-		raise Exception.Create('BCrypt selftest failed; invalid salt length');
+  {
+    Ensure that the salt generator creates salt, and it is of the correct length.
+  }
+  salt := TBCrypt.GenerateSalt;
+  if Length(salt) <> BCRYPT_SALT_LEN then
+    raise Exception.Create('BCrypt selftest failed; invalid salt length');
 
-	Result := True;
+  Result := True;
 end;
 
 {****************************************}
 class function TBCrypt.SelfTestF: Boolean;
 var
-	rehashNeeded: Boolean;
+  rehashNeeded: Boolean;
 begin
-	{
-		Validate a known password hash
-	}
-	Result := TBCrypt.CheckPassword('correctbatteryhorsestapler', '$2a$12$mACnM5lzNigHMaf7O1py1O3vlf6.BA8k8x3IoJ.Tq3IB/2e7g61Km', {out}rehashNeeded);
+  {
+    Validate a known password hash
+  }
+  //OutputDebugString('SAMPLING ON');
+  Result := TBCrypt.CheckPassword('correctbatteryhorsestapler', '$2a$12$mACnM5lzNigHMaf7O1py1O3vlf6.BA8k8x3IoJ.Tq3IB/2e7g61Km', {out}rehashNeeded);
+  //OutputDebugString('SAMPLING OFF');
 end;
 
 {****************************************}
 class function TBCrypt.SelfTestG: Boolean;
 var
-	s55, s56, s57: TBytes;
-	s70, s71, s72, s73, s74: TBytes;
-	sCopy: TBytes;
-	salt: TBytes;
+  s55, s56, s57: TBytes;
+  s70, s71, s72, s73, s74: TBytes;
+  sCopy: TBytes;
+  salt: TBytes;
 
-	function BytesEqual(const data1, data2: array of Byte): Boolean;
-	begin
-		Result := True;
+  function BytesEqual(const data1, data2: array of Byte): Boolean;
+  begin
+    Result := True;
 
-		if Length(data1) <> Length(data2) then
-		begin
-			Result := False;
-			Exit;
-		end;
+    if Length(data1) <> Length(data2) then
+    begin
+      Result := False;
+      Exit;
+    end;
 
-		if Length(data1) = 0 then
-			Exit;
+    if Length(data1) = 0 then
+      Exit;
 
-		Result := CompareMem(@data1[0], @data2[0], Length(data1))
+    Result := CompareMem(@data1[0], @data2[0], Length(data1))
    end;
 const
-	testPassword = 'The quick brown fox jumped over the lazy dog then sat on a log. The sixth sick';
-	//                                                                   56^               ^72
+  testPassword = 'The quick brown fox jumped over the lazy dog then sat on a log. The sixth sick';
+  //                                                                   56^               ^72
 begin
-	Result := True;
+  Result := True;
 
-	salt := TBCrypt.GenerateSalt;
+  salt := TBCrypt.GenerateSalt;
 
-	s55 := TBCrypt.HashPassword(alCopyStr(testPassword, 1, 55), salt, 4);
-	s56 := TBCrypt.HashPassword(ALCopyStr(testPassword, 1, 56), salt, 4);
-	s57 := TBCrypt.HashPassword(ALCopyStr(testPassword, 1, 57), salt, 4);
+  s55 := TBCrypt.HashPassword(alCopyStr(testPassword, 1, 55), salt, 4);
+  s56 := TBCrypt.HashPassword(ALCopyStr(testPassword, 1, 56), salt, 4);
+  s57 := TBCrypt.HashPassword(ALCopyStr(testPassword, 1, 57), salt, 4);
 
-	//First make sure that we can generate the same hash twice with the same password and salt
-	sCopy := TBCrypt.HashPassword(AlCopyStr(testPassword, 1, 55), salt, 4);
-	if not BytesEqual(s55, sCopy) then
-		Result := False;
+  //First make sure that we can generate the same hash twice with the same password and salt
+  sCopy := TBCrypt.HashPassword(AlCopyStr(testPassword, 1, 55), salt, 4);
+  if not BytesEqual(s55, sCopy) then
+    Result := False;
 
-	//The old limit was 56 byte (55 characters + 1 null terminator). Make sure that we can at least handle 57
-	if BytesEqual(s55, s56) then
-		Result := False;
-	if BytesEqual(s56, s57) then
-		Result := False;
+  //The old limit was 56 byte (55 characters + 1 null terminator). Make sure that we can at least handle 57
+  if BytesEqual(s55, s56) then
+    Result := False;
+  if BytesEqual(s56, s57) then
+    Result := False;
 
-	//Finally, do the same test around the 72 character limit. If you specify more than 71 characters, it is cut off
-	//20161025: Change to match what OpenBSD does: they cut off the byte array - null terminator and all - after 72 bytes
-	s70 := TBCrypt.HashPassword(AlCopyStr(testPassword, 1, 70), salt, 4);
-	s71 := TBCrypt.HashPassword(AlCopyStr(testPassword, 1, 71), salt, 4);
-	s72 := TBCrypt.HashPassword(AlCopyStr(testPassword, 1, 72), salt, 4);
-	s73 := TBCrypt.HashPassword(AlCopyStr(testPassword, 1, 73), salt, 4);
-	s74 := TBCrypt.HashPassword(AlCopyStr(testPassword, 1, 74), salt, 4);
+  //Finally, do the same test around the 72 character limit. If you specify more than 71 characters, it is cut off
+  //20161025: Change to match what OpenBSD does: they cut off the byte array - null terminator and all - after 72 bytes
+  s70 := TBCrypt.HashPassword(AlCopyStr(testPassword, 1, 70), salt, 4);
+  s71 := TBCrypt.HashPassword(AlCopyStr(testPassword, 1, 71), salt, 4);
+  s72 := TBCrypt.HashPassword(AlCopyStr(testPassword, 1, 72), salt, 4);
+  s73 := TBCrypt.HashPassword(AlCopyStr(testPassword, 1, 73), salt, 4);
+  s74 := TBCrypt.HashPassword(AlCopyStr(testPassword, 1, 74), salt, 4);
 
-	if BytesEqual(s70, s71) then //we should have still had room
-		Result := False;
+  if BytesEqual(s70, s71) then //we should have still had room
+    Result := False;
 
-	if BytesEqual(s71, s72) then //the 72 character version has no room for the null terminator anymore, so it's also going to be different
-		Result := False;
+  if BytesEqual(s71, s72) then //the 72 character version has no room for the null terminator anymore, so it's also going to be different
+    Result := False;
 
-	if not BytesEqual(s72, s73) then //we should have stopped at 72 characters
-		Result := False;
-	if not BytesEqual(s72, s74) then //definitely don't overflow into 74
-		Result := False;
+  if not BytesEqual(s72, s73) then //we should have stopped at 72 characters
+    Result := False;
+  if not BytesEqual(s72, s74) then //definitely don't overflow into 74
+    Result := False;
 end;
 
 {****************************************}
 class function TBCrypt.SelfTestH: Boolean;
 var
-	szPassword: AnsiString;
-	rehashNeeded: Boolean;
+  szPassword: AnsiString;
+  rehashNeeded: Boolean;
 begin
-	szPassword := ansiString(StringOfChar('a', 260));
 
-	Result := TBCrypt.CheckPassword(szPassword, '$2a$04$QqpSfI8JYX8HSxNwW5yx8Ohp12sNboonE6e5jfnGZ0fD4ZZwQkOOK', {out}rehashNeeded);
+  // A bug was discovered in the OpenBSD implemenation of bcrypt in February of 2014
+  //
+  //   http://undeadly.org/cgi?action=article&sid=20140224132743
+  //   http://marc.info/?l=openbsd-misc&m=139320023202696
+  //
+  // They were storing the length of their strings in an unsigned char (i.e. 0..255)
+  // If a password was longer than 255 characters, it would overflow and wrap at 255.
+  //
+  // They fixed their bug, and decided that everyone should use a new version string (2b).
+  //
+  // Delphi doesn't have this problem, because Delphi does strings correctly (length prefixed, null terminated, reference counted)
+
+  szPassword := ansiString(StringOfChar('a', 260));
+
+  Result := TBCrypt.CheckPassword(szPassword, '$2a$04$QqpSfI8JYX8HSxNwW5yx8Ohp12sNboonE6e5jfnGZ0fD4ZZwQkOOK', {out}rehashNeeded);
 end;
 
 {***************************************}
 class function TBCrypt.SelfTest: Boolean;
 begin
-	Result := True;
+  Result := True;
 
-	Result := Result and SelfTestA;  //known test vectors
-	Result := Result and SelfTestB;  //the base64 encoder/decoder
-	Result := Result and SelfTestD;  //different length passwords
-	Result := Result and SelfTestE;  //salt RNG
-	Result := Result and SelfTestF;  //example of correct horse battery staple
-	Result := Result and SelfTestG;  //72 byte key length (71characters + 1 null = 72)
-	Result := Result and SelfTestH;  //check out handling of strings longer than 255 characters
+  Result := Result and SelfTestA;  //known test vectors
+  Result := Result and SelfTestB;  //the base64 encoder/decoder
+  Result := Result and SelfTestD;  //different length passwords
+  Result := Result and SelfTestE;  //salt RNG
+  Result := Result and SelfTestF;  //example of correct horse battery staple
+  Result := Result and SelfTestG;  //72 byte key length (71characters + 1 null = 72)
+  Result := Result and SelfTestH;  //check out handling of strings longer than 255 characters
 
 end;
 
@@ -4601,7 +4654,7 @@ end;
 // http://mormot.net
 //
 
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
 {$IFEND}
 
@@ -4982,7 +5035,7 @@ begin
   // http://mormot.net
   //
 
-  {$IF CompilerVersion > 32} // tokyo
+  {$IF CompilerVersion > 33} // tokyo
     {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
   {$IFEND}
 

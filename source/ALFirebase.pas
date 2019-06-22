@@ -936,10 +936,6 @@ begin
     TMessageManager.DefaultManager.SendMessage(nil, aMessage);
   end;
 
-  {$IF CompilerVersion > 32} // tokyo
-    {$MESSAGE WARN 'check if this is not already implemented - look for the keyword imp_implementationWithBlock/imp_removeBlock in the source code'}
-  {$ENDIF}
-
   @aImp := imp_implementationWithBlock(withCompletionHandler);
   aImp(aOptions);
   imp_removeBlock(@aImp);
@@ -967,15 +963,12 @@ begin
   finally
     ALFreeAndNil(aJsonDoc);
   end;
+
   {$IFDEF DEBUG}
   allog('TALFirebaseMessagingClient.TUserNotificationCenterDelegate.userNotificationCenterDidReceiveNotificationResponseWithCompletionHandler', aMessage.Value.Notification +
                                                                                                                                                 ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
   TMessageManager.DefaultManager.SendMessage(nil, aMessage);
-
-  {$IF CompilerVersion > 32} // tokyo
-    {$MESSAGE WARN 'check if this is not already implemented - look for the keyword imp_implementationWithBlock/imp_removeBlock in the source code'}
-  {$ENDIF}
 
   @aImp := imp_implementationWithBlock(withCompletionHandler);
   aImp();

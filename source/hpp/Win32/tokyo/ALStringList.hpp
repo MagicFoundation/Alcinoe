@@ -487,7 +487,7 @@ class PASCALIMPLEMENTATION TALHashedStringList : public TALStrings
 	
 private:
 	System::Generics::Collections::TObjectList__1<TALHashedStringListDictionaryNode*>* FNodeList;
-	Alquicksortlist::TALObjectDictionary__2<System::AnsiString,TALHashedStringListDictionaryNode*>* FDictionary;
+	System::Generics::Collections::TObjectDictionary__2<System::AnsiString,TALHashedStringListDictionaryNode*>* FDictionary;
 	System::Types::TDuplicates FDuplicates;
 	System::Classes::TNotifyEvent FOnChange;
 	System::Classes::TNotifyEvent FOnChanging;
@@ -499,7 +499,7 @@ private:
 	bool __fastcall GetCaseSensitive(void);
 	bool __fastcall ExtractNameValue(const System::AnsiString S, System::AnsiString &Name, System::AnsiString &Value);
 	void __fastcall SetDuplicates(const System::Types::TDuplicates Value);
-	Alquicksortlist::TALObjectDictionary__2<System::AnsiString,TALHashedStringListDictionaryNode*>* __fastcall CreateDictionary(int ACapacity, bool aCaseSensitive);
+	System::Generics::Collections::TObjectDictionary__2<System::AnsiString,TALHashedStringListDictionaryNode*>* __fastcall CreateDictionary(int ACapacity, bool aCaseSensitive);
 	
 protected:
 	virtual System::AnsiString __fastcall GetName(int Index);

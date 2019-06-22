@@ -3,9 +3,8 @@
  
   <!-- EditText on a blue background -->
   <style name="BlueBGTextView" parent="@android:style/Widget.Holo.EditText">
-    <item name="android:background">@null</item>
+    <item name="android:background">#FF0087B4</item>
     <item name="android:textCursorDrawable">@null</item>
-    <item name="alfloatingToolbarStyle">@style/al_floating_toolbar_light</item>
   </style>
 
   <style name="AppThemeEditTextStyle" parent="@android:style/Widget.Holo.Light.EditText">
@@ -16,7 +15,6 @@
     <item name="android:editTextStyle">@style/AppThemeEditTextStyle</item>
     <item name="android:colorAccent">#ff0288d1</item>
     <item name="@attr/BlueBGTextViewStyle">@style/BlueBGTextView</item>
-    <item name="alfloatingToolbarStyle">@style/al_floating_toolbar_dark</item>
   </style>
 
 </resources>

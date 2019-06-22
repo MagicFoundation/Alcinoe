@@ -19,7 +19,9 @@
                  android:largeHeap="%largeHeap%"
                  android:icon="%icon%"
                  android:theme="@style/AppTheme"
-                 android:hardwareAccelerated="%hardwareAccelerated%"> <!-- android:theme="@style/AppTheme" instead of android:theme="%theme%" -->
+                 android:hardwareAccelerated="%hardwareAccelerated%"
+                 android:usesCleartextTraffic="true"
+                 android:resizeableActivity="false">
    
         <%application-meta-data%>
 		

@@ -5,21 +5,4 @@
   <attr name="BlueBGTextViewStyle" format="reference"/>
 
 
-
-
-
-  <!-- http://androidbook.com/item/4169 -->
-  <declare-styleable name="alfloatingToolbar">
-
-    <attr name="alfloatingToolbarCloseDrawable" format="reference"/>
-    <attr name="alfloatingToolbarForegroundColor" format="reference|color"/>
-    <attr name="alfloatingToolbarItemBackgroundBorderlessDrawable" format="reference"/>
-    <attr name="alfloatingToolbarItemBackgroundDrawable" format="reference"/>
-    <attr name="alfloatingToolbarOpenDrawable" format="reference"/>
-    <attr name="alfloatingToolbarPopupBackgroundDrawable" format="reference"/>
-    <attr name="alfloatingToolbarStyle" format="reference"/>
-    
-  </declare-styleable>
-
-
 </resources>

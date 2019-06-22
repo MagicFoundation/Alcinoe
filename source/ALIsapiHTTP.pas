@@ -12,7 +12,7 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if Web.Win.IsapiHTTP / Web.HTTPApp was not updated and adjust the IFDEF'}
 {$IFEND}
 

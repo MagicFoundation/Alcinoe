@@ -2,6 +2,10 @@
 Description:  AnsiString version of delphi Unicode Tinifile
 ***********************************************************}
 
+{$IF CompilerVersion > 33} // rio
+  {$MESSAGE WARN 'Check if System.IniFiles still has the exact same fields and adjust the IFDEF'}
+{$ENDIF}
+
 unit ALIniFiles;
 
 {$R-,T-,H+,X+}
@@ -28,11 +32,11 @@ type
     procedure InternalReadSections(const Section: AnsiString; Strings: TALStrings; SubSectionNamesOnly, Recurse: Boolean); virtual;
   public
     constructor Create(const FileName: AnsiString);
-    function SectionExists(const Section: AnsiString): Boolean;
+    function SectionExists(const Section: AnsiString): Boolean; virtual;
     function ReadString(const Section, Ident, Default: AnsiString): AnsiString; virtual; abstract;
     procedure WriteString(const Section, Ident, Value: AnsiString); virtual; abstract;
-    function ReadInteger(const Section, Ident: AnsiString; Default: Longint): Longint; virtual;
-    procedure WriteInteger(const Section, Ident: AnsiString; Value: Longint); virtual;
+    function ReadInteger(const Section, Ident: AnsiString; Default: Integer): Integer; virtual;
+    procedure WriteInteger(const Section, Ident: AnsiString; Value: Integer); virtual;
     function ReadBool(const Section, Ident: AnsiString; Default: Boolean): Boolean; virtual;
     procedure WriteBool(const Section, Ident: AnsiString; Value: Boolean); virtual;
     function ReadBinaryStream(const Section, Name: AnsiString; Value: TStream): Integer; virtual;
@@ -98,7 +102,7 @@ begin
 end;
 
 {*************************************************************************************************}
-function TALCustomIniFile.ReadInteger(const Section, Ident: AnsiString; Default: Longint): Longint;
+function TALCustomIniFile.ReadInteger(const Section, Ident: AnsiString; Default: Integer): Integer;
 var
   IntStr: AnsiString;
 begin
@@ -110,7 +114,7 @@ begin
 end;
 
 {****************************************************************************************}
-procedure TALCustomIniFile.WriteInteger(const Section, Ident: AnsiString; Value: Longint);
+procedure TALCustomIniFile.WriteInteger(const Section, Ident: AnsiString; Value: Integer);
 begin
   WriteString(Section, Ident, ALIntToStr(Value));
 end;
@@ -268,20 +272,20 @@ end;
 procedure TALCustomIniFile.WriteBinaryStream(const Section, Name: AnsiString; Value: TStream);
 var
   Text: AnsiString;
-  Stream: TMemoryStream;
+  Stream: TBytesStream;
 begin
   SetLength(Text, (Value.Size - Value.Position) * 2);
   if Length(Text) > 0 then begin
 
-    if Value is TMemoryStream then Stream := TMemoryStream(Value)
-    else Stream := TMemoryStream.Create;
+    if Value is TBytesStream then Stream := TBytesStream(Value)
+    else Stream := TBytesStream.Create;
 
     try
       if Stream <> Value then begin
         Stream.CopyFrom(Value, Value.Size - Value.Position);
         Stream.Position := 0;
       end;
-      BinToHex(PAnsiChar(Integer(Stream.Memory) + Stream.Position),
+      BinToHex(PAnsiChar(Integer(Stream.Bytes) + Stream.Position),
                PAnsiChar(Text),
                Stream.Size - Stream.Position);
     finally
@@ -376,6 +380,7 @@ procedure TALIniFile.ReadSections(Strings: TALStrings);
 const CStdBufSize = 16384; // chars
 var P, LBuffer: PAnsiChar;
     LCharCount: Integer;
+    LLen: Integer;
 begin
   LBuffer := nil;
   try
@@ -406,9 +411,11 @@ begin
       // chars were read from the file; get the section names
       if LCharCount <> 0 then begin
         P := LBuffer;
-        while P^ <> #0 do begin
+        while LCharCount > 0 do begin
           Strings.Add(P);
-          Inc(P, {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLen(P) + 1);
+          LLen := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLen(P) + 1;
+          Inc(P, LLen);
+          Dec(LCharCount, LLen);
         end;
       end;
     finally

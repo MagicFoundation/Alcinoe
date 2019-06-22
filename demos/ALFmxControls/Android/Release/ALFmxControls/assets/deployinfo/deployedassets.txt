@@ -1,10 +1,10 @@
+.\assets\internal\checkbox_unchecked_88x88.png
 .\assets\internal\radio_unchecked_88x88.png
 .\assets\internal\checkbox_checked_88x88.png
 .\assets\internal\four_720x720.png
 .\assets\internal\tree_720x720.png
-.\assets\internal\thumb_144x144.png
-.\assets\internal\aniindicator_540x432.png
-.\assets\internal\checkbox_unchecked_88x88.png
 .\assets\internal\two_720x720.png
+.\assets\internal\thumb_144x144.png
 .\assets\internal\radio_checked_88x88.png
 .\assets\internal\one_720x720.png
+.\assets\internal\aniindicator_540x432.png

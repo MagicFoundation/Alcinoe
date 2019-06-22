@@ -1,11 +1,20 @@
 unit Bcrypt;
 
-{
+(*
 	Sample Usage
 	============
 
-		hash := TBCrypt.HashPassword('p@ssword1');     //hash using default cost (11)
-		hash := TBCrypt.HashPassword('p@ssword1', 14); //hash using custom cost factor of 14
+		//Hash a password using default cost (e.g. 11 ==> 2^11 ==> 2,048 rounds)
+		hash := TBCrypt.HashPassword('p@ssword1');
+
+		//Hash a password using custom cost factor
+		hash := TBCrypt.HashPassword('p@ssword1', 14); //14 ==> 2^14 ==> 16,384 rounds
+
+		//Check a password
+		var
+			passwordRehashNeeded: Boolean;
+
+		TBCrypt.CheckPassword(szPassword, existingHash, {out}passwordRehashNeeded);
 
 	Remarks
 	=======
@@ -22,10 +31,16 @@ unit Bcrypt;
 	It uses the Blowfish encryption algorithm, but with an "expensive key setup" modification,
 	contained in the function EksBlowfishSetup.
 
-	Initially posted to Stackoverflow (http://stackoverflow.com/a/10441765/12597)
-	Subsequently hosted on GitHub (https://github.com/JoseJimeniz/bcrypt-for-delphi)
 
-	Version 1.10     201612125
+
+	Version 1.13     20180729
+			- UIntPtr isn't declared in Delphi 2010 (21.0). Maybe it first appeared in Delphi XE (22.0)?
+	Version 1.12     20180419
+			- Made compatible with Delphi 5
+			- Published all self tests, but put slow ones behind the -SlowUnitTests command line parameter
+	Version 1.11     20180120
+			- Bugfix: The raw version of CheckPassword forgot to time the hash operation, and set PasswordRehashNeeded out parameter approriately
+	Version 1.10     20161212
 			- Bugfix: Don't zero out password byte array when it is empty - it's a range check error and unneeded
 	Version 1.09     20161122
 			- Added: In accordance with the recommendations of NIST SP 800-63B, we now apply KC normalization to the password.
@@ -141,49 +156,54 @@ unit Bcrypt;
 		This means that everyone else needs to follow suit if you want to remain current to "their" specification.
 		http://undeadly.org/cgi?action=article&sid=20140224132743
 		http://marc.info/?l=openbsd-misc&m=139320023202696
-}
+*)
 
 interface
 
 (*
-	The problem is how to make "TBytes" and "UnicodeString" work in Delphi 5, Delphi 7, and XE2+
+	The problem is how to make "TBytes", "UIntPtr", and "UnicodeString" work in Delphi 5, Delphi 7, Delphi 2010, and XE2+
 
-	| Item            | Delphi 5        | Delphi 7              | Delphi XE2             |
-	|-----------------|-----------------|-----------------------|------------------------|
-	| Version         | VER130          | VER150                | VER230                 |
-	| CompilerVersion | 5               | 7                     | 16                     |
-	| TBytes          | = array of Byte | = Types.TByteDynArray | = SysUtils.TBytes      |
-	| UnicodeString   | = WideString    | = WideString          | = System.UnicodeString |
-	| UIntPtr         | = Cardinal      | = Cardinal            | = System.UIntPtr       |
+	| Item            | Delphi 5        | Delphi 7              | Delphi 2009            | Delphi 2010            | Delphi XE2             |
+	|-----------------|-----------------|-----------------------|------------------------|------------------------|------------------------|
+	| Product version | 5               | 7                     | 12                     | 14                     | 16                     |
+	| Version         | VER130          | VER150                | VER200                 | VER210                 | VER230                 |
+	| CompilerVersion | n/a             | 15.0                  | 20.0                   | 21.0                   | 23.0                   |
+	| TBytes          | = array of Byte | = Types.TByteDynArray | = Types.TByteDynArray? | = Types.TByteDynArray? | = SysUtils.TBytes      |
+	| UnicodeString   | = WideString    | = WideString          | = System.UnicodeString | = System.UnicodeString | = System.UnicodeString | Added in Delphi 2009
+	| UIntPtr         | = Cardinal      | = Cardinal            | = Cardinal             | = Cardinal             | = System.UIntPtr       |
 
-	And it wassn't until Delphi 6 that conditional expressions were added
+	And it wasn't until Delphi 6 (CompilerVersion >= 14.0) that conditional expressions (CONDITIONALEXPRESSIONS) were added.
 *)
-{$IFDEF VER150}
-	{$DEFINE COMPILER_7}
-	{$DEFINE COMPILER_7_DOWN}
-{$ENDIF}
-{$IFDEF VER130}
-	{$DEFINE COMPILER_5}
-	{$DEFINE COMPILER_7_DOWN}
+{$IFDEF CONDITIONALEXPRESSIONS}
+	{$IF CompilerVersion >= 22}
+		{$DEFINE COMPILER_15_UP} //Delphi XE
+	{$IFEND}
+	{$IF CompilerVersion >= 15}
+		{$DEFINE COMPILER_7_UP} //Delphi 7
+	{$IFEND}
 {$ENDIF}
 
 uses
 	SysUtils, Windows, Math,
-	{$IFDEF COMPILER_7}Types,{$ENDIF} //Types.pas didn't appear until ~Delphi 7.
+	{$IFDEF COMPILER_7_UP}Types,{$ENDIF} //Types.pas didn't appear until ~Delphi 7.
 	ComObj;
 
 type
 {$IFNDEF UNICODE}
-	UnicodeString = WideString; //System.UnicodeString wasn't added until around XE2
+	UnicodeString = WideString; //System.UnicodeString wasn't added until Delphi 2009
 {$ENDIF}
 
-{$IFDEF COMPILER_7}
+{$IFDEF VER150} //Delphi 7
 	TBytes = Types.TByteDynArray; //TByteDynArray wasn't added until around Delphi 7. Sometime later it moved to SysUtils.
 {$ENDIF}
-{$IFDEF COMPILER_5}
+
+{$IFDEF VER130} //Delphi 5
 	TBytes = array of Byte; //for old-fashioned Delphi 5, we have to do it ourselves
 {$ENDIF}
-{$IFDEF COMPILER_7_DOWN}
+
+{$IFNDEF COMPILER_15_UP}
+	//Someone said that Delphi 2010 (Delphi 14) didn't have UIntPtr.
+	//So maybe it was Delphi XE (Delphi 15)
 	UIntPtr = Cardinal; //an unsigned, pointer sized, integer
 {$ENDIF}
 
@@ -289,9 +309,17 @@ const
 		|   15 | 32,768 iterations |  8,027.05 ms |  3,999.9 ms | 2,781.4 ms |  2,670.5 ms |
 		|   16 | 65,536 iterations | 15,982.14 ms |  8,008.2 ms | 5,564.9 ms |  5,342.8 ms |
 
-		In 1977, on a VAX-11/780, crypt (MD5) could be evaluated about 3.6 times per second.
-			-->  277 ms per password
-		277 ms per hash would mean a range of 180ms-360ms
+
+		At the time of deployment in 1976, crypt could hash fewer than 4 passwords per second. (250 ms per password)
+		In 1977, on a VAX-11/780, crypt (MD5) could be evaluated about 3.6 times per second.   (277 ms per password)
+		If 277 ms per hash was our target, it would mean a range of 180 ms..360 ms.
+
+		At the time of publication of BCrypt (1999) the default costs were:
+			- Normal User: 6
+			- the Superuser: 8
+
+			"Of course, whatever cost people choose should be reevaluated from time to time."
+
 		We want to target between 250-500ms per hash.
 	}
 
@@ -353,16 +381,15 @@ type
 	TBCryptTests = class(TTestCase)
 	public
 		procedure SpeedTests;
+		function GetCompilerOptions: string;
 	public
 		//These are just too darn slow (as they should be) for continuous testing
 		procedure SelfTest;
-		procedure Benchmark;
 
-		//These two are too slow to use in normal unit testing
-		procedure SelfTestA_KnownTestVectors; //known test vectors
-		procedure SelfTestC_UnicodeStrings; //unicode strings in UTF8
 	published
+		procedure SelfTestA_KnownTestVectors; //known test vectors
 		procedure SelfTestB_Base64EncoderDecoder; //BSD's base64 encoder/decoder
+		procedure SelfTestC_UnicodeStrings; //unicode strings in UTF8
 		procedure SelfTestD_VariableLengthPasswords; //different length passwords
 		procedure SelfTestE_SaltRNG; //salt rng
 		procedure SelfTestF_CorrectBattery; //correctbatteryhorsestapler
@@ -372,7 +399,10 @@ type
 		procedure SelfTestJ_NormalizedPasswordsMatch; //
 		procedure SelfTestK_SASLprep; //
 
-		procedure Test_ParseHashString; //How well we handle past, present, and future versioning stings
+		procedure Test_ParseHashString; //How well we handle past, present, and future versioning strings
+
+		procedure Benchmark;
+		procedure Test_ManualSystem;
 	end;
 {$ENDIF}
 
@@ -387,7 +417,13 @@ procedure BurnString(var s: UnicodeString);
 begin
 	if Length(s) > 0 then
 	begin
+		{$IFDEF UNICODE}
+		{
+			In Delphi 5 (and really anything before XE2), UnicodeString is an alias for WideString.
+			WideString does not have, or does it need, an RTL UniqueString function.
+		}
 		UniqueString({var}s); //We can't FillChar the string if it's shared, or its in the constant data page
+		{$ENDIF}
 		FillChar(s[1], Length(s), 0);
 		s := '';
 	end;
@@ -813,15 +849,15 @@ begin
 	Move(SBox, Result.SBoxM, Sizeof(SBox));
 	Move(PBox, Result.PBoxM, Sizeof(PBox));
 
-	Self.ExpandKey(Result, salt, key);
+	Self.ExpandKey({var} Result, salt, key);
 
 	//rounds = 2^cost
 	rounds := 1 shl cost;
 
 	for i := 1 to rounds do
 	begin
-		Self.ExpandKey(Result, zero, key);
-		Self.ExpandKey(Result, zero, salt);
+		Self.ExpandKey({var} Result, zero, key);
+		Self.ExpandKey({var} Result, zero, salt);
 	end;
 
 	//Result := what it is
@@ -923,19 +959,32 @@ class function TBCrypt.CheckPassword(const password: UnicodeString; const salt, 
 var
 	candidateHash: TBytes;
 	len: Integer;
+	freq, t1, t2: Int64;
 begin
 	Result := False;
+	PasswordRehashNeeded := False;
+
+	if not QueryPerformanceFrequency({var}freq) then
+		freq := -1; //avoid a division by zero
+
+	//Measure how long it takes to run the hash. If it's too quick, it's time to increase the cost
+	if not QueryPerformanceCounter(t1) then t1 := 0;
 
 	candidateHash := TBCrypt.HashPassword(password, salt, cost);
+
+	if not QueryPerformanceCounter(t2) then t2 := 0;
 
 	len := Length(hash);
 	if Length(candidateHash) <> len then
 		Exit;
 
 	Result := CompareMem(@candidateHash[0], @hash[0], len);
+
+	//Based on how long it took to hash the password, see if a rehash is needed to increase the cost
+	PasswordRehashNeeded := TBcrypt.PasswordRehashNeededCore(version, cost, cost, (t2-t1)/freq*1000);
 end;
 
-{$IFDEF COMPILER_7_DOWN}
+{$IFNDEF UNICODE}
 function CharInSet(C: Char; const CharSet: TSysCharSet): Boolean;
 begin
   Result := C in CharSet;
@@ -1045,6 +1094,7 @@ begin
 	if not TryParseHashString(expectedHashString, {out}version, {out}cost, {out}salt) then
 		raise Exception.Create(SInvalidHashString);
 
+	//Measure how long it takes to run the hash. If it's too quick, it's time to increase the cost
 	if not QueryPerformanceCounter(t1) then t1 := 0;
 
 	hash := TBCrypt.HashPassword(password, salt, cost);
@@ -1251,8 +1301,8 @@ var
 	dw: DWORD;
 const
 	CodePage = CP_UTF8;
-	SLenError = '[WideStringToUtf8] Could not get length of destination string. Error %d (%s)';
-	SConvertStringError = '[WideStringToUtf8] Could not convert utf16 to utf8 string. Error %d (%s)';
+	SLenError = '[PasswordStringPrep] Could not get length of destination string. Error %d (%s)';
+	SConvertStringError = '[PasswordStringPrep] Could not convert utf16 to utf8 string. Error %d (%s)';
 begin
 	if Length(Source) = 0 then
 	begin
@@ -1266,20 +1316,50 @@ begin
 		https://pages.nist.gov/800-63-3/sp800-63b.html
 
 		Reminds us to normalize the string (using either NFKC or NFKD).
-			- Compatibility normalization (K) decomposes ligatures into base compatibilty characters
-
-			- composition (C)   adds character+diacritic into single code point (if possible)
-			- decomposition (D) separates an accented character into the letter and the diacritic
+			- K (Compatibility normalization): decomposes ligatures into base compatibilty characters
+			- C (Composition):                 adds character+diacritic into single code point (if possible)
+			- D (Decomposition):               separates an accented character into the letter and the diacritic
 
 		SASLprep (rfc4013), like StringPrep (rfc3454) both specified NFKC:
 
 			Before: Noe¨l
 			After:  Noël
+
+		Spaces
+		======
+
+		RFC7613 - Preparation, Enforcement, and Comparison of Internationalized Strings Representing Usernames and Passwords,
+		like RFC4013 that it obsoletes, reminds us to normalize all the differnet unicode space characters into the
+		standard single U+0020 SPACE:
+
+			2.  Additional Mapping Rule: Any instances of non-ASCII space MUST be mapped to ASCII space (U+0020);
+				 a non-ASCII space is any Unicode code point having a Unicode general category of "Zs"
+				 (with the  exception of U+0020).
+
+					U+0020	SPACE
+					U+00A0	NO-BREAK SPACE
+					U+1680	OGHAM SPACE MARK
+					U+2000	EN QUAD
+					U+2001	EM QUAD
+					U+2002	EN SPACE
+					U+2003	EM SPACE
+					U+2004	THREE-PER-EM SPACE
+					U+2005	FOUR-PER-EM SPACE
+					U+2006	SIX-PER-EM SPACE
+					U+2007	FIGURE SPACE
+					U+2008	PUNCTUATION SPACE
+					U+2009	THIN SPACE
+					U+200A	HAIR SPACE
+					U+202F	NARROW NO-BREAK SPACE
+					U+205F	MEDIUM MATHEMATICAL SPACE
+					U+3000	IDEOGRAPHIC SPACE
+
+		This is handled by NFC.
 	}
 
 	//We use concrete variable for length, because i've seen it return asking for 64 bytes for a 6 byte string
 //	normalizedLength := NormalizeString(5, PWideChar(Source), Length(Source), nil, 0);
-	normalizedLength := FoldString(MAP_FOLDCZONE, PWideChar(Source), Length(Source), nil, 0);
+	normalizedLength := FoldStringW(MAP_FOLDCZONE, PWideChar(Source), Length(Source), nil, 0);
 	if normalizedLength = 0 then
 	begin
 		dw := GetLastError;
@@ -1292,7 +1372,7 @@ begin
 	// Now do it for real
 	try
 //		normalizedLength := NormalizeString(5, PWideChar(Source), Length(Source), PWideChar(normalized), Length(normalized));
-		normalizedLength := FoldString(MAP_FOLDCZONE, PWideChar(Source), Length(Source), PWideChar(normalized), Length(normalized));
+		normalizedLength := FoldStringW(MAP_FOLDCZONE, PWideChar(Source), Length(Source), PWideChar(normalized), Length(normalized));
 		if normalizedLength = 0 then
 		begin
 			dw := GetLastError;
@@ -1454,15 +1534,48 @@ begin
 		Given a Cost factor, and how long it took to compute the hash, figure out the cost needed to get a hashing duration
 		between 250ms - 500ms. Maybe 200-400. It probably needs some discussion.
 
-		In 1977, on a VAX-11/780, crypt (MD5) could be evaluated about 3.6 times per second.
-			-->  277 ms per password
+		This function is used not only as part of the benchmark to decide on a cost for new passwords, but we
+		also use it to measure how long it took to check an existing password, and decide if it was too quick
+		and the password hash needs to be upgraded.
 
-		In 1999, at the time of publication of BCrypt, the default cost is 6 for a normal user and 8 for the superuser.
+		What speed to use?
+		==================
 
+		At the time of deployment in 1976, crypt could hash fewer than 4 passwords per second. (250 ms per password)
+		In 1977, on a VAX-11/780, crypt (MD5) could be evaluated about 3.6 times per second.   (277 ms per password)
+
+		At the time of publication of BCrypt (1999) the default costs were:
+			- Normal User: 6
+			- the Superuser: 8
+
+			"Of course, whatever cost people choose should be reevaluated from time to time."
+
+		Speed tests from the paper from 1999 for Cost 5
+			- OpenBSD 2.3, P5 133 MHz:     156.2 ms  (6.4 crypts/sec)
+			- x86 assembler, P5 133 MHz:     4.4 ms  (22.5 crypts/sec)
+			- Alpha 21164A 600 MHz:          1.6 ms  (62.5 crypts/sec)
+
+		That means that these speeds would for Cost 6 be:
+			- OpenBSD 2.3, P5 133 MHz:     312.5 ms
+			- x86 assembler, P5 133 MHz:     8.9 ms
+			- Alpha 21164A 600 MHz:          3.2 ms
+
+		For cost 8 (superuser) these would be:
+			- OpenBSD 2.3, P5 133 MHz:   1,250.0 ms
+			- x86 assembler, P5 133 MHz:    35.6 ms
+			- Alpha 21164A 600 MHz:         12.8 ms
+
+
+		For regular users we want to target between 250-500ms per hash (i.e. no more than 500 ms, no less than 250 ms)
 		We would like to target 300ms as the calculation time, but not exceed 500ms.
-		So if our time was less than 250ms, then we can double it.
 
-		For a 5-digit pin (59,049 combinations):
+		- if our calculation time was less than 250ms, then we can double it
+		- if our calculation time was more than 500ms, then we can half it
+
+		Speed of pins
+		=============
+
+		For a 5-digit pin (59,049 combinations) the time to exhaust all combinations is:
 				200 ms --> 3.2 hours
 				250 ms --> 4.1 hours
 				400 ms --> 6.6 hours
@@ -1557,7 +1670,9 @@ begin
 	{
 		Validate a known password hash
 	}
+	//OutputDebugString('SAMPLING ON');
 	Result := TBCrypt.CheckPassword('correctbatteryhorsestapler', '$2a$12$mACnM5lzNigHMaf7O1py1O3vlf6.BA8k8x3IoJ.Tq3IB/2e7g61Km', {out}rehashNeeded);
+	//OutputDebugString('SAMPLING OFF');
 end;
 
 class function TBCrypt.SelfTestG: Boolean;
@@ -1630,6 +1745,19 @@ var
 	szPassword: string;
 	rehashNeeded: Boolean;
 begin
+{
+	A bug was discovered in the OpenBSD implemenation of bcrypt in February of 2014
+
+		http://undeadly.org/cgi?action=article&sid=20140224132743
+		http://marc.info/?l=openbsd-misc&m=139320023202696
+
+	They were storing the length of their strings in an unsigned char (i.e. 0..255)
+	If a password was longer than 255 characters, it would overflow and wrap at 255.
+
+	They fixed their bug, and decided that everyone should use a new version string (2b).
+
+	Delphi doesn't have this problem, because Delphi does strings correctly (length prefixed, null terminated, reference counted)
+}
 	szPassword := StringOfChar('a', 260);
 
 	Result := TBCrypt.CheckPassword(szPassword, '$2a$04$QqpSfI8JYX8HSxNwW5yx8Ohp12sNboonE6e5jfnGZ0fD4ZZwQkOOK', {out}rehashNeeded);
@@ -1639,6 +1767,10 @@ class function TBCrypt.SelfTestI: Boolean;
 var
 	password: UnicodeString;
 	utf8: TBytes;
+const
+	n: UnicodeString=''; //n=nothing.
+			//Work around bug in Delphi compiler when building widestrings
+			//http://stackoverflow.com/a/7031942/12597
 begin
 	{
 		Before: A + ¨ + fi + n
@@ -1660,7 +1792,7 @@ begin
 				n:  0x6E
 				\0: 0x00
 	}
-	password := 'A' + #$0308 + #$FB01 + 'n';
+	password := n + WideChar('A') + WideChar(#$0308) + WideChar(#$FB01) + WideChar('n');
 
 	utf8 := TBCrypt.PasswordStringPrep(password);
 
@@ -1682,6 +1814,10 @@ var
 	password2: UnicodeString;
 	hash: string;
 	passwordRehashNeeded: Boolean;
+const
+	n: UnicodeString=''; //n=nothing.
+			//Work around bug in Delphi compiler when building widestrings
+			//http://stackoverflow.com/a/7031942/12597
 begin
 	{
 		There are four Unicode normalization schemes:
@@ -1710,8 +1846,8 @@ begin
 				i:  U+0069
 				n:  U+006E
 	}
-	password1 := 'A' + #$0308 + #$FB01 + 'n';
-	password2 := #$00C4 + 'f' + 'i' + 'n';
+	password1 := n + 'A' + #$0308 + #$FB01 + 'n';
+	password2 := n + #$00C4 + 'f' + 'i' + 'n';
 
 	hash := TBCrypt.HashPassword(password1, 4);
 
@@ -1738,6 +1874,7 @@ var
 
 		Result := True;
 	end;
+
 begin
 	{
 		1. Width-Mapping Rule: Fullwidth and halfwidth characters MUST NOT be mapped to their decomposition mappings
@@ -1921,6 +2058,12 @@ var
 	t1, t2, freq: Int64;
 	durationMS: Double;
 begin
+	if not FindCmdLineSwitch('SlowUnitTests', ['/', '-'], True) then
+	begin
+		Status('Very slow test. Specify -SlowUnitTests to include');
+		Exit;
+	end;
+
 	if not QueryPerformanceFrequency(freq) then
 		freq := -1; //to avoid division by zero
 
@@ -1943,6 +2086,61 @@ begin
 		if durationMS > 15000 then
 			Break;
 	end;
+
+	Status(Self.GetCompilerOptions);
+end;
+
+function TBCryptTests.GetCompilerOptions: string;
+
+	procedure Add(s: string);
+	begin
+		if Result <> '' then
+			Result := Result+#13#10;
+
+		Result := Result + s;
+	end;
+
+begin
+	Result := '';
+
+(*
+	Other than for certain debugging situations, you should never have a need to turn optimizations off.
+*)
+{$IFOPT O+} //OPTIMIZATION
+	Add('Optimization: ON');
+{$ELSE}
+	Add('Optimization: OFF');
+{$ENDIF}
+
+(*
+	Enabling overflow checking slows down your program and makes it somewhat larger, so use {$Q+} only for debugging.
+*)
+{$IFOPT Q+} //OVERFLOWCHECKS
+	Add('Overflow Checking: ON');
+{$ELSE}
+	Add('Overflow Checking: OFF');
+{$ENDIF}
+
+(*
+	Enabling range checking slows down your program and makes it somewhat larger.
+*)
+{$IFOPT R+} //RANGECHECKS
+	Add('Range Checking: ON');
+{$ELSE}
+	Add('Range Checking: OFF');
+{$ENDIF}
+
+{$IFOPT W+} //STACKFRAMES
+	Add('Stack frames: ON');
+{$ELSE}
+	Add('Stack frames: OFF');
+{$ENDIF}
+
+{$IFOPT I+} //IOCHECKS
+	Add('I/O Checking: ON');
+{$ELSE}
+	Add('I/O Checking: OFF');
+{$ENDIF}
 end;
 
 procedure TBCryptTests.SelfTest;
@@ -1952,6 +2150,12 @@ end;
 
 procedure TBCryptTests.SelfTestA_KnownTestVectors;
 begin
+	if not FindCmdLineSwitch('SlowUnitTests', ['/', '-'], True) then
+	begin
+		Status('Very slow test. Specify -SlowUnitTests to include');
+		Exit;
+	end;
+
 	CheckTrue(TBCrypt.SelfTestA);
 end;
 
@@ -1962,6 +2166,12 @@ end;
 
 procedure TBCryptTests.SelfTestC_UnicodeStrings;
 begin
+	if not FindCmdLineSwitch('SlowUnitTests', ['/', '-'], True) then
+	begin
+		Status('Very slow test. Specify -SlowUnitTests to include');
+		Exit;
+	end;
+
 	CheckTrue(TBCrypt.SelfTestC);
 end;
 
@@ -1976,8 +2186,19 @@ begin
 end;
 
 procedure TBCryptTests.SelfTestF_CorrectBattery;
+var
+	t1, t2, freq: Int64;
 begin
+	if not QueryPerformanceFrequency(freq) then
+		freq := -1; //to avoid division by zero
+
+	QueryPerformanceCounter(t1);
 	CheckTrue(TBcrypt.SelfTestF);
+	QueryPerformanceCounter(t2);
+
+	Status(Format('%.4f ms', [(t2-t1)/freq*1000]));
+
+	Status(GetCompilerOptions);
 end;
 
 procedure TBCryptTests.SelfTestG_PasswordLength;
@@ -2053,6 +2274,29 @@ begin
 	TimeIt(16);
 //OutputDebugString('SAMPLING OFF');
 //	TimeIt(17);
+end;
+
+procedure TBCryptTests.Test_ManualSystem;
+var
+	salt: TBytes;
+	hash: TBytes;
+	password: string;
+	validPassword: Boolean;
+	passwordRehashNeeded: Boolean;
+begin
+	{
+		Normally bcrypt hashes to an OpenBSD password-file compatible string (i.e. $2b$...)
+		But if you want to handle the salt, and hash bytes directly, and come up with your own serialization format
+		you can do that too
+	}
+	password := 'correct horse battery staple';
+	salt := TBCrypt.GenerateSalt;
+
+	hash := TBCrypt.HashPassword(password, salt, 4); //4 is the lowest cost we'll accept
+
+	validPassword := TBCrypt.CheckPassword(password, salt, hash, 4, {out}passwordRehashNeeded);
+	CheckTrue(validPassword);
+	CheckTrue(passwordRehashNeeded, 'Expected passwordRehashNeede to be true, given that we used a cost of 4');
 end;
 
 procedure TBCryptTests.Test_ParseHashString;

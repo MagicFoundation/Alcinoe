@@ -268,7 +268,7 @@ object Form1: TForm1
     object Text3: TText
       Align = Top
       HitTest = False
-      Position.Y = 1609.484375000000000000
+      Position.Y = 1530.484375000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 40.000000000000000000
       Size.PlatformDefault = False
@@ -278,7 +278,7 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 2916.367187500000000000
+      Position.Y = 2900.406250000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
@@ -297,7 +297,7 @@ object Form1: TForm1
       Position.X = 16.000000000000000000
       Position.Y = 2720.484375000000000000
       Size.Width = 288.000000000000000000
-      Size.Height = 47.882812500000000000
+      Size.Height = 31.921875000000000000
       Size.PlatformDefault = False
       Text = 
         'Note that the verticalscrollbar is deactivated when you move lef' +
@@ -527,8 +527,6 @@ object Form1: TForm1
       MaxThumb.Glyph.ResourceName = 'thumb_144x144'
       BackGround.Align = VertCenter
       BackGround.Fill.Color = xFFC5C5C5
-      BackGround.Margins.Left = 16.000000000000000000
-      BackGround.Margins.Right = 16.000000000000000000
       BackGround.Position.X = 16.000000000000000000
       BackGround.Position.Y = 17.000000000000000000
       BackGround.Size.Width = 238.000000000000000000
@@ -547,7 +545,7 @@ object Form1: TForm1
       Margins.Top = 8.000000000000000000
       Margins.Right = 25.000000000000000000
       Position.X = 25.000000000000000000
-      Position.Y = 2872.367187500000000000
+      Position.Y = 2856.406250000000000000
       Size.Width = 270.000000000000000000
       Size.Height = 36.000000000000000000
       Size.PlatformDefault = False
@@ -563,8 +561,6 @@ object Form1: TForm1
       Thumb.Glyph.Size.PlatformDefault = False
       BackGround.Align = VertCenter
       BackGround.Fill.Color = xFFC5C5C5
-      BackGround.Margins.Left = 16.000000000000000000
-      BackGround.Margins.Right = 16.000000000000000000
       BackGround.Position.X = 16.000000000000000000
       BackGround.Position.Y = 15.000000000000000000
       BackGround.Size.Width = 238.000000000000000000
@@ -580,7 +576,7 @@ object Form1: TForm1
       Margins.Left = 25.000000000000000000
       Margins.Right = 25.000000000000000000
       Position.X = 25.000000000000000000
-      Position.Y = 2783.367187500000000000
+      Position.Y = 2767.406250000000000000
       Size.Width = 270.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
@@ -590,7 +586,7 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 2823.367187500000000000
+      Position.Y = 2807.406250000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
@@ -630,7 +626,7 @@ object Form1: TForm1
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 15.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 2972.367187500000000000
+      Position.Y = 2956.406250000000000000
       Size.Width = 288.000000000000000000
       Size.Height = 160.000000000000000000
       Size.PlatformDefault = False
@@ -901,7 +897,7 @@ object Form1: TForm1
     object ALRectangle3: TALRectangle
       Align = Top
       Fill.Color = claWhite
-      Position.Y = 3292.367187500000000000
+      Position.Y = 3276.406250000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
@@ -1078,7 +1074,7 @@ object Form1: TForm1
       Padding.Right = 8.000000000000000000
       Padding.Bottom = 8.000000000000000000
       Margins.Bottom = 25.000000000000000000
-      Position.Y = 3147.367187500000000000
+      Position.Y = 3131.406250000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 120.000000000000000000
       Size.PlatformDefault = False
@@ -1096,7 +1092,7 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 1568.484375000000000000
+      Position.Y = 1608.484375000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
@@ -1111,7 +1107,7 @@ object Form1: TForm1
       Margins.Top = 8.000000000000000000
       Margins.Right = 25.000000000000000000
       Position.X = 25.000000000000000000
-      Position.Y = 1538.484375000000000000
+      Position.Y = 1578.484375000000000000
       Size.Width = 270.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
@@ -1130,8 +1126,6 @@ object Form1: TForm1
         Thumb.YRadius = 11.000000000000000000
         BackGround.Align = VertCenter
         BackGround.Fill.Color = xFFC5C5C5
-        BackGround.Margins.Left = 6.000000000000000000
-        BackGround.Margins.Right = 6.000000000000000000
         BackGround.Position.X = 6.000000000000000000
         BackGround.Position.Y = 4.000000000000000000
         BackGround.Size.Width = 32.000000000000000000
@@ -1140,6 +1134,7 @@ object Form1: TForm1
         BackGround.Stroke.Kind = None
         BackGround.XRadius = 7.000000000000000000
         BackGround.YRadius = 7.000000000000000000
+        AnimationDuration = 0.200000002980232200
         OnChange = ALSwitch1Change
       end
     end

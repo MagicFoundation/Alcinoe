@@ -8,8 +8,8 @@
 
     <!-- This is the platform API where NativeActivity was introduced. -->
     <uses-sdk android:minSdkVersion="14" 
-              android:targetSdkVersion="22" /> <!-- android:minSdkVersion="14" instead of android:minSdkVersion="14"
-                                                    android:targetSdkVersion="22" instead of android:targetSdkVersion="14" -->
+              android:targetSdkVersion="22" /> <!-- android:minSdkVersion="14" instead of android:minSdkVersion="19"
+                                                    android:targetSdkVersion="22" instead of android:targetSdkVersion="28" -->
 
     <!-- support-fragment.jar -->
     <!-- support-core-utils.jar -->
@@ -21,7 +21,7 @@
     <!-- customtabs.jar -->
     <meta-data android:name="android.support.VERSION" android:value="25.3.1" />
 
-    <!--     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.CAMERA" />

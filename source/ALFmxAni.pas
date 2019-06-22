@@ -1,6 +1,6 @@
 unit ALFmxAni;
 
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if FMX.Ani.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -109,6 +109,7 @@ type
     destructor Destroy; override;
     procedure AddAnimation(const Ani: TALAnimation);
     procedure RemoveAnimation(const Ani: TALAnimation);
+    Procedure WakeUpTimer;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -118,7 +119,7 @@ type
   public class var
     AniFrameRate: Integer;
   private class var
-    FAniThread: {$IF defined(ANDROID)}TALChoreographerThread{$ELSEIF defined(IOS)}TALDisplayLinkThread{$ELSE}TTimer{$ENDIF};
+    FAniThread: TALAniThread;
   private
     FTag: int64;
     [Weak] FTagObject: TObject;
@@ -149,6 +150,8 @@ type
     procedure DoProcess; virtual;
     procedure DoFinish; virtual;
   public
+    class Procedure WakeUpTimer;
+  public
     constructor Create; Virtual;
     destructor Destroy; override;
     procedure Start; virtual;
@@ -171,7 +174,7 @@ type
     property OnProcess: TNotifyEvent read FOnProcess write FOnProcess;
     property OnFinish: TNotifyEvent read FOnFinish write FOnFinish;
     property Overshoot: Single read fOvershoot write fOvershoot;
-    class property AniThread: {$IF defined(ANDROID)}TALChoreographerThread{$ELSEIF defined(IOS)}TALDisplayLinkThread{$ELSE}TTimer{$ENDIF} read FAniThread;
+    class property AniThread: TALAniThread read FAniThread;
     property Tag: int64 read FTag write FTag default 0;
     property TagObject: TObject read FTagObject write FTagObject;
     property TagFloat: Double read FTagFloat write FTagFloat;
@@ -445,7 +448,7 @@ procedure TALDisplayLinkThread.TDisplayLinkListener.displayLinkUpdated;
 begin
 
   {$IFDEF DEBUG}
-  ALLog('TALDisplayLinkThread.TDisplayLinkListener.displayLinkUpdated', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  //ALLog('TALDisplayLinkThread.TDisplayLinkListener.displayLinkUpdated', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
   if assigned(fDisplayLinkThread.FTimerEvent) then
@@ -545,6 +548,23 @@ begin
   Enabled := FAniList.Count > 0;
 end;
 
+{*********************************}
+Procedure TALAniThread.WakeUpTimer;
+begin
+  if not enabled then exit;
+  if FTimerService.GetTick - FTime > 0.04 then begin // normally DoSyncTimer must be called every 0.016 seconds.
+                                                     // but in heavy situation, especially on ios, the CADisplay link
+                                                     // could never fire. I saw it on iphone 5 playing webRTC + filter
+                                                     // the GPU was so busy that the CADisplay link never fire.
+                                                     // so if it's was not called for more than 0.04 seconds (0.016*2 + 0.016/2)
+                                                     // then call it again
+    {$IFDEF DEBUG}
+    ALLog('TALAniThread.WakeUpTimer', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.warn);
+    {$ENDIF}
+    DoSyncTimer(nil);
+  end;
+end;
+
 {**************************************************}
 procedure TALAniThread.DoSyncTimer(Sender: TObject);
 begin
@@ -560,6 +580,7 @@ procedure TALAniThread.OneStep;
 var
   I: Integer;
   NewTime: Double;
+  [unsafe] Ani: TALAnimation;
 begin
   NewTime := FTimerService.GetTick;
   FDeltaTime := NewTime - FTime;
@@ -571,11 +592,12 @@ begin
     I := FAniList.Count - 1;
     while I >= 0 do
     begin
-      if FAniList[I].FRunning then
+      Ani := FAniList[I];
+      if Ani.FRunning then
       begin
-        FAniList[I].ProcessTick(FTime, FDeltaTime);
+        Ani.ProcessTick(FTime, FDeltaTime);
       end;
-      dec(I);
+      Dec(I);
       if I >= FAniList.Count then
         I := FAniList.Count - 1;
     end;
@@ -814,7 +836,7 @@ begin
     if AniThread = nil then
       FAniThread := TALAniThread.Create;
 
-    TALAniThread(AniThread).AddAnimation(Self);
+    AniThread.AddAnimation(Self);
     if not AniThread.Enabled then
       Stop
     else
@@ -869,6 +891,12 @@ end;
 class procedure TALAnimation.Uninitialize;
 begin
   ALFreeAndNil(FAniThread);
+end;
+
+{***************************************}
+class Procedure TALAnimation.WakeUpTimer;
+begin
+  if AniThread <> nil then FAniThread.WakeUpTimer
 end;
 
 {***********************************}

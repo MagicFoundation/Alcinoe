@@ -1,6 +1,6 @@
 unit ALFmxDesignEditors;
 
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if FMX.Editor.Items.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 

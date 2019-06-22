@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>2018/11/26 19:01:25.000.046,C:\Dev\Alcinoe\demos\ALLiveVideoChat\ALLiveVideoChat.groupproj=C:\Dev\Alcinoe\demos\ALLiveVideoChat\ProjectGroup1.groupproj</Transaction>
+    <Transaction>2018/11/26 19:01:25.000.046,C:\Dev\Alcinoe\demos\ALLiveVideoChat\ProjectGroup1.groupproj=C:\Dev\Alcinoe\demos\ALLiveVideoChat\ALLiveVideoChat.groupproj</Transaction>
   </Transactions>
 	<Default.Personality>
-		<Projects ActiveProject="C:\Dev\Alcinoe\demos\ALLiveVideoChat\server\_source\ALLiveVideoChatServer.dproj"/>
+		<Projects ActiveProject="C:\Dev\Alcinoe\demos\ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj"/>
 	</Default.Personality>
 </BorlandProject>

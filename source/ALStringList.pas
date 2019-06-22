@@ -60,8 +60,8 @@ Type
     FStrings: TALStrings;
   public
     constructor Create(AStrings: TALStrings);
-    function GetCurrent: AnsiString; inline;
-    function MoveNext: Boolean;
+    function GetCurrent: AnsiString;
+    function MoveNext: Boolean; inline;
     property Current: AnsiString read GetCurrent;
   end;
 
@@ -140,7 +140,7 @@ Type
     procedure EndUpdate;
     function Equals(Strings: TALStrings): Boolean; reintroduce;
     procedure Exchange(Index1, Index2: Integer); virtual;
-    function GetEnumerator: TALStringsEnumerator;
+    function GetEnumerator: TALStringsEnumerator; inline;
     function GetText: PAnsiChar; virtual;
     function IndexOf(const S: AnsiString): Integer; virtual;
     function IndexOfName(const Name: AnsiString): Integer; virtual;
@@ -462,7 +462,7 @@ Type
   TALHashedStringList = class(TALStrings)
   private
     FNodeList: TObjectList<TALHashedStringListDictionaryNode>;
-    FDictionary: TALObjectDictionary<ansiString, TALHashedStringListDictionaryNode>;
+    FDictionary: TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>;
     FDuplicates: TDuplicates;
     FOnChange: TNotifyEvent;
     FOnChanging: TNotifyEvent;
@@ -474,7 +474,7 @@ Type
     function GetCaseSensitive: Boolean;
     Function ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean;
     procedure SetDuplicates(const Value: TDuplicates);
-    function CreateDictionary(ACapacity: integer; aCaseSensitive: boolean): TALObjectDictionary<ansiString, TALHashedStringListDictionaryNode>;
+    function CreateDictionary(ACapacity: integer; aCaseSensitive: boolean): TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>;
   protected
     function GetName(Index: Integer): AnsiString; override;
     function GetStrictName(Index: Integer): AnsiString; override; // [added from Tstrings]
@@ -542,14 +542,14 @@ type
     FStrings: TALStringsU;
   public
     constructor Create(AStrings: TALStringsU);
-    function GetCurrent: String; inline;
-    function MoveNext: Boolean;
+    function GetCurrent: String;
+    function MoveNext: Boolean; inline;
     property Current: String read GetCurrent;
   end;
 
   {------------------------}
-  {$IF CompilerVersion > 32} // tokyo
-    {$MESSAGE WARN 'Check if System.classes.TStrings didn't change and adjust the IFDEF'}
+  {$IF CompilerVersion > 33} // rio
+    {$MESSAGE WARN 'Check if System.classes.TStrings didn''t change and adjust the IFDEF'}
   {$IFEND}
   TALStringsU = class(TPersistent)
   private
@@ -618,7 +618,7 @@ type
     procedure EndUpdate;
     function Equals(Strings: TALStringsU): Boolean; reintroduce;
     procedure Exchange(Index1, Index2: Integer); virtual;
-    function GetEnumerator: TALStringsEnumeratorU;
+    function GetEnumerator: TALStringsEnumeratorU; inline;
     function GetText: PChar; virtual;
     function IndexOf(const S: String): Integer; virtual;
     function IndexOfName(const Name: String): Integer; virtual;
@@ -678,8 +678,8 @@ type
   TALStringListSortCompareU = reference to function(List: TALStringListU; Index1, Index2: Integer): Integer;
 
   {------------------------}
-  {$IF CompilerVersion > 32} // tokyo
-    {$MESSAGE WARN 'Check if System.classes.TStringList didn't change and adjust the IFDEF'}
+  {$IF CompilerVersion > 33} // rio
+    {$MESSAGE WARN 'Check if System.classes.TStringList didn''t change and adjust the IFDEF'}
   {$IFEND}
   TALStringListU = class(TALStringsU)
   private
@@ -866,9 +866,8 @@ end;
 {**********************************************}
 function TALStringsEnumerator.MoveNext: Boolean;
 begin
-  Result := FIndex < FStrings.Count - 1;
-  if Result then
-    Inc(FIndex);
+  Inc(FIndex);
+  Result := FIndex < FStrings.Count;
 end;
 
 {****************************}
@@ -1383,7 +1382,7 @@ begin
   try
     LoadFromStream(Stream);
   finally
-    Stream.Free;
+    ALFreeAndNil(Stream);
   end;
 end;
 
@@ -1448,7 +1447,7 @@ begin
     Try
       SaveToStream(aFileStream);
     finally
-      aFileStream.Free;
+      ALFreeAndNil(aFileStream);
     end;
 
     if aTmpFilename <> FileName then begin
@@ -1711,7 +1710,7 @@ begin
   // Free the objects that were owned by the list
   if Length(Temp) > 0 then
     for I := 0 to Length(Temp) - 1 do
-      Temp[I].Free;
+      ALFreeAndNil(Temp[I]);
 end;
 
 {*******************************************************}
@@ -1826,7 +1825,7 @@ begin
     // Free the objects that were owned by the list
     if Length(Temp) > 0 then
       for I := 0 to Length(Temp) - 1 do
-        Temp[I].Free;
+        ALFreeAndNil(Temp[I]);
 
     Changed;
   end;
@@ -1859,7 +1858,7 @@ begin
     PPointer(@FList[FCount].FObject)^ := nil;
   end;
   if Obj <> nil then
-    Obj.Free;
+    ALFreeAndNil(Obj);
   Changed;
 end;
 
@@ -2000,13 +1999,19 @@ end;
 
 {***************************}
 procedure TALStringList.Grow;
+{$IF CompilerVersion <= 32}{tokyo}
 var
   Delta: Integer;
+{$endif}
 begin
+  {$IF CompilerVersion <= 32}{tokyo}
   if FCapacity > 64 then Delta := FCapacity div 4 else
     if FCapacity > 8 then Delta := 16 else
       Delta := 4;
   SetCapacity(FCapacity + Delta);
+  {$else}
+  SetCapacity(GrowCollection(FCapacity, FCount + 1));
+  {$endif}
 end;
 
 {***********************************************************}
@@ -2109,7 +2114,7 @@ begin
   FList[Index].FObject := AObject;
 
   if Obj <> nil then
-    Obj.Free;
+    ALFreeAndNil(Obj);
 
   Changed;
 end;
@@ -2421,7 +2426,7 @@ begin
   // Free the objects that were owned by the list
   if Length(Temp) > 0 then
     for I := 0 to Length(Temp) - 1 do
-      Temp[I].Free;
+      ALFreeAndNil(Temp[I]);
 end;
 
 {*********************************************************}
@@ -2572,7 +2577,7 @@ begin
     // Free the objects that were owned by the list
     if Length(Temp) > 0 then
       for I := 0 to Length(Temp) - 1 do
-        Temp[I].Free;
+        ALFreeAndNil(Temp[I]);
 
     Changed;
   end;
@@ -2606,7 +2611,7 @@ begin
     PPointer(@FList[FCount].FObject)^ := nil;
   end;
   if Obj <> nil then
-    Obj.Free;
+    ALFreeAndNil(Obj);
   Changed;
 end;
 
@@ -2841,13 +2846,19 @@ end;
 
 {*****************************}
 procedure TALNVStringList.Grow;
+{$IF CompilerVersion <= 32}{tokyo}
 var
   Delta: Integer;
+{$endif}
 begin
+  {$IF CompilerVersion <= 32}{tokyo}
   if FCapacity > 64 then Delta := FCapacity div 4 else
     if FCapacity > 8 then Delta := 16 else
       Delta := 4;
   SetCapacity(FCapacity + Delta);
+  {$else}
+  SetCapacity(GrowCollection(FCapacity, FCount + 1));
+  {$endif}
 end;
 
 {**********************************************}
@@ -3083,7 +3094,7 @@ begin
   FList[Index].FObject := AObject;
 
   if Obj <> nil then
-    Obj.Free;
+    ALFreeAndNil(Obj);
 
   Changed;
 end;
@@ -3436,14 +3447,14 @@ begin
       Temp[I] := Objects[I];
   end;
 
-  FAVLBinTree.free;
-  FNodeList.free;
+  ALFreeAndNil(FAVLBinTree);
+  ALFreeAndNil(FNodeList);
   inherited Destroy;
 
   // Free the objects that were owned by the list
   if Length(Temp) > 0 then
     for I := 0 to Length(Temp) - 1 do
-      Temp[I].Free;
+      ALFreeAndNil(Temp[I]);
 end;
 
 {**********************************************************}
@@ -3559,7 +3570,7 @@ begin
     // Free the objects that were owned by the list
     if Length(Temp) > 0 then
       for I := 0 to Length(Temp) - 1 do
-        Temp[I].Free;
+        ALFreeAndNil(Temp[I]);
 
     Changed;
   end;
@@ -3585,7 +3596,7 @@ begin
     TALAVLStringListBinaryTreeNode(FNodelist[i]).Idx := i;
 
   if Obj <> nil then
-    Obj.Free;
+    ALFreeAndNil(Obj);
   Changed;
 end;
 
@@ -3784,7 +3795,7 @@ begin
   aNode.Nvs := True;
   aNode.Obj := AObject;
   if not FAVLBinTree.AddNode(aNode) then begin
-    aNode.free;
+    ALFreeAndNil(aNode);
     case Duplicates of
       dupIgnore: Exit;
       else Error(@SDuplicateString, 0);
@@ -3814,7 +3825,7 @@ begin
   aNode.Nvs := aNvs;
   aNode.Obj := AObject;
   if not FAVLBinTree.AddNode(aNode) then begin
-    aNode.free;
+    ALFreeAndNil(aNode);
     case Duplicates of
       dupIgnore: Exit;
       else Error(@SDuplicateString, 0);
@@ -3848,7 +3859,7 @@ begin
     aNewNode.NVS := aNewNvs;
     aNewNode.Obj := aOldNode.Obj;
     if not FAVLBinTree.AddNode(aNewNode) then begin
-      aNewNode.free;
+      ALFreeAndNil(aNewNode);
       case Duplicates of
         dupIgnore: Exit;
         else Error(@SDuplicateString, 0);
@@ -3884,7 +3895,7 @@ begin
   TALAVLStringListBinaryTreeNode(FNodeList[Index]).Obj := AObject;
 
   if Obj <> nil then
-    Obj.Free;
+    ALFreeAndNil(Obj);
 
   Changed;
 end;
@@ -4129,14 +4140,14 @@ begin
       Temp[I] := Objects[I];
   end;
 
-  FDictionary.free;
-  FNodeList.free;
+  ALFreeAndNil(FDictionary);
+  ALFreeAndNil(FNodeList);
   inherited Destroy;
 
   // Free the objects that were owned by the list
   if Length(Temp) > 0 then
     for I := 0 to Length(Temp) - 1 do
-      Temp[I].Free;
+      ALFreeAndNil(Temp[I]);
 end;
 
 {*************************************************************}
@@ -4252,7 +4263,7 @@ begin
     // Free the objects that were owned by the list
     if Length(Temp) > 0 then
       for I := 0 to Length(Temp) - 1 do
-        Temp[I].Free;
+        ALFreeAndNil(Temp[I]);
 
     Changed;
   end;
@@ -4278,7 +4289,7 @@ begin
     FNodelist[i].Idx := i;
 
   if Obj <> nil then
-    Obj.Free;
+    ALFreeAndNil(Obj);
   Changed;
 end;
 
@@ -4473,8 +4484,13 @@ begin
   aNode.Val := Value;
   aNode.Nvs := True;
   aNode.Obj := AObject;
+  {$IF CompilerVersion <= 32} // tokyo
+  if not Fdictionary.ContainsKey(Name) then Fdictionary.Add(Name,aNode)
+  else begin
+  {$ELSE}
   if not Fdictionary.TryAdd(Name,aNode) then begin
-    aNode.Free;
+  {$ENDIF}
+    ALFreeAndNil(aNode);
     case Duplicates of
       dupIgnore: Exit;
       else Error(@SDuplicateString, 0);
@@ -4503,8 +4519,13 @@ begin
   aNode.Val := aValue;
   aNode.Nvs := aNvs;
   aNode.Obj := AObject;
+  {$IF CompilerVersion <= 32} // tokyo
+  if not Fdictionary.ContainsKey(aName) then Fdictionary.Add(aName,aNode)
+  else begin
+  {$ELSE}
   if not Fdictionary.TryAdd(aName,aNode) then begin
-    aNode.Free;
+  {$ENDIF}
+    ALFreeAndNil(aNode);
     case Duplicates of
       dupIgnore: Exit;
       else Error(@SDuplicateString, 0);
@@ -4537,8 +4558,13 @@ begin
     aNewNode.Val := ANewValue;
     aNewNode.NVS := aNewNvs;
     aNewNode.Obj := aOldNode.Obj;
+    {$IF CompilerVersion <= 32} // tokyo
+    if not Fdictionary.ContainsKey(aNewName) then Fdictionary.Add(aNewName, aNewNode)
+    else begin
+    {$ELSE}
     if not Fdictionary.TryAdd(aNewName, aNewNode) then begin
-      aNewNode.free;
+    {$ENDIF}
+      ALFreeAndNil(aNewNode);
       case Duplicates of
         dupIgnore: Exit;
         else Error(@SDuplicateString, 0);
@@ -4574,7 +4600,7 @@ begin
   FNodeList[Index].Obj := AObject;
 
   if Obj <> nil then
-    Obj.Free;
+    ALFreeAndNil(Obj);
 
   Changed;
 end;
@@ -4582,7 +4608,7 @@ end;
 {**************************************************************}
 procedure TALHashedStringList.SetCapacity(NewCapacity: Integer);
 begin
-  FDictionary.SetCapacity(NewCapacity);
+  if NewCapacity <= FDictionary.Count then FDictionary.TrimExcess;
   FNodeList.Capacity := NewCapacity;
 end;
 
@@ -4632,31 +4658,31 @@ begin
   end;
 end;
 
-{*************************************************************************************************************************************************************}
-function TALHashedStringList.CreateDictionary(ACapacity: integer; aCaseSensitive: boolean): TALObjectDictionary<ansiString, TALHashedStringListDictionaryNode>;
+{***********************************************************************************************************************************************************}
+function TALHashedStringList.CreateDictionary(ACapacity: integer; aCaseSensitive: boolean): TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>;
 begin
-  if aCaseSensitive then result := TALObjectDictionary<ansiString, TALHashedStringListDictionaryNode>.create([doOwnsValues],
-                                                                                                             ACapacity,
-                                                                                                             TDelegatedEqualityComparer<ansiString>.Create(
-                                                                                                               function(const Left, Right: ansiString): Boolean
-                                                                                                               begin
-                                                                                                                 Result := ALSameText(Left, Right);
-                                                                                                               end,
-                                                                                                               function(const Value: ansiString): Integer
-                                                                                                               begin
-                                                                                                                 Result := integer(ALStringHashCrc32(Value));
-                                                                                                               end))
-  else result := TALObjectDictionary<ansiString, TALHashedStringListDictionaryNode>.create([doOwnsValues],
-                                                                                           ACapacity,
-                                                                                           TDelegatedEqualityComparer<ansiString>.Create(
-                                                                                             function(const Left, Right: ansiString): Boolean
-                                                                                             begin
-                                                                                               Result := ALSameText(Left, Right);
-                                                                                             end,
-                                                                                             function(const Value: ansiString): Integer
-                                                                                             begin
-                                                                                               Result := integer(ALStringHashCrc32(ALLowerCase(Value)));
-                                                                                             end));
+  if aCaseSensitive then result := TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>.create([doOwnsValues],
+                                                                                                           ACapacity,
+                                                                                                           TDelegatedEqualityComparer<ansiString>.Create(
+                                                                                                             function(const Left, Right: ansiString): Boolean
+                                                                                                             begin
+                                                                                                               Result := ALSameText(Left, Right);
+                                                                                                             end,
+                                                                                                             function(const Value: ansiString): Integer
+                                                                                                             begin
+                                                                                                               Result := integer(ALStringHashCrc32(Value));
+                                                                                                             end))
+  else result := TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>.create([doOwnsValues],
+                                                                                         ACapacity,
+                                                                                         TDelegatedEqualityComparer<ansiString>.Create(
+                                                                                           function(const Left, Right: ansiString): Boolean
+                                                                                           begin
+                                                                                             Result := ALSameText(Left, Right);
+                                                                                           end,
+                                                                                           function(const Value: ansiString): Integer
+                                                                                           begin
+                                                                                             Result := integer(ALStringHashCrc32(ALLowerCase(Value)));
+                                                                                           end));
 end;
 
 {***************************************************************************}
@@ -4700,17 +4726,28 @@ begin
   init(OwnsObjects, ACapacity);
 end;
 
+type
+
+  {************************}
+  {$IF CompilerVersion > 33} // rio
+    {$MESSAGE WARN 'Check if System.Generics.Collections.TObjectDictionary<TKey,TValue> was not updated and adjust the IFDEF'}
+  {$ENDIF}
+  TALObjectDictionaryAccessPrivate<TKey,TValue> = class(TObjectDictionary<TKey,TValue>)
+  private
+    FOwnerships: TDictionaryOwnerships;
+  end;
+
 {*******************************************************************}
 procedure TALHashedStringList.SetCaseSensitive(const Value: Boolean);
-var aTmpDictionary: TALObjectDictionary<ansiString, TALHashedStringListDictionaryNode>;
+var aTmpDictionary: TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>;
     i: integer;
 begin
   if fCaseSensitive <> Value then begin
     aTmpDictionary := CreateDictionary(count, Value);
     for I := 0 to FnodeList.Count - 1 do
       aTmpDictionary.Add(FNodeList[i].ID,FNodeList[i]);
-    Fdictionary.Ownerships := [];
-    Fdictionary.free;
+    TALObjectDictionaryAccessPrivate<ansiString, TALHashedStringListDictionaryNode>(Fdictionary).fOwnerships := [];
+    ALFreeAndNil(Fdictionary);
     FDictionary := aTmpDictionary;
   end;
 end;
@@ -4870,18 +4907,17 @@ begin
   FStrings := AStrings;
 end;
 
-{***************************************************}
+{************************************************}
 function TALStringsEnumeratorU.GetCurrent: String;
 begin
   Result := FStrings[FIndex];
 end;
 
-{**********************************************}
+{***********************************************}
 function TALStringsEnumeratorU.MoveNext: Boolean;
 begin
-  Result := FIndex < FStrings.Count - 1;
-  if Result then
-    Inc(FIndex);
+  Inc(FIndex);
+  Result := FIndex < FStrings.Count;
 end;
 
 {*****************************}
@@ -6097,13 +6133,19 @@ end;
 
 {****************************}
 procedure TALStringListU.Grow;
+{$IF CompilerVersion <= 32}{tokyo}
 var
   Delta: Integer;
+{$endif}
 begin
+  {$IF CompilerVersion <= 32}{tokyo}
   if FCapacity > 64 then Delta := FCapacity div 4 else
     if FCapacity > 8 then Delta := 16 else
       Delta := 4;
   SetCapacity(FCapacity + Delta);
+  {$else}
+  SetCapacity(GrowCollection(FCapacity, FCount + 1));
+  {$endif}
 end;
 
 {********************************************************}
@@ -6924,13 +6966,19 @@ end;
 
 {******************************}
 procedure TALNVStringListU.Grow;
+{$IF CompilerVersion <= 32}{tokyo}
 var
   Delta: Integer;
+{$endif}
 begin
+  {$IF CompilerVersion <= 32}{tokyo}
   if FCapacity > 64 then Delta := FCapacity div 4 else
     if FCapacity > 8 then Delta := 16 else
       Delta := 4;
   SetCapacity(FCapacity + Delta);
+  {$else}
+  SetCapacity(GrowCollection(FCapacity, FCount + 1));
+  {$endif}
 end;
 
 {*******************************************}

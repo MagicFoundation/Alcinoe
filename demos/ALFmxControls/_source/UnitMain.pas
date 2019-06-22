@@ -1455,71 +1455,32 @@ procedure TForm1.FormResize(Sender: TObject);
 begin
   ALLog('FormResize', 'width: ' + FloatToStr(width) + ' - ' + FloatToStr(height));
   ALVideoPlayerSurface1.Height := (width / 1920) * 1080;
+
+  {$IF Defined(ANDROID)}
+  //handle the action bar under lollipop
+  if FVKKeyboardOpen then
+    AlVertScrollBox1.AniCalculations.ViewportPosition := AlVertScrollBox1.AniCalculations.MaxTarget.Point;
+  {$ENDIF}
+
 end;
 
 procedure TForm1.FormVirtualKeyboardHidden(Sender: TObject;
   KeyboardVisible: Boolean; const Bounds: TRect);
 begin
-
   ALLog('FormVirtualKeyboardHidden', 'FormVirtualKeyboardHidden');
   FVKKeyboardOpen := False;
-
-  // wait 100 ms before to remove the padding in case the keyboard is
-  // just swaping control
-  TThread.CreateAnonymousThread(
-    procedure
-    begin
-      sleep(100);
-      TThread.Synchronize(nil,
-        procedure
-        begin
-          if FVKKeyboardOpen then exit;
-          AlVertScrollBox1.margins.Bottom := 0;
-          AlVertScrollBox1.AniCalculations.TouchTracking := [ttVertical];
-        end);
-    end).Start;
-
+  AlVertScrollBox1.margins.Bottom := 0;
+  AlVertScrollBox1.AniCalculations.TouchTracking := [ttVertical];
 end;
 
 procedure TForm1.FormVirtualKeyboardShown(Sender: TObject;
   KeyboardVisible: Boolean; const Bounds: TRect);
 begin
-
   ALLog('FormVirtualKeyboardShown', 'FormVirtualKeyboardShown');
   FVKKeyboardOpen := True;
-
-  // when the keyboard is show, sometime the suggestion bar of the keyboard
-  // is not show imediatly. so wait around 250ms before visually hide it via
-  // the padding
-  {$IFDEF ANDROID}
-  if AlVertScrollBox1.margins.Bottom > Bounds.height then begin
-    TThread.CreateAnonymousThread(
-      procedure
-      var aTmpBound: TRect;
-      begin
-        sleep(250);
-        TThread.Synchronize(nil,
-          procedure
-          begin
-            if not FVKKeyboardOpen then exit;
-            ALObtainKeyboardRect(aTmpBound);
-            AlVertScrollBox1.margins.Bottom := aTmpBound.height;
-            AlVertScrollBox1.VScrollBar.Value := AlVertScrollBox1.VScrollBar.Max;
-            AlVertScrollBox1.AniCalculations.TouchTracking := [];
-          end);
-      end).Start;
-  end
-  else begin
-    AlVertScrollBox1.margins.Bottom := Bounds.height;
-    AlVertScrollBox1.VScrollBar.Value := AlVertScrollBox1.VScrollBar.Max;
-    AlVertScrollBox1.AniCalculations.TouchTracking := [];
-  end;
-  {$ELSE}
   AlVertScrollBox1.margins.Bottom := Bounds.height;
   AlVertScrollBox1.VScrollBar.Value := AlVertScrollBox1.VScrollBar.Max;
   AlVertScrollBox1.AniCalculations.TouchTracking := [];
-  {$ENDIF}
-
 end;
 
 { TALTextStopWatch }

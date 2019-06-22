@@ -4,10 +4,10 @@
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>
     <PropertyGroup>
-        <DeviceId Condition="'$(Platform)'=='Android'">UEEDU18728001190</DeviceId>
-        <DeviceId Condition="'$(Platform)'=='iOSDevice32'"/>
-        <DeviceId Condition="'$(Platform)'=='iOSDevice64'"/>
-        <DeviceId Condition="'$(Platform)'=='iOSSimulator'">8B7C80D2-24B6-4168-A77A-9842FE73EDD4</DeviceId>
+        <DeviceId Condition="'$(Platform)'=='Android'"/>
+        <DeviceId Condition="'$(Platform)'=='iOSDevice32'">1269d5786e75bc1b4c1469f4bacd0b66bb640f13</DeviceId>
+        <DeviceId Condition="'$(Platform)'=='iOSDevice64'">1269d5786e75bc1b4c1469f4bacd0b66bb640f13</DeviceId>
+        <DeviceId Condition="'$(Platform)'=='iOSSimulator'">27B3A61B-4A14-4E96-ADEA-68983AA07924</DeviceId>
     </PropertyGroup>
     <ItemGroup Condition="'$(Platform)'=='iOSDevice64'">
         <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_640x1136.png" Condition="'$(Config)'=='Debug'">

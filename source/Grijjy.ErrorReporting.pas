@@ -204,6 +204,8 @@ uses
   {$ENDIF}
   Grijjy.SymbolTranslator;
 
+{$RANGECHECKS OFF}
+
 type
   TgoExceptionReport = class(TInterfacedObject, IgoExceptionReport)
   private

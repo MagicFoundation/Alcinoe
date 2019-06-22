@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false"
-          android:alpha="@dimen/al_disabled_alpha_material_light"
-          android:color="@color/al_secondary_text_default_material_light"/>
-    <item android:color="@color/al_secondary_text_default_material_light"/>
-</selector>

@@ -1,6 +1,6 @@
 unit ALFmxObjects;
 
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if FMX.Objects.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -1699,7 +1699,7 @@ begin
 
       //stroke with solid color
       if Stroke.Kind = TBrushKind.Solid then begin
-        aPaint.setColor(Stroke.Color);
+        aPaint.setColor(integer(Stroke.Color));
         case lineType of
           TLineType.Diagonal: aCanvas.drawLine(aRect.left {startX},
                                                aRect.top {startY},
@@ -2297,8 +2297,26 @@ begin
   if fRestoreLayoutUpdateAfterLoaded then begin
     if (FAutoSize) and
        (Text <> '') then begin
-      if WordWrap then Layout.MaxSize := TPointF.Create(Min(Width, maxWidth), maxHeight)
+
+      //Originally, if WordWrap then the algo take in account the current width of the TALText
+      //to calculate the autosized width (mean the size can be lower than maxwidth if the current width
+      //is already lower than maxwidth). problem with that is if we for exemple change the text (or font
+      //dimension) of an already calculated TALText, then it's the old width (that correspond to the
+      //previous text/font) that will be taken in account. finally the good way is to alway use the
+      //maxwidth if we desir a max width and don't rely on the current width
+
+      //if WordWrap then Layout.MaxSize := TPointF.Create(Min(Width, maxWidth), maxHeight)
+      //else Layout.MaxSize := TPointF.Create(maxWidth, MaxHeight);
+      if (WordWrap) and
+         (Align in [TAlignLayout.Client,
+                    TAlignLayout.Contents,
+                    TAlignLayout.Top,
+                    TAlignLayout.Bottom,
+                    TAlignLayout.MostTop,
+                    TAlignLayout.MostBottom,
+                    TAlignLayout.VertCenter]) then Layout.MaxSize := TPointF.Create(Width, maxHeight)
       else Layout.MaxSize := TPointF.Create(maxWidth, MaxHeight);
+
     end
     else Layout.MaxSize := TPointF.Create(width, height);  // << this is important because else when the component is loaded then
                                                            // << we will call DoRenderLayout that will use the original maxsise (ie: 65535, 65535)
@@ -2612,8 +2630,25 @@ begin
       LOpacity := FLayout.Opacity;
       try
 
-        if WordWrap then R := TRectF.Create(0, 0, Min(Width, maxWidth), maxHeight)
+        //Originally, if WordWrap then the algo take in account the current width of the TALText
+        //to calculate the autosized width (mean the size can be lower than maxwidth if the current width
+        //is already lower than maxwidth). problem with that is if we for exemple change the text (or font
+        //dimension) of an already calculated TALText, then it's the old width (that correspond to the
+        //previous text/font) that will be taken in account. finally the good way is to alway use the
+        //maxwidth if we desir a max width and don't rely on the current width
+
+        //if WordWrap then R := TRectF.Create(0, 0, Min(Width, maxWidth), maxHeight)
+        //else R := TRectF.Create(0, 0, maxWidth, MaxHeight);
+        if (WordWrap) and
+           (Align in [TAlignLayout.Client,
+                      TAlignLayout.Contents,
+                      TAlignLayout.Top,
+                      TAlignLayout.Bottom,
+                      TAlignLayout.MostTop,
+                      TAlignLayout.MostBottom,
+                      TAlignLayout.VertCenter]) then R := TRectF.Create(0, 0, Width, maxHeight)
         else R := TRectF.Create(0, 0, maxWidth, MaxHeight);
+
         FLayout.BeginUpdate;
         try
           FLayout.TopLeft := R.TopLeft;
@@ -2804,8 +2839,26 @@ procedure TALText.EndUpdate;
 begin
   if (FAutoSize) and
      (Text <> '') then begin
-    if WordWrap then Layout.MaxSize := TPointF.Create(Min(Width, maxWidth), maxHeight)
+
+    //Originally, if WordWrap then the algo take in account the current width of the TALText
+    //to calculate the autosized width (mean the size can be lower than maxwidth if the current width
+    //is already lower than maxwidth). problem with that is if we for exemple change the text (or font
+    //dimension) of an already calculated TALText, then it's the old width (that correspond to the
+    //previous text/font) that will be taken in account. finally the good way is to alway use the
+    //maxwidth if we desir a max width and don't rely on the current width
+
+    //if WordWrap then Layout.MaxSize := TPointF.Create(Min(Width, maxWidth), maxHeight)
+    //else Layout.MaxSize := TPointF.Create(maxWidth, MaxHeight);
+    if (WordWrap) and
+       (Align in [TAlignLayout.Client,
+                  TAlignLayout.Contents,
+                  TAlignLayout.Top,
+                  TAlignLayout.Bottom,
+                  TAlignLayout.MostTop,
+                  TAlignLayout.MostBottom,
+                  TAlignLayout.VertCenter]) then Layout.MaxSize := TPointF.Create(Width, maxHeight)
     else Layout.MaxSize := TPointF.Create(maxWidth, MaxHeight);
+
   end
   else Layout.MaxSize := TPointF.Create(width, height);  // << this is important because else when the component is loaded then
                                                          // << we will call DoRenderLayout that will use the original maxsise (ie: 65535, 65535)

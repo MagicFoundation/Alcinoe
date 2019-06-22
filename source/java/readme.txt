@@ -1,2 +1,0 @@
-*) The source of the floating toolbar was taken from android api 23.
-*) The ./android and ./com/android/internal directories contain some android java file (api 23) to expose some internal class or "@hide" members 

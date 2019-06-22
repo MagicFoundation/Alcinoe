@@ -1,0 +1,65 @@
+package Alcinoe_rio;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS OFF}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE RELEASE}
+{$DEFINE ALDPK}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'Alcinoe'}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  fmx,
+  DesignIDE;
+
+contains
+  ALFmxLayouts in 'ALFmxLayouts.pas',
+  ALFmxObjects in 'ALFmxObjects.pas',
+  ALFmxStdCtrls in 'ALFmxStdCtrls.pas',
+  ALFmxCommon in 'ALFmxCommon.pas',
+  ALFmxTabControl in 'ALFmxTabControl.pas',
+  ALFmxDesignEditors in 'ALFmxDesignEditors.pas',
+  ALFmxInertialMovement in 'ALFmxInertialMovement.pas',
+  ALFmxEdit in 'ALFmxEdit.pas',
+  ALCommon in 'ALCommon.pas',
+  ALFMXTypes3D in 'ALFMXTypes3D.pas',
+  ALStringList in 'ALStringList.pas',
+  ALString in 'ALString.pas',
+  ALQuickSortList in 'ALQuickSortList.pas',
+  ALMime in 'ALMime.pas',
+  ALInit in 'ALInit.pas',
+  ALCipher in 'ALCipher.pas',
+  ALAVLBinaryTree in 'ALAVLBinaryTree.pas',
+  ALVideoPlayer in 'ALVideoPlayer.pas',
+  ALFmxMemo in 'ALFmxMemo.pas',
+  ALGraphics in 'ALGraphics.pas',
+  ALFmxFilterEffects in 'ALFmxFilterEffects.pas',
+  ALFmxAni in 'ALFmxAni.pas';
+
+end.
+
+
+

@@ -138,8 +138,8 @@ type
     dataChannelNegotiated: boolean; // Negotiated.
     dataChannelId: integer; // data channel id.
     class function Create(const aVideoCallEnabled: boolean = true;
-                          const aVideoWidth: integer = 1920;
-                          const aVideoHeight: integer = 1080;
+                          const aVideoWidth: integer = 1280;
+                          const aVideoHeight: integer = 720;
                           const aVideoFps: integer = 0;
                           const aVideoMaxBitrate: integer = 0;
                           const aVideoCodec: String = 'VP8';
@@ -158,7 +158,6 @@ type
                           const aDataChannelNegotiated: boolean = false;
                           const aDataChannelId: integer = -1): TALWebRTCPeerConnectionParameters; static;
   end;
-
 
   {$REGION ' IOS'}
   {$IF defined(ios)}
@@ -461,8 +460,8 @@ end;
 
 {**********************************************************************************************}
 class function TALWebRTCPeerConnectionParameters.Create(const aVideoCallEnabled: boolean = true;
-                                                        const aVideoWidth: integer = 1920;
-                                                        const aVideoHeight: integer = 1080;
+                                                        const aVideoWidth: integer = 1280;
+                                                        const aVideoHeight: integer = 720;
                                                         const aVideoFps: integer = 0;
                                                         const aVideoMaxBitrate: integer = 0;
                                                         const aVideoCodec: String = 'VP8';
@@ -688,7 +687,6 @@ begin
   inherited Destroy;
 
 end;
-
 
 {********************************}
 function TALWebRTC.Start: boolean;
@@ -993,7 +991,6 @@ begin
 
   {$ENDIF}
   {$ENDREGION}
-
 
   {$REGION ' MSWINDOWS / _MACOS'}
   {$IF defined(MSWINDOWS) or defined(_MACOS)}
@@ -2395,8 +2392,8 @@ begin
     glBindTexture(GL_TEXTURE_2D, 0);
 
     //-----
-    {$IF CompilerVersion > 32} // tokyo
-      {$MESSAGE WARN 'Check if this is still true and adjust the IFDEF'}
+    {$IF CompilerVersion > 33} // rio
+      {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
     {$ENDIF}
     TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.FLocalBitmap).FWidth := aLumaWidth;
     TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.FLocalBitmap).FHeight := aLumaHeight; // we can't use setsize because it's fill finalise the texture
@@ -2627,7 +2624,6 @@ begin
   {$ENDIF}
   {$ENDREGION}
 
-
   {$REGION ' IOS'}
   {$IF defined(ios)}
 
@@ -2665,7 +2661,6 @@ begin
 
   {$ENDIF}
   {$ENDREGION}
-
 
 end;
 

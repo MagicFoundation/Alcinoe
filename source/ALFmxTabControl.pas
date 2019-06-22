@@ -1,6 +1,6 @@
 unit ALFmxTabControl;
 
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if FMX.TabControl.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -99,7 +99,6 @@ type
   private
     FTabCount: integer;
     FMouseEvents: Boolean;
-    fGestureEvents: Boolean;
     FchildreenChanging: boolean;
     FTabIndex: Integer;
     FRealigningTabs: Boolean;
@@ -131,6 +130,10 @@ type
     function GetItemsCount: Integer;
     function GetItem(const AIndex: Integer): TFmxObject;
     { IItemContainer }
+    procedure internalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+    procedure internalMouseMove(Shift: TShiftState; X, Y: Single);
+    procedure internalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+    procedure internalMouseLeave;
   protected
     procedure Paint; override;
     function GetTabItem(AIndex: Integer): TALTabItem;
@@ -142,11 +145,16 @@ type
     procedure DoRemoveObject(const AObject: TFmxObject); override;
     procedure DoDeleteChildren; override;
     procedure DoChange; virtual;
-    procedure CMGesture(var EventInfo: TGestureEventInfo); override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure DoMouseLeave; override;
+    {$IFNDEF ALDPK}
+    procedure ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single); override;
+    procedure ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure ChildrenMouseLeave(const AObject: TControl); override;
+    {$ENDIF}
     procedure Resize; override;
     property ClipChildren default True;
     property Padding;
@@ -449,7 +457,6 @@ begin
   //-----
   FTabCount := 0;
   FMouseEvents := False;
-  fGestureEvents := False;
   FOnChange := nil;
   Visible := true;
   Enabled := true;
@@ -712,7 +719,6 @@ begin
     if fAniCalculations.down then begin
       fAniCalculations.MouseLeave; // instead of down := false to reposition the tabitem
       FMouseEvents := False;
-      fGestureEvents := False;
       if not FAniTransition.Running then RealignTabs; // << if i try with fAniCalculations.launchanimation i have a flickr because the anim stop and restart at a different speed
     end;
     fScrollingAcquiredByOther := True;
@@ -720,55 +726,10 @@ begin
   else fScrollingAcquiredByOther := False;
 end;
 
-{******************************************************************}
-procedure TALTabControl.CMGesture(var EventInfo: TGestureEventInfo);
-var LP: TPointF;
+{************************************************************************************************}
+procedure TALTabControl.internalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-
-  //note: Mouse events (with autocapture) are more accurate than CMGesture
-  //      to detect when mouse go out of the screen. with CMGesture their
-  //      will be (often) no final event with TInteractiveGestureFlag.gfEnd
-  //      https://quality.embarcadero.com/browse/RSP-15617
-  if AnimationEnabled then begin
-
-    //This is used when scrolling with the finger on top of a control (like a TButton).
-    if (not FMouseEvents) and (EventInfo.GestureID = igiPan) then begin
-      LP := AbsoluteToLocal(EventInfo.Location);
-      if TInteractiveGestureFlag.gfBegin in EventInfo.Flags then begin
-        if not fScrollingAcquiredByOther then begin
-          setScrollingAcquiredByMe(False);
-          fMouseDownPos := LP.X;
-          fGestureEvents := true;
-          FAniCalculations.averaging := true;
-          AniCalculations.MouseDown(LP.X, LP.Y);
-        end;
-      end
-      else if fGestureEvents and
-              (EventInfo.Flags = []) then begin
-        if (not fScrollingAcquiredByMe) and
-           (abs(fMouseDownPos - LP.X) > fDeadZoneBeforeAcquireScrolling) then setScrollingAcquiredByMe(True);
-        AniCalculations.MouseMove(LP.X, LP.Y)
-      end
-      else if fGestureEvents and
-              (TInteractiveGestureFlag.gfEnd in EventInfo.Flags) then begin
-        setScrollingAcquiredByMe(False);
-        AniCalculations.MouseUp(LP.X, LP.Y);
-        fGestureEvents := False;
-      end;
-    end;
-
-  end;
-
-  //important to let parent (like TScrollBox) continue
-  //to handle this gesture event
-  inherited;
-
-end;
-
-{****************************************************************************************}
-procedure TALTabControl.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-begin
-  FMouseEvents := not fGestureEvents;
+  FMouseEvents := true;
   inherited;
   if not AnimationEnabled then exit;
   if (not fScrollingAcquiredByOther) and FMouseEvents and (Button = TMouseButton.mbLeft) then begin
@@ -779,8 +740,8 @@ begin
   end;
 end;
 
-{******************************************************************}
-procedure TALTabControl.MouseMove(Shift: TShiftState; X, Y: Single);
+{**************************************************************************}
+procedure TALTabControl.internalMouseMove(Shift: TShiftState; X, Y: Single);
 begin
   inherited;
   if not AnimationEnabled then exit;
@@ -791,8 +752,8 @@ begin
   end;
 end;
 
-{**************************************************************************************}
-procedure TALTabControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+{**********************************************************************************************}
+procedure TALTabControl.internalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
   if not AnimationEnabled then exit;
@@ -803,8 +764,8 @@ begin
   end;
 end;
 
-{***********************************}
-procedure TALTabControl.DoMouseLeave;
+{*****************************************}
+procedure TALTabControl.internalMouseLeave;
 begin
   inherited;
   if not AnimationEnabled then exit;
@@ -814,6 +775,82 @@ begin
     FMouseEvents := False;
   end;
 end;
+
+{****************************************************************************************}
+procedure TALTabControl.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  inherited;
+  internalMouseDown(Button, Shift, X, Y);
+end;
+
+{******************************************************************}
+procedure TALTabControl.MouseMove(Shift: TShiftState; X, Y: Single);
+begin
+  inherited;
+  internalMouseMove(Shift, X, Y);
+end;
+
+{**************************************************************************************}
+procedure TALTabControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  inherited;
+  internalMouseUp(Button, Shift, X, Y);
+end;
+
+{***********************************}
+procedure TALTabControl.DoMouseLeave;
+begin
+  inherited;
+  internalMouseLeave;
+end;
+
+{**}
+Type
+  _TALControlAccessProtected = class(Tcontrol);
+
+{*************}
+{$IFNDEF ALDPK}
+procedure TALTabControl.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+var P: Tpointf;
+begin
+  if not aObject.AutoCapture then _TALControlAccessProtected(aObject).capture;
+  P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
+  internalMouseDown(Button, Shift, P.X, P.Y);
+  inherited;
+end;
+{$ENDIF}
+
+{*************}
+{$IFNDEF ALDPK}
+procedure TALTabControl.ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);
+var P: Tpointf;
+begin
+  P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
+  internalMouseMove(Shift, P.X, P.Y);
+  inherited;
+end;
+{$ENDIF}
+
+{*************}
+{$IFNDEF ALDPK}
+procedure TALTabControl.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+var P: Tpointf;
+begin
+  if not aObject.AutoCapture then _TALControlAccessProtected(aObject).releasecapture;
+  P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
+  internalMouseUp(Button, Shift, P.X, P.Y);
+  inherited;
+end;
+{$ENDIF}
+
+{*************}
+{$IFNDEF ALDPK}
+procedure TALTabControl.ChildrenMouseLeave(const AObject: TControl);
+begin
+  internalMouseLeave;
+  inherited;
+end;
+{$ENDIF}
 
 {**********************************}
 procedure TALTabControl.RealignTabs;

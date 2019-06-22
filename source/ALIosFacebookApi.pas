@@ -814,7 +814,6 @@ procedure StubProc11; cdecl; external 'FBSDKCoreKit'  name 'OBJC_CLASS_$_FBSDKGr
 procedure StubProc12; cdecl; external 'Bolts'         name 'OBJC_CLASS_$_BFAppLink'; // else i have ld: b/bl/blx thumb2 branch out of range (16777216 max is +/-16MB): from -[FIRAAlarm runAfterDelay:withBlock:] (0x00032AA0) to _objc_msgSend.island (0x00E09DE4) for architecture armv7
 procedure StubProc13; cdecl; external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a' name '__isOSVersionAtLeast'; // << else I have Error: "___isOSVersionAtLeast", referenced from: ...
 
-
 {$ELSE}
 
 // i don't know how to do under ios simulator :(

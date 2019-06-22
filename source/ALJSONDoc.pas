@@ -12462,7 +12462,8 @@ Var NodeStack: Tstack<TalJSONNodeU>;
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteBytes2Buffer(const aBytes: array of byte);
   Begin
-    _Write2Buffer(aBytes[0], length(aBytes));
+    if length(aBytes)  > 0 then
+      _Write2Buffer(aBytes[0], length(aBytes));
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}

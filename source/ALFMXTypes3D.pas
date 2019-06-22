@@ -95,7 +95,7 @@ type
   end;
 
   {************************}
-  {$IF CompilerVersion > 32} // tokyo
+  {$IF CompilerVersion > 33} // rio
     {$MESSAGE WARN 'Check if FMX.Types3D.TTexture still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALTextureAccessPrivate = class(TInterfacedPersistent)
@@ -210,8 +210,11 @@ uses system.sysutils,
      ALCommon;
 
 {$IFDEF DEBUG}
-var TotalMemoryUsedByTextures: int64;
-    LastTotalMemoryUsedByTexturesLog: int64;
+{$IF CompilerVersion > 33} // rio
+  {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-23154 was corrected and adjust the IFDEF'}
+{$ENDIF}
+var TotalMemoryUsedByTextures: {$IF defined(IOS32)}int32{$ELSE}int64{$ENDIF};        // << https://quality.embarcadero.com/browse/RSP-23154
+    LastTotalMemoryUsedByTexturesLog: {$IF defined(IOS32)}int32{$ELSE}int64{$ENDIF}; // << https://quality.embarcadero.com/browse/RSP-23154
 {$ENDIF}
 
 {****************************}
@@ -303,7 +306,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32}
+{$IF CompilerVersion > 33} // Rio
   {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.assign is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 //
@@ -402,6 +405,7 @@ begin
   else inherited ;
 
   {$IFDEF DEBUG}
+  {$WARNINGS OFF}
   if PixelFormat <> TPixelFormat.None then AtomicIncrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
   if TThread.GetTickCount - AtomicCmpExchange(LastTotalMemoryUsedByTexturesLog, 0, 0) > 1000 then begin // every 1 sec
     AtomicExchange(LastTotalMemoryUsedByTexturesLog, TThread.GetTickCount); // oki maybe 2 or 3 log can be show simultaneously. i will not died for this !
@@ -409,6 +413,7 @@ begin
   end;
   if TALTextureAccessPrivate(self).FBits <> nil then
     ALLog('TALTexture.Assign', 'Bits: ' + ALFormatFloatU('0.##',(Width * Height * BytesPerPixel) / 1000, ALDefaultFormatSettingsU) +' kB', TalLogType.Warn);
+  {$WARNINGS ON}
   {$ENDIF}
 
 end;
@@ -423,7 +428,7 @@ begin
   if PixelFormat <> TPixelFormat.None then AtomicDecrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
   {$ENDIF}
 
-  {$IF CompilerVersion > 32} // tokyo
+  {$IF CompilerVersion > 33} // rio
     {$MESSAGE WARN 'Check if the full flow of FMX.Types3D.TTexture.Assign is still the same as below and adjust the IFDEF'}
   {$ENDIF}
   {$IF CompilerVersion >= 32} // tokyo
@@ -525,7 +530,7 @@ begin
 end;
 
 {*************************}
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if FMX.Context.GLES.TCustomContextOpenGL.DoInitializeTexture still has the same implementation and adjust the IFDEF'}
 {$ENDIF}
 {$IF defined(ANDROID)}
@@ -598,7 +603,7 @@ end;
 {$ENDIF}
 
 {************************}
-{$IF CompilerVersion > 32}
+{$IF CompilerVersion > 33} // Rio
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvasExternalOESTextureMaterial.DoInitialize;
@@ -793,7 +798,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32}
+{$IF CompilerVersion > 33} // Rio
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvasExternalOESColorAdjustEffectTextureMaterial.DoInitialize;
@@ -991,7 +996,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32}
+{$IF CompilerVersion > 33} // Rio
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8BiPlanarVideoRangeTextureMaterial.DoInitialize;
@@ -1204,7 +1209,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32}
+{$IF CompilerVersion > 33} // Rio
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8BiPlanarVideoRangeColorAdjustEffectTextureMaterial.DoInitialize;
@@ -1428,7 +1433,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32}
+{$IF CompilerVersion > 33} // Rio
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8PlanarTextureMaterial.DoInitialize;
@@ -1644,7 +1649,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 32}
+{$IF CompilerVersion > 33} // Rio
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8PlanarColorAdjustEffectTextureMaterial.DoInitialize;

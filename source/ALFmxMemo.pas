@@ -17,7 +17,7 @@ uses System.Types,
      iOSapi.UIKit,
      Macapi.ObjectiveC,
      Macapi.ObjCRuntime,
-     ALIosNativeControl,
+     ALIosNativeView,
      ALIosScrollBox,
      {$ELSE}
      FMX.StdCtrls,
@@ -236,7 +236,7 @@ type
     fTintColor: TalphaColor;
     fAutoCapitalizationType: TALAutoCapitalizationType;
     fMemoControl: TALAndroidEdit;
-    function GetAndroidEditText: JALEditText;
+    function GetAndroidEditText: TALAndroidEditText;
     {$ELSEIF defined(IOS)}
     fMemoControl: TALIosMemo;
     function GetIosTextView: TALIosTextView;
@@ -293,7 +293,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     {$IF defined(android)}
-    property AndroidEditText: JALEditText read GetAndroidEditText;
+    property AndroidEditText: TALAndroidEditText read GetAndroidEditText;
     {$ELSEIF defined(IOS)}
     property IosTextView: TALIosTextView read GetIosTextView;
     {$ENDIF}
@@ -1503,7 +1503,7 @@ end;
 
 {********************}
 {$IF defined(android)}
-function TALMemo.GetAndroidEditText: JALEditText;
+function TALMemo.GetAndroidEditText: TALAndroidEditText;
 begin
   if FMemoControl = nil then CreateMemoControl;
   result := FMemoControl.EditText;

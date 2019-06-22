@@ -171,19 +171,8 @@ begin
     TMessageManager.DefaultManager.SubscribeToMessage(TMessageResultNotification, ActivityResultHandler);
     FCallback := TLoginCallback.Create(Self);
 
-
-    {$IF CompilerVersion <= 31} // berlin
-    CallInUIThreadandWaitFinishing(
-      procedure
-      begin
-    {$ENDIF}
-
-        FCallbackManager := TJCallbackManager_Factory.JavaClass.create;
-        TJloginManager.JavaClass.getInstance.registerCallback(FCallbackManager, FCallback);
-
-    {$IF CompilerVersion <= 31} // berlin
-      end);
-    {$ENDIF}
+    FCallbackManager := TJCallbackManager_Factory.JavaClass.create;
+    TJloginManager.JavaClass.getInstance.registerCallback(FCallbackManager, FCallback);
 
   {$ENDIF}
   {$ENDREGION}
@@ -259,19 +248,9 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  {$IF CompilerVersion <= 31} // berlin
-  CallInUIThread(
-    procedure
-    begin
-  {$ENDIF}
-
-      aArrayList := ALStringsToJArrayList(APermissions);
-      aCollection := TJCollection.Wrap((aArrayList as ILocalObject).GetObjectID);
-      TJloginManager.JavaClass.getInstance.logInWithReadPermissions(TAndroidHelper.Activity, aCollection);
-
-  {$IF CompilerVersion <= 31} // berlin
-    end);
-  {$ENDIF}
+  aArrayList := ALStringsToJArrayList(APermissions);
+  aCollection := TJCollection.Wrap((aArrayList as ILocalObject).GetObjectID);
+  TJloginManager.JavaClass.getInstance.logInWithReadPermissions(TAndroidHelper.Activity, aCollection);
 
   {$ENDIF}
   {$ENDREGION}
@@ -298,17 +277,7 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  {$IF CompilerVersion <= 31} // berlin
-  CallInUIThreadandWaitFinishing(
-    procedure
-    begin
-  {$ENDIF}
-
-      TJloginManager.JavaClass.getInstance.logout;
-
-  {$IF CompilerVersion <= 31} // berlin
-    end);
-  {$ENDIF}
+    TJloginManager.JavaClass.getInstance.logout;
 
   {$ENDIF}
   {$ENDREGION}
@@ -329,9 +298,6 @@ function TALFacebookLogin.CurrentToken: String;
   {$REGION ' ANDROID'}
   {$IF defined(android)}
   var aToken: JAccessToken;
-      {$IF CompilerVersion <= 31} // berlin
-      aTmpResult: String;
-      {$ENDIF}
   {$ENDIF}
   {$ENDREGION}
 
@@ -346,22 +312,9 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  {$IF CompilerVersion <= 31} // berlin
-  CallInUIThreadandWaitFinishing(
-    procedure
-    var Result: String;
-    begin
-  {$ENDIF}
-
-      aToken := TJAccessToken.JavaClass.getCurrentAccessToken;
-      if aToken = nil then Result := ''
-      else Result := JStringToString(aToken.GetToken);
-
-  {$IF CompilerVersion <= 31} // berlin
-      aTmpResult := Result;
-    end);
-  result := aTmpResult;
-  {$ENDIF}
+    aToken := TJAccessToken.JavaClass.getCurrentAccessToken;
+    if aToken = nil then Result := ''
+    else Result := JStringToString(aToken.GetToken);
 
   {$ENDIF}
   {$ENDREGION}
@@ -384,9 +337,6 @@ function TALFacebookLogin.CurrentUserId: String;
   {$REGION ' ANDROID'}
   {$IF defined(android)}
   var aToken: JAccessToken;
-      {$IF CompilerVersion <= 31} // berlin
-      aTmpResult: String;
-      {$ENDIF}
   {$ENDIF}
   {$ENDREGION}
 
@@ -401,22 +351,9 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  {$IF CompilerVersion <= 31} // berlin
-  CallInUIThreadandWaitFinishing(
-    procedure
-    var Result: String;
-    begin
-  {$ENDIF}
-
-      aToken := TJAccessToken.JavaClass.getCurrentAccessToken;
-      if aToken = nil then Result := ''
-      else Result := JStringToString(aToken.getUserId);
-
-  {$IF CompilerVersion <= 31} // berlin
-      aTmpResult := Result;
-    end);
-  result := aTmpResult;
-  {$ENDIF}
+    aToken := TJAccessToken.JavaClass.getCurrentAccessToken;
+    if aToken = nil then Result := ''
+    else Result := JStringToString(aToken.getUserId);
 
   {$ENDIF}
   {$ENDREGION}
@@ -439,9 +376,6 @@ function TALFacebookLogin.CurrentGrantedPermissions: TArray<String>;
   {$REGION ' ANDROID'}
   {$IF defined(android)}
   var aToken: JAccessToken;
-      {$IF CompilerVersion <= 31} // berlin
-      aTmpResult: TArray<String>;
-      {$ENDIF}
   {$ENDIF}
   {$ENDREGION}
 
@@ -456,22 +390,9 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  {$IF CompilerVersion <= 31} // berlin
-  CallInUIThreadandWaitFinishing(
-    procedure
-    var Result: TArray<String>;
-    begin
-  {$ENDIF}
-
-      aToken := TJAccessToken.JavaClass.getCurrentAccessToken;
-      if aToken = nil then setlength(Result, 0)
-      else Result := ALJsetToStrings(aToken.getPermissions);
-
-  {$IF CompilerVersion <= 31} // berlin
-      aTmpResult := Result;
-    end);
-  result := aTmpResult;
-  {$ENDIF}
+    aToken := TJAccessToken.JavaClass.getCurrentAccessToken;
+    if aToken = nil then setlength(Result, 0)
+    else Result := ALJsetToStrings(aToken.getPermissions);
 
   {$ENDIF}
   {$ENDREGION}
@@ -494,9 +415,6 @@ function TALFacebookLogin.CurrentDeniedPermissions: TArray<String>;
   {$REGION ' ANDROID'}
   {$IF defined(android)}
   var aToken: JAccessToken;
-      {$IF CompilerVersion <= 31} // berlin
-      aTmpResult: TArray<String>;
-      {$ENDIF}
   {$ENDIF}
   {$ENDREGION}
 
@@ -511,22 +429,9 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  {$IF CompilerVersion <= 31} // berlin
-  CallInUIThreadandWaitFinishing(
-    procedure
-    var Result: TArray<String>;
-    begin
-  {$ENDIF}
-
-      aToken := TJAccessToken.JavaClass.getCurrentAccessToken;
-      if aToken = nil then setlength(Result, 0)
-      else Result := ALJsetToStrings(aToken.getDeclinedPermissions);
-
-  {$IF CompilerVersion <= 31} // berlin
-      aTmpResult := Result;
-    end);
-  result := aTmpResult;
-  {$ENDIF}
+    aToken := TJAccessToken.JavaClass.getCurrentAccessToken;
+    if aToken = nil then setlength(Result, 0)
+    else Result := ALJsetToStrings(aToken.getDeclinedPermissions);
 
   {$ENDIF}
   {$ENDREGION}
@@ -559,19 +464,7 @@ begin
   {$ENDIF}
 
   if M is TMessageResultNotification then begin
-
-    {$IF CompilerVersion <= 31} // berlin
-    CallInUIThread(
-      procedure
-      begin
-    {$ENDIF}
-
-        FCallbackManager.onActivityResult(TMessageResultNotification(M).RequestCode, TMessageResultNotification(M).ResultCode, TMessageResultNotification(M).Value);
-
-    {$IF CompilerVersion <= 31} // berlin
-      end);
-    {$ENDIF}
-
+    FCallbackManager.onActivityResult(TMessageResultNotification(M).RequestCode, TMessageResultNotification(M).ResultCode, TMessageResultNotification(M).Value);
   end;
 
 end;
@@ -596,19 +489,9 @@ begin
   allog('TALFacebookLogin.TLoginCallback.onCancel', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.warn);
   {$ENDIF}
 
-  {$IF CompilerVersion <= 31} // berlin
-  TThread.queue(nil,
-    procedure
-    begin
-  {$ENDIF}
-
-      fFacebookLogin.fIsRunning := False;
-      if assigned(fFacebookLogin.fOnCancel) then
-        fFacebookLogin.fOnCancel;
-
-  {$IF CompilerVersion <= 31} // berlin
-    end);
-  {$ENDIF}
+  fFacebookLogin.fIsRunning := False;
+  if assigned(fFacebookLogin.fOnCancel) then
+    fFacebookLogin.fOnCancel;
 
 end;
 
@@ -626,19 +509,9 @@ begin
                                                    ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
   {$ENDIF}
 
-  {$IF CompilerVersion <= 31} // berlin
-  TThread.queue(nil,
-    procedure
-    begin
-  {$ENDIF}
-
-      fFacebookLogin.fIsRunning := False;
-      if assigned(fFacebookLogin.fOnError) then
-        fFacebookLogin.fOnError(aErrorMsg{aMsg});
-
-  {$IF CompilerVersion <= 31} // berlin
-    end);
-  {$ENDIF}
+  fFacebookLogin.fIsRunning := False;
+  if assigned(fFacebookLogin.fOnError) then
+    fFacebookLogin.fOnError(aErrorMsg{aMsg});
 
 end;
 
@@ -677,19 +550,9 @@ begin
                                                      ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.info);
   {$ENDIF}
 
-  {$IF CompilerVersion <= 31} // berlin
-  TThread.queue(nil,
-    procedure
-    begin
-  {$ENDIF}
-
-      fFacebookLogin.fIsRunning := False;
-      if assigned(fFacebookLogin.fOnsuccess) then
-        fFacebookLogin.fOnsuccess(aUserIDStr, aTokenStr, aGrantedPermissions, aDeniedPermissions);
-
-  {$IF CompilerVersion <= 31} // berlin
-    end);
-  {$ENDIF}
+  fFacebookLogin.fIsRunning := False;
+  if assigned(fFacebookLogin.fOnsuccess) then
+    fFacebookLogin.fOnsuccess(aUserIDStr, aTokenStr, aGrantedPermissions, aDeniedPermissions);
 
 end;
 
@@ -862,29 +725,19 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  {$IF CompilerVersion <= 31} // berlin
-  CallInUIThread(
-    procedure
-    begin
-  {$ENDIF}
-
-      aBundle := TJBundle.JavaClass.init;
-      for i := Low(aparameters) to High(aparameters) do begin
-        _ExtractNameValue(aparameters[i], aName, aValue);
-        aJName := StringToJstring(aName);
-        aJValue := StringToJstring(aValue);
-        aBundle.putString(aJName, aJValue);
-        aJName := nil;  // << because of
-        aJValue := nil; // << https://quality.embarcadero.com/browse/RSP-14187
-      end;
-      if AlSameTextU(aHttpMethod, 'POST') then aJHttpMethod := TJHttpMethod.JavaClass.POST
-      else aJHttpMethod := TJHttpMethod.JavaClass.GET;
-      aGraphRequest := TJGraphRequest.JavaClass.init(TJAccessToken.JavaClass.getCurrentAccessToken, StringToJstring(aGraphPath), aBundle, aJHttpMethod, FCallback);
-      aGraphRequest.executeAsync;
-
-  {$IF CompilerVersion <= 31} // berlin
-    end);
-  {$ENDIF}
+  aBundle := TJBundle.JavaClass.init;
+  for i := Low(aparameters) to High(aparameters) do begin
+    _ExtractNameValue(aparameters[i], aName, aValue);
+    aJName := StringToJstring(aName);
+    aJValue := StringToJstring(aValue);
+    aBundle.putString(aJName, aJValue);
+    aJName := nil;  // << because of
+    aJValue := nil; // << https://quality.embarcadero.com/browse/RSP-14187
+  end;
+  if AlSameTextU(aHttpMethod, 'POST') then aJHttpMethod := TJHttpMethod.JavaClass.POST
+  else aJHttpMethod := TJHttpMethod.JavaClass.GET;
+  aGraphRequest := TJGraphRequest.JavaClass.init(TJAccessToken.JavaClass.getCurrentAccessToken, StringToJstring(aGraphPath), aBundle, aJHttpMethod, FCallback);
+  aGraphRequest.executeAsync;
 
   {$ENDIF}
   {$ENDREGION}
@@ -948,19 +801,9 @@ begin
                                                                      ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
-  {$IF CompilerVersion <= 31} // berlin
-  TThread.queue(nil,
-    procedure
-    begin
-  {$ENDIF}
-
-      fFacebookGraphRequest.fIsRunning := False;
-      if assigned(fFacebookGraphRequest.fOnCompleted) then
-        fFacebookGraphRequest.fOnCompleted(aRawResponse, aErrorCode, aErrorMsg);
-
-  {$IF CompilerVersion <= 31} // berlin
-    end);
-  {$ENDIF}
+  fFacebookGraphRequest.fIsRunning := False;
+  if assigned(fFacebookGraphRequest.fOnCompleted) then
+    fFacebookGraphRequest.fOnCompleted(aRawResponse, aErrorCode, aErrorMsg);
 
 end;
 

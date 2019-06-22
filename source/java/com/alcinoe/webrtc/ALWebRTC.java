@@ -465,6 +465,9 @@ public class ALWebRTC {
                                                                                 
   public boolean start() throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
     
+    /* exit if already started */
+    if (mPeerConnectionFactory != null) { return mVideoCapturer != null; }
+    
     /* create mPeerConnectionFactory */
     mPeerConnectionFactory = createPeerConnectionFactory(new PeerConnectionFactory.Options());
 
@@ -583,7 +586,8 @@ public class ALWebRTC {
                                                                                 
   public void stop() {
     mListener = null;
-    if (mPeerConnectionParameters.aecDump) { mPeerConnectionFactory.stopAecDump(); }
+    if ((mPeerConnectionParameters.aecDump) && 
+        (mPeerConnectionFactory != null)) { mPeerConnectionFactory.stopAecDump(); }
     if (mDataChannel != null) {
       mDataChannel.dispose();
       mDataChannel = null;
@@ -613,8 +617,10 @@ public class ALWebRTC {
       mSurfaceTextureHelper.dispose();
       mSurfaceTextureHelper = null;
     }
-    mPeerConnectionFactory.dispose();
-    mPeerConnectionFactory = null;
+    if (mPeerConnectionFactory != null) {
+      mPeerConnectionFactory.dispose();
+      mPeerConnectionFactory = null;
+    }
     mEglBase.release();
   }
   

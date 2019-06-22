@@ -5,13 +5,16 @@ Alcinoe is a library of visual and non-visual components for Delphi. The compone
 be used in commercial as well as shareware and freeware and open source projects 
 without cost.
 
+Alcinoe is compatible with <b>Delphi RIO 10.3.1</b>
+
 Please "star" (like) this project in GitHub! It's cost nothing but help
 to reference the code
 
 <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-24.jpg?raw=true" alt="like" />
 
-App made with Alcinoe
----------------------
+
+Example of an app made with Alcinoe: KisKis
+-------------------------------------------
 
 * YouTube: https://www.youtube.com/watch?v=WEsEhGfrW-g&vq=hd2160
 * iOS: https://itunes.apple.com/us/app/id1420049759
@@ -368,7 +371,7 @@ To parse an JSON document in Sax Mode :
 
 
 ImageMagick wrapper for Delphi
----------------------------------------
+------------------------------
 
 Use ImageMagick® to create, edit, compose, or convert bitmap 
 images. It can read and write images in a variety of formats 

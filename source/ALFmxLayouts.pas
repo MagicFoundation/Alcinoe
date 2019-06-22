@@ -1,6 +1,6 @@
 unit ALFmxLayouts;
 
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if FMX.Layouts.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -103,7 +103,6 @@ type
     FShowScrollBars: Boolean;
     FAutoHide: Boolean;
     FMouseEvents: Boolean;
-    fGestureEvents: Boolean;
     FOnViewportPositionChange: TALScrollBoxPositionChangeEvent;
     fOnScrollBarInit: TALScrollBoxBarInit;
     fOnAniStart: TnotifyEvent;
@@ -123,11 +122,14 @@ type
     procedure setAniCalculations(const Value: TALScrollBoxAniCalculations);
     function isMaxContentHeightStored: Boolean;
     function isMaxContentWidthStored: Boolean;
+    procedure internalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+    procedure internalMouseMove(Shift: TShiftState; X, Y: Single);
+    procedure internalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+    procedure internalMouseLeave;
   protected
     procedure Loaded; override;
     procedure DoAddObject(const AObject: TFmxObject); override;
     procedure DoRealign; override;
-    procedure CMGesture(var EventInfo: TGestureEventInfo); override;
     function CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar; virtual;
     function CreateContent: TALScrollBoxContent; virtual;
     function CreateAniCalculations: TALScrollBoxAniCalculations; virtual;
@@ -136,6 +138,12 @@ type
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure DoMouseLeave; override;
+    {$IFNDEF ALDPK}
+    procedure ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single); override;
+    procedure ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure ChildrenMouseLeave(const AObject: TControl); override;
+    {$ENDIF}
     procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); override;
     property HScrollBar: TALScrollBoxBar read fHScrollBar;
     property VScrollBar: TALScrollBoxBar read fVScrollBar;
@@ -551,7 +559,6 @@ begin
   fdisableScrollChange := False;
   FDisableMouseWheel := False;
   FMouseEvents := False;
-  fGestureEvents := False;
   FOnViewportPositionChange := nil;
   fOnScrollBarInit := nil;
   fOnAniStart := nil;
@@ -789,62 +796,16 @@ begin
       fAniCalculations.Down := false;
       fAniCalculations.CurrentVelocity := TalPointD.Create(0,0);
       FMouseEvents := False;
-      fGestureEvents := False;
     end;
     fScrollingAcquiredByOther := True;
   end
   else fScrollingAcquiredByOther := False;
 end;
 
-{***********************************************************************}
-procedure TALCustomScrollBox.CMGesture(var EventInfo: TGestureEventInfo);
-var LP: TPointF;
+{*****************************************************************************************************}
+procedure TALCustomScrollBox.internalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-
-  //note: Mouse events (with autocapture) are more accurate than CMGesture
-  //      to detect when mouse go out of the screen. with CMGesture their
-  //      will be (often) no final event with TInteractiveGestureFlag.gfEnd
-  //      https://quality.embarcadero.com/browse/RSP-15617
-
-  //This is used when scrolling with the finger on top of a control (like a TButton).
-  if (not FMouseEvents) and (EventInfo.GestureID = igiPan) then begin
-    LP := AbsoluteToLocal(EventInfo.Location);
-    if TInteractiveGestureFlag.gfBegin in EventInfo.Flags then begin
-      if not fScrollingAcquiredByOther then begin
-        setScrollingAcquiredByMe(False);
-        fMouseDownPos := TpointF.Create(LP.X, LP.Y);
-        fGestureEvents := true;
-        FAniCalculations.averaging := true;
-        AniCalculations.MouseDown(LP.X, LP.Y);
-      end;
-    end
-    else if fGestureEvents and
-            (EventInfo.Flags = []) then begin
-      if (not fScrollingAcquiredByMe) and
-         (((ttHorizontal in fAniCalculations.TouchTracking) and
-           (abs(fMouseDownPos.x - LP.x) > fDeadZoneBeforeAcquireScrolling)) or
-          ((ttVertical in fAniCalculations.TouchTracking) and
-           (abs(fMouseDownPos.y - LP.y) > fDeadZoneBeforeAcquireScrolling))) then setScrollingAcquiredByMe(True);
-      AniCalculations.MouseMove(LP.X, LP.Y)
-    end
-    else if fGestureEvents and
-            (TInteractiveGestureFlag.gfEnd in EventInfo.Flags) then begin
-      setScrollingAcquiredByMe(False);
-      AniCalculations.MouseUp(LP.X, LP.Y);
-      fGestureEvents := False;
-    end;
-  end;
-
-  //important to let parent (like TScrollBox) continue
-  //to handle this gesture event
-  inherited;
-
-end;
-
-{*********************************************************************************************}
-procedure TALCustomScrollBox.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-begin
-  FMouseEvents := not fGestureEvents;
+  FMouseEvents := true;
   inherited;
   if (not fScrollingAcquiredByOther) and FMouseEvents and (Button = TMouseButton.mbLeft) then begin
     setScrollingAcquiredByMe(False);
@@ -854,8 +815,8 @@ begin
   end;
 end;
 
-{***********************************************************************}
-procedure TALCustomScrollBox.MouseMove(Shift: TShiftState; X, Y: Single);
+{*******************************************************************************}
+procedure TALCustomScrollBox.internalMouseMove(Shift: TShiftState; X, Y: Single);
 begin
   inherited;
   if FMouseEvents then begin
@@ -868,8 +829,8 @@ begin
   end;
 end;
 
-{*******************************************************************************************}
-procedure TALCustomScrollBox.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+{***************************************************************************************************}
+procedure TALCustomScrollBox.internalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
   if FMouseEvents and (Button = TMouseButton.mbLeft) then begin
@@ -879,8 +840,8 @@ begin
   end;
 end;
 
-{****************************************}
-procedure TALCustomScrollBox.DoMouseLeave;
+{**********************************************}
+procedure TALCustomScrollBox.internalMouseLeave;
 begin
   inherited;
   if FMouseEvents then begin
@@ -889,6 +850,82 @@ begin
     FMouseEvents := False;
   end;
 end;
+
+{*********************************************************************************************}
+procedure TALCustomScrollBox.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  inherited;
+  internalMouseDown(Button, Shift, X, Y);
+end;
+
+{***********************************************************************}
+procedure TALCustomScrollBox.MouseMove(Shift: TShiftState; X, Y: Single);
+begin
+  inherited;
+  internalMouseMove(Shift, X, Y);
+end;
+
+{*******************************************************************************************}
+procedure TALCustomScrollBox.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  inherited;
+  internalMouseUp(Button, Shift, X, Y);
+end;
+
+{****************************************}
+procedure TALCustomScrollBox.DoMouseLeave;
+begin
+  inherited;
+  internalMouseLeave;
+end;
+
+{**}
+Type
+  _TALControlAccessProtected = class(Tcontrol);
+
+{*************}
+{$IFNDEF ALDPK}
+procedure TALCustomScrollBox.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+var P: Tpointf;
+begin
+  if not aObject.AutoCapture then _TALControlAccessProtected(aObject).capture;
+  P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
+  internalMouseDown(Button, Shift, P.X, P.Y);
+  inherited;
+end;
+{$ENDIF}
+
+{*************}
+{$IFNDEF ALDPK}
+procedure TALCustomScrollBox.ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);
+var P: Tpointf;
+begin
+  P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
+  internalMouseMove(Shift, P.X, P.Y);
+  inherited;
+end;
+{$ENDIF}
+
+{*************}
+{$IFNDEF ALDPK}
+procedure TALCustomScrollBox.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+var P: Tpointf;
+begin
+  if not aObject.AutoCapture then _TALControlAccessProtected(aObject).releasecapture;
+  P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
+  internalMouseUp(Button, Shift, P.X, P.Y);
+  inherited;
+end;
+{$ENDIF}
+
+{*************}
+{$IFNDEF ALDPK}
+procedure TALCustomScrollBox.ChildrenMouseLeave(const AObject: TControl);
+begin
+  internalMouseLeave;
+  inherited;
+end;
+{$ENDIF}
 
 {*****************************************************************************************************}
 procedure TALCustomScrollBox.MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean);

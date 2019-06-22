@@ -515,13 +515,13 @@ begin
   inc(fTotalFramesProcessed);
   {$ENDIF}
 
-  {$IF CompilerVersion > 32} // tokyo
-    {$MESSAGE WARN 'Check if this is still true and adjust the IFDEF'}
+  {$IF CompilerVersion > 33} // rio
+    {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
   {$ENDIF}
   if (fVideoPlayerControl.fbitmap.Width <> fVideoPlayerControl.fVideoWidth) or
      (fVideoPlayerControl.fbitmap.Height <> fVideoPlayerControl.fVideoHeight) then begin
     TALTextureAccessPrivate(fVideoPlayerControl.fBitmap).FWidth := fVideoPlayerControl.fVideoWidth;
-    TALTextureAccessPrivate(fVideoPlayerControl.fBitmap).FHeight := fVideoPlayerControl.fVideoHeight; // we can't use setsize because it's fill finalise the texture
+    TALTextureAccessPrivate(fVideoPlayerControl.fBitmap).FHeight := fVideoPlayerControl.fVideoHeight; // we can't use setsize because it's will finalise the texture
                                                                                                       // but with/height are used only in
                                                                                                       // procedure TCanvasHelper.TexRect(const DestCorners, SrcCorners: TCornersF; const Texture: TTexture; const Color1, Color2, Color3, Color4: TAlphaColor);
                                                                                                       // begin
@@ -1667,11 +1667,11 @@ begin
         cfRElease(pointer(aPrevTextureRef));
 
       //-----
-      {$IF CompilerVersion > 32} // tokyo
-        {$MESSAGE WARN 'Check if this is still true and adjust the IFDEF'}
+      {$IF CompilerVersion > 33} // rio
+        {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
       {$ENDIF}
       TALTextureAccessPrivate(fBitmap).FWidth := aWidth;
-      TALTextureAccessPrivate(fBitmap).FHeight := aHeight; // we can't use setsize because it's fill finalise the texture
+      TALTextureAccessPrivate(fBitmap).FHeight := aHeight; // we can't use setsize because it's will finalise the texture
                                                            // but with/height are used only in
                                                            // procedure TCanvasHelper.TexRect(const DestCorners, SrcCorners: TCornersF; const Texture: TTexture; const Color1, Color2, Color3, Color4: TAlphaColor);
                                                            // begin

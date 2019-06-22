@@ -9,7 +9,7 @@ unit ALFmxInertialMovement;
 //and i update significantly this unit
 //
 
-{$IF CompilerVersion > 32} // tokyo
+{$IF CompilerVersion > 33} // rio
   {$MESSAGE WARN 'Check if FMX.InertialMovement.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -133,6 +133,7 @@ type
     FUpVelocity: TALPointD;
     FUpPosition: TALPointD;
     FUpDownTime: TDateTime;
+    FlastTickCalc: Double;
     FLastTimeCalc: TDateTime;
     [Weak] FOwner: TPersistent;
     FPlatformTimer: IFMXTimerService;
@@ -155,7 +156,7 @@ type
     FLastTimeChanged: TDateTime;
     FDownPoint: TALPointD;
     FDownPosition: TALPointD;
-    FUpdateTimerCount: ShortInt;
+    FUpdateTimerCount: Integer;
     FElasticity: Double;
     FDecelerationRate: Double;
     FStorageTime: Double;
@@ -277,6 +278,7 @@ type
     property Down: Boolean read FDown write SetDown;
     property Opacity: Single read GetOpacity;
     property InTimerProc: Boolean read FInTimerProc;
+    Procedure WakeUpTimer;
     Procedure Calculate; // when Ontimer is set (an event that just need to call repaint/invalidate), then in the onpaint of the control we must manually call Calculate
                          // this because of this problem: https://stackoverflow.com/questions/46146006/why-calling-setneedsdisplay-from-a-nstimer-make-cadisplaylink-stop-to-work-corre
                          // i do also like this because between the time to receive the ontimer event, then we calculate new position and then we call repaint AND the time we
@@ -308,39 +310,7 @@ type
   end;
 
 var
-  ALAniCalcTimerProcs: Tlist<TALAniCalculations>; // << i add this because i don't like the idea that the anicalculations work on a timer
-                                                  // << i prefere that the timer proc is call before each paint that at a fixed intervall
-                                                  // << (that is never really fixed). so i add this variable but to use it you must update
-                                                  // << FMX.Platform.Android and add:
-                                                  // <<
-                                                  // << procedure TPlatformAndroid.InternalProcessMessages;
-                                                  // <<
-                                                  // <<   if TThread.CurrentThread.ThreadID = MainThreadID then
-                                                  // <<     begin
-                                                  // <<       for i := ALAniCalcTimerProcs.Count - 1 downto 0 do
-                                                  // <<         ALAniCalcTimerProcs[i].timerProc;
-                                                  // <<       end;
-                                                  // <<
-                                                  // <<   just before
-                                                  // <<
-                                                  // <<   if TWindowManager.Current.RenderIfNeeds then
-                                                  // <<     HasEvents := True;
-                                                  // <<
-                                                  // << and also update :
-                                                  // <<
-                                                  // << constructor TPlatformAndroid.Create;
-                                                  // << begin
-                                                  // <<   inherited;
-                                                  // <<   ALAniCalcTimerProcs := Tlist<TALAniCalculations>.create; // added to support ALFmxInertialMovement
-                                                  // <<   ....
-                                                  // << end;
-                                                  // <<
-                                                  // << destructor TPlatformAndroid.Destroy;
-                                                  // << begin
-                                                  // <<   ...
-                                                  // <<   ALAniCalcTimerProcs.Free; // added to support ALFmxInertialMovement
-                                                  // <<   inherited;
-                                                  // << end;
+  ALAniCalcTimerProcs: Tlist<TALAniCalculations>; 
 
 implementation
 
@@ -812,48 +782,51 @@ end;
 {**************************************}
 procedure TALAniCalculations.StartTimer;
 begin
+
   if FTimerActive then exit;
   {$IFDEF DEBUG}
   //ALLog('TALAniCalculations.StartTimer', 'TALAniCalculations.StartTimer', TalLogType.verbose);
   {$ENDIF}
+  FlastTickCalc := FPlatformTimer.getTick;
   FTimerActive := True;
+  if ALAniCalcTimerProcs <> nil then ALAniCalcTimerProcs.Add(self);
+
   {$IFDEF IOS}
   fDisplayLink.setPaused(False);
   {$ELSEIF defined(ANDROID) and (CompilerVersion >= 32)} // tokyo
   fChoreographer.postFrameCallback(fChoreographerFrameCallback);
-  if ALAniCalcTimerProcs <> nil then ALAniCalcTimerProcs.Add(self);
   {$ELSE}
-  if ALAniCalcTimerProcs <> nil then ALAniCalcTimerProcs.Add(self)
-  else begin
-    if FTimerHandle = TFmxHandle(-1) then
-    begin
-      FTimerHandle := FPlatformTimer.CreateTimer(FInterval, TimerProc);
-    end;
+  if FTimerHandle = TFmxHandle(-1) then
+  begin
+    FTimerHandle := FPlatformTimer.CreateTimer(FInterval, TimerProc);
   end;
   {$ENDIF}
+
 end;
 
 {*************************************}
 procedure TALAniCalculations.StopTimer;
 begin
+
   if not FTimerActive then exit;
   {$IFDEF DEBUG}
   //ALLog('TALAniCalculations.StopTimer', 'TALAniCalculations.StopTimer', TalLogType.verbose);
   {$ENDIF}
   FTimerActive := False;
+  if ALAniCalcTimerProcs <> nil then ALAniCalcTimerProcs.Remove(self);
+
   {$IFDEF IOS}
   fDisplayLink.setPaused(True);
   {$ELSEIF defined(ANDROID) and (CompilerVersion >= 32)} // tokyo
   fChoreographer.removeFrameCallback(fChoreographerFrameCallback);
-  if ALAniCalcTimerProcs <> nil then ALAniCalcTimerProcs.Remove(self);
   {$ELSE}
   if FTimerHandle <> TFmxHandle(-1) then
   begin
     FPlatformTimer.DestroyTimer(FTimerHandle);
     FTimerHandle := TFmxHandle(-1);
-  end
-  else if ALAniCalcTimerProcs <> nil then ALAniCalcTimerProcs.Remove(self);
+  end;
   {$ENDIF}
+
 end;
 
 {********************************************************************************************************************}
@@ -1038,18 +1011,30 @@ begin
 end;
 {$ENDIF}
 
+{***************************************}
+Procedure TALAniCalculations.WakeUpTimer;
+begin
+  if not FTimerActive then exit;
+  if FPlatformTimer.GetTick - FlastTickCalc > 0.04 then begin // normally Calculate must be called every 0.016 seconds.
+                                                              // but in heavy situation, especially on ios, the CADisplay link
+                                                              // could never fire. I saw it on iphone 5 playing webRTC + filter
+                                                              // the GPU was so busy that the CADisplay link never fire.
+                                                              // so if it's was not called for more than 0.04 seconds (0.016*2 + 0.016/2)
+                                                              // then call it again
+    {$IFDEF DEBUG}
+    ALLog('TALAniCalculations.WakeUpTimer', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.warn);
+    {$ENDIF}
+    if assigned(fOnTimer) then fOnTimer(self)
+    else Calculate;
+  end;
+end;
+
 {*************************************}
 procedure TALAniCalculations.Calculate;
 var
   D, T: TDateTime;
   IsInit: Boolean;
   DOpacity: Single;
-  {$IFDEF ANDROID}
-  {$IF CompilerVersion <= 31} // berlin
-  PEventPollSource: Pandroid_poll_source;
-  EventPollValue: Integer;
-  {$ENDIF}
-  {$ENDIF}
 begin
 
   if (FTimerActive) and (not FInTimerProc) then
@@ -1063,7 +1048,6 @@ begin
 
     FInTimerProc := True;
 
-    {$IFDEF ANDROID}
     // you put you finger, you move => result in jerks!
     // why ? because their is 16ms between each paint, BUT if you call very often the paint,
     // then maybe you can miss some move event resulting in drop frame (not really dropped
@@ -1073,46 +1057,39 @@ begin
     // T=16 mouse move (ok)
     // T=16 paint OK
     // T=32 paint (aie we didn't receive yet the move move, that maybe is in the nanosecond later) result in drop frame
-    {$IF CompilerVersion <= 31} // berlin
-    if down and (not fMouseEventReceived) then begin
-      T := FPlatformTimer.getTick;
-      while (not fMouseEventReceived) and (FPlatformTimer.getTick - T < 0.004) do begin
-        EventPollValue := ALooper_pollAll(1, nil, nil, PPointer(@PEventPollSource));
-        if (EventPollValue = ALOOPER_POLL_ERROR) or (EventPollValue = ALOOPER_POLL_TIMEOUT) then continue;
-        if GetAndroidApp.destroyRequested <> 0 then continue;
-        if (PEventPollSource <> nil) and Assigned(PEventPollSource^.process) then PEventPollSource^.process(GetAndroidApp, PEventPollSource);
-      end;
-    end;
-    {$ELSE} // Tokyo
 
-      //under tokyo and up this is handled in the unit FMX.Platform.Android by adding this
+    {$IFDEF ANDROID}
 
-        //procedure TWindowManager.Render;
-        //
-        //  ...
-        //
-        //  for i := ALAniCalcTimerProcs.Count - 1 downto 0 do
-        //    if (ALAniCalcTimerProcs[i].Down) and
-        //       (not ALAniCalcTimerProcs[i].mouseEventReceived) then exit;
-        //
-        //  ...
-        //
+    //
+    // this is handled in the unit FMX.Platform.UI.Android by adding this
+    //
+    //   procedure TWindowManager.Render;
+    //     ...
+    //     for i := ALAniCalcTimerProcs.Count - 1 downto 0 do
+    //       if (ALAniCalcTimerProcs[i].Down) and
+    //          (not ALAniCalcTimerProcs[i].mouseEventReceived) then exit;
+    //     ...
+    //
 
-    {$ENDIF}
     {$ENDIF}
     {$IFDEF IOS}
-    // this hack to handle https://stackoverflow.com/questions/46157947/ios-how-to-check-for-touch-event-between-2-frame-updates
-    // so the idea is that if the mouse is down and not yet processed the mouse move then wait max 2 ms
-    if down and (not fMouseEventReceived) then begin
-      T := FPlatformTimer.getTick;
-      while (not fMouseEventReceived) and (FPlatformTimer.getTick - T < 0.004) do begin
-        CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.001, true);
-      end;
-    end;
+
+    //
+    // this is handled in the unit FMX.Platform.iOS by adding this
+    //
+    //   procedure TFMXView3D.drawRect(R: CGRect);
+    //     ...
+    //     for i := ALAniCalcTimerProcs.Count - 1 downto 0 do
+    //       if (ALAniCalcTimerProcs[i].Down) and
+    //          (not ALAniCalcTimerProcs[i].mouseEventReceived) then exit;
+    //     ...
+    //
+
     {$ENDIF}
     fMouseEventReceived := False;
 
-    T := FPlatformTimer.getTick/SecsPerDay;
+    FlastTickCalc := FPlatformTimer.getTick;
+    T := FlastTickCalc/SecsPerDay;
     IsInit := FLastTimeCalc > 0;
     D := T - FLastTimeCalc;
     FLastTimeCalc := T;

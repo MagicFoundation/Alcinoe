@@ -1,5 +1,5 @@
-@SET BDS=C:\Program Files (x86)\Embarcadero\Studio\19.0
-@SET FrameworkDir=C:\Windows\Microsoft.NET\Framework\v3.5
+@SET BDS=C:\Program Files (x86)\Embarcadero\Studio\20.0
+@SET FrameworkDir=C:\Windows\Microsoft.NET\Framework\v4.0.30319
 @SET PATH=%FrameworkDir%;%PATH%
 
 @echo off
@@ -31,22 +31,22 @@ SET FileName=*.deployproj.local
 del %FileName% /s
 if exist %FileName% goto ERROR
 
-SET FileName=source\dcu\Win32\tokyo
+SET FileName=source\dcu\Win32\rio
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 mkdir %FileName%
 
-SET FileName=source\hpp\Win32\tokyo
+SET FileName=source\hpp\Win32\rio
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 mkdir %FileName%
 
-SET FileName=lib\bpl\alcinoe\Win32\tokyo
+SET FileName=lib\bpl\alcinoe\Win32\rio
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 mkdir %FileName%
 
-MSBuild source\Alcinoe_tokyo.dproj /p:Config=Release /p:Platform=Win32
+MSBuild source\Alcinoe_rio.dproj /p:Config=Release /p:Platform=Win32
 IF ERRORLEVEL 1 goto ERROR
 
 call compilejar.bat off
@@ -257,7 +257,7 @@ IF ERRORLEVEL 1 goto ERROR
 
 :FINISHED
 
-SET FileName=source\dcu\Win32\tokyo
+SET FileName=source\dcu\Win32\rio
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 mkdir %FileName%

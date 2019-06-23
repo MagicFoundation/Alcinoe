@@ -1095,7 +1095,8 @@ end;
 procedure TALIosMemo.DoEnter;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosMemo.DoEnter', '', TalLogType.VERBOSE);
+  ALLog('TALIosMemo.DoEnter', 'control.name: ' + parent.Name +
+                              ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
   inherited DoEnter;
   FTextView.SetFocus;
@@ -1105,7 +1106,8 @@ end;
 procedure TALIosMemo.DoExit;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosMemo.DoExit', '', TalLogType.VERBOSE);
+  ALLog('TALIosMemo.DoExit', 'control.name: ' + parent.Name +
+                             ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
   inherited DoExit;
   FTextView.ResetFocus;
@@ -1115,9 +1117,9 @@ end;
 procedure TALIosMemo.DoEndUpdate;
 begin
   inherited;
-  if FTextView <> nil then FTextView.RefreshNativeParent; // << without this, in some case when we are doing beginupdate to the TEdit
-                                                          // << (because in android for exemple we would like to not refresh the position of the control during calculation)
-                                                          // << then when we do endupdate the control is not paint or lost somewhere
+  if FTextView <> nil then FTextView.UpdateFrame; // << without this, in some case when we are doing beginupdate to the TEdit
+                                                  // << (because in android for exemple we would like to not refresh the position of the control during calculation)
+                                                  // << then when we do endupdate the control is not paint or lost somewhere
 end;
 
 {$endif}
@@ -1821,12 +1823,18 @@ end;
 function TALMemo.GetCanFocus: Boolean;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALEdit.GetCanFocus', 'GetCanFocus', TalLogType.VERBOSE);
+  ALLog('TALEdit.GetCanFocus', 'name: ' + Name, TalLogType.VERBOSE);
   {$ENDIF}
   if FMemoControl = nil then CreateMemoControl;
   result := inherited GetCanFocus;
   if result then begin
+    {$IF defined(IOS)}
+    FMemoControl.FTextView.SetFocus; // << instead of fEditControl.SetFocus because when I do setFocus
+                                     // << of another TalEdit when one is already currently focused then the event
+                                     // << formkeyboadHidden and formKeyboardShow will be raised (and it's slow)
+    {$ELSE}
     FMemoControl.SetFocus;
+    {$ENDIF}
     exit(false);   // << the canparentfocus is also set to false, so the TCommonCustomForm.NewFocusedControl(const Value: IControl)
                    //    will do nothing !
   end;

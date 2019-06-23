@@ -1190,6 +1190,10 @@ begin
   FEditText.SetFocus;
   if IsFocused then begin
     ALVirtualKeyboardVisible := True;
+    {$IF defined(DEBUG)}
+    ALLog('TalAndroidEdit.showVirtualKeyboard', 'control.name: ' + parent.Name +
+                                                ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+    {$ENDIF}
     MainActivity.getVirtualKeyboard.showFor(FEditText.View);
   end;
 end;
@@ -1206,8 +1210,12 @@ begin
   ALVirtualKeyboardVisible := False;
   TThread.ForceQueue(nil, procedure
   begin
-    If not ALVirtualKeyboardVisible then
+    If not ALVirtualKeyboardVisible then begin
+      {$IF defined(DEBUG)}
+      ALLog('TalAndroidEdit.hideVirtualKeyboard', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+      {$ENDIF}
       MainActivity.getVirtualKeyboard.hide;
+    end;
   end);
 end;
 

@@ -1279,7 +1279,8 @@ end;
 procedure TALIosTextField.ControlEventEditingChanged;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosTextField.ControlEventEditingChanged', '', TalLogType.VERBOSE);
+  ALLog('TALIosTextField.ControlEventEditingChanged', 'control.name: ' + fEditControl.parent.Name +
+                                                      ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
   if assigned(fEditControl.fOnChangeTracking) then
     fEditControl.fOnChangeTracking(fEditControl);
@@ -1289,7 +1290,8 @@ end;
 procedure TALIosTextField.ControlEventEditingDidEnd;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosTextField.ControlEventEditingDidEnd', '', TalLogType.VERBOSE);
+  ALLog('TALIosTextField.ControlEventEditingDidEnd', 'control.name: ' + fEditControl.parent.Name +
+                                                     ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
   if assigned(fEditControl.fOnChangeTracking) then
     fEditControl.fOnChangeTracking(fEditControl);  // << when we change the word via the sugestion (clicking on the selection) then ControlEventEditingChanged is not fired
@@ -1322,6 +1324,11 @@ end;
 function TALIosTextFieldDelegate.textField(textField: UITextField; shouldChangeCharactersInRange: NSRange; replacementString: NSString): Boolean;
 var aText: NSString;
 begin
+  {$IF defined(DEBUG)}
+  ALLog('TALIosTextFieldDelegate.textField', 'control.name: ' + FTextField.fEditControl.parent.Name +
+                                             ' - replacementString: ' + NSStrToStr(replacementString) +
+                                             ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  {$ENDIF}
   if FTextField.FEditControl.maxLength > 0 then begin
 
     //https://stackoverflow.com/questions/433337/set-the-maximum-character-length-of-a-uitextfield
@@ -1336,6 +1343,10 @@ end;
 {*********************************************************************************}
 procedure TALIosTextFieldDelegate.textFieldDidBeginEditing(textField: UITextField);
 begin
+  {$IF defined(DEBUG)}
+  ALLog('TALIosTextFieldDelegate.textFieldDidBeginEditing', 'control.name: ' + FTextField.fEditControl.parent.Name +
+                                                            ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  {$ENDIF}
   if not FTextField.Control.IsFocused then
     FTextField.Control.SetFocus;
 end;
@@ -1366,6 +1377,10 @@ end;
 {**************************************************************************************}
 function TALIosTextFieldDelegate.textFieldShouldReturn(textField: UITextField): Boolean;
 begin
+  {$IF defined(DEBUG)}
+  ALLog('TALIosTextFieldDelegate.textFieldShouldReturn', 'control.name: ' + FTextField.FEditControl.parent.Name +
+                                                         ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  {$ENDIF}
   FTextField.ControlEventEditingDidEnd;
   if assigned(FTextField.fEditControl.fOnReturnKey) then begin
     FTextField.fEditControl.fOnReturnKey(FTextField.fEditControl);
@@ -1774,7 +1789,8 @@ end;
 procedure TalIosEdit.DoEnter;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TalIosEdit.DoEnter', '', TalLogType.VERBOSE);
+  ALLog('TalIosEdit.DoEnter', 'control.name: ' + parent.Name +
+                              ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
   inherited DoEnter;
   FTextField.SetFocus;
@@ -1784,7 +1800,8 @@ end;
 procedure TalIosEdit.DoExit;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TalIosEdit.DoExit', '', TalLogType.VERBOSE);
+  ALLog('TalIosEdit.DoExit', 'control.name: ' + parent.Name +
+                             ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
   inherited DoExit;
   FTextField.ResetFocus;
@@ -2229,7 +2246,13 @@ begin
   if FEditControl = nil then CreateEditControl;
   result := inherited GetCanFocus;
   if result then begin
+    {$IF defined(IOS)}
+    fEditControl.FTextField.SetFocus; // << instead of fEditControl.SetFocus because when I do setFocus
+                                      // << of another TalEdit when one is already currently focused then the event
+                                      // << formkeyboadHidden and formKeyboardShow will be raised (and it's slow)
+    {$ELSE}
     fEditControl.SetFocus;
+    {$ENDIF}
     exit(false);   // << the canparentfocus is also set to false, so the TCommonCustomForm.NewFocusedControl(const Value: IControl)
                    //    will do nothing !
   end;

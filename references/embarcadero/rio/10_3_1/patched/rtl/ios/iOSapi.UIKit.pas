@@ -1385,6 +1385,17 @@ const
   {$EXTERNALSYM UIUserInterfaceSizeClassCompact}
   UIUserInterfaceSizeClassRegular = 2;
   {$EXTERNALSYM UIUserInterfaceSizeClassRegular}
+  UIAlertActionStyleDefault = 0;                    // https://quality.embarcadero.com/browse/RSP-24740
+  {$EXTERNALSYM UIAlertActionStyleDefault}          // https://quality.embarcadero.com/browse/RSP-24740
+  UIAlertActionStyleCancel = 1;                     // https://quality.embarcadero.com/browse/RSP-24740
+  {$EXTERNALSYM UIAlertActionStyleCancel}           // https://quality.embarcadero.com/browse/RSP-24740
+  UIAlertActionStyleDestructive = 2;                // https://quality.embarcadero.com/browse/RSP-24740
+  {$EXTERNALSYM UIAlertActionStyleDestructive}      // https://quality.embarcadero.com/browse/RSP-24740
+  UIAlertControllerStyleAlert = 1;                  // https://quality.embarcadero.com/browse/RSP-24740
+  {$EXTERNALSYM UIAlertControllerStyleAlert}        // https://quality.embarcadero.com/browse/RSP-24740
+  UIAlertControllerStyleActionSheet = 0;            // https://quality.embarcadero.com/browse/RSP-24740
+  {$EXTERNALSYM UIAlertControllerStyleActionSheet}  // https://quality.embarcadero.com/browse/RSP-24740
+
 
 type
   // ===== Forward declarations =====
@@ -1593,6 +1604,8 @@ type
   UITraitCollection = interface;
   UIPrinter = interface;
   UIPrinterPickerController = interface;
+  UIAlertAction = interface; // https://quality.embarcadero.com/browse/RSP-24740
+  UIAlertController = interface; // https://quality.embarcadero.com/browse/RSP-24740
 
   // ===== Framework typedefs =====
 {$M+}
@@ -1775,6 +1788,9 @@ type
   {$EXTERNALSYM UIPrinterJobTypes}
   UIPrinterPickerCompletionHandler = procedure(param1: UIPrinterPickerController; param2: Boolean; param3: NSError)
     of object;
+  UIAlertActionStyle = NSInteger; // https://quality.embarcadero.com/browse/RSP-24740
+  TUIAlertActionHandler = procedure(action: UIAlertAction) of object; // https://quality.embarcadero.com/browse/RSP-24740
+  UIAlertControllerStyle = NSInteger; // https://quality.embarcadero.com/browse/RSP-24740
 
   // ===== Interface declarations =====
 
@@ -6818,6 +6834,43 @@ type
     procedure popoverPresentationController(popoverPresentationController: UIPopoverPresentationController;
       willRepositionPopoverToRect: Pointer; inView: UIView); cdecl;
   end;
+
+  // https://quality.embarcadero.com/browse/RSP-24740
+  UIAlertActionClass = interface(NSObjectClass)
+    ['{C5BB4A76-81D4-4ADE-BB75-09B7D8966B5A}']
+    { class } function actionWithTitle(title: NSString; style: UIAlertActionStyle; handler: TUIAlertActionHandler): Pointer { instancetype }; cdecl;
+  end;
+  UIAlertAction = interface(NSObject)
+    ['{890CEEA6-1381-434F-83CB-C885655A3592}']
+    function title: NSString; cdecl;
+    function style: UIAlertActionStyle; cdecl;
+    procedure setEnabled(enabled: Boolean); cdecl;
+    function isEnabled: Boolean; cdecl;
+  end;
+  TUIAlertAction = class(TOCGenericImport<UIAlertActionClass, UIAlertAction>) end;
+  PUIAlertAction = Pointer;
+
+  // https://quality.embarcadero.com/browse/RSP-24740
+  UIAlertControllerClass = interface(UIViewControllerClass)
+    ['{5FB1577B-555E-4D40-A026-16DD52B90EBF}']
+    { class } function alertControllerWithTitle(title: NSString; message: NSString; preferredStyle: UIAlertControllerStyle): Pointer { instancetype }; cdecl;
+  end;
+  UIAlertController = interface(UIViewController)
+    ['{59400341-B161-4E86-8F4F-D621A0C30384}']
+    procedure addAction(action: UIAlertAction); cdecl;
+    function actions: NSArray; cdecl;
+    procedure setPreferredAction(preferredAction: UIAlertAction); cdecl;
+    function preferredAction: UIAlertAction; cdecl;
+    //procedure addTextFieldWithConfigurationHandler(configurationHandler: TUIKitConfigurationHandler); cdecl;
+    function textFields: NSArray; cdecl;
+    procedure setTitle(title: NSString); cdecl;
+    function title: NSString; cdecl;
+    procedure setMessage(message: NSString); cdecl;
+    function message: NSString; cdecl;
+    function preferredStyle: UIAlertControllerStyle; cdecl;
+  end;
+  TUIAlertController = class(TOCGenericImport<UIAlertControllerClass, UIAlertController>) end;
+  PUIAlertController = Pointer;
 
   // ===== Exported string consts =====
 

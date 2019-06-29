@@ -278,11 +278,11 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 2900.406250000000000000
+      Position.Y = 2916.367187500000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 98
+      TabOrder = 99
       Text = 'TALRangeTrackbar'
       TextSettings.Font.Size = 13.000000000000000000
     end
@@ -296,8 +296,8 @@ object Form1: TForm1
       Margins.Bottom = 15.000000000000000000
       Position.X = 16.000000000000000000
       Position.Y = 2720.484375000000000000
-      Size.Width = 288.000000000000000000
-      Size.Height = 31.921875000000000000
+      Size.Width = 292.000000000000000000
+      Size.Height = 47.882812500000000000
       Size.PlatformDefault = False
       Text = 
         'Note that the verticalscrollbar is deactivated when you move lef' +
@@ -545,7 +545,7 @@ object Form1: TForm1
       Margins.Top = 8.000000000000000000
       Margins.Right = 25.000000000000000000
       Position.X = 25.000000000000000000
-      Position.Y = 2856.406250000000000000
+      Position.Y = 2872.367187500000000000
       Size.Width = 270.000000000000000000
       Size.Height = 36.000000000000000000
       Size.PlatformDefault = False
@@ -576,7 +576,7 @@ object Form1: TForm1
       Margins.Left = 25.000000000000000000
       Margins.Right = 25.000000000000000000
       Position.X = 25.000000000000000000
-      Position.Y = 2767.406250000000000000
+      Position.Y = 2783.367187500000000000
       Size.Width = 270.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
@@ -586,7 +586,7 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 2807.406250000000000000
+      Position.Y = 2823.367187500000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
@@ -626,7 +626,7 @@ object Form1: TForm1
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 15.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 2956.406250000000000000
+      Position.Y = 3021.367187500000000000
       Size.Width = 288.000000000000000000
       Size.Height = 160.000000000000000000
       Size.PlatformDefault = False
@@ -693,7 +693,7 @@ object Form1: TForm1
       Margins.Bottom = 15.000000000000000000
       Position.X = 16.000000000000000000
       Position.Y = 15.000000000000000000
-      Size.Width = 288.000000000000000000
+      Size.Width = 289.636383056640600000
       Size.Height = 74.484375000000000000
       Size.PlatformDefault = False
       Text = 
@@ -838,7 +838,7 @@ object Form1: TForm1
       Size.Width = 320.000000000000000000
       Size.Height = 78.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 107
+      TabOrder = 108
       object ALAniIndicator1: TALAniIndicator
         Align = Center
         Enabled = True
@@ -897,7 +897,7 @@ object Form1: TForm1
     object ALRectangle3: TALRectangle
       Align = Top
       Fill.Color = claWhite
-      Position.Y = 3276.406250000000000000
+      Position.Y = 3341.367187500000000000
       Size.Width = 320.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
@@ -1074,12 +1074,12 @@ object Form1: TForm1
       Padding.Right = 8.000000000000000000
       Padding.Bottom = 8.000000000000000000
       Margins.Bottom = 25.000000000000000000
-      Position.Y = 3131.406250000000000000
+      Position.Y = 3196.367187500000000000
       Size.Width = 320.000000000000000000
       Size.Height = 120.000000000000000000
       Size.PlatformDefault = False
       DefStyleAttr = 'BlueBGTextViewStyle'
-      TabOrder = 111
+      TabOrder = 112
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.FontColor = claWhite
       TextPrompt = 'Write multiple lines here'
@@ -1137,6 +1137,19 @@ object Form1: TForm1
         AnimationDuration = 0.200000002980232200
         OnChange = ALSwitch1Change
       end
+    end
+    object Button23: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 2965.367187500000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 98
+      Text = 'TALDatePickerDialog'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button23Click
     end
   end
 end

@@ -8,7 +8,7 @@ uses
   FMX.Controls.Presentation, FMX.Objects, ALFmxObjects, FMX.Layouts,
   ALFmxLayouts, fmx.types3D, ALFmxCommon, System.ImageList,
   FMX.ImgList, ALFmxStdCtrls, ALFmxTabControl,
-  FMX.ScrollBox, FMX.Edit, ALFmxEdit, ALVideoPlayer, FMX.Effects,
+  FMX.ScrollBox, FMX.Edit, ALFmxEdit, ALVideoPlayer, ALDatePickerDialog, FMX.Effects,
   {$IF Defined(IOS) or Defined(ANDROID)}
   Grijjy.ErrorReporting,
   {$ENDIF}
@@ -199,6 +199,7 @@ type
     Button11: TButton;
     ALSwitch1: TALSwitch;
     Layout5: TLayout;
+    Button23: TButton;
     procedure Button2Click(Sender: TObject);
     procedure Button255Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
@@ -241,7 +242,9 @@ type
       const width, height: Integer);
     procedure Button11Click(Sender: TObject);
     procedure ALSwitch1Change(Sender: TObject);
+    procedure Button23Click(Sender: TObject);
   private
+    FDatePickerDialog: TALDatePickerDialog;
     fALcheckbox2: TALcheckboxStopWatch;
     fcheckbox2: TcheckboxStopWatch;
     fLine: TLineStopWatch;
@@ -1180,6 +1183,19 @@ begin
     end).Start;
 end;
 
+procedure TForm1.Button23Click(Sender: TObject);
+begin
+  ALFreeAndNil(fDatePickerDialog);
+  fDatePickerDialog := TALDatePickerDialog.create('OK', // const aBtnOKCaption: string;
+                                                  'Cancel', // const aBtnCancelCaption: string;
+                                                  '', // const aBtnClearCaption: string
+                                                  'this is a title');// const aTitle: String = ''
+  fDatePickerDialog.show(YearOf(now), // const aYear: integer;
+                         MonthOf(now), // const aMonth: integer;
+                         DayOfTheMonth(now)); // const aDayOfMonth: integer);
+
+end;
+
 procedure TForm1.Button255Click(Sender: TObject);
 begin
   fALRectangle1.clearBufBitmap;
@@ -1237,6 +1253,8 @@ begin
   {$ELSE}
   Application.OnException := ApplicationExceptionHandler;
   {$ENDIF}
+
+  fDatePickerDialog := nil;
 
   FVKKeyboardOpen := False;
   beginupdate;

@@ -82,7 +82,8 @@ type
     {class} function init(context: JContext;
                           button_positive_text: JCharSequence;
 	                        button_negative_text: JCharSequence;
-                          button_neutral_text: JCharSequence): JALDatePickerDialog; cdecl;
+                          button_neutral_text: JCharSequence;
+                          title: JCharSequence): JALDatePickerDialog; cdecl;
   end;
 
   {**********************************************************}

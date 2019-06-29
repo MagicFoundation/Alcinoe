@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
  
+  <style name="AppThemeDatePickerDialogTheme" parent="@android:style/Theme.Material.Light.Dialog.Alert">
+    <item name="android:datePickerStyle">@style/AppThemeDatePickerStyle</item>
+    <item name="android:colorAccent">#ff0288d1</item>
+    <item name="android:colorControlNormal">#ff6bc6e7</item>
+  </style>
+
+  <style name="AppThemeDatePickerStyle" parent="@android:style/Widget.Material.Light.DatePicker">
+    <item name="android:datePickerMode">spinner</item>
+  </style>
+ 
   <!-- EditText on a blue background -->
   <style name="BlueBGTextView" parent="@android:style/Widget.Material.Light.EditText">
     <item name="android:background">#FF0087B4</item>   
@@ -22,6 +32,7 @@
     <item name="android:editTextStyle">@style/AppThemeEditTextStyle</item>
     <item name="android:colorAccent">#ff0288d1</item>
     <item name="@attr/BlueBGTextViewStyle">@style/BlueBGTextView</item>
+    <item name="android:datePickerDialogTheme">@style/AppThemeDatePickerDialogTheme</item>
   </style>
         
 </resources>

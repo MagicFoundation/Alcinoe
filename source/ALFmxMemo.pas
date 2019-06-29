@@ -361,6 +361,7 @@ uses {$IF defined(ANDROID)}
      Macapi.Helpers,
      iOSapi.CoreText,
      FMX.Helpers.iOS,
+     ALString,
      {$ELSE}
      FMX.Styles.Objects,
      FMX.BehaviorManager,

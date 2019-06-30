@@ -242,6 +242,7 @@ type
     fPeerConnection: RTCPeerConnection;
     fPeerConnectionDelegate: TPeerConnectionDelegate;
     fCameraVideoCapturer: RTCCameraVideoCapturer;
+    fCameraVideoCapturerStopped: Boolean;
     fVideoSource: RTCVideoSource;
     fLocalAudioTrack: RTCAudioTrack;
     fLocalVideoTrack: RTCVideoTrack;
@@ -267,6 +268,8 @@ type
     destructor Destroy; override;
     function Start: boolean;
     procedure Stop;
+    procedure resumeVideoCapturer;
+    procedure pauseVideoCapturer;
     procedure createOffer;
     procedure createAnswer;
     procedure setRemoteDescription(const aSdpType: TALWebRTCSDPType; const aSdpDescription: String);
@@ -390,6 +393,8 @@ type
     destructor Destroy; override;
     function Start: boolean;
     procedure Stop;
+    procedure resumeVideoCapturer;
+    procedure pauseVideoCapturer;
     procedure createOffer;
     procedure createAnswer;
     procedure setRemoteDescription(const aSdpType: TALWebRTCSDPType; const aSdpDescription: String);
@@ -699,6 +704,10 @@ var aNativeWin: JWindow;
 
 begin
 
+  {$IFDEF DEBUG}
+  allog('TALWebRTC.Start', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  {$ENDIF}
+
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
@@ -741,6 +750,10 @@ var aNativeWin: JWindow;
 
 begin
 
+  {$IFDEF DEBUG}
+  allog('TALWebRTC.Stop', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  {$ENDIF}
+
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
@@ -764,6 +777,50 @@ begin
       fiOSWebRTC := nil; // as fWebRTC have freeOnTerminate = True, it's will free up the memory it's use by himself
     end;
     TiOSHelper.SharedApplication.setIdleTimerDisabled(false);
+
+  {$ENDIF}
+  {$ENDREGION}
+
+end;
+
+{**************************************}
+procedure TALWebRTC.resumeVideoCapturer;
+begin
+
+  {$REGION ' ANDROID'}
+  {$IF defined(android)}
+
+    fAndroidWebRTC.resumeVideoCapturer;
+
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION ' IOS'}
+  {$IF defined(ios)}
+
+    fiOSWebRTC.resumeVideoCapturer;
+
+  {$ENDIF}
+  {$ENDREGION}
+
+end;
+
+{************************************}
+procedure TALWebRTC.pauseVideoCapturer;
+begin
+
+  {$REGION ' ANDROID'}
+  {$IF defined(android)}
+
+    fAndroidWebRTC.pauseVideoCapturer;
+
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION ' IOS'}
+  {$IF defined(ios)}
+
+    fiOSWebRTC.pauseVideoCapturer;
 
   {$ENDIF}
   {$ENDREGION}
@@ -1182,7 +1239,7 @@ constructor TALiOSWebRTC.Create(const aWebRTC: TALWebRTC; const aIceServers: TAL
 begin
 
   {$IFDEF DEBUG}
-  allog('TALiOSWebRTC.Create', 'TALiOSWebRTC.Create - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALiOSWebRTC.Create', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
   FreeOnTerminate := True;
@@ -1207,6 +1264,7 @@ begin
   fPeerConnection := nil;
   fPeerConnectionDelegate := nil;
   fCameraVideoCapturer := nil;
+  fCameraVideoCapturerStopped := true;
   fVideoSource := nil;
   fLocalAudioTrack := nil;
   fLocalVideoTrack := nil;
@@ -1226,7 +1284,7 @@ destructor TALiOSWebRTC.Destroy;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALiOSWebRTC.Destroy', 'TALiOSWebRTC.Destroy - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALiOSWebRTC.Destroy', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
   if not terminated then begin
@@ -1296,6 +1354,10 @@ begin
     End;
   end;
 
+  {$IFDEF DEBUG}
+  allog('TALiOSWebRTC.Execute', 'Terminating', TalLogType.verbose);
+  {$ENDIF}
+
   //release all retained object
   //-----
   if fpeerConnection <> nil then begin
@@ -1305,6 +1367,7 @@ begin
   //-----
   if fCameraVideoCapturer <> nil then begin
     fCameraVideoCapturer.stopCapture;
+    fCameraVideoCapturerStopped := true;
     fCameraVideoCapturer.release; // << was created - taken from TRTCCameraVideoCapturer.OCClass.alloc.initWithDelegate(fVideoSource)
     fCameraVideoCapturer := nil;
   end;
@@ -1403,6 +1466,9 @@ begin
         aTransceiver: RTCRtpTransceiver;
         i: integer;
     begin
+
+      //exit if already started
+      if fPeerConnectionFactory <> nil then exit;
 
       //init fPeerConnectionFactory
       aDecoderFactory := TRTCDefaultVideoDecoderFactory.Wrap(TRTCDefaultVideoDecoderFactory.Wrap(TRTCDefaultVideoDecoderFactory.OCClass.alloc).init);
@@ -1551,6 +1617,7 @@ begin
           fCameraVideoCapturer.startCaptureWithDeviceFormatFps(aCaptureDevice, // device: AVCaptureDevice;
                                                                aCaptureDeviceFormat, // format: AVCaptureDeviceFormat;
                                                                selectFpsForFormat(aCaptureDeviceFormat)); // fps: NSInteger)
+          fCameraVideoCapturerStopped := False;
 
           // We can set up rendering for the remote track right away since the transceiver already has an
           // RTCRtpReceiver with a track. The track will automatically get unmuted and produce frames
@@ -1584,6 +1651,41 @@ end;
 procedure TALiOSWebRTC.Stop;
 begin
   Terminate;
+end;
+
+{*****************************************}
+procedure TALiOSWebRTC.resumeVideoCapturer;
+begin
+
+  Enqueue(
+    Procedure
+    var aCaptureDevice: AVCaptureDevice;
+        aCaptureDeviceFormat: AVCaptureDeviceFormat;
+    begin
+      if not fCameraVideoCapturerStopped then exit;
+      aCaptureDevice := findDeviceForPosition(AVCaptureDevicePositionFront);
+      aCaptureDeviceFormat := selectFormatForDevice(aCaptureDevice, fCameraVideoCapturer.PreferredOutputPixelFormat);
+      if aCaptureDeviceFormat = nil then raise Exception.Create('No valid formats for device');
+      fCameraVideoCapturer.startCaptureWithDeviceFormatFps(aCaptureDevice, // device: AVCaptureDevice;
+                                                           aCaptureDeviceFormat, // format: AVCaptureDeviceFormat;
+                                                           selectFpsForFormat(aCaptureDeviceFormat)); // fps: NSInteger)
+      fCameraVideoCapturerStopped := False;
+    end);
+
+end;
+
+{****************************************}
+procedure TALiOSWebRTC.pauseVideoCapturer;
+begin
+
+  Enqueue(
+    Procedure
+    begin
+      if fCameraVideoCapturerStopped then exit;
+      fCameraVideoCapturer.stopCapture;
+      fCameraVideoCapturerStopped := true;
+    end);
+
 end;
 
 {*********************************}

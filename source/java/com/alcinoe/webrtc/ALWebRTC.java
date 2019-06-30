@@ -103,6 +103,7 @@ public class ALWebRTC {
   private VideoTrack mRemoteVideoTrack = null;
   private SurfaceTextureHelper mSurfaceTextureHelper = null;
   private VideoCapturer mVideoCapturer = null;
+  private boolean mVideoCapturerStopped = true;
   private List<IceCandidate> mQueuedRemoteCandidates = null;
   private PeerConnection mPeerConnection = null;
   private DataChannel mDataChannel = null;
@@ -505,6 +506,7 @@ public class ALWebRTC {
       mVideoCapturer.startCapture(mPeerConnectionParameters.videoWidth, /*width*/ 
                                   mPeerConnectionParameters.videoHeight, /*height*/ 
                                   mPeerConnectionParameters.videoFps); /*framerate*/
+      mVideoCapturerStopped = false;
       
       mLocalVideoTrack = mPeerConnectionFactory.createVideoTrack(VIDEO_TRACK_ID, mVideoSource);
       mLocalVideoTrack.setEnabled(true);
@@ -603,9 +605,8 @@ public class ALWebRTC {
     if (mVideoCapturer != null) {
       try {
         mVideoCapturer.stopCapture();
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
+      } catch (InterruptedException e) {}
+      mVideoCapturerStopped = true;
       mVideoCapturer.dispose();
       mVideoCapturer = null;
     }
@@ -622,6 +623,22 @@ public class ALWebRTC {
       mPeerConnectionFactory = null;
     }
     mEglBase.release();
+  }
+  
+  public void pauseVideoCapturer() {
+    if (mVideoCapturerStopped) { return; }
+    try {
+      mVideoCapturer.stopCapture();
+    } catch (InterruptedException e) {}
+    mVideoCapturerStopped = true;
+  }
+  
+  public void resumeVideoCapturer() {
+    if (!mVideoCapturerStopped) { return; }
+    mVideoCapturer.startCapture(mPeerConnectionParameters.videoWidth, /*width*/ 
+                                mPeerConnectionParameters.videoHeight, /*height*/ 
+                                mPeerConnectionParameters.videoFps); /*framerate*/
+    mVideoCapturerStopped = false;
   }
   
   public void setAudioEnabled(final boolean enable) {

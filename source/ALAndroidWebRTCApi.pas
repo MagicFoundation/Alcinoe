@@ -290,6 +290,8 @@ type
     procedure setListener(listener: JALWebRTC_Listener); cdecl;
     function start: boolean; cdecl;
     procedure stop; cdecl;
+    procedure resumeVideoCapturer; cdecl;
+    procedure pauseVideoCapturer; cdecl;
     procedure setAudioEnabled(enable: boolean); cdecl;
     procedure setVideoEnabled(enable: boolean); cdecl;
     function setVideoMaxBitrate(maxBitrateKbps: integer): boolean; cdecl;

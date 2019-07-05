@@ -19,6 +19,7 @@ import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.support.annotation.Nullable;
+import android.media.AudioManager;
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
 import org.webrtc.CameraVideoCapturer;
@@ -469,6 +470,10 @@ public class ALWebRTC {
     /* exit if already started */
     if (mPeerConnectionFactory != null) { return mVideoCapturer != null; }
     
+    /* set the speaker on */
+    AudioManager audioManager = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
+    if (!audioManager.isSpeakerphoneOn()) { audioManager.setSpeakerphoneOn(true); }
+
     /* create mPeerConnectionFactory */
     mPeerConnectionFactory = createPeerConnectionFactory(new PeerConnectionFactory.Options());
 

@@ -1236,6 +1236,7 @@ end;
 
 {********************************************************************************************************************************************************************}
 constructor TALiOSWebRTC.Create(const aWebRTC: TALWebRTC; const aIceServers: TALWebRTCIceServers; const aPeerConnectionParameters: TALWebRTCPeerConnectionParameters);
+Var LwebRTCConfig: RTCAudioSessionConfiguration;
 begin
 
   {$IFDEF DEBUG}
@@ -1274,6 +1275,10 @@ begin
   fLocalSdp := nil;
   fQueuedRemoteCandidates := nil;
   fIsInitiator := False;
+  //-----
+  LwebRTCConfig := TRTCAudioSessionConfiguration.Wrap(TRTCAudioSessionConfiguration.OCClass.webRTCConfiguration);
+  LwebRTCConfig.setCategoryOptions(LwebRTCConfig.CategoryOptions or AVAudioSessionCategoryOptionDefaultToSpeaker);
+  TRTCAudioSessionConfiguration.OCClass.setWebRTCConfiguration(LwebRTCConfig);
   //-----
   inherited Create(False); // see http://www.gerixsoft.com/blog/delphi/fixing-symbol-resume-deprecated-warning-delphi-2010
 

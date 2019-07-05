@@ -211,6 +211,28 @@ const
   RTCSdpTypePrAnswer = 1;
   RTCSdpTypeAnswer = 2;
 
+type
+
+  //typedef NS_OPTIONS(NSUInteger, AVAudioSessionCategoryOptions)
+  AVAudioSessionCategoryOptions = NSUInteger;
+
+const
+
+	//MixWithOthers is only valid with AVAudioSessionCategoryPlayAndRecord, AVAudioSessionCategoryPlayback, and  AVAudioSessionCategoryMultiRoute
+	AVAudioSessionCategoryOptionMixWithOthers = $1;
+	//DuckOthers is only valid with AVAudioSessionCategoryAmbient, AVAudioSessionCategoryPlayAndRecord, AVAudioSessionCategoryPlayback, and AVAudioSessionCategoryMultiRoute
+	AVAudioSessionCategoryOptionDuckOthers = $2;
+	//AllowBluetooth is only valid with AVAudioSessionCategoryRecord and AVAudioSessionCategoryPlayAndRecord
+	AVAudioSessionCategoryOptionAllowBluetooth = $4;
+	//DefaultToSpeaker is only valid with AVAudioSessionCategoryPlayAndRecord
+	AVAudioSessionCategoryOptionDefaultToSpeaker = $8;
+	//InterruptSpokenAudioAndMixWithOthers is only valid with AVAudioSessionCategoryPlayAndRecord, AVAudioSessionCategoryPlayback, and AVAudioSessionCategoryMultiRoute
+	AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers = $11;
+	//AllowBluetoothA2DP is only valid with AVAudioSessionCategoryPlayAndRecord
+	AVAudioSessionCategoryOptionAllowBluetoothA2DP = $20;
+	//AllowAirPlay is only valid with AVAudioSessionCategoryPlayAndRecord
+	AVAudioSessionCategoryOptionAllowAirPlay = $40;
+
 //const
   //RTCH264PacketizationModeNonInterleaved = 0;
   //RTCH264PacketizationModeSingleNalUnit = 1;
@@ -340,7 +362,6 @@ type
   //PNSUInteger = ^NSUInteger;
 
   //AVAudioSessionRouteChangeReason = NSUInteger;
-  //AVAudioSessionCategoryOptions = NSUInteger;
   //NSTimeInterval = Double;
   //PNSTimeInterval = ^NSTimeInterval;
 
@@ -472,33 +493,65 @@ type
   //TRTCAudioSession = class(TOCGenericImport<RTCAudioSessionClass, RTCAudioSession>) end;
   //PRTCAudioSession = Pointer;
 
-  //{**********************************************************}
-  //RTCAudioSessionConfigurationClass = interface(NSObjectClass)
-    //['{F4D9F6EB-B091-43AC-A885-5C43ACF9ED43}']
+  //{*************************************}
+  RTCAudioSessionConfiguration = interface;
+
+  //{************************************************}
+  //@interface RTCAudioSessionConfiguration : NSObject
+  RTCAudioSessionConfigurationClass = interface(NSObjectClass)
+    ['{5391E964-2176-41A0-9362-E2C5D2230817}']
+
+    //Returns the current configuration of the audio session.
+    //+ (instancetype)currentConfiguration;
     //{ class } function currentConfiguration: Pointer { instancetype }; cdecl;
-    //{ class } function webRTCConfiguration: Pointer { instancetype }; cdecl;
-    //{ class } procedure setWebRTCConfiguration(configuration: RTCAudioSessionConfiguration); cdecl;
-  //end;
-  //RTCAudioSessionConfiguration = interface(NSObject)
-    //['{D4A1E1DE-E80B-4A61-940E-B28B3F0CF007}']
+
+    //Returns the configuration that WebRTC needs.
+    //+ (instancetype)webRTCConfiguration;
+    { class } function webRTCConfiguration: Pointer { instancetype }; cdecl;
+
+    //Provide a way to override the default configuration./
+    //+ (void)setWebRTCConfiguration:(RTCAudioSessionConfiguration *)configuration;
+    { class } procedure setWebRTCConfiguration(configuration: RTCAudioSessionConfiguration); cdecl;
+
+  end;
+  RTCAudioSessionConfiguration = interface(NSObject)
+    ['{F0B3D9A6-B0B4-4CBD-9769-FF2FE4CA5F05}']
+
+    //@property(nonatomic, strong) NSString *category;
     //procedure setCategory(category: NSString); cdecl;
     //function category: NSString; cdecl;
-    //procedure setCategoryOptions(categoryOptions: AVAudioSessionCategoryOptions); cdecl;
-    //function categoryOptions: AVAudioSessionCategoryOptions; cdecl;
+
+    //@property(nonatomic, assign) AVAudioSessionCategoryOptions categoryOptions;
+    procedure setCategoryOptions(categoryOptions: AVAudioSessionCategoryOptions); cdecl;
+    function categoryOptions: AVAudioSessionCategoryOptions; cdecl;
+
+    //@property(nonatomic, strong) NSString *mode;
     //procedure setMode(mode: NSString); cdecl;
     //function mode: NSString; cdecl;
+
+    //@property(nonatomic, assign) double sampleRate;
     //procedure setSampleRate(sampleRate: Double); cdecl;
     //function sampleRate: Double; cdecl;
+
+    //@property(nonatomic, assign) NSTimeInterval ioBufferDuration;
     //procedure setIoBufferDuration(IOBufferDuration: NSTimeInterval); cdecl;
     //function IOBufferDuration: NSTimeInterval; cdecl;
+
+    //@property(nonatomic, assign) NSInteger inputNumberOfChannels;
     //procedure setInputNumberOfChannels(inputNumberOfChannels: NSInteger); cdecl;
     //function inputNumberOfChannels: NSInteger; cdecl;
+
+    //@property(nonatomic, assign) NSInteger outputNumberOfChannels;
     //procedure setOutputNumberOfChannels(outputNumberOfChannels: NSInteger); cdecl;
     //function outputNumberOfChannels: NSInteger; cdecl;
+
+    //Initializes configuration to defaults.
+    //- (instancetype)init NS_DESIGNATED_INITIALIZER;
     //function init: Pointer { instancetype }; cdecl;
-  //end;
-  //TRTCAudioSessionConfiguration = class(TOCGenericImport<RTCAudioSessionConfigurationClass, RTCAudioSessionConfiguration>) end;
-  //PRTCAudioSessionConfiguration = Pointer;
+
+  end;
+  TRTCAudioSessionConfiguration = class(TOCGenericImport<RTCAudioSessionConfigurationClass, RTCAudioSessionConfiguration>) end;
+  PRTCAudioSessionConfiguration = Pointer;
 
   {************************************}
   //@interface RTCMediaSource : NSObject

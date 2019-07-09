@@ -13,3 +13,4 @@
 *.dproj.local 
 *.groupproj.local 
 *.stat
+*.exe

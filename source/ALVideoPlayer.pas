@@ -163,9 +163,10 @@ type
     procedure prepare(Const aDataSource: String);
     procedure Start;
     procedure Stop;
-    procedure seekTo(const msec: Integer);
+    procedure seekTo(const msec: Int64);
     procedure setLooping(const looping: Boolean);
     procedure setVolume(const Value: Single);
+    procedure setPlaybackSpeed(const Value: single);
     property bitmap: TalTexture read fbitmap;
     property OnError: TNotifyEvent read fOnErrorEvent write fOnErrorEvent;
     property OnPrepared: TNotifyEvent read fOnPreparedEvent write fOnPreparedEvent;
@@ -270,9 +271,10 @@ type
     procedure prepare(Const aDataSource: String);
     procedure Start;
     procedure Stop;
-    procedure seekTo(const msec: Integer);
+    procedure seekTo(const msec: Int64);
     procedure setLooping(const looping: Boolean);
     procedure setVolume(const Value: Single);
+    procedure setPlaybackSpeed(const Value: single);
     property bitmap: TalTexture read fbitmap;
     property OnError: TNotifyEvent read fOnErrorEvent write fOnErrorEvent;
     property OnPrepared: TNotifyEvent read fOnPreparedEvent write fOnPreparedEvent;
@@ -308,9 +310,10 @@ type
     procedure prepare(Const aDataSource: String);
     procedure Start;
     procedure Stop;
-    procedure seekTo(const msec: Integer);
+    procedure seekTo(const msec: Int64);
     procedure setLooping(const looping: Boolean);
     procedure setVolume(const Value: Single);
+    procedure setPlaybackSpeed(const Value: single);
     property bitmap: TBitmap read fbitmap;
     property OnError: TNotifyEvent read fOnErrorEvent write fOnErrorEvent;
     property OnPrepared: TNotifyEvent read fOnPreparedEvent write fOnPreparedEvent;
@@ -346,7 +349,7 @@ type
     procedure prepare(Const aDataSource: String);
     procedure Start;
     procedure Stop;
-    procedure seekTo(const msec: Integer);
+    procedure seekTo(const msec: Int64);
     procedure setLooping(const looping: Boolean);
     procedure setVolume(const Value: Single);
     property bitmap: TBitmap read fbitmap;
@@ -410,9 +413,10 @@ type
     procedure prepare(Const aDataSource: String; const aAutoStartWhenPrepared: Boolean=False);
     procedure Start;
     procedure Stop;
-    procedure seekTo(const msec: Integer);
+    procedure seekTo(const msec: Int64);
     procedure setLooping(const looping: Boolean);
     procedure setVolume(const Value: Single);
+    procedure setPlaybackSpeed(const Value: single);
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     property Bitmap: TALTexture read Getbitmap;
     {$ELSE}
@@ -1010,8 +1014,8 @@ begin
   {$ENDIF}
 end;
 
-{**********************************************************}
-procedure TALAndroidVideoPlayer.seekTo(const msec: Integer);
+{********************************************************}
+procedure TALAndroidVideoPlayer.seekTo(const msec: Int64);
 begin
   if not (GetState in [vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then exit;
   FSimpleExoPlayer.seekTo(msec); // The seek position in the current window, or TIME_UNSET to seek to the window's default position.
@@ -1060,6 +1064,15 @@ begin
   ALLog('TALAndroidVideoPlayer.setVolume', 'Value: ' + alFloattostrU(Value, ALDefaultFormatSettingsU) +
                                            ' - timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
+end;
+
+{********************************************************************}
+procedure TALAndroidVideoPlayer.setPlaybackSpeed(const Value: single);
+var aPlaybackParameters: JPlaybackParameters;
+begin
+  aPlaybackParameters := tJPlaybackParameters.JavaClass.init(Value, 1);
+  FSimpleExoPlayer.setPlaybackParameters(aPlaybackParameters);
+  aPlaybackParameters := Nil;
 end;
 
 {***********************************************}
@@ -1534,8 +1547,8 @@ begin
   {$ENDIF}
 end;
 
-{******************************************************}
-procedure TALIOSVideoPlayer.seekTo(const msec: Integer);
+{****************************************************}
+procedure TALIOSVideoPlayer.seekTo(const msec: Int64);
 begin
   if not (GetState in [vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then exit;
   FPlayer.seekToTime(CMTimeMake(msec, 1));
@@ -1567,6 +1580,12 @@ begin
   ALLog('TALIOSVideoPlayer.setVolume', 'Value: ' + alFloattostrU(Value, ALDefaultFormatSettingsU) +
                                        ' - timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
+end;
+
+{****************************************************************}
+procedure TALIOSVideoPlayer.setPlaybackSpeed(const Value: single);
+begin
+  // not yet implemented
 end;
 
 {************************************************************}
@@ -1943,8 +1962,8 @@ procedure TALWinVideoPlayer.Stop;
 begin
 end;
 
-{******************************************************}
-procedure TALWinVideoPlayer.seekTo(const msec: Integer);
+{****************************************************}
+procedure TALWinVideoPlayer.seekTo(const msec: Int64);
 begin
 end;
 
@@ -1955,6 +1974,11 @@ end;
 
 {*********************************************************}
 procedure TALWinVideoPlayer.setVolume(const Value: Single);
+begin
+end;
+
+{****************************************************************}
+procedure TALWinVideoPlayer.setPlaybackSpeed(const Value: single);
 begin
 end;
 
@@ -2039,8 +2063,8 @@ procedure TALMacOSVideoPlayer.Stop;
 begin
 end;
 
-{********************************************************}
-procedure TALMacOSVideoPlayer.seekTo(const msec: Integer);
+{******************************************************}
+procedure TALMacOSVideoPlayer.seekTo(const msec: Int64);
 begin
 end;
 
@@ -2166,8 +2190,8 @@ begin
   fVideoPlayerControl.prepare(aDataSource);
 end;
 
-{***************************************************}
-procedure TALVideoPlayer.seekTo(const msec: Integer);
+{*************************************************}
+procedure TALVideoPlayer.seekTo(const msec: Int64);
 begin
   fVideoPlayerControl.seekTo(msec);
 end;
@@ -2182,6 +2206,12 @@ end;
 procedure TALVideoPlayer.setVolume(const Value: Single);
 begin
   fVideoPlayerControl.setVolume(Value);
+end;
+
+{*************************************************************}
+procedure TALVideoPlayer.setPlaybackSpeed(const Value: single);
+begin
+  fVideoPlayerControl.setPlaybackSpeed(Value);
 end;
 
 {*****************************}

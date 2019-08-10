@@ -423,8 +423,8 @@ uses System.messaging,
      Androidapi.JNI.GraphicsContentViewText,
      Androidapi.jni,
      Androidapi.jni.App,
+     Androidapi.JNI.OpenGL,
      Androidapi.Helpers,
-     FMX.Context.GLES.Android,
      {$ELSEIF defined(IOS)}
      system.math,
      Macapi.Helpers,
@@ -631,7 +631,7 @@ begin
     aJPeerConnectionParameters.DataChannelId := aPeerConnectionParameters.DataChannelId;
     //-----
     fAndroidWebRTC := TJALWebRTC.Wrap(TJALWebRTC.JavaClass.init(TAndroidHelper.Context.getApplicationContext,
-                                                                int64(TCustomAndroidContext(TContext3D.CurrentContext).SharedContext),
+                                                                TJEGL14.JavaClass.eglGetCurrentContext,
                                                                 aJListIceServers,
                                                                 aJPeerConnectionParameters));
     fAndroidWebRTCListener := TAndroidWebRTCListener.Create(Self);

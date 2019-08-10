@@ -5,7 +5,8 @@ interface
 uses Androidapi.JNIBridge,
      Androidapi.JNI.GraphicsContentViewText,
      Androidapi.JNI.JavaTypes,
-     Androidapi.JNI.App;
+     Androidapi.JNI.App,
+     Androidapi.JNI.OpenGL;
 
 type
 
@@ -280,7 +281,7 @@ type
     ['{3F5C8CF8-CEB7-4C92-B6E4-FD43F27BF995}']
     {class} procedure initializeLibrary(appContext: JContext); cdecl;
     {class} procedure finalizeLibrary; cdecl;
-    {class} function init(appContext: JContext; eglContext: int64; iceServers: JList; peerConnectionParameters: JALWebRTC_PeerConnectionParameters): JALWebRTC; cdecl;
+    {class} function init(appContext: JContext; eglContext: Jopengl_EGLContext; iceServers: JList; peerConnectionParameters: JALWebRTC_PeerConnectionParameters): JALWebRTC; cdecl;
   end;
 
   {********************************************}

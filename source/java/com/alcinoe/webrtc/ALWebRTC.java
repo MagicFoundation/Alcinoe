@@ -114,6 +114,10 @@ public class ALWebRTC {
   private final SDPObserver mSDPObserver = new SDPObserver();
   private final RemoteProxyVideoSink mRemoteProxyVideoSink = new RemoteProxyVideoSink();
   private final LocalProxyVideoSink mLocalProxyVideoSink = new LocalProxyVideoSink();
+  private boolean mCanRestoreSavedAudioState = false;
+  private int mSavedAudioMode = AudioManager.MODE_INVALID;
+  private boolean mSavedIsSpeakerPhoneOn = false;
+  private boolean mSavedIsMicrophoneMute = false;
   
   public static class PeerConnectionParameters {
     public boolean videoCallEnabled = true; /* Enable video in a call. */
@@ -247,7 +251,7 @@ public class ALWebRTC {
         
   }
                                                                                                    
-  public ALWebRTC(Context appContext, long eglContext, List<PeerConnection.IceServer> iceServers, PeerConnectionParameters peerConnectionParameters) throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+  public ALWebRTC(Context appContext, android.opengl.EGLContext eglContext, List<PeerConnection.IceServer> iceServers, PeerConnectionParameters peerConnectionParameters) {
     
     /* init local vars */
     mAppContext = appContext;
@@ -255,7 +259,7 @@ public class ALWebRTC {
     mPeerConnectionParameters = peerConnectionParameters;
     mPreferIsac = (mPeerConnectionParameters.audioCodec != null) && 
                   (mPeerConnectionParameters.audioCodec.equals(AUDIO_CODEC_ISAC));
-    mEglBase = EglBase.createEgl14(createSharedEGLContextObj(eglContext), EglBase.CONFIG_PLAIN);   
+    mEglBase = EglBase.createEgl14(eglContext, EglBase.CONFIG_PLAIN);   
     mIceServers = iceServers;
                                     
   }
@@ -419,15 +423,6 @@ public class ALWebRTC {
     mListener = listener;
   } 
           
-  private android.opengl.EGLContext createSharedEGLContextObj(long handle) throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-    Class<?> classType =Class.forName("android.opengl.EGLContext"); 
-    Class<?>[] types = new Class[] { long.class };
-    Constructor constructor=classType.getDeclaredConstructor(types);
-    constructor.setAccessible(true);     
-    Object object=constructor.newInstance(handle);
-    return (android.opengl.EGLContext) object;
-  }
-
   private @Nullable VideoCapturer createVideoCapturer() {
     final VideoCapturer videoCapturer;
     if (Camera2Enumerator.isSupported(mAppContext)) {
@@ -470,9 +465,25 @@ public class ALWebRTC {
     /* exit if already started */
     if (mPeerConnectionFactory != null) { return mVideoCapturer != null; }
     
-    /* set the speaker on */
+    // init audioManager
     AudioManager audioManager = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
-    if (!audioManager.isSpeakerphoneOn()) { audioManager.setSpeakerphoneOn(true); }
+    
+    // Store current audio state so we can restore it when stop() is called.
+    mSavedAudioMode = audioManager.getMode();
+    mSavedIsSpeakerPhoneOn = audioManager.isSpeakerphoneOn();
+    mSavedIsMicrophoneMute = audioManager.isMicrophoneMute();
+    mCanRestoreSavedAudioState = true;
+
+    // By setting MODE_IN_COMMUNICATION as default audio mode. It is
+    // required to be in this mode when playout and/or recording starts for
+    // best possible VoIP performance.
+    audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+
+    // Always disable microphone mute during a WebRTC call.
+    if (mSavedIsMicrophoneMute) { audioManager.setMicrophoneMute(false); }
+
+    /* set the speaker on */
+    if (!mSavedIsSpeakerPhoneOn) { audioManager.setSpeakerphoneOn(true); }
 
     /* create mPeerConnectionFactory */
     mPeerConnectionFactory = createPeerConnectionFactory(new PeerConnectionFactory.Options());
@@ -592,6 +603,17 @@ public class ALWebRTC {
   }   
                                                                                 
   public void stop() {
+
+    // Restore previously stored audio states.
+    if (mCanRestoreSavedAudioState) {
+      AudioManager audioManager = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
+      audioManager.setSpeakerphoneOn(mSavedIsSpeakerPhoneOn);
+      audioManager.setMicrophoneMute(mSavedIsMicrophoneMute);
+      audioManager.setMode(mSavedAudioMode);
+      mCanRestoreSavedAudioState = false;
+    }
+
+    //free the objects
     mListener = null;
     if ((mPeerConnectionParameters.aecDump) && 
         (mPeerConnectionFactory != null)) { mPeerConnectionFactory.stopAecDump(); }
@@ -628,6 +650,7 @@ public class ALWebRTC {
       mPeerConnectionFactory = null;
     }
     mEglBase.release();
+    
   }
   
   public void pauseVideoCapturer() {

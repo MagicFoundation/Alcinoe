@@ -185,8 +185,8 @@ type
   private
     FStartFloat: Double;
     FStopFloat: Double;
-    fcurrentFloat: Double;
   protected
+    fcurrentFloat: Double;
     procedure ProcessAnimation; override;
   public
     constructor Create; override;

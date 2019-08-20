@@ -129,6 +129,7 @@ type
   protected
     procedure Loaded; override;
     procedure DoAddObject(const AObject: TFmxObject); override;
+    procedure DoViewportPositionChange(const AOldPosition, ANewPosition: TPointF); virtual;
     procedure DoRealign; override;
     function CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar; virtual;
     function CreateContent: TALScrollBoxContent; virtual;
@@ -145,10 +146,13 @@ type
     procedure ChildrenMouseLeave(const AObject: TControl); override;
     {$ENDIF}
     procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); override;
-    property HScrollBar: TALScrollBoxBar read fHScrollBar;
-    property VScrollBar: TALScrollBoxBar read fVScrollBar;
+    property AnchoredContentOffset: TPointF read FAnchoredContentOffset write FAnchoredContentOffset;
+    property HScrollBar: TALScrollBoxBar read fHScrollBar write fHScrollBar;
+    property VScrollBar: TALScrollBoxBar read fVScrollBar write fVScrollBar;
     property MaxContentWidth: Single read fMaxContentWidth write fMaxContentWidth stored isMaxContentWidthStored;
     property MaxContentHeight: Single read fMaxContentHeight write fMaxContentHeight stored isMaxContentHeightStored;
+    property OnViewportPositionChange: TALScrollBoxPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
+    property ScreenScale: Single read FScreenScale;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -161,7 +165,6 @@ type
     property AutoHide: Boolean read FAutoHide write SetAutoHide default True;
     property DisableMouseWheel: Boolean read FDisableMouseWheel write FDisableMouseWheel default False;
     property ShowScrollBars: Boolean read FShowScrollBars write SetShowScrollBars default True;
-    property OnViewportPositionChange: TALScrollBoxPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
     property DeadZoneBeforeAcquireScrolling: Integer read FDeadZoneBeforeAcquireScrolling write FDeadZoneBeforeAcquireScrolling default 32;
     property OnScrollBarInit: TALScrollBoxBarInit read fOnScrollBarInit write fOnScrollBarInit;
     property ClipChildren default true;
@@ -472,9 +475,8 @@ begin
 
     //fire the OnViewportPositionChange
     aNewViewportPosition := TpointF.Create(ViewportPosition.X, ViewportPosition.Y);
-    if (assigned(FScrollBox.FOnViewportPositionChange)) and
-       (not fLastViewportPosition.EqualsTo(aNewViewportPosition, TEpsilon.Position)) then
-      FScrollBox.FOnViewportPositionChange(self, fLastViewportPosition, aNewViewportPosition);
+    if not fLastViewportPosition.EqualsTo(aNewViewportPosition, TEpsilon.Position) then
+      FScrollBox.DoViewportPositionChange(fLastViewportPosition, aNewViewportPosition);
     fLastViewportPosition := aNewViewportPosition;
 
   end;
@@ -718,6 +720,13 @@ begin
 
   if aDoRealignAgain then DoRealign;
 
+end;
+
+procedure TALCustomScrollBox.DoViewportPositionChange(const AOldPosition,
+  ANewPosition: TPointF);
+begin
+  if Assigned(FOnViewportPositionChange) then
+    FOnViewportPositionChange(Self, AOldPosition, ANewPosition);
 end;
 
 {*********************************************************************************************}

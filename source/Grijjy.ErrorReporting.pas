@@ -205,6 +205,7 @@ uses
   Grijjy.SymbolTranslator;
 
 {$RANGECHECKS OFF}
+{$OverFlowChecks Off}
 
 type
   TgoExceptionReport = class(TInterfacedObject, IgoExceptionReport)

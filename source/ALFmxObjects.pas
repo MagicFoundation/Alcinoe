@@ -447,6 +447,8 @@ type
     function GetVertTextAlign: TTextAlign;
     function GetWordWrap: Boolean;
     function GetText: string;
+    procedure SetMaxWidth(const Value: Single);
+    procedure SetMaxHeight(const Value: Single);
     function IsMaxWidthStored: Boolean;
     function IsMaxHeightStored: Boolean;
   protected
@@ -521,8 +523,8 @@ type
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
     property Visible default True;
     property Width;
-    property MaxWidth: single read fMaxWidth write fMaxWidth stored IsMaxWidthStored;       // these properties are usefull when used
-    property MaxHeight: single read fMaxHeight write fMaxHeight stored IsMaxHeightStored;      // with autosize
+    property MaxWidth: single read fMaxWidth write SetMaxWidth stored IsMaxWidthStored;       // these properties are usefull when used
+    property MaxHeight: single read fMaxHeight write SetMaxHeight stored IsMaxHeightStored;      // with autosize
     {Drag and Drop events}
     property OnDragEnter;
     property OnDragLeave;
@@ -2875,6 +2877,24 @@ begin
   if not doubleBuffered then exit(false);
   result := (TALdoubleBufferedTextLayout(fLayout).fbufBitmap <> nil) and
             (TALdoubleBufferedTextLayout(fLayout).fBufTextBreaked);
+end;
+
+{*************************************************}
+procedure TALText.SetMaxWidth(const Value: Single);
+begin
+  if compareValue(fMaxWidth, Value, Tepsilon.position) <> 0 then begin
+    fMaxWidth := Value;
+    AdjustSize;
+  end;
+end;
+
+{**************************************************}
+procedure TALText.SetMaxHeight(const Value: Single);
+begin
+  if compareValue(fMaxHeight, Value, Tepsilon.position) <> 0 then begin
+    fMaxHeight := Value;
+    AdjustSize;
+  end;
 end;
 
 {*****************************************}

@@ -420,8 +420,7 @@ implementation
 uses
   System.SysUtils, System.Math, System.Rtti, System.RTLConsts, System.DateUtils, System.Diagnostics,
   AndroidApi.JNI.App, AndroidApi.JNI.Os,
-  FMX.Maps, FMX.Presentation.Style, FMX.Platform.Android, FMX.Gestures.Android, FMX.TextLayout, FMX.Canvas.GPU,
-  ALFmxInertialMovement;
+  FMX.Maps, FMX.Presentation.Style, FMX.Platform.Android, FMX.Gestures.Android, FMX.TextLayout, FMX.Canvas.GPU;
 
 function ConvertPixelToPoint(const APixel: TPointF): TPointF;
 begin
@@ -446,7 +445,6 @@ var
   ScreenService: IFMXScreenService;
 begin
   inherited Create;
-  ALAniCalcTimerProcs := Tlist<TALAniCalculations>.create; // added to support ALFmxInertialMovement
   if not TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, ScreenService) then
     raise Exception.CreateFmt(SUnsupportedPlatformService, ['IFMXScreenService']);
 
@@ -478,8 +476,6 @@ begin
   FVirtualKeyboard := nil;
   SetFocusedControl(nil);
   FMouseDownControl := nil;
-  ALAniCalcTimerProcs.Free; // added to support ALFmxInertialMovement
-  ALAniCalcTimerProcs := nil;
   inherited;
 end;
 
@@ -2348,12 +2344,6 @@ begin
   // If SurfaceHolder is not created, we need to skip rendering.
   if FHandle.Holder = nil then
     Exit;
-
-  //process all the pending input event
-  //NOTE: when the mouse is down, MouseMove is continuously firing
-  for i := ALAniCalcTimerProcs.Count - 1 downto 0 do
-    if (ALAniCalcTimerProcs[i].Down) and
-       (not ALAniCalcTimerProcs[i].mouseEventReceived) then exit;
 
   if Supports(FHandle.Form, IPaintControl, PaintControl) then
     try

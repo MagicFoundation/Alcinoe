@@ -740,6 +740,7 @@ function  ALRandomStr(const aLength: Longint; const aCharset: Array of ansiChar)
 function  ALRandomStr(const aLength: Longint): AnsiString; overload;
 function  ALNEVExtractName(const S: AnsiString): AnsiString;
 function  ALNEVExtractValue(const s: AnsiString): AnsiString;
+function  ALGetBytesFromFile(const filename: ansiString; const ShareMode: Word = fmShareDenyWrite): Tbytes;
 function  ALGetStringFromFile(const filename: AnsiString; const ShareMode: Word = fmShareDenyWrite): AnsiString;
 function  ALGetStringFromFileWithoutUTF8BOM(const filename: AnsiString; const ShareMode: Word = fmShareDenyWrite): AnsiString;
 procedure ALAppendStringToFile(const Str: AnsiString; const FileName: AnsiString);
@@ -10842,6 +10843,18 @@ begin
 
   SplitTextAndTagLst.AddObject(AlcopyStr(SourceString,SourceCurrentPos,maxint), pointer(0));
 
+end;
+
+{********************************************************************************************************}
+function ALGetBytesFromFile(const filename: ansiString; const ShareMode: Word = fmShareDenyWrite): Tbytes;
+Var AFileStream: TfileStream;
+begin
+  AFileStream := TFileStream.Create(string(filename),fmOpenRead or ShareMode);
+  try
+    Result := ALGetBytesFromStream(AFileStream);
+  finally
+    ALFreeAndNil(AfileStream);
+  end;
 end;
 
 {*************************************************************************************************************}

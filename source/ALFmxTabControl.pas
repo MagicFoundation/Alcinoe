@@ -150,10 +150,10 @@ type
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure DoMouseLeave; override;
     {$IFNDEF ALDPK}
-    procedure ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
-    procedure ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single); override;
-    procedure ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
-    procedure ChildrenMouseLeave(const AObject: TControl); override;
+//    procedure ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+//    procedure ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single); override;
+//    procedure ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+//    procedure ChildrenMouseLeave(const AObject: TControl); override;
     {$ENDIF}
     procedure Resize; override;
     property ClipChildren default True;
@@ -809,48 +809,48 @@ Type
   _TALControlAccessProtected = class(Tcontrol);
 
 {*************}
-{$IFNDEF ALDPK}
-procedure TALTabControl.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-var P: Tpointf;
-begin
-  if not aObject.AutoCapture then _TALControlAccessProtected(aObject).capture;
-  P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
-  internalMouseDown(Button, Shift, P.X, P.Y);
-  inherited;
-end;
-{$ENDIF}
-
-{*************}
-{$IFNDEF ALDPK}
-procedure TALTabControl.ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);
-var P: Tpointf;
-begin
-  P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
-  internalMouseMove(Shift, P.X, P.Y);
-  inherited;
-end;
-{$ENDIF}
-
-{*************}
-{$IFNDEF ALDPK}
-procedure TALTabControl.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-var P: Tpointf;
-begin
-  if not aObject.AutoCapture then _TALControlAccessProtected(aObject).releasecapture;
-  P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
-  internalMouseUp(Button, Shift, P.X, P.Y);
-  inherited;
-end;
-{$ENDIF}
-
-{*************}
-{$IFNDEF ALDPK}
-procedure TALTabControl.ChildrenMouseLeave(const AObject: TControl);
-begin
-  internalMouseLeave;
-  inherited;
-end;
-{$ENDIF}
+//{$IFNDEF ALDPK}
+//procedure TALTabControl.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+//var P: Tpointf;
+//begin
+//  if not aObject.AutoCapture then _TALControlAccessProtected(aObject).capture;
+//  P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
+//  internalMouseDown(Button, Shift, P.X, P.Y);
+//  inherited;
+//end;
+//{$ENDIF}
+//
+//{*************}
+//{$IFNDEF ALDPK}
+//procedure TALTabControl.ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);
+//var P: Tpointf;
+//begin
+//  P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
+//  internalMouseMove(Shift, P.X, P.Y);
+//  inherited;
+//end;
+//{$ENDIF}
+//
+//{*************}
+//{$IFNDEF ALDPK}
+//procedure TALTabControl.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+//var P: Tpointf;
+//begin
+//  if not aObject.AutoCapture then _TALControlAccessProtected(aObject).releasecapture;
+//  P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
+//  internalMouseUp(Button, Shift, P.X, P.Y);
+//  inherited;
+//end;
+//{$ENDIF}
+//
+//{*************}
+//{$IFNDEF ALDPK}
+//procedure TALTabControl.ChildrenMouseLeave(const AObject: TControl);
+//begin
+//  internalMouseLeave;
+//  inherited;
+//end;
+//{$ENDIF}
 
 {**********************************}
 procedure TALTabControl.RealignTabs;

@@ -1020,7 +1020,7 @@ function WideGetToken(var Pos: Integer; const S: string; const Separators: strin
 implementation
 
 uses
-  System.Math, System.TypInfo, System.RTLConsts, FMX.Platform, FMX.Materials, FMX.Surfaces, FMX.Consts, FMX.Utils;
+  System.Math, System.TypInfo, System.RTLConsts, FMX.Platform, FMX.Surfaces, FMX.Consts, FMX.Utils;
 
 type
   TOpenObject = class(TFmxObject);

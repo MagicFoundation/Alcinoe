@@ -3332,11 +3332,11 @@ begin
 
                     aClampFilter := TCIFilter.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIAffineClamp')));
                     aClampFilter.setDefaults;
-                    aClampFilter.setValueforKey((aCIImage as ILocalObject).getObjectId, kCIInputImageKey);
+                    //aClampFilter.setValueforKey((aCIImage as ILocalObject).getObjectId, kCIInputImageKey);
 
                     aBlurFilter := TCIFilter.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIGaussianBlur')));
-                    aBlurFilter.setValueforKey((aClampFilter.outputImage as ILocalObject).getObjectId, kCIInputImageKey);
-                    aBlurFilter.setValueforKey(TNSNumber.OCClass.numberWithFloat(aRadius), kCIInputRadiusKey);
+                    //aBlurFilter.setValueforKey((aClampFilter.outputImage as ILocalObject).getObjectId, kCIInputImageKey);
+                    //aBlurFilter.setValueforKey(TNSNumber.OCClass.numberWithFloat(aRadius), kCIInputRadiusKey);
 
                     result := aCIContext.createCGImage(aBlurFilter.outputImage, aCIImage.extent);
 
@@ -3522,11 +3522,11 @@ begin
 
                     aClampFilter := TCIFilter.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIAffineClamp')));
                     aClampFilter.setDefaults;
-                    aClampFilter.setValueforKey((aCIImage as ILocalObject).getObjectId, kCIInputImageKey);
+                    //aClampFilter.setValueforKey((aCIImage as ILocalObject).getObjectId, kCIInputImageKey);
 
                     aBlurFilter := TCIFilter.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIGaussianBlur')));
-                    aBlurFilter.setValueforKey((aClampFilter.outputImage as ILocalObject).getObjectId, kCIInputImageKey);
-                    aBlurFilter.setValueforKey(TNSNumber.OCClass.numberWithFloat(aRadius), kCIInputRadiusKey);
+                    //aBlurFilter.setValueforKey((aClampFilter.outputImage as ILocalObject).getObjectId, kCIInputImageKey);
+                    //aBlurFilter.setValueforKey(TNSNumber.OCClass.numberWithFloat(aRadius), kCIInputRadiusKey);
 
                     result := aCIContext.createCGImage(aBlurFilter.outputImage, aCIImage.extent);
 

@@ -134,6 +134,7 @@ type
     function CreateContent: TALScrollBoxContent; virtual;
     function CreateAniCalculations: TALScrollBoxAniCalculations; virtual;
     function CalcContentBounds: TRectF; virtual;
+    function IsAddToContent(const AObject: TFmxObject): Boolean; virtual;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
@@ -851,6 +852,16 @@ begin
   end;
 end;
 
+{**********************************************}
+function TALCustomScrollBox.IsAddToContent(const AObject: TFmxObject): Boolean;
+begin
+  Result := (FContent <> nil) and
+     (AObject <> FContent) and
+     (not (AObject is TEffect)) and
+     (not (AObject is TAnimation)) and
+     (not (AObject is TALScrollBoxBar));
+end;
+
 {*********************************************************************************************}
 procedure TALCustomScrollBox.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
@@ -956,11 +967,7 @@ end;
 {******************************************************************}
 procedure TALCustomScrollBox.DoAddObject(const AObject: TFmxObject);
 begin
-  if (FContent <> nil) and
-     (AObject <> FContent) and
-     (not (AObject is TEffect)) and
-     (not (AObject is TAnimation)) and
-     (not (AObject is TALScrollBoxBar)) then FContent.AddObject(AObject)
+  if IsAddToContent(AObject) then FContent.AddObject(AObject)
   else inherited;
 end;
 

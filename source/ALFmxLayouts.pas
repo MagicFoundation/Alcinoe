@@ -130,6 +130,7 @@ type
     procedure Loaded; override;
     procedure DoAddObject(const AObject: TFmxObject); override;
     procedure DoRealign; override;
+    procedure DoRealignContent(R: TRectF); virtual;
     function CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar; virtual;
     function CreateContent: TALScrollBoxContent; virtual;
     function CreateAniCalculations: TALScrollBoxAniCalculations; virtual;
@@ -709,6 +710,7 @@ begin
         _UpdateHScrollBar(aContentRect);
         _UpdateAnimationTargets(aContentRect);
         fAniCalculations.DoChanged;
+        DoRealignContent(aContentRect);
       end
       else aDoRealignAgain := True;
     end;
@@ -719,6 +721,11 @@ begin
 
   if aDoRealignAgain then DoRealign;
 
+end;
+
+{*********************************************************************************************}
+procedure TALCustomScrollBox.DoRealignContent(R: TRectF);
+begin
 end;
 
 {*********************************************************************************************}

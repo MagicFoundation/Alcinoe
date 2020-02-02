@@ -1591,13 +1591,13 @@ end;
 
 {*********************************}
 procedure TALCustomTrack.DoRealign;
-var R: TRectF;
+var LThumbRect: TRectF;
 begin
   inherited;
   if FThumb <> nil then begin
-    R := GetThumbRect(Value, FThumb);
-    FThumb.Visible := not ((R.Right <= R.Left) or (R.Bottom <= R.Top));
-    FThumb.BoundsRect := R;
+    LThumbRect := GetThumbRect(Value, FThumb);
+    FThumb.Visible := not LThumbRect.IsEmpty;
+    FThumb.BoundsRect := LThumbRect;
   end;
   UpdateHighlight;
 end;

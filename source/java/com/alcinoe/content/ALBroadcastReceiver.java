@@ -7,7 +7,7 @@ import android.util.Log;
 
 public class ALBroadcastReceiver extends BroadcastReceiver {
 	
-	ALBroadcastReceiverListener mListener;
+  ALBroadcastReceiverListener mListener;
 	
   public ALBroadcastReceiver() {
     super(); 
@@ -18,9 +18,9 @@ public class ALBroadcastReceiver extends BroadcastReceiver {
     mListener = listener;
   }    
   
-	@Override
-	public void onReceive(Context context, Intent intent) {
-		if (mListener != null) { mListener.onReceive(context, intent); }
-	}
+  @Override
+  public void onReceive(Context context, Intent intent) {
+    if (mListener != null) { mListener.onReceive(context, intent); }
+  }
 
 }

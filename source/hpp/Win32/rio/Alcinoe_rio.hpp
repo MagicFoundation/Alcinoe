@@ -1,5 +1,5 @@
 ﻿// CodeGear C++Builder
-// Copyright (c) 1995, 2017 by Embarcadero Technologies, Inc.
+// Copyright (c) 1995, 2018 by Embarcadero Technologies, Inc.
 // All rights reserved
 
 // (DO NOT EDIT: machine generated header) 'Alcinoe_rio.dpk' rev: 33.00 (Windows)

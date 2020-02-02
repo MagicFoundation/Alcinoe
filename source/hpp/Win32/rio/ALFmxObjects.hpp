@@ -1,5 +1,5 @@
 ﻿// CodeGear C++Builder
-// Copyright (c) 1995, 2017 by Embarcadero Technologies, Inc.
+// Copyright (c) 1995, 2018 by Embarcadero Technologies, Inc.
 // All rights reserved
 
 // (DO NOT EDIT: machine generated header) 'ALFmxObjects.pas' rev: 33.00 (Windows)
@@ -307,6 +307,8 @@ private:
 	Fmx::Types::TTextAlign __fastcall GetVertTextAlign();
 	bool __fastcall GetWordWrap();
 	System::UnicodeString __fastcall GetText();
+	void __fastcall SetMaxWidth(const float Value);
+	void __fastcall SetMaxHeight(const float Value);
 	bool __fastcall IsMaxWidthStored();
 	bool __fastcall IsMaxHeightStored();
 	
@@ -374,8 +376,8 @@ __published:
 	__property Fmx::Graphics::TTextSettings* TextSettings = {read=GetTextSettings, write=SetTextSettings};
 	__property Visible = {default=1};
 	__property Width;
-	__property float MaxWidth = {read=fMaxWidth, write=fMaxWidth, stored=IsMaxWidthStored};
-	__property float MaxHeight = {read=fMaxHeight, write=fMaxHeight, stored=IsMaxHeightStored};
+	__property float MaxWidth = {read=fMaxWidth, write=SetMaxWidth, stored=IsMaxWidthStored};
+	__property float MaxHeight = {read=fMaxHeight, write=SetMaxHeight, stored=IsMaxHeightStored};
 	__property OnDragEnter;
 	__property OnDragLeave;
 	__property OnDragOver;

@@ -8041,23 +8041,25 @@ begin
         if IntPart = '' then
           IntPart := '0';
         U64 := _ALValInt64(IntPart, I);
-        if I <> 0 then Exit; // error.
-        if U64 > UInt64(Int64.MaxValue)+1 then Exit; // overflow error
+        if I <> 0 then
+          Exit; // error
+        if U64 > UInt64(Int64.MaxValue)+1 then
+          Exit; // overflow error
 
         if (FracPart <> '') and (FracPart[low(FracPart)] >= '5') then
         begin
           RoundUp := True;
-          if (FracPart[low(FracPart)] = '5') then
+          // exact half -> False / more than half -> True
+          if FracPart[low(FracPart)] = '5' then
           begin
             RoundUp := False;
             for I := low(FracPart) + 1 to high(FracPart) do
-              if IntPart[I] <> '0' then
+              if FracPart[I] <> '0' then
               begin
                 RoundUp := True;
                 Break;
               end;
-            // exact half -> False / not half -> True
-            RoundUp := RoundUp or (IntPart[length(IntPart)] in ['1','3','5','7','9']);
+            RoundUp := RoundUp or (IntPart[length(IntPart)] in ['1', '3', '5', '7', '9']);
           end;
           if RoundUp then
             Inc(U64); // U64 is UInt64. no overflow.
@@ -8065,11 +8067,13 @@ begin
 
         if LSign < 0 then
         begin
-          if U64 > UInt64(Int64.MaxValue)+1 then Exit;
-          U64 := (not U64) + 1; // nagate;
+          if U64 > UInt64(Int64.MaxValue) + 1 then
+            Exit;
+          U64 := (not U64) + 1; // negate
         end
         else
-          if U64 > Int64.MaxValue then Exit;
+          if U64 > Int64.MaxValue then
+            Exit;
         PUInt64(@AValue)^ := U64;
         Result := True;
       end;

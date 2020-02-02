@@ -127,8 +127,8 @@ type
     property Path: AnsiString read FPath write FPath;
     property Expires: TDateTime read FExpires write FExpires;
     property Secure: Boolean read FSecure write FSecure;
-    property HeaderValue: AnsiString read GetHeaderValue write SetHeaderValue;
     property HttpOnly: Boolean read FHttpOnly write FHttpOnly;
+    property HeaderValue: AnsiString read GetHeaderValue write SetHeaderValue;
   end;
 
   {--TALCookieCollection--}
@@ -144,7 +144,8 @@ type
                  const Path: AnsiString;
                  const Domain: AnsiString;
                  const Expires: int64; // unixDateTime format
-                 const Secure: Boolean): TALHTTPCookie; overload;
+                 const Secure: Boolean;
+                 const HttpOnly: Boolean): TALHTTPCookie; overload;
     property Items[Index: Integer]: TALHTTPCookie read GetCookie write SetCookie; default;
   end;
 
@@ -539,6 +540,7 @@ begin
   FDomain := '';
   FExpires := ALNullDate;
   FSecure := False;
+  FHttpOnly := false;
 end;
 
 {**************************************************}
@@ -569,7 +571,7 @@ begin
                                                  ALDefaultFormatSettings),
                                 [AlRfc822DayOfWeekNames[DayOfWeek(Expires)],
                                  ALRfc822MonthOfTheYearNames[MonthOf(Expires)]]);
-  if Secure then Result := Result + 'secure';
+  if Secure then Result := Result + 'secure; ';
   if HttpOnly then Result := Result + 'httponly';
   if ALCopyStr(Result, Length(Result) - 1, MaxInt) = '; ' then SetLength(Result, Length(Result) - 2);
 end;
@@ -590,6 +592,7 @@ begin
   FDomain:= '';
   FExpires:= ALNullDate;
   FSecure:= False;
+  FHttpOnly := False;
 
   aCookieProp := TALStringList.Create;
   try
@@ -614,6 +617,7 @@ begin
     if not ALTryRfc822StrToGmtDateTime(aCookieProp.values['EXPIRES'], FExpires) then FExpires := ALNullDate;
     FDomain := aCookieProp.values['DOMAIN'];
     FSecure := aCookieProp.IndexOf('SECURE') <> -1;
+    FHttpOnly := aCookieProp.IndexOf('HTTPONLY') <> -1;
 
   finally
     AlFreeAndNil(aCookieProp);
@@ -633,7 +637,8 @@ function TALHTTPCookieCollection.Add(const Name: AnsiString;
                                      const Path: AnsiString;
                                      const Domain: AnsiString;
                                      const Expires: int64; // unixDateTime format
-                                     const Secure: Boolean): TALHTTPCookie;
+                                     const Secure: Boolean;
+                                     const HttpOnly: boolean): TALHTTPCookie;
 begin
   result := TALHTTPCookie(inherited Add);
   result.Name := Name;
@@ -642,6 +647,7 @@ begin
   result.Domain := Domain;
   result.Expires := unixtoDateTime(Expires);
   result.Secure := Secure;
+  result.HttpOnly := HttpOnly;
 end;
 
 {************************************************************************}

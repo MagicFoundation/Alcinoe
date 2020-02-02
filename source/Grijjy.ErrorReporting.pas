@@ -1,3 +1,7 @@
+//Copyright (c) 2017 by Grijjy, Inc.
+//All rights reserved.
+//https://blog.grijjy.com/
+
 unit Grijjy.ErrorReporting;
 
 { Some building blocks for creating an exception logger for iOS or Android.
@@ -562,6 +566,106 @@ begin
 
   { Use backtrace API to retrieve call stack }
   CallStack.Count := backtrace(@CallStack.Stack, FInstance.FMaxCallStackDepth);
+  Result := CallStack;
+end;
+
+class function TgoExceptionReporter.GetCallStack(
+  const AStackInfo: Pointer): TgoCallStack;
+var
+  CallStack: PCallStack;
+  I: Integer;
+begin
+  { Convert TCallStack to TgoCallStack }
+  CallStack := AStackInfo;
+  SetLength(Result, CallStack.Count);
+  for I := 0 to CallStack.Count - 1 do
+  begin
+    Result[I].CodeAddress := CallStack.Stack[I];
+    GetCallStackEntry(Result[I]);
+  end;
+end;
+
+{$ELSEIF Defined(ANDROID64)}
+
+(*****************************************************************************)
+(*** Android64 specific ******************************************************)
+(*****************************************************************************)
+
+function cxa_demangle(const mangled_name: MarshaledAString;
+  output_buffer: MarshaledAString; length: NativeInt;
+  out status: Integer): MarshaledAString; cdecl;
+  external 'libc++abi.a' name '__cxa_demangle';
+
+type
+  _PUnwind_Context = Pointer;
+  _Unwind_Ptr = UIntPtr;
+
+type
+  _Unwind_Reason_code = Integer;
+
+const
+  _URC_NO_REASON = 0;
+  _URC_FOREIGN_EXCEPTION_CAUGHT = 1;
+  _URC_FATAL_PHASE2_ERROR = 2;
+  _URC_FATAL_PHASE1_ERROR = 3;
+  _URC_NORMAL_STOP = 4;
+  _URC_END_OF_STACK = 5;
+  _URC_HANDLER_FOUND = 6;
+  _URC_INSTALL_CONTEXT = 7;
+  _URC_CONTINUE_UNWIND = 8;
+
+type
+  _Unwind_Trace_Fn = function(context: _PUnwind_Context; userdata: Pointer): _Unwind_Reason_code; cdecl;
+
+const
+  LIB_UNWIND = 'libunwind.a';
+
+procedure _Unwind_Backtrace(fn: _Unwind_Trace_Fn; userdata: Pointer); cdecl; external LIB_UNWIND;
+function _Unwind_GetIP(context: _PUnwind_Context): _Unwind_Ptr; cdecl; external LIB_UNWIND;
+
+type
+  TCallStack = record
+    { Number of entries in the call stack }
+    Count: Integer;
+
+    { The entries in the call stack }
+    Stack: array [0..0] of UIntPtr;
+  end;
+  PCallStack = ^TCallStack;
+
+function UnwindCallback(AContext: _PUnwind_Context; AUserData: Pointer): _Unwind_Reason_code; cdecl;
+var
+  Callstack: PCallstack;
+begin
+  Callstack := AUserData;
+  if (TgoExceptionReporter.FInstance = nil) or (Callstack.Count >= TgoExceptionReporter.FInstance.FMaxCallStackDepth) then
+    Exit(_URC_END_OF_STACK);
+
+  Callstack.Stack[Callstack.Count] := _Unwind_GetIP(AContext);
+  Inc(Callstack.Count);
+  Result := _URC_NO_REASON;
+end;
+
+class function TgoExceptionReporter.GlobalGetExceptionStackInfo(
+  P: PExceptionRecord): Pointer;
+var
+  CallStack: PCallStack;
+begin
+  { Don't call into FInstance here. That would only add another entry to the
+    call stack. Instead, retrieve the entire call stack from within this method.
+    Just return nil if we are already reporting an exception, or call stacks
+    are disabled. }
+  if (FInstance = nil) or (FInstance.FReportingException) or (FInstance.FMaxCallStackDepth <= 0) then
+    Exit(nil);
+
+  { Allocate a PCallStack record large enough to hold just MaxCallStackDepth
+    entries }
+  GetMem(CallStack, SizeOf(Integer{TCallStack.Count}) +
+    FInstance.FMaxCallStackDepth * SizeOf(Pointer));
+
+  { Use _Unwind_Backtrace API to retrieve call stack }
+  CallStack.Count := 0;
+  _Unwind_Backtrace(UnwindCallback, Callstack);
   Result := CallStack;
 end;
 

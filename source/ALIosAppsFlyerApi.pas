@@ -31,7 +31,7 @@ type
   //NSUInteger = Cardinal;
   //PNSUInteger = ^NSUInteger;
 
-  {***********************************************************}
+  {***************************************************}
   //@interface AppsFlyerCrossPromotionHelper : NSObject
   AppsFlyerCrossPromotionHelperClass = interface(NSObjectClass)
     ['{8EB76D9A-7F56-4876-AA30-C9E59CB6BD80}']

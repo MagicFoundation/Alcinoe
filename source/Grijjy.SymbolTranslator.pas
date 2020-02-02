@@ -1,3 +1,7 @@
+//Copyright (c) 2017 by Grijjy, Inc.
+//All rights reserved.
+//https://blog.grijjy.com/
+
 unit Grijjy.SymbolTranslator;
 
 interface

@@ -13,3 +13,5 @@
 *.dproj.local 
 *.groupproj.local 
 *.stat
+/references/embarcadero/rio/10_3_3/originals/fmx
+/references/embarcadero/rio/10_3_3/originals/rtl

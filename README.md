@@ -5,7 +5,7 @@ Alcinoe is a library of visual and non-visual components for Delphi. The compone
 be used in commercial as well as shareware and freeware and open source projects 
 without cost.
 
-Alcinoe is compatible with <b>Delphi RIO 10.3.1</b>
+Alcinoe is compatible with <b>Delphi RIO 10.3.3</b>
 
 Please "star" (like) this project in GitHub! It's cost nothing but help
 to reference the code

@@ -283,6 +283,40 @@ IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
 
+REM ---------------------------------
+REM Build alcinoe-installreferrer.jar
+REM ---------------------------------
+
+echo Build alcinoe-installreferrer.jar
+
+mkdir lib\jar\com.alcinoe\com.alcinoe.installreferrer
+
+SET FileName=source\output
+IF EXIST %FileName% rmdir /s /q %FileName%
+IF EXIST %FileName% goto ERROR
+
+mkdir source\output 2> nul
+%JDK_PATH1_8%\javac^
+ -Xlint:unchecked^
+ -Xlint:deprecation^
+ -cp %ANDROID_PLATFORM%\android.jar;^
+lib\jar\com.android.installreferrer\installreferrer.jar;^
+ -d source\output^
+ source\java\com\alcinoe\installreferrer\*.java
+IF ERRORLEVEL 1 goto ERROR
+
+SET FileName=source\output\com\alcinoe\*.class
+if exist %FileName% del %FileName%
+if exist %FileName% goto ERROR
+
+%JDK_PATH1_8%\jar cf lib\jar\com.alcinoe\com.alcinoe.installreferrer\alcinoe-installreferrer.jar -C source\output com\alcinoe\
+IF ERRORLEVEL 1 goto ERROR
+
+SET FileName=source\output
+IF EXIST %FileName% rmdir /s /q %FileName%
+IF EXIST %FileName% goto ERROR
+
+
 REM ----
 REM EXIT
 REM ----

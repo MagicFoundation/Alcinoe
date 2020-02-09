@@ -61,7 +61,7 @@ type
     {$REGION ' IOS'}
     {$IF defined(IOS)}
     FLoginManager: FBSDKLoginManager;
-    procedure logInWithReadPermissionsHandler(result: FBSDKLoginManagerLoginResult; error: NSError);
+    procedure logInWithPermissionsHandler(result: FBSDKLoginManagerLoginResult; error: NSError);
     {$ENDIF}
     {$ENDREGION}
 
@@ -260,7 +260,7 @@ begin
 
   ANSPermissions := ALStringsToNSArray(APermissions);
   try
-    FLoginManager.logInWithReadPermissions(ANSPermissions, nil, logInWithReadPermissionsHandler);
+    FLoginManager.logInWithPermissions(ANSPermissions, nil, logInWithPermissionsHandler);
   finally
     ANSPermissions.release;
   end;
@@ -562,8 +562,8 @@ end;
 {$REGION ' IOS'}
 {$IF defined(IOS)}
 
-{***************************************************************************************************************}
-procedure TALFacebookLogin.logInWithReadPermissionsHandler(result: FBSDKLoginManagerLoginResult; error: NSError);
+{***********************************************************************************************************}
+procedure TALFacebookLogin.logInWithPermissionsHandler(result: FBSDKLoginManagerLoginResult; error: NSError);
 var aToken: FBSDKAccessToken;
     aTokenStr: String;
     aUserIDStr: String;
@@ -751,9 +751,9 @@ begin
       _ExtractNameValue(aparameters[i], aName, aValue);
       aNSDictParameters.setValue(StringToID(aName), StrToNsStr(aValue));
     end;
-    aGraphRequest := TFBSDKGraphRequest.Wrap(TFBSDKGraphRequest.Alloc.initWithGraphPath(StrToNSStr(aGraphPath), // graphPath: NSString;
-                                                                                        aNSDictParameters, // parameters: NSDictionary;
-                                                                                        StrToNSStr(aHTTPMethod)));//HTTPMethod: NSString
+    aGraphRequest := TFBSDKGraphRequest.Wrap(TFBSDKGraphRequest.Alloc.initWithGraphPathParametersHTTPMethod(StrToNSStr(aGraphPath), // graphPath: NSString;
+                                                                                                            aNSDictParameters, // parameters: NSDictionary;
+                                                                                                            StrToNSStr(aHTTPMethod)));//HTTPMethod: NSString
   finally
     aNSDictParameters.release;
   end;

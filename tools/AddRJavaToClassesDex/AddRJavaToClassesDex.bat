@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 
 REM ----------------------------------------------
 REM Add this Post Build event (android platform) :
-REM C:\Dev\Alcinoe\tools\AddRJavaToClassesDex\AddRJavaToClassesDex.bat "$(PROJECTDIR)" "$(OUTPUTPATH)" "$(SDKAaptPath)" "$(SDKApiLevelPath)" "$(JavaDxPath)" "$(JDKPath)"
+REM C:\Dev\Alcinoe\tools\AddRJavaToClassesDex\AddRJavaToClassesDex.bat "$(PROJECTDIR)" "$(OUTPUTPATH)" "$(SDKAaptPath)" "$(SDKApiLevelPath)" "$(JavaDxPath)" "$(JDKPath)" true/false(true if you build an .aab package, false if you build an .apk)
 REM 
 REM Example of the generated content of each params : 
 REM $(PROJECTDIR) = C:\MyProject\_source
@@ -39,6 +39,17 @@ set ProjectDir=%1
 
 set SDKAaptPath=%3
 @echo SDKAaptPath=%SDKAaptPath% >> %logFile% 2>&1
+
+set Aapt2name=Aapt2.exe
+set SDKAapt2Path=%SDKAaptPath:Aapt.exe=!Aapt2name!%
+@echo SDKAapt2Path=%SDKAapt2Path% >> %logFile% 2>&1
+
+set UseAapt2=%7
+if "%UseAapt2%" == "true" (
+  @echo UseAapt2=true >> %logFile% 2>&1
+) ELSE (
+  @echo UseAapt2=false >> %logFile% 2>&1
+)
 
 set SDKApiLevelPath=%4
 @echo SDKApiLevelPath=%SDKApiLevelPath% >> %logFile% 2>&1
@@ -85,6 +96,25 @@ mkdir %TMPDir%\obj >> %logFile% 2>&1
 
 
 
+REM -----------------------------------------
+REM Compile all Android resources using AAPT2
+REM -----------------------------------------
+
+if "%UseAapt2%" == "true" (
+
+  REM -------------------------------------------------
+  @echo. >> %logFile% 2>&1
+  @echo Compile all Android resources >> %logFile% 2>&1
+  REM -------------------------------------------------
+
+  @echo %SDKAapt2Path% compile --dir %ProjectDir%\android\res -o %TMPDir%\compiled_res.flata >> %logFile% 2>&1
+  %SDKAapt2Path% compile --dir %ProjectDir%\android\res -o %TMPDir%\compiled_res.flata
+  IF ERRORLEVEL 1 goto ERROR
+
+)
+
+
+
 REM ---------------------
 REM Loop on all libraries
 REM ---------------------
@@ -99,12 +129,18 @@ for /d %%D in (*) do (
     @echo Create R.java - %%~nxD >> %logFile% 2>&1
     REM ------------------------------------------
 
-    @echo %SDKAaptPath% package -f -m -M %%~fD\AndroidManifest.xml -I %SDKApiLevelPath% -S %ProjectDir%\android\res -J %TMPDir%\src --auto-add-overlay --output-text-symbols %outputTextSymbols% >> %logFile% 2>&1
-    %SDKAaptPath% package -f -m -M %%~fD\AndroidManifest.xml -I %SDKApiLevelPath% -S %ProjectDir%\android\res -J %TMPDir%\src --auto-add-overlay --output-text-symbols %outputTextSymbols% >> %logFile% 2>&1
-    IF ERRORLEVEL 1 goto ERROR
-
-
-
+    if "%UseAapt2%" == "true" (
+      @echo %SDKAapt2Path% link --auto-add-overlay -I %SDKApiLevelPath% --manifest %%~fD\AndroidManifest.xml -R %TMPDir%\compiled_res.flata -o %TMPDir%\linked_res.ap_ --java %TMPDir%\src --output-text-symbols %TMPDir%\R.txt >> %logFile% 2>&1
+      %SDKAapt2Path% link --auto-add-overlay -I %SDKApiLevelPath% --manifest %%~fD\AndroidManifest.xml -R %TMPDir%\compiled_res.flata -o %TMPDir%\linked_res.ap_ --java %TMPDir%\src --output-text-symbols %TMPDir%\R.txt
+      IF ERRORLEVEL 1 goto ERROR
+    ) ELSE (
+      @echo %SDKAaptPath% package -f -m -M %%~fD\AndroidManifest.xml -I %SDKApiLevelPath% -S %ProjectDir%\android\res -J %TMPDir%\src --auto-add-overlay --output-text-symbols %outputTextSymbols% >> %logFile% 2>&1
+      %SDKAaptPath% package -f -m -M %%~fD\AndroidManifest.xml -I %SDKApiLevelPath% -S %ProjectDir%\android\res -J %TMPDir%\src --auto-add-overlay --output-text-symbols %outputTextSymbols% >> %logFile% 2>&1
+      IF ERRORLEVEL 1 goto ERROR
+    )        
+   
+   
+    
     REM -----------------------------------------------------------
     @echo. >> %logFile% 2>&1
     @echo Compile R.java into R$ classes - %%~nxD >> %logFile% 2>&1

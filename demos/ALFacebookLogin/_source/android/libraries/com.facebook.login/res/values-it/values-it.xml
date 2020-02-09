@@ -6,7 +6,7 @@
     <string gender="unknown" name="com_facebook_internet_permission_error_title">Errore AndroidManifest</string>
     <string gender="unknown" name="com_facebook_like_button_liked">Ti piace</string>
     <string gender="unknown" name="com_facebook_like_button_not_liked">Mi piace</string>
-    <string gender="unknown" name="com_facebook_loading">Caricamento in corso...</string>
+    <string gender="unknown" name="com_facebook_loading">Caricamento in corso…</string>
     <string gender="unknown" name="com_facebook_loginview_cancel_action">Annulla</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button">Accedi</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Continua con Facebook</string>

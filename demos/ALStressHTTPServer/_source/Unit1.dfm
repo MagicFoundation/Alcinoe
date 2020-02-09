@@ -24,17 +24,16 @@ object Form1: TForm1
     TabOrder = 0
     Properties.ActivePage = TabSheet1
     Properties.CustomButtons.Buttons = <>
-    ClientRectBottom = 610
-    ClientRectLeft = 5
-    ClientRectRight = 1003
-    ClientRectTop = 27
+    ClientRectBottom = 615
+    ClientRectRight = 1008
+    ClientRectTop = 24
     object TabSheet1: TcxTabSheet
       Caption = 'Application'
       Color = 15066860
       ParentColor = False
       DesignSize = (
-        998
-        583)
+        1008
+        591)
       object Label4: TcxLabel
         Left = 11
         Top = 8
@@ -77,13 +76,13 @@ object Form1: TForm1
         ParentFont = False
         TabOrder = 0
         Height = 124
-        Width = 998
+        Width = 1008
       end
       object GridThread: TcxGrid
         Left = 0
         Top = 226
-        Width = 998
-        Height = 338
+        Width = 1008
+        Height = 346
         Align = alBottom
         Anchors = [akLeft, akTop, akRight, akBottom]
         Font.Charset = ANSI_CHARSET
@@ -107,6 +106,7 @@ object Form1: TForm1
           Navigator.Buttons.GotoBookmark.Visible = False
           Navigator.Buttons.Filter.Visible = False
           FilterBox.CustomizeDialog = False
+          ScrollbarAnnotations.CustomAnnotations = <>
           DataController.Summary.DefaultGroupSummaryItems = <>
           DataController.Summary.FooterSummaryItems = <
             item
@@ -158,8 +158,8 @@ object Form1: TForm1
           OptionsBehavior.FocusCellOnTab = True
           OptionsBehavior.FocusFirstCellOnNewRecord = True
           OptionsBehavior.GoToNextCellOnEnter = True
-          OptionsBehavior.ImmediateEditor = False
           OptionsBehavior.FocusCellOnCycle = True
+          OptionsBehavior.ImmediateEditor = False
           OptionsCustomize.ColumnFiltering = False
           OptionsCustomize.ColumnGrouping = False
           OptionsCustomize.ColumnHidingOnGrouping = False
@@ -257,8 +257,8 @@ object Form1: TForm1
       end
       object StatusBar1: TStatusBar
         Left = 0
-        Top = 564
-        Width = 998
+        Top = 572
+        Width = 1008
         Height = 19
         Color = 15525605
         Font.Charset = DEFAULT_CHARSET
@@ -310,7 +310,6 @@ object Form1: TForm1
     object TabSheet2: TcxTabSheet
       Caption = 'Configuration'
       ImageIndex = 1
-      ExplicitLeft = 0
       ExplicitTop = 0
       ExplicitWidth = 0
       ExplicitHeight = 0

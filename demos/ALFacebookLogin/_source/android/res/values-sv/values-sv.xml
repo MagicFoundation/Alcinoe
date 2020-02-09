@@ -7,7 +7,7 @@
     <string gender="unknown" name="com_facebook_internet_permission_error_title">AndroidManifest-fel</string>
     <string gender="unknown" name="com_facebook_like_button_liked">Gillat</string>
     <string gender="unknown" name="com_facebook_like_button_not_liked">Gilla</string>
-    <string gender="unknown" name="com_facebook_loading">Laddar ...</string>
+    <string gender="unknown" name="com_facebook_loading">Läser in \u2026</string>
     <string gender="unknown" name="com_facebook_loginview_cancel_action">Avbryt</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button">Logga in</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Fortsätt med Facebook</string>

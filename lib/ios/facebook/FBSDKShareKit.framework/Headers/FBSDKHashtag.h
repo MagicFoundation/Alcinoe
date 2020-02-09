@@ -18,19 +18,27 @@
 
 #import <Foundation/Foundation.h>
 
-#import <FBSDKCoreKit/FBSDKCopying.h>
+#if defined BUCK || defined FBSDKCOCOAPODS || defined __cplusplus
+#import <FBSDKCoreKit/FBSDKCoreKit.h>
+#else
+@import FBSDKCoreKit;
+#endif
+
+NS_ASSUME_NONNULL_BEGIN
 
 /**
   Represents a single hashtag that can be used with the share dialog.
  */
+NS_SWIFT_NAME(Hashtag)
 @interface FBSDKHashtag : NSObject <FBSDKCopying, NSSecureCoding>
 
 /**
   Convenience method to build a new hashtag with a string identifier. Equivalent to setting the
    `stringRepresentation` property.
- - Parameter hashtagString: The hashtag string.
+ @param hashtagString The hashtag string.
  */
-+ (instancetype)hashtagWithString:(NSString *)hashtagString;
++ (instancetype)hashtagWithString:(NSString *)hashtagString
+NS_SWIFT_NAME(init(_:));
 
 /**
   The hashtag string.
@@ -38,24 +46,26 @@
  You are responsible for making sure that `stringRepresentation` is a valid hashtag (a single '#' followed
    by one or more word characters). Invalid hashtags are ignored when sharing content. You can check validity with the
    `valid` property.
- - Returns: The hashtag string.
+ @return The hashtag string.
  */
-@property (nonatomic, readwrite, copy) NSString *stringRepresentation;
+@property (nonatomic, copy) NSString *stringRepresentation;
 
 /**
   Tests if a hashtag is valid.
 
  A valid hashtag matches the regular expression "#\w+": A single '#' followed by one or more
    word characters.
- - Returns: YES if the hashtag is valid, NO otherwise.
+ @return YES if the hashtag is valid, NO otherwise.
  */
 @property (nonatomic, readonly, assign, getter=isValid) BOOL valid;
 
 /**
   Compares the receiver to another hashtag.
- - Parameter hashtag: The other hashtag
- - Returns: YES if the receiver is equal to the other hashtag; otherwise NO
+ @param hashtag The other hashtag
+ @return YES if the receiver is equal to the other hashtag; otherwise NO
  */
 - (BOOL)isEqualToHashtag:(FBSDKHashtag *)hashtag;
 
 @end
+
+NS_ASSUME_NONNULL_END

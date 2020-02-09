@@ -61,9 +61,10 @@ public:
 	void __fastcall prepare(const System::UnicodeString aDataSource);
 	void __fastcall Start(void);
 	void __fastcall Stop(void);
-	void __fastcall seekTo(const int msec);
+	void __fastcall seekTo(const __int64 msec);
 	void __fastcall setLooping(const bool looping);
 	void __fastcall setVolume(const float Value);
+	void __fastcall setPlaybackSpeed(const float Value);
 	__property Fmx::Graphics::TBitmap* bitmap = {read=fbitmap};
 	__property System::Classes::TNotifyEvent OnError = {read=fOnErrorEvent, write=fOnErrorEvent};
 	__property System::Classes::TNotifyEvent OnPrepared = {read=FOnPreparedEvent, write=FOnPreparedEvent};
@@ -109,9 +110,10 @@ public:
 	void __fastcall prepare(const System::UnicodeString aDataSource, const bool aAutoStartWhenPrepared = false);
 	void __fastcall Start(void);
 	void __fastcall Stop(void);
-	void __fastcall seekTo(const int msec);
+	void __fastcall seekTo(const __int64 msec);
 	void __fastcall setLooping(const bool looping);
 	void __fastcall setVolume(const float Value);
+	void __fastcall setPlaybackSpeed(const float Value);
 	__property Fmx::Graphics::TBitmap* Bitmap = {read=GetBitmap};
 	__property System::Classes::TNotifyEvent OnError = {read=fOnErrorEvent, write=fOnErrorEvent};
 	__property System::Classes::TNotifyEvent OnPrepared = {read=fOnPreparedEvent, write=fOnPreparedEvent};

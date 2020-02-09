@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
-    <color name="com_facebook_button_login_background_color">#4267b2</color>
-    <color name="com_facebook_button_login_silver_background_color">#f4f6f8</color>
-    <color name="com_facebook_button_login_silver_background_color_pressed">#e9eaf0</color>
     <declare-styleable name="com_facebook_login_view"><attr format="boolean" name="com_facebook_confirm_logout"/><attr format="string" name="com_facebook_login_text"/><attr format="string" name="com_facebook_logout_text"/><attr name="com_facebook_tooltip_mode">
             
             <enum name="automatic" value="0"/>
@@ -42,18 +39,7 @@
     <string name="com_facebook_smart_login_confirmation_continue_as">Continue as <ns1:g id="user name">%1$s</ns1:g></string>
     <string name="com_facebook_smart_login_confirmation_title">Confirm Login</string>
     <string name="com_facebook_tooltip_default">You\'re in control - choose what info you want to share with apps.</string>
-    <style name="com_facebook_loginview_default_style" parent="com_facebook_button">
-        <item name="android:background">@drawable/com_facebook_button_login_background</item>
-        <item name="android:drawablePadding">5dp</item>
-        <item name="android:paddingLeft">6dp</item>
-        <item name="android:paddingRight">6dp</item>
-        <item name="android:textSize">13.0dp</item>
-    </style>
-    <style name="com_facebook_loginview_silver_style" parent="com_facebook_loginview_default_style">
-        <item name="android:background">@drawable/com_facebook_button_login_silver_background</item>
-        <item name="android:drawableLeft">@null</item>
-        <item name="android:textColor">#4b5164</item>
-    </style>
+    <style name="com_facebook_loginview_default_style" parent="com_facebook_button"/>
     <style name="tooltip_bubble_text">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:gravity">left</item>

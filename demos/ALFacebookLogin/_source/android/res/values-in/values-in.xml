@@ -8,7 +8,7 @@
     <string gender="unknown" name="com_facebook_like_button_liked">Suka</string>
     <string gender="unknown" name="com_facebook_like_button_not_liked">Suka</string>
     <string gender="unknown" name="com_facebook_loading">Memuat…</string>
-    <string gender="unknown" name="com_facebook_loginview_cancel_action">Batalkan</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">Batal</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button">Masuk</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Lanjutkan dengan Facebook</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Masuk dengan Facebook</string>

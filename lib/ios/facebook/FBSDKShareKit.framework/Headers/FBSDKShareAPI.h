@@ -18,32 +18,48 @@
 
 #import <Foundation/Foundation.h>
 
-#import <FBSDKCoreKit/FBSDKAccessToken.h>
+#import "FBSDKShareOpenGraphObject.h"
+#import "FBSDKSharing.h"
 
-#import <FBSDKShareKit/FBSDKShareOpenGraphObject.h>
-#import <FBSDKShareKit/FBSDKSharing.h>
+NS_ASSUME_NONNULL_BEGIN
 
 /**
   A utility class for sharing through the graph API.  Using this class requires an access token that
  has been granted the "publish_actions" permission.
 
- FBSDKShareAPI network requests are scheduled on the current run loop in the default run loop mode
- (like NSURLConnection). If you want to use FBSDKShareAPI in a background thread, you must manage the run loop
+ FBSDKShareAPI network requests are scheduled on the current run loop in the default run loop mode.
+ If you want to use FBSDKShareAPI in a background thread, you must manage the run loop
  yourself.
  */
+NS_SWIFT_NAME(ShareAPI)
 @interface FBSDKShareAPI : NSObject <FBSDKSharing>
+
+- (instancetype)init NS_DESIGNATED_INITIALIZER
+NS_SWIFT_UNAVAILABLE("Use init(content:delegate:) instead");
++ (instancetype)new NS_UNAVAILABLE;
 
 /**
   Convenience method to build up a share API with content and a delegate.
- - Parameter content: The content to be shared.
- - Parameter delegate: The receiver's delegate.
+ @param content The content to be shared.
+ @param delegate The receiver's delegate.
  */
-+ (instancetype)shareWithContent:(id<FBSDKSharingContent>)content delegate:(id<FBSDKSharingDelegate>)delegate;
++ (instancetype)apiWithContent:(id<FBSDKSharingContent>)content
+                      delegate:(nullable id<FBSDKSharingDelegate>)delegate
+NS_SWIFT_NAME(init(content:delegate:));
+
+/**
+ Convenience method to build up and share a share API with content and a delegate.
+ @param content The content to be shared.
+ @param delegate The receiver's delegate.
+ */
++ (instancetype)shareWithContent:(id<FBSDKSharingContent>)content
+                        delegate:(nullable id<FBSDKSharingDelegate>)delegate
+NS_SWIFT_UNAVAILABLE("Use init(content:delegate:).share() instead");
 
 /**
   The message the person has provided through the custom dialog that will accompany the share content.
  */
-@property (nonatomic, copy) NSString *message;
+@property (nonatomic, copy, nullable) NSString *message;
 
 /**
   The graph node to which content should be shared.
@@ -57,7 +73,7 @@
  Defaults to [FBSDKAccessToken currentAccessToken]. Setting this to nil will revert the access token to
  [FBSDKAccessToken currentAccessToken].
  */
-@property (nonatomic, strong) FBSDKAccessToken *accessToken;
+@property (nonatomic, strong, nullable) FBSDKAccessToken *accessToken;
 
 /**
   A Boolean value that indicates whether the receiver can send the share.
@@ -66,14 +82,14 @@
  required but not available.  This method does not validate the content on the receiver, so this can be checked before
  building up the content.
 
-- See:[FBSDKSharing validateWithError:]
- - Returns: YES if the receiver can send, otherwise NO.
+ @see [FBSDKSharing validateWithError:]
+ @return YES if the receiver can send, otherwise NO.
  */
-- (BOOL)canShare;
+@property (nonatomic, readonly) BOOL canShare;
 
 /**
   Creates an User Owned Open Graph object without an action.
- - Parameter openGraphObject: The open graph object to create.
+ @param openGraphObject The open graph object to create.
 
  Use this method to create an object alone, when an action is not going to be posted with the object.  If
  the object will be used within an action, just put the object in the action and share that as the shareContent and the
@@ -81,14 +97,16 @@
 
  Also see https://developers.facebook.com/docs/sharing/opengraph/object-api#objectapi-creatinguser
 
- - Returns: YES if the receiver was able to send the request to create the object, otherwise NO.
+ @return YES if the receiver was able to send the request to create the object, otherwise NO.
  */
 - (BOOL)createOpenGraphObject:(FBSDKShareOpenGraphObject *)openGraphObject;
 
 /**
   Begins the send from the receiver.
- - Returns: YES if the receiver was able to send the share, otherwise NO.
+ @return YES if the receiver was able to send the share, otherwise NO.
  */
 - (BOOL)share;
 
 @end
+
+NS_ASSUME_NONNULL_END

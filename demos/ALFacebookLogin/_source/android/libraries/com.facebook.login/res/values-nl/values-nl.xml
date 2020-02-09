@@ -6,7 +6,7 @@
     <string gender="unknown" name="com_facebook_internet_permission_error_title">AndroidManifest-fout</string>
     <string gender="unknown" name="com_facebook_like_button_liked">Vind ik leuk</string>
     <string gender="unknown" name="com_facebook_like_button_not_liked">Vind ik leuk</string>
-    <string gender="unknown" name="com_facebook_loading">Laden...</string>
+    <string gender="unknown" name="com_facebook_loading">Laden…</string>
     <string gender="unknown" name="com_facebook_loginview_cancel_action">Annuleren</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button">Aanmelden</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Doorgaan met Facebook</string>

@@ -18,17 +18,21 @@
 
 #import <Foundation/Foundation.h>
 
-#import <FBSDKShareKit/FBSDKShareMessengerActionButton.h>
+#import "FBSDKShareMessengerActionButton.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSUInteger, FBSDKShareMessengerURLActionButtonWebviewHeightRatio) {
   FBSDKShareMessengerURLActionButtonWebviewHeightRatioFull = 0,
   FBSDKShareMessengerURLActionButtonWebviewHeightRatioTall,
   FBSDKShareMessengerURLActionButtonWebviewHeightRatioCompact
-};
+} NS_SWIFT_NAME(ShareMessengerURLActionButton.WebviewHeightRatio);
 
 /**
  A model for a Messenger share URL action button.
  */
+DEPRECATED_FOR_MESSENGER
+NS_SWIFT_NAME(ShareMessengerURLActionButton)
 @interface FBSDKShareMessengerURLActionButton : NSObject <FBSDKShareMessengerActionButton>
 
 /**
@@ -51,7 +55,7 @@ typedef NS_ENUM(NSUInteger, FBSDKShareMessengerURLActionButtonWebviewHeightRatio
  Messenger Extensions. If this is not defined, the url will be used as a fallback. Optional, but ignored
  unless isMessengerExtensionURL == YES.
  */
-@property (nonatomic, copy) NSURL *fallbackURL;
+@property (nonatomic, copy, nullable) NSURL *fallbackURL;
 
 /**
  This controls whether we want to hide the share button in the webview or not. It is useful to hide the share
@@ -60,3 +64,5 @@ typedef NS_ENUM(NSUInteger, FBSDKShareMessengerURLActionButtonWebviewHeightRatio
 @property (nonatomic, assign) BOOL shouldHideWebviewShareButton;
 
 @end
+
+NS_ASSUME_NONNULL_END

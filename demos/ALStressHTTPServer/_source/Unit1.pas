@@ -10,7 +10,7 @@ uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
      cxGridCustomView, cxGrid, Spin, dxSkinsCore, dxSkinFoggy, dxSkinscxPCPainter, cxPCdxBarPopupMenu,
      cxLookAndFeels, cxLookAndFeelPainters, cxContainer, Menus, dxSkinsForm,
      cxRadioGroup, cxGroupBox, cxButtons, cxTextEdit, cxMaskEdit, cxCheckBox,
-     cxMemo, cxLabel, cxPC, uiTypes, cxNavigator, dxBarBuiltInMenu;
+     cxMemo, cxLabel, cxPC, uiTypes, cxNavigator, dxBarBuiltInMenu, dxDateRanges, dxScrollbarAnnotations;
 
 Const
   WM_UpdateGUI = WM_User + 1;
@@ -129,8 +129,8 @@ type
     HttpClientInternetOptions: TALWinHttpClientInternetOptionSet;
     HttpClientRawHeaderText: ansiString;
     NBActiveThread: Integer;
-    LastUpdateStatusBar: int64;
-    StartTime: int64;
+    LastUpdateStatusBar: Uint64;
+    StartTime: uint64;
     ToTalBytesRead: Int64;
     TotalDNScount: integer;
     TotalDNSTimeTaken: Int64;
@@ -169,7 +169,7 @@ type
     FSendTimeTaken: Integer;
     FWaitTimeTaken: Integer;
     FReceiveTimeTaken: Integer;
-    FHttpStatusStartTime: int64;
+    FHttpStatusStartTime: uint64;
   protected
     StopOnError: Boolean;
     DoLikeaSpider: Boolean;

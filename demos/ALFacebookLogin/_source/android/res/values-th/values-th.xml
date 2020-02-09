@@ -7,7 +7,7 @@
     <string gender="unknown" name="com_facebook_internet_permission_error_title">ข้อผิดพลาด AndroidManifest</string>
     <string gender="unknown" name="com_facebook_like_button_liked">ถูกใจแล้ว</string>
     <string gender="unknown" name="com_facebook_like_button_not_liked">ถูกใจ</string>
-    <string gender="unknown" name="com_facebook_loading">กำลังโหลด...</string>
+    <string gender="unknown" name="com_facebook_loading">กำลังโหลด…</string>
     <string gender="unknown" name="com_facebook_loginview_cancel_action">ยกเลิก</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button">เข้าสู่ระบบ</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">ดำเนินการต่อด้วย Facebook</string>

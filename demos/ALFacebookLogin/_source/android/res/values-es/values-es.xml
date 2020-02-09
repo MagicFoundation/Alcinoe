@@ -7,7 +7,7 @@
     <string gender="unknown" name="com_facebook_internet_permission_error_title">Error de AndroidManifest</string>
     <string gender="unknown" name="com_facebook_like_button_liked">Te gusta</string>
     <string gender="unknown" name="com_facebook_like_button_not_liked">Me gusta</string>
-    <string gender="unknown" name="com_facebook_loading">Cargando...</string>
+    <string gender="unknown" name="com_facebook_loading">Cargando\u2026</string>
     <string gender="unknown" name="com_facebook_loginview_cancel_action">Cancelar</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button">Entrar</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Continuar con Facebook</string>
@@ -18,12 +18,12 @@
     <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Iniciaste sesión con Facebook</string>
     <string gender="unknown" name="com_facebook_send_button_text">Enviar</string>
     <string gender="unknown" name="com_facebook_share_button_text">Compartir</string>
-    <string gender="unknown" name="com_facebook_smart_device_instructions">Para conectar tu cuenta, abre la aplicación de Facebook en tu dispositivo móvil y comprueba las notificaciones.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">Para conectar tu cuenta, abre la app de Facebook en tu dispositivo móvil y comprueba las notificaciones.</string>
     <string gender="unknown" name="com_facebook_smart_device_instructions_or">o</string>
     <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">¿No eres tú?</string>
     <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">Continuar como %1$s</string>
     <string gender="unknown" name="com_facebook_smart_login_confirmation_title">Confirmar inicio de sesión</string>
-    <string gender="unknown" name="com_facebook_tooltip_default">Tú decides qué información quieres compartir con las aplicaciones.</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">Tú decides qué información quieres compartir con las apps.</string>
 
 
 

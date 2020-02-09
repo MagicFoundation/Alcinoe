@@ -737,6 +737,7 @@ extern DELPHI_PACKAGE System::AnsiString __fastcall ALFastTagReplace(const Syste
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALFastTagReplace(const System::AnsiString SourceString, const System::AnsiString TagStart, const System::AnsiString TagEnd, const System::AnsiString ReplaceWith, const System::Sysutils::TReplaceFlags Flags = (System::Sysutils::TReplaceFlags() << System::Sysutils::System_Sysutils__85::rfReplaceAll ))/* overload */;
 extern DELPHI_PACKAGE bool __fastcall ALExtractTagParams(const System::AnsiString SourceString, const System::AnsiString TagStart, const System::AnsiString TagEnd, bool StripParamQuotes, Alstringlist::TALStrings* TagParams, bool IgnoreCase);
 extern DELPHI_PACKAGE void __fastcall ALSplitTextAndTag(const System::AnsiString SourceString, const System::AnsiString TagStart, const System::AnsiString TagEnd, Alstringlist::TALStrings* SplitTextAndTagLst, bool IgnoreCase);
+extern DELPHI_PACKAGE System::DynamicArray<System::Byte> __fastcall ALGetBytesFromFile(const System::AnsiString filename, const System::Word ShareMode = (System::Word)(0x20));
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALGetStringFromFile(const System::AnsiString filename, const System::Word ShareMode = (System::Word)(0x20));
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALGetStringFromFileWithoutUTF8BOM(const System::AnsiString filename, const System::Word ShareMode = (System::Word)(0x20));
 extern DELPHI_PACKAGE void __fastcall ALAppendStringToFile(const System::AnsiString Str, const System::AnsiString FileName);

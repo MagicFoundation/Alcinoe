@@ -4233,16 +4233,18 @@ var Iterator: JIterator;
     S: JString;
 begin
   SetLength(Result, ASet.size);
-  Index := 0;
-  Iterator := ASet.iterator;
-  while Iterator.hasNext do begin
-    S := TJString.Wrap((Iterator.next as ILocalObject).GetObjectID);
-    if S <> nil then begin
-      Result[Index] := JStringToString(S);
-      Inc(Index);
+  if ASet.size > 0 then begin
+    Index := 0;
+    Iterator := ASet.iterator;
+    while Iterator.hasNext do begin
+      S := TJString.Wrap((Iterator.next as ILocalObject).GetObjectID);
+      if S <> nil then begin
+        Result[Index] := JStringToString(S);
+        Inc(Index);
+      end;
     end;
+    SetLength(Result, Index);
   end;
-  SetLength(Result, Index);
 end;
 {$ENDIF}
 
@@ -4269,10 +4271,12 @@ var StringArray: NSArray;
 begin
   if ANSSet <> nil then begin
     SetLength(Result, ANSSet.count);
-    StringArray := ANSSet.allObjects;
-    for I := 0 to StringArray.Count - 1 do begin
-      AString := NSStrToStr(TNSString.Wrap(StringArray.objectAtIndex(I)));
-      Result[I] := AString;
+    if ANSSet.count > 0 then begin
+      StringArray := ANSSet.allObjects;
+      for I := 0 to StringArray.Count - 1 do begin
+        AString := NSStrToStr(TNSString.Wrap(StringArray.objectAtIndex(I)));
+        Result[I] := AString;
+      end;
     end;
   end;
 end;

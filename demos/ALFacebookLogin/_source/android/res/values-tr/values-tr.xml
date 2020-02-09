@@ -7,7 +7,7 @@
     <string gender="unknown" name="com_facebook_internet_permission_error_title">AndroidManifest Hatası</string>
     <string gender="unknown" name="com_facebook_like_button_liked">Beğendin</string>
     <string gender="unknown" name="com_facebook_like_button_not_liked">Beğen</string>
-    <string gender="unknown" name="com_facebook_loading">Yükleniyor...</string>
+    <string gender="unknown" name="com_facebook_loading">Yükleniyor\u2026</string>
     <string gender="unknown" name="com_facebook_loginview_cancel_action">İptal</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button">Giriş yap</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Facebook ile Devam Et</string>

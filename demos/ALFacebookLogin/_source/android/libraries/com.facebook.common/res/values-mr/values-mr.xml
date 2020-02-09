@@ -16,7 +16,7 @@
     <string gender="unknown" name="com_facebook_loginview_logged_in_as">%1$s म्हणून लॉग इन केले</string>
     <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Facebook वापरून लॉग इन केले</string>
     <string gender="unknown" name="com_facebook_send_button_text">पाठवा</string>
-    <string gender="unknown" name="com_facebook_share_button_text">शेअर करा</string>
+    <string gender="unknown" name="com_facebook_share_button_text">सामायिक करा</string>
     <string gender="unknown" name="com_facebook_smart_device_instructions">तुमचे खाते कनेक्ट करण्यासाठी, तुमच्या मोबाईल उपकरणावर Facebook अॅप उघडा आणि सूचना तपासा.</string>
     <string gender="unknown" name="com_facebook_smart_device_instructions_or">- किंवा -</string>
     <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">आपण नाही?</string>

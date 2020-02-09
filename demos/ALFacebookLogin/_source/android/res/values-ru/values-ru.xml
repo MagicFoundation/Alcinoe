@@ -7,7 +7,7 @@
     <string gender="unknown" name="com_facebook_internet_permission_error_title">Ошибка AndroidManifest</string>
     <string gender="unknown" name="com_facebook_like_button_liked">Нравится</string>
     <string gender="unknown" name="com_facebook_like_button_not_liked">Нравится</string>
-    <string gender="unknown" name="com_facebook_loading">Загрузка...</string>
+    <string gender="unknown" name="com_facebook_loading">Загрузка…</string>
     <string gender="unknown" name="com_facebook_loginview_cancel_action">Отмена</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button">Войти</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Продолжить с Facebook</string>

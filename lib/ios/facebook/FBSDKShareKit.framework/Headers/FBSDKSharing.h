@@ -18,19 +18,22 @@
 
 #import <Foundation/Foundation.h>
 
-#import <FBSDKShareKit/FBSDKSharingContent.h>
+#import "FBSDKSharingContent.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 @protocol FBSDKSharingDelegate;
 
 /**
   The common interface for components that initiate sharing.
 
-- See:FBSDKShareDialog
+ @see FBSDKShareDialog
 
-- See:FBSDKMessageDialog
+ @see FBSDKMessageDialog
 
-- See:FBSDKShareAPI
+ @see FBSDKShareAPI
  */
+NS_SWIFT_NAME(Sharing)
 @protocol FBSDKSharing <NSObject>
 
 /**
@@ -53,8 +56,8 @@
 
 /**
   Validates the content on the receiver.
- - Parameter errorRef: If an error occurs, upon return contains an NSError object that describes the problem.
- - Returns: YES if the content is valid, otherwise NO.
+ @param errorRef If an error occurs, upon return contains an NSError object that describes the problem.
+ @return YES if the content is valid, otherwise NO.
  */
 - (BOOL)validateWithError:(NSError **)errorRef;
 
@@ -63,6 +66,7 @@
 /**
   The common interface for dialogs that initiate sharing.
  */
+NS_SWIFT_NAME(SharingDialog)
 @protocol FBSDKSharingDialog <FBSDKSharing>
 
 /**
@@ -72,14 +76,14 @@
  required but not available.  This method does not validate the content on the receiver, so this can be checked before
  building up the content.
 
-- See:[FBSDKSharing validateWithError:]
- - Returns: YES if the receiver can share, otherwise NO.
+ @see [FBSDKSharing validateWithError:]
+ @return YES if the receiver can share, otherwise NO.
  */
-- (BOOL)canShow;
+@property (nonatomic, readonly) BOOL canShow;
 
 /**
   Shows the dialog.
- - Returns: YES if the receiver was able to begin sharing, otherwise NO.
+ @return YES if the receiver was able to begin sharing, otherwise NO.
  */
 - (BOOL)show;
 
@@ -92,26 +96,29 @@
  receive the information.  For example, if the person is not signed into the containing app, the sharer may not be able
  to distinguish between completion of a share and cancellation.
  */
+NS_SWIFT_NAME(SharingDelegate)
 @protocol FBSDKSharingDelegate <NSObject>
 
 /**
   Sent to the delegate when the share completes without error or cancellation.
- - Parameter sharer: The FBSDKSharing that completed.
- - Parameter results: The results from the sharer.  This may be nil or empty.
+ @param sharer The FBSDKSharing that completed.
+ @param results The results from the sharer.  This may be nil or empty.
  */
-- (void)sharer:(id<FBSDKSharing>)sharer didCompleteWithResults:(NSDictionary *)results;
+- (void)sharer:(id<FBSDKSharing>)sharer didCompleteWithResults:(NSDictionary<NSString *, id> *)results;
 
 /**
   Sent to the delegate when the sharer encounters an error.
- - Parameter sharer: The FBSDKSharing that completed.
- - Parameter error: The error.
+ @param sharer The FBSDKSharing that completed.
+ @param error The error.
  */
 - (void)sharer:(id<FBSDKSharing>)sharer didFailWithError:(NSError *)error;
 
 /**
   Sent to the delegate when the sharer is cancelled.
- - Parameter sharer: The FBSDKSharing that completed.
+ @param sharer The FBSDKSharing that completed.
  */
 - (void)sharerDidCancel:(id<FBSDKSharing>)sharer;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -7,7 +7,7 @@
     <string gender="unknown" name="com_facebook_internet_permission_error_title">Σφάλμα AndroidManifest</string>
     <string gender="unknown" name="com_facebook_like_button_liked">Σας αρέσει</string>
     <string gender="unknown" name="com_facebook_like_button_not_liked">Μου αρέσει!</string>
-    <string gender="unknown" name="com_facebook_loading">Φόρτωση...</string>
+    <string gender="unknown" name="com_facebook_loading">Φόρτωση\u2026</string>
     <string gender="unknown" name="com_facebook_loginview_cancel_action">Ακύρωση</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button">Σύνδεση</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Συνέχεια με το Facebook</string>

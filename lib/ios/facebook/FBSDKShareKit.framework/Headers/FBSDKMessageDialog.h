@@ -16,20 +16,56 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#import "TargetConditionals.h"
+
+#if !TARGET_OS_TV
+
 #import <Foundation/Foundation.h>
 
-#import <FBSDKShareKit/FBSDKSharing.h>
+#import "FBSDKShareConstants.h"
+#import "FBSDKSharing.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 /**
-  A dialog for sharing content through Messenger.
+ A dialog for sharing content through Messenger.
+
+ SUPPORTED SHARE TYPES
+ - FBSDKShareLinkContent
+ - FBSDKShareMessengerOpenGraphMusicTemplateContent
+ - FBSDKShareMessengerMediaTemplateContent
+ - FBSDKShareMessengerGenericTemplateContent
+
+ UNSUPPORTED SHARE TYPES (DEPRECATED AUGUST 2018)
+ - FBSDKShareOpenGraphContent
+ - FBSDKSharePhotoContent
+ - FBSDKShareVideoContent
+ - Any other types that are not one of the four supported types listed above
  */
+NS_SWIFT_NAME(MessageDialog)
+DEPRECATED_FOR_MESSENGER
 @interface FBSDKMessageDialog : NSObject <FBSDKSharingDialog>
 
 /**
-  Convenience method to show a Message Share Dialog with content and a delegate.
- - Parameter content: The content to be shared.
- - Parameter delegate: The receiver's delegate.
+ Convenience method to return a Message Share Dialog with content and a delegate.
+ @param content The content to be shared.
+ @param delegate The receiver's delegate.
  */
-+ (instancetype)showWithContent:(id<FBSDKSharingContent>)content delegate:(id<FBSDKSharingDelegate>)delegate;
++ (instancetype)dialogWithContent:(id<FBSDKSharingContent>)content
+                         delegate:(nullable id<FBSDKSharingDelegate>)delegate
+NS_SWIFT_NAME(init(content:delegate:));
+
+/**
+ Convenience method to show a Message Share Dialog with content and a delegate.
+ @param content The content to be shared.
+ @param delegate The receiver's delegate.
+ */
++ (instancetype)showWithContent:(id<FBSDKSharingContent>)content
+                       delegate:(nullable id<FBSDKSharingDelegate>)delegate
+NS_SWIFT_UNAVAILABLE("Use init(content:delegate:).show() instead");
 
 @end
+
+NS_ASSUME_NONNULL_END
+
+#endif

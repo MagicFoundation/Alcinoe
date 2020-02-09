@@ -14,7 +14,7 @@
   <style name="AppTheme" parent="@android:style/Theme.Holo.Light.NoActionBar"> 
     <item name="android:editTextStyle">@style/AppThemeEditTextStyle</item>
     <item name="android:colorAccent">#ff0288d1</item>
-    <item name="@attr/BlueBGTextViewStyle">@style/BlueBGTextView</item>
+    <item type="attr" name="BlueBGTextViewStyle">@style/BlueBGTextView</item>
   </style>
 
 </resources>

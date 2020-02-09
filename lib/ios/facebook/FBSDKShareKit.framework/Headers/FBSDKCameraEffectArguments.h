@@ -16,42 +16,59 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#import "TargetConditionals.h"
+
+#if !TARGET_OS_TV
+
 #import <Foundation/Foundation.h>
 
-#import <FBSDKCoreKit/FBSDKCopying.h>
+#if defined BUCK || defined FBSDKCOCOAPODS || defined __cplusplus
+#import <FBSDKCoreKit/FBSDKCoreKit.h>
+#else
+@import FBSDKCoreKit;
+#endif
+
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  * A container of arguments for a camera effect.
  * An argument is a NSString identified by a NSString key.
  */
+NS_SWIFT_NAME(CameraEffectArguments)
 @interface FBSDKCameraEffectArguments : NSObject <FBSDKCopying, NSSecureCoding>
 
 /**
  Sets a string argument in the container.
- - Parameter string: The argument
- - Parameter key: The key for the argument
+ @param string The argument
+ @param key The key for the argument
  */
-- (void)setString:(NSString *)string forKey:(NSString *)key;
+- (void)setString:(nullable NSString *)string forKey:(NSString *)key
+NS_SWIFT_NAME(set(_:forKey:));
 
 /**
  Gets a string argument from the container.
- - Parameter key: The key for the argument
- - Returns: The string value or nil
+ @param key The key for the argument
+ @return The string value or nil
  */
-- (NSString *)stringForKey:(NSString *)key;
+- (nullable NSString *)stringForKey:(NSString *)key;
 
 /**
  Sets a string array argument in the container.
- - Parameter array: The array argument
- - Parameter key: The key for the argument
+ @param array The array argument
+ @param key The key for the argument
  */
-- (void)setArray:(NSArray<NSString *> *)array forKey:(NSString *)key;
+- (void)setArray:(nullable NSArray<NSString *> *)array forKey:(NSString *)key
+NS_SWIFT_NAME(set(_:forKey:));
 
 /**
  Gets an array argument from the container.
- - Parameter key: The key for the argument
- - Returns: The array argument
+ @param key The key for the argument
+ @return The array argument
  */
-- (NSArray *)arrayForKey:(NSString *)key;
+- (nullable NSArray<NSString *> *)arrayForKey:(NSString *)key;
 
 @end
+
+NS_ASSUME_NONNULL_END
+
+#endif

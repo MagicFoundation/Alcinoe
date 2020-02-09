@@ -7,7 +7,7 @@
     <string gender="unknown" name="com_facebook_internet_permission_error_title">AndroidManifest 오류</string>
     <string gender="unknown" name="com_facebook_like_button_liked">좋아요</string>
     <string gender="unknown" name="com_facebook_like_button_not_liked">좋아요</string>
-    <string gender="unknown" name="com_facebook_loading">읽어들이는 중...</string>
+    <string gender="unknown" name="com_facebook_loading">읽어들이는 중…</string>
     <string gender="unknown" name="com_facebook_loginview_cancel_action">취소</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button">로그인</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Facebook으로 계속하기</string>

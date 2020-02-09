@@ -6,7 +6,7 @@
     <string gender="unknown" name="com_facebook_like_button_liked">Nagustuhan</string>
     <string gender="unknown" name="com_facebook_like_button_not_liked">I-like</string>
     <string gender="unknown" name="com_facebook_loading">Naglo-load...</string>
-    <string gender="unknown" name="com_facebook_loginview_cancel_action">Kanselahin</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">I-cancel</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button">Mag-log in</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Magpatuloy gamit ang Facebook</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Mag-log in sa Facebook</string>

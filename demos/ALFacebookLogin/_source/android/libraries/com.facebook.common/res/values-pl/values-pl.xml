@@ -6,7 +6,7 @@
     <string gender="unknown" name="com_facebook_internet_permission_error_title">Błąd AndroidManifest</string>
     <string gender="unknown" name="com_facebook_like_button_liked">Lubisz to</string>
     <string gender="unknown" name="com_facebook_like_button_not_liked">Lubię to!</string>
-    <string gender="unknown" name="com_facebook_loading">Ładowanie…</string>
+    <string gender="unknown" name="com_facebook_loading">Ładowanie\u2026</string>
     <string gender="unknown" name="com_facebook_loginview_cancel_action">Anuluj</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button">Logowanie się</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Kontynuuj za pośrednictwem Facebooka</string>

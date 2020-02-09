@@ -6,7 +6,7 @@
     <string gender="unknown" name="com_facebook_internet_permission_error_title">Pogreška AndroidManifest</string>
     <string gender="unknown" name="com_facebook_like_button_liked">Označeno sa \"sviđa mi se\"</string>
     <string gender="unknown" name="com_facebook_like_button_not_liked">Sviđa mi se</string>
-    <string gender="unknown" name="com_facebook_loading">Učitavanje...</string>
+    <string gender="unknown" name="com_facebook_loading">Učitavanje…</string>
     <string gender="unknown" name="com_facebook_loginview_cancel_action">Odustani</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button">Prijava</string>
     <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Nastavak uz Facebook</string>

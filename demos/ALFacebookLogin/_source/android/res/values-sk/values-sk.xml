@@ -23,7 +23,7 @@
     <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">Nie ste to vy?</string>
     <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">Pokračovať ako %1$s</string>
     <string gender="unknown" name="com_facebook_smart_login_confirmation_title">Potvrdiť prihlásenie</string>
-    <string gender="unknown" name="com_facebook_tooltip_default">Máte to pod kontrolou: vy určujete, ktoré informácie chcete zdieľať s aplikáciami.</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">Máte to pod kontrolou – vyberte, ktoré informácie chcete zdieľať s aplikáciami.</string>
 
 
 

@@ -307,6 +307,8 @@ private:
 	Fmx::Types::TTextAlign __fastcall GetVertTextAlign(void);
 	bool __fastcall GetWordWrap(void);
 	System::UnicodeString __fastcall GetText(void);
+	void __fastcall SetMaxWidth(const float Value);
+	void __fastcall SetMaxHeight(const float Value);
 	bool __fastcall IsMaxWidthStored(void);
 	bool __fastcall IsMaxHeightStored(void);
 	
@@ -374,8 +376,8 @@ __published:
 	__property Fmx::Graphics::TTextSettings* TextSettings = {read=GetTextSettings, write=SetTextSettings};
 	__property Visible = {default=1};
 	__property Width;
-	__property float MaxWidth = {read=fMaxWidth, write=fMaxWidth, stored=IsMaxWidthStored};
-	__property float MaxHeight = {read=fMaxHeight, write=fMaxHeight, stored=IsMaxHeightStored};
+	__property float MaxWidth = {read=fMaxWidth, write=SetMaxWidth, stored=IsMaxWidthStored};
+	__property float MaxHeight = {read=fMaxHeight, write=SetMaxHeight, stored=IsMaxHeightStored};
 	__property OnDragEnter;
 	__property OnDragLeave;
 	__property OnDragOver;

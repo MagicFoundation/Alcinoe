@@ -122,6 +122,9 @@ type
                                                         Var Continue: Boolean);
     {$IFEND}
 
+    {-------------------------------------------------------------------------------------}
+    TALMongoDBClientRunCommandOnNewBatchRowFunct = TALMongoDBClientSelectDataOnNewRowFunct;
+
     {---------------------------------------}
     //bit num     name            description
     // 0	      Reserved	        Must be set to 0.
@@ -150,6 +153,16 @@ type
                                               sfNoCursorTimeout, // The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use.
                                                                  // Set this option to prevent that.
                                               sfPartial);        // Get partial results from a mongos if some shards are down (instead of throwing an error)
+
+    {--------------------------------------------------}
+    TALMongoDBClientRunCommandFlags = set of (cfSlaveOk,         // Allow query of replica slave.
+                                                                 // Note that you should use this flag even if you do not use the automatic routing to secondaries.
+                                                                 // If you connect directly to a secondary in a replica set, you still need to set this flag, which basically tells
+                                                                 // the database that you are aware that you might be getting older data and you're okay with that.
+                                                                 // If you do not call this, you'll get "not master" errors when you try to query.
+                                              cfNoCursorTimeout, // The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use.
+                                                                 // Set this option to prevent that.
+                                              cfPartial);        // Get partial results from a mongos if some shards are down (instead of throwing an error)
 
     {-------------------------------------------------}
     TALMongoDBClientUpdateDataFlags = set of (ufUpsert,       // If set, the database will insert the supplied object into the collection if no matching document is found.
@@ -197,7 +210,7 @@ type
       procedure SetReceiveTimeout(const Value: integer); virtual;
       procedure SetKeepAlive(const Value: boolean); virtual;
       procedure SetTCPNoDelay(const Value: boolean); virtual;
-      procedure CheckError(Error: Boolean);
+      procedure CheckOSError(Error: Boolean);
       procedure DoConnect(var aSocketDescriptor: TSocket;
                           const aHost: AnsiString;
                           const APort: integer;
@@ -212,10 +225,11 @@ type
                        const aCmd: AnsiString;
                        const aGetResponse: boolean): AnsiString;
       Function GetResponse(aSocketDescriptor: TSocket): AnsiString; virtual;
+      Procedure CheckRunCommandResponse(aResponseNode: TalJsonNode); virtual;
       Procedure CheckServerLastError(aSocketDescriptor: TSocket;
                                      var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed, if the preceding operation was an update or remove operation.
-                                     var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                                     var upserted: ansiString); overload; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+                                     var UpdatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
+                                     var Upserted: ansiString); overload; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
       Procedure CheckServerLastError(aSocketDescriptor: TSocket); overload;
       Function BuildOPKILLCURSORSMessage(const requestID: integer;                       // identifier for this message
                                          const responseTo: integer;                      // requestID from the original request (used in reponses from db)
@@ -319,6 +333,13 @@ type
                                  const ViewTag: AnsiString;
                                  Skip: integer;
                                  First: Integer;
+                                 CacheThreshold: Integer;
+                                 TimeTaken: double); virtual;
+      procedure OnRunCommandDone(const DatabaseName: AnsiString;
+                                 const Command: AnsiString;
+                                 flags: TALMongoDBClientRunCommandFlags;
+                                 const RowTag: AnsiString;
+                                 const ViewTag: AnsiString;
                                  CacheThreshold: Integer;
                                  TimeTaken: double); virtual;
       procedure OnUpdateDataDone(const FullCollectionName: AnsiString;
@@ -452,6 +473,42 @@ type
       Procedure SelectData(const FullCollectionName: AnsiString;
                            const Query: AnsiString;
                            const ReturnFieldsSelector: AnsiString;
+                           JSONDATA: TALJSONNode); overload; virtual;
+
+      Procedure RunCommand(const DatabaseName: AnsiString;
+                           const Command: AnsiString; // BSON document that represents the Command
+                           flags: TALMongoDBClientRunCommandFlags; // Options (see TALMongoDBClientRunCommandFlags)
+                           const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
+                           const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
+                           CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                                    // cache or not. Values <= 0 deactivate the cache
+                           JSONDATA: TALJSONNode;
+                           OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
+                           ExtData: Pointer); overload; virtual;
+      Procedure RunCommand(const DatabaseName: AnsiString;
+                           const Command: AnsiString;
+                           flags: TALMongoDBClientRunCommandFlags;
+                           OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
+                           ExtData: Pointer); overload; virtual;
+      Procedure RunCommand(const DatabaseName: AnsiString;
+                           const Command: AnsiString;
+                           flags: TALMongoDBClientRunCommandFlags;
+                           const RowTag: AnsiString;
+                           JSONDATA: TALJSONNode); overload; virtual;
+      Procedure RunCommand(const DatabaseName: AnsiString;
+                           const Command: AnsiString;
+                           flags: TALMongoDBClientRunCommandFlags;
+                           JSONDATA: TALJSONNode); overload; virtual;
+      Procedure RunCommand(const DatabaseName: AnsiString;
+                           const Command: AnsiString;
+                           OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
+                           ExtData: Pointer); overload; virtual;
+      Procedure RunCommand(const DatabaseName: AnsiString;
+                           const Command: AnsiString;
+                           const RowTag: AnsiString;
+                           JSONDATA: TALJSONNode); overload; virtual;
+      Procedure RunCommand(const DatabaseName: AnsiString;
+                           const Command: AnsiString;
                            JSONDATA: TALJSONNode); overload; virtual;
 
       procedure UpdateData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
@@ -672,6 +729,49 @@ type
                            JSONDATA: TALJSONNode;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
 
+      Procedure RunCommand(const DatabaseName: AnsiString;
+                           const Command: AnsiString; // BSON document that represents the Command
+                           flags: TALMongoDBClientRunCommandFlags; // Options (see TALMongoDBClientRunCommandFlags)
+                           const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
+                           const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
+                           CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                                    // cache or not. Values <= 0 deactivate the cache
+                           JSONDATA: TALJSONNode;
+                           OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
+                           ExtData: Pointer;
+                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+      Procedure RunCommand(const DatabaseName: AnsiString;
+                           const Command: AnsiString;
+                           flags: TALMongoDBClientRunCommandFlags;
+                           OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
+                           ExtData: Pointer;
+                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+      Procedure RunCommand(const DatabaseName: AnsiString;
+                           const Command: AnsiString;
+                           flags: TALMongoDBClientRunCommandFlags;
+                           const RowTag: AnsiString;
+                           JSONDATA: TALJSONNode;
+                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+      Procedure RunCommand(const DatabaseName: AnsiString;
+                           const Command: AnsiString;
+                           flags: TALMongoDBClientRunCommandFlags;
+                           JSONDATA: TALJSONNode;
+                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+      Procedure RunCommand(const DatabaseName: AnsiString;
+                           const Command: AnsiString;
+                           OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
+                           ExtData: Pointer;
+                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+      Procedure RunCommand(const DatabaseName: AnsiString;
+                           const Command: AnsiString;
+                           const RowTag: AnsiString;
+                           JSONDATA: TALJSONNode;
+                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+      Procedure RunCommand(const DatabaseName: AnsiString;
+                           const Command: AnsiString;
+                           JSONDATA: TALJSONNode;
+                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+
       procedure UpdateData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
                                                                  // name with the collection name, using a . for the concatenation. For example, for the database
                                                                  // foo and the collection bar, the full collection name is foo.bar
@@ -817,6 +917,7 @@ implementation
 
 uses Winapi.Windows,
      System.Diagnostics,
+     System.math,
      ALCipher,
      AlWinsock,
      ALWindows;
@@ -831,9 +932,9 @@ end;
 
 {**************************************}
 constructor TAlBaseMongoDBClient.Create;
-var aWSAData: TWSAData;
+var LWSAData: TWSAData;
 begin
-  CheckError(WSAStartup(MAKEWORD(2,2), aWSAData) <> 0);
+  CheckOSError(WSAStartup(MAKEWORD(2,2), LWSAData) <> 0);
   FSendTimeout := 2{h}*60{min}*60{s}*1000{ms}; // 2 hours
   FReceiveTimeout := 2{h}*60{min}*60{s}*1000{ms}; // 2 hours
   FKeepAlive := True;
@@ -847,8 +948,8 @@ begin
   inherited;
 end;
 
-{********************************************************}
-procedure TAlBaseMongoDBClient.CheckError(Error: Boolean);
+{**********************************************************}
+procedure TAlBaseMongoDBClient.CheckOSError(Error: Boolean);
 begin
   if Error then RaiseLastOSError;
 end;
@@ -864,25 +965,25 @@ procedure TAlBaseMongoDBClient.DoConnect(var aSocketDescriptor: TSocket;
 
   {--------------------------------------------------------------}
   procedure _CallServer(const Server:AnsiString; const Port:word);
-  var SockAddr:Sockaddr_in;
-      IP: AnsiString;
+  var LSockAddr:Sockaddr_in;
+      LIP: AnsiString;
   begin
     aSocketDescriptor:=Socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
-    CheckError(aSocketDescriptor=INVALID_SOCKET);
-    FillChar(SockAddr,SizeOf(SockAddr),0);
-    SockAddr.sin_family:=AF_INET;
-    SockAddr.sin_port:=swap(Port);
-    SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(Server));
+    CheckOSError(aSocketDescriptor=INVALID_SOCKET);
+    FillChar(LSockAddr,SizeOf(LSockAddr),0);
+    LSockAddr.sin_family:=AF_INET;
+    LSockAddr.sin_port:=swap(Port);
+    LSockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(Server));
     {$IF CompilerVersion >= 23} {Delphi XE2}
-    If SockAddr.sin_addr.S_addr = INADDR_NONE then begin
+    If LSockAddr.sin_addr.S_addr = INADDR_NONE then begin
     {$ELSE}
     If SockAddr.sin_addr.S_addr = integer(INADDR_NONE) then begin
     {$IFEND}
-      checkError(not ALHostToIP(Server, IP));
-      SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(IP));
+      CheckOSError(not ALHostToIP(Server, LIP));
+      LSockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(LIP));
     end;
     {$IF CompilerVersion >= 23} {Delphi XE2}
-    CheckError(Winapi.WinSock2.Connect(aSocketDescriptor,TSockAddr(SockAddr),SizeOf(SockAddr))=SOCKET_ERROR);
+    CheckOSError(Winapi.WinSock2.Connect(aSocketDescriptor,TSockAddr(LSockAddr),SizeOf(LSockAddr))=SOCKET_ERROR);
     {$ELSE}
     CheckError(WinSock.Connect(aSocketDescriptor,SockAddr,SizeOf(SockAddr))=SOCKET_ERROR);
     {$IFEND}
@@ -920,17 +1021,17 @@ end;
 Function TAlBaseMongoDBClient.SendCmd(aSocketDescriptor: TSocket;
                                       const aCmd: AnsiString;
                                       const aGetResponse: boolean): AnsiString;
-Var P: PAnsiChar;
+Var LByteSent: integer;
+    P: PAnsiChar;
     L: Integer;
-    ByteSent: integer;
 begin
   p:=@aCmd[1]; // pchar
   l:=length(aCmd);
   while l>0 do begin
-    ByteSent:=SocketWrite(aSocketDescriptor, p^,l);
-    if ByteSent<=0 then raise EALException.Create('Connection close gracefully!');
-    inc(p,ByteSent);
-    dec(l,ByteSent);
+    LByteSent:=SocketWrite(aSocketDescriptor, p^,l);
+    if LByteSent<=0 then raise EALException.Create('Connection close gracefully!');
+    inc(p,LByteSent);
+    dec(l,LByteSent);
   end;
   if aGetResponse then Result := GetResponse(aSocketDescriptor)
   else result := '';
@@ -938,58 +1039,79 @@ end;
 
 {********************************************************************************}
 function TAlBaseMongoDBClient.GetResponse(aSocketDescriptor: TSocket): AnsiString;
-Var aBytesReceived: Integer;
-    aResultPos: Integer;
-    aMessageLength: Integer;
-const aBuffSize: integer = 8192;
+Var LBytesReceived: Integer;
+    LResultPos: Integer;
+    LMessageLength: Integer;
+const LBuffSize: integer = 8192;
 begin
 
   //init local var
-  Setlength(Result,aBuffSize);
-  aResultPos := 0;
-  aMessageLength := 0;
+  Setlength(Result,LBuffSize);
+  LResultPos := 0;
+  LMessageLength := 0;
 
   //loop still we receive the full answer
   While True do begin
 
     //expnd the buffer
-    if aResultPos = length(Result) then setlength(Result, length(Result) + aBuffSize);
+    if LResultPos = length(Result) then setlength(Result, length(Result) + LBuffSize);
 
     //read string from socket
-    aBytesReceived := SocketRead(aSocketDescriptor, Result[aResultPos+1], length(Result) - aResultPos);
-    If aBytesReceived <= 0 then raise EALException.Create('Connection close gracefully!');
-    aResultPos := aResultPos + aBytesReceived;
+    LBytesReceived := SocketRead(aSocketDescriptor, Result[LResultPos+1], length(Result) - LResultPos);
+    If LBytesReceived <= 0 then raise EALException.Create('Connection close gracefully!');
+    LResultPos := LResultPos + LBytesReceived;
 
     //the first 4 bytes contain the length of the message
-    if (aMessageLength = 0) and (aResultPos >= sizeof(aMessageLength)) then begin
-      ALMove(Result[1], aMessageLength, sizeof(aMessageLength));
-      if aMessageLength < aResultPos then raise EALException.Create('Wrong socket response');
-      setlength(Result, aMessageLength);
+    if (LMessageLength = 0) and (LResultPos >= sizeof(LMessageLength)) then begin
+      ALMove(Result[1], LMessageLength, sizeof(LMessageLength));
+      if LMessageLength < LResultPos then raise EALException.Create('Wrong socket response');
+      setlength(Result, LMessageLength);
     end;
 
     //break if we are at the end of the message
-    if aResultPos = aMessageLength then break;
+    if LResultPos = LMessageLength then break;
 
   end;
+
+end;
+
+{*********************************************************************************}
+Procedure TAlBaseMongoDBClient.CheckRunCommandResponse(aResponseNode: TalJsonNode);
+begin
+
+  //
+  //{
+  //  "ok" : 0.0,
+  //  "errmsg" : "cursor id 379994841580103813 not found",
+  //  "code" : 43.0,
+  //  "codeName" : "CursorNotFound"
+  //}
+  //
+
+  if not sameValue(aResponseNode.GetChildNodeValueFloat('ok', 0), 1) then
+    raise EAlMongoDBClientException.Create(aResponseNode.GetChildNodeValueText('errmsg', 'Misc Error'), // const aMsg: AnsiString;
+                                           aResponseNode.GetChildNodeValueInt32('code', 0)); // const aErrorCode: integer;
 
 end;
 
 {*****************************************************************************}
 Procedure TAlBaseMongoDBClient.CheckServerLastError(aSocketDescriptor: TSocket;
                                                     var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed, if the preceding operation was an update or remove operation.
-                                                    var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                                                    var upserted: ansiString); // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+                                                    var UpdatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
+                                                    var Upserted: ansiString); // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
 
-Var aResponseFlags: integer;
-    aCursorID: int64;
-    aStartingFrom: integer;
-    aNumberReturned: integer;
-    aContinue: boolean;
-    aJSONDoc: TALJSONDocument;
-    aNode: TALJSONNode;
+Var LResponseFlags: integer;
+    LCursorID: int64;
+    LStartingFrom: integer;
+    LNumberReturned: integer;
+    LContinue: boolean;
+    LJSONDoc: TALJSONDocument;
+    LCodeNode: TALJSONNode;
+    LCodeInt: int32;
+    LNode: TALJSONNode;
 
 begin
-  aJSONDoc := TALJSONDocument.Create;
+  LJSONDoc := TALJSONDocument.Create;
   try
 
     //do the First query
@@ -1000,77 +1122,99 @@ begin
              1, // First
              '{getLastError:1}', // query
              '', // ReturnFieldsSelector,
-             aResponseFlags,
-             aCursorID,
-             aStartingFrom,
-             aNumberReturned,
-             aJSONDoc.Node,
+             LResponseFlags,
+             LCursorID,
+             LStartingFrom,
+             LNumberReturned,
+             LJSONDoc.Node,
              nil,
              nil,
              '',
              '',
-             aContinue);
+             LContinue);
     try
 
-      aJSONDoc.Options := [doNodeAutoCreate];
+      CheckRunCommandResponse(LJSONDoc.Node);
 
-      if aJSONDoc.Node.ChildNodes['ok'].Text <> '1' then raise Exception.Create('Error calling getLastError');
+      LCodeNode := LJSONDoc.Node.ChildNodes.FindNode('code');
+      if assigned(LCodeNode) and (not LCodeNode.Null) then LCodeInt := LCodeNode.int32
+      else LCodeInt := 0;
 
-      aNode := aJSONDoc.Node.ChildNodes.FindNode('err');
-      if assigned(aNode) and (not anode.Null) then raise EAlMongoDBClientException.Create(aNode.Text,
-                                                                                          ALIfThen(ALIsInteger(aJSONDoc.Node.ChildNodes['code'].Text),
-                                                                                                   ALStrToInt(aJSONDoc.Node.ChildNodes['code'].Text),
-                                                                                                   0));
+      //err is null unless an error occurs. When there was an error with the preceding
+      //operation, err contains a string identifying the error.
+      LNode := LJSONDoc.Node.ChildNodes.FindNode('err');
+      if assigned(LNode) and (not LNode.Null) then
+        raise EAlMongoDBClientException.Create(LNode.Text, LCodeInt);
 
-      aNode := aJSONDoc.Node.ChildNodes.FindNode('code');
-      if assigned(aNode) then raise EAlMongoDBClientException.Create('Misc Error',aNode.int32);
+      //errmsg contains the description of the error. errmsg only appears
+      //if there was an error with the preceding operation.
+      LNode := LJSONDoc.Node.ChildNodes.FindNode('errmsg');
+      if assigned(LNode) and (not LNode.Null) then
+        raise EAlMongoDBClientException.Create(LNode.Text, LCodeInt);
 
-      aNode := aJSONDoc.Node.ChildNodes.FindNode('n');
-      if assigned(aNode) then NumberOfDocumentsUpdatedOrRemoved := aNode.int32
+      //code reports the preceding operation's error code.
+      if assigned(LCodeNode) and (not LCodeNode.Null) then
+        raise EAlMongoDBClientException.Create('Misc Error',LCodeInt);
+
+      //If the preceding operation was an update or a remove operation, but not a findAndModify
+      //operation, n reports the number of documents matched by the update or remove operation.
+      //
+      //For a remove operation, the number of matched documents will equal the number removed.
+      //
+      //For an update operation, if the operation results in no change to the document, such as setting
+      //the value of the field to its current value, the number of matched documents may be smaller than
+      //the number of documents actually modified. If the update includes the upsert:true option and
+      //results in the creation of a new document, n returns the number of documents inserted.
+      //
+      //n is 0 if reporting on an update or remove that occurs through a findAndModify operation.
+      LNode := LJSONDoc.Node.ChildNodes.FindNode('n');
+      if assigned(LNode) then NumberOfDocumentsUpdatedOrRemoved := LNode.int32
       else NumberOfDocumentsUpdatedOrRemoved := 0;
 
+      //updatedExisting is true when an update affects at least one document and
+      //does not result in an upsert.
+      LNode := LJSONDoc.Node.ChildNodes.FindNode('updatedExisting');
+      if assigned(LNode) then UpdatedExisting := LNode.bool
+      else UpdatedExisting := False;
 
-      aNode := aJSONDoc.Node.ChildNodes.FindNode('updatedExisting');
-      if assigned(aNode) then updatedExisting := aNode.bool
-      else updatedExisting := False;
-
-      aNode := aJSONDoc.Node.ChildNodes.FindNode('upserted');
-      if assigned(aNode) then upserted := aNode.text
-      else upserted := '';
+      //If the update results in an insert, upserted is the value of _id field of the document.
+      LNode := LJSONDoc.Node.ChildNodes.FindNode('upserted');
+      if assigned(LNode) then Upserted := LNode.text
+      else Upserted := '';
 
     finally
 
       //close the curson
-      if aCursorId <> 0 then OP_KILL_CURSORS(aSocketDescriptor, [aCursorID]);
+      if LCursorID <> 0 then OP_KILL_CURSORS(aSocketDescriptor, [LCursorID]);
 
     end;
 
   finally
-    aJSONDoc.free;
+    LJSONDoc.free;
   end;
 end;
 
 {******************************************************************************}
 Procedure TAlBaseMongoDBClient.CheckServerLastError(aSocketDescriptor: TSocket);
-var aNumberOfDocumentsUpdatedOrRemoved: integer;
-    updatedExisting: boolean;
-    upserted: ansiString;
+var LNumberOfDocumentsUpdatedOrRemoved: integer;
+    LUpdatedExisting: boolean;
+    LUpserted: ansiString;
 begin
   CheckServerLastError(aSocketDescriptor,
-                       aNumberOfDocumentsUpdatedOrRemoved,
-                       updatedExisting,
-                       upserted);
+                       LNumberOfDocumentsUpdatedOrRemoved,
+                       LUpdatedExisting,
+                       LUpserted);
 end;
 
 {*******************************************************************************}
 Function TAlBaseMongoDBClient.BuildOPKILLCURSORSMessage(const requestID: integer;                       // identifier for this message
                                                         const responseTo: integer;                      // requestID from the original request (used in reponses from db)
                                                         const cursorIDs: array of int64): ansiString;   // cursorIDs to be close
-var aCurrPos: integer;
-    aMessageLength: Integer;
-    aOPCode: integer;
-    aZERO: integer;
-    anumberOfCursorIDs: integer;
+var LCurrPos: integer;
+    LMessageLength: Integer;
+    LOPCode: integer;
+    LZERO: integer;
+    LNumberOfCursorIDs: integer;
     i: integer;
 begin
 
@@ -1083,51 +1227,51 @@ begin
   //
 
   //exit if no cursorID
-  anumberOfCursorIDs := length(cursorIDs);
-  if anumberOfCursorIDs <= 0 then exit;
+  LNumberOfCursorIDs := length(cursorIDs);
+  if LNumberOfCursorIDs <= 0 then exit;
 
   // init aMessageLength
-  aMessageLength := sizeof(aMessageLength) +
+  LMessageLength := sizeof(LMessageLength) +
                     sizeof(requestID) +
                     sizeof(responseTo) +
-                    sizeof(aOPCode) +
-                    sizeof(aZERO) +
-                    sizeof(anumberOfCursorIDs) +
-                    anumberOfCursorIDs * sizeof(cursorIDs[low(cursorIDs)]);
+                    sizeof(LOPCode) +
+                    sizeof(LZERO) +
+                    sizeof(LNumberOfCursorIDs) +
+                    LNumberOfCursorIDs * sizeof(cursorIDs[low(cursorIDs)]);
 
   //init the length of the result
-  setlength(result, amessageLength);
-  aCurrPos := 1;
+  setlength(result, LMessageLength);
+  LCurrPos := 1;
 
   // messageLength
-  ALMove(aMessageLength, Result[aCurrPos], sizeof(aMessageLength));
-  inc(aCurrPos,sizeof(aMessageLength));
+  ALMove(LMessageLength, Result[LCurrPos], sizeof(LMessageLength));
+  inc(LCurrPos,sizeof(LMessageLength));
 
   //requestID
-  ALMove(requestID, Result[aCurrPos], sizeof(requestID));
-  inc(aCurrPos,sizeof(requestID));
+  ALMove(requestID, Result[LCurrPos], sizeof(requestID));
+  inc(LCurrPos,sizeof(requestID));
 
   //responseTo
-  ALMove(responseTo, Result[aCurrPos], sizeof(responseTo));
-  inc(aCurrPos,sizeof(responseTo));
+  ALMove(responseTo, Result[LCurrPos], sizeof(responseTo));
+  inc(LCurrPos,sizeof(responseTo));
 
   //opCode
-  aOPCode := MONGO_OP_KILL_CURSORS;
-  ALMove(aOPCode, Result[aCurrPos], sizeof(aOPCode));
-  inc(aCurrPos,sizeof(aOPCode));
+  LOPCode := MONGO_OP_KILL_CURSORS;
+  ALMove(LOPCode, Result[LCurrPos], sizeof(LOPCode));
+  inc(LCurrPos,sizeof(LOPCode));
 
   //aZERO
-  aZERO := 0;
-  ALMove(aZERO, Result[aCurrPos], sizeof(aZERO));
-  inc(aCurrPos,sizeof(aZERO));
+  LZERO := 0;
+  ALMove(LZERO, Result[LCurrPos], sizeof(LZERO));
+  inc(LCurrPos,sizeof(LZERO));
 
   //anumberOfCursorIDs
-  ALMove(anumberOfCursorIDs, Result[aCurrPos], sizeof(anumberOfCursorIDs));
-  inc(aCurrPos,sizeof(anumberOfCursorIDs));
+  ALMove(LNumberOfCursorIDs, Result[LCurrPos], sizeof(LNumberOfCursorIDs));
+  inc(LCurrPos,sizeof(LNumberOfCursorIDs));
 
   //cursorIDs
   for i := low(cursorIDs) to High(cursorIDs) do
-    ALMove(cursorIDs[i], Result[aCurrPos], sizeof(cursorIDs[i]));
+    ALMove(cursorIDs[i], Result[LCurrPos], sizeof(cursorIDs[i]));
 
 end;
 
@@ -1137,12 +1281,12 @@ Function TAlBaseMongoDBClient.BuildOPINSERTMessage(const requestID: integer;    
                                                    const flags: integer;                                // bit vector
                                                    const fullCollectionName: ansiString;                // "dbname.collectionname"
                                                    const documents: ansiString): ansiString;            // one or more documents to insert into the collection
-var aCurrPos: integer;
-    aMessageLength: Integer;
-    aTmpInt: integer;
-    aOPCode: integer;
-    aBsonDocuments: ansiString;
-    aJsonDocument: TALJsonDocument;
+var LCurrPos: integer;
+    LMessageLength: Integer;
+    LTmpInt: integer;
+    LOPCode: integer;
+    LBsonDocuments: ansiString;
+    LJsonDocument: TALJsonDocument;
     i: integer;
 begin
 
@@ -1155,79 +1299,79 @@ begin
   //
 
   //init aBsonQuery
-  if (length(documents) > sizeof(aMessageLength)) then ALMove(documents[1], aMessageLength, sizeof(aMessageLength))
-  else aMessageLength := 0;
-  while (aMessageLength > 0) and
-        (aMessageLength <= length(documents) - sizeof(aTmpInt)) do begin
-    ALMove(documents[aMessageLength+1], aTmpInt, sizeof(aTmpInt));
-    if aTmpInt <= 0 then break;
-    aMessageLength := aMessageLength + aTmpInt;
+  if (length(documents) > sizeof(LMessageLength)) then ALMove(documents[1], LMessageLength, sizeof(LMessageLength))
+  else LMessageLength := 0;
+  while (LMessageLength > 0) and
+        (LMessageLength <= length(documents) - sizeof(LTmpInt)) do begin
+    ALMove(documents[LMessageLength+1], LTmpInt, sizeof(LTmpInt));
+    if LTmpInt <= 0 then break;
+    LMessageLength := LMessageLength + LTmpInt;
   end;
-  if (aMessageLength <> length(documents)) or
+  if (LMessageLength <> length(documents)) or
      ((length(documents) > 0) and
       (documents[length(documents)] <> #0)) then begin
-    aJsonDocument := TALJsonDocument.Create;
+    LJsonDocument := TALJsonDocument.Create;
     try
-      aJsonDocument.LoadFromJSONString('{"documents":' + documents + '}'); // { .... }                      => {"documents":{ .... } }
-                                                                     // [{ ... }, { ... }, { ... }]   => {"documents":[{ ... }, { ... }, { ... }] }
-      aBsonDocuments := '';
-      with aJsonDocument.Node.ChildNodes['documents'] do begin
-        if nodeType = ntObject then aBsonDocuments := BSON  // {"documents":{ .... } }
+      LJsonDocument.LoadFromJSONString('{"documents":' + documents + '}'); // { .... }                      => {"documents":{ .... } }
+                                                                           // [{ ... }, { ... }, { ... }]   => {"documents":[{ ... }, { ... }, { ... }] }
+      LBsonDocuments := '';
+      with LJsonDocument.Node.ChildNodes['documents'] do begin
+        if nodeType = ntObject then LBsonDocuments := BSON  // {"documents":{ .... } }
         else begin  // {"documents":[{ ... }, { ... }, { ... }] }
           for I := 0 to ChildNodes.Count - 1 do
-            aBsonDocuments := aBsonDocuments + ChildNodes[i].BSON;
+            LBsonDocuments := LBsonDocuments + ChildNodes[i].BSON;
         end;
       end;
     finally
-      aJsonDocument.Free;
+      LJsonDocument.Free;
     end;
   end
-  else aBsonDocuments := documents;
+  else LBsonDocuments := documents;
 
   // init aMessageLength
-  aMessageLength := sizeof(aMessageLength) +
+  LMessageLength := sizeof(LMessageLength) +
                     sizeof(requestID) +
                     sizeof(responseTo) +
-                    sizeof(aOPCode) +
+                    sizeof(LOPCode) +
                     sizeof(flags) +
                     length(fullCollectionName) + 1{the trailing #0} +
-                    length(aBsonDocuments);
+                    length(LBsonDocuments);
 
   //init the length of the result
-  setlength(result, amessageLength);
-  aCurrPos := 1;
+  setlength(result, LMessageLength);
+  LCurrPos := 1;
 
   // messageLength
-  ALMove(aMessageLength, Result[aCurrPos], sizeof(aMessageLength));
-  inc(aCurrPos,sizeof(aMessageLength));
+  ALMove(LMessageLength, Result[LCurrPos], sizeof(LMessageLength));
+  inc(LCurrPos,sizeof(LMessageLength));
 
   //requestID
-  ALMove(requestID, Result[aCurrPos], sizeof(requestID));
-  inc(aCurrPos,sizeof(requestID));
+  ALMove(requestID, Result[LCurrPos], sizeof(requestID));
+  inc(LCurrPos,sizeof(requestID));
 
   //responseTo
-  ALMove(responseTo, Result[aCurrPos], sizeof(responseTo));
-  inc(aCurrPos,sizeof(responseTo));
+  ALMove(responseTo, Result[LCurrPos], sizeof(responseTo));
+  inc(LCurrPos,sizeof(responseTo));
 
   //opCode
-  aOPCode := MONGO_OP_INSERT;
-  ALMove(aOPCode, Result[aCurrPos], sizeof(aOPCode));
-  inc(aCurrPos,sizeof(aOPCode));
+  LOPCode := MONGO_OP_INSERT;
+  ALMove(LOPCode, Result[LCurrPos], sizeof(LOPCode));
+  inc(LCurrPos,sizeof(LOPCode));
 
   //flags
-  ALMove(flags, Result[aCurrPos], sizeof(flags));
-  inc(aCurrPos,sizeof(flags));
+  ALMove(flags, Result[LCurrPos], sizeof(flags));
+  inc(LCurrPos,sizeof(flags));
 
   //fullCollectionName
-  if length(fullCollectionName) <= 0 then raise Exception.Create('FullCollectionName must not be empty');
-  ALMove(fullCollectionName[1], result[aCurrPos], length(fullCollectionName));
-  inc(aCurrPos,length(fullCollectionName));
-  result[aCurrPos] := #0;
-  inc(aCurrPos);
+  if length(fullCollectionName) <= 0 then raise EALException.Create('FullCollectionName must not be empty');
+  ALMove(fullCollectionName[1], result[LCurrPos], length(fullCollectionName));
+  inc(LCurrPos,length(fullCollectionName));
+  result[LCurrPos] := #0;
+  inc(LCurrPos);
 
   //aBsonDocuments
-  if length(aBsonDocuments) <= 0 then raise Exception.Create('documents must not be empty');
-  ALMove(aBsonDocuments[1], result[aCurrPos], length(aBsonDocuments));
+  if length(LBsonDocuments) <= 0 then raise EALException.Create('documents must not be empty');
+  ALMove(LBsonDocuments[1], result[LCurrPos], length(LBsonDocuments));
 
 end;
 
@@ -1238,13 +1382,13 @@ Function TAlBaseMongoDBClient.BuildOPUPDATEMessage(const requestID: integer;    
                                                    const fullCollectionName: ansiString;                // "dbname.collectionname"
                                                    const selector: ansiString;                          // the query to select the document
                                                    const update: ansiString): ansiString;               // specification of the update to perform
-var aCurrPos: integer;
-    aMessageLength: Integer;
-    aOPCode: integer;
-    aZERO: integer;
-    aBsonselector: ansiString;
-    aBsonupdate: AnsiString;
-    aJSONDocument: TalJSONDocument;
+var LCurrPos: integer;
+    LMessageLength: Integer;
+    LOPCode: integer;
+    LZERO: integer;
+    LBsonSelector: ansiString;
+    LBsonUpdate: AnsiString;
+    LJSONDocument: TalJSONDocument;
 begin
 
   //
@@ -1256,97 +1400,97 @@ begin
   //
 
   //init aBsonselector
-  if (length(Selector) > sizeof(aMessageLength)) then ALMove(Selector[1], aMessageLength, sizeof(aMessageLength))
-  else aMessageLength := 0;
-  if (aMessageLength <> length(Selector)) or
+  if (length(Selector) > sizeof(LMessageLength)) then ALMove(Selector[1], LMessageLength, sizeof(LMessageLength))
+  else LMessageLength := 0;
+  if (LMessageLength <> length(Selector)) or
    ((length(Selector) > 0) and
     (Selector[length(Selector)] <> #0)) then begin
-    aJsonDocument := TALJsonDocument.Create;
+    LJSONDocument := TALJsonDocument.Create;
     try
-      aJsonDocument.LoadFromJSONString(Selector);
-      aJsonDocument.SaveToBSONString(aBsonSelector);
+      LJSONDocument.LoadFromJSONString(Selector);
+      LJSONDocument.SaveToBSONString(LBsonSelector);
     finally
-      aJsonDocument.Free;
+      LJSONDocument.Free;
     end;
   end
   else begin
-    if Selector = '' then aBsonSelector := #5#0#0#0#0 // empty BSON
-    else aBsonSelector := Selector;
+    if Selector = '' then LBsonSelector := #5#0#0#0#0 // empty BSON
+    else LBsonSelector := Selector;
   end;
 
   //init aBSONUpdate
-  if (length(Update) > sizeof(aMessageLength)) then ALMove(Update[1], aMessageLength, sizeof(aMessageLength))
-  else aMessageLength := 0;
-  if (aMessageLength <> length(Update)) or
+  if (length(Update) > sizeof(LMessageLength)) then ALMove(Update[1], LMessageLength, sizeof(LMessageLength))
+  else LMessageLength := 0;
+  if (LMessageLength <> length(Update)) or
      ((length(Update) > 0) and
       (Update[length(Update)] <> #0)) then begin
-    aJsonDocument := TALJsonDocument.Create;
+    LJSONDocument := TALJsonDocument.Create;
     try
-      aJsonDocument.LoadFromJSONString(Update);
-      aJsonDocument.SaveToBSONString(aBsonUpdate);
+      LJSONDocument.LoadFromJSONString(Update);
+      LJSONDocument.SaveToBSONString(LBsonUpdate);
     finally
-      aJsonDocument.Free;
+      LJSONDocument.Free;
     end;
   end
   else begin
-    if Update = '' then aBsonUpdate := #5#0#0#0#0 // empty BSON
-    else aBsonUpdate := Update;
+    if Update = '' then LBsonUpdate := #5#0#0#0#0 // empty BSON
+    else LBsonUpdate := Update;
   end;
 
   // init aMessageLength
-  aMessageLength := sizeof(aMessageLength) +
+  LMessageLength := sizeof(LMessageLength) +
                     sizeof(requestID) +
                     sizeof(responseTo) +
-                    sizeof(aOPCode) +
-                    sizeof(aZERO) +
+                    sizeof(LOPCode) +
+                    sizeof(LZERO) +
                     length(fullCollectionName) + 1{the trailing #0} +
                     sizeof(flags) +
-                    length(aBsonselector) +
-                    length(aBSONUpdate);
+                    length(LBsonSelector) +
+                    length(LBsonUpdate);
 
   //init the length of the result
-  setlength(result, amessageLength);
-  aCurrPos := 1;
+  setlength(result, LMessageLength);
+  LCurrPos := 1;
 
   // messageLength
-  ALMove(aMessageLength, Result[aCurrPos], sizeof(aMessageLength));
-  inc(aCurrPos,sizeof(aMessageLength));
+  ALMove(LMessageLength, Result[LCurrPos], sizeof(LMessageLength));
+  inc(LCurrPos,sizeof(LMessageLength));
 
   //requestID
-  ALMove(requestID, Result[aCurrPos], sizeof(requestID));
-  inc(aCurrPos,sizeof(requestID));
+  ALMove(requestID, Result[LCurrPos], sizeof(requestID));
+  inc(LCurrPos,sizeof(requestID));
 
   //responseTo
-  ALMove(responseTo, Result[aCurrPos], sizeof(responseTo));
-  inc(aCurrPos,sizeof(responseTo));
+  ALMove(responseTo, Result[LCurrPos], sizeof(responseTo));
+  inc(LCurrPos,sizeof(responseTo));
 
   //opCode
-  aOPCode := MONGO_OP_UPDATE;
-  ALMove(aOPCode, Result[aCurrPos], sizeof(aOPCode));
-  inc(aCurrPos,sizeof(aOPCode));
+  LOPCode := MONGO_OP_UPDATE;
+  ALMove(LOPCode, Result[LCurrPos], sizeof(LOPCode));
+  inc(LCurrPos,sizeof(LOPCode));
 
   //ZERO
-  aZERO := 0;
-  ALMove(aZERO, Result[aCurrPos], sizeof(aZERO));
-  inc(aCurrPos,sizeof(aZERO));
+  LZERO := 0;
+  ALMove(LZERO, Result[LCurrPos], sizeof(LZERO));
+  inc(LCurrPos,sizeof(LZERO));
 
   //fullCollectionName
-  if length(fullCollectionName) <= 0 then raise Exception.Create('FullCollectionName must not be empty');
-  ALMove(fullCollectionName[1], result[aCurrPos], length(fullCollectionName));
-  inc(aCurrPos,length(fullCollectionName));
-  result[aCurrPos] := #0;
-  inc(aCurrPos);
+  if length(fullCollectionName) <= 0 then raise EALException.Create('FullCollectionName must not be empty');
+  ALMove(fullCollectionName[1], result[LCurrPos], length(fullCollectionName));
+  inc(LCurrPos,length(fullCollectionName));
+  result[LCurrPos] := #0;
+  inc(LCurrPos);
 
   //flags
-  ALMove(flags, Result[aCurrPos], sizeof(flags));
-  inc(aCurrPos,sizeof(flags));
+  ALMove(flags, Result[LCurrPos], sizeof(flags));
+  inc(LCurrPos,sizeof(flags));
 
   //aBsonselector
-  ALMove(aBsonselector[1], result[aCurrPos], length(aBsonselector));
-  inc(aCurrPos,length(aBsonselector));
+  ALMove(LBsonSelector[1], result[LCurrPos], length(LBsonSelector));
+  inc(LCurrPos,length(LBsonSelector));
 
   //aBSONUpdate
-  ALMove(aBSONUpdate[1], result[aCurrPos], length(aBSONUpdate));
+  ALMove(LBsonUpdate[1], result[LCurrPos], length(LBsonUpdate));
 
 end;
 
@@ -1356,12 +1500,12 @@ Function TAlBaseMongoDBClient.BuildOPDELETEMessage(const requestID: integer;    
                                                    const flags: integer;                                // bit vector
                                                    const fullCollectionName: ansiString;                // "dbname.collectionname"
                                                    const selector: ansiString): ansiString;             // query object.
-var aCurrPos: integer;
-    aMessageLength: Integer;
-    aOPCode: integer;
-    aZERO: integer;
-    aBsonselector: ansiString;
-    aJSONDocument: TalJSONDocument;
+var LCurrPos: integer;
+    LMessageLength: Integer;
+    LOPCode: integer;
+    LZERO: integer;
+    LBsonSelector: ansiString;
+    LJSONDocument: TalJSONDocument;
 begin
 
   //
@@ -1373,73 +1517,73 @@ begin
   //
 
   //init aBsonselector
-  if (length(Selector) > sizeof(aMessageLength)) then ALMove(Selector[1], aMessageLength, sizeof(aMessageLength))
-  else aMessageLength := 0;
-  if (aMessageLength <> length(Selector)) or
+  if (length(Selector) > sizeof(LMessageLength)) then ALMove(Selector[1], LMessageLength, sizeof(LMessageLength))
+  else LMessageLength := 0;
+  if (LMessageLength <> length(Selector)) or
      ((length(Selector) > 0) and
       (Selector[length(Selector)] <> #0)) then begin
-    aJsonDocument := TALJsonDocument.Create;
+    LJSONDocument := TALJsonDocument.Create;
     try
-      aJsonDocument.LoadFromJSONString(Selector);
-      aJsonDocument.SaveToBSONString(aBsonSelector);
+      LJSONDocument.LoadFromJSONString(Selector);
+      LJSONDocument.SaveToBSONString(LBsonSelector);
     finally
-      aJsonDocument.Free;
+      LJSONDocument.Free;
     end;
   end
   else begin
-    if Selector = '' then aBsonSelector := #5#0#0#0#0 // empty BSON
-    else aBsonSelector := Selector;
+    if Selector = '' then LBsonSelector := #5#0#0#0#0 // empty BSON
+    else LBsonSelector := Selector;
   end;
 
   // init aMessageLength
-  aMessageLength := sizeof(aMessageLength) +
+  LMessageLength := sizeof(LMessageLength) +
                     sizeof(requestID) +
                     sizeof(responseTo) +
-                    sizeof(aOPCode) +
-                    sizeof(aZERO) +
+                    sizeof(LOPCode) +
+                    sizeof(LZERO) +
                     length(fullCollectionName) + 1{the trailing #0} +
                     sizeof(flags) +
-                    length(aBsonselector);
+                    length(LBsonSelector);
 
   //init the length of the result
-  setlength(result, amessageLength);
-  aCurrPos := 1;
+  setlength(result, LMessageLength);
+  LCurrPos := 1;
 
   // messageLength
-  ALMove(aMessageLength, Result[aCurrPos], sizeof(aMessageLength));
-  inc(aCurrPos,sizeof(aMessageLength));
+  ALMove(LMessageLength, Result[LCurrPos], sizeof(LMessageLength));
+  inc(LCurrPos,sizeof(LMessageLength));
 
   //requestID
-  ALMove(requestID, Result[aCurrPos], sizeof(requestID));
-  inc(aCurrPos,sizeof(requestID));
+  ALMove(requestID, Result[LCurrPos], sizeof(requestID));
+  inc(LCurrPos,sizeof(requestID));
 
   //responseTo
-  ALMove(responseTo, Result[aCurrPos], sizeof(responseTo));
-  inc(aCurrPos,sizeof(responseTo));
+  ALMove(responseTo, Result[LCurrPos], sizeof(responseTo));
+  inc(LCurrPos,sizeof(responseTo));
 
   //opCode
-  aOPCode := MONGO_OP_DELETE;
-  ALMove(aOPCode, Result[aCurrPos], sizeof(aOPCode));
-  inc(aCurrPos,sizeof(aOPCode));
+  LOPCode := MONGO_OP_DELETE;
+  ALMove(LOPCode, Result[LCurrPos], sizeof(LOPCode));
+  inc(LCurrPos,sizeof(LOPCode));
 
   //ZERO
-  aZERO := 0;
-  ALMove(aZERO, Result[aCurrPos], sizeof(aZERO));
-  inc(aCurrPos,sizeof(aZERO));
+  LZERO := 0;
+  ALMove(LZERO, Result[LCurrPos], sizeof(LZERO));
+  inc(LCurrPos,sizeof(LZERO));
 
   //fullCollectionName
-  if length(fullCollectionName) <= 0 then raise Exception.Create('FullCollectionName must not be empty');
-  ALMove(fullCollectionName[1], result[aCurrPos], length(fullCollectionName));
-  inc(aCurrPos,length(fullCollectionName));
-  result[aCurrPos] := #0;
-  inc(aCurrPos);
+  if length(fullCollectionName) <= 0 then raise EALException.Create('FullCollectionName must not be empty');
+  ALMove(fullCollectionName[1], result[LCurrPos], length(fullCollectionName));
+  inc(LCurrPos,length(fullCollectionName));
+  result[LCurrPos] := #0;
+  inc(LCurrPos);
 
   //flags
-  ALMove(flags, Result[aCurrPos], sizeof(flags));
-  inc(aCurrPos,sizeof(flags));
+  ALMove(flags, Result[LCurrPos], sizeof(flags));
+  inc(LCurrPos,sizeof(flags));
 
   //aBsonselector
-  ALMove(aBsonselector[1], result[aCurrPos], length(aBsonselector));
+  ALMove(LBsonSelector[1], result[LCurrPos], length(LBsonSelector));
 
 end;
 
@@ -1452,12 +1596,12 @@ Function TAlBaseMongoDBClient.BuildOPQUERYMessage(const requestID: integer;     
                                                   const numberToReturn: integer;                        // number of documents to return in the first OP_REPLY batch
                                                   const query: ansiString;                              // query object
                                                   const returnFieldsSelector: ansiString): AnsiString;  // Optional. Selector indicating the fields to return
-var aCurrPos: integer;
-    aMessageLength: Integer;
-    aOPCode: integer;
-    aBsonQuery: ansiString;
-    aBSONReturnFieldsSelector: ansiString;
-    aJsonDocument: TALJsonDocument;
+var LCurrPos: integer;
+    LMessageLength: Integer;
+    LOPCode: integer;
+    LBsonQuery: ansiString;
+    LBSONReturnFieldsSelector: ansiString;
+    LJsonDocument: TALJsonDocument;
 begin
 
   //
@@ -1469,99 +1613,99 @@ begin
   //
 
   //init aBsonQuery
-  if (length(Query) > sizeof(aMessageLength)) then ALMove(Query[1], aMessageLength, sizeof(aMessageLength))
-  else aMessageLength := 0;
-  if (aMessageLength <> length(Query)) or
+  if (length(Query) > sizeof(LMessageLength)) then ALMove(Query[1], LMessageLength, sizeof(LMessageLength))
+  else LMessageLength := 0;
+  if (LMessageLength <> length(Query)) or
      ((length(Query) > 0) and
       (Query[length(Query)] <> #0)) then begin
-    aJsonDocument := TALJsonDocument.Create;
+    LJsonDocument := TALJsonDocument.Create;
     try
-      aJsonDocument.LoadFromJSONString(Query);
-      aJsonDocument.SaveToBSONString(aBsonQuery);
+      LJsonDocument.LoadFromJSONString(Query);
+      LJsonDocument.SaveToBSONString(LBsonQuery);
     finally
-      aJsonDocument.Free;
+      LJsonDocument.Free;
     end;
   end
   else begin
-    if Query = '' then aBsonQuery := #5#0#0#0#0 // empty BSON
-    else aBsonQuery := Query;
+    if Query = '' then LBsonQuery := #5#0#0#0#0 // empty BSON
+    else LBsonQuery := Query;
   end;
 
   //init aBSONReturnFieldsSelector
-  if (length(ReturnFieldsSelector) > sizeof(aMessageLength)) then ALMove(ReturnFieldsSelector[1], aMessageLength, sizeof(aMessageLength))
-  else aMessageLength := 0;
-  if (aMessageLength <> length(ReturnFieldsSelector)) or
+  if (length(ReturnFieldsSelector) > sizeof(LMessageLength)) then ALMove(ReturnFieldsSelector[1], LMessageLength, sizeof(LMessageLength))
+  else LMessageLength := 0;
+  if (LMessageLength <> length(ReturnFieldsSelector)) or
      ((length(ReturnFieldsSelector) > 0) and
       (ReturnFieldsSelector[length(ReturnFieldsSelector)] <> #0)) then begin
-    aJsonDocument := TALJsonDocument.Create;
+    LJsonDocument := TALJsonDocument.Create;
     try
-      aJsonDocument.LoadFromJSONString(ReturnFieldsSelector);
-      aJsonDocument.SaveToBSONString(aBsonReturnFieldsSelector);
+      LJsonDocument.LoadFromJSONString(ReturnFieldsSelector);
+      LJsonDocument.SaveToBSONString(LBSONReturnFieldsSelector);
     finally
-      aJsonDocument.Free;
+      LJsonDocument.Free;
     end;
   end
-  else aBsonReturnFieldsSelector := ReturnFieldsSelector;
+  else LBSONReturnFieldsSelector := ReturnFieldsSelector;
 
   // init aMessageLength
-  aMessageLength := sizeof(aMessageLength) +
+  LMessageLength := sizeof(LMessageLength) +
                     sizeof(requestID) +
                     sizeof(responseTo) +
-                    sizeof(aOPCode) +
+                    sizeof(LOPCode) +
                     sizeof(flags) +
                     length(fullCollectionName) + 1{the trailing #0} +
                     sizeof(numberToSkip) +
                     sizeof(numberToReturn) +
-                    length(aBsonQuery) +
-                    length(aBSONReturnFieldsSelector);
+                    length(LBsonQuery) +
+                    length(LBSONReturnFieldsSelector);
 
   //init the length of the result
-  setlength(result, amessageLength);
-  aCurrPos := 1;
+  setlength(result, LMessageLength);
+  LCurrPos := 1;
 
   // messageLength
-  ALMove(aMessageLength, Result[aCurrPos], sizeof(aMessageLength));
-  inc(aCurrPos,sizeof(aMessageLength));
+  ALMove(LMessageLength, Result[LCurrPos], sizeof(LMessageLength));
+  inc(LCurrPos,sizeof(LMessageLength));
 
   //requestID
-  ALMove(requestID, Result[aCurrPos], sizeof(requestID));
-  inc(aCurrPos,sizeof(requestID));
+  ALMove(requestID, Result[LCurrPos], sizeof(requestID));
+  inc(LCurrPos,sizeof(requestID));
 
   //responseTo
-  ALMove(responseTo, Result[aCurrPos], sizeof(responseTo));
-  inc(aCurrPos,sizeof(responseTo));
+  ALMove(responseTo, Result[LCurrPos], sizeof(responseTo));
+  inc(LCurrPos,sizeof(responseTo));
 
   //opCode
-  aOPCode := MONGO_OP_QUERY;
-  ALMove(aOPCode, Result[aCurrPos], sizeof(aOPCode));
-  inc(aCurrPos,sizeof(aOPCode));
+  LOPCode := MONGO_OP_QUERY;
+  ALMove(LOPCode, Result[LCurrPos], sizeof(LOPCode));
+  inc(LCurrPos,sizeof(LOPCode));
 
   //flags
-  ALMove(flags, Result[aCurrPos], sizeof(flags));
-  inc(aCurrPos,sizeof(flags));
+  ALMove(flags, Result[LCurrPos], sizeof(flags));
+  inc(LCurrPos,sizeof(flags));
 
   //fullCollectionName
-  if length(fullCollectionName) <= 0 then raise Exception.Create('FullCollectionName must not be empty');
-  ALMove(fullCollectionName[1], result[aCurrPos], length(fullCollectionName));
-  inc(aCurrPos,length(fullCollectionName));
-  result[aCurrPos] := #0;
-  inc(aCurrPos);
+  if length(fullCollectionName) <= 0 then raise EALException.Create('FullCollectionName must not be empty');
+  ALMove(fullCollectionName[1], result[LCurrPos], length(fullCollectionName));
+  inc(LCurrPos,length(fullCollectionName));
+  result[LCurrPos] := #0;
+  inc(LCurrPos);
 
   //numberToSkip
-  ALMove(numberToSkip, Result[aCurrPos], sizeof(numberToSkip));
-  inc(aCurrPos,sizeof(numberToSkip));
+  ALMove(numberToSkip, Result[LCurrPos], sizeof(numberToSkip));
+  inc(LCurrPos,sizeof(numberToSkip));
 
   //numberToReturn
-  ALMove(numberToReturn, Result[aCurrPos], sizeof(numberToReturn));
-  inc(aCurrPos,sizeof(numberToReturn));
+  ALMove(numberToReturn, Result[LCurrPos], sizeof(numberToReturn));
+  inc(LCurrPos,sizeof(numberToReturn));
 
   //aBsonQuery
-  ALMove(aBsonQuery[1], result[aCurrPos], length(aBsonQuery));
-  inc(aCurrPos,length(aBsonQuery));
+  ALMove(LBsonQuery[1], result[LCurrPos], length(LBsonQuery));
+  inc(LCurrPos,length(LBsonQuery));
 
   //aBSONReturnFieldsSelector
-  if length(aBSONReturnFieldsSelector) > 0 then
-    ALMove(aBSONReturnFieldsSelector[1], result[aCurrPos], length(aBSONReturnFieldsSelector));
+  if length(LBSONReturnFieldsSelector) > 0 then
+    ALMove(LBSONReturnFieldsSelector[1], result[LCurrPos], length(LBSONReturnFieldsSelector));
 
 end;
 
@@ -1571,10 +1715,10 @@ Function TAlBaseMongoDBClient.BuildOPGETMOREMessage(const requestID: integer;   
                                                     const fullCollectionName: ansiString;  // "dbname.collectionname"
                                                     const numberToReturn: integer;         // number of documents to return in the first OP_REPLY batch
                                                     const cursorID: int64): AnsiString;
-var aCurrPos: integer;
-    aMessageLength: Integer;
-    aOPCode: integer;
-    aZero: integer;
+var LCurrPos: integer;
+    LMessageLength: Integer;
+    LOPCode: integer;
+    LZero: integer;
 begin
 
   //
@@ -1586,54 +1730,54 @@ begin
   //
 
   // init aMessageLength
-  aMessageLength := sizeof(aMessageLength) +
+  LMessageLength := sizeof(LMessageLength) +
                     sizeof(requestID) +
                     sizeof(responseTo) +
-                    sizeof(aOPCode) +
-                    sizeof(aZero) +
+                    sizeof(LOPCode) +
+                    sizeof(LZero) +
                     length(fullCollectionName) + 1{the trailing #0} +
                     sizeof(numberToReturn) +
                     sizeof(cursorID);
 
   //init the length of the result
-  setlength(result, amessageLength);
-  aCurrPos := 1;
+  setlength(result, LMessageLength);
+  LCurrPos := 1;
 
   // messageLength
-  ALMove(aMessageLength, Result[aCurrPos], sizeof(aMessageLength));
-  inc(aCurrPos,sizeof(aMessageLength));
+  ALMove(LMessageLength, Result[LCurrPos], sizeof(LMessageLength));
+  inc(LCurrPos,sizeof(LMessageLength));
 
   //requestID
-  ALMove(requestID, Result[aCurrPos], sizeof(requestID));
-  inc(aCurrPos,sizeof(requestID));
+  ALMove(requestID, Result[LCurrPos], sizeof(requestID));
+  inc(LCurrPos,sizeof(requestID));
 
   //responseTo
-  ALMove(responseTo, Result[aCurrPos], sizeof(responseTo));
-  inc(aCurrPos,sizeof(responseTo));
+  ALMove(responseTo, Result[LCurrPos], sizeof(responseTo));
+  inc(LCurrPos,sizeof(responseTo));
 
   //opCode
-  aOPCode := MONGO_OP_GET_MORE;
-  ALMove(aOPCode, Result[aCurrPos], sizeof(aOPCode));
-  inc(aCurrPos,sizeof(aOPCode));
+  LOPCode := MONGO_OP_GET_MORE;
+  ALMove(LOPCode, Result[LCurrPos], sizeof(LOPCode));
+  inc(LCurrPos,sizeof(LOPCode));
 
   //Zero
-  aZero := 0;
-  ALMove(aZero, Result[aCurrPos], sizeof(aZero));
-  inc(aCurrPos,sizeof(aZero));
+  LZero := 0;
+  ALMove(LZero, Result[LCurrPos], sizeof(LZero));
+  inc(LCurrPos,sizeof(LZero));
 
   //fullCollectionName
-  if length(fullCollectionName) <= 0 then raise Exception.Create('FullCollectionName must not be empty');
-  ALMove(fullCollectionName[1], result[aCurrPos], length(fullCollectionName));
-  inc(aCurrPos,length(fullCollectionName));
-  result[aCurrPos] := #0;
-  inc(aCurrPos);
+  if length(fullCollectionName) <= 0 then raise EALException.Create('FullCollectionName must not be empty');
+  ALMove(fullCollectionName[1], result[LCurrPos], length(fullCollectionName));
+  inc(LCurrPos,length(fullCollectionName));
+  result[LCurrPos] := #0;
+  inc(LCurrPos);
 
   //numberToReturn
-  ALMove(numberToReturn, Result[aCurrPos], sizeof(numberToReturn));
-  inc(aCurrPos,sizeof(numberToReturn));
+  ALMove(numberToReturn, Result[LCurrPos], sizeof(numberToReturn));
+  inc(LCurrPos,sizeof(numberToReturn));
 
   //cursorID
-  ALMove(cursorID, Result[aCurrPos], sizeof(cursorID));
+  ALMove(cursorID, Result[LCurrPos], sizeof(cursorID));
 
 end;
 
@@ -1651,15 +1795,15 @@ Procedure TAlBaseMongoDBClient.ParseOPREPLYMessage(const OpReplyMsg: AnsiString;
                                                    const RowTag: AnsiString;      // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
                                                    const ViewTag: AnsiString;     // the node name under with all records will be stored in the JSON/XML result document.
                                                    var continue: boolean);
-Var aMessageLength: integer;
-    aOPCode: integer;
-    aCurrPos: integer;
-    aDocumentStr: AnsiString;
-    aNumberOfDocumentsFounded: Integer;
-    aTmpRowTag: ansiString;
-    aUpdateRowTagByFieldValue: Boolean;
-    aJsonNode1: TALJSONNode;
-    aJsonNode2: TALJSONNode;
+Var LMessageLength: integer;
+    LOPCode: integer;
+    LCurrPos: integer;
+    LDocumentStr: AnsiString;
+    LNumberOfDocumentsFounded: Integer;
+    LTmpRowTag: ansiString;
+    LUpdateRowTagByFieldValue: Boolean;
+    LJsonNode1: TALJSONNode;
+    LJsonNode2: TALJSONNode;
 begin
 
   //
@@ -1671,39 +1815,39 @@ begin
   //
 
   // some checkc
-  if length(OpReplyMsg) < sizeof(aMessageLength) +
+  if length(OpReplyMsg) < sizeof(LMessageLength) +
                           sizeof(requestID) +
                           sizeof(responseTo) +
-                          sizeof(aOPCode) +
+                          sizeof(LOPCode) +
                           sizeof(responseFlags) +
                           sizeof(cursorID) +
                           sizeof(startingFrom) +
-                          sizeof(numberReturned) then raise Exception.Create('Wrong OP_REPLY message');
+                          sizeof(numberReturned) then raise EALException.Create('Wrong OP_REPLY message');
 
   // init aCurrPos
-  aCurrPos := 1;
+  LCurrPos := 1;
 
   // messageLength
-  ALMove(OpReplyMsg[aCurrPos], aMessageLength, sizeof(aMessageLength));
-  inc(aCurrPos,sizeof(aMessageLength));
-  if aMessageLength <> length(OpReplyMsg) then raise Exception.Create('Wrong OP_REPLY message');
+  ALMove(OpReplyMsg[LCurrPos], LMessageLength, sizeof(LMessageLength));
+  inc(LCurrPos,sizeof(LMessageLength));
+  if LMessageLength <> length(OpReplyMsg) then raise EALException.Create('Wrong OP_REPLY message');
 
   // requestID
-  ALMove(OpReplyMsg[aCurrPos], requestID, sizeof(requestID));
-  inc(aCurrPos,sizeof(requestID));
+  ALMove(OpReplyMsg[LCurrPos], requestID, sizeof(requestID));
+  inc(LCurrPos,sizeof(requestID));
 
   // responseTo
-  ALMove(OpReplyMsg[aCurrPos], responseTo, sizeof(responseTo));
-  inc(aCurrPos,sizeof(responseTo));
+  ALMove(OpReplyMsg[LCurrPos], responseTo, sizeof(responseTo));
+  inc(LCurrPos,sizeof(responseTo));
 
   // OPCode
-  ALMove(OpReplyMsg[aCurrPos], aOPCode, sizeof(aOPCode));
-  if aOPCode <> MONGO_OP_REPLY then raise Exception.Create('Wrong OP_REPLY message');
-  inc(aCurrPos,sizeof(aOPCode));
+  ALMove(OpReplyMsg[LCurrPos], LOPCode, sizeof(LOPCode));
+  if LOPCode <> MONGO_OP_REPLY then raise EALException.Create('Wrong OP_REPLY message');
+  inc(LCurrPos,sizeof(LOPCode));
 
   // responseFlags
-  ALMove(OpReplyMsg[aCurrPos], responseFlags, sizeof(responseFlags));
-  inc(aCurrPos,sizeof(responseFlags));
+  ALMove(OpReplyMsg[LCurrPos], responseFlags, sizeof(responseFlags));
+  inc(LCurrPos,sizeof(responseFlags));
 
   //bit num	  name	            description
   //0	        CursorNotFound	  Set when getMore is called but the cursor id is not valid at the server. Returned with zero results.
@@ -1712,62 +1856,62 @@ begin
   //3        	AwaitCapable	    Set when the server supports the AwaitData Query option. If it doesn’t, a client should sleep a little between
   //                            getMore’s of a Tailable cursor. Mongod version 1.6 supports AwaitData and thus always sets AwaitCapable.
   //4-31    	Reserved	        Ignore
-  if responseFlags and (1 shl 0) <> 0 then raise Exception.Create('Cursor Not Found');
-  if responseFlags and (1 shl 1) <> 0 then raise Exception.Create('Query Failure');
+  if responseFlags and (1 shl 0) <> 0 then raise EALException.Create('Cursor Not Found');
+  if responseFlags and (1 shl 1) <> 0 then raise EALException.Create('Query Failure');
 
   // cursorID
-  ALMove(OpReplyMsg[aCurrPos], cursorID, sizeof(cursorID));
-  inc(aCurrPos,sizeof(cursorID));
+  ALMove(OpReplyMsg[LCurrPos], cursorID, sizeof(cursorID));
+  inc(LCurrPos,sizeof(cursorID));
 
   // startingFrom
-  ALMove(OpReplyMsg[aCurrPos], startingFrom, sizeof(startingFrom));
-  inc(aCurrPos,sizeof(startingFrom));
+  ALMove(OpReplyMsg[LCurrPos], startingFrom, sizeof(startingFrom));
+  inc(LCurrPos,sizeof(startingFrom));
 
   // numberReturned
-  ALMove(OpReplyMsg[aCurrPos], numberReturned, sizeof(numberReturned));
-  inc(aCurrPos,sizeof(numberReturned));
+  ALMove(OpReplyMsg[LCurrPos], numberReturned, sizeof(numberReturned));
+  inc(LCurrPos,sizeof(numberReturned));
 
   // documents
-  aNumberOfDocumentsFounded := 0;
-  if aCurrPos <= aMessageLength then begin
+  LNumberOfDocumentsFounded := 0;
+  if LCurrPos <= LMessageLength then begin
 
     //init aUpdateRowTagByFieldValue and aTmpRowTag
     if AlPos('&>',RowTag) = 1 then begin
-      aTmpRowTag := AlcopyStr(RowTag, 3, maxint);
-      aUpdateRowTagByFieldValue := aTmpRowTag <> '';
+      LTmpRowTag := AlcopyStr(RowTag, 3, maxint);
+      LUpdateRowTagByFieldValue := LTmpRowTag <> '';
     end
     else begin
-      aTmpRowTag := RowTag;
-      aUpdateRowTagByFieldValue := False;
+      LTmpRowTag := RowTag;
+      LUpdateRowTagByFieldValue := False;
     end;
 
     //loop on all node to add
     while True do begin
-      if aCurrPos > length(OpReplyMsg) then break;
-      if aCurrPos > length(OpReplyMsg) - sizeof(aMessageLength) + 1 then raise Exception.Create('Wrong OP_REPLY message');
-      ALMove(OpReplyMsg[aCurrPos], aMessageLength, sizeof(aMessageLength));
-      if aCurrPos + aMessageLength - 1 > length(OpReplyMsg) then raise Exception.Create('Wrong OP_REPLY message');
-      setlength(adocumentStr, aMessageLength);
-      ALMove(OpReplyMsg[aCurrPos], adocumentStr[1], aMessageLength);
-      inc(aCurrPos,aMessageLength);
-      if (aTmpRowTag <> '') or
-         (documents.NodeType = ntarray) then aJsonNode1 := documents.AddChild(aTmpRowTag, ntobject)
-      else aJsonNode1 := documents;
-      aJsonNode1.LoadFromBSONString(adocumentStr, False{ClearChildNodes});
-      if aUpdateRowTagByFieldValue then begin
-        aJsonNode2 := aJsonNode1.ChildNodes.FindNode(aTmpRowTag);
-        if assigned(aJsonNode2) then aJsonNode1.NodeName := aJsonNode2.Text;
+      if LCurrPos > length(OpReplyMsg) then break;
+      if LCurrPos > length(OpReplyMsg) - sizeof(LMessageLength) + 1 then raise EALException.Create('Wrong OP_REPLY message');
+      ALMove(OpReplyMsg[LCurrPos], LMessageLength, sizeof(LMessageLength));
+      if LCurrPos + LMessageLength - 1 > length(OpReplyMsg) then raise EALException.Create('Wrong OP_REPLY message');
+      setlength(LDocumentStr, LMessageLength);
+      ALMove(OpReplyMsg[LCurrPos], LDocumentStr[1], LMessageLength);
+      inc(LCurrPos,LMessageLength);
+      if (LTmpRowTag <> '') or
+         (documents.NodeType = ntarray) then LJsonNode1 := documents.AddChild(LTmpRowTag, ntobject)
+      else LJsonNode1 := documents;
+      LJsonNode1.LoadFromBSONString(LDocumentStr, False{ClearChildNodes});
+      if LUpdateRowTagByFieldValue then begin
+        LJsonNode2 := LJsonNode1.ChildNodes.FindNode(LTmpRowTag);
+        if assigned(LJsonNode2) then LJsonNode1.NodeName := LJsonNode2.Text;
       end;
       if assigned(OnNewRowFunct) then begin
         Continue := True;
-        OnNewRowFunct(aJsonNode1, ViewTag, ExtData, Continue);
+        OnNewRowFunct(LJsonNode1, ViewTag, ExtData, Continue);
         documents.ChildNodes.Clear;
         if Not Continue then exit;
       end;
-      inc(aNumberOfDocumentsFounded);
+      inc(LNumberOfDocumentsFounded);
     end;
   end;
-  if aNumberOfDocumentsFounded <> numberReturned then raise Exception.Create('Wrong OP_REPLY message');
+  if LNumberOfDocumentsFounded <> numberReturned then raise EALException.Create('Wrong OP_REPLY message');
 
 end;
 
@@ -1800,8 +1944,8 @@ Procedure TAlBaseMongoDBClient.OP_QUERY(aSocketDescriptor: TSocket;
                                         const RowTag: AnsiString;                // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
                                         const ViewTag: AnsiString;               // the node name under with all records will be stored in the JSON/XML result document.
                                         var continue: boolean);
-var aRequestID: integer;
-    aResponseTo: integer;
+var LRequestID: integer;
+    LResponseTo: integer;
 begin
   ParseOPREPLYMessage(SendCmd(aSocketDescriptor,
                               BuildOPQUERYMessage(0, //const requestID: integer;
@@ -1813,8 +1957,8 @@ begin
                                                   query,
                                                   returnFieldsSelector),
                               True), // aGetResponse
-                      arequestID,
-                      aresponseTo,
+                      LRequestID,
+                      LResponseTo,
                       responseFlags,
                       cursorID,
                       startingFrom,
@@ -1841,8 +1985,8 @@ Procedure TAlBaseMongoDBClient.OP_GET_MORE(aSocketDescriptor: TSocket;
                                            const RowTag: AnsiString;               // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
                                            const ViewTag: AnsiString;              // the node name under with all records will be stored in the JSON/XML result document.
                                            var continue: boolean);
-var aRequestID: integer;
-    aResponseTo: integer;
+var LRequestID: integer;
+    LResponseTo: integer;
 begin
   ParseOPREPLYMessage(SendCmd(aSocketDescriptor,
                               BuildOPGETMOREMessage(0, //const requestID: integer;
@@ -1851,8 +1995,8 @@ begin
                                                     numberToReturn,
                                                     cursorID),
                               True), // aGetResponse
-                      arequestID,
-                      aresponseTo,
+                      LRequestID,
+                      LResponseTo,
                       responseFlags,
                       cursorID,
                       startingFrom,
@@ -1911,8 +2055,8 @@ Procedure TAlBaseMongoDBClient.OP_DELETE(aSocketDescriptor: TSocket;
                                          const fullCollectionName: ansiString;   // "dbname.collectionname"
                                          const selector: ansiString;             // query object.
                                          var NumberOfDocumentsRemoved: integer); // reports the number of documents updated or removed, if the preceding operation was an update or remove operation.
-var updatedExisting: boolean;
-    upserted: ansiString;
+var LUpdatedExisting: boolean;
+    LUpserted: ansiString;
 begin
   SendCmd(aSocketDescriptor,
           BuildOPDELETEMessage(0, //const requestID: integer;
@@ -1923,8 +2067,8 @@ begin
           false);
   CheckServerLastError(aSocketDescriptor,
                        NumberOfDocumentsRemoved,
-                       updatedExisting,
-                       upserted);
+                       LUpdatedExisting,
+                       LUpserted);
 end;
 
 {***********************************************************************************}
@@ -1936,6 +2080,18 @@ procedure TAlBaseMongoDBClient.OnSelectDataDone(const FullCollectionName: AnsiSt
                                                 const ViewTag: AnsiString;
                                                 Skip: integer;
                                                 First: Integer;
+                                                CacheThreshold: Integer;
+                                                TimeTaken: double);
+begin
+  // virtual
+end;
+
+{*****************************************************************************}
+procedure TAlBaseMongoDBClient.OnRunCommandDone(const DatabaseName: AnsiString;
+                                                const Command: AnsiString;
+                                                flags: TALMongoDBClientRunCommandFlags;
+                                                const RowTag: AnsiString;
+                                                const ViewTag: AnsiString;
                                                 CacheThreshold: Integer;
                                                 TimeTaken: double);
 begin
@@ -1990,14 +2146,14 @@ end;
 Function TAlBaseMongoDBClient.SocketWrite(aSocketDescriptor: TSocket; {$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer;
 begin
   Result := Send(aSocketDescriptor,Buf,len,0);
-  CheckError(Result =  SOCKET_ERROR);
+  CheckOSError(Result =  SOCKET_ERROR);
 end;
 
 {***************************************************************************************************}
 function TAlBaseMongoDBClient.SocketRead(aSocketDescriptor: TSocket; var buf; len: Integer): Integer;
 begin
   Result := Recv(aSocketDescriptor,buf,len,0);
-  CheckError(Result = SOCKET_ERROR);
+  CheckOSError(Result = SOCKET_ERROR);
 end;
 
 {*****************************************************************}
@@ -2018,39 +2174,39 @@ end;
 {************************************************************************************************}
 procedure TAlBaseMongoDBClient.DoSetSendTimeout(aSocketDescriptor: TSocket; const Value: integer);
 begin
-  CheckError(setsockopt(aSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PAnsiChar(@Value),SizeOf(Value))=SOCKET_ERROR);
+  CheckOSError(setsockopt(aSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PAnsiChar(@Value),SizeOf(Value))=SOCKET_ERROR);
 end;
 
 {***************************************************************************************************}
 procedure TAlBaseMongoDBClient.DoSetReceiveTimeout(aSocketDescriptor: TSocket; const Value: integer);
 begin
-  CheckError(setsockopt(aSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PAnsiChar(@Value),SizeOf(Value))=SOCKET_ERROR);
+  CheckOSError(setsockopt(aSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PAnsiChar(@Value),SizeOf(Value))=SOCKET_ERROR);
 end;
 
 {*******************************************************************************************************************}
 // http://blogs.technet.com/b/nettracer/archive/2010/06/03/things-that-you-may-want-to-know-about-tcp-keepalives.aspx
 procedure TAlBaseMongoDBClient.DoSetKeepAlive(aSocketDescriptor: TSocket; const Value: boolean);
-var aIntBool: integer;
+var LIntBool: integer;
 begin
   // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
   // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
   // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
-  if Value then aIntBool := 1
-  else aIntBool := 0;
-  CheckError(setsockopt(aSocketDescriptor,SOL_SOCKET,SO_KEEPALIVE,PAnsiChar(@aIntBool),SizeOf(aIntBool))=SOCKET_ERROR);
+  if Value then LIntBool := 1
+  else LIntBool := 0;
+  CheckOSError(setsockopt(aSocketDescriptor,SOL_SOCKET,SO_KEEPALIVE,PAnsiChar(@LIntBool),SizeOf(LIntBool))=SOCKET_ERROR);
 end;
 
 {***************************************************************************************************************************************************************************************************************}
 // https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_MRG/1.1/html/Realtime_Tuning_Guide/sect-Realtime_Tuning_Guide-Application_Tuning_and_Deployment-TCP_NODELAY_and_Small_Buffer_Writes.html
 procedure TAlBaseMongoDBClient.DoSetTCPNoDelay(aSocketDescriptor: TSocket; const Value: boolean);
-var aIntBool: integer;
+var LIntBool: integer;
 begin
   // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
   // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
   // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
-  if Value then aIntBool := 1
-  else aIntBool := 0;
-  CheckError(setsockopt(aSocketDescriptor,SOL_SOCKET,TCP_NODELAY,PAnsiChar(@aIntBool),SizeOf(aIntBool))=SOCKET_ERROR);
+  if Value then LIntBool := 1
+  else LIntBool := 0;
+  CheckOSError(setsockopt(aSocketDescriptor,SOL_SOCKET,TCP_NODELAY,PAnsiChar(@LIntBool),SizeOf(LIntBool))=SOCKET_ERROR);
 end;
 
 {******************************************************************}
@@ -2169,63 +2325,65 @@ Procedure TAlMongoDBClient.SelectData(const FullCollectionName: AnsiString; // T
                                       OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                                       ExtData: Pointer);
 
-Var aViewRec: TalJSONNode;
-    aJSONDocument: TalJSONDocument;
-    aResponseFlags: integer;
-    aCursorID: int64;
-    aStartingFrom: integer;
-    aNumberReturned: integer;
-    aFlags: integer;
-    aRecAdded: integer;
-    aContinue: boolean;
-    aStopWatch: TStopWatch;
-    aCacheKey: ansiString;
-    aCacheStr: ansiString;
+Var LViewRec: TalJSONNode;
+    LJSONDocument: TalJSONDocument;
+    LResponseFlags: integer;
+    LCursorID: int64;
+    LStartingFrom: integer;
+    LNumberReturned: integer;
+    LFlags: integer;
+    LRecAdded: integer;
+    LContinue: boolean;
+    LStopWatch: TStopWatch;
+    LCacheKey: ansiString;
+    LCacheStr: ansiString;
 
 begin
 
   //Error if we are not connected
-  If not connected then raise Exception.Create('Not connected');
+  If not connected then raise EALException.Create('Not connected');
 
   //only OnNewRowFunct / JSONDATA can be used
   if assigned(OnNewRowFunct) then JSONDATA := nil;
 
   //clear the JSONDATA
-  if assigned(JSONDATA) then aJSONDocument := Nil
+  if assigned(JSONDATA) then LJSONDocument := Nil
   else begin
-    aJSONDocument := TALJSONDocument.create;
-    JSONDATA := aJSONDocument.Node;
+    LJSONDocument := TALJSONDocument.create;
+    JSONDATA := LJSONDocument.Node;
   end;
 
   Try
 
     //init the TstopWatch
-    aStopWatch := TstopWatch.Create;
+    LStopWatch := TstopWatch.Create;
 
     //Handle the CacheThreshold
-    aCacheKey := '';
+    LCacheKey := '';
     If (CacheThreshold > 0) and
-       (not assigned(aJSONDocument)) and
+       (not assigned(LJSONDocument)) and
        (not (sfTailMonitoring in flags)) and
        ((JSONDATA.ChildNodes.Count = 0) or  // else the save will not work
         (ViewTag <> '')) then begin
 
       //try to load from from cache
-      aCacheKey := ALStringHashSHA1(RowTag + '#' +
-                                    alinttostr(Skip) + '#' +
-                                    alinttostr(First) + '#' +
-                                    FullCollectionName + '#' +
-                                    ReturnFieldsSelector + '#' +
-                                    Query);
+      LCacheKey := ALStringHashSHA1(
+                     ALFormat('%s#%d#%d#%s#%s#%s',
+                              [RowTag,
+                               Skip,
+                               First,
+                               FullCollectionName,
+                               ReturnFieldsSelector,
+                               Query]));
 
-      if loadcachedData(aCacheKey, aCacheStr) then begin
+      if loadcachedData(LCacheKey, LCacheStr) then begin
 
         //init the aViewRec
-        if (ViewTag <> '') then aViewRec := JSONDATA.AddChild(ViewTag, ntobject)
-        else aViewRec := JSONDATA;
+        if (ViewTag <> '') then LViewRec := JSONDATA.AddChild(ViewTag, ntobject)
+        else LViewRec := JSONDATA;
 
         //assign the tmp data to the XMLData
-        aViewRec.LoadFromJsonString(aCacheStr, false{ClearChildNodes});
+        LViewRec.LoadFromJsonString(LCacheStr, false{ClearChildNodes});
 
         //exit
         exit;
@@ -2235,8 +2393,8 @@ begin
     end;
 
     //start the TstopWatch
-    aStopWatch.Reset;
-    aStopWatch.Start;
+    LStopWatch.Reset;
+    LStopWatch.Start;
 
     //build the flag integer
     //bit num	   name	            description
@@ -2266,30 +2424,30 @@ begin
     //                            Mostly because Exhaust is not compatible with mongos we will not use it
     //7	         Partial	        Get partial results from a mongos if some shards are down (instead of throwing an error)
     //8-31	     Reserved	        Must be set to 0.
-    aFlags := 0;
+    LFlags := 0;
     if sfTailMonitoring in flags then begin
-      if not assigned(OnNewRowFunct) then raise Exception.Create('OnNewRowFunct is mandatory for tail monitoring');
-      aFlags := aFlags or (1 shl 1); // TailableCursor
-      aFlags := aFlags or (1 shl 5); // AwaitData
+      if not assigned(OnNewRowFunct) then raise EALException.Create('OnNewRowFunct is mandatory for tail monitoring');
+      LFlags := LFlags or (1 shl 1); // TailableCursor
+      LFlags := LFlags or (1 shl 5); // AwaitData
     end;
-    if sfSlaveOk in flags then aFlags := aFlags or (1 shl 2);
-    if sfNoCursorTimeout in flags then aFlags := aFlags or (1 shl 4);
-    if sfPartial in flags then aFlags := aFlags or (1 shl 7);
+    if sfSlaveOk in flags then LFlags := LFlags or (1 shl 2);
+    if sfNoCursorTimeout in flags then LFlags := LFlags or (1 shl 4);
+    if sfPartial in flags then LFlags := LFlags or (1 shl 7);
 
     //init the aViewRec
-    if (ViewTag <> '') and (not assigned(aJSONDocument)) then aViewRec := JSONdata.AddChild(ViewTag, ntobject)
-    else aViewRec := JSONdata;
+    if (ViewTag <> '') and (not assigned(LJSONDocument)) then LViewRec := JSONdata.AddChild(ViewTag, ntobject)
+    else LViewRec := JSONdata;
 
     //init aRecAdded
-    aRecAdded := 0;
+    LRecAdded := 0;
 
     //for the TailMonitoring
     repeat
 
       //do the First query
-      aContinue := true;
+      LContinue := true;
       OP_QUERY(fSocketDescriptor,
-               aFlags,
+               LFlags,
                fullCollectionName,
                ALIfThen(Skip >= 0, Skip, 0),
                ALIfThen(First >= 0, First, 0), // The MongoDB server returns the query results in batches. Batch size will not exceed
@@ -2298,54 +2456,54 @@ begin
                                                // 4 megabytes. To override the default size of the batch, see batchSize() and limit().
                query,
                ReturnFieldsSelector,
-               aResponseFlags,
-               aCursorID,
-               aStartingFrom, // where in the cursor this reply is starting
-               aNumberReturned, // number of documents in the reply
-               aViewRec,
+               LResponseFlags,
+               LCursorID,
+               LStartingFrom, // where in the cursor this reply is starting
+               LNumberReturned, // number of documents in the reply
+               LViewRec,
                OnNewRowFunct,
                ExtData,
                RowTag,
                ViewTag,
-               aContinue);
+               LContinue);
 
       try
 
         //init aRecAdded
-        aRecAdded := aRecAdded + aNumberReturned;
+        LRecAdded := LRecAdded + LNumberReturned;
 
         //loop still the cursorID > 0
         while ((not (sfTailMonitoring in flags)) or
                (not fStopTailMonitoring)) and
-              (aContinue) and
-              (aCursorID <> 0) and
+              (LContinue) and
+              (LCursorID <> 0) and
               ((First <= 0) or
-               (aRecAdded < First)) do begin
+               (LRecAdded < First)) do begin
 
           //Get more data
           OP_GET_MORE(fSocketDescriptor,
                       fullCollectionName,
-                      ALIfThen(First > 0, First - aRecAdded, 0),
-                      aCursorID,
-                      aResponseFlags,
-                      aStartingFrom,
-                      anumberReturned,
-                      aViewRec,
+                      ALIfThen(First > 0, First - LRecAdded, 0),
+                      LCursorID,
+                      LResponseFlags,
+                      LStartingFrom,
+                      LNumberReturned,
+                      LViewRec,
                       OnNewRowFunct,
                       ExtData,
                       RowTag,
                       ViewTag,
-                      aContinue);
+                      LContinue);
 
           //init aRecAdded
-          aRecAdded := aRecAdded + aNumberReturned;
+          LRecAdded := LRecAdded + LNumberReturned;
 
         end;
 
       finally
 
         //close the curson
-        if aCursorId <> 0 then OP_KILL_CURSORS(fSocketDescriptor, [aCursorID]);
+        if LCursorID <> 0 then OP_KILL_CURSORS(fSocketDescriptor, [LCursorID]);
 
       end;
 
@@ -2353,16 +2511,16 @@ begin
       if (sfTailMonitoring in flags) and
          (not fStopTailMonitoring) and
          ((First <= 0) or
-          (aRecAdded < First)) then sleep(1);
+          (LRecAdded < First)) then sleep(1);
 
     //loop for the TailMonitoring
     until (not (sfTailMonitoring in flags)) or
           (fStopTailMonitoring) or
           ((First > 0) and
-           (aRecAdded >= First));
+           (LRecAdded >= First));
 
     //do the OnSelectDataDone
-    aStopWatch.Stop;
+    LStopWatch.Stop;
     OnSelectDataDone(FullCollectionName,
                      Query,
                      ReturnFieldsSelector,
@@ -2372,21 +2530,21 @@ begin
                      Skip,
                      First,
                      CacheThreshold,
-                     aStopWatch.Elapsed.TotalMilliseconds);
+                     LStopWatch.Elapsed.TotalMilliseconds);
 
     //save to the cache
-    If aCacheKey <> '' then begin
+    If LCacheKey <> '' then begin
 
       //save the data
-      aViewRec.SaveToJSONString(aCacheStr);
-      SaveDataToCache(aCacheKey,
+      LViewRec.SaveToJSONString(LCacheStr);
+      SaveDataToCache(LCacheKey,
                       CacheThreshold,
-                      aCacheStr);
+                      LCacheStr);
 
     end;
 
   Finally
-    if assigned(aJSONDocument) then aJSONDocument.free;
+    if assigned(LJSONDocument) then LJSONDocument.free;
   End;
 
 end;
@@ -2612,6 +2770,372 @@ begin
              nil); // ExtData
 end;
 
+{*******************************************************************}
+Procedure TAlMongoDBClient.RunCommand(const DatabaseName: AnsiString;
+                                      const Command: AnsiString; // BSON document that represents the Command
+                                      flags: TALMongoDBClientRunCommandFlags; // Options (see TALMongoDBClientRunCommandFlags)
+                                      const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
+                                      const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
+                                      CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                                               // cache or not. Values <= 0 deactivate the cache
+                                      JSONDATA: TALJSONNode;
+                                      OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
+                                      ExtData: Pointer);
+
+Var LViewRec: TalJSONNode;
+    LRowRec: TalJSONNode;
+    LCursorRec: TalJsonNode;
+    LFirstBatchRec: TalJsonNode;
+    LJSONDocument: TalJSONDocument;
+    LResponseFlags: integer;
+    LCursorID: int64;
+    LStartingFrom: integer;
+    LNumberReturned: integer;
+    LFlags: integer;
+    LContinue: boolean;
+    LStopWatch: TStopWatch;
+    LCacheKey: ansiString;
+    LCacheStr: ansiString;
+    LFullCollectionName: ansiString;
+    i: integer;
+
+begin
+
+  //Error if we are not connected
+  If not connected then raise EALException.Create('Not connected');
+
+  //init aFullCollectionName
+  LFullCollectionName := DatabaseName + '.$cmd';
+
+  //only OnNewBatchRowFunct / JSONDATA can be used
+  if assigned(OnNewBatchRowFunct) then JSONDATA := nil;
+
+  //clear the JSONDATA
+  if assigned(JSONDATA) then LJSONDocument := Nil
+  else begin
+    LJSONDocument := TALJSONDocument.create;
+    JSONDATA := LJSONDocument.Node;
+  end;
+
+  try
+
+    //init the TstopWatch
+    LStopWatch := TstopWatch.Create;
+
+    //Handle the CacheThreshold
+    LCacheKey := '';
+    If (CacheThreshold > 0) and
+       (not assigned(LJSONDocument)) and
+       ((JSONDATA.ChildNodes.Count = 0) or  // else the save will not work
+        (ViewTag <> '')) then begin
+
+      //try to load from from cache
+      LCacheKey := ALStringHashSHA1(
+                     ALFormat('%s#%d#%d#%s#%s#%s',
+                              [RowTag,
+                               0,
+                               1,
+                               LFullCollectionName,
+                               '',
+                               Command]));
+
+      if loadcachedData(LCacheKey, LCacheStr) then begin
+
+        //init the aViewRec
+        if (ViewTag <> '') then LViewRec := JSONDATA.AddChild(ViewTag, ntobject)
+        else LViewRec := JSONDATA;
+
+        //assign the tmp data to the XMLData
+        LViewRec.LoadFromJsonString(LCacheStr, false{ClearChildNodes});
+
+        //exit
+        exit;
+
+      end;
+
+    end;
+
+    //start the TstopWatch
+    LStopWatch.Reset;
+    LStopWatch.Start;
+
+    //build the flag integer
+    //bit num	   name	            description
+    //0	         Reserved	        Must be set to 0.
+    //1	         TailableCursor	  Tailable means cursor is not closed when the last data is retrieved. Rather, the cursor marks the final object’s
+    //                            position. You can resume using the cursor later, from where it was located, if more data were received. Like any
+    //                            “latent cursor”, the cursor may become invalid at some point (CursorNotFound) – for example if the final object
+    //                            it references were deleted.
+    //2	         SlaveOk	        Allow query of replica slave. Normally these return an error except for namespace “local”.
+    //3	         OplogReplay	    Internal replication use only - driver should not set
+    //4	         NoCursorTimeout	The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use. Set this
+    //                            option to prevent that.
+    //5	         AwaitData	      Use with TailableCursor. If we are at the end of the data, block for a while rather than returning no data. After a
+    //                            timeout period, we do return as normal.
+    //6	         Exhaust	        Stream the data down full blast in multiple “more” packages, on the assumption that the client will fully read all data queried.
+    //                            Faster when you are pulling a lot of data and know you want to pull it all down. Note: the client is not allowed to not read all
+    //                            the data unless it closes the connection.
+    //                            Caveats:
+    //                            * Exhaust and limit are not compatible.
+    //                            * Exhaust cursors are not supported by mongos and can not be used with a sharded cluster.
+    //                            * Exhaust cursors require an exclusive socket connection to MongoDB. If the Cursor is discarded
+    //                              without being completely iterated the underlying socket connection will be closed and discarded
+    //                              without being returned to the connection pool.
+    //                            * If you create an exhaust cursor in a request (http://api.mongodb.org/python/current/examples/requests.html),
+    //                              you must completely iterate the Cursor before executing any other operation.
+    //                            * The per-query network_timeout option is ignored when using an exhaust cursor.
+    //                            Mostly because Exhaust is not compatible with mongos we will not use it
+    //7	         Partial	        Get partial results from a mongos if some shards are down (instead of throwing an error)
+    //8-31	     Reserved	        Must be set to 0.
+    LFlags := 0;
+    if cfSlaveOk in flags then LFlags := LFlags or (1 shl 2);
+    if cfNoCursorTimeout in flags then LFlags := LFlags or (1 shl 4);
+    if cfPartial in flags then LFlags := LFlags or (1 shl 7);
+
+    //init the aViewRec
+    if (ViewTag <> '') and (not assigned(LJSONDocument)) then LViewRec := JSONdata.AddChild(ViewTag, ntobject)
+    else LViewRec := JSONdata;
+
+    //do the First query
+    LContinue := true;
+    OP_QUERY(fSocketDescriptor,
+             LFlags,
+             LFullCollectionName,
+             0,
+             1,
+             Command,
+             '', // ReturnFieldsSelector
+             LResponseFlags,
+             LCursorID,
+             LStartingFrom, // where in the cursor this reply is starting
+             LNumberReturned, // number of documents in the reply
+             LViewRec,
+             nil,
+             ExtData,
+             RowTag,
+             ViewTag,
+             LContinue);
+
+    //aCursorID must be egual to 0 (we retrieve only one doc) but in case
+    if LCursorID <> 0 then OP_KILL_CURSORS(fSocketDescriptor, [LCursorID]);
+
+    //init LRowRec
+    if (RowTag <> '') and (LViewRec.ChildNodes.Count > 0) then LRowRec := LViewRec.ChildNodes[LViewRec.ChildNodes.Count - 1]
+    else LRowRec := LViewRec;
+
+    //check error
+    CheckRunCommandResponse(LRowRec);
+
+    //{
+    //  "cursor" : {
+    //      "id" : NumberLong(3286429289449024015),
+    //      "ns" : "mydatabase.$cmd.listCollections",
+    //      "firstBatch" : [
+    //          {
+    //            ....
+    //          },
+    //          {
+    //            ....
+    //          }
+    //      ]
+    //  },
+    //  "ok" : 1.0
+    //}
+    LCursorRec := LRowRec.ChildNodes.FindNode('cursor');
+    if LCursorRec <> nil then begin
+
+      //init LFirstBatchRec
+      LFirstBatchRec := LCursorRec.ChildNodes.FindNode('firstBatch');
+      if (LFirstBatchRec <> nil) and
+         (assigned(OnNewBatchRowFunct)) and
+         (LContinue) then begin
+        for I := 0 to LFirstBatchRec.ChildNodes.Count - 1 do begin
+          OnNewBatchRowFunct(LFirstBatchRec.ChildNodes[I], // JSONRowData: TALJSONNode;
+                             ViewTag, // const ViewTag: AnsiString;
+                             ExtData, // ExtData: Pointer;
+                             LContinue); // Var Continue: Boolean);
+          if not LContinue then break;
+        end;
+      end;
+
+      //init LCursorID
+      LCursorID := LCursorRec.getChildNodeValueInt64('id', 0);
+      if LCursorID <> 0 then begin
+
+        try
+
+          //we do the job only if LFirstBatchRec exist
+          if LFirstBatchRec <> nil then begin
+
+            //init LCollectionName
+            LFullCollectionName := LCursorRec.getChildNodeValueText('ns', '');
+
+            //loop still the cursorID > 0
+            while (LContinue) and
+                  (LCursorID <> 0) do begin
+
+              //Get more data
+              OP_GET_MORE(fSocketDescriptor,
+                          LFullCollectionName,
+                          0, // numberToReturn
+                          LCursorID,
+                          LResponseFlags,
+                          LStartingFrom,
+                          LNumberReturned,
+                          LFirstBatchRec, // documents
+                          OnNewBatchRowFunct,
+                          ExtData,
+                          '', // RowTag,
+                          ViewTag,
+                          LContinue);
+
+            end;
+
+          end;
+
+        finally
+
+          //close the curson
+          if LCursorID <> 0 then OP_KILL_CURSORS(fSocketDescriptor, [LCursorID]);
+
+        end;
+
+        LCursorRec.SetChildNodeValueInt64('id', 0);
+
+      end;
+
+    end;
+
+    //do the OnRunCommandDone
+    LStopWatch.Stop;
+    OnRunCommandDone(DatabaseName,
+                     Command,
+                     flags,
+                     RowTag,
+                     ViewTag,
+                     CacheThreshold,
+                     LStopWatch.Elapsed.TotalMilliseconds);
+
+    //save to the cache
+    If LCacheKey <> '' then begin
+
+      //save the data
+      LViewRec.SaveToJSONString(LCacheStr);
+      SaveDataToCache(LCacheKey,
+                      CacheThreshold,
+                      LCacheStr);
+
+    end;
+
+  finally
+    if assigned(LJSONDocument) then LJSONDocument.free;
+  end;
+
+end;
+
+{*******************************************************************}
+Procedure TAlMongoDBClient.RunCommand(const DatabaseName: AnsiString;
+                                      const Command: AnsiString;
+                                      flags: TALMongoDBClientRunCommandFlags;
+                                      OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
+                                      ExtData: Pointer);
+begin
+  RunCommand(DatabaseName,
+             Command,
+             flags,
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // CacheThreshold,
+             nil, //JSONDATA,
+             OnNewBatchRowFunct,
+             ExtData);
+end;
+
+{*******************************************************************}
+Procedure TAlMongoDBClient.RunCommand(const DatabaseName: AnsiString;
+                                      const Command: AnsiString;
+                                      flags: TALMongoDBClientRunCommandFlags;
+                                      const RowTag: AnsiString;
+                                      JSONDATA: TALJSONNode);
+begin
+  RunCommand(DatabaseName,
+             Command,
+             flags,
+             RowTag,
+             '', // ViewTag,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewBatchRowFunct,
+             nil); // ExtData
+end;
+
+{*******************************************************************}
+Procedure TAlMongoDBClient.RunCommand(const DatabaseName: AnsiString;
+                                      const Command: AnsiString;
+                                      flags: TALMongoDBClientRunCommandFlags;
+                                      JSONDATA: TALJSONNode);
+begin
+  RunCommand(DatabaseName,
+             Command,
+             flags,
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewBatchRowFunct,
+             nil); // ExtData
+end;
+
+{*******************************************************************}
+Procedure TAlMongoDBClient.RunCommand(const DatabaseName: AnsiString;
+                                      const Command: AnsiString;
+                                      OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
+                                      ExtData: Pointer);
+begin
+  RunCommand(DatabaseName,
+             Command,
+             [],
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // CacheThreshold,
+             nil, //JSONDATA,
+             OnNewBatchRowFunct,
+             ExtData);
+end;
+
+{*******************************************************************}
+Procedure TAlMongoDBClient.RunCommand(const DatabaseName: AnsiString;
+                                      const Command: AnsiString;
+                                      const RowTag: AnsiString;
+                                      JSONDATA: TALJSONNode);
+begin
+  RunCommand(DatabaseName,
+             Command,
+             [],
+             RowTag,
+             '', // ViewTag,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewBatchRowFunct,
+             nil); // ExtData
+end;
+
+{*******************************************************************}
+Procedure TAlMongoDBClient.RunCommand(const DatabaseName: AnsiString;
+                                      const Command: AnsiString;
+                                      JSONDATA: TALJSONNode);
+begin
+  RunCommand(DatabaseName,
+             Command,
+             [],
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewBatchRowFunct,
+             nil); // ExtData
+end;
+
 {*************************************************************************}
 Procedure TAlMongoDBClient.UpdateData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
                                                                             // name with the collection name, using a . for the concatenation. For example, for the database
@@ -2623,26 +3147,26 @@ Procedure TAlMongoDBClient.UpdateData(const FullCollectionName: AnsiString; // T
                                       var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
                                       var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
                                       var ObjectID: ansiString); // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-Var aFlags: integer;
-    aStopWatch: TStopWatch;
+Var LFlags: integer;
+    LStopWatch: TStopWatch;
 begin
 
   //Error if we are not connected
-  If not connected then raise Exception.Create('Not connected');
+  If not connected then raise EALException.Create('Not connected');
 
   //init the TstopWatch
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
 
   //bit num	  name	        description
   //0	        Upsert	      If set, the database will insert the supplied object into the collection if no matching document is found.
   //1	        MultiUpdate	  If set, the database will update all matching objects in the collection. Otherwise only updates first matching doc.
   //2-31    	Reserved	    Must be set to 0.
-  aFlags := 0;
-  if ufUpsert in flags then aFlags := aFlags or (1 shl 0);
-  if ufMultiUpdate in flags then aFlags := aFlags or (1 shl 1);
+  LFlags := 0;
+  if ufUpsert in flags then LFlags := LFlags or (1 shl 0);
+  if ufMultiUpdate in flags then LFlags := LFlags or (1 shl 1);
 
   OP_UPDATE(fSocketDescriptor,
-            aflags,
+            LFlags,
             FullCollectionName,
             selector,
             Update,
@@ -2651,12 +3175,12 @@ begin
             ObjectID);
 
   //do the OnUpdateDataDone
-  aStopWatch.Stop;
+  LStopWatch.Stop;
   OnUpdateDataDone(FullCollectionName,
                    selector,
                    update,
                    flags,
-                   aStopWatch.Elapsed.TotalMilliseconds);
+                   LStopWatch.Elapsed.TotalMilliseconds);
 
 end;
 
@@ -2665,34 +3189,34 @@ Procedure TAlMongoDBClient.UpdateData(const FullCollectionName: AnsiString;
                                       const Selector: AnsiString;
                                       const Update: AnsiString;
                                       flags: TALMongoDBClientUpdateDataFlags);
-var aNumberOfDocumentsUpdated: integer;
-    aupdatedExisting: boolean;
-    aObjectID: ansiString;
+var LNumberOfDocumentsUpdated: integer;
+    LUpdatedExisting: boolean;
+    LObjectID: ansiString;
 begin
   UpdateData(FullCollectionName,
              selector,
              update,
              flags,
-             aNumberOfDocumentsUpdated,
-             aupdatedExisting,
-             aObjectID);
+             LNumberOfDocumentsUpdated,
+             LUpdatedExisting,
+             LObjectID);
 end;
 
 {*************************************************************************}
 Procedure TAlMongoDBClient.UpdateData(const FullCollectionName: AnsiString;
                                       const Selector: AnsiString;
                                       const Update: AnsiString);
-var aNumberOfDocumentsUpdated: integer;
-    aupdatedExisting: boolean;
-    aObjectID: ansiString;
+var LNumberOfDocumentsUpdated: integer;
+    LUpdatedExisting: boolean;
+    LObjectID: ansiString;
 begin
   UpdateData(FullCollectionName,
              selector,
              update,
              [],
-             aNumberOfDocumentsUpdated,
-             aupdatedExisting,
-             aObjectID);
+             LNumberOfDocumentsUpdated,
+             LUpdatedExisting,
+             LObjectID);
 end;
 
 {*************************************************************************}
@@ -2701,19 +3225,19 @@ Procedure TAlMongoDBClient.InsertData(const FullCollectionName: AnsiString; // T
                                                                             // foo and the collection bar, the full collection name is foo.bar
                                       const documents: AnsiString; // One or more documents to insert into the collection. If there are more than one, they are written in sequence, one after another.
                                       flags: TALMongoDBClientInsertDataFlags); // Options (see TALMongoDBClientInsertDataFlags)
-Var aFlags: integer;
-    aStopWatch: TStopWatch;
+Var LFlags: integer;
+    LStopWatch: TStopWatch;
 begin
 
   //Error if we are not connected
-  If not connected then raise Exception.Create('Not connected');
+  If not connected then raise EALException.Create('Not connected');
 
   //init the TstopWatch
-  aStopWatch := TstopWatch.Create;
+  LStopWatch := TstopWatch.Create;
 
   //start the TstopWatch
-  aStopWatch.Reset;
-  aStopWatch.Start;
+  LStopWatch.Reset;
+  LStopWatch.Start;
 
   //bit num	 name	            description
   //0	       ContinueOnError	If set, the database will not stop processing a bulk insert if one fails (eg due to duplicate IDs).
@@ -2721,20 +3245,20 @@ begin
   //                          any insert fails, not just the last one. If multiple errors occur, only the most recent will be
   //                          reported by getLastError. (new in 1.9.1)
   //1-31	   Reserved	        Must be set to 0.
-  aFlags := 0;
-  if ifContinueOnError in flags then aFlags := aFlags or (1 shl 0);
+  LFlags := 0;
+  if ifContinueOnError in flags then LFlags := LFlags or (1 shl 0);
 
   OP_INSERT(fSocketDescriptor,
-            aflags,
+            LFlags,
             FullCollectionName,
             documents);
 
   //do the OnInsertDataDone
-  aStopWatch.Stop;
+  LStopWatch.Stop;
   OnInsertDataDone(FullCollectionName,
                    documents,
                    flags,
-                   aStopWatch.Elapsed.TotalMilliseconds);
+                   LStopWatch.Elapsed.TotalMilliseconds);
 
 end;
 
@@ -2756,34 +3280,34 @@ Procedure TAlMongoDBClient.DeleteData(const FullCollectionName: AnsiString; // T
                                                                   // to be removed from the collection
                                       flags: TALMongoDBClientDeleteDataFlags; // Options (see TALMongoDBClientDeleteDataFlags)
                                       var NumberOfDocumentsRemoved: integer);
-Var aFlags: integer;
-    aStopWatch: TStopWatch;
+Var LFlags: integer;
+    LStopWatch: TStopWatch;
 begin
 
   //Error if we are not connected
-  If not connected then raise Exception.Create('Not connected');
+  If not connected then raise EALException.Create('Not connected');
 
   //init the TstopWatch
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
 
   //bit num	   name	          description
   //0	         SingleRemove	  If set, the database will remove only the first matching document in the collection. Otherwise all matching documents will be removed.
   //1-31	     Reserved	      Must be set to 0.
-  aFlags := 0;
-  if dfSingleRemove in flags then aFlags := aFlags or (1 shl 0);
+  LFlags := 0;
+  if dfSingleRemove in flags then LFlags := LFlags or (1 shl 0);
 
   OP_DELETE(fSocketDescriptor,
-            aflags,
+            LFlags,
             FullCollectionName,
             selector,
             NumberOfDocumentsRemoved);
 
   //do the OnDeleteDataDone
-  aStopWatch.Stop;
+  LStopWatch.Stop;
   OnDeleteDataDone(FullCollectionName,
                    selector,
                    flags,
-                   aStopWatch.Elapsed.TotalMilliseconds);
+                   LStopWatch.Elapsed.TotalMilliseconds);
 
 end;
 
@@ -2791,23 +3315,23 @@ end;
 Procedure TAlMongoDBClient.DeleteData(const FullCollectionName: AnsiString;
                                       const Selector: AnsiString;
                                       flags: TALMongoDBClientDeleteDataFlags);
-var aNumberOfDocumentsRemoved: integer;
+var LNumberOfDocumentsRemoved: integer;
 begin
   DeleteData(FullCollectionName,
              selector,
              flags,
-             aNumberOfDocumentsRemoved);
+             LNumberOfDocumentsRemoved);
 end;
 
 {*************************************************************************}
 Procedure TAlMongoDBClient.DeleteData(const FullCollectionName: AnsiString;
                                       const Selector: AnsiString);
-var aNumberOfDocumentsRemoved: integer;
+var LNumberOfDocumentsRemoved: integer;
 begin
   DeleteData(FullCollectionName,
              selector,
              [],
-             aNumberOfDocumentsRemoved);
+             LNumberOfDocumentsRemoved);
 end;
 
 {********************************************************************************}
@@ -2837,71 +3361,71 @@ Procedure TAlMongoDBClient.FindAndModifyData(const FullCollectionName: AnsiStrin
                                              var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
                                              var ObjectID: AnsiString); // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
 
-Var aStopWatch: TStopWatch;
-    aDatabaseName: AnsiString;
-    aCollectionName: AnsiString;
-    aViewRec: TalJSONNode;
-    aResponseFlags: integer;
-    aTmpQuery: ansiString;
-    aCursorID: int64;
-    aStartingFrom: integer;
-    aNumberReturned: integer;
-    aContinue: boolean;
-    aTmpRowTag: ansiString;
-    aUpdateRowTagByFieldValue: Boolean;
-    aJSONDoc: TALJSONDocument;
-    aNode1: TALJSONNode;
-    aNode2: TALJSONNode;
-    alastErrorObjectNode: TALJSONNode;
+Var LStopWatch: TStopWatch;
+    LDatabaseName: AnsiString;
+    LCollectionName: AnsiString;
+    LViewRec: TalJSONNode;
+    LResponseFlags: integer;
+    LTmpQuery: ansiString;
+    LCursorID: int64;
+    LStartingFrom: integer;
+    LNumberReturned: integer;
+    LContinue: boolean;
+    LTmpRowTag: ansiString;
+    LUpdateRowTagByFieldValue: Boolean;
+    LJSONDoc: TALJSONDocument;
+    LNode1: TALJSONNode;
+    LNode2: TALJSONNode;
+    LLastErrorObjectNode: TALJSONNode;
     P1: integer;
 
 begin
 
   //Error if we are not connected
-  If not connected then raise Exception.Create('Not connected');
+  If not connected then raise EALException.Create('Not connected');
 
   //init the TstopWatch
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
 
   //create a temp JSONDoc
-  aJSONDoc := TALJSONDocument.Create;
+  LJSONDoc := TALJSONDocument.Create;
   try
 
     //init aDatabaseName and aCollectionName
     P1 := AlPos('.',FullCollectionName);
-    if P1 <= 0 then raise Exception.Create('The full collection name must be the concatenation of the database name with the collection name');
-    aDatabaseName := ALCopyStr(FullCollectionName, 1, P1-1);
-    aCollectionName := ALCopyStr(FullCollectionName, P1+1, maxint);
+    if P1 <= 0 then raise EALException.Create('The full collection name must be the concatenation of the database name with the collection name');
+    LDatabaseName := ALCopyStr(FullCollectionName, 1, P1-1);
+    LCollectionName := ALCopyStr(FullCollectionName, P1+1, maxint);
 
     //buid the query
-    aTmpQuery := '{"findAndModify":' + ALJsonEncodeTextWithNodeSubTypeHelper(aCollectionName);
-    if query <> '' then aTmpQuery := aTmpQuery + ',"query":'+query;
-    if sort <> '' then aTmpQuery := aTmpQuery + ',"sort":'+sort;
-    aTmpQuery := aTmpQuery + ',"remove":'+ALJsonEncodeBooleanWithNodeSubTypeHelper(remove);
-    if update <> '' then aTmpQuery := aTmpQuery + ',"update":'+update;
-    aTmpQuery := aTmpQuery + ',"new":' + ALJsonEncodeBooleanWithNodeSubTypeHelper(new);
-    if ReturnFieldsSelector <> '' then aTmpQuery := aTmpQuery + ',"fields":'+ReturnFieldsSelector;
-    aTmpQuery := aTmpQuery + ',"upsert":'+ALJsonEncodeBooleanWithNodeSubTypeHelper(InsertIfNotFound);
-    aTmpQuery := aTmpQuery + '}';
+    LTmpQuery := '{"findAndModify":' + ALJsonEncodeTextWithNodeSubTypeHelper(LCollectionName);
+    if query <> '' then LTmpQuery := LTmpQuery + ',"query":'+query;
+    if sort <> '' then LTmpQuery := LTmpQuery + ',"sort":'+sort;
+    LTmpQuery := LTmpQuery + ',"remove":'+ALJsonEncodeBooleanWithNodeSubTypeHelper(remove);
+    if update <> '' then LTmpQuery := LTmpQuery + ',"update":'+update;
+    LTmpQuery := LTmpQuery + ',"new":' + ALJsonEncodeBooleanWithNodeSubTypeHelper(new);
+    if ReturnFieldsSelector <> '' then LTmpQuery := LTmpQuery + ',"fields":'+ReturnFieldsSelector;
+    LTmpQuery := LTmpQuery + ',"upsert":'+ALJsonEncodeBooleanWithNodeSubTypeHelper(InsertIfNotFound);
+    LTmpQuery := LTmpQuery + '}';
 
     //do the First query
     OP_QUERY(fSocketDescriptor,
              0, // flags
-             aDatabaseName  + '.$cmd', // fullCollectionName
+             LDatabaseName  + '.$cmd', // fullCollectionName
              0, // skip
              1, // First
-             aTmpQuery, // query
+             LTmpQuery, // query
              '', // ReturnFieldsSelector,
-             aResponseFlags,
-             aCursorID,
-             aStartingFrom,
-             aNumberReturned,
-             aJSONDoc.Node,
+             LResponseFlags,
+             LCursorID,
+             LStartingFrom,
+             LNumberReturned,
+             LJSONDoc.Node,
              nil,
              nil,
              '',
              '',
-             aContinue);
+             LContinue);
     try
 
       // exemple of returned json result
@@ -2930,88 +3454,81 @@ begin
       // "errmsg":"remove and returnNew can\u0027t co-exist"
       //}
 
-      //doNodeAutoCreate for the aJSONDoc
-      aJSONDoc.Options := [doNodeAutoCreate];
-
       //init the aViewRec
-      if (ViewTag <> '') then aViewRec := JSONdata.AddChild(ViewTag, ntobject)
-      else aViewRec := JSONdata;
+      if (ViewTag <> '') then LViewRec := JSONdata.AddChild(ViewTag, ntobject)
+      else LViewRec := JSONdata;
 
       //check error
-      if aJSONDoc.Node.ChildNodes['ok'].Text <> '1' then begin
-        aNode1 := aJSONDoc.Node.ChildNodes.FindNode('errmsg');
-        if assigned(aNode1) and (not aNode1.Null) then raise EALException.Create(aNode1.Text)
-        else raise Exception.Create('Error calling FindAndModifyData')
-      end;
+      CheckRunCommandResponse(LJSONDoc.Node);
 
       //get the value node
-      aNode1 := aJSONDoc.Node.ChildNodes.FindNode('value');
-      if assigned(aNode1) and (aNode1.NodeType = ntObject) then begin
+      LNode1 := LJSONDoc.Node.ChildNodes.FindNode('value');
+      if assigned(LNode1) and (LNode1.NodeType = ntObject) then begin
 
         //init aUpdateRowTagByFieldValue and aTmpRowTag
         if AlPos('&>',RowTag) = 1 then begin
-          aTmpRowTag := AlcopyStr(RowTag, 3, maxint);
-          aUpdateRowTagByFieldValue := aTmpRowTag <> '';
+          LTmpRowTag := AlcopyStr(RowTag, 3, maxint);
+          LUpdateRowTagByFieldValue := LTmpRowTag <> '';
         end
         else begin
-          aTmpRowTag := RowTag;
-          aUpdateRowTagByFieldValue := False;
+          LTmpRowTag := RowTag;
+          LUpdateRowTagByFieldValue := False;
         end;
 
         //add the row tag
-        if (aTmpRowTag <> '') or
-           (aViewRec.NodeType = ntarray) then aViewRec := aViewRec.AddChild(aTmpRowTag, ntobject);
+        if (LTmpRowTag <> '') or
+           (LViewRec.NodeType = ntarray) then LViewRec := LViewRec.AddChild(LTmpRowTag, ntobject);
 
         //move the node
-        while aNode1.ChildNodes.Count > 0 do begin
-          aNode2 := aNode1.ChildNodes.Extract(0);
+        while LNode1.ChildNodes.Count > 0 do begin
+          LNode2 := LNode1.ChildNodes.Extract(0);
           try
-            aViewRec.ChildNodes.Add(aNode2);
+            LViewRec.ChildNodes.Add(LNode2);
           except
-            aNode2.Free;
+            LNode2.Free;
             raise;
           end;
         end;
 
         // aUpdateRowTagByFieldValue
-        if aUpdateRowTagByFieldValue then begin
-          aNode1 := aViewRec.ChildNodes.FindNode(aTmpRowTag);
-          if assigned(aNode1) then aViewRec.NodeName := aNode1.Text;
+        if LUpdateRowTagByFieldValue then begin
+          LNode1 := LViewRec.ChildNodes.FindNode(LTmpRowTag);
+          if assigned(LNode1) then LViewRec.NodeName := LNode1.Text;
         end;
 
       end;
 
       //init alastErrorObjectNode;
-      alastErrorObjectNode := aJSONDoc.Node.ChildNodes['lastErrorObject'];
+      LLastErrorObjectNode := LJSONDoc.Node.ChildNodes['lastErrorObject'];
 
       //NumberOfDocumentsUpdatedOrRemoved
-      aNode1 := alastErrorObjectNode.ChildNodes.FindNode('n');
-      if assigned(aNode1) then NumberOfDocumentsUpdatedOrRemoved := aNode1.int32
+      LNode1 := LLastErrorObjectNode.ChildNodes.FindNode('n');
+      if assigned(LNode1) then NumberOfDocumentsUpdatedOrRemoved := LNode1.int32
       else NumberOfDocumentsUpdatedOrRemoved := 0;
 
       //updatedExisting
-      aNode1 := alastErrorObjectNode.ChildNodes.FindNode('updatedExisting');
-      if assigned(aNode1) then updatedExisting := aNode1.bool
+      LNode1 := LLastErrorObjectNode.ChildNodes.FindNode('updatedExisting');
+      if assigned(LNode1) then updatedExisting := LNode1.bool
       else updatedExisting := False;
 
       //ObjectID
-      aNode1 := alastErrorObjectNode.ChildNodes.FindNode('upserted');
-      if assigned(aNode1) then ObjectID := aNode1.text
+      LNode1 := LLastErrorObjectNode.ChildNodes.FindNode('upserted');
+      if assigned(LNode1) then ObjectID := LNode1.text
       else ObjectID := '';
 
     finally
 
       //close the curson
-      if aCursorId <> 0 then OP_KILL_CURSORS(fSocketDescriptor, [aCursorID]);
+      if LCursorID <> 0 then OP_KILL_CURSORS(fSocketDescriptor, [LCursorID]);
 
     end;
 
   finally
-    aJSONDoc.free;
+    LJSONDoc.free;
   end;
 
   //do the OnDeleteDataDone
-  aStopWatch.Stop;
+  LStopWatch.Stop;
   OnFindAndModifyDataDone(FullCollectionName,
                           query,
                           sort,
@@ -3022,7 +3539,7 @@ begin
                           InsertIfNotFound,
                           RowTag,
                           ViewTag,
-                          aStopWatch.Elapsed.TotalMilliseconds);
+                          LStopWatch.Elapsed.TotalMilliseconds);
 
 end;
 
@@ -3067,9 +3584,9 @@ Procedure TAlMongoDBClient.FindAndModifyData(const FullCollectionName: AnsiStrin
                                              const ReturnFieldsSelector: AnsiString;
                                              InsertIfNotFound: boolean;
                                              JSONDATA: TALJSONNode);
-var aNumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
-    aupdatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-    aObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+var LNumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
+    LUpdatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
+    LObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
 begin
   FindAndModifyData(FullCollectionName,
                     query,
@@ -3082,9 +3599,9 @@ begin
                     '', // RowTag,
                     '', // ViewTag,
                     JSONDATA,
-                    aNumberOfDocumentsUpdatedOrRemoved,
-                    aupdatedExisting,
-                    aObjectID);
+                    LNumberOfDocumentsUpdatedOrRemoved,
+                    LUpdatedExisting,
+                    LObjectID);
 end;
 
 {****************************************************************************}
@@ -3137,7 +3654,7 @@ end;
 
 {*****************************************************************}
 function TAlMongoDBConnectionPoolClient.AcquireConnection: TSocket;
-Var aTickCount: int64;
+Var LTickCount: int64;
 Begin
 
   //synchronize the code
@@ -3145,13 +3662,13 @@ Begin
   Try
 
     //raise an exception if currently realeasing all connection
-    if FReleasingAllconnections then raise exception.Create('Can not acquire connection: currently releasing all connections');
+    if FReleasingAllconnections then raise EALException.Create('Can not acquire connection: currently releasing all connections');
 
     //delete the old unused connection
-    aTickCount := GetTickCount64;
-    if aTickCount - fLastConnectionGarbage > (60000 {every minutes})  then begin
+    LTickCount := GetTickCount64;
+    if LTickCount - fLastConnectionGarbage > (60000 {every minutes})  then begin
       while FConnectionPoolCount > 0 do begin
-        if aTickCount - FConnectionPool[0].Lastaccessdate > FConnectionMaxIdleTime then begin
+        if LTickCount - FConnectionPool[0].Lastaccessdate > FConnectionMaxIdleTime then begin
 
           Try
             DoDisconnect(FConnectionPool[0].SocketDescriptor);
@@ -3170,7 +3687,7 @@ Begin
         end
         else break;
       end;
-      FLastConnectionGarbage := aTickCount;
+      FLastConnectionGarbage := LTickCount;
     end;
 
     //acquire the new connection from the pool
@@ -3218,7 +3735,7 @@ procedure TAlMongoDBConnectionPoolClient.ReleaseConnection(var SocketDescriptor:
 begin
 
   //security check
-  if SocketDescriptor = INVALID_SOCKET then raise exception.Create('Connection handle can not be INVALID_SOCKET');
+  if SocketDescriptor = INVALID_SOCKET then raise EALException.Create('Connection handle can not be INVALID_SOCKET');
 
   //release the connection
   FConnectionPoolCS.Acquire;
@@ -3351,20 +3868,20 @@ Procedure TAlMongoDBConnectionPoolClient.SelectData(const FullCollectionName: An
                                                     ExtData: Pointer;
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
 
-Var aViewRec: TalJSONNode;
-    aJSONDocument: TalJSONDocument;
-    aResponseFlags: integer;
-    aCursorID: int64;
-    aStartingFrom: integer;
-    aNumberReturned: integer;
-    aFlags: integer;
-    aRecAdded: integer;
-    aContinue: boolean;
-    aTMPConnectionSocket: TSocket;
-    aOwnConnection: Boolean;
-    aStopWatch: TStopWatch;
-    aCacheKey: ansiString;
-    aCacheStr: ansiString;
+Var LViewRec: TalJSONNode;
+    LJSONDocument: TalJSONDocument;
+    LResponseFlags: integer;
+    LCursorID: int64;
+    LStartingFrom: integer;
+    LNumberReturned: integer;
+    LFlags: integer;
+    LRecAdded: integer;
+    LContinue: boolean;
+    LTMPConnectionSocket: TSocket;
+    LOwnConnection: Boolean;
+    LStopWatch: TStopWatch;
+    LCacheKey: ansiString;
+    LCacheStr: ansiString;
 
 begin
 
@@ -3372,41 +3889,43 @@ begin
   if assigned(OnNewRowFunct) then JSONDATA := nil;
 
   //clear the JSONDATA
-  if assigned(JSONDATA) then aJSONDocument := Nil
+  if assigned(JSONDATA) then LJSONDocument := Nil
   else begin
-    aJSONDocument := TALJSONDocument.create;
-    JSONDATA := aJSONDocument.Node;
+    LJSONDocument := TALJSONDocument.create;
+    JSONDATA := LJSONDocument.Node;
   end;
 
   try
 
     //init the TstopWatch
-    aStopWatch := TstopWatch.Create;
+    LStopWatch := TstopWatch.Create;
 
     //Handle the CacheThreshold
-    aCacheKey := '';
+    LCacheKey := '';
     If (CacheThreshold > 0) and
-       (not assigned(aJSONDocument)) and
+       (not assigned(LJSONDocument)) and
        (not (sfTailMonitoring in flags)) and
        ((JSONDATA.ChildNodes.Count = 0) or  // else the save will not work
         (ViewTag <> '')) then begin
 
       //try to load from from cache
-      aCacheKey := ALStringHashSHA1(RowTag + '#' +
-                                    alinttostr(Skip) + '#' +
-                                    alinttostr(First) + '#' +
-                                    FullCollectionName + '#' +
-                                    ReturnFieldsSelector + '#' +
-                                    Query);
+      LCacheKey := ALStringHashSHA1(
+                     ALFormat('%s#%d#%d#%s#%s#%s',
+                              [RowTag,
+                               Skip,
+                               First,
+                               FullCollectionName,
+                               ReturnFieldsSelector,
+                               Query]));
 
-      if loadcachedData(aCacheKey, aCacheStr) then begin
+      if loadcachedData(LCacheKey, LCacheStr) then begin
 
         //init the aViewRec
-        if (ViewTag <> '') then aViewRec := JSONDATA.AddChild(ViewTag, ntobject)
-        else aViewRec := JSONDATA;
+        if (ViewTag <> '') then LViewRec := JSONDATA.AddChild(ViewTag, ntobject)
+        else LViewRec := JSONDATA;
 
         //assign the tmp data to the XMLData
-        aViewRec.LoadFromJsonString(aCacheStr, false{ClearChildNodes});
+        LViewRec.LoadFromJsonString(LCacheStr, false{ClearChildNodes});
 
         //exit
         exit;
@@ -3417,19 +3936,19 @@ begin
 
     //acquire a connection
     if ConnectionSocket = INVALID_SOCKET then begin
-      aTMPConnectionSocket := AcquireConnection;
-      aOwnConnection := True;
+      LTMPConnectionSocket := AcquireConnection;
+      LOwnConnection := True;
     end
     else begin
-      aTMPConnectionSocket := ConnectionSocket;
-      aOwnConnection := False;
+      LTMPConnectionSocket := ConnectionSocket;
+      LOwnConnection := False;
     end;
 
     try
 
       //start the TstopWatch
-      aStopWatch.Reset;
-      aStopWatch.Start;
+      LStopWatch.Reset;
+      LStopWatch.Start;
 
       //build the flag integer
       //bit num	   name	            description
@@ -3459,24 +3978,24 @@ begin
       //                            Mostly because Exhaust is not compatible with mongos we will not use it
       //7	         Partial	        Get partial results from a mongos if some shards are down (instead of throwing an error)
       //8-31	     Reserved	        Must be set to 0.
-      aFlags := 0;
+      LFlags := 0;
       if sfTailMonitoring in flags then
         raise EAlMongoDBClientException.Create('Tail monitoring work only with TAlMongoDBClient', 0 {aErrorCode}, false {aCloseConnection});
-      if sfSlaveOk in flags then aFlags := aFlags or (1 shl 2);
-      if sfNoCursorTimeout in flags then aFlags := aFlags or (1 shl 4);
-      if sfPartial in flags then aFlags := aFlags or (1 shl 7);
+      if sfSlaveOk in flags then LFlags := LFlags or (1 shl 2);
+      if sfNoCursorTimeout in flags then LFlags := LFlags or (1 shl 4);
+      if sfPartial in flags then LFlags := LFlags or (1 shl 7);
 
       //init the aViewRec
-      if (ViewTag <> '') and (not assigned(aJSONDocument)) then aViewRec := JSONdata.AddChild(ViewTag, ntobject)
-      else aViewRec := JSONdata;
+      if (ViewTag <> '') and (not assigned(LJSONDocument)) then LViewRec := JSONdata.AddChild(ViewTag, ntobject)
+      else LViewRec := JSONdata;
 
       //init aRecAdded
-      aRecAdded := 0;
+      LRecAdded := 0;
 
       //do the First query
-      aContinue := true;
-      OP_QUERY(aTMPConnectionSocket,
-               aFlags,
+      LContinue := true;
+      OP_QUERY(LTMPConnectionSocket,
+               LFlags,
                fullCollectionName,
                ALIfThen(Skip >= 0, Skip, 0),
                ALIfThen(First >= 0, First, 0), // The MongoDB server returns the query results in batches. Batch size will not exceed
@@ -3485,57 +4004,57 @@ begin
                                                // 4 megabytes. To override the default size of the batch, see batchSize() and limit().
                query,
                ReturnFieldsSelector,
-               aResponseFlags,
-               aCursorID,
-               aStartingFrom, // where in the cursor this reply is starting
-               aNumberReturned, // number of documents in the reply
-               aViewRec,
+               LResponseFlags,
+               LCursorID,
+               LStartingFrom, // where in the cursor this reply is starting
+               LNumberReturned, // number of documents in the reply
+               LViewRec,
                OnNewRowFunct,
                ExtData,
                RowTag,
                ViewTag,
-               aContinue);
+               LContinue);
 
       try
 
         //init aRecAdded
-        aRecAdded := aRecAdded + aNumberReturned;
+        LRecAdded := LRecAdded + LNumberReturned;
 
         //loop still the cursorID > 0
-        while (aContinue) and
-              (aCursorID <> 0) and
+        while (LContinue) and
+              (LCursorID <> 0) and
               ((First <= 0) or
-               (aRecAdded < First)) do begin
+               (LRecAdded < First)) do begin
 
           //Get more data
-          OP_GET_MORE(aTMPConnectionSocket,
+          OP_GET_MORE(LTMPConnectionSocket,
                       fullCollectionName,
-                      ALIfThen(First > 0, First - aRecAdded, 0),
-                      aCursorID,
-                      aResponseFlags,
-                      aStartingFrom,
-                      anumberReturned,
-                      aViewRec,
+                      ALIfThen(First > 0, First - LRecAdded, 0),
+                      LCursorID,
+                      LResponseFlags,
+                      LStartingFrom,
+                      LNumberReturned,
+                      LViewRec,
                       OnNewRowFunct,
                       ExtData,
                       RowTag,
                       ViewTag,
-                      aContinue);
+                      LContinue);
 
           //init aRecAdded
-          aRecAdded := aRecAdded + aNumberReturned;
+          LRecAdded := LRecAdded + LNumberReturned;
 
         end;
 
       finally
 
         //close the curson
-        if aCursorId <> 0 then OP_KILL_CURSORS(aTMPConnectionSocket, [aCursorID]);
+        if LCursorID <> 0 then OP_KILL_CURSORS(LTMPConnectionSocket, [LCursorID]);
 
       end;
 
       //do the OnSelectDataDone
-      aStopWatch.Stop;
+      LStopWatch.Stop;
       OnSelectDataDone(FullCollectionName,
                        Query,
                        ReturnFieldsSelector,
@@ -3545,25 +4064,25 @@ begin
                        Skip,
                        First,
                        CacheThreshold,
-                       aStopWatch.Elapsed.TotalMilliseconds);
+                       LStopWatch.Elapsed.TotalMilliseconds);
 
       //save to the cache
-      If aCacheKey <> '' then begin
+      If LCacheKey <> '' then begin
 
         //save the data
-        aViewRec.SaveToJSONString(aCacheStr);
-        SaveDataToCache(aCacheKey,
+        LViewRec.SaveToJSONString(LCacheStr);
+        SaveDataToCache(LCacheKey,
                         CacheThreshold,
-                        aCacheStr);
+                        LCacheStr);
 
       end;
 
-    //Release the Connection
-    if aOwnConnection then ReleaseConnection(aTMPConnectionSocket);
+      //Release the Connection
+      if LOwnConnection then ReleaseConnection(LTMPConnectionSocket);
 
     except
       On E: Exception do begin
-        if aOwnConnection then ReleaseConnection(aTMPConnectionSocket,
+        if LOwnConnection then ReleaseConnection(LTMPConnectionSocket,
                                                  (not (E Is EAlMongoDBClientException)) or
                                                  (E as EAlMongoDBClientException).CloseConnection);
         raise;
@@ -3571,7 +4090,7 @@ begin
     end;
 
   finally
-    if assigned(aJSONDocument) then aJSONDocument.free;
+    if assigned(LJSONDocument) then LJSONDocument.free;
   end;
 
 end;
@@ -3813,6 +4332,408 @@ begin
              -1, // CacheThreshold,
              JSONDATA,
              nil, // OnNewRowFunct,
+             nil, // ExtData,
+             ConnectionSocket);
+end;
+
+{*********************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.RunCommand(const DatabaseName: AnsiString;
+                                                    const Command: AnsiString; // BSON document that represents the Command
+                                                    flags: TALMongoDBClientRunCommandFlags; // Options (see TALMongoDBClientRunCommandFlags)
+                                                    const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
+                                                    const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
+                                                    CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                                                             // cache or not. Values <= 0 deactivate the cache
+                                                    JSONDATA: TALJSONNode;
+                                                    OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
+                                                    ExtData: Pointer;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+
+Var LViewRec: TalJSONNode;
+    LRowRec: TalJSONNode;
+    LCursorRec: TalJsonNode;
+    LFirstBatchRec: TalJsonNode;
+    LJSONDocument: TalJSONDocument;
+    LResponseFlags: integer;
+    LCursorID: int64;
+    LStartingFrom: integer;
+    LNumberReturned: integer;
+    LFlags: integer;
+    LContinue: boolean;
+    LTMPConnectionSocket: TSocket;
+    LOwnConnection: Boolean;
+    LStopWatch: TStopWatch;
+    LCacheKey: ansiString;
+    LCacheStr: ansiString;
+    LFullCollectionName: ansiString;
+    i: integer;
+
+begin
+
+  //init aFullCollectionName
+  LFullCollectionName := DatabaseName + '.$cmd';
+
+  //only OnNewBatchRowFunct / JSONDATA can be used
+  if assigned(OnNewBatchRowFunct) then JSONDATA := nil;
+
+  //clear the JSONDATA
+  if assigned(JSONDATA) then LJSONDocument := Nil
+  else begin
+    LJSONDocument := TALJSONDocument.create;
+    JSONDATA := LJSONDocument.Node;
+  end;
+
+  try
+
+    //init the TstopWatch
+    LStopWatch := TstopWatch.Create;
+
+    //Handle the CacheThreshold
+    LCacheKey := '';
+    If (CacheThreshold > 0) and
+       (not assigned(LJSONDocument)) and
+       ((JSONDATA.ChildNodes.Count = 0) or  // else the save will not work
+        (ViewTag <> '')) then begin
+
+      //try to load from from cache
+      LCacheKey := ALStringHashSHA1(
+                     ALFormat('%s#%d#%d#%s#%s#%s',
+                              [RowTag,
+                               0,
+                               1,
+                               LFullCollectionName,
+                               '',
+                               Command]));
+
+      if loadcachedData(LCacheKey, LCacheStr) then begin
+
+        //init the aViewRec
+        if (ViewTag <> '') then LViewRec := JSONDATA.AddChild(ViewTag, ntobject)
+        else LViewRec := JSONDATA;
+
+        //assign the tmp data to the XMLData
+        LViewRec.LoadFromJsonString(LCacheStr, false{ClearChildNodes});
+
+        //exit
+        exit;
+
+      end;
+
+    end;
+
+    //acquire a connection
+    if ConnectionSocket = INVALID_SOCKET then begin
+      LTMPConnectionSocket := AcquireConnection;
+      LOwnConnection := True;
+    end
+    else begin
+      LTMPConnectionSocket := ConnectionSocket;
+      LOwnConnection := False;
+    end;
+
+    try
+
+      //start the TstopWatch
+      LStopWatch.Reset;
+      LStopWatch.Start;
+
+      //build the flag integer
+      //bit num	   name	            description
+      //0	         Reserved	        Must be set to 0.
+      //1	         TailableCursor	  Tailable means cursor is not closed when the last data is retrieved. Rather, the cursor marks the final object’s
+      //                            position. You can resume using the cursor later, from where it was located, if more data were received. Like any
+      //                            “latent cursor”, the cursor may become invalid at some point (CursorNotFound) – for example if the final object
+      //                            it references were deleted.
+      //2	         SlaveOk	        Allow query of replica slave. Normally these return an error except for namespace “local”.
+      //3	         OplogReplay	    Internal replication use only - driver should not set
+      //4	         NoCursorTimeout	The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use. Set this
+      //                            option to prevent that.
+      //5	         AwaitData	      Use with TailableCursor. If we are at the end of the data, block for a while rather than returning no data. After a
+      //                            timeout period, we do return as normal.
+      //6	         Exhaust	        Stream the data down full blast in multiple “more” packages, on the assumption that the client will fully read all data queried.
+      //                            Faster when you are pulling a lot of data and know you want to pull it all down. Note: the client is not allowed to not read all
+      //                            the data unless it closes the connection.
+      //                            Caveats:
+      //                            * Exhaust and limit are not compatible.
+      //                            * Exhaust cursors are not supported by mongos and can not be used with a sharded cluster.
+      //                            * Exhaust cursors require an exclusive socket connection to MongoDB. If the Cursor is discarded
+      //                              without being completely iterated the underlying socket connection will be closed and discarded
+      //                              without being returned to the connection pool.
+      //                            * If you create an exhaust cursor in a request (http://api.mongodb.org/python/current/examples/requests.html),
+      //                              you must completely iterate the Cursor before executing any other operation.
+      //                            * The per-query network_timeout option is ignored when using an exhaust cursor.
+      //                            Mostly because Exhaust is not compatible with mongos we will not use it
+      //7	         Partial	        Get partial results from a mongos if some shards are down (instead of throwing an error)
+      //8-31	     Reserved	        Must be set to 0.
+      LFlags := 0;
+      if cfSlaveOk in flags then LFlags := LFlags or (1 shl 2);
+      if cfNoCursorTimeout in flags then LFlags := LFlags or (1 shl 4);
+      if cfPartial in flags then LFlags := LFlags or (1 shl 7);
+
+      //init the aViewRec
+      if (ViewTag <> '') and (not assigned(LJSONDocument)) then LViewRec := JSONdata.AddChild(ViewTag, ntobject)
+      else LViewRec := JSONdata;
+
+      //do the First query
+      LContinue := true;
+      OP_QUERY(LTMPConnectionSocket,
+               LFlags,
+               LFullCollectionName,
+               0,
+               1,
+               Command,
+               '', // ReturnFieldsSelector
+               LResponseFlags,
+               LCursorID,
+               LStartingFrom, // where in the cursor this reply is starting
+               LNumberReturned, // number of documents in the reply
+               LViewRec,
+               nil,
+               ExtData,
+               RowTag,
+               ViewTag,
+               LContinue);
+
+      //aCursorID must be egual to 0 (we retrieve only one doc) but in case
+      if LCursorID <> 0 then OP_KILL_CURSORS(LTMPConnectionSocket, [LCursorID]);
+
+      //init LRowRec
+      if (RowTag <> '') and (LViewRec.ChildNodes.Count > 0) then LRowRec := LViewRec.ChildNodes[LViewRec.ChildNodes.Count - 1]
+      else LRowRec := LViewRec;
+
+      //check error
+      CheckRunCommandResponse(LRowRec);
+
+      //{
+      //  "cursor" : {
+      //      "id" : NumberLong(3286429289449024015),
+      //      "ns" : "mydatabase.$cmd.listCollections",
+      //      "firstBatch" : [
+      //          {
+      //            ....
+      //          },
+      //          {
+      //            ....
+      //          }
+      //      ]
+      //  },
+      //  "ok" : 1.0
+      //}
+      LCursorRec := LRowRec.ChildNodes.FindNode('cursor');
+      if LCursorRec <> nil then begin
+
+        //init LFirstBatchRec
+        LFirstBatchRec := LCursorRec.ChildNodes.FindNode('firstBatch');
+        if (LFirstBatchRec <> nil) and
+           (assigned(OnNewBatchRowFunct)) and
+           (LContinue) then begin
+          for I := 0 to LFirstBatchRec.ChildNodes.Count - 1 do begin
+            OnNewBatchRowFunct(LFirstBatchRec.ChildNodes[I], // JSONRowData: TALJSONNode;
+                               ViewTag, // const ViewTag: AnsiString;
+                               ExtData, // ExtData: Pointer;
+                               LContinue); // Var Continue: Boolean);
+            if not LContinue then break;
+          end;
+        end;
+
+        //init LCursorID
+        LCursorID := LCursorRec.getChildNodeValueInt64('id', 0);
+        if LCursorID <> 0 then begin
+
+          try
+
+            //we do the job only if LFirstBatchRec exist
+            if LFirstBatchRec <> nil then begin
+
+              //init LCollectionName
+              LFullCollectionName := LCursorRec.getChildNodeValueText('ns', '');
+
+              //loop still the cursorID > 0
+              while (LContinue) and
+                    (LCursorID <> 0) do begin
+
+                //Get more data
+                OP_GET_MORE(LTMPConnectionSocket,
+                            LFullCollectionName,
+                            0, // numberToReturn
+                            LCursorID,
+                            LResponseFlags,
+                            LStartingFrom,
+                            LNumberReturned,
+                            LFirstBatchRec, // documents
+                            OnNewBatchRowFunct,
+                            ExtData,
+                            '', // RowTag,
+                            ViewTag,
+                            LContinue);
+
+              end;
+
+            end;
+
+          finally
+
+            //close the curson
+            if LCursorID <> 0 then OP_KILL_CURSORS(LTMPConnectionSocket, [LCursorID]);
+
+          end;
+
+          LCursorRec.SetChildNodeValueInt64('id', 0);
+
+        end;
+
+      end;
+
+      //do the OnRunCommandDone
+      LStopWatch.Stop;
+      OnRunCommandDone(DatabaseName,
+                       Command,
+                       flags,
+                       RowTag,
+                       ViewTag,
+                       CacheThreshold,
+                       LStopWatch.Elapsed.TotalMilliseconds);
+
+      //save to the cache
+      If LCacheKey <> '' then begin
+
+        //save the data
+        LViewRec.SaveToJSONString(LCacheStr);
+        SaveDataToCache(LCacheKey,
+                        CacheThreshold,
+                        LCacheStr);
+
+      end;
+
+      //Release the Connection
+      if LOwnConnection then ReleaseConnection(LTMPConnectionSocket);
+
+    except
+      On E: Exception do begin
+        if LOwnConnection then ReleaseConnection(LTMPConnectionSocket,
+                                                 (not (E Is EAlMongoDBClientException)) or
+                                                 (E as EAlMongoDBClientException).CloseConnection);
+        raise;
+      end;
+    end;
+
+  finally
+    if assigned(LJSONDocument) then LJSONDocument.free;
+  end;
+
+end;
+
+{*********************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.RunCommand(const DatabaseName: AnsiString;
+                                                    const Command: AnsiString;
+                                                    flags: TALMongoDBClientRunCommandFlags;
+                                                    OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
+                                                    ExtData: Pointer;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+begin
+  RunCommand(DatabaseName,
+             Command,
+             flags,
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // CacheThreshold,
+             nil, // JSONDATA,
+             OnNewBatchRowFunct,
+             ExtData,
+             ConnectionSocket);
+end;
+
+{*********************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.RunCommand(const DatabaseName: AnsiString;
+                                                    const Command: AnsiString;
+                                                    flags: TALMongoDBClientRunCommandFlags;
+                                                    const RowTag: AnsiString;
+                                                    JSONDATA: TALJSONNode;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+begin
+  RunCommand(DatabaseName,
+             Command,
+             flags,
+             RowTag,
+             '', // ViewTag,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewBatchRowFunct,
+             nil, // ExtData,
+             ConnectionSocket);
+end;
+
+{*********************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.RunCommand(const DatabaseName: AnsiString;
+                                                    const Command: AnsiString;
+                                                    flags: TALMongoDBClientRunCommandFlags;
+                                                    JSONDATA: TALJSONNode;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+begin
+  RunCommand(DatabaseName,
+             Command,
+             flags,
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewBatchRowFunct,
+             nil, // ExtData,
+             ConnectionSocket);
+end;
+
+{*********************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.RunCommand(const DatabaseName: AnsiString;
+                                                    const Command: AnsiString;
+                                                    OnNewBatchRowFunct: TALMongoDBClientRunCommandOnNewBatchRowFunct;
+                                                    ExtData: Pointer;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+begin
+  RunCommand(DatabaseName,
+             Command,
+             [],
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // CacheThreshold,
+             nil, // JSONDATA,
+             OnNewBatchRowFunct,
+             ExtData,
+             ConnectionSocket);
+end;
+
+{*********************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.RunCommand(const DatabaseName: AnsiString;
+                                                    const Command: AnsiString;
+                                                    const RowTag: AnsiString;
+                                                    JSONDATA: TALJSONNode;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+begin
+  RunCommand(DatabaseName,
+             Command,
+             [],
+             RowTag,
+             '', // ViewTag,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewBatchRowFunct,
+             nil, // ExtData,
+             ConnectionSocket);
+end;
+
+{*********************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.RunCommand(const DatabaseName: AnsiString;
+                                                    const Command: AnsiString;
+                                                    JSONDATA: TALJSONNode;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+begin
+  RunCommand(DatabaseName,
+             Command,
+             [],
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewBatchRowFunct,
              nil, // ExtData,
              ConnectionSocket);
 end;
@@ -3829,37 +4750,37 @@ Procedure TAlMongoDBConnectionPoolClient.UpdateData(const FullCollectionName: An
                                                     var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
                                                     var ObjectID: ansiString; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
-Var aFlags: integer;
-    aTMPConnectionSocket: TSocket;
-    aOwnConnection: Boolean;
-    aStopWatch: TStopWatch;
+Var LFlags: integer;
+    LTMPConnectionSocket: TSocket;
+    LOwnConnection: Boolean;
+    LStopWatch: TStopWatch;
 begin
 
   //acquire a connection
   if ConnectionSocket = INVALID_SOCKET then begin
-    aTMPConnectionSocket := AcquireConnection;
-    aOwnConnection := True;
+    LTMPConnectionSocket := AcquireConnection;
+    LOwnConnection := True;
   end
   else begin
-    aTMPConnectionSocket := ConnectionSocket;
-    aOwnConnection := False;
+    LTMPConnectionSocket := ConnectionSocket;
+    LOwnConnection := False;
   end;
 
   try
 
     //init the TstopWatch
-    aStopWatch := TstopWatch.StartNew;
+    LStopWatch := TstopWatch.StartNew;
 
     //bit num	  name	        description
     //0	        Upsert	      If set, the database will insert the supplied object into the collection if no matching document is found.
     //1	        MultiUpdate	  If set, the database will update all matching objects in the collection. Otherwise only updates first matching doc.
     //2-31    	Reserved	    Must be set to 0.
-    aFlags := 0;
-    if ufUpsert in flags then aFlags := aFlags or (1 shl 0);
-    if ufMultiUpdate in flags then aFlags := aFlags or (1 shl 1);
+    LFlags := 0;
+    if ufUpsert in flags then LFlags := LFlags or (1 shl 0);
+    if ufMultiUpdate in flags then LFlags := LFlags or (1 shl 1);
 
-    OP_UPDATE(aTMPConnectionSocket,
-              aflags,
+    OP_UPDATE(LTMPConnectionSocket,
+              LFlags,
               FullCollectionName,
               selector,
               Update,
@@ -3868,19 +4789,19 @@ begin
               ObjectID);
 
     //do the OnUpdateDataDone
-    aStopWatch.Stop;
+    LStopWatch.Stop;
     OnUpdateDataDone(FullCollectionName,
                      selector,
                      update,
                      flags,
-                     aStopWatch.Elapsed.TotalMilliseconds);
+                     LStopWatch.Elapsed.TotalMilliseconds);
 
     //Release the Connection
-    if aOwnConnection then ReleaseConnection(aTMPConnectionSocket);
+    if LOwnConnection then ReleaseConnection(LTMPConnectionSocket);
 
   except
     On E: Exception do begin
-      if aOwnConnection then ReleaseConnection(aTMPConnectionSocket,
+      if LOwnConnection then ReleaseConnection(LTMPConnectionSocket,
                                                (not (E Is EAlMongoDBClientException)) or
                                                (E as EAlMongoDBClientException).CloseConnection);
       raise;
@@ -3895,17 +4816,17 @@ Procedure TAlMongoDBConnectionPoolClient.UpdateData(const FullCollectionName: An
                                                     const Update: AnsiString;
                                                     flags: TALMongoDBClientUpdateDataFlags;
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
-var aNumberOfDocumentsUpdated: integer;
-    aupdatedExisting: boolean;
-    aObjectID: ansiString;
+var LNumberOfDocumentsUpdated: integer;
+    LUpdatedExisting: boolean;
+    LObjectID: ansiString;
 begin
   UpdateData(FullCollectionName,
              selector,
              update,
              flags,
-             aNumberOfDocumentsUpdated,
-             aupdatedExisting,
-             aObjectID,
+             LNumberOfDocumentsUpdated,
+             LUpdatedExisting,
+             LObjectID,
              ConnectionSocket);
 end;
 
@@ -3914,17 +4835,17 @@ Procedure TAlMongoDBConnectionPoolClient.UpdateData(const FullCollectionName: An
                                                     const Selector: AnsiString;
                                                     const Update: AnsiString;
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
-var aNumberOfDocumentsUpdated: integer;
-    aupdatedExisting: boolean;
-    aObjectID: ansiString;
+var LNumberOfDocumentsUpdated: integer;
+    LUpdatedExisting: boolean;
+    LObjectID: ansiString;
 begin
   UpdateData(FullCollectionName,
              selector,
              update,
              [],
-             aNumberOfDocumentsUpdated,
-             aupdatedExisting,
-             aObjectID,
+             LNumberOfDocumentsUpdated,
+             LUpdatedExisting,
+             LObjectID,
              ConnectionSocket);
 end;
 
@@ -3936,31 +4857,31 @@ Procedure TAlMongoDBConnectionPoolClient.InsertData(const FullCollectionName: An
                                                     flags: TALMongoDBClientInsertDataFlags;// Options (see TALMongoDBClientInsertDataFlags)
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
 
-Var aFlags: integer;
-    aTMPConnectionSocket: TSocket;
-    aOwnConnection: Boolean;
-    aStopWatch: TStopWatch;
+Var LFlags: integer;
+    LTMPConnectionSocket: TSocket;
+    LOwnConnection: Boolean;
+    LStopWatch: TStopWatch;
 
 begin
 
   //acquire a connection
   if ConnectionSocket = INVALID_SOCKET then begin
-    aTMPConnectionSocket := AcquireConnection;
-    aOwnConnection := True;
+    LTMPConnectionSocket := AcquireConnection;
+    LOwnConnection := True;
   end
   else begin
-    aTMPConnectionSocket := ConnectionSocket;
-    aOwnConnection := False;
+    LTMPConnectionSocket := ConnectionSocket;
+    LOwnConnection := False;
   end;
 
   try
 
     //init the TstopWatch
-    aStopWatch := TstopWatch.Create;
+    LStopWatch := TstopWatch.Create;
 
     //start the TstopWatch
-    aStopWatch.Reset;
-    aStopWatch.Start;
+    LStopWatch.Reset;
+    LStopWatch.Start;
 
     //bit num	 name	            description
     //0	       ContinueOnError	If set, the database will not stop processing a bulk insert if one fails (eg due to duplicate IDs).
@@ -3968,27 +4889,27 @@ begin
     //                          any insert fails, not just the last one. If multiple errors occur, only the most recent will be
     //                          reported by getLastError. (new in 1.9.1)
     //1-31	   Reserved	        Must be set to 0.
-    aFlags := 0;
-    if ifContinueOnError in flags then aFlags := aFlags or (1 shl 0);
+    LFlags := 0;
+    if ifContinueOnError in flags then LFlags := LFlags or (1 shl 0);
 
-    OP_INSERT(aTMPConnectionSocket,
-              aflags,
+    OP_INSERT(LTMPConnectionSocket,
+              LFlags,
               FullCollectionName,
               documents);
 
     //do the OnInsertDataDone
-    aStopWatch.Stop;
+    LStopWatch.Stop;
     OnInsertDataDone(FullCollectionName,
                      documents,
                      flags,
-                     aStopWatch.Elapsed.TotalMilliseconds);
+                     LStopWatch.Elapsed.TotalMilliseconds);
 
     //Release the Connection
-    if aOwnConnection then ReleaseConnection(aTMPConnectionSocket);
+    if LOwnConnection then ReleaseConnection(LTMPConnectionSocket);
 
   except
     On E: Exception do begin
-      if aOwnConnection then ReleaseConnection(aTMPConnectionSocket,
+      if LOwnConnection then ReleaseConnection(LTMPConnectionSocket,
                                                (not (E Is EAlMongoDBClientException)) or
                                                (E as EAlMongoDBClientException).CloseConnection);
       raise;
@@ -4019,53 +4940,53 @@ Procedure TAlMongoDBConnectionPoolClient.DeleteData(const FullCollectionName: An
                                                     var NumberOfDocumentsRemoved: integer;
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
 
-Var aFlags: integer;
-    aTMPConnectionSocket: TSocket;
-    aOwnConnection: Boolean;
-    aStopWatch: TStopWatch;
+Var LFlags: integer;
+    LTMPConnectionSocket: TSocket;
+    LOwnConnection: Boolean;
+    LStopWatch: TStopWatch;
 
 begin
 
   //acquire a connection
   if ConnectionSocket = INVALID_SOCKET then begin
-    aTMPConnectionSocket := AcquireConnection;
-    aOwnConnection := True;
+    LTMPConnectionSocket := AcquireConnection;
+    LOwnConnection := True;
   end
   else begin
-    aTMPConnectionSocket := ConnectionSocket;
-    aOwnConnection := False;
+    LTMPConnectionSocket := ConnectionSocket;
+    LOwnConnection := False;
   end;
 
   try
 
     //init the TstopWatch
-    aStopWatch := TstopWatch.StartNew;
+    LStopWatch := TstopWatch.StartNew;
 
     //bit num	   name	          description
     //0	         SingleRemove	  If set, the database will remove only the first matching document in the collection. Otherwise all matching documents will be removed.
     //1-31	     Reserved	      Must be set to 0.
-    aFlags := 0;
-    if dfSingleRemove in flags then aFlags := aFlags or (1 shl 0);
+    LFlags := 0;
+    if dfSingleRemove in flags then LFlags := LFlags or (1 shl 0);
 
-    OP_DELETE(aTMPConnectionSocket,
-              aflags,
+    OP_DELETE(LTMPConnectionSocket,
+              LFlags,
               FullCollectionName,
               selector,
               NumberOfDocumentsRemoved);
 
     //do the OnDeleteDataDone
-    aStopWatch.Stop;
+    LStopWatch.Stop;
     OnDeleteDataDone(FullCollectionName,
                      selector,
                      flags,
-                     aStopWatch.Elapsed.TotalMilliseconds);
+                     LStopWatch.Elapsed.TotalMilliseconds);
 
     //Release the Connection
-    if aOwnConnection then ReleaseConnection(aTMPConnectionSocket);
+    if LOwnConnection then ReleaseConnection(LTMPConnectionSocket);
 
   except
     On E: Exception do begin
-      if aOwnConnection then ReleaseConnection(aTMPConnectionSocket,
+      if LOwnConnection then ReleaseConnection(LTMPConnectionSocket,
                                                (not (E Is EAlMongoDBClientException)) or
                                                (E as EAlMongoDBClientException).CloseConnection);
       raise;
@@ -4079,12 +5000,12 @@ Procedure TAlMongoDBConnectionPoolClient.DeleteData(const FullCollectionName: An
                                                     const Selector: AnsiString;
                                                     flags: TALMongoDBClientDeleteDataFlags;
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
-var aNumberOfDocumentsRemoved: integer;
+var LNumberOfDocumentsRemoved: integer;
 begin
   DeleteData(FullCollectionName,
              selector,
              flags,
-             aNumberOfDocumentsRemoved,
+             LNumberOfDocumentsRemoved,
              ConnectionSocket);
 end;
 
@@ -4092,12 +5013,12 @@ end;
 Procedure TAlMongoDBConnectionPoolClient.DeleteData(const FullCollectionName: AnsiString;
                                                     const Selector: AnsiString;
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
-var aNumberOfDocumentsRemoved: integer;
+var LNumberOfDocumentsRemoved: integer;
 begin
   DeleteData(FullCollectionName,
              selector,
              [],
-             aNumberOfDocumentsRemoved,
+             LNumberOfDocumentsRemoved,
              ConnectionSocket);
 end;
 
@@ -4129,82 +5050,82 @@ Procedure TAlMongoDBConnectionPoolClient.FindAndModifyData(const FullCollectionN
                                                            var ObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
                                                            const ConnectionSocket: TSocket = INVALID_SOCKET);
 
-Var aTMPConnectionSocket: TSocket;
-    aOwnConnection: Boolean;
-    aStopWatch: TStopWatch;
-    aDatabaseName: AnsiString;
-    aCollectionName: AnsiString;
-    aViewRec: TalJSONNode;
-    aResponseFlags: integer;
-    aTmpQuery: ansiString;
-    aCursorID: int64;
-    aStartingFrom: integer;
-    aNumberReturned: integer;
-    aContinue: boolean;
-    aTmpRowTag: ansiString;
-    aUpdateRowTagByFieldValue: Boolean;
-    aJSONDoc: TALJSONDocument;
-    aNode1: TALJSONNode;
-    aNode2: TALJSONNode;
-    alastErrorObjectNode: TALJSONNode;
+Var LTMPConnectionSocket: TSocket;
+    LOwnConnection: Boolean;
+    LStopWatch: TStopWatch;
+    LDatabaseName: AnsiString;
+    LCollectionName: AnsiString;
+    LViewRec: TalJSONNode;
+    LResponseFlags: integer;
+    LTmpQuery: ansiString;
+    LCursorID: int64;
+    LStartingFrom: integer;
+    LNumberReturned: integer;
+    LContinue: boolean;
+    LTmpRowTag: ansiString;
+    LUpdateRowTagByFieldValue: Boolean;
+    LJSONDoc: TALJSONDocument;
+    LNode1: TALJSONNode;
+    LNode2: TALJSONNode;
+    LLastErrorObjectNode: TALJSONNode;
     P1: integer;
 
 begin
 
   //acquire a connection
   if ConnectionSocket = INVALID_SOCKET then begin
-    aTMPConnectionSocket := AcquireConnection;
-    aOwnConnection := True;
+    LTMPConnectionSocket := AcquireConnection;
+    LOwnConnection := True;
   end
   else begin
-    aTMPConnectionSocket := ConnectionSocket;
-    aOwnConnection := False;
+    LTMPConnectionSocket := ConnectionSocket;
+    LOwnConnection := False;
   end;
 
   try
 
     //init the TstopWatch
-    aStopWatch := TstopWatch.StartNew;
+    LStopWatch := TstopWatch.StartNew;
 
     //create a temp JSONDoc
-    aJSONDoc := TALJSONDocument.Create;
+    LJSONDoc := TALJSONDocument.Create;
     try
 
       //init aDatabaseName and aCollectionName
       P1 := AlPos('.',FullCollectionName);
-      if P1 <= 0 then raise Exception.Create('The full collection name must be the concatenation of the database name with the collection name');
-      aDatabaseName := ALCopyStr(FullCollectionName, 1, P1-1);
-      aCollectionName := ALCopyStr(FullCollectionName, P1+1, maxint);
+      if P1 <= 0 then raise EALException.Create('The full collection name must be the concatenation of the database name with the collection name');
+      LDatabaseName := ALCopyStr(FullCollectionName, 1, P1-1);
+      LCollectionName := ALCopyStr(FullCollectionName, P1+1, maxint);
 
       //buid the query
-      aTmpQuery := '{"findAndModify":' + ALJsonEncodeTextWithNodeSubTypeHelper(aCollectionName);
-      if query <> '' then aTmpQuery := aTmpQuery + ',"query":'+query;
-      if sort <> '' then aTmpQuery := aTmpQuery + ',"sort":'+sort;
-      aTmpQuery := aTmpQuery + ',"remove":'+ALJsonEncodeBooleanWithNodeSubTypeHelper(remove);
-      if update <> '' then aTmpQuery := aTmpQuery + ',"update":'+update;
-      aTmpQuery := aTmpQuery + ',"new":' + ALJsonEncodeBooleanWithNodeSubTypeHelper(new);
-      if ReturnFieldsSelector <> '' then aTmpQuery := aTmpQuery + ',"fields":'+ReturnFieldsSelector;
-      aTmpQuery := aTmpQuery + ',"upsert":'+ALJsonEncodeBooleanWithNodeSubTypeHelper(InsertIfNotFound);
-      aTmpQuery := aTmpQuery + '}';
+      LTmpQuery := '{"findAndModify":' + ALJsonEncodeTextWithNodeSubTypeHelper(LCollectionName);
+      if query <> '' then LTmpQuery := LTmpQuery + ',"query":'+query;
+      if sort <> '' then LTmpQuery := LTmpQuery + ',"sort":'+sort;
+      LTmpQuery := LTmpQuery + ',"remove":'+ALJsonEncodeBooleanWithNodeSubTypeHelper(remove);
+      if update <> '' then LTmpQuery := LTmpQuery + ',"update":'+update;
+      LTmpQuery := LTmpQuery + ',"new":' + ALJsonEncodeBooleanWithNodeSubTypeHelper(new);
+      if ReturnFieldsSelector <> '' then LTmpQuery := LTmpQuery + ',"fields":'+ReturnFieldsSelector;
+      LTmpQuery := LTmpQuery + ',"upsert":'+ALJsonEncodeBooleanWithNodeSubTypeHelper(InsertIfNotFound);
+      LTmpQuery := LTmpQuery + '}';
 
       //do the First query
-      OP_QUERY(aTMPConnectionSocket,
+      OP_QUERY(LTMPConnectionSocket,
                0, // flags
-               aDatabaseName + '.$cmd', // fullCollectionName
+               LDatabaseName + '.$cmd', // fullCollectionName
                0, // skip
                1, // First
-               aTmpQuery, // query
+               LTmpQuery, // query
                '', // ReturnFieldsSelector,
-               aResponseFlags,
-               aCursorID,
-               aStartingFrom,
-               aNumberReturned,
-               aJSONDoc.Node,
+               LResponseFlags,
+               LCursorID,
+               LStartingFrom,
+               LNumberReturned,
+               LJSONDoc.Node,
                nil,
                nil,
                '',
                '',
-               aContinue);
+               LContinue);
       try
 
         // exemple of returned json result
@@ -4233,88 +5154,81 @@ begin
         // "errmsg":"remove and returnNew can\u0027t co-exist"
         //}
 
-        //doNodeAutoCreate for the aJSONDoc
-        aJSONDoc.Options := [doNodeAutoCreate];
-
         //init the aViewRec
-        if (ViewTag <> '') then aViewRec := JSONdata.AddChild(ViewTag, ntobject)
-        else aViewRec := JSONdata;
+        if (ViewTag <> '') then LViewRec := JSONdata.AddChild(ViewTag, ntobject)
+        else LViewRec := JSONdata;
 
         //check error
-        if aJSONDoc.Node.ChildNodes['ok'].Text <> '1' then begin
-          aNode1 := aJSONDoc.Node.ChildNodes.FindNode('errmsg');
-          if assigned(aNode1) and (not aNode1.Null) then raise EALException.Create(aNode1.Text)
-          else raise Exception.Create('Error calling FindAndModifyData')
-        end;
+        CheckRunCommandResponse(LJSONDoc.Node);
 
         //get the value node
-        aNode1 := aJSONDoc.Node.ChildNodes.FindNode('value');
-        if assigned(aNode1) and (aNode1.NodeType = ntObject) then begin
+        LNode1 := LJSONDoc.Node.ChildNodes.FindNode('value');
+        if assigned(LNode1) and (LNode1.NodeType = ntObject) then begin
 
           //init aUpdateRowTagByFieldValue and aTmpRowTag
           if AlPos('&>',RowTag) = 1 then begin
-            aTmpRowTag := AlcopyStr(RowTag, 3, maxint);
-            aUpdateRowTagByFieldValue := aTmpRowTag <> '';
+            LTmpRowTag := AlcopyStr(RowTag, 3, maxint);
+            LUpdateRowTagByFieldValue := LTmpRowTag <> '';
           end
           else begin
-            aTmpRowTag := RowTag;
-            aUpdateRowTagByFieldValue := False;
+            LTmpRowTag := RowTag;
+            LUpdateRowTagByFieldValue := False;
           end;
 
           //add the row tag
-          if (aTmpRowTag <> '') or
-             (aViewRec.NodeType = ntarray) then aViewRec := aViewRec.AddChild(aTmpRowTag, ntobject);
+          if (LTmpRowTag <> '') or
+             (LViewRec.NodeType = ntarray) then LViewRec := LViewRec.AddChild(LTmpRowTag, ntobject);
 
           //move the node
-          while aNode1.ChildNodes.Count > 0 do begin
-            aNode2 := aNode1.ChildNodes.Extract(0);
+          while LNode1.ChildNodes.Count > 0 do begin
+            LNode2 := LNode1.ChildNodes.Extract(0);
             try
-              aViewRec.ChildNodes.Add(aNode2);
+              LViewRec.ChildNodes.Add(LNode2);
             except
-              aNode2.Free;
+              LNode2.Free;
               raise;
             end;
           end;
 
           // aUpdateRowTagByFieldValue
-          if aUpdateRowTagByFieldValue then begin
-            aNode1 := aViewRec.ChildNodes.FindNode(aTmpRowTag);
-            if assigned(aNode1) then aViewRec.NodeName := aNode1.Text;
+          if LUpdateRowTagByFieldValue then begin
+            LNode1 := LViewRec.ChildNodes.FindNode(LTmpRowTag);
+            if assigned(LNode1) then LViewRec.NodeName := LNode1.Text;
           end;
 
         end;
 
         //init alastErrorObjectNode;
-        alastErrorObjectNode := aJSONDoc.Node.ChildNodes['lastErrorObject'];
+        LLastErrorObjectNode := LJSONDoc.Node.ChildNodes['lastErrorObject'];
 
         //NumberOfDocumentsUpdatedOrRemoved
-        aNode1 := alastErrorObjectNode.ChildNodes.FindNode('n');
-        if assigned(aNode1) then NumberOfDocumentsUpdatedOrRemoved := aNode1.int32
+        LNode1 := LLastErrorObjectNode.ChildNodes.FindNode('n');
+        if assigned(LNode1) then NumberOfDocumentsUpdatedOrRemoved := LNode1.int32
         else NumberOfDocumentsUpdatedOrRemoved := 0;
 
         //updatedExisting
-        aNode1 := alastErrorObjectNode.ChildNodes.FindNode('updatedExisting');
-        if assigned(aNode1) then updatedExisting := aNode1.bool
+        LNode1 := LLastErrorObjectNode.ChildNodes.FindNode('updatedExisting');
+        if assigned(LNode1) then updatedExisting := LNode1.bool
         else updatedExisting := False;
 
         //ObjectID
-        aNode1 := alastErrorObjectNode.ChildNodes.FindNode('upserted');
-        if assigned(aNode1) then ObjectID := aNode1.text
+        LNode1 := LLastErrorObjectNode.ChildNodes.FindNode('upserted');
+        if assigned(LNode1) then ObjectID := LNode1.text
         else ObjectID := '';
 
       finally
 
         //close the curson
-        if aCursorId <> 0 then OP_KILL_CURSORS(aTMPConnectionSocket, [aCursorID]);
+        if LCursorID <> 0 then OP_KILL_CURSORS(LTMPConnectionSocket, [LCursorID]);
 
       end;
 
     finally
-      aJSONDoc.free;
+      LJSONDoc.free;
     end;
 
     //do the OnDeleteDataDone
-    aStopWatch.Stop;
+    LStopWatch.Stop;
     OnFindAndModifyDataDone(FullCollectionName,
                             query,
                             sort,
@@ -4325,14 +5239,14 @@ begin
                             InsertIfNotFound,
                             RowTag,
                             ViewTag,
-                            aStopWatch.Elapsed.TotalMilliseconds);
+                            LStopWatch.Elapsed.TotalMilliseconds);
 
     //Release the Connection
-    if aOwnConnection then ReleaseConnection(aTMPConnectionSocket);
+    if LOwnConnection then ReleaseConnection(LTMPConnectionSocket);
 
   except
     On E: Exception do begin
-      if aOwnConnection then ReleaseConnection(aTMPConnectionSocket,
+      if LOwnConnection then ReleaseConnection(LTMPConnectionSocket,
                                                (not (E Is EAlMongoDBClientException)) or
                                                (E as EAlMongoDBClientException).CloseConnection);
       raise;
@@ -4384,9 +5298,9 @@ Procedure TAlMongoDBConnectionPoolClient.FindAndModifyData(const FullCollectionN
                                                            InsertIfNotFound: boolean;
                                                            JSONDATA: TALJSONNode;
                                                            const ConnectionSocket: TSocket = INVALID_SOCKET);
-var aNumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
-    aupdatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-    aObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+var LNumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
+    LUpdatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
+    LObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
 begin
   FindAndModifyData(FullCollectionName,
                     query,
@@ -4399,9 +5313,9 @@ begin
                     '', // RowTag,
                     '', // ViewTag,
                     JSONDATA,
-                    aNumberOfDocumentsUpdatedOrRemoved,
-                    aupdatedExisting,
-                    aObjectID,
+                    LNumberOfDocumentsUpdatedOrRemoved,
+                    LUpdatedExisting,
+                    LObjectID,
                     ConnectionSocket);
 end;
 

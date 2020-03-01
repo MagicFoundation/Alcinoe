@@ -929,8 +929,8 @@ begin
       dkVtable: result := PVtable(Cls)^[fVirtualIndex];
       dkDynamic: result := GetDynaMethod(Cls, fVirtualIndex);
       else result := fCodeAddress; //dkStatic => not virtual nor dynamic method
-                                             //dkMessage => never possible here
-                                             //dkInterface => never possible here
+                                   //dkMessage => never possible here
+                                   //dkInterface => never possible here
 
     end;
   end;

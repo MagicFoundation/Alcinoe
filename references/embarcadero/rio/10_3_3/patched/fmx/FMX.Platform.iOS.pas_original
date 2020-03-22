@@ -179,6 +179,8 @@ type
     function preferredStatusBarStyle: UIStatusBarStyle; cdecl;
     { Handling View Rotations }
     procedure viewWillTransitionToSize(size: CGSize; withTransitionCoordinator: UIViewControllerTransitionCoordinator); cdecl;
+    { Handling Theme changing }
+    procedure traitCollectionDidChange(previousTraitCollection: UITraitCollection); cdecl;
  end;
 
   TFMXViewController = class(TOCLocal)
@@ -215,6 +217,8 @@ type
     function preferredStatusBarStyle: UIStatusBarStyle; cdecl;
     { Handling View Rotations }
     procedure viewWillTransitionToSize(size: CGSize; withTransitionCoordinator: UIViewControllerTransitionCoordinator); cdecl;
+    { Handling Theme changing }
+    procedure traitCollectionDidChange(previousTraitCollection: UITraitCollection); cdecl;
   public
     property View: UIView read GetView;
     property ViewController: UIViewController read GetViewController;
@@ -375,7 +379,8 @@ type
     function GetNativeWindow: UIWindow;
     procedure SetRootViewController(const Value: TFMXViewController);
   protected
-    procedure UpdateStatusBar(const AForm: TCommonCustomForm);
+    procedure UpdateStatusBar; overload;
+    procedure UpdateStatusBar(const AForm: TCommonCustomForm); overload;
     procedure UpdateFormState(const AForm: TCommonCustomForm; const ANewState: TWindowState);
     function CalculateFormViewFrame(const AForm: TCommonCustomForm): NSRect;
     function CanInvalidate: Boolean;
@@ -4417,6 +4422,7 @@ type
   UITraitEnvironment = interface(NSObject)
     ['{36F5C50F-B09D-4A20-B1A2-4410C5DB838C}']
     function traitCollection: UITraitCollection; cdecl;
+    procedure traitCollectionDidChange(previousTraitCollection: UITraitCollection); cdecl;
   end;
   TUITraitEnvironment = class(TOCGenericImport<UITraitEnvironmentClass, UITraitEnvironment>)
   end;
@@ -4434,6 +4440,17 @@ begin
   end
   else
     Result := UIUserInterfaceStyleLight;
+end;
+
+procedure TFMXViewController.traitCollectionDidChange(previousTraitCollection: iOSApi.UIKit.UITraitCollection);
+var
+  TraitCollection: UITraitCollection;
+begin
+  TraitCollection := TUITraitCollection.Wrap(NSObjectToID(previousTraitCollection));
+
+  UITraitEnvironment(Super).traitCollectionDidChange(TraitCollection);
+  TMessageManager.DefaultManager.SendMessage(nil, TStyleChangedMessage.Create(nil, nil), True);
+  PlatformCocoaTouch.WindowManager.UpdateStatusBar;
 end;
 
 procedure TCocoaTouchWindowManager.SetBackgroundColor(const AForm: TCommonCustomForm; const AColor: TAlphaColor);
@@ -4588,6 +4605,21 @@ begin
       FCanSetState := True;
     end;
   end;
+end;
+
+procedure TCocoaTouchWindowManager.UpdateStatusBar;
+var
+  StatusBarColor: TAlphaColor;
+begin
+  if Screen.ActiveForm = nil then
+  begin
+    if GetUserInterfaceStyle = UIUserInterfaceStyleLight then
+      StatusBarColor := TAlphaColorRec.White
+    else
+      StatusBarColor := TAlphaColorRec.Black;
+  end
+  else
+    UpdateStatusBar(Screen.ActiveForm);
 end;
 
 procedure TCocoaTouchWindowManager.UpdateStatusBar(const AForm: TCommonCustomForm);

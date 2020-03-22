@@ -580,7 +580,7 @@ procedure TALAniThread.OneStep;
 var
   I: Integer;
   NewTime: Double;
-  [unsafe] Ani: TALAnimation;
+  {[unsafe] }Ani: TALAnimation;
 begin
   NewTime := FTimerService.GetTick;
   FDeltaTime := NewTime - FTime;

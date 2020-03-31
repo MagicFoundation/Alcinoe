@@ -64,21 +64,21 @@ search path of your project.
 
 If you plan to use visual components at design time then you need to
 install the bpl. Launch Delphi and go in component > Install Packages... > and choose the 
-BPL located in <span class="text-blue mb-2">{alcinoe_rootdir}\lib\bpl\alcinoe\Win32\rio\Alcinoe_rio.bpl</span> (if you are in delphi Rio 
+BPL located in <span style="color:#0366d6">{alcinoe_rootdir}\lib\bpl\alcinoe\Win32\rio\Alcinoe_rio.bpl</span> (if you are in delphi Rio 
 else choose the directory that correspond to your Delphi version). 
-You still need to add in your search path <span class="text-blue mb-2">{alcinoe_rootdir}\source\</span>  
+You still need to add in your search path <span style="color:#0366d6">{alcinoe_rootdir}\source\ </span>  
   
 Alcinoe use sometime some advanced functions that need to patch the delphi RTL.
 For this you need to include in your project search path ALL the directories located
-under <span class="text-blue mb-2">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\</span> (if you are in delphi Rio 
+under <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\ </span> (if you are in delphi Rio 
 else choose the directory that correspond to your Delphi version) like for exemple:
 
-* <span class="text-blue mb-2">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\fmx</span>
-* <span class="text-blue mb-2">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\ios</span>
-* <span class="text-blue mb-2">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\android</span>
-* <span class="text-blue mb-2">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\osx</span>
-* <span class="text-blue mb-2">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\net</span>
-* <span class="text-blue mb-2">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\common</span>
+* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\fmx</span>
+* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\ios</span>
+* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\android</span>
+* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\osx</span>
+* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\net</span>
+* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\common</span>
 
 If after this you have error like (for exemple)
 [dcc32 Fatal Error] FMX.Types3D.pas(1023): F2051 Unit FMX.Materials was compiled with 
@@ -87,12 +87,12 @@ path non patched units (here FMX.Materials.pas for exemple) that are located
 in your C:\Program Files (x86)\Embarcadero\Studio\20.0\source\ directory
 You can copy thoses files in (for exemple)
   
-* <span class="text-blue mb-2">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\fmx</span>
-* <span class="text-blue mb-2">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\ios</span>
-* <span class="text-blue mb-2">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\android</span>
-* <span class="text-blue mb-2">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\osx</span>
-* <span class="text-blue mb-2">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\net</span>
-* <span class="text-blue mb-2">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\common</span>
+* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\fmx</span>
+* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\ios</span>
+* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\android</span>
+* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\osx</span>
+* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\net</span>
+* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\common</span>
   
 and then you need to add also all thoses directories to your project search path (add them 
 AFTER the previous entries you just made for the patched version)

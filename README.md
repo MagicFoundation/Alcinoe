@@ -76,9 +76,6 @@ else choose the directory that correspond to your Delphi version) like for exemp
 * <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched\fmx">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\fmx</a>
 * <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched\rtl\ios">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\ios</a>
 * <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched\rtl\android">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\android</a>
-* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched\rtl\osx">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\osx</a>
-* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched\rtl\net">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\net</a>
-* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched\rtl\common">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\common</a>
 
 If after this you have error like (for exemple)
 [dcc32 Fatal Error] FMX.Types3D.pas(1023): F2051 Unit FMX.Materials was compiled with 

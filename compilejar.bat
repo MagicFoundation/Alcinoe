@@ -326,7 +326,8 @@ if x%CONFIRM% == xon PAUSE
 goto EXIT
 
 :ERROR
-pause
+PAUSE
+EXIT 1 & REM without /B to Close CMD.exe in case this batch is a subroutine and the caller forget to catch the ERRORLEVEL
 
 :EXIT
 

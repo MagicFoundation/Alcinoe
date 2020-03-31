@@ -1,6 +1,7 @@
 @echo off
 
 call "C:\Program Files (x86)\Embarcadero\Studio\20.0\bin\rsvars.bat"
+IF ERRORLEVEL 1 goto ERROR
 
 set INPUT=
 set /P INPUT=Build demos (Y/N)?: %=%
@@ -48,6 +49,7 @@ MSBuild source\Alcinoe_rio.dproj /p:Config=Release /p:Platform=Win32
 IF ERRORLEVEL 1 goto ERROR
 
 call compilejar.bat off
+IF ERRORLEVEL 1 goto ERROR
 
 if "%INPUT%"=="Y" goto BUILD_DEMOS
 if "%INPUT%"=="y" goto BUILD_DEMOS

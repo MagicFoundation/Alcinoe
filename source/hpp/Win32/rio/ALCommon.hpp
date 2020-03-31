@@ -14,6 +14,8 @@
 #pragma pack(push,8)
 #include <System.hpp>
 #include <SysInit.hpp>
+#include <Winapi.Windows.hpp>
+#include <ALStringList.hpp>
 #include <System.Types.hpp>
 
 //-- user supplied -----------------------------------------------------------
@@ -234,6 +236,9 @@ typedef System::Set<TALIntelCpuFeature, TALIntelCpuFeature::cfFPU, TALIntelCpuFe
 
 //-- var, const, procedure ---------------------------------------------------
 extern DELPHI_PACKAGE TALCustomDelayedFreeObjectProc ALCustomDelayedFreeObjectProc;
+extern "C" unsigned __stdcall EnumDynamicTimeZoneInformation(unsigned dwIndex, Winapi::Windows::PDynamicTimeZoneInformation lpTimeZoneInformation);
+extern "C" System::LongBool __stdcall SystemTimeToTzSpecificLocalTimeEx(Winapi::Windows::PDynamicTimeZoneInformation lpTimeZoneInformation, _SYSTEMTIME &lpUniversalTime, _SYSTEMTIME &lpLocalTime);
+extern "C" System::LongBool __stdcall TzSpecificLocalTimeToSystemTimeEx(Winapi::Windows::PDynamicTimeZoneInformation lpTimeZoneInformation, _SYSTEMTIME &lpLocalTime, _SYSTEMTIME &lpUniversalTime);
 extern DELPHI_PACKAGE unsigned __int64 ALMAXUInt64;
 extern DELPHI_PACKAGE __int64 ALMAXInt64;
 extern DELPHI_PACKAGE unsigned ALMAXUInt;
@@ -265,8 +270,14 @@ extern DELPHI_PACKAGE void __fastcall ALLog(const System::UnicodeString Tag, con
 extern DELPHI_PACKAGE int __fastcall AlBoolToInt(bool Value);
 extern DELPHI_PACKAGE bool __fastcall AlIntToBool(int Value);
 extern DELPHI_PACKAGE int __fastcall ALMediumPos(int LTotal, int LBorder, int LObject);
-extern DELPHI_PACKAGE System::TDateTime __fastcall AlLocalDateTimeToUTCDateTime(const System::TDateTime aLocalDateTime);
-extern DELPHI_PACKAGE System::TDateTime __fastcall AlUTCDateTimeToLocalDateTime(const System::TDateTime aUTCDateTime);
+extern DELPHI_PACKAGE System::DynamicArray<_TIME_DYNAMIC_ZONE_INFORMATION> __fastcall ALGetDynamicTimeZoneInformations(void);
+extern DELPHI_PACKAGE _TIME_DYNAMIC_ZONE_INFORMATION __fastcall ALGetDynamicTimeZoneInformation(const System::UnicodeString aTimeZoneKeyName);
+extern DELPHI_PACKAGE System::TDateTime __fastcall AlLocalDateTimeToUTC(const System::TDateTime aLocalDateTime)/* overload */;
+extern DELPHI_PACKAGE System::TDateTime __fastcall AlLocalDateTimeToUTC(const System::UnicodeString aTimeZoneKeyName, System::TDateTime aLocalDateTime)/* overload */;
+extern DELPHI_PACKAGE System::TDateTime __fastcall AlLocalDateTimeToUTC(const _TIME_DYNAMIC_ZONE_INFORMATION &aTimeZoneInformation, System::TDateTime aLocalDateTime)/* overload */;
+extern DELPHI_PACKAGE System::TDateTime __fastcall AlUTCDateTimeToLocal(const System::TDateTime aUTCDateTime)/* overload */;
+extern DELPHI_PACKAGE System::TDateTime __fastcall AlUTCDateTimeToLocal(const System::UnicodeString aTimeZoneKeyName, System::TDateTime aUTCDateTime)/* overload */;
+extern DELPHI_PACKAGE System::TDateTime __fastcall AlUTCDateTimeToLocal(const _TIME_DYNAMIC_ZONE_INFORMATION &aTimeZoneInformation, System::TDateTime aUTCDateTime)/* overload */;
 extern DELPHI_PACKAGE System::TDateTime __fastcall ALUTCNow(void);
 extern DELPHI_PACKAGE int __fastcall ALInc(int &x, int Count);
 extern DELPHI_PACKAGE System::TDateTime __fastcall ALUnixMsToDateTime(const __int64 aValue);

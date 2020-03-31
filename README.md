@@ -55,6 +55,49 @@ Compiled demo
 Please ask apple how to do
 
 
+Install Alcinoe
+---------------
+
+If you don't plan to use any Alcinoe visual components at design time, then
+you don't need to install anything, just add {alcinoe_rootdir}\source\ in the 
+search path of your project. 
+
+If you plan to use visual components at design time then you need to
+install the bpl. Launch Delphi and go in component > Install Packages... > and choose the 
+BPL located in {alcinoe_rootdir}\lib\bpl\alcinoe\Win32\rio\Alcinoe_rio.bpl (if you are in delphi Rio 
+else choose the directory that correspond to your Delphi version). 
+You still need to add in your search path {alcinoe_rootdir}\source\  
+  
+Alcinoe use sometime some advanced functions that need to patch the delphi RTL.
+For this you need to include in your project search path ALL the directories located
+under {alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\ (if you are in delphi Rio 
+else choose the directory that correspond to your Delphi version) like for exemple:
+
+* {alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\fmx
+* {alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\ios
+* {alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\android
+* {alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\osx
+* {alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\net
+* {alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\common
+
+If after this you have error like (for exemple)
+[dcc32 Fatal Error] FMX.Types3D.pas(1023): F2051 Unit FMX.Materials was compiled with 
+a different version of FMX.Types3D.TMaterial. then you need also to include in you search 
+path non patched units (here FMX.Materials.pas for exemple) that are located 
+in your C:\Program Files (x86)\Embarcadero\Studio\20.0\source\ directory
+You can copy thoses files in (for exemple)
+  
+* {alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\fmx
+* {alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\ios
+* {alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\android
+* {alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\osx
+* {alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\net
+* {alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\common
+  
+and then you need to add also all thoses directories to your project search path (add them 
+AFTER the previous entries you just made for the patched version)
+
+
 Full opengl video player for FireMonkey
 ---------------------------------------
 
@@ -75,7 +118,6 @@ also HLS like ExoPlayer do.
   <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-2.jpg?raw=true" alt="video player for FireMonkey" width="280" style="width:280px;"/>
   <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-3.jpg?raw=true" alt="video player for FireMonkey" width="280" style="width:280px;"/>
 </p>
-
 
 
 WebRTC Delphi wrapper
@@ -386,29 +428,37 @@ Example :
     var aWand: PMagickWand;
     begin
     
-      //create the wand pointer
-      aWand := ALImageMagickLib.NewMagickWand;
+      //Create the ImageMagick Library
+      alCreateImageMagickLibrary({alcinoe_rootdir} + '\lib\dll\imagemagick\win32\imagemagick', min(2, System.CPUCount){aThreadLimit});
       try
-    
-        //load the image
-        if ALImageMagickLib.MagickReadImage(aWand, pansiChar(aInputFilename)) <> MagickTrue then RaiseLastWandError(aWand);
-        
-        //Set the compression quality
-        if ALImageMagickLib.MagickSetImageCompressionQuality(aWand,80) <> MagickTrue then RaiseLastWandError(aWand);
-    
-        //autorate the image
-        if ALImageMagickLib.MagickAutoOrientImage(aWand) <> MagickTrue then RaiseLastWandError(aWand);
-    
-        //Resize the image using the Lanczos filter
-        if ALImageMagickLib.MagickResizeImage(aWand, 640, 480, LanczosFilter) <> MagickTrue then RaiseLastWandError(aWand);
-           
-        //save the image
-        ALImageMagickLib.MagickWriteImage(aWand, pansiChar(aOutputFilename));
+      
+        //create the wand pointer
+        aWand := ALImageMagickLib.NewMagickWand;
+        try
+      
+          //load the image
+          if ALImageMagickLib.MagickReadImage(aWand, pansiChar(aInputFilename)) <> MagickTrue then RaiseLastMagickWandError(aWand);
+          
+          //Set the compression quality
+          if ALImageMagickLib.MagickSetImageCompressionQuality(aWand,80) <> MagickTrue then RaiseLastMagickWandError(aWand);
+      
+          //autorate the image
+          if ALImageMagickLib.MagickAutoOrientImage(aWand) <> MagickTrue then RaiseLastMagickWandError(aWand);
+      
+          //Resize the image using the Lanczos filter
+          if ALImageMagickLib.MagickResizeImage(aWand, 640, 480, LanczosFilter) <> MagickTrue then RaiseLastMagickWandError(aWand);
+             
+          //save the image
+          ALImageMagickLib.MagickWriteImage(aWand, pansiChar(aOutputFilename));
+      
+        finally
+          ALImageMagickLib.DestroyMagickWand(aWand);
+        end;
     
       finally
-        ALImageMagickLib.DestroyMagickWand(aWand);
+        alFreeImageMagickLibrary;
       end;
-    
+
     end;
 
 

@@ -2,26 +2,45 @@ unit Unit1;
 
 interface
 
-uses Windows,
-     Messages,
-     SysUtils,
-     Variants,
-     Classes,
-     Graphics,
-     Controls,
-     Forms,
-     Dialogs,
-     StdCtrls,
-     shellapi,
-     ExtCtrls,
-     ComCtrls,
-     AlWinHttpClient,
-     AlWinHttpWrapper,
-     cxPCdxBarPopupMenu, cxGraphics, cxControls, cxLookAndFeels,
-  cxLookAndFeelPainters, cxContainer, cxEdit, cxLabel, cxPC, Menus,
-  cxRadioGroup, cxCheckBox, cxButtons, cxMemo, cxTextEdit, cxGroupBox,
-  dxSkinsForm, dxSkinsCore, dxSkinFoggy, dxSkinscxPCPainter, cxSplitter,
-  cxClasses, dxBarBuiltInMenu;
+uses
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  StdCtrls,
+  shellapi,
+  ExtCtrls,
+  ComCtrls,
+  Menus,
+  cxPCdxBarPopupMenu,
+  cxGraphics,
+  cxControls,
+  cxLookAndFeels,
+  cxLookAndFeelPainters,
+  cxContainer,
+  cxEdit,
+  cxLabel,
+  cxPC,
+  cxRadioGroup,
+  cxCheckBox,
+  cxButtons,
+  cxMemo,
+  cxTextEdit,
+  cxGroupBox,
+  dxSkinsForm,
+  dxSkinsCore,
+  dxSkinFoggy,
+  dxSkinscxPCPainter,
+  cxSplitter,
+  cxClasses,
+  dxBarBuiltInMenu,
+  AlWinHttpClient,
+  AlWinHttpWrapper;
 
 type
   TForm1 = class(TForm)
@@ -76,7 +95,6 @@ type
     GroupBox9: TcxGroupBox;
     editURL: TcxTextEdit;
     Label4: TcxLabel;
-    Label6: TcxLabel;
     MemoPostDataStrings: TcxMemo;
     MemoPostDataFiles: TcxMemo;
     Label7: TcxLabel;
@@ -104,6 +122,7 @@ type
     ButtonOptions: TcxButton;
     ButtonPut: TcxButton;
     ButtonDelete: TcxButton;
+    cxSplitter3: TcxSplitter;
     procedure ButtonGetClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -134,16 +153,17 @@ var
 
 implementation
 
-Uses system.AnsiStrings,
-     DateUtils,
-     HttpApp,
-     ALMultiPartParser,
-     AlFiles,
-     AlCommon,
-     ALString,
-     ALMime,
-     ALStringList,
-     AlHttpClient;
+Uses
+  system.AnsiStrings,
+  DateUtils,
+  HttpApp,
+  ALMultiPartParser,
+  AlFiles,
+  AlCommon,
+  ALString,
+  ALMime,
+  ALStringList,
+  AlHttpClient;
 
 {$R *.dfm}
 

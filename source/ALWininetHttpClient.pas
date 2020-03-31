@@ -166,7 +166,8 @@ type
     procedure SetInternetOptions(const Value: TAlWininetHTTPClientInternetOptionSet);
     procedure SetOnStatusChange(const Value: TAlWinInetHTTPClientStatusChangeEvent);
   protected
-    procedure CheckError(Error: Boolean);
+    procedure CheckError(ErrCode: DWORD); overload;
+    procedure CheckError(Error: Boolean); overload;
     procedure SetURL(const Value: AnsiString);
     procedure SetUsername(const NameValue: AnsiString); override;
     procedure SetPassword(const PasswordValue: AnsiString); override;
@@ -253,27 +254,30 @@ begin
 end;
 
 {********************************************************}
-procedure TALWinInetHTTPClient.CheckError(Error: Boolean);
-var ErrCode: DWORD;
-    ln: DWORD;
+procedure TALWinInetHTTPClient.CheckError(ErrCode: DWORD);
+var ln: DWORD;
     S: AnsiString;
 begin
-  if Error then begin
-    ErrCode := GetLastError;
-    if ErrCode <> 0 then begin
-      SetLength(S, 256);
-      ln := FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM or FORMAT_MESSAGE_FROM_HMODULE,
-                           Pointer(GetModuleHandle('wininet.dll')),
-                           ErrCode,
-                           0,
-                           PAnsiChar(S),
-                           Length(S),
-                           nil);
-      if ln = 0 then raiseLastOsError;
-      SetLength(S, ln);
-      raise EALHTTPClientException.CreateFmt('%s - URL:%s', [ALtrim(S), URL]);      { Do not localize }
-    end;
+  if ErrCode <> 0 then begin
+    SetLength(S, 256);
+    ln := FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM or FORMAT_MESSAGE_FROM_HMODULE,
+                         Pointer(GetModuleHandle('wininet.dll')),
+                         ErrCode,
+                         0,
+                         PAnsiChar(S),
+                         Length(S),
+                         nil);
+    if ln = 0 then raiseLastOsError;
+    SetLength(S, ln);
+    raise EALHTTPClientException.CreateFmt('%s - URL:%s', [ALtrim(S), URL]);      { Do not localize }
   end;
+end;
+
+{********************************************************}
+procedure TALWinInetHTTPClient.CheckError(Error: Boolean);
+begin
+  if Error then
+    CheckError(GetLastError);
 end;
 
 {*************************************************************}
@@ -682,31 +686,6 @@ begin
     end;
   end;
 
-  { Handle error from status}
-  Index := 0;
-  Len := SizeOf(Status);
-  if HttpQueryInfoA(aContext,
-                    HTTP_QUERY_STATUS_CODE or HTTP_QUERY_FLAG_NUMBER,
-                    @Status,
-                    Len,
-                    Index) and
-     (Status >= 300) then begin
-    Size := 256;
-    While true do begin
-      Index := 0;
-      SetLength(aStr, Size);
-      if HttpQueryInfoA(aContext,
-                        HTTP_QUERY_STATUS_TEXT,
-                        pointer(aStr),
-                        Size,
-                        Index) then begin
-        SetLength(aStr, Size);
-        raise EALHTTPClientException.CreateFmt('%s (%d) - ''%s''', [aStr, Status, URL], Status);
-      end
-      else checkError(GetLastError <> ERROR_INSUFFICIENT_BUFFER);
-    end;
-  end;
-
   { read content-length }
   if assigned(onDownloadProgress) then begin
     Index := 0;
@@ -740,6 +719,32 @@ begin
       end;
     end;
   until Size = 0;
+
+  { Handle error from status}
+  Index := 0;
+  Len := SizeOf(Status);
+  if HttpQueryInfoA(aContext,
+                    HTTP_QUERY_STATUS_CODE or HTTP_QUERY_FLAG_NUMBER,
+                    @Status,
+                    Len,
+                    Index) and
+     (Status >= 300) then begin
+    Size := 256;
+    While true do begin
+      Index := 0;
+      SetLength(aStr, Size);
+      if HttpQueryInfoA(aContext,
+                        HTTP_QUERY_STATUS_TEXT,
+                        pointer(aStr),
+                        Size,
+                        Index) then begin
+        SetLength(aStr, Size);
+        raise EALHTTPClientException.CreateFmt('%s (%d) - ''%s''', [aStr, Status, URL], Status);
+      end
+      else checkError(GetLastError <> ERROR_INSUFFICIENT_BUFFER);
+    end;
+  end;
+
 end;
 
 {***********************************************************}

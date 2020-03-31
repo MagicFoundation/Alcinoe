@@ -42,10 +42,9 @@ object Form1: TForm1
     TabOrder = 1
     Properties.ActivePage = TabSheet1
     Properties.CustomButtons.Buttons = <>
-    ClientRectBottom = 584
-    ClientRectLeft = 5
-    ClientRectRight = 791
-    ClientRectTop = 27
+    ClientRectBottom = 589
+    ClientRectRight = 796
+    ClientRectTop = 24
     object TabSheet1: TcxTabSheet
       Caption = 'Main'
       object GroupBox9: TcxGroupBox
@@ -61,213 +60,283 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 0
-        DesignSize = (
-          786
-          187)
         Height = 193
-        Width = 786
-        object Label4: TcxLabel
-          Left = 8
-          Top = 62
-          Caption = 'Post Data Strings'
-          ParentFont = False
-          Style.Font.Charset = DEFAULT_CHARSET
-          Style.Font.Color = clWindowText
-          Style.Font.Height = -11
-          Style.Font.Name = 'Tahoma'
-          Style.Font.Style = [fsBold]
-          Style.IsFontAssigned = True
-          Transparent = True
-        end
-        object Label6: TcxLabel
-          Left = 8
-          Top = 78
-          Caption = 'Format "name=value" if URL Encode Post Data checked'
-          ParentFont = False
-          Transparent = True
-        end
-        object Label7: TcxLabel
-          Left = 392
-          Top = 78
-          Caption = 'Format "Name=FileName"'
-          ParentFont = False
-          Transparent = True
-        end
-        object Label5: TcxLabel
-          Left = 392
-          Top = 62
-          Caption = 'Post Data Files'
-          ParentFont = False
-          Style.Font.Charset = DEFAULT_CHARSET
-          Style.Font.Color = clWindowText
-          Style.Font.Height = -11
-          Style.Font.Name = 'Tahoma'
-          Style.Font.Style = [fsBold]
-          Style.IsFontAssigned = True
-          Transparent = True
-        end
-        object Label1: TcxLabel
-          Left = 8
-          Top = 27
-          Caption = 'URL'
-          ParentFont = False
-          Transparent = True
-        end
-        object editURL: TcxTextEdit
-          Left = 40
-          Top = 24
-          ParentFont = False
-          TabOrder = 0
-          Text = 'http://www.wikipedia.org'
-          Width = 305
-        end
-        object MemoPostDataStrings: TcxMemo
-          Left = 8
-          Top = 94
-          Anchors = [akLeft, akTop, akBottom]
-          ParentFont = False
-          Properties.ScrollBars = ssVertical
-          Properties.WordWrap = False
-          Style.Font.Charset = DEFAULT_CHARSET
-          Style.Font.Color = clWindowText
-          Style.Font.Height = -13
-          Style.Font.Name = 'Courier New'
-          Style.Font.Style = []
-          Style.IsFontAssigned = True
+        Width = 796
+        object Panel150: TPanel
+          Left = 2
+          Top = 18
+          Width = 792
+          Height = 45
+          Align = alTop
+          BevelOuter = bvNone
           TabOrder = 1
-          Height = 80
-          Width = 375
+          DesignSize = (
+            792
+            45)
+          object Label1: TcxLabel
+            Left = 8
+            Top = 12
+            Caption = 'URL'
+            ParentFont = False
+            Transparent = True
+          end
+          object editURL: TcxTextEdit
+            Left = 40
+            Top = 9
+            Anchors = [akLeft, akTop, akRight]
+            ParentFont = False
+            TabOrder = 0
+            Text = 'http://www.wikipedia.org'
+            Width = 305
+          end
+          object ButtonPost: TcxButton
+            Left = 407
+            Top = 6
+            Width = 50
+            Height = 25
+            Anchors = [akTop, akRight]
+            Caption = 'Post'
+            TabOrder = 2
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+            OnClick = ButtonPostClick
+          end
+          object ButtonGet: TcxButton
+            Left = 351
+            Top = 6
+            Width = 50
+            Height = 25
+            Anchors = [akTop, akRight]
+            Caption = 'Get'
+            TabOrder = 3
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+            OnClick = ButtonGetClick
+          end
+          object ButtonHead: TcxButton
+            Left = 462
+            Top = 6
+            Width = 50
+            Height = 25
+            Anchors = [akTop, akRight]
+            Caption = 'Head'
+            TabOrder = 4
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+            OnClick = ButtonHeadClick
+          end
+          object ButtonTrace: TcxButton
+            Left = 518
+            Top = 6
+            Width = 50
+            Height = 25
+            Anchors = [akTop, akRight]
+            Caption = 'Trace'
+            TabOrder = 7
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+            OnClick = ButtonTraceClick
+          end
+          object ButtonOptions: TcxButton
+            Left = 574
+            Top = 6
+            Width = 50
+            Height = 25
+            Anchors = [akTop, akRight]
+            Caption = 'Options'
+            TabOrder = 5
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+            OnClick = ButtonOptionsClick
+          end
+          object ButtonPut: TcxButton
+            Left = 630
+            Top = 6
+            Width = 50
+            Height = 25
+            Anchors = [akTop, akRight]
+            Caption = 'Put'
+            TabOrder = 6
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+            OnClick = ButtonPutClick
+          end
+          object ButtonDelete: TcxButton
+            Left = 686
+            Top = 6
+            Width = 50
+            Height = 25
+            Anchors = [akTop, akRight]
+            Caption = 'Delete'
+            TabOrder = 8
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+            OnClick = ButtonDeleteClick
+          end
         end
-        object MemoPostDataFiles: TcxMemo
-          Left = 392
-          Top = 94
-          Anchors = [akLeft, akTop, akRight, akBottom]
-          ParentFont = False
-          Properties.ScrollBars = ssVertical
-          Properties.WordWrap = False
-          Style.Font.Charset = DEFAULT_CHARSET
-          Style.Font.Color = clWindowText
-          Style.Font.Height = -13
-          Style.Font.Name = 'Courier New'
-          Style.Font.Style = []
-          Style.IsFontAssigned = True
-          TabOrder = 2
-          Height = 80
-          Width = 384
-        end
-        object ButtonPost: TcxButton
-          Left = 407
-          Top = 21
-          Width = 50
-          Height = 25
-          Caption = 'Post'
-          TabOrder = 3
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentFont = False
-          OnClick = ButtonPostClick
-        end
-        object ButtonGet: TcxButton
-          Left = 351
-          Top = 21
-          Width = 50
-          Height = 25
-          Caption = 'Get'
-          TabOrder = 4
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentFont = False
-          OnClick = ButtonGetClick
-        end
-        object ButtonHead: TcxButton
-          Left = 462
-          Top = 21
-          Width = 50
-          Height = 25
-          Caption = 'Head'
-          TabOrder = 5
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentFont = False
-          OnClick = ButtonHeadClick
-        end
-        object CheckBoxUrlEncodePostData: TcxCheckBox
-          Left = 648
-          Top = 69
-          Caption = 'URL Encode Post Data'
-          ParentFont = False
-          State = cbsChecked
-          TabOrder = 6
-          Transparent = True
-        end
-        object ButtonTrace: TcxButton
-          Left = 518
-          Top = 21
-          Width = 50
-          Height = 25
-          Caption = 'Trace'
-          TabOrder = 7
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentFont = False
-          OnClick = ButtonTraceClick
-        end
-        object ButtonOptions: TcxButton
-          Left = 574
-          Top = 21
-          Width = 50
-          Height = 25
-          Caption = 'Options'
-          TabOrder = 13
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentFont = False
-          OnClick = ButtonOptionsClick
-        end
-        object ButtonPut: TcxButton
-          Left = 630
-          Top = 21
-          Width = 50
-          Height = 25
-          Caption = 'Put'
-          TabOrder = 14
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentFont = False
-          OnClick = ButtonPutClick
-        end
-        object ButtonDelete: TcxButton
-          Left = 686
-          Top = 21
-          Width = 50
-          Height = 25
-          Caption = 'Delete'
-          TabOrder = 15
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentFont = False
-          OnClick = ButtonDeleteClick
+        object Panel151: TPanel
+          Left = 2
+          Top = 63
+          Width = 792
+          Height = 128
+          Align = alClient
+          BevelOuter = bvNone
+          TabOrder = 0
+          object Panel152: TPanel
+            Left = 0
+            Top = 0
+            Width = 392
+            Height = 128
+            Align = alLeft
+            BevelOuter = bvNone
+            TabOrder = 1
+            object Label4: TcxLabel
+              AlignWithMargins = True
+              Left = 8
+              Top = 0
+              Margins.Left = 8
+              Margins.Top = 0
+              Margins.Right = 0
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Post Data Strings'
+              ParentFont = False
+              Style.Font.Charset = DEFAULT_CHARSET
+              Style.Font.Color = clWindowText
+              Style.Font.Height = -11
+              Style.Font.Name = 'Tahoma'
+              Style.Font.Style = [fsBold]
+              Style.IsFontAssigned = True
+              Transparent = True
+            end
+            object MemoPostDataStrings: TcxMemo
+              AlignWithMargins = True
+              Left = 8
+              Top = 38
+              Margins.Left = 8
+              Margins.Top = 0
+              Align = alClient
+              ParentFont = False
+              Properties.ScrollBars = ssVertical
+              Properties.WordWrap = False
+              Style.Font.Charset = DEFAULT_CHARSET
+              Style.Font.Color = clWindowText
+              Style.Font.Height = -13
+              Style.Font.Name = 'Courier New'
+              Style.Font.Style = []
+              Style.IsFontAssigned = True
+              TabOrder = 1
+              Height = 87
+              Width = 381
+            end
+            object CheckBoxUrlEncodePostData: TcxCheckBox
+              AlignWithMargins = True
+              Left = 8
+              Top = 17
+              Margins.Left = 8
+              Margins.Top = 0
+              Margins.Right = 0
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'URL Encode Post Data (Format "name=value" if checked)'
+              ParentFont = False
+              State = cbsChecked
+              TabOrder = 2
+              Transparent = True
+            end
+          end
+          object Panel153: TPanel
+            Left = 399
+            Top = 0
+            Width = 393
+            Height = 128
+            Align = alClient
+            BevelOuter = bvNone
+            TabOrder = 0
+            object Label7: TcxLabel
+              AlignWithMargins = True
+              Left = 3
+              Top = 17
+              Margins.Top = 0
+              Margins.Right = 0
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Format "Name=FileName"'
+              ParentFont = False
+              Transparent = True
+            end
+            object Label5: TcxLabel
+              AlignWithMargins = True
+              Left = 3
+              Top = 0
+              Margins.Top = 0
+              Margins.Right = 0
+              Margins.Bottom = 0
+              Align = alTop
+              Caption = 'Post Data Files'
+              ParentFont = False
+              Style.Font.Charset = DEFAULT_CHARSET
+              Style.Font.Color = clWindowText
+              Style.Font.Height = -11
+              Style.Font.Name = 'Tahoma'
+              Style.Font.Style = [fsBold]
+              Style.IsFontAssigned = True
+              Transparent = True
+            end
+            object MemoPostDataFiles: TcxMemo
+              AlignWithMargins = True
+              Left = 3
+              Top = 34
+              Margins.Top = 0
+              Align = alClient
+              ParentFont = False
+              Properties.ScrollBars = ssVertical
+              Properties.WordWrap = False
+              Style.Font.Charset = DEFAULT_CHARSET
+              Style.Font.Color = clWindowText
+              Style.Font.Height = -13
+              Style.Font.Name = 'Courier New'
+              Style.Font.Style = []
+              Style.IsFontAssigned = True
+              TabOrder = 2
+              Height = 91
+              Width = 387
+            end
+          end
+          object cxSplitter3: TcxSplitter
+            Left = 392
+            Top = 0
+            Width = 7
+            Height = 128
+          end
         end
       end
       object GroupBox10: TcxGroupBox
@@ -283,19 +352,19 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 1
-        Height = 347
-        Width = 786
+        Height = 355
+        Width = 796
         object Panel5: TPanel
-          Left = 3
-          Top = 15
+          Left = 2
+          Top = 18
           Width = 267
-          Height = 323
+          Height = 335
           Align = alLeft
           BevelOuter = bvNone
           TabOrder = 0
           DesignSize = (
             267
-            323)
+            335)
           object Label2: TcxLabel
             Left = 5
             Top = 6
@@ -317,22 +386,22 @@ object Form1: TForm1
             Style.Font.Style = []
             Style.IsFontAssigned = True
             TabOrder = 1
-            Height = 267
+            Height = 275
             Width = 260
           end
         end
         object Panel6: TPanel
-          Left = 277
-          Top = 15
-          Width = 506
-          Height = 323
+          Left = 276
+          Top = 18
+          Width = 518
+          Height = 335
           Align = alClient
           BevelOuter = bvNone
           Caption = 'Panel5'
           TabOrder = 1
           DesignSize = (
-            506
-            323)
+            518
+            335)
           object Label3: TcxLabel
             Left = 2
             Top = 6
@@ -354,22 +423,22 @@ object Form1: TForm1
             Style.Font.Style = []
             Style.IsFontAssigned = True
             TabOrder = 1
-            Height = 267
-            Width = 495
+            Height = 275
+            Width = 505
           end
         end
         object cxSplitter1: TcxSplitter
-          Left = 270
-          Top = 15
+          Left = 269
+          Top = 18
           Width = 7
-          Height = 323
+          Height = 335
           Control = Panel5
         end
       end
       object Panel3: TPanel
         Left = 0
         Top = 0
-        Width = 786
+        Width = 796
         Height = 10
         Align = alTop
         BevelOuter = bvNone
@@ -380,7 +449,7 @@ object Form1: TForm1
       object cxSplitter2: TcxSplitter
         Left = 0
         Top = 203
-        Width = 786
+        Width = 796
         Height = 7
         AlignSplitter = salTop
       end
@@ -389,8 +458,8 @@ object Form1: TForm1
       Caption = 'Configuration'
       ImageIndex = 1
       DesignSize = (
-        786
-        557)
+        796
+        565)
       object GroupBox3: TcxGroupBox
         Left = 7
         Top = 11
@@ -1014,10 +1083,10 @@ object Form1: TForm1
         Style.IsFontAssigned = True
         TabOrder = 7
         DesignSize = (
-          313
-          528)
-        Height = 534
-        Width = 313
+          323
+          542)
+        Height = 542
+        Width = 323
         object Label8: TcxLabel
           Left = 9
           Top = 22
@@ -1040,8 +1109,8 @@ object Form1: TForm1
           Style.IsFontAssigned = True
           TabOrder = 0
           OnClick = OnCfgEditCHange
-          Height = 487
-          Width = 294
+          Height = 495
+          Width = 304
         end
       end
     end
@@ -1049,7 +1118,7 @@ object Form1: TForm1
   object dxSkinController1: TdxSkinController
     NativeStyle = False
     SkinName = 'Foggy'
-    Left = 360
-    Top = 224
+    Left = 688
+    Top = 288
   end
 end

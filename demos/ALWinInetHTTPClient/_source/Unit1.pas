@@ -2,26 +2,46 @@ unit Unit1;
 
 interface
 
-uses Windows,
-     Messages,
-     SysUtils,
-     Variants,
-     Classes,
-     Graphics,
-     Controls,
-     Forms,
-     Dialogs,
-     StdCtrls,
-     WinInet,
-     shellapi,
-     ExtCtrls,
-     ComCtrls,
-     AlWininetHttpClient,
-     cxPCdxBarPopupMenu, cxGraphics, cxControls, cxLookAndFeels,
-  cxLookAndFeelPainters, cxContainer, cxEdit, Menus, cxRadioGroup,
-  cxCheckBox, cxButtons, cxMemo, cxTextEdit, cxLabel, cxGroupBox, cxPC,
-  dxSkinsCore, dxSkinFoggy, dxSkinscxPCPainter, dxSkinsForm, cxSplitter,
-  cxClasses, dxBarBuiltInMenu, system.AnsiStrings;
+uses
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  StdCtrls,
+  WinInet,
+  shellapi,
+  ExtCtrls,
+  ComCtrls,
+  AlWininetHttpClient,
+  cxPCdxBarPopupMenu,
+  cxGraphics,
+  cxControls,
+  cxLookAndFeels,
+  cxLookAndFeelPainters,
+  cxContainer,
+  cxEdit,
+  Menus,
+  cxRadioGroup,
+  cxCheckBox,
+  cxButtons,
+  cxMemo,
+  cxTextEdit,
+  cxLabel,
+  cxGroupBox,
+  cxPC,
+  dxSkinsCore,
+  dxSkinFoggy,
+  dxSkinscxPCPainter,
+  dxSkinsForm,
+  cxSplitter,
+  cxClasses,
+  dxBarBuiltInMenu,
+  system.AnsiStrings;
 
 type
   TForm1 = class(TForm)
@@ -89,7 +109,6 @@ type
     GroupBox9: TcxGroupBox;
     editURL: TcxTextEdit;
     Label4: TcxLabel;
-    Label6: TcxLabel;
     MemoPostDataStrings: TcxMemo;
     MemoPostDataFiles: TcxMemo;
     Label7: TcxLabel;
@@ -114,6 +133,7 @@ type
     ButtonOptions: TcxButton;
     ButtonPut: TcxButton;
     ButtonDelete: TcxButton;
+    cxSplitter3: TcxSplitter;
     procedure ButtonGetClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -144,15 +164,16 @@ var
 
 implementation
 
-Uses DateUtils,
-     HttpApp,
-     ALMultiPartParser,
-     AlCommon,
-     AlFiles,
-     ALMime,
-     ALString,
-     AlStringList,
-     AlHTTPClient;
+Uses
+  DateUtils,
+  HttpApp,
+  ALMultiPartParser,
+  AlCommon,
+  AlFiles,
+  ALMime,
+  ALString,
+  AlStringList,
+  AlHTTPClient;
 
 {$R *.dfm}
 

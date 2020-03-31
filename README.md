@@ -78,10 +78,10 @@ else choose the directory that correspond to your Delphi version) like for exemp
 * <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched\rtl\android">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\android</a>
 
 If after this you have error like (for exemple)
-[dcc32 Fatal Error] FMX.Types3D.pas(1023): F2051 Unit FMX.Materials was compiled with 
-a different version of FMX.Types3D.TMaterial. then you need also to include in you search 
+`[dcc32 Fatal Error] FMX.Types3D.pas(1023): F2051 Unit FMX.Materials was compiled with 
+a different version of FMX.Types3D.TMaterial`. then you need also to include in you search 
 path non patched units (here FMX.Materials.pas for exemple) that are located 
-in your C:\Program Files (x86)\Embarcadero\Studio\20.0\source\ directory
+in your `C:\Program Files (x86)\Embarcadero\Studio\20.0\source\` directory
 You can copy thoses files in (for exemple)
   
 * <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\originals\fmx">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\fmx</a>

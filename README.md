@@ -66,11 +66,11 @@ If you plan to use visual components at design time then you need to
 install the bpl. Launch Delphi and go in component > Install Packages... > and choose the 
 BPL located in <a href="https://github.com/Zeus64/alcinoe/tree/master/lib/bpl/alcinoe/Win32/rio">{alcinoe_rootdir}\lib\bpl\alcinoe\Win32\rio\Alcinoe_rio.bpl</a> (if you are in delphi Rio 
 else choose the directory that correspond to your Delphi version). 
-You still need to add in your search path <a href="https://github.com/Zeus64/alcinoe/tree/master/source">{alcinoe_rootdir}\source\</a>  
+You still need to add in your search path <a href="https://github.com/Zeus64/alcinoe/tree/master/source">{alcinoe_rootdir}\source\ </a>  
   
 Alcinoe use sometime some advanced functions that need to patch the delphi RTL.
 For this you need to include in your project search path ALL the directories located
-under <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\</a> (if you are in delphi Rio 
+under <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\ </a> (if you are in delphi Rio 
 else choose the directory that correspond to your Delphi version) like for exemple:
 
 * <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched\fmx">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\fmx</a>

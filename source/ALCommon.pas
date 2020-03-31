@@ -5,6 +5,10 @@ interface
 uses {$IFDEF IOS}
      iOSapi.Foundation,
      {$ENDIF}
+     {$IFDEF MSWINDOWS}
+     Winapi.Windows,
+     {$ENDIF}
+     ALStringList,
      system.types;
 
 {$IF CompilerVersion < 29} {Delphi XE8}
@@ -333,8 +337,27 @@ Procedure ALFreeAndNil(var Obj; const adelayed: boolean; const aRefCountWarn: Bo
 Function AlBoolToInt(Value:Boolean):Integer;
 Function AlIntToBool(Value:integer):boolean;
 Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
-function AlLocalDateTimeToUTCDateTime(Const aLocalDateTime: TDateTime): TdateTime;
-function AlUTCDateTimeToLocalDateTime(Const aUTCDateTime: TDateTime): TdateTime;
+
+{$IFDEF MSWINDOWS}
+{$IF CompilerVersion > 33} // rio
+  {$MESSAGE WARN 'Check if EnumDynamicTimeZoneInformation/SystemTimeToTzSpecificLocalTimeEx/TzSpecificLocalTimeToSystemTimeEx are still not declared in Winapi.Windows and adjust the IFDEF'}
+{$ENDIF}
+{$WARNINGS OFF}
+function EnumDynamicTimeZoneInformation(dwIndex: DWORD; lpTimeZoneInformation: PDynamicTimeZoneInformation): DWORD; stdcall; external advapi32 delayed;
+function SystemTimeToTzSpecificLocalTimeEx(lpTimeZoneInformation: PDynamicTimeZoneInformation; var lpUniversalTime, lpLocalTime: TSystemTime): BOOL; stdcall; external Kernel32 delayed;
+function TzSpecificLocalTimeToSystemTimeEx(lpTimeZoneInformation: PDynamicTimeZoneInformation; var lpLocalTime, lpUniversalTime: TSystemTime): BOOL; stdcall; external Kernel32 delayed;
+{$WARNINGS ON}
+Function ALGetDynamicTimeZoneInformations: Tarray<TDynamicTimeZoneInformation>;
+Function ALGetDynamicTimeZoneInformation(const aTimeZoneKeyName: String): TDynamicTimeZoneInformation;
+{$ENDIF}
+function AlLocalDateTimeToUTC(Const aLocalDateTime: TDateTime): TdateTime; overload;
+function AlUTCDateTimeToLocal(Const aUTCDateTime: TDateTime): TdateTime; overload;
+{$IFDEF MSWINDOWS}
+Function AlLocalDateTimeToUTC(const aTimeZoneKeyName: String; aLocalDateTime: TdateTime): TdateTime; overload;
+Function AlLocalDateTimeToUTC(const aTimeZoneInformation: TDynamicTimeZoneInformation; aLocalDateTime: TdateTime): TdateTime; overload;
+Function AlUTCDateTimeToLocal(const aTimeZoneKeyName: String; aUTCDateTime: TdateTime): TdateTime; overload;
+Function AlUTCDateTimeToLocal(const aTimeZoneInformation: TDynamicTimeZoneInformation; aUTCDateTime: TdateTime): TdateTime; overload;
+{$ENDIF}
 {$IFDEF IOS}
 function ALNSDateToUTCDateTime(const ADateTime: NSDate): TDateTime;
 {$ENDIF}
@@ -402,9 +425,6 @@ implementation
 
 uses system.Classes,
      system.math,
-     {$IFDEF MSWINDOWS}
-     Winapi.Windows,
-     {$ENDIF}
      {$IF defined(ANDROID)}
      Androidapi.JNI.JavaTypes,
      Androidapi.Helpers,
@@ -414,7 +434,8 @@ uses system.Classes,
      Macapi.Helpers,
      {$ENDIF}
      system.sysutils,
-     system.DateUtils;
+     system.DateUtils,
+     ALString;
 
 {***********************************************}
 function ALRectWidth(const Rect: TRect): Integer;
@@ -1640,17 +1661,196 @@ Begin
   result := (LTotal - (LBorder*2) - LObject) div 2 + LBorder;
 End;
 
-{********************************************************************************}
-function AlLocalDateTimeToUTCDateTime(Const aLocalDateTime: TDateTime): TdateTime;
+{****************}
+{$IFDEF MSWINDOWS}
+Function ALGetDynamicTimeZoneInformations: Tarray<TDynamicTimeZoneInformation>;
+var LResult: Dword;
+    LdynamicTimezone:TDynamicTimeZoneInformation;
+    I: integer;
+begin
+  setlength(result, 200);
+  for i := 0 to maxint do begin
+    Lresult := EnumDynamicTimeZoneInformation(I, @LdynamicTimezone);
+    if (Lresult = ERROR_SUCCESS) then begin
+      if i >= length(result) then Setlength(Result, length(result) + 100);
+      Result[i] := LdynamicTimezone;
+    end
+    else if (Lresult = ERROR_NO_MORE_ITEMS) then begin
+      setlength(result, i);
+      break
+    end
+    else raiseLastOsError
+  end;
+end;
+{$ENDIF}
+
+{****************}
+{$IFDEF MSWINDOWS}
+Function ALGetDynamicTimeZoneInformation(const aTimeZoneKeyName: String): TDynamicTimeZoneInformation;
+var LDynamicTimeZoneInformations: Tarray<TDynamicTimeZoneInformation>;
+    I: integer;
+begin
+  LDynamicTimeZoneInformations := ALGetDynamicTimeZoneInformations;
+  for I := low(LDynamicTimeZoneInformations) to High(LDynamicTimeZoneInformations) do
+    if ALSameTextU(LDynamicTimeZoneInformations[i].TimeZoneKeyName, aTimeZoneKeyName) then begin
+      result := LDynamicTimeZoneInformations[i];
+      Exit;
+    end;
+  raise Exception.Create('Unknown TimeZoneKeyName');
+end;
+{$ENDIF}
+
+{************************************************************************}
+function AlLocalDateTimeToUTC(Const aLocalDateTime: TDateTime): TdateTime;
 begin
   result := TTimeZone.Local.ToUniversalTime(aLocalDateTime);
 end;
 
-{******************************************************************************}
-function AlUTCDateTimeToLocalDateTime(Const aUTCDateTime: TDateTime): TdateTime;
+{****************}
+{$IFDEF MSWINDOWS}
+Function AlLocalDateTimeToUTC(const aTimeZoneKeyName: String; aLocalDateTime: TdateTime): TdateTime; overload;
+var LDynamicTimeZoneInformations: Tarray<TDynamicTimeZoneInformation>;
+    LSystemTime, LLocalTime: TSystemTime;
+    I: integer;
+begin
+  LDynamicTimeZoneInformations := ALGetDynamicTimeZoneInformations;
+  for I := low(LDynamicTimeZoneInformations) to High(LDynamicTimeZoneInformations) do begin
+    if ALSameTextU(LDynamicTimeZoneInformations[i].TimeZoneKeyName, aTimeZoneKeyName) then begin
+      DecodeDateTime(
+        aLocalDateTime,
+        LLocalTime.wYear,
+        LLocalTime.wMonth,
+        LLocalTime.wDay,
+        LLocalTime.wHour,
+        LLocalTime.wMinute,
+        LLocalTime.wSecond,
+        LLocalTime.wMilliseconds);
+      LLocalTime.wDayOfWeek := DayOfWeek(aLocalDateTime) - 1;
+      if TzSpecificLocalTimeToSystemTimeEx(@LDynamicTimeZoneInformations[i], LLocalTime, LSystemTime) then begin
+        Result := EncodeDateTime(
+                    LSystemTime.wYear,
+                    LSystemTime.wMonth,
+                    LSystemTime.wDay,
+                    LSystemTime.wHour,
+                    LSystemTime.wMinute,
+                    LSystemTime.wSecond,
+                    LSystemTime.wMilliseconds);
+        exit;
+      end
+      else
+        RaiseLastOsError;
+    end;
+  end;
+  raise Exception.Create('Unknown TimeZoneKeyName');
+end;
+{$ENDIF}
+
+{****************}
+{$IFDEF MSWINDOWS}
+Function AlLocalDateTimeToUTC(const aTimeZoneInformation: TDynamicTimeZoneInformation; aLocalDateTime: TdateTime): TdateTime; overload;
+var LSystemTime, LLocalTime: TSystemTime;
+begin
+  DecodeDateTime(
+    aLocalDateTime,
+    LLocalTime.wYear,
+    LLocalTime.wMonth,
+    LLocalTime.wDay,
+    LLocalTime.wHour,
+    LLocalTime.wMinute,
+    LLocalTime.wSecond,
+    LLocalTime.wMilliseconds);
+  LLocalTime.wDayOfWeek := DayOfWeek(aLocalDateTime) - 1;
+  if TzSpecificLocalTimeToSystemTimeEx(@aTimeZoneInformation, LLocalTime, LSystemTime) then
+    Result := EncodeDateTime(
+                LSystemTime.wYear,
+                LSystemTime.wMonth,
+                LSystemTime.wDay,
+                LSystemTime.wHour,
+                LSystemTime.wMinute,
+                LSystemTime.wSecond,
+                LSystemTime.wMilliseconds)
+  else begin
+    result := 0; // to hide a warning
+    RaiseLastOsError;
+  end;
+end;
+{$ENDIF}
+
+{**********************************************************************}
+function AlUTCDateTimeToLocal(Const aUTCDateTime: TDateTime): TdateTime;
 begin
   result := TTimeZone.Local.ToLocalTime(aUTCDateTime);
 end;
+
+{****************}
+{$IFDEF MSWINDOWS}
+Function AlUTCDateTimeToLocal(const aTimeZoneKeyName: String; aUTCDateTime: TdateTime): TdateTime; overload;
+var LDynamicTimeZoneInformations: Tarray<TDynamicTimeZoneInformation>;
+    LSystemTime, LLocalTime: TSystemTime;
+    I: integer;
+begin
+  LDynamicTimeZoneInformations := ALGetDynamicTimeZoneInformations;
+  for I := low(LDynamicTimeZoneInformations) to High(LDynamicTimeZoneInformations) do begin
+    if ALSameTextU(LDynamicTimeZoneInformations[i].TimeZoneKeyName, aTimeZoneKeyName) then begin
+      DecodeDateTime(
+        aUTCDateTime,
+        LSystemTime.wYear,
+        LSystemTime.wMonth,
+        LSystemTime.wDay,
+        LSystemTime.wHour,
+        LSystemTime.wMinute,
+        LSystemTime.wSecond,
+        LSystemTime.wMilliseconds);
+      LLocalTime.wDayOfWeek := DayOfWeek(aUTCDateTime) - 1;
+      if SystemTimeToTzSpecificLocalTime(@LDynamicTimeZoneInformations[i], LSystemTime, LLocalTime) then begin
+        Result := EncodeDateTime(
+                    LLocalTime.wYear,
+                    LLocalTime.wMonth,
+                    LLocalTime.wDay,
+                    LLocalTime.wHour,
+                    LLocalTime.wMinute,
+                    LLocalTime.wSecond,
+                    LLocalTime.wMilliseconds);
+        exit;
+      end
+      else
+        RaiseLastOsError;
+    end;
+  end;
+  raise Exception.Create('Unknown TimeZoneKeyName');
+end;
+{$ENDIF}
+
+{****************}
+{$IFDEF MSWINDOWS}
+Function AlUTCDateTimeToLocal(const aTimeZoneInformation: TDynamicTimeZoneInformation; aUTCDateTime: TdateTime): TdateTime; overload;
+var LSystemTime, LLocalTime: TSystemTime;
+begin
+  DecodeDateTime(
+    aUTCDateTime,
+    LSystemTime.wYear,
+    LSystemTime.wMonth,
+    LSystemTime.wDay,
+    LSystemTime.wHour,
+    LSystemTime.wMinute,
+    LSystemTime.wSecond,
+    LSystemTime.wMilliseconds);
+  LLocalTime.wDayOfWeek := DayOfWeek(aUTCDateTime) - 1;
+  if SystemTimeToTzSpecificLocalTime(@aTimeZoneInformation, LSystemTime, LLocalTime) then
+    Result := EncodeDateTime(
+                LLocalTime.wYear,
+                LLocalTime.wMonth,
+                LLocalTime.wDay,
+                LLocalTime.wHour,
+                LLocalTime.wMinute,
+                LLocalTime.wSecond,
+                LLocalTime.wMilliseconds)
+  else begin
+    result := 0; // to hide a warning
+    RaiseLastOsError;
+  end;
+end;
+{$ENDIF}
 
 {**********}
 {$IFDEF IOS}

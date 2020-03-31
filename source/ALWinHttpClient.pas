@@ -175,7 +175,8 @@ type
     procedure SetAccessType(const Value: TALWinHttpClientInternetOpenAccessType);
     procedure SetOnStatusChange(const Value: TALWinHttpClientStatusChangeEvent);
   protected
-    procedure CheckError(Error: Boolean);
+    procedure CheckError(ErrCode: DWORD); overload;
+    procedure CheckError(Error: Boolean); overload;
     procedure SetURL(const Value: AnsiString);
     procedure SetUsername(const NameValue: AnsiString); override;
     procedure SetPassword(const PasswordValue: AnsiString); override;
@@ -260,27 +261,30 @@ begin
 end;
 
 {****************************************************}
-procedure TALWinHttpClient.CheckError(Error: Boolean);
-var ErrCode: DWORD;
-    ln: DWORD;
+procedure TALWinHttpClient.CheckError(ErrCode: DWORD);
+var ln: DWORD;
     S: AnsiString;
 begin
-  if Error then begin
-    ErrCode := GetLastError;
-    if ErrCode <> 0 then begin
-      SetLength(S, 256);
-      ln := FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM or FORMAT_MESSAGE_FROM_HMODULE, //  _In_     DWORD   dwFlags,
-                           Pointer(GetModuleHandle('winhttp.dll')), // _In_opt_ LPCVOID lpSource,
-                           ErrCode, // _In_     DWORD   dwMessageId,
-                           0, // _In_     DWORD   dwLanguageId,
-                           PAnsiChar(S), // _Out_    LPTSTR  lpBuffer,
-                           Length(S), // _In_     DWORD   nSize,
-                           nil); // _In_opt_ va_list *Arguments
-      if ln = 0 then raiseLastOsError;
-      SetLength(S, ln);
-      raise EALHTTPClientException.CreateFmt('%s - URL:%s', [ALTrim(S), URL]);      { Do not localize }
-    end;
+  if ErrCode <> 0 then begin
+    SetLength(S, 256);
+    ln := FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM or FORMAT_MESSAGE_FROM_HMODULE, //  _In_     DWORD   dwFlags,
+                         Pointer(GetModuleHandle('winhttp.dll')), // _In_opt_ LPCVOID lpSource,
+                         ErrCode, // _In_     DWORD   dwMessageId,
+                         0, // _In_     DWORD   dwLanguageId,
+                         PAnsiChar(S), // _Out_    LPTSTR  lpBuffer,
+                         Length(S), // _In_     DWORD   nSize,
+                         nil); // _In_opt_ va_list *Arguments
+    if ln = 0 then raiseLastOsError;
+    SetLength(S, ln);
+    raise EALHTTPClientException.CreateFmt('%s - URL:%s', [ALTrim(S), URL]);      { Do not localize }
   end;
+end;
+
+{****************************************************}
+procedure TALWinHttpClient.CheckError(Error: Boolean);
+begin
+  if Error then
+    CheckError(GetLastError);
 end;
 
 {*********************************************************}
@@ -454,6 +458,8 @@ var BuffSize, Len: DWord;
     StrProtocolVersion: String;
     StrVerb: String;
     AcceptTypes: array of PWideChar;
+    CertContextSet: Boolean;
+    ErrCode: DWORD;
 
 begin
 
@@ -536,14 +542,25 @@ begin
       Buffer := TMemoryStream.Create;
       try
         Buffer.SetSize(UploadBufferSize);
-        CheckError(not WinHttpSendRequest(Result, // _In_     HINTERNET hRequest,
-                                          WINHTTP_NO_ADDITIONAL_HEADERS, // _In_opt_ LPCWSTR   pwszHeaders,
-                                          0, // _In_     DWORD     dwHeadersLength,
-                                          nil, // _In_opt_ LPVOID    lpOptional,
-                                          0,  //  _In_     DWORD     dwOptionalLength,
-                                          BuffSize, // _In_     DWORD     dwTotalLength,
-                                          DWORD_PTR(self))); // _In_     DWORD_PTR dwContext
-
+        CertContextSet := False;
+        repeat
+          if not WinHttpSendRequest(Result, // _In_     HINTERNET hRequest,
+                                    WINHTTP_NO_ADDITIONAL_HEADERS, // _In_opt_ LPCWSTR   pwszHeaders,
+                                    0, // _In_     DWORD     dwHeadersLength,
+                                    nil, // _In_opt_ LPVOID    lpOptional,
+                                    0,  //  _In_     DWORD     dwOptionalLength,
+                                    BuffSize, // _In_     DWORD     dwTotalLength,
+                                    DWORD_PTR(self)) then begin // _In_     DWORD_PTR dwContext
+            ErrCode := GetLastError;
+            if (not CertContextSet) and (ErrCode = ERROR_WINHTTP_CLIENT_AUTH_CERT_NEEDED) then begin
+              CheckError(not WinHttpSetOption(Result, WINHTTP_OPTION_CLIENT_CERT_CONTEXT, WINHTTP_NO_CLIENT_CERT_CONTEXT, 0));
+              CertContextSet := True;
+            end
+            else
+              checkError(ErrCode);
+          end
+          else ErrCode := 0;
+        until ErrCode = 0;
         try
 
           while True do begin
@@ -574,13 +591,25 @@ begin
       Buffer := TMemoryStream.Create;
       try
         Buffer.CopyFrom(aRequestDataStream, 0);
-        CheckError(not WinHttpSendRequest(Result, // _In_     HINTERNET hRequest,
-                                          WINHTTP_NO_ADDITIONAL_HEADERS, // _In_opt_ LPCWSTR   pwszHeaders,
-                                          0, // _In_     DWORD     dwHeadersLength,
-                                          Buffer.Memory, // _In_opt_ LPVOID    lpOptional,
-                                          Buffer.Size, //  _In_     DWORD     dwOptionalLength,
-                                          Buffer.Size, // _In_     DWORD     dwTotalLength,
-                                          DWORD_PTR(self))); // _In_     DWORD_PTR dwContext
+        CertContextSet := False;
+        repeat
+          if not WinHttpSendRequest(Result, // _In_     HINTERNET hRequest,
+                                    WINHTTP_NO_ADDITIONAL_HEADERS, // _In_opt_ LPCWSTR   pwszHeaders,
+                                    0, // _In_     DWORD     dwHeadersLength,
+                                    Buffer.Memory, // _In_opt_ LPVOID    lpOptional,
+                                    Buffer.Size, //  _In_     DWORD     dwOptionalLength,
+                                    Buffer.Size, // _In_     DWORD     dwTotalLength,
+                                    DWORD_PTR(self)) then begin // _In_     DWORD_PTR dwContext
+            ErrCode := GetLastError;
+            if (not CertContextSet) and (ErrCode = ERROR_WINHTTP_CLIENT_AUTH_CERT_NEEDED) then begin
+              CheckError(not WinHttpSetOption(Result, WINHTTP_OPTION_CLIENT_CERT_CONTEXT, WINHTTP_NO_CLIENT_CERT_CONTEXT, 0));
+              CertContextSet := True;
+            end
+            else
+              checkError(ErrCode);
+          end
+          else ErrCode := 0;
+        until ErrCode = 0;
         CheckError(not WinHttpReceiveResponse(Result, nil));
       finally
         AlFreeAndNil(Buffer);
@@ -588,13 +617,25 @@ begin
     end
 
     else begin
-      CheckError(not WinHttpSendRequest(Result, // _In_     HINTERNET hRequest,
-                                        WINHTTP_NO_ADDITIONAL_HEADERS, // _In_opt_ LPCWSTR   pwszHeaders,
-                                        0, // _In_     DWORD     dwHeadersLength,
-                                        nil, // _In_opt_ LPVOID    lpOptional,
-                                        0, //  _In_     DWORD     dwOptionalLength,
-                                        0, // _In_     DWORD     dwTotalLength,
-                                        DWORD_PTR(self))); // _In_     DWORD_PTR dwContext
+      CertContextSet := False;
+      repeat
+        if not WinHttpSendRequest(Result, // _In_     HINTERNET hRequest,
+                                  WINHTTP_NO_ADDITIONAL_HEADERS, // _In_opt_ LPCWSTR   pwszHeaders,
+                                  0, // _In_     DWORD     dwHeadersLength,
+                                  nil, // _In_opt_ LPVOID    lpOptional,
+                                  0, //  _In_     DWORD     dwOptionalLength,
+                                  0, // _In_     DWORD     dwTotalLength,
+                                  DWORD_PTR(self)) then begin // _In_     DWORD_PTR dwContext
+          ErrCode := GetLastError;
+          if (not CertContextSet) and (ErrCode = ERROR_WINHTTP_CLIENT_AUTH_CERT_NEEDED) then begin
+            CheckError(not WinHttpSetOption(Result, WINHTTP_OPTION_CLIENT_CERT_CONTEXT, WINHTTP_NO_CLIENT_CERT_CONTEXT, 0));
+            CertContextSet := True;
+          end
+          else
+            checkError(ErrCode);
+        end
+        else ErrCode := 0;
+      until ErrCode = 0;
       CheckError(not WinHttpReceiveResponse(Result, nil));
     end;
 
@@ -638,31 +679,6 @@ begin
     end;
   end;
 
-  { Handle error from status}
-  Len := SizeOf(Status);
-  if WinHttpQueryHeaders(aContext, // _In_     HINTERNET hRequest,
-                         WINHTTP_QUERY_STATUS_CODE or WINHTTP_QUERY_FLAG_NUMBER, // _In_     DWORD     dwInfoLevel,
-                         WINHTTP_HEADER_NAME_BY_INDEX, // _In_opt_ LPCWSTR   pwszName,
-                         @Status, // _Out_    LPVOID    lpBuffer,
-                         Len, // _Inout_  LPDWORD   lpdwBufferLength,
-                         WINHTTP_NO_HEADER_INDEX) and // _Inout_  LPDWORD   lpdwIndex
-     (Status >= 300) then begin
-    Size := 256 * sizeof(Char);
-    While true do begin
-      SetLength(aWideStr, Size div sizeof(Char));
-      if WinHttpQueryHeaders(aContext, // _In_     HINTERNET hRequest,
-                             WINHTTP_QUERY_STATUS_TEXT, // _In_     DWORD     dwInfoLevel,
-                             WINHTTP_HEADER_NAME_BY_INDEX, // _In_opt_ LPCWSTR   pwszName,
-                             pointer(aWideStr), // _Out_    LPVOID    lpBuffer,
-                             Size, // _Inout_  LPDWORD   lpdwBufferLength,
-                             WINHTTP_NO_HEADER_INDEX) then begin // _Inout_  LPDWORD   lpdwIndex
-        SetLength(aWideStr, Size div sizeof(Char));
-        raise EALHTTPClientException.CreateFmt('%s (%d) - ''%s''', [aWideStr, Status, URL], Status);
-      end
-      else checkError(GetLastError <> ERROR_INSUFFICIENT_BUFFER);
-    end;
-  end;
-
   { read content-length }
   if Assigned(onDownloadProgress) then begin
     Len := SizeOf(ContentLength);
@@ -692,6 +708,31 @@ begin
       end;
     end;
   until Size = 0;
+
+  { Handle error from status}
+  Len := SizeOf(Status);
+  if WinHttpQueryHeaders(aContext, // _In_     HINTERNET hRequest,
+                         WINHTTP_QUERY_STATUS_CODE or WINHTTP_QUERY_FLAG_NUMBER, // _In_     DWORD     dwInfoLevel,
+                         WINHTTP_HEADER_NAME_BY_INDEX, // _In_opt_ LPCWSTR   pwszName,
+                         @Status, // _Out_    LPVOID    lpBuffer,
+                         Len, // _Inout_  LPDWORD   lpdwBufferLength,
+                         WINHTTP_NO_HEADER_INDEX) and // _Inout_  LPDWORD   lpdwIndex
+     (Status >= 300) then begin
+    Size := 256 * sizeof(Char);
+    While true do begin
+      SetLength(aWideStr, Size div sizeof(Char));
+      if WinHttpQueryHeaders(aContext, // _In_     HINTERNET hRequest,
+                             WINHTTP_QUERY_STATUS_TEXT, // _In_     DWORD     dwInfoLevel,
+                             WINHTTP_HEADER_NAME_BY_INDEX, // _In_opt_ LPCWSTR   pwszName,
+                             pointer(aWideStr), // _Out_    LPVOID    lpBuffer,
+                             Size, // _Inout_  LPDWORD   lpdwBufferLength,
+                             WINHTTP_NO_HEADER_INDEX) then begin // _Inout_  LPDWORD   lpdwIndex
+        SetLength(aWideStr, Size div sizeof(Char));
+        raise EALHTTPClientException.CreateFmt('%s (%d) - ''%s''', [aWideStr, Status, URL], Status);
+      end
+      else checkError(GetLastError <> ERROR_INSUFFICIENT_BUFFER);
+    end;
+  end;
 
 end;
 

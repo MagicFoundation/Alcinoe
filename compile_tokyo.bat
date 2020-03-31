@@ -1,6 +1,7 @@
 @echo off
 
 call "C:\Program Files (x86)\Embarcadero\Studio\19.0\bin\rsvars.bat"
+IF ERRORLEVEL 1 goto ERROR
 
 SET FileName=*.skincfg
 del %FileName% /s
@@ -45,6 +46,7 @@ MSBuild source\Alcinoe_tokyo.dproj /p:Config=Release /p:Platform=Win32
 IF ERRORLEVEL 1 goto ERROR
 
 call compilejar.bat off
+IF ERRORLEVEL 1 goto ERROR
 
 :FINISHED
 

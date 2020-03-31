@@ -64,21 +64,21 @@ search path of your project.
 
 If you plan to use visual components at design time then you need to
 install the bpl. Launch Delphi and go in component > Install Packages... > and choose the 
-BPL located in <span style="color:#0366d6">{alcinoe_rootdir}\lib\bpl\alcinoe\Win32\rio\Alcinoe_rio.bpl</span> (if you are in delphi Rio 
+BPL located in <a href="https://github.com/Zeus64/alcinoe/tree/master/lib/bpl/alcinoe/Win32/rio">{alcinoe_rootdir}\lib\bpl\alcinoe\Win32\rio\Alcinoe_rio.bpl</a> (if you are in delphi Rio 
 else choose the directory that correspond to your Delphi version). 
-You still need to add in your search path <span style="color:#0366d6">{alcinoe_rootdir}\source\ </span>  
+You still need to add in your search path <a href="https://github.com/Zeus64/alcinoe/tree/master/source">{alcinoe_rootdir}\source\</a>  
   
 Alcinoe use sometime some advanced functions that need to patch the delphi RTL.
 For this you need to include in your project search path ALL the directories located
-under <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\ </span> (if you are in delphi Rio 
+under <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\</a> (if you are in delphi Rio 
 else choose the directory that correspond to your Delphi version) like for exemple:
 
-* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\fmx</span>
-* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\ios</span>
-* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\android</span>
-* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\osx</span>
-* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\net</span>
-* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\common</span>
+* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched\fmx">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\fmx</a>
+* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched\rtl\ios">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\ios</a>
+* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched\rtl\android">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\android</a>
+* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched\rtl\osx">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\osx</a>
+* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched\rtl\net">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\net</a>
+* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched\rtl\common">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\common</a>
 
 If after this you have error like (for exemple)
 [dcc32 Fatal Error] FMX.Types3D.pas(1023): F2051 Unit FMX.Materials was compiled with 
@@ -87,12 +87,12 @@ path non patched units (here FMX.Materials.pas for exemple) that are located
 in your C:\Program Files (x86)\Embarcadero\Studio\20.0\source\ directory
 You can copy thoses files in (for exemple)
   
-* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\fmx</span>
-* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\ios</span>
-* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\android</span>
-* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\osx</span>
-* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\net</span>
-* <span style="color:#0366d6">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\common</span>
+* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\originals\fmx">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\fmx</a>
+* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\originals\rtl\ios">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\ios</a>
+* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\originals\rtl\android">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\android</a>
+* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\originals\rtl\osx">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\osx</a>
+* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\originals\rtl\net">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\net</a>
+* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\originals\rtl\common">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\common</a>
   
 and then you need to add also all thoses directories to your project search path (add them 
 AFTER the previous entries you just made for the patched version)

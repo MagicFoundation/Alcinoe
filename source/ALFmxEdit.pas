@@ -87,6 +87,7 @@ type
   private
     fIsMultiline: boolean;
     fDefStyleAttr: String;
+    fDefStyleRes: String;
     FTextWatcher: TALTextWatcher;
     FEditorActionListener: TALEditorActionListener;
     FKeyPreImeListener: TALKeyPreImeListener;
@@ -96,7 +97,7 @@ type
     function CreateView: JView; override;
     procedure InitView; override;
   public
-    constructor Create(const AControl: TalAndroidEdit; Const aIsMultiline: Boolean = False; const aDefStyleAttr: String = ''); reintroduce;
+    constructor Create(const AControl: TalAndroidEdit; Const aIsMultiline: Boolean = False; const aDefStyleAttr: String = ''; const aDefStyleRes: String = ''); reintroduce;
     destructor Destroy; override;
     property View: JALEditText read GetView;
   end;
@@ -162,7 +163,7 @@ type
     procedure DoExit; override;
     procedure DoEndUpdate; override;
   public
-    constructor Create(const AOwner: TComponent; Const aIsMultiline: Boolean = False; const aDefStyleAttr: String = ''); reintroduce; virtual;
+    constructor Create(const AOwner: TComponent; Const aIsMultiline: Boolean = False; const aDefStyleAttr: String = ''; const aDefStyleRes: String = ''); reintroduce; virtual;
     destructor Destroy; override;
     procedure RecalcOpacity; override;
     procedure RecalcEnabled; override;
@@ -326,6 +327,7 @@ type
   TALEdit = class(TALRectangle)
   private
     fDefStyleAttr: String;
+    fDefStyleRes: String;
     FAutoTranslate: Boolean;
     FAutoConvertFontFamily: boolean;
     fOnChangeTracking: TNotifyEvent;
@@ -379,6 +381,7 @@ type
     procedure SetReturnKeyType(const Value: TReturnKeyType);
     function GetReturnKeyType: TReturnKeyType;
     procedure SetDefStyleAttr(const Value: String);
+    procedure SetDefStyleRes(const Value: String);
     procedure CreateEditControl;
     function GetContainFocus: Boolean;
     procedure SetMaxLength(const Value: integer);
@@ -403,11 +406,14 @@ type
     Procedure setSelection(const aindex: integer); overload;
     property ContainFocus: Boolean read GetContainFocus;
   published
-    property DefStyleAttr: String read fDefStyleAttr write SetDefStyleAttr; // << android only - the name of An attribute in the current theme that contains a
-                                                                            // << reference to a style resource that supplies defaults values for the StyledAttributes.
+    property DefStyleAttr: String read fDefStyleAttr write SetDefStyleAttr; // << android only - the name of an attribute in the current theme that contains a reference to
+                                                                            // << a style resource that supplies defaults style values
                                                                             // << exemple of use: https://stackoverflow.com/questions/5051753/how-do-i-apply-a-style-programmatically
                                                                             // << NOTE: !!IMPORTANT!! This properties must be defined the very first because the stream system
                                                                             // <<       must load it the very first
+    property DefStyleRes: String read fDefStyleRes write SetDefStyleRes; // << android only - the name of a style resource that supplies default style values
+                                                                         // << NOTE: !!IMPORTANT!! This properties must be defined the very first because the stream system
+                                                                         // <<       must load it the very first
     property TabOrder;
     property TabStop;
     property Cursor default crIBeam;
@@ -458,6 +464,7 @@ uses {$IF defined(android)}
      Androidapi.KeyCodes,
      Androidapi.JNI.App,
      Androidapi.JNI.Util,
+     Androidapi.JNI.Os,
      FMX.VirtualKeyboard,
      FMX.Platform,
      FMX.Platform.Android,
@@ -606,11 +613,12 @@ begin
   else result := false;
 end;
 
-{*******************************************************************************************************************************************}
-constructor TALAndroidEditText.Create(const AControl: TalAndroidEdit; Const aIsMultiline: Boolean = False; const aDefStyleAttr: String = '');
+{****************************************************************************************************************************************************************************}
+constructor TALAndroidEditText.Create(const AControl: TalAndroidEdit; Const aIsMultiline: Boolean = False; const aDefStyleAttr: String = ''; const aDefStyleRes: String = '');
 begin
   fIsMultiline := aIsMultiline;
   fDefStyleAttr := aDefStyleAttr;
+  fDefStyleRes := aDefStyleRes;
   FTextWatcher := TALTextWatcher.Create(self);
   FEditorActionListener := TALEditorActionListener.Create(self, aIsMultiline);
   FKeyPreImeListener := TALKeyPreImeListener.Create(self);
@@ -637,16 +645,53 @@ end;
 
 {********************************************}
 function TALAndroidEditText.CreateView: JView;
+Var LSDKVersion: integer;
 begin
-  if fDefStyleAttr = '' then Result := TJALEditText.JavaClass.init(TAndroidHelper.Activity)
-  else Result := TJALEditText.JavaClass.init(TAndroidHelper.Activity, // context: JContext;
-                                             nil, // attrs: JAttributeSet;
-                                             TAndroidHelper. // defStyleAttr: Integer
-                                               Context.
-                                                 getResources().
-                                                   getIdentifier(StringToJstring(fDefStyleAttr), // name	String: The name of the desired resource.
-                                                                 StringToJstring('attr'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
-                                                                 TAndroidHelper.Context.getPackageName())); // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
+  LSDKVersion := TJBuild_VERSION.JavaClass.SDK_INT;
+  //-----
+  if (fDefStyleAttr = '') and
+     ((LSDKVersion < 22{lollipop}) or (fDefStyleRes='')) then
+    Result := TJALEditText.JavaClass.init(TAndroidHelper.Activity)
+  //-----
+  else if (LSDKVersion < 22{lollipop}) or (fDefStyleRes='')  then
+    Result := TJALEditText.JavaClass.init(
+                TAndroidHelper.Activity, // context: JContext;
+                nil, // attrs: JAttributeSet;
+                TAndroidHelper. // defStyleAttr: Integer
+                  Context.
+                    getResources().
+                      getIdentifier(StringToJstring(fDefStyleAttr), // name	String: The name of the desired resource.
+                                    StringToJstring('attr'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
+                                    TAndroidHelper.Context.getPackageName())) // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
+  //-----
+  else if (fDefStyleAttr = '') then
+    Result := TJALEditText.JavaClass.init(
+                TAndroidHelper.Activity, // context: JContext;
+                nil, // attrs: JAttributeSet;
+                0, // defStyleAttr: Integer
+                TAndroidHelper. // defStyleRes: Integer
+                  Context.
+                    getResources().
+                      getIdentifier(StringToJstring(fDefStyleRes), // name	String: The name of the desired resource.
+                                    StringToJstring('style'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
+                                    TAndroidHelper.Context.getPackageName())) // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
+  //-----
+  else  
+    Result := TJALEditText.JavaClass.init(
+                TAndroidHelper.Activity, // context: JContext;
+                nil, // attrs: JAttributeSet;
+                TAndroidHelper. // defStyleAttr: Integer
+                  Context.
+                    getResources().
+                      getIdentifier(StringToJstring(fDefStyleAttr), // name	String: The name of the desired resource.
+                                    StringToJstring('attr'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
+                                    TAndroidHelper.Context.getPackageName()), // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
+                TAndroidHelper. // defStyleRes: Integer
+                  Context.
+                    getResources().
+                      getIdentifier(StringToJstring(fDefStyleRes), // name	String: The name of the desired resource.
+                                    StringToJstring('style'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
+                                    TAndroidHelper.Context.getPackageName())) // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
 end;
 
 {************************************}
@@ -671,8 +716,8 @@ begin
   Result := inherited GetView<JALEditText>;
 end;
 
-{*********************************************************************************************************************************}
-constructor TalAndroidEdit.Create(const AOwner: TComponent; Const aIsMultiline: Boolean = False; const aDefStyleAttr: String = '');
+{******************************************************************************************************************************************************************}
+constructor TalAndroidEdit.Create(const AOwner: TComponent; Const aIsMultiline: Boolean = False; const aDefStyleAttr: String = ''; const aDefStyleRes: String = '');
 var aScreenSrv: IFMXScreenService;
 begin
   {$IF defined(DEBUG)}
@@ -696,7 +741,7 @@ begin
   fKeyboardType := TVirtualKeyboardType.default;
   fPassword := false;
   fIsMultiline := aIsMultiline;
-  FEditText := TALAndroidEditText.create(self, aIsMultiline, aDefStyleAttr);
+  FEditText := TALAndroidEditText.create(self, aIsMultiline, aDefStyleAttr, aDefStyleRes);
   DoSetReturnKeyType(fReturnKeyType);
   DoSetInputType(fKeyboardType, fPassword, fIsMultiline);
   SetCheckSpelling(True);
@@ -1824,6 +1869,7 @@ constructor TALEdit.Create(AOwner: TComponent);
 begin
   inherited;
   fDefStyleAttr := '';
+  fDefStyleRes := '';
   FAutoTranslate := true;
   FAutoConvertFontFamily := True;
   fOnChangeTracking := nil;
@@ -1839,7 +1885,7 @@ begin
   //i use this way to know that the compoment
   //will load it's properties from the dfm
   if (aOwner = nil) or
-     (not (csloading in aOwner.ComponentState)) then CreateEditControl; // because we must first know the value of DefStyleAttr to create the fEditControl
+     (not (csloading in aOwner.ComponentState)) then CreateEditControl; // because we must first know the value of DefStyleAttr/DefStyleRes to create the fEditControl
   {$ELSE}
   CreateEditControl;
   {$ENDIF}
@@ -1876,7 +1922,7 @@ procedure TALEdit.CreateEditControl;
 begin
   if fEditControl <> nil then exit;
   {$IF defined(android)}
-  fEditControl := TALAndroidEdit.Create(self, false, fDefStyleAttr);
+  fEditControl := TALAndroidEdit.Create(self, false, fDefStyleAttr, fDefStyleRes);
   fEditControl.Parent := self;
   FeditControl.Stored := False;
   FeditControl.SetSubComponent(True);
@@ -1940,8 +1986,24 @@ begin
   if Value <> fDefStyleAttr then begin
     fDefStyleAttr := Value;
     {$IFDEF ANDROID}
-    ALFreeAndNil(fEditControl, false{adelayed}, false{aRefCountWarn}); // << will call disposeOF under ARC so it's ok
-    CreateEditControl;
+    if not (csLoading in componentState) then begin
+      ALFreeAndNil(fEditControl, false{adelayed}, false{aRefCountWarn}); // << will call disposeOF under ARC so it's ok
+      CreateEditControl;
+    end;
+    {$ENDIF}
+  end;
+end;
+
+{****************************************************}
+procedure TALEdit.SetDefStyleRes(const Value: String);
+begin
+  if Value <> fDefStyleRes then begin
+    fDefStyleRes := Value;
+    {$IFDEF ANDROID}
+    if not (csLoading in componentState) then begin
+      ALFreeAndNil(fEditControl, false{adelayed}, false{aRefCountWarn}); // << will call disposeOF under ARC so it's ok
+      CreateEditControl;
+    end;
     {$ENDIF}
   end;
 end;

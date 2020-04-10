@@ -303,7 +303,6 @@ uses system.SysUtils,
      Androidapi.JNI.Os,
      FMX.Helpers.Android,
      FMX.platform.Android,
-     ALAndroidShortcutBadgerApi,
      {$ELSEIF defined(IOS)}
      Macapi.Helpers,
      iOSapi.Helpers,
@@ -705,8 +704,9 @@ begin
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
-  If TJShortcutBadger.JavaClass.isBadgeCounterSupported(TAndroidHelper.Context) then
-    TJShortcutBadger.JavaClass.applyCount(TAndroidHelper.Context, aNewValue);
+  // It's seam that ShortcutBadger is not maintained anymore so remove this dependancy  
+  // If TJShortcutBadger.JavaClass.isBadgeCounterSupported(TAndroidHelper.Context) then
+  //   TJShortcutBadger.JavaClass.applyCount(TAndroidHelper.Context, aNewValue);
   {$ENDIF}
   {$ENDREGION}
 

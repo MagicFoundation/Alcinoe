@@ -39,6 +39,7 @@ class PASCALIMPLEMENTATION TALEdit : public Alfmxobjects::TALRectangle
 	
 private:
 	System::UnicodeString fDefStyleAttr;
+	System::UnicodeString fDefStyleRes;
 	bool FAutoTranslate;
 	bool FAutoConvertFontFamily;
 	System::Classes::TNotifyEvent fOnChangeTracking;
@@ -77,6 +78,7 @@ private:
 	void __fastcall SetReturnKeyType(const Fmx::Types::TReturnKeyType Value);
 	Fmx::Types::TReturnKeyType __fastcall GetReturnKeyType();
 	void __fastcall SetDefStyleAttr(const System::UnicodeString Value);
+	void __fastcall SetDefStyleRes(const System::UnicodeString Value);
 	void __fastcall CreateEditControl();
 	bool __fastcall GetContainFocus();
 	void __fastcall SetMaxLength(const int Value);
@@ -100,6 +102,7 @@ public:
 	
 __published:
 	__property System::UnicodeString DefStyleAttr = {read=fDefStyleAttr, write=SetDefStyleAttr};
+	__property System::UnicodeString DefStyleRes = {read=fDefStyleRes, write=SetDefStyleRes};
 	__property TabOrder = {default=-1};
 	__property TabStop = {default=1};
 	__property Cursor = {default=-4};

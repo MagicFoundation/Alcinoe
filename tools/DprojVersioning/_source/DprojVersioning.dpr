@@ -8,6 +8,8 @@ uses
   System.SysUtils,
   System.math,
   ALFiles,
+  ALStringList,
+  ALCommon,
   ALString;
 
 {********************************************************************}
@@ -31,7 +33,9 @@ function getdProjVersionName(const aDProjSrc: AnsiString): ansiString;
 
 Var
   LPropertyGroupSrc: AnsiString;
+  LStringList: TALStringList;
   P1, P2: integer;
+  I: integer;
 
 begin
   result := '';
@@ -45,6 +49,12 @@ begin
     Result := _GetVersionNameFromPropertyGroup(LPropertyGroupSrc, 'versionName');
     if result <> '' then break;
     //-----
+    Result := _GetVersionNameFromPropertyGroup(LPropertyGroupSrc, 'CFBundleVersion');
+    if result <> '' then break;
+    //-----
+    Result := _GetVersionNameFromPropertyGroup(LPropertyGroupSrc, 'CFBundleShortVersionString');
+    if result <> '' then break;
+    //-----
     Result := _GetVersionNameFromPropertyGroup(LPropertyGroupSrc, 'FileVersion');
     if result <> '' then break;
     //-----
@@ -53,8 +63,17 @@ begin
     //-----
     P1 := ALPosExIgnoreCase('<PropertyGroup', aDProjSrc, P1 + 1);
   end;
-  if Result = '' then
-    raise Exception.Create('Version Info was not found inside the dproj. Please in project options include version information and choose auto increment build number');
+  if Result = '' then raise Exception.Create('Version Info was not found inside the dproj. Please in project options include version information and choose auto increment build number');
+  LStringList := TALStringList.Create;
+  try
+    LStringList.LineBreak := '.';
+    LStringList.Text := ALTrim(Result);
+    Result := '';
+    for I := 0 to Min(2, LStringList.Count - 1) do
+      Result := result + ALIfThen(i > 0, '.') + LStringList[i];
+  finally
+    ALFreeAndNil(LStringList);
+  end;
 end;
 
 {*****************************************************************}
@@ -93,52 +112,38 @@ procedure UpdateProjMajorMinorPatchVersion(var aDProjSrc: AnsiString;
                                            Const aMinorNumber: integer;
                                            Const aPatchOffset: integer);
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _UpdateNameValueInSrcString(var aStrSrc: AnsiString;
+                                        const aName: ansiString;
+                                        const aValue: ansiString);
+  var P1, P2, P3: integer;
+  begin
+    P1 := ALPosExIgnoreCase(aName+'=', aStrSrc);
+    if P1 > 0 then begin
+      inc(P1,length(aName+'='));
+      P2 := AlPosEx(';', aStrSrc, P1);
+      if P2 <= 0 then P2 := Maxint;
+      P3 := AlPosEx('<', aStrSrc, P1);
+      if P3 <= 0 then P3 := Maxint;
+      P2 := Min(P2,P3);
+      delete(aStrSrc,P1,P2-P1);
+      Insert(aValue, aStrSrc, P1);
+    end;
+  end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _UpdateBuildNumberInPropertyGroup(var aPropertyGroupSrc: AnsiString);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _UpdateXmlNodeValue(var aXmlSrc: AnsiString;
+                                const aName: ansiString;
+                                const aValue: ansiString); overload;
   var P1, P2: integer;
   begin
-    P1 := ALPosExIgnoreCase('<VerInfo_Build>', aPropertyGroupSrc);
+    P1 := ALPosExIgnoreCase('<'+aName+'>', aXmlSrc);
     if P1 > 0 then begin
-      inc(P1,length('<VerInfo_Build>'));
-      P2 := ALPosExIgnoreCase('</VerInfo_Build>', aPropertyGroupSrc, P1);
+      inc(P1,length('<'+aName+'>'));
+      P2 := ALPosExIgnoreCase('</'+aName+'>', aXmlSrc, P1);
       if P2 <= 0 then raise Exception.Create('Error 1194E1A4-ED12-4981-ABC8-B5BE8D781362');
-      delete(aPropertyGroupSrc, P1, P2-P1);
-      insert(alinttostr(aBuildNumber), aPropertyGroupSrc, P1);
-    end;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _UpdateVersionCodeInPropertyGroup(var aPropertyGroupSrc: AnsiString; const aName: ansiString);
-  var P1, P2, P3: integer;
-  begin
-    P1 := ALPosExIgnoreCase(aName+'=', aPropertyGroupSrc);
-    if P1 > 0 then begin
-      inc(P1,length(aName+'='));
-      P2 := AlPosEx(';', aPropertyGroupSrc, P1);
-      if P2 <= 0 then P2 := Maxint;
-      P3 := AlPosEx('<', aPropertyGroupSrc, P1);
-      if P3 <= 0 then P3 := Maxint;
-      P2 := Min(P2,P3);
-      delete(aPropertyGroupSrc,P1,P2-P1);
-      Insert(alinttostr(aBuildNumber), aPropertyGroupSrc, P1);
-    end;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _UpdateVersionNameInPropertyGroup(var aPropertyGroupSrc: AnsiString; const aName: ansiString);
-  var P1, P2, P3: integer;
-  begin
-    P1 := ALPosExIgnoreCase(aName+'=', aPropertyGroupSrc);
-    if P1 > 0 then begin
-      inc(P1,length(aName+'='));
-      P2 := AlPosEx(';', aPropertyGroupSrc, P1);
-      if P2 <= 0 then P2 := Maxint;
-      P3 := AlPosEx('<', aPropertyGroupSrc, P1);
-      if P3 <= 0 then P3 := Maxint;
-      P2 := Min(P2,P3);
-      delete(aPropertyGroupSrc,P1,P2-P1);
-      Insert(alinttostr(aMajorNumber)+ '.' + alinttostr(aMinorNumber) + '.' + alinttostr(max(0,aBuildNumber - aPatchOffset)), aPropertyGroupSrc, P1);
+      delete(aXmlSrc, P1, P2-P1);
+      insert(aValue, aXmlSrc, P1);
     end;
   end;
 
@@ -147,7 +152,7 @@ procedure UpdateProjMajorMinorPatchVersion(var aDProjSrc: AnsiString;
                                 const aNodeName: ansiString;
                                 const aAttributeName: AnsiString;
                                 const aAttributeValue: AnsiString;
-                                Const aNodeValue: ansiString);
+                                Const aNodeValue: ansiString); overload;
   var P1, P2, P3, P4: integer;
   begin
     P1 := ALPosExIgnoreCase('<'+aNodeName, aXmlSrc);
@@ -156,11 +161,18 @@ procedure UpdateProjMajorMinorPatchVersion(var aDProjSrc: AnsiString;
       if P2 <= 0 then raise Exception.Create('Error 3CA9247C-6509-4D66-A200-DEE4FF844072');
       P3 := alposExIgnoreCase(aAttributeName+'="'+aAttributeValue+'"', aXmlSrc, P1);
       if (P3 > P1) and (P3 < P2) then begin
-        P3 := P2 + 1;
-        P4 := AlPosEx('<', aXmlSrc, P3);
-        if P4 <= 0 then raise Exception.Create('Error 92AF413C-F2E1-4A69-A1EB-158C5CF95548');
-        delete(aXmlSrc,P3,P4-P3);
-        insert(aNodeValue, aXmlSrc, P3);
+        P3 := AlPosEx('/>', aXmlSrc, P1); // <VersionInfo Name="MajorVer"/>
+        if P3 = P2 - 1 then begin
+          delete(aXmlSrc,P3,2);
+          insert('>' + aNodeValue+'</'+aNodeName + '>', aXmlSrc, P3);
+        end
+        else begin
+          P3 := P2 + 1;
+          P4 := AlPosEx('<', aXmlSrc, P3);
+          if P4 <= 0 then raise Exception.Create('Error 92AF413C-F2E1-4A69-A1EB-158C5CF95548');
+          delete(aXmlSrc,P3,P4-P3);
+          insert(aNodeValue, aXmlSrc, P3);
+        end;
       end;
       P1 := ALPosExIgnoreCase('<'+aNodeName, aXmlSrc, P1 + 1);
     end;
@@ -178,13 +190,16 @@ begin
     if P2 <= 0 then raise Exception.Create('Error CFC183DF-EE69-4E48-B78A-C8EB8DF5F85A');
     LPropertyGroupSrc := ALCopyStr(aDProjSrc, P1, P2 - P1);
     //-----
-    _UpdateBuildNumberInPropertyGroup(LPropertyGroupSrc);
-    _UpdateVersionCodeInPropertyGroup(LPropertyGroupSrc, 'versionCode');
-    _UpdateVersionNameInPropertyGroup(LPropertyGroupSrc, 'FileVersion');
-    _UpdateVersionNameInPropertyGroup(LPropertyGroupSrc, 'ProductVersion');
-    _UpdateVersionNameInPropertyGroup(LPropertyGroupSrc, 'versionName');
-    _UpdateVersionNameInPropertyGroup(LPropertyGroupSrc, 'CFBundleVersion');
-    _UpdateVersionNameInPropertyGroup(LPropertyGroupSrc, 'CFBundleShortVersionString');
+    _UpdateXmlNodeValue(        LPropertyGroupSrc, 'VerInfo_MajorVer',           alinttostr(aMajorNumber));
+    _UpdateXmlNodeValue(        LPropertyGroupSrc, 'VerInfo_MinorVer',           alinttostr(aMinorNumber));
+    _UpdateXmlNodeValue(        LPropertyGroupSrc, 'VerInfo_Release',            alinttostr(max(0,aBuildNumber - aPatchOffset)));
+    _UpdateXmlNodeValue(        LPropertyGroupSrc, 'VerInfo_Build',              alinttostr(aBuildNumber));
+    _UpdateNameValueInSrcString(LPropertyGroupSrc, 'versionCode',                alinttostr(aBuildNumber));
+    _UpdateNameValueInSrcString(LPropertyGroupSrc, 'versionName',                alinttostr(aMajorNumber)+ '.' + alinttostr(aMinorNumber) + '.' + alinttostr(max(0,aBuildNumber - aPatchOffset)));
+    _UpdateNameValueInSrcString(LPropertyGroupSrc, 'CFBundleVersion',            alinttostr(aMajorNumber)+ '.' + alinttostr(aMinorNumber) + '.' + alinttostr(max(0,aBuildNumber - aPatchOffset)));
+    _UpdateNameValueInSrcString(LPropertyGroupSrc, 'CFBundleShortVersionString', alinttostr(aMajorNumber)+ '.' + alinttostr(aMinorNumber) + '.' + alinttostr(max(0,aBuildNumber - aPatchOffset)));
+    _UpdateNameValueInSrcString(LPropertyGroupSrc, 'FileVersion',                alinttostr(aMajorNumber)+ '.' + alinttostr(aMinorNumber) + '.' + alinttostr(max(0,aBuildNumber - aPatchOffset)) + '.' + alinttostr(aBuildNumber));
+    _UpdateNameValueInSrcString(LPropertyGroupSrc, 'ProductVersion',             alinttostr(aMajorNumber)+ '.' + alinttostr(aMinorNumber) + '.' + alinttostr(max(0,aBuildNumber - aPatchOffset)) + '.' + alinttostr(aBuildNumber));
     //-----
     Delete(aDProjSrc,P1, P2-P1);
     Insert(LPropertyGroupSrc, aDProjSrc, P1);
@@ -192,12 +207,12 @@ begin
     P1 := ALPosExIgnoreCase('<PropertyGroup', aDProjSrc, P1 + 1);
   end;
   //-----
-  _UpdateXmlNodeValue(aDProjSrc,'VersionInfo','Name','MajorVer',alinttostr(aMajorNumber));
-  _UpdateXmlNodeValue(aDProjSrc,'VersionInfo','Name','MinorVer',alinttostr(aMinorNumber));
-  _UpdateXmlNodeValue(aDProjSrc,'VersionInfo','Name','Release',alinttostr(max(0,aBuildNumber - aPatchOffset)));
-  _UpdateXmlNodeValue(aDProjSrc,'VersionInfo','Name','Build',alinttostr(aBuildNumber));
-  _UpdateXmlNodeValue(aDProjSrc,'VersionInfoKeys','Name','FileVersion',alinttostr(aMajorNumber)+ '.' + alinttostr(aMinorNumber) + '.' + alinttostr(max(0,aBuildNumber - aPatchOffset)));
-  _UpdateXmlNodeValue(aDProjSrc,'VersionInfoKeys','Name','ProductVersion',alinttostr(aMajorNumber)+ '.' + alinttostr(aMinorNumber) + '.' + alinttostr(max(0,aBuildNumber - aPatchOffset)));
+  _UpdateXmlNodeValue(aDProjSrc,'VersionInfo',    'Name','MajorVer',       alinttostr(aMajorNumber));
+  _UpdateXmlNodeValue(aDProjSrc,'VersionInfo',    'Name','MinorVer',       alinttostr(aMinorNumber));
+  _UpdateXmlNodeValue(aDProjSrc,'VersionInfo',    'Name','Release',        alinttostr(max(0,aBuildNumber - aPatchOffset)));
+  _UpdateXmlNodeValue(aDProjSrc,'VersionInfo',    'Name','Build',          alinttostr(aBuildNumber));
+  _UpdateXmlNodeValue(aDProjSrc,'VersionInfoKeys','Name','FileVersion',    alinttostr(aMajorNumber)+ '.' + alinttostr(aMinorNumber) + '.' + alinttostr(max(0,aBuildNumber - aPatchOffset)) + '.' + alinttostr(aBuildNumber));
+  _UpdateXmlNodeValue(aDProjSrc,'VersionInfoKeys','Name','ProductVersion', alinttostr(aMajorNumber)+ '.' + alinttostr(aMinorNumber) + '.' + alinttostr(max(0,aBuildNumber - aPatchOffset)) + '.' + alinttostr(aBuildNumber));
 end;
 
 Var LAction: AnsiString;
@@ -215,7 +230,7 @@ begin
 
     {$region 'init params'}
     LDProjFilename := ansiString(paramstr(1));
-    LAction := ansiString(paramstr(2)); // getVersionName | incMajorMinorPatchVersion
+    LAction := ansiString(paramstr(2)); // getVersionName | incMajorMinorPatchVersion | decMajorMinorPatchVersion
     LMajorNumber := ALStrToIntDef(ansiString(paramstr(3)), 1);
     LMinorNumber := ALStrToIntDef(ansiString(paramstr(4)), 0);
     LPatchOffset := ALStrToIntDef(ansiString(paramstr(5)), 0);
@@ -235,6 +250,23 @@ begin
       LBuildNumber := getdProjBuildNumber(LSrcStr);
       UpdateProjMajorMinorPatchVersion(LSrcStr, // var aDProjSrc: AnsiString;
                                        LBuildNumber + 1, // const aBuildNumber: Integer;
+                                       LMajorNumber, // const aMajorNumber: integer;
+                                       LMinorNumber, // Const aMinorNumber: integer;
+                                       LPatchOffset); // Const aPatchOffset: integer);
+      if LCreateBackup then begin
+        if ALFileExists(LDProjFilename + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [LDProjFilename + '.bak']);
+        if not ALrenameFile(LDProjFilename, LDProjFilename+ '.bak') then raiseLastOsError;
+      end;
+      AlSaveStringToFile(LSrcStr, LDProjFilename);
+    end
+    {$endregion}
+
+    {$region 'decMajorMinorPatchVersion'}
+    else If ALSameText(LAction, 'decMajorMinorPatchVersion') then begin
+      LSrcStr := AlGetStringFromFile(LDProjFilename);
+      LBuildNumber := getdProjBuildNumber(LSrcStr);
+      UpdateProjMajorMinorPatchVersion(LSrcStr, // var aDProjSrc: AnsiString;
+                                       max(0, LBuildNumber - 1), // const aBuildNumber: Integer;
                                        LMajorNumber, // const aMajorNumber: integer;
                                        LMinorNumber, // Const aMinorNumber: integer;
                                        LPatchOffset); // Const aPatchOffset: integer);

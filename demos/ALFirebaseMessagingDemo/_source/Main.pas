@@ -19,7 +19,6 @@ uses
   Androidapi.JNI.Support,
   Androidapi.JNI.Media,
   Androidapi.JNI.JavaTypes,
-  ALAndroidShortcutBadgerApi,
   ALAndroidFirebaseApi,
   ALAndroidApi,
   ALGraphics,

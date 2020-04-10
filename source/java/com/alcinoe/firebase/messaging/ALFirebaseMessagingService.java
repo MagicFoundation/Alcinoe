@@ -27,7 +27,6 @@ import android.media.RingtoneManager;
 import android.os.Build;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import me.leolin.shortcutbadger.ShortcutBadger;
 import com.embarcadero.firemonkey.FMXNativeActivity;
 
 public class ALFirebaseMessagingService extends FirebaseMessagingService {
@@ -295,10 +294,11 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
           notificationBuilder = notificationBuilder.setAutoCancel(true);
           notificationBuilder = notificationBuilder.setContentIntent(pendingIntent);
           
-          if (data.containsKey("notification.badgecount")) { 
-            ShortcutBadger.applyCount(context.getApplicationContext(), Integer.parseInt(data.get("notification.badgecount")));
-          } 
-      
+          // It's seam that ShortcutBadger is not maintained anymore so remove this dependancy 
+          // if (data.containsKey("notification.badgecount")) { 
+          //   ShortcutBadger.applyCount(context.getApplicationContext(), Integer.parseInt(data.get("notification.badgecount")));
+          // } 
+          
           NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);    
           notificationManager.notify(data.get("notification.tag"), /* tag	String: A string identifier for this notification. May be null. */ 
                                      0, /* id	int: An identifier for this notification. The pair (tag, id) must be unique within your application. */  

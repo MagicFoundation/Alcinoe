@@ -223,7 +223,6 @@ mkdir source\output 2> nul
  -Xlint:unchecked^
  -Xlint:deprecation^
  -cp %ANDROID_PLATFORM%\android.jar;%FMX_JAR%;^
-lib\jar\me.leolin\shortcutbadger.jar;^
 lib\jar\com.android.support\support-core-utils.jar;^
 lib\jar\com.android.support\support-compat.jar;^
 lib\jar\com.android.support\support-annotations.jar;^

@@ -579,9 +579,6 @@
         <JavaReference Include="..\..\..\lib\jar\com.google.firebase\firebase-messaging.jar">
             <Disabled/>
         </JavaReference>
-        <JavaReference Include="..\..\..\lib\jar\me.leolin\shortcutbadger.jar">
-            <Disabled/>
-        </JavaReference>
         <JavaReference Include="..\..\..\lib\jar\com.android.support\support-annotations.jar">
             <Disabled/>
         </JavaReference>

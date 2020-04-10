@@ -65,6 +65,27 @@ Begin
         aNode.ChildNodes.Delete(i);
 End;
 
+{***************************************************}
+Procedure _RemoveCDataNodes(const aNode: TalXmlNode);
+var LValue: AnsiString;
+    LParentNode: TalXmlNode;
+    i: integer;
+Begin
+  if ANode = nil then exit;
+  if aNode.NodeType = ntCData then begin
+    LValue := aNode.Text;
+    LParentNode := ANode.ParentNode;
+    if LParentNode.ChildNodes.Count <> 1 then
+      raise Exception.Create('Error 2F418A94-9F42-4418-90D7-ED8EC120D1B0');
+    LParentNode.ChildNodes.Clear;
+    LPArentNode.Text := LValue;
+  end;
+  //-----
+  if aNode.ChildNodes <> nil then
+    for i := 0 to aNode.ChildNodes.Count - 1 do
+      _RemoveCDataNodes(aNode.ChildNodes[i]);
+End;
+
 var
   LDProjFilename: AnsiString;
   LCreateBackup: Boolean;
@@ -190,6 +211,9 @@ begin
 
       //Remove Empty ProjectExtensions Node
       _RemoveEmptyProjectExtensionsNode(LXmlDoc.DocumentElement);
+
+      //remove CData nodes
+      _RemoveCDataNodes(LXmlDoc.DocumentElement);
 
       //save the file to LXmlStr
       LXmlDoc.SaveToXML(LXmlStr);

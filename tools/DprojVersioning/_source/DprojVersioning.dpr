@@ -218,7 +218,7 @@ begin
     LAction := ansiString(paramstr(2)); // getVersionName | incMajorMinorPatchVersion
     LMajorNumber := ALStrToIntDef(ansiString(paramstr(3)), 1);
     LMinorNumber := ALStrToIntDef(ansiString(paramstr(4)), 0);
-    LPatchOffset := ALStrToIntDef(ansiString(paramstr(5)), 1);
+    LPatchOffset := ALStrToIntDef(ansiString(paramstr(5)), 0);
     LCreateBackup := not ALSameText(ALTrim(ansiString(paramstr(6))), 'false');
     {$endregion}
 

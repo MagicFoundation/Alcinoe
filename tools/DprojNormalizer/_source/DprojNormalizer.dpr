@@ -190,8 +190,9 @@ begin
                 (not ALSameText(LEnabledNode.Text,'false'))) then                 // enabled, but i consider we can only update enabled
               LDeploymentNode.ChildNodes.Delete(i);
           end
-          else if (ALSameText(LDeployFileNode.NodeName, 'DeployClass')) then  // this DeployClass seam not correctly updated
-            LDeploymentNode.ChildNodes.Delete(i);                             // so I prefer to delete them (don't know what could be the consequence)
+          else if (ALSameText(LDeployFileNode.NodeName, 'DeployClass')) or    // this DeployClass seam not correctly updated
+                  (ALSameText(LDeployFileNode.NodeName, 'ProjectRoot')) then  // so I prefer to delete them (don't know what could be the consequence)
+            LDeploymentNode.ChildNodes.Delete(i);                             // and ProjectRoot seam also to be useless
         end;
 
       //put ProjectRoot at the end (don't know if it's matter)

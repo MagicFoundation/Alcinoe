@@ -283,8 +283,10 @@ Json Parser
 -----------
 
 TALJsonDocument is a Delphi parser/writer for JSON / BSON data
-format. it's support DOM and SAX parser, support BSON format,
-and use a similar syntax than TALXMLDocument / TXMLDocument.
+format. it's support DOM and SAX parser (Note a better name could 
+be SAJ for Simple API for JSON instead of SAX for Simple API for XML 
+but as the concept of SAX is well know I keep this name), support 
+BSON format, and use a similar syntax than TALXMLDocument / TXMLDocument.
 TALJsonDocument can also export Json / Bson data in TALStringList.
 
 When it deals with parsing some (textual) content, two directions
@@ -293,7 +295,7 @@ make a choice between:
 * A DOM parser, which creates an in-memory tree structure of
   objects mapping the JSON content;
 * A SAX parser, which reads the JSON content, then call pre-defined
-  events for each JSON content element.
+  events for each JSON content element. 
 
 In fact, DOM parsers use internally a SAX parser to read the JSON
 content. Therefore, with the overhead of object creation and
@@ -310,13 +312,20 @@ or the SuperObject library create a class instance mapping
 each JSON node. In order to achieve best speed, TALJsonDocument
 implement DOM parser and also a SAX parser.
 
-TALJsonDocument syntax is very similar
+TALJsonDocument can also support comments inside the JSON source
+that is an extension to the JSON specifications
+
+TALJsonDocument syntax is very similar 
 to TALXMLdocument / TXMLDocument
+
+TALJsonDocument is available in 2 variants: TALJsonDocument that 
+is made on the top of ansiString (so UTF-8) and TALJsonDocumentU
+that is made on the top of unicode string (so UTF-16)
 
 Example :
 
     {
-      _id: 1,
+      _id: 1, // comments
       name: { first: "John", last: "Backus" },
       birth: new Date('1999-10-21T21:04:54.234Z'),
       contribs: [ "Fortran", "ALGOL", "Backus-Naur Form", "FP" ],
@@ -336,6 +345,7 @@ Example :
 To access the document nodes :
 
     MyJsonDoc.loadFromJson(AJsonStr, False);
+    MyJsonDoc.ParseOptions := [poAllowComments]; // to allow comments inside the JSON source
     MyJsonDoc.childnodes['_id'].int32;
     MyJsonDoc.childnodes['name'].childnodes['first'].text;
     MyJsonDoc.childnodes['name'].childnodes['last'].text;
@@ -347,6 +357,13 @@ To access the document nodes :
       MyJsonDoc.childnodes['awards'].childnodes[i].childnodes['year'].text;
       MyJsonDoc.childnodes['awards'].childnodes[i].childnodes['by'].text;
     end;
+
+Or if you are not sure of the existence of the nodes before to access 
+them or you don't want to check it you can also do :
+
+    MyJsonDoc.GetChildNodeValueInt32('_id', 0{default if node not exists});
+    MyJsonDoc.GetChildNodeValueText(['name','first'], ''{default if node not exists});
+    MyJsonDoc.GetChildNodeValueDateTime('birth', Now{default if node not exists});
 
 To create the document nodes :
 
@@ -377,6 +394,12 @@ To create the document nodes :
     MyJsonDoc.addchild('spouse');
     MyJsonDoc.addchild('address', ntObject);
     MyJsonDoc.addchild('phones', ntArray);
+
+You can also create/update nodes like this :
+
+    MyJsonDoc.SetChildNodeValueInt32('_id', 0);
+    MyJsonDoc.SetChildNodeValueText(['name','first'], 'John');
+    MyJsonDoc.SetChildNodeValueDateTime('birth', Now);
 
 To load and save from BSON :
 

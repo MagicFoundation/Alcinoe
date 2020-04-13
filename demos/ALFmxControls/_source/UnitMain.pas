@@ -1730,4 +1730,10 @@ begin
   PaintMs := aStopWatch.Elapsed.TotalMilliseconds;
 end;
 
+initialization
+  {$IFDEF DEBUG}
+  ReportMemoryleaksOnSHutdown := True;
+  {$ENDIF}
+  SetMultiByteConversionCodePage(CP_UTF8);
+  
 end.

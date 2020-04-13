@@ -1397,11 +1397,11 @@ begin
   Showmessage('10,000,000 ALTrystrFloat in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
-{$IFDEF DEBUG}
 initialization
+  {$IFDEF DEBUG}
   ReportMemoryleaksOnSHutdown := True;
+  {$ENDIF}
   SetMultiByteConversionCodePage(CP_UTF8);
-{$ENDIF}
 
 end.
 

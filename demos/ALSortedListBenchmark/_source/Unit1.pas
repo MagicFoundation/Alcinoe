@@ -488,10 +488,10 @@ begin
 
 end;
 
-{$IFDEF DEBUG}
 initialization
+  {$IFDEF DEBUG}
   ReportMemoryleaksOnSHutdown := True;
+  {$ENDIF}
   SetMultiByteConversionCodePage(CP_UTF8);
-{$ENDIF}
 
 end.

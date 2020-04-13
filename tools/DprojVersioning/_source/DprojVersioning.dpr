@@ -229,6 +229,10 @@ begin
   try
 
     {$region 'init params'}
+    {$IFDEF DEBUG}
+    ReportMemoryleaksOnSHutdown := True;
+    {$ENDIF}
+    SetMultiByteConversionCodePage(CP_UTF8);
     LDProjFilename := ansiString(paramstr(1));
     LAction := ansiString(paramstr(2)); // getVersionName | incMajorMinorPatchVersion | decMajorMinorPatchVersion
     LMajorNumber := ALStrToIntDef(ansiString(paramstr(3)), 1);

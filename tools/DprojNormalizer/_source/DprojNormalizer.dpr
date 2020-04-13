@@ -109,6 +109,12 @@ begin
 
   try
 
+    //Init project params 
+    {$IFDEF DEBUG}
+    ReportMemoryleaksOnSHutdown := True;
+    {$ENDIF}
+    SetMultiByteConversionCodePage(CP_UTF8);
+
     //init LDProjFilename / LCreateBackup
     LDProjFilename := ALTrim(ansiString(paramstr(1)));
     LCreateBackup := not ALSameText(ALTrim(ansiString(paramstr(2))), 'false');

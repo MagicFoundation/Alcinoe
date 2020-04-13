@@ -263,6 +263,12 @@ begin
 end;
 
 begin
+
+  {$IFDEF DEBUG}
+  ReportMemoryleaksOnSHutdown := True;
+  {$ENDIF}
+  SetMultiByteConversionCodePage(CP_UTF8);
+
   LiveChats := TLiveChats.create;
   Server := TIdHTTPServer.Create(nil);
   try
@@ -274,4 +280,5 @@ begin
     ALFreeAndNil(Server);
     ALFreeAndNil(LiveChats);
   end;
+  
 end.

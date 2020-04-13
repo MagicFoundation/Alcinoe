@@ -213,4 +213,10 @@ begin
   memo1.lines.Add('Logged out');
 end;
 
+initialization
+  {$IFDEF DEBUG}
+  ReportMemoryleaksOnSHutdown := True;
+  {$ENDIF}
+  SetMultiByteConversionCodePage(CP_UTF8);
+
 end.

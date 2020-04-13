@@ -548,4 +548,10 @@ begin
 end;
 {$ENDIF}
 
+initialization
+  {$IFDEF DEBUG}
+  ReportMemoryleaksOnSHutdown := True;
+  {$ENDIF}
+  SetMultiByteConversionCodePage(CP_UTF8);
+  
 end.

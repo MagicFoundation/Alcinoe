@@ -166,6 +166,7 @@
         <DCC_UnitSearchPath>..\..\..\..\references\embarcadero\rio\10_3_3\patched\fmx;..\..\..\..\references\embarcadero\rio\10_3_3\patched\rtl\ios;..\..\..\..\references\embarcadero\rio\10_3_3\patched\rtl\android;..\..\..\..\references\embarcadero\rio\10_3_3\patched\rtl\osx;..\..\..\..\references\embarcadero\rio\10_3_3\patched\rtl\net;..\..\..\..\references\embarcadero\rio\10_3_3\patched\rtl\common;..\..\..\..\references\embarcadero\rio\10_3_3\originals\fmx;..\..\..\..\references\embarcadero\rio\10_3_3\originals\rtl\ios;..\..\..\..\references\embarcadero\rio\10_3_3\originals\rtl\android;..\..\..\..\references\embarcadero\rio\10_3_3\originals\rtl\osx;..\..\..\..\references\embarcadero\rio\10_3_3\originals\rtl\net;..\..\..\..\references\embarcadero\rio\10_3_3\originals\rtl\common;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <OrientationPortrait>true</OrientationPortrait>
         <OrientationPortraitUpsideDown>true</OrientationPortraitUpsideDown>
+        <DCC_CodePage>65001</DCC_CodePage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
         <DCC_UsePackage>DBXSqliteDriver;DBXInterBaseDriver;tethering;bindcompfmx;FmxTeeUI;fmx;FireDACDBXDriver;dbexpress;IndyCore;dsnap;DataSnapCommon;bindengine;DataSnapClient;bindcompdbx;IndyIPCommon;IndyIPServer;IndySystem;fmxFireDAC;ibmonitor;FMXTee;DbxCommonDriver;ibxpress;xmlrtl;DataSnapNativeClient;ibxbindings;rtl;FireDACDSDriver;DbxClientDriver;CustomIPTransport;bindcomp;IndyIPClient;dbxcds;dsnapxml;DataSnapProviderClient;dbrtl;IndyProtocols;$(DCC_UsePackage)</DCC_UsePackage>
@@ -445,6 +446,7 @@
         <CfgParent>Cfg_1</CfgParent>
         <Cfg_1>true</Cfg_1>
         <VerInfo_Build>1</VerInfo_Build>
+        <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_iOSDevice32)'!=''">
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -574,15 +576,14 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png" Configuration="Debug" Class="Android_SplashImage426">
-                    <Platform Name="Android">
-                        <RemoteName>splash_image.png</RemoteName>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_144x144.png" Configuration="Debug" Class="iPad_AppIcon144">
+                    <Platform Name="iOSDevice64">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\iOSDevice64\Debug\ALLiveVideoChatClient.info.plist" Configuration="Debug" Class="ProjectiOSInfoPList">
-                    <Platform Name="iOSDevice64">
-                        <RemoteName>Info.plist</RemoteName>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png" Configuration="Debug" Class="Android_SplashImage426">
+                    <Platform Name="Android">
+                        <RemoteName>splash_image.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -592,8 +593,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_144x144.png" Configuration="Debug" Class="iPad_AppIcon144">
+                <DeployFile LocalName="..\iOSDevice64\Debug\ALLiveVideoChatClient.info.plist" Configuration="Debug" Class="ProjectiOSInfoPList">
                     <Platform Name="iOSDevice64">
+                        <RemoteName>Info.plist</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -906,6 +908,12 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so" Configuration="Release" Class="AndroidLibnativeArmeabiv7aFile">
+                    <Platform Name="Android64">
+                        <RemoteName>libALLiveVideoChatClient.so</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageLandscape_2048x1496.png" Configuration="Debug" Class="iPad_Launch2048">
                     <Platform Name="iOSDevice32">
                         <RemoteName>Default-Landscape@2x.png</RemoteName>
@@ -917,12 +925,6 @@
                         <RemoteDir>.\Frameworks\WebRTC.framework\_CodeSignature</RemoteDir>
                         <Operation>1</Operation>
                         <RemoteName>CodeResources</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so" Configuration="Release" Class="AndroidLibnativeArmeabiv7aFile">
-                    <Platform Name="Android64">
-                        <RemoteName>libALLiveVideoChatClient.so</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

@@ -191,6 +191,11 @@ var Index: Integer;
 begin
   try
 
+    {$IFDEF DEBUG}
+    ReportMemoryleaksOnSHutdown := True;
+    {$ENDIF}
+    SetMultiByteConversionCodePage(CP_UTF8);
+
     if ParamCount < 2 then begin
       Writeln('Usage: XmlMerge <OutputPath> <ResourcePath1> <ResourcePath2> ...');
       Writeln(' Example: XmlMerge .\Merged\res .\Twitter\res .\Facebook\res');

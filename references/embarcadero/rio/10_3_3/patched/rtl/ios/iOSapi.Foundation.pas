@@ -5503,7 +5503,27 @@ type
       downloadTask: NSURLSessionDownloadTask; didResumeAtOffset: Int64; expectedTotalBytes: Int64); cdecl;
   end;
 
-
+  //https://quality.embarcadero.com/browse/RSP-28096
+  NSPersonNameComponentsClass = interface(NSObjectClass)
+    ['{2EDFEAC4-A0B4-4BB2-BAD9-4581B92DA4C7}']
+  end;
+  NSPersonNameComponents = interface(NSObject)
+    ['{821B6CD5-BE9B-4708-928B-FD5CE5D12788}']
+    procedure setNamePrefix(namePrefix: NSString); cdecl;
+    function namePrefix : NSString; cdecl;
+    procedure setGivenName(givenName: NSString); cdecl;
+    function givenName : NSString; cdecl;
+    procedure setMiddleName(middleName: NSString); cdecl;
+    function middleName : NSString; cdecl;
+    procedure setFamilyName(familyName: NSString); cdecl;
+    function familyName : NSString; cdecl;
+    procedure setNameSuffix(nameSuffix: NSString); cdecl;
+    function nameSuffix : NSString; cdecl;
+    procedure setNickname(nickname: NSString); cdecl;
+    function nickname : NSString; cdecl;
+    procedure setPhoneticRepresentation(phoneticRepresentation: NSPersonNameComponents); cdecl;
+    function phoneticRepresentation : NSPersonNameComponents; cdecl;
+  end;
 
 // Convenience method for creating an NSString from a Delphi Unicode string
 function NSSTR(const Str: string): NSString; inline; deprecated 'use StrToNSStr instead';

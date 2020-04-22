@@ -8,7 +8,10 @@ maven.google.com/<group_path>/<library>/<version>/<library>-<version>.<ext>
   https://maven.google.com/com/google/android/gms/play-services-location/12.0.1/play-services-location-12.0.1.aar
   https://maven.google.com/com/google/android/gms/play-services-basement/12.0.1/play-services-basement-12.0.1.aar
   https://maven.google.com/com/google/android/gms/play-services-base/12.0.1/play-services-base-12.0.1.aar
-  
+  https://maven.google.com/com/google/android/gms/play-services-auth/12.0.1/play-services-auth-12.0.1.aar
+  https://maven.google.com/com/google/android/gms/play-services-auth-base/12.0.1/play-services-auth-base-12.0.1.aar
+  https://maven.google.com/com/google/android/gms/play-services-auth-api-phone/12.0.1/play-services-auth-api-phone-12.0.1.aar
+      
 *************************
 
   I don't know what to do with theses file, their jar seam empty and their is just a third_party_licenses.txt & third_party_licenses.json
@@ -18,7 +21,9 @@ maven.google.com/<group_path>/<library>/<version>/<library>-<version>.<ext>
   https://maven.google.com/com/google/android/gms/play-services-location-license/12.0.1/play-services-location-license-12.0.1.aar
   https://maven.google.com/com/google/android/gms/play-services-basement-license/12.0.1/play-services-basement-license-12.0.1.aar
   https://maven.google.com/com/google/android/gms/play-services-base-license/12.0.1/play-services-base-license-12.0.1.aar
-    
+  https://maven.google.com/com/google/android/gms/play-services-auth-base-license/12.0.1/play-services-auth-base-license-12.0.1.aar
+  https://maven.google.com/com/google/android/gms/play-services-auth-api-phone-license/12.0.1/play-services-auth-api-phone-license-12.0.1.aar
+      
 *************************
 
 to know all the dependancies needed by a libraries, create a android

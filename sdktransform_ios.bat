@@ -11,10 +11,10 @@ cd "c:\program files (x86)\embarcadero\studio\20.0\bin\"
 -g ^
 -w ^
 -D TARGET_OS_IPHONE ^
--isysroot "C:\SDKs\iPhoneOS12.2.sdk" ^
--isystem "C:\SDKs\iPhoneOS12.2.sdk\usr\include" ^
+-isysroot "C:\SDKs\iPhoneOS13.4.sdk" ^
+-isystem "C:\SDKs\iPhoneOS13.4.sdk\usr\include" ^
 -isystem "C:\SDKs\iPhoneOS11.2.sdk\usr\lib\clang" ^
--F "C:\SDKs\iPhoneOS12.2.sdk\System\Library\Frameworks" ^
+-F "C:\SDKs\iPhoneOS13.4.sdk\System\Library\Frameworks" ^
 -triple thumbv7-apple-ios ^
 -fdiagnostics-show-option ^
 -fexceptions ^

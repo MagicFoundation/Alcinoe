@@ -283,43 +283,15 @@ var
 //////////////////////////
 
 {$IFDEF MSWINDOWS}
-
-const
-
-  CRYPT_VERIFYCONTEXT = $F0000000;
-  CRYPT_NEWKEYSET = $00000008;
-  PROV_RSA_FULL = 1;
-  MS_ENHANCED_PROV_A = ansiString('Microsoft Enhanced Cryptographic Provider v1.0');
-  MS_ENHANCED_PROV_W = string('Microsoft Enhanced Cryptographic Provider v1.0');
-
-type
-  HCRYPTPROV = NativeUInt;
-  PHCRYPTPROV = ^HCRYPTPROV;
-
-function CryptAcquireContextA(phProv: PHCRYPTPROV;
-                              pszContainer: PAnsiChar;
-                              pszProvider: PAnsiChar;
-                              dwProvType: DWORD;
-                              dwFlags: DWORD): BOOL; stdcall;
-function CryptAcquireContextW(phProv: PHCRYPTPROV;
-                              pszContainer: PWideChar;
-                              pszProvider: PWideChar;
-                              dwProvType: DWORD;
-                              dwFlags: DWORD): BOOL; stdcall;
-function CryptReleaseContext(hProv: HCRYPTPROV;
-                             dwFlags: DWORD): BOOL; stdcall;
-function CryptGenRandom(hProv: HCRYPTPROV;
-                        dwLen: DWORD;
-                        pbBuffer: PBYTE): BOOL; stdcall;
-
 procedure ALRandomBytes(const Dest; const Len: Cardinal); overload;
 function ALRandomBytes(const Len: Cardinal): TBytes; overload;
 function ALRandomByteStr(const Len: Cardinal): ansiString;
-
 {$ENDIF}
 
 function ALRandom32(const ARange: Cardinal): cardinal;
 function ALRandom64(const ARange: UInt64): UInt64;
+
+
 
 ///////////////////
 ////// Fnv1a //////
@@ -335,6 +307,120 @@ function ALFnv1aInt64(const str: ansiString): int64; inline;
 function ALFnv1aInt32U(const str: String; Const encoding: Tencoding): int64; inline;
 function ALFnv1aInt64U(const str: String; Const encoding: Tencoding): int64; inline;
 
+
+
+///////////////////////
+////// Signature //////
+///////////////////////
+
+{$IF defined(MSWINDOWS)}
+function ALVerifyRSA256Signature(const aData: AnsiString; // bytes string
+                                 const aSignature: AnsiString; // bytes string
+                                 const aBase64PubKeyModulus: ansiString;
+                                 Const aBase64PubKeyExponent: ansiString): boolean;
+{$IFEND}
+
+
+
+////////////////////
+////// WINAPI //////
+////////////////////
+
+{$IFDEF MSWINDOWS}
+{$WARN SYMBOL_PLATFORM OFF}
+const
+  crypt32 = 'crypt32.dll';
+
+const
+  CRYPT_VERIFYCONTEXT = $F0000000;
+  CRYPT_NEWKEYSET = $00000008;
+  CRYPT_SILENT = $00000040;
+  PROV_RSA_FULL = $00000001;
+  PROV_RSA_AES = $00000018;
+  MS_ENHANCED_PROV_A = ansiString('Microsoft Enhanced Cryptographic Provider v1.0');
+  MS_ENHANCED_PROV_W = string('Microsoft Enhanced Cryptographic Provider v1.0');
+
+const
+  CRYPT_STRING_BASE64 = $00000001;
+  PUBLICKEYBLOB = $6;
+  CUR_BLOB_VERSION = 2;
+  CALG_RSA_KEYX = $0000a400;
+  CALG_SHA_256 = $0000800c;
+  RSA1 = $31415352;
+
+type
+  ALG_ID = UINT;
+  HCRYPTPROV = ULONG_PTR;
+  PHCRYPTPROV = ^HCRYPTPROV;
+  HCRYPTKEY = ULONG_PTR;
+  PHCRYPTKEY = ^HCRYPTKEY;
+  HCRYPTHASH = ULONG_PTR;
+  PHCRYPTHASH = ^HCRYPTHASH;
+
+type
+  _PUBLICKEYSTRUC = record
+    bType   : BYTE;
+    bVersion: BYTE;
+    reserved: WORD;
+    aiKeyAlg: ALG_ID;
+  end;
+  BLOBHEADER = _PUBLICKEYSTRUC;
+  PUBLICKEYSTRUC = _PUBLICKEYSTRUC;
+
+  _RSAPUBKEY = record
+    magic : DWORD;
+    bitlen: DWORD;
+    pubexp: DWORD;
+  end;
+  RSAPUBKEY  = _RSAPUBKEY;
+
+function CryptAcquireContextA(phProv: PHCRYPTPROV;
+                              szContainer: LPCSTR;
+                              szProvider: LPCSTR;
+                              dwProvType: DWORD;
+                              dwFlags: DWORD): BOOL; stdcall external ADVAPI32 delayed;
+function CryptAcquireContextW(phProv: PHCRYPTPROV;
+                              szContainer: LPCWSTR;
+                              szProvider: LPCWSTR;
+                              dwProvType: DWORD;
+                              dwFlags: DWORD): BOOL; stdcall external ADVAPI32 delayed;
+function CryptReleaseContext(hProv: HCRYPTPROV;
+                             dwFlags: DWORD): BOOL; stdcall external ADVAPI32 delayed;
+function CryptGenRandom(hProv: HCRYPTPROV;
+                        dwLen: DWORD;
+                        pbBuffer: PBYTE): BOOL; stdcall external ADVAPI32 delayed;
+function CryptStringToBinaryA(pszString: LPCSTR;
+                              cchString: DWORD;
+                              dwFlags: DWORD;
+                              pbBinary: pByte;
+                              pcbBinary: PDWORD;
+                              pdwSkip: PDWORD;
+                              pdwFlags: PDWORD): boolean; stdcall external crypt32 delayed;
+function CryptImportKey(hProv: HCRYPTPROV;
+                        const pbData: PBYTE;
+                        dwDataLen: DWORD;
+                        hPubKey: HCRYPTKEY;
+                        dwFlags: DWORD;
+                        phKey: PHCRYPTKEY): BOOL; stdcall external ADVAPI32 delayed;
+function CryptDestroyKey(hKey: HCRYPTKEY): BOOL; stdcall external ADVAPI32 delayed;
+function CryptVerifySignatureA(hHash: HCRYPTHASH;
+                               const pbSignature: PBYTE;
+                               dwSigLen: DWORD;
+                               hPubKey: HCRYPTKEY;
+                               szDescription: LPCSTR;
+                               dwFlags: DWORD): BOOL; stdcall external ADVAPI32 delayed;
+function CryptCreateHash(hProv: HCRYPTPROV;
+                         Algid: ALG_ID;
+                         hKey: HCRYPTKEY;
+                         dwFlags: DWORD;
+                         phHash: PHCRYPTHASH): BOOL; stdcall external ADVAPI32 delayed;
+function CryptDestroyHash(hHash: HCRYPTHASH): BOOL; stdcall external ADVAPI32 delayed;
+function CryptHashData(hHash: HCRYPTHASH;
+                       const pbData: PBYTE;
+                       dwDataLen: DWORD;
+                       dwFlags: DWORD): BOOL; stdcall external ADVAPI32 delayed;
+{$WARN SYMBOL_PLATFORM ON}
+{$ENDIF}
 
 implementation
 
@@ -3055,7 +3141,7 @@ end;
 {*************************************************************************************************}
 procedure ALRdlRound(const RoundKey : TALRDLBlock; var State : TALRDLBlock; const Final : Boolean);
   { Rijndael round transformation }
-  { entire routine rewritten for optimization }                      
+  { entire routine rewritten for optimization }
 var
   i : Integer;
   e : TALRDLVectors;
@@ -4517,36 +4603,19 @@ end;
 
 {$IFDEF MSWINDOWS}
 
-{***************************************************************************}
-function CryptAcquireContextA; external ADVAPI32 name 'CryptAcquireContextA';
-
-{***************************************************************************}
-function CryptAcquireContextW; external ADVAPI32 name 'CryptAcquireContextW';
-
-{*************************************************************************}
-function CryptReleaseContext; external ADVAPI32 name 'CryptReleaseContext';
-
-{***************************************************************}
-function CryptGenRandom; external ADVAPI32 name 'CryptGenRandom';
-
 {*******************************************************}
 procedure ALRandomBytes(const Dest; const Len: Cardinal);
 var hProv: HCRYPTPROV;
 begin
   if (not CryptAcquireContextA(@hProv,
                                nil,
-                               MS_ENHANCED_PROV_A,
-                               PROV_RSA_FULL,
-                               CRYPT_VERIFYCONTEXT)) and
-     (not CryptAcquireContextA(@hProv,
                                nil,
-                               MS_ENHANCED_PROV_A,
                                PROV_RSA_FULL,
-                               CRYPT_NEWKEYSET + CRYPT_VERIFYCONTEXT)) then raiselastOsError;
+                               CRYPT_VERIFYCONTEXT or CRYPT_SILENT)) then raiselastOsError;
   try
     if not CryptGenRandom(hProv,Len,@Dest) then raiselastOsError;
   finally
-    CryptReleaseContext(hProv,0);
+    if not CryptReleaseContext(hProv,0) then raiseLastOsError;
   end;
 end;
 
@@ -4556,19 +4625,14 @@ var hProv: HCRYPTPROV;
 begin
   if (not CryptAcquireContextA(@hProv,
                                nil,
-                               MS_ENHANCED_PROV_A,
-                               PROV_RSA_FULL,
-                               CRYPT_VERIFYCONTEXT)) and
-     (not CryptAcquireContextA(@hProv,
                                nil,
-                               MS_ENHANCED_PROV_A,
                                PROV_RSA_FULL,
-                               CRYPT_NEWKEYSET + CRYPT_VERIFYCONTEXT)) then raiselastOsError;
+                               CRYPT_VERIFYCONTEXT or CRYPT_SILENT)) then raiselastOsError;
   try
     SetLength(Result,Len);
     if not CryptGenRandom(hProv,Len,@Result[0]) then raiselastOsError;
   finally
-    CryptReleaseContext(hProv,0);
+    if not CryptReleaseContext(hProv,0) then raiseLastOsError;
   end;
 end;
 
@@ -4578,19 +4642,14 @@ var hProv: HCRYPTPROV;
 begin
   if (not CryptAcquireContextA(@hProv,
                                nil,
-                               MS_ENHANCED_PROV_A,
-                               PROV_RSA_FULL,
-                               CRYPT_VERIFYCONTEXT)) and
-     (not CryptAcquireContextA(@hProv,
                                nil,
-                               MS_ENHANCED_PROV_A,
                                PROV_RSA_FULL,
-                               CRYPT_NEWKEYSET + CRYPT_VERIFYCONTEXT)) then raiselastOsError;
+                               CRYPT_VERIFYCONTEXT or CRYPT_SILENT)) then raiselastOsError;
   try
     SetLength(Result,Len);
     if not CryptGenRandom(hProv,Len,@Result[low(result)]) then raiselastOsError;
   finally
-    CryptReleaseContext(hProv,0);
+    if not CryptReleaseContext(hProv,0) then raiseLastOsError;
   end;
 end;
 
@@ -5009,6 +5068,176 @@ begin
 end;
 
 
+
+///////////////////////
+////// Signature //////
+///////////////////////
+
+{**********************}
+{$IF defined(MSWINDOWS)}
+function ALVerifyRSA256Signature(const aData: AnsiString; // bytes string
+                                 const aSignature: AnsiString; // bytes string
+                                 const aBase64PubKeyModulus: ansiString;
+                                 Const aBase64PubKeyExponent: ansiString): boolean;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _bigEndianToLittleEndian(var aArr: TBytes);
+  var B: Byte;
+      i,j: integer;
+  begin
+    J := Length(aArr) - 1;
+    i := low(aArr);
+    while i < J do begin
+      B := aArr[i];
+      aArr[i] := aArr[j];
+      aArr[j] := B;
+      Dec(j);
+      inc(i);
+    end;
+  end;
+
+var pModulus: TBytes;
+    cbModulus: DWORD;
+    pExponent: TBytes;
+    cbExponent: DWORD;
+    dwExponent: Dword;
+    hProv: HCRYPTPROV;
+    cbKeyBlob: DWord;
+    pKeyBlob: Tbytes;
+    pPublicKey: PUBLICKEYSTRUC;
+    pRsaPubKey: RSAPUBKEY;
+    hRSAKey: HCRYPTKEY;
+    hHash: HCRYPTHASH;
+    pSignature: TBytes;
+
+begin
+
+  //init pModulus / cbModulus
+  if not CryptStringToBinaryA(
+           PansiChar(aBase64PubKeyModulus), // pszString: LPCSTR;
+           length(aBase64PubKeyModulus), // cchString: DWORD;
+           CRYPT_STRING_BASE64, // dwFlags: DWORD;
+           nil, // pbBinary: pByte;
+           @cbModulus, // pcbBinary: PDWORD;
+           nil, // pdwSkip: PDWORD;
+           nil) then raiseLastOsError; // pdwFlags: PDWORD
+  setlength(pModulus, cbModulus);
+  if not CryptStringToBinaryA(
+           PansiChar(aBase64PubKeyModulus), // pszString: LPCSTR;
+           length(aBase64PubKeyModulus), // cchString: DWORD;
+           CRYPT_STRING_BASE64, // dwFlags: DWORD;
+           @pModulus[0], // pbBinary: pByte;
+           @cbModulus, // pcbBinary: PDWORD;
+           nil, // pdwSkip: PDWORD;
+           nil) then raiseLastOsError; // pdwFlags: PDWORD
+  _bigEndianToLittleEndian(pModulus);
+
+  //init pExponent / cbExponent
+  if not CryptStringToBinaryA(
+           PansiChar(aBase64PubKeyExponent), // pszString: LPCSTR;
+           length(aBase64PubKeyExponent), // cchString: DWORD;
+           CRYPT_STRING_BASE64, // dwFlags: DWORD;
+           nil, // pbBinary: pByte;
+           @cbExponent, // pcbBinary: PDWORD;
+           nil, // pdwSkip: PDWORD;
+           nil) then raiseLastOsError; // pdwFlags: PDWORD
+  setlength(pExponent, cbExponent);
+  if not CryptStringToBinaryA(
+           PansiChar(aBase64PubKeyExponent), // pszString: LPCSTR;
+           length(aBase64PubKeyExponent), // cchString: DWORD;
+           CRYPT_STRING_BASE64, // dwFlags: DWORD;
+           @pExponent[0], // pbBinary: pByte;
+           @cbExponent, // pcbBinary: PDWORD;
+           nil, // pdwSkip: PDWORD;
+           nil) then raiseLastOsError; // pdwFlags: PDWORD
+  _bigEndianToLittleEndian(pExponent);
+  if cbExponent > sizeof(dwExponent) then
+    raise Exception.CreateFmt('Wrong exponent (%s)',[aBase64PubKeyExponent]);
+  dwExponent := 0;
+  move(pExponent[0], dwExponent, cbExponent);
+
+  //acquire a handle to a particular key container
+  if (not CryptAcquireContextA(@hProv, // phProv: PHCRYPTPROV;
+                               nil, // pszContainer: PAnsiChar;
+                               nil, // pszProvider: PAnsiChar;
+                               PROV_RSA_AES, // dwProvType: DWORD;
+                               CRYPT_VERIFYCONTEXT)) then raiselastOsError; // dwFlags: DWORD
+  try
+
+    // create the pKeyBlob
+    // The data format is: PUBLICKEYSTRUC + RSAPUBKEY + key
+    cbKeyBlob := sizeof(PUBLICKEYSTRUC) + sizeof(RSAPUBKEY) + cbModulus;
+    setlength(pKeyBlob, cbKeyBlob);
+
+    // Fill in the PUBLICKEYSTRUC
+    pPublicKey.bType := PUBLICKEYBLOB;
+    pPublicKey.bVersion := CUR_BLOB_VERSION;  // Always use this value.
+    pPublicKey.reserved := 0;                 // Must be zero.
+    pPublicKey.aiKeyAlg := CALG_RSA_KEYX;     // RSA public-key key exchange.
+    Move(pPublicKey,pKeyBlob[0],sizeof(PUBLICKEYSTRUC));
+
+    // Fill in the RSAPUBKEY
+    pRsaPubKey.magic := RSA1;            // Public key.
+    pRsaPubKey.bitlen := cbModulus * 8;  // Number of bits in the modulus.
+    pRsaPubKey.pubexp := dwExponent;     // Exponent.
+    Move(pRsaPubKey,pKeyBlob[sizeof(PUBLICKEYSTRUC)],sizeof(RSAPUBKEY));
+
+    // Fill in the modulus
+    Move(pModulus[0],pKeyBlob[sizeof(PUBLICKEYSTRUC)+sizeof(RSAPUBKEY)],cbModulus);
+
+    // Now import the key.
+    if not CryptImportKey(hProv, // hProv: HCRYPTPROV;
+                          @pKeyBlob[0], // const pbData: PBYTE;
+                          cbKeyBlob, // dwDataLen: DWORD;
+                          0, // hPubKey: HCRYPTKEY;
+                          0, // dwFlags: DWORD;
+                          @hRSAKey) then raiseLastOsError; // phKey: PHCRYPTKEY
+    try
+
+      //initiates the hashing of a stream of data.
+      if not (CryptCreateHash(hProv, // hProv: HCRYPTPROV;
+                              CALG_SHA_256, // Algid: ALG_ID;
+                              0, // hKey: HCRYPTKEY;
+                              0, // dwFlags: DWORD;
+                              @hHash)) then raiseLastOsError;
+      try
+
+        //adds data to a specified hash object.
+        if not (CryptHashData(hHash, // hHash: HCRYPTHASH;
+                              pbyte(aData), // const pbData: PBYTE;
+                              length(aData), // dwDataLen: DWORD;
+                              0)) then raiseLastOsError; // dwFlags: DWORD
+
+        //verifies the signature
+        setlength(pSignature, length(aSignature));
+        Move(Pointer(aSignature)^, Pointer(pSignature)^, Length(aSignature));
+        _bigEndianToLittleEndian(pSignature);
+        if not CryptVerifySignatureA(hHash, // hHash: HCRYPTHASH;
+                                     @pSignature[0], // const pbSignature: PBYTE;
+                                     length(pSignature), // dwSigLen: DWORD;
+                                     hRSAKey, // hPubKey: HCRYPTKEY;
+                                     nil, // const sDescription: LPCSTR;
+                                     0) then begin // dwFlags: DWORD)
+          if HRESULT(GetLastError) = NTE_BAD_SIGNATURE then exit(False)
+          else raiseLastOsError;
+        end;
+
+        //everything is ok
+        Result := True;
+
+      finally
+        if not CryptDestroyHash(hHash) then raiseLastOsError;
+      end;
+
+    finally
+      if not CryptDestroyKey(hRSAKey) then raiseLastOsError;
+    end;
+
+  finally
+    if not CryptReleaseContext(hProv,0) then raiseLastOsError;
+  end;
+end;
+{$IFEND}
 
 //////////////////
 ////// Init //////

@@ -49,8 +49,6 @@ type
   JScriptIntrinsicBlur = interface;
   JElement = interface;
   JDebug = interface;
-  JAdvertisingIdClient_Info = interface;
-  JAdvertisingIdClient = interface;
 
   {****************************************}
   JALFileUtilClass = interface(JObjectClass)
@@ -812,29 +810,6 @@ type
     //{class} function init(advertisingId: JString; limitAdTrackingEnabled: boolean): JAdvertisingIdClient_InfoClass; cdecl;
   end;
 
-  {*******************************************************************************}
-  [JavaSignature('com/google/android/gms/ads/identifier/AdvertisingIdClient$Info')]
-  JAdvertisingIdClient_Info = interface(JObject)
-    ['{80C719A6-DB6A-4342-A509-0A21CE9D62A9}']
-    function getId: JString; cdecl;
-    function isLimitAdTrackingEnabled: boolean; cdecl;
-    //function toString: JString; cdecl;
-  end;
-  TJAdvertisingIdClient_Info = class(TJavaGenericImport<JAdvertisingIdClient_InfoClass, JAdvertisingIdClient_Info>) end;
-
-  {*************************************************}
-  JAdvertisingIdClientClass = interface(JObjectClass)
-    ['{33BA0A20-1B57-43FC-A3FD-6146CE8B414F}']
-    {class} function getAdvertisingIdInfo(context: JContext) : JAdvertisingIdClient_Info; cdecl;
-  end;
-
-  {**************************************************************************}
-  [JavaSignature('com/google/android/gms/ads/identifier/AdvertisingIdClient')]
-  JAdvertisingIdClient = interface(JObject)
-    ['{63ECAAFA-76F4-4917-B7E7-F6A588EAC44B}']
-  end;
-  TJAdvertisingIdClient = class(TJavaGenericImport<JAdvertisingIdClientClass, JAdvertisingIdClient>) end;
-
 implementation
 
 procedure RegisterTypes;
@@ -865,8 +840,6 @@ begin
   TRegTypes.RegisterType('ALAndroidApi.JScriptIntrinsicBlur', TypeInfo(ALAndroidApi.JScriptIntrinsicBlur));
   TRegTypes.RegisterType('ALAndroidApi.JElement', TypeInfo(ALAndroidApi.JElement));
   TRegTypes.RegisterType('ALAndroidApi.JDebug', TypeInfo(ALAndroidApi.JDebug));
-  TRegTypes.RegisterType('ALAndroidApi.JAdvertisingIdClient_Info', TypeInfo(ALAndroidApi.JAdvertisingIdClient_Info));
-  TRegTypes.RegisterType('ALAndroidApi.JAdvertisingIdClient', TypeInfo(ALAndroidApi.JAdvertisingIdClient));
 end;
 
 initialization

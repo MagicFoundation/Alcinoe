@@ -12,10 +12,10 @@ cd "c:\program files (x86)\embarcadero\studio\20.0\bin\"
 -w ^
 --macsdk ^
 -D TARGET_OS_MAC ^
--isysroot "C:\SDKs\MacOSX10.14.sdk" ^
--isystem "C:\SDKs\MacOSX10.14.sdk\usr\include" ^
+-isysroot "C:\SDKs\MacOSX10.15.sdk" ^
+-isystem "C:\SDKs\MacOSX10.15.sdk\usr\include" ^
 -isystem "C:\SDKs\iPhoneOS12.2.sdk\usr\lib\clang" ^
--F "C:\SDKs\MacOSX10.14.sdk\System\Library\Frameworks" ^
+-F "C:\SDKs\MacOSX10.15.sdk\System\Library\Frameworks" ^
 -triple x86_64-apple-macosx-clang++ ^
 -fdiagnostics-show-option ^
 -fexceptions ^

@@ -1265,12 +1265,10 @@ end;
 // {$IF defined(IOS) and NOT defined(CPUARM)} => https://stackoverflow.com/questions/52475704/how-to-link-correctly-apple-ios-library
 
 initialization
-
-PhotosModule := dlopen(MarshaledAString(libPhotos), RTLD_LAZY);
+  PhotosModule := dlopen(MarshaledAString(libPhotos), RTLD_LAZY);
 
 finalization
-
-dlclose(PhotosModule);
+  dlclose(PhotosModule);
 
 // {$ENDIF IOS} => https://stackoverflow.com/questions/52475704/how-to-link-correctly-apple-ios-library
 

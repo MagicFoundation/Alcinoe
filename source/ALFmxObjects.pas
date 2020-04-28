@@ -101,6 +101,7 @@ type
   //also from smartphone to tablet i notice that to keep a good ratio i must increase all the font size, and image by 15%. So using multires
   //bitmap and if i want to avoid any resize (the purpose of multires bitmap as i understand) i must have 10 bitmaps per image !!
   //so all of this to say that multi-res bitmap is a fundamentally wrong concept
+  [ComponentPlatforms($FFFF)]
   TALImage = class(TControl)
   private
     fExifOrientationInfo: TalExifOrientationInfo;
@@ -195,7 +196,8 @@ type
     {$ENDIF}
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
   TALRectangle = class(TRectangle)
   private
     FScreenScale: single;
@@ -243,7 +245,8 @@ type
     property shadow: TALShadow read fshadow write SetShadow;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
   TALCircle = class(TCircle)
   private
     FScreenScale: single;
@@ -291,7 +294,8 @@ type
     property shadow: TALShadow read fshadow write SetShadow;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
   TALLine = class(TLine)
   private
     FScreenScale: single;
@@ -399,6 +403,7 @@ type
   //       style to not have MakeBufBitmap called several times (applystyle
   //       don't call beginupdate/endupdate (crazy!!), so everytime a property of the
   //       TALText is updated, MakeBufBitmap is call again)
+  [ComponentPlatforms($FFFF)]
   TALText = class(TControl)
   private
     fRestoreLayoutUpdateAfterLoaded: boolean;

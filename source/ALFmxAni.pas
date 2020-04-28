@@ -228,7 +228,8 @@ type
     procedure Stop; virtual;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
   TALFloatPropertyAnimation = class(TALCustomPropertyAnimation)
   private
     FStartFromCurrent: Boolean;
@@ -249,6 +250,7 @@ type
     function getRunning: Boolean;
     function GetStartValue: Single;
     function GetStopValue: Single;
+    function GetCurrentValue: Single;
     function OvershootStored: Boolean;
     procedure setAnimationType(const Value: TAnimationType);
     procedure setAutoReverse(const Value: Boolean);
@@ -274,6 +276,7 @@ type
     procedure StopAtCurrent; virtual;
     property Running: Boolean read getRunning;
     property Pause: Boolean read getPause write setPause;
+    property CurrentValue: Single read GetCurrentValue;
   published
     property AnimationType: TAnimationType read getAnimationType write setAnimationType default TAnimationType.In;
     property AutoReverse: Boolean read getAutoReverse write setAutoReverse default False;
@@ -293,7 +296,8 @@ type
     property Overshoot: Single read getOvershoot write setOvershoot Stored OvershootStored;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
   TALColorPropertyAnimation = class(TALCustomPropertyAnimation)
   private
     FStartFromCurrent: Boolean;
@@ -314,6 +318,7 @@ type
     function getRunning: Boolean;
     function GetStartValue: TAlphaColor;
     function GetStopValue: TAlphaColor;
+    function GetCurrentValue: TAlphaColor;
     function OvershootStored: Boolean;
     procedure setAnimationType(const Value: TAnimationType);
     procedure setAutoReverse(const Value: Boolean);
@@ -339,6 +344,7 @@ type
     procedure StopAtCurrent; virtual;
     property Running: Boolean read getRunning;
     property Pause: Boolean read getPause write setPause;
+    property CurrentValue: TAlphaColor read GetCurrentValue;
   published
     property AnimationType: TAnimationType read getAnimationType write setAnimationType default TAnimationType.In;
     property AutoReverse: Boolean read getAutoReverse write setAutoReverse default False;
@@ -957,6 +963,15 @@ var
 begin
   Result := False;
 
+  //This is to permit to put a TALxxxPropertyAnimation on a Form
+  //but use it only via it's onprocess event
+  if FPropertyName = '' then begin
+    FInstance := nil;
+    FRttiProperty := nil;
+    FPath := '';
+    exit(true);
+  end;
+
   if (Parent <> nil) and (FPropertyName <> '') then
   begin
     if FInstance = nil then
@@ -1073,7 +1088,7 @@ var
   T: TRttiType;
   P: TRttiProperty;
 begin
-  if StartFromCurrent then
+  if (FInstance <> nil) and StartFromCurrent then
   begin
     T := SharedContext.GetType(FInstance.ClassInfo);
     if T <> nil then
@@ -1190,6 +1205,12 @@ end;
 function TALFloatPropertyAnimation.GetStopValue: Single;
 begin
   result := fFloatAnimation.StopValue;
+end;
+
+{*********************************************************}
+function TALFloatPropertyAnimation.GetCurrentValue: Single;
+begin
+  result := fFloatAnimation.CurrentValue;
 end;
 
 {**********************************************************}
@@ -1320,7 +1341,7 @@ var
   T: TRttiType;
   P: TRttiProperty;
 begin
-  if StartFromCurrent then
+  if (FInstance <> nil) and StartFromCurrent then
   begin
     T := SharedContext.GetType(FInstance.ClassInfo);
     if T <> nil then
@@ -1437,6 +1458,12 @@ end;
 function TALColorPropertyAnimation.GetStopValue: TAlphaColor;
 begin
   result := fColorAnimation.StopValue;
+end;
+
+{**************************************************************}
+function TALColorPropertyAnimation.GetCurrentValue: TAlphaColor;
+begin
+  result := fColorAnimation.CurrentValue;
 end;
 
 {**********************************************************}

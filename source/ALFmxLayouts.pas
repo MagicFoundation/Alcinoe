@@ -20,7 +20,8 @@ uses System.Classes,
 
 type
 
-  {************************}
+  {*************************}
+  [ComponentPlatforms($FFFF)]
   TALLayout = class(TLayout)
   protected
     procedure DoRealign; override;
@@ -169,7 +170,8 @@ type
     property OnAniStop: TnotifyEvent read fOnAniStop write fOnAniStop;
   end;
 
-  {**************************************}
+  {*************************}
+  [ComponentPlatforms($FFFF)]
   TALScrollBox = class(TALCustomScrollBox)
   protected
     procedure Paint; override;
@@ -235,7 +237,8 @@ type
     property OnAniStop;
   end;
 
-  {******************************************}
+  {*************************}
+  [ComponentPlatforms($FFFF)]
   TALVertScrollBox = class(TALCustomScrollBox)
   protected
     function CalcContentBounds: TRectF; override;
@@ -303,7 +306,8 @@ type
     property OnAniStop;
   end;
 
-  {******************************************}
+  {*************************}
+  [ComponentPlatforms($FFFF)]
   TALHorzScrollBox = class(TALCustomScrollBox)
   protected
     function CalcContentBounds: TRectF; override;

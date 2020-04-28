@@ -435,7 +435,8 @@ type
     property TagString: String read FTagString write FTagString;
   end;
 
-  {*****************************************}
+  {*************************}
+  [ComponentPlatforms($FFFF)]
   TALVideoPlayerSurface = class(TALRectangle)
   private
     fVideoPlayer: TALVideoPlayer;

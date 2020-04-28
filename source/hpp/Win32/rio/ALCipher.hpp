@@ -29,6 +29,8 @@ class DELPHICLASS EALCipherException;
 struct TALBFContext;
 struct TALRDLVector;
 struct TALRDLContext;
+struct _PUBLICKEYSTRUC;
+struct _RSAPUBKEY;
 //-- type declarations -------------------------------------------------------
 #pragma pack(push,4)
 class PASCALIMPLEMENTATION EALCipherException : public Alstring::EALException
@@ -128,20 +130,75 @@ typedef unsigned __fastcall (*TALStringHashCrc32)(const System::AnsiString str);
 
 typedef unsigned __fastcall (*TALHashCrc32)(char * buf, unsigned len);
 
+typedef unsigned ALG_ID;
+
 typedef NativeUInt HCRYPTPROV;
 
 typedef NativeUInt *PHCRYPTPROV;
+
+typedef NativeUInt HCRYPTKEY;
+
+typedef NativeUInt *PHCRYPTKEY;
+
+typedef NativeUInt HCRYPTHASH;
+
+typedef NativeUInt *PHCRYPTHASH;
+
+struct DECLSPEC_DRECORD _PUBLICKEYSTRUC
+{
+public:
+	System::Byte bType;
+	System::Byte bVersion;
+	System::Word reserved;
+	unsigned aiKeyAlg;
+};
+
+
+typedef _PUBLICKEYSTRUC BLOBHEADER;
+
+typedef _PUBLICKEYSTRUC PUBLICKEYSTRUC;
+
+struct DECLSPEC_DRECORD _RSAPUBKEY
+{
+public:
+	unsigned magic;
+	unsigned bitlen;
+	unsigned pubexp;
+};
+
+
+typedef _RSAPUBKEY RSAPUBKEY;
 
 //-- var, const, procedure ---------------------------------------------------
 static const System::Int8 cALBFRounds = System::Int8(0x10);
 static const System::Int8 cALMaxRDLRounds = System::Int8(0xe);
 extern DELPHI_PACKAGE TALStringHashCrc32 ALStringHashCrc32;
 extern DELPHI_PACKAGE TALHashCrc32 ALHashCrc32;
+#define crypt32 L"crypt32.dll"
 static const unsigned CRYPT_VERIFYCONTEXT = unsigned(0xf0000000);
 static const System::Int8 CRYPT_NEWKEYSET = System::Int8(0x8);
+static const System::Int8 CRYPT_SILENT = System::Int8(0x40);
 static const System::Int8 PROV_RSA_FULL = System::Int8(0x1);
+static const System::Int8 PROV_RSA_AES = System::Int8(0x18);
 #define MS_ENHANCED_PROV_A "Microsoft Enhanced Cryptographic Provider v1.0"
 #define MS_ENHANCED_PROV_W L"Microsoft Enhanced Cryptographic Provider v1.0"
+static const System::Int8 CRYPT_STRING_BASE64 = System::Int8(0x1);
+static const System::Int8 PUBLICKEYBLOB = System::Int8(0x6);
+static const System::Int8 CUR_BLOB_VERSION = System::Int8(0x2);
+static const System::Word CALG_RSA_KEYX = System::Word(0xa400);
+static const System::Word CALG_SHA_256 = System::Word(0x800c);
+static const int RSA1 = int(0x31415352);
+extern "C" System::LongBool __stdcall CryptAcquireContextA(PHCRYPTPROV phProv, char * szContainer, char * szProvider, unsigned dwProvType, unsigned dwFlags);
+extern "C" System::LongBool __stdcall CryptAcquireContextW(PHCRYPTPROV phProv, System::WideChar * szContainer, System::WideChar * szProvider, unsigned dwProvType, unsigned dwFlags);
+extern "C" System::LongBool __stdcall CryptReleaseContext(NativeUInt hProv, unsigned dwFlags);
+extern "C" System::LongBool __stdcall CryptGenRandom(NativeUInt hProv, unsigned dwLen, System::PByte pbBuffer);
+extern "C" bool __stdcall CryptStringToBinaryA(char * pszString, unsigned cchString, unsigned dwFlags, System::PByte pbBinary, unsigned* pcbBinary, unsigned* pdwSkip, unsigned* pdwFlags);
+extern "C" System::LongBool __stdcall CryptImportKey(NativeUInt hProv, const System::PByte pbData, unsigned dwDataLen, NativeUInt hPubKey, unsigned dwFlags, PHCRYPTKEY phKey);
+extern "C" System::LongBool __stdcall CryptDestroyKey(NativeUInt hKey);
+extern "C" System::LongBool __stdcall CryptVerifySignatureA(NativeUInt hHash, const System::PByte pbSignature, unsigned dwSigLen, NativeUInt hPubKey, char * szDescription, unsigned dwFlags);
+extern "C" System::LongBool __stdcall CryptCreateHash(NativeUInt hProv, unsigned Algid, NativeUInt hKey, unsigned dwFlags, PHCRYPTHASH phHash);
+extern "C" System::LongBool __stdcall CryptDestroyHash(NativeUInt hHash);
+extern "C" System::LongBool __stdcall CryptHashData(NativeUInt hHash, const System::PByte pbData, unsigned dwDataLen, unsigned dwFlags);
 extern DELPHI_PACKAGE void __fastcall ALStringHashMD5(TALCipherKey128 &Digest, const System::AnsiString Str)/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALStringHashMD5(const System::AnsiString Str, const bool HexEncode = true)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALStringHashMD5U(TALCipherKey128 &Digest, const System::UnicodeString Str, System::Sysutils::TEncoding* const encoding)/* overload */;
@@ -200,10 +257,6 @@ extern DELPHI_PACKAGE System::AnsiString __fastcall ALBFEncryptString(const Syst
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALBFEncryptStringCBC(const System::AnsiString InString, const System::AnsiString Key, bool Encrypt)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALBFEncryptStream(System::Classes::TStream* InStream, System::Classes::TStream* OutStream, const System::AnsiString Key, bool Encrypt)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALBFEncryptStreamCBC(System::Classes::TStream* InStream, System::Classes::TStream* OutStream, const System::AnsiString Key, bool Encrypt)/* overload */;
-extern "C" System::LongBool __stdcall CryptAcquireContextA(PHCRYPTPROV phProv, char * pszContainer, char * pszProvider, unsigned dwProvType, unsigned dwFlags);
-extern "C" System::LongBool __stdcall CryptAcquireContextW(PHCRYPTPROV phProv, System::WideChar * pszContainer, System::WideChar * pszProvider, unsigned dwProvType, unsigned dwFlags);
-extern "C" System::LongBool __stdcall CryptReleaseContext(NativeUInt hProv, unsigned dwFlags);
-extern "C" System::LongBool __stdcall CryptGenRandom(NativeUInt hProv, unsigned dwLen, System::PByte pbBuffer);
 extern DELPHI_PACKAGE void __fastcall ALRandomBytes(const void *Dest, const unsigned Len)/* overload */;
 extern DELPHI_PACKAGE System::DynamicArray<System::Byte> __fastcall ALRandomBytes(const unsigned Len)/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALRandomByteStr(const unsigned Len);
@@ -213,6 +266,7 @@ extern DELPHI_PACKAGE __int64 __fastcall ALFnv1aInt64(const System::AnsiString s
 extern DELPHI_PACKAGE __int64 __fastcall ALFnv1aInt64U(const System::UnicodeString str, System::Sysutils::TEncoding* const encoding);
 extern DELPHI_PACKAGE __int64 __fastcall ALFnv1aInt32(const System::AnsiString str);
 extern DELPHI_PACKAGE __int64 __fastcall ALFnv1aInt32U(const System::UnicodeString str, System::Sysutils::TEncoding* const encoding);
+extern DELPHI_PACKAGE bool __fastcall ALVerifyRSA256Signature(const System::AnsiString aData, const System::AnsiString aSignature, const System::AnsiString aBase64PubKeyModulus, const System::AnsiString aBase64PubKeyExponent);
 }	/* namespace Alcipher */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALCIPHER)
 using namespace Alcipher;

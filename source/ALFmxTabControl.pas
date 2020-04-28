@@ -92,7 +92,8 @@ type
     {$ENDIF}
   end;
 
-  {**********************************************}
+  {*************************}
+  [ComponentPlatforms($FFFF)]
   TALTabControl = class(TControl, IItemsContainer)
   public type
     TFindKind = (Next, Back, First, Last, Current);

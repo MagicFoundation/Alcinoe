@@ -225,6 +225,7 @@ private:
 	bool __fastcall getRunning();
 	float __fastcall GetStartValue();
 	float __fastcall GetStopValue();
+	float __fastcall GetCurrentValue();
 	bool __fastcall OvershootStored();
 	void __fastcall setAnimationType(const Fmx::Types::TAnimationType Value);
 	void __fastcall setAutoReverse(const bool Value);
@@ -252,6 +253,7 @@ public:
 	virtual void __fastcall StopAtCurrent();
 	__property bool Running = {read=getRunning, nodefault};
 	__property bool Pause = {read=getPause, write=setPause, nodefault};
+	__property float CurrentValue = {read=GetCurrentValue};
 	
 __published:
 	__property Fmx::Types::TAnimationType AnimationType = {read=getAnimationType, write=setAnimationType, default=0};
@@ -296,6 +298,7 @@ private:
 	bool __fastcall getRunning();
 	System::Uitypes::TAlphaColor __fastcall GetStartValue();
 	System::Uitypes::TAlphaColor __fastcall GetStopValue();
+	System::Uitypes::TAlphaColor __fastcall GetCurrentValue();
 	bool __fastcall OvershootStored();
 	void __fastcall setAnimationType(const Fmx::Types::TAnimationType Value);
 	void __fastcall setAutoReverse(const bool Value);
@@ -323,6 +326,7 @@ public:
 	virtual void __fastcall StopAtCurrent();
 	__property bool Running = {read=getRunning, nodefault};
 	__property bool Pause = {read=getPause, write=setPause, nodefault};
+	__property System::Uitypes::TAlphaColor CurrentValue = {read=GetCurrentValue, nodefault};
 	
 __published:
 	__property Fmx::Types::TAnimationType AnimationType = {read=getAnimationType, write=setAnimationType, default=0};

@@ -108,7 +108,7 @@ Under android I use ExoPlayer. ExoPlayer supports features
 like Dynamic adaptive streaming over HTTP (DASH), HLS, SmoothStreaming and 
 Common Encryption, which are not supported by MediaPlayer. It's designed 
 to be easy to customize and extend. Under iOS I use AVPlayer with support 
-also HLS like ExoPlayer do.
+also HLS like ExoPlayer does
 
 <p align="left">
   <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-1.jpg?raw=true" alt="video player for FireMonkey" width="280" style="width:280px;"/>
@@ -139,9 +139,9 @@ Firemonkey native iOS/Android TEdit and TMemo
 ---------------------------------------------
 
 The spirit is to mix FireMonkey control with native platform control
-when the functionality on such control start to be very hard to
+when the functionality on such control starts to be very hard to
 implement (like webbrowser, edit, memo, datepicker, etc.). But it's
-not to make several distinct form for several platform like 
+not to make several distinct forms for several platforms like 
 offer for example http://www.turbococoa.com/ (but this option is
 also a good alternative in some way, it's up to you to decide)
 
@@ -177,7 +177,7 @@ Fast/double-buffered FireMonkey controls with native draw
 
 #### The fact ####
 
-Painting of FireMonkey controls can be sometime slow, or say 
+Painting of FireMonkey controls can be sometimes slow, or say 
 differently, not sufficiently fast for a fluid scrolling. For example if 
 you simply look the basic TRectangle with round corners, the paint procedure 
 can take around 3ms! So if you have around 20 visible TRectangles on your 
@@ -189,13 +189,13 @@ much less even) so the scrolling can't be fluid :(
 
 #### The solution #### 
  
-I didn't want to rebuild the FireMonkey controls, it's too 
+I didn't want to rebuild the FireMonkey controls, it's a too 
 huge job for me, and instead I try to find an intermediate solution. 
 This what I find by adding "double-buffered" property to the FireMonkey 
 controls. So instead to repaint and repaint (and repaint) the controls 
 for every single pixels move of the scrollbox, I first paint the control 
 on a "buffer" that I store directly in the GPU memory (through TTexture), 
-and when the system ask me to repaint the controls instead of calling 
+and when the system asks me to repaint the controls instead of calling 
 again the paint algorithm I simply redraw the buffer TTexture.
 
 #### The results ####  
@@ -306,11 +306,11 @@ handling the data: as soon as it's mapped in native objects,
 code can access with no time to any given node, whereas a
 SAX-based access will have to read again the whole JSON content.
 
-Most JSON parser available in Delphi use a DOM-like approach.
+Most JSON parser available in Delphi uses a DOM-like approach.
 For instance, the DBXJSON unit included since Delphi 2010
 or the SuperObject library create a class instance mapping
 each JSON node. In order to achieve best speed, TALJsonDocument
-implement DOM parser and also a SAX parser.
+implements DOM parser and also a SAX parser.
 
 TALJsonDocument can also support comments inside the JSON source
 that is an extension to the JSON specifications

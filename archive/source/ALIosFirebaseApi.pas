@@ -136,10 +136,10 @@ type
   end;
   TFIRDynamicLinks = class(TOCGenericImport<FIRDynamicLinksClass, FIRDynamicLinks>) end;
   PFIRDynamicLinks = Pointer;
-  
-  
-  
-  
+
+
+
+
 implementation
 
 

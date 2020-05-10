@@ -55,7 +55,7 @@
 // actually for the notification alert i support these params, but nothing forbid to extends them
 //
 // notification - Must be equal to 1 to activate showing of custom notification when no receiver
-// notification.channel - on Android 0 The notification will be posted on this NotificationChannel. 
+// notification.channel - on Android 0 The notification will be posted on this NotificationChannel.
 // notification.tag - A string identifier for this notification.
 // notification.color - The accent color to use
 // notification.text - Set the second line of text in the platform notification template.
@@ -704,7 +704,7 @@ begin
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
-  // It's seam that ShortcutBadger is not maintained anymore so remove this dependancy  
+  // It's seam that ShortcutBadger is not maintained anymore so remove this dependancy
   // If TJShortcutBadger.JavaClass.isBadgeCounterSupported(TAndroidHelper.Context) then
   //   TJShortcutBadger.JavaClass.applyCount(TAndroidHelper.Context, aNewValue);
   {$ENDIF}
@@ -1065,14 +1065,14 @@ begin
         else if sharedApplication.applicationState = UIApplicationStateBackground then begin
           aJsonStr := (M as TPushRemoteNotificationMessage).Value.Notification
         end;
-        
+
       end
 
       //ios 10+
       else aJsonStr := (M as TPushRemoteNotificationMessage).Value.Notification
 
     end
-    
+
     else if (M is TPushStartupNotificationMessage) then begin
       aJsonDoc := TalJsonDocumentU.create;
       try
@@ -1085,7 +1085,7 @@ begin
         ALFreeAndNil(aJsonDoc);
       end;
     end
-    
+
     else aJsonStr := '';
 
     {$IFDEF DEBUG}
@@ -1094,7 +1094,7 @@ begin
     {$ENDIF}
 
     if aJsonStr <> '' then ALJSONToTStringsU(aJsonStr, ALDefaultFormatSettingsU, aPayload);
-        
+
     if assigned(fOnMessageReceived) then
       fOnMessageReceived(aPayload);
 

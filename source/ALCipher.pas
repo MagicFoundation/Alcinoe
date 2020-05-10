@@ -693,7 +693,7 @@ begin
   MD5.State[1] := $EFCDAB89;
   MD5.State[2] := $98BADCFE;
   MD5.State[3] := $10325476;
-  ALMove(MD5, Context, SizeOf(Context));                               
+  ALMove(MD5, Context, SizeOf(Context));
 end;
 
 {**********************************************************************************}
@@ -706,7 +706,7 @@ var
   I      : Word;
   II     : Word;
 begin
-  ALMove(Context, MD5, SizeOf(MD5));                                   
+  ALMove(Context, MD5, SizeOf(MD5));
 
   {compute number of bytes mod 64}
   MDI := (MD5.Count[0] shr 3) and $3F;
@@ -721,7 +721,7 @@ begin
   BufOfs := 0;
   while (BufSize > 0) do begin
     Dec(BufSize);
-    MD5.Buf[MDI] := TByteArray(Buf)[BufOfs];                         
+    MD5.Buf[MDI] := TByteArray(Buf)[BufOfs];
     Inc(MDI);
     Inc(BufOfs);
     if (MDI = $40) then begin
@@ -757,7 +757,7 @@ var
   II     : Word;
   PadLen : Word;
 begin
-  ALMove(Context, MD5, SizeOf(MD5));                                   
+  ALMove(Context, MD5, SizeOf(MD5));
   {save number of bits}
   InBuf[14] := MD5.Count[0];
   InBuf[15] := MD5.Count[1];
@@ -770,7 +770,7 @@ begin
     PadLen := 120 - MDI;
   ALUpdateMD5(Context, Padding, PadLen);
 
-  ALMove(Context, MD5, SizeOf(MD5));                                   
+  ALMove(Context, MD5, SizeOf(MD5));
 
   {append length in bits and transform}
   II := 0;
@@ -792,7 +792,7 @@ begin
     Digest[II + 3] := Byte((MD5.State[I] shr 24) and $FF);
     Inc(II, 4);
   end;
-  ALMove(MD5, Context, SizeOf(Context));                               
+  ALMove(MD5, Context, SizeOf(Context));
 end;
 
 {*****************************************************************************}
@@ -3166,7 +3166,7 @@ end;
 {****************************************************************************************************}
 procedure ALRdlInvRound(const RoundKey : TALRDLBlock; var State : TALRDLBlock; const First : Boolean);
   { Rijndael inverse round transformation }
-  { entire routine rewritten for optimization }                      
+  { entire routine rewritten for optimization }
 var
   i : Integer;
   r : TALRDLVectors;

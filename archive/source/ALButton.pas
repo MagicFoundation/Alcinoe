@@ -1,6 +1,6 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
+www:          http://sourceforge.net/projects/alcinoe/
+svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
 Author(s):    Stéphane Vander Clock (alcinoe@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
@@ -241,7 +241,7 @@ type
     Property Font;
     property ParentFont;
     Property Color;
-    Property ParentColor;    
+    Property ParentColor;
     property Glyph;
     Property State;
     Property GroupIndex;

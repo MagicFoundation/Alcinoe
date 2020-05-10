@@ -176,7 +176,7 @@ begin
   ALButtonFirebirdCommit.Enabled := False;
   ALButtonFirebirdCommitRetaining.Enabled := False;
   ALButtonFirebirdRollBack.Enabled := False;
-  ALButtonFirebirdRollBackRetaining.Enabled := False;  
+  ALButtonFirebirdRollBackRetaining.Enabled := False;
   ALButtonCloseConnection.Enabled := True;
   Try
 
@@ -219,9 +219,9 @@ begin
     ALButtonFirebirdPrepare.Enabled := False;
     ALButtonFirebirdUpdate.Enabled := False;
     ALButtonFirebirdCommit.Enabled := False;
-    ALButtonFirebirdCommitRetaining.Enabled := False;    
+    ALButtonFirebirdCommitRetaining.Enabled := False;
     ALButtonFirebirdRollBack.Enabled := False;
-    ALButtonFirebirdRollBackRetaining.Enabled := False;    
+    ALButtonFirebirdRollBackRetaining.Enabled := False;
     ALButtonCloseConnection.Enabled := False;
     Raise;
   End;
@@ -245,9 +245,9 @@ begin
   ALButtonFirebirdPrepare.Enabled := true;
   ALButtonFirebirdUpdate.Enabled := True;
   ALButtonFirebirdCommit.Enabled := True;
-  ALButtonFirebirdCommitRetaining.Enabled := True;  
+  ALButtonFirebirdCommitRetaining.Enabled := True;
   ALButtonFirebirdRollBack.Enabled := True;
-  ALButtonFirebirdRollBackRetaining.Enabled := True;  
+  ALButtonFirebirdRollBackRetaining.Enabled := True;
   ALButtonCloseConnection.Enabled := True;
   Try
 
@@ -313,9 +313,9 @@ begin
     ALButtonFirebirdPrepare.Enabled := False;
     ALButtonFirebirdUpdate.Enabled := False;
     ALButtonFirebirdCommit.Enabled := False;
-    ALButtonFirebirdCommitRetaining.Enabled := False;    
+    ALButtonFirebirdCommitRetaining.Enabled := False;
     ALButtonFirebirdRollBack.Enabled := False;
-    ALButtonFirebirdRollBackRetaining.Enabled := False;    
+    ALButtonFirebirdRollBackRetaining.Enabled := False;
     ALButtonCloseConnection.Enabled := True;
     Raise;
   End;
@@ -602,9 +602,9 @@ begin
   ALButtonFirebirdPrepare.Enabled := False;
   ALButtonFirebirdUpdate.Enabled := False;
   ALButtonFirebirdCommit.Enabled := False;
-  ALButtonFirebirdCommitRetaining.Enabled := False;  
+  ALButtonFirebirdCommitRetaining.Enabled := False;
   ALButtonFirebirdRollBack.Enabled := False;
-  ALButtonFirebirdRollBackRetaining.Enabled := False;  
+  ALButtonFirebirdRollBackRetaining.Enabled := False;
   ALButtonCloseConnection.Enabled := True;
   Try
 
@@ -656,9 +656,9 @@ begin
     ALButtonFirebirdPrepare.Enabled := True;
     ALButtonFirebirdUpdate.Enabled := True;
     ALButtonFirebirdCommit.Enabled := True;
-    ALButtonFirebirdCommitRetaining.Enabled := True;    
+    ALButtonFirebirdCommitRetaining.Enabled := True;
     ALButtonFirebirdRollBack.Enabled := True;
-    ALButtonFirebirdRollBackRetaining.Enabled := True;    
+    ALButtonFirebirdRollBackRetaining.Enabled := True;
     ALButtonCloseConnection.Enabled := True;
     Raise;
   End;
@@ -798,7 +798,7 @@ begin
     ALButtonFirebirdCommit.Enabled := True;
     ALButtonFirebirdCommitRetaining.Enabled := True;
     ALButtonFirebirdRollBack.Enabled := True;
-    ALButtonFirebirdRollBackRetaining.Enabled := True;    
+    ALButtonFirebirdRollBackRetaining.Enabled := True;
     ALButtonCloseConnection.Enabled := True;
     Raise;
   End;

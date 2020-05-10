@@ -101,7 +101,7 @@ begin
       Font.Color := $00AFAFAF;
     end;
 
-    Continue := OldFontColor = Font.Color;    
+    Continue := OldFontColor = Font.Color;
   end;
 end;
 

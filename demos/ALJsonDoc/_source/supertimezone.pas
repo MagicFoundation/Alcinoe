@@ -101,7 +101,7 @@ function _SystemTimeToTzSpecificLocalTimeEx(
    const lpUniversalTime: PSystemTime; var lpLocalTime: TSystemTime): BOOL; stdcall; external kernel32 name 'SystemTimeToTzSpecificLocalTimeEx' delayed;
 
 { Convert Local <=> UTC for specific time-zones using the Windows API only. NOT Guaranteed to work }
-   
+
 function _ConvertLocalDateTimeToUTC(const TimeZoneName: SOString;
   const Local: TDateTime; var UTC: TDateTime): Boolean;
 

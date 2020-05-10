@@ -1,7 +1,7 @@
 
   JALFirebaseDynamicLinksListener = interface;
   JALFirebaseDynamicLinks = interface;
-  
+
   {**********************************************************}
   JALFirebaseDynamicLinksListenerClass = interface(IJavaClass)
     ['{6BD08D6D-4A89-47CC-B042-BB9DF9699975}']

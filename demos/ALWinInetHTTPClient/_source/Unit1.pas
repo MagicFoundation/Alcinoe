@@ -156,7 +156,7 @@ type
   public
     procedure OnHttpClientStatusChange(sender: Tobject; InternetStatus: DWord; StatusInformation: Pointer; StatusInformationLength: DWord);
     procedure OnHttpDownloadProgress(sender: Tobject; Read: Integer; Total: Integer);
-    procedure OnHttpUploadProgress(sender: Tobject; Sent: Integer; Total: Integer);    
+    procedure OnHttpUploadProgress(sender: Tobject; Sent: Integer; Total: Integer);
   end;
 
 var

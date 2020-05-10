@@ -172,11 +172,13 @@ type
   end;
 
 type
-
+
+
   //typedef enum MFMailComposeResult MFMailComposeResult;   // available in iPhone 3.0
   MFMailComposeResult = NSInteger;
 
-const
+
+const
 
   {*************************************************************************}
   //@abstract   Composition result sent to the delegate upon user completion.

@@ -62,6 +62,7 @@ protected:
 	
 public:
 	__fastcall virtual TALTabItem(System::Classes::TComponent* AOwner);
+	__fastcall virtual ~TALTabItem();
 	virtual void __fastcall SetBounds(float X, float Y, float AWidth, float AHeight);
 	__property TALTabControl* TabControl = {read=FTabControl};
 	__property float ViewPortOffset = {read=fViewPortOffset};
@@ -98,9 +99,6 @@ __published:
 	__property OnPaint;
 	__property OnResize;
 	__property OnResized;
-public:
-	/* TControl.Destroy */ inline __fastcall virtual ~TALTabItem() { }
-	
 };
 
 
@@ -128,6 +126,7 @@ private:
 	TALTabAniTransitionInit fOnAniTransitionInit;
 	System::Classes::TNotifyEvent fOnAniStart;
 	System::Classes::TNotifyEvent fOnAniStop;
+	System::Classes::TNotifyEvent fOnAniProcess;
 	float fMouseDownPos;
 	int FDeadZoneBeforeAcquireScrolling;
 	bool fScrollingAcquiredByMe;
@@ -142,6 +141,7 @@ private:
 	void __fastcall setAnimationEnabled(const bool Value);
 	void __fastcall AniTransitionSlideProcess(System::TObject* Sender);
 	void __fastcall AniTransitionSlideFinish(System::TObject* Sender);
+	void __fastcall AniTransitionFadeOutProcess(System::TObject* Sender);
 	void __fastcall AniTransitionFadeOutFinish(System::TObject* Sender);
 	int __fastcall GetItemsCount();
 	Fmx::Types::TFmxObject* __fastcall GetItem(const int AIndex);
@@ -236,6 +236,7 @@ __published:
 	__property TALTabAniTransitionInit OnAniTransitionInit = {read=fOnAniTransitionInit, write=fOnAniTransitionInit};
 	__property System::Classes::TNotifyEvent OnAniStart = {read=fOnAniStart, write=fOnAniStart};
 	__property System::Classes::TNotifyEvent OnAniStop = {read=fOnAniStop, write=fOnAniStop};
+	__property System::Classes::TNotifyEvent OnAniProcess = {read=fOnAniProcess, write=fOnAniProcess};
 private:
 	void *__IItemsContainer;	// Fmx::Types::IItemsContainer 
 	

@@ -235,7 +235,7 @@ Var Ln: Integer;
 begin
   result := ALExtractFileName(ALGetModuleName);
   ln := Length(ALExtractFileExt(Result));
-  if Ln > 0 then delete(Result,length(Result)-ln+1,ln);  
+  if Ln > 0 then delete(Result,length(Result)-ln+1,ln);
 end;
 
 {***********************************}

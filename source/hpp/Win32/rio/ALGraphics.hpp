@@ -174,6 +174,7 @@ extern DELPHI_PACKAGE System::DynamicArray<System::Byte> __fastcall AlGetImageSi
 extern DELPHI_PACKAGE System::UnicodeString __fastcall AlDetectImageExtensionU(System::Classes::TStream* const aStream)/* overload */;
 extern DELPHI_PACKAGE System::UnicodeString __fastcall AlDetectImageExtensionU(const System::UnicodeString aFileName)/* overload */;
 extern DELPHI_PACKAGE System::Uitypes::TAlphaColor __fastcall ALPrepareColor(const System::Uitypes::TAlphaColor SrcColor, const float Opacity);
+extern DELPHI_PACKAGE System::Uitypes::TAlphaColor __fastcall ALAlphaBlendColors(const System::Uitypes::TAlphaColor *aBackToFrontColors, const int aBackToFrontColors_High);
 }	/* namespace Algraphics */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALGRAPHICS)
 using namespace Algraphics;

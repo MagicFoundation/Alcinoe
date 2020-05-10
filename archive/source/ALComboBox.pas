@@ -1,6 +1,6 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
+www:          http://sourceforge.net/projects/alcinoe/
+svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
 Author(s):    Stéphane Vander Clock (alcinoe@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
@@ -63,9 +63,9 @@ History :
 Link :
 
 * Please send all your feedback to alcinoe@arkadia.com
-* If you have downloaded this source from a website different from 
+* If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
-* Please, help us to keep the development of these components free by 
+* Please, help us to keep the development of these components free by
   promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALComboBox;
@@ -93,7 +93,7 @@ type
     FCustomProperty: String;
     procedure CNCommand(var Message: TWMCommand); message CN_COMMAND;
     Procedure PaintCombo;
-    Procedure ReplaceInvalidateInQueueByRefresh;    
+    Procedure ReplaceInvalidateInQueueByRefresh;
   protected
     procedure WndProc(var Message: TMessage); override;
     Property BorderColor: Tcolor read FBorderColor Write FBorderColor Default Clblack;

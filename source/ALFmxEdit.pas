@@ -118,9 +118,11 @@ type
     fReturnKeyType: TReturnKeyType;
     fKeyboardType: TVirtualKeyboardType;
     fPassword: boolean;
+    fCheckSpelling: boolean;
     fIsMultiline: Boolean;
     procedure DoSetInputType(const aKeyboardType: TVirtualKeyboardType;
                              const aPassword: Boolean;
+                             const aCheckSpelling: Boolean;
                              const aIsMultiline: Boolean);
     procedure setKeyboardType(const Value: TVirtualKeyboardType);
     function GetKeyboardType: TVirtualKeyboardType;
@@ -677,7 +679,7 @@ begin
                                     StringToJstring('style'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
                                     TAndroidHelper.Context.getPackageName())) // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
   //-----
-  else  
+  else
     Result := TJALEditText.JavaClass.init(
                 TAndroidHelper.Activity, // context: JContext;
                 nil, // attrs: JAttributeSet;
@@ -741,11 +743,11 @@ begin
   fReturnKeyType := tReturnKeyType.Default;
   fKeyboardType := TVirtualKeyboardType.default;
   fPassword := false;
+  fCheckSpelling := true;
   fIsMultiline := aIsMultiline;
   FEditText := TALAndroidEditText.create(self, aIsMultiline, aDefStyleAttr, aDefStyleRes);
   DoSetReturnKeyType(fReturnKeyType);
-  DoSetInputType(fKeyboardType, fPassword, fIsMultiline);
-  SetCheckSpelling(True);
+  DoSetInputType(fKeyboardType, fPassword, fCheckSpelling, fIsMultiline);
   //-----
   {$IF defined(DEBUG)}
   ALLog('TALAndroidEdit.Create', 'end', TalLogType.VERBOSE);
@@ -774,6 +776,7 @@ end;
 {********************************************************************************}
 procedure TALAndroidEdit.DoSetInputType(const aKeyboardType: TVirtualKeyboardType;
                                         const aPassword: Boolean;
+                                        const aCheckSpelling: Boolean;
                                         const aIsMultiline: Boolean);
 var aInputType: integer;
 begin
@@ -839,6 +842,19 @@ begin
       TVirtualKeyboardType.EmailAddress:          aInputType := aInputType or TJInputType.JavaClass.TYPE_TEXT_VARIATION_PASSWORD;
       else {TVirtualKeyboardType.Default}         aInputType := aInputType or TJInputType.JavaClass.TYPE_TEXT_VARIATION_PASSWORD;
     end;
+  end
+  else if not aCheckSpelling then begin
+    // https://stackoverflow.com/questions/61704644/why-type-text-flag-no-suggestions-is-not-working-to-disable-auto-corrections
+    case aKeyboardType of
+      TVirtualKeyboardType.Alphabet:              aInputType := aInputType or TJInputType.JavaClass.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
+      TVirtualKeyboardType.URL:;
+      TVirtualKeyboardType.NamePhonePad:          aInputType := aInputType or TJInputType.JavaClass.TYPE_TEXT_FLAG_NO_SUGGESTIONS or TJInputType.JavaClass.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
+      TVirtualKeyboardType.EmailAddress:;
+      TVirtualKeyboardType.NumbersAndPunctuation:;
+      TVirtualKeyboardType.NumberPad:;
+      TVirtualKeyboardType.PhonePad:;
+      else {TVirtualKeyboardType.Default}         aInputType := aInputType or TJInputType.JavaClass.TYPE_TEXT_FLAG_NO_SUGGESTIONS or TJInputType.JavaClass.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
+    end;
   end;
 
   if aIsMultiline then aInputType := aInputType or TJInputType.JavaClass.TYPE_TEXT_FLAG_MULTI_LINE;
@@ -852,7 +868,7 @@ procedure TALAndroidEdit.setKeyboardType(const Value: TVirtualKeyboardType);
 begin
   if (value <> fKeyboardType) then begin
     fKeyboardType := Value;
-    DoSetInputType(Value, fPassword, fIsMultiLine);
+    DoSetInputType(Value, fPassword, fCheckSpelling, fIsMultiLine);
   end;
 end;
 
@@ -867,7 +883,7 @@ procedure TALAndroidEdit.setPassword(const Value: Boolean);
 begin
   if (value <> fPassword) then begin
     fPassword := Value;
-    DoSetInputType(fKeyboardType, Value, fIsMultiLine);
+    DoSetInputType(fKeyboardType, Value, fCheckSpelling, fIsMultiLine);
   end;
 end;
 
@@ -880,13 +896,16 @@ end;
 {**************************************************************}
 procedure TalAndroidEdit.SetCheckSpelling(const Value: Boolean);
 begin
-  // do nothing as far as i know their is no much such option but on marshmallow it's activated by default
+  if (value <> fCheckSpelling) then begin
+    fCheckSpelling := Value;
+    DoSetInputType(fKeyboardType, fPassword, Value, fIsMultiLine);
+  end;
 end;
 
 {************************************************}
 function TalAndroidEdit.GetCheckSpelling: Boolean;
 begin
-  result := false;
+  result := fCheckSpelling;
 end;
 
 {*********************************************************************************}

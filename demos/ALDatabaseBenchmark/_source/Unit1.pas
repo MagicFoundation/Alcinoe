@@ -512,7 +512,7 @@ begin
     if not ALTryStrToInt(TagParams.Values['min'], aMin) then aMin := 0;
     currentIncNumberCR.Acquire;
     try
-      inc(currentIncNumber);      
+      inc(currentIncNumber);
       if aMin > currentIncNumber then begin
         currentIncNumber := aMin;
         result := ALinttostr(currentIncNumber);
@@ -4141,7 +4141,7 @@ initialization
   ReportMemoryleaksOnSHutdown := True;
   {$ENDIF}
   SetMultiByteConversionCodePage(CP_UTF8);
-  
+
 finalization
   currentIncNumberCR.free;
 

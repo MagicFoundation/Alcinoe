@@ -10,7 +10,7 @@ product:      Alcinoe Expression Evaluator
 Description:  This unit contains expression evaluators, each tailored for different usage
               patterns. It also contains the component objects, so that a customized
               expression evaluator can be assembled relatively easily.
-              
+
 Note :        operator priority (as implemented in this unit)
               all binary operators are associated from left to right
               all unary operators are associated from right to left
@@ -1430,14 +1430,14 @@ begin
                     Lexer.NextTok;
                     break;
                   end;
-                end 
+                end
                 else if Lexer.CurrTok = etEOF then
-                  raise EALExprEvalError.CreateRes(@RsALExprEvalEndArgs); 
+                  raise EALExprEvalError.CreateRes(@RsALExprEvalEndArgs);
 
                 Lexer.NextTok(false);
-                  
+
               end;
-              
+
               break;
 
             end
@@ -1449,11 +1449,11 @@ begin
                 break;
               end
               else if Lexer.CurrTok <> etComma then
-                raise EALExprEvalError.CreateRes(@RsALExprEvalNextArg);                                                    
+                raise EALExprEvalError.CreateRes(@RsALExprEvalNextArg);
             end;
-            
+
           end;
-          
+
         end
         else
         if ALSameText(Lexer.TokenAsString, 'div') then
@@ -1708,7 +1708,7 @@ begin
             if FTokenAsString = '' then FTokenAsNumber := 0
             else FTokenAsNumber := ALFnv1aInt64(FTokenAsString);
           end;
-          
+
           FCurrTok := etNumber;
 
         end;
@@ -1754,7 +1754,7 @@ begin
           SetString(FTokenAsString, start, cp - start);
           FTokenAsNumber := ALStrToFloat(FTokenAsString, ALDefaultFormatSettings);
         end;
-        
+
         FCurrTok := etNumber;
       end;
     '<':

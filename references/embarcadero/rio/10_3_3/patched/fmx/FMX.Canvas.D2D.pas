@@ -2820,7 +2820,7 @@ begin
 
   PathRendering := TTextRendering.Create;
   try
-                                                                                       
+
     FLayout.Draw(APath, PathRendering, 0, 0);
   finally
     PathRendering.Free;

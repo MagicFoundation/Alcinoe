@@ -569,7 +569,7 @@ begin
     begin
       if CompareText(FValues[I].Name, 'Output') = 0 then
       begin
-        if not FProcessing and FModified then 
+        if not FProcessing and FModified then
           Apply;
         Result := TFilterManager.GetTexture(FPass);
         FValues[I].Value := Result;

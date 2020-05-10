@@ -16,7 +16,7 @@ interface
 {$SCOPEDENUMS ON}
 
 uses
-  System.Types, System.UITypes, FMX.Types, FMX.Types3D, FMX.Materials.Canvas, FMX.Graphics, 
+  System.Types, System.UITypes, FMX.Types, FMX.Types3D, FMX.Materials.Canvas, FMX.Graphics,
   System.Math.Vectors, ALFMXTypes3D;
 
 type

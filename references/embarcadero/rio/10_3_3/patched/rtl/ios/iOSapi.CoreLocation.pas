@@ -33,7 +33,7 @@ const
   kCLAuthorizationStatusNotDetermined = 0;
   kCLAuthorizationStatusRestricted = 1;
   kCLAuthorizationStatusAuthorizedAlways  = kCLAuthorizationStatusAuthorized ;
-  kCLAuthorizationStatusAuthorizedWhenInUse = 4; 
+  kCLAuthorizationStatusAuthorizedWhenInUse = 4;
   kCLErrorDenied = 1;
   kCLErrorGeocodeCanceled = 10;
   kCLErrorGeocodeFoundNoResult = 8;

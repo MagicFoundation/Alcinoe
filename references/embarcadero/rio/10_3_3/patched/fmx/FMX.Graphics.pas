@@ -5971,7 +5971,7 @@ end;
 function TCanvas.LoadFontFromStream(const AStream: TStream): Boolean;
 begin
   Result := False;
-                                                       
+
 end;
 
 procedure TCanvas.MeasureLines(const ALines: TLineMetricInfo; const ARect: TRectF; const AText: string; const WordWrap: Boolean; const Flags: TFillTextFlags;

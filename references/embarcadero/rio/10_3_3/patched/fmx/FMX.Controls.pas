@@ -113,7 +113,7 @@ type
     /// <summary>Register a class to create hint instances. When a new THint instance is needed, the registered classes are invoked
     /// to create the needed instance.</summary>
     class procedure RegisterClass(const AClass: THintClass);
-    /// <summary>Returns an instance created by the first available registered class. This method can return nil if there are no classes 
+    /// <summary>Returns an instance created by the first available registered class. This method can return nil if there are no classes
     /// registered or none of the registered classes can create a THint instance.</summary>
     class function CreateNewInstance(const AHandle: TWindowHandle): THint;
     /// <summary>Returns True if there are some THint class registered.</summary>
@@ -3645,7 +3645,7 @@ begin
   Result := Touch.InteractiveGestures;
   if Result = [] then
     if (Parent <> nil) and Supports(Parent, IGestureControl, LGObj) then
-      Result := LGObj.GetListOfInteractiveGestures;                 
+      Result := LGObj.GetListOfInteractiveGestures;
 end;
 
 function TControl.GetLocked: Boolean;
@@ -4367,7 +4367,7 @@ begin
     end;
 
   if not Handled and (FParent <> nil) and (EventInfo.GestureID <> sgiNoGesture) and Supports(Parent, IGestureControl, LGObj) then
-    LGObj.CMGesture(EventInfo);                  
+    LGObj.CMGesture(EventInfo);
 end;
 
 procedure TControl.DblClick;
@@ -5974,7 +5974,7 @@ begin
   KillResourceLink;
   if csLoading in ComponentState then
     Exit;
-  Repaint;                             
+  Repaint;
 end;
 
 procedure TStyledControl.AdjustSize;
@@ -7161,7 +7161,7 @@ procedure TTextSettingsInfo.TTextPropLoader.ReadFontFillColor(Reader: TReader);
 var
   LFontColor: TAlphaColor;
 begin
-                                                                                          
+
 {$IFDEF LONGINT64}
   IdentToAlphaColor(Reader.ReadIdent, Integer(LFontColor));
 {$ELSE !LONGINT64}

@@ -23,7 +23,7 @@ const
   /// <summary>Notification. Posted when native UIViewcontroller changed frame of root view.</summary>
   FMXViewControllerFrameChanged = 'FMXViewControllerFrameChanged';
   libobjc = '/usr/lib/libobjc.dylib';
-  
+
 //https://blog.grijjy.com/2017/01/23/using-facebook-sdk-native-framework-for-ios-and-android-for-social-login-and-more-part-1/
 type
   // Moved from implementation
@@ -77,7 +77,7 @@ type
     constructor Create(const AValue: TAppDelegate_applicationDidBecomeActive);
   end;
 //https://blog.grijjy.com/2017/01/23/using-facebook-sdk-native-framework-for-ios-and-android-for-social-login-and-more-part-1/
-  
+
 type
 
   TiOSWindowHandle = class(TWindowHandle)
@@ -123,12 +123,12 @@ implementation
 
 uses
   System.Classes, System.SysUtils, System.Types, System.UITypes, System.TypInfo, System.RTLConsts,
-  System.Math, Macapi.ObjCRuntime, Macapi.CoreFoundation, Macapi.Helpers, iOSapi.CocoaTypes, 
+  System.Math, Macapi.ObjCRuntime, Macapi.CoreFoundation, Macapi.Helpers, iOSapi.CocoaTypes,
   iOSapi.CoreGraphics, iOSapi.Helpers, FMX.Graphics, FMX.Consts, FMX.Controls, FMX.Canvas.GPU, FMX.TextLayout,
   FMX.Text, FMX.Styles, FMX.Gestures, FMX.Context.GLES, FMX.Forms3D, FMX.Utils, FMX.Graphics.iOS, FMX.Context.GLES.iOS,
   FMX.Controls.iOS, FMX.Gestures.iOS, FMX.Helpers.iOS, FMX.Dialogs.iOS, FMX.Platform, FMX.Platform.Timer.iOS,
   FMX.Platform.SaveState.iOS, FMX.MultiTouch.iOS, FMX.Platform.Metrics.iOS, FMX.Platform.Device.iOS,
-  FMX.Platform.Screen.iOS, FMX.Platform.Logger.iOS, 
+  FMX.Platform.Screen.iOS, FMX.Platform.Logger.iOS,
   System.Generics.Collections, ALFmxInertialMovement; //https://blog.grijjy.com/2017/01/23/using-facebook-sdk-native-framework-for-ios-and-android-for-social-login-and-more-part-1/
 
 const
@@ -819,7 +819,7 @@ type
   TFMXTextRange = class;
 
   { TTextServiceCocoa }
-  
+
   TTextServiceCocoa = class(TTextService)
   private
     [Weak] FView: TFMXViewBase;
@@ -942,7 +942,7 @@ type
 
     class function FromUITextRange(const ARange: UITextRange): TFMXTextRange; static;
   end;
-    
+
 function imp_implementationWithBlock(block: id): Pointer; cdecl; external libobjc name _PU + 'imp_implementationWithBlock';
 function imp_removeBlock(anImp: Pointer): Integer; cdecl; external libobjc name _PU + 'imp_removeBlock';
 
@@ -1156,12 +1156,12 @@ class procedure TApplicationDelegate.applicationDidRegisterForRemoteNotification
     Dest: TBytes;
   begin
     Length := Data.length;
-     
+
     SetLength(Src, Length);
     Move(Data.bytes^, Src[0], Length);
     SetLength(Dest, Length * 2);
     BinToHex(Src, 0, Dest, 0, Length);
-    
+
     Result := LowerCase(StringOf(Dest));
   end;
 var
@@ -2155,7 +2155,7 @@ begin
     NSLayoutRelationEqual, NSObjectToID(RootView), NSLayoutAttributeRight, 1, 0));
   Constraint.setActive(True);
 
-                                       
+
 //  Constraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FStatusBar), NSLayoutAttributeTop,
 //    NSLayoutRelationEqual, NSObjectToID(RootView), NSLayoutAttributeTopMargin, 1, 0));
 //  Constraint.setActive(True);
@@ -2720,7 +2720,7 @@ begin
     UIGestureRecognizerStateCancelled:
       State := [TInteractiveGestureFlag.gfEnd];
   end;
-  
+
   MultiTouchManager.HandleRotate(LPoint.ToPointF, -gestureRecognizer.Rotation, State, gestureRecognizer.numberOfTouches);
 end;
 
@@ -3344,7 +3344,7 @@ procedure TFMXViewBase.ShowContextMenu;
   var
     TextInput: ITextInput;
   begin
-    if not FIgnorePosition and FContextMenu.HasControl and (Form <> nil) and (Form.Focused <> nil) and 
+    if not FIgnorePosition and FContextMenu.HasControl and (Form <> nil) and (Form.Focused <> nil) and
       Form.Focused.GetObject.GetInterface(ITextInput, TextInput) then
       FCarretPositionChanged := TextInput.GetTextService.CaretPosition <> FLastCaretPosition
     else
@@ -4556,7 +4556,7 @@ begin
   if AForm is TCustomForm then
   begin
     SystemStatusBar := TCustomForm(AForm).SystemStatusBar;
-    if (SystemStatusBar.Visibility = TFormSystemStatusBar.TVisibilityMode.Visible) and 
+    if (SystemStatusBar.Visibility = TFormSystemStatusBar.TVisibilityMode.Visible) and
        (SystemStatusBar.BackgroundColor = TAlphaColorRec.Null) then
     begin
       if GetUserInterfaceStyle = UIUserInterfaceStyleLight then

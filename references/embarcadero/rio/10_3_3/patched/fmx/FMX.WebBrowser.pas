@@ -54,7 +54,7 @@ type
     /// <summary>
     ///   Method should be called before destruction of native control
     /// </summary>
-    procedure PrepareForDestruction;                                           
+    procedure PrepareForDestruction;
     property URL: string read GetURL write SetURL;
     property EnableCaching: Boolean read GetEnableCaching write SetEnableCaching;
     property CanGoBack: Boolean read GetCanGoBack;

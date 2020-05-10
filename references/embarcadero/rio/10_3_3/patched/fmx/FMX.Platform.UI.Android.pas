@@ -2442,7 +2442,7 @@ begin
     begin
       TopMostFormHandle := TAndroidWindowHandle(TCommonCustomForm(FZOrderForms.Last).Handle);
       TopMostFormHandle.Show;
-      // We activate previous form, as it is required for form functionality like a caret, etc. 
+      // We activate previous form, as it is required for form functionality like a caret, etc.
       // Since Android doesn't know anything about our form activation, we need to do that manually.
       TopMostFormHandle.Form.Activate;
       // If previous form doesn't have allocated surface holder, we should wait when form will take it

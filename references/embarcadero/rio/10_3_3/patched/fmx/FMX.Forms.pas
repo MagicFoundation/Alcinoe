@@ -1392,7 +1392,7 @@ type
 
 var
   GlobalTimerService: IFMXTimerService;
-  
+
 function PropertyValuesFromStream(const ComponentName: string; const Properties: array of string; const Input: TStream): TArray<Variant>; forward;
 function ReadResource(const FormClass: TClass; const PropertyNames: array of string; const PropertyStore : TDictionary<string, Variant>) : Boolean; forward;
 

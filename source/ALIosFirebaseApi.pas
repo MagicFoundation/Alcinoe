@@ -416,7 +416,8 @@ type
   //  FIRMessaging delegate method `messaging:didReceiveRegistrationToken:` to receive current and
   //  updated tokens.
   //  FOUNDATION_EXPORT NSString * __nonnull const FIRMessagingRegistrationTokenRefreshedNotification NS_SWIFT_NAME(MessagingRegistrationTokenRefreshedNotification);
-  //#endif  // defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
+
+  //#endif  // defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
 
 
 Type
@@ -506,7 +507,8 @@ type
     // Delegate to handle FCM token refreshes, and remote data messages received via FCM for devices
     // running iOS 10 or above.
     // @property(nonatomic, weak, nullable) id<FIRMessagingDelegate> delegate;
-    procedure setDelegate(delegate: Pointer); cdecl;
+
+    procedure setDelegate(delegate: Pointer); cdecl;
     function delegate: Pointer; cdecl;
 
     // Delegate to handle remote data messages received via FCM for devices running iOS 10 or above.
@@ -739,7 +741,8 @@ type
     // direct channel (not via APNS). For iOS 9 and below, the FCM data message is delivered via the
     // UIApplicationDelegate's -application:didReceiveRemoteNotification: method.
     // - (void)messaging:(nonnull FIRMessaging *)messaging didReceiveMessage:(nonnull FIRMessagingRemoteMessage *)remoteMessage NS_SWIFT_NAME(messaging(_:didReceive:)) __IOS_AVAILABLE(10.0);
-    [MethodName('messaging:didReceiveMessage:')]
+
+    [MethodName('messaging:didReceiveMessage:')]
     procedure messagingDidReceiveMessage(messaging: FIRMessaging; didReceiveMessage: FIRMessagingRemoteMessage); cdecl;
 
     // The callback to handle data message received via FCM for devices running iOS 10 or above.

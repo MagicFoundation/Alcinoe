@@ -1143,7 +1143,7 @@ Begin
     // created thread to initialize thread-specific variables
     // this look very important because if we comment this and
     // the mysql_thread_end then the Flibrary.unload can take several seconds
-    // you can see this in the ALSQLBenchmark.exe project with the loop update button 
+    // you can see this in the ALSQLBenchmark.exe project with the loop update button
     // http://dev.mysql.com/doc/refman/5.6/en/threaded-clients.html
     CheckAPIError(Nil, FLibrary.mysql_thread_init <> 0);
     inc(_ThreadInitRefCount);
@@ -1177,7 +1177,7 @@ Begin
           end
           else break;
         end;
-        FLastConnectionGarbage := aTickCount;        
+        FLastConnectionGarbage := aTickCount;
       end;
 
       //acquire the new connection from the pool

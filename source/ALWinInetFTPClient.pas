@@ -511,7 +511,7 @@ procedure TALWinInetFTPClient.GetFile(const RemoteFile: AnsiString;
     if wFtpIo_Need_file in InternetOptions then Result := result or INTERNET_FLAG_NEED_FILE;
     if wftpIo_Reload in InternetOptions then Result := result or INTERNET_FLAG_RELOAD;
     if wftpIo_Resynchronize in InternetOptions then Result := result or INTERNET_FLAG_RESYNCHRONIZE;
-    if wftpIo_No_cache_write in InternetOptions then Result := result or INTERNET_FLAG_NO_CACHE_WRITE; //even if the doc of Ms don't say it, we must set this here    
+    if wftpIo_No_cache_write in InternetOptions then Result := result or INTERNET_FLAG_NO_CACHE_WRITE; //even if the doc of Ms don't say it, we must set this here
   end;
 
 var Size,
@@ -605,7 +605,7 @@ function TALWinInetFTPClient.GetFileSize(const filename: AnsiString): Longword;
     if wFtpIo_Need_file in InternetOptions then Result := result or INTERNET_FLAG_NEED_FILE;
     if wftpIo_Reload in InternetOptions then Result := result or INTERNET_FLAG_RELOAD;
     if wftpIo_Resynchronize in InternetOptions then Result := result or INTERNET_FLAG_RESYNCHRONIZE;
-    if wftpIo_No_cache_write in InternetOptions then Result := result or INTERNET_FLAG_NO_CACHE_WRITE; //even if the doc of Ms don't say it, we must set this here    
+    if wftpIo_No_cache_write in InternetOptions then Result := result or INTERNET_FLAG_NO_CACHE_WRITE; //even if the doc of Ms don't say it, we must set this here
   end;
 
 Var hFile: HINTERNET;
@@ -703,7 +703,7 @@ procedure TALWinInetFTPClient.PutFile(const LocalFile: AnsiString;
     if wFtpIo_Need_file in InternetOptions then Result := result or INTERNET_FLAG_NEED_FILE;
     if wftpIo_Reload in InternetOptions then Result := result or INTERNET_FLAG_RELOAD;
     if wftpIo_Resynchronize in InternetOptions then Result := result or INTERNET_FLAG_RESYNCHRONIZE;
-    if wftpIo_No_cache_write in InternetOptions then Result := result or INTERNET_FLAG_NO_CACHE_WRITE; //even if the doc of Ms don't say it, we must set this here    
+    if wftpIo_No_cache_write in InternetOptions then Result := result or INTERNET_FLAG_NO_CACHE_WRITE; //even if the doc of Ms don't say it, we must set this here
   end;
 
 begin

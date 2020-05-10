@@ -210,7 +210,7 @@ type
                                                    // to handle 32-bit integers
                         poSaveInt64AsText,         // JS represents all numbers as double, and with growing integers you loose precision at some point
                                                    // use this option to return Int64 as string
-                        poAllowComments);          // allow comments inside the Json Source file. ex: 
+                        poAllowComments);          // allow comments inside the Json Source file. ex:
                                                    //{
                                                    //  "nodename": "nodevalue",  // your comments here
                                                    //}
@@ -3111,7 +3111,7 @@ Begin
         c := Buffer[BufferPos];
         If (c <= ' ') or (c = ',') then inc(bufferPos)
         else AnalyzeNode;
-      end;    
+      end;
     end;
 
     //some tags are not closed

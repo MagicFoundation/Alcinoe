@@ -1994,7 +1994,7 @@ const
                   if (not Sqlda.FCachedFetch) and        // not stored
                     (BlobData.Size > 0)  then // not null (null if the first one)
                       FreeMem(BlobData.Buffer);
-                      
+
                   if Sqlda.IsNull[Sqlda.FBlobsIndex[i]] then
                   begin
                     BlobData.Size := 0;
@@ -2034,7 +2034,7 @@ const
   var
     i: integer;
     ArrayCount: integer;
-    aStatusVector: TALFBXStatusVector;  
+    aStatusVector: TALFBXStatusVector;
   begin
 
 	  CheckFBXApiCall(isc_dsql_describe(@aStatusVector, @StmtHandle, Dialect, ALFBXGetSQLDAData(Sqlda)), aStatusVector);
@@ -2093,7 +2093,7 @@ const
             src^.SqlScale := dst^.SqlScale;
             src^.SqlInd^ := -1;
           end;
-         Sqlda.AllocateDataBuffer(false); 
+         Sqlda.AllocateDataBuffer(false);
       finally
         FreeMem(da);
       end;
@@ -2705,7 +2705,7 @@ type
         isc_info_blob_max_segment + isc_info_blob_total_length,
         SizeOf(BlobInfos), @BlobInfos), aStatusVector);
 
-    
+
     Value := VarArrayCreate([0, BlobInfos[1].CardType - 1], varByte);
     Len := 0;
     Buffer := VarArrayLock(Value);
@@ -2724,7 +2724,7 @@ type
 
   function TALFBXLibrary.BlobCreate(var DBHandle: IscDbHandle; var TraHandle: IscTrHandle;
     var BlobHandle: IscBlobHandle; BPB: AnsiString = ''): TISCQuad;
-  var aStatusVector: TALFBXStatusVector;  
+  var aStatusVector: TALFBXStatusVector;
   begin
     BPB := ALFBXCreateBlobParams(BPB,';');
 
@@ -2861,7 +2861,7 @@ type
   procedure TALFBXLibrary.SetSegmentSize(Value: Word);
   begin
 
-      Assert(Value > 0); 
+      Assert(Value > 0);
       FSegmentSize := Value;
 
   end;

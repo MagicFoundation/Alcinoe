@@ -155,7 +155,7 @@ type
     procedure setLoginBehavior(loginBehavior: FBSDKLoginBehavior); cdecl;
     function loginBehavior : FBSDKLoginBehavior; cdecl;
     procedure logInWithPermissions(permissions: NSArray;
-                                   fromViewController: UIViewController; 
+                                   fromViewController: UIViewController;
                                    handler: LoginManagerLoginResultBlock); cdecl;
     procedure logOut; cdecl;
   end;

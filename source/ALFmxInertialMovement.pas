@@ -310,7 +310,7 @@ type
   end;
 
 var
-  ALAniCalcTimerProcs: Tlist<TALAniCalculations>; 
+  ALAniCalcTimerProcs: Tlist<TALAniCalculations>;
 
 implementation
 

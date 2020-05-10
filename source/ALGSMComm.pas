@@ -299,7 +299,7 @@ function AlGSMComm_UnicodeToGSM7BitDefaultAlphabet(const aMessage: WideString): 
 
 Var aWideString: WideString;
     ResultCurrentIndex: integer;
-    i: Integer;    
+    i: Integer;
 Begin
   SetLength(result,length(aMessage) * 2);
   ResultCurrentIndex := 1;
@@ -745,7 +745,7 @@ var aLength, I: Integer;
     aFirstOctet: ansiString;
     aDSCOctet: ansiString;
     aUdhLength: Integer;
-    
+
 begin
 
   {init}
@@ -774,7 +774,7 @@ begin
 
   //First octet of this SMS-DELIVER message.
   //Bit no	  7	       6	      5	       4	        3	       2	     1	    0
-  //Name	  TP-RP	  TP-UDHI  	TP-SRI	(unused)	(unused)	TP-MMS	TP-MTI	TP-MTI  
+  //Name	  TP-RP	  TP-UDHI  	TP-SRI	(unused)	(unused)	TP-MMS	TP-MTI	TP-MTI
   aFirstOctet := ALIntToBit(ALStrToInt('$'+AlCopyStr(aPDUMessage,I,2)), 8);
   inc(I,2); //0B913386184131F900006040722172728007F43AA87D0AC301
 
@@ -812,10 +812,10 @@ begin
   //TP-UDHI
   if aFirstOctet[2] = '1' then begin
     aUdhLength := (ALStrToInt('$' + AlCopyStr(aPDUMessage,I,2))) + 1; //6
-    inc(i,aUdhLength * 2);   
+    inc(i,aUdhLength * 2);
   end
   else aUdhLength := 0;
-  
+
   // NumLength is the length of the message
   aLength := Length(aPDUMessage); // 14
 
@@ -824,29 +824,29 @@ begin
   if (aDSCOctet[5] = '0') and (aDSCOctet[6] = '0') then begin
     while I <= aLength - 1 do begin
       aMessage := aMessage + AnsiChar(ALStrToInt(ansiChar('$') + ansiChar(aPDUMessage[I]) + ansiChar(aPDUMessage[I+1])));
-      inc(I,2); 
+      inc(I,2);
     end;
     aMessage := ansiString(AlGSMComm_GSM7BitDefaultAlphabetToUnicode(_7bitPDUToString(aMessage, aUdhLength)))
   end
-  // 8-bit alphabet 
+  // 8-bit alphabet
   else if (aDSCOctet[5] = '0') and (aDSCOctet[6] = '1') then begin
     while I <= aLength - 1 do begin
       aMessage := aMessage + AnsiChar(ALStrToInt(ansiChar('$') + ansiChar(aPDUMessage[I]) + ansiChar(aPDUMessage[I+1])));
-      inc(I,2); 
+      inc(I,2);
     end;
-  end  
-  // 16-bit alphabet 
+  end
+  // 16-bit alphabet
   else if (aDSCOctet[5] = '1') and (aDSCOctet[6] = '0') then begin
     while I <= aLength - 3 do begin
-      aMessage := aMessage + ansiString( WideChar(ALStrToInt(ansiChar('$') + 
-                                                             ansiChar(aPDUMessage[I]) + 
-                                                             ansiChar(aPDUMessage[I+1]) + 
-                                                             ansiChar(aPDUMessage[I+2]) + 
+      aMessage := aMessage + ansiString( WideChar(ALStrToInt(ansiChar('$') +
+                                                             ansiChar(aPDUMessage[I]) +
+                                                             ansiChar(aPDUMessage[I+1]) +
+                                                             ansiChar(aPDUMessage[I+2]) +
                                                              ansiChar(aPDUMessage[I+3]))));
       inc(I,4);
-    end;                                                     
+    end;
   end;
-  
+
 end;
 
 {**********************************************}

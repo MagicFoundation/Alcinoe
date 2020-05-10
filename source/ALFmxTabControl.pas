@@ -53,6 +53,7 @@ type
     property Margins;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     procedure SetBounds(X, Y, AWidth, AHeight: Single); override;
     property TabControl: TALTabControl read FTabControl;
     property ViewPortOffset: single read fViewPortOffset;
@@ -112,6 +113,7 @@ type
     fOnAniTransitionInit: TALTabAniTransitionInit;
     fOnAniStart: TnotifyEvent;
     fOnAniStop: TnotifyEvent;
+    fOnAniProcess: TnotifyEvent;
     fMouseDownPos: single;
     FDeadZoneBeforeAcquireScrolling: Integer;
     fScrollingAcquiredByMe: boolean;
@@ -126,6 +128,7 @@ type
     procedure setAnimationEnabled(const Value: boolean);
     procedure AniTransitionSlideProcess(Sender: TObject);
     procedure AniTransitionSlideFinish(Sender: TObject);
+    procedure AniTransitionFadeOutProcess(Sender: TObject);
     procedure AniTransitionFadeOutFinish(Sender: TObject);
     { IItemContainer }
     function GetItemsCount: Integer;
@@ -230,6 +233,7 @@ type
     property OnAniTransitionInit: TALTabAniTransitionInit read fOnAniTransitionInit write fOnAniTransitionInit;
     property OnAniStart: TnotifyEvent read fOnAniStart write fOnAniStart;
     property OnAniStop: TnotifyEvent read fOnAniStop write fOnAniStop;
+    property OnAniProcess: TnotifyEvent read fOnAniProcess write fOnAniProcess;
   end;
 
 procedure Register;
@@ -259,6 +263,18 @@ begin
                         // when the tab (all the tab) is first created, it's created at a visible pos to be later realigned
                         // by the tabcontrol. this cause the TALEdit to be show for very short time, waiting the realignment
                         // so workaround is to create instead the Tabitem at an invisible position
+end;
+
+{****************************}
+destructor TALTabItem.Destroy;
+begin
+  if (FTabControl <> nil) and
+     (fTabControl.FAniTransition <> nil) and
+     (fTabControl.FAniTransition.Parent = self) then begin
+    TabControl.FAniTransition.Enabled := False;
+    TabControl.FAniTransition.Parent := nil;
+  end;
+  inherited;
 end;
 
 {************************************************************}
@@ -455,6 +471,7 @@ begin
   fOnAniTransitionInit := nil;
   fOnAniStart := nil;
   fOnAniStop := nil;
+  fOnAniProcess := nil;
   //-----
   FTabCount := 0;
   FMouseEvents := False;
@@ -991,6 +1008,11 @@ begin
     FOnViewportPositionChange(self, fLastViewportPosition, aNewViewportPosition);
   fLastViewportPosition := aNewViewportPosition;
 
+  //fire the fOnAniProcess
+  if (assigned(fOnAniProcess)) and
+     (not fAniCalculations.down) then
+    fOnAniProcess(Self);
+
 end;
 
 {****************************************************************}
@@ -999,6 +1021,13 @@ begin
   if (assigned(fOnAniStop)) and
      (not fAniCalculations.down) then
     fOnAniStop(Self);
+end;
+
+{*******************************************************************}
+procedure TALTabControl.AniTransitionFadeOutProcess(Sender: TObject);
+begin
+  if (assigned(fOnAniProcess)) then
+    fOnAniProcess(Self);
 end;
 
 {******************************************************************}
@@ -1065,7 +1094,7 @@ begin
 
     FAniTransition.Parent := ActiveTab;
     FAniTransition.TagObject := ATab;
-    FAniTransition.OnProcess := nil;
+    FAniTransition.OnProcess := AniTransitionFadeOutProcess;
     FaniTransition.OnFinish := AniTransitionFadeOutFinish;
     FAniTransition.PropertyName := 'Opacity';
     FAniTransition.StartFromCurrent := True;

@@ -14,7 +14,7 @@ interface
 {$IFEND}
 
 uses system.classes;
-     
+
 type
 
   {class defintion----------------}

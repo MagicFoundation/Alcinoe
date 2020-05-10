@@ -12,7 +12,7 @@ interface
 
 uses winapi.windows,
      system.classes;
-     
+
 {$IF CompilerVersion < 18.5}
 Type
   TStartupInfoA = TStartupInfo;

@@ -3,49 +3,61 @@
 call "C:\Program Files (x86)\Embarcadero\Studio\20.0\bin\rsvars.bat"
 IF ERRORLEVEL 1 goto ERROR
 
+FOR %%a IN ("%%~dp0") DO set "ProjectDir=%%~dpa"
+IF %ProjectDir:~-1%==\ SET ProjectDir=%ProjectDir:~0,-1%
+
 set INPUT=
 set /P INPUT=Build demos (Y/N)?: %=%
 
-SET FileName=*.skincfg
+call %ProjectDir%\tools\UnitNormalizer\UnitNormalizer.exe "%ProjectDir%\source\" "false"
+IF ERRORLEVEL 1 goto ERROR
+
+call %ProjectDir%\tools\UnitNormalizer\UnitNormalizer.exe "%ProjectDir%\demos\" "false"
+IF ERRORLEVEL 1 goto ERROR
+
+call %ProjectDir%\tools\UnitNormalizer\UnitNormalizer.exe "%ProjectDir%\tools\" "false"
+IF ERRORLEVEL 1 goto ERROR
+
+SET FileName=%ProjectDir%\*.skincfg
 del %FileName% /s
 if exist %FileName% goto ERROR
 
-SET FileName=*.rsm
+SET FileName=%ProjectDir%\*.rsm
 del %FileName% /s
 if exist %FileName% goto ERROR
 
-SET FileName=*.stat
+SET FileName=%ProjectDir%\*.stat
 del %FileName% /s
 if exist %FileName% goto ERROR
 
-SET FileName=*.identcache
+SET FileName=%ProjectDir%\*.identcache
 del %FileName% /s
 if exist %FileName% goto ERROR
 
-SET FileName=*.dproj.local
+SET FileName=%ProjectDir%\*.dproj.local
 del %FileName% /s
 if exist %FileName% goto ERROR
 
-SET FileName=*.deployproj.local
+SET FileName=%ProjectDir%\*.deployproj.local
 del %FileName% /s
 if exist %FileName% goto ERROR
 
-SET FileName=source\dcu\Win32\rio
+SET FileName=%ProjectDir%\source\dcu\Win32\rio
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 mkdir %FileName%
 
-SET FileName=source\hpp\Win32\rio
+SET FileName=%ProjectDir%\source\hpp\Win32\rio
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 mkdir %FileName%
 
-SET FileName=lib\bpl\alcinoe\Win32\rio
+SET FileName=%ProjectDir%\lib\bpl\alcinoe\Win32\rio
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 mkdir %FileName%
 
-MSBuild source\Alcinoe_rio.dproj /p:Config=Release /p:Platform=Win32
+MSBuild %ProjectDir%\source\Alcinoe_rio.dproj /p:Config=Release /p:Platform=Win32
 IF ERRORLEVEL 1 goto ERROR
 
 call compilejar.bat off
@@ -57,11 +69,11 @@ goto FINISHED
 
 :BUILD_DEMOS
 
-SET FileName=demos\*.vlb
+SET FileName=%ProjectDir%\demos\*.vlb
 del %FileName% /s
 if exist %FileName% goto ERROR
 
-CHDIR demos\
+CHDIR %ProjectDir%\demos\
 FOR /d /R %%J IN (Android) DO (	  
   Echo.%%J | findstr /C:"_source">nul && (
     REM do not delete inside /_source/
@@ -71,9 +83,9 @@ FOR /d /R %%J IN (Android) DO (
     if EXIST %%J goto ERROR
   )
 )
-CHDIR ..
+CHDIR %ProjectDir%\
 
-CHDIR demos\
+CHDIR %ProjectDir%\demos\
 FOR /d /R %%J IN (Android64) DO (	  
   Echo.%%J | findstr /C:"_source">nul && (
     REM do not delete inside /_source/
@@ -83,9 +95,9 @@ FOR /d /R %%J IN (Android64) DO (
     if EXIST %%J goto ERROR
   )
 )
-CHDIR ..
+CHDIR %ProjectDir%\
 
-CHDIR demos\
+CHDIR %ProjectDir%\demos\
 FOR /d /R %%J IN (iOSSimulator) DO (	  
   Echo.%%J | findstr /C:"_source">nul && (
     REM do not delete inside /_source/
@@ -95,9 +107,9 @@ FOR /d /R %%J IN (iOSSimulator) DO (
     if EXIST %%J goto ERROR
   )
 )
-CHDIR ..
+CHDIR %ProjectDir%\
 
-CHDIR demos\
+CHDIR %ProjectDir%\demos\
 FOR /d /R %%J IN (iOSDevice32) DO (	  
   Echo.%%J | findstr /C:"_source">nul && (
     REM do not delete inside /_source/
@@ -107,9 +119,9 @@ FOR /d /R %%J IN (iOSDevice32) DO (
     if EXIST %%J goto ERROR
   )
 )
-CHDIR ..
+CHDIR %ProjectDir%\
 
-CHDIR demos\
+CHDIR %ProjectDir%\demos\
 FOR /d /R %%J IN (iOSDevice64) DO (	  
   Echo.%%J | findstr /C:"_source">nul && (
     REM do not delete inside /_source/
@@ -119,9 +131,9 @@ FOR /d /R %%J IN (iOSDevice64) DO (
     if EXIST %%J goto ERROR
   )
 )
-CHDIR ..
+CHDIR %ProjectDir%\
 
-CHDIR demos\
+CHDIR %ProjectDir%\demos\
 FOR /d /R %%J IN (Osx32) DO (	  
   Echo.%%J | findstr /C:"_source">nul && (
     REM do not delete inside /_source/
@@ -131,9 +143,9 @@ FOR /d /R %%J IN (Osx32) DO (
     if EXIST %%J goto ERROR
   )
 )
-CHDIR ..
+CHDIR %ProjectDir%\
 
-CHDIR demos\
+CHDIR %ProjectDir%\demos\
 FOR /d /R %%J IN (win32) DO (	  
   Echo.%%J | findstr /C:"_source">nul && (
     REM do not delete inside /_source/
@@ -143,9 +155,9 @@ FOR /d /R %%J IN (win32) DO (
     if EXIST %%J goto ERROR
   )
 )
-CHDIR ..
+CHDIR %ProjectDir%\
 
-CHDIR demos\
+CHDIR %ProjectDir%\demos\
 FOR /d /R %%J IN (win64) DO (	  
   Echo.%%J | findstr /C:"_source">nul && (
     REM do not delete inside /_source/
@@ -155,9 +167,9 @@ FOR /d /R %%J IN (win64) DO (
     if EXIST %%J goto ERROR
   )
 )
-CHDIR ..
+CHDIR %ProjectDir%\
 
-CHDIR demos\
+CHDIR %ProjectDir%\demos\
 FOR /d /R %%J IN (dcu) DO (	
   IF EXIST %%J echo rmdir - %%J			
   IF EXIST %%J (
@@ -166,9 +178,9 @@ FOR /d /R %%J IN (dcu) DO (
     mkdir %%J
   )
 )
-CHDIR ..
+CHDIR %ProjectDir%\
 
-CHDIR demos\
+CHDIR %ProjectDir%\demos\
 FOR /R %%J IN (*.dproj) DO (	
   echo %%J			
   MSBuild %%J /p:Config=Release /p:Platform=Win32 /t:Build
@@ -176,9 +188,9 @@ FOR /R %%J IN (*.dproj) DO (
   MSBuild %%J /p:Config=Release /p:Platform=Win64 /t:Build
   IF ERRORLEVEL 1 PAUSE
 )
-CHDIR ..
+CHDIR %ProjectDir%\
 
-CHDIR demos\
+CHDIR %ProjectDir%\demos\
 MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=Android /t:Build
 IF ERRORLEVEL 1 PAUSE
 MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=Android /t:Deploy
@@ -195,9 +207,9 @@ MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=
 IF ERRORLEVEL 1 PAUSE
 REM MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=OSX32 /t:Build
 REM IF ERRORLEVEL 1 PAUSE
-CHDIR ..
+CHDIR %ProjectDir%\
 
-CHDIR demos\
+CHDIR %ProjectDir%\demos\
 MSBuild ALFirebaseMessagingDemo\_source\ALFirebaseMessagingDemo.dproj /p:Config=Release /p:Platform=Android /t:Build
 IF ERRORLEVEL 1 PAUSE
 MSBuild ALFirebaseMessagingDemo\_source\ALFirebaseMessagingDemo.dproj /p:Config=Release /p:Platform=Android /t:Deploy
@@ -214,9 +226,9 @@ MSBuild ALFirebaseMessagingDemo\_source\ALFirebaseMessagingDemo.dproj /p:Config=
 IF ERRORLEVEL 1 PAUSE
 REM MSBuild ALFirebaseMessagingDemo\_source\ALFirebaseMessagingDemo.dproj /p:Config=Release /p:Platform=OSX32 /t:Build
 REM IF ERRORLEVEL 1 PAUSE
-CHDIR ..
+CHDIR %ProjectDir%\
 
-CHDIR demos\
+CHDIR %ProjectDir%\demos\
 MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=Android /t:Build
 IF ERRORLEVEL 1 PAUSE
 MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=Android /t:Deploy
@@ -233,9 +245,9 @@ MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platf
 IF ERRORLEVEL 1 PAUSE
 REM MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=OSX32 /t:Build
 REM IF ERRORLEVEL 1 PAUSE
-CHDIR ..
+CHDIR %ProjectDir%\
 
-CHDIR demos\
+CHDIR %ProjectDir%\demos\
 MSBuild ALFmxEffects\_source\ALFmxEffects.dproj /p:Config=Release /p:Platform=Android /t:Build
 IF ERRORLEVEL 1 PAUSE
 MSBuild ALFmxEffects\_source\ALFmxEffects.dproj /p:Config=Release /p:Platform=Android /t:Deploy
@@ -252,9 +264,9 @@ MSBuild ALFmxEffects\_source\ALFmxEffects.dproj /p:Config=Release /p:Platform=iO
 IF ERRORLEVEL 1 PAUSE
 REM MSBuild ALFmxEffects\_source\ALFmxEffects.dproj /p:Config=Release /p:Platform=OSX32 /t:Build
 REM IF ERRORLEVEL 1 PAUSE
-CHDIR ..
+CHDIR %ProjectDir%\
 
-CHDIR demos\
+CHDIR %ProjectDir%\demos\
 MSBuild ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj /p:Config=Release /p:Platform=Android /t:Build
 IF ERRORLEVEL 1 PAUSE
 MSBuild ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj /p:Config=Release /p:Platform=Android /t:Deploy
@@ -271,128 +283,128 @@ MSBuild ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj /p:Config=Rel
 IF ERRORLEVEL 1 PAUSE
 REM MSBuild ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj /p:Config=Release /p:Platform=OSX32 /t:Build
 REM IF ERRORLEVEL 1 PAUSE
-CHDIR ..
+CHDIR %ProjectDir%\
 
 SET FileName=ALFmxControls
-xcopy demos\%FileName%\Android\Release\%FileName%\bin\%FileName%.apk demos\%FileName%\Android 
+xcopy %ProjectDir%\demos\%FileName%\Android\Release\%FileName%\bin\%FileName%.apk %ProjectDir%\demos\%FileName%\Android 
 IF ERRORLEVEL 1 goto ERROR
-IF EXIST demos\%FileName%\Android\Release rmdir /s /q demos\%FileName%\Android\Release
-IF EXIST demos\%FileName%\Android\Release goto ERROR
-mkdir demos\%FileName%\Android\Release\%FileName%\bin\
+IF EXIST %ProjectDir%\demos\%FileName%\Android\Release rmdir /s /q %ProjectDir%\demos\%FileName%\Android\Release
+IF EXIST %ProjectDir%\demos\%FileName%\Android\Release goto ERROR
+mkdir %ProjectDir%\demos\%FileName%\Android\Release\%FileName%\bin\
 IF ERRORLEVEL 1 goto ERROR
-xcopy demos\%FileName%\Android\%FileName%.apk demos\%FileName%\Android\Release\%FileName%\bin 
+xcopy %ProjectDir%\demos\%FileName%\Android\%FileName%.apk %ProjectDir%\demos\%FileName%\Android\Release\%FileName%\bin 
 IF ERRORLEVEL 1 goto ERROR
-del demos\%FileName%\Android\%FileName%.apk
+del %ProjectDir%\demos\%FileName%\Android\%FileName%.apk
 if exist %FileName% goto ERROR
 
-xcopy demos\%FileName%\Android64\Release\%FileName%\bin\%FileName%.apk demos\%FileName%\Android64 
+xcopy %ProjectDir%\demos\%FileName%\Android64\Release\%FileName%\bin\%FileName%.apk %ProjectDir%\demos\%FileName%\Android64 
 IF ERRORLEVEL 1 goto ERROR
-IF EXIST demos\%FileName%\Android64\Release rmdir /s /q demos\%FileName%\Android64\Release
-IF EXIST demos\%FileName%\Android64\Release goto ERROR
-mkdir demos\%FileName%\Android64\Release\%FileName%\bin\
+IF EXIST %ProjectDir%\demos\%FileName%\Android64\Release rmdir /s /q %ProjectDir%\demos\%FileName%\Android64\Release
+IF EXIST %ProjectDir%\demos\%FileName%\Android64\Release goto ERROR
+mkdir %ProjectDir%\demos\%FileName%\Android64\Release\%FileName%\bin\
 IF ERRORLEVEL 1 goto ERROR
-xcopy demos\%FileName%\Android64\%FileName%.apk demos\%FileName%\Android64\Release\%FileName%\bin 
+xcopy %ProjectDir%\demos\%FileName%\Android64\%FileName%.apk %ProjectDir%\demos\%FileName%\Android64\Release\%FileName%\bin 
 IF ERRORLEVEL 1 goto ERROR
-del demos\%FileName%\Android64\%FileName%.apk
+del %ProjectDir%\demos\%FileName%\Android64\%FileName%.apk
 if exist %FileName% goto ERROR
 
 
 SET FileName=ALFirebaseMessagingDemo
-xcopy demos\%FileName%\Android\Release\%FileName%\bin\%FileName%.apk demos\%FileName%\Android 
+xcopy %ProjectDir%\demos\%FileName%\Android\Release\%FileName%\bin\%FileName%.apk %ProjectDir%\demos\%FileName%\Android 
 IF ERRORLEVEL 1 goto ERROR
-IF EXIST demos\%FileName%\Android\Release rmdir /s /q demos\%FileName%\Android\Release
-IF EXIST demos\%FileName%\Android\Release goto ERROR
-mkdir demos\%FileName%\Android\Release\%FileName%\bin\
+IF EXIST %ProjectDir%\demos\%FileName%\Android\Release rmdir /s /q %ProjectDir%\demos\%FileName%\Android\Release
+IF EXIST %ProjectDir%\demos\%FileName%\Android\Release goto ERROR
+mkdir %ProjectDir%\demos\%FileName%\Android\Release\%FileName%\bin\
 IF ERRORLEVEL 1 goto ERROR
-xcopy demos\%FileName%\Android\%FileName%.apk demos\%FileName%\Android\Release\%FileName%\bin 
+xcopy %ProjectDir%\demos\%FileName%\Android\%FileName%.apk %ProjectDir%\demos\%FileName%\Android\Release\%FileName%\bin 
 IF ERRORLEVEL 1 goto ERROR
-del demos\%FileName%\Android\%FileName%.apk
+del %ProjectDir%\demos\%FileName%\Android\%FileName%.apk
 if exist %FileName% goto ERROR
 
-xcopy demos\%FileName%\Android64\Release\%FileName%\bin\%FileName%.apk demos\%FileName%\Android64 
+xcopy %ProjectDir%\demos\%FileName%\Android64\Release\%FileName%\bin\%FileName%.apk %ProjectDir%\demos\%FileName%\Android64 
 IF ERRORLEVEL 1 goto ERROR
-IF EXIST demos\%FileName%\Android64\Release rmdir /s /q demos\%FileName%\Android64\Release
-IF EXIST demos\%FileName%\Android64\Release goto ERROR
-mkdir demos\%FileName%\Android64\Release\%FileName%\bin\
+IF EXIST %ProjectDir%\demos\%FileName%\Android64\Release rmdir /s /q %ProjectDir%\demos\%FileName%\Android64\Release
+IF EXIST %ProjectDir%\demos\%FileName%\Android64\Release goto ERROR
+mkdir %ProjectDir%\demos\%FileName%\Android64\Release\%FileName%\bin\
 IF ERRORLEVEL 1 goto ERROR
-xcopy demos\%FileName%\Android64\%FileName%.apk demos\%FileName%\Android64\Release\%FileName%\bin 
+xcopy %ProjectDir%\demos\%FileName%\Android64\%FileName%.apk %ProjectDir%\demos\%FileName%\Android64\Release\%FileName%\bin 
 IF ERRORLEVEL 1 goto ERROR
-del demos\%FileName%\Android64\%FileName%.apk
+del %ProjectDir%\demos\%FileName%\Android64\%FileName%.apk
 if exist %FileName% goto ERROR
 
 
 SET FileName=ALFacebookLogin
-xcopy demos\%FileName%\Android\Release\%FileName%\bin\%FileName%.apk demos\%FileName%\Android 
+xcopy %ProjectDir%\demos\%FileName%\Android\Release\%FileName%\bin\%FileName%.apk %ProjectDir%\demos\%FileName%\Android 
 IF ERRORLEVEL 1 goto ERROR
-IF EXIST demos\%FileName%\Android\Release rmdir /s /q demos\%FileName%\Android\Release
-IF EXIST demos\%FileName%\Android\Release goto ERROR
-mkdir demos\%FileName%\Android\Release\%FileName%\bin\
+IF EXIST %ProjectDir%\demos\%FileName%\Android\Release rmdir /s /q %ProjectDir%\demos\%FileName%\Android\Release
+IF EXIST %ProjectDir%\demos\%FileName%\Android\Release goto ERROR
+mkdir %ProjectDir%\demos\%FileName%\Android\Release\%FileName%\bin\
 IF ERRORLEVEL 1 goto ERROR
-xcopy demos\%FileName%\Android\%FileName%.apk demos\%FileName%\Android\Release\%FileName%\bin 
+xcopy %ProjectDir%\demos\%FileName%\Android\%FileName%.apk %ProjectDir%\demos\%FileName%\Android\Release\%FileName%\bin 
 IF ERRORLEVEL 1 goto ERROR
-del demos\%FileName%\Android\%FileName%.apk
+del %ProjectDir%\demos\%FileName%\Android\%FileName%.apk
 if exist %FileName% goto ERROR
 
-xcopy demos\%FileName%\Android64\Release\%FileName%\bin\%FileName%.apk demos\%FileName%\Android64 
+xcopy %ProjectDir%\demos\%FileName%\Android64\Release\%FileName%\bin\%FileName%.apk %ProjectDir%\demos\%FileName%\Android64 
 IF ERRORLEVEL 1 goto ERROR
-IF EXIST demos\%FileName%\Android64\Release rmdir /s /q demos\%FileName%\Android64\Release
-IF EXIST demos\%FileName%\Android64\Release goto ERROR
-mkdir demos\%FileName%\Android64\Release\%FileName%\bin\
+IF EXIST %ProjectDir%\demos\%FileName%\Android64\Release rmdir /s /q %ProjectDir%\demos\%FileName%\Android64\Release
+IF EXIST %ProjectDir%\demos\%FileName%\Android64\Release goto ERROR
+mkdir %ProjectDir%\demos\%FileName%\Android64\Release\%FileName%\bin\
 IF ERRORLEVEL 1 goto ERROR
-xcopy demos\%FileName%\Android64\%FileName%.apk demos\%FileName%\Android64\Release\%FileName%\bin 
+xcopy %ProjectDir%\demos\%FileName%\Android64\%FileName%.apk %ProjectDir%\demos\%FileName%\Android64\Release\%FileName%\bin 
 IF ERRORLEVEL 1 goto ERROR
-del demos\%FileName%\Android64\%FileName%.apk
+del %ProjectDir%\demos\%FileName%\Android64\%FileName%.apk
 if exist %FileName% goto ERROR
 
 
 SET FileName=ALFmxEffects
-xcopy demos\%FileName%\Android\Release\%FileName%\bin\%FileName%.apk demos\%FileName%\Android 
+xcopy %ProjectDir%\demos\%FileName%\Android\Release\%FileName%\bin\%FileName%.apk %ProjectDir%\demos\%FileName%\Android 
 IF ERRORLEVEL 1 goto ERROR
-IF EXIST demos\%FileName%\Android\Release rmdir /s /q demos\%FileName%\Android\Release
-IF EXIST demos\%FileName%\Android\Release goto ERROR
-mkdir demos\%FileName%\Android\Release\%FileName%\bin\
+IF EXIST %ProjectDir%\demos\%FileName%\Android\Release rmdir /s /q %ProjectDir%\demos\%FileName%\Android\Release
+IF EXIST %ProjectDir%\demos\%FileName%\Android\Release goto ERROR
+mkdir %ProjectDir%\demos\%FileName%\Android\Release\%FileName%\bin\
 IF ERRORLEVEL 1 goto ERROR
-xcopy demos\%FileName%\Android\%FileName%.apk demos\%FileName%\Android\Release\%FileName%\bin 
+xcopy %ProjectDir%\demos\%FileName%\Android\%FileName%.apk %ProjectDir%\demos\%FileName%\Android\Release\%FileName%\bin 
 IF ERRORLEVEL 1 goto ERROR
-del demos\%FileName%\Android\%FileName%.apk
+del %ProjectDir%\demos\%FileName%\Android\%FileName%.apk
 if exist %FileName% goto ERROR
 
-xcopy demos\%FileName%\Android64\Release\%FileName%\bin\%FileName%.apk demos\%FileName%\Android64 
+xcopy %ProjectDir%\demos\%FileName%\Android64\Release\%FileName%\bin\%FileName%.apk %ProjectDir%\demos\%FileName%\Android64 
 IF ERRORLEVEL 1 goto ERROR
-IF EXIST demos\%FileName%\Android64\Release rmdir /s /q demos\%FileName%\Android64\Release
-IF EXIST demos\%FileName%\Android64\Release goto ERROR
-mkdir demos\%FileName%\Android64\Release\%FileName%\bin\
+IF EXIST %ProjectDir%\demos\%FileName%\Android64\Release rmdir /s /q %ProjectDir%\demos\%FileName%\Android64\Release
+IF EXIST %ProjectDir%\demos\%FileName%\Android64\Release goto ERROR
+mkdir %ProjectDir%\demos\%FileName%\Android64\Release\%FileName%\bin\
 IF ERRORLEVEL 1 goto ERROR
-xcopy demos\%FileName%\Android64\%FileName%.apk demos\%FileName%\Android64\Release\%FileName%\bin 
+xcopy %ProjectDir%\demos\%FileName%\Android64\%FileName%.apk %ProjectDir%\demos\%FileName%\Android64\Release\%FileName%\bin 
 IF ERRORLEVEL 1 goto ERROR
-del demos\%FileName%\Android64\%FileName%.apk
+del %ProjectDir%\demos\%FileName%\Android64\%FileName%.apk
 if exist %FileName% goto ERROR
 
 
 SET FileName=ALLiveVideoChatClient
-xcopy demos\ALLiveVideoChat\client\Android\Release\%FileName%\bin\%FileName%.apk demos\ALLiveVideoChat\client\Android 
+xcopy %ProjectDir%\demos\ALLiveVideoChat\client\Android\Release\%FileName%\bin\%FileName%.apk %ProjectDir%\demos\ALLiveVideoChat\client\Android 
 IF ERRORLEVEL 1 goto ERROR
-IF EXIST demos\ALLiveVideoChat\client\Android\Release rmdir /s /q demos\ALLiveVideoChat\client\Android\Release
-IF EXIST demos\ALLiveVideoChat\client\Android\Release goto ERROR
-mkdir demos\ALLiveVideoChat\client\Android\Release\%FileName%\bin\
+IF EXIST %ProjectDir%\demos\ALLiveVideoChat\client\Android\Release rmdir /s /q %ProjectDir%\demos\ALLiveVideoChat\client\Android\Release
+IF EXIST %ProjectDir%\demos\ALLiveVideoChat\client\Android\Release goto ERROR
+mkdir %ProjectDir%\demos\ALLiveVideoChat\client\Android\Release\%FileName%\bin\
 IF ERRORLEVEL 1 goto ERROR
-xcopy demos\ALLiveVideoChat\client\Android\%FileName%.apk demos\ALLiveVideoChat\client\Android\Release\%FileName%\bin 
+xcopy %ProjectDir%\demos\ALLiveVideoChat\client\Android\%FileName%.apk %ProjectDir%\demos\ALLiveVideoChat\client\Android\Release\%FileName%\bin 
 IF ERRORLEVEL 1 goto ERROR
-del demos\ALLiveVideoChat\client\Android\%FileName%.apk
+del %ProjectDir%\demos\ALLiveVideoChat\client\Android\%FileName%.apk
 if exist %FileName% goto ERROR
 
-xcopy demos\ALLiveVideoChat\client\Android64\Release\%FileName%\bin\%FileName%.apk demos\ALLiveVideoChat\client\Android64 
+xcopy %ProjectDir%\demos\ALLiveVideoChat\client\Android64\Release\%FileName%\bin\%FileName%.apk %ProjectDir%\demos\ALLiveVideoChat\client\Android64 
 IF ERRORLEVEL 1 goto ERROR
-IF EXIST demos\ALLiveVideoChat\client\Android64\Release rmdir /s /q demos\ALLiveVideoChat\client\Android64\Release
-IF EXIST demos\ALLiveVideoChat\client\Android64\Release goto ERROR
-mkdir demos\ALLiveVideoChat\client\Android64\Release\%FileName%\bin\
+IF EXIST %ProjectDir%\demos\ALLiveVideoChat\client\Android64\Release rmdir /s /q %ProjectDir%\demos\ALLiveVideoChat\client\Android64\Release
+IF EXIST %ProjectDir%\demos\ALLiveVideoChat\client\Android64\Release goto ERROR
+mkdir %ProjectDir%\demos\ALLiveVideoChat\client\Android64\Release\%FileName%\bin\
 IF ERRORLEVEL 1 goto ERROR
-xcopy demos\ALLiveVideoChat\client\Android64\%FileName%.apk demos\ALLiveVideoChat\client\Android64\Release\%FileName%\bin 
+xcopy %ProjectDir%\demos\ALLiveVideoChat\client\Android64\%FileName%.apk %ProjectDir%\demos\ALLiveVideoChat\client\Android64\Release\%FileName%\bin 
 IF ERRORLEVEL 1 goto ERROR
-del demos\ALLiveVideoChat\client\Android64\%FileName%.apk
+del %ProjectDir%\demos\ALLiveVideoChat\client\Android64\%FileName%.apk
 if exist %FileName% goto ERROR
 
-CHDIR demos\
+CHDIR %ProjectDir%\demos\
 FOR /d /R %%J IN (dcu) DO (	
   IF EXIST %%J echo rmdir - %%J			
   IF EXIST %%J (
@@ -401,9 +413,9 @@ FOR /d /R %%J IN (dcu) DO (
     mkdir %%J
   )
 )
-CHDIR ..
+CHDIR %ProjectDir%\
 
-CHDIR demos\
+CHDIR %ProjectDir%\demos\
 FOR /d /R %%J IN (iOSDevice32) DO (	  
   Echo.%%J | findstr /C:"_source">nul && (
     REM do not delete inside /_source/
@@ -413,9 +425,9 @@ FOR /d /R %%J IN (iOSDevice32) DO (
     if EXIST %%J goto ERROR
   )
 )
-CHDIR ..
+CHDIR %ProjectDir%\
 
-CHDIR demos\
+CHDIR %ProjectDir%\demos\
 FOR /d /R %%J IN (iOSDevice64) DO (	  
   Echo.%%J | findstr /C:"_source">nul && (
     REM do not delete inside /_source/
@@ -425,18 +437,18 @@ FOR /d /R %%J IN (iOSDevice64) DO (
     if EXIST %%J goto ERROR
   )
 )
-CHDIR ..
+CHDIR %ProjectDir%\
 
-xcopy lib\dll\tbbmalloc\win32\tbbmalloc.dll demos\ALDatabaseBenchmark\win32 /s
+xcopy %ProjectDir%\lib\dll\tbbmalloc\win32\tbbmalloc.dll %ProjectDir%\demos\ALDatabaseBenchmark\win32 /s
 IF ERRORLEVEL 1 goto ERROR
 
-xcopy lib\dll\tbbmalloc\win64\tbbmalloc.dll demos\ALDatabaseBenchmark\win64 /s
+xcopy %ProjectDir%\lib\dll\tbbmalloc\win64\tbbmalloc.dll %ProjectDir%\demos\ALDatabaseBenchmark\win64 /s
 IF ERRORLEVEL 1 goto ERROR
 
 
 :FINISHED
 
-SET FileName=source\dcu\Win32\rio
+SET FileName=%ProjectDir%\source\dcu\Win32\rio
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 mkdir %FileName%

@@ -48,6 +48,7 @@ function  AlGetImageSignature(const aFileName: string): Tbytes; overload;
 function  AlDetectImageExtensionU(const aStream: TStream): String; overload;
 function  AlDetectImageExtensionU(const aFileName: string): String; overload;
 function  ALPrepareColor(const SrcColor: TAlphaColor; const Opacity: Single): TAlphaColor;
+function  ALAlphaBlendColors(const aBackToFrontColors: array of TAlphaColor): TAlphaColor;
 
 {$IF defined(ANDROID)}
 function ALJBitmaptoTexture(const aBitmap: Jbitmap): TTexture;
@@ -6997,6 +6998,26 @@ begin
     Result := PremultiplyAlpha(SrcColor)
   else
     Result := SrcColor;
+end;
+
+{****************************************************************************************}
+function  ALAlphaBlendColors(const aBackToFrontColors: array of TAlphaColor): TAlphaColor;
+Var LBelow: TalphaColorF;
+    LAbove: TalphaColorF;
+    LMixed: TalphaColorF;
+    i: integer;
+begin
+  if length(aBackToFrontColors) = 0 then exit(TalphaColorRec.Null);
+  LMixed := TalphaColorF.Create(aBackToFrontColors[Low(aBackToFrontColors)]);
+  for I := Low(aBackToFrontColors) + 1 to High(aBackToFrontColors) do begin
+    LBelow := LMixed;
+    LAbove := TalphaColorF.Create(aBackToFrontColors[I]);
+    LMixed.a := (1-LAbove.a)*LBelow.a + LAbove.a;
+    LMixed.r := ((1-LAbove.a)*LBelow.a*LBelow.r + LAbove.a*LAbove.r) / LMixed.a;
+    LMixed.g := ((1-LAbove.a)*LBelow.a*LBelow.g + LAbove.a*LAbove.g) / LMixed.a;
+    LMixed.b := ((1-LAbove.a)*LBelow.a*LBelow.b + LAbove.a*LAbove.b) / LMixed.a;
+  end;
+  result := LMixed.ToAlphaColor;
 end;
 
 {****************}

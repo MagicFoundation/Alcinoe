@@ -2174,7 +2174,8 @@ begin
   end;
 end;
 
-{****************************************************************************************}
+
+{****************************************************************************************}
 function TALiOSWebRTC.selectFpsForFormat(const aFormat: AVCaptureDeviceFormat): NSInteger;
 var aMaxSupportedFramerate: Float64;
     i: integer;

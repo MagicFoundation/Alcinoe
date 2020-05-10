@@ -33,7 +33,7 @@ interface
 {$IFEND}
 
 uses winapi.Windows;
-     
+
 (* Basic data types *)
 type
 
@@ -865,7 +865,7 @@ const
 {FB20_LOWER}
   blr_seek_no_warn = 156;
   blr_find_dbkey_version = 157; // find dbkey with record version
-{FB20_LOWER}  
+{FB20_LOWER}
   blr_ansi_all = 158; // required for NULL handling
 
   blr_extract = 159;

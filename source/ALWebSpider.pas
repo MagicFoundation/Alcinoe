@@ -680,7 +680,7 @@ Begin
   {check the SaveDirectory}
   if (SaveDirectory <> '') and not directoryExists(String(SaveDirectory)) then Raise Exception.CreateFmt('The directory: "%s" not exist!', [SaveDirectory]);
   if fHttpClient = nil then Raise Exception.Create('The HttpClient cannot be empty!');
-  
+
   {init private var}
   fStartUrl := ALTrim(aUrl);
   FCurrentDeepLevel := 0;

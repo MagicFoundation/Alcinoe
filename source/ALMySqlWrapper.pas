@@ -16,7 +16,7 @@ interface
 {$IFEND}
 
 Uses Winapi.Windows;
-     
+
 {$IF CompilerVersion < 18.5}
   // from http://stackoverflow.com/questions/6378107/how-to-define-an-unsigned-64-bit-integer-in-delphi7
   // their is no way in delphi 7 to have an uint64 (unsigned int64)
@@ -145,7 +145,7 @@ const
   _CLIENT_MULTI_RESULTS   = 131072; { Enable/disable multi-results }
   _CLIENT_PS_MULTI_RESULTS = 262144; { Enable Multi-results in PS-protocol }
   _CLIENT_PLUGIN_AUTH      = 524288;
-  _CLIENT_SSL_VERIFY_SERVER_CERT = 1073741824;  
+  _CLIENT_SSL_VERIFY_SERVER_CERT = 1073741824;
   _CLIENT_REMEMBER_OPTIONS = 2147483648; {Enable/disable multi-results }
 
 {THD: Killable}

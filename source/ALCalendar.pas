@@ -154,7 +154,7 @@ Begin
   wt := ALDrawCalendarGetTextSizeW(C, Month3 + ' ' + year).cx;
   xt := r.left + 2*(W1Calendar + 2) + ((W1Calendar - wt) div 2);
   ALDrawCalendarTextOutW(C, xt, yt, Month3 + ' ' + year);
-  
+
 end;
 
 {********************************************************************************}
@@ -375,7 +375,7 @@ begin
     Canvas.Font.Color := DayHeaderStyle.FontColor;
     Canvas.Font.Name := DayHeaderStyle.FontName;
     Canvas.Font.Height := DayHeaderStyle.FontHeight;
-    Canvas.Font.style := DayHeaderStyle.FontStyle;    
+    Canvas.Font.style := DayHeaderStyle.FontStyle;
     Hbox := ALDrawCalendarGetTextSizeW(Canvas,'^_').cy + DayHeaderStyle.PaddingBottom + DayHeaderStyle.PaddingTop;
     wbox := ALDrawCalendarGetTextSizeW(Canvas,'__').cx + DayHeaderStyle.PaddingLeft   + DayHeaderStyle.PaddingRight;
     Canvas.Font.Color := MonthHeaderStyle.FontColor;

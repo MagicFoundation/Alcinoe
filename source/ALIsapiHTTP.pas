@@ -616,9 +616,16 @@ end;
 
 {***********************************************************************}
 function TALISAPIRequest.ReadClient(var Buffer; Count: Integer): Integer;
+var LLastError: DWORD;
 begin
   Result := Count;
-  if not ECB.ReadClient(ECB.ConnID, @Buffer, DWORD(Result)) then RaiseLastOsError;
+  if not ECB.ReadClient(ECB.ConnID, @Buffer, DWORD(Result)) then begin
+    LLastError := GetLastError;
+    if LLastError = 10054 then // An existing connection was forcibly closed by the remote host
+      raise EALIsapiRequestConnectionDropped.Create(SysErrorMessage(LLastError))
+    else
+      RaiseLastOsError(LLastError);
+  end;
   if Result <= 0 then fClientDataExhausted := True;
 end;
 

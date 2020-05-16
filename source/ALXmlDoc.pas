@@ -734,6 +734,7 @@ uses System.Math,
      {$ENDIF}
      AlHTML,
      ALHttpClient,
+     ALCommon,
      ALString;
 
 {**********************************}

@@ -58,6 +58,7 @@ uses System.Math,
      Winapi.Ole2,
      Winapi.ActiveX,
      {$ENDIF}
+     ALCommon,
      ALString,
      ALQuickSortList;
 

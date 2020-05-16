@@ -8,6 +8,7 @@ uses {$IFDEF IOS}
      {$IFDEF MSWINDOWS}
      Winapi.Windows,
      {$ENDIF}
+     system.sysutils,
      ALStringList,
      system.types;
 
@@ -317,6 +318,17 @@ function ALRectPlaceInto(const R: TRectf;
                          const AHorzAlign: THorzRectAlign = THorzRectAlign.Center;
                          const AVertAlign: TVertRectAlign = TVertRectAlign.Center): TRectF; overload;
 
+type
+
+  {$IFNDEF NEXTGEN}
+  EALException = class(Exception)
+  public
+    constructor Create(const Msg: AnsiString);
+    constructor CreateFmt(const Msg: ansistring; const Args: array of const);
+  end;
+  {$ENDIF}
+  EALExceptionU = class(Exception);
+
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 Type TalLogType = (VERBOSE, DEBUG, INFO, WARN, ERROR, ASSERT);
 procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO);
@@ -337,6 +349,18 @@ Procedure ALFreeAndNil(var Obj; const adelayed: boolean; const aRefCountWarn: Bo
 Function AlBoolToInt(Value:Boolean):Integer;
 Function AlIntToBool(Value:integer):boolean;
 Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
+
+{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+function  ALIfThen(AValue: Boolean; const ATrue: Integer; const AFalse: Integer): Integer; overload; inline;
+function  ALIfThen(AValue: Boolean; const ATrue: Int64; const AFalse: Int64): Int64; overload; inline;
+function  ALIfThen(AValue: Boolean; const ATrue: UInt64; const AFalse: UInt64): UInt64; overload; inline;
+function  ALIfThen(AValue: Boolean; const ATrue: Single; const AFalse: Single): Single; overload; inline;
+function  ALIfThen(AValue: Boolean; const ATrue: Double; const AFalse: Double): Double; overload; inline;
+function  ALIfThen(AValue: Boolean; const ATrue: Extended; const AFalse: Extended): Extended; overload; inline;
+{$IFNDEF NEXTGEN}
+function  ALIfThen(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString; overload; inline;
+{$ENDIF}
+function  ALIfThenU(AValue: Boolean; const ATrue: String; AFalse: String = ''): String; overload; inline;
 
 {$IFDEF MSWINDOWS}
 {$IF CompilerVersion > 33} // rio
@@ -365,6 +389,7 @@ function ALUTCNow: TDateTime;
 function ALUnixMsToDateTime(const aValue: Int64): TDateTime;
 function ALDateTimeToUnixMs(const aValue: TDateTime): Int64;
 Function ALInc(var x: integer; Count: integer): Integer;
+var ALMove: procedure (const Source; var Dest; Count: NativeInt);
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 const ALMAXUInt64: UInt64 = 18446744073709551615;
@@ -433,7 +458,6 @@ uses system.Classes,
      {$IF defined(IOS)}
      Macapi.Helpers,
      {$ENDIF}
-     system.sysutils,
      system.DateUtils,
      ALString;
 
@@ -1597,6 +1621,22 @@ begin
   Result.cy := Size.cy;
 end;
 
+{$IFNDEF NEXTGEN}
+
+{*****************************************************}
+constructor EALException.Create(const Msg: AnsiString);
+begin
+  inherited create(String(Msg));
+end;
+
+{************************************************************************************}
+constructor EALException.CreateFmt(const Msg: ansistring; const Args: array of const);
+begin
+  inherited CreateFmt(String(Msg), Args);
+end;
+
+{$ENDIF !NEXTGEN}
+
 {***********************************************************************************************}
 procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO);
 {$IF defined(IOS) or defined(MSWINDOWS)}
@@ -1660,6 +1700,82 @@ Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
 Begin
   result := (LTotal - (LBorder*2) - LObject) div 2 + LBorder;
 End;
+
+{$IFNDEF NEXTGEN}
+
+{***********************************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString;
+begin
+  if AValue then
+    Result := ATrue
+  else
+    Result := AFalse;
+end;
+
+{$ENDIF !NEXTGEN}
+
+{************************************************************************************}
+function ALIfThenU(AValue: Boolean; const ATrue: String; AFalse: String = ''): String;
+begin
+  if AValue then
+    Result := ATrue
+  else
+    Result := AFalse;
+end;
+
+{***************************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: Integer; const AFalse: Integer): Integer;
+begin
+  if AValue then
+    Result := ATrue
+  else
+    Result := AFalse;
+end;
+
+{*********************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: Int64; const AFalse: Int64): Int64;
+begin
+  if AValue then
+    Result := ATrue
+  else
+    Result := AFalse;
+end;
+
+{************************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: UInt64; const AFalse: UInt64): UInt64;
+begin
+  if AValue then
+    Result := ATrue
+  else
+    Result := AFalse;
+end;
+
+{************************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: Single; const AFalse: Single): Single;
+begin
+  if AValue then
+    Result := ATrue
+  else
+    Result := AFalse;
+end;
+
+{************************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: Double; const AFalse: Double): Double;
+begin
+  if AValue then
+    Result := ATrue
+  else
+    Result := AFalse;
+end;
+
+{******************************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: Extended; const AFalse: Extended): Extended;
+begin
+  if AValue then
+    Result := ATrue
+  else
+    Result := AFalse;
+end;
 
 {****************}
 {$IFDEF MSWINDOWS}
@@ -2056,5 +2172,7 @@ initialization
   ALFreeAndNilRefCountWarn := False;
   ALFreeAndNilCanRefCountWarnProc := nil;
   {$ENDIF}
+
+  ALMove := system.Move;
 
 end.

@@ -59,7 +59,6 @@ uses {$IFDEF MSWINDOWS}
      {$IFDEF MACOS}
      Macapi.CoreFoundation,
      {$ENDIF MACOS}
-     ALInit,
      ALStringList;
 
 resourcestring
@@ -141,15 +140,6 @@ var
   ALDefaultFormatSettingsU: TALformatSettingsU;
 
 type
-
-  {$IFNDEF NEXTGEN}
-  EALException = class(Exception)
-  public
-    constructor Create(const Msg: AnsiString);
-    constructor CreateFmt(const Msg: ansistring; const Args: array of const);
-  end;
-  {$ENDIF}
-  EALExceptionU = class(Exception);
 
   {$IFNDEF NEXTGEN}
   TALStringStream = class(TStream)
@@ -417,20 +407,13 @@ type
   ERegularExpressionError = class(Exception);
 {$IFEND}
 
-var ALMove: procedure (const Source; var Dest; Count: NativeInt);
-function  ALIfThen(AValue: Boolean; const ATrue: Integer; const AFalse: Integer): Integer; overload; inline;
-function  ALIfThen(AValue: Boolean; const ATrue: Int64; const AFalse: Int64): Int64; overload; inline;
-function  ALIfThen(AValue: Boolean; const ATrue: UInt64; const AFalse: UInt64): UInt64; overload; inline;
-function  ALIfThen(AValue: Boolean; const ATrue: Single; const AFalse: Single): Single; overload; inline;
-function  ALIfThen(AValue: Boolean; const ATrue: Double; const AFalse: Double): Double; overload; inline;
-function  ALIfThen(AValue: Boolean; const ATrue: Extended; const AFalse: Extended): Extended; overload; inline;
+
 
 {$IFNDEF NEXTGEN}
 function  ALGUIDToByteString(const Guid: TGUID): Ansistring;
 function  ALNewGUIDByteString: Ansistring;
 function  ALGUIDToString(const Guid: TGUID; const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): Ansistring;
 Function  ALNewGUIDString(const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): AnsiString;
-function  ALIfThen(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString; overload; inline;
 function  ALFormat(const Format: AnsiString; const Args: array of const): AnsiString; overload;
 procedure ALFormat(const Format: AnsiString; const Args: array of const; var Result: ansiString); overload;
 function  ALFormat(const Format: AnsiString; const Args: array of const; const AFormatSettings: TALFormatSettings): AnsiString; overload;
@@ -552,7 +535,6 @@ function  ALStringReplace(const S, OldPattern, NewPattern: AnsiString; Flags: TR
 Function  ALNewGUIDBytes: TBytes;
 function  ALGUIDToStringU(const Guid: TGUID; const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): string;
 Function  ALNewGUIDStringU(const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): String;
-function  ALIfThenU(AValue: Boolean; const ATrue: String; AFalse: String = ''): String; overload; inline;
 function  ALFormatU(const Format: String; const Args: array of const): String; overload;
 procedure ALFormatU(const Format: String; const Args: array of const; var Result: String); overload;
 function  ALFormatU(const Format: String; const Args: array of const; const AFormatSettings: TALFormatSettingsU): String; overload;
@@ -839,9 +821,6 @@ Const cAlUTF8Bom = ansiString(#$EF) + ansiString(#$BB) + ansiString(#$BF);
       cAlUTF32BigEndianBom = ansiString(#$00) + ansiString(#$00) + ansiString(#$FE) + ansiString(#$FF);
 {$ENDIF}
 
-Procedure ALStringInitialization;
-procedure ALStringFinalization;
-
 implementation
 
 uses System.SysConst,
@@ -862,18 +841,6 @@ uses System.SysConst,
      ALcommon;
 
 {$IFNDEF NEXTGEN}
-
-{*****************************************************}
-constructor EALException.Create(const Msg: AnsiString);
-begin
-  inherited create(String(Msg));
-end;
-
-{************************************************************************************}
-constructor EALException.CreateFmt(const Msg: ansistring; const Args: array of const);
-begin
-  inherited CreateFmt(String(Msg), Args);
-end;
 
 {************************************************************}
 constructor TALStringStream.Create(const AString: AnsiString);
@@ -2388,83 +2355,7 @@ begin
   ARegEx.Start := FStart;
 end;
 
-{$IFEND}
-
-{$IFNDEF NEXTGEN}
-
-{***********************************************************************************************}
-function ALIfThen(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString;
-begin
-  if AValue then
-    Result := ATrue
-  else
-    Result := AFalse;
-end;
-
-{$ENDIF !NEXTGEN}
-
-{************************************************************************************}
-function ALIfThenU(AValue: Boolean; const ATrue: String; AFalse: String = ''): String;
-begin
-  if AValue then
-    Result := ATrue
-  else
-    Result := AFalse;
-end;
-
-{***************************************************************************************}
-function ALIfThen(AValue: Boolean; const ATrue: Integer; const AFalse: Integer): Integer;
-begin
-  if AValue then
-    Result := ATrue
-  else
-    Result := AFalse;
-end;
-
-{*********************************************************************************}
-function ALIfThen(AValue: Boolean; const ATrue: Int64; const AFalse: Int64): Int64;
-begin
-  if AValue then
-    Result := ATrue
-  else
-    Result := AFalse;
-end;
-
-{************************************************************************************}
-function ALIfThen(AValue: Boolean; const ATrue: UInt64; const AFalse: UInt64): UInt64;
-begin
-  if AValue then
-    Result := ATrue
-  else
-    Result := AFalse;
-end;
-
-{************************************************************************************}
-function ALIfThen(AValue: Boolean; const ATrue: Single; const AFalse: Single): Single;
-begin
-  if AValue then
-    Result := ATrue
-  else
-    Result := AFalse;
-end;
-
-{************************************************************************************}
-function ALIfThen(AValue: Boolean; const ATrue: Double; const AFalse: Double): Double;
-begin
-  if AValue then
-    Result := ATrue
-  else
-    Result := AFalse;
-end;
-
-{******************************************************************************************}
-function ALIfThen(AValue: Boolean; const ATrue: Extended; const AFalse: Extended): Extended;
-begin
-  if AValue then
-    Result := ATrue
-  else
-    Result := AFalse;
-end;
+{$IFEND} // {$IF (not defined(NEXTGEN)) and (CompilerVersion <= 32)}{Delphi Tokyo}
 
 {$IFNDEF NEXTGEN}
 
@@ -12757,8 +12648,8 @@ end;
   {$ZEROBASEDSTRINGS ON}
 {$IFEND}
 
-{*******************************}
-Procedure ALStringInitialization;
+{********************************}
+Procedure _ALStringInitialization;
 {$IFNDEF NEXTGEN}
 var i: integer;
 {$ENDIF}
@@ -12902,7 +12793,6 @@ begin
   ALDefaultFormatSettingsU.TwoDigitYearCenturyWindow := 50;
   ALDefaultFormatSettingsU.NegCurrFormat := 0;
 
-  ALMove := system.Move;
   {$IFNDEF NEXTGEN}
   ALPosEx := System.AnsiStrings.PosEx;
   AlUpperCase := system.AnsiStrings.UpperCase;
@@ -12961,8 +12851,8 @@ begin
 
 end;
 
-{*****************************}
-Procedure ALStringFinalization;
+{******************************}
+Procedure _ALStringFinalization;
 begin
 
   {$IF CompilerVersion >= 31} // berlin
@@ -12970,5 +12860,11 @@ begin
   {$IFEND}
 
 end;
+
+initialization
+  _ALStringInitialization;
+
+finalization
+  _ALStringFinalization;
 
 end.

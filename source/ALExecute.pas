@@ -89,7 +89,7 @@ uses system.sysutils,
      winapi.winsvc,
      System.Diagnostics,
      ALWindows,
-     ALString;
+     ALCommon;
 
 {******************************************}
 Function AlGetEnvironmentString: AnsiString;

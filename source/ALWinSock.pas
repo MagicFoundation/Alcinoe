@@ -24,6 +24,7 @@ uses Winapi.Windows,
      System.SysUtils,
      Winapi.WinSock2,
      System.Ansistrings,
+     ALCommon,
      ALString;
 
 {***************************************************************************}

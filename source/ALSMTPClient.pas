@@ -115,6 +115,7 @@ Uses Winapi.Windows,
      System.Classes,
      System.SysUtils,
      ALWinsock,
+     ALCommon,
      ALString;
 
 {*******************************}

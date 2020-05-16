@@ -39,7 +39,7 @@ uses system.sysutils,
      system.hash,
      {$IFEND}
      System.Classes,
-     ALString;
+     ALCommon;
 
 {$IF CompilerVersion < 29} {Delphi XE8}
 type
@@ -428,7 +428,7 @@ uses {$IF defined(MSWINDOWS)}
      winapi.MMSystem,
      {$IFEND}
      system.Math,
-     ALCommon;
+     ALString;
 
 {***}
 const

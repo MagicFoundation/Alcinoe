@@ -93,7 +93,7 @@ uses winapi.WinSock2,
      system.Classes,
      System.SyncObjs,
      System.SysUtils,
-     ALString,
+     ALCommon,
      ALStringList,
      ALJSONDoc;
 
@@ -920,7 +920,8 @@ uses Winapi.Windows,
      System.math,
      ALCipher,
      AlWinsock,
-     ALWindows;
+     ALWindows,
+     ALString;
 
 {***************************************************************************************************************************************}
 constructor EAlMongoDBClientException.Create(const aMsg: AnsiString; const aErrorCode: integer; const aCloseConnection: Boolean = False);

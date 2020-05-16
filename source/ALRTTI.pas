@@ -441,7 +441,8 @@ implementation
 
 uses System.sysutils,
      System.Generics.Defaults,
-     AlString;
+     AlCommon,
+     ALString;
 
 {****************************************}
 // P points a length field of ShortString.

@@ -152,6 +152,7 @@ uses system.Sysutils,
      ALHttpClient,
      ALWinsock,
      {$ENDIF}
+     ALCommon,
      ALString;
 
 {$IFNDEF NEXTGEN}

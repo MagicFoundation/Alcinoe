@@ -210,7 +210,6 @@
         <DCCReference Include="ALString.pas"/>
         <DCCReference Include="ALQuickSortList.pas"/>
         <DCCReference Include="ALMime.pas"/>
-        <DCCReference Include="ALInit.pas"/>
         <DCCReference Include="ALCipher.pas"/>
         <DCCReference Include="ALAVLBinaryTree.pas"/>
         <DCCReference Include="ALVideoPlayer.pas"/>

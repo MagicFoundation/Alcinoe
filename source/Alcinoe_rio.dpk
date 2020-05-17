@@ -50,7 +50,6 @@ contains
   ALString in 'ALString.pas',
   ALQuickSortList in 'ALQuickSortList.pas',
   ALMime in 'ALMime.pas',
-  ALInit in 'ALInit.pas',
   ALCipher in 'ALCipher.pas',
   ALAVLBinaryTree in 'ALAVLBinaryTree.pas',
   ALVideoPlayer in 'ALVideoPlayer.pas',

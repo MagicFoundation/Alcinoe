@@ -18,6 +18,7 @@ interface
 uses Winapi.Windows,
      System.Contnrs,
      System.SyncObjs,
+     ALCommon,
      AlXmlDoc,
      ALStringList,
      ALString,

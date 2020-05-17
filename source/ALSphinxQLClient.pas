@@ -46,7 +46,8 @@ function AlSphinxEscapeString(const src: ansiString): ansiString;
 
 implementation
 
-uses alString;
+uses ALCommon,
+     alString;
 
 {*********************************************************}
 procedure TalSphinxQlClient.Connect(const Host: AnsiString;

@@ -139,9 +139,9 @@ var
   {$ENDIF}
   ALDefaultFormatSettingsU: TALformatSettingsU;
 
+{$IFNDEF NEXTGEN}
 type
 
-  {$IFNDEF NEXTGEN}
   TALStringStream = class(TStream)
   private
     FDataString: AnsiString;
@@ -157,9 +157,6 @@ type
     procedure WriteString(const AString: AnsiString);
     property DataString: AnsiString read FDataString;
   end;
-  {$ENDIF}
-
-  {$IFNDEF NEXTGEN}
 
   {************************}
   {$IF CompilerVersion > 33} // rio
@@ -201,7 +198,7 @@ type
 
   function  ALMatchesMask(const Filename, Mask: AnsiString): Boolean;
 
-  {$ENDIF}
+{$ENDIF}
 
 type
   TALPerlRegExOptions = set of (

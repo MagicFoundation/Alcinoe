@@ -18,7 +18,6 @@
 #include <System.SysUtils.hpp>
 #include <System.Classes.hpp>
 #include <System.Contnrs.hpp>
-#include <ALInit.hpp>
 #include <ALStringList.hpp>
 
 //-- user supplied -----------------------------------------------------------
@@ -27,8 +26,6 @@ namespace Alstring
 {
 //-- forward type declarations -----------------------------------------------
 struct TALFormatSettings;
-class DELPHICLASS EALException;
-class DELPHICLASS EALExceptionU;
 class DELPHICLASS TALStringStream;
 class DELPHICLASS EALMaskException;
 class DELPHICLASS TALMask;
@@ -96,55 +93,6 @@ public:
 typedef System::Sysutils::TFormatSettings *pALFormatSettingsU;
 
 typedef System::Sysutils::TFormatSettings TALFormatSettingsU;
-
-#pragma pack(push,4)
-class PASCALIMPLEMENTATION EALException : public System::Sysutils::Exception
-{
-	typedef System::Sysutils::Exception inherited;
-	
-public:
-	__fastcall EALException(const System::AnsiString Msg);
-	__fastcall EALException(const System::AnsiString Msg, const System::TVarRec *Args, const int Args_High);
-public:
-	/* Exception.CreateRes */ inline __fastcall EALException(NativeUInt Ident)/* overload */ : System::Sysutils::Exception(Ident) { }
-	/* Exception.CreateRes */ inline __fastcall EALException(System::PResStringRec ResStringRec)/* overload */ : System::Sysutils::Exception(ResStringRec) { }
-	/* Exception.CreateResFmt */ inline __fastcall EALException(NativeUInt Ident, const System::TVarRec *Args, const int Args_High)/* overload */ : System::Sysutils::Exception(Ident, Args, Args_High) { }
-	/* Exception.CreateResFmt */ inline __fastcall EALException(System::PResStringRec ResStringRec, const System::TVarRec *Args, const int Args_High)/* overload */ : System::Sysutils::Exception(ResStringRec, Args, Args_High) { }
-	/* Exception.CreateHelp */ inline __fastcall EALException(const System::UnicodeString Msg, int AHelpContext) : System::Sysutils::Exception(Msg, AHelpContext) { }
-	/* Exception.CreateFmtHelp */ inline __fastcall EALException(const System::UnicodeString Msg, const System::TVarRec *Args, const int Args_High, int AHelpContext) : System::Sysutils::Exception(Msg, Args, Args_High, AHelpContext) { }
-	/* Exception.CreateResHelp */ inline __fastcall EALException(NativeUInt Ident, int AHelpContext)/* overload */ : System::Sysutils::Exception(Ident, AHelpContext) { }
-	/* Exception.CreateResHelp */ inline __fastcall EALException(System::PResStringRec ResStringRec, int AHelpContext)/* overload */ : System::Sysutils::Exception(ResStringRec, AHelpContext) { }
-	/* Exception.CreateResFmtHelp */ inline __fastcall EALException(System::PResStringRec ResStringRec, const System::TVarRec *Args, const int Args_High, int AHelpContext)/* overload */ : System::Sysutils::Exception(ResStringRec, Args, Args_High, AHelpContext) { }
-	/* Exception.CreateResFmtHelp */ inline __fastcall EALException(NativeUInt Ident, const System::TVarRec *Args, const int Args_High, int AHelpContext)/* overload */ : System::Sysutils::Exception(Ident, Args, Args_High, AHelpContext) { }
-	/* Exception.Destroy */ inline __fastcall virtual ~EALException() { }
-	
-};
-
-#pragma pack(pop)
-
-#pragma pack(push,4)
-class PASCALIMPLEMENTATION EALExceptionU : public System::Sysutils::Exception
-{
-	typedef System::Sysutils::Exception inherited;
-	
-public:
-	/* Exception.Create */ inline __fastcall EALExceptionU(const System::UnicodeString Msg) : System::Sysutils::Exception(Msg) { }
-	/* Exception.CreateFmt */ inline __fastcall EALExceptionU(const System::UnicodeString Msg, const System::TVarRec *Args, const int Args_High) : System::Sysutils::Exception(Msg, Args, Args_High) { }
-	/* Exception.CreateRes */ inline __fastcall EALExceptionU(NativeUInt Ident)/* overload */ : System::Sysutils::Exception(Ident) { }
-	/* Exception.CreateRes */ inline __fastcall EALExceptionU(System::PResStringRec ResStringRec)/* overload */ : System::Sysutils::Exception(ResStringRec) { }
-	/* Exception.CreateResFmt */ inline __fastcall EALExceptionU(NativeUInt Ident, const System::TVarRec *Args, const int Args_High)/* overload */ : System::Sysutils::Exception(Ident, Args, Args_High) { }
-	/* Exception.CreateResFmt */ inline __fastcall EALExceptionU(System::PResStringRec ResStringRec, const System::TVarRec *Args, const int Args_High)/* overload */ : System::Sysutils::Exception(ResStringRec, Args, Args_High) { }
-	/* Exception.CreateHelp */ inline __fastcall EALExceptionU(const System::UnicodeString Msg, int AHelpContext) : System::Sysutils::Exception(Msg, AHelpContext) { }
-	/* Exception.CreateFmtHelp */ inline __fastcall EALExceptionU(const System::UnicodeString Msg, const System::TVarRec *Args, const int Args_High, int AHelpContext) : System::Sysutils::Exception(Msg, Args, Args_High, AHelpContext) { }
-	/* Exception.CreateResHelp */ inline __fastcall EALExceptionU(NativeUInt Ident, int AHelpContext)/* overload */ : System::Sysutils::Exception(Ident, AHelpContext) { }
-	/* Exception.CreateResHelp */ inline __fastcall EALExceptionU(System::PResStringRec ResStringRec, int AHelpContext)/* overload */ : System::Sysutils::Exception(ResStringRec, AHelpContext) { }
-	/* Exception.CreateResFmtHelp */ inline __fastcall EALExceptionU(System::PResStringRec ResStringRec, const System::TVarRec *Args, const int Args_High, int AHelpContext)/* overload */ : System::Sysutils::Exception(ResStringRec, Args, Args_High, AHelpContext) { }
-	/* Exception.CreateResFmtHelp */ inline __fastcall EALExceptionU(NativeUInt Ident, const System::TVarRec *Args, const int Args_High, int AHelpContext)/* overload */ : System::Sysutils::Exception(Ident, Args, Args_High, AHelpContext) { }
-	/* Exception.Destroy */ inline __fastcall virtual ~EALExceptionU() { }
-	
-};
-
-#pragma pack(pop)
 
 #pragma pack(push,4)
 class PASCALIMPLEMENTATION TALStringStream : public System::Classes::TStream
@@ -272,9 +220,9 @@ public:
 
 #pragma pack(pop)
 
-enum DECLSPEC_DENUM Alstring__6 : unsigned char { preCaseLess, preMultiLine, preSingleLine, preExtended, preAnchored, preUnGreedy, preNoAutoCapture };
+enum DECLSPEC_DENUM Alstring__4 : unsigned char { preCaseLess, preMultiLine, preSingleLine, preExtended, preAnchored, preUnGreedy, preNoAutoCapture };
 
-typedef System::Set<Alstring__6, Alstring__6::preCaseLess, Alstring__6::preNoAutoCapture> TALPerlRegExOptions;
+typedef System::Set<Alstring__4, Alstring__4::preCaseLess, Alstring__4::preNoAutoCapture> TALPerlRegExOptions;
 
 typedef System::TMetaClass* TALTagParamsClass;
 
@@ -331,7 +279,6 @@ extern DELPHI_PACKAGE System::ResourceString _SALArgumentMissing;
 #define Alstring_SALArgumentMissing System::LoadResourceString(&Alstring::_SALArgumentMissing)
 extern DELPHI_PACKAGE TALFormatSettings ALDefaultFormatSettings;
 extern DELPHI_PACKAGE System::Sysutils::TFormatSettings ALDefaultFormatSettingsU;
-extern DELPHI_PACKAGE void __fastcall (*ALMove)(const void *Source, void *Dest, NativeInt Count);
 extern DELPHI_PACKAGE int __fastcall (*ALPosEx)(const System::AnsiString SubStr, const System::AnsiString S, int Offset/* = 0x1*/);
 extern DELPHI_PACKAGE System::AnsiString __fastcall (*AlUpperCase)(const System::AnsiString S);
 extern DELPHI_PACKAGE System::AnsiString __fastcall (*AlLowerCase)(const System::AnsiString S);
@@ -397,14 +344,6 @@ extern DELPHI_PACKAGE System::DynamicArray<System::Byte> __fastcall ALNewGUIDByt
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALGUIDToStringU(const GUID &Guid, const bool WithoutBracket = false, const bool WithoutHyphen = false);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALNewGUIDStringU(const bool WithoutBracket = false, const bool WithoutHyphen = false);
 extern DELPHI_PACKAGE bool __fastcall ALMatchesMask(const System::AnsiString Filename, const System::AnsiString Mask);
-extern DELPHI_PACKAGE System::AnsiString __fastcall ALIfThen(bool AValue, const System::AnsiString ATrue, System::AnsiString AFalse = System::AnsiString())/* overload */;
-extern DELPHI_PACKAGE System::UnicodeString __fastcall ALIfThenU(bool AValue, const System::UnicodeString ATrue, System::UnicodeString AFalse = System::UnicodeString())/* overload */;
-extern DELPHI_PACKAGE int __fastcall ALIfThen(bool AValue, const int ATrue, const int AFalse)/* overload */;
-extern DELPHI_PACKAGE __int64 __fastcall ALIfThen(bool AValue, const __int64 ATrue, const __int64 AFalse)/* overload */;
-extern DELPHI_PACKAGE unsigned __int64 __fastcall ALIfThen(bool AValue, const unsigned __int64 ATrue, const unsigned __int64 AFalse)/* overload */;
-extern DELPHI_PACKAGE float __fastcall ALIfThen(bool AValue, const float ATrue, const float AFalse)/* overload */;
-extern DELPHI_PACKAGE double __fastcall ALIfThen(bool AValue, const double ATrue, const double AFalse)/* overload */;
-extern DELPHI_PACKAGE System::Extended __fastcall ALIfThen(bool AValue, const System::Extended ATrue, const System::Extended AFalse)/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALFormat(const System::AnsiString Format, const System::TVarRec *Args, const int Args_High)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALFormat(const System::AnsiString Format, const System::TVarRec *Args, const int Args_High, System::AnsiString &Result)/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALFormat(const System::AnsiString Format, const System::TVarRec *Args, const int Args_High, const TALFormatSettings &AFormatSettings)/* overload */;
@@ -622,8 +561,6 @@ extern DELPHI_PACKAGE void __fastcall ALExtractHeaderFieldsWithQuoteEscaped(cons
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALHTTPEncodeU(const System::UnicodeString AStr);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALHTTPDecodeU(const System::UnicodeString AStr);
 extern DELPHI_PACKAGE void __fastcall ALExtractHeaderFieldsWithQuoteEscapedU(const System::Sysutils::TSysCharSet &Separators, const System::Sysutils::TSysCharSet &WhiteSpace, const System::Sysutils::TSysCharSet &Quotes, System::WideChar * Content, Alstringlist::TALStringsU* Strings, bool HttpDecode, bool StripQuotes = false);
-extern DELPHI_PACKAGE void __fastcall ALStringInitialization(void);
-extern DELPHI_PACKAGE void __fastcall ALStringFinalization(void);
 }	/* namespace Alstring */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALSTRING)
 using namespace Alstring;

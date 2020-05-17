@@ -891,6 +891,7 @@ implementation
 uses System.Diagnostics,
      ALCipher,
      ALWindows,
+     ALCommon,
      alfbxError;
 
 {***************************************************************}

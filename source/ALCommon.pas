@@ -329,6 +329,11 @@ type
   {$ENDIF}
   EALExceptionU = class(Exception);
 
+{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+var ALCallStackCustomLogsMaxCount: integer = 50;
+procedure ALAddCallStackCustomLogU(Const aLog: String);
+function ALGetCallStackCustomLogsU(Const aAppendTimeStamp: boolean = True): String;
+
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 Type TalLogType = (VERBOSE, DEBUG, INFO, WARN, ERROR, ASSERT);
 procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO);
@@ -450,6 +455,7 @@ implementation
 
 uses system.Classes,
      system.math,
+     system.generics.collections,
      {$IF defined(ANDROID)}
      Androidapi.JNI.JavaTypes,
      Androidapi.Helpers,
@@ -460,6 +466,16 @@ uses system.Classes,
      {$ENDIF}
      system.DateUtils,
      ALString;
+
+type
+  _TALCallStackCustomLogU = record
+    TimeStamp: TDateTime;
+    log: String;
+  end;
+
+var
+  _ALCallStackCustomLogsU: TList<_TALCallStackCustomLogU>;
+  _ALCallStackCustomLogsUCurrentIndex: integer = -1;
 
 {***********************************************}
 function ALRectWidth(const Rect: TRect): Integer;
@@ -1637,6 +1653,45 @@ end;
 
 {$ENDIF !NEXTGEN}
 
+{*****************************************************}
+procedure ALAddCallStackCustomLogU(Const aLog: String);
+var LCallStackCustomLogU: _TALCallStackCustomLogU;
+begin
+  LCallStackCustomLogU.TimeStamp := Now;
+  LCallStackCustomLogU.log := aLog;
+  Tmonitor.enter(_ALCallStackCustomLogsU);
+  Try
+    _ALCallStackCustomLogsUCurrentIndex := (_ALCallStackCustomLogsUCurrentIndex + 1) mod ALCallStackCustomLogsMaxCount;
+    if _ALCallStackCustomLogsUCurrentIndex <= _ALCallStackCustomLogsU.Count - 1 then
+      _ALCallStackCustomLogsU[_ALCallStackCustomLogsUCurrentIndex] := LCallStackCustomLogU
+    else
+      _ALCallStackCustomLogsUCurrentIndex := _ALCallStackCustomLogsU.Add(LCallStackCustomLogU);
+  Finally
+    Tmonitor.exit(_ALCallStackCustomLogsU);
+  End;
+end;
+
+{*********************************************************************************}
+function ALGetCallStackCustomLogsU(Const aAppendTimeStamp: boolean = True): String;
+Var i: integer;
+begin
+  Result := '';
+  if aAppendTimeStamp then begin
+    for i := _ALCallStackCustomLogsUCurrentIndex downto 0 do
+      Result := Result + ALFormatDateTimeU('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsU) + ': ' + _ALCallStackCustomLogsU[i].log + #13#10;
+    for i := _ALCallStackCustomLogsU.Count - 1 downto _ALCallStackCustomLogsUCurrentIndex + 1 do
+      Result := Result + ALFormatDateTimeU('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsU) + ': ' + _ALCallStackCustomLogsU[i].log + #13#10;
+  end
+  else begin
+    for i := _ALCallStackCustomLogsUCurrentIndex downto 0 do
+      Result := Result + _ALCallStackCustomLogsU[i].log + #13#10;
+    for i := _ALCallStackCustomLogsU.Count - 1 downto _ALCallStackCustomLogsUCurrentIndex + 1 do
+      Result := Result + _ALCallStackCustomLogsU[i].log + #13#10;
+  end;
+  Result := ALTrimU(Result);
+
+end;
+
 {***********************************************************************************************}
 procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO);
 {$IF defined(IOS) or defined(MSWINDOWS)}
@@ -2173,6 +2228,12 @@ initialization
   ALFreeAndNilCanRefCountWarnProc := nil;
   {$ENDIF}
 
+  _ALCallStackCustomLogsU := TList<_TALCallStackCustomLogU>.Create;
   ALMove := system.Move;
+
+
+Finalization
+
+  ALFreeAndNil(_ALCallStackCustomLogsU);
 
 end.

@@ -1164,6 +1164,7 @@ uses System.Math,
      System.Ansistrings,
      ALFBXerror,
      ALFBXConst,
+     ALCommon,
      ALString;
 
 //function ALFBXMBUEncode(const str: UnicodeString; cp: Word): RawByteString;
@@ -2861,7 +2862,7 @@ type
   procedure TALFBXLibrary.SetSegmentSize(Value: Word);
   begin
 
-      Assert(Value > 0);
+      system.Assert(Value > 0);
       FSegmentSize := Value;
 
   end;
@@ -5846,7 +5847,7 @@ end;
 
 constructor TALFBXPoolStream.Create(ItemsInPage, ItemSize: Integer);
 begin
-  Assert((ItemSize > 0) and (ItemsInPage > 0));
+  System.Assert((ItemSize > 0) and (ItemsInPage > 0));
   FItemSize := ItemSize;
   FItemsInPage := ItemsInPage;
   FPageSize := FItemSize * FItemsInPage;
@@ -5867,7 +5868,7 @@ end;
 
 function TALFBXPoolStream.Get(Item: Integer): Pointer;
 begin
-  assert(Item * FItemSize <= FSize);
+  system.assert(Item * FItemSize <= FSize);
   Result := Pointer(PtrInt(FPages[Item div FItemsInPage]) + (Item mod FItemsInPage) * FItemSize);
 end;
 

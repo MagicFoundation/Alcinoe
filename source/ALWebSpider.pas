@@ -215,6 +215,7 @@ Uses Winapi.Windows,
      Winapi.UrlMon,
      AlHTML,
      AlMime,
+     ALCommon,
      ALString;
 
 type

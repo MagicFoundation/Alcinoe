@@ -18,7 +18,7 @@
 #include <Winapi.Windows.hpp>
 #include <System.Hash.hpp>
 #include <System.Classes.hpp>
-#include <ALString.hpp>
+#include <ALCommon.hpp>
 
 //-- user supplied -----------------------------------------------------------
 
@@ -33,25 +33,25 @@ struct _PUBLICKEYSTRUC;
 struct _RSAPUBKEY;
 //-- type declarations -------------------------------------------------------
 #pragma pack(push,4)
-class PASCALIMPLEMENTATION EALCipherException : public Alstring::EALException
+class PASCALIMPLEMENTATION EALCipherException : public Alcommon::EALException
 {
-	typedef Alstring::EALException inherited;
+	typedef Alcommon::EALException inherited;
 	
 public:
-	/* EALException.Create */ inline __fastcall EALCipherException(const System::AnsiString Msg) : Alstring::EALException(Msg) { }
-	/* EALException.CreateFmt */ inline __fastcall EALCipherException(const System::AnsiString Msg, const System::TVarRec *Args, const int Args_High) : Alstring::EALException(Msg, Args, Args_High) { }
+	/* EALException.Create */ inline __fastcall EALCipherException(const System::AnsiString Msg) : Alcommon::EALException(Msg) { }
+	/* EALException.CreateFmt */ inline __fastcall EALCipherException(const System::AnsiString Msg, const System::TVarRec *Args, const int Args_High) : Alcommon::EALException(Msg, Args, Args_High) { }
 	
 public:
-	/* Exception.CreateRes */ inline __fastcall EALCipherException(NativeUInt Ident)/* overload */ : Alstring::EALException(Ident) { }
-	/* Exception.CreateRes */ inline __fastcall EALCipherException(System::PResStringRec ResStringRec)/* overload */ : Alstring::EALException(ResStringRec) { }
-	/* Exception.CreateResFmt */ inline __fastcall EALCipherException(NativeUInt Ident, const System::TVarRec *Args, const int Args_High)/* overload */ : Alstring::EALException(Ident, Args, Args_High) { }
-	/* Exception.CreateResFmt */ inline __fastcall EALCipherException(System::PResStringRec ResStringRec, const System::TVarRec *Args, const int Args_High)/* overload */ : Alstring::EALException(ResStringRec, Args, Args_High) { }
-	/* Exception.CreateHelp */ inline __fastcall EALCipherException(const System::UnicodeString Msg, int AHelpContext) : Alstring::EALException(Msg, AHelpContext) { }
-	/* Exception.CreateFmtHelp */ inline __fastcall EALCipherException(const System::UnicodeString Msg, const System::TVarRec *Args, const int Args_High, int AHelpContext) : Alstring::EALException(Msg, Args, Args_High, AHelpContext) { }
-	/* Exception.CreateResHelp */ inline __fastcall EALCipherException(NativeUInt Ident, int AHelpContext)/* overload */ : Alstring::EALException(Ident, AHelpContext) { }
-	/* Exception.CreateResHelp */ inline __fastcall EALCipherException(System::PResStringRec ResStringRec, int AHelpContext)/* overload */ : Alstring::EALException(ResStringRec, AHelpContext) { }
-	/* Exception.CreateResFmtHelp */ inline __fastcall EALCipherException(System::PResStringRec ResStringRec, const System::TVarRec *Args, const int Args_High, int AHelpContext)/* overload */ : Alstring::EALException(ResStringRec, Args, Args_High, AHelpContext) { }
-	/* Exception.CreateResFmtHelp */ inline __fastcall EALCipherException(NativeUInt Ident, const System::TVarRec *Args, const int Args_High, int AHelpContext)/* overload */ : Alstring::EALException(Ident, Args, Args_High, AHelpContext) { }
+	/* Exception.CreateRes */ inline __fastcall EALCipherException(NativeUInt Ident)/* overload */ : Alcommon::EALException(Ident) { }
+	/* Exception.CreateRes */ inline __fastcall EALCipherException(System::PResStringRec ResStringRec)/* overload */ : Alcommon::EALException(ResStringRec) { }
+	/* Exception.CreateResFmt */ inline __fastcall EALCipherException(NativeUInt Ident, const System::TVarRec *Args, const int Args_High)/* overload */ : Alcommon::EALException(Ident, Args, Args_High) { }
+	/* Exception.CreateResFmt */ inline __fastcall EALCipherException(System::PResStringRec ResStringRec, const System::TVarRec *Args, const int Args_High)/* overload */ : Alcommon::EALException(ResStringRec, Args, Args_High) { }
+	/* Exception.CreateHelp */ inline __fastcall EALCipherException(const System::UnicodeString Msg, int AHelpContext) : Alcommon::EALException(Msg, AHelpContext) { }
+	/* Exception.CreateFmtHelp */ inline __fastcall EALCipherException(const System::UnicodeString Msg, const System::TVarRec *Args, const int Args_High, int AHelpContext) : Alcommon::EALException(Msg, Args, Args_High, AHelpContext) { }
+	/* Exception.CreateResHelp */ inline __fastcall EALCipherException(NativeUInt Ident, int AHelpContext)/* overload */ : Alcommon::EALException(Ident, AHelpContext) { }
+	/* Exception.CreateResHelp */ inline __fastcall EALCipherException(System::PResStringRec ResStringRec, int AHelpContext)/* overload */ : Alcommon::EALException(ResStringRec, AHelpContext) { }
+	/* Exception.CreateResFmtHelp */ inline __fastcall EALCipherException(System::PResStringRec ResStringRec, const System::TVarRec *Args, const int Args_High, int AHelpContext)/* overload */ : Alcommon::EALException(ResStringRec, Args, Args_High, AHelpContext) { }
+	/* Exception.CreateResFmtHelp */ inline __fastcall EALCipherException(NativeUInt Ident, const System::TVarRec *Args, const int Args_High, int AHelpContext)/* overload */ : Alcommon::EALException(Ident, Args, Args_High, AHelpContext) { }
 	/* Exception.Destroy */ inline __fastcall virtual ~EALCipherException() { }
 	
 };

@@ -43,8 +43,8 @@ Type
 function  AlGetExifOrientationInfo(const aFilename: String): TalExifOrientationInfo;
 procedure ALNormalizeImageOrientationV1(const aBitmap: Tbitmap; const aExifOrientationInfo: TalExifOrientationInfo);
 function  ALNormalizeImageOrientationV2(const aBitmap: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const aExifOrientationInfo: TalExifOrientationInfo): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF};
-function  AlGetImageSignature(const aStream: TStream): Tbytes; overload;
-function  AlGetImageSignature(const aFileName: string): Tbytes; overload;
+function  AlGetImageSignature(const aStream: TStream; const aSignatureLength: integer = 12): Tbytes; overload;
+function  AlGetImageSignature(const aFileName: string; const aSignatureLength: integer = 12): Tbytes; overload;
 function  AlDetectImageExtensionU(const aStream: TStream): String; overload;
 function  AlDetectImageExtensionU(const aFileName: string): String; overload;
 function  ALPrepareColor(const SrcColor: TAlphaColor; const Opacity: Single): TAlphaColor;
@@ -6891,29 +6891,27 @@ end;
 {$ENDIF}
 {$ENDREGION}
 
-{************************************************************}
-function  AlGetImageSignature(const aStream: TStream): Tbytes;
+{**************************************************************************************************}
+function  AlGetImageSignature(const aStream: TStream; const aSignatureLength: integer = 12): Tbytes;
 var i: integer;
 begin
   aStream.Position := 0;
-  SetLength(result, 12);
-  if aStream.Size < 12 then begin
-    for I := Low(result) to High(result) do
+  SetLength(result, aSignatureLength);
+  aStream.ReadBuffer(result[0], min(length(result),aStream.Size));
+  if aStream.Size < length(Result) then
+    for I := aStream.Size to High(result) do
       result[i] := $00;
-    exit;
-  end;
-  aStream.ReadBuffer(result[0], length(result));
 end;
 
-{*************************************************************}
-function  AlGetImageSignature(const aFileName: string): Tbytes;
+{***************************************************************************************************}
+function  AlGetImageSignature(const aFileName: string; const aSignatureLength: integer = 12): Tbytes;
 var aFileStream: TFileStream;
 begin
   aFileStream := TFileStream.Create(aFileName, fmOpenRead);
   try
-    result := AlGetImageSignature(aFileStream);
+    result := AlGetImageSignature(aFileStream, aSignatureLength);
   finally
-    aFileStream.Free;
+    ALFreeAndNil(aFileStream);
   end;
 end;
 
@@ -6946,7 +6944,7 @@ begin
   else if (aFirstBytes[0] = $00) and
           (aFirstBytes[1] = $00) and
           (aFirstBytes[2] = $00) and
-          (aFirstBytes[3] = $18) and
+          //(aFirstBytes[3] = $18) => I encounter $18, $20, $24 and I don't know the purpose of this byte so ignore it
           (aFirstBytes[4] = $66) and
           (aFirstBytes[5] = $74) and
           (aFirstBytes[6] = $79) and
@@ -6959,7 +6957,7 @@ begin
   else if (aFirstBytes[0] = $00) and
           (aFirstBytes[1] = $00) and
           (aFirstBytes[2] = $00) and
-          (aFirstBytes[3] = $18) and
+          //(aFirstBytes[3] = $18) => I encounter $18, $20, $24 and I don't know the purpose of this byte so ignore it
           (aFirstBytes[4] = $66) and
           (aFirstBytes[5] = $74) and
           (aFirstBytes[6] = $79) and
@@ -6968,6 +6966,18 @@ begin
           (aFirstBytes[9] = $69) and
           (aFirstBytes[10] = $66) and
           (aFirstBytes[11] = $31) then result := 'heif' // ftypmif1....
+  else if (aFirstBytes[0] = $52) and
+          (aFirstBytes[1] = $49) and
+          (aFirstBytes[2] = $46) and
+          (aFirstBytes[3] = $46) and
+          //(aFirstBytes[4] = $3c) and //
+          //(aFirstBytes[5] = $db) and // => The size of the file
+          //(aFirstBytes[6] = $00) and // => in bytes
+          //(aFirstBytes[7] = $00) and //
+          (aFirstBytes[8] = $57) and
+          (aFirstBytes[9] = $45) and
+          (aFirstBytes[10] = $42) and
+          (aFirstBytes[11] = $50) then result := 'webp' // RIFF....WEBP
   else result := '';
 
 end;
@@ -6980,7 +6990,7 @@ begin
   try
     result := AlDetectImageExtensionU(aFileStream);
   finally
-    aFileStream.Free;
+    ALFreeAndNil(aFileStream);
   end;
 end;
 

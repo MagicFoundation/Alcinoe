@@ -110,6 +110,7 @@ object Form1: TForm1
           Navigator.Buttons.GotoBookmark.Visible = False
           Navigator.Buttons.Filter.Visible = False
           FilterBox.CustomizeDialog = False
+          ScrollbarAnnotations.CustomAnnotations = <>
           DataController.Summary.DefaultGroupSummaryItems = <>
           DataController.Summary.FooterSummaryItems = <>
           DataController.Summary.SummaryGroups = <>
@@ -118,8 +119,8 @@ object Form1: TForm1
           OptionsBehavior.FocusCellOnTab = True
           OptionsBehavior.FocusFirstCellOnNewRecord = True
           OptionsBehavior.GoToNextCellOnEnter = True
-          OptionsBehavior.ImmediateEditor = False
           OptionsBehavior.FocusCellOnCycle = True
+          OptionsBehavior.ImmediateEditor = False
           OptionsCustomize.ColumnFiltering = False
           OptionsCustomize.ColumnGrouping = False
           OptionsCustomize.ColumnHidingOnGrouping = False
@@ -184,10 +185,9 @@ object Form1: TForm1
     TabOrder = 0
     Properties.ActivePage = Firebird
     Properties.CustomButtons.Buttons = <>
-    ClientRectBottom = 324
-    ClientRectLeft = 5
-    ClientRectRight = 1002
-    ClientRectTop = 27
+    ClientRectBottom = 329
+    ClientRectRight = 1007
+    ClientRectTop = 24
     object Firebird: TcxTabSheet
       Caption = 'Firebird'
       ImageIndex = 2

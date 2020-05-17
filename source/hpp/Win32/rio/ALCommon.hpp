@@ -15,6 +15,7 @@
 #include <System.hpp>
 #include <SysInit.hpp>
 #include <Winapi.Windows.hpp>
+#include <System.SysUtils.hpp>
 #include <ALStringList.hpp>
 #include <System.Types.hpp>
 
@@ -26,6 +27,8 @@ namespace Alcommon
 struct TALPointD;
 struct TALSizeD;
 struct TALRectD;
+class DELPHICLASS EALException;
+class DELPHICLASS EALExceptionU;
 //-- type declarations -------------------------------------------------------
 typedef System::StaticArray<double, 2> TALPointDType;
 
@@ -225,6 +228,55 @@ public:
 };
 
 
+#pragma pack(push,4)
+class PASCALIMPLEMENTATION EALException : public System::Sysutils::Exception
+{
+	typedef System::Sysutils::Exception inherited;
+	
+public:
+	__fastcall EALException(const System::AnsiString Msg);
+	__fastcall EALException(const System::AnsiString Msg, const System::TVarRec *Args, const int Args_High);
+public:
+	/* Exception.CreateRes */ inline __fastcall EALException(NativeUInt Ident)/* overload */ : System::Sysutils::Exception(Ident) { }
+	/* Exception.CreateRes */ inline __fastcall EALException(System::PResStringRec ResStringRec)/* overload */ : System::Sysutils::Exception(ResStringRec) { }
+	/* Exception.CreateResFmt */ inline __fastcall EALException(NativeUInt Ident, const System::TVarRec *Args, const int Args_High)/* overload */ : System::Sysutils::Exception(Ident, Args, Args_High) { }
+	/* Exception.CreateResFmt */ inline __fastcall EALException(System::PResStringRec ResStringRec, const System::TVarRec *Args, const int Args_High)/* overload */ : System::Sysutils::Exception(ResStringRec, Args, Args_High) { }
+	/* Exception.CreateHelp */ inline __fastcall EALException(const System::UnicodeString Msg, int AHelpContext) : System::Sysutils::Exception(Msg, AHelpContext) { }
+	/* Exception.CreateFmtHelp */ inline __fastcall EALException(const System::UnicodeString Msg, const System::TVarRec *Args, const int Args_High, int AHelpContext) : System::Sysutils::Exception(Msg, Args, Args_High, AHelpContext) { }
+	/* Exception.CreateResHelp */ inline __fastcall EALException(NativeUInt Ident, int AHelpContext)/* overload */ : System::Sysutils::Exception(Ident, AHelpContext) { }
+	/* Exception.CreateResHelp */ inline __fastcall EALException(System::PResStringRec ResStringRec, int AHelpContext)/* overload */ : System::Sysutils::Exception(ResStringRec, AHelpContext) { }
+	/* Exception.CreateResFmtHelp */ inline __fastcall EALException(System::PResStringRec ResStringRec, const System::TVarRec *Args, const int Args_High, int AHelpContext)/* overload */ : System::Sysutils::Exception(ResStringRec, Args, Args_High, AHelpContext) { }
+	/* Exception.CreateResFmtHelp */ inline __fastcall EALException(NativeUInt Ident, const System::TVarRec *Args, const int Args_High, int AHelpContext)/* overload */ : System::Sysutils::Exception(Ident, Args, Args_High, AHelpContext) { }
+	/* Exception.Destroy */ inline __fastcall virtual ~EALException() { }
+	
+};
+
+#pragma pack(pop)
+
+#pragma pack(push,4)
+class PASCALIMPLEMENTATION EALExceptionU : public System::Sysutils::Exception
+{
+	typedef System::Sysutils::Exception inherited;
+	
+public:
+	/* Exception.Create */ inline __fastcall EALExceptionU(const System::UnicodeString Msg) : System::Sysutils::Exception(Msg) { }
+	/* Exception.CreateFmt */ inline __fastcall EALExceptionU(const System::UnicodeString Msg, const System::TVarRec *Args, const int Args_High) : System::Sysutils::Exception(Msg, Args, Args_High) { }
+	/* Exception.CreateRes */ inline __fastcall EALExceptionU(NativeUInt Ident)/* overload */ : System::Sysutils::Exception(Ident) { }
+	/* Exception.CreateRes */ inline __fastcall EALExceptionU(System::PResStringRec ResStringRec)/* overload */ : System::Sysutils::Exception(ResStringRec) { }
+	/* Exception.CreateResFmt */ inline __fastcall EALExceptionU(NativeUInt Ident, const System::TVarRec *Args, const int Args_High)/* overload */ : System::Sysutils::Exception(Ident, Args, Args_High) { }
+	/* Exception.CreateResFmt */ inline __fastcall EALExceptionU(System::PResStringRec ResStringRec, const System::TVarRec *Args, const int Args_High)/* overload */ : System::Sysutils::Exception(ResStringRec, Args, Args_High) { }
+	/* Exception.CreateHelp */ inline __fastcall EALExceptionU(const System::UnicodeString Msg, int AHelpContext) : System::Sysutils::Exception(Msg, AHelpContext) { }
+	/* Exception.CreateFmtHelp */ inline __fastcall EALExceptionU(const System::UnicodeString Msg, const System::TVarRec *Args, const int Args_High, int AHelpContext) : System::Sysutils::Exception(Msg, Args, Args_High, AHelpContext) { }
+	/* Exception.CreateResHelp */ inline __fastcall EALExceptionU(NativeUInt Ident, int AHelpContext)/* overload */ : System::Sysutils::Exception(Ident, AHelpContext) { }
+	/* Exception.CreateResHelp */ inline __fastcall EALExceptionU(System::PResStringRec ResStringRec, int AHelpContext)/* overload */ : System::Sysutils::Exception(ResStringRec, AHelpContext) { }
+	/* Exception.CreateResFmtHelp */ inline __fastcall EALExceptionU(System::PResStringRec ResStringRec, const System::TVarRec *Args, const int Args_High, int AHelpContext)/* overload */ : System::Sysutils::Exception(ResStringRec, Args, Args_High, AHelpContext) { }
+	/* Exception.CreateResFmtHelp */ inline __fastcall EALExceptionU(NativeUInt Ident, const System::TVarRec *Args, const int Args_High, int AHelpContext)/* overload */ : System::Sysutils::Exception(Ident, Args, Args_High, AHelpContext) { }
+	/* Exception.Destroy */ inline __fastcall virtual ~EALExceptionU() { }
+	
+};
+
+#pragma pack(pop)
+
 enum DECLSPEC_DENUM TalLogType : unsigned char { VERBOSE, DEBUG, INFO, WARN, ERROR, ASSERT };
 
 typedef void __fastcall (__closure *TALCustomDelayedFreeObjectProc)(System::TObject* &aObject);
@@ -235,10 +287,12 @@ enum DECLSPEC_DENUM TALIntelCpuFeature : unsigned char { cfFPU, cfVME, cfDE, cfP
 typedef System::Set<TALIntelCpuFeature, TALIntelCpuFeature::cfFPU, TALIntelCpuFeature::cfAVX512VBMI> TALIntelCpuFeatures;
 
 //-- var, const, procedure ---------------------------------------------------
+extern DELPHI_PACKAGE int ALCallStackCustomLogsMaxCount;
 extern DELPHI_PACKAGE TALCustomDelayedFreeObjectProc ALCustomDelayedFreeObjectProc;
 extern "C" unsigned __stdcall EnumDynamicTimeZoneInformation(unsigned dwIndex, Winapi::Windows::PDynamicTimeZoneInformation lpTimeZoneInformation);
 extern "C" System::LongBool __stdcall SystemTimeToTzSpecificLocalTimeEx(Winapi::Windows::PDynamicTimeZoneInformation lpTimeZoneInformation, _SYSTEMTIME &lpUniversalTime, _SYSTEMTIME &lpLocalTime);
 extern "C" System::LongBool __stdcall TzSpecificLocalTimeToSystemTimeEx(Winapi::Windows::PDynamicTimeZoneInformation lpTimeZoneInformation, _SYSTEMTIME &lpLocalTime, _SYSTEMTIME &lpUniversalTime);
+extern DELPHI_PACKAGE void __fastcall (*ALMove)(const void *Source, void *Dest, NativeInt Count);
 extern DELPHI_PACKAGE unsigned __int64 ALMAXUInt64;
 extern DELPHI_PACKAGE __int64 ALMAXInt64;
 extern DELPHI_PACKAGE unsigned ALMAXUInt;
@@ -266,10 +320,20 @@ extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectFitInto(const Syste
 extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectPlaceInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt, /* out */ float &Ratio)/* overload */;
 extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectPlaceInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt)/* overload */;
 extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectPlaceInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::THorzRectAlign AHorzAlign = (System::Types::THorzRectAlign)(0x0), const System::Types::TVertRectAlign AVertAlign = (System::Types::TVertRectAlign)(0x0))/* overload */;
+extern DELPHI_PACKAGE void __fastcall ALAddCallStackCustomLogU(const System::UnicodeString aLog);
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALGetCallStackCustomLogsU(const bool aAppendTimeStamp = true);
 extern DELPHI_PACKAGE void __fastcall ALLog(const System::UnicodeString Tag, const System::UnicodeString msg, const TalLogType _type = (TalLogType)(0x2));
 extern DELPHI_PACKAGE int __fastcall AlBoolToInt(bool Value);
 extern DELPHI_PACKAGE bool __fastcall AlIntToBool(int Value);
 extern DELPHI_PACKAGE int __fastcall ALMediumPos(int LTotal, int LBorder, int LObject);
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALIfThen(bool AValue, const System::AnsiString ATrue, System::AnsiString AFalse = System::AnsiString())/* overload */;
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALIfThenU(bool AValue, const System::UnicodeString ATrue, System::UnicodeString AFalse = System::UnicodeString())/* overload */;
+extern DELPHI_PACKAGE int __fastcall ALIfThen(bool AValue, const int ATrue, const int AFalse)/* overload */;
+extern DELPHI_PACKAGE __int64 __fastcall ALIfThen(bool AValue, const __int64 ATrue, const __int64 AFalse)/* overload */;
+extern DELPHI_PACKAGE unsigned __int64 __fastcall ALIfThen(bool AValue, const unsigned __int64 ATrue, const unsigned __int64 AFalse)/* overload */;
+extern DELPHI_PACKAGE float __fastcall ALIfThen(bool AValue, const float ATrue, const float AFalse)/* overload */;
+extern DELPHI_PACKAGE double __fastcall ALIfThen(bool AValue, const double ATrue, const double AFalse)/* overload */;
+extern DELPHI_PACKAGE System::Extended __fastcall ALIfThen(bool AValue, const System::Extended ATrue, const System::Extended AFalse)/* overload */;
 extern DELPHI_PACKAGE System::DynamicArray<_TIME_DYNAMIC_ZONE_INFORMATION> __fastcall ALGetDynamicTimeZoneInformations(void);
 extern DELPHI_PACKAGE _TIME_DYNAMIC_ZONE_INFORMATION __fastcall ALGetDynamicTimeZoneInformation(const System::UnicodeString aTimeZoneKeyName);
 extern DELPHI_PACKAGE System::TDateTime __fastcall AlLocalDateTimeToUTC(const System::TDateTime aLocalDateTime)/* overload */;

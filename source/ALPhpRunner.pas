@@ -71,6 +71,7 @@ Uses Winapi.Windows,
      System.Contnrs,
      System.SyncObjs,
      ALHttpClient,
+     ALCommon,
      ALStringList;
 
 {###############################################################################

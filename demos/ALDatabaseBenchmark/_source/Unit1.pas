@@ -14,7 +14,7 @@ uses
   cxPCdxBarPopupMenu, cxPC, cxContainer, cxLabel, cxTextEdit, cxMaskEdit,
   cxButtonEdit, cxCheckBox, cxGroupBox, cxRadioGroup, AlMemCachedClient,
   ALMongoDBClient, ALJsonDoc, cxCheckGroup, cxNavigator, Shellapi,
-  dxBarBuiltInMenu;
+  dxBarBuiltInMenu, dxDateRanges, dxScrollbarAnnotations;
 
 type
 
@@ -461,6 +461,7 @@ uses SyncObjs,
      ALMySqlWrapper,
      alSqlite3Wrapper,
      ALAVLBinaryTree,
+     ALCommon,
      AlXmlDoc,
      alStringList,
      ALString;

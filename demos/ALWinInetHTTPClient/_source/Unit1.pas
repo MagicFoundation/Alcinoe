@@ -493,6 +493,7 @@ begin
     Try
 
       aTmpPostDataString.Assign(MemoPostDataStrings.lines);
+      aTmpPostDataString.Text := ansiString(MemoPostDataStrings.Text); // << I don't know yet why but MemoPostDataStrings.lines.count split very long line in severals lines of around 1000 chars
 
       For I := 0 To MemoPostDataFiles.Lines.Count - 1 do
         if MemoPostDataFiles.Lines[i] <> '' then begin
@@ -586,6 +587,7 @@ begin
     Try
 
       aTmpPutDataString.Assign(MemoPostDataStrings.lines);
+      aTmpPutDataString.Text := ansiString(MemoPostDataStrings.Text); // << I don't know yet why but MemoPostDataStrings.lines.count split very long line in severals lines of around 1000 chars
 
       For I := 0 To MemoPostDataFiles.Lines.Count - 1 do
         if MemoPostDataFiles.Lines[i] <> '' then begin

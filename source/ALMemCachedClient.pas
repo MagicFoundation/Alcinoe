@@ -28,6 +28,7 @@ uses Winapi.WinSock2,
      System.Contnrs,
      System.SyncObjs,
      System.Diagnostics,
+     ALCommon,
      ALString;
 
 type

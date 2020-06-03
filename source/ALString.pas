@@ -754,8 +754,8 @@ function  ALUTF8CharCount(const S: AnsiString): Integer;
 Function  ALUTF8ByteTrunc(const s:AnsiString; const Count: Integer): AnsiString;
 Function  ALUTF8CharTrunc(const s:AnsiString; const Count: Integer): AnsiString;
 Function  ALUTF8UpperFirstChar(const s:AnsiString): AnsiString;
-Function  ALUTF8TitleCase(const s:AnsiString): AnsiString;
-Function  ALUTF8SentenceCase(const s:AnsiString): AnsiString;
+Function  ALTitleCase(const s:AnsiString): AnsiString;
+Function  ALSentenceCase(const s:AnsiString): AnsiString;
 {$IF defined(MSWINDOWS)}
 Function  ALStringToWideString(const S: RawByteString; const aCodePage: Word): WideString;
 function  AlWideStringToString(const WS: WideString; const aCodePage: Word): AnsiString;
@@ -798,6 +798,8 @@ function  ALGetStringFromFileU(const filename: String; const ADefaultEncoding: T
 procedure ALSaveStringtoFileU(const Str: String; const filename: String; AEncoding: TEncoding; const WriteBOM: boolean = False);
 function  ALRandomStrU(const aLength: Longint; const aCharset: Array of Char): String; overload;
 function  ALRandomStrU(const aLength: Longint): String; overload;
+Function  ALTitleCaseU(const s: String): String;
+Function  ALSentenceCaseU(const s: String): String;
 function  ALHTTPEncodeU(const AStr: String): String;
 function  ALHTTPDecodeU(const AStr: String): String;
 {$WARN SYMBOL_DEPRECATED OFF}
@@ -816,6 +818,12 @@ Const cAlUTF8Bom = ansiString(#$EF) + ansiString(#$BB) + ansiString(#$BF);
       cAlUTF16bigEndianBom = ansiString(#$FE) + ansiString(#$FF);
       cAlUTF32LittleEndianBom = ansiString(#$FF) + ansiString(#$FE) + ansiString(#$00) + ansiString(#$00);
       cAlUTF32BigEndianBom = ansiString(#$00) + ansiString(#$00) + ansiString(#$FE) + ansiString(#$FF);
+{$ENDIF}
+
+//deprecated functions
+{$IFNDEF NEXTGEN}
+Function  ALUTF8TitleCase(const s:AnsiString): AnsiString; deprecated 'use ALTitleCase instead';
+Function  ALUTF8SentenceCase(const s:AnsiString): AnsiString; deprecated 'use ALSentenceCase instead';
 {$ENDIF}
 
 implementation
@@ -10000,6 +10008,34 @@ begin
   Result := ALRandomStrU(aLength,['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']);
 end;
 
+{*********************************************}
+//the first letter of each word is capitalized,
+//the rest are lower case
+Function ALTitleCaseU(const s: String): String;
+var i: integer;
+begin
+  Result := ALSentenceCaseU(s);
+  for i:= low(result)+1 to high(Result) do
+    if (Result[i-1].IsInArray(['&', ' ', '-', ''''])) and
+       (
+        (i = high(Result)) or
+        (
+         ((Result[i+1] <> ' ') or (Result[i-1] = '&')) and // Agenge L&G Prestige - Maison à Vendre - A Prendre Ou a Laisser
+         (Result[i+1] <> '''') // Avenue de l'Elysée
+        )
+       )
+    then Result[i] := Result.Chars[i-low(result)].ToUpper;
+end;
+
+{***************************************************************}
+//first letter of the sentence capitalized, all others lower case
+Function ALSentenceCaseU(const s: String): String;
+begin
+  Result := S.ToLower;
+  if length(Result) = 0 then exit;
+  result[low(result)] := Result.Chars[0].ToUpper;
+end;
+
 {$IFNDEF NEXTGEN}
 
 {*********************************************************}
@@ -11401,39 +11437,18 @@ end;
 {*********************************************}
 //the first letter of each word is capitalized,
 //the rest are lower case
-Function ALUTF8TitleCase(const s:AnsiString): AnsiString;
-var tmpWideStr: WideString;
-    i: integer;
+Function ALTitleCase(const s:AnsiString): AnsiString;
 begin
-  TmpWideStr := UTF8ToWideString(S);
-  if length(TmpWideStr) = 0 then begin
-    result := '';
-    exit;
-  end;
-  TmpWideStr := WideUpperCase(copy(TmpWideStr,1,1)) + WidelowerCase(copy(TmpWideStr,2,MaxInt));
-  for i:= 2 to length(TmpWideStr) do
-    if ((TmpWideStr[i-1] = WideChar('&')) or
-        (TmpWideStr[i-1] = WideChar(' ')) or
-        (TmpWideStr[i-1] = WideChar('-')) or
-        (TmpWideStr[i-1] = WideChar('''')))
-       and
-       (
-        (i = length(TmpWideStr)) or
-        (
-         ((TmpWideStr[i+1] <> ' ') or (TmpWideStr[i-1] = '&')) and // Agenge L&G Prestige - Maison à Vendre - A Prendre Ou a Laisser
-         (TmpWideStr[i+1] <> '''') // Avenue de l'Elysée
-        )
-       )
-    then TmpWideStr[i] := WideUpperCase(TmpWideStr[i])[1];
-  result := utf8encode(TmpWideStr);
+  result := ansiString(ALTitleCaseU(string(s))); // in such function, use of the ansiString is
+                                                 // painfull, so convert to unicode and do the job
 end;
 
 {****************************************************************}
 // first letter of the sentence capitalized, all others lower case
-Function ALUTF8SentenceCase(const s:AnsiString): AnsiString;
+Function ALSentenceCase(const s:AnsiString): AnsiString;
 begin
-  Result := AlUtf8LowerCase(S);
-  Result := ALUTF8UpperFirstChar(Result);
+  result := ansiString(ALSentenceCaseU(string(s))); // in such function, use of the ansiString is
+                                                    // painfull, so convert to unicode and do the job
 end;
 
 {***************************************************************}
@@ -12644,6 +12659,49 @@ end;
 {$IF defined(_ZEROBASEDSTRINGS_ON)}
   {$ZEROBASEDSTRINGS ON}
 {$IFEND}
+
+
+{$IFNDEF NEXTGEN}
+
+{**********}
+//deprecated
+Function ALUTF8TitleCase(const s:AnsiString): AnsiString;
+var tmpWideStr: WideString;
+    i: integer;
+begin
+  TmpWideStr := UTF8ToWideString(S);
+  if length(TmpWideStr) = 0 then begin
+    result := '';
+    exit;
+  end;
+  TmpWideStr := WideUpperCase(copy(TmpWideStr,1,1)) + WidelowerCase(copy(TmpWideStr,2,MaxInt));
+  for i:= 2 to length(TmpWideStr) do
+    if ((TmpWideStr[i-1] = WideChar('&')) or
+        (TmpWideStr[i-1] = WideChar(' ')) or
+        (TmpWideStr[i-1] = WideChar('-')) or
+        (TmpWideStr[i-1] = WideChar('''')))
+       and
+       (
+        (i = length(TmpWideStr)) or
+        (
+         ((TmpWideStr[i+1] <> ' ') or (TmpWideStr[i-1] = '&')) and // Agenge L&G Prestige - Maison à Vendre - A Prendre Ou a Laisser
+         (TmpWideStr[i+1] <> '''') // Avenue de l'Elysée
+        )
+       )
+    then TmpWideStr[i] := WideUpperCase(TmpWideStr[i])[1];
+  result := utf8encode(TmpWideStr);
+end;
+
+{**********}
+//deprecated
+Function ALUTF8SentenceCase(const s:AnsiString): AnsiString;
+begin
+  Result := AlUtf8LowerCase(S);
+  Result := ALUTF8UpperFirstChar(Result);
+end;
+
+{$ENDIF}
+
 
 {********************************}
 Procedure _ALStringInitialization;

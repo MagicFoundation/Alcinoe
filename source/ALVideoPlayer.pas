@@ -30,30 +30,31 @@ interface
   {$DEFINE _MACOS}
 {$IFEND}
 
-uses system.Classes,
-     System.SyncObjs,
-     {$IF defined(DEBUG)}
-     system.diagnostics,
-     {$endIF}
-     {$IF defined(ANDROID)}
-     Androidapi.JNI.Os,
-     Androidapi.JNI.GraphicsContentViewText,
-     Androidapi.JNIBridge,
-     Androidapi.JNI.JavaTypes,
-     ALAndroidExoPlayerApi,
-     AlFmxTypes3D,
-     {$endIF}
-     {$IF defined(IOS)}
-     Macapi.ObjectiveC,
-     iOSapi.Foundation,
-     iOSapi.AVFoundation,
-     iOSapi.CoreVideo,
-     Fmx.types,
-     AlFmxTypes3D,
-     {$endIF}
-     Fmx.graphics,
-     ALFmxCommon,
-     AlFmxObjects;
+uses
+  system.Classes,
+  System.SyncObjs,
+  {$IF defined(DEBUG)}
+  system.diagnostics,
+  {$endIF}
+  {$IF defined(ANDROID)}
+  Androidapi.JNI.Os,
+  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNIBridge,
+  Androidapi.JNI.JavaTypes,
+  ALAndroidExoPlayerApi,
+  AlFmxTypes3D,
+  {$endIF}
+  {$IF defined(IOS)}
+  Macapi.ObjectiveC,
+  iOSapi.Foundation,
+  iOSapi.AVFoundation,
+  iOSapi.CoreVideo,
+  Fmx.types,
+  AlFmxTypes3D,
+  {$endIF}
+  Fmx.graphics,
+  ALFmxCommon,
+  AlFmxObjects;
 
 type
 
@@ -458,31 +459,32 @@ procedure register;
 
 implementation
 
-uses system.SysUtils,
-     system.Types,
-     {$IF defined(ANDROID)}
-     system.Math,
-     Androidapi.Helpers,
-     androidapi.jni.net,
-     FMX.Canvas.GPU,
-     AlString,
-     ALGraphics,
-     {$ENDIF}
-     {$IF defined(IOS)}
-     System.RTLConsts,
-     Macapi.CoreFoundation,
-     iOSapi.CoreMedia,
-     iOSapi.OpenGLES,
-     Macapi.Helpers,
-     Macapi.ObjCRuntime,
-     FMX.Canvas.GPU,
-     FMX.Context.GLES.iOS,
-     FMX.Types3D,
-     AlString,
-     ALGraphics,
-     {$ENDIF}
-     fmx.controls,
-     AlCommon;
+uses
+  system.SysUtils,
+  system.Types,
+  {$IF defined(ANDROID)}
+  system.Math,
+  Androidapi.Helpers,
+  androidapi.jni.net,
+  FMX.Canvas.GPU,
+  AlString,
+  ALGraphics,
+  {$ENDIF}
+  {$IF defined(IOS)}
+  System.RTLConsts,
+  Macapi.CoreFoundation,
+  iOSapi.CoreMedia,
+  iOSapi.OpenGLES,
+  Macapi.Helpers,
+  Macapi.ObjCRuntime,
+  FMX.Canvas.GPU,
+  FMX.Context.GLES.iOS,
+  FMX.Types3D,
+  AlString,
+  ALGraphics,
+  {$ENDIF}
+  fmx.controls,
+  AlCommon;
 
 {$REGION ' ANDROID'}
 {$IF defined(ANDROID)}
@@ -1414,6 +1416,7 @@ begin
   fPrepareThread := TThread.CreateAnonymousThread(
     procedure
     var aURL: NSUrl;
+        aLowerDataSource: String;
         P: Pointer;
         {$IFDEF DEBUG}
         aStopWatch: TstopWatch;
@@ -1426,7 +1429,10 @@ begin
         aStopWatch := TstopWatch.StartNew;
         {$ENDIF}
 
-        P := TNSUrl.OCClass.URLWithString(StrToNSStr(aDataSource)); // Creates and returns an NSURL object initialized with a provided URL string
+        aLowerDataSource := ALLowerCaseU(aDataSource);
+        if (ALPosU('http://',aLowerDataSource) = 1) or
+           (ALPosU('https://',aLowerDataSource) = 1) then P := TNSUrl.OCClass.URLWithString(StrToNSStr(aDataSource)) // Creates and returns an NSURL object initialized with a provided URL string
+        else P := TNSUrl.OCClass.fileURLWithPath(StrToNSStr(aDataSource)); // Initializes and returns a newly created NSURL object as a file URL with a specified path.
         if P = nil then exit; // << we can't call synchronize from here (else possible trouble when we will free the object) so we can't call onErrorEvent :(
         aURL := TNSUrl.Wrap(P);
         FPlayerItem := TAVPlayerItem.Wrap(TAVPlayerItem.OCClass.playerItemWithURL(aURL)); // return A new player item, prepared to use URL.

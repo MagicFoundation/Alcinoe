@@ -2,6 +2,7 @@
 * MPV - Fake implementation of nodejs tty
 * Always return `false` to isatty() call
 * @module tty
+* @memberOf module:buildin
 */ 
 exports.isatty = function(fd) {
   return false;

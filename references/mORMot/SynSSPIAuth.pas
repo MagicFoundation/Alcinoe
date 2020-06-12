@@ -5,7 +5,7 @@ unit SynSSPIAuth;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -24,7 +24,7 @@ unit SynSSPIAuth;
 
   The Initial Developer of the Original Code is Chaa.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -44,34 +44,15 @@ unit SynSSPIAuth;
 
   ***** END LICENSE BLOCK *****
 
-
   This unit has been contributed by Chaa.
   See https://synopse.info/forum/viewtopic.php?pid=5619#p5619
-
-  Thanks A LOT for this great contribution to the framework!
-
-
-  Version 1.18
-  - initial release, with code submitted by Chaa
-  - code refactored to conform MSDN sample code, see
-    http://msdn.microsoft.com/en-us/library/windows/desktop/aa379449.aspx
-  - SECURITY_NETWORK_DREP changed to SECURITY_NATIVE_DREP to conform
-    browser authentication requirements
-  - SecPkgName moved to unit interface section, to be used in
-    browser authentication code
-  - added support for Kerberos authentication method
-  - added SecPackageName() to see active Kerberos or NTLM authentication scheme
-  - added SecEncrypt() and SecDecrypt() functions
-  - added ClientSSPIAuthWithPassword for authentication procedure
-    with clear text password
-  - added ServerForceNTLM to force NTLM authentication instead of Negotiate
-    for browser authenticaton
-
 }
 
 {$I Synopse.inc} // define HASINLINE and other compatibility switches
 
 interface
+
+{$ifdef MSWINDOWS} // compiles as void unit for non-Windows - allow Lazarus package
 
 uses
   Windows,
@@ -125,6 +106,12 @@ procedure ServerSSPIAuthUser(var aSecContext: TSecContext; out aUserName: RawUTF
 // or ClientSSPIAuth
 function SecPackageName(var aSecContext: TSecContext): RawUTF8;
 
+/// Force using aSecKerberosSPN for server identification.
+// - aSecKerberosSPN is the Service Principal Name,
+// registered in domain, e.g.
+// 'mymormotservice/myserver.mydomain.tld@MYDOMAIN.TLD'
+procedure ClientForceSPN(const aSecKerberosSPN: RawUTF8);
+
 /// Force NTLM authentication instead of Negotiate for browser authenticaton.
 // Use case: SPNs not configured properly in domain
 // - see for details https://synopse.info/forum/viewtopic.php?id=931&p=3
@@ -144,6 +131,9 @@ var
 
 
 implementation
+
+var
+  ForceSecKerberosSPN: WideString;
 
 function ClientSSPIAuthWorker(var aSecContext: TSecContext;
     const aInData: RawByteString; pszTargetName: PWideChar;
@@ -218,8 +208,11 @@ function ClientSSPIAuth(var aSecContext: TSecContext;
 var TargetName: PWideChar;
 begin
   if aSecKerberosSPN <> '' then
-    TargetName := PWideChar(UTF8ToSynUnicode(aSecKerberosSPN)) else
-    TargetName := nil;
+    TargetName := PWideChar(UTF8ToSynUnicode(aSecKerberosSPN)) else begin
+      if ForceSecKerberosSPN <> '' then
+        TargetName := PWideChar(ForceSecKerberosSPN) else
+        TargetName := nil;
+    end;
   Result := ClientSSPIAuthWorker(aSecContext, aInData, TargetName, nil, aOutData);
 end;
 
@@ -229,8 +222,9 @@ function ClientSSPIAuthWithPassword(var aSecContext: TSecContext;
 var UserPos: Integer;
     Domain, User, Password: SynUnicode;
     AuthIdentity: TSecWinntAuthIdentityW;
+    TargetName: PWideChar;
 begin
-  UserPos := PosEx('\', aUserName);
+  UserPos := PosExChar('\', aUserName);
   if UserPos=0 then begin
     Domain := '';
     User := UTF8ToSynUnicode(aUserName);
@@ -248,7 +242,11 @@ begin
   AuthIdentity.PasswordLength := Length(Password);
   AuthIdentity.Flags := SEC_WINNT_AUTH_IDENTITY_UNICODE;
 
-  Result := ClientSSPIAuthWorker(aSecContext, aInData, nil, @AuthIdentity, aOutData);
+  if ForceSecKerberosSPN <> '' then
+    TargetName := PWideChar(ForceSecKerberosSPN) else
+    TargetName := nil;
+
+  Result := ClientSSPIAuthWorker(aSecContext, aInData, TargetName, @AuthIdentity, aOutData);
 end;
 
 function ServerSSPIAuth(var aSecContext: TSecContext;
@@ -312,38 +310,12 @@ begin
 end;
 
 procedure ServerSSPIAuthUser(var aSecContext: TSecContext; out aUserName: RawUTF8);
-var UserToken: THandle;
-    UserInfo: PSIDAndAttributes;
-    Size: Cardinal;
-    NameBuf: array[byte] of Char;
-    NameLen: Cardinal;
-    DomainBuf: array[byte] of Char;
-    DomainLen: Cardinal;
-    NameType: {$ifdef FPC}SID_NAME_USE{$else}Cardinal{$endif};
+var Names: SecPkgContext_NamesW;
 begin
-  if QuerySecurityContextToken(@aSecContext.CtxHandle, UserToken) <> 0 then
+  if QueryContextAttributesW(@aSecContext.CtxHandle, SECPKG_ATTR_NAMES, @Names) <> 0 then
     raise ESynSSPI.CreateLastOSError(aSecContext);
-  try
-    Size := 0;
-    GetTokenInformation(UserToken, TokenUser, nil, 0, Size);
-    UserInfo := AllocMem(Size);
-    try
-      if not GetTokenInformation(Cardinal(UserToken), Windows.TokenUser, UserInfo, Size, Size) then
-        raise ESynSSPI.CreateLastOSError(aSecContext);
-      FillCharFast(NameBuf[0], SizeOf(NameBuf), 0);
-      NameLen := SizeOf(NameBuf);
-      FillCharFast(DomainBuf[0], SizeOf(DomainBuf), 0);
-      DomainLen := SizeOf(DomainBuf);
-      if not LookupAccountSid(nil, UserInfo^.Sid, NameBuf, NameLen, DomainBuf, DomainLen, NameType) then
-        raise ESynSSPI.CreateLastOSError(aSecContext);
-      if NameType = SidTypeUser then
-        FormatUTF8('%\%', [DomainBuf, NameBuf], aUserName);
-    finally
-      FreeMem(UserInfo);
-    end;
-  finally
-    CloseHandle(UserToken);
-  end;
+  aUserName := RawUnicodeToUtf8(Names.sUserName, StrLenW(Names.sUserName));
+  FreeContextBuffer(Names.sUserName);
 end;
 
 function SecPackageName(var aSecContext: TSecContext): RawUTF8;
@@ -352,6 +324,12 @@ begin
   if QueryContextAttributesW(@aSecContext.CtxHandle, SECPKG_ATTR_NEGOTIATION_INFO, @NegotiationInfo) <> 0 then
     raise ESynSSPI.CreateLastOSError(aSecContext);
   Result := RawUnicodeToUtf8(NegotiationInfo.PackageInfo^.Name, StrLenW(NegotiationInfo.PackageInfo^.Name));
+  FreeContextBuffer(NegotiationInfo.PackageInfo);
+end;
+
+procedure ClientForceSPN(const aSecKerberosSPN: RawUTF8);
+begin
+  ForceSecKerberosSPN := UTF8ToSynUnicode(aSecKerberosSPN);
 end;
 
 procedure ServerForceNTLM(IsNTLM: boolean);
@@ -367,4 +345,11 @@ end;
 
 initialization
   ServerForceNTLM(False);
+
+{$else}
+
+implementation
+
+{$endif MSWINDOWS} // compiles as void unit for non-Windows - allow Lazarus package
+
 end.

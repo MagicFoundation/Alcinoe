@@ -1,5 +1,8 @@
 'use strict';
-/** @module string_decoder */
+/** 
+ * @module string_decoder 
+ * @memberOf module:buildin
+ */
 
 const Buffer = require('buffer').Buffer;
 const internalUtil = require('internal/util');

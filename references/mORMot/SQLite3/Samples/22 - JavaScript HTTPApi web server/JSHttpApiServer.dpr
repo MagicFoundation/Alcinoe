@@ -23,6 +23,7 @@ uses
   Windows,
   SysUtils,
   SynCommons,
+  SynTable,
   SynZip,
   SynCrtSock,
   SynSM,
@@ -57,6 +58,7 @@ type
 
 constructor TTestServer.Create(const Path: TFileName);
 begin
+  fPath := IncludeTrailingPathDelimiter(Path);
   fServer := THttpApiServer.Create(false);
   fSMManager := TSMEngineManager.Create;
   fSMManager.OnNewEngine := DoOnNewEngine;
@@ -64,8 +66,7 @@ begin
   fServer.AddUrl('root','888',false,'+',true);
   fServer.RegisterCompress(CompressDeflate); // our server will deflate html :)
   fServer.OnRequest := Process;
-  fServer.Clone(12);
-  fPath := IncludeTrailingPathDelimiter(Path);
+  fServer.Clone(31); // will use a thread pool of 32 threads in total
 end;
 
 destructor TTestServer.Destroy;

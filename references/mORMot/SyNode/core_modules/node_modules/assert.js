@@ -24,8 +24,10 @@
 
 'use strict';
 
-/** 
- * @module assert 
+/**
+ * Assertions
+ * @module assert
+ * @memberOf module:buildin
  */
 
 // UTILITY

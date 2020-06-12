@@ -6,7 +6,7 @@ unit SynRestMidasVCL;
 {
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit SynRestMidasVCL;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -58,7 +58,7 @@ unit SynRestMidasVCL;
 
 }
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 interface
 
@@ -74,7 +74,9 @@ uses
   mORMot,
   mORMotHttpClient,
   SynCommons,
-  SynDB, SynRestVCL,
+  SynTable,
+  SynDB,
+  SynRestVCL,
   DB,
   {$ifdef FPC}
   BufDataset

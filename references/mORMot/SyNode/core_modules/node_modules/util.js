@@ -1,5 +1,6 @@
 /** 
  * @module util 
+ * @memberOf module:buildin
  */
 'use strict';
 

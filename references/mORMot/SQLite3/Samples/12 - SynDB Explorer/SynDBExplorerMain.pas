@@ -1,6 +1,6 @@
 unit SynDBExplorerMain;
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 interface
 
@@ -100,7 +100,7 @@ uses
 
 
 {$ifndef HASINLINE}
-  {$R Vista.res}
+  {$R vista.RES} // includes Win10 manifest - use .RES for linux cross-compilation
 {$endif}
 
 {$R *.dfm}

@@ -12,6 +12,7 @@ uses
   {$I SynDprUses.inc}    // will enable FastMM4 prior to Delphi 2006
   SynCrtSock,
   SynCommons,
+  SynTable,
   SynLog,
   mORMot,
   SynSQLite3,

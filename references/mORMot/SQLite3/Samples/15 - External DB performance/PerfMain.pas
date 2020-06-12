@@ -487,6 +487,7 @@ var aUseBatch, aUseTransactions, aUseDirect: boolean;
     assert(err='',string(Stat.fEngine+' read failure: '+err));
     Value.ClearProperties;
   end;
+
 begin
   U := 'Namee ';
   UniqueRawUTF8(U); // FPC does not call it
@@ -836,10 +837,8 @@ begin
     Doc := Doc+'%15';
   Doc := Doc+#13#10;
   for i := 0 to High(Rows) do begin
-    Doc := Doc+StringReplaceAll(StringReplaceAll(StringReplaceAll(StringReplaceAll(
-      StringReplaceAll(StringReplaceAll(StringReplaceAll(StringReplaceAll(
-      Rows[i],'</td>',''),'</tr>',''),'<tr align=center>',''),
-      '</b>','}'),'</td>',''),'<b>','{\b '),'<td>','|'),'&nbsp;','')+#13#10;
+    Doc := Doc+StringReplaceAll(Rows[i], ['</td>','', '</tr>','', '<tr align=center>','',
+      '</b>','}', '</td>','', '<b>','{\b ', '<td>','|', '&nbsp;',''])+#13#10;
   end;
   Doc := Doc+'|%'#13#10;
 end;

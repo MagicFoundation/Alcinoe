@@ -6,7 +6,7 @@ unit SynCrossPlatformSpecific;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit SynCrossPlatformSpecific;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -47,10 +47,8 @@ unit SynCrossPlatformSpecific;
   ***** END LICENSE BLOCK *****
 
 
-  Version 1.18
-  - first public release, corresponding to mORMot Framework 1.18
-  - each operating system will have its own API calls in this single unit
-  - would compile with Delphi for any platform (including NextGen for mobiles),
+  Each operating system will have its own API calls in this single unit
+  Should compile with Delphi for any platform (including NextGen for mobiles),
     with FPC 2.7 or Kylix, and with SmartMobileStudio 2.2
 
 }
@@ -79,6 +77,7 @@ unit SynCrossPlatformSpecific;
       {$ifdef ISDELPHIXE8}     // use new XE8+ System.Net.HttpClient
         {$ifdef ANDROID}
           {$define USEHTTPCLIENT}
+          {.$define USEINDY}    // for debugging Indy within Android
         {$else}
           {$define USEINDY} // HttpClient has still issues with https under iOS
         {$endif ANDROID}
@@ -96,7 +95,6 @@ uses
   SmartCL.System,
   System.Types,
   ECMA.Date,
-  System.Date,
   ECMA.Json;
 {$else}
 uses
@@ -110,7 +108,16 @@ uses
 
 type
   {$ifdef ISDWS}
-
+  JDateHelper = helper for JDate
+  private
+    function GetAsDateTime : TDateTime;
+    function GetAsLocalDateTime : TDateTime;
+    procedure SetAsDateTime(dt : TDateTime);
+    procedure SetAsLocalDateTime(dt : TDateTime);
+  public
+    property AsDateTime : TDateTime read GetAsDateTime write SetAsDateTime;
+    property AsLocalDateTime : TDateTime read GetAsLocalDateTime write SetAsLocalDateTime;
+  end;
   // HTTP body may not match the string type, and could be binary
   THttpBody = string;
 
@@ -345,7 +352,7 @@ function StartWithPropName(const PropName1,PropName2: string): boolean;
 function VarRecToValue(const VarRec: variant; var tmpIsString: boolean): string;
 procedure DecodeTime(Value: TDateTime; var HH,MM,SS,MS: word);
 procedure DecodeDate(Value: TDateTime; var Y,M,D: word);
-function TryEncodeDate(Y,M,D: integer; var Value: TDateTime): boolean;
+function TryEncodeDate(Y,M,D: integer; UTC: DateTimeZone; var Value: TDateTime): boolean;
 function TryEncodeTime(HH,MM,SS,MS: integer; var Value: TDateTIme): boolean;
 function NowToIso8601: string;
 function DateTimeToIso8601(Value: TDateTime): string;
@@ -425,6 +432,27 @@ uses
   System.Net.HttpClient;
 {$endif}
 
+{$ifdef ISDWS}
+function JDateHelper.GetAsDateTime : TDateTime;
+begin
+  Result := Self.getTime / 864e5 + 25569;
+end;
+
+procedure JDateHelper.SetAsDateTime(dt : TDateTime);
+begin
+  Self.setTime(round((dt - 25569) * 864e5));
+end;
+
+function JDateHelper.GetAsLocalDateTime: TDateTime;
+begin
+  Result := (Self.getTime - 60000 * Self.getTimezoneOffset) / 864e5 + 25569;
+end;
+
+procedure JDateHelper.SetAsLocalDateTime(dt: TDateTime);
+begin
+  Self.setTime(round((dt - 25569) * 864e5) + 60000 * Self.getTimezoneOffset);
+end;
+{$endif}
 
 function TextToHttpBody(const Text: string): THttpBody;
 {$ifdef ISSMS}
@@ -587,6 +615,7 @@ type
   protected
     fConnection: TIdHTTP;
     fIOHandler: TIdSSLIOHandlerSocketOpenSSL; // here due to NextGen ARC model
+    fLock : TMutex;
   public
     constructor Create(const aParameters: TSQLRestConnectionParams); override;
     procedure URI(var Call: TSQLRestURIParams; const InDataType: string;
@@ -600,8 +629,10 @@ constructor TIndyHttpConnectionClass.Create(
   const aParameters: TSQLRestConnectionParams);
 begin
   inherited;
+  fLock := TMutex.Create;
   fConnection := TIdHTTP.Create(nil);
   fOpaqueConnection := fConnection;
+  fConnection.UseNagle := False; 
   fConnection.HTTPOptions := fConnection.HTTPOptions+[hoKeepOrigProtocol];
   fConnection.ConnectTimeout := fParameters.ConnectionTimeOut;
   fConnection.ReadTimeout := fParameters.ReceiveTimeout;
@@ -617,6 +648,7 @@ destructor TIndyHttpConnectionClass.Destroy;
 begin
   fConnection.Free;
   fIOHandler.Free;
+  fLock.Free;
   inherited;
 end;
 
@@ -626,51 +658,56 @@ var InStr, OutStr: TStream;
     OutLen,i: integer;
     Auth: string;
 begin
-  InStr := TMemoryStream.Create;
-  OutStr := TMemoryStream.Create;
+  fLock.Enter;
   try
-    fConnection.Request.RawHeaders.Text := Call.InHead;
-    Auth := fConnection.Request.RawHeaders.Values['Authorization'];
-    if (Auth<>'') and SameText(Copy(Auth,1,6),'Basic ') then begin
-      // see https://synopse.info/forum/viewtopic.php?pid=11761#p11761
-      with TIdDecoderMIME.Create do
-      try
-        Auth := DecodeString(copy(Auth,7,maxInt));
-      finally
-        Free;
+    InStr := TMemoryStream.Create;
+    OutStr := TMemoryStream.Create;
+    try
+      fConnection.Request.RawHeaders.Text := Call.InHead;
+      Auth := fConnection.Request.RawHeaders.Values['Authorization'];
+      if (Auth<>'') and SameText(Copy(Auth,1,6),'Basic ') then begin
+        // see https://synopse.info/forum/viewtopic.php?pid=11761#p11761
+        with TIdDecoderMIME.Create do
+        try
+          Auth := DecodeString(copy(Auth,7,maxInt));
+        finally
+          Free;
+        end;
+        i := Pos(':',Auth);
+        if i>0 then begin
+          fConnection.Request.BasicAuthentication := true;
+          fConnection.Request.Username := copy(Auth,1,i-1);
+          fConnection.Request.Password := Copy(Auth,i+1,maxInt);
+        end;
       end;
-      i := Pos(':',Auth);
-      if i>0 then begin
-        fConnection.Request.BasicAuthentication := true;
-        fConnection.Request.Username := copy(Auth,1,i-1);
-        fConnection.Request.Password := Copy(Auth,i+1,maxInt);
+      if Call.InBody<>nil then begin
+        InStr.Write(Call.InBody[0],length(Call.InBody));
+        InStr.Seek(0,soBeginning);
+        fConnection.Request.Source := InStr;
       end;
-    end;
-    if Call.InBody<>nil then begin
-      InStr.Write(Call.InBody[0],length(Call.InBody));
-      InStr.Seek(0,soBeginning);
-      fConnection.Request.Source := InStr;
-    end;
-    if Call.Verb='GET' then // allow 404 as valid Call.OutStatus
-      fConnection.Get(fURL+Call.Url,OutStr,[HTTP_SUCCESS,HTTP_NOTFOUND]) else
-    if Call.Verb='POST' then
-      fConnection.Post(fURL+Call.Url,InStr,OutStr) else
-    if Call.Verb='PUT' then
-      fConnection.Put(fURL+Call.Url,InStr) else
-    if Call.Verb='DELETE' then
-      fConnection.Delete(fURL+Call.Url) else
-      raise Exception.CreateFmt('Indy does not know method %s',[Call.Verb]);
-    Call.OutStatus := fConnection.Response.ResponseCode;
-    Call.OutHead := fConnection.Response.RawHeaders.Text;
-    OutLen := OutStr.Size;
-    if OutLen>0 then begin
-      SetLength(Call.OutBody,OutLen);
-      OutStr.Seek(0,soBeginning);
-      OutStr.Read(Call.OutBody[0],OutLen);
+      if Call.Verb='GET' then // allow 404 as valid Call.OutStatus
+        fConnection.Get(fURL+Call.Url,OutStr,[HTTP_SUCCESS,HTTP_NOTFOUND]) else
+      if Call.Verb='POST' then
+        fConnection.Post(fURL+Call.Url,InStr,OutStr) else
+      if Call.Verb='PUT' then
+        fConnection.Put(fURL+Call.Url,InStr) else
+      if Call.Verb='DELETE' then
+        fConnection.Delete(fURL+Call.Url) else
+        raise Exception.CreateFmt('Indy does not know method %s',[Call.Verb]);
+      Call.OutStatus := fConnection.Response.ResponseCode;
+      Call.OutHead := fConnection.Response.RawHeaders.Text;
+      OutLen := OutStr.Size;
+      if OutLen>0 then begin
+        SetLength(Call.OutBody,OutLen);
+        OutStr.Seek(0,soBeginning);
+        OutStr.Read(Call.OutBody[0],OutLen);
+      end;
+    finally
+      OutStr.Free;
+      InStr.Free;
     end;
   finally
-    OutStr.Free;
-    InStr.Free;
+    fLock.Leave;
   end;
 end;
 
@@ -897,10 +934,10 @@ begin
   D := date.getUTCDate;
 end;
 
-function TryEncodeDate(Y,M,D: integer; var Value: TDateTime): boolean;
+function TryEncodeDate(Y,M,D: integer; UTC: DateTimeZone; var Value: TDateTime): boolean;
 begin
   try
-    Value := EncodeDate(Y,M,D);
+    Value := EncodeDate(Y,M,D, DateTimeZone.UTC);
     result := true
   except
     result := false;
@@ -954,10 +991,10 @@ begin // e.g. YYYY-MM-DD Thh:mm:ss or YYYY-MM-DDThh:mm:ss
   if Value<=0 then
     result := '' else
   if frac(Value)=0 then
-    result := FormatDateTime('yyyy-mm-dd',Value) else
+    result := FormatDateTime('yyyy-mm-dd',Value,DateTimeZone.UTC) else
   if trunc(Value)=0 then
-    result := FormatDateTime('Thh:nn:ss',Value) else
-    result := FormatDateTime('yyyy-mm-ddThh:nn:ss',Value);
+    result := FormatDateTime('Thh:nn:ss',Value,DateTimeZone.UTC) else
+    result := FormatDateTime('yyyy-mm-ddThh:nn:ss',Value,DateTimeZone.UTC);
 end;
 
 function Iso8601ToDateTime(const Value: string): TDateTime;
@@ -977,7 +1014,7 @@ begin //  YYYY-MM-DD   Thh:mm:ss  or  YYYY-MM-DDThh:mm:ss
          ord(Value[3])*10+ord(Value[4])-(48+480+4800+48000);
     M := ord(Value[6])*10+ord(Value[7])-(48+480);
     D := ord(Value[9])*10+ord(Value[10])-(48+480);
-    TryEncodeDate(Y,M,D,result);
+    TryEncodeDate(Y,M,D,DateTimeZone.UTC,result);
   end;
   19: if (Value[5]=Value[8]) and (ord(Value[8]) in [ord('-'),ord('/')]) and
          (ord(Value[11]) in [ord(' '),ord('T')]) and (Value[14]=':') and (Value[17]=':') then begin
@@ -990,7 +1027,7 @@ begin //  YYYY-MM-DD   Thh:mm:ss  or  YYYY-MM-DDThh:mm:ss
     SS := ord(Value[18])*10+ord(Value[19])-(48+480);
     if (Y<=9999) and ((M-1)<12) and ((D-1)<31) and
        (HH<24) and (MI<60) and (SS<60) then
-      result := EncodeDate(Y,M,D)+EncodeTime(HH,MI,SS,0);
+      result := EncodeDate(Y,M,D,DateTimeZone.UTC)+EncodeTime(HH,MI,SS,0);
   end;
   end;
 end;

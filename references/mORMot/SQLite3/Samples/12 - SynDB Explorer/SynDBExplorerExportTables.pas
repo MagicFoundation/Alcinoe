@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, CheckLst, Controls, StdCtrls, Classes, Graphics,
   Forms, ExtCtrls, mORMotUILogin,
-  SynZip, SynCommons, SynDB, SynDBSQLite3;
+  SynZip, SynCommons, SynDB, SynTable, SynDBSQLite3;
 
 type
   TDBExportTablesForm = class(TForm)
@@ -87,7 +87,7 @@ begin
             Rows := aProps.NewThreadSafeStatement;
             try
               Rows.Execute(SQL,true);
-              Table := StringReplaceAll(StringReplaceAll(Table,' ',''),'-','');
+              Table := StringReplaceAll(Table,[' ','' ,'-','']);
               inc(result,Conn.NewTableFromRows(Table,Rows,true));
             finally
               Rows.Free;

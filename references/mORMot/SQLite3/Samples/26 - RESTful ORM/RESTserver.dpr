@@ -9,6 +9,7 @@ uses
   Classes,
   SysUtils,
   SynCommons,
+  SynTable,
   SynLog,
   mORMot,
   SynCrtSock,

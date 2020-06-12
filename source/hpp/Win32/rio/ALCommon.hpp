@@ -16,7 +16,6 @@
 #include <SysInit.hpp>
 #include <Winapi.Windows.hpp>
 #include <System.SysUtils.hpp>
-#include <ALStringList.hpp>
 #include <System.Types.hpp>
 
 //-- user supplied -----------------------------------------------------------
@@ -282,9 +281,9 @@ enum DECLSPEC_DENUM TalLogType : unsigned char { VERBOSE, DEBUG, INFO, WARN, ERR
 typedef void __fastcall (__closure *TALCustomDelayedFreeObjectProc)(System::TObject* &aObject);
 
 enum DECLSPEC_DENUM TALIntelCpuFeature : unsigned char { cfFPU, cfVME, cfDE, cfPSE, cfTSC, cfMSR, cfPAE, cfMCE, cfCX8, cfAPIC, cf_d10, cfSEP, cfMTRR, cfPGE, cfMCA, cfCMOV, cfPAT, cfPSE36, cfPSN, cfCLFSH, cf_d20, cfDS, cfACPI, cfMMX, cfFXSR, cfSSE, cfSSE2, cfSS, cfHTT, cfTM, cfIA64, cfPBE, cfSSE3, cfCLMUL, cfDS64, cfMON, cfDSCPL, cfVMX, cfSMX, cfEST, cfTM2, cfSSSE3, cfCID, cfSDBG, cfFMA, cfCX16, cfXTPR, cfPDCM, cf_c16, cfPCID, cfDCA, cfSSE41, cfSSE42, cfX2A, cfMOVBE, cfPOPCNT, cfTSC2, cfAESNI, cfXS, cfOSXS, cfAVX, cfF16C, cfRAND, cfHYP, cfFSGS, cf_b01, cfSGX, cfBMI1, cfHLE, cfAVX2, cf_b06, cfSMEP, cfBMI2, cfERMS, cfINVPCID, cfRTM, cfPQM, cf_b13, cfMPX, cfPQE, cfAVX512F, cfAVX512DQ, cfRDSEED, cfADX, cfSMAP, cfAVX512IFMA, cfPCOMMIT, cfCLFLUSH, cfCLWB, cfIPT, 
-	cfAVX512PF, cfAVX512ER, cfAVX512CD, cfSHA, cfAVX512BW, cfAVX512VL, cfPREFW1, cfAVX512VBMI };
+	cfAVX512PF, cfAVX512ER, cfAVX512CD, cfSHA, cfAVX512BW, cfAVX512VL, cfPREFW1, cfAVX512VBMI, cfUMIP, cfPKU, cfOSPKE, cf_c05, cfAVX512VBMI2, cf_c07, cfGFNI, cfVAES, cfVCLMUL, cfAVX512NNI, cfAVX512BITALG, cf_c13, cfAVX512VPC, cf_c15, cf_cc16, cf_c17, cf_c18, cf_c19, cf_c20, cf_c21, cfRDPID, cf_c23, cf_c24, cf_c25, cf_c26, cf_c27, cf_c28, cf_c29, cfSGXLC, cf_c31, cf_d0, cf_d1, cfAVX512NNIW, cfAVX512MAS, cf_d4, cf_d5, cf_d6, cf_d7 };
 
-typedef System::Set<TALIntelCpuFeature, TALIntelCpuFeature::cfFPU, TALIntelCpuFeature::cfAVX512VBMI> TALIntelCpuFeatures;
+typedef System::Set<TALIntelCpuFeature, TALIntelCpuFeature::cfFPU, TALIntelCpuFeature::cf_d7> TALIntelCpuFeatures;
 
 //-- var, const, procedure ---------------------------------------------------
 extern DELPHI_PACKAGE int ALCallStackCustomLogsMaxCount;
@@ -328,12 +327,12 @@ extern DELPHI_PACKAGE bool __fastcall AlIntToBool(int Value);
 extern DELPHI_PACKAGE int __fastcall ALMediumPos(int LTotal, int LBorder, int LObject);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALIfThen(bool AValue, const System::AnsiString ATrue, System::AnsiString AFalse = System::AnsiString())/* overload */;
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALIfThenU(bool AValue, const System::UnicodeString ATrue, System::UnicodeString AFalse = System::UnicodeString())/* overload */;
-extern DELPHI_PACKAGE int __fastcall ALIfThen(bool AValue, const int ATrue, const int AFalse)/* overload */;
-extern DELPHI_PACKAGE __int64 __fastcall ALIfThen(bool AValue, const __int64 ATrue, const __int64 AFalse)/* overload */;
-extern DELPHI_PACKAGE unsigned __int64 __fastcall ALIfThen(bool AValue, const unsigned __int64 ATrue, const unsigned __int64 AFalse)/* overload */;
-extern DELPHI_PACKAGE float __fastcall ALIfThen(bool AValue, const float ATrue, const float AFalse)/* overload */;
-extern DELPHI_PACKAGE double __fastcall ALIfThen(bool AValue, const double ATrue, const double AFalse)/* overload */;
-extern DELPHI_PACKAGE System::Extended __fastcall ALIfThen(bool AValue, const System::Extended ATrue, const System::Extended AFalse)/* overload */;
+extern DELPHI_PACKAGE int __fastcall ALIfThen(bool AValue, const int ATrue, const int AFalse = 0x0)/* overload */;
+extern DELPHI_PACKAGE __int64 __fastcall ALIfThen(bool AValue, const __int64 ATrue, const __int64 AFalse = 0LL)/* overload */;
+extern DELPHI_PACKAGE unsigned __int64 __fastcall ALIfThen(bool AValue, const unsigned __int64 ATrue, const unsigned __int64 AFalse = 0ULL)/* overload */;
+extern DELPHI_PACKAGE float __fastcall ALIfThen(bool AValue, const float ATrue, const float AFalse = 0.000000E+00f)/* overload */;
+extern DELPHI_PACKAGE double __fastcall ALIfThen(bool AValue, const double ATrue, const double AFalse = 0.000000E+00)/* overload */;
+extern DELPHI_PACKAGE System::Extended __fastcall ALIfThen(bool AValue, const System::Extended ATrue, const System::Extended AFalse = 0.000000E+00)/* overload */;
 extern DELPHI_PACKAGE System::DynamicArray<_TIME_DYNAMIC_ZONE_INFORMATION> __fastcall ALGetDynamicTimeZoneInformations(void);
 extern DELPHI_PACKAGE _TIME_DYNAMIC_ZONE_INFORMATION __fastcall ALGetDynamicTimeZoneInformation(const System::UnicodeString aTimeZoneKeyName);
 extern DELPHI_PACKAGE System::TDateTime __fastcall AlLocalDateTimeToUTC(const System::TDateTime aLocalDateTime)/* overload */;
@@ -348,6 +347,7 @@ extern DELPHI_PACKAGE System::TDateTime __fastcall ALUnixMsToDateTime(const __in
 extern DELPHI_PACKAGE __int64 __fastcall ALDateTimeToUnixMs(const System::TDateTime aValue);
 extern DELPHI_PACKAGE void __fastcall ALFreeAndNil(void *Obj, const bool adelayed = false)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALFreeAndNil(void *Obj, const bool adelayed, const bool aRefCountWarn)/* overload */;
+extern DELPHI_PACKAGE void __fastcall ALInitCpuFeatures(void);
 }	/* namespace Alcommon */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALCOMMON)
 using namespace Alcommon;

@@ -1,14 +1,16 @@
 program Project31WinHTTPEchoServer;
 
+{$I Synopse.inc}
+
+{$APPTYPE CONSOLE}
+
 uses
   {$I SynDprUses.inc} // use FastMM4 on older Delphi, or set FPC threads
   SysUtils,
-  Windows,
   SynZip,
   SynCrtSock,
-  SynCommons;
-
-{$APPTYPE CONSOLE}
+  SynCommons,
+  SynTable;
 
 type
   TSimpleWebsocketServer = class
@@ -18,8 +20,8 @@ type
     function onHttpRequest(Ctxt: THttpServerRequest): cardinal;
     function onAccept(Ctxt: THttpServerRequest; var Conn: THttpApiWebSocketConnection): Boolean;
     procedure onConnect(const Conn: THttpApiWebSocketConnection );
-    procedure onMessage(const Conn: THttpApiWebSocketConnection; aBufferType: WEB_SOCKET_BUFFER_TYPE; aBuffer: Pointer; aBufferSize: ULONG);
-    procedure onDisconnect(const Conn: THttpApiWebSocketConnection ; aStatus: WEB_SOCKET_CLOSE_STATUS; aBuffer: Pointer; aBufferSize: ULONG);
+    procedure onMessage(const Conn: THttpApiWebSocketConnection; aBufferType: WEB_SOCKET_BUFFER_TYPE; aBuffer: Pointer; aBufferSize: Cardinal);
+    procedure onDisconnect(const Conn: THttpApiWebSocketConnection ; aStatus: WEB_SOCKET_CLOSE_STATUS; aBuffer: Pointer; aBufferSize: Cardinal);
   public
     constructor Create;
     destructor Destroy; override;
@@ -53,11 +55,11 @@ end;
 
 procedure TSimpleWebsocketServer.onConnect(const Conn: THttpApiWebSocketConnection);
 begin
-  Writeln('Connected ', Conn.index);
+  Writeln('New connection. Assigned connectionID=', Conn.index);
 end;
 
 procedure TSimpleWebsocketServer.onDisconnect(const Conn: THttpApiWebSocketConnection;
-  aStatus: WEB_SOCKET_CLOSE_STATUS; aBuffer: Pointer; aBufferSize: ULONG);
+  aStatus: WEB_SOCKET_CLOSE_STATUS; aBuffer: Pointer; aBufferSize: Cardinal);
 var
   str: RawUTF8;
 begin
@@ -78,7 +80,7 @@ begin
 end;
 
 procedure TSimpleWebsocketServer.onMessage(const Conn: THttpApiWebSocketConnection;
-  aBufferType: WEB_SOCKET_BUFFER_TYPE; aBuffer: Pointer; aBufferSize: ULONG);
+  aBufferType: WEB_SOCKET_BUFFER_TYPE; aBuffer: Pointer; aBufferSize: Cardinal);
 var
   str: RawUTF8;
 begin
@@ -86,45 +88,72 @@ begin
 //  Conn.Protocol.Send(Conn.index, aBufferType, aBuffer, aBufferSize); //also work
   SetString(str, pUtf8Char(aBuffer), aBufferSize);
   if aBufferType = WEB_SOCKET_UTF8_MESSAGE_BUFFER_TYPE then
-    Writeln('UTF8 message from ', Conn.index, ' ',str)
+    Writeln('UTF8 message from ', Conn.index, ': ',str)
   else if aBufferType = WEB_SOCKET_UTF8_FRAGMENT_BUFFER_TYPE then
-    Writeln('UTF8 fragment from ', Conn.index, ' ',str)
+    Writeln('UTF8 fragment from ', Conn.index, ': ',str)
   else if (aBufferType = WEB_SOCKET_BINARY_MESSAGE_BUFFER_TYPE)
     or (aBufferType = WEB_SOCKET_BINARY_FRAGMENT_BUFFER_TYPE) then
     Writeln(aBufferType, ' from ', Conn.index, ' of length ', aBufferSize)
   else begin
-    Writeln(aBufferType, ' from ', Conn.index, ' ',str);
+    Writeln(aBufferType, ' from ', Conn.index, ': ',str);
   end;
 end;
 
 var
   _Server: TSimpleWebsocketServer;
   s: string;
+  idx: integer;
   MsgBuffer: RawUTF8;
   CloseReasonBuffer: RawUTF8;
 begin
-  MsgBuffer := 'Manual Message!';
-  CloseReasonBuffer := 'Manual Close!';
+  MsgBuffer := '';
+  CloseReasonBuffer := 'Connection closed by server';
   try
     _Server := TSimpleWebsocketServer.Create;
     try
       Writeln('WebSocket server is now listen on ws://localhost:8888/whatever');
       Writeln('HTTP server is now listen on http://localhost:8888/');
-      Writeln(' - point your browser to http://localhost:8888/ for initial page');
-      Writeln(' - type "close connectionID" to close existing webSocket connection');
-      Writeln(' - type "send  connectionID" to send text to specified WebCocket');
+      Writeln(' Point your browser to http://localhost:8888/ for initial page');
+      WriteLn('Type one of a commnad:');
+      Writeln(' - "close connectionID" to close existing webSocket connection');
+      Writeln(' - "sendto connectionID" to send text to specified WebCocket');
+      Writeln(' - "sendall" to send text to specified WebCocket');
       Writeln(' - press [Enter] to quit');
+      Writeln('Waiting for command:');
       repeat
         Readln(s);
         if Pos('close ', s) = 1 then begin
           s := SysUtils.Trim(Copy(s, 7, Length(s)));
           _Server.fServer.Protocols[0].Close(StrToIntDef(s, -1), WEB_SOCKET_SUCCESS_CLOSE_STATUS,
             Pointer(CloseReasonBuffer), length(CloseReasonBuffer));
-        end else if Pos('send ', s) = 1 then begin
-          s := SysUtils.Trim(Copy(s, 6, Length(s)));
-          _Server.fServer.Protocols[0].Send(StrToIntDef(s, -1), WEB_SOCKET_UTF8_MESSAGE_BUFFER_TYPE,
-             Pointer(MsgBuffer), length(MsgBuffer));
-        end;
+        end else if Pos('sendto ', s) = 1 then begin
+          s := SysUtils.Trim(Copy(s, 8, Length(s)));
+          idx := StrToIntDef(s, -1);
+          if (idx = -1 ) then
+            Writeln('Invalid connection ID. Usage: send connectionID (Example: send 0)')
+          else begin
+            Write('Type text to send: ');
+            Readln(MsgBuffer);
+            if _Server.fServer.Protocols[0].Send(
+              StrToIntDef(s, -1), WEB_SOCKET_UTF8_MESSAGE_BUFFER_TYPE,
+              Pointer(MsgBuffer), length(MsgBuffer)
+            ) then
+              WriteLn('Sent successfully. The message should appear in the client. Waiting for command:')
+            else
+              WriteLn('Error')
+          end;
+        end else if (s = 'sendall') then begin
+          Write('Type text to send: ');
+          Readln(MsgBuffer);
+          if _Server.fServer.Protocols[0].Broadcast(
+            WEB_SOCKET_UTF8_MESSAGE_BUFFER_TYPE,
+            Pointer(MsgBuffer), length(MsgBuffer)
+          ) then
+            WriteLn('Broadcast successfully. All clients should got a message. Waiting for command:')
+          else
+            WriteLn('Error')
+        end else if (s <> '') then
+          WriteLn('Invalid comand; Valid command are: close, sendto, sendall');
       until s = '';
     finally
       _Server.Free;

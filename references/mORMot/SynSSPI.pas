@@ -5,7 +5,7 @@ unit SynSSPI;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -24,7 +24,7 @@ unit SynSSPI;
 
   The Initial Developer of the Original Code is Chaa.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -44,17 +44,13 @@ unit SynSSPI;
 
   ***** END LICENSE BLOCK *****
 
-
-
-  Version 1.18
-  - initial release, with code split from SynSSPIAuth.pas
-  - has no external unit dependency, so can be used e.g. by SynCrtSock
-
 }
 
 {$I Synopse.inc} // define HASINLINE and other compatibility switches
 
 interface
+
+{$ifdef MSWINDOWS} // compiles as void unit for non-Windows - allow Lazarus package
 
 uses
   Windows,
@@ -96,8 +92,10 @@ type
   // - used to hold information between calls to ServerSSPIAuth
   TSecContextDynArray = array of TSecContext;
 
-  /// defines a SSPI buffer 
-  TSecBuffer = object
+  /// defines a SSPI buffer
+  {$ifdef USERECORDWITHMETHODS}TSecBuffer = record
+    {$else}TSecBuffer = object{$endif}
+  public
     cbBuffer: Cardinal;
     BufferType: Cardinal;
     pvBuffer: Pointer;
@@ -106,7 +104,9 @@ type
   PSecBuffer = ^TSecBuffer;
 
   /// describes a SSPI buffer
-  TSecBufferDesc = object
+  {$ifdef USERECORDWITHMETHODS}TSecBufferDesc = record
+    {$else}TSecBufferDesc = object{$endif}
+  public
     ulVersion: Cardinal;
     cBuffers: Cardinal;
     pBuffers: PSecBuffer;
@@ -114,6 +114,11 @@ type
   end;
   PSecBufferDesc = ^TSecBufferDesc;
 
+  /// store the name associated with the context
+  SecPkgContext_NamesW = record
+    sUserName: PWideChar;
+  end;
+  
   /// store information about a SSPI package
   TSecPkgInfoW = record
     fCapabilities: Cardinal;
@@ -174,9 +179,12 @@ const
   SECBUFFER_VERSION = 0;
   SECBUFFER_DATA = 1;
   SECBUFFER_TOKEN = 2;
+  SECBUFFER_PADDING = 9;
+  SECBUFFER_STREAM = 10;
   SECPKG_CRED_INBOUND  = $00000001;
   SECPKG_CRED_OUTBOUND = $00000002;
   SECPKG_ATTR_SIZES = 0;
+  SECPKG_ATTR_NAMES = 1;
   SECPKG_ATTR_STREAM_SIZES = 4;
   SECPKG_ATTR_NEGOTIATION_INFO = 12;
   SECURITY_NETWORK_DREP = 0;
@@ -290,7 +298,7 @@ function CertFindCertificateInStore(hCertStore: HCERTSTORE;
   pPrevCertContext: PCCERT_CONTEXT): PCCERT_CONTEXT; stdcall;
 
 
-  
+
 (* ========================= High-Level SSPI / SChannel API wrappers  ======= *)
 
 /// Sets aSecHandle fields to empty state for a given connection ID
@@ -445,49 +453,61 @@ end;
 function SecEncrypt(var aSecContext: TSecContext; const aPlain: TSSPIBuffer): TSSPIBuffer;
 var Sizes: TSecPkgContext_Sizes;
     SrcLen, EncLen: Cardinal;
-    EncBuffer: TSSPIBuffer; // TODO: use result as temporary buffer
-    InBuf: array[0..1] of TSecBuffer;
+    Token: array [0..127] of Byte; // Usually 60 bytes
+    Padding: array [0..63] of Byte; // Usually 1 byte
+    InBuf: array[0..2] of TSecBuffer;
     InDesc: TSecBufferDesc;
+    EncBuffer: TSSPIBuffer;
     Status: Integer;
     BufPtr: PByte;
 begin
   // Sizes.cbSecurityTrailer is size of the trailer (signature + padding) block
   if QueryContextAttributesW(@aSecContext.CtxHandle, SECPKG_ATTR_SIZES, @Sizes) <> 0 then
-    ESynSSPI.CreateLastOSError(aSecContext);
-
-  SrcLen := Length(aPlain);
-  EncLen := SizeOf(Cardinal) + Sizes.cbSecurityTrailer + SrcLen;
-  SetLength(Result, EncLen);
-  InBuf[0].Init(SECBUFFER_TOKEN, pointer(LONG_PTR(Result) + SizeOf(Cardinal)),
-    Sizes.cbSecurityTrailer);
-
-  // Encoding done in-place, so we copy the data
-  SetString(EncBuffer, PAnsiChar(pointer(aPlain)), SrcLen);
-  InBuf[1].Init(SECBUFFER_DATA, pointer(EncBuffer), SrcLen);
-
-  InDesc.Init(SECBUFFER_VERSION, @InBuf, 2);
-
-  Status := EncryptMessage(@aSecContext.CtxHandle, 0, @InDesc, 0);
-  if Status < 0 then
-    ESynSSPI.CreateLastOSError(aSecContext);
+    raise ESynSSPI.CreateLastOSError(aSecContext);
 
   // Encrypted data buffer structure:
   //
-  //   4 bytes  SigLen bytes     Remaining bytes
-  // +--------+----------------+-----------------+
-  // | SigLen | Trailer        | Data            |
-  // +--------+----------------+-----------------+
+  // SSPI/Kerberos Interoperability with GSSAPI
+  // https://msdn.microsoft.com/library/windows/desktop/aa380496.aspx
+  //
+  // GSS-API wrapper for Microsoft's Kerberos SSPI in Windows 2000
+  // http://www.kerberos.org/software/samples/gsskrb5/gsskrb5/krb5/krb5msg.c
+  //
+  //   cbSecurityTrailer bytes   SrcLen bytes     cbBlockSize bytes or less
+  //   (60 bytes)                                 (0 bytes, not used)
+  // +-------------------------+----------------+--------------------------+
+  // | Trailer                 | Data           | Padding                  |
+  // +-------------------------+----------------+--------------------------+
 
+  Assert(Sizes.cbSecurityTrailer <= High(Token)+1);
+  InBuf[0].Init(SECBUFFER_TOKEN, @Token[0], Sizes.cbSecurityTrailer);
+
+  // Encoding done in-place, so we copy the data
+  SrcLen := Length(aPlain);
+  SetString(EncBuffer, PAnsiChar(Pointer(aPlain)), SrcLen);
+  InBuf[1].Init(SECBUFFER_DATA, Pointer(EncBuffer), SrcLen);
+
+  Assert(Sizes.cbBlockSize <= High(Padding)+1);
+  InBuf[2].Init(SECBUFFER_PADDING, @Padding[0], Sizes.cbBlockSize);
+
+  InDesc.Init(SECBUFFER_VERSION, @InBuf, 3);
+
+  Status := EncryptMessage(@aSecContext.CtxHandle, 0, @InDesc, 0);
+  if Status < 0 then
+    raise ESynSSPI.CreateLastOSError(aSecContext);
+
+  EncLen := InBuf[0].cbBuffer + InBuf[1].cbBuffer + InBuf[2].cbBuffer;
+  SetLength(Result, EncLen);
   BufPtr := PByte(Result);
-  PCardinal(BufPtr)^ := InBuf[0].cbBuffer;
-  Inc(BufPtr, SizeOf(Cardinal));
+  Move(PByte(InBuf[0].pvBuffer)^, BufPtr^, InBuf[0].cbBuffer);
   Inc(BufPtr, InBuf[0].cbBuffer);
-  Move(PByte(InBuf[1].pvBuffer)^, BufPtr^, SrcLen);
-  SetLength(Result, SizeOf(Cardinal) + InBuf[0].cbBuffer + SrcLen);
+  Move(PByte(InBuf[1].pvBuffer)^, BufPtr^, InBuf[1].cbBuffer);
+  Inc(BufPtr, InBuf[1].cbBuffer);
+  Move(PByte(InBuf[2].pvBuffer)^, BufPtr^, InBuf[2].cbBuffer);
 end;
 
 function SecDecrypt(var aSecContext: TSecContext; const aEncrypted: TSSPIBuffer): TSSPIBuffer;
-var EncLen, SigLen, SrcLen: Cardinal;
+var EncLen, SigLen: Cardinal;
     BufPtr: PByte;
     InBuf: array [0..1] of TSecBuffer;
     InDesc: TSecBufferDesc;
@@ -498,30 +518,30 @@ begin
   BufPtr := PByte(aEncrypted);
   if EncLen < SizeOf(Cardinal) then  begin
     SetLastError(ERROR_INVALID_PARAMETER);
-    ESynSSPI.CreateLastOSError(aSecContext);
+    raise ESynSSPI.CreateLastOSError(aSecContext);
   end;
 
+  // Hack for compatibility with previous versions.
+  // Should be removed in future.
+  // Old version buffer format - first 4 bytes is Trailer length, skip it.
+  // 16 bytes for NTLM and 60 bytes for Kerberos
   SigLen := PCardinal(BufPtr)^;
-  Inc(BufPtr, SizeOf(Cardinal));
-  if EncLen < (SizeOf(Cardinal) + SigLen) then begin
-    SetLastError(ERROR_INVALID_PARAMETER);
-    ESynSSPI.CreateLastOSError(aSecContext);
+  if (SigLen = 16) or (SigLen = 60) then
+  begin
+    Inc(BufPtr, SizeOf(Cardinal));
+    Dec(EncLen, SizeOf(Cardinal));
   end;
 
-  SrcLen := EncLen - SizeOf(Cardinal) - SigLen;
-  SetLength(Result, SrcLen);
-
-  InBuf[0].Init(SECBUFFER_TOKEN, BufPtr, SigLen);
-  Inc(BufPtr, SigLen);
-
-  Move(BufPtr^, PByte(Result)^, SrcLen);
-  InBuf[1].Init(SECBUFFER_DATA, pointer(result), SrcLen);
-
+  InBuf[0].Init(SECBUFFER_STREAM, BufPtr, EncLen);
+  InBuf[1].Init(SECBUFFER_DATA, nil, 0);
   InDesc.Init(SECBUFFER_VERSION, @InBuf, 2);
 
   Status := DecryptMessage(@aSecContext.CtxHandle, @InDesc, 0, QOP);
   if Status < 0 then
-    ESynSSPI.CreateLastOSError(aSecContext);
+    raise ESynSSPI.CreateLastOSError(aSecContext);
+
+  SetString(Result, PAnsiChar(InBuf[1].pvBuffer), InBuf[1].cbBuffer);
+  FreeContextBuffer(InBuf[1].pvBuffer);
 end;
 
 
@@ -550,7 +570,7 @@ procedure TSynSSPIAbstract.EnsureStreamSizes;
 begin
   if fStreamSizes.cbHeader=0 then
     if QueryContextAttributesW(@fContext.CtxHandle,SECPKG_ATTR_STREAM_SIZES,@fStreamSizes) <> 0 then
-      ESynSSPI.CreateLastOSError(fContext);
+      raise ESynSSPI.CreateLastOSError(fContext);
 end;
 
 procedure TSynSSPIAbstract.DeleteContext;
@@ -559,5 +579,10 @@ begin
   FreeCredentialsContext(fContext.CredHandle);
 end;
 
+{$else}
+
+implementation // compiles as void unit for non-Windows
+
+{$endif MSWINDOWS}
 
 end.

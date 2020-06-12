@@ -5,10 +5,10 @@ unit SynSM;
 {
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
-    Scripting support for mORMot Copyright (C) 2018 Pavel Mashlyakovsky
+    Scripting support for mORMot Copyright (C) 2020 Pavel Mashlyakovsky
       pavel.mash at gmail.com
 
     Some ideas taken from
@@ -29,7 +29,7 @@ unit SynSM;
 
   The Initial Developer of the Original Code is
   Pavel Mashlyakovsky.
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -67,7 +67,7 @@ unit SynSM;
 
 }
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 {$I SynSM.inc}   // define SM_DEBUG JS_THREADSAFE CONSIDER_TIME_IN_Z
 
 interface
@@ -83,6 +83,7 @@ uses
   SynCommons,
   SynLog,
   SynTests,
+  SynTable,
   SynSMAPI;
 
 const
@@ -557,7 +558,7 @@ type
   // in addition to the main function result), it shall return a JSON object,
   // with parameter names for all var/out/result values, e.g.
   // ! '{"first":1,"second":2,"result":3}'
-  // - this allows the function result to be consummed by the JavaScript as
+  // - this allows the function result to be consumed by the JavaScript as
   // a regular JS value or object
   // - corresponds to meJSON kind of callback method
   TSMEngineMethodEventJSON = function(const This: TSMObject;
@@ -883,8 +884,10 @@ type
   TSMVariant = class(TSynInvokeableVariantType)
   protected
     /// fast getter/setter implementation of object properties
-    procedure IntGet(var Dest: TVarData; const V: TVarData; Name: PAnsiChar); override;
-    procedure IntSet(const V, Value: TVarData; Name: PAnsiChar); override;
+    function IntGet(var Dest: TVarData; const Instance: TVarData;
+      Name: PAnsiChar; NameLen: PtrInt): boolean; override;
+    function IntSet(const Instance, Value: TVarData;
+      Name: PAnsiChar; NameLen: PtrInt): boolean; override;
   public
     /// initialize a variant instance to store a JavaScript object
     class procedure New(const aObject: TSMObject; out aValue: variant); overload;
@@ -924,9 +927,10 @@ type
   protected
   {$endif}
     VType: TVarType;
-    {$HINTS OFF} // does not complain if Filler is declared but never used
+    {$IFDEF FPC} {$PUSH} {$ENDIF} {$HINTS OFF}
+    // does not complain if Filler is declared but never used
     Filler: array[1..SizeOf(TVarData)-SizeOf(TVarType)-SizeOf(TSMObject)] of byte;
-    {$HINTS ON}
+    {$IFDEF FPC} {$POP} {$ELSE} {$HINTS ON} {$ENDIF}
     VObject: TSMObject;
   public
     /// initialize a TSMVariant structure to store a specified JavaScript object
@@ -1170,7 +1174,7 @@ begin
   end;
   if res=JS_FALSE then begin
     SynSMLog.Add.Log(sllError, 'Error compiling script %', FLastErrorFileName);
-    raise ESMException.CreateUTF8('%: Error compiling script "%". Line %',
+    raise ESMException.CreateUTF8('%: Error compiling script [%]. Line %',
       [self,FLastErrorFileName,FLastErrorLine]);
   end;
 end;
@@ -1643,8 +1647,7 @@ begin
   varWord:
     FValue := INT_TO_JSVAL(VWord);
   varLongWord:
-    if (VLongWord>=cardinal(Low(integer))) and
-      (VLongWord<=cardinal(High(integer))) then
+    if VLongWord<=cardinal(high(Integer)) then
       FValue := INT_TO_JSVAL(VLongWord) else
       FValue := DOUBLE_TO_JSVAL(VLongWord);
   {$endif}
@@ -1942,8 +1945,9 @@ end;
 
 function TSMValue.ToJSON(cx: PJSContext): RawUTF8;
 var W: TJSONWriter;
+    tmp: TTextWriterStackBuffer;
 begin
-  W := TJSONWriter.CreateOwnedStream;
+  W := TJSONWriter.CreateOwnedStream(tmp);
   try
     AddJSON(cx,W);
     W.SetText(result);
@@ -2409,15 +2413,16 @@ end;
 
 { TSMVariant }
 
-procedure TSMVariant.IntGet(var Dest: TVarData; const V: TVarData;
-  Name: PAnsiChar);
+function TSMVariant.IntGet(var Dest: TVarData; const Instance: TVarData;
+  Name: PAnsiChar; NameLen: PtrInt): boolean;
 var res: TSMValue;
 begin
-  //Assert(V.VType=SMVariantType.VarType);
-  with TSMVariantData(V) do
+  //Assert(Instance.VType=SMVariantType.VarType);
+  with TSMVariantData(Instance) do
     if JS_GetProperty(cx,obj,Name,res.FValue)=JS_FALSE then
       raise ESMException.CreateUTF8('Unexpected %.%',[self,Name]) else
       res.ToVariant(cx,variant(Dest));
+  result := true;
 end;
 
 function TSMVariant.DoFunction(var Dest: TVarData; const V: TVarData;
@@ -2457,14 +2462,17 @@ begin
   end;
 end;
 
-procedure TSMVariant.IntSet(const V, Value: TVarData; Name: PAnsiChar);
+function TSMVariant.IntSet(const Instance, Value: TVarData;
+  Name: PAnsiChar; NameLen: PtrInt): boolean;
 var smValue: TSMValue;
 begin
-  with TSMVariantData(V) do begin
+  //Assert(Instance.VType=SMVariantType.VarType);
+  with TSMVariantData(Instance) do begin
     smValue.SetVariant(cx,Variant(Value));
-    if JS_SetProperty(cx,obj,Name,smValue.FValue)=JS_FALSE then
-      raise ESMException.CreateUTF8('Error setting %.%',[self,Name]);
+    result := JS_SetProperty(cx,obj,Name,smValue.FValue)<>JS_FALSE;
   end;
+  if not result then
+    raise ESMException.CreateUTF8('Error setting %.%',[self,Name]);
 end;
 
 procedure TSMVariant.ToJSON(W: TTextWriter; const Value: variant;
@@ -2485,23 +2493,20 @@ end;
 class procedure TSMVariant.New(const aObject: TSMObject;
   out aValue: variant);
 begin
-  if TVarData(aValue).VType and VTYPE_STATIC<>0 then
-    VarClear(aValue);
+  VarClear(aValue);
   TSMVariantData(aValue).Init(aObject);
 end;
 
 class procedure TSMVariant.New(cx: PJSContext; obj: PJSObject;
   out aValue: variant);
 begin
-  if TVarData(aValue).VType and VTYPE_STATIC<>0 then
-    VarClear(aValue);
+  VarClear(aValue);
   TSMVariantData(aValue).Init(cx,obj);
 end;
 
 class procedure TSMVariant.New(engine: TSMEngine; out aValue: variant);
 begin
-  if TVarData(aValue).VType and VTYPE_STATIC<>0 then
-    VarClear(aValue);
+  VarClear(aValue);
   TSMVariantData(aValue).InitNew(engine);
 end;
 

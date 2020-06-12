@@ -6,7 +6,7 @@ unit mORMotSelfTests;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,11 +25,11 @@ unit mORMotSelfTests;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
-  
+
   Alternatively, the contents of this file may be used under the terms of
   either the GNU General Public License Version 2 or later (the "GPL"), or
   the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
@@ -44,28 +44,11 @@ unit mORMotSelfTests;
 
   ***** END LICENSE BLOCK *****
 
-  Version 1.16
-  - first public release, corresponding to SQLite3 Framework 1.16
-  - all mORMot tests are now implemented in this separated unit: this is
-    requested by bugs in the Delphi XE2 background compilers: main compiler
-    was OK with our code (i.e. it compiles into .exe and run as expected), but
-    background IDE compilers (used e.g. for syntax checking) was not able
-    to compile the tests within the main .dpr source code
-
-  Version 1.17
-  - fixed LVCL and Delphi 5 compilation issues
-
-  Version 1.18
-  - renamed SQLite3SelfTests.pas to mORMotSelfTests.pas
-  - added TInterfaceStub and TInterfaceMock classes testing
-  - added multi-thread stress tests over all handled communication protocols
-  - included WebSockets and DDD dedicated testing
-
 }
 
 interface
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64
 
 /// this is the main entry point of the tests
 // - this procedure will create a console, then run all available tests
@@ -75,18 +58,21 @@ procedure SQLite3ConsoleTests;
 implementation
 
 uses
+  SysUtils,
+  SynCommons,
   {$ifdef MSWINDOWS}
-  Windows, // for AllocConsole
-  {$ifndef DELPHI5OROLDER}
-  SynBigTable,
+    Windows, // for AllocConsole
+    {$ifndef DELPHI5OROLDER}
+      SynBigTable,
+    {$endif}
   {$endif}
-  {$endif}
   {$ifndef DELPHI5OROLDER}
-  mORMot, // for TSQLLog
+    mORMot, // for TSQLLog
   {$endif}
   SynLog,
   SynBidirSock, // for WebSocketLog
   SynTests,
+  SynSQLite3, // for Sqlite3 used version
   SynSelfTests;
 
 type
@@ -96,6 +82,9 @@ type
   // - inherits from TSynTestsLogged in order to create enhanced log information
   // in case of any test case failure
   TTestSynopsemORMotFramework = class(TSynTestsLogged)
+  public
+    /// provide additional information
+    function Run: boolean; override;
   published
     /// test the freeware Synopse library
     // - low level functions and classes, cryptographic or compression routines,
@@ -111,9 +100,17 @@ type
 
 { TTestSynopsemORMotFramework }
 
+function TTestSynopsemORMotFramework.Run: boolean;
+begin
+  CustomVersions := format(#13#10#13#10'%s (cp%d)'#13#10 +
+    '    %s'#13#10'Using mORMot %s'#13#10'    %s', [OSVersionText, GetACP,
+    CpuInfoText, SYNOPSE_FRAMEWORK_FULLVERSION, sqlite3.Version]);
+  result := inherited Run;
+end;
+
 procedure TTestSynopsemORMotFramework.SynopseLibraries;
 begin
-  //AddCase(TTestCompression);
+  //AddCase(TTestLowLevelTypes);
   //exit;
   AddCase([TTestLowLevelCommon,
     TTestLowLevelTypes,
@@ -140,7 +137,7 @@ type // mORMot.pas unit doesn't compile with Delphi 5 yet
 {$else}
 procedure TTestSynopsemORMotFramework._mORMot;
 begin
-  //AddCase(TTestFileBased);
+  //AddCase(TTestExternalDatabase);
   //exit; // (*
   AddCase([TTestFileBased,TTestFileBasedMemoryMap,TTestFileBasedWAL]);
   AddCase(TTestMemoryBased);
@@ -166,7 +163,7 @@ begin
   TSynLogTestLog := TSQLLog; // share the same log file with whole mORMot
   {$endif}
   WebSocketLog := TSQLLog; // enable low-level WebSockets frames logging
-  if false then // "if not false then" will create around 1.2 GB of log file
+  if false then // "if not false then" will create around 1.4 GB of log file
   with TSQLLog.Family do begin
     Level := LOG_VERBOSE;
     //DestinationPath := ExeVersion.ProgramFilePath+'logs'; folder should exist

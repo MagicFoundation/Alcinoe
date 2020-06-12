@@ -1,5 +1,49 @@
 unit ECCProcess;
 
+(*
+    This file is part of Synopse framework.
+
+    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
+      Synopse Informatique - https://synopse.info
+
+  *** BEGIN LICENSE BLOCK *****
+  Version: MPL 1.1/GPL 2.0/LGPL 2.1
+
+  The contents of this file are subject to the Mozilla Public License Version
+  1.1 (the "License"); you may not use this file except in compliance with
+  the License. You may obtain a copy of the License at
+  http://www.mozilla.org/MPL
+
+  Software distributed under the License is distributed on an "AS IS" basis,
+  WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+  for the specific language governing rights and limitations under the License.
+
+  The Original Code is Synopse framework.
+
+  The Initial Developer of the Original Code is Arnaud Bouchez.
+
+  Portions created by the Initial Developer are Copyright (C) 2020
+  the Initial Developer. All Rights Reserved.
+
+  Contributor(s):
+   - Nicolas Marchand (MC)
+
+  Alternatively, the contents of this file may be used under the terms of
+  either the GNU General Public License Version 2 or later (the "GPL"), or
+  the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+  in which case the provisions of the GPL or the LGPL are applicable instead
+  of those above. If you wish to allow use of your version of this file only
+  under the terms of either the GPL or the LGPL, and not to allow others to
+  use your version of this file under the terms of the MPL, indicate your
+  decision by deleting the provisions above and replace them with the notice
+  and other provisions required by the GPL or the LGPL. If you do not delete
+  the provisions above, a recipient may use your version of this file under
+  the terms of any one of the MPL, the GPL or the LGPL.
+
+  ***** END LICENSE BLOCK *****
+
+*)
+
 interface
 
 {$I Synopse.inc}
@@ -8,6 +52,7 @@ uses
   SysUtils,
   Classes,
   SynCommons,
+  SynTable,
   SynEcc,
   SynCrypto;
 
@@ -27,7 +72,8 @@ function ECCCommandRekey(const AuthPrivKey: TFileName;
 /// end-user command to sign a file using a private key file
 // - as used in the ECC.dpr command-line sample project
 function ECCCommandSignFile(const FileToSign, AuthPrivKey: TFileName;
-  const AuthPassword: RawUTF8; AuthPasswordRounds: integer): TFileName;
+  const AuthPassword: RawUTF8; AuthPasswordRounds: integer;
+  const MetaNameValuePairs: array of const): TFileName;
 
 /// end-user command to verify a file signature
 // - as used in the ECC.dpr command-line sample project
@@ -91,6 +137,17 @@ function ECCCommandCheatInit(const Issuer, CheatPassword: RawUTF8;
 function ECCCommandCheat(const PrivateFile: TFileName; const CheatPassword: RawUTF8;
   CheatRounds: integer; out authpass: RawUTF8; out authround: integer): RawUTF8;
 
+/// end-user command to encrypt a file with the symetric .synaead format
+// - will use symetric encryption via AES-256-CFB/PKCS7 over PBKDF2_HMAC_SHA256
+// - as used in the ECC.dpr command-line sample project
+procedure AEADCommandCryptFile(const FileToCrypt, DestFile: TFileName;
+  const Password, PasswordSalt: RawUTF8; PasswordRounds: integer);
+
+/// end-user command to decrypt a symetric .synaead file
+// - will use symetric encryption via AES-256-CFB/PKCS7 over PBKDF2_HMAC_SHA256
+// - as used in the ECC.dpr command-line sample project
+procedure AEADCommandDecryptFile(const FileToDecrypt, DestFile: TFileName;
+  const Password, PasswordSalt: RawUTF8; PasswordRounds: integer);
 
 type
   /// the actions implemented by ECCCommand()
@@ -100,6 +157,7 @@ type
     ecHelp, ecNew, ecRekey, ecSign, ecVerify, ecSource, ecInfoPriv,
     ecChain, ecChainAll,
     ecCrypt, ecDecrypt, ecInfoCrypt,
+    ecAeadCrypt, ecAeadDecrypt,
     ecCheatInit, ecCheat);
   /// the result code returned by ECCCommand()
   // - as used in the ECC.dpr command-line sample project
@@ -118,7 +176,10 @@ const
   CHEAT_ROUNDS = 100000;
   CHEAT_SPLIT = 100;
 
-  
+  AEAD_FILEEXT = '.synaead';
+  DEFAULT_AEADROUNDS = 60000;
+
+
 implementation
 
 procedure CreateCheatFile(secret: TECCCertificateSecret;
@@ -189,12 +250,13 @@ begin
 end;
 
 function ECCCommandSignFile(const FileToSign, AuthPrivKey: TFileName;
-  const AuthPassword: RawUTF8; AuthPasswordRounds: integer): TFileName;
+  const AuthPassword: RawUTF8; AuthPasswordRounds: integer;
+  const MetaNameValuePairs: array of const): TFileName;
 var auth: TECCCertificateSecret;
 begin
   auth := TECCCertificateSecret.CreateFromSecureFile(AuthPrivKey,AuthPassword,AuthPasswordRounds);
   try
-    result := auth.SignFile(FileToSign,[]);
+    result := auth.SignFile(FileToSign,MetaNameValuePairs);
   finally
     auth.Free;
   end;
@@ -415,6 +477,61 @@ begin
   end;
 end;
 
+procedure AEADProcess(Encrypt: boolean; var Source: RawByteString;
+  const DestFileName: TFileName; const Password, PasswordSalt: RawUTF8; PasswordRounds: integer);
+var
+  aeskey: THash256;
+  dst: RawByteString;
+begin
+  try
+    PBKDF2_HMAC_SHA256(Password,PasswordSalt,PasswordRounds,aeskey,'salt');
+    try
+      dst := TAESCFBCRC.MACEncrypt(Source,aeskey,Encrypt);
+      try
+        if dst='' then
+          raise EECCException.CreateUTF8('MACEncrypt failed for %',[DestFileName]);
+        if not FileFromString(dst,DestFileName) then
+          raise EECCException.CreateUTF8('FileFromString failed for %',[DestFileName]);
+      finally
+        FillZero(dst);
+      end;
+    finally
+      FillZero(aeskey);
+    end;
+  finally
+    FillZero(Source);
+  end;
+end;
+
+procedure AEADCommandCryptFile(const FileToCrypt, DestFile: TFileName;
+  const Password, PasswordSalt: RawUTF8; PasswordRounds: integer);
+var plain: RawByteString;
+    dest: TFileName;
+begin
+  plain := StringFromFile(FileToCrypt);
+  if plain='' then
+    raise EECCException.CreateUTF8('File not found: %',[FileToCrypt]);
+  if DestFile='' then
+    dest := FileToCrypt+AEAD_FILEEXT else
+    dest := DestFile;
+  AEADProcess({encrypt=}true,plain,dest,Password,PasswordSalt,PasswordRounds);
+end;
+
+
+procedure AEADCommandDecryptFile(const FileToDecrypt, DestFile: TFileName;
+  const Password, PasswordSalt: RawUTF8; PasswordRounds: integer);
+var encrypted: RawByteString;
+    dest: TFileName;
+begin
+  encrypted := StringFromFile(FileToDecrypt);
+  if encrypted='' then
+    raise EECCException.CreateUTF8('File not found: %',[FileToDeCrypt]);
+  if DestFile='' then
+    dest := GetFileNameWithoutExt(FileToDecrypt) else
+    dest := DestFile;
+  AEADProcess({encrypt=}false,encrypted,dest,Password,PasswordSalt,PasswordRounds);
+end;
+
 
 
 function ECCCommand(cmd: TECCCommand; const sw: ICommandLine): TECCCommandError;
@@ -545,7 +662,7 @@ begin
         'Enter the PassPhrase of this .private file.');
       authrounds := sw.AsInt('Rounds',DEFAULT_ECCROUNDS,
         'Enter the PassPhrase iteration rounds of this .private file.');
-      newfile := EccCommandSignFile(origfile,auth,authpass,authrounds);
+      newfile := EccCommandSignFile(origfile,auth,authpass,authrounds,[]);
     end;
     ecVerify: begin
       repeat
@@ -650,6 +767,33 @@ begin
         sw.Text(' % file decryption failure: % (%).',[origfile,msg,ord(decrypt)],ccLightRed);
         result := eccError;
       end;
+    end;
+    ecAeadCrypt: begin
+      repeat
+        origfile := sw.AsString('File','','Enter the name of the file to be encrypted.');
+      until FileExists(origfile) or sw.NoPrompt;
+      repeat
+        newfile := SysUtils.Trim(sw.AsString('Out',origfile+AEAD_FILEEXT,
+          'Enter the name of the encrypted file'));
+      until (newfile <> '') or sw.NoPrompt;
+      authpass := sw.AsUTF8('Pass','', 'Enter the PassPhrase to be used for encryption.');
+      savepass := sw.AsUTF8('Salt','salt','Enter the optional PassPhrase to be used for encryption.');
+      authrounds := sw.AsInt('Rounds',DEFAULT_AEADROUNDS, 'Enter the PassPhrase iteration rounds.');
+      AEADCommandCryptFile(origfile,newfile,authpass,savepass, authrounds);
+    end;
+    ecAeadDecrypt: begin
+      repeat
+        origfile := sw.AsString('File','','Enter the name of the file to be decrypted.');
+      until FileExists(origfile) or sw.NoPrompt;
+      repeat
+        newfile := SysUtils.Trim(sw.AsString('Out',GetFileNameWithoutExt(origfile)+'.2',
+          'Enter the name of the decrypted file'));
+      until (newfile <> '') or sw.NoPrompt;
+      authpass := sw.AsUTF8('Pass','','Enter the PassPhrase to be used for decryption.');
+      savepass := sw.AsUTF8('Salt','salt','Enter the optional PassPhrase to be used for decryption.');
+      authrounds := sw.AsInt('Rounds',DEFAULT_AEADROUNDS,'Enter the PassPhrase iteration rounds.');
+      AEADCommandDecryptFile(origfile,newfile,authpass,savepass,authrounds);
+      sw.Text(' % file decrypted.',[origfile],ccLightGreen);
     end;
     ecCheatInit: begin
       issuer := sw.AsUTF8('Issuer',ExeVersion.User,

@@ -49,6 +49,8 @@ type
     Button14: TButton;
     Button17: TButton;
     Button18: TButton;
+    Button9: TButton;
+    Button19: TButton;
     procedure ALButton1Click(Sender: TObject);
     procedure ALButton3Click(Sender: TObject);
     procedure ALButton4Click(Sender: TObject);
@@ -80,6 +82,8 @@ type
     procedure Button17Click(Sender: TObject);
     procedure Button14Click(Sender: TObject);
     procedure Button18Click(Sender: TObject);
+    procedure Button9Click(Sender: TObject);
+    procedure Button19Click(Sender: TObject);
   private
   public
   end;
@@ -92,8 +96,10 @@ uses math,
      alcommon,
      system.hash,
      system.netencoding,
+     system.uitypes,
      AlAVLBinaryTree,
      ALString,
+     ALFiles,
      alCipher,
      ZlibExApi,
      ZlibEx;
@@ -419,13 +425,14 @@ end;
 {*********************************************}
 procedure TForm1.Button10Click(Sender: TObject);
 Var aData: AnsiString;
+    aBase64Data: AnsiString;
     aCounter: integer;
     aStopWatch: TstopWatch;
     aLastGUIUpdate: TDateTime;
 begin
   if (Sender as TButton).Tag = 1 then begin
     (Sender as TButton).Tag := 0;
-    (Sender as TButton).Caption := 'Bench ALBase64Encode (ansiString)';
+    (Sender as TButton).Caption := 'Test/Bench ALBase64Encode (ansiString)';
     exit;
   end;
   (Sender as TButton).Tag := 1;
@@ -436,7 +443,7 @@ begin
   ALMemoCryptedData.Lines.Text := string(ALBase64EncodeString(ansiString(ALMemoDecryptedData.Lines.Text)));
   ALMemoDecryptedData.Lines.Text := string(ALBase64DecodeString(ansiString(ALMemoCryptedData.Lines.Text)));
 
-  StatusBar1.Panels[0].Text := 'Bench ALBase64Encode (ansiString)';
+  StatusBar1.Panels[0].Text := 'Test/Bench ALBase64Encode (ansiString)';
   StatusBar1.Panels[1].Text := '';
   StatusBar1.Panels[2].Text := 'Input: 1 to 4096 bytes';
   StatusBar1.Panels[3].Text := '';
@@ -446,9 +453,11 @@ begin
   aLastGUIUpdate := now;
   aStopWatch := TstopWatch.Create;
   while True do begin
-    aData := ALRandomByteStr(1+random(4096));
+    aData := ALRandomByteStr(random(4096));
     aStopWatch.Start;
-    ALBase64EncodeString(aData);
+    aBase64Data := ALBase64EncodeString(aData);
+    if ALBase64DecodeString(aBase64Data) <> aData then
+      raise Exception.Create('Test failed!');
     aStopWatch.Stop;
     inc(acounter);
     if millisecondsbetween(now, aLastGUIUpdate) > 200 then begin
@@ -693,13 +702,14 @@ end;
 
 procedure TForm1.Button15Click(Sender: TObject);
 Var aData: String;
+    aBase64Data: String;
     aCounter: integer;
     aStopWatch: TstopWatch;
     aLastGUIUpdate: TDateTime;
 begin
   if (Sender as TButton).Tag = 1 then begin
     (Sender as TButton).Tag := 0;
-    (Sender as TButton).Caption := 'Bench ALBase64EncodeU (UNICODE)';
+    (Sender as TButton).Caption := 'Test/Bench ALBase64EncodeU (UNICODE)';
     exit;
   end;
   (Sender as TButton).Tag := 1;
@@ -710,7 +720,7 @@ begin
   ALMemoCryptedData.Lines.Text := ALBase64EncodeStringU(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8);
   ALMemoDecryptedData.Lines.Text := ALBase64DecodeStringU(ALMemoCryptedData.Lines.Text, Tencoding.UTF8);
 
-  StatusBar1.Panels[0].Text := 'Bench ALBase64EncodeU (UNICODE)';
+  StatusBar1.Panels[0].Text := 'Test/Bench ALBase64EncodeU (UNICODE)';
   StatusBar1.Panels[1].Text := '';
   StatusBar1.Panels[2].Text := 'Input: 1 to 4096 bytes';
   StatusBar1.Panels[3].Text := '';
@@ -720,9 +730,11 @@ begin
   aLastGUIUpdate := now;
   aStopWatch := TstopWatch.Create;
   while True do begin
-    aData := ALRandomStrU(1+random(4096));
+    aData := ALRandomStrU(random(4096));
     aStopWatch.Start;
-    ALBase64EncodeStringU(aData, Tencoding.UTF8);
+    aBase64Data := ALBase64EncodeStringU(aData, Tencoding.UTF8);
+    if ALBase64DecodeStringU(aBase64Data, Tencoding.UTF8) <> aData then
+      raise Exception.Create('Test failed!');
     aStopWatch.Stop;
     inc(acounter);
     if millisecondsbetween(now, aLastGUIUpdate) > 200 then begin
@@ -904,6 +916,14 @@ begin
   end;
 end;
 
+procedure TForm1.Button19Click(Sender: TObject);
+begin
+  if messageDLG('This operation will take a moment to execute, you will need to be patient.',mtConfirmation,[mbOK,MbCancel],0) = mrOK then begin
+    ALTestCRC32Implementation(ALGetModulePath + '..\_source\crc32test.txt');
+    Showmessage('Test passed successfully!');
+  end;
+end;
+
 procedure TForm1.Button1Click(Sender: TObject);
 Var aData: AnsiString;
     aTmpData: ansiString;
@@ -969,11 +989,11 @@ end;
 procedure TForm1.Button2Click(Sender: TObject);
 Var aData: AnsiString;
     aTmpData: ansiString;
-    aHash: integer;
+    aHash: cardinal;
     aCounter: integer;
     aStopWatch: TstopWatch;
     aLastGUIUpdate: TDateTime;
-    aDictionary: TDictionary<integer,ansistring>;
+    aDictionary: TDictionary<cardinal,ansistring>;
     aCollision: integer;
 begin
   if (Sender as TButton).Tag = 1 then begin
@@ -994,7 +1014,7 @@ begin
   StatusBar1.Panels[3].Text := '';
   StatusBar1.Panels[4].Text := '';
   ALMemoCollisions.Lines.Clear;
-  aDictionary := TDictionary<integer,ansistring>.create;
+  aDictionary := TDictionary<cardinal,ansistring>.create;
   try
     aCounter := 0;
     aCollision := 0;
@@ -1026,6 +1046,68 @@ begin
     aDictionary.free;
   end;
 end;
+
+procedure TForm1.Button9Click(Sender: TObject);
+Var aData: AnsiString;
+    aTmpData: ansiString;
+    aHash: int64;
+    aCounter: integer;
+    aStopWatch: TstopWatch;
+    aLastGUIUpdate: TDateTime;
+    aDictionary: TDictionary<int64,ansistring>;
+    aCollision: integer;
+begin
+  if (Sender as TButton).Tag = 1 then begin
+    (Sender as TButton).Tag := 0;
+    (Sender as TButton).Caption := 'Bench ALCRC64';
+    exit;
+  end;
+  (Sender as TButton).Tag := 1;
+  (Sender as TButton).Caption := 'Stop';
+  randomize;
+
+  ALMemoCryptedData.Lines.Text := '';
+  ALMemoDecryptedData.Lines.Text := '';
+
+  StatusBar1.Panels[0].Text := 'ALCRC64';
+  StatusBar1.Panels[1].Text := '';
+  StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
+  StatusBar1.Panels[3].Text := '';
+  StatusBar1.Panels[4].Text := '';
+  ALMemoCollisions.Lines.Clear;
+  aDictionary := TDictionary<int64,ansistring>.create;
+  try
+    aCounter := 0;
+    aCollision := 0;
+    aLastGUIUpdate := now;
+    aStopWatch := TstopWatch.Create;
+    while True do begin
+      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aStopWatch.Start;
+      aHash := ALStringHashCRC64(aData);
+      aStopWatch.Stop;
+      if aDictionary.TryGetValue(aHash, aTmpData) then begin
+        if aTmpData <> aData then begin
+          ALMemoCollisions.Lines.Add(string(aTmpData + '  =  ' + aData));
+          inc(aCollision);
+        end;
+      end
+      else aDictionary.Add(aHash, aData);
+      inc(acounter);
+      if millisecondsbetween(now, aLastGUIUpdate) > 200 then begin
+        aLastGUIUpdate := now;
+        StatusBar1.Panels[1].Text := FormatFloat('#,.', (acounter / (aStopWatch.Elapsed.TotalMilliseconds / 1000))) + ' keys/s ('+ FormatFloat('0,.######', ((aStopWatch.Elapsed.TotalMilliseconds / acounter))) + ' ms/key)';
+        StatusBar1.Panels[3].Text := inttostr(aCollision) + ' collisions';
+        StatusBar1.Panels[4].Text := FormatFloat('#,.', aDictionary.Count) + ' keys';
+        if (Sender as TButton).Tag = 0 then break;
+        application.ProcessMessages;
+      end;
+    end;
+  finally
+    aDictionary.free;
+  end;
+end;
+
 
 {***************************}
 {$WARN SYMBOL_DEPRECATED OFF}
@@ -1156,11 +1238,11 @@ end;
 procedure TForm1.Button5Click(Sender: TObject);
 Var aData: AnsiString;
     aTmpData: ansiString;
-    aHash: integer;
+    aHash: int32;
     aCounter: integer;
     aStopWatch: TstopWatch;
     aLastGUIUpdate: TDateTime;
-    aDictionary: TDictionary<integer,ansistring>;
+    aDictionary: TDictionary<int32,ansistring>;
     aCollision: integer;
 begin
   if (Sender as TButton).Tag = 1 then begin
@@ -1181,7 +1263,7 @@ begin
   StatusBar1.Panels[3].Text := '';
   StatusBar1.Panels[4].Text := '';
   ALMemoCollisions.Lines.Clear;
-  aDictionary := TDictionary<integer,ansistring>.create;
+  aDictionary := TDictionary<int32,ansistring>.create;
   try
     aCounter := 0;
     aCollision := 0;

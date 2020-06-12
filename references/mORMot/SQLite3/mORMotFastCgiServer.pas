@@ -6,7 +6,7 @@ unit mORMotFastCgiServer;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit mORMotFastCgiServer;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -62,17 +62,6 @@ fastcgi.server = ( "/test/" =>
       "kill-signal" => 10  # libfcgi need to be killed with SIGUSR1(10)
   ))
 )
-
-  Version 1.5
-  - new server class, using FASTCGI to communicate with an external
-    dedicated HTTP Server (tested with lighttpd under Linux via CrossKylix
-    compile), using the LibFastCgi external library
-  - can use either the standard client library (libfcgi.dll or libfcgi.so),
-    either an embedded 100% pascal FastCGI client (for Windows only) - not
-    fully tested yet on real production project
-
-  Version 1.18
-  - renamed unit SQlite3FastCgiServer.pas to mORMotFastCgiServer.pas
 
   ------------------------------------------------------------------------
   TODO: to be changed so that it uses THttpServerRequest, and would be

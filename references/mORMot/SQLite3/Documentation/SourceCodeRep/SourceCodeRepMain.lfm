@@ -1,0 +1,237 @@
+object MainForm: TMainForm
+  Left = 506
+  Height = 507
+  Top = 235
+  Width = 617
+  BorderStyle = bsDialog
+  Caption = ' mORMot Source Code Repository Synch'
+  ClientHeight = 507
+  ClientWidth = 617
+  Color = clBtnFace
+  Constraints.MinHeight = 422
+  Constraints.MinWidth = 617
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  OnCreate = FormCreate
+  LCLVersion = '1.9.0.0'
+  object lbl1: TLabel
+    Left = 24
+    Height = 14
+    Top = 8
+    Width = 77
+    Caption = 'Pending Files:'
+    ParentColor = False
+  end
+  object lbl2: TLabel
+    Left = 24
+    Height = 14
+    Top = 224
+    Width = 115
+    Caption = 'Commit Description:'
+    ParentColor = False
+  end
+  object mmoStatus: TMemo
+    Left = 16
+    Height = 193
+    Top = 24
+    Width = 585
+    Anchors = [akTop, akLeft, akRight]
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Consolas'
+    ParentFont = False
+    ReadOnly = True
+    ScrollBars = ssVertical
+    TabOrder = 1
+  end
+  object mmoDescription: TMemo
+    Left = 16
+    Height = 180
+    Top = 240
+    Width = 585
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Consolas'
+    ParentFont = False
+    ScrollBars = ssVertical
+    TabOrder = 0
+  end
+  object btnFossilSynch: TButton
+    Left = 168
+    Height = 32
+    Top = 427
+    Width = 113
+    Anchors = [akLeft, akBottom]
+    Caption = 'Fossil Synch'
+    OnClick = btnFossilSynchClick
+    TabOrder = 3
+  end
+  object btnFullSynch: TButton
+    Left = 472
+    Height = 57
+    Top = 427
+    Width = 113
+    Anchors = [akLeft, akBottom]
+    Caption = 'Fossil+Git'
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    OnClick = btnFullSynchClick
+    ParentFont = False
+    TabOrder = 2
+  end
+  object btnGitSynch: TButton
+    Left = 304
+    Height = 41
+    Top = 427
+    Width = 81
+    Anchors = [akLeft, akBottom]
+    Caption = 'Git Synch'
+    OnClick = btnGitSynchClick
+    TabOrder = 4
+  end
+  object btnRefreshStatus: TButton
+    Left = 536
+    Height = 18
+    Top = 5
+    Width = 75
+    Anchors = [akTop, akRight]
+    Caption = 'Refresh'
+    OnClick = btnRefreshStatusClick
+    TabOrder = 5
+  end
+  object btnGitShell: TButton
+    Left = 232
+    Height = 25
+    Top = 478
+    Width = 49
+    Anchors = [akLeft, akBottom]
+    Caption = 'Git Shell'
+    OnClick = btnGitShellClick
+    TabOrder = 6
+  end
+  object btnFossilShell: TButton
+    Left = 168
+    Height = 25
+    Top = 478
+    Width = 65
+    Anchors = [akLeft, akBottom]
+    Caption = 'Fossil Shell'
+    OnClick = btnFossilShellClick
+    TabOrder = 7
+  end
+  object btnTests: TButton
+    Left = 16
+    Height = 60
+    Top = 427
+    Width = 113
+    Anchors = [akLeft, akBottom]
+    Caption = 'Regression Tests'
+    OnClick = btnTestsClick
+    TabOrder = 8
+  end
+  object btnCopyLink: TButton
+    Left = 512
+    Height = 18
+    Top = 222
+    Width = 75
+    Caption = 'Copy Link'
+    OnClick = btnCopyLinkClick
+    TabOrder = 9
+  end
+  object btnGitAll: TButton
+    Left = 304
+    Height = 25
+    Hint = 'Git Commit mORMot + SynPDF + SynMustache + LVCL + SynProject repositories'
+    Top = 474
+    Width = 41
+    Anchors = [akLeft, akBottom]
+    Caption = 'Git ALL'
+    OnClick = btnGitSynchClick
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 10
+  end
+  object btnSynProject: TButton
+    Left = 392
+    Height = 25
+    Hint = 'Git Commit SynProject Repository'
+    Top = 426
+    Width = 65
+    Anchors = [akLeft, akBottom]
+    Caption = 'SynProject'
+    OnClick = btnGitSynchClick
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 11
+  end
+  object btnSynPdf: TButton
+    Left = 392
+    Height = 25
+    Hint = 'Git Commit SynPdf Repository'
+    Top = 450
+    Width = 65
+    Anchors = [akLeft, akBottom]
+    Caption = 'SynPdf'
+    OnClick = btnGitSynchClick
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 12
+  end
+  object btnDMustache: TButton
+    Left = 392
+    Height = 25
+    Hint = 'Git Commit dmustache Repository'
+    Top = 474
+    Width = 65
+    Anchors = [akLeft, akBottom]
+    Caption = 'dmustache'
+    OnClick = btnGitSynchClick
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 13
+  end
+  object btnLVCL: TButton
+    Left = 344
+    Height = 25
+    Hint = 'Git Commit LVCL Repository'
+    Top = 474
+    Width = 41
+    Anchors = [akLeft, akBottom]
+    Caption = 'LVCL'
+    OnClick = btnGitSynchClick
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 14
+  end
+  object chkCopyLink: TCheckBox
+    Left = 480
+    Height = 23
+    Top = 480
+    Width = 93
+    Anchors = [akLeft, akBottom]
+    Caption = '+copy link'
+    TabOrder = 15
+  end
+  object chkFossilPush: TCheckBox
+    Left = 168
+    Height = 23
+    Top = 455
+    Width = 66
+    Anchors = [akLeft, akBottom]
+    Caption = '+push'
+    TabOrder = 16
+  end
+  object chkFossilPull: TCheckBox
+    Left = 230
+    Height = 23
+    Top = 455
+    Width = 59
+    Anchors = [akLeft, akBottom]
+    Caption = '+pull'
+    TabOrder = 17
+  end
+end

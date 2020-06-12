@@ -6,7 +6,7 @@ unit mORMotUIOptions;
 (*
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit mORMotUIOptions;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -300,7 +300,7 @@ begin
           end;
         {$endif}
         tkClass: begin
-          O := pointer(P^.GetOrdValue(Obj));
+          O := P^.GetObjProp(Obj);
           if (O<>nil) and (PtrInt(O)<>-1) then
             if O.InheritsFrom(TCollection) then
             with TCollection(O) do
@@ -368,7 +368,7 @@ begin
   E := aEnum^.EnumBaseType;
   assert(E^.MaxValue<64); // Value is a Int64 (i.e. max 64 actions)
   for A := 0 to E^.MaxValue do
-  if (aActionsBits=nil) or GetBit64(aActionsBits^,A) then begin
+  if (aActionsBits=nil) or GetBitPtr(aActionsBits,A) then begin
     with TCheckBox.Create(Scroll) do begin
       Parent := Scroll;
       Hint := GetCSVItemString(pointer(aActionHints),A,#13);
@@ -377,7 +377,7 @@ begin
       SetBounds(64,Scroll.Tag,W,16);
       V := aProp^.GetInt64Value(Obj);
       fAddToolbar := fAddToolbar+AnsiChar(A); // every char is a bit index
-      Checked := GetBit64(V,A);
+      Checked := GetBitPtr(@V,A);
       Tag := PtrInt(aProp);  // for BtnSaveClick() event
     end;
     Scroll.Tag := Scroll.Tag+16;
@@ -466,7 +466,7 @@ begin // update the properties of the settings object from screen
             if CC.Checked then
               SetBit64(ToolbarValue,ord(fAddToolbar[ToolbarIndex])) else
               UnsetBit64(ToolbarValue,ord(fAddToolbar[ToolbarIndex]));
-            P^.SetInt64Value(Obj,ToolbarValue);
+            P^.SetInt64Prop(Obj,ToolbarValue);
           end;
         end else
           P^.SetOrdValue(Obj,integer(CC.Checked)) else

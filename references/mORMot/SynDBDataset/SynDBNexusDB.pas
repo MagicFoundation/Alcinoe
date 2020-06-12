@@ -6,7 +6,7 @@ unit SynDBNexusDB;
 {
   This file is part of Synopse framework.
 
-  Synopse framework. Copyright (C) 2018 Arnaud Bouchez
+  Synopse framework. Copyright (C) 2020 Arnaud Bouchez
   Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit SynDBNexusDB;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -45,13 +45,9 @@ unit SynDBNexusDB;
 
   ***** END LICENSE BLOCK *****
 
-  Version 1.18
-  - first public release, corresponding to mORMot framework 1.18
-  - including fix for ticket [d02e686413]
-
 }
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 interface
                                               
@@ -68,6 +64,7 @@ uses
   Classes, Contnrs,
   {$ifdef ISDELPHIXE2}Data.DB,{$else}DB,{$endif}
   SynCommons,
+  SynTable,
   SynLog,
   SynDB,
   SynDBDataset,
@@ -244,14 +241,14 @@ uses
 function TSQLDBNexusDBConnectionProperties.ColumnTypeNativeToDB(const aNativeType: RawUTF8;
   aScale: integer): TSQLDBFieldType;
 const CONV_TABLE: array[TnxFieldType] of TSQLDBFieldType  = (
-  SynCommons.ftInt64, SynCommons.ftUTF8, SynCommons.ftUTF8, SynCommons.ftInt64,
-  SynCommons.ftInt64, SynCommons.ftInt64, SynCommons.ftInt64, SynCommons.ftInt64,
-  SynCommons.ftInt64, SynCommons.ftInt64, SynCommons.ftInt64, SynCommons.ftDouble,
-  SynCommons.ftDouble, SynCommons.ftDouble, SynCommons.ftCurrency, SynCommons.ftDate,
-  SynCommons.ftDate, SynCommons.ftDate, SynCommons.ftInt64, SynCommons.ftBlob,
-  SynCommons.ftUTF8, SynCommons.ftBlob, SynCommons.ftBlob, SynCommons.ftUTF8,
-  SynCommons.ftUTF8, SynCommons.ftUTF8, SynCommons.ftInt64, SynCommons.ftUTF8,
-  SynCommons.ftCurrency, SynCommons.ftUTF8, SynCommons.ftDouble );
+  SynTable.ftInt64, SynTable.ftUTF8, SynTable.ftUTF8, SynTable.ftInt64,
+  SynTable.ftInt64, SynTable.ftInt64, SynTable.ftInt64, SynTable.ftInt64,
+  SynTable.ftInt64, SynTable.ftInt64, SynTable.ftInt64, SynTable.ftDouble,
+  SynTable.ftDouble, SynTable.ftDouble, SynTable.ftCurrency, SynTable.ftDate,
+  SynTable.ftDate, SynTable.ftDate, SynTable.ftInt64, SynTable.ftBlob,
+  SynTable.ftUTF8, SynTable.ftBlob, SynTable.ftBlob, SynTable.ftUTF8,
+  SynTable.ftUTF8, SynTable.ftUTF8, SynTable.ftInt64, SynTable.ftUTF8,
+  SynTable.ftCurrency, SynTable.ftUTF8, SynTable.ftDouble );
 begin
   result := CONV_TABLE[FieldDataTypesMapSQL(UTF8ToString(aNativeType))];
 end;

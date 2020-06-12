@@ -730,7 +730,7 @@ begin
                           then continue;
                        (*Delete all children tables*)
                        RStr:=PUTF8Char(TORMCDSinfo(CDS.Fields[I].Tag).LinkField+' = ?');
-                       DB.Delete(TORMCDSinfo(CDS.Fields[I].Tag).SQLRecordClass,@RStr,[I64]);
+                       DB.Delete(TORMCDSinfo(CDS.Fields[I].Tag).SQLRecordClass,RStr^,[I64]);
                       end;
                      DB.Delete(OInfo.SQLRecordClass,I64);
                      CDS.Next;

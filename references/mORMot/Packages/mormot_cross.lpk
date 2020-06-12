@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="4">
+    <PathDelim Value="\"/>
+    <Name Value="mormot_cross"/>
+    <Type Value="RunTimeOnly"/>
+    <Author Value="Arnaud Bouchez"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <IncludeFiles Value="..;..\CrossPlatform"/>
+        <Libraries Value="..\static\$(TargetCPU)-$(TargetOS)"/>
+        <OtherUnitFiles Value="..\CrossPlatform"/>
+        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+    </CompilerOptions>
+    <Description Value="Stand-alone package, client-side only, but should be running on all FPC targets"/>
+    <License Value="Licensed under a disjunctive tri-license giving you the choice of one of
+the three following sets of free software/open source licensing terms:
+ - Mozilla Public License, version 1.1 or later;
+ - GNU General Public License, version 2.0 or later;
+ - GNU Lesser General Public License, version 2.1 or later.
+This allows the use of our code in as wide a variety of software projects
+as possible, while still maintaining copy-left on code we wrote."/>
+    <Version Major="1" Minor="18"/>
+    <Files Count="5">
+      <Item1>
+        <Filename Value="..\CrossPlatform\SynCrossPlatformCrypto.pas"/>
+        <UnitName Value="SynCrossPlatformCrypto"/>
+      </Item1>
+      <Item2>
+        <Filename Value="..\CrossPlatform\SynCrossPlatformJSON.pas"/>
+        <UnitName Value="SynCrossPlatformJSON"/>
+      </Item2>
+      <Item3>
+        <Filename Value="..\CrossPlatform\SynCrossPlatformREST.pas"/>
+        <UnitName Value="SynCrossPlatformREST"/>
+      </Item3>
+      <Item4>
+        <Filename Value="..\CrossPlatform\SynCrossPlatformSpecific.pas"/>
+        <UnitName Value="SynCrossPlatformSpecific"/>
+      </Item4>
+      <Item5>
+        <Filename Value="..\CrossPlatform\SynCrossPlatformSynLZ.pas"/>
+        <UnitName Value="SynCrossPlatformSynLZ"/>
+      </Item5>
+    </Files>
+    <RequiredPkgs Count="1">
+      <Item1>
+        <PackageName Value="FCL"/>
+      </Item1>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

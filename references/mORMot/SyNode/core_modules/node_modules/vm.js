@@ -1,6 +1,7 @@
 /** 
  * Fake vm
  * @module vm
+ * @memberOf module:buildin
  */
 
 const {runInThisContext, loadDll} = process.binding('modules');

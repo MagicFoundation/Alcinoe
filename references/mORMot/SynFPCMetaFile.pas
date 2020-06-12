@@ -11,8 +11,8 @@ interface
 
 uses
   Windows,
-  Classes, 
-  SysUtils, 
+  Classes,
+  SysUtils,
   Graphics;
 
 type
@@ -30,7 +30,7 @@ type
     destructor Destroy; override;
   end;
 
-  
+
 { TMetafile }
 
   TMetafile = class(TGraphic)
@@ -125,7 +125,7 @@ const
   EMR_POLYGON16 = 86;
   EMR_POLYLINE16 = 87;
 
-  
+
 implementation
 
 { TMetafile }

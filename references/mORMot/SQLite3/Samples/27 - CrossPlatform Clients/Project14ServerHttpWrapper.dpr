@@ -8,6 +8,7 @@ uses
   SysUtils,
   Classes,
   SynCommons,
+  SynTable,
   SynLog,
   mORMot,
   mORMotHttpServer,
@@ -29,6 +30,7 @@ var
   aModel: TSQLModel;
   aServer: TSQLRestServer;
   aHTTPServer: TSQLHttpServer;
+  url: RawUTF8;
 begin
   // define the log level
   with TSQLLog.Family do begin
@@ -39,22 +41,25 @@ begin
   aModel := TSQLModel.Create([],ROOT_NAME);
   try
     // initialize a TObjectList-based database engine
-    aServer := TSQLRestServerFullMemory.Create(aModel,'test.json',false,true);
+    aServer := TSQLRestServerFullMemory.Create(aModel,'test.json',{binary=}false,{auth=}false);
     try
       // add the http://localhost:888/root/wrapper code generation web page
       AddToServerWrapperMethod(aServer,
         ['..\..\..\CrossPlatform\templates','..\..\..\..\CrossPlatform\templates']);
       // register our ICalculator service on the server side
-      aServer.ServiceRegister(TServiceCalculator,[TypeInfo(ICalculator)],sicShared);
+      aServer.ServiceDefine(TServiceCalculator,[ICalculator],sicShared)
+        .ResultAsJSONObjectWithoutResult := true;
       // launch the HTTP server
-      aHTTPServer := TSQLHttpServer.Create(PORT_NAME,[aServer],'+',useHttpApiRegisteringURI);
+      aHTTPServer := TSQLHttpServer.Create(PORT_NAME,[aServer]);
       try
         aHTTPServer.AccessControlAllowOrigin := '*'; // for AJAX requests to work
         writeln(#10'Background server is running.'#10);
-        writeln('Cross-Platform wrappers are available at localhost:',
-          PORT_NAME,'/',ROOT_NAME,'/wrapper'#10);
+        url := 'http://localhost:'+PORT_NAME+'/'+ROOT_NAME+'/wrapper';
+        writeln('Cross-Platform wrappers are available at: ',url);
+        writeln('- you may also check:');
+        writeln(' http://petstore.swagger.io/?url=',url,'/Swagger/mORMotClient.json.txt');
         writeln(#10'Press [Enter] to close the server.'#10);
-        readln;
+        ConsoleWaitForEnterKey;
       finally
         aHTTPServer.Free;
       end;
@@ -64,4 +69,5 @@ begin
   finally
     aModel.Free;
   end;
+  writeln('Server is now down');
 end.

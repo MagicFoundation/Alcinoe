@@ -31,7 +31,7 @@ var
   bufData: pointer;
   decodedStr: RawByteString;
 begin
-  if (argc = 0) or ((argc=0) and vals[0].isVoid) then
+  if (argc = 0) or ((argc=1) and vals[0].isVoid) then
     encoding := 'utf-8'
   else
     encoding := LowerCase(vals[0].asJSString.ToUTF8(cx));
@@ -62,9 +62,10 @@ end;
 function SMWrite_impl(cx: PJSContext; argc: uintN; vals: PjsvalVector; dest: TTextWriter): jsval; cdecl;
 var
   encoding: RawUTF8;
-  len: size_t;
+  len: uint32;
+  isShared: boolean;
   bufObj: PJSObject;
-  bufData: pointer;
+  bufData: Puint8Vector;
   tmp1: RawByteString;
   tmp2: SynUnicode;
 begin
@@ -79,7 +80,7 @@ begin
 
   case cx.TypeOfValue(vals[0]) of
     JSTYPE_STRING: begin
-      if (encoding = '') or (encoding = 'utf-8') then // default is utf-8
+      if (encoding = '') or (encoding = 'utf-8') or (encoding = 'utf8') then // default is utf-8
         vals[0].asJSString.ToUTF8(cx, dest)
       else if (encoding = 'ucs2') then begin
         tmp2 := vals[0].asJSString.ToSynUnicode(cx);
@@ -98,15 +99,10 @@ begin
         Result.asBoolean := true;
         Exit;
       end;
-      if bufObj.IsArrayBufferViewObject then
-        bufObj := cx.GetArrayBufferViewBuffer(bufObj);
-
-      if bufObj.IsArrayBufferObject then begin
-        bufData := bufObj.GetArrayBufferData;
-        len := bufObj.GetArrayBufferByteLength;
+      if bufObj.GetBufferDataAndLength(bufData, len) then begin
         if encoding = 'base64' then begin
           tmp1 := BinToBase64(PAnsiChar(bufData), len);
-          bufData := Pointer(tmp1);
+          bufData := Puint8Vector(tmp1);
           len := Length(tmp1);
           encoding := 'bin';
         end;
@@ -116,7 +112,7 @@ begin
         end else
           raise ESMException.Create('invalid encoding');
       end else begin
-        if (encoding = '') or (encoding = 'utf-8') then // default is utf-8
+        if (encoding = '') or (encoding = 'utf-8') or (encoding = 'utf8') then // default is utf-8
           vals[0].AddJSON(cx, dest)
         else
           raise ESMException.Create('invalid encoding');

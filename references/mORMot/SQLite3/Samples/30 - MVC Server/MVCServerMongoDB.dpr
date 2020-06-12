@@ -8,6 +8,7 @@ uses
   SynCrtSock,
   SynCommons,
   SynLog,
+  SynTable,
   mORMot,
   SynMongoDB,
   mORMotMongoDB,

@@ -4,6 +4,7 @@
 
 /**
  * @module querystring
+ * @memberOf module:buildin
  */
 
 var QueryString = exports;

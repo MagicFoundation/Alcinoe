@@ -10,6 +10,7 @@ uses
   {$endif}
   Classes, SysUtils, Forms, Controls, Dialogs, StdCtrls,
   SynCommons,
+  SynTable,
   mORMot,
   SampleData;
 

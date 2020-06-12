@@ -6,7 +6,7 @@ unit mORMotUILogin;
 (*
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit mORMotUILogin;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -83,32 +83,45 @@ unit mORMotUILogin;
 
 interface
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64
 
 uses
-  {$IFDEF FPC}
-  //LCLProc, LCLIntf, LCLType,
-  LCLType, LCLIntf,
-  {$ENDIF}
-  {$IFDEF MSWINDOWS}
-  Windows, CommCtrl,
-  {$ENDIF}
-  {$ifdef FPC}
-  LResources,
-  {$else}
-  Consts, PsAPI,
+  {$ifdef MSWINDOWS}
+    Windows,
+    CommCtrl,
   {$endif}
-  Messages, SysUtils, Classes, Graphics,
-  Controls, Forms, StdCtrls, ExtCtrls, Buttons,
-{$ifdef USETMSPACK}
-  AdvGlowButton, TaskDialog, TaskDialogEx, AdvToolBarStylers, AdvToolBar,
-{$endif USETMSPACK}
   {$ifdef FPC}
-  SynTaskDialog in '.\Samples\ThirdPartyDemos\Ondrej\SynTaskDialog4Lazarus\SynTaskDialog.pas',
+    //LCLProc, LCLIntf, LCLType,
+    LCLType,
+    LCLIntf,
+    LResources,
+    SynTaskDialog, Controls, StdCtrls, ExtCtrls, Classes in '.\Samples\ThirdPartyDemos\Ondrej\SynTaskDialog4Lazarus\SynTaskDialog.pas',
   {$else}
-  SynTaskDialog,
-  {$endif}
-  SynGdiPlus, SynCommons, mORMot, mORMotUI;
+    Consts,
+    PsAPI,
+    SynTaskDialog,
+  {$endif FPC}
+  Messages,
+  SysUtils,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  StdCtrls,
+  ExtCtrls,
+  Buttons,
+  {$ifdef USETMSPACK}
+    AdvGlowButton,
+    TaskDialog,
+    TaskDialogEx,
+    AdvToolBarStylers,
+    AdvToolBar,
+  {$endif USETMSPACK}
+  SynGdiPlus,
+  SynCommons,
+  SynTable,
+  mORMot,
+  mORMotUI;
 
 type
   /// Form used to Log User and enter its password
@@ -946,7 +959,7 @@ begin
         for f := 1 to InternalClassPropInfo(CL,P) do begin
           with P^.PropType^{$ifndef HASDIRECTTYPEINFO}^{$endif} do
           if (Kind=tkClass) and ClassType^.InheritsFrom(TFont) then begin
-            Obj := pointer(P^.GetOrdValue(C));
+            Obj := P^.GetObjProp(C);
             if Obj<>nil then
               with TFont(Obj) do
               if Name<>DefaultFont.Name then begin

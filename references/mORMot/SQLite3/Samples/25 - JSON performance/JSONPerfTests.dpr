@@ -6,6 +6,7 @@ program JSONPerfTests;
 uses
   {$I SynDprUses.inc}
   SynCommons,
+  SynCrossPlatformJSON in '..\..\..\CrossPlatform\SynCrossPlatformJSON.pas',
   JSONPerfTestCases;
 
 begin

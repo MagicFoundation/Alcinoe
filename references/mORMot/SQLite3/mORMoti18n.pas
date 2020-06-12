@@ -6,7 +6,7 @@ unit mORMoti18n;
 (*
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,12 +25,12 @@ unit mORMoti18n;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
   - lagodny
-  
+
   Alternatively, the contents of this file may be used under the terms of
   either the GNU General Public License Version 2 or later (the "GPL"), or
   the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
@@ -178,7 +178,7 @@ unit mORMoti18n;
 
 *)
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 interface
 
@@ -212,13 +212,16 @@ interface
 {$endif}
 
 uses
-  Windows, SysUtils, Classes,
+  Windows,
+  SysUtils,
+  Classes,
   {$ifdef USEFORMCREATEHOOK}
   {$ifndef LVCL}
   Menus,
   {$endif}
   {$endif USEFORMCREATEHOOK}
-  StdCtrls, Forms,
+  StdCtrls,
+  Forms,
   SynCommons,     // some basic types and functions
   mORmot;         // need extended RTTI information
 
@@ -293,7 +296,9 @@ var
 
 type
   /// a common record to identify a language
-  TLanguage = object
+  {$ifdef USERECORDWITHMETHODS}TLanguage = record
+    {$else}TLanguage = object{$endif}
+  public
     /// as in LanguageAbr[index], LANGUAGE_NONE before first SetLanguageLocal()
     Index: TLanguages;
     /// the corresponding Char Set
@@ -707,7 +712,9 @@ uses
   UxTheme,
   {$endif}
 {$endif}
-  Controls, ExtCtrls, Graphics;
+  Controls,
+  ExtCtrls,
+  Graphics;
 
 var
   // to speed up search in LanguageAbrToIndex():
@@ -863,14 +870,6 @@ const
         RUSSIAN_CHARSET, // 'mk' Macedonian CP1251, iso-8859-5
         ARABIC_CHARSET // 'ap' Pashto (Afghanistan)
      );
-
-type
-  PPatchEvent = ^TPatchEvent;
-  /// asm opcode hack to patch an existing routine
-  TPatchEvent = packed record
-    Jump: byte;
-    Offset: PtrInt;
-  end;
 
 
 {$ifndef ENHANCEDRTL}
@@ -1060,15 +1059,17 @@ end;
 function i18nInnerCompareText(const S1, S2: AnsiString): Integer;
 var Str1, Str2: PByte;
     C1, C2: byte;
+    table: {$ifdef CPUX86NOTPIC}TNormTableByte absolute i18nToUpperByte{$else}PNormTableByte{$endif};
 begin
   Str1 := pointer(S1);
   Str2 := pointer(S2);
   if Str1<>Str2 then
   if Str1<>nil then
   if Str2<>nil then begin
+    {$ifndef CPUX86NOTPIC}table := @i18nToUpperByte;{$endif}
     repeat
-      C1 := i18nToUpperByte[Str1^];
-      C2 := i18nToUpperByte[Str2^];
+      C1 := table[Str1^];
+      C2 := table[Str2^];
       if (C1<>C2) or (C1=0) then
         break;
       Inc(Str1);
@@ -1080,10 +1081,12 @@ begin
   result := -1 else // Str1=''
   result := 0;      // Str1=Str2
 end;
-{$else}
+
+{$else PUREPASCAL}
 
 {$ifndef ENHANCEDRTL}
 function i18nInnerCompareStr(const S1, S2: AnsiString): Integer;
+  {$ifdef FPC} nostackframe; assembler; {$endif}
 // original name: CompareStr_PLR_IA32_14
 asm
   cmp eax, edx
@@ -1181,6 +1184,7 @@ end;
 {$endif}
 
 function i18nInnerCompareText(const S1, S2: AnsiString): Integer;
+  {$ifdef FPC} nostackframe; assembler; {$endif}
 asm // fast CompareText() version using i18nToUpper[] instead of NormToUpper[]
     cmp eax,edx
     je @2
@@ -1310,11 +1314,12 @@ begin
     end;
     CharUpperBuffA(i18nToUpper,256); // get values from current user locale
     CharLowerBuffA(i18nToLower,256);
-    if not(CharSet in [GB2312_CHARSET,SHIFTJIS_CHARSET,HANGEUL_CHARSET,ARABIC_CHARSET]) and
+    if not((CharSet in [GB2312_CHARSET,SHIFTJIS_CHARSET,HANGEUL_CHARSET,ARABIC_CHARSET])
+       {$ifndef LVCL} or SysLocale.FarEast{$endif}) and
       (LanguageCharSet[LCIDToLanguage(GetUserDefaultLCID)]=CharSet) then begin
       // NormToUpper/Lower[] was filled with LOCALE_USER_DEFAULT values
       // -> OK if same CHARSET, and not multi-byte
-      i18nCompareStr := // not MBCS strict comparaison is always valid
+      i18nCompareStr := // not MBCS strict comparison is always valid
         {$ifdef ENHANCEDRTL}CompareStr{$else}i18nInnerCompareStr{$endif};
       // CompareText in SysUtils.pas uses NormToUpper[], this uses i18nToUpper[]:
       i18nCompareText := i18nInnerCompareText;
@@ -1385,7 +1390,7 @@ begin
       continue;
     if index=CurrentLanguage.Index then
       result := List.Count; // current language selection
-    List.AddObject(format('%s (%s)',[LanguageName(index),LanguageAbr[index]]),
+    List.AddObject(FormatString('% (%)',[LanguageName(index),LanguageAbr[index]]),
       pointer(index));
   end;
 end;
@@ -1666,7 +1671,7 @@ var Section: PUTF8Char; {$endif}
             TranslateOneProp(P,O,CName) else
           // class properties
           if P^.PropType^^.Kind=tkClass then begin
-            Obj := pointer(P^.GetOrdValue(O));
+            Obj := P^.GetObjProp(O);
             if Obj<>nil then
     {$ifndef LVCL} // doesn't allow to change Font during the run
             if Obj.InheritsFrom(TFont) then
@@ -1706,7 +1711,7 @@ var Section: PUTF8Char; {$endif}
           end;
           P := P^.Next;
         end;
-        CL := CL.ClassParent; // translate parent published properties
+        CL := GetClassParent(CL); // translate parent published properties
       end;
     end;
 
@@ -2203,7 +2208,7 @@ var
 
 function Hash32Str(crc: cardinal; buf: PAnsiChar; len: cardinal): cardinal;
 begin
-  result := Hash32(buf,len);
+  result := Hash32(pointer(buf),len);
 end;
 
 function AddOnceDynArray(const S: WinAnsiString): integer;
@@ -2458,7 +2463,7 @@ var F: Text;
     if (C=nil) or (ClassList.IndexOf(C)>=0) then
       exit; // already done or no RTTI information (e.g. reached TObject level)
     ClassList.Add(C);
-    AddClass(C.ClassParent); // add parent properties first
+    AddClass(GetClassParent(C)); // add parent properties first
     for i := 1 to InternalClassPropInfo(C,P) do begin // add all field names
       AddOnceDynArray(StringToWinAnsi(TSQLRecord.CaptionNameFromRTTI(@P^.Name)));
       // for Delphi 2009 and up/XE: CaptionName converted into a WinAnsiString
@@ -2505,7 +2510,7 @@ begin
               AddOnceDynArray(StringToWinAnsi(CaptionNameFromRTTI(@P^.Name)));
               P := P^.Next;
             end;
-            CT := CT.ClassParent;
+            CT := GetClassParent(CT);
           until CT=nil;
         end;
       end else
@@ -2562,6 +2567,7 @@ initialization
   // avoid call nil functions -> set default function to point to
   i18nCompareStr := {$ifdef ENHANCEDRTL}CompareStr{$else}i18nInnerCompareStr{$endif};
   move(NormToUpper,i18nToUpper,sizeof(NormToUpper));
+  move(NormToLower,i18nToLower,sizeof(NormToUpper));
   i18nCompareText := i18nInnerCompareText;
 {$ifndef ENHANCEDRTL}
   RedirectCode(@System.LoadResString,@mORmoti18n.LoadResString,@BackupLoadResString);

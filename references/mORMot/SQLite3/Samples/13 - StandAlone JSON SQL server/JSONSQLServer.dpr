@@ -69,11 +69,12 @@ begin
   fProps := Props;
   Conn := fProps.ThreadSafeConnection;
   if not Conn.Connected then
-    Conn.Connect;
+    Conn.Connect; // ensure we can connect to the DB
   fServer := THttpApiServer.Create(false);
   fServer.AddUrl('root',DEFAULT_PORT,false,'+',true);
   fServer.RegisterCompress(CompressDeflate); // our server will deflate JSON :)
   fServer.OnRequest := Process;
+  fServer.Clone(31); // will use a thread pool of 32 threads in total
 end;
 
 destructor TJSONServer.Destroy;

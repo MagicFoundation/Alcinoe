@@ -4,7 +4,7 @@ unit SynKylix;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -23,7 +23,7 @@ unit SynKylix;
 
   The Initial Developer of the Original Code is Arnaud Bouchez
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -42,13 +42,9 @@ unit SynKylix;
 
   ***** END LICENSE BLOCK *****
 
-
-  Version 1.18
-  - initial revision, corresponding to functions not available in LibC.pas
-
 }
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 interface
 
@@ -104,6 +100,9 @@ var
 /// compatibility function, wrapping Win32 API high resolution timer
 // - this version will return the CLOCK_MONOTONIC value, with a 1 ns resolution
 procedure QueryPerformanceCounter(var Value: Int64);
+
+/// slightly faster than QueryPerformanceCounter() div 1000 - but not for Windows
+procedure QueryPerformanceMicroSeconds(out Value: Int64);
 
 /// compatibility function, wrapping Win32 API high resolution timer
 function QueryPerformanceFrequency(var Value: Int64): boolean;
@@ -186,15 +185,20 @@ procedure QueryPerformanceCounter(var Value: Int64);
 var r: TTimeSpec;
 begin
   clock_gettime(CLOCK_MONOTONIC,r);
-  value := r.tv_nsec+r.tv_sec*C_BILLION;
+  value := r.tv_nsec+r.tv_sec*C_BILLION; // nanosecond resolution
+end;
+
+procedure QueryPerformanceMicroSeconds(out Value: Int64);
+var r : TTimeSpec;
+begin
+  clock_gettime(CLOCK_MONOTONIC,r);
+  value := r.tv_nsec div 1000+r.tv_sec*C_MILLION;
 end;
 
 function QueryPerformanceFrequency(var Value: Int64): boolean;
-var r: TTimeSpec;
 begin
-  result := (clock_getres(CLOCK_MONOTONIC,r)=0) and (r.tv_nsec<>0);
-  if result then
-    value := C_BILLION div (r.tv_nsec+(r.tv_sec*C_BILLION));
+  Value := C_BILLION; // 1 second = 1e9 nanoseconds
+  result := true;
 end;
 
 function SetFilePointer(hFile: THandle; lDistanceToMove: integer;
@@ -387,7 +391,7 @@ end;
 procedure SleepHiRes(ms: cardinal);
 begin
   if ms=0 then
-    sched_yield else
+    usleep(1) else // sched_yield() is buggy on multi CPU
     usleep(ms shl 10); // from ms to us
 end;
 

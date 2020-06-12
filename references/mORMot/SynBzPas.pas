@@ -5,7 +5,7 @@ unit SynBzPas;
 {
     This file is part of Synopse BZ2 Compression.
 
-    Synopse Synopse BZ2 Compression. Copyright (C) 2018 Arnaud Bouchez
+    Synopse Synopse BZ2 Compression. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -24,7 +24,7 @@ unit SynBzPas;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -43,8 +43,6 @@ unit SynBzPas;
   ***** END LICENSE BLOCK *****
 }
 
-{ $D-,L-}
-
 {
       BZip2 decompression unit
       ========================
@@ -53,20 +51,35 @@ unit SynBzPas;
        - pascal and asm speed and memory optimization of the code
        - bug in main loop -> use it at once, TBZDecompressor is buggy
        - use UnCompressBzMem() global function
-       - you MUST set DestSize before call (in-memory decompression)
+
+      HUGE WARNING / BIG DISCLOSURE / PLEASE README :
+       - we discovered that this unit doesn't properly uncompress some big
+         content, so you should rather not trust this unit - consider it
+         as a proof-of-concept, not to be used on production
 
       initial release (c)2002 by Daniel Mantione
       modifications and speed-up by Arnaud Bouchez (c)2008 http://bouchez.info
 
 }
 
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
+
 interface
 
-uses Classes, Sysutils;
+uses
+  Classes,
+  SysUtils;
 
-function UnCompressBzMem(Source: pChar; SourceSize, DestSize: integer): TMemoryStream; overload;
+{$ifndef FPC_OR_UNICODE}
+type
+  RawByteString = AnsiString;
+{$endif}
+
+function UnCompressBzMem(Source: pointer; SourceSize, DestSize: integer;
+  error: PInteger = nil): TMemoryStream;
 // result=nil if error decompressing
 
+function UnCompressBzMemToString(Source: pointer; SourceSize, DestSize: integer): RawByteString;
 
 
 implementation
@@ -87,46 +100,45 @@ type  TCardinal_array=array [0..899999] of cardinal;
       Thuffarray=array[0..max_alpha_size] of cardinal;
       Phuffarray=^Thuffarray;
 
+      {$ifndef FPC}
+      PtrInt = {$ifdef UNICODE}NativeInt{$else}integer{$endif};
+      {$endif}
+
       PBZip2_Decode_Stream = ^TBZip2_Decode_Stream;
       TBZip2_Decode_Stream = object
-      public
-        error: integer;
       private
-        short:cardinal;
-        readstream: pChar;
-        block_randomized:boolean;
-        blocksize:cardinal;
-        tt:PCardinal_Array;
-        tt_count:cardinal;
-        rle_run_left,rle_run_data: integer;
-        nextrle:Pbyte;
-        decode_available:cardinal;
-        block_origin:cardinal;
-        current_block:cardinal;
+        bits_available: byte;
         read_data: byte;
-        bits_available:integer;
-        inuse16:set of 0..15;
-        inuse:set of 0..255;
-        inuse_count:cardinal;
-        alphasize:cardinal;
-        group_count,group_pos,gsel,gminlen:integer;
-        group_no:cardinal;
-        glimit,gperm,gbase:Phuffarray;
-        selector_count:cardinal;
-        seq_to_unseq:array[0..255] of byte;
-        selector,selector_mtf:array[0..max_selectors] of byte;
-        len:array[0..max_groups,0..max_alpha_size] of byte;
-        limit:array[0..max_groups,0..max_alpha_size] of cardinal;
-        base:array[0..max_groups,0..max_alpha_size] of cardinal;
-        perm:array[0..max_groups,0..max_alpha_size] of cardinal;
-        minlens:array[0..max_groups] of byte;
-        cftab:array[0..257] of cardinal;
-        mtfbase:array[0..256 div mtfl_size-1] of cardinal;
-        mtfa:array[0..mtfa_size-1] of byte;
-        function get_bits(n: integer):cardinal;
-        function get_boolean:boolean;
-        function get_cardinal24:cardinal;
-        function get_cardinal:cardinal;
+        readstream: PByte;
+        block_randomized: boolean;
+        blocksize: cardinal;
+        tt: PCardinal_Array;
+        tt_count: cardinal;
+        rle_run_left,rle_run_data: integer;
+        nextrle: PByte;
+        decode_available: cardinal;
+        block_origin: cardinal;
+        current_block: cardinal;
+        inuse_count: cardinal;
+        alphasize: cardinal;
+        group_count,group_pos,gsel,gminlen: integer;
+        group_no: cardinal;
+        glimit,gperm,gbase: Phuffarray;
+        selector_count: cardinal;
+        seq_to_unseq: array[0..255] of byte;
+        selector,selector_mtf: array[0..max_selectors] of byte;
+        len: array[0..max_groups,0..max_alpha_size] of byte;
+        limit: array[0..max_groups,0..max_alpha_size] of cardinal;
+        base: array[0..max_groups,0..max_alpha_size] of cardinal;
+        perm: array[0..max_groups,0..max_alpha_size] of cardinal;
+        minlens: array[0..max_groups] of byte;
+        cftab: array[0..257] of cardinal;
+        mtfbase: array[0..256 div mtfl_size-1] of cardinal;
+        mtfa: array[0..mtfa_size-1] of byte;
+        function get_bits(n: cardinal): cardinal; {$ifdef HASINLINE}inline;{$endif}
+        function get_boolean: boolean; {$ifdef HASINLINE}inline;{$endif}
+        function get_cardinal24: cardinal;
+        function get_cardinal: cardinal;
         procedure receive_mapping_table;
         procedure receive_selectors;
         procedure undo_mtf_values;
@@ -138,12 +150,13 @@ type  TCardinal_array=array [0..899999] of cardinal;
         procedure receive_mtf_values;
         procedure detransform;
         function decode_block:boolean;
-        procedure rle_read(bufptr:Pbyte;var count:integer);
+        procedure rle_read(bufptr:PByte; var count:integer);
         procedure new_block;
-        procedure consume_rle;
+        procedure consume_rle; {$ifdef HASINLINE}inline;{$endif}
       public
-        procedure Open(Areadstream: pChar);
-        procedure read(bufptr: pByte;count:integer);
+        error: integer;
+        procedure Open(bz2source: pointer);
+        procedure Read(bufptr: PByte; count:integer);
         procedure Close;
       end;
 
@@ -184,10 +197,11 @@ end;
                              TBZip2_decode_stream
 *****************************************************************************}
 
-procedure TBZip2_decode_stream.Open(Areadstream: pChar);
+procedure TBZip2_decode_stream.Open(bz2source: pointer);
 begin
   fillchar(self,256{sizeof(self)},0); // 256 is enough for reset
-  readstream := Areadstream;
+  error := 0;
+  readstream := bz2source;
   {Read the magic.}
   if PCardinal(readstream)^ and $00ffffff<>ord('B')+ord('Z')shl 8+ord('h')shl 16 then begin
     error := BZip2_bad_header_magic;
@@ -195,49 +209,10 @@ begin
   end else
     inc(readstream,3);
   {Read the block size and allocate the working array.}
-  blocksize:= (ord(readstream^)-integer('0'))*100000; inc(readstream);
+  blocksize:= (readstream^-ord('0'))*100000;
+  inc(readstream);
   getmem(tt,blocksize*4);
   decode_available := high(decode_available);
-end;
-
-function TBZip2_decode_stream.get_bits(n: integer): cardinal;
-var data: cardinal;
-    n8: integer;
-begin
-//  if n<>8 then begin // not faster :(
-    if n<bits_available then begin
-      result := read_data shr (8-n);
-      read_data := read_data shl n;
-      dec(bits_available,n);
-    end
-    else begin
-      data := ord(readstream^); inc(readstream);
-      n8 := 8-n;
-      result :=(read_data shr n8) or (data shr (n8+bits_available));
-      read_data := data shl (n-bits_available);
-      inc(bits_available,n8);
-    end;
-{  end else begin
-    data := ord(readstream^); inc(readstream);
-    result := read_data or (data shr bits_available);
-    read_data := data shl (8-bits_available);
-  end;}
-end;
-
-function TBZip2_decode_stream.get_boolean:boolean;
-var data: integer;
-begin
-  if bits_available>0 then begin
-    result := boolean(read_data shr 7);
-    read_data:=byte(read_data shl 1);
-    dec(bits_available);
-  end
-  else begin
-    data := ord(readstream^); inc(readstream);
-    result := boolean(data shr 7);
-    read_data := byte(data shl 1);
-    bits_available := 7;
-  end;
 end;
 
 function TBZip2_decode_stream.get_cardinal24:cardinal;
@@ -250,30 +225,70 @@ begin
   get_cardinal := get_bits(8) shl 24 or get_bits(8) shl 16 or get_bits(8) shl 8 or get_bits(8);
 end;
 
+function TBZip2_decode_stream.get_bits(n: cardinal): cardinal;
+var data,n8: cardinal;
+begin
+//  if n<>8 then begin // not faster :(
+    if n<bits_available then begin
+      result := read_data shr (8-n);
+      read_data := read_data shl n;
+      dec(bits_available,n);
+    end
+    else begin
+      data := readstream^;
+      inc(readstream);
+      n8 := 8-n;
+      result := (read_data shr n8) or (data shr (n8+bits_available));
+      read_data := data shl (n-bits_available);
+      inc(bits_available,n8);
+    end;
+{  end else begin
+    data := readstream^; inc(readstream);
+    result := read_data or (data shr bits_available);
+    read_data := data shl (8-bits_available);
+  end;}
+end;
+
+function TBZip2_decode_stream.get_boolean: boolean;
+var data: cardinal;
+begin
+  if bits_available>0 then begin
+    result := boolean(read_data shr 7);
+    read_data := read_data shl 1;
+    dec(bits_available);
+  end
+  else begin
+    data := readstream^;
+    inc(readstream);
+    result := boolean(data shr 7);
+    read_data := data shl 1;
+    bits_available := 7;
+  end;
+end;
+
 procedure TBZip2_decode_stream.receive_mapping_table;
 {Receive the mapping table. To save space, the inuse set is stored in pieces
  of 16 bits. First 16 bits are stored which pieces of 16 bits are used, then
  the pieces follow.}
-var i,j: integer;
-    v: byte;
+var i,j,v,inuse16: cardinal;
 begin
-  inuse16 := [];
+  inuse16 := 0;
   {Receive the first 16 bits which tell which pieces are stored.}
   for i := 0 to 15 do
     if get_boolean then
-      include(inuse16,i);
+      inuse16 := inuse16 or (1 shl i);
   {Receive the used pieces.}
-  inuse := [];
   inuse_count := 0;
-  for i := 0 to 15 do
-    if i in inuse16 then
+  v := 0;
+  for i := 0 to 15 do begin
+    if inuse16 or (1 shl i)<>0 then
       for j := 0 to 15 do
         if get_boolean then begin
-            v := 16*i+j;
-            include(inuse,v);
-            seq_to_unseq[inuse_count] := v;
-            inc(inuse_count);
-          end;
+          seq_to_unseq[inuse_count] := v+j;
+          inc(inuse_count);
+        end;
+    inc(v,16);
+  end;
 end;
 
 procedure TBZip2_decode_stream.receive_selectors;
@@ -288,9 +303,9 @@ begin
 // while get_boolean do begin
     repeat
       if bits_available<=0 then begin
-        data := ord(readstream^);
+        data := readstream^;
         inc(readstream);
-        read_data := byte(data shl 1);
+        read_data := data shl 1;
         bits_available := 7;
         if data shr 7=0 then
           break;
@@ -364,8 +379,8 @@ end;
 
 procedure TBZip2_decode_stream.make_hufftab;
 {Builds the Huffman tables.}
-var i: cardinal;
-    t, minlen, maxlen: byte;
+var i, t: cardinal;
+    minlen, maxlen: byte;
 begin
   for t := 0 to group_count-1 do begin
     minlen := 32;
@@ -383,8 +398,7 @@ begin
 end;
 
 procedure TBZip2_decode_stream.init_mtf;
-var i,j,v: byte;
-    k: cardinal;
+var i,j,v,k: cardinal;
 begin
   k := mtfa_size-1;
   for i := 256 div mtfl_size-1 downto 0 do begin
@@ -415,7 +429,8 @@ begin
   zn := gminlen;
 //  zvec:=get_bits(zn);
   if zn>bits_available then begin
-    data := ord(readstream^); inc(readstream);
+    data := readstream^;
+    inc(readstream);
     n8 := 8-zn;
     zvec := (read_data shr n8) or (data shr (n8+bits_available));
     read_data := data shl (zn-bits_available);
@@ -430,9 +445,10 @@ begin
     inc(zn);
 //  zvec := (zvec shl 1) or cardinal(get_boolean);
     if bits_available<=0 then begin
-      data := ord(readstream^); inc(readstream);
+      data := readstream^;
+      inc(readstream);
       zvec := (zvec shl 1) or (data shr 7);
-      read_data := byte(data shl 1);
+      read_data := data shl 1;
       bits_available := 7;
     end
     else begin
@@ -456,20 +472,20 @@ begin
   end;
 end;
 
-function depl(p: pChar; n: cardinal): cardinal;
+function depl(p: PAnsiChar; n: PtrInt): cardinal; {$ifdef HASINLINE}inline;{$endif}
 begin
   result := ord(p[n]);
   move(p[0],p[1],n);
   p[0] := char(result);
 end;
 
-function depl2(p: pChar; n: cardinal): cardinal;
+function depl2(p: PAnsiChar; n: PtrInt): cardinal; {$ifdef HASINLINE}inline;{$endif}
 begin
   result := ord(p[n]);
   move(p[0],p[1],n);
 end;
 
-procedure fill(p: pCardinal_array; n,v: integer);
+procedure fill(p: PCardinal_array; n,v: integer); {$ifdef HASINLINE}inline;{$endif}
 var i: integer;
 begin
   for i := 0 to n-1 do
@@ -483,7 +499,7 @@ var t, next_sym: cardinal;
     es: cardinal;
     n, c, d: cardinal;
     nn, i: cardinal;
-    u, v: Pcardinal;
+    u, v: PCardinal;
     lno, off: cardinal;
 begin
   group_no := high(group_no);
@@ -524,8 +540,9 @@ begin
         v := u;
         inc(v,lno);
         repeat
-          mtfa[v^] := mtfa[pCardinal(cardinal(v)-4)^+MTFL_SIZE-1];
-          dec(v); dec(v^);
+          mtfa[v^] := mtfa[PCardinal(PtrInt(v)-4)^+MTFL_SIZE-1];
+          dec(v);
+          dec(v^);
         until v=u;
         mtfa[v^] := n;
         if v^=0 then
@@ -552,32 +569,54 @@ begin
 end;
 
 procedure TBZip2_decode_stream.detransform;
+{$ifdef PUREPASCAL}
+var a: cardinal;
+    c: PtrInt;
+    p,pend: PByte;
+    t,cf: PCardinal_array;
+begin // efficient code on FPC x86-64
+  if tt_count=0 then
+    exit;
+  t := @tt;
+  p := pointer(t);
+  pend := @t^[tt_count];
+  cf := @cftab;
+  a := 0;
+  repeat
+    c := p^;
+    inc(p,4);
+    t^[cf^[c]] := t^[cf^[c]] or a;
+    inc(cf^[c]);
+    inc(a,256);
+  until p=pend;
+end;
+{$else} {$ifdef FPC} nostackframe; assembler; {$endif}
 asm
-  mov ecx,[eax+TBZip2_decode_stream.tt_count]
-  jcxz @a2
-  push ebx
-  push ebp
-  push esi
-  push edi
-  lea ebx,[eax+TBZip2_decode_stream.cftab]
-  mov esi,[eax+TBZip2_decode_stream.tt]
-  mov edi,esi
-  xor edx,edx
-@a1:
-  movzx eax,byte [esi]
-  mov ebp,[ebx+4*eax]
-  inc dword [ebx+4*eax]
-  or [edi+ebp*4],edx
-  add edx,$100
-  add esi,4
-  dec ecx
-  jnz @a1
-  pop edi
-  pop esi
-  pop ebp
-  pop ebx
+      mov ecx,[eax+TBZip2_decode_stream.tt_count]
+      jcxz @a2
+      push ebx
+      push ebp
+      push esi
+      push edi
+      lea ebx,[eax+TBZip2_decode_stream.cftab]
+      mov esi,[eax+TBZip2_decode_stream.tt]
+      mov edi,esi
+      xor edx,edx
+@a1:  movzx eax,byte [esi]
+      mov ebp,[ebx+4*eax]
+      inc dword [ebx+4*eax]
+      or [edi+ebp*4],edx
+      add edx,$100
+      add esi,4
+      dec ecx
+      jnz @a1
+      pop edi
+      pop esi
+      pop ebp
+      pop ebx
 @a2:
 end;
+{$endif}
 
 function TBZip2_decode_stream.decode_block: boolean;
 {Decode a new compressed block.}
@@ -634,14 +673,13 @@ procedure TBZip2_decode_stream.consume_rle;
 {Make nextrle point to the next decoded byte. If nextrle did point to the last
  byte in the current block, decode the next block.}
 begin
-{  Pcardinal(nextrle)^:=Pcardinal(nextrle)^ shr 8;}
-  nextrle := @tt^[Pcardinal(nextrle)^ shr 8];
+  nextrle := @tt^[PCardinal(nextrle)^ shr 8];
   dec(decode_available);
   if decode_available=0 then
     new_block;
 end;
 
-procedure TBZip2_decode_stream.rle_read(bufptr:Pbyte;var count: integer);
+procedure TBZip2_decode_stream.rle_read(bufptr:PByte;var count: integer);
 var rle_len: integer;
     data: byte;
 label rle_write;
@@ -659,12 +697,12 @@ begin
         break;
       rle_len := 1;
       data := nextrle^;
-      nextrle := @tt^[Pcardinal(nextrle)^ shr 8];
+      nextrle := @tt^[PCardinal(nextrle)^ shr 8];
       dec(decode_available);
       if decode_available=0 then
         new_block;
       if (decode_available>0) and (data=nextrle^) then begin
-        nextrle := @tt^[Pcardinal(nextrle)^ shr 8];
+        nextrle := @tt^[PCardinal(nextrle)^ shr 8];
         dec(decode_available);
         inc(rle_len);
         if decode_available=0 then
@@ -701,15 +739,13 @@ rle_write:
         break; // count=0
       end;
     until false;
-    short := count;
   end;
   rle_run_data := data;
   rle_run_left := rle_len;
 end;
 
-procedure TBZip2_decode_stream.read(bufptr: pByte;count:integer);
+procedure TBZip2_decode_stream.read(bufptr: PByte; count:integer);
 begin
-  short := 0;
   if decode_available=high(decode_available) then begin
     {Initialize the rle process:
       - Decode a block
@@ -732,7 +768,7 @@ end;
 (*
 { TBZDecompressor }
 
-constructor TBZDecompressor.Create(Buffer: pChar);
+constructor TBZDecompressor.Create(Buffer: PByte);
 begin
   GetMem(BZ,sizeof(TBZip2_decode_stream));
   PBZip2_Decode_Stream(BZ)^.Open(Buffer);
@@ -769,7 +805,8 @@ begin
 end;
 *)
 
-function UnCompressBzMem(Source: pChar; SourceSize, DestSize: integer): TMemoryStream;
+function UnCompressBzMem(Source: pointer; SourceSize, DestSize: integer;
+  error: PInteger): TMemoryStream;
 var BZ: PBZip2_decode_stream;
 begin
   result := TMemoryStream.Create;
@@ -783,6 +820,26 @@ begin
     BZ^.Close;
     if BZ^.error<>BZip2_endoffile then
       FreeAndNil(result); // result=nil if error decompressing
+    if error <> nil then
+      error^ := BZ^.error;
+  finally
+    Freemem(BZ);
+  end;
+end;
+
+function UnCompressBzMemToString(Source: pointer; SourceSize, DestSize: integer): RawByteString;
+var BZ: PBZip2_decode_stream;
+begin
+  if DestSize<=0 then exit;
+  SetLength(result,DestSize);
+  Getmem(BZ,sizeof(TBZip2_decode_stream));
+  try
+    BZ^.Open(Source);
+    if BZ^.error=0 then
+      BZ^.Read(pointer(result),DestSize);
+    BZ^.Close;
+    if BZ^.error<>BZip2_endoffile then
+      result := '';
   finally
     Freemem(BZ);
   end;

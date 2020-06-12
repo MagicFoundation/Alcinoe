@@ -6,7 +6,7 @@ unit SynProtoRTSPHTTP;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,12 +25,12 @@ unit SynProtoRTSPHTTP;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
 
-  
+
   Alternatively, the contents of this file may be used under the terms of
   either the GNU General Public License Version 2 or later (the "GPL"), or
   the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
@@ -62,7 +62,7 @@ unit SynProtoRTSPHTTP;
 }
 
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 interface
 
@@ -82,8 +82,6 @@ uses
   SynBidirSock,
   SynLog,
   SynTests;
-
-{$I Synopse.inc}
 
 type
   /// holds a HTTP POST connection for RTSP proxy
@@ -116,10 +114,11 @@ type
   TRTSPOverHTTPServer = class(TAsynchServer)
   protected
     fRtspServer, fRtspPort: SockString;
-    fPendingGet: TRawUTF8ListLocked;
+    fPendingGet: TRawUTF8List;
     function GetHttpPort: SockString;
     // creates TPostConnection and TRtspConnection instances for a given stream
-    function ConnectionCreate(aSocket: TSocket; out aConnection: TAsynchConnection): boolean; override;
+    function ConnectionCreate(aSocket: TSocket; const aRemoteIp: RawUTF8;
+      out aConnection: TAsynchConnection): boolean; override;
   public
     /// initialize the proxy HTTP server forwarding specified RTSP server:port
     constructor Create(const aRtspServer, aRtspPort, aHttpPort: SockString;
@@ -159,8 +158,8 @@ begin
     result := sorContinue;
   end
   else begin
-    Sender.Log.Add.Log(sllDebug, 'OnRead % RTSP failed send to GET -> close connection',
-      [Handle], self);
+    Sender.Log.Add.Log(sllDebug, 'OnRead % RTSP failed send to GET -> close % connection',
+      [Handle, RemoteIP], self);
     result := sorClose;
   end;
   fSlot.readbuf := '';
@@ -187,13 +186,13 @@ begin
   fSlot.readbuf := '';
   rtsp := Sender.ConnectionFindLocked(fRtspTag);
   if rtsp <> nil then
-  try
-    Sender.Write(rtsp, decoded); // asynch sending to RTSP server
-    Sender.Log.Add.Log(sllDebug, 'OnRead % POST forwarded RTSP command [%]',
-      [Handle, decoded], self);
-  finally
-    Sender.Unlock;
-  end
+    try
+      Sender.Write(rtsp, decoded); // asynch sending to RTSP server
+      Sender.Log.Add.Log(sllDebug, 'OnRead % POST forwarded RTSP command [%]',
+        [Handle, decoded], self);
+    finally
+      Sender.Unlock;
+    end
   else begin
     Sender.Log.Add.Log(sllDebug, 'OnRead % POST found no rtsp=%', [Handle, fRtspTag], self);
     result := sorClose;
@@ -215,14 +214,15 @@ begin
   fLog := aLog;
   fRtspServer := aRtspServer;
   fRtspPort := aRtspPort;
-  fPendingGet := TRawUTF8ListLocked.Create(true);
+  fPendingGet := TRawUTF8List.Create([fObjectsOwned,fCaseSensitive]);
   inherited Create(aHttpPort, aOnStart, aOnStop, TPostConnection,
     'rtsp/http', aLog, aOptions);
 end;
 
 destructor TRTSPOverHTTPServer.Destroy;
+var log: ISynLog;
 begin
-  fLog.Enter(self);
+  log := fLog.Enter(self{$ifndef DELPHI5OROLDER},'Destroy'{$endif});
   inherited Destroy;
   fPendingGet.Free;
 end;
@@ -240,21 +240,22 @@ type
 const
   RTSP_MIME = 'application/x-rtsp-tunnelled';
 
-function TRTSPOverHTTPServer.ConnectionCreate(aSocket: TSocket;
+function TRTSPOverHTTPServer.ConnectionCreate(aSocket: TSocket; const aRemoteIp: RawUTF8;
   out aConnection: TAsynchConnection): boolean;
 var
   log: ISynLog;
   sock, get, old: TProxySocket;
   cookie: RawUTF8;
   rtsp: TSocket;
-  i: integer;
+  i, found: integer;
   postconn: TPostConnection;
   rtspconn: TRtspConnection;
   now: cardinal;
 
   procedure PendingDelete(i: integer; const reason: RawUTF8);
   begin
-    log.Log(sllDebug, 'ConnectionCreate rejected %', [reason], self);
+    if log<>nil then
+      log.Log(sllDebug, 'ConnectionCreate rejected %', [reason], self);
     fPendingGet.Delete(i);
   end;
 
@@ -266,29 +267,34 @@ begin
   try
     sock := TProxySocket.Create(nil);
     try
-      sock.InitRequest(aSocket);
-      if sock.GetRequest({withBody=}false) and (sock.URL <> '') then begin
+      sock.AcceptRequest(aSocket,nil);
+      sock.RemoteIP := aRemoteIP;
+      sock.CreateSockIn; // faster header process (released below once not needed)
+      if (sock.GetRequest({withBody=}false, {headertix=}0)=grHeaderReceived) and
+         (sock.URL <> '') then begin
         if log<>nil then
           log.Log(sllTrace, 'ConnectionCreate received % % %', [sock.Method, sock.URL,
             sock.HeaderGetText], self);
-        cookie := sock.HeaderValue('x-sessioncookie');
+        cookie := sock.HeaderGetValue('X-SESSIONCOOKIE');
         if cookie = '' then
           exit;
         fPendingGet.Safe.Lock;
         try
-          now := GetTickCount64 shr 10;
+          found := -1;
+          now := SynCommons.GetTickCount64 shr 10;
           for i := fPendingGet.Count - 1 downto 0 do begin
             old := fPendingGet.ObjectPtr[i];
             if now > old.fExpires then begin
               if log<>nil then
                 log.Log(sllTrace, 'ConnectionCreate deletes deprecated %', [old], self);
               fPendingGet.Delete(i);
-            end;
+            end
+            else if fPendingGet[i]=cookie then
+              found := i;
           end;
-          i := fPendingGet.IndexOf(cookie);
           if IdemPropNameU(sock.Method, 'GET') then begin
-            if i >= 0 then
-              PendingDelete(i, 'duplicated')
+            if found >= 0 then
+              PendingDelete(found, 'duplicated')
             else begin
               sock.Write(FormatUTF8('HTTP/1.0 200 OK'#13#10 +
                 'Server: % %'#13#10 +
@@ -306,15 +312,15 @@ begin
             end;
           end
           else if IdemPropNameU(sock.Method, 'POST') then begin
-            if i < 0 then begin
+            if found < 0 then begin
               if log<>nil then
                 log.Log(sllDebug, 'ConnectionCreate rejected on unknonwn %', [sock], self)
             end else if not IdemPropNameU(sock.ContentType, RTSP_MIME) then
-              PendingDelete(i, sock.ContentType)
+              PendingDelete(found, sock.ContentType)
             else begin
-              get := fPendingGet.Objects[i] as TProxySocket;
-              fPendingGet.Objects[i] := nil; // will be owned by rtspinstance
-              fPendingGet.Delete(i);
+              get := fPendingGet.Objects[found];
+              fPendingGet.Objects[found] := nil; // will be owned by rtspinstance
+              fPendingGet.Delete(found);
               sock.Sock := -1; // disable Close on sock.Free -> handled in pool
             end;
           end;
@@ -335,10 +341,10 @@ begin
       exit;
     end;
     rtsp := CallServer(fRtspServer, fRtspPort, false, cslTCP, 1000);
-    if rtsp <= 0 then
+    if rtsp <= 0 then // ECrtSocket to include WSAGetLastError
       raise ECrtSocket.CreateFmt('No RTSP server on %s:%s', [fRtspServer, fRtspPort], -1);
-    postconn := TPostConnection.Create;
-    rtspconn := TRtspConnection.Create;
+    postconn := TPostConnection.Create(aRemoteIP);
+    rtspconn := TRtspConnection.Create(aRemoteIP);
     if not inherited ConnectionAdd(aSocket, postconn) or
        not inherited ConnectionAdd(rtsp, rtspconn) then
       raise EAsynchConnections.CreateUTF8('inherited %.ConnectionAdd(%) % failed',
@@ -377,7 +383,7 @@ var
   text: SockString;
   log: ISynLog;
 begin // here we follow the steps and content stated by https://goo.gl/CX6VA3
-  log := fLog.Enter(self);
+  log := fLog.Enter(self{$ifndef DELPHI5OROLDER},'Tests'{$endif});
   if (self = nil) or (fRtspServer <> '127.0.0.1') then
     test.Check(false, 'expect a running proxy on 127.0.0.1')
   else
@@ -401,8 +407,8 @@ begin // here we follow the steps and content stated by https://goo.gl/CX6VA3
           'Cache-Control: no-cache'#13#10#13#10);
         get.SockRecvLn(text);
         test.Check(text = 'HTTP/1.0 200 OK');
-        get.GetHeader;
-        test.Check(get.ConnectionClose);
+        get.GetHeader(false);
+        test.Check(connectionClose in get.HeaderFlags);
         test.Check(get.SockConnected);
         test.Check(get.ContentType = RTSP_MIME);
       end;

@@ -100,13 +100,17 @@ begin
   case fClientSettings.Protocol of
     HTTP_Socket:
       begin
-        fClient := TSQLHttpClientWinSock.Create(AnsiString(fClientSettings.HostOrIP), AnsiString(fClientSettings.Port), fModel, fConnectionSettings.SendTimeout, fConnectionSettings.ReceiveTimeout,
+        fClient := TSQLHttpClientWinSock.Create(AnsiString(fClientSettings.HostOrIP),
+          AnsiString(fClientSettings.Port), fModel, false, '', '',
+          fConnectionSettings.SendTimeout, fConnectionSettings.ReceiveTimeout,
           fConnectionSettings.ConnectTimeout);
         TSQLHttpClientWinSock(fClient).KeepAliveMS := CONNECTION_TIMEOUT;
       end;
     HTTP_HTTPsys:
       begin
-        fClient := TSQLHttpClientWinHTTP.Create(AnsiString(fClientSettings.HostOrIP), AnsiString(fClientSettings.Port), fModel, fConnectionSettings.SendTimeout, fConnectionSettings.ReceiveTimeout,
+        fClient := TSQLHttpClientWinHTTP.Create(AnsiString(fClientSettings.HostOrIP),
+          AnsiString(fClientSettings.Port), fModel, false, '', '',
+          fConnectionSettings.SendTimeout, fConnectionSettings.ReceiveTimeout,
           fConnectionSettings.ConnectTimeout);
         TSQLHttpClientWinHTTP(fClient).KeepAliveMS := CONNECTION_TIMEOUT;
         TSQLHttpClientWinHTTP(fClient).Compression := [hcSynShaAes];
@@ -114,7 +118,8 @@ begin
    {$ifdef MSWINDOWS}
     HTTPsys_SSL:
       begin
-        fClient := TSQLHttpClientWinHTTP.Create(AnsiString(fClientSettings.HostOrIP), AnsiString(fClientSettings.Port), fModel, True, '', '', fConnectionSettings.SendTimeout,
+        fClient := TSQLHttpClientWinHTTP.Create(AnsiString(fClientSettings.HostOrIP),
+          AnsiString(fClientSettings.Port), fModel, True, '', '', fConnectionSettings.SendTimeout,
           fConnectionSettings.ReceiveTimeout, fConnectionSettings.ConnectTimeout);
         TSQLHttpClientWinHTTP(fClient).KeepAliveMS := CONNECTION_TIMEOUT;
         TSQLHttpClientWinHTTP(fClient).Compression := [hcSynShaAes];
@@ -122,34 +127,44 @@ begin
    {$endif}
     HTTPsys_AES:
       begin
-        fClient := TSQLHttpClientWinHTTP.Create(AnsiString(fClientSettings.HostOrIP), AnsiString(fClientSettings.Port), fModel, fConnectionSettings.SendTimeout, fConnectionSettings.ReceiveTimeout,
+        fClient := TSQLHttpClientWinHTTP.Create(AnsiString(fClientSettings.HostOrIP),
+          AnsiString(fClientSettings.Port), fModel, false, '', '',
+          fConnectionSettings.SendTimeout, fConnectionSettings.ReceiveTimeout,
           fConnectionSettings.ConnectTimeout);
         TSQLHttpClientWinHTTP(fClient).KeepAliveMS := CONNECTION_TIMEOUT;
         TSQLHttpClientWinHTTP(fClient).Compression := [hcSynShaAes];
       end;
     HTTP_WebSocket:
       begin
-        fClient := TSQLHttpClientWebsockets.Create(AnsiString(fClientSettings.HostOrIP), AnsiString(fClientSettings.Port), fModel, fConnectionSettings.SendTimeout, fConnectionSettings.ReceiveTimeout,
+        fClient := TSQLHttpClientWebsockets.Create(AnsiString(fClientSettings.HostOrIP),
+          AnsiString(fClientSettings.Port), fModel, false, '', '',
+          fConnectionSettings.SendTimeout, fConnectionSettings.ReceiveTimeout,
           fConnectionSettings.ConnectTimeout);
         TSQLHttpClientWebsockets(fClient).KeepAliveMS := CONNECTION_TIMEOUT;
       end;
     WebSocketBidir_JSON:
       begin
-        fClient := TSQLHttpClientWebsockets.Create(AnsiString(fClientSettings.HostOrIP), AnsiString(fClientSettings.Port), fModel, fConnectionSettings.SendTimeout, fConnectionSettings.ReceiveTimeout,
+        fClient := TSQLHttpClientWebsockets.Create(AnsiString(fClientSettings.HostOrIP),
+          AnsiString(fClientSettings.Port), fModel, false, '', '',
+          fConnectionSettings.SendTimeout, fConnectionSettings.ReceiveTimeout,
           fConnectionSettings.ConnectTimeout);
         TSQLHttpClientWebsockets(fClient).KeepAliveMS := CONNECTION_TIMEOUT;
         (fClient as TSQLHttpClientWebsockets).WebSocketsUpgrade('', True);
       end;
     WebSocketBidir_Binary:
       begin
-        fClient := TSQLHttpClientWebsockets.Create(AnsiString(fClientSettings.HostOrIP), AnsiString(fClientSettings.Port), fModel, fConnectionSettings.SendTimeout, fConnectionSettings.ReceiveTimeout,
+        fClient := TSQLHttpClientWebsockets.Create(AnsiString(fClientSettings.HostOrIP),
+          AnsiString(fClientSettings.Port), fModel, false, '', '',
+          fConnectionSettings.SendTimeout, fConnectionSettings.ReceiveTimeout,
           fConnectionSettings.ConnectTimeout);
         TSQLHttpClientWebsockets(fClient).KeepAliveMS := CONNECTION_TIMEOUT;
         (fClient as TSQLHttpClientWebsockets).WebSocketsUpgrade('', False);
       end;
     WebSocketBidir_BinaryAES:
       begin
-        fClient := TSQLHttpClientWebsockets.Create(AnsiString(fClientSettings.HostOrIP), AnsiString(fClientSettings.Port), fModel, fConnectionSettings.SendTimeout, fConnectionSettings.ReceiveTimeout,
+        fClient := TSQLHttpClientWebsockets.Create(AnsiString(fClientSettings.HostOrIP),
+          AnsiString(fClientSettings.Port), fModel, false, '', '',
+          fConnectionSettings.SendTimeout, fConnectionSettings.ReceiveTimeout,
           fConnectionSettings.ConnectTimeout);
         TSQLHttpClientWebsockets(fClient).KeepAliveMS := CONNECTION_TIMEOUT;
         (fClient as TSQLHttpClientWebsockets).WebSocketsUpgrade('2141D32ADAD54D9A9DB56000CC9A4A70', False);

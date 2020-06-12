@@ -7,6 +7,7 @@ uses
   Classes,
   SysUtils,
   SynCommons,
+  SynTable,
   SynLog,
   mORMotService,
   mORMot,

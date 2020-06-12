@@ -16,6 +16,14 @@
 }
 program LoggingTest;
 
+{$AppType console}
+
+{$I Synopse.inc} // all expected conditionals
+
+{$ifndef DELPHI5OROLDER} // mORMot.pas doesn't compile under Delphi 5
+  {$define WITHMORMOT}
+{$endif}
+
 uses
   {$I SynDprUses.inc} // use FastMM4 on older Delphi, or set FPC threads
   {$ifdef MSWINDOWS}
@@ -23,8 +31,7 @@ uses
   ComObj,
   {$endif}
   SysUtils,
-  {$ifdef CONDITIONALEXPRESSIONS}
-  // mORMot.pas doesn't compile under Delphi 5
+  {$ifdef WITHMORMOT}
   mORMot,
   {$endif}
   SynCommons,
@@ -41,7 +48,7 @@ type
   // can be ignored on request
   ECustomException = class(Exception);
 
-{$ifdef CONDITIONALEXPRESSIONS}
+{$ifdef WITHMORMOT}
   TSQLRecordPeople = class(TSQLRecord)
   private
     fFirstName: RawUTF8;
@@ -69,9 +76,10 @@ begin
   ILog := TSQLLog.Enter(self);
   // do some stuff
   ILog.Log(sllCustom1);
-  ILog.Log(sllInfo,'TestLevel',TypeInfo(TSynLogInfo),TestLevel);
-  ILog.Log(sllInfo,'set',TypeInfo(TSynLogInfos),S);
+  ILog.Log(sllInfo,'TestLevel',TypeInfo(TSynLogInfo),TestLevel,nil);
+  ILog.Log(sllInfo,'set',TypeInfo(TSynLogInfos),S,nil);
   ILog.Log(sllDebug,ILog.Instance);
+  ILog.Log(sllExceptionOS, 'Some error with stacktrace from %', [ExeVersion.ProgramName], self);
   if TestLevel=low(TestLevel) then
     TTestLogClass(nil).ClassName; // will raise an access violation
   dec(TestLevel);
@@ -89,7 +97,7 @@ end;
 
 procedure TestsLog;
 
-{$ifdef CONDITIONALEXPRESSIONS}
+{$ifdef WITHMORMOT}
   procedure TestPeopleProc;
   var People: TSQLRecordPeople;
       Log: ISynLog;
@@ -99,7 +107,7 @@ procedure TestsLog;
     try
       People.IDValue := 16;
       People.FirstName := 'Louis';
-      People.LastName := 'Croivébaton';
+      People.LastName := 'Croivebaton';
       People.YearOfBirth := 1754;
       People.YearOfDeath := 1793;
       Log.Log(sllInfo,People);
@@ -135,8 +143,11 @@ procedure TestsLog;
       Proc1(n1, n2 - 1);
   end;
 
-var dummy: integer;
+var i: integer;
+    f: system.TextFile;
+    info: TSynLogExceptionInfoDynArray;
 begin
+  i := 1; // we need this to circumvent the FPC compiler :)
   // first, set the TSQLLog family parameters
   with TSQLLog.Family do begin
     Level := LOG_VERBOSE;
@@ -149,24 +160,25 @@ begin
     ArchiveAfterDays := 1; // archive after one day
   end;
   TSQLLog.Add.Log(sllInfo,'Starting');
-  // try some low-level common exceptions
+  writeln(' try some low-level common exceptions');
   try
-    dummy := 0;
-    if 10 div dummy=0 then; // will raise EDivByZero
+    dec(i);
+    if 10 div i=0 then; // will raise EDivByZero
   except
     on E: exception do
       TSQLLog.Add.Log(sllStackTrace,'^^^^^^^^ the first sample, divide by 0',E);
   end;
   try
-    readln; // will raise EIOError (no console is available to read from)
+    closefile(f);
+    readln(f); // will raise EIOError (no console is available to read from)
   except
     on E: exception do
       TSQLLog.Add.Log(sllStackTrace,'^^^^^^^^ the next sample, I/O error',E);
   end;
-  // try EAccessViolation in nested procedure calls (see stack trace)
+  writeln(' try EAccessViolation in nested procedure calls (see stack trace)');
   Proc1(5,7);
   Proc2(7,5);
-  // try a method recursive call, with an EAccessViolation raised within
+  writeln(' try a method recursive call, with an EAccessViolation raised within');
   with TTestLogClass.Create do
   try
     try
@@ -177,20 +189,20 @@ begin
   finally
     Free;
   end;
-  // try a procedure call with Enter/Auto-Leave
+  writeln(' try a procedure call with Enter/Auto-Leave');
   TestLogProc;
-{$ifdef CONDITIONALEXPRESSIONS}
-  // try a procedure call with Enter/Auto-Leave and a TSQLRecordPeople logging
+  {$ifdef WITHMORMOT}
+  writeln(' try a procedure call with Enter/Auto-Leave and a TSQLRecordPeople logging');
   TestPeopleProc;
-{$endif}
-  // try a custom Delphi exception
+  {$endif}
+  writeln(' try a custom Delphi exception');
   try
     raise ECustomException.Create('Test exception'); // logged to TSQLLog
   except
     on E: Exception do
       TSQLLog.Add.Log(sllInfo,'^^^^^^^^  custom exception type',E);
   end;
-  // try a custom Delphi exception after been marked as to be ignored
+  writeln(' try a custom Delphi exception after been marked as to be ignored');
   TSQLLog.Family.ExceptionIgnore.Add(ECustomException);
   try
     raise ECustomException.Create('Test exception');
@@ -198,25 +210,27 @@ begin
     on E: Exception do
       TSQLLog.Add.Log(sllInfo,'^^^^^^^^  nothing should be logged just above',E);
   end;
-  // try an Exception with message='' - see ticket [388c2768b6]
+  writeln(' try an Exception with message='' - see ticket [388c2768b6]');
   try
     raise Exception.Create('');
   except
     on E: Exception do
       TSQLLog.Add.Log(sllInfo,'^^^^^^^^  Exception.Message=""',E);
   end;
-  // try an ESynException
+  writeln(' try an ESynException');
   try
     raise ESynException.CreateUTF8('testing %.CreateUTF8',[ESynException]);
   except
     on E: ESynException do begin
       TSQLLog.Add.Log(sllInfo,'^^^^^^^^  ESynException',E);
+      {$ifdef WITHMORMOT}
       TSQLLog.Add.Log(sllDebug,'ObjectToJSONDebug(E) = %',[ObjectToJSONDebug(E)],E);
+      {$endif}
       TSQLLog.Add.Log(sllDebug,'FindLocation(E) = %',[TSynMapFile.FindLocation(E)],E);
     end;
   end;
   {$ifdef MSWINDOWS}
-  // try a EOleSysError, as if it was triggered from the .Net CLR
+  writeln(' try a EOleSysError, as if it was triggered from the .Net CLR');
   try
     raise EOleSysError.Create('Test',HRESULT($80004003),0);
   except
@@ -224,9 +238,14 @@ begin
       TSQLLog.Add.Log(sllInfo,'^^^^^^^^  should be recognized as NullReferenceException',E);
   end;
   {$endif}
+  writeln('GetLastExceptions = ');
+  GetLastExceptions(info);
+  for i := 0 to high(info) do
+    writeln(ToText(info[i]));
 end;
 
 begin
   TestsLog;
+  writeln('------ finished');
 end.
 

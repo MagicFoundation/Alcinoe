@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <General>
+      <Flags>
+        <MainUnitHasCreateFormStatements Value="False"/>
+        <MainUnitHasTitleStatement Value="False"/>
+      </Flags>
+      <SessionStorage Value="InProjectDir"/>
+      <MainUnit Value="0"/>
+      <UseAppBundle Value="False"/>
+      <ResourceType Value="res"/>
+    </General>
+    <BuildModes Count="8">
+      <Item1 Name="Default" Default="True"/>
+      <Item2 Name="win32">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="exe\FishShopDaemon"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir);..\..\..;..\..\..\SQLite3"/>
+            <Libraries Value="..\..\..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..\..\..;..\..\..\SQLite3;..\..\..\SQLite3\DDD\infra;..\data;..\serv;..\daemon"/>
+            <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <TargetProcessor Value="pentiumm"/>
+            <TargetCPU Value="i386"/>
+            <TargetOS Value="win32"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <StripSymbols Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+        </CompilerOptions>
+      </Item2>
+      <Item3 Name="win64">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="exe\FishShopDaemon"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir);..\..\..;..\..\..\SQLite3"/>
+            <Libraries Value="..\..\..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..\..\..;..\..\..\SQLite3;..\..\..\SQLite3\DDD\infra;..\data;..\serv;..\daemon"/>
+            <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <TargetCPU Value="x86_64"/>
+            <TargetOS Value="win64"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <StripSymbols Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShowDebugInfo Value="True"/>
+            </Verbosity>
+            <CustomOptions Value="-dONLYUSEHTTPSOCKET"/>
+          </Other>
+        </CompilerOptions>
+      </Item3>
+      <Item4 Name="linux32">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir);..\..\..;..\..\..\SQLite3"/>
+            <Libraries Value="..\..\..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..\..\..;..\..\..\SQLite3;..\..\..\SQLite3\DDD\infra;..\data;..\serv;..\daemon"/>
+            <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <TargetProcessor Value="pentiumm"/>
+            <TargetCPU Value="i386"/>
+            <TargetOS Value="linux"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <StripSymbols Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <OtherDefines Count="2">
+              <Define0 Value="LMSBRIDGE"/>
+              <Define1 Value="ONLYUSEHTTPSOCKET"/>
+            </OtherDefines>
+          </Other>
+        </CompilerOptions>
+      </Item4>
+      <Item5 Name="linux64">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir);..\..\..;..\..\..\SQLite3"/>
+            <Libraries Value="..\..\..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..\..\..;..\..\..\SQLite3;..\..\..\SQLite3\DDD\infra;..\data;..\serv;..\daemon"/>
+            <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <TargetCPU Value="x86_64"/>
+            <TargetOS Value="linux"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <StripSymbols Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <CustomOptions Value="-Sa"/>
+          </Other>
+        </CompilerOptions>
+      </Item5>
+      <Item6 Name="linuxarm">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir);..\..\..;..\..\..\SQLite3"/>
+            <Libraries Value="..\..\..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..\..\..;..\..\..\SQLite3;..\..\..\SQLite3\DDD\infra;..\data;..\serv;..\daemon"/>
+            <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <TargetCPU Value="arm"/>
+            <TargetOS Value="linux"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <StripSymbols Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <OtherDefines Count="2">
+              <Define0 Value="LMSBRIDGE"/>
+              <Define1 Value="ONLYUSEHTTPSOCKET"/>
+            </OtherDefines>
+          </Other>
+        </CompilerOptions>
+      </Item6>
+      <Item7 Name="bsd32">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir);..\..\..;..\..\..\SQLite3"/>
+            <Libraries Value="..\..\..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..\..\..;..\..\..\SQLite3;..\..\..\SQLite3\DDD\infra;..\data;..\serv;..\daemon"/>
+            <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <TargetProcessor Value="pentiumm"/>
+            <TargetCPU Value="i386"/>
+            <TargetOS Value="freebsd"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <StripSymbols Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <OtherDefines Count="2">
+              <Define0 Value="LMSBRIDGE"/>
+              <Define1 Value="ONLYUSEHTTPSOCKET"/>
+            </OtherDefines>
+          </Other>
+        </CompilerOptions>
+      </Item7>
+      <Item8 Name="bsd64">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <SearchPaths>
+            <IncludeFiles Value="$(ProjOutDir);..\..\..;..\..\..\SQLite3"/>
+            <Libraries Value="..\..\..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..\..\..;..\..\..\SQLite3;..\..\..\SQLite3\DDD\infra;..\data;..\serv;..\daemon"/>
+            <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <TargetCPU Value="x86_64"/>
+            <TargetOS Value="netbsd"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <StripSymbols Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <OtherDefines Count="2">
+              <Define0 Value="LMSBRIDGE"/>
+              <Define1 Value="ONLYUSEHTTPSOCKET"/>
+            </OtherDefines>
+          </Other>
+        </CompilerOptions>
+      </Item8>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default"/>
+      </Modes>
+    </RunParams>
+    <Units Count="1">
+      <Unit0>
+        <Filename Value="FishShopDaemon.dpr"/>
+        <IsPartOfProject Value="True"/>
+      </Unit0>
+    </Units>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <Target>
+      <Filename Value="exe/FishShopDaemon"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir);../../../lib;../../../lib/SQLite3"/>
+      <Libraries Value="../../../lib/static/$(TargetCPU)-$(TargetOS)"/>
+      <OtherUnitFiles Value="../../../lib;../../../lib/SQLite3;../../../lib/SQLite3/DDD/infra;../data;../serv;../daemon"/>
+      <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+    </SearchPaths>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="3">
+      <Item1>
+        <Name Value="EAbort"/>
+      </Item1>
+      <Item2>
+        <Name Value="ECodetoolError"/>
+      </Item2>
+      <Item3>
+        <Name Value="EFOpenError"/>
+      </Item3>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

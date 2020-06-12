@@ -2,7 +2,7 @@ unit TestMustacheUnit;
 
 interface
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
@@ -51,7 +51,7 @@ uses
 {$R *.dfm}
 
 {$ifndef FPC}
-{$R Vista.res}
+  {$R vista.RES} // includes Win10 manifest - use .RES for linux cross-compilation
 {$endif}
 
 procedure TMainForm.Render(Sender: TObject);

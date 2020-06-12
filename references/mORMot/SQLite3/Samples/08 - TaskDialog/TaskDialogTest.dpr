@@ -1,6 +1,6 @@
 program TaskDialogTest;
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64
 
 uses
   {$ifdef FPC}
@@ -17,6 +17,7 @@ uses
   {$else}
   SynTaskDialog,
   {$endif}
+  SynCommons,
   mORMot,
   mORMotUILogin;
 
@@ -102,9 +103,9 @@ begin
   TaskEx.DialogIcon := tiQuestion;
   TaskEx.OnButtonClicked := TCallBack.TaskDialogButtonClicked;
   TaskEx.Execute;
-  ShowMessage(Format('User=%s Password=%s',[aUserName,aPassword]),
+  ShowMessage(FormatString('User=% Password=%',[aUserName,aPassword]),
     not TLoginForm.Login('Title','Please login',aUserName,aPassWord,true,''));
-  ShowMessage(Format('User=%s Password=%s',[aUserName,aPassword]),
+  ShowMessage(FormatString('User=% Password=%',[aUserName,aPassword]),
     not TLoginForm.Login('Title','Please login again',aUserName,aPassWord,true,''));
 end;
 

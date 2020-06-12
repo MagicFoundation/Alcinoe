@@ -3,7 +3,7 @@
 unit SynBigTable;
 
 (*
-    Synopse Big Table. Copyright (C) 2018 Arnaud Bouchez
+    Synopse Big Table. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -22,7 +22,7 @@ unit SynBigTable;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -75,150 +75,14 @@ unit SynBigTable;
     handling, which could be sufficient as a simple database
   - save your soul or make me rich...
 
-
-  Version 1.0
-   - initial release
-
-  Version 1.1
-   - Fix save on disk issue, when some items are deleted but none added
-   - enhanced unitary testing procedure
-
-  Version 1.2
-   - new TSynBigTableString class to store data from a UTF-8 encoded string ID
-     instead of a numerical ID
-   - added caching for last Get() items (may speed up next Get() a little bit)
-   - custom Get() method for range retrieval into a dynamic array
-   - TSynBigTable modified in order to handle custom data in header (used to
-     store string IDs for TSynBigTableString for instance)
-   - whole engine more robust against any file corruption or type mistmatch
-   - Count property returned an incorrect value (including deleted values)
-   - added timing (in 1/10 ms) for test steps
-   - version 1.2b: even (much) faster TSynBigTableString.Add()
-
-  Version 1.3
-    - new Open() Read() and Seek() methods to read data like in a TStream
-    - new Clear method to flush the table and rebuild from scratch
-    - don't cache data bigger than 1 MB (to save RAM)
-
-  Version 1.4
-    - added RawByteStringFromFile() and FileFromRawByteString() procedures
-    - added TSynBigTable.AddFile() method
-
-  Version 1.7
-    - Thread safe version of the Synopse Big Table
-
-  Version 1.8
-    - new GetPart() method for retrieving a part of a stored file
-      (to be used especially for big file content)
-    - fix issue with files > 2 GB (thanks to sanyin for the report)
-
-  Version 1.9 - mostly requests and modification proposal from sanyin - thanks!
-    - new TSynBigTable.GetLength() method
-    - new TSynBigTable.ReadToStream() method
-    - can set additional file open mode flags in TSynBigTable.Create
-    - fixed an obscure possible issue for saving/loading TSynBigTableString
-      with string IDs bigger in size than 65535 chars
-
-  Version 1.9.2
-    - Range Checking forced OFF to avoid problems with some projects
-    - fFile type modified to THandle, instead of integer
-
-  Version 1.12
-    - this is a MAJOR update: the file format changed (new magics $ABAB0004/5)
-    - now uses SynCommons unit (avoid too much duplicated code)
-    - buffered writing and reading to file: major speed up of the unit,
-      since Windows file access API are dead slow; for instance, reading
-      uses now memory-mapped files for best possible performance
-    - all previous caching (not working in fact) has been disabled
-      (the caching is now implemented more efficiently at OS level, within
-      memory mapped files)
-    - TSynBigTableString has no 65535 key length limitation any more
-    - values or UTF-8 keys of fixed-size are now stored in the most efficient way
-    - new Update() methods, allowing to change the content of any record
-    - new GetPointer() methods, to retrieve a pointer to the data, directly
-      in memory mapped buffer (faster than a standar Get() call)
-    - new GetAsStream() methods, to retrieve a data into an in-memory stream,
-      pointing into the memory mapped buffer in most cases
-    - new GetIterating() method, which will loop into all data items, calling
-      a call-back with pointers to each data element (very fast method)
-    - fDeleted[] array now stored in ascending order, to make whole unit faster
-    - NumericalID[] property is now available also in TSynBigTable (don't use it
-      to loop through all items, but rather the dedicated GetIterating() method)
-
-  Version 1.12a
-    - Offsets can now be stored as Int32 instead of Int64 (to save space in
-      memory for most TSynBigTable usage): the file format did therefore changed
-      (new magics $ABAB0006/7)
-    - fixed issue when opening an TSynBigTableString file with updated items
-    - fixed a major problem in TFileBufferWriter.WriteVarUInt32Array, with
-      DataLayout=wkOffset and ValuesCount=1 - the same error occured in
-      WriteVarUInt64DynArray with Offset=true and ValuesCount=1
-    - fix issue with files >= 2 GB (thanks to sanyin for another report):
-      memory mapped files are not well handled in this case -> direct read
-      from disk is used for such huge files (but faster memory mapping is
-      using for all files < 2 GB)
-    - enhanced coherency checks when loading from a TSynBigTable file
-    - the unit will now flushes the in-memory data to disk when 256 MB of data
-      is stored in RAM (manual flush was confusing for some users) - see the
-      new BIGTABLE_AUTOFLUSH_SIZE constant
-    - code refactoring in TSynBigTableString: some generic functions were
-      moved into SynCommons
-    - get rid of the Open/Read/Seek methods: use GetAsStream() instead
-    - faster GetIterating() method, looping in physical order in disk by default,
-      and optionaly in Numerical ID order or even the faster available order
-      (new TSynBigTableIterationOrder parameter)
-    - added an Opaque parameter to GetIterating() method and corresponding
-      TSynBigTableIterateEvent call-back
-    - new GetAllIDs() method to retrieve all IDs at once
-    - new GetAllPhysicalIndexes() method to retrive all physical indexes at once
-    - new GetPointerFromPhysicalIndex() public method
-    - faster Update: in-place refresh if previous data is still in memory
-    - speed enhancements (e.g. TSynBigTable.Destroy) and extended test coverage
-    - new TSynBigTableRecord class to store data, with fields handling inside
-      each record, fast indexes and search possibilities, late-binding access
-    - new TSynBigTableMetaData class to store BLOB data, with metadata fields in
-      parallel (also with fast indexes and search, late-binding access)
-
-  Version 1.12b
-    - fixed issue with Pack method implementation, in case of updated records
-    - fixed issue with TSynBigTableMetaData/TSynBigTableRecord updating and
-      packing (and added corresponding regression tests)
-    - AddField methods now return a boolean and no TSynTableFieldProperties,
-      because these instances may be modified after a later AddFieldUpdate call
-    - enhanced test coverage (mostly TSynBigTableMetaData/TSynBigTableRecord)
-
-  Version 1.13
-    - record validation now uses the generic TSynValidate mechanism, common
-      with our main ORM framework, compliant with true multi-tier architecture:
-      use Table.Validate method (see e.g. the update CheckConstraints)
-    - record filtering now uses the generic TSynFilter mechanism, common
-      with our main ORM framework, compliant with true multi-tier architecture:
-      use Table.Filter method
-    - GetAsStream() method now will create a TSynMemoryStreamMapped if needed,
-      so will be faster than direct in-memory reading of the whole content
-    - fixed issue when compiled with THREADSAFE
-
-  Version 1.15
-    - unit now tested with Delphi XE2 (32 Bit)
-
-  Version 1.16
-    - new overridden TSynBigTableTable.Clear method which will clear fields
-    - new TSynBigTable.FileFormatCheck class method to recognize file format
-    - replaced sbtGetMagic kind of header with InternalMagic class function
-    - fixed issue in TSynTableFieldProperties.SaveTo about saving wrong indexes
-    - new sbtBeforeWrite step available (e.g. to safely update indexes)
-
-  Version 1.18
-  - unit fixed and tested with Delphi XE2..10.1 Berlin 64-bit compiler
-  - added TSynBigTable.FileSizeOnDisk property for [e4a1e76a32ab]
-  - fixed ticket [b9320499ae] about TBigTableRecord saving updated tables with
-    indexed fields
+  DISCLOSER: this unit is not use on production since years, so is not
+    really maintained
 
 *)
 
 interface
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64
 
 {$ifndef LVCL}
 {.$define THREADSAFE}
@@ -433,7 +297,7 @@ type
     // the associated content
     // - in most cases, this TStream is just a wrapper around the memory mapped
     // buffer in memory
-    // - the TStream must be consummed immediately, before any Pack or
+    // - the TStream must be consumed immediately, before any Pack or
     // UpdateToFile method calls
     // - the caller must Free the returned TStream instance
     // - if the data is not already memory mapped (i.e. for files >= 2 GB)
@@ -591,7 +455,7 @@ type
     // the associated content
     // - in most cases, this TStream is just a wrapper around the memory mapped
     // buffer in memory
-    // - the TStream must be consummed immediately, before any Pack or
+    // - the TStream must be consumed immediately, before any Pack or
     // UpdateToFile method calls
     // - the caller must Free the returned TStream instance
     // - if the data is not already memory mapped (i.e. for files >= 2 GB)

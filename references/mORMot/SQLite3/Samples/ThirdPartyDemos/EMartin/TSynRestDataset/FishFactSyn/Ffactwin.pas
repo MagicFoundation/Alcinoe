@@ -12,7 +12,7 @@ interface
 
 uses
   SysUtils, Windows, Messages, Classes, Graphics, Controls,
-  Forms, StdCtrls, DBCtrls, DBGrids, DB, DBTables, Buttons, Grids, ExtCtrls,
+  Forms, StdCtrls, DBCtrls, DBGrids, DB, Buttons, Grids, ExtCtrls,
   SynRestMidasVCL, DBClient,
   SynCommons, mORMot, OleCtrls, Dialogs, ExtDlgs,
   SynGdiPlus;

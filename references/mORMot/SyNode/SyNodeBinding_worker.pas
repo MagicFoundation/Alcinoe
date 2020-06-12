@@ -261,8 +261,9 @@ begin
         Suspended := True;
     end;
     try
-      if not fSMManager.WorkersManager.FIsInDestroyState then
-        FEng.CallObjectFunction(fModuleObj, 'onterminate', []);
+      if not fSMManager.WorkersManager.FIsInDestroyState
+        and fModuleObj.ptr.HasProperty(cx, 'onterminate') then
+          FEng.CallObjectFunction(fModuleObj, 'onterminate', []);
     except
       ;
     end;
@@ -530,12 +531,11 @@ end;
 function worker_createThread(cx: PJSContext; argc: uintN; var vp: jsargRec): Boolean; cdecl;
 var
   in_argv: PjsvalVector;
-  moduleStr, scriptOnMessage, scriptOnTerminate, scriptOnError: SynUnicode;
-  fThread: TJSWorkerThread;
+  moduleStr: SynUnicode;
   workerName: RawUTF8;
-  params, obj: PJSObject;
+  params: PJSObject;
   IsInvalidCall: Boolean;
-  name, module, onmessage, onterminate, onerror: jsval;
+  name, module: jsval;
   val: jsval;
   FEng: TSMEngine;
 const

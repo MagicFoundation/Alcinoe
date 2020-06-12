@@ -26,7 +26,7 @@ var
 implementation
 
 {$R *.dfm}
-{$R Vista.res}
+{$R vista.RES} // includes Win10 manifest - use .RES for linux cross-compilation
 
 procedure TForm1.Button1Click(Sender: TObject);
 var SearchVersion, Text, Head: string;

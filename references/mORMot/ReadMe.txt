@@ -2,23 +2,27 @@
   Synopse mORMot framework
 
 An Open Source Client-Server ORM/SOA framework
- (c) 2008-2018 Synopse Informatique
+ (c) 2008-2020 Synopse Informatique
   https://synopse.info
   http://mormot.net
 
 Contributors
+  Alan Chate
   Alexander (sha)
   Alexander (volax)
   AlexPirate
   Alfred Glaenzer (alf)
+  Andre Heider (dhewg)
   Arnaud Bouchez
   ASiwon
   Aweste
   Bas Schouten
   BigStar
+  BugsDigger
   Cheemeng
   CoMPi
   Damien (ddemars)
+  Darian Miller
   Daniel Kuettner
   David Mead (MDW)
   Delphinium (louisyeow)
@@ -29,26 +33,40 @@ Contributors
   Eric Grange
   Esmond
   Esteban Martin (EMartin)
+  Eugene Ilyin
   Eva Freimann (EVaF)
+  F-Vicente
   Goran Despalatovic (gigo)
   Jean-Baptiste Roussia (jbroussia)
   Joe (jokusoft)
   Johan Bontes
   Jordi Tudela
+  Kevin Chen
+  Lagodny
   Leon Oosthuizen
+  Macc2010
   Maciej Izak (hnb)
+  Marcos Douglas B. Santos (mdbs99)
   Mario Moretti
   Marius Maximus (mariuszekpl)
+  Martin Eckes
   Martin Suer
+  Mapes
+  Maxim Masiutin
   Mazinsw
   MChaos
   Miab3
   Michael (EgonHugeist)
+  Michalis Kamburelis 
   MilesYou
   Mingda
+  Mr Yang (ysair)
+  Nicolas Marchand (MC)
+  Nortg
   Nzsolt
+  Oleg Tretyakov
   Ondrej (reddwarf)
-  Pavel (mpv)
+  Pavel Mashlyakovskii (mpv)
   Pierre le Riche
   RalfS
   Richard6688
@@ -58,6 +76,8 @@ Contributors
   Sllimr7139
   SSoftPro
   Stefan (itSDS)
+  Svetozar Belic (transmogrifix)
+  Transmogrifix
   Uian2000
   Vaclav
   Vadim Orel
@@ -66,13 +86,14 @@ Contributors
   Wloochacz
   Wolfgang Ehrhardt
   Yoanq
+  Ysair
   Zed
 
 [See below if you upgrade from 1.17 revision]
 
   
 Synopse mORMot is an Open Source Client-Server ORM SOA MVC framework
-for Delphi 6 up to Delphi 10.2 Tokyo and FPC, targeting Windows/Linux
+for Delphi 6 up to Delphi 10.3 Rio and FPC, targeting Windows/Linux
 for servers, and any platform for clients (including mobile or AJAX).
 
 The main features of mORMot are therefore:

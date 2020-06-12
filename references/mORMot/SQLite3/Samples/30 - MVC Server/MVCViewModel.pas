@@ -65,7 +65,7 @@ type
     fHasFTS: boolean;
     procedure ComputeMinimalData; virtual;
     procedure FlushAnyCache; override;
-    function GetViewInfo(MethodIndex: integer): variant; override;
+    procedure GetViewInfo(MethodIndex: integer; out info: variant); override;
     function GetLoggedAuthorID(Right: TSQLAuthorRight; ContentToFillAuthor: TSQLContent): TID;
     procedure MonthToText(const Value: variant; out result: variant);
     procedure TagToText(const Value: variant; out result: variant);
@@ -111,6 +111,10 @@ begin
     SetCache('Default',cacheRootIfNoSession,15).
     SetCache('ArticleView',cacheWithParametersIfNoSession,60).
     SetCache('AuthorView',cacheWithParametersIgnoringSession,60);
+  with TMVCRunOnRestServer(fMainRunner) do begin
+    PublishOptions := PublishOptions - [cacheStatic];
+    StaticCacheControlMaxAge := 60*30; // 30 minutes
+  end;
   (TMVCRunOnRestServer(fMainRunner).Views as TMVCViewsMustache).
     RegisterExpressionHelpers(['MonthToText'],[MonthToText]).
     RegisterExpressionHelpers(['TagToText'],[TagToText]);
@@ -168,16 +172,27 @@ begin
   auto := TSQLRecord.AutoFree([ // avoid several try..finally
     @info,TSQLBlogInfo, @article,TSQLArticle, @comment,TSQLComment, @tag,TSQLTag]);
   if not RestModel.Retrieve('',info) then begin // retrieve first item
-    info.Title := 'mORMot BLOG';
+    tmp := StringFromFile('/home/ab/Downloads/2020-01-16-a8003957c2ae6bde5be6ea279c9c9ce4-backup.txt');
     info.Language := 'en';
-    info.Description := 'Sample Blog Web Application using Synopse mORMot MVC';
-    info.Copyright := '&copy;2018 <a href=https://synopse.info>Synopse Informatique</a>';
-    info.About := TSynTestCase.RandomTextParagraph(30,'!');
+    if tmp<>'' then begin
+      info.Title := 'Synopse Blog';
+      info.Description := 'Articles, announcements, news, updates and more '+
+        'about our Open Source projects';
+      info.About := 'Latest information about Synopse Open Source librairies, '+
+        'mainly the mORMot ORM/SOA/MVC framework, and SynPDF.';
+    end else begin
+      info.Title := 'mORMot BLOG';
+      info.Description := 'Sample Blog Web Application using Synopse mORMot MVC';
+      info.About := TSynTestCase.RandomTextParagraph(10,'!');
+    end;
+    info.About := info.About+#13#10'Website powered by mORMot MVC '+
+      SYNOPSE_FRAMEWORK_VERSION+', compiled with '+GetDelphiCompilerVersion+
+      ', running on '+ToText(OSVersion32)+'.';
+    info.Copyright := '&copy;'+ToUTF8(CurrentYear)+'<a href=https://synopse.info>Synopse Informatique</a>';
     RestModel.Add(info,true);
   end;
   if RestModel.TableHasRows(TSQLArticle) then
     exit;
-  tmp := StringFromFile('d:\download\2014-12-27-a8003957c2ae6bde5be6ea279c9c9ce4-backup.txt');
   if tmp<>'' then begin
     DotClearFlatImport(RestModel,tmp,fTagsLookup,'http://blog.synopse.info',
       (TMVCRunOnRestServer(fMainRunner).Views as TMVCViewsMustache).ViewStaticFolder);
@@ -240,17 +255,20 @@ begin
     end;
 end;
 
-function TBlogApplication.GetViewInfo(MethodIndex: integer): variant;
+procedure TBlogApplication.GetViewInfo(MethodIndex: integer; out info: variant);
+var archives: variant; // needed to circumvent memory leak bug on FPC
 begin
-  result := inherited GetViewInfo(MethodIndex);
+  inherited GetViewInfo(MethodIndex,info);
   _ObjAddProps(['blog',fBlogMainInfo,
-    'session',CurrentSession.CheckAndRetrieveInfo(TypeInfo(TCookieData))],result);
-  if not fDefaultData.AddExistingProp('archives',result) then
-    fDefaultData.AddNewProp('archives',RestModel.RetrieveDocVariantArray(
+    'session',CurrentSession.CheckAndRetrieveInfo(TypeInfo(TCookieData))],info);
+  if not fDefaultData.AddExistingProp('archives',info) then begin
+    archives := RestModel.RetrieveDocVariantArray(
       TSQLArticle,'','group by PublishedMonth order by PublishedMonth desc limit 100',[],
-      'distinct(PublishedMonth),max(RowID)+1 as FirstID'),result);
-  if not fDefaultData.AddExistingProp('tags',result) then
-    fDefaultData.AddNewProp('tags',fTagsLookup.GetAsDocVariantArray,result);
+      'distinct(PublishedMonth),max(RowID)+1 as FirstID');
+    fDefaultData.AddNewProp('archives',archives,info);
+  end;
+  if not fDefaultData.AddExistingProp('tags',info) then
+    fDefaultData.AddNewProp('tags',fTagsLookup.GetAsDocVariantArray,info);
 end;
 
 procedure TBlogApplication.FlushAnyCache;
@@ -285,8 +303,7 @@ begin
     whereClause := 'join (select docid,rank(matchinfo(ArticleSearch),1.0,0.7,0.5) as rank '+
       'from ArticleSearch where ArticleSearch match ? '+whereClause+
       'order by rank desc'+ARTICLE_DEFAULT_LIMIT+')as r on (r.docid=Article.id)';
-    articles := RestModel.RetrieveDocVariantArray(
-      TSQLArticle,'',whereClause,[match,rank],
+    articles := RestModel.RetrieveDocVariantArray(TSQLArticle,'',whereClause,[match,rank],
       'id,title,tags,author,authorname,createdat,abstract,contenthtml,rank');
     with _Safe(articles)^ do
       if (Kind=dvArray) and (Count>0) then
@@ -304,15 +321,17 @@ begin
   end;
   SetVariantNull(Scope);
   if (lastID=0) and (tag=0) then begin // use simple cache if no parameters
-    if not fDefaultData.AddExistingProp('Articles',Scope) then
-      fDefaultData.AddNewProp('Articles',RestModel.RetrieveDocVariantArray(
-        TSQLArticle,'',ARTICLE_DEFAULT_ORDER,[],
-        ARTICLE_FIELDS,nil,@fDefaultLastID),Scope);
+    if not fDefaultData.AddExistingProp('Articles',Scope) then begin
+      articles := RestModel.RetrieveDocVariantArray(TSQLArticle,'',
+        ARTICLE_DEFAULT_ORDER,[],ARTICLE_FIELDS,nil,@fDefaultLastID);
+      fDefaultData.AddNewProp('Articles',articles,Scope);
+    end;
     lastID := fDefaultLastID;
-  end else // use more complex request using lastID + tag parameters
-    scope := _ObjFast(['Articles',RestModel.RetrieveDocVariantArray(
-        TSQLArticle,'',whereClause+ARTICLE_DEFAULT_ORDER,[lastID,tag],
-        ARTICLE_FIELDS,nil,@lastID)]);
+  end else begin // use more complex request using lastID + tag parameters
+    articles := RestModel.RetrieveDocVariantArray(TSQLArticle,'',
+      whereClause+ARTICLE_DEFAULT_ORDER,[lastID,tag],ARTICLE_FIELDS,nil,@lastID);
+    scope := _ObjFast(['Articles',articles]);
+  end;
   if lastID>1 then
     _ObjAddProps(['lastID',lastID, 'tag',tag],Scope);
 end;

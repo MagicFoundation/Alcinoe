@@ -48,7 +48,7 @@ implementation
 {$R *.dfm}
 
 {$ifndef FPC}
-{$R Vista.res}
+  {$R vista.RES} // includes Win10 manifest - use .RES for linux cross-compilation
 {$endif}
 
 procedure TForm1.btnCancelClick(Sender: TObject);

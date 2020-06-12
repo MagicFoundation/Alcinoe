@@ -5,10 +5,10 @@ unit SyNodeNewProto;
 {
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - http://synopse.info
 
-    SyNode for mORMot Copyright (C) 2018 Pavel Mashlyakovsky & Vadim Orel
+    SyNode for mORMot Copyright (C) 2020 Pavel Mashlyakovsky & Vadim Orel
       pavel.mash at gmail.com
 
     Some ideas taken from
@@ -29,7 +29,7 @@ unit SyNodeNewProto;
 
   The Initial Developer of the Original Code is
   Pavel Mashlyakovsky.
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -52,13 +52,6 @@ unit SyNodeNewProto;
   the terms of any one of the MPL, the GPL or the LGPL.
 
   ***** END LICENSE BLOCK *****
-
-
-  ---------------------------------------------------------------------------
-   Download the mozjs-45 library at
-     x32: https://unitybase.info/downloads/mozjs-45.zip
-     x64: https://unitybase.info/downloads/mozjs-45-x64.zip
-  ---------------------------------------------------------------------------
 
 
   Version 1.18
@@ -106,7 +99,11 @@ type
     procedure DefineRTTIMethods(aRtype: TRttiType);
     procedure DefinePropOrFld(rTyp: TRttiType; rMember: TRttiMember; aParent: PJSRootedObject);
     function GetJSClass: JSClass; override;
-
+    /// Can be used to optimize JS engine proerty access.
+    // - if isReadonly setted to true property become read-only for JS engine
+    // - if property valu don't changed during object lifecircle set isDeterministic=true
+    //   to prevent creating of JS value every time JS engine read property value
+    // If method return false propery will not be created in the JS
     function GetPropertyAddInformation(cx: PJSContext; rMember: TRttiMember; out isReadonly: boolean;
       out isDeterministic: boolean): boolean; virtual;
   public
@@ -688,7 +685,7 @@ begin
         mORMot.PPropInfo(PPropInfoEx(TRttiMember(pc.mbr).Handle)^.Info).SetOrdValue(Instance.Instance, i_val);
       end else if PTypeinfo(pc.typeInfo).Kind = tkClass then begin
         IsInstanceObject(cx, vp.argv[0], setObj);
-        mORMot.PPropInfo(PPropInfoEx(TRttiMember(pc.mbr).Handle)^.Info).SetOrdValue(Instance.Instance, Integer(setObj.Instance));
+        mORMot.PPropInfo(PPropInfoEx(TRttiMember(pc.mbr).Handle)^.Info).SetObjProp(Instance.Instance, setObj.Instance);
       end else begin
         JSVal2TVal(cx, pc.typeInfo, vp.argv[0], v);
         TRttiProperty(pc.mbr).SetValue(Instance.Instance, v);
@@ -785,15 +782,15 @@ begin
                 rval.asInteger := GetOrdProp(Instance.Instance, PPropInfoEx(TRttiMember(pc.mbr).Handle)^.Info);
               end;
             end;
-            tkWString, tkUString:
+            tkWString{$ifdef HASVARUSTRING},tkUString{$endif}:
               rval := cx.NewJSString(mORMot.PPropInfo(PPropInfoEx(TRttiMember(pc.mbr).Handle)^.Info).GetUnicodeStrValue(Instance.Instance)).ToJSVal;
             tkLString: begin
               mORMot.PPropInfo(PPropInfoEx(TRttiMember(pc.mbr).Handle)^.Info).GetLongStrValue(Instance.Instance, tmp);
               rval := cx.NewJSString(tmp).ToJSVal;
             end;
             tkClass: begin
-              //MPV TODO Optymize. Don't create calss every time - instead check pointer is not changed
-              clObj := TObject(mORMot.PPropInfo(PPropInfoEx(TRttiMember(pc.mbr).Handle)^.Info).GetOrdValue(Instance.Instance));
+              //MPV TODO Optimize. Don't create class every time - instead check pointer is not changed
+              clObj := mORMot.PPropInfo(PPropInfoEx(TRttiMember(pc.mbr).Handle)^.Info).GetObjProp(Instance.Instance);
               if Assigned(clObj) then begin
                 New(InstanceIO);
                 rval := InstanceIO.CreateForObj(cx,clObj, TSMNewRTTIProtoObject, Instance.proto);
@@ -895,7 +892,7 @@ begin
       SetLength(FRTTIPropsCache, idx + 1);
       FRTTIPropsCache[idx].jsName := camelize(StringToAnsi7(rMember.Name));
 
-      // TODO mote the enumerations to global.binding.enums
+      // TODO move the enumerations to global.binding.enums
       // and do not clog the global object
       if (ti.Kind = tkEnumeration)and(ti<>TypeInfo(boolean)) then begin
         Engine.defineEnum(mORMot.PTypeInfo(ti), aParent);

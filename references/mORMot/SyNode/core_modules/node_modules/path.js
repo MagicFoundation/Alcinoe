@@ -1,6 +1,7 @@
 /**
  * See <a href="https://nodejs.org/api/path.html">Node <strong>path</strong> module documentation</a>
  * @module path
+ * @memberOf module:buildin
  */
 
 'use strict';

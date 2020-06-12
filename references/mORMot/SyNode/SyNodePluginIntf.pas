@@ -2,12 +2,16 @@ unit SyNodePluginIntf;
 
 interface
 
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
+{$I SyNode.inc}   //define WITHASSERT
+
 uses
   SynCommons,
   SpiderMonkey;
 
 type
-  TSMPluginRec = {$ifdef UNICODE}record{$else}object{$endif}
+  {$ifdef USERECORDWITHMETHODS}TSMPluginRec = record
+    {$else}TSMPluginRec = object{$endif}
     cx: PJSContext;
     Exp: PJSRootedObject;
     Req: PJSRootedObject;
@@ -55,7 +59,18 @@ type
 
   TNSMCallInfoArray = array of TNSMCallInfo;
 
-function nsmCallFunc(cx: PJSContext; argc: uintN;  var vp: JSArgRec; Calls: TNSMCallInfoArray; CallCount: Integer = 1; isConstructor: Boolean = false): Boolean; cdecl;
+  /// Helper to call a native function depending on JS function arguments.
+  // As a side effect will verify JS function arguments types. Can be used e.g. as:
+  // ! const
+  // !   overload1Args: array [0..0] of uintN = ( ptInt );
+  // !   overload2Args: array [0..1] of uintN = ( ptInt, SyNodePluginIntf.ptStr );
+  // !   overloads: array [0..1] of TNSMCallInfo = (
+  // !     (func: @SLReadLn_impl; argc: Length(overload1Args); argt: @overload1Args),
+  // !     (func: @SLReadLn_impl; argc: Length(overload2Args); argt: @overload2Args));
+  // ! begin
+  // !   Result := nsmCallFunc(cx, argc, vp, @overloads, Length(overloads));
+  // ! end;
+  function nsmCallFunc(cx: PJSContext; argc: uintN;  var vp: JSArgRec; const overloads: TNSMCallInfoArray; overloadsCount: Integer = 1; isConstructor: Boolean = false): Boolean; cdecl;
 
 const
   StaticROAttrs = JSPROP_ENUMERATE or JSPROP_READONLY or JSPROP_PERMANENT;
@@ -72,24 +87,18 @@ begin
     ptInt: result := val.isInteger;
     ptStr: result := val.isString;
     ptObj: result := val.isObject;
-    ptBuffer: result := val.isObject and val.asObject.IsArrayBufferObject;
+    ptBuffer: result := val.isObject and (val.asObject.IsArrayBufferObject or val.asObject.IsArrayBufferViewObject);
     ptAny: result := True;
     else result := false;
   end;
 end;
 
-///////
-/// Structure of params Is
-/// (param_count_case1(N1),param1_case1,param2_case1...paramN1_case1,Integer(call_case1),
-///  param_count_case2(N2),param1_case2,param2_case2...paramN2_case2,Integer(call_case2),...
-///  param_count_caseK(NK),param1_caseK,param2_caseK...paramNK_caseK,Integer(call_caseK2)
-///  )
-function nsmCallFunc(cx: PJSContext; argc: uintN; var vp: JSArgRec; Calls: TNSMCallInfoArray; CallCount: Integer = 1; isConstructor: Boolean = false): Boolean; cdecl;
+function nsmCallFunc(cx: PJSContext; argc: uintN; var vp: JSArgRec; const overloads: TNSMCallInfoArray; overloadsCount: Integer = 1; isConstructor: Boolean = false): Boolean; cdecl;
 var
   thisObj, calleeObj: PJSObject;
   vals: PjsvalVector;
   i,j: Integer;
-  call: PNSMCallInfo;
+  overloadCase: PNSMCallInfo;
   IsCalled, IsCorrect: Boolean;
 begin
   Result := False;
@@ -102,17 +111,17 @@ begin
     vals := vp.argv;
     IsCalled := false;
 
-    for i := 0 to CallCount do begin
-      call := @Calls[i];
-      if (call <> nil) then begin
-        if argc = call.argc then begin
+    for i := 0 to overloadsCount - 1 do begin
+      overloadCase := @overloads[i];
+      if (overloadCase <> nil) then begin
+        if argc = overloadCase.argc then begin
           IsCorrect := true;
-          for j := 0 to call.argc do begin
-            IsCorrect := isParamCorrect(call.argt[j], vals[j]);
+          for j := 0 to overloadCase.argc - 1 do begin
+            IsCorrect := isParamCorrect(overloadCase.argt[j], vals[j]);
             if not IsCorrect then Break;
           end;
           if IsCorrect then begin
-            vp.rval := call.func(cx, argc, vals, thisObj, calleeObj);
+            vp.rval := overloadCase.func(cx, argc, vals, thisObj, calleeObj);
             IsCalled := True;
             Break;
           end;
@@ -121,7 +130,7 @@ begin
     end;
 
     if not IsCalled then
-      raise ESMException.Create('invalid usage');
+      raise ESMException.CreateUTF8('There is no overloaded function "%" with such a list of arguments', [calleeObj.GetFunctionId().ToSynUnicode(cx)]);
 
     Result := True;
   except

@@ -1,5 +1,7 @@
 /// this unit will patch the System.pas RTL to use a custom NON OLE COMPATIBLE
 // WideString type, NOT using the slow Windows API, but FastMM4 (without COW)
+// - this unit is a part of the freeware Synopse mORMot framework,
+// licensed under a MPL/GPL/LGPL tri-license; version 1.18
 unit SynFastWideString;
 
 interface
@@ -7,7 +9,7 @@ interface
 (*
     This file is part of Synopse Framework.
 
-    Synopse Framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse Framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -26,7 +28,7 @@ interface
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -44,9 +46,6 @@ interface
   the terms of any one of the MPL, the GPL or the LGPL.
 
   ***** END LICENSE BLOCK *****
-
-  Version 1.18
-  - first public release, corresponding to mORMot Framework 1.18
 
   DISCLAIMER:
 
@@ -153,7 +152,7 @@ implementation
   {$define NOOVERRIDE}
 {$endif}
 {$ifdef FPC}
-  // our low-level Delphi Win32 specific hack won't work with FPC 
+  // our low-level Delphi Win32 specific hack won't work with FPC
   {$define NOOVERRIDE}
 {$endif}
 

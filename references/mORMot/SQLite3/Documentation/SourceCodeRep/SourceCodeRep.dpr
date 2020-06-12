@@ -1,10 +1,16 @@
 program SourceCodeRep;
 
+{$ifndef MSWINDOWS}
+  {$AppType console}
+{$endif}
+
+{$I ../../../Synopse.inc}
+
 uses
-  {$I SynDprUses.inc} // includes FastMM4
-  {$ifndef LVCL}
-  SynTaskDialog,
-  {$endif}
+  {$I ../../../SynDprUses.inc} // includes FastMM4
+  {$ifdef FPC}
+  Interfaces, // set appropriate LCL CreateWidgetset()
+  {$endif FPC}
   Forms,
   SourceCodeRepMain in 'SourceCodeRepMain.pas' {MainForm};
 

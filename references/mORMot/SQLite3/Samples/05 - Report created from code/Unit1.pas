@@ -32,7 +32,7 @@ var
 implementation
 
 {$R *.dfm}
-{$R Vista.res}
+{$R vista.RES} // includes Win10 manifest - use .RES for linux cross-compilation
 
 procedure TForm1.btn2Click(Sender: TObject);
 begin
@@ -195,9 +195,11 @@ procedure TForm1.Button1Click(Sender: TObject);
 var
   i, y: integer;
   TestImage: TBitmap;
+  Stream: TStream;
   MF: TMetaFile;
   R: TRect;
 begin
+  if false then
   with TGDIPages.Create(self) do
   try
     BeginDoc;
@@ -238,7 +240,53 @@ begin
     //ExportPDF('test.pdf', true, true);
   finally
     Free;
-  end;
+  end
+  else
+  if false then
+  with TPdfDocumentGDI.Create do
+    try
+      Stream := TFileStream.Create(ExeVersion.ProgramFilePath + 'streamdirect.pdf', fmCreate);
+      try
+        SaveToStreamDirectBegin(Stream);
+        for i := 1 to 9 do
+        begin
+          AddPage;
+          with VCLCanvas do
+          begin
+            Font.Name := 'Times new roman';
+            Font.Size := 120;
+            Font.Style := [fsBold, fsItalic];
+            Font.Color := clNavy;
+            TextOut(100, 100, 'Page ' + IntToStr(i));
+          end;
+          SaveToStreamDirectPageFlush; // direct writing
+        end;
+        SaveToStreamDirectEnd;
+      finally
+        Stream.Free;
+      end;
+    finally
+      Free;
+    end
+  else
+  with TPdfDocumentGDI.Create do
+    try
+      for i := 1 to 9 do
+      begin
+        AddPage;
+        with VCLCanvas do
+        begin
+          Font.Name := 'Times new roman';
+          Font.Size := 120;
+          Font.Style := [fsBold, fsItalic];
+          Font.Color := clNavy;
+          TextOut(100, 100, 'Page ' + IntToStr(i));
+        end;
+      end;
+      SaveToFile(ExeVersion.ProgramFilePath + 'multipages.pdf');
+    finally
+      Free;
+    end;
 end;
 {
 var

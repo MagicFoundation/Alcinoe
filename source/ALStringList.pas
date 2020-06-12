@@ -842,7 +842,7 @@ Uses System.RTLConsts,
      system.IOUtils,
      {$IFNDEF NEXTGEN}
      System.Ansistrings,
-     ALCipher,
+     System.Hash,
      {$ENDIF}
      ALString,
      ALCommon;
@@ -4670,7 +4670,7 @@ begin
                                                                                                              end,
                                                                                                              function(const Value: ansiString): Integer
                                                                                                              begin
-                                                                                                               Result := integer(ALStringHashCrc32(Value));
+                                                                                                               Result := THashBobJenkins.GetHashValue(PAnsiChar(Value)^, Length(Value) * SizeOf(AnsiChar));
                                                                                                              end))
   else result := TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>.create([doOwnsValues],
                                                                                          ACapacity,
@@ -4680,8 +4680,10 @@ begin
                                                                                              Result := ALSameText(Left, Right);
                                                                                            end,
                                                                                            function(const Value: ansiString): Integer
+                                                                                           var LLowerValue: ansiString;
                                                                                            begin
-                                                                                             Result := integer(ALStringHashCrc32(ALLowerCase(Value)));
+                                                                                             LLowerValue := ALLowerCase(Value);
+                                                                                             Result := THashBobJenkins.GetHashValue(PAnsiChar(LLowerValue)^, Length(LLowerValue) * SizeOf(AnsiChar));
                                                                                            end));
 end;
 

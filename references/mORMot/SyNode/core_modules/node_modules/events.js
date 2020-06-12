@@ -1,6 +1,7 @@
 'use strict';
 /**
  * @module events
+ * @memberOf module:buildin
  */
 
 /**

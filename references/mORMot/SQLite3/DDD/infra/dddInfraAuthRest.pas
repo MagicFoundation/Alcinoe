@@ -6,7 +6,7 @@ unit dddInfraAuthRest;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit dddInfraAuthRest;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -45,15 +45,12 @@ unit dddInfraAuthRest;
 
   ***** END LICENSE BLOCK *****
 
-  Version 1.18
-  - first public release, corresponding to Synopse mORMot Framework 1.18
-
   TODO:
-   - manage Authentication expiration
+   - manage Authentication expiration?
 
 }
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 interface
 
@@ -203,9 +200,9 @@ begin
   if DoHash(fChallengeLogonName+':'+fChallengeNonce+':'+
      (fCurrentORMInstance as TSQLRecordUserAuth).HashedPassword)=aChallengedPassword then begin
     fLogged := true;
-    CqrsSetResult(cqrsSuccess);
+    CqrsSetResult(cqrsSuccess,result);
   end else
-    CqrsSetResultMsg(cqrsBadRequest,'Wrong Password for "%"',[fChallengeLogonName]);
+    CqrsSetResultMsg(cqrsBadRequest,'Wrong Password for [%]',[fChallengeLogonName],result);
   fChallengeNonce := '';
   fChallengeLogonName := '';
 end;
@@ -256,7 +253,7 @@ begin
     Logon := aLogonName;
     HashedPassword := aHashedPassword;
   end;
-  ORMPrepareForCommit(soInsert,nil);
+  ORMPrepareForCommit(soInsert,nil,result);
 end;
 
 function TDDDAuthenticationAbstract.UpdatePassword(
@@ -265,7 +262,7 @@ begin
   if not CqrsBeginMethod(qaCommandOnSelect,result) then
     exit;
   (fCurrentORMInstance as TSQLRecordUserAuth).HashedPassword := aHashedPassword;
-  ORMPrepareForCommit(soUpdate,nil);
+  ORMPrepareForCommit(soUpdate,nil,result);
 end;
 
 class procedure TDDDAuthenticationAbstract.RegressionTests(

@@ -250,7 +250,7 @@ object Form1: TForm1
   end
   object Button1: TButton
     Left = 24
-    Top = 109
+    Top = 140
     Width = 140
     Height = 25
     Caption = 'Bench CRC32 (Zlib)'
@@ -259,7 +259,7 @@ object Form1: TForm1
   end
   object Button2: TButton
     Left = 24
-    Top = 140
+    Top = 171
     Width = 140
     Height = 25
     Caption = 'Bench ALCRC32'
@@ -340,7 +340,7 @@ object Form1: TForm1
     Top = 16
     Width = 225
     Height = 25
-    Caption = 'Bench ALBase64Encode (ansiString)'
+    Caption = 'Test/Bench ALBase64Encode (ansiString)'
     TabOrder = 26
     OnClick = Button10Click
   end
@@ -367,7 +367,7 @@ object Form1: TForm1
     Top = 47
     Width = 225
     Height = 25
-    Caption = 'Bench ALBase64EncodeU (UNICODE)'
+    Caption = 'Test/Bench ALBase64EncodeU (UNICODE)'
     TabOrder = 29
     OnClick = Button15Click
   end
@@ -415,5 +415,23 @@ object Form1: TForm1
     Caption = 'Bench HexEncode (UNICODE)'
     TabOrder = 34
     OnClick = Button18Click
+  end
+  object Button9: TButton
+    Left = 24
+    Top = 202
+    Width = 140
+    Height = 25
+    Caption = 'Bench ALCRC64'
+    TabOrder = 35
+    OnClick = Button9Click
+  end
+  object Button19: TButton
+    Left = 24
+    Top = 109
+    Width = 140
+    Height = 25
+    Caption = 'Test ALCRC32'
+    TabOrder = 36
+    OnClick = Button19Click
   end
 end

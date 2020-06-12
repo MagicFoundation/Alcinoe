@@ -6,7 +6,7 @@ unit dddInfraEmail;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit dddInfraEmail;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -45,12 +45,9 @@ unit dddInfraEmail;
 
   ***** END LICENSE BLOCK *****
 
-  Version 1.18
-  - first public release, corresponding to Synopse mORMot Framework 1.18
-
 }
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 interface
 
@@ -128,7 +125,8 @@ type
   TDDDEmailServiceAbstract = class(TCQRSQueryObjectRest,IDomUserEmailCheck)
   protected
     fEmailValidate: TSynValidate;
-    function CheckEmailCorrect(aEmail: TSQLRecordEmailAbstract): boolean; virtual;
+    function CheckEmailCorrect(aEmail: TSQLRecordEmailAbstract;
+      var aResult: TCQRSResult): boolean; virtual;
     procedure SetEmailValidate(const Value: TSynValidate); virtual;
   public
     constructor Create(aRest: TSQLRest); override;
@@ -245,13 +243,13 @@ begin
 end;
 
 function TDDDEmailServiceAbstract.CheckEmailCorrect(
-  aEmail: TSQLRecordEmailAbstract): boolean;
+  aEmail: TSQLRecordEmailAbstract; var aResult: TCQRSResult): boolean;
 var msg: string;
 begin
   if (aEmail<>nil) and fEmailValidate.Process(0,aEmail.Email,msg) and
      aEmail.FilterAndValidate(Rest,msg) then
     result := true else  begin
-    CqrsSetResultString(cqrsDDDValidationFailed,msg);
+    CqrsSetResultString(cqrsDDDValidationFailed,msg,aResult);
     result := false;
   end;
 end;
@@ -262,8 +260,8 @@ var msg: string;
 begin
   CqrsBeginMethod(qaNone,result);
   if fEmailValidate.Process(0,aEmail,msg) then
-    CqrsSetResult(cqrsSuccess) else
-    CqrsSetResultString(cqrsDDDValidationFailed,msg);
+    CqrsSetResult(cqrsSuccess,result) else
+    CqrsSetResultString(cqrsDDDValidationFailed,msg,result);
 end;
 
 function TDDDEmailServiceAbstract.CheckRecipients(
@@ -274,10 +272,10 @@ begin
   CqrsBeginMethod(qaNone,result);
   for i := 0 to high(aEMails) do
     if not fEmailValidate.Process(0,aEmails[i],msg) then begin
-      CqrsSetResultString(cqrsDDDValidationFailed,msg);
+      CqrsSetResultString(cqrsDDDValidationFailed,msg,result);
       exit;
     end;
-  CqrsSetResult(cqrsSuccess);
+  CqrsSetResult(cqrsSuccess,result);
 end;
 
 procedure TDDDEmailServiceAbstract.SetEmailValidate(
@@ -403,14 +401,14 @@ begin
   EmailValidation := GetEmailValidation(aLogonName);
   try
     if EmailValidation.IsValidated(email) then begin
-      CqrsSetResultMsg(cqrsSuccess,'Already validated');
+      CqrsSetResultMsg(cqrsSuccess,'Already validated',result);
       exit;
     end;
     if EmailValidation=nil then begin
       EmailValidation := RestClass.Create;
       EmailValidation.Email := aEmail;
       EmailValidation.Logon := aLogonName;
-      if not CheckEmailCorrect(EmailValidation) then
+      if not CheckEmailCorrect(EmailValidation,result) then
         exit;
     end else
       if EmailValidation.Email<>email then
@@ -424,12 +422,12 @@ begin
     msg := Template.ComputeMessage(context,aTemplate.FileName);
     if msg='' then
       CqrsSetResultMsg(cqrsInvalidContent,
-        'Impossible to render template "%"',[aTemplate.FileName]) else
+        'Impossible to render template [%]',[aTemplate.FileName],result) else
       if EMailer.SendEmail(TRawUTF8DynArrayFrom([aEmail]),
           aTemplate.SenderEmail,aTemplate.Subject,'',msg)=cqrsSuccess then
         if Rest.AddOrUpdate(EmailValidation)=0 then
           CqrsSetResultError(cqrsDataLayerError) else
-          CqrsSetResultMsg(cqrsSuccess,'Validation email sent');
+          CqrsSetResultMsg(cqrsSuccess,'Validation email sent',result);
   finally
     EmailValidation.Free;
   end;

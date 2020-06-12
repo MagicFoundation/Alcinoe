@@ -5,6 +5,7 @@ program WindowsAuth;
 uses
   {$I SynDprUses.inc}
   SysUtils,
+  SynSSPI,
   SynLZ in 'SynLZ.pas',
   SynCommons in 'SynCommons.pas',
   SynSSPIAuth in 'SynSSPIAuth.pas';

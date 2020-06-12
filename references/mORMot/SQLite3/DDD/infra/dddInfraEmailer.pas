@@ -6,7 +6,7 @@ unit dddInfraEmailer;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit dddInfraEmailer;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -45,12 +45,9 @@ unit dddInfraEmailer;
 
   ***** END LICENSE BLOCK *****
 
-  Version 1.18
-  - first public release, corresponding to Synopse mORMot Framework 1.18
-
 }
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 interface
 
@@ -69,6 +66,7 @@ uses
   SynTests,
   SynCrtSock,
   SynMustache,
+  SynTable,
   SyncObjs,
   mORMot,
   mORMotDDD,
@@ -357,7 +355,7 @@ begin
     readln(fSocket.SockIn^,Res);
   until (Length(Res)<4)or(Res[4]<>'-');
   if not IdemPChar(pointer(Res),pointer(Answer)) then
-    raise ECrtSocket.CreateFmt('returned "%s", expecting "%s"',[Res,Answer]);
+    raise ECrtSocket.CreateFmt('returned [%s], expecting [%s]',[Res,Answer]);
 end;
 
 procedure TSMTPServerSocketConnection.Exec(const Command,
@@ -382,7 +380,7 @@ begin
       toList := 'To: ';
       for i := 0 to high(aRecipient) do begin
         rcpt := aRecipient[i];
-        if PosEx('<',rcpt)=0 then
+        if PosExChar('<',rcpt)=0 then
           rcpt := '<'+rcpt+'>';
         Exec('RCPT TO:'+rcpt,'25');
         toList := toList+rcpt+', ';
@@ -405,8 +403,8 @@ begin
       result := ''; // for success
     except
       on E: Exception do
-        result := FormatUTF8('%.SendEmail(%:%) server failure "%" (%)',
-          [self,fOwner.Address,fOwner.Port,E.Message,E]);
+        result := FormatUTF8('%.SendEmail(%:%) server failure % [%]',
+          [self,fOwner.Address,fOwner.Port,E,E.Message]);
     end;
 end;
 
@@ -528,10 +526,10 @@ begin
     Email.MessageCompressed := SynLZCompressToBytes(aBody);
     CqrsBeginMethod(qaNone,result);
     if not Email.FilterAndValidate(Rest,msg) then
-      CqrsSetResultString(cqrsDDDValidationFailed,msg) else
+      CqrsSetResultString(cqrsDDDValidationFailed,msg,result) else
       if Rest.Add(Email,true)=0 then
-        CqrsSetResult(cqrsDataLayerError) else
-        CqrsSetResult(cqrsSuccess);
+        CqrsSetResult(cqrsDataLayerError,result) else
+        CqrsSetResult(cqrsSuccess,result);
   finally
     Email.Free;
   end;
@@ -644,11 +642,11 @@ end;
 
 procedure TDDDEmailerDaemonStats.NewConnection;
 begin
-  EnterCriticalSection(fLock);
+  fSafe^.Lock;
   try
     inc(fConnection);
   finally
-    LeaveCriticalSection(fLock);
+    fSafe^.UnLock;
   end;
 end;
 

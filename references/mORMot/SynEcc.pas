@@ -6,7 +6,7 @@ unit SynEcc;
 (*
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit SynEcc;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -75,9 +75,6 @@ unit SynEcc;
   ***** END LICENSE BLOCK *****
 
 
-  Version 1.18
-  - first public release, corresponding to mORMot Framework 1.18
-
   TODO:
   - secure sign-then-crypt by signing the destination name with the plain content
     to avoid "Surreptitious Forwarding" (reuse of the plain content to another
@@ -85,25 +82,26 @@ unit SynEcc;
 
 *)
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 interface
 
 uses
   {$ifdef MSWINDOWS}
-  Windows, // for CriticalSection API inling
+    Windows, // for CriticalSection API inling
   {$else}  // for GetFileSize emulated API
-  {$ifdef KYLIX3}
-  SynKylix,
-  {$endif}
-  {$ifdef FPC}
-  SynFPCLinux,
-  {$endif}
+    {$ifdef KYLIX3}
+      SynKylix,
+    {$endif}
+    {$ifdef FPC}
+      SynFPCLinux,
+    {$endif}
   {$endif MSWINDOWS}
   SysUtils,
   Classes,
   Contnrs,
   SynCommons,
+  SynTable,
   SynCrypto;
 
 
@@ -367,7 +365,7 @@ type
     Signature: TECCSignature;
     /// FNV-1a checksum of all previous fields
     // - we use fnv32 and not crc32c here to avoid colision with crc64c hashing
-    // - avoiding to compute slow ECDSA verification in case of corrumption,
+    // - avoiding to compute slow ECDSA verification in case of corruption,
     // due e.g. to unexpected transmission/bug/fuzzing
     // - should be the very last field in the record
     CRC: cardinal;
@@ -490,7 +488,8 @@ type
   // property should be macDuringEF
   // - other values will define TAESCFB/TAESOFB/TAESCTR/TAESCBC in 128-bit or
   // 256-bit mode, in conjunction with a TECDHEMAC setting
-  // - AES-NI hardware acceleration will be used, if available
+  // - AES-NI hardware acceleration will be used, if available - under x86-64,
+  // efAesOfb128 will potentially give the best performance
   // - of course, weack ECB mode is not available
   TECDHEEF = (efAesCrc128, efAesCfb128, efAesOfb128, efAesCtr128, efAesCbc128,
               efAesCrc256, efAesCfb256, efAesOfb256, efAesCtr256, efAesCbc256);
@@ -505,9 +504,11 @@ type
   // and prevent transmission errors but not message integrity or authentication
   // since composition of two crcs is a multiplication by a polynomial - see
   // http://mslc.ctf.su/wp/boston-key-party-ctf-2016-hmac-crc-crypto-5pts
+  // - macXxHash32 will use the xxhash32() algorithm, fastest without SSE4.2
   // - macNone (800MB/s, which is the speed of AES-NI encryption itself for a
   // random set of small messages) won't check errors, but only replay attacks
-  TECDHEMAC = (macDuringEF, macHmacSha256, macHmacCrc256c, macHmacCrc32c, macNone);
+  TECDHEMAC = (macDuringEF, macHmacSha256, macHmacCrc256c, macHmacCrc32c,
+    macXxHash32, macNone);
 
   /// defines one protocol Algorithm recognized by TECDHEProtocol
   // - only safe and strong parameters are allowed, and the default values
@@ -1256,7 +1257,7 @@ type
   // based on JSON objects or even plain base-64 encoded JSON strings
   // - consider using TECCCertificateChainFile from mORMot.pas if you want
   // to use convenient human-readable JSON serialization in files
-  TECCCertificateChain = class(TSynPersistentLocked)
+  TECCCertificateChain = class(TSynPersistentLock)
   protected
     fItems: TECCCertificateObjArray;
     fIsValidCached: boolean;
@@ -1516,11 +1517,11 @@ type
     fCertificateValidity: TECCValidity;
     fRndA,fRndB: THash128;
     fAES: array[boolean] of TAESAbstract;
-    fkM: array[boolean] of THash256;
+    fkM: array[boolean] of THash256Rec;
     // contains inc(PInt64(@aKey)^) to maintain RX/TX sequence number
     procedure SetKey(aEncrypt: boolean);
     procedure ComputeMAC(aEncrypt: boolean; aEncrypted: pointer; aLen: integer;
-      out aMAC: THash256);
+      out aMAC: THash256Rec);
     function Verify(frame: PByteArray; len: integer; const QC: TECCCertificateContent;
       out res: TProtocolResult): boolean;
     procedure Sign(frame: PByteArray; len: integer; out QC: TECCCertificateContent);
@@ -1857,23 +1858,23 @@ end;
   {$ifdef FPC}
     {$ifdef MSWINDOWS}
       {$ifdef ECC_O1}
-        {$L fpc-win32\eccwin32O1.o}
+        {$L static\i386-win32\eccwin32O1.o}
       {$endif}
       {$ifdef ECC_O2}
-        {$L fpc-win32\eccwin32O2.o}
+        {$L static\i386-win32\eccwin32O2.o}
       {$endif}
       {$ifdef ECC_O3}
-        {$L fpc-win32\eccwin32O3.o}
+        {$L static\i386-win32\eccwin32O3.o}
       {$endif}
     {$else}
       {$ifdef ECC_O1}
-        {$L fpc-linux32/ecclin32O1.o}
+        {$L static/i386-linux/ecclin32O1.o}
       {$endif}
       {$ifdef ECC_O2}
-        {$L fpc-linux32/ecclin32O2.o}
+        {$L static/i386-linux/ecclin32O2.o}
       {$endif}
       {$ifdef ECC_O3}
-        {$L fpc-linux32/ecclin32O3.o}
+        {$L static/i386-linux/ecclin32O3.o}
       {$endif}
     {$endif MSWINDOWS}
   {$else}
@@ -1890,26 +1891,31 @@ end;
 {$endif CPUX86}
 
 {$ifdef CPUX64}
-  {$ifdef MSWINDOWS} // same .o format under Win64 for Delphi and FPC :)
-  {$ifdef ECC_O1}
-    {$L SynEcc64O1.o}
-  {$endif}
-  {$ifdef ECC_O2}
-    {$L SynEcc64O2.o}
-  {$endif}
-  {$ifdef ECC_O3}
-    {$L SynEcc64O3.o}
-  {$endif}
+  {$ifdef MSWINDOWS}
+    // same .o format under Win64 for Delphi and FPC :)
+    {$ifdef ECC_O1}
+      {$L static\x86_64-win64\eccwin64O1.o}
+    {$endif}
+    {$ifdef ECC_O2}
+      {$ifdef FPC}
+      {$L static\x86_64-win64\eccwin64O2.o}
+      {$else}
+      {$L SynEcc64O2.o} // same file as static\x86_64-win64\eccwin64O2.o
+      {$endif}
+    {$endif}
+    {$ifdef ECC_O3}
+      {$L static\x86_64-win64\eccwin64O3.o}
+    {$endif}
   {$else}
   {$ifdef FPC}
     {$ifdef ECC_O1}
-      {$L fpc-linux64/ecclin64O1.o}
+      {$L static/x86_64-linux/ecclin64O1.o}
     {$endif}
     {$ifdef ECC_O2}
-      {$L fpc-linux64/ecclin64O2.o}
+      {$L static/x86_64-linux/ecclin64O2.o}
     {$endif}
     {$ifdef ECC_O3}
-      {$L fpc-linux64/ecclin64O3.o}
+      {$L static/x86_64-linux/ecclin64O3.o}
     {$endif}
   {$endif FPC}
   {$endif MSWINDOWS}
@@ -2003,25 +2009,32 @@ Delphi XE7-32 ECC_O2
   Total failed: 0 / 529,825  - ECC cryptography PASSED  17.12s
 
 Delphi XE7-64 pascal
-  - ecc_make_key: 1,000 assertions passed  1.70s
-  - ecdsa_sign: 1,000 assertions passed  1.72s
-  - ecdsa_verify: 1,000 assertions passed  2.08s
-  - ecdh_shared_secret: 2,997 assertions passed  3.51s
-  Total failed: 0 / 529,825  - ECC cryptography PASSED  12.20s
+  - ecc_make_key: 1,000 assertions passed  1.55s
+  - ecdsa_sign: 1,000 assertions passed  1.57s
+  - ecdsa_verify: 1,000 assertions passed  1.86s
+  - ecdh_shared_secret: 2,997 assertions passed  3.23s
+  Total failed: 0 / 529,825  - ECC cryptography PASSED
 
 Delphi XE7-64 ECC_O2
   - ecc_make_key: 1,000 assertions passed  729.49ms
   - ecdsa_sign: 1,000 assertions passed  740.38ms
   - ecdsa_verify: 1,000 assertions passed  914.80ms
   - ecdh_shared_secret: 2,997 assertions passed  1.55s
-  Total failed: 0 / 529,825  - ECC cryptography PASSED  6.29s
+  Total failed: 0 / 529,825  - ECC cryptography PASSED
 
 FPC Win64 pascal
-  - ecc_make_key: 1,000 assertions passed  1.66s
-  - ecdsa_sign: 1,000 assertions passed  1.73s
-  - ecdsa_verify: 1,000 assertions passed  2.05s
-  - ecdh_shared_secret: 2,997 assertions passed  3.63s
-  Total failed: 0 / 529,825  - ECC cryptography PASSED  12.80s
+  - ecc_make_key: 1,000 assertions passed  1.43s
+  - ecdsa_sign: 1,000 assertions passed  1.45s
+  - ecdsa_verify: 1,000 assertions passed  1.76s
+  - ecdh_shared_secret: 2,997 assertions passed  3.03s
+  Total failed: 0 / 529,825  - ECC cryptography PASSED
+
+FPC Linux x86-64 pascal
+  - ecc_make_key: 1,000 assertions passed  1.42s
+  - ecdsa_sign: 1,000 assertions passed  1.48s
+  - ecdsa_verify: 1,000 assertions passed  1.80s
+  - ecdh_shared_secret: 2,997 assertions passed  3.11s
+  Total failed: 0 / 529,825  - ECC cryptography PASSED
 }
 
 const
@@ -2074,6 +2087,12 @@ end;
 function _isZero(const VLI: TVLI): boolean; {$ifdef HASINLINE}inline;{$endif}
 begin
   result := (VLI[0]=0) and (VLI[1]=0) and (VLI[2]=0) and (VLI[3]=0);
+end;
+
+function _equals(const Left, Right: TVLI): boolean; {$ifdef HASINLINE}inline;{$endif}
+begin
+  result := (Left[0]=Right[0]) and (Left[1]=Right[1]) and (Left[2]=Right[2]) and
+    (Left[3]=Right[3]);
 end;
 
 // counts the number of bits required for VLI
@@ -2220,7 +2239,7 @@ begin
 end;
 {$else}
 function _lshift1(var VLI: TVLI): UInt64;
-  {$ifdef HASINLINE}inline;{$endif} 
+  {$ifdef HASINLINE}inline;{$endif}
 var temp: UInt64;
 begin
   result := VLI[0] shr 63;
@@ -2245,7 +2264,7 @@ var Output: TCardinalArray absolute Output64;
     Right: TCardinalArray absolute Right64;
 {$else}
 function _add(var Output: TVLI; const Left, Right: TVLI): PtrUInt;
-  {$ifdef HASINLINE}inline;{$endif} 
+  {$ifdef HASINLINE}inline;{$endif}
 {$endif}
 var sum: PtrUInt;
 begin
@@ -2309,7 +2328,7 @@ var Output: TCardinalArray absolute Output64;
     Right: TCardinalArray absolute Right64;
 {$else}
 function _sub(var Output: TVLI; const Left, Right: TVLI): PtrUInt;
-  {$ifdef HASINLINE}inline;{$endif} 
+  {$ifdef HASINLINE}inline;{$endif}
 {$endif}
 var diff: PtrUInt;
 begin
@@ -2369,6 +2388,7 @@ procedure _mult(out Output: TVLI2; const Left, Right: TVLI);
 var i, k, l_min: integer;
     Product, r01: UInt128;
     carry, prev: UInt64;
+    l, r: ^UInt64;
 begin
   r01.m_low := 0;
   r01.m_high := 0;
@@ -2378,10 +2398,12 @@ begin
     if k < NUM_ECC_DIGITS then
       l_min := 0 else
       l_min := (k + 1) - NUM_ECC_DIGITS;
+    l := @Left[l_min];
+    r := @Right[k-l_min];
     for i := l_min to k do begin
       if i >= NUM_ECC_DIGITS then
         break;
-      mul64x64(Left[i], Right[k-i], THash128Rec(Product));
+      mul64x64(l^, r^, THash128Rec(Product));
       prev := r01.m_low;
       inc(r01.m_low, Product.m_low);
       inc(r01.m_high, Product.m_high);
@@ -2389,6 +2411,8 @@ begin
         inc(r01.m_high);
       if r01.m_high < Product.m_high then
         inc(carry);
+      inc(l);
+      dec(r);
     end;
     Output[k] := r01.m_low;
     r01.m_low := r01.m_high;
@@ -2621,7 +2645,7 @@ begin
   _modMult_fast(X1, X1, Z1);       // t1 = x1^2 - z1^4
   _modAdd(Z1, X1, X1, Curve_P_32); // t3 = 2*(x1^2 - z1^4)
   _modAdd(X1, X1, Z1, Curve_P_32); // t1 = 3*(x1^2 - z1^4)
-  if GetBit(X1, 0) then begin
+  if GetBitPtr(@X1, 0) then begin
     carry := _add(X1, X1, Curve_P_32);
     _rshift1(X1);
     X1[NUM_ECC_DIGITS-1] := X1[NUM_ECC_DIGITS-1] or (carry shl 63);
@@ -2725,13 +2749,13 @@ begin
   Ry[1] := Point.y;
   _XYcZ_initial_double(Rx[1], Ry[1], Rx[0], Ry[0], InitialZ);
   for i := _numBits(Scalar) - 2 downto 1 do begin
-    if GetBit(Scalar, i) then
+    if GetBitPtr(@Scalar, i) then
       nb := 0 else
       nb := 1;
     _XYcZ_addC(Rx[1-nb], Ry[1-nb], Rx[nb], Ry[nb]);
     _XYcZ_add(Rx[nb], Ry[nb], Rx[1-nb], Ry[1-nb]);
   end;
-  if GetBit(Scalar, 0) then
+  if GetBitPtr(@Scalar, 0) then
     nb := 0 else
     nb := 1;
   _XYcZ_addC(Rx[1-nb], Ry[1-nb], Rx[nb], Ry[nb]);
@@ -2768,7 +2792,7 @@ begin
   _add(p1, Curve_P_32, _1); // p1 = curve_p + 1
   for i := _numBits(p1) - 1 downto 2 do begin
     _modSquare_fast(result, result, false);
-    if GetBit(p1, i) then
+    if GetBitPtr(@p1, i) then
       _modMult_fast(result, result, a);
   end;
   a := result;
@@ -2798,7 +2822,7 @@ begin
     TAESPRNG.Fill(THash256(PrivateK));
     if tries >= MAX_TRIES then
       exit;
-    if _isZero(PrivateK) or (_cmp(PrivateK, _1) = 0) or (_cmp(PrivateK, _11) = 0) then
+    if _isZero(PrivateK) or _equals(PrivateK, _1) or _equals(PrivateK, _11) then
       continue;
     // Make sure the private key is in the range [1, n-1]
     // For the supported curves, n is always large enough that we only need
@@ -2915,7 +2939,7 @@ begin
     TAESPRNG.Fill(THash256(k));
     if Tries >= MAX_TRIES then
       exit;
-    if _isZero(k) or (_cmp(k, _1) = 0) or (_cmp(k, _11) = 0) then
+    if _isZero(k) or _equals(k, _1) or _equals(k, _11) then
       continue;
     if _cmp(Curve_N_32, k) <> 1 then
       _sub(k, k, Curve_N_32);
@@ -2937,7 +2961,7 @@ begin
 end;
 
 function ecdsa_verify_pas(const PublicKey: TECCPublicKeyUncompressed;
-  const Hash: TECCHash; const Signature: TECCSignature): boolean; 
+  const Hash: TECCHash; const Signature: TECCSignature): boolean;
 var i, Index, NumBits: integer;
     PublicPoint: TEccPoint absolute PublicKey;
     SumPoint: TEccPoint;
@@ -2974,10 +2998,10 @@ begin
   Index := _numBits(u2);
   if Index > NumBits then
     NumBits := Index;
-  if GetBit(u1, NumBits-1) then
+  if GetBitPtr(@u1, NumBits-1) then
     Index := 1 else
     Index := 0;
-  if GetBit(u2, NumBits-1) then
+  if GetBitPtr(@u2, NumBits-1) then
     inc(Index, 2);
   Point := Points[Index];
   rx := Point.x;
@@ -2985,10 +3009,10 @@ begin
   z := _1;
   for i := NumBits - 2 downto 0 do begin
     EccPointDoubleJacobian(rx, ry, z);
-    if GetBit(u1, i) then
+    if GetBitPtr(@u1, i) then
       Index := 1 else
       Index := 0;
-    if GetBit(u2, i) then
+    if GetBitPtr(@u2, i) then
       inc(Index, 2);
     Point := Points[Index];
     if Point <> nil then begin
@@ -3108,12 +3132,12 @@ begin
 end;
 
 function ECCText(const Issuer: TECCCertificateIssuer): RawUTF8;
-var tmp: array[0..sizeof(Issuer)] of byte;
+var tmp: array[0..1] of TECCCertificateIssuer;
 begin
   if IsZero(Issuer) then
     result := '' else begin
-    PAESBlock(@tmp)^ := TAESBlock(Issuer);
-    tmp[sizeof(Issuer)] := 0; // add a trailing #0 as expected for trailing bits
+    tmp[0] := Issuer;
+    tmp[1][0] := 0; // add a trailing #0 as expected for trailing bits
     result := BaudotToAscii(@tmp,sizeof(Issuer));
     if result='' then
       result := SynCommons.BinToHex(@Issuer,sizeof(Issuer));
@@ -3690,7 +3714,7 @@ begin
   finally
     FillZero(aeskey);
     FillZero(mackey);
-    FillcharFast(rndpriv,sizeof(rndpriv),0);
+    FillCharFast(rndpriv,sizeof(rndpriv),0);
     if dec<>Plain then
       FillZero(dec);
     if content<>Plain then
@@ -3712,7 +3736,7 @@ var plain,encrypted: RawByteString;
 begin
   plain := StringFromFile(FileToCrypt);
   if plain='' then
-    raise EECCException.CreateUTF8('File not found: "%"',[FileToCrypt]);
+    raise EECCException.CreateUTF8('File not found: [%]',[FileToCrypt]);
   if DestFile='' then
     dest := FileToCrypt+ENCRYPTED_FILEEXT else
     dest := DestFile;
@@ -4111,7 +4135,7 @@ var content: RawByteString;
 begin
   content := StringFromFile(FileToSign);
   if content='' then
-    raise EECCException.CreateUTF8('%.SignFile: "%" not found',[self,FileToSign]);
+    raise EECCException.CreateUTF8('%.SignFile: file [%] not found',[self,FileToSign]);
   sha := SHA256Digest(pointer(content),length(content));
   sign := SignToBase64(sha);
   meta.InitObject(['name',ExtractFileName(FileToSign),
@@ -4170,7 +4194,7 @@ begin
     if efMetaData in features then begin
       if (Decrypted='') or (Decrypted[1]<>'{') then
         exit;
-      metaend := PosEx(#0,Decrypted); // {metadata}+#0+plain
+      metaend := PosExChar(#0,Decrypted); // {metadata}+#0+plain
       if metaend=0 then
         exit;
       if MetaData<>nil then
@@ -4813,9 +4837,12 @@ var values: TRawUTF8DynArray;
     tmp: TSynTempBuffer; // private copy
 begin
   tmp.Init(json);
-  result := (DynArrayLoadJSON(values,tmp.buf,TypeInfo(TRawUTF8DynArray))<>nil) and
-    LoadFromArray(values);
-  tmp.Done;
+  try
+    result := (DynArrayLoadJSON(values,tmp.buf,TypeInfo(TRawUTF8DynArray))<>nil) and
+      LoadFromArray(values);
+  finally
+    tmp.Done;
+  end;
 end;
 
 function TECCCertificateChain.LoadFromArray(const values: TRawUTF8DynArray): boolean;
@@ -4878,7 +4905,8 @@ begin
         ObjArrayAdd(fItems,auth);
         auth := nil;
       end else
-        raise EECCException.CreateUTF8('%.CreateFromFiles: invalid "%"',[self,files[i]]);
+        raise EECCException.CreateUTF8(
+          '%.CreateFromFiles: invalid file [%]',[self,files[i]]);
     finally
       auth.Free;
     end;
@@ -4989,8 +5017,8 @@ begin
   if fAES[true]<>fAES[false] then
     fAES[true].Free; // occurs only for TAESCBC
   fAES[false].Free;
-  FillZero(fkM[false]);
-  FillZero(fkM[true]);
+  FillZero(fkM[false].b);
+  FillZero(fkM[true].b);
   if fPKI<>nil then
     if ownPKI in fOwned then
       fPKI.Free else
@@ -5100,44 +5128,53 @@ procedure TECDHEProtocol.SetKey(aEncrypt: boolean);
 begin
   if fAES[aEncrypt]=nil then
     raise EECCException.CreateUTF8('%.% with no handshake',[self,ED[aEncrypt]]);
-  fAES[aEncrypt].IV := PHash128(@fkM[aEncrypt])^; // kM is a CTR -> IV unicity
+  fAES[aEncrypt].IV := fkM[aEncrypt].Lo; // kM is a CTR -> IV unicity
   if fAlgo.mac=macDuringEF then
-    if not fAES[aEncrypt].MACSetNonce(fkM[aEncrypt]) then
+    if not fAES[aEncrypt].MACSetNonce(fkM[aEncrypt].b) then
       raise EECCException.CreateUTF8('%.%: macDuringEF not available in %/%',
         [self,ED[aEncrypt],ToText(fAlgo.ef)^,fAES[aEncrypt]]);
 end;
 
 procedure TECDHEProtocol.ComputeMAC(aEncrypt: boolean;
-  aEncrypted: pointer; aLen: integer; out aMAC: THash256);
+  aEncrypted: pointer; aLen: integer; out aMAC: THash256Rec);
 var i,c: cardinal;
 begin
   case fAlgo.mac of
     macDuringEF:
-      if not fAES[aEncrypt].MACGetLast(aMac) then // computed during EF process
+      if not fAES[aEncrypt].MACGetLast(aMac.b) then // computed during EF process
         raise EECCException.CreateUTF8('%.%: macDuringEF not available in %/%',
           [self,ED[aEncrypt],ToText(fAlgo.ef)^,fAES[aEncrypt]]);
     macHmacCrc256c:
-      HMAC_CRC256C(@fkM[aEncrypt],aEncrypted,sizeof(THash256),aLen,aMAC);
+      HMAC_CRC256C(@fkM[aEncrypt],aEncrypted,sizeof(THash256),aLen,aMAC.b);
     macHmacSha256:
-      HMAC_SHA256(@fkM[aEncrypt],aEncrypted,sizeof(THash256),aLen,aMAC);
+      HMAC_SHA256(@fkM[aEncrypt],aEncrypted,sizeof(THash256),aLen,aMAC.b);
     macHmacCrc32c: begin
       c := HMAC_CRC32C(@fkM[aEncrypt],aEncrypted,sizeof(THash256),aLen);
       for i := 0 to 7 do
-        PCardinalArray(@aMac)^[i] := c; // naive 256-bit diffusion
+        aMac.c[i] := c; // naive 256-bit diffusion
+    end;
+    macXxHash32: begin
+      c := xxHash32(fkM[aEncrypt].i0,aEncrypted,aLen);
+      for i := 0 to 7 do
+        aMac.c[i] := c; // naive 256-bit diffusion
     end;
     macNone:
-      crc256c(@fkM[aEncrypt],sizeof(THash256),aMAC); // replay attack only
+      crc256c(@fkM[aEncrypt],sizeof(THash256),aMAC.b); // replay attack only
     else
       raise EECCException.CreateUTF8('%.%: ComputeMAC %?',
         [self,ED[aEncrypt],ToText(fAlgo.mac)^]);
   end;
-  inc(PInt64(@fkM[aEncrypt])^); // 64-bit sequence number against replay attacks
+  with fkM[aEncrypt] do
+    for i := 0 to 3 do begin
+      inc(q[i]); // sequence number against replay attacks
+      if q[i]<>0 then
+        break;
+    end;
 end;
 
 procedure TECDHEProtocol.Encrypt(const aPlain: RawByteString;
   out aEncrypted: RawByteString);
 var len: integer;
-    mac: PHash256;
 begin
   fSafe.Lock;
   try
@@ -5146,8 +5183,7 @@ begin
     SetString(aEncrypted,nil,len+sizeof(THash256));
     fAES[true].EncryptPKCS7Buffer(Pointer(aPlain),pointer(aEncrypted),
       length(aPlain),len,false);
-    mac := @PByteArray(aEncrypted)[len];
-    ComputeMac(true,pointer(aEncrypted),len,mac^);
+    ComputeMac(true,pointer(aEncrypted),len,PHash256Rec(@PByteArray(aEncrypted)[len])^);
   finally
     fSafe.UnLock;
   end;
@@ -5156,8 +5192,8 @@ end;
 function TECDHEProtocol.Decrypt(const aEncrypted: RawByteString;
   out aPlain: RawByteString): TProtocolResult;
 var P: PAnsiChar absolute aEncrypted;
-    len: integer;
-    mac: THash256;
+    len, i: integer;
+    mac: THash256Rec;
 begin
   result := sprInvalidMAC;
   len := length(aEncrypted)-sizeof(THash256);
@@ -5168,11 +5204,16 @@ begin
     SetKey(false);
     aPlain := fAES[false].DecryptPKCS7Buffer(P,len,false,false);
     if aPlain='' then begin
-      inc(PInt64(@fkM[false])^); // don't compute MAC, but increase sequence
+      with fkM[false] do
+        for i := 0 to 3 do begin
+          inc(q[i]); // don't compute MAC, but increase sequence
+          if q[i]<>0 then
+            break;
+        end;
       exit;
     end;
     ComputeMac(false,P,len,mac);
-    if IsEqual(mac,PHash256(P+len)^) then
+    if IsEqual(mac.b,PHash256(P+len)^) then
       result := sprSuccess;
   finally
     fSafe.Unlock;
@@ -5227,8 +5268,8 @@ begin
     fAES[false] := AES_CLASS[fAlgo.ef].Create(secret,AES_BITS[fAlgo.ef]);
     fAES[true] := fAES[false].CloneEncryptDecrypt;
     ComputeSecret(fMACSalt);
-    fkM[false] := secret; // first 128-bit also used as AES IV
-    fkM[true] := secret;
+    fkM[false].b := secret; // first 128-bit also used as AES IV
+    fkM[true].b := secret;
   finally
     FillZero(secret);
   end;

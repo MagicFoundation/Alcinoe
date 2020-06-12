@@ -3,7 +3,7 @@ unit FileClient;
 
 interface
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 uses
   Windows,
@@ -166,7 +166,7 @@ begin
           s := U2S(GetMimeContentType(Pointer(Data),Length(Data),TFileName(Rec.fName)));
       if s<>'' then
         DrawTextFmt(sContentTypeN,[s]);
-      DrawTextFmt(sSizeN,[U2S(KB(Length(Data)))]);
+      DrawTextFmt(sSizeN,[U2S(KB(Data))]);
       NewHalfLine;
       DrawText(sDataContent);
     end;

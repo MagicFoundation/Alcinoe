@@ -20,6 +20,7 @@ var util = require('util');
  * Arguments, passed to console output functions are transformed to string using {@link util.format} call.
  *
  * @module console
+ * @memberOf module:buildin
  */
 
 /**
@@ -28,6 +29,7 @@ var util = require('util');
  *      console.debug('Yeh!');
  *
  * @class Console
+ * @memberOf module:buildin
  */
 function Console(stdout, stderr) {
   if (!(this instanceof Console)) {

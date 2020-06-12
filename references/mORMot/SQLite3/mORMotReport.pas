@@ -6,7 +6,7 @@ unit mORMotReport;
 (*
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -27,7 +27,7 @@ unit mORMotReport;
 
   Portions created by the Initial Developer are Copyright (C) 2003
   the Initial Developer. All Rights Reserved.
-  Portions created by Arnaud Bouchez for Synopse are Copyright (C) 2018
+  Portions created by Arnaud Bouchez for Synopse are Copyright (C) 2020
   Arnaud Bouchez. All Rights Reserved.
 
   Contributor(s):
@@ -111,7 +111,7 @@ unit mORMotReport;
   - full Unicode text process (even before Delphi 2009)
   - speed up and various bug fixes to work with Delphi 5 up to XE3
 
-  Modifications © 2009-2018 Arnaud Bouchez
+  Modifications © 2009-2020 Arnaud Bouchez
 
   Version 1.4 - February 8, 2010
   - whole Synopse SQLite3 database framework released under the GNU Lesser
@@ -234,7 +234,7 @@ interface
   // Black&White and Duplex printing are only available with our Enhanced RTL
 {$endif}
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 uses
   SynCommons, SynLZ,
@@ -346,7 +346,7 @@ type
   end;
 
   /// contains one page
-  TGDIPageContent = object
+  TGDIPageContent = record
     /// SynLZ-compressed content of the page
     MetaFileCompressed: RawByteString;
     /// text equivalent of the page
@@ -1611,33 +1611,30 @@ begin
 end;
 
 procedure SetCurrentPrinterAsDefault;
-var Device : array[byte] of char;
-  Driver : array[byte] of char;
-  Port  : array[byte] of char;
-  DefaultPrinter: string;
-  hDeviceMode: THandle;
+var Device, Driver, Port: array[byte] of char;
+    DefaultPrinter: string;
+    hDeviceMode: THandle;
 begin
   DefaultPrinter := GetDefaultPrinterName;
   Printer.GetPrinter(Device, Driver, Port, hDeviceMode);
-  if DefaultPrinter = Device then exit;
-  if (Driver[0] = #0) then
-    if not GetDriverForPrinter(Device, Driver) then exit;  //oops !
-  DefaultPrinter := format('%s,%s,%s',[Device, Driver, Port]);
+  if DefaultPrinter = Device then
+    exit;
+  if Driver[0] = #0 then
+    if not GetDriverForPrinter(Device, Driver) then
+      exit;  // oops !
+  DefaultPrinter := FormatString('%,%,%',[Device, Driver, Port]);
   WriteProfileString( 'windows', 'device', pointer(DefaultPrinter) );
   Device := 'windows';
-  SendMessage( HWND_BROADCAST, WM_WININICHANGE, 0, integer( @Device ));
+  SendMessage(HWND_BROADCAST, WM_WININICHANGE, 0, PtrInt(@Device));
 end;
 
 function CurrentPrinterName: string;
-var Device : array[byte] of char;
-    Driver : array[byte] of char;
-    Port  : array[byte] of char;
+var Device, Driver, Port: array[byte] of char;
     hDeviceMode: THandle;
 begin
   Printer.GetPrinter(Device, Driver, Port, hDeviceMode);
   result := trim(Device);
 end;
-
 
 function CurrentPrinterPaperSize: string;
 var PtrHdl: THandle;
@@ -1648,8 +1645,8 @@ begin
     PtrHdl := Printer.Handle;
     PtrPPI.x := GetDeviceCaps(PtrHdl, LOGPIXELSX);
     PtrPPI.y := GetDeviceCaps(PtrHdl, LOGPIXELSY);
-    size.cx := MulDiv(GetDeviceCaps(PtrHdl, PHYSICALWIDTH), 254,PtrPPI.x *10);
-    size.cy := MulDiv(GetDeviceCaps(PtrHdl, PHYSICALHEIGHT), 254,PtrPPI.y *10);
+    size.cx := MulDiv(GetDeviceCaps(PtrHdl, PHYSICALWIDTH), 254, PtrPPI.x * 10);
+    size.cy := MulDiv(GetDeviceCaps(PtrHdl, PHYSICALHEIGHT), 254, PtrPPI.y * 10);
   except
   end;
   with size do
@@ -1658,44 +1655,45 @@ begin
     begin
       //landscape ...
       case cy of
-        148: if (cx = 210) then result := 'A5 (210 x 148mm)';
-        210: if (cx = 297) then result := 'A4 (297 x 210mm)';
-        216: if (cx = 279) then result := 'Letter (11 x 8½")'
-             else if (cx = 356) then result := 'Legal (14 x 8½")';
-        297: if (cx = 420) then result := 'A3 (420 x 297mm)';
+        148: if cx = 210 then result := 'A5 (210 x 148mm)';
+        210: if cx = 297 then result := 'A4 (297 x 210mm)';
+        216: if cx = 279 then result := 'Letter (11 x 8.5")'
+             else if cx = 356 then result := 'Legal (14 x 8.5")';
+        297: if cx = 420 then result := 'A3 (420 x 297mm)';
       end;
     end else
     begin
       //portrait ...
       case cx of
-        148: if (cy = 210) then result := 'A5 (148 x 210mm)';
-        210: if (cy = 297) then result := 'A4 (210 x 297mm)';
-        216: if (cy = 279) then result := 'Letter (8½ x 11")'
-             else if (cy = 356) then result := 'Legal (8½ x 14")';
-        297: if (cy = 420) then result := 'A3 (297 x 420mm)';
+        148: if cy = 210 then result := 'A5 (148 x 210mm)';
+        210: if cy = 297 then result := 'A4 (210 x 297mm)';
+        216: if cy = 279 then result := 'Letter (8.5 x 11")'
+             else if cy = 356 then result := 'Legal (8.5 x 14")';
+        297: if cy = 420 then result := 'A3 (297 x 420mm)';
       end;
     end;
-    if result = '' then result := format('Custom (%d x %dmm)',[cx, cy]);
+    if result = '' then
+      result := FormatString('Custom (% x %mm)',[cx, cy]);
   end;
 end;
 
 
 // This declaration modifies Delphi's declaration of GetTextExtentExPoint
 // so that the variable to receive partial string extents (p6) is ignored ...
-function GetTextExtentExPointNoPartialsW(DC: HDC; p2: PChar; p3, p4: Integer;
-  var p5: Integer; const p6: integer; var p7: TSize): BOOL; stdcall;
+function GetTextExtentExPointNoPartialsW(DC: HDC; p2: PWideChar; p3, p4: Integer;
+  var p5: Integer; p6: pointer; var p7: TSize): BOOL; stdcall;
     external gdi32 name 'GetTextExtentExPointW';
 
 // TrimLine: Splits off from LS any characters beyond the allowed width
 // breaking at the end of a word if possible. Leftover chars -> RS.
 procedure TrimLine(Canvas: TCanvas; var ls: SynUnicode; out rs: SynUnicode;
-                           LineWidthInPxls: integer);
+                   LineWidthInPxls: integer);
 var i,len,NumCharWhichFit: integer;
     dummy: TSize;
   function Fits: boolean;
   begin
     result := GetTextExtentExPointNoPartialsW(Canvas.Handle,
-      pointer(ls),len,LineWidthInPxls,NumCharWhichFit,0,dummy);
+      pointer(ls),len,LineWidthInPxls,NumCharWhichFit,nil,dummy);
   end;
 begin
   len := length(ls);
@@ -1785,7 +1783,7 @@ begin
   yLineDelta := ToPoint.Y - FromPoint.Y;
 
   xLineUnitDelta := xLineDelta / SQRT( SQR(xLineDelta) + SQR(yLineDelta) );
-  yLineUnitDelta := yLineDelta / SQRt( SQR(xLineDelta) + SQR(yLineDelta) );
+  yLineUnitDelta := yLineDelta / SQRT( SQR(xLineDelta) + SQR(yLineDelta) );
 
   // (xBase,yBase) is where arrow line is perpendicular to base of triangle
   xBase := ToPoint.X - ROUND(HeadSize * xLineUnitDelta);
@@ -1794,7 +1792,7 @@ begin
   xNormalDelta :=  yLineDelta;
   yNormalDelta := -xLineDelta;
   xNormalUnitDelta := xNormalDelta / SQRT( SQR(xNormalDelta) + SQR(yNormalDelta) );
-  yNormalUnitDelta := yNormalDelta / SQRt( SQR(xNormalDelta) + SQR(yNormalDelta) );
+  yNormalUnitDelta := yNormalDelta / SQRT( SQR(xNormalDelta) + SQR(yNormalDelta) );
 
   SavedBrushColor := Canvas.Brush.Color;
   if SolidArrowHead then
@@ -2811,6 +2809,7 @@ end;
 procedure TGDIPages.PreviewPaint(Sender: TObject);
 var R: TRect;
     P1,P2: TPoint;
+    metapage: TMetaFile;
 begin
   if csDesigning in ComponentState then begin // no preview at design time
     R := fPreviewSurface.ClientRect;
@@ -2843,17 +2842,16 @@ begin
     // draw the metafile on the page
     if (fPages<>nil) and (cardinal(Page-1)<=cardinal(High(fPages))) and
        (fPages[Page-1].MetaFileCompressed<>'') then begin
+      // note: we must use a temporary TMetaFile, otherwise the Pages[] content
+      // is changed (screen dpi is changed but not reset in nested emf) and the
+      // resulting report is incorrect on most printers, due to a driver bug :(
+      metapage := GetMetaFileForPage(Page-1);
 {$ifdef GDIPLUSDRAW} // anti aliased drawing:
       if not ForceNoAntiAliased then
-        DrawEmfGdip(PreviewSurfaceBitmap.Canvas.Handle,
-          GetMetaFileForPage(Page-1),R,ForceInternalAntiAliased,
-          ForceInternalAntiAliasedFontFallBack) else
-{$endif} begin // fast direct GDI painting, with no antialiaising:
-        // note: we must use a temporary TMetaFile, otherwise the Pages[] content
-        // is changed (screen dpi is changed but not reset in nested emf) and the
-        // resulting report is incorrect on most printers, due to a driver bug :(
-        PreviewSurfaceBitmap.Canvas.StretchDraw(R,GetMetaFileForPage(Page-1));
-      end;
+        DrawEmfGdip(PreviewSurfaceBitmap.Canvas.Handle,metapage,R,
+          ForceInternalAntiAliased,ForceInternalAntiAliasedFontFallBack) else
+{$endif} // fast direct GDI painting, with no antialiaising:
+        PreviewSurfaceBitmap.Canvas.StretchDraw(R,metapage);
       PreviewSurfaceBitmap.Canvas.Refresh;
     end;
     // draw the change page grey "arrow" buttons
@@ -4188,9 +4186,9 @@ end;
 /// round inverted color to white or black
 function clAlways(cl: TColor): TColor;
 begin
-  if ((GetRValue(longword(cl)) * 2) +
-      (GetGValue(longword(cl)) * 3) +
-      (GetBValue(longword(cl)) * 2)) < 600 then
+  if ((GetRValue(cardinal(cl)) * 2) +
+      (GetGValue(cardinal(cl)) * 3) +
+      (GetBValue(cardinal(cl)) * 2)) < 600 then
     result := clWhite else
     result := clBlack;
 end;

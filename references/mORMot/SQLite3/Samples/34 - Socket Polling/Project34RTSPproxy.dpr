@@ -31,6 +31,7 @@ uses
   {$I SynDprUses.inc}
   SysUtils,
   SynCommons,
+  SynTable,
   SynLog,
   SynCrtSock,
   SynBidirSock,
@@ -82,9 +83,12 @@ const
   All process did take place with logs enabled, on the same physical PC.
   Note that the Windows Seven native system (not a VM) may be slow down by its
   AntiVirus software, whereas the XP VM did not have any AntiVirus installed.
-  WSAPoll API was very disapointing: it is slightly slower than plain Select!
+  WSAPoll API was very disappointing: it is slightly slower than plain Select!
   In the future, we will eventually uses the IOCP API on Windows, which is told
-  to be much faster (but also much more difficult to implement).
+  to be much faster (but also much more difficult to implement). An alternative
+  may be to use https://github.com/piscisaureus/wepoll (eventually statically
+  linked), to keep the epoll API and reduce time-to-market.
+  
   Memory consumption was similar on all OS and API methods.
 
   In all cases, the Linux VM with poll/epoll did show the best scaling abilities.

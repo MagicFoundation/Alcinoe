@@ -1,6 +1,6 @@
 program SynFile;
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 //   first line of uses clause must be   {$I SynDprUses.inc}
 uses

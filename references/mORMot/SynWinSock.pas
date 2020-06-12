@@ -6,7 +6,7 @@ unit SynWinSock;
 {
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -27,10 +27,14 @@ unit SynWinSock;
   Portions created by Lukas Gebauer are Copyright (C) 2003.
   All Rights Reserved.
 
-  Portions created by Arnaud Bouchez are Copyright (C) 2018 Arnaud Bouchez.
+  Portions created by Arnaud Bouchez are Copyright (C) 2020 Arnaud Bouchez.
   All Rights Reserved.
 
   Contributor(s):
+  - Arnaud Bouchez, Jan 2009, for SynCrtSock: see https://synopse.info
+    Delphi 2009/2010 compatibility (Jan 2010): the WinSock library
+      expects Ansi encoded parameters
+  - Svetozar Belic (transmogrifix)
 
   Alternatively, the contents of this file may be used under the terms of
   either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -46,22 +50,6 @@ unit SynWinSock;
 
   ***** END LICENSE BLOCK *****
 
-
-
-     Low level access to network Sockets
-    *************************************
-
-  Contributor(s):
-   - Arnaud Bouchez, Jan 2009, for SynCrtSock: see https://synopse.info
-     Delphi 2009/2010 compatibility (Jan 2010): the WinSock library
-       expects Ansi encoded parameters
-
-
-  Version 1.18
-  - fixed ticket [f79ff5714b] about potential finalization issues as .bpl in IDE
-  - fixed Win64 compatibility issue
-
-
 }
 
 {.$DEFINE WINSOCK1}
@@ -74,10 +62,10 @@ you can install an update from microsoft}
 for name resolution. If you leave this directive inactive, then the new API
 is used, when running system allows it. For IPv6 support you must have the new API! }
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 interface
-
+{$ifdef MSWINDOWS}
 uses
   SysUtils,
   Classes,
@@ -802,7 +790,7 @@ type
   TSChannelCred = record
     dwVersion: cardinal;
     cCreds: cardinal;
-    paCred: pointer; 
+    paCred: pointer;
     hRootStore: THandle;
     cMappers: cardinal;
     aphMappers: pointer;
@@ -847,7 +835,9 @@ type
   PSecPkgContextStreamSizes = ^TSecPkgContextStreamSizes;
 
   ESChannel = class(Exception);
-  TSChannelClient = object
+
+  {$ifdef USERECORDWITHMETHODS}TSChannelClient = record
+    {$else}TSChannelClient = object{$endif}
   private
     Cred: TCredHandle;
     Ctxt: TCtxtHandle;
@@ -938,6 +928,7 @@ const
   SEC_E_OK = 0;
   SEC_I_CONTINUE_NEEDED = $00090312;
   SEC_I_RENEGOTIATE = $00090321;
+  SEC_I_CONTEXT_EXPIRED	= $00090317;
   SEC_E_INCOMPLETE_MESSAGE = $80090318;
   SEC_E_INVALID_TOKEN = $80090308;
 
@@ -945,14 +936,14 @@ const
   SECPKG_ATTR_STREAM_SIZES = 4;
   SECURITY_NATIVE_DREP = $10;
   SCHANNEL_SHUTDOWN = 1;
-
+{$endif}
 implementation
-
+{$ifdef MSWINDOWS}
 var
   SynSockCount: integer;
-  LibHandle: THandle;
-  Libwship6Handle: THandle;
-  LibSecurHandle: THandle;
+  LibHandle: {$ifdef FPC}TLibHandle{$else}HMODULE{$endif};
+  Libwship6Handle: {$ifdef FPC}TLibHandle{$else}HMODULE{$endif};
+  LibSecurHandle: {$ifdef FPC}TLibHandle{$else}HMODULE{$endif};
 
 function IN6_IS_ADDR_UNSPECIFIED(const a: PInAddr6): boolean;
 begin
@@ -1455,12 +1446,12 @@ end;
 function InitSocketInterface(const Stack: TFileName = ''): Boolean;
 begin
   result := False;
-  SockEnhancedApi := False;
-  SockSChannelApi := False;
   EnterCriticalSection(SynSockCS);
   try
     if SynSockCount = 0 then begin
-      SockWship6Api := False;
+      SockEnhancedApi := false;
+      SockSChannelApi := false;
+      SockWship6Api := false;
       if Stack = '' then
         LibHandle := LoadLibrary(DLLStackName)
       else
@@ -1534,7 +1525,7 @@ begin
             SockSChannelApi := Assigned(AcquireCredentialsHandle) and
               Assigned(InitializeSecurityContext) and
               Assigned(QueryContextAttributes) and
-              Assigned(EncryptMessage);
+              Assigned(EncryptMessage) and Assigned(DecryptMessage);
           end;
         end;
         result := True;
@@ -1659,7 +1650,9 @@ const
   TLSRECMAXSIZE = 19000; // stack buffers for TSChannelClient.Receive/Send
 
 type
-  THandshakeBuf = object
+  {$ifdef USERECORDWITHMETHODS}THandshakeBuf = record
+    {$else}THandshakeBuf = object{$endif}
+  public
     buf: array[0..2] of TSecBuffer;
     input, output: TSecBufferDesc;
     procedure Init;
@@ -1801,6 +1794,23 @@ var
   buf: array[0..3] of TSecBuffer;
   res: cardinal;
   read, i: integer;
+  needsRenegotiate: boolean;
+  function DecryptInput: cardinal;
+  begin
+    buf[0].cbBuffer := InputCount;
+    buf[0].BufferType := SECBUFFER_DATA;
+    buf[0].pvBuffer := pointer(Input);
+    buf[1].cbBuffer := 0;
+    buf[1].BufferType := SECBUFFER_EMPTY;
+    buf[1].pvBuffer := nil;
+    buf[2].cbBuffer := 0;
+    buf[2].BufferType := SECBUFFER_EMPTY;
+    buf[2].pvBuffer := nil;
+    buf[3].cbBuffer := 0;
+    buf[3].BufferType := SECBUFFER_EMPTY;
+    buf[3].pvBuffer := nil;
+    result := DecryptMessage(@Ctxt, @desc, 0, nil);
+  end;
 begin
   if not Initialized then begin // use plain socket API
     result := Recv(aSocket, aBuffer, aLength, MSG_NOSIGNAL);
@@ -1820,27 +1830,30 @@ begin
         exit;
       end;
       inc(InputCount, read);
-      buf[0].cbBuffer := InputCount;
-      buf[0].BufferType := SECBUFFER_DATA;
-      buf[0].pvBuffer := pointer(Input);
-      buf[1].cbBuffer := 0;
-      buf[1].BufferType := SECBUFFER_EMPTY;
-      buf[1].pvBuffer := nil;
-      buf[2].cbBuffer := 0;
-      buf[2].BufferType := SECBUFFER_EMPTY;
-      buf[2].pvBuffer := nil;
-      buf[3].cbBuffer := 0;
-      buf[3].BufferType := SECBUFFER_EMPTY;
-      buf[3].pvBuffer := nil;
-      res := DecryptMessage(@Ctxt, @desc, 0, nil);
+      res := DecryptInput;
     until res <> SEC_E_INCOMPLETE_MESSAGE;
-    InputCount := 0;
-    if res <> SEC_I_RENEGOTIATE then // handle data, even with renegotiation
-      CheckSEC_E_OK(res);
-    for i := 1 to 3 do
-      if buf[i].BufferType in [SECBUFFER_DATA, SECBUFFER_EXTRA] then
-        AppendData(buf[i]);
-    if res = SEC_I_RENEGOTIATE then
+    needsRenegotiate := false;
+    repeat
+      case res of
+        SEC_I_RENEGOTIATE: needsRenegotiate := true;
+        SEC_I_CONTEXT_EXPIRED: exit;
+        SEC_E_INCOMPLETE_MESSAGE: break;
+        else CheckSEC_E_OK(res);
+      end;
+      InputCount := 0;
+      for i := 1 to 3 do
+        case buf[i].BufferType of
+          SECBUFFER_DATA: AppendData(buf[i]);
+          SECBUFFER_EXTRA: begin
+            Move(buf[i].pvBuffer^, pointer(Input)^, buf[i].cbBuffer);
+            InputCount := buf[i].cbBuffer;
+          end;
+        end;
+      if InputCount = 0 then
+        break;
+      res := DecryptInput;
+    until false;
+    if needsRenegotiate then
       HandshakeLoop(aSocket);
   except
     exit; // shutdown the connection on ESChannel fatal error
@@ -1877,7 +1890,6 @@ begin
     inc(PByte(aBuffer), templen);
     dec(pending, templen);
     trailer := Sizes.cbHeader + templen;
-    len := trailer + Sizes.cbTrailer;
     buf[0].cbBuffer := Sizes.cbHeader;
     buf[0].BufferType := SECBUFFER_STREAM_HEADER;
     buf[0].pvBuffer := @temp;
@@ -1892,6 +1904,7 @@ begin
     buf[3].pvBuffer := nil;
     if EncryptMessage(@Ctxt, 0, @desc, 0) <> SEC_E_OK then
       exit; // shutdown the connection on SChannel error
+    len := buf[0].cbBuffer + buf[1].cbBuffer + buf[2].cbBuffer;
     sent := 0;
     repeat
       s := SynWinSock.Send(aSocket, @temp[sent], len, MSG_NOSIGNAL);
@@ -1929,5 +1942,6 @@ finalization
   SynSockCount := -254; // force release library
   DestroySocketInterface;
   DeleteCriticalSection(SynSockCS);
+{$endif}
 end.
 

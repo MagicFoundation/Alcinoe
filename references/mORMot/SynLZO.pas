@@ -5,7 +5,7 @@ unit SynLZO;
 {
     This file is part of Synopse LZO Compression.
 
-    Synopse LZO Compression. Copyright (C) 2018 Arnaud Bouchez
+    Synopse LZO Compression. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -24,7 +24,7 @@ unit SynLZO;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -42,9 +42,7 @@ unit SynLZO;
 
   ***** END LICENSE BLOCK *****
 
-
-
-     Pascal SynLZO Compression / Decompression library
+      Pascal SynLZO Compression / Decompression library
      =================================================
      by Arnaud Bouchez http://bouchez.info
 
@@ -52,7 +50,7 @@ unit SynLZO;
       written in optimized pascal code for Delphi 3 up to Delphi 2009
       with a tuned asm version available
     * offers *extremely* fast compression and decompression
-      with good compression rate, in comparaison with its speed
+      with good compression rate, in comparison with its speed
     * original LZO written in ANSI C - pascal+asm conversion by A.Bouchez
     * simple but very fast direct file compression:
       SynLZO compressed files read/write is faster than copying plain files!
@@ -100,44 +98,6 @@ unit SynLZO;
     - if you include it in your application, please give me some credits:
        "use SynLZO compression by http://bouchez.info"
     - use at your own risk!
-
- Some benchmark are available at the end of the file (on my Turion TL-65 1.8Ghz)
-
- The results show that our SynLZO implementation is often faster than original
-   LZO C implementation, especially for compression.
- It's a must-have for compression speed, regarding ZIP (compression is
-   10 times faster, decompression 4 times, with lower compression rate) or others.
- You can notice some speed enhancements in the compiler from Delphi 7 to 2009:
-   the D2009 optimizer deals better with register assignment and 8bits-32bits
-   conversion. Note the pascal code was optimized by looking at the generated
-   asm (via Alt-F2), and by proper profiling. D2009 use fpu fast move(), and my
-   D7 version use the FastCode SSE move() version (which may be blazzing fast
-   on the upcoming CPUs, with true 128bits memory access - until now, the
-   use of 128bits registers in the move() code were not faster than 64bits FPU).
- => for the first time, I consider leaving D7 for the new D2009 IDE... there's
-   a lot to refactor (string->ansistring, PChar->PAnsiChar) in the code,
-   but it may be worth it, since quite all my code is test-driven, so that I can
-   be sure the conversion is ok. My only negative impact is that I can't use the
-   language enhancements if I want to be compatible with CrossKylix, which I
-   would like to, in order to be able to compile for Linux target. But the new
-   D2009 IDE is great, even if it seems a bit slow compared to the old D7 one.
-   And don't speak about the MSHelp system used in Delphi 2009: it's a bulky
-   piece of software - such coders should be hang. :)
- => an optimized asm version, derivating from D2009 generated code, is provided
-   and is to be used - this asm version is 100% compatible with the pascal code
-
-
-  Revision history
-
-  Version 1.6
-  - first release, associated with the main Synopse SQLite3 framework
-
-  Version 1.13
-  - code modifications to compile with Delphi 5 compiler
-  - comment refactoring (mostly for inclusion in SynProject documentation)
-  - new CompressSynLZO function, for THttpSocket.RegisterCompress - those
-    functions will return 'synlzo' as ACCEPT-ENCODING: HTTP header parameter
-
 }
 
 interface
@@ -179,7 +139,7 @@ function CompressSynLZO(var Data: AnsiString; Compress: boolean): AnsiString;
 
 {$ifdef LZOFILE}
 
-{$ifdef WIN32}
+{$ifdef MSWINDOWS}
 // file compression functions using fast SynLZO library (up to 2GB file size)
 // - if you are dealing directly with file compression, this is where to begin
 // - SynLZO compressed files read/write is faster than copying plain files :)
@@ -207,17 +167,11 @@ function lzopas_decompressfilecheck(const srcFile: AnsiString): boolean;
 
 implementation
 
-{$ifndef CPUARM}
-{$ifndef CPUX64}
-{$ifndef CPU64}
-{$ifndef BSD}
+{$ifdef CPU32DELPHI}
   {$define USEASM}
   // if defined, a hand-tuned asm compression code (derivating from one generated
   //   by Delphi 2009) will be used instead of the slower Delphi3-2007 code
-{$endif}
-{$endif}
-{$endif}
-{$endif}
+{$endif CPU32DELPHI}
 
 {$ifdef MSWINDOWS}
 uses
@@ -241,7 +195,7 @@ type
 {$endif}
 
 {$else}
-{$ifdef CPU64}
+{$ifdef CPUX64}
 // CPU64 note: integer must be 4 bytes, word 2 bytes; use of PtrInt for common integer
 {$define USEOFFSET}
 // the PAnsiPChar hashing trick used in the original lzo algo is not 64bits enabled
@@ -308,9 +262,9 @@ begin
   end;
 end;
 
-function _lzo1x_1_do_compress(in_p: PAnsiChar; in_len: PtrInt;
-  out_p: PAnsiChar; out out_len: integer): integer;
 {$ifdef USEASM}
+function _lzo1x_1_do_compress(in_p: PAnsiChar; in_len: PtrInt;
+  out_p: PAnsiChar; out out_len: integer): PtrInt;
 // code below was extracted from the pascal code generated by Delphi 2009
 // after some manual further optimization of the asm, here's something fast...
 // faster than the original lzo asm or the most optimized C code generated I got
@@ -638,6 +592,9 @@ asm
         mov     esp, ebp
 end;
 {$else}
+procedure _lzo1x_1_do_compress(in_p: PAnsiChar; in_len: PtrInt;
+  out_p: PAnsiChar; out out_len: integer; out left: PtrInt);
+// not a function, to avoid unexpected issue on ARM (reported by Alf)
 var in_end, ip_end, ii, end_p, m_pos, out_beg: PAnsiChar;
     m_off, m_len, dindex, t, tt: PtrInt; // CPU register (32 or 64 bits wide)
 {$ifdef USEOFFSET}
@@ -664,6 +621,9 @@ begin
       xor ord(in_p[1])) shl 5) xor ord(in_p[0]))) shr D_MUL_SHIFT) and D_MASK;
     // 2. check if already hashed p[0]..p[3] sequence
     // 2.1 not hashed -> add hash position in dict[], and continue
+    {$ifdef CPUARM3264}
+    dindex := dindex MOD PtrInt(D_MASK+1);
+    {$endif}
 {$ifdef USEOFFSET}
     if dict[dindex]=0 then begin
 lit:  dict[dindex] := in_p-ip_beg;
@@ -893,7 +853,7 @@ m1:   inc(out_p);
   until false;
   // 6. finished -> store out_len and number of bytes left to store
   out_len := out_p-out_beg;
-  result := in_end-ii; // returns source left bytes
+  left := in_end-ii;
 end;
 {$endif USEASM}
 
@@ -934,7 +894,11 @@ begin
     goto mov;
   end else begin
     // 2.2 compress using lzo hashing
+    {$ifdef USEASM}
     t := _lzo1x_1_do_compress(in_p, in_len, out_p, result);
+    {$else}
+    _lzo1x_1_do_compress(in_p, in_len, out_p, result, t);
+    {$endif}
     inc(out_p,result);
   end;
   // 3. store remaining t bytes
@@ -1322,7 +1286,7 @@ end;
 
 
 {$ifdef LZOFILE}
-{$ifdef WIN32}
+{$ifdef MSWINDOWS}
 
 function adler32(adler: cardinal; buf: pointer; len: cardinal): cardinal;
 {$ifdef USEASM}
@@ -1796,7 +1760,7 @@ begin
     SetLastError(err);
 end;
 
-{$endif WIN32}
+{$endif MSWINDOWS}
 {$endif LZOFILE}
 
 function Hash32(P: PIntegerArray; L: integer): cardinal;
@@ -1845,7 +1809,7 @@ begin
     SetString(result,nil,len);
     P := pointer(result);
     PCardinal(P)^ := Hash32(pointer(Data),DataLen);
-    len := lzopas_compress(pointer(Data),DataLen,P+8);
+    len := lzopas_compress(pointer(Data),DataLen,pointer(P+8));
     PCardinal(P+4)^ := Hash32(pointer(P+8),len);
     SetString(Data,P,len+8);
   end else begin
@@ -1853,9 +1817,9 @@ begin
     P := pointer(Data);
     if (DataLen<=8) or (Hash32(pointer(P+8),DataLen-8)<>PCardinal(P+4)^) then
       exit;
-    len := lzopas_decompressdestlen(P+8);
+    len := lzopas_decompressdestlen(pointer(P+8));
     SetLength(result,len);
-    if (len<>0) and ((lzopas_decompress(P+8,DataLen-8,pointer(result))<>len) or
+    if (len<>0) and ((lzopas_decompress(pointer(P+8),DataLen-8,pointer(result))<>len) or
        (Hash32(pointer(result),len)<>PCardinal(P)^)) then begin
       result := '';
       exit;

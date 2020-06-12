@@ -6,7 +6,7 @@ unit mORMotHttpServer;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit mORMotHttpServer;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -46,111 +46,19 @@ unit mORMotHttpServer;
 
   ***** END LICENSE BLOCK *****
 
+   HTTP/1.1 RESTFUL JSON Client/Server for mORMot
+  ************************************************
 
-     HTTP/1.1 RESTFUL JSON Client/Server for mORMot
-    ************************************************
-
-   - use internaly the JSON format for content communication
-   - can be called by TSQLHttpClient class from direct Delphi clients
-     (see mORMotHttpClient unit)
-   - can be called by any JSON-aware AJAX application
-   - can optionaly compress the returned data to optimize Internet bandwidth
-   - speed is very high: more than 20MB/sec R/W localy on a 1.8GHz Sempron,
-     i.e. 400Mb/sec of duplex raw IP data, with about 200 탎 only elapsed
-     by request (direct call is 50 탎, so bottle neck is the Win32 API),
-     i.e. 5000 requests per second, with 113 result rows (i.e. 4803 bytes
-     of JSON data each)... try to find a faster JSON HTTP server! ;)
-
-    Initial version: 2009 May, by Arnaud Bouchez
-
-    Version 1.1
-      - code rewrite for FPC and Delphi 2009/2010 compilation
-
-    Version 1.3 - January 22, 2010
-      - some small fixes and multi-compiler enhancements
-
-    Version 1.4 - February 8, 2010
-      - whole Synopse SQLite3 database framework released under the GNU Lesser
-        General Public License version 3, instead of generic "Public Domain"
-      - HTTP/1.1 RESTFUL JSON Client and Server split into two units
-        (SQLite3HttpClient and SQLite3HttpServer)
-
-    Version 1.5 - February 22, 2010
-      - by default, the SQlite3 unit is now not included, in order to save
-        some space
-
-    Version 1.8
-      - includes Unitary Testing class and functions
-      - allows content-type changing for GET blob fields
-
-    Version 1.12
-      - TSQLHttpServer now handle multiple TSQLRestServer instances
-        per one server (dispatching requests via the Root URI used)
-      - new AddServer method, to register a TSQLRestServer after launch
-      - new TSQLRestServer.OnlyJSONRequests property
-
-    Version 1.13
-      - can now use fast http.sys kernel-mode server (THttpApiServer) if
-        available, and our pure Delphi THttpServer on default
-      - now can compress its content using deflate or faster SynLZ algorithm
-      - by default, will handle SynLZ compression for TSQLHttpClient
-      - can make TCP/IP stream not HTTP compliant (for security visions)
-      - TSQLHttpServer.Request now uses the new THttpServerGeneric.Request
-        virtual abstract method prototype to handle THttpApiServer
-
-    Version 1.16
-      - added optional aRestAccessRights parameter in TSQLHttpServer.AddServer
-        to override the default HTTP_DEFAULT_ACCESS_RIGHTS settings
-      - added ServerThreadPoolCount parameter to TSQLHttpServer.Create()
-        constructor, set by default to 32 - will speed up process of slow
-        requests (e.g. a POST with some huge data transmitted at slow rate)
-      - fixed error in case of URI similar to 'root?session_signature=...'
-      - fixed incorect thread count in TSQLHttpServer.Create
-      - regression tests are now extracted from this unit, in order to allow
-        construction of a TSQLHttpServer instance without the need
-        of linking the SQLite3 engine to the executable
-
-    Version 1.17
-      - made URI check case-insensitive (as for official RFC)
-      - TSQLHttpServer will now call virtual TSQLRestServer.EndCurrentThread
-        method in each of its terminating threads, to release any thread-specific
-        resources (for instance, external connections in SQlite3DB)
-
-    Version 1.18
-      - renamed SQLite3HttpServer.pas unit to mORMotHttpServer.pas
-      - classes TSQLHttpServer* renamed as TSQLHttpServer*
-      - added TSQLHttpServer.RemoveServer() and Shutdown methods
-      - added TSQLHttpServer.Port and DomainName properties
-      - added TSQLHttpServer.AccessControlAllowOrigin property to handle
-        cross-site AJAX requests via cross-origin resource sharing (CORS)
-      - added TSQLHttpServer.RedirectServerRootUriForExactCase to fix
-        URIs on the fly for case sensitivity
-      - TSQLHttpServer now handles sub-domains generic matching (via
-        TSQLModel.URIMatch call) at database model level (e.g. you can set
-        root='/root/sub1' URIs)
-      - added TSQLHttpServer.DomainHostRedirect() method for virtual-host
-        redirection of Internet domains or sub-domains
-      - declared TSQLHttpServer.Request method as virtual, to allow easiest
-        customization, like direct file sending to the clients
-      - added TSQLHttpServerOptions parameter to TSQLHttpServer.Create(),
-        allowing optional auto-registration of the URI to http.sys internals
-      - added aHttpServerSecurity: TSQLHttpServerSecurity parameter to
-        TSQLHttpServer.Create(), allowing HTTPS secure content publishing, when
-        using the http.sys kind of server, or our proprietary SHA-256 /
-        AES-256-CTR encryption identified as "ACCEPT-ENCODING: synshaaes"
-      - added optional aAdditionalURL parameter to TSQLHttpServer.Create(), to
-        be used e.g. to registry an URI to server static file content in addition
-        to TSQLRestServer instances - need to override TSQLHttpServer.Request()
-      - added optional parameter to TSQLHttpServer.Create(), to specify a
-        name for the THttpApiServer HTTP queue
-      - COMPRESSDEFLATE conditional will use gzip (and not deflate/zip)
-      - added TSQLHTTPRemoteLogServer class for easy remote log serving
-      - ensure TSQLHttpServer.AddServer() will handle useHttpApiRegisteringURI
-      - added TSQLHttpServer.RootRedirectToURI() method for root URI redirection
-      - declared TSQLHttpServer.HttpThreadStart/HttpThreadTerminate as virtual
-      - allow TSQLHttpServer.Create() without any associated TSQLRestServer
-      - allow to specify the binding server address for sockets ('1.2.3.4:1234')
-      - implement asynchronous interface callbacks using WebSockets
+ - use internaly the JSON format for content communication
+ - can be called by TSQLHttpClient class from direct Delphi clients
+   (see mORMotHttpClient unit)
+ - can be called by any JSON-aware AJAX application
+ - can optionaly compress the returned data to optimize Internet bandwidth
+ - speed is very high: more than 20MB/sec R/W localy on a 1.8GHz Sempron,
+   i.e. 400Mb/sec of duplex raw IP data, with about 200 탎 only elapsed
+   by request (direct call is 50 탎, so bottle neck is the Win32 API),
+   i.e. 5000 requests per second, with 113 result rows (i.e. 4803 bytes
+   of JSON data each)... try to find a faster JSON HTTP server! ;)
 
 }
 
@@ -169,7 +77,7 @@ interface
 { if defined, will use gzip (and not deflate/zip) for content compression
   - can be set global for Client and Server applications
   - deflate/zip is just broken between browsers and client, and should be
-    avoided: see http://stackoverflow.com/a/9186091/458259
+    avoided: see http://stackoverflow.com/a/9186091
   - SynLZ is faster but only known by Delphi clients: you can enable deflate
     when the server is connected an AJAX application (not defined by default)
   - if you define both COMPRESSSYNLZ and COMPRESSDEFLATE, the server will use
@@ -208,6 +116,7 @@ uses
   SynBidirSock, // for WebSockets
   SynCrypto,    // for CompressShaAes()
   SynCommons,
+  SynTable,
   SynLog,
   mORMot;
 
@@ -273,30 +182,29 @@ type
   // - just create it and it will serve SQL statements as UTF-8 JSON
   // - for a true AJAX server, expanded data is prefered - your code may contain:
   // ! DBServer.NoAJAXJSON := false;
-  TSQLHttpServer = class
+  TSQLHttpServer = class(TSynPersistentLock)
   protected
     fOnlyJSONRequests: boolean;
     fShutdownInProgress: boolean;
     fHttpServer: THttpServerGeneric;
     fPort, fDomainName: AnsiString;
     fPublicAddress, fPublicPort: RawUTF8;
-    /// internal servers to compute responses
+    /// internal servers to compute responses (protected by inherited fSafe)
     fDBServers: array of record
       Server: TSQLRestServer;
       RestAccessRights: PSQLAccessRights;
       Security: TSQLHttpServerSecurity;
     end;
-    fDBServersSafe: IAutoLocker;
     fHosts: TSynNameValue;
     fAccessControlAllowOrigin: RawUTF8;
-    fAccessControlAllowOriginHeader: RawUTF8;
-    fAccessControlAllowCredentials: boolean;
+    fAccessControlAllowOriginsMatch: TMatchs;
+    fAccessControlAllowCredential: boolean;
     fRootRedirectToURI: array[boolean] of RawUTF8;
     fRedirectServerRootUriForExactCase: boolean;
     fHttpServerKind: TSQLHttpServerOptions;
     fLog: TSynLogClass;
     procedure SetAccessControlAllowOrigin(const Value: RawUTF8);
-    procedure SetAccessControlAllowCredential(Value: boolean);
+    procedure ComputeAccessControlHeader(Ctxt: THttpServerRequest);
     // assigned to fHttpServer.OnHttpThreadStart/Terminate e.g. to handle connections
     procedure HttpThreadStart(Sender: TThread); virtual;
     procedure HttpThreadTerminate(Sender: TThread); virtual;
@@ -310,10 +218,8 @@ type
     function GetDBServerNames: RawUTF8;
     function HttpApiAddUri(const aRoot,aDomainName: RawByteString;
       aSecurity: TSQLHttpServerSecurity; aRegisterURI,aRaiseExceptionOnError: boolean): RawUTF8;
-    function NotifyCallback(aSender: TSQLRestServer;
-      const aInterfaceDotMethodName,aParams: RawUTF8;
-      aConnectionID: Int64; aFakeCallID: integer;
-      aResult, aErrorMsg: PRawUTF8): boolean;
+    function NotifyCallback(aSender: TSQLRestServer; const aInterfaceDotMethodName,aParams: RawUTF8;
+      aConnectionID: THttpServerConnectionID; aFakeCallID: integer; aResult, aErrorMsg: PRawUTF8): boolean;
   public
     /// create a Server instance, binded and listening on a TCP port to HTTP requests
     // - raise a EHttpServer exception if binding failed
@@ -347,11 +253,12 @@ type
     // - optional aAdditionalURL parameter can be used e.g. to registry an URI
     // to server static file content, by overriding TSQLHttpServer.Request
     // - for THttpApiServer, you can specify an optional name for the HTTP queue
+    // - for THttpServer, you can force aHeadersUnFiltered flag
     constructor Create(const aPort: AnsiString;
       const aServers: array of TSQLRestServer; const aDomainName: AnsiString='+';
       aHttpServerKind: TSQLHttpServerOptions=HTTP_DEFAULT_MODE; ServerThreadPoolCount: Integer=32;
-      aHttpServerSecurity: TSQLHttpServerSecurity=secNone;
-      const aAdditionalURL: AnsiString=''; const aQueueName: SynUnicode=''); reintroduce; overload;
+      aHttpServerSecurity: TSQLHttpServerSecurity=secNone; const aAdditionalURL: AnsiString='';
+      const aQueueName: SynUnicode=''; aHeadersUnFiltered: boolean=false); reintroduce; overload;
     /// create a Server instance, binded and listening on a TCP port to HTTP requests
     // - raise a EHttpServer exception if binding failed
     // - specify one TSQLRestServer server class to be used
@@ -378,10 +285,12 @@ type
     // transmission definition; other parameters would be the standard one
     // - only the supplied aDefinition.Authentication will be defined
     // - under Windows, will use http.sys with automatic URI registration, unless
-    // aDefinition.WebSocketPassword is set (and then binary WebSockets would be
-    // expected with the corresponding encryption), or aForcedKind is overriden
+    // aDefinition.WebSocketPassword is set and binary WebSockets would be
+    // expected with the corresponding encryption, or aForcedKind is overriden
+    // - optional aWebSocketsLoopDelay parameter could be set for tuning
+    // WebSockets responsiveness
     constructor Create(aServer: TSQLRestServer; aDefinition: TSQLHttpServerDefinition;
-      aForcedKind: TSQLHttpServerOptions=HTTP_DEFAULT_MODE); reintroduce; overload;
+      aForcedKind: TSQLHttpServerOptions=HTTP_DEFAULT_MODE; aWebSocketsLoopDelay: integer=0); reintroduce; overload;
     /// release all memory, internal mORMot server and HTTP handlers
     destructor Destroy; override;
     /// you can call this method to prepare the HTTP server for shutting down
@@ -424,6 +333,8 @@ type
     // ! fMainRunner := TMVCRunOnRestServer.Create(self,nil,'blog');
     // ! ...
     // - if aURI='' is given, the corresponding host redirection will be disabled
+    // - note: by design, 'something.localhost' is likely to be not recognized
+    // as aDomain, since 'localhost' can not be part of proper DNS resolution
     procedure DomainHostRedirect(const aDomain,aURI: RawUTF8);
     /// allow to temporarly redirect ip:port root URI to a given sub-URI
     // - by default, only sub-URI, as defined by TSQLRestServer.Model.Root, are
@@ -462,12 +373,12 @@ type
     /// the TCP/IP (address and) port on which this server is listening to
     // - may contain the public server address to bind to: e.g. '1.2.3.4:1234'
     // - see PublicAddress and PublicPort properties if you want to get the
-    // true IP port or address 
+    // true IP port or address
     property Port: AnsiString read fPort;
     /// the TCP/IP public address on which this server is listening to
     // - equals e.g. '1.2.3.4' if Port = '1.2.3.4:1234'
     // - if Port does not contain an explicit address (e.g. '1234'), the current
-    // computer host name would be assigned as PublicAddress 
+    // computer host name would be assigned as PublicAddress
     property PublicAddress: RawUTF8 read fPublicAddress;
     /// the TCP/IP public port on which this server is listening to
     // - equals e.g. '1234' if Port = '1.2.3.4:1234'
@@ -493,9 +404,9 @@ type
     /// enable cross-origin resource sharing (CORS) for proper AJAX process
     // - see @https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS
     // - can be set e.g. to '*' to allow requests from any site/domain; or
-    // specify an URI to be allowed as origin (e.g. 'http://foo.example')
-    // - current implementation is pretty basic, and does not check the incoming
-    // "Origin: " header value,
+    // specify an CSV white-list of URI to be allowed as origin e.g. as
+    // 'https://foo.example1,https://foo.example2' or 'https://*.foo.example' or
+    // (faster) '*.foo.example1,*.foo.example2' following the TMatch syntax
     // - see also AccessControlAllowCredential property
     property AccessControlAllowOrigin: RawUTF8
       read fAccessControlAllowOrigin write SetAccessControlAllowOrigin;
@@ -505,7 +416,7 @@ type
     // @https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials
     // - see @https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
     property AccessControlAllowCredential: boolean
-      write SetAccessControlAllowCredential;
+      read fAccessControlAllowCredential write fAccessControlAllowCredential;
     /// enable redirectoin to fix any URI for a case-sensitive match of Model.Root
     // - by default, TSQLRestServer.Model.Root would be accepted with case
     // insensitivity; but it may induce errors for HTTP cookies, since they
@@ -537,7 +448,7 @@ type
     // - you can share several HTTP log servers on the same port, if you use
     // a dedicated root URI and use the http.sys server (which is the default)
     constructor Create(const aRoot: RawUTF8; aPort: integer;
-      const aEvent: TRemoteLogReceivedOne);
+      const aEvent: TRemoteLogReceivedOne); reintroduce;
     /// release the HTTP server and its internal mORMot server
     destructor Destroy; override;
     /// the associated mORMot server instance running with this HTTP server
@@ -577,12 +488,13 @@ end;
 function TSQLHttpServer.AddServer(aServer: TSQLRestServer;
   aRestAccessRights: PSQLAccessRights; aHttpServerSecurity: TSQLHttpServerSecurity): boolean;
 var i,n: integer;
+    log: ISynLog;
 begin
   result := False;
   if (self=nil) or (aServer=nil) or (aServer.Model=nil) then
     exit;
-  fLog.Enter(self);
-  fDBServersSafe.Enter;
+  log := fLog.Enter(self, 'AddServer');
+  fSafe.Lock; // protect fDBServers[]
   try
     n := length(fDBServers);
     for i := 0 to n-1 do
@@ -600,34 +512,36 @@ begin
     fHttpServer.ProcessName := GetDBServerNames;
     result := true;
   finally
-    fDBServersSafe.Leave;
-    fLog.Add.Log(sllHttp,'%.AddServer(%,Root=%,Port=%,Public=%:%)=%',
-      [self,aServer,aServer.Model.Root,fPort,fPublicAddress,fPublicPort,
-       BOOL_STR[result]],self);
+    fSafe.UnLock;
+    if log<>nil then
+      log.Log(sllHttp,'AddServer(%,Root=%,Port=%,Public=%:%)=%',
+        [aServer,aServer.Model.Root,fPort,fPublicAddress,fPublicPort,
+         BOOL_STR[result]],self);
   end;
 end;
 
 function TSQLHttpServer.DBServerFind(aServer: TSQLRestServer): integer;
 begin
-  fDBServersSafe.Enter;
+  fSafe.Lock; // protect fDBServers[]
   try
     for result := 0 to Length(fDBServers)-1 do
       if fDBServers[result].Server=aServer then
         exit;
     result := -1;
   finally
-    fDBServersSafe.Leave;
+    fSafe.UnLock;
   end;
 end;
 
 function TSQLHttpServer.RemoveServer(aServer: TSQLRestServer): boolean;
 var i,j,n: integer;
+    log: ISynLog;
 begin
   result := False;
   if (self=nil) or (aServer=nil) or (aServer.Model=nil) then
     exit;
-  fLog.Enter(self);
-  fDBServersSafe.Enter;
+  log := fLog.Enter(self, 'RemoveServer');
+  fSafe.Lock; // protect fDBServers[]
   try
     n := high(fDBServers);
     for i := n downto 0 do // may appear several times, with another Security
@@ -636,7 +550,7 @@ begin
       if fHttpServer.InheritsFrom(THttpApiServer) then
         if THttpApiServer(fHttpServer).RemoveUrl(aServer.Model.Root,fPublicPort,
            fDBServers[i].Security=secSSL,fDomainName)<>NO_ERROR then
-          fLog.Add.Log(sllLastError,'%.RemoveUrl(%)',[self,aServer.Model.Root],self);
+          log.Log(sllLastError,'%.RemoveUrl(%)',[self,aServer.Model.Root],self);
       {$endif}
       for j := i to n-1 do
         fDBServers[j] := fDBServers[j+1];
@@ -647,36 +561,42 @@ begin
       result := true; // don't break here: may appear with another Security
     end;
   finally
-    fDBServersSafe.Leave;
-    fLog.Add.Log(sllHttp,'%.RemoveServer(Root=%)=%',
-      [self,aServer.Model.Root,BOOL_STR[result]],self);
+    fSafe.UnLock;
+    if log<>nil then
+      log.Log(sllHttp,'%.RemoveServer(Root=%)=%',
+        [self,aServer.Model.Root,BOOL_STR[result]],self);
   end;
 end;
 
 procedure TSQLHttpServer.DomainHostRedirect(const aDomain,aURI: RawUTF8);
+var uri: TURI;
 begin
+  if uri.From(aDomain) and EndWith(uri.Server,'.LOCALHOST') then
+      fLog.Add.Log(sllWarning, 'DomainHostRedirect(%) is very likely to be unresolved'+
+        ': consider using a real host name instead of the loopback',[aDomain],self);
   if aURI='' then
     fHosts.Delete(aDomain) else
     fHosts.Add(aDomain,aURI); // e.g. Add('project1.com','root1')
+
 end;
 
 constructor TSQLHttpServer.Create(const aPort: AnsiString;
   const aServers: array of TSQLRestServer; const aDomainName: AnsiString;
   aHttpServerKind: TSQLHttpServerOptions; ServerThreadPoolCount: Integer;
   aHttpServerSecurity: TSQLHttpServerSecurity; const aAdditionalURL: AnsiString;
-  const aQueueName: SynUnicode);
+  const aQueueName: SynUnicode; aHeadersUnFiltered: boolean);
 var i,j: integer;
     ServersRoot: RawUTF8;
     ErrMsg: RawUTF8;
+    log: ISynLog;
 begin
   {$ifdef WITHLOG} // this is the only place where we check for WITHLOG
   if high(aServers)<0 then
     fLog := TSQLLog else
     fLog := aServers[0].LogClass;
-  fLog.Enter('Create % (%) on port %',[ToText(aHttpServerKind)^,
+  log := fLog.Enter('Create % (%) on port %',[ToText(aHttpServerKind)^,
     ToText(aHttpServerSecurity)^,aPort],self);
   {$endif}
-  fDBServersSafe := TAutoLocker.Create;
   inherited Create;
   SetAccessControlAllowOrigin(''); // deny CORS by default
   fHosts.Init(false);
@@ -704,13 +624,16 @@ begin
        raise EHttpServerException.CreateUTF8('%.Create(% ): %',[self,ServersRoot,ErrMsg]);
     // associate before HTTP server is started, for TSQLRestServer.BeginCurrentThread
     SetLength(fDBServers,length(aServers));
-    for i := 0 to high(aServers) do 
+    for i := 0 to high(aServers) do
       SetDBServer(i,aServers[i],aHttpServerSecurity,HTTP_DEFAULT_ACCESS_RIGHTS);
   end;
   {$ifndef USETCPPREFIX}
   {$ifndef ONLYUSEHTTPSOCKET}
   if aHttpServerKind in [useHttpApi,useHttpApiRegisteringURI] then
   try
+    if PosEx('Wine',OSVersionInfoEx)>0 then
+      log.Log(sllWarning,'%: httpapi probably not supported on % -> try useHttpSocket',
+        [ToText(aHttpServerKind)^,OSVersionInfoEx]);
     // first try to use fastest http.sys
     fHttpServer := THttpApiServer.Create(false,
       aQueueName,HttpThreadStart,HttpThreadTerminate,GetDBServerNames);
@@ -722,20 +645,21 @@ begin
         fHttpServerKind=useHttpApiRegisteringURI,true);
   except
     on E: Exception do begin
-      fLog.Add.Log(sllError,'% for % at%  -> fallback to socket-based server',
-        [E,fHttpServer,ServersRoot],self);
+      log.Log(sllError,'% for % % at%  -> fallback to socket-based server',
+        [E,ToText(aHttpServerKind)^,fHttpServer,ServersRoot],self);
       FreeAndNil(fHttpServer); // if http.sys initialization failed
     end;
   end;
   {$endif}
   {$endif}
   if fHttpServer=nil then begin
-    // http.sys failed -> create one instance of our pure Delphi server
+    // http.sys not running -> create one instance of our pure socket server
     if aHttpServerKind=useBidirSocket then
       fHttpServer := TWebSocketServerRest.Create(
         fPort,HttpThreadStart,HttpThreadTerminate,GetDBServerNames) else
       fHttpServer := THttpServer.Create(fPort,HttpThreadStart,HttpThreadTerminate,
-        GetDBServerNames,ServerThreadPoolCount);
+        GetDBServerNames,ServerThreadPoolCount,30000,aHeadersUnFiltered);
+    THttpServer(fHttpServer).WaitStarted;
     {$ifdef USETCPPREFIX}
     THttpServer(fHttpServer).TCPPrefix := 'magic';
     {$endif}
@@ -756,16 +680,16 @@ begin
       THttpApiServer(fHttpServer).Clone(ServerThreadPoolCount-1);
 {$endif}
   // last HTTP server handling callbacks would be set for the TSQLRestServer(s)
-  if fHttpServer.CanNotifyCallback then 
+  if fHttpServer.CanNotifyCallback then
     for i := 0 to high(fDBServers) do
       fDBServers[i].Server.OnNotifyCallback := NotifyCallback;
-  fLog.Add.Log(sllHttp,'% initialized for%',[fHttpServer,ServersRoot],self);
+  log.Log(sllHttp,'% initialized for%',[fHttpServer,ServersRoot],self);
 end;
 
 constructor TSQLHttpServer.Create(const aPort: AnsiString;
   aServer: TSQLRestServer; const aDomainName: AnsiString;
   aHttpServerKind: TSQLHttpServerOptions; aRestAccessRights: PSQLAccessRights;
-  ServerThreadPoolCount: integer; aHttpServerSecurity: TSQLHttpServerSecurity;
+  ServerThreadPoolCount: Integer; aHttpServerSecurity: TSQLHttpServerSecurity;
   const aAdditionalURL: AnsiString; const aQueueName: SynUnicode);
 begin
   Create(aPort,[aServer],aDomainName,aHttpServerKind,ServerThreadPoolCount,
@@ -775,23 +699,26 @@ begin
 end;
 
 destructor TSQLHttpServer.Destroy;
+var log: ISynLog;
 begin
-  fLog.Enter(self);
-  fLog.Add.Log(sllHttp,'% finalized for %',[fHttpServer,
-    Plural('server',length(fDBServers))],self);
+  log := fLog.Enter(self,'Destroy');
+  if log<>nil then
+    log.Log(sllHttp,'% finalized for %',[fHttpServer,Plural('server',length(fDBServers))],self);
   Shutdown(true); // but don't call fDBServers[i].Server.Shutdown
   FreeAndNil(fHttpServer);
   inherited Destroy;
+  fAccessControlAllowOriginsMatch.Free;
 end;
 
 procedure TSQLHttpServer.Shutdown(noRestServerShutdown: boolean);
 var i: integer;
+    log: ISynLog;
 begin
   if (self<>nil) and not fShutdownInProgress then begin
-    fLog.Enter('Shutdown(%)',[BOOL_STR[noRestServerShutdown]],self);
+    log := fLog.Enter('Shutdown(%)',[BOOL_STR[noRestServerShutdown]],self);
     fShutdownInProgress := true;
     fHttpServer.Shutdown;
-    fDBServersSafe.Enter;
+    fSafe.Lock; // protect fDBServers[]
     try
       for i := 0 to high(fDBServers) do begin
         if not noRestServerShutdown then
@@ -800,7 +727,7 @@ begin
           fDBServers[i].Server.OnNotifyCallback := nil; // avoid unexpected GPF
       end;
     finally
-      fDBServersSafe.Leave;
+      fSafe.UnLock;
     end;
   end;
 end;
@@ -810,12 +737,12 @@ begin
   result := nil;
   if self=nil then
     exit;
-  fDBServersSafe.Enter;
+  fSafe.Lock; // protect fDBServers[]
   try
     if cardinal(Index)<cardinal(length(fDBServers)) then
       result := fDBServers[Index].Server;
   finally
-    fDBServersSafe.Leave;
+    fSafe.UnLock;
   end;
 end;
 
@@ -830,12 +757,12 @@ begin
   result := '';
   if self=nil then
     exit;
-  fDBServersSafe.Enter;
+  fSafe.Lock; // protect fDBServers[]
   try
     for i := 0 to high(fDBServers) do
       result := result+fDBServers[i].Server.Model.Root+' ';
   finally
-    fDBServersSafe.Leave;
+    fSafe.UnLock;
   end;
 end;
 
@@ -844,20 +771,20 @@ procedure TSQLHttpServer.SetDBServerAccessRight(Index: integer;
 begin
   if self=nil then
     exit;
-  fDBServersSafe.Enter;
+  fSafe.Lock; // protect fDBServers[]
   try
     if Value=nil then
       Value := HTTP_DEFAULT_ACCESS_RIGHTS;
     if cardinal(Index)<cardinal(length(fDBServers)) then
       fDBServers[Index].RestAccessRights := Value;
   finally
-    fDBServersSafe.Leave;
+    fSafe.UnLock;
   end;
 end;
 
 procedure TSQLHttpServer.SetDBServer(aIndex: integer; aServer: TSQLRestServer;
   aSecurity: TSQLHttpServerSecurity; aRestAccessRights: PSQLAccessRights);
-begin
+begin // caller should have made fSafe.Lock
   if (self<>nil) and (cardinal(aIndex)<cardinal(length(fDBServers))) then
     with fDBServers[aIndex] do begin
       Server := aServer;
@@ -876,7 +803,7 @@ const
   HTTPS_SECURITY: array[boolean] of TSQLHttpServerSecurity = (secNone, secSSL);
 
 procedure TSQLHttpServer.RootRedirectToURI(const aRedirectedURI: RawUTF8;
-  aRegisterURI,aHttps: boolean);
+  aRegisterURI: boolean; aHttps: boolean);
 begin
   if fRootRedirectToURI[aHttps]=aRedirectedURI then
     exit;
@@ -921,7 +848,7 @@ function TSQLHttpServer.Request(Ctxt: THttpServerRequest): cardinal;
 var call: TSQLRestURIParams;
     i,hostlen: integer;
     P: PUTF8Char;
-    hostroot,redirect: RawUTF8;
+    headers,hostroot,redirect: RawUTF8;
     match: TSQLRestModelMatch;
     serv: TSQLRestServer;
 begin
@@ -937,12 +864,14 @@ begin
      not IdemPChar(pointer(Ctxt.InContentType),JSON_CONTENT_TYPE_UPPER)) then
     // wrong Input parameters or not JSON request: 400 BAD REQUEST
     result := HTTP_BADREQUEST else
-  if Ctxt.Method='OPTIONS' then begin
-    // handle CORS headers control
-    Ctxt.OutCustomHeaders := 'Access-Control-Allow-Headers: '+
-      FindIniNameValue(pointer(Ctxt.InHeaders),'ACCESS-CONTROL-REQUEST-HEADERS: ')+
-      fAccessControlAllowOriginHeader;
-    result := HTTP_SUCCESS;
+  if Ctxt.Method='OPTIONS' then begin // handle CORS
+    if fAccessControlAllowOrigin='' then
+      Ctxt.OutCustomHeaders := 'Access-Control-Allow-Origin:' else begin
+      FindNameValue(Ctxt.InHeaders,'ACCESS-CONTROL-REQUEST-HEADERS:',headers);
+      Ctxt.OutCustomHeaders := 'Access-Control-Allow-Headers: '+headers;
+      ComputeAccessControlHeader(Ctxt);
+    end;
+    result := HTTP_NOCONTENT;
   end else begin
     // compute URI, handling any virtual host domain
     call.Init;
@@ -956,8 +885,8 @@ begin
           include(call.LowLevelFlags,llfSecured);
     end;
     if fHosts.Count>0 then begin
-      hostroot := FindIniNameValue(pointer(Ctxt.InHeaders),'HOST: ');
-      i := PosEx(':',hostroot);
+      FindNameValue(Ctxt.InHeaders,'HOST: ',hostroot);
+      i := PosExChar(':',hostroot);
       if i>0 then
         SetLength(hostroot,i-1); // trim any port
       if hostroot<>'' then // e.g. 'Host: project1.com' -> 'root1'
@@ -969,27 +898,27 @@ begin
         if Ctxt.URL[1]='/' then
           call.Url := hostroot+Ctxt.URL else
           call.Url := hostroot+'/'+Ctxt.URL else
-      if Ctxt.URL[1]='/' then
-        call.Url := copy(Ctxt.URL,2,maxInt) else
-        call.Url := Ctxt.URL;
+      if (Ctxt.URL<>'') and (Ctxt.URL[1]='/') then
+          call.Url := copy(Ctxt.URL,2,maxInt) else
+          call.Url := Ctxt.URL;
     // search and call any matching TSQLRestServer instance
     result := HTTP_NOTFOUND; // page not found by default (in case of wrong URL)
     serv := nil;
     match := rmNoMatch;
-    fDBServersSafe.Enter;
+    fSafe.Lock; // protect fDBServers[]
     try
       for i := 0 to length(fDBServers)-1 do
-      with fDBServers[i] do
-      if Ctxt.UseSSL=(Security=secSSL) then begin // registered for http or https
-        match := Server.Model.URIMatch(call.Url);
-        if match=rmNoMatch then
-          continue;
-        call.RestAccessRights := RestAccessRights;
-        serv := Server;
-        break;
-      end;
+        with fDBServers[i] do
+        if Ctxt.UseSSL=(Security=secSSL) then begin // registered for http or https
+          match := Server.Model.URIMatch(call.Url);
+          if match=rmNoMatch then
+            continue;
+          call.RestAccessRights := RestAccessRights;
+          serv := Server;
+          break;
+        end;
     finally
-      fDBServersSafe.Leave;
+      fSafe.UnLock;
     end;
     if (match=rmNoMatch) or (serv=nil) then
       exit;
@@ -1031,12 +960,14 @@ begin
         Call.OutHead := StringReplaceAll(
           Call.OutHead,'; Path=/'+serv.Model.Root,'; Path=/')
     end;
-    Ctxt.OutCustomHeaders := Trim(call.OutHead)+
-      #13#10'Server-InternalState: '+Int32ToUtf8(call.OutInternalState);
+    Ctxt.OutCustomHeaders := Trim(call.OutHead);
+    if call.OutInternalState<>0 then
+      Ctxt.OutCustomHeaders := FormatUTF8('%'#13#10'Server-InternalState: %',
+        [Ctxt.OutCustomHeaders,call.OutInternalState]);
     // handle optional CORS origin
-    if ExistsIniName(pointer(call.InHead),'ORIGIN:') then
-      Ctxt.OutCustomHeaders := Trim(Ctxt.OutCustomHeaders+fAccessControlAllowOriginHeader) else
-      Ctxt.OutCustomHeaders := Trim(Ctxt.OutCustomHeaders);
+    if fAccessControlAllowOrigin<>'' then
+      ComputeAccessControlHeader(Ctxt);
+    Ctxt.OutCustomHeaders := trim(Ctxt.OutCustomHeaders);
   end;
 end;
 
@@ -1045,12 +976,12 @@ var i: integer;
 begin
   if self=nil then
     exit;
-  fDBServersSafe.Enter;
+  fSafe.Lock; // protect fDBServers[]
   try
     for i := 0 to high(fDBServers) do
       fDBServers[i].Server.EndCurrentThread(Sender);
   finally
-    fDBServersSafe.Leave;
+    fSafe.UnLock;
   end;
 end;
 
@@ -1060,37 +991,47 @@ begin
   if self=nil then
     exit;
   SetCurrentThreadName('% %/%%',[self,fPort,GetDBServerNames,Sender]);
-  fDBServersSafe.Enter;
+  fSafe.Lock; // protect fDBServers[]
   try
     for i := 0 to high(fDBServers) do
       fDBServers[i].Server.BeginCurrentThread(Sender);
   finally
-    fDBServersSafe.Leave;
+    fSafe.UnLock;
   end;
-end;
-
-procedure TSQLHttpServer.SetAccessControlAllowCredential(Value: boolean);
-begin
-  fAccessControlAllowCredentials := Value;
-  SetAccessControlAllowOrigin(fAccessControlAllowOrigin); // compute header
 end;
 
 procedure TSQLHttpServer.SetAccessControlAllowOrigin(const Value: RawUTF8);
+var patterns: TRawUTF8DynArray;
 begin
   fAccessControlAllowOrigin := Value;
-  if Value='' then
-    fAccessControlAllowOriginHeader :=
-      #13#10'Access-Control-Allow-Origin: ' else begin
-    fAccessControlAllowOriginHeader :=
-      #13#10'Access-Control-Allow-Methods: POST, PUT, GET, DELETE, LOCK, OPTIONS'+
-      #13#10'Access-Control-Max-Age: 1728000'+
-      // see http://blog.import.io/tech-blog/exposing-headers-over-cors-with-access-control-expose-headers
-      #13#10'Access-Control-Expose-Headers: content-length,location,server-internalstate'+
-      #13#10'Access-Control-Allow-Origin: '+Value;
-    if fAccessControlAllowCredentials then
-      fAccessControlAllowOriginHeader := fAccessControlAllowOriginHeader+
-        #13#10'Access-Control-Allow-Credentials: true';
-  end;
+  FreeAndNil(fAccessControlAllowOriginsMatch);
+  if (Value='') or (Value='*') then
+    exit;
+  CSVToRawUTF8DynArray(pointer(Value),patterns);
+  if patterns=nil then
+    exit;
+  fAccessControlAllowOriginsMatch := TMatchs.Create(patterns,{caseinsensitive=}true);
+end;
+
+procedure TSQLHttpServer.ComputeAccessControlHeader(Ctxt: THttpServerRequest);
+var origin: RawUTF8;
+begin // caller did ensure that fAccessControlAllowOrigin<>''
+  FindNameValue(Ctxt.InHeaders,'ORIGIN: ',origin);
+  if origin='' then
+    exit;
+  if fAccessControlAllowOrigin='*' then
+    origin := fAccessControlAllowOrigin else
+    if fAccessControlAllowOriginsMatch.Match(origin)<0 then
+      exit;
+  Ctxt.OutCustomHeaders := Ctxt.OutCustomHeaders+
+    #13#10'Access-Control-Allow-Methods: POST, PUT, GET, DELETE, LOCK, OPTIONS'+
+    #13#10'Access-Control-Max-Age: 1728000'+
+    // see http://blog.import.io/tech-blog/exposing-headers-over-cors-with-access-control-expose-headers
+    #13#10'Access-Control-Expose-Headers: content-length,location,server-internalstate'+
+    #13#10'Access-Control-Allow-Origin: '+origin;
+  if fAccessControlAllowCredential then
+    Ctxt.OutCustomHeaders := Ctxt.OutCustomHeaders+
+      #13#10'Access-Control-Allow-Credentials: true';
 end;
 
 function TSQLHttpServer.WebSocketsEnable(
@@ -1118,7 +1059,7 @@ begin
 end;
 
 function TSQLHttpServer.NotifyCallback(aSender: TSQLRestServer;
-  const aInterfaceDotMethodName, aParams: RawUTF8; aConnectionID: Int64;
+  const aInterfaceDotMethodName, aParams: RawUTF8; aConnectionID: THttpServerConnectionID;
   aFakeCallID: integer; aResult, aErrorMsg: PRawUTF8): boolean;
 var ctxt: THttpServerRequest;
     status: cardinal;
@@ -1131,8 +1072,8 @@ begin
       // -> checked in WebSocketsCallback/IsActiveWebSocket
       ctxt := THttpServerRequest.Create(nil,aConnectionID,nil);
       try
-        ctxt.Prepare(FormatUTF8('%/%/%',[aSender.Model.Root,
-          aInterfaceDotMethodName,aFakeCallID]),'POST','','['+aParams+']','','');
+        ctxt.Prepare(FormatUTF8('%/%/%',[aSender.Model.Root,aInterfaceDotMethodName,
+          aFakeCallID]),'POST','','['+aParams+']','','',{ssl=}false);
         status := fHttpServer.Callback(ctxt,aResult=nil);
         if status=HTTP_SUCCESS then begin
           if aResult<>nil then
@@ -1158,12 +1099,12 @@ begin
 end;
 
 constructor TSQLHttpServer.Create(aServer: TSQLRestServer;
-  aDefinition: TSQLHttpServerDefinition; aForcedKind: TSQLHttpServerOptions);
+  aDefinition: TSQLHttpServerDefinition; aForcedKind: TSQLHttpServerOptions;
+  aWebSocketsLoopDelay: integer);
 const AUTH: array[TSQLHttpServerRestAuthentication] of TSQLRestServerAuthenticationClass = (
   // adDefault, adHttpBasic, adWeak, adSSPI
   TSQLRestServerAuthenticationDefault, TSQLRestServerAuthenticationHttpBasic,
-  TSQLRestServerAuthenticationNone,
-  {$ifdef MSWINDOWS}TSQLRestServerAuthenticationSSPI{$else}nil{$endif});
+  TSQLRestServerAuthenticationNone,TSQLRestServerAuthenticationSSPI{may be nil});
 var a: TSQLHttpServerRestAuthentication;
     thrdCnt: integer;
     websock: TWebSocketServerRest;
@@ -1177,8 +1118,12 @@ begin
     thrdCnt := aDefinition.ThreadCount;
   Create(aDefinition.BindPort,aServer,'+',aForcedKind,nil,thrdCnt,
     HTTPS_SECURITY[aDefinition.Https],'',aDefinition.HttpSysQueueName);
-  if aDefinition.EnableCORS then
-    AccessControlAllowOrigin := '*';
+  if aDefinition.EnableCORS<>'' then begin
+    AccessControlAllowOrigin := aDefinition.EnableCORS;
+    AccessControlAllowCredential := true;
+  end;
+  if fHttpServer<>nil then
+    fHttpServer.RemoteIPHeader := aDefinition.RemoteIPHeader;
   a := aDefinition.Authentication;
   if aServer.HandleAuthentication then
     if AUTH[a]=nil then
@@ -1190,6 +1135,7 @@ begin
     websock := WebSocketsEnable(aServer,aDefinition.PasswordPlain);
     if HttpServerFullWebSocketsLog then
       websock.Settings.SetFullLog;
+    websock.Settings^.LoopDelay := aWebSocketsLoopDelay;
   end;
 end;
 

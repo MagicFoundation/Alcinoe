@@ -6,7 +6,7 @@ unit mORMotVCL;
 {
     This file is part of Synopse mORmot framework.
 
-    Synopse mORMot framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit mORMotVCL;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -57,7 +57,7 @@ unit mORMotVCL;
 
 }
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 interface
 
@@ -160,7 +160,7 @@ type
     DBSize: Integer;
     SQLType: TSQLFieldType;
     SQLIndex: integer;
-    EnumType: Pointer;
+    FieldType: PSQLTableFieldType;
   end;
 
 /// get low-level DB.pas field information
@@ -190,7 +190,7 @@ function JSONToDataSet(aOwner: TComponent; const aJSON: RawUTF8
 // - with Unicode version of Delphi (2009+), string/UnicodeString will be used
 function JSONTableToDataSet(aOwner: TComponent; const aJSON: RawUTF8;
   const Tables: array of TSQLRecordClass
-  {$ifndef UNICODE}; aForceWideString: boolean=false{$endif}): TSynSQLTableDataSet; 
+  {$ifndef UNICODE}; aForceWideString: boolean=false{$endif}): TSynSQLTableDataSet;
 
 /// convert a JSON result into a VCL DataSet, with a given set of column types
 // - this function is just a wrapper around TSynSQLTableDataSet.CreateFromJSON()
@@ -221,7 +221,7 @@ end;
 
 function JSONTableToDataSet(aOwner: TComponent; const aJSON: RawUTF8;
   const Tables: array of TSQLRecordClass
-  {$ifndef UNICODE}; aForceWideString: boolean=false{$endif}): TSynSQLTableDataSet;
+  {$ifndef UNICODE}; aForceWideString: boolean{$endif}): TSynSQLTableDataSet;
 begin
   result := TSynSQLTableDataSet.CreateFromJSON(
     aOwner,aJSON,Tables{$ifndef UNICODE},aForceWideString{$endif});
@@ -248,11 +248,11 @@ constructor TSynSQLTableDataSet.CreateOwnedTable(Owner: TComponent; Table: TSQLT
 begin
   Create(Owner,Table{$ifndef UNICODE},ForceWideString{$endif});
   if Table<>nil then
-    TableShouldBeFreed := true;
+    fTableShouldBeFreed := true;
 end;
 
 constructor TSynSQLTableDataSet.CreateFromJSON(Owner: TComponent; const JSON: RawUTF8
-  {$ifndef UNICODE}; ForceWideString: boolean=false{$endif});
+  {$ifndef UNICODE}; ForceWideString: boolean{$endif});
 var T: TSQLTable;
 begin
   T := TSQLTableJSON.Create('',JSON);
@@ -266,7 +266,7 @@ end;
 
 constructor TSynSQLTableDataSet.CreateFromJSON(Owner: TComponent; const JSON: RawUTF8;
   const ColumnTypes: array of TSQLFieldType
-  {$ifndef UNICODE}; ForceWideString: boolean=false{$endif});
+  {$ifndef UNICODE}; ForceWideString: boolean{$endif});
 var T: TSQLTable;
 begin
   T := TSQLTableJSON.CreateWithColumnTypes(ColumnTypes,'',JSON);
@@ -280,7 +280,7 @@ end;
 
 constructor TSynSQLTableDataSet.CreateFromJSON(Owner: TComponent; const JSON: RawUTF8;
   const Tables: array of TSQLRecordClass
-  {$ifndef UNICODE}; ForceWideString: boolean=false{$endif});
+  {$ifndef UNICODE}; ForceWideString: boolean{$endif});
 var T: TSQLTable;
 begin
   T := TSQLTableJSON.CreateFromTables(Tables,'',JSON);
@@ -309,42 +309,37 @@ end;
 
 function TSynSQLTableDataSet.GetRowFieldData(Field: TField; RowIndex: integer;
   out ResultLen: Integer; OnlyCheckNull: boolean): Pointer;
-var SQLType: TSQLFieldType;
-    EnumType: Pointer;
+var info: PSQLTableFieldType;
     F: integer;
     P: PUTF8Char;
 label Txt;
 begin
   result := nil;
   F := Field.Index;
-  inc(RowIndex);
-  if (cardinal(RowIndex)>cardinal(fTable.RowCount)) or
-     (cardinal(F)>=cardinal(fTable.FieldCount)) then
-    exit;
+  inc(RowIndex); // first TSQLTable row are field names
   P := fTable.Get(RowIndex,F);
-  if P=nil then // null field -> result := nil
+  if P=nil then // null field or out-of-range RowIndex/F -> result := nil
     exit;
   result := @fTemp64; // let result point to Int64, Double or TDatetime
   if OnlyCheckNull then
     exit;
-  SQLType := fTable.FieldType(F,@EnumType);
-  case SQLType of
+  case fTable.FieldType(F,info) of
   sftBoolean, sftInteger, sftID, sftTID:
     SetInt64(P,fTemp64);
   sftFloat, sftCurrency:
-    PDouble(@fTemp64)^ := GetExtended(P);
+    unaligned(PDouble(@fTemp64)^) := GetExtended(P);
   sftEnumerate, sftSet:
-    if EnumType=nil then
+    if info^.ContentTypeInfo=nil then
       SetInt64(P,fTemp64) else
       goto Txt;
   sftDateTime, sftDateTimeMS:
-    PDouble(@fTemp64)^ := Iso8601ToDateTimePUTF8Char(P,0);
+    unaligned(PDouble(@fTemp64)^) := Iso8601ToDateTimePUTF8Char(P,0);
   sftTimeLog, sftModTime, sftCreateTime:
-    PDouble(@fTemp64)^ := TimeLogToDateTime(GetInt64(P));
+    unaligned(PDouble(@fTemp64)^) := TimeLogToDateTime(GetInt64(P));
   sftUnixTime:
-    PDouble(@fTemp64)^ := UnixTimeToDateTime(GetInt64(P));
+    unaligned(PDouble(@fTemp64)^) := UnixTimeToDateTime(GetInt64(P));
   sftUnixMSTime:
-    PDouble(@fTemp64)^ := UnixMSTimeToDateTime(GetInt64(P));
+    unaligned(PDouble(@fTemp64)^) := UnixMSTimeToDateTime(GetInt64(P));
   sftBlob: begin
     fTempBlob := BlobToTSQLRawBlob(P);
     result := pointer(fTempBlob);
@@ -378,7 +373,7 @@ begin
     sftFloat, sftCurrency:
       aField.AsFloat := GetExtended(P);
     sftEnumerate, sftSet:
-      if EnumType=nil then
+      if FieldType^.ContentTypeInfo=nil then
         aField.AsInteger := GetInteger(P) else
         aField.AsString := aTable.GetString(aRow,SQLIndex);
     sftDateTime, sftDateTimeMS:
@@ -417,7 +412,7 @@ begin
 end;
 
 procedure GetDBFieldDef(aTable: TSQLTable; aField: integer;
-  out DBFieldDef: TDBFieldDef{$ifndef UNICODE}; aForceWideString: boolean=false{$endif});
+  out DBFieldDef: TDBFieldDef{$ifndef UNICODE}; aForceWideString: boolean{$endif});
 begin
   with DBFieldDef do begin
     DBSize := 0;
@@ -427,7 +422,7 @@ begin
       DBType := DB.ftUnknown;
       SQLType := sftUnknown;
     end else begin
-      SQLType := aTable.FieldType(aField,@EnumType);
+      SQLType := aTable.FieldType(aField,FieldType);
       case SQLType of
       sftBoolean:
         DBType := ftBoolean;
@@ -436,7 +431,7 @@ begin
       sftFloat, sftCurrency:
         DBType := ftFloat;
       sftEnumerate, sftSet:
-        if EnumType=nil then
+        if FieldType^.ContentTypeInfo=nil then
           DBType := ftInteger else begin
           DBSize := 64;
           DBType := ftDefaultVCLString;

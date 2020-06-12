@@ -6,7 +6,7 @@ unit SynVirtualDataSet;
 {
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit SynVirtualDataSet;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -49,13 +49,9 @@ unit SynVirtualDataSet;
 
   ***** END LICENSE BLOCK *****
 
-  Version 1.18
-  - first public release, corresponding to Synopse mORMot Framework 1.18
-
-
 }
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 interface
 
@@ -69,6 +65,7 @@ uses
   Variants,
   {$endif}
   SynCommons,
+  SynTable,
   {$ifdef ISDELPHIXE2}
   System.Generics.Collections,
   Data.DB, Data.FMTBcd;
@@ -235,7 +232,7 @@ procedure AddBcd(WR: TTextWriter; const AValue: TBcd);
 type
   /// a string buffer, used by InternalBCDToBuffer to store its output text
   TBCDBuffer = array[0..66] of AnsiChar;
-  
+
 /// convert a TBcd value as text to the output buffer
 // - buffer is to be array[0..66] of AnsiChar
 // - returns the resulting text start in PBeg, and the length as function result
@@ -448,17 +445,14 @@ var Data, Dest: pointer;
     OnlyTestForNull: boolean;
     TS: TTimeStamp;
 begin
-  result := false;
   OnlyTestForNull := (Buffer=nil);
   RowIndex := PRecInfo(ActiveBuffer).RowIndentifier;
   Data := GetRowFieldData(Field,RowIndex,DataLen,OnlyTestForNull);
-  if Data=nil then // on success, points to Int64,Double,Blob,UTF8
-    exit;
-  result := true;
-  if OnlyTestForNull then
+  result := Data<>nil; // null field or out-of-range RowIndex/Field
+  if OnlyTestForNull or not result then
     exit;
   Dest := pointer(Buffer); // works also if Buffer is [var] TValueBuffer
-  case Field.DataType of
+  case Field.DataType of // Data^ points to Int64,Double,Blob,UTF8
   ftBoolean:
     PWORDBOOL(Dest)^ := PBoolean(Data)^;
   ftInteger:
@@ -731,7 +725,7 @@ type // as in FMTBcd.pas
     VType: TVarType;
     Reserved1, Reserved2, Reserved3: Word;
     VBcd: TFMTBcdData;
-    Reserved4: LongWord;
+    Reserved4: Cardinal;
   end;
 
 class procedure TSynVirtualDataSet.BcdWrite(const aWriter: TTextWriter; const aValue);
@@ -820,7 +814,7 @@ begin
         ftLongWord:
           W.AddU(TLongWordField(Data.Fields[f]).Value);
         ftExtended:
-          W.Add(AsFloat,DOUBLE_PRECISION);
+          W.AddDouble(AsFloat);
         ftSingle:
           W.Add(AsFloat,SINGLE_PRECISION);
         {$endif}
@@ -846,7 +840,7 @@ end;
 constructor TDocVariantArrayDataSet.Create(Owner: TComponent;
   const Data: TVariantDynArray; const ColumnNames: array of RawUTF8;
   const ColumnTypes: array of TSQLDBFieldType);
-var n,ndx,j: integer;
+var n,ndx,j: PtrInt;
     first: PDocVariantData;
 begin
   fValues := Data;
@@ -867,19 +861,19 @@ begin
       fColumns[ndx].Name := first^.Names[ndx];
       fColumns[ndx].FieldType := VariantTypeToSQLDBFieldType(first^.Values[ndx]);
       case fColumns[ndx].FieldType of
-      SynCommons.ftNull:
-        fColumns[ndx].FieldType := SynCommons.ftBlob;
-      SynCommons.ftCurrency:
-        fColumns[ndx].FieldType := SynCommons.ftDouble;
-      SynCommons.ftInt64: // ensure type coherency of whole column
+      SynTable.ftNull:
+        fColumns[ndx].FieldType := SynTable.ftBlob;
+      SynTable.ftCurrency:
+        fColumns[ndx].FieldType := SynTable.ftDouble;
+      SynTable.ftInt64: // ensure type coherency of whole column
         for j := 1 to first^.Count-1 do
           if j>=Length(fValues) then // check objects are consistent
             break else
             with _Safe(fValues[j],dvObject)^ do
             if (ndx<Length(Names)) and IdemPropNameU(Names[ndx],fColumns[ndx].Name) then
             if VariantTypeToSQLDBFieldType(Values[ndx]) in
-                [SynCommons.ftNull,SynCommons.ftDouble,SynCommons.ftCurrency] then begin
-              fColumns[ndx].FieldType := SynCommons.ftDouble;
+                [SynTable.ftNull,SynTable.ftDouble,SynTable.ftCurrency] then begin
+              fColumns[ndx].FieldType := SynTable.ftDouble;
               break;
             end;
       end;
@@ -902,7 +896,7 @@ begin
   F := Field.Index;
   if (cardinal(RowIndex)<cardinal(length(fValues))) and
      (cardinal(F)<cardinal(length(fColumns))) and
-     not (fColumns[F].FieldType in [ftNull,SynCommons.ftUnknown,SynCommons.ftCurrency]) then
+     not (fColumns[F].FieldType in [ftNull,SynTable.ftUnknown,SynTable.ftCurrency]) then
     with _Safe(fValues[RowIndex])^ do
     if (Kind=dvObject) and (Count>0) then begin
       if IdemPropNameU(fColumns[F].Name,Names[F]) then
@@ -916,14 +910,14 @@ begin
           case fColumns[F].FieldType of
           ftInt64:
             VariantToInt64(Values[ndx],fTemp64);
-          ftDouble,SynCommons.ftDate:
-            VariantToDouble(Values[ndx],PDouble(@fTemp64)^);
+          ftDouble,SynTable.ftDate:
+            VariantToDouble(Values[ndx],unaligned(PDouble(@fTemp64)^));
           ftUTF8: begin
             VariantToUTF8(Values[ndx],fTempUTF8,wasString);
             result := pointer(fTempUTF8);
             ResultLen := length(fTempUTF8);
           end;
-          SynCommons.ftBlob: begin
+          SynTable.ftBlob: begin
             VariantToUTF8(Values[ndx],fTempUTF8,wasString);
             if Base64MagicCheckAndDecode(pointer(fTempUTF8),length(fTempUTF8),fTempBlob) then begin
               result := pointer(fTempBlob);

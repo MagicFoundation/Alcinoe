@@ -6,6 +6,7 @@ uses
   SysUtils,
   Classes,
   SynCommons,
+  SynTable,
   mORMot,
   mORMotHttpClient,
   Project31LongWorkCallbackInterface in 'Project31LongWorkCallbackInterface.pas';

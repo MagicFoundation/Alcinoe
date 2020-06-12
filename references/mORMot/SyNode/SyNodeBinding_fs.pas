@@ -9,22 +9,32 @@ interface
 {$I SyNode.inc}
 
 uses
+  SysUtils,
   SynCommons,
   SpiderMonkey,
   SyNode;
 
-function os_realpath(const FileName: SynUnicode; var TargetName: SynUnicode): Boolean;
+function os_realpath(const FileName: TFileName; var TargetName: TFileName): Boolean;
 
 implementation
 
+{$IFNDEF SM_DEBUG}
+  {$UNDEF SM_DEBUG_FSTRACEFILEREAD}
+  {$UNDEF SM_DEBUG_FSDUMPFILEEXCERPT}
+{$ENDIF}
+
 uses
-  SysUtils,
 {$IFDEF MSWINDOWS}
   Windows,
 {$ELSE}
   Unix, BaseUnix, DateUtils,
 {$ENDIF}
-  Classes;
+{$IFDEF FPC}
+  LazFileUtils,
+{$ENDIF}
+  SyNodeReadWrite,
+  Classes,
+  SynLog;
 
 /// decode text file to string using BOM
 //  if BOM not fount - use current system code page to convert ANSI content to unicode
@@ -50,8 +60,11 @@ begin
       forceUTF8 := in_argv[1].asBoolean;
 
     name := in_argv[0].asJSString.ToString(cx);
+    {$ifdef SM_DEBUG_FSTRACEFILEREAD}
+    SynSMLog.Add.Log(sllDebug, 'fs_loadFile (%) called', name);
+    {$ENDIF}
     if not FileExists(name) then
-      raise ESMException.Create('file  not exists');
+      raise ESMException.Create('file does not exist');
     // implementation below dont work if called in the same time from differnt thread
     // TFileStream.Create(name, fmOpenRead).Free; // Check that file exists and can be opened;
     vp.rval := cx.NewJSString(AnyTextFileToRawUTF8(name, forceUTF8)).ToJSVal;
@@ -98,7 +111,7 @@ end;
 //    ctime: Date  // create time
 //    size: Number
 //  }
-// or null is file not exists
+// or null is file does not exist
 function fs_fileStat(cx: PJSContext; argc: uintN; var vp: jsargRec): Boolean; cdecl;
 const
   USAGE = 'usage: fileStat(filePath: string;)';
@@ -130,25 +143,27 @@ begin
     in_argv := vp.argv;
     if (argc < 1) or not in_argv[0].isString then
       raise ESMException.Create(USAGE);
-    try
-      fn := in_argv[0].asJSString.ToSynUnicode(cx);
-    except
-      raise
-    end;
+    fn := in_argv[0].asJSString.ToString(cx);
     obj := cx.NewRootedObject(cx.NewObject(nil));
     try
       {$IFNDEF MSWINDOWS}
-      if fpstat(fn, info) <> 0 then
-        raise EOSError.CreateFmt('fstat failed with error no #', [fpgeterrno]);
-      val.asDate[cx] := UnixToDateTime(info.st_atime);
-      obj.ptr.DefineProperty(cx, 'atime', val, JSPROP_ENUMERATE or JSPROP_READONLY, nil, nil);
-      val.asDate[cx] := UnixToDateTime(info.st_mtime);
-      obj.ptr.DefineProperty(cx, 'mtime', val, JSPROP_ENUMERATE or JSPROP_READONLY, nil, nil);
-      val.asDate[cx] := UnixToDateTime(info.st_ctime);
-      obj.ptr.DefineProperty(cx, 'ctime', val, JSPROP_ENUMERATE or JSPROP_READONLY, nil, nil);
-      val.asInt64 := info.st_size;
-      obj.ptr.DefineProperty(cx, 'size', val, JSPROP_ENUMERATE or JSPROP_READONLY, nil, nil);
-      vp.rval := obj.ptr.ToJSValue;
+      if fpstat(PChar(fn), info) = 0 then begin
+        val.asDate[cx] := UnixToDateTime(info.st_atime);
+        obj.ptr.DefineProperty(cx, 'atime', val, JSPROP_ENUMERATE or JSPROP_READONLY, nil, nil);
+        val.asDate[cx] := UnixToDateTime(info.st_mtime);
+        obj.ptr.DefineProperty(cx, 'mtime', val, JSPROP_ENUMERATE or JSPROP_READONLY, nil, nil);
+        val.asDate[cx] := UnixToDateTime(info.st_ctime);
+        obj.ptr.DefineProperty(cx, 'ctime', val, JSPROP_ENUMERATE or JSPROP_READONLY, nil, nil);
+        val.asInt64 := info.st_size;
+        obj.ptr.DefineProperty(cx, 'size', val, JSPROP_ENUMERATE or JSPROP_READONLY, nil, nil);
+        vp.rval := obj.ptr.ToJSValue;
+      end else begin
+        {$ifdef SM_DEBUG}
+        SynSMLog.Add.Log(sllDebug, 'fstat(%) failed with error %',
+          [fn, SysErrorMessage(errno)]);
+        {$endif}
+        vp.rval := JSVAL_NULL;
+      end;
       {$ELSE}
       {$ifdef ISDELPHIXE2}
       if FileGetDateTimeInfo(fn, infoRec, true) then begin
@@ -204,14 +219,14 @@ const
   USAGE = 'usage: directoryExists(dirPath: string;)';
 var
   in_argv: PjsvalVector;
-  filePath: string;
+  filePath: TFileName;
   val: jsval;
 begin
   try
     in_argv := vp.argv;
     if (argc < 1) or not in_argv[0].isString then
       raise ESMException.Create(USAGE);
-    filePath := in_argv[0].asJSString.ToSynUnicode(cx);
+    filePath := in_argv[0].asJSString.ToString(cx);
     val.asBoolean := DirectoryExists(filePath);
     vp.rval := val;
     Result := True;
@@ -232,14 +247,14 @@ const
   USAGE = 'usage: fileExists(filePath: string;)';
 var
   in_argv: PjsvalVector;
-  filePath: string;
+  filePath: TFileName;
   val: jsval;
 begin
   try
     in_argv := vp.argv;
     if (argc < 1) or not in_argv[0].isString then
       raise ESMException.Create(USAGE);
-    filePath := in_argv[0].asJSString.ToSynUnicode(cx);
+    filePath := in_argv[0].asJSString.ToString(cx);
     val.asBoolean := FileExists(filePath);
     vp.rval := val;
     Result := True;
@@ -261,17 +276,40 @@ const
   USAGE = 'usage: internalModuleReadFile(filePath: string;)';
 var
   in_argv: PjsvalVector;
-  filePath: string;
+  filePath: TFileName;
+  fileContent: jsval;
+  {$ifdef SM_DEBUG_FSDUMPFILEEXCERPT}
+  len: size_t;
+  content: RawUTF8;
+  {$endif}
 begin
   try
     in_argv := vp.argv;
     if (argc < 1) or not in_argv[0].isString then
       raise ESMException.Create(USAGE);
     filePath := in_argv[0].asJSString.ToString(cx);
-    if FileExists(filePath) then
-      vp.rval := cx.NewJSString(AnyTextFileToRawUTF8(filePath, true)).ToJSVal
-    else
+    {$ifdef SM_DEBUG_FSTRACEFILEREAD}
+    SynSMLog.Add.Log(sllDebug, 'fs_internalModuleReadFile (%) called', filePath);
+    {$ENDIF}
+    if FileExists(filePath) then begin
+      fileContent := cx.NewJSString(AnyTextFileToRawUTF8(filePath, true)).ToJSVal;
+      vp.rval := fileContent;
+      {$ifdef SM_DEBUG_FSDUMPFILEEXCERPT}
+      len := fileContent.asJSString.Length;
+      content := fileContent.asJSString.ToUTF8(cx);
+      if len > 120 then
+        content := Format('%s .. %s', [Copy(content, 1, 58), Copy(content, len-58, 58)]);
+      SynSMLog.Add.Log(sllDebug,
+        'fs_internalModuleReadFile (%): content loaded, length = % content:'#13'%',
+        [filePath, len, content]);
+      {$endif}
+    end else begin
       vp.rval := JSVAL_VOID;
+      {$ifdef SM_DEBUG}
+      SynSMLog.Add.Log(sllDebug,
+        'fs_internalModuleReadFile (%): file not found', StringToUTF8(filePath));
+      {$endif}
+    end;
 
     Result := True;
   except
@@ -301,7 +339,7 @@ begin
     if (argc < 1) or not in_argv[0].isString then
       raise ESMException.Create(USAGE);
     try
-      fn := in_argv[0].asJSString.ToSynUnicode(cx);
+      fn := in_argv[0].asJSString.ToString(cx);
     except
       raise
     end;
@@ -338,7 +376,7 @@ end;
 function fs_readDir(cx: PJSContext; argc: uintN; var vp: jsargRec): Boolean; cdecl;
 var
   in_argv: PjsvalVector;
-  dir, founded: TFileName;
+  dir: TFileName;
   F: TSearchRec;
   res: PJSRootedObject;
   cNum, searchAttr: integer;
@@ -355,7 +393,7 @@ begin
     else
       includeFolders := false;
 
-    dir := in_argv[0].asJSString.ToSynUnicode(cx);
+    dir := in_argv[0].asJSString.ToString(cx);
     if not DirectoryExists(Dir) then
     begin
       vp.rval := JSVAL_NULL;
@@ -371,12 +409,11 @@ begin
       searchAttr := faAnyFile;
       if not includeFolders then
         searchAttr := searchAttr - faDirectory;
-      if FindFirst(Dir + '*.*', searchAttr, F) = 0 then begin
+      if FindFirst(Dir + '*', searchAttr, F) = 0 then begin
         cNum := 0;
         repeat
           if (F.Name <> '.') and (F.Name <> '..') then begin
-            founded := F.Name;
-            res.ptr.SetElement(cx, cNum, cx.NewJSString(founded).ToJSVal);
+            res.ptr.SetElement(cx, cNum, cx.NewJSString(F.Name).ToJSVal);
             inc(cNum);
           end;
         until FindNext(F) <> 0;
@@ -399,29 +436,33 @@ begin
 end;
 
 {$ifdef MSWINDOWS}
-{$ifdef FPC}
+{$if defined(FPC) or not defined(ISDELPHIXE2)}
 const VOLUME_NAME_DOS = $0;
-function GetFinalPathNameByHandleW(hFile: THandle; lpszFilePath: LPWSTR;
-  cchFilePath, dwFlags: DWORD): DWORD; stdcall; external kernel32;
-{$endif}
 
-const LONG_PATH_PREFIX: PWideChar = '\\?\';
-const UNC_PATH_PREFIX: PWideChar = '\\?\UNC\';
+// Only Wide version return a value
+function GetFinalPathNameByHandleW(hFile: THandle; lpszFilePath: LPWSTR;
+  cchFilePath: DWORD; dwFlags: DWORD): DWORD; stdcall; external kernel32;
+{$ifend}
+
+const LONG_PATH_PREFIX: PChar = '\\?\';
+const UNC_PATH_PREFIX: PChar = '\\?\UNC\';
 {$else}
 function realpath(name: PChar; resolved: PChar): PChar; cdecl; external 'c' name 'realpath';
 {$endif}
 
 /// Implementation of realpath as in libuv
-function os_realpath(const FileName: SynUnicode; var TargetName: SynUnicode): Boolean;
+function os_realpath(const FileName: TFileName; var TargetName: TFileName): Boolean;
 {$ifdef MSWINDOWS}
+{$WARN SYMBOL_PLATFORM OFF}
 var
   Handle: THandle;
   w_realpath_len: Cardinal;
+  Res: WideString;
 begin
   Result := False;
   if not CheckWin32Version(6, 0) then
     exit;
-  Handle := CreateFileW(pointer(FileName), GENERIC_READ, FILE_SHARE_READ, nil,
+  Handle := CreateFile(PChar(FileName), GENERIC_READ, FILE_SHARE_READ, nil,
     OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL or FILE_FLAG_BACKUP_SEMANTICS, 0);
   if Handle = INVALID_HANDLE_VALUE then
     exit;
@@ -429,28 +470,30 @@ begin
     w_realpath_len := GetFinalPathNameByHandleW(Handle, nil, 0, VOLUME_NAME_DOS);
     if (w_realpath_len = 0) then
       exit;
-    SetLength(TargetName, w_realpath_len);
-    if GetFinalPathNameByHandleW(Handle, PWideChar(TargetName), w_realpath_len, VOLUME_NAME_DOS) > 0 then begin
-      if StrLComp(PWideChar(TargetName), UNC_PATH_PREFIX, length(UNC_PATH_PREFIX)) = 0 then begin
+    SetLength(Res, w_realpath_len);
+    if GetFinalPathNameByHandleW(Handle, PWideChar(Res), w_realpath_len, VOLUME_NAME_DOS) > 0 then begin
+      WideCharToStrVar(PWideChar(Res), String(TargetName));
+      if StrLComp(PChar(TargetName), UNC_PATH_PREFIX, length(UNC_PATH_PREFIX)) = 0 then begin
         // convert \\?\UNC\host\folder -> \\host\folder
         TargetName := Copy(TargetName, 7, length(TargetName)-7);
         TargetName[1] := '\';
-      end else if StrLComp(PWideChar(TargetName), LONG_PATH_PREFIX, length(LONG_PATH_PREFIX)) = 0 then
-        TargetName := Copy(TargetName, length(LONG_PATH_PREFIX)+1, length(TargetName)-length(LONG_PATH_PREFIX)-1)
+      end else if StrLComp(PChar(TargetName), LONG_PATH_PREFIX, length(LONG_PATH_PREFIX)) = 0 then
+        TargetName := Copy(TargetName, length(LONG_PATH_PREFIX)+1, length(TargetName)-length(LONG_PATH_PREFIX))
       else
-       Exit; // error
+        Exit; // error
       Result := True;
     end;
   finally
     CloseHandle(Handle);
   end;
 end;
+{$WARN SYMBOL_PLATFORM ON}
 {$else}
 var
-  Buf: AnsiString;
+  Buf: TFileName;
 begin
   SetLength(Buf, PATH_MAX);
-  Result := realpath(PChar(SynUnicodeToString(FileName)), PChar(Buf)) <> nil;
+  Result := realpath(PChar(FileName), PChar(Buf)) <> nil;
   if Result then
     TargetName := PChar(Buf)
   else
@@ -464,7 +507,7 @@ end;
 // to produce a canonicalized absolute pathname
 function fs_realPath(cx: PJSContext; argc: uintN; var vp: jsargRec): Boolean; cdecl;
 var
-  dir, target: SynUnicode;
+  dir, target: TFileName;
 const
   USAGE = 'usage: realpath(dirPath: String): string';
 begin
@@ -472,7 +515,7 @@ begin
     if (argc < 1) or not vp.argv[0].isString then
       raise ESMException.Create(USAGE);
 
-    dir := vp.argv[0].asJSString.ToSynUnicode(cx);
+    dir := vp.argv[0].asJSString.ToString(cx);
     //if not FileGetSymLinkTarget(dir, target) then
     if not os_realpath(dir, target) then
       target := dir;
@@ -493,23 +536,242 @@ function fs_rename(cx: PJSContext; argc: uintN; var vp: jsargRec): Boolean; cdec
 const
   USAGE = 'usage: rename(fromPath, toPath: String)';
 var
-  fromPath, toPath: SynUnicode;
-  f : file;
+  fromPath, toPath: TFileName;
+  //f : file;
 begin
   try
     if (argc <> 2) or not vp.argv[0].isString or not vp.argv[1].isString then
       raise ESMException.Create(USAGE);
-    fromPath := vp.argv[0].asJSString.ToSynUnicode(cx);
-    toPath := vp.argv[1].asJSString.ToSynUnicode(cx);
-    AssignFile(f, fromPath);
-    // libc rename implementation rewrite destination if it exists
-    // Rename in delphi fail with Access deny. let's fix it
+    fromPath := vp.argv[0].asJSString.ToString(cx);
+    toPath := vp.argv[1].asJSString.ToString(cx);
+    {$IFDEF MSWINDOWS} // libc rename implementation rewrites destination if it's already exist
     if FileExists(toPath) then
-      SysUtils.DeleteFile(toPath);
-    Rename(f, toPath);
+      if not SysUtils.DeleteFile(toPath) then
+        RaiseLastOSError;
+    {$ENDIF}
+    if not SysUtils.RenameFile(fromPath, toPath) then
+      RaiseLastOSError;
     Result := True;
   except
     on E: Exception do begin
+      Result := False;
+      vp.rval := JSVAL_VOID;
+      JSError(cx, E);
+    end;
+  end;
+end;
+
+/// Create UInt8Array & load file into it
+function fs_loadFileToBuffer(cx: PJSContext; argc: uintN; var vp: jsargRec): Boolean; cdecl;
+var
+  in_argv: PjsvalVector;
+  filePath: string;
+  size: Int64;
+  arr_data: Puint8Vector;
+  fFileStream: TFileStream;
+  arr: PJSObject;
+  val: jsval;
+begin
+  try
+    if (argc <> 1) then
+      raise ESMException.Create('usage loadFileToBuffer(pathToFile: String): ArrayBuffer');
+    in_argv := vp.argv;
+    filePath := in_argv[0].asJSString.ToSynUnicode(cx);
+    {$IFNDEF FPC}
+    if IsRelativePath(filePath) then
+    {$ELSE}
+    if not FilenameIsAbsolute(filePath) then
+    {$ENDIF}
+      raise ESMException.Create('no relative path allowed in loadFile');
+    if not FileExists(filePath) then
+    begin
+      vp.rval := JSVAL_NULL;
+    end
+    else
+    begin
+      size := FileSize(filePath);
+      if PInt64Rec(@size)^.Hi > 0 then
+        raise ESMException.Create('file to large');
+      arr := cx.NewArrayBuffer(PInt64Rec(@size)^.Lo);
+      arr_data := arr.GetArrayBufferData;
+      fFileStream := TFileStream.Create(filePath, fmOpenRead or fmShareDenyNone);
+      try
+        fFileStream.Read(arr_data[0], size);
+      finally
+        fFileStream.Free;
+      end;
+      val.asObject := arr;
+      vp.rval := val;
+    end;
+    Result := True;
+  except
+    on E: Exception do
+    begin
+      Result := False;
+      vp.rval := JSVAL_VOID;
+      JSError(cx, E);
+    end;
+  end;
+end;
+
+/// write Object to file using specifien encoding.
+//  internaly use SyNodeReadWrite.write
+function fs_writeFile(cx: PJSContext; argc: uintN; var vp: jsargRec): Boolean; cdecl;
+var
+  in_argv: PjsvalVector;
+  filePath: string;
+  stream: TFileStream;
+  writer: SynCommons.TTextWriter;
+begin
+  try
+    if (argc < 2) then
+      raise ESMException.Create('usage writeFile(filePath: String, fileContent: String|Object|ArrayBuffer [,encoding]');
+    in_argv := vp.argv;
+    filePath := in_argv[0].asJSString.ToSynUnicode(cx);
+    stream := TFileStream.Create(filePath, fmCreate);
+    writer := SynCommons.TTextWriter.Create(stream, 65536);
+    try
+      vp.rval := SyNodeReadWrite.SMWrite_impl(cx, argc - 1, @in_argv[1], writer);
+      result := True;
+    finally
+      writer.FlushFinal;
+      writer.Free;
+      stream.Free;
+    end;
+  except
+    on E: Exception do
+    begin
+      Result := False;
+      vp.rval := JSVAL_VOID;
+      JSError(cx, E);
+    end;
+  end;
+end;
+
+/// append Object to file using specifien encoding.
+//  internaly use SyNodeReadWrite.write
+function fs_appendFile(cx: PJSContext; argc: uintN; var vp: jsargRec): Boolean; cdecl;
+var
+  in_argv: PjsvalVector;
+  filePath: string;
+  FFile: THandle;
+  stream: TFileStream;
+  writer: SynCommons.TTextWriter;
+begin
+  try
+    if (argc < 2) then
+      raise ESMException.Create('usage appendFile(filePath: String, fileContent: String|Object|ArrayBuffer [,encoding]');
+    in_argv := vp.argv;
+    filePath := in_argv[0].asJSString.ToSynUnicode(cx);
+    if not FileExists(filePath) then begin
+      FFile := FileCreate(filePath);
+      if PtrInt(FFile) > 0 then
+        FileClose(FFile);
+    end;
+
+    stream := TFileStream.Create(filePath, fmOpenReadWrite);
+    stream.Seek(0, soFromEnd);
+    writer := SynCommons.TTextWriter.Create(stream, 65536);
+    try
+      vp.rval := SyNodeReadWrite.SMWrite_impl(cx, argc - 1, @in_argv[1], writer);
+      result := True;
+    finally
+      writer.FlushFinal;
+      writer.Free;
+      stream.Free;
+    end;
+  except
+    on E: Exception do
+    begin
+      Result := False;
+      vp.rval := JSVAL_VOID;
+      JSError(cx, E);
+    end;
+  end;
+end;
+
+/// delete file AFileName: TFileName - full file path
+function fs_deleteFile(cx: PJSContext; argc: uintN; var vp: jsargRec): Boolean; cdecl;
+var
+  in_argv: PjsvalVector;
+  filePath: string;
+  val: jsval;
+begin
+  try
+    if (argc <> 1) then
+      raise ESMException.Create('Invalid number of args for function nsm_deleteFile. Requied 1  - filePath');
+    in_argv := vp.argv;
+    filePath := in_argv[0].asJSString.ToSynUnicode(cx);
+    if SysUtils.DeleteFile(filePath) then
+      val.asBoolean := True
+    else if fileExists(filePath) then
+      raise Exception.Create('can''t delete file')
+    else
+      val.asBoolean := True;
+    vp.rval := val;
+    Result := True;
+  except
+    on E: Exception do
+    begin
+      Result := False;
+      vp.rval := JSVAL_VOID;
+      JSError(cx, E);
+    end;
+  end;
+end;
+
+/// the same as SysUtils.ForceDirectories
+function fs_forceDirectories(cx: PJSContext; argc: uintN; var vp: jsargRec): Boolean; cdecl;
+var
+  in_argv: PjsvalVector;
+  dir: TFileName;
+  val: jsval;
+const
+  f_usage = 'usage: forceDirectories(dirPath: String): Boolean';
+  f_invalidPath = 'empty or relative path is not allowed';
+begin
+  try
+    in_argv := vp.argv;
+    if (argc <> 1) or not in_argv[0].isString then
+      raise ESMException.Create(f_usage);
+    dir := in_argv[0].asJSString.ToSynUnicode(cx);
+    if (dir = '') or {$IFNDEF FPC}IsRelativePath(dir){$ELSE}not FilenameIsAbsolute(dir){$ENDIF} then
+      raise ESMException.Create(f_invalidPath);
+    val.asBoolean := ForceDirectories(dir);
+    vp.rval := val;
+    Result := True;
+  except
+    on E: Exception do
+    begin
+      Result := False;
+      vp.rval := JSVAL_VOID;
+      JSError(cx, E);
+    end;
+  end;
+end;
+
+function fs_removeDir(cx: PJSContext; argc: uintN; var vp: jsargRec): Boolean; cdecl;
+var
+  in_argv: PjsvalVector;
+  dir: TFileName;
+  val: jsval;
+const
+  f_usage = 'usage: removeDir(dirPath: String): Boolean';
+  f_invalidPath = 'empty or relative path is not allowed';
+begin
+  try
+    in_argv := vp.argv;
+    if (argc <> 1) or not in_argv[0].isString then
+      raise ESMException.Create(f_usage);
+    dir := in_argv[0].asJSString.ToSynUnicode(cx);
+    if (dir = '') or {$IFNDEF FPC}IsRelativePath(dir){$ELSE}not FilenameIsAbsolute(dir){$ENDIF} then
+      raise ESMException.Create(f_invalidPath);
+    val.asBoolean := RemoveDir(dir);
+    vp.rval := val;
+    Result := True;
+  except
+    on E: Exception do
+    begin
       Result := False;
       vp.rval := JSVAL_VOID;
       JSError(cx, E);
@@ -538,7 +800,12 @@ begin
     obj.ptr.DefineFunction(cx, 'readDir', fs_readDir, 2, attrs);
     obj.ptr.DefineFunction(cx, 'realpath', fs_realPath, 1, attrs);
     obj.ptr.DefineFunction(cx, 'rename', fs_rename, 2, attrs);
-
+    obj.ptr.DefineFunction(cx, 'loadFileToBuffer', fs_loadFileToBuffer, 1, attrs);
+    obj.ptr.DefineFunction(cx, 'writeFile', fs_writeFile, 3, attrs);
+    obj.ptr.DefineFunction(cx, 'appendFile', fs_appendFile, 3, attrs);
+    obj.ptr.DefineFunction(cx, 'forceDirectories', fs_forceDirectories, 1, attrs);
+    obj.ptr.DefineFunction(cx, 'removeDir', fs_removeDir, 1, attrs);
+    obj.ptr.DefineFunction(cx, 'deleteFile', fs_deleteFile, 1, attrs);
     Result := obj.ptr.ToJSValue;
   finally
     cx.FreeRootedObject(obj);

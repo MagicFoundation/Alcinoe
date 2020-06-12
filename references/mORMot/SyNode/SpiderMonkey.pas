@@ -6,10 +6,10 @@ unit SpiderMonkey;
 {
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - http://synopse.info
 
-    SyNode for mORMot Copyright (C) 2018 Pavel Mashlyakovsky & Vadim Orel
+    SyNode for mORMot Copyright (C) 2020 Pavel Mashlyakovsky & Vadim Orel
       pavel.mash at gmail.com
 
   *** BEGIN LICENSE BLOCK *****
@@ -26,7 +26,7 @@ unit SpiderMonkey;
 
   The Initial Developer of the Original Code is
   Pavel Mashlyakovsky & Vadim Orel.
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -49,17 +49,11 @@ unit SpiderMonkey;
 
   ***** END LICENSE BLOCK *****
 
-  ---------------------------------------------------------------------------
-   Download the mozjs-45 library at
-     x32: https://unitybase.info/downloads/mozjs-45.zip
-     x64: https://unitybase.info/downloads/mozjs-45-x64.zip
-  ---------------------------------------------------------------------------
-
   Version 1.18
   - initial release. Use SpiderMonkey 45
 }
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 {$I SyNode.inc}   //define WITHASSERT
 
 interface
@@ -68,6 +62,7 @@ uses
   Windows,
   {$endif}
   SynCommons,
+  SynTable,
   SynLog,
   SysUtils;
 
@@ -492,7 +487,18 @@ type
   PJSStringFinalizer = ^JSStringFinalizer;
 
 // jsid
-  jsid = size_t;
+  JSIdType = (
+    JSID_TYPE_STRING = $0,
+    JSID_TYPE_INT    = $1,
+    JSID_TYPE_VOID   = $2,
+    JSID_TYPE_SYMBOL = $4
+  );
+  jsid = record
+    asBits: size_t;
+    function isString: Boolean;
+    function asJSString: PJSString;
+  end;
+
   TjsidVector = array[0..(MaxInt div sizeof(jsid))-2] of jsid;
   PjsidVector = ^TjsidVector;
 
@@ -504,7 +510,8 @@ type
     mStorage: Int64;
   end;
 /// internal Spidermonkey structure for storrage jsid
-  JSIdArray  = {$ifdef UNICODE}record{$else}object{$endif}
+  {$ifdef USERECORDWITHMETHODS}JSIdArray  = record
+    {$else}JSIdArray  = object{$endif}
   private
     _internal: _JSIdArray;
     procedure init(cx: PJSContext); {$ifdef HASINLINE}inline;{$endif}
@@ -561,7 +568,8 @@ type
   JSONWriteCallback = function(const buf: PCChar16; len: uint32; data: pointer): Boolean; cdecl;
 
   /// high-level definition of the JSValue
-  jsval = {$ifdef UNICODE}record{$else}object{$endif}
+  {$ifdef USERECORDWITHMETHODS}jsval = record
+    {$else}jsval = object{$endif}
   private
     _l: jsval_layout;
 
@@ -698,7 +706,8 @@ type
   end;
 
   /// hight-level definition of arguments of function
-  JSArgRec = {$ifdef UNICODE}record{$else}object{$endif}
+  {$ifdef USERECORDWITHMETHODS}JSArgRec = record
+    {$else}JSArgRec = object{$endif}
   private
     rec: _JSArgRec;
     function GetIsConstructing: Boolean; {$ifdef HASINLINE}inline;{$endif}
@@ -922,6 +931,12 @@ type
     function GetRuntime: PJSRuntime; {$ifdef HASINLINE}inline;{$endif}
 {$ENDIF}
     function GetIsRunning: boolean; {$ifdef HASINLINE}inline;{$endif}
+  protected
+    // Return the ArrayBuffer underlying an ArrayBufferView
+    // - If the buffer has been neutered, this will still return the neutered buffer.
+    // - obj must be an object that would return true for JS_IsArrayBufferViewObject()
+    function GetArrayBufferViewBuffer(var obj: PJSObject; out isSharedMemory: Boolean): PJSObject; overload;{$ifdef HASINLINE}inline;{$endif}
+    function GetArrayBufferViewBuffer(var obj: PJSObject): PJSObject; overload;{$ifdef HASINLINE}inline;{$endif}
   public
 {$IFDEF SM52}
     /// Initializes the JavaScript context.
@@ -1311,13 +1326,6 @@ type
     /// Create a new ArrayBuffer with the given byte length.
     function NewArrayBuffer(nbytes: uint32): PJSObject;{$ifdef HASINLINE}inline;{$endif}
 
-    /// Return the ArrayBuffer underlying an ArrayBufferView
-    // - If the buffer has been neutered, this will still return the neutered buffer.
-    // - obj must be an object that would return true for JS_IsArrayBufferViewObject()
-    function GetArrayBufferViewBuffer(var obj: PJSObject; out isSharedMemory: Boolean): PJSObject; overload;{$ifdef HASINLINE}inline;{$endif}
-    function GetArrayBufferViewBuffer(var obj: PJSObject): PJSObject; overload;{$ifdef HASINLINE}inline;{$endif}
-
-
     /// Indicates whether or not a script or function is currently executing in a given context.
     property IsRunning: boolean read GetIsRunning;
     /// Destroy a JSContext.
@@ -1347,7 +1355,8 @@ type
   /// JSObject is the type of JavaScript objects in the JSAPI
   // - this object does not store anything, but just provide some helper methods
   // to access a PJSObject value via low-level API functions
-  JSObject = {$ifdef UNICODE}record{$else}object{$endif}
+  {$ifdef USERECORDWITHMETHODS}JSObject = record
+    {$else}JSObject = object{$endif}
   private
     function GetPrivate: Pointer; {$ifdef HASINLINE}inline;{$endif}
     procedure SetPrivate(data: Pointer); cdecl; {$ifdef HASINLINE}inline;{$endif}
@@ -1355,6 +1364,20 @@ type
     procedure SetReservedSlot(index: uint32; v: jsval); {$ifdef HASINLINE}inline;{$endif}
     function GetClass: PJSClass; {$ifdef HASINLINE}inline;{$endif}
     function GetConstructor(cx: PJSContext): PJSObject; {$ifdef HASINLINE}inline;{$endif}
+    // Return the available byte length of an array buffer
+    // - obj must have passed a JS_IsArrayBufferObject test, or somehow be known
+    // that it would pass such a test: it is an ArrayBuffer or a wrapper of an
+    // ArrayBuffer, and the unwrapping will succeed
+    function GetArrayBufferByteLength: uint32;{$ifdef HASINLINE}inline;{$endif}
+    function GetSharedArrayBufferByteLength: uint32;{$ifdef HASINLINE}inline;{$endif}
+    // Return a pointer to the start of the data referenced by any typed array
+    // - The data is still owned by the typed array, and should not be modified on
+    // another thread
+    // - obj must have passed a JS_Is*Array test, or somehow be known that it would
+    // pass such a test: it is a typed array or a wrapper of a typed array, and the
+    // unwrapping will succeed
+    // - Prefer the type-specific versions when possible
+    function GetArrayBufferViewData(out isSharedMemory: Boolean; nogc: PJSAutoCheckCannotGC): Pointer;{$ifdef HASINLINE}inline;{$endif}
   public
     /// get a jsval corresponding to this object
     function ToJSValue: jsval; {$ifdef HASINLINE}inline;{$endif}
@@ -1608,14 +1631,6 @@ type
 
     function IsSharedArrayBufferObject: Boolean;
 
-    /// Return the available byte length of an array buffer
-    // - obj must have passed a JS_IsArrayBufferObject test, or somehow be known
-    // that it would pass such a test: it is an ArrayBuffer or a wrapper of an
-    // ArrayBuffer, and the unwrapping will succeed
-    function GetArrayBufferByteLength: uint32;{$ifdef HASINLINE}inline;{$endif}
-
-    function GetSharedArrayBufferByteLength: uint32;{$ifdef HASINLINE}inline;{$endif}
-
     /// Return true if the arrayBuffer contains any data. This will return false for
     // ArrayBuffer.prototype and neutered ArrayBuffers.
     //
@@ -1734,13 +1749,11 @@ type
     function GetFloat64ArrayData(out isSharedMemory: Boolean; nogc: PJSAutoCheckCannotGC): Pfloat64Vector;{$ifdef HASINLINE}inline;{$endif}
 
     /// Return a pointer to the start of the data referenced by any typed array
+    // and it's length. For ArrayBufferView return a pointer and length of slice.
     // - The data is still owned by the typed array, and should not be modified on
     // another thread
-    // - obj must have passed a JS_Is*Array test, or somehow be known that it would
-    // pass such a test: it is a typed array or a wrapper of a typed array, and the
-    // unwrapping will succeed
-    // - Prefer the type-specific versions when possible
-    function GetArrayBufferViewData(out isSharedMemory: Boolean; nogc: PJSAutoCheckCannotGC): Pointer;{$ifdef HASINLINE}inline;{$endif}
+    // - If JSObject is not a typed array or arrayBufferView return false
+    function GetBufferDataAndLength(out data: Puint8Vector; out len: uint32): boolean;{$ifdef HASINLINE}inline;{$endif}
   end;
 
 
@@ -2103,6 +2116,8 @@ type
     constructor CreateWithTrace(const AFileName: RawUTF8; AJSErrorNum, ALineNum: integer;
        AMessage: string; const AStackTrace: SynUnicode);
     /// Format a JS exception as text
+    // If SM_DEBUG is defined will write full JS stack, including SyNode core_modules calls
+    //  if not - core_modules is cutched from stack trace for simplicity
     procedure WriteFormatted(WR: TTextWriter);
 
     {$ifndef NOEXCEPTIONINTERCEPT}
@@ -2198,7 +2213,7 @@ function SimpleVariantToJSval(cx: PJSContext; val: Variant): jsval;
 
 const
 {$IFDEF SM52}
-  SpiderMonkeyLib = 'mozjs-52'{$IFDEF MSWINDOWS} + '.dll'{$ENDIF};
+  SpiderMonkeyLib = 'synmozjs52'{$IFDEF MSWINDOWS} + '.dll'{$ENDIF};
 {$ELSE}
   SpiderMonkeyLib = 'mozjs-45'{$IFDEF MSWINDOWS} + '.dll'{$ENDIF};
 {$ENDIF}
@@ -3534,9 +3549,8 @@ var
   str16: PCChar16;
   strL: size_t;
 begin
+  VarClear(Value);
   with TVarData(Value) do begin
-    if VType and VTYPE_STATIC<>0 then
-      VarClear(Value);
     VType := varSynUnicode;
     VAny := nil; // avoid GPF below
     if JS_StringHasLatin1Chars(@self) then begin
@@ -4949,6 +4963,20 @@ begin
   Result.asObject := @self;
 end;
 
+function JSObject.GetBufferDataAndLength(out data: Puint8Vector; out len: uint32): boolean;
+var
+  isShared: boolean;
+begin
+  if Self.IsArrayBufferViewObject then begin
+    Result := Self.GetObjectAsArrayBufferView(len, isShared, data) <> nil;
+  end else if Self.IsArrayBufferObject then begin
+    data := Self.GetArrayBufferData;
+    len := Self.GetArrayBufferByteLength;
+    Result := True
+  end else
+    Result := False;
+end;
+
 { ESMException }
 
 constructor ESMException.CreateWithTrace(const AFileName: RawUTF8; AJSErrorNum, ALineNum: integer; AMessage: string; const AStackTrace: SynUnicode);
@@ -4964,12 +4992,35 @@ begin
 end;
 
 procedure ESMException.WriteFormatted(WR: TTextWriter);
+{$IFNDEF SM_DEBUG}
+var
+  P, Pb: PWord;
+{$ENDIF}
 begin
   WR.AddJSONEscape(pointer(FileName), Length(fileName));
     WR.Add(':'); WR.Add(Line);
-  WR.AddShort('\r\rError: ');
+  WR.AddShort('\n\nError: ');
     WR.AddJSONEscapeString(Message); WR.AddShort('\n');
-  WR.AddJSONEscapeString(Stack);
+  {$IFDEF SM_DEBUG}
+    WR.AddJSONEscapeString(Stack);
+  {$ELSE}
+    // any stack line what don't start with `@` is internal (core_modules) calls
+    // remove it to simplify domain logic debugging
+    if length(Stack) > 0 then begin
+      P := PWord(pointer(Stack));
+      while P^ <> 0 do begin
+        if (P^ = Ord('@')) then begin
+          Pb := P;
+          while (P^ <> 10) and (P^ <> 0) do Inc(P);
+          if (P^ = 10) then Inc(P);
+          WR.AddJSONEscapeW(Pb, (PtrUInt(P)-PtrUInt(Pb)) div 2);
+        end else
+          while (P^ <> 10) and (P^ <> 0) do
+            Inc(P);
+          if (P^ = 10) then Inc(P);
+      end;
+    end;
+  {$ENDIF}
 end;
 
 {$ifndef NOEXCEPTIONINTERCEPT}
@@ -5008,6 +5059,24 @@ end;
 function JSArgRec.getThisObject(cx: PJSContext): PJSObject;
 begin
   Result := this[cx].asObject;
+end;
+
+{ jsid }
+
+const
+  JSID_TYPE_MASK = $7;
+
+function jsid.isString: Boolean;
+begin
+  Result := JSIdType(asBits and JSID_TYPE_MASK) = JSID_TYPE_STRING;
+end;
+
+function jsid.asJSString: PJSString;
+begin
+{$ifdef WITHASSERT}
+  Assert(isString);
+{$endif}
+  Result := PJSString(asBits);
 end;
 
 { JSIdArray }
@@ -5553,7 +5622,9 @@ begin
     {$endif}
     varByte: setAsInteger(VByte);
     varInteger: setAsInteger(VInteger);
+    {$ifdef FPC}varQword,{$endif}
     varInt64: setAsInt64(VInt64);
+
     varSingle: setAsDouble(VSingle);
     varDouble: setAsDouble(VDouble);
     varCurrency: setAsDouble(VCurrency);

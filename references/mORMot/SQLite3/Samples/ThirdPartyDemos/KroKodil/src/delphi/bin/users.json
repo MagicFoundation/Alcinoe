@@ -1,0 +1,10 @@
+[{"AuthGroup":[
+{"RowID":1,"Ident":"Admin","SessionTimeout":10,"AccessRights":"47,1-256,0,1-256,0,1-256,0,1-256,0"},
+{"RowID":2,"Ident":"Supervisor","SessionTimeout":60,"AccessRights":"46,1-256,0,3-256,0,3-256,0,3-256,0"},
+{"RowID":3,"Ident":"User","SessionTimeout":60,"AccessRights":"14,3-256,0,3-256,0,3-256,0,3-256,0"},
+{"RowID":4,"Ident":"Guest","SessionTimeout":60,"AccessRights":"0,3-256,0,0,0,0"}]
+},{"AuthUser":[
+{"RowID":1,"LogonName":"Admin","DisplayName":"Admin","PasswordHashHexa":"67aeea294e1cb515236fd7829c55ec820ef888e8e221814d24d83b3dc4d825dd","GroupRights":1,"Data":null},
+{"RowID":2,"LogonName":"Supervisor","DisplayName":"Supervisor","PasswordHashHexa":"67aeea294e1cb515236fd7829c55ec820ef888e8e221814d24d83b3dc4d825dd","GroupRights":2,"Data":null},
+{"RowID":3,"LogonName":"User","DisplayName":"User","PasswordHashHexa":"67aeea294e1cb515236fd7829c55ec820ef888e8e221814d24d83b3dc4d825dd","GroupRights":3,"Data":null}]
+}]

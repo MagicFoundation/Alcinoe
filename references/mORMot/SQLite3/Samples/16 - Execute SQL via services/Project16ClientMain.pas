@@ -64,7 +64,7 @@ implementation
 
 {$R *.dfm}
 
-{$R Vista.res}
+{$R vista.RES} // includes Win10 manifest - use .RES for linux cross-compilation
 
 function TMainForm.Execute(FormatSQLWhere: PUTF8Char;
   const BoundsSQLWhere: array of const): TSQLTableJSON;

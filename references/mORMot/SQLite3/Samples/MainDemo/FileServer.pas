@@ -3,12 +3,13 @@ unit FileServer;
 
 interface
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 uses
   SysUtils,
   Classes,
   SynCommons,
+  SynTable,
   mORMot,
   mORMoti18n,
   mORMotHttpServer,

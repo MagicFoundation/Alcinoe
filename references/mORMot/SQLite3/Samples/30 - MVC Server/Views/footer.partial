@@ -22,7 +22,7 @@
     </div><!-- container -->
     <div class="blog-footer">
       <p>Proudly using the Open Source <a href="http://mormot.net">mORMot ORM/SOA/MVC Framework</a>.<br>
-      <small>{{{main.blog.copyright}}}</small></p>
+      <small>{{{main.blog.copyright}}} - page generated in [[GENERATION_TIME_TAG]]</small></p>
       <p><a href="#">Back to top</a></p>
     </div>
   </body>

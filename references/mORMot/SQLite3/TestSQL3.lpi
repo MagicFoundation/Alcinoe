@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="10"/>
+    <Version Value="11"/>
     <PathDelim Value="\"/>
     <General>
       <Flags>
@@ -17,18 +17,499 @@
     <i18n>
       <EnableI18N LFM="False"/>
     </i18n>
-    <BuildModes Count="1">
+    <BuildModes Count="11">
       <Item1 Name="default" Default="True"/>
+      <Item2 Name="win32">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="fpc\bin\$(TargetCPU)-$(TargetOS)\TestSQL3"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="..;$(ProjOutDir)"/>
+            <Libraries Value="..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..;DDD\dom;DDD\infra"/>
+            <UnitOutputDirectory Value="fpc\lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <Conditionals Value="if TargetOS='darwin' then
+   CustomOptions := ' -Cg-';"/>
+          <Parsing>
+            <SyntaxOptions>
+              <SyntaxMode Value="Delphi"/>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Checks>
+              <IOChecks Value="True"/>
+            </Checks>
+            <TargetCPU Value="i386"/>
+            <TargetOS Value="win32"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShowNotes Value="False"/>
+              <ShowHints Value="False"/>
+            </Verbosity>
+          </Other>
+        </CompilerOptions>
+      </Item2>
+      <Item3 Name="win64">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="fpc\bin\$(TargetCPU)-$(TargetOS)\TestSQL3"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="..;$(ProjOutDir)"/>
+            <Libraries Value="..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..;DDD\dom;DDD\infra"/>
+            <UnitOutputDirectory Value="fpc\lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <Conditionals Value="if TargetOS='darwin' then
+   CustomOptions := ' -Cg-';"/>
+          <Parsing>
+            <SyntaxOptions>
+              <SyntaxMode Value="Delphi"/>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Checks>
+              <IOChecks Value="True"/>
+            </Checks>
+            <TargetCPU Value="x86_64"/>
+            <TargetOS Value="win64"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShowNotes Value="False"/>
+              <ShowHints Value="False"/>
+            </Verbosity>
+          </Other>
+        </CompilerOptions>
+      </Item3>
+      <Item4 Name="lin32">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="fpc\bin\$(TargetCPU)-$(TargetOS)\TestSQL3"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="..;$(ProjOutDir)"/>
+            <Libraries Value="..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..;DDD\dom;DDD\infra"/>
+            <UnitOutputDirectory Value="fpc\lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <Conditionals Value="if TargetOS='darwin' then
+   CustomOptions := ' -Cg-';"/>
+          <Parsing>
+            <SyntaxOptions>
+              <SyntaxMode Value="Delphi"/>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Checks>
+              <IOChecks Value="True"/>
+            </Checks>
+            <TargetCPU Value="i386"/>
+            <TargetOS Value="linux"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShowNotes Value="False"/>
+              <ShowHints Value="False"/>
+            </Verbosity>
+          </Other>
+        </CompilerOptions>
+      </Item4>
+      <Item5 Name="lin64">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="fpc\bin\$(TargetCPU)-$(TargetOS)\TestSQL3"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="..;$(ProjOutDir)"/>
+            <Libraries Value="..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..;DDD\dom;DDD\infra"/>
+            <UnitOutputDirectory Value="fpc\lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <Conditionals Value="if TargetOS='darwin' then
+   CustomOptions := ' -Cg-';"/>
+          <Parsing>
+            <SyntaxOptions>
+              <SyntaxMode Value="Delphi"/>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Checks>
+              <IOChecks Value="True"/>
+            </Checks>
+            <TargetCPU Value="x86_64"/>
+            <TargetOS Value="linux"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShowNotes Value="False"/>
+              <ShowHints Value="False"/>
+            </Verbosity>
+          </Other>
+        </CompilerOptions>
+      </Item5>
+      <Item6 Name="bsd32">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="fpc\bin\$(TargetCPU)-$(TargetOS)\TestSQL3"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="..;$(ProjOutDir)"/>
+            <Libraries Value="..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..;DDD\dom;DDD\infra"/>
+            <UnitOutputDirectory Value="fpc\lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <Conditionals Value="if TargetOS='darwin' then
+   CustomOptions := ' -Cg-';"/>
+          <Parsing>
+            <SyntaxOptions>
+              <SyntaxMode Value="Delphi"/>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Checks>
+              <IOChecks Value="True"/>
+            </Checks>
+            <TargetCPU Value="i386"/>
+            <TargetOS Value="freebsd"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShowNotes Value="False"/>
+              <ShowHints Value="False"/>
+            </Verbosity>
+          </Other>
+        </CompilerOptions>
+      </Item6>
+      <Item7 Name="bsd64">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="fpc\bin\$(TargetCPU)-$(TargetOS)\TestSQL3"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="..;$(ProjOutDir)"/>
+            <Libraries Value="..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..;DDD\dom;DDD\infra"/>
+            <UnitOutputDirectory Value="fpc\lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <Conditionals Value="if TargetOS='darwin' then
+   CustomOptions := ' -Cg-';"/>
+          <Parsing>
+            <SyntaxOptions>
+              <SyntaxMode Value="Delphi"/>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Checks>
+              <IOChecks Value="True"/>
+            </Checks>
+            <TargetCPU Value="x86_64"/>
+            <TargetOS Value="freebsd"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShowNotes Value="False"/>
+              <ShowHints Value="False"/>
+            </Verbosity>
+          </Other>
+        </CompilerOptions>
+      </Item7>
+      <Item8 Name="darwin32">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="fpc\bin\$(TargetCPU)-$(TargetOS)\TestSQL3"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="..;$(ProjOutDir)"/>
+            <Libraries Value="..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..;DDD\dom;DDD\infra"/>
+            <UnitOutputDirectory Value="fpc\lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <Conditionals Value="if TargetOS='darwin' then
+   CustomOptions := ' -Cg-';"/>
+          <Parsing>
+            <SyntaxOptions>
+              <SyntaxMode Value="Delphi"/>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Checks>
+              <IOChecks Value="True"/>
+            </Checks>
+            <TargetCPU Value="i386"/>
+            <TargetOS Value="darwin"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShowNotes Value="False"/>
+              <ShowHints Value="False"/>
+            </Verbosity>
+          </Other>
+        </CompilerOptions>
+      </Item8>
+      <Item9 Name="darwin64">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="fpc\bin\$(TargetCPU)-$(TargetOS)\TestSQL3"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="..;$(ProjOutDir)"/>
+            <Libraries Value="..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..;DDD\dom;DDD\infra"/>
+            <UnitOutputDirectory Value="fpc\lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <Conditionals Value="if TargetOS='darwin' then
+   CustomOptions := ' -Cg-';"/>
+          <Parsing>
+            <SyntaxOptions>
+              <SyntaxMode Value="Delphi"/>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Checks>
+              <IOChecks Value="True"/>
+            </Checks>
+            <TargetCPU Value="x86_64"/>
+            <TargetOS Value="darwin"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShowNotes Value="False"/>
+              <ShowHints Value="False"/>
+            </Verbosity>
+          </Other>
+        </CompilerOptions>
+      </Item9>
+      <Item10 Name="linarm32">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="fpc\bin\$(TargetCPU)-$(TargetOS)\TestSQL3"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="..;$(ProjOutDir)"/>
+            <Libraries Value="..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..;DDD\dom;DDD\infra"/>
+            <UnitOutputDirectory Value="fpc\lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <Conditionals Value="if TargetOS='darwin' then
+   CustomOptions := ' -Cg-';"/>
+          <Parsing>
+            <SyntaxOptions>
+              <SyntaxMode Value="Delphi"/>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Checks>
+              <IOChecks Value="True"/>
+            </Checks>
+            <TargetCPU Value="arm"/>
+            <TargetOS Value="linux"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShowNotes Value="False"/>
+              <ShowHints Value="False"/>
+            </Verbosity>
+          </Other>
+        </CompilerOptions>
+      </Item10>
+      <Item11 Name="linarm64">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="fpc\bin\$(TargetCPU)-$(TargetOS)\TestSQL3"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="..;$(ProjOutDir)"/>
+            <Libraries Value="..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..;DDD\dom;DDD\infra"/>
+            <UnitOutputDirectory Value="fpc\lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <Conditionals Value="if TargetOS='darwin' then
+   CustomOptions := ' -Cg-';"/>
+          <Parsing>
+            <SyntaxOptions>
+              <SyntaxMode Value="Delphi"/>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Checks>
+              <IOChecks Value="True"/>
+            </Checks>
+            <TargetCPU Value="aarch64"/>
+            <TargetOS Value="linux"/>
+            <Optimizations>
+              <OptimizationLevel Value="3"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShowNotes Value="False"/>
+              <ShowHints Value="False"/>
+            </Verbosity>
+          </Other>
+        </CompilerOptions>
+      </Item11>
     </BuildModes>
     <PublishOptions>
       <Version Value="2"/>
     </PublishOptions>
     <RunParams>
-      <local>
-        <FormatVersion Value="1"/>
-      </local>
+      <FormatVersion Value="2"/>
+      <Modes Count="1">
+        <Mode0 Name="default"/>
+      </Modes>
     </RunParams>
-    <Units Count="51">
+    <Units Count="52">
       <Unit0>
         <Filename Value="TestSQL3.dpr"/>
         <IsPartOfProject Value="True"/>
@@ -86,8 +567,9 @@
         <IsPartOfProject Value="True"/>
       </Unit13>
       <Unit14>
-        <Filename Value="..\SynBidirSock.pas"/>
+        <Filename Value="..\SynBiDirSock.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="SynBidirSock"/>
       </Unit14>
       <Unit15>
         <Filename Value="..\SynTests.pas"/>
@@ -233,6 +715,10 @@
         <Filename Value="..\SynLizard.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit50>
+      <Unit51>
+        <Filename Value="mORMotService.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit51>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -243,8 +729,8 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="..;$(ProjOutDir)"/>
-      <Libraries Value="..\fpc-$(TargetOS)"/>
-      <OtherUnitFiles Value="..;DDD\dom;DDD\infra;Samples\33 - ECC"/>
+      <Libraries Value="..\static\$(TargetCPU)-$(TargetOS)"/>
+      <OtherUnitFiles Value="..;DDD\dom;DDD\infra"/>
       <UnitOutputDirectory Value="fpc\lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Conditionals Value="if TargetOS='darwin' then
@@ -258,8 +744,6 @@
     <CodeGeneration>
       <Checks>
         <IOChecks Value="True"/>
-        <RangeChecks Value="True"/>
-        <OverflowChecks Value="True"/>
         <StackChecks Value="True"/>
       </Checks>
       <Optimizations>

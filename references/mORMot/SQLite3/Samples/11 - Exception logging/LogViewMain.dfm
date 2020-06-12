@@ -19,7 +19,7 @@ object MainLogView: TMainLogView
   TextHeight = 13
   object Splitter2: TSplitter
     Left = 0
-    Top = 545
+    Top = 544
     Width = 844
     Height = 4
     Cursor = crVSplit
@@ -29,35 +29,35 @@ object MainLogView: TMainLogView
     Left = 805
     Top = 0
     Width = 4
-    Height = 545
+    Height = 544
     Visible = False
   end
   object Splitter1: TSplitter
     Left = 649
     Top = 0
     Width = 4
-    Height = 545
+    Height = 544
     Visible = False
   end
   object Splitter4: TSplitter
     Left = 801
     Top = 0
     Width = 4
-    Height = 545
+    Height = 544
     Visible = False
   end
   object PanelLeft: TPanel
     Left = 225
     Top = 0
     Width = 150
-    Height = 545
+    Height = 544
     Align = alLeft
     Constraints.MinWidth = 150
     TabOrder = 0
     OnResize = PanelLeftResize
     DesignSize = (
       150
-      545)
+      544)
     object ImageLogo: TImage
       Left = 8
       Top = 501
@@ -416,21 +416,20 @@ object MainLogView: TMainLogView
       OnDblClick = lstDaysDblClick
     end
   end
-  object MemoBottom: TMemo
+  object PanelBottom: TPanel
     Left = 0
-    Top = 549
+    Top = 548
     Width = 844
     Height = 52
     Align = alBottom
-    ReadOnly = True
-    ScrollBars = ssVertical
     TabOrder = 3
+    OnResize = PanelBottomResize
   end
   object List: TDrawGrid
     Left = 809
     Top = 0
     Width = 35
-    Height = 545
+    Height = 544
     Align = alClient
     ColCount = 3
     DefaultColWidth = 100
@@ -450,7 +449,7 @@ object MainLogView: TMainLogView
     Left = 375
     Top = 0
     Width = 274
-    Height = 545
+    Height = 544
     Align = alLeft
     ColCount = 2
     DefaultColWidth = 100
@@ -467,7 +466,7 @@ object MainLogView: TMainLogView
     Left = 653
     Top = 0
     Width = 148
-    Height = 545
+    Height = 544
     Align = alLeft
     TabOrder = 4
     Visible = False
@@ -475,7 +474,7 @@ object MainLogView: TMainLogView
       Left = 1
       Top = 1
       Width = 146
-      Height = 503
+      Height = 502
       OnClickCheck = ThreadListBoxClickCheck
       Align = alClient
       ItemHeight = 13
@@ -485,7 +484,7 @@ object MainLogView: TMainLogView
     end
     object pnlThreadBottom: TPanel
       Left = 1
-      Top = 504
+      Top = 503
       Width = 146
       Height = 40
       Align = alBottom
@@ -514,14 +513,14 @@ object MainLogView: TMainLogView
     Left = 0
     Top = 0
     Width = 225
-    Height = 545
+    Height = 544
     Align = alLeft
     Constraints.MinWidth = 80
     TabOrder = 5
     Visible = False
     DesignSize = (
       225
-      545)
+      544)
     object Drive: TDriveComboBox
       Left = 8
       Top = 8

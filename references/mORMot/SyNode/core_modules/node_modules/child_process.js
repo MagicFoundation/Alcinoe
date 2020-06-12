@@ -1,7 +1,7 @@
-/**
-* MPV - Fake implementation of nodejs child_process
-* Throw error on spawn
+/*
+* Fake implementation of nodejs child_process
+* Throw on spawn
 */ 
 module.exports.spawn = function(){
-  throw new Error('Not implemented in UB');
+  throw new Error('Not implemented in SyNode');
 }

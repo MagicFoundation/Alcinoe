@@ -250,9 +250,9 @@ function  ALCalcHMACMD5(const Str, Key : AnsiString): AnsiString;
 
 
 
-///////////////////
-////// CRC32 //////
-///////////////////
+/////////////////
+////// CRC //////
+/////////////////
 
  //http://blog.synopse.info/post/2014/05/25/New-crc32c%28%29-function-using-optimized-asm-and-SSE-4.2-instruction
  //In fact, most popular file formats and protocols (Ethernet, MPEG-2, ZIP, RAR,
@@ -266,13 +266,25 @@ function  ALCalcHMACMD5(const Str, Key : AnsiString): AnsiString;
 type
   TALStringHashCrc32 = function(Const str: AnsiString): cardinal;
   TALHashCrc32 = function(buf: PAnsiChar; len: cardinal): cardinal;
+  TALStringHashCrc64 = function(Const str: AnsiString): int64;
+  TALHashCrc64 = function(buf: PAnsiChar; len: cardinal): int64;
 
 var
-  /// compute CRC32C checksum on the supplied buffer
+  /// compute CRC32 checksum on the supplied buffer
   // - this variable will use the fastest mean available, e.g. SSE 4.2
-  // - you should use this function instead of ALCrc32cfast() nor Crc32csse42()
   ALStringHashCrc32: TALStringHashCrc32;
   ALHashCrc32: TALHashCrc32;
+
+
+  /// compute CRC64 checksum on the supplied buffer, cascading two crc32c
+  // - will use SSE 4.2 hardware accelerated instruction, if available
+  // - will combine two crc32() calls into a single Int64 result
+  // - by design, such combined hashes cannot be cascaded
+  ALStringHashCrc64: TALStringHashCrc64;
+  ALHashCrc64: TALHashCrc64;
+
+// test the implementation of the CRC32
+procedure ALTestCRC32Implementation(const aSavedResultsFilename: AnsiString = '');
 
 {$ENDIF}
 
@@ -299,13 +311,13 @@ function ALRandom64(const ARange: UInt64): UInt64;
 
 {$IFNDEF NEXTGEN}
 
-function ALFnv1aInt32(const str: ansiString): int64; inline;
-function ALFnv1aInt64(const str: ansiString): int64; inline;
+function ALFnv1aInt32(const str: ansiString): int32; inline;
+function ALFnv1aInt64(const str: ansiString): Int64; inline;
 
 {$ENDIF}
 
-function ALFnv1aInt32U(const str: String; Const encoding: Tencoding): int64; inline;
-function ALFnv1aInt64U(const str: String; Const encoding: Tencoding): int64; inline;
+function ALFnv1aInt32U(const str: String; Const encoding: Tencoding): int32; inline;
+function ALFnv1aInt64U(const str: String; Const encoding: Tencoding): Int64; inline;
 
 
 
@@ -428,6 +440,8 @@ uses {$IF defined(MSWINDOWS)}
      winapi.MMSystem,
      {$IFEND}
      system.Math,
+     ALFiles,
+     ALStringList,
      ALString;
 
 {***}
@@ -4653,19 +4667,28 @@ begin
   end;
 end;
 
+//
+// Taken from https://github.com/synopse/mORMot.git
+// https://synopse.info
+// http://mormot.net
+//
+
+{$IF CompilerVersion > 34} // sydney
+  {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
+{$IFEND}
+
 {***********************************************}
 // from synCrypto.pas of Synopse mORMot framework
 // get 32-bit value from NIST SP 800-90A compliant RDRAND Intel x86/x64 opcode
 // https://software.intel.com/en-us/articles/intel-digital-random-number-generator-drng-software-implementation-guide
-function _RdRand32: cardinal;
-{$ifdef CPU64BITS}
+function RdRand32: cardinal;
+{$IF defined(CPU64BITS)}
+asm .noframe
+{$else}
 asm
-  .noframe
-{$ELSE}
-asm
-{$endif}
+{$ifend}
   // rdrand eax: same opcodes for x86 and x64
-  db $0f,$c7,$f0
+  db $0f, $c7, $f0
   // returns in eax, ignore carry flag (eax=0 won't hurt)
 end;
 
@@ -4674,7 +4697,7 @@ function ALRandom32(const ARange: Cardinal): cardinal;
 var aBytes: Tbytes;
 begin
   if cfRAND in ALCpuFeatures then begin
-    result := _RdRand32 mod ARange;
+    result := RdRand32 mod ARange;
     exit;
   end;
   aBytes := ALRandomBytes(sizeOf(result));
@@ -4707,157 +4730,317 @@ end;
 
 {$IFNDEF NEXTGEN}
 
+//!!!!! ///////////////////////////////////////////////////////////// !!!!!//
+//!!!!! WARNINGS : DON'T CHANGE THE IMPLEMENTATION OF THE FUNCTIONS   !!!!!//
+//!!!!! BELOW BECAUSE THEY ARE USED TO STORE IN DATABASE CHECKSUM FOR !!!!!//
+//!!!!! LATER COMPARAISON. If you change it, you must be sure that    !!!!!//
+//!!!!! the new checksum calculation will be strictly equal the the   !!!!!//
+//!!!!! previous one                                                  !!!!!//
+//!!!!! ///////////////////////////////////////////////////////////// !!!!!//
+
 //
 // Taken from https://github.com/synopse/mORMot.git
 // https://synopse.info
 // http://mormot.net
 //
 
-{$IF CompilerVersion > 33} // rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
 {$IFEND}
 
 type
-  {$ifdef UNICODE}
-  PtrUInt = NativeUInt;
-  {$else}
-  PtrUInt = cardinal;
-  {$endif}
-
-type
-  ToByte = byte;
+  TCrc32tab = array[0..7,byte] of cardinal;
+  PCrc32tab = ^TCrc32tab;
 
 var
-  /// tables used by Crc32cfast() function
+  /// tables used by crc32cfast() function
   // - created with a polynom diverse from zlib's crc32() algorithm, but
   // compatible with SSE 4.2 crc32 instruction
   // - tables content is created from code in initialization section below
-  Crc32ctab: array[0..{$IF defined(CPU64BITS)}3{$else}7{$ifend},byte] of cardinal;
+  // - will also be used internally by SymmetricEncrypt, FillRandom and
+  // TSynUniqueIdentifierGenerator as 1KB master/reference key tables
+  crc32ctab: TCrc32tab;
 
-{***************************************************************}
-/// compute CRC32C checksum on the supplied buffer using SSE 4.2
-// - use Intel Streaming SIMD Extensions 4.2 hardware accelerated instruction
-// - SSE 4.2 shall be available on the processor (i.e. cfSSE42 in ALCpuFeatures)
-// - result is not compatible with zlib's crc32() - not the same polynom
-// - Crc32cfast() is 1.7 GB/s, Crc32csse42() is 3.7 GB/s
-function Crc32csse42(crc: cardinal; buf: PAnsiChar; len: cardinal): cardinal;
-{$IF defined(CPU64BITS)}
-asm // ecx=crc, rdx=buf, r8=len (Linux: edi,rsi,rdx)
-        .NOFRAME
-        {$ifdef win64}
-        mov     eax, ecx
-        {$else}
-        mov     eax, edi
-        mov     r8, rdx
-        mov     rdx, rsi
-        {$endif win64}
-        not     eax
-        test    rdx, rdx
-        jz      @0
-        test    r8, r8
-        jz      @0
-@7:     test    dl, 7
-        jz      @8 // align to 8 bytes boundary
-        crc32   eax, byte ptr[rdx]
-        inc     rdx
-        dec     r8
-        jz      @0
-        test    dl, 7
-        jnz     @7
-@8:     mov     rcx, r8
-        shr     r8, 3
-        jz      @2
-@1:     db $F2,$48,$0F,$38,$F1,$02 // circumvent Delphi inline asm compiler bug
-        dec     r8
-        lea     rdx, [rdx + 8]
-        jnz     @1
-@2:     and     ecx, 7
-        jz      @0
-        cmp     ecx, 4
-        jb      @4
-        crc32   eax, dword ptr[rdx]
-        sub     ecx, 4
-        lea     rdx, [rdx + 4]
-        jz      @0
-@4:     crc32   eax, byte ptr[rdx]
-        dec     ecx
-        jz      @0
-        crc32   eax, byte ptr[rdx + 1]
-        dec     ecx
-        jz      @0
-        crc32   eax, byte ptr[rdx + 2]
-@0:     not     eax
+{*********************************************}
+//pure pascal implementation - used for testing
+function crc32cfastpurepascal(crc: cardinal; buf: PAnsiChar; len: cardinal): cardinal;
+var tab: PCrc32tab;
+begin // on ARM, we use slicing-by-4 to avoid polluting smaller L1 cache
+  tab := @crc32ctab;
+  result := not crc;
+  if (buf<>nil) and (len>0) then begin
+    repeat
+      if NativeUInt(buf) and 3=0 then // align to 4 bytes boundary
+        break;
+      result := tab[0,Byte(result xor ord(buf^))] xor (result shr 8);
+      dec(len);
+      inc(buf);
+    until len=0;
+    if len>=4 then
+      repeat
+        result := result xor PCardinal(buf)^;
+        inc(buf,4);
+        dec(len,4);
+        result := tab[3,Byte(result)] xor
+                  tab[2,Byte(result shr 8)] xor
+                  tab[1,Byte(result shr 16)] xor
+                  tab[0,Byte(result shr 24)];
+      until len<4;
+    while len>0 do begin
+      result := tab[0,Byte(result xor ord(buf^))] xor (result shr 8);
+      dec(len);
+      inc(buf);
+    end;
+  end;
+  result := not result;
 end;
-{$else}
+
+{****************}
+{$ifdef CPU32BITS}
+function crc32cfast(crc: cardinal; buf: PAnsiChar; len: cardinal): cardinal;
+asm  // adapted from Aleksandr Sharahov code and Maxim Masiutin remarks
+        test    edx, edx
+        jz      @z
+        neg     ecx
+        jz      @z
+        not     eax
+        push    ebx
+        push    ebp
+        lea     ebp, [crc32ctab]
+@head:  test    dl, 3
+        jz      @align
+        movzx   ebx, byte ptr[edx]
+        inc     edx
+        xor     bl, al
+        shr     eax, 8
+        xor     eax, dword ptr[ebx * 4 + ebp]
+        inc     ecx
+        jnz     @head
+        pop     ebp
+        pop     ebx
+        not     eax
+@z:     ret
+@align: sub     edx, ecx
+        add     ecx, 8
+        jg      @done
+        push    esi
+        push    edi
+        mov     edi, edx
+@by8:   mov     edx, eax
+        mov     ebx, [edi + ecx - 4]
+        xor     edx, [edi + ecx - 8]
+        movzx   esi, bl
+        mov     eax, dword ptr[esi * 4 + ebp + 1024 * 3]
+        movzx   esi, bh
+        xor     eax, dword ptr[esi * 4 + ebp + 1024 * 2]
+        shr     ebx, 16
+        movzx   esi, bl
+        xor     eax, dword ptr[esi * 4 + ebp + 1024 * 1]
+        movzx   esi, bh
+        xor     eax, dword ptr[esi * 4 + ebp + 1024 * 0]
+        movzx   esi, dl
+        xor     eax, dword ptr[esi * 4 + ebp + 1024 * 7]
+        movzx   esi, dh
+        xor     eax, dword ptr[esi * 4 + ebp + 1024 * 6]
+        shr     edx, 16
+        movzx   esi, dl
+        xor     eax, dword ptr[esi * 4 + ebp + 1024 * 5]
+        movzx   esi, dh
+        xor     eax, dword ptr[esi * 4 + ebp + 1024 * 4]
+        add     ecx, 8
+        jle     @by8
+        mov     edx, edi
+        pop     edi
+        pop     esi
+@done:  sub     ecx, 8
+        jl      @tail
+        pop     ebp
+        pop     ebx
+        not     eax
+        ret
+@tail:  movzx   ebx, byte[edx + ecx]
+        xor     bl, al
+        shr     eax, 8
+        xor     eax, dword ptr[ebx * 4 + ebp]
+        inc     ecx
+        jnz     @tail
+@e:     pop     ebp
+        pop     ebx
+        not     eax
+end;
+{$endif}
+
+{****************}
+{$ifdef CPU64BITS}
+function crc32cfast(crc: cardinal; buf: PAnsiChar; len: cardinal): cardinal;
+asm .noframe
+        {$ifndef win64}
+        mov     r8d, len
+        {$endif}
+        mov     eax, crc
+        xor     ecx, ecx
+        test    buf, buf // buf=rdx/rsi len=r8
+        jz      @z
+        neg     r8
+        jz      @z
+        not     eax
+        lea     r9, [rip + crc32ctab]
+        cmp     r8, -8
+        jb      @head
+@sml:   mov     cl, byte ptr[buf]
+        inc     buf
+        xor     cl, al
+        shr     eax, 8
+        xor     eax, dword ptr[rcx * 4 + r9]
+        inc     r8
+        jnz     @sml
+@0:     not     eax
+@z:     ret
+@head:  test    buf, 7
+        jz      @align
+        mov     cl, byte ptr[buf]
+        inc     buf
+        xor     cl, al
+        shr     eax, 8
+        xor     eax, dword ptr[rcx * 4 + r9]
+        inc     r8
+        jnz     @head
+        not     eax
+        ret
+@align: sub     buf, r8
+        add     r8, 8
+        jg      @done
+        xor     r11, r11
+@by8:   mov     r10d, eax
+        mov     rcx, qword ptr[buf + r8 - 8]
+        xor     r10d, ecx
+        shr     rcx, 32
+        mov     r11b, cl
+        shr     ecx, 8
+        mov     eax, dword ptr[r11 * 4 + r9 + 1024 * 3]
+        mov     r11b, cl
+        shr     ecx, 8
+        xor     eax, dword ptr[r11 * 4 + r9 + 1024 * 2]
+        mov     r11b, cl
+        shr     ecx, 8
+        xor     eax, dword ptr[r11 * 4 + r9 + 1024 * 1]
+        mov     r11b, cl
+        xor     eax, dword ptr[r11 * 4 + r9 + 1024 * 0]
+        mov     ecx, r10d
+        mov     r11b, cl
+        shr     ecx, 8
+        xor     eax, dword ptr[r11 * 4 + r9 + 1024 * 7]
+        mov     r11b, cl
+        shr     ecx, 8
+        xor     eax, dword ptr[r11 * 4 + r9 + 1024 * 6]
+        mov     r11b, cl
+        shr     ecx, 8
+        xor     eax, dword ptr[r11 * 4 + r9 + 1024 * 5]
+        mov     r11b, cl
+        xor     eax, dword ptr[r11 * 4 + r9 + 1024 * 4]
+        add     r8, 8
+        jle     @by8
+@done:  sub     r8, 8
+        jge     @e
+@tail:  mov     cl, byte ptr[buf + r8]
+        xor     cl, al
+        shr     eax, 8
+        xor     eax, dword ptr[rcx * 4 + r9]
+        inc     r8
+        jnz     @tail
+@e:     not     eax
+end;
+{$endif}
+
+{****************}
+{$ifdef CPU32BITS}
+function crc32csse42(crc: cardinal; buf: PAnsiChar; len: cardinal): cardinal;
 asm // eax=crc, edx=buf, ecx=len
         not     eax
         test    ecx, ecx
         jz      @0
         test    edx, edx
         jz      @0
-@3:     test    edx, 3
-        jz      @8 // align to 4 bytes boundary
-        {$if CompilerVersion >= 21.0} {Delphi 2010}
-        crc32   eax, byte ptr[edx]
-        {$else}
-        db      $F2, $0F, $38, $F0, $02
-        {$ifend}
+        jmp     @align
+        db      $8D, $0B4, $26, $00, $00, $00, $00 // manual @by8 align 16
+@a:     db      $F2, $0F, $38, $F0, $02
         inc     edx
         dec     ecx
         jz      @0
-        test    edx, 3
-        jnz     @3
-@8:     push    ecx
+@align: test    dl, 3
+        jnz     @a
+        push    ecx
         shr     ecx, 3
+        jnz     @by8
+@rem:   pop     ecx
+        test    cl, 4
+        jz      @4
+        db      $F2, $0F, $38, $F1, $02
+        add     edx, 4
+@4:     test    cl, 2
         jz      @2
-@1:     {$if CompilerVersion >= 21.0} {Delphi 2010}
-        crc32   eax, dword ptr[edx]
-        crc32   eax, dword ptr[edx + 4]
-        {$else}
-        db      $F2, $0F, $38, $F1, $02
-        db      $F2, $0F, $38, $F1, $42, $04
-        {$ifend}
-        dec     ecx
-        lea     edx, [edx + 8]
-        jnz     @1
-@2:     pop     ecx
-        and     ecx, 7
+        db      $66, $F2, $0F, $38, $F1, $02
+        add     edx, 2
+@2:     test    cl, 1
         jz      @0
-        cmp     ecx, 4
-        jb      @4
-        {$if CompilerVersion >= 21.0} {Delphi 2010}
-        crc32   eax, dword ptr[edx]
-        {$else}
-        db      $F2, $0F, $38, $F1, $02
-        {$ifend}
-        sub     ecx, 4
-        lea     edx, [edx + 4]
-        jz      @0
-@4:     {$if CompilerVersion >= 21.0} {Delphi 2010}
-        crc32   eax, byte ptr[edx]
-        dec     ecx
-        jz      @0
-        crc32   eax, byte ptr[edx + 1]
-        dec     ecx
-        jz      @0
-        crc32   eax, byte ptr[edx + 2]
-        {$else}
         db      $F2, $0F, $38, $F0, $02
-        dec     ecx
-        jz      @0
-        db      $F2, $0F, $38, $F0, $42, $01
-        dec     ecx
-        jz      @0
-        db      $F2, $0F, $38, $F0, $42, $02
-        {$ifend}
 @0:     not     eax
+        ret
+@by8:   db      $F2, $0F, $38, $F1, $02
+        db      $F2, $0F, $38, $F1, $42, $04
+        add     edx, 8
+        dec     ecx
+        jnz     @by8
+        jmp     @rem
 end;
-{$ifend}
+{$endif}
+
+{****************}
+{$ifdef CPU64BITS}
+function crc32csse42(crc: cardinal; buf: PAnsiChar; len: cardinal): cardinal;
+asm .noframe // ecx=crc, rdx=buf, r8=len (Linux: edi,rsi,edx)
+        mov     eax, crc
+        not     eax
+        test    len, len
+        jz      @0
+        test    buf, buf
+        jz      @0
+        jmp     @align
+@7:     crc32   eax, byte ptr[buf]
+        inc     buf
+        dec     len
+        jz      @0
+@align: test    buf, 7
+        jnz     @7
+        mov     ecx, len
+        shr     len, 3
+        jnz     @s
+@2:     test    cl, 4
+        jz      @3
+        crc32   eax, dword ptr[buf]
+        add     buf, 4
+@3:     test    cl, 2
+        jz      @1
+        crc32   eax, word ptr[buf]
+        add     buf, 2
+@1:     test    cl, 1
+        jz      @0
+        crc32   eax, byte ptr[buf]
+@0:     not     eax
+        ret
+        .align 16
+@s:     db $F2,$48,$0F,$38,$F1,$02 // circumvent Delphi inline asm compiler bug
+        add     buf, 8
+        dec     len
+        jnz     @s
+        jmp     @2
+end;
+{$endif}
 
 {******************************************************}
 function Crc32csse42_2(Const str: AnsiString): cardinal;
 begin
-   Result:=Crc32csse42(0, Pointer(@str[1]), Length(str));
+   Result:=Crc32csse42(0, Pointer(str), Length(str));
 end;
 
 {**************************************************************}
@@ -4866,146 +5049,104 @@ begin
    Result:=Crc32csse42(0, buf, len);
 end;
 
-{*******************************************************************}
-/// compute CRC32C checksum on the supplied buffer using x86/x64 code
-// - result is compatible with SSE 4.2 based hardware accelerated instruction
-// - result is not compatible with zlib's crc32() - not the same polynom
-// - Crc32cfast() is 1.7 GB/s, Crc32csse42() is 3.7 GB/s
-function Crc32cfast(crc: cardinal; buf: PAnsiChar; len: cardinal): cardinal;
-{$IF defined(CPU64BITS)}
-begin
-  result := not crc;
-  if (buf<>nil) and (len>0) then begin
-    repeat
-      if PtrUInt(buf) and 3=0 then // align to 4 bytes boundary
-        break;
-      result := crc32ctab[0,ToByte(result xor ord(buf^))] xor (result shr 8);
-      dec(len);
-      inc(buf);
-    until len=0;
-    while len>=4 do begin
-      result := result xor PCardinal(buf)^;
-      inc(buf,4);
-      result := crc32ctab[3,ToByte(result)] xor
-                crc32ctab[2,ToByte(result shr 8)] xor
-                crc32ctab[1,ToByte(result shr 16)] xor
-                crc32ctab[0,result shr 24];
-      dec(len,4);
-    end;
-    while len>0 do begin
-      result := crc32ctab[0,ToByte(result xor ord(buf^))] xor (result shr 8);
-      dec(len);
-      inc(buf);
-    end;
-  end;
-  result := not result;
-end;
-{$else}
-// adapted from fast Aleksandr Sharahov version
-asm
-        test    edx, edx
-        jz      @ret
-        neg     ecx
-        jz      @ret
-        not     eax
-        push    ebx
-@head:  test    dl, 3
-        jz      @aligned
-        movzx   ebx, byte[edx]
-        inc     edx
-        xor     bl, al
-        shr     eax, 8
-        xor     eax, dword ptr[ebx * 4 + crc32ctab]
-        inc     ecx
-        jnz     @head
-        pop     ebx
-        not     eax
-        ret
-@ret:   rep     ret
-@aligned:
-        sub     edx, ecx
-        add     ecx, 8
-        jg      @bodydone
-        push    esi
-        push    edi
-        mov     edi, edx
-        mov     edx, eax
-@bodyloop:
-        mov     ebx, [edi + ecx - 4]
-        xor     edx, [edi + ecx - 8]
-        movzx   esi, bl
-        mov     eax, dword ptr[esi * 4 + crc32ctab + 1024 * 3]
-        movzx   esi, bh
-        xor     eax, dword ptr[esi * 4 + crc32ctab + 1024 * 2]
-        shr     ebx, 16
-        movzx   esi, bl
-        xor     eax, dword ptr[esi * 4 + crc32ctab + 1024 * 1]
-        movzx   esi, bh
-        xor     eax, dword ptr[esi * 4 + crc32ctab + 1024 * 0]
-        movzx   esi, dl
-        xor     eax, dword ptr[esi * 4 + crc32ctab + 1024 * 7]
-        movzx   esi, dh
-        xor     eax, dword ptr[esi * 4 + crc32ctab + 1024 * 6]
-        shr     edx, 16
-        movzx   esi, dl
-        xor     eax, dword ptr[esi * 4 + crc32ctab + 1024 * 5]
-        movzx   esi, dh
-        xor     eax, dword ptr[esi * 4 + crc32ctab + 1024 * 4]
-        add     ecx, 8
-        jg      @done
-        mov     ebx, [edi + ecx - 4]
-        xor     eax, [edi + ecx - 8]
-        movzx   esi, bl
-        mov     edx, dword ptr[esi * 4 + crc32ctab + 1024 * 3]
-        movzx   esi, bh
-        xor     edx, dword ptr[esi * 4 + crc32ctab + 1024 * 2]
-        shr     ebx, 16
-        movzx   esi, bl
-        xor     edx, dword ptr[esi * 4 + crc32ctab + 1024 * 1]
-        movzx   esi, bh
-        xor     edx, dword ptr[esi * 4 + crc32ctab + 1024 * 0]
-        movzx   esi, al
-        xor     edx, dword ptr[esi * 4 + crc32ctab + 1024 * 7]
-        movzx   esi, ah
-        xor     edx, dword ptr[esi * 4 + crc32ctab + 1024 * 6]
-        shr     eax, 16
-        movzx   esi, al
-        xor     edx, dword ptr[esi * 4 + crc32ctab + 1024 * 5]
-        movzx   esi, ah
-        xor     edx, dword ptr[esi * 4 + crc32ctab + 1024 * 4]
-        add     ecx, 8
-        jle     @bodyloop
-        mov     eax, edx
-@done:  mov     edx, edi
-        pop     edi
-        pop     esi
-@bodydone:
-        sub     ecx, 8
-        jl      @tail
-        pop     ebx
-        not     eax
-        ret
-@tail:  movzx   ebx, byte[edx + ecx]
-        xor     bl, al
-        shr     eax, 8
-        xor     eax, dword ptr[ebx * 4 + crc32ctab]
-        inc     ecx
-        jnz     @tail
-        pop     ebx
-        not     eax
-end;
-{$ifend}
-
 {*****************************************************}
 function Crc32cfast_2(Const str: AnsiString): cardinal;
 begin
-   Result:=Crc32cfast(0, Pointer(@str[1]), Length(str));
+   Result:=Crc32cfast(0, Pointer(str), Length(str));
 end;
 
 {*************************************************************}
 function Crc32cfast_3(buf: PAnsiChar; len: cardinal): cardinal;
 begin
    Result:=Crc32cfast(0, buf, len);
+end;
+
+{***************************************************}
+function Crc64csse42_2(Const str: AnsiString): int64;
+var hilo: Int64Rec absolute result;
+begin
+  hilo.Lo := Crc32csse42(0, Pointer(str), Length(str));
+  hilo.Hi := Crc32csse42(hilo.Lo, Pointer(str), Length(str));
+end;
+
+{***********************************************************}
+function Crc64csse42_3(buf: PAnsiChar; len: cardinal): int64;
+var hilo: Int64Rec absolute result;
+begin
+  hilo.Lo := Crc32csse42(0,buf,len);
+  hilo.Hi := Crc32csse42(hilo.Lo,buf,len);
+end;
+
+{**************************************************}
+function Crc64cfast_2(Const str: AnsiString): int64;
+var hilo: Int64Rec absolute result;
+begin
+  hilo.Lo := Crc32cfast(0, Pointer(str), Length(str));
+  hilo.Hi := Crc32cfast(hilo.Lo, Pointer(str), Length(str));
+end;
+
+{**********************************************************}
+function Crc64cfast_3(buf: PAnsiChar; len: cardinal): int64;
+var hilo: Int64Rec absolute result;
+begin
+  hilo.Lo := Crc32cfast(0,buf,len);
+  hilo.Hi := Crc32cfast(hilo.Lo,buf,len);
+end;
+
+{********************************************************************************}
+procedure ALTestCRC32Implementation(const aSavedResultsFilename: AnsiString = '');
+var LData: ansiString;
+    LCharset: Array of ansiChar;
+    LCrc32csse42Result: cardinal;
+    LCrc32cfastResult: cardinal;
+    LCrc32cfastpurepascalResult: cardinal;
+    LStringList: TalStringList;
+    LSaveResults: Boolean;
+    I: integer;
+begin
+  if not (cfSSE42 in ALCpuFeatures) then
+    raise Exception.Create('test failed!');
+  //-----
+  LSaveResults := aSavedResultsFilename <> '';
+  LStringList := TalStringList.Create;
+  try
+
+    if (aSavedResultsFilename <> '') and
+       (ALFileExists(aSavedResultsFilename)) then begin
+      LSaveResults := False;
+      LStringList.LoadFromFile(aSavedResultsFilename);
+      for I := 0 to LStringList.Count - 1 do begin
+        LData := ALBase64DecodeString(LStringList.ValueFromIndex[i]);
+        LCrc32cfastResult:=Crc32cfast(0, Pointer(LData), Length(LData));
+        LCrc32csse42Result:=Crc32csse42(0, Pointer(LData), Length(LData));
+        LCrc32cfastpurepascalResult:=Crc32cfastpurepascal(0, Pointer(LData), Length(LData));
+        if LCrc32cfastResult <> LCrc32cfastpurepascalResult then raise Exception.Create('test failed!');
+        if LCrc32cfastResult <> LCrc32csse42Result then raise Exception.Create('test failed!');
+        if LCrc32cfastResult <> ALStrToUInt(LStringList.Names[i]) then raise Exception.Create('test failed!');
+      end;
+    end;
+    //-----
+    setlength(LCharset, 255);
+    for I := low(LCharset) to high(LCharset) do
+      LCharset[i] := ansichar(i);
+    //-----
+    for I := 0 to 1000000 do begin
+      LData := ALRandomStr(random(65536), LCharset);
+      LCrc32cfastResult:=Crc32cfast(0, Pointer(LData), Length(LData));
+      LCrc32csse42Result:=Crc32csse42(0, Pointer(LData), Length(LData));
+      LCrc32cfastpurepascalResult:=Crc32cfastpurepascal(0, Pointer(LData), Length(LData));
+      if LCrc32cfastResult <> LCrc32cfastpurepascalResult then raise Exception.Create('test failed!');
+      if LCrc32cfastResult <> LCrc32csse42Result then raise Exception.Create('test failed!');
+      if LSaveResults and (I mod 1000 = 0) then
+        LStringList.add(ALUintToStr(LCrc32cfastResult) + LStringList.NameValueSeparator + ALBase64EncodeString(LData));
+    end;
+    //-----
+    if LSaveResults then
+      LStringList.SaveToFile(aSavedResultsFilename);
+
+  finally
+    ALFreeAndNil(LStringList);
+  end;
 end;
 
 {$ENDIF}
@@ -5018,51 +5159,47 @@ end;
 
 {***************}
 {$IFNDEF NEXTGEN}
-{$WARNINGS OFF}
 //http://programmers.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed
 //https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
 //http://www.isthe.com/chongo/tech/comp/fnv/index.html#FNV-param
-function ALFnv1aInt64(const str: ansiString): int64;
+function ALFnv1aInt64(const str: ansiString): Int64;
 var i : Integer;
 begin
-   Result := 14695981039346656037;
+   Result := Int64(14695981039346656037);
    for i:=low(str) to high(str) do
       Result := (Result xor Ord(str[i])) * 1099511628211;
 end;
-{$WARNINGS ON}
 {$ENDIF}
 
-{*************}
-{$WARNINGS OFF}
-function ALFnv1aInt64U(const str: String; Const encoding: Tencoding): int64;
+{**************************************************************************}
+function ALFnv1aInt64U(const str: String; Const encoding: Tencoding): Int64;
 var abytes: Tbytes;
     i : Integer;
 begin
   aBytes := encoding.GetBytes(str);
-  Result := 14695981039346656037;
+  Result := Int64(14695981039346656037);
   for i:=low(aBytes) to high(aBytes) do
     Result := (Result xor aBytes[i]) * 10995116282118;
 end;
-{$WARNINGS ON}
 
 {***************}
 {$IFNDEF NEXTGEN}
-function ALFnv1aInt32(const str: ansiString): int64;
+function ALFnv1aInt32(const str: ansiString): int32;
 var i : Integer;
 begin
-   Result := 2166136261;
+   Result := int32(2166136261);
    for i:=low(str) to high(str) do
       Result := (Result xor Ord(str[i])) * 16777619;
 end;
 {$ENDIF}
 
-{*************************************************************************}
-function ALFnv1aInt32U(const str: String; Const encoding: Tencoding): int64;
+{**************************************************************************}
+function ALFnv1aInt32U(const str: String; Const encoding: Tencoding): int32;
 var abytes: Tbytes;
     i : Integer;
 begin
   aBytes := encoding.GetBytes(str);
-  Result := 2166136261;
+  Result := int32(2166136261);
   for i:=low(aBytes) to high(aBytes) do
     Result := (Result xor aBytes[i]) * 16777619;
 end;
@@ -5264,7 +5401,7 @@ begin
   // http://mormot.net
   //
 
-  {$IF CompilerVersion > 33} // tokyo
+  {$IF CompilerVersion > 34} // sydney
     {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
   {$IFEND}
 
@@ -5275,22 +5412,27 @@ begin
       if (crc and 1)<>0 then // polynom is not the same as with zlib's crc32()
         crc := (crc shr 1) xor $82f63b78 else
         crc := crc shr 1;
-    crc32ctab[0,i] := crc;
+    crc32ctab[0,i] := crc; // for crc32cfast() and SymmetricEncrypt/FillRandom
   end;
   for i := 0 to 255 do begin
     crc := crc32ctab[0,i];
     for n := 1 to high(crc32ctab) do begin
-      crc := (crc shr 8) xor crc32ctab[0,ToByte(crc)];
+      crc := (crc shr 8) xor crc32ctab[0,Byte(crc)];
       crc32ctab[n,i] := crc;
     end;
   end;
+  ALInitCpuFeatures;
   if cfSSE42 in ALCpuFeatures then begin
     ALStringHashCrc32 := @Crc32csse42_2;
     ALHashCrc32 := @Crc32csse42_3;
+    ALStringHashCrc64 := @Crc64csse42_2;
+    ALHashCrc64 := @Crc64csse42_3;
   end
   else begin
     ALStringHashCrc32 := @Crc32cfast_2;
     ALHashCrc32 := @Crc32cfast_3;
+    ALStringHashCrc64 := @Crc64cfast_2;
+    ALHashCrc64 := @Crc64cfast_3;
   end;
 
   {$ENDIF}

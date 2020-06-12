@@ -35,6 +35,7 @@
 #include <ALGraphics.hpp>
 #include <ALFmxFilterEffects.hpp>
 #include <ALFmxAni.hpp>
+#include <ALFiles.hpp>
 #include <System.UITypes.hpp>	// (rtl)
 #include <Winapi.Windows.hpp>	// (rtl)
 #include <Winapi.PsAPI.hpp>	// (rtl)

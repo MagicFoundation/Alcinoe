@@ -10,6 +10,7 @@ program ECC;
     Manage certificate-based public-key cryptography using ECC-secp256r1,
     i.e. public/private key pairs, ECDSA digital signatures and ECIES encryption,
     as implemented in SynECC.
+    Symetric encryption is also available from aeadcrypt/aeaddecrypt commands.
 
 
   Version 1.18
@@ -24,6 +25,7 @@ uses
   {$I SynDprUses.inc}
   SysUtils,
   SynCommons,
+  SynTable,
   SynCrypto,
   SynEcc,
   ECCProcess;
@@ -38,7 +40,7 @@ begin
   cmd := StringToUTF8(ParamStr(1));
   main := TECCCommand(GetEnumNameValueTrimmed(TypeInfo(TECCCommand),pointer(cmd),length(cmd)));
   if main=ecChain then
-    sw := TCommandLine.CreateAsArray(2) else
+    sw := TCommandLine.CreateAsArray({firstparam=}2) else
     sw := TCommandLine.Create;
   result := ECCCommand(main,sw);
   if result=eccUnknownCommand then begin
@@ -78,6 +80,12 @@ begin
       '      -authpass P@ssW0rd -authrounds 60000 -saltpass salt -saltrounds 60000');
     writeln(ExeVersion.ProgramName,
       ' infocrypt -file some.doc.synecc [-rawfile some.raw][-json some.json]');
+    writeln(ExeVersion.ProgramName,
+      ' aeadcrypt -file some.doc -out some.doc.synaead -pass P@ssW0rd -salt salt'#13#10+
+      '       -rounds 60000');
+    writeln(ExeVersion.ProgramName,
+      ' aeaddecrypt -file some.doc -out some.doc.synaead -pass P@ssW0rd -salt salt'#13#10+
+      '       -rounds 60000');
     writeln(ExeVersion.ProgramName,
       ' cheatinit -newpass MasterP@ssw0RD@ -newrounds 100000');
     writeln(ExeVersion.ProgramName,

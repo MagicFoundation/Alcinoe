@@ -31,6 +31,7 @@
  // assert.ok(doc.documentElement.textContent.startsWith('mORMot'), 'got mORMot from mORMot');
  *
  * @module http
+ * @memberOf module:buildin
  */
 const CRLF = '\r\n'
 const url = require('url')
@@ -38,10 +39,13 @@ const EventEmitter = require('events').EventEmitter
 const util = require('util')
 const THTTPClient = process.binding('synode_http').THTTPClient
 
-/* Global http proxy configuration */
+/* Global http proxy configuration. 
+  Default value for proxy server getted form http_proxy environment variable.
+  Under Windows (Docker for Windows for example) HTTP_PROXY is used, so fallback to it also
+*/
 var
   proxyConfig = {
-    server: '',
+    server: process.env.http_proxy || process.env.HTTP_PROXY || '',
     bypass: ''
   },
   connectionDefaults = {

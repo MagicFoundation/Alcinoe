@@ -3,9 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
 */
 
-let {coreModulesPath, runInThisContext} = process.binding('modules'),
-    {loadFile} = process.binding('fs'),
-    Module;
+const {coreModulesPath, runInThisContext, runInThisContextRes, _coreModulesInRes} = process.binding('modules');
+const {loadFile} = process.binding('fs');
+let Module;
 
 
 /**
@@ -157,7 +157,9 @@ const NODE_CORE_MODULES = ['fs', 'util', 'path', 'assert', 'module', 'console', 
 NativeModule._source = {};
 const PATH_DELIM = process.platform === 'win32' ? '\\' : '/'
 NODE_CORE_MODULES.forEach( (module_name) => { 
-  NativeModule._source[module_name] = `${coreModulesPath}${PATH_DELIM}node_modules${PATH_DELIM}${module_name}.js`
+  NativeModule._source[module_name] = _coreModulesInRes
+      ? `node_modules/${module_name}.js`.toUpperCase()
+      : `${coreModulesPath}${PATH_DELIM}node_modules${PATH_DELIM}${module_name}.js`
 });
 
 NativeModule._cache = {};
@@ -233,12 +235,15 @@ NativeModule.wrapper = [
 ];
 
 NativeModule.prototype.compile = function () {
-    var source = NativeModule.getSource(this.id);
-    source = NativeModule.wrap(source);
-
-    var fn = runInThisContext(source, this.filename, true);
+    let fn;
+    if (_coreModulesInRes) {
+        fn = runInThisContextRes(NativeModule._source[this.id], this.filename, true);
+    } else {
+        let source = NativeModule.getSource(this.id);
+        source = NativeModule.wrap(source);
+        fn = runInThisContext(source, this.filename, true);
+    }
     fn(this.exports, NativeModule.require, this, this.filename);
-
     this.loaded = true;
 };
 

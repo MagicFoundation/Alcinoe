@@ -5,10 +5,10 @@ unit SynSMAPI;
 {
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
-    Scripting support for mORMot Copyright (C) 2018 Pavel Mashlyakovsky
+    Scripting support for mORMot Copyright (C) 2020 Pavel Mashlyakovsky
       pavel.mash at gmail.com
 
     Some ideas taken from
@@ -29,7 +29,7 @@ unit SynSMAPI;
 
   The Initial Developer of the Original Code is
   Pavel Mashlyakovsky.
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -71,7 +71,7 @@ unit SynSMAPI;
 
 }
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 {$I SynSM.inc}   //define JS_THREADSAFE WITHASSERT
 
 interface
@@ -135,7 +135,7 @@ type
   /// 16 bit unsigned integer type for SMAPI
   JSUint16 = Word;
   /// 32 bit unsigned integer type for SMAPI
-  JSUInt32 = LongWord;
+  JSUInt32 = Cardinal;
   /// 64 bit signed integer type for SMAPI
   JSInt64 = Int64;
   /// 64 bit unsigned integer type for SMAPI
@@ -4806,8 +4806,7 @@ procedure JSString.ToVariant(cx: PJSContext; var Value: Variant);
 var len: size_t;
 begin
   with TVarData(Value) do begin
-    if VType and VTYPE_STATIC<>0 then
-      VarClear(Value);
+    VarClear(Value);
     VType := varSynUnicode;
     VAny := nil; // avoid GPF below
     SetString(SynUnicode(VAny),

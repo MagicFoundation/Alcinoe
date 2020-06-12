@@ -2,6 +2,7 @@
 /**
  * See <a href="https://nodejs.org/api/stream.html">Node <strong>stream</strong> module documentation</a>
  * @module stream
+ * @memberOf module:buildin
  */
 module.exports = Stream;
 

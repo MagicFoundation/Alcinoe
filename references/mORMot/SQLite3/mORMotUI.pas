@@ -6,7 +6,7 @@ unit mORMotUI;
 (*
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,11 +25,12 @@ unit mORMotUI;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
   - kevinday
+  - MartinEckes
 
   Alternatively, the contents of this file may be used under the terms of
   either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -127,13 +128,18 @@ interface
 {$I Synopse.inc}
 
 uses
+  {$ifdef MSWINDOWS}
   Windows,
+  {$endif MSWINDOWS}
+  {$ifdef FPC}
+  LCLType, LCLProc, LCLIntf, LMessages,
+  {$endif FPC}
   Types, DateUtils,
   SynCommons, mORMot,
   SysUtils, Classes, Messages, Variants,
   {$ifdef WITHUXTHEME}
   Themes,
-  {$endif}
+  {$endif WITHUXTHEME}
   Graphics, StdCtrls, Controls, Grids, Buttons, ExtCtrls, Forms;
 
 type
@@ -153,7 +159,11 @@ type
     /// called after a Hide call
     procedure VisibleChanging; override;
     /// used to hide the popup hint after a delay
+    {$ifdef FPC}
+    procedure WMTimer(var Message: TLMTimer); message LM_TIMER;
+    {$else}
     procedure WMTimer(var Msg: TWMTimer); message WM_TIMER;
+    {$endif}
     /// overridden method, Unicode ready
     procedure Paint; override;
   public
@@ -231,7 +241,7 @@ type
     {$else}
     fOnDrawCellBackground: TDrawCellEvent;
     {$endif}
-    fMarked: array of byte;
+    fMarked: TByteDynArray;
     fMarkAllowed: boolean;
     fMouseDownMarkedValue: (markNone,markOn,markOff);
     fTruncAsHint: Boolean;
@@ -522,7 +532,7 @@ type
 
   /// allow to track and load/save UI components as JSON
   // - may be used to persist TEdit / TCheckBox / TComboBox values on a form
-  // when the application leaves 
+  // when the application leaves
   TUIComponentsPersist = class
   protected
     fTracked: array of TComponent;
@@ -541,7 +551,7 @@ type
     /// save all tracked controls properties as JSON in a local file
     procedure SaveToFile;
     /// the local JSON file used for persistence
-    // - is set to 'executablename.default' if none is specified   
+    // - is set to 'executablename.default' if none is specified
     property FileName: TFileName read GetFileName write fFileName;
   end;
 
@@ -603,6 +613,9 @@ procedure HideAppFormTaskBarButton;
 // - use theming under XP, Vista and Seven
 procedure DrawCheckBox(hWnd: THandle; Handle: HDC; const Rect: TRect; Checked: boolean);
 
+
+{$ifdef MSWINDOWS}
+
 /// test if the ClearType is enabled for font display
 // - ClearType is a software technology that improves the readability of text
 // on liquid crystal display (LCD) monitors
@@ -641,6 +654,7 @@ procedure AddApplicationToFirewall(const EntryName, ApplicationPathAndExe: strin
 // for a setup program)
 procedure AddPortToFirewall(const EntryName: string; PortNumber: cardinal);
 
+{$endif MSWINDOWS}
 
 /// fill TStringGrid.Cells[] with the supplied data
 // - will be slower than the TSQLTableToGrid method, but will work on
@@ -657,7 +671,10 @@ implementation
 
 uses
   {$ifdef ISDELPHIXE3}System.UITypes,{$endif}
-  ShellApi, ComObj, Activex, Shlobj, VarUtils;
+  {$ifdef MSWINDOWS}ShellApi, ComObj, Activex,Shlobj, {$endif}
+  VarUtils;
+
+{$ifdef MSWINDOWS}
 
 procedure CreateShellLink (const Filename, Description, ShortcutTo, Parameters,
   WorkingDir, IconFilename: String; const IconIndex: Integer;
@@ -871,6 +888,8 @@ begin
   SetScrollInfo(Handle, SB_VERT, ScrollInfo, true);
 end;
 
+{$endif MSWINDOWS}
+
 
 { THintWindowDelayed }
 
@@ -931,7 +950,7 @@ var U: RawUnicode; // faster than a WideString
 begin // unicode version
   Result := Rect(0, 0, MaxWidth, 0);
   U := Utf8DecodeToRawUnicode(AHint);
-  DrawTextW(Canvas.Handle, pointer(U), length(U) shr 1, Result, DT_CALCRECT or DT_LEFT or
+  {$ifdef MSWINDOWS}DrawTextW{$else}DrawText{$endif}(Canvas.Handle, pointer(U), length(U) shr 1, Result, DT_CALCRECT or DT_LEFT or
     DT_WORDBREAK or DT_NOPREFIX {$ifndef FPC}or DrawTextBiDiModeFlagsReadingOnly{$endif});
   Inc(Result.Right, 6);
   Inc(Result.Bottom, 2);
@@ -946,7 +965,7 @@ begin // unicode version
   Inc(R.Top, 2);
   Canvas.Font.Color := fFontColor;
   U := Utf8DecodeToRawUnicodeUI(fUTF8Text);
-  DrawTextW(Canvas.Handle, pointer(U), -1, R, DT_LEFT or DT_NOPREFIX or
+  {$ifdef MSWINDOWS}DrawTextW{$else}DrawText{$endif}(Canvas.Handle, pointer(U), -1, R, DT_LEFT or DT_NOPREFIX or
     DT_WORDBREAK {$ifndef FPC}or DrawTextBiDiModeFlagsReadingOnly{$endif});
 end;
 
@@ -965,7 +984,11 @@ begin
   end;
 end;
 
+{$ifdef FPC}
+procedure THintWindowDelayed.WMTimer(var Message: TLMTimer);
+{$else}
 procedure THintWindowDelayed.WMTimer(var Msg: TWMTimer);
+{$endif}
 begin
   Hide;
   fRow := -1;
@@ -1083,6 +1106,18 @@ begin
     DrawFrameControl(Handle,DrawRect,DFC_BUTTON,Win32State[Checked]);
 end;
 
+{$ifndef MSWINDOWS}
+function ExtTextOutW(DC: HDC; X, Y: Integer; Options: LongInt; Rect: PRect;
+  Str: PWideChar; Count: LongInt; Dx: ObjPas.PInteger): Boolean;
+var
+  TempStr: UTF8String;
+  L:integer;
+begin
+  TempStr := RawUnicodeToUtf8(Str,Count,L);
+  Result := ExtTextOut(DC, X, Y, Options, Rect, PChar(TempStr),L, Dx);
+end;
+{$endif}
+
 procedure TSQLTableToGrid.DrawCell(Sender: TObject; ACol, ARow: Integer;
   Rect: TRect; State: TGridDrawState);
 var Options, x,y, L, i, XInc: integer;
@@ -1091,6 +1126,9 @@ var Options, x,y, L, i, XInc: integer;
     WithMark: boolean;
     Aligned: TSQLTableToGridAlign;
     tmp: array[0..255] of WideChar; // 255 chars is wide enough inside a cell
+    {$ifndef MSWINDOWS}
+    aTextStyle: TTextStyle;
+    {$endif}
 begin
   // default cell draw
   if NotDefined then
@@ -1101,6 +1139,9 @@ begin
     (cardinal(ACol)>=cardinal(Table.FieldCount)) then // avoid any possible GPF
     exit;
   with TDrawGrid(Owner).Canvas do begin
+    {$ifndef MSWINDOWS}
+    aTextStyle := TextStyle;
+    {$endif}
     Options := ETO_CLIPPED {$ifndef FPC}or TextFlags{$endif};
     if Brush.Style <> bsClear then
       Options := Options or ETO_OPAQUE;
@@ -1121,17 +1162,30 @@ begin
       if Aligned=alCenter then begin
         UnSetBit64(fFieldNameTruncated,ACol);
         XInc := L shr 1;
+        {$ifdef MSWINDOWS}
         SetTextAlign(Handle,TA_CENTER);
+        {$else}
+        aTextStyle.Alignment := taCenter;
+        {$endif}
       end else begin
         SetBit64(fFieldNameTruncated,ACol);
         XInc := 2;
       end;
       if WithMark then
         inc(XInc,CheckBoxWidth+4);
+      {$ifndef MSWINDOWS}
+      TextStyle := aTextStyle;
+      TextRect(Rect,Rect.Left+XInc,Rect.Top+2,StringValue);
+      {$else}
       ExtTextOut(Handle, Rect.Left+XInc,Rect.Top+2, Options, @Rect, pointer(StringValue),
         length(StringValue), nil); // direct translated text centered draw
+      {$endif}
       if Aligned=alCenter then
+        {$ifdef MSWINDOWS}
         SetTextAlign(Handle,TA_LEFT);
+        {$else}
+        aTextStyle.Alignment := taLeftJustify;
+        {$endif}
       Font.Style := [];
       if fCurrentFieldOrder=ACol then begin
         // sorted field: draw sort indicator
@@ -1172,11 +1226,19 @@ begin
       Aligned := self.Aligned[ACol];
       case Aligned of
       alCenter: begin
+        {$ifdef MSWINDOWS}
         SetTextAlign(Handle,TA_CENTER);
+        {$else}
+        aTextStyle.Alignment := taCenter;
+        {$endif}
         XInc := L shr 1;
       end;
       alRight: begin
+        {$ifdef MSWINDOWS}
         SetTextAlign(Handle,TA_RIGHT);
+        {$else}
+        aTextStyle.Alignment := taRightJustify;
+        {$endif}
         XInc := L-4;
       end else
         XInc := 4;
@@ -1187,34 +1249,62 @@ begin
         L := length(StringValue);
         if L>255 then
           L := 255; // avoid blank cell drawing for huge content
+        {$ifndef MSWINDOWS}
+        TextStyle := aTextStyle;
+        TextRect(Rect,Rect.Left+XInc,Rect.Top+2,StringValue);
+        {$else}
         ExtTextOut(Handle, Rect.Left+XInc, Rect.Top+2, Options, @Rect,
           pointer(StringValue), L, nil); // translated text
+        {$endif}
       end else
       case Table.ExpandAsString(ARow,ACol,Client,StringValue,GetCustomFormat(ACol)) of
       // very fast response (calculated once)
       sftBoolean:
         // display boolean as checkbox
-        DrawCheckBox(TDrawGrid(Owner).Handle, Handle, Rect,
-          PWord(Table.Get(ARow,ACol))^<>ord('0')); // fast StrComp(,'0')
+        if Assigned(Table.Get(ARow,ACol)) then
+          DrawCheckBox(TDrawGrid(Owner).Handle, Handle, Rect,
+            PWord(Table.Get(ARow,ACol))^<>ord('0')) // fast StrComp(,'0')
+        else
+          DrawCheckBox(TDrawGrid(Owner).Handle, Handle, Rect, False);
       sftInteger, sftFloat, sftCurrency,
       sftEnumerate, sftTimeLog, sftRecord,
       sftDateTime, sftDateTimeMS, sftUnixTime, sftUnixMSTime:
-        ExtTextOut(Handle, Rect.Left+XInc, Rect.Top+2, Options, @Rect, pointer(StringValue),
-          length(StringValue), nil); // translated short text
+        begin
+          {$ifndef MSWINDOWS}
+          TextStyle := aTextStyle;
+          TextRect(Rect,Rect.Left+XInc,Rect.Top+2,StringValue);
+          {$else}
+          ExtTextOut(Handle, Rect.Left+XInc, Rect.Top+2, Options, @Rect, pointer(StringValue),
+            length(StringValue), nil); // translated short text
+          {$endif}
+        end;
       //sftID,sftTID:
       // proposal: display ID as TSQLRecord content? better compute it in SELECT
       else begin
         // normal field value: unicode text (even with Delphi 2-2007 VCL), left aligned
+        {$ifndef MSWINDOWS}
+        StringValue := Table.GetU(ARow,ACol);
+        for i := 0 to Length(StringValue)-1 do // replace #13,#10 chars in the grid with spaces
+          if StringValue[i]<' ' then
+            StringValue[i] := ' ';
+        TextStyle := aTextStyle;
+        TextRect(Rect,Rect.Left+XInc,Rect.Top+2,StringValue);
+        {$else}
         L := Table.GetWP(ARow,ACol,tmp,high(tmp));
         for i := 0 to L-1 do // replace #13,#10 chars in the grid with spaces
           if tmp[i]<' ' then
             tmp[i] := ' ';
         // direct unicode text draw
         ExtTextOutW(Handle, Rect.Left+XInc, Rect.Top+2, Options, @Rect, tmp, L, nil);
+        {$endif}
       end;
       end;
       if Aligned<>alLeft then
+        {$ifdef MSWINDOWS}
         SetTextAlign(Handle,TA_LEFT);
+        {$else}
+        aTextStyle.Alignment := taLeftJustify;
+        {$endif}
     end;
     if WithMark then begin // draw left side checkbox with Marked[] value
       inc(Rect.Left,2);
@@ -1700,7 +1790,7 @@ begin
   if (self=nil) or (fMarked=nil) or
      (cardinal(RowIndex)>=cardinal(length(fMarked)shl 3)) then
     result := false else
-    result := GetBit(fMarked[0],RowIndex);
+    result := GetBitPtr(pointer(fMarked),RowIndex);
 end;
 
 procedure TSQLTableToGrid.SetMarked(RowIndex: integer;
@@ -1714,8 +1804,8 @@ begin
   if length(fMarked)<n then // need to allocate/expand fMarked[] array?
     SetLength(fMarked,n);   // initializes all expanded bytes to 0
   if Value then
-    SetBit(fMarked[0],RowIndex) else
-    UnSetBit(fMarked[0],RowIndex)
+    SetBitPtr(pointer(fMarked),RowIndex) else
+    UnSetBitPtr(pointer(fMarked),RowIndex)
 end;
 
 procedure TSQLTableToGrid.SetMark(aAction: TSQLAction);
@@ -1792,7 +1882,7 @@ begin
   if not result then
     exit;
   for i := 0 to Table.RowCount-1 do // very any bit is realy set
-    if GetBit(fMarked[0],i) then
+    if GetBitPtr(pointer(fMarked),i) then
       exit;
   result := false;
 end;
@@ -1875,7 +1965,7 @@ begin
   if fFieldIndexTimeLogForMark=-2 then begin
     fFieldIndexTimeLogForMark := -1;
     for F := 0 to Table.FieldCount-1 do
-      if Table.FieldType(F,nil)=sftTimeLog then begin
+      if Table.FieldType(F)=sftTimeLog then begin
         fFieldIndexTimeLogForMark := F;
         break;
       end;

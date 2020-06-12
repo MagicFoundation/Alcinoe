@@ -6,7 +6,7 @@ unit SynDBDataset;
 {
   This file is part of Synopse framework.
 
-  Synopse framework. Copyright (C) 2018 Arnaud Bouchez
+  Synopse framework. Copyright (C) 2020 Arnaud Bouchez
   Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit SynDBDataset;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -46,12 +46,9 @@ unit SynDBDataset;
 
   ***** END LICENSE BLOCK *****
 
-  Version 1.18
-  - first public release, corresponding to mORMot framework 1.18
-
 }
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 interface
 
@@ -65,6 +62,7 @@ uses
   {$ENDIF}
   Classes, Contnrs,
   SynCommons,
+  SynTable,
   SynLog,
   SynDB,
   {$ifdef ISDELPHIXE2}
@@ -184,13 +182,15 @@ type
     // - raise an ESQLDBDataset on any error
     procedure Reset; override;
 
-    /// Access the next or first row of data from the SQL Statement result
+    /// access the next or first row of data from the SQL Statement result
     // - return true on success, with data ready to be retrieved by Column*() methods
     // - return false if no more row is available (e.g. if the SQL statement
     // is not a SELECT but an UPDATE or INSERT command)
     // - if SeekFirst is TRUE, will put the cursor on the first row of results
     // - raise an ESQLDBDataset on any error
     function Step(SeekFirst: boolean = false): boolean; override;
+    /// close the associated TQuery when ISQLDBStatement is back in cache
+    procedure ReleaseRows; override;
     /// return a Column integer value of the current Row, first Col is 0
     function ColumnInt(Col: Integer): Int64; override;
     /// returns TRUE if the column contains NULL
@@ -363,30 +363,26 @@ begin
 end;
 
 procedure TSQLDBDatasetStatementAbstract.Prepare(const aSQL: RawUTF8; ExpectResults: boolean);
-var Log: ISynLog;
-    oSQL: RawUTF8;
+var oSQL: RawUTF8;
 begin
-  Log := SynDBLog.Enter(Self);
+  SQLLogBegin(sllDB);
   if fPrepared then
     raise ESQLDBDataset.CreateUTF8('%.Prepare() shall be called once',[self]);
   inherited Prepare(aSQL,ExpectResults); // connect if necessary
   fPreparedParamsCount := ReplaceParamsByNames(aSQL,oSQL);
   fPrepared := DatasetPrepare(UTF8ToString(oSQL));
+  SQLLogEnd;
   if not fPrepared then
     raise ESQLDBDataset.CreateUTF8('%.DatasetPrepare not prepared',[self]);
 end;
 
 procedure TSQLDBDatasetStatementAbstract.ExecutePrepared;
-var Log: ISynLog;
-    i,p: Integer;
+var i,p: Integer;
     lArrayIndex: integer;
     Field: TField;
 begin
-  Log := SynDBLog.Enter(Self);
+  SQLLogBegin(sllSQL);
   inherited ExecutePrepared; // set fConnection.fLastAccessTicks
-  with Log.Instance do
-    if sllSQL in Family.Level then
-      Log(sllSQL,SQLWithInlinedParams,self,2048);
   // 1. bind parameters in fParams[] to fQuery.Params
   if fPreparedParamsCount<>fParamCount then
     raise ESQLDBDataset.CreateUTF8(
@@ -421,7 +417,6 @@ begin
     end else
       DatasetExecSQL;
   until fDatasetSupportBatchBinding or (lArrayIndex=fParamsArrayCount-1);
-
   // 3. handle out parameters
   if fParamCount>0 then
     if fParamsArrayCount>0 then
@@ -431,6 +426,7 @@ begin
       for p := 0 to fParamCount-1 do
         if fParams[p].VInOut<>paramIn then
           DataSetOutSQLParam(p,fParams[p]);
+  SQLLogEnd;
 end;
 
 function TSQLDBDatasetStatementAbstract.Step(SeekFirst: boolean): boolean;
@@ -449,8 +445,15 @@ end;
 
 procedure TSQLDBDatasetStatementAbstract.Reset;
 begin
-  fQuery.Close;
+  ReleaseRows;
   inherited Reset;
+end;
+
+procedure TSQLDBDatasetStatementAbstract.ReleaseRows;
+begin
+  if (fQuery<>nil) and fQuery.Active then
+    fQuery.Close;
+  inherited ReleaseRows;
 end;
 
 function TSQLDBDatasetStatementAbstract.SQLParamTypeToDBParamType(IO: TSQLDBParamInOutType): TParamType;
@@ -470,28 +473,28 @@ begin
     ftLongWord,ftShortint,ftByte,
     {$endif}
     ftAutoInc,ftBoolean, ftSmallint,ftInteger,ftLargeint,ftWord:
-      result := SynCommons.ftInt64;
+      result := SynTable.ftInt64;
     {$ifdef UNICODE}
     ftSingle,ftExtended,
     {$endif}
     ftFloat:
-      result := SynCommons.ftDouble;
+      result := SynTable.ftDouble;
     ftCurrency, ftBCD, ftFMTBcd:
-      result := SynCommons.ftCurrency;
+      result := SynTable.ftCurrency;
     {$ifdef UNICODE}
     ftOraTimeStamp,ftOraInterval,
     {$endif}
     ftDate,ftTime,ftDateTime,ftTimeStamp:
-      result := SynCommons.ftDate;
+      result := SynTable.ftDate;
     ftBytes,ftVarBytes,ftBlob,ftGraphic,ftOraBlob:
-      result := SynCommons.ftBlob;
+      result := SynTable.ftBlob;
     {$ifdef UNICODE}
     ftFixedWideChar,ftWideMemo,
     {$endif}
     ftString,ftFixedChar,ftWideString,ftMemo,ftFmtMemo,ftOraClob,ftVariant,ftGuid:
-      result := SynCommons.ftUTF8;
+      result := SynTable.ftUTF8;
   else // will use TEXT for other fields (any feedback is welcome!)
-      result := SynCommons.ftUTF8;
+      result := SynTable.ftUTF8;
   end;
 end;
 
@@ -513,9 +516,9 @@ begin
     if TField(ColumnAttr).IsNull then
       WR.AddShort('null') else
     case ColumnType of
-      SynCommons.ftNull:
+      SynTable.ftNull:
         WR.AddShort('null');
-      SynCommons.ftInt64:
+      SynTable.ftInt64:
         if TField(ColumnAttr).DataType=ftBoolean then
           WR.Add(ord(TField(ColumnAttr).AsBoolean)) else
           {$ifdef UNICODE}
@@ -525,18 +528,18 @@ begin
             WR.Add(TLargeintField(ColumnAttr).AsLargeInt) else
             WR.Add(TField(ColumnAttr).AsInteger);
           {$endif}
-      SynCommons.ftDouble:
+      SynTable.ftDouble:
         WR.AddDouble(TField(ColumnAttr).AsFloat);
-      SynCommons.ftCurrency:
+      SynTable.ftCurrency:
         if TField(ColumnAttr).DataType in [ftBCD,ftFMTBcd] then
           AddBcd(WR,TField(ColumnAttr).AsBCD) else
           WR.AddCurr64(TField(ColumnAttr).AsCurrency);
-      SynCommons.ftDate: begin
+      SynTable.ftDate: begin
         WR.Add('"');
         WR.AddDateTime(TField(ColumnAttr).AsDateTime,fForceDateWithMS);
         WR.Add('"');
       end;
-      SynCommons.ftUTF8: begin
+      SynTable.ftUTF8: begin
         WR.Add('"');
         {$ifndef UNICODE}
         if ColumnValueDBType=IsTWideStringField then
@@ -545,7 +548,7 @@ begin
           WR.AddJSONEscapeString(TField(ColumnAttr).AsString);
         WR.Add('"');
       end;
-      SynCommons.ftBlob:
+      SynTable.ftBlob:
         if fForceBlobAsNull then
           WR.AddShort('null') else begin
           blob := ColumnBlob(col);
@@ -570,12 +573,12 @@ var P: TParam;
     I64: Int64;
     tmp: RawUTF8;
 begin
+  P := fQueryParams[aParamIndex];
   with aParam do begin
-    P := fQueryParams[aParamIndex];
     P.ParamType := SQLParamTypeToDBParamType(VInOut);
     if VinOut <> paramInOut then
       case VType of
-        SynCommons.ftNull: begin
+        SynTable.ftNull: begin
           P.Clear;
           {$ifdef UNICODE}
           P.AsBlob := nil; // avoid type errors when a blob field is adressed
@@ -583,14 +586,14 @@ begin
           P.AsString := '';
           {$endif}
         end;
-        SynCommons.ftInt64: begin
+        SynTable.ftInt64: begin
           if aArrayIndex>=0 then
             I64 := GetInt64(pointer(VArray[aArrayIndex])) else
             I64 := VInt64;
           {$ifdef UNICODE}
           P.AsLargeInt := I64;
           {$else}
-          if (Int64Rec(I64).Hi=0) or (Int64Rec(I64).Hi=Cardinal(-1)) then
+          if (PInt64Rec(@I64)^.Hi=0) or (PInt64Rec(@I64)^.Hi=Cardinal(-1)) then
             P.AsInteger := I64 else
             if TSQLDBDatasetConnectionProperties(Connection.Properties).
                fForceInt64AsFloat then
@@ -598,21 +601,21 @@ begin
               P.Value := I64;
           {$endif}
         end;
-        SynCommons.ftDouble:
+        SynTable.ftDouble:
           if aArrayIndex>=0 then
             P.AsFloat := GetExtended(pointer(VArray[aArrayIndex])) else
-            P.AsFloat := PDouble(@VInt64)^;
-        SynCommons.ftCurrency:
+            P.AsFloat := unaligned(PDouble(@VInt64)^);
+        SynTable.ftCurrency:
           if aArrayIndex>=0 then
             P.AsCurrency := StrToCurrency(pointer(VArray[aArrayIndex])) else
             P.AsCurrency := PCurrency(@VInt64)^;
-        SynCommons.ftDate:
+        SynTable.ftDate:
           if aArrayIndex>=0 then begin
             UnQuoteSQLStringVar(pointer(VArray[aArrayIndex]),tmp);
             P.AsDateTime := Iso8601ToDateTime(tmp);
           end else
             P.AsDateTime := PDateTime(@VInt64)^;
-        SynCommons.ftUTF8:
+        SynTable.ftUTF8:
           if aArrayIndex>=0 then
             if (VArray[aArrayIndex]='') and
                fConnection.Properties.StoreVoidStringAsNull then
@@ -627,13 +630,12 @@ begin
             if fForceUseWideString then
               P.Value := UTF8ToWideString(VData) else
               P.AsString := UTF8ToString(VData);
-        SynCommons.ftBlob:
-          {$ifdef UNICODE}
+        SynTable.ftBlob:
           if aArrayIndex>=0 then
+          {$ifdef UNICODE}
             P.SetBlobData(TValueBuffer(VArray[aArrayIndex]),Length(VArray[aArrayIndex])) else
             P.SetBlobData(TValueBuffer(VData),Length(VData));
           {$else}
-          if aArrayIndex>=0 then
             P.AsString := VArray[aArrayIndex] else
             P.AsString := VData;
           {$endif}
@@ -654,17 +656,17 @@ var Par: TParam;
 begin
   Par := fQueryParams[aParamIndex];
   case aParam.VType of
-    SynCommons.ftInt64:
+    SynTable.ftInt64:
       {$ifdef UNICODE}
       aParam.VInt64 := Par.AsLargeInt;
       {$else}
       aParam.VInt64 := trunc(Par.AsFloat);
       {$endif}
-    SynCommons.ftDouble:  PDouble(@aParam.VInt64)^ := Par.AsFloat;
-    SynCommons.ftCurrency:PCurrency(@aParam.VInt64)^ := Par.AsCurrency;
-    SynCommons.ftDate:    PDateTime(@aParam.VInt64)^ := Par.AsDateTime;
-    SynCommons.ftUTF8:    aParam.VData := StringToUTF8(Par.AsString);
-    SynCommons.ftBlob: begin
+    SynTable.ftDouble:  unaligned(PDouble(@aParam.VInt64)^) := Par.AsFloat;
+    SynTable.ftCurrency:PCurrency(@aParam.VInt64)^ := Par.AsCurrency;
+    SynTable.ftDate:    PDateTime(@aParam.VInt64)^ := Par.AsDateTime;
+    SynTable.ftUTF8:    aParam.VData := StringToUTF8(Par.AsString);
+    SynTable.ftBlob: begin
       {$ifdef UNICODE}
       tmpBytes := Par.AsBlob;
       SetString(aParam.VData,PAnsiChar(pointer(tmpBytes)),Length(tmpBytes));
@@ -680,8 +682,7 @@ procedure TSQLDBDatasetStatement.Prepare(const aSQL: RawUTF8;
 begin
   inherited;
   if fPreparedParamsCount<>fQueryParams.Count then
-    raise ESQLDBDataset.CreateUTF8(
-      '%.Prepare expected % parameters in request, found % - [%]',
+    raise ESQLDBDataset.CreateUTF8('%.Prepare expected % parameters in request, found % - [%]',
       [self,fPreparedParamsCount,fQueryParams.Count,aSQL]);
 end;
 

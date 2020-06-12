@@ -6,7 +6,7 @@ unit SynRestVCL;
 {
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit SynRestVCL;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -58,7 +58,7 @@ unit SynRestVCL;
 
 }
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 interface
 
@@ -75,7 +75,9 @@ uses
   mORMotHttpClient,
   SynCrtSock, // remover una vez implementado TSQLHttpClient
   SynCommons,
-  SynDB, SynDBVCL,
+  SynTable,
+  SynDB,
+  SynDBVCL,
   DB,
   {$ifdef FPC}
   BufDataset
@@ -170,11 +172,10 @@ type
 
 // JSON columns to binary from a TSQLTableJSON, is not ideal because this code is a almost repeated code.
 procedure JSONColumnsToBinary(const aTable: TSQLTableJSON; W: TFileBufferWriter;
-  const Null: TSQLDBProxyStatementColumns;
-  const ColTypes: TSQLDBFieldTypeDynArray);
+  Null: pointer; const ColTypes: TSQLDBFieldTypeDynArray);
 // convert to binary from a TSQLTableJSON, is not ideal because this code is a almost repeated code.
 function JSONToBinary(const aTable: TSQLTableJSON; Dest: TStream; MaxRowCount: cardinal=0; DataRowPosition: PCardinalDynArray=nil;
-                      const DefaultDataType: TSQLDBFieldType = SynCommons.ftUTF8; const DefaultFieldSize: Integer = 255): cardinal;
+  const DefaultDataType: TSQLDBFieldType = SynTable.ftUTF8; const DefaultFieldSize: Integer = 255): cardinal;
 
 implementation
 
@@ -186,37 +187,37 @@ const
   FETCHALLTOBINARY_MAGIC = 1;
 
   SQLFIELDTYPETODBFIELDTYPE: array[TSQLFieldType] of TSQLDBFieldType =
-    (SynCommons.ftUnknown,   // sftUnknown
-     SynCommons.ftUTF8,      // sftAnsiText
-     SynCommons.ftUTF8,      // sftUTF8Text
-     SynCommons.ftInt64,     // sftEnumerate
-     SynCommons.ftInt64,     // sftSet
-     SynCommons.ftInt64,     // sftInteger
-     SynCommons.ftInt64,     // sftID = TSQLRecord(aID)
-     SynCommons.ftInt64,     // sftRecord = TRecordReference
-     SynCommons.ftInt64,     // sftBoolean
-     SynCommons.ftDouble,    // sftFloat
-     SynCommons.ftDate,      // sftDateTime
-     SynCommons.ftInt64,     // sftTimeLog
-     SynCommons.ftCurrency,  // sftCurrency
-     SynCommons.ftUTF8,      // sftObject
+    (SynTable.ftUnknown,   // sftUnknown
+     SynTable.ftUTF8,      // sftAnsiText
+     SynTable.ftUTF8,      // sftUTF8Text
+     SynTable.ftInt64,     // sftEnumerate
+     SynTable.ftInt64,     // sftSet
+     SynTable.ftInt64,     // sftInteger
+     SynTable.ftInt64,     // sftID = TSQLRecord(aID)
+     SynTable.ftInt64,     // sftRecord = TRecordReference
+     SynTable.ftInt64,     // sftBoolean
+     SynTable.ftDouble,    // sftFloat
+     SynTable.ftDate,      // sftDateTime
+     SynTable.ftInt64,     // sftTimeLog
+     SynTable.ftCurrency,  // sftCurrency
+     SynTable.ftUTF8,      // sftObject
 {$ifndef NOVARIANTS}
-     SynCommons.ftUTF8,      // sftVariant
-     SynCommons.ftUTF8,      // sftNullable
+     SynTable.ftUTF8,      // sftVariant
+     SynTable.ftUTF8,      // sftNullable
 {$endif}
-     SynCommons.ftBlob,      // sftBlob
-     SynCommons.ftBlob,      // sftBlobDynArray
-     SynCommons.ftBlob,      // sftBlobCustom
-     SynCommons.ftUTF8,      // sftUTF8Custom
-     SynCommons.ftUnknown,   // sftMany
-     SynCommons.ftInt64,     // sftModTime
-     SynCommons.ftInt64,     // sftCreateTime
-     SynCommons.ftInt64,     // sftTID
-     SynCommons.ftInt64,     // sftRecordVersion = TRecordVersion
-     SynCommons.ftInt64,     // sftSessionUserID
-     SynCommons.ftDate,      // sftDateTimeMS
-     SynCommons.ftInt64,     // sftUnixTime
-     SynCommons.ftInt64);    // sftUnixMSTime
+     SynTable.ftBlob,      // sftBlob
+     SynTable.ftBlob,      // sftBlobDynArray
+     SynTable.ftBlob,      // sftBlobCustom
+     SynTable.ftUTF8,      // sftUTF8Custom
+     SynTable.ftUnknown,   // sftMany
+     SynTable.ftInt64,     // sftModTime
+     SynTable.ftInt64,     // sftCreateTime
+     SynTable.ftInt64,     // sftTID
+     SynTable.ftInt64,     // sftRecordVersion = TRecordVersion
+     SynTable.ftInt64,     // sftSessionUserID
+     SynTable.ftDate,      // sftDateTimeMS
+     SynTable.ftInt64,     // sftUnixTime
+     SynTable.ftInt64);    // sftUnixMSTime
 
   SQLFieldTypeToVCLDB: array[TSQLFieldType] of TFieldType =
     (DB.ftUnknown,           // sftUnknown
@@ -283,7 +284,7 @@ const
 
 
 procedure JSONColumnsToBinary(const aTable: TSQLTableJSON; W: TFileBufferWriter;
-  const Null: TSQLDBProxyStatementColumns; const ColTypes: TSQLDBFieldTypeDynArray);
+  Null: pointer; const ColTypes: TSQLDBFieldTypeDynArray);
 var F: integer;
     VDouble: double;
     VCurrency: currency absolute VDouble;
@@ -291,7 +292,7 @@ var F: integer;
     colType: TSQLDBFieldType;
 begin
   for F := 0 to length(ColTypes)-1 do
-    if not (F in Null) then begin
+    if not GetBitPtr(Null,F) then begin
       colType := ColTypes[F];
       if colType<ftInt64 then begin // ftUnknown,ftNull
         colType := SQLFIELDTYPETODBFIELDTYPE[aTable.FieldType(F)]; // per-row column type (SQLite3 only)
@@ -306,19 +307,19 @@ begin
         VDouble := aTable.FieldAsFloat(F);
         W.Write(@VDouble,sizeof(VDouble));
       end;
-      SynCommons.ftCurrency: begin
+      SynTable.ftCurrency: begin
         VCurrency := aTable.Field(F);
         W.Write(@VCurrency,sizeof(VCurrency));
       end;
-      SynCommons.ftDate: begin
+      SynTable.ftDate: begin
         VDateTime := aTable.Field(F);
         W.Write(@VDateTime,sizeof(VDateTime));
       end;
-      SynCommons.ftUTF8:
+      SynTable.ftUTF8:
       begin
         W.Write(aTable.FieldBuffer(F));
       end;
-      SynCommons.ftBlob:
+      SynTable.ftBlob:
       begin
         W.Write(aTable.FieldBuffer(F));
       end;
@@ -330,15 +331,14 @@ begin
 end;
 
 function JSONToBinary(const aTable: TSQLTableJSON; Dest: TStream; MaxRowCount: cardinal=0; DataRowPosition: PCardinalDynArray=nil;
-                      const DefaultDataType: TSQLDBFieldType = SynCommons.ftUTF8; const DefaultFieldSize: Integer = 255): cardinal;
+                      const DefaultDataType: TSQLDBFieldType = SynTable.ftUTF8; const DefaultFieldSize: Integer = 255): cardinal;
 var F, FMax, FieldSize, NullRowSize: integer;
     StartPos: cardinal;
-    Null: TSQLDBProxyStatementColumns;
+    Null: TByteDynArray;
     W: TFileBufferWriter;
     ColTypes: TSQLDBFieldTypeDynArray;
     FieldType: TSQLDBFieldType;
 begin
-  FillChar(Null,sizeof(Null),0);
   result := 0;
   W := TFileBufferWriter.Create(Dest);
   try
@@ -352,7 +352,7 @@ begin
       for F := 0 to FMax do begin
         W.Write(aTable.Get(0, F));
         FieldType := SQLFIELDTYPETODBFIELDTYPE[aTable.FieldType(F)];
-        if (FieldType = SynCommons.ftUnknown) and (DefaultDataType <> SynCommons.ftUnknown) then
+        if (FieldType = SynTable.ftUnknown) and (DefaultDataType <> SynTable.ftUnknown) then
           FieldType := DefaultDataType;
         ColTypes[F] := FieldType;
         FieldSize := aTable.FieldLengthMax(F);
@@ -362,10 +362,8 @@ begin
         W.WriteVarUInt32(FieldSize);
       end;
       // initialize null handling
-      NullRowSize := (FMax shr 3)+1;
-      if NullRowSize>sizeof(Null) then
-        raise ESQLDBException.CreateUTF8(
-          'JSONToBinary: too many columns', []);
+      SetLength(Null,(FMax shr 3)+1);
+      NullRowSize := 0;
       // save all data rows
       StartPos := W.TotalWritten;
       if aTable.Step or (aTable.RowCount=1) then // Need step first or error is raised in Table.Field function.
@@ -378,19 +376,19 @@ begin
         end;
         // first write null columns flags
         if NullRowSize>0 then begin
-          FillChar(Null,NullRowSize,0);
+          FillChar(Null[0],NullRowSize,0);
           NullRowSize := 0;
         end;
         for F := 0 to FMax do
         begin
           if VarIsNull(aTable.Field(F)) then begin
-            include(Null,F);
+            SetBitPtr(pointer(Null),F);
             NullRowSize := (F shr 3)+1;
           end;
         end;
         W.WriteVarUInt32(NullRowSize);
         if NullRowSize>0 then
-          W.Write(@Null,NullRowSize);
+          W.Write(Null,NullRowSize);
         // then write data values
         JSONColumnsToBinary(aTable, W,Null,ColTypes);
         inc(result);

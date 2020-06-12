@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <PersonalityInfo>
+    <Option>
+      <Option Name="Personality">Default.Personality</Option>
+      <Option Name="ProjectType"></Option>
+      <Option Name="Version">1.0</Option>
+      <Option Name="GUID">{FC3C74B5-C087-4A9F-8F96-38AF9C207B93}</Option>
+    </Option>
+  </PersonalityInfo>
+  <Default.Personality>
+    
+    <Projects>
+      <Projects Name="Project04ServerStatic.exe">Project04ServerStatic.bdsproj</Projects>
+      <Projects Name="Project04Client.exe">Project04Client.bdsproj</Projects>
+      <Projects Name="Targets">Project04ServerStatic.exe Project04Client.exe</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+</BorlandProject>

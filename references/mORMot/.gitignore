@@ -73,6 +73,7 @@ fpc/
 __history/
 __recovery/
 *.~*
+*.bak
 
 # Castalia statistics file (since XE7 Castalia is distributed with Delphi)
 *.stat
@@ -82,3 +83,6 @@ _FOSSIL_
 .svn/
 # SourceCodeRep artifact
 *.txt
+
+backup/
+.idea/

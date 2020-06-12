@@ -1,6 +1,6 @@
 /// fast cryptographic routines (hashing and cypher)
-// - implements AES, XOR, ADLER32, MD5, RC4, SHA1, SHA256, SHA384, SHA512, SHA3 algorithms
-// - optimized for speed (tuned assembler and AES-NI / PADLOCK support)
+// - implements AES,XOR,ADLER32,MD5,RC4,SHA1,SHA256,SHA384,SHA512,SHA3 and JWT
+// - optimized for speed (tuned assembler and SSE3/SSE4/AES-NI/PADLOCK support)
 // - this unit is a part of the freeware Synopse mORMot framework,
 // licensed under a MPL/GPL/LGPL tri-license; version 1.18
 unit SynCrypto;
@@ -8,7 +8,7 @@ unit SynCrypto;
 (*
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -27,7 +27,7 @@ unit SynCrypto;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -37,8 +37,9 @@ unit SynCrypto;
   - Intel's sha256_sse4.asm under under a three-clause Open Software license
   - Johan Bontes
   - souchaud
-  - Project Nayuki (MIT License) for SHA-512 optimized x86 asm 
+  - Project Nayuki (MIT License) for SHA-512 optimized x86 asm
   - Wolfgang Ehrhardt under zlib license for SHA-3 and AES "pure pascal" code
+  - Maxim Masiutin for the MD5 asm
 
   Alternatively, the contents of this file may be used under the terms of
   either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -73,184 +74,15 @@ unit SynCrypto;
     - VIA PADLOCK optional support - native .o code on linux or .dll (Win32)
      (tested on a Dedibox C7 (rev1) linux server - need validation for Win32)
     - Microsoft AES Cryptographic Provider optional support via CryptoAPI
-
-    Source code licenced under the MPL:
-      see http://www.mozilla.org/MPL/MPL-1.1.html
-
-
-    (old) Benchmark on my AMD-64 TL-56 dualcore-CPU:
-    ================================================
-    Testing with blocks of 16KB each
-           crc32  624 MB/s
-     adler32 pas  571 MB/s              asm 1304 MB/s
-             MD5  176 MB/s
-            SHA1  101 MB/s
-          SHA256   63 MB/s
-   AES128 cypher   84 MB/s         uncypher   81 MB/s  asm version
-   AES128 cypher   57 MB/s         uncypher   57 MB/s  pascal version
-   AES192 cypher   72 MB/s         uncypher   70 MB/s  asm version
-   AES192 cypher   48 MB/s         uncypher   48 MB/s  pascal version
-   AES256 cypher   62 MB/s         uncypher   61 MB/s  asm version
-   AES256 cypher   42 MB/s         uncypher   42 MB/s  pascal version
-        XorBlock 3463 MB/s  (very fast, since with 16KB data remain in L2 cache)
-       XorOffset 3425 MB/s
-        XorConst 5940 MB/s  (even faster, since no table used -> all in L1 cache)
-
-    Testing with blocks of 1024KB each (for AES: block >512KB -> uses dualcore)
-           crc32  577 MB/s
-     adler32 pas  529 MB/s              asm 1003 MB/s
-             MD5  176 MB/s
-            SHA1  100 MB/s
-          SHA256   63 MB/s
-   AES128 cypher  129 MB/s         uncypher  130 MB/s  asm version
-   AES128 cypher   96 MB/s         uncypher   95 MB/s  pascal version
-   AES192 cypher  107 MB/s         uncypher  114 MB/s  asm version
-   AES192 cypher   83 MB/s         uncypher   85 MB/s  pascal version
-   AES256 cypher   98 MB/s         uncypher  105 MB/s  asm version
-   AES256 cypher   76 MB/s         uncypher   76 MB/s  pascal version
-        XorBlock 1423 MB/s   (we reach the memory control bandwidth)
-       XorOffset 1325 MB/s
-        XorConst 1506 MB/s
-
-    Testing with blocks of 4096KB each (for AES: block >512KB -> uses dualcore)
-           crc32  578 MB/s
-     adler32 pas  525 MB/s              asm  984 MB/s
-             MD5  175 MB/s
-            SHA1  100 MB/s
-          SHA256   63 MB/s
-   AES128 cypher  159 MB/s         uncypher  147 MB/s  asm version
-   AES128 cypher  107 MB/s         uncypher  109 MB/s  pascal version
-   AES192 cypher  134 MB/s         uncypher  128 MB/s  asm version
-   AES192 cypher   90 MB/s         uncypher   92 MB/s  pascal version
-   AES256 cypher  118 MB/s         uncypher  113 MB/s  asm version
-   AES256 cypher   80 MB/s         uncypher   81 MB/s  pascal version
-        XorBlock 1385 MB/s
-       XorOffset 1292 MB/s
-        XorConst 1479 MB/s
-
-   (old) Benchmark on a C7 Dedibox (USEPADLOCK version):
-   =====================================================
-   Testing with blocks of 16KB each
-           crc32  402 MB/s
-     adler32 pas  274 MB/s        asm  542 MB/s       libz.so 414 MB/s
-             MD5  126 MB/s
-            SHA1  480 MB/s
-          SHA256  458 MB/s
-   AES128 cypher 1566 MB/s         uncypher 1560 MB/s
-   AES192 cypher 1421 MB/s         uncypher 1422 MB/s
-   AES256 cypher 1237 MB/s         uncypher 1247 MB/s
-        XorBlock 2336 MB/s
-       XorOffset 1807 MB/s
-        XorConst 3154 MB/s
-
-    Testing with blocks of 1024KB each
-           crc32  352 MB/s
-     adler32 pas  256 MB/s         asm  395 MB/s      libz.so 361 MB/s
-             MD5  123 MB/s
-            SHA1  324 MB/s
-          SHA256  324 MB/s
-   AES128 cypher  552 MB/s         uncypher  552 MB/s
-   AES192 cypher  552 MB/s         uncypher  552 MB/s
-   AES256 cypher  552 MB/s         uncypher  552 MB/s
-        XorBlock  354 MB/s
-       XorOffset  373 MB/s
-        XorConst  511 MB/s
-
-    Testing with blocks of 4096KB each
-           crc32  352 MB/s
-     adler32 pas  255 MB/s         asm  395 MB/s      libz.so 361 MB/s
-             MD5  124 MB/s
-            SHA1  324 MB/s
-          SHA256  326 MB/s
-   AES128 cypher  552 MB/s         uncypher  552 MB/s
-   AES192 cypher  552 MB/s         uncypher  552 MB/s
-   AES256 cypher  552 MB/s         uncypher  552 MB/s
-        XorBlock  352 MB/s
-       XorOffset  368 MB/s
-        XorConst  510 MB/s
-
-   Conclusion:
-   - USETHREADSFORBIGAESBLOCKS will help on modern multi-threaded CPU
-   - AES speed: W.Ehrhardt's pascal is 55MB/s, A.Bouchez's asm is 84MB/s
-   - AES-256 is faster than a simple XOR() on a dedibox with a C7 cpu ;)
-   - see below for benchmarks using AES-NI, SHA-256-SSE4, which induce
-     a huge performance boost
-
-   Initial version (C) 2008-2009 Arnaud Bouchez http://bouchez.info
-
-   Revision History:
-
-   Version 1.0
-    - initial release on Internet, with MyCrypto unit name
-
-   Version 1.1
-    - updated release, with new optimized AES i386 assembler implementation
-      and no FastCode dependency (CpuCount is taken from Windows API)
-
-   Version 1.4 - February 8, 2010
-   - whole Synopse SQLite3 database framework released under the GNU Lesser
-     General Public License version 3, instead of generic "Public Domain"
-
-   Version 1.8
-   - mostly code review for Delphi 2009/2010 integration (unit uses now
-     SynCommons string types definitions)
-
-   Version 1.9
-   - now use direct Windows threads, since we don't need any exception handling
-     nor memory usage inside the AES encryption Thread handler
-     -> avoid classes.TThread and system.BeginThread() use
-     -> application is still "officialy" mono-threaded (i.e. IsMultiThread=false),
-     for faster System.pas and FastMM4 (prevent CPU locking - see
-     https://synopse.info/forum/viewtopic.php?id=57 about Delphi & multi-core)
-   - some other minor fixes and enhancements
-
-   Version 1.10
-   - code modifications to compile with Delphi 6 compiler
-
-   Version 1.13
-   - code modifications to compile with Delphi 5 compiler
-
-   Version 1.15
-   - unit now tested with Delphi XE2 (32 Bit)
-
-   Version 1.16
-   - added TAESECB, TAESCBC, TAESCFB, TAESOFB and TAESCTR classes to handle AES
-     encryption of memory buffers in ECB, CBC, CFB, OFB and CTR mode (including
-     PKCS7 padding)
-   - added pure pascal version (for XE2 64 compilation) of all algorithms
-
-   Version 1.18
-   - added AES-NI hardware support on newer CPUs, for huge performance boost
-     and enhanced security
-   - AES encryption will compute its own tables, to get rid of 4KB of const
-   - optimized x86 asm version for MD5
-   - tested compilation for Win64 platform
-   - run with FPC under Windows and Linux (including AES-NI support), and Kylix
-   - added Intel's SSE4 x64 optimized asm for SHA-256 on Win64
-   - added overloaded procedure TMD5.Final() and function SHA-256()
-   - introduce ESynCrypto exception class dedicated to this unit
-   - added AES encryption using official Microsoft AES Cryptographic Provider
-     (CryptoAPI) via TAESECB_API, TAESCBC_API, TAESCFB_API and TAESOFB_API -
-     our optimized asm version is faster, so is still our default/preferred
-   - added optional IVAtBeginning parameter to EncryptPKCS7/DecryptPKC7 methods
-   - get rid of the unsafe IV parameter for TAES* classes constructors
-   - added CompressShaAes() and global CompressShaAesKey and CompressShaAesClass
-     variables to be used by THttpSocket.RegisterCompress
-   - introduce new TRC4 object for RC4 encryption algorithm
-   - introducing TSHA384, TSHA512 and TSHA3 objects for SHA-384, SHA-512 and
-     SHA-3 algorithms
-   - new HMAC_SHA1/SHA256/SHA384/SHA512 and PBKDF2_HMAC_SHA1/SHA256/SHA384/SHA512 functions
-   - removed several compilation hints when assertions are set to off
-
 *)
 
 interface
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 {.$define USEPADLOCK}
 
-{.$define PUREPASCAL} // for debug
+{.$define AESPASCAL} // for debug
 
 {$ifdef Linux}
   {$undef USETHREADSFORBIGAESBLOCKS} // uses low-level WinAPI threading
@@ -296,7 +128,75 @@ uses
 {$endif LVCL}
   Classes,
   SynLZ, // already included in SynCommons, and used by CompressShaAes()
-  SynCommons;
+  SynCommons,
+  SynTable; // for TSynUniqueIdentifierGenerator
+
+{$ifdef ABSOLUTEPASCAL}
+  {$define AES_PASCAL}
+  {$define SHA3_PASCAL}
+{$else}
+{$ifdef DELPHI5OROLDER}
+  {$define AES_PASCAL} // Delphi 5 internal asm is buggy :(
+  {$define SHA3_PASCAL}
+  {$define SHA512_X86} // external sha512-x86.obj
+{$else}
+  {$ifdef CPUINTEL} // AES-NI supported for x86 and x64 under Windows
+    {$ifdef CPU64}
+      {$ifdef HASAESNI}
+        {$define USEAESNI}
+        {$define USEAESNI64}
+      {$else}
+        {$define AES_PASCAL} // Delphi XE2/XE3 do not have the AES-NI opcodes :(
+      {$endif}
+      {$define AESPASCAL_OR_CPU64}
+      {$ifndef BSD}
+        {$define CRC32C_X64} // external crc32_iscsi_01 for win64/lin64
+        {$define SHA512_X64} // external sha512_sse4 for win64/lin64
+      {$endif}
+    {$else}
+      {$ifdef MSWINDOWS}
+        {$define SHA512_X86} // external sha512-x86.obj/.o
+      {$endif}
+      {$ifdef ABSOLUTEPASCAL}
+        {$define AES_PASCAL} // x86 AES asm below is not PIC-safe
+      {$else}
+        {$define CPUX86_NOTPIC}
+      {$endif ABSOLUTEPASCAL}
+      {$ifdef FPC}
+        {$ifdef DARWIN}
+          {$define AES_PASCAL} // as reported by alf
+        {$endif DARWIN}
+        {$ifdef LINUX}
+          {$ifndef AES_PASCAL}
+            {$define SHA512_X86} // external linux32/sha512-x86.o
+          {$endif AES_PASCAL}
+        {$endif}
+      {$endif FPC}
+      {$ifndef AES_PASCAL}
+        {$define USEAESNI} // some functions are not PIC-safe
+        {$define USEAESNI32}
+      {$endif AES_PASCAL}
+    {$endif}
+  {$else}
+    {$define AES_PASCAL}
+    {$define SHA3_PASCAL}
+  {$endif CPUINTEL}
+{$endif}
+{$endif}
+
+{$ifdef AES_PASCAL}
+  {$define AESPASCAL_OR_CPU64}
+{$endif}
+
+{.$define AES_ROLLED}
+// if defined, use rolled version, which is slightly slower (at least on my CPU)
+
+{$ifndef AESPASCAL_OR_CPU64}
+  {$define AES_ROLLED} // asm requires rolled decryption keys
+{$endif}
+{$ifdef CPUX64}
+  {$define AES_ROLLED} // asm requires rolled decryption keys
+{$endif}
 
 {$ifdef USEPADLOCK}
 var
@@ -306,10 +206,11 @@ var
 
 const
   /// hide all AES Context complex code
-  AESContextSize = 275+sizeof(pointer){$ifdef USEPADLOCK}*2{$endif};
+  AESContextSize = 276+sizeof(pointer){$ifdef USEPADLOCK}*2{$endif}
+    {$ifdef USEAESNI32}+sizeof(pointer){$endif};
   /// hide all SHA-1/SHA-2 complex code by storing the context as buffer
   SHAContextSize = 108;
-  /// hide all SHA-3 complex code by storing the Keccak Sponge as buffer 
+  /// hide all SHA-3 complex code by storing the Keccak Sponge as buffer
   SHA3ContextSize = 412;
   /// power of two for a standard AES block size during cypher/uncypher
   // - to be used as 1 shl AESBlockShift or 1 shr AESBlockShift for fast div/mod
@@ -323,17 +224,20 @@ type
   /// class of Exceptions raised by this unit
   ESynCrypto = class(ESynException);
 
-  PAESBlock = ^TAESBlock;
-
   /// 128 bits memory block for AES data cypher/uncypher
   TAESBlock = THash128;
+
+  /// points to a 128 bits memory block, as used for AES data cypher/uncypher
+  PAESBlock = ^TAESBlock;
 
   /// 256 bits memory block for maximum AES key storage
   TAESKey = THash256;
 
   /// stores an array of THash128 to check for their unicity
-  // - used e.g. to implement TAESAbstract.IVHistoryDepth property
-  THash128History = {$ifndef UNICODE}object{$else}record{$endif}
+  // - used e.g. to implement TAESAbstract.IVHistoryDepth property, but may be
+  // also used to efficiently store a list of 128-bit IPv6 addresses
+  {$ifdef USERECORDWITHMETHODS}THash128History = record
+    {$else}THash128History = object{$endif}
   private
     Previous: array of THash128Rec;
     Index: integer;
@@ -343,10 +247,12 @@ type
     /// how many THash128 values are currently stored
     Count: integer;
     /// initialize the storage for a given history depth
-    procedure Init(size: integer);
+    // - if Count reaches Depth, then older items will be removed
+    procedure Init(size, maxsize: integer);
     /// O(n) fast search of a hash value in the stored entries
     // - returns true if the hash was found, or false if it did not appear
     function Exists(const hash: THash128): boolean;
+      {$ifdef HASINLINE}inline;{$endif}
     /// add a hash value to the stored entries, checking for duplicates
     // - returns true if the hash was added, or false if it did already appear
     function Add(const hash: THash128): boolean;
@@ -360,8 +266,9 @@ type
   // - this class will use VIA PadLock instructions, if available
   {$endif}
   // - we defined a record instead of a class, to allow stack allocation and
-  // thread-safe reuse of one initialized instance, if needed
-  TAES = {$ifndef UNICODE}object{$else}record{$endif}
+  // thread-safe reuse of one initialized instance (warning: not for Padlock)
+  {$ifdef USERECORDWITHMETHODS}TAES = record
+    {$else}TAES = object{$endif}
   private
     Context: packed array[1..AESContextSize] of byte;
     {$ifdef USEPADLOCK}
@@ -369,7 +276,7 @@ type
     {$endif}
   public
     /// Initialize AES contexts for cypher
-    // - first method to call before using this class
+    // - first method to call before using this object for encryption
     // - KeySize is in bits, i.e. 128,192,256
     function EncryptInit(const Key; KeySize: cardinal): boolean;
     /// encrypt an AES data block into another data block
@@ -378,7 +285,12 @@ type
     procedure Encrypt(var B: TAESBlock); overload;
 
     /// Initialize AES contexts for uncypher
+    // - first method to call before using this object for decryption
+    // - KeySize is in bits, i.e. 128,192,256
     function DecryptInit(const Key; KeySize: cardinal): boolean;
+    /// Initialize AES contexts for uncypher, from another TAES.EncryptInit
+    function DecryptInitFrom(const Encryption{$ifndef DELPHI5OROLDER}: TAES{$endif};
+      const Key; KeySize: cardinal): boolean;
     /// decrypt an AES data block
     procedure Decrypt(var B: TAESBlock); overload;
     /// decrypt an AES data block into another data block
@@ -398,16 +310,22 @@ type
     /// perform the AES cypher or uncypher to continuous memory blocks
     // - call either Encrypt() either Decrypt() method
     procedure DoBlocks(pIn, pOut: PAESBlock; Count: integer; doEncrypt: boolean); overload;
-{$ifdef USETHREADSFORBIGAESBLOCKS}
+    {$ifdef USETHREADSFORBIGAESBLOCKS}
     /// perform the AES cypher or uncypher to continuous memory blocks
     // - this special method will use Threads for bigs blocks (>512KB) if multi-CPU
     // - call either Encrypt() either Decrypt() method
     procedure DoBlocksThread(var bIn, bOut: PAESBlock; Count: integer; doEncrypt: boolean);
-{$endif}
+    {$endif}
+    /// performs AES-OFB encryption and decryption on whole blocks
+    // - may be called instead of TAESOFB when only a raw TAES is available
+    // - this method is thread-safe (except if padlock is used)
+    procedure DoBlocksOFB(const iv: TAESBlock; src, dst: pointer; blockcount: PtrUInt);
     /// TRUE if the context was initialized via EncryptInit/DecryptInit
-    function Initialized: boolean;
+    function Initialized: boolean; {$ifdef FPC}inline;{$endif}
     /// return TRUE if the AES-NI instruction sets are available on this CPU
     function UsesAESNI: boolean; {$ifdef HASINLINE}inline;{$endif}
+    /// returns the key size in bits (128/192/256)
+    function KeyBits: integer; {$ifdef FPC}inline;{$endif}
   end;
 
   /// class-reference type (metaclass) of an AES cypher/uncypher
@@ -481,6 +399,9 @@ type
     constructor CreateTemp(aKeySize: cardinal);
     /// Initialize AES context for cypher, from SHA-256 hash
     // - here the Key is supplied as a string, and will be hashed using SHA-256
+    // via the SHA256Weak proprietary algorithm - to be used only for backward
+    // compatibility of existing code
+    // - consider using more secure (and more standard) CreateFromPBKDF2 instead
     constructor CreateFromSha256(const aKey: RawUTF8);
     /// Initialize AES context for cypher, from PBKDF2_HMAC_SHA256 derivation
     // - here the Key is supplied as a string, and will be hashed using
@@ -663,6 +584,8 @@ type
     class function SimpleEncryptFile(const InputFile, Outputfile: TFileName; const Key;
       KeySize: integer; Encrypt: boolean; IVAtBeginning: boolean=false;
       RaiseESynCryptoOnError: boolean=true): boolean; overload;
+    //// returns e.g. 'aes128cfb' or '' if nil
+    function AlgoName: TShort16;
 
     /// associated Key Size, in bits (i.e. 128,192,256)
     property KeySize: cardinal read fKeySize;
@@ -691,7 +614,7 @@ type
     property IVHistoryDepth: integer read fIVHistoryDec.Depth write SetIVHistory;
   end;
 
-  /// handle AES cypher/uncypher with chaining
+  /// handle AES cypher/uncypher with chaining with out own optimized code
   // - use any of the inherited implementation, corresponding to the chaining
   // mode required - TAESECB, TAESCBC, TAESCFB, TAESOFB and TAESCTR classes to
   // handle in ECB, CBC, CFB, OFB and CTR mode (including PKCS7-like padding)
@@ -703,16 +626,15 @@ type
     fIn, fOut: PAESBlock;
     fCV: TAESBlock;
     AES: TAES;
-    fCount: Cardinal;
-    fAESInit: (initNone, initEncrypt, initDecrypt); 
+    fAESInit: (initNone, initEncrypt, initDecrypt);
     procedure EncryptInit;
     procedure DecryptInit;
-    procedure TrailerBytes; 
+    procedure TrailerBytes(count: cardinal);
   public
     /// creates a new instance with the very same values
-    // - by design, our classes will use stateless context, so this method
+    // - by design, our classes will use TAES stateless context, so this method
     // will just copy the current fields to a new instance, by-passing
-    // the key creation
+    // the key creation step
     function Clone: TAESAbstract; override;
     /// release the used instance memory and resources
     // - also fill the TAES instance with zeros, for safety
@@ -756,11 +678,11 @@ type
     procedure Decrypt(BufIn, BufOut: pointer; Count: cardinal); override;
   end;
 
-  /// abstract parent class for chaining modes using only AES encryption 
+  /// abstract parent class for chaining modes using only AES encryption
   TAESAbstractEncryptOnly = class(TAESAbstractSyn)
   public
     /// Initialize AES context for cypher
-    // - will pre-generate the encryption key
+    // - will pre-generate the encryption key (aKeySize in bits, i.e. 128,192,256)
     constructor Create(const aKey; aKeySize: cardinal); override;
     /// compute a class instance similar to this one, for performing the
     // reverse encryption/decryption process
@@ -785,7 +707,7 @@ type
   // - this class will use AES-NI hardware instructions, if available, e.g.
   // ! OFB256: 27.69ms in x86 optimized code, 9.94ms with AES-NI
   // - expect IV to be set before process, or IVAtBeginning=true
-  // - TAESOFB 128-bit has its own optimized asm version under x86_64 + AES_NI
+  // - TAESOFB 128/256 have an optimized asm version under x86_64 + AES_NI
   TAESOFB = class(TAESAbstractEncryptOnly)
   public
     /// perform the AES cypher in the OFB mode
@@ -794,12 +716,29 @@ type
     procedure Decrypt(BufIn, BufOut: pointer; Count: cardinal); override;
   end;
 
-  /// handle AES cypher/uncypher with Counter mode (CTR)
+  /// handle AES cypher/uncypher with 64-bit Counter mode (CTR)
+  // - the CTR will use a counter in bytes 7..0 by default - which is safe
+  // but not standard - call ComposeIV() to change e.g. to NIST behavior
   // - this class will use AES-NI hardware instructions, e.g.
   // ! CTR256: 28.13ms in x86 optimized code, 10.63ms with AES-NI
   // - expect IV to be set before process, or IVAtBeginning=true
   TAESCTR = class(TAESAbstractEncryptOnly)
+  protected
+    fCTROffset, fCTROffsetMin: PtrInt;
   public
+    /// Initialize AES context for cypher
+    // - will pre-generate the encryption key (aKeySize in bits, i.e. 128,192,256)
+    constructor Create(const aKey; aKeySize: cardinal); override;
+    /// defines how the IV is set and updated in CTR mode
+    // - default (if you don't call this method) uses a Counter in bytes 7..0
+    // - you can specify startup Nonce and Counter, and the Counter position
+    // - NonceLen + CounterLen should be 16 - otherwise it fails and returns false
+    function ComposeIV(Nonce, Counter: PAESBlock; NonceLen, CounterLen: integer;
+      LSBCounter: boolean): boolean; overload;
+    /// defines how the IV is set and updated in CTR mode
+    // - you can specify startup Nonce and Counter, and the Counter position
+    // - Nonce + Counter lengths should add to 16 - otherwise returns false
+    function ComposeIV(const Nonce, Counter: TByteDynArray; LSBCounter: boolean): boolean; overload;
     /// perform the AES cypher in the CTR mode
     procedure Encrypt(BufIn, BufOut: pointer; Count: cardinal); override;
     /// perform the AES un-cypher in the CTR mode
@@ -817,7 +756,7 @@ type
     // with no compromission of the plain content
     encrypted: THash128;
   end;
-  
+
   /// AEAD (authenticated-encryption with associated-data) abstract class
   // - perform AES encryption and on-the-fly MAC computation, i.e. computes
   // a proprietary 256-bit MAC during AES cyphering, as 128-bit CRC of the
@@ -915,7 +854,7 @@ type
       aiKeyAlg: cardinal;
       dwKeyLength: cardinal;
     end;
-    fKeyHeaderKey: TAESKey; // should be just after fKeyHeader record 
+    fKeyHeaderKey: TAESKey; // should be just after fKeyHeader record
     fKeyCryptoAPI: pointer;
     fInternalMode: cardinal;
     procedure InternalSetMode; virtual; abstract;
@@ -987,13 +926,10 @@ procedure AESIVCtrEncryptDecrypt(const BI; var BO; DoEncrypt: boolean);
 
 type
   /// thread-safe class containing a TAES encryption/decryption engine
-  TAESLocked = class(TSynPersistent)
+  TAESLocked = class(TSynPersistentLock)
   protected
     fAES: TAES;
-    fLock: TRTLCriticalSection;
   public
-    /// initialize the internal lock, but not the TAES instance
-    constructor Create; override;
     /// finalize all used memory and resources
     destructor Destroy; override;
   end;
@@ -1054,6 +990,8 @@ type
     function Random64: QWord;
     /// returns a floating-point random number in range [0..1]
     function RandomExt: TSynExtended;
+    /// returns a 64-bit floating-point random number in range [0..1]
+    function RandomDouble: double;
     /// computes a random ASCII password
     // - will contain uppercase/lower letters, digits and $.:()?%!-+*/@#
     // excluding ;,= to allow direct use in CSV content
@@ -1181,23 +1119,38 @@ procedure SetMainAESPRNG;
 {$endif}
 
 /// low-level function returning some random binary using standard API
-// - will call /dev/urandom under POSIX, and CryptGenRandom API on Windows,
-// and fallback to SynCommons.FillRandom if the system is not supported
+// - will call /dev/urandom or /dev/random under POSIX, and CryptGenRandom API
+// on Windows, and fallback to SynCommons.FillRandom if the system API failed
+// or for padding if more than 32 bytes is retrieved from /dev/urandom
 // - you should not have to call this procedure, but faster and safer TAESPRNG
 procedure FillSystemRandom(Buffer: PByteArray; Len: integer; AllowBlocking: boolean);
 
+/// low-level function able to derivate a 0..1 floating-point from 128-bit of data
+// - used e.g. by TAESPRNG.RandomExt
+function Hash128ToExt({$ifdef FPC}constref{$else}const{$endif} r: THash128): TSynExtended;
+  {$ifdef FPC}inline;{$endif}
+
+/// low-level function able to derivate a 0..1 64-bit floating-point from 128-bit of data
+// - used e.g. by TAESPRNG.RandomDouble
+function Hash128ToDouble({$ifdef FPC}constref{$else}const{$endif} r: THash128): double;
+  {$ifdef FPC}inline;{$endif}
+
+/// low-level function able to derivate a 0..1 32-bit floating-point from 128-bit of data
+function Hash128ToSingle({$ifdef FPC}constref{$else}const{$endif} r: THash128): double;
+  {$ifdef FPC}inline;{$endif}
 
 type
   PSHA1Digest = ^TSHA1Digest;
   /// 160 bits memory block for SHA-1 hash digest storage
-  TSHA1Digest   = packed array[0..19] of byte;
+  TSHA1Digest = THash160;
 
   PSHA1 = ^TSHA1;
   /// handle SHA-1 hashing
   // - we defined a record instead of a class, to allow stack allocation and
   // thread-safe reuse of one initialized instance, e.g. for THMAC_SHA1
   // - see TSynHasher if you expect to support more than one algorithm at runtime
-  TSHA1 = {$ifndef UNICODE}object{$else}record{$endif}
+  {$ifdef USERECORDWITHMETHODS}TSHA1 = record
+    {$else}TSHA1 = object{$endif}
   private
     Context: packed array[1..SHAContextSize] of byte;
   public
@@ -1230,7 +1183,8 @@ type
   // - we defined a record instead of a class, to allow stack allocation and
   // thread-safe reuse of one initialized instance, e.g. for THMAC_SHA256
   // - see TSynHasher if you expect to support more than one algorithm at runtime
-  TSHA256 = {$ifndef UNICODE}object{$else}record{$endif}
+  {$ifdef USERECORDWITHMETHODS}TSHA256 = record
+    {$else}TSHA256 = object{$endif}
   private
     Context: packed array[1..SHAContextSize] of byte;
   public
@@ -1263,7 +1217,8 @@ type
   // - we defined a record instead of a class, to allow stack allocation and
   // thread-safe reuse of one initialized instance, e.g. for THMAC_SHA384
   // - see TSynHasher if you expect to support more than one algorithm at runtime
-  TSHA384 = {$ifndef UNICODE}object{$else}record{$endif}
+  {$ifdef USERECORDWITHMETHODS}TSHA384 = record
+    {$else}TSHA384 = object{$endif}
   private
     Hash: TSHA512Hash;
     MLen: QWord;
@@ -1307,7 +1262,8 @@ type
   // - we defined a record instead of a class, to allow stack allocation and
   // thread-safe reuse of one initialized instance, e.g. for THMAC_SHA512
   // - see TSynHasher if you expect to support more than one algorithm at runtime
-  TSHA512 = {$ifndef UNICODE}object{$else}record{$endif}
+  {$ifdef USERECORDWITHMETHODS}TSHA512 = record
+    {$else}TSHA512 = object{$endif}
   private
     Hash: TSHA512Hash;
     MLen: QWord;
@@ -1341,7 +1297,7 @@ type
   PSHA3 = ^TSHA3;
   /// handle SHA-3 (Keccak) hashing
   // - Keccak was the winner of the NIST hashing competition for a new hashing
-  // algorithm to provide an alternative to SHA-256. In became SHA-3 and was
+  // algorithm to provide an alternative to SHA-256. It became SHA-3 and was
   // named by NIST a FIPS 180-4, then FIPS 202 hashing standard in 2015
   // - by design, SHA-3 doesn't need to be encapsulated into a HMAC algorithm,
   // since it already includes proper padding, so keys could be concatenated
@@ -1350,7 +1306,8 @@ type
   // - we defined a record instead of a class, to allow stack allocation and
   // thread-safe reuse of one initialized instance, e.g. after InitCypher
   // - see TSynHasher if you expect to support more than one algorithm at runtime
-  TSHA3 = {$ifndef UNICODE}object{$else}record{$endif}
+  {$ifdef USERECORDWITHMETHODS}TSHA3 = record
+    {$else}TSHA3 = object{$endif}
   private
     Context: packed array[1..SHA3ContextSize] of byte;
   public
@@ -1369,14 +1326,14 @@ type
     /// finalize and compute the resulting SHA-3 hash 256-bit Digest
     function Final256(NoInit: boolean=false): THash256;
     /// finalize and compute the resulting SHA-3 hash 512-bit Digest
-    function Final512(NoInit: boolean=false): THash512; 
+    function Final512(NoInit: boolean=false): THash512;
     /// finalize and compute the resulting SHA-3 hash Digest
     // - Digest destination buffer must contain enough bytes
     // - default DigestBits=0 will write the default number of bits to Digest
     // output memory buffer, according to the current TSHA3Algo
     // - you can call this method several times, to use this SHA-3 hasher as
     // "Extendable-Output Function" (XOF), e.g. for stream encryption (ensure
-    // NoInit is set to true, to enable recall) 
+    // NoInit is set to true, to enable recall)
     procedure Final(Digest: pointer; DigestBits: integer=0; NoInit: boolean=false); overload;
     /// compute a SHA-3 hash 256-bit Digest from a buffer, in one call
     // - call Init, then Update(), then Final() using SHA3_256 into a THash256
@@ -1447,12 +1404,9 @@ type
     /// returns the algorithm specified at Init()
     function Algorithm: TSHA3Algo;
     /// fill all used memory context with zeros, for safety
-    // - is necessary only when NoInit is set to true (e.g. after InitCypher)  
+    // - is necessary only when NoInit is set to true (e.g. after InitCypher)
     procedure Done;
   end;
-
-  /// 64 bytes buffer, used internally during HMAC process
-  TByte64 = array[0..15] of cardinal;
 
   TMD5In = array[0..15] of cardinal;
   PMD5In = ^TMD5In;
@@ -1466,7 +1420,12 @@ type
   // - we defined a record instead of a class, to allow stack allocation and
   // thread-safe reuse of one initialized instance
   // - see TSynHasher if you expect to support more than one algorithm at runtime
-  TMD5 = {$ifndef UNICODE}object{$else}record{$endif}
+  // - even if MD5 is now seldom used, it is still faster than SHA alternatives,
+  // when you need a 128-bit cryptographic hash, but can afford some collisions
+  // - this implementation has optimized x86 and x64 assembly, for processing
+  // around 500MB/s, and a pure-pascal fallback code on other platforms
+  {$ifdef USERECORDWITHMETHODS}TMD5 = record
+    {$else}TMD5 = object{$endif}
   private
     in_: TMD5In;
     bytes: array[0..1] of cardinal;
@@ -1497,7 +1456,8 @@ type
   // thread-safe reuse of one initialized instance
   // - you can also restore and backup any previous state of the RC4 encryption
   // by copying the whole TRC4 variable into another (stack-allocated) variable
-  TRC4 = {$ifndef UNICODE}object{$else}record{$endif}
+  {$ifdef USERECORDWITHMETHODS}TRC4 = record
+    {$else}TRC4 = object{$endif}
   private
     {$ifdef CPUINTEL}
     state: array[byte] of PtrInt; // PtrInt=270MB/s  byte=240MB/s on x86
@@ -1535,7 +1495,8 @@ type
 {$A-} { packed memory structure }
   /// internal header for storing our AES data with salt and CRC
   // - memory size matches an TAESBlock on purpose, for direct encryption
-  TAESFullHeader = {$ifndef UNICODE}object{$else}record{$endif}
+  {$ifdef USERECORDWITHMETHODS}TAESFullHeader = record
+    {$else}TAESFullHeader = object{$endif}
   public
     /// Len before compression (if any)
     OriginalLen,
@@ -1555,7 +1516,8 @@ type
   // - calls internaly TAES objet methods, and handle memory and streams for best speed
   // - a TAESFullHeader is encrypted at the begining, allowing fast Key validation,
   // but the resulting stream is not compatible with raw TAES object
-  TAESFull = {$ifndef UNICODE}object{$else}record{$endif}
+  {$ifdef USERECORDWITHMETHODS}TAESFull = record
+    {$else}TAESFull = object{$endif}
   public
     /// header, stored at the beginning of struct -> 16-byte aligned
     Head: TAESFullHeader;
@@ -1609,16 +1571,6 @@ type
     procedure Finish;
   end;
 
-/// overwrite a 64-byte buffer with zeros
-// - may be used to cleanup stack-allocated content
-// ! ... finally FillZero(temp); end;
-procedure FillZero(var hash: TByte64); overload;
-
-/// overwrite a SHA-1 digest buffer with zeros
-// - may be used to cleanup stack-allocated content
-// ! ... finally FillZero(temp); end;
-procedure FillZero(var hash: TSHA1Digest); overload;
-
 /// direct MD5 hash calculation of some data
 function MD5Buf(const Buffer; Len: Cardinal): TMD5Digest;
 
@@ -1643,10 +1595,11 @@ type
   // - you may use HMAC_SHA1() overloaded functions for one-step process
   // - we defined a record instead of a class, to allow stack allocation and
   // thread-safe reuse of one initialized instance via Compute(), e.g. for fast PBKDF2
-  THMAC_SHA1 = {$ifndef UNICODE}object{$else}record{$endif}
+  {$ifdef USERECORDWITHMETHODS}THMAC_SHA1 = record
+    {$else}THMAC_SHA1 = object{$endif}
   private
     sha: TSHA1;
-    step7data: TByte64;
+    step7data: THash512Rec;
   public
     /// prepare the HMAC authentication with the supplied key
     // - content of this record is stateless, so you can prepare a HMAC for a
@@ -1690,7 +1643,8 @@ type
   // - you may use HMAC_SHA384() overloaded functions for one-step process
   // - we defined a record instead of a class, to allow stack allocation and
   // thread-safe reuse of one initialized instance via Compute(), e.g. for fast PBKDF2
-  THMAC_SHA384 = {$ifndef UNICODE}object{$else}record{$endif}
+  {$ifdef USERECORDWITHMETHODS}THMAC_SHA384 = record
+    {$else}THMAC_SHA384 = object{$endif}
   private
     sha: TSHA384;
     step7data: array[0..31] of cardinal;
@@ -1737,7 +1691,8 @@ type
   // - you may use HMAC_SHA512() overloaded functions for one-step process
   // - we defined a record instead of a class, to allow stack allocation and
   // thread-safe reuse of one initialized instance via Compute(), e.g. for fast PBKDF2
-  THMAC_SHA512 = {$ifndef UNICODE}object{$else}record{$endif}
+  {$ifdef USERECORDWITHMETHODS}THMAC_SHA512 = record
+    {$else}THMAC_SHA512 = object{$endif}
   private
     sha: TSHA512;
     step7data: array[0..31] of cardinal;
@@ -1807,6 +1762,10 @@ function SHA256Digest(const Data: RawByteString): TSHA256Digest; overload;
 // - this procedure has a weak password protection: small incoming data
 // is append to some salt, in order to have at least a 256 bytes long hash:
 // such a feature improve security for small passwords, e.g.
+// - note that this algorithm is proprietary, and less secure (and standard)
+// than the PBKDF2 algorithm, so is there only for backward compatibility of
+// existing code: use PBKDF2_HMAC_SHA256 or similar functions for password
+// derivation
 procedure SHA256Weak(const s: RawByteString; out Digest: TSHA256Digest);
 
 type
@@ -1814,10 +1773,11 @@ type
   // - you may use HMAC_SHA256() overloaded functions for one-step process
   // - we defined a record instead of a class, to allow stack allocation and
   // thread-safe reuse of one initialized instance via Compute(), e.g. for fast PBKDF2
-  THMAC_SHA256 = {$ifndef UNICODE}object{$else}record{$endif}
+  {$ifdef USERECORDWITHMETHODS}THMAC_SHA256 = record
+    {$else}THMAC_SHA256 = object{$endif}
   private
     sha: TSha256;
-    step7data: TByte64;
+    step7data: THash512Rec;
   public
     /// prepare the HMAC authentication with the supplied key
     // - content of this record is stateless, so you can prepare a HMAC for a
@@ -1872,6 +1832,11 @@ procedure PBKDF2_HMAC_SHA256(const password,salt: RawByteString; count: Integer;
 procedure PBKDF2_HMAC_SHA256(const password,salt: RawByteString; count: Integer;
   var result: THash256DynArray; const saltdefault: RawByteString=''); overload;
 
+/// low-level anti-forensic diffusion of a memory buffer using SHA-256
+// - as used by TAESPRNG.AFSplit and TAESPRNG.AFUnSplit
+procedure AFDiffusion(buf,rnd: pointer; size: cardinal);
+
+
 /// direct SHA-3 hash calculation of some data (string-encoded)
 // - result is returned in hexadecimal format
 // - default DigestBits=0 will write the default number of bits to Digest
@@ -1889,7 +1854,7 @@ function SHA3(Algo: TSHA3Algo; Buffer: pointer; Len: integer;
 /// safe key derivation using iterated SHA-3 hashing
 // - you can use SHA3_224, SHA3_256, SHA3_384, SHA3_512 algorithm to fill
 // the result buffer with the default sized derivated key of 224,256,384 or 512
-// bytes (leaving resultbytes = 0)
+// bits (leaving resultbytes = 0)
 // - or you may select SHAKE_128 or SHAKE_256, and specify any custom key size
 // in resultbytes (used e.g. by PBKDF2_SHA3_Crypt)
 procedure PBKDF2_SHA3(algo: TSHA3Algo; const password,salt: RawByteString;
@@ -1909,9 +1874,19 @@ type
     saSha1, saSha256, saSha384, saSha512,
     saSha3224, saSha3256, saSha3384, saSha3512, saSha3S128, saSha3S256);
 
+  /// JSON-serialization ready object as used by TSynSigner.PBKDF2 overloaded methods
+  // - default value for unspecified parameters will be SHAKE_128 with
+  // rounds=1000 and a fixed salt
+  TSynSignerParams = packed record
+    algo: TSignAlgo;
+    secret,salt: RawUTF8;
+    rounds: integer;
+  end;
+
   /// a generic wrapper object to handle digital HMAC-SHA-2/SHA-3 signatures
   // - used e.g. to implement TJWTSynSignerAbstract
-  TSynSigner = object
+  {$ifdef USERECORDWITHMETHODS}TSynSigner = record
+    {$else}TSynSigner = object{$endif}
   private
     ctxt: packed array[1..SHA3ContextSize] of byte; // enough space for all
     fSignatureSize: integer;
@@ -1942,21 +1917,43 @@ type
       aSecretPBKDF2Rounds: integer; aBuffer: Pointer; aLen: integer): RawUTF8; overload;
     /// convenient wrapper to perform PBKDF2 safe iterative key derivation
     procedure PBKDF2(aAlgo: TSignAlgo; const aSecret, aSalt: RawUTF8;
-      aSecretPBKDF2Rounds: integer; out aDerivatedKey: THash512Rec);
+      aSecretPBKDF2Rounds: integer; out aDerivatedKey: THash512Rec); overload;
+    /// convenient wrapper to perform PBKDF2 safe iterative key derivation
+    procedure PBKDF2(const aParams: TSynSignerParams; out aDerivatedKey: THash512Rec); overload;
+    /// convenient wrapper to perform PBKDF2 safe iterative key derivation
+    // - accept as input a TSynSignerParams serialized as JSON object
+    procedure PBKDF2(aParamsJSON: PUTF8Char; aParamsJSONLen: integer;
+      out aDerivatedKey: THash512Rec; const aDefaultSalt: RawUTF8='I6sWioAidNnhXO9BK';
+      aDefaultAlgo: TSignAlgo=saSha3S128); overload;
+    /// convenient wrapper to perform PBKDF2 safe iterative key derivation
+    // - accept as input a TSynSignerParams serialized as JSON object
+    procedure PBKDF2(const aParamsJSON: RawUTF8; out aDerivatedKey: THash512Rec;
+      const aDefaultSalt: RawUTF8='I6sWioAidNnhXO9BK'; aDefaultAlgo: TSignAlgo=saSha3S128); overload;
+    /// prepare a TAES object with the key derivated via a PBKDF2() call
+    // - aDerivatedKey is defined as "var", since it will be zeroed after use
+    procedure AssignTo(var aDerivatedKey: THash512Rec; out aAES: TAES; aEncrypt: boolean);
+    /// fill the intenral context with zeros, for security
+    procedure Done;
     /// the algorithm used for digitial signature
     property Algo: TSignAlgo read fAlgo;
     /// the size, in bytes, of the digital signature of this algorithm
+    // - potential values are 20, 28, 32, 48 and 64
     property SignatureSize: integer read fSignatureSize;
   end;
+  /// reference to TSynSigner wrapper object
+  PSynSigner = ^TSynSigner;
 
   /// hash algorithms available for HashFile/HashFull functions and TSynHasher object
   THashAlgo = (hfMD5, hfSHA1, hfSHA256, hfSHA384, hfSHA512, hfSHA3_256, hfSHA3_512);
+  /// set of algorithms available for HashFile/HashFull functions and TSynHasher object
+  THashAlgos = set of THashAlgo;
 
   /// convenient multi-algorithm hashing wrapper
   // - as used e.g. by HashFile/HashFull functions
   // - we defined a record instead of a class, to allow stack allocation and
   // thread-safe reuse of one initialized instance
-  TSynHasher = object
+  {$ifdef USERECORDWITHMETHODS}TSynHasher = record
+    {$else}TSynHasher = object{$endif}
   private
     fAlgo: THashAlgo;
     ctxt: array[1..SHA3ContextSize] of byte; // enough space for all algorithms
@@ -1978,11 +1975,15 @@ type
 
 /// compute the hexadecimal hash of any (big) file
 // - using a temporary buffer of 1MB for the sequential reading
-function HashFile(const aFileName: TFileName; aAlgo: THashAlgo): RawUTF8;
+function HashFile(const aFileName: TFileName; aAlgo: THashAlgo): RawUTF8; overload;
+
+/// compute the hexadecimal hashe(s) of one file, as external .md5/.sha256/.. files
+// - reading the file once in memory, then apply all algorithms on it and
+// generate the text hash files in the very same folder
+procedure HashFile(const aFileName: TFileName; aAlgos: THashAlgos); overload;
 
 /// one-step hash computation of a buffer as lowercase hexadecimal string
 function HashFull(aAlgo: THashAlgo; aBuffer: Pointer; aLen: integer): RawUTF8;
-
 
 /// compute the HMAC message authentication code using crc256c as hash function
 // - HMAC over a non cryptographic hash function like crc256c is known to be
@@ -2010,16 +2011,17 @@ type
   // - you may use HMAC_CRC32C() overloaded functions for one-step process
   // - we defined a record instead of a class, to allow stack allocation and
   // thread-safe reuse of one initialized instance via Compute()
-  THMAC_CRC32C = {$ifndef UNICODE}object{$else}record{$endif}
+  {$ifdef USERECORDWITHMETHODS}THMAC_CRC32C = record
+    {$else}THMAC_CRC32C = object{$endif}
   private
     seed: cardinal;
-    step7data: TByte64;
+    step7data: THash512Rec;
   public
     /// prepare the HMAC authentication with the supplied key
-    // - consider using Compute to re-use a prepared HMAC instance 
+    // - consider using Compute to re-use a prepared HMAC instance
     procedure Init(key: pointer; keylen: integer); overload;
     /// prepare the HMAC authentication with the supplied key
-    // - consider using Compute to re-use a prepared HMAC instance 
+    // - consider using Compute to re-use a prepared HMAC instance
     procedure Init(const key: RawByteString); overload;
     /// call this method for each continuous message block
     // - iterate over all message blocks, then call Done to retrieve the HMAC
@@ -2123,7 +2125,7 @@ var
 /// protect some data for the current user, using Windows DPAPI
 // - the application can specify a secret salt text, which should reflect the
 // current execution context, to ensure nobody could decrypt the data without
-// knowing this application-specific AppSecret value 
+// knowing this application-specific AppSecret value
 // - will use CryptProtectData DPAPI function call under Windows
 // - see https://msdn.microsoft.com/en-us/library/ms995355
 // - this function is Windows-only, could be slow, and you don't know which
@@ -2137,7 +2139,7 @@ function CryptDataForCurrentUserDPAPI(const Data,AppSecret: RawByteString; Encry
 /// protect some data via AES-256-CFB and a secret known by the current user only
 // - the application can specify a secret salt text, which should reflect the
 // current execution context, to ensure nobody could decrypt the data without
-// knowing this application-specific AppSecret value 
+// knowing this application-specific AppSecret value
 // - here data is cyphered using a random secret key, stored in a file located in
 // ! GetSystemPath(spUserData)+sep+PBKDF2_HMAC_SHA256(CryptProtectDataEntropy,User)
 // with sep='_' under Windows, and sep='.syn-' under Linux/Posix
@@ -2164,6 +2166,7 @@ function CryptDataForCurrentUserDPAPI(const Data,AppSecret: RawByteString; Encry
 // !    end;
 // !  end;
 function CryptDataForCurrentUser(const Data,AppSecret: RawByteString; Encrypt: boolean): RawByteString;
+
 
 const
   SHA1DIGESTSTRLEN = sizeof(TSHA1Digest)*2;
@@ -2253,6 +2256,18 @@ function AESSelfTest(onlytables: Boolean): boolean;
 
 /// self test of RC4 routines
 function RC4SelfTest: boolean;
+
+/// entry point of the raw MD5 transform function - may be used for low-level use
+procedure RawMd5Compress(var Hash; Data: pointer);
+
+/// entry point of the raw SHA-1 transform function - may be used for low-level use
+procedure RawSha1Compress(var Hash; Data: pointer);
+
+/// entry point of the raw SHA-256 transform function - may be used for low-level use
+procedure RawSha256Compress(var Hash; Data: pointer);
+
+/// entry point of the raw SHA-512 transform function - may be used for low-level use
+procedure RawSha512Compress(var Hash; Data: pointer);
 
 // little endian fast conversion
 // - 160 bits = 5 integers
@@ -2378,7 +2393,7 @@ type
   // and another one for decryption, with PKCS7 padding and no MAC validation
   TProtocolAES = class(TInterfacedObjectLocked, IProtocol)
   protected
-    fAES: array[boolean] of TAESAbstract;
+    fAES: array[boolean] of TAESAbstract; // [false]=decrypt [true]=encrypt
   public
     /// initialize this encryption protocol with the given AES settings
     constructor Create(aClass: TAESAbstractClass; const aKey; aKeySize: cardinal;
@@ -2426,7 +2441,7 @@ type
   // generated, e.g. "iat":1477438667
   // - jrcJwtID provides a unique identifier for the JWT, to prevent any replay;
   // TJWTAbstract.Compute will set an obfuscated TSynUniqueIdentifierGenerator
-  // hexadecimal value  
+  // hexadecimal value
   TJWTClaim = (
     jrcIssuer, jrcSubject, jrcAudience, jrcExpirationTime, jrcNotBefore,
     jrcIssuedAt, jrcJwtID);
@@ -2450,15 +2465,15 @@ type
   TJWTContent = record
     /// store latest Verify() result
     result: TJWTResult;
-    /// set of registered claims, as stored in the JWT payload
+    /// set of known/registered claims, as stored in the JWT payload
     claims: TJWTClaims;
     /// match TJWTAbstract.Audience[] indexes for reg[jrcAudience]
     audience: set of 0..15;
-    /// registered claims UTF-8 values, as stored in the JWT payload
+    /// known/registered claims UTF-8 values, as stored in the JWT payload
     // - e.g. reg[jrcSubject]='1234567890' and reg[jrcIssuer]='' for
     // $ {"sub": "1234567890","name": "John Doe","admin": true}
     reg: array[TJWTClaim] of RawUTF8;
-    /// unregistered public/private claim values, as stored in the JWT payload
+    /// custom/unregistered claim values, as stored in the JWT payload
     // - registered claims will be available from reg[], not in this field
     // - e.g. data.U['name']='John Doe' and data.B['admin']=true for
     // $ {"sub": "1234567890","name": "John Doe","admin": true}
@@ -2507,7 +2522,7 @@ type
       const Issuer, Subject, Audience: RawUTF8; NotBefore: TDateTime;
       ExpirationMinutes: cardinal): RawUTF8; virtual;
     procedure Parse(const Token: RawUTF8; var JWT: TJWTContent;
-      out headpayload: RawUTF8; out signature: RawByteString); virtual;
+      out headpayload: RawUTF8; out signature: RawByteString; excluded: TJWTClaims); virtual;
     function CheckAgainstActualTimestamp(var JWT: TJWTContent): boolean;
     // abstract methods which should be overriden by inherited classes
     function ComputeSignature(const headpayload: RawUTF8): RawUTF8; virtual; abstract;
@@ -2550,13 +2565,15 @@ type
       const Issuer: RawUTF8=''; const Subject: RawUTF8=''; const Audience: RawUTF8='';
       NotBefore: TDateTime=0; ExpirationMinutes: integer=0): RawUTF8;
     /// check a JWT value, and its signature
-    // - will validate all expected Claims, and the associated signature
+    // - will validate all expected Claims (minus ExcludedClaims optional
+    // parameter), and the associated signature
     // - verification state is returned in JWT.result (jwtValid for a valid JWT),
     // together with all parsed payload information
     // - supplied JWT is transmitted e.g. in HTTP header:
     // $ Authorization: Bearer <Token>
     // - this method is thread-safe
-    procedure Verify(const Token: RawUTF8; out JWT: TJWTContent); overload;
+    procedure Verify(const Token: RawUTF8; out JWT: TJWTContent;
+      ExcludedClaims: TJWTClaims=[]); overload;
     /// check a JWT value, and its signature
     // - will validate all expected Claims, and the associated signature
     // - verification state is returned as function result
@@ -2577,11 +2594,14 @@ type
     // - it won't check the signature, but the header's algorithm against the
     // class name (use TJWTAbstract class to allow any algorithm)
     // - it will decode the JWT payload and check for its expiration, and some
-    // mandatory fied values
+    // mandatory fied values - you can optionally retrieve the Expiration time,
+    // the ending Signature, and/or the Payload decoded as TDocVariant
+    // - NotBeforeDelta allows to define some time frame for the "nbf" field
     // - may be used on client side to quickly validate a JWT received from
-    // server, without knowing the exact algorithm or secret keys 
+    // server, without knowing the exact algorithm or secret keys
     class function VerifyPayload(const Token, ExpectedSubject, ExpectedIssuer,
-      ExpectedAudience: RawUTF8; Expiration: PUnixTime=nil; Signature: PRawUTF8=nil): TJWTResult;
+      ExpectedAudience: RawUTF8; Expiration: PUnixTime=nil; Signature: PRawUTF8=nil;
+      Payload: PVariant=nil; IgnoreTime: boolean=false; NotBeforeDelta: TUnixTime=15): TJWTResult;
   published
     /// the name of the algorithm used by this instance (e.g. 'HS256')
     property Algorithm: RawUTF8 read fAlgorithm;
@@ -2591,7 +2611,7 @@ type
     // - Verify() method will ensure all claims are defined in the payload,
     // then fill TJWTContent.reg[] with all corresponding values
     property Claims: TJWTClaims read fClaims;
-    /// the period, in seconds, for the "exp" claim 
+    /// the period, in seconds, for the "exp" claim
     property ExpirationSeconds: integer read fExpirationSeconds;
     /// the audience string values associated with this instance
     // - will be checked by Verify() method, and set in TJWTContent.audience
@@ -2668,6 +2688,8 @@ type
     property SignatureSize: integer read fSignPrepared.fSignatureSize;
     /// the TSynSigner raw algorithm used for digital signature
     property SignatureAlgo: TSignAlgo read fSignPrepared.fAlgo;
+    /// low-level read access to the internal signature structure
+    property SignPrepared: TSynSigner read fSignPrepared;
   end;
   /// meta-class for TJWTSynSignerAbstract creations
   TJWTSynSignerAbstractClass = class of TJWTSynSignerAbstract;
@@ -2756,7 +2778,6 @@ type
     function GetAlgo: TSignAlgo; override;
   end;
 
-
 const
   /// the text field names of the registerd claims, as defined by RFC 7519
   // - see TJWTClaim enumeration and TJWTClaims set
@@ -2764,14 +2785,14 @@ const
   JWT_CLAIMS_TEXT: array[TJWTClaim] of RawUTF8 = (
     'iss','sub','aud','exp','nbf','iat','jti');
 
-  /// how TJWTSynSignerAbstract algorithms are identified in the JWT 
+  /// how TJWTSynSignerAbstract algorithms are identified in the JWT
   // - SHA-1 will fallback to HS256 (since there will never be SHA-1 support)
   // - SHA-3 is not yet officially defined in @http://tools.ietf.org/html/rfc7518
   JWT_TEXT: array[TSignAlgo] of RawUTF8 = (
     'HS256','HS256','HS384','HS512','S3224','S3256','S3384','S3512','S3S128','S3S256');
 
   /// able to instantiate any of the TJWTSynSignerAbstract instance expected
-  // - SHA-1 will fallback to TJWTHS256 (since there will never be SHA-1 support)
+  // - SHA-1 will fallback to TJWTHS256 (since SHA-1 will never be supported)
   // - SHA-3 is not yet officially defined in @http://tools.ietf.org/html/rfc7518
   // - typical use is the following:
   // ! result := JWT_CLASS[algo].Create(master, round, claims, [], expirationMinutes);
@@ -2782,15 +2803,24 @@ const
 
 function ToText(res: TJWTResult): PShortString; overload;
 function ToCaption(res: TJWTResult): string; overload;
+function ToText(claim: TJWTClaim): PShortString; overload;
+function ToText(claims: TJWTClaims): ShortString; overload;
 
 {$endif NOVARIANTS}
 
 function ToText(chk: TAESIVReplayAttackCheck): PShortString; overload;
 function ToText(res: TProtocolResult): PShortString; overload;
+function ToText(algo: TSignAlgo): PShortString; overload;
+function ToText(algo: THashAlgo): PShortString; overload;
 function ToText(algo: TSHA3Algo): PShortString; overload;
 
 
 implementation
+
+{$ifndef NOVARIANTS}
+uses
+  Variants;
+{$endif}
 
 function ToText(res: TProtocolResult): PShortString;
 begin
@@ -2802,11 +2832,108 @@ begin
   result := GetEnumName(TypeInfo(TAESIVReplayAttackCheck),ord(chk));
 end;
 
+function ToText(algo: TSignAlgo): PShortString;
+begin
+  result := GetEnumName(TypeInfo(TSignAlgo),ord(algo));
+end;
+
+function ToText(algo: THashAlgo): PShortString;
+begin
+  result := GetEnumName(TypeInfo(THashAlgo),ord(algo));
+end;
+
 function ToText(algo: TSHA3Algo): PShortString;
 begin
   result := GetEnumName(TypeInfo(TSHA3Algo),ord(algo));
 end;
 
+
+{$ifdef CPU64}
+procedure XorBlock16(A,B: PInt64Array);
+begin
+  A[0] := A[0] xor B[0];
+  A[1] := A[1] xor B[1];
+end;
+
+procedure XorBlock16(A,B,C: PInt64Array);
+begin
+  B[0] := A[0] xor C[0];
+  B[1] := A[1] xor C[1];
+end;
+{$else}
+procedure XorBlock16(A,B: PCardinalArray);
+begin
+  A[0] := A[0] xor B[0];
+  A[1] := A[1] xor B[1];
+  A[2] := A[2] xor B[2];
+  A[3] := A[3] xor B[3];
+end;
+
+procedure XorBlock16(A,B,C: PCardinalArray);
+begin
+  B[0] := A[0] xor C[0];
+  B[1] := A[1] xor C[1];
+  B[2] := A[2] xor C[2];
+  B[3] := A[3] xor C[3];
+end;
+{$endif}
+
+procedure AESBlockToShortString(const block: TAESBlock; out result: short32);
+begin
+  result[0] := #32;
+  SynCommons.BinToHex(@block,@result[1],16);
+end;
+
+function AESBlockToShortString(const block: TAESBlock): short32;
+begin
+  AESBlockToShortString(block,result);
+end;
+
+function AESBlockToString(const block: TAESBlock): RawUTF8;
+begin
+  FastSetString(result,nil,32);
+  SynCommons.BinToHex(@block,pointer(result),16);
+end;
+
+function MD5DigestToString(const D: TMD5Digest): RawUTF8;
+begin
+  BinToHexLower(@D,sizeof(D),result);
+end;
+
+function MD5StringToDigest(const Source: RawUTF8; out Dest: TMD5Digest): boolean;
+begin
+  result := SynCommons.HexToBin(pointer(Source), @Dest, sizeof(Dest));
+end;
+
+function SHA1DigestToString(const D: TSHA1Digest): RawUTF8;
+begin
+  BinToHexLower(@D,sizeof(D),result);
+end;
+
+function SHA1StringToDigest(const Source: RawUTF8; out Dest: TSHA1Digest): boolean;
+begin
+  result := SynCommons.HexToBin(pointer(Source), @Dest, sizeof(Dest));
+end;
+
+function SHA256DigestToString(const D: TSHA256Digest): RawUTF8;
+begin
+  BinToHexLower(@D,sizeof(D),result);
+end;
+
+function SHA256StringToDigest(const Source: RawUTF8; out Dest: TSHA256Digest): boolean;
+begin
+  result := SynCommons.HexToBin(pointer(Source), @Dest, sizeof(Dest));
+end;
+
+function SHA512DigestToString(const D: TSHA512Digest): RawUTF8;
+begin
+  BinToHexLower(@D, sizeof(D), result);
+end;
+
+function SHA384DigestToString(const D: TSHA384Digest): RawUTF8;
+begin
+  BinToHexLower(@D, sizeof(D), result);
+end;
 
 {$ifdef USEPADLOCK}
 
@@ -2980,20 +3107,22 @@ const
 type
   TKeyArray = packed array[0..AESMaxRounds] of TAESBlock;
 
+  /// low-level content of TAES.Context (AESContextSize bytes)
+  // - is defined privately in the implementation section
+  // - don't change the structure below: it is fixed in the asm code
+  // -> use PUREPASCAL if you really have to change it
   TAESContext = packed record
-    // don't change the structure below: it is fixed in the asm code
-    // -> use PUREPASCAL if you really have to change it
     RK: TKeyArray;   // Key (encr. or decr.)
     IV: TAESBlock;   // IV or CTR
     buf: TAESBlock;  // Work buffer
     {$ifdef USEPADLOCK}
     ViaCtx: pointer; // padlock_*() context
     {$endif}
-    AesNi: procedure{$ifdef CPU64}(const ctxt, source, dest){$endif};
-      // AesNi set if the CPU supports AES-NI new asm instructions
+    DoBlock: procedure(const ctxt, source, dest); // main AES function
+    {$ifdef USEAESNI32}AesNi32: pointer;{$endif}
     Initialized: boolean;
     Rounds: byte;    // Number of rounds
-    KeyBits: byte;   // Number of bits in key
+    KeyBits: word;   // Number of bits in key (128/192/256)
   end;
 
 
@@ -3007,10 +3136,10 @@ type
 const
   RCon: array[0..9] of cardinal = ($01,$02,$04,$08,$10,$20,$40,$80,$1b,$36);
 
-// AES computed tables
+// AES computed tables - don't change the order below!
 var
-  SBox, InvSBox: array[byte] of byte;
   Td0, Td1, Td2, Td3, Te0, Te1, Te2, Te3: array[byte] of cardinal;
+  SBox, InvSBox: array[byte] of byte;
   Xor32Byte: TByteArray absolute Td0;  // 2^13=$2000=8192 bytes of XOR tables ;)
 
 procedure ComputeAesStaticTables;
@@ -3078,65 +3207,165 @@ type
 
 {$ifdef CPU32}
 
-procedure bswap256(s,d: PIntegerArray);
+procedure bswap256(s,d: PIntegerArray); {$ifdef FPC}nostackframe; assembler;{$endif}
 asm
-  push ebx
-  mov ecx,eax // ecx=s, edx=d
-  mov eax,[ecx]; mov ebx,[ecx+4]; bswap eax; bswap ebx; mov [edx],eax; mov [edx+4],ebx
-  mov eax,[ecx+8]; mov ebx,[ecx+12]; bswap eax; bswap ebx; mov [edx+8],eax; mov [edx+12],ebx
-  mov eax,[ecx+16]; mov ebx,[ecx+20]; bswap eax; bswap ebx; mov [edx+16],eax; mov [edx+20],ebx
-  mov eax,[ecx+24]; mov ebx,[ecx+28]; bswap eax; bswap ebx; mov [edx+24],eax; mov [edx+28],ebx
-  pop ebx
+        push    ebx
+        mov     ecx, eax // ecx=s, edx=d
+        mov     eax, [ecx]
+        mov     ebx, [ecx + 4]
+        bswap   eax
+        bswap   ebx
+        mov     [edx], eax
+        mov     [edx + 4], ebx
+        mov     eax, [ecx + 8]
+        mov     ebx, [ecx + 12]
+        bswap   eax
+        bswap   ebx
+        mov     [edx + 8], eax
+        mov     [edx + 12], ebx
+        mov     eax, [ecx + 16]
+        mov     ebx, [ecx + 20]
+        bswap   eax
+        bswap   ebx
+        mov     [edx + 16], eax
+        mov     [edx + 20], ebx
+        mov     eax, [ecx + 24]
+        mov     ebx, [ecx + 28]
+        bswap   eax
+        bswap   ebx
+        mov     [edx + 24], eax
+        mov     [edx + 28], ebx
+        pop     ebx
 end;
 
-procedure bswap160(s,d: PIntegerArray);
+procedure bswap160(s,d: PIntegerArray); {$ifdef FPC}nostackframe; assembler;{$endif}
 asm
-  push ebx
-  mov ecx,eax // ecx=s, edx=d
-  mov eax,[ecx]; mov ebx,[ecx+4]; bswap eax; bswap ebx; mov [edx],eax; mov [edx+4],ebx
-  mov eax,[ecx+8]; mov ebx,[ecx+12]; bswap eax; bswap ebx; mov [edx+8],eax; mov [edx+12],ebx
-  mov eax,[ecx+16]; bswap eax; mov [edx+16],eax
-  pop ebx
+        push    ebx
+        mov     ecx, eax // ecx=s, edx=d
+        mov     eax, [ecx]
+        mov     ebx, [ecx + 4]
+        bswap   eax
+        bswap   ebx
+        mov     [edx], eax
+        mov     [edx + 4], ebx
+        mov     eax, [ecx + 8]
+        mov     ebx, [ecx + 12]
+        bswap   eax
+        bswap   ebx
+        mov     [edx + 8], eax
+        mov     [edx + 12], ebx
+        mov     eax, [ecx + 16]
+        bswap   eax
+        mov     [edx + 16], eax
+        pop     ebx
+end;
+
+function gf2_multiply(x,y,m: PtrUInt): PtrUInt; {$ifdef FPC}nostackframe; assembler;{$endif}
+asm // eax=x edx=y ecx=m
+        push    esi
+        push    edi
+        push    ebx
+        push    ebp
+        mov     ebp, 32
+        mov     ebx, eax
+        and     eax, 1
+        cmovne  eax, edx
+@s:     mov     esi, eax
+        mov     edi, ecx
+        shr     esi, 1
+        xor     edi, esi
+        test    al, 1
+        mov     eax, esi
+        cmovne  eax, edi
+        shr     ebx, 1
+        mov     esi, eax
+        xor     esi, edx
+        test    bl, 1
+        cmovne  eax, esi
+        dec     ebp
+        jne     @s
+        pop     ebp
+        pop     ebx
+        pop     edi
+        pop     esi
 end;
 
 {$endif CPU32}
 
 {$ifdef CPU64}
 
-procedure bswap256(s,d: PIntegerArray);
-{$ifdef FPC}nostackframe; assembler;
-asm
-{$else}
-asm // rcx=s, rdx=d
-  .noframe
-{$endif}
-  {$ifndef win64}
-  mov rdx,rsi
-  mov rcx,rdi
-  {$endif win64}
-  mov eax,[rcx]; mov r8d,[rcx+4]; mov r9d,[rcx+8]; mov r10d,[rcx+12]
-  bswap eax; bswap r8d; bswap r9d; bswap r10d
-  mov [rdx],eax; mov [rdx+4],r8d; mov [rdx+8],r9d; mov [rdx+12],r10d
-  mov eax,[rcx+16]; mov r8d,[rcx+20]; mov r9d,[rcx+24]; mov r10d,[rcx+28]
-  bswap eax; bswap r8d; bswap r9d; bswap r10d
-  mov [rdx+16],eax; mov [rdx+20],r8d; mov [rdx+24],r9d; mov [rdx+28],r10d
+procedure bswap256(s,d: PIntegerArray); {$ifdef FPC} nostackframe; assembler;
+asm {$else} asm .noframe {$endif}
+        mov     eax, dword ptr[s]
+        mov     r8d, dword ptr[s + 4]
+        mov     r9d, dword ptr[s + 8]
+        mov     r10d, dword ptr[s + 12]
+        bswap   eax
+        bswap   r8d
+        bswap   r9d
+        bswap   r10d
+        mov     dword ptr[d], eax
+        mov     dword ptr[d + 4], r8d
+        mov     dword ptr[d + 8], r9d
+        mov     dword ptr[d + 12], r10d
+        mov     eax, dword ptr[s + 16]
+        mov     r8d, dword ptr[s + 20]
+        mov     r9d, dword ptr[s + 24]
+        mov     r10d, dword ptr[s + 28]
+        bswap   eax
+        bswap   r8d
+        bswap   r9d
+        bswap   r10d
+        mov     dword ptr[d + 16], eax
+        mov     dword ptr[d + 20], r8d
+        mov     dword ptr[d + 24], r9d
+        mov     dword ptr[d + 28], r10d
 end;
 
-procedure bswap160(s,d: PIntegerArray);
-{$ifdef FPC}nostackframe; assembler;
-asm
-{$else}
-asm // rcx=s, rdx=d
-  .noframe
-{$endif}
-  {$ifndef win64}
-  mov rdx,rsi
-  mov rcx,rdi
-  {$endif win64}
-  mov eax,[rcx]; mov r8d,[rcx+4]; mov r9d,[rcx+8]; mov r10d,[rcx+12];
-  bswap eax;     bswap r8d;       bswap r9d;       bswap r10d;
-  mov [rdx],eax; mov [rdx+4],r8d; mov [rdx+8],r9d; mov [rdx+12],r10d;
-  mov eax,[rcx+16]; bswap eax; mov [rdx+16],eax
+procedure bswap160(s,d: PIntegerArray); {$ifdef FPC} nostackframe; assembler;
+asm {$else} asm .noframe {$endif}
+        mov     eax, dword ptr[s]
+        mov     r8d, dword ptr[s + 4]
+        mov     r9d, dword ptr[s + 8]
+        mov     r10d, dword ptr[s + 12]
+        bswap   eax
+        bswap   r8d
+        bswap   r9d
+        bswap   r10d
+        mov     dword ptr[d], eax
+        mov     dword ptr[d + 4], r8d
+        mov     dword ptr[d + 8], r9d
+        mov     dword ptr[d + 12], r10d
+        mov     eax, dword ptr[s + 16]
+        bswap   eax
+        mov     dword ptr[d + 16], eax
+end;
+
+// see http://nicst.de/crc.pdf
+
+function gf2_multiply(x,y,m,bits: PtrUInt): PtrUInt; {$ifdef FPC} nostackframe; assembler;
+asm {$else} asm .noframe {$endif}
+        mov     rax, x
+        and     rax, 1
+        cmovne  rax, y
+@s:     mov     r10, rax
+        mov     r11, m
+        shr     r10, 1
+        xor     r11, r10
+        test    al, 1
+        mov     rax, r10
+        cmovne  rax, r11
+        shr     x, 1
+        mov     r10, rax
+        xor     r10, y
+        {$ifdef win64}
+        test    cl, 1
+        {$else}
+        test    dil, 1
+        {$endif}
+        cmovne  rax, r10
+        dec     bits
+        jne     @s
 end;
 
 {$endif CPU64}
@@ -3278,32 +3507,22 @@ end;
 
 { THMAC_SHA1 }
 
-procedure FillZero(var hash: TSHA1Digest); overload;
-begin
-  FillCharFast(hash,sizeof(hash),0);
-end;
-
-procedure FillZero(var hash: TByte64);
-begin
-  FillCharFast(hash,sizeof(hash),0);
-end;
-
 procedure THMAC_SHA1.Init(key: pointer; keylen: integer);
 var i: integer;
-    k0,k0xorIpad: TByte64;
+    k0,k0xorIpad: THash512Rec;
 begin
-  FillZero(k0);
+  FillZero(k0.b);
   if keylen>sizeof(k0) then
-    sha.Full(key,keylen,PSHA1Digest(@k0)^) else
+    sha.Full(key,keylen,k0.b160) else
     MoveFast(key^,k0,keylen);
   for i := 0 to 15 do
-    k0xorIpad[i] := k0[i] xor $36363636;
+    k0xorIpad.c[i] := k0.c[i] xor $36363636;
   for i := 0 to 15 do
-    step7data[i] := k0[i] xor $5c5c5c5c;
+    step7data.c[i] := k0.c[i] xor $5c5c5c5c;
   sha.Init;
   sha.Update(@k0xorIpad,sizeof(k0xorIpad));
-  FillZero(k0);
-  FillZero(k0xorIpad);
+  FillZero(k0.b);
+  FillZero(k0xorIpad.b);
 end;
 
 procedure THMAC_SHA1.Update(msg: pointer; msglen: integer);
@@ -3318,7 +3537,7 @@ begin
   sha.Update(@result,sizeof(result));
   sha.Final(result,NoInit);
   if not NoInit then
-    FillZero(step7data);
+    FillZero(step7data.b);
 end;
 
 procedure THMAC_SHA1.Done(out result: RawUTF8; NoInit: boolean);
@@ -3384,20 +3603,20 @@ end;
 
 procedure THMAC_SHA256.Init(key: pointer; keylen: integer);
 var i: integer;
-    k0,k0xorIpad: TByte64;
+    k0,k0xorIpad: THash512Rec;
 begin
-  FillZero(k0);
+  FillZero(k0.b);
   if keylen>sizeof(k0) then
-    sha.Full(key,keylen,PSHA256Digest(@k0)^) else
+    sha.Full(key,keylen,k0.Lo) else
     MoveFast(key^,k0,keylen);
   for i := 0 to 15 do
-    k0xorIpad[i] := k0[i] xor $36363636;
+    k0xorIpad.c[i] := k0.c[i] xor $36363636;
   for i := 0 to 15 do
-    step7data[i] := k0[i] xor $5c5c5c5c;
+    step7data.c[i] := k0.c[i] xor $5c5c5c5c;
   sha.Init;
   sha.Update(@k0xorIpad,sizeof(k0xorIpad));
-  FillZero(k0);
-  FillZero(k0xorIpad);
+  FillZero(k0.b);
+  FillZero(k0xorIpad.b);
 end;
 
 procedure THMAC_SHA256.Update(msg: pointer; msglen: integer);
@@ -3427,7 +3646,7 @@ begin
   sha.Update(@result,sizeof(result));
   sha.Final(result,NoInit);
   if not NoInit then
-    FillZero(step7data);
+    FillZero(step7data.b);
 end;
 
 procedure THMAC_SHA256.Done(out result: RawUTF8; NoInit: boolean);
@@ -3754,16 +3973,16 @@ end;
 procedure HMAC_CRC256C(key,msg: pointer; keylen,msglen: integer; out result: THash256);
 var i: integer;
     h1,h2: cardinal;
-    k0,k0xorIpad,step7data: TByte64;
+    k0,k0xorIpad,step7data: THash512Rec;
 begin
   FillCharFast(k0,sizeof(k0),0);
   if keylen>sizeof(k0) then
-    crc256c(key,keylen,PHash256(@k0)^) else
+    crc256c(key,keylen,k0.Lo) else
     MoveFast(key^,k0,keylen);
   for i := 0 to 15 do
-    k0xorIpad[i] := k0[i] xor $36363636;
+    k0xorIpad.c[i] := k0.c[i] xor $36363636;
   for i := 0 to 15 do
-    step7data[i] := k0[i] xor $5c5c5c5c;
+    step7data.c[i] := k0.c[i] xor $5c5c5c5c;
   h1 := crc32c(crc32c(0,@k0xorIpad,sizeof(k0xorIpad)),msg,msglen);
   h2 := crc32c(crc32c(h1,@k0xorIpad,sizeof(k0xorIpad)),msg,msglen);
   crc256cmix(h1,h2,@result);
@@ -3795,16 +4014,16 @@ end;
 
 procedure THMAC_CRC32C.Init(key: pointer; keylen: integer);
 var i: integer;
-    k0,k0xorIpad: TByte64;
+    k0,k0xorIpad: THash512Rec;
 begin
   FillCharFast(k0,sizeof(k0),0);
   if keylen>sizeof(k0) then
-    crc256c(key,keylen,PHash256(@k0)^) else
+    crc256c(key,keylen,k0.Lo) else
     MoveFast(key^,k0,keylen);
   for i := 0 to 15 do
-    k0xorIpad[i] := k0[i] xor $36363636;
+    k0xorIpad.c[i] := k0.c[i] xor $36363636;
   for i := 0 to 15 do
-    step7data[i] := k0[i] xor $5c5c5c5c;
+    step7data.c[i] := k0.c[i] xor $5c5c5c5c;
   seed := crc32c(0,@k0xorIpad,sizeof(k0xorIpad));
   FillCharFast(k0,sizeof(k0),0);
   FillCharFast(k0xorIpad,sizeof(k0xorIpad),0);
@@ -3859,19 +4078,19 @@ var SHA: TSHA1;
 begin
   // 1. Hash complete RawByteString
   SHA.Full(pointer(s),length(s),Digest);
-  result := CompareMem(@Digest,@TDig,sizeof(Digest));
+  result := IsEqual(Digest,TDig);
   if not result then exit;
   // 2. one update call for all chars
   for i := 1 to length(s) do
     SHA.Update(@s[i],1);
   SHA.Final(Digest);
-  result := CompareMem(@Digest,@TDig,sizeof(Digest));
+  result := IsEqual(Digest,TDig);
   // 3. test consistency with Padlock engine down results
 {$ifdef USEPADLOCK}
   if not result or not padlock_available then exit;
   padlock_available := false;  // force PadLock engine down
   SHA.Full(pointer(s),length(s),Digest);
-  result := CompareMem(@Digest,@TDig,sizeof(Digest));
+  result := IsEqual(Digest,TDig);
 {$ifdef PADLOCKDEBUG} write('=padlock '); {$endif}
   padlock_available := true;
 {$endif}
@@ -3915,49 +4134,6 @@ end;
 
 
 { TAES }
-
-{$define AES_ROLLED}
-// if defined, use rolled version, which is faster (at least on my AMD CPU)
-
-{$ifdef DELPHI5OROLDER}
-  {$define AES_PASCAL} // Delphi 5 internal asm is buggy :(
-  {$define SHA3_PASCAL}
-  {$define SHA512_X86} // external sha512-x86.obj 
-{$else}
-  {$ifdef CPUINTEL} // AES-NI supported for x86 and x64 under Windows
-    {$ifdef CPU64}
-      {$ifdef HASAESNI}
-        {$define USEAESNI}
-        {$define USEAESNI64}
-      {$else}
-        {$define AES_PASCAL} // Delphi XE2/XE3 do not have the AES-NI opcodes :(
-      {$endif}
-      {$define AESPASCAL_OR_CPU64}
-      {$ifndef BSD}
-        {$define CRC32C_X64} // external crc32_iscsi_01 for win64/lin64
-        {$define SHA512_X64} // external sha512_sse4 for win64/lin64
-      {$endif}
-    {$else}
-      {$define USEAESNI}
-      {$define USEAESNI32}
-      {$ifdef MSWINDOWS}
-        {$define SHA512_X86} // external sha512-x86.obj/.o
-      {$endif}
-      {$ifdef FPC}
-        {$ifdef LINUX}
-          {$define SHA512_X86} // external linux32/sha512-x86.o
-        {$endif}
-      {$endif FPC}
-    {$endif}
-  {$else}
-    {$define AES_PASCAL} // AES128 unrolled pascal(Delphi7)=57MB/s rolled asm=84MB/s :)
-    {$define SHA3_PASCAL}
-  {$endif CPUINTEL}
-{$endif}
-
-{$ifdef AES_PASCAL}
-  {$define AESPASCAL_OR_CPU64}
-{$endif}
 
 function AESSelfTest(onlytables: Boolean): boolean;
 var A: TAES;
@@ -4008,392 +4184,379 @@ end;
 
 procedure TAES.Encrypt(var B: TAESBlock);
 begin
-  Encrypt(B,B);
+  TAESContext(Context).DoBlock(Context,B,B);
 end;
 
 {$ifdef USEAESNI}
 {$ifdef CPU32}
-procedure AesNiEncryptXmm7_128;
+procedure AesNiEncryptXmm7_128; {$ifdef FPC} nostackframe; assembler; {$endif}
 asm // input: eax=TAESContext, xmm7=data; output: eax=TAESContext, xmm7=data
-  movdqu xmm0,[eax+16*0]
-  movdqu xmm1,[eax+16*1]
-  movdqu xmm2,[eax+16*2]
-  movdqu xmm3,[eax+16*3]
-  movdqu xmm4,[eax+16*4]
-  movdqu xmm5,[eax+16*5]
-  movdqu xmm6,[eax+16*6]
-  pxor xmm7,xmm0
+        movups  xmm0, [eax + 16 * 0]
+        movups  xmm1, [eax + 16 * 1]
+        movups  xmm2, [eax + 16 * 2]
+        movups  xmm3, [eax + 16 * 3]
+        movups  xmm4, [eax + 16 * 4]
+        movups  xmm5, [eax + 16 * 5]
+        movups  xmm6, [eax + 16 * 6]
+        pxor    xmm7, xmm0
   {$ifdef HASAESNI}
-  aesenc xmm7,xmm1
-  aesenc xmm7,xmm2
-  aesenc xmm7,xmm3
-  aesenc xmm7,xmm4
-  aesenc xmm7,xmm5
-  aesenc xmm7,xmm6
+        aesenc  xmm7, xmm1
+        aesenc  xmm7, xmm2
+        aesenc  xmm7, xmm3
+        aesenc  xmm7, xmm4
+        aesenc  xmm7, xmm5
+        aesenc  xmm7, xmm6
   {$else}
-  db $66,$0F,$38,$DC,$F9
-  db $66,$0F,$38,$DC,$FA
-  db $66,$0F,$38,$DC,$FB
-  db $66,$0F,$38,$DC,$FC
-  db $66,$0F,$38,$DC,$FD
-  db $66,$0F,$38,$DC,$FE
+        db      $66, $0F, $38, $DC, $F9
+        db      $66, $0F, $38, $DC, $FA
+        db      $66, $0F, $38, $DC, $FB
+        db      $66, $0F, $38, $DC, $FC
+        db      $66, $0F, $38, $DC, $FD
+        db      $66, $0F, $38, $DC, $FE
   {$endif}
-  movdqu xmm0,[eax+16*7]
-  movdqu xmm1,[eax+16*8]
-  movdqu xmm2,[eax+16*9]
-  movdqu xmm3,[eax+16*10]
+        movups  xmm0, [eax + 16 * 7]
+        movups  xmm1, [eax + 16 * 8]
+        movups  xmm2, [eax + 16 * 9]
+        movups  xmm3, [eax + 16 * 10]
   {$ifdef HASAESNI}
-  aesenc xmm7,xmm0
-  aesenc xmm7,xmm1
-  aesenc xmm7,xmm2
-  aesenclast xmm7,xmm3
+        aesenc  xmm7, xmm0
+        aesenc  xmm7, xmm1
+        aesenc  xmm7, xmm2
+        aesenclast xmm7, xmm3
   {$else}
-  db $66,$0F,$38,$DC,$F8
-  db $66,$0F,$38,$DC,$F9
-  db $66,$0F,$38,$DC,$FA
-  db $66,$0F,$38,$DD,$FB
+        db      $66, $0F, $38, $DC, $F8
+        db      $66, $0F, $38, $DC, $F9
+        db      $66, $0F, $38, $DC, $FA
+        db      $66, $0F, $38, $DD, $FB
   {$endif}
+end;
+procedure aesniencrypt128(const ctxt, source, dest);
+  {$ifdef FPC} nostackframe; assembler; {$endif}
+asm // eax=ctxt edx=source ecx=dest
+        movups  xmm7, [edx]
+        call    AesNiEncryptXmm7_128
+        movups  [ecx], xmm7
+        pxor    xmm7, xmm7 // for safety
 end;
 procedure AesNiEncryptXmm7_192;
+  {$ifdef FPC} nostackframe; assembler; {$endif}
 asm // input: eax=TAESContext, xmm7=data; output: eax=TAESContext, xmm7=data
-  movdqu xmm0,[eax+16*0]
-  movdqu xmm1,[eax+16*1]
-  movdqu xmm2,[eax+16*2]
-  movdqu xmm3,[eax+16*3]
-  movdqu xmm4,[eax+16*4]
-  movdqu xmm5,[eax+16*5]
-  movdqu xmm6,[eax+16*6]
-  pxor xmm7,xmm0
+        movups  xmm0, [eax + 16 * 0]
+        movups  xmm1, [eax + 16 * 1]
+        movups  xmm2, [eax + 16 * 2]
+        movups  xmm3, [eax + 16 * 3]
+        movups  xmm4, [eax + 16 * 4]
+        movups  xmm5, [eax + 16 * 5]
+        movups  xmm6, [eax + 16 * 6]
+        pxor    xmm7, xmm0
   {$ifdef HASAESNI}
-  aesenc xmm7,xmm1
-  aesenc xmm7,xmm2
-  aesenc xmm7,xmm3
-  aesenc xmm7,xmm4
-  aesenc xmm7,xmm5
-  aesenc xmm7,xmm6
+        aesenc  xmm7, xmm1
+        aesenc  xmm7, xmm2
+        aesenc  xmm7, xmm3
+        aesenc  xmm7, xmm4
+        aesenc  xmm7, xmm5
+        aesenc  xmm7, xmm6
   {$else}
-  db $66,$0F,$38,$DC,$F9
-  db $66,$0F,$38,$DC,$FA
-  db $66,$0F,$38,$DC,$FB
-  db $66,$0F,$38,$DC,$FC
-  db $66,$0F,$38,$DC,$FD
-  db $66,$0F,$38,$DC,$FE
+        db      $66, $0F, $38, $DC, $F9
+        db      $66, $0F, $38, $DC, $FA
+        db      $66, $0F, $38, $DC, $FB
+        db      $66, $0F, $38, $DC, $FC
+        db      $66, $0F, $38, $DC, $FD
+        db      $66, $0F, $38, $DC, $FE
   {$endif}
-  movdqu xmm0,[eax+16*7]
-  movdqu xmm1,[eax+16*8]
-  movdqu xmm2,[eax+16*9]
-  movdqu xmm3,[eax+16*10]
-  movdqu xmm4,[eax+16*11]
-  movdqu xmm5,[eax+16*12]
+        movups  xmm0, [eax + 16 * 7]
+        movups  xmm1, [eax + 16 * 8]
+        movups  xmm2, [eax + 16 * 9]
+        movups  xmm3, [eax + 16 * 10]
+        movups  xmm4, [eax + 16 * 11]
+        movups  xmm5, [eax + 16 * 12]
   {$ifdef HASAESNI}
-  aesenc xmm7,xmm0
-  aesenc xmm7,xmm1
-  aesenc xmm7,xmm2
-  aesenc xmm7,xmm3
-  aesenc xmm7,xmm4
-  aesenclast xmm7,xmm5
+        aesenc  xmm7, xmm0
+        aesenc  xmm7, xmm1
+        aesenc  xmm7, xmm2
+        aesenc  xmm7, xmm3
+        aesenc  xmm7, xmm4
+        aesenclast xmm7, xmm5
   {$else}
-  db $66,$0F,$38,$DC,$F8
-  db $66,$0F,$38,$DC,$F9
-  db $66,$0F,$38,$DC,$FA
-  db $66,$0F,$38,$DC,$FB
-  db $66,$0F,$38,$DC,$FC
-  db $66,$0F,$38,$DD,$FD
+        db      $66, $0F, $38, $DC, $F8
+        db      $66, $0F, $38, $DC, $F9
+        db      $66, $0F, $38, $DC, $FA
+        db      $66, $0F, $38, $DC, $FB
+        db      $66, $0F, $38, $DC, $FC
+        db      $66, $0F, $38, $DD, $FD
   {$endif}
 end;
+procedure aesniencrypt192(const ctxt, source, dest);
+  {$ifdef FPC} nostackframe; assembler; {$endif}
+asm // eax=ctxt edx=source ecx=dest
+        movups  xmm7, [edx]
+        call    AesNiEncryptXmm7_192
+        movups  [ecx], xmm7
+        pxor    xmm7, xmm7 // for safety
+end;
 procedure AesNiEncryptXmm7_256;
+  {$ifdef FPC} nostackframe; assembler; {$endif}
 asm // input: eax=TAESContext, xmm7=data; output: eax=TAESContext, xmm7=data
-  movdqu xmm0,[eax+16*0]
-  movdqu xmm1,[eax+16*1]
-  movdqu xmm2,[eax+16*2]
-  movdqu xmm3,[eax+16*3]
-  movdqu xmm4,[eax+16*4]
-  movdqu xmm5,[eax+16*5]
-  movdqu xmm6,[eax+16*6]
-  pxor xmm7,xmm0
+        movups  xmm0, [eax + 16 * 0]
+        movups  xmm1, [eax + 16 * 1]
+        movups  xmm2, [eax + 16 * 2]
+        movups  xmm3, [eax + 16 * 3]
+        movups  xmm4, [eax + 16 * 4]
+        movups  xmm5, [eax + 16 * 5]
+        movups  xmm6, [eax + 16 * 6]
+        pxor    xmm7, xmm0
   {$ifdef HASAESNI}
-  aesenc xmm7,xmm1
-  aesenc xmm7,xmm2
-  aesenc xmm7,xmm3
-  aesenc xmm7,xmm4
-  aesenc xmm7,xmm5
-  aesenc xmm7,xmm6
+        aesenc  xmm7, xmm1
+        aesenc  xmm7, xmm2
+        aesenc  xmm7, xmm3
+        aesenc  xmm7, xmm4
+        aesenc  xmm7, xmm5
+        aesenc  xmm7, xmm6
   {$else}
-  db $66,$0F,$38,$DC,$F9
-  db $66,$0F,$38,$DC,$FA
-  db $66,$0F,$38,$DC,$FB
-  db $66,$0F,$38,$DC,$FC
-  db $66,$0F,$38,$DC,$FD
-  db $66,$0F,$38,$DC,$FE
+        db      $66, $0F, $38, $DC, $F9
+        db      $66, $0F, $38, $DC, $FA
+        db      $66, $0F, $38, $DC, $FB
+        db      $66, $0F, $38, $DC, $FC
+        db      $66, $0F, $38, $DC, $FD
+        db      $66, $0F, $38, $DC, $FE
   {$endif}
-  movdqu xmm0,[eax+16*7]
-  movdqu xmm1,[eax+16*8]
-  movdqu xmm2,[eax+16*9]
-  movdqu xmm3,[eax+16*10]
-  movdqu xmm4,[eax+16*11]
-  movdqu xmm5,[eax+16*12]
-  movdqu xmm6,[eax+16*13]
+        movups  xmm0, [eax + 16 * 7]
+        movups  xmm1, [eax + 16 * 8]
+        movups  xmm2, [eax + 16 * 9]
+        movups  xmm3, [eax + 16 * 10]
+        movups  xmm4, [eax + 16 * 11]
+        movups  xmm5, [eax + 16 * 12]
+        movups  xmm6, [eax + 16 * 13]
   {$ifdef HASAESNI}
-  aesenc xmm7,xmm0
-  aesenc xmm7,xmm1
-  aesenc xmm7,xmm2
-  aesenc xmm7,xmm3
-  aesenc xmm7,xmm4
-  aesenc xmm7,xmm5
-  aesenc xmm7,xmm6
+        aesenc  xmm7, xmm0
+        aesenc  xmm7, xmm1
+        aesenc  xmm7, xmm2
+        aesenc  xmm7, xmm3
+        aesenc  xmm7, xmm4
+        aesenc  xmm7, xmm5
+        aesenc  xmm7, xmm6
   {$else}
-  db $66,$0F,$38,$DC,$F8
-  db $66,$0F,$38,$DC,$F9
-  db $66,$0F,$38,$DC,$FA
-  db $66,$0F,$38,$DC,$FB
-  db $66,$0F,$38,$DC,$FC
-  db $66,$0F,$38,$DC,$FD
-  db $66,$0F,$38,$DC,$FE
+        db      $66, $0F, $38, $DC, $F8
+        db      $66, $0F, $38, $DC, $F9
+        db      $66, $0F, $38, $DC, $FA
+        db      $66, $0F, $38, $DC, $FB
+        db      $66, $0F, $38, $DC, $FC
+        db      $66, $0F, $38, $DC, $FD
+        db      $66, $0F, $38, $DC, $FE
   {$endif}
-  movdqu xmm1,[eax+16*14]
+        movups  xmm1, [eax + 16 * 14]
   {$ifdef HASAESNI}
-  aesenclast xmm7,xmm1
+        aesenclast xmm7, xmm1
   {$else}
-  db $66,$0F,$38,$DD,$F9
+        db      $66, $0F, $38, $DD, $F9
   {$endif}
+end;
+procedure aesniencrypt256(const ctxt, source, dest);
+  {$ifdef FPC} nostackframe; assembler; {$endif}
+asm // eax=ctxt edx=source ecx=dest
+        movups  xmm7, [edx]
+        call    AesNiEncryptXmm7_256
+        movups  [ecx], xmm7
+        pxor    xmm7, xmm7 // for safety
 end;
 {$endif CPU32}
 {$ifdef CPU64}
-procedure AesNiEncryptXmm7_128(const ctxt, source, dest);
-{$ifdef FPC}nostackframe; assembler;
-asm
-{$else}
-asm // input: rcx=TAESContext, rdx=source, r8=dest
-  .noframe
-{$endif}
-  {$ifndef win64}
-  mov r8,rdx
-  mov rdx,rsi
-  mov rcx,rdi
-  {$endif win64}
-  movdqu xmm7,[rdx]
-  movdqu xmm0,[rcx+16*0]
-  movdqu xmm1,[rcx+16*1]
-  movdqu xmm2,[rcx+16*2]
-  movdqu xmm3,[rcx+16*3]
-  movdqu xmm4,[rcx+16*4]
-  movdqu xmm5,[rcx+16*5]
-  movdqu xmm6,[rcx+16*6]
-  movdqu xmm8,[rcx+16*7]
-  movdqu xmm9,[rcx+16*8]
-  movdqu xmm10,[rcx+16*9]
-  movdqu xmm11,[rcx+16*10]
-  pxor xmm7,xmm0
-  aesenc xmm7,xmm1
-  aesenc xmm7,xmm2
-  aesenc xmm7,xmm3
-  aesenc xmm7,xmm4
-  aesenc xmm7,xmm5
-  aesenc xmm7,xmm6
-  aesenc xmm7,xmm8
-  aesenc xmm7,xmm9
-  aesenc xmm7,xmm10
-  aesenclast xmm7,xmm11
-  movdqu [r8],xmm7
+procedure aesniencrypt128(const ctxt, source, dest); {$ifdef FPC}nostackframe; assembler;
+asm {$else} asm .noframe {$endif}
+        movups  xmm7, dqword ptr[source]
+        movups  xmm0, dqword ptr[ctxt + 16 * 0]
+        movups  xmm1, dqword ptr[ctxt + 16 * 1]
+        movups  xmm2, dqword ptr[ctxt + 16 * 2]
+        movups  xmm3, dqword ptr[ctxt + 16 * 3]
+        movups  xmm4, dqword ptr[ctxt + 16 * 4]
+        movups  xmm5, dqword ptr[ctxt + 16 * 5]
+        movups  xmm6, dqword ptr[ctxt + 16 * 6]
+        movups  xmm8, dqword ptr[ctxt + 16 * 7]
+        movups  xmm9, dqword ptr[ctxt + 16 * 8]
+        movups  xmm10, dqword ptr[ctxt + 16 * 9]
+        movups  xmm11, dqword ptr[ctxt + 16 * 10]
+        pxor    xmm7, xmm0
+        aesenc  xmm7, xmm1
+        aesenc  xmm7, xmm2
+        aesenc  xmm7, xmm3
+        aesenc  xmm7, xmm4
+        aesenc  xmm7, xmm5
+        aesenc  xmm7, xmm6
+        aesenc  xmm7, xmm8
+        aesenc  xmm7, xmm9
+        aesenc  xmm7, xmm10
+        aesenclast xmm7, xmm11
+        movups  dqword ptr[dest], xmm7
+        pxor    xmm7, xmm7 // for safety
 end;
-procedure AesNiEncryptXmm7_192(const ctxt, source, dest);
-{$ifdef FPC}nostackframe; assembler;
-asm
-{$else}
-asm // input: rcx=TAESContext, rdx=source, r8=dest
-  .noframe
-{$endif}
-  {$ifndef win64}
-  mov r8,rdx
-  mov rdx,rsi
-  mov rcx,rdi
-  {$endif win64}
-  movdqu xmm7,[rdx]
-  movdqu xmm0,[rcx+16*0]
-  movdqu xmm1,[rcx+16*1]
-  movdqu xmm2,[rcx+16*2]
-  movdqu xmm3,[rcx+16*3]
-  movdqu xmm4,[rcx+16*4]
-  movdqu xmm5,[rcx+16*5]
-  movdqu xmm6,[rcx+16*6]
-  movdqu xmm8,[rcx+16*7]
-  movdqu xmm9,[rcx+16*8]
-  movdqu xmm10,[rcx+16*9]
-  movdqu xmm11,[rcx+16*10]
-  movdqu xmm12,[rcx+16*11]
-  movdqu xmm13,[rcx+16*12]
-  pxor xmm7,xmm0
-  aesenc xmm7,xmm1
-  aesenc xmm7,xmm2
-  aesenc xmm7,xmm3
-  aesenc xmm7,xmm4
-  aesenc xmm7,xmm5
-  aesenc xmm7,xmm6
-  aesenc xmm7,xmm8
-  aesenc xmm7,xmm9
-  aesenc xmm7,xmm10
-  aesenc xmm7,xmm11
-  aesenc xmm7,xmm12
-  aesenclast xmm7,xmm13
-  movdqu [r8],xmm7
+procedure aesniencrypt192(const ctxt, source, dest); {$ifdef FPC}nostackframe; assembler;
+asm {$else} asm .noframe {$endif}
+        movups  xmm7, dqword ptr[source]
+        movups  xmm0, dqword ptr[ctxt + 16 * 0]
+        movups  xmm1, dqword ptr[ctxt + 16 * 1]
+        movups  xmm2, dqword ptr[ctxt + 16 * 2]
+        movups  xmm3, dqword ptr[ctxt + 16 * 3]
+        movups  xmm4, dqword ptr[ctxt + 16 * 4]
+        movups  xmm5, dqword ptr[ctxt + 16 * 5]
+        movups  xmm6, dqword ptr[ctxt + 16 * 6]
+        movups  xmm8, dqword ptr[ctxt + 16 * 7]
+        movups  xmm9, dqword ptr[ctxt + 16 * 8]
+        movups  xmm10, dqword ptr[ctxt + 16 * 9]
+        movups  xmm11, dqword ptr[ctxt + 16 * 10]
+        movups  xmm12, dqword ptr[ctxt + 16 * 11]
+        movups  xmm13, dqword ptr[ctxt + 16 * 12]
+        pxor    xmm7, xmm0
+        aesenc  xmm7, xmm1
+        aesenc  xmm7, xmm2
+        aesenc  xmm7, xmm3
+        aesenc  xmm7, xmm4
+        aesenc  xmm7, xmm5
+        aesenc  xmm7, xmm6
+        aesenc  xmm7, xmm8
+        aesenc  xmm7, xmm9
+        aesenc  xmm7, xmm10
+        aesenc  xmm7, xmm11
+        aesenc  xmm7, xmm12
+        aesenclast xmm7, xmm13
+        movups  dqword ptr[dest], xmm7
+        pxor    xmm7, xmm7 // for safety
 end;
-procedure AesNiEncryptXmm7_256(const ctxt, source, dest);
-{$ifdef FPC}nostackframe; assembler;
-asm
-{$else}
-asm // input: rcx=TAESContext, rdx=source, r8=dest
-  .noframe
-{$endif}
-  {$ifndef win64}
-  mov r8,rdx
-  mov rdx,rsi
-  mov rcx,rdi
-  {$endif win64}
-  movdqu xmm7,[rdx]
-  movdqu xmm0,[rcx+16*0]
-  movdqu xmm1,[rcx+16*1]
-  movdqu xmm2,[rcx+16*2]
-  movdqu xmm3,[rcx+16*3]
-  movdqu xmm4,[rcx+16*4]
-  movdqu xmm5,[rcx+16*5]
-  movdqu xmm6,[rcx+16*6]
-  movdqu xmm8,[rcx+16*7]
-  movdqu xmm9,[rcx+16*8]
-  movdqu xmm10,[rcx+16*9]
-  movdqu xmm11,[rcx+16*10]
-  movdqu xmm12,[rcx+16*11]
-  movdqu xmm13,[rcx+16*12]
-  movdqu xmm14,[rcx+16*13]
-  movdqu xmm15,[rcx+16*14]
-  pxor xmm7,xmm0
-  aesenc xmm7,xmm1
-  aesenc xmm7,xmm2
-  aesenc xmm7,xmm3
-  aesenc xmm7,xmm4
-  aesenc xmm7,xmm5
-  aesenc xmm7,xmm6
-  aesenc xmm7,xmm8
-  aesenc xmm7,xmm9
-  aesenc xmm7,xmm10
-  aesenc xmm7,xmm11
-  aesenc xmm7,xmm12
-  aesenc xmm7,xmm13
-  aesenc xmm7,xmm14
-  aesenclast xmm7,xmm15
-  movdqu [r8],xmm7
+procedure aesniencrypt256(const ctxt, source, dest); {$ifdef FPC}nostackframe; assembler;
+asm {$else} asm .noframe {$endif}
+        movups  xmm7, dqword ptr[source]
+        movups  xmm0, dqword ptr[ctxt + 16 * 0]
+        movups  xmm1, dqword ptr[ctxt + 16 * 1]
+        movups  xmm2, dqword ptr[ctxt + 16 * 2]
+        movups  xmm3, dqword ptr[ctxt + 16 * 3]
+        movups  xmm4, dqword ptr[ctxt + 16 * 4]
+        movups  xmm5, dqword ptr[ctxt + 16 * 5]
+        movups  xmm6, dqword ptr[ctxt + 16 * 6]
+        movups  xmm8, dqword ptr[ctxt + 16 * 7]
+        movups  xmm9, dqword ptr[ctxt + 16 * 8]
+        movups  xmm10, dqword ptr[ctxt + 16 * 9]
+        movups  xmm11, dqword ptr[ctxt + 16 * 10]
+        movups  xmm12, dqword ptr[ctxt + 16 * 11]
+        movups  xmm13, dqword ptr[ctxt + 16 * 12]
+        movups  xmm14, dqword ptr[ctxt + 16 * 13]
+        movups  xmm15, dqword ptr[ctxt + 16 * 14]
+        pxor    xmm7, xmm0
+        aesenc  xmm7, xmm1
+        aesenc  xmm7, xmm2
+        aesenc  xmm7, xmm3
+        aesenc  xmm7, xmm4
+        aesenc  xmm7, xmm5
+        aesenc  xmm7, xmm6
+        aesenc  xmm7, xmm8
+        aesenc  xmm7, xmm9
+        aesenc  xmm7, xmm10
+        aesenc  xmm7, xmm11
+        aesenc  xmm7, xmm12
+        aesenc  xmm7, xmm13
+        aesenc  xmm7, xmm14
+        aesenclast xmm7, xmm15
+        movups  dqword ptr[dest], xmm7
+        pxor    xmm7, xmm7 // for safety
 end;
-
-procedure AesNiDecrypt(const ctxt: TAESContext; const source: TAESBlock; var dest: TAESBlock);
-{$ifdef FPC}nostackframe; assembler;
-asm
-{$else}
-asm // input: rcx=TAESContext, rdx=source, r8=dest
-  .noframe
-{$endif}
-  {$ifndef win64}
-  mov r8,rdx
-  mov rdx,rsi
-  mov rcx,rdi
-  {$endif win64}
-  movdqu xmm7,[rdx]
-  mov dl,[rcx].TAESContext.Rounds
-  cmp dl,10
-  je @128
-  cmp dl,12
-  je @192
-@256:
-  movdqu xmm0,[rcx+16*14]
-  movdqu xmm1,[rcx+16*13]
-  movdqu xmm2,[rcx+16*12]
-  movdqu xmm3,[rcx+16*11]
-  movdqu xmm4,[rcx+16*10]
-  movdqu xmm5,[rcx+16*9]
-  movdqu xmm6,[rcx+16*8]
-  movdqu xmm8,[rcx+16*7]
-  movdqu xmm9,[rcx+16*6]
-  movdqu xmm10,[rcx+16*5]
-  movdqu xmm11,[rcx+16*4]
-  movdqu xmm12,[rcx+16*3]
-  movdqu xmm13,[rcx+16*2]
-  movdqu xmm14,[rcx+16*1]
-  movdqu xmm15,[rcx+16*0]
-  pxor xmm7,xmm0
-  aesdec xmm7,xmm1
-  aesdec xmm7,xmm2
-  aesdec xmm7,xmm3
-  aesdec xmm7,xmm4
-  aesdec xmm7,xmm5
-  aesdec xmm7,xmm6
-  aesdec xmm7,xmm8
-  aesdec xmm7,xmm9
-  aesdec xmm7,xmm10
-  aesdec xmm7,xmm11
-  aesdec xmm7,xmm12
-  aesdec xmm7,xmm13
-  aesdec xmm7,xmm14
-  aesdeclast xmm7,xmm15
-  movdqu [r8],xmm7
-  ret
-@192:
-  movdqu xmm0,[rcx+16*12]
-  movdqu xmm1,[rcx+16*11]
-  movdqu xmm2,[rcx+16*10]
-  movdqu xmm3,[rcx+16*9]
-  movdqu xmm4,[rcx+16*8]
-  movdqu xmm5,[rcx+16*7]
-  movdqu xmm6,[rcx+16*6]
-  movdqu xmm8,[rcx+16*5]
-  movdqu xmm9,[rcx+16*4]
-  movdqu xmm10,[rcx+16*3]
-  movdqu xmm11,[rcx+16*2]
-  movdqu xmm12,[rcx+16*1]
-  movdqu xmm13,[rcx+16*0]
-  pxor xmm7,xmm0
-  aesdec xmm7,xmm1
-  aesdec xmm7,xmm2
-  aesdec xmm7,xmm3
-  aesdec xmm7,xmm4
-  aesdec xmm7,xmm5
-  aesdec xmm7,xmm6
-  aesdec xmm7,xmm8
-  aesdec xmm7,xmm9
-  aesdec xmm7,xmm10
-  aesdec xmm7,xmm11
-  aesdec xmm7,xmm12
-  aesdeclast xmm7,xmm13
-  movdqu [r8],xmm7
-  ret
-@128:
-  movdqu xmm0,[rcx+16*10]
-  movdqu xmm1,[rcx+16*9]
-  movdqu xmm2,[rcx+16*8]
-  movdqu xmm3,[rcx+16*7]
-  movdqu xmm4,[rcx+16*6]
-  movdqu xmm5,[rcx+16*5]
-  movdqu xmm6,[rcx+16*4]
-  movdqu xmm8,[rcx+16*3]
-  movdqu xmm9,[rcx+16*2]
-  movdqu xmm10,[rcx+16*1]
-  movdqu xmm11,[rcx+16*0]
-  pxor xmm7,xmm0
-  aesdec xmm7,xmm1
-  aesdec xmm7,xmm2
-  aesdec xmm7,xmm3
-  aesdec xmm7,xmm4
-  aesdec xmm7,xmm5
-  aesdec xmm7,xmm6
-  aesdec xmm7,xmm8
-  aesdec xmm7,xmm9
-  aesdec xmm7,xmm10
-  aesdeclast xmm7,xmm11
-  movdqu [r8],xmm7
+procedure aesnidecrypt128(const ctxt, source, dest); {$ifdef FPC}nostackframe; assembler;
+asm {$else} asm .noframe {$endif}
+        movups  xmm7, dqword ptr[source]
+        movups  xmm0, dqword ptr[ctxt + 16 * 10]
+        movups  xmm1, dqword ptr[ctxt + 16 * 9]
+        movups  xmm2, dqword ptr[ctxt + 16 * 8]
+        movups  xmm3, dqword ptr[ctxt + 16 * 7]
+        movups  xmm4, dqword ptr[ctxt + 16 * 6]
+        movups  xmm5, dqword ptr[ctxt + 16 * 5]
+        movups  xmm6, dqword ptr[ctxt + 16 * 4]
+        movups  xmm8, dqword ptr[ctxt + 16 * 3]
+        movups  xmm9, dqword ptr[ctxt + 16 * 2]
+        movups  xmm10, dqword ptr[ctxt + 16 * 1]
+        movups  xmm11, dqword ptr[ctxt + 16 * 0]
+        pxor    xmm7, xmm0
+        aesdec  xmm7, xmm1
+        aesdec  xmm7, xmm2
+        aesdec  xmm7, xmm3
+        aesdec  xmm7, xmm4
+        aesdec  xmm7, xmm5
+        aesdec  xmm7, xmm6
+        aesdec  xmm7, xmm8
+        aesdec  xmm7, xmm9
+        aesdec  xmm7, xmm10
+        aesdeclast xmm7, xmm11
+        movups  dqword ptr[dest], xmm7
+        pxor    xmm7, xmm7 // for safety
+end;
+procedure aesnidecrypt192(const ctxt, source, dest); {$ifdef FPC}nostackframe; assembler;
+asm {$else} asm .noframe {$endif}
+        movups  xmm7, dqword ptr[source]
+        movups  xmm0, dqword ptr[ctxt + 16 * 12]
+        movups  xmm1, dqword ptr[ctxt + 16 * 11]
+        movups  xmm2, dqword ptr[ctxt + 16 * 10]
+        movups  xmm3, dqword ptr[ctxt + 16 * 9]
+        movups  xmm4, dqword ptr[ctxt + 16 * 8]
+        movups  xmm5, dqword ptr[ctxt + 16 * 7]
+        movups  xmm6, dqword ptr[ctxt + 16 * 6]
+        movups  xmm8, dqword ptr[ctxt + 16 * 5]
+        movups  xmm9, dqword ptr[ctxt + 16 * 4]
+        movups  xmm10, dqword ptr[ctxt + 16 * 3]
+        movups  xmm11, dqword ptr[ctxt + 16 * 2]
+        movups  xmm12, dqword ptr[ctxt + 16 * 1]
+        movups  xmm13, dqword ptr[ctxt + 16 * 0]
+        pxor    xmm7, xmm0
+        aesdec  xmm7, xmm1
+        aesdec  xmm7, xmm2
+        aesdec  xmm7, xmm3
+        aesdec  xmm7, xmm4
+        aesdec  xmm7, xmm5
+        aesdec  xmm7, xmm6
+        aesdec  xmm7, xmm8
+        aesdec  xmm7, xmm9
+        aesdec  xmm7, xmm10
+        aesdec  xmm7, xmm11
+        aesdec  xmm7, xmm12
+        aesdeclast xmm7, xmm13
+        movups  dqword ptr[dest], xmm7
+        pxor    xmm7, xmm7 // for safety
+end;
+procedure aesnidecrypt256(const ctxt, source, dest); {$ifdef FPC}nostackframe; assembler;
+asm {$else} asm .noframe {$endif}
+        movups  xmm7, dqword ptr[source]
+        movups  xmm0, dqword ptr[ctxt + 16 * 14]
+        movups  xmm1, dqword ptr[ctxt + 16 * 13]
+        movups  xmm2, dqword ptr[ctxt + 16 * 12]
+        movups  xmm3, dqword ptr[ctxt + 16 * 11]
+        movups  xmm4, dqword ptr[ctxt + 16 * 10]
+        movups  xmm5, dqword ptr[ctxt + 16 * 9]
+        movups  xmm6, dqword ptr[ctxt + 16 * 8]
+        movups  xmm8, dqword ptr[ctxt + 16 * 7]
+        movups  xmm9, dqword ptr[ctxt + 16 * 6]
+        movups  xmm10, dqword ptr[ctxt + 16 * 5]
+        movups  xmm11, dqword ptr[ctxt + 16 * 4]
+        movups  xmm12, dqword ptr[ctxt + 16 * 3]
+        movups  xmm13, dqword ptr[ctxt + 16 * 2]
+        movups  xmm14, dqword ptr[ctxt + 16 * 1]
+        movups  xmm15, dqword ptr[ctxt + 16 * 0]
+        pxor    xmm7, xmm0
+        aesdec  xmm7, xmm1
+        aesdec  xmm7, xmm2
+        aesdec  xmm7, xmm3
+        aesdec  xmm7, xmm4
+        aesdec  xmm7, xmm5
+        aesdec  xmm7, xmm6
+        aesdec  xmm7, xmm8
+        aesdec  xmm7, xmm9
+        aesdec  xmm7, xmm10
+        aesdec  xmm7, xmm11
+        aesdec  xmm7, xmm12
+        aesdec  xmm7, xmm13
+        aesdec  xmm7, xmm14
+        aesdeclast xmm7, xmm15
+        movups  dqword ptr[dest], xmm7
+        pxor    xmm7, xmm7 // for safety
 end;
 {$endif CPU64}
 {$endif USEAESNI}
 
-procedure TAES.Encrypt(const BI: TAESBlock; var BO: TAESBlock);
-// encrypt one block: Context contains encryption key
-{$ifdef AESPASCAL_OR_CPU64}
+procedure aesencryptpas(const ctxt: TAESContext; bi, bo: PWA4);
 { AES_PASCAL version (c) Wolfgang Ehrhardt under zlib license:
  Permission is granted to anyone to use this software for any purpose,
  including commercial applications, and to alter it and redistribute it
@@ -4404,652 +4567,785 @@ procedure TAES.Encrypt(const BI: TAESBlock; var BO: TAESBlock);
     appreciated but is not required.
  2. Altered source versions must be plainly marked as such, and must not be
     misrepresented as being the original software.
- 3. This notice may not be removed or altered from any source distribution. }
+ 3. This notice may not be removed or altered from any source distribution.
+ -> code has been refactored and tuned especially for FPC x86_64 target }
 var
-  ctx: TAESContext absolute Context;
-  s0,s1,s2,s3: cardinal; // TAESBlock s* as separate variables
-  t0,t1,t2: cardinal;    // TAESBlock t* as separate variables
+  t: PCardinalArray;    // faster on a PIC system
 {$ifdef AES_ROLLED}
+  s0,s1,s2,s3: PtrUInt; // TAESBlock s# as separate variables
+  t0,t1,t2: cardinal;   // TAESBlock t# as separate variables
+  pk: PWA4;
   i: integer;
-  pK: PWA4;
-{$else}
-  t3: cardinal;
-  pK: PAWk;              // pointer to loop rount key
-{$endif}
 begin
-{$ifdef USEAESNI64}
-  if Assigned(ctx.AesNi) then begin
-    ctx.AesNi(ctx,BI,BO);
-    exit;
+  pk := @ctxt.RK;
+  s0 := bi[0] xor pk[0];
+  s1 := bi[1] xor pk[1];
+  s2 := bi[2] xor pk[2];
+  s3 := bi[3] xor pk[3];
+  inc(pk);
+  t := @Te0;
+  for i := 1 to ctxt.rounds-1 do begin
+    t0 := t[s0 and $ff] xor t[$100+s1 shr 8 and $ff] xor t[$200+s2 shr 16 and $ff] xor t[$300+s3 shr 24];
+    t1 := t[s1 and $ff] xor t[$100+s2 shr 8 and $ff] xor t[$200+s3 shr 16 and $ff] xor t[$300+s0 shr 24];
+    t2 := t[s2 and $ff] xor t[$100+s3 shr 8 and $ff] xor t[$200+s0 shr 16 and $ff] xor t[$300+s1 shr 24];
+    s3 := t[s3 and $ff] xor t[$100+s0 shr 8 and $ff] xor t[$200+s1 shr 16 and $ff] xor t[$300+s2 shr 24] xor pk[3];;
+    s0 := t0 xor pk[0];
+    s1 := t1 xor pk[1];
+    s2 := t2 xor pk[2];
+    inc(pk);
   end;
-{$endif USEAESNI64}
-{$ifdef USEPADLOCK}
-  if ctx.ViaCtx<>nil then begin
-    padlock_aes_encrypt(ctx.ViaCtx,@BI,@BO,16);
-    exit;
-  end;
-{$endif}
-  // Setup key pointer
-  pK := PWA4(@ctx.RK);
+  bo[0] := ((SBox[s0        and $ff])        xor
+            (SBox[s1 shr  8 and $ff]) shl  8 xor
+            (SBox[s2 shr 16 and $ff]) shl 16 xor
+            (SBox[s3 shr 24])         shl 24    ) xor pk[0];
+  bo[1] := ((SBox[s1        and $ff])        xor
+            (SBox[s2 shr  8 and $ff]) shl  8 xor
+            (SBox[s3 shr 16 and $ff]) shl 16 xor
+            (SBox[s0 shr 24])         shl 24    ) xor pk[1];
+  bo[2] := ((SBox[s2        and $ff])        xor
+            (SBox[s3 shr  8 and $ff]) shl  8 xor
+            (SBox[s0 shr 16 and $ff]) shl 16 xor
+            (SBox[s1 shr 24])         shl 24    ) xor pk[2];
+  bo[3] := ((SBox[s3        and $ff])        xor
+            (SBox[s0 shr  8 and $ff]) shl  8 xor
+            (SBox[s1 shr 16 and $ff]) shl 16 xor
+            (SBox[s2 shr 24])         shl 24    ) xor pk[3];
+{$else}
+  s0,s1,s2,s3,t0,t1,t2,t3: cardinal; // TAESBlock s#/t# as separate variables
+  pK: PAWk;
+begin
+  pK := @ctxt.RK;
   // Initialize with input block
-  s0 := TWA4(BI)[0] xor pK^[0];
-  s1 := TWA4(BI)[1] xor pK^[1];
-  s2 := TWA4(BI)[2] xor pK^[2];
-  s3 := TWA4(BI)[3] xor pK^[3];
-{$ifdef AES_ROLLED}
-  // Wolfgang Ehrhardt rolled version - faster on modern CPU than unrolled one below
-  Inc(PK);
-  for I := 1 to ctx.Rounds-1 do begin
-    t0 := Te0[s0 and $ff] xor Te1[s1 shr 8 and $ff] xor Te2[s2 shr 16 and $ff] xor Te3[s3 shr 24];
-    t1 := Te0[s1 and $ff] xor Te1[s2 shr 8 and $ff] xor Te2[s3 shr 16 and $ff] xor Te3[s0 shr 24];
-    t2 := Te0[s2 and $ff] xor Te1[s3 shr 8 and $ff] xor Te2[s0 shr 16 and $ff] xor Te3[s1 shr 24];
-    s3 := Te0[s3 and $ff] xor Te1[s0 shr 8 and $ff] xor Te2[s1 shr 16 and $ff] xor Te3[s2 shr 24] xor PK[3];
-    s0 := t0 xor PK[0];
-    s1 := t1 xor PK[1];
-    s2 := t2 xor PK[2];
-    Inc(pK);
-  end;
-  TWA4(BO)[0] := ((SBox[s0        and $ff])        xor
-                  (SBox[s1 shr  8 and $ff]) shl  8 xor
-                  (SBox[s2 shr 16 and $ff]) shl 16 xor
-                  (SBox[s3 shr 24])         shl 24    ) xor pK^[0];
-  TWA4(BO)[1] := ((SBox[s1        and $ff])        xor
-                  (SBox[s2 shr  8 and $ff]) shl  8 xor
-                  (SBox[s3 shr 16 and $ff]) shl 16 xor
-                  (SBox[s0 shr 24])         shl 24    ) xor pK^[1];
-  TWA4(BO)[2] := ((SBox[s2        and $ff])        xor
-                  (SBox[s3 shr  8 and $ff]) shl  8 xor
-                  (SBox[s0 shr 16 and $ff]) shl 16 xor
-                  (SBox[s1 shr 24])         shl 24    ) xor pK^[2];
-  TWA4(BO)[3] := ((SBox[s3        and $ff])        xor
-                  (SBox[s0 shr  8 and $ff]) shl  8 xor
-                  (SBox[s1 shr 16 and $ff]) shl 16 xor
-                  (SBox[s2 shr 24])         shl 24    ) xor pK^[3];
-{$else} // unrolled version (WE6) from Wolfgang Ehrhardt - slower
+  s0 := bi[0] xor pk[0];
+  s1 := bi[1] xor pk[1];
+  s2 := bi[2] xor pk[2];
+  s3 := bi[3] xor pk[3];
+  t := @Te0;
   // Round 1
-  t0 := Te0[s0 and $ff] xor Te1[s1 shr 8 and $ff] xor Te2[s2 shr 16 and $ff] xor Te3[s3 shr 24] xor pK^[4];
-  t1 := Te0[s1 and $ff] xor Te1[s2 shr 8 and $ff] xor Te2[s3 shr 16 and $ff] xor Te3[s0 shr 24] xor pK^[5];
-  t2 := Te0[s2 and $ff] xor Te1[s3 shr 8 and $ff] xor Te2[s0 shr 16 and $ff] xor Te3[s1 shr 24] xor pK^[6];
-  t3 := Te0[s3 and $ff] xor Te1[s0 shr 8 and $ff] xor Te2[s1 shr 16 and $ff] xor Te3[s2 shr 24] xor pK^[7];
+  t0 := t[s0 and $ff] xor t[$100+s1 shr 8 and $ff] xor t[$200+s2 shr 16 and $ff] xor t[$300+s3 shr 24] xor pk[4];
+  t1 := t[s1 and $ff] xor t[$100+s2 shr 8 and $ff] xor t[$200+s3 shr 16 and $ff] xor t[$300+s0 shr 24] xor pk[5];
+  t2 := t[s2 and $ff] xor t[$100+s3 shr 8 and $ff] xor t[$200+s0 shr 16 and $ff] xor t[$300+s1 shr 24] xor pk[6];
+  t3 := t[s3 and $ff] xor t[$100+s0 shr 8 and $ff] xor t[$200+s1 shr 16 and $ff] xor t[$300+s2 shr 24] xor pk[7];
   // Round 2
-  s0 := Te0[t0 and $ff] xor Te1[t1 shr 8 and $ff] xor Te2[t2 shr 16 and $ff] xor Te3[t3 shr 24] xor pK^[8];
-  s1 := Te0[t1 and $ff] xor Te1[t2 shr 8 and $ff] xor Te2[t3 shr 16 and $ff] xor Te3[t0 shr 24] xor pK^[9];
-  s2 := Te0[t2 and $ff] xor Te1[t3 shr 8 and $ff] xor Te2[t0 shr 16 and $ff] xor Te3[t1 shr 24] xor pK^[10];
-  s3 := Te0[t3 and $ff] xor Te1[t0 shr 8 and $ff] xor Te2[t1 shr 16 and $ff] xor Te3[t2 shr 24] xor pK^[11];
+  s0 := t[t0 and $ff] xor t[$100+t1 shr 8 and $ff] xor t[$200+t2 shr 16 and $ff] xor t[$300+t3 shr 24] xor pk[8];
+  s1 := t[t1 and $ff] xor t[$100+t2 shr 8 and $ff] xor t[$200+t3 shr 16 and $ff] xor t[$300+t0 shr 24] xor pk[9];
+  s2 := t[t2 and $ff] xor t[$100+t3 shr 8 and $ff] xor t[$200+t0 shr 16 and $ff] xor t[$300+t1 shr 24] xor pk[10];
+  s3 := t[t3 and $ff] xor t[$100+t0 shr 8 and $ff] xor t[$200+t1 shr 16 and $ff] xor t[$300+t2 shr 24] xor pk[11];
   // Round 3
-  t0 := Te0[s0 and $ff] xor Te1[s1 shr 8 and $ff] xor Te2[s2 shr 16 and $ff] xor Te3[s3 shr 24] xor pK^[12];
-  t1 := Te0[s1 and $ff] xor Te1[s2 shr 8 and $ff] xor Te2[s3 shr 16 and $ff] xor Te3[s0 shr 24] xor pK^[13];
-  t2 := Te0[s2 and $ff] xor Te1[s3 shr 8 and $ff] xor Te2[s0 shr 16 and $ff] xor Te3[s1 shr 24] xor pK^[14];
-  t3 := Te0[s3 and $ff] xor Te1[s0 shr 8 and $ff] xor Te2[s1 shr 16 and $ff] xor Te3[s2 shr 24] xor pK^[15];
+  t0 := t[s0 and $ff] xor t[$100+s1 shr 8 and $ff] xor t[$200+s2 shr 16 and $ff] xor t[$300+s3 shr 24] xor pk[12];
+  t1 := t[s1 and $ff] xor t[$100+s2 shr 8 and $ff] xor t[$200+s3 shr 16 and $ff] xor t[$300+s0 shr 24] xor pk[13];
+  t2 := t[s2 and $ff] xor t[$100+s3 shr 8 and $ff] xor t[$200+s0 shr 16 and $ff] xor t[$300+s1 shr 24] xor pk[14];
+  t3 := t[s3 and $ff] xor t[$100+s0 shr 8 and $ff] xor t[$200+s1 shr 16 and $ff] xor t[$300+s2 shr 24] xor pk[15];
   // Round 4
-  s0 := Te0[t0 and $ff] xor Te1[t1 shr 8 and $ff] xor Te2[t2 shr 16 and $ff] xor Te3[t3 shr 24] xor pK^[16];
-  s1 := Te0[t1 and $ff] xor Te1[t2 shr 8 and $ff] xor Te2[t3 shr 16 and $ff] xor Te3[t0 shr 24] xor pK^[17];
-  s2 := Te0[t2 and $ff] xor Te1[t3 shr 8 and $ff] xor Te2[t0 shr 16 and $ff] xor Te3[t1 shr 24] xor pK^[18];
-  s3 := Te0[t3 and $ff] xor Te1[t0 shr 8 and $ff] xor Te2[t1 shr 16 and $ff] xor Te3[t2 shr 24] xor pK^[19];
+  s0 := t[t0 and $ff] xor t[$100+t1 shr 8 and $ff] xor t[$200+t2 shr 16 and $ff] xor t[$300+t3 shr 24] xor pk[16];
+  s1 := t[t1 and $ff] xor t[$100+t2 shr 8 and $ff] xor t[$200+t3 shr 16 and $ff] xor t[$300+t0 shr 24] xor pk[17];
+  s2 := t[t2 and $ff] xor t[$100+t3 shr 8 and $ff] xor t[$200+t0 shr 16 and $ff] xor t[$300+t1 shr 24] xor pk[18];
+  s3 := t[t3 and $ff] xor t[$100+t0 shr 8 and $ff] xor t[$200+t1 shr 16 and $ff] xor t[$300+t2 shr 24] xor pk[19];
   // Round 5
-  t0 := Te0[s0 and $ff] xor Te1[s1 shr 8 and $ff] xor Te2[s2 shr 16 and $ff] xor Te3[s3 shr 24] xor pK^[20];
-  t1 := Te0[s1 and $ff] xor Te1[s2 shr 8 and $ff] xor Te2[s3 shr 16 and $ff] xor Te3[s0 shr 24] xor pK^[21];
-  t2 := Te0[s2 and $ff] xor Te1[s3 shr 8 and $ff] xor Te2[s0 shr 16 and $ff] xor Te3[s1 shr 24] xor pK^[22];
-  t3 := Te0[s3 and $ff] xor Te1[s0 shr 8 and $ff] xor Te2[s1 shr 16 and $ff] xor Te3[s2 shr 24] xor pK^[23];
+  t0 := t[s0 and $ff] xor t[$100+s1 shr 8 and $ff] xor t[$200+s2 shr 16 and $ff] xor t[$300+s3 shr 24] xor pk[20];
+  t1 := t[s1 and $ff] xor t[$100+s2 shr 8 and $ff] xor t[$200+s3 shr 16 and $ff] xor t[$300+s0 shr 24] xor pk[21];
+  t2 := t[s2 and $ff] xor t[$100+s3 shr 8 and $ff] xor t[$200+s0 shr 16 and $ff] xor t[$300+s1 shr 24] xor pk[22];
+  t3 := t[s3 and $ff] xor t[$100+s0 shr 8 and $ff] xor t[$200+s1 shr 16 and $ff] xor t[$300+s2 shr 24] xor pk[23];
   // Round 6
-  s0 := Te0[t0 and $ff] xor Te1[t1 shr 8 and $ff] xor Te2[t2 shr 16 and $ff] xor Te3[t3 shr 24] xor pK^[24];
-  s1 := Te0[t1 and $ff] xor Te1[t2 shr 8 and $ff] xor Te2[t3 shr 16 and $ff] xor Te3[t0 shr 24] xor pK^[25];
-  s2 := Te0[t2 and $ff] xor Te1[t3 shr 8 and $ff] xor Te2[t0 shr 16 and $ff] xor Te3[t1 shr 24] xor pK^[26];
-  s3 := Te0[t3 and $ff] xor Te1[t0 shr 8 and $ff] xor Te2[t1 shr 16 and $ff] xor Te3[t2 shr 24] xor pK^[27];
+  s0 := t[t0 and $ff] xor t[$100+t1 shr 8 and $ff] xor t[$200+t2 shr 16 and $ff] xor t[$300+t3 shr 24] xor pk[24];
+  s1 := t[t1 and $ff] xor t[$100+t2 shr 8 and $ff] xor t[$200+t3 shr 16 and $ff] xor t[$300+t0 shr 24] xor pk[25];
+  s2 := t[t2 and $ff] xor t[$100+t3 shr 8 and $ff] xor t[$200+t0 shr 16 and $ff] xor t[$300+t1 shr 24] xor pk[26];
+  s3 := t[t3 and $ff] xor t[$100+t0 shr 8 and $ff] xor t[$200+t1 shr 16 and $ff] xor t[$300+t2 shr 24] xor pk[27];
   // Round 7
-  t0 := Te0[s0 and $ff] xor Te1[s1 shr 8 and $ff] xor Te2[s2 shr 16 and $ff] xor Te3[s3 shr 24] xor pK^[28];
-  t1 := Te0[s1 and $ff] xor Te1[s2 shr 8 and $ff] xor Te2[s3 shr 16 and $ff] xor Te3[s0 shr 24] xor pK^[29];
-  t2 := Te0[s2 and $ff] xor Te1[s3 shr 8 and $ff] xor Te2[s0 shr 16 and $ff] xor Te3[s1 shr 24] xor pK^[30];
-  t3 := Te0[s3 and $ff] xor Te1[s0 shr 8 and $ff] xor Te2[s1 shr 16 and $ff] xor Te3[s2 shr 24] xor pK^[31];
+  t0 := t[s0 and $ff] xor t[$100+s1 shr 8 and $ff] xor t[$200+s2 shr 16 and $ff] xor t[$300+s3 shr 24] xor pk[28];
+  t1 := t[s1 and $ff] xor t[$100+s2 shr 8 and $ff] xor t[$200+s3 shr 16 and $ff] xor t[$300+s0 shr 24] xor pk[29];
+  t2 := t[s2 and $ff] xor t[$100+s3 shr 8 and $ff] xor t[$200+s0 shr 16 and $ff] xor t[$300+s1 shr 24] xor pk[30];
+  t3 := t[s3 and $ff] xor t[$100+s0 shr 8 and $ff] xor t[$200+s1 shr 16 and $ff] xor t[$300+s2 shr 24] xor pk[31];
   // Round 8
-  s0 := Te0[t0 and $ff] xor Te1[t1 shr 8 and $ff] xor Te2[t2 shr 16 and $ff] xor Te3[t3 shr 24] xor pK^[32];
-  s1 := Te0[t1 and $ff] xor Te1[t2 shr 8 and $ff] xor Te2[t3 shr 16 and $ff] xor Te3[t0 shr 24] xor pK^[33];
-  s2 := Te0[t2 and $ff] xor Te1[t3 shr 8 and $ff] xor Te2[t0 shr 16 and $ff] xor Te3[t1 shr 24] xor pK^[34];
-  s3 := Te0[t3 and $ff] xor Te1[t0 shr 8 and $ff] xor Te2[t1 shr 16 and $ff] xor Te3[t2 shr 24] xor pK^[35];
+  s0 := t[t0 and $ff] xor t[$100+t1 shr 8 and $ff] xor t[$200+t2 shr 16 and $ff] xor t[$300+t3 shr 24] xor pk[32];
+  s1 := t[t1 and $ff] xor t[$100+t2 shr 8 and $ff] xor t[$200+t3 shr 16 and $ff] xor t[$300+t0 shr 24] xor pk[33];
+  s2 := t[t2 and $ff] xor t[$100+t3 shr 8 and $ff] xor t[$200+t0 shr 16 and $ff] xor t[$300+t1 shr 24] xor pk[34];
+  s3 := t[t3 and $ff] xor t[$100+t0 shr 8 and $ff] xor t[$200+t1 shr 16 and $ff] xor t[$300+t2 shr 24] xor pk[35];
   // Round 9
-  t0 := Te0[s0 and $ff] xor Te1[s1 shr 8 and $ff] xor Te2[s2 shr 16 and $ff] xor Te3[s3 shr 24] xor pK^[36];
-  t1 := Te0[s1 and $ff] xor Te1[s2 shr 8 and $ff] xor Te2[s3 shr 16 and $ff] xor Te3[s0 shr 24] xor pK^[37];
-  t2 := Te0[s2 and $ff] xor Te1[s3 shr 8 and $ff] xor Te2[s0 shr 16 and $ff] xor Te3[s1 shr 24] xor pK^[38];
-  t3 := Te0[s3 and $ff] xor Te1[s0 shr 8 and $ff] xor Te2[s1 shr 16 and $ff] xor Te3[s2 shr 24] xor pK^[39];
-  if ctx.rounds>10 then begin
+  t0 := t[s0 and $ff] xor t[$100+s1 shr 8 and $ff] xor t[$200+s2 shr 16 and $ff] xor t[$300+s3 shr 24] xor pk[36];
+  t1 := t[s1 and $ff] xor t[$100+s2 shr 8 and $ff] xor t[$200+s3 shr 16 and $ff] xor t[$300+s0 shr 24] xor pk[37];
+  t2 := t[s2 and $ff] xor t[$100+s3 shr 8 and $ff] xor t[$200+s0 shr 16 and $ff] xor t[$300+s1 shr 24] xor pk[38];
+  t3 := t[s3 and $ff] xor t[$100+s0 shr 8 and $ff] xor t[$200+s1 shr 16 and $ff] xor t[$300+s2 shr 24] xor pk[39];
+  if ctxt.rounds>10 then begin
     // Round 10
-    s0 := Te0[t0 and $ff] xor Te1[t1 shr 8 and $ff] xor Te2[t2 shr 16 and $ff] xor Te3[t3 shr 24] xor pK^[40];
-    s1 := Te0[t1 and $ff] xor Te1[t2 shr 8 and $ff] xor Te2[t3 shr 16 and $ff] xor Te3[t0 shr 24] xor pK^[41];
-    s2 := Te0[t2 and $ff] xor Te1[t3 shr 8 and $ff] xor Te2[t0 shr 16 and $ff] xor Te3[t1 shr 24] xor pK^[42];
-    s3 := Te0[t3 and $ff] xor Te1[t0 shr 8 and $ff] xor Te2[t1 shr 16 and $ff] xor Te3[t2 shr 24] xor pK^[43];
+    s0 := t[t0 and $ff] xor t[$100+t1 shr 8 and $ff] xor t[$200+t2 shr 16 and $ff] xor t[$300+t3 shr 24] xor pk[40];
+    s1 := t[t1 and $ff] xor t[$100+t2 shr 8 and $ff] xor t[$200+t3 shr 16 and $ff] xor t[$300+t0 shr 24] xor pk[41];
+    s2 := t[t2 and $ff] xor t[$100+t3 shr 8 and $ff] xor t[$200+t0 shr 16 and $ff] xor t[$300+t1 shr 24] xor pk[42];
+    s3 := t[t3 and $ff] xor t[$100+t0 shr 8 and $ff] xor t[$200+t1 shr 16 and $ff] xor t[$300+t2 shr 24] xor pk[43];
     // Round 11
-    t0 := Te0[s0 and $ff] xor Te1[s1 shr 8 and $ff] xor Te2[s2 shr 16 and $ff] xor Te3[s3 shr 24] xor pK^[44];
-    t1 := Te0[s1 and $ff] xor Te1[s2 shr 8 and $ff] xor Te2[s3 shr 16 and $ff] xor Te3[s0 shr 24] xor pK^[45];
-    t2 := Te0[s2 and $ff] xor Te1[s3 shr 8 and $ff] xor Te2[s0 shr 16 and $ff] xor Te3[s1 shr 24] xor pK^[46];
-    t3 := Te0[s3 and $ff] xor Te1[s0 shr 8 and $ff] xor Te2[s1 shr 16 and $ff] xor Te3[s2 shr 24] xor pK^[47];
-    if ctx.rounds>12 then begin
+    t0 := t[s0 and $ff] xor t[$100+s1 shr 8 and $ff] xor t[$200+s2 shr 16 and $ff] xor t[$300+s3 shr 24] xor pk[44];
+    t1 := t[s1 and $ff] xor t[$100+s2 shr 8 and $ff] xor t[$200+s3 shr 16 and $ff] xor t[$300+s0 shr 24] xor pk[45];
+    t2 := t[s2 and $ff] xor t[$100+s3 shr 8 and $ff] xor t[$200+s0 shr 16 and $ff] xor t[$300+s1 shr 24] xor pk[46];
+    t3 := t[s3 and $ff] xor t[$100+s0 shr 8 and $ff] xor t[$200+s1 shr 16 and $ff] xor t[$300+s2 shr 24] xor pk[47];
+    if ctxt.rounds>12 then begin
       // Round 12
-      s0 := Te0[t0 and $ff] xor Te1[t1 shr 8 and $ff] xor Te2[t2 shr 16 and $ff] xor Te3[t3 shr 24] xor pK^[48];
-      s1 := Te0[t1 and $ff] xor Te1[t2 shr 8 and $ff] xor Te2[t3 shr 16 and $ff] xor Te3[t0 shr 24] xor pK^[49];
-      s2 := Te0[t2 and $ff] xor Te1[t3 shr 8 and $ff] xor Te2[t0 shr 16 and $ff] xor Te3[t1 shr 24] xor pK^[50];
-      s3 := Te0[t3 and $ff] xor Te1[t0 shr 8 and $ff] xor Te2[t1 shr 16 and $ff] xor Te3[t2 shr 24] xor pK^[51];
+      s0 := t[t0 and $ff] xor t[$100+t1 shr 8 and $ff] xor t[$200+t2 shr 16 and $ff] xor t[$300+t3 shr 24] xor pk[48];
+      s1 := t[t1 and $ff] xor t[$100+t2 shr 8 and $ff] xor t[$200+t3 shr 16 and $ff] xor t[$300+t0 shr 24] xor pk[49];
+      s2 := t[t2 and $ff] xor t[$100+t3 shr 8 and $ff] xor t[$200+t0 shr 16 and $ff] xor t[$300+t1 shr 24] xor pk[50];
+      s3 := t[t3 and $ff] xor t[$100+t0 shr 8 and $ff] xor t[$200+t1 shr 16 and $ff] xor t[$300+t2 shr 24] xor pk[51];
       // Round 13
-      t0 := Te0[s0 and $ff] xor Te1[s1 shr 8 and $ff] xor Te2[s2 shr 16 and $ff] xor Te3[s3 shr 24] xor pK^[52];
-      t1 := Te0[s1 and $ff] xor Te1[s2 shr 8 and $ff] xor Te2[s3 shr 16 and $ff] xor Te3[s0 shr 24] xor pK^[53];
-      t2 := Te0[s2 and $ff] xor Te1[s3 shr 8 and $ff] xor Te2[s0 shr 16 and $ff] xor Te3[s1 shr 24] xor pK^[54];
-      t3 := Te0[s3 and $ff] xor Te1[s0 shr 8 and $ff] xor Te2[s1 shr 16 and $ff] xor Te3[s2 shr 24] xor pK^[55];
+      t0 := t[s0 and $ff] xor t[$100+s1 shr 8 and $ff] xor t[$200+s2 shr 16 and $ff] xor t[$300+s3 shr 24] xor pk[52];
+      t1 := t[s1 and $ff] xor t[$100+s2 shr 8 and $ff] xor t[$200+s3 shr 16 and $ff] xor t[$300+s0 shr 24] xor pk[53];
+      t2 := t[s2 and $ff] xor t[$100+s3 shr 8 and $ff] xor t[$200+s0 shr 16 and $ff] xor t[$300+s1 shr 24] xor pk[54];
+      t3 := t[s3 and $ff] xor t[$100+s0 shr 8 and $ff] xor t[$200+s1 shr 16 and $ff] xor t[$300+s2 shr 24] xor pk[55];
     end;
   end;
-  inc(PtrUInt(pK), (ctx.rounds shl 4));
-  TWA4(BO)[0] := ((SBox[t0        and $ff])        xor
-                  (SBox[t1 shr  8 and $ff]) shl  8 xor
-                  (SBox[t2 shr 16 and $ff]) shl 16 xor
-                  (SBox[t3 shr 24])         shl 24    ) xor pK^[0];
-  TWA4(BO)[1] := ((SBox[t1        and $ff])        xor
-                  (SBox[t2 shr  8 and $ff]) shl  8 xor
-                  (SBox[t3 shr 16 and $ff]) shl 16 xor
-                  (SBox[t0 shr 24])         shl 24    ) xor pK^[1];
-  TWA4(BO)[2] := ((SBox[t2        and $ff])        xor
-                  (SBox[t3 shr  8 and $ff]) shl  8 xor
-                  (SBox[t0 shr 16 and $ff]) shl 16 xor
-                  (SBox[t1 shr 24])         shl 24    ) xor pK^[2];
-  TWA4(BO)[3] := ((SBox[t3        and $ff])        xor
-                  (SBox[t0 shr  8 and $ff]) shl  8 xor
-                  (SBox[t1 shr 16 and $ff]) shl 16 xor
-                  (SBox[t2 shr 24])         shl 24    ) xor pK^[3];
-{$endif AES_ROLLED}
-end;
-{$else}
-asm // eax=TAES(self)=TAESContext edx=BI ecx=BO
-{$ifdef USEAESNI}
-  // AES-NI hardware accelerated version by A. Bouchez
-  cmp dword ptr [eax].TAESContext.AesNi,0
-  je @noAesNi
-  movdqu xmm7,[edx]
-  call dword ptr [eax].TAESContext.AesNi
-  movdqu [ecx],xmm7
-  ret
-@noAesNi:
-{$endif USEAESNI}
-  // rolled optimized encryption asm version by A. Bouchez
-{$ifdef USEPADLOCK}
-  cmp dword [eax].TAESContext.ViaCtx,0
-  jz @DoAsm
-  mov eax,[eax].TAESContext.ViaCtx
-  push 16
-  push ecx
-  push edx
-  push eax           // padlock_aes_encrypt(ctx.ViaCtx,@BI,@BO,16);
-{$ifdef USEPADLOCKDLL}
-  call dword ptr [padlock_aes_encrypt]
-{$else}
-  call padlock_aes_encrypt
+  inc(PByte(pK), ctxt.rounds shl 4);
+  bo[0] := ((SBox[t0        and $ff])        xor
+            (SBox[t1 shr  8 and $ff]) shl  8 xor
+            (SBox[t2 shr 16 and $ff]) shl 16 xor
+            (SBox[t3 shr 24])         shl 24    ) xor pk[0];
+  bo[1] := ((SBox[t1        and $ff])        xor
+            (SBox[t2 shr  8 and $ff]) shl  8 xor
+            (SBox[t3 shr 16 and $ff]) shl 16 xor
+            (SBox[t0 shr 24])         shl 24    ) xor pk[1];
+  bo[2] := ((SBox[t2        and $ff])        xor
+            (SBox[t3 shr  8 and $ff]) shl  8 xor
+            (SBox[t0 shr 16 and $ff]) shl 16 xor
+            (SBox[t1 shr 24])         shl 24    ) xor pk[2];
+  bo[3] := ((SBox[t3        and $ff])        xor
+            (SBox[t0 shr  8 and $ff]) shl  8 xor
+            (SBox[t1 shr 16 and $ff]) shl 16 xor
+            (SBox[t2 shr 24])         shl 24    ) xor pk[3];
 {$endif}
-  add esp,16 // padlock_aes_encrypt is cdecl -> caller must restore stack
-  ret
-@DoAsm:
-{$endif USEPADLOCK}
-  push ebx
-  push esi
-  push edi
-  push ebp
-  add esp,-24
-  mov [esp+4],ecx
-  mov ecx,eax // ecx=pk
-  movzx eax,byte ptr [eax].TAESContext.Rounds
-  dec eax
-  mov [esp+20],eax
-  mov ebx,[edx]
-  xor ebx,[ecx]
-  mov esi,[edx+4]
-  xor esi,[ecx+4]
-  mov eax,[edx+8]
-  xor eax,[ecx+8]
-  mov edx,[edx+12]
-  xor edx,[ecx+12]
-  lea ecx,[ecx+16]
-@1: // pK=ecx s0=ebx s1=esi s2=eax s3=edx
-  movzx edi,bl
-  mov edi,[4*edi+te0]
-  movzx ebp,si
-  shr ebp,$08
-  xor edi,[4*ebp+te1]
-  mov ebp,eax
-  shr ebp,$10
-  and ebp,$ff
-  xor edi,[4*ebp+te2]
-  mov ebp,edx
-  shr ebp,$18
-  xor edi,[4*ebp+te3]
-  mov [esp+8],edi
-  mov edi,esi
-  and edi,255
-  mov edi,[4*edi+te0]
-  movzx ebp,ax
-  shr ebp,$08
-  xor edi,[4*ebp+te1]
-  mov ebp,edx
-  shr ebp,$10
-  and ebp,255
-  xor edi,[4*ebp+te2]
-  mov ebp,ebx
-  shr ebp,$18
-  xor edi,[4*ebp+te3]
-  mov [esp+12],edi
-  movzx edi,al
-  mov edi,[4*edi+te0]
-  movzx ebp,dh
-  xor edi,[4*ebp+te1]
-  mov ebp,ebx
-  shr ebp,$10
-  and ebp,255
-  xor edi,[4*ebp+te2]
-  mov ebp,esi
-  shr ebp,$18
-  xor edi,[4*ebp+te3]
-  mov [esp+16],edi
-  and edx,255
-  mov edx,[4*edx+te0]
-  shr ebx,$08
-  and ebx,255
-  xor edx,[4*ebx+te1]
-  shr esi,$10
-  and esi,255
-  xor edx,[4*esi+te2]
-  shr eax,$18
-  xor edx,[4*eax+te3]
-  mov ebx,[ecx]
-  xor ebx,[esp+8]
-  mov esi,[ecx+4]
-  xor esi,[esp+12]
-  mov eax,[ecx+8]
-  xor eax,[esp+16]
-  xor edx,[ecx+12]
-  lea ecx,[ecx+16]
-  dec byte ptr [esp+20]
-  jne @1
-  mov ebp,ecx // ebp=pk
-  movzx ecx,bl
-  mov edi,esi
-  movzx ecx,byte ptr [ecx+SBox]
-  shr edi,$08
-  and edi,255
-  movzx edi,byte ptr [edi+SBox]
-  shl edi,$08
-  xor ecx,edi
-  mov edi,eax
-  shr edi,$10
-  and edi,255
-  movzx edi,byte ptr [edi+SBox]
-  shl edi,$10
-  xor ecx,edi
-  mov edi,edx
-  shr edi,$18
-  movzx edi,byte ptr [edi+SBox]
-  shl edi,$18
-  xor ecx,edi
-  xor ecx,[ebp]
-  mov edi,[esp+4]
-  mov [edi],ecx
-  mov ecx,esi
-  and ecx,255
-  movzx ecx,byte ptr [ecx+SBox]
-  movzx edi,ah
-  movzx edi,byte ptr [edi+SBox]
-  shl edi,$08
-  xor ecx,edi
-  mov edi,edx
-  shr edi,$10
-  and edi,255
-  movzx edi,byte ptr [edi+SBox]
-  shl edi,$10
-  xor ecx,edi
-  mov edi,ebx
-  shr edi,$18
-  movzx edi,byte ptr [edi+SBox]
-  shl edi,$18
-  xor ecx,edi
-  xor ecx,[ebp+4]
-  mov edi,[esp+4]
-  mov [edi+4],ecx
-  mov ecx,eax
-  and ecx,255
-  movzx ecx,byte ptr [ecx+SBox]
-  movzx edi,dh
-  movzx edi,byte ptr [edi+SBox]
-  shl edi,$08
-  xor ecx,edi
-  mov edi,ebx
-  shr edi,$10
-  and edi,255
-  movzx edi,byte ptr [edi+SBox]
-  shl edi,$10
-  xor ecx,edi
-  mov edi,esi
-  shr edi,$18
-  movzx edi,byte ptr [edi+SBox]
-  shl edi,$18
-  xor ecx,edi
-  xor ecx,[ebp+8]
-  mov edi,[esp+4]
-  mov [edi+8],ecx
-  and edx,255
-  movzx edx,byte ptr [edx+SBox]
-  shr ebx,$08
-  and ebx,255
-  xor ecx,ecx
-  mov cl,byte ptr [ebx+SBox]
-  shl ecx,$08
-  xor edx,ecx
-  shr esi,$10
-  and esi,255
-  xor ecx,ecx
-  mov cl,byte ptr [esi+SBox]
-  shl ecx,$10
-  xor edx,ecx
-  shr eax,$18
-  movzx eax,byte ptr [eax+SBox]
-  shl eax,$18
-  xor edx,eax
-  xor edx,[ebp+12]
-  mov eax,[esp+4]
-  mov [eax+12],edx
-  add esp,24
-  pop ebp
-  pop edi
-  pop esi
-  pop ebx
 end;
-{$endif AESPASCAL_OR_CPU64}
+
+{$ifdef USEPADLOCK}
+procedure aesencryptpadlock(const ctxt: TAESContext; bi, bo: PWA4);
+begin
+  padlock_aes_encrypt(ctxt.ViaCtx,bi,bo,16);
+end;
+{$endif}
+
+{$ifdef CPUX64}
+procedure aesencryptx64(const ctxt: TAESContext; bi, bo: PWA4);
+{$ifdef FPC}nostackframe; assembler; asm{$else}
+asm // input: rcx/rdi=TAESContext, rdx/rsi=source, r8/rdx=dest
+        .noframe
+{$endif} // rolled optimized encryption asm version by A. Bouchez
+        push    r15
+        push    r14
+        push    r13
+        push    r12
+        push    rbx
+        push    rbp
+        {$ifdef win64}
+        push    rdi
+        push    rsi
+        mov     r15, r8
+        mov     r12, rcx
+        {$else}
+        mov     r15, rdx
+        mov     rdx, rsi
+        mov     r12, rdi
+        {$endif win64}
+        movzx   r13, byte ptr [r12].TAESContext.Rounds
+        mov     eax, dword ptr [rdx]
+        mov     ebx, dword ptr [rdx+4H]
+        mov     ecx, dword ptr [rdx+8H]
+        mov     edx, dword ptr [rdx+0CH]
+        xor     eax, dword ptr [r12]
+        xor     ebx, dword ptr [r12+4H]
+        xor     ecx, dword ptr [r12+8H]
+        xor     edx, dword ptr [r12+0CH]
+        sub     r13, 1
+        add     r12, 16
+        lea     r14, [rip+Te0]
+        {$ifdef FPC} align 16 {$else} .align 16 {$endif}
+@round: mov     esi, eax
+        mov     edi, edx
+        movzx   r8d, al
+        movzx   r9d, cl
+        movzx   r10d, bl
+        mov     r8d, dword ptr [r14+r8*4]
+        mov     r9d, dword ptr [r14+r9*4]
+        mov     r10d, dword ptr [r14+r10*4]
+        shr     esi, 16
+        shr     edi, 16
+        movzx   ebp, bh
+        xor     r8d, dword ptr [r14+rbp*4+400H]
+        movzx   ebp, dh
+        xor     r9d, dword ptr [r14+rbp*4+400H]
+        movzx   ebp, ch
+        xor     r10d, dword ptr [r14+rbp*4+400H]
+        shr     ebx, 16
+        shr     ecx, 16
+        movzx   ebp, dl
+        mov     edx, dword ptr [r14+rbp*4]
+        movzx   ebp, cl
+        xor     r8d, dword ptr [r14+rbp*4+800H]
+        movzx   ebp, sil
+        xor     r9d, dword ptr [r14+rbp*4+800H]
+        movzx   r11, dil
+        movzx   eax, ah
+        shr     edi, 8
+        movzx   ebp, bh
+        shr     esi, 8
+        xor     r10d, dword ptr [r14+r11*4+800H]
+        xor     edx, dword ptr [r14+rax*4+400H]
+        xor     r8d, dword ptr [r14+rdi*4+0C00H]
+        xor     r9d, dword ptr [r14+rbp*4+0C00H]
+        xor     r10d, dword ptr [r14+rsi*4+0C00H]
+        movzx   ebp, bl
+        xor     edx, dword ptr [r14+rbp*4+800H]
+        mov     rbx, r10
+        mov     rax, r8
+        movzx   ebp, ch
+        xor     edx, dword ptr [r14+rbp*4+0C00H]
+        mov     rcx, r9
+        xor     eax, dword ptr [r12]
+        xor     ebx, dword ptr [r12+4H]
+        xor     ecx, dword ptr [r12+8H]
+        xor     edx, dword ptr [r12+0CH]
+        add     r12, 16
+        sub     r13, 1
+        jnz     @round
+        lea     r9, [rip+SBox]
+        movzx   r8, al
+        movzx   r14, byte ptr [r9+r8]
+        movzx   edi, bh
+        movzx   r8, byte ptr [r9+rdi]
+        shl     r8d, 8
+        xor     r14d, r8d
+        mov     r11, rcx
+        shr     r11, 16
+        and     r11, 0FFH
+        movzx   r8, byte ptr [r9+r11]
+        shl     r8d, 16
+        xor     r14d, r8d
+        mov     r11, rdx
+        shr     r11, 24
+        movzx   r8, byte ptr [r9+r11]
+        shl     r8d, 24
+        xor     r14d, r8d
+        xor     r14d, dword ptr [r12]
+        mov     dword ptr [r15], r14d
+        movzx   r8, bl
+        movzx   r14, byte ptr [r9+r8]
+        movzx   edi, ch
+        movzx   r8, byte ptr [r9+rdi]
+        shl     r8d, 8
+        xor     r14d, r8d
+        mov     r11, rdx
+        shr     r11, 16
+        and     r11, 0FFH
+        movzx   r8, byte ptr [r9+r11]
+        shl     r8d, 16
+        xor     r14d, r8d
+        mov     r11, rax
+        shr     r11, 24
+        movzx   r8, byte ptr [r9+r11]
+        shl     r8d, 24
+        xor     r14d, r8d
+        xor     r14d, dword ptr [r12+4H]
+        mov     dword ptr [r15+4H], r14d
+        movzx   r8, cl
+        movzx   r14, byte ptr [r9+r8]
+        movzx   edi, dh
+        movzx   r8, byte ptr [r9+rdi]
+        shl     r8d, 8
+        xor     r14d, r8d
+        mov     r11, rax
+        shr     r11, 16
+        and     r11, 0FFH
+        movzx   r8, byte ptr [r9+r11]
+        shl     r8d, 16
+        xor     r14d, r8d
+        mov     r11, rbx
+        shr     r11, 24
+        movzx   r8, byte ptr [r9+r11]
+        shl     r8d, 24
+        xor     r14d, r8d
+        xor     r14d, dword ptr [r12+8H]
+        mov     dword ptr [r15+8H], r14d
+        and     rdx, 0FFH
+        movzx   r14, byte ptr [r9+rdx]
+        movzx   eax, ah
+        movzx   r8, byte ptr [r9+rax]
+        shl     r8d, 8
+        xor     r14d, r8d
+        shr     rbx, 16
+        and     rbx, 0FFH
+        movzx   r8, byte ptr [r9+rbx]
+        shl     r8d, 16
+        xor     r14d, r8d
+        shr     rcx, 24
+        movzx   r8, byte ptr [r9+rcx]
+        shl     r8d, 24
+        xor     r14d, r8d
+        xor     r14d, dword ptr [r12+0CH]
+        mov     dword ptr [r15+0CH], r14d
+        {$ifdef win64}
+        pop     rsi
+        pop     rdi
+        {$endif win64}
+        pop     rbp
+        pop     rbx
+        pop     r12
+        pop     r13
+        pop     r14
+        pop     r15
+end;
+{$endif CPUX64}
+
+{$ifdef CPUX86_NOTPIC}
+procedure aesencrypt386(const ctxt: TAESContext; bi, bo: PWA4);
+  {$ifdef FPC} nostackframe; assembler; {$endif}
+asm // rolled optimized encryption asm version by A. Bouchez
+        push    ebx
+        push    esi
+        push    edi
+        push    ebp
+        add     esp,  - 24
+        mov     [esp + 4], ecx
+        mov     ecx, eax // ecx=pk
+        movzx   eax, byte ptr[eax].taescontext.rounds
+        dec     eax
+        mov     [esp + 20], eax
+        mov     ebx, [edx]
+        xor     ebx, [ecx]
+        mov     esi, [edx + 4]
+        xor     esi, [ecx + 4]
+        mov     eax, [edx + 8]
+        xor     eax, [ecx + 8]
+        mov     edx, [edx + 12]
+        xor     edx, [ecx + 12]
+        lea     ecx, [ecx + 16]
+@1:     // pk=ecx s0=ebx s1=esi s2=eax s3=edx
+        movzx   edi, bl
+        mov     edi, dword ptr[4 * edi + te0]
+        movzx   ebp, si
+        shr     ebp, $08
+        xor     edi, dword ptr[4 * ebp + te1]
+        mov     ebp, eax
+        shr     ebp, $10
+        and     ebp, $ff
+        xor     edi, dword ptr[4 * ebp + te2]
+        mov     ebp, edx
+        shr     ebp, $18
+        xor     edi, dword ptr[4 * ebp + te3]
+        mov     [esp + 8], edi
+        mov     edi, esi
+        and     edi, 255
+        mov     edi, dword ptr[4 * edi + te0]
+        movzx   ebp, ax
+        shr     ebp, $08
+        xor     edi, dword ptr[4 * ebp + te1]
+        mov     ebp, edx
+        shr     ebp, $10
+        and     ebp, 255
+        xor     edi, dword ptr[4 * ebp + te2]
+        mov     ebp, ebx
+        shr     ebp, $18
+        xor     edi, dword ptr[4 * ebp + te3]
+        mov     [esp + 12], edi
+        movzx   edi, al
+        mov     edi, dword ptr[4 * edi + te0]
+        movzx   ebp, dh
+        xor     edi, dword ptr[4 * ebp + te1]
+        mov     ebp, ebx
+        shr     ebp, $10
+        and     ebp, 255
+        xor     edi, dword ptr[4 * ebp + te2]
+        mov     ebp, esi
+        shr     ebp, $18
+        xor     edi, dword ptr[4 * ebp + te3]
+        mov     [esp + 16], edi
+        and     edx, 255
+        mov     edx, dword ptr[4 * edx + te0]
+        shr     ebx, $08
+        and     ebx, 255
+        xor     edx, dword ptr[4 * ebx + te1]
+        shr     esi, $10
+        and     esi, 255
+        xor     edx, dword ptr[4 * esi + te2]
+        shr     eax, $18
+        xor     edx, dword ptr[4 * eax + te3]
+        mov     ebx, [ecx]
+        xor     ebx, [esp + 8]
+        mov     esi, [ecx + 4]
+        xor     esi, [esp + 12]
+        mov     eax, [ecx + 8]
+        xor     eax, [esp + 16]
+        xor     edx, [ecx + 12]
+        lea     ecx, [ecx + 16]
+        dec     byte ptr[esp + 20]
+        jne     @1
+        mov     ebp, ecx // ebp=pk
+        movzx   ecx, bl
+        mov     edi, esi
+        movzx   ecx, byte ptr[ecx + SBox]
+        shr     edi, $08
+        and     edi, 255
+        movzx   edi, byte ptr[edi + SBox]
+        shl     edi, $08
+        xor     ecx, edi
+        mov     edi, eax
+        shr     edi, $10
+        and     edi, 255
+        movzx   edi, byte ptr[edi + SBox]
+        shl     edi, $10
+        xor     ecx, edi
+        mov     edi, edx
+        shr     edi, $18
+        movzx   edi, byte ptr[edi + SBox]
+        shl     edi, $18
+        xor     ecx, edi
+        xor     ecx, [ebp]
+        mov     edi, [esp + 4]
+        mov     [edi], ecx
+        mov     ecx, esi
+        and     ecx, 255
+        movzx   ecx, byte ptr[ecx + SBox]
+        movzx   edi, ah
+        movzx   edi, byte ptr[edi + SBox]
+        shl     edi, $08
+        xor     ecx, edi
+        mov     edi, edx
+        shr     edi, $10
+        and     edi, 255
+        movzx   edi, byte ptr[edi + SBox]
+        shl     edi, $10
+        xor     ecx, edi
+        mov     edi, ebx
+        shr     edi, $18
+        movzx   edi, byte ptr[edi + SBox]
+        shl     edi, $18
+        xor     ecx, edi
+        xor     ecx, [ebp + 4]
+        mov     edi, [esp + 4]
+        mov     [edi + 4], ecx
+        mov     ecx, eax
+        and     ecx, 255
+        movzx   ecx, byte ptr[ecx + SBox]
+        movzx   edi, dh
+        movzx   edi, byte ptr[edi + SBox]
+        shl     edi, $08
+        xor     ecx, edi
+        mov     edi, ebx
+        shr     edi, $10
+        and     edi, 255
+        movzx   edi, byte ptr[edi + SBox]
+        shl     edi, $10
+        xor     ecx, edi
+        mov     edi, esi
+        shr     edi, $18
+        movzx   edi, byte ptr[edi + SBox]
+        shl     edi, $18
+        xor     ecx, edi
+        xor     ecx, [ebp + 8]
+        mov     edi, [esp + 4]
+        mov     [edi + 8], ecx
+        and     edx, 255
+        movzx   edx, byte ptr[edx + SBox]
+        shr     ebx, $08
+        and     ebx, 255
+        xor     ecx, ecx
+        mov     cl, byte ptr[ebx + SBox]
+        shl     ecx, $08
+        xor     edx, ecx
+        shr     esi, $10
+        and     esi, 255
+        xor     ecx, ecx
+        mov     cl, byte ptr[esi + SBox]
+        shl     ecx, $10
+        xor     edx, ecx
+        shr     eax, $18
+        movzx   eax, byte ptr[eax + SBox]
+        shl     eax, $18
+        xor     edx, eax
+        xor     edx, [ebp + 12]
+        mov     eax, [esp + 4]
+        mov     [eax + 12], edx
+        add     esp, 24
+        pop     ebp
+        pop     edi
+        pop     esi
+        pop     ebx
+end;
+{$endif CPUX86_NOTPIC}
+
+procedure TAES.Encrypt(const BI: TAESBlock; var BO: TAESBlock);
+begin
+  TAESContext(Context).DoBlock(Context,BI,BO);
+end;
 
 {$ifdef USEAESNI} // should be put outside the main method for FPC :(
 procedure ShiftAesNi(KeySize: cardinal; pk: pointer);
-{$ifdef CPU32}
+{$ifdef CPU32} {$ifdef FPC} nostackframe; assembler; {$endif}
 asm // eax=KeySize edx=pk
-  movdqu xmm1,[edx]
-  movdqu xmm5,dqword ptr [@shuffle_mask]
-  cmp al,128
-  je @128
-  cmp al,192
-  je @end // 192 bits is very complicated -> skip by now (we mostly use 128+256)
-@256:
-  movdqu xmm3,[edx+16]
-  add edx,32
-  db $66,$0F,$3A,$DF,$D3,$01 // aeskeygenassist xmm2,xmm3,1
-  call @key_expansion256
-  db $66,$0F,$3A,$DF,$D3,$02 // aeskeygenassist xmm2,xmm3,2
-  call @key_expansion256
-  db $66,$0F,$3A,$DF,$D3,$04 // aeskeygenassist xmm2,xmm3,4
-  call @key_expansion256
-  db $66,$0F,$3A,$DF,$D3,$08 // aeskeygenassist xmm2,xmm3,8
-  call @key_expansion256
-  db $66,$0F,$3A,$DF,$D3,$10 // aeskeygenassist xmm2,xmm3,$10
-  call @key_expansion256
-  db $66,$0F,$3A,$DF,$D3,$20 // aeskeygenassist xmm2,xmm3,$20
-  call @key_expansion256
-  db $66,$0F,$3A,$DF,$D3,$40 // aeskeygenassist xmm2,xmm3,$40
-  pshufd xmm2,xmm2,$FF
-  movdqu xmm4,xmm1
-  db $66,$0F,$38,$00,$E5 // pshufb xmm4,xmm5
-  pxor xmm1,xmm4
-  db $66,$0F,$38,$00,$E5 // pshufb xmm4,xmm5
-  pxor xmm1,xmm4
-  db $66,$0F,$38,$00,$E5 // pshufb xmm4,xmm5
-  pxor xmm1,xmm4
-  pxor xmm1,xmm2
-  movdqu [edx],xmm1
-  jmp @end
-@shuffle_mask:
-  dd $ffffffff
-  dd $03020100
-  dd $07060504
-  dd $0b0a0908
-@key_expansion256:
-  pshufd xmm2,xmm2,$ff
-  movdqu xmm4,xmm1
-  db $66,$0F,$38,$00,$E5 // pshufb xmm4,xmm5
-  pxor xmm1,xmm4
-  db $66,$0F,$38,$00,$E5 // pshufb xmm4,xmm5
-  pxor xmm1,xmm4
-  db $66,$0F,$38,$00,$E5 // pshufb xmm4,xmm5
-  pxor xmm1,xmm4
-  pxor xmm1,xmm2
-  movdqu [edx],xmm1
-  add edx,$10
-  db $66,$0F,$3A,$DF,$E1,$00 // aeskeygenassist xmm4,xmm1,0
-  pshufd xmm2,xmm4,$AA
-  movdqu xmm4,xmm3
-  db $66,$0F,$38,$00,$E5 // pshufb xmm4,xmm5
-  pxor xmm3,xmm4
-  db $66,$0F,$38,$00,$E5 // pshufb xmm4,xmm5
-  pxor xmm3,xmm4
-  db $66,$0F,$38,$00,$E5 // pshufb xmm4,xmm5
-  pxor xmm3,xmm4
-  pxor xmm3,xmm2
-  movdqu [edx],xmm3
-  add edx,$10
-  ret
-@key_expansion128:
-  pshufd xmm2,xmm2,$FF
-  movdqu xmm3,xmm1
-  db $66,$0F,$38,$00,$DD // pshufb xmm3,xmm5
-  pxor xmm1,xmm3
-  db $66,$0F,$38,$00,$DD // pshufb xmm3,xmm5
-  pxor xmm1,xmm3
-  db $66,$0F,$38,$00,$DD // pshufb xmm3,xmm5
-  pxor xmm1,xmm3
-  pxor xmm1,xmm2
-  movdqu [edx],xmm1
-  add edx,$10
-  ret
-@128:
-  add edx,16
-  db $66,$0F,$3A,$DF,$D1,$01 // aeskeygenassist xmm2,xmm1,1
-  call @key_expansion128
-  db $66,$0F,$3A,$DF,$D1,$02 // aeskeygenassist xmm2,xmm1,2
-  call @key_expansion128
-  db $66,$0F,$3A,$DF,$D1,$04 // aeskeygenassist xmm2,xmm1,4
-  call @key_expansion128
-  db $66,$0F,$3A,$DF,$D1,$08 // aeskeygenassist xmm2,xmm1,8
-  call @key_expansion128
-  db $66,$0F,$3A,$DF,$D1,$10 // aeskeygenassist xmm2,xmm1,$10
-  call @key_expansion128
-  db $66,$0F,$3A,$DF,$D1,$20 // aeskeygenassist xmm2,xmm1,$20
-  call @key_expansion128
-  db $66,$0F,$3A,$DF,$D1,$40 // aeskeygenassist xmm2,xmm1,$40
-  call @key_expansion128
-  db $66,$0F,$3A,$DF,$D1,$80 // aeskeygenassist xmm2,xmm1,$80
-  call @key_expansion128
-  db $66,$0F,$3A,$DF,$D1,$1b // aeskeygenassist xmm2,xmm1,$1b
-  call @key_expansion128
-  db $66,$0F,$3A,$DF,$D1,$36 // aeskeygenassist xmm2,xmm1,$36
-  call @key_expansion128
-@end: db $f3 // rep ret
+        movups  xmm1, [edx]
+        movups  xmm5, dqword ptr[@mask]
+        cmp     al, 128
+        je      @128
+        cmp     al, 192
+        je      @e // 192 bits is very complicated -> skip by now (use 128+256)
+@256:   movups  xmm3, [edx + 16]
+        add     edx, 32
+        db      $66, $0F, $3A, $DF, $D3, $01 // aeskeygenassist xmm2,xmm3,1
+        call    @exp256
+        db      $66, $0F, $3A, $DF, $D3, $02 // aeskeygenassist xmm2,xmm3,2
+        call    @exp256
+        db      $66, $0F, $3A, $DF, $D3, $04 // aeskeygenassist xmm2,xmm3,4
+        call    @exp256
+        db      $66, $0F, $3A, $DF, $D3, $08 // aeskeygenassist xmm2,xmm3,8
+        call    @exp256
+        db      $66, $0F, $3A, $DF, $D3, $10 // aeskeygenassist xmm2,xmm3,$10
+        call    @exp256
+        db      $66, $0F, $3A, $DF, $D3, $20 // aeskeygenassist xmm2,xmm3,$20
+        call    @exp256
+        db      $66, $0F, $3A, $DF, $D3, $40 // aeskeygenassist xmm2,xmm3,$40
+        pshufd  xmm2, xmm2, $FF
+        movups  xmm4, xmm1
+        db      $66, $0F, $38, $00, $E5 // pshufb xmm4,xmm5
+        pxor    xmm1, xmm4
+        db      $66, $0F, $38, $00, $E5 // pshufb xmm4,xmm5
+        pxor    xmm1, xmm4
+        db      $66, $0F, $38, $00, $E5 // pshufb xmm4,xmm5
+        pxor    xmm1, xmm4
+        pxor    xmm1, xmm2
+        movups  [edx], xmm1
+        jmp     @e
+@mask:  dd      $ffffffff
+        dd      $03020100
+        dd      $07060504
+        dd      $0b0a0908
+@exp256:pshufd  xmm2, xmm2, $ff
+        movups  xmm4, xmm1
+        db      $66, $0F, $38, $00, $E5 // pshufb xmm4,xmm5
+        pxor    xmm1, xmm4
+        db      $66, $0F, $38, $00, $E5 // pshufb xmm4,xmm5
+        pxor    xmm1, xmm4
+        db      $66, $0F, $38, $00, $E5 // pshufb xmm4,xmm5
+        pxor    xmm1, xmm4
+        pxor    xmm1, xmm2
+        movups  [edx], xmm1
+        add     edx, $10
+        db      $66, $0F, $3A, $DF, $E1, $00 // aeskeygenassist xmm4,xmm1,0
+        pshufd  xmm2, xmm4, $AA
+        movups  xmm4, xmm3
+        db      $66, $0F, $38, $00, $E5 // pshufb xmm4,xmm5
+        pxor    xmm3, xmm4
+        db      $66, $0F, $38, $00, $E5 // pshufb xmm4,xmm5
+        pxor    xmm3, xmm4
+        db      $66, $0F, $38, $00, $E5 // pshufb xmm4,xmm5
+        pxor    xmm3, xmm4
+        pxor    xmm3, xmm2
+        movups  [edx], xmm3
+        add     edx, $10
+        ret
+@exp128:pshufd  xmm2, xmm2, $FF
+        movups  xmm3, xmm1
+        db      $66, $0F, $38, $00, $DD // pshufb xmm3,xmm5
+        pxor    xmm1, xmm3
+        db      $66, $0F, $38, $00, $DD // pshufb xmm3,xmm5
+        pxor    xmm1, xmm3
+        db      $66, $0F, $38, $00, $DD // pshufb xmm3,xmm5
+        pxor    xmm1, xmm3
+        pxor    xmm1, xmm2
+        movups  [edx], xmm1
+        add     edx, $10
+        ret
+@128:   add     edx, 16
+        db      $66, $0F, $3A, $DF, $D1, $01 // aeskeygenassist xmm2,xmm1,1
+        call    @exp128
+        db      $66, $0F, $3A, $DF, $D1, $02 // aeskeygenassist xmm2,xmm1,2
+        call    @exp128
+        db      $66, $0F, $3A, $DF, $D1, $04 // aeskeygenassist xmm2,xmm1,4
+        call    @exp128
+        db      $66, $0F, $3A, $DF, $D1, $08 // aeskeygenassist xmm2,xmm1,8
+        call    @exp128
+        db      $66, $0F, $3A, $DF, $D1, $10 // aeskeygenassist xmm2,xmm1,$10
+        call    @exp128
+        db      $66, $0F, $3A, $DF, $D1, $20 // aeskeygenassist xmm2,xmm1,$20
+        call    @exp128
+        db      $66, $0F, $3A, $DF, $D1, $40 // aeskeygenassist xmm2,xmm1,$40
+        call    @exp128
+        db      $66, $0F, $3A, $DF, $D1, $80 // aeskeygenassist xmm2,xmm1,$80
+        call    @exp128
+        db      $66, $0F, $3A, $DF, $D1, $1b // aeskeygenassist xmm2,xmm1,$1b
+        call    @exp128
+        db      $66, $0F, $3A, $DF, $D1, $36 // aeskeygenassist xmm2,xmm1,$36
+        call    @exp128
+@e:     db      $f3 // rep ret
 end;
 {$endif CPU32}
 {$ifdef CPU64}
-{$ifdef FPC}nostackframe; assembler;
-asm
-{$else}
-asm
-  .noframe
-{$endif}
-  {$ifndef win64}
-  mov rdx,rsi
-  mov rcx,rdi
-  {$endif win64}
-  mov rax,rcx
-  movdqu xmm1,[rdx]
-  movdqu xmm5,dqword ptr [rip+@shuffle_mask]
-  cmp al,128
-  je @128
-  cmp al,192
-  je @end // 192 bits is very complicated -> skip by now (we mostly use 128+256)
-@256:
-  movdqu xmm3,[rdx+16]
-  add rdx,32
-  aeskeygenassist xmm2,xmm3,1
-  call @key_expansion256
-  aeskeygenassist xmm2,xmm3,2
-  call @key_expansion256
-  aeskeygenassist xmm2,xmm3,4
-  call @key_expansion256
-  aeskeygenassist xmm2,xmm3,8
-  call @key_expansion256
-  aeskeygenassist xmm2,xmm3,$10
-  call @key_expansion256
-  aeskeygenassist xmm2,xmm3,$20
-  call @key_expansion256
-  aeskeygenassist xmm2,xmm3,$40
-  pshufd xmm2,xmm2,$FF
-  movdqu xmm4,xmm1
-  pshufb xmm4,xmm5
-  pxor xmm1,xmm4
-  pshufb xmm4,xmm5
-  pxor xmm1,xmm4
-  pshufb xmm4,xmm5
-  pxor xmm1,xmm4
-  pxor xmm1,xmm2
-  movdqu [rdx],xmm1
-  jmp @end
-@shuffle_mask:
-  dd $ffffffff
-  dd $03020100
-  dd $07060504
-  dd $0b0a0908
-@key_expansion256:
-  pshufd xmm2,xmm2,$ff
-  movdqu xmm4,xmm1
-  pshufb xmm4,xmm5
-  pxor xmm1,xmm4
-  pshufb xmm4,xmm5
-  pxor xmm1,xmm4
-  pshufb xmm4,xmm5
-  pxor xmm1,xmm4
-  pxor xmm1,xmm2
-  movdqu [rdx],xmm1
-  add rdx,$10
-  aeskeygenassist xmm4,xmm1,0
-  pshufd xmm2,xmm4,$AA
-  movdqu xmm4,xmm3
-  pshufb xmm4,xmm5
-  pxor xmm3,xmm4
-  pshufb xmm4,xmm5
-  pxor xmm3,xmm4
-  pshufb xmm4,xmm5
-  pxor xmm3,xmm4
-  pxor xmm3,xmm2
-  movdqu [rdx],xmm3
-  add rdx,$10
-  ret
-@key_expansion128:
-  pshufd xmm2,xmm2,$FF
-  movdqu xmm3,xmm1
-  pshufb xmm3,xmm5
-  pxor xmm1,xmm3
-  pshufb xmm3,xmm5
-  pxor xmm1,xmm3
-  pshufb xmm3,xmm5
-  pxor xmm1,xmm3
-  pxor xmm1,xmm2
-  movdqu [rdx],xmm1
-  add rdx,$10
-  ret
-@128:
-  add rdx,16
-  aeskeygenassist xmm2,xmm1,1
-  call @key_expansion128
-  aeskeygenassist xmm2,xmm1,2
-  call @key_expansion128
-  aeskeygenassist xmm2,xmm1,4
-  call @key_expansion128
-  aeskeygenassist xmm2,xmm1,8
-  call @key_expansion128
-  aeskeygenassist xmm2,xmm1,$10
-  call @key_expansion128
-  aeskeygenassist xmm2,xmm1,$20
-  call @key_expansion128
-  aeskeygenassist xmm2,xmm1,$40
-  call @key_expansion128
-  aeskeygenassist xmm2,xmm1,$80
-  call @key_expansion128
-  aeskeygenassist xmm2,xmm1,$1b
-  call @key_expansion128
-  aeskeygenassist xmm2,xmm1,$36
-  call @key_expansion128
-@end:
+{$ifdef FPC} nostackframe; assembler; asm {$else} asm .noframe {$endif}
+        mov     eax, keysize
+        movups  xmm1, dqword ptr[pk]
+        movaps  xmm5, dqword ptr[rip + @mask]
+        cmp     al, 128
+        je      @128
+        cmp     al, 192
+        je      @e // 192 bits is very complicated -> skip by now (128+256)
+@256:   movups  xmm3, dqword ptr[pk + 16]
+        add     pk, 32
+        aeskeygenassist xmm2, xmm3, 1
+        call    @exp256
+        aeskeygenassist xmm2, xmm3, 2
+        call    @exp256
+        aeskeygenassist xmm2, xmm3, 4
+        call    @exp256
+        aeskeygenassist xmm2, xmm3, 8
+        call    @exp256
+        aeskeygenassist xmm2, xmm3, $10
+        call    @exp256
+        aeskeygenassist xmm2, xmm3, $20
+        call    @exp256
+        aeskeygenassist xmm2, xmm3, $40
+        pshufd  xmm2, xmm2, $FF
+        movups  xmm4, xmm1
+        pshufb  xmm4, xmm5
+        pxor    xmm1, xmm4
+        pshufb  xmm4, xmm5
+        pxor    xmm1, xmm4
+        pshufb  xmm4, xmm5
+        pxor    xmm1, xmm4
+        pxor    xmm1, xmm2
+        movups  dqword ptr[pk], xmm1
+        jmp     @e
+{$ifdef FPC} align 16 {$else} .align 16 {$endif}
+@mask:  dd      $ffffffff
+        dd      $03020100
+        dd      $07060504
+        dd      $0b0a0908
+@exp256:pshufd  xmm2, xmm2, $ff
+        movups  xmm4, xmm1
+        pshufb  xmm4, xmm5
+        pxor    xmm1, xmm4
+        pshufb  xmm4, xmm5
+        pxor    xmm1, xmm4
+        pshufb  xmm4, xmm5
+        pxor    xmm1, xmm4
+        pxor    xmm1, xmm2
+        movups  dqword ptr[pk], xmm1
+        add     pk, $10
+        aeskeygenassist xmm4, xmm1, 0
+        pshufd  xmm2, xmm4, $AA
+        movups  xmm4, xmm3
+        pshufb  xmm4, xmm5
+        pxor    xmm3, xmm4
+        pshufb  xmm4, xmm5
+        pxor    xmm3, xmm4
+        pshufb  xmm4, xmm5
+        pxor    xmm3, xmm4
+        pxor    xmm3, xmm2
+        movups  dqword ptr[pk], xmm3
+        add     pk, $10
+@e:     ret
+@exp128:pshufd  xmm2, xmm2, $FF
+        movups  xmm3, xmm1
+        pshufb  xmm3, xmm5
+        pxor    xmm1, xmm3
+        pshufb  xmm3, xmm5
+        pxor    xmm1, xmm3
+        pshufb  xmm3, xmm5
+        pxor    xmm1, xmm3
+        pxor    xmm1, xmm2
+        movups  dqword ptr[pk], xmm1
+        add     pk, $10
+        ret
+@128:   add     pk, 16
+        aeskeygenassist xmm2, xmm1, 1
+        call    @exp128
+        aeskeygenassist xmm2, xmm1, 2
+        call    @exp128
+        aeskeygenassist xmm2, xmm1, 4
+        call    @exp128
+        aeskeygenassist xmm2, xmm1, 8
+        call    @exp128
+        aeskeygenassist xmm2, xmm1, $10
+        call    @exp128
+        aeskeygenassist xmm2, xmm1, $20
+        call    @exp128
+        aeskeygenassist xmm2, xmm1, $40
+        call    @exp128
+        aeskeygenassist xmm2, xmm1, $80
+        call    @exp128
+        aeskeygenassist xmm2, xmm1, $1b
+        call    @exp128
+        aeskeygenassist xmm2, xmm1, $36
+        call    @exp128
 end;
 {$endif CPU64}
 {$endif USEAESNI}
 
 function TAES.EncryptInit(const Key; KeySize: cardinal): boolean;
-procedure Shift(KeySize: cardinal; pk: PAWK);
-var i: integer;
-    temp: cardinal;
-begin
-  // 32 bit use shift and mask
-  case KeySize of
-  128:
-    for i := 0 to 9 do begin
-      temp := pK^[3];
-      // SubWord(RotWord(temp)) if "word" count mod 4 = 0
-      pK^[4] := ((SBox[(temp shr  8) and $ff])       ) xor
-                ((SBox[(temp shr 16) and $ff]) shl  8) xor
-                ((SBox[(temp shr 24)        ]) shl 16) xor
-                ((SBox[(temp       ) and $ff]) shl 24) xor
-                pK^[0] xor RCon[i];
-      pK^[5] := pK^[1] xor pK^[4];
-      pK^[6] := pK^[2] xor pK^[5];
-      pK^[7] := pK^[3] xor pK^[6];
-      inc(PtrUInt(pK),4*4);
-    end;
-  192:
-    for i := 0 to 7 do begin
-      temp := pK^[5];
-      // SubWord(RotWord(temp)) if "word" count mod 6 = 0
-      pK^[ 6] := ((SBox[(temp shr  8) and $ff])       ) xor
-                 ((SBox[(temp shr 16) and $ff]) shl  8) xor
-                 ((SBox[(temp shr 24)        ]) shl 16) xor
-                 ((SBox[(temp       ) and $ff]) shl 24) xor
-                 pK^[0] xor RCon[i];
-      pK^[ 7] := pK^[1] xor pK^[6];
-      pK^[ 8] := pK^[2] xor pK^[7];
-      pK^[ 9] := pK^[3] xor pK^[8];
-      if i=7 then exit;
-      pK^[10] := pK^[4] xor pK^[ 9];
-      pK^[11] := pK^[5] xor pK^[10];
-      inc(PtrUInt(pK),6*4);
-    end;
-  else // 256:
-    for i := 0 to 6 do begin
-      temp := pK^[7];
-      // SubWord(RotWord(temp)) if "word" count mod 8 = 0
-      pK^[ 8] := ((SBox[(temp shr  8) and $ff])       ) xor
-                 ((SBox[(temp shr 16) and $ff]) shl  8) xor
-                 ((SBox[(temp shr 24)        ]) shl 16) xor
-                 ((SBox[(temp       ) and $ff]) shl 24) xor
-                 pK^[0] xor RCon[i];
-      pK^[ 9] := pK^[1] xor pK^[ 8];
-      pK^[10] := pK^[2] xor pK^[ 9];
-      pK^[11] := pK^[3] xor pK^[10];
-      if i=6 then exit;
-      temp := pK^[11];
-      // SubWord(temp) if "word" count mod 8 = 4
-      pK^[12] := ((SBox[(temp       ) and $ff])       ) xor
-                 ((SBox[(temp shr  8) and $ff]) shl  8) xor
-                 ((SBox[(temp shr 16) and $ff]) shl 16) xor
-                 ((SBox[(temp shr 24)        ]) shl 24) xor
-                 pK^[4];
-      pK^[13] := pK^[5] xor pK^[12];
-      pK^[14] := pK^[6] xor pK^[13];
-      pK^[15] := pK^[7] xor pK^[14];
-      inc(PtrUInt(pK),8*4);
+  procedure Shift(KeySize: cardinal; pk: PAWK);
+  var i: integer;
+      temp: cardinal;
+  begin
+    // 32 bit use shift and mask
+    case KeySize of
+    128:
+      for i := 0 to 9 do begin
+        temp := pK^[3];
+        // SubWord(RotWord(temp)) if "word" count mod 4 = 0
+        pK^[4] := ((SBox[(temp shr  8) and $ff])       ) xor
+                  ((SBox[(temp shr 16) and $ff]) shl  8) xor
+                  ((SBox[(temp shr 24)        ]) shl 16) xor
+                  ((SBox[(temp       ) and $ff]) shl 24) xor
+                  pK^[0] xor RCon[i];
+        pK^[5] := pK^[1] xor pK^[4];
+        pK^[6] := pK^[2] xor pK^[5];
+        pK^[7] := pK^[3] xor pK^[6];
+        inc(PByte(pK),4*4);
+      end;
+    192:
+      for i := 0 to 7 do begin
+        temp := pK^[5];
+        // SubWord(RotWord(temp)) if "word" count mod 6 = 0
+        pK^[ 6] := ((SBox[(temp shr  8) and $ff])       ) xor
+                   ((SBox[(temp shr 16) and $ff]) shl  8) xor
+                   ((SBox[(temp shr 24)        ]) shl 16) xor
+                   ((SBox[(temp       ) and $ff]) shl 24) xor
+                   pK^[0] xor RCon[i];
+        pK^[ 7] := pK^[1] xor pK^[6];
+        pK^[ 8] := pK^[2] xor pK^[7];
+        pK^[ 9] := pK^[3] xor pK^[8];
+        if i=7 then exit;
+        pK^[10] := pK^[4] xor pK^[ 9];
+        pK^[11] := pK^[5] xor pK^[10];
+        inc(PByte(pK),6*4);
+      end;
+    else // 256:
+      for i := 0 to 6 do begin
+        temp := pK^[7];
+        // SubWord(RotWord(temp)) if "word" count mod 8 = 0
+        pK^[ 8] := ((SBox[(temp shr  8) and $ff])       ) xor
+                   ((SBox[(temp shr 16) and $ff]) shl  8) xor
+                   ((SBox[(temp shr 24)        ]) shl 16) xor
+                   ((SBox[(temp       ) and $ff]) shl 24) xor
+                   pK^[0] xor RCon[i];
+        pK^[ 9] := pK^[1] xor pK^[ 8];
+        pK^[10] := pK^[2] xor pK^[ 9];
+        pK^[11] := pK^[3] xor pK^[10];
+        if i=6 then exit;
+        temp := pK^[11];
+        // SubWord(temp) if "word" count mod 8 = 4
+        pK^[12] := ((SBox[(temp       ) and $ff])       ) xor
+                   ((SBox[(temp shr  8) and $ff]) shl  8) xor
+                   ((SBox[(temp shr 16) and $ff]) shl 16) xor
+                   ((SBox[(temp shr 24)        ]) shl 24) xor
+                   pK^[4];
+        pK^[13] := pK^[5] xor pK^[12];
+        pK^[14] := pK^[6] xor pK^[13];
+        pK^[15] := pK^[7] xor pK^[14];
+        inc(PByte(pK),8*4);
+      end;
     end;
   end;
-end;
 var Nk: integer;
     ctx: TAESContext absolute Context;
 begin
   result := true;
   ctx.Initialized := true;
   {$ifdef USEPADLOCK}
-  if DoPadlockInit(Key,KeySize) then
+  if DoPadlockInit(Key,KeySize) then begin
+    ctx.DoBlock := @aesencryptpadlock;
     exit; // Init OK
+  end;
   {$endif}
   if (KeySize<>128) and (KeySize<>192) and (KeySize<>256) then begin
     result := false;
@@ -5058,701 +5354,720 @@ begin
   end;
   Nk := KeySize div 32;
   MoveFast(Key, ctx.RK, 4*Nk);
-  ctx.AesNi := nil;
+  // aes128ofb: aesencryptpas=140MB/s aesencryptx64=200MB/s aesniencrypt=500MB/s
+  {$ifdef CPUX64}
+  ctx.DoBlock := @aesencryptx64;
+  {$else}
+  {$ifdef CPUX86_NOTPIC}
+  ctx.DoBlock := @aesencrypt386;
+  {$else}
+  ctx.DoBlock := @aesencryptpas;
+  {$endif}
+  {$endif}
   {$ifdef CPUINTEL}
   {$ifdef USEAESNI}
-  if cfAESNI in CpuFeatures then
+  if cfAESNI in CpuFeatures then begin
      case KeySize of
-     128: ctx.AesNi := AesNiEncryptXmm7_128;
-     192: ctx.AesNi := AesNiEncryptXmm7_192;
-     256: ctx.AesNi := AesNiEncryptXmm7_256;
+     128: ctx.DoBlock := @aesniencrypt128;
+     192: ctx.DoBlock := @aesniencrypt192;
+     256: ctx.DoBlock := @aesniencrypt256;
      end;
+     {$ifdef USEAESNI32}
+     case KeySize of
+     128: ctx.AesNi32 := @AesNiEncryptXmm7_128;
+     192: ctx.AesNi32 := @AesNiEncryptXmm7_192;
+     256: ctx.AesNi32 := @AesNiEncryptXmm7_256;
+     end;
+     {$endif}
+  end;
   {$endif}
   {$endif}
   ctx.Rounds  := 6+Nk;
   ctx.KeyBits := KeySize;
   // Calculate encryption round keys
   {$ifdef USEAESNI} // 192 is more complex and seldom used -> skip to pascal
-  if (KeySize<>192) and Assigned(ctx.AESNI) then
+  if (KeySize<>192) and (cfAESNI in CpuFeatures) then
     ShiftAesNi(KeySize,@ctx.RK) else
   {$endif}
     Shift(KeySize,pointer(@ctx.RK));
 end;
 
-{$ifndef AESPASCAL_OR_CPU64}
-  {$define AES_ROLLED} // asm version is rolled
-{$endif}
-
 {$ifdef USEAESNI} // should be put outside the main method for FPC :(
 {$ifdef CPU32}
 procedure MakeDecrKeyAesNi(Rounds: integer; RK: Pointer);
+  {$ifdef FPC} nostackframe; assembler; {$endif}
 asm // eax=Rounds edx=RK
-  sub eax,9
-  movdqu xmm0,[edx+$10]
-  movdqu xmm1,[edx+$20]
-  movdqu xmm2,[edx+$30]
-  movdqu xmm3,[edx+$40]
-  movdqu xmm4,[edx+$50]
-  movdqu xmm5,[edx+$60]
-  movdqu xmm6,[edx+$70]
-  movdqu xmm7,[edx+$80]
+        sub     eax, 9
+        movups  xmm0, [edx + $10]
+        movups  xmm1, [edx + $20]
+        movups  xmm2, [edx + $30]
+        movups  xmm3, [edx + $40]
+        movups  xmm4, [edx + $50]
+        movups  xmm5, [edx + $60]
+        movups  xmm6, [edx + $70]
+        movups  xmm7, [edx + $80]
   {$ifdef HASAESNI}
-  aesimc xmm0,xmm0
-  aesimc xmm1,xmm1
-  aesimc xmm2,xmm2
-  aesimc xmm3,xmm3
-  aesimc xmm4,xmm4
-  aesimc xmm5,xmm5
-  aesimc xmm6,xmm6
-  aesimc xmm7,xmm7
+        aesimc  xmm0, xmm0
+        aesimc  xmm1, xmm1
+        aesimc  xmm2, xmm2
+        aesimc  xmm3, xmm3
+        aesimc  xmm4, xmm4
+        aesimc  xmm5, xmm5
+        aesimc  xmm6, xmm6
+        aesimc  xmm7, xmm7
   {$else}
-  db $66,$0F,$38,$DB,$C0
-  db $66,$0F,$38,$DB,$C9
-  db $66,$0F,$38,$DB,$D2
-  db $66,$0F,$38,$DB,$DB
-  db $66,$0F,$38,$DB,$E4
-  db $66,$0F,$38,$DB,$ED
-  db $66,$0F,$38,$DB,$F6
-  db $66,$0F,$38,$DB,$FF
+        db      $66, $0F, $38, $DB, $C0
+        db      $66, $0F, $38, $DB, $C9
+        db      $66, $0F, $38, $DB, $D2
+        db      $66, $0F, $38, $DB, $DB
+        db      $66, $0F, $38, $DB, $E4
+        db      $66, $0F, $38, $DB, $ED
+        db      $66, $0F, $38, $DB, $F6
+        db      $66, $0F, $38, $DB, $FF
   {$endif}
-  movdqu [edx+$10],xmm0
-  movdqu [edx+$20],xmm1
-  movdqu [edx+$30],xmm2
-  movdqu [edx+$40],xmm3
-  movdqu [edx+$50],xmm4
-  movdqu [edx+$60],xmm5
-  movdqu [edx+$70],xmm6
-  movdqu [edx+$80],xmm7
-  lea edx,[edx+$90]
-@loop:
-  movdqu xmm0,[edx]
-  db $66,$0F,$38,$DB,$C0 // aesimc xmm0,xmm0
-  movdqu [edx],xmm0
-  dec eax
-  lea edx,[edx+16]
-  jnz @loop
+        movups  [edx + $10], xmm0
+        movups  [edx + $20], xmm1
+        movups  [edx + $30], xmm2
+        movups  [edx + $40], xmm3
+        movups  [edx + $50], xmm4
+        movups  [edx + $60], xmm5
+        movups  [edx + $70], xmm6
+        movups  [edx + $80], xmm7
+        lea     edx, [edx + $90]
+@loop:  movups  xmm0, [edx]
+        db      $66, $0F, $38, $DB, $C0 // aesimc xmm0,xmm0
+        movups  [edx], xmm0
+        dec     eax
+        lea     edx, [edx + 16]
+        jnz     @loop
 end;
 {$endif CPU32}
 {$ifdef CPU64}
 procedure MakeDecrKeyAesNi(Rounds: integer; RK: Pointer);
-{$ifdef FPC}nostackframe; assembler;
-asm
-{$else}
-asm // rcx=Rounds rdx=RK
-  .noframe
-{$endif}
-  {$ifndef win64}
-  mov rdx,rsi
-  mov rcx,rdi
-  {$endif win64}
-  mov rax,rcx
-  sub eax,9
-  movdqu xmm0,[rdx+$10]
-  movdqu xmm1,[rdx+$20]
-  movdqu xmm2,[rdx+$30]
-  movdqu xmm3,[rdx+$40]
-  movdqu xmm4,[rdx+$50]
-  movdqu xmm5,[rdx+$60]
-  movdqu xmm6,[rdx+$70]
-  movdqu xmm7,[rdx+$80]
-  aesimc xmm0,xmm0
-  aesimc xmm1,xmm1
-  aesimc xmm2,xmm2
-  aesimc xmm3,xmm3
-  aesimc xmm4,xmm4
-  aesimc xmm5,xmm5
-  aesimc xmm6,xmm6
-  aesimc xmm7,xmm7
-  movdqu [rdx+$10],xmm0
-  movdqu [rdx+$20],xmm1
-  movdqu [rdx+$30],xmm2
-  movdqu [rdx+$40],xmm3
-  movdqu [rdx+$50],xmm4
-  movdqu [rdx+$60],xmm5
-  movdqu [rdx+$70],xmm6
-  movdqu [rdx+$80],xmm7
-  lea rdx,[rdx+$90]
-@loop:
-  movdqu xmm0,[rdx]
-  aesimc xmm0,xmm0
-  movdqu [rdx],xmm0
-  dec eax
-  lea rdx,[rdx+16]
-  jnz @loop
+{$ifdef FPC} nostackframe; assembler; asm {$else} asm .noframe {$endif}
+        mov     eax, Rounds
+        sub     eax, 9
+        movups  xmm0, dqword ptr[RK + $10]
+        movups  xmm1, dqword ptr[RK + $20]
+        movups  xmm2, dqword ptr[RK + $30]
+        movups  xmm3, dqword ptr[RK + $40]
+        movups  xmm4, dqword ptr[RK + $50]
+        movups  xmm5, dqword ptr[RK + $60]
+        movups  xmm6, dqword ptr[RK + $70]
+        movups  xmm7, dqword ptr[RK + $80]
+        aesimc  xmm0, xmm0
+        aesimc  xmm1, xmm1
+        aesimc  xmm2, xmm2
+        aesimc  xmm3, xmm3
+        aesimc  xmm4, xmm4
+        aesimc  xmm5, xmm5
+        aesimc  xmm6, xmm6
+        aesimc  xmm7, xmm7
+        movups  dqword ptr[RK + $10], xmm0
+        movups  dqword ptr[RK + $20], xmm1
+        movups  dqword ptr[RK + $30], xmm2
+        movups  dqword ptr[RK + $40], xmm3
+        movups  dqword ptr[RK + $50], xmm4
+        movups  dqword ptr[RK + $60], xmm5
+        movups  dqword ptr[RK + $70], xmm6
+        movups  dqword ptr[RK + $80], xmm7
+        lea     RK, [RK + $90]
+@loop:  movups  xmm0, dqword ptr[RK]
+        aesimc  xmm0, xmm0
+        movups  dqword ptr[RK], xmm0
+        dec     eax
+        lea     RK, [RK + 16]
+        jnz     @loop
 end;
 {$endif CPU64}
 {$endif USEAESNI}
 
-function TAES.DecryptInit(const Key; KeySize: cardinal): boolean;
-procedure MakeDecrKey(var ctx: TAESContext);
-// Calculate decryption key from encryption key
-var i: integer;
-    x: cardinal;
-{$ifndef AES_ROLLED}
-    j: integer;
-{$endif}
+{$ifdef USEPADLOCK}
+procedure aesdecryptpadlock(const ctxt: TAESContext; bi, bo: PWA4);
 begin
-{$ifndef AES_ROLLED} // inversion is needed only for fully unrolled version
-  // invert the order of the round keys
+  padlock_aes_decrypt(ctxt.ViaCtx,bi,bo,16);
+end;
+{$endif}
+
+procedure aesdecryptpas(const ctxt: TAESContext; bi, bo: PWA4);
+var
+  {$ifdef AES_ROLLED}
+  s0,s1,s2,s3: PtrUInt;  // TAESBlock s# as separate variables
+  t0,t1,t2: cardinal;    // TAESBlock t# as separate variables
+  i: integer;
+  pk: PWA4;
+  {$else}
+  s0,s1,s2,s3,t0,t1,t2,t3: cardinal; // TAESBlock s#/t# as separate variables
+  pk: PAWk;  // pointer to loop rount key
+  {$endif}
+  t: PCardinalArray;    // faster on a PIC system
+begin
+  t := @Td0;
+{$ifdef AES_ROLLED}
+  // Wolfgang Ehrhardt rolled version - faster on modern CPU than unrolled one below
+  // Setup key pointer
+  pk := PWA4(@ctxt.RK[ctxt.Rounds]);
+  // Initialize with input block
+  s0 := bi[0] xor pk[0];
+  s1 := bi[1] xor pk[1];
+  s2 := bi[2] xor pk[2];
+  s3 := bi[3] xor pk[3];
+  dec(pk);
+  for I := 1 to ctxt.Rounds-1 do begin
+      t0 := t[s0 and $ff] xor t[$100+s3 shr 8 and $ff] xor t[$200+s2 shr 16 and $ff] xor t[$300+s1 shr 24];
+      t1 := t[s1 and $ff] xor t[$100+s0 shr 8 and $ff] xor t[$200+s3 shr 16 and $ff] xor t[$300+s2 shr 24];
+      t2 := t[s2 and $ff] xor t[$100+s1 shr 8 and $ff] xor t[$200+s0 shr 16 and $ff] xor t[$300+s3 shr 24];
+      s3 := t[s3 and $ff] xor t[$100+s2 shr 8 and $ff] xor t[$200+s1 shr 16 and $ff] xor t[$300+s0 shr 24] xor pk[3];
+      s0 := t0 xor pk[0];
+      s1 := t1 xor pk[1];
+      s2 := t2 xor pk[2];
+      dec(pk);
+    end;
+  bo[0] := ((InvSBox[s0        and $ff])        xor
+            (InvSBox[s3 shr  8 and $ff]) shl  8 xor
+            (InvSBox[s2 shr 16 and $ff]) shl 16 xor
+            (InvSBox[s1 shr 24])         shl 24    ) xor pk[0];
+  bo[1] := ((InvSBox[s1        and $ff])        xor
+            (InvSBox[s0 shr  8 and $ff]) shl  8 xor
+            (InvSBox[s3 shr 16 and $ff]) shl 16 xor
+            (InvSBox[s2 shr 24])         shl 24    ) xor pk[1];
+  bo[2] := ((InvSBox[s2        and $ff])        xor
+            (InvSBox[s1 shr  8 and $ff]) shl  8 xor
+            (InvSBox[s0 shr 16 and $ff]) shl 16 xor
+            (InvSBox[s3 shr 24])         shl 24    ) xor pk[2];
+  bo[3] := ((InvSBox[s3        and $ff])        xor
+            (InvSBox[s2 shr  8 and $ff]) shl  8 xor
+            (InvSBox[s1 shr 16 and $ff]) shl 16 xor
+            (InvSBox[s0 shr 24])         shl 24    ) xor pk[3];
+{$else} // unrolled version (WE6) from Wolfgang Ehrhardt - slower
+  // Setup key pointer
+  pk := PAWk(@ctxt.RK);
+  // Initialize with input block
+  s0 := bi[0] xor pk[0];
+  s1 := bi[1] xor pk[1];
+  s2 := bi[2] xor pk[2];
+  s3 := bi[3] xor pk[3];
+  // Round 1
+  t0 := t[s0 and $ff] xor t[$100+s3 shr 8 and $ff] xor t[$200+s2 shr 16 and $ff] xor t[$300+s1 shr 24] xor pk[4];
+  t1 := t[s1 and $ff] xor t[$100+s0 shr 8 and $ff] xor t[$200+s3 shr 16 and $ff] xor t[$300+s2 shr 24] xor pk[5];
+  t2 := t[s2 and $ff] xor t[$100+s1 shr 8 and $ff] xor t[$200+s0 shr 16 and $ff] xor t[$300+s3 shr 24] xor pk[6];
+  t3 := t[s3 and $ff] xor t[$100+s2 shr 8 and $ff] xor t[$200+s1 shr 16 and $ff] xor t[$300+s0 shr 24] xor pk[7];
+  // Round 2
+  s0 := t[t0 and $ff] xor t[$100+t3 shr 8 and $ff] xor t[$200+t2 shr 16 and $ff] xor t[$300+t1 shr 24] xor pk[8];
+  s1 := t[t1 and $ff] xor t[$100+t0 shr 8 and $ff] xor t[$200+t3 shr 16 and $ff] xor t[$300+t2 shr 24] xor pk[9];
+  s2 := t[t2 and $ff] xor t[$100+t1 shr 8 and $ff] xor t[$200+t0 shr 16 and $ff] xor t[$300+t3 shr 24] xor pk[10];
+  s3 := t[t3 and $ff] xor t[$100+t2 shr 8 and $ff] xor t[$200+t1 shr 16 and $ff] xor t[$300+t0 shr 24] xor pk[11];
+  // Round 3
+  t0 := t[s0 and $ff] xor t[$100+s3 shr 8 and $ff] xor t[$200+s2 shr 16 and $ff] xor t[$300+s1 shr 24] xor pk[12];
+  t1 := t[s1 and $ff] xor t[$100+s0 shr 8 and $ff] xor t[$200+s3 shr 16 and $ff] xor t[$300+s2 shr 24] xor pk[13];
+  t2 := t[s2 and $ff] xor t[$100+s1 shr 8 and $ff] xor t[$200+s0 shr 16 and $ff] xor t[$300+s3 shr 24] xor pk[14];
+  t3 := t[s3 and $ff] xor t[$100+s2 shr 8 and $ff] xor t[$200+s1 shr 16 and $ff] xor t[$300+s0 shr 24] xor pk[15];
+  // Round 4
+  s0 := t[t0 and $ff] xor t[$100+t3 shr 8 and $ff] xor t[$200+t2 shr 16 and $ff] xor t[$300+t1 shr 24] xor pk[16];
+  s1 := t[t1 and $ff] xor t[$100+t0 shr 8 and $ff] xor t[$200+t3 shr 16 and $ff] xor t[$300+t2 shr 24] xor pk[17];
+  s2 := t[t2 and $ff] xor t[$100+t1 shr 8 and $ff] xor t[$200+t0 shr 16 and $ff] xor t[$300+t3 shr 24] xor pk[18];
+  s3 := t[t3 and $ff] xor t[$100+t2 shr 8 and $ff] xor t[$200+t1 shr 16 and $ff] xor t[$300+t0 shr 24] xor pk[19];
+  // Round 5
+  t0 := t[s0 and $ff] xor t[$100+s3 shr 8 and $ff] xor t[$200+s2 shr 16 and $ff] xor t[$300+s1 shr 24] xor pk[20];
+  t1 := t[s1 and $ff] xor t[$100+s0 shr 8 and $ff] xor t[$200+s3 shr 16 and $ff] xor t[$300+s2 shr 24] xor pk[21];
+  t2 := t[s2 and $ff] xor t[$100+s1 shr 8 and $ff] xor t[$200+s0 shr 16 and $ff] xor t[$300+s3 shr 24] xor pk[22];
+  t3 := t[s3 and $ff] xor t[$100+s2 shr 8 and $ff] xor t[$200+s1 shr 16 and $ff] xor t[$300+s0 shr 24] xor pk[23];
+  // Round 6
+  s0 := t[t0 and $ff] xor t[$100+t3 shr 8 and $ff] xor t[$200+t2 shr 16 and $ff] xor t[$300+t1 shr 24] xor pk[24];
+  s1 := t[t1 and $ff] xor t[$100+t0 shr 8 and $ff] xor t[$200+t3 shr 16 and $ff] xor t[$300+t2 shr 24] xor pk[25];
+  s2 := t[t2 and $ff] xor t[$100+t1 shr 8 and $ff] xor t[$200+t0 shr 16 and $ff] xor t[$300+t3 shr 24] xor pk[26];
+  s3 := t[t3 and $ff] xor t[$100+t2 shr 8 and $ff] xor t[$200+t1 shr 16 and $ff] xor t[$300+t0 shr 24] xor pk[27];
+  // Round 7
+  t0 := t[s0 and $ff] xor t[$100+s3 shr 8 and $ff] xor t[$200+s2 shr 16 and $ff] xor t[$300+s1 shr 24] xor pk[28];
+  t1 := t[s1 and $ff] xor t[$100+s0 shr 8 and $ff] xor t[$200+s3 shr 16 and $ff] xor t[$300+s2 shr 24] xor pk[29];
+  t2 := t[s2 and $ff] xor t[$100+s1 shr 8 and $ff] xor t[$200+s0 shr 16 and $ff] xor t[$300+s3 shr 24] xor pk[30];
+  t3 := t[s3 and $ff] xor t[$100+s2 shr 8 and $ff] xor t[$200+s1 shr 16 and $ff] xor t[$300+s0 shr 24] xor pk[31];
+  // Round 8
+  s0 := t[t0 and $ff] xor t[$100+t3 shr 8 and $ff] xor t[$200+t2 shr 16 and $ff] xor t[$300+t1 shr 24] xor pk[32];
+  s1 := t[t1 and $ff] xor t[$100+t0 shr 8 and $ff] xor t[$200+t3 shr 16 and $ff] xor t[$300+t2 shr 24] xor pk[33];
+  s2 := t[t2 and $ff] xor t[$100+t1 shr 8 and $ff] xor t[$200+t0 shr 16 and $ff] xor t[$300+t3 shr 24] xor pk[34];
+  s3 := t[t3 and $ff] xor t[$100+t2 shr 8 and $ff] xor t[$200+t1 shr 16 and $ff] xor t[$300+t0 shr 24] xor pk[35];
+  // Round 9
+  t0 := t[s0 and $ff] xor t[$100+s3 shr 8 and $ff] xor t[$200+s2 shr 16 and $ff] xor t[$300+s1 shr 24] xor pk[36];
+  t1 := t[s1 and $ff] xor t[$100+s0 shr 8 and $ff] xor t[$200+s3 shr 16 and $ff] xor t[$300+s2 shr 24] xor pk[37];
+  t2 := t[s2 and $ff] xor t[$100+s1 shr 8 and $ff] xor t[$200+s0 shr 16 and $ff] xor t[$300+s3 shr 24] xor pk[38];
+  t3 := t[s3 and $ff] xor t[$100+s2 shr 8 and $ff] xor t[$200+s1 shr 16 and $ff] xor t[$300+s0 shr 24] xor pk[39];
+  if ctxt.rounds>10 then begin
+    // Round 10
+    s0 := t[t0 and $ff] xor t[$100+t3 shr 8 and $ff] xor t[$200+t2 shr 16 and $ff] xor t[$300+t1 shr 24] xor pk[40];
+    s1 := t[t1 and $ff] xor t[$100+t0 shr 8 and $ff] xor t[$200+t3 shr 16 and $ff] xor t[$300+t2 shr 24] xor pk[41];
+    s2 := t[t2 and $ff] xor t[$100+t1 shr 8 and $ff] xor t[$200+t0 shr 16 and $ff] xor t[$300+t3 shr 24] xor pk[42];
+    s3 := t[t3 and $ff] xor t[$100+t2 shr 8 and $ff] xor t[$200+t1 shr 16 and $ff] xor t[$300+t0 shr 24] xor pk[43];
+    // Round 11
+    t0 := t[s0 and $ff] xor t[$100+s3 shr 8 and $ff] xor t[$200+s2 shr 16 and $ff] xor t[$300+s1 shr 24] xor pk[44];
+    t1 := t[s1 and $ff] xor t[$100+s0 shr 8 and $ff] xor t[$200+s3 shr 16 and $ff] xor t[$300+s2 shr 24] xor pk[45];
+    t2 := t[s2 and $ff] xor t[$100+s1 shr 8 and $ff] xor t[$200+s0 shr 16 and $ff] xor t[$300+s3 shr 24] xor pk[46];
+    t3 := t[s3 and $ff] xor t[$100+s2 shr 8 and $ff] xor t[$200+s1 shr 16 and $ff] xor t[$300+s0 shr 24] xor pk[47];
+    if ctxt.rounds>12 then begin
+      // Round 12
+      s0 := t[t0 and $ff] xor t[$100+t3 shr 8 and $ff] xor t[$200+t2 shr 16 and $ff] xor t[$300+t1 shr 24] xor pk[48];
+      s1 := t[t1 and $ff] xor t[$100+t0 shr 8 and $ff] xor t[$200+t3 shr 16 and $ff] xor t[$300+t2 shr 24] xor pk[49];
+      s2 := t[t2 and $ff] xor t[$100+t1 shr 8 and $ff] xor t[$200+t0 shr 16 and $ff] xor t[$300+t3 shr 24] xor pk[50];
+      s3 := t[t3 and $ff] xor t[$100+t2 shr 8 and $ff] xor t[$200+t1 shr 16 and $ff] xor t[$300+t0 shr 24] xor pk[51];
+      // Round 13
+      t0 := t[s0 and $ff] xor t[$100+s3 shr 8 and $ff] xor t[$200+s2 shr 16 and $ff] xor t[$300+s1 shr 24] xor pk[52];
+      t1 := t[s1 and $ff] xor t[$100+s0 shr 8 and $ff] xor t[$200+s3 shr 16 and $ff] xor t[$300+s2 shr 24] xor pk[53];
+      t2 := t[s2 and $ff] xor t[$100+s1 shr 8 and $ff] xor t[$200+s0 shr 16 and $ff] xor t[$300+s3 shr 24] xor pk[54];
+      t3 := t[s3 and $ff] xor t[$100+s2 shr 8 and $ff] xor t[$200+s1 shr 16 and $ff] xor t[$300+s0 shr 24] xor pk[55];
+    end;
+  end;
+  inc(PByte(pk), (ctxt.rounds shl 4));
+  // Uses InvSBox and shl, needs type cast cardinal() for
+  // 16 bit compilers: here InvSBox is byte, Td4 is cardinal
+  bo[0] := ((InvSBox[t0 and $ff]) xor
+    (InvSBox[t3 shr  8 and $ff]) shl  8 xor
+    (InvSBox[t2 shr 16 and $ff]) shl 16 xor
+    (InvSBox[t1 shr 24]) shl 24) xor pk[0];
+  bo[1] := ((InvSBox[t1 and $ff]) xor
+    (InvSBox[t0 shr  8 and $ff]) shl  8 xor
+    (InvSBox[t3 shr 16 and $ff]) shl 16 xor
+    (InvSBox[t2 shr 24]) shl 24) xor pk[1];
+  bo[2] := ((InvSBox[t2 and $ff]) xor
+    (InvSBox[t1 shr  8 and $ff]) shl  8 xor
+    (InvSBox[t0 shr 16 and $ff]) shl 16 xor
+    (InvSBox[t3 shr 24]) shl 24) xor pk[2];
+  bo[3] := ((InvSBox[t3 and $ff]) xor
+    (InvSBox[t2 shr  8 and $ff]) shl  8 xor
+    (InvSBox[t1 shr 16 and $ff]) shl 16 xor
+    (InvSBox[t0 shr 24]) shl 24) xor pk[3];
+{$endif AES_ROLLED}
+end;
+
+{$ifdef CPUX86}
+{$ifdef USEAESNI}
+procedure aesnidecrypt128(const ctxt, source, dest);
+  {$ifdef FPC} nostackframe; assembler; {$endif}
+asm
+        movups  xmm7, [edx]
+        movups  xmm0, [eax + 16 * 10]
+        movups  xmm1, [eax + 16 * 9]
+        movups  xmm2, [eax + 16 * 8]
+        movups  xmm3, [eax + 16 * 7]
+        movups  xmm4, [eax + 16 * 6]
+        movups  xmm5, [eax + 16 * 5]
+        movups  xmm6, [eax + 16 * 4]
+        pxor    xmm7, xmm0
+  {$ifdef HASAESNI}
+        aesdec  xmm7, xmm1
+        aesdec  xmm7, xmm2
+        aesdec  xmm7, xmm3
+        aesdec  xmm7, xmm4
+  {$else}
+        db      $66, $0F, $38, $DE, $F9
+        db      $66, $0F, $38, $DE, $FA
+        db      $66, $0F, $38, $DE, $FB
+        db      $66, $0F, $38, $DE, $FC
+  {$endif}
+        movups  xmm0, [eax + 16 * 3]
+        movups  xmm1, [eax + 16 * 2]
+        movups  xmm2, [eax + 16 * 1]
+        movups  xmm3, [eax + 16 * 0]
+  {$ifdef HASAESNI}
+        aesdec  xmm7, xmm5
+        aesdec  xmm7, xmm6
+        aesdec  xmm7, xmm0
+        aesdec  xmm7, xmm1
+        aesdec  xmm7, xmm2
+        aesdeclast xmm7, xmm3
+  {$else}
+        db      $66, $0F, $38, $DE, $FD
+        db      $66, $0F, $38, $DE, $FE
+        db      $66, $0F, $38, $DE, $F8
+        db      $66, $0F, $38, $DE, $F9
+        db      $66, $0F, $38, $DE, $FA
+        db      $66, $0F, $38, $DF, $FB
+  {$endif}
+        movups  [ecx], xmm7
+        pxor    xmm7, xmm7
+end;
+
+procedure aesnidecrypt192(const ctxt, source, dest);
+  {$ifdef FPC} nostackframe; assembler; {$endif}
+asm
+        movups  xmm7, [edx]
+        movups  xmm0, [eax + 16 * 12]
+        movups  xmm1, [eax + 16 * 11]
+        movups  xmm2, [eax + 16 * 10]
+        movups  xmm3, [eax + 16 * 9]
+        movups  xmm4, [eax + 16 * 8]
+        movups  xmm5, [eax + 16 * 7]
+        movups  xmm6, [eax + 16 * 6]
+        pxor    xmm7, xmm0
+  {$ifdef HASAESNI}
+        aesdec  xmm7, xmm1
+        aesdec  xmm7, xmm2
+        aesdec  xmm7, xmm3
+        aesdec  xmm7, xmm4
+        aesdec  xmm7, xmm5
+        aesdec  xmm7, xmm6
+  {$else}
+        db      $66, $0F, $38, $DE, $F9
+        db      $66, $0F, $38, $DE, $FA
+        db      $66, $0F, $38, $DE, $FB
+        db      $66, $0F, $38, $DE, $FC
+        db      $66, $0F, $38, $DE, $FD
+        db      $66, $0F, $38, $DE, $FE
+  {$endif}
+        movups  xmm0, [eax + 16 * 5]
+        movups  xmm1, [eax + 16 * 4]
+        movups  xmm2, [eax + 16 * 3]
+        movups  xmm3, [eax + 16 * 2]
+        movups  xmm4, [eax + 16 * 1]
+        movups  xmm5, [eax + 16 * 0]
+  {$ifdef HASAESNI}
+        aesdec  xmm7, xmm0
+        aesdec  xmm7, xmm1
+        aesdec  xmm7, xmm2
+        aesdec  xmm7, xmm3
+        aesdec  xmm7, xmm4
+        aesdeclast xmm7, xmm5
+  {$else}
+        db      $66, $0F, $38, $DE, $F8
+        db      $66, $0F, $38, $DE, $F9
+        db      $66, $0F, $38, $DE, $FA
+        db      $66, $0F, $38, $DE, $FB
+        db      $66, $0F, $38, $DE, $FC
+        db      $66, $0F, $38, $DF, $FD
+  {$endif}
+        movups  [ecx], xmm7
+        pxor    xmm7, xmm7
+end;
+
+procedure aesnidecrypt256(const ctxt, source, dest);
+  {$ifdef FPC} nostackframe; assembler; {$endif}
+asm
+        movups  xmm7, [edx]
+        movups  xmm0, [eax + 16 * 14]
+        movups  xmm1, [eax + 16 * 13]
+        movups  xmm2, [eax + 16 * 12]
+        movups  xmm3, [eax + 16 * 11]
+        movups  xmm4, [eax + 16 * 10]
+        movups  xmm5, [eax + 16 * 9]
+        movups  xmm6, [eax + 16 * 8]
+        pxor    xmm7, xmm0
+  {$ifdef HASAESNI}
+        aesdec  xmm7, xmm1
+        aesdec  xmm7, xmm2
+        aesdec  xmm7, xmm3
+        aesdec  xmm7, xmm4
+        aesdec  xmm7, xmm5
+        aesdec  xmm7, xmm6
+  {$else}
+        db      $66, $0F, $38, $DE, $F9
+        db      $66, $0F, $38, $DE, $FA
+        db      $66, $0F, $38, $DE, $FB
+        db      $66, $0F, $38, $DE, $FC
+        db      $66, $0F, $38, $DE, $FD
+        db      $66, $0F, $38, $DE, $FE
+  {$endif}
+        movups  xmm0, [eax + 16 * 7]
+        movups  xmm1, [eax + 16 * 6]
+        movups  xmm2, [eax + 16 * 5]
+        movups  xmm3, [eax + 16 * 4]
+        movups  xmm4, [eax + 16 * 3]
+        movups  xmm5, [eax + 16 * 2]
+        movups  xmm6, [eax + 16 * 1]
+  {$ifdef HASAESNI}
+        aesdec  xmm7, xmm0
+        aesdec  xmm7, xmm1
+        aesdec  xmm7, xmm2
+        aesdec  xmm7, xmm3
+        aesdec  xmm7, xmm4
+        aesdec  xmm7, xmm5
+        aesdec  xmm7, xmm6
+  {$else}
+        db      $66, $0F, $38, $DE, $F8
+        db      $66, $0F, $38, $DE, $F9
+        db      $66, $0F, $38, $DE, $FA
+        db      $66, $0F, $38, $DE, $FB
+        db      $66, $0F, $38, $DE, $FC
+        db      $66, $0F, $38, $DE, $FD
+        db      $66, $0F, $38, $DE, $FE
+  {$endif}
+        movups  xmm0, [eax + 16 * 0]
+  {$ifdef HASAESNI}
+        aesdeclast xmm7, xmm0
+  {$else}
+        db      $66, $0F, $38, $DF, $F8
+  {$endif}
+        movups  [ecx], xmm7
+        pxor    xmm7, xmm7
+end;
+{$endif}
+
+{$ifdef CPUX86_NOTPIC}
+procedure aesdecrypt386(const ctxt: TAESContext; bi, bo: PWA4);
+  {$ifdef FPC} nostackframe; assembler; {$endif}
+asm
+        push    ebx
+        push    esi
+        push    edi
+        push    ebp
+        add     esp,  - 20
+        mov     [esp], ecx
+        movzx   ecx, byte ptr[eax].taescontext.rounds
+        lea     esi, [4 * ecx]
+        lea     ecx, [ecx - 1]
+        lea     eax, [eax + 4 * esi] // eax=@ctx.rk[ctx.rounds]=pk
+        mov     [esp + 16], ecx      // [esp+16]=ctx.round
+        mov     ebx, [edx]
+        xor     ebx, [eax]
+        mov     esi, [edx + 4]
+        xor     esi, [eax + 4]
+        mov     ecx, [edx + 8]
+        xor     ecx, [eax + 8]
+        mov     edx, [edx + 12]
+        xor     edx, [eax + 12]
+        lea     eax, [eax - 16]
+@1:     // pk=eax s0=ebx s1=esi s2=ecx s3=edx
+        movzx   edi, bl
+        mov     edi, dword ptr[4 * edi + td0]
+        movzx   ebp, dh
+        xor     edi, dword ptr[4 * ebp + td1]
+        mov     ebp, ecx
+        shr     ebp, $10
+        and     ebp, 255
+        xor     edi, dword ptr[4 * ebp + td2]
+        mov     ebp, esi
+        shr     ebp, $18
+        xor     edi, dword ptr[4 * ebp + td3]
+        mov     [esp + 4], edi
+        mov     edi, esi
+        and     edi, 255
+        mov     edi, dword ptr[4 * edi + td0]
+        movzx   ebp, bh
+        xor     edi, dword ptr[4 * ebp + td1]
+        mov     ebp, edx
+        shr     ebp, $10
+        and     ebp, 255
+        xor     edi, dword ptr[4 * ebp + td2]
+        mov     ebp, ecx
+        shr     ebp, $18
+        xor     edi, dword ptr[4 * ebp + td3]
+        mov     [esp + 8], edi
+        movzx   edi, cl
+        mov     edi, dword ptr[4 * edi + td0]
+        movzx   ebp, si
+        shr     ebp, $08
+        xor     edi, dword ptr[4 * ebp + td1]
+        mov     ebp, ebx
+        shr     ebp, $10
+        and     ebp, 255
+        xor     edi, dword ptr[4 * ebp + td2]
+        mov     ebp, edx
+        shr     ebp, $18
+        xor     edi, dword ptr[4 * ebp + td3]
+        mov     [esp + 12], edi
+        and     edx, 255
+        mov     edx, dword ptr[4 * edx + td0]
+        movzx   ecx, ch
+        xor     edx, dword ptr[4 * ecx + td1]
+        shr     esi, $10
+        and     esi, 255
+        xor     edx, dword ptr[4 * esi + td2]
+        shr     ebx, $18
+        xor     edx, dword ptr[4 * ebx + td3]
+        xor     edx, [eax + 12]
+        mov     ebx, [eax]
+        xor     ebx, [esp + 4]
+        mov     esi, [eax + 4]
+        xor     esi, [esp + 8]
+        mov     ecx, [eax + 8]
+        xor     ecx, [esp + 12]
+        lea     eax, [eax - 16]
+        dec     byte ptr[esp + 16]
+        jnz     @1
+        mov     ebp, eax
+        movzx   eax, bl
+        movzx   eax, byte ptr[eax + invsbox]
+        movzx   edi, dh
+        movzx   edi, byte ptr[edi + invsbox]
+        shl     edi, $08
+        xor     eax, edi
+        mov     edi, ecx
+        shr     edi, $10
+        and     edi, 255
+        movzx   edi, byte ptr[edi + invsbox]
+        shl     edi, $10
+        xor     eax, edi
+        mov     edi, esi
+        shr     edi, $18
+        movzx   edi, byte ptr[edi + invsbox]
+        shl     edi, $18
+        xor     eax, edi
+        xor     eax, [ebp]
+        mov     edi, [esp]
+        mov     [edi], eax
+        mov     eax, esi
+        and     eax, 255
+        movzx   eax, byte ptr[eax + invsbox]
+        movzx   edi, bh
+        movzx   edi, byte ptr[edi + invsbox]
+        shl     edi, $08
+        xor     eax, edi
+        mov     edi, edx
+        shr     edi, $10
+        and     edi, 255
+        movzx   edi, byte ptr[edi + invsbox]
+        shl     edi, $10
+        xor     eax, edi
+        mov     edi, ecx
+        shr     edi, $18
+        movzx   edi, byte ptr[edi + invsbox]
+        shl     edi, $18
+        xor     eax, edi
+        xor     eax, [ebp + 4]
+        mov     edi, [esp]
+        mov     [edi + 4], eax
+        movzx   eax, cl
+        movzx   eax, byte ptr[eax + invsbox]
+        movzx   edi, si
+        shr     edi, $08
+        movzx   edi, byte ptr[edi + invsbox]
+        shl     edi, $08
+        xor     eax, edi
+        mov     edi, ebx
+        shr     edi, $10
+        and     edi, 255
+        movzx   edi, byte ptr[edi + invsbox]
+        shl     edi, $10
+        xor     eax, edi
+        mov     edi, edx
+        shr     edi, $18
+        movzx   edi, byte ptr[edi + invsbox]
+        shl     edi, $18
+        xor     eax, edi
+        xor     eax, [ebp + 8]
+        mov     edi, [esp]
+        mov     [edi + 8], eax
+        and     edx, 255
+        movzx   eax, byte ptr[edx + invsbox]
+        shr     ecx, $08
+        and     ecx, 255
+        movzx   edx, byte ptr[ecx + invsbox]
+        shl     edx, $08
+        xor     eax, edx
+        shr     esi, $10
+        and     esi, 255
+        movzx   edx, byte ptr[esi + invsbox]
+        shl     edx, $10
+        xor     eax, edx
+        shr     ebx, $18
+        movzx   edx, byte ptr[ebx + invsbox]
+        shl     edx, $18
+        xor     eax, edx
+        xor     eax, [ebp + 12]
+        mov     [edi + 12], eax
+        add     esp, 20
+        pop     ebp
+        pop     edi
+        pop     esi
+        pop     ebx
+end;
+{$endif CPUX86_NOTPIC}
+{$endif CPUX86}
+
+procedure MakeDecrKey(rounds: integer; k: PAWk);
+// Calculate decryption key from encryption key
+var x: cardinal;
+    {$ifndef AES_ROLLED}
+    i,j: integer;
+    {$endif}
+    t: PCardinalArray;  // faster on a PIC system
+    s: PByteArray;
+begin
+  {$ifndef AES_ROLLED} // inversion is needed only for fully unrolled version
   i := 0;
-  j := 4*ctx.Rounds;
+  j := 4*rounds;
   while i<j do begin
-    x:=TAWk(ctx.RK)[i  ];  TAWk(ctx.RK)[i  ]:=TAWk(ctx.RK)[j  ];  TAWk(ctx.RK)[j  ]:=x;
-    x:=TAWk(ctx.RK)[i+1];  TAWk(ctx.RK)[i+1]:=TAWk(ctx.RK)[j+1];  TAWk(ctx.RK)[j+1]:=x;
-    x:=TAWk(ctx.RK)[i+2];  TAWk(ctx.RK)[i+2]:=TAWk(ctx.RK)[j+2];  TAWk(ctx.RK)[j+2]:=x;
-    x:=TAWk(ctx.RK)[i+3];  TAWk(ctx.RK)[i+3]:=TAWk(ctx.RK)[j+3];  TAWk(ctx.RK)[j+3]:=x;
+    x := k[i];    k[i] := k[j];      k[j] := x;
+    x := k[i+1];  k[i+1] := k[j+1];  k[j+1] := x;
+    x := k[i+2];  k[i+2] := k[j+2];  k[j+2] := x;
+    x := k[i+3];  k[i+3] := k[j+3];  k[j+3] := x;
     inc(i,4);
     dec(j,4);
   end;
-{$endif}
-  for i := 1 to ctx.Rounds-1 do begin
-    x  := TAWk(ctx.RK)[i*4  ];
-    TAWk(ctx.RK)[i*4  ] := Td3[SBox[x shr 24]] xor Td2[SBox[x shr 16 and $ff]]
-      xor Td1[SBox[x shr 8 and $ff]] xor Td0[SBox[x and $ff]];
-    x  := TAWk(ctx.RK)[i*4+1];
-    TAWk(ctx.RK)[i*4+1] := Td3[SBox[x shr 24]] xor Td2[SBox[x shr 16 and $ff]]
-      xor Td1[SBox[x shr 8 and $ff]] xor Td0[SBox[x and $ff]];
-    x  := TAWk(ctx.RK)[i*4+2];
-    TAWk(ctx.RK)[i*4+2] := Td3[SBox[x shr 24]] xor Td2[SBox[x shr 16 and $ff]]
-      xor Td1[SBox[x shr 8 and $ff]] xor Td0[SBox[x and $ff]];
-    x  := TAWk(ctx.RK)[i*4+3];
-    TAWk(ctx.RK)[i*4+3] := Td3[SBox[x shr 24]] xor Td2[SBox[x shr 16 and $ff]]
-      xor Td1[SBox[x shr 8 and $ff]] xor Td0[SBox[x and $ff]];
-  end;
+  {$endif}
+  t := @Td0;
+  s := @SBox;
+  repeat
+    inc(PByte(k),16);
+    dec(rounds);
+    x := k[0];
+    k[0] := t[$300+s[x shr 24]] xor t[$200+s[x shr 16 and $ff]] xor
+            t[$100+s[x shr 8 and $ff]] xor t[s[x and $ff]];
+    x := k[1];
+    k[1] := t[$300+s[x shr 24]] xor t[$200+s[x shr 16 and $ff]] xor
+            t[$100+s[x shr 8 and $ff]] xor t[s[x and $ff]];
+    x := k[2];
+    k[2] := t[$300+s[x shr 24]] xor t[$200+s[x shr 16 and $ff]] xor
+            t[$100+s[x shr 8 and $ff]] xor t[s[x and $ff]];
+    x := k[3];
+    k[3] := t[$300+s[x shr 24]] xor t[$200+s[x shr 16 and $ff]] xor
+            t[$100+s[x shr 8 and $ff]] xor t[s[x and $ff]];
+  until rounds=1;
 end;
+
+function TAES.DecryptInitFrom(const Encryption{$ifndef DELPHI5OROLDER}: TAES{$endif};
+  const Key; KeySize: cardinal): boolean;
 var ctx: TAESContext absolute Context;
 begin
   {$ifdef USEPADLOCK}
   if DoPadlockInit(Key,KeySize) then begin
     result := true;
     ctx.Initialized := true;
+    ctx.DoBlock := @aesdecryptpadlock;
     exit; // Init OK
   end;
   {$endif}
-  result := EncryptInit(Key, KeySize); // contains Initialized := true
+  ctx.Initialized := false;
+  if not {$ifdef DELPHI5OROLDER}TAES{$endif}(Encryption).Initialized then
+    // e.g. called from DecryptInit()
+    EncryptInit(Key, KeySize) else // contains Initialized := true
+    self := {$ifdef DELPHI5OROLDER}TAES{$endif}(Encryption);
+  result := ctx.Initialized;
   if not result then
     exit;
-  {$ifdef USEAESNI}
-  if Assigned(ctx.AESNI) then
-    MakeDecrKeyAesNi(ctx.Rounds,@ctx.RK) else
+  {$ifdef CPUX86_NOTPIC}
+  ctx.DoBlock := @aesdecrypt386;
+  {$else}
+  ctx.DoBlock := @aesdecryptpas;
   {$endif}
-    MakeDecrKey(ctx);
+  {$ifdef USEAESNI}
+  if cfAESNI in CpuFeatures then begin
+    MakeDecrKeyAesNi(ctx.Rounds,@ctx.RK);
+    case KeySize of
+    128: ctx.DoBlock := @aesnidecrypt128;
+    192: ctx.DoBlock := @aesnidecrypt192;
+    256: ctx.DoBlock := @aesnidecrypt256;
+    end;
+  end else
+  {$endif}
+    MakeDecrKey(ctx.Rounds,@ctx.RK);
+end;
+
+function TAES.DecryptInit(const Key; KeySize: cardinal): boolean;
+begin
+  result := DecryptInitFrom(self, Key, KeySize);
 end;
 
 procedure TAES.Decrypt(var B: TAESBlock);
 begin
-  Decrypt(B,B);
+  TAESContext(Context).DoBlock(Context,B,B);
 end;
 
 procedure TAES.Decrypt(const BI: TAESBlock; var BO: TAESBlock);
-// decrypt one block (in ECB mode)
-{$ifdef AESPASCAL_OR_CPU64}
-var
-  ctx: TAESContext absolute Context;
-  s0,s1,s2,s3: cardinal;    {TAESBlock s as separate variables}
-  t0,t1,t2: cardinal;    {TAESBlock t as separate variables}
-{$ifdef AES_ROLLED}
-  i: integer;
-  pK: PWA4;
-{$else}
-  t3: cardinal;
-  pK: PAWk;                 {pointer to loop rount key   }
-{$endif}
 begin
-{$ifdef USEAESNI64}
-  if Assigned(ctx.AesNi) then begin
-    AesNiDecrypt(ctx,BI,BO);
-    exit;
-  end;
-{$endif USEAESNI64}
-{$ifdef USEPADLOCK}
-  if ctx.ViaCtx<>nil then begin
-    padlock_aes_decrypt(ctx.ViaCtx,@BI,@BO,16);
-    exit;
-  end;
-{$endif}
-{$ifdef AES_ROLLED}
-  // Wolfgang Ehrhardt rolled version - faster on modern CPU than unrolled one below
-  // Setup key pointer
-  pK := PWA4(@ctx.RK[ctx.Rounds]);
-  // Initialize with input block
-  s0 := TWA4(BI)[0] xor pK^[0];
-  s1 := TWA4(BI)[1] xor pK^[1];
-  s2 := TWA4(BI)[2] xor pK^[2];
-  s3 := TWA4(BI)[3] xor pK^[3];
-  dec(pK);
-  for I := 1 to ctx.Rounds-1 do begin
-      t0 := Td0[s0 and $ff] xor Td1[s3 shr 8 and $ff] xor Td2[s2 shr 16 and $ff] xor Td3[s1 shr 24];
-      t1 := Td0[s1 and $ff] xor Td1[s0 shr 8 and $ff] xor Td2[s3 shr 16 and $ff] xor Td3[s2 shr 24];
-      t2 := Td0[s2 and $ff] xor Td1[s1 shr 8 and $ff] xor Td2[s0 shr 16 and $ff] xor Td3[s3 shr 24];
-      s3 := Td0[s3 and $ff] xor Td1[s2 shr 8 and $ff] xor Td2[s1 shr 16 and $ff] xor Td3[s0 shr 24] xor PK[3];
-      s0 := t0 xor PK[0];
-      s1 := t1 xor PK[1];
-      s2 := t2 xor PK[2];
-      dec(pK);
-    end;
-  TWA4(BO)[0] := ((InvSBox[s0        and $ff])        xor
-                  (InvSBox[s3 shr  8 and $ff]) shl  8 xor
-                  (InvSBox[s2 shr 16 and $ff]) shl 16 xor
-                  (InvSBox[s1 shr 24])         shl 24    ) xor pK^[0];
-  TWA4(BO)[1] := ((InvSBox[s1        and $ff])        xor
-                  (InvSBox[s0 shr  8 and $ff]) shl  8 xor
-                  (InvSBox[s3 shr 16 and $ff]) shl 16 xor
-                  (InvSBox[s2 shr 24])         shl 24    ) xor pK^[1];
-  TWA4(BO)[2] := ((InvSBox[s2        and $ff])        xor
-                  (InvSBox[s1 shr  8 and $ff]) shl  8 xor
-                  (InvSBox[s0 shr 16 and $ff]) shl 16 xor
-                  (InvSBox[s3 shr 24])         shl 24    ) xor pK^[2];
-  TWA4(BO)[3] := ((InvSBox[s3        and $ff])        xor
-                  (InvSBox[s2 shr  8 and $ff]) shl  8 xor
-                  (InvSBox[s1 shr 16 and $ff]) shl 16 xor
-                  (InvSBox[s0 shr 24])         shl 24    ) xor pK^[3];
-{$else} // unrolled version (WE6) from Wolfgang Ehrhardt - slower
-  // Setup key pointer
-  pK := PAWk(@ctx.RK);
-  // Initialize with input block
-  s0 := TWA4(BI)[0] xor pK^[0];
-  s1 := TWA4(BI)[1] xor pK^[1];
-  s2 := TWA4(BI)[2] xor pK^[2];
-  s3 := TWA4(BI)[3] xor pK^[3];
-
-  // Round 1
-  t0 := Td0[s0 and $ff] xor Td1[s3 shr 8 and $ff] xor Td2[s2 shr 16 and $ff] xor Td3[s1 shr 24] xor pK^[4];
-  t1 := Td0[s1 and $ff] xor Td1[s0 shr 8 and $ff] xor Td2[s3 shr 16 and $ff] xor Td3[s2 shr 24] xor pK^[5];
-  t2 := Td0[s2 and $ff] xor Td1[s1 shr 8 and $ff] xor Td2[s0 shr 16 and $ff] xor Td3[s3 shr 24] xor pK^[6];
-  t3 := Td0[s3 and $ff] xor Td1[s2 shr 8 and $ff] xor Td2[s1 shr 16 and $ff] xor Td3[s0 shr 24] xor pK^[7];
-  // Round 2
-  s0 := Td0[t0 and $ff] xor Td1[t3 shr 8 and $ff] xor Td2[t2 shr 16 and $ff] xor Td3[t1 shr 24] xor pK^[8];
-  s1 := Td0[t1 and $ff] xor Td1[t0 shr 8 and $ff] xor Td2[t3 shr 16 and $ff] xor Td3[t2 shr 24] xor pK^[9];
-  s2 := Td0[t2 and $ff] xor Td1[t1 shr 8 and $ff] xor Td2[t0 shr 16 and $ff] xor Td3[t3 shr 24] xor pK^[10];
-  s3 := Td0[t3 and $ff] xor Td1[t2 shr 8 and $ff] xor Td2[t1 shr 16 and $ff] xor Td3[t0 shr 24] xor pK^[11];
-  // Round 3
-  t0 := Td0[s0 and $ff] xor Td1[s3 shr 8 and $ff] xor Td2[s2 shr 16 and $ff] xor Td3[s1 shr 24] xor pK^[12];
-  t1 := Td0[s1 and $ff] xor Td1[s0 shr 8 and $ff] xor Td2[s3 shr 16 and $ff] xor Td3[s2 shr 24] xor pK^[13];
-  t2 := Td0[s2 and $ff] xor Td1[s1 shr 8 and $ff] xor Td2[s0 shr 16 and $ff] xor Td3[s3 shr 24] xor pK^[14];
-  t3 := Td0[s3 and $ff] xor Td1[s2 shr 8 and $ff] xor Td2[s1 shr 16 and $ff] xor Td3[s0 shr 24] xor pK^[15];
-  // Round 4
-  s0 := Td0[t0 and $ff] xor Td1[t3 shr 8 and $ff] xor Td2[t2 shr 16 and $ff] xor Td3[t1 shr 24] xor pK^[16];
-  s1 := Td0[t1 and $ff] xor Td1[t0 shr 8 and $ff] xor Td2[t3 shr 16 and $ff] xor Td3[t2 shr 24] xor pK^[17];
-  s2 := Td0[t2 and $ff] xor Td1[t1 shr 8 and $ff] xor Td2[t0 shr 16 and $ff] xor Td3[t3 shr 24] xor pK^[18];
-  s3 := Td0[t3 and $ff] xor Td1[t2 shr 8 and $ff] xor Td2[t1 shr 16 and $ff] xor Td3[t0 shr 24] xor pK^[19];
-  // Round 5
-  t0 := Td0[s0 and $ff] xor Td1[s3 shr 8 and $ff] xor Td2[s2 shr 16 and $ff] xor Td3[s1 shr 24] xor pK^[20];
-  t1 := Td0[s1 and $ff] xor Td1[s0 shr 8 and $ff] xor Td2[s3 shr 16 and $ff] xor Td3[s2 shr 24] xor pK^[21];
-  t2 := Td0[s2 and $ff] xor Td1[s1 shr 8 and $ff] xor Td2[s0 shr 16 and $ff] xor Td3[s3 shr 24] xor pK^[22];
-  t3 := Td0[s3 and $ff] xor Td1[s2 shr 8 and $ff] xor Td2[s1 shr 16 and $ff] xor Td3[s0 shr 24] xor pK^[23];
-  // Round 6
-  s0 := Td0[t0 and $ff] xor Td1[t3 shr 8 and $ff] xor Td2[t2 shr 16 and $ff] xor Td3[t1 shr 24] xor pK^[24];
-  s1 := Td0[t1 and $ff] xor Td1[t0 shr 8 and $ff] xor Td2[t3 shr 16 and $ff] xor Td3[t2 shr 24] xor pK^[25];
-  s2 := Td0[t2 and $ff] xor Td1[t1 shr 8 and $ff] xor Td2[t0 shr 16 and $ff] xor Td3[t3 shr 24] xor pK^[26];
-  s3 := Td0[t3 and $ff] xor Td1[t2 shr 8 and $ff] xor Td2[t1 shr 16 and $ff] xor Td3[t0 shr 24] xor pK^[27];
-  // Round 7
-  t0 := Td0[s0 and $ff] xor Td1[s3 shr 8 and $ff] xor Td2[s2 shr 16 and $ff] xor Td3[s1 shr 24] xor pK^[28];
-  t1 := Td0[s1 and $ff] xor Td1[s0 shr 8 and $ff] xor Td2[s3 shr 16 and $ff] xor Td3[s2 shr 24] xor pK^[29];
-  t2 := Td0[s2 and $ff] xor Td1[s1 shr 8 and $ff] xor Td2[s0 shr 16 and $ff] xor Td3[s3 shr 24] xor pK^[30];
-  t3 := Td0[s3 and $ff] xor Td1[s2 shr 8 and $ff] xor Td2[s1 shr 16 and $ff] xor Td3[s0 shr 24] xor pK^[31];
-  // Round 8
-  s0 := Td0[t0 and $ff] xor Td1[t3 shr 8 and $ff] xor Td2[t2 shr 16 and $ff] xor Td3[t1 shr 24] xor pK^[32];
-  s1 := Td0[t1 and $ff] xor Td1[t0 shr 8 and $ff] xor Td2[t3 shr 16 and $ff] xor Td3[t2 shr 24] xor pK^[33];
-  s2 := Td0[t2 and $ff] xor Td1[t1 shr 8 and $ff] xor Td2[t0 shr 16 and $ff] xor Td3[t3 shr 24] xor pK^[34];
-  s3 := Td0[t3 and $ff] xor Td1[t2 shr 8 and $ff] xor Td2[t1 shr 16 and $ff] xor Td3[t0 shr 24] xor pK^[35];
-  // Round 9
-  t0 := Td0[s0 and $ff] xor Td1[s3 shr 8 and $ff] xor Td2[s2 shr 16 and $ff] xor Td3[s1 shr 24] xor pK^[36];
-  t1 := Td0[s1 and $ff] xor Td1[s0 shr 8 and $ff] xor Td2[s3 shr 16 and $ff] xor Td3[s2 shr 24] xor pK^[37];
-  t2 := Td0[s2 and $ff] xor Td1[s1 shr 8 and $ff] xor Td2[s0 shr 16 and $ff] xor Td3[s3 shr 24] xor pK^[38];
-  t3 := Td0[s3 and $ff] xor Td1[s2 shr 8 and $ff] xor Td2[s1 shr 16 and $ff] xor Td3[s0 shr 24] xor pK^[39];
-  if ctx.rounds>10 then begin
-    // Round 10
-    s0 := Td0[t0 and $ff] xor Td1[t3 shr 8 and $ff] xor Td2[t2 shr 16 and $ff] xor Td3[t1 shr 24] xor pK^[40];
-    s1 := Td0[t1 and $ff] xor Td1[t0 shr 8 and $ff] xor Td2[t3 shr 16 and $ff] xor Td3[t2 shr 24] xor pK^[41];
-    s2 := Td0[t2 and $ff] xor Td1[t1 shr 8 and $ff] xor Td2[t0 shr 16 and $ff] xor Td3[t3 shr 24] xor pK^[42];
-    s3 := Td0[t3 and $ff] xor Td1[t2 shr 8 and $ff] xor Td2[t1 shr 16 and $ff] xor Td3[t0 shr 24] xor pK^[43];
-    // Round 11
-    t0 := Td0[s0 and $ff] xor Td1[s3 shr 8 and $ff] xor Td2[s2 shr 16 and $ff] xor Td3[s1 shr 24] xor pK^[44];
-    t1 := Td0[s1 and $ff] xor Td1[s0 shr 8 and $ff] xor Td2[s3 shr 16 and $ff] xor Td3[s2 shr 24] xor pK^[45];
-    t2 := Td0[s2 and $ff] xor Td1[s1 shr 8 and $ff] xor Td2[s0 shr 16 and $ff] xor Td3[s3 shr 24] xor pK^[46];
-    t3 := Td0[s3 and $ff] xor Td1[s2 shr 8 and $ff] xor Td2[s1 shr 16 and $ff] xor Td3[s0 shr 24] xor pK^[47];
-    if ctx.rounds>12 then begin
-      // Round 12
-      s0 := Td0[t0 and $ff] xor Td1[t3 shr 8 and $ff] xor Td2[t2 shr 16 and $ff] xor Td3[t1 shr 24] xor pK^[48];
-      s1 := Td0[t1 and $ff] xor Td1[t0 shr 8 and $ff] xor Td2[t3 shr 16 and $ff] xor Td3[t2 shr 24] xor pK^[49];
-      s2 := Td0[t2 and $ff] xor Td1[t1 shr 8 and $ff] xor Td2[t0 shr 16 and $ff] xor Td3[t3 shr 24] xor pK^[50];
-      s3 := Td0[t3 and $ff] xor Td1[t2 shr 8 and $ff] xor Td2[t1 shr 16 and $ff] xor Td3[t0 shr 24] xor pK^[51];
-      // Round 13
-      t0 := Td0[s0 and $ff] xor Td1[s3 shr 8 and $ff] xor Td2[s2 shr 16 and $ff] xor Td3[s1 shr 24] xor pK^[52];
-      t1 := Td0[s1 and $ff] xor Td1[s0 shr 8 and $ff] xor Td2[s3 shr 16 and $ff] xor Td3[s2 shr 24] xor pK^[53];
-      t2 := Td0[s2 and $ff] xor Td1[s1 shr 8 and $ff] xor Td2[s0 shr 16 and $ff] xor Td3[s3 shr 24] xor pK^[54];
-      t3 := Td0[s3 and $ff] xor Td1[s2 shr 8 and $ff] xor Td2[s1 shr 16 and $ff] xor Td3[s0 shr 24] xor pK^[55];
-    end;
-  end;
-  inc(PtrUInt(pK), (ctx.rounds shl 4));
-
-  // Uses InvSbox and shl, needs type cast cardinal() for
-  // 16 bit compilers: here InvSbox is byte, Td4 is cardinal
-  TWA4(BO)[0] := ((InvSBox[t0 and $ff]) xor
-    (InvSBox[t3 shr  8 and $ff]) shl  8 xor
-    (InvSBox[t2 shr 16 and $ff]) shl 16 xor
-    (InvSBox[t1 shr 24]) shl 24) xor pK^[0];
-  TWA4(BO)[1] := ((InvSBox[t1 and $ff]) xor
-    (InvSBox[t0 shr  8 and $ff]) shl  8 xor
-    (InvSBox[t3 shr 16 and $ff]) shl 16 xor
-    (InvSBox[t2 shr 24]) shl 24) xor pK^[1];
-  TWA4(BO)[2] := ((InvSBox[t2 and $ff]) xor
-    (InvSBox[t1 shr  8 and $ff]) shl  8 xor
-    (InvSBox[t0 shr 16 and $ff]) shl 16 xor
-    (InvSBox[t3 shr 24]) shl 24) xor pK^[2];
-  TWA4(BO)[3] := ((InvSBox[t3 and $ff]) xor
-    (InvSBox[t2 shr  8 and $ff]) shl  8 xor
-    (InvSBox[t1 shr 16 and $ff]) shl 16 xor
-    (InvSBox[t0 shr 24]) shl 24) xor pK^[3];
-{$endif AES_ROLLED}
+  TAESContext(Context).DoBlock(Context,BI,BO);
 end;
-{$else}
-asm // eax=TAES(self)=TAESContext edx=BI ecx=BO
-{$ifdef USEAESNI}
-  // AES-NI hardware accelerated version by A. Bouchez
-  cmp dword ptr [eax].TAESContext.AesNi,0
-  je @noAesNi
-  movdqu xmm7,[edx]
-  mov dl,[eax].TAESContext.Rounds
-  cmp dl,10
-  je @128
-  cmp dl,12
-  je @192
-@256:
-  movdqu xmm0,[eax+16*14]
-  movdqu xmm1,[eax+16*13]
-  movdqu xmm2,[eax+16*12]
-  movdqu xmm3,[eax+16*11]
-  movdqu xmm4,[eax+16*10]
-  movdqu xmm5,[eax+16*9]
-  movdqu xmm6,[eax+16*8]
-  pxor xmm7,xmm0
-  {$ifdef HASAESNI}
-  aesdec xmm7,xmm1
-  aesdec xmm7,xmm2
-  aesdec xmm7,xmm3
-  aesdec xmm7,xmm4
-  aesdec xmm7,xmm5
-  aesdec xmm7,xmm6
-  {$else}
-  db $66,$0F,$38,$DE,$F9
-  db $66,$0F,$38,$DE,$FA
-  db $66,$0F,$38,$DE,$FB
-  db $66,$0F,$38,$DE,$FC
-  db $66,$0F,$38,$DE,$FD
-  db $66,$0F,$38,$DE,$FE
-  {$endif}
-  movdqu xmm0,[eax+16*7]
-  movdqu xmm1,[eax+16*6]
-  movdqu xmm2,[eax+16*5]
-  movdqu xmm3,[eax+16*4]
-  movdqu xmm4,[eax+16*3]
-  movdqu xmm5,[eax+16*2]
-  movdqu xmm6,[eax+16*1]
-  {$ifdef HASAESNI}
-  aesdec xmm7,xmm0
-  aesdec xmm7,xmm1
-  aesdec xmm7,xmm2
-  aesdec xmm7,xmm3
-  aesdec xmm7,xmm4
-  aesdec xmm7,xmm5
-  aesdec xmm7,xmm6
-  {$else}
-  db $66,$0F,$38,$DE,$F8
-  db $66,$0F,$38,$DE,$F9
-  db $66,$0F,$38,$DE,$FA
-  db $66,$0F,$38,$DE,$FB
-  db $66,$0F,$38,$DE,$FC
-  db $66,$0F,$38,$DE,$FD
-  db $66,$0F,$38,$DE,$FE
-  {$endif}
-  movdqu xmm0,[eax+16*0]
-  {$ifdef HASAESNI}
-  aesdeclast xmm7,xmm0
-  {$else}
-  db $66,$0F,$38,$DF,$F8
-  {$endif}
-  movdqu [ecx],xmm7
-  ret
-@192:
-  movdqu xmm0,[eax+16*12]
-  movdqu xmm1,[eax+16*11]
-  movdqu xmm2,[eax+16*10]
-  movdqu xmm3,[eax+16*9]
-  movdqu xmm4,[eax+16*8]
-  movdqu xmm5,[eax+16*7]
-  movdqu xmm6,[eax+16*6]
-  pxor xmm7,xmm0
-  {$ifdef HASAESNI}
-  aesdec xmm7,xmm1
-  aesdec xmm7,xmm2
-  aesdec xmm7,xmm3
-  aesdec xmm7,xmm4
-  aesdec xmm7,xmm5
-  aesdec xmm7,xmm6
-  {$else}
-  db $66,$0F,$38,$DE,$F9
-  db $66,$0F,$38,$DE,$FA
-  db $66,$0F,$38,$DE,$FB
-  db $66,$0F,$38,$DE,$FC
-  db $66,$0F,$38,$DE,$FD
-  db $66,$0F,$38,$DE,$FE
-  {$endif}
-  movdqu xmm0,[eax+16*5]
-  movdqu xmm1,[eax+16*4]
-  movdqu xmm2,[eax+16*3]
-  movdqu xmm3,[eax+16*2]
-  movdqu xmm4,[eax+16*1]
-  movdqu xmm5,[eax+16*0]
-  {$ifdef HASAESNI}
-  aesdec xmm7,xmm0
-  aesdec xmm7,xmm1
-  aesdec xmm7,xmm2
-  aesdec xmm7,xmm3
-  aesdec xmm7,xmm4
-  aesdeclast xmm7,xmm5
-  {$else}
-  db $66,$0F,$38,$DE,$F8
-  db $66,$0F,$38,$DE,$F9
-  db $66,$0F,$38,$DE,$FA
-  db $66,$0F,$38,$DE,$FB
-  db $66,$0F,$38,$DE,$FC
-  db $66,$0F,$38,$DF,$FD
-  {$endif}
-  movdqu [ecx],xmm7
-  ret
-@128:
-  movdqu xmm0,[eax+16*10]
-  movdqu xmm1,[eax+16*9]
-  movdqu xmm2,[eax+16*8]
-  movdqu xmm3,[eax+16*7]
-  movdqu xmm4,[eax+16*6]
-  movdqu xmm5,[eax+16*5]
-  movdqu xmm6,[eax+16*4]
-  pxor xmm7,xmm0
-  {$ifdef HASAESNI}
-  aesdec xmm7,xmm1
-  aesdec xmm7,xmm2
-  aesdec xmm7,xmm3
-  aesdec xmm7,xmm4
-  {$else}
-  db $66,$0F,$38,$DE,$F9
-  db $66,$0F,$38,$DE,$FA
-  db $66,$0F,$38,$DE,$FB
-  db $66,$0F,$38,$DE,$FC
-  {$endif}
-  movdqu xmm0,[eax+16*3]
-  movdqu xmm1,[eax+16*2]
-  movdqu xmm2,[eax+16*1]
-  movdqu xmm3,[eax+16*0]
-  {$ifdef HASAESNI}
-  aesdec xmm7,xmm5
-  aesdec xmm7,xmm6
-  aesdec xmm7,xmm0
-  aesdec xmm7,xmm1
-  aesdec xmm7,xmm2
-  aesdeclast xmm7,xmm3
-  {$else}
-  db $66,$0F,$38,$DE,$FD
-  db $66,$0F,$38,$DE,$FE
-  db $66,$0F,$38,$DE,$F8
-  db $66,$0F,$38,$DE,$F9
-  db $66,$0F,$38,$DE,$FA
-  db $66,$0F,$38,$DF,$FB
-  {$endif}
-  movdqu [ecx],xmm7
-  ret
-@noAesNi:
-{$endif USEAESNI}
-// rolled optimized decryption asm version by A. Bouchez
-{$ifdef USEPADLOCK}
-  cmp dword [eax].TAESContext.ViaCtx,0
-  jz @DoAsm
-  mov eax,[eax].TAESContext.ViaCtx
-  push 16
-  push ecx
-  push edx
-  push eax           // padlock_aes_decrypt(ctx.ViaCtx,@BI,@BO,16);
-{$ifdef USEPADLOCKDLL}
-  call dword ptr [padlock_aes_decrypt]
-{$else}
-  call padlock_aes_decrypt
-{$endif}
-  add esp,16 // padlock_aes_decrypt is cdecl -> caller must restore stack
-  ret
-@DoAsm:
-{$endif USEPADLOCK}
-  push ebx
-  push esi
-  push edi
-  push ebp
-  add esp,-20
-  mov [esp],ecx
-  movzx ecx,byte ptr [eax].TAESContext.Rounds
-  lea esi,[4*ecx]
-  lea ecx,[ecx-1]
-  lea eax,[eax+4*esi] // eax=@ctx.rk[ctx.rounds]=pk
-  mov [esp+16],ecx // [esp+16]=ctx.round
-  mov ebx,[edx]
-  xor ebx,[eax]
-  mov esi,[edx+4]
-  xor esi,[eax+4]
-  mov ecx,[edx+8]
-  xor ecx,[eax+8]
-  mov edx,[edx+12]
-  xor edx,[eax+12]
-  lea eax,[eax-16]
-@1: // pk=eax s0=ebx s1=esi s2=ecx s3=edx
-  movzx edi,bl
-  mov edi,[4*edi+td0]
-  movzx ebp,dh
-  xor edi,[4*ebp+td1]
-  mov ebp,ecx
-  shr ebp,$10
-  and ebp,255
-  xor edi,[4*ebp+td2]
-  mov ebp,esi
-  shr ebp,$18
-  xor edi,[4*ebp+td3]
-  mov [esp+4],edi
-  mov edi,esi
-  and edi,255
-  mov edi,[4*edi+td0]
-  movzx ebp,bh
-  xor edi,[4*ebp+td1]
-  mov ebp,edx
-  shr ebp,$10
-  and ebp,255
-  xor edi,[4*ebp+td2]
-  mov ebp,ecx
-  shr ebp,$18
-  xor edi,[4*ebp+td3]
-  mov [esp+8],edi
-  movzx edi,cl
-  mov edi,[4*edi+td0]
-  movzx ebp,si
-  shr ebp,$08
-  xor edi,[4*ebp+td1]
-  mov ebp,ebx
-  shr ebp,$10
-  and ebp,255
-  xor edi,[4*ebp+td2]
-  mov ebp,edx
-  shr ebp,$18
-  xor edi,[4*ebp+td3]
-  mov [esp+12],edi
-  and edx,255
-  mov edx,[4*edx+td0]
-  movzx ecx,ch
-  xor edx,[4*ecx+td1]
-  shr esi,$10
-  and esi,255
-  xor edx,[4*esi+td2]
-  shr ebx,$18
-  xor edx,[4*ebx+td3]
-  xor edx,[eax+12]
-  mov ebx,[eax]
-  xor ebx,[esp+4]
-  mov esi,[eax+4]
-  xor esi,[esp+8]
-  mov ecx,[eax+8]
-  xor ecx,[esp+12]
-  lea eax,[eax-16]
-  dec byte ptr [esp+16]
-  jnz @1
 
-  mov ebp,eax
-  movzx eax,bl
-  movzx eax,byte ptr [eax+InvSBox]
-  movzx edi,dh
-  movzx edi,byte ptr [edi+InvSBox]
-  shl edi,$08
-  xor eax,edi
-  mov edi,ecx
-  shr edi,$10
-  and edi,255
-  movzx edi,byte ptr [edi+InvSBox]
-  shl edi,$10
-  xor eax,edi
-  mov edi,esi
-  shr edi,$18
-  movzx edi,byte ptr [edi+InvSBox]
-  shl edi,$18
-  xor eax,edi
-  xor eax,[ebp]
-  mov edi,[esp]
-  mov [edi],eax
-  mov eax,esi
-  and eax,255
-  movzx eax,byte ptr [eax+InvSBox]
-  movzx edi,bh
-  movzx edi,byte ptr [edi+InvSBox]
-  shl edi,$08
-  xor eax,edi
-  mov edi,edx
-  shr edi,$10
-  and edi,255
-  movzx edi,byte ptr [edi+InvSBox]
-  shl edi,$10
-  xor eax,edi
-  mov edi,ecx
-  shr edi,$18
-  movzx edi,byte ptr [edi+InvSBox]
-  shl edi,$18
-  xor eax,edi
-  xor eax,[ebp+4]
-  mov edi,[esp]
-  mov [edi+4],eax
-  movzx eax,cl
-  movzx eax,byte ptr [eax+InvSBox]
-  movzx edi,si
-  shr edi,$08
-  movzx edi,byte ptr [edi+InvSBox]
-  shl edi,$08
-  xor eax,edi
-  mov edi,ebx
-  shr edi,$10
-  and edi,255
-  movzx edi,byte ptr [edi+InvSBox]
-  shl edi,$10
-  xor eax,edi
-  mov edi,edx
-  shr edi,$18
-  movzx edi,byte ptr [edi+InvSBox]
-  shl edi,$18
-  xor eax,edi
-  xor eax,[ebp+8]
-  mov edi,[esp]
-  mov [edi+8],eax
-  and edx,255
-  movzx eax,byte ptr [edx+InvSBox]
-  shr ecx,$08
-  and ecx,255
-  movzx edx,byte ptr [ecx+InvSBox]
-  shl edx,$08
-  xor eax,edx
-  shr esi,$10
-  and esi,255
-  movzx edx,byte ptr [esi+InvSBox]
-  shl edx,$10
-  xor eax,edx
-  shr ebx,$18
-  movzx edx,byte ptr [ebx+InvSBox]
-  shl edx,$18
-  xor eax,edx
-  xor eax,[ebp+12]
-  mov [edi+12],eax
-  add esp,20
-  pop ebp
-  pop edi
-  pop esi
-  pop ebx
-end;
-{$endif AESPASCAL_OR_CPU64}
-
-procedure TAES.DoBlocks(pIn, pOut: PAESBlock;
-  out oIn, oOut: PAESBLock; Count: integer; doEncrypt: Boolean);
+procedure TAES.DoBlocks(pIn, pOut: PAESBlock; out oIn, oOut: PAESBLock;
+  Count: integer; doEncrypt: boolean);
 var i: integer;
     ctx: TAESContext absolute Context;
 begin
@@ -5770,14 +6085,8 @@ begin
     exit;
   end;
 {$endif}
-  if doEncrypt then
   for i := 1 to Count do begin
-    Encrypt(pIn^,pOut^);
-    inc(pIn);
-    inc(pOut);
-  end else
-  for i := 1 to Count do begin
-    Decrypt(pIn^,pOut^);
+    ctx.DoBlock(ctx,pIn^,pOut^);
     inc(pIn);
     inc(pOut);
   end;
@@ -5797,6 +6106,19 @@ begin
   DoBlocks(pIn,pOut,pIn,pOut,Count,doEncrypt);
 end;
 
+procedure TAES.DoBlocksOFB(const iv: TAESBlock; src, dst: pointer; blockcount: PtrUInt);
+var cv: TAESBlock;
+begin
+  cv := iv;
+  while blockcount > 0 do begin
+    dec(blockcount);
+    TAESContext(Context).DoBlock(Context,cv,cv);
+    XorBlock16(src,dst,pointer(@cv));
+    inc(PByte(src),SizeOf(TAESBlock));
+    inc(PByte(dst),SizeOf(TAESBlock));
+  end;
+end;
+
 function TAES.Initialized: boolean;
 begin
   result := TAESContext(Context).Initialized;
@@ -5811,15 +6133,17 @@ begin
   {$endif}
 end;
 
+function TAES.KeyBits: integer;
+begin
+  result := TAESContext(Context).KeyBits;
+end;
+
 procedure TAES.Done;
 var ctx: TAESContext absolute Context;
 begin
   {$ifdef USEPADLOCK}
-  if Initialized and padlock_available and (ctx.ViaCtx<>nil) then begin
+  if Initialized and padlock_available and (ctx.ViaCtx<>nil) then
     padlock_aes_close(ctx.ViaCtx);
-    ctx.Initialized := false;
-    ctx.ViaCtx := nil;
-  end;
   {$endif USEPADLOCK}
   FillcharFast(ctx,sizeof(ctx),0); // always erase key in memory after use
 end;
@@ -5921,108 +6245,186 @@ begin
     {$endif}
 end;
 {$else}
-{$ifdef CPUX86}
+{$ifdef CPUX86} {$ifdef FPC} nostackframe; assembler; {$endif}
 asm // W=eax Buf=edx
-     push  esi
-     push  edi
-     push  ebx
-     mov   esi,eax
-     // part 1: W[i]:= RB(TW32Buf(Buf)[i])
-     mov eax,[edx];    mov ebx,[edx+ 4]; bswap eax; bswap ebx; mov [esi  ],eax;  mov [esi+ 4],ebx
-     mov eax,[edx+8];  mov ebx,[edx+12]; bswap eax; bswap ebx; mov [esi+8],eax;  mov [esi+12],ebx
-     mov eax,[edx+16]; mov ebx,[edx+20]; bswap eax; bswap ebx; mov [esi+16],eax; mov [esi+20],ebx
-     mov eax,[edx+24]; mov ebx,[edx+28]; bswap eax; bswap ebx; mov [esi+24],eax; mov [esi+28],ebx
-     mov eax,[edx+32]; mov ebx,[edx+36]; bswap eax; bswap ebx; mov [esi+32],eax; mov [esi+36],ebx
-     mov eax,[edx+40]; mov ebx,[edx+44]; bswap eax; bswap ebx; mov [esi+40],eax; mov [esi+44],ebx
-     mov eax,[edx+48]; mov ebx,[edx+52]; bswap eax; bswap ebx; mov [esi+48],eax; mov [esi+52],ebx
-     mov eax,[edx+56]; mov ebx,[edx+60]; bswap eax; bswap ebx; mov [esi+56],eax; mov [esi+60],ebx
-     lea esi,[esi+64]
-     // part2: W[i]:= LRot_1(W[i-3] xor W[i-8] xor W[i-14] xor W[i-16]);
-     mov   ecx,48
-@@2: mov   eax,[esi-2*4]    // W[i-2]
-     mov   edi,[esi-7*4]    // W[i-7]
-     mov   edx,eax
-     mov   ebx,eax          // Sig1: RR17 xor RR19 xor SRx,10
-     ror   eax,17
-     ror   edx,19
-     shr   ebx,10
-     xor   eax,edx
-     xor   eax,ebx
-     add   edi,eax
-     mov   eax,[esi-15*4]   // W[i-15]
-     mov   ebx,eax          // Sig0: RR7 xor RR18 xor SR3
-     mov   edx,eax
-     ror   eax,7
-     ror   edx,18
-     shr   ebx,3
-     xor   eax,edx
-     xor   eax,ebx
-     add   eax,edi
-     add   eax,[esi-16*4]   // W[i-16]
-     mov   [esi],eax
-     add   esi,4
-     dec   ecx
-     jnz   @@2
-     pop   ebx
-     pop   edi
-     pop   esi
+        push    esi
+        push    edi
+        push    ebx
+        mov     esi, eax
+        // part 1: W[i]:= RB(TW32Buf(Buf)[i])
+        mov     eax, [edx]
+        mov     ebx, [edx + 4]
+        bswap   eax
+        bswap   ebx
+        mov     [esi], eax
+        mov     [esi + 4], ebx
+        mov     eax, [edx + 8]
+        mov     ebx, [edx + 12]
+        bswap   eax
+        bswap   ebx
+        mov     [esi + 8], eax
+        mov     [esi + 12], ebx
+        mov     eax, [edx + 16]
+        mov     ebx, [edx + 20]
+        bswap   eax
+        bswap   ebx
+        mov     [esi + 16], eax
+        mov     [esi + 20], ebx
+        mov     eax, [edx + 24]
+        mov     ebx, [edx + 28]
+        bswap   eax
+        bswap   ebx
+        mov     [esi + 24], eax
+        mov     [esi + 28], ebx
+        mov     eax, [edx + 32]
+        mov     ebx, [edx + 36]
+        bswap   eax
+        bswap   ebx
+        mov     [esi + 32], eax
+        mov     [esi + 36], ebx
+        mov     eax, [edx + 40]
+        mov     ebx, [edx + 44]
+        bswap   eax
+        bswap   ebx
+        mov     [esi + 40], eax
+        mov     [esi + 44], ebx
+        mov     eax, [edx + 48]
+        mov     ebx, [edx + 52]
+        bswap   eax
+        bswap   ebx
+        mov     [esi + 48], eax
+        mov     [esi + 52], ebx
+        mov     eax, [edx + 56]
+        mov     ebx, [edx + 60]
+        bswap   eax
+        bswap   ebx
+        mov     [esi + 56], eax
+        mov     [esi + 60], ebx
+        lea     esi, [esi + 64]
+        // part2: w[i]:= lrot_1(w[i-3] xor w[i-8] xor w[i-14] xor w[i-16])
+        mov     ecx, 48
+@@2:    mov     eax, [esi - 2 * 4]    // w[i-2]
+        mov     edi, [esi - 7 * 4]    // w[i-7]
+        mov     edx, eax
+        mov     ebx, eax              // sig1: rr17 xor rr19 xor srx,10
+        ror     eax, 17
+        ror     edx, 19
+        shr     ebx, 10
+        xor     eax, edx
+        xor     eax, ebx
+        add     edi, eax
+        mov     eax, [esi - 15 * 4]   // w[i-15]
+        mov     ebx, eax              // sig0: rr7 xor rr18 xor sr3
+        mov     edx, eax
+        ror     eax, 7
+        ror     edx, 18
+        shr     ebx, 3
+        xor     eax, edx
+        xor     eax, ebx
+        add     eax, edi
+        add     eax, [esi - 16 * 4]   // w[i-16]
+        mov     [esi], eax
+        add     esi, 4
+        dec     ecx
+        jnz     @@2
+        pop     ebx
+        pop     edi
+        pop     esi
 end;
 {$endif CPUX86}
 {$ifdef CPUX64}
-{$ifdef FPC}nostackframe; assembler;
-asm
-{$else}
+{$ifdef FPC}nostackframe; assembler; asm{$else}
 asm // W=rcx Buf=rdx
   .noframe
 {$endif}
      {$ifndef win64}
-     mov   rdx,rsi
-     mov   rcx,rdi
+        mov     rdx, rsi
+        mov     rcx, rdi
      {$endif win64}
-     mov   rax,rcx
-     push  rsi
-     push  rdi
-     push  rbx
-     mov   rsi,rax
-     // part 1: W[i]:= RB(TW32Buf(Buf)[i])
-     mov eax,[rdx];    mov ebx,[rdx+ 4]; bswap eax; bswap ebx; mov [rsi  ],eax;  mov [rsi+ 4],ebx
-     mov eax,[rdx+8];  mov ebx,[rdx+12]; bswap eax; bswap ebx; mov [rsi+8],eax;  mov [rsi+12],ebx
-     mov eax,[rdx+16]; mov ebx,[rdx+20]; bswap eax; bswap ebx; mov [rsi+16],eax; mov [rsi+20],ebx
-     mov eax,[rdx+24]; mov ebx,[rdx+28]; bswap eax; bswap ebx; mov [rsi+24],eax; mov [rsi+28],ebx
-     mov eax,[rdx+32]; mov ebx,[rdx+36]; bswap eax; bswap ebx; mov [rsi+32],eax; mov [rsi+36],ebx
-     mov eax,[rdx+40]; mov ebx,[rdx+44]; bswap eax; bswap ebx; mov [rsi+40],eax; mov [rsi+44],ebx
-     mov eax,[rdx+48]; mov ebx,[rdx+52]; bswap eax; bswap ebx; mov [rsi+48],eax; mov [rsi+52],ebx
-     mov eax,[rdx+56]; mov ebx,[rdx+60]; bswap eax; bswap ebx; mov [rsi+56],eax; mov [rsi+60],ebx
-     lea rsi,[rsi+64]
-     // part2: W[i]:= LRot_1(W[i-3] xor W[i-8] xor W[i-14] xor W[i-16]);
-     mov   ecx,48
-@@2: mov   eax,[rsi-2*4]    // W[i-2]
-     mov   edi,[rsi-7*4]    // W[i-7]
-     mov   edx,eax
-     mov   ebx,eax          // Sig1: RR17 xor RR19 xor SRx,10
-     ror   eax,17
-     ror   edx,19
-     shr   ebx,10
-     xor   eax,edx
-     xor   eax,ebx
-     add   edi,eax
-     mov   eax,[rsi-15*4]   // W[i-15]
-     mov   ebx,eax          // Sig0: RR7 xor RR18 xor SR3
-     mov   edx,eax
-     ror   eax,7
-     ror   edx,18
-     shr   ebx,3
-     xor   eax,edx
-     xor   eax,ebx
-     add   eax,edi
-     add   eax,[rsi-16*4]   // W[i-16]
-     mov   [rsi],eax
-     add   rsi,4
-     dec   ecx
-     jnz   @@2
-     pop   rbx
-     pop   rdi
-     pop   rsi
+        mov     rax, rcx
+        push    rsi
+        push    rdi
+        push    rbx
+        mov     rsi, rax
+        // part 1: W[i]:= RB(TW32Buf(Buf)[i])
+        mov     eax, [rdx]
+        mov     ebx, [rdx + 4]
+        bswap   eax
+        bswap   ebx
+        mov     [rsi], eax
+        mov     [rsi + 4], ebx
+        mov     eax, [rdx + 8]
+        mov     ebx, [rdx + 12]
+        bswap   eax
+        bswap   ebx
+        mov     [rsi + 8], eax
+        mov     [rsi + 12], ebx
+        mov     eax, [rdx + 16]
+        mov     ebx, [rdx + 20]
+        bswap   eax
+        bswap   ebx
+        mov     [rsi + 16], eax
+        mov     [rsi + 20], ebx
+        mov     eax, [rdx + 24]
+        mov     ebx, [rdx + 28]
+        bswap   eax
+        bswap   ebx
+        mov     [rsi + 24], eax
+        mov     [rsi + 28], ebx
+        mov     eax, [rdx + 32]
+        mov     ebx, [rdx + 36]
+        bswap   eax
+        bswap   ebx
+        mov     [rsi + 32], eax
+        mov     [rsi + 36], ebx
+        mov     eax, [rdx + 40]
+        mov     ebx, [rdx + 44]
+        bswap   eax
+        bswap   ebx
+        mov     [rsi + 40], eax
+        mov     [rsi + 44], ebx
+        mov     eax, [rdx + 48]
+        mov     ebx, [rdx + 52]
+        bswap   eax
+        bswap   ebx
+        mov     [rsi + 48], eax
+        mov     [rsi + 52], ebx
+        mov     eax, [rdx + 56]
+        mov     ebx, [rdx + 60]
+        bswap   eax
+        bswap   ebx
+        mov     [rsi + 56], eax
+        mov     [rsi + 60], ebx
+        lea     rsi, [rsi + 64]
+        // part2: W[i]:= LRot_1(W[i-3] xor W[i-8] xor W[i-14] xor W[i-16])
+        mov     ecx, 48
+@@2:    mov     eax, [rsi - 2 * 4]    // W[i-2]
+        mov     edi, [rsi - 7 * 4]    // W[i-7]
+        mov     edx, eax
+        mov     ebx, eax          // Sig1: RR17 xor RR19 xor SRx,10
+        ror     eax, 17
+        ror     edx, 19
+        shr     ebx, 10
+        xor     eax, edx
+        xor     eax, ebx
+        add     edi, eax
+        mov     eax, [rsi - 15 * 4]   // W[i-15]
+        mov     ebx, eax          // Sig0: RR7 xor RR18 xor SR3
+        mov     edx, eax
+        ror     eax, 7
+        ror     edx, 18
+        shr     ebx, 3
+        xor     eax, edx
+        xor     eax, ebx
+        add     eax, edi
+        add     eax, [rsi - 16 * 4]   // W[i-16]
+        mov     [rsi], eax
+        add     rsi, 4
+        dec     ecx
+        jnz     @@2
+        pop     rbx
+        pop     rdi
+        pop     rsi
 end;
 {$endif CPUX64}
 {$endif AES_PASCAL}
@@ -6045,29 +6447,21 @@ const
 // optimized unrolled version from Intel's sha256_sse4.asm
 //  Original code is released as Copyright (c) 2012, Intel Corporation
 var
-  K256Aligned: RawByteString; // movdqa + paddd do expect 16 bytes alignment
-
+  K256AlignedStore: RawByteString;
+  K256Aligned: pointer; // movaps + paddd do expect 16 bytes alignment
 const
-  PSHUFFLE_BYTE_FLIP_MASK: array[0..1] of QWord =
-    (QWord($0405060700010203),QWord($0C0D0E0F08090A0B));
-  _SHUF_00BA: array[0..1] of QWord =
-    (QWord($0B0A090803020100),QWord($FFFFFFFFFFFFFFFF));
-  _SHUF_DC00: array[0..1] of QWord =
-    (QWord($FFFFFFFFFFFFFFFF),QWord($B0A090803020100));
   STACK_SIZE = 32{$ifndef LINUX}+7*16{$endif};
 
 procedure sha256_sse4(var input_data; var digest; num_blks: PtrUInt);
-{$ifdef FPC}nostackframe; assembler;
-asm
-{$else}
+{$ifdef FPC}nostackframe; assembler; asm{$else}
 asm // rcx=input_data rdx=digest r8=num_blks (Linux: rdi,rsi,rdx)
-        .NOFRAME
+        .noframe
 {$endif FPC}
         push    rbx
         {$ifdef LINUX}
-        mov     r8,rdx
-        mov     rcx,rdi
-        mov     rdx,rsi
+        mov     r8, rdx
+        mov     rcx, rdi
+        mov     rdx, rsi
         {$else}
         push    rsi   // Win64 expects those registers to be preserved
         push    rdi
@@ -6076,926 +6470,925 @@ asm // rcx=input_data rdx=digest r8=num_blks (Linux: rdi,rsi,rdx)
         push    r13
         push    r14
         push    r15
-        sub     rsp,STACK_SIZE
+        sub     rsp, STACK_SIZE
         {$ifndef LINUX}
-        movdqa  [rsp+20H],xmm6    // manual .PUSHNV for FPC compatibility
-        movdqa  [rsp+30H],xmm7
-        movdqa  [rsp+40H],xmm8
-        movdqa  [rsp+50H],xmm9
-        movdqa  [rsp+60H],xmm10
-        movdqa  [rsp+70H],xmm11
-        movdqa  [rsp+80H],xmm12
+        movaps  [rsp + 20H], xmm6    // manual .PUSHNV for FPC compatibility
+        movaps  [rsp + 30H], xmm7
+        movaps  [rsp + 40H], xmm8
+        movaps  [rsp + 50H], xmm9
+        movaps  [rsp + 60H], xmm10
+        movaps  [rsp + 70H], xmm11
+        movaps  [rsp + 80H], xmm12
         {$endif}
-        shl     r8,6
+        shl     r8, 6
         je      @done
-        add     r8,rcx
-        mov     [rsp],r8
-        mov     eax,[rdx]
-        mov     ebx,[rdx+4H]
-        mov     edi,[rdx+8H]
-        mov     esi,[rdx+0CH]
-        mov     r8d,[rdx+10H]
-        mov     r9d,[rdx+14H]
-        mov     r10d,[rdx+18H]
-        mov     r11d,[rdx+1CH]
-        movdqu  xmm12,[rip+PSHUFFLE_BYTE_FLIP_MASK]
-        movdqu  xmm10,[rip+_SHUF_00BA]
-        movdqu  xmm11,[rip+_SHUF_DC00]
-@loop0: mov     rbp,[rip+K256Aligned]
-        movdqu  xmm4,[rcx]
-        pshufb  xmm4,xmm12
-        movdqu  xmm5,[rcx+10H]
-        pshufb  xmm5,xmm12
-        movdqu  xmm6,[rcx+20H]
-        pshufb  xmm6,xmm12
-        movdqu  xmm7,[rcx+30H]
-        pshufb  xmm7,xmm12
-        mov     [rsp+8H],rcx
-        mov     rcx,3
-        nop; nop; nop; nop; nop // manual align 16
-@loop1: movdqa  xmm9,[rbp]
-        paddd   xmm9,xmm4
-        movdqa  [rsp+10H],xmm9
-        movdqa  xmm0,xmm7
-        mov     r13d,r8d
-        ror     r13d,14
-        mov     r14d,eax
-        palignr xmm0,xmm6,04H
-        ror     r14d,9
-        xor     r13d,r8d
-        mov     r15d,r9d
-        ror     r13d,5
-        movdqa  xmm1,xmm5
-        xor     r14d,eax
-        xor     r15d,r10d
-        paddd   xmm0,xmm4
-        xor     r13d,r8d
-        and     r15d,r8d
-        ror     r14d,11
-        palignr xmm1,xmm4,04H
-        xor     r14d,eax
-        ror     r13d,6
-        xor     r15d,r10d
-        movdqa  xmm2,xmm1
-        ror     r14d,2
-        add     r15d,r13d
-        add     r15d,[rsp+10H]
-        movdqa  xmm3,xmm1
-        mov     r13d,eax
-        add     r11d,r15d
-        mov     r15d,eax
-        pslld   xmm1,25
-        or      r13d,edi
-        add     esi,r11d
-        and     r15d,edi
-        psrld   xmm2,7
-        and     r13d,ebx
-        add     r11d,r14d
-        por     xmm1,xmm2
-        or      r13d,r15d
-        add     r11d,r13d
-        movdqa  xmm2,xmm3
-        mov     r13d,esi
-        mov     r14d,r11d
-        movdqa  xmm8,xmm3
-        ror     r13d,14
-        xor     r13d,esi
-        mov     r15d,r8d
-        ror     r14d,9
-        pslld   xmm3,14
-        xor     r14d,r11d
-        ror     r13d,5
-        xor     r15d,r9d
-        psrld   xmm2,18
-        ror     r14d,11
-        xor     r13d,esi
-        and     r15d,esi
-        ror     r13d,6
-        pxor    xmm1,xmm3
-        xor     r14d,r11d
-        xor     r15d,r9d
-        psrld   xmm8,3
-        add     r15d,r13d
-        add     r15d,[rsp+14H]
-        ror     r14d,2
-        pxor    xmm1,xmm2
-        mov     r13d,r11d
-        add     r10d,r15d
-        mov     r15d,r11d
-        pxor    xmm1,xmm8
-        or      r13d,ebx
-        add     edi,r10d
-        and     r15d,ebx
-        pshufd  xmm2,xmm7,0FAH
-        and     r13d,eax
-        add     r10d,r14d
-        paddd   xmm0,xmm1
-        or      r13d,r15d
-        add     r10d,r13d
-        movdqa  xmm3,xmm2
-        mov     r13d,edi
-        mov     r14d,r10d
-        ror     r13d,14
-        movdqa  xmm8,xmm2
-        xor     r13d,edi
-        ror     r14d,9
-        mov     r15d,esi
-        xor     r14d,r10d
-        ror     r13d,5
-        psrlq   xmm2,17
-        xor     r15d,r8d
-        psrlq   xmm3,19
-        xor     r13d,edi
-        and     r15d,edi
-        psrld   xmm8,10
-        ror     r14d,11
-        xor     r14d,r10d
-        xor     r15d,r8d
-        ror     r13d,6
-        pxor    xmm2,xmm3
-        add     r15d,r13d
-        ror     r14d,2
-        add     r15d,[rsp+18H]
-        pxor    xmm8,xmm2
-        mov     r13d,r10d
-        add     r9d,r15d
-        mov     r15d,r10d
-        pshufb  xmm8,xmm10
-        or      r13d,eax
-        add     ebx,r9d
-        and     r15d,eax
-        paddd   xmm0,xmm8
-        and     r13d,r11d
-        add     r9d,r14d
-        pshufd  xmm2,xmm0,50H
-        or      r13d,r15d
-        add     r9d,r13d
-        movdqa  xmm3,xmm2
-        mov     r13d,ebx
-        ror     r13d,14
-        mov     r14d,r9d
-        movdqa  xmm4,xmm2
-        ror     r14d,9
-        xor     r13d,ebx
-        mov     r15d,edi
-        ror     r13d,5
-        psrlq   xmm2,17
-        xor     r14d,r9d
-        xor     r15d,esi
-        psrlq   xmm3,19
-        xor     r13d,ebx
-        and     r15d,ebx
-        ror     r14d,11
-        psrld   xmm4,10
-        xor     r14d,r9d
-        ror     r13d,6
-        xor     r15d,esi
-        pxor    xmm2,xmm3
-        ror     r14d,2
-        add     r15d,r13d
-        add     r15d,[rsp+1CH]
-        pxor    xmm4,xmm2
-        mov     r13d,r9d
-        add     r8d,r15d
-        mov     r15d,r9d
-        pshufb  xmm4,xmm11
-        or      r13d,r11d
-        add     eax,r8d
-        and     r15d,r11d
-        paddd   xmm4,xmm0
-        and     r13d,r10d
-        add     r8d,r14d
-        or      r13d,r15d
-        add     r8d,r13d
-        movdqa  xmm9,[rbp+10H]
-        paddd   xmm9,xmm5
-        movdqa  [rsp+10H],xmm9
-        movdqa  xmm0,xmm4
-        mov     r13d,eax
-        ror     r13d,14
-        mov     r14d,r8d
-        palignr xmm0,xmm7,04H
-        ror     r14d,9
-        xor     r13d,eax
-        mov     r15d,ebx
-        ror     r13d,5
-        movdqa  xmm1,xmm6
-        xor     r14d,r8d
-        xor     r15d,edi
-        paddd   xmm0,xmm5
-        xor     r13d,eax
-        and     r15d,eax
-        ror     r14d,11
-        palignr xmm1,xmm5,04H
-        xor     r14d,r8d
-        ror     r13d,6
-        xor     r15d,edi
-        movdqa  xmm2,xmm1
-        ror     r14d,2
-        add     r15d,r13d
-        add     r15d,[rsp+10H]
-        movdqa  xmm3,xmm1
-        mov     r13d,r8d
-        add     esi,r15d
-        mov     r15d,r8d
-        pslld   xmm1,25
-        or      r13d,r10d
-        add     r11d,esi
-        and     r15d,r10d
-        psrld   xmm2,7
-        and     r13d,r9d
-        add     esi,r14d
-        por     xmm1,xmm2
-        or      r13d,r15d
-        add     esi,r13d
-        movdqa  xmm2,xmm3
-        mov     r13d,r11d
-        mov     r14d,esi
-        movdqa  xmm8,xmm3
-        ror     r13d,14
-        xor     r13d,r11d
-        mov     r15d,eax
-        ror     r14d,9
-        pslld   xmm3,14
-        xor     r14d,esi
-        ror     r13d,5
-        xor     r15d,ebx
-        psrld   xmm2,18
-        ror     r14d,11
-        xor     r13d,r11d
-        and     r15d,r11d
-        ror     r13d,6
-        pxor    xmm1,xmm3
-        xor     r14d,esi
-        xor     r15d,ebx
-        psrld   xmm8,3
-        add     r15d,r13d
-        add     r15d,[rsp+14H]
-        ror     r14d,2
-        pxor    xmm1,xmm2
-        mov     r13d,esi
-        add     edi,r15d
-        mov     r15d,esi
-        pxor    xmm1,xmm8
-        or      r13d,r9d
-        add     r10d,edi
-        and     r15d,r9d
-        pshufd  xmm2,xmm4,0FAH
-        and     r13d,r8d
-        add     edi,r14d
-        paddd   xmm0,xmm1
-        or      r13d,r15d
-        add     edi,r13d
-        movdqa  xmm3,xmm2
-        mov     r13d,r10d
-        mov     r14d,edi
-        ror     r13d,14
-        movdqa  xmm8,xmm2
-        xor     r13d,r10d
-        ror     r14d,9
-        mov     r15d,r11d
-        xor     r14d,edi
-        ror     r13d,5
-        psrlq   xmm2,17
-        xor     r15d,eax
-        psrlq   xmm3,19
-        xor     r13d,r10d
-        and     r15d,r10d
-        psrld   xmm8,10
-        ror     r14d,11
-        xor     r14d,edi
-        xor     r15d,eax
-        ror     r13d,6
-        pxor    xmm2,xmm3
-        add     r15d,r13d
-        ror     r14d,2
-        add     r15d,[rsp+18H]
-        pxor    xmm8,xmm2
-        mov     r13d,edi
-        add     ebx,r15d
-        mov     r15d,edi
-        pshufb  xmm8,xmm10
-        or      r13d,r8d
-        add     r9d,ebx
-        and     r15d,r8d
-        paddd   xmm0,xmm8
-        and     r13d,esi
-        add     ebx,r14d
-        pshufd  xmm2,xmm0,50H
-        or      r13d,r15d
-        add     ebx,r13d
-        movdqa  xmm3,xmm2
-        mov     r13d,r9d
-        ror     r13d,14
-        mov     r14d,ebx
-        movdqa  xmm5,xmm2
-        ror     r14d,9
-        xor     r13d,r9d
-        mov     r15d,r10d
-        ror     r13d,5
-        psrlq   xmm2,17
-        xor     r14d,ebx
-        xor     r15d,r11d
-        psrlq   xmm3,19
-        xor     r13d,r9d
-        and     r15d,r9d
-        ror     r14d,11
-        psrld   xmm5,10
-        xor     r14d,ebx
-        ror     r13d,6
-        xor     r15d,r11d
-        pxor    xmm2,xmm3
-        ror     r14d,2
-        add     r15d,r13d
-        add     r15d,[rsp+1CH]
-        pxor    xmm5,xmm2
-        mov     r13d,ebx
-        add     eax,r15d
-        mov     r15d,ebx
-        pshufb  xmm5,xmm11
-        or      r13d,esi
-        add     r8d,eax
-        and     r15d,esi
-        paddd   xmm5,xmm0
-        and     r13d,edi
-        add     eax,r14d
-        or      r13d,r15d
-        add     eax,r13d
-        movdqa  xmm9,[rbp+20H]
-        paddd   xmm9,xmm6
-        movdqa  [rsp+10H],xmm9
-        movdqa  xmm0,xmm5
-        mov     r13d,r8d
-        ror     r13d,14
-        mov     r14d,eax
-        palignr xmm0,xmm4,04H
-        ror     r14d,9
-        xor     r13d,r8d
-        mov     r15d,r9d
-        ror     r13d,5
-        movdqa  xmm1,xmm7
-        xor     r14d,eax
-        xor     r15d,r10d
-        paddd   xmm0,xmm6
-        xor     r13d,r8d
-        and     r15d,r8d
-        ror     r14d,11
-        palignr xmm1,xmm6,04H
-        xor     r14d,eax
-        ror     r13d,6
-        xor     r15d,r10d
-        movdqa  xmm2,xmm1
-        ror     r14d,2
-        add     r15d,r13d
-        add     r15d,[rsp+10H]
-        movdqa  xmm3,xmm1
-        mov     r13d,eax
-        add     r11d,r15d
-        mov     r15d,eax
-        pslld   xmm1,25
-        or      r13d,edi
-        add     esi,r11d
-        and     r15d,edi
-        psrld   xmm2,7
-        and     r13d,ebx
-        add     r11d,r14d
-        por     xmm1,xmm2
-        or      r13d,r15d
-        add     r11d,r13d
-        movdqa  xmm2,xmm3
-        mov     r13d,esi
-        mov     r14d,r11d
-        movdqa  xmm8,xmm3
-        ror     r13d,14
-        xor     r13d,esi
-        mov     r15d,r8d
-        ror     r14d,9
-        pslld   xmm3,14
-        xor     r14d,r11d
-        ror     r13d,5
-        xor     r15d,r9d
-        psrld   xmm2,18
-        ror     r14d,11
-        xor     r13d,esi
-        and     r15d,esi
-        ror     r13d,6
-        pxor    xmm1,xmm3
-        xor     r14d,r11d
-        xor     r15d,r9d
-        psrld   xmm8,3
-        add     r15d,r13d
-        add     r15d,[rsp+14H]
-        ror     r14d,2
-        pxor    xmm1,xmm2
-        mov     r13d,r11d
-        add     r10d,r15d
-        mov     r15d,r11d
-        pxor    xmm1,xmm8
-        or      r13d,ebx
-        add     edi,r10d
-        and     r15d,ebx
-        pshufd  xmm2,xmm5,0FAH
-        and     r13d,eax
-        add     r10d,r14d
-        paddd   xmm0,xmm1
-        or      r13d,r15d
-        add     r10d,r13d
-        movdqa  xmm3,xmm2
-        mov     r13d,edi
-        mov     r14d,r10d
-        ror     r13d,14
-        movdqa  xmm8,xmm2
-        xor     r13d,edi
-        ror     r14d,9
-        mov     r15d,esi
-        xor     r14d,r10d
-        ror     r13d,5
-        psrlq   xmm2,17
-        xor     r15d,r8d
-        psrlq   xmm3,19
-        xor     r13d,edi
-        and     r15d,edi
-        psrld   xmm8,10
-        ror     r14d,11
-        xor     r14d,r10d
-        xor     r15d,r8d
-        ror     r13d,6
-        pxor    xmm2,xmm3
-        add     r15d,r13d
-        ror     r14d,2
-        add     r15d,[rsp+18H]
-        pxor    xmm8,xmm2
-        mov     r13d,r10d
-        add     r9d,r15d
-        mov     r15d,r10d
-        pshufb  xmm8,xmm10
-        or      r13d,eax
-        add     ebx,r9d
-        and     r15d,eax
-        paddd   xmm0,xmm8
-        and     r13d,r11d
-        add     r9d,r14d
-        pshufd  xmm2,xmm0,50H
-        or      r13d,r15d
-        add     r9d,r13d
-        movdqa  xmm3,xmm2
-        mov     r13d,ebx
-        ror     r13d,14
-        mov     r14d,r9d
-        movdqa  xmm6,xmm2
-        ror     r14d,9
-        xor     r13d,ebx
-        mov     r15d,edi
-        ror     r13d,5
-        psrlq   xmm2,17
-        xor     r14d,r9d
-        xor     r15d,esi
-        psrlq   xmm3,19
-        xor     r13d,ebx
-        and     r15d,ebx
-        ror     r14d,11
-        psrld   xmm6,10
-        xor     r14d,r9d
-        ror     r13d,6
-        xor     r15d,esi
-        pxor    xmm2,xmm3
-        ror     r14d,2
-        add     r15d,r13d
-        add     r15d,[rsp+1CH]
-        pxor    xmm6,xmm2
-        mov     r13d,r9d
-        add     r8d,r15d
-        mov     r15d,r9d
-        pshufb  xmm6,xmm11
-        or      r13d,r11d
-        add     eax,r8d
-        and     r15d,r11d
-        paddd   xmm6,xmm0
-        and     r13d,r10d
-        add     r8d,r14d
-        or      r13d,r15d
-        add     r8d,r13d
-        movdqa  xmm9,[rbp+30H]
-        paddd   xmm9,xmm7
-        movdqa  [rsp+10H],xmm9
-        add     rbp,64
-        movdqa  xmm0,xmm6
-        mov     r13d,eax
-        ror     r13d,14
-        mov     r14d,r8d
-        palignr xmm0,xmm5,04H
-        ror     r14d,9
-        xor     r13d,eax
-        mov     r15d,ebx
-        ror     r13d,5
-        movdqa  xmm1,xmm4
-        xor     r14d,r8d
-        xor     r15d,edi
-        paddd   xmm0,xmm7
-        xor     r13d,eax
-        and     r15d,eax
-        ror     r14d,11
-        palignr xmm1,xmm7,04H
-        xor     r14d,r8d
-        ror     r13d,6
-        xor     r15d,edi
-        movdqa  xmm2,xmm1
-        ror     r14d,2
-        add     r15d,r13d
-        add     r15d,[rsp+10H]
-        movdqa  xmm3,xmm1
-        mov     r13d,r8d
-        add     esi,r15d
-        mov     r15d,r8d
-        pslld   xmm1,25
-        or      r13d,r10d
-        add     r11d,esi
-        and     r15d,r10d
-        psrld   xmm2,7
-        and     r13d,r9d
-        add     esi,r14d
-        por     xmm1,xmm2
-        or      r13d,r15d
-        add     esi,r13d
-        movdqa  xmm2,xmm3
-        mov     r13d,r11d
-        mov     r14d,esi
-        movdqa  xmm8,xmm3
-        ror     r13d,14
-        xor     r13d,r11d
-        mov     r15d,eax
-        ror     r14d,9
-        pslld   xmm3,14
-        xor     r14d,esi
-        ror     r13d,5
-        xor     r15d,ebx
-        psrld   xmm2,18
-        ror     r14d,11
-        xor     r13d,r11d
-        and     r15d,r11d
-        ror     r13d,6
-        pxor    xmm1,xmm3
-        xor     r14d,esi
-        xor     r15d,ebx
-        psrld   xmm8,3
-        add     r15d,r13d
-        add     r15d,[rsp+14H]
-        ror     r14d,2
-        pxor    xmm1,xmm2
-        mov     r13d,esi
-        add     edi,r15d
-        mov     r15d,esi
-        pxor    xmm1,xmm8
-        or      r13d,r9d
-        add     r10d,edi
-        and     r15d,r9d
-        pshufd  xmm2,xmm6,0FAH
-        and     r13d,r8d
-        add     edi,r14d
-        paddd   xmm0,xmm1
-        or      r13d,r15d
-        add     edi,r13d
-        movdqa  xmm3,xmm2
-        mov     r13d,r10d
-        mov     r14d,edi
-        ror     r13d,14
-        movdqa  xmm8,xmm2
-        xor     r13d,r10d
-        ror     r14d,9
-        mov     r15d,r11d
-        xor     r14d,edi
-        ror     r13d,5
-        psrlq   xmm2,17
-        xor     r15d,eax
-        psrlq   xmm3,19
-        xor     r13d,r10d
-        and     r15d,r10d
-        psrld   xmm8,10
-        ror     r14d,11
-        xor     r14d,edi
-        xor     r15d,eax
-        ror     r13d,6
-        pxor    xmm2,xmm3
-        add     r15d,r13d
-        ror     r14d,2
-        add     r15d,[rsp+18H]
-        pxor    xmm8,xmm2
-        mov     r13d,edi
-        add     ebx,r15d
-        mov     r15d,edi
-        pshufb  xmm8,xmm10
-        or      r13d,r8d
-        add     r9d,ebx
-        and     r15d,r8d
-        paddd   xmm0,xmm8
-        and     r13d,esi
-        add     ebx,r14d
-        pshufd  xmm2,xmm0,50H
-        or      r13d,r15d
-        add     ebx,r13d
-        movdqa  xmm3,xmm2
-        mov     r13d,r9d
-        ror     r13d,14
-        mov     r14d,ebx
-        movdqa  xmm7,xmm2
-        ror     r14d,9
-        xor     r13d,r9d
-        mov     r15d,r10d
-        ror     r13d,5
-        psrlq   xmm2,17
-        xor     r14d,ebx
-        xor     r15d,r11d
-        psrlq   xmm3,19
-        xor     r13d,r9d
-        and     r15d,r9d
-        ror     r14d,11
-        psrld   xmm7,10
-        xor     r14d,ebx
-        ror     r13d,6
-        xor     r15d,r11d
-        pxor    xmm2,xmm3
-        ror     r14d,2
-        add     r15d,r13d
-        add     r15d,[rsp+1CH]
-        pxor    xmm7,xmm2
-        mov     r13d,ebx
-        add     eax,r15d
-        mov     r15d,ebx
-        pshufb  xmm7,xmm11
-        or      r13d,esi
-        add     r8d,eax
-        and     r15d,esi
-        paddd   xmm7,xmm0
-        and     r13d,edi
-        add     eax,r14d
-        or      r13d,r15d
-        add     eax,r13d
-        sub     rcx,1
+        add     r8, rcx
+        mov     [rsp], r8
+        mov     eax, [rdx]
+        mov     ebx, [rdx + 4H]
+        mov     edi, [rdx + 8H]
+        mov     esi, [rdx + 0CH]
+        mov     r8d, [rdx + 10H]
+        mov     r9d, [rdx + 14H]
+        mov     r10d, [rdx + 18H]
+        mov     r11d, [rdx + 1CH]
+        movaps  xmm12, [rip + @flip]
+        movaps  xmm10, [rip + @00BA]
+        movaps  xmm11, [rip + @DC00]
+@loop0: mov     rbp, [rip + K256Aligned]
+        movups  xmm4, [rcx]
+        pshufb  xmm4, xmm12
+        movups  xmm5, [rcx + 10h]
+        pshufb  xmm5, xmm12
+        movups  xmm6, [rcx + 20h]
+        pshufb  xmm6, xmm12
+        movups  xmm7, [rcx + 30h]
+        pshufb  xmm7, xmm12
+        mov     [rsp + 8h], rcx
+        mov     rcx, 3
+@loop1: movaps  xmm9, [rbp]
+        paddd   xmm9, xmm4
+        movaps  [rsp + 10h], xmm9
+        movaps  xmm0, xmm7
+        mov     r13d, r8d
+        ror     r13d, 14
+        mov     r14d, eax
+        palignr xmm0, xmm6, 04h
+        ror     r14d, 9
+        xor     r13d, r8d
+        mov     r15d, r9d
+        ror     r13d, 5
+        movaps  xmm1, xmm5
+        xor     r14d, eax
+        xor     r15d, r10d
+        paddd   xmm0, xmm4
+        xor     r13d, r8d
+        and     r15d, r8d
+        ror     r14d, 11
+        palignr xmm1, xmm4, 04h
+        xor     r14d, eax
+        ror     r13d, 6
+        xor     r15d, r10d
+        movaps  xmm2, xmm1
+        ror     r14d, 2
+        add     r15d, r13d
+        add     r15d, [rsp + 10h]
+        movaps  xmm3, xmm1
+        mov     r13d, eax
+        add     r11d, r15d
+        mov     r15d, eax
+        pslld   xmm1, 25
+        or      r13d, edi
+        add     esi, r11d
+        and     r15d, edi
+        psrld   xmm2, 7
+        and     r13d, ebx
+        add     r11d, r14d
+        por     xmm1, xmm2
+        or      r13d, r15d
+        add     r11d, r13d
+        movaps  xmm2, xmm3
+        mov     r13d, esi
+        mov     r14d, r11d
+        movaps  xmm8, xmm3
+        ror     r13d, 14
+        xor     r13d, esi
+        mov     r15d, r8d
+        ror     r14d, 9
+        pslld   xmm3, 14
+        xor     r14d, r11d
+        ror     r13d, 5
+        xor     r15d, r9d
+        psrld   xmm2, 18
+        ror     r14d, 11
+        xor     r13d, esi
+        and     r15d, esi
+        ror     r13d, 6
+        pxor    xmm1, xmm3
+        xor     r14d, r11d
+        xor     r15d, r9d
+        psrld   xmm8, 3
+        add     r15d, r13d
+        add     r15d, [rsp + 14h]
+        ror     r14d, 2
+        pxor    xmm1, xmm2
+        mov     r13d, r11d
+        add     r10d, r15d
+        mov     r15d, r11d
+        pxor    xmm1, xmm8
+        or      r13d, ebx
+        add     edi, r10d
+        and     r15d, ebx
+        pshufd  xmm2, xmm7, 0fah
+        and     r13d, eax
+        add     r10d, r14d
+        paddd   xmm0, xmm1
+        or      r13d, r15d
+        add     r10d, r13d
+        movaps  xmm3, xmm2
+        mov     r13d, edi
+        mov     r14d, r10d
+        ror     r13d, 14
+        movaps  xmm8, xmm2
+        xor     r13d, edi
+        ror     r14d, 9
+        mov     r15d, esi
+        xor     r14d, r10d
+        ror     r13d, 5
+        psrlq   xmm2, 17
+        xor     r15d, r8d
+        psrlq   xmm3, 19
+        xor     r13d, edi
+        and     r15d, edi
+        psrld   xmm8, 10
+        ror     r14d, 11
+        xor     r14d, r10d
+        xor     r15d, r8d
+        ror     r13d, 6
+        pxor    xmm2, xmm3
+        add     r15d, r13d
+        ror     r14d, 2
+        add     r15d, [rsp + 18h]
+        pxor    xmm8, xmm2
+        mov     r13d, r10d
+        add     r9d, r15d
+        mov     r15d, r10d
+        pshufb  xmm8, xmm10
+        or      r13d, eax
+        add     ebx, r9d
+        and     r15d, eax
+        paddd   xmm0, xmm8
+        and     r13d, r11d
+        add     r9d, r14d
+        pshufd  xmm2, xmm0, 50h
+        or      r13d, r15d
+        add     r9d, r13d
+        movaps  xmm3, xmm2
+        mov     r13d, ebx
+        ror     r13d, 14
+        mov     r14d, r9d
+        movaps  xmm4, xmm2
+        ror     r14d, 9
+        xor     r13d, ebx
+        mov     r15d, edi
+        ror     r13d, 5
+        psrlq   xmm2, 17
+        xor     r14d, r9d
+        xor     r15d, esi
+        psrlq   xmm3, 19
+        xor     r13d, ebx
+        and     r15d, ebx
+        ror     r14d, 11
+        psrld   xmm4, 10
+        xor     r14d, r9d
+        ror     r13d, 6
+        xor     r15d, esi
+        pxor    xmm2, xmm3
+        ror     r14d, 2
+        add     r15d, r13d
+        add     r15d, [rsp + 1ch]
+        pxor    xmm4, xmm2
+        mov     r13d, r9d
+        add     r8d, r15d
+        mov     r15d, r9d
+        pshufb  xmm4, xmm11
+        or      r13d, r11d
+        add     eax, r8d
+        and     r15d, r11d
+        paddd   xmm4, xmm0
+        and     r13d, r10d
+        add     r8d, r14d
+        or      r13d, r15d
+        add     r8d, r13d
+        movaps  xmm9, [rbp + 10h]
+        paddd   xmm9, xmm5
+        movaps  [rsp + 10h], xmm9
+        movaps  xmm0, xmm4
+        mov     r13d, eax
+        ror     r13d, 14
+        mov     r14d, r8d
+        palignr xmm0, xmm7, 04h
+        ror     r14d, 9
+        xor     r13d, eax
+        mov     r15d, ebx
+        ror     r13d, 5
+        movaps  xmm1, xmm6
+        xor     r14d, r8d
+        xor     r15d, edi
+        paddd   xmm0, xmm5
+        xor     r13d, eax
+        and     r15d, eax
+        ror     r14d, 11
+        palignr xmm1, xmm5, 04h
+        xor     r14d, r8d
+        ror     r13d, 6
+        xor     r15d, edi
+        movaps  xmm2, xmm1
+        ror     r14d, 2
+        add     r15d, r13d
+        add     r15d, [rsp + 10h]
+        movaps  xmm3, xmm1
+        mov     r13d, r8d
+        add     esi, r15d
+        mov     r15d, r8d
+        pslld   xmm1, 25
+        or      r13d, r10d
+        add     r11d, esi
+        and     r15d, r10d
+        psrld   xmm2, 7
+        and     r13d, r9d
+        add     esi, r14d
+        por     xmm1, xmm2
+        or      r13d, r15d
+        add     esi, r13d
+        movaps  xmm2, xmm3
+        mov     r13d, r11d
+        mov     r14d, esi
+        movaps  xmm8, xmm3
+        ror     r13d, 14
+        xor     r13d, r11d
+        mov     r15d, eax
+        ror     r14d, 9
+        pslld   xmm3, 14
+        xor     r14d, esi
+        ror     r13d, 5
+        xor     r15d, ebx
+        psrld   xmm2, 18
+        ror     r14d, 11
+        xor     r13d, r11d
+        and     r15d, r11d
+        ror     r13d, 6
+        pxor    xmm1, xmm3
+        xor     r14d, esi
+        xor     r15d, ebx
+        psrld   xmm8, 3
+        add     r15d, r13d
+        add     r15d, [rsp + 14h]
+        ror     r14d, 2
+        pxor    xmm1, xmm2
+        mov     r13d, esi
+        add     edi, r15d
+        mov     r15d, esi
+        pxor    xmm1, xmm8
+        or      r13d, r9d
+        add     r10d, edi
+        and     r15d, r9d
+        pshufd  xmm2, xmm4, 0fah
+        and     r13d, r8d
+        add     edi, r14d
+        paddd   xmm0, xmm1
+        or      r13d, r15d
+        add     edi, r13d
+        movaps  xmm3, xmm2
+        mov     r13d, r10d
+        mov     r14d, edi
+        ror     r13d, 14
+        movaps  xmm8, xmm2
+        xor     r13d, r10d
+        ror     r14d, 9
+        mov     r15d, r11d
+        xor     r14d, edi
+        ror     r13d, 5
+        psrlq   xmm2, 17
+        xor     r15d, eax
+        psrlq   xmm3, 19
+        xor     r13d, r10d
+        and     r15d, r10d
+        psrld   xmm8, 10
+        ror     r14d, 11
+        xor     r14d, edi
+        xor     r15d, eax
+        ror     r13d, 6
+        pxor    xmm2, xmm3
+        add     r15d, r13d
+        ror     r14d, 2
+        add     r15d, [rsp + 18h]
+        pxor    xmm8, xmm2
+        mov     r13d, edi
+        add     ebx, r15d
+        mov     r15d, edi
+        pshufb  xmm8, xmm10
+        or      r13d, r8d
+        add     r9d, ebx
+        and     r15d, r8d
+        paddd   xmm0, xmm8
+        and     r13d, esi
+        add     ebx, r14d
+        pshufd  xmm2, xmm0, 50h
+        or      r13d, r15d
+        add     ebx, r13d
+        movaps  xmm3, xmm2
+        mov     r13d, r9d
+        ror     r13d, 14
+        mov     r14d, ebx
+        movaps  xmm5, xmm2
+        ror     r14d, 9
+        xor     r13d, r9d
+        mov     r15d, r10d
+        ror     r13d, 5
+        psrlq   xmm2, 17
+        xor     r14d, ebx
+        xor     r15d, r11d
+        psrlq   xmm3, 19
+        xor     r13d, r9d
+        and     r15d, r9d
+        ror     r14d, 11
+        psrld   xmm5, 10
+        xor     r14d, ebx
+        ror     r13d, 6
+        xor     r15d, r11d
+        pxor    xmm2, xmm3
+        ror     r14d, 2
+        add     r15d, r13d
+        add     r15d, [rsp + 1ch]
+        pxor    xmm5, xmm2
+        mov     r13d, ebx
+        add     eax, r15d
+        mov     r15d, ebx
+        pshufb  xmm5, xmm11
+        or      r13d, esi
+        add     r8d, eax
+        and     r15d, esi
+        paddd   xmm5, xmm0
+        and     r13d, edi
+        add     eax, r14d
+        or      r13d, r15d
+        add     eax, r13d
+        movaps  xmm9, [rbp + 20h]
+        paddd   xmm9, xmm6
+        movaps  [rsp + 10h], xmm9
+        movaps  xmm0, xmm5
+        mov     r13d, r8d
+        ror     r13d, 14
+        mov     r14d, eax
+        palignr xmm0, xmm4, 04h
+        ror     r14d, 9
+        xor     r13d, r8d
+        mov     r15d, r9d
+        ror     r13d, 5
+        movaps  xmm1, xmm7
+        xor     r14d, eax
+        xor     r15d, r10d
+        paddd   xmm0, xmm6
+        xor     r13d, r8d
+        and     r15d, r8d
+        ror     r14d, 11
+        palignr xmm1, xmm6, 04h
+        xor     r14d, eax
+        ror     r13d, 6
+        xor     r15d, r10d
+        movaps  xmm2, xmm1
+        ror     r14d, 2
+        add     r15d, r13d
+        add     r15d, [rsp + 10h]
+        movaps  xmm3, xmm1
+        mov     r13d, eax
+        add     r11d, r15d
+        mov     r15d, eax
+        pslld   xmm1, 25
+        or      r13d, edi
+        add     esi, r11d
+        and     r15d, edi
+        psrld   xmm2, 7
+        and     r13d, ebx
+        add     r11d, r14d
+        por     xmm1, xmm2
+        or      r13d, r15d
+        add     r11d, r13d
+        movaps  xmm2, xmm3
+        mov     r13d, esi
+        mov     r14d, r11d
+        movaps  xmm8, xmm3
+        ror     r13d, 14
+        xor     r13d, esi
+        mov     r15d, r8d
+        ror     r14d, 9
+        pslld   xmm3, 14
+        xor     r14d, r11d
+        ror     r13d, 5
+        xor     r15d, r9d
+        psrld   xmm2, 18
+        ror     r14d, 11
+        xor     r13d, esi
+        and     r15d, esi
+        ror     r13d, 6
+        pxor    xmm1, xmm3
+        xor     r14d, r11d
+        xor     r15d, r9d
+        psrld   xmm8, 3
+        add     r15d, r13d
+        add     r15d, [rsp + 14h]
+        ror     r14d, 2
+        pxor    xmm1, xmm2
+        mov     r13d, r11d
+        add     r10d, r15d
+        mov     r15d, r11d
+        pxor    xmm1, xmm8
+        or      r13d, ebx
+        add     edi, r10d
+        and     r15d, ebx
+        pshufd  xmm2, xmm5, 0fah
+        and     r13d, eax
+        add     r10d, r14d
+        paddd   xmm0, xmm1
+        or      r13d, r15d
+        add     r10d, r13d
+        movaps  xmm3, xmm2
+        mov     r13d, edi
+        mov     r14d, r10d
+        ror     r13d, 14
+        movaps  xmm8, xmm2
+        xor     r13d, edi
+        ror     r14d, 9
+        mov     r15d, esi
+        xor     r14d, r10d
+        ror     r13d, 5
+        psrlq   xmm2, 17
+        xor     r15d, r8d
+        psrlq   xmm3, 19
+        xor     r13d, edi
+        and     r15d, edi
+        psrld   xmm8, 10
+        ror     r14d, 11
+        xor     r14d, r10d
+        xor     r15d, r8d
+        ror     r13d, 6
+        pxor    xmm2, xmm3
+        add     r15d, r13d
+        ror     r14d, 2
+        add     r15d, [rsp + 18h]
+        pxor    xmm8, xmm2
+        mov     r13d, r10d
+        add     r9d, r15d
+        mov     r15d, r10d
+        pshufb  xmm8, xmm10
+        or      r13d, eax
+        add     ebx, r9d
+        and     r15d, eax
+        paddd   xmm0, xmm8
+        and     r13d, r11d
+        add     r9d, r14d
+        pshufd  xmm2, xmm0, 50h
+        or      r13d, r15d
+        add     r9d, r13d
+        movaps  xmm3, xmm2
+        mov     r13d, ebx
+        ror     r13d, 14
+        mov     r14d, r9d
+        movaps  xmm6, xmm2
+        ror     r14d, 9
+        xor     r13d, ebx
+        mov     r15d, edi
+        ror     r13d, 5
+        psrlq   xmm2, 17
+        xor     r14d, r9d
+        xor     r15d, esi
+        psrlq   xmm3, 19
+        xor     r13d, ebx
+        and     r15d, ebx
+        ror     r14d, 11
+        psrld   xmm6, 10
+        xor     r14d, r9d
+        ror     r13d, 6
+        xor     r15d, esi
+        pxor    xmm2, xmm3
+        ror     r14d, 2
+        add     r15d, r13d
+        add     r15d, [rsp + 1ch]
+        pxor    xmm6, xmm2
+        mov     r13d, r9d
+        add     r8d, r15d
+        mov     r15d, r9d
+        pshufb  xmm6, xmm11
+        or      r13d, r11d
+        add     eax, r8d
+        and     r15d, r11d
+        paddd   xmm6, xmm0
+        and     r13d, r10d
+        add     r8d, r14d
+        or      r13d, r15d
+        add     r8d, r13d
+        movaps  xmm9, [rbp + 30h]
+        paddd   xmm9, xmm7
+        movaps  [rsp + 10h], xmm9
+        add     rbp, 64
+        movaps  xmm0, xmm6
+        mov     r13d, eax
+        ror     r13d, 14
+        mov     r14d, r8d
+        palignr xmm0, xmm5, 04h
+        ror     r14d, 9
+        xor     r13d, eax
+        mov     r15d, ebx
+        ror     r13d, 5
+        movaps  xmm1, xmm4
+        xor     r14d, r8d
+        xor     r15d, edi
+        paddd   xmm0, xmm7
+        xor     r13d, eax
+        and     r15d, eax
+        ror     r14d, 11
+        palignr xmm1, xmm7, 04h
+        xor     r14d, r8d
+        ror     r13d, 6
+        xor     r15d, edi
+        movaps  xmm2, xmm1
+        ror     r14d, 2
+        add     r15d, r13d
+        add     r15d, [rsp + 10h]
+        movaps  xmm3, xmm1
+        mov     r13d, r8d
+        add     esi, r15d
+        mov     r15d, r8d
+        pslld   xmm1, 25
+        or      r13d, r10d
+        add     r11d, esi
+        and     r15d, r10d
+        psrld   xmm2, 7
+        and     r13d, r9d
+        add     esi, r14d
+        por     xmm1, xmm2
+        or      r13d, r15d
+        add     esi, r13d
+        movaps  xmm2, xmm3
+        mov     r13d, r11d
+        mov     r14d, esi
+        movaps  xmm8, xmm3
+        ror     r13d, 14
+        xor     r13d, r11d
+        mov     r15d, eax
+        ror     r14d, 9
+        pslld   xmm3, 14
+        xor     r14d, esi
+        ror     r13d, 5
+        xor     r15d, ebx
+        psrld   xmm2, 18
+        ror     r14d, 11
+        xor     r13d, r11d
+        and     r15d, r11d
+        ror     r13d, 6
+        pxor    xmm1, xmm3
+        xor     r14d, esi
+        xor     r15d, ebx
+        psrld   xmm8, 3
+        add     r15d, r13d
+        add     r15d, [rsp + 14h]
+        ror     r14d, 2
+        pxor    xmm1, xmm2
+        mov     r13d, esi
+        add     edi, r15d
+        mov     r15d, esi
+        pxor    xmm1, xmm8
+        or      r13d, r9d
+        add     r10d, edi
+        and     r15d, r9d
+        pshufd  xmm2, xmm6, 0fah
+        and     r13d, r8d
+        add     edi, r14d
+        paddd   xmm0, xmm1
+        or      r13d, r15d
+        add     edi, r13d
+        movaps  xmm3, xmm2
+        mov     r13d, r10d
+        mov     r14d, edi
+        ror     r13d, 14
+        movaps  xmm8, xmm2
+        xor     r13d, r10d
+        ror     r14d, 9
+        mov     r15d, r11d
+        xor     r14d, edi
+        ror     r13d, 5
+        psrlq   xmm2, 17
+        xor     r15d, eax
+        psrlq   xmm3, 19
+        xor     r13d, r10d
+        and     r15d, r10d
+        psrld   xmm8, 10
+        ror     r14d, 11
+        xor     r14d, edi
+        xor     r15d, eax
+        ror     r13d, 6
+        pxor    xmm2, xmm3
+        add     r15d, r13d
+        ror     r14d, 2
+        add     r15d, [rsp + 18h]
+        pxor    xmm8, xmm2
+        mov     r13d, edi
+        add     ebx, r15d
+        mov     r15d, edi
+        pshufb  xmm8, xmm10
+        or      r13d, r8d
+        add     r9d, ebx
+        and     r15d, r8d
+        paddd   xmm0, xmm8
+        and     r13d, esi
+        add     ebx, r14d
+        pshufd  xmm2, xmm0, 50h
+        or      r13d, r15d
+        add     ebx, r13d
+        movaps  xmm3, xmm2
+        mov     r13d, r9d
+        ror     r13d, 14
+        mov     r14d, ebx
+        movaps  xmm7, xmm2
+        ror     r14d, 9
+        xor     r13d, r9d
+        mov     r15d, r10d
+        ror     r13d, 5
+        psrlq   xmm2, 17
+        xor     r14d, ebx
+        xor     r15d, r11d
+        psrlq   xmm3, 19
+        xor     r13d, r9d
+        and     r15d, r9d
+        ror     r14d, 11
+        psrld   xmm7, 10
+        xor     r14d, ebx
+        ror     r13d, 6
+        xor     r15d, r11d
+        pxor    xmm2, xmm3
+        ror     r14d, 2
+        add     r15d, r13d
+        add     r15d, [rsp + 1ch]
+        pxor    xmm7, xmm2
+        mov     r13d, ebx
+        add     eax, r15d
+        mov     r15d, ebx
+        pshufb  xmm7, xmm11
+        or      r13d, esi
+        add     r8d, eax
+        and     r15d, esi
+        paddd   xmm7, xmm0
+        and     r13d, edi
+        add     eax, r14d
+        or      r13d, r15d
+        add     eax, r13d
+        sub     rcx, 1
         jne     @loop1
-        mov     rcx,2
-@loop2: paddd   xmm4,[rbp]
-        movdqa  [rsp+10H],xmm4
-        mov     r13d,r8d
-        ror     r13d,14
-        mov     r14d,eax
-        xor     r13d,r8d
-        ror     r14d,9
-        mov     r15d,r9d
-        xor     r14d,eax
-        ror     r13d,5
-        xor     r15d,r10d
-        xor     r13d,r8d
-        ror     r14d,11
-        and     r15d,r8d
-        xor     r14d,eax
-        ror     r13d,6
-        xor     r15d,r10d
-        add     r15d,r13d
-        ror     r14d,2
-        add     r15d,[rsp+10H]
-        mov     r13d,eax
-        add     r11d,r15d
-        mov     r15d,eax
-        or      r13d,edi
-        add     esi,r11d
-        and     r15d,edi
-        and     r13d,ebx
-        add     r11d,r14d
-        or      r13d,r15d
-        add     r11d,r13d
-        mov     r13d,esi
-        ror     r13d,14
-        mov     r14d,r11d
-        xor     r13d,esi
-        ror     r14d,9
-        mov     r15d,r8d
-        xor     r14d,r11d
-        ror     r13d,5
-        xor     r15d,r9d
-        xor     r13d,esi
-        ror     r14d,11
-        and     r15d,esi
-        xor     r14d,r11d
-        ror     r13d,6
-        xor     r15d,r9d
-        add     r15d,r13d
-        ror     r14d,2
-        add     r15d,[rsp+14H]
-        mov     r13d,r11d
-        add     r10d,r15d
-        mov     r15d,r11d
-        or      r13d,ebx
-        add     edi,r10d
-        and     r15d,ebx
-        and     r13d,eax
-        add     r10d,r14d
-        or      r13d,r15d
-        add     r10d,r13d
-        mov     r13d,edi
-        ror     r13d,14
-        mov     r14d,r10d
-        xor     r13d,edi
-        ror     r14d,9
-        mov     r15d,esi
-        xor     r14d,r10d
-        ror     r13d,5
-        xor     r15d,r8d
-        xor     r13d,edi
-        ror     r14d,11
-        and     r15d,edi
-        xor     r14d,r10d
-        ror     r13d,6
-        xor     r15d,r8d
-        add     r15d,r13d
-        ror     r14d,2
-        add     r15d,[rsp+18H]
-        mov     r13d,r10d
-        add     r9d,r15d
-        mov     r15d,r10d
-        or      r13d,eax
-        add     ebx,r9d
-        and     r15d,eax
-        and     r13d,r11d
-        add     r9d,r14d
-        or      r13d,r15d
-        add     r9d,r13d
-        mov     r13d,ebx
-        ror     r13d,14
-        mov     r14d,r9d
-        xor     r13d,ebx
-        ror     r14d,9
-        mov     r15d,edi
-        xor     r14d,r9d
-        ror     r13d,5
-        xor     r15d,esi
-        xor     r13d,ebx
-        ror     r14d,11
-        and     r15d,ebx
-        xor     r14d,r9d
-        ror     r13d,6
-        xor     r15d,esi
-        add     r15d,r13d
-        ror     r14d,2
-        add     r15d,[rsp+1CH]
-        mov     r13d,r9d
-        add     r8d,r15d
-        mov     r15d,r9d
-        or      r13d,r11d
-        add     eax,r8d
-        and     r15d,r11d
-        and     r13d,r10d
-        add     r8d,r14d
-        or      r13d,r15d
-        add     r8d,r13d
-        paddd   xmm5,[rbp+10H]
-        movdqa  [rsp+10H],xmm5
-        add     rbp,32
-        mov     r13d,eax
-        ror     r13d,14
-        mov     r14d,r8d
-        xor     r13d,eax
-        ror     r14d,9
-        mov     r15d,ebx
-        xor     r14d,r8d
-        ror     r13d,5
-        xor     r15d,edi
-        xor     r13d,eax
-        ror     r14d,11
-        and     r15d,eax
-        xor     r14d,r8d
-        ror     r13d,6
-        xor     r15d,edi
-        add     r15d,r13d
-        ror     r14d,2
-        add     r15d,[rsp+10H]
-        mov     r13d,r8d
-        add     esi,r15d
-        mov     r15d,r8d
-        or      r13d,r10d
-        add     r11d,esi
-        and     r15d,r10d
-        and     r13d,r9d
-        add     esi,r14d
-        or      r13d,r15d
-        add     esi,r13d
-        mov     r13d,r11d
-        ror     r13d,14
-        mov     r14d,esi
-        xor     r13d,r11d
-        ror     r14d,9
-        mov     r15d,eax
-        xor     r14d,esi
-        ror     r13d,5
-        xor     r15d,ebx
-        xor     r13d,r11d
-        ror     r14d,11
-        and     r15d,r11d
-        xor     r14d,esi
-        ror     r13d,6
-        xor     r15d,ebx
-        add     r15d,r13d
-        ror     r14d,2
-        add     r15d,[rsp+14H]
-        mov     r13d,esi
-        add     edi,r15d
-        mov     r15d,esi
-        or      r13d,r9d
-        add     r10d,edi
-        and     r15d,r9d
-        and     r13d,r8d
-        add     edi,r14d
-        or      r13d,r15d
-        add     edi,r13d
-        mov     r13d,r10d
-        ror     r13d,14
-        mov     r14d,edi
-        xor     r13d,r10d
-        ror     r14d,9
-        mov     r15d,r11d
-        xor     r14d,edi
-        ror     r13d,5
-        xor     r15d,eax
-        xor     r13d,r10d
-        ror     r14d,11
-        and     r15d,r10d
-        xor     r14d,edi
-        ror     r13d,6
-        xor     r15d,eax
-        add     r15d,r13d
-        ror     r14d,2
-        add     r15d,[rsp+18H]
-        mov     r13d,edi
-        add     ebx,r15d
-        mov     r15d,edi
-        or      r13d,r8d
-        add     r9d,ebx
-        and     r15d,r8d
-        and     r13d,esi
-        add     ebx,r14d
-        or      r13d,r15d
-        add     ebx,r13d
-        mov     r13d,r9d
-        ror     r13d,14
-        mov     r14d,ebx
-        xor     r13d,r9d
-        ror     r14d,9
-        mov     r15d,r10d
-        xor     r14d,ebx
-        ror     r13d,5
-        xor     r15d,r11d
-        xor     r13d,r9d
-        ror     r14d,11
-        and     r15d,r9d
-        xor     r14d,ebx
-        ror     r13d,6
-        xor     r15d,r11d
-        add     r15d,r13d
-        ror     r14d,2
-        add     r15d,[rsp+1CH]
-        mov     r13d,ebx
-        add     eax,r15d
-        mov     r15d,ebx
-        or      r13d,esi
-        add     r8d,eax
-        and     r15d,esi
-        and     r13d,edi
-        add     eax,r14d
-        or      r13d,r15d
-        add     eax,r13d
-        movdqa  xmm4,xmm6
-        movdqa  xmm5,xmm7
+        mov     rcx, 2
+@loop2: paddd   xmm4, [rbp]
+        movaps  [rsp + 10h], xmm4
+        mov     r13d, r8d
+        ror     r13d, 14
+        mov     r14d, eax
+        xor     r13d, r8d
+        ror     r14d, 9
+        mov     r15d, r9d
+        xor     r14d, eax
+        ror     r13d, 5
+        xor     r15d, r10d
+        xor     r13d, r8d
+        ror     r14d, 11
+        and     r15d, r8d
+        xor     r14d, eax
+        ror     r13d, 6
+        xor     r15d, r10d
+        add     r15d, r13d
+        ror     r14d, 2
+        add     r15d, [rsp + 10h]
+        mov     r13d, eax
+        add     r11d, r15d
+        mov     r15d, eax
+        or      r13d, edi
+        add     esi, r11d
+        and     r15d, edi
+        and     r13d, ebx
+        add     r11d, r14d
+        or      r13d, r15d
+        add     r11d, r13d
+        mov     r13d, esi
+        ror     r13d, 14
+        mov     r14d, r11d
+        xor     r13d, esi
+        ror     r14d, 9
+        mov     r15d, r8d
+        xor     r14d, r11d
+        ror     r13d, 5
+        xor     r15d, r9d
+        xor     r13d, esi
+        ror     r14d, 11
+        and     r15d, esi
+        xor     r14d, r11d
+        ror     r13d, 6
+        xor     r15d, r9d
+        add     r15d, r13d
+        ror     r14d, 2
+        add     r15d, [rsp + 14h]
+        mov     r13d, r11d
+        add     r10d, r15d
+        mov     r15d, r11d
+        or      r13d, ebx
+        add     edi, r10d
+        and     r15d, ebx
+        and     r13d, eax
+        add     r10d, r14d
+        or      r13d, r15d
+        add     r10d, r13d
+        mov     r13d, edi
+        ror     r13d, 14
+        mov     r14d, r10d
+        xor     r13d, edi
+        ror     r14d, 9
+        mov     r15d, esi
+        xor     r14d, r10d
+        ror     r13d, 5
+        xor     r15d, r8d
+        xor     r13d, edi
+        ror     r14d, 11
+        and     r15d, edi
+        xor     r14d, r10d
+        ror     r13d, 6
+        xor     r15d, r8d
+        add     r15d, r13d
+        ror     r14d, 2
+        add     r15d, [rsp + 18h]
+        mov     r13d, r10d
+        add     r9d, r15d
+        mov     r15d, r10d
+        or      r13d, eax
+        add     ebx, r9d
+        and     r15d, eax
+        and     r13d, r11d
+        add     r9d, r14d
+        or      r13d, r15d
+        add     r9d, r13d
+        mov     r13d, ebx
+        ror     r13d, 14
+        mov     r14d, r9d
+        xor     r13d, ebx
+        ror     r14d, 9
+        mov     r15d, edi
+        xor     r14d, r9d
+        ror     r13d, 5
+        xor     r15d, esi
+        xor     r13d, ebx
+        ror     r14d, 11
+        and     r15d, ebx
+        xor     r14d, r9d
+        ror     r13d, 6
+        xor     r15d, esi
+        add     r15d, r13d
+        ror     r14d, 2
+        add     r15d, [rsp + 1ch]
+        mov     r13d, r9d
+        add     r8d, r15d
+        mov     r15d, r9d
+        or      r13d, r11d
+        add     eax, r8d
+        and     r15d, r11d
+        and     r13d, r10d
+        add     r8d, r14d
+        or      r13d, r15d
+        add     r8d, r13d
+        paddd   xmm5, [rbp + 10h]
+        movaps  [rsp + 10h], xmm5
+        add     rbp, 32
+        mov     r13d, eax
+        ror     r13d, 14
+        mov     r14d, r8d
+        xor     r13d, eax
+        ror     r14d, 9
+        mov     r15d, ebx
+        xor     r14d, r8d
+        ror     r13d, 5
+        xor     r15d, edi
+        xor     r13d, eax
+        ror     r14d, 11
+        and     r15d, eax
+        xor     r14d, r8d
+        ror     r13d, 6
+        xor     r15d, edi
+        add     r15d, r13d
+        ror     r14d, 2
+        add     r15d, [rsp + 10h]
+        mov     r13d, r8d
+        add     esi, r15d
+        mov     r15d, r8d
+        or      r13d, r10d
+        add     r11d, esi
+        and     r15d, r10d
+        and     r13d, r9d
+        add     esi, r14d
+        or      r13d, r15d
+        add     esi, r13d
+        mov     r13d, r11d
+        ror     r13d, 14
+        mov     r14d, esi
+        xor     r13d, r11d
+        ror     r14d, 9
+        mov     r15d, eax
+        xor     r14d, esi
+        ror     r13d, 5
+        xor     r15d, ebx
+        xor     r13d, r11d
+        ror     r14d, 11
+        and     r15d, r11d
+        xor     r14d, esi
+        ror     r13d, 6
+        xor     r15d, ebx
+        add     r15d, r13d
+        ror     r14d, 2
+        add     r15d, [rsp + 14h]
+        mov     r13d, esi
+        add     edi, r15d
+        mov     r15d, esi
+        or      r13d, r9d
+        add     r10d, edi
+        and     r15d, r9d
+        and     r13d, r8d
+        add     edi, r14d
+        or      r13d, r15d
+        add     edi, r13d
+        mov     r13d, r10d
+        ror     r13d, 14
+        mov     r14d, edi
+        xor     r13d, r10d
+        ror     r14d, 9
+        mov     r15d, r11d
+        xor     r14d, edi
+        ror     r13d, 5
+        xor     r15d, eax
+        xor     r13d, r10d
+        ror     r14d, 11
+        and     r15d, r10d
+        xor     r14d, edi
+        ror     r13d, 6
+        xor     r15d, eax
+        add     r15d, r13d
+        ror     r14d, 2
+        add     r15d, [rsp + 18h]
+        mov     r13d, edi
+        add     ebx, r15d
+        mov     r15d, edi
+        or      r13d, r8d
+        add     r9d, ebx
+        and     r15d, r8d
+        and     r13d, esi
+        add     ebx, r14d
+        or      r13d, r15d
+        add     ebx, r13d
+        mov     r13d, r9d
+        ror     r13d, 14
+        mov     r14d, ebx
+        xor     r13d, r9d
+        ror     r14d, 9
+        mov     r15d, r10d
+        xor     r14d, ebx
+        ror     r13d, 5
+        xor     r15d, r11d
+        xor     r13d, r9d
+        ror     r14d, 11
+        and     r15d, r9d
+        xor     r14d, ebx
+        ror     r13d, 6
+        xor     r15d, r11d
+        add     r15d, r13d
+        ror     r14d, 2
+        add     r15d, [rsp + 1ch]
+        mov     r13d, ebx
+        add     eax, r15d
+        mov     r15d, ebx
+        or      r13d, esi
+        add     r8d, eax
+        and     r15d, esi
+        and     r13d, edi
+        add     eax, r14d
+        or      r13d, r15d
+        add     eax, r13d
+        movaps  xmm4, xmm6
+        movaps  xmm5, xmm7
         dec     rcx
         jne     @loop2
-        add     eax,[rdx]
-        mov     [rdx],eax
-        add     ebx,[rdx+4H]
-        add     edi,[rdx+8H]
-        add     esi,[rdx+0CH]
-        add     r8d,[rdx+10H]
-        add     r9d,[rdx+14H]
-        add     r10d,[rdx+18H]
-        add     r11d,[rdx+1CH]
-        mov     [rdx+4H],ebx
-        mov     [rdx+8H],edi
-        mov     [rdx+0CH],esi
-        mov     [rdx+10H],r8d
-        mov     [rdx+14H],r9d
-        mov     [rdx+18H],r10d
-        mov     [rdx+1CH],r11d
-        mov     rcx,[rsp+8H]
-        add     rcx,64
-        cmp     rcx,[rsp]
+        add     eax, [rdx]
+        mov     [rdx], eax
+        add     ebx, [rdx + 4H]
+        add     edi, [rdx + 8H]
+        add     esi, [rdx + 0CH]
+        add     r8d, [rdx + 10H]
+        add     r9d, [rdx + 14H]
+        add     r10d, [rdx + 18H]
+        add     r11d, [rdx + 1CH]
+        mov     [rdx + 4H], ebx
+        mov     [rdx + 8H], edi
+        mov     [rdx + 0CH], esi
+        mov     [rdx + 10H], r8d
+        mov     [rdx + 14H], r9d
+        mov     [rdx + 18H], r10d
+        mov     [rdx + 1CH], r11d
+        mov     rcx, [rsp + 8H]
+        add     rcx, 64
+        cmp     rcx, [rsp]
         jne     @loop0
 @done: {$ifndef LINUX}
-        movdqa  xmm6,[rsp+20H]
-        movdqa  xmm7,[rsp+30H]
-        movdqa  xmm8,[rsp+40H]
-        movdqa  xmm9,[rsp+50H]
-        movdqa  xmm10,[rsp+60H]
-        movdqa  xmm11,[rsp+70H]
-        movdqa  xmm12,[rsp+80H]
+        movaps  xmm6, [rsp + 20H]
+        movaps  xmm7, [rsp + 30H]
+        movaps  xmm8, [rsp + 40H]
+        movaps  xmm9, [rsp + 50H]
+        movaps  xmm10, [rsp + 60H]
+        movaps  xmm11, [rsp + 70H]
+        movaps  xmm12, [rsp + 80H]
         {$endif}
-        add     rsp,STACK_SIZE
+        add     rsp, STACK_SIZE
         pop     r15
         pop     r14
         pop     r13
@@ -7005,10 +7398,18 @@ asm // rcx=input_data rdx=digest r8=num_blks (Linux: rdi,rsi,rdx)
         pop     rsi
         {$endif}
         pop     rbx
+        ret
+{$ifdef FPC} align 16 {$else} .align 16 {$endif}
+@flip:  dq      $0405060700010203
+        dq      $0C0D0E0F08090A0B
+@00BA:  dq      $0B0A090803020100
+        dq      $FFFFFFFFFFFFFFFF
+@DC00:  dq      $FFFFFFFFFFFFFFFF
+        dq      $0B0A090803020100
 end;
 {$endif CPUX64}
 
-procedure sha256Compress(var Hash: TSHAHash; Data: pointer);
+procedure Sha256CompressPas(var Hash: TSHAHash; Data: pointer);
 // Actual hashing function
 var H: TSHAHash;
     W: array[0..63] of cardinal;
@@ -7017,16 +7418,6 @@ var H: TSHAHash;
     t1, t2: cardinal;
     {$endif}
 begin
-  {$ifdef CPUX64}
-  if cfSSE41 in CpuFeatures then begin
-    if K256Aligned='' then
-      SetString(K256Aligned,PAnsiChar(@K256),SizeOf(K256));
-    if PtrUInt(K256ALigned)and 15=0 then begin
-      sha256_sse4(Data^,Hash,1);
-      exit;
-    end; // if K256Aligned[] is not properly aligned -> fallback to pascal
-  end;
-  {$endif CPUX64}
   // calculate "expanded message blocks"
   Sha256ExpandMessageBlocks(@W,Data);
   // assign old working hash to local variables A..H
@@ -7132,6 +7523,15 @@ begin
   inc(Hash.H,H.H);
 end;
 
+procedure RawSha256Compress(var Hash; Data: pointer);
+begin
+  {$ifdef CPUX64}
+  if K256AlignedStore<>'' then // use optimized Intel's sha256_sse4.asm
+    sha256_sse4(Data^,Hash,1) else
+  {$endif CPUX64}
+    Sha256CompressPas(TSHAHash(Hash),Data);
+end;
+
 procedure TSHA256.Final(out Digest: TSHA256Digest; NoInit: boolean);
 // finalize SHA-256 calculation, clear context
 var Data: TSHAContext absolute Context;
@@ -7141,14 +7541,14 @@ begin
   FillcharFast(Data.Buffer[Data.Index+1],63-Data.Index,0);
   // compress if more than 448 bits (no space for 64 bit length storage)
   if Data.Index>=56 then begin
-    sha256Compress(Data.Hash,@Data.Buffer);
+    RawSha256Compress(Data.Hash,@Data.Buffer);
     FillcharFast(Data.Buffer,56,0);
   end;
   // write 64 bit Buffer length into the last bits of the last block
   // (in big endian format) and do a final compress
   PInteger(@Data.Buffer[56])^ := bswap32(TQWordRec(Data.MLen).H);
   PInteger(@Data.Buffer[60])^ := bswap32(TQWordRec(Data.MLen).L);
-  sha256Compress(Data.Hash,@Data.Buffer);
+  RawSha256Compress(Data.Hash,@Data.Buffer);
   // Hash -> Digest to little endian format
   bswap256(@Data.Hash,@Digest);
   // clear Data and internally stored Digest
@@ -7203,10 +7603,10 @@ begin
     if aLen<=Len then begin
       if Data.Index<>0 then begin
         MoveFast(Buffer^,Data.Buffer[Data.Index],aLen);
-        sha256Compress(Data.Hash,@Data.Buffer);
+        RawSha256Compress(Data.Hash,@Data.Buffer);
         Data.Index := 0;
       end else
-        sha256Compress(Data.Hash,Buffer); // avoid temporary copy
+        RawSha256Compress(Data.Hash,Buffer); // avoid temporary copy
       dec(Len,aLen);
       inc(PtrInt(Buffer),aLen);
     end else begin
@@ -7322,9 +7722,9 @@ end;
 {$ifdef SHA512_X86} // optimized asm using SSE3 instructions for x86 32-bit
 {$ifdef FPC}
   {$ifdef MSWINDOWS}
-    {$L fpc-win32\sha512-x86.o}
+    {$L static\i386-win32\sha512-x86.o}
   {$else}
-    {$L fpc-linux32/sha512-x86.o}
+    {$L static/i386-linux/sha512-x86.o}
   {$endif}
 {$else}
   {$L sha512-x86.obj}
@@ -7358,7 +7758,7 @@ procedure sha512_compress(state: PQWord; block: PByteArray); cdecl; external;
   {$ifdef MSWINDOWS}
     {$L sha512-x64sse4.obj}
   {$else}
-    {$L fpc-linux64/sha512-x64sse4.o}
+    {$L static/x86_64-linux/sha512-x64sse4.o}
   {$endif}
 {$else}
   {$L sha512-x64sse4.obj}
@@ -7366,6 +7766,19 @@ procedure sha512_compress(state: PQWord; block: PByteArray); cdecl; external;
 
 procedure sha512_sse4(data, hash: pointer; blocks: Int64); {$ifdef FPC}cdecl;{$endif} external;
 {$endif SHA512_X64}
+
+procedure RawSha512Compress(var Hash; Data: pointer);
+begin
+  {$ifdef SHA512_X86}
+  if cfSSSE3 in CpuFeatures then
+    sha512_compress(@Hash,Data) else
+  {$endif}
+  {$ifdef SHA512_X64}
+  if cfSSE41 in CpuFeatures then
+    sha512_sse4(Data,@Hash,1) else
+  {$endif}
+    sha512_compresspas(TSHA512Hash(Hash), Data);
+end;
 
 
 { TSHA384 }
@@ -7375,28 +7788,12 @@ begin
   Data[Index] := $80;
   FillcharFast(Data[Index+1],127-Index,0);
   if Index>=112 then begin
-    {$ifdef SHA512_X86}
-    if cfSSSE3 in CpuFeatures then
-      sha512_compress(@Hash,@Data) else
-    {$endif}
-    {$ifdef SHA512_X64}
-    if cfSSE41 in CpuFeatures then
-      sha512_sse4(@Data,@Hash,1) else
-    {$endif}
-      sha512_compresspas(Hash,@Data);
+    RawSha512Compress(Hash,@Data);
     FillcharFast(Data,112,0);
   end;
   PQWord(@Data[112])^ := bswap64(MLen shr 61);
   PQWord(@Data[120])^ := bswap64(MLen shl 3);
-  {$ifdef SHA512_X86}
-  if cfSSSE3 in CpuFeatures then
-    sha512_compress(@Hash,@Data) else
-  {$endif}
-  {$ifdef SHA512_X64}
-  if cfSSE41 in CpuFeatures then
-    sha512_sse4(@Data,@Hash,1) else
-  {$endif}
-    sha512_compresspas(Hash,@Data);
+  RawSha512Compress(Hash,@Data);
   bswap64array(@Hash,@Digest,6);
   if not NoInit then
     Init;
@@ -7439,28 +7836,12 @@ begin
     if aLen<=Len then begin
       if Index<>0 then begin
         MoveFast(Buffer^,Data[Index],aLen);
-        {$ifdef SHA512_X86}
-        if cfSSSE3 in CpuFeatures then
-          sha512_compress(@Hash,@Data) else
-        {$endif}
-        {$ifdef SHA512_X64}
-        if cfSSE41 in CpuFeatures then
-          sha512_sse4(@Data,@Hash,1) else
-        {$endif}
-          sha512_compresspas(Hash,@Data);
+        RawSha512Compress(Hash,@Data);
         Index := 0;
       end else // avoid temporary copy
-        {$ifdef SHA512_X86}
-        if cfSSSE3 in CpuFeatures then
-          sha512_compress(@Hash,Buffer) else
-        {$endif}
-        {$ifdef SHA512_X64}
-        if cfSSE41 in CpuFeatures then
-          sha512_sse4(Buffer,@Hash,1) else
-        {$endif}
-          sha512_compresspas(Hash,Buffer);
+        RawSha512Compress(Hash,Buffer);
       dec(Len,aLen);
-      inc(PtrUInt(Buffer),aLen);
+      inc(PByte(Buffer),aLen);
     end else begin
       MoveFast(Buffer^,Data[Index],Len);
       inc(Index,Len);
@@ -7482,28 +7863,12 @@ begin
   Data[Index] := $80;
   FillcharFast(Data[Index+1],127-Index,0);
   if Index>=112 then begin
-    {$ifdef SHA512_X86}
-    if cfSSSE3 in CpuFeatures then
-      sha512_compress(@Hash,@Data) else
-    {$endif}
-    {$ifdef SHA512_X64}
-    if cfSSE41 in CpuFeatures then
-      sha512_sse4(@Data,@Hash,1) else
-    {$endif}
-      sha512_compresspas(Hash,@Data);
+    RawSha512Compress(Hash,@Data);
     FillcharFast(Data,112,0);
   end;
   PQWord(@Data[112])^ := bswap64(MLen shr 61);
   PQWord(@Data[120])^ := bswap64(MLen shl 3);
-  {$ifdef SHA512_X86}
-  if cfSSSE3 in CpuFeatures then
-    sha512_compress(@Hash,@Data) else
-  {$endif}
-  {$ifdef SHA512_X64}
-  if cfSSE41 in CpuFeatures then
-    sha512_sse4(@Data,@Hash,1) else
-  {$endif}
-    sha512_compresspas(Hash,@Data);
+  RawSha512Compress(Hash,@Data);
   bswap64array(@Hash,@Digest,8);
   if not NoInit then
     Init;
@@ -7546,28 +7911,12 @@ begin
     if aLen<=Len then begin
       if Index<>0 then begin
         MoveFast(Buffer^,Data[Index],aLen);
-        {$ifdef SHA512_X86}
-        if cfSSSE3 in CpuFeatures then
-          sha512_compress(@Hash,@Data) else
-        {$endif}
-        {$ifdef SHA512_X64}
-        if cfSSE41 in CpuFeatures then
-          sha512_sse4(@Data,@Hash,1) else
-        {$endif}
-          sha512_compresspas(Hash,@Data);
+        RawSha512Compress(Hash,@Data);
         Index := 0;
       end else // avoid temporary copy
-        {$ifdef SHA512_X86}
-        if cfSSSE3 in CpuFeatures then
-          sha512_compress(@Hash,Buffer) else
-        {$endif}
-        {$ifdef SHA512_X64}
-        if cfSSE41 in CpuFeatures then
-          sha512_sse4(Buffer,@Hash,1) else
-        {$endif}
-          sha512_compresspas(Hash,Buffer);
+        RawSha512Compress(Hash,Buffer);
       dec(Len,aLen);
-      inc(PtrUInt(Buffer),aLen);
+      inc(PByte(Buffer),aLen);
     end else begin
       MoveFast(Buffer^,Data[Index],Len);
       inc(Index,Len);
@@ -7613,7 +7962,9 @@ const
     QWord($8000000000008080), QWord($0000000080000001), QWord($8000000080008008));
 
 type
-  TSHA3Context = object
+  {$ifdef USERECORDWITHMETHODS}TSHA3Context = record
+    {$else}TSHA3Context = object{$endif}
+  public
     State: packed array[0..cKeccakPermutationSizeInBytes-1] of byte;
     DataQueue: packed array[0..cKeccakMaximumRateInBytes-1] of byte;
     Algo: TSHA3Algo;
@@ -7740,7 +8091,8 @@ end;
   - new x64 assembler version by Synopse }
 
 procedure KeccakPermutationKernel(B, A, C: Pointer);
-{$ifdef CPU32} // Eric Grange's MMX version
+{$ifdef CPU32} // Eric Grange's MMX version (PIC-safe)
+  {$ifdef FPC}nostackframe; assembler;{$endif}
 asm
         add     edx, 128
         add     eax, 128
@@ -8081,9 +8433,8 @@ asm
         movq    [edx + 56], mm7
         movq    [edx + 64], mm0
 {$else}
-{$ifdef FPC}nostackframe; assembler;
-asm
-{$else}  { Synopse's x64 asm, optimized for both in/out-order pipelined CPUs }
+{$ifdef FPC}nostackframe; assembler; asm{$else}
+// Synopse's x64 asm, optimized for both in+out-order pipelined CPUs
 asm // input: rcx=B, rdx=A, r8=C (Linux: rdi,rsi,rdx)
         .noframe
 {$endif}{$ifndef win64}
@@ -8858,6 +9209,25 @@ begin
     end;
 end;
 
+procedure HashFile(const aFileName: TFileName; aAlgos: THashAlgos);
+var data, hash: RawUTF8;
+    efn, fn: string;
+    a: THashAlgo;
+begin
+  if aAlgos=[] then
+    exit;
+  efn := ExtractFileName(aFileName);
+  data := StringFromFile(aFileName);
+  if data<>'' then
+    for a := low(a) to high(a) do
+      if a in aAlgos then begin
+        FormatUTF8('% *%',[HashFull(a,pointer(data),length(data)),efn],hash);
+        FormatString('%.%',[efn,LowerCase(TrimLeftLowerCaseShort(ToText(a)))],fn);
+        FileFromString(hash,fn);
+      end;
+end;
+
+
 { TSynSigner }
 
 procedure TSynSigner.Init(aAlgo: TSignAlgo; aSecret: pointer; aSecretLen: integer);
@@ -8919,9 +9289,9 @@ end;
 procedure TSynSigner.Final(out aSignature: THash512Rec; aNoInit: boolean);
 begin
   case fAlgo of
-  saSha1:   PHMAC_SHA1(@ctxt)^.Done(PSHA1Digest(@aSignature)^,aNoInit);
+  saSha1:   PHMAC_SHA1(@ctxt)^.Done(aSignature.b160,aNoInit);
   saSha256: PHMAC_SHA256(@ctxt)^.Done(aSignature.Lo,aNoInit);
-  saSha384: PHMAC_SHA384(@ctxt)^.Done(aSignature.b3,aNoInit);
+  saSha384: PHMAC_SHA384(@ctxt)^.Done(aSignature.b384,aNoInit);
   saSha512: PHMAC_SHA512(@ctxt)^.Done(aSignature.b,aNoInit);
   saSha3224..saSha3S256: PSHA3(@ctxt)^.Final(@aSignature,fSignatureSize shl 3,aNoInit);
   end;
@@ -8976,6 +9346,88 @@ begin
   FillCharFast(ctxt,SizeOf(ctxt),0);
 end;
 
+procedure TSynSigner.PBKDF2(const aParams: TSynSignerParams;
+  out aDerivatedKey: THash512Rec);
+begin
+  PBKDF2(aParams.algo,aParams.secret,aParams.salt,aParams.rounds,aDerivatedKey);
+end;
+
+procedure TSynSigner.PBKDF2(aParamsJSON: PUTF8Char; aParamsJSONLen: integer;
+  out aDerivatedKey: THash512Rec; const aDefaultSalt: RawUTF8; aDefaultAlgo: TSignAlgo);
+var tmp: TSynTempBuffer;
+    k: TSynSignerParams;
+  procedure SetDefault;
+  begin
+    k.algo := aDefaultAlgo;
+    k.secret := '';
+    k.salt := aDefaultSalt;
+    k.rounds := 1000;
+  end;
+begin
+  SetDefault;
+  if (aParamsJSON=nil) or (aParamsJSONLen<=0) then
+    k.secret := aDefaultSalt else
+    if aParamsJSON[1]<>'{' then
+      FastSetString(k.secret,aParamsJSON,aParamsJSONLen) else begin
+    tmp.Init(aParamsJSON,aParamsJSONLen);
+    try
+      if (RecordLoadJSON(k,tmp.buf,TypeInfo(TSynSignerParams))=nil) or
+         (k.secret='') or (k.salt='') then begin
+        SetDefault;
+        FastSetString(k.secret,aParamsJSON,aParamsJSONLen);
+      end;
+    finally
+      FillCharFast(tmp.buf^,tmp.len,0);
+      tmp.Done;
+    end;
+  end;
+  PBKDF2(k.algo,k.secret,k.salt,k.rounds,aDerivatedKey);
+  FillZero(k.secret);
+end;
+
+procedure TSynSigner.PBKDF2(const aParamsJSON: RawUTF8; out aDerivatedKey: THash512Rec;
+    const aDefaultSalt: RawUTF8; aDefaultAlgo: TSignAlgo);
+begin
+  PBKDF2(pointer(aParamsJSON),length(aParamsJSON),aDerivatedKey,aDefaultSalt,aDefaultAlgo);
+end;
+
+procedure TSynSigner.AssignTo(var aDerivatedKey: THash512Rec; out aAES: TAES; aEncrypt: boolean);
+var ks: integer;
+begin
+  case Algo of
+  saSha3S128: ks := 128; // truncate to Keccak sponge precision
+  saSha3S256: ks := 256;
+  else
+    case SignatureSize of
+    20: begin
+      ks := 128;
+      aDerivatedKey.i0 := aDerivatedKey.i0 xor aDerivatedKey.i4;
+    end;
+    28: ks := 192;
+    32: ks := 256;
+    48: begin
+      ks := 256;
+      aDerivatedKey.d0 := aDerivatedKey.d0 xor aDerivatedKey.d4;
+      aDerivatedKey.d1 := aDerivatedKey.d1 xor aDerivatedKey.d5;
+    end;
+    64: begin
+      ks := 256;
+      aDerivatedKey.d0 := aDerivatedKey.d0 xor aDerivatedKey.d4;
+      aDerivatedKey.d1 := aDerivatedKey.d1 xor aDerivatedKey.d5;
+      aDerivatedKey.d2 := aDerivatedKey.d0 xor aDerivatedKey.d6;
+      aDerivatedKey.d3 := aDerivatedKey.d1 xor aDerivatedKey.d7;
+    end;
+    else exit;
+    end;
+  end;
+  aAES.DoInit(aDerivatedKey,ks,aEncrypt);
+  FillZero(aDerivatedKey.b);
+end;
+
+procedure TSynSigner.Done;
+begin
+  FillCharFast(self, SizeOf(self), 0);
+end;
 
 procedure AES(const Key; KeySize: cardinal; buffer: pointer; Len: Integer; Encrypt: boolean);
 begin
@@ -9042,7 +9494,7 @@ begin
   if (KeySize>4) and not Crypt.DoInit(Key,KeySize,Encrypt) then
     KeySize := 4; // if error in KeySize, use default fast XorOffset()
   if KeySize=0 then begin // no Crypt -> direct write to dest Stream
-    Stream.Write(buffer^,Len);
+    Stream.WriteBuffer(buffer^,Len);
     result := true;
     exit;
   end;
@@ -9062,15 +9514,15 @@ begin
         inc(i,b);
       end else
         Crypt.DoBlocks(buffer,buf,b shr AESBlockShift,Encrypt);
-      Stream.Write(buf^,b);
-      inc(PtrUInt(buffer),b);
+      Stream.WriteBuffer(buf^,b);
+      inc(PByte(buffer),b);
       dec(n,b);
     end;
     assert((KeySize>4)or(i=Len-Last));
     if last>0 then begin // crypt/uncrypt (Xor) last 0..15 bytes
       MoveFast(buffer^,buf^,Last);
       XorOffset(pointer(buf),Len-Last,Last);
-      Stream.Write(buf^,Last);
+      Stream.WriteBuffer(buf^,Last);
     end;
     result := true;
   finally
@@ -9106,15 +9558,15 @@ begin
   if pIn=nil then
     InStream.Read(Tmp^,ByteCount) else begin
     MoveFast(pIn^,Tmp^,ByteCount);
-    inc(PtrUInt(pIn),ByteCount);
+    inc(PByte(pIn),ByteCount);
   end;
 end;
 procedure Write(Tmp: pointer; ByteCount: cardinal);
 begin
   if pOut=nil then
-    OutStream.Write(Tmp^,ByteCount) else begin
+    OutStream.WriteBuffer(Tmp^,ByteCount) else begin
     MoveFast(Tmp^,pOut^,ByteCount);
-    inc(PtrUInt(pOut),ByteCount);
+    inc(PByte(pOut),ByteCount);
   end;
 end;
 procedure SetOutLen(Len: cardinal);
@@ -9347,7 +9799,7 @@ begin
       n := 5552;
     for i := 1 to n do begin
       inc(s1,PByte(p)^);
-      inc(PtrUInt(p));
+      inc(PByte(p));
       inc(s2,s1);
     end;
     s1 := s1 mod 65521;
@@ -9362,112 +9814,112 @@ function Adler32Asm(Adler: cardinal; p: pointer; Count: Integer): cardinal;
 begin
   result := Adler32Pas(Adler,p,Count);
 end;
-{$else}
+{$else} {$ifdef FPC} nostackframe; assembler; {$endif}
 asm
-    push  ebx
-    push  esi
-    push  edi
-    mov   edi,eax
-    shr   edi,16
-    movzx ebx,ax
-    push  ebp
-    mov   esi,edx
-    test  esi,esi
-    mov   ebp,ecx
-    jne   @31
-    mov   eax,1
-    jmp   @32
-@31:test  ebp,ebp
-  	jbe   @34
-@33:cmp   ebp,5552
-    jae    @35
-    mov   eax,ebp
-    jmp    @36
-@35:mov   eax,5552
-@36:sub   ebp,eax
-    cmp   eax,16
-    jl    @38
-    xor   edx,edx
-    xor   ecx,ecx
-@39:sub   eax,16
-    mov   dl,[esi]
-    mov   cl,[esi+1]
-    add   ebx,edx
-    add   edi,ebx
-    add   ebx,ecx
-    mov   dl,[esi+2]
-    add   edi,ebx
-    add   ebx,edx
-    mov   cl,[esi+3]
-    add   edi,ebx
-    add   ebx,ecx
-    mov   dl,[esi+4]
-    add   edi,ebx
-    add   ebx,edx
-    mov   cl,[esi+5]
-    add   edi,ebx
-    add   ebx,ecx
-    mov   dl,[esi+6]
-    add   edi,ebx
-    add   ebx,edx
-    mov   cl,[esi+7]
-    add   edi,ebx
-    add   ebx,ecx
-    mov   dl,[esi+8]
-    add   edi,ebx
-    add   ebx,edx
-    mov   cl,[esi+9]
-    add   edi,ebx
-    add   ebx,ecx
-    mov   dl,[esi+10]
-    add   edi,ebx
-    add   ebx,edx
-    mov   cl,[esi+11]
-    add   edi,ebx
-    add   ebx,ecx
-    mov   dl,[esi+12]
-    add   edi,ebx
-    add   ebx,edx
-    mov   cl,[esi+13]
-    add   edi,ebx
-    add   ebx,ecx
-    mov   dl,[esi+14]
-    add   edi,ebx
-    add   ebx,edx
-    mov   cl,[esi+15]
-    add   edi,ebx
-    add   ebx,ecx
-    cmp   eax,16
-    lea   esi,[esi+16]
-    lea   edi,[edi+ebx]
-    jge   @39
-@38:test  eax,eax
-  	je    @42
-@43:movzx edx,byte ptr [esi]
-    add   ebx,edx
-    dec   eax
-    lea   esi,[esi+1]
-    lea   edi,[edi+ebx]
-    jg    @43
-@42:mov   ecx,65521
-    mov   eax,ebx
-    xor   edx,edx
-    div   ecx
-    mov   ebx,edx
-    mov   ecx,65521
-    mov   eax,edi
-    xor   edx,edx
-    div   ecx
-    test  ebp,ebp
-    mov   edi,edx
-    ja    @33
-@34:mov   eax,edi
-    shl   eax,16
-    or    eax,ebx
-@32:pop   ebp
-	  pop   edi
-  	pop   esi
-  	pop   ebx
+        push    ebx
+        push    esi
+        push    edi
+        mov     edi, eax
+        shr     edi, 16
+        movzx   ebx, ax
+        push    ebp
+        mov     esi, edx
+        test    esi, esi
+        mov     ebp, ecx
+        jne     @31
+        mov     eax, 1
+        jmp     @32
+@31:    test    ebp, ebp
+        jbe     @34
+@33:    cmp     ebp, 5552
+        jae     @35
+        mov     eax, ebp
+        jmp     @36
+@35:    mov     eax, 5552
+@36:    sub     ebp, eax
+        cmp     eax, 16
+        jl      @38
+        xor     edx, edx
+        xor     ecx, ecx
+@39:    sub     eax, 16
+        mov     dl, [esi]
+        mov     cl, [esi + 1]
+        add     ebx, edx
+        add     edi, ebx
+        add     ebx, ecx
+        mov     dl, [esi + 2]
+        add     edi, ebx
+        add     ebx, edx
+        mov     cl, [esi + 3]
+        add     edi, ebx
+        add     ebx, ecx
+        mov     dl, [esi + 4]
+        add     edi, ebx
+        add     ebx, edx
+        mov     cl, [esi + 5]
+        add     edi, ebx
+        add     ebx, ecx
+        mov     dl, [esi + 6]
+        add     edi, ebx
+        add     ebx, edx
+        mov     cl, [esi + 7]
+        add     edi, ebx
+        add     ebx, ecx
+        mov     dl, [esi + 8]
+        add     edi, ebx
+        add     ebx, edx
+        mov     cl, [esi + 9]
+        add     edi, ebx
+        add     ebx, ecx
+        mov     dl, [esi + 10]
+        add     edi, ebx
+        add     ebx, edx
+        mov     cl, [esi + 11]
+        add     edi, ebx
+        add     ebx, ecx
+        mov     dl, [esi + 12]
+        add     edi, ebx
+        add     ebx, edx
+        mov     cl, [esi + 13]
+        add     edi, ebx
+        add     ebx, ecx
+        mov     dl, [esi + 14]
+        add     edi, ebx
+        add     ebx, edx
+        mov     cl, [esi + 15]
+        add     edi, ebx
+        add     ebx, ecx
+        add     esi, 16
+        lea     edi, [edi + ebx]
+        cmp     eax, 16
+        jge     @39
+@38:    test    eax, eax
+        je      @42
+@43:    movzx   edx, byte ptr[esi]
+        add     ebx, edx
+        dec     eax
+        lea     esi, [esi + 1]
+        lea     edi, [edi + ebx]
+        jg      @43
+@42:    mov     ecx, 65521
+        mov     eax, ebx
+        xor     edx, edx
+        div     ecx
+        mov     ebx, edx
+        mov     ecx, 65521
+        mov     eax, edi
+        xor     edx, edx
+        div     ecx
+        test    ebp, ebp
+        mov     edi, edx
+        ja      @33
+@34:    mov     eax, edi
+        shl     eax, 16
+        or      eax, ebx
+@32:    pop     ebp
+        pop     edi
+        pop     esi
+        pop     ebx
 end;
 {$endif}
 
@@ -9506,7 +9958,7 @@ begin
   if BufCount=0 then exit;
   assert((BufCount<sizeof(TAESBlock)) and AES.Initialized and not NoCrypt);
   XorOffset(@Buf,DestSize,BufCount);
-  Dest.Write(Buf,BufCount);
+  Dest.WriteBuffer(Buf,BufCount);
   BufCount := 0;
 end;
 
@@ -9540,7 +9992,7 @@ begin
       if BufCount<sizeof(TAESBlock) then
         exit;
       AES.Encrypt(Buf);
-      Dest.Write(Buf,sizeof(TAESBlock));
+      Dest.WriteBuffer(Buf,sizeof(TAESBlock));
       inc(DestSize,sizeof(TAESBlock));
       Dec(Count,Len);
       AES.DoBlocks(@B[Len],@B[Len],cardinal(Count) shr AESBlockShift,true);
@@ -9552,7 +10004,7 @@ begin
       MoveFast(B[Count],Buf[0],BufCount);
     end;
   end;
-  Dest.Write(Buffer,Count);
+  Dest.WriteBuffer(Buffer,Count);
   inc(DestSize,Count);
 end;
 
@@ -9566,16 +10018,16 @@ begin
     p^[1] := p^[1] xor Cod;
     p^[2] := p^[2] xor Cod;
     p^[3] := p^[3] xor Cod;
-    inc(PtrUInt(p),16);
+    inc(PByte(p),16);
   end;
   Cod := (Cod shl 11) xor integer(Td0[cod shr 21]);
-  for i := 1 to (Count and 15)shr 2 do begin // last 4 bytes blocs
+  for i := 1 to (Count and AESBlockMod)shr 2 do begin // last 4 bytes blocs
     p^[0] := p^[0] xor Cod;
-    inc(PtrUInt(p),4);
+    inc(PByte(p),4);
   end;
   for i := 1 to Count and 3 do begin
     PByte(p)^ := PByte(p)^ xor byte(Cod);
-    inc(PtrUInt(p));
+    inc(PByte(p));
   end;
 end;
 
@@ -9610,9 +10062,9 @@ begin // 1 to 3 bytes may stay unencrypted: not relevant
      P^[1] := P^[1] xor Code;
      P^[2] := P^[2] xor Code;
      P^[3] := P^[3] xor Code;
-     inc(PtrUInt(P),16);
+     inc(PByte(P),16);
   end;
-  for i := 0 to ((Count and 15)shr 2)-1 do // last 4 bytes blocs
+  for i := 0 to ((Count and AESBlockMod)shr 2)-1 do // last 4 bytes blocs
     P^[i] := P^[i] xor Code;
 end;
 
@@ -9620,6 +10072,738 @@ end;
 { TMD5 }
 
 procedure MD5Transform(var buf: TMD5Buf; const in_: TMD5In);
+// see https://synopse.info/forum/viewtopic.php?id=4369 for asm numbers
+{$ifdef CPUX64}
+{
+ MD5_Transform-x64
+ MD5 transform routine optimized for x64 processors
+ Copyright 2018 Ritlabs, SRL
+ The 64-bit version is written by Maxim Masiutin <max@ritlabs.com>
+
+ The main advantage of this 64-bit version is that it loads 64 bytes of hashed
+ message into 8 64-bit registers (RBP, R8, R9, R10, R11, R12, R13, R14) at the
+ beginning, to avoid excessive memory load operations througout the routine.
+
+ MD5_Transform-x64 is released under a dual license, and you may choose to use
+ it under either the Mozilla Public License 2.0 (MPL 2.1, available from
+ https://www.mozilla.org/en-US/MPL/2.0/) or the GNU Lesser General Public
+ License Version 3, dated 29 June 2007 (LGPL 3, available from
+ https://www.gnu.org/licenses/lgpl.html).
+
+ MD5_Transform-x64 is based on Peter Sawatzki's code.
+ Taken from https://github.com/maximmasiutin/MD5_Transform-x64
+}
+{$ifdef FPC}nostackframe; assembler; asm{$else}
+asm // W=rcx Buf=rdx
+        .noframe
+{$endif}
+        {$ifndef win64}
+        mov     rdx, rsi
+        mov     rcx, rdi
+        {$endif win64}
+        push    rbx
+        push    rsi
+        push    rdi
+        push    rbp
+        push    r12
+        push    r13
+        push    r14
+        mov     r14, rdx
+        mov     rsi, rcx
+        push    rsi
+        mov     eax, dword ptr [rsi]
+        mov     ebx, dword ptr [rsi+4H]
+        mov     ecx, dword ptr [rsi+8H]
+        mov     edx, dword ptr [rsi+0CH]
+        mov     rbp, qword ptr [r14]
+        add     eax, -680876936
+        add     eax, ebp
+        mov     esi, ebx
+        not     esi
+        and     esi, edx
+        mov     edi, ecx
+        and     edi, ebx
+        or      esi, edi
+        add     eax, esi
+        rol     eax, 7
+        add     eax, ebx
+        ror     rbp, 32
+        add     edx, -389564586
+        add     edx, ebp
+        mov     esi, eax
+        not     esi
+        and     esi, ecx
+        mov     edi, ebx
+        and     edi, eax
+        or      esi, edi
+        add     edx, esi
+        rol     edx, 12
+        add     edx, eax
+        mov     r8, qword ptr [r14+8H]
+        add     ecx, 606105819
+        add     ecx, r8d
+        mov     esi, edx
+        not     esi
+        and     esi, ebx
+        mov     edi, eax
+        and     edi, edx
+        or      esi, edi
+        add     ecx, esi
+        rol     ecx, 17
+        add     ecx, edx
+        ror     r8, 32
+        add     ebx, -1044525330
+        add     ebx, r8d
+        mov     esi, ecx
+        not     esi
+        and     esi, eax
+        mov     edi, edx
+        and     edi, ecx
+        or      esi, edi
+        add     ebx, esi
+        rol     ebx, 22
+        add     ebx, ecx
+        mov     r9, qword ptr [r14+10H]
+        add     eax, -176418897
+        add     eax, r9d
+        mov     esi, ebx
+        not     esi
+        and     esi, edx
+        mov     edi, ecx
+        and     edi, ebx
+        or      esi, edi
+        add     eax, esi
+        rol     eax, 7
+        add     eax, ebx
+        ror     r9, 32
+        add     edx, 1200080426
+        add     edx, r9d
+        mov     esi, eax
+        not     esi
+        and     esi, ecx
+        mov     edi, ebx
+        and     edi, eax
+        or      esi, edi
+        add     edx, esi
+        rol     edx, 12
+        add     edx, eax
+        mov     r10, qword ptr [r14+18H]
+        add     ecx, -1473231341
+        add     ecx, r10d
+        mov     esi, edx
+        not     esi
+        and     esi, ebx
+        mov     edi, eax
+        and     edi, edx
+        or      esi, edi
+        add     ecx, esi
+        rol     ecx, 17
+        add     ecx, edx
+        ror     r10, 32
+        add     ebx, -45705983
+        add     ebx, r10d
+        mov     esi, ecx
+        not     esi
+        and     esi, eax
+        mov     edi, edx
+        and     edi, ecx
+        or      esi, edi
+        add     ebx, esi
+        rol     ebx, 22
+        add     ebx, ecx
+        mov     r11, qword ptr [r14+20H]
+        add     eax, 1770035416
+        add     eax, r11d
+        mov     esi, ebx
+        not     esi
+        and     esi, edx
+        mov     edi, ecx
+        and     edi, ebx
+        or      esi, edi
+        add     eax, esi
+        rol     eax, 7
+        add     eax, ebx
+        ror     r11, 32
+        add     edx, -1958414417
+        add     edx, r11d
+        mov     esi, eax
+        not     esi
+        and     esi, ecx
+        mov     edi, ebx
+        and     edi, eax
+        or      esi, edi
+        add     edx, esi
+        rol     edx, 12
+        add     edx, eax
+        mov     r12, qword ptr [r14+28H]
+        add     ecx, -42063
+        add     ecx, r12d
+        mov     esi, edx
+        not     esi
+        and     esi, ebx
+        mov     edi, eax
+        and     edi, edx
+        or      esi, edi
+        add     ecx, esi
+        rol     ecx, 17
+        add     ecx, edx
+        ror     r12, 32
+        add     ebx, -1990404162
+        add     ebx, r12d
+        mov     esi, ecx
+        not     esi
+        and     esi, eax
+        mov     edi, edx
+        and     edi, ecx
+        or      esi, edi
+        add     ebx, esi
+        rol     ebx, 22
+        add     ebx, ecx
+        mov     r13, qword ptr [r14+30H]
+        add     eax, 1804603682
+        add     eax, r13d
+        mov     esi, ebx
+        not     esi
+        and     esi, edx
+        mov     edi, ecx
+        and     edi, ebx
+        or      esi, edi
+        add     eax, esi
+        rol     eax, 7
+        add     eax, ebx
+        ror     r13, 32
+        add     edx, -40341101
+        add     edx, r13d
+        mov     esi, eax
+        not     esi
+        and     esi, ecx
+        mov     edi, ebx
+        and     edi, eax
+        or      esi, edi
+        add     edx, esi
+        rol     edx, 12
+        add     edx, eax
+        mov     r14, qword ptr [r14+38H]
+        add     ecx, -1502002290
+        add     ecx, r14d
+        mov     esi, edx
+        not     esi
+        and     esi, ebx
+        mov     edi, eax
+        and     edi, edx
+        or      esi, edi
+        add     ecx, esi
+        rol     ecx, 17
+        add     ecx, edx
+        ror     r14, 32
+        add     ebx, 1236535329
+        add     ebx, r14d
+        mov     esi, ecx
+        not     esi
+        and     esi, eax
+        mov     edi, edx
+        and     edi, ecx
+        or      esi, edi
+        add     ebx, esi
+        rol     ebx, 22
+        add     ebx, ecx
+        add     eax, -165796510
+        add     eax, ebp
+        mov     esi, edx
+        not     esi
+        and     esi, ecx
+        mov     edi, edx
+        and     edi, ebx
+        or      esi, edi
+        add     eax, esi
+        rol     eax, 5
+        add     eax, ebx
+        ror     r10, 32
+        add     edx, -1069501632
+        add     edx, r10d
+        mov     esi, ecx
+        not     esi
+        and     esi, ebx
+        mov     edi, ecx
+        and     edi, eax
+        or      esi, edi
+        add     edx, esi
+        rol     edx, 9
+        add     edx, eax
+        add     ecx, 643717713
+        add     ecx, r12d
+        mov     esi, ebx
+        not     esi
+        and     esi, eax
+        mov     edi, ebx
+        and     edi, edx
+        or      esi, edi
+        add     ecx, esi
+        rol     ecx, 14
+        add     ecx, edx
+        ror     rbp, 32
+        add     ebx, -373897302
+        add     ebx, ebp
+        mov     esi, eax
+        not     esi
+        and     esi, edx
+        mov     edi, eax
+        and     edi, ecx
+        or      esi, edi
+        add     ebx, esi
+        rol     ebx, 20
+        add     ebx, ecx
+        add     eax, -701558691
+        add     eax, r9d
+        mov     esi, edx
+        not     esi
+        and     esi, ecx
+        mov     edi, edx
+        and     edi, ebx
+        or      esi, edi
+        add     eax, esi
+        rol     eax, 5
+        add     eax, ebx
+        ror     r12, 32
+        add     edx, 38016083
+        add     edx, r12d
+        mov     esi, ecx
+        not     esi
+        and     esi, ebx
+        mov     edi, ecx
+        and     edi, eax
+        or      esi, edi
+        add     edx, esi
+        rol     edx, 9
+        add     edx, eax
+        add     ecx, -660478335
+        add     ecx, r14d
+        mov     esi, ebx
+        not     esi
+        and     esi, eax
+        mov     edi, ebx
+        and     edi, edx
+        or      esi, edi
+        add     ecx, esi
+        rol     ecx, 14
+        add     ecx, edx
+        ror     r9, 32
+        add     ebx, -405537848
+        add     ebx, r9d
+        mov     esi, eax
+        not     esi
+        and     esi, edx
+        mov     edi, eax
+        and     edi, ecx
+        or      esi, edi
+        add     ebx, esi
+        rol     ebx, 20
+        add     ebx, ecx
+        add     eax, 568446438
+        add     eax, r11d
+        mov     esi, edx
+        not     esi
+        and     esi, ecx
+        mov     edi, edx
+        and     edi, ebx
+        or      esi, edi
+        add     eax, esi
+        rol     eax, 5
+        add     eax, ebx
+        ror     r14, 32
+        add     edx, -1019803690
+        add     edx, r14d
+        mov     esi, ecx
+        not     esi
+        and     esi, ebx
+        mov     edi, ecx
+        and     edi, eax
+        or      esi, edi
+        add     edx, esi
+        rol     edx, 9
+        add     edx, eax
+        add     ecx, -187363961
+        add     ecx, r8d
+        mov     esi, ebx
+        not     esi
+        and     esi, eax
+        mov     edi, ebx
+        and     edi, edx
+        or      esi, edi
+        add     ecx, esi
+        rol     ecx, 14
+        add     ecx, edx
+        ror     r11, 32
+        add     ebx, 1163531501
+        add     ebx, r11d
+        mov     esi, eax
+        not     esi
+        and     esi, edx
+        mov     edi, eax
+        and     edi, ecx
+        or      esi, edi
+        add     ebx, esi
+        rol     ebx, 20
+        add     ebx, ecx
+        add     eax, -1444681467
+        add     eax, r13d
+        mov     esi, edx
+        not     esi
+        and     esi, ecx
+        mov     edi, edx
+        and     edi, ebx
+        or      esi, edi
+        add     eax, esi
+        rol     eax, 5
+        add     eax, ebx
+        ror     r8, 32
+        add     edx, -51403784
+        add     edx, r8d
+        mov     esi, ecx
+        not     esi
+        and     esi, ebx
+        mov     edi, ecx
+        and     edi, eax
+        or      esi, edi
+        add     edx, esi
+        rol     edx, 9
+        add     edx, eax
+        ror     r10, 32
+        add     ecx, 1735328473
+        add     ecx, r10d
+        mov     esi, ebx
+        not     esi
+        and     esi, eax
+        mov     edi, ebx
+        and     edi, edx
+        or      esi, edi
+        add     ecx, esi
+        rol     ecx, 14
+        add     ecx, edx
+        ror     r13, 32
+        add     ebx, -1926607734
+        add     ebx, r13d
+        mov     esi, eax
+        not     esi
+        and     esi, edx
+        mov     edi, eax
+        and     edi, ecx
+        or      esi, edi
+        add     ebx, esi
+        rol     ebx, 20
+        add     ebx, ecx
+        ror     r9, 32
+        add     eax, -378558
+        add     eax, r9d
+        mov     esi, edx
+        xor     esi, ecx
+        xor     esi, ebx
+        add     eax, esi
+        rol     eax, 4
+        add     eax, ebx
+        add     edx, -2022574463
+        add     edx, r11d
+        mov     esi, ecx
+        xor     esi, ebx
+        xor     esi, eax
+        add     edx, esi
+        rol     edx, 11
+        add     edx, eax
+        ror     r12, 32
+        add     ecx, 1839030562
+        add     ecx, r12d
+        mov     esi, ebx
+        xor     esi, eax
+        xor     esi, edx
+        add     ecx, esi
+        rol     ecx, 16
+        add     ecx, edx
+        add     ebx, -35309556
+        add     ebx, r14d
+        mov     esi, eax
+        xor     esi, edx
+        xor     esi, ecx
+        add     ebx, esi
+        rol     ebx, 23
+        add     ebx, ecx
+        ror     rbp, 32
+        add     eax, -1530992060
+        add     eax, ebp
+        mov     esi, edx
+        xor     esi, ecx
+        xor     esi, ebx
+        add     eax, esi
+        rol     eax, 4
+        add     eax, ebx
+        ror     r9, 32
+        add     edx, 1272893353
+        add     edx, r9d
+        mov     esi, ecx
+        xor     esi, ebx
+        xor     esi, eax
+        add     edx, esi
+        rol     edx, 11
+        add     edx, eax
+        add     ecx, -155497632
+        add     ecx, r10d
+        mov     esi, ebx
+        xor     esi, eax
+        xor     esi, edx
+        add     ecx, esi
+        rol     ecx, 16
+        add     ecx, edx
+        ror     r12, 32
+        add     ebx, -1094730640
+        add     ebx, r12d
+        mov     esi, eax
+        xor     esi, edx
+        xor     esi, ecx
+        add     ebx, esi
+        rol     ebx, 23
+        add     ebx, ecx
+        ror     r13, 32
+        add     eax, 681279174
+        add     eax, r13d
+        mov     esi, edx
+        xor     esi, ecx
+        xor     esi, ebx
+        add     eax, esi
+        rol     eax, 4
+        add     eax, ebx
+        ror     rbp, 32
+        add     edx, -358537222
+        add     edx, ebp
+        mov     esi, ecx
+        xor     esi, ebx
+        xor     esi, eax
+        add     edx, esi
+        rol     edx, 11
+        add     edx, eax
+        ror     r8, 32
+        add     ecx, -722521979
+        add     ecx, r8d
+        mov     esi, ebx
+        xor     esi, eax
+        xor     esi, edx
+        add     ecx, esi
+        rol     ecx, 16
+        add     ecx, edx
+        ror     r10, 32
+        add     ebx, 76029189
+        add     ebx, r10d
+        mov     esi, eax
+        xor     esi, edx
+        xor     esi, ecx
+        add     ebx, esi
+        rol     ebx, 23
+        add     ebx, ecx
+        ror     r11, 32
+        add     eax, -640364487
+        add     eax, r11d
+        mov     esi, edx
+        xor     esi, ecx
+        xor     esi, ebx
+        add     eax, esi
+        rol     eax, 4
+        add     eax, ebx
+        ror     r13, 32
+        add     edx, -421815835
+        add     edx, r13d
+        mov     esi, ecx
+        xor     esi, ebx
+        xor     esi, eax
+        add     edx, esi
+        rol     edx, 11
+        add     edx, eax
+        ror     r14, 32
+        add     ecx, 530742520
+        add     ecx, r14d
+        mov     esi, ebx
+        xor     esi, eax
+        xor     esi, edx
+        add     ecx, esi
+        rol     ecx, 16
+        add     ecx, edx
+        ror     r8, 32
+        add     ebx, -995338651
+        add     ebx, r8d
+        mov     esi, eax
+        xor     esi, edx
+        xor     esi, ecx
+        add     ebx, esi
+        rol     ebx, 23
+        add     ebx, ecx
+        add     eax, -198630844
+        add     eax, ebp
+        mov     esi, edx
+        not     esi
+        or      esi, ebx
+        xor     esi, ecx
+        add     eax, esi
+        rol     eax, 6
+        add     eax, ebx
+        ror     r10, 32
+        add     edx, 1126891415
+        add     edx, r10d
+        mov     esi, ecx
+        not     esi
+        or      esi, eax
+        xor     esi, ebx
+        add     edx, esi
+        rol     edx, 10
+        add     edx, eax
+        ror     r14, 32
+        add     ecx, -1416354905
+        add     ecx, r14d
+        mov     esi, ebx
+        not     esi
+        or      esi, edx
+        xor     esi, eax
+        add     ecx, esi
+        rol     ecx, 15
+        add     ecx, edx
+        ror     r9, 32
+        add     ebx, -57434055
+        add     ebx, r9d
+        mov     esi, eax
+        not     esi
+        or      esi, ecx
+        xor     esi, edx
+        add     ebx, esi
+        rol     ebx, 21
+        add     ebx, ecx
+        add     eax, 1700485571
+        add     eax, r13d
+        mov     esi, edx
+        not     esi
+        or      esi, ebx
+        xor     esi, ecx
+        add     eax, esi
+        rol     eax, 6
+        add     eax, ebx
+        ror     r8, 32
+        add     edx, -1894986606
+        add     edx, r8d
+        mov     esi, ecx
+        not     esi
+        or      esi, eax
+        xor     esi, ebx
+        add     edx, esi
+        rol     edx, 10
+        add     edx, eax
+        add     ecx, -1051523
+        add     ecx, r12d
+        mov     esi, ebx
+        not     esi
+        or      esi, edx
+        xor     esi, eax
+        add     ecx, esi
+        rol     ecx, 15
+        add     ecx, edx
+        ror     rbp, 32
+        add     ebx, -2054922799
+        add     ebx, ebp
+        mov     esi, eax
+        not     esi
+        or      esi, ecx
+        xor     esi, edx
+        add     ebx, esi
+        rol     ebx, 21
+        add     ebx, ecx
+        ror     r11, 32
+        add     eax, 1873313359
+        add     eax, r11d
+        mov     esi, edx
+        not     esi
+        or      esi, ebx
+        xor     esi, ecx
+        add     eax, esi
+        rol     eax, 6
+        add     eax, ebx
+        ror     r14, 32
+        add     edx, -30611744
+        add     edx, r14d
+        mov     esi, ecx
+        not     esi
+        or      esi, eax
+        xor     esi, ebx
+        add     edx, esi
+        rol     edx, 10
+        add     edx, eax
+        ror     r10, 32
+        add     ecx, -1560198380
+        add     ecx, r10d
+        mov     esi, ebx
+        not     esi
+        or      esi, edx
+        xor     esi, eax
+        add     ecx, esi
+        rol     ecx, 15
+        add     ecx, edx
+        ror     r13, 32
+        add     ebx, 1309151649
+        add     ebx, r13d
+        mov     esi, eax
+        not     esi
+        or      esi, ecx
+        xor     esi, edx
+        add     ebx, esi
+        rol     ebx, 21
+        add     ebx, ecx
+        ror     r9, 32
+        add     eax, -145523070
+        add     eax, r9d
+        mov     esi, edx
+        not     esi
+        or      esi, ebx
+        xor     esi, ecx
+        add     eax, esi
+        rol     eax, 6
+        add     eax, ebx
+        ror     r12, 32
+        add     edx, -1120210379
+        add     edx, r12d
+        mov     esi, ecx
+        not     esi
+        or      esi, eax
+        xor     esi, ebx
+        add     edx, esi
+        rol     edx, 10
+        add     edx, eax
+        ror     r8, 32
+        add     ecx, 718787259
+        add     ecx, r8d
+        mov     esi, ebx
+        not     esi
+        or      esi, edx
+        xor     esi, eax
+        add     ecx, esi
+        rol     ecx, 15
+        add     ecx, edx
+        ror     r11, 32
+        add     ebx, -343485551
+        add     ebx, r11d
+        mov     esi, eax
+        not     esi
+        or      esi, ecx
+        xor     esi, edx
+        add     ebx, esi
+        rol     ebx, 21
+        add     ebx, ecx
+        pop     rsi
+        add     dword ptr [rsi], eax
+        add     dword ptr [rsi+4H], ebx
+        add     dword ptr [rsi+8H], ecx
+        add     dword ptr [rsi+0CH], edx
+        pop     r14
+        pop     r13
+        pop     r12
+        pop     rbp
+        pop     rdi
+        pop     rsi
+        pop     rbx
+end;
+{$else}
 {$ifdef PUREPASCAL}
 var a,b,c,d: cardinal; // unrolled -> compiler will only use cpu registers :)
 // the code below is very fast, and can be compared proudly against C or ASM
@@ -9764,558 +10948,670 @@ begin
   inc(buf[2],c);
   inc(buf[3],d);
 end;
-{$else} // MD5 don't use CPU pipelines: this optimized asm is only 10-15% faster
+{$else PUREPASCAL}
+{
+ MD5_386.Asm   -  386 optimized helper routine for calculating
+                  MD Message-Digest values
+ written 2/2/94 by Peter Sawatzki
+ Buchenhof 3, D58091 Hagen, Germany Fed Rep
+ Peter@Sawatzki.de http://www.sawatzki.de
+
+ original C Source was found in Dr. Dobbs Journal Sep 91
+ MD5 algorithm from RSA Data Security, Inc.
+ Taken from https://github.com/maximmasiutin/MD5_Transform-x64
+}   {$ifdef FPC} nostackframe; assembler; {$endif}
 asm // eax=buf:TMD5Buf edx=in_:TMD5In
-  push ebx
-  push esi
-  push edi
-  push ebp
-  push eax
-  mov esi,eax
-  mov ebp,edx
-  mov eax,[esi]
-  mov ebx,[esi+4H]
-  mov ecx,[esi+8H]
-  mov edx,[esi+0CH]
-  mov esi,ecx
-  add eax,[ebp]
-  xor esi,edx
-  and esi,ebx
-  xor esi,edx
-  lea eax,[esi+eax-28955B88H]
-  rol eax,7
-  add eax,ebx
-  mov esi,ebx
-  add edx,[ebp+4H]
-  xor esi,ecx
-  and esi,eax
-  xor esi,ecx
-  lea edx,[esi+edx-173848AAH]
-  rol edx,12
-  add edx,eax
-  mov esi,eax
-  add ecx,[ebp+8H]
-  xor esi,ebx
-  and esi,edx
-  xor esi,ebx
-  lea ecx,[esi+ecx+242070DBH]
-  rol ecx,17
-  add ecx,edx
-  mov esi,edx
-  add ebx,[ebp+0CH]
-  xor esi,eax
-  and esi,ecx
-  xor esi,eax
-  lea ebx,[esi+ebx-3E423112H]
-  rol ebx,22
-  add ebx,ecx
-  mov esi,ecx
-  add eax,[ebp+10H]
-  xor esi,edx
-  and esi,ebx
-  xor esi,edx
-  lea eax,[esi+eax-0A83F051H]
-  rol eax,7
-  add eax,ebx
-  mov esi,ebx
-  add edx,[ebp+14H]
-  xor esi,ecx
-  and esi,eax
-  xor esi,ecx
-  lea edx,[esi+edx+4787C62AH]
-  rol edx,12
-  add edx,eax
-  mov esi,eax
-  add ecx,[ebp+18H]
-  xor esi,ebx
-  and esi,edx
-  xor esi,ebx
-  lea ecx,[esi+ecx-57CFB9EDH]
-  rol ecx,17
-  add ecx,edx
-  mov esi,edx
-  add ebx,[ebp+1CH]
-  xor esi,eax
-  and esi,ecx
-  xor esi,eax
-  lea ebx,[esi+ebx-2B96AFFH]
-  rol ebx,22
-  add ebx,ecx
-  mov esi,ecx
-  add eax,[ebp+20H]
-  xor esi,edx
-  and esi,ebx
-  xor esi,edx
-  lea eax,[esi+eax+698098D8H]
-  rol eax,7
-  add eax,ebx
-  mov esi,ebx
-  add edx,[ebp+24H]
-  xor esi,ecx
-  and esi,eax
-  xor esi,ecx
-  lea edx,[esi+edx-74BB0851H]
-  rol edx,12
-  add edx,eax
-  mov esi,eax
-  add ecx,[ebp+28H]
-  xor esi,ebx
-  and esi,edx
-  xor esi,ebx
-  lea ecx,[esi+ecx-0A44FH]
-  rol ecx,17
-  add ecx,edx
-  mov esi,edx
-  add ebx,[ebp+2CH]
-  xor esi,eax
-  and esi,ecx
-  xor esi,eax
-  lea ebx,[esi+ebx-76A32842H]
-  rol ebx,22
-  add ebx,ecx
-  mov esi,ecx
-  add eax,[ebp+30H]
-  xor esi,edx
-  and esi,ebx
-  xor esi,edx
-  lea eax,[esi+eax+6B901122H]
-  rol eax,7
-  add eax,ebx
-  mov esi,ebx
-  add edx,[ebp+34H]
-  xor esi,ecx
-  and esi,eax
-  xor esi,ecx
-  lea edx,[esi+edx-2678E6DH]
-  rol edx,12
-  add edx,eax
-  mov esi,eax
-  add ecx,[ebp+38H]
-  xor esi,ebx
-  and esi,edx
-  xor esi,ebx
-  lea ecx,[esi+ecx-5986BC72H]
-  rol ecx,17
-  add ecx,edx
-  mov esi,edx
-  add ebx,[ebp+3CH]
-  xor esi,eax
-  and esi,ecx
-  xor esi,eax
-  lea ebx,[esi+ebx+49B40821H]
-  rol ebx,22
-  add ebx,ecx
-  mov esi,edx
-  mov edi,edx
-  add eax,[ebp+4H]
-  not esi
-  and edi,ebx
-  and esi,ecx
-  or  esi,edi
-  lea eax,[esi+eax-9E1DA9EH]
-  rol eax,5
-  add eax,ebx
-  mov esi,ecx
-  mov edi,ecx
-  add edx,[ebp+18H]
-  not esi
-  and edi,eax
-  and esi,ebx
-  or  esi,edi
-  lea edx,[esi+edx-3FBF4CC0H]
-  rol edx,9
-  add edx,eax
-  mov esi,ebx
-  mov edi,ebx
-  add ecx,[ebp+2CH]
-  not esi
-  and edi,edx
-  and esi,eax
-  or  esi,edi
-  lea ecx,[esi+ecx+265E5A51H]
-  rol ecx,14
-  add ecx,edx
-  mov esi,eax
-  mov edi,eax
-  add ebx,[ebp]
-  not esi
-  and edi,ecx
-  and esi,edx
-  or  esi,edi
-  lea ebx,[esi+ebx-16493856H]
-  rol ebx,20
-  add ebx,ecx
-  mov esi,edx
-  mov edi,edx
-  add eax,[ebp+14H]
-  not esi
-  and edi,ebx
-  and esi,ecx
-  or  esi,edi
-  lea eax,[esi+eax-29D0EFA3H]
-  rol eax,5
-  add eax,ebx
-  mov esi,ecx
-  mov edi,ecx
-  add edx,[ebp+28H]
-  not esi
-  and edi,eax
-  and esi,ebx
-  or  esi,edi
-  lea edx,[esi+edx+2441453H]
-  rol edx,9
-  add edx,eax
-  mov esi,ebx
-  mov edi,ebx
-  add ecx,[ebp+3CH]
-  not esi
-  and edi,edx
-  and esi,eax
-  or  esi,edi
-  lea ecx,[esi+ecx-275E197FH]
-  rol ecx,14
-  add ecx,edx
-  mov esi,eax
-  mov edi,eax
-  add ebx,[ebp+10H]
-  not esi
-  and edi,ecx
-  and esi,edx
-  or  esi,edi
-  lea ebx,[esi+ebx-182C0438H]
-  rol ebx,20
-  add ebx,ecx
-  mov esi,edx
-  mov edi,edx
-  add eax,[ebp+24H]
-  not esi
-  and edi,ebx
-  and esi,ecx
-  or  esi,edi
-  lea eax,[esi+eax+21E1CDE6H]
-  rol eax,5
-  add eax,ebx
-  mov esi,ecx
-  mov edi,ecx
-  add edx,[ebp+38H]
-  not esi
-  and edi,eax
-  and esi,ebx
-  or  esi,edi
-  lea edx,[esi+edx-3CC8F82AH]
-  rol edx,9
-  add edx,eax
-  mov esi,ebx
-  mov edi,ebx
-  add ecx,[ebp+0CH]
-  not esi
-  and edi,edx
-  and esi,eax
-  or  esi,edi
-  lea ecx,[esi+ecx-0B2AF279H]
-  rol ecx,14
-  add ecx,edx
-  mov esi,eax
-  mov edi,eax
-  add ebx,[ebp+20H]
-  not esi
-  and edi,ecx
-  and esi,edx
-  or  esi,edi
-  lea ebx,[esi+ebx+455A14EDH]
-  rol ebx,20
-  add ebx,ecx
-  mov esi,edx
-  mov edi,edx
-  add eax,[ebp+34H]
-  not esi
-  and edi,ebx
-  and esi,ecx
-  or  esi,edi
-  lea eax,[esi+eax-561C16FBH]
-  rol eax,5
-  add eax,ebx
-  mov esi,ecx
-  mov edi,ecx
-  add edx,[ebp+8H]
-  not esi
-  and edi,eax
-  and esi,ebx
-  or  esi,edi
-  lea edx,[esi+edx-3105C08H]
-  rol edx,9
-  add edx,eax
-  mov esi,ebx
-  mov edi,ebx
-  add ecx,[ebp+1CH]
-  not esi
-  and edi,edx
-  and esi,eax
-  or  esi,edi
-  lea ecx,[esi+ecx+676F02D9H]
-  rol ecx,14
-  add ecx,edx
-  mov esi,eax
-  mov edi,eax
-  add ebx,[ebp+30H]
-  not esi
-  and edi,ecx
-  and esi,edx
-  or  esi,edi
-  lea ebx,[esi+ebx-72D5B376H]
-  rol ebx,20
-  add ebx,ecx
-  mov esi,ecx
-  add eax,[ebp+14H]
-  xor esi,edx
-  xor esi,ebx
-  lea eax,[esi+eax-5C6BEH]
-  rol eax,4
-  add eax,ebx
-  mov esi,ebx
-  add edx,[ebp+20H]
-  xor esi,ecx
-  xor esi,eax
-  lea edx,[esi+edx-788E097FH]
-  rol edx,11
-  add edx,eax
-  mov esi,eax
-  add ecx,[ebp+2CH]
-  xor esi,ebx
-  xor esi,edx
-  lea ecx,[esi+ecx+6D9D6122H]
-  rol ecx,16
-  add ecx,edx
-  mov esi,edx
-  add ebx,[ebp+38H]
-  xor esi,eax
-  xor esi,ecx
-  lea ebx,[esi+ebx-21AC7F4H]
-  rol ebx,23
-  add ebx,ecx
-  mov esi,ecx
-  add eax,[ebp+4H]
-  xor esi,edx
-  xor esi,ebx
-  lea eax,[esi+eax-5B4115BCH]
-  rol eax,4
-  add eax,ebx
-  mov esi,ebx
-  add edx,[ebp+10H]
-  xor esi,ecx
-  xor esi,eax
-  lea edx,[esi+edx+4BDECFA9H]
-  rol edx,11
-  add edx,eax
-  mov esi,eax
-  add ecx,[ebp+1CH]
-  xor esi,ebx
-  xor esi,edx
-  lea ecx,[esi+ecx-944B4A0H]
-  rol ecx,16
-  add ecx,edx
-  mov esi,edx
-  add ebx,[ebp+28H]
-  xor esi,eax
-  xor esi,ecx
-  lea ebx,[esi+ebx-41404390H]
-  rol ebx,23
-  add ebx,ecx
-  mov esi,ecx
-  add eax,[ebp+34H]
-  xor esi,edx
-  xor esi,ebx
-  lea eax,[esi+eax+289B7EC6H]
-  rol eax,4
-  add eax,ebx
-  mov esi,ebx
-  add edx,[ebp]
-  xor esi,ecx
-  xor esi,eax
-  lea edx,[esi+edx-155ED806H]
-  rol edx,11
-  add edx,eax
-  mov esi,eax
-  add ecx,[ebp+0CH]
-  xor esi,ebx
-  xor esi,edx
-  lea ecx,[esi+ecx-2B10CF7BH]
-  rol ecx,16
-  add ecx,edx
-  mov esi,edx
-  add ebx,[ebp+18H]
-  xor esi,eax
-  xor esi,ecx
-  lea ebx,[esi+ebx+4881D05H]
-  rol ebx,23
-  add ebx,ecx
-  mov esi,ecx
-  add eax,[ebp+24H]
-  xor esi,edx
-  xor esi,ebx
-  lea eax,[esi+eax-262B2FC7H]
-  rol eax,4
-  add eax,ebx
-  mov esi,ebx
-  add edx,[ebp+30H]
-  xor esi,ecx
-  xor esi,eax
-  lea edx,[esi+edx-1924661BH]
-  rol edx,11
-  add edx,eax
-  mov esi,eax
-  add ecx,[ebp+3CH]
-  xor esi,ebx
-  xor esi,edx
-  lea ecx,[esi+ecx+1FA27CF8H]
-  rol ecx,16
-  add ecx,edx
-  mov esi,edx
-  add ebx,[ebp+8H]
-  xor esi,eax
-  xor esi,ecx
-  lea ebx,[esi+ebx-3B53A99BH]
-  rol ebx,23
-  add ebx,ecx
-  mov esi,edx
-  not esi
-  add eax,[ebp]
-  or  esi,ebx
-  xor esi,ecx
-  lea eax,[esi+eax-0BD6DDBCH]
-  rol eax,6
-  add eax,ebx
-  mov esi,ecx
-  not esi
-  add edx,[ebp+1CH]
-  or  esi,eax
-  xor esi,ebx
-  lea edx,[esi+edx+432AFF97H]
-  rol edx,10
-  add edx,eax
-  mov esi,ebx
-  not esi
-  add ecx,[ebp+38H]
-  or  esi,edx
-  xor esi,eax
-  lea ecx,[esi+ecx-546BDC59H]
-  rol ecx,15
-  add ecx,edx
-  mov esi,eax
-  not esi
-  add ebx,[ebp+14H]
-  or  esi,ecx
-  xor esi,edx
-  lea ebx,[esi+ebx-36C5FC7H]
-  rol ebx,21
-  add ebx,ecx
-  mov esi,edx
-  not esi
-  add eax,[ebp+30H]
-  or  esi,ebx
-  xor esi,ecx
-  lea eax,[esi+eax+655B59C3H]
-  rol eax,6
-  add eax,ebx
-  mov esi,ecx
-  not esi
-  add edx,[ebp+0CH]
-  or  esi,eax
-  xor esi,ebx
-  lea edx,[esi+edx-70F3336EH]
-  rol edx,10
-  add edx,eax
-  mov esi,ebx
-  not esi
-  add ecx,[ebp+28H]
-  or  esi,edx
-  xor esi,eax
-  lea ecx,[esi+ecx-100B83H]
-  rol ecx,15
-  add ecx,edx
-  mov esi,eax
-  not esi
-  add ebx,[ebp+4H]
-  or  esi,ecx
-  xor esi,edx
-  lea ebx,[esi+ebx-7A7BA22FH]
-  rol ebx,21
-  add ebx,ecx
-  mov esi,edx
-  not esi
-  add eax,[ebp+20H]
-  or  esi,ebx
-  xor esi,ecx
-  lea eax,[esi+eax+6FA87E4FH]
-  rol eax,6
-  add eax,ebx
-  mov esi,ecx
-  not esi
-  add edx,[ebp+3CH]
-  or  esi,eax
-  xor esi,ebx
-  lea edx,[esi+edx-1D31920H]
-  rol edx,10
-  add edx,eax
-  mov esi,ebx
-  not esi
-  add ecx,[ebp+18H]
-  or  esi,edx
-  xor esi,eax
-  lea ecx,[esi+ecx-5CFEBCECH]
-  rol ecx,15
-  add ecx,edx
-  mov esi,eax
-  not esi
-  add ebx,[ebp+34H]
-  or  esi,ecx
-  xor esi,edx
-  lea ebx,[esi+ebx+4E0811A1H]
-  rol ebx,21
-  add ebx,ecx
-  mov esi,edx
-  not esi
-  add eax,[ebp+10H]
-  or  esi,ebx
-  xor esi,ecx
-  lea eax,[esi+eax-8AC817EH]
-  rol eax,6
-  add eax,ebx
-  mov esi,ecx
-  not esi
-  add edx,[ebp+2CH]
-  or  esi,eax
-  xor esi,ebx
-  lea edx,[esi+edx-42C50DCBH]
-  rol edx,10
-  add edx,eax
-  mov esi,ebx
-  not esi
-  add ecx,[ebp+8H]
-  or  esi,edx
-  xor esi,eax
-  lea ecx,[esi+ecx+2AD7D2BBH]
-  rol ecx,15
-  add ecx,edx
-  mov esi,eax
-  not esi
-  add ebx,[ebp+24H]
-  or  esi,ecx
-  xor esi,edx
-  lea ebx,[esi+ebx-14792C6FH]
-  rol ebx,21
-  add ebx,ecx
-  pop esi
-  add [esi],eax
-  add [esi+4H],ebx
-  add [esi+8H],ecx
-  add [esi+0CH],edx
-  pop ebp
-  pop edi
-  pop esi
-  pop ebx
+        push    ebx
+        push    esi
+        push    edi
+        push    ebp
+        mov     ebp, edx
+        push    eax
+        mov     edx, dword ptr [eax+0CH]
+        mov     ecx, dword ptr [eax+8H]
+        mov     ebx, dword ptr [eax+4H]
+        mov     eax, dword ptr [eax]
+        add     eax, dword ptr [ebp]
+        add     eax, -680876936
+        mov     esi, ebx
+        not     esi
+        and     esi, edx
+        mov     edi, ecx
+        and     edi, ebx
+        or      esi, edi
+        add     eax, esi
+        rol     eax, 7
+        add     eax, ebx
+        add     edx, dword ptr [ebp+4H]
+        add     edx, -389564586
+        mov     esi, eax
+        not     esi
+        and     esi, ecx
+        mov     edi, ebx
+        and     edi, eax
+        or      esi, edi
+        add     edx, esi
+        rol     edx, 12
+        add     edx, eax
+        add     ecx, dword ptr [ebp+8H]
+        add     ecx, 606105819
+        mov     esi, edx
+        not     esi
+        and     esi, ebx
+        mov     edi, eax
+        and     edi, edx
+        or      esi, edi
+        add     ecx, esi
+        rol     ecx, 17
+        add     ecx, edx
+        add     ebx, dword ptr [ebp+0CH]
+        add     ebx, -1044525330
+        mov     esi, ecx
+        not     esi
+        and     esi, eax
+        mov     edi, edx
+        and     edi, ecx
+        or      esi, edi
+        add     ebx, esi
+        rol     ebx, 22
+        add     ebx, ecx
+        add     eax, dword ptr [ebp+10H]
+        add     eax, -176418897
+        mov     esi, ebx
+        not     esi
+        and     esi, edx
+        mov     edi, ecx
+        and     edi, ebx
+        or      esi, edi
+        add     eax, esi
+        rol     eax, 7
+        add     eax, ebx
+        add     edx, dword ptr [ebp+14H]
+        add     edx, 1200080426
+        mov     esi, eax
+        not     esi
+        and     esi, ecx
+        mov     edi, ebx
+        and     edi, eax
+        or      esi, edi
+        add     edx, esi
+        rol     edx, 12
+        add     edx, eax
+        add     ecx, dword ptr [ebp+18H]
+        add     ecx, -1473231341
+        mov     esi, edx
+        not     esi
+        and     esi, ebx
+        mov     edi, eax
+        and     edi, edx
+        or      esi, edi
+        add     ecx, esi
+        rol     ecx, 17
+        add     ecx, edx
+        add     ebx, dword ptr [ebp+1CH]
+        add     ebx, -45705983
+        mov     esi, ecx
+        not     esi
+        and     esi, eax
+        mov     edi, edx
+        and     edi, ecx
+        or      esi, edi
+        add     ebx, esi
+        rol     ebx, 22
+        add     ebx, ecx
+        add     eax, dword ptr [ebp+20H]
+        add     eax, 1770035416
+        mov     esi, ebx
+        not     esi
+        and     esi, edx
+        mov     edi, ecx
+        and     edi, ebx
+        or      esi, edi
+        add     eax, esi
+        rol     eax, 7
+        add     eax, ebx
+        add     edx, dword ptr [ebp+24H]
+        add     edx, -1958414417
+        mov     esi, eax
+        not     esi
+        and     esi, ecx
+        mov     edi, ebx
+        and     edi, eax
+        or      esi, edi
+        add     edx, esi
+        rol     edx, 12
+        add     edx, eax
+        add     ecx, dword ptr [ebp+28H]
+        add     ecx, -42063
+        mov     esi, edx
+        not     esi
+        and     esi, ebx
+        mov     edi, eax
+        and     edi, edx
+        or      esi, edi
+        add     ecx, esi
+        rol     ecx, 17
+        add     ecx, edx
+        add     ebx, dword ptr [ebp+2CH]
+        add     ebx, -1990404162
+        mov     esi, ecx
+        not     esi
+        and     esi, eax
+        mov     edi, edx
+        and     edi, ecx
+        or      esi, edi
+        add     ebx, esi
+        rol     ebx, 22
+        add     ebx, ecx
+        add     eax, dword ptr [ebp+30H]
+        add     eax, 1804603682
+        mov     esi, ebx
+        not     esi
+        and     esi, edx
+        mov     edi, ecx
+        and     edi, ebx
+        or      esi, edi
+        add     eax, esi
+        rol     eax, 7
+        add     eax, ebx
+        add     edx, dword ptr [ebp+34H]
+        add     edx, -40341101
+        mov     esi, eax
+        not     esi
+        and     esi, ecx
+        mov     edi, ebx
+        and     edi, eax
+        or      esi, edi
+        add     edx, esi
+        rol     edx, 12
+        add     edx, eax
+        add     ecx, dword ptr [ebp+38H]
+        add     ecx, -1502002290
+        mov     esi, edx
+        not     esi
+        and     esi, ebx
+        mov     edi, eax
+        and     edi, edx
+        or      esi, edi
+        add     ecx, esi
+        rol     ecx, 17
+        add     ecx, edx
+        add     ebx, dword ptr [ebp+3CH]
+        add     ebx, 1236535329
+        mov     esi, ecx
+        not     esi
+        and     esi, eax
+        mov     edi, edx
+        and     edi, ecx
+        or      esi, edi
+        add     ebx, esi
+        rol     ebx, 22
+        add     ebx, ecx
+        add     eax, dword ptr [ebp+4H]
+        add     eax, -165796510
+        mov     esi, edx
+        not     esi
+        and     esi, ecx
+        mov     edi, edx
+        and     edi, ebx
+        or      esi, edi
+        add     eax, esi
+        rol     eax, 5
+        add     eax, ebx
+        add     edx, dword ptr [ebp+18H]
+        add     edx, -1069501632
+        mov     esi, ecx
+        not     esi
+        and     esi, ebx
+        mov     edi, ecx
+        and     edi, eax
+        or      esi, edi
+        add     edx, esi
+        rol     edx, 9
+        add     edx, eax
+        add     ecx, dword ptr [ebp+2CH]
+        add     ecx, 643717713
+        mov     esi, ebx
+        not     esi
+        and     esi, eax
+        mov     edi, ebx
+        and     edi, edx
+        or      esi, edi
+        add     ecx, esi
+        rol     ecx, 14
+        add     ecx, edx
+        add     ebx, dword ptr [ebp]
+        add     ebx, -373897302
+        mov     esi, eax
+        not     esi
+        and     esi, edx
+        mov     edi, eax
+        and     edi, ecx
+        or      esi, edi
+        add     ebx, esi
+        rol     ebx, 20
+        add     ebx, ecx
+        add     eax, dword ptr [ebp+14H]
+        add     eax, -701558691
+        mov     esi, edx
+        not     esi
+        and     esi, ecx
+        mov     edi, edx
+        and     edi, ebx
+        or      esi, edi
+        add     eax, esi
+        rol     eax, 5
+        add     eax, ebx
+        add     edx, dword ptr [ebp+28H]
+        add     edx, 38016083
+        mov     esi, ecx
+        not     esi
+        and     esi, ebx
+        mov     edi, ecx
+        and     edi, eax
+        or      esi, edi
+        add     edx, esi
+        rol     edx, 9
+        add     edx, eax
+        add     ecx, dword ptr [ebp+3CH]
+        add     ecx, -660478335
+        mov     esi, ebx
+        not     esi
+        and     esi, eax
+        mov     edi, ebx
+        and     edi, edx
+        or      esi, edi
+        add     ecx, esi
+        rol     ecx, 14
+        add     ecx, edx
+        add     ebx, dword ptr [ebp+10H]
+        add     ebx, -405537848
+        mov     esi, eax
+        not     esi
+        and     esi, edx
+        mov     edi, eax
+        and     edi, ecx
+        or      esi, edi
+        add     ebx, esi
+        rol     ebx, 20
+        add     ebx, ecx
+        add     eax, dword ptr [ebp+24H]
+        add     eax, 568446438
+        mov     esi, edx
+        not     esi
+        and     esi, ecx
+        mov     edi, edx
+        and     edi, ebx
+        or      esi, edi
+        add     eax, esi
+        rol     eax, 5
+        add     eax, ebx
+        add     edx, dword ptr [ebp+38H]
+        add     edx, -1019803690
+        mov     esi, ecx
+        not     esi
+        and     esi, ebx
+        mov     edi, ecx
+        and     edi, eax
+        or      esi, edi
+        add     edx, esi
+        rol     edx, 9
+        add     edx, eax
+        add     ecx, dword ptr [ebp+0CH]
+        add     ecx, -187363961
+        mov     esi, ebx
+        not     esi
+        and     esi, eax
+        mov     edi, ebx
+        and     edi, edx
+        or      esi, edi
+        add     ecx, esi
+        rol     ecx, 14
+        add     ecx, edx
+        add     ebx, dword ptr [ebp+20H]
+        add     ebx, 1163531501
+        mov     esi, eax
+        not     esi
+        and     esi, edx
+        mov     edi, eax
+        and     edi, ecx
+        or      esi, edi
+        add     ebx, esi
+        rol     ebx, 20
+        add     ebx, ecx
+        add     eax, dword ptr [ebp+34H]
+        add     eax, -1444681467
+        mov     esi, edx
+        not     esi
+        and     esi, ecx
+        mov     edi, edx
+        and     edi, ebx
+        or      esi, edi
+        add     eax, esi
+        rol     eax, 5
+        add     eax, ebx
+        add     edx, dword ptr [ebp+8H]
+        add     edx, -51403784
+        mov     esi, ecx
+        not     esi
+        and     esi, ebx
+        mov     edi, ecx
+        and     edi, eax
+        or      esi, edi
+        add     edx, esi
+        rol     edx, 9
+        add     edx, eax
+        add     ecx, dword ptr [ebp+1CH]
+        add     ecx, 1735328473
+        mov     esi, ebx
+        not     esi
+        and     esi, eax
+        mov     edi, ebx
+        and     edi, edx
+        or      esi, edi
+        add     ecx, esi
+        rol     ecx, 14
+        add     ecx, edx
+        add     ebx, dword ptr [ebp+30H]
+        add     ebx, -1926607734
+        mov     esi, eax
+        not     esi
+        and     esi, edx
+        mov     edi, eax
+        and     edi, ecx
+        or      esi, edi
+        add     ebx, esi
+        rol     ebx, 20
+        add     ebx, ecx
+        add     eax, dword ptr [ebp+14H]
+        add     eax, -378558
+        mov     esi, edx
+        xor     esi, ecx
+        xor     esi, ebx
+        add     eax, esi
+        rol     eax, 4
+        add     eax, ebx
+        add     edx, dword ptr [ebp+20H]
+        add     edx, -2022574463
+        mov     esi, ecx
+        xor     esi, ebx
+        xor     esi, eax
+        add     edx, esi
+        rol     edx, 11
+        add     edx, eax
+        add     ecx, dword ptr [ebp+2CH]
+        add     ecx, 1839030562
+        mov     esi, ebx
+        xor     esi, eax
+        xor     esi, edx
+        add     ecx, esi
+        rol     ecx, 16
+        add     ecx, edx
+        add     ebx, dword ptr [ebp+38H]
+        add     ebx, -35309556
+        mov     esi, eax
+        xor     esi, edx
+        xor     esi, ecx
+        add     ebx, esi
+        rol     ebx, 23
+        add     ebx, ecx
+        add     eax, dword ptr [ebp+4H]
+        add     eax, -1530992060
+        mov     esi, edx
+        xor     esi, ecx
+        xor     esi, ebx
+        add     eax, esi
+        rol     eax, 4
+        add     eax, ebx
+        add     edx, dword ptr [ebp+10H]
+        add     edx, 1272893353
+        mov     esi, ecx
+        xor     esi, ebx
+        xor     esi, eax
+        add     edx, esi
+        rol     edx, 11
+        add     edx, eax
+        add     ecx, dword ptr [ebp+1CH]
+        add     ecx, -155497632
+        mov     esi, ebx
+        xor     esi, eax
+        xor     esi, edx
+        add     ecx, esi
+        rol     ecx, 16
+        add     ecx, edx
+        add     ebx, dword ptr [ebp+28H]
+        add     ebx, -1094730640
+        mov     esi, eax
+        xor     esi, edx
+        xor     esi, ecx
+        add     ebx, esi
+        rol     ebx, 23
+        add     ebx, ecx
+        add     eax, dword ptr [ebp+34H]
+        add     eax, 681279174
+        mov     esi, edx
+        xor     esi, ecx
+        xor     esi, ebx
+        add     eax, esi
+        rol     eax, 4
+        add     eax, ebx
+        add     edx, dword ptr [ebp]
+        add     edx, -358537222
+        mov     esi, ecx
+        xor     esi, ebx
+        xor     esi, eax
+        add     edx, esi
+        rol     edx, 11
+        add     edx, eax
+        add     ecx, dword ptr [ebp+0CH]
+        add     ecx, -722521979
+        mov     esi, ebx
+        xor     esi, eax
+        xor     esi, edx
+        add     ecx, esi
+        rol     ecx, 16
+        add     ecx, edx
+        add     ebx, dword ptr [ebp+18H]
+        add     ebx, 76029189
+        mov     esi, eax
+        xor     esi, edx
+        xor     esi, ecx
+        add     ebx, esi
+        rol     ebx, 23
+        add     ebx, ecx
+        add     eax, dword ptr [ebp+24H]
+        add     eax, -640364487
+        mov     esi, edx
+        xor     esi, ecx
+        xor     esi, ebx
+        add     eax, esi
+        rol     eax, 4
+        add     eax, ebx
+        add     edx, dword ptr [ebp+30H]
+        add     edx, -421815835
+        mov     esi, ecx
+        xor     esi, ebx
+        xor     esi, eax
+        add     edx, esi
+        rol     edx, 11
+        add     edx, eax
+        add     ecx, dword ptr [ebp+3CH]
+        add     ecx, 530742520
+        mov     esi, ebx
+        xor     esi, eax
+        xor     esi, edx
+        add     ecx, esi
+        rol     ecx, 16
+        add     ecx, edx
+        add     ebx, dword ptr [ebp+8H]
+        add     ebx, -995338651
+        mov     esi, eax
+        xor     esi, edx
+        xor     esi, ecx
+        add     ebx, esi
+        rol     ebx, 23
+        add     ebx, ecx
+        add     eax, dword ptr [ebp]
+        add     eax, -198630844
+        mov     esi, edx
+        not     esi
+        or      esi, ebx
+        xor     esi, ecx
+        add     eax, esi
+        rol     eax, 6
+        add     eax, ebx
+        add     edx, dword ptr [ebp+1CH]
+        add     edx, 1126891415
+        mov     esi, ecx
+        not     esi
+        or      esi, eax
+        xor     esi, ebx
+        add     edx, esi
+        rol     edx, 10
+        add     edx, eax
+        add     ecx, dword ptr [ebp+38H]
+        add     ecx, -1416354905
+        mov     esi, ebx
+        not     esi
+        or      esi, edx
+        xor     esi, eax
+        add     ecx, esi
+        rol     ecx, 15
+        add     ecx, edx
+        add     ebx, dword ptr [ebp+14H]
+        add     ebx, -57434055
+        mov     esi, eax
+        not     esi
+        or      esi, ecx
+        xor     esi, edx
+        add     ebx, esi
+        rol     ebx, 21
+        add     ebx, ecx
+        add     eax, dword ptr [ebp+30H]
+        add     eax, 1700485571
+        mov     esi, edx
+        not     esi
+        or      esi, ebx
+        xor     esi, ecx
+        add     eax, esi
+        rol     eax, 6
+        add     eax, ebx
+        add     edx, dword ptr [ebp+0CH]
+        add     edx, -1894986606
+        mov     esi, ecx
+        not     esi
+        or      esi, eax
+        xor     esi, ebx
+        add     edx, esi
+        rol     edx, 10
+        add     edx, eax
+        add     ecx, dword ptr [ebp+28H]
+        add     ecx, -1051523
+        mov     esi, ebx
+        not     esi
+        or      esi, edx
+        xor     esi, eax
+        add     ecx, esi
+        rol     ecx, 15
+        add     ecx, edx
+        add     ebx, dword ptr [ebp+4H]
+        add     ebx, -2054922799
+        mov     esi, eax
+        not     esi
+        or      esi, ecx
+        xor     esi, edx
+        add     ebx, esi
+        rol     ebx, 21
+        add     ebx, ecx
+        add     eax, dword ptr [ebp+20H]
+        add     eax, 1873313359
+        mov     esi, edx
+        not     esi
+        or      esi, ebx
+        xor     esi, ecx
+        add     eax, esi
+        rol     eax, 6
+        add     eax, ebx
+        add     edx, dword ptr [ebp+3CH]
+        add     edx, -30611744
+        mov     esi, ecx
+        not     esi
+        or      esi, eax
+        xor     esi, ebx
+        add     edx, esi
+        rol     edx, 10
+        add     edx, eax
+        add     ecx, dword ptr [ebp+18H]
+        add     ecx, -1560198380
+        mov     esi, ebx
+        not     esi
+        or      esi, edx
+        xor     esi, eax
+        add     ecx, esi
+        rol     ecx, 15
+        add     ecx, edx
+        add     ebx, dword ptr [ebp+34H]
+        add     ebx, 1309151649
+        mov     esi, eax
+        not     esi
+        or      esi, ecx
+        xor     esi, edx
+        add     ebx, esi
+        rol     ebx, 21
+        add     ebx, ecx
+        add     eax, dword ptr [ebp+10H]
+        add     eax, -145523070
+        mov     esi, edx
+        not     esi
+        or      esi, ebx
+        xor     esi, ecx
+        add     eax, esi
+        rol     eax, 6
+        add     eax, ebx
+        add     edx, dword ptr [ebp+2CH]
+        add     edx, -1120210379
+        mov     esi, ecx
+        not     esi
+        or      esi, eax
+        xor     esi, ebx
+        add     edx, esi
+        rol     edx, 10
+        add     edx, eax
+        add     ecx, dword ptr [ebp+8H]
+        add     ecx, 718787259
+        mov     esi, ebx
+        not     esi
+        or      esi, edx
+        xor     esi, eax
+        add     ecx, esi
+        rol     ecx, 15
+        add     ecx, edx
+        add     ebx, dword ptr [ebp+24H]
+        add     ebx, -343485551
+        mov     esi, eax
+        not     esi
+        or      esi, ecx
+        xor     esi, edx
+        add     ebx, esi
+        rol     ebx, 21
+        add     ebx, ecx
+        pop     esi
+        add     dword ptr [esi], eax
+        add     dword ptr [esi+4H], ebx
+        add     dword ptr [esi+8H], ecx
+        add     dword ptr [esi+0CH], edx
+        pop     ebp
+        pop     edi
+        pop     esi
+        pop     ebx
 end;
-{$endif}
+{$endif PUREPASCAL}
+{$endif CPUX64}
+
+procedure RawMd5Compress(var Hash; Data: pointer);
+begin
+  MD5Transform(TMD5Buf(Hash), PMD5In(Data)^);
+end;
 
 function TMD5.Final: TMD5Digest;
 begin
@@ -10413,7 +11709,7 @@ begin
   // First chunk is an odd size
   MoveFast(p^,Pointer(PtrUInt(@in_)+64-t)^,t);
   MD5Transform(buf,in_);
-  inc(PtrUInt(p),t);
+  inc(PByte(p),t);
   dec(len,t);
   // Process data in 64-byte chunks
   for i := 1 to len shr 6 do begin
@@ -10433,63 +11729,6 @@ function MD5Buf(const Buffer; Len: Cardinal): TMD5Digest;
 var MD5: TMD5;
 begin
   MD5.Full(@Buffer,Len,result);
-end;
-
-function AESBlockToShortString(const block: TAESBlock): short32;
-begin
-  AESBlockToShortString(block,result);
-end;
-
-procedure AESBlockToShortString(const block: TAESBlock; out result: short32);
-begin
-  result[0] := #32;
-  SynCommons.BinToHex(@block,@result[1],16);
-end;
-
-function AESBlockToString(const block: TAESBlock): RawUTF8;
-begin
-  SetString(result,nil,32);
-  SynCommons.BinToHex(@block,pointer(result),16);
-end;
-
-function MD5DigestToString(const D: TMD5Digest): RawUTF8;
-begin
-  BinToHexLower(@D,sizeof(D),result);
-end;
-
-function MD5StringToDigest(const Source: RawUTF8; out Dest: TMD5Digest): boolean;
-begin
-  result := SynCommons.HexToBin(pointer(Source), @Dest, sizeof(Dest));
-end;
-
-function SHA1DigestToString(const D: TSHA1Digest): RawUTF8;
-begin
-  BinToHexLower(@D,sizeof(D),result);
-end;
-
-function SHA1StringToDigest(const Source: RawUTF8; out Dest: TSHA1Digest): boolean;
-begin
-  result := SynCommons.HexToBin(pointer(Source), @Dest, sizeof(Dest));
-end;
-
-function SHA256DigestToString(const D: TSHA256Digest): RawUTF8;
-begin
-  BinToHexLower(@D,sizeof(D),result);
-end;
-
-function SHA256StringToDigest(const Source: RawUTF8; out Dest: TSHA256Digest): boolean;
-begin
-  result := SynCommons.HexToBin(pointer(Source), @Dest, sizeof(Dest));
-end;
-
-function SHA512DigestToString(const D: TSHA512Digest): RawUTF8;
-begin
-  BinToHexLower(@D, sizeof(D), result);
-end;
-
-function SHA384DigestToString(const D: TSHA384Digest): RawUTF8;
-begin
-  BinToHexLower(@D, sizeof(D), result);
 end;
 
 function htdigest(const user, realm, pass: RawByteString): RawUTF8;
@@ -10623,6 +11862,11 @@ begin
   inc(Hash.E,E);
 end;
 
+procedure RawSha1Compress(var Hash; Data: pointer);
+begin
+  sha1Compress(TSHAHash(Hash), Data);
+end;
+
 procedure TSHA1.Final(out Digest: TSHA1Digest; NoInit: boolean);
 var Data: TSHAContext absolute Context;
 begin
@@ -10695,7 +11939,7 @@ begin
       end else
         sha1Compress(Data.Hash,Buffer); // avoid temporary copy
       dec(Len,aLen);
-      inc(PtrUInt(buffer),aLen);
+      inc(PByte(buffer),aLen);
     end else begin
       MoveFast(buffer^,Data.Buffer[Data.Index],Len);
       inc(Data.Index,Len);
@@ -10712,39 +11956,6 @@ end;
 
 { TAESAbstract }
 
-{$ifdef CPU64}
-procedure XorBlock16(A,B: PInt64Array);
-begin
-  A[0] := A[0] xor B[0];
-  A[1] := A[1] xor B[1];
-end;
-
-procedure XorBlock16(A,B,C: PInt64Array);
-begin
-  B[0] := A[0] xor C[0];
-  B[1] := A[1] xor C[1];
-end;
-{$else}
-procedure XorBlock16(A,B: PCardinalArray);
-begin
-  A[0] := A[0] xor B[0];
-  A[1] := A[1] xor B[1];
-  A[2] := A[2] xor B[2];
-  A[3] := A[3] xor B[3];
-end;
-
-procedure XorBlock16(A,B,C: PCardinalArray);
-begin
-  B[0] := A[0] xor C[0];
-  B[1] := A[1] xor C[1];
-  B[2] := A[2] xor C[2];
-  B[3] := A[3] xor C[3];
-end;
-{$endif}
-
-const
-  sAESException = 'AES engine initialization failure';
-
 var
   aesivctr: array[boolean] of TAESLocked;
 
@@ -10758,19 +11969,16 @@ begin
         DecryptInit(AESIVCTR_KEY,128);
   end;
   with aesivctr[DoEncrypt] do begin
-    EnterCriticalSection(fLock);
-    if DoEncrypt then
-      fAES.Encrypt(TAESBlock(BI),TAESBlock(BO)) else
-      fAES.Decrypt(TAESBlock(BI),TAESBlock(BO));
-    LeaveCriticalSection(fLock);
+    fSafe^.Lock;
+    TAESContext(fAES.Context).DoBlock(fAES.Context,BI,BO);
+    fSafe^.UnLock;
   end;
 end;
 
 constructor TAESAbstract.Create(const aKey; aKeySize: cardinal);
 begin
    if (aKeySize<>128) and (aKeySize<>192) and (aKeySize<>256) then
-    raise ESynCrypto.CreateUTF8(
-      '%.Create key size = %; should be either 128, 192 or 256',[self,aKeySize]);
+    raise ESynCrypto.CreateUTF8('%.Create(aKeySize=%): 128/192/256 required',[self,aKeySize]);
   fKeySize := aKeySize;
   fKeySizeBytes := fKeySize shr 3;
   MoveFast(aKey,fKey,fKeySizeBytes);
@@ -10827,9 +12035,26 @@ begin
   FillZero(fKey);
 end;
 
+function TAESAbstract.AlgoName: TShort16;
+const TXT: array[2..4] of array[0..7] of AnsiChar = (#9'aes128',#9'aes192',#9'aes256');
+var s: PShortString;
+begin
+  if (self=nil) or (KeySize=0) then
+    result[0] := #0 else begin
+    PInt64(@result)^ := PInt64(@TXT[KeySize shr 6])^;
+    s := ClassNameShort(self);
+    if s^[0]<#7 then
+      result[0] := #6 else begin
+      result[7] := NormToLower[s^[5]]; // TAESCBC -> 'aes128cbc'
+      result[8] := NormToLower[s^[6]];
+      result[9] := NormToLower[s^[7]];
+    end;
+  end;
+end;
+
 procedure TAESAbstract.SetIVHistory(aDepth: integer);
 begin
-  fIVHistoryDec.Init(aDepth);
+  fIVHistoryDec.Init(aDepth,aDepth);
 end;
 
 function TAESAbstract.EncryptPKCS7(const Input: RawByteString;
@@ -10843,6 +12068,7 @@ end;
 function TAESAbstract.EncryptPKCS7(const Input: TBytes;
   IVAtBeginning: boolean): TBytes;
 begin
+  result := nil;
   SetLength(result,EncryptPKCS7Length(length(Input),IVAtBeginning));
   EncryptPKCS7Buffer(Pointer(Input),pointer(result),
     length(Input),length(result),IVAtBeginning);
@@ -11148,24 +12374,24 @@ end;
 destructor TAESAbstractSyn.Destroy;
 begin
   inherited Destroy;
-  AES.Done; // mandatory for Padlock - also fill AES buffer with 0 for safety
+  AES.Done;      // mandatory for Padlock - also fill buffer with 0 for safety
+  FillZero(fCV); // may contain sensitive data on some modes
 end;
 
 function TAESAbstractSyn.Clone: TAESAbstract;
 begin
-  {$ifdef USEPADLOCK}
-  if TAESContext(AES).initialized and (TAESContext(AES).ViaCtx<>nil) then
-    result := inherited Clone;
-  {$endif}
-  result := NewInstance as TAESAbstractSyn;
-  MoveFast(pointer(self)^,pointer(result)^,InstanceSize);
+  if (fIVHistoryDec.Count<>0) {$ifdef USEPADLOCK} or
+     TAESContext(AES).initialized and (TAESContext(AES).ViaCtx<>nil){$endif} then
+    result := inherited Clone else begin
+    result := NewInstance as TAESAbstractSyn;
+    MoveFast(pointer(self)^,pointer(result)^,InstanceSize);
+  end;
 end;
 
 procedure TAESAbstractSyn.Decrypt(BufIn, BufOut: pointer; Count: cardinal);
 begin
   fIn := BufIn;
   fOut := BufOut;
-  fCount := Count;
   fCV := fIV;
 end;
 
@@ -11173,14 +12399,13 @@ procedure TAESAbstractSyn.DecryptInit;
 begin
   if AES.DecryptInit(fKey,fKeySize) then
     fAESInit := initDecrypt else
-    raise ESynCrypto.Create(sAESException);
+    raise ESynCrypto.CreateUTF8('%.DecryptInit',[self]);
 end;
 
 procedure TAESAbstractSyn.Encrypt(BufIn, BufOut: pointer; Count: cardinal);
 begin
   fIn := BufIn;
   fOut := BufOut;
-  fCount := Count;
   fCV := fIV;
 end;
 
@@ -11188,19 +12413,15 @@ procedure TAESAbstractSyn.EncryptInit;
 begin
   if AES.EncryptInit(fKey,fKeySize) then
     fAESInit := initEncrypt else
-    raise ESynCrypto.Create(sAESException);
+    raise ESynCrypto.CreateUTF8('%.EncryptInit',[self]);
 end;
 
-procedure TAESAbstractSyn.TrailerBytes;
+procedure TAESAbstractSyn.TrailerBytes(count: cardinal);
 begin
   if fAESInit<>initEncrypt then
     EncryptInit;
-  {$ifdef USEAESNI64}
-  if Assigned(TAESContext(AES.Context).AesNi) then
-    TAESContext(AES.Context).AesNi(AES.Context,fCV,fCV) else
-  {$endif USEAESNI64}
-    AES.Encrypt(fCV,fCV);
-  XorMemory(pointer(fOut),pointer(fIn),@fCV,fCount);
+  TAESContext(AES.Context).DoBlock(AES.Context,fCV,fCV);
+  XorMemory(pointer(fOut),pointer(fIn),@fCV,count);
 end;
 
 
@@ -11209,37 +12430,33 @@ end;
 procedure TAESECB.Decrypt(BufIn, BufOut: pointer; Count: cardinal);
 var i: integer;
 begin
-  inherited; // CV := IV + set fIn,fOut,fCount
+  inherited; // CV := IV + set fIn,fOut
   if fAESInit<>initDecrypt then
     DecryptInit;
   for i := 1 to Count shr 4 do begin
-    AES.Decrypt(fIn^,fOut^);
+    TAESContext(AES.Context).DoBlock(AES.Context,fIn^,fOut^);
     inc(fIn);
     inc(fOut);
   end;
-  fCount := fCount and AESBlockMod;
-  if fCount<>0 then
-    TrailerBytes;
+  Count := Count and AESBlockMod;
+  if Count<>0 then
+    TrailerBytes(Count);
 end;
 
 procedure TAESECB.Encrypt(BufIn, BufOut: pointer; Count: cardinal);
 var i: integer;
 begin
-  inherited; // CV := IV + set fIn,fOut,fCount
+  inherited; // CV := IV + set fIn,fOut
   if fAESInit<>initEncrypt then
     EncryptInit;
   for i := 1 to Count shr 4 do begin
-    {$ifdef USEAESNI64}
-    if Assigned(TAESContext(AES.Context).AesNi) then
-      TAESContext(AES.Context).AesNi(AES.Context,fIn^,fOut^) else
-    {$endif USEAESNI64}
-      AES.Encrypt(fIn^,fOut^);
+    TAESContext(AES.Context).DoBlock(AES.Context,fIn^,fOut^);
     inc(fIn);
     inc(fOut);
   end;
-  fCount := fCount and AESBlockMod;
-  if fCount<>0 then
-    TrailerBytes;
+  Count := Count and AESBlockMod;
+  if Count<>0 then
+    TrailerBytes(Count);
 end;
 
 
@@ -11249,44 +12466,40 @@ procedure TAESCBC.Decrypt(BufIn, BufOut: pointer; Count: cardinal);
 var i: integer;
     tmp: TAESBlock;
 begin
-  inherited; // CV := IV + set fIn,fOut,fCount
+  inherited; // CV := IV + set fIn,fOut
   if Count>=sizeof(TAESBlock) then begin
     if fAESInit<>initDecrypt then
       DecryptInit;
     for i := 1 to Count shr 4 do begin
       tmp := fIn^;
-      AES.Decrypt(fIn^,fOut^);
+      TAESContext(AES.Context).DoBlock(AES.Context,fIn^,fOut^);
       XorBlock16(pointer(fOut),pointer(@fCV));
       fCV := tmp;
       inc(fIn);
       inc(fOut);
     end;
   end;
-  fCount := fCount and AESBlockMod;
-  if fCount<>0 then
-    TrailerBytes;
+  Count := Count and AESBlockMod;
+  if Count<>0 then
+    TrailerBytes(Count);
 end;
 
 procedure TAESCBC.Encrypt(BufIn, BufOut: pointer; Count: cardinal);
 var i: integer;
 begin
-  inherited; // CV := IV + set fIn,fOut,fCount
+  inherited; // CV := IV + set fIn,fOut
   if fAESInit<>initEncrypt then
     EncryptInit;
   for i := 1 to Count shr 4 do begin
     XorBlock16(pointer(fIn),pointer(fOut),pointer(@fCV));
-    {$ifdef USEAESNI64}
-    if Assigned(TAESContext(AES.Context).AesNi) then
-      TAESContext(AES.Context).AesNi(AES.Context,fOut^,fOut^) else
-    {$endif USEAESNI64}
-      AES.Encrypt(fOut^,fOut^);
+    TAESContext(AES.Context).DoBlock(AES.Context,fOut^,fOut^);
     fCV := fOut^;
     inc(fIn);
     inc(fOut);
   end;
-  fCount := fCount and AESBlockMod;
-  if fCount<>0 then
-    TrailerBytes;
+  Count := Count and AESBlockMod;
+  if Count<>0 then
+    TrailerBytes(Count);
 end;
 
 { TAESAbstractEncryptOnly }
@@ -11294,7 +12507,7 @@ end;
 constructor TAESAbstractEncryptOnly.Create(const aKey; aKeySize: cardinal);
 begin
   inherited Create(aKey,aKeySize);
-  EncryptInit; // as expected by overriden Encrypt/Decrypt methods below 
+  EncryptInit; // as expected by overriden Encrypt/Decrypt methods below
 end;
 
 function TAESAbstractEncryptOnly.CloneEncryptDecrypt: TAESAbstract;
@@ -11307,16 +12520,18 @@ end;
 
 {$ifdef USEAESNI32}
 procedure AesNiTrailer; // = TAESAbstractSyn.EncryptTrailer from AES-NI asm
+  {$ifdef FPC} nostackframe; assembler; {$endif}
 asm // eax=TAESContext ecx=len xmm7=CV esi=BufIn edi=BufOut
-    call   dword ptr [eax].TAESContext.AesNi // = AES.Encrypt(fCV,fCV)
+    call   dword ptr [eax].TAESContext.AesNi32 // = AES.Encrypt(fCV,fCV)
     lea    edx, [eax].TAESContext.buf // used as temporary buffer
-    movdqu [edx], xmm7
+    movups [edx], xmm7
     cld
 @s: lodsb
     xor    al, [edx] // = XorMemory(pointer(fOut),pointer(fIn),@fCV,len);
     inc    edx
     stosb
-    loop   @s
+    dec    ecx
+    jnz    @s
 end;
 {$endif}
 
@@ -11325,53 +12540,50 @@ var i: integer;
     tmp: TAESBlock;
 begin
   {$ifdef USEAESNI32}
-  if Assigned(TAESContext(AES.Context).AesNi) then
+  if Assigned(TAESContext(AES.Context).AesNi32) then
   asm
-    push   esi
-    push   edi
-    mov    eax,self
-    mov    ecx,Count
-    mov    esi,BufIn
-    mov    edi,BufOut
-    movdqu xmm7,dqword ptr [eax].TAESCFB.fIV
-    lea    eax,[eax].TAESCFB.AES
-    push   ecx
-    shr    ecx,4
-    jz     @z
-@s: call   dword ptr [eax].TAESContext.AesNi // AES.Encrypt(fCV,fCV)
-    movdqu xmm0,dqword ptr [esi]
-    movdqa xmm1,xmm0
-    pxor   xmm0,xmm7
-    movdqa xmm7,xmm1              // fCV := fIn
-    movdqu dqword ptr [edi],xmm0  // fOut := fIn xor fCV
-    dec    ecx
-    lea    esi,[esi+16]
-    lea    edi,[edi+16]
-    jnz    @s
-@z: pop    ecx
-    and    ecx,15
-    jz     @0
-    call   AesNiTrailer
-@0: pop    edi
-    pop    esi
+        push    esi
+        push    edi
+        mov     eax, self
+        mov     ecx, count
+        mov     esi, BufIn
+        mov     edi, BufOut
+        movups  xmm7, dqword ptr[eax].TAESCFB.fIV
+        lea     eax, [eax].TAESCFB.AES
+        push    ecx
+        shr     ecx, 4
+        jz      @z
+@s:     call    dword ptr[eax].TAESContext.AesNi32 // AES.Encrypt(fCV,fCV)
+        movups  xmm0, dqword ptr[esi]
+        movaps  xmm1, xmm0
+        pxor    xmm0, xmm7
+        movaps  xmm7, xmm1              // fCV := fIn
+        movups  dqword ptr[edi], xmm0  // fOut := fIn xor fCV
+        dec     ecx
+        lea     esi, [esi + 16]
+        lea     edi, [edi + 16]
+        jnz     @s
+@z:     pop     ecx
+        and     ecx, 15
+        jz      @0
+        call    AesNiTrailer
+@0:     pop     edi
+        pop     esi
+        pxor    xmm7, xmm7 // for safety
   end else
   {$endif} begin
-    inherited; // CV := IV + set fIn,fOut,fCount
+    inherited; // CV := IV + set fIn,fOut
     for i := 1 to Count shr 4 do begin
       tmp := fIn^;
-      {$ifdef USEAESNI64}
-      if Assigned(TAESContext(AES.Context).AesNi) then
-        TAESContext(AES.Context).AesNi(AES.Context,fCV,fCV) else
-      {$endif USEAESNI64}
-        AES.Encrypt(fCV,fCV);
+      TAESContext(AES.Context).DoBlock(AES.Context,fCV,fCV);
       XorBlock16(pointer(fIn),pointer(fOut),pointer(@fCV));
       fCV := tmp;
       inc(fIn);
       inc(fOut);
     end;
-    fCount := fCount and AESBlockMod;
-    if fCount<>0 then
-      TrailerBytes;
+    Count := Count and AESBlockMod;
+    if Count<>0 then
+      TrailerBytes(Count);
   end;
 end;
 
@@ -11379,50 +12591,47 @@ procedure TAESCFB.Encrypt(BufIn, BufOut: pointer; Count: cardinal);
 var i: integer;
 begin
   {$ifdef USEAESNI32}
-  if Assigned(TAESContext(AES.Context).AesNi) then
+  if Assigned(TAESContext(AES.Context).AesNi32) then
   asm
-    push   esi
-    push   edi
-    mov    eax,self
-    mov    ecx,Count
-    mov    esi,BufIn
-    mov    edi,BufOut
-    movdqu xmm7,dqword ptr [eax].TAESCFB.fIV
-    lea    eax,[eax].TAESCFB.AES
-    push   ecx
-    shr    ecx,4
-    jz     @z
-@s: call   dword ptr [eax].TAESContext.AesNi // AES.Encrypt(fCV,fCV)
-    movdqu xmm0,dqword ptr [esi]
-    pxor   xmm7,xmm0
-    movdqu dqword ptr [edi],xmm7  // fOut := fIn xor fCV
-    dec    ecx
-    lea    esi,[esi+16]
-    lea    edi,[edi+16]
-    jnz    @s
-@z: pop    ecx
-    and    ecx,15
-    jz     @0
-    call   AesNiTrailer
-@0: pop    edi
-    pop    esi
+        push    esi
+        push    edi
+        mov     eax, self
+        mov     ecx, count
+        mov     esi, BufIn
+        mov     edi, BufOut
+        movups  xmm7, dqword ptr[eax].TAESCFB.fIV
+        lea     eax, [eax].TAESCFB.AES
+        push    ecx
+        shr     ecx, 4
+        jz      @z
+@s:     call    dword ptr[eax].TAESContext.AesNi32 // AES.Encrypt(fCV,fCV)
+        movups  xmm0, dqword ptr[esi]
+        pxor    xmm7, xmm0
+        movups  dqword ptr[edi], xmm7  // fOut := fIn xor fCV
+        dec     ecx
+        lea     esi, [esi + 16]
+        lea     edi, [edi + 16]
+        jnz     @s
+@z:     pop     ecx
+        and     ecx, 15
+        jz      @0
+        call    AesNiTrailer
+@0:     pop     edi
+        pop     esi
+        pxor    xmm7, xmm7 // for safety
   end else
   {$endif} begin
-    inherited; // CV := IV + set fIn,fOut,fCount
+    inherited; // CV := IV + set fIn,fOut
     for i := 1 to Count shr 4 do begin
-      {$ifdef USEAESNI64}
-      if Assigned(TAESContext(AES.Context).AesNi) then
-        TAESContext(AES.Context).AesNi(AES.Context,fCV,fCV) else
-      {$endif USEAESNI64}
-        AES.Encrypt(fCV,fCV);
+      TAESContext(AES.Context).DoBlock(AES.Context,fCV,fCV);
       XorBlock16(pointer(fIn),pointer(fOut),pointer(@fCV));
       fCV := fOut^;
       inc(fIn);
       inc(fOut);
     end;
-    fCount := fCount and AESBlockMod;
-    if fCount<>0 then
-      TrailerBytes;
+    Count := Count and AESBlockMod;
+    if Count<>0 then
+      TrailerBytes(Count);
   end;
 end;
 
@@ -11483,57 +12692,54 @@ begin
     exit;
   fMAC := fMACKey; // reuse the same key until next MACSetNonce()
   {$ifdef USEAESNI32}
-  if Assigned(TAESContext(AES.Context).AesNi) and (Count and AESBlockMod=0) then
+  if Assigned(TAESContext(AES.Context).AesNi32) and (Count and AESBlockMod=0) then
   asm
-    push   ebx
-    push   esi
-    push   edi
-    mov    ebx,self
-    mov    esi,BufIn
-    mov    edi,BufOut
-    movdqu xmm7,dqword ptr [ebx].TAESCFBCRC.fIV
-@s: lea    eax,[ebx].TAESCFBCRC.fMAC.encrypted
-    mov    edx,esi
-    call   crcblock // using SSE4.2 or fast tables
-    lea    eax,[ebx].TAESCFBCRC.AES
-    call   dword ptr [eax].TAESContext.AesNi // AES.Encrypt(fCV,fCV)
-    movdqu xmm0,dqword ptr [esi]
-    movdqa xmm1,xmm0
-    pxor   xmm0,xmm7
-    movdqa xmm7,xmm1              // fCV := fIn
-    movdqu dqword ptr [edi],xmm0  // fOut := fIn xor fCV
-    lea    eax,[ebx].TAESCFBCRC.fMAC.plain
-    mov    edx,edi
-    call   crcblock
-    sub    dword ptr [Count],16
-    lea    esi,[esi+16]
-    lea    edi,[edi+16]
-    ja     @s
-@z: pop    edi
-    pop    esi
-    pop    ebx
+        push    ebx
+        push    esi
+        push    edi
+        mov     ebx, self
+        mov     esi, BufIn
+        mov     edi, BufOut
+        movups  xmm7, dqword ptr[ebx].TAESCFBCRC.fIV
+@s:     lea     eax, [ebx].TAESCFBCRC.fMAC.encrypted
+        mov     edx, esi
+        call    crcblock // using SSE4.2 or fast tables
+        lea     eax, [ebx].TAESCFBCRC.AES
+        call    dword ptr[eax].TAESContext.AesNi32 // AES.Encrypt(fCV,fCV)
+        movups  xmm0, dqword ptr[esi]
+        movaps  xmm1, xmm0
+        pxor    xmm0, xmm7
+        movaps  xmm7, xmm1              // fCV := fIn
+        movups  dqword ptr[edi], xmm0  // fOut := fIn xor fCV
+        lea     eax, [ebx].TAESCFBCRC.fMAC.plain
+        mov     edx, edi
+        call    crcblock
+        sub     dword ptr[count], 16
+        lea     esi, [esi + 16]
+        lea     edi, [edi + 16]
+        ja      @s
+@z:     pop     edi
+        pop     esi
+        pop     ebx
+        pxor    xmm7, xmm7 // for safety
   end else
   {$endif} begin
-    inherited; // CV := IV + set fIn,fOut,fCount
+    inherited; // CV := IV + set fIn,fOut
     for i := 1 to Count shr 4 do begin
       tmp := fIn^;
       crcblock(@fMAC.encrypted,pointer(fIn)); // fIn may be = fOut
-      {$ifdef USEAESNI64}
-      if Assigned(TAESContext(AES.Context).AesNi) then
-        TAESContext(AES.Context).AesNi(AES.Context,fCV,fCV) else
-      {$endif USEAESNI64}
-        AES.Encrypt(fCV,fCV);
+      TAESContext(AES.Context).DoBlock(AES.Context,fCV,fCV);
       XorBlock16(pointer(fIn),pointer(fOut),pointer(@fCV));
       fCV := tmp;
       crcblock(@fMAC.plain,pointer(fOut));
       inc(fIn);
       inc(fOut);
     end;
-    fCount := fCount and AESBlockMod;
-    if fCount<>0 then begin
-      TrailerBytes;
+    Count := Count and AESBlockMod;
+    if Count<>0 then begin
+      TrailerBytes(Count);
       with fMAC do // includes trailing bytes to the plain crc
-        PCardinal(@plain)^ := crc32c(PCardinal(@plain)^,pointer(fOut),fCount);
+        PCardinal(@plain)^ := crc32c(PCardinal(@plain)^,pointer(fOut),Count);
     end;
   end;
 end;
@@ -11545,54 +12751,51 @@ begin
     exit;
   fMAC := fMACKey; // reuse the same key until next MACSetNonce()
   {$ifdef USEAESNI32}
-  if Assigned(TAESContext(AES.Context).AesNi) and (Count and AESBlockMod=0) then
+  if Assigned(TAESContext(AES.Context).AesNi32) and (Count and AESBlockMod=0) then
   asm
-    push   ebx
-    push   esi
-    push   edi
-    mov    ebx,self
-    mov    esi,BufIn
-    mov    edi,BufOut
-    movdqu xmm7,dqword ptr [ebx].TAESCFBCRC.fIV
-@s: lea    eax,[ebx].TAESCFBCRC.fMAC.plain
-    mov    edx,esi
-    call   crcblock
-    lea    eax,[ebx].TAESCFBCRC.AES
-    call   dword ptr [eax].TAESContext.AesNi // AES.Encrypt(fCV,fCV)
-    movdqu xmm0,dqword ptr [esi]
-    pxor   xmm7,xmm0
-    movdqu dqword ptr [edi],xmm7  // fOut := fIn xor fCV  +  fCV := fOut^
-    lea    eax,[ebx].TAESCFBCRC.fMAC.encrypted
-    mov    edx,edi
-    call   crcblock
-    sub    dword ptr [Count],16
-    lea    esi,[esi+16]
-    lea    edi,[edi+16]
-    ja     @s
-    pop    edi
-    pop    esi
-    pop    ebx
+        push    ebx
+        push    esi
+        push    edi
+        mov     ebx, self
+        mov     esi, BufIn
+        mov     edi, BufOut
+        movups  xmm7, dqword ptr[ebx].TAESCFBCRC.fIV
+@s:     lea     eax, [ebx].TAESCFBCRC.fMAC.plain
+        mov     edx, esi
+        call    crcblock
+        lea     eax, [ebx].TAESCFBCRC.AES
+        call    dword ptr[eax].TAESContext.AesNi32 // AES.Encrypt(fCV,fCV)
+        movups  xmm0, dqword ptr[esi]
+        pxor    xmm7, xmm0
+        movups  dqword ptr[edi], xmm7  // fOut := fIn xor fCV  +  fCV := fOut^
+        lea     eax, [ebx].TAESCFBCRC.fMAC.encrypted
+        mov     edx, edi
+        call    crcblock
+        sub     dword ptr[count], 16
+        lea     esi, [esi + 16]
+        lea     edi, [edi + 16]
+        ja      @s
+        pop     edi
+        pop     esi
+        pop     ebx
+        pxor    xmm7, xmm7 // for safety
   end else
   {$endif} begin
-    inherited; // CV := IV + set fIn,fOut,fCount
+    inherited; // CV := IV + set fIn,fOut
     for i := 1 to Count shr 4 do begin
-      {$ifdef USEAESNI64}
-      if Assigned(TAESContext(AES.Context).AesNi) then
-        TAESContext(AES.Context).AesNi(AES.Context,fCV,fCV) else
-      {$endif USEAESNI64}
-        AES.Encrypt(fCV,fCV);
+      TAESContext(AES.Context).DoBlock(AES.Context,fCV,fCV);
       crcblock(@fMAC.plain,pointer(fIn)); // fOut may be = fIn
-      XorBlock16(pointer(fIn),pointer(fOut),pointer(@fCV)); 
+      XorBlock16(pointer(fIn),pointer(fOut),pointer(@fCV));
       fCV := fOut^;
       crcblock(@fMAC.encrypted,pointer(fOut));
       inc(fIn);
       inc(fOut);
     end;
-    fCount := fCount and AESBlockMod;
-    if fCount<>0 then begin
-      TrailerBytes;
+    Count := Count and AESBlockMod;
+    if Count<>0 then begin
       with fMAC do // includes trailing bytes to the plain crc
-        PCardinal(@plain)^ := crc32c(PCardinal(@plain)^,pointer(fIn),fCount);
+        PCardinal(@plain)^ := crc32c(PCardinal(@plain)^,pointer(fIn),Count);
+      TrailerBytes(Count);
     end;
   end;
 end;
@@ -11607,53 +12810,50 @@ begin
     exit;
   fMAC := fMACKey; // reuse the same key until next MACSetNonce()
   {$ifdef USEAESNI32}
-  if Assigned(TAESContext(AES.Context).AesNi) and (Count and AESBlockMod=0) then
+  if Assigned(TAESContext(AES.Context).AesNi32) and (Count and AESBlockMod=0) then
   asm
-    push   ebx
-    push   esi
-    push   edi
-    mov    ebx,self
-    mov    esi,BufIn
-    mov    edi,BufOut
-    movdqu xmm7,dqword ptr [ebx].TAESOFBCRC.fIV
-@s: lea    eax,[ebx].TAESOFBCRC.fMAC.encrypted
-    mov    edx,esi
-    call   crcblock
-    lea    eax,[ebx].TAESOFBCRC.AES
-    call   dword ptr [eax].TAESContext.AesNi // AES.Encrypt(fCV,fCV)
-    movdqu xmm0,dqword ptr [esi]
-    pxor   xmm0,xmm7
-    movdqu dqword ptr [edi],xmm0  // fOut := fIn xor fCV
-    lea    eax,[ebx].TAESOFBCRC.fMAC.plain
-    mov    edx,edi
-    call   crcblock
-    sub    dword ptr [Count],16
-    lea    esi,[esi+16]
-    lea    edi,[edi+16]
-    ja     @s
-    pop    edi
-    pop    esi
-    pop    ebx
+        push    ebx
+        push    esi
+        push    edi
+        mov     ebx, self
+        mov     esi, BufIn
+        mov     edi, BufOut
+        movups  xmm7, dqword ptr[ebx].TAESOFBCRC.fIV
+@s:     lea     eax, [ebx].TAESOFBCRC.fMAC.encrypted
+        mov     edx, esi
+        call    crcblock
+        lea     eax, [ebx].TAESOFBCRC.AES
+        call    dword ptr[eax].TAESContext.AesNi32 // AES.Encrypt(fCV,fCV)
+        movups  xmm0, dqword ptr[esi]
+        pxor    xmm0, xmm7
+        movups  dqword ptr[edi], xmm0  // fOut := fIn xor fCV
+        lea     eax, [ebx].TAESOFBCRC.fMAC.plain
+        mov     edx, edi
+        call    crcblock
+        sub     dword ptr[count], 16
+        lea     esi, [esi + 16]
+        lea     edi, [edi + 16]
+        ja      @s
+        pop     edi
+        pop     esi
+        pop     ebx
+        pxor    xmm7, xmm7 // for safety
   end else
   {$endif} begin
-    inherited Encrypt(BufIn,BufOut,Count); // CV := IV + set fIn,fOut,fCount
+    inherited Encrypt(BufIn,BufOut,Count); // CV := IV + set fIn,fOut
     for i := 1 to Count shr 4 do begin
-      {$ifdef USEAESNI64}
-      if Assigned(TAESContext(AES.Context).AesNi) then
-        TAESContext(AES.Context).AesNi(AES.Context,fCV,fCV) else
-      {$endif USEAESNI64}
-        AES.Encrypt(fCV,fCV);
+      TAESContext(AES.Context).DoBlock(AES.Context,fCV,fCV);
       crcblock(@fMAC.encrypted,pointer(fIn)); // fOut may be = fIn
       XorBlock16(pointer(fIn),pointer(fOut),pointer(@fCV));
       crcblock(@fMAC.plain,pointer(fOut));
       inc(fIn);
       inc(fOut);
     end;
-    fCount := fCount and AESBlockMod;
-    if fCount<>0 then begin
-      TrailerBytes;
+    Count := Count and AESBlockMod;
+    if Count<>0 then begin
+      TrailerBytes(Count);
       with fMAC do // includes trailing bytes to the plain crc
-        PCardinal(@plain)^ := crc32c(PCardinal(@plain)^,pointer(fOut),fCount);
+        PCardinal(@plain)^ := crc32c(PCardinal(@plain)^,pointer(fOut),Count);
     end;
   end;
 end;
@@ -11665,53 +12865,50 @@ begin
     exit;
   fMAC := fMACKey; // reuse the same key until next MACSetNonce()
   {$ifdef USEAESNI32}
-  if Assigned(TAESContext(AES.Context).AesNi) and (Count and AESBlockMod=0) then
+  if Assigned(TAESContext(AES.Context).AesNi32) and (Count and AESBlockMod=0) then
   asm
-    push   ebx
-    push   esi
-    push   edi
-    mov    ebx,self
-    mov    esi,BufIn
-    mov    edi,BufOut
-    movdqu xmm7,dqword ptr [ebx].TAESOFBCRC.fIV
-@s: lea    eax,[ebx].TAESOFBCRC.fMAC.plain
-    mov    edx,esi
-    call   crcblock
-    lea    eax,[ebx].TAESOFBCRC.AES
-    call   dword ptr [eax].TAESContext.AesNi // AES.Encrypt(fCV,fCV)
-    movdqu xmm0,dqword ptr [esi]
-    pxor   xmm0,xmm7
-    movdqu dqword ptr [edi],xmm0  // fOut := fIn xor fCV
-    lea    eax,[ebx].TAESOFBCRC.fMAC.encrypted
-    mov    edx,edi
-    call   crcblock
-    sub    dword ptr [Count],16
-    lea    esi,[esi+16]
-    lea    edi,[edi+16]
-    ja     @s
-    pop    edi
-    pop    esi
-    pop    ebx
+        push    ebx
+        push    esi
+        push    edi
+        mov     ebx, self
+        mov     esi, BufIn
+        mov     edi, BufOut
+        movups  xmm7, dqword ptr[ebx].TAESOFBCRC.fIV
+@s:     lea     eax, [ebx].TAESOFBCRC.fMAC.plain
+        mov     edx, esi
+        call    crcblock
+        lea     eax, [ebx].TAESOFBCRC.AES
+        call    dword ptr[eax].TAESContext.AesNi32 // AES.Encrypt(fCV,fCV)
+        movups  xmm0, dqword ptr[esi]
+        pxor    xmm0, xmm7
+        movups  dqword ptr[edi], xmm0  // fOut := fIn xor fCV
+        lea     eax, [ebx].TAESOFBCRC.fMAC.encrypted
+        mov     edx, edi
+        call    crcblock
+        sub     dword ptr[count], 16
+        lea     esi, [esi + 16]
+        lea     edi, [edi + 16]
+        ja      @s
+        pop     edi
+        pop     esi
+        pop     ebx
+        pxor    xmm7, xmm7 // for safety
   end else
   {$endif} begin
-    inherited Encrypt(BufIn,BufOut,Count); // CV := IV + set fIn,fOut,fCount
+    inherited Encrypt(BufIn,BufOut,Count); // CV := IV + set fIn,fOut
     for i := 1 to Count shr 4 do begin
-      {$ifdef USEAESNI64}
-      if Assigned(TAESContext(AES.Context).AesNi) then
-        TAESContext(AES.Context).AesNi(AES.Context,fCV,fCV) else
-      {$endif USEAESNI64}
-        AES.Encrypt(fCV,fCV);
+      TAESContext(AES.Context).DoBlock(AES.Context,fCV,fCV);
       crcblock(@fMAC.plain,pointer(fIn)); // fOut may be = fIn
       XorBlock16(pointer(fIn),pointer(fOut),pointer(@fCV));
       crcblock(@fMAC.encrypted,pointer(fOut));
       inc(fIn);
       inc(fOut);
     end;
-    fCount := fCount and AESBlockMod;
-    if fCount<>0 then begin
-      TrailerBytes;
+    Count := Count and AESBlockMod;
+    if Count<>0 then begin
       with fMAC do // includes trailing bytes to the plain crc
-        PCardinal(@plain)^ := crc32c(PCardinal(@plain)^,pointer(fIn),fCount);
+        PCardinal(@plain)^ := crc32c(PCardinal(@plain)^,pointer(fIn),Count);
+      TrailerBytes(Count);
     end;
   end;
 end;
@@ -11721,51 +12918,89 @@ end;
 
 {$ifdef USEAESNI64}
 procedure AesNiEncryptOFB_128(self: TAESOFB; source, dest: pointer; blockcount: PtrUInt);
-{$ifdef FPC}nostackframe; assembler;
-asm
-{$else}
-asm // rcx=TAESOFB,rdx=source,r8=dest,r9=blockcount Linux:rdi,rsi,rdx,rcx
-  .noframe
-{$endif}
-    {$ifndef win64}
-    mov    r9,rcx
-    mov    r8,rdx
-    mov    rdx,rsi
-    mov    rcx,rdi
-    {$endif}
-    test   r9,r9
-    jz     @z
-    movdqu xmm7,dqword ptr [rcx].TAESOFB.fIV  // xmm7 = fCV
-    lea    rcx,[rcx].TAESOFB.AES
-    movdqu xmm0,[rcx+16*0]
-    movdqu xmm1,[rcx+16*1]
-    movdqu xmm2,[rcx+16*2]
-    movdqu xmm3,[rcx+16*3]
-    movdqu xmm4,[rcx+16*4]
-    movdqu xmm5,[rcx+16*5]
-    movdqu xmm6,[rcx+16*6]
-    movdqu xmm8,[rcx+16*7]
-    movdqu xmm9,[rcx+16*8]
-    movdqu xmm10,[rcx+16*9]
-    movdqu xmm11,[rcx+16*10]
-@s: movdqu xmm15,dqword ptr [rdx]
-    pxor xmm7,xmm0
-    aesenc xmm7,xmm1
-    aesenc xmm7,xmm2
-    aesenc xmm7,xmm3
-    aesenc xmm7,xmm4
-    aesenc xmm7,xmm5
-    aesenc xmm7,xmm6
-    aesenc xmm7,xmm8
-    aesenc xmm7,xmm9
-    aesenc xmm7,xmm10
-    aesenclast xmm7,xmm11         // AES.Encrypt(fCV,fCV)
-    pxor   xmm15,xmm7
-    movdqu dqword ptr [r8],xmm15  // fOut := fIn xor fCV
-    add    rdx,16
-    add    r8,16
-    dec    r9
-    jnz    @s
+{$ifdef FPC} nostackframe; assembler; asm {$else} asm .noframe {$endif}
+        test    blockcount, blockcount
+        jz      @z
+        movups  xmm7, dqword ptr[self].TAESOFB.fIV  // xmm7 = fCV
+        lea     self, [self].TAESOFB.AES
+        movups  xmm0, dqword ptr[self + 16 * 0]
+        movups  xmm1, dqword ptr[self + 16 * 1]
+        movups  xmm2, dqword ptr[self + 16 * 2]
+        movups  xmm3, dqword ptr[self + 16 * 3]
+        movups  xmm4, dqword ptr[self + 16 * 4]
+        movups  xmm5, dqword ptr[self + 16 * 5]
+        movups  xmm6, dqword ptr[self + 16 * 6]
+        movups  xmm8, dqword ptr[self + 16 * 7]
+        movups  xmm9, dqword ptr[self + 16 * 8]
+        movups  xmm10, dqword ptr[self + 16 * 9]
+        movups  xmm11, dqword ptr[self + 16 * 10]
+{$ifdef FPC} align 16 {$else} .align 16 {$endif}
+@s:     movups  xmm15, dqword ptr[source]
+        pxor    xmm7, xmm0
+        aesenc  xmm7, xmm1
+        aesenc  xmm7, xmm2
+        aesenc  xmm7, xmm3
+        aesenc  xmm7, xmm4
+        aesenc  xmm7, xmm5
+        aesenc  xmm7, xmm6
+        aesenc  xmm7, xmm8
+        aesenc  xmm7, xmm9
+        aesenc  xmm7, xmm10
+        aesenclast xmm7, xmm11
+        pxor    xmm15, xmm7
+        movups  dqword ptr[dest], xmm15  // fOut := fIn xor fCV
+        add     source, 16
+        add     dest, 16
+        dec     blockcount
+        jnz     @s
+@z:
+end;
+
+procedure AesNiEncryptOFB_256(self: TAESOFB; source, dest: pointer; blockcount: PtrUInt);
+{$ifdef FPC} nostackframe; assembler; asm {$else} asm .noframe {$endif}
+        test    blockcount, blockcount
+        jz      @z
+        movups  xmm7, dqword ptr[self].TAESOFB.fIV  // xmm7 = fCV
+        lea     self, [self].TAESOFB.AES
+        movups  xmm0, dqword ptr[self + 16 * 0]
+        movups  xmm1, dqword ptr[self + 16 * 1]
+        movups  xmm2, dqword ptr[self + 16 * 2]
+        movups  xmm3, dqword ptr[self + 16 * 3]
+        movups  xmm4, dqword ptr[self + 16 * 4]
+        movups  xmm5, dqword ptr[self + 16 * 5]
+        movups  xmm6, dqword ptr[self + 16 * 6]
+        movups  xmm8, dqword ptr[self + 16 * 7]
+        movups  xmm9, dqword ptr[self + 16 * 8]
+        movups  xmm10, dqword ptr[self + 16 * 9]
+        movups  xmm11, dqword ptr[self + 16 * 10]
+        movups  xmm12, dqword ptr[self + 16 * 11]
+        movups  xmm13, dqword ptr[self + 16 * 12]
+        movups  xmm14, dqword ptr[self + 16 * 13]
+        add     self, 16 * 14
+{$ifdef FPC} align 16 {$else} .align 16 {$endif}
+@s:     movups  xmm15, dqword ptr[self]
+        pxor    xmm7, xmm0
+        aesenc  xmm7, xmm1
+        aesenc  xmm7, xmm2
+        aesenc  xmm7, xmm3
+        aesenc  xmm7, xmm4
+        aesenc  xmm7, xmm5
+        aesenc  xmm7, xmm6
+        aesenc  xmm7, xmm8
+        aesenc  xmm7, xmm9
+        aesenc  xmm7, xmm10
+        aesenc  xmm7, xmm11
+        aesenc  xmm7, xmm12
+        aesenc  xmm7, xmm13
+        aesenc  xmm7, xmm14
+        aesenclast xmm7, xmm15
+        movups  xmm15, dqword ptr[source]
+        pxor    xmm15, xmm7
+        movups  dqword ptr[dest], xmm15  // fOut := fIn xor fCV
+        add     source, 16
+        add     dest, 16
+        dec     blockcount
+        jnz     @s
 @z:
 end;
 {$endif USEAESNI64}
@@ -11779,99 +13014,128 @@ procedure TAESOFB.Encrypt(BufIn, BufOut: pointer; Count: cardinal);
 var i: integer;
 begin
   {$ifdef USEAESNI64}
-  with TAESContext(AES.Context) do
-  if (Count and AESBlockMod=0) and Assigned(AesNi) and (KeyBits=128) then
-    AesNiEncryptOFB_128(self,BufIn,BufOut,Count shr 4) else
+  if (Count and AESBlockMod=0) and (cfAESNI in CpuFeatures) then
+    with TAESContext(AES.Context) do
+    case KeyBits of
+    128: begin
+      AesNiEncryptOFB_128(self,BufIn,BufOut,Count shr 4);
+      exit;
+    end;
+    256: begin
+      AesNiEncryptOFB_256(self,BufIn,BufOut,Count shr 4);
+      exit;
+    end;
+    end;
   {$endif USEAESNI64}
   {$ifdef USEAESNI32}
-  if Assigned(TAESContext(AES.Context).AesNi) then
+  if Assigned(TAESContext(AES.Context).AesNi32) then
   asm
-    push   esi
-    push   edi
-    mov    eax,self
-    mov    ecx,Count
-    mov    esi,BufIn
-    mov    edi,BufOut
-    movdqu xmm7,dqword ptr [eax].TAESOFB.fIV  // xmm7 = fCV
-    lea    eax,[eax].TAESOFB.AES
-    push   ecx
-    shr    ecx,4
-    jz     @z
-@s: call   dword ptr [eax].TAESContext.AesNi // AES.Encrypt(fCV,fCV)
-    movdqu xmm0,dqword ptr [esi]
-    pxor   xmm0,xmm7
-    movdqu dqword ptr [edi],xmm0  // fOut := fIn xor fCV
-    dec    ecx
-    lea    esi,[esi+16]
-    lea    edi,[edi+16]
-    jnz    @s
-@z: pop    ecx
-    and    ecx,15
-    jz     @0
-    call   AesNiTrailer
-@0: pop    edi
-    pop    esi
+        push    esi
+        push    edi
+        mov     eax, self
+        mov     ecx, count
+        mov     esi, BufIn
+        mov     edi, BufOut
+        movups  xmm7, dqword ptr[eax].TAESOFB.fIV  // xmm7 = fCV
+        lea     eax, [eax].TAESOFB.AES
+        push    ecx
+        shr     ecx, 4
+        jz      @z
+@s:     call    dword ptr[eax].TAESContext.AesNi32 // AES.Encrypt(fCV,fCV)
+        movups  xmm0, dqword ptr[esi]
+        pxor    xmm0, xmm7
+        movups  dqword ptr[edi], xmm0  // fOut := fIn xor fCV
+        dec     ecx
+        lea     esi, [esi + 16]
+        lea     edi, [edi + 16]
+        jnz     @s
+@z:     pop     ecx
+        and     ecx, 15
+        jz      @0
+        call    AesNiTrailer
+@0:     pop     edi
+        pop     esi
+        pxor    xmm7, xmm7 // for safety
   end else
   {$endif} begin
-    inherited; // CV := IV + set fIn,fOut,fCount
+    inherited; // CV := IV + set fIn,fOut
     for i := 1 to Count shr 4 do begin
-      {$ifdef USEAESNI64}
-      if Assigned(TAESContext(AES.Context).AesNi) then
-        TAESContext(AES.Context).AesNi(AES.Context,fCV,fCV) else
-      {$endif USEAESNI64}
-        AES.Encrypt(fCV,fCV);
+      TAESContext(AES.Context).DoBlock(AES.Context,fCV,fCV);
       XorBlock16(pointer(fIn),pointer(fOut),pointer(@fCV));
       inc(fIn);
       inc(fOut);
     end;
-    fCount := fCount and AESBlockMod;
-    if fCount<>0 then 
-      TrailerBytes;
+    Count := Count and AESBlockMod;
+    if Count<>0 then
+      TrailerBytes(Count);
   end;
 end;
 
 
 { TAESCTR }
 
-procedure TAESCTR.Decrypt(BufIn, BufOut: pointer; Count: cardinal);
+constructor TAESCTR.Create(const aKey; aKeySize: cardinal);
 begin
-  Encrypt(BufIn, BufOut, Count); // by definition
+  inherited Create(aKey, aKeySize);
+  fCTROffset := 7; // counter is in the lower 64 bits, nonce in the upper 64 bits
+end;
+
+function TAESCTR.ComposeIV(Nonce, Counter: PAESBlock; NonceLen, CounterLen: integer;
+  LSBCounter: boolean): boolean;
+begin
+  result := (NonceLen + CounterLen = 16) and (CounterLen > 0);
+  if result then
+    if LSBCounter then begin
+      MoveFast(Nonce[0], fIV[0], NonceLen);
+      MoveFast(Counter[0], fIV[NonceLen], CounterLen);
+      fCTROffset := 15;
+      fCTROffsetMin := 16-CounterLen;
+    end else begin
+      MoveFast(Counter[0], fIV[0], CounterLen);
+      MoveFast(Nonce[0], fIV[CounterLen], NonceLen);
+      fCTROffset := CounterLen-1;
+      fCTROffsetMin := 0;
+    end;
+end;
+
+function TAESCTR.ComposeIV(const Nonce, Counter: TByteDynArray;
+  LSBCounter: boolean): boolean;
+begin
+  result := ComposeIV(pointer(Nonce), pointer(Counter),
+    length(Nonce), length(Counter), LSBCounter);
 end;
 
 procedure TAESCTR.Encrypt(BufIn, BufOut: pointer; Count: cardinal);
-var i,j: integer;
+var i: integer;
+    offs: PtrInt;
     tmp: TAESBlock;
 begin
-  inherited; // CV := IV + set fIn,fOut,fCount
+  inherited; // CV := IV + set fIn,fOut
   for i := 1 to Count shr 4 do begin
-    {$ifdef USEAESNI64}
-    if Assigned(TAESContext(AES.Context).AesNi) then
-      TAESContext(AES.Context).AesNi(AES.Context,fCV,tmp) else
-    {$endif USEAESNI64}
-      AES.Encrypt(fCV,tmp);
-    inc(fCV[7]); // counter is in the lower 64 bits, nonce in the upper 64 bits
-    if fCV[7]=0 then begin // manual big-endian increment
-      j := 6;
+    TAESContext(AES.Context).DoBlock(AES.Context,fCV,tmp);
+    offs := fCTROffset;
+    inc(fCV[offs]);
+    if fCV[offs]=0 then // manual big-endian increment
       repeat
-        inc(fCV[j]);
-        if (fCV[j]<>0) or (j=0) then
+        dec(offs);
+        inc(fCV[offs]);
+        if (fCV[offs]<>0) or (offs=fCTROffsetMin) then
           break;
-        dec(j);
       until false;
-    end;
     XorBlock16(pointer(fIn),pointer(fOut),pointer(@tmp));
     inc(fIn);
     inc(fOut);
   end;
   Count := Count and AESBlockMod;
   if Count<>0 then begin
-    {$ifdef USEAESNI64}
-    if Assigned(TAESContext(AES.Context).AesNi) then
-      TAESContext(AES.Context).AesNi(AES.Context,fCV,tmp) else
-    {$endif USEAESNI64}
-      AES.Encrypt(fCV,tmp);
+    TAESContext(AES.Context).DoBlock(AES.Context,fCV,tmp);
     XorMemory(pointer(fOut),pointer(fIn),@tmp,Count);
   end;
+end;
+
+procedure TAESCTR.Decrypt(BufIn, BufOut: pointer; Count: cardinal);
+begin
+  Encrypt(BufIn, BufOut, Count); // by definition
 end;
 
 
@@ -11882,7 +13146,8 @@ type
   HCRYPTKEY = pointer;
   HCRYPTHASH = pointer;
 
-  TCryptLibrary = object
+  {$ifdef USERECORDWITHMETHODS}TCryptLibrary = record
+    {$else}TCryptLibrary = object{$endif}
   public
     AcquireContextA: function(var phProv: HCRYPTPROV; pszContainer: PAnsiChar;
       pszProvider: PAnsiChar; dwProvType: DWORD; dwFlags: DWORD): BOOL; stdcall;
@@ -11897,10 +13162,9 @@ type
     Decrypt: function(hKey: HCRYPTKEY; hHash: HCRYPTHASH; Final: BOOL;
       dwFlags: DWORD; pbData: pointer; var pdwDataLen: DWORD): BOOL; stdcall;
     GenRandom: function(hProv: HCRYPTPROV; dwLen: DWORD; pbBuffer: Pointer): BOOL; stdcall;
-    function Available: boolean;
-  protected
     Tested: boolean;
     Handle: THandle;
+    function Available: boolean;
   end;
 
 const
@@ -12063,7 +13327,7 @@ end;
 
 procedure TAESCFB_API.InternalSetMode;
 begin
-  raise ESynCrypto.Create('CRYPT_MODE_CFB does not work');
+  raise ESynCrypto.CreateUTF8('%: CRYPT_MODE_CFB does not work',[self]);
   fInternalMode := CRYPT_MODE_CFB;
 end;
 
@@ -12071,7 +13335,7 @@ end;
 
 procedure TAESOFB_API.InternalSetMode;
 begin
-  raise ESynCrypto.Create('CRYPT_MODE_OFB not implemented by PROV_RSA_AES');
+  raise ESynCrypto.CreateUTF8('%: CRYPT_MODE_OFB not implemented by PROV_RSA_AES',[self]);
   fInternalMode := CRYPT_MODE_OFB;
 end;
 
@@ -12082,17 +13346,10 @@ end;
 
 { TAESLocked }
 
-constructor TAESLocked.Create;
-begin
-  inherited Create;
-  InitializeCriticalSection(fLock);
-end;
-
 destructor TAESLocked.Destroy;
 begin
   inherited Destroy;
   fAES.Done; // mandatory for Padlock - also fill AES buffer with 0 for safety
-  DeleteCriticalSection(fLock);
 end;
 
 
@@ -12128,26 +13385,25 @@ begin
   if dev>0 then
     try
       i := Len;
-      repeat
-        dec(i,FileRead(dev,Buffer^[Len-i],i));
-      until i<=0;
-      fromos := i=0;
+      if i>32 then
+        i := 32; // up to 256 bits - see "man urandom" Usage paragraph
+      fromos := (FileRead(dev,Buffer[0],i)=i) and (Len<=32); // will XOR up to Len
     finally
       FileClose(dev);
     end;
-  {$endif}
+  {$endif LINUX}
   {$ifdef MSWINDOWS}
   if CryptoAPI.Available then
     if CryptoAPI.AcquireContextA(prov,nil,nil,PROV_RSA_FULL,CRYPT_VERIFYCONTEXT) then begin
       fromos := CryptoAPI.GenRandom(prov,len,Buffer);
       CryptoAPI.ReleaseContext(prov,0);
     end;
-  {$endif}
+  {$endif MSWINDOWS}
   if fromos then
     exit;
   i := Len;
-  repeat
-    SynCommons.FillRandom(@tmp,SizeOf(tmp) shr 2); // SynCommons as fallback
+  repeat // call Random32() (=RdRand32 or Lecuyer) as fallback/padding
+    SynCommons.FillRandom(@tmp,SizeOf(tmp) shr 2);
     if i<=SizeOf(tmp) then begin
       XorMemory(@Buffer^[Len-i],@tmp,i);
       break;
@@ -12172,7 +13428,7 @@ var ext: TSynExtended;
   begin
     SynCommons.FillRandom(@data.Hi,8); // QueryPerformanceCounter+8*Random32
     sha3.Update(@data,sizeof(data));
-    CreateGUID(g); // not random, but genuine
+    CreateGUID(g); // not random, but genuine (at least on Windows)
     sha3.Update(@g,sizeof(g));
   end;
 begin
@@ -12180,7 +13436,7 @@ begin
   try
     // retrieve some initial entropy from OS
     SetLength(fromos,Len);
-    FillSystemRandom(pointer(fromos),len,true);
+    FillSystemRandom(pointer(fromos),len,{allowblocking=}SystemOnly);
     if SystemOnly then begin
       result := fromos;
       fromos := '';
@@ -12200,7 +13456,7 @@ begin
     data.i0 := integer(HInstance); // override data.d0d1/h0
     data.i1 := integer(GetCurrentThreadId);
     data.i2 := integer(MainThreadID);
-    data.i3 := integer(UnixTimeUTC);
+    data.i3 := integer(UnixMSTimeUTCFast);
     SleepHiRes(0); // force non deterministic time shift
     sha3update;
     sha3.Update(OSVersionText);
@@ -12219,11 +13475,14 @@ begin
   try
     entropy := GetEntropy(128); // 128 bytes is the HMAC_SHA512 key block size
     PBKDF2_HMAC_SHA512(entropy,ExeVersion.User,fSeedPBKDF2Rounds,key.b);
-    EnterCriticalSection(fLock);
-    fAES.EncryptInit(key.Lo,fAESKeySize);
-    crcblocks(@fCTR,@key.Hi,2);
-    fBytesSinceSeed := 0;
-    LeaveCriticalSection(fLock);
+    fSafe^.Lock;
+    try
+      fAES.EncryptInit(key.Lo,fAESKeySize);
+      crcblocks(@fCTR,@key.Hi,2);
+      fBytesSinceSeed := 0;
+    finally
+      fSafe^.UnLock;
+    end;
   finally
     FillZero(key.b); // avoid the key appear in clear on stack
     FillZero(entropy);
@@ -12253,16 +13512,12 @@ procedure TAESPRNG.FillRandom(out Block: TAESBlock);
 begin
   if fBytesSinceSeed>fSeedAfterBytes then
     Seed;
-  EnterCriticalSection(fLock);
-  {$ifdef USEAESNI64}
-   if Assigned(TAESContext(fAES.Context).AesNi) then
-    TAESContext(fAES.Context).AesNi(fAES.Context,fCTR.b,Block) else
-  {$endif USEAESNI64}
-    fAES.Encrypt(fCTR.b,Block);
+  fSafe^.Lock;
+  TAESContext(fAES.Context).DoBlock(fAES.Context,fCTR.b,Block);
   IncrementCTR;
   inc(fBytesSinceSeed,SizeOf(Block));
   inc(fTotalBytes,SizeOf(Block));
-  LeaveCriticalSection(fLock);
+  fSafe^.UnLock;
 end;
 
 procedure TAESPRNG.FillRandom(out Buffer: THash256);
@@ -12279,13 +13534,9 @@ begin
     exit;
   if fBytesSinceSeed>fSeedAfterBytes then
     Seed;
-  EnterCriticalSection(fLock);
+  fSafe^.Lock;
   for i := 1 to Len shr 4 do begin
-    {$ifdef USEAESNI64}
-    if Assigned(TAESContext(fAES.Context).AesNi) then
-      TAESContext(fAES.Context).AesNi(fAES.Context,fCTR.b,buf^) else
-    {$endif USEAESNI64}
-      fAES.Encrypt(fCTR.b,buf^);
+    TAESContext(fAES.Context).DoBlock(fAES.Context,fCTR.b,buf^);
     IncrementCTR;
     inc(buf);
   end;
@@ -12293,15 +13544,11 @@ begin
   inc(fTotalBytes,Len);
   Len := Len and AESBlockMod;
   if Len>0 then begin
-    {$ifdef USEAESNI64}
-    if Assigned(TAESContext(fAES.Context).AesNi) then
-      TAESContext(fAES.Context).AesNi(fAES.Context,fCTR.b,rnd) else
-    {$endif USEAESNI64}
-      fAES.Encrypt(fCTR.b,rnd);
+    TAESContext(fAES.Context).DoBlock(fAES.Context,fCTR.b,rnd);
     IncrementCTR;
     MoveFast(rnd,buf^,Len);
   end;
-  LeaveCriticalSection(fLock);
+  fSafe^.UnLock;
 end;
 
 function TAESPRNG.FillRandom(Len: integer): RawByteString;
@@ -12312,6 +13559,8 @@ end;
 
 function TAESPRNG.FillRandomBytes(Len: integer): TBytes;
 begin
+  if Len<>length(result) then
+    result := nil;
   SetLength(result,Len);
   FillRandom(pointer(result),Len);
 end;
@@ -12319,10 +13568,10 @@ end;
 function TAESPRNG.FillRandomHex(Len: integer): RawUTF8;
 var bin: pointer;
 begin
-  SetString(result,nil,Len*2);
+  FastSetString(result,nil,Len*2);
   if Len=0 then
     exit;
-  bin := @PByteArray(result)[Len]; // temporary store random bytes at the end 
+  bin := @PByteArray(result)[Len]; // temporary store random bytes at the end
   FillRandom(bin,Len);
   SynCommons.BinToHex(bin,pointer(result),Len);
 end;
@@ -12348,20 +13597,39 @@ begin
   result := block.L xor block.H;
 end;
 
-function TAESPRNG.RandomExt: TSynExtended;
-{$ifdef FPC_OR_UNICODE}
-const coeff: double = (1.0/$100000000)/$100000000;  // 2^-64
-{$else} // circumvent QWord bug on oldest Delphi revisions
-const coeff: double = (1.0/$80000000)/$100000000;  // 2^-63
-{$endif}
-var block: THash128Rec;
+function Hash128ToExt({$ifdef FPC}constref{$else}const{$endif} r: THash128): TSynExtended;
+const
+  COEFF64: TSynExtended = (1.0/$80000000)/$100000000;  // 2^-63
 begin
-  FillRandom(block.b);
-  {$ifdef FPC_OR_UNICODE}
-  result := (block.L xor block.H)*coeff;
-  {$else}
-  result := abs(block.Lo xor block.Hi)*coeff;
-  {$endif}
+  result := ((THash128Rec(r).Lo xor THash128Rec(r).Hi) and $7fffffffffffffff)*COEFF64;
+end;
+
+function Hash128ToDouble({$ifdef FPC}constref{$else}const{$endif} r: THash128): double;
+const
+  COEFF64: double = (1.0/$80000000)/$100000000;  // 2^-63
+begin
+  result := ((THash128Rec(r).Lo xor THash128Rec(r).Hi) and $7fffffffffffffff)*COEFF64;
+end;
+
+function Hash128ToSingle({$ifdef FPC}constref{$else}const{$endif} r: THash128): double;
+const
+  COEFF64: single = (1.0/$80000000)/$100000000;  // 2^-63
+begin
+  result := ((THash128Rec(r).Lo xor THash128Rec(r).Hi) and $7fffffffffffffff)*COEFF64;
+end;
+
+function TAESPRNG.RandomExt: TSynExtended;
+var block: THash128;
+begin
+  FillRandom(block);
+  result := Hash128ToExt(block);
+end;
+
+function TAESPRNG.RandomDouble: double;
+var block: THash128;
+begin
+  FillRandom(block);
+  result := Hash128ToDouble(block);
 end;
 
 function TAESPRNG.RandomPassword(Len: integer): RawUTF8;
@@ -12401,7 +13669,7 @@ begin
   result := MainAESPRNG;
 end;
 
-procedure _afdiffusesha256(buf,rnd: pointer; size: cardinal);
+procedure AFDiffusion(buf,rnd: pointer; size: cardinal);
 var sha: TSHA256;
     dig: TSHA256Digest;
     last, iv: cardinal;
@@ -12424,9 +13692,9 @@ begin
   sha.Update(@iv,SizeOf(iv));
   sha.Update(buf,size);
   sha.Final(dig);
-  MoveFast(dig,buf^,size);
+  MoveSmall(@dig,buf,size);
 end;
- 
+
 function TAESPRNG.AFSplit(const Buffer; BufferBytes, StripesCount: integer): RawByteString;
 var dst: pointer;
     tmp: TByteDynArray;
@@ -12441,10 +13709,10 @@ begin
   SetLength(tmp,BufferBytes);
   for i := 1 to StripesCount do begin
     FillRandom(dst,BufferBytes);
-    _afdiffusesha256(pointer(tmp),dst,BufferBytes);
+    AFDiffusion(pointer(tmp),dst,BufferBytes);
     inc(PByte(dst),BufferBytes);
   end;
-  XorMemory(dst,@Buffer,pointer(tmp),BufferBytes); 
+  XorMemory(dst,@Buffer,pointer(tmp),BufferBytes);
 end;
 
 function TAESPRNG.AFSplit(const Buffer: RawByteString; StripesCount: integer): RawByteString;
@@ -12466,7 +13734,7 @@ begin
   src := pointer(Split);
   SetLength(tmp,BufferBytes);
   for i := 2 to len div cardinal(BufferBytes) do begin
-    _afdiffusesha256(pointer(tmp),src,BufferBytes);
+    AFDiffusion(pointer(tmp),src,BufferBytes);
     inc(PByte(src),BufferBytes);
   end;
   XorMemory(@Buffer,src,pointer(tmp),BufferBytes);
@@ -12723,47 +13991,37 @@ end;
 
 { THash128History }
 
-procedure THash128History.Init(size: integer);
+procedure THash128History.Init(size, maxsize: integer);
 begin
-  Depth := size;
+  Depth := maxsize;
   SetLength(Previous,size);
   Count := 0;
   Index := 0;
 end;
 
-function HashFound(P: PHash128Rec; Count: integer; const h: THash128Rec): boolean;
-var first: PtrInt;
-    i: integer;
-begin // fast O(n) brute force search
-  if P<>nil then begin
-    result := true;
-    first := h.Lo;
-    for i := 1 to Count do
-      {$ifdef CPU64}
-      if (P^.Lo=first) and (P^.Hi=h.Hi) then
-      {$else}
-      if (P^.i0=first) and (P^.i1=h.i1) and (P^.i2=h.i2) and (P^.i3=h.i3) then
-      {$endif}
-        exit else
-        inc(P);
-  end;
-  result := false;
-end;
-
 function THash128History.Exists(const hash: THash128): boolean;
 begin
-  result := HashFound(pointer(Previous),Count,THash128Rec(hash));
+  if Count = 0 then
+    result := false else
+    result := Hash128Index(pointer(Previous),Count,@hash)>=0;
 end;
 
 function THash128History.Add(const hash: THash128): boolean;
+var n: integer;
 begin
-  result := not HashFound(pointer(Previous),Count,THash128Rec(hash));
+  result := Hash128Index(pointer(Previous),Count,@hash)<0;
   if not result then
     exit;
   Previous[Index].b := hash;
   inc(Index);
-  if Index>=Depth then
-    Index := 0;
+  if Index>=length(Previous) then
+    if Index=Depth then
+      Index := 0 else begin
+      n := NextGrow(Index);
+      if n>=Depth then
+        n := Depth;
+      SetLength(Previous,n);
+    end;
   if Count<Depth then
     inc(Count);
 end;
@@ -12814,7 +14072,7 @@ begin
   end else
     result := '';
 end;
-{$endif}
+{$endif MSWINDOWS}
 
 var
   __h: THash256;
@@ -12830,8 +14088,8 @@ begin
   PBKDF2_HMAC_SHA256(appsec,ExeVersion.User,100,instance);
   FillZero(appsec);
   appsec := BinToBase64URI(@instance,15); // local file has 21 chars length
-  keyfile := format({$ifdef MSWINDOWS}'%s_%s'{$else}'%s.syn-%s'{$endif},
-    [GetSystemPath(spUserData),appsec]); // .* files are hidden under Linux 
+  FormatString({$ifdef MSWINDOWS}'%_%'{$else}'%.syn-%'{$endif},
+    [GetSystemPath(spUserData),appsec], string(keyfile)); // .* files are hidden under Linux
   SetString(appsec,PAnsiChar(@instance[15]),17); // use remaining bytes as key
   try
     key := StringFromFile(keyfile);
@@ -12965,7 +14223,7 @@ begin
   fSafe.Lock;
   try
     try
-      aPlain := fAES[false].DecryptPKCS7(aEncrypted,true);
+      aPlain := fAES[false].DecryptPKCS7(aEncrypted,{iv=}true,{raise=}false);
       if aPlain='' then
         result := sprBadRequest else
         result := sprSuccess;
@@ -12982,7 +14240,7 @@ procedure TProtocolAES.Encrypt(const aPlain: RawByteString;
 begin
   fSafe.Lock;
   try
-    aEncrypted := fAES[true].EncryptPKCS7(aPlain,true);
+    aEncrypted := fAES[true].EncryptPKCS7(aPlain,{iv=}true);
   finally
     fSafe.UnLock;
   end;
@@ -13039,10 +14297,9 @@ function TJWTAbstract.Compute(const DataNameValue: array of const;
   ExpirationMinutes: integer; Signature: PRawUTF8): RawUTF8;
 var payload, headpayload, signat: RawUTF8;
 begin
-  if self=nil then begin
-    result := '';
+  result := '';
+  if self=nil then
     exit;
-  end;
   payload := PayloadToJSON(DataNameValue,Issuer,Subject,Audience,NotBefore,ExpirationMinutes);
   headpayload := fHeaderB64+BinToBase64URI(payload);
   signat := ComputeSignature(headpayload);
@@ -13066,21 +14323,25 @@ end;
 function TJWTAbstract.PayloadToJSON(const DataNameValue: array of const;
   const Issuer, Subject, Audience: RawUTF8; NotBefore: TDateTime;
   ExpirationMinutes: cardinal): RawUTF8;
+  procedure RaiseMissing(c: TJWTClaim);
+  begin
+    raise EJWTException.CreateUTF8('%.PayloadJSON: missing %', [self, ToText(c)^]);
+  end;
 var payload: TDocVariantData;
 begin
   result := '';
   payload.InitObject(DataNameValue,JSON_OPTIONS_FAST);
   if jrcIssuer in fClaims then
     if Issuer='' then
-      exit else
+      RaiseMissing(jrcIssuer) else
       payload.AddValueFromText(JWT_CLAIMS_TEXT[jrcIssuer],Issuer,true);
   if jrcSubject in fClaims then
     if Subject='' then
-      exit else
+      RaiseMissing(jrcSubject) else
       payload.AddValueFromText(JWT_CLAIMS_TEXT[jrcSubject],Subject,true);
   if jrcAudience in fClaims then
     if Audience='' then
-      exit else
+      RaiseMissing(jrcAudience) else
       if Audience[1]='[' then
         payload.AddOrUpdateValue(JWT_CLAIMS_TEXT[jrcAudience],_JsonFast(Audience)) else
         payload.AddValueFromText(JWT_CLAIMS_TEXT[jrcAudience],Audience,true);
@@ -13114,18 +14375,20 @@ begin
       TypeInfo(TJWTContentDynArray),false,value);
 end;
 
-procedure TJWTAbstract.Verify(const Token: RawUTF8; out JWT: TJWTContent);
+procedure TJWTAbstract.Verify(const Token: RawUTF8; out JWT: TJWTContent;
+  ExcludedClaims: TJWTClaims);
 var headpayload: RawUTF8;
     signature: RawByteString;
     fromcache: boolean;
 begin
+  JWT.result := jwtNoToken;
   if (self=nil) or (fCache=nil) then
     fromcache := false else begin
     fromcache := fCache.FindAndCopy(Token,JWT);
     fCache.DeleteDeprecated;
   end;
   if not fromcache then
-    Parse(Token,JWT,headpayload,signature);
+    Parse(Token,JWT,headpayload,signature,ExcludedClaims);
   if JWT.result in [jwtValid,jwtNotBeforeFailed] then
     if CheckAgainstActualTimestamp(JWT) and not fromcache then
       CheckSignature(headpayload,signature,JWT); // depending on the algorithm used
@@ -13167,21 +14430,24 @@ begin
 end;
 
 procedure TJWTAbstract.Parse(const Token: RawUTF8; var JWT: TJWTContent;
-  out headpayload: RawUTF8; out signature: RawByteString);
+  out headpayload: RawUTF8; out signature: RawByteString; excluded: TJWTClaims);
 var payloadend,j,toklen,c,cap,headerlen,len,a: integer;
     P: PUTF8Char;
     N,V: PUTF8Char;
     wasString: boolean;
     EndOfObject: AnsiChar;
     claim: TJWTClaim;
+    requiredclaims: TJWTClaims;
     id: TSynUniqueIdentifierBits;
     value: variant;
     payload: RawUTF8;
-    head: TPUtf8CharDynArray;
+    head: array[0..1] of TValuePUTF8Char;
     aud: TDocVariantData;
     tok: PAnsiChar absolute Token;
 begin
-  JWT.data.InitFast(0,dvObject);
+  // 0. initialize parsing
+  Finalize(JWT.reg);
+  JWT.data.InitFast(0,dvObject); // custom claims
   byte(JWT.claims) := 0;
   word(JWT.audience) := 0;
   toklen := length(Token);
@@ -13189,21 +14455,23 @@ begin
     JWT.result := jwtNoToken;
     exit;
   end;
+  // 1. validate the header (including algorithm "alg" verification)
   JWT.result := jwtInvalidAlgorithm;
-  if joHeaderParse in fOptions then begin
-    headerlen := PosEx('.',Token);
+  if joHeaderParse in fOptions then begin // slower parsing
+    headerlen := PosExChar('.',Token);
     if (headerlen=0) or (headerlen>512) then
       exit;
     Base64URIToBin(tok,headerlen-1,signature);
-    JSONDecode(pointer(signature),['alg','typ'],head);
-    if not IdemPropNameU(fAlgorithm,head[0],StrLen(head[0])) or
-       ((head[1]<>nil) and not IdemPropNameU('JWT',head[1],StrLen(head[1]))) then
+    JSONDecode(pointer(signature),['alg','typ'],@head);
+    if not head[0].Idem(fAlgorithm) or
+       ((head[1].Value<>nil) and not head[1].Idem('JWT')) then
       exit;
-  end else begin
-    headerlen := length(fHeaderB64); // fast direct compare of fHeaderB64 (including "alg")
+  end else begin // fast direct compare of fHeaderB64 (including "alg")
+    headerlen := length(fHeaderB64);
     if (toklen<=headerlen) or not CompareMem(pointer(fHeaderB64),tok,headerlen) then
       exit;
   end;
+  // 2. extract the payload
   JWT.result := jwtWrongFormat;
   if toklen>JWT_MAXSIZE Then
     exit;
@@ -13217,13 +14485,16 @@ begin
   Base64URIToBin(tok+headerlen,payloadend-headerlen-1,RawByteString(payload));
   if payload='' then
     exit;
+  // 3. decode the payload into JWT.reg[]/JWT.claims (known) and JWT.data (custom)
   P := GotoNextNotSpace(pointer(payload));
   if P^<>'{' then
     exit;
   P := GotoNextNotSpace(P+1);
   cap := JSONObjectPropCount(P);
-  if cap<=0 then
+  if cap<0 then
     exit;
+  requiredclaims := fClaims - excluded;
+  if cap>0 then
   repeat
     N := GetJSONPropName(P);
     if N=nil then
@@ -13243,8 +14514,8 @@ begin
             JWT.result := jwtUnexpectedClaim;
             exit;
           end;
-          SetString(JWT.reg[claim],V,StrLen(V));
-          if claim in fClaims then
+          FastSetString(JWT.reg[claim],V,StrLen(V));
+          if claim in requiredclaims then
           case claim of
           jrcJwtID:
             if not(joNoJwtIDCheck in fOptions) then
@@ -13292,9 +14563,9 @@ begin
   until EndOfObject='}';
   if JWT.data.Count>0 then
     JWT.data.Capacity := JWT.data.Count;
-  if fClaims-JWT.claims<>[] then
+  if requiredclaims-JWT.claims<>[] then
     JWT.result := jwtMissingClaim else begin
-    SetString(headpayload,tok,payloadend-1);
+    FastSetString(headpayload,tok,payloadend-1);
     JWT.result := jwtValid;
   end;
 end;
@@ -13310,9 +14581,10 @@ begin
 end;
 
 class function TJWTAbstract.VerifyPayload(const Token, ExpectedSubject, ExpectedIssuer,
-  ExpectedAudience: RawUTF8; Expiration: PUnixTime; Signature: PRawUTF8): TJWTResult;
+  ExpectedAudience: RawUTF8; Expiration: PUnixTime; Signature: PRawUTF8; Payload: PVariant;
+  IgnoreTime: boolean; NotBeforeDelta: TUnixTime): TJWTResult;
 var P,B: PUTF8Char;
-    V: TPUtf8CharDynArray;
+    V: array[0..4] of TValuePUTF8Char;
     now, time: PtrUInt;
     text: RawUTF8;
 begin
@@ -13335,37 +14607,38 @@ begin
   text := Base64URIToBin(PAnsiChar(B),P-B);
   if text='' then
     exit;
-  JSONDecode(pointer(text),['iss','aud','exp','nbf','sub'],V,true);
+  if Payload<>nil then
+    _Json(text,Payload^,JSON_OPTIONS_FAST);
+  JSONDecode(pointer(text),['iss','aud','exp','nbf','sub'],@V,true);
   result := jwtUnexpectedClaim;
-  if (ExpectedSubject<>'') and not IdemPropNameU(ExpectedSubject,V[4],StrLen(V[4])) then
-    exit;
-  if (ExpectedIssuer<>'') and not IdemPropNameU(ExpectedIssuer,V[0],StrLen(V[0])) then
+  if ((ExpectedSubject<>'') and not V[4].Idem(ExpectedSubject)) or
+     ((ExpectedIssuer<>'') and not V[0].Idem(ExpectedIssuer)) then
     exit;
   result := jwtUnknownAudience;
-  if (ExpectedAudience<>'') and not IdemPropNameU(ExpectedAudience,V[1],StrLen(V[1])) then
+  if (ExpectedAudience<>'') and not V[1].Idem(ExpectedAudience) then
     exit;
   if Expiration<>nil then
     Expiration^ := 0;
-  if (V[2]<>nil) or (V[3]<>nil) then begin
+  if (V[2].Value<>nil) or (V[3].Value<>nil) then begin
     now := UnixTimeUTC;
-    if V[2]<>nil then begin
-      time := GetCardinal(V[2]);
+    if V[2].Value<>nil then begin
+      time := V[2].ToCardinal;
       result := jwtExpired;
-      if now>time then
+      if not IgnoreTime and (now>time) then
         exit;
       if Expiration<>nil then
         Expiration^ := time;
     end;
-    if V[3]<>nil then begin
-      time := GetCardinal(V[3]);
+    if not IgnoreTime and (V[3].Value<>nil) then begin
+      time := V[3].ToCardinal;
       result := jwtNotBeforeFailed;
-      if (time=0) or (now<time) then
+      if (time=0) or (now+PtrUInt(NotBeforeDelta)<time) then
         exit;
     end;
   end;
   inc(P);
   if Signature<>nil then
-    SetRawUTF8(Signature^,P,StrLen(P));
+    FastSetString(Signature^,P,StrLen(P));
   result := jwtValid;
 end;
 
@@ -13422,6 +14695,9 @@ begin
   signer := fSignPrepared; // thread-safe re-use of prepared TSynSigner
   signer.Update(pointer(headpayload),length(headpayload));
   signer.Final(temp);
+{  writeln('payload=',headpayload);
+  writeln('sign=',bintohex(@temp,SignatureSize));
+  writeln('expected=',bintohex(pointer(signature),SignatureSize)); }
   if CompareMem(@temp,pointer(signature),SignatureSize) then
     JWT.result := jwtValid;
 end;
@@ -13505,15 +14781,28 @@ begin
   result := saSha3S256;
 end;
 
+var
+  _TJWTResult: array[TJWTResult] of PShortString;
+  _TJWTClaim: array[TJWTClaim] of PShortString;
 
 function ToText(res: TJWTResult): PShortString;
 begin
-  result := GetEnumName(TypeInfo(TJWTResult),ord(res));
+  result := _TJWTResult[res];
 end;
 
 function ToCaption(res: TJWTResult): string;
 begin
-  result := GetCaptionFromEnum(TypeInfo(TJWTResult),ord(res));
+  GetCaptionFromTrimmed(_TJWTResult[res],result);
+end;
+
+function ToText(claim: TJWTClaim): PShortString;
+begin
+  result := _TJWTClaim[claim];
+end;
+
+function ToText(claims: TJWTClaims): ShortString;
+begin
+  GetSetNameShort(TypeInfo(TJWTClaims),claims,result);
 end;
 
 {$endif NOVARIANTS}
@@ -13550,7 +14839,7 @@ end;
   {$ifdef MSWINDOWS}
     {$L crc32c64.obj}
   {$else}
-    {$L fpc-linux64/crc32c64.o}
+    {$L static/x86_64-linux/crc32c64.o}
   {$endif}
 {$else}
   {$L crc32c64.obj}
@@ -13559,58 +14848,43 @@ end;
 
 function crc32_iscsi_01(buf: PAnsiChar; len: PtrUInt; crc: cardinal): cardinal; {$ifdef FPC}cdecl;{$endif} external;
 
-function crc32c_sse42_aesni(crc: cardinal; buf: PAnsiChar; len: cardinal): cardinal;
-{$ifdef MSWINDOWS} {$ifdef FPC}nostackframe; assembler;{$endif}
-asm // rcx=crc, rdx=buf, r8=len
-        mov     rax, rcx
-        mov     rcx, r8
+function crc32c_sse42_aesni(crc: PtrUInt; buf: PAnsiChar; len: PtrUInt): cardinal;
+{$ifdef FPC}nostackframe; assembler; asm{$else}asm .noframe {$endif}
+        mov     rax, crc
+        mov     rcx, len
         not     eax
-        test    rdx, rdx
-        jz      @0
-        test    r8, r8
-        jz      @0
-        cmp     r8, 64
-        ja      @intel // only call Intel code if worth it
-        shr     r8, 3
-        jz      @2
-        // alignment non needed for small blocks < 64 bytes
-@1:     {$ifdef FPC}
-        crc32 rax, qword [rdx] // hash 8 bytes per opcode
-        {$else}
-        db $F2,$48,$0F,$38,$F1,$02 // circumvent Delphi inline asm compiler bug
-        {$endif}
-        dec     r8
-        lea     rdx, [rdx + 8]
-        jnz     @1
-@2:     and     ecx, 7
-        jz      @0
-        cmp     ecx, 4
-        jb      @4
-        crc32   eax, dword ptr[rdx]
-        sub     ecx, 4
-        lea     rdx, [rdx + 4]
-        jz      @0
-@4:     crc32   eax, byte ptr[rdx]
-        dec     ecx
-        jz      @0
-        crc32   eax, byte ptr[rdx + 1]
-        dec     ecx
-        jz      @0
-        crc32   eax, byte ptr[rdx + 2]
-@0:     not     eax
-        ret
-@intel: mov     rcx, rdx
-        mov     rdx, r8
-        mov     r8, rax
+        test    buf, buf
+        jz      @z
+        cmp     len, 64
+        jb      @sml
+        // our  call: rcx/rdi=crc rdx/rsi=buf r8/rdx=len
+        // iscsi_01:  rcx/rdi=buf rdx/rsi=len r8/rdx=crc
+        mov     crc, buf
+        mov     buf, len
+        mov     len, rax
         call    crc32_iscsi_01
-        not     eax
-@none:
-{$else}
-begin
-  if buf=nil then
-    result := crc else
-    result := not crc32_iscsi_01(buf,len,not crc);
-{$endif}
+@z:     not     eax
+        ret
+@sml:   shr     len, 3
+        jz      @2
+{$ifdef FPC} align 16
+@s:     crc32   rax, qword [buf] // hash 8 bytes per loop
+{$else} @s:     db $F2,$48,$0F,$38,$F1,$02 // circumvent Delphi inline asm compiler bug
+{$endif}add     buf, 8
+        dec     len
+        jnz     @s
+@2:     test    cl, 4
+        jz      @3
+        crc32   eax, dword ptr[buf]
+        add     buf, 4
+@3:     test    cl, 2
+        jz      @1
+        crc32   eax, word ptr[buf]
+        add     buf, 2
+@1:     test    cl, 1
+        jz      @0
+        crc32   eax, byte ptr[buf]
+@0:     not     eax
 end;
 
 {$endif CRC32C_X64}
@@ -13619,13 +14893,29 @@ initialization
   ComputeAesStaticTables;
 {$ifdef USEPADLOCK}
   PadlockInit;
-{$endif}
-{$ifdef CRC32C_X64} // use SSE4.2+pclmulqdq instructions
-  if (cfSSE42 in CpuFeatures) and (cfAesNi in CpuFeatures) then
-    crc32c := @crc32c_sse42_aesni;
-{$endif}
+{$endif USEPADLOCK}
+{$ifdef CPUX64}
+  {$ifdef CRC32C_X64} // use SSE4.2+pclmulqdq instructions
+    if (cfSSE42 in CpuFeatures) and (cfAesNi in CpuFeatures) then
+      crc32c := @crc32c_sse42_aesni;
+  {$endif CRC32C_X64}
+  if cfSSE41 in CpuFeatures then begin // optimized Intel's sha256_sse4.asm
+    if K256AlignedStore='' then
+      GetMemAligned(K256AlignedStore,@K256,SizeOf(K256),K256Aligned);
+    if PtrUInt(K256Aligned) and 15<>0 then
+      K256AlignedStore := ''; // if not properly aligned -> fallback to pascal
+  end;
+{$endif CPUX64}
+  TTextWriter.RegisterCustomJSONSerializerFromTextSimpleType(TypeInfo(TSignAlgo));
+  TTextWriter.RegisterCustomJSONSerializerFromText(TypeInfo(TSynSignerParams),
+    'algo:TSignAlgo secret,salt:RawUTF8 rounds:integer');
+  {$ifndef NOVARIANTS}
+  GetEnumNames(TypeInfo(TJWTResult),@_TJWTResult);
+  GetEnumNames(TypeInfo(TJWTClaim),@_TJWTClaim);
+  {$endif NOVARIANTS}
   assert(sizeof(TMD5Buf)=sizeof(TMD5Digest));
   assert(sizeof(TAESContext)=AESContextSize);
+  assert(AESContextSize<=300); // see synsqlite3.c KEYLENGTH
   assert(sizeof(TSHAContext)=SHAContextSize);
   assert(sizeof(TSHA3Context)=SHA3ContextSize);
   assert(1 shl AESBlockShift=sizeof(TAESBlock));
@@ -13640,19 +14930,15 @@ finalization
 {$ifdef USEPADLOCKDLL}
   if PadLockLibHandle<>0 then
     FreeLibrary(PadLockLibHandle); // same on Win+Linux, thanks to SysUtils
-{$endif}
+{$endif USEPADLOCKDLL}
   FillZero(__h);
 {$ifdef MSWINDOWS}
   if CryptoAPI.Handle<>0 then begin
     {$ifdef USE_PROV_RSA_AES}
     if (CryptoAPIAESProvider<>nil) and (CryptoAPIAESProvider<>HCRYPTPROV_NOTTESTED) then
       CryptoAPI.ReleaseContext(CryptoAPIAESProvider,0);
-    {$endif}
+    {$endif USE_PROV_RSA_AES}
     FreeLibrary(CryptoAPI.Handle);
   end;
-{$endif}
+{$endif MSWINDOWS}
 end.
-
-
-
-

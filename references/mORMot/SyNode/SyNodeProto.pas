@@ -5,10 +5,10 @@ unit SyNodeProto;
 {
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - http://synopse.info
 
-    SyNode for mORMot Copyright (C) 2018 Pavel Mashlyakovsky & Vadim Orel
+    SyNode for mORMot Copyright (C) 2020 Pavel Mashlyakovsky & Vadim Orel
       pavel.mash at gmail.com
 
     Some ideas taken from
@@ -51,13 +51,6 @@ unit SyNodeProto;
   the terms of any one of the MPL, the GPL or the LGPL.
 
   ***** END LICENSE BLOCK *****
-
-
-  ---------------------------------------------------------------------------
-   Download the mozjs-45 library at
-     x32: https://unitybase.info/downloads/mozjs-45.zip
-     x64: https://unitybase.info/downloads/mozjs-45-x64.zip
-  ---------------------------------------------------------------------------
 
 
   Version 1.18
@@ -423,12 +416,12 @@ begin
 
   obj_ := cx.NewRootedObject(cx.NewObject(nil));
   try
-    aParent.ptr.DefineUCProperty(cx, Pointer(s), Length(s), obj_.ptr.ToJSValue, JSPROP_ENUMERATE or JSPROP_PERMANENT or JSPROP_READONLY, nil, nil);
+    aParent.ptr.DefineUCProperty(cx, Pointer(s), Length(s), obj_.ptr.ToJSValue, JSPROP_ENUMERATE or JSPROP_PERMANENT, nil, nil);
     with ti^.EnumBaseType^ do begin
       for i := MinValue to MaxValue do begin
         s := UTF8ToSynUnicode(GetEnumNameTrimed(i));
         val.asInteger := i;
-        obj_.ptr.DefineUCProperty(cx, Pointer(s), Length(s), val, JSPROP_ENUMERATE or JSPROP_PERMANENT or JSPROP_READONLY, nil, nil);
+        obj_.ptr.DefineUCProperty(cx, Pointer(s), Length(s), val, JSPROP_ENUMERATE or JSPROP_PERMANENT, nil, nil);
       end;
     end;
   finally
@@ -559,8 +552,11 @@ begin
     protoObj := cx.NewRootedObject(global.ptr.ReservedSlot[proto.fSlotIndex].asObject);
     jsobj := cx.NewRootedObject(cx.NewObjectWithGivenProto(@proto.FJSClass, protoObj.ptr));
     try
-      if Length(AProto.FJSProps)>0 then
-        jsobj.ptr.DefineProperties(cx,@AProto.FJSProps[0]);
+      // premature optimization is the root of evil
+      // as shown by valgrind profiler better to not redefine props in object
+      // but let's JS engine to use it from prototype
+      //if Length(AProto.FJSProps)>0 then
+      //  jsobj.ptr.DefineProperties(cx,@AProto.FJSProps[0]);
 
       Instance := AInstance;
       new(ObjRec);
@@ -593,7 +589,7 @@ begin
   FjsObjName := StringToAnsi7(fRttiCls.ClassName);
 
   global := cx.CurrentGlobalOrNull;
-  global.ReservedSlot[slotIndex] := cx.NewJSString(FjsObjName).ToJSVal;
+  global.ReservedSlot[fSlotIndex] := cx.NewJSString(fRttiCls.ClassName).ToJSVal;
 
   FMethodsDA.Init(TypeInfo(TSMMethodDynArray), FMethods);
   InitObject(aParent);
@@ -634,7 +630,7 @@ begin
     new(ObjRec);
     ObjRec.init(otProto,self);
     obj.PrivateData := ObjRec;
-    global.ReservedSlot[slotIndex] := obj.ToJSValue;
+    global.ReservedSlot[fSlotIndex] := obj.ToJSValue;
   finally
     cx.EndRequest;
   end;

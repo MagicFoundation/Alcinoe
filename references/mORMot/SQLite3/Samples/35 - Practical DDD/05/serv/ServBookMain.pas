@@ -9,6 +9,7 @@ uses
   SynCommons,
   mORMot,
   SynSQLite3,
+  SynTable,
   mORMotSQLite3,
   mORMotDB,
   dddInfraApps,

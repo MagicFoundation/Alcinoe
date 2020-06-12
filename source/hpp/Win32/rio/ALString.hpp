@@ -501,6 +501,8 @@ extern DELPHI_PACKAGE System::AnsiString __fastcall ALRandomStr(const int aLengt
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALRandomStr(const int aLength)/* overload */;
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALRandomStrU(const int aLength, const System::WideChar *aCharset, const int aCharset_High)/* overload */;
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALRandomStrU(const int aLength)/* overload */;
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALTitleCaseU(const System::UnicodeString s);
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALSentenceCaseU(const System::UnicodeString s);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALNEVExtractName(const System::AnsiString S);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALNEVExtractValue(const System::AnsiString s);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALFastTagReplacePrecompile(const System::AnsiString SourceString, const System::AnsiString TagStart, const System::AnsiString TagEnd, TALHandleTagPrecompileFunct PrecompileProc, bool StripParamQuotes, void * ExtData, System::Contnrs::TObjectList* TagsContainer, const System::Sysutils::TReplaceFlags flags = System::Sysutils::TReplaceFlags() );
@@ -543,8 +545,8 @@ extern DELPHI_PACKAGE int __fastcall ALUTF8CharCount(const System::AnsiString S)
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALUTF8ByteTrunc(const System::AnsiString s, const int Count);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALUTF8CharTrunc(const System::AnsiString s, const int Count);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALUTF8UpperFirstChar(const System::AnsiString s);
-extern DELPHI_PACKAGE System::AnsiString __fastcall ALUTF8TitleCase(const System::AnsiString s);
-extern DELPHI_PACKAGE System::AnsiString __fastcall ALUTF8SentenceCase(const System::AnsiString s);
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALTitleCase(const System::AnsiString s);
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALSentenceCase(const System::AnsiString s);
 extern DELPHI_PACKAGE System::Word __fastcall ALGetCodePageFromCharSetName(System::AnsiString Acharset);
 extern DELPHI_PACKAGE System::Word __fastcall ALGetCodePageFromLCID(const int aLCID);
 extern DELPHI_PACKAGE System::WideString __fastcall ALStringToWideString(const System::RawByteString S, const System::Word aCodePage);
@@ -561,6 +563,8 @@ extern DELPHI_PACKAGE void __fastcall ALExtractHeaderFieldsWithQuoteEscaped(cons
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALHTTPEncodeU(const System::UnicodeString AStr);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALHTTPDecodeU(const System::UnicodeString AStr);
 extern DELPHI_PACKAGE void __fastcall ALExtractHeaderFieldsWithQuoteEscapedU(const System::Sysutils::TSysCharSet &Separators, const System::Sysutils::TSysCharSet &WhiteSpace, const System::Sysutils::TSysCharSet &Quotes, System::WideChar * Content, Alstringlist::TALStringsU* Strings, bool HttpDecode, bool StripQuotes = false);
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALUTF8TitleCase _DEPRECATED_ATTRIBUTE1("use ALTitleCase instead") (const System::AnsiString s);
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALUTF8SentenceCase _DEPRECATED_ATTRIBUTE1("use ALSentenceCase instead") (const System::AnsiString s);
 }	/* namespace Alstring */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALSTRING)
 using namespace Alstring;

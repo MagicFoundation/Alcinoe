@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="4">
+    <PathDelim Value="\"/>
+    <Name Value="mormot_base"/>
+    <Type Value="RunTimeOnly"/>
+    <Author Value="Arnaud Bouchez"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <IncludeFiles Value="$PkgDir(zcore)\..\..\src;..;..\SQLite3"/>
+        <Libraries Value="..\static\$(TargetCPU)-$(TargetOS)"/>
+        <OtherUnitFiles Value="..;..\SQLite3;..\SQLite3\DDD\infra"/>
+        <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+      <Other>
+        <CustomOptions Value="-dNOSYNDBZEOS"/>
+        <OtherDefines Count="1">
+          <Define0 Value="NOSYNDBZEOS"/>
+        </OtherDefines>
+      </Other>
+    </CompilerOptions>
+    <Description Value="Core units needed by mORMot
+- Implement ORM, SOA and MVC features
+- ORM via static-linked SQLite3
+- ORM over external SQL and MongoDB
+- High-level Domain-Driven-Design units"/>
+    <License Value="Licensed under a disjunctive tri-license giving you the choice of one of
+the three following sets of free software/open source licensing terms:
+ - Mozilla Public License, version 1.1 or later;
+ - GNU General Public License, version 2.0 or later;
+ - GNU Lesser General Public License, version 2.1 or later.
+This allows the use of our code in as wide a variety of software projects
+as possible, while still maintaining copy-left on code we wrote."/>
+    <Version Major="1" Minor="18"/>
+    <Files Count="40">
+      <Item1>
+        <Filename Value="..\SynCommons.pas"/>
+        <UnitName Value="SynCommons"/>
+      </Item1>
+      <Item2>
+        <Filename Value="..\SynBidirSock.pas"/>
+        <UnitName Value="SynBidirSock"/>
+      </Item2>
+      <Item3>
+        <Filename Value="..\SynTable.pas"/>
+        <UnitName Value="SynTable"/>
+      </Item3>
+      <Item4>
+        <Filename Value="..\SynCrtSock.pas"/>
+        <UnitName Value="SynCrtSock"/>
+      </Item4>
+      <Item5>
+        <Filename Value="..\SynCrypto.pas"/>
+        <UnitName Value="SynCrypto"/>
+      </Item5>
+      <Item6>
+        <Filename Value="..\SynEcc.pas"/>
+        <UnitName Value="SynEcc"/>
+      </Item6>
+      <Item7>
+        <Filename Value="..\SynFPCTypInfo.pas"/>
+        <UnitName Value="SynFPCTypInfo"/>
+      </Item7>
+      <Item8>
+        <Filename Value="..\SynLog.pas"/>
+        <UnitName Value="SynLog"/>
+      </Item8>
+      <Item9>
+        <Filename Value="..\SynLZ.pas"/>
+        <UnitName Value="SynLZ"/>
+      </Item9>
+      <Item10>
+        <Filename Value="..\SynLZO.pas"/>
+        <UnitName Value="SynLZO"/>
+      </Item10>
+      <Item11>
+        <Filename Value="..\SynLizard.pas"/>
+        <UnitName Value="SynLizard"/>
+      </Item11>
+      <Item12>
+        <Filename Value="..\SynZip.pas"/>
+        <UnitName Value="SynZip"/>
+      </Item12>
+      <Item13>
+        <Filename Value="..\SynZipFiles.pas"/>
+        <UnitName Value="SynZipFiles"/>
+      </Item13>
+      <Item14>
+        <Filename Value="..\SynMustache.pas"/>
+        <UnitName Value="SynMustache"/>
+      </Item14>
+      <Item15>
+        <Filename Value="..\SynSSPI.pas"/>
+        <UnitName Value="SynSSPI"/>
+      </Item15>
+      <Item16>
+        <Filename Value="..\SynSSPIAuth.pas"/>
+        <UnitName Value="SynSSPIAuth"/>
+      </Item16>
+      <Item17>
+        <Filename Value="..\SynGSSAPI.pas"/>
+        <UnitName Value="SynGSSAPI"/>
+      </Item17>
+      <Item18>
+        <Filename Value="..\SynGSSAPIAuth.pas"/>
+        <UnitName Value="SynGSSAPIAuth"/>
+      </Item18>
+      <Item19>
+        <Filename Value="..\SynOpenSSL.pas"/>
+        <UnitName Value="SynOpenSSL"/>
+      </Item19>
+      <Item20>
+        <Filename Value="..\SynTests.pas"/>
+        <UnitName Value="SynTests"/>
+      </Item20>
+      <Item21>
+        <Filename Value="..\SynWinSock.pas"/>
+        <UnitName Value="SynWinSock"/>
+      </Item21>
+      <Item22>
+        <Filename Value="..\SynDB.pas"/>
+        <UnitName Value="SynDB"/>
+      </Item22>
+      <Item23>
+        <Filename Value="..\SynDBDataset.pas"/>
+        <UnitName Value="SynDBDataset"/>
+      </Item23>
+      <Item24>
+        <Filename Value="..\SynDBODBC.pas"/>
+        <UnitName Value="SynDBODBC"/>
+      </Item24>
+      <Item25>
+        <Filename Value="..\SynDBOracle.pas"/>
+        <UnitName Value="SynDBOracle"/>
+      </Item25>
+      <Item26>
+        <Filename Value="..\SynDBRemote.pas"/>
+        <UnitName Value="SynDBRemote"/>
+      </Item26>
+      <Item27>
+        <Filename Value="..\SynDBSQLite3.pas"/>
+        <UnitName Value="SynDBSQLite3"/>
+      </Item27>
+      <Item28>
+        <Filename Value="..\SQLite3\mORMot.pas"/>
+        <UnitName Value="mORMot"/>
+      </Item28>
+      <Item29>
+        <Filename Value="..\SQLite3\mORMotHttpClient.pas"/>
+        <UnitName Value="mORMotHttpClient"/>
+      </Item29>
+      <Item30>
+        <Filename Value="..\SQLite3\mORMotHttpServer.pas"/>
+        <UnitName Value="mORMotHttpServer"/>
+      </Item30>
+      <Item31>
+        <Filename Value="..\SQLite3\mORMotMVC.pas"/>
+        <UnitName Value="mORMotMVC"/>
+      </Item31>
+      <Item32>
+        <Filename Value="..\SQLite3\mORMotService.pas"/>
+        <UnitName Value="mORMotService"/>
+      </Item32>
+      <Item33>
+        <Filename Value="..\SQLite3\mORMotWrappers.pas"/>
+        <UnitName Value="mORMotWrappers"/>
+      </Item33>
+      <Item34>
+        <Filename Value="..\SQLite3\mORMotDDD.pas"/>
+        <UnitName Value="mORMotDDD"/>
+      </Item34>
+      <Item35>
+        <Filename Value="..\SQLite3\DDD\infra\dddInfraApps.pas"/>
+        <UnitName Value="dddInfraApps"/>
+      </Item35>
+      <Item36>
+        <Filename Value="..\SQLite3\DDD\infra\dddInfraSettings.pas"/>
+        <UnitName Value="dddInfraSettings"/>
+      </Item36>
+      <Item37>
+        <Filename Value="..\SynSQLite3.pas"/>
+        <UnitName Value="SynSQLite3"/>
+      </Item37>
+      <Item38>
+        <Filename Value="..\SQLite3\mORMotSQLite3.pas"/>
+        <UnitName Value="mORMotSQLite3"/>
+      </Item38>
+      <Item39>
+        <Filename Value="..\SynSQLite3Static.pas"/>
+        <UnitName Value="SynSQLite3Static"/>
+      </Item39>
+      <Item40>
+        <Filename Value="..\SynDBZeos.pas"/>
+        <UnitName Value="SynDBZeos"/>
+      </Item40>
+    </Files>
+    <RequiredPkgs Count="1">
+      <Item1>
+        <PackageName Value="FCL"/>
+      </Item1>
+    </RequiredPkgs>
+    <UsageOptions>
+      <IncludePath Value="$(PkgIncPath)"/>
+      <LibraryPath Value="$(PkgDir)\..\static\$(TargetCPU)-$(TargetOS)"/>
+      <ObjectPath Value="$(PkgDir)\.."/>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

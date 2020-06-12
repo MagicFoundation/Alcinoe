@@ -3,37 +3,40 @@ program HelloSpiderMonkey52;
   This example has translated from C++ hello world example taken on
   https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/How_to_embed_the_JavaScript_engine
 }
+{$mode objfpc}{$H+}
 uses
+  {$IFDEF UNIX}{$IFDEF UseCThreads}
   cthreads,
+  {$ENDIF}{$ENDIF}
   Classes,
   SysUtils,
   SpiderMonkey;
 
 const
-  script = '''hello''+''world, it is ''+new Date()';
+  script = '''Hello '' + ''world, it is ''+new Date()';
   filename = 'noname';
 
 var
   global_ops: JSClassOps = (
-  addProperty:        nil;
-  delProperty:        nil;
-  getProperty:        nil;
-  setProperty:        nil;
-  enumerate:          nil;
-  resolve:            nil;
-  mayResolve:         nil;
-  finalize:           nil;
-  call:               nil;
-  hasInstance:        nil;
-  construct:          nil;
-  trace:              nil;//@JS_GlobalObjectTraceHook;
+    addProperty:        nil;
+    delProperty:        nil;
+    getProperty:        nil;
+    setProperty:        nil;
+    enumerate:          nil;
+    resolve:            nil;
+    mayResolve:         nil;
+    finalize:           nil;
+    call:               nil;
+    hasInstance:        nil;
+    construct:          nil;
+    trace:              nil;//@JS_GlobalObjectTraceHook;
   );
 
   // The class of the global object.
   global_class: JSClass = (
-  name:               'global';
-  flags:              JSCLASS_GLOBAL_FLAGS;
-  cOps:               @global_ops;
+    name:               'global';
+    flags:              JSCLASS_GLOBAL_FLAGS;
+    cOps:               @global_ops;
   );
 
   cx: PJSContext;

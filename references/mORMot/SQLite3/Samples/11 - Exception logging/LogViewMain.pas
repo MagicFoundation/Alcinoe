@@ -5,8 +5,24 @@ interface
 
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ImgList, StdCtrls, CheckLst, Menus, ExtCtrls, ShellAPI, Grids, Clipbrd,
+  {$ifdef MSWINDOWS}
+  Windows,
+  ShellAPI,
+  {$endif}
+  Messages,
+  SysUtils,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  ImgList,
+  StdCtrls,
+  CheckLst,
+  Menus,
+  ExtCtrls,
+  Grids,
+  Clipbrd,
   {$WARN UNIT_PLATFORM OFF}
   FileCtrl,
   {$WARN UNIT_PLATFORM ON}
@@ -16,7 +32,10 @@ uses
   {$else}
   SynTaskDialog, // also fix QC 37403 for Delphi 6/7/2006
   {$endif}
-  SynCommons, SynLog, mORMotHttpServer;
+  SynCommons,
+  SynLog,
+  SynMemoEx,
+  mORMotHttpServer;
 
 type
    {$ifdef FPC}
@@ -29,12 +48,12 @@ type
   TMainLogView = class(TForm)
     PanelLeft: TPanel;
     PanelThread: TPanel;
+    PanelBottom: TPanel;
     BtnBrowse: TButton;
     EventsList: TCheckListBox;
     FilterMenu: TPopupMenu;
     EditSearch: TEdit;
     BtnSearchNext: TButton;
-    MemoBottom: TMemo;
     Splitter2: TSplitter;
     Splitter3: TSplitter;
     BtnStats: TButton;
@@ -117,6 +136,7 @@ type
     procedure PanelLeftResize(Sender: TObject);
     procedure btnThreadDownClick(Sender: TObject);
     procedure btnThreadUpClick(Sender: TObject);
+    procedure PanelBottomResize(Sender: TObject);
   protected
     FLog: TSynLogFileView;
     FMainCaption: string;
@@ -135,6 +155,7 @@ type
     procedure ThreadListNameRefresh(Index: integer);
     procedure ReceivedOne(const Text: RawUTF8);
   public
+    MemoBottom: TMemoEx;
     destructor Destroy; override;
     property LogFileName: TFileName write SetLogFileName;
   end;
@@ -146,14 +167,15 @@ var
 
 implementation
 
-{$ifndef FPC}
-{$R *.dfm}
-{$else}
+{$ifdef FPC}
 {$R *.lfm}
+{$else}
+{$R *.dfm}
 {$endif}
 
 {$ifdef FPC}
 uses
+  LCLIntf,
   Themes,
   LCLType;
 {$endif}
@@ -167,12 +189,12 @@ resourcestring
    'Executable'#13#10'----------'#13#10#13#10'Name: %s%s'#13#10+
      'Version: %s'#13#10'Build Date: %s'#13#10'Framework: %s'#13#10#13#10+
    'Host'#13#10'----'#13#10#13#10'Computer: %s'#13#10+
-     'User: %s'#13#10'CPU: %s%s'#13#10'OS: %s'#13#10'Wow64: %s'#13#10#13#10+
+     'User: %s'#13#10'CPU: %s%s'#13#10'OS: %s'#13#10#13#10+
    'Events'#13#10'------'#13#10#13#10;
   sNoFile = 'No File';
   sRemoteLog = 'Remote Log';
   sUnknown = 'Unknown';
-  sWindowsStats = 'Windows %s (service pack %d)';
+  sWindowsStats = 'Windows %s (service pack %d)'#13#10'Wow64: %s';
   sTimeInfo = '%d lines - time elapsed: %s';
   
 { TMainLogView }
@@ -224,7 +246,7 @@ begin
     Screen.Cursor := crDefault;
   end else
     Caption := FMainCaption+sNoFile;
-  EventsList.Height := 8+EventsList.Count*EventsList.ItemHeight;
+  EventsList.Height := 8+EventsList.Count*(EventsList.ItemHeight{$ifndef MSWINDOWS}+4{$endif});
   ProfileGroup.Top := EventsList.Top+EventsList.Height+12;
   MergedProfile.Top := ProfileGroup.Top+ProfileGroup.Height+2;
   y := MergedProfile.Top+32;
@@ -310,6 +332,16 @@ begin
   ProfileList.ColWidths[0] := 60;
   ProfileList.ColWidths[1] := 1000;
   ProfileList.Hide;
+  MemoBottom := TMemoEx.Create(self);
+  MemoBottom.Parent := PanelBottom;
+  MemoBottom.Align := alClient;
+  MemoBottom.Font.Height := -11;
+  if Screen.Fonts.IndexOf('Consolas') >= 0 then
+    MemoBottom.Font.Name := 'Consolas' else
+    MemoBottom.Font.Name := 'Courier New';
+  MemoBottom.ReadOnly := true;
+  MemoBottom.ScrollBars := ssVertical;
+  MemoBottom.Text := '';
 end;
 
 procedure TMainLogView.FormShow(Sender: TObject);
@@ -355,13 +387,19 @@ begin
   EventsListClickCheck(nil);
 end;
 
+{$ifdef FPC}
+  {$ifdef MSWINDOWS}
+    {$define FPCCHECKBOXUNFIXED} // circumvent LCL issue under Windows
+  {$endif}
+{$endif}
+
 procedure TMainLogView.EventsListDrawItem(Control: TWinControl;
   Index: Integer; Rect: TRect; State: TOwnerDrawState);
 var E: TSynLogInfo;
-  {$ifdef FPC}
-  BRect: TRect;
-  aTheme: TThemedElementDetails;
-  {$endif}
+   {$ifdef FPCCHECKBOXUNFIXED}
+   BRect: TRect;
+   aTheme: TThemedElementDetails;
+   {$endif}
 begin
   if Index<0 then
     exit;
@@ -372,6 +410,7 @@ begin
     Canvas.Font.Color  := LOG_LEVEL_COLORS[true,E];
     {$ifdef FPC}
     Canvas.FillRect(Rect);
+    {$ifdef FPCCHECKBOXUNFIXED}
     BRect.Left := Rect.Left + 1;
     BRect.Top := Rect.Top;
     BRect.Bottom := Rect.Bottom;
@@ -382,7 +421,8 @@ begin
     ThemeServices.DrawElement(Canvas.Handle, aTheme, BRect);
     Rect.Left := BRect.Right;
     {$endif}
-    Canvas.TextRect(Rect,Rect.Left+4,Rect.Top,ToCaption(E));
+    {$endif}
+    Canvas.TextRect(Rect,Rect.Left+4,Rect.Top{$ifndef MSWINDOWS}+4{$endif},ToCaption(E));
   end;
 end;
 
@@ -582,6 +622,8 @@ begin
     end;
     s := format(sTimeInfo,[Selection.Bottom-Selection.Top+1,s]);
   end;
+  if Pos(#9, s) > 0 then
+    s := StringReplace(s, #9, ' ', [rfReplaceAll]);
   MemoBottom.Text := s;
 end;
 
@@ -635,7 +677,7 @@ end;
 procedure TMainLogView.BtnStatsClick(Sender: TObject);
 var M: TMemo;
     F: TForm;
-    s,win: string;
+    s,ostext: string;
     sets: array[TSynLogInfo] of integer;
     i: integer;
     P: PUTF8Char;
@@ -661,9 +703,9 @@ begin
       with FLog do begin
         if InstanceName<>'' then
           s := ' / '+UTF8ToString(InstanceName);
-        if OS=wUnknown then
-          win := UTF8ToString(DetailedOS) else
-          win := format(sWindowsStats,[WINDOWS_NAME[OS],ServicePack]);
+        if OS<>wUnknown then
+          ostext := format(sWindowsStats,[WINDOWS_NAME[OS],ServicePack,BOOL_STR[Wow64]]) else
+          ostext := UTF8ToString(DetailedOS);
         feat := ToText(IntelCPU,' ');
         if feat<>'' then
           feat := '  ' + LowerCase(feat);
@@ -675,7 +717,7 @@ begin
            Count,LogProcCount,ThreadsCount,KB(Map.Size),
            UTF8ToString(ExecutableName),s,ExecutableVersion,
            DateTimeToStr(ExecutableDate),Framework,UTF8ToString(ComputerHost),
-           UTF8ToString(RunningUser),CPU,feat,win,BOOL_STR[Wow64]]);
+           UTF8ToString(RunningUser),CPU,feat,ostext]);
         fillchar(sets,sizeof(sets),0);
         for i := 0 to Count-1 do
           inc(sets[EventLevel[i]]);
@@ -716,12 +758,14 @@ begin
     if FLog.EventLevel<>nil then
       Index := FLog.Selected[Index];
     s := FLog.EventString(Index,'',0,true);
+    if Pos(#9, s) > 0 then
+      s := StringReplace(s, #9, ' ', [rfReplaceAll]);
     MemoBottom.Text := s;
     if search<>'' then begin
       ss := UTF8ToString(search);
       i := Pos(ss,SysUtils.UpperCase(s));
       if i>0 then begin
-        MemoBottom.SelStart := i-1;
+        MemoBottom.SelStart := i;
         MemoBottom.SelLength := length(ss);
       end;
     end;
@@ -808,12 +852,14 @@ end;
 
 procedure TMainLogView.ImageLogoClick(Sender: TObject);
 begin
-{$ifndef FPC}
+{$ifdef FPC}
+  OpenURL('https://synopse.info');
+{$else}
   {$WARNINGS OFF}
   if DebugHook=0 then
-{$endif}
+  {$WARNINGS ON}
     ShellExecute(0,'open','https://synopse.info',nil,nil,SW_SHOWNORMAL);
-{$WARNINGS ON}
+{$endif}
 end;
 
 procedure TMainLogView.BtnThreadClick(Sender: TObject);
@@ -1027,5 +1073,13 @@ begin
   lstDays.Height := PanelLeft.ClientHeight-lstDays.Top-48;
 end;
 
+
+procedure TMainLogView.PanelBottomResize(Sender: TObject);
+var w: integer;
+begin
+  w := MemoBottom.CellRect.Width;
+  if w > 0 then
+    MemoBottom.RightMargin := (PanelBottom.ClientWidth div w) - 7;
+end;
 
 end.

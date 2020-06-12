@@ -56,7 +56,8 @@ contains
   ALFmxMemo in 'ALFmxMemo.pas',
   ALGraphics in 'ALGraphics.pas',
   ALFmxFilterEffects in 'ALFmxFilterEffects.pas',
-  ALFmxAni in 'ALFmxAni.pas';
+  ALFmxAni in 'ALFmxAni.pas',
+  ALFiles in 'ALFiles.pas';
 
 end.
 

@@ -6,7 +6,7 @@ unit SynFPCSock;
 {
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2018 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -27,7 +27,7 @@ unit SynFPCSock;
   Portions created by Lukas Gebauer are Copyright (C) 2003.
   All Rights Reserved.
 
-  Portions created by Arnaud Bouchez are Copyright (C) 2018 Arnaud Bouchez.
+  Portions created by Arnaud Bouchez are Copyright (C) 2020 Arnaud Bouchez.
   All Rights Reserved.
 
   Contributor(s):
@@ -52,9 +52,6 @@ unit SynFPCSock;
 
   Shared by Kylix and FPC for all POSIX systems.
 
-  Version 1.18
-  - initial release
-
 }
 
 {$ifdef FPC}
@@ -62,18 +59,22 @@ unit SynFPCSock;
 {$MODE DELPHI}
 {$H+}
 
+{.$define USELIBC}
+
 {$ifdef ANDROID}
   {$define LINUX} // a Linux-based system
 {$endif}
 
-// BSD definition of scoketaddr
-{$ifdef FREEBSD}
-  {$DEFINE SOCK_HAS_SINLEN}
+// BSD definition of socketaddr
+{$if
+     defined(OpenBSD) or
+     defined(FreeBSD) or
+     defined(Darwin) or
+     defined(Haiku)
+}
+  {$DEFINE SOCK_HAS_SINLEN}               // BSD definition of socketaddr
 {$endif}
 {$ifdef SUNOS}
-  {$DEFINE SOCK_HAS_SINLEN}
-{$endif}
-{$ifdef BSD}
   {$DEFINE SOCK_HAS_SINLEN}
 {$endif}
 
@@ -90,15 +91,16 @@ unit SynFPCSock;
 interface
 
 uses
+  SysUtils,
   {$ifdef FPC}
   BaseUnix,
   Unix,
   {$ifdef Linux}
   Linux, // for epoll support
-  {$endif}
+  {$endif Linux}
   termio,
   netdb,
-  Sockets,
+  Sockets, // most definitions are inlined in SynFPCSock to avoid Lazarus problems with Sockets.pp
   SynFPCLinux,
   {$else}
   {$ifdef KYLIX3}
@@ -107,9 +109,8 @@ uses
   KernelIoctl,
   SynKylix,
   {$endif}
-  {$endif}
+  {$endif FPC}
   SyncObjs,
-  SysUtils,
   Classes;
 
 const
@@ -150,6 +151,9 @@ type
   PSockAddrIn6 = ^TSockAddrIn6;
   TSockAddrIn6 = sockets.TInetSockAddr6;
 
+  TSockAddr = sockets.TSockAddr;
+  PSockAddr = sockets.PSockAddr;
+
 const
   FIONREAD        = termio.FIONREAD;
   FIONBIO         = termio.FIONBIO;
@@ -167,10 +171,17 @@ const
   IP_ADD_MEMBERSHIP  = sockets.IP_ADD_MEMBERSHIP;  { ip_mreq; add an IP group membership }
   IP_DROP_MEMBERSHIP = sockets.IP_DROP_MEMBERSHIP; { ip_mreq; drop an IP group membership }
 
+  SHUT_RD         = sockets.SHUT_RD;
+  SHUT_WR         = sockets.SHUT_WR;
+  SHUT_RDWR       = sockets.SHUT_RDWR;
+
   SOL_SOCKET    = sockets.SOL_SOCKET;
 
   SO_DEBUG      = sockets.SO_DEBUG;
   SO_REUSEADDR  = sockets.SO_REUSEADDR;
+  {$ifdef BSD}
+  SO_REUSEPORT  = sockets.SO_REUSEPORT;
+  {$endif}
   SO_TYPE       = sockets.SO_TYPE;
   SO_ERROR      = sockets.SO_ERROR;
   SO_DONTROUTE  = sockets.SO_DONTROUTE;
@@ -185,9 +196,16 @@ const
   SO_RCVTIMEO   = sockets.SO_RCVTIMEO;
   SO_SNDTIMEO   = sockets.SO_SNDTIMEO;
 {$IFDEF BSD}
+  {$IFNDEF OPENBSD}
+  {$IFDEF DARWIN}
   SO_NOSIGPIPE  = $1022;
+  {$ELSE}
+  SO_NOSIGPIPE	= $800;
+  {$ENDIF}
+  {$ENDIF}
 {$ENDIF}
-  SOMAXCONN     = 1024;
+  // we use Linux default here
+  SOMAXCONN     = 128;
 
   IPV6_UNICAST_HOPS     = sockets.IPV6_UNICAST_HOPS;
   IPV6_MULTICAST_IF     = sockets.IPV6_MULTICAST_IF;
@@ -200,8 +218,12 @@ const
   MSG_PEEK      = sockets.MSG_PEEK;     // Peek at incoming messages.
 
   {$ifdef BSD}
+  {$ifndef OpenBSD}
+  // Works under MAC OS X and FreeBSD, but is undocumented, so FPC doesn't include it
   MSG_NOSIGNAL  = $20000;  // Do not generate SIGPIPE.
-  // Works under MAC OS X, but is undocumented, so FPC doesn't include it
+  {$else}
+  MSG_NOSIGNAL  = $400;
+  {$endif}
   {$else}
   {$ifdef SUNOS}
   MSG_NOSIGNAL  = $20000;  // Do not generate SIGPIPE.
@@ -215,7 +237,9 @@ const
 
   { Address families. }
   AF_UNSPEC       = 0;               { unspecified }
+  AF_LOCAL        = 1;
   AF_INET         = 2;               { internetwork: UDP, TCP, etc. }
+  AF_UNIX         = AF_LOCAL;
   AF_MAX          = 24;
 
   { Protocol families, same as address families for now. }
@@ -230,7 +254,7 @@ const
   WSAEFAULT = ESysEFAULT;
   WSAEINVAL = ESysEINVAL;
   WSAEMFILE = ESysEMFILE;
-  WSAEWOULDBLOCK = ESysEWOULDBLOCK;
+  WSAEWOULDBLOCK = ESysEWOULDBLOCK; // =WSATRY_AGAIN/ESysEAGAIN on POSIX
   WSAEINPROGRESS = ESysEINPROGRESS;
   WSAEALREADY = ESysEALREADY;
   WSATRY_AGAIN = ESysEAGAIN;
@@ -310,7 +334,7 @@ const
   WSAHOST_NOT_FOUND = HOST_NOT_FOUND;
   WSAETIMEDOUT = ETIMEDOUT;
   WSAEMFILE = EMFILE;
-  
+
 {$endif FPC}
 
 
@@ -393,7 +417,7 @@ procedure SET_LOOPBACK_ADDR6 (const a: PInAddr6);
 var
   in6addr_any, in6addr_loopback : TInAddr6;
 
-{$ifdef FPC}
+{$ifdef FPC} // some functions inlined redirection to Sockets.pp
 
 procedure FD_CLR(Socket: TSocket; var FDSet: TFDSet); inline;
 function FD_ISSET(Socket: TSocket; var FDSet: TFDSet): Boolean; inline;
@@ -403,14 +427,20 @@ procedure FD_ZERO(var FDSet: TFDSet); inline;
 function ResolveIPToName(const IP: string; Family,SockProtocol,SockType: integer): string;
 function ResolvePort(const Port: string; Family,SockProtocol,SockType: integer): Word;
 
+function fpbind(s:cint; addrx: psockaddr; addrlen: tsocklen): cint; inline;
+function fplisten(s:cint; backlog: cint): cint; inline;
+function fprecv(s:cint; buf: pointer; len: size_t; Flags: cint): ssize_t; inline;
+function fpsend(s:cint; msg:pointer; len:size_t; flags:cint): ssize_t; inline;
+
 {$endif FPC}
 
 const
-  // we assume that the OS has IP6 compatibility
+  // we assume that the Posix OS has IP6 compatibility
   SockEnhancedApi = true;
   SockWship6Api = true;
 
 type
+  PVarSin = ^TVarSin;
   TVarSin = packed record
     {$ifdef SOCK_HAS_SINLEN}
     sin_len: cuchar;
@@ -422,10 +452,11 @@ type
           AF_INET: (sin_port: word;
                     sin_addr: TInAddr;
                     sin_zero: array[0..7] of Char);
-          AF_INET6:(sin6_port:     word;
-                    sin6_flowinfo: longword;
-      	    	      sin6_addr:     TInAddr6;
-      		          sin6_scope_id: longword);
+          AF_INET6:(sin6_port:     word; // see sockaddr_in6
+                    sin6_flowinfo: cardinal;
+      	    	    sin6_addr:     TInAddr6;
+      		    sin6_scope_id: cardinal);
+          AF_UNIX: (sun_path: array[0..{$ifdef SOCK_HAS_SINLEN}103{$else}107{$endif}] of Char);
           );
   end;
 
@@ -443,11 +474,11 @@ function GetSockOpt(s: TSocket; level,optname: Integer; optval: pointer;
 function SendTo(s: TSocket; Buf: pointer; len,flags: Integer; addrto: TVarSin): Integer;
 function RecvFrom(s: TSocket; Buf: pointer; len,flags: Integer; var from: TVarSin): Integer;
 function ntohs(netshort: word): word;
-function ntohl(netlong: longword): longword;
+function ntohl(netlong: cardinal): cardinal;
 function Listen(s: TSocket; backlog: Integer): Integer;
 function IoctlSocket(s: TSocket; cmd: DWORD; var arg: integer): Integer;
 function htons(hostshort: word): word;
-function htonl(hostlong: longword): longword;
+function htonl(hostlong: cardinal): cardinal;
 function GetSockName(s: TSocket; var name: TVarSin): Integer;
 function GetPeerName(s: TSocket; var name: TVarSin): Integer;
 function Connect(s: TSocket; const name: TVarSin): Integer;
@@ -492,7 +523,7 @@ const
 
 type
   /// polling request data structure for poll()
-  TPollFD = packed record
+  TPollFD = {packed} record
     /// file descriptor to poll
     fd: integer;
     /// types of events poller cares about
@@ -571,9 +602,14 @@ function epoll_wait(epfd: integer; events: PEPollEvent; maxevents, timeout: inte
 function epoll_close(epfd: integer): integer;
 {$endif Linux}
 
+var
+  SynSockCS: TRTLCriticalSection;
 
 implementation
 
+{$ifdef USELIBC}
+{$i SynFPCSockLIBC.inc}
+{$endif}
 
 function IN6_IS_ADDR_UNSPECIFIED(const a: PInAddr6): boolean;
 begin
@@ -626,14 +662,8 @@ begin
   with WSData do begin
     wVersion := wVersionRequired;
     wHighVersion := $202;
-    {$ifdef FPC}
-    szDescription := 'Synopse CrossPlatform Socket Layer';
-    szSystemStatus := 'Running on Unix/Linux by FreePascal';
-    {$endif}
-    {$ifdef KYLIX3}
-    {$endif}
-    szDescription := 'Synopse CrossPlatform Socket Layer';
-    szSystemStatus := 'Running on Unix/Linux by Kylix';
+    szDescription := 'Synopse Sockets';
+    szSystemStatus := 'Linux';
     iMaxSockets := 32768;
     iMaxUdpDg := 8192;
   end;
@@ -672,6 +702,28 @@ begin
   fpFD_ZERO(fdset);
 end;
 
+{$ifndef USELIBC}
+function fpbind(s:cint; addrx: psockaddr; addrlen: tsocklen): cint;
+begin
+  result := sockets.fpbind(s, addrx, addrlen);
+end;
+
+function fplisten(s:cint; backlog : cint): cint;
+begin
+  result := sockets.fplisten(s, backlog);
+end;
+
+function fprecv(s:cint; buf: pointer; len: size_t; Flags: cint): ssize_t;
+begin
+  result := sockets.fprecv(s, buf, len, Flags);
+end;
+
+function fpsend(s:cint; msg:pointer; len:size_t; flags:cint): ssize_t;
+begin
+  result := sockets.fpsend(s, msg, len, flags);
+end;
+{$endif USELIBC}
+
 {$endif FPC}
 
 function SizeOfVarSin(sin: TVarSin): integer;
@@ -679,6 +731,7 @@ begin
   case sin.sin_family of
     AF_INET:  result := SizeOf(TSockAddrIn);
     AF_INET6: result := SizeOf(TSockAddrIn6);
+    AF_UNIX:  result := SizeOf(sockaddr_un);
   else        result := 0;
   end;
 end;
@@ -806,7 +859,7 @@ begin
   result := {$ifdef KYLIX3}LibC{$else}sockets{$endif}.ntohs(NetShort);
 end;
 
-function ntohl(netlong: longword): longword;
+function ntohl(netlong: cardinal): cardinal;
 begin
   result := {$ifdef KYLIX3}LibC{$else}sockets{$endif}.ntohl(NetLong);
 end;
@@ -818,7 +871,7 @@ begin
     result := SOCKET_ERROR;
 end;
 
-function  IoctlSocket(s: TSocket; cmd: DWORD; var arg: integer): Integer;
+function IoctlSocket(s: TSocket; cmd: DWORD; var arg: integer): Integer;
 begin
   {$ifdef KYLIX3}
   result := ioctl(s,cmd,@arg);
@@ -829,12 +882,12 @@ end;
 
 function htons(hostshort: word): word;
 begin
-  result := {$ifdef KYLIX3}LibC{$else}sockets{$endif}.htons(Hostshort);
+  result := {$ifdef KYLIX3}LibC{$else}sockets{$endif}.htons(hostshort);
 end;
 
-function htonl(hostlong: longword): longword;
+function htonl(hostlong: cardinal): cardinal;
 begin
-  result := {$ifdef KYLIX3}LibC{$else}sockets{$endif}.htonl(HostLong);
+  result := {$ifdef KYLIX3}LibC{$else}sockets{$endif}.htonl(hostlong);
 end;
 
 function CloseSocket(s: TSocket): Integer;
@@ -847,13 +900,14 @@ begin
 end;
 
 function Socket(af,Struc,Protocol: Integer): TSocket;
-{$IFDEF BSD}
-var on_off: integer;
+{$IF defined(BSD) AND NOT defined(OpenBSD)}
+var
+  on_off: integer;
 {$ENDIF}
 begin
   result := {$ifdef KYLIX3}LibC.socket{$else}fpSocket{$endif}(af,struc,protocol);
 // ##### Patch for BSD to avoid "Project XXX raised exception class 'External: SIGPIPE'" error.
-{$IFDEF BSD}
+{$IF defined(BSD) AND NOT defined(OpenBSD)}
   if result <> INVALID_SOCKET then begin
     on_off := 1;
     fpSetSockOpt(result,integer(SOL_SOCKET),integer(SO_NOSIGPIPE),@on_off,SizeOf(integer));
@@ -934,8 +988,8 @@ begin
       Hints2.ai_family := AF_INET6;
       TwoPass := True;
     end else begin
-      Hints2.ai_family := AF_INET;
       Hints1.ai_family := AF_INET6;
+      Hints2.ai_family := AF_INET;
       TwoPass := True;
     end;
   end else
@@ -1073,7 +1127,13 @@ var TwoPass: boolean;
   end;
 begin
   result := 0;
-  FillChar(Sin,Sizeof(Sin),0);
+  if (Family=AF_UNIX) then begin
+    Sin.AddressFamily := AF_UNIX;
+    Move(IP[1],Sin.sun_path,length(IP));
+    Sin.sun_path[length(IP)]:=#0;
+    exit;
+  end;
+  FillChar(Sin,SizeOf(Sin),0);
   Sin.sin_port := Resolveport(port,family,SockProtocol,SockType);
   TwoPass := false;
   if Family=AF_UNSPEC then begin
@@ -1114,7 +1174,10 @@ begin
     IPList.Clear;
   if (family=AF_INET) or (family=AF_UNSPEC) then begin
     if lowercase(name)=cLocalHostStr then
-      IpList.Add(cLocalHost) else begin
+      IpList.Add(cLocalHost)
+    else if name=cAnyHost then
+      IpList.Add(cAnyHost)
+    else begin
       a4[1] := StrTonetAddr(name);
       if a4[1].s_addr=INADDR_ANY then
         if GetHostByName(name,he) then begin
@@ -1122,14 +1185,17 @@ begin
           x := 1;
         end else
           x := Resolvename(name,a4) else
-        x := 1;
+          x := 1;
       for n := 1  to x do
         IpList.Add(netaddrToStr(a4[n]));
     end;
   end;
   if (family=AF_INET6) or (family=AF_UNSPEC) then begin
     if lowercase(name)=cLocalHostStr then
-      IpList.Add(c6LocalHost) else begin
+      IpList.Add(c6LocalHost)
+    else if name=c6AnyHost then
+      IpList.Add(c6AnyHost)
+    else begin
       a6[1] := StrTonetAddr6(name);
       if IN6_IS_ADDR_UNSPECIFIED(@a6[1]) then
         x := Resolvename6(name,a6) else
@@ -1223,5 +1289,8 @@ end;
 initialization
   SET_IN6_IF_ADDR_ANY(@in6addr_any);
   SET_LOOPBACK_ADDR6(@in6addr_loopback);
+  InitializeCriticalSection(SynSockCS);
 
+finalization
+  DeleteCriticalSection(SynSockCS);
 end.

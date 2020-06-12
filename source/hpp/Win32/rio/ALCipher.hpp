@@ -130,6 +130,10 @@ typedef unsigned __fastcall (*TALStringHashCrc32)(const System::AnsiString str);
 
 typedef unsigned __fastcall (*TALHashCrc32)(char * buf, unsigned len);
 
+typedef __int64 __fastcall (*TALStringHashCrc64)(const System::AnsiString str);
+
+typedef __int64 __fastcall (*TALHashCrc64)(char * buf, unsigned len);
+
 typedef unsigned ALG_ID;
 
 typedef NativeUInt HCRYPTPROV;
@@ -174,6 +178,8 @@ static const System::Int8 cALBFRounds = System::Int8(0x10);
 static const System::Int8 cALMaxRDLRounds = System::Int8(0xe);
 extern DELPHI_PACKAGE TALStringHashCrc32 ALStringHashCrc32;
 extern DELPHI_PACKAGE TALHashCrc32 ALHashCrc32;
+extern DELPHI_PACKAGE TALStringHashCrc64 ALStringHashCrc64;
+extern DELPHI_PACKAGE TALHashCrc64 ALHashCrc64;
 #define crypt32 L"crypt32.dll"
 static const unsigned CRYPT_VERIFYCONTEXT = unsigned(0xf0000000);
 static const System::Int8 CRYPT_NEWKEYSET = System::Int8(0x8);
@@ -262,10 +268,11 @@ extern DELPHI_PACKAGE System::DynamicArray<System::Byte> __fastcall ALRandomByte
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALRandomByteStr(const unsigned Len);
 extern DELPHI_PACKAGE unsigned __fastcall ALRandom32(const unsigned ARange);
 extern DELPHI_PACKAGE unsigned __int64 __fastcall ALRandom64(const unsigned __int64 ARange);
+extern DELPHI_PACKAGE void __fastcall ALTestCRC32Implementation(const System::AnsiString aSavedResultsFilename = System::AnsiString());
 extern DELPHI_PACKAGE __int64 __fastcall ALFnv1aInt64(const System::AnsiString str);
 extern DELPHI_PACKAGE __int64 __fastcall ALFnv1aInt64U(const System::UnicodeString str, System::Sysutils::TEncoding* const encoding);
-extern DELPHI_PACKAGE __int64 __fastcall ALFnv1aInt32(const System::AnsiString str);
-extern DELPHI_PACKAGE __int64 __fastcall ALFnv1aInt32U(const System::UnicodeString str, System::Sysutils::TEncoding* const encoding);
+extern DELPHI_PACKAGE int __fastcall ALFnv1aInt32(const System::AnsiString str);
+extern DELPHI_PACKAGE int __fastcall ALFnv1aInt32U(const System::UnicodeString str, System::Sysutils::TEncoding* const encoding);
 extern DELPHI_PACKAGE bool __fastcall ALVerifyRSA256Signature(const System::AnsiString aData, const System::AnsiString aSignature, const System::AnsiString aBase64PubKeyModulus, const System::AnsiString aBase64PubKeyExponent);
 }	/* namespace Alcipher */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALCIPHER)

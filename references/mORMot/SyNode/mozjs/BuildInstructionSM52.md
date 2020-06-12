@@ -78,3 +78,4 @@ Then we can run build
     mozmake.exe
 
 After successfully build binary files will be located in `dist\bin` folder. We need to take all `*.dll` from here.
+In order to be aligned with Linux version, the name of the mozjs-52.dll file should be changed to synmozjs52.dll

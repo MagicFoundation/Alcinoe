@@ -6,7 +6,7 @@ unit SynDBBDE;
 {
   This file is part of Synopse framework.
 
-  Synopse framework. Copyright (C) 2018 Arnaud Bouchez
+  Synopse framework. Copyright (C) 2020 Arnaud Bouchez
   Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit SynDBBDE;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2018
+  Portions created by the Initial Developer are Copyright (C) 2020
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -45,16 +45,12 @@ unit SynDBBDE;
 
   ***** END LICENSE BLOCK *****
 
-  Version 1.18
-  - first public release, corresponding to mORMot framework 1.18
-
-  
   Todo:
   - use BDE metadata to retrieve table names and field definitions from
     any supported database (not only our SynDB.TSQLDBDefinition list)
 }
 
-{$I Synopse.inc} // define HASINLINE USETYPEINFO CPU32 CPU64 OWNNORMTOUPPER
+{$I Synopse.inc} // define HASINLINE CPU32 CPU64 OWNNORMTOUPPER
 
 interface
 
@@ -228,7 +224,7 @@ begin
   if (fSession=nil) or (fDatabase=nil) then
     raise ESQLDBBDE.CreateUTF8('%.Connect() on % failed: Database=nil',
       [self,fProperties.ServerName]);
-  Log := SynDBLog.Enter(Self,pointer(FormatUTF8('Connect to Alias=%',[fDatabase.AliasName])),true);
+  Log := SynDBLog.Enter('Connect to Alias=%',[fDatabase.AliasName],self);
   try
     fSession.Open;
     fDatabase.Open;

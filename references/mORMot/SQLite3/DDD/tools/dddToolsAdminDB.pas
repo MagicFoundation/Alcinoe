@@ -279,7 +279,7 @@ begin
         if cmd = '#log ' then
           sub.Caption := sub.Caption + '  ' + res.Values[i].TimeStamp
         else
-          sub.Caption := format('%s  %s', [sub.Caption, KB(res.Values[i].Size)]);
+          sub.Caption := FormatString('%  %', [sub.Caption, KB(res.Values[i].Size)]);
         subpar.Add(sub);
       end;
   end
@@ -441,8 +441,8 @@ begin
     drwgrdResult.Options := drwgrdResult.Options - [goRowSelect];
     drwgrdResult.Show;
     mmoResult.OnGetLineAttr := mmoResult.JSONLineAttr;
-    mmoResult.Text := Format(#13#10' Returned %d row(s), as %s in %s',
-      [table.RowCount, KB(Length(fJson)), execTime]);
+    mmoResult.Text := FormatString(#13#10' Returned % row(s), as % in %',
+      [table.RowCount, KB(fJson), execTime]);
   end;
   if Sender <> nil then begin
     mmoSQL.SelStart := SelStart;

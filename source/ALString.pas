@@ -6821,21 +6821,16 @@ end;
 // https://synopse.info
 // http://mormot.net
 //
-// NOTE: the original function was different from the Unicode in the way that it's
-//       don't ignore Characters outside alphabet (and even don't raise any exception)
-//       also the purepascal implementation seam to be 2x more faster than the
-//       ASM implementation. So i decide to remove the ASM implementation
-//       and i make that Base64decode crash with invalid chars
-//       https://synopse.info/forum/viewtopic.php?pid=26173#p26173
-//
 
-{$IF CompilerVersion > 33} // rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
 {$IFEND}
 
 type
   TBase64Enc = array[0..63] of AnsiChar;
+  PBase64Enc = ^TBase64Enc;
   TBase64Dec = array[AnsiChar] of shortint;
+  PBase64Dec = ^TBase64Dec;
 const
   b64enc: TBase64Enc =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
@@ -6904,50 +6899,43 @@ end;
 
 {*******************************************************************}
 function Base64EncodeMain(rp, sp: PAnsiChar; len: cardinal): integer;
-var i: integer;
-    c: cardinal;
+var c: cardinal;
+    enc: PBase64Enc; // use local register
 begin
-  result := len div 3;
-  for i := 1 to result do begin
-    c := ord(sp[0]) shl 16 + ord(sp[1]) shl 8 + ord(sp[2]);
-    rp[0] := b64enc[(c shr 18) and $3f];
-    rp[1] := b64enc[(c shr 12) and $3f];
-    rp[2] := b64enc[(c shr 6) and $3f];
-    rp[3] := b64enc[c and $3f];
-    inc(rp,4);
-    inc(sp,3);
-  end;
-end;
-
-{*******************************************************}
-procedure Base64Decode(sp,rp: PAnsiChar; len: NativeInt);
-begin
-  len := len shl 2; // len was the number of 4 chars chunks in sp
-  if (len>0) and (ConvertBase64ToBin[sp[len-2]]>=0) then
-    if ConvertBase64ToBin[sp[len-1]]>=0 then else
-      dec(len) else
-      dec(len,2); // adjust for Base64AnyDecode() algorithm
-  if not Base64AnyDecode(ConvertBase64ToBin,sp,rp,len) then
-    raise Exception.Create(sInvalidbase64String);
+  enc := @b64enc;
+  len := len div 3;
+  result := len;
+  if len<>0 then
+    repeat
+      c := (ord(sp[0]) shl 16) or (ord(sp[1]) shl 8) or ord(sp[2]);
+      rp[0] := enc[(c shr 18) and $3f];
+      rp[1] := enc[(c shr 12) and $3f];
+      rp[2] := enc[(c shr 6) and $3f];
+      rp[3] := enc[c and $3f];
+      inc(rp,4);
+      inc(sp,3);
+      dec(len);
+    until len=0;
 end;
 
 {***********************************************************************}
 procedure Base64EncodeTrailing(rp, sp: PAnsiChar; len: cardinal); inline;
 var c: cardinal;
+    enc: PBase64Enc; // use local register
 begin
+  enc := @b64enc;
   case len of
     1: begin
       c := ord(sp[0]) shl 4;
-      rp[0] := b64enc[(c shr 6) and $3f];
-      rp[1] := b64enc[c and $3f];
-      rp[2] := '=';
-      rp[3] := '=';
+      rp[0] := enc[(c shr 6) and $3f];
+      rp[1] := enc[c and $3f];
+      PWord(rp+2)^ := ord('=')+ord('=') shl 8;
     end;
     2: begin
-      c := ord(sp[0]) shl 10 + ord(sp[1]) shl 2;
-      rp[0] := b64enc[(c shr 12) and $3f];
-      rp[1] := b64enc[(c shr 6) and $3f];
-      rp[2] := b64enc[c and $3f];
+      c := (ord(sp[0]) shl 10) or (ord(sp[1]) shl 2);
+      rp[0] := enc[(c shr 12) and $3f];
+      rp[1] := enc[(c shr 6) and $3f];
+      rp[2] := enc[c and $3f];
       rp[3] := '=';
     end;
   end;
@@ -6969,27 +6957,37 @@ end;
 
 {*******************************************************************}
 function Base64ToBinLength(sp: PAnsiChar; len: NativeInt): NativeInt;
+var dec: PBase64Dec;
 begin
   result := 0;
-  if (len=0) then exit;
-  if (len and 3<>0) then raise Exception.Create(sInvalidbase64String);
-  if ConvertBase64ToBin[sp[len-2]]>=0 then
-    if ConvertBase64ToBin[sp[len-1]]>=0 then
+  if (len=0) or (len and 3<>0) then
+    exit;
+  dec := @ConvertBase64ToBin;
+  if dec[sp[len-2]]>=0 then
+    if dec[sp[len-1]]>=0 then
       result := 0 else
       result := 1 else
       result := 2;
   result := (len shr 2)*3-result;
 end;
 
-{***************************************************************************}
-procedure Base64ToBin(sp: PAnsiChar; len: NativeInt; var result: AnsiString);
+{*************************************************************************************}
+function Base64ToBinSafe(sp: PAnsiChar; len: NativeInt; var data: AnsiString): boolean;
 var resultLen: NativeInt;
 begin
   resultLen := Base64ToBinLength(sp,len);
-  if resultLen=0 then
-    result := '' else begin
-    SetString(result,nil,resultLen);
-    Base64Decode(sp,pointer(result),len shr 2);
+  if resultLen<>0 then begin
+    SetString(data,nil,resultLen);
+    if ConvertBase64ToBin[sp[len-2]]>=0 then
+      if ConvertBase64ToBin[sp[len-1]]>=0 then else
+        dec(len) else
+        dec(len,2); // adjust for Base64AnyDecode() algorithm
+    result := Base64AnyDecode(ConvertBase64ToBin,sp,pointer(data),len);
+    if not result then
+      data := '';
+  end else begin
+    result := false;
+    data := '';
   end;
 end;
 
@@ -6997,8 +6995,9 @@ end;
 function  ALBase64EncodeString(const P: PansiChar; const ln: Integer): AnsiString;
 begin
   result := '';
-  if ln=0 then exit;
-  SetLength(result,BinToBase64Length(ln));
+  if ln=0 then
+    exit;
+  SetString(result,nil,BinToBase64Length(ln));
   Base64Encode(pointer(result),P,ln);
 end;
 
@@ -7008,21 +7007,26 @@ var len: integer;
 begin
   result := '';
   len := length(s);
-  if len=0 then exit;
-  SetLength(result,BinToBase64Length(len));
+  if len=0 then
+    exit;
+  SetString(result,nil,BinToBase64Length(len));
   Base64Encode(pointer(result),pointer(s),len);
 end;
 
 {********************************************************************************}
 function  ALBase64DecodeString(const P: PansiChar; const ln: Integer): AnsiString;
 begin
-  Base64ToBin(P,ln,result);
+  if ln=0 then exit('');
+  if not Base64ToBinSafe(P,ln,result) then
+    raise Exception.Create(sInvalidbase64String);
 end;
 
 {**************************************************************}
 function  ALBase64DecodeString(const S: AnsiString): AnsiString;
 begin
-  Base64ToBin(pointer(s),length(s),result);
+  if S='' then exit('');
+  if not Base64ToBinSafe(pointer(s),length(s),result) then
+    raise Exception.Create(sInvalidbase64String);
 end;
 
 {*********************}
@@ -12718,7 +12722,7 @@ begin
   // http://mormot.net
   //
 
-  {$IF CompilerVersion > 33} // rio
+  {$IF CompilerVersion > 34} // sydney
     {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
   {$IFEND}
 

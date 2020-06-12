@@ -9,7 +9,6 @@ uses {$IFDEF IOS}
      Winapi.Windows,
      {$ENDIF}
      system.sysutils,
-     ALStringList,
      system.types;
 
 {$IF CompilerVersion < 29} {Delphi XE8}
@@ -355,13 +354,13 @@ Function AlBoolToInt(Value:Boolean):Integer;
 Function AlIntToBool(Value:integer):boolean;
 Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-function  ALIfThen(AValue: Boolean; const ATrue: Integer; const AFalse: Integer): Integer; overload; inline;
-function  ALIfThen(AValue: Boolean; const ATrue: Int64; const AFalse: Int64): Int64; overload; inline;
-function  ALIfThen(AValue: Boolean; const ATrue: UInt64; const AFalse: UInt64): UInt64; overload; inline;
-function  ALIfThen(AValue: Boolean; const ATrue: Single; const AFalse: Single): Single; overload; inline;
-function  ALIfThen(AValue: Boolean; const ATrue: Double; const AFalse: Double): Double; overload; inline;
-function  ALIfThen(AValue: Boolean; const ATrue: Extended; const AFalse: Extended): Extended; overload; inline;
+{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+function  ALIfThen(AValue: Boolean; const ATrue: Integer; const AFalse: Integer = 0): Integer; overload; inline;
+function  ALIfThen(AValue: Boolean; const ATrue: Int64; const AFalse: Int64 = 0): Int64; overload; inline;
+function  ALIfThen(AValue: Boolean; const ATrue: UInt64; const AFalse: UInt64 = 0): UInt64; overload; inline;
+function  ALIfThen(AValue: Boolean; const ATrue: Single; const AFalse: Single = 0): Single; overload; inline;
+function  ALIfThen(AValue: Boolean; const ATrue: Double; const AFalse: Double = 0): Double; overload; inline;
+function  ALIfThen(AValue: Boolean; const ATrue: Extended; const AFalse: Extended = 0): Extended; overload; inline;
 {$IFNDEF NEXTGEN}
 function  ALIfThen(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString; overload; inline;
 {$ENDIF}
@@ -421,26 +420,41 @@ const ALMAXUInt64: UInt64 = 18446744073709551615;
 
 {$IFNDEF NEXTGEN}
 
+//
+// Taken from https://github.com/synopse/mORMot.git
+// https://synopse.info
+// http://mormot.net
+//
+
+{$IF CompilerVersion > 34} // sydney
+  {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
+{$ENDIF}
+
 type
   /// the potential features, retrieved from an Intel CPU
   // - see https://en.wikipedia.org/wiki/CPUID#EAX.3D1:_Processor_Info_and_Feature_Bits
+  // - is defined on all platforms, since an ARM desktop could browse Intel logs
   TALIntelCpuFeature =
-   ( { in EDX }
+   ( { CPUID 1 in EDX }
    cfFPU, cfVME, cfDE, cfPSE, cfTSC, cfMSR, cfPAE, cfMCE,
    cfCX8, cfAPIC, cf_d10, cfSEP, cfMTRR, cfPGE, cfMCA, cfCMOV,
    cfPAT, cfPSE36, cfPSN, cfCLFSH, cf_d20, cfDS, cfACPI, cfMMX,
    cfFXSR, cfSSE, cfSSE2, cfSS, cfHTT, cfTM, cfIA64, cfPBE,
-   { in ECX }
+   { CPUID 1 in ECX }
    cfSSE3, cfCLMUL, cfDS64, cfMON, cfDSCPL, cfVMX, cfSMX, cfEST,
    cfTM2, cfSSSE3, cfCID, cfSDBG, cfFMA, cfCX16, cfXTPR, cfPDCM,
    cf_c16, cfPCID, cfDCA, cfSSE41, cfSSE42, cfX2A, cfMOVBE, cfPOPCNT,
    cfTSC2, cfAESNI, cfXS, cfOSXS, cfAVX, cfF16C, cfRAND, cfHYP,
-   { extended features in EBX, ECX }
-   cfFSGS, cf_b01, cfSGX, cfBMI1, cfHLE, cfAVX2, cf_b06, cfSMEP, cfBMI2,
-   cfERMS, cfINVPCID, cfRTM, cfPQM, cf_b13, cfMPX, cfPQE, cfAVX512F,
-   cfAVX512DQ, cfRDSEED, cfADX, cfSMAP, cfAVX512IFMA, cfPCOMMIT,
-   cfCLFLUSH, cfCLWB, cfIPT, cfAVX512PF, cfAVX512ER, cfAVX512CD,
-   cfSHA, cfAVX512BW, cfAVX512VL, cfPREFW1, cfAVX512VBMI);
+   { extended features CPUID 7 in EBX, ECX, DL }
+   cfFSGS, cf_b01, cfSGX, cfBMI1, cfHLE, cfAVX2, cf_b06, cfSMEP,
+   cfBMI2, cfERMS, cfINVPCID, cfRTM, cfPQM, cf_b13, cfMPX, cfPQE,
+   cfAVX512F, cfAVX512DQ, cfRDSEED, cfADX, cfSMAP, cfAVX512IFMA, cfPCOMMIT, cfCLFLUSH,
+   cfCLWB, cfIPT, cfAVX512PF, cfAVX512ER, cfAVX512CD, cfSHA, cfAVX512BW, cfAVX512VL,
+   cfPREFW1, cfAVX512VBMI, cfUMIP, cfPKU, cfOSPKE, cf_c05, cfAVX512VBMI2, cf_c07,
+   cfGFNI, cfVAES, cfVCLMUL, cfAVX512NNI, cfAVX512BITALG, cf_c13, cfAVX512VPC, cf_c15,
+   cf_cc16, cf_c17, cf_c18, cf_c19, cf_c20, cf_c21, cfRDPID, cf_c23,
+   cf_c24, cf_c25, cf_c26, cf_c27, cf_c28, cf_c29, cfSGXLC, cf_c31,
+   cf_d0, cf_d1, cfAVX512NNIW, cfAVX512MAS, cf_d4, cf_d5, cf_d6, cf_d7);
 
   /// all features, as retrieved from an Intel CPU
   TALIntelCpuFeatures = set of TALIntelCpuFeature;
@@ -448,6 +462,8 @@ type
 var
   /// the available CPU features, as recognized at program startup
   ALCpuFeatures: TALIntelCpuFeatures;
+
+procedure ALInitCpuFeatures;
 
 {$ENDIF}
 
@@ -1689,7 +1705,6 @@ begin
       Result := Result + _ALCallStackCustomLogsU[i].log + #13#10;
   end;
   Result := ALTrimU(Result);
-
 end;
 
 {***********************************************************************************************}
@@ -1778,8 +1793,8 @@ begin
     Result := AFalse;
 end;
 
-{***************************************************************************************}
-function ALIfThen(AValue: Boolean; const ATrue: Integer; const AFalse: Integer): Integer;
+{*******************************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: Integer; const AFalse: Integer = 0): Integer;
 begin
   if AValue then
     Result := ATrue
@@ -1787,8 +1802,8 @@ begin
     Result := AFalse;
 end;
 
-{*********************************************************************************}
-function ALIfThen(AValue: Boolean; const ATrue: Int64; const AFalse: Int64): Int64;
+{*************************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: Int64; const AFalse: Int64 = 0): Int64;
 begin
   if AValue then
     Result := ATrue
@@ -1796,8 +1811,8 @@ begin
     Result := AFalse;
 end;
 
-{************************************************************************************}
-function ALIfThen(AValue: Boolean; const ATrue: UInt64; const AFalse: UInt64): UInt64;
+{****************************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: UInt64; const AFalse: UInt64 = 0): UInt64;
 begin
   if AValue then
     Result := ATrue
@@ -1805,8 +1820,8 @@ begin
     Result := AFalse;
 end;
 
-{************************************************************************************}
-function ALIfThen(AValue: Boolean; const ATrue: Single; const AFalse: Single): Single;
+{****************************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: Single; const AFalse: Single = 0): Single;
 begin
   if AValue then
     Result := ATrue
@@ -1814,8 +1829,8 @@ begin
     Result := AFalse;
 end;
 
-{************************************************************************************}
-function ALIfThen(AValue: Boolean; const ATrue: Double; const AFalse: Double): Double;
+{****************************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: Double; const AFalse: Double = 0): Double;
 begin
   if AValue then
     Result := ATrue
@@ -1823,8 +1838,8 @@ begin
     Result := AFalse;
 end;
 
-{******************************************************************************************}
-function ALIfThen(AValue: Boolean; const ATrue: Extended; const AFalse: Extended): Extended;
+{**********************************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: Extended; const AFalse: Extended = 0): Extended;
 begin
   if AValue then
     Result := ATrue
@@ -2129,6 +2144,7 @@ begin
   {$ENDIF}
 end;
 
+{$IFNDEF NEXTGEN}
 
 //
 // Taken from https://github.com/synopse/mORMot.git
@@ -2136,25 +2152,22 @@ end;
 // http://mormot.net
 //
 
-{$IF CompilerVersion > 33} // rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
 {$ENDIF}
 
-{$IFNDEF NEXTGEN}
-
 {**}
 type
- TRegisters = record
-   eax,ebx,ecx,edx: cardinal;
- end;
+  TRegisters = record
+    eax,ebx,ecx,edx: cardinal;
+  end;
 
 {*************************************************************}
 procedure GetCPUID(Param: Cardinal; var Registers: TRegisters);
 {$IF defined(CPU64BITS)}
-asm // ecx=param, rdx=Registers (Linux: edi,rsi)
-        .NOFRAME
-        mov     eax, ecx
-        mov     r9, rdx
+asm .noframe // ecx=param, rdx=Registers (Linux: edi,rsi)
+        mov     eax, Param
+        mov     r9, Registers
         mov     r10, rbx // preserve rbx
         xor     ebx, ebx
         xor     ecx, ecx
@@ -2195,13 +2208,54 @@ asm
         pop     edi
         pop     esi
 end;
-{$ifend}
+{$endif}
 
-{*****************************}
-procedure TestIntelCpuFeatures;
+{******************************************************}
+function crc32cBy4SSE42(crc, value: cardinal): cardinal;
+{$IF defined(CPU64BITS)}
+asm .noframe
+        mov     eax, crc
+        crc32   eax, value
+end;
+{$else}
+asm // eax=crc, edx=value
+        {$ifdef UNICODE}
+        crc32   eax, edx
+        {$else}
+        db      $F2, $0F, $38, $F1, $C2
+        {$endif}
+end;
+{$endif}
+
+{**************************}
+function RdRand32: cardinal;
+{$IF defined(CPU64BITS)}
+asm .noframe
+{$else}
+asm
+{$endif}
+  // rdrand eax: same opcodes for x86 and x64
+  db $0f, $c7, $f0
+  // returns in eax, ignore carry flag (eax=0 won't hurt)
+end;
+
+{*********************************************}
+function IsXmmYmmOSEnabled: boolean; assembler;
+asm // see https://software.intel.com/en-us/blogs/2011/04/14/is-avx-enabled
+        xor     ecx, ecx  // specify control register XCR0 = XFEATURE_ENABLED_MASK
+        db  $0f, $01, $d0 // XGETBV reads XCR0 into EDX:EAX
+        and     eax, 6    // check OS has enabled both XMM (bit 1) and YMM (bit 2)
+        cmp     al, 6
+        sete    al
+end;
+
+{**************************}
+procedure ALInitCpuFeatures;
 var regs: TRegisters;
+    c: cardinal;
 begin
   {$R-} // this code require range check error OFF
+  // retrieve CPUID raw flags
   regs.edx := 0;
   regs.ecx := 0;
   GetCPUID(1,regs);
@@ -2211,6 +2265,24 @@ begin
   PIntegerArray(@ALCpuFeatures)^[2] := regs.ebx;
   PIntegerArray(@ALCpuFeatures)^[3] := regs.ecx;
   PByte(@PIntegerArray(@ALCpuFeatures)^[4])^ := regs.edx;
+  if not(cfOSXS in ALCpuFeatures) or not IsXmmYmmOSEnabled then
+    ALCpuFeatures := ALCpuFeatures-[cfAVX,cfAVX2,cfFMA];
+  // validate accuracy of most used HW opcodes
+  if cfRAND in ALCpuFeatures then
+    try
+      c := RdRand32;
+      if RdRand32=c then // most probably a RDRAND bug, e.g. on AMD Rizen 3000
+        exclude(ALCpuFeatures,cfRAND);
+    except // may trigger an illegal instruction exception on some Ivy Bridge
+      exclude(ALCpuFeatures,cfRAND);
+    end;
+  if cfSSE42 in ALCpuFeatures then
+    try
+      if crc32cBy4SSE42(0,1)<>3712330424 then
+        raise EALException.Create('Invalid crc32cBy4SSE42');
+    except // disable now on illegal instruction or incorrect result
+      exclude(ALCpuFeatures,cfSSE42);
+    end;
   {$R+} // enable back the {$R+}
 end;
 
@@ -2219,7 +2291,7 @@ end;
 initialization
 
   {$IFNDEF NEXTGEN}
-  TestIntelCpuFeatures;
+  ALInitCpuFeatures;
   {$ENDIF}
 
   ALCustomDelayedFreeObjectProc := nil;

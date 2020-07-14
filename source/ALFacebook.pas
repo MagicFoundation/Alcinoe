@@ -154,6 +154,7 @@ uses
   Androidapi.Helpers,
   Androidapi.JNI.app,
   Androidapi.JNI.Os,
+  Androidapi.JNI.net,
   FMX.Helpers.Android,
   {$ELSEIF defined(IOS)}
   Macapi.Helpers,

@@ -8,16 +8,17 @@ unit ALFacebook;
 
 interface
 
-uses system.Classes,
-     {$IF defined(android)}
-     Androidapi.JNI.JavaTypes,
-     Androidapi.JNIBridge,
-     ALAndroidFacebookApi,
-     {$ELSEIF defined(IOS)}
-     iOSapi.Foundation,
-     ALIosFacebookApi,
-     {$ENDIF}
-     system.Messaging;
+uses
+  system.Classes,
+  {$IF defined(android)}
+  Androidapi.JNI.JavaTypes,
+  Androidapi.JNIBridge,
+  ALAndroidFacebookApi,
+  {$ELSEIF defined(IOS)}
+  iOSapi.Foundation,
+  ALIosFacebookApi,
+  {$ENDIF}
+  system.Messaging;
 
 type
 
@@ -52,7 +53,7 @@ type
 
     {$REGION ' ANDROID'}
     {$IF defined(android)}
-    FCallback: TLoginCallback;
+    FLoginCallback: TLoginCallback;
     FCallbackManager: JCallbackManager;
     procedure ActivityResultHandler(const Sender: TObject; const M: TMessage);
     {$ENDIF}
@@ -67,7 +68,6 @@ type
 
   private
 
-    fIsRunning: boolean;
     fOnCancel: TALFacebookLoginOnCancelEvent;
     fOnError: TALFacebookLoginOnErrorEvent;
     fOnSuccess: TALFacebookLoginOnSuccessEvent;
@@ -84,7 +84,6 @@ type
     property onCancel: TALFacebookLoginOnCancelEvent read fOnCancel write fOnCancel;
     property onError: TALFacebookLoginOnErrorEvent read fOnError write fOnError;
     property onSuccess: TALFacebookLoginOnSuccessEvent read fOnSuccess write fOnSuccess;
-    property isRunning: boolean read fIsRunning;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -114,7 +113,7 @@ type
 
     {$REGION ' ANDROID'}
     {$IF defined(android)}
-    FCallback: TGraphRequestCallback;
+    FGraphRequestCallback: TGraphRequestCallback;
     {$ENDIF}
     {$ENDREGION}
 
@@ -126,7 +125,6 @@ type
 
   private
 
-    fIsRunning: Boolean;
     fOnCompleted: TALFacebookGraphRequestOnCompletedEvent;
 
   public
@@ -134,25 +132,62 @@ type
     destructor Destroy; override;
     procedure Request(const aGraphPath: String; aParameters: Tarray<String>; const aHttpMethod: string = 'GET');
     property onCompleted: TALFacebookGraphRequestOnCompletedEvent read fOnCompleted write fOnCompleted;
-    property isRunning: boolean read fIsRunning;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALFacebookShareDialog = class(TObject)
+  private
+  public
+    class function ShowShareLinkDialog(const aLinkUrl: String): boolean;
   end;
 
 
+
+{***********************}
+procedure ALInitFacebook;
+
 implementation
 
-uses system.SysUtils,
-     {$IF defined(android)}
-     Androidapi.Helpers,
-     Androidapi.JNI.app,
-     Androidapi.JNI.Os,
-     FMX.Helpers.Android,
-     {$ELSEIF defined(IOS)}
-     Macapi.Helpers,
-     FMX.Platform.iOS,
-     {$ENDIF}
-     ALFmxCommon,
-     AlString,
-     alcommon;
+uses
+  system.SysUtils,
+  {$IF defined(android)}
+  Androidapi.Helpers,
+  Androidapi.JNI.app,
+  Androidapi.JNI.Os,
+  FMX.Helpers.Android,
+  {$ELSEIF defined(IOS)}
+  Macapi.Helpers,
+  FMX.Platform.iOS,
+  {$ENDIF}
+  ALFmxCommon,
+  AlString,
+  alcommon;
+
+{*}
+var
+  _ALFacebookInitialised: Boolean;
+
+{***********************}
+procedure ALInitFacebook;
+begin
+  if not _ALFacebookInitialised then begin
+
+    {$REGION ' ANDROID'}
+    {$IF defined(android)}
+    TJFacebookSdk.JavaClass.sdkInitialize(TAndroidHelper.Context);
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION ' IOS'}
+    {$IF defined(ios)}
+    TFBSDKApplicationDelegate.OCClass.initializeSDK(nil{launchOptions});
+    {$ENDIF}
+    {$ENDREGION}
+
+    _ALFacebookInitialised := True;
+
+  end;
+end;
 
 {**********************************}
 constructor TALFacebookLogin.Create;
@@ -163,16 +198,16 @@ begin
   fOnCancel := nil;
   fOnError := nil;
   fOnSuccess := nil;
-  fIsRunning := False;
+  ALInitFacebook;
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
     TMessageManager.DefaultManager.SubscribeToMessage(TMessageResultNotification, ActivityResultHandler);
-    FCallback := TLoginCallback.Create(Self);
-
+    FLoginCallback := TLoginCallback.Create(Self);
+    //-----
     FCallbackManager := TJCallbackManager_Factory.JavaClass.create;
-    TJloginManager.JavaClass.getInstance.registerCallback(FCallbackManager, FCallback);
+    TJloginManager.JavaClass.getInstance.registerCallback(FCallbackManager, FLoginCallback);
 
   {$ENDIF}
   {$ENDREGION}
@@ -189,22 +224,19 @@ begin
 
 end;
 
-{****************************************************************}
-//if we launch logInWithReadPermissions we must wait it's finished
-//before to destroy the facebooklogin
+{**********************************}
 destructor TALFacebookLogin.Destroy;
 begin
 
   fOnCancel := nil;
   fOnError := nil;
   fOnSuccess := nil;
-  while fIsRunning do sleep(100);
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
     TMessageManager.DefaultManager.Unsubscribe(TMessageResultNotification, ActivityResultHandler);
-    AlFreeAndNil(FCallback);
+    AlFreeAndNil(FLoginCallback);
     FCallbackManager := nil;
 
   {$ENDIF}
@@ -241,9 +273,6 @@ procedure TALFacebookLogin.logInWithReadPermissions(const APermissions: TArray<S
   {$ENDREGION}
 
 begin
-
-  if fIsRunning then raise Exception.Create('Already Running');
-  fIsRunning := true;
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
@@ -457,8 +486,6 @@ end;
 procedure TALFacebookLogin.ActivityResultHandler(const Sender: TObject; const M: TMessage);
 begin
 
-  if not fIsRunning then exit;
-
   {$IFDEF DEBUG}
   allog('TALFacebookLogin.ActivityResultHandler', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
@@ -489,7 +516,6 @@ begin
   allog('TALFacebookLogin.TLoginCallback.onCancel', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.warn);
   {$ENDIF}
 
-  fFacebookLogin.fIsRunning := False;
   if assigned(fFacebookLogin.fOnCancel) then
     fFacebookLogin.fOnCancel;
 
@@ -509,7 +535,6 @@ begin
                                                    ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
   {$ENDIF}
 
-  fFacebookLogin.fIsRunning := False;
   if assigned(fFacebookLogin.fOnError) then
     fFacebookLogin.fOnError(aErrorMsg{aMsg});
 
@@ -550,7 +575,6 @@ begin
                                                      ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.info);
   {$ENDIF}
 
-  fFacebookLogin.fIsRunning := False;
   if assigned(fFacebookLogin.fOnsuccess) then
     fFacebookLogin.fOnsuccess(aUserIDStr, aTokenStr, aGrantedPermissions, aDeniedPermissions);
 
@@ -570,8 +594,6 @@ var aToken: FBSDKAccessToken;
     aGrantedPermissions: TArray<String>;
     aDeniedPermissions: TArray<String>;
 begin
-
-  fIsRunning := False;
 
   //ERROR
   if (error <> nil) or (result = nil) then begin
@@ -640,32 +662,29 @@ begin
 
   inherited Create;
 
-  fIsRunning := False;
   fonCompleted := nil;
+  ALInitFacebook;
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-    FCallback := TGraphRequestCallback.Create(Self);
+    FGraphRequestCallback := TGraphRequestCallback.Create(Self);
 
   {$ENDIF}
   {$ENDREGION}
 
 end;
 
-{*************************************************}
-//if we launch a request we must wait it's finished
-//before to destroy the TALFacebookGraphRequest
+{*****************************************}
 destructor TALFacebookGraphRequest.Destroy;
 begin
 
   fOnCompleted := nil;
-  while fIsRunning do sleep(100);
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-    AlFreeAndNil(FCallback);
+    AlFreeAndNil(FGraphRequestCallback);
 
   {$ENDIF}
   {$ENDREGION}
@@ -719,9 +738,6 @@ procedure TALFacebookGraphRequest.Request(const aGraphPath: String; aParameters:
 
 begin
 
-  if fIsRunning then raise Exception.Create('Already Running');
-  fIsRunning := True;
-
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
@@ -736,7 +752,7 @@ begin
   end;
   if AlSameTextU(aHttpMethod, 'POST') then aJHttpMethod := TJHttpMethod.JavaClass.POST
   else aJHttpMethod := TJHttpMethod.JavaClass.GET;
-  aGraphRequest := TJGraphRequest.JavaClass.init(TJAccessToken.JavaClass.getCurrentAccessToken, StringToJstring(aGraphPath), aBundle, aJHttpMethod, FCallback);
+  aGraphRequest := TJGraphRequest.JavaClass.init(TJAccessToken.JavaClass.getCurrentAccessToken, StringToJstring(aGraphPath), aBundle, aJHttpMethod, FGraphRequestCallback);
   aGraphRequest.executeAsync;
 
   {$ENDIF}
@@ -762,7 +778,6 @@ begin
 
   {$ENDIF}
   {$ENDREGION}
-
 
 end;
 
@@ -801,7 +816,6 @@ begin
                                                                      ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
-  fFacebookGraphRequest.fIsRunning := False;
   if assigned(fFacebookGraphRequest.fOnCompleted) then
     fFacebookGraphRequest.fOnCompleted(aRawResponse, aErrorCode, aErrorMsg);
 
@@ -849,7 +863,6 @@ begin
                                                                      ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
-  fIsRunning := False;
   if assigned(fOnCompleted) then
     fOnCompleted(aRawResponse, aErrorCode, aErrorMsg);
 
@@ -857,6 +870,52 @@ end;
 
 {$ENDIF}
 {$ENDREGION}
+
+{*****************************************************************************************}
+class function TALFacebookShareDialog.ShowShareLinkDialog(const aLinkUrl: String): boolean;
+begin
+
+  ALInitFacebook;
+  result := False;
+
+  {$REGION ' ANDROID'}
+  {$IF defined(android)}
+
+    if TJALFacebookShareLinkDialog.javaclass.canshow then begin
+      result := True;
+      TJALFacebookShareLinkDialog.javaclass.Show(
+        TAndroidHelper.Activity,
+        StrToJURI(aLinkUrl), // contentUrl: Jnet_Uri;
+        nil) //quote: JString
+    end;
+
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION ' IOS'}
+  {$IF defined(IOS)}
+
+    var LFBSDKShareDialog := TFBSDKShareDialog.create;
+    try
+      if LFBSDKShareDialog.canshow then begin
+        Result := True;
+        var LFBSDKShareLinkContent := TFBSDKShareLinkContent.create;
+        try
+          LFBSDKShareLinkContent.setContentURL(StrToNSUrl(aLinkUrl));
+          LFBSDKShareDialog.setShareContent(LFBSDKShareLinkContent);
+          LFBSDKShareDialog.show;
+        finally
+          LFBSDKShareLinkContent.release;
+        end;
+      end;
+    finally
+      LFBSDKShareDialog.release;
+    end;
+
+  {$ENDIF}
+  {$ENDREGION}
+
+end;
 
 
 {$REGION ' IOS'}
@@ -866,9 +925,9 @@ Type
 
   {*******************************************}
   //if i don't don't this i have internal error
-  _TProcOfObjectWrapper = class(Tobject)
+  _TFacebookProcOfObjectWrapper = class(Tobject)
   public
-    class procedure applicationDidFinishLaunchingWithOptionsHandler(const Sender: TObject; const M: TMessage);
+    //class procedure applicationDidFinishLaunchingWithOptionsHandler(const Sender: TObject; const M: TMessage);
     class procedure applicationOpenURLWithSourceAnnotationHandler(const Sender: TObject; const M: TMessage);
     class procedure applicationOpenURLWithOptionsHandler(const Sender: TObject; const M: TMessage);
   end;
@@ -876,26 +935,37 @@ Type
 {****************************************************************************}
 // To bypass compile errors you must add a custom modified FMX.Platform.iOS to
 // your project, see the instructions at https://github.com/grijjy/DelphiSocialFrameworks for more details
-class procedure _TProcOfObjectWrapper.applicationDidFinishLaunchingWithOptionsHandler(const Sender: TObject; const M: TMessage);
-var aFBSDKApplicationDelegate: FBSDKApplicationDelegate;
-    aValue: TAppDelegate_applicationDidFinishLaunchingWithOptions;
-begin
-  if M is TAppDelegateMessage_applicationDidFinishLaunchingWithOptions then begin
-    aValue := (M as TAppDelegateMessage_applicationDidFinishLaunchingWithOptions).Value;
-    aFBSDKApplicationDelegate := TFBSDKApplicationDelegate.Wrap(TFBSDKApplicationDelegate.OCClass.sharedInstance);
-    aFBSDKApplicationDelegate.applicationDidFinishLaunchingWithOptions(aValue.Application, aValue.Options);
-  end;
-end;
+// NOTE: I remove this procedure because in the code it's get call inside TFBSDKApplicationDelegate.OCClass.initializeSDK
+//       that we call manually in ALInitFacebook
+// class procedure _TFacebookProcOfObjectWrapper.applicationDidFinishLaunchingWithOptionsHandler(const Sender: TObject; const M: TMessage);
+// var aFBSDKApplicationDelegate: FBSDKApplicationDelegate;
+//     aValue: TAppDelegate_applicationDidFinishLaunchingWithOptions;
+// begin
+//   if M is TAppDelegateMessage_applicationDidFinishLaunchingWithOptions then begin
+//     aValue := (M as TAppDelegateMessage_applicationDidFinishLaunchingWithOptions).Value;
+//     {$IFDEF DEBUG}
+//     allog('_TFacebookProcOfObjectWrapper.applicationDidFinishLaunchingWithOptionsHandler', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
+//     {$ENDIF}
+//     aFBSDKApplicationDelegate := TFBSDKApplicationDelegate.Wrap(TFBSDKApplicationDelegate.OCClass.sharedInstance);
+//     aFBSDKApplicationDelegate.applicationDidFinishLaunchingWithOptions(aValue.Application, aValue.Options);
+//   end;
+// end;
 
 {****************************************************************************}
 // To bypass compile errors you must add a custom modified FMX.Platform.iOS to
 // your project, see the instructions at https://github.com/grijjy/DelphiSocialFrameworks for more details
-class procedure _TProcOfObjectWrapper.applicationOpenURLWithSourceAnnotationHandler(const Sender: TObject; const M: TMessage);
+class procedure _TFacebookProcOfObjectWrapper.applicationOpenURLWithSourceAnnotationHandler(const Sender: TObject; const M: TMessage);
 var aFBSDKApplicationDelegate: FBSDKApplicationDelegate;
     aValue: TAppDelegate_applicationOpenURLWithSourceAnnotation;
 begin
+  if not _ALFacebookInitialised then exit;
   if M is TAppDelegateMessage_applicationOpenURLWithSourceAnnotation then begin
     aValue := (M as TAppDelegateMessage_applicationOpenURLWithSourceAnnotation).value;
+    {$IFDEF DEBUG}
+    allog('_TFacebookProcOfObjectWrapper.applicationOpenURLWithSourceAnnotationHandler', 'openURL: ' + NSStrToStr(aValue.Url.absoluteString) +
+                                                                                         ' - sourceApplication: ' + NSStrToStr(aValue.SourceApplication) +
+                                                                                         ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
+    {$ENDIF}
     aFBSDKApplicationDelegate := TFBSDKApplicationDelegate.Wrap(TFBSDKApplicationDelegate.OCClass.sharedInstance);
     aFBSDKApplicationDelegate.applicationOpenURLSourceApplicationAnnotation(aValue.Application, // application: UIApplication;
                                                                             aValue.Url,  // openURL: NSURL;
@@ -904,13 +974,18 @@ begin
   end;
 end;
 
-{*******************************************************************************************************************}
-class procedure _TProcOfObjectWrapper.applicationOpenURLWithOptionsHandler(const Sender: TObject; const M: TMessage);
+{***************************************************************************************************************************}
+class procedure _TFacebookProcOfObjectWrapper.applicationOpenURLWithOptionsHandler(const Sender: TObject; const M: TMessage);
 var aFBSDKApplicationDelegate: FBSDKApplicationDelegate;
     aValue: TAppDelegate_applicationOpenURLWithOptions;
 begin
+  if not _ALFacebookInitialised then exit;
   if M is TAppDelegateMessage_applicationOpenURLWithOptions then begin
     aValue := (M as TAppDelegateMessage_applicationOpenURLWithOptions).Value;
+    {$IFDEF DEBUG}
+    allog('_TFacebookProcOfObjectWrapper.applicationOpenURLWithOptionsHandler', 'openURL: ' + NSStrToStr(aValue.Url.absoluteString) +
+                                                                                ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
+    {$ENDIF}
     aFBSDKApplicationDelegate := TFBSDKApplicationDelegate.Wrap(TFBSDKApplicationDelegate.OCClass.sharedInstance);
     aFBSDKApplicationDelegate.applicationOpenURLOptions(aValue.Application, // application: UIApplication
                                                         aValue.Url,  // openURL: NSURL;
@@ -923,11 +998,13 @@ end;
 
 initialization
 
+  _ALFacebookInitialised := False;
+
   {$REGION ' IOS'}
   {$IF defined(IOS)}
-  TMessageManager.DefaultManager.SubscribeToMessage(TAppDelegateMessage_applicationDidFinishLaunchingWithOptions, _TProcOfObjectWrapper.applicationDidFinishLaunchingWithOptionsHandler);
-  TMessageManager.DefaultManager.SubscribeToMessage(TAppDelegateMessage_applicationOpenURLWithSourceAnnotation, _TProcOfObjectWrapper.applicationOpenURLWithSourceAnnotationHandler);
-  TMessageManager.DefaultManager.SubscribeToMessage(TAppDelegateMessage_applicationOpenURLWithOptions, _TProcOfObjectWrapper.applicationOpenURLWithOptionsHandler);
+  //TMessageManager.DefaultManager.SubscribeToMessage(TAppDelegateMessage_applicationDidFinishLaunchingWithOptions, _TFacebookProcOfObjectWrapper.applicationDidFinishLaunchingWithOptionsHandler);
+  TMessageManager.DefaultManager.SubscribeToMessage(TAppDelegateMessage_applicationOpenURLWithSourceAnnotation, _TFacebookProcOfObjectWrapper.applicationOpenURLWithSourceAnnotationHandler);
+  TMessageManager.DefaultManager.SubscribeToMessage(TAppDelegateMessage_applicationOpenURLWithOptions, _TFacebookProcOfObjectWrapper.applicationOpenURLWithOptionsHandler);
   {$ENDIF}
   {$ENDREGION}
 
@@ -935,9 +1012,9 @@ finalization
 
   {$REGION ' IOS'}
   {$IF defined(IOS)}
-  TMessageManager.DefaultManager.Unsubscribe(TAppDelegateMessage_applicationDidFinishLaunchingWithOptions, _TProcOfObjectWrapper.applicationDidFinishLaunchingWithOptionsHandler);
-  TMessageManager.DefaultManager.Unsubscribe(TAppDelegateMessage_applicationOpenURLWithSourceAnnotation, _TProcOfObjectWrapper.applicationOpenURLWithSourceAnnotationHandler);
-  TMessageManager.DefaultManager.Unsubscribe(TAppDelegateMessage_applicationOpenURLWithOptions, _TProcOfObjectWrapper.applicationOpenURLWithOptionsHandler);
+  //TMessageManager.DefaultManager.Unsubscribe(TAppDelegateMessage_applicationDidFinishLaunchingWithOptions, _TFacebookProcOfObjectWrapper.applicationDidFinishLaunchingWithOptionsHandler);
+  TMessageManager.DefaultManager.Unsubscribe(TAppDelegateMessage_applicationOpenURLWithSourceAnnotation, _TFacebookProcOfObjectWrapper.applicationOpenURLWithSourceAnnotationHandler);
+  TMessageManager.DefaultManager.Unsubscribe(TAppDelegateMessage_applicationOpenURLWithOptions, _TFacebookProcOfObjectWrapper.applicationOpenURLWithOptionsHandler);
   {$ENDIF}
   {$ENDREGION}
 

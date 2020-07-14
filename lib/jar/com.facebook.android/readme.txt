@@ -2,6 +2,9 @@ All the jar can be found here:
 https://developers.facebook.com/docs/android/downloads/
 https://search.maven.org/search?q=g:com.facebook.android
 
+the source code can be downloaded from
+https://github.com/facebook/facebook-android-sdk
+
 *************************
 
 to know all the dependancies needed by a libraries, create a android

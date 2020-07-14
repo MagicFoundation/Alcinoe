@@ -20,7 +20,7 @@ REM -----------------------------------------------------
 
 if x%ANDROID% == x set ANDROID="C:\SDKs\android-sdk-windows"
 set ANDROID_PLATFORM=%ANDROID%\platforms\android-28
-set FMX_JAR="C:\Program Files (x86)\Embarcadero\Studio\19.0\lib\android\release\fmx.jar"
+set FMX_JAR="C:\Program Files (x86)\Embarcadero\Studio\20.0\lib\android\release\fmx.jar"
 set JDK_PATH1_8="C:\Program Files\Java\jdk1.8.0_131\bin"
 set CONFIRM=%1
 if x%CONFIRM% == x set CONFIRM=on

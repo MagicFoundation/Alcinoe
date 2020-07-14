@@ -1,0 +1,6 @@
+framework module VKSdkFramework {
+  umbrella header "VKSdkFramework.h"
+
+  export *
+  module * { export * }
+}

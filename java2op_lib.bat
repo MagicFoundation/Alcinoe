@@ -11,7 +11,9 @@ mkdir %OutputDir%
 set filenames=
 for /f %%G in ('dir .\lib\jar\*.jar /s /b /a-d') do (
   if not "%%~G" == "%CD%\lib\jar\org.webrtc\webrtc.jar" (
-    set filenames=!filenames! %%~G
+    if not "%%~G" == "%CD%\lib\jar\org.jetbrains.kotlin\kotlin-stdlib.jar" (
+      set filenames=!filenames! %%~G
+    )
   )
 )
 

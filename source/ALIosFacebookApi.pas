@@ -165,6 +165,7 @@ type
   FBSDKApplicationDelegateClass = interface(NSObjectClass)
     ['{B4050326-F748-4FC6-9018-734AEADEE9ED}']
     {class} function sharedInstance: Pointer{instancetype}; cdecl;
+    {class} procedure initializeSDK(launchOptions: NSDictionary); cdecl;
   end;
   FBSDKApplicationDelegate = interface(NSObject)
     ['{FA8D976C-3BC9-4152-A053-CD08C919210D}']

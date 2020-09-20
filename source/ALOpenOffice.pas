@@ -53,6 +53,7 @@ function MakePropertyValue(aPropertyName: AnsiString;
 
 //----- Document functions
 function CreateCalcDocument: Variant;
+function OpenCalcDocument(const aFileName: AnsiString): Variant;
 procedure SaveDocument(aDocument: Variant;
                        aFileName: AnsiString;
                        aFileType: AnsiString = '');
@@ -253,6 +254,17 @@ var aArgs: Variant;
 begin
   aArgs := VarArrayCreate([0, 0], varVariant);
   result := vALOpenOfficeStarDesktop.LoadComponentFromURL('private:factory/scalc',
+                                                          '_blank',
+                                                          0,
+                                                          aArgs);
+end;
+
+{**************************************************************}
+function OpenCalcDocument(const aFileName: AnsiString): Variant;
+var aArgs: Variant;
+begin
+  aArgs := VarArrayCreate([0, 0], varVariant);
+  result := vALOpenOfficeStarDesktop.LoadComponentFromURL(String('file:///' + ALStringReplace(aFileName, '\', '/', [rfReplaceAll])),
                                                           '_blank',
                                                           0,
                                                           aArgs);

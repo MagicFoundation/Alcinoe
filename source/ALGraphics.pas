@@ -6915,7 +6915,8 @@ begin
   end;
 end;
 
-{******************************************************}
+{***************************************************}
+// https://www.garykessler.net/library/file_sigs.html
 // https://en.wikipedia.org/wiki/List_of_file_signatures
 // https://github.com/strukturag/libheif/issues/83
 // https://nokiatech.github.io/heif/technical.html

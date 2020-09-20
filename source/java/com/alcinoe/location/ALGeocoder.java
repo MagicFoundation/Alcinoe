@@ -5,6 +5,7 @@ import android.location.Address;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.net.HttpURLConnection;
 import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
@@ -27,7 +28,7 @@ public class ALGeocoder {
 
       URL url = new URL(apiServer+(apiServer.indexOf("?") >= 0 ? "&" : "?")+
                           "latlng="+Double.toString(latitude)+","+Double.toString(longitude)+"&"+
-                          ((language != null) && (language.length() > 0) ? "language="+language : ""));
+                          ((language != null) && (language.length() > 0) ? "language="+URLEncoder.encode(language, "UTF-8") : ""));
       HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection(); 
       httpURLConnection.setConnectTimeout(60000);
       httpURLConnection.setReadTimeout(60000);      
@@ -201,11 +202,17 @@ public class ALGeocoder {
                                          String language, 
                                          String apiKey, 
                                          StringBuilder apiStatus) {
-    return getFromLocation ("https://maps.googleapis.com/maps/api/geocode/json?key="+apiKey,
-                            latitude, 
-                            longitude, 
-                            language, 
-                            apiStatus);
+    try {
+      return getFromLocation ("https://maps.googleapis.com/maps/api/geocode/json?key="+URLEncoder.encode(apiKey, "UTF-8"),
+                              latitude, 
+                              longitude, 
+                              language, 
+                              apiStatus);
+    }
+    catch (Throwable e){ 
+      Log.e("ALGeocoder", "getFromLocation - Exception", e); 
+      return null;
+    }  
   }
 
 }

@@ -2,14 +2,15 @@ unit ALCommon;
 
 interface
 
-uses {$IFDEF IOS}
-     iOSapi.Foundation,
-     {$ENDIF}
-     {$IFDEF MSWINDOWS}
-     Winapi.Windows,
-     {$ENDIF}
-     system.sysutils,
-     system.types;
+uses
+  {$IFDEF IOS}
+  iOSapi.Foundation,
+  {$ENDIF}
+  {$IFDEF MSWINDOWS}
+  Winapi.Windows,
+  {$ENDIF}
+  system.sysutils,
+  system.types;
 
 {$IF CompilerVersion < 29} {Delphi XE8}
   {$IF defined(CPUX64)} // The CPU supports the x86-64 instruction set, and is in a 64-bit environment. *New* in XE2/x64
@@ -336,6 +337,8 @@ function ALGetCallStackCustomLogsU(Const aAppendTimeStamp: boolean = True): Stri
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 Type TalLogType = (VERBOSE, DEBUG, INFO, WARN, ERROR, ASSERT);
 procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO);
+Var ALEnqueueLog: Boolean; // We can use this flag to enqueue the log when the device just started and when we didn't yet
+procedure ALPrintLogQueue; // pluged the device to the monitoring tool, so that we can print the log a little later
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 type TALCustomDelayedFreeObjectProc = procedure(var aObject: Tobject) of object;
@@ -469,21 +472,24 @@ procedure ALInitCpuFeatures;
 
 implementation
 
-uses system.Classes,
-     system.math,
-     system.generics.collections,
-     {$IF defined(ANDROID)}
-     Androidapi.JNI.JavaTypes,
-     Androidapi.Helpers,
-     ALAndroidApi,
-     {$ENDIF}
-     {$IF defined(IOS)}
-     Macapi.Helpers,
-     {$ENDIF}
-     system.DateUtils,
-     ALString;
+uses
+  system.Classes,
+  system.math,
+  system.generics.collections,
+  {$IF defined(ANDROID)}
+  Androidapi.JNI.JavaTypes,
+  Androidapi.Helpers,
+  ALAndroidApi,
+  {$ENDIF}
+  {$IF defined(IOS)}
+  Macapi.Helpers,
+  {$ENDIF}
+  system.DateUtils,
+  ALString;
 
 type
+
+  {******************************}
   _TALCallStackCustomLogU = record
     TimeStamp: TDateTime;
     log: String;
@@ -492,6 +498,29 @@ type
 var
   _ALCallStackCustomLogsU: TList<_TALCallStackCustomLogU>;
   _ALCallStackCustomLogsUCurrentIndex: integer = -1;
+
+type
+
+  {***********************}
+  _TALLogQueueItem = record
+  private
+    Tag: String;
+    msg: String;
+    _type: TalLogType;
+  public
+    class function Create(const ATag: String; const AMsg: String; Const aType: TalLogType): _TALLogQueueItem; static; inline;
+  end;
+
+var
+  _ALLogQueue: TList<_TALLogQueueItem>;
+
+{************************************************************************************************************************}
+class function _TALLogQueueItem.Create(const ATag: String; const AMsg: String; Const aType: TalLogType): _TALLogQueueItem;
+begin
+  Result.Tag := aTag;
+  Result.Msg := aMsg;
+  Result._Type := aType;
+end;
 
 {***********************************************}
 function ALRectWidth(const Rect: TRect): Integer;
@@ -1692,18 +1721,23 @@ function ALGetCallStackCustomLogsU(Const aAppendTimeStamp: boolean = True): Stri
 Var i: integer;
 begin
   Result := '';
-  if aAppendTimeStamp then begin
-    for i := _ALCallStackCustomLogsUCurrentIndex downto 0 do
-      Result := Result + ALFormatDateTimeU('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsU) + ': ' + _ALCallStackCustomLogsU[i].log + #13#10;
-    for i := _ALCallStackCustomLogsU.Count - 1 downto _ALCallStackCustomLogsUCurrentIndex + 1 do
-      Result := Result + ALFormatDateTimeU('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsU) + ': ' + _ALCallStackCustomLogsU[i].log + #13#10;
-  end
-  else begin
-    for i := _ALCallStackCustomLogsUCurrentIndex downto 0 do
-      Result := Result + _ALCallStackCustomLogsU[i].log + #13#10;
-    for i := _ALCallStackCustomLogsU.Count - 1 downto _ALCallStackCustomLogsUCurrentIndex + 1 do
-      Result := Result + _ALCallStackCustomLogsU[i].log + #13#10;
-  end;
+  Tmonitor.enter(_ALCallStackCustomLogsU);
+  Try
+    if aAppendTimeStamp then begin
+      for i := _ALCallStackCustomLogsUCurrentIndex downto 0 do
+        Result := Result + ALFormatDateTimeU('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsU) + ': ' + _ALCallStackCustomLogsU[i].log + #13#10;
+      for i := _ALCallStackCustomLogsU.Count - 1 downto _ALCallStackCustomLogsUCurrentIndex + 1 do
+        Result := Result + ALFormatDateTimeU('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsU) + ': ' + _ALCallStackCustomLogsU[i].log + #13#10;
+    end
+    else begin
+      for i := _ALCallStackCustomLogsUCurrentIndex downto 0 do
+        Result := Result + _ALCallStackCustomLogsU[i].log + #13#10;
+      for i := _ALCallStackCustomLogsU.Count - 1 downto _ALCallStackCustomLogsUCurrentIndex + 1 do
+        Result := Result + _ALCallStackCustomLogsU[i].log + #13#10;
+    end;
+  Finally
+    Tmonitor.exit(_ALCallStackCustomLogsU);
+  End;
   Result := ALTrimU(Result);
 end;
 
@@ -1713,44 +1747,78 @@ procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = 
 var aMsg: String;
 {$ENDIF}
 begin
-  {$IF defined(ANDROID)}
-  case _type of
-    TalLogType.VERBOSE: TJLog.JavaClass.v(StringToJString(Tag), StringToJString(msg));
-    TalLogType.DEBUG: TJLog.JavaClass.d(StringToJString(Tag), StringToJString(msg));
-    TalLogType.INFO: TJLog.JavaClass.i(StringToJString(Tag), StringToJString(msg));
-    TalLogType.WARN: TJLog.JavaClass.w(StringToJString(Tag), StringToJString(msg));
-    TalLogType.ERROR: TJLog.JavaClass.e(StringToJString(Tag), StringToJString(msg));
-    TalLogType.ASSERT: TJLog.JavaClass.wtf(StringToJString(Tag), StringToJString(msg)); // << wtf for What a Terrible Failure but everyone know that it's for what the fuck !
-  end;
-  {$ELSEIF defined(IOS)}
-  // https://forums.developer.apple.com/thread/4685
-  //if _type <> TalLogType.VERBOSE  then begin // because log on ios slow down the app so skip verbosity
-    if msg <> '' then aMsg := ' => ' + msg
-    else aMsg := '';
-    case _type of
-      TalLogType.VERBOSE: NSLog(StringToID('[V] ' + Tag + aMsg));
-      TalLogType.DEBUG:   NSLog(StringToID('[D][V] ' + Tag + aMsg));
-      TalLogType.INFO:    NSLog(StringToID('[I][D][V] ' + Tag + aMsg));
-      TalLogType.WARN:    NSLog(StringToID('[W][I][D][V] ' + Tag + aMsg));
-      TalLogType.ERROR:   NSLog(StringToID('[E][W][I][D][V] ' + Tag + aMsg));
-      TalLogType.ASSERT:  NSLog(StringToID('[A][E][W][I][D][V] ' + Tag + aMsg));
+  if ALEnqueueLog then begin
+    Tmonitor.Enter(_ALLogQueue);
+    try
+      _ALLogQueue.Add(
+        _TALLogQueueItem.Create(
+          Tag, // const ATag: String;
+          Msg, // const AMsg: String;
+          _Type)); // Const aType: TalLogType
+    finally
+      Tmonitor.Exit(_ALLogQueue);
     end;
-  //end;
-  {$ELSEIF defined(MSWINDOWS)}
-  if _type <> TalLogType.VERBOSE  then begin // because log on windows slow down the app so skip verbosity
-    if msg <> '' then aMsg := ' => ' + stringReplace(msg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
-    else aMsg := '';
+  end
+  else begin
+    {$IF defined(ANDROID)}
     case _type of
-      TalLogType.VERBOSE: OutputDebugString(pointer('[V] ' + Tag + aMsg + ' |'));
-      TalLogType.DEBUG:   OutputDebugString(pointer('[D][V] ' + Tag + aMsg + ' |'));
-      TalLogType.INFO:    OutputDebugString(pointer('[I][D][V] ' + Tag + aMsg + ' |'));
-      TalLogType.WARN:    OutputDebugString(pointer('[W][I][D][V] ' + Tag + aMsg + ' |'));
-      TalLogType.ERROR:   OutputDebugString(pointer('[E][W][I][D][V] ' + Tag + aMsg + ' |'));
-      TalLogType.ASSERT:  OutputDebugString(pointer('[A][E][W][I][D][V] ' + Tag + aMsg + ' |'));
+      TalLogType.VERBOSE: TJLog.JavaClass.v(StringToJString(Tag), StringToJString(msg));
+      TalLogType.DEBUG: TJLog.JavaClass.d(StringToJString(Tag), StringToJString(msg));
+      TalLogType.INFO: TJLog.JavaClass.i(StringToJString(Tag), StringToJString(msg));
+      TalLogType.WARN: TJLog.JavaClass.w(StringToJString(Tag), StringToJString(msg));
+      TalLogType.ERROR: TJLog.JavaClass.e(StringToJString(Tag), StringToJString(msg));
+      TalLogType.ASSERT: TJLog.JavaClass.wtf(StringToJString(Tag), StringToJString(msg)); // << wtf for What a Terrible Failure but everyone know that it's for what the fuck !
     end;
+    {$ELSEIF defined(IOS)}
+    // https://forums.developer.apple.com/thread/4685
+    //if _type <> TalLogType.VERBOSE  then begin // because log on ios slow down the app so skip verbosity
+      if msg <> '' then aMsg := ' => ' + msg
+      else aMsg := '';
+      case _type of
+        TalLogType.VERBOSE: NSLog(StringToID('[V] ' + Tag + aMsg));
+        TalLogType.DEBUG:   NSLog(StringToID('[D][V] ' + Tag + aMsg));
+        TalLogType.INFO:    NSLog(StringToID('[I][D][V] ' + Tag + aMsg));
+        TalLogType.WARN:    NSLog(StringToID('[W][I][D][V] ' + Tag + aMsg));
+        TalLogType.ERROR:   NSLog(StringToID('[E][W][I][D][V] ' + Tag + aMsg));
+        TalLogType.ASSERT:  NSLog(StringToID('[A][E][W][I][D][V] ' + Tag + aMsg));
+      end;
+    //end;
+    {$ELSEIF defined(MSWINDOWS)}
+    if _type <> TalLogType.VERBOSE  then begin // because log on windows slow down the app so skip verbosity
+      if msg <> '' then aMsg := ' => ' + stringReplace(msg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
+      else aMsg := '';
+      case _type of
+        TalLogType.VERBOSE: OutputDebugString(pointer('[V] ' + Tag + aMsg + ' |'));
+        TalLogType.DEBUG:   OutputDebugString(pointer('[D][V] ' + Tag + aMsg + ' |'));
+        TalLogType.INFO:    OutputDebugString(pointer('[I][D][V] ' + Tag + aMsg + ' |'));
+        TalLogType.WARN:    OutputDebugString(pointer('[W][I][D][V] ' + Tag + aMsg + ' |'));
+        TalLogType.ERROR:   OutputDebugString(pointer('[E][W][I][D][V] ' + Tag + aMsg + ' |'));
+        TalLogType.ASSERT:  OutputDebugString(pointer('[A][E][W][I][D][V] ' + Tag + aMsg + ' |'));
+      end;
+    end;
+    {$IFEND}
   end;
-  {$IFEND}
 end;
+
+{************************}
+procedure ALPrintLogQueue;
+var LOldEnqueueLogValue: Boolean;
+    i: integer;
+begin
+  LOldEnqueueLogValue := ALEnqueueLog;
+  ALEnqueueLog := False;
+  Tmonitor.Enter(_ALLogQueue);
+  try
+    for I := 0 to _ALLogQueue.Count - 1 do
+      with _ALLogQueue[i] do
+        ALLog(Tag, Msg, _type);
+    _ALLogQueue.Clear;
+  finally
+    Tmonitor.Exit(_ALLogQueue);
+    ALEnqueueLog := LOldEnqueueLogValue;
+  end;
+end;
+
 
 {******************************************}
 Function AlBoolToInt(Value:Boolean):Integer;
@@ -2300,6 +2368,8 @@ initialization
   ALFreeAndNilCanRefCountWarnProc := nil;
   {$ENDIF}
 
+  ALEnqueueLog := False;
+  _ALLogQueue := TList<_TALLogQueueItem>.Create;
   _ALCallStackCustomLogsU := TList<_TALCallStackCustomLogU>.Create;
   ALMove := system.Move;
 
@@ -2307,5 +2377,6 @@ initialization
 Finalization
 
   ALFreeAndNil(_ALCallStackCustomLogsU);
+  ALFreeAndNil(_ALLogQueue);
 
 end.

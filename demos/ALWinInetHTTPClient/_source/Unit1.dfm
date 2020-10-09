@@ -74,17 +74,29 @@ object Form1: TForm1
             792
             45)
           object Label1: TcxLabel
-            Left = 8
-            Top = 12
+            Left = 10
+            Top = 8
             Caption = 'URL'
             ParentFont = False
+            Style.Font.Charset = DEFAULT_CHARSET
+            Style.Font.Color = clWindowText
+            Style.Font.Height = -13
+            Style.Font.Name = 'Tahoma'
+            Style.Font.Style = []
+            Style.IsFontAssigned = True
             Transparent = True
           end
           object editURL: TcxTextEdit
             Left = 40
-            Top = 9
+            Top = 7
             Anchors = [akLeft, akTop, akRight]
             ParentFont = False
+            Style.Font.Charset = DEFAULT_CHARSET
+            Style.Font.Color = clWindowText
+            Style.Font.Height = -13
+            Style.Font.Name = 'Tahoma'
+            Style.Font.Style = []
+            Style.IsFontAssigned = True
             TabOrder = 0
             Text = 'http://www.wikipedia.org'
             Width = 305
@@ -106,7 +118,7 @@ object Form1: TForm1
             OnClick = ButtonPostClick
           end
           object ButtonGet: TcxButton
-            Left = 351
+            Left = 352
             Top = 6
             Width = 50
             Height = 25
@@ -425,6 +437,22 @@ object Form1: TForm1
             TabOrder = 1
             Height = 275
             Width = 505
+          end
+          object ButtonSaveToFile: TcxButton
+            Left = 425
+            Top = 1
+            Width = 82
+            Height = 21
+            Anchors = [akTop, akRight]
+            Caption = 'Save to file'
+            TabOrder = 2
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+            OnClick = ButtonSaveToFileClick
           end
         end
         object cxSplitter1: TcxSplitter

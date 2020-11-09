@@ -287,6 +287,7 @@ typedef System::Set<TALIntelCpuFeature, TALIntelCpuFeature::cfFPU, TALIntelCpuFe
 
 //-- var, const, procedure ---------------------------------------------------
 extern DELPHI_PACKAGE int ALCallStackCustomLogsMaxCount;
+extern DELPHI_PACKAGE bool ALEnqueueLog;
 extern DELPHI_PACKAGE TALCustomDelayedFreeObjectProc ALCustomDelayedFreeObjectProc;
 extern "C" unsigned __stdcall EnumDynamicTimeZoneInformation(unsigned dwIndex, Winapi::Windows::PDynamicTimeZoneInformation lpTimeZoneInformation);
 extern "C" System::LongBool __stdcall SystemTimeToTzSpecificLocalTimeEx(Winapi::Windows::PDynamicTimeZoneInformation lpTimeZoneInformation, _SYSTEMTIME &lpUniversalTime, _SYSTEMTIME &lpLocalTime);
@@ -322,6 +323,7 @@ extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectPlaceInto(const Sys
 extern DELPHI_PACKAGE void __fastcall ALAddCallStackCustomLogU(const System::UnicodeString aLog);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALGetCallStackCustomLogsU(const bool aAppendTimeStamp = true);
 extern DELPHI_PACKAGE void __fastcall ALLog(const System::UnicodeString Tag, const System::UnicodeString msg, const TalLogType _type = (TalLogType)(0x2));
+extern DELPHI_PACKAGE void __fastcall ALPrintLogQueue(void);
 extern DELPHI_PACKAGE int __fastcall AlBoolToInt(bool Value);
 extern DELPHI_PACKAGE bool __fastcall AlIntToBool(int Value);
 extern DELPHI_PACKAGE int __fastcall ALMediumPos(int LTotal, int LBorder, int LObject);

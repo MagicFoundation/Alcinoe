@@ -1126,9 +1126,6 @@ Var aTickCount: int64;
     i: integer;
 Begin
 
-  //for a stupid warning
-  result := nil;
-
   //synchronize the code
   FConnectionPoolCS.Acquire;
   Try

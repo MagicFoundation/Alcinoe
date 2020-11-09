@@ -233,6 +233,10 @@ private:
 	System::Uitypes::TFontName fBuffontFamily;
 	System::Uitypes::TFontStyles fBuffontStyle;
 	float fBuffontSize;
+	float fBufLineSpacing;
+	float fBufXRadius;
+	float fBufYRadius;
+	bool fBufTextIsHTML;
 	bool fBufWordWrap;
 	bool fBufAutosize;
 	Fmx::Types::TTextTrimming fBufTrimming;
@@ -314,10 +318,13 @@ private:
 	
 protected:
 	__property Fmx::Graphics::TBitmap* BufBitmap = {read=GetBufBitmap};
+	virtual void __fastcall PaddingChanged()/* overload */;
 	virtual void __fastcall FillChanged(System::TObject* Sender);
 	virtual void __fastcall StrokeChanged(System::TObject* Sender);
 	virtual void __fastcall SetXRadius(const float Value);
 	virtual void __fastcall SetYRadius(const float Value);
+	virtual void __fastcall SetLineSpacing(const float Value);
+	virtual void __fastcall SetTextIsHtml(const bool Value);
 	virtual void __fastcall SetCorners(const Fmx::Types::TCorners Value);
 	virtual void __fastcall SetSides(const Fmx::Types::TSides Value);
 	virtual void __fastcall SetParent(Fmx::Types::TFmxObject* const Value);
@@ -404,8 +411,8 @@ __published:
 	__property Fmx::Types::TSides Sides = {read=FSides, write=SetSides, stored=IsSidesStored, nodefault};
 	__property float XRadius = {read=FXRadius, write=SetXRadius};
 	__property float YRadius = {read=FYRadius, write=SetYRadius};
-	__property float LineSpacing = {read=fLineSpacing, write=fLineSpacing};
-	__property bool TextIsHtml = {read=fTextIsHtml, write=fTextIsHtml, default=0};
+	__property float LineSpacing = {read=fLineSpacing, write=SetLineSpacing};
+	__property bool TextIsHtml = {read=fTextIsHtml, write=SetTextIsHtml, default=0};
 	__property TouchTargetExpansion;
 };
 

@@ -422,6 +422,8 @@ extern DELPHI_PACKAGE System::AnsiString __fastcall ALBase64DecodeString(const c
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALBase64DecodeString(const System::AnsiString S)/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALBase64EncodeStringMIME(const System::AnsiString S);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALBase64DecodeStringMIME(const System::AnsiString S);
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALURLBase64EncodeString(const System::AnsiString S, const bool aDoOnlyUrlEncode = false);
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALURLBase64DecodeString(const System::AnsiString S, const bool aDoOnlyUrlDecode = false);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALBase64EncodeStringU(const System::UnicodeString S, System::Sysutils::TEncoding* const AEncoding = (System::Sysutils::TEncoding*)(0x0));
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALBase64DecodeStringU(const System::UnicodeString S, System::Sysutils::TEncoding* const AEncoding = (System::Sysutils::TEncoding*)(0x0));
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALBase64EncodeBytesU(const System::DynamicArray<System::Byte> Bytes)/* overload */;

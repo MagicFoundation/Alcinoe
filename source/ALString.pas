@@ -467,6 +467,8 @@ function  ALBase64DecodeString(const P: PansiChar; const ln: Integer): AnsiStrin
 function  ALBase64DecodeString(const S: AnsiString): AnsiString; overload;
 function  ALBase64EncodeStringMIME(const S: AnsiString): AnsiString;
 function  ALBase64DecodeStringMIME(const S: AnsiString): AnsiString;
+function  ALURLBase64EncodeString(const S: AnsiString; const aDoOnlyUrlEncode: boolean = false): AnsiString;
+function  ALURLBase64DecodeString(const S: AnsiString; const aDoOnlyUrlDecode: boolean = false): AnsiString;
 function  ALIsDecimal(const S: AnsiString; const RejectPlusMinusSign: boolean = False): boolean;
 Function  ALIsInt64 (const S: AnsiString): Boolean;
 Function  ALIsInteger (const S: AnsiString): Boolean;
@@ -7077,6 +7079,51 @@ begin
 
   result := ALBase64DecodeString(AlStringReplace(s, #13#10, '', [rfReplaceAll]));
 
+end;
+
+{**********************************************************************************************************}
+function  ALURLBase64EncodeString(const S: AnsiString; const aDoOnlyUrlEncode: boolean = false): AnsiString;
+begin
+
+  //It’s often more convenient to manage data in text format rather than binary data
+  //(for example a string column in a database, or a string rendered into a HTTP response).
+  //Common examples in security are digital signatures and encryption. Signing and encrypting
+  //typically produce bytes of data and in a web application sometimes it’s just easier to
+  //manage that data as text.
+  //
+  //Base64 is a useful tool for doing this encoding. The only problem is that base64
+  //encoding uses characters that do not work well in URLs and sometimes HTTP headers
+  //(e.g. the +, / and = characters are either reserved or have special meaning in URLs).
+  //URL encoding is designed to address that problem, but it’s sometimes error prone (e.g.
+  //double encoding) or the tooling just doesn’t do the right thing (IIS decodes %2F into
+  //a / before it arrives into the application and thus confuses the ASP.NET routing framework).
+  //It is very useful to put these sorts of values in a URL, but it’s also frustrating that
+  //it’s problematic and that we have to work around these issues again and again.
+  //
+  //While reading the JWT specs they faced the same problem and they addressed it by using
+  //base64url encoding (which is almost the same, yet different than base64 encoding).
+  //Base64url encoding is basically base64 encoding except they use non-reserved URL
+  //characters (e.g. – is used instead of + and _ is used instead of /) and they omit
+  //the padding characters. I’ve been using this for some time now and am quite
+  //happy with it as a replacement for base64 encoding.
+
+  if aDoOnlyUrlEncode then result := S
+  else result := ALBase64EncodeString(s);
+  Result := ALStringReplace(Result, '+', '-', [rfReplaceALL]);
+  Result := ALStringReplace(Result, '/', '_', [rfReplaceALL]);
+  Result := ALStringReplace(Result, '=', '',  [rfReplaceALL]);
+
+end;
+
+{**********************************************************************************************************}
+function  ALURLBase64DecodeString(const S: AnsiString; const aDoOnlyUrlDecode: boolean = false): AnsiString;
+begin
+  result := ALStringReplace(S,      '-', '+', [rfReplaceALL]);
+  result := ALStringReplace(result, '_', '/', [rfReplaceALL]);
+  while length(result) mod 4 <> 0 do
+    result := result + '=';
+  if aDoOnlyUrlDecode then exit;
+  result := ALBase64DecodeString(result);
 end;
 
 ////////////////////////////////////

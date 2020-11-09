@@ -163,6 +163,7 @@ const
   cALJSONOperationError         = 'This operation can not be performed with a node of type %s';
   cALJSONParseError             = 'JSON Parse error';
   cALBSONParseError             = 'BSON Parse error';
+  cALJSONImmutable              = 'The document is immutable';
 
 type
 
@@ -202,7 +203,8 @@ type
 
   TALJSONDocOption = (doNodeAutoCreate, // create only ntText Node !
                       doNodeAutoIndent, // affect only the SaveToStream
-                      doProtectedSave);     // save first to a tmp file and then later rename the tmp file to the desired filename
+                      doProtectedSave,     // save first to a tmp file and then later rename the tmp file to the desired filename
+                      doImmutable); // the doc is immutable and can not be updated (usefull when sharing a document across multiple threads)
   TALJSONDocOptions = set of TALJSONDocOption;
 
   TALJSONParseOption = (poIgnoreControlCharacters, // don't decode escaped characters (like \") and not encode them also (when save / load)
@@ -508,7 +510,7 @@ type
                                   // for exemple for NumberLong(12391293) it's
                                   // store only 12391293
     FRawNodeValueInt64: int64;    // contain the value Stored in an int64 (if the
-                               // value can be store in an int64)
+                                  // value can be store in an int64)
     fRawNodeValueDefined: TALJSONTextNodeValueDefined;
   protected
     function GetNodeType: TALJSONNodeType; override;
@@ -1033,11 +1035,11 @@ type
   TALJSONTextNodeU = Class(TALJSONNodeU)
   private
     fNodeSubType: TALJSONNodeSubType;
-    fRawNodeValueStr: String; // contain the text representation of the node
-                                  // WITHOUT any node subtype helper
-                                  // for exemple for NumberLong(12391293) it's
-                                  // store only 12391293
-    FRawNodeValueInt64: int64;    // contain the value Stored in an int64 (if the
+    fRawNodeValueStr: String;  // contain the text representation of the node
+                               // WITHOUT any node subtype helper
+                               // for exemple for NumberLong(12391293) it's
+                               // store only 12391293
+    FRawNodeValueInt64: int64; // contain the value Stored in an int64 (if the
                                // value can be store in an int64)
     fRawNodeValueDefined: TALJSONTextNodeValueDefined;
   protected
@@ -1868,6 +1870,7 @@ procedure TALJSONDocument.SetActive(const Value: Boolean);
 begin
   if Value <> GetActive then begin
     if Value then begin
+      if (doImmutable in Options) then ALJSONDocError(cALJSONImmutable);
       FDocumentNode := TALJSONObjectNode.Create;
       FDocumentNode.SetOwnerDocument(Self);
     end
@@ -1875,7 +1878,7 @@ begin
   end;
 end;
 
-{*****=********}
+{**************}
 {The JSON format
  There are just a few rules that you need to remember:
  *Objects are encapsulated within opening and closing brackets { } {
@@ -3014,6 +3017,9 @@ Begin
   // NOTE: ContainerNode must be ntobject or nil (sax mode)
   //
 
+  //error if Immutable
+  if (doImmutable in Options) then ALJSONDocError(cALJSONImmutable);
+
   //event fonParseStartDocument
   DoParseStartDocument;
 
@@ -3989,6 +3995,9 @@ Begin
   // NOTE: ContainerNode must be ntobject or nil (sax mode)
   //
 
+  //error if Immutable
+  if (doImmutable in Options) then ALJSONDocError(cALJSONImmutable);
+
   //event fonParseStartDocument
   DoParseStartDocument;
 
@@ -4063,6 +4072,7 @@ end;
 {***********************************}
 procedure TALJSONDocument.ReleaseDoc;
 begin
+  if (doImmutable in Options) then ALJSONDocError(cALJSONImmutable);
   if assigned(FDocumentNode) then FreeAndNil(FDocumentNode);
 end;
 
@@ -4730,6 +4740,7 @@ end;
 {Creates the object that implements the ChildNodes property}
 function TALJSONNode.CreateChildList: TALJSONNodeList;
 begin
+  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
   result := TALJSONNodeList.Create(Self);
 end;
 
@@ -6011,6 +6022,7 @@ var I: Integer;
     aNodeList: TALJSONNodeList;
 begin
   if FDocument <> Value then begin
+    if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
     FDocument := Value;
     aNodeList := InternalGetChildNodes;
     if Assigned(aNodeList) then
@@ -6031,6 +6043,7 @@ end;
 procedure TALJSONNode.SetParentNode(const Value: TALJSONNode);
 begin
   if FParentNode <> Value then begin
+    if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
     If assigned(Value) then SetOwnerDocument(Value.OwnerDocument)
     else SetOwnerDocument(nil);
     FParentNode := Value;
@@ -6110,7 +6123,7 @@ begin
       //nstArray: can not be retrieve from int64
       //nstBinary: only the binarysubtype is store in int64
       //nstObjectID: can not be retrieve from int64
-      //nstRegEx: only the regex option is store in the int64
+      //nstRegEx: only the regex options is store in the int64
       //nstJavascript: can not be retrieve from int64
     end;
 
@@ -6127,7 +6140,7 @@ begin
       //nstArray: can not be retrieve from int64
       //nstBinary: only the binarysubtype is store in int64
       //nstObjectID: can not be retrieve from int64
-      //nstRegEx: only the regex option is store in the int64
+      //nstRegEx: only the regex options is store in the int64
       //nstJavascript: can not be retrieve from int64
     end;
 
@@ -6142,6 +6155,7 @@ end;
 {******************************************************************************************************************************************}
 function TALJSONNode.AddChild(const NodeName: AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode;
 begin
+  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
   Result := ALCreateJSONNode(NodeName,NodeType);
   Try
     ChildNodes.Insert(Index, Result);
@@ -6176,6 +6190,7 @@ end;
 function TALJSONNode.DeleteChild(const NodeName: AnsiString): boolean;
 var i: integer;
 begin
+  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
   I := ChildNodes.IndexOf(NodeName);
   if i >= 0 then begin
     ChildNodes.Delete(i);
@@ -6190,6 +6205,7 @@ var aNode: TALJSONNode;
     aTmpNode: TALJSONNode;
     i: integer;
 begin
+  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
   aNode := Self;
   for i := low(path) to high(path) - 1 do begin
     aTmpNode := aNode.ChildNodes.findNode(path[i]);
@@ -7089,6 +7105,7 @@ end;
 {*********************************************************************}
 procedure TALJSONObjectNode.SetChildNodes(const Value: TALJSONNodeList);
 begin
+  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
   If Assigned(FChildNodes) then FreeAndNil(FchildNodes);
   FChildNodes := Value;
 end;
@@ -7136,6 +7153,7 @@ end;
 {*********************************************************************}
 procedure TALJSONArrayNode.SetChildNodes(const Value: TALJSONNodeList);
 begin
+  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
   If Assigned(FChildNodes) then FreeAndNil(FchildNodes);
   FChildNodes := Value;
 end;
@@ -7188,6 +7206,7 @@ begin
   else begin
 
     if not (nvInt64 in fRawNodeValueDefined) then ALJsonDocError(CALJsonOperationError,GetNodeType);
+    if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
 
     case fNodeSubType of
       nstFloat: ALFloatToStr(GetFloat, fRawNodeValueStr, ALDefaultFormatSettings);
@@ -7199,7 +7218,7 @@ begin
       nstBoolean: ALBoolToStr(fRawNodeValueStr, getBool, 'true', 'false');
       nstDateTime: ALDateTimeToStr(GetDateTime, fRawNodeValueStr, ALDefaultFormatSettings);
       nstNull: fRawNodeValueStr := 'null';
-      //nstRegEx: only the regex option is store in the int64
+      //nstRegEx: only the regex options is store in the int64
       //nstJavascript: can not be retrieve from int64
       nstInt32: ALintToStr(GetInt32, fRawNodeValueStr);
       nstTimestamp: ALformat('Timestamp(%u, %u)', [GetTimestamp.W1,GetTimestamp.W2], fRawNodeValueStr);
@@ -7225,6 +7244,7 @@ begin
   else begin
 
     if not (nvStr in fRawNodeValueDefined) then ALJsonDocError(CALJsonOperationError,GetNodeType);
+    if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
 
     case fNodeSubType of
       nstFloat: begin
@@ -7247,7 +7267,7 @@ begin
       nstNull:  begin
                   fRawNodeValueInt64 := 0;
                 end;
-      //nstRegEx: only the regex option is store in the int64
+      //nstRegEx: only the regex options is store in the int64
       //nstJavascript: can not be retrieve from int64
       nstInt32: begin
                   IF not ALTryStrToInt(fRawNodeValueStr, aInt32) then ALJSONDocError('%s is not a valid Int32', [fRawNodeValueStr]);
@@ -7272,6 +7292,7 @@ end;
 {*****************************************************************************************************}
 procedure TALJSONTextNode.SetNodeValue(const Value: AnsiString; const NodeSubType: TALJSONNodeSubType);
 begin
+  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
   fNodeSubType := NodeSubType;
   fRawNodeValueStr := Value;
   fRawNodeValueDefined := [nvStr];
@@ -7280,6 +7301,7 @@ end;
 {************************************************************************************************}
 procedure TALJSONTextNode.SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType);
 begin
+  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
   fNodeSubType := NodeSubType;
   fRawNodeValueInt64 := Value;
   if (NodeSubType in [nstBinary, nstRegEx]) then fRawNodeValueDefined := fRawNodeValueDefined + [nvInt64] // keep the fNodeValueStr
@@ -7289,6 +7311,7 @@ end;
 {*********************************************************************************************************************************}
 procedure TALJSONTextNode.SetNodeValue(const StrValue: AnsiString; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType);
 begin
+  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
   fNodeSubType := NodeSubType;
   fRawNodeValueStr := StrValue;
   fRawNodeValueInt64 := Int64Value;
@@ -8705,6 +8728,7 @@ procedure TALJSONDocumentU.SetActive(const Value: Boolean);
 begin
   if Value <> GetActive then begin
     if Value then begin
+      if (doImmutable in Options) then ALJSONDocErrorU(cALJSONImmutable);
       FDocumentNode := TALJSONObjectNodeU.Create;
       FDocumentNode.SetOwnerDocument(Self);
     end
@@ -8712,7 +8736,7 @@ begin
   end;
 end;
 
-{*****=********}
+{**************}
 {The JSON format
  There are just a few rules that you need to remember:
  *Objects are encapsulated within opening and closing brackets { } {
@@ -9798,6 +9822,9 @@ Begin
   // NOTE: ContainerNode must be ntobject or nil (sax mode)
   //
 
+  //error if Immutable
+  if (doImmutable in Options) then ALJSONDocErrorU(cALJSONImmutable);
+
   //event fonParseStartDocument
   DoParseStartDocument;
 
@@ -10671,6 +10698,9 @@ Begin
   // NOTE: ContainerNode must be ntobject or nil (sax mode)
   //
 
+  //error if Immutable
+  if (doImmutable in Options) then ALJSONDocErrorU(cALJSONImmutable);
+
   //event fonParseStartDocument
   DoParseStartDocument;
 
@@ -10736,6 +10766,7 @@ end;
 {************************************}
 procedure TALJSONDocumentU.ReleaseDoc;
 begin
+  if (doImmutable in Options) then ALJSONDocErrorU(cALJSONImmutable);
   if assigned(FDocumentNode) then ALFreeAndNil(FDocumentNode);
 end;
 
@@ -11415,6 +11446,7 @@ end;
 {Creates the object that implements the ChildNodes property}
 function TALJSONNodeU.CreateChildList: TALJSONNodeListU;
 begin
+  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
   result := TALJSONNodeListU.Create(Self);
 end;
 
@@ -12696,6 +12728,7 @@ var I: Integer;
     aNodeList: TALJSONNodeListU;
 begin
   if FDocument <> Value then begin
+    if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
     FDocument := Value;
     aNodeList := InternalGetChildNodes;
     if Assigned(aNodeList) then
@@ -12716,6 +12749,7 @@ end;
 procedure TALJSONNodeU.SetParentNode(const Value: TALJSONNodeU);
 begin
   if FParentNode <> Value then begin
+    if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
     If assigned(Value) then SetOwnerDocument(Value.OwnerDocument)
     else SetOwnerDocument(nil);
     FParentNode := Value;
@@ -12795,7 +12829,7 @@ begin
       //nstArray: can not be retrieve from int64
       //nstBinary: only the binarysubtype is store in int64
       //nstObjectID: can not be retrieve from int64
-      //nstRegEx: only the regex option is store in the int64
+      //nstRegEx: only the regex options is store in the int64
       //nstJavascript: can not be retrieve from int64
     end;
 
@@ -12812,7 +12846,7 @@ begin
       //nstArray: can not be retrieve from int64
       //nstBinary: only the binarysubtype is store in int64
       //nstObjectID: can not be retrieve from int64
-      //nstRegEx: only the regex option is store in the int64
+      //nstRegEx: only the regex options is store in the int64
       //nstJavascript: can not be retrieve from int64
     end;
 
@@ -12827,6 +12861,7 @@ end;
 {****************************************************************************************************************************************}
 function TALJSONNodeU.AddChild(const NodeName: String; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU;
 begin
+  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
   Result := ALCreateJSONNodeU(NodeName,NodeType);
   Try
     ChildNodes.Insert(Index, Result);
@@ -12861,6 +12896,7 @@ end;
 function TALJSONNodeU.DeleteChild(const NodeName: String): boolean;
 var i: integer;
 begin
+  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
   I := ChildNodes.IndexOf(NodeName);
   if i >= 0 then begin
     ChildNodes.Delete(i);
@@ -12875,6 +12911,7 @@ var aNode: TALJSONNodeU;
     aTmpNode: TALJSONNodeU;
     i: integer;
 begin
+  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
   aNode := Self;
   for i := low(path) to high(path) - 1 do begin
     aTmpNode := aNode.ChildNodes.findNode(path[i]);
@@ -13812,6 +13849,7 @@ end;
 {************************************************************************}
 procedure TALJSONObjectNodeU.SetChildNodes(const Value: TALJSONNodeListU);
 begin
+  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
   If Assigned(FChildNodes) then ALFreeAndNil(FchildNodes);
   FChildNodes := Value;
 end;
@@ -13859,6 +13897,7 @@ end;
 {***********************************************************************}
 procedure TALJSONArrayNodeU.SetChildNodes(const Value: TALJSONNodeListU);
 begin
+  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
   If Assigned(FChildNodes) then ALFreeAndNil(FchildNodes);
   FChildNodes := Value;
 end;
@@ -13911,6 +13950,7 @@ begin
   else begin
 
     if not (nvInt64 in fRawNodeValueDefined) then ALJSONDocErrorU(CALJsonOperationError,GetNodeType);
+    if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
 
     case fNodeSubType of
       nstFloat: ALFloatToStrU(GetFloat, fRawNodeValueStr, ALDefaultFormatSettingsU);
@@ -13922,7 +13962,7 @@ begin
       nstBoolean: ALBoolToStrU(fRawNodeValueStr, getBool, 'true', 'false');
       nstDateTime: ALDateTimeToStrU(GetDateTime, fRawNodeValueStr, ALDefaultFormatSettingsU);
       nstNull: fRawNodeValueStr := 'null';
-      //nstRegEx: only the regex option is store in the int64
+      //nstRegEx: only the regex options is store in the int64
       //nstJavascript: can not be retrieve from int64
       nstInt32: alinttostrU(GetInt32, fRawNodeValueStr);
       nstTimestamp: ALformatU('Timestamp(%u, %u)', [GetTimestamp.W1,GetTimestamp.W2], fRawNodeValueStr);
@@ -13948,6 +13988,7 @@ begin
   else begin
 
     if not (nvStr in fRawNodeValueDefined) then ALJSONDocErrorU(CALJsonOperationError,GetNodeType);
+    if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(CALJsonOperationError,GetNodeType);
 
     case fNodeSubType of
       nstFloat: begin
@@ -13970,7 +14011,7 @@ begin
       nstNull:  begin
                   fRawNodeValueInt64 := 0;
                 end;
-      //nstRegEx: only the regex option is store in the int64
+      //nstRegEx: only the regex options is store in the int64
       //nstJavascript: can not be retrieve from int64
       nstInt32: begin
                   IF not ALTryStrToIntU(fRawNodeValueStr, aInt32) then ALJSONDocErrorU('%s is not a valid Int32', [fRawNodeValueStr]);
@@ -13995,6 +14036,7 @@ end;
 {**************************************************************************************************}
 procedure TALJSONTextNodeU.SetNodeValue(const Value: String; const NodeSubType: TALJSONNodeSubType);
 begin
+  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
   fNodeSubType := NodeSubType;
   fRawNodeValueStr := Value;
   fRawNodeValueDefined := [nvStr];
@@ -14003,6 +14045,7 @@ end;
 {*************************************************************************************************}
 procedure TALJSONTextNodeU.SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType);
 begin
+  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
   fNodeSubType := NodeSubType;
   fRawNodeValueInt64 := Value;
   if (NodeSubType in [nstBinary, nstRegEx]) then fRawNodeValueDefined := fRawNodeValueDefined + [nvInt64] // keep the fNodeValueStr
@@ -14012,6 +14055,7 @@ end;
 {******************************************************************************************************************************}
 procedure TALJSONTextNodeU.SetNodeValue(const StrValue: String; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType);
 begin
+  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
   fNodeSubType := NodeSubType;
   fRawNodeValueStr := StrValue;
   fRawNodeValueInt64 := Int64Value;

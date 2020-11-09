@@ -357,6 +357,10 @@ type
     fBuffontFamily: TFontName;
     fBuffontStyle: TFontStyles;
     fBuffontSize: Single;
+    fBufLineSpacing: Single;
+    fBufXRadius: Single;
+    fBufYRadius: Single;
+    fBufTextIsHTML: Boolean;
     fBufWordWrap: Boolean;
     fBufAutosize: Boolean;
     fBufTrimming: TTextTrimming;
@@ -462,10 +466,13 @@ type
     {$ELSE}
     property BufBitmap: Tbitmap read GetBufBitmap;
     {$ENDIF}
+    procedure PaddingChanged; override;
     procedure FillChanged(Sender: TObject); virtual;
     procedure StrokeChanged(Sender: TObject); virtual;
     procedure SetXRadius(const Value: Single); virtual;
     procedure SetYRadius(const Value: Single); virtual;
+    procedure SetLineSpacing(const Value: Single); virtual;
+    procedure SetTextIsHtml(const Value: Boolean); virtual;
     procedure SetCorners(const Value: TCorners); virtual;
     procedure SetSides(const Value: TSides); virtual;
     procedure SetParent(const Value: TFmxObject); override;
@@ -560,8 +567,8 @@ type
     property Sides: TSides read FSides write SetSides stored IsSidesStored;
     property XRadius: Single read FXRadius write SetXRadius;
     property YRadius: Single read FYRadius write SetYRadius;
-    property LineSpacing: single read fLineSpacing write fLineSpacing;
-    property TextIsHtml: boolean read fTextIsHtml write fTextIsHtml default false;
+    property LineSpacing: single read fLineSpacing write SetLineSpacing;
+    property TextIsHtml: boolean read fTextIsHtml write SetTextIsHtml default false;
     property TouchTargetExpansion;
   end;
 
@@ -1086,8 +1093,8 @@ begin
      (((Stroke.Kind = TBrushKind.None) or
        (sides = []))
       and
-      ((SameValue(xRadius, 0, TEpsilon.position)) or
-       (SameValue(yRadius, 0, TEpsilon.position)) or
+      ((SameValue(xRadius, 0, TEpsilon.Vector)) or
+       (SameValue(yRadius, 0, TEpsilon.Vector)) or
        (corners=[]))
       and
       (not fShadow.enabled)
@@ -1935,28 +1942,51 @@ begin
      (sametext(fBuffontFamily, fTextControl.TextSettings.Font.Family)) and
      (fBuffontStyle = fTextControl.TextSettings.Font.Style) and
      (SameValue(fBuffontSize, fTextControl.TextSettings.Font.Size, TEpsilon.FontSize)) and
+     (SameValue(fBufLineSpacing, fTextControl.LineSpacing, TEpsilon.FontSize)) and
+     (SameValue(fBufXRadius, fTextControl.XRadius, TEpsilon.Vector)) and
+     (SameValue(fBufYRadius, fTextControl.YRadius, TEpsilon.Vector)) and
+     (fBufTextIsHTML = fTextControl.TextIsHTML) and
      (fBufWordWrap = fTextControl.TextSettings.WordWrap) and
      (fBufAutosize = fTextControl.AutoSize) and
      (fBufTrimming = fTextControl.TextSettings.Trimming) and
      (
       (
-       (not fTextControl.AutoSize) and // if not autosize then the dimensions returned by this function will depend of MaxSize.X / MaxSize.Y
-       (SameValue(fBufSize.cx, MaxSize.X, TEpsilon.position)) and
-       (SameValue(fBufSize.cy, MaxSize.Y, TEpsilon.position))
+       (not fTextControl.AutoSize) and                              // if NOT autosize then the dimensions returned
+       (SameValue(fBufSize.cx, MaxSize.X, TEpsilon.position)) and   // by this function will depend of MaxSize.X / MaxSize.Y
+       (SameValue(fBufSize.cy, MaxSize.Y, TEpsilon.position))       // so if fBufSize = MaxSize do nothing
       )
       OR
       (
-       (fTextControl.AutoSize) and
+       (fTextControl.AutoSize) and                                                 // * IF autosize
        (
-        (SameValue(fBufSize.cx, MaxSize.x, TEpsilon.position)) or // if we already calculate the buf for maxsize.x
-        (SameValue(fbufBitmapRect.width, MaxSize.x, TEpsilon.position)) or // if fbufBitmapRect.width = MaxSize.x we can not do anything better ;)
-        ((not fBufTextBreaked) and
-         (CompareValue(fbufBitmapRect.width, MaxSize.x, TEpsilon.position) <= 0)) // if fbufBitmapRect.width <= MaxSize.x and text wasn't breaked we can't do anything better
+        (SameValue(fBufSize.cx, MaxSize.x, TEpsilon.position)) or                  // * if we already did the job with maxsize.x then do nothing
+        (SameValue(fbufBitmapRect.width, MaxSize.x, TEpsilon.position)) or         // * if fbufBitmapRect.width = MaxSize.x we can not do anything better ;)
+        ((fTextControl.Fill.Kind = TbrushKind.None) and                            // * if we don't draw any background =>
+         (fTextControl.stroke.Kind = TbrushKind.None) and                          //                                   =>
+         (not (fTextControl.Align in [TAlignLayout.Client,                         //                                   =>
+                                      TAlignLayout.Contents,                       //                                   => Else we must have
+                                      TAlignLayout.Top,                            //                                   => fbufBitmapRect.width = MaxSize.x
+                                      TAlignLayout.Bottom,                         //                                   =>
+                                      TAlignLayout.MostTop,                        //                                   =>
+                                      TAlignLayout.MostBottom,                     //                                   =>
+                                      TAlignLayout.VertCenter])) and               //   and if the Width is not aligned =>
+         (not fBufTextBreaked) and                                                 //   and if text wasn't breaked                                            => else if fbufBitmapRect.width > MaxSize.x
+         (CompareValue(fbufBitmapRect.width, MaxSize.x, TEpsilon.position) <= 0))  //   and if fbufBitmapRect.width <= MaxSize.x we can't do anything better  => then we must recalculate the width
        ) and
        (
-        (SameValue(fBufSize.cy, MaxSize.y, TEpsilon.position)) or // if we already calculate the buf for maxsize.y
-        ((fBufAllTextDrawed) and
-         (CompareValue(fbufBitmapRect.height, MaxSize.y, TEpsilon.position) <= 0)) // if fbufBitmapRect.height <= MaxSize.y and all text was drawed then we can't do anything better
+        (SameValue(fBufSize.cy, MaxSize.y, TEpsilon.position)) or                  // * if we already did the job with maxsize.y then do nothing
+        (SameValue(fbufBitmapRect.height, MaxSize.y, TEpsilon.position)) or        // * if fbufBitmapRect.height = MaxSize.y we can not do anything better ;)
+        ((fTextControl.Fill.Kind = TbrushKind.None) and                            // * if we don't draw any background  =>
+         (fTextControl.stroke.Kind = TbrushKind.None) and                          //                                    =>
+         (not (fTextControl.Align in [TAlignLayout.Client,                         //                                    =>
+                                      TAlignLayout.Contents,                       //                                    => Else we must have
+                                      TAlignLayout.Left,                           //                                    => fbufBitmapRect.height = MaxSize.y
+                                      TAlignLayout.Right,                          //                                    =>
+                                      TAlignLayout.MostLeft,                       //                                    =>
+                                      TAlignLayout.MostRight,                      //                                    =>
+                                      TAlignLayout.HorzCenter])) and               //   and if the Height is not aligned =>
+         (fBufAllTextDrawed) and                                                   //   and IF all text was drawed                                                 => else if fbufBitmapRect.height > MaxSize.y
+         (CompareValue(fbufBitmapRect.height, MaxSize.y, TEpsilon.position) <= 0)) //   and if fbufBitmapRect.height <= MaxSize.y then we can't do anything better => then we must recalculate the height
        )
       )
      ) and
@@ -1969,6 +1999,10 @@ begin
   fBuffontFamily := fTextControl.TextSettings.Font.Family;
   fBuffontStyle := fTextControl.TextSettings.Font.Style;
   fBuffontSize := fTextControl.TextSettings.Font.Size;
+  fBufLineSpacing := fTextControl.LineSpacing;
+  fBufXRadius := fTextControl.XRadius;
+  fBufYRadius := fTextControl.YRadius;
+  fBufTextIsHtml := fTextControl.TextIsHTML;
   fBufWordWrap := fTextControl.TextSettings.WordWrap;
   fBufAutosize := fTextControl.AutoSize;
   fBufTrimming := fTextControl.TextSettings.Trimming;
@@ -2001,13 +2035,40 @@ begin
     //aOptions.EllipsisFontStyle: TFontStyles; // default = [];
     //aOptions.EllipsisFontColor: TalphaColor; // default = TAlphaColorRec.Null;
     //-----
-    if (not fBufAutosize) and
-       ((fTextControl.Fill.Kind <> TbrushKind.None) or
-        (fTextControl.stroke.Kind <> TbrushKind.None)) then aOptions.AutoSize := false
+    if ((fTextControl.Fill.Kind <> TbrushKind.None) or            // if we don't draw any background then
+        (fTextControl.stroke.Kind <> TbrushKind.None)) then begin // always set autosize = true
+
+      if (not fBufAutosize) then aOptions.AutoSize := false // if we ask autosize = false then autosize to false
+      //-----
+      else if (fTextControl.Align in [TAlignLayout.Top,
+                                      TAlignLayout.Bottom,
+                                      TAlignLayout.MostTop,
+                                      TAlignLayout.MostBottom,
+                                      TAlignLayout.VertCenter]) then begin
+          aOptions.AutoSize := false;   // if we ask autosize = true and Width is aligned
+          aOptions.AutoSizeY := True;   // then autosize only the Y
+      end
+      //-----
+      else if (fTextControl.Align in [TAlignLayout.Left,
+                                      TAlignLayout.Right,
+                                      TAlignLayout.MostLeft,
+                                      TAlignLayout.MostRight,
+                                      TAlignLayout.HorzCenter]) then begin
+        aOptions.AutoSize := false; // if we ask autosize = true and Height is aligned
+        aOptions.AutoSizeX := True; // then autosize only the X
+      end
+      //-----
+      else if (fTextControl.Align in [TAlignLayout.Client,
+                                      TAlignLayout.Contents]) then aOptions.AutoSize := false  // if we ask autosize = true and Width & Height are aligned then don't autosize anything
+      //-----
+      else aOptions.AutoSize := True; // // if we ask autosize = true and Width & Height are not aligned then autosize to true
+
+    end
     else aOptions.AutoSize := True;
+    //-----
     aOptions.WordWrap := fBufWordWrap;
     //aOptions.MaxLines: integer; // default = 0;
-    aOptions.LineSpacing := fTextControl.LineSpacing * FScreenScale;
+    aOptions.LineSpacing := FBufLineSpacing * FScreenScale;
     aOptions.Trimming := fBufTrimming;
     //aOptions.FirstLineIndent: TpointF; // default = Tpointf.create(0,0);
     //aOptions.FailIfTextBreaked: boolean; // default = false
@@ -2019,8 +2080,8 @@ begin
     aOptions.Stroke.assign(fTextControl.Stroke);
     aOptions.Stroke.Thickness := aOptions.Stroke.Thickness * FScreenScale;
     aOptions.Sides := fTextControl.Sides;
-    aOptions.XRadius := fTextControl.XRadius * FScreenScale;
-    aOptions.YRadius := fTextControl.YRadius * FScreenScale;
+    aOptions.XRadius := fBufXRadius * FScreenScale;
+    aOptions.YRadius := fBufYRadius * FScreenScale;
     aOptions.Corners := fTextControl.Corners;
     aOptions.Padding := fTextControl.padding.Rect;
     aOptions.Padding.Top := aOptions.Padding.Top * FScreenScale;
@@ -2028,7 +2089,7 @@ begin
     aOptions.Padding.left := aOptions.Padding.left * FScreenScale;
     aOptions.Padding.bottom := aOptions.Padding.bottom * FScreenScale;
     //-----
-    aOptions.TextIsHtml := fTextControl.TextIsHtml;
+    aOptions.TextIsHtml := FBufTextIsHtml;
 
     //build fBufBitmap
     fBufBitmap := ALDrawMultiLineText(fBufText, // const aText: String; // support only basic html tag like <b>...</b>, <i>...</i>, <font color="#ffffff">...</font> and <span id="xxx">...</span>
@@ -2310,19 +2371,23 @@ begin
       //is already lower than maxwidth). problem with that is if we for exemple change the text (or font
       //dimension) of an already calculated TALText, then it's the old width (that correspond to the
       //previous text/font) that will be taken in account. finally the good way is to alway use the
-      //maxwidth if we desir a max width and don't rely on the current width
-
+      //the property maxwidth if we desir a max width and don't rely on the current width
       //if WordWrap then Layout.MaxSize := TPointF.Create(Min(Width, maxWidth), maxHeight)
       //else Layout.MaxSize := TPointF.Create(maxWidth, MaxHeight);
-      if (WordWrap) and
-         (Align in [TAlignLayout.Client,
-                    TAlignLayout.Contents,
-                    TAlignLayout.Top,
+
+      if (Align in [TAlignLayout.Top,
                     TAlignLayout.Bottom,
                     TAlignLayout.MostTop,
                     TAlignLayout.MostBottom,
                     TAlignLayout.VertCenter]) then Layout.MaxSize := TPointF.Create(Width, maxHeight)
-      else Layout.MaxSize := TPointF.Create(maxWidth, MaxHeight);
+      else if (Align in [TAlignLayout.Left,
+                         TAlignLayout.Right,
+                         TAlignLayout.MostLeft,
+                         TAlignLayout.MostRight,
+                         TAlignLayout.HorzCenter]) then Layout.MaxSize := TPointF.Create(maxWidth, Height)
+      else if (Align in [TAlignLayout.Client,
+                         TAlignLayout.Contents]) then Layout.MaxSize := TPointF.Create(Width, Height)
+      else Layout.MaxSize := TPointF.Create(maxWidth, maxHeight);
 
     end
     else Layout.MaxSize := TPointF.Create(width, height);  // << this is important because else when the component is loaded then
@@ -2334,6 +2399,13 @@ begin
     AdjustSize;
   end;
   fRestoreLayoutUpdateAfterLoaded := False;
+end;
+
+{*******************************}
+procedure TALText.PaddingChanged;
+begin
+  clearBufBitmap;
+  if FUpdating = 0 then Repaint;
 end;
 
 {*********************************************}
@@ -2406,6 +2478,25 @@ begin
   if not SameValue(FYRadius, NewValue, TEpsilon.Vector) then begin
     FYRadius := NewValue;
     Repaint;
+  end;
+end;
+{****************************************************}
+procedure TALText.SetLineSpacing(const Value: Single);
+begin
+  if not sameValue(Value,FlineSpacing,Tepsilon.FontSize) then begin
+    FlineSpacing := Value;
+    AdjustSize;
+    repaint;
+  end;
+end;
+
+{****************************************************}
+procedure TALText.SetTextIsHtml(const Value: Boolean);
+begin
+  if Value <> FTextIsHTML then begin
+    FTextIsHTML := Value;
+    AdjustSize;
+    repaint;
   end;
 end;
 
@@ -2642,19 +2733,23 @@ begin
         //is already lower than maxwidth). problem with that is if we for exemple change the text (or font
         //dimension) of an already calculated TALText, then it's the old width (that correspond to the
         //previous text/font) that will be taken in account. finally the good way is to alway use the
-        //maxwidth if we desir a max width and don't rely on the current width
+        //the property maxwidth if we desir a max width and don't rely on the current width
+        //if WordWrap then Layout.MaxSize := TPointF.Create(Min(Width, maxWidth), maxHeight)
+        //else Layout.MaxSize := TPointF.Create(maxWidth, MaxHeight);
 
-        //if WordWrap then R := TRectF.Create(0, 0, Min(Width, maxWidth), maxHeight)
-        //else R := TRectF.Create(0, 0, maxWidth, MaxHeight);
-        if (WordWrap) and
-           (Align in [TAlignLayout.Client,
-                      TAlignLayout.Contents,
-                      TAlignLayout.Top,
+        if (Align in [TAlignLayout.Top,
                       TAlignLayout.Bottom,
                       TAlignLayout.MostTop,
                       TAlignLayout.MostBottom,
                       TAlignLayout.VertCenter]) then R := TRectF.Create(0, 0, Width, maxHeight)
-        else R := TRectF.Create(0, 0, maxWidth, MaxHeight);
+        else if (Align in [TAlignLayout.Left,
+                           TAlignLayout.Right,
+                           TAlignLayout.MostLeft,
+                           TAlignLayout.MostRight,
+                           TAlignLayout.HorzCenter]) then R := TRectF.Create(0, 0, maxWidth, Height)
+        else if (Align in [TAlignLayout.Client,
+                           TAlignLayout.Contents]) then R := TRectF.Create(0, 0, Width, Height)
+        else R := TRectF.Create(0, 0, maxWidth, maxHeight);
 
         FLayout.BeginUpdate;
         try
@@ -2852,19 +2947,23 @@ begin
     //is already lower than maxwidth). problem with that is if we for exemple change the text (or font
     //dimension) of an already calculated TALText, then it's the old width (that correspond to the
     //previous text/font) that will be taken in account. finally the good way is to alway use the
-    //maxwidth if we desir a max width and don't rely on the current width
-
+    //the property maxwidth if we desir a max width and don't rely on the current width
     //if WordWrap then Layout.MaxSize := TPointF.Create(Min(Width, maxWidth), maxHeight)
     //else Layout.MaxSize := TPointF.Create(maxWidth, MaxHeight);
-    if (WordWrap) and
-       (Align in [TAlignLayout.Client,
-                  TAlignLayout.Contents,
-                  TAlignLayout.Top,
+
+    if (Align in [TAlignLayout.Top,
                   TAlignLayout.Bottom,
                   TAlignLayout.MostTop,
                   TAlignLayout.MostBottom,
                   TAlignLayout.VertCenter]) then Layout.MaxSize := TPointF.Create(Width, maxHeight)
-    else Layout.MaxSize := TPointF.Create(maxWidth, MaxHeight);
+    else if (Align in [TAlignLayout.Left,
+                       TAlignLayout.Right,
+                       TAlignLayout.MostLeft,
+                       TAlignLayout.MostRight,
+                       TAlignLayout.HorzCenter]) then Layout.MaxSize := TPointF.Create(maxWidth, Height)
+    else if (Align in [TAlignLayout.Client,
+                       TAlignLayout.Contents]) then Layout.MaxSize := TPointF.Create(Width, Height)
+    else Layout.MaxSize := TPointF.Create(maxWidth, maxHeight);
 
   end
   else Layout.MaxSize := TPointF.Create(width, height);  // << this is important because else when the component is loaded then

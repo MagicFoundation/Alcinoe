@@ -332,7 +332,7 @@ type
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 var ALCallStackCustomLogsMaxCount: integer = 50;
 procedure ALAddCallStackCustomLogU(Const aLog: String);
-function ALGetCallStackCustomLogsU(Const aAppendTimeStamp: boolean = True): String;
+function ALGetCallStackCustomLogsU(Const aPrependTimeStamp: boolean = True; Const aPrependThreadID: boolean = True): String;
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 Type TalLogType = (VERBOSE, DEBUG, INFO, WARN, ERROR, ASSERT);
@@ -491,6 +491,7 @@ type
 
   {******************************}
   _TALCallStackCustomLogU = record
+    ThreadID: TThreadID;
     TimeStamp: TDateTime;
     log: String;
   end;
@@ -1702,6 +1703,7 @@ end;
 procedure ALAddCallStackCustomLogU(Const aLog: String);
 var LCallStackCustomLogU: _TALCallStackCustomLogU;
 begin
+  LCallStackCustomLogU.ThreadID := TThread.Current.ThreadID;
   LCallStackCustomLogU.TimeStamp := Now;
   LCallStackCustomLogU.log := aLog;
   Tmonitor.enter(_ALCallStackCustomLogsU);
@@ -1716,18 +1718,30 @@ begin
   End;
 end;
 
-{*********************************************************************************}
-function ALGetCallStackCustomLogsU(Const aAppendTimeStamp: boolean = True): String;
+{**************************************************************************************************************************}
+function ALGetCallStackCustomLogsU(Const aPrependTimeStamp: boolean = True; Const aPrependThreadID: boolean = True): String;
 Var i: integer;
 begin
   Result := '';
   Tmonitor.enter(_ALCallStackCustomLogsU);
   Try
-    if aAppendTimeStamp then begin
+    if aPrependTimeStamp and aPrependThreadID then begin
+      for i := _ALCallStackCustomLogsUCurrentIndex downto 0 do
+        Result := Result + ALFormatDateTimeU('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsU) + ' [' + ALIntToStrU(_ALCallStackCustomLogsU[i].ThreadID) + ']: ' + _ALCallStackCustomLogsU[i].log + #13#10;
+      for i := _ALCallStackCustomLogsU.Count - 1 downto _ALCallStackCustomLogsUCurrentIndex + 1 do
+        Result := Result + ALFormatDateTimeU('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsU) + ' [' + ALIntToStrU(_ALCallStackCustomLogsU[i].ThreadID) + ']: ' + _ALCallStackCustomLogsU[i].log + #13#10;
+    end
+    else if aPrependTimeStamp then begin
       for i := _ALCallStackCustomLogsUCurrentIndex downto 0 do
         Result := Result + ALFormatDateTimeU('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsU) + ': ' + _ALCallStackCustomLogsU[i].log + #13#10;
       for i := _ALCallStackCustomLogsU.Count - 1 downto _ALCallStackCustomLogsUCurrentIndex + 1 do
         Result := Result + ALFormatDateTimeU('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsU) + ': ' + _ALCallStackCustomLogsU[i].log + #13#10;
+    end
+    else if aPrependThreadID then begin
+      for i := _ALCallStackCustomLogsUCurrentIndex downto 0 do
+        Result := Result + '[' + ALIntToStrU(_ALCallStackCustomLogsU[i].ThreadID) + ']: ' + _ALCallStackCustomLogsU[i].log + #13#10;
+      for i := _ALCallStackCustomLogsU.Count - 1 downto _ALCallStackCustomLogsUCurrentIndex + 1 do
+        Result := Result + '[' + ALIntToStrU(_ALCallStackCustomLogsU[i].ThreadID) + ']: ' + _ALCallStackCustomLogsU[i].log + #13#10;
     end
     else begin
       for i := _ALCallStackCustomLogsUCurrentIndex downto 0 do

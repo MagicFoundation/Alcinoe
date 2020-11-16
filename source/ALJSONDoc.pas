@@ -1837,6 +1837,7 @@ end;
 destructor TALJSONDocument.Destroy;
 begin
   if fFormatSettings <> @ALDefaultFormatSettings then dispose(fFormatSettings);
+  Options := Options - [doImmutable];
   ReleaseDoc;
   inherited;
 end;
@@ -8695,6 +8696,7 @@ end;
 destructor TALJSONDocumentU.Destroy;
 begin
   if fFormatSettings <> @ALDefaultFormatSettingsU then dispose(fFormatSettings);
+  Options := Options - [doImmutable];
   ReleaseDoc;
   inherited;
 end;

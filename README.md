@@ -1,3 +1,47 @@
+Delphi Warrior
+==============
+
+<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/embarcadero_mvp.png?raw=true" alt="MVP Delphi"  />
+
+Increase velocity and reduce technical debt through quality code review 
+by 2 seniors <a href="https://www.embarcadero.com/embarcadero-mvp-program">MVP</a> delphi experts for 
+less than 250 EUR/months.
+
+* We review within your tools to catch security threats, stop crashes, and fix performance issues before they reach production.
+* Get insight into coding best practices from top-tier delphi engineers. Share knowledge and collaborate effectively with your colleagues.
+* We work where you do (GitHub, GitLab, Bitbucket, etc.), no distraction or change of process required.
+* Onboard world-class delphi engineers in you team for less than 250 EUR/months.
+
+contact us now: <a href="mailto:contact@delphiwarrior.com">contact@delphiwarrior.com</a>
+
+
+Stéphane Vander Clock
+---------------------
+
+With more than 25 years of experience in the development of software applications 
+(Delphi engineering), member of the Embarcadero <a href="https://www.embarcadero.com/embarcadero-mvp-program">MVP program</a> 
+(Most Valuable Professionals) I excel in every stage of the life cycle of software development, 
+including design creation, coding, debugging, testing, and maintenance. I am able to perform the 
+following tasks:
+
+* Analysis and conception
+* Technical specifications 
+* Costs estimation
+* Development and Test
+* Documentation
+* Deployment
+
+Projects I was involved in let me work as a developer, analyst, architect and project manager 
+in various sectors such as retail, robotics, management, real estate, finance and even 
+online dating.
+
+
+Robin Valtot
+------------
+
+I work as a software developer in banking IT, recognized Most Valuable Professional and certified Professional Scrum Master I.
+
+
 Alcinoe
 =======
 

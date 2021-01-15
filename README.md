@@ -41,8 +41,8 @@ Robin Valtot
 
 I work as a software developer in banking IT, recognized Most Valuable Professional and certified Professional Scrum Master I.
 
-<p></p>
-<p></p>
+<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/empty.png?raw=true" alt="" width="50" style="width:50px;"  />
+  
 
 Alcinoe
 =======

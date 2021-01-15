@@ -1,8 +1,8 @@
 Delphi Warrior
 ==============
 
-Increase velocity and reduce technical debt through quality code review 
-by 2 seniors <a href="https://www.embarcadero.com/embarcadero-mvp-program">MVP</a> delphi experts for 
+Increase velocity and reduce technical debt through <b>quality code review 
+by 2 seniors <a href="https://www.embarcadero.com/embarcadero-mvp-program">MVP</a> delphi experts</b> for 
 less than 250 EUR/months.
 
 * We review within your tools to catch security threats, stop crashes, and fix performance issues before they reach production.
@@ -39,7 +39,19 @@ online dating.
 Robin Valtot
 ------------
 
-I work as a software developer in banking IT, recognized Most Valuable Professional and certified Professional Scrum Master I.
+I have acquired a solid experience in Enterprise Resource Planning (ERP) development. 
+My priority, have a clean code that implement new development "standards" and responding 
+to technical tests. I am able to perform the following tasks:
+
+* Analysis and conception
+* Technical specifications
+* Costs estimation
+* Development and Test
+* Documentation
+* Deployment
+
+Projects I was involved in let me work as a developer, analyst, architect and in 
+research and development team.
 
 <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/empty.png?raw=true" alt="" width="0" style="width:0px;"  />
   

@@ -1,8 +1,6 @@
 Delphi Warrior
 ==============
 
-<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/embarcadero_mvp.png?raw=true" alt="MVP Delphi"  />
-
 Increase velocity and reduce technical debt through quality code review 
 by 2 seniors <a href="https://www.embarcadero.com/embarcadero-mvp-program">MVP</a> delphi experts for 
 less than 250 EUR/months.
@@ -13,6 +11,8 @@ less than 250 EUR/months.
 * Onboard world-class delphi engineers in you team for less than 250 EUR/months.
 
 contact us now: <a href="mailto:contact@delphiwarrior.com">contact@delphiwarrior.com</a>
+
+<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/embarcadero_mvp.png?raw=true" alt="MVP Delphi" width="100" style="width:100px;"  />
 
 
 Stéphane Vander Clock
@@ -42,6 +42,8 @@ Robin Valtot
 I work as a software developer in banking IT, recognized Most Valuable Professional and certified Professional Scrum Master I.
 
 
+<p></p>
+<p></p>
 Alcinoe
 =======
 
@@ -207,7 +209,7 @@ top of the form (so off course no z-order with FireMonkey control)
 
 
 Fast/double-buffered FireMonkey controls with native draw
---------------------------------------------------------
+---------------------------------------------------------
 
 * Rectangle
 * Circle
@@ -274,7 +276,7 @@ a high speed without being dependent of the form.quality
 
 
 Improved FireMonkey controls
------------------------------
+----------------------------
 
 * ScrollBox
 * TabControl
@@ -293,7 +295,7 @@ Improved FireMonkey controls
 
 
 Firebase cloud messaging
--------------------------
+------------------------
 
 A cross-platform method of using Firebase Cloud Messaging (FCM) to receive push notifications
 Using FCM, you can notify a client app that new email or other data is available to sync. 

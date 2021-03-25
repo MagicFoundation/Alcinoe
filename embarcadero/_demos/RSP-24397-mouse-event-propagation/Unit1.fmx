@@ -1,0 +1,100 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 500
+  ClientWidth = 311
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object Rectangle1: TRectangle
+    Align = Bottom
+    Position.Y = 260.000000000000000000
+    Size.Width = 311.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    object Text1: TText
+      Align = Client
+      Size.Width = 150.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'ChildrenMouseMove'
+    end
+    object Text2: TText
+      Align = Right
+      Position.X = 150.000000000000000000
+      Size.Width = 161.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'CMGesture'
+    end
+  end
+  object Rectangle2: TRectangle
+    Align = Bottom
+    Position.Y = 340.000000000000000000
+    Size.Width = 311.000000000000000000
+    Size.Height = 160.000000000000000000
+    Size.PlatformDefault = False
+    object Memo3: TMemo
+      Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+      DataDetectorTypes = []
+      Align = Right
+      Position.X = 150.000000000000000000
+      Size.Width = 161.000000000000000000
+      Size.Height = 160.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Viewport.Width = 157.000000000000000000
+      Viewport.Height = 156.000000000000000000
+    end
+    object Memo4: TMemo
+      Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+      DataDetectorTypes = []
+      Align = Client
+      Size.Width = 150.000000000000000000
+      Size.Height = 160.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Viewport.Width = 146.000000000000000000
+      Viewport.Height = 156.000000000000000000
+    end
+  end
+  object Rectangle3: TRectangle
+    Align = Bottom
+    Position.Y = 300.000000000000000000
+    Size.Width = 311.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    object Text3: TText
+      Align = Client
+      Size.Width = 150.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      Text = '0'
+    end
+    object Text4: TText
+      Align = Right
+      Position.X = 150.000000000000000000
+      Size.Width = 161.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      Text = '0'
+    end
+  end
+  object Text5: TText
+    Align = Bottom
+    Position.Y = 120.000000000000000000
+    Size.Width = 311.000000000000000000
+    Size.Height = 140.000000000000000000
+    Size.PlatformDefault = False
+    Text = 
+      'On Android move your finger on the Yellow and see that their is ' +
+      'more events on ChildrenMouseMove than on CMGesture. Positions lo' +
+      'gged are also not the same (onChildrenMouseMove more acurate). T' +
+      'ry also to just put your finger on the yellow and don'#39't mouve it' +
+      '. conclusion: childrenMouseMove is more acurate than CMGesture. ' +
+      'This difference is very important to make fluid scrolling '
+  end
+end

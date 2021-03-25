@@ -1,0 +1,59 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 480
+  ClientWidth = 334
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnVirtualKeyboardShown = FormVirtualKeyboardShown
+  OnVirtualKeyboardHidden = FormVirtualKeyboardHidden
+  DesignerMasterStyle = 0
+  object Edit1: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    Align = Top
+    TabOrder = 0
+    ControlType = Platform
+    Position.X = 10.000000000000000000
+    Position.Y = 168.000000000000000000
+    Margins.Left = 10.000000000000000000
+    Margins.Top = 10.000000000000000000
+    Margins.Right = 10.000000000000000000
+    Margins.Bottom = 10.000000000000000000
+    Size.Width = 314.000000000000000000
+    Size.Height = 41.000000000000000000
+    Size.PlatformDefault = False
+  end
+  object Text1: TText
+    Align = Top
+    Margins.Left = 5.000000000000000000
+    Margins.Top = 5.000000000000000000
+    Margins.Right = 5.000000000000000000
+    Margins.Bottom = 5.000000000000000000
+    Position.X = 5.000000000000000000
+    Position.Y = 5.000000000000000000
+    Size.Width = 324.000000000000000000
+    Size.Height = 148.000000000000000000
+    Size.PlatformDefault = False
+    Text = 
+      'Click inside the TEdit below, wait the keyboard (event FormVirtu' +
+      'alKeyboardShown will raise) then click on the "return key" in th' +
+      'e keyboard (the key in bottom left), the keyboard will close but' +
+      ' see that no FormVirtualKeyboardHidden was raised. Rename _FMX.V' +
+      'irtualKeyboard.Android.pas in FMX.VirtualKeyboard.Android.pas an' +
+      'd compile again to see a fix'
+  end
+  object Text2: TText
+    Align = Client
+    AutoSize = True
+    Margins.Left = 5.000000000000000000
+    Margins.Top = 5.000000000000000000
+    Margins.Right = 5.000000000000000000
+    Margins.Bottom = 5.000000000000000000
+    Size.Width = 324.000000000000000000
+    Size.Height = 251.000000000000000000
+    Size.PlatformDefault = False
+    TextSettings.VertAlign = Leading
+  end
+end

@@ -59,7 +59,7 @@ Install Alcinoe
 ---------------
 
 If you don't plan to use any Alcinoe visual components at design time, then
-you don't need to install anything, just add {alcinoe_rootdir}\source\ in the 
+you don't need to install anything, just add <a href="https://github.com/Zeus64/alcinoe/tree/master/source">{alcinoe_rootdir}\source</a> in the 
 search path of your project. 
 
 If you plan to use visual components at design time then you need to

@@ -1,15 +1,15 @@
-{*****************************************************
-Description:  TALFTPClient is a ancestor base class of
-              TALWinInetFTPClient
-******************************************************}
+{*******************************************************************************
+TALFTPClient is a ancestor base class of TALWinInetFTPClient
+*******************************************************************************}
 
 unit ALFTPClient;
 
 interface
 
-uses Winapi.Windows,
-     System.SysUtils,
-     System.Classes;
+uses
+  Winapi.Windows,
+  System.SysUtils,
+  System.Classes;
 
 type
 
@@ -133,7 +133,8 @@ ResourceString
 
 implementation
 
-uses ALCommon;
+uses
+  ALCommon;
 
 {******************************}
 constructor TALFTPClient.Create;

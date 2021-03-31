@@ -2,10 +2,11 @@ unit ALIosFacebookApi;
 
 interface
 
-uses Macapi.ObjectiveC,
-     iOSapi.Foundation,
-     iOSapi.CocoaTypes,
-     iOSapi.UIKit;
+uses
+  Macapi.ObjectiveC,
+  iOSapi.Foundation,
+  iOSapi.CocoaTypes,
+  iOSapi.UIKit;
 
 {$M+}
 

@@ -710,14 +710,14 @@ uses system.sysutils,
 {****************************************************************}
 constructor TALImageMagickLibrary.Create(aImageMagickHome: String;
                                          const aThreadLimit: integer = -1);
-Var aPath: String;
+Var LPath: String;
 begin
 
   // http://www.imagemagick.org/script/resources.php
   aImageMagickHome := ExcludeTrailingPathDelimiter(aImageMagickHome);
-  aPath := getEnvironmentVariable('PATH');
-  if ((pos(aImageMagickHome, aPath) <= 0) and
-      (not setEnvironmentVariable(PChar('PATH'), pChar(aPath + ';' + aImageMagickHome)))) or
+  LPath := getEnvironmentVariable('PATH');
+  if ((pos(aImageMagickHome, LPath) <= 0) and
+      (not setEnvironmentVariable(PChar('PATH'), pChar(LPath + ';' + aImageMagickHome)))) or
      (not setEnvironmentVariable(PChar('MAGICK_HOME'), pChar(aImageMagickHome))) or
      (not setEnvironmentVariable(PChar('MAGICK_CONFIGURE_PATH'), pChar(aImageMagickHome))) or
      (not setEnvironmentVariable(PChar('MAGICK_CODER_FILTER_PATH'), pChar(aImageMagickHome + '\modules\filters'))) or
@@ -818,38 +818,38 @@ end;
 
 {**********************************************************}
 procedure RaiseLastMagickWandError(const wand: PMagickWand);
-var aPAnsiChar: PansiChar;
-    aDescription: ansiString;
-    aSeverity: ExceptionType;
+var LPAnsiChar: PansiChar;
+    LDescription: ansiString;
+    LSeverity: ExceptionType;
 begin
-  aPAnsiChar := ALImageMagickLib.MagickGetException(wand, @aSeverity);
-  aDescription := aPAnsiChar;
-  ALImageMagickLib.MagickRelinquishMemory(aPAnsiChar);
-  raise Exception.create(string(aDescription));
+  LPAnsiChar := ALImageMagickLib.MagickGetException(wand, @LSeverity);
+  LDescription := LPAnsiChar;
+  ALImageMagickLib.MagickRelinquishMemory(LPAnsiChar);
+  raise Exception.create(string(LDescription));
 end;
 
 {********************************************************}
 procedure RaiseLastPixelWandError(const wand: PPixelWand);
-var aPAnsiChar: PansiChar;
-    aDescription: ansiString;
-    aSeverity: ExceptionType;
+var LPAnsiChar: PansiChar;
+    LDescription: ansiString;
+    LSeverity: ExceptionType;
 begin
-  aPAnsiChar := ALImageMagickLib.PixelGetException(wand, @aSeverity);
-  aDescription := aPAnsiChar;
-  ALImageMagickLib.MagickRelinquishMemory(aPAnsiChar);
-  raise Exception.create(string(aDescription));
+  LPAnsiChar := ALImageMagickLib.PixelGetException(wand, @LSeverity);
+  LDescription := LPAnsiChar;
+  ALImageMagickLib.MagickRelinquishMemory(LPAnsiChar);
+  raise Exception.create(string(LDescription));
 end;
 
 {************************************************************}
 procedure RaiseLastDrawingWandError(const wand: PDrawingWand);
-var aPAnsiChar: PansiChar;
-    aDescription: ansiString;
-    aSeverity: ExceptionType;
+var LPAnsiChar: PansiChar;
+    LDescription: ansiString;
+    LSeverity: ExceptionType;
 begin
-  aPAnsiChar := ALImageMagickLib.DrawGetException(wand, @aSeverity);
-  aDescription := aPAnsiChar;
-  ALImageMagickLib.MagickRelinquishMemory(aPAnsiChar);
-  raise Exception.create(string(aDescription));
+  LPAnsiChar := ALImageMagickLib.DrawGetException(wand, @LSeverity);
+  LDescription := LPAnsiChar;
+  ALImageMagickLib.MagickRelinquishMemory(LPAnsiChar);
+  raise Exception.create(string(LDescription));
 end;
 
 {******************************************************************}

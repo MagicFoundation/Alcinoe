@@ -2,10 +2,11 @@ unit ALAndroidShortcutBadgerApi;
 
 interface
 
-uses Androidapi.JNI.GraphicsContentViewText,
-     Androidapi.JNIBridge,
-     Androidapi.JNI.JavaTypes,
-     Androidapi.JNI.App;
+uses
+  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNIBridge,
+  Androidapi.JNI.JavaTypes,
+  Androidapi.JNI.App;
 
 type
 

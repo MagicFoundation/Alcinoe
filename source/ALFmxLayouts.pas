@@ -1,6 +1,6 @@
 unit ALFmxLayouts;
 
-{$IF CompilerVersion > 33} // rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.Layouts.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -8,15 +8,16 @@ interface
 
 {$SCOPEDENUMS ON}
 
-uses System.Classes,
-     System.Types,
-     System.UITypes,
-     System.Messaging,
-     FMX.layouts,
-     FMX.Types,
-     FMX.Controls,
-     ALFmxStdCtrls,
-     ALFmxInertialMovement;
+uses
+  System.Classes,
+  System.Types,
+  System.UITypes,
+  System.Messaging,
+  FMX.layouts,
+  FMX.Types,
+  FMX.Controls,
+  ALFmxStdCtrls,
+  ALFmxInertialMovement;
 
 type
 
@@ -191,6 +192,7 @@ type
     property Enabled;
     property EnableDragHighlight;
     property Height;
+    property Hint;
     property HitTest;
     property Locked;
     property Margins;
@@ -208,6 +210,8 @@ type
     property TouchTargetExpansion;
     property Visible;
     property Width;
+    property ParentShowHint;
+    property ShowHint;
     { Events }
     property OnPainting;
     property OnPaint;
@@ -260,6 +264,7 @@ type
     property Enabled;
     property EnableDragHighlight;
     property Height;
+    property Hint;
     property HitTest;
     property Locked;
     property Margins;
@@ -277,6 +282,8 @@ type
     property TouchTargetExpansion;
     property Visible;
     property Width;
+    property ParentShowHint;
+    property ShowHint;
     { Events }
     property OnPainting;
     property OnPaint;
@@ -329,6 +336,7 @@ type
     property Enabled;
     property EnableDragHighlight;
     property Height;
+    property Hint;
     property HitTest;
     property Locked;
     property Margins;
@@ -346,6 +354,8 @@ type
     property TouchTargetExpansion;
     property Visible;
     property Width;
+    property ParentShowHint;
+    property ShowHint;
     { Events }
     property OnPainting;
     property OnPaint;
@@ -379,19 +389,20 @@ procedure Register;
 
 implementation
 
-uses System.SysUtils,
-     System.Math,
-     System.Math.Vectors,
-     {$IFDEF ALDPK}
-     DesignIntf,
-     {$ENDIF}
-     FMX.Platform,
-     FMX.Consts,
-     FMX.Effects,
-     FMX.utils,
-     FMX.Ani,
-     AlFmxCommon,
-     ALCommon;
+uses
+  System.SysUtils,
+  System.Math,
+  System.Math.Vectors,
+  {$IFDEF ALDPK}
+  DesignIntf,
+  {$ENDIF}
+  FMX.Platform,
+  FMX.Consts,
+  FMX.Effects,
+  FMX.utils,
+  FMX.Ani,
+  AlFmxCommon,
+  ALCommon;
 
 {*******************************************************************************************************}
 // http://stackoverflow.com/questions/39317984/does-the-delphi-firemonkey-dorealign-implemented-correctly
@@ -400,11 +411,11 @@ uses System.SysUtils,
 // resize their parentcontrols to the same size as them. But in this way the problem is that if
 // we resize the parentcontrol during it's dorealign process then it will not call again dorealign
 procedure TALLayout.DoRealign;
-var aOriginalSize: TpointF;
+var LOriginalSize: TpointF;
 begin
-  aOriginalSize := Size.Size;
+  LOriginalSize := Size.Size;
   inherited;
-  if not aOriginalSize.EqualsTo(Size.Size) then DoRealign;
+  if not LOriginalSize.EqualsTo(Size.Size) then DoRealign;
 end;
 
 {*********************************************************}
@@ -446,7 +457,7 @@ procedure TALScrollBoxAniCalculations.DoChanged;
                              Y - FScrollBox.fAnchoredContentOffset.Y); // FScrollBox.fAnchoredContentOffset.Y is already pixel aligned and if present then y = 0 so return -FScrollBox.fAnchoredContentOffset.Y
   end;
 
-var aNewViewportPosition: TPointF;
+var LNewViewportPosition: TPointF;
 
 begin
   if (not (csDestroying in FScrollBox.ComponentState)) then begin
@@ -475,11 +486,11 @@ begin
     end;
 
     //fire the OnViewportPositionChange
-    aNewViewportPosition := TpointF.Create(ViewportPosition.X, ViewportPosition.Y);
+    LNewViewportPosition := TpointF.Create(ViewportPosition.X, ViewportPosition.Y);
     if (assigned(FScrollBox.FOnViewportPositionChange)) and
-       (not fLastViewportPosition.EqualsTo(aNewViewportPosition, TEpsilon.Position)) then
-      FScrollBox.FOnViewportPositionChange(self, fLastViewportPosition, aNewViewportPosition);
-    fLastViewportPosition := aNewViewportPosition;
+       (not fLastViewportPosition.EqualsTo(LNewViewportPosition, TEpsilon.Position)) then
+      FScrollBox.FOnViewportPositionChange(self, fLastViewportPosition, LNewViewportPosition);
+    fLastViewportPosition := LNewViewportPosition;
 
   end;
   inherited DoChanged;
@@ -545,16 +556,16 @@ end;
 
 {********************************************************}
 constructor TALCustomScrollBox.Create(AOwner: TComponent);
-var aDeviceService: IFMXDeviceService;
-    aScreenSrv: IFMXScreenService;
+var LDeviceService: IFMXDeviceService;
+    LScreenSrv: IFMXScreenService;
 begin
   inherited Create(AOwner);
-  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, aScreenSrv) then FScreenScale := aScreenSrv.GetScreenScale
+  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, LScreenSrv) then FScreenScale := LScreenSrv.GetScreenScale
   else FScreenScale := 1;
   ClipChildren := True;
   SetAcceptsControls(True);
   AutoCapture := True;
-  if SupportsPlatformService(IFMXDeviceService, aDeviceService) then FHasTouchScreen := TDeviceFeature.HasTouchScreen in aDeviceService.GetFeatures
+  if SupportsPlatformService(IFMXDeviceService, LDeviceService) then FHasTouchScreen := TDeviceFeature.HasTouchScreen in LDeviceService.GetFeatures
   else FHasTouchScreen := False;
   Touch.DefaultInteractiveGestures := Touch.DefaultInteractiveGestures + [TInteractiveGesture.Pan];
   Touch.InteractiveGestures := Touch.InteractiveGestures + [TInteractiveGesture.Pan];
@@ -678,49 +689,50 @@ procedure TALCustomScrollBox.DoRealign;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _UpdateAnimationTargets(const aContentRect: TRectF);
-  var aNewTargets: array of TALAniCalculations.TTarget;
+  var LNewTargets: array of TALAniCalculations.TTarget;
   begin
-    SetLength(aNewTargets, 2);
-    aNewTargets[0].TargetType := TALAniCalculations.TTargetType.Min;
-    aNewTargets[0].Point := TALPointD.Create(0,0);
-    aNewTargets[1].TargetType := TALAniCalculations.TTargetType.Max;
+    SetLength(LNewTargets, 2);
+    LNewTargets[0].TargetType := TALAniCalculations.TTargetType.Min;
+    LNewTargets[0].Point := TALPointD.Create(0,0);
+    LNewTargets[1].TargetType := TALAniCalculations.TTargetType.Max;
     if (fHScrollBar <> nil) and
-       (fVScrollBar <> nil) then aNewTargets[1].Point := TALPointD.Create(aContentRect.Width - width, aContentRect.Height - height)
-    else if (fVScrollBar <> nil) then aNewTargets[1].Point := TALPointD.Create(0, aContentRect.Height - height)
-    else if (fHScrollBar <> nil) then aNewTargets[1].Point := TALPointD.Create(aContentRect.Width - width, 0)
-    else aNewTargets[1].Point := TALPointD.Create(0, 0);
-    AniCalculations.SetTargets(aNewTargets);
+       (fVScrollBar <> nil) then LNewTargets[1].Point := TALPointD.Create(aContentRect.Width - width, aContentRect.Height - height)
+    else if (fVScrollBar <> nil) then LNewTargets[1].Point := TALPointD.Create(0, aContentRect.Height - height)
+    else if (fHScrollBar <> nil) then LNewTargets[1].Point := TALPointD.Create(aContentRect.Width - width, 0)
+    else LNewTargets[1].Point := TALPointD.Create(0, 0);
+    AniCalculations.SetTargets(LNewTargets);
   end;
 
-var aContentRect: TrectF;
-    aDoRealignAgain: boolean;
+var LContentRect: TrectF;
+    LDoRealignAgain: boolean;
+
 begin
 
   if fDisableAlign then exit;
   fDisableAlign := True;
   try
 
-    aDoRealignAgain := False;
+    LDoRealignAgain := False;
     if (FContent <> nil) then begin
-      aContentRect := CalcContentBounds;
-      Content.SetBounds(aContentRect.Left + fAnchoredContentOffset.x,
-                        aContentRect.Top + fAnchoredContentOffset.y,
-                        aContentRect.Width,
-                        aContentRect.Height);
-      if aContentRect.EqualsTo(CalcContentBounds, Tepsilon.Position) then  begin
-        _UpdateVScrollBar(aContentRect);
-        _UpdateHScrollBar(aContentRect);
-        _UpdateAnimationTargets(aContentRect);
+      LContentRect := CalcContentBounds;
+      Content.SetBounds(LContentRect.Left + fAnchoredContentOffset.x,
+                        LContentRect.Top + fAnchoredContentOffset.y,
+                        LContentRect.Width,
+                        LContentRect.Height);
+      if LContentRect.EqualsTo(CalcContentBounds, Tepsilon.Position) then  begin
+        _UpdateVScrollBar(LContentRect);
+        _UpdateHScrollBar(LContentRect);
+        _UpdateAnimationTargets(LContentRect);
         fAniCalculations.DoChanged;
       end
-      else aDoRealignAgain := True;
+      else LDoRealignAgain := True;
     end;
 
   finally
     fDisableAlign := false;
   end;
 
-  if aDoRealignAgain then DoRealign;
+  if LDoRealignAgain then DoRealign;
 
 end;
 

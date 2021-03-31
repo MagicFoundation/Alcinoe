@@ -1,29 +1,20 @@
-{*************************************************************
-product:      Alcinoe ISAPI Http WebRequest and WebResponse Objects
-Description:  Inherited TWebRequest and TWebResponse for better handling
-              of ISAPI Request
-**************************************************************}
-
 unit ALIsapiHTTP;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
-{$IF CompilerVersion > 33} // rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if Web.Win.IsapiHTTP / Web.HTTPApp was not updated and adjust the IFDEF'}
 {$IFEND}
 
-uses System.SysUtils,
-     System.Classes,
-     System.Types,
-     Winapi.Isapi2,
-     ALMultiPartParser,
-     ALHttpClient,
-     ALStringList,
-     ALString;
+uses
+  System.SysUtils,
+  System.Classes,
+  System.Types,
+  Winapi.Isapi2,
+  ALMultiPartParser,
+  ALHttpClient,
+  ALStringList,
+  ALString;
 
 type
 
@@ -272,11 +263,12 @@ const
 
 implementation
 
-uses Winapi.Windows,
-     System.DateUtils,
-     System.Ansistrings,
-     System.math,
-     ALCommon;
+uses
+  Winapi.Windows,
+  System.DateUtils,
+  System.Ansistrings,
+  System.math,
+  ALCommon;
 
 const
   ALWebRequestServerVariables: array[0..28] of AnsiString = (
@@ -361,19 +353,19 @@ end;
 
 {**************************************************************************************************************}
 procedure TALWebRequest.ExtractMultipartFormDataFields(Fields: TALStrings; Files: TALMultiPartFormDataContents);
-var aBoundary: AnsiString;
-    aMultipartFormDataDecoder: TALMultipartFormDataDecoder;
+var LBoundary: AnsiString;
+    LMultipartFormDataDecoder: TALMultipartFormDataDecoder;
 begin
-  aBoundary := ALMultipartExtractBoundaryFromContentType(ContentType);
-  If aBoundary='' then raise Exception.Create('Bad multipart/form-data Content-Type');
-  aMultipartFormDataDecoder := TALMultipartFormDataDecoder.Create;
+  LBoundary := ALMultipartExtractBoundaryFromContentType(ContentType);
+  If LBoundary='' then raise Exception.Create('Bad multipart/form-data Content-Type');
+  LMultipartFormDataDecoder := TALMultipartFormDataDecoder.Create;
   Try
-    aMultipartFormDataDecoder.Decode(Content,
-                                     aBoundary,
+    LMultipartFormDataDecoder.Decode(Content,
+                                     LBoundary,
                                      Fields,
                                      Files);
   Finally
-    AlFreeAndNil(aMultipartFormDataDecoder);
+    AlFreeAndNil(LMultipartFormDataDecoder);
   End;
 end;
 
@@ -385,25 +377,25 @@ end;
 
 {**************************************************}
 function TALWebRequest.GetMethodType: TALHTTPMethod;
-var aMethodStr : AnsiString;
+var LMethodStr : AnsiString;
 begin
-  aMethodStr := Method;
-       if ALSameText(aMethodStr, 'GET')     then result := HTTPmt_Get
-  else if ALSameText(aMethodStr, 'POST')    then result := HTTPmt_Post
-  else if ALSameText(aMethodStr, 'PUT')     then result := HTTPmt_Put
-  else if ALSameText(aMethodStr, 'HEAD')    then result := HTTPmt_Head
-  else if ALSameText(aMethodStr, 'TRACE')   then result := HTTPmt_Trace
-  else if ALSameText(aMethodStr, 'DELETE')  then result := HTTPmt_Delete
-  else if ALSameText(aMethodStr, 'OPTIONS') then result := HTTPmt_Options
+  LMethodStr := Method;
+       if ALSameText(LMethodStr, 'GET')     then result := HTTPmt_Get
+  else if ALSameText(LMethodStr, 'POST')    then result := HTTPmt_Post
+  else if ALSameText(LMethodStr, 'PUT')     then result := HTTPmt_Put
+  else if ALSameText(LMethodStr, 'HEAD')    then result := HTTPmt_Head
+  else if ALSameText(LMethodStr, 'TRACE')   then result := HTTPmt_Trace
+  else if ALSameText(LMethodStr, 'DELETE')  then result := HTTPmt_Delete
+  else if ALSameText(LMethodStr, 'OPTIONS') then result := HTTPmt_Options
   else raise Exception.Create('Unknown method type');
 end;
 
 {***************************************************}
 function TALWebRequest.GetBytesRange: TInt64DynArray;
-var aRangeHeader: ansiString;
-    aList: TalStringList;
-    aStr: ansiString;
-    i: integer;
+var LRangeHeader: ansiString;
+    LList: TalStringList;
+    LStr: ansiString;
+    I: integer;
 begin
 
   //
@@ -414,43 +406,43 @@ begin
   setlength(Result, 0);
 
   //get aRangeHeader
-  aRangeHeader := GetFieldByName('Range');
-  if aRangeHeader = '' then Exit;
+  LRangeHeader := GetFieldByName('Range');
+  if LRangeHeader = '' then Exit;
 
   //check that unit is bytes
   //Range: bytes=200-1000, 2000-6576, 19000-
-  i := ALPos('=', aRangeHeader); // bytes=200-1000, 2000-6576, 19000-
-  if i <= 0 then exit;
-  if not ALSameText(alTrim(alcopyStr(aRangeHeader,1,i-1)), 'bytes') then exit;  // bytes
-  aRangeHeader := alcopyStr(aRangeHeader, i+1, maxint); // 200-1000, 2000-6576, 19000-
+  I := ALPos('=', LRangeHeader); // bytes=200-1000, 2000-6576, 19000-
+  if I <= 0 then exit;
+  if not ALSameText(alTrim(alcopyStr(LRangeHeader,1,I-1)), 'bytes') then exit;  // bytes
+  LRangeHeader := alcopyStr(LRangeHeader, I+1, maxint); // 200-1000, 2000-6576, 19000-
 
   //move all ranges in result
   //200-1000, 2000-6576, 19000- => [200,1000,2000,6576,19000,-1]
   //200-1000, 2000-6576, -19000 => [200,1000,2000,6576,-1,19000]
-  aList := TalStringList.Create;
+  LList := TalStringList.Create;
   try
-    aList.LineBreak := ',';
-    aList.NameValueSeparator := '-';
-    aList.Text := aRangeHeader;
-    setlength(result, aList.Count * 2);
-    for I := 0 to aList.Count - 1 do begin
+    LList.LineBreak := ',';
+    LList.NameValueSeparator := '-';
+    LList.Text := LRangeHeader;
+    setlength(result, LList.Count * 2);
+    for I := 0 to LList.Count - 1 do begin
 
-      aStr := alTrim(aList.Names[i]);
-      if aStr = '' then result[i*2] := -1
-      else if not alTryStrToint64(aStr, result[i*2]) then raise Exception.Create('Bad range header');
+      LStr := alTrim(LList.Names[I]);
+      if LStr = '' then result[I*2] := -1
+      else if not alTryStrToint64(LStr, result[I*2]) then raise Exception.Create('Bad range header');
       //----
-      aStr := alTrim(aList.ValueFromIndex[i]);
-      if aStr = '' then result[(i*2)+1] := -1
-      else if not alTryStrToint64(aStr, result[(i*2)+1]) then raise Exception.Create('Bad range header');
+      LStr := alTrim(LList.ValueFromIndex[I]);
+      if LStr = '' then result[(I*2)+1] := -1
+      else if not alTryStrToint64(LStr, result[(I*2)+1]) then raise Exception.Create('Bad range header');
       //----
-      if ((result[i*2] = -1) and
-          (result[(i*2)+1] = -1)) or
-         ((result[(i*2)+1] <> -1) and
-          (result[(i*2)+1] < result[i*2])) then raise Exception.Create('Bad range header');
+      if ((result[I*2] = -1) and
+          (result[(I*2)+1] = -1)) or
+         ((result[(I*2)+1] <> -1) and
+          (result[(I*2)+1] < result[I*2])) then raise Exception.Create('Bad range header');
 
     end;
   finally
-    aList.Free;
+    LList.Free;
   end;
 
 end;
@@ -537,8 +529,8 @@ end;
 
 {*******************************************************************}
 procedure TALISAPIRequest.ReadClientToStream(const aStream: TStream);
-var aByteRead: Integer;
-    aBuffer: array[0..8191] of Byte;
+var LByteRead: Integer;
+    LBuffer: array[0..8191] of Byte;
 begin
 
   If (FMaxContentSize > -1) and (ECB.cbTotalBytes > DWord(FMaxContentSize)) then begin
@@ -556,22 +548,22 @@ begin
                                                                                   // the rest of the data (beginning from an offset of cbAvailable).
   if aStream is TALStringStream then begin
     while aStream.Position < aStream.Size do begin
-      aByteRead := ReadClient(Pbyte(TALStringStream(aStream).DataString)[aStream.Position], aStream.Size - aStream.Position);
-      if aByteRead <= 0 then break;  // The doc of Delphi say "If no more content is available, ReadClient returns -1."
+      LByteRead := ReadClient(Pbyte(TALStringStream(aStream).DataString)[aStream.Position], aStream.Size - aStream.Position);
+      if LByteRead <= 0 then break;  // The doc of Delphi say "If no more content is available, ReadClient returns -1."
                                      // but it's false !!
                                      // http://msdn.microsoft.com/en-us/library/ms525214(v=vs.90).aspx
                                      // If the socket on which the server is listening to the client is closed, ReadClient will return TRUE, but with zero bytes read.
-      aStream.Position := aStream.Position + aByteRead;
+      aStream.Position := aStream.Position + LByteRead;
     end;
   end
   else begin
     while aStream.Position < aStream.Size do begin
-      aByteRead := ReadClient(aBuffer[0], length(aBuffer));
-      if aByteRead <= 0 then break;  // The doc of Delphi say "If no more content is available, ReadClient returns -1."
+      LByteRead := ReadClient(LBuffer[0], length(LBuffer));
+      if LByteRead <= 0 then break;  // The doc of Delphi say "If no more content is available, ReadClient returns -1."
                                      // but it's false !!
                                      // http://msdn.microsoft.com/en-us/library/ms525214(v=vs.90).aspx
                                      // If the socket on which the server is listening to the client is closed, ReadClient will return TRUE, but with zero bytes read.
-      aStream.WriteBuffer(aBuffer[0], aByteRead);
+      aStream.WriteBuffer(LBuffer[0], LByteRead);
     end;
   end;
   fClientDataExhausted := True;

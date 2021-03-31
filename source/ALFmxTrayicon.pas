@@ -1,27 +1,28 @@
-﻿{ ******************************************}
-{ 功能：FMX平台win托盘图标                   }
-{ 名称：FMX.ZYJ.TrayIcon.pas                 }
-{ 版本：1.1                                  }
-{ 环境：Win8.1                               }
-{ 工具：Delphi XE3 AppMethod DelphiXE6       }
-{ 日期：2014/3/12 20:27:56                   }
-{ 作者：ying32                               }
-{ QQ  ：1444386932                           }
-{ E-mail：1444386932@qq.com                  }
-{ ******************************************}
+﻿{ *****************************************************************************}
+{ 功能：FMX平台win托盘图标                                                      }
+{ 名称：FMX.ZYJ.TrayIcon.pas                                                    }
+{ 版本：1.1                                                                     }
+{ 环境：Win8.1                                                                  }
+{ 工具：Delphi XE3 AppMethod DelphiXE6                                          }
+{ 日期：2014/3/12 20:27:56                                                      }
+{ 作者：ying32                                                                  }
+{ QQ  ：1444386932                                                              }
+{ E-mail：1444386932@qq.com                                                     }
+{ *****************************************************************************}
 
-unit ALFmxTrayicon.Win;
+unit ALFmxTrayicon;
 
 interface
 
-uses Winapi.Windows,
-     Winapi.Messages,
-     Winapi.ShellApi,
-     System.SysUtils,
-     System.Classes,
-     FMX.Forms,
-     FMX.Types,
-     FMX.Platform.Win;
+uses
+  Winapi.Windows,
+  Winapi.Messages,
+  Winapi.ShellApi,
+  System.SysUtils,
+  System.Classes,
+  FMX.Forms,
+  FMX.Types,
+  FMX.Platform.Win;
 
 type
 

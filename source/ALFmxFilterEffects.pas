@@ -2,11 +2,12 @@ unit ALFmxFilterEffects;
 
 interface
 
-uses system.classes,
-     FMX.types,
-     FMX.types3D,
-     FMX.filter,
-     FMX.Filter.Effects;
+uses
+  system.classes,
+  FMX.types,
+  FMX.types3D,
+  FMX.filter,
+  FMX.Filter.Effects;
 
 const
 
@@ -586,7 +587,7 @@ Type
     property Gamma: Single read fGamma write fGamma;
   end;
 
-  {$IF CompilerVersion > 33} // rio
+  {$IF CompilerVersion > 34} // sydney
     {$MESSAGE WARN 'Check if FMX.Filter.Effects.TFilterBaseFilter still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALFilterBaseFilterAccessPrivate = class(TFmxObject)
@@ -656,9 +657,10 @@ procedure Register;
 
 implementation
 
-uses system.sysutils,
-     System.Math.Vectors,
-     ALString;
+uses
+  system.sysutils,
+  System.Math.Vectors,
+  ALString;
 
 {***********************************************}
 constructor TALColorAdjustShaderVariables.Create;
@@ -707,6 +709,9 @@ constructor TALColorAdjustFilter.Create;
 begin
   inherited;
   FShaders[0] := TShaderManager.RegisterShaderFromData('ColorAdjust.fps', TContextShaderKind.PixelShader, '', [
+
+    {$REGION 'TContextShaderArch.DX9'}
+    {$IF defined(MSWindows)}
     // todo - implement this part as I only copied the code of TContrastFilter for now
     TContextShaderSource.Create(TContextShaderArch.DX9, [
       $00, $02, $FF, $FF, $FE, $FF, $31, $00, $43, $54, $41, $42, $1C, $00, $00, $00, $9B, $00, $00, $00, $00, $02, $FF, $FF, $03, $00, $00, $00, $1C, $00, $00, $00, $00, $01, $00, $20, $94, $00, $00, $00,
@@ -723,6 +728,11 @@ begin
       TContextShaderVariable.Create('Contrast', TContextShaderVariableKind.Float, 1, 1),
       TContextShaderVariable.Create('Input', TContextShaderVariableKind.Texture, 0, 0)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.DX11_level_9'}
+    {$IF defined(MSWindows)}
     // todo - implement this part as I only copied the code of TContrastFilter for now
     TContextShaderSource.Create(TContextShaderArch.DX11_level_9, [
       $44, $58, $42, $43, $39, $01, $F2, $B8, $28, $05, $92, $38, $25, $66, $69, $67, $94, $95, $AD, $88, $01, $00, $00, $00, $B8, $04, $00, $00, $06, $00, $00, $00, $38, $00, $00, $00, $38, $01, $00, $00,
@@ -760,6 +770,43 @@ begin
       TContextShaderVariable.Create('Brightness', TContextShaderVariableKind.Float, 0, 4),
       TContextShaderVariable.Create('Contrast', TContextShaderVariableKind.Float, 4, 4)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.Metal'}
+    {$IF defined(MACOS)}
+    // todo - implement this part as I only copied the code of TContrastFilter for now
+    TContextShaderSource.Create(
+      TContextShaderArch.Metal,
+      TEncoding.UTF8.GetBytes(
+        'using namespace metal;'+
+
+        'struct ProjectedVertex {'+
+          'float4 position [[position]];'+
+          'float2 textureCoord;'+
+        '};'+
+
+        'fragment float4 fragmentShader(const ProjectedVertex in [[stage_in]],'+
+                                       'constant float4 &Brightness [[buffer(0)]],'+
+                                       'constant float4 &Contrast [[buffer(1)]],'+
+                                       'const texture2d<float> Input [[texture(0)]],'+
+                                       'const sampler InputSampler [[sampler(0)]]) {'+
+          'float4 pixelColor = Input.sample(InputSampler, in.textureCoord);'+
+          'pixelColor.rgb /= pixelColor.a;'+
+          'pixelColor.rgb = ((pixelColor.rgb - 0.5f) * max(Contrast.x, 0.0)) + 0.5f;'+
+          'pixelColor.rgb += Brightness.x;'+
+          'pixelColor.rgb *= pixelColor.a;'+
+          'return pixelColor;'+
+        '}'
+      ),
+      [TContextShaderVariable.Create('Brightness', TContextShaderVariableKind.Float, 0, 1),
+       TContextShaderVariable.Create('Contrast', TContextShaderVariableKind.Float, 1, 1),
+       TContextShaderVariable.Create('Input', TContextShaderVariableKind.Texture, 0, 0)]
+    ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.GLSL'}
     TContextShaderSource.Create(
       TContextShaderArch.GLSL,
       TEncoding.UTF8.GetBytes(
@@ -787,6 +834,8 @@ begin
        TContextShaderVariable.Create('Gamma',       TContextShaderVariableKind.Float, 0, 1),
        TContextShaderVariable.Create('Input',       TContextShaderVariableKind.Texture, 0, 0)]
     )
+    {$ENDREGION}
+
   ]);
 end;
 
@@ -1064,5 +1113,4 @@ initialization
   RegisterClasses([TALColorAdjustEffect]);
   TFilterManager.RegisterFilter('ColorAdjust', TALColorAdjustFilter); // << 'ColorAdjust' is the CATEGORY! Several filters can have the same category. this why 'ColorAdjust' and not 'ALColorAdjust'
                                                                       // << the name of the filter is defined in TALColorAdjustFilter.FilterAttr as 'ALColorAdjust'
-
 end.

@@ -1,20 +1,16 @@
-{****************************************************************
-Description:  Function to run CGI application like PHP-CGI.exe or
-              Perl.exe
-*****************************************************************}
+{*******************************************************************************
+Function to run CGI application like PHP-CGI.exe or Perl.exe
+*******************************************************************************}
 
 unit ALCGI;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
-uses system.classes,
-     ALIsapiHTTP,
-     AlHttpClient,
-     AlStringList;
+uses
+  system.classes,
+  ALIsapiHTTP,
+  AlHttpClient,
+  AlStringList;
 
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest; ServerVariables: TALStrings); overload;
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest;
@@ -41,8 +37,10 @@ Procedure AlCGIExec(const InterpreterFilename: AnsiString;
 
 implementation
 
-uses AlExecute,
-     ALString;
+uses
+  System.AnsiStrings,
+  AlExecute,
+  ALString;
 
 {**************************************************************************************************************}
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest; ServerVariables: TALStrings);
@@ -167,15 +165,15 @@ const EnvironmentTemplate = '%s=%s'#0;
 
 Var ScriptFileName: AnsiString;
     Environment: AnsiString;
-    aStream: TALStringStream;
+    LStream: TALStringStream;
     FreeRequestContentStream: Boolean;
     S1: AnsiString;
     P1: Integer;
-    i: integer;
+    I: integer;
 
 begin
 
-  aStream := TALStringStream.Create('');
+  LStream := TALStringStream.Create('');
   If not assigned(RequestContentStream) then begin
     RequestContentStream := TmemoryStream.Create;
     FreeRequestContentStream := True;
@@ -228,8 +226,8 @@ begin
                                             //windir=C:\WINDOWS
 
     {----------}
-    For i := 0 to serverVariables.Count - 1 do
-      Environment := Environment + ALFormat(EnvironmentTemplate,[ServerVariables.Names[i], ServerVariables.ValueFromIndex[i]]);
+    For I := 0 to serverVariables.Count - 1 do
+      Environment := Environment + ALFormat(EnvironmentTemplate,[ServerVariables.Names[I], ServerVariables.ValueFromIndex[I]]);
 
     {----------}
     Environment := Environment + #0;
@@ -239,19 +237,20 @@ begin
               ALExtractFileDir(InterpreterFilename),
               Environment,
               RequestContentStream,
-              aStream);
+              LStream);
 
     {----------}
-    S1 := aStream.DataString;
+    S1 := LStream.DataString;
     P1 := AlPos(#13#10#13#10,S1);
     ResponseHeader.RawHeaderText := AlCopyStr(S1,1,P1-1);
     S1 := AlCopyStr(S1,P1+4,MaxInt);
     ResponseContentStream.WriteBuffer(pointer(S1)^, length(S1));
 
   finally
-    aStream.Free;
+    LStream.Free;
     If FreeRequestContentStream then RequestContentStream.Free;
   end;
+
 end;
 
 end.

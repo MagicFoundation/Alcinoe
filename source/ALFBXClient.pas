@@ -1,48 +1,39 @@
-{*************************************************************
+{*******************************************************************************
 product:      ALFBXClient (Alcinoe FireBird Express Client)
 Description:  Retrieving Data as XML from Firebird Server.
 Link :        http://www.progdigy.com/modules.php?name=UIB
-**************************************************************}
+*******************************************************************************}
 
 unit ALFBXClient;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
-uses Winapi.Windows,
-     System.classes,
-     System.SysUtils,
-     System.Contnrs,
-     System.SyncObjs,
-     AlXmlDoc,
-     ALAVLBinaryTree,
-     ALFBXLib,
-     ALFBXBase,
-     ALString,
-     ALStringList;
+uses
+  Winapi.Windows,
+  System.classes,
+  System.SysUtils,
+  System.Contnrs,
+  System.SyncObjs,
+  AlXmlDoc,
+  ALAVLBinaryTree,
+  ALFBXLib,
+  ALFBXBase,
+  ALString,
+  ALStringList;
 
 Type
 
-  {$IF CompilerVersion >= 23} {Delphi XE2}
+  {----------------------------------------------------------------------------------}
   TALFBXClientSelectDataOnNewRowFunct = reference to Procedure(XMLRowData: TalXmlNode;
                                                                const ViewTag: AnsiString;
                                                                ExtData: Pointer;
                                                                Var Continue: Boolean);
-  {$ELSE}
-  TALFBXClientSelectDataOnNewRowFunct = Procedure(XMLRowData: TalXmlNode;
-                                                  const ViewTag: AnsiString;
-                                                  ExtData: Pointer;
-                                                  Var Continue: Boolean);
-  {$IFEND}
 
   {----------------------------}
   TALFBXClientSQLParam = record
     Value: AnsiString;
     IsNull: Boolean;
-    class function Create: TALFBXClientSQLParam; static; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
+    class function Create: TALFBXClientSQLParam; static; inline;
   end;
   TALFBXClientSQLParams = array of TALFBXClientSQLParam;
 
@@ -57,7 +48,7 @@ Type
     First: Integer; // used only if value is > 0
     CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
                              // cache or not. Values <= 0 deactivate the cache
-    class function Create: TALFBXClientSelectDataQUERY; static; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
+    class function Create: TALFBXClientSelectDataQUERY; static; inline;
   end;
   TALFBXClientSelectDataQUERIES = array of TALFBXClientSelectDataQUERY;
 
@@ -66,7 +57,7 @@ Type
     SQL: AnsiString;
     Params: TALFBXClientSQLParams; // use to replace the ? in SQL like
                                    // insert into TableA(FieldA) Values(?)
-    class function Create: TALFBXClientUpdateDataQUERY; static; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
+    class function Create: TALFBXClientUpdateDataQUERY; static; inline;
   end;
   TALFBXClientUpdateDataQUERIES = array of TALFBXClientUpdateDataQUERY;
 
@@ -613,13 +604,9 @@ Type
     property  DefaultWriteTPB: AnsiString read fDefaultWriteTPB write fDefaultWriteTPB;
   end;
 
-  {$IF CompilerVersion >= 23} {Delphi XE2}
+  {-------------------------------------------------------------------------------------------------------------}
   TALFBXEventThreadEvent = reference to Procedure (Sender: TObject; const EventName: AnsiString; Count: Integer);
   TALFBXEventThreadException = reference to procedure (Sender: TObject; Error: Exception);
-  {$ELSE}
-  TALFBXEventThreadEvent = Procedure (Sender: TObject; const EventName: AnsiString; Count: Integer) of object;
-  TALFBXEventThreadException = procedure (Sender: TObject; Error: Exception) of object;
-  {$IFEND}
 
   {--------------------------------}
   TALFBXEventThread = class(TThread)
@@ -888,11 +875,12 @@ Const  cALFbxClientDefaultReadNOWaitTPB = isc_tpb_version3 + //Transaction versi
 
 implementation
 
-uses System.Diagnostics,
-     ALCipher,
-     ALWindows,
-     ALCommon,
-     alfbxError;
+uses
+  System.Diagnostics,
+  ALCipher,
+  ALWindows,
+  ALCommon,
+  alfbxError;
 
 {***************************************************************}
 class function TALFBXClientSQLParam.Create: TALFBXClientSQLParam;
@@ -974,16 +962,16 @@ procedure TALFBXClient.GetMonitoringInfos(ConnectionID,
                                           Const SkipRecordStats: Boolean = False;
                                           Const SkipMemoryUsage: Boolean = False);
 
-Var aXMLDATA: TalXmlDocument;
-    aSelectPart: AnsiString;
-    aFromPart: AnsiString;
-    aJoinPart: AnsiString;
-    aWherePart: AnsiString;
+Var LXMLDATA: TalXmlDocument;
+    LSelectPart: AnsiString;
+    LFromPart: AnsiString;
+    LJoinPart: AnsiString;
+    LWherePart: AnsiString;
 
-    a_saved_TraHandle: IscTrHandle;
-    a_saved_StmtHandle: IscStmtHandle;
-    a_saved_Sqlda: TALFBXSQLResult;
-    a_saved_StmtSQL: AnsiString;
+    L_saved_TraHandle: IscTrHandle;
+    L_saved_StmtHandle: IscStmtHandle;
+    L_saved_Sqlda: TALFBXSQLResult;
+    L_saved_StmtSQL: AnsiString;
 
 Begin
 
@@ -1002,7 +990,7 @@ Begin
   if not Connected then raise Exception.Create('Not connected');
 
   //build the aSelectPart;
-  aSelectPart := ALIfThen(not SkipIOStats,     'MON$PAGE_READS as PAGE_READS, '+
+  LSelectPart := ALIfThen(not SkipIOStats,     'MON$PAGE_READS as PAGE_READS, '+
                                                'MON$PAGE_WRITES as PAGE_WRITES, '+
                                                'MON$PAGE_FETCHES as PAGE_FETCHES, '+
                                                'MON$PAGE_MARKS as PAGE_MARKS, ') +
@@ -1018,38 +1006,38 @@ Begin
                                                'MON$MEMORY_ALLOCATED as MEMORY_ALLOCATED, '+
                                                'MON$MAX_MEMORY_USED as MAX_MEMORY_USED, '+
                                                'MON$MAX_MEMORY_ALLOCATED as MAX_MEMORY_ALLOCATED, ');
-  if aSelectPart <> '' then delete(aSelectPart,length(aSelectPart) - 1, 1)
+  if LSelectPart <> '' then delete(LSelectPart,length(LSelectPart) - 1, 1)
   else Exit;
 
   //build the aFromPart
-  if StatementSQL <> '' then       aFromPart := 'MON$STATEMENTS'
-  else if TransactionID <> -1 then aFromPart := 'MON$TRANSACTIONS'
-  else if ConnectionID <> -1 then  aFromPart := 'MON$ATTACHMENTS'
-  else                             aFromPart := 'MON$DATABASE';
+  if StatementSQL <> '' then       LFromPart := 'MON$STATEMENTS'
+  else if TransactionID <> -1 then LFromPart := 'MON$TRANSACTIONS'
+  else if ConnectionID <> -1 then  LFromPart := 'MON$ATTACHMENTS'
+  else                             LFromPart := 'MON$DATABASE';
 
   //build the aJoinPart
-  aJoinPart := ALIfThen(not SkipIOStats,     'JOIN MON$IO_STATS ON MON$IO_STATS.MON$STAT_ID = '        +aFromPart+'.MON$STAT_ID ') +
-               ALIfThen(not SkipRecordStats, 'JOIN MON$RECORD_STATS ON MON$RECORD_STATS.MON$STAT_ID = '+aFromPart+'.MON$STAT_ID ') +
-               ALIfThen(not SkipMemoryUsage, 'JOIN MON$MEMORY_USAGE ON MON$MEMORY_USAGE.MON$STAT_ID = '+aFromPart+'.MON$STAT_ID ');
+  LJoinPart := ALIfThen(not SkipIOStats,     'JOIN MON$IO_STATS ON MON$IO_STATS.MON$STAT_ID = '        +LFromPart+'.MON$STAT_ID ') +
+               ALIfThen(not SkipRecordStats, 'JOIN MON$RECORD_STATS ON MON$RECORD_STATS.MON$STAT_ID = '+LFromPart+'.MON$STAT_ID ') +
+               ALIfThen(not SkipMemoryUsage, 'JOIN MON$MEMORY_USAGE ON MON$MEMORY_USAGE.MON$STAT_ID = '+LFromPart+'.MON$STAT_ID ');
 
   //build the aWherePart
-  if StatementSQL <> '' then       aWherePart := 'WHERE '+
+  if StatementSQL <> '' then       LWherePart := 'WHERE '+
                                                  'MON$SQL_TEXT = ' + ALQuotedStr(StatementSQL) +
                                                  ALIfThen(TransactionID <> -1, ' AND MON$TRANSACTION_ID = '+ALIntToStr(TransactionID)) +
                                                  ALIfThen(ConnectionID <> -1,  ' AND MON$ATTACHMENT_ID = '+ALIntToStr(ConnectionID))
-  else if TransactionID <> -1 then aWherePart := 'WHERE '+
+  else if TransactionID <> -1 then LWherePart := 'WHERE '+
                                                  'MON$TRANSACTION_ID = '+ALIntToStr(TransactionID) +
                                                  ALIfThen(ConnectionID <> -1,  ' AND MON$ATTACHMENT_ID = '+ALIntToStr(ConnectionID))
-  else if ConnectionID <> -1 then  aWherePart := 'WHERE '+
+  else if ConnectionID <> -1 then  LWherePart := 'WHERE '+
                                                  'MON$ATTACHMENT_ID = '+ALIntToStr(ConnectionID)
-  else                             aWherePart := '';
+  else                             LWherePart := '';
 
 
   //Save the old data
-  a_saved_TraHandle := fTraHandle;
-  a_saved_StmtHandle := fStmtHandle;
-  a_saved_Sqlda := fSqlda;
-  a_saved_StmtSQL := fStmtSQL;
+  L_saved_TraHandle := fTraHandle;
+  L_saved_StmtHandle := fStmtHandle;
+  L_saved_Sqlda := fSqlda;
+  L_saved_StmtSQL := fStmtSQL;
   Try
 
     //clear the handle
@@ -1063,21 +1051,21 @@ Begin
     Try
 
       //get the data from the monitoring table
-      aXMLDATA := TALXmlDocument.create('root');
+      LXMLDATA := TALXmlDocument.create('root');
       try
 
         SelectData('SELECT '+
-                     aSelectPart +
+                     LSelectPart +
                    'FROM ' +
-                     aFromPart + ' ' +
-                   aJoinPart +
-                   aWherePart,
+                     LFromPart + ' ' +
+                   LJoinPart +
+                   LWherePart,
                    'rec',
-                   aXMLDATA.DocumentElement,
+                   LXMLDATA.DocumentElement,
                    ALDefaultFormatSettings);
 
-        if aXMLDATA.DocumentElement.ChildNodes.Count <> 1 then raise Exception.Create('Can not get the monitoring stats');
-        with aXMLDATA.DocumentElement.ChildNodes[0] do begin
+        if LXMLDATA.DocumentElement.ChildNodes.Count <> 1 then raise Exception.Create('Can not get the monitoring stats');
+        with LXMLDATA.DocumentElement.ChildNodes[0] do begin
 
           if not SkipIOStats then begin
             with IOStats do begin
@@ -1113,7 +1101,7 @@ Begin
         end;
 
       finally
-        aXMLDATA.free;
+        LXMLDATA.free;
       end;
 
       //commit the TMP transaction
@@ -1130,10 +1118,10 @@ Begin
   Finally
 
     //get back the original transaction data
-    fTraHandle := a_saved_TraHandle;
-    fStmtHandle := a_saved_StmtHandle;
-    fSqlda := a_saved_Sqlda;
-    fStmtSQL := a_saved_StmtSQL;
+    fTraHandle := L_saved_TraHandle;
+    fStmtHandle := L_saved_StmtHandle;
+    fSqlda := L_saved_Sqlda;
+    fStmtSQL := L_saved_StmtSQL;
 
   End;
 
@@ -1250,25 +1238,25 @@ end;
 
 {****************************************************************************}
 function  TALFBXClient.GetDataBaseInfoString(const item: Integer): AnsiString;
-var aSize: byte;
-    aData: AnsiString;
+var LSize: byte;
+    LData: AnsiString;
 begin
   If not connected then raise Exception.Create('Not connected');
-  aData := FLibrary.DatabaseInfoString(FDbHandle, item, 256);
+  LData := FLibrary.DatabaseInfoString(FDbHandle, item, 256);
   case Item of
     isc_info_cur_logfile_name,
     isc_info_wal_prv_ckpt_fname: begin
-                                   aSize := byte(aData[4]);
-                                   ALMove(aData[5], aData[1], aSize);
-                                   SetLength(aData, aSize);
+                                   LSize := byte(LData[4]);
+                                   ALMove(LData[5], LData[1], LSize);
+                                   SetLength(LData, LSize);
                                  end;
     else begin
-      aSize := byte(aData[5]);
-      ALMove(aData[6], aData[1], aSize);
-      SetLength(aData, aSize);
+      LSize := byte(LData[5]);
+      ALMove(LData[6], LData[1], LSize);
+      SetLength(LData, LSize);
     end;
   end;
-  Result := AnsiString(aData);
+  Result := AnsiString(LData);
 end;
 
 {*****************************************************************************}
@@ -1338,18 +1326,18 @@ procedure TALFBXClient.Connect(const DataBaseName,
                                      Password,
                                      CharSet: AnsiString;
                                const ExtraParams: AnsiString = '');
-Var aParams: AnsiString;
+Var LParams: AnsiString;
 begin
   if connected then raise Exception.Create('Already connected');
   fCharSet :=  ALFBXStrToCharacterSet(CharSet);
-  aParams := 'user_name = '+Login+'; '+
+  LParams := 'user_name = '+Login+'; '+
              'password = '+Password+'; '+
              'lc_ctype = '+CharSet;
-  if ExtraParams <> '' then aParams := aParams + '; ' + ExtraParams;
+  if ExtraParams <> '' then LParams := LParams + '; ' + ExtraParams;
   Try
     FLibrary.AttachDatabase(DataBaseName,
                             fDBHandle,
-                            aParams);
+                            LParams);
   Except
     fDBHandle := nil;
     raise;
@@ -1551,86 +1539,86 @@ procedure TALFBXClient.SelectData(const Queries: TALFBXClientSelectDataQUERIES;
                                   ExtData: Pointer;
                                   const FormatSettings: TALFormatSettings);
 
-Var aSqlpa: TALFBXSQLParams;
-    aParamsIndex: integer;
-    aBlobhandle: IscBlobHandle;
-    aQueriesIndex: integer;
-    aViewRec: TalXmlNode;
-    aDropStmt: Boolean;
-    aXmlDocument: TalXmlDocument;
-    aStopWatch: TStopWatch;
-    aCacheKey: ansiString;
-    aCacheStr: ansiString;
+Var LSqlpa: TALFBXSQLParams;
+    LParamsIndex: integer;
+    LBlobhandle: IscBlobHandle;
+    LQueriesIndex: integer;
+    LViewRec: TalXmlNode;
+    LDropStmt: Boolean;
+    LXmlDocument: TalXmlDocument;
+    LStopWatch: TStopWatch;
+    LCacheKey: ansiString;
+    LCacheStr: ansiString;
 
     {------------------------------------}
     Procedure InternalSelectDataFetchRows;
-    var aColumnIndex: integer;
-        aRecIndex: integer;
-        aRecAdded: integer;
-        aContinue: Boolean;
-        aNewRec: TalXmlNode;
-        aValueRec: TalXmlNode;
-        aUpdateRowTagByFieldValue: Boolean;
+    var LColumnIndex: integer;
+        LRecIndex: integer;
+        LRecAdded: integer;
+        LContinue: Boolean;
+        LNewRec: TalXmlNode;
+        LValueRec: TalXmlNode;
+        LUpdateRowTagByFieldValue: Boolean;
     Begin
 
       //init the aViewRec
-      if (Queries[aQueriesIndex].ViewTag <> '') and (not assigned(aXmlDocument)) then aViewRec := XMLdata.AddChild(Queries[aQueriesIndex].ViewTag)
-      else aViewRec := XMLdata;
+      if (Queries[LQueriesIndex].ViewTag <> '') and (not assigned(LXmlDocument)) then LViewRec := XMLdata.AddChild(Queries[LQueriesIndex].ViewTag)
+      else LViewRec := XMLdata;
 
       //init aUpdateRowTagByFieldValue
-      if AlPos('&>',Queries[aQueriesIndex].RowTag) = 1 then begin
-        delete(Queries[aQueriesIndex].RowTag, 1, 2);
-        aUpdateRowTagByFieldValue := Queries[aQueriesIndex].RowTag <> '';
+      if AlPos('&>',Queries[LQueriesIndex].RowTag) = 1 then begin
+        delete(Queries[LQueriesIndex].RowTag, 1, 2);
+        LUpdateRowTagByFieldValue := Queries[LQueriesIndex].RowTag <> '';
       end
-      else aUpdateRowTagByFieldValue := False;
+      else LUpdateRowTagByFieldValue := False;
 
       //retrieve all row
-      aRecIndex := 0;
-      aRecAdded := 0;
+      LRecIndex := 0;
+      LRecAdded := 0;
       while Flibrary.DSQLFetch(fDBHandle, fTraHandle, fStmtHandle, FSQLDIALECT, fsqlda) do begin
 
         //process if > Skip
-        inc(aRecIndex);
-        If aRecIndex > Queries[aQueriesIndex].Skip then begin
+        inc(LRecIndex);
+        If LRecIndex > Queries[LQueriesIndex].Skip then begin
 
           //init NewRec
-          if (Queries[aQueriesIndex].RowTag <> '') and (not assigned(aXmlDocument)) then aNewRec := aViewRec.AddChild(Queries[aQueriesIndex].RowTag)
-          Else aNewRec := aViewRec;
+          if (Queries[LQueriesIndex].RowTag <> '') and (not assigned(LXmlDocument)) then LNewRec := LViewRec.AddChild(Queries[LQueriesIndex].RowTag)
+          Else LNewRec := LViewRec;
 
           //loop throught all column
-          For aColumnIndex := 0 to fsqlda.FieldCount - 1 do begin
-            aValueRec := aNewRec.AddChild(ALlowercase(fsqlda.AliasName[aColumnIndex]));
-            if (fSQLDA.SQLType[aColumnIndex] = SQL_BLOB) then avalueRec.ChildNodes.Add(
-                                                                                       avalueRec.OwnerDocument.CreateNode(
+          For LColumnIndex := 0 to fsqlda.FieldCount - 1 do begin
+            LValueRec := LNewRec.AddChild(ALlowercase(fsqlda.AliasName[LColumnIndex]));
+            if (fSQLDA.SQLType[LColumnIndex] = SQL_BLOB) then LValueRec.ChildNodes.Add(
+                                                                                       LValueRec.OwnerDocument.CreateNode(
                                                                                                                           GetFieldValue(fsqlda,
                                                                                                                                         fDBHandle,
                                                                                                                                         fTRAHandle,
-                                                                                                                                        aColumnIndex,
+                                                                                                                                        LColumnIndex,
                                                                                                                                         FormatSettings),
                                                                                                                           ntCData
                                                                                                                          )
                                                                                        )
-            else aValueRec.Text := GetFieldValue(fsqlda,
+            else LValueRec.Text := GetFieldValue(fsqlda,
                                                  fDBHandle,
                                                  fTRAHandle,
-                                                 aColumnIndex,
+                                                 LColumnIndex,
                                                  FormatSettings);
-            if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
+            if LUpdateRowTagByFieldValue and (LValueRec.NodeName=LNewRec.NodeName) then LNewRec.NodeName := ALLowerCase(LValueRec.Text);
           end;
 
           //handle OnNewRowFunct
           if assigned(OnNewRowFunct) then begin
-            aContinue := True;
-            OnNewRowFunct(aNewRec, Queries[aQueriesIndex].ViewTag, ExtData, aContinue);
-            if Not aContinue then Break;
+            LContinue := True;
+            OnNewRowFunct(LNewRec, Queries[LQueriesIndex].ViewTag, ExtData, LContinue);
+            if Not LContinue then Break;
           end;
 
           //free the node if aXmlDocument
-          if assigned(aXmlDocument) then aXmlDocument.DocumentElement.ChildNodes.Clear;
+          if assigned(LXmlDocument) then LXmlDocument.DocumentElement.ChildNodes.Clear;
 
           //handle the First
-          inc(aRecAdded);
-          If (Queries[aQueriesIndex].First > 0) and (aRecAdded >= Queries[aQueriesIndex].First) then Break;
+          inc(LRecAdded);
+          If (Queries[LQueriesIndex].First > 0) and (LRecAdded >= Queries[LQueriesIndex].First) then Break;
 
         end;
 
@@ -1650,42 +1638,42 @@ begin
   if assigned(OnNewRowFunct) then XMLDATA := nil;
 
   //clear the XMLDATA
-  if assigned(XMLDATA) then aXmlDocument := Nil
+  if assigned(XMLDATA) then LXmlDocument := Nil
   else begin
-    aXmlDocument := TALXmlDocument.create('root');
-    XMLDATA := aXmlDocument.DocumentElement;
+    LXmlDocument := TALXmlDocument.create('root');
+    XMLDATA := LXmlDocument.DocumentElement;
   end;
 
   Try
 
     //init the TstopWatch
-    aStopWatch := TstopWatch.Create;
+    LStopWatch := TstopWatch.Create;
 
     //loop on all the SQL
-    For aQueriesIndex := 0 to length(Queries) - 1 do begin
+    For LQueriesIndex := 0 to length(Queries) - 1 do begin
 
       //Handle the CacheThreshold
-      aCacheKey := '';
-      If (Queries[aQueriesIndex].CacheThreshold > 0) and
-         (not assigned(aXmlDocument)) and
+      LCacheKey := '';
+      If (Queries[LQueriesIndex].CacheThreshold > 0) and
+         (not assigned(LXmlDocument)) and
          (((length(Queries) = 1) and
            (XMLdata.ChildNodes.Count = 0)) or  // else the save will not work
-          (Queries[aQueriesIndex].ViewTag <> '')) then begin
+          (Queries[LQueriesIndex].ViewTag <> '')) then begin
 
         //try to load from from cache
-        aCacheKey := ALStringHashSHA1(Queries[aQueriesIndex].RowTag + '#' +
-                                      alinttostr(Queries[aQueriesIndex].Skip) + '#' +
-                                      alinttostr(Queries[aQueriesIndex].First) + '#' +
+        LCacheKey := ALStringHashSHA1(Queries[LQueriesIndex].RowTag + '#' +
+                                      alinttostr(Queries[LQueriesIndex].Skip) + '#' +
+                                      alinttostr(Queries[LQueriesIndex].First) + '#' +
                                       ALGetFormatSettingsID(FormatSettings) + '#' +
-                                      Queries[aQueriesIndex].SQL);
-        if loadcachedData(aCacheKey, aCacheStr) then begin
+                                      Queries[LQueriesIndex].SQL);
+        if loadcachedData(LCacheKey, LCacheStr) then begin
 
           //init the aViewRec
-          if (Queries[aQueriesIndex].ViewTag <> '') then aViewRec := XMLdata.AddChild(Queries[aQueriesIndex].ViewTag)
-          else aViewRec := XMLdata;
+          if (Queries[LQueriesIndex].ViewTag <> '') then LViewRec := XMLdata.AddChild(Queries[LQueriesIndex].ViewTag)
+          else LViewRec := XMLdata;
 
           //assign the tmp data to the XMLData
-          aViewRec.LoadFromXML(aCacheStr, true{XmlContainOnlyChildNodes}, false{ClearChildNodes});
+          LViewRec.LoadFromXML(LCacheStr, true{XmlContainOnlyChildNodes}, false{ClearChildNodes});
 
           //go to the next loop
           continue;
@@ -1695,56 +1683,56 @@ begin
       end;
 
       //start the TstopWatch
-      aStopWatch.Reset;
-      aStopWatch.Start;
+      LStopWatch.Reset;
+      LStopWatch.Start;
 
       //prepare if neccessary
       if (not assigned(fSqlda)) or
          (not assigned(fStmtHandle)) or
-         (Queries[aQueriesIndex].SQL <> fStmtSQL) then begin
-        Prepare(Queries[aQueriesIndex].SQL);
-        aDropStmt := True;
+         (Queries[LQueriesIndex].SQL <> fStmtSQL) then begin
+        Prepare(Queries[LQueriesIndex].SQL);
+        LDropStmt := True;
       end
-      else aDropStmt := False;
+      else LDropStmt := False;
 
       try
 
         //if their is params
-        if length(Queries[aQueriesIndex].Params) > 0 then begin
+        if length(Queries[LQueriesIndex].Params) > 0 then begin
 
           //create the aSqlpa object
-          aSqlpa := TALFBXSQLParams.Create(fCharSet);
+          LSqlpa := TALFBXSQLParams.Create(fCharSet);
 
           try
 
             //loop throught all Params Fields
-            for aParamsIndex := 0 to length(Queries[aQueriesIndex].Params) - 1 do begin
+            for LParamsIndex := 0 to length(Queries[LQueriesIndex].Params) - 1 do begin
 
               //with current Params Fields
-              with Queries[aQueriesIndex].Params[aParamsIndex] do begin
+              with Queries[LQueriesIndex].Params[LParamsIndex] do begin
 
                 //isnull
                 if IsNull then begin
-                  aSqlpa.AddFieldType('', uftVarchar);
-                  aSqlpa.IsNull[aParamsIndex] := True;
+                  LSqlpa.AddFieldType('', uftVarchar);
+                  LSqlpa.IsNull[LParamsIndex] := True;
                 end
 
                 //IsBlob
                 else if length(value) > high(smallint) then begin
-                  aSqlpa.AddFieldType('', uftBlob);
-                  aBlobhandle := nil;
-                  aSqlpa.AsQuad[aParamsIndex] := Flibrary.BlobCreate(fDBHandle,fTraHandle,aBlobHandle);
+                  LSqlpa.AddFieldType('', uftBlob);
+                  LBlobhandle := nil;
+                  LSqlpa.AsQuad[LParamsIndex] := Flibrary.BlobCreate(fDBHandle,fTraHandle,LBlobhandle);
                   Try
-                    FLibrary.BlobWriteString(aBlobHandle,Value);
+                    FLibrary.BlobWriteString(LBlobhandle,Value);
                   Finally
-                    FLibrary.BlobClose(aBlobHandle);
+                    FLibrary.BlobClose(LBlobhandle);
                   End;
                 end
 
                 //all the other
                 else begin
-                  aSqlpa.AddFieldType('', uftVarchar);
-                  aSqlpa.AsAnsiString[aParamsIndex] := Value;
+                  LSqlpa.AddFieldType('', uftVarchar);
+                  LSqlpa.AsAnsiString[LParamsIndex] := Value;
                 end;
 
               end;
@@ -1752,13 +1740,13 @@ begin
             end;
 
             //execute the sql with the params
-            FLibrary.DSQLExecute(fTraHandle, fStmtHandle, FSQLDIALECT, asqlpa);
+            FLibrary.DSQLExecute(fTraHandle, fStmtHandle, FSQLDIALECT, LSqlpa);
 
             //fetch the rows
             InternalSelectDataFetchRows;
 
           finally
-            asqlpa.free;
+            LSqlpa.free;
           end;
 
         end
@@ -1777,7 +1765,7 @@ begin
       finally
 
         //free the statement
-        if aDropStmt then begin
+        if LDropStmt then begin
 
           try
             Flibrary.DSQLFreeStatement(fStmtHandle, DSQL_drop);
@@ -1809,25 +1797,25 @@ begin
       end;
 
       //do the OnSelectDataDone
-      aStopWatch.Stop;
-      OnSelectDataDone(Queries[aQueriesIndex],
-                       aStopWatch.Elapsed.TotalMilliseconds);
+      LStopWatch.Stop;
+      OnSelectDataDone(Queries[LQueriesIndex],
+                       LStopWatch.Elapsed.TotalMilliseconds);
 
       //save to the cache
-      If aCacheKey <> '' then begin
+      If LCacheKey <> '' then begin
 
         //save the data
-        aViewRec.SaveToXML(aCacheStr, true{SaveOnlyChildNodes});
-        SaveDataToCache(aCacheKey,
-                        Queries[aQueriesIndex].CacheThreshold,
-                        aCacheStr);
+        LViewRec.SaveToXML(LCacheStr, true{SaveOnlyChildNodes});
+        SaveDataToCache(LCacheKey,
+                        Queries[LQueriesIndex].CacheThreshold,
+                        LCacheStr);
 
       end;
 
     End;
 
   Finally
-    if assigned(aXmlDocument) then aXmlDocument.free;
+    if assigned(LXmlDocument) then LXmlDocument.free;
   End;
 
 end;
@@ -1837,11 +1825,11 @@ procedure TALFBXClient.SelectData(const Query: TALFBXClientSelectDataQUERY;
                                   OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                                   ExtData: Pointer;
                                   const FormatSettings: TALFormatSettings);
-var aSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
+var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := Query;
-  SelectData(aSelectDataQUERIES,
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := Query;
+  SelectData(LSelectDataQUERIES,
              nil,
              OnNewRowFunct,
              ExtData,
@@ -1855,14 +1843,14 @@ procedure TALFBXClient.SelectData(const SQL: AnsiString;
                                   OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                                   ExtData: Pointer;
                                   const FormatSettings: TALFormatSettings);
-var aSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
+var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  aSelectDataQUERIES[0].skip := Skip;
-  aSelectDataQUERIES[0].First := First;
-  SelectData(aSelectDataQUERIES,
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
+  LSelectDataQUERIES[0].Sql := Sql;
+  LSelectDataQUERIES[0].skip := Skip;
+  LSelectDataQUERIES[0].First := First;
+  SelectData(LSelectDataQUERIES,
              nil,
              OnNewRowFunct,
              ExtData,
@@ -1874,12 +1862,12 @@ procedure TALFBXClient.SelectData(const SQL: AnsiString;
                                   OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                                   ExtData: Pointer;
                                   const FormatSettings: TALFormatSettings);
-var aSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
+var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  SelectData(aSelectDataQUERIES,
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
+  LSelectDataQUERIES[0].Sql := Sql;
+  SelectData(LSelectDataQUERIES,
              nil,
              OnNewRowFunct,
              ExtData,
@@ -1904,11 +1892,11 @@ end;
 procedure TALFBXClient.SelectData(const Query: TALFBXClientSelectDataQUERY;
                                   XMLDATA: TalXMLNode;
                                   const FormatSettings: TALFormatSettings);
-var aSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
+var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := Query;
-  SelectData(aSelectDataQUERIES,
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := Query;
+  SelectData(LSelectDataQUERIES,
              XMLDATA,
              nil,
              nil,
@@ -1922,15 +1910,15 @@ procedure TALFBXClient.SelectData(const SQL: AnsiString;
                                   First: Integer;
                                   XMLDATA: TalXMLNode;
                                   const FormatSettings: TALFormatSettings);
-var aSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
+var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  aSelectDataQUERIES[0].RowTag := RowTag;
-  aSelectDataQUERIES[0].skip := Skip;
-  aSelectDataQUERIES[0].First := First;
-  SelectData(aSelectDataQUERIES,
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
+  LSelectDataQUERIES[0].Sql := Sql;
+  LSelectDataQUERIES[0].RowTag := RowTag;
+  LSelectDataQUERIES[0].skip := Skip;
+  LSelectDataQUERIES[0].First := First;
+  SelectData(LSelectDataQUERIES,
              XMLDATA,
              nil,
              nil,
@@ -1942,13 +1930,13 @@ procedure TALFBXClient.SelectData(const SQL: AnsiString;
                                   const RowTag: AnsiString;
                                   XMLDATA: TalXMLNode;
                                   const FormatSettings: TALFormatSettings);
-var aSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
+var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  aSelectDataQUERIES[0].RowTag := RowTag;
-  SelectData(aSelectDataQUERIES,
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
+  LSelectDataQUERIES[0].Sql := Sql;
+  LSelectDataQUERIES[0].RowTag := RowTag;
+  SelectData(LSelectDataQUERIES,
              XMLDATA,
              nil,
              nil,
@@ -1959,12 +1947,12 @@ end;
 procedure TALFBXClient.SelectData(const SQL: AnsiString;
                                   XMLDATA: TalXMLNode;
                                   const FormatSettings: TALFormatSettings);
-var aSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
+var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  SelectData(aSelectDataQUERIES,
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
+  LSelectDataQUERIES[0].Sql := Sql;
+  SelectData(LSelectDataQUERIES,
              XMLDATA,
              nil,
              nil,
@@ -1979,22 +1967,22 @@ procedure TALFBXClient.SelectData(const SQL: AnsiString;
                                   First: Integer;
                                   XMLDATA: TalXMLNode;
                                   const FormatSettings: TALFormatSettings);
-var aSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
-    i: integer;
+var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
+    I: integer;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  setlength(aSelectDataQUERIES[0].params, length(Params));
-  for i := 0 to length(Params) - 1 do begin
-    aSelectDataQUERIES[0].params[i] := TALFBXClientSQLParam.Create;
-    aSelectDataQUERIES[0].params[i].Value := Params[i];
-    aSelectDataQUERIES[0].params[i].IsNull := Params[i] = fNullString;
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
+  LSelectDataQUERIES[0].Sql := Sql;
+  setlength(LSelectDataQUERIES[0].params, length(Params));
+  for I := 0 to length(Params) - 1 do begin
+    LSelectDataQUERIES[0].params[I] := TALFBXClientSQLParam.Create;
+    LSelectDataQUERIES[0].params[I].Value := Params[I];
+    LSelectDataQUERIES[0].params[I].IsNull := Params[I] = fNullString;
   end;
-  aSelectDataQUERIES[0].RowTag := RowTag;
-  aSelectDataQUERIES[0].skip := Skip;
-  aSelectDataQUERIES[0].First := First;
-  SelectData(aSelectDataQUERIES,
+  LSelectDataQUERIES[0].RowTag := RowTag;
+  LSelectDataQUERIES[0].skip := Skip;
+  LSelectDataQUERIES[0].First := First;
+  SelectData(LSelectDataQUERIES,
              XMLDATA,
              nil,
              nil,
@@ -2007,20 +1995,20 @@ procedure TALFBXClient.SelectData(const SQL: AnsiString;
                                   const RowTag: AnsiString;
                                   XMLDATA: TalXMLNode;
                                   const FormatSettings: TALFormatSettings);
-var aSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
-    i: integer;
+var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
+    I: integer;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  setlength(aSelectDataQUERIES[0].params, length(Params));
-  for i := 0 to length(Params) - 1 do begin
-    aSelectDataQUERIES[0].params[i] := TALFBXClientSQLParam.Create;
-    aSelectDataQUERIES[0].params[i].Value := Params[i];
-    aSelectDataQUERIES[0].params[i].IsNull := Params[i] = fNullString;
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
+  LSelectDataQUERIES[0].Sql := Sql;
+  setlength(LSelectDataQUERIES[0].params, length(Params));
+  for I := 0 to length(Params) - 1 do begin
+    LSelectDataQUERIES[0].params[I] := TALFBXClientSQLParam.Create;
+    LSelectDataQUERIES[0].params[I].Value := Params[I];
+    LSelectDataQUERIES[0].params[I].IsNull := Params[I] = fNullString;
   end;
-  aSelectDataQUERIES[0].RowTag := RowTag;
-  SelectData(aSelectDataQUERIES,
+  LSelectDataQUERIES[0].RowTag := RowTag;
+  SelectData(LSelectDataQUERIES,
              XMLDATA,
              nil,
              nil,
@@ -2032,19 +2020,19 @@ procedure TALFBXClient.SelectData(const SQL: AnsiString;
                                   const Params: Array of AnsiString;
                                   XMLDATA: TalXMLNode;
                                   const FormatSettings: TALFormatSettings);
-var aSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
-    i: integer;
+var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
+    I: integer;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  setlength(aSelectDataQUERIES[0].params, length(Params));
-  for i := 0 to length(Params) - 1 do begin
-    aSelectDataQUERIES[0].params[i] := TALFBXClientSQLParam.Create;
-    aSelectDataQUERIES[0].params[i].Value := Params[i];
-    aSelectDataQUERIES[0].params[i].IsNull := Params[i] = fNullString;
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
+  LSelectDataQUERIES[0].Sql := Sql;
+  setlength(LSelectDataQUERIES[0].params, length(Params));
+  for I := 0 to length(Params) - 1 do begin
+    LSelectDataQUERIES[0].params[I] := TALFBXClientSQLParam.Create;
+    LSelectDataQUERIES[0].params[I].Value := Params[I];
+    LSelectDataQUERIES[0].params[I].IsNull := Params[I] = fNullString;
   end;
-  SelectData(aSelectDataQUERIES,
+  SelectData(LSelectDataQUERIES,
              XMLDATA,
              nil,
              nil,
@@ -2053,12 +2041,12 @@ end;
 
 {******************************************************************************}
 procedure TALFBXClient.UpdateData(const Queries: TALFBXClientUpdateDataQUERIES);
-Var aSqlpa: TALFBXSQLParams;
-    aBlobhandle: IscBlobHandle;
-    aParamsIndex: integer;
-    aQueriesIndex: integer;
-    aDropStmt: Boolean;
-    aStopWatch: TStopWatch;
+Var LSqlpa: TALFBXSQLParams;
+    LBlobhandle: IscBlobHandle;
+    LParamsIndex: integer;
+    LQueriesIndex: integer;
+    LDropStmt: Boolean;
+    LStopWatch: TStopWatch;
 begin
 
   //exit if no SQL
@@ -2068,61 +2056,61 @@ begin
   If not connected then raise Exception.Create('Not connected');
 
   //init the TstopWatch
-  aStopWatch := TstopWatch.Create;
+  LStopWatch := TstopWatch.Create;
 
   {loop on all the SQL}
-  For aQueriesIndex := 0 to length(Queries) - 1 do begin
+  For LQueriesIndex := 0 to length(Queries) - 1 do begin
 
     //start the TstopWatch
-    aStopWatch.Reset;
-    aStopWatch.Start;
+    LStopWatch.Reset;
+    LStopWatch.Start;
 
     //if their is params
-    if length(Queries[aQueriesIndex].Params) > 0 then begin
+    if length(Queries[LQueriesIndex].Params) > 0 then begin
 
       //prepare if neccessary
       if (not assigned(fSqlda)) or
          (not assigned(fStmtHandle)) or
-         (Queries[aQueriesIndex].SQL <> fStmtSQL) then begin
-        Prepare(Queries[aQueriesIndex].SQL);
-        aDropStmt := True;
+         (Queries[LQueriesIndex].SQL <> fStmtSQL) then begin
+        Prepare(Queries[LQueriesIndex].SQL);
+        LDropStmt := True;
       end
-      else aDropStmt := False;
+      else LDropStmt := False;
 
       try
 
         //create the aSqlpa object
-        aSqlpa := TALFBXSQLParams.Create(fCharSet);
+        LSqlpa := TALFBXSQLParams.Create(fCharSet);
         try
 
           //loop throught all Params Fields
-          for aParamsIndex := 0 to length(Queries[aQueriesIndex].Params) - 1 do begin
+          for LParamsIndex := 0 to length(Queries[LQueriesIndex].Params) - 1 do begin
 
             //with current Params Fields
-            with Queries[aQueriesIndex].Params[aParamsIndex] do begin
+            with Queries[LQueriesIndex].Params[LParamsIndex] do begin
 
               //isnull
               if IsNull then begin
-                aSqlpa.AddFieldType('', uftVarchar);
-                aSqlpa.IsNull[aParamsIndex] := True;
+                LSqlpa.AddFieldType('', uftVarchar);
+                LSqlpa.IsNull[LParamsIndex] := True;
               end
 
               //IsBlob
               else if length(value) > high(smallint) then begin
-                aSqlpa.AddFieldType('', uftBlob);
-                aBlobhandle := nil;
-                aSqlpa.AsQuad[aParamsIndex] := Flibrary.BlobCreate(fDBHandle,fTraHandle,aBlobHandle);
+                LSqlpa.AddFieldType('', uftBlob);
+                LBlobhandle := nil;
+                LSqlpa.AsQuad[LParamsIndex] := Flibrary.BlobCreate(fDBHandle,fTraHandle,LBlobhandle);
                 Try
-                  FLibrary.BlobWriteString(aBlobHandle,Value);
+                  FLibrary.BlobWriteString(LBlobhandle,Value);
                 Finally
-                  FLibrary.BlobClose(aBlobHandle);
+                  FLibrary.BlobClose(LBlobhandle);
                 End;
               end
 
               //all the other
               else begin
-                aSqlpa.AddFieldType('', uftVarchar);
-                aSqlpa.AsAnsiString[aParamsIndex] := Value;
+                LSqlpa.AddFieldType('', uftVarchar);
+                LSqlpa.AsAnsiString[LParamsIndex] := Value;
               end;
 
             end;
@@ -2130,16 +2118,16 @@ begin
           end;
 
           //execute the SQL
-          FLibrary.DSQLExecute(fTraHandle, fStmtHandle, FSQLDIALECT, aSqlpa);
+          FLibrary.DSQLExecute(fTraHandle, fStmtHandle, FSQLDIALECT, LSqlpa);
 
         finally
-          aSqlpa.free;
+          LSqlpa.free;
         end;
 
       finally
 
         //free the statement
-        if aDropStmt then begin
+        if LDropStmt then begin
 
           try
             Flibrary.DSQLFreeStatement(fStmtHandle, DSQL_drop);
@@ -2165,9 +2153,9 @@ begin
       //in case the query was not prepared
       if (not assigned(fSqlda)) or
          (not assigned(fStmtHandle)) or
-         (Queries[aQueriesIndex].SQL <> fStmtSQL) then begin
+         (Queries[LQueriesIndex].SQL <> fStmtSQL) then begin
 
-        Flibrary.DSQLExecuteImmediate(fDBHandle, fTraHandle, Queries[aQueriesIndex].SQL, FSQLDIALECT, nil);
+        Flibrary.DSQLExecuteImmediate(fDBHandle, fTraHandle, Queries[LQueriesIndex].SQL, FSQLDIALECT, nil);
 
       end
 
@@ -2182,9 +2170,9 @@ begin
     end;
 
     //do the OnUpdateDataDone
-    aStopWatch.Stop;
-    OnUpdateDataDone(Queries[aQueriesIndex],
-                     aStopWatch.Elapsed.TotalMilliseconds);
+    LStopWatch.Stop;
+    OnUpdateDataDone(Queries[LQueriesIndex],
+                     LStopWatch.Elapsed.TotalMilliseconds);
 
   end;
 
@@ -2192,65 +2180,65 @@ end;
 
 {**************************************************************************}
 procedure TALFBXClient.UpdateData(const Query: TALFBXClientUpdateDataQUERY);
-var aUpdateDataQUERIES: TALFBXClientUpdateDataQUERIES;
+var LUpdateDataQUERIES: TALFBXClientUpdateDataQUERIES;
 begin
-  setlength(aUpdateDataQUERIES,1);
-  aUpdateDataQUERIES[0] := Query;
-  UpdateData(aUpdateDataQUERIES);
+  setlength(LUpdateDataQUERIES,1);
+  LUpdateDataQUERIES[0] := Query;
+  UpdateData(LUpdateDataQUERIES);
 end;
 
 {**************************************************}
 procedure TALFBXClient.UpdateData(SQLs: TALStrings);
-Var aSQLsIndex : integer;
-    aUpdateDataQUERIES: TALFBXClientUpdateDataQUERIES;
+Var LSQLsIndex : integer;
+    LUpdateDataQUERIES: TALFBXClientUpdateDataQUERIES;
 begin
-  setlength(aUpdateDataQUERIES,SQLs.Count);
-  For aSQLsIndex := 0 to SQLs.Count - 1 do begin
-    aUpdateDataQUERIES[aSQLsIndex] := TALFBXClientUpdateDataQUERY.Create;
-    aUpdateDataQUERIES[aSQLsIndex].SQL := SQLs[aSQLsIndex];
+  setlength(LUpdateDataQUERIES,SQLs.Count);
+  For LSQLsIndex := 0 to SQLs.Count - 1 do begin
+    LUpdateDataQUERIES[LSQLsIndex] := TALFBXClientUpdateDataQUERY.Create;
+    LUpdateDataQUERIES[LSQLsIndex].SQL := SQLs[LSQLsIndex];
   end;
-  UpdateData(aUpdateDataQUERIES);
+  UpdateData(LUpdateDataQUERIES);
 end;
 
 {*******************************************************}
 procedure TALFBXClient.UpdateData(const SQL: AnsiString);
-Var aUpdateDataQUERIES: TALFBXClientUpdateDataQUERIES;
+Var LUpdateDataQUERIES: TALFBXClientUpdateDataQUERIES;
 begin
-  setlength(aUpdateDataQUERIES,1);
-  aUpdateDataQUERIES[0] := TALFBXClientUpdateDataQUERY.Create;
-  aUpdateDataQUERIES[0].SQL := SQL;
-  UpdateData(aUpdateDataQUERIES);
+  setlength(LUpdateDataQUERIES,1);
+  LUpdateDataQUERIES[0] := TALFBXClientUpdateDataQUERY.Create;
+  LUpdateDataQUERIES[0].SQL := SQL;
+  UpdateData(LUpdateDataQUERIES);
 end;
 
 {******************************************************}
 procedure TALFBXClient.UpdateData(const SQL: AnsiString;
                                   const Params: Array of AnsiString);
-Var aUpdateDataQUERIES: TALFBXClientUpdateDataQUERIES;
+Var LUpdateDataQUERIES: TALFBXClientUpdateDataQUERIES;
     i: integer;
 begin
-  setlength(aUpdateDataQUERIES,1);
-  aUpdateDataQUERIES[0] := TALFBXClientUpdateDataQUERY.Create;
-  aUpdateDataQUERIES[0].SQL := SQL;
-  setlength(aUpdateDataQUERIES[0].params, length(Params));
+  setlength(LUpdateDataQUERIES,1);
+  LUpdateDataQUERIES[0] := TALFBXClientUpdateDataQUERY.Create;
+  LUpdateDataQUERIES[0].SQL := SQL;
+  setlength(LUpdateDataQUERIES[0].params, length(Params));
   for i := 0 to length(Params) - 1 do begin
-    aUpdateDataQUERIES[0].params[i] := TALFBXClientSQLParam.Create;
-    aUpdateDataQUERIES[0].params[i].Value := Params[i];
-    aUpdateDataQUERIES[0].params[i].IsNull := Params[i] = fNullString;
+    LUpdateDataQUERIES[0].params[i] := TALFBXClientSQLParam.Create;
+    LUpdateDataQUERIES[0].params[i].Value := Params[i];
+    LUpdateDataQUERIES[0].params[i].IsNull := Params[i] = fNullString;
   end;
-  UpdateData(aUpdateDataQUERIES);
+  UpdateData(LUpdateDataQUERIES);
 end;
 
 {*****************************************************************}
 procedure TALFBXClient.UpdateData(const SQLs: array of AnsiString);
-Var aUpdateDataQUERIES: TalFBXClientUpdateDataQUERIES;
+Var LUpdateDataQUERIES: TalFBXClientUpdateDataQUERIES;
     i: integer;
 begin
-  setlength(aUpdateDataQUERIES,length(SQLs));
+  setlength(LUpdateDataQUERIES,length(SQLs));
   for I := 0 to length(SQLs) - 1 do begin
-    aUpdateDataQUERIES[i] := TALFBXClientUpdateDataQUERY.Create;
-    aUpdateDataQUERIES[i].SQL := SQLs[i];
+    LUpdateDataQUERIES[i] := TALFBXClientUpdateDataQUERY.Create;
+    LUpdateDataQUERIES[i].SQL := SQLs[i];
   end;
-  UpdateData(aUpdateDataQUERIES);
+  UpdateData(LUpdateDataQUERIES);
 end;
 
 {*******************************************************************}
@@ -2264,14 +2252,14 @@ procedure TALFBXConnectionPoolClient.GetMonitoringInfos(ConnectionID,
                                                         Const SkipRecordStats: Boolean = False;
                                                         Const SkipMemoryUsage: Boolean = False);
 
-Var aXMLDATA: TalXmlDocument;
-    aSelectPart: AnsiString;
-    aFromPart: AnsiString;
-    aJoinPart: AnsiString;
-    aWherePart: AnsiString;
+Var LXMLDATA: TalXmlDocument;
+    LSelectPart: AnsiString;
+    LFromPart: AnsiString;
+    LJoinPart: AnsiString;
+    LWherePart: AnsiString;
 
-    aDBHandle: IscDbHandle;
-    aTraHandle: IscTrHandle;
+    LDBHandle: IscDbHandle;
+    LTraHandle: IscTrHandle;
 
 Begin
 
@@ -2287,7 +2275,7 @@ Begin
   //To refresh the snapshot, the current transaction should be finished and the monitoring tables should be queried in a new transaction context.
 
   //build the aSelectPart;
-  aSelectPart := ALIfThen(not SkipIOStats,     'MON$PAGE_READS as PAGE_READS, '+
+  LSelectPart := ALIfThen(not SkipIOStats,     'MON$PAGE_READS as PAGE_READS, '+
                                                'MON$PAGE_WRITES as PAGE_WRITES, '+
                                                'MON$PAGE_FETCHES as PAGE_FETCHES, '+
                                                'MON$PAGE_MARKS as PAGE_MARKS, ') +
@@ -2303,61 +2291,61 @@ Begin
                                                'MON$MEMORY_ALLOCATED as MEMORY_ALLOCATED, '+
                                                'MON$MAX_MEMORY_USED as MAX_MEMORY_USED, '+
                                                'MON$MAX_MEMORY_ALLOCATED as MAX_MEMORY_ALLOCATED, ');
-  if aSelectPart <> '' then delete(aSelectPart,length(aSelectPart) - 1, 1)
+  if LSelectPart <> '' then delete(LSelectPart,length(LSelectPart) - 1, 1)
   else Exit;
 
   //build the aFromPart
-  if StatementSQL <> '' then       aFromPart := 'MON$STATEMENTS'
-  else if TransactionID <> -1 then aFromPart := 'MON$TRANSACTIONS'
-  else if ConnectionID <> -1 then  aFromPart := 'MON$ATTACHMENTS'
-  else                             aFromPart := 'MON$DATABASE';
+  if StatementSQL <> '' then       LFromPart := 'MON$STATEMENTS'
+  else if TransactionID <> -1 then LFromPart := 'MON$TRANSACTIONS'
+  else if ConnectionID <> -1 then  LFromPart := 'MON$ATTACHMENTS'
+  else                             LFromPart := 'MON$DATABASE';
 
   //build the aJoinPart
-  aJoinPart := ALIfThen(not SkipIOStats,     'JOIN MON$IO_STATS ON MON$IO_STATS.MON$STAT_ID = '        +aFromPart+'.MON$STAT_ID ') +
-               ALIfThen(not SkipRecordStats, 'JOIN MON$RECORD_STATS ON MON$RECORD_STATS.MON$STAT_ID = '+aFromPart+'.MON$STAT_ID ') +
-               ALIfThen(not SkipMemoryUsage, 'JOIN MON$MEMORY_USAGE ON MON$MEMORY_USAGE.MON$STAT_ID = '+aFromPart+'.MON$STAT_ID ');
+  LJoinPart := ALIfThen(not SkipIOStats,     'JOIN MON$IO_STATS ON MON$IO_STATS.MON$STAT_ID = '        +LFromPart+'.MON$STAT_ID ') +
+               ALIfThen(not SkipRecordStats, 'JOIN MON$RECORD_STATS ON MON$RECORD_STATS.MON$STAT_ID = '+LFromPart+'.MON$STAT_ID ') +
+               ALIfThen(not SkipMemoryUsage, 'JOIN MON$MEMORY_USAGE ON MON$MEMORY_USAGE.MON$STAT_ID = '+LFromPart+'.MON$STAT_ID ');
 
   //build the aWherePart
-  if StatementSQL <> '' then       aWherePart := 'WHERE '+
+  if StatementSQL <> '' then       LWherePart := 'WHERE '+
                                                  'MON$SQL_TEXT = ' + ALQuotedStr(StatementSQL) +
                                                  ALIfThen(TransactionID <> -1, ' AND MON$TRANSACTION_ID = '+ALIntToStr(TransactionID)) +
                                                  ALIfThen(ConnectionID <> -1,  ' AND MON$ATTACHMENT_ID = '+ALIntToStr(ConnectionID))
-  else if TransactionID <> -1 then aWherePart := 'WHERE '+
+  else if TransactionID <> -1 then LWherePart := 'WHERE '+
                                                  'MON$TRANSACTION_ID = '+ALIntToStr(TransactionID) +
                                                  ALIfThen(ConnectionID <> -1,  ' AND MON$ATTACHMENT_ID = '+ALIntToStr(ConnectionID))
-  else if ConnectionID <> -1 then  aWherePart := 'WHERE '+
+  else if ConnectionID <> -1 then  LWherePart := 'WHERE '+
                                                  'MON$ATTACHMENT_ID = '+ALIntToStr(ConnectionID)
-  else                             aWherePart := '';
+  else                             LWherePart := '';
 
 
   //clear the handle
-  aDBHandle := nil;
-  aTraHandle := nil;
+  LDBHandle := nil;
+  LTraHandle := nil;
 
   //start the TMP transaction
-  TransactionStart(aDBHandle,
-                   aTraHandle,
+  TransactionStart(LDBHandle,
+                   LTraHandle,
                    DefaultReadTPB);
   Try
 
     //get the data from the monitoring table
-    aXMLDATA := TALXmlDocument.create('root');
+    LXMLDATA := TALXmlDocument.create('root');
     try
 
       SelectData('SELECT '+
-                   aSelectPart +
+                   LSelectPart +
                  'FROM ' +
-                   aFromPart + ' ' +
-                 aJoinPart +
-                 aWherePart,
+                   LFromPart + ' ' +
+                 LJoinPart +
+                 LWherePart,
                  'rec',
-                 aXMLDATA.DocumentElement,
+                 LXMLDATA.DocumentElement,
                  ALDefaultFormatSettings,
-                 aDBHandle,
-                 aTraHandle);
+                 LDBHandle,
+                 LTraHandle);
 
-      if aXMLDATA.DocumentElement.ChildNodes.Count <> 1 then raise Exception.Create('Can not get the monitoring stats');
-      with aXMLDATA.DocumentElement.ChildNodes[0] do begin
+      if LXMLDATA.DocumentElement.ChildNodes.Count <> 1 then raise Exception.Create('Can not get the monitoring stats');
+      with LXMLDATA.DocumentElement.ChildNodes[0] do begin
 
         if not SkipIOStats then begin
           with IOStats do begin
@@ -2393,18 +2381,18 @@ Begin
       end;
 
     finally
-      aXMLDATA.free;
+      LXMLDATA.free;
     end;
 
     //commit the TMP transaction
-    TransactionCommit(aDBHandle,
-                      aTraHandle);
+    TransactionCommit(LDBHandle,
+                      LTraHandle);
 
   Except
 
     //roolback the TMP transaction
-    TransactionRollBack(aDBHandle,
-                        aTraHandle);
+    TransactionRollBack(LDBHandle,
+                        LTraHandle);
     Raise;
 
   End;
@@ -2563,63 +2551,63 @@ end;
 {**************************************************************************}
 function  TALFBXConnectionPoolClient.GetDataBaseInfoInt(const item: Integer;
                                                         const DBHandle: IscDbHandle= nil): Integer;
-Var aTmpDBHandle: IscDbHandle;
+Var LTmpDBHandle: IscDbHandle;
 begin
-  aTmpDBHandle := DBHandle;
-  if not assigned(aTmpDBHandle) then aTmpDBHandle := AcquireConnectionWithoutStmt;
+  LTmpDBHandle := DBHandle;
+  if not assigned(LTmpDBHandle) then LTmpDBHandle := AcquireConnectionWithoutStmt;
   try
     case item of
       isc_info_implementation,
       isc_info_base_level:
-      result := byte(FLibrary.DatabaseInfoString(aTmpDBHandle, item, 8)[5]);
-      else result := FLibrary.DatabaseInfoIntValue(aTmpDBHandle, AnsiChar(item));
+      result := byte(FLibrary.DatabaseInfoString(LTmpDBHandle, item, 8)[5]);
+      else result := FLibrary.DatabaseInfoIntValue(LTmpDBHandle, AnsiChar(item));
     end;
   finally
-    if not assigned(DBHandle) then ReleaseConnectionWithoutStmt(aTmpDBHandle);
+    if not assigned(DBHandle) then ReleaseConnectionWithoutStmt(LTmpDBHandle);
   end;
 end;
 
 {*****************************************************************************}
 function  TALFBXConnectionPoolClient.GetDataBaseInfoString(const item: Integer;
                                                            const DBHandle: IscDbHandle= nil): AnsiString;
-Var aTmpDBHandle: IscDbHandle;
-    aSize: byte;
-    aData: AnsiString;
+Var LTmpDBHandle: IscDbHandle;
+    LSize: byte;
+    LData: AnsiString;
 begin
-  aTmpDBHandle := DBHandle;
-  if not assigned(aTmpDBHandle) then aTmpDBHandle := AcquireConnectionWithoutStmt;
+  LTmpDBHandle := DBHandle;
+  if not assigned(LTmpDBHandle) then LTmpDBHandle := AcquireConnectionWithoutStmt;
   try
-    aData := FLibrary.DatabaseInfoString(aTmpDBHandle, item, 256);
+    LData := FLibrary.DatabaseInfoString(LTmpDBHandle, item, 256);
     case Item of
       isc_info_cur_logfile_name,
       isc_info_wal_prv_ckpt_fname: begin
-                                     aSize := byte(aData[4]);
-                                     ALMove(aData[5], aData[1], aSize);
-                                     SetLength(aData, aSize);
+                                     LSize := byte(LData[4]);
+                                     ALMove(LData[5], LData[1], LSize);
+                                     SetLength(LData, LSize);
                                    end;
       else begin
-        aSize := byte(aData[5]);
-        ALMove(aData[6], aData[1], aSize);
-        SetLength(aData, aSize);
+        LSize := byte(LData[5]);
+        ALMove(LData[6], LData[1], LSize);
+        SetLength(LData, LSize);
       end;
     end;
-    Result := AnsiString(aData);
+    Result := AnsiString(LData);
   finally
-    if not assigned(DBHandle) then ReleaseConnectionWithoutStmt(aTmpDBHandle);
+    if not assigned(DBHandle) then ReleaseConnectionWithoutStmt(LTmpDBHandle);
   end;
 end;
 
 {*******************************************************************************}
 function  TALFBXConnectionPoolClient.GetDataBaseInfoDateTime(const item: Integer;
                                                              const DBHandle: IscDbHandle= nil): TDateTime;
-Var aTmpDBHandle: IscDbHandle;
+Var LTmpDBHandle: IscDbHandle;
 begin
-  aTmpDBHandle := DBHandle;
-  if not assigned(aTmpDBHandle) then aTmpDBHandle := AcquireConnectionWithoutStmt;
+  LTmpDBHandle := DBHandle;
+  if not assigned(LTmpDBHandle) then LTmpDBHandle := AcquireConnectionWithoutStmt;
   try
-    result := FLibrary.DatabaseInfoDateTime(aTmpDBHandle, item);
+    result := FLibrary.DatabaseInfoDateTime(LTmpDBHandle, item);
   finally
-    if not assigned(DBHandle) then ReleaseConnectionWithoutStmt(aTmpDBHandle);
+    if not assigned(DBHandle) then ReleaseConnectionWithoutStmt(LTmpDBHandle);
   end;
 end;
 
@@ -2669,10 +2657,10 @@ end;
 {***************************************************************************************}
 Procedure TALFBXConnectionPoolClient.AcquireConnectionWithStmt(var DBHandle: IscDbHandle;
                                                                var StatementPool: TALFBXConnectionStatementPoolBinTree);
-Var aConnectionStatementPoolIterateExtData: TALFBXConnectionPoolClient_ConnectionStatementPoolIterateExtData;
-    aConnectionWithStmtPoolContainer: TALFBXConnectionWithStmtPoolContainer;
-    aTickCount: int64;
-    i: integer;
+Var LConnectionStatementPoolIterateExtData: TALFBXConnectionPoolClient_ConnectionStatementPoolIterateExtData;
+    LConnectionWithStmtPoolContainer: TALFBXConnectionWithStmtPoolContainer;
+    LTickCount: int64;
+    I: integer;
 Begin
 
   //synchronize the code
@@ -2683,18 +2671,18 @@ Begin
     if FReleasingAllconnections then raise exception.Create('Can not acquire connection: currently releasing all connections');
 
     //delete the old unused connection
-    aTickCount := GetTickCount64;
-    if aTickCount - FLastConnectionWithStmtGarbage > (60000 {every minutes})  then begin
+    LTickCount := GetTickCount64;
+    if LTickCount - FLastConnectionWithStmtGarbage > (60000 {every minutes})  then begin
       while FConnectionWithStmtPool.Count > 0 do begin
-        aConnectionWithStmtPoolContainer := TALFBXConnectionWithStmtPoolContainer(FConnectionWithStmtPool[0]);
-        if aTickCount - aConnectionWithStmtPoolContainer.Lastaccessdate > FConnectionMaxIdleTime then begin
+        LConnectionWithStmtPoolContainer := TALFBXConnectionWithStmtPoolContainer(FConnectionWithStmtPool[0]);
+        if LTickCount - LConnectionWithStmtPoolContainer.Lastaccessdate > FConnectionMaxIdleTime then begin
 
           //first drop all statements
-          aConnectionWithStmtPoolContainer.StatementPool.free;
+          LConnectionWithStmtPoolContainer.StatementPool.free;
 
           //now drop the connection
           Try
-            fLibrary.DetachDatabase(aConnectionWithStmtPoolContainer.DBHandle);
+            fLibrary.DetachDatabase(LConnectionWithStmtPoolContainer.DBHandle);
           Except
             //Disconnect must be a "safe" procedure because it's mostly called in
             //finalization part of the code that it is not protected
@@ -2711,9 +2699,9 @@ Begin
 
     //acquire the new connection from the pool
     If FConnectionWithStmtPool.Count > 0 then begin
-      aConnectionWithStmtPoolContainer := TALFBXConnectionWithStmtPoolContainer(FConnectionWithStmtPool[FConnectionWithStmtPool.count - 1]);
-      DBHandle := aConnectionWithStmtPoolContainer.DBHandle;
-      StatementPool := aConnectionWithStmtPoolContainer.StatementPool;
+      LConnectionWithStmtPoolContainer := TALFBXConnectionWithStmtPoolContainer(FConnectionWithStmtPool[FConnectionWithStmtPool.count - 1]);
+      DBHandle := LConnectionWithStmtPoolContainer.DBHandle;
+      StatementPool := LConnectionWithStmtPoolContainer.StatementPool;
       FConnectionWithStmtPool.Delete(FConnectionWithStmtPool.count - 1);
     end
 
@@ -2739,27 +2727,27 @@ Begin
   if GetTickCount64 - StatementPool.LastGarbage > (60000 {every minutes})  then begin
 
     //create aExtData.LstNodeToDelete
-    aConnectionStatementPoolIterateExtData.LstBinaryTreeNodeToDelete := TObjectlist.Create(False);
+    LConnectionStatementPoolIterateExtData.LstBinaryTreeNodeToDelete := TObjectlist.Create(False);
     Try
 
       //init aExtData.ConnectionPoolClient and aExtData.TickCount
-      aConnectionStatementPoolIterateExtData.ConnectionPoolClient := Self;
-      aConnectionStatementPoolIterateExtData.TickCountCurrentdate := GetTickCount64;
+      LConnectionStatementPoolIterateExtData.ConnectionPoolClient := Self;
+      LConnectionStatementPoolIterateExtData.TickCountCurrentdate := GetTickCount64;
 
       //iterate all StatementPool node
       StatementPool.Iterate(ALFBXConnectionPoolClient_ConnectionStatementPoolIterateFunct,
                             true,
-                            @aConnectionStatementPoolIterateExtData);
+                            @LConnectionStatementPoolIterateExtData);
 
       //delete all StatementPool node that have an empty pool
-      for I := 0 to aConnectionStatementPoolIterateExtData.LstBinaryTreeNodeToDelete.Count - 1 do
-        StatementPool.DeleteNode(TALFBXStringKeyPoolBinTreeNode(aConnectionStatementPoolIterateExtData.LstBinaryTreeNodeToDelete[i]).id);
+      for I := 0 to LConnectionStatementPoolIterateExtData.LstBinaryTreeNodeToDelete.Count - 1 do
+        StatementPool.DeleteNode(TALFBXStringKeyPoolBinTreeNode(LConnectionStatementPoolIterateExtData.LstBinaryTreeNodeToDelete[I]).id);
 
       //init the StatementPool.LastGarbage
       StatementPool.LastGarbage := GetTickCount64;
 
     Finally
-      aConnectionStatementPoolIterateExtData.LstBinaryTreeNodeToDelete.Free;
+      LConnectionStatementPoolIterateExtData.LstBinaryTreeNodeToDelete.Free;
     End;
 
   end;
@@ -2770,7 +2758,7 @@ End;
 Procedure TALFBXConnectionPoolClient.ReleaseConnectionWithStmt(var DBHandle: IscDbHandle;
                                                                var StatementPool: TALFBXConnectionStatementPoolBinTree;
                                                                const CloseConnection: Boolean = False);
-Var aConnectionWithStmtPoolContainer: TALFBXConnectionWithStmtPoolContainer;
+Var LConnectionWithStmtPoolContainer: TALFBXConnectionWithStmtPoolContainer;
 begin
 
   //security check
@@ -2783,11 +2771,11 @@ begin
 
     //add the connection to the pool
     If (not CloseConnection) and (not FReleasingAllconnections) then begin
-      aConnectionWithStmtPoolContainer := TALFBXConnectionWithStmtPoolContainer.Create;
-      aConnectionWithStmtPoolContainer.DBHandle := DBHandle;
-      aConnectionWithStmtPoolContainer.StatementPool:= StatementPool;
-      aConnectionWithStmtPoolContainer.LastAccessDate := GetTickCount64;
-      FConnectionWithStmtPool.add(aConnectionWithStmtPoolContainer);
+      LConnectionWithStmtPoolContainer := TALFBXConnectionWithStmtPoolContainer.Create;
+      LConnectionWithStmtPoolContainer.DBHandle := DBHandle;
+      LConnectionWithStmtPoolContainer.StatementPool:= StatementPool;
+      LConnectionWithStmtPoolContainer.LastAccessDate := GetTickCount64;
+      FConnectionWithStmtPool.add(LConnectionWithStmtPoolContainer);
     end
 
     else begin
@@ -2820,8 +2808,8 @@ end;
 
 {****************************************************************************}
 function TALFBXConnectionPoolClient.AcquireConnectionWithoutStmt: IscDbHandle;
-Var aConnectionWithoutStmtPoolContainer: TALFBXConnectionWithoutStmtPoolContainer;
-    aTickCount: int64;
+Var LConnectionWithoutStmtPoolContainer: TALFBXConnectionWithoutStmtPoolContainer;
+    LTickCount: int64;
 Begin
 
   //synchronize the code
@@ -2832,15 +2820,15 @@ Begin
     if FReleasingAllconnections then raise exception.Create('Can not acquire connection: currently releasing all connections');
 
     //delete the old unused connection
-    aTickCount := GetTickCount64;
-    if aTickCount - FLastConnectionWithoutStmtGarbage > (60000 {every minutes})  then begin
+    LTickCount := GetTickCount64;
+    if LTickCount - FLastConnectionWithoutStmtGarbage > (60000 {every minutes})  then begin
       while FConnectionWithoutStmtPool.Count > 0 do begin
-        aConnectionWithoutStmtPoolContainer := TALFBXConnectionWithoutStmtPoolContainer(FConnectionWithoutStmtPool[0]);
-        if aTickCount - aConnectionWithoutStmtPoolContainer.Lastaccessdate > FConnectionMaxIdleTime then begin
+        LConnectionWithoutStmtPoolContainer := TALFBXConnectionWithoutStmtPoolContainer(FConnectionWithoutStmtPool[0]);
+        if LTickCount - LConnectionWithoutStmtPoolContainer.Lastaccessdate > FConnectionMaxIdleTime then begin
 
           //drop the connection
           Try
-            fLibrary.DetachDatabase(aConnectionWithoutStmtPoolContainer.DBHandle);
+            fLibrary.DetachDatabase(LConnectionWithoutStmtPoolContainer.DBHandle);
           Except
             //Disconnect must be a "safe" procedure because it's mostly called in
             //finalization part of the code that it is not protected
@@ -2857,8 +2845,8 @@ Begin
 
     //acquire the new connection from the pool
     If FConnectionWithoutStmtPool.Count > 0 then begin
-      aConnectionWithoutStmtPoolContainer := TALFBXConnectionWithoutStmtPoolContainer(FConnectionWithoutStmtPool[FConnectionWithoutStmtPool.count - 1]);
-      Result := aConnectionWithoutStmtPoolContainer.DBHandle;
+      LConnectionWithoutStmtPoolContainer := TALFBXConnectionWithoutStmtPoolContainer(FConnectionWithoutStmtPool[FConnectionWithoutStmtPool.count - 1]);
+      Result := LConnectionWithoutStmtPoolContainer.DBHandle;
       FConnectionWithoutStmtPool.Delete(FConnectionWithoutStmtPool.count - 1);
     end
 
@@ -2883,7 +2871,7 @@ End;
 {******************************************************************************************}
 procedure TALFBXConnectionPoolClient.ReleaseConnectionWithoutStmt(var DBHandle: IscDbHandle;
                                                                    const CloseConnection: Boolean = False);
-Var aConnectionWithoutStmtPoolContainer: TALFBXConnectionWithoutStmtPoolContainer;
+Var LConnectionWithoutStmtPoolContainer: TALFBXConnectionWithoutStmtPoolContainer;
 begin
 
   //security check
@@ -2895,10 +2883,10 @@ begin
 
     //add the connection to the pool
     If (not CloseConnection) and (not FReleasingAllconnections) then begin
-      aConnectionWithoutStmtPoolContainer := TALFBXConnectionWithoutStmtPoolContainer.Create;
-      aConnectionWithoutStmtPoolContainer.DBHandle := DBHandle;
-      aConnectionWithoutStmtPoolContainer.LastAccessDate := GetTickCount64;
-      FConnectionWithoutStmtPool.add(aConnectionWithoutStmtPoolContainer);
+      LConnectionWithoutStmtPoolContainer := TALFBXConnectionWithoutStmtPoolContainer.Create;
+      LConnectionWithoutStmtPoolContainer.DBHandle := DBHandle;
+      LConnectionWithoutStmtPoolContainer.LastAccessDate := GetTickCount64;
+      FConnectionWithoutStmtPool.add(LConnectionWithoutStmtPoolContainer);
     end
 
     else begin
@@ -2939,8 +2927,8 @@ procedure ALFBXConnectionPoolClient_ReadTransactionPoolIterateFunct(aTree: TALBa
                                                                     aExtData: Pointer;
                                                                     Var aContinue: Boolean);
 
-Var aReadTransactionPool: TobjectList;
-    aReadTransactionPoolContainer: TalFBXReadTransactionPoolContainer;
+Var LReadTransactionPool: TobjectList;
+    LReadTransactionPoolContainer: TalFBXReadTransactionPoolContainer;
 
 begin
 
@@ -2948,38 +2936,38 @@ begin
   With TALFBXConnectionPoolClient_ReadTransactionPoolIterateExtData(aExtData^) do begin
 
     //init aReadTransactionPool
-    aReadTransactionPool := TALFBXStringKeyPoolBinTreeNode(aNode).Pool;
+    LReadTransactionPool := TALFBXStringKeyPoolBinTreeNode(aNode).Pool;
 
     //still their is some item in the aReadTransactionPool
-    while aReadTransactionPool.Count > 0 do begin
+    while LReadTransactionPool.Count > 0 do begin
 
       //init aReadTransactionPoolContainer
-      aReadTransactionPoolContainer := TalFBXReadTransactionPoolContainer(aReadTransactionPool[0]);
+      LReadTransactionPoolContainer := TalFBXReadTransactionPoolContainer(LReadTransactionPool[0]);
 
       //if the aReadTransactionPoolContainer is expired
-      if TickCountCurrentdate - aReadTransactionPoolContainer.Lastaccessdate > ConnectionPoolClient.TransactionMaxIdleTime then begin
+      if TickCountCurrentdate - LReadTransactionPoolContainer.Lastaccessdate > ConnectionPoolClient.TransactionMaxIdleTime then begin
 
         Try
 
           //commit the transaction and release the connection
-          ConnectionPoolClient.TransactionCommit(aReadTransactionPoolContainer.DBHandle,
-                                                 aReadTransactionPoolContainer.TraHandle);
+          ConnectionPoolClient.TransactionCommit(LReadTransactionPoolContainer.DBHandle,
+                                                 LReadTransactionPoolContainer.TraHandle);
 
         Except
 
           //roolback the transaction (and free the connection)
-          if assigned(aReadTransactionPoolContainer.TraHandle) then ConnectionPoolClient.TransactionRollback(aReadTransactionPoolContainer.DBHandle,
-                                                                                                             aReadTransactionPoolContainer.TraHandle,
+          if assigned(LReadTransactionPoolContainer.TraHandle) then ConnectionPoolClient.TransactionRollback(LReadTransactionPoolContainer.DBHandle,
+                                                                                                             LReadTransactionPoolContainer.TraHandle,
                                                                                                              True) // const CloseConnection: Boolean = False
 
           //simply free the connection
-          else if assigned(aReadTransactionPoolContainer.DBHandle) then ConnectionPoolClient.ReleaseConnectionWithoutStmt(aReadTransactionPoolContainer.DBHandle,
+          else if assigned(LReadTransactionPoolContainer.DBHandle) then ConnectionPoolClient.ReleaseConnectionWithoutStmt(LReadTransactionPoolContainer.DBHandle,
                                                                                                                            True); // const CloseConnection: Boolean = False
 
         End;
 
         //free the TransactionPoolContainer
-        aReadTransactionPool.Delete(0);
+        LReadTransactionPool.Delete(0);
 
       end
 
@@ -2989,7 +2977,7 @@ begin
     end;
 
     //update LstNodeToDelete
-    if aReadTransactionPool.Count = 0 then LstBinaryTreeNodeToDelete.Add(aNode);
+    if LReadTransactionPool.Count = 0 then LstBinaryTreeNodeToDelete.Add(aNode);
 
   end;
 
@@ -3000,10 +2988,10 @@ procedure TALFBXConnectionPoolClient.AcquireReadTransaction(var DBHandle: IscDbH
                                                             var TraHandle: IscTrHandle;
                                                             const TPB: AnsiString);
 
-Var aReadTransactionPoolIterateExtData: TALFBXConnectionPoolClient_ReadTransactionPoolIterateExtData;
-    aReadTransactionPoolContainer: TalFBXReadTransactionPoolContainer;
-    aStringKeyPoolBinTreeNode: TALStringKeyAVLBinaryTreeNode;
-    i: integer;
+Var LReadTransactionPoolIterateExtData: TALFBXConnectionPoolClient_ReadTransactionPoolIterateExtData;
+    LReadTransactionPoolContainer: TalFBXReadTransactionPoolContainer;
+    LStringKeyPoolBinTreeNode: TALStringKeyAVLBinaryTreeNode;
+    I: integer;
 
 Begin
 
@@ -3028,48 +3016,48 @@ Begin
     if GetTickCount64 - FLastReadTransactionGarbage > (60000 {every minutes})  then begin
 
       //create aExtData.LstNodeToDelete
-      aReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete := TObjectlist.Create(False);
+      LReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete := TObjectlist.Create(False);
       Try
 
         //init aExtData.ConnectionPoolClient and aExtData.TickCount
-        aReadTransactionPoolIterateExtData.ConnectionPoolClient := Self;
-        aReadTransactionPoolIterateExtData.TickCountCurrentdate := GetTickCount64;
+        LReadTransactionPoolIterateExtData.ConnectionPoolClient := Self;
+        LReadTransactionPoolIterateExtData.TickCountCurrentdate := GetTickCount64;
 
         //iterate all FReadTransactionPool node
         FReadTransactionPool.Iterate(ALFBXConnectionPoolClient_ReadTransactionPoolIterateFunct,
                                      true,
-                                     @aReadTransactionPoolIterateExtData);
+                                     @LReadTransactionPoolIterateExtData);
 
         //delete all FReadTransactionPool node that have an empty pool
-        for I := 0 to aReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete.Count - 1 do
-          FReadTransactionPool.DeleteNode(TALFBXStringKeyPoolBinTreeNode(aReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete[i]).id);
+        for I := 0 to LReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete.Count - 1 do
+          FReadTransactionPool.DeleteNode(TALFBXStringKeyPoolBinTreeNode(LReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete[I]).id);
 
         //init the FLastReadTransactionGarbage
         FLastReadTransactionGarbage := GetTickCount64;
 
       Finally
-        aReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete.Free;
+        LReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete.Free;
       End;
 
     end;
 
     //look for a node with TPB id in the ReadTransactionPool. if not found create it
-    aStringKeyPoolBinTreeNode := FReadTransactionPool.FindNode(TPB);
-    if not assigned(aStringKeyPoolBinTreeNode) then begin
-      aStringKeyPoolBinTreeNode := TALFBXStringKeyPoolBinTreeNode.Create;
-      aStringKeyPoolBinTreeNode.ID := TPB;
-      if not FReadTransactionPool.AddNode(aStringKeyPoolBinTreeNode) then begin
-        aStringKeyPoolBinTreeNode.free;
+    LStringKeyPoolBinTreeNode := FReadTransactionPool.FindNode(TPB);
+    if not assigned(LStringKeyPoolBinTreeNode) then begin
+      LStringKeyPoolBinTreeNode := TALFBXStringKeyPoolBinTreeNode.Create;
+      LStringKeyPoolBinTreeNode.ID := TPB;
+      if not FReadTransactionPool.AddNode(LStringKeyPoolBinTreeNode) then begin
+        LStringKeyPoolBinTreeNode.free;
         Raise Exception.Create('Can not add any more node in transaction pool binary tree');
       end;
     end;
 
     //if the if still some transaction in the queue
-    If TALFBXStringKeyPoolBinTreeNode(aStringKeyPoolBinTreeNode).Pool.Count > 0 then begin
-      with TALFBXStringKeyPoolBinTreeNode(aStringKeyPoolBinTreeNode) do begin
-        aReadTransactionPoolContainer := TalFBXReadTransactionPoolContainer(Pool[Pool.count - 1]);
-        DBHandle := aReadTransactionPoolContainer.DBHandle;
-        TraHandle := aReadTransactionPoolContainer.TraHandle;
+    If TALFBXStringKeyPoolBinTreeNode(LStringKeyPoolBinTreeNode).Pool.Count > 0 then begin
+      with TALFBXStringKeyPoolBinTreeNode(LStringKeyPoolBinTreeNode) do begin
+        LReadTransactionPoolContainer := TalFBXReadTransactionPoolContainer(Pool[Pool.count - 1]);
+        DBHandle := LReadTransactionPoolContainer.DBHandle;
+        TraHandle := LReadTransactionPoolContainer.TraHandle;
         Pool.Delete(Pool.count - 1);
       end;
     end
@@ -3099,8 +3087,8 @@ procedure TALFBXConnectionPoolClient.ReleaseReadTransaction(var DBHandle: IscDbH
                                                             const TPB: AnsiString;
                                                             const CloseConnection: Boolean = False);
 
-Var aReadTransactionPoolContainer: TalFBXReadTransactionPoolContainer;
-    aStringKeyPoolBinTreeNode: TALStringKeyAVLBinaryTreeNode;
+Var LReadTransactionPoolContainer: TalFBXReadTransactionPoolContainer;
+    LStringKeyPoolBinTreeNode: TALStringKeyAVLBinaryTreeNode;
 
 begin
 
@@ -3117,22 +3105,22 @@ begin
     If (not CloseConnection) and (not FReleasingAllconnections) then begin
 
       //look for the node in FReadTransactionPool
-      aStringKeyPoolBinTreeNode := FReadTransactionPool.FindNode(TPB);
-      if not assigned(aStringKeyPoolBinTreeNode) then begin
-        aStringKeyPoolBinTreeNode := TALFBXStringKeyPoolBinTreeNode.Create;
-        aStringKeyPoolBinTreeNode.ID := TPB;
-        if not FReadTransactionPool.AddNode(aStringKeyPoolBinTreeNode) then begin
-          aStringKeyPoolBinTreeNode.free;
+      LStringKeyPoolBinTreeNode := FReadTransactionPool.FindNode(TPB);
+      if not assigned(LStringKeyPoolBinTreeNode) then begin
+        LStringKeyPoolBinTreeNode := TALFBXStringKeyPoolBinTreeNode.Create;
+        LStringKeyPoolBinTreeNode.ID := TPB;
+        if not FReadTransactionPool.AddNode(LStringKeyPoolBinTreeNode) then begin
+          LStringKeyPoolBinTreeNode.free;
           Raise Exception.Create('Can not add any more node in transaction pool binary tree');
         end;
       end;
 
       //add the item to the pool
-      aReadTransactionPoolContainer := TalFBXReadTransactionPoolContainer.Create;
-      aReadTransactionPoolContainer.DBHandle := DBHandle;
-      aReadTransactionPoolContainer.TraHandle := TraHandle;
-      aReadTransactionPoolContainer.LastAccessDate := GetTickCount64;
-      TALFBXStringKeyPoolBinTreeNode(aStringKeyPoolBinTreeNode).Pool.add(aReadTransactionPoolContainer);
+      LReadTransactionPoolContainer := TalFBXReadTransactionPoolContainer.Create;
+      LReadTransactionPoolContainer.DBHandle := DBHandle;
+      LReadTransactionPoolContainer.TraHandle := TraHandle;
+      LReadTransactionPoolContainer.LastAccessDate := GetTickCount64;
+      TALFBXStringKeyPoolBinTreeNode(LStringKeyPoolBinTreeNode).Pool.add(LReadTransactionPoolContainer);
 
     end
 
@@ -3188,8 +3176,8 @@ procedure ALFBXConnectionPoolClient_ReadStatementPoolIterateFunct(aTree: TALBase
                                                                   aExtData: Pointer;
                                                                   Var aContinue: Boolean);
 
-Var aReadStatementPool: TobjectList;
-    aReadStatementPoolContainer: TalFBXReadStatementPoolContainer;
+Var LReadStatementPool: TobjectList;
+    LReadStatementPoolContainer: TalFBXReadStatementPoolContainer;
 
 begin
 
@@ -3197,49 +3185,49 @@ begin
   With TALFBXConnectionPoolClient_ReadStatementPoolIterateExtData(aExtData^) do begin
 
     //init aReadStatementPool
-    aReadStatementPool := TALFBXStringKeyPoolBinTreeNode(aNode).Pool;
+    LReadStatementPool := TALFBXStringKeyPoolBinTreeNode(aNode).Pool;
 
     //still their is some item in the aReadStatementPool
-    while aReadStatementPool.Count > 0 do begin
+    while LReadStatementPool.Count > 0 do begin
 
       //init aReadStatementPoolContainer
-      aReadStatementPoolContainer := TalFBXReadStatementPoolContainer(aReadStatementPool[0]);
+      LReadStatementPoolContainer := TalFBXReadStatementPoolContainer(LReadStatementPool[0]);
 
       //if the aReadStatementPoolContainer is expired
-      if TickCountCurrentdate - aReadStatementPoolContainer.Lastaccessdate > ConnectionPoolClient.StatementMaxIdleTime then begin
+      if TickCountCurrentdate - LReadStatementPoolContainer.Lastaccessdate > ConnectionPoolClient.StatementMaxIdleTime then begin
 
         Try
 
           //drop the statement
           try
-            ConnectionPoolClient.lib.DSQLFreeStatement(aReadStatementPoolContainer.StmtHandle, DSQL_drop);
+            ConnectionPoolClient.lib.DSQLFreeStatement(LReadStatementPoolContainer.StmtHandle, DSQL_drop);
           Except
             //what else we can do here ?
             //this can happen if connection lost for exemple
           end;
-          aReadStatementPoolContainer.Sqlda.free;
-          aReadStatementPoolContainer.StmtHandle := nil;
-          aReadStatementPoolContainer.Sqlda := nil;
+          LReadStatementPoolContainer.Sqlda.free;
+          LReadStatementPoolContainer.StmtHandle := nil;
+          LReadStatementPoolContainer.Sqlda := nil;
 
           //commit and release the connection
-          ConnectionPoolClient.TransactionCommit(aReadStatementPoolContainer.DBHandle,
-                                                 aReadStatementPoolContainer.TraHandle);
+          ConnectionPoolClient.TransactionCommit(LReadStatementPoolContainer.DBHandle,
+                                                 LReadStatementPoolContainer.TraHandle);
 
         Except
 
           //roolback the transaction (and free the connection)
-          if assigned(aReadStatementPoolContainer.TraHandle) then ConnectionPoolClient.TransactionRollback(aReadStatementPoolContainer.DBHandle,
-                                                                                                           aReadStatementPoolContainer.TraHandle,
+          if assigned(LReadStatementPoolContainer.TraHandle) then ConnectionPoolClient.TransactionRollback(LReadStatementPoolContainer.DBHandle,
+                                                                                                           LReadStatementPoolContainer.TraHandle,
                                                                                                            True) // const CloseConnection: Boolean = False
 
           //simply free the connection
-          else if assigned(aReadStatementPoolContainer.DBHandle) then ConnectionPoolClient.ReleaseConnectionWithoutStmt(aReadStatementPoolContainer.DBHandle,
+          else if assigned(LReadStatementPoolContainer.DBHandle) then ConnectionPoolClient.ReleaseConnectionWithoutStmt(LReadStatementPoolContainer.DBHandle,
                                                                                                                          True); // const CloseConnection: Boolean = False
 
         End;
 
         //free the ReadStatementPoolContainer
-        aReadStatementPool.Delete(0);
+        LReadStatementPool.Delete(0);
 
       end
 
@@ -3249,7 +3237,7 @@ begin
     end;
 
     //update LstNodeToDelete
-    if aReadStatementPool.Count = 0 then LstBinaryTreeNodeToDelete.Add(aNode);
+    if LReadStatementPool.Count = 0 then LstBinaryTreeNodeToDelete.Add(aNode);
 
   end;
 
@@ -3263,10 +3251,10 @@ procedure TALFBXConnectionPoolClient.AcquireReadStatement(const SQL: AnsiString;
                                                           var Sqlda: TALFBXSQLResult;
                                                           const TPB: AnsiString);
 
-Var aReadStatementPoolIterateExtData: TALFBXConnectionPoolClient_ReadStatementPoolIterateExtData;
-    aReadStatementPoolContainer: TalFBXReadStatementPoolContainer;
-    aStringKeyPoolBinTreeNode: TALStringKeyAVLBinaryTreeNode;
-    i: integer;
+Var LReadStatementPoolIterateExtData: TALFBXConnectionPoolClient_ReadStatementPoolIterateExtData;
+    LReadStatementPoolContainer: TalFBXReadStatementPoolContainer;
+    LStringKeyPoolBinTreeNode: TALStringKeyAVLBinaryTreeNode;
+    I: integer;
 
 Begin
 
@@ -3294,50 +3282,50 @@ Begin
     if GetTickCount64 - FLastReadStatementGarbage > (60000 {every minutes})  then begin
 
       //create aExtData.LstNodeToDelete
-      aReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete := TObjectlist.Create(False);
+      LReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete := TObjectlist.Create(False);
       Try
 
         //init aExtData.ConnectionPoolClient and aExtData.TickCount
-        aReadStatementPoolIterateExtData.ConnectionPoolClient := Self;
-        aReadStatementPoolIterateExtData.TickCountCurrentdate := GetTickCount64;
+        LReadStatementPoolIterateExtData.ConnectionPoolClient := Self;
+        LReadStatementPoolIterateExtData.TickCountCurrentdate := GetTickCount64;
 
         //iterate all FReadStatementPool node
         FReadStatementPool.Iterate(ALFBXConnectionPoolClient_ReadStatementPoolIterateFunct,
                                    true,
-                                   @aReadStatementPoolIterateExtData);
+                                   @LReadStatementPoolIterateExtData);
 
         //delete all FReadStatementPool node that have an empty pool
-        for I := 0 to aReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete.Count - 1 do
-          FReadStatementPool.DeleteNode(TALFBXStringKeyPoolBinTreeNode(aReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete[i]).id);
+        for I := 0 to LReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete.Count - 1 do
+          FReadStatementPool.DeleteNode(TALFBXStringKeyPoolBinTreeNode(LReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete[I]).id);
 
         //init the FLastReadStatementGarbage
         FLastReadStatementGarbage := GetTickCount64;
 
       Finally
-        aReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete.Free;
+        LReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete.Free;
       End;
 
     end;
 
     //look for a node with TPB + SQL id in the ReadStatementPool. if not found create it
-    aStringKeyPoolBinTreeNode := FReadStatementPool.FindNode(TPB+'#'+SQL);
-    if not assigned(aStringKeyPoolBinTreeNode) then begin
-      aStringKeyPoolBinTreeNode := TALFBXStringKeyPoolBinTreeNode.Create;
-      aStringKeyPoolBinTreeNode.ID := TPB+'#'+SQL;
-      if not FReadStatementPool.AddNode(aStringKeyPoolBinTreeNode) then begin
-        aStringKeyPoolBinTreeNode.free;
+    LStringKeyPoolBinTreeNode := FReadStatementPool.FindNode(TPB+'#'+SQL);
+    if not assigned(LStringKeyPoolBinTreeNode) then begin
+      LStringKeyPoolBinTreeNode := TALFBXStringKeyPoolBinTreeNode.Create;
+      LStringKeyPoolBinTreeNode.ID := TPB+'#'+SQL;
+      if not FReadStatementPool.AddNode(LStringKeyPoolBinTreeNode) then begin
+        LStringKeyPoolBinTreeNode.free;
         Raise Exception.Create('Can not add any more node in statement pool binary tree');
       end;
     end;
 
     //if the if still some Statement in the queue
-    If TALFBXStringKeyPoolBinTreeNode(aStringKeyPoolBinTreeNode).Pool.Count > 0 then begin
-      with TALFBXStringKeyPoolBinTreeNode(aStringKeyPoolBinTreeNode) do begin
-        aReadStatementPoolContainer := TalFBXReadStatementPoolContainer(Pool[Pool.count - 1]);
-        DBHandle := aReadStatementPoolContainer.DBHandle;
-        TraHandle := aReadStatementPoolContainer.TraHandle;
-        StmtHandle := aReadStatementPoolContainer.StmtHandle;
-        Sqlda := aReadStatementPoolContainer.Sqlda;
+    If TALFBXStringKeyPoolBinTreeNode(LStringKeyPoolBinTreeNode).Pool.Count > 0 then begin
+      with TALFBXStringKeyPoolBinTreeNode(LStringKeyPoolBinTreeNode) do begin
+        LReadStatementPoolContainer := TalFBXReadStatementPoolContainer(Pool[Pool.count - 1]);
+        DBHandle := LReadStatementPoolContainer.DBHandle;
+        TraHandle := LReadStatementPoolContainer.TraHandle;
+        StmtHandle := LReadStatementPoolContainer.StmtHandle;
+        Sqlda := LReadStatementPoolContainer.Sqlda;
         Pool.Delete(Pool.count - 1);
       end;
     end
@@ -3375,8 +3363,8 @@ procedure TALFBXConnectionPoolClient.ReleaseReadStatement(const SQL: AnsiString;
                                                           const TPB: AnsiString;
                                                           const CloseConnection: Boolean = False);
 
-Var aReadStatementPoolContainer: TalFBXReadStatementPoolContainer;
-    aStringKeyPoolBinTreeNode: TALStringKeyAVLBinaryTreeNode;
+Var LReadStatementPoolContainer: TalFBXReadStatementPoolContainer;
+    LStringKeyPoolBinTreeNode: TALStringKeyAVLBinaryTreeNode;
 
 begin
 
@@ -3402,24 +3390,24 @@ begin
     If (not CloseConnection) and (not FReleasingAllconnections) then begin
 
       //look for the node in FReadStatementPool
-      aStringKeyPoolBinTreeNode := FReadStatementPool.FindNode(TPB+'#'+SQL);
-      if not assigned(aStringKeyPoolBinTreeNode) then begin
-        aStringKeyPoolBinTreeNode := TALFBXStringKeyPoolBinTreeNode.Create;
-        aStringKeyPoolBinTreeNode.ID := TPB+'#'+SQL;
-        if not FReadStatementPool.AddNode(aStringKeyPoolBinTreeNode) then begin
-          aStringKeyPoolBinTreeNode.free;
+      LStringKeyPoolBinTreeNode := FReadStatementPool.FindNode(TPB+'#'+SQL);
+      if not assigned(LStringKeyPoolBinTreeNode) then begin
+        LStringKeyPoolBinTreeNode := TALFBXStringKeyPoolBinTreeNode.Create;
+        LStringKeyPoolBinTreeNode.ID := TPB+'#'+SQL;
+        if not FReadStatementPool.AddNode(LStringKeyPoolBinTreeNode) then begin
+          LStringKeyPoolBinTreeNode.free;
           Raise Exception.Create('Can not add any more node in statement pool binary tree');
         end;
       end;
 
       //add the item to the pool
-      aReadStatementPoolContainer := TalFBXReadStatementPoolContainer.Create;
-      aReadStatementPoolContainer.DBHandle := DBHandle;
-      aReadStatementPoolContainer.TraHandle := TraHandle;
-      aReadStatementPoolContainer.StmtHandle := StmtHandle;
-      aReadStatementPoolContainer.Sqlda := Sqlda;
-      aReadStatementPoolContainer.LastAccessDate := GetTickCount64;
-      TALFBXStringKeyPoolBinTreeNode(aStringKeyPoolBinTreeNode).Pool.add(aReadStatementPoolContainer);
+      LReadStatementPoolContainer := TalFBXReadStatementPoolContainer.Create;
+      LReadStatementPoolContainer.DBHandle := DBHandle;
+      LReadStatementPoolContainer.TraHandle := TraHandle;
+      LReadStatementPoolContainer.StmtHandle := StmtHandle;
+      LReadStatementPoolContainer.Sqlda := Sqlda;
+      LReadStatementPoolContainer.LastAccessDate := GetTickCount64;
+      TALFBXStringKeyPoolBinTreeNode(LStringKeyPoolBinTreeNode).Pool.add(LReadStatementPoolContainer);
 
     end
 
@@ -3473,11 +3461,11 @@ end;
 
 {*******************************************************************************************************}
 procedure TALFBXConnectionPoolClient.ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True);
-Var aConnectionWithStmtPoolContainer: TALFBXConnectionWithStmtPoolContainer;
-    aConnectionWithoutStmtPoolContainer: TALFBXConnectionWithoutStmtPoolContainer;
-    aReadTransactionPoolIterateExtData: TALFBXConnectionPoolClient_ReadTransactionPoolIterateExtData;
-    aReadStatementPoolIterateExtData: TALFBXConnectionPoolClient_ReadStatementPoolIterateExtData;
-    i: integer;
+Var LConnectionWithStmtPoolContainer: TALFBXConnectionWithStmtPoolContainer;
+    LConnectionWithoutStmtPoolContainer: TALFBXConnectionWithoutStmtPoolContainer;
+    LReadTransactionPoolIterateExtData: TALFBXConnectionPoolClient_ReadTransactionPoolIterateExtData;
+    LReadStatementPoolIterateExtData: TALFBXConnectionPoolClient_ReadStatementPoolIterateExtData;
+    I: integer;
 begin
 
   //we do this to forbid any new thread to create a new transaction
@@ -3505,27 +3493,27 @@ begin
     FReadStatementPoolCS.Acquire;
     Try
 
-      aReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete := TObjectlist.Create(False);
+      LReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete := TObjectlist.Create(False);
       Try
 
         //init aExtData.ConnectionPoolClient and aExtData.TickCount
-        aReadStatementPoolIterateExtData.ConnectionPoolClient := Self;
-        aReadStatementPoolIterateExtData.TickCountCurrentdate :=  high(int64); //this will cause to delete all node
+        LReadStatementPoolIterateExtData.ConnectionPoolClient := Self;
+        LReadStatementPoolIterateExtData.TickCountCurrentdate :=  high(int64); //this will cause to delete all node
 
         //iterate all FReadStatementPool node
         FReadStatementPool.Iterate(ALFBXConnectionPoolClient_ReadStatementPoolIterateFunct,
                                    true,
-                                   @aReadStatementPoolIterateExtData);
+                                   @LReadStatementPoolIterateExtData);
 
         //delete all FReadStatementPool node that have an empty pool
-        for I := 0 to aReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete.Count - 1 do
-          FReadStatementPool.DeleteNode(TALFBXStringKeyPoolBinTreeNode(aReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete[i]).id);
+        for I := 0 to LReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete.Count - 1 do
+          FReadStatementPool.DeleteNode(TALFBXStringKeyPoolBinTreeNode(LReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete[I]).id);
 
         //init the FLastReadStatementGarbage
         FLastReadStatementGarbage := GetTickCount64;
 
       Finally
-        aReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete.Free;
+        LReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete.Free;
       End;
 
     Finally
@@ -3556,27 +3544,27 @@ begin
     FReadTransactionPoolCS.Acquire;
     Try
 
-      aReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete := TObjectlist.Create(False);
+      LReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete := TObjectlist.Create(False);
       Try
 
         //init aExtData.ConnectionPoolClient and aExtData.TickCount
-        aReadTransactionPoolIterateExtData.ConnectionPoolClient := Self;
-        aReadTransactionPoolIterateExtData.TickCountCurrentdate :=  high(int64); //this will cause to delete all node
+        LReadTransactionPoolIterateExtData.ConnectionPoolClient := Self;
+        LReadTransactionPoolIterateExtData.TickCountCurrentdate :=  high(int64); //this will cause to delete all node
 
         //iterate all FReadTransactionPool node
         FReadTransactionPool.Iterate(ALFBXConnectionPoolClient_ReadTransactionPoolIterateFunct,
                                      true,
-                                     @aReadTransactionPoolIterateExtData);
+                                     @LReadTransactionPoolIterateExtData);
 
         //delete all FReadTransactionPool node that have an empty pool
-        for I := 0 to aReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete.Count - 1 do
-          FReadTransactionPool.DeleteNode(TALFBXStringKeyPoolBinTreeNode(aReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete[i]).id);
+        for I := 0 to LReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete.Count - 1 do
+          FReadTransactionPool.DeleteNode(TALFBXStringKeyPoolBinTreeNode(LReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete[I]).id);
 
         //init the FLastReadTransactionGarbage
         FLastReadTransactionGarbage := GetTickCount64;
 
       Finally
-        aReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete.Free;
+        LReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete.Free;
       End;
 
     Finally
@@ -3609,14 +3597,14 @@ begin
       while FConnectionWithStmtPool.Count > 0 do begin
 
         //init aConnectionWithStmtPoolContainer
-        aConnectionWithStmtPoolContainer := TALFBXConnectionWithStmtPoolContainer(FConnectionWithStmtPool[FConnectionWithStmtPool.count - 1]);
+        LConnectionWithStmtPoolContainer := TALFBXConnectionWithStmtPoolContainer(FConnectionWithStmtPool[FConnectionWithStmtPool.count - 1]);
 
         //first drop all statements
-        aConnectionWithStmtPoolContainer.StatementPool.free;
+        LConnectionWithStmtPoolContainer.StatementPool.free;
 
         //now drop the connection
         Try
-          fLibrary.DetachDatabase(aConnectionWithStmtPoolContainer.DBHandle);
+          fLibrary.DetachDatabase(LConnectionWithStmtPoolContainer.DBHandle);
         Except
           //Disconnect must be a "safe" procedure because it's mostly called in
           //finalization part of the code that it is not protected
@@ -3657,11 +3645,11 @@ begin
       while FConnectionWithoutStmtPool.Count > 0 do begin
 
         //init aConnectionWithoutStmtPoolContainer
-        aConnectionWithoutStmtPoolContainer := TALFBXConnectionWithoutStmtPoolContainer(FConnectionWithoutStmtPool[FConnectionWithoutStmtPool.count - 1]);
+        LConnectionWithoutStmtPoolContainer := TALFBXConnectionWithoutStmtPoolContainer(FConnectionWithoutStmtPool[FConnectionWithoutStmtPool.count - 1]);
 
         //now drop the connection
         Try
-          fLibrary.DetachDatabase(aConnectionWithoutStmtPoolContainer.DBHandle);
+          fLibrary.DetachDatabase(LConnectionWithoutStmtPoolContainer.DBHandle);
         Except
           //Disconnect must be a "safe" procedure because it's mostly called in
           //finalization part of the code that it is not protected
@@ -3742,7 +3730,7 @@ procedure TALFBXConnectionPoolClient.TransactionRollback(var DBHandle: IscDbHand
                                                          var TraHandle: IscTrHandle;
                                                          var StatementPool: TALFBXConnectionStatementPoolBinTree;
                                                          const CloseConnection: Boolean = False);
-var aTmpCloseConnection: Boolean;
+var LTmpCloseConnection: Boolean;
 begin
 
   //security check
@@ -3751,7 +3739,7 @@ begin
   if not assigned(StatementPool) then raise exception.Create('Statement pool object can not be null');
 
   //rollback the connection
-  aTmpCloseConnection := CloseConnection;
+  LTmpCloseConnection := CloseConnection;
   Try
     Try
       FLibrary.TransactionRollback(TraHandle);
@@ -3761,7 +3749,7 @@ begin
       //raising the exception here will hide the first exception message
       //it's not a problem to hide the error here because closing the
       //connection will normally rollback the data
-      aTmpCloseConnection := True;
+      LTmpCloseConnection := True;
     End;
   Finally
 
@@ -3769,7 +3757,7 @@ begin
     TraHandle := nil;
     ReleaseConnectionWithStmt(DBHandle,
                               StatementPool,
-                              aTmpCloseConnection);
+                              LTmpCloseConnection);
 
   End;
 
@@ -3825,7 +3813,7 @@ end;
 procedure TALFBXConnectionPoolClient.TransactionRollback(var DBHandle: IscDbHandle;
                                                          var TraHandle: IscTrHandle;
                                                          const CloseConnection: Boolean = False);
-var aTmpCloseConnection: Boolean;
+var LTmpCloseConnection: Boolean;
 begin
 
   //security check
@@ -3833,7 +3821,7 @@ begin
   if not assigned(TraHandle) then raise exception.Create('Transaction handle can not be null');
 
   //rollback the connection
-  aTmpCloseConnection := CloseConnection;
+  LTmpCloseConnection := CloseConnection;
   Try
     Try
       FLibrary.TransactionRollback(TraHandle);
@@ -3843,13 +3831,13 @@ begin
       //raising the exception here will hide the first exception message
       //it's not a problem to hide the error here because closing the
       //connection will normally rollback the data
-      aTmpCloseConnection := True;
+      LTmpCloseConnection := True;
     End;
   Finally
 
     //release the connection
     TraHandle := nil;
-    ReleaseConnectionWithoutStmt(DBHandle, aTmpCloseConnection);
+    ReleaseConnectionWithoutStmt(DBHandle, LTmpCloseConnection);
 
   End;
 
@@ -3886,7 +3874,7 @@ function TALFBXConnectionPoolClient.Prepare(const SQL: AnsiString;
                                             var StmtHandle: IscStmtHandle;
                                             var Sqlda: TALFBXSQLResult;
                                             const TPB: AnsiString = ''): TALFBXStatementType;
-Var aReleaseConnectionHandleonError: Boolean;
+Var LReleaseConnectionHandleonError: Boolean;
 begin
 
   //check the params
@@ -3912,9 +3900,9 @@ begin
     TransactionStart(DBHandle,
                      TraHandle,
                      TPB);
-    aReleaseConnectionHandleonError := True;
+    LReleaseConnectionHandleonError := True;
   end
-  else aReleaseConnectionHandleonError := False;
+  else LReleaseConnectionHandleonError := False;
   try
 
     //create the sqlda result
@@ -3948,7 +3936,7 @@ begin
     end;
 
   except
-    if aReleaseConnectionHandleonError then TransactionRollBack(DBHandle,
+    if LReleaseConnectionHandleonError then TransactionRollBack(DBHandle,
                                                                 TraHandle,
                                                                 true); // const CloseConnection: Boolean = False
     raise;
@@ -3981,113 +3969,113 @@ procedure TALFBXConnectionPoolClient.SelectData(const Queries: TALFBXClientSelec
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                                                 const TPB: AnsiString = '');
 
-  {$IFDEF undef}{$REGION 'Var Declarations'}{$ENDIF}
-  Var aSqlpa: TALFBXSQLParams;
-      aParamsIndex: integer;
-      aBlobhandle: IscBlobHandle;
-      aQueriesIndex: integer;
-      aViewRec: TalXmlNode;
-      aXmlDocument: TalXmlDocument;
-      aTmpDBHandle: IscDbHandle;
-      aTmpTraHandle: IscTrHandle;
-      aTmpStmtHandle: IscStmtHandle;
-      aTmpSqlda: TALFBXSQLResult;
-      aTmpStatementPoolNode: TALStringKeyAVLBinaryTreeNode;
-      aTmpTPB: AnsiString;
-      aGDSCode: integer;
-      aReadOnlyReadCommitedTPB: Boolean;
-      aConnectionWasAcquiredFromPool: Boolean;
-      aTransactionWasAcquiredFromPool: Boolean;
-      aStatementWasAcquiredFromPool: Boolean;
-      aStopWatch: TStopWatch;
-      aCacheKey: ansiString;
-      aCacheStr: ansiString;
-  {$IFDEF undef}{$ENDREGION}{$ENDIF}
+  {$REGION 'Var Declarations'}
+  Var LSqlpa: TALFBXSQLParams;
+      LParamsIndex: integer;
+      LBlobhandle: IscBlobHandle;
+      LQueriesIndex: integer;
+      LViewRec: TalXmlNode;
+      LXmlDocument: TalXmlDocument;
+      LTmpDBHandle: IscDbHandle;
+      LTmpTraHandle: IscTrHandle;
+      LTmpStmtHandle: IscStmtHandle;
+      LTmpSqlda: TALFBXSQLResult;
+      LTmpStatementPoolNode: TALStringKeyAVLBinaryTreeNode;
+      LTmpTPB: AnsiString;
+      LGDSCode: integer;
+      LReadOnlyReadCommitedTPB: Boolean;
+      LConnectionWasAcquiredFromPool: Boolean;
+      LTransactionWasAcquiredFromPool: Boolean;
+      LStatementWasAcquiredFromPool: Boolean;
+      LStopWatch: TStopWatch;
+      LCacheKey: ansiString;
+      LCacheStr: ansiString;
+  {$ENDREGION}
 
-  {$IFDEF undef}{$REGION 'InternalSelectDataFetchRows'}{$ENDIF}
+  {$REGION 'InternalSelectDataFetchRows'}
   Procedure InternalSelectDataFetchRows;
-  var aColumnIndex: integer;
-      aRecIndex: integer;
-      aRecAdded: integer;
-      aContinue: Boolean;
-      aNewRec: TalXmlNode;
-      aValueRec: TalXmlNode;
-      aUpdateRowTagByFieldValue: Boolean;
+  var LColumnIndex: integer;
+      LRecIndex: integer;
+      LRecAdded: integer;
+      LContinue: Boolean;
+      LNewRec: TalXmlNode;
+      LValueRec: TalXmlNode;
+      LUpdateRowTagByFieldValue: Boolean;
   Begin
 
     //init the aViewRec
-    if (Queries[aQueriesIndex].ViewTag <> '') and (not assigned(aXmlDocument)) then aViewRec := XMLdata.AddChild(Queries[aQueriesIndex].ViewTag)
-    else aViewRec := XMLdata;
+    if (Queries[LQueriesIndex].ViewTag <> '') and (not assigned(LXmlDocument)) then LViewRec := XMLdata.AddChild(Queries[LQueriesIndex].ViewTag)
+    else LViewRec := XMLdata;
 
     //init aUpdateRowTagByFieldValue
-    if AlPos('&>',Queries[aQueriesIndex].RowTag) = 1 then begin
-      delete(Queries[aQueriesIndex].RowTag, 1, 2);
-      aUpdateRowTagByFieldValue := Queries[aQueriesIndex].RowTag <> '';
+    if AlPos('&>',Queries[LQueriesIndex].RowTag) = 1 then begin
+      delete(Queries[LQueriesIndex].RowTag, 1, 2);
+      LUpdateRowTagByFieldValue := Queries[LQueriesIndex].RowTag <> '';
     end
-    else aUpdateRowTagByFieldValue := False;
+    else LUpdateRowTagByFieldValue := False;
 
     //retrieve all row
-    aRecIndex := 0;
-    aRecAdded := 0;
-    while Flibrary.DSQLFetch(aTmpDBHandle, aTmpTraHandle, aTmpStmtHandle, FSQLDIALECT, aTmpSqlda) do begin
+    LRecIndex := 0;
+    LRecAdded := 0;
+    while Flibrary.DSQLFetch(LTmpDBHandle, LTmpTraHandle, LTmpStmtHandle, FSQLDIALECT, LTmpSqlda) do begin
 
       //process if > Skip
-      inc(aRecIndex);
-      If aRecIndex > Queries[aQueriesIndex].Skip then begin
+      inc(LRecIndex);
+      If LRecIndex > Queries[LQueriesIndex].Skip then begin
 
         //init NewRec
-        if (Queries[aQueriesIndex].RowTag <> '') and (not assigned(aXmlDocument)) then aNewRec := aViewRec.AddChild(Queries[aQueriesIndex].RowTag)
-        Else aNewRec := aViewRec;
+        if (Queries[LQueriesIndex].RowTag <> '') and (not assigned(LXmlDocument)) then LNewRec := LViewRec.AddChild(Queries[LQueriesIndex].RowTag)
+        Else LNewRec := LViewRec;
 
         //loop throught all column
-        For aColumnIndex := 0 to aTmpSqlda.FieldCount - 1 do begin
-          aValueRec := aNewRec.AddChild(ALlowercase(aTmpSqlda.AliasName[aColumnIndex]));
-          if (aTmpSQLDA.SQLType[aColumnIndex] = SQL_BLOB) then avalueRec.ChildNodes.Add(
-                                                                                        avalueRec.OwnerDocument.CreateNode(
-                                                                                                                           GetFieldValue(aTmpSqlda,
-                                                                                                                                         aTmpDBHandle,
-                                                                                                                                         aTmpTRAHandle,
-                                                                                                                                         aColumnIndex,
+        For LColumnIndex := 0 to LTmpSqlda.FieldCount - 1 do begin
+          LValueRec := LNewRec.AddChild(ALlowercase(LTmpSqlda.AliasName[LColumnIndex]));
+          if (LTmpSqlda.SQLType[LColumnIndex] = SQL_BLOB) then LValueRec.ChildNodes.Add(
+                                                                                        LValueRec.OwnerDocument.CreateNode(
+                                                                                                                           GetFieldValue(LTmpSqlda,
+                                                                                                                                         LTmpDBHandle,
+                                                                                                                                         LTmpTraHandle,
+                                                                                                                                         LColumnIndex,
                                                                                                                                          FormatSettings),
                                                                                                                            ntCData
                                                                                                                           )
                                                                                         )
-          else aValueRec.Text := GetFieldValue(aTmpSqlda,
-                                               aTmpDBHandle,
-                                               aTmpTRAHandle,
-                                               aColumnIndex,
+          else LValueRec.Text := GetFieldValue(LTmpSqlda,
+                                               LTmpDBHandle,
+                                               LTmpTraHandle,
+                                               LColumnIndex,
                                                FormatSettings);
-          if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
+          if LUpdateRowTagByFieldValue and (LValueRec.NodeName=LNewRec.NodeName) then LNewRec.NodeName := ALLowerCase(LValueRec.Text);
         end;
 
         //handle OnNewRowFunct
         if assigned(OnNewRowFunct) then begin
-          aContinue := True;
-          OnNewRowFunct(aNewRec, Queries[aQueriesIndex].ViewTag, ExtData, aContinue);
-          if Not aContinue then Break;
+          LContinue := True;
+          OnNewRowFunct(LNewRec, Queries[LQueriesIndex].ViewTag, ExtData, LContinue);
+          if Not LContinue then Break;
         end;
 
         //free the node if aXmlDocument
-        if assigned(aXmlDocument) then aXmlDocument.DocumentElement.ChildNodes.Clear;
+        if assigned(LXmlDocument) then LXmlDocument.DocumentElement.ChildNodes.Clear;
 
         //handle the First
-        inc(aRecAdded);
-        If (Queries[aQueriesIndex].First > 0) and (aRecAdded >= Queries[aQueriesIndex].First) then Break;
+        inc(LRecAdded);
+        If (Queries[LQueriesIndex].First > 0) and (LRecAdded >= Queries[LQueriesIndex].First) then Break;
 
       end;
 
     end;
 
   end;
-  {$IFDEF undef}{$ENDREGION}{$ENDIF}
+  {$ENDREGION}
 
 begin
 
-  {$IFDEF undef}{$REGION 'exit if no SQL'}{$ENDIF}
+  {$REGION 'exit if no SQL'}
   if length(Queries) = 0 then Exit;
-  {$IFDEF undef}{$ENDREGION}{$ENDIF}
+  {$ENDREGION}
 
-  {$IFDEF undef}{$REGION 'Check the params'}{$ENDIF}
+  {$REGION 'Check the params'}
   if (
       (not assigned(DBHandle)) and
       (assigned(TraHandle))
@@ -4103,68 +4091,68 @@ begin
       (not assigned(DBHandle))
      )
   then raise Exception.Create('Wrong Params');
-  {$IFDEF undef}{$ENDREGION}{$ENDIF}
+  {$ENDREGION}
 
-  {$IFDEF undef}{$REGION 'init OnNewRowFunct/XMLDATA'}{$ENDIF}
+  {$REGION 'init OnNewRowFunct/XMLDATA'}
   if assigned(OnNewRowFunct) then XMLDATA := nil;
-  {$IFDEF undef}{$ENDREGION}{$ENDIF}
+  {$ENDREGION}
 
-  {$IFDEF undef}{$REGION 'clear the XMLDATA'}{$ENDIF}
-  if assigned(XMLDATA) then aXmlDocument := Nil
+  {$REGION 'clear the XMLDATA'}
+  if assigned(XMLDATA) then LXmlDocument := Nil
   else begin
-    aXmlDocument := TALXmlDocument.create('root');
-    XMLDATA := aXmlDocument.DocumentElement;
+    LXmlDocument := TALXmlDocument.create('root');
+    XMLDATA := LXmlDocument.DocumentElement;
   end;
-  {$IFDEF undef}{$ENDREGION}{$ENDIF}
+  {$ENDREGION}
 
   Try
 
-    {$IFDEF undef}{$REGION 'init local variable'}{$ENDIF}
-    aTmpDBHandle := DBHandle;
-    aTmpTraHandle := TraHandle;
-    aTmpStmtHandle := nil;
-    aTmpSqlda := nil;
-    aTmpTPB := TPB;
-    if aTmpTPB = '' then aTmpTPB := fDefaultReadTPB;
-    aReadOnlyReadCommitedTPB := (alpos(isc_tpb_read_committed,aTmpTPB) > 0) and
-                                (alpos(isc_tpb_read, aTmpTPB) > 0) and
-                                (alpos(isc_tpb_write, aTmpTPB) <= 0);
-    aConnectionWasAcquiredFromPool := False;
-    aTransactionWasAcquiredFromPool := False;
-    aStatementWasAcquiredFromPool := False;
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+    {$REGION 'init local variable'}
+    LTmpDBHandle := DBHandle;
+    LTmpTraHandle := TraHandle;
+    LTmpStmtHandle := nil;
+    LTmpSqlda := nil;
+    LTmpTPB := TPB;
+    if LTmpTPB = '' then LTmpTPB := fDefaultReadTPB;
+    LReadOnlyReadCommitedTPB := (alpos(isc_tpb_read_committed,LTmpTPB) > 0) and
+                                (alpos(isc_tpb_read, LTmpTPB) > 0) and
+                                (alpos(isc_tpb_write, LTmpTPB) <= 0);
+    LConnectionWasAcquiredFromPool := False;
+    LTransactionWasAcquiredFromPool := False;
+    LStatementWasAcquiredFromPool := False;
+    {$ENDREGION}
 
     Try
 
-      {$IFDEF undef}{$REGION 'init aStopWatch'}{$ENDIF}
-      aStopWatch := TstopWatch.Create;
-      {$IFDEF undef}{$ENDREGION}{$ENDIF}
+      {$REGION 'init aStopWatch'}
+      LStopWatch := TstopWatch.Create;
+      {$ENDREGION}
 
-      {$IFDEF undef}{$REGION 'loop on all the SQL'}{$ENDIF}
-      For aQueriesIndex := 0 to length(Queries) - 1 do begin
+      {$REGION 'loop on all the SQL'}
+      For LQueriesIndex := 0 to length(Queries) - 1 do begin
 
-        {$IFDEF undef}{$REGION 'Handle the CacheThreshold'}{$ENDIF}
-        aCacheKey := '';
-        If (Queries[aQueriesIndex].CacheThreshold > 0) and
-           (not assigned(aXmlDocument)) and
+        {$REGION 'Handle the CacheThreshold'}
+        LCacheKey := '';
+        If (Queries[LQueriesIndex].CacheThreshold > 0) and
+           (not assigned(LXmlDocument)) and
            (((length(Queries) = 1) and
              (XMLdata.ChildNodes.Count = 0)) or  // else the save will not work
-            (Queries[aQueriesIndex].ViewTag <> '')) then begin
+            (Queries[LQueriesIndex].ViewTag <> '')) then begin
 
           //try to load from from cache
-          aCacheKey := ALStringHashSHA1(Queries[aQueriesIndex].RowTag + '#' +
-                                        alinttostr(Queries[aQueriesIndex].Skip) + '#' +
-                                        alinttostr(Queries[aQueriesIndex].First) + '#' +
+          LCacheKey := ALStringHashSHA1(Queries[LQueriesIndex].RowTag + '#' +
+                                        alinttostr(Queries[LQueriesIndex].Skip) + '#' +
+                                        alinttostr(Queries[LQueriesIndex].First) + '#' +
                                         ALGetFormatSettingsID(FormatSettings) + '#' +
-                                        Queries[aQueriesIndex].SQL);
-          if loadcachedData(aCacheKey, aCacheStr) then begin
+                                        Queries[LQueriesIndex].SQL);
+          if loadcachedData(LCacheKey, LCacheStr) then begin
 
             //init the aViewRec
-            if (Queries[aQueriesIndex].ViewTag <> '') then aViewRec := XMLdata.AddChild(Queries[aQueriesIndex].ViewTag)
-            else aViewRec := XMLdata;
+            if (Queries[LQueriesIndex].ViewTag <> '') then LViewRec := XMLdata.AddChild(Queries[LQueriesIndex].ViewTag)
+            else LViewRec := XMLdata;
 
             //assign the tmp data to the XMLData
-            aViewRec.LoadFromXML(aCacheStr, true{XmlContainOnlyChildNodes}, false{ClearChildNodes});
+            LViewRec.LoadFromXML(LCacheStr, true{XmlContainOnlyChildNodes}, false{ClearChildNodes});
 
             //go to the next loop
             continue;
@@ -4172,25 +4160,25 @@ begin
           end;
 
         end;
-        {$IFDEF undef}{$ENDREGION}{$ENDIF}
+        {$ENDREGION}
 
-        {$IFDEF undef}{$REGION 'Reset aStopWatch'}{$ENDIF}
-        aStopWatch.Reset;
-        aStopWatch.Start;
-        {$IFDEF undef}{$ENDREGION}{$ENDIF}
+        {$REGION 'Reset aStopWatch'}
+        LStopWatch.Reset;
+        LStopWatch.Start;
+        {$ENDREGION}
 
-        {$IFDEF undef}{$REGION 'Create/acquire the connection/transaction/statement'}{$ENDIF}
+        {$REGION 'Create/acquire the connection/transaction/statement'}
 
-        {$IFDEF undef}{$REGION 'init aTmpStatementPoolNode'}{$ENDIF}
-        if assigned(StatementPool) then aTmpStatementPoolNode := StatementPool.FindNode(Queries[aQueriesIndex].SQL)
-        else aTmpStatementPoolNode := nil;
-        {$IFDEF undef}{$ENDREGION}{$ENDIF}
+        {$REGION 'init aTmpStatementPoolNode'}
+        if assigned(StatementPool) then LTmpStatementPoolNode := StatementPool.FindNode(Queries[LQueriesIndex].SQL)
+        else LTmpStatementPoolNode := nil;
+        {$ENDREGION}
 
-        {$IFDEF undef}{$REGION 'if aTmpStatementPoolNode is null'}{$ENDIF}
-        if not assigned(aTmpStatementPoolNode) then begin
+        {$REGION 'if aTmpStatementPoolNode is null'}
+        if not assigned(LTmpStatementPoolNode) then begin
 
-          {$IFDEF undef}{$REGION 'if it''s a readonly Read Commited TPB AND DBHandle = nil'}{$ENDIF}
-          if (aReadOnlyReadCommitedTPB) and
+          {$REGION 'if it''s a readonly Read Commited TPB AND DBHandle = nil'}
+          if (LReadOnlyReadCommitedTPB) and
              (not assigned(DBHandle)) then begin
 
             //not assigned(DBHandle) mean that the aTmpDBHandle and aTmpTraHandle
@@ -4198,140 +4186,140 @@ begin
             //AcquireReadTransaction or AcquireReadStatement (but if via AcquireReadStatement
             //then it's was already releasead ad the end of the current loop)
 
-            {$IFDEF undef}{$REGION 'if their is some params'}{$ENDIF}
-            if length(Queries[aQueriesIndex].Params) > 0 then begin
+            {$REGION 'if their is some params'}
+            if length(Queries[LQueriesIndex].Params) > 0 then begin
 
               //release previous connection if need
-              if aTransactionWasAcquiredFromPool then begin
-                ReleaseReadTransaction(aTmpDBHandle,
-                                       aTmpTraHandle,
-                                       aTmpTPB);
-                aTransactionWasAcquiredFromPool := False;
+              if LTransactionWasAcquiredFromPool then begin
+                ReleaseReadTransaction(LTmpDBHandle,
+                                       LTmpTraHandle,
+                                       LTmpTPB);
+                LTransactionWasAcquiredFromPool := False;
               end;
 
               //acquire a statement from the pool
-              AcquireReadStatement(Queries[aQueriesIndex].SQL,
-                                   aTmpDBHandle,
-                                   aTmpTraHandle,
-                                   aTmpStmtHandle,
-                                   aTmpSqlda,
-                                   aTmpTPB);
-              aStatementWasAcquiredFromPool := True;
+              AcquireReadStatement(Queries[LQueriesIndex].SQL,
+                                   LTmpDBHandle,
+                                   LTmpTraHandle,
+                                   LTmpStmtHandle,
+                                   LTmpSqlda,
+                                   LTmpTPB);
+              LStatementWasAcquiredFromPool := True;
 
             end
-            {$IFDEF undef}{$ENDREGION}{$ENDIF}
+            {$ENDREGION}
 
-            {$IFDEF undef}{$REGION 'if their is NO param'}{$ENDIF}
+            {$REGION 'if their is NO param'}
             else begin
 
               //acquire a transaction in the pool
-              if not aTransactionWasAcquiredFromPool then begin
-                AcquireReadTransaction(aTmpDBHandle,
-                                       aTmpTraHandle,
-                                       aTmpTPB);
-                aTransactionWasAcquiredFromPool := True;
+              if not LTransactionWasAcquiredFromPool then begin
+                AcquireReadTransaction(LTmpDBHandle,
+                                       LTmpTraHandle,
+                                       LTmpTPB);
+                LTransactionWasAcquiredFromPool := True;
               end;
 
               //Prepare the statement
-              Prepare(Queries[aQueriesIndex].SQL,
-                      aTmpDBHandle,
-                      aTmpTraHandle,
-                      aTmpStmtHandle,
-                      aTmpSqlda,
-                      aTmpTPB);
-              aStatementWasAcquiredFromPool := False;
+              Prepare(Queries[LQueriesIndex].SQL,
+                      LTmpDBHandle,
+                      LTmpTraHandle,
+                      LTmpStmtHandle,
+                      LTmpSqlda,
+                      LTmpTPB);
+              LStatementWasAcquiredFromPool := False;
 
             end;
-            {$IFDEF undef}{$ENDREGION}{$ENDIF}
+            {$ENDREGION}
 
           end
-          {$IFDEF undef}{$ENDREGION}{$ENDIF}
+          {$ENDREGION}
 
-          {$IFDEF undef}{$REGION 'if it''s NOT a readonly Read Commited TPB or DBHandle <> nil'}{$ENDIF}
+          {$REGION 'if it''s NOT a readonly Read Commited TPB or DBHandle <> nil'}
           else begin
 
             //assigned(DBHandle) or NOT a readonly Read Commited TPB mean that the aTmpDBHandle and aTmpTraHandle
             //are nil or given via the params or assigned in previous loop only throught TransactionStart
 
             //Start the transaction
-            if not assigned(aTmpDBHandle) then begin
-              TransactionStart(aTmpDBHandle,
-                               aTmpTraHandle,
-                               aTmpTPB);
-              aConnectionWasAcquiredFromPool := True;
+            if not assigned(LTmpDBHandle) then begin
+              TransactionStart(LTmpDBHandle,
+                               LTmpTraHandle,
+                               LTmpTPB);
+              LConnectionWasAcquiredFromPool := True;
             end;
 
             //prepare the statement
-            Prepare(Queries[aQueriesIndex].SQL,
-                    aTmpDBHandle,
-                    aTmpTraHandle,
-                    aTmpStmtHandle,
-                    aTmpSqlda,
-                    aTmpTPB);
-            aStatementWasAcquiredFromPool := False;
+            Prepare(Queries[LQueriesIndex].SQL,
+                    LTmpDBHandle,
+                    LTmpTraHandle,
+                    LTmpStmtHandle,
+                    LTmpSqlda,
+                    LTmpTPB);
+            LStatementWasAcquiredFromPool := False;
 
           end;
-          {$IFDEF undef}{$ENDREGION}{$ENDIF}
+          {$ENDREGION}
 
         end
-        {$IFDEF undef}{$ENDREGION}{$ENDIF}
+        {$ENDREGION}
 
-        {$IFDEF undef}{$REGION 'else if aTmpStatementPoolNode is NOT null'}{$ENDIF}
+        {$REGION 'else if aTmpStatementPoolNode is NOT null'}
         else begin
 
           //if aTmpStatementPoolNode is NOT null then DBHandle and TraHandle are not null too
           //so just init the aTmpStmtHandle and aTmpSqlda from aTmpStatementPoolNode
 
-          with TALFBXConnectionStatementPoolBinTreeNode(aTmpStatementPoolNode) do begin
-            aTmpStmtHandle := StmtHandle;
-            aTmpSqlda := Sqlda;
+          with TALFBXConnectionStatementPoolBinTreeNode(LTmpStatementPoolNode) do begin
+            LTmpStmtHandle := StmtHandle;
+            LTmpSqlda := Sqlda;
           end;
 
         end;
-        {$IFDEF undef}{$ENDREGION}{$ENDIF}
+        {$ENDREGION}
 
-        {$IFDEF undef}{$ENDREGION}{$ENDIF}
+        {$ENDREGION}
 
         try
 
-          {$IFDEF undef}{$REGION 'Execute the statement'}{$ENDIF}
+          {$REGION 'Execute the statement'}
 
-          {$IFDEF undef}{$REGION 'if their is params'}{$ENDIF}
-          if length(Queries[aQueriesIndex].Params) > 0 then begin
+          {$REGION 'if their is params'}
+          if length(Queries[LQueriesIndex].Params) > 0 then begin
 
             //create the aSqlpa object
-            aSqlpa := TALFBXSQLParams.Create(fCharSet);
+            LSqlpa := TALFBXSQLParams.Create(fCharSet);
 
             try
 
               //loop throught all Params Fields
-              for aParamsIndex := 0 to length(Queries[aQueriesIndex].Params) - 1 do begin
+              for LParamsIndex := 0 to length(Queries[LQueriesIndex].Params) - 1 do begin
 
                 //with current Params Fields
-                with Queries[aQueriesIndex].Params[aParamsIndex] do begin
+                with Queries[LQueriesIndex].Params[LParamsIndex] do begin
 
                   //isnull
                   if IsNull then begin
-                    aSqlpa.AddFieldType('', uftVarchar);
-                    aSqlpa.IsNull[aParamsIndex] := True;
+                    LSqlpa.AddFieldType('', uftVarchar);
+                    LSqlpa.IsNull[LParamsIndex] := True;
                   end
 
                   //IsBlob
                   else if length(value) > high(smallint) then begin
-                    aSqlpa.AddFieldType('', uftBlob);
-                    aBlobhandle := nil;
-                    aSqlpa.AsQuad[aParamsIndex] := Flibrary.BlobCreate(aTmpDBHandle,aTmpTraHandle,aBlobHandle);
+                    LSqlpa.AddFieldType('', uftBlob);
+                    LBlobhandle := nil;
+                    LSqlpa.AsQuad[LParamsIndex] := Flibrary.BlobCreate(LTmpDBHandle,LTmpTraHandle,LBlobhandle);
                     Try
-                      FLibrary.BlobWriteString(aBlobHandle,Value);
+                      FLibrary.BlobWriteString(LBlobhandle,Value);
                     Finally
-                      FLibrary.BlobClose(aBlobHandle);
+                      FLibrary.BlobClose(LBlobhandle);
                     End;
                   end
 
                   //all the other
                   else begin
-                    aSqlpa.AddFieldType('', uftVarchar);
-                    aSqlpa.AsAnsiString[aParamsIndex] := Value;
+                    LSqlpa.AddFieldType('', uftVarchar);
+                    LSqlpa.AsAnsiString[LParamsIndex] := Value;
                   end;
 
                 end;
@@ -4339,100 +4327,100 @@ begin
               end;
 
               //execute the sql with the params
-              FLibrary.DSQLExecute(aTmpTraHandle, aTmpStmtHandle, FSQLDIALECT, asqlpa);
+              FLibrary.DSQLExecute(LTmpTraHandle, LTmpStmtHandle, FSQLDIALECT, LSqlpa);
 
               //fetch the rows
               InternalSelectDataFetchRows;
 
             finally
-              asqlpa.free;
+              LSqlpa.free;
             end;
 
           end
-          {$IFDEF undef}{$ENDREGION}{$ENDIF}
+          {$ENDREGION}
 
-          {$IFDEF undef}{$REGION 'if their is NO params'}{$ENDIF}
+          {$REGION 'if their is NO params'}
           else begin
 
             //execute the SQL wihtout params
-            FLibrary.DSQLExecute(aTmpTraHandle, aTmpStmtHandle, FSQLDIALECT, nil);
+            FLibrary.DSQLExecute(LTmpTraHandle, LTmpStmtHandle, FSQLDIALECT, nil);
 
             //fetch the rows
             InternalSelectDataFetchRows;
 
           end;
-          {$IFDEF undef}{$ENDREGION}{$ENDIF}
+          {$ENDREGION}
 
-          {$IFDEF undef}{$ENDREGION}{$ENDIF}
+          {$ENDREGION}
 
         finally
 
-          {$IFDEF undef}{$REGION 'drop/close/release the statement'}{$ENDIF}
+          {$REGION 'drop/close/release the statement'}
 
-          {$IFDEF undef}{$REGION 'If NO StatementPool was given in params'}{$ENDIF}
+          {$REGION 'If NO StatementPool was given in params'}
           if not assigned(StatementPool) then begin
 
-            {$IFDEF undef}{$REGION 'if the statement was acquired from the pool - CLOSE IT and RELEASE IT'}{$ENDIF}
-            if aStatementWasAcquiredFromPool then begin
+            {$REGION 'if the statement was acquired from the pool - CLOSE IT and RELEASE IT'}
+            if LStatementWasAcquiredFromPool then begin
 
               try
 
                 //close the cursor
-                Flibrary.DSQLFreeStatement(aTmpStmtHandle, DSQL_Close);
+                Flibrary.DSQLFreeStatement(LTmpStmtHandle, DSQL_Close);
 
                 //release the statement in the pool
-                ReleaseReadStatement(Queries[aQueriesIndex].SQL,
-                                     aTmpDBHandle,
-                                     aTmpTraHandle,
-                                     aTmpStmtHandle,
-                                     aTmpSqlda,
-                                     aTmpTPB);
+                ReleaseReadStatement(Queries[LQueriesIndex].SQL,
+                                     LTmpDBHandle,
+                                     LTmpTraHandle,
+                                     LTmpStmtHandle,
+                                     LTmpSqlda,
+                                     LTmpTPB);
 
               Except
 
                 //free the statement in the pool
-                ReleaseReadStatement(Queries[aQueriesIndex].SQL,
-                                     aTmpDBHandle,
-                                     aTmpTraHandle,
-                                     aTmpStmtHandle,
-                                     aTmpSqlda,
-                                     aTmpTPB,
+                ReleaseReadStatement(Queries[LQueriesIndex].SQL,
+                                     LTmpDBHandle,
+                                     LTmpTraHandle,
+                                     LTmpStmtHandle,
+                                     LTmpSqlda,
+                                     LTmpTPB,
                                      true); // CloseConnection
 
               end;
 
             end
-            {$IFDEF undef}{$ENDREGION}{$ENDIF}
+            {$ENDREGION}
 
-            {$IFDEF undef}{$REGION 'else if the statement was NOT acquired from the pool - DROP IT'}{$ENDIF}
+            {$REGION 'else if the statement was NOT acquired from the pool - DROP IT'}
             else begin
 
               try
-                Flibrary.DSQLFreeStatement(aTmpStmtHandle, DSQL_drop);
+                Flibrary.DSQLFreeStatement(LTmpStmtHandle, DSQL_drop);
               Except
                 //what else we can do here ?
                 //this can happen if connection lost for exemple
                 //i preferre to hide this exception to not hide previous exception
               end;
-              aTmpSqlda.free;
+              LTmpSqlda.free;
 
             end;
-            {$IFDEF undef}{$ENDREGION}{$ENDIF}
+            {$ENDREGION}
 
           end
-          {$IFDEF undef}{$ENDREGION}{$ENDIF}
+          {$ENDREGION}
 
-          {$IFDEF undef}{$REGION 'Else if a statementPool was given in the params'}{$ENDIF}
+          {$REGION 'Else if a statementPool was given in the params'}
           else begin
 
             //add to the statement pool only if their is some params or
             //if assigned aTmpStatementPoolNode
-            if (length(Queries[aQueriesIndex].Params) > 0) or
-               (assigned(aTmpStatementPoolNode)) then begin
+            if (length(Queries[LQueriesIndex].Params) > 0) or
+               (assigned(LTmpStatementPoolNode)) then begin
 
               //first close the statement
               try
-                Flibrary.DSQLFreeStatement(aTmpStmtHandle, DSQL_close);
+                Flibrary.DSQLFreeStatement(LTmpStmtHandle, DSQL_close);
               Except
                 //what else we can do here ?
                 //this can happen if connection lost for exemple
@@ -4440,16 +4428,16 @@ begin
               end;
 
               //if the statement was already in the pool, simply update it LastAccessDate
-              if assigned(aTmpStatementPoolNode) then TALFBXConnectionStatementPoolBinTreeNode(aTmpStatementPoolNode).LastAccessDate := GetTickCount64
+              if assigned(LTmpStatementPoolNode) then TALFBXConnectionStatementPoolBinTreeNode(LTmpStatementPoolNode).LastAccessDate := GetTickCount64
 
               //else add it to the statement pool
               else begin
-                aTmpStatementPoolNode := TALFBXConnectionStatementPoolBinTreeNode.Create;
-                aTmpStatementPoolNode.ID := Queries[aQueriesIndex].SQL;
-                TALFBXConnectionStatementPoolBinTreeNode(aTmpStatementPoolNode).Lib := Lib;
-                TALFBXConnectionStatementPoolBinTreeNode(aTmpStatementPoolNode).StmtHandle := aTmpStmtHandle;
-                TALFBXConnectionStatementPoolBinTreeNode(aTmpStatementPoolNode).Sqlda := aTmpSqlda;
-                if not StatementPool.AddNode(aTmpStatementPoolNode) then aTmpStatementPoolNode.Free; // don't raise any exception to not hide previous error
+                LTmpStatementPoolNode := TALFBXConnectionStatementPoolBinTreeNode.Create;
+                LTmpStatementPoolNode.ID := Queries[LQueriesIndex].SQL;
+                TALFBXConnectionStatementPoolBinTreeNode(LTmpStatementPoolNode).Lib := Lib;
+                TALFBXConnectionStatementPoolBinTreeNode(LTmpStatementPoolNode).StmtHandle := LTmpStmtHandle;
+                TALFBXConnectionStatementPoolBinTreeNode(LTmpStatementPoolNode).Sqlda := LTmpSqlda;
+                if not StatementPool.AddNode(LTmpStatementPoolNode) then LTmpStatementPoolNode.Free; // don't raise any exception to not hide previous error
               end;
 
             end
@@ -4458,93 +4446,93 @@ begin
             else begin
 
               try
-                Flibrary.DSQLFreeStatement(aTmpStmtHandle, DSQL_drop);
+                Flibrary.DSQLFreeStatement(LTmpStmtHandle, DSQL_drop);
               Except
                 //what else we can do here ?
                 //this can happen if connection lost for exemple
                 //i preferre to hide this exception to not hide previous exception
               end;
-              aTmpSqlda.free;
+              LTmpSqlda.free;
 
             end;
 
           end;
-          {$IFDEF undef}{$ENDREGION}{$ENDIF}
+          {$ENDREGION}
 
-          {$IFDEF undef}{$REGION 'nil aTmpStmtHandle and aTmpSqlda'}{$ENDIF}
-          aTmpStmtHandle := nil;
-          aTmpSqlda := nil;
-          {$IFDEF undef}{$ENDREGION}{$ENDIF}
+          {$REGION 'nil aTmpStmtHandle and aTmpSqlda'}
+          LTmpStmtHandle := nil;
+          LTmpSqlda := nil;
+          {$ENDREGION}
 
-          {$IFDEF undef}{$ENDREGION}{$ENDIF}
+          {$ENDREGION}
 
         end;
 
-        {$IFDEF undef}{$REGION 'do the OnSelectDataDone'}{$ENDIF}
-        aStopWatch.Stop;
-        OnSelectDataDone(Queries[aQueriesIndex],
-                         aStopWatch.Elapsed.TotalMilliseconds);
-        {$IFDEF undef}{$ENDREGION}{$ENDIF}
+        {$REGION 'do the OnSelectDataDone'}
+        LStopWatch.Stop;
+        OnSelectDataDone(Queries[LQueriesIndex],
+                         LStopWatch.Elapsed.TotalMilliseconds);
+        {$ENDREGION}
 
-        {$IFDEF undef}{$REGION 'save to the cache'}{$ENDIF}
-        If aCacheKey <> '' then begin
+        {$REGION 'save to the cache'}
+        If LCacheKey <> '' then begin
 
           //save the data
-          aViewRec.SaveToXML(aCacheStr, true{SaveOnlyChildNodes});
-          SaveDataToCache(aCacheKey,
-                          Queries[aQueriesIndex].CacheThreshold,
-                          aCacheStr);
+          LViewRec.SaveToXML(LCacheStr, true{SaveOnlyChildNodes});
+          SaveDataToCache(LCacheKey,
+                          Queries[LQueriesIndex].CacheThreshold,
+                          LCacheStr);
 
         end;
-        {$IFDEF undef}{$ENDREGION}{$ENDIF}
+        {$ENDREGION}
 
       End;
-      {$IFDEF undef}{$ENDREGION}{$ENDIF}
+      {$ENDREGION}
 
-      {$IFDEF undef}{$REGION 'Commit or release the transaction'}{$ENDIF}
-      if aTransactionWasAcquiredFromPool then ReleaseReadTransaction(aTmpDBHandle,
-                                                                     aTmpTraHandle,
-                                                                     aTmpTPB)
-      else if aConnectionWasAcquiredFromPool then TransactionCommit(aTmpDBHandle,
-                                                                    aTmpTraHandle);
-      {$IFDEF undef}{$ENDREGION}{$ENDIF}
+      {$REGION 'Commit or release the transaction'}
+      if LTransactionWasAcquiredFromPool then ReleaseReadTransaction(LTmpDBHandle,
+                                                                     LTmpTraHandle,
+                                                                     LTmpTPB)
+      else if LConnectionWasAcquiredFromPool then TransactionCommit(LTmpDBHandle,
+                                                                    LTmpTraHandle);
+      {$ENDREGION}
 
     Except
 
-      {$IFDEF undef}{$REGION 'On Exception'}{$ENDIF}
+      {$REGION 'On Exception'}
       On E: Exception do begin
 
         {get the gdscode}
-        if E is EALFBXError then aGDSCode := (E as EALFBXError).GDSCode
-        else aGDSCode := -1;
+        if E is EALFBXError then LGDSCode := (E as EALFBXError).GDSCode
+        else LGDSCode := -1;
 
         //rollback the transaction and release the connection if owned
-        if aTransactionWasAcquiredFromPool then ReleaseReadTransaction(aTmpDBHandle,
-                                                                       aTmpTraHandle,
-                                                                       aTmpTPB,
-                                                                       GetCloseConnectionByErrCode(aGDSCode))
-        else if aConnectionWasAcquiredFromPool then TransactionRollback(aTmpDBHandle,
-                                                                        aTmpTraHandle,
-                                                                        GetCloseConnectionByErrCode(aGDSCode));
+        if LTransactionWasAcquiredFromPool then ReleaseReadTransaction(LTmpDBHandle,
+                                                                       LTmpTraHandle,
+                                                                       LTmpTPB,
+                                                                       GetCloseConnectionByErrCode(LGDSCode))
+        else if LConnectionWasAcquiredFromPool then TransactionRollback(LTmpDBHandle,
+                                                                        LTmpTraHandle,
+                                                                        GetCloseConnectionByErrCode(LGDSCode));
 
         //Database @1 shutdown
-        if (aGDSCode = isc_shutdown) or        // Database @1 shutdown
-           (aGDSCode = isc_shutinprog)         // Database @1 shutdown in progress
+        if (LGDSCode = isc_shutdown) or        // Database @1 shutdown
+           (LGDSCode = isc_shutinprog)         // Database @1 shutdown in progress
         then ReleaseAllConnections(False);
 
         //raise the error
         raise;
 
       end;
-      {$IFDEF undef}{$ENDREGION}{$ENDIF}
+      {$ENDREGION}
 
     End;
 
   Finally
 
-    {$IFDEF undef}{$REGION 'Free aXmlDocument'}{$ENDIF}
-    if assigned(aXmlDocument) then aXmlDocument.free;
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+    {$REGION 'Free aXmlDocument'}
+    if assigned(LXmlDocument) then LXmlDocument.free;
+    {$ENDREGION}
 
   End;
 
@@ -4559,11 +4547,11 @@ procedure TALFBXConnectionPoolClient.SelectData(const Query: TALFBXClientSelectD
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                                                 const TPB: AnsiString = '');
-var aSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
+var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := Query;
-  SelectData(aSelectDataQUERIES,
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := Query;
+  SelectData(LSelectDataQUERIES,
              nil,
              OnNewRowFunct,
              ExtData,
@@ -4585,14 +4573,14 @@ procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                                                 const TPB: AnsiString = '');
-var aSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
+var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  aSelectDataQUERIES[0].skip := Skip;
-  aSelectDataQUERIES[0].First := First;
-  SelectData(aSelectDataQUERIES,
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
+  LSelectDataQUERIES[0].Sql := Sql;
+  LSelectDataQUERIES[0].skip := Skip;
+  LSelectDataQUERIES[0].First := First;
+  SelectData(LSelectDataQUERIES,
              nil,
              OnNewRowFunct,
              ExtData,
@@ -4612,12 +4600,12 @@ procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                                                 const TPB: AnsiString = '');
-var aSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
+var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  SelectData(aSelectDataQUERIES,
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
+  LSelectDataQUERIES[0].Sql := Sql;
+  SelectData(LSelectDataQUERIES,
              nil,
              OnNewRowFunct,
              ExtData,
@@ -4658,11 +4646,11 @@ procedure TALFBXConnectionPoolClient.SelectData(const Query: TALFBXClientSelectD
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                                                 const TPB: AnsiString = '');
-var aSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
+var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := Query;
-  SelectData(aSelectDataQUERIES,
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := Query;
+  SelectData(LSelectDataQUERIES,
              XMLDATA,
              nil,
              nil,
@@ -4684,15 +4672,15 @@ procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                                                 const TPB: AnsiString = '');
-var aSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
+var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  aSelectDataQUERIES[0].RowTag := RowTag;
-  aSelectDataQUERIES[0].skip := Skip;
-  aSelectDataQUERIES[0].First := First;
-  SelectData(aSelectDataQUERIES,
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
+  LSelectDataQUERIES[0].Sql := Sql;
+  LSelectDataQUERIES[0].RowTag := RowTag;
+  LSelectDataQUERIES[0].skip := Skip;
+  LSelectDataQUERIES[0].First := First;
+  SelectData(LSelectDataQUERIES,
              XMLDATA,
              nil,
              nil,
@@ -4712,13 +4700,13 @@ procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                                                 const TPB: AnsiString = '');
-var aSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
+var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  aSelectDataQUERIES[0].RowTag := RowTag;
-  SelectData(aSelectDataQUERIES,
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
+  LSelectDataQUERIES[0].Sql := Sql;
+  LSelectDataQUERIES[0].RowTag := RowTag;
+  SelectData(LSelectDataQUERIES,
              XMLDATA,
              nil,
              nil,
@@ -4737,12 +4725,12 @@ procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                                                 const TPB: AnsiString = '');
-var aSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
+var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  SelectData(aSelectDataQUERIES,
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
+  LSelectDataQUERIES[0].Sql := Sql;
+  SelectData(LSelectDataQUERIES,
              XMLDATA,
              nil,
              nil,
@@ -4765,22 +4753,22 @@ procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                                                 const TPB: AnsiString = '');
-var aSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
-    i: integer;
+var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
+    I: integer;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  setlength(aSelectDataQUERIES[0].params, length(Params));
-  for i := 0 to length(Params) - 1 do begin
-    aSelectDataQUERIES[0].params[i] := TALFBXClientSQLParam.Create;
-    aSelectDataQUERIES[0].params[i].Value := Params[i];
-    aSelectDataQUERIES[0].params[i].IsNull := Params[i] = fNullString;
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
+  LSelectDataQUERIES[0].Sql := Sql;
+  setlength(LSelectDataQUERIES[0].params, length(Params));
+  for I := 0 to length(Params) - 1 do begin
+    LSelectDataQUERIES[0].params[I] := TALFBXClientSQLParam.Create;
+    LSelectDataQUERIES[0].params[I].Value := Params[I];
+    LSelectDataQUERIES[0].params[I].IsNull := Params[I] = fNullString;
   end;
-  aSelectDataQUERIES[0].RowTag := RowTag;
-  aSelectDataQUERIES[0].skip := Skip;
-  aSelectDataQUERIES[0].First := First;
-  SelectData(aSelectDataQUERIES,
+  LSelectDataQUERIES[0].RowTag := RowTag;
+  LSelectDataQUERIES[0].skip := Skip;
+  LSelectDataQUERIES[0].First := First;
+  SelectData(LSelectDataQUERIES,
              XMLDATA,
              nil,
              nil,
@@ -4801,20 +4789,20 @@ procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                                                 const TPB: AnsiString = '');
-var aSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
-    i: integer;
+var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
+    I: integer;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  setlength(aSelectDataQUERIES[0].params, length(Params));
-  for i := 0 to length(Params) - 1 do begin
-    aSelectDataQUERIES[0].params[i] := TALFBXClientSQLParam.Create;
-    aSelectDataQUERIES[0].params[i].Value := Params[i];
-    aSelectDataQUERIES[0].params[i].IsNull := Params[i] = fNullString;
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
+  LSelectDataQUERIES[0].Sql := Sql;
+  setlength(LSelectDataQUERIES[0].params, length(Params));
+  for I := 0 to length(Params) - 1 do begin
+    LSelectDataQUERIES[0].params[I] := TALFBXClientSQLParam.Create;
+    LSelectDataQUERIES[0].params[I].Value := Params[I];
+    LSelectDataQUERIES[0].params[I].IsNull := Params[I] = fNullString;
   end;
-  aSelectDataQUERIES[0].RowTag := RowTag;
-  SelectData(aSelectDataQUERIES,
+  LSelectDataQUERIES[0].RowTag := RowTag;
+  SelectData(LSelectDataQUERIES,
              XMLDATA,
              nil,
              nil,
@@ -4834,19 +4822,19 @@ procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                                                 const TPB: AnsiString = '');
-var aSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
-    i: integer;
+var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
+    I: integer;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  setlength(aSelectDataQUERIES[0].params, length(Params));
-  for i := 0 to length(Params) - 1 do begin
-    aSelectDataQUERIES[0].params[i] := TALFBXClientSQLParam.Create;
-    aSelectDataQUERIES[0].params[i].Value := Params[i];
-    aSelectDataQUERIES[0].params[i].IsNull := Params[i] = fNullString;
+  setlength(LSelectDataQUERIES,1);
+  LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
+  LSelectDataQUERIES[0].Sql := Sql;
+  setlength(LSelectDataQUERIES[0].params, length(Params));
+  for I := 0 to length(Params) - 1 do begin
+    LSelectDataQUERIES[0].params[I] := TALFBXClientSQLParam.Create;
+    LSelectDataQUERIES[0].params[I].Value := Params[I];
+    LSelectDataQUERIES[0].params[I].IsNull := Params[I] = fNullString;
   end;
-  SelectData(aSelectDataQUERIES,
+  SelectData(LSelectDataQUERIES,
              XMLDATA,
              nil,
              nil,
@@ -4864,30 +4852,30 @@ procedure TALFBXConnectionPoolClient.UpdateData(const Queries: TALFBXClientUpdat
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                                                 const TPB: AnsiString = '');
 
-  {$IFDEF undef}{$REGION 'Var Declarations'}{$ENDIF}
-  Var aSqlpa: TALFBXSQLParams;
-      aBlobhandle: IscBlobHandle;
-      aParamsIndex: integer;
-      aQueriesIndex: integer;
-      aTmpDBHandle: IscDbHandle;
-      aTmpTraHandle: IscTrHandle;
-      aTmpStmtHandle: IscStmtHandle;
-      aTmpSqlda: TALFBXSQLResult;
-      aTmpStatementPool: TALFBXConnectionStatementPoolBinTree;
-      aTmpStatementPoolNode: TALStringKeyAVLBinaryTreeNode;
-      aTmpTPB: AnsiString;
-      aGDSCode: integer;
-      aConnectionWasAcquiredFromPool: Boolean;
-      aStopWatch: TStopWatch;
-  {$IFDEF undef}{$ENDREGION}{$ENDIF}
+  {$REGION 'Var Declarations'}
+  Var LSqlpa: TALFBXSQLParams;
+      LBlobhandle: IscBlobHandle;
+      LParamsIndex: integer;
+      LQueriesIndex: integer;
+      LTmpDBHandle: IscDbHandle;
+      LTmpTraHandle: IscTrHandle;
+      LTmpStmtHandle: IscStmtHandle;
+      LTmpSqlda: TALFBXSQLResult;
+      LTmpStatementPool: TALFBXConnectionStatementPoolBinTree;
+      LTmpStatementPoolNode: TALStringKeyAVLBinaryTreeNode;
+      LTmpTPB: AnsiString;
+      LGDSCode: integer;
+      LConnectionWasAcquiredFromPool: Boolean;
+      LStopWatch: TStopWatch;
+  {$ENDREGION}
 
 begin
 
-  {$IFDEF undef}{$REGION 'Exit if no SQL'}{$ENDIF}
+  {$REGION 'Exit if no SQL'}
   if length(Queries) = 0 then Exit;
-  {$IFDEF undef}{$ENDREGION}{$ENDIF}
+  {$ENDREGION}
 
-  {$IFDEF undef}{$REGION 'Check the params'}{$ENDIF}
+  {$REGION 'Check the params'}
   if (
       (not assigned(DBHandle)) and
       (assigned(TraHandle))
@@ -4903,107 +4891,107 @@ begin
       (not assigned(DBHandle))
      )
   then raise Exception.Create('Wrong Params');
-  {$IFDEF undef}{$ENDREGION}{$ENDIF}
+  {$ENDREGION}
 
-  {$IFDEF undef}{$REGION 'init local variable'}{$ENDIF}
-  aTmpDBHandle := DBHandle;
-  aTmpTraHandle := TraHandle;
-  aTmpStmtHandle := nil;
-  aTmpSqlda := nil;
-  aTmpTPB := TPB;
-  if aTmpTPB = '' then aTmpTPB := fDefaultWriteTPB;
-  aTmpStatementPool := nil;
-  if not assigned(aTmpDBHandle) then begin
-    TransactionStart(aTmpDBHandle,
-                     aTmpTraHandle,
-                     aTmpStatementPool,
+  {$REGION 'init local variable'}
+  LTmpDBHandle := DBHandle;
+  LTmpTraHandle := TraHandle;
+  LTmpStmtHandle := nil;
+  LTmpSqlda := nil;
+  LTmpTPB := TPB;
+  if LTmpTPB = '' then LTmpTPB := fDefaultWriteTPB;
+  LTmpStatementPool := nil;
+  if not assigned(LTmpDBHandle) then begin
+    TransactionStart(LTmpDBHandle,
+                     LTmpTraHandle,
+                     LTmpStatementPool,
                      TPB);
-    aConnectionWasAcquiredFromPool := true;
+    LConnectionWasAcquiredFromPool := true;
   end
   else begin
-    aTmpStatementPool := StatementPool;
-    aConnectionWasAcquiredFromPool := False;
+    LTmpStatementPool := StatementPool;
+    LConnectionWasAcquiredFromPool := False;
   end;
-  {$IFDEF undef}{$ENDREGION}{$ENDIF}
+  {$ENDREGION}
 
   try
 
-    {$IFDEF undef}{$REGION 'init aStopWatch'}{$ENDIF}
-    aStopWatch := TstopWatch.Create;
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+    {$REGION 'init aStopWatch'}
+    LStopWatch := TstopWatch.Create;
+    {$ENDREGION}
 
-    {$IFDEF undef}{$REGION 'loop on all the SQL'}{$ENDIF}
-    For aQueriesIndex := 0 to length(Queries) - 1 do begin
+    {$REGION 'loop on all the SQL'}
+    For LQueriesIndex := 0 to length(Queries) - 1 do begin
 
-      {$IFDEF undef}{$REGION 'Reset aStopWatch'}{$ENDIF}
-      aStopWatch.Reset;
-      aStopWatch.Start;
-      {$IFDEF undef}{$ENDREGION}{$ENDIF}
+      {$REGION 'Reset aStopWatch'}
+      LStopWatch.Reset;
+      LStopWatch.Start;
+      {$ENDREGION}
 
-      {$IFDEF undef}{$REGION 'init aTmpStatementPoolNode'}{$ENDIF}
-      if assigned(aTmpStatementPool) then aTmpStatementPoolNode := aTmpStatementPool.FindNode(Queries[aQueriesIndex].SQL)
-      else aTmpStatementPoolNode := nil;
-      {$IFDEF undef}{$ENDREGION}{$ENDIF}
+      {$REGION 'init aTmpStatementPoolNode'}
+      if assigned(LTmpStatementPool) then LTmpStatementPoolNode := LTmpStatementPool.FindNode(Queries[LQueriesIndex].SQL)
+      else LTmpStatementPoolNode := nil;
+      {$ENDREGION}
 
-      {$IFDEF undef}{$REGION 'if their is params or aTmpStatementPoolNode <> nil'}{$ENDIF}
-      if (length(Queries[aQueriesIndex].Params) > 0) or
-         (assigned(aTmpStatementPoolNode)) then begin
+      {$REGION 'if their is params or aTmpStatementPoolNode <> nil'}
+      if (length(Queries[LQueriesIndex].Params) > 0) or
+         (assigned(LTmpStatementPoolNode)) then begin
 
-        {$IFDEF undef}{$REGION 'Prepare or acquire the statement'}{$ENDIF}
+        {$REGION 'Prepare or acquire the statement'}
         //if aTmpStatementPoolNode found
-        if assigned(aTmpStatementPoolNode) then begin
-          with TALFBXConnectionStatementPoolBinTreeNode(aTmpStatementPoolNode) do begin
-            aTmpStmtHandle := StmtHandle;
-            aTmpSqlda := Sqlda;
+        if assigned(LTmpStatementPoolNode) then begin
+          with TALFBXConnectionStatementPoolBinTreeNode(LTmpStatementPoolNode) do begin
+            LTmpStmtHandle := StmtHandle;
+            LTmpSqlda := Sqlda;
           end;
         end
 
         //if aTmpStatementPoolNode was not founded (prepare the statement)
         else begin
-          Prepare(Queries[aQueriesIndex].SQL,
-                  aTmpDBHandle,          //not nil => will not change
-                  aTmpTraHandle,         //not nil => will not change
-                  aTmpStmtHandle,        //nil => will be assigned
-                  aTmpSqlda,             //nil => will be assigned
-                  aTmpTPB);
+          Prepare(Queries[LQueriesIndex].SQL,
+                  LTmpDBHandle,          //not nil => will not change
+                  LTmpTraHandle,         //not nil => will not change
+                  LTmpStmtHandle,        //nil => will be assigned
+                  LTmpSqlda,             //nil => will be assigned
+                  LTmpTPB);
         end;
-       {$IFDEF undef}{$ENDREGION}{$ENDIF}
+       {$ENDREGION}
 
         try
 
-          {$IFDEF undef}{$REGION 'Execute the statement'}{$ENDIF}
+          {$REGION 'Execute the statement'}
           //create the aSqlpa object
-          aSqlpa := TALFBXSQLParams.Create(fCharSet);
+          LSqlpa := TALFBXSQLParams.Create(fCharSet);
           try
 
             //loop throught all Params Fields
-            for aParamsIndex := 0 to length(Queries[aQueriesIndex].Params) - 1 do begin
+            for LParamsIndex := 0 to length(Queries[LQueriesIndex].Params) - 1 do begin
 
               //with current Params Fields
-              with Queries[aQueriesIndex].Params[aParamsIndex] do begin
+              with Queries[LQueriesIndex].Params[LParamsIndex] do begin
 
                 //isnull
                 if IsNull then begin
-                  aSqlpa.AddFieldType('', uftVarchar);
-                  aSqlpa.IsNull[aParamsIndex] := True;
+                  LSqlpa.AddFieldType('', uftVarchar);
+                  LSqlpa.IsNull[LParamsIndex] := True;
                 end
 
                 //IsBlob
                 else if length(value) > high(smallint) then begin
-                  aSqlpa.AddFieldType('', uftBlob);
-                  aBlobhandle := nil;
-                  aSqlpa.AsQuad[aParamsIndex] := Flibrary.BlobCreate(aTmpDBHandle,aTmpTraHandle,aBlobHandle);
+                  LSqlpa.AddFieldType('', uftBlob);
+                  LBlobhandle := nil;
+                  LSqlpa.AsQuad[LParamsIndex] := Flibrary.BlobCreate(LTmpDBHandle,LTmpTraHandle,LBlobhandle);
                   Try
-                    FLibrary.BlobWriteString(aBlobHandle,Value);
+                    FLibrary.BlobWriteString(LBlobhandle,Value);
                   Finally
-                    FLibrary.BlobClose(aBlobHandle);
+                    FLibrary.BlobClose(LBlobhandle);
                   End;
                 end
 
                 //all the other
                 else begin
-                  aSqlpa.AddFieldType('', uftVarchar);
-                  aSqlpa.AsAnsiString[aParamsIndex] := Value;
+                  LSqlpa.AddFieldType('', uftVarchar);
+                  LSqlpa.AsAnsiString[LParamsIndex] := Value;
                 end;
 
               end;
@@ -5011,109 +4999,109 @@ begin
             end;
 
             //execute the SQL
-            FLibrary.DSQLExecute(aTmpTraHandle, aTmpStmtHandle, FSQLDIALECT, aSqlpa);
+            FLibrary.DSQLExecute(LTmpTraHandle, LTmpStmtHandle, FSQLDIALECT, LSqlpa);
 
           finally
-            aSqlpa.free;
+            LSqlpa.free;
           end;
-         {$IFDEF undef}{$ENDREGION}{$ENDIF}
+         {$ENDREGION}
 
         finally
 
-          {$IFDEF undef}{$REGION 'drop or pool the statement'}{$ENDIF}
+          {$REGION 'drop or pool the statement'}
 
           //if the statement was already in the pool, simply update it LastAccessDate
-          if assigned(aTmpStatementPoolNode) then TALFBXConnectionStatementPoolBinTreeNode(aTmpStatementPoolNode).LastAccessDate := GetTickCount64
+          if assigned(LTmpStatementPoolNode) then TALFBXConnectionStatementPoolBinTreeNode(LTmpStatementPoolNode).LastAccessDate := GetTickCount64
 
           //else add it to the statement pool OR DROP it
           else begin
 
             //if their is a StatementPool then add a new node with the prepared statement
-            if assigned(aTmpStatementPool) then begin
-              aTmpStatementPoolNode := TALFBXConnectionStatementPoolBinTreeNode.Create;
-              aTmpStatementPoolNode.ID := Queries[aQueriesIndex].SQL;
-              TALFBXConnectionStatementPoolBinTreeNode(aTmpStatementPoolNode).Lib := Lib;
-              TALFBXConnectionStatementPoolBinTreeNode(aTmpStatementPoolNode).StmtHandle := aTmpStmtHandle;
-              TALFBXConnectionStatementPoolBinTreeNode(aTmpStatementPoolNode).Sqlda := aTmpSqlda;
-              if not aTmpStatementPool.AddNode(aTmpStatementPoolNode) then aTmpStatementPoolNode.Free; // don't raise any exception to not hide previous error
+            if assigned(LTmpStatementPool) then begin
+              LTmpStatementPoolNode := TALFBXConnectionStatementPoolBinTreeNode.Create;
+              LTmpStatementPoolNode.ID := Queries[LQueriesIndex].SQL;
+              TALFBXConnectionStatementPoolBinTreeNode(LTmpStatementPoolNode).Lib := Lib;
+              TALFBXConnectionStatementPoolBinTreeNode(LTmpStatementPoolNode).StmtHandle := LTmpStmtHandle;
+              TALFBXConnectionStatementPoolBinTreeNode(LTmpStatementPoolNode).Sqlda := LTmpSqlda;
+              if not LTmpStatementPool.AddNode(LTmpStatementPoolNode) then LTmpStatementPoolNode.Free; // don't raise any exception to not hide previous error
             end
 
             //if their is NO StatementPool then DROP the prepared statement
             else begin
               try
-                Flibrary.DSQLFreeStatement(aTmpStmtHandle, DSQL_drop);
+                Flibrary.DSQLFreeStatement(LTmpStmtHandle, DSQL_drop);
               Except
                 //what else we can do here ?
                 //this can happen if connection lost for exemple
                 //i preferre to hide this exception to not hide previous exception
               end;
-              aTmpSqlda.free;
+              LTmpSqlda.free;
             end;
 
           end;
 
-          aTmpStmtHandle := nil;
-          aTmpSqlda := nil;
-          {$IFDEF undef}{$ENDREGION}{$ENDIF}
+          LTmpStmtHandle := nil;
+          LTmpSqlda := nil;
+          {$ENDREGION}
 
         end;
 
       end
-      {$IFDEF undef}{$ENDREGION}{$ENDIF}
+      {$ENDREGION}
 
-      {$IFDEF undef}{$REGION 'if their is NO params and aTmpStatementPoolNode = nil'}{$ENDIF}
+      {$REGION 'if their is NO params and aTmpStatementPoolNode = nil'}
       else begin
 
         //simply call DSQLExecuteImmediate
-        Flibrary.DSQLExecuteImmediate(aTmpDBHandle, aTmpTraHandle, Queries[aQueriesIndex].SQL, FSQLDIALECT, nil);
+        Flibrary.DSQLExecuteImmediate(LTmpDBHandle, LTmpTraHandle, Queries[LQueriesIndex].SQL, FSQLDIALECT, nil);
 
       end;
-      {$IFDEF undef}{$ENDREGION}{$ENDIF}
+      {$ENDREGION}
 
-      {$IFDEF undef}{$REGION 'do the OnUpdateDataDone'}{$ENDIF}
-      aStopWatch.Stop;
-      OnUpdateDataDone(Queries[aQueriesIndex],
-                       aStopWatch.Elapsed.TotalMilliseconds);
-      {$IFDEF undef}{$ENDREGION}{$ENDIF}
+      {$REGION 'do the OnUpdateDataDone'}
+      LStopWatch.Stop;
+      OnUpdateDataDone(Queries[LQueriesIndex],
+                       LStopWatch.Elapsed.TotalMilliseconds);
+      {$ENDREGION}
 
     end;
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+    {$ENDREGION}
 
-    {$IFDEF undef}{$REGION 'Commit the transaction'}{$ENDIF}
-    if aConnectionWasAcquiredFromPool then begin
-      TransactionCommit(aTmpDBHandle,
-                        aTmpTraHandle,
-                        aTmpStatementPool);
+    {$REGION 'Commit the transaction'}
+    if LConnectionWasAcquiredFromPool then begin
+      TransactionCommit(LTmpDBHandle,
+                        LTmpTraHandle,
+                        LTmpStatementPool);
     end;
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+    {$ENDREGION}
 
   Except
 
-    {$IFDEF undef}{$REGION 'On Exception'}{$ENDIF}
+    {$REGION 'On Exception'}
     On E: Exception do begin
 
       {get the gdscode}
-      if E is EALFBXError then aGDSCode := (E as EALFBXError).GDSCode
-      else aGDSCode := -1;
+      if E is EALFBXError then LGDSCode := (E as EALFBXError).GDSCode
+      else LGDSCode := -1;
 
       //rollback the transaction and release the connection if owned
-      if aConnectionWasAcquiredFromPool then begin
-        TransactionRollback(aTmpDBHandle,
-                            aTmpTraHandle,
-                            aTmpStatementPool,
-                            GetCloseConnectionByErrCode(aGDSCode)); // const CloseConnection: Boolean = False
+      if LConnectionWasAcquiredFromPool then begin
+        TransactionRollback(LTmpDBHandle,
+                            LTmpTraHandle,
+                            LTmpStatementPool,
+                            GetCloseConnectionByErrCode(LGDSCode)); // const CloseConnection: Boolean = False
       end;
 
       //Database @1 shutdown
-      if (aGDSCode = isc_shutdown) or        // Database @1 shutdown
-         (aGDSCode = isc_shutinprog)         // Database @1 shutdown in progress
+      if (LGDSCode = isc_shutdown) or        // Database @1 shutdown
+         (LGDSCode = isc_shutinprog)         // Database @1 shutdown in progress
       then ReleaseAllConnections(False);
 
       //raise the error
       raise;
 
     end;
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+    {$ENDREGION}
 
   end;
 
@@ -5125,11 +5113,11 @@ procedure TALFBXConnectionPoolClient.UpdateData(const Query: TALFBXClientUpdateD
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                                                 const TPB: AnsiString = '');
-Var aUpdateDataQUERIES: TalFBXClientUpdateDataQUERIES;
+Var LUpdateDataQUERIES: TalFBXClientUpdateDataQUERIES;
 begin
-  setlength(aUpdateDataQUERIES,1);
-  aUpdateDataQUERIES[0] := Query;
-  UpdateData(aUpdateDataQUERIES,
+  setlength(LUpdateDataQUERIES,1);
+  LUpdateDataQUERIES[0] := Query;
+  UpdateData(LUpdateDataQUERIES,
              DBHandle,
              TraHandle,
              StatementPool,
@@ -5142,15 +5130,15 @@ procedure TALFBXConnectionPoolClient.UpdateData(SQLs: TALStrings;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                                                 const TPB: AnsiString = '');
-Var aSQLsIndex : integer;
-    aUpdateDataQUERIES: TalFBXClientUpdateDataQUERIES;
+Var LSQLsIndex : integer;
+    LUpdateDataQUERIES: TalFBXClientUpdateDataQUERIES;
 begin
-  setlength(aUpdateDataQUERIES,SQLs.Count);
-  For aSQLsIndex := 0 to SQLs.Count - 1 do begin
-    aUpdateDataQUERIES[aSQLsIndex] := TALFBXClientUpdateDataQUERY.Create;
-    aUpdateDataQUERIES[aSQLsIndex].SQL := SQLs[aSQLsIndex];
+  setlength(LUpdateDataQUERIES,SQLs.Count);
+  For LSQLsIndex := 0 to SQLs.Count - 1 do begin
+    LUpdateDataQUERIES[LSQLsIndex] := TALFBXClientUpdateDataQUERY.Create;
+    LUpdateDataQUERIES[LSQLsIndex].SQL := SQLs[LSQLsIndex];
   end;
-  UpdateData(aUpdateDataQUERIES,
+  UpdateData(LUpdateDataQUERIES,
              DBHandle,
              TraHandle,
              StatementPool,
@@ -5163,12 +5151,12 @@ procedure TALFBXConnectionPoolClient.UpdateData(const SQL: AnsiString;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                                                 const TPB: AnsiString = '');
-Var aUpdateDataQUERIES: TalFBXClientUpdateDataQUERIES;
+Var LUpdateDataQUERIES: TalFBXClientUpdateDataQUERIES;
 begin
-  setlength(aUpdateDataQUERIES,1);
-  aUpdateDataQUERIES[0] := TALFBXClientUpdateDataQUERY.Create;
-  aUpdateDataQUERIES[0].SQL := SQL;
-  UpdateData(aUpdateDataQUERIES,
+  setlength(LUpdateDataQUERIES,1);
+  LUpdateDataQUERIES[0] := TALFBXClientUpdateDataQUERY.Create;
+  LUpdateDataQUERIES[0].SQL := SQL;
+  UpdateData(LUpdateDataQUERIES,
              DBHandle,
              TraHandle,
              StatementPool,
@@ -5182,19 +5170,19 @@ procedure TALFBXConnectionPoolClient.UpdateData(const SQL: AnsiString;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                                                 const TPB: AnsiString = '');
-Var aUpdateDataQUERIES: TalFBXClientUpdateDataQUERIES;
+Var LUpdateDataQUERIES: TalFBXClientUpdateDataQUERIES;
     i: integer;
 begin
-  setlength(aUpdateDataQUERIES,1);
-  aUpdateDataQUERIES[0] := TALFBXClientUpdateDataQUERY.Create;
-  aUpdateDataQUERIES[0].SQL := SQL;
-  setlength(aUpdateDataQUERIES[0].params, length(Params));
+  setlength(LUpdateDataQUERIES,1);
+  LUpdateDataQUERIES[0] := TALFBXClientUpdateDataQUERY.Create;
+  LUpdateDataQUERIES[0].SQL := SQL;
+  setlength(LUpdateDataQUERIES[0].params, length(Params));
   for i := 0 to length(Params) - 1 do begin
-    aUpdateDataQUERIES[0].params[i] := TALFBXClientSQLParam.Create;
-    aUpdateDataQUERIES[0].params[i].Value := Params[i];
-    aUpdateDataQUERIES[0].params[i].IsNull := Params[i] = fNullString;
+    LUpdateDataQUERIES[0].params[i] := TALFBXClientSQLParam.Create;
+    LUpdateDataQUERIES[0].params[i].Value := Params[i];
+    LUpdateDataQUERIES[0].params[i].IsNull := Params[i] = fNullString;
   end;
-  UpdateData(aUpdateDataQUERIES,
+  UpdateData(LUpdateDataQUERIES,
              DBHandle,
              TraHandle,
              StatementPool,
@@ -5207,15 +5195,15 @@ procedure TALFBXConnectionPoolClient.UpdateData(const SQLs: array of AnsiString;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                                                 const TPB: AnsiString = '');
-Var aUpdateDataQUERIES: TalFBXClientUpdateDataQUERIES;
+Var LUpdateDataQUERIES: TalFBXClientUpdateDataQUERIES;
     i: integer;
 begin
-  setlength(aUpdateDataQUERIES,length(SQLs));
+  setlength(LUpdateDataQUERIES,length(SQLs));
   for I := 0 to length(SQLs) - 1 do begin
-    aUpdateDataQUERIES[i] := TALFBXClientUpdateDataQUERY.Create;
-    aUpdateDataQUERIES[i].SQL := SQLs[i];
+    LUpdateDataQUERIES[i] := TALFBXClientUpdateDataQUERY.Create;
+    LUpdateDataQUERIES[i].SQL := SQLs[i];
   end;
-  UpdateData(aUpdateDataQUERIES,
+  UpdateData(LUpdateDataQUERIES,
              DBHandle,
              TraHandle,
              StatementPool,
@@ -5389,7 +5377,7 @@ procedure TALFBXEventThread.initObject(const aDataBaseName,
                                        const aOpenConnectionExtraParams: AnsiString;
                                        aOnEvent: TALFBXEventThreadEvent;
                                        aOnException: TALFBXEventThreadException);
-Var aLst: TALStrings;
+Var LLst: TALStrings;
     i: integer;
 begin
   //if we put lower than tpNormal it seam than the
@@ -5415,12 +5403,12 @@ begin
                            'lc_ctype = '+aCharSet;
   if aNumbuffers > -1 then fOpenConnectionParams := fOpenConnectionParams + '; num_buffers = ' + ALIntToStr(aNumbuffers);
   if aOpenConnectionExtraParams <> '' then fOpenConnectionParams := fOpenConnectionParams + '; ' + aOpenConnectionExtraParams;
-  aLst := TALStringList.Create;
+  LLst := TALStringList.Create;
   Try
-    Alst.Text := ALTrim(alStringReplace(aEventNames,';',#13#10,[rfReplaceALL]));
+    LLst.Text := ALTrim(alStringReplace(aEventNames,';',#13#10,[rfReplaceALL]));
     i := 0;
-    while (i <= 14) and (i <= Alst.Count - 1) do begin
-      fEventNamesArr[i] := ALTrim(Alst[i]);
+    while (i <= 14) and (i <= LLst.Count - 1) do begin
+      fEventNamesArr[i] := ALTrim(LLst[i]);
       inc(i);
     end;
     fEventNamesCount := i;
@@ -5429,7 +5417,7 @@ begin
       inc(i);
     end;
   Finally
-    Alst.Free;
+    LLst.Free;
   End;
 end;
 
@@ -5589,20 +5577,20 @@ end;
 
 {**********************************}
 procedure TALFBXEventThread.Execute;
-var aEventBuffer: PAnsiChar;
-    aEventBufferLen: Smallint;
-    aEventID: Integer;
-    aStatusVector: TALFBXStatusVector;
+var LEventBuffer: PAnsiChar;
+    LEventBufferLen: Smallint;
+    LEventID: Integer;
+    LStatusVector: TALFBXStatusVector;
 
     {-----------------------------}
     Procedure InternalFreeLocalVar;
     Begin
       //free the aEventID
-      if aEventID <> 0 then begin
+      if LEventID <> 0 then begin
         FEventCanceled := True;
         Try
           ResetEvent(Fsignal);
-          FLibrary.EventCancel(FDbHandle, aEventID);
+          FLibrary.EventCancel(FDbHandle, LEventID);
           //in case the connection or fbserver crash the Fsignal will
           //be never signaled
           WaitForSingleObject(FSignal, 60000);
@@ -5612,17 +5600,17 @@ var aEventBuffer: PAnsiChar;
         End;
         FEventCanceled := False;
       end;
-      aEventID := 0;
+      LEventID := 0;
 
       //free the aEventBuffer
-      if assigned(aEventBuffer) then begin
+      if assigned(LEventBuffer) then begin
         Try
-          FLibrary.IscFree(aEventBuffer);
+          FLibrary.IscFree(LEventBuffer);
         Except
           //paranoia mode ... i never see it's can raise any error here
         End;
       end;
-      aEventBuffer := nil;
+      LEventBuffer := nil;
 
       //free the FResultBuffer
       if assigned(FResultBuffer) then begin
@@ -5646,17 +5634,17 @@ var aEventBuffer: PAnsiChar;
       FDBHandle := Nil;
     End;
 
-var aCurrentEventIdx: integer;
-    aMustResetDBHandle: Boolean;
+var LCurrentEventIdx: integer;
+    LMustResetDBHandle: Boolean;
 
 begin
   //to be sure that the thread was stated
   fStarted := True;
 
-  aEventBuffer := nil;
-  aEventID := 0;
-  aEventBufferLen := 0;
-  aMustResetDBHandle := True;
+  LEventBuffer := nil;
+  LEventID := 0;
+  LEventBufferLen := 0;
+  LMustResetDBHandle := True;
 
   while not Terminated do begin
     Try
@@ -5664,10 +5652,10 @@ begin
       //if the DBHandle is not assigned the create it
       //FDBHandle can not be assigned if for exemple
       //an error (disconnection happen)
-      if aMustResetDBHandle then begin
+      if LMustResetDBHandle then begin
 
         //set the FMustResetDBHandle to false
-        aMustResetDBHandle := False;
+        LMustResetDBHandle := False;
 
         //free the local var
         InternalFreeLocalVar;
@@ -5678,7 +5666,7 @@ begin
                                 fOpenConnectionParams);
 
         //register the EventBlock
-        aEventBufferLen := FLibrary.EventBlock(aEventBuffer,
+        LEventBufferLen := FLibrary.EventBlock(LEventBuffer,
                                                fResultBuffer,
                                                fEventNamesCount,
                                                PAnsiChar(fEventNamesArr[0]),
@@ -5700,15 +5688,15 @@ begin
         //the First EventQueue
         ResetEvent(Fsignal);
         FLibrary.EventQueue(FdbHandle,
-                            aEventID,
-                            aEventBufferLen,
-                            aEventBuffer,
+                            LEventID,
+                            LEventBufferLen,
+                            LEventBuffer,
                             @ALFBXEventCallback,
                             self);
         if WaitForSingleObject(FSignal, 60000) <> WAIT_OBJECT_0 then raise Exception.Create('Timeout in the first call to isc_que_events');
-        FLibrary.EventCounts(aStatusVector,
-                             aEventBufferLen,
-                             aEventBuffer,
+        FLibrary.EventCounts(LStatusVector,
+                             LEventBufferLen,
+                             LEventBuffer,
                              fResultBuffer);
 
         //set the FQueueEvent to false in case the next
@@ -5718,9 +5706,9 @@ begin
         //the 2nd EventQueue
         ResetEvent(Fsignal);
         FLibrary.EventQueue(FdbHandle,
-                            aEventID,
-                            aEventBufferLen,
-                            aEventBuffer,
+                            LEventID,
+                            LEventBufferLen,
+                            LEventBuffer,
                             @ALFBXEventCallback,
                             self);
 
@@ -5745,14 +5733,14 @@ begin
       if (FQueueEvent) then begin
 
         //retrieve the list of event
-        FLibrary.EventCounts(aStatusVector,
-                             aEventBufferLen,
-                             aEventBuffer,
+        FLibrary.EventCounts(LStatusVector,
+                             LEventBufferLen,
+                             LEventBuffer,
                              fResultBuffer);
 
         //if it was the event
-        for aCurrentEventIdx := 0 to 14 do
-          if aStatusVector[aCurrentEventIdx] <> 0 then DoEvent(fEventNamesArr[aCurrentEventIdx],aStatusVector[aCurrentEventIdx]);
+        for LCurrentEventIdx := 0 to 14 do
+          if LStatusVector[LCurrentEventIdx] <> 0 then DoEvent(fEventNamesArr[LCurrentEventIdx],LStatusVector[LCurrentEventIdx]);
 
         //reset the FQueueEvent
         FQueueEvent := False;
@@ -5760,21 +5748,21 @@ begin
         //start to listen again
         ResetEvent(Fsignal);
         FLibrary.EventQueue(FdbHandle,
-                            aEventID,
-                            aEventBufferLen,
-                            aEventBuffer,
+                            LEventID,
+                            LEventBufferLen,
+                            LEventBuffer,
                             @ALFBXEventCallback,
                             self);
 
       end
 
       //it must be an error somewhere
-      else aMustResetDBHandle := True;
+      else LMustResetDBHandle := True;
 
     Except
       on E: Exception do begin
         //Reset the DBHandle
-        aMustResetDBHandle := True;
+        LMustResetDBHandle := True;
         DoException(E);
       end;
     End;

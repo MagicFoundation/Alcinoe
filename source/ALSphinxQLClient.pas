@@ -1,19 +1,15 @@
-{*************************************************************
-product:      ALSphinxQLClient
-Description:  An Object to query Sphinx full text search engine using
-              SphinxQL protocol (MySql Clone Protocol)
-**************************************************************}
+{*******************************************************************************
+An Object to query Sphinx full text search engine using SphinxQL protocol
+(MySql Clone Protocol)
+*******************************************************************************}
 
 unit ALSphinxQLClient;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
-uses AlMySqlClient,
-     ALMySqlWrapper;
+uses
+  AlMySqlClient,
+  ALMySqlWrapper;
 
 Type
 
@@ -46,8 +42,9 @@ function AlSphinxEscapeString(const src: ansiString): ansiString;
 
 implementation
 
-uses ALCommon,
-     alString;
+uses
+  ALCommon,
+  alString;
 
 {*********************************************************}
 procedure TalSphinxQlClient.Connect(const Host: AnsiString;

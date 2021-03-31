@@ -2,7 +2,8 @@ unit ALZLibExGZ;
 
 interface
 
-uses system.classes;
+uses
+  system.classes;
 
 function  ALGZCompressStr(const s: AnsiString): AnsiString; inline;
 function  ALGZDecompressStr(const s: AnsiString): AnsiString; inline;
@@ -11,7 +12,8 @@ procedure ALGZDecompressStream(inStream, outStream: TStream); inline;
 
 implementation
 
-uses ZLibExGZ;
+uses
+  ZLibExGZ;
 
 {********************************************************}
 function ALGZCompressStr(const s: AnsiString): AnsiString;

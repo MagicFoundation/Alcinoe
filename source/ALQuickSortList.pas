@@ -1,62 +1,13 @@
-{*************************************************************
-product:      ALQuickSortList
-Description:  TALIntegerList or TALDoubleList that work exactly
-              like TstringList but with integer or Double.
-**************************************************************}
+{*******************************************************************************
+TALIntegerList or TALDoubleList that work exactly like TstringList but with integer or Double.
+*******************************************************************************}
 
 unit ALQuickSortList;
 
-{Exemple of a QuickSort Algorithm :
-
-procedure _SampleQuickSort(aArray: TArrayOfxxx; L, R: Integer);
-
-  Function _Compare(I1,I2: xxx): Integer;
-  Begin
-    if I1 < I2 then result := -1
-    else if I1 > I2 then result := 1
-    else result := 0;
-  end;
-
-var aItem: xxx;
-    I, J, P: Integer;
-
-begin
-  repeat
-    I := L;
-    J := R;
-    P := (L + R) shr 1;
-    repeat
-      while _Compare(aArray[I], aArray[P]) < 0 do Inc(I);
-      while _Compare(aArray[J], aArray[P]) > 0 do Dec(J);
-      if I <= J then
-      begin
-        if I <> J then begin
-          aItem := aArray[i];
-          aArray[i] := aArray[j];
-          aArray[j] := aItem;
-        end;
-        if P = I then
-          P := J
-        else if P = J then
-          P := I;
-        Inc(I);
-        Dec(J);
-      end;
-    until I > J;
-    if L < J then _SampleQuickSort(L, J);
-    L := I;
-  until I >= R;
-end;
-
-}
-
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
-Uses System.Classes;
+Uses
+  System.Classes;
 
 Type
 
@@ -75,7 +26,7 @@ Type
     FSorted: Boolean;
     FDuplicates: TDuplicates;
     procedure SetSorted(Value: Boolean);
-    procedure QuickSort(L, R: Integer; SCompare: TALQuickSortListCompare);
+    procedure QuickSort(L, R: Integer; ACompare: TALQuickSortListCompare);
   protected
     function  Get(Index: Integer): Pointer;
     procedure Grow;
@@ -314,9 +265,10 @@ resourcestring
 
 implementation
 
-uses System.Math,
-     ALCommon,
-     ALString;
+uses
+  System.Math,
+  ALCommon,
+  ALString;
 
 {***********************************************************************************}
 function AlBaseQuickSortListCompare(List: TObject; Index1, Index2: Integer): Integer;
@@ -531,17 +483,24 @@ begin
 end;
 
 {*****************************************************************************************}
-procedure TALBaseQuickSortList.QuickSort(L, R: Integer; SCompare: TALQuickSortListCompare);
+procedure TALBaseQuickSortList.QuickSort(L, R: Integer; ACompare: TALQuickSortListCompare);
 var
   I, J, P: Integer;
 begin
-  repeat
+  while L < R do
+  begin
+    if (R - L) = 1 then
+    begin
+      if ACompare(Self, L, R) > 0 then
+        ExchangeItems(L, R);
+      break;
+    end;
     I := L;
     J := R;
     P := (L + R) shr 1;
     repeat
-      while SCompare(Self, I, P) < 0 do Inc(I);
-      while SCompare(Self, J, P) > 0 do Dec(J);
+      while (I <> P) and (ACompare(Self, I, P) < 0) do Inc(I);
+      while (J <> P) and (ACompare(Self, J, P) > 0) do Dec(J);
       if I <= J then
       begin
         if I <> J then
@@ -554,9 +513,19 @@ begin
         Dec(J);
       end;
     until I > J;
-    if L < J then QuickSort(L, J, SCompare);
-    L := I;
-  until I >= R;
+    if (J - L) > (R - I) then
+    begin
+      if I < R then
+        QuickSort(I, R, ACompare);
+      R := J;
+    end
+    else
+    begin
+      if L < J then
+        QuickSort(L, J, ACompare);
+      L := I;
+    end;
+  end;
 end;
 
 {**************************************************************************}
@@ -604,30 +573,30 @@ end;
 
 {***********************************************************************************}
 function TALIntegerList.TryAddObject(const Item: integer; AObject: TObject): Boolean;
-var aIndex: integer;
+var LIndex: integer;
 begin
-  if not Sorted then aIndex := FCount
-  else if Find(Item, aIndex) then
+  if not Sorted then LIndex := FCount
+  else if Find(Item, LIndex) then
     case Duplicates of
       dupIgnore,
       dupError: Exit(False);
     end;
-  InsertItem(aIndex, Item, AObject);
+  InsertItem(LIndex, Item, AObject);
   result := true;
 end;
 
 {*****************************************************************************************}
 procedure TALIntegerList.InsertItem(Index: Integer; const item: integer; AObject: TObject);
-Var aPALIntegerListItem: PALIntegerListItem;
+Var LPALIntegerListItem: PALIntegerListItem;
 begin
-  New(aPALIntegerListItem);
-  aPALIntegerListItem^.FInteger := item;
-  aPALIntegerListItem^.FObject := AObject;
+  New(LPALIntegerListItem);
+  LPALIntegerListItem^.FInteger := item;
+  LPALIntegerListItem^.FObject := AObject;
   try
-    inherited InsertItem(index,aPALIntegerListItem);
+    inherited InsertItem(index,LPALIntegerListItem);
   except
-    aPALIntegerListItem^.FObject := nil;
-    Dispose(aPALIntegerListItem);
+    LPALIntegerListItem^.FObject := nil;
+    Dispose(LPALIntegerListItem);
     raise;
   end;
 end;
@@ -699,16 +668,16 @@ end;
 
 {*******************************************************************************************}
 procedure TALIntegerList.InsertObject(Index: Integer; const item: integer; AObject: TObject);
-Var aPALIntegerListItem: PALIntegerListItem;
+Var LPALIntegerListItem: PALIntegerListItem;
 begin
-  New(aPALIntegerListItem);
-  aPALIntegerListItem^.FInteger := item;
-  aPALIntegerListItem^.FObject := AObject;
+  New(LPALIntegerListItem);
+  LPALIntegerListItem^.FInteger := item;
+  LPALIntegerListItem^.FObject := AObject;
   try
-    inherited insert(index,aPALIntegerListItem);
+    inherited insert(index,LPALIntegerListItem);
   except
-    aPALIntegerListItem^.FObject := nil;
-    Dispose(aPALIntegerListItem);
+    LPALIntegerListItem^.FObject := nil;
+    Dispose(LPALIntegerListItem);
     raise;
   end;
 end;
@@ -726,15 +695,15 @@ end;
 
 {********************************************************************}
 procedure TALIntegerList.SetItem(Index: Integer; const Item: Integer);
-Var aPALIntegerListItem: PALIntegerListItem;
+Var LPALIntegerListItem: PALIntegerListItem;
 begin
-  New(aPALIntegerListItem);
-  aPALIntegerListItem^.FInteger := item;
-  aPALIntegerListItem^.FObject := nil;
+  New(LPALIntegerListItem);
+  LPALIntegerListItem^.FInteger := item;
+  LPALIntegerListItem^.FObject := nil;
   Try
-    Put(Index, aPALIntegerListItem);
+    Put(Index, LPALIntegerListItem);
   except
-    Dispose(aPALIntegerListItem);
+    Dispose(LPALIntegerListItem);
     raise;
   end;
 end;
@@ -783,11 +752,11 @@ end;
 
 {***********************************************}
 function TALIntegerList.ToArray: TArray<Integer>;
-var i: integer;
+var I: integer;
 begin
   SetLength(Result, Count);
   for I := 0 to Count - 1 do
-    Result[i] := GetItem(i);
+    Result[I] := GetItem(I);
 end;
 
 {**********************************************************}
@@ -816,43 +785,43 @@ end;
 
 {*************************************************************************************}
 function TALCardinalList.TryAddObject(const Item: Cardinal; AObject: TObject): Boolean;
-var aIndex: integer;
+var LIndex: integer;
 begin
-  if not Sorted then aIndex := FCount
-  else if Find(Item, aIndex) then
+  if not Sorted then LIndex := FCount
+  else if Find(Item, LIndex) then
     case Duplicates of
       dupIgnore,
       dupError: Exit(False);
     end;
-  InsertItem(aIndex, Item, AObject);
+  InsertItem(LIndex, Item, AObject);
   result := true;
 end;
 
 {*******************************************************************************************}
 procedure TALCardinalList.InsertItem(Index: Integer; const item: Cardinal; AObject: TObject);
-Var aPALCardinalListItem: PALCardinalListItem;
+Var LPALCardinalListItem: PALCardinalListItem;
 begin
-  New(aPALCardinalListItem);
-  aPALCardinalListItem^.FCardinal := item;
-  aPALCardinalListItem^.FObject := AObject;
+  New(LPALCardinalListItem);
+  LPALCardinalListItem^.FCardinal := item;
+  LPALCardinalListItem^.FObject := AObject;
   try
-    inherited InsertItem(index,aPALCardinalListItem);
+    inherited InsertItem(index,LPALCardinalListItem);
   except
-    aPALCardinalListItem^.FObject := nil;
-    Dispose(aPALCardinalListItem);
+    LPALCardinalListItem^.FObject := nil;
+    Dispose(LPALCardinalListItem);
     raise;
   end;
 end;
 
 {****************************************************************************}
 function TALCardinalList.CompareItems(const Index1, Index2: integer): Integer;
-var aCard1: Cardinal;
-    aCard2: Cardinal;
+var LCard1: Cardinal;
+    LCard2: Cardinal;
 begin
-  aCard1 := PALCardinalListItem(Get(Index1))^.FCardinal;
-  aCard2 := PALCardinalListItem(Get(Index2))^.FCardinal;
-  if aCard1 < aCard2 then result := -1
-  else if aCard1 > aCard2 then result := 1
+  LCard1 := PALCardinalListItem(Get(Index1))^.FCardinal;
+  LCard2 := PALCardinalListItem(Get(Index2))^.FCardinal;
+  if LCard1 < LCard2 then result := -1
+  else if LCard1 > LCard2 then result := 1
   else result := 0;
 end;
 
@@ -926,16 +895,16 @@ end;
 
 {*********************************************************************************************}
 procedure TALCardinalList.InsertObject(Index: Integer; const item: Cardinal; AObject: TObject);
-Var aPALCardinalListItem: PALCardinalListItem;
+Var LPALCardinalListItem: PALCardinalListItem;
 begin
-  New(aPALCardinalListItem);
-  aPALCardinalListItem^.FCardinal := item;
-  aPALCardinalListItem^.FObject := AObject;
+  New(LPALCardinalListItem);
+  LPALCardinalListItem^.FCardinal := item;
+  LPALCardinalListItem^.FObject := AObject;
   try
-    inherited insert(index,aPALCardinalListItem);
+    inherited insert(index,LPALCardinalListItem);
   except
-    aPALCardinalListItem^.FObject := nil;
-    Dispose(aPALCardinalListItem);
+    LPALCardinalListItem^.FObject := nil;
+    Dispose(LPALCardinalListItem);
     raise;
   end;
 end;
@@ -953,15 +922,15 @@ end;
 
 {**********************************************************************}
 procedure TALCardinalList.SetItem(Index: Integer; const Item: Cardinal);
-Var aPALCardinalListItem: PALCardinalListItem;
+Var LPALCardinalListItem: PALCardinalListItem;
 begin
-  New(aPALCardinalListItem);
-  aPALCardinalListItem^.FCardinal := item;
-  aPALCardinalListItem^.FObject := nil;
+  New(LPALCardinalListItem);
+  LPALCardinalListItem^.FCardinal := item;
+  LPALCardinalListItem^.FObject := nil;
   Try
-    Put(Index, aPALCardinalListItem);
+    Put(Index, LPALCardinalListItem);
   except
-    Dispose(aPALCardinalListItem);
+    Dispose(LPALCardinalListItem);
     raise;
   end;
 end;
@@ -1010,11 +979,11 @@ end;
 
 {*************************************************}
 function TALCardinalList.ToArray: TArray<cardinal>;
-var i: integer;
+var I: integer;
 begin
   SetLength(Result, Count);
   for I := 0 to Count - 1 do
-    Result[i] := GetItem(i);
+    Result[I] := GetItem(I);
 end;
 
 {****************************************************}
@@ -1043,30 +1012,30 @@ end;
 
 {*******************************************************************************}
 function TALInt64List.TryAddObject(const Item: Int64; AObject: TObject): Boolean;
-var aIndex: integer;
+var LIndex: integer;
 begin
-  if not Sorted then aIndex := FCount
-  else if Find(Item, aIndex) then
+  if not Sorted then LIndex := FCount
+  else if Find(Item, LIndex) then
     case Duplicates of
       dupIgnore,
       dupError: Exit(False);
     end;
-  InsertItem(aIndex, Item, AObject);
+  InsertItem(LIndex, Item, AObject);
   result := true;
 end;
 
 {*************************************************************************************}
 procedure TALInt64List.InsertItem(Index: Integer; const item: Int64; AObject: TObject);
-Var aPALInt64ListItem: PALInt64ListItem;
+Var LPALInt64ListItem: PALInt64ListItem;
 begin
-  New(aPALInt64ListItem);
-  aPALInt64ListItem^.FInt64 := item;
-  aPALInt64ListItem^.FObject := AObject;
+  New(LPALInt64ListItem);
+  LPALInt64ListItem^.FInt64 := item;
+  LPALInt64ListItem^.FObject := AObject;
   try
-    inherited InsertItem(index,aPALInt64ListItem);
+    inherited InsertItem(index,LPALInt64ListItem);
   except
-    aPALInt64ListItem^.FObject := nil;
-    Dispose(aPALInt64ListItem);
+    LPALInt64ListItem^.FObject := nil;
+    Dispose(LPALInt64ListItem);
     raise;
   end;
 end;
@@ -1138,16 +1107,16 @@ end;
 
 {***************************************************************************************}
 procedure TALInt64List.InsertObject(Index: Integer; const item: Int64; AObject: TObject);
-Var aPALInt64ListItem: PALInt64ListItem;
+Var LPALInt64ListItem: PALInt64ListItem;
 begin
-  New(aPALInt64ListItem);
-  aPALInt64ListItem^.FInt64 := item;
-  aPALInt64ListItem^.FObject := AObject;
+  New(LPALInt64ListItem);
+  LPALInt64ListItem^.FInt64 := item;
+  LPALInt64ListItem^.FObject := AObject;
   try
-    inherited insert(index,aPALInt64ListItem);
+    inherited insert(index,LPALInt64ListItem);
   except
-    aPALInt64ListItem^.FObject := nil;
-    Dispose(aPALInt64ListItem);
+    LPALInt64ListItem^.FObject := nil;
+    Dispose(LPALInt64ListItem);
     raise;
   end;
 end;
@@ -1165,15 +1134,15 @@ end;
 
 {****************************************************************}
 procedure TALInt64List.SetItem(Index: Integer; const Item: Int64);
-Var aPALInt64ListItem: PALInt64ListItem;
+Var LPALInt64ListItem: PALInt64ListItem;
 begin
-  New(aPALInt64ListItem);
-  aPALInt64ListItem^.FInt64 := item;
-  aPALInt64ListItem^.FObject := nil;
+  New(LPALInt64ListItem);
+  LPALInt64ListItem^.FInt64 := item;
+  LPALInt64ListItem^.FObject := nil;
   Try
-    Put(Index, aPALInt64ListItem);
+    Put(Index, LPALInt64ListItem);
   except
-    Dispose(aPALInt64ListItem);
+    Dispose(LPALInt64ListItem);
     raise;
   end;
 end;
@@ -1222,11 +1191,11 @@ end;
 
 {*******************************************}
 function TALInt64List.ToArray: TArray<int64>;
-var i: integer;
+var I: integer;
 begin
   SetLength(Result, Count);
   for I := 0 to Count - 1 do
-    Result[i] := GetItem(i);
+    Result[I] := GetItem(I);
 end;
 
 {************************************************************}
@@ -1255,43 +1224,43 @@ end;
 
 {***************************************************************************************}
 function TALNativeIntList.TryAddObject(const Item: NativeInt; AObject: TObject): Boolean;
-var aIndex: integer;
+var LIndex: integer;
 begin
-  if not Sorted then aIndex := FCount
-  else if Find(Item, aIndex) then
+  if not Sorted then LIndex := FCount
+  else if Find(Item, LIndex) then
     case Duplicates of
       dupIgnore,
       dupError: Exit(False);
     end;
-  InsertItem(aIndex, Item, AObject);
+  InsertItem(LIndex, Item, AObject);
   result := true;
 end;
 
 {*********************************************************************************************}
 procedure TALNativeIntList.InsertItem(Index: Integer; const item: NativeInt; AObject: TObject);
-Var aPALNativeIntListItem: PALNativeIntListItem;
+Var LPALNativeIntListItem: PALNativeIntListItem;
 begin
-  New(aPALNativeIntListItem);
-  aPALNativeIntListItem^.FNativeInt := item;
-  aPALNativeIntListItem^.FObject := AObject;
+  New(LPALNativeIntListItem);
+  LPALNativeIntListItem^.FNativeInt := item;
+  LPALNativeIntListItem^.FObject := AObject;
   try
-    inherited InsertItem(index,aPALNativeIntListItem);
+    inherited InsertItem(index,LPALNativeIntListItem);
   except
-    aPALNativeIntListItem^.FObject := nil;
-    Dispose(aPALNativeIntListItem);
+    LPALNativeIntListItem^.FObject := nil;
+    Dispose(LPALNativeIntListItem);
     raise;
   end;
 end;
 
 {*****************************************************************************}
 function TALNativeIntList.CompareItems(const Index1, Index2: integer): Integer;
-var aNativeInt1: Cardinal;
-    aNativeInt2: Cardinal;
+var LNativeInt1: Cardinal;
+    LNativeInt2: Cardinal;
 begin
-  aNativeInt1 := PALNativeIntListItem(Get(Index1))^.FNativeInt;
-  aNativeInt2 := PALNativeIntListItem(Get(Index2))^.FNativeInt;
-  if aNativeInt1 < aNativeInt2 then result := -1
-  else if aNativeInt1 > aNativeInt2 then result := 1
+  LNativeInt1 := PALNativeIntListItem(Get(Index1))^.FNativeInt;
+  LNativeInt2 := PALNativeIntListItem(Get(Index2))^.FNativeInt;
+  if LNativeInt1 < LNativeInt2 then result := -1
+  else if LNativeInt1 > LNativeInt2 then result := 1
   else result := 0;
 end;
 
@@ -1365,16 +1334,16 @@ end;
 
 {***********************************************************************************************}
 procedure TALNativeIntList.InsertObject(Index: Integer; const item: NativeInt; AObject: TObject);
-Var aPALNativeIntListItem: PALNativeIntListItem;
+Var LPALNativeIntListItem: PALNativeIntListItem;
 begin
-  New(aPALNativeIntListItem);
-  aPALNativeIntListItem^.FNativeInt := item;
-  aPALNativeIntListItem^.FObject := AObject;
+  New(LPALNativeIntListItem);
+  LPALNativeIntListItem^.FNativeInt := item;
+  LPALNativeIntListItem^.FObject := AObject;
   try
-    inherited insert(index,aPALNativeIntListItem);
+    inherited insert(index,LPALNativeIntListItem);
   except
-    aPALNativeIntListItem^.FObject := nil;
-    Dispose(aPALNativeIntListItem);
+    LPALNativeIntListItem^.FObject := nil;
+    Dispose(LPALNativeIntListItem);
     raise;
   end;
 end;
@@ -1392,15 +1361,15 @@ end;
 
 {************************************************************************}
 procedure TALNativeIntList.SetItem(Index: Integer; const Item: NativeInt);
-Var aPALNativeIntListItem: PALNativeIntListItem;
+Var LPALNativeIntListItem: PALNativeIntListItem;
 begin
-  New(aPALNativeIntListItem);
-  aPALNativeIntListItem^.FNativeInt := item;
-  aPALNativeIntListItem^.FObject := nil;
+  New(LPALNativeIntListItem);
+  LPALNativeIntListItem^.FNativeInt := item;
+  LPALNativeIntListItem^.FObject := nil;
   Try
-    Put(Index, aPALNativeIntListItem);
+    Put(Index, LPALNativeIntListItem);
   except
-    Dispose(aPALNativeIntListItem);
+    Dispose(LPALNativeIntListItem);
     raise;
   end;
 end;
@@ -1449,11 +1418,11 @@ end;
 
 {***************************************************}
 function TALNativeIntList.ToArray: TArray<NativeInt>;
-var i: integer;
+var I: integer;
 begin
   SetLength(Result, Count);
   for I := 0 to Count - 1 do
-    Result[i] := GetItem(i);
+    Result[I] := GetItem(I);
 end;
 
 {******************************************************}
@@ -1482,30 +1451,30 @@ end;
 
 {*********************************************************************************}
 function TALDoubleList.TryAddObject(const Item: Double; AObject: TObject): Boolean;
-var aIndex: integer;
+var LIndex: integer;
 begin
-  if not Sorted then aIndex := FCount
-  else if Find(Item, aIndex) then
+  if not Sorted then LIndex := FCount
+  else if Find(Item, LIndex) then
     case Duplicates of
       dupIgnore,
       dupError: Exit(False);
     end;
-  InsertItem(aIndex, Item, AObject);
+  InsertItem(LIndex, Item, AObject);
   result := true;
 end;
 
 {***************************************************************************************}
 procedure TALDoubleList.InsertItem(Index: Integer; const item: Double; AObject: TObject);
-Var aPALDoubleListItem: PALDoubleListItem;
+Var LPALDoubleListItem: PALDoubleListItem;
 begin
-  New(aPALDoubleListItem);
-  aPALDoubleListItem^.FDouble := item;
-  aPALDoubleListItem^.FObject := AObject;
+  New(LPALDoubleListItem);
+  LPALDoubleListItem^.FDouble := item;
+  LPALDoubleListItem^.FObject := AObject;
   try
-    inherited InsertItem(index,aPALDoubleListItem);
+    inherited InsertItem(index,LPALDoubleListItem);
   except
-    aPALDoubleListItem^.FObject := nil;
-    Dispose(aPALDoubleListItem);
+    LPALDoubleListItem^.FObject := nil;
+    Dispose(LPALDoubleListItem);
     raise;
   end;
 end;
@@ -1577,16 +1546,16 @@ end;
 
 {*****************************************************************************************}
 procedure TALDoubleList.InsertObject(Index: Integer; const item: Double; AObject: TObject);
-Var aPALDoubleListItem: PALDoubleListItem;
+Var LPALDoubleListItem: PALDoubleListItem;
 begin
-  New(aPALDoubleListItem);
-  aPALDoubleListItem^.FDouble := item;
-  aPALDoubleListItem^.FObject := AObject;
+  New(LPALDoubleListItem);
+  LPALDoubleListItem^.FDouble := item;
+  LPALDoubleListItem^.FObject := AObject;
   try
-    inherited insert(index,aPALDoubleListItem);
+    inherited insert(index,LPALDoubleListItem);
   except
-    aPALDoubleListItem^.FObject := nil;
-    Dispose(aPALDoubleListItem);
+    LPALDoubleListItem^.FObject := nil;
+    Dispose(LPALDoubleListItem);
     raise;
   end;
 end;
@@ -1604,15 +1573,15 @@ end;
 
 {******************************************************************}
 procedure TALDoubleList.SetItem(Index: Integer; const Item: Double);
-Var aPALDoubleListItem: PALDoubleListItem;
+Var LPALDoubleListItem: PALDoubleListItem;
 begin
-  New(aPALDoubleListItem);
-  aPALDoubleListItem^.FDouble := item;
-  aPALDoubleListItem^.FObject := nil;
+  New(LPALDoubleListItem);
+  LPALDoubleListItem^.FDouble := item;
+  LPALDoubleListItem^.FObject := nil;
   Try
-    Put(Index, aPALDoubleListItem);
+    Put(Index, LPALDoubleListItem);
   except
-    Dispose(aPALDoubleListItem);
+    Dispose(LPALDoubleListItem);
     raise;
   end;
 end;
@@ -1661,11 +1630,11 @@ end;
 
 {*********************************************}
 function TALDoubleList.ToArray: TArray<Double>;
-var i: integer;
+var I: integer;
 begin
   SetLength(Result, Count);
   for I := 0 to Count - 1 do
-    Result[i] := GetItem(i);
+    Result[I] := GetItem(I);
 end;
 
 end.

@@ -24,37 +24,32 @@ interface
 // 30 fps
 // 15 fps
 
-{$IF Defined(ANDROID) or defined(IOS)}
-  {$DEFINE _USE_TEXTURE}
-{$ENDIF}
+{$I Alcinoe.inc}
 
-{$IF defined(MACOS) and not defined(IOS)}
-  {$DEFINE _MACOS}
-{$ENDIF}
-
-uses System.sysUtils,
-     {$IF defined(android)}
-     Androidapi.JNI.JavaTypes,
-     Androidapi.JNIBridge,
-     FMX.Types3D,
-     ALAndroidWebRTCApi,
-     ALFmxTypes3D,
-     {$ELSEIF defined(IOS)}
-     System.syncObjs,
-     System.generics.collections,
-     Macapi.CoreFoundation,
-     iOSapi.CoreVideo,
-     iOSapi.CoreGraphics,
-     iOSapi.Foundation,
-     iOSapi.AVFoundation,
-     iOSapi.CocoaTypes,
-     Macapi.ObjectiveC,
-     ALIosWebRTCApi,
-     ALFmxTypes3D,
-     {$ELSE}
-     FMX.graphics,
-     {$ENDIF}
-     system.Classes;
+uses
+  System.sysUtils,
+  {$IF defined(android)}
+  Androidapi.JNI.JavaTypes,
+  Androidapi.JNIBridge,
+  FMX.Types3D,
+  ALAndroidWebRTCApi,
+  ALFmxTypes3D,
+  {$ELSEIF defined(IOS)}
+  System.syncObjs,
+  System.generics.collections,
+  Macapi.CoreFoundation,
+  iOSapi.CoreVideo,
+  iOSapi.CoreGraphics,
+  iOSapi.Foundation,
+  iOSapi.AVFoundation,
+  iOSapi.CocoaTypes,
+  Macapi.ObjectiveC,
+  ALIosWebRTCApi,
+  ALFmxTypes3D,
+  {$ELSE}
+  FMX.graphics,
+  {$ENDIF}
+  system.Classes;
 
 type
 
@@ -345,8 +340,8 @@ type
     {$ENDIF}
     {$ENDREGION}
 
-    {$REGION ' MSWINDOWS / _MACOS'}
-    {$IF defined(MSWINDOWS) or defined(_MACOS)}
+    {$REGION ' MSWINDOWS / ALMacOS'}
+    {$IF defined(MSWINDOWS) or defined(ALMacOS)}
     function getLocalBitmap: Tbitmap;
     function getRemoteBitmap: Tbitmap;
     {$ENDIF}
@@ -380,8 +375,8 @@ type
     {$ENDIF}
     {$ENDREGION}
 
-    {$REGION ' MSWINDOWS / _MACOS'}
-    {$IF defined(MSWINDOWS) or defined(_MACOS)}
+    {$REGION ' MSWINDOWS / ALMacOS'}
+    {$IF defined(MSWINDOWS) or defined(ALMacOS)}
     property LocalBitmap: Tbitmap read getLocalBitmap;
     property RemoteBitmap: Tbitmap read getRemoteBitmap;
     {$ENDIF}
@@ -417,27 +412,28 @@ type
 
 implementation
 
-uses System.messaging,
-     FMX.platform,
-     {$IF defined(android)}
-     Androidapi.JNI.GraphicsContentViewText,
-     Androidapi.jni,
-     Androidapi.jni.App,
-     Androidapi.JNI.OpenGL,
-     Androidapi.Helpers,
-     {$ELSEIF defined(IOS)}
-     system.math,
-     Macapi.Helpers,
-     iOSapi.OpenGLES,
-     iOSapi.CoreMedia,
-     iOSapi.Helpers,
-     FMX.Consts,
-     FMX.Types3D,
-     FMX.Context.GLES.iOS,
-     FMX.Context.GLES,
-     {$ENDIF}
-     AlString,
-     alcommon;
+uses
+  System.messaging,
+  FMX.platform,
+  {$IF defined(android)}
+  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.jni,
+  Androidapi.jni.App,
+  Androidapi.JNI.OpenGL,
+  Androidapi.Helpers,
+  {$ELSEIF defined(IOS)}
+  system.math,
+  Macapi.Helpers,
+  iOSapi.OpenGLES,
+  iOSapi.CoreMedia,
+  iOSapi.Helpers,
+  FMX.Consts,
+  FMX.Types3D,
+  FMX.Context.GLES.iOS,
+  FMX.Context.GLES,
+  {$ENDIF}
+  AlString,
+  alcommon;
 
 {**********************************************************}
 class function TALWebRTCIceServer.Create(const aUri: String;
@@ -514,10 +510,10 @@ constructor TALWebRTC.Create(const aIceServers: TALWebRTCIceServers; const aPeer
 
 {$REGION ' ANDROID'}
 {$IF defined(android)}
-var aJListIceServers: JList;
-    aIceServerBuilder: JPeerConnection_IceServer_Builder;
-    aJPeerConnectionParameters: JALWebRTC_PeerConnectionParameters;
-    i: integer;
+var LJListIceServers: JList;
+    LIceServerBuilder: JPeerConnection_IceServer_Builder;
+    LJPeerConnectionParameters: JALWebRTC_PeerConnectionParameters;
+    I: integer;
 {$ENDIF}
 {$ENDREGION}
 
@@ -530,13 +526,7 @@ var aJListIceServers: JList;
   begin
     aTexture.Style := aTexture.Style - [TTextureStyle.MipMaps];
 
-    {$IF CompilerVersion >= 32} // tokyo
     if TALCustomContextIOSAccess.valid then
-    {$ELSE}
-    TALCustomContextIOSAccess.CreateSharedContext;
-    if TALCustomContextIOSAccess.IsContextAvailable then
-    {$ENDIF}
-
     begin
       glActiveTexture(GL_TEXTURE0);
       glGenTextures(1, @Tex);
@@ -599,46 +589,46 @@ begin
     //-----
     fAndroidWebRTC := nil;
     //-----
-    aJListIceServers := TJlist.wrap(TJArrayList.JavaClass.init);
+    LJListIceServers := TJlist.wrap(TJArrayList.JavaClass.init);
     for I := low(aIceServers) to High(aIceServers) do begin
-      aIceServerBuilder := TJPeerConnection_IceServer.javaclass.builder(StringToJstring(aIceServers[i].uri));
-      if aIceServers[i].username <> '' then aIceServerBuilder := aIceServerBuilder.setUsername(StringToJstring(aIceServers[i].username));
-      if aIceServers[i].password <> '' then aIceServerBuilder := aIceServerBuilder.setPassword(StringToJstring(aIceServers[i].password));
-      aJListIceServers.add(aIceServerBuilder.createIceServer);
-      aIceServerBuilder := nil;
+      LIceServerBuilder := TJPeerConnection_IceServer.javaclass.builder(StringToJstring(aIceServers[i].uri));
+      if aIceServers[i].username <> '' then LIceServerBuilder := LIceServerBuilder.setUsername(StringToJstring(aIceServers[i].username));
+      if aIceServers[i].password <> '' then LIceServerBuilder := LIceServerBuilder.setPassword(StringToJstring(aIceServers[i].password));
+      LJListIceServers.add(LIceServerBuilder.createIceServer);
+      LIceServerBuilder := nil;
     end;
     //-----
-    aJPeerConnectionParameters := TJALWebRTC_PeerConnectionParameters.JavaClass.init;
-    aJPeerConnectionParameters.VideoCallEnabled := aPeerConnectionParameters.VideoCallEnabled;
-    aJPeerConnectionParameters.VideoWidth := aPeerConnectionParameters.VideoWidth;
-    aJPeerConnectionParameters.VideoHeight := aPeerConnectionParameters.VideoHeight;
-    aJPeerConnectionParameters.VideoFps := aPeerConnectionParameters.VideoFps;
-    aJPeerConnectionParameters.VideoMaxBitrate := aPeerConnectionParameters.VideoMaxBitrate;
-    aJPeerConnectionParameters.VideoCodec := StringToJstring(aPeerConnectionParameters.VideoCodec);
-    aJPeerConnectionParameters.VideoCodecHwAcceleration := aPeerConnectionParameters.VideoCodecHwAcceleration;
-    aJPeerConnectionParameters.AudioStartBitrate := aPeerConnectionParameters.AudioStartBitrate;
-    aJPeerConnectionParameters.AudioCodec := StringToJstring(aPeerConnectionParameters.AudioCodec);
-    aJPeerConnectionParameters.NoAudioProcessing := aPeerConnectionParameters.NoAudioProcessing;
-    aJPeerConnectionParameters.AecDump := aPeerConnectionParameters.AecDump;
-    aJPeerConnectionParameters.DisableBuiltInAEC := aPeerConnectionParameters.DisableBuiltInAEC;
-    aJPeerConnectionParameters.DisableBuiltInNS := aPeerConnectionParameters.DisableBuiltInNS;
-    aJPeerConnectionParameters.DataChannelEnabled := aPeerConnectionParameters.DataChannelEnabled;
-    aJPeerConnectionParameters.DataChannelOrdered := aPeerConnectionParameters.DataChannelOrdered;
-    aJPeerConnectionParameters.DataChannelMaxRetransmitTimeMs := aPeerConnectionParameters.DataChannelMaxRetransmitTimeMs;
-    aJPeerConnectionParameters.DataChannelMaxRetransmits := aPeerConnectionParameters.DataChannelMaxRetransmits;
-    aJPeerConnectionParameters.DataChannelProtocol := StringToJstring(aPeerConnectionParameters.DataChannelProtocol);
-    aJPeerConnectionParameters.DataChannelNegotiated := aPeerConnectionParameters.DataChannelNegotiated;
-    aJPeerConnectionParameters.DataChannelId := aPeerConnectionParameters.DataChannelId;
+    LJPeerConnectionParameters := TJALWebRTC_PeerConnectionParameters.JavaClass.init;
+    LJPeerConnectionParameters.VideoCallEnabled := aPeerConnectionParameters.VideoCallEnabled;
+    LJPeerConnectionParameters.VideoWidth := aPeerConnectionParameters.VideoWidth;
+    LJPeerConnectionParameters.VideoHeight := aPeerConnectionParameters.VideoHeight;
+    LJPeerConnectionParameters.VideoFps := aPeerConnectionParameters.VideoFps;
+    LJPeerConnectionParameters.VideoMaxBitrate := aPeerConnectionParameters.VideoMaxBitrate;
+    LJPeerConnectionParameters.VideoCodec := StringToJstring(aPeerConnectionParameters.VideoCodec);
+    LJPeerConnectionParameters.VideoCodecHwAcceleration := aPeerConnectionParameters.VideoCodecHwAcceleration;
+    LJPeerConnectionParameters.AudioStartBitrate := aPeerConnectionParameters.AudioStartBitrate;
+    LJPeerConnectionParameters.AudioCodec := StringToJstring(aPeerConnectionParameters.AudioCodec);
+    LJPeerConnectionParameters.NoAudioProcessing := aPeerConnectionParameters.NoAudioProcessing;
+    LJPeerConnectionParameters.AecDump := aPeerConnectionParameters.AecDump;
+    LJPeerConnectionParameters.DisableBuiltInAEC := aPeerConnectionParameters.DisableBuiltInAEC;
+    LJPeerConnectionParameters.DisableBuiltInNS := aPeerConnectionParameters.DisableBuiltInNS;
+    LJPeerConnectionParameters.DataChannelEnabled := aPeerConnectionParameters.DataChannelEnabled;
+    LJPeerConnectionParameters.DataChannelOrdered := aPeerConnectionParameters.DataChannelOrdered;
+    LJPeerConnectionParameters.DataChannelMaxRetransmitTimeMs := aPeerConnectionParameters.DataChannelMaxRetransmitTimeMs;
+    LJPeerConnectionParameters.DataChannelMaxRetransmits := aPeerConnectionParameters.DataChannelMaxRetransmits;
+    LJPeerConnectionParameters.DataChannelProtocol := StringToJstring(aPeerConnectionParameters.DataChannelProtocol);
+    LJPeerConnectionParameters.DataChannelNegotiated := aPeerConnectionParameters.DataChannelNegotiated;
+    LJPeerConnectionParameters.DataChannelId := aPeerConnectionParameters.DataChannelId;
     //-----
     fAndroidWebRTC := TJALWebRTC.Wrap(TJALWebRTC.JavaClass.init(TAndroidHelper.Context.getApplicationContext,
                                                                 TJEGL14.JavaClass.eglGetCurrentContext,
-                                                                aJListIceServers,
-                                                                aJPeerConnectionParameters));
+                                                                LJListIceServers,
+                                                                LJPeerConnectionParameters));
     fAndroidWebRTCListener := TAndroidWebRTCListener.Create(Self);
     fAndroidWebRTC.setListener(fAndroidWebRTCListener);
     //-----
-    aJPeerConnectionParameters := nil;
-    aJListIceServers := nil;
+    LJPeerConnectionParameters := nil;
+    LJListIceServers := nil;
 
   {$ENDIF}
   {$ENDREGION}
@@ -698,7 +688,7 @@ function TALWebRTC.Start: boolean;
 
 {$REGION ' ANDROID'}
 {$IF defined(android)}
-var aNativeWin: JWindow;
+var LNativeWin: JWindow;
 {$ENDIF}
 {$ENDREGION}
 
@@ -713,8 +703,8 @@ begin
 
     result := fAndroidWebRTC.start;
     if result then begin
-      aNativeWin := TAndroidHelper.Activity.getWindow;
-      if aNativeWin <> nil then aNativeWin.addFlags(TJWindowManager_LayoutParams.javaclass.FLAG_KEEP_SCREEN_ON);
+      LNativeWin := TAndroidHelper.Activity.getWindow;
+      if LNativeWin <> nil then LNativeWin.addFlags(TJWindowManager_LayoutParams.javaclass.FLAG_KEEP_SCREEN_ON);
     end
 
   {$ENDIF}
@@ -729,8 +719,8 @@ begin
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' MSWINDOWS / _MACOS'}
-  {$IF defined(MSWINDOWS) or defined(_MACOS)}
+  {$REGION ' MSWINDOWS / ALMacOS'}
+  {$IF defined(MSWINDOWS) or defined(ALMacOS)}
 
     result := false;
 
@@ -744,7 +734,7 @@ procedure TALWebRTC.Stop;
 
 {$REGION ' ANDROID'}
 {$IF defined(android)}
-var aNativeWin: JWindow;
+var LNativeWin: JWindow;
 {$ENDIF}
 {$ENDREGION}
 
@@ -763,8 +753,8 @@ begin
       fAndroidWebRTC := Nil;
     end;
     AlFreeAndNil(fAndroidWebRTCListener);
-    aNativeWin := TAndroidHelper.Activity.getWindow;
-    if aNativeWin <> nil then aNativeWin.clearFlags(TJWindowManager_LayoutParams.javaclass.FLAG_KEEP_SCREEN_ON);
+    LNativeWin := TAndroidHelper.Activity.getWindow;
+    if LNativeWin <> nil then LNativeWin.clearFlags(TJWindowManager_LayoutParams.javaclass.FLAG_KEEP_SCREEN_ON);
 
   {$ENDIF}
   {$ENDREGION}
@@ -926,8 +916,8 @@ procedure TALWebRTC.removeRemoteIceCandidates(const aIceCandidates: Tarray<TALWe
 
 {$REGION ' ANDROID'}
 {$IF defined(android)}
-var aJIceCandidates: TJavaObjectArray<JIceCandidate>;
-    i: integer;
+var LJIceCandidates: TJavaObjectArray<JIceCandidate>;
+    I: integer;
 {$ENDIF}
 {$ENDREGION}
 
@@ -936,16 +926,16 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-    aJIceCandidates := TJavaObjectArray<JIceCandidate>.Create(length(aIceCandidates));
+    LJIceCandidates := TJavaObjectArray<JIceCandidate>.Create(length(aIceCandidates));
     try
       for I := 0 to length(aIceCandidates) - 1 do
-        aJIceCandidates.Items[I] := TJIceCandidate.JavaClass.init(
+        LJIceCandidates.Items[I] := TJIceCandidate.JavaClass.init(
                                       StringToJstring(aIceCandidates[i].SdpMid),
                                       aIceCandidates[i].sdpMLineIndex,
                                       StringToJstring(aIceCandidates[i].Sdp));
-      fAndroidWebRtc.removeRemoteIceCandidates(aJIceCandidates);
+      fAndroidWebRtc.removeRemoteIceCandidates(LJIceCandidates);
     finally
-      ALFreeAndNil(aJIceCandidates);
+      ALFreeAndNil(LJIceCandidates);
     end;
 
   {$ENDIF}
@@ -1049,8 +1039,8 @@ begin
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' MSWINDOWS / _MACOS'}
-  {$IF defined(MSWINDOWS) or defined(_MACOS)}
+  {$REGION ' MSWINDOWS / ALMacOS'}
+  {$IF defined(MSWINDOWS) or defined(ALMacOS)}
 
     result := false;
 
@@ -1113,7 +1103,7 @@ end;
 
 {**************************************************************************************}
 procedure TALWebRTC.TAndroidWebRTCListener.onLocalDescription(sdp: JSessionDescription);
-var aSDPType: TALWebRTCSDPType;
+var LSDPType: TALWebRTCSDPType;
 begin
 
   {$IFDEF DEBUG}
@@ -1122,11 +1112,11 @@ begin
   {$ENDIF}
 
   if assigned(fWebRTC.fonLocalDescriptionEvent) then begin
-    if sdp.&type.equals(TJSessionDescription_Type.JavaClass.OFFER) then aSDPType := TALWebRTCSDPType.OFFER
-    else if sdp.&type.equals(TJSessionDescription_Type.JavaClass.ANSWER) then aSDPType := TALWebRTCSDPType.ANSWER
-    else if sdp.&type.equals(TJSessionDescription_Type.JavaClass.PRANSWER) then aSDPType := TALWebRTCSDPType.PRANSWER
+    if sdp.&type.equals(TJSessionDescription_Type.JavaClass.OFFER) then LSDPType := TALWebRTCSDPType.OFFER
+    else if sdp.&type.equals(TJSessionDescription_Type.JavaClass.ANSWER) then LSDPType := TALWebRTCSDPType.ANSWER
+    else if sdp.&type.equals(TJSessionDescription_Type.JavaClass.PRANSWER) then LSDPType := TALWebRTCSDPType.PRANSWER
     else raise Exception.createFmt('Unknown Description Type (%s)', [JstringToString(sdp.&type.toString)]);
-    fWebRTC.fonLocalDescriptionEvent(fWebRTC, aSDPType, JstringToString(sdp.description));
+    fWebRTC.fonLocalDescriptionEvent(fWebRTC, LSDPType, JstringToString(sdp.description));
   end;
 
 end;
@@ -1154,8 +1144,8 @@ end;
 
 {*************************************************************************************************************}
 procedure TALWebRTC.TAndroidWebRTCListener.onIceCandidatesRemoved(candidates: TJavaObjectArray<JIceCandidate>);
-var aIceCandidates: TALWebRTCIceCandidates;
-    i: integer;
+var LIceCandidates: TALWebRTCIceCandidates;
+    I: integer;
 begin
 
   {$IFDEF DEBUG}
@@ -1163,21 +1153,21 @@ begin
   {$ENDIF}
 
   if assigned(fWebRTC.fonIceCandidatesRemovedEvent) then begin
-    setlength(aIceCandidates, candidates.Length);
+    setlength(LIceCandidates, candidates.Length);
     for I := 0 to candidates.Length - 1 do begin
-      aIceCandidates[i] := TALWebRTCIceCandidate.Create(
+      LIceCandidates[i] := TALWebRTCIceCandidate.Create(
                              JstringToString(candidates.Items[i].sdpMid),
                              candidates.Items[i].sdpMLineIndex,
                              JstringToString(candidates.Items[i].sdp));
     end;
-    fWebRTC.fonIceCandidatesRemovedEvent(fWebRTC, aIceCandidates);
+    fWebRTC.fonIceCandidatesRemovedEvent(fWebRTC, LIceCandidates);
   end;
 
 end;
 
 {*************************************************************************************************************}
 procedure TALWebRTC.TAndroidWebRTCListener.onIceConnectionChange(newState: JPeerConnection_IceConnectionState);
-var aState: TALWebRTCIceConnectionState;
+var LState: TALWebRTCIceConnectionState;
 begin
 
   {$IFDEF DEBUG}
@@ -1186,15 +1176,15 @@ begin
   {$ENDIF}
 
   if assigned(fWebRTC.fonIceConnectionChangeEvent) then begin
-    if newState.equals(tJPeerConnection_IceConnectionState.JavaClass.CONNECTED) then aState := TALWebRTCIceConnectionState.CONNECTED
-    else if newState.equals(tJPeerConnection_IceConnectionState.JavaClass.DISCONNECTED) then aState := TALWebRTCIceConnectionState.DISCONNECTED
-    else if newState.equals(tJPeerConnection_IceConnectionState.JavaClass.FAILED) then aState := TALWebRTCIceConnectionState.FAILED
-    else if newState.equals(tJPeerConnection_IceConnectionState.JavaClass.CLOSED) then aState := TALWebRTCIceConnectionState.CLOSED
-    else if newState.equals(tJPeerConnection_IceConnectionState.JavaClass.COMPLETED) then aState := TALWebRTCIceConnectionState.COMPLETED
-    else if newState.equals(tJPeerConnection_IceConnectionState.JavaClass.CHECKING) then aState := TALWebRTCIceConnectionState.CHECKING
-    else if newState.equals(tJPeerConnection_IceConnectionState.JavaClass.NEW) then aState := TALWebRTCIceConnectionState.NEW
+    if newState.equals(tJPeerConnection_IceConnectionState.JavaClass.CONNECTED) then LState := TALWebRTCIceConnectionState.CONNECTED
+    else if newState.equals(tJPeerConnection_IceConnectionState.JavaClass.DISCONNECTED) then LState := TALWebRTCIceConnectionState.DISCONNECTED
+    else if newState.equals(tJPeerConnection_IceConnectionState.JavaClass.FAILED) then LState := TALWebRTCIceConnectionState.FAILED
+    else if newState.equals(tJPeerConnection_IceConnectionState.JavaClass.CLOSED) then LState := TALWebRTCIceConnectionState.CLOSED
+    else if newState.equals(tJPeerConnection_IceConnectionState.JavaClass.COMPLETED) then LState := TALWebRTCIceConnectionState.COMPLETED
+    else if newState.equals(tJPeerConnection_IceConnectionState.JavaClass.CHECKING) then LState := TALWebRTCIceConnectionState.CHECKING
+    else if newState.equals(tJPeerConnection_IceConnectionState.JavaClass.NEW) then LState := TALWebRTCIceConnectionState.NEW
     else raise Exception.createFmt('Unknown Ice Connection State (%s)', [JstringToString(newState.toString)]);
-    fWebRTC.fonIceConnectionChangeEvent(fWebRTC,aState);
+    fWebRTC.fonIceConnectionChangeEvent(fWebRTC,LState);
   end;
 
 end;
@@ -1236,7 +1226,7 @@ end;
 
 {********************************************************************************************************************************************************************}
 constructor TALiOSWebRTC.Create(const aWebRTC: TALWebRTC; const aIceServers: TALWebRTCIceServers; const aPeerConnectionParameters: TALWebRTCPeerConnectionParameters);
-Var LwebRTCConfig: RTCAudioSessionConfiguration;
+Var LWebRTCConfig: RTCAudioSessionConfiguration;
 begin
 
   {$IFDEF DEBUG}
@@ -1321,7 +1311,7 @@ end;
 
 {*****************************}
 procedure TALiOSWebRTC.Execute;
-var aProc: TProc;
+var LProc: TProc;
 begin
 
   //loop still not terminated
@@ -1330,14 +1320,14 @@ begin
 
       Tmonitor.Enter(fQueue);
       try
-        if (fQueue.Count > 0) then aProc := fQueue.Dequeue()
-        else aProc := nil;
+        if (fQueue.Count > 0) then LProc := fQueue.Dequeue()
+        else LProc := nil;
       finally
         Tmonitor.exit(fQueue);
       end;
-      if assigned(aProc) then begin
-        aProc();
-        aProc := nil;
+      if assigned(LProc) then begin
+        LProc();
+        LProc := nil;
       end
       else fSignal.WaitFor;
 
@@ -1453,149 +1443,149 @@ begin
 
   Enqueue(
     Procedure
-    var aDecoderFactory: RTCDefaultVideoDecoderFactory;
-        aEncoderFactory: RTCDefaultVideoEncoderFactory;
-        aVideoCodecInfo: RTCVideoCodecInfo;
-        aH264ProfileLevelId: RTCH264ProfileLevelId;
-        aSupportedCodecs: NSArray;
-        aVideoCodecName: String;
-        aConfiguration: RTCConfiguration;
-        aMediaConstraints: RTCMediaConstraints;
-        aIceServers: array of Pointer;
-        aAudioSource: RTCAudioSource;
-        aCaptureDevice: AVCaptureDevice;
-        aCaptureDeviceFormat: AVCaptureDeviceFormat;
-        aCertificate: RTCCertificate;
-        aCertificateParams: NSMutableDictionary;
-        aOptionalConstraints: NSMutableDictionary;
-        aTransceiver: RTCRtpTransceiver;
-        i: integer;
+    var LDecoderFactory: RTCDefaultVideoDecoderFactory;
+        LEncoderFactory: RTCDefaultVideoEncoderFactory;
+        LVideoCodecInfo: RTCVideoCodecInfo;
+        LH264ProfileLevelId: RTCH264ProfileLevelId;
+        LSupportedCodecs: NSArray;
+        LVideoCodecName: String;
+        LConfiguration: RTCConfiguration;
+        LMediaConstraints: RTCMediaConstraints;
+        LIceServers: array of Pointer;
+        LAudioSource: RTCAudioSource;
+        LCaptureDevice: AVCaptureDevice;
+        LCaptureDeviceFormat: AVCaptureDeviceFormat;
+        LCertificate: RTCCertificate;
+        LCertificateParams: NSMutableDictionary;
+        LOptionalConstraints: NSMutableDictionary;
+        LTransceiver: RTCRtpTransceiver;
+        I: integer;
     begin
 
       //exit if already started
       if fPeerConnectionFactory <> nil then exit;
 
       //init fPeerConnectionFactory
-      aDecoderFactory := TRTCDefaultVideoDecoderFactory.Wrap(TRTCDefaultVideoDecoderFactory.Wrap(TRTCDefaultVideoDecoderFactory.OCClass.alloc).init);
-      aEncoderFactory := TRTCDefaultVideoEncoderFactory.Wrap(TRTCDefaultVideoEncoderFactory.Wrap(TRTCDefaultVideoEncoderFactory.OCClass.alloc).init);
+      LDecoderFactory := TRTCDefaultVideoDecoderFactory.Wrap(TRTCDefaultVideoDecoderFactory.Wrap(TRTCDefaultVideoDecoderFactory.OCClass.alloc).init);
+      LEncoderFactory := TRTCDefaultVideoEncoderFactory.Wrap(TRTCDefaultVideoEncoderFactory.Wrap(TRTCDefaultVideoEncoderFactory.OCClass.alloc).init);
       try
 
-        aVideoCodecInfo := nil;
-        aSupportedCodecs := TRTCDefaultVideoEncoderFactory.OCClass.supportedCodecs;
-        for I := aSupportedCodecs.count - 1 downto 0 do begin
-          aVideoCodecInfo := TRTCVideoCodecInfo.Wrap(TRTCDefaultVideoEncoderFactory.OCClass.supportedCodecs.objectAtIndex(i));
-          aVideoCodecName := NSStrToStr(aVideoCodecInfo.name);
-          if ALSameTextU(aVideoCodecName, 'H264') then begin
-            aH264ProfileLevelId := TRTCH264ProfileLevelId.wrap(
+        LVideoCodecInfo := nil;
+        LSupportedCodecs := TRTCDefaultVideoEncoderFactory.OCClass.supportedCodecs;
+        for I := LSupportedCodecs.count - 1 downto 0 do begin
+          LVideoCodecInfo := TRTCVideoCodecInfo.Wrap(TRTCDefaultVideoEncoderFactory.OCClass.supportedCodecs.objectAtIndex(I));
+          LVideoCodecName := NSStrToStr(LVideoCodecInfo.name);
+          if ALSameTextU(LVideoCodecName, 'H264') then begin
+            LH264ProfileLevelId := TRTCH264ProfileLevelId.wrap(
                                      TRTCH264ProfileLevelId.wrap(
                                        TRTCH264ProfileLevelId.OCClass.alloc).
                                          initWithHexString(
-                                           TNSString.Wrap(aVideoCodecInfo.parameters.objectForKey((StrToNsStr('profile-level-id') as IlocalObject).GetObjectID))));
+                                           TNSString.Wrap(LVideoCodecInfo.parameters.objectForKey((StrToNsStr('profile-level-id') as IlocalObject).GetObjectID))));
             try
-              if (aH264ProfileLevelId.profile = RTCH264ProfileConstrainedHigh) or
-                 (aH264ProfileLevelId.profile = RTCH264ProfileHigh) then aVideoCodecName := 'H264 High'
-              else if (aH264ProfileLevelId.profile = RTCH264ProfileConstrainedBaseline) or
-                      (aH264ProfileLevelId.profile = RTCH264ProfileBaseline) then aVideoCodecName := 'H264 Baseline';
+              if (LH264ProfileLevelId.profile = RTCH264ProfileConstrainedHigh) or
+                 (LH264ProfileLevelId.profile = RTCH264ProfileHigh) then LVideoCodecName := 'H264 High'
+              else if (LH264ProfileLevelId.profile = RTCH264ProfileConstrainedBaseline) or
+                      (LH264ProfileLevelId.profile = RTCH264ProfileBaseline) then LVideoCodecName := 'H264 Baseline';
             finally
-              aH264ProfileLevelId.release;
+              LH264ProfileLevelId.release;
             end;
           end;
-          if ALSameTextU(aVideoCodecName, fPeerConnectionParameters.videoCodec) then break;
+          if ALSameTextU(LVideoCodecName, fPeerConnectionParameters.videoCodec) then break;
         end;
-        if aVideoCodecInfo <> nil then aEncoderFactory.setPreferredCodec(aVideoCodecInfo);
+        if LVideoCodecInfo <> nil then LEncoderFactory.setPreferredCodec(LVideoCodecInfo);
         //-----
         fPeerConnectionFactory := TRTCPeerConnectionFactory.Wrap(
                                     TRTCPeerConnectionFactory.Wrap(
                                       TRTCPeerConnectionFactory.OCClass.alloc).
                                         initWithEncoderFactory(
-                                          (aEncoderFactory as ILocalObject).GetObjectID,
-                                          (aDecoderFactory as ILocalObject).GetObjectID));
+                                          (LEncoderFactory as ILocalObject).GetObjectID,
+                                          (LDecoderFactory as ILocalObject).GetObjectID));
 
       finally
-        aDecoderFactory.release;
-        aEncoderFactory.release;
+        LDecoderFactory.release;
+        LEncoderFactory.release;
       end;
 
       //-----
       fQueuedRemoteCandidates := TList<TALWebRTCIceCandidate>.create;
 
       //-----
-      setlength(aIceServers, length(fIceServers));
-      for I := low(aIceServers) to High(aIceServers) do begin
-        if (fIceServers[i].username = '') and
-           (fIceServers[i].password = '') then aIceServers[i] := TRTCIceServer.Wrap(
+      setlength(LIceServers, length(fIceServers));
+      for I := low(LIceServers) to High(LIceServers) do begin
+        if (fIceServers[I].username = '') and
+           (fIceServers[I].password = '') then LIceServers[I] := TRTCIceServer.Wrap(
                                                                    TRTCIceServer.OCClass.alloc).
                                                                      initWithURLStrings(
-                                                                       TNSArray.Wrap(TNSArray.OCClass.arrayWithObject((StrToNSStr(fIceServers[i].uri) as ILocalObject).GetObjectID))) // urlStrings: NSArray)
-        else aIceServers[i] := TRTCIceServer.Wrap(
+                                                                       TNSArray.Wrap(TNSArray.OCClass.arrayWithObject((StrToNSStr(fIceServers[I].uri) as ILocalObject).GetObjectID))) // urlStrings: NSArray)
+        else LIceServers[I] := TRTCIceServer.Wrap(
                                  TRTCIceServer.OCClass.alloc).
                                     initWithURLStringsUsernameCredential(
-                                      TNSArray.Wrap(TNSArray.OCClass.arrayWithObject((StrToNSStr(fIceServers[i].uri) as ILocalObject).GetObjectID)), // urlStrings: NSArray;
-                                      StrToNSStr(fIceServers[i].username), // username: NSString;
-                                      StrToNSStr(fIceServers[i].password)); // credential: NSString)
+                                      TNSArray.Wrap(TNSArray.OCClass.arrayWithObject((StrToNSStr(fIceServers[I].uri) as ILocalObject).GetObjectID)), // urlStrings: NSArray;
+                                      StrToNSStr(fIceServers[I].username), // username: NSString;
+                                      StrToNSStr(fIceServers[I].password)); // credential: NSString)
       end;
 
       try
 
-        aConfiguration := TRTCConfiguration.Wrap(TRTCConfiguration.Wrap(TRTCConfiguration.OCClass.alloc).init);
+        LConfiguration := TRTCConfiguration.Wrap(TRTCConfiguration.Wrap(TRTCConfiguration.OCClass.alloc).init);
         try
 
-          aConfiguration.setIceServers(TNSArray.Wrap(TNSArray.OCClass.arrayWithObjects(@aIceServers[0], Length(aIceServers))));
+          LConfiguration.setIceServers(TNSArray.Wrap(TNSArray.OCClass.arrayWithObjects(@LIceServers[0], Length(LIceServers))));
           //-----
-          aCertificateParams := TNSMutableDictionary.Create;
+          LCertificateParams := TNSMutableDictionary.Create;
           try
-            aCertificateParams.setValue((StrToNSStr('RSASSA-PKCS1-v1_5') as ILocalObject).GetObjectID, StrToNSStr('name'));
-            aCertificateParams.setValue(TNSNumber.OCClass.numberWithInt(100000), StrToNSStr('expires'));
-            aCertificate := TRTCCertificate.oCClass.generateCertificateWithParams(aCertificateParams); // << we don't need to call release (https://stackoverflow.com/questions/52314334/ios-objective-c-object-when-to-use-release-and-when-to-not-use-it)
-            aConfiguration.setCertificate(aCertificate);
+            LCertificateParams.setValue((StrToNSStr('RSASSA-PKCS1-v1_5') as ILocalObject).GetObjectID, StrToNSStr('name'));
+            LCertificateParams.setValue(TNSNumber.OCClass.numberWithInt(100000), StrToNSStr('expires'));
+            LCertificate := TRTCCertificate.oCClass.generateCertificateWithParams(LCertificateParams); // << we don't need to call release (https://stackoverflow.com/questions/52314334/ios-objective-c-object-when-to-use-release-and-when-to-not-use-it)
+            LConfiguration.setCertificate(LCertificate);
           finally
-            aCertificateParams.release;
+            LCertificateParams.release;
           end;
           //-----
-          aConfiguration.setsdpSemantics(RTCSdpSemanticsUnifiedPlan);
+          LConfiguration.setsdpSemantics(RTCSdpSemanticsUnifiedPlan);
           //-----
-          aOptionalConstraints := TNSMutableDictionary.Create;
+          LOptionalConstraints := TNSMutableDictionary.Create;
           try
-            aOptionalConstraints.setValue((StrToNSStr('true') as ILocalObject).GetObjectID, StrToNSStr('DtlsSrtpKeyAgreement'));
-            aMediaConstraints := TRTCMediaConstraints.Wrap(
+            LOptionalConstraints.setValue((StrToNSStr('true') as ILocalObject).GetObjectID, StrToNSStr('DtlsSrtpKeyAgreement'));
+            LMediaConstraints := TRTCMediaConstraints.Wrap(
                                    TRTCMediaConstraints.Wrap(
                                      TRTCMediaConstraints.OCClass.alloc).
                                        initWithMandatoryConstraints(nil, //mandatory: NSDictionary;
-                                                                    aOptionalConstraints)); //optionalConstraints: NSDictionary
+                                                                    LOptionalConstraints)); //optionalConstraints: NSDictionary
             try
 
               fPeerConnectionDelegate := TPeerConnectionDelegate.Create(self);
-              fpeerConnection := fPeerConnectionFactory.peerConnectionWithConfiguration(aConfiguration, // configuration: RTCConfiguration;
-                                                                                        aMediaConstraints, // constraints: RTCMediaConstraints;
+              fpeerConnection := fPeerConnectionFactory.peerConnectionWithConfiguration(LConfiguration, // configuration: RTCConfiguration;
+                                                                                        LMediaConstraints, // constraints: RTCMediaConstraints;
                                                                                         fPeerConnectionDelegate.GetObjectID); //delegate: Pointer);
               fpeerConnection.retain;
 
             finally
-              aMediaConstraints.release;
+              LMediaConstraints.release;
             end;
           finally
-            aOptionalConstraints.release;
+            LOptionalConstraints.release;
           end;
 
         finally
-          aConfiguration.release;
+          LConfiguration.release;
         end;
 
       finally
-        for I := Low(aIceServers) to High(aIceServers) do
-          TRTCIceServer.Wrap(aIceServers[i]).release;
+        for I := Low(LIceServers) to High(LIceServers) do
+          TRTCIceServer.Wrap(LIceServers[I]).release;
       end;
 
       //-----
-      aMediaConstraints := TRTCMediaConstraints.Wrap(
+      LMediaConstraints := TRTCMediaConstraints.Wrap(
                              TRTCMediaConstraints.Wrap(
                                TRTCMediaConstraints.OCClass.alloc).
                                  initWithMandatoryConstraints(nil, //mandatory: NSDictionary;
                                                               nil)); //optionalConstraints: NSDictionary
       try
 
-        aAudioSource := fPeerConnectionFactory.audioSourceWithConstraints(aMediaConstraints); // << we don't need to call release (https://stackoverflow.com/questions/52314334/ios-objective-c-object-when-to-use-release-and-when-to-not-use-it)
-        fLocalAudioTrack := fPeerConnectionFactory.audioTrackWithSource(aAudioSource, StrToNSStr(kARDAudioTrackId)); // << we don't need to call release (https://stackoverflow.com/questions/52314334/ios-objective-c-object-when-to-use-release-and-when-to-not-use-it)
+        LAudioSource := fPeerConnectionFactory.audioSourceWithConstraints(LMediaConstraints); // << we don't need to call release (https://stackoverflow.com/questions/52314334/ios-objective-c-object-when-to-use-release-and-when-to-not-use-it)
+        fLocalAudioTrack := fPeerConnectionFactory.audioTrackWithSource(LAudioSource, StrToNSStr(kARDAudioTrackId)); // << we don't need to call release (https://stackoverflow.com/questions/52314334/ios-objective-c-object-when-to-use-release-and-when-to-not-use-it)
         fLocalAudioTrack.retain;
         fpeerConnection.addTrack(fLocalAudioTrack, TNSArray.Wrap(TNSArray.OCClass.arrayWithObject((StrToNSStr(kARDMediaStreamId) as ILocalObject).GetObjectID)));
 
@@ -1616,25 +1606,25 @@ begin
           fLocalVideoTrackRenderer := TLocalVideoTrackRenderer.create(self);
           fLocalVideoTrack.addRenderer(fLocalVideoTrackRenderer.GetObjectID);
 
-          aCaptureDevice := findDeviceForPosition(AVCaptureDevicePositionFront);
-          aCaptureDeviceFormat := selectFormatForDevice(aCaptureDevice, fCameraVideoCapturer.PreferredOutputPixelFormat);
-          if aCaptureDeviceFormat = nil then raise Exception.Create('No valid formats for device');
-          fCameraVideoCapturer.startCaptureWithDeviceFormatFps(aCaptureDevice, // device: AVCaptureDevice;
-                                                               aCaptureDeviceFormat, // format: AVCaptureDeviceFormat;
-                                                               selectFpsForFormat(aCaptureDeviceFormat)); // fps: NSInteger)
+          LCaptureDevice := findDeviceForPosition(AVCaptureDevicePositionFront);
+          LCaptureDeviceFormat := selectFormatForDevice(LCaptureDevice, fCameraVideoCapturer.PreferredOutputPixelFormat);
+          if LCaptureDeviceFormat = nil then raise Exception.Create('No valid formats for device');
+          fCameraVideoCapturer.startCaptureWithDeviceFormatFps(LCaptureDevice, // device: AVCaptureDevice;
+                                                               LCaptureDeviceFormat, // format: AVCaptureDeviceFormat;
+                                                               selectFpsForFormat(LCaptureDeviceFormat)); // fps: NSInteger)
           fCameraVideoCapturerStopped := False;
 
           // We can set up rendering for the remote track right away since the transceiver already has an
           // RTCRtpReceiver with a track. The track will automatically get unmuted and produce frames
           // once RTP is received.
-          aTransceiver := nil;
+          LTransceiver := nil;
           for I := 0 to fpeerConnection.transceivers.count - 1 do begin
-            aTransceiver := tRTCRtpTransceiver.Wrap(fpeerConnection.transceivers.objectAtIndex(i));
-            if aTransceiver.mediaType <> RTCRtpMediaTypeVideo then aTransceiver := nil
+            LTransceiver := tRTCRtpTransceiver.Wrap(fpeerConnection.transceivers.objectAtIndex(I));
+            if LTransceiver.mediaType <> RTCRtpMediaTypeVideo then LTransceiver := nil
             else break;
           end;
-          if aTransceiver = nil then raise Exception.Create('No remote video track founded');
-          fRemoteVideoTrack := TRTCVideoTrack.Wrap((aTransceiver.receiver.track as ILocalObject).GetObjectID);
+          if LTransceiver = nil then raise Exception.Create('No remote video track founded');
+          fRemoteVideoTrack := TRTCVideoTrack.Wrap((LTransceiver.receiver.track as ILocalObject).GetObjectID);
           fRemoteVideoTrack.retain;
           fRemoteVideoTrackRenderer := TRemoteVideoTrackRenderer.create(self);
           fRemoteVideoTrack.addRenderer(fRemoteVideoTrackRenderer.GetObjectID);
@@ -1642,7 +1632,7 @@ begin
         end;
 
       finally
-        aMediaConstraints.release;
+        LMediaConstraints.release;
       end;
 
   end);
@@ -1664,16 +1654,16 @@ begin
 
   Enqueue(
     Procedure
-    var aCaptureDevice: AVCaptureDevice;
-        aCaptureDeviceFormat: AVCaptureDeviceFormat;
+    var LCaptureDevice: AVCaptureDevice;
+        LCaptureDeviceFormat: AVCaptureDeviceFormat;
     begin
       if not fCameraVideoCapturerStopped then exit;
-      aCaptureDevice := findDeviceForPosition(AVCaptureDevicePositionFront);
-      aCaptureDeviceFormat := selectFormatForDevice(aCaptureDevice, fCameraVideoCapturer.PreferredOutputPixelFormat);
-      if aCaptureDeviceFormat = nil then raise Exception.Create('No valid formats for device');
-      fCameraVideoCapturer.startCaptureWithDeviceFormatFps(aCaptureDevice, // device: AVCaptureDevice;
-                                                           aCaptureDeviceFormat, // format: AVCaptureDeviceFormat;
-                                                           selectFpsForFormat(aCaptureDeviceFormat)); // fps: NSInteger)
+      LCaptureDevice := findDeviceForPosition(AVCaptureDevicePositionFront);
+      LCaptureDeviceFormat := selectFormatForDevice(LCaptureDevice, fCameraVideoCapturer.PreferredOutputPixelFormat);
+      if LCaptureDeviceFormat = nil then raise Exception.Create('No valid formats for device');
+      fCameraVideoCapturer.startCaptureWithDeviceFormatFps(LCaptureDevice, // device: AVCaptureDevice;
+                                                           LCaptureDeviceFormat, // format: AVCaptureDeviceFormat;
+                                                           selectFpsForFormat(LCaptureDeviceFormat)); // fps: NSInteger)
       fCameraVideoCapturerStopped := False;
     end);
 
@@ -1699,18 +1689,18 @@ begin
 
   Enqueue(
     Procedure
-    var aMediaConstraints: RTCMediaConstraints;
+    var LMediaConstraints: RTCMediaConstraints;
     begin
 
       //-----
       fIsInitiator := true;
 
       //-----
-      aMediaConstraints := createSdpMediaConstraints;
+      LMediaConstraints := createSdpMediaConstraints;
       try
-        fpeerConnection.offerForConstraints(aMediaConstraints, CreateSessionDescriptionCompletionHandler);
+        fpeerConnection.offerForConstraints(LMediaConstraints, CreateSessionDescriptionCompletionHandler);
       finally
-        aMediaConstraints.release;
+        LMediaConstraints.release;
       end;
 
     end);
@@ -1723,18 +1713,18 @@ begin
 
   Enqueue(
     Procedure
-    var aMediaConstraints: RTCMediaConstraints;
+    var LMediaConstraints: RTCMediaConstraints;
     begin
 
       //-----
       fIsInitiator := false;
 
       //-----
-      aMediaConstraints := createSdpMediaConstraints;
+      LMediaConstraints := createSdpMediaConstraints;
       try
-        fpeerConnection.answerForConstraints(aMediaConstraints, CreateSessionDescriptionCompletionHandler);
+        fpeerConnection.answerForConstraints(LMediaConstraints, CreateSessionDescriptionCompletionHandler);
       finally
-        aMediaConstraints.release;
+        LMediaConstraints.release;
       end;
 
     end);
@@ -1747,14 +1737,14 @@ begin
 
   Enqueue(
     Procedure
-    var aSdp: RTCSessionDescription;
+    var LSdp: RTCSessionDescription;
     begin
       case aSdpType of
-        TALWebRTCSDPType.OFFER:    aSdp := TRTCSessionDescription.Wrap(TRTCSessionDescription.Wrap(TRTCSessionDescription.OCClass.alloc).initWithType(RTCSdpTypeOFFER,    StrToNsStr(aSdpDescription)));
-        TALWebRTCSDPType.ANSWER:   aSdp := TRTCSessionDescription.Wrap(TRTCSessionDescription.Wrap(TRTCSessionDescription.OCClass.alloc).initWithType(RTCSdpTypeANSWER,   StrToNsStr(aSdpDescription)));
-        TALWebRTCSDPType.PRANSWER: aSdp := TRTCSessionDescription.Wrap(TRTCSessionDescription.Wrap(TRTCSessionDescription.OCClass.alloc).initWithType(RTCSdpTypePRANSWER, StrToNsStr(aSdpDescription)));
+        TALWebRTCSDPType.OFFER:    LSdp := TRTCSessionDescription.Wrap(TRTCSessionDescription.Wrap(TRTCSessionDescription.OCClass.alloc).initWithType(RTCSdpTypeOFFER,    StrToNsStr(aSdpDescription)));
+        TALWebRTCSDPType.ANSWER:   LSdp := TRTCSessionDescription.Wrap(TRTCSessionDescription.Wrap(TRTCSessionDescription.OCClass.alloc).initWithType(RTCSdpTypeANSWER,   StrToNsStr(aSdpDescription)));
+        TALWebRTCSDPType.PRANSWER: LSdp := TRTCSessionDescription.Wrap(TRTCSessionDescription.Wrap(TRTCSessionDescription.OCClass.alloc).initWithType(RTCSdpTypePRANSWER, StrToNsStr(aSdpDescription)));
       end;
-      fPeerConnection.setRemoteDescription(aSdp, SetSessionDescriptionCompletionHandler);
+      fPeerConnection.setRemoteDescription(LSdp, SetSessionDescriptionCompletionHandler);
     end);
 
 end;
@@ -1772,12 +1762,12 @@ begin
 
   Enqueue(
     Procedure
-    var aRTCIceCandidate: RTCIceCandidate;
+    var LRTCIceCandidate: RTCIceCandidate;
     begin
 
       if fQueuedRemoteCandidates <> nil then fQueuedRemoteCandidates.Add(aIceCandidate)
       else begin
-        aRTCIceCandidate := TRTCIceCandidate.wrap(
+        LRTCIceCandidate := TRTCIceCandidate.wrap(
                               TRTCIceCandidate.wrap(
                                 TRTCIceCandidate.OCClass.alloc).
                                   initWithSdp(
@@ -1785,9 +1775,9 @@ begin
                                     aIceCandidate.SdpMLineIndex, // sdpMLineIndex: Integer;
                                     StrToNsStr(aIceCandidate.SdpMid))); // sdpMid: NSString)
         try
-          fPeerConnection.addIceCandidate(aRTCIceCandidate);
+          fPeerConnection.addIceCandidate(LRTCIceCandidate);
         finally
-          aRTCIceCandidate.release;
+          LRTCIceCandidate.release;
         end;
       end;
 
@@ -1801,8 +1791,8 @@ begin
 
   Enqueue(
     Procedure
-    var aRTCIceCandidates: array of Pointer;
-        i: integer;
+    var LRTCIceCandidates: array of Pointer;
+        I: integer;
     begin
 
       // Drain the queued remote candidates if there is any so that
@@ -1810,19 +1800,19 @@ begin
       drainCandidates();
 
       //-----
-      setlength(aRTCIceCandidates, length(aIceCandidates));
-      for I := low(aRTCIceCandidates) to High(aRTCIceCandidates) do
-        aRTCIceCandidates[i] := TRTCIceCandidate.wrap(
+      setlength(LRTCIceCandidates, length(aIceCandidates));
+      for I := low(LRTCIceCandidates) to High(LRTCIceCandidates) do
+        LRTCIceCandidates[I] := TRTCIceCandidate.wrap(
                                   TRTCIceCandidate.OCClass.alloc).
                                     initWithSdp(
-                                      StrToNsStr(aIceCandidates[i].Sdp),// sdp: NSString;
-                                      aIceCandidates[i].SdpMLineIndex, // sdpMLineIndex: Integer;
-                                      StrToNsStr(aIceCandidates[i].SdpMid)); // sdpMid: NSString)
+                                      StrToNsStr(aIceCandidates[I].Sdp),// sdp: NSString;
+                                      aIceCandidates[I].SdpMLineIndex, // sdpMLineIndex: Integer;
+                                      StrToNsStr(aIceCandidates[I].SdpMid)); // sdpMid: NSString)
       try
-        fPeerConnection.removeIceCandidates(TNSArray.Wrap(TNSArray.OCClass.arrayWithObjects(@aRTCIceCandidates[0], Length(aRTCIceCandidates))));
+        fPeerConnection.removeIceCandidates(TNSArray.Wrap(TNSArray.OCClass.arrayWithObjects(@LRTCIceCandidates[0], Length(LRTCIceCandidates))));
       finally
-        for I := Low(aRTCIceCandidates) to High(aRTCIceCandidates) do
-          TRTCIceCandidate.Wrap(aRTCIceCandidates[i]).release;
+        for I := Low(LRTCIceCandidates) to High(LRTCIceCandidates) do
+          TRTCIceCandidate.Wrap(LRTCIceCandidates[I]).release;
       end;
 
     end);
@@ -1878,18 +1868,18 @@ begin
 
   Enqueue(
     Procedure
-    var aSender: RTCRtpSender;
-        aParametersToModify: RTCRtpParameters;
-        i,j: integer;
+    var LSender: RTCRtpSender;
+        LParametersToModify: RTCRtpParameters;
+        I,J: integer;
     begin
 
-      for i := 0 to fPeerConnection.senders.count - 1 do begin
-        aSender := TRTCRtpSender.Wrap(fPeerConnection.senders.objectAtIndex(i));
-        if (aSender.track <> nil) and (NSStrToStr(aSender.track.kind) = kARDVideoTrackKind) then begin
-          aParametersToModify := aSender.parameters;
-          for J := 0 to aParametersToModify.encodings.count - 1 do begin
+      for I := 0 to fPeerConnection.senders.count - 1 do begin
+        LSender := TRTCRtpSender.Wrap(fPeerConnection.senders.objectAtIndex(I));
+        if (LSender.track <> nil) and (NSStrToStr(LSender.track.kind) = kARDVideoTrackKind) then begin
+          LParametersToModify := LSender.parameters;
+          for J := 0 to LParametersToModify.encodings.count - 1 do begin
             TRTCRtpEncodingParameters.wrap(
-              aParametersToModify.encodings.objectAtIndex(j))
+              LParametersToModify.encodings.objectAtIndex(J))
                 .setMaxBitrateBps(TNSNumber.Wrap(TNSNumber.OCClass.numberWithInt(maxBitrateKbps * 1000)));
           end;
         end;
@@ -1903,7 +1893,7 @@ end;
 
 {***********************************************************************************************************}
 procedure TALiOSWebRTC.CreateSessionDescriptionCompletionHandler(sdp: RTCSessionDescription; error: NSError);
-var aErrorStr: String;
+var LErrorStr: String;
 begin
 
   {$IFDEF DEBUG}
@@ -1915,13 +1905,13 @@ begin
 
   //check if error
   if error <> nil then begin
-    aErrorStr := NSStrToStr(error.localizedDescription);
+    LErrorStr := NSStrToStr(error.localizedDescription);
     TThread.Synchronize(nil,
       procedure
       begin
         if Terminated then exit;
         if assigned(fWebRTC.fOnErrorEvent) then
-          fWebRTC.fOnErrorEvent(self, fWebRTC.ERROR_CREATE_SDP, aErrorStr);
+          fWebRTC.fOnErrorEvent(self, fWebRTC.ERROR_CREATE_SDP, LErrorStr);
       end);
     exit;
   end;
@@ -1957,9 +1947,9 @@ end;
 
 {****************************************************************************}
 procedure TALiOSWebRTC.SetSessionDescriptionCompletionHandler(error: NSError);
-var aSDPType: TALWebRTCSDPType;
-    aErrorStr: String;
-    aSDPStr: String;
+var LSDPType: TALWebRTCSDPType;
+    LErrorStr: String;
+    LSDPStr: String;
 begin
 
   {$IFDEF DEBUG}
@@ -1969,13 +1959,13 @@ begin
 
   //check if error
   if error <> nil then begin
-    aErrorStr := NSStrToStr(error.localizedDescription);
+    LErrorStr := NSStrToStr(error.localizedDescription);
     TThread.Synchronize(nil,
       procedure
       begin
         if Terminated then exit;
         if assigned(fWebRTC.fOnErrorEvent) then
-          fWebRTC.fOnErrorEvent(self, fWebRTC.ERROR_SET_SDP, aErrorStr);
+          fWebRTC.fOnErrorEvent(self, fWebRTC.ERROR_SET_SDP, LErrorStr);
       end);
     exit;
   end;
@@ -1994,12 +1984,12 @@ begin
                                                                 ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
       {$ENDIF}
 
-      if fLocalSdp.&type = RTCSdpTypeOffer then aSDPType := TALWebRTCSDPType.OFFER
-      else if fLocalSdp.&type = RTCSdpTypeANSWER then aSDPType := TALWebRTCSDPType.ANSWER
-      else if fLocalSdp.&type = RTCSdpTypePRANSWER then aSDPType := TALWebRTCSDPType.PRANSWER
+      if fLocalSdp.&type = RTCSdpTypeOffer then LSDPType := TALWebRTCSDPType.OFFER
+      else if fLocalSdp.&type = RTCSdpTypeANSWER then LSDPType := TALWebRTCSDPType.ANSWER
+      else if fLocalSdp.&type = RTCSdpTypePRANSWER then LSDPType := TALWebRTCSDPType.PRANSWER
       else raise Exception.createFmt('Unknown Description Type (%d)', [fLocalSdp.&type]);
 
-      aSDPStr := NSStrToStr(fLocalSdp.sdp);
+      LSDPStr := NSStrToStr(fLocalSdp.sdp);
 
       fLocalSdp.release;
       fLocalSdp := nil;
@@ -2009,7 +1999,7 @@ begin
         begin
           if Terminated then exit;
           if assigned(fWebRTC.fonLocalDescriptionEvent) then
-            fWebRTC.fonLocalDescriptionEvent(self, aSDPType, aSDPStr);
+            fWebRTC.fonLocalDescriptionEvent(self, LSDPType, LSDPStr);
         end);
 
     end
@@ -2045,12 +2035,12 @@ begin
                                                                 ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
       {$ENDIF}
 
-      if fLocalSdp.&type = RTCSdpTypeOffer then aSDPType := TALWebRTCSDPType.OFFER
-      else if fLocalSdp.&type = RTCSdpTypeANSWER then aSDPType := TALWebRTCSDPType.ANSWER
-      else if fLocalSdp.&type = RTCSdpTypePRANSWER then aSDPType := TALWebRTCSDPType.PRANSWER
+      if fLocalSdp.&type = RTCSdpTypeOffer then LSDPType := TALWebRTCSDPType.OFFER
+      else if fLocalSdp.&type = RTCSdpTypeANSWER then LSDPType := TALWebRTCSDPType.ANSWER
+      else if fLocalSdp.&type = RTCSdpTypePRANSWER then LSDPType := TALWebRTCSDPType.PRANSWER
       else raise Exception.createFmt('Unknown Description Type (%d)', [fLocalSdp.&type]);
 
-      aSDPStr := NsStrToStr(fLocalSdp.sdp);
+      LSDPStr := NsStrToStr(fLocalSdp.sdp);
 
       fLocalSdp.release;
       fLocalSdp := nil;
@@ -2060,7 +2050,7 @@ begin
         begin
           if Terminated then exit;
           if assigned(fWebRTC.fonLocalDescriptionEvent) then
-            fWebRTC.fonLocalDescriptionEvent(self, aSDPType, aSDPStr);
+            fWebRTC.fonLocalDescriptionEvent(self, LSDPType, LSDPStr);
         end);
 
       Enqueue(
@@ -2087,43 +2077,43 @@ end;
 
 {*******************************************************************}
 function TALiOSWebRTC.createSdpMediaConstraints: RTCMediaConstraints;
-var aMandatoryConstraints: NSMutableDictionary;
+var LMandatoryConstraints: NSMutableDictionary;
 begin
 
-  aMandatoryConstraints := TNSMutableDictionary.Create;
+  LMandatoryConstraints := TNSMutableDictionary.Create;
   try
-    aMandatoryConstraints.setValue((StrToNSStr('true') as ILocalObject).GetObjectID, StrToNSStr('OfferToReceiveAudio'));
-    aMandatoryConstraints.setValue((StrToNSStr(ALIfThenU(fPeerConnectionParameters.videoCallEnabled, 'true', 'false')) as ILocalObject).GetObjectID, StrToNSStr('OfferToReceiveVideo'));
+    LMandatoryConstraints.setValue((StrToNSStr('true') as ILocalObject).GetObjectID, StrToNSStr('OfferToReceiveAudio'));
+    LMandatoryConstraints.setValue((StrToNSStr(ALIfThenU(fPeerConnectionParameters.videoCallEnabled, 'true', 'false')) as ILocalObject).GetObjectID, StrToNSStr('OfferToReceiveVideo'));
     result := TRTCMediaConstraints.Wrap(
                 TRTCMediaConstraints.Wrap(
                   TRTCMediaConstraints.OCClass.alloc).
-                    initWithMandatoryConstraints(aMandatoryConstraints, //mandatory: NSDictionary;
+                    initWithMandatoryConstraints(LMandatoryConstraints, //mandatory: NSDictionary;
                                                  nil)); //optionalConstraints: NSDictionary
   finally
-    aMandatoryConstraints.release;
+    LMandatoryConstraints.release;
   end;
 
 end;
 
 {*************************************}
 procedure TALiOSWebRTC.drainCandidates;
-var aALWebRTCIceCandidate: TALWebRTCIceCandidate;
-var aRTCIceCandidate: RTCIceCandidate;
+var LWebRTCIceCandidate: TALWebRTCIceCandidate;
+    LRTCIceCandidate: RTCIceCandidate;
 begin
 
   if (fQueuedRemoteCandidates <> nil) then begin
-    for aALWebRTCIceCandidate in fQueuedRemoteCandidates do begin
-      aRTCIceCandidate := TRTCIceCandidate.wrap(
+    for LWebRTCIceCandidate in fQueuedRemoteCandidates do begin
+      LRTCIceCandidate := TRTCIceCandidate.wrap(
                             TRTCIceCandidate.wrap(
                               TRTCIceCandidate.OCClass.alloc).
                                 initWithSdp(
-                                  StrToNsStr(aALWebRTCIceCandidate.Sdp),// sdp: NSString;
-                                  aALWebRTCIceCandidate.SdpMLineIndex, // sdpMLineIndex: Integer;
-                                  StrToNsStr(aALWebRTCIceCandidate.SdpMid))); // sdpMid: NSString)
+                                  StrToNsStr(LWebRTCIceCandidate.Sdp),// sdp: NSString;
+                                  LWebRTCIceCandidate.SdpMLineIndex, // sdpMLineIndex: Integer;
+                                  StrToNsStr(LWebRTCIceCandidate.SdpMid))); // sdpMid: NSString)
       try
-        fPeerConnection.addIceCandidate(aRTCIceCandidate);
+        fPeerConnection.addIceCandidate(LRTCIceCandidate);
       finally
-        aRTCIceCandidate.release;
+        LRTCIceCandidate.release;
       end;
     end;
     AlFreeAndNil(fQueuedRemoteCandidates);
@@ -2133,57 +2123,56 @@ end;
 
 {*****************************************************************************************************}
 function TALiOSWebRTC.findDeviceForPosition(const aPosition: AVCaptureDevicePosition): AVCaptureDevice;
-var aCaptureDevices: NSArray;
+var LCaptureDevices: NSArray;
     I: integer;
 begin
   result := nil;
-  aCaptureDevices := TRTCCameraVideoCapturer.OCClass.captureDevices;
-  for I := 0 to aCaptureDevices.count - 1 do begin
-    result := TAVCaptureDevice.Wrap(aCaptureDevices.objectAtIndex(I));
+  LCaptureDevices := TRTCCameraVideoCapturer.OCClass.captureDevices;
+  for I := 0 to LCaptureDevices.count - 1 do begin
+    result := TAVCaptureDevice.Wrap(LCaptureDevices.objectAtIndex(I));
     if result.position = aPosition then exit;
   end;
 end;
 
 {**************************************************************************************************************************************************}
 function TALiOSWebRTC.selectFormatForDevice(const aDevice: AVCaptureDevice; const aPreferredOutputPixelFormat: FourCharCode): AVCaptureDeviceFormat;
-var aSupportedFormats: NSArray;
-    aSupportedFormat: AVCaptureDeviceFormat;
-    aTargetWidth: integer;
-    aTargetHeight: integer;
-    aCurrentDiff: integer;
-    aDimension: CMVideoDimensions;
-    aPixelFormat: FourCharCode;
-    aDiff: integer;
+var LSupportedFormats: NSArray;
+    LSupportedFormat: AVCaptureDeviceFormat;
+    LTargetWidth: integer;
+    LTargetHeight: integer;
+    LCurrentDiff: integer;
+    LDimension: CMVideoDimensions;
+    LPixelFormat: FourCharCode;
+    LDiff: integer;
     I: integer;
 begin
-  aSupportedFormats := TRTCCameraVideoCapturer.OCClass.supportedFormatsForDevice(aDevice);
-  aTargetWidth := fPeerConnectionParameters.videoWidth;
-  aTargetHeight := fPeerConnectionParameters.videoHeight;
+  LSupportedFormats := TRTCCameraVideoCapturer.OCClass.supportedFormatsForDevice(aDevice);
+  LTargetWidth := fPeerConnectionParameters.videoWidth;
+  LTargetHeight := fPeerConnectionParameters.videoHeight;
   result := nil;
-  aCurrentDiff := MaxInt;
-  for I := 0 to aSupportedFormats.count - 1 do begin
-    aSupportedFormat := TAVCaptureDeviceFormat.Wrap(aSupportedFormats.objectAtIndex(i));
-    aDimension := CMVideoFormatDescriptionGetDimensions(aSupportedFormat.formatDescription);
-    aPixelFormat := CMFormatDescriptionGetMediaSubType(aSupportedFormat.formatDescription);
-    aDiff := abs(aTargetWidth - aDimension.width) + abs(aTargetHeight - aDimension.height);
-    if (aDiff < aCurrentDiff) then begin
-      result := aSupportedFormat;
-      aCurrentDiff := aDiff;
+  LCurrentDiff := MaxInt;
+  for I := 0 to LSupportedFormats.count - 1 do begin
+    LSupportedFormat := TAVCaptureDeviceFormat.Wrap(LSupportedFormats.objectAtIndex(i));
+    LDimension := CMVideoFormatDescriptionGetDimensions(LSupportedFormat.formatDescription);
+    LPixelFormat := CMFormatDescriptionGetMediaSubType(LSupportedFormat.formatDescription);
+    LDiff := abs(LTargetWidth - LDimension.width) + abs(LTargetHeight - LDimension.height);
+    if (LDiff < LCurrentDiff) then begin
+      result := LSupportedFormat;
+      LCurrentDiff := LDiff;
     end
-    else if (aDiff = aCurrentDiff) and (aPixelFormat = aPreferredOutputPixelFormat) then result := aSupportedFormat;
+    else if (LDiff = LCurrentDiff) and (LPixelFormat = aPreferredOutputPixelFormat) then result := LSupportedFormat;
   end;
 end;
 
-
 {****************************************************************************************}
 function TALiOSWebRTC.selectFpsForFormat(const aFormat: AVCaptureDeviceFormat): NSInteger;
-var aMaxSupportedFramerate: Float64;
-    i: integer;
+var LMaxSupportedFramerate: Float64;
+    I: integer;
 begin
-  aMaxSupportedFramerate := 0;
+  LMaxSupportedFramerate := 0;
   for I := 0 to aFormat.videoSupportedFrameRateRanges.count - 1 do
-    aMaxSupportedFramerate := max(aMaxSupportedFramerate, TAVFrameRateRange.Wrap(aFormat.videoSupportedFrameRateRanges.ObjectatIndex(i)).maxFrameRate);
-  result := trunc(min(aMaxSupportedFramerate, kFramerateLimit));
+    LMaxSupportedFramerate := max(LMaxSupportedFramerate, TAVFrameRateRange.Wrap(aFormat.videoSupportedFrameRateRanges.ObjectatIndex(I)).maxFrameRate);
+  result := trunc(min(LMaxSupportedFramerate, kFramerateLimit));
 end;
 
 {**************************************************************************************}
@@ -2232,20 +2221,20 @@ end;
 
 {******************************************************************************************************************************************************************************}
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidChangeIceConnectionState(peerConnection: RTCPeerConnection; didChangeIceConnectionState: RTCIceConnectionState);
-var aState: TALWebRTCIceConnectionState;
+var LState: TALWebRTCIceConnectionState;
 begin
 
   {$IFDEF DEBUG}
   allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidChangeIceConnectionState', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
-  if didChangeIceConnectionState = RTCIceConnectionStateCONNECTED then aState := TALWebRTCIceConnectionState.CONNECTED
-  else if didChangeIceConnectionState = RTCIceConnectionStateDISCONNECTED then aState := TALWebRTCIceConnectionState.DISCONNECTED
-  else if didChangeIceConnectionState = RTCIceConnectionStateFAILED then aState := TALWebRTCIceConnectionState.FAILED
-  else if didChangeIceConnectionState = RTCIceConnectionStateCLOSED then aState := TALWebRTCIceConnectionState.CLOSED
-  else if didChangeIceConnectionState = RTCIceConnectionStateCOMPLETED then aState := TALWebRTCIceConnectionState.COMPLETED
-  else if didChangeIceConnectionState = RTCIceConnectionStateCHECKING then aState := TALWebRTCIceConnectionState.CHECKING
-  else if didChangeIceConnectionState = RTCIceConnectionStateNEW then aState := TALWebRTCIceConnectionState.NEW
+  if didChangeIceConnectionState = RTCIceConnectionStateCONNECTED then LState := TALWebRTCIceConnectionState.CONNECTED
+  else if didChangeIceConnectionState = RTCIceConnectionStateDISCONNECTED then LState := TALWebRTCIceConnectionState.DISCONNECTED
+  else if didChangeIceConnectionState = RTCIceConnectionStateFAILED then LState := TALWebRTCIceConnectionState.FAILED
+  else if didChangeIceConnectionState = RTCIceConnectionStateCLOSED then LState := TALWebRTCIceConnectionState.CLOSED
+  else if didChangeIceConnectionState = RTCIceConnectionStateCOMPLETED then LState := TALWebRTCIceConnectionState.COMPLETED
+  else if didChangeIceConnectionState = RTCIceConnectionStateCHECKING then LState := TALWebRTCIceConnectionState.CHECKING
+  else if didChangeIceConnectionState = RTCIceConnectionStateNEW then LState := TALWebRTCIceConnectionState.NEW
   else if didChangeIceConnectionState = RTCIceConnectionStateCount then exit
   else raise Exception.createfmt('Unknown Ice Connection State (%d)', [didChangeIceConnectionState]);
 
@@ -2254,7 +2243,7 @@ begin
     begin
       if fiOSWebRTC.Terminated then exit;
       if assigned(fiOSWebRTC.fWebRTC.fonIceConnectionChangeEvent) then
-        fiOSWebRTC.fWebRTC.fonIceConnectionChangeEvent(fiOSWebRTC.fWebRTC,aState);
+        fiOSWebRTC.fWebRTC.fonIceConnectionChangeEvent(fiOSWebRTC.fWebRTC,LState);
     end);
 
 end;
@@ -2269,14 +2258,14 @@ end;
 
 {****************************************************************************************************************************************************************}
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidGenerateIceCandidate(peerConnection: RTCPeerConnection; didGenerateIceCandidate: RTCIceCandidate);
-var aALWebRTCIceCandidate: TALWebRTCIceCandidate;
+var LWebRTCIceCandidate: TALWebRTCIceCandidate;
 begin
 
   {$IFDEF DEBUG}
   allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidGenerateIceCandidate', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
-  aALWebRTCIceCandidate := TALWebRTCIceCandidate.Create(
+  LWebRTCIceCandidate := TALWebRTCIceCandidate.Create(
                              NSStrToStr(didGenerateIceCandidate.sdpMid),
                              didGenerateIceCandidate.sdpMLineIndex,
                              NSStrToStr(didGenerateIceCandidate.sdp));
@@ -2286,15 +2275,15 @@ begin
     begin
       if fiOSWebRTC.Terminated then exit;
       if assigned(fiOSWebRTC.fWebRTC.fonIceCandidateEvent) then
-        fiOSWebRTC.fWebRTC.fonIceCandidateEvent(fiOSWebRTC.fWebRTC, aALWebRTCIceCandidate);
+        fiOSWebRTC.fWebRTC.fonIceCandidateEvent(fiOSWebRTC.fWebRTC, LWebRTCIceCandidate);
     end);
 
 end;
 
 {******************************************************************************************************************************************************}
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidRemoveIceCandidates(peerConnection: RTCPeerConnection; didRemoveIceCandidates: NSArray);
-var aALWebRTCIceCandidates: TALWebRTCIceCandidates;
-    aRTCIceCandidate: RTCIceCandidate;
+var LWebRTCIceCandidates: TALWebRTCIceCandidates;
+    LRTCIceCandidate: RTCIceCandidate;
     i: integer;
 begin
 
@@ -2302,13 +2291,13 @@ begin
   allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidRemoveIceCandidates', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
-  setlength(aALWebRTCIceCandidates, didRemoveIceCandidates.count);
+  setlength(LWebRTCIceCandidates, didRemoveIceCandidates.count);
   for I := 0 to didRemoveIceCandidates.count - 1 do begin
-    aRTCIceCandidate := TRTCIceCandidate.Wrap(didRemoveIceCandidates.objectAtIndex(I));
-    aALWebRTCIceCandidates[i] := TALWebRTCIceCandidate.Create(
-                                   NSStrToStr(aRTCIceCandidate.sdpMid),
-                                   aRTCIceCandidate.sdpMLineIndex,
-                                   NSStrToStr(aRTCIceCandidate.sdp));
+    LRTCIceCandidate := TRTCIceCandidate.Wrap(didRemoveIceCandidates.objectAtIndex(I));
+    LWebRTCIceCandidates[i] := TALWebRTCIceCandidate.Create(
+                                   NSStrToStr(LRTCIceCandidate.sdpMid),
+                                   LRTCIceCandidate.sdpMLineIndex,
+                                   NSStrToStr(LRTCIceCandidate.sdp));
   end;
 
   TThread.synchronize(nil,
@@ -2316,7 +2305,7 @@ begin
     begin
       if fiOSWebRTC.Terminated then exit;
       if assigned(fiOSWebRTC.fWebRTC.fonIceCandidatesRemovedEvent) then
-        fiOSWebRTC.fWebRTC.fonIceCandidatesRemovedEvent(fiOSWebRTC.fWebRTC, aALWebRTCIceCandidates);
+        fiOSWebRTC.fWebRTC.fonIceCandidatesRemovedEvent(fiOSWebRTC.fWebRTC, LWebRTCIceCandidates);
     end);
 
 end;
@@ -2378,20 +2367,20 @@ begin
 
   TThread.synchronize(nil,
   procedure
-  var aPixelBuffer: CVPixelBufferRef;
-      aTextureRefLuma: CVOpenGLESTextureRef;
-      aTextureRefChroma: CVOpenGLESTextureRef;
-      aLumaWidth, aLumaHeight: integer;
-      aChromaWidth, aChromaHeight: integer;
-      aReturnValue: CVReturn;
+  var LPixelBuffer: CVPixelBufferRef;
+      LTextureRefLuma: CVOpenGLESTextureRef;
+      LTextureRefChroma: CVOpenGLESTextureRef;
+      LLumaWidth, LLumaHeight: integer;
+      LChromaWidth, LChromaHeight: integer;
+      LReturnValue: CVReturn;
   begin
 
     //-----
     if fiOSWebRTC.Terminated then exit;
 
     //init aPixelBuffer
-    aPixelBuffer := TRTCCVPixelBuffer.Wrap(Frame.buffer).pixelBuffer;
-    if aPixelBuffer = 0 then begin // could be nil if nothing should be displayed
+    LPixelBuffer := TRTCCVPixelBuffer.Wrap(Frame.buffer).pixelBuffer;
+    if LPixelBuffer = 0 then begin // could be nil if nothing should be displayed
       {$IFDEF DEBUG}
       ALLog('TALWebRTC.TLocalVideoTrackRenderer.renderFrame', 'pixelBuffer:nil', TalLogType.warn);
       {$ENDIF}
@@ -2399,8 +2388,8 @@ begin
     end;
 
     //check the CVPixelBufferGetPixelFormatType
-    if CVPixelBufferGetPixelFormatType(aPixelBuffer) <> kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange then
-      raise Exception.CreateFmt('TALWebRTC.TLocalVideoTrackRenderer.renderFrame: Unknown pixel format type (%d)', [CVPixelBufferGetPixelFormatType(aPixelBuffer)]);
+    if CVPixelBufferGetPixelFormatType(LPixelBuffer) <> kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange then
+      raise Exception.CreateFmt('TALWebRTC.TLocalVideoTrackRenderer.renderFrame: Unknown pixel format type (%d)', [CVPixelBufferGetPixelFormatType(LPixelBuffer)]);
 
 
     /////////////
@@ -2408,8 +2397,8 @@ begin
     /////////////
 
     //-----
-    aLumaWidth := CVPixelBufferGetWidth(aPixelBuffer); // Returns the width of the pixel buffer.
-    aLumaHeight := CVPixelBufferGetHeight(aPixelBuffer); // Returns the height of the pixel buffer.
+    LLumaWidth := CVPixelBufferGetWidth(LPixelBuffer); // Returns the width of the pixel buffer.
+    LLumaHeight := CVPixelBufferGetHeight(LPixelBuffer); // Returns the height of the pixel buffer.
 
     //-----
     // This function either creates a new or returns a cached CVOpenGLESTexture texture object mapped to the
@@ -2421,21 +2410,21 @@ begin
     //
     // The texture cache automatically flushes currently unused resources when you call the
     // CVOpenGLESTextureCacheCreateTextureFromImage function
-    aReturnValue := CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, // allocator: The CFAllocator to use for allocating the texture object. This parameter can be NULL.
+    LReturnValue := CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, // allocator: The CFAllocator to use for allocating the texture object. This parameter can be NULL.
                                                                  fiOSWebRTC.fvideoTextureCacheRef, // textureCache: The texture cache object that will manage the texture.
-                                                                 aPixelBuffer, // sourceImage: The CVImageBuffer that you want to create a texture from.
+                                                                 LPixelBuffer, // sourceImage: The CVImageBuffer that you want to create a texture from.
                                                                  nil,  // textureAttributes: A CFDictionary containing the attributes to be used for creating the CVOpenGLESTexture objects. This parameter can be NULL.
                                                                  GL_TEXTURE_2D, // target: The target texture. GL_TEXTURE_2D and GL_RENDERBUFFER are the only targets currently supported.
                                                                  GL_RED_EXT,  // internalFormat: The number of color components in the texture. Examples are GL_RGBA, GL_LUMINANCE, GL_RGBA8_OES, GL_RED, and GL_RG.
-                                                                 aLumaWidth, // width: The width of the texture image.
-                                                                 aLumaHeight, // height The height of the texture image.
+                                                                 LLumaWidth, // width: The width of the texture image.
+                                                                 LLumaHeight, // height The height of the texture image.
                                                                  GL_RED_EXT,  // format: The format of the pixel data. Examples are GL_RGBA and GL_LUMINANCE.
                                                                  GL_UNSIGNED_BYTE, // type: The data type of the pixel data. One example is GL_UNSIGNED_BYTE.
                                                                  0,  // planeIndex: The plane of the CVImageBuffer to map bind. Ignored for non-planar CVImageBuffers.
-                                                                 @aTextureRefLuma); // textureOut: A pointer to a CVOpenGLESTexture where the newly created texture object will be placed.
-    if aReturnValue <> kCVReturnSuccess then begin
+                                                                 @LTextureRefLuma); // textureOut: A pointer to a CVOpenGLESTexture where the newly created texture object will be placed.
+    if LReturnValue <> kCVReturnSuccess then begin
       {$IFDEF DEBUG}
-      ALLog('TALWebRTC.renderFrame', alFormatU('CVOpenGLESTextureCacheCreateTextureFromImage (Luma) failed: %d', [aReturnValue]), TalLogType.Error);
+      ALLog('TALWebRTC.renderFrame', alFormatU('CVOpenGLESTextureCacheCreateTextureFromImage (Luma) failed: %d', [LReturnValue]), TalLogType.Error);
       {$ENDIF}
       exit;
     end;
@@ -2446,8 +2435,8 @@ begin
     //////////////
 
     //-----
-    aChromaWidth := CVPixelBufferGetWidthOfPlane(aPixelBuffer, 1); // Returns the width of the pixel buffer.
-    aChromaHeight := CVPixelBufferGetHeightOfPlane(aPixelBuffer, 1); // Returns the height of the pixel buffer.
+    LChromaWidth := CVPixelBufferGetWidthOfPlane(LPixelBuffer, 1); // Returns the width of the pixel buffer.
+    LChromaHeight := CVPixelBufferGetHeightOfPlane(LPixelBuffer, 1); // Returns the height of the pixel buffer.
 
     //-----
     // This function either creates a new or returns a cached CVOpenGLESTexture texture object mapped to the
@@ -2459,23 +2448,23 @@ begin
     //
     // The texture cache automatically flushes currently unused resources when you call the
     // CVOpenGLESTextureCacheCreateTextureFromImage function
-    aReturnValue := CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, // allocator: The CFAllocator to use for allocating the texture object. This parameter can be NULL.
+    LReturnValue := CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, // allocator: The CFAllocator to use for allocating the texture object. This parameter can be NULL.
                                                                  fiOSWebRTC.fvideoTextureCacheRef, // textureCache: The texture cache object that will manage the texture.
-                                                                 aPixelBuffer, // sourceImage: The CVImageBuffer that you want to create a texture from.
+                                                                 LPixelBuffer, // sourceImage: The CVImageBuffer that you want to create a texture from.
                                                                  nil,  // textureAttributes: A CFDictionary containing the attributes to be used for creating the CVOpenGLESTexture objects. This parameter can be NULL.
                                                                  GL_TEXTURE_2D, // target: The target texture. GL_TEXTURE_2D and GL_RENDERBUFFER are the only targets currently supported.
                                                                  GL_RG_EXT,  // internalFormat: The number of color components in the texture. Examples are GL_RGBA, GL_LUMINANCE, GL_RGBA8_OES, GL_RED, and GL_RG.
-                                                                 aChromaWidth, // width: The width of the texture image.
-                                                                 aChromaHeight, // height The height of the texture image.
+                                                                 LChromaWidth, // width: The width of the texture image.
+                                                                 LChromaHeight, // height The height of the texture image.
                                                                  GL_RG_EXT,  // format: The format of the pixel data. Examples are GL_RGBA and GL_LUMINANCE.
                                                                  GL_UNSIGNED_BYTE, // type: The data type of the pixel data. One example is GL_UNSIGNED_BYTE.
                                                                  1,  // planeIndex: The plane of the CVImageBuffer to map bind. Ignored for non-planar CVImageBuffers.
-                                                                 @aTextureRefChroma); // textureOut: A pointer to a CVOpenGLESTexture where the newly created texture object will be placed.
-    if aReturnValue <> kCVReturnSuccess then begin
+                                                                 @LTextureRefChroma); // textureOut: A pointer to a CVOpenGLESTexture where the newly created texture object will be placed.
+    if LReturnValue <> kCVReturnSuccess then begin
       {$IFDEF DEBUG}
-      ALLog('TALWebRTC.renderFrame', alFormatU('CVOpenGLESTextureCacheCreateTextureFromImage (Chroma) failed: %d', [aReturnValue]), TalLogType.Error);
+      ALLog('TALWebRTC.renderFrame', alFormatU('CVOpenGLESTextureCacheCreateTextureFromImage (Chroma) failed: %d', [LReturnValue]), TalLogType.Error);
       {$ENDIF}
-      cfRElease(pointer(aTextureRefLuma));
+      cfRElease(pointer(LTextureRefLuma));
       exit;
     end;
 
@@ -2486,7 +2475,7 @@ begin
 
     //-----
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, CVOpenGLESTextureGetName(aTextureRefLuma));
+    glBindTexture(GL_TEXTURE_2D, CVOpenGLESTextureGetName(LTextureRefLuma));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     case fiOSWebRTC.fWebRTC.FLocalBitmap.MagFilter of
@@ -2500,11 +2489,11 @@ begin
     glBindTexture(GL_TEXTURE_2D, 0);
 
     //-----
-    {$IF CompilerVersion > 33} // rio
+    {$IF CompilerVersion > 34} // sydney
       {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
     {$ENDIF}
-    TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.FLocalBitmap).FWidth := aLumaWidth;
-    TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.FLocalBitmap).FHeight := aLumaHeight; // we can't use setsize because it's fill finalise the texture
+    TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.FLocalBitmap).FWidth := LLumaWidth;
+    TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.FLocalBitmap).FHeight := LLumaHeight; // we can't use setsize because it's fill finalise the texture
                                                                                      // but with/height are used only in
                                                                                      // procedure TCanvasHelper.TexRect(const DestCorners, SrcCorners: TCornersF; const Texture: TTexture; const Color1, Color2, Color3, Color4: TAlphaColor);
                                                                                      // begin
@@ -2515,11 +2504,11 @@ begin
                                                                                      //   ...
                                                                                      // end
                                                                                      // so i don't need to finalize the texture !!
-    ITextureAccess(fiOSWebRTC.fWebRTC.FLocalBitmap).Handle := CVOpenGLESTextureGetName(aTextureRefLuma);
+    ITextureAccess(fiOSWebRTC.fWebRTC.FLocalBitmap).Handle := CVOpenGLESTextureGetName(LTextureRefLuma);
 
     //-----
     if fiOSWebRTC.fLocalVideoTextureRefLuma <> 0 then cfRElease(pointer(fiOSWebRTC.fLocalVideoTextureRefLuma));
-    fiOSWebRTC.fLocalVideoTextureRefLuma := aTextureRefLuma;
+    fiOSWebRTC.fLocalVideoTextureRefLuma := LTextureRefLuma;
 
 
     //////////////
@@ -2528,7 +2517,7 @@ begin
 
     //-----
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, CVOpenGLESTextureGetName(aTextureRefChroma));
+    glBindTexture(GL_TEXTURE_2D, CVOpenGLESTextureGetName(LTextureRefChroma));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     case fiOSWebRTC.fWebRTC.FLocalBitmap.SecondTexture.MagFilter of
@@ -2542,11 +2531,11 @@ begin
     glBindTexture(GL_TEXTURE_2D, 0);
 
     //-----
-    ITextureAccess(fiOSWebRTC.fWebRTC.FLocalBitmap.SecondTexture).Handle := CVOpenGLESTextureGetName(aTextureRefChroma);
+    ITextureAccess(fiOSWebRTC.fWebRTC.FLocalBitmap.SecondTexture).Handle := CVOpenGLESTextureGetName(LTextureRefChroma);
 
     //-----
     if fiOSWebRTC.fLocalVideoTextureRefChroma <> 0 then cfRElease(pointer(fiOSWebRTC.fLocalVideoTextureRefChroma));
-    fiOSWebRTC.fLocalVideoTextureRefChroma := aTextureRefChroma;
+    fiOSWebRTC.fLocalVideoTextureRefChroma := LTextureRefChroma;
 
 
     ////////////////////////////////
@@ -2589,28 +2578,28 @@ begin
   //-----
   TThread.Synchronize(nil,
   procedure
-  var aRTCI420Buffer: RTCI420Buffer;
+  var LRTCI420Buffer: RTCI420Buffer;
   begin
 
     //-----
     if fiOSWebRTC.Terminated then exit;
 
     //-----
-    aRTCI420Buffer := TRTCI420Buffer.Wrap(frame.buffer);
+    LRTCI420Buffer := TRTCI420Buffer.Wrap(frame.buffer);
 
     //-----
     glBindTexture(GL_TEXTURE_2D, fiOSWebRTC.fWebRTC.fRemoteBitmap.Handle);
     glTexImage2D(GL_TEXTURE_2D,
                  0,
                  GL_RED_EXT,
-                 aRTCI420Buffer.width,
-                 aRTCI420Buffer.height,
+                 LRTCI420Buffer.width,
+                 LRTCI420Buffer.height,
                  0,
                  GL_RED_EXT,
                  GL_UNSIGNED_BYTE,
-                 aRTCI420Buffer.dataY);
-    TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.fRemoteBitmap).FWidth := aRTCI420Buffer.width;
-    TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.fRemoteBitmap).FHeight := aRTCI420Buffer.height; // we can't use setsize because it's fill finalise the texture
+                 LRTCI420Buffer.dataY);
+    TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.fRemoteBitmap).FWidth := LRTCI420Buffer.width;
+    TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.fRemoteBitmap).FHeight := LRTCI420Buffer.height; // we can't use setsize because it's fill finalise the texture
                                                                                                 // but with/height are used only in
                                                                                                 // procedure TCanvasHelper.TexRect(const DestCorners, SrcCorners: TCornersF; const Texture: TTexture; const Color1, Color2, Color3, Color4: TAlphaColor);
                                                                                                 // begin
@@ -2627,24 +2616,24 @@ begin
     glTexImage2D(GL_TEXTURE_2D,
                  0,
                  GL_RED_EXT,
-                 aRTCI420Buffer.ChromaWidth,
-                 aRTCI420Buffer.ChromaHeight,
+                 LRTCI420Buffer.ChromaWidth,
+                 LRTCI420Buffer.ChromaHeight,
                  0,
                  GL_RED_EXT,
                  GL_UNSIGNED_BYTE,
-                 aRTCI420Buffer.dataU);
+                 LRTCI420Buffer.dataU);
 
     //-----
     glBindTexture(GL_TEXTURE_2D, fiOSWebRTC.fWebRTC.fRemoteBitmap.ThirdTexture.Handle);
     glTexImage2D(GL_TEXTURE_2D,
                  0,
                  GL_RED_EXT,
-                 aRTCI420Buffer.ChromaWidth,
-                 aRTCI420Buffer.ChromaHeight,
+                 LRTCI420Buffer.ChromaWidth,
+                 LRTCI420Buffer.ChromaHeight,
                  0,
                  GL_RED_EXT,
                  GL_UNSIGNED_BYTE,
-                 aRTCI420Buffer.dataV);
+                 LRTCI420Buffer.dataV);
 
     //-----
     fiOSWebRTC.fWebRTC.FRemoteBitmapRotation := Frame.Rotation;
@@ -2672,8 +2661,8 @@ end;
 {$ENDIF}
 {$ENDREGION}
 
-{$REGION ' MSWINDOWS / _MACOS'}
-{$IF defined(MSWINDOWS) or defined(_MACOS)}
+{$REGION ' MSWINDOWS / ALMacOS'}
+{$IF defined(MSWINDOWS) or defined(ALMacOS)}
 
 {*****************************************}
 function TALWebRTC.getLocalBitmap: Tbitmap;
@@ -2704,7 +2693,7 @@ class procedure _TProcOfObjectWrapper.ApplicationEventHandler(const Sender: TObj
 
 {$REGION ' IOS'}
 {$IF defined(ios)}
-Var aFieldTrials: NSDictionary;
+Var LFieldTrials: NSDictionary;
 {$ENDIF}
 {$ENDREGION}
 
@@ -2739,11 +2728,11 @@ begin
   if (M is TApplicationEventMessage) then begin
     if ((M as TApplicationEventMessage).Value.Event = TApplicationEvent.FinishedLaunching) then begin
 
-      aFieldTrials := TNSDictionary.Wrap(TNSDictionary.Wrap(TNSDictionary.OCClass.alloc).init);
+      LFieldTrials := TNSDictionary.Wrap(TNSDictionary.Wrap(TNSDictionary.OCClass.alloc).init);
       try
-        RTCInitFieldTrialDictionary((aFieldTrials as ILocalObject).GetObjectID);
+        RTCInitFieldTrialDictionary((LFieldTrials as ILocalObject).GetObjectID);
       finally
-        aFieldTrials.release;
+        LFieldTrials.release;
       end;
 
       RTCInitializeSSL();

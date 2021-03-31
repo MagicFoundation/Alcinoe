@@ -1,27 +1,13 @@
 @echo off
 
-setlocal
-
-REM -----------------------------------------------------
-REM 
+REM ----------------------------------------------
 REM Update the path below according to your system
-REM Please notice that we use the SDK of Android P (28)
-REM instead of the default lollipop (22) used by Delphi.
-REM This because we want the text selection
-REM like https://developer.android.com/about/versions/marshmallow/android-6.0-changes.html#behavior-text-selection
-REM Please install the SDK build tools and the SDK Platform 
-REM of Android P (28) using SDK Manager.exe
-REM 
-REM JDK 1.8/1.7 Compatibility Gotcha: http://www.draconianoverlord.com/2014/04/01/jdk-compatibility.html
-REM set JDK_PATH1_7="C:\Program Files\Java\jdk1.7.0_80\bin"
-REM %JDK_PATH1_8%\javac ... -source 1.7 -target 1.7 -bootclasspath %JDK_PATH1_7%\jre\lib\rt.jar ...
-REM 
-REM -----------------------------------------------------
+REM ----------------------------------------------
 
-if x%ANDROID% == x set ANDROID="C:\SDKs\android-sdk-windows"
-set ANDROID_PLATFORM=%ANDROID%\platforms\android-28
-set FMX_JAR="C:\Program Files (x86)\Embarcadero\Studio\20.0\lib\android\release\fmx.jar"
-set JDK_PATH1_8="C:\Program Files\Java\jdk1.8.0_131\bin"
+if x%ANDROID% == x set ANDROID="C:\SDKs\android"
+set ANDROID_PLATFORM=%ANDROID%\platforms\android-30
+set FMX_JAR="C:\Program Files (x86)\Embarcadero\Studio\21.0\lib\android\release\fmx.jar"
+set JDK_PATH1_8="C:\Program Files\AdoptOpenJDK\jdk-8.0.282.8-hotspot\bin"
 set CONFIRM=%1
 if x%CONFIRM% == x set CONFIRM=on
 
@@ -221,7 +207,6 @@ IF EXIST %FileName% goto ERROR
 mkdir source\output 2> nul
 %JDK_PATH1_8%\javac^
  -Xlint:unchecked^
- -Xlint:deprecation^
  -cp %ANDROID_PLATFORM%\android.jar;%FMX_JAR%;^
 lib\jar\com.android.support\support-core-utils.jar;^
 lib\jar\com.android.support\support-compat.jar;^

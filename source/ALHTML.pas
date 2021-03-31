@@ -1,39 +1,30 @@
-{*************************************************************
-product:      Alcinoe HTML Functions
-Description:  Functions to work on Html Tag (extract Text, HTML Encode,
-              HTML Decode, etc. The function ALHTMLdecode and
-              ALHTMLEncode is to encode decode HTML entity
-              like &nbsp;
-**************************************************************}
-
 unit ALHTML;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
+{$I Alcinoe.inc}
 
-uses AlStringList;
+uses
+  AlStringList;
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 
-procedure ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
-                                LstExtractedResourceText: TALStrings;
-                                Const DecodeHTMLText: Boolean = True); overload;
-function  ALUTF8ExtractHTMLText(const HtmlContent: AnsiString;
-                                Const DecodeHTMLText: Boolean = True): AnsiString; overload;
+procedure ALExtractHTMLText(HtmlContent: AnsiString;
+                            LstExtractedResourceText: TALStrings;
+                            Const DecodeHTMLText: Boolean = True); overload;
+function  ALExtractHTMLText(const HtmlContent: AnsiString;
+                            Const DecodeHTMLText: Boolean = True): AnsiString; overload;
 function  ALXMLCDataElementEncode(const Src: AnsiString): AnsiString;
 function  ALXMLTextElementEncode(const Src: AnsiString; const useNumericReference: boolean = True): AnsiString;
-procedure ALUTF8XMLTextElementDecodeV(var Str: AnsiString);
-function  ALUTF8XMLTextElementDecode(const Src: AnsiString): AnsiString;
-function  ALUTF8HTMLEncode(const Src: AnsiString;
-                           const EncodeASCIIHtmlEntities: Boolean = True;
-                           const useNumericReference: boolean = True): AnsiString;
-function  ALUTF8HTMLDecode(const Src: AnsiString): AnsiString;
+procedure ALXMLTextElementDecodeV(var Str: AnsiString);
+function  ALXMLTextElementDecode(const Src: AnsiString): AnsiString;
+function  ALHTMLEncode(const Src: AnsiString;
+                       const EncodeASCIIHtmlEntities: Boolean = True;
+                       const useNumericReference: boolean = True): AnsiString;
+function  ALHTMLDecode(const Src: AnsiString): AnsiString;
 function  ALJavascriptEncode(const Src: AnsiString; const useNumericReference: boolean = true): AnsiString;
-procedure ALUTF8JavascriptDecodeV(Var Str: AnsiString);
-function  ALUTF8JavascriptDecode(const Src: AnsiString): AnsiString;
+procedure ALJavascriptDecodeV(Var Str: AnsiString);
+function  ALJavascriptDecode(const Src: AnsiString): AnsiString;
 {$IFDEF MSWINDOWS}
 function  ALRunJavascript(const aCode: AnsiString): AnsiString;
 {$ENDIF}
@@ -48,23 +39,48 @@ function  ALJavascriptEncodeU(const Src: String; const useNumericReference: bool
 procedure ALJavascriptDecodeVU(Var Str: String);
 function  ALJavascriptDecodeU(const Src: String): String;
 
+
+
+////////////////////////////
+/// deprecated functions ///
+////////////////////////////
+
+{$IFNDEF ALHideAnsiString}
+procedure ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
+                                LstExtractedResourceText: TALStrings;
+                                Const DecodeHTMLText: Boolean = True); overload; deprecated 'use ALExtractHTMLText instead with SetMultiByteConversionCodePage(CP_UTF8)';
+function  ALUTF8ExtractHTMLText(const HtmlContent: AnsiString;
+                                Const DecodeHTMLText: Boolean = True): AnsiString; overload; deprecated 'use ALExtractHTMLText instead with SetMultiByteConversionCodePage(CP_UTF8)';
+procedure ALUTF8XMLTextElementDecodeV(var Str: AnsiString); deprecated 'use ALXMLTextElementDecodeV instead with SetMultiByteConversionCodePage(CP_UTF8)';
+function  ALUTF8XMLTextElementDecode(const Src: AnsiString): AnsiString; deprecated 'use ALXMLTextElementDecode instead with SetMultiByteConversionCodePage(CP_UTF8)';
+function  ALUTF8HTMLEncode(const Src: AnsiString;
+                           const EncodeASCIIHtmlEntities: Boolean = True;
+                           const useNumericReference: boolean = True): AnsiString; deprecated 'use ALHTMLEncode instead with SetMultiByteConversionCodePage(CP_UTF8)';
+function  ALUTF8HTMLDecode(const Src: AnsiString): AnsiString; deprecated 'use ALHTMLDecode instead with SetMultiByteConversionCodePage(CP_UTF8)';
+procedure ALUTF8JavascriptDecodeV(Var Str: AnsiString); deprecated 'use ALJavascriptDecodeV instead with SetMultiByteConversionCodePage(CP_UTF8)';
+function  ALUTF8JavascriptDecode(const Src: AnsiString): AnsiString; deprecated 'use ALJavascriptDecode instead with SetMultiByteConversionCodePage(CP_UTF8)';
+{$ENDIF !ALHideAnsiString}
+
+
 implementation
 
-uses System.Math,
-     System.Classes,
-     System.sysutils,
-     {$IFDEF MSWINDOWS}
-     System.Win.Comobj,
-     Winapi.Ole2,
-     Winapi.ActiveX,
-     {$ENDIF}
-     ALCommon,
-     ALString,
-     ALQuickSortList;
+uses
+  System.Math,
+  System.Classes,
+  System.sysutils,
+  {$IFDEF MSWINDOWS}
+  System.Win.Comobj,
+  Winapi.Ole2,
+  Winapi.ActiveX,
+  {$ENDIF}
+  ALCommon,
+  ALString,
+  ALQuickSortList;
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 
-Var _ALHtmlEntities: TALStrings;
+Var
+  _ALHtmlEntities: TALStrings;
 
 {************************************************************}
 procedure ALInitHtmlEntities(const aHtmlEntities: TALStrings);
@@ -416,8 +432,8 @@ begin
   end;
 end;
 
-{*********************************************************}
-procedure ALUTF8XMLTextElementDecodeV(var Str: AnsiString);
+{*****************************************************}
+procedure ALXMLTextElementDecodeV(var Str: AnsiString);
 
 var CurrPos: integer;
     Ln: integer;
@@ -473,13 +489,13 @@ var CurrPos: integer;
 
     {--------------------------------------------------------------------------}
     procedure _CopyUnicodeCharToResult(aCharInt: integer; aNewCurrPos: integer);
-    var aUTF8String: UTF8String;
+    var LString: AnsiString;
         k: integer;
     begin
       if not IsUniqueString then _GenerateUniqueString;
-      aUTF8String := UTF8String(Char(aCharInt));
-      for k := low(aUTF8String) to high(aUTF8String) do begin
-        PResTail^ := aUTF8String[k];
+      LString := AnsiString(Char(aCharInt));
+      for k := low(LString) to high(LString) do begin
+        PResTail^ := LString[k];
         Inc(PResTail);
       end;
       CurrPos := aNewCurrPos;
@@ -639,24 +655,24 @@ begin
 
 end;
 
-{*********************************************************************}
-function ALUTF8XMLTextElementDecode(const Src: AnsiString): AnsiString;
+{*****************************************************************}
+function ALXMLTextElementDecode(const Src: AnsiString): AnsiString;
 begin
   result := Src;
-  ALUTF8XMLTextElementDecodeV(result);
+  ALXMLTextElementDecodeV(result);
 end;
 
-{**********************************************}
-function ALUTF8HTMLEncode(const Src: AnsiString;
-                          const EncodeASCIIHtmlEntities: Boolean = True;
-                          const useNumericReference: boolean = True): AnsiString;
+{******************************************}
+function ALHTMLEncode(const Src: AnsiString;
+                      const EncodeASCIIHtmlEntities: Boolean = True;
+                      const useNumericReference: boolean = True): AnsiString;
 
 var i, k, l: integer;
     Buf, P: PAnsiChar;
-    aEntityStr: AnsiString;
-    aEntityInt: Integer;
-    aIndex: integer;
-    aTmpString: String;
+    LEntityStr: AnsiString;
+    LEntityInt: Integer;
+    LIndex: integer;
+    LTmpString: String;
     LstUnicodeEntitiesNumber: TALIntegerList;
 
 begin
@@ -672,16 +688,16 @@ begin
         LstUnicodeEntitiesNumber.AddObject(integer(_ALHtmlEntities.Objects[i]),pointer(i));
     end;
 
-    aTmpString := UTF8ToString(Src);
-    L := length(aTmpString);
+    LTmpString := String(Src);
+    L := length(LTmpString);
     If L=0 then Exit;
 
     GetMem(Buf, length(Src) * 12); // to be on the *very* safe side
     try
       P := Buf;
       For i := 1 to L do begin
-        aEntityInt := Integer(aTmpString[i]);
-        Case aEntityInt of
+        LEntityInt := Integer(LTmpString[i]);
+        Case LEntityInt of
           34: begin // quot "
                 If EncodeASCIIHtmlEntities then begin
                   if useNumericReference then begin
@@ -757,22 +773,22 @@ begin
                 end;
               end;
           else begin
-            if (aEntityInt > 127) then begin
-              if useNumericReference then aEntityStr := '&#'+ALIntToStr(aEntityInt)+';'
+            if (LEntityInt > 127) then begin
+              if useNumericReference then LEntityStr := '&#'+ALIntToStr(LEntityInt)+';'
               else begin
-                aIndex := LstUnicodeEntitiesNumber.IndexOf(aEntityInt);
-                If aIndex >= 0 Then begin
-                  aEntityStr := _ALHtmlEntities[integer(LstUnicodeEntitiesNumber.Objects[aIndex])];
-                  If aEntityStr <> '' then aEntityStr := '&' + aEntityStr + ';'
-                  else aEntityStr := '&#'+ALIntToStr(aEntityInt)+';'
+                LIndex := LstUnicodeEntitiesNumber.IndexOf(LEntityInt);
+                If LIndex >= 0 Then begin
+                  LEntityStr := _ALHtmlEntities[integer(LstUnicodeEntitiesNumber.Objects[LIndex])];
+                  If LEntityStr <> '' then LEntityStr := '&' + LEntityStr + ';'
+                  else LEntityStr := '&#'+ALIntToStr(LEntityInt)+';'
                 end
-                else aEntityStr := '&#'+ALIntToStr(aEntityInt)+';'
+                else LEntityStr := '&#'+ALIntToStr(LEntityInt)+';'
               end;
             end
-            else aEntityStr := ansistring(aTmpString[i]);
+            else LEntityStr := ansistring(LTmpString[i]);
 
-            for k := 1 to Length(aEntityStr) do begin
-              P^ := aEntityStr[k];
+            for k := 1 to Length(LEntityStr) do begin
+              P^ := LEntityStr[k];
               Inc(P)
             end;
           end;
@@ -791,8 +807,8 @@ begin
 
 end;
 
-{***********************************************************}
-function ALUTF8HTMLDecode(const Src: AnsiString): AnsiString;
+{*******************************************************}
+function ALHTMLDecode(const Src: AnsiString): AnsiString;
 
 var CurrentSrcPos, CurrentResultPos : Integer;
 
@@ -806,19 +822,19 @@ var CurrentSrcPos, CurrentResultPos : Integer;
 
   {----------------------------------------------------------------------------------}
   procedure _CopyCharToResult(aUnicodeOrdEntity: Integer; aNewCurrentSrcPos: integer);
-  Var aUTF8String: Utf8String;
+  Var LString: AnsiString;
       K: integer;
   Begin
-    aUTF8String := UTF8String(Char(aUnicodeOrdEntity));
-    For k := low(aUTF8String) to high(aUTF8String) do begin
-      result[CurrentResultPos] := aUTF8String[k];
+    LString := AnsiString(Char(aUnicodeOrdEntity));
+    For k := low(LString) to high(LString) do begin
+      result[CurrentResultPos] := LString[k];
       inc(CurrentResultPos);
     end;
     CurrentSrcPos := aNewCurrentSrcPos;
   end;
 
 var j: integer;
-    aTmpInteger: Integer;
+    LTmpInteger: Integer;
     SrcLength: integer;
 
 begin
@@ -849,8 +865,8 @@ begin
             if ALTryStrToInt('$' + ALCopyStr(Src,
                                              CurrentSrcPos+3,
                                              j-CurrentSrcPos-3),
-                             aTmpInteger)
-            then _CopyCharToResult(aTmpInteger, J+1)
+                             LTmpInteger)
+            then _CopyCharToResult(LTmpInteger, J+1)
             else _CopyCurrentSrcPosCharToResult;
           end
 
@@ -861,8 +877,8 @@ begin
             if ALTryStrToInt(ALCopyStr(Src,
                                        CurrentSrcPos+2,
                                        j-CurrentSrcPos-2),
-                             aTmpInteger)
-            then _CopyCharToResult(aTmpInteger, J+1)
+                             LTmpInteger)
+            then _CopyCharToResult(LTmpInteger, J+1)
             else _CopyCurrentSrcPosCharToResult;
 
           end;
@@ -872,10 +888,10 @@ begin
         {HTML entity is litteral}
         else begin
 
-          aTmpInteger := _ALHtmlEntities.IndexOf(ALCopyStr(Src,
+          LTmpInteger := _ALHtmlEntities.IndexOf(ALCopyStr(Src,
                                                            CurrentSrcPos+1,
                                                            j-CurrentSrcPos-1));
-          If aTmpInteger >= 0 then _CopyCharToResult(integer(_ALHtmlEntities.Objects[aTmpInteger]),J+1)
+          If LTmpInteger >= 0 then _CopyCharToResult(integer(_ALHtmlEntities.Objects[LTmpInteger]),J+1)
           else _CopyCurrentSrcPosCharToResult;
 
         end;
@@ -1023,8 +1039,8 @@ begin
   end;
 end;
 
-{*****************************************************}
-procedure ALUTF8JavascriptDecodeV(Var Str: AnsiString);
+{*************************************************}
+procedure ALJavascriptDecodeV(Var Str: AnsiString);
 
 var CurrPos : Integer;
     pResTail: PansiChar;
@@ -1079,13 +1095,13 @@ var CurrPos : Integer;
 
     {--------------------------------------------------------------------------}
     procedure _CopyUnicodeCharToResult(aCharInt: Integer; aNewCurrPos: integer); overload;
-    var aUTF8String: UTF8String;
+    var LString: AnsiString;
         K: integer;
     begin
       if not IsUniqueString then _GenerateUniqueString;
-      aUTF8String := UTF8String(Char(aCharInt));
-      For k := low(aUTF8String) to high(aUTF8String) do begin
-        pResTail^ := aUTF8String[k];
+      LString := AnsiString(Char(aCharInt));
+      For k := low(LString) to high(LString) do begin
+        pResTail^ := LString[k];
         inc(pResTail);
       end;
       CurrPos := aNewCurrPos;
@@ -1104,8 +1120,8 @@ var CurrPos : Integer;
 
     {------------------------------------------------------------------------}
     procedure _CopyIso88591CharToResult(aCharInt: byte; aNewCurrPos: integer);
-    var aChar: WideChar;
-        aUTF8String: UTF8String;
+    var LChar: WideChar;
+        LString: AnsiString;
         K: integer;
     begin
       if not IsUniqueString then _GenerateUniqueString;
@@ -1113,11 +1129,11 @@ var CurrPos : Integer;
                                 0, // Flags
                                 @aCharInt,// LocaleStr
                                 1, // LocaleStrLen
-                                @aChar, // UnicodeStr
+                                @LChar, // UnicodeStr
                                 1)<> 1 then RaiseLastOSError; // UnicodeStrLen
-      aUTF8String := UTF8String(aChar);
-      for k := low(aUTF8String) to high(aUTF8String) do begin
-        pResTail^ := aUTF8String[k];
+      LString := AnsiString(LChar);
+      for k := low(LString) to high(LString) do begin
+        pResTail^ := LString[k];
         inc(pResTail);
       end;
       CurrPos := aNewCurrPos;
@@ -1246,14 +1262,14 @@ begin
 
 end;
 
-{******************************************************************}
-function  ALUTF8JavascriptDecode(const Src: AnsiString): AnsiString;
+{**************************************************************}
+function  ALJavascriptDecode(const Src: AnsiString): AnsiString;
 begin
   result := Src;
-  ALUTF8JavascriptDecodeV(result);
+  ALJavascriptDecodeV(result);
 end;
 
-{$ENDIF !NEXTGEN}
+{$ENDIF !ALHideAnsiString}
 
 {******************************************************************************************}
 // https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Values,_variables,_and_literals
@@ -1464,16 +1480,16 @@ var CurrPos : Integer;
 
     {------------------------------------------------------------------------}
     procedure _CopyIso88591CharToResult(aCharInt: byte; aNewCurrPos: integer);
-    var aChar: WideChar;
+    var LChar: WideChar;
     begin
       if not IsUniqueString then _GenerateUniqueString;
       if UnicodeFromLocaleChars(28591, //CodePage,
                                 0, // Flags
                                 @aCharInt,// LocaleStr
                                 1, // LocaleStrLen
-                                @aChar, // UnicodeStr
+                                @LChar, // UnicodeStr
                                 1) <> 1 then RaiseLastOSError; // UnicodeStrLen
-      pResTail^ := aChar;
+      pResTail^ := LChar;
       inc(pResTail);
       CurrPos := aNewCurrPos;
     end;
@@ -1609,7 +1625,7 @@ begin
   ALJavascriptDecodeVU(result);
 end;
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 
 {****************}
 {$IFDEF MSWINDOWS}
@@ -1626,11 +1642,11 @@ var HandleResult: HResult;
     // THIS scope (function MakeExecution) and its destroying is handled inside of this function too
     // on the last "end;" of this function.
     function _MakeExecution(const aCode: AnsiString): AnsiString;
-    var aJavaScript: OleVariant;
+    var LJavaScript: OleVariant;
     begin
-      aJavaScript          := CreateOleObject('ScriptControl');
-      aJavaScript.Language := 'JavaScript';
-      result               := AnsiString(aJavaScript.Eval(String(aCode)));
+      LJavaScript          := CreateOleObject('ScriptControl');
+      LJavaScript.Language := 'JavaScript';
+      result               := AnsiString(LJavaScript.Eval(String(aCode)));
     end;
     {$ENDREGION}
 
@@ -1841,16 +1857,16 @@ Begin
   end;
 end;
 
-{******************************************************}
-procedure ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
-                                LstExtractedResourceText : TALStrings;
-                                Const DecodeHTMLText: Boolean = True);
+{**************************************************}
+procedure ALExtractHTMLText(HtmlContent: AnsiString;
+                            LstExtractedResourceText : TALStrings;
+                            Const DecodeHTMLText: Boolean = True);
 
   {-----------------------------------------------------}
   procedure _Add2LstExtractedResourceText(S: AnsiString);
   Begin
     If DecodeHTMLText then Begin
-      S := alUTF8HtmlDecode(ALTrim(S));
+      S := alHtmlDecode(ALTrim(S));
       S := AlStringReplace(S, #13, ' ', [rfreplaceAll]);
       S := AlStringReplace(S, #10, ' ', [rfreplaceAll]);
       S := AlStringReplace(S, #9,  ' ', [rfreplaceAll]);
@@ -1888,30 +1904,103 @@ Begin
   end;
 end;
 
-{************************************************************}
-function  ALUTF8ExtractHTMLText(const HtmlContent: AnsiString;
-                                Const DecodeHTMLText: Boolean = True): AnsiString;
+{********************************************************}
+function  ALExtractHTMLText(const HtmlContent: AnsiString;
+                            Const DecodeHTMLText: Boolean = True): AnsiString;
 Var LstExtractedResourceText: TALStrings;
 Begin
   LstExtractedResourceText := TALStringList.Create;
   Try
-    ALUTF8ExtractHTMLText(HtmlContent,
-                          LstExtractedResourceText,
-                          DecodeHTMLText);
-    Result := ALTrim(AlStringReplace(LstExtractedResourceText.Text,
-                                   #13#10,
-                                   ' ',
-                                   [rfReplaceAll]));
+    ALExtractHTMLText(HtmlContent,
+                      LstExtractedResourceText,
+                      DecodeHTMLText);
+    Result := ALTrim(
+                AlStringReplace(
+                  LstExtractedResourceText.Text,
+                  #13#10,
+                  ' ',
+                  [rfReplaceAll]));
   finally
     LstExtractedResourceText.free;
   end;
 end;
 
-{$ENDIF}
+{$ENDIF !ALHideAnsiString}
+
+
+
+////////////////////////////
+/// deprecated functions ///
+////////////////////////////
+
+{$IFNDEF ALHideAnsiString}
+
+{**********}
+//deprecated
+procedure ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
+                                LstExtractedResourceText: TALStrings;
+                                Const DecodeHTMLText: Boolean = True);
+begin
+  ALExtractHTMLText(HtmlContent, LstExtractedResourceText, DecodeHTMLText);
+end;
+
+{**********}
+//deprecated
+function  ALUTF8ExtractHTMLText(const HtmlContent: AnsiString;
+                                Const DecodeHTMLText: Boolean = True): AnsiString;
+begin
+  result := ALExtractHTMLText(HtmlContent, DecodeHTMLText);
+end;
+
+{**********}
+//deprecated
+procedure ALUTF8XMLTextElementDecodeV(var Str: AnsiString);
+begin
+  ALXMLTextElementDecodeV(Str);
+end;
+
+{**********}
+//deprecated
+function  ALUTF8XMLTextElementDecode(const Src: AnsiString): AnsiString;
+begin
+  result := ALXMLTextElementDecode(Src);
+end;
+
+{**********}
+//deprecated
+function  ALUTF8HTMLEncode(const Src: AnsiString;
+                           const EncodeASCIIHtmlEntities: Boolean = True;
+                           const useNumericReference: boolean = True): AnsiString;
+begin
+  result := ALHTMLEncode(Src, EncodeASCIIHtmlEntities, useNumericReference);
+end;
+
+{**********}
+//deprecated
+function  ALUTF8HTMLDecode(const Src: AnsiString): AnsiString;
+begin
+  result := ALHTMLDecode(Src);
+end;
+
+{**********}
+//deprecated
+procedure ALUTF8JavascriptDecodeV(Var Str: AnsiString);
+begin
+  ALJavascriptDecodeV(Str);
+end;
+
+{**********}
+//deprecated
+function  ALUTF8JavascriptDecode(const Src: AnsiString): AnsiString;
+begin
+  result := ALJavascriptDecode(Src);
+end;
+
+{$ENDIF !ALHideAnsiString}
 
 Initialization
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
   _ALHtmlEntities := TALStringList.create;
   TALStringList(_ALHtmlEntities).NameValueOptimization := False;
   ALInitHtmlEntities(_ALHtmlEntities);
@@ -1923,7 +2012,7 @@ Initialization
 {$ENDIF}
 
 Finalization
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
   _ALHtmlEntities.Free;
 {$ENDIF}
 

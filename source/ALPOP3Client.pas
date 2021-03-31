@@ -1,21 +1,16 @@
-{*************************************************************
-Description:  TALPOP3Client class implements the POP3 protocol (Post Office
-              Protocol - Version 3)
-
-Link :        http://www.ietf.org/rfc/rfc1939.txt
-**************************************************************}
+{*******************************************************************************
+TALPOP3Client class implements the POP3 protocol (Post Office Protocol - Version 3)
+http://www.ietf.org/rfc/rfc1939.txt
+*******************************************************************************}
 
 unit ALPOP3Client;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
-Uses Winapi.WinSock2,
-     ALStringList,
-     ALInternetMessages;
+Uses
+  Winapi.WinSock2,
+  ALStringList,
+  ALInternetMessages;
 
 type
 
@@ -36,7 +31,7 @@ type
       procedure CheckError(Error: Boolean);
       Function SendCmd(aCmd:AnsiString; const MultilineResponse: Boolean=False): AnsiString; virtual;
       Function GetResponse(const MultilineResponse: Boolean=False): AnsiString;
-      Function SocketWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer; Virtual;
+      Function SocketWrite(const Buf; len: Integer): Integer; Virtual;
       Function SocketRead(var buf; len: Integer): Integer; Virtual;
     public
       constructor Create; virtual;
@@ -70,10 +65,11 @@ type
 
 implementation
 
-Uses Winapi.Windows,
-     System.SysUtils,
-     AlWinsock,
-     ALString;
+Uses
+  Winapi.Windows,
+  System.SysUtils,
+  AlWinsock,
+  ALString;
 
 {*******************************************************************************}
 Procedure ALPOP3ClientSplitResponseLine(aResponse: AnsiString; ALst: TALStrings);
@@ -128,9 +124,9 @@ end;
 
 {*******************************}
 constructor TAlPOP3Client.Create;
-var aWSAData: TWSAData;
+var LWSAData: TWSAData;
 begin
-  CheckError(WSAStartup(MAKEWORD(2,2), aWSAData) <> 0);
+  CheckError(WSAStartup(MAKEWORD(2,2), LWSAData) <> 0);
   Fconnected:= False;
   FSocketDescriptor:= INVALID_SOCKET;
   FSendTimeout := 60000; // 60 seconds
@@ -167,19 +163,11 @@ Function TAlPOP3Client.Connect(const aHost: AnsiString; const APort: integer): A
     SockAddr.sin_family:=AF_INET;
     SockAddr.sin_port:=swap(Port);
     SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(Server));
-    {$IF CompilerVersion >= 23} {Delphi XE2}
     If SockAddr.sin_addr.S_addr = INADDR_NONE then begin
-    {$ELSE}
-    If SockAddr.sin_addr.S_addr = integer(INADDR_NONE) then begin
-    {$IFEND}
       checkError(not ALHostToIP(Server, IP));
       SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(IP));
     end;
-    {$IF CompilerVersion >= 23} {Delphi XE2}
     CheckError(Winapi.WinSock2.Connect(FSocketDescriptor,TSockAddr(SockAddr),SizeOf(SockAddr))=SOCKET_ERROR);
-    {$ELSE}
-    CheckError(WinSock.Connect(FSocketDescriptor,SockAddr,SizeOf(SockAddr))=SOCKET_ERROR);
-    {$IFEND}
   end;
 
 begin
@@ -456,15 +444,15 @@ end;
 
 {**********************************************************************************}
 Procedure TAlPOP3Client.Uidl(aMsgNumber: Integer; Var aUniqueIDListing: AnsiString);
-Var aLst: TALStringList;
+Var LLst: TALStringList;
 Begin
-  aLst := TALStringList.Create;
+  LLst := TALStringList.Create;
   Try
-    ALPOP3ClientSplitResponseLine(UIDL(aMsgNumber), aLst);
-    If aLst.Count < 3 then raise Exception.Create('UIDL cmd Error');
-    aUniqueIDListing := aLst[2];
+    ALPOP3ClientSplitResponseLine(UIDL(aMsgNumber), LLst);
+    If LLst.Count < 3 then raise Exception.Create('UIDL cmd Error');
+    aUniqueIDListing := LLst[2];
   finally
-    aLst.Free;
+    LLst.Free;
   end;
 end;
 
@@ -513,16 +501,16 @@ end;
 
 {****************************************************************************************************}
 procedure TAlPOP3Client.Stat(Var ANumberofMsgInthemaildrop: Integer; Var aSizeofthemaildrop: integer);
-Var aLst: TALStringList;
+Var LLst: TALStringList;
 Begin
-  aLst := TALStringList.Create;
+  LLst := TALStringList.Create;
   Try
-    ALPOP3ClientSplitResponseLine(Stat, aLst);
-    If aLst.Count < 3 then raise Exception.Create('Stat cmd Error');
-    If not ALTryStrToInt(aLst[1],ANumberofMsgInthemaildrop) then raise Exception.Create('Stat cmd Error');
-    If not ALTryStrToInt(aLst[2],aSizeofthemaildrop) then raise Exception.Create('Stat cmd Error');
+    ALPOP3ClientSplitResponseLine(Stat, LLst);
+    If LLst.Count < 3 then raise Exception.Create('Stat cmd Error');
+    If not ALTryStrToInt(LLst[1],ANumberofMsgInthemaildrop) then raise Exception.Create('Stat cmd Error');
+    If not ALTryStrToInt(LLst[2],aSizeofthemaildrop) then raise Exception.Create('Stat cmd Error');
   finally
-    aLst.Free;
+    LLst.Free;
   end;
 end;
 
@@ -798,47 +786,47 @@ end;
  server is ended and the line containing ".CRLF" is not considered
  part of the multi-line response.}
 function TAlPOP3Client.GetResponse(Const MultilineResponse: Boolean=False): AnsiString;
-Var aBuffStr: AnsiString;
-    aBuffStrLength: Integer;
-    aResponseLength: Integer;
-    aGoodResponse: integer;
+Var LBuffStr: AnsiString;
+    LBuffStrLength: Integer;
+    LResponseLength: Integer;
+    LGoodResponse: integer;
 begin
   {Read the response from the socket - end of the Multiline response is show by <CRLF>.<CRLF> and
    end of single line response is show by <CRLF>}
   Result := '';
-  Setlength(aBuffStr,512);
-  aGoodResponse := -1;
+  Setlength(LBuffStr,512);
+  LGoodResponse := -1;
   While True do begin
-    aBuffStrLength := SocketRead(aBuffStr[1], length(aBuffStr));
-    If aBuffStrLength <= 0 then raise Exception.Create('Connection close gracefully!');
-    Result := Result + AlCopyStr(aBuffStr,1,aBuffStrLength);
-    aResponseLength := length(Result);
+    LBuffStrLength := SocketRead(LBuffStr[1], length(LBuffStr));
+    If LBuffStrLength <= 0 then raise Exception.Create('Connection close gracefully!');
+    Result := Result + AlCopyStr(LBuffStr,1,LBuffStrLength);
+    LResponseLength := length(Result);
 
-    If aGoodResponse = -1 then begin
-      if ALPos('+OK ', Result) = 1 then aGoodResponse := 1
-      else if ALPos('-ERR ', Result) = 1 then aGoodResponse := 0;
+    If LGoodResponse = -1 then begin
+      if ALPos('+OK ', Result) = 1 then LGoodResponse := 1
+      else if ALPos('-ERR ', Result) = 1 then LGoodResponse := 0;
     end;
 
-    If (aGoodResponse = 0) or (not MultilineResponse) then begin
-      If (aResponseLength > 1) and
-         (Result[aResponseLength] = #10) and
-         (Result[aResponseLength - 1] = #13) then Break;
+    If (LGoodResponse = 0) or (not MultilineResponse) then begin
+      If (LResponseLength > 1) and
+         (Result[LResponseLength] = #10) and
+         (Result[LResponseLength - 1] = #13) then Break;
     end
     else begin
-      If (aResponseLength > 4) and
-         (Result[aResponseLength] = #10) and
-         (Result[aResponseLength - 1] = #13) and
-         (Result[aResponseLength - 2] = '.') and
-         (Result[aResponseLength - 3] = #10) and
-         (Result[aResponseLength - 4] = #13) then Break;
+      If (LResponseLength > 4) and
+         (Result[LResponseLength] = #10) and
+         (Result[LResponseLength - 1] = #13) and
+         (Result[LResponseLength - 2] = '.') and
+         (Result[LResponseLength - 3] = #10) and
+         (Result[LResponseLength - 4] = #13) then Break;
     end;
   end;
 
-  If aGoodResponse <> 1 then Raise Exception.Create(String(Result));
+  If LGoodResponse <> 1 then Raise Exception.Create(String(Result));
 end;
 
-{****************************************************************************************************************}
-Function TAlPOP3Client.SocketWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer;
+{*******************************************************************}
+Function TAlPOP3Client.SocketWrite(const Buf; len: Integer): Integer;
 begin
   Result := Send(FSocketDescriptor,Buf,len,0);
   CheckError(Result =  SOCKET_ERROR);
@@ -868,32 +856,32 @@ end;
 {*******************************************************************************************************************}
 // http://blogs.technet.com/b/nettracer/archive/2010/06/03/things-that-you-may-want-to-know-about-tcp-keepalives.aspx
 procedure TAlPOP3Client.SetKeepAlive(const Value: boolean);
-var aIntBool: integer;
+var LIntBool: integer;
 begin
   FKeepAlive := Value;
   if FConnected then begin
     // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
     // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
     // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
-    if FKeepAlive then aIntBool := 1
-    else aIntBool := 0;
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_KEEPALIVE,PAnsiChar(@aIntBool),SizeOf(aIntBool))=SOCKET_ERROR);
+    if FKeepAlive then LIntBool := 1
+    else LIntBool := 0;
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_KEEPALIVE,PAnsiChar(@LIntBool),SizeOf(LIntBool))=SOCKET_ERROR);
   end;
 end;
 
 {***************************************************************************************************************************************************************************************************************}
 // https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_MRG/1.1/html/Realtime_Tuning_Guide/sect-Realtime_Tuning_Guide-Application_Tuning_and_Deployment-TCP_NODELAY_and_Small_Buffer_Writes.html
 procedure TAlPOP3Client.SetTCPNoDelay(const Value: boolean);
-var aIntBool: integer;
+var LIntBool: integer;
 begin
   fTCPNoDelay := Value;
   if FConnected then begin
     // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
     // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
     // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
-    if fTCPNoDelay then aIntBool := 1
-    else aIntBool := 0;
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,TCP_NODELAY,PAnsiChar(@aIntBool),SizeOf(aIntBool))=SOCKET_ERROR);
+    if fTCPNoDelay then LIntBool := 1
+    else LIntBool := 0;
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,TCP_NODELAY,PAnsiChar(@LIntBool),SizeOf(LIntBool))=SOCKET_ERROR);
   end;
 end;
 

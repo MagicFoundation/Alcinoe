@@ -1,16 +1,16 @@
-{******************************************************************
-Description:  TALWinInetFTPClient is a is easy to use WinInet-based
-              FTP client component.
-*******************************************************************}
+{*******************************************************************************
+TALWinInetFTPClient is a is easy to use WinInet-based FTP client component.
+*******************************************************************************}
 
 unit ALWinInetFTPClient;
 
 interface
 
-uses WinApi.Windows,
-     System.Classes,
-     Winapi.WinInet,
-     ALFTPClient;
+uses
+  WinApi.Windows,
+  System.Classes,
+  Winapi.WinInet,
+  ALFTPClient;
 
 type
 
@@ -166,10 +166,11 @@ type
 
 implementation
 
-uses System.SysUtils,
-     System.Ansistrings,
-     ALCommon,
-     ALString;
+uses
+  System.SysUtils,
+  System.Ansistrings,
+  ALCommon,
+  ALString;
 
 {********************************************************************}
 {this procedure produce some strange bug under windows Server 2008 R2}
@@ -338,7 +339,7 @@ begin
   if (FConnected) then Exit;
 
   { Also, could switch to new API introduced in IE4/Preview2}
-  if InternetAttemptConnect(0) <> ERROR_SUCCESS then {$IF CompilerVersion >= 23}{Delphi XE2}System.{$IFEND}SysUtils.Abort;
+  if InternetAttemptConnect(0) <> ERROR_SUCCESS then System.SysUtils.Abort;
 
   {init FInetRoot}
   FInetRoot := InternetOpenA(PAnsiChar(''),

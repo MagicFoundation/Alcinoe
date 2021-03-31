@@ -1,6 +1,6 @@
 unit ALAndroidNativeView;
 
-{$IF CompilerVersion > 33} // rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.Presentation.Android.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -8,15 +8,16 @@ interface
 
 {$SCOPEDENUMS ON}
 
-uses System.Classes,
-     System.Types,
-     Androidapi.JNI.GraphicsContentViewText,
-     Androidapi.JNIBridge,
-     Androidapi.JNI.Widget,
-     FMX.Types,
-     FMX.Forms,
-     FMX.Controls,
-     FMX.ZOrder.Android;
+uses
+  System.Classes,
+  System.Types,
+  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNIBridge,
+  Androidapi.JNI.Widget,
+  FMX.Types,
+  FMX.Forms,
+  FMX.Controls,
+  FMX.ZOrder.Android;
 
 type
 
@@ -107,14 +108,15 @@ var
 
 implementation
 
-uses System.SysUtils,
-     Androidapi.Helpers,
-     Androidapi.JNI.App,
-     FMX.Platform,
-     FMX.Platform.Android,
-     FMX.Consts,
-     ALString,
-     ALCommon;
+uses
+  System.SysUtils,
+  Androidapi.Helpers,
+  Androidapi.JNI.App,
+  FMX.Platform,
+  FMX.Platform.Android,
+  FMX.Consts,
+  ALString,
+  ALCommon;
 
 {****************************************************************}
 constructor TALAndroidNativeView.Create(const AControl: TControl);
@@ -282,10 +284,11 @@ end;
 procedure TALAndroidNativeView.UpdateFrame;
 begin
   if ZOrderManager <> nil then
-    ZOrderManager.UpdateBounds(Control); // UpdateBounds instead of UpdateOrderAndBounds because else everytime
-                                         // we will move the edit we will loose the focus and this is problematic
-                                         // if we for exemple move the edit from the bottom to the top to let some
-                                         // place to show the virtual keyboard
+    // UpdateBounds instead of UpdateOrderAndBounds because else everytime
+    // we will move the edit we will loose the focus and this is problematic
+    // if we for exemple move the edit from the bottom to the top to let some
+    // place to show the virtual keyboard
+    ZOrderManager.UpdateBounds(Control);
 end;
 
 {*******************************************}

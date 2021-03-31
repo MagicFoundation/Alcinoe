@@ -1,23 +1,17 @@
-{*************************************************************
-product:      ALNNTPClient
-Description:  TALNNTPClient class implements the NNTP protocol (RFC-977
-              and RFC-850) Support authentification (RFC-977 Extension)
-
-Link :        http://www.w3.org/Protocols/rfc977/rfc977
-**************************************************************}
+{*******************************************************************************
+TALNNTPClient class implements the NNTP protocol (RFC-977 and RFC-850)
+Support authentification (RFC-977 Extension)
+*******************************************************************************}
 
 unit ALNNTPClient;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
-Uses Winapi.WinSock2,
-     ALInternetMessages,
-     ALMultiPartParser,
-     ALStringList;
+Uses
+  Winapi.WinSock2,
+  ALInternetMessages,
+  ALMultiPartParser,
+  ALStringList;
 
 type
 
@@ -38,7 +32,7 @@ type
       procedure CheckError(Error: Boolean);
       Function SendCmd(aCmd:AnsiString; const OkResponses: array of Word; const MultilineResponse: Boolean=False): AnsiString; virtual;
       Function GetResponse(const OkResponses: array of Word; const MultilineResponse: Boolean=False): AnsiString;
-      Function SocketWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer; Virtual;
+      Function SocketWrite(const Buf; len: Integer): Integer; Virtual;
       Function SocketRead(var buf; len: Integer): Integer; Virtual;
     public
       constructor Create; virtual;
@@ -117,11 +111,12 @@ type
 
 implementation
 
-Uses Winapi.Windows,
-     System.SysUtils,
-     System.Classes,
-     AlWinsock,
-     ALString;
+Uses
+  Winapi.Windows,
+  System.SysUtils,
+  System.Classes,
+  AlWinsock,
+  ALString;
 
 {*******************************************************************************}
 Procedure ALNNTPClientSplitResponseLine(aResponse: AnsiString; ALst: TALStrings);
@@ -175,9 +170,9 @@ end;
 
 {*******************************}
 constructor TAlNNTPClient.Create;
-var aWSAData: TWSAData;
+var LWSAData: TWSAData;
 begin
-  CheckError(WSAStartup(MAKEWORD(2,2), aWSAData) <> 0);
+  CheckError(WSAStartup(MAKEWORD(2,2), LWSAData) <> 0);
   Fconnected:= False;
   FSocketDescriptor:= INVALID_SOCKET;
   FSendTimeout := 60000; // 60 seconds
@@ -214,19 +209,11 @@ Function TAlNNTPClient.Connect(const aHost: AnsiString; const APort: integer): A
     SockAddr.sin_family:=AF_INET;
     SockAddr.sin_port:=swap(Port);
     SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(Server));
-    {$IF CompilerVersion >= 23} {Delphi XE2}
     If SockAddr.sin_addr.S_addr = INADDR_NONE then begin
-    {$ELSE}
-    If SockAddr.sin_addr.S_addr = integer(INADDR_NONE) then begin
-    {$IFEND}
       checkError(not ALHostToIP(Server, IP));
       SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(IP));
     end;
-    {$IF CompilerVersion >= 23} {Delphi XE2}
     CheckError(Winapi.WinSock2.Connect(FSocketDescriptor,TSockAddr(SockAddr),SizeOf(SockAddr))=SOCKET_ERROR);
-    {$ELSE}
-    CheckError(WinSock.Connect(FSocketDescriptor,SockAddr,SizeOf(SockAddr))=SOCKET_ERROR);
-    {$IFEND}
   end;
 
 begin
@@ -749,17 +736,17 @@ Procedure TAlNNTPClient.Group(const NewsGroupName: AnsiString;
                               Var EstimatedNumberArticles,
                                   FirstArticleNumber,
                                   LastArticleNumber: Integer);
-Var aLst: TALStringList;
+Var LLst: TALStringList;
 Begin
-  aLst := TALStringList.Create;
+  LLst := TALStringList.Create;
   Try
-    ALNNTPClientSplitResponseLine(Group(NewsGroupName), aLst);
-    If aLst.Count < 4 then raise Exception.Create('GROUP cmd Error');
-    If not ALTryStrToInt(aLst[1], EstimatedNumberArticles) then raise Exception.Create('GROUP cmd Error');
-    If not ALTryStrToInt(aLst[2], FirstArticleNumber) then raise Exception.Create('GROUP cmd Error');
-    If not ALTryStrToInt(aLst[3], LastArticleNumber) then raise Exception.Create('GROUP cmd Error');
+    ALNNTPClientSplitResponseLine(Group(NewsGroupName), LLst);
+    If LLst.Count < 4 then raise Exception.Create('GROUP cmd Error');
+    If not ALTryStrToInt(LLst[1], EstimatedNumberArticles) then raise Exception.Create('GROUP cmd Error');
+    If not ALTryStrToInt(LLst[2], FirstArticleNumber) then raise Exception.Create('GROUP cmd Error');
+    If not ALTryStrToInt(LLst[3], LastArticleNumber) then raise Exception.Create('GROUP cmd Error');
   finally
-    aLst.Free;
+    LLst.Free;
   end;
 end;
 
@@ -1013,15 +1000,15 @@ end;
 
 {****************************************************************************************}
 procedure TAlNNTPClient.StatByID(const ArticleID: AnsiString; var ArticleNumber: integer);
-Var aLst: TALStringList;
+Var LLst: TALStringList;
 Begin
-  aLst := TALStringList.Create;
+  LLst := TALStringList.Create;
   Try
-    ALNNTPClientSplitResponseLine(StatByID(ArticleID), aLst);
-    If aLst.Count < 3 then raise Exception.Create('STAT cmd Error');
-    If not ALTryStrToInt(aLst[1], ArticleNumber) then raise Exception.Create('STAT cmd Error');
+    ALNNTPClientSplitResponseLine(StatByID(ArticleID), LLst);
+    If LLst.Count < 3 then raise Exception.Create('STAT cmd Error');
+    If not ALTryStrToInt(LLst[1], ArticleNumber) then raise Exception.Create('STAT cmd Error');
   finally
-    aLst.Free;
+    LLst.Free;
   end;
 end;
 
@@ -1033,15 +1020,15 @@ end;
 
 {**************************************************************************************}
 procedure TAlNNTPClient.StatByNumber(ArticleNumber: Integer; var ArticleID: AnsiString);
-Var aLst: TALStringList;
+Var LLst: TALStringList;
 Begin
-  aLst := TALStringList.Create;
+  LLst := TALStringList.Create;
   Try
-    ALNNTPClientSplitResponseLine(StatByNumber(ArticleNumber), aLst);
-    If aLst.Count < 3 then raise Exception.Create('STAT cmd Error');
-    ArticleID  := aLst[2]; // <23445@sdcsvax.ARPA>
+    ALNNTPClientSplitResponseLine(StatByNumber(ArticleNumber), LLst);
+    If LLst.Count < 3 then raise Exception.Create('STAT cmd Error');
+    ArticleID  := LLst[2]; // <23445@sdcsvax.ARPA>
   finally
-    aLst.Free;
+    LLst.Free;
   end;
 end;
 
@@ -1054,16 +1041,16 @@ end;
 
 {**********************************************************************************}
 procedure TAlNNTPClient.Stat(var ArticleID: AnsiString; var ArticleNumber: integer);
-Var aLst: TALStringList;
+Var LLst: TALStringList;
 Begin
-  aLst := TALStringList.Create;
+  LLst := TALStringList.Create;
   Try
-    ALNNTPClientSplitResponseLine(Stat, aLst);
-    If aLst.Count < 3 then raise Exception.Create('STAT cmd Error');
-    If not ALTryStrToInt(aLst[1],ArticleNumber) then raise Exception.Create('STAT cmd Error');
-    ArticleID  := aLst[2]; // <23445@sdcsvax.ARPA>
+    ALNNTPClientSplitResponseLine(Stat, LLst);
+    If LLst.Count < 3 then raise Exception.Create('STAT cmd Error');
+    If not ALTryStrToInt(LLst[1],ArticleNumber) then raise Exception.Create('STAT cmd Error');
+    ArticleID  := LLst[2]; // <23445@sdcsvax.ARPA>
   finally
-    aLst.Free;
+    LLst.Free;
   end;
 end;
 
@@ -1174,24 +1161,24 @@ end;
 
  Note: I discover some servers that use 422 in place of 421!}
 function TAlNNTPClient.Next: Boolean;
-Var aStatutCode: integer;
+Var LStatutCode: integer;
 begin
-  aStatutCode := GetStatusCodeFromResponse(SendCmd('NEXT',[223,421,422], False)); //223 10113 <21495@nudebch.uucp> article retrieved - request text separately
-  Result := aStatutCode=223;
+  LStatutCode := GetStatusCodeFromResponse(SendCmd('NEXT',[223,421,422], False)); //223 10113 <21495@nudebch.uucp> article retrieved - request text separately
+  Result := LStatutCode=223;
 end;
 
 {**********************************************************************************}
 procedure TAlNNTPClient.Next(var ArticleNumber: Integer; var ArticleID: AnsiString);
-Var aLst: TALStringList;
+Var LLst: TALStringList;
 begin
-  aLst := TALStringList.Create;
+  LLst := TALStringList.Create;
   Try
-    ALNNTPClientSplitResponseLine(SendCmd('NEXT',[223], False), aLst);
-    If aLst.Count < 3 then raise Exception.Create('NEXT cmd Error');
-    If not ALTryStrToInt(aLst[1],ArticleNumber) then raise Exception.Create('NEXT cmd Error');
-    ArticleID  := aLst[2]; //<21495@nudebch.uucp>
+    ALNNTPClientSplitResponseLine(SendCmd('NEXT',[223], False), LLst);
+    If LLst.Count < 3 then raise Exception.Create('NEXT cmd Error');
+    If not ALTryStrToInt(LLst[1],ArticleNumber) then raise Exception.Create('NEXT cmd Error');
+    ArticleID  := LLst[2]; //<21495@nudebch.uucp>
   finally
-    aLst.Free;
+    LLst.Free;
   end;
 end;
 
@@ -1218,24 +1205,24 @@ end;
 
  Note: I discover some servers that use 421 in place of 422!}
 function TAlNNTPClient.Last: Boolean;
-Var aStatutCode: integer;
+Var LStatutCode: integer;
 begin
-  aStatutCode := GetStatusCodeFromResponse(SendCmd('LAST',[223, 421, 422], False)); //223 10113 <21495@nudebch.uucp> article retrieved
-  Result := aStatutCode=223;
+  LStatutCode := GetStatusCodeFromResponse(SendCmd('LAST',[223, 421, 422], False)); //223 10113 <21495@nudebch.uucp> article retrieved
+  Result := LStatutCode=223;
 end;
 
 {**********************************************************************************}
 procedure TAlNNTPClient.Last(var ArticleNumber: Integer; var ArticleID: AnsiString);
-Var aLst: TALStringList;
+Var LLst: TALStringList;
 begin
-  aLst := TALStringList.Create;
+  LLst := TALStringList.Create;
   Try
-    ALNNTPClientSplitResponseLine(SendCmd('LAST',[223], False), aLst);
-    If aLst.Count < 3 then raise Exception.Create('LAST cmd Error');
-    if not ALTryStrToInt(aLst[1],ArticleNumber) then raise Exception.Create('LAST cmd Error');
-    ArticleID  := aLst[2]; //<21495@nudebch.uucp>
+    ALNNTPClientSplitResponseLine(SendCmd('LAST',[223], False), LLst);
+    If LLst.Count < 3 then raise Exception.Create('LAST cmd Error');
+    if not ALTryStrToInt(LLst[1],ArticleNumber) then raise Exception.Create('LAST cmd Error');
+    ArticleID  := LLst[2]; //<21495@nudebch.uucp>
   finally
-    aLst.Free;
+    LLst.Free;
   end;
 end;
 
@@ -1292,22 +1279,22 @@ end;
  the problem.  Perhaps some implementations will wish to send mail to
  the author of the article in certain of these cases.}
 function TAlNNTPClient.IHave(const ArticleID: AnsiString; ArticleContent: AnsiString): Boolean;
-Var aResponse: AnsiString;
-    aStatusCode: integer;
-    i: integer;
+Var LResponse: AnsiString;
+    LStatusCode: integer;
+    I: integer;
 begin
   Result := True;
-  aResponse := SendCmd('IHAVE' + ALNNTPClientEnclosedInAngleBrackets(ArticleID),[335,435], False);
-  aStatusCode := GetStatusCodeFromResponse(aResponse);
-  If aStatusCode = 435 then begin
+  LResponse := SendCmd('IHAVE' + ALNNTPClientEnclosedInAngleBrackets(ArticleID),[335,435], False);
+  LStatusCode := GetStatusCodeFromResponse(LResponse);
+  If LStatusCode = 435 then begin
     Result := False;
     exit;
   end;
 
-  i := 2;
-  while i <= Length(ArticleContent) Do begin
-    If (ArticleContent[i] = '.') and (ArticleContent[i-1] = #10) and (ArticleContent[i-2] = #13) then Insert('.',ArticleContent,i);
-    inc(i);
+  I := 2;
+  while I <= Length(ArticleContent) Do begin
+    If (ArticleContent[I] = '.') and (ArticleContent[I-1] = #10) and (ArticleContent[I-2] = #13) then Insert('.',ArticleContent,I);
+    inc(I);
   end;
 
   SendCmd(ArticleContent + #13#10 + '.' + #13#10,[235], False);
@@ -1361,14 +1348,14 @@ end;
  generally permitted from these:) 200 server ready - posting allowed
  201 server ready - no posting allowed}
 Procedure TAlNNTPClient.Post(ArticleContent: AnsiString);
-Var i: integer;
+Var I: integer;
 begin
   SendCmd('POST',[340], False);
 
-  i := 2;
-  while i <= Length(ArticleContent) Do begin
-    If (ArticleContent[i] = '.') and (ArticleContent[i-1] = #10) and (ArticleContent[i-2] = #13) then Insert('.',ArticleContent,i);
-    inc(i);
+  I := 2;
+  while I <= Length(ArticleContent) Do begin
+    If (ArticleContent[I] = '.') and (ArticleContent[I-1] = #10) and (ArticleContent[I-2] = #13) then Insert('.',ArticleContent,I);
+    inc(I);
   end;
 
   SendCmd(ArticleContent + #13#10 + '.' + #13#10,[240], False);
@@ -1391,15 +1378,15 @@ procedure TAlNNTPClient.PostMultipartMixed(HeaderContent: TALNewsArticleHeader;
                                            const InlineText,
                                                  InlineTextContentType: AnsiString;
                                            Attachments: TALMultiPartMixedContents);
-Var aMultipartMixedEncoder: TALMultipartMixedEncoder;
+Var LMultipartMixedEncoder: TALMultipartMixedEncoder;
     Str: AnsiString;
 begin
-  aMultipartMixedEncoder := TALMultipartMixedEncoder.create;
+  LMultipartMixedEncoder := TALMultipartMixedEncoder.create;
   try
-    aMultipartMixedEncoder.Encode(InlineText,
+    LMultipartMixedEncoder.Encode(InlineText,
                                   InlineTextContentType,
                                   Attachments);
-    with aMultipartMixedEncoder do begin
+    with LMultipartMixedEncoder do begin
       HeaderContent.ContentType := 'multipart/mixed; boundary="' + DataStream.Boundary + '"';
       SetLength(Str,DataStream.size);
       DataStream.Position := 0;
@@ -1407,7 +1394,7 @@ begin
     end;
     Post(Headercontent.RawHeaderText, Str);
   finally
-    aMultipartMixedEncoder.free;
+    LMultipartMixedEncoder.free;
   end;
 end;
 
@@ -1624,54 +1611,54 @@ end;
  debugging.  (An example might be to use e.g., 290 to acknowledge a
  remote debugging request.)}
 function TAlNNTPClient.GetResponse(const OkResponses: array of Word; Const MultilineResponse: Boolean=False): AnsiString;
-Var aBuffStr: AnsiString;
-    aBuffStrLength: Integer;
-    aResponseLength: Integer;
-    aStatusCode: Integer;
-    aGoodResponse: integer;
-    i: integer;
+Var LBuffStr: AnsiString;
+    LBuffStrLength: Integer;
+    LResponseLength: Integer;
+    LStatusCode: Integer;
+    LGoodResponse: integer;
+    I: integer;
 begin
   {Read the response from the socket - end of the Multiline response is show by <CRLF>.<CRLF> and
    end of single line response is show by <CRLF>}
   Result := '';
-  Setlength(aBuffStr,512);
-  aGoodResponse := -1;
+  Setlength(LBuffStr,512);
+  LGoodResponse := -1;
   While True do begin
-    aBuffStrLength := SocketRead(aBuffStr[1], length(aBuffStr));
-    If aBuffStrLength <= 0 then raise Exception.Create('Connection close gracefully!');
-    Result := Result + AlCopyStr(aBuffStr,1,aBuffStrLength);
-    aResponseLength := length(Result);
+    LBuffStrLength := SocketRead(LBuffStr[1], length(LBuffStr));
+    If LBuffStrLength <= 0 then raise Exception.Create('Connection close gracefully!');
+    Result := Result + AlCopyStr(LBuffStr,1,LBuffStrLength);
+    LResponseLength := length(Result);
 
-    If aGoodResponse = -1 then begin
-      aStatusCode := GetStatusCodeFromResponse(Result);
-      aGoodResponse := 0;
+    If LGoodResponse = -1 then begin
+      LStatusCode := GetStatusCodeFromResponse(Result);
+      LGoodResponse := 0;
       for I := 0 to High(OkResponses) do
-        if OkResponses[I] = aStatusCode then begin
-          aGoodResponse := 1;
+        if OkResponses[I] = LStatusCode then begin
+          LGoodResponse := 1;
           Break;
         end;
     end;
 
-    If (aGoodResponse = 0) or (not MultilineResponse) then begin
-      If (aResponseLength > 1) and
-         (Result[aResponseLength] = #10) and
-         (Result[aResponseLength - 1] = #13) then Break;
+    If (LGoodResponse = 0) or (not MultilineResponse) then begin
+      If (LResponseLength > 1) and
+         (Result[LResponseLength] = #10) and
+         (Result[LResponseLength - 1] = #13) then Break;
     end
     else begin
-      If (aResponseLength > 4) and
-         (Result[aResponseLength] = #10) and
-         (Result[aResponseLength - 1] = #13) and
-         (Result[aResponseLength - 2] = '.') and
-         (Result[aResponseLength - 3] = #10) and
-         (Result[aResponseLength - 4] = #13) then Break;
+      If (LResponseLength > 4) and
+         (Result[LResponseLength] = #10) and
+         (Result[LResponseLength - 1] = #13) and
+         (Result[LResponseLength - 2] = '.') and
+         (Result[LResponseLength - 3] = #10) and
+         (Result[LResponseLength - 4] = #13) then Break;
     end;
   end;
 
-  If aGoodResponse <> 1 then Raise Exception.Create(String(Result));
+  If LGoodResponse <> 1 then Raise Exception.Create(String(Result));
 end;
 
-{****************************************************************************************************************}
-Function TAlNNTPClient.SocketWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer;
+{*******************************************************************}
+Function TAlNNTPClient.SocketWrite(const Buf; len: Integer): Integer;
 begin
   Result := Send(FSocketDescriptor,Buf,len,0);
   CheckError(Result =  SOCKET_ERROR);
@@ -1701,32 +1688,32 @@ end;
 {*******************************************************************************************************************}
 // http://blogs.technet.com/b/nettracer/archive/2010/06/03/things-that-you-may-want-to-know-about-tcp-keepalives.aspx
 procedure TAlNNTPClient.SetKeepAlive(const Value: boolean);
-var aIntBool: integer;
+var LIntBool: integer;
 begin
   FKeepAlive := Value;
   if FConnected then begin
     // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
     // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
     // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
-    if FKeepAlive then aIntBool := 1
-    else aIntBool := 0;
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_KEEPALIVE,PAnsiChar(@aIntBool),SizeOf(aIntBool))=SOCKET_ERROR);
+    if FKeepAlive then LIntBool := 1
+    else LIntBool := 0;
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_KEEPALIVE,PAnsiChar(@LIntBool),SizeOf(LIntBool))=SOCKET_ERROR);
   end;
 end;
 
 {***************************************************************************************************************************************************************************************************************}
 // https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_MRG/1.1/html/Realtime_Tuning_Guide/sect-Realtime_Tuning_Guide-Application_Tuning_and_Deployment-TCP_NODELAY_and_Small_Buffer_Writes.html
 procedure TAlNNTPClient.SetTCPNoDelay(const Value: boolean);
-var aIntBool: integer;
+var LIntBool: integer;
 begin
   fTCPNoDelay := Value;
   if FConnected then begin
     // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
     // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
     // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
-    if fTCPNoDelay then aIntBool := 1
-    else aIntBool := 0;
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,TCP_NODELAY,PAnsiChar(@aIntBool),SizeOf(aIntBool))=SOCKET_ERROR);
+    if fTCPNoDelay then LIntBool := 1
+    else LIntBool := 0;
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,TCP_NODELAY,PAnsiChar(@LIntBool),SizeOf(LIntBool))=SOCKET_ERROR);
   end;
 end;
 

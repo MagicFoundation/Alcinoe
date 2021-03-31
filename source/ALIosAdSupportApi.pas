@@ -1,9 +1,10 @@
-unit ALIosAdSupport;
+unit ALIosAdSupportApi;
 
 interface
 
-uses Macapi.ObjectiveC,
-     iOSapi.Foundation;
+uses
+  Macapi.ObjectiveC,
+  iOSapi.Foundation;
 
 {$M+}
 

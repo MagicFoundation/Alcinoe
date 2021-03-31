@@ -1,34 +1,37 @@
 unit ALFmxStdCtrls;
 
-{$IF CompilerVersion > 33} // rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.StdCtrls.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
+{$I Alcinoe.inc}
+
 interface
 
-uses System.Classes,
-     System.Types,
-     {$IFDEF DEBUG}
-     System.Diagnostics,
-     {$ENDIF}
-     System.UITypes,
-     System.ImageList,
-     System.Math,
-     System.Rtti,
-     System.Messaging,
-     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
-     FMX.types3D,
-     {$ENDIF}
-     FMX.types,
-     FMX.stdActns,
-     FMX.Controls,
-     FMX.Graphics,
-     FMX.StdCtrls,
-     FMX.actnlist,
-     FMX.ImgList,
-     ALFmxAni,
-     ALFmxInertialMovement,
-     ALFmxObjects;
+uses
+  System.Classes,
+  System.Types,
+  {$IFDEF DEBUG}
+  System.Diagnostics,
+  {$ENDIF}
+  System.UITypes,
+  System.ImageList,
+  System.Math,
+  System.Rtti,
+  System.Messaging,
+  {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+  FMX.types3D,
+  {$ENDIF}
+  FMX.types,
+  FMX.stdActns,
+  FMX.Controls,
+  FMX.Graphics,
+  FMX.StdCtrls,
+  FMX.actnlist,
+  FMX.ImgList,
+  ALFmxAni,
+  ALFmxInertialMovement,
+  ALFmxObjects;
 
 type
 
@@ -43,25 +46,19 @@ type
     fResourceName: String;
     fFrameIndex: TSmallPoint;
     FScreenScale: single;
-    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    {$IF DEFINED(ALUseTexture)}
     fBufBitmap: TTexture;
     {$ELSE}
     fBufBitmap: Tbitmap;
     {$ENDIF}
     fBufBitmapRect: TRectF;
     fBufSize: TsizeF;
-    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
-    FOpenGLContextLostId: integer;
-    FOpenGLContextResetId: Integer;
-    procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
-    procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage); // << because of https://quality.embarcadero.com/browse/RSP-16142
-    {$ENDIF}
     procedure setResourceName(const Value: String);
     procedure onTimer(sender: Tobject);
     function ResourceNameStored: Boolean;
   protected
     procedure Paint; override;
-    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    {$IF DEFINED(ALUseTexture)}
     property BufBitmap: TTexture read fBufBitmap;
     {$ELSE}
     property BufBitmap: Tbitmap read fBufBitmap;
@@ -72,7 +69,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    {$IF DEFINED(ALUseTexture)}
     function MakeBufBitmap: TTexture; virtual;
     {$ELSE}
     function MakeBufBitmap: Tbitmap; virtual;
@@ -382,6 +379,7 @@ type
     property Enabled;
     property Locked;
     property Height;
+    property Hint;
     property HitTest;
     property Padding;
     property Min;
@@ -401,6 +399,8 @@ type
     property Value;
     property Visible;
     property Width;
+    property ParentShowHint;
+    property ShowHint;
     property ViewportSize;
     {events}
     property OnChange;
@@ -541,7 +541,7 @@ type
   TALCheckBox = class(TControl)
   private
     FScreenScale: single;
-    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    {$IF DEFINED(ALUseTexture)}
     fBufBitmap: TTexture;
     {$ELSE}
     fBufBitmap: Tbitmap;
@@ -557,18 +557,12 @@ type
     fImageCheckedResourceName: String;
     fImageUncheckedResourceName: String;
     FWrapMode: TALImageWrapMode;
-    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
-    FOpenGLContextLostId: integer;
-    FOpenGLContextResetId: Integer;
-    procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
-    procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage); // << because of https://quality.embarcadero.com/browse/RSP-16142
-    {$ENDIF}
     procedure setImageCheckedResourceName(const Value: String);
     procedure setImageUncheckedResourceName(const Value: String);
     procedure SetWrapMode(const Value: TALImageWrapMode);
   protected
     procedure Paint; override;
-    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    {$IF DEFINED(ALUseTexture)}
     property BufBitmap: TTexture read fBufBitmap;
     {$ELSE}
     property BufBitmap: Tbitmap read fBufBitmap;
@@ -582,7 +576,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    {$IF DEFINED(ALUseTexture)}
     function MakeBufBitmap: TTexture; virtual;
     {$ELSE}
     function MakeBufBitmap: Tbitmap; virtual;
@@ -813,27 +807,28 @@ procedure Register;
 
 implementation
 
-uses System.SysUtils,
-     system.Math.Vectors,
-     {$IFDEF ALDPK}
-     system.IOUtils,
-     DesignIntf,
-     toolsApi,
-     {$ENDIF}
-     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
-     FMX.Canvas.GPU,
-     ALFmxTypes3D,
-     {$ENDIF}
-     FMX.Platform,
-     fmx.consts,
-     fmx.utils,
-     alGraphics,
-     AlCommon,
-     ALFmxCommon;
+uses
+  System.SysUtils,
+  system.Math.Vectors,
+  {$IFDEF ALDPK}
+  system.IOUtils,
+  DesignIntf,
+  toolsApi,
+  {$ENDIF}
+  {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+  FMX.Canvas.GPU,
+  ALFmxTypes3D,
+  {$ENDIF}
+  FMX.Platform,
+  fmx.consts,
+  fmx.utils,
+  alGraphics,
+  AlCommon,
+  ALFmxCommon;
 
 {*****************************************************}
 constructor TALAniIndicator.Create(AOwner: TComponent);
-var aScreenSrv: IFMXScreenService;
+var LScreenSrv: IFMXScreenService;
 begin
   inherited Create(AOwner);
   finterval := 50;
@@ -845,13 +840,9 @@ begin
   fTimer.Enabled := False;
   fTimer.Interval := finterval;
   fTimer.OnTimer := onTimer;
-  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, aScreenSrv) then FScreenScale := aScreenSrv.GetScreenScale
+  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, LScreenSrv) then FScreenScale := LScreenSrv.GetScreenScale
   else FScreenScale := 1;
   fBufBitmap := nil;
-  {$IF defined(ANDROID) or defined(IOS)}
-  FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
-  FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
-  {$ENDIF}
   Enabled := False;
   SetAcceptsControls(False);
 end;
@@ -862,10 +853,6 @@ begin
   fTimer.Enabled := False;
   ALFreeAndNil(fTimer);
   clearBufBitmap;
-  {$IF defined(ANDROID) or defined(IOS)}
-  TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
-  TMessageManager.DefaultManager.Unsubscribe(TContextResetMessage, FOpenGLContextResetId);
-  {$ENDIF}
   inherited;
 end;
 
@@ -887,15 +874,15 @@ begin
   ALFreeAndNil(fBufBitmap);
 end;
 
-{************************************}
-{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+{*************************}
+{$IF DEFINED(ALUseTexture)}
 function TALAniIndicator.MakeBufBitmap: TTexture;
 {$ELSE}
 function TALAniIndicator.MakeBufBitmap: Tbitmap;
 {$ENDIF}
 
 {$IFDEF ALDPK}
-var aFileName: String;
+var LFileName: String;
 {$ENDIF}
 
 begin
@@ -926,16 +913,16 @@ begin
   {$endif}
 
     {$IFDEF ALDPK}
-    aFileName := extractFilePath(getActiveProject.fileName) + 'resources\' + fResourceName; // by default all the resources files must be located in the sub-folder /resources/ of the project
-    if not TFile.Exists(aFileName) then begin
-      aFileName := aFileName + '.png';
-      if not TFile.Exists(aFileName) then aFileName := '';
+    LFileName := extractFilePath(getActiveProject.fileName) + 'resources\' + fResourceName; // by default all the resources files must be located in the sub-folder /resources/ of the project
+    if not TFile.Exists(LFileName) then begin
+      LFileName := LFileName + '.png';
+      if not TFile.Exists(LFileName) then LFileName := '';
     end;
     {$ENDIF}
 
     fBufBitmapRect := LocalRect;
     {$IFDEF ALDPK}
-    if aFileName <> '' then fBufBitmap := ALLoadFitIntoFileImageV3(aFileName, Width * (fframeCount div fRowCount) * FScreenScale, Height * fRowCount * FScreenScale)
+    if LFileName <> '' then fBufBitmap := ALLoadFitIntoFileImageV3(LFileName, Width * (fframeCount div fRowCount) * FScreenScale, Height * fRowCount * FScreenScale)
     else fBufBitmap := nil;
     {$ELSE}
     fBufBitmap := ALLoadFitIntoResourceImageV3(fResourceName, Width * (fframeCount div fRowCount) * FScreenScale, Height * fRowCount * FScreenScale);
@@ -981,7 +968,7 @@ begin
     exit;
   end;
 
-  {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+  {$IF DEFINED(ALUseTexture)}
 
   TCustomCanvasGpu(Canvas).DrawTexture(canvas.AlignToPixel(fBufBitmapRect), // ATexRect (destRec)
                                        TRectF.Create(TPointF.Create(fFrameIndex.x * Width * fScreenScale,
@@ -1020,24 +1007,6 @@ begin
     fTimer.Enabled := Enabled;
   end;
 end;
-
-{************************************}
-{$IF DEFINED(IOS) or DEFINED(ANDROID)}
-procedure TALAniIndicator.OpenGLContextLostHandler(const Sender: TObject; const Msg: TMessage);
-begin
-  clearBufBitmap;
-  fTimer.enabled := False;
-end;
-{$ENDIF}
-
-{************************************}
-{$IF DEFINED(IOS) or DEFINED(ANDROID)}
-procedure TALAniIndicator.OpenGLContextResetHandler(const Sender: TObject; const Msg: TMessage);
-begin
-  clearBufBitmap;
-  fTimer.enabled := Enabled;
-end;
-{$ENDIF}
 
 {*************************************************************}
 procedure TALAniIndicator.setResourceName(const Value: String);
@@ -1965,10 +1934,10 @@ end;
 
 {*************************************************}
 constructor TALCheckbox.Create(AOwner: TComponent);
-var aScreenSrv: IFMXScreenService;
+var LScreenSrv: IFMXScreenService;
 begin
   inherited;
-  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, aScreenSrv) then FScreenScale := aScreenSrv.GetScreenScale
+  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, LScreenSrv) then FScreenScale := LScreenSrv.GetScreenScale
   else FScreenScale := 1;
   fBufBitmap := nil;
   SetAcceptsControls(False);
@@ -1981,20 +1950,12 @@ begin
   fImageCheckedResourceName := 'checkbox_checked_88x88';
   fImageUncheckedResourceName := 'checkbox_unchecked_88x88';
   FWrapMode := TALImageWrapMode.Fit;
-  {$IF defined(ANDROID) or defined(IOS)}
-  FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
-  FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
-  {$ENDIF}
 end;
 
 {*****************************}
 destructor TALCheckbox.Destroy;
 begin
   clearBufBitmap;
-  {$IF defined(ANDROID) or defined(IOS)}
-  TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
-  TMessageManager.DefaultManager.Unsubscribe(TContextResetMessage, FOpenGLContextResetId);
-  {$ENDIF}
   inherited;
 end;
 
@@ -2066,27 +2027,27 @@ begin
   end;
 end;
 
-{************************************}
-{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+{*************************}
+{$IF DEFINED(ALUseTexture)}
 function TALCheckbox.MakeBufBitmap: TTexture;
 {$ELSE}
 function TALCheckbox.MakeBufBitmap: Tbitmap;
 {$ENDIF}
 
-var aResourceName: String;
+var LResourceName: String;
     {$IFDEF ALDPK}
-    aFileName: String;
+    LFileName: String;
     {$ENDIF}
 
 begin
 
-  if IsChecked then aResourceName := ImageCheckedResourceName
-  else aResourceName := ImageUncheckedResourceName;
+  if IsChecked then LResourceName := ImageCheckedResourceName
+  else LResourceName := ImageUncheckedResourceName;
 
   if (Scene = nil) or
      (SameValue(Size.Size.cx, 0, TEpsilon.position)) or
      (SameValue(Size.Size.cy, 0, TEpsilon.position)) or
-     (aResourceName = '') then begin
+     (LResourceName = '') then begin
     clearBufBitmap;
     exit(nil);
   end;
@@ -2094,11 +2055,11 @@ begin
   if (fBufBitmap <> nil) and
      (SameValue(fBufSize.cx, Size.Size.cx, TEpsilon.position)) and
      (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) and
-     (FbufResourceName = aResourceName) then exit(fBufBitmap);
+     (FbufResourceName = LResourceName) then exit(fBufBitmap);
 
   clearBufBitmap;
   fBufSize := Size.Size;
-  FbufResourceName := aResourceName;
+  FbufResourceName := LResourceName;
 
   {$IFDEF debug}
   ALLog('TALCheckbox.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
@@ -2108,10 +2069,10 @@ begin
   {$endif}
 
     {$IFDEF ALDPK}
-    aFileName := extractFilePath(getActiveProject.fileName) + 'resources\' + aResourceName; // by default all the resources files must be located in the sub-folder /resources/ of the project
-    if not TFile.Exists(aFileName) then begin
-      aFileName := aFileName + '.png';
-      if not TFile.Exists(aFileName) then aFileName := '';
+    LFileName := extractFilePath(getActiveProject.fileName) + 'resources\' + LResourceName; // by default all the resources files must be located in the sub-folder /resources/ of the project
+    if not TFile.Exists(LFileName) then begin
+      LFileName := LFileName + '.png';
+      if not TFile.Exists(LFileName) then LFileName := '';
     end;
     {$ENDIF}
 
@@ -2138,10 +2099,10 @@ begin
         begin
           fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
           {$IFDEF ALDPK}
-          if aFileName <> '' then fBufBitmap := ALLoadFitIntoFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+          if LFileName <> '' then fBufBitmap := ALLoadFitIntoFileImageV3(LFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
           else fBufBitmap := nil;
           {$ELSE}
-          fBufBitmap := ALLoadFitIntoResourceImageV3(aResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+          fBufBitmap := ALLoadFitIntoResourceImageV3(LResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
           {$ENDIF}
           result := fBufBitmap;
           if result <> nil then fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).
@@ -2193,10 +2154,10 @@ begin
         begin
           fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
           {$IFDEF ALDPK}
-          if aFileName <> '' then fBufBitmap := ALLoadFitIntoAndCropFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+          if LFileName <> '' then fBufBitmap := ALLoadFitIntoAndCropFileImageV3(LFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
           else fBufBitmap := nil;
           {$ELSE}
-          fBufBitmap := ALLoadFitIntoAndCropResourceImageV3(aResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+          fBufBitmap := ALLoadFitIntoAndCropResourceImageV3(LResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
           {$ENDIF}
           result := fBufBitmap;
           if result <> nil then fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).
@@ -2235,7 +2196,7 @@ begin
     exit;
   end;
 
-  {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+  {$IF DEFINED(ALUseTexture)}
 
   TCustomCanvasGpu(Canvas).DrawTexture(canvas.AlignToPixel(fBufBitmapRect), // ATexRect (destRec)
                                        TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), // ARect (srcRec)
@@ -2253,22 +2214,6 @@ begin
   {$ENDIF}
 
 end;
-
-{************************************}
-{$IF DEFINED(IOS) or DEFINED(ANDROID)}
-procedure TALCheckbox.OpenGLContextLostHandler(const Sender: TObject; const Msg: TMessage);
-begin
-  clearBufBitmap;
-end;
-{$ENDIF}
-
-{************************************}
-{$IF DEFINED(IOS) or DEFINED(ANDROID)}
-procedure TALCheckbox.OpenGLContextResetHandler(const Sender: TObject; const Msg: TMessage);
-begin
-  clearBufBitmap;
-end;
-{$ENDIF}
 
 {******************************************}
 function TALCheckbox.GetDefaultSize: TSizeF;
@@ -2392,16 +2337,16 @@ end;
 
 {**********************************************************************************}
 procedure TALRadioButton.GroupMessageCall(const Sender: TObject; const M: TMessage);
-var aOldMandatory: Boolean;
+var LOldMandatory: Boolean;
 begin
   if SameText(TRadioButtonGroupMessage(M).GroupName, GroupName) and (Sender <> Self) and (Scene <> nil) and
      (not (Sender is TControl) or ((Sender as TControl).Scene = Scene)) then begin
-    aOldMandatory := fMandatory;
+    LOldMandatory := fMandatory;
     fMandatory := False;
     try
       IsChecked := False;
     finally
-      fMandatory := aOldMandatory;
+      fMandatory := LOldMandatory;
     end;
   end;
 end;

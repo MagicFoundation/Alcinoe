@@ -1,17 +1,18 @@
 unit ALFmxDesignEditors;
 
-{$IF CompilerVersion > 33} // rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.Editor.Items.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
 interface
 
-uses System.Classes,
-     System.Generics.Collections,
-     FMX.Types,
-     DesignIntf,
-     DesignEditors,
-     DesignMenus;
+uses
+  System.Classes,
+  System.Generics.Collections,
+  FMX.Types,
+  DesignIntf,
+  DesignEditors,
+  DesignMenus;
 
 resourcestring
   SNewItem = 'Add Item';
@@ -95,10 +96,11 @@ procedure Register;
 
 implementation
 
-uses System.SysUtils,
-     Vcl.Menus,
-     fmx.controls,
-     ALFmxTabControl;
+uses
+  System.SysUtils,
+  Vcl.Menus,
+  fmx.controls,
+  ALFmxTabControl;
 
 {********************************************************************}
 constructor TALItemClassDesc.Create(const AItemClass: TFmxObjectClass;

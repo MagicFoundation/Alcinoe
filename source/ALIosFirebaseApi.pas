@@ -2,9 +2,10 @@
 
 interface
 
-uses Macapi.ObjectiveC,
-     iOSapi.CocoaTypes,
-     iOSapi.Foundation;
+uses
+  Macapi.ObjectiveC,
+  iOSapi.CocoaTypes,
+  iOSapi.Foundation;
 
 {$M+}
 
@@ -869,8 +870,9 @@ type
 
 implementation
 
-uses Macapi.Helpers,
-     System.Sqlite; // << else I have Error: "_sqlite3_errstr", referenced from: ....
+uses
+  Macapi.Helpers,
+  System.Sqlite; // << else I have Error: "_sqlite3_errstr", referenced from: ....
 
 {********************************************************}
 function kFIRInstanceIDTokenRefreshNotification: NSString;

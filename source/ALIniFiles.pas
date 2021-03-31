@@ -1,8 +1,8 @@
-{**********************************************************
+{*******************************************************************************
 Description:  AnsiString version of delphi Unicode Tinifile
-***********************************************************}
+*******************************************************************************}
 
-{$IF CompilerVersion > 33} // rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if System.IniFiles still has the exact same fields and adjust the IFDEF'}
 {$ENDIF}
 
@@ -12,14 +12,11 @@ unit ALIniFiles;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
-uses System.SysUtils,
-     System.Classes,
-     ALString,
-     ALStringList;
+uses
+  System.SysUtils,
+  System.Classes,
+  ALString,
+  ALStringList;
 
 type
   EALIniFileException = class(Exception);
@@ -37,6 +34,8 @@ type
     procedure WriteString(const Section, Ident, Value: AnsiString); virtual; abstract;
     function ReadInteger(const Section, Ident: AnsiString; Default: Integer): Integer; virtual;
     procedure WriteInteger(const Section, Ident: AnsiString; Value: Integer); virtual;
+    function ReadInt64(const Section, Ident: AnsiString; Default: Int64): Int64; virtual;
+    procedure WriteInt64(const Section, Ident: AnsiString; Value: Int64); virtual;
     function ReadBool(const Section, Ident: AnsiString; Default: Boolean): Boolean; virtual;
     procedure WriteBool(const Section, Ident: AnsiString; Value: Boolean); virtual;
     function ReadBinaryStream(const Section, Name: AnsiString; Value: TStream): Integer; virtual;
@@ -76,10 +75,11 @@ type
 
 implementation
 
-uses Winapi.Windows,
-     System.RTLConsts,
-     System.Ansistrings,
-     ALFiles;
+uses
+  Winapi.Windows,
+  System.RTLConsts,
+  System.Ansistrings,
+  ALFiles;
 
 {**************************************************************}
 constructor TALCustomIniFile.Create(const FileName: AnsiString);
@@ -115,6 +115,24 @@ end;
 
 {****************************************************************************************}
 procedure TALCustomIniFile.WriteInteger(const Section, Ident: AnsiString; Value: Integer);
+begin
+  WriteString(Section, Ident, ALIntToStr(Value));
+end;
+
+{*******************************************************************************************}
+function TALCustomIniFile.ReadInt64(const Section, Ident: AnsiString; Default: Int64): Int64;
+var
+  IntStr: AnsiString;
+begin
+  IntStr := ReadString(Section, Ident, '');
+  if (Length(IntStr) > 2) and (IntStr[1] = '0') and
+     ((IntStr[2] = 'X') or (IntStr[2] = 'x')) then
+    IntStr := '$' + ALCopyStr(IntStr, 3, Maxint);
+  Result := ALStrToInt64Def(IntStr, Default);
+end;
+
+{************************************************************************************}
+procedure TALCustomIniFile.WriteInt64(const Section, Ident: AnsiString; Value: Int64);
 begin
   WriteString(Section, Ident, ALIntToStr(Value));
 end;
@@ -413,7 +431,7 @@ begin
         P := LBuffer;
         while LCharCount > 0 do begin
           Strings.Add(P);
-          LLen := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLen(P) + 1;
+          LLen := System.Ansistrings.StrLen(P) + 1;
           Inc(P, LLen);
           Dec(LCharCount, LLen);
         end;
@@ -442,7 +460,7 @@ var
         P := Buffer;
         while P^ <> #0 do begin
           Strings.Add(P);
-          Inc(P, {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLen(P) + 1);
+          Inc(P, System.Ansistrings.StrLen(P) + 1);
         end;
       end;
     finally

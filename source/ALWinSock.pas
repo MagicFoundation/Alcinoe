@@ -1,17 +1,14 @@
-{*********************************************************************
-Description:  Misc function that use winsock (for exempple ALHostToIP,
-              ALIPAddrToName or ALgetLocalIPs)
-**********************************************************************}
+{*******************************************************************************
+Misc function that use winsock (for exempple ALHostToIP, ALIPAddrToName or
+ALgetLocalIPs)
+*******************************************************************************}
 
 unit ALWinSock;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
-uses AlStringList;
+uses
+  AlStringList;
 
 function  ALHostToIP(const HostName: AnsiString; var Ip: AnsiString): Boolean;
 function  ALIPAddrToName(const IPAddr : AnsiString): AnsiString;
@@ -20,12 +17,13 @@ function  ALgetLocalHostName: AnsiString;
 
 implementation
 
-uses Winapi.Windows,
-     System.SysUtils,
-     Winapi.WinSock2,
-     System.Ansistrings,
-     ALCommon,
-     ALString;
+uses
+  Winapi.Windows,
+  System.SysUtils,
+  Winapi.WinSock2,
+  System.Ansistrings,
+  ALCommon,
+  ALString;
 
 {***************************************************************************}
 function ALHostToIP(const HostName: AnsiString; var Ip: AnsiString): Boolean;
@@ -66,7 +64,7 @@ begin
   Try
     SockAddrIn.sin_addr.s_addr:= inet_addr(PAnsiChar(IPAddr));
     HostEnt:= gethostbyaddr(@SockAddrIn.sin_addr.S_addr, 4, AF_INET);
-    if HostEnt<>nil then result:={$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrPas(Hostent^.h_name)
+    if HostEnt<>nil then result:=System.Ansistrings.StrPas(Hostent^.h_name)
     else result:='';
   finally
     WSACleanup;
@@ -112,7 +110,7 @@ begin
   Try
 
     if gethostname(Buffer, SizeOf(Buffer)) <> 0 then raise EALException.Create('Winsock GetHostName failed');
-    Result := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrPas(Buffer);
+    Result := System.Ansistrings.StrPas(Buffer);
 
   finally
     WSACleanup;

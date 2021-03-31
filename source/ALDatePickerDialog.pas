@@ -2,17 +2,18 @@ unit ALDatePickerDialog;
 
 interface
 
-uses {$IF defined(android)}
-     Androidapi.JNIBridge,
-     ALAndroidApi,
-     {$ENDIF}
-     {$IF defined(ios)}
-     System.TypInfo,
-     Macapi.ObjectiveC,
-     iOSapi.uikit,
-     iOSapi.Foundation,
-     {$ENDIF}
-     System.UITypes;
+uses
+  {$IF defined(android)}
+  Androidapi.JNIBridge,
+  ALAndroidApi,
+  {$ENDIF}
+  {$IF defined(ios)}
+  System.TypInfo,
+  Macapi.ObjectiveC,
+  iOSapi.uikit,
+  iOSapi.Foundation,
+  {$ENDIF}
+  System.UITypes;
 
 const
   mrClear = 103;
@@ -134,27 +135,28 @@ type
 
 implementation
 
-uses system.Classes,
-     system.SysUtils,
-     {$IF defined(android)}
-     Androidapi.JNI.JavaTypes,
-     Androidapi.JNI.GraphicsContentViewText,
-     FMX.Helpers.Android,
-     Androidapi.Helpers,
-     {$ENDIF}
-     {$IF defined(ios)}
-     System.Types,
-     system.Math,
-     system.DateUtils,
-     Macapi.Helpers,
-     iOSapi.CoreGraphics,
-     Macapi.ObjCRuntime,
-     Fmx.platForm.iOS,
-     FMX.Helpers.iOS,
-     FMX.Forms,
-     {$ENDIF}
-     alstring,
-     alcommon;
+uses
+  system.Classes,
+  system.SysUtils,
+  {$IF defined(android)}
+  Androidapi.JNI.JavaTypes,
+  Androidapi.JNI.GraphicsContentViewText,
+  FMX.Helpers.Android,
+  Androidapi.Helpers,
+  {$ENDIF}
+  {$IF defined(ios)}
+  System.Types,
+  system.Math,
+  system.DateUtils,
+  Macapi.Helpers,
+  iOSapi.CoreGraphics,
+  Macapi.ObjCRuntime,
+  Fmx.platForm.iOS,
+  FMX.Helpers.iOS,
+  FMX.Forms,
+  {$ENDIF}
+  alstring,
+  alcommon;
 
 {$REGION ' ANDROID'}
 {$IF defined(android)}
@@ -168,7 +170,7 @@ end;
 
 {*************************************************************************************************************************************}
 procedure TALDatePickerDialog.TDatePickerDialogListener.onBtnClick(which: integer; year: integer; month: integer; dayOfMonth: integer);
-var AResult: TModalResult;
+var LResult: TModalResult;
 begin
 
   {$IFDEF DEBUG}
@@ -182,13 +184,13 @@ begin
 
   if assigned(fDatePickerDialog.fOnClose) then begin
 
-    if which = TJDialogInterface.javaclass.BUTTON_POSITIVE then AResult := mrOk
-    else if which = TJDialogInterface.javaclass.BUTTON_NEGATIVE then AResult := mrCancel
-    else if which = TJDialogInterface.javaclass.BUTTON_NEUTRAL then AResult := mrClear
-    else AResult := mrClose;
+    if which = TJDialogInterface.javaclass.BUTTON_POSITIVE then LResult := mrOk
+    else if which = TJDialogInterface.javaclass.BUTTON_NEGATIVE then LResult := mrCancel
+    else if which = TJDialogInterface.javaclass.BUTTON_NEUTRAL then LResult := mrClear
+    else LResult := mrClose;
 
     // Months are indexed starting at 0, so August is month 8, or index 7
-    fDatePickerDialog.fOnClose(fDatePickerDialog, AResult, year, month+1, dayOfMonth);
+    fDatePickerDialog.fOnClose(fDatePickerDialog, LResult, year, month+1, dayOfMonth);
 
   end;
 
@@ -218,10 +220,11 @@ constructor TALDatePickerDialog.create(const aBtnOKCaption: string;
   {$REGION ' IOS'}
   {$IF defined(ios)}
 
-  var aButtons: NSMutableArray;
-      aUIColor: UIColor;
-      aSingleTapGestureRecognizer: UITapGestureRecognizer;
-      aConstraint: NSLayoutConstraint;
+  var
+    LButtons: NSMutableArray;
+    LUIColor: UIColor;
+    LSingleTapGestureRecognizer: UITapGestureRecognizer;
+    LConstraint: NSLayoutConstraint;
 
   {$ENDIF}
   {$ENDREGION}
@@ -260,8 +263,8 @@ begin
 
   { Creating Root view container for picker }
   FUIOverlayView := TUIView.Create;
-  aUIColor := AlphaColorToUIColor($32000000);
-  FUIOverlayView.setBackgroundColor(aUIColor);
+  LUIColor := AlphaColorToUIColor($32000000);
+  FUIOverlayView.setBackgroundColor(LUIColor);
   FUIOverlayView.setAutoresizingMask(UIViewAutoresizingFlexibleWidth or
                                      UIViewAutoresizingFlexibleHeight or
                                      UIViewAutoresizingFlexibleLeftMargin or
@@ -269,13 +272,13 @@ begin
                                      UIViewAutoresizingFlexibleTopMargin or
                                      UIViewAutoresizingFlexibleBottomMargin);
   FUIOverlayView.setFrame(CGRect.Create(0, 0, screen.Size.Width, screen.Size.Height));
-  aSingleTapGestureRecognizer := TUITapGestureRecognizer.Wrap(TUITapGestureRecognizer.Alloc.initWithTarget(GetObjectID, sel_getUid('HandleTap')));
+  LSingleTapGestureRecognizer := TUITapGestureRecognizer.Wrap(TUITapGestureRecognizer.Alloc.initWithTarget(GetObjectID, sel_getUid('HandleTap')));
   try
-    aSingleTapGestureRecognizer.setDelegate(GetObjectID);
-    aSingleTapGestureRecognizer.setNumberOfTapsRequired(1);
-    FUIOverlayView.addGestureRecognizer(aSingleTapGestureRecognizer);
+    LSingleTapGestureRecognizer.setDelegate(GetObjectID);
+    LSingleTapGestureRecognizer.setNumberOfTapsRequired(1);
+    FUIOverlayView.addGestureRecognizer(LSingleTapGestureRecognizer);
   finally
-    aSingleTapGestureRecognizer.release;
+    LSingleTapGestureRecognizer.release;
   end;
 
   { Creating Root view container for picker }
@@ -292,22 +295,22 @@ begin
   FUIToolBar.setAlpha(0.8);
   FUIContainerView.addSubview(FUIToolBar);
   FUIToolBar.setTranslatesAutoresizingMaskIntoConstraints(False);
-  aConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUIToolBar), NSLayoutAttributeLeft,   NSLayoutRelationEqual, NSObjectToID(FUIContainerView),    NSLayoutAttributeLeft,           1, 0));
-  aConstraint.setActive(True);
-  aConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUIToolBar), NSLayoutAttributeRight,  NSLayoutRelationEqual, NSObjectToID(FUIContainerView),    NSLayoutAttributeRight,          1, 0));
-  aConstraint.setActive(True);
-  aConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUIToolBar), NSLayoutAttributeBottom, NSLayoutRelationEqual, NSObjectToID(FUIContainerView),    NSLayoutAttributeBottom,         1, 0));
-  aConstraint.setActive(True);
+  LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUIToolBar), NSLayoutAttributeLeft,   NSLayoutRelationEqual, NSObjectToID(FUIContainerView),    NSLayoutAttributeLeft,           1, 0));
+  LConstraint.setActive(True);
+  LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUIToolBar), NSLayoutAttributeRight,  NSLayoutRelationEqual, NSObjectToID(FUIContainerView),    NSLayoutAttributeRight,          1, 0));
+  LConstraint.setActive(True);
+  LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUIToolBar), NSLayoutAttributeBottom, NSLayoutRelationEqual, NSObjectToID(FUIContainerView),    NSLayoutAttributeBottom,         1, 0));
+  LConstraint.setActive(True);
 
   { Creating Toolbar buttons }
-  aButtons := TNSMutableArray.Create;
+  LButtons := TNSMutableArray.Create;
   try
 
     { Adding Flexible Separator }
     FUIToolbarButtonSepararator1 := TUIBarButtonItem.Create;
     FUIToolbarButtonSepararator1.initWithBarButtonSystemItem(UIBarButtonSystemItemFixedSpace, nil, nil);
     FUIToolbarButtonSepararator1.setWidth(5);
-    aButtons.addObject(NSObjectToID(FUIToolbarButtonSepararator1));
+    LButtons.addObject(NSObjectToID(FUIToolbarButtonSepararator1));
 
     { Adding clear Button }
     if aBtnClearCaption <> '' then begin
@@ -316,14 +319,14 @@ begin
       FUIClearButton.setStyle(UIBarButtonItemStyleBordered);
       FUIClearButton.setTarget(Self.GetObjectID);
       FUIClearButton.setAction(sel_getUid('Clear'));
-      aButtons.addObject(NSObjectToID(FUIClearButton));
+      LButtons.addObject(NSObjectToID(FUIClearButton));
     end
     else FUIClearButton := nil;
 
     { Adding Flexible Separator }
     FUIToolbarButtonSepararator2 := TUIBarButtonItem.Create;
     FUIToolbarButtonSepararator2.initWithBarButtonSystemItem(UIBarButtonSystemItemFlexibleSpace, nil, nil);
-    aButtons.addObject(NSObjectToID(FUIToolbarButtonSepararator2));
+    LButtons.addObject(NSObjectToID(FUIToolbarButtonSepararator2));
 
     { Adding Close Button }
     if aBtnCancelCaption <> '' then begin
@@ -332,7 +335,7 @@ begin
       FUICancelButton.setStyle(UIBarButtonItemStyleBordered);
       FUICancelButton.setTarget(Self.GetObjectID);
       FUICancelButton.setAction(sel_getUid('Cancel'));
-      aButtons.addObject(NSObjectToID(FUICancelButton));
+      LButtons.addObject(NSObjectToID(FUICancelButton));
     end
     else FUICancelButton := nil;
 
@@ -340,7 +343,7 @@ begin
     FUIToolbarButtonSepararator3 := TUIBarButtonItem.Create;
     FUIToolbarButtonSepararator3.initWithBarButtonSystemItem(UIBarButtonSystemItemFixedSpace, nil, nil);
     FUIToolbarButtonSepararator3.setWidth(28);
-    aButtons.addObject(NSObjectToID(FUIToolbarButtonSepararator3));
+    LButtons.addObject(NSObjectToID(FUIToolbarButtonSepararator3));
 
     { Adding Done Button }
     FUIDoneButton := TUIBarButtonItem.Create;
@@ -348,31 +351,31 @@ begin
     FUIDoneButton.setStyle(UIBarButtonItemStyleDone);
     FUIDoneButton.setTarget(Self.GetObjectID);
     FUIDoneButton.setAction(sel_getUid('Done'));
-    aButtons.addObject(NSObjectToID(FUIDoneButton));
+    LButtons.addObject(NSObjectToID(FUIDoneButton));
 
     { Adding Flexible Separator }
     FUIToolbarButtonSepararator4 := TUIBarButtonItem.Create;
     FUIToolbarButtonSepararator4.initWithBarButtonSystemItem(UIBarButtonSystemItemFixedSpace, nil, nil);
     if aBtnClearCaption <> '' then FUIToolbarButtonSepararator4.setWidth(5)
     else FUIToolbarButtonSepararator4.setWidth(15);
-    aButtons.addObject(NSObjectToID(FUIToolbarButtonSepararator4));
+    LButtons.addObject(NSObjectToID(FUIToolbarButtonSepararator4));
 
     { Adding button to Toolbar }
-    FUIToolBar.setItems(aButtons);
+    FUIToolBar.setItems(LButtons);
 
   finally
-    aButtons.release;
+    LButtons.release;
   end;
 
   { Adding DatePicker }
   FUIContainerView.addSubview(FUIDatePicker);
   FUIDatePicker.setTranslatesAutoresizingMaskIntoConstraints(False);
-  aConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUIDatePicker), NSLayoutAttributeLeft,   NSLayoutRelationEqual, NSObjectToID(FUIContainerView), NSLayoutAttributeLeft,           1, 0));
-  aConstraint.setActive(True);
-  aConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUIDatePicker), NSLayoutAttributeRight,  NSLayoutRelationEqual, NSObjectToID(FUIContainerView), NSLayoutAttributeRight,          1, 0));
-  aConstraint.setActive(True);
-  aConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUIDatePicker), NSLayoutAttributebottom, NSLayoutRelationEqual, NSObjectToID(FUIToolBar),       NSLayoutAttributetop,            1, 0));
-  aConstraint.setActive(True);
+  LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUIDatePicker), NSLayoutAttributeLeft,   NSLayoutRelationEqual, NSObjectToID(FUIContainerView), NSLayoutAttributeLeft,           1, 0));
+  LConstraint.setActive(True);
+  LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUIDatePicker), NSLayoutAttributeRight,  NSLayoutRelationEqual, NSObjectToID(FUIContainerView), NSLayoutAttributeRight,          1, 0));
+  LConstraint.setActive(True);
+  LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUIDatePicker), NSLayoutAttributebottom, NSLayoutRelationEqual, NSObjectToID(FUIToolBar),       NSLayoutAttributetop,            1, 0));
+  LConstraint.setActive(True);
 
   { Creating the title }
   if aTitle <> '' then begin
@@ -387,35 +390,35 @@ begin
     FUITitleSeparatorLeft := TUIView.Create;
     FUIContainerView.addSubview(FUITitleSeparatorLeft);
     FUITitleSeparatorLeft.setTranslatesAutoresizingMaskIntoConstraints(False);
-    aConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitleSeparatorLeft), NSLayoutAttributeLeft,   NSLayoutRelationEqual, NSObjectToID(FUIContainerView), NSLayoutAttributeLeft,           1, 0));
-    aConstraint.setActive(True);
-    aConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitleSeparatorLeft), NSLayoutAttributeTop,    NSLayoutRelationEqual, NSObjectToID(FUIContainerView), NSLayoutAttributeTop,            1, 0));
-    aConstraint.setActive(True);
-    aConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitleSeparatorLeft), NSLayoutAttributebottom, NSLayoutRelationEqual, NSObjectToID(FUIDatePicker),    NSLayoutAttributeBottom,         1, 0));
-    aConstraint.setActive(True);
-    aConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitleSeparatorLeft), NSLayoutAttributeWidth,  NSLayoutRelationEqual, nil,                            NSLayoutAttributeNotAnAttribute, 1, _TitlePaddingleft));
-    aConstraint.setActive(True);
+    LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitleSeparatorLeft), NSLayoutAttributeLeft,   NSLayoutRelationEqual, NSObjectToID(FUIContainerView), NSLayoutAttributeLeft,           1, 0));
+    LConstraint.setActive(True);
+    LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitleSeparatorLeft), NSLayoutAttributeTop,    NSLayoutRelationEqual, NSObjectToID(FUIContainerView), NSLayoutAttributeTop,            1, 0));
+    LConstraint.setActive(True);
+    LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitleSeparatorLeft), NSLayoutAttributebottom, NSLayoutRelationEqual, NSObjectToID(FUIDatePicker),    NSLayoutAttributeBottom,         1, 0));
+    LConstraint.setActive(True);
+    LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitleSeparatorLeft), NSLayoutAttributeWidth,  NSLayoutRelationEqual, nil,                            NSLayoutAttributeNotAnAttribute, 1, _TitlePaddingleft));
+    LConstraint.setActive(True);
 
     FUITitleSeparatorRight := TUIView.Create;
     FUIContainerView.addSubview(FUITitleSeparatorRight);
     FUITitleSeparatorRight.setTranslatesAutoresizingMaskIntoConstraints(False);
-    aConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitleSeparatorRight), NSLayoutAttributeRight,   NSLayoutRelationEqual, NSObjectToID(FUIContainerView), NSLayoutAttributeRight,          1, 0));
-    aConstraint.setActive(True);
-    aConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitleSeparatorRight), NSLayoutAttributeTop,     NSLayoutRelationEqual, NSObjectToID(FUIContainerView), NSLayoutAttributeTop,            1, 0));
-    aConstraint.setActive(True);
-    aConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitleSeparatorRight), NSLayoutAttributebottom,  NSLayoutRelationEqual, NSObjectToID(FUIDatePicker),    NSLayoutAttributeBottom,         1, 0));
-    aConstraint.setActive(True);
-    aConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitleSeparatorRight), NSLayoutAttributeWidth,   NSLayoutRelationEqual, nil,                            NSLayoutAttributeNotAnAttribute, 1, _TitlePaddingRight));
-    aConstraint.setActive(True);
+    LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitleSeparatorRight), NSLayoutAttributeRight,   NSLayoutRelationEqual, NSObjectToID(FUIContainerView), NSLayoutAttributeRight,          1, 0));
+    LConstraint.setActive(True);
+    LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitleSeparatorRight), NSLayoutAttributeTop,     NSLayoutRelationEqual, NSObjectToID(FUIContainerView), NSLayoutAttributeTop,            1, 0));
+    LConstraint.setActive(True);
+    LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitleSeparatorRight), NSLayoutAttributebottom,  NSLayoutRelationEqual, NSObjectToID(FUIDatePicker),    NSLayoutAttributeBottom,         1, 0));
+    LConstraint.setActive(True);
+    LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitleSeparatorRight), NSLayoutAttributeWidth,   NSLayoutRelationEqual, nil,                            NSLayoutAttributeNotAnAttribute, 1, _TitlePaddingRight));
+    LConstraint.setActive(True);
 
     FUIContainerView.addSubview(FUITitle);
     FUITitle.setTranslatesAutoresizingMaskIntoConstraints(False);
-    aConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitle), NSLayoutAttributeLeft,   NSLayoutRelationEqual, NSObjectToID(FUITitleSeparatorLeft),    NSLayoutAttributeRight,  1, 0));
-    aConstraint.setActive(True);
-    aConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitle), NSLayoutAttributeRight,  NSLayoutRelationEqual, NSObjectToID(FUITitleSeparatorRight),   NSLayoutAttributeLeft,   1, 0));
-    aConstraint.setActive(True);
-    aConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitle), NSLayoutAttributebottom, NSLayoutRelationEqual, NSObjectToID(FUIDatePicker),            NSLayoutAttributetop,    1, 0));
-    aConstraint.setActive(True);
+    LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitle), NSLayoutAttributeLeft,   NSLayoutRelationEqual, NSObjectToID(FUITitleSeparatorLeft),    NSLayoutAttributeRight,  1, 0));
+    LConstraint.setActive(True);
+    LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitle), NSLayoutAttributeRight,  NSLayoutRelationEqual, NSObjectToID(FUITitleSeparatorRight),   NSLayoutAttributeLeft,   1, 0));
+    LConstraint.setActive(True);
+    LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUITitle), NSLayoutAttributebottom, NSLayoutRelationEqual, NSObjectToID(FUIDatePicker),            NSLayoutAttributetop,    1, 0));
+    LConstraint.setActive(True);
 
   end
   else begin
@@ -492,10 +495,10 @@ procedure TALDatePickerDialog.show(const aYear: integer;
 
   {$REGION ' IOS'}
   {$IF defined(ios)}
-  var aStartFrame: CGRect;
-      aEndFrame: NSRect;
-      aRootViewRect: NSRect;
-      aKeyWin: UIWindow;
+  var LStartFrame: CGRect;
+      LEndFrame: NSRect;
+      LRootViewRect: NSRect;
+      LKeyWin: UIWindow;
   {$ENDIF}
   {$ENDREGION}
 
@@ -526,21 +529,21 @@ begin
   FUIContainerView.sizeToFit;
 
   { Setting animation }
-  aStartFrame := GetPopupFrame;
-  aEndFrame := aStartFrame;
-  aKeyWin := SharedApplication.keyWindow;
-  if (aKeyWin <> nil) and (aKeyWin.rootViewController <> nil) and (aKeyWin.rootViewController.view <> nil) then begin
-    aRootViewRect := SharedApplication.keyWindow.rootViewController.view.frame;
-    aRootViewRect := SharedApplication.keyWindow.rootViewController.view.bounds;
-    aStartFrame.origin.y := aRootViewRect.size.height;
+  LStartFrame := GetPopupFrame;
+  LEndFrame := LStartFrame;
+  LKeyWin := SharedApplication.keyWindow;
+  if (LKeyWin <> nil) and (LKeyWin.rootViewController <> nil) and (LKeyWin.rootViewController.view <> nil) then begin
+    LRootViewRect := SharedApplication.keyWindow.rootViewController.view.frame;
+    LRootViewRect := SharedApplication.keyWindow.rootViewController.view.bounds;
+    LStartFrame.origin.y := LRootViewRect.size.height;
   end;
-  FUIContainerView.setFrame(aStartFrame);
+  FUIContainerView.setFrame(LStartFrame);
 
   { Start Animation }
   TUIView.OCClass.beginAnimations(nil, nil);
   try
     TUIView.OCClass.setAnimationDuration(_AnimationDuration);
-    FUIContainerView.setFrame(aEndFrame);
+    FUIContainerView.setFrame(LEndFrame);
   finally
     TUIView.OCClass.commitAnimations;
   end;
@@ -631,16 +634,16 @@ end;
 
 {*************************************************}
 function TALDatePickerDialog.GetPopupFrame: NSRect;
-var aRootViewRect: NSRect;
-    aKeyWin: UIWindow;
+var LRootViewRect: NSRect;
+    LKeyWin: UIWindow;
 begin
   Result := CGRect.Create(0, 0, GetWidth, GetHeight);
-  aKeyWin := SharedApplication.keyWindow;
-  if (aKeyWin <> nil) and (aKeyWin.rootViewController <> nil) and (aKeyWin.rootViewController.view <> nil) then begin
-    aRootViewRect := SharedApplication.keyWindow.rootViewController.view.frame;
-    aRootViewRect := SharedApplication.keyWindow.rootViewController.view.bounds;
-    Result.origin.y := (aRootViewRect.size.height - GetHeight) / 2;
-    Result.origin.x := (aRootViewRect.size.width - GetWidth) / 2;
+  LKeyWin := SharedApplication.keyWindow;
+  if (LKeyWin <> nil) and (LKeyWin.rootViewController <> nil) and (LKeyWin.rootViewController.view <> nil) then begin
+    LRootViewRect := SharedApplication.keyWindow.rootViewController.view.frame;
+    LRootViewRect := SharedApplication.keyWindow.rootViewController.view.bounds;
+    Result.origin.y := (LRootViewRect.size.height - GetHeight) / 2;
+    Result.origin.x := (LRootViewRect.size.width - GetWidth) / 2;
   end;
 end;
 
@@ -658,63 +661,63 @@ function TALDatePickerDialog.GetDateTime: TDateTime;
     Result := DateOf(ADateTime) +  EncodeTime(Hour, Min, 0, 0);
   end;
 
-var aDateTimeWithoutSec: TDateTime;
+var LDateTimeWithoutSec: TDateTime;
 begin
   // Native ios UIDatePicker doesn't allow users to set second.
   // We must to trim second from datetime
-  aDateTimeWithoutSec := _TrimSeconds(NSDateToDateTime(FUIDatePicker.date));
-  Result := _TrimSeconds(aDateTimeWithoutSec);
+  LDateTimeWithoutSec := _TrimSeconds(NSDateToDateTime(FUIDatePicker.date));
+  Result := _TrimSeconds(LDateTimeWithoutSec);
 end;
 
 {***********************************}
 procedure TALDatePickerDialog.Cancel;
-var aDt: TdateTime;
+var LDt: TdateTime;
 begin
   Hide;
-  aDt := GetDateTime;
-  if assigned(FonClose) then fOnClose(self, mrCancel, yearOf(aDt), monthOf(aDt), DayOfTheMonth(aDt));
+  LDt := GetDateTime;
+  if assigned(FonClose) then fOnClose(self, mrCancel, yearOf(LDt), monthOf(LDt), DayOfTheMonth(LDt));
 end;
 
 {**********************************}
 procedure TALDatePickerDialog.Clear;
-var aDt: TdateTime;
+var LDt: TdateTime;
 begin
   Hide;
-  aDt := GetDateTime;
-  if assigned(FonClose) then fOnClose(self, mrClear, yearOf(aDt), monthOf(aDt), DayOfTheMonth(aDt));
+  LDt := GetDateTime;
+  if assigned(FonClose) then fOnClose(self, mrClear, yearOf(LDt), monthOf(LDt), DayOfTheMonth(LDt));
 end;
 
 {*********************************}
 procedure TALDatePickerDialog.Done;
-var aDt: TdateTime;
+var LDt: TdateTime;
 begin
   Hide;
-  aDt := GetDateTime;
-  if assigned(FonClose) then fOnClose(self, mrOK, yearOf(aDt), monthOf(aDt), DayOfTheMonth(aDt));
+  LDt := GetDateTime;
+  if assigned(FonClose) then fOnClose(self, mrOK, yearOf(LDt), monthOf(LDt), DayOfTheMonth(LDt));
 end;
 
 {*********************************}
 procedure TALDatePickerDialog.Hide;
-var aEndFrame: NSRect;
-    aRootViewRect: NSRect;
-    aKeyWin: UIWindow;
+var LEndFrame: NSRect;
+    LRootViewRect: NSRect;
+    LKeyWin: UIWindow;
 begin
 
   if FUIOverlayView.superview = nil then Exit;
 
-  aEndFrame := GetPopupFrame;
-  aKeyWin := SharedApplication.keyWindow;
-  if (aKeyWin <> nil) and (aKeyWin.rootViewController <> nil) and (aKeyWin.rootViewController.view <> nil) then begin
-    aRootViewRect := SharedApplication.keyWindow.rootViewController.view.frame;
-    aRootViewRect := SharedApplication.keyWindow.rootViewController.view.bounds;
-    aEndFrame.origin.y := aRootViewRect.size.height;
+  LEndFrame := GetPopupFrame;
+  LKeyWin := SharedApplication.keyWindow;
+  if (LKeyWin <> nil) and (LKeyWin.rootViewController <> nil) and (LKeyWin.rootViewController.view <> nil) then begin
+    LRootViewRect := SharedApplication.keyWindow.rootViewController.view.frame;
+    LRootViewRect := SharedApplication.keyWindow.rootViewController.view.bounds;
+    LEndFrame.origin.y := LRootViewRect.size.height;
   end;
 
   { Start Slide down Animation }
   TUIView.OCClass.beginAnimations(nil, nil);
   try
     TUIView.OCClass.setAnimationDuration(_AnimationDuration);
-    FUIContainerView.setFrame(aEndFrame);
+    FUIContainerView.setFrame(LEndFrame);
     TUIView.OCClass.setAnimationDelegate(Self.GetObjectID);
     TUIView.OCClass.setAnimationDidStopSelector(sel_getUid('Hidden'))
   finally

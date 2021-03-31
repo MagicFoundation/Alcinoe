@@ -1,22 +1,14 @@
-{*********************************************************************
+{*******************************************************************************
 Description:  Function to launch executable (and wait for termination)
-**********************************************************************}
+*******************************************************************************}
 
 unit ALExecute;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
-uses winapi.windows,
-     system.classes;
-
-{$IF CompilerVersion < 18.5}
-Type
-  TStartupInfoA = TStartupInfo;
-{$IFEND}
+uses
+  winapi.windows,
+  system.classes;
 
 const
   SE_CREATE_TOKEN_NAME = 'SeCreateTokenPrivilege';
@@ -84,12 +76,13 @@ function ALMakeServiceAutorestarting(const aServiceName: AnsiString;
 
 implementation
 
-uses system.sysutils,
-     winapi.messages,
-     winapi.winsvc,
-     System.Diagnostics,
-     ALWindows,
-     ALCommon;
+uses
+  system.sysutils,
+  winapi.messages,
+  winapi.winsvc,
+  System.Diagnostics,
+  ALWindows,
+  ALCommon;
 
 {******************************************}
 Function AlGetEnvironmentString: AnsiString;
@@ -127,139 +120,139 @@ function ALWinExec(const aCommandLine: AnsiString;
                    const aOutputStream: TStream;
                    const aOwnerThread: TThread = nil): Dword;
 
-var aOutputReadPipe,aOutputWritePipe: THANDLE;
-    aInputReadPipe,aInputWritePipe: THANDLE;
+var LOutputReadPipe,LOutputWritePipe: THANDLE;
+    LInputReadPipe,LInputWritePipe: THANDLE;
 
   {-----------------------------}
   procedure InternalProcessInput;
-  var aBytesWritten: Dword;
-      aBuffer: Tbytes;
+  var LBytesWritten: Dword;
+      LBuffer: Tbytes;
       P: cardinal;
   begin
     If (aInputStream <> nil) and (aInputStream.size > 0) then begin
-      SetLength(aBuffer,aInputStream.size);
-      aInputStream.readBuffer(pointer(aBuffer)^,aInputStream.size);
+      SetLength(LBuffer,aInputStream.size);
+      aInputStream.readBuffer(pointer(LBuffer)^,aInputStream.size);
       P := 0;
       While true do begin
         if (aOwnerThread <> nil) and (aOwnerThread.checkTerminated) then break;
-        if not WriteFile(aInputWritePipe,     // handle to file to write to
-                         aBuffer[P],          // pointer to data to write to file
-                         cardinal(length(ABuffer)) - P, // number of bytes to write
-                         aBytesWritten,       // pointer to number of bytes written
+        if not WriteFile(LInputWritePipe,     // handle to file to write to
+                         LBuffer[P],          // pointer to data to write to file
+                         cardinal(length(LBuffer)) - P, // number of bytes to write
+                         LBytesWritten,       // pointer to number of bytes written
                          nil) then RaiseLastOSError; // pointer to structure needed for overlapped I/O
-        If aBytesWritten = Dword(length(ABuffer)) then break
-        else P := P + aBytesWritten;
+        If LBytesWritten = Dword(length(LBuffer)) then break
+        else P := P + LBytesWritten;
       end;
     end;
   end;
 
   {------------------------------}
   procedure InternalProcessOutput;
-  var aBytesInPipe: Cardinal;
-      aBytesRead: Dword;
-      aBuffer: TBytes;
+  var LBytesInPipe: Cardinal;
+      LBytesRead: Dword;
+      LBuffer: TBytes;
   begin
     While true do begin
 
       if (aOwnerThread <> nil) and (aOwnerThread.checkTerminated) then break;
 
-      If not PeekNamedPipe(aOutputReadPipe,  // handle to pipe to copy from
+      If not PeekNamedPipe(LOutputReadPipe,  // handle to pipe to copy from
                            nil,              // pointer to data buffer
                            0,                // size, in bytes, of data buffer
                            nil,              // pointer to number of bytes read
-                           @aBytesInPipe,    // pointer to total number of bytes available
+                           @LBytesInPipe,    // pointer to total number of bytes available
                            nil) then break;  // pointer to unread bytes in this message
 
-      if aBytesInPipe > 0 then begin
-        SetLength(aBuffer, aBytesInPipe);
-        if not ReadFile(aOutputReadPipe,             // handle of file to read
-                        pointer(aBuffer)^,           // address of buffer that receives data
-                        aBytesInPipe,                // number of bytes to read
-                        aBytesRead,                  // address of number of bytes read
+      if LBytesInPipe > 0 then begin
+        SetLength(LBuffer, LBytesInPipe);
+        if not ReadFile(LOutputReadPipe,             // handle of file to read
+                        pointer(LBuffer)^,           // address of buffer that receives data
+                        LBytesInPipe,                // number of bytes to read
+                        LBytesRead,                  // address of number of bytes read
                         nil) then RaiseLastOSError;  // address of structure for data
-        If (aBytesRead > 0) and (aOutputStream <> nil) then aOutputStream.WriteBuffer(pointer(aBuffer)^, aBytesRead);
+        If (LBytesRead > 0) and (aOutputStream <> nil) then aOutputStream.WriteBuffer(pointer(LBuffer)^, LBytesRead);
       end
       else break;
 
     end;
   end;
 
-Var aProcessInformation: TProcessInformation;
-    aStartupInfo: TStartupInfoA;
-    aSecurityAttributes: TSecurityAttributes;
-    aPEnvironment: Pointer;
-    aPCurrentDirectory: Pointer;
+Var LProcessInformation: TProcessInformation;
+    LStartupInfo: TStartupInfoA;
+    LSecurityAttributes: TSecurityAttributes;
+    LPEnvironment: Pointer;
+    LPCurrentDirectory: Pointer;
 
 begin
 
   // Set up the security attributes struct.
-  aSecurityAttributes.nLength := sizeof(TSecurityAttributes);
-  aSecurityAttributes.lpSecurityDescriptor := NiL;
-  aSecurityAttributes.bInheritHandle := TRUE;
+  LSecurityAttributes.nLength := sizeof(TSecurityAttributes);
+  LSecurityAttributes.lpSecurityDescriptor := NiL;
+  LSecurityAttributes.bInheritHandle := TRUE;
 
   // Create the child output pipe.
-  if not CreatePipe(aOutputReadPipe,          // address of variable for read handle
-                    aOutputWritePipe,         // address of variable for write handle
-                    @aSecurityAttributes,     // pointer to security attributes
+  if not CreatePipe(LOutputReadPipe,          // address of variable for read handle
+                    LOutputWritePipe,         // address of variable for write handle
+                    @LSecurityAttributes,     // pointer to security attributes
                     0) then RaiseLastOSError; // number of bytes reserved for pipe
 
   Try
 
     // Create the child input pipe.
-    if not CreatePipe(aInputReadPipe,           // address of variable for read handle
-                      aInputWritePipe,          // address of variable for write handle
-                      @aSecurityAttributes,     // pointer to security attributes
+    if not CreatePipe(LInputReadPipe,           // address of variable for read handle
+                      LInputWritePipe,          // address of variable for write handle
+                      @LSecurityAttributes,     // pointer to security attributes
                       0) then RaiseLastOSError; // number of bytes reserved for pipe
 
     Try
 
       // Set up the start up info struct.
-      ZeroMemory(@aStartupInfo,sizeof(TStartupInfo));
-      aStartupInfo.cb := sizeof(TStartupInfo);
-      aStartupInfo.dwFlags := STARTF_USESTDHANDLES;
-      aStartupInfo.hStdOutput := aOutputWritePipe;
-      aStartupInfo.hStdInput  := aInputReadPipe;
-      aStartupInfo.hStdError  := aOutputWritePipe;
+      ZeroMemory(@LStartupInfo,sizeof(TStartupInfo));
+      LStartupInfo.cb := sizeof(TStartupInfo);
+      LStartupInfo.dwFlags := STARTF_USESTDHANDLES;
+      LStartupInfo.hStdOutput := LOutputWritePipe;
+      LStartupInfo.hStdInput  := LInputReadPipe;
+      LStartupInfo.hStdError  := LOutputWritePipe;
 
-      if aEnvironment <> '' then aPEnvironment := PAnsiChar(aEnvironment)
-      else aPEnvironment := nil;
-      if aCurrentDirectory <> '' then aPCurrentDirectory := PAnsiChar(aCurrentDirectory)
-      else aPCurrentDirectory := nil;
+      if aEnvironment <> '' then LPEnvironment := PAnsiChar(aEnvironment)
+      else LPEnvironment := nil;
+      if aCurrentDirectory <> '' then LPCurrentDirectory := PAnsiChar(aCurrentDirectory)
+      else LPCurrentDirectory := nil;
 
       // Launch the process that you want to redirect.
       if not CreateProcessA(nil,                     // pointer to name of executable module
                             PAnsiChar(aCommandLine), // pointer to command line string
-                            @aSecurityAttributes,    // pointer to process security attributes
+                            @LSecurityAttributes,    // pointer to process security attributes
                             NiL,                     // pointer to thread security attributes
                             TrUE,                    // handle inheritance flag
                             CREATE_NO_WINDOW,        // creation flags
-                            aPEnvironment,           // pointer to new environment block
-                            aPCurrentDirectory,      // pointer to current directory name
-                            aStartupInfo,            // pointer to STARTUPINFO
-                            aProcessInformation) then RaiseLastOSError; // pointer to PROCESS_INFORMATION
+                            LPEnvironment,           // pointer to new environment block
+                            LPCurrentDirectory,      // pointer to current directory name
+                            LStartupInfo,            // pointer to STARTUPINFO
+                            LProcessInformation) then RaiseLastOSError; // pointer to PROCESS_INFORMATION
       Try
 
         InternalProcessInput;
-        while (WaitForSingleObject(aProcessInformation.hProcess, 1{to not use 100% CPU usage}) = WAIT_TIMEOUT) do begin
+        while (WaitForSingleObject(LProcessInformation.hProcess, 1{to not use 100% CPU usage}) = WAIT_TIMEOUT) do begin
           InternalProcessOutput;
           if (aOwnerThread <> nil) and (aOwnerThread.checkTerminated) then break;
         end;
         InternalProcessOutput;
-        if not GetExitCodeProcess(aProcessInformation.hProcess, Cardinal(Result)) then raiseLastOsError;
+        if not GetExitCodeProcess(LProcessInformation.hProcess, Cardinal(Result)) then raiseLastOsError;
 
       finally
-        if not CloseHandle(aProcessInformation.hThread) then raiseLastOsError;
-        if not CloseHandle(aProcessInformation.hProcess) then raiseLastOsError;
+        if not CloseHandle(LProcessInformation.hThread) then raiseLastOsError;
+        if not CloseHandle(LProcessInformation.hProcess) then raiseLastOsError;
       end;
 
     Finally
-      if not CloseHandle(aInputReadPipe) then raiseLastOsError;
-      if not CloseHandle(aInputWritePipe) then raiseLastOsError;
+      if not CloseHandle(LInputReadPipe) then raiseLastOsError;
+      if not CloseHandle(LInputWritePipe) then raiseLastOsError;
     end;
 
   Finally
-    if not CloseHandle(aOutputReadPipe) then raiseLastOsError;
-    if not CloseHandle(aOutputWritePipe) then raiseLastOsError;
+    if not CloseHandle(LOutputReadPipe) then raiseLastOsError;
+    if not CloseHandle(LOutputWritePipe) then raiseLastOsError;
   end;
 
 end;
@@ -278,39 +271,39 @@ Begin
                       aOwnerThread);
 End;
 
-{************************************************}
+{*************************************************}
 procedure ALWinExec(const aCommandLine: AnsiString;
                     const aCurrentDirectory: AnsiString);
-Var aProcessInformation: TProcessInformation;
-    aStartupInfo: TStartupInfoA;
-    aSecurityAttributes: TSecurityAttributes;
-    aPCurrentDirectory: Pointer;
+Var LProcessInformation: TProcessInformation;
+    LStartupInfo: TStartupInfoA;
+    LSecurityAttributes: TSecurityAttributes;
+    LPCurrentDirectory: Pointer;
 begin
 
   // Set up the security attributes struct.
-  aSecurityAttributes.nLength := sizeof(TSecurityAttributes);
-  aSecurityAttributes.lpSecurityDescriptor := nil;
-  aSecurityAttributes.bInheritHandle := true;
+  LSecurityAttributes.nLength := sizeof(TSecurityAttributes);
+  LSecurityAttributes.lpSecurityDescriptor := nil;
+  LSecurityAttributes.bInheritHandle := true;
 
   // Set up the start up info struct.
-  ZeroMemory(@aStartupInfo,sizeof(TStartupInfo));
-  aStartupInfo.cb := sizeof(TStartupInfo);
-  aStartupInfo.dwFlags := STARTF_USESTDHANDLES;
+  ZeroMemory(@LStartupInfo,sizeof(TStartupInfo));
+  LStartupInfo.cb := sizeof(TStartupInfo);
+  LStartupInfo.dwFlags := STARTF_USESTDHANDLES;
 
-  if aCurrentDirectory <> '' then aPCurrentDirectory := PAnsiChar(aCurrentDirectory)
-  else aPCurrentDirectory := nil;
+  if aCurrentDirectory <> '' then LPCurrentDirectory := PAnsiChar(aCurrentDirectory)
+  else LPCurrentDirectory := nil;
 
   // Launch the process
   if not CreateProcessA(nil,                     // pointer to name of executable module
                         PAnsiChar(aCommandLine), // pointer to command line string
-                        @aSecurityAttributes,    // pointer to process security attributes
+                        @LSecurityAttributes,    // pointer to process security attributes
                         nil,                     // pointer to thread security attributes
                         false,                   // handle inheritance flag
                         CREATE_NO_WINDOW,        // creation flags
                         nil,                     // pointer to new environment block
-                        aPCurrentDirectory,      // pointer to current directory name
-                        aStartupInfo,            // pointer to STARTUPINFO
-                        aProcessInformation)     // pointer to PROCESS_INFORMATION
+                        LPCurrentDirectory,      // pointer to current directory name
+                        LStartupInfo,            // pointer to STARTUPINFO
+                        LProcessInformation)     // pointer to PROCESS_INFORMATION
   then RaiseLastOSError;
 
 end;
@@ -321,14 +314,14 @@ Procedure ALWinExec(const aUserName: ANSIString;
                     const aCommandLine: ANSIString;
                     const aCurrentDirectory: AnsiString;
                     const aLogonFlags: dword = 0);
-var aStartupInfo: TStartupInfoW;
-    aProcessInformation: TProcessInformation;
-    aCommandLineW: WideString;
+var LStartupInfo: TStartupInfoW;
+    LProcessInformation: TProcessInformation;
+    LCommandLineW: WideString;
 begin
 
   // clear the startup info and set count of bytes to read
-  ZeroMemory(@aStartupInfo, SizeOf(TStartupInfoW));
-  aStartupInfo.cb := SizeOf(TStartupInfoW);
+  ZeroMemory(@LStartupInfo, SizeOf(TStartupInfoW));
+  LStartupInfo.cb := SizeOf(TStartupInfoW);
 
   // http://msdn.microsoft.com/en-us/library/windows/desktop/ms682431(v=vs.85).aspx
   // The function can modify the contents of this string. Therefore, this parameter cannot be a pointer
@@ -337,7 +330,7 @@ begin
   // ...
   // Because argv[0] is the module name, C programmers typically repeat the module name as the first
   // token in the command line.
-  aCommandLineW := String(aCommandLine);
+  LCommandLineW := String(aCommandLine);
 
   // try to create the process under specified user
   if not CreateProcessWithLogonW(PWideChar(String(aUserName)), // The name of the user.
@@ -345,15 +338,15 @@ begin
                                  PWideChar(String(aPassword)), // The clear-text password for the lpUsername account.
                                  aLogonFlags, // The logon option.
                                  nil, // The name of the module to be executed.
-                                 PWideChar(aCommandLineW), // The command line to be executed.
+                                 PWideChar(LCommandLineW), // The command line to be executed.
                                  0, // The flags that control how the process is created.
                                  nil, // a pointer to an environment block for the new process. If this parameter is NULL, the new process uses an environment created from the profile of the user specified by lpUsername.
                                  PwideChar(string(aCurrentDirectory)), // The full path to the current directory for the process.
-                                 aStartupInfo, // a pointer to a STARTUPINFO or STARTUPINFOEX structure.
-                                 aProcessInformation) // A pointer to a PROCESS_INFORMATION structure that receives identification information for the new process
+                                 LStartupInfo, // a pointer to a STARTUPINFO or STARTUPINFOEX structure.
+                                 LProcessInformation) // A pointer to a PROCESS_INFORMATION structure that receives identification information for the new process
   then raiseLastOsError;
-  CloseHandle(aProcessInformation.hProcess);
-  CloseHandle(aProcessInformation.hThread);
+  CloseHandle(LProcessInformation.hProcess);
+  CloseHandle(LProcessInformation.hThread);
 
 end;
 
@@ -395,6 +388,7 @@ begin
     CloseHandle( ProcessInfo.hProcess );
     CloseHandle( ProcessInfo.hThread );
   end;
+
 end;
 
 {******************************************************}
@@ -528,50 +522,50 @@ end;
 {Computer name could be a network name, for example \\SERVER.
  If empty this will be applied to local machine.}
 function ALStartService(const aServiceName: AnsiString; const aComputerName: AnsiString = ''; const aTimeOut: integer = 180): boolean;
-var aServiceStatus: TServiceStatus;
-    aServiceManager: SC_HANDLE;
-    aServiceInstance: SC_HANDLE;
-    aServiceArgVectors: PansiChar;
-    aStopwatch: TStopwatch;
+var LServiceStatus: TServiceStatus;
+    LServiceManager: SC_HANDLE;
+    LServiceInstance: SC_HANDLE;
+    LServiceArgVectors: PansiChar;
+    LStopwatch: TStopwatch;
 begin
   result := False;
-  aServiceManager := OpenSCManagerA(PAnsiChar(aComputerName), nil, SC_MANAGER_CONNECT);
+  LServiceManager := OpenSCManagerA(PAnsiChar(aComputerName), nil, SC_MANAGER_CONNECT);
   try
 
-    if aServiceManager > 0 then begin
+    if LServiceManager > 0 then begin
 
-      aServiceInstance := OpenServiceA(aServiceManager, PAnsiChar(aServiceName), SERVICE_START or SERVICE_QUERY_STATUS);
+      LServiceInstance := OpenServiceA(LServiceManager, PAnsiChar(aServiceName), SERVICE_START or SERVICE_QUERY_STATUS);
       try
 
-        if aServiceInstance > 0 then begin
+        if LServiceInstance > 0 then begin
 
           // NOTICE: even if this function fails we need to do the QueryServiceStatus,
           // because it could fail if the service is already running, so we don't
           // check result of this function.
-          aServiceArgVectors := nil;
-          StartServiceA(aServiceInstance, 0, aServiceArgVectors);
-          if QueryServiceStatus(aServiceInstance, aServiceStatus) then begin
+          LServiceArgVectors := nil;
+          StartServiceA(LServiceInstance, 0, LServiceArgVectors);
+          if QueryServiceStatus(LServiceInstance, LServiceStatus) then begin
 
-            aStopwatch := TStopwatch.StartNew;
-            while aServiceStatus.dwCurrentState = SERVICE_START_PENDING do begin
-              if aStopwatch.ElapsedMilliseconds > aTimeOut * 1000 then exit;
+            LStopwatch := TStopwatch.StartNew;
+            while LServiceStatus.dwCurrentState = SERVICE_START_PENDING do begin
+              if LStopwatch.ElapsedMilliseconds > aTimeOut * 1000 then exit;
               Sleep(1000); // sleep one seconds
-              if (not QueryServiceStatus(aServiceInstance, aServiceStatus)) then Exit;
+              if (not QueryServiceStatus(LServiceInstance, LServiceStatus)) then Exit;
             end;
-            result := (aServiceStatus.dwCurrentState = SERVICE_RUNNING);
+            result := (LServiceStatus.dwCurrentState = SERVICE_RUNNING);
 
           end;
 
         end;
 
       finally
-        CloseServiceHandle(aServiceInstance);
+        CloseServiceHandle(LServiceInstance);
       end;
 
     end;
 
   finally
-    CloseServiceHandle(aServiceManager);
+    CloseServiceHandle(LServiceManager);
   end;
 end;
 
@@ -579,48 +573,48 @@ end;
 {Computer name could be a network name, for example \\SERVER.
  If empty this will be applied to local machine.}
 function ALStopService(const aServiceName: AnsiString; const aComputerName: AnsiString = ''; const aTimeOut: integer = 180): boolean;
-var aServiceStatus: TServiceStatus;
-    aServiceManager: SC_HANDLE;
-    aServiceInstance: SC_HANDLE;
-    aStopwatch: TStopwatch;
+var LServiceStatus: TServiceStatus;
+    LServiceManager: SC_HANDLE;
+    LServiceInstance: SC_HANDLE;
+    LStopwatch: TStopwatch;
 begin
   result := false;
-  aServiceManager := OpenSCManagerA(PAnsiChar(aComputerName), nil, SC_MANAGER_CONNECT);
+  LServiceManager := OpenSCManagerA(PAnsiChar(aComputerName), nil, SC_MANAGER_CONNECT);
   try
 
-    if aServiceManager > 0 then begin
+    if LServiceManager > 0 then begin
 
-      aServiceInstance := OpenServiceA(aServiceManager, PAnsiChar(aServiceName), SERVICE_STOP or SERVICE_QUERY_STATUS);
+      LServiceInstance := OpenServiceA(LServiceManager, PAnsiChar(aServiceName), SERVICE_STOP or SERVICE_QUERY_STATUS);
       try
 
-        if aServiceInstance > 0 then begin
+        if LServiceInstance > 0 then begin
 
           // NOTICE: even if this function fails, we need to do QueryServiceStatus
           // because it can fail if the service is already stopped, so we don't check
           // result of this function.
-          ControlService(aServiceInstance, SERVICE_CONTROL_STOP, aServiceStatus);
-          if QueryServiceStatus(aServiceInstance, aServiceStatus) then begin
+          ControlService(LServiceInstance, SERVICE_CONTROL_STOP, LServiceStatus);
+          if QueryServiceStatus(LServiceInstance, LServiceStatus) then begin
 
-            aStopwatch := TStopwatch.StartNew;
-            while aServiceStatus.dwCurrentState = SERVICE_STOP_PENDING do begin
-              if aStopwatch.ElapsedMilliseconds > aTimeOut * 1000 then exit;
+            LStopwatch := TStopwatch.StartNew;
+            while LServiceStatus.dwCurrentState = SERVICE_STOP_PENDING do begin
+              if LStopwatch.ElapsedMilliseconds > aTimeOut * 1000 then exit;
               Sleep(1000); // sleep 1 second
-              if (not QueryServiceStatus(aServiceInstance, aServiceStatus)) then break;
+              if (not QueryServiceStatus(LServiceInstance, LServiceStatus)) then break;
             end;
-            result := (aServiceStatus.dwCurrentState = SERVICE_STOPPED);
+            result := (LServiceStatus.dwCurrentState = SERVICE_STOPPED);
 
           end;
 
         end;
 
       finally
-        CloseServiceHandle(aServiceInstance);
+        CloseServiceHandle(LServiceInstance);
       end;
 
     end;
 
   finally
-    CloseServiceHandle(aServiceManager);
+    CloseServiceHandle(LServiceManager);
   end;
 end;
 
@@ -636,43 +630,43 @@ function ALMakeServiceAutorestarting(const aServiceName: AnsiString;
                                      const aComputerName: AnsiString = '';
                                      const aTimeToRestartInSec: integer = 60 {one minute by default};
                                      const aTimeToResetInSec: integer = 180 {three minutes by default}): boolean;
-var aServiceFailureActions: SERVICE_FAILURE_ACTIONS;
-    aFailActions: array[1..1] of SC_ACTION;
-    aServiceManager: SC_HANDLE;
-    aServiceInstance: SC_HANDLE;
+var LServiceFailureActions: SERVICE_FAILURE_ACTIONS;
+    LFailActions: array[1..1] of SC_ACTION;
+    LServiceManager: SC_HANDLE;
+    LServiceInstance: SC_HANDLE;
 begin
   result := false;
-  aServiceManager := OpenSCManagerA(PAnsiChar(aComputerName), nil, SC_MANAGER_CONNECT);
+  LServiceManager := OpenSCManagerA(PAnsiChar(aComputerName), nil, SC_MANAGER_CONNECT);
   try
 
-    if aServiceManager > 0 then begin
+    if LServiceManager > 0 then begin
 
-      aServiceInstance := OpenServiceA(aServiceManager, PAnsiChar(aServiceName), SERVICE_ALL_ACCESS);
+      LServiceInstance := OpenServiceA(LServiceManager, PAnsiChar(aServiceName), SERVICE_ALL_ACCESS);
       try
 
-        if aServiceInstance > 0 then begin
+        if LServiceInstance > 0 then begin
 
-          aFailActions[1].&Type := SC_ACTION_RESTART;
-          aFailActions[1].Delay := aTimeToRestartInSec * 1000; // must be in milliseconds
+          LFailActions[1].&Type := SC_ACTION_RESTART;
+          LFailActions[1].Delay := aTimeToRestartInSec * 1000; // must be in milliseconds
 
-          aServiceFailureActions.dwResetPeriod := aTimeToResetInSec;  // must be in seconds, so don't need to do x1000
-          aServiceFailureActions.cActions      := 1;
-          aServiceFailureActions.lpRebootMsg   := nil;
-          aServiceFailureActions.lpCommand     := nil;
-          aServiceFailureActions.lpsaActions   := @aFailActions;
+          LServiceFailureActions.dwResetPeriod := aTimeToResetInSec;  // must be in seconds, so don't need to do x1000
+          LServiceFailureActions.cActions      := 1;
+          LServiceFailureActions.lpRebootMsg   := nil;
+          LServiceFailureActions.lpCommand     := nil;
+          LServiceFailureActions.lpsaActions   := @LFailActions;
 
-          result := ChangeServiceConfig2(aServiceInstance, SERVICE_CONFIG_FAILURE_ACTIONS, @aServiceFailureActions);
+          result := ChangeServiceConfig2(LServiceInstance, SERVICE_CONFIG_FAILURE_ACTIONS, @LServiceFailureActions);
 
         end;
 
       finally
-        CloseServiceHandle(aServiceInstance);
+        CloseServiceHandle(LServiceInstance);
       end;
 
     end;
 
   finally
-    CloseServiceHandle(aServiceManager);
+    CloseServiceHandle(LServiceManager);
   end;
 end;
 

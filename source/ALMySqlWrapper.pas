@@ -1,28 +1,21 @@
-{*************************************************************
-Author(s):    Sergey Seroukhov (Zeos Database Objects)
-              based on Mysql-direct library by Cristian Nicola
-Description:  MysQL libmysql.dll Version 5 API Interface Unit
+{*******************************************************************************
+Author(s):
+Sergey Seroukhov (Zeos Database Objects)
+based on Mysql-direct library by Cristian Nicola
 
-Link :        http://www.sourceforge.net/projects/zeoslib
-              http://dev.mysql.com/doc/refman/5.0/en/c-api-functions.html
-**************************************************************}
+MysQL libmysql.dll Version 5 API Interface Unit
+
+Link :
+http://www.sourceforge.net/projects/zeoslib
+http://dev.mysql.com/doc/refman/5.0/en/c-api-functions.html
+*******************************************************************************}
 
 unit ALMySqlWrapper;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
-Uses Winapi.Windows;
-
-{$IF CompilerVersion < 18.5}
-  // from http://stackoverflow.com/questions/6378107/how-to-define-an-unsigned-64-bit-integer-in-delphi7
-  // their is no way in delphi 7 to have an uint64 (unsigned int64)
-  // but i think we not really need an unsigned INT64 and just an int64 will be enalf
- type uLongLong = LongLong;
-{$IFEND}
+Uses
+  Winapi.Windows;
 
 const
 
@@ -675,7 +668,8 @@ TMYSQL_CLIENT_OPTIONS =
 
 implementation
 
-Uses System.sysutils;
+Uses
+  System.sysutils;
 
 {**************************************************************}
 constructor TALMySqlLibrary.Create(ApiVer: TALMySqlVersion_API);

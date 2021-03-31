@@ -2,11 +2,12 @@ unit ALAndroidFirebaseApi;
 
 interface
 
-uses Androidapi.JNIBridge,
-     Androidapi.JNI.GraphicsContentViewText,
-     Androidapi.JNI.JavaTypes,
-     Androidapi.JNI.App,
-     Androidapi.JNI.Os;
+uses
+  Androidapi.JNIBridge,
+  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNI.JavaTypes,
+  Androidapi.JNI.App,
+  Androidapi.JNI.Os;
 
 type
 

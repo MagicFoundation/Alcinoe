@@ -1,30 +1,27 @@
-{*************************************************************
-product:      ALSMTPClient
-Description:  TALsmtpClient class implements the SMTP protocol (RFC-821)
-              Support file attachement using MIME format (RFC-1521, RFC-2045)
-              Support authentification (RFC-2104)
+{*******************************************************************************
+TALsmtpClient class implements the SMTP protocol (RFC-821)
+Support file attachement using MIME format (RFC-1521, RFC-2045)
+Support authentification (RFC-2104)
 
-Link :        http://linuxgazette.net/issue45/stumpel.html
-              http://www.overbyte.be
-              http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winsock/winsock/socket_options.asp
-              http://www.fehcom.de/qmail/smtpauth.html
-              http://www.freesoft.org/CIE/RFC/821/
-              http://www.expita.com/header1.html
-              http://cr.yp.to/immhf.html
-**************************************************************}
+Link :
+http://linuxgazette.net/issue45/stumpel.html
+http://www.overbyte.be
+http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winsock/winsock/socket_options.asp
+http://www.fehcom.de/qmail/smtpauth.html
+http://www.freesoft.org/CIE/RFC/821/
+http://www.expita.com/header1.html
+http://cr.yp.to/immhf.html
+*******************************************************************************}
 
 unit ALSMTPClient;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
-Uses Winapi.WinSock2,
-     ALStringList,
-     ALInternetMessages,
-     ALMultiPartParser;
+Uses
+  Winapi.WinSock2,
+  ALStringList,
+  ALInternetMessages,
+  ALMultiPartParser;
 
 type
 
@@ -111,18 +108,19 @@ type
 
 implementation
 
-Uses Winapi.Windows,
-     System.Classes,
-     System.SysUtils,
-     ALWinsock,
-     ALCommon,
-     ALString;
+Uses
+  Winapi.Windows,
+  System.Classes,
+  System.SysUtils,
+  ALWinsock,
+  ALCommon,
+  ALString;
 
 {*******************************}
 constructor TAlSmtpClient.Create;
-var aWSAData: TWSAData;
+var LWSAData: TWSAData;
 begin
-  CheckError(WSAStartup(MAKEWORD(2,2), aWSAData) <> 0);
+  CheckError(WSAStartup(MAKEWORD(2,2), LWSAData) <> 0);
   Fconnected:= False;
   FSocketDescriptor:= INVALID_SOCKET;
   FAuthTypesSupported:= [];
@@ -294,12 +292,12 @@ Function TAlSmtpClient.Auth(const AUserName, APassword: AnsiString; aAuthType: T
 
   {--------------------------------}
   Function _DoAuthPlain: AnsiString;
-  var aAuthPlain : AnsiString;
+  var LAuthPlain : AnsiString;
   begin
     If aUserName='' then raise EALException.Create('UserName is empty');
     If aPassword='' then raise EALException.Create('Password is empty');
-    aAuthPlain := ALBase64EncodeString(aUserName + #0 + aUserName + #0 + aPassword);
-    Result := SendCmd('AUTH PLAIN ' + aAuthPlain,[235]);
+    LAuthPlain := ALBase64EncodeString(aUserName + #0 + aUserName + #0 + aPassword);
+    Result := SendCmd('AUTH PLAIN ' + LAuthPlain,[235]);
   end;
 
   {--------------------------------}
@@ -339,15 +337,15 @@ end;
 {This command is used to identify an individual recipient of the mail data;
  multiple recipients are specified by multiple use of this command.}
 Function TAlSmtpClient.RcptTo(aRcptNameLst: TALStrings): AnsiString;
-Var i: integer;
-    aRcptNameValue: AnsiString;
+Var I: integer;
+    LRcptNameValue: AnsiString;
 begin
   Result := '';
   if aRcptNameLst.Count <= 0 then raise EALException.Create('RcptName list is empty');
-  For i := 0 to aRcptNameLst.Count - 1 do begin
-    aRcptNameValue := ALTrim(aRcptNameLst[i]);
-    If (aRcptNameValue = '') or (AlPos(#13#10,aRcptNameValue) > 0) then raise EALException.Create('Bad entry in RcptName list');
-    Result := Result + SendCmd('RCPT To:<'+aRcptNameValue+'>',[250, 251]) + #13#10;
+  For I := 0 to aRcptNameLst.Count - 1 do begin
+    LRcptNameValue := ALTrim(aRcptNameLst[I]);
+    If (LRcptNameValue = '') or (AlPos(#13#10,LRcptNameValue) > 0) then raise EALException.Create('Bad entry in RcptName list');
+    Result := Result + SendCmd('RCPT To:<'+LRcptNameValue+'>',[250, 251]) + #13#10;
   end;
   If result <> '' then delete(Result,Length(Result)-1,2);
 end;
@@ -382,19 +380,19 @@ end;
  to get the message, or separate notification messages must be sent for each failed recipient. All undeliverable mail
  notification messages are sent using the MAIL command (even if they result from processing a SEND, SOML, or SAML command).}
 Function TAlSmtpClient.Data(const aMailData: AnsiString): AnsiString;
-Var aTmpMailData: AnsiString;
+Var LTmpMailData: AnsiString;
     I : Integer;
 begin
   SendCmd('DATA',[354]);
 
   i := 2;
-  aTmpMailData := aMailData;
-  while i <= Length(aTmpMailData) Do begin
-    If (aTmpMailData[i] = '.') and (aTmpMailData[i-1] = #10) and (aTmpMailData[i-2] = #13) then Insert('.',aTmpMailData,i);
+  LTmpMailData := aMailData;
+  while i <= Length(LTmpMailData) Do begin
+    If (LTmpMailData[i] = '.') and (LTmpMailData[i-1] = #10) and (LTmpMailData[i-2] = #13) then Insert('.',LTmpMailData,i);
     inc(i);
   end;
 
-  Result := SendCmd(aTmpMailData + #13#10'.'#13#10,[250]);
+  Result := SendCmd(LTmpMailData + #13#10'.'#13#10,[250]);
 end;
 
 {************************************************************************}
@@ -413,15 +411,15 @@ end;
 Function TAlSmtpClient.DataMultipartMixed(aHeader: TALEmailHeader;
                                           const aInlineText, aInlineTextContentType: AnsiString;
                                           aAttachments: TALMultiPartMixedContents): AnsiString;
-Var aMultipartMixedEncoder: TALMultipartMixedEncoder;
+Var LMultipartMixedEncoder: TALMultipartMixedEncoder;
     Str: AnsiString;
 begin
-  aMultipartMixedEncoder := TALMultipartMixedEncoder.create;
+  LMultipartMixedEncoder := TALMultipartMixedEncoder.create;
   try
-    aMultipartMixedEncoder.Encode(aInlineText,
+    LMultipartMixedEncoder.Encode(aInlineText,
                                   aInlineTextContentType,
                                   aAttachments);
-    with aMultipartMixedEncoder do begin
+    with LMultipartMixedEncoder do begin
       aHeader.ContentType := 'multipart/mixed; boundary="' + DataStream.Boundary + '"';
       SetLength(Str,DataStream.size);
       DataStream.Position := 0;
@@ -429,7 +427,7 @@ begin
     end;
     Result := Data(aHeader.RawHeaderText, Str);
   finally
-    aMultipartMixedEncoder.free;
+    LMultipartMixedEncoder.free;
   end;
 end;
 
@@ -654,62 +652,62 @@ function TAlSmtpClient.GetResponse(const OkResponses: array of Word): AnsiString
     if bSign then Number := -Number;
   end;
 
-Var aBuffStr: AnsiString;
-    aBuffStrLength: Integer;
-    aResponseLength: Integer;
-    aResponse: AnsiString;
-    aStatusCode: Integer;
-    aGoodResponse: Boolean;
-    ALst : TALStringList;
+Var LBuffStr: AnsiString;
+    LBuffStrLength: Integer;
+    LResponseLength: Integer;
+    LResponse: AnsiString;
+    LStatusCode: Integer;
+    LGoodResponse: Boolean;
+    LLst : TALStringList;
     P: PAnsiChar;
     i, j: integer;
 
 begin
   Result := '';
-  Setlength(aBuffStr,512); //The maximum total length of a reply line including the reply code and the <CRLF> is 512 characters. (http://www.freesoft.org/CIE/RFC/821/24.htm)
+  Setlength(LBuffStr,512); //The maximum total length of a reply line including the reply code and the <CRLF> is 512 characters. (http://www.freesoft.org/CIE/RFC/821/24.htm)
   While true do begin
 
     {Read the response from the socket - end of the response is show by <CRLF>}
-    aResponse := '';
+    LResponse := '';
     While True do begin
-      aBuffStrLength := SocketRead(pointer(aBuffStr)^, length(aBuffStr));
-      If aBuffStrLength <= 0 then raise EALException.Create('Connection close gracefully!');
-      aResponse := AResponse + AlCopyStr(aBuffStr,1,aBuffStrLength);
-      aResponseLength := length(aResponse);
-      If (aResponseLength > 1) and
-         (aResponse[aResponseLength] = #10) and
-         (aResponse[aResponseLength - 1] = #13) then Break;
+      LBuffStrLength := SocketRead(pointer(LBuffStr)^, length(LBuffStr));
+      If LBuffStrLength <= 0 then raise EALException.Create('Connection close gracefully!');
+      LResponse := LResponse + AlCopyStr(LBuffStr,1,LBuffStrLength);
+      LResponseLength := length(LResponse);
+      If (LResponseLength > 1) and
+         (LResponse[LResponseLength] = #10) and
+         (LResponse[LResponseLength - 1] = #13) then Break;
     end;
-    Result := Result + aResponse;
+    Result := Result + LResponse;
 
     {The format for multiline replies requires that every line, except the last,
      begin with the reply code, followed immediately by a hyphen, "-" (also known as minus),
      followed by text. The last line will begin with the reply code, followed immediately
      by <SP>, optionally some text, and <CRLF>.}
-    ALst := TALStringList.create;
+    LLst := TALStringList.create;
     Try
-      Alst.Text := aResponse;
-      If Alst.count = 0 then raise EALException.Create('Emtpy response');
-      For j := 0 to Alst.count - 1 do begin
+      LLst.Text := LResponse;
+      If LLst.count = 0 then raise EALException.Create('Emtpy response');
+      For j := 0 to LLst.count - 1 do begin
 
-        aResponse := Alst[j];
-        p := _GetInteger(@aResponse[1], aStatusCode);
-        aGoodResponse := False;
+        LResponse := LLst[j];
+        p := _GetInteger(@LResponse[1], LStatusCode);
+        LGoodResponse := False;
         for I := 0 to High(OkResponses) do
-          if OkResponses[I] = aStatusCode then begin
-            aGoodResponse := True;
+          if OkResponses[I] = LStatusCode then begin
+            LGoodResponse := True;
             Break;
           end;
 
-        If not aGoodResponse then Raise EALException.Create(aResponse);
+        If not LGoodResponse then Raise EALException.Create(LResponse);
         if p^ <> '-' then Begin
-          If J <> Alst.count - 1 then Raise EALException.Create(aResponse);
+          If J <> LLst.count - 1 then Raise EALException.Create(LResponse);
           Exit;
         end;
 
       end;
     Finally
-      ALst.Free;
+      LLst.Free;
     end;
 
   end;
@@ -746,32 +744,32 @@ end;
 {*******************************************************************************************************************}
 // http://blogs.technet.com/b/nettracer/archive/2010/06/03/things-that-you-may-want-to-know-about-tcp-keepalives.aspx
 procedure TAlSmtpClient.SetKeepAlive(const Value: boolean);
-var aIntBool: integer;
+var LIntBool: integer;
 begin
   FKeepAlive := Value;
   if FConnected then begin
     // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
     // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
     // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
-    if FKeepAlive then aIntBool := 1
-    else aIntBool := 0;
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_KEEPALIVE,PAnsiChar(@aIntBool),SizeOf(aIntBool))=SOCKET_ERROR);
+    if FKeepAlive then LIntBool := 1
+    else LIntBool := 0;
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_KEEPALIVE,PAnsiChar(@LIntBool),SizeOf(LIntBool))=SOCKET_ERROR);
   end;
 end;
 
 {***************************************************************************************************************************************************************************************************************}
 // https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_MRG/1.1/html/Realtime_Tuning_Guide/sect-Realtime_Tuning_Guide-Application_Tuning_and_Deployment-TCP_NODELAY_and_Small_Buffer_Writes.html
 procedure TAlSmtpClient.SetTCPNoDelay(const Value: boolean);
-var aIntBool: integer;
+var LIntBool: integer;
 begin
   fTCPNoDelay := Value;
   if FConnected then begin
     // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
     // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
     // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
-    if fTCPNoDelay then aIntBool := 1
-    else aIntBool := 0;
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,TCP_NODELAY,PAnsiChar(@aIntBool),SizeOf(aIntBool))=SOCKET_ERROR);
+    if fTCPNoDelay then LIntBool := 1
+    else LIntBool := 0;
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,TCP_NODELAY,PAnsiChar(@LIntBool),SizeOf(LIntBool))=SOCKET_ERROR);
   end;
 end;
 

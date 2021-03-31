@@ -1,8 +1,8 @@
-{*****************************************************
+{*******************************************************************************
 This unit was (originaly) inspired by
 https://blog.grijjy.com/2017/01/23/using-facebook-sdk-native-framework-for-ios-and-android-for-social-login-and-more-part-1/
 https://blog.grijjy.com/2017/01/30/embed-facebook-sdk-for-android-in-your-delphi-mobile-app-part-2/
-*****************************************************}
+*******************************************************************************}
 
 unit ALFacebook;
 
@@ -158,6 +158,8 @@ uses
   FMX.Helpers.Android,
   {$ELSEIF defined(IOS)}
   Macapi.Helpers,
+  iOSapi.Helpers,
+  FMX.Platform,
   FMX.Platform.iOS,
   {$ENDIF}
   ALFmxCommon,
@@ -262,14 +264,14 @@ procedure TALFacebookLogin.logInWithReadPermissions(const APermissions: TArray<S
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
-  var aArrayList: JArrayList;
-      aCollection: JCollection;
+  var LArrayList: JArrayList;
+      LCollection: JCollection;
   {$ENDIF}
   {$ENDREGION}
 
   {$REGION ' IOS'}
   {$IF defined(IOS)}
-  var ANSPermissions: NSArray;
+  var LNSPermissions: NSArray;
   {$ENDIF}
   {$ENDREGION}
 
@@ -278,9 +280,9 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  aArrayList := ALStringsToJArrayList(APermissions);
-  aCollection := TJCollection.Wrap((aArrayList as ILocalObject).GetObjectID);
-  TJloginManager.JavaClass.getInstance.logInWithReadPermissions(TAndroidHelper.Activity, aCollection);
+  LArrayList := ALStringsToJArrayList(APermissions);
+  LCollection := TJCollection.Wrap((LArrayList as ILocalObject).GetObjectID);
+  TJloginManager.JavaClass.getInstance.logInWithReadPermissions(TAndroidHelper.Activity, LCollection);
 
   {$ENDIF}
   {$ENDREGION}
@@ -288,11 +290,11 @@ begin
   {$REGION ' IOS'}
   {$IF defined(IOS)}
 
-  ANSPermissions := ALStringsToNSArray(APermissions);
+  LNSPermissions := ALStringsToNSArray(APermissions);
   try
-    FLoginManager.logInWithPermissions(ANSPermissions, nil, logInWithPermissionsHandler);
+    FLoginManager.logInWithPermissions(LNSPermissions, nil, logInWithPermissionsHandler);
   finally
-    ANSPermissions.release;
+    LNSPermissions.release;
   end;
 
   {$ENDIF}
@@ -327,13 +329,13 @@ function TALFacebookLogin.CurrentToken: String;
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
-  var aToken: JAccessToken;
+  var LToken: JAccessToken;
   {$ENDIF}
   {$ENDREGION}
 
   {$REGION ' IOS'}
   {$IF defined(ios)}
-  var aToken: FBSDKAccessToken;
+  var LToken: FBSDKAccessToken;
   {$ENDIF}
   {$ENDREGION}
 
@@ -342,9 +344,9 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-    aToken := TJAccessToken.JavaClass.getCurrentAccessToken;
-    if aToken = nil then Result := ''
-    else Result := JStringToString(aToken.GetToken);
+    LToken := TJAccessToken.JavaClass.getCurrentAccessToken;
+    if LToken = nil then Result := ''
+    else Result := JStringToString(LToken.GetToken);
 
   {$ENDIF}
   {$ENDREGION}
@@ -352,9 +354,9 @@ begin
   {$REGION ' IOS'}
   {$IF defined(IOS)}
 
-    aToken := TFBSDKAccessToken.OCClass.currentAccessToken;
-    if aToken = nil then result := ''
-    else result := NSStrToStr(aToken.tokenString);
+    LToken := TFBSDKAccessToken.OCClass.currentAccessToken;
+    if LToken = nil then result := ''
+    else result := NSStrToStr(LToken.tokenString);
 
   {$ENDIF}
   {$ENDREGION}
@@ -366,13 +368,13 @@ function TALFacebookLogin.CurrentUserId: String;
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
-  var aToken: JAccessToken;
+  var LToken: JAccessToken;
   {$ENDIF}
   {$ENDREGION}
 
   {$REGION ' IOS'}
   {$IF defined(ios)}
-  var aToken: FBSDKAccessToken;
+  var LToken: FBSDKAccessToken;
   {$ENDIF}
   {$ENDREGION}
 
@@ -381,9 +383,9 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-    aToken := TJAccessToken.JavaClass.getCurrentAccessToken;
-    if aToken = nil then Result := ''
-    else Result := JStringToString(aToken.getUserId);
+    LToken := TJAccessToken.JavaClass.getCurrentAccessToken;
+    if LToken = nil then Result := ''
+    else Result := JStringToString(LToken.getUserId);
 
   {$ENDIF}
   {$ENDREGION}
@@ -391,9 +393,9 @@ begin
   {$REGION ' IOS'}
   {$IF defined(IOS)}
 
-    aToken := TFBSDKAccessToken.OCClass.currentAccessToken;
-    if aToken = nil then result := ''
-    else result := NSStrToStr(aToken.userID)
+    LToken := TFBSDKAccessToken.OCClass.currentAccessToken;
+    if LToken = nil then result := ''
+    else result := NSStrToStr(LToken.userID)
 
   {$ENDIF}
   {$ENDREGION}
@@ -405,13 +407,13 @@ function TALFacebookLogin.CurrentGrantedPermissions: TArray<String>;
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
-  var aToken: JAccessToken;
+  var LToken: JAccessToken;
   {$ENDIF}
   {$ENDREGION}
 
   {$REGION ' IOS'}
   {$IF defined(ios)}
-  var aToken: FBSDKAccessToken;
+  var LToken: FBSDKAccessToken;
   {$ENDIF}
   {$ENDREGION}
 
@@ -420,9 +422,9 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-    aToken := TJAccessToken.JavaClass.getCurrentAccessToken;
-    if aToken = nil then setlength(Result, 0)
-    else Result := ALJsetToStrings(aToken.getPermissions);
+    LToken := TJAccessToken.JavaClass.getCurrentAccessToken;
+    if LToken = nil then setlength(Result, 0)
+    else Result := ALJsetToStrings(LToken.getPermissions);
 
   {$ENDIF}
   {$ENDREGION}
@@ -430,9 +432,9 @@ begin
   {$REGION ' IOS'}
   {$IF defined(IOS)}
 
-    aToken := TFBSDKAccessToken.OCClass.currentAccessToken;
-    if aToken = nil then setlength(result, 0)
-    else result := ALNSSetToStrings(aToken.permissions);
+    LToken := TFBSDKAccessToken.OCClass.currentAccessToken;
+    if LToken = nil then setlength(result, 0)
+    else result := ALNSSetToStrings(LToken.permissions);
 
   {$ENDIF}
   {$ENDREGION}
@@ -444,13 +446,13 @@ function TALFacebookLogin.CurrentDeniedPermissions: TArray<String>;
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
-  var aToken: JAccessToken;
+  var LToken: JAccessToken;
   {$ENDIF}
   {$ENDREGION}
 
   {$REGION ' IOS'}
   {$IF defined(ios)}
-  var aToken: FBSDKAccessToken;
+  var LToken: FBSDKAccessToken;
   {$ENDIF}
   {$ENDREGION}
 
@@ -459,9 +461,9 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-    aToken := TJAccessToken.JavaClass.getCurrentAccessToken;
-    if aToken = nil then setlength(Result, 0)
-    else Result := ALJsetToStrings(aToken.getDeclinedPermissions);
+    LToken := TJAccessToken.JavaClass.getCurrentAccessToken;
+    if LToken = nil then setlength(Result, 0)
+    else Result := ALJsetToStrings(LToken.getDeclinedPermissions);
 
   {$ENDIF}
   {$ENDREGION}
@@ -469,9 +471,9 @@ begin
   {$REGION ' IOS'}
   {$IF defined(IOS)}
 
-    aToken := TFBSDKAccessToken.OCClass.currentAccessToken;
-    if aToken = nil then setlength(result, 0)
-    else result := ALNSSetToStrings(aToken.declinedPermissions)
+    LToken := TFBSDKAccessToken.OCClass.currentAccessToken;
+    if LToken = nil then setlength(result, 0)
+    else result := ALNSSetToStrings(LToken.declinedPermissions)
 
   {$ENDIF}
   {$ENDREGION}
@@ -526,18 +528,18 @@ end;
 //onError(FacebookException)
 //Called when the dialog finishes with an error.
 procedure TALFacebookLogin.TLoginCallback.onError(error: JFacebookException);
-var aErrorMsg: String;
+var LErrorMsg: String;
 begin
 
-  if error <> nil then aErrorMsg := JStringToString(error.toString)
-  else aErrorMsg := '';
+  if error <> nil then LErrorMsg := JStringToString(error.toString)
+  else LErrorMsg := '';
   {$IFDEF DEBUG}
-  allog('TALFacebookLogin.TLoginCallback.onError', 'Error: ' + aErrorMsg +
+  allog('TALFacebookLogin.TLoginCallback.onError', 'Error: ' + LErrorMsg +
                                                    ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
   {$ENDIF}
 
   if assigned(fFacebookLogin.fOnError) then
-    fFacebookLogin.fOnError(aErrorMsg{aMsg});
+    fFacebookLogin.fOnError(LErrorMsg{aMsg});
 
 end;
 
@@ -548,36 +550,36 @@ end;
 // * MessageDialog is used.
 // * The logged in Facebook user has not authorized the app that has initiated the dialog.
 procedure TALFacebookLogin.TLoginCallback.onSuccess(result: JObject);
-var aLoginResult: JLoginResult;
-    aToken: JAccessToken;
-    aTokenStr: String;
-    aUserIDStr: String;
-    aGrantedPermissions: TArray<String>;
-    aDeniedPermissions: TArray<String>;
+var LLoginResult: JLoginResult;
+    LToken: JAccessToken;
+    LTokenStr: String;
+    LUserIDStr: String;
+    LGrantedPermissions: TArray<String>;
+    LDeniedPermissions: TArray<String>;
 begin
 
-  aLoginResult := TJLoginResult.Wrap((result as ILocalObject).GetObjectID);
-  aToken := aLoginResult.getAccessToken;
-  if aToken <> nil then begin
-    aUserIDStr := JStringToString(aToken.getUserId);
-    aTokenStr := JStringToString(aToken.getToken);
-    aGrantedPermissions := ALJSetToStrings(aToken.getPermissions);
-    aDeniedPermissions := ALJSetToStrings(aToken.getDeclinedPermissions);
+  LLoginResult := TJLoginResult.Wrap((result as ILocalObject).GetObjectID);
+  LToken := LLoginResult.getAccessToken;
+  if LToken <> nil then begin
+    LUserIDStr := JStringToString(LToken.getUserId);
+    LTokenStr := JStringToString(LToken.getToken);
+    LGrantedPermissions := ALJSetToStrings(LToken.getPermissions);
+    LDeniedPermissions := ALJSetToStrings(LToken.getDeclinedPermissions);
   end
   else begin
-    aUserIDStr := '';
-    aTokenStr := '';
-    setlength(aGrantedPermissions, 0);
-    setlength(aDeniedPermissions, 0);
+    LUserIDStr := '';
+    LTokenStr := '';
+    setlength(LGrantedPermissions, 0);
+    setlength(LDeniedPermissions, 0);
   end;
   {$IFDEF DEBUG}
-  allog('TALFacebookLogin.TLoginCallback.onSuccess', 'UserID: ' + aUserIDStr +
-                                                     ' - Token: ' + aTokenStr +
+  allog('TALFacebookLogin.TLoginCallback.onSuccess', 'UserID: ' + LUserIDStr +
+                                                     ' - Token: ' + LTokenStr +
                                                      ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.info);
   {$ENDIF}
 
   if assigned(fFacebookLogin.fOnsuccess) then
-    fFacebookLogin.fOnsuccess(aUserIDStr, aTokenStr, aGrantedPermissions, aDeniedPermissions);
+    fFacebookLogin.fOnsuccess(LUserIDStr, LTokenStr, LGrantedPermissions, LDeniedPermissions);
 
 end;
 
@@ -589,11 +591,11 @@ end;
 
 {***********************************************************************************************************}
 procedure TALFacebookLogin.logInWithPermissionsHandler(result: FBSDKLoginManagerLoginResult; error: NSError);
-var aToken: FBSDKAccessToken;
-    aTokenStr: String;
-    aUserIDStr: String;
-    aGrantedPermissions: TArray<String>;
-    aDeniedPermissions: TArray<String>;
+var LToken: FBSDKAccessToken;
+    LTokenStr: String;
+    LUserIDStr: String;
+    LGrantedPermissions: TArray<String>;
+    LDeniedPermissions: TArray<String>;
 begin
 
   //ERROR
@@ -627,28 +629,28 @@ begin
   //SUCCESS
   else begin
 
-    aToken := result.token;
-    if aToken <> nil then begin
-      aUserIDStr := NSStrToStr(aToken.UserId);
-      aTokenStr := NSStrToStr(aToken.TokenString);
-      aGrantedPermissions := ALNSSetToStrings(aToken.Permissions);
-      aDeniedPermissions := ALNSSetToStrings(aToken.DeclinedPermissions);
+    LToken := result.token;
+    if LToken <> nil then begin
+      LUserIDStr := NSStrToStr(LToken.UserId);
+      LTokenStr := NSStrToStr(LToken.TokenString);
+      LGrantedPermissions := ALNSSetToStrings(LToken.Permissions);
+      LDeniedPermissions := ALNSSetToStrings(LToken.DeclinedPermissions);
     end
     else begin
-      aUserIDStr := '';
-      aTokenStr := '';
-      setlength(aGrantedPermissions, 0);
-      setlength(aDeniedPermissions, 0);
+      LUserIDStr := '';
+      LTokenStr := '';
+      setlength(LGrantedPermissions, 0);
+      setlength(LDeniedPermissions, 0);
     end;
 
     {$IFDEF DEBUG}
-    allog('TALFacebookLogin.logInWithReadPermissionsHandler.onSuccess', 'UserID: ' + aUserIDStr +
-                                                                        ' - Token: ' + aTokenStr +
+    allog('TALFacebookLogin.logInWithReadPermissionsHandler.onSuccess', 'UserID: ' + LUserIDStr +
+                                                                        ' - Token: ' + LTokenStr +
                                                                         ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.info);
     {$ENDIF}
 
     if assigned(fOnsuccess) then
-      fOnsuccess(aUserIDStr, aTokenStr, aGrantedPermissions, aDeniedPermissions);
+      fOnsuccess(LUserIDStr, LTokenStr, LGrantedPermissions, LDeniedPermissions);
 
   end;
 
@@ -719,21 +721,21 @@ procedure TALFacebookGraphRequest.Request(const aGraphPath: String; aParameters:
 
   {$REGION ' IOS'}
   {$IF defined(IOS)}
-  var aGraphRequest: FBSDKGraphRequest;
-      aNSDictParameters: NSMutableDictionary;
-      aName, aValue: String;
-      i : integer;
+  var LGraphRequest: FBSDKGraphRequest;
+      LNSDictParameters: NSMutableDictionary;
+      LName, LValue: String;
+      I: integer;
   {$ENDIF}
   {$ENDREGION}
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
-  var aBundle: JBundle;
-      aName, aValue: String;
-      aJName, aJValue: JString;
-      aGraphRequest: JGraphRequest;
-      aJHttpMethod: JHttpMethod;
-      i : integer;
+  var LBundle: JBundle;
+      LName, LValue: String;
+      LJName, LJValue: JString;
+      LGraphRequest: JGraphRequest;
+      LJHttpMethod: JHttpMethod;
+      I: integer;
   {$ENDIF}
   {$ENDREGION}
 
@@ -742,19 +744,19 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  aBundle := TJBundle.JavaClass.init;
+  LBundle := TJBundle.JavaClass.init;
   for i := Low(aparameters) to High(aparameters) do begin
-    _ExtractNameValue(aparameters[i], aName, aValue);
-    aJName := StringToJstring(aName);
-    aJValue := StringToJstring(aValue);
-    aBundle.putString(aJName, aJValue);
-    aJName := nil;  // << because of
-    aJValue := nil; // << https://quality.embarcadero.com/browse/RSP-14187
+    _ExtractNameValue(aparameters[i], LName, LValue);
+    LJName := StringToJstring(LName);
+    LJValue := StringToJstring(LValue);
+    LBundle.putString(LJName, LJValue);
+    LJName := nil;  // << because of
+    LJValue := nil; // << https://quality.embarcadero.com/browse/RSP-14187
   end;
-  if AlSameTextU(aHttpMethod, 'POST') then aJHttpMethod := TJHttpMethod.JavaClass.POST
-  else aJHttpMethod := TJHttpMethod.JavaClass.GET;
-  aGraphRequest := TJGraphRequest.JavaClass.init(TJAccessToken.JavaClass.getCurrentAccessToken, StringToJstring(aGraphPath), aBundle, aJHttpMethod, FGraphRequestCallback);
-  aGraphRequest.executeAsync;
+  if AlSameTextU(aHttpMethod, 'POST') then LJHttpMethod := TJHttpMethod.JavaClass.POST
+  else LJHttpMethod := TJHttpMethod.JavaClass.GET;
+  LGraphRequest := TJGraphRequest.JavaClass.init(TJAccessToken.JavaClass.getCurrentAccessToken, StringToJstring(aGraphPath), LBundle, LJHttpMethod, FGraphRequestCallback);
+  LGraphRequest.executeAsync;
 
   {$ENDIF}
   {$ENDREGION}
@@ -762,20 +764,20 @@ begin
   {$REGION ' IOS'}
   {$IF defined(IOS)}
 
-  aNSDictParameters := TNSMutableDictionary.Create;
+  LNSDictParameters := TNSMutableDictionary.Create;
   try
     for i := Low(aparameters) to High(aparameters) do begin
-      _ExtractNameValue(aparameters[i], aName, aValue);
-      aNSDictParameters.setValue(StringToID(aName), StrToNsStr(aValue));
+      _ExtractNameValue(aparameters[i], LName, LValue);
+      LNSDictParameters.setValue(StringToID(LName), StrToNsStr(LValue));
     end;
-    aGraphRequest := TFBSDKGraphRequest.Wrap(TFBSDKGraphRequest.Alloc.initWithGraphPathParametersHTTPMethod(StrToNSStr(aGraphPath), // graphPath: NSString;
-                                                                                                            aNSDictParameters, // parameters: NSDictionary;
+    LGraphRequest := TFBSDKGraphRequest.Wrap(TFBSDKGraphRequest.Alloc.initWithGraphPathParametersHTTPMethod(StrToNSStr(aGraphPath), // graphPath: NSString;
+                                                                                                            LNSDictParameters, // parameters: NSDictionary;
                                                                                                             StrToNSStr(aHTTPMethod)));//HTTPMethod: NSString
   finally
-    aNSDictParameters.release;
+    LNSDictParameters.release;
   end;
-  aGraphRequest.startWithCompletionHandler(GraphRequestCompletionHandler);
-  aGraphRequest.release; // https://stackoverflow.com/questions/44176681/delphi-ios-release-retain-and-reference-counting-with-objective-c-object
+  LGraphRequest.startWithCompletionHandler(GraphRequestCompletionHandler);
+  LGraphRequest.release; // https://stackoverflow.com/questions/44176681/delphi-ios-release-retain-and-reference-counting-with-objective-c-object
 
   {$ENDIF}
   {$ENDREGION}
@@ -795,30 +797,30 @@ end;
 {*****************************************************}
 //when their is an error, it's return an empty response
 procedure TALFacebookGraphRequest.TGraphRequestCallback.onCompleted(response: JGraphResponse);
-var aRawResponse: String;
-    aErrorCode: Integer;
-    aErrorMsg: String;
+var LRawResponse: String;
+    LErrorCode: Integer;
+    LErrorMsg: String;
 begin
 
-  aRawResponse := '';
-  aErrorCode := 0;
-  aErrorMsg := '';
+  LRawResponse := '';
+  LErrorCode := 0;
+  LErrorMsg := '';
   if response <> nil then begin
-    aRawResponse := JstringToString(response.getRawResponse);
+    LRawResponse := JstringToString(response.getRawResponse);
     if (response.getError <> nil) then begin
-      aErrorCode := response.getError.getErrorCode;
-      aErrorMsg := JStringToString(response.getError.getErrorMessage);
+      LErrorCode := response.getError.getErrorCode;
+      LErrorMsg := JStringToString(response.getError.getErrorMessage);
     end;
   end;
   {$IFDEF DEBUG}
-  allog('TALFacebookGraphRequest.TGraphRequestCallback.onCompleted', 'response: ' + aRawResponse +
-                                                                     ' - ErrorCode: ' + alinttoStrU(aErrorCode) +
-                                                                     ' - ErrorMsg: ' + aErrorMsg +
+  allog('TALFacebookGraphRequest.TGraphRequestCallback.onCompleted', 'response: ' + LRawResponse +
+                                                                     ' - ErrorCode: ' + alinttoStrU(LErrorCode) +
+                                                                     ' - ErrorMsg: ' + LErrorMsg +
                                                                      ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
   if assigned(fFacebookGraphRequest.fOnCompleted) then
-    fFacebookGraphRequest.fOnCompleted(aRawResponse, aErrorCode, aErrorMsg);
+    fFacebookGraphRequest.fOnCompleted(LRawResponse, LErrorCode, LErrorMsg);
 
 end;
 
@@ -830,42 +832,42 @@ end;
 
 {****************************************************************************************************************************************}
 procedure TALFacebookGraphRequest.GraphRequestCompletionHandler(connection: FBSDKGraphRequestConnection; result: Pointer; error: NSError);
-var aRawResponse: String;
-    aErrorCode: integer;
-    aErrorMsg: String;
-    aJsonErr: NSError;
-    aJsonData: NSData;
-    aNSString: NSString;
+var LRawResponse: String;
+    LErrorCode: integer;
+    LErrorMsg: String;
+    LJsonErr: NSError;
+    LJsonData: NSData;
+    LNSString: NSString;
 begin
 
-  aRawResponse := '';
-  aErrorCode := 0;
-  aErrorMsg := '';
+  LRawResponse := '';
+  LErrorCode := 0;
+  LErrorMsg := '';
   if error <> nil then begin
-    aErrorCode := error.code;
-    aErrorMsg := NSStrToStr(error.localizedDescription);
+    LErrorCode := error.code;
+    LErrorMsg := NSStrToStr(error.localizedDescription);
   end
   else if result <> nil then begin
-    aJsonData := TNSJSONSerialization.OCClass.dataWithJSONObject(result, 0, Addr(aJsonErr));
-    if (aJsonData <> nil) and (aJsonErr = nil) then begin
-      aNSString := TNSString.Wrap(TNSString.Alloc.initWithData(aJsonData, NSUTF8StringEncoding));
+    LJsonData := TNSJSONSerialization.OCClass.dataWithJSONObject(result, 0, Addr(LJsonErr));
+    if (LJsonData <> nil) and (LJsonErr = nil) then begin
+      LNSString := TNSString.Wrap(TNSString.Alloc.initWithData(LJsonData, NSUTF8StringEncoding));
       try
-        aRawResponse := NSStrToStr(aNSString);
+        LRawResponse := NSStrToStr(LNSString);
       finally
-        aNSString.release;
+        LNSString.release;
       end;
     end;
   end;
 
   {$IFDEF DEBUG}
-  allog('TALFacebookGraphRequest.TGraphRequestCallback.onCompleted', 'response: ' + aRawResponse +
-                                                                     ' - ErrorCode: ' + alinttoStrU(aErrorCode) +
-                                                                     ' - ErrorMsg: ' + aErrorMsg +
+  allog('TALFacebookGraphRequest.TGraphRequestCallback.onCompleted', 'response: ' + LRawResponse +
+                                                                     ' - ErrorCode: ' + alinttoStrU(LErrorCode) +
+                                                                     ' - ErrorMsg: ' + LErrorMsg +
                                                                      ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
   if assigned(fOnCompleted) then
-    fOnCompleted(aRawResponse, aErrorCode, aErrorMsg);
+    fOnCompleted(LRawResponse, LErrorCode, LErrorMsg);
 
 end;
 
@@ -928,69 +930,40 @@ Type
   //if i don't don't this i have internal error
   _TFacebookProcOfObjectWrapper = class(Tobject)
   public
-    //class procedure applicationDidFinishLaunchingWithOptionsHandler(const Sender: TObject; const M: TMessage);
-    class procedure applicationOpenURLWithSourceAnnotationHandler(const Sender: TObject; const M: TMessage);
-    class procedure applicationOpenURLWithOptionsHandler(const Sender: TObject; const M: TMessage);
+    class procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
   end;
 
-{****************************************************************************}
-// To bypass compile errors you must add a custom modified FMX.Platform.iOS to
-// your project, see the instructions at https://github.com/grijjy/DelphiSocialFrameworks for more details
-// NOTE: I remove this procedure because in the code it's get call inside TFBSDKApplicationDelegate.OCClass.initializeSDK
-//       that we call manually in ALInitFacebook
-// class procedure _TFacebookProcOfObjectWrapper.applicationDidFinishLaunchingWithOptionsHandler(const Sender: TObject; const M: TMessage);
-// var aFBSDKApplicationDelegate: FBSDKApplicationDelegate;
-//     aValue: TAppDelegate_applicationDidFinishLaunchingWithOptions;
-// begin
-//   if M is TAppDelegateMessage_applicationDidFinishLaunchingWithOptions then begin
-//     aValue := (M as TAppDelegateMessage_applicationDidFinishLaunchingWithOptions).Value;
-//     {$IFDEF DEBUG}
-//     allog('_TFacebookProcOfObjectWrapper.applicationDidFinishLaunchingWithOptionsHandler', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
-//     {$ENDIF}
-//     aFBSDKApplicationDelegate := TFBSDKApplicationDelegate.Wrap(TFBSDKApplicationDelegate.OCClass.sharedInstance);
-//     aFBSDKApplicationDelegate.applicationDidFinishLaunchingWithOptions(aValue.Application, aValue.Options);
-//   end;
-// end;
-
-{****************************************************************************}
-// To bypass compile errors you must add a custom modified FMX.Platform.iOS to
-// your project, see the instructions at https://github.com/grijjy/DelphiSocialFrameworks for more details
-class procedure _TFacebookProcOfObjectWrapper.applicationOpenURLWithSourceAnnotationHandler(const Sender: TObject; const M: TMessage);
-var aFBSDKApplicationDelegate: FBSDKApplicationDelegate;
-    aValue: TAppDelegate_applicationOpenURLWithSourceAnnotation;
+{*********************************************************************************************************************}
+class procedure _TFacebookProcOfObjectWrapper.ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
 begin
   if not _ALFacebookInitialised then exit;
-  if M is TAppDelegateMessage_applicationOpenURLWithSourceAnnotation then begin
-    aValue := (M as TAppDelegateMessage_applicationOpenURLWithSourceAnnotation).value;
-    {$IFDEF DEBUG}
-    allog('_TFacebookProcOfObjectWrapper.applicationOpenURLWithSourceAnnotationHandler', 'openURL: ' + NSStrToStr(aValue.Url.absoluteString) +
-                                                                                         ' - sourceApplication: ' + NSStrToStr(aValue.SourceApplication) +
-                                                                                         ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
-    {$ENDIF}
-    aFBSDKApplicationDelegate := TFBSDKApplicationDelegate.Wrap(TFBSDKApplicationDelegate.OCClass.sharedInstance);
-    aFBSDKApplicationDelegate.applicationOpenURLSourceApplicationAnnotation(aValue.Application, // application: UIApplication;
-                                                                            aValue.Url,  // openURL: NSURL;
-                                                                            aValue.SourceApplication,  // sourceApplication: NSString;
-                                                                            aValue.Annotation); // annotation: Pointer
-  end;
-end;
+  if M is TApplicationEventMessage then begin
+    var LValue := (M as TApplicationEventMessage).value;
+    if LValue.Event = TApplicationEvent.OpenURL then begin
 
-{***************************************************************************************************************************}
-class procedure _TFacebookProcOfObjectWrapper.applicationOpenURLWithOptionsHandler(const Sender: TObject; const M: TMessage);
-var aFBSDKApplicationDelegate: FBSDKApplicationDelegate;
-    aValue: TAppDelegate_applicationOpenURLWithOptions;
-begin
-  if not _ALFacebookInitialised then exit;
-  if M is TAppDelegateMessage_applicationOpenURLWithOptions then begin
-    aValue := (M as TAppDelegateMessage_applicationOpenURLWithOptions).Value;
-    {$IFDEF DEBUG}
-    allog('_TFacebookProcOfObjectWrapper.applicationOpenURLWithOptionsHandler', 'openURL: ' + NSStrToStr(aValue.Url.absoluteString) +
-                                                                                ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
-    {$ENDIF}
-    aFBSDKApplicationDelegate := TFBSDKApplicationDelegate.Wrap(TFBSDKApplicationDelegate.OCClass.sharedInstance);
-    aFBSDKApplicationDelegate.applicationOpenURLOptions(aValue.Application, // application: UIApplication
-                                                        aValue.Url,  // openURL: NSURL;
-                                                        aValue.Options); // options: NSDictionary
+      var Lcontext := TiOSOpenApplicationContext(LValue.Context);
+      {$IFDEF DEBUG}
+      ALLog('_TFacebookProcOfObjectWrapper.ApplicationEventMessageHandler', 'Url: ' + Lcontext.URL);
+      {$ENDIF}
+
+      //application:openURL:options: (iOS 9 and up)
+      If TOSVersion.Check(9) then begin
+        var LFBSDKApplicationDelegate := TFBSDKApplicationDelegate.Wrap(TFBSDKApplicationDelegate.OCClass.sharedInstance);
+        LFBSDKApplicationDelegate.applicationOpenURLOptions(TiOSHelper.SharedApplication, // application: UIApplication
+                                                            StrToNSUrl(Lcontext.Url),  // openURL: NSURL;
+                                                            TNSDictionary.Wrap(Lcontext.Context)); // options: NSDictionary
+      end
+
+      //application:openURL:sourceApplication:annotation: (iOS 8 and older)
+      else begin
+        var LFBSDKApplicationDelegate := TFBSDKApplicationDelegate.Wrap(TFBSDKApplicationDelegate.OCClass.sharedInstance);
+        LFBSDKApplicationDelegate.applicationOpenURLSourceApplicationAnnotation(TiOSHelper.SharedApplication, // application: UIApplication;
+                                                                                StrToNSUrl(Lcontext.Url),  // openURL: NSURL;
+                                                                                StrToNsStr(Lcontext.SourceApp),  // sourceApplication: NSString;
+                                                                                Lcontext.Context); // annotation: Pointer
+      end;
+
+    end;
   end;
 end;
 
@@ -1003,9 +976,7 @@ initialization
 
   {$REGION ' IOS'}
   {$IF defined(IOS)}
-  //TMessageManager.DefaultManager.SubscribeToMessage(TAppDelegateMessage_applicationDidFinishLaunchingWithOptions, _TFacebookProcOfObjectWrapper.applicationDidFinishLaunchingWithOptionsHandler);
-  TMessageManager.DefaultManager.SubscribeToMessage(TAppDelegateMessage_applicationOpenURLWithSourceAnnotation, _TFacebookProcOfObjectWrapper.applicationOpenURLWithSourceAnnotationHandler);
-  TMessageManager.DefaultManager.SubscribeToMessage(TAppDelegateMessage_applicationOpenURLWithOptions, _TFacebookProcOfObjectWrapper.applicationOpenURLWithOptionsHandler);
+  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, _TFacebookProcOfObjectWrapper.ApplicationEventMessageHandler);
   {$ENDIF}
   {$ENDREGION}
 
@@ -1013,9 +984,7 @@ finalization
 
   {$REGION ' IOS'}
   {$IF defined(IOS)}
-  //TMessageManager.DefaultManager.Unsubscribe(TAppDelegateMessage_applicationDidFinishLaunchingWithOptions, _TFacebookProcOfObjectWrapper.applicationDidFinishLaunchingWithOptionsHandler);
-  TMessageManager.DefaultManager.Unsubscribe(TAppDelegateMessage_applicationOpenURLWithSourceAnnotation, _TFacebookProcOfObjectWrapper.applicationOpenURLWithSourceAnnotationHandler);
-  TMessageManager.DefaultManager.Unsubscribe(TAppDelegateMessage_applicationOpenURLWithOptions, _TFacebookProcOfObjectWrapper.applicationOpenURLWithOptionsHandler);
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, _TFacebookProcOfObjectWrapper.ApplicationEventMessageHandler);
   {$ENDIF}
   {$ENDREGION}
 

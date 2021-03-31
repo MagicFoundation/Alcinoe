@@ -2,11 +2,12 @@ unit ALAndroidExoPlayerApi;
 
 interface
 
-uses Androidapi.JNIBridge,
-     Androidapi.JNI.JavaTypes,
-     Androidapi.JNI.Net,
-     Androidapi.JNI.Os,
-     Androidapi.JNI.GraphicsContentViewText;
+uses
+  Androidapi.JNIBridge,
+  Androidapi.JNI.JavaTypes,
+  Androidapi.JNI.Net,
+  Androidapi.JNI.Os,
+  Androidapi.JNI.GraphicsContentViewText;
 
 type
 

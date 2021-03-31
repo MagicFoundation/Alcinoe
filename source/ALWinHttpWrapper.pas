@@ -1,6 +1,6 @@
 unit ALWinHttpWrapper;
 
-{$IF CompilerVersion > 33} // rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if Winapi.WinHTTP.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -8,6 +8,7 @@ unit ALWinHttpWrapper;
 {$ALIGN ON}
 {$MINENUMSIZE 4}
 {$WEAKPACKAGEUNIT}
+{$WARN SYMBOL_PLATFORM OFF}
 
 {$HPPEMIT ''}
 {$HPPEMIT '#include "winhttp.h"'}
@@ -733,6 +734,7 @@ const
   {$EXTERNALSYM WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_1}
   WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_2 = $00000800;
   {$EXTERNALSYM WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_2}
+  WINHTTP_FLAG_SECURE_PROTOCOL_TLS1_3 = $00002000;
   WINHTTP_FLAG_SECURE_PROTOCOL_ALL = WINHTTP_FLAG_SECURE_PROTOCOL_SSL2 or
                                              WINHTTP_FLAG_SECURE_PROTOCOL_SSL3 or
                                              WINHTTP_FLAG_SECURE_PROTOCOL_TLS1;

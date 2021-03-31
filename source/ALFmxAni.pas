@@ -1,27 +1,28 @@
 unit ALFmxAni;
 
-{$IF CompilerVersion > 33} // rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.Ani.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
 interface
 
-uses System.Classes,
-     System.SyncObjs,
-     System.Rtti,
-     System.Generics.Collections,
-     System.UITypes,
-     {$IFDEF IOS}
-     System.TypInfo,
-     Macapi.ObjectiveC,
-     iOSapi.Foundation,
-     iOSapi.QuartzCore,
-     {$ENDIF}
-     {$IFDEF ANDROID}
-     Androidapi.JNIBridge,
-     ALAndroidApi,
-     {$ENDIF}
-     FMX.Types;
+uses
+  System.Classes,
+  System.SyncObjs,
+  System.Rtti,
+  System.Generics.Collections,
+  System.UITypes,
+  {$IFDEF IOS}
+  System.TypInfo,
+  Macapi.ObjectiveC,
+  iOSapi.Foundation,
+  iOSapi.QuartzCore,
+  {$ENDIF}
+  {$IFDEF ANDROID}
+  Androidapi.JNIBridge,
+  ALAndroidApi,
+  {$ENDIF}
+  FMX.Types;
 
 type
 
@@ -368,16 +369,17 @@ procedure Register;
 
 implementation
 
-uses System.SysUtils,
-     System.math,
-     {$IFDEF IOS}
-     Macapi.ObjCRuntime,
-     {$ENDIF}
-     FMX.Platform,
-     FMX.Ani,
-     FMX.Utils,
-     ALString,
-     AlCommon;
+uses
+  System.SysUtils,
+  System.math,
+  {$IFDEF IOS}
+  Macapi.ObjCRuntime,
+  {$ENDIF}
+  FMX.Platform,
+  FMX.Ani,
+  FMX.Utils,
+  ALString,
+  AlCommon;
 
 {$IFDEF ANDROID}
 

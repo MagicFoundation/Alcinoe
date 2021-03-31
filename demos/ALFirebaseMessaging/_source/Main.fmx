@@ -1,0 +1,113 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 718
+  ClientWidth = 683
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  DesignerMasterStyle = 0
+  object ButtonShowSampleNotification: TButton
+    Align = Top
+    Position.Y = 198.000000000000000000
+    Size.Width = 683.000000000000000000
+    Size.Height = 65.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Text = 'Show a Sample Notification'
+    OnClick = ButtonShowSampleNotificationClick
+  end
+  object Memo1: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Lines.Strings = (
+      'To send a data notification you can go to'
+      'https://reqbin.com/'
+      ''
+      'Destination: '
+      'POST - https://fcm.googleapis.com/fcm/send'
+      ''
+      'Headers:'
+      'Content-Type: application/json'
+      
+        'Authorization: key=AAAAivIua_g:APA91bHh0mh-gYaKbh1XTb4Ny3AZI-H8y' +
+        'padjARZ1ijr9bokJ7ptBWYaH_gY-ZAbWMDluD1fnyjo8ySGFOCQ4fjXsBi8jFJzk' +
+        'pvF9N_URm3bjs7dHmvGZu9t0lJfs_oMhAsUAI1COHBN '
+      ''
+      'Content:'
+      '{'
+      ''
+      '  "to": "<token>",'
+      ''
+      '  "data": {'
+      ''
+      '    "notification": "1",            '
+      
+        '    "notification.channel": "demo",                             ' +
+        '          '
+      '    "notification.color":"-15108398",                '
+      '    "notification.text": "notification text",'
+      '    "notification.title": "notification title",'
+      
+        '    "notification.largeicon": "https://i.stack.imgur.com/EwPfY.j' +
+        'pg?s=64&g=1",            '
+      '    "notification.smallicon": "notification_icon",   '
+      '    "notification.ticker":"notification ticker",'
+      '    "notification.vibrate": "default",        '
+      '    "notification.priority": "1",             '
+      '    "notification.sound": "default",          '
+      '    "notification.badgecount":"25"          '
+      ''
+      '  }'
+      ''
+      '}')
+    TextSettings.WordWrap = True
+    Align = Client
+    Size.Width = 683.000000000000000000
+    Size.Height = 390.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    Viewport.Width = 663.000000000000000000
+    Viewport.Height = 386.000000000000000000
+  end
+  object ButtonGetToken: TButton
+    Align = Top
+    Position.Y = 263.000000000000000000
+    Size.Width = 683.000000000000000000
+    Size.Height = 65.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    Text = 'Get Token'
+    OnClick = ButtonGetTokenClick
+  end
+  object TextIntro: TALText
+    Align = Top
+    AutoSize = True
+    Margins.Left = 15.000000000000000000
+    Margins.Top = 15.000000000000000000
+    Margins.Right = 15.000000000000000000
+    Margins.Bottom = 15.000000000000000000
+    Position.X = 15.000000000000000000
+    Position.Y = 15.000000000000000000
+    Size.Width = 653.000000000000000000
+    Size.Height = 168.000000000000000000
+    Size.PlatformDefault = False
+    Text = 
+      'You must run '#13#10'Alcinoe\embarcadero\<yourDelphiVersion>\update.ba' +
+      't'#13#10' to retrieve and patch the original delphi source code.'#13#10#13#10'Yo' +
+      'u will also probably need to replace the values in '#13#10'.\android\l' +
+      'ibraries\com.ALFirebaseMessaging.app\res\values\strings.xml '#13#10'by' +
+      ' your own values taken from your own google-services.json, and d' +
+      'o not forget to also run'#13#10'.\ALFirebaseMessaging\_source\android\' +
+      'build_res.bat'#13#10'On iOS you will need to deploy your own GoogleSer' +
+      'vice-Info.plist to the root of the app'
+    TextSettings.Font.Size = 14.000000000000000000
+    TextSettings.Font.StyleExt = {00070000000000000004000000}
+    TextSettings.FontColor = claCrimson
+    TextSettings.WordWrap = True
+    TextSettings.HorzAlign = Center
+  end
+end

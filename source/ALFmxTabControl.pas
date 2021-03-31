@@ -1,6 +1,6 @@
 unit ALFmxTabControl;
 
-{$IF CompilerVersion > 33} // rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.TabControl.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -8,15 +8,16 @@ interface
 
 {$SCOPEDENUMS ON}
 
-uses System.Classes,
-     System.UITypes,
-     System.Types,
-     System.Messaging,
-     FMX.Types,
-     FMX.Controls,
-     ALFMXAni,
-     ALFmxLayouts,
-     ALFmxInertialMovement;
+uses
+  System.Classes,
+  System.UITypes,
+  System.Types,
+  System.Messaging,
+  FMX.Types,
+  FMX.Controls,
+  ALFMXAni,
+  ALFmxLayouts,
+  ALFmxInertialMovement;
 
 type
 
@@ -240,13 +241,14 @@ procedure Register;
 
 implementation
 
-uses System.SysUtils,
-     System.Math,
-     System.Math.Vectors,
-     FMX.Utils,
-     FMX.Consts,
-     ALFmxCommon,
-     ALCommon;
+uses
+  System.SysUtils,
+  System.Math,
+  System.Math.Vectors,
+  FMX.Utils,
+  FMX.Consts,
+  ALFmxCommon,
+  ALCommon;
 
 {************************************************}
 constructor TALTabItem.Create(AOwner: TComponent);
@@ -408,25 +410,25 @@ end;
 
 {*********************************************************}
 Procedure TALTabControlAniCalculations.LaunchAniTransition;
-var aVelocity: double;
-    aTargetTabIndex: integer;
+var LVelocity: double;
+    LTargetTabIndex: integer;
 begin
 
   // exit or if their is no activetab
   if (not FTabControl.HasActiveTab) then exit;
 
   // init aVelocity
-  aVelocity := currentVelocity.X;
+  LVelocity := currentVelocity.X;
 
   // init aTargetTabIndex
-  aTargetTabIndex := fTabControl.tabindex;
-  if compareValue(aVelocity, 0, Tepsilon.Position) > 0 then begin
+  LTargetTabIndex := fTabControl.tabindex;
+  if compareValue(LVelocity, 0, Tepsilon.Position) > 0 then begin
     if compareValue(FTabControl.activeTab.Position.x, 0, Tepsilon.Position) <= 0 then
-      fTabControl.FindVisibleTab(aTargetTabIndex, TALTabControl.TFindKind.next); // if not found the bounds animation will play
+      fTabControl.FindVisibleTab(LTargetTabIndex, TALTabControl.TFindKind.next); // if not found the bounds animation will play
   end
-  else if compareValue(aVelocity, 0, Tepsilon.Position) < 0 then begin
+  else if compareValue(LVelocity, 0, Tepsilon.Position) < 0 then begin
     if compareValue(FTabControl.activeTab.Position.x, 0, Tepsilon.Position) >= 0 then
-      fTabControl.FindVisibleTab(aTargetTabIndex, TALTabControl.TFindKind.back); // if not found the bounds animation will play
+      fTabControl.FindVisibleTab(LTargetTabIndex, TALTabControl.TFindKind.back); // if not found the bounds animation will play
   end;
 
   // Stop the animation
@@ -437,28 +439,28 @@ begin
                     // ##{^#{^ anicalculations is very hard to understand :(
 
   // SetActiveTabWithTransition + aVelocity
-  fTabControl.SetActiveTabWithTransition(fTabControl.tabs[aTargetTabIndex], TALTabTransition.Slide, aVelocity, false{ALaunchAniStartEvent});
+  fTabControl.SetActiveTabWithTransition(fTabControl.tabs[LTargetTabIndex], TALTabTransition.Slide, LVelocity, false{ALaunchAniStartEvent});
 
 end;
 
 {***********************************************************}
 procedure TALTabControlAniCalculations.MouseUp(X, Y: Double);
-var aDown: Boolean;
+var LDown: Boolean;
 begin
-  aDown := Down;
+  LDown := Down;
   fRunning := False;
   inherited MouseUp(X, Y);
-  if aDown and Moved then LaunchAniTransition;
+  if LDown and Moved then LaunchAniTransition;
 end;
 
 {************************************************}
 procedure TALTabControlAniCalculations.MouseLeave;
-var aDown: Boolean;
+var LDown: Boolean;
 begin
-  aDown := Down;
+  LDown := Down;
   fRunning := False;
   inherited MouseLeave;
-  if aDown and Moved then LaunchAniTransition;
+  if LDown and Moved then LaunchAniTransition;
 end;
 
 {***************************************************}
@@ -527,7 +529,7 @@ end;
 // this method is called on Child.ChangeOrder (like changing the index property)
 // DoInsertObject and Sort but NOT on DoAddObject !
 procedure TALTabControl.ChangeChildren;
-var aNeedRealignTabs: Boolean;
+var LNeedRealignTabs: Boolean;
     i, k: integer;
 begin
 
@@ -540,14 +542,14 @@ begin
   //keep the TalTabItem at the beginning of the controls list and the
   //other child objects at the end of the controls list
   if not FchildreenChanging then begin
-    aNeedRealignTabs := False;
+    LNeedRealignTabs := False;
     FchildreenChanging := True;
     try
       K := controlsCount - 1;
       for I := controlsCount - 1 downto 0 do begin
         if not (controls[i] is TalTabItem) then begin
           if (i <> k) then begin
-            aNeedRealignTabs := True;
+            LNeedRealignTabs := True;
             controls[i].Index := K;
           end;
           dec(k);
@@ -556,21 +558,21 @@ begin
     finally
       FchildreenChanging := False;
     end;
-    if aNeedRealignTabs then RealignTabs;
+    if LNeedRealignTabs then RealignTabs;
   end;
 
 end;
 
 {*************************************************************}
 procedure TALTabControl.DoAddObject(const AObject: TFmxObject);
-var aIdx: integer;
+var LIdx: integer;
 begin
   //keep the TalTabItem as the beginning of the controls list and the
   //other child objects at the end of the controls list
   if AObject is TALTabItem then begin
-    aIdx := TabCount;
+    LIdx := TabCount;
     inherited DoAddObject(AObject);
-    AObject.Index := aIdx;
+    AObject.Index := LIdx;
     inc(FTabCount);
     RealignTabs;
   end
@@ -872,9 +874,9 @@ end;
 
 {**********************************}
 procedure TALTabControl.RealignTabs;
-var aBoundsRect: TrectF;
-    aTmpRect: TrectF;
-    aTargets: array of TALAniCalculations.TTarget;
+var LBoundsRect: TrectF;
+    LTmpRect: TrectF;
+    LTargets: array of TALAniCalculations.TTarget;
     i, k: integer;
 begin
 
@@ -887,28 +889,28 @@ begin
   try
 
     //update the boundsRect of all the visible tab
-    aBoundsRect := LocalRect;
+    LBoundsRect := LocalRect;
     if HasActiveTab then begin
       //-----
-      aTmpRect := aBoundsRect;
-      ActiveTab.SetBoundsRect(aTmpRect);
+      LTmpRect := LBoundsRect;
+      ActiveTab.SetBoundsRect(LTmpRect);
       //-----
       k := 0;
       i := tabindex;
       while FindVisibleTab(i, TFindKind.Back) do begin
         dec(k);
-        aTmpRect := aBoundsRect;
-        aTmpRect.Offset(k * width,0);
-        tabs[i].SetBoundsRect(aTmpRect);
+        LTmpRect := LBoundsRect;
+        LTmpRect.Offset(k * width,0);
+        tabs[i].SetBoundsRect(LTmpRect);
       end;
       //-----
       k := 0;
       i := tabindex;
       while FindVisibleTab(i, TFindKind.Next) do begin
         inc(k);
-        aTmpRect := aBoundsRect;
-        aTmpRect.Offset(k * width,0);
-        tabs[i].SetBoundsRect(aTmpRect);
+        LTmpRect := LBoundsRect;
+        LTmpRect.Offset(k * width,0);
+        tabs[i].SetBoundsRect(LTmpRect);
       end;
     end
     else begin
@@ -916,9 +918,9 @@ begin
       i := -1;
       while FindVisibleTab(i, TFindKind.Next) do begin
         inc(k);
-        aTmpRect := aBoundsRect;
-        aTmpRect.Offset(k * width,0);
-        tabs[i].SetBoundsRect(aTmpRect);
+        LTmpRect := LBoundsRect;
+        LTmpRect.Offset(k * width,0);
+        tabs[i].SetBoundsRect(LTmpRect);
       end;
     end;
 
@@ -932,12 +934,12 @@ begin
     dec(k);
 
     //update the FAniCalculations target
-    SetLength(aTargets, 2);
-    aTargets[0].TargetType := TALAniCalculations.TTargetType.Min;
-    aTargets[0].Point := TALPointD.Create(0, 0);
-    aTargets[1].TargetType := TALAniCalculations.TTargetType.Max;
-    aTargets[1].Point := TALPointD.Create(max(0,k) * width, 0);
-    FAniCalculations.SetTargets(aTargets);
+    SetLength(LTargets, 2);
+    LTargets[0].TargetType := TALAniCalculations.TTargetType.Min;
+    LTargets[0].Point := TALPointD.Create(0, 0);
+    LTargets[1].TargetType := TALAniCalculations.TTargetType.Max;
+    LTargets[1].Point := TALPointD.Create(max(0,k) * width, 0);
+    FAniCalculations.SetTargets(LTargets);
     if HasActiveTab then FAniCalculations.ViewportPosition := TAlPointD.Create(ActiveTab.ViewPortOffset, 0)
     else FAniCalculations.ViewportPosition := TAlPointD.Create(0,0);
 
@@ -949,8 +951,8 @@ end;
 
 {*****************************************************************}
 procedure TALTabControl.AniTransitionSlideProcess(Sender: TObject);
-var aTargetTabItem: TALTabItem;
-    aNewViewportPosition: TPointF;
+var LTargetTabItem: TALTabItem;
+    LNewViewportPosition: TPointF;
     i, k: integer;
 begin
 
@@ -958,12 +960,12 @@ begin
   if not HasActiveTab then exit;
 
   //init aTargetTabItem
-  if (Sender <> nil) then aTargetTabItem := TALTabItem((Sender as TALFloatPropertyAnimation).TagObject)
-  else aTargetTabItem := activeTab;
+  if (Sender <> nil) then LTargetTabItem := TALTabItem((Sender as TALFloatPropertyAnimation).TagObject)
+  else LTargetTabItem := activeTab;
 
   //offset all the items before aTargetTabItem
-  k := aTargetTabItem.Index;
-  for I := aTargetTabItem.Index - 1 downto 0 do begin
+  k := LTargetTabItem.Index;
+  for I := LTargetTabItem.Index - 1 downto 0 do begin
     if tabs[i].Visible then begin
       tabs[i].Position.X := tabs[k].Position.X - tabs[i].Width;
       k := i;
@@ -971,8 +973,8 @@ begin
   end;
 
   //offset all the items after aTargetTabItem
-  k := aTargetTabItem.Index;
-  for I := aTargetTabItem.Index + 1 to tabcount - 1 do begin
+  k := LTargetTabItem.Index;
+  for I := LTargetTabItem.Index + 1 to tabcount - 1 do begin
     if tabs[i].Visible then begin
       tabs[i].Position.X := tabs[k].Position.X + tabs[k].Width;
       k := i;
@@ -1002,11 +1004,11 @@ begin
     FAniCalculations.ViewportPosition := TAlPointD.Create(activeTab.ViewPortOffset - activeTab.Position.Point.X, 0);
 
   //fire the OnViewportPositionChange
-  aNewViewportPosition := TpointF.Create(FAniCalculations.ViewportPosition.X, FAniCalculations.ViewportPosition.Y);
+  LNewViewportPosition := TpointF.Create(FAniCalculations.ViewportPosition.X, FAniCalculations.ViewportPosition.Y);
   if (assigned(FOnViewportPositionChange)) and
-     (not fLastViewportPosition.EqualsTo(aNewViewportPosition, TEpsilon.Position)) then
-    FOnViewportPositionChange(self, fLastViewportPosition, aNewViewportPosition);
-  fLastViewportPosition := aNewViewportPosition;
+     (not fLastViewportPosition.EqualsTo(LNewViewportPosition, TEpsilon.Position)) then
+    FOnViewportPositionChange(self, fLastViewportPosition, LNewViewportPosition);
+  fLastViewportPosition := LNewViewportPosition;
 
   //fire the fOnAniProcess
   if (assigned(fOnAniProcess)) and
@@ -1032,11 +1034,11 @@ end;
 
 {******************************************************************}
 procedure TALTabControl.AniTransitionFadeOutFinish(Sender: TObject);
-var aOldActiveTab: TalTabItem;
+var LOldActiveTab: TalTabItem;
 begin
-  aOldActiveTab := ActiveTab;
+  LOldActiveTab := ActiveTab;
   ActiveTab := TALTabItem(TALFloatPropertyAnimation(Sender).TagObject);
-  aOldActiveTab.Opacity := 1;
+  LOldActiveTab.Opacity := 1;
   ALFreeAndNil(FAniTransitionOverlay);
   if (assigned(fOnAniStop)) then
     fOnAniStop(Self);

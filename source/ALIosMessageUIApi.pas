@@ -2,10 +2,11 @@ unit ALIosMessageUIApi;
 
 interface
 
-uses iOSapi.Foundation,
-     iOSapi.CocoaTypes,
-     iOSapi.UIKit,
-     Macapi.ObjectiveC;
+uses
+  iOSapi.Foundation,
+  iOSapi.CocoaTypes,
+  iOSapi.UIKit,
+  Macapi.ObjectiveC;
 
 {$M+}
 

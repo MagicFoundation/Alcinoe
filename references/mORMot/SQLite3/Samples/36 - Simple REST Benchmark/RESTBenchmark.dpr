@@ -12,6 +12,8 @@ program RESTBenchmark;
 {$APPTYPE CONSOLE}
 {$endif}
 
+{$I Synopse.inc} // LINUXNOTBSD
+
 uses
   {$I SynDprUses.inc}  // use FastMM4 on older Delphi, or set FPC threads
   SysUtils,
@@ -22,6 +24,13 @@ uses
   mORMot,              // RESTful server & ORM
   mORMotSQLite3,       // SQLite3 engine as ORM core
   SynSQLite3Static,    // staticaly linked SQLite3 engine
+  {$ifdef UNIX}
+  BaseUnix,
+  {$endif}
+  {$ifdef LINUXNOTBSD}
+  SynFPCLinux,
+  mORMotService,
+  {$endif}
   mORMotHttpServer;    // HTTP server for RESTful server
 
 type
@@ -102,9 +111,14 @@ begin
   ctxt.Returns(s);
 end;
 
+var
+  url: AnsiString;
+  keepAlive: boolean;
+  aRestServer: TSQLRestServer;
+  lastReadCount: TSynMonitorCount64;
+
 procedure DoTest(const url: AnsiString; keepAlive: boolean);
 var
-  aRestServer: TSQLRestServerDB;
   aHttpServer: TSQLHttpServer;
   aServices: TMyServices;
 begin
@@ -126,8 +140,14 @@ begin
         if (keepAlive) then
           writeLn('is enabled') else
           writeLn('is disabled');
+        {$ifdef LINUX}
+        SynDaemonIntercept(nil);
+        writeln('Press [Ctrl+C] or send SIGINT/SIGTERM to close the server.');
+        fpPause;
+        {$else}
         write('Press [Enter] to close the server.');
         readln;
+        {$endif}
       finally
         aHttpServer.Free;
       end;
@@ -135,16 +155,33 @@ begin
       aServices.Free;
     end;
   finally
-    aRestServer.Free;
+    FreeAndNil(aRestServer);
   end;
 end;
 
 const
   UNIX_SOCK_PATH = '/tmp/rest-bench.socket';
 
-var
-  url: AnsiString;
-  keepAlive: boolean;
+{$ifdef LINUX}
+/// killa process after X second without Get requests
+function inactivityWatchdog(p: pointer): ptrint;
+var currentRC: TSynMonitorCount64;
+begin
+  repeat
+    sleep(10000); // once per 10 second
+    if aRestServer = nil then // not initialized
+      continue;
+    currentRC := aRestServer.Stats.Read;
+    if (currentRC - lastReadCount) <= 0 then begin
+      SQLite3Log.Add.Log(sllServer, 'Terminating due to inactivity..');
+      FpKill(GetProcessID, SIGTERM);
+      break;
+    end;
+    lastReadCount := currentRC;
+  until false;
+  Result := 0;
+end;
+{$endif}
 
 begin
   // set logging abilities
@@ -153,6 +190,20 @@ begin
   SQLite3Log.Family.PerThreadLog := ptIdentifiedInOnFile;
   SQLite3Log.Family.NoFile := true; // do not create log files for benchmark
   {$ifdef UNIX}
+  {$ifdef LINUXNOTBSD}
+  if ProcessIsStartedBySystemd then begin
+    SQLite3Log.Family.EchoToConsole := SQLite3Log.Family.Level;
+    SQLite3Log.Family.EchoToConsoleUseJournal := true;
+    if ExternalLibraries.sd_listen_fds(0) = 1 then
+      url := '' // force to use socket passed by systemd
+    else
+      url := '8888';
+    // set a wachdog to kill our process after 10 sec of inactivity
+    // just for demo - in real life verifiing only read operations is not enought
+    lastReadCount := 0;
+    BeginThread(@inactivityWatchdog, nil);
+  end else
+  {$endif}
   if (ParamCount>0) and (ParamStr(1)='unix') then begin
     url := 'unix:' + UNIX_SOCK_PATH;
     if FileExists(UNIX_SOCK_PATH) then

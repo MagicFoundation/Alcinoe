@@ -1,5 +1,4 @@
-
-//
+(*******************************************************************************
 //  This unit was (originaly) inspired by
 //  DelphiWorlds PushClient project - https://github.com/DelphiWorlds/PushClient
 //  http://www.delphiworlds.com
@@ -7,7 +6,6 @@
 //  ------------------------------------------
 //  A cross-platform method of using Firebase Cloud Messaging (FCM) to receive push notifications
 //
-
 //
 // -----
 //
@@ -105,29 +103,30 @@
 // ANDROID: data & custom notification message  + app FOREGROUND                 : NO ALERT - NO BADGE - we receive the data message
 // ANDROID: data message                        + app in BACKGROUND / NO RUNNING : NO ALERT - NO BADGE - WHEN the app will BECAME FOREGROUND: we receive the data message
 // ANDROID: data & custom notification message  + app BACKGROUND / NO RUNNING    : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message
-//
+*******************************************************************************)
 
 unit ALFirebase;
 
 interface
 
-uses system.Classes,
-     system.Messaging,
-     {$IF defined(android)}
-     Androidapi.JNI.Embarcadero,
-     Androidapi.JNI.GraphicsContentViewText,
-     Androidapi.Helpers,
-     Androidapi.JNIBridge,
-     ALAndroidApi,
-     ALAndroidFirebaseApi,
-     {$ELSEIF defined(IOS)}
-     System.TypInfo,
-     iOSapi.Foundation,
-     Macapi.ObjectiveC,
-     ALIosUserNotificationsApi,
-     ALIosFirebaseApi,
-     {$ENDIF}
-     ALStringList;
+uses
+  system.Classes,
+  system.Messaging,
+  {$IF defined(android)}
+  Androidapi.JNI.Embarcadero,
+  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.Helpers,
+  Androidapi.JNIBridge,
+  ALAndroidApi,
+  ALAndroidFirebaseApi,
+  {$ELSEIF defined(IOS)}
+  System.TypInfo,
+  iOSapi.Foundation,
+  Macapi.ObjectiveC,
+  ALIosUserNotificationsApi,
+  ALIosFirebaseApi,
+  {$ENDIF}
+  ALStringList;
 
 type
 
@@ -296,25 +295,25 @@ type
 
 implementation
 
-uses system.SysUtils,
-     fmx.platform,
-     {$IF defined(android)}
-     androidapi.JNI.JavaTypes,
-     Androidapi.JNI.Os,
-     FMX.Helpers.Android,
-     FMX.platform.Android,
-     {$ELSEIF defined(IOS)}
-     Macapi.Helpers,
-     iOSapi.Helpers,
-     iOSapi.CocoaTypes,
-     IOSapi.UIKit,
-     Macapi.ObjCRuntime,
-     FMX.Helpers.iOS,
-     ALMacapiObjCRuntime,
-     {$ENDIF}
-     AlString,
-     alJsonDoc,
-     alcommon;
+uses
+  system.SysUtils,
+  fmx.platform,
+  {$IF defined(android)}
+  androidapi.JNI.JavaTypes,
+  Androidapi.JNI.Os,
+  FMX.Helpers.Android,
+  FMX.platform.Android,
+  {$ELSEIF defined(IOS)}
+  Macapi.Helpers,
+  iOSapi.Helpers,
+  iOSapi.CocoaTypes,
+  IOSapi.UIKit,
+  Macapi.ObjCRuntime,
+  FMX.Helpers.iOS,
+  {$ENDIF}
+  AlString,
+  alJsonDoc,
+  alcommon;
 
 /////////////////////////////////
 // TALFirebaseInstanceIdClient //
@@ -325,7 +324,7 @@ constructor TALFirebaseInstanceIdClient.Create;
 
 {$REGION ' ANDROID'}
 {$IF defined(android)}
-var aIntentFilter: JIntentFilter;
+var LIntentFilter: JIntentFilter;
 {$ENDIF}
 {$ENDREGION}
 
@@ -343,8 +342,8 @@ begin
     fBroadcastReceiver := TJALBroadcastReceiver.JavaClass.init();
     FBroadcastReceiverListener := TBroadcastReceiverListener.Create(Self);
     fBroadcastReceiver.setListener(FBroadcastReceiverListener);
-    aIntentFilter := TJIntentFilter.JavaClass.init(TJALFirebaseInstanceIdService.JavaClass.ACTION_TOKENREFRESHED);
-    TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).registerReceiver(fBroadcastReceiver, aIntentFilter);
+    LIntentFilter := TJIntentFilter.JavaClass.init(TJALFirebaseInstanceIdService.JavaClass.ACTION_TOKENREFRESHED);
+    TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).registerReceiver(fBroadcastReceiver, LIntentFilter);
 
   {$ENDIF}
   {$ENDREGION}
@@ -420,16 +419,16 @@ end;
 
 {*************************************************************************************************************}
 procedure TALFirebaseInstanceIdClient.TBroadcastReceiverListener.onReceive(context: JContext; intent: JIntent);
-var aToken: String;
+var LToken: String;
 begin
 
-  aToken := JstringToString(intent.getStringExtra(StringToJstring('token')));
+  LToken := JstringToString(intent.getStringExtra(StringToJstring('token')));
   {$IFDEF DEBUG}
-  allog('TALFirebaseInstanceIdClient.TBroadcastReceiverListener.onReceive','Token: ' + aToken +
+  allog('TALFirebaseInstanceIdClient.TBroadcastReceiverListener.onReceive','Token: ' + LToken +
                                                                            ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
 
-  if assigned(fFirebaseInstanceIdClient.fOnTokenRefresh) then fFirebaseInstanceIdClient.fOnTokenRefresh(aToken);
+  if assigned(fFirebaseInstanceIdClient.fOnTokenRefresh) then fFirebaseInstanceIdClient.fOnTokenRefresh(LToken);
 
 end;
 
@@ -564,15 +563,15 @@ procedure TALFirebaseMessagingClient.connect;
 
 {$REGION ' ANDROID'}
 {$IF defined(android)}
-var aIntentFilter: JIntentFilter;
+var LIntentFilter: JIntentFilter;
 {$ENDIF}
 {$ENDREGION}
 
 {$REGION ' IOS'}
 {$IF defined(IOS)}
-var aTypes: NSUInteger;
-    aOptions: UNAuthorizationOptions;
-    aSettings: UIUserNotificationSettings;
+var LTypes: NSUInteger;
+    LOptions: UNAuthorizationOptions;
+    LSettings: UIUserNotificationSettings;
 {$ENDIF}
 {$ENDREGION}
 
@@ -588,8 +587,8 @@ begin
 
       fIsPhysicallyConnected := True;
 
-      aIntentFilter := TJIntentFilter.JavaClass.init(TJALFirebaseMessagingService.JavaClass.ACTION_MESSAGERECEIVED);
-      TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).registerReceiver(fBroadcastReceiver, aIntentFilter);
+      LIntentFilter := TJIntentFilter.JavaClass.init(TJALFirebaseMessagingService.JavaClass.ACTION_MESSAGERECEIVED);
+      TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).registerReceiver(fBroadcastReceiver, LIntentFilter);
 
       {$IFDEF DEBUG}
       allog('TALFirebaseMessagingClient.connect', 'Physically connected', TalLogType.verbose);
@@ -610,10 +609,10 @@ begin
       // For iOS 10 display notification (sent via APNS)
       fUserNotificationCenterDelegate := TUserNotificationCenterDelegate.Create(self);
       TUNUserNotificationCenter.OCClass.currentNotificationCenter.setdelegate(fUserNotificationCenterDelegate.GetObjectID);
-      aOptions := UNAuthorizationOptionSound or
+      LOptions := UNAuthorizationOptionSound or
                   UNAuthorizationOptionAlert or
                   UNAuthorizationOptionBadge;
-      TUNUserNotificationCenter.OCClass.currentNotificationCenter.requestAuthorizationWithOptions(aOptions{options}, UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler{completionHandler});
+      TUNUserNotificationCenter.OCClass.currentNotificationCenter.requestAuthorizationWithOptions(LOptions{options}, UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler{completionHandler});
 
       // registerForRemoteNotifications
       SharedApplication.registerForRemoteNotifications;
@@ -621,20 +620,20 @@ begin
     end
     else if TOSVersion.Check(8) then begin // iOS 8 or later
 
-      aTypes := UIUserNotificationTypeSound or
+      LTypes := UIUserNotificationTypeSound or
                 UIUserNotificationTypeAlert or
                 UIUserNotificationTypeBadge;
-      aSettings := TUIUserNotificationSettings.Wrap(TUIUserNotificationSettings.OCClass.settingsForTypes(aTypes{types}, nil{categories}));
-      sharedApplication.registerUserNotificationSettings(aSettings);
+      LSettings := TUIUserNotificationSettings.Wrap(TUIUserNotificationSettings.OCClass.settingsForTypes(LTypes{types}, nil{categories}));
+      sharedApplication.registerUserNotificationSettings(LSettings);
       SharedApplication.registerForRemoteNotifications;
 
     end
     else begin // iOS 7.1 or earlier.
 
-      aTypes := UIRemoteNotificationTypeSound or
+      LTypes := UIRemoteNotificationTypeSound or
                 UIRemoteNotificationTypeAlert or
                 UIRemoteNotificationTypeBadge;
-      SharedApplication.registerForRemoteNotificationTypes(Addr(aTypes));
+      SharedApplication.registerForRemoteNotificationTypes(Addr(LTypes));
 
     end;
 
@@ -761,30 +760,30 @@ procedure TALFirebaseMessagingClient.applicationEvent(const Sender: TObject; con
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _handlePendingDataMessage;
-  var aJsonDoc: TalJsonDocumentU;
-      aMessagesNode: TalJsonNodeU;
-      aPayload: TalStringListU;
+  var LJsonDoc: TalJsonDocumentU;
+      LMessagesNode: TalJsonNodeU;
+      LPayload: TalStringListU;
       i: integer;
   begin
     Try
-      aJsonDoc := TalJsonDocumentU.create;
+      LJsonDoc := TalJsonDocumentU.create;
       try
-        aJsonDoc.LoadFromJSONString(JstringToString(TJALFirebaseMessagingService.JavaClass.getPendingDataMessages));
-        aMessagesNode := aJsonDoc.ChildNodes.FindNode('messages');
-        if (aMessagesNode <> nil) and assigned(fOnMessageReceived) then begin
-          aPayload := TalStringListU.Create;
+        LJsonDoc.LoadFromJSONString(JstringToString(TJALFirebaseMessagingService.JavaClass.getPendingDataMessages));
+        LMessagesNode := LJsonDoc.ChildNodes.FindNode('messages');
+        if (LMessagesNode <> nil) and assigned(fOnMessageReceived) then begin
+          LPayload := TalStringListU.Create;
           try
-            for I := 0 to aMessagesNode.ChildNodes.Count - 1 do begin
-              aPayload.Clear;
-              ALJSONToTStringsU(aMessagesNode.ChildNodes[i], aPayload);
-              fOnMessageReceived(aPayload);
+            for I := 0 to LMessagesNode.ChildNodes.Count - 1 do begin
+              LPayload.Clear;
+              ALJSONToTStringsU(LMessagesNode.ChildNodes[i], LPayload);
+              fOnMessageReceived(LPayload);
             end;
           finally
-            alFreeAndNil(aPayload);
+            alFreeAndNil(LPayload);
           end;
         end;
       finally
-        ALFreeAndNil(aJsonDoc, false{adelayed}, false{aRefCountWarn});
+        ALFreeAndNil(LJsonDoc);
       end;
     except
       {$IFDEF DEBUG}
@@ -794,7 +793,8 @@ procedure TALFirebaseMessagingClient.applicationEvent(const Sender: TObject; con
     end;
   end;
 
-var aWasConnected: Boolean;
+var LWasConnected: Boolean;
+
 begin
   if M is TApplicationEventMessage then begin
     case (M as TApplicationEventMessage).Value.Event of
@@ -811,9 +811,9 @@ begin
                                         end;                                                // we create the TALFirebaseMessagingClient in the formCreate
                                       end;
       TApplicationEvent.EnteredBackground: begin
-                                              aWasConnected := fconnected;
+                                              LWasConnected := fconnected;
                                               disconnect;
-                                              fconnected := aWasConnected;
+                                              fconnected := LWasConnected;
                                             end;
       TApplicationEvent.WillBecomeInactive:; // << don't do anything here, because this event is fired when for exemple we open the keyboard
     end;
@@ -822,50 +822,50 @@ end;
 
 {***********************************************************************************}
 procedure TALFirebaseMessagingClient.HandleNotificationIntent(const Intent: JIntent);
-var aPayload: TalStringListU;
-    ABundle: JBundle;
-    aIterator: JIterator;
-    aKeyObj: JObject;
-    aKeyStr: Jstring;
-    aValueObj: JObject;
-    aValueStr: String;
+var LPayload: TalStringListU;
+    LBundle: JBundle;
+    LIterator: JIterator;
+    LKeyObj: JObject;
+    LKeyStr: Jstring;
+    LValueObj: JObject;
+    LValueStr: String;
 begin
 
   if (Intent = nil) or
      (Intent.getAction = nil) or
      (Intent.getAction.compareTo(TJALFirebaseMessagingService.JavaClass.ACTION_MESSAGERECEIVED) <> 0) then exit;
 
-  aPayload := TalStringListU.Create;
+  LPayload := TalStringListU.Create;
   try
 
-    ABundle := intent.getExtras;
-    if ABundle <> nil then begin
-      aIterator := ABundle.keySet.iterator;
-      while aIterator.hasNext do begin
+    LBundle := intent.getExtras;
+    if LBundle <> nil then begin
+      LIterator := LBundle.keySet.iterator;
+      while LIterator.hasNext do begin
         //-----
-        aKeyObj := aIterator.next;
-        if aKeyObj = nil then continue;
-        aKeyStr := aKeyObj.toString;
+        LKeyObj := LIterator.next;
+        if LKeyObj = nil then continue;
+        LKeyStr := LKeyObj.toString;
         //-----
-        aValueObj := ABundle.&get(aKeyStr);
-        if aValueObj = nil then aValueStr := ''
-        else aValueStr := JStringToString(aValueObj.toString);
+        LValueObj := LBundle.&get(LKeyStr);
+        if LValueObj = nil then LValueStr := ''
+        else LValueStr := JStringToString(LValueObj.toString);
         //-----
-        aPayload.Add(JStringToString(aKeyStr) + aPayload.NameValueSeparator + aValueStr);
+        LPayload.Add(JStringToString(LKeyStr) + LPayload.NameValueSeparator + LValueStr);
         //-----
       end;
     end;
 
     {$IFDEF DEBUG}
-    allog('TALFirebaseMessagingClient.HandleNotificationIntent','Payload: ' + aPayload.Text +
+    allog('TALFirebaseMessagingClient.HandleNotificationIntent','Payload: ' + LPayload.Text +
                                                                 ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
     {$ENDIF}
 
     if assigned(fOnMessageReceived) then
-      fOnMessageReceived(aPayload);
+      fOnMessageReceived(LPayload);
 
   finally
-    ALFreeAndNil(aPayload);
+    ALFreeAndNil(LPayload);
   end;
 
 end;
@@ -902,43 +902,43 @@ end;
 procedure TALFirebaseMessagingClient.TUserNotificationCenterDelegate.userNotificationCenterWillPresentNotificationWithCompletionHandler(center: UNUserNotificationCenter;
                                                                                                                                         willPresentNotification: UNNotification;
                                                                                                                                         withCompletionHandler: TUserNotificationCenterWillPresentNotificationCompletionHandler);
-var aImp: procedure(aOptions: UNNotificationPresentationOptions); cdecl;
-    aPresent: boolean;
-    aOptions: UNNotificationPresentationOptions;
-    aMessage: TPushRemoteNotificationMessage;
-    aJsonDoc: TalJsonDocumentU;
-    aJsonStr: String;
+var LImp: procedure(aOptions: UNNotificationPresentationOptions); cdecl;
+    LPresent: boolean;
+    LOptions: UNNotificationPresentationOptions;
+    LMessage: TPushRemoteNotificationMessage;
+    LJsonDoc: TalJsonDocumentU;
+    LJsonStr: String;
 begin
 
   // if 'notification.present' is in the data payload, then it's mean it's
   // an alert we want to show
-  aJsonDoc := TalJsonDocumentU.create;
+  LJsonDoc := TalJsonDocumentU.create;
   try
-    aJsonStr := _NSDictionaryToJSON(willPresentNotification.request.content.userInfo);
-    if aJsonStr <> '' then aJsonDoc.LoadFromJSONString(aJsonStr);
-    aOptions := UNNotificationPresentationOptionNone;
-    aPresent := ALStrToBoolU(aJsonDoc.Node.GetChildNodeValueText('notification.present', '0'));
-    if aPresent then begin
-      aOptions := aOptions or UNNotificationPresentationOptionAlert;
-      if aJsonDoc.Node.ChildNodes.FindNode('notification.badgecount') <> nil then aOptions := aOptions or UNNotificationPresentationOptionBadge;
-      if aJsonDoc.Node.ChildNodes.FindNode('notification.sound') <> nil then aOptions := aOptions or UNNotificationPresentationOptionSound;
+    LJsonStr := _NSDictionaryToJSON(willPresentNotification.request.content.userInfo);
+    if LJsonStr <> '' then LJsonDoc.LoadFromJSONString(LJsonStr);
+    LOptions := UNNotificationPresentationOptionNone;
+    LPresent := ALStrToBoolU(LJsonDoc.Node.GetChildNodeValueText('notification.present', '0'));
+    if LPresent then begin
+      LOptions := LOptions or UNNotificationPresentationOptionAlert;
+      if LJsonDoc.Node.ChildNodes.FindNode('notification.badgecount') <> nil then LOptions := LOptions or UNNotificationPresentationOptionBadge;
+      if LJsonDoc.Node.ChildNodes.FindNode('notification.sound') <> nil then LOptions := LOptions or UNNotificationPresentationOptionSound;
     end;
   finally
-    ALFreeAndNil(aJsonDoc);
+    ALFreeAndNil(LJsonDoc);
   end;
 
   {$IFDEF DEBUG}
-  allog('TALFirebaseMessagingClient.TUserNotificationCenterDelegate.userNotificationCenterWillPresentNotificationWithCompletionHandler', aJsonStr +
+  allog('TALFirebaseMessagingClient.TUserNotificationCenterDelegate.userNotificationCenterWillPresentNotificationWithCompletionHandler', LJsonStr +
                                                                                                                                          ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
-  if not aPresent then begin
-    aMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(aJsonStr));
-    TMessageManager.DefaultManager.SendMessage(nil, aMessage);
+  if not LPresent then begin
+    LMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(LJsonStr));
+    TMessageManager.DefaultManager.SendMessage(nil, LMessage);
   end;
 
-  @aImp := imp_implementationWithBlock(withCompletionHandler);
-  aImp(aOptions);
-  imp_removeBlock(@aImp);
+  @LImp := imp_implementationWithBlock(withCompletionHandler);
+  LImp(LOptions);
+  imp_removeBlock(@LImp);
 
 end;
 
@@ -947,32 +947,32 @@ end;
 procedure TALFirebaseMessagingClient.TUserNotificationCenterDelegate.userNotificationCenterDidReceiveNotificationResponseWithCompletionHandler(center: UNUserNotificationCenter;
                                                                                                                                                didReceiveNotificationResponse: UNNotificationResponse;
                                                                                                                                                withCompletionHandler: TUserNotificationCenterDidReceiveNotificationResponseCompletionHandler); cdecl;
-var aImp: procedure(); cdecl;
-    aMessage: TPushRemoteNotificationMessage;
-    aJsonDoc: TalJsonDocumentU;
-    aJsonStr: String;
+var LImp: procedure(); cdecl;
+    LMessage: TPushRemoteNotificationMessage;
+    LJsonDoc: TalJsonDocumentU;
+    LJsonStr: String;
 begin
 
-  aJsonDoc := TalJsonDocumentU.create;
+  LJsonDoc := TalJsonDocumentU.create;
   try
-    aJsonStr := _NSDictionaryToJSON(didReceiveNotificationResponse.notification.request.content.userInfo);
-    if aJsonStr <> '' then aJsonDoc.LoadFromJSONString(aJsonStr);
-    if aJsonDoc.Node.ChildNodes.FindNode('notification.presented') = nil then
-      aJsonDoc.Node.AddChild('notification.presented').Text := '1';
-    aMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(aJsonDoc.JSON));
+    LJsonStr := _NSDictionaryToJSON(didReceiveNotificationResponse.notification.request.content.userInfo);
+    if LJsonStr <> '' then LJsonDoc.LoadFromJSONString(LJsonStr);
+    if LJsonDoc.Node.ChildNodes.FindNode('notification.presented') = nil then
+      LJsonDoc.Node.AddChild('notification.presented').Text := '1';
+    LMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(LJsonDoc.JSON));
   finally
-    ALFreeAndNil(aJsonDoc);
+    ALFreeAndNil(LJsonDoc);
   end;
 
   {$IFDEF DEBUG}
-  allog('TALFirebaseMessagingClient.TUserNotificationCenterDelegate.userNotificationCenterDidReceiveNotificationResponseWithCompletionHandler', aMessage.Value.Notification +
+  allog('TALFirebaseMessagingClient.TUserNotificationCenterDelegate.userNotificationCenterDidReceiveNotificationResponseWithCompletionHandler', LMessage.Value.Notification +
                                                                                                                                                 ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
-  TMessageManager.DefaultManager.SendMessage(nil, aMessage);
+  TMessageManager.DefaultManager.SendMessage(nil, LMessage);
 
-  @aImp := imp_implementationWithBlock(withCompletionHandler);
-  aImp();
-  imp_removeBlock(@aImp);
+  @LImp := imp_implementationWithBlock(withCompletionHandler);
+  LImp();
+  imp_removeBlock(@LImp);
 
 end;
 
@@ -989,23 +989,23 @@ end;
 // * Uploading the FCM token to your application server, so targeted notifications can be sent.
 // * Subscribing to any topics.
 procedure TALFirebaseMessagingClient.TFIRMessagingDelegate.messagingDidReceiveRegistrationToken(messaging: FIRMessaging; didReceiveRegistrationToken: NSString);
-var aToken: String;
+var LToken: String;
 begin
 
   // On android, to monitor the Token registration need by firebase messaging, you must listen onTokenRefresh inside FirebaseMessagingService
   // However on Ios to monitor the Token registration, you must listen messagingDidReceiveRegistrationToken inside a delegate assigned to  FirebaseMessaging
   // https://stackoverflow.com/questions/49728761/why-on-android-token-are-monitored-in-firebaseinstanceid-and-in-ios-in-firebasem
 
-  aToken := NSStrToStr(didReceiveRegistrationToken);
+  LToken := NSStrToStr(didReceiveRegistrationToken);
   {$IFDEF DEBUG}
-  allog('TALFirebaseMessagingClient.TFIRMessagingDelegate.messagingDidReceiveRegistrationToken','Token: ' + aToken +
+  allog('TALFirebaseMessagingClient.TFIRMessagingDelegate.messagingDidReceiveRegistrationToken','Token: ' + LToken +
                                                                                                 ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
 
   //execute fOnTokenRefresh
   if assigned(fFirebaseMessagingClient.fFirebaseInstanceIdClient) and
      assigned(fFirebaseMessagingClient.fFirebaseInstanceIdClient.fOnTokenRefresh) then
-    fFirebaseMessagingClient.fFirebaseInstanceIdClient.fOnTokenRefresh(aToken);
+    fFirebaseMessagingClient.fFirebaseInstanceIdClient.fOnTokenRefresh(LToken);
 
 end;
 
@@ -1013,26 +1013,26 @@ end;
 // This method is called on iOS 10 devices to handle data messages received via FCM through its direct channel (not via APNS).
 // For iOS 9 and below, the FCM data message is delivered via the UIApplicationDelegate’s -application:didReceiveRemoteNotification: method.
 procedure TALFirebaseMessagingClient.TFIRMessagingDelegate.messagingDidReceiveMessage(messaging: FIRMessaging; didReceiveMessage: FIRMessagingRemoteMessage);
-var aMessage: TPushRemoteNotificationMessage;
+var LMessage: TPushRemoteNotificationMessage;
 begin
 
-  aMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(_NSDictionaryToJSON(didReceiveMessage.appData)));
+  LMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(_NSDictionaryToJSON(didReceiveMessage.appData)));
   {$IFDEF DEBUG}
-  allog('TALFirebaseMessagingClient.TFIRMessagingDelegate.messagingDidReceiveMessage', aMessage.Value.Notification +
+  allog('TALFirebaseMessagingClient.TFIRMessagingDelegate.messagingDidReceiveMessage', LMessage.Value.Notification +
                                                                                        ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
-  TMessageManager.DefaultManager.SendMessage(nil, aMessage);
+  TMessageManager.DefaultManager.SendMessage(nil, LMessage);
 
 end;
 
 {*********************************************************************************************************************}
 procedure TALFirebaseMessagingClient.applicationDidReceiveRemoteNotification(const Sender: TObject; const M: TMessage);
-var aPayload: TalStringListU;
-    aJsonDoc: TalJsonDocumentU;
-    aJsonStr: String;
+var LPayload: TalStringListU;
+    LJsonDoc: TalJsonDocumentU;
+    LJsonStr: String;
 begin
 
-  aPayload := TalStringListU.Create;
+  LPayload := TalStringListU.Create;
   try
 
     if (M is TPushRemoteNotificationMessage) then begin
@@ -1042,76 +1042,76 @@ begin
 
         // Just received notification (Foreground)
         if sharedApplication.applicationState = UIApplicationStateActive then begin
-          aJsonStr := (M as TPushRemoteNotificationMessage).Value.Notification
+          LJsonStr := (M as TPushRemoteNotificationMessage).Value.Notification
         end
 
         // launched by taping notification
         else if sharedApplication.applicationState = UIApplicationStateInactive then begin
-          aJsonDoc := TalJsonDocumentU.create;
+          LJsonDoc := TalJsonDocumentU.create;
           try
-            aJsonStr := (M as TPushRemoteNotificationMessage).Value.Notification;
-            if aJsonStr <> '' then aJsonDoc.LoadFromJSONString(aJsonStr);
-            if ((ALStrToBoolU(aJsonDoc.Node.GetChildNodeValueText('notification', '0'))) or
-                (aJsonDoc.Node.childnodes.findnode('aps') <> nil)) and
-               (aJsonDoc.Node.ChildNodes.FindNode('notification.presented') = nil) then
-              aJsonDoc.Node.AddChild('notification.presented').Text := '1';
-            aJsonStr := aJsonDoc.JSON;
+            LJsonStr := (M as TPushRemoteNotificationMessage).Value.Notification;
+            if LJsonStr <> '' then LJsonDoc.LoadFromJSONString(LJsonStr);
+            if ((ALStrToBoolU(LJsonDoc.Node.GetChildNodeValueText('notification', '0'))) or
+                (LJsonDoc.Node.childnodes.findnode('aps') <> nil)) and
+               (LJsonDoc.Node.ChildNodes.FindNode('notification.presented') = nil) then
+              LJsonDoc.Node.AddChild('notification.presented').Text := '1';
+            LJsonStr := LJsonDoc.JSON;
           finally
-            ALFreeAndNil(aJsonDoc);
+            ALFreeAndNil(LJsonDoc);
           end;
         end
 
         // Just received notification (Background)
         else if sharedApplication.applicationState = UIApplicationStateBackground then begin
-          aJsonStr := (M as TPushRemoteNotificationMessage).Value.Notification
+          LJsonStr := (M as TPushRemoteNotificationMessage).Value.Notification
         end;
 
       end
 
       //ios 10+
-      else aJsonStr := (M as TPushRemoteNotificationMessage).Value.Notification
+      else LJsonStr := (M as TPushRemoteNotificationMessage).Value.Notification
 
     end
 
     else if (M is TPushStartupNotificationMessage) then begin
-      aJsonDoc := TalJsonDocumentU.create;
+      LJsonDoc := TalJsonDocumentU.create;
       try
-        aJsonStr := (M as TPushStartupNotificationMessage).Value.Notification;
-        if aJsonStr <> '' then aJsonDoc.LoadFromJSONString(aJsonStr);
-        if aJsonDoc.Node.ChildNodes.FindNode('notification.presented') = nil then
-          aJsonDoc.Node.AddChild('notification.presented').Text := '1';
-        aJsonStr := aJsonDoc.JSON;
+        LJsonStr := (M as TPushStartupNotificationMessage).Value.Notification;
+        if LJsonStr <> '' then LJsonDoc.LoadFromJSONString(LJsonStr);
+        if LJsonDoc.Node.ChildNodes.FindNode('notification.presented') = nil then
+          LJsonDoc.Node.AddChild('notification.presented').Text := '1';
+        LJsonStr := LJsonDoc.JSON;
       finally
-        ALFreeAndNil(aJsonDoc);
+        ALFreeAndNil(LJsonDoc);
       end;
     end
 
-    else aJsonStr := '';
+    else LJsonStr := '';
 
     {$IFDEF DEBUG}
-    allog('TALFirebaseMessagingClient.applicationDidReceiveRemoteNotification', aJsonStr +
+    allog('TALFirebaseMessagingClient.applicationDidReceiveRemoteNotification', LJsonStr +
                                                                                 ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
     {$ENDIF}
 
-    if aJsonStr <> '' then ALJSONToTStringsU(aJsonStr, ALDefaultFormatSettingsU, aPayload);
+    if LJsonStr <> '' then ALJSONToTStringsU(LJsonStr, ALDefaultFormatSettingsU, LPayload);
 
     if assigned(fOnMessageReceived) then
-      fOnMessageReceived(aPayload);
+      fOnMessageReceived(LPayload);
 
   finally
-    ALFreeAndNil(aPayload);
+    ALFreeAndNil(LPayload);
   end;
 
 end;
 
 {********************************************************************}
 procedure TALFirebaseMessagingClient.HandleStartupNotificationMessage;
-var aPushStartupNotificationMessage: TPushStartupNotificationMessage;
+var LPushStartupNotificationMessage: TPushStartupNotificationMessage;
 begin
   if TALFirebaseMessagingClient.StartupNotificationMessage <> '' then begin
-    aPushStartupNotificationMessage := TPushStartupNotificationMessage.Create(TPushNotificationData.Create(TALFirebaseMessagingClient.StartupNotificationMessage));
+    LPushStartupNotificationMessage := TPushStartupNotificationMessage.Create(TPushNotificationData.Create(TALFirebaseMessagingClient.StartupNotificationMessage));
     TALFirebaseMessagingClient.StartupNotificationMessage := '';
-    applicationDidReceiveRemoteNotification(Self, aPushStartupNotificationMessage);
+    applicationDidReceiveRemoteNotification(Self, LPushStartupNotificationMessage);
   end;
 end;
 

@@ -1,6 +1,6 @@
-{**************************************************************
+{*******************************************************************************
 Description:  Windows API function not (yet) in the windows.pas
-***************************************************************}
+*******************************************************************************}
 
 unit ALWindows;
 
@@ -8,7 +8,8 @@ interface
 
 {$MINENUMSIZE 4} // https://stackoverflow.com/questions/48953749/why-this-c-to-pascal-conversion-crash
 
-uses Winapi.Windows;
+uses
+  Winapi.Windows;
 
 type
   _MEMORYSTATUSEX = record
@@ -106,8 +107,9 @@ const
 
 implementation
 
-uses System.Ansistrings,
-     System.SysUtils;
+uses
+  System.Ansistrings,
+  System.SysUtils;
 
 {**********************************************************}
 function ALUserExists(const aUserName: AnsiString): boolean;

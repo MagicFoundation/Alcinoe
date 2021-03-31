@@ -2,13 +2,12 @@ unit ALFiles;
 
 interface
 
-uses ALCommon;
+{$I Alcinoe.inc}
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
+uses
+  ALCommon;
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 Function  AlEmptyDirectory(Directory: ansiString;
                            SubDirectory: Boolean;
                            const IgnoreFiles: Array of AnsiString;
@@ -41,7 +40,7 @@ function  ALCreateDir(const Dir: Ansistring): Boolean;
 function  ALRemoveDir(const Dir: Ansistring): Boolean;
 function  ALDeleteFile(const FileName: Ansistring): Boolean;
 function  ALRenameFile(const OldName, NewName: ansistring): Boolean;
-{$ENDIF}
+{$ENDIF !ALHideAnsiString}
 
 Function  AlEmptyDirectoryU(Directory: String;
                             SubDirectory: Boolean;
@@ -58,19 +57,21 @@ function  ALGetFileSizeU(const FileName : string): Int64;
 
 implementation
 
-uses System.Classes,
-     System.sysutils,
-     System.Masks,
-     {$IFNDEF NEXTGEN}
-     Winapi.Windows,
-     Winapi.ShLwApi,
-     {$ELSE}
-     Posix.Unistd,
-     {$ENDIF}
-     ALString,
-     ALStringList;
+uses
+  System.Classes,
+  System.sysutils,
+  System.Masks,
+  {$IFNDEF ALHideAnsiString}
+  System.AnsiStrings,
+  Winapi.Windows,
+  Winapi.ShLwApi,
+  {$ELSE}
+  Posix.Unistd,
+  {$ENDIF}
+  ALString,
+  ALStringList;
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 
 {***********************************************}
 Function  AlEmptyDirectory(Directory: ansiString;
@@ -79,9 +80,9 @@ Function  AlEmptyDirectory(Directory: ansiString;
                            const RemoveEmptySubDirectory: Boolean = True;
                            const FileNameMask: ansiString = '*';
                            const MinFileAge: TdateTime = ALNullDate): Boolean;
-var sr: TSearchRec;
-    aIgnoreFilesLst: TalStringList;
-    i: integer;
+var LSR: TSearchRec;
+    LIgnoreFilesLst: TalStringList;
+    I: integer;
 begin
   if (Directory = '') or
      (Directory = '.') or
@@ -89,42 +90,42 @@ begin
 
   Result := True;
   Directory := ALIncludeTrailingPathDelimiter(Directory);
-  aIgnoreFilesLst := TalStringList.Create;
+  LIgnoreFilesLst := TalStringList.Create;
   try
-    for I := 0 to length(IgnoreFiles) - 1 do aIgnoreFilesLst.Add(ALExcludeTrailingPathDelimiter(IgnoreFiles[i]));
-    aIgnoreFilesLst.Duplicates := DupIgnore;
-    aIgnoreFilesLst.Sorted := True;
-    if System.sysutils.FindFirst(string(Directory) + '*', faAnyFile	, sr) = 0 then begin
+    for I := 0 to length(IgnoreFiles) - 1 do LIgnoreFilesLst.Add(ALExcludeTrailingPathDelimiter(IgnoreFiles[I]));
+    LIgnoreFilesLst.Duplicates := DupIgnore;
+    LIgnoreFilesLst.Sorted := True;
+    if System.sysutils.FindFirst(string(Directory) + '*', faAnyFile	, LSR) = 0 then begin
       Try
         repeat
-          If (sr.Name <> '.') and
-             (sr.Name <> '..') and
-             (aIgnoreFilesLst.IndexOf(Directory + ansistring(sr.Name)) < 0) Then Begin
-            If ((sr.Attr and faDirectory) <> 0) then begin
+          If (LSR.Name <> '.') and
+             (LSR.Name <> '..') and
+             (LIgnoreFilesLst.IndexOf(Directory + ansistring(LSR.Name)) < 0) Then Begin
+            If ((LSR.Attr and faDirectory) <> 0) then begin
               If SubDirectory then begin
-                Result := AlEmptyDirectory(Directory + ansistring(sr.Name),
+                Result := AlEmptyDirectory(Directory + ansistring(LSR.Name),
                                            True,
                                            IgnoreFiles,
                                            RemoveEmptySubDirectory,
                                            fileNameMask,
                                            MinFileAge);
-                If result and RemoveEmptySubDirectory then RemoveDir(string(Directory) + sr.Name);
+                If result and RemoveEmptySubDirectory then RemoveDir(string(Directory) + LSR.Name);
               end;
             end
             else If ((FileNameMask = '*') or
-                     ALMatchesMask(AnsiString(sr.Name), FileNameMask))
+                     ALMatchesMask(AnsiString(LSR.Name), FileNameMask))
                     and
                     ((MinFileAge=ALNullDate) or
-                     (sr.TimeStamp < MinFileAge))
-            then Result := System.sysutils.Deletefile(string(Directory) + sr.Name);
+                     (LSR.TimeStamp < MinFileAge))
+            then Result := System.sysutils.Deletefile(string(Directory) + LSR.Name);
           end;
-        until (not result) or (FindNext(sr) <> 0);
+        until (not result) or (FindNext(LSR) <> 0);
       finally
-        System.sysutils.FindClose(sr);
+        System.sysutils.FindClose(LSR);
       end;
     end;
   finally
-    aIgnoreFilesLst.Free;
+    LIgnoreFilesLst.Free;
   end;
 end;
 
@@ -193,7 +194,7 @@ begin
   Handle := FindFirstFileA(PAnsiChar(AFileName), FindData);
   if Handle <> INVALID_HANDLE_VALUE then
   begin
-    {$IF CompilerVersion >= 23}{Delphi XE2}Winapi.{$IFEND}Windows.FindClose(Handle);
+    Winapi.Windows.FindClose(Handle);
     if (FindData.dwFileAttributes and FILE_ATTRIBUTE_DIRECTORY) = 0 then
     begin
       Int64Rec(Result).Lo := FindData.nFileSizeLow;
@@ -242,7 +243,7 @@ end;
 function ALGetModuleName: ansiString;
 var ModName: array[0..MAX_PATH] of AnsiChar;
 begin
-  SetString(Result, ModName, {$IF CompilerVersion >= 23}{Delphi XE2}Winapi.{$IFEND}Windows.GetModuleFileNameA(HInstance, ModName, SizeOf(ModName)));
+  SetString(Result, ModName, Winapi.Windows.GetModuleFileNameA(HInstance, ModName, SizeOf(ModName)));
   If ALpos('\\?\',result) = 1 then delete(Result,1,4);
 end;
 
@@ -255,64 +256,64 @@ end;
 
 {**************************************************************************}
 function  ALGetFileCreationDateTime(const aFileName: Ansistring): TDateTime;
-var aHandle: THandle;
-    aFindData: TWin32FindDataA;
-    aLocalFileTime: TFileTime;
-    aFileDate: Integer;
+var LHandle: THandle;
+    LFindData: TWin32FindDataA;
+    LLocalFileTime: TFileTime;
+    LFileDate: Integer;
 begin
-  aHandle := FindFirstFileA(PAnsiChar(aFileName), aFindData);
-  if (aHandle = INVALID_HANDLE_VALUE) or
-     (not {$IF CompilerVersion >= 23}{Delphi XE2}Winapi.{$IFEND}Windows.FindClose(aHandle)) or
-     (not FileTimeToLocalFileTime(aFindData.ftCreationTime, aLocalFileTime)) or
-     (not FileTimeToDosDateTime(aLocalFileTime, LongRec(aFileDate).Hi, LongRec(aFileDate).Lo)) then raiselastOsError;
-  Result := filedatetodatetime(aFileDate);
+  LHandle := FindFirstFileA(PAnsiChar(aFileName), LFindData);
+  if (LHandle = INVALID_HANDLE_VALUE) or
+     (not Winapi.Windows.FindClose(LHandle)) or
+     (not FileTimeToLocalFileTime(LFindData.ftCreationTime, LLocalFileTime)) or
+     (not FileTimeToDosDateTime(LLocalFileTime, LongRec(LFileDate).Hi, LongRec(LFileDate).Lo)) then raiselastOsError;
+  Result := filedatetodatetime(LFileDate);
 end;
 
 {***************************************************************************}
 function  ALGetFileLastWriteDateTime(const aFileName: Ansistring): TDateTime;
-var aHandle: THandle;
-    aFindData: TWin32FindDataA;
-    aLocalFileTime: TFileTime;
-    aFileDate: Integer;
+var LHandle: THandle;
+    LFindData: TWin32FindDataA;
+    LLocalFileTime: TFileTime;
+    LFileDate: Integer;
 begin
-  aHandle := FindFirstFileA(PAnsiChar(aFileName), aFindData);
-  if (aHandle = INVALID_HANDLE_VALUE) or
-     (not {$IF CompilerVersion >= 23}{Delphi XE2}Winapi.{$IFEND}Windows.FindClose(aHandle)) or
-     (not FileTimeToLocalFileTime(aFindData.ftLastWriteTime, aLocalFileTime)) or
-     (not FileTimeToDosDateTime(aLocalFileTime, LongRec(aFileDate).Hi, LongRec(aFileDate).Lo)) then raiselastOsError;
-  Result := filedatetodatetime(aFileDate);
+  LHandle := FindFirstFileA(PAnsiChar(aFileName), LFindData);
+  if (LHandle = INVALID_HANDLE_VALUE) or
+     (not Winapi.Windows.FindClose(LHandle)) or
+     (not FileTimeToLocalFileTime(LFindData.ftLastWriteTime, LLocalFileTime)) or
+     (not FileTimeToDosDateTime(LLocalFileTime, LongRec(LFileDate).Hi, LongRec(LFileDate).Lo)) then raiselastOsError;
+  Result := filedatetodatetime(LFileDate);
 end;
 
 {****************************************************************************}
 function  ALGetFileLastAccessDateTime(const aFileName: Ansistring): TDateTime;
-var aHandle: THandle;
-    aFindData: TWin32FindDataA;
-    aLocalFileTime: TFileTime;
-    aFileDate: Integer;
+var LHandle: THandle;
+    LFindData: TWin32FindDataA;
+    LLocalFileTime: TFileTime;
+    LFileDate: Integer;
 begin
-  aHandle := FindFirstFileA(PAnsiChar(aFileName), aFindData);
-  if (aHandle = INVALID_HANDLE_VALUE) or
-     (not {$IF CompilerVersion >= 23}{Delphi XE2}Winapi.{$IFEND}Windows.FindClose(aHandle)) or
-     (not FileTimeToLocalFileTime(aFindData.ftLastAccessTime, aLocalFileTime)) or
-     (not FileTimeToDosDateTime(aLocalFileTime, LongRec(aFileDate).Hi, LongRec(aFileDate).Lo)) then raiselastOsError;
-  Result := filedatetodatetime(aFileDate);
+  LHandle := FindFirstFileA(PAnsiChar(aFileName), LFindData);
+  if (LHandle = INVALID_HANDLE_VALUE) or
+     (not Winapi.Windows.FindClose(LHandle)) or
+     (not FileTimeToLocalFileTime(LFindData.ftLastAccessTime, LLocalFileTime)) or
+     (not FileTimeToDosDateTime(LLocalFileTime, LongRec(LFileDate).Hi, LongRec(LFileDate).Lo)) then raiselastOsError;
+  Result := filedatetodatetime(LFileDate);
 end;
 
 {***************************************************************************************************}
 Procedure ALSetFileCreationDateTime(Const aFileName: Ansistring; Const aCreationDateTime: TDateTime);
-Var ahandle: Thandle;
-    aSystemTime: TsystemTime;
-    afiletime: TfileTime;
+Var LHandle: Thandle;
+    LSystemTime: TsystemTime;
+    LFiletime: TfileTime;
 Begin
-  aHandle := {$IF CompilerVersion >= 23}{Delphi XE2}System.{$IFEND}sysUtils.fileOpen(String(aFileName), fmOpenWrite or fmShareDenyNone);
-  if aHandle = INVALID_HANDLE_VALUE then raiseLastOsError;
+  LHandle := System.sysUtils.fileOpen(String(aFileName), fmOpenWrite or fmShareDenyNone);
+  if LHandle = INVALID_HANDLE_VALUE then raiseLastOsError;
   Try
-    dateTimeToSystemTime(aCreationDateTime, aSystemTime);
-    if (not SystemTimeToFileTime(aSystemTime, aFileTime)) or
-       (not LocalFileTimeToFileTime(aFileTime, aFileTime)) or
-       (not setFileTime(aHandle, @aFileTime, nil, nil)) then raiselastOsError;
+    dateTimeToSystemTime(aCreationDateTime, LSystemTime);
+    if (not SystemTimeToFileTime(LSystemTime, LFiletime)) or
+       (not LocalFileTimeToFileTime(LFiletime, LFiletime)) or
+       (not setFileTime(LHandle, @LFiletime, nil, nil)) then raiselastOsError;
   finally
-    fileClose(aHandle);
+    fileClose(LHandle);
   end;
 End;
 
@@ -358,7 +359,7 @@ begin
   Result := MoveFileA(PansiChar(OldName), PansiChar(NewName));
 end;
 
-{$ENDIF}
+{$ENDIF !ALHideAnsiString}
 
 {********************************************}
 Function  AlEmptyDirectoryU(Directory: String;
@@ -367,9 +368,9 @@ Function  AlEmptyDirectoryU(Directory: String;
                             const RemoveEmptySubDirectory: Boolean = True;
                             const FileNameMask: String = '*';
                             const MinFileAge: TdateTime = ALNullDate): Boolean;
-var sr: TSearchRec;
-    aIgnoreFilesLst: TalStringListU;
-    i: integer;
+var LSR: TSearchRec;
+    LIgnoreFilesLst: TalStringListU;
+    I: integer;
 begin
   if (Directory = '') or
      (Directory = '.') or
@@ -377,42 +378,42 @@ begin
 
   Result := True;
   Directory := ALIncludeTrailingPathDelimiterU(Directory);
-  aIgnoreFilesLst := TalStringListU.Create;
+  LIgnoreFilesLst := TalStringListU.Create;
   try
-    for I := 0 to length(IgnoreFiles) - 1 do aIgnoreFilesLst.Add(ALExcludeTrailingPathDelimiterU(IgnoreFiles[i]));
-    aIgnoreFilesLst.Duplicates := DupIgnore;
-    aIgnoreFilesLst.Sorted := True;
-    if System.sysutils.FindFirst(string(Directory) + '*', faAnyFile	, sr) = 0 then begin
+    for I := 0 to length(IgnoreFiles) - 1 do LIgnoreFilesLst.Add(ALExcludeTrailingPathDelimiterU(IgnoreFiles[I]));
+    LIgnoreFilesLst.Duplicates := DupIgnore;
+    LIgnoreFilesLst.Sorted := True;
+    if System.sysutils.FindFirst(string(Directory) + '*', faAnyFile	, LSR) = 0 then begin
       Try
         repeat
-          If (sr.Name <> '.') and
-             (sr.Name <> '..') and
-             (aIgnoreFilesLst.IndexOf(Directory + sr.Name) < 0) Then Begin
-            If ((sr.Attr and faDirectory) <> 0) then begin
+          If (LSR.Name <> '.') and
+             (LSR.Name <> '..') and
+             (LIgnoreFilesLst.IndexOf(Directory + LSR.Name) < 0) Then Begin
+            If ((LSR.Attr and faDirectory) <> 0) then begin
               If SubDirectory then begin
-                Result := AlEmptyDirectoryU(Directory + sr.Name,
+                Result := AlEmptyDirectoryU(Directory + LSR.Name,
                                             True,
                                             IgnoreFiles,
                                             RemoveEmptySubDirectory,
                                             fileNameMask,
                                             MinFileAge);
-                If result and RemoveEmptySubDirectory then RemoveDir(string(Directory) + sr.Name);
+                If result and RemoveEmptySubDirectory then RemoveDir(string(Directory) + LSR.Name);
               end;
             end
             else If ((FileNameMask = '*') or
-                     MatchesMask(sr.Name, FileNameMask))
+                     MatchesMask(LSR.Name, FileNameMask))
                     and
                     ((MinFileAge=ALNullDate) or
-                     (sr.TimeStamp < MinFileAge))
-            then Result := System.sysutils.Deletefile(string(Directory) + sr.Name);
+                     (LSR.TimeStamp < MinFileAge))
+            then Result := System.sysutils.Deletefile(string(Directory) + LSR.Name);
           end;
-        until (not result) or (FindNext(sr) <> 0);
+        until (not result) or (FindNext(LSR) <> 0);
       finally
-        System.sysutils.FindClose(sr);
+        System.sysutils.FindClose(LSR);
       end;
     end;
   finally
-    aIgnoreFilesLst.Free;
+    LIgnoreFilesLst.Free;
   end;
 end;
 
@@ -433,13 +434,13 @@ end;
 
 {*******************************************************}
 function ALGetFileSizeU(const FileName : string) : Int64;
-var aFileStream: TFileStream;
+var LFileStream: TFileStream;
 begin
-  aFileStream := TFileStream.Create(FileName, fmOpenRead);
+  LFileStream := TFileStream.Create(FileName, fmOpenRead);
   try
-    result := aFileStream.Size;
+    result := LFileStream.Size;
   finally
-    alFreeAndNil(aFileStream);
+    alFreeAndNil(LFileStream);
   end;
 end;
 

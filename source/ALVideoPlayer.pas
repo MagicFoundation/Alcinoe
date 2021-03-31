@@ -1,34 +1,42 @@
+(*******************************************************************************
+ALVideoPlayer will render a video on a TEXTURE. this is really important because
+you can fully integrate the video in the delphi form and you can place any
+controls you want on the top of it as it's support Z-ORDER. Official delphi
+video player are just native video player window on the top of the form and
+thus not supporting Z-ORDER.
+
+Under android I use ExoPlayer. ExoPlayer is an open source project that is not
+part of the Android framework and is distributed separately from the Android
+SDK. ExoPlayer’s standard audio and video components are built on Android’s
+MediaCodec API, which was released in Android 4.1 (API level 16). Because
+ExoPlayer is a library, you can easily take advantage of new features as
+they become available by updating your app. ExoPlayer supports features like
+Dynamic adaptive streaming over HTTP (DASH), HLS, SmoothStreaming and Common
+Encryption, which are not supported by MediaPlayer. It's designed to be easy
+to customize and extend.
+
+Under Ios i use AVPlayer with support also HLS like exoplayer do.
+
+Notice: I stop to support delphi berlin with have 2 UI threads on android, it's
+too hard to manage and debug the both compiler
+
+
+INSTALLATION
+1) on android you will need to patch the RTL because it's not support
+   GL_TEXTURE_EXTERNAL_OES https://quality.embarcadero.com/browse/RSP-16830
+   see sample of the patched library in demos\alfmxcontrols
+2) on android we use exoplayer so you must add the exoplayer libraries
+   (lib\jar\exoplayer\exoplayer-core.jar and if you need HLS support
+   lib\jar\exoplayer\exoplayer-hls.jar) in
+   project manager > target platforms> Android > libraries
+3) after it's must be quite easy, just read the source code or look the sample
+   located at demos\alfmxcontrols
+*******************************************************************************)
 unit ALVideoPlayer;
 
 interface
 
-//
-// ALVideoPlayer will render a video on a TEXTURE. this is really important because you can fully integrate the video in
-// the delphi form and you can place any controls you want on the top of it as it's support Z-ORDER. Official delphi video player
-// are just native video player window on the top of the form and thus not supporting Z-ORDER.
-//
-// Under android I use ExoPlayer. ExoPlayer is an open source project that is not part of the Android framework and is distributed
-// separately from the Android SDK. ExoPlayer’s standard audio and video components are built on Android’s MediaCodec API, which
-// was released in Android 4.1 (API level 16). Because ExoPlayer is a library, you can easily take advantage of new features as
-// they become available by updating your app. ExoPlayer supports features like Dynamic adaptive streaming over HTTP (DASH), HLS,
-// SmoothStreaming and Common Encryption, which are not supported by MediaPlayer. It's designed to be easy to customize and extend.
-//
-// Under Ios i use AVPlayer with support also HLS like exoplayer do.
-//
-// Notice: I stop to support delphi berlin with have 2 UI threads on android, it's too hard to manage and debug the both compiler
-//
-//
-// INSTALLATION
-// 1) on android you will need to patch the RTL because it's not support GL_TEXTURE_EXTERNAL_OES https://quality.embarcadero.com/browse/RSP-16830
-//    see sample of the patched library in demos\alfmxcontrols
-// 2) on android we use exoplayer so you must add the exoplayer libraries (lib\jar\exoplayer\exoplayer-core.jar and if you need HLS support lib\jar\exoplayer\exoplayer-hls.jar)
-//    in project manager > target platforms > Android > libraries
-// 3) after it's must be quite easy, just read the source code or look the sample located at demos\alfmxcontrols
-//
-
-{$IF defined(MACOS) and not defined(IOS)}
-  {$DEFINE _MACOS}
-{$IFEND}
+{$I Alcinoe.inc}
 
 uses
   system.Classes,
@@ -326,8 +334,8 @@ type
   {$ENDREGION}
 
   {****************}
-  {$REGION '_MACOS'}
-  {$IF defined(_MACOS)}
+  {$REGION 'ALMacOS'}
+  {$IF defined(ALMacOS)}
   TALMacOSVideoPlayer = class(Tobject)
   private
     fbitmap: TBitmap;
@@ -374,7 +382,7 @@ type
     fVideoPlayerControl: TALIOSVideoPlayer;
     {$ELSEIF defined(MSWINDOWS)}
     fVideoPlayerControl: TALWinVideoPlayer;
-    {$ELSEIF defined(_MACOS)}
+    {$ELSEIF defined(ALMacOS)}
     fVideoPlayerControl: TALMacOSVideoPlayer;
     {$ENDIF}
     //-----
@@ -504,7 +512,7 @@ end;
 {************************************************************************************************************}
 procedure TALAndroidVideoPlayer.TALFrameAvailableListener.DoOnFrameAvailable(surfaceTexture: JSurfaceTexture);
 {$IF defined(DEBUG)}
-var aStopWatch: TStopWatch;
+var LStopWatch: TStopWatch;
 {$ENDIF}
 begin
 
@@ -522,7 +530,7 @@ begin
   inc(fTotalFramesProcessed);
   {$ENDIF}
 
-  {$IF CompilerVersion > 33} // rio
+  {$IF CompilerVersion > 34} // sydney
     {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
   {$ENDIF}
   if (fVideoPlayerControl.fbitmap.Width <> fVideoPlayerControl.fVideoWidth) or
@@ -542,15 +550,15 @@ begin
   end;
 
   {$IF defined(DEBUG)}
-  if (fTotalFramesProcessed mod 1000 = 0) then aStopWatch := TStopWatch.StartNew;
+  if (fTotalFramesProcessed mod 1000 = 0) then LStopWatch := TStopWatch.StartNew;
   {$ENDIF}
 
   fVideoPlayerControl.fSurfaceTexture.updateTexImage;
 
   {$IFDEF DEBUG}
   if (fTotalFramesProcessed mod 1000 = 0) then begin
-    aStopWatch.Stop;
-    ALLog('TALAndroidVideoPlayer.onFrameAvailable.updateTexImage', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+    LStopWatch.Stop;
+    ALLog('TALAndroidVideoPlayer.onFrameAvailable.updateTexImage', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   end;
   {$ENDIF}
 
@@ -747,11 +755,11 @@ end;
 {***************************************}
 constructor TALAndroidVideoPlayer.Create;
 {$IFDEF DEBUG}
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 {$ENDIF}
 begin
   {$IFDEF DEBUG}
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   //-----
@@ -801,8 +809,8 @@ begin
 
   //----
   {$IFDEF DEBUG}
-  aStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.Create', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  LStopWatch.Stop;
+  ALLog('TALAndroidVideoPlayer.Create', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -810,11 +818,11 @@ end;
 {***************************************}
 destructor TALAndroidVideoPlayer.Destroy;
 {$IFDEF DEBUG}
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 {$ENDIF}
 begin
   {$IFDEF DEBUG}
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   //-----
@@ -855,8 +863,8 @@ begin
 
   //----
   {$IFDEF DEBUG}
-  aStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.Destroy', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  LStopWatch.Stop;
+  ALLog('TALAndroidVideoPlayer.Destroy', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -909,15 +917,15 @@ end;
 
 {*****************************************************************}
 procedure TALAndroidVideoPlayer.prepare(Const aDataSource: String);
-var aVideoSource: JMediaSource;
-    aExtractorMediaSourceFactory: JExtractorMediaSource_Factory;
-    aHlsMediaSourceFactory: JHlsMediaSource_Factory;
+var LVideoSource: JMediaSource;
+    LExtractorMediaSourceFactory: JExtractorMediaSource_Factory;
+    LHlsMediaSourceFactory: JHlsMediaSource_Factory;
     {$IFDEF DEBUG}
-    aStopWatch: TstopWatch;
+    LStopWatch: TstopWatch;
     {$ENDIF}
 begin
   {$IFDEF DEBUG}
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   //----
@@ -925,40 +933,39 @@ begin
 
   //HLS datasource
   if alSameTextU(ExtractFileExt(aDataSource), '.m3u8') then begin
-    aHlsMediaSourceFactory := TJHlsMediaSource_Factory.JavaClass.init(fDataSourceFactory);
-    aVideoSource := aHlsMediaSourceFactory.createMediaSource(StrToJURI(aDataSource));
-    aHlsMediaSourceFactory := nil;
+    LHlsMediaSourceFactory := TJHlsMediaSource_Factory.JavaClass.init(fDataSourceFactory);
+    LVideoSource := LHlsMediaSourceFactory.createMediaSource(StrToJURI(aDataSource));
+    LHlsMediaSourceFactory := nil;
   end
 
   //Other datasource
   else begin
-    aExtractorMediaSourceFactory := TJExtractorMediaSource_Factory.JavaClass.init(fDataSourceFactory);
-    aVideoSource := aExtractorMediaSourceFactory.createMediaSource(StrToJURI(aDataSource));
-    aExtractorMediaSourceFactory := nil;
+    LExtractorMediaSourceFactory := TJExtractorMediaSource_Factory.JavaClass.init(fDataSourceFactory);
+    LVideoSource := LExtractorMediaSourceFactory.createMediaSource(StrToJURI(aDataSource));
+    LExtractorMediaSourceFactory := nil;
   end;
 
   //-----
-  fSimpleExoPlayer.prepare(aVideoSource);
+  fSimpleExoPlayer.prepare(LVideoSource);
 
   //----
-  aVideoSource := nil;
+  LVideoSource := nil;
 
   //----
   {$IFDEF DEBUG}
-  aStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.prepare', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  LStopWatch.Stop;
+  ALLog('TALAndroidVideoPlayer.prepare', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
-
 
 {************************************}
 procedure TALAndroidVideoPlayer.pause;
 {$IFDEF DEBUG}
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 {$ENDIF}
 begin
   {$IFDEF DEBUG}
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   if not SetState(vpsPaused, vpsStarted) then exit;
@@ -967,19 +974,19 @@ begin
                                             // playback
 
   {$IFDEF DEBUG}
-  aStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.pause', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  LStopWatch.Stop;
+  ALLog('TALAndroidVideoPlayer.pause', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
 {************************************}
 procedure TALAndroidVideoPlayer.start;
 {$IFDEF DEBUG}
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 {$ENDIF}
 begin
   {$IFDEF DEBUG}
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   if not SetState(vpsStarted, [vpsPrepared, vpsPaused, vpsPlaybackCompleted]) then exit;
@@ -988,19 +995,19 @@ begin
                                            // playback
 
   {$IFDEF DEBUG}
-  aStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.start', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  LStopWatch.Stop;
+  ALLog('TALAndroidVideoPlayer.start', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
 {***********************************}
 procedure TALAndroidVideoPlayer.stop;
 {$IFDEF DEBUG}
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 {$ENDIF}
 begin
   {$IFDEF DEBUG}
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   if not SetState(vpsStopped, [vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then exit;
@@ -1012,8 +1019,8 @@ begin
                            // Calling this method does not reset the playback position.
 
   {$IFDEF DEBUG}
-  aStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.stop', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  LStopWatch.Stop;
+  ALLog('TALAndroidVideoPlayer.stop', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1027,11 +1034,11 @@ end;
 {*****************************************************************}
 procedure TALAndroidVideoPlayer.setLooping(const looping: Boolean);
 {$IFDEF DEBUG}
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 {$ENDIF}
 begin
   {$IFDEF DEBUG}
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   //int REPEAT_MODE_OFF = 0; => Normal playback without repetition.
@@ -1043,39 +1050,39 @@ begin
 
   {$IFDEF DEBUG}
   ALLog('TALAndroidVideoPlayer.setLooping', 'looping: ' + alBoolToStrU(looping) +
-                                            ' - timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+                                            ' - timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
 {*************************************************************}
 procedure TALAndroidVideoPlayer.setVolume(const Value: Single);
-var aVolume: Single;
+var LVolume: Single;
     {$IFDEF DEBUG}
-    aStopWatch: TstopWatch;
+    LStopWatch: TstopWatch;
     {$ENDIF}
 begin
   {$IFDEF DEBUG}
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
-  aVolume := Value;
-  if aVolume < 0 then aVolume := 0
-  else if aVolume > 1 then aVolume := 1;
-  FSimpleExoPlayer.setVolume(aVolume); // Sets the audio volume, with 0 being silence and 1 being unity gain.
+  LVolume := Value;
+  if LVolume < 0 then LVolume := 0
+  else if LVolume > 1 then LVolume := 1;
+  FSimpleExoPlayer.setVolume(LVolume); // Sets the audio volume, with 0 being silence and 1 being unity gain.
 
   {$IFDEF DEBUG}
   ALLog('TALAndroidVideoPlayer.setVolume', 'Value: ' + alFloattostrU(Value, ALDefaultFormatSettingsU) +
-                                           ' - timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+                                           ' - timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
 {********************************************************************}
 procedure TALAndroidVideoPlayer.setPlaybackSpeed(const Value: single);
-var aPlaybackParameters: JPlaybackParameters;
+var LPlaybackParameters: JPlaybackParameters;
 begin
-  aPlaybackParameters := tJPlaybackParameters.JavaClass.init(Value, 1);
-  FSimpleExoPlayer.setPlaybackParameters(aPlaybackParameters);
-  aPlaybackParameters := Nil;
+  LPlaybackParameters := tJPlaybackParameters.JavaClass.init(Value, 1);
+  FSimpleExoPlayer.setPlaybackParameters(LPlaybackParameters);
+  LPlaybackParameters := Nil;
 end;
 
 {***********************************************}
@@ -1224,13 +1231,13 @@ end;
 
 {***********************************}
 constructor TALIOSVideoPlayer.Create;
-var aAudioSession: AVAudioSession;
+var LAudioSession: AVAudioSession;
     {$IFDEF DEBUG}
-    aStopWatch: TstopWatch;
+    LStopWatch: TstopWatch;
     {$ENDIF}
 begin
   {$IFDEF DEBUG}
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   inherited;
@@ -1243,9 +1250,9 @@ begin
   //-----
   if not appAudioSessionActivated then begin
     appAudioSessionActivated := True;
-    aAudioSession := TAVAudioSession.Wrap(TAVAudioSession.OCClass.sharedInstance);
-    aAudioSession.setCategory(AVAudioSessionCategoryPlayback, nil);
-    aAudioSession.setActive(True, nil);
+    LAudioSession := TAVAudioSession.Wrap(TAVAudioSession.OCClass.sharedInstance);
+    LAudioSession.setCategory(AVAudioSessionCategoryPlayback, nil);
+    LAudioSession.setActive(True, nil);
   end;
 
   //-----
@@ -1287,19 +1294,19 @@ begin
 
   //----
   {$IFDEF DEBUG}
-  aStopWatch.Stop;
-  ALLog('TALIOSVideoPlayer.Create', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  LStopWatch.Stop;
+  ALLog('TALIOSVideoPlayer.Create', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
 {***********************************}
 destructor TALIOSVideoPlayer.Destroy;
 {$IFDEF DEBUG}
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 {$ENDIF}
 begin
   {$IFDEF DEBUG}
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   //-----
@@ -1348,8 +1355,8 @@ begin
 
   //----
   {$IFDEF DEBUG}
-  aStopWatch.Stop;
-  ALLog('TALIOSVideoPlayer.Destroy', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  LStopWatch.Stop;
+  ALLog('TALIOSVideoPlayer.Destroy', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1415,27 +1422,27 @@ begin
   //https://stackoverflow.com/questions/30363502/maintaining-good-scroll-performance-when-using-avplayer
   fPrepareThread := TThread.CreateAnonymousThread(
     procedure
-    var aURL: NSUrl;
-        aLowerDataSource: String;
+    var LURL: NSUrl;
+        LLowerDataSource: String;
         P: Pointer;
         {$IFDEF DEBUG}
-        aStopWatch: TstopWatch;
+        LStopWatch: TstopWatch;
         {$ENDIF}
     begin
 
       try
 
         {$IFDEF DEBUG}
-        aStopWatch := TstopWatch.StartNew;
+        LStopWatch := TstopWatch.StartNew;
         {$ENDIF}
 
-        aLowerDataSource := ALLowerCaseU(aDataSource);
-        if (ALPosU('http://',aLowerDataSource) = 1) or
-           (ALPosU('https://',aLowerDataSource) = 1) then P := TNSUrl.OCClass.URLWithString(StrToNSStr(aDataSource)) // Creates and returns an NSURL object initialized with a provided URL string
+        LLowerDataSource := ALLowerCaseU(aDataSource);
+        if (ALPosU('http://',LLowerDataSource) = 1) or
+           (ALPosU('https://',LLowerDataSource) = 1) then P := TNSUrl.OCClass.URLWithString(StrToNSStr(aDataSource)) // Creates and returns an NSURL object initialized with a provided URL string
         else P := TNSUrl.OCClass.fileURLWithPath(StrToNSStr(aDataSource)); // Initializes and returns a newly created NSURL object as a file URL with a specified path.
         if P = nil then exit; // << we can't call synchronize from here (else possible trouble when we will free the object) so we can't call onErrorEvent :(
-        aURL := TNSUrl.Wrap(P);
-        FPlayerItem := TAVPlayerItem.Wrap(TAVPlayerItem.OCClass.playerItemWithURL(aURL)); // return A new player item, prepared to use URL.
+        LURL := TNSUrl.Wrap(P);
+        FPlayerItem := TAVPlayerItem.Wrap(TAVPlayerItem.OCClass.playerItemWithURL(LURL)); // return A new player item, prepared to use URL.
                                                                                           // This method immediately returns the item, but with the status AVPlayerItemStatusUnknown.
                                                                                           // Associating the player item with an AVPlayer immediately begins enqueuing its media
                                                                                           // and preparing it for playback. If the URL contains valid data that can be used by
@@ -1473,8 +1480,8 @@ begin
 
         //-----
         {$IFDEF DEBUG}
-        aStopWatch.Stop;
-        ALLog('TALIOSVideoPlayer.prepare', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU) +
+        LStopWatch.Stop;
+        ALLog('TALIOSVideoPlayer.prepare', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU) +
                                            ' - FPlayer.status: ' + alinttostrU(FPlayer.status) +
                                            ' - FPlayerItem.status: ' + alinttostrU(FPlayerItem.status) +
                                            ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
@@ -1493,11 +1500,11 @@ end;
 {********************************}
 procedure TALIOSVideoPlayer.pause;
 {$IFDEF DEBUG}
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 {$ENDIF}
 begin
   {$IFDEF DEBUG}
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   if not SetState(vpsPaused, vpsStarted) then exit;
@@ -1506,19 +1513,19 @@ begin
   FFrameRefreshTimer.Enabled := False;
 
   {$IFDEF DEBUG}
-  aStopWatch.Stop;
-  ALLog('TALIOSVideoPlayer.pause', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  LStopWatch.Stop;
+  ALLog('TALIOSVideoPlayer.pause', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
 {********************************}
 procedure TALIOSVideoPlayer.Start;
 {$IFDEF DEBUG}
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 {$ENDIF}
 begin
   {$IFDEF DEBUG}
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   if not SetState(vpsStarted, [vpsPrepared, vpsPaused, vpsPlaybackCompleted]) then exit;
@@ -1528,19 +1535,19 @@ begin
   FFrameRefreshTimer.Enabled := True;
 
   {$IFDEF DEBUG}
-  aStopWatch.Stop;
-  ALLog('TALIOSVideoPlayer.start', 'TimeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  LStopWatch.Stop;
+  ALLog('TALIOSVideoPlayer.start', 'TimeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
 {*******************************}
 procedure TALIOSVideoPlayer.Stop;
 {$IFDEF DEBUG}
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 {$ENDIF}
 begin
   {$IFDEF DEBUG}
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   if not SetState(vpsStopped, [vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then exit;
@@ -1549,8 +1556,8 @@ begin
   FFrameRefreshTimer.Enabled := False;
 
   {$IFDEF DEBUG}
-  aStopWatch.Stop;
-  ALLog('TALIOSVideoPlayer.Stop', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  LStopWatch.Stop;
+  ALLog('TALIOSVideoPlayer.Stop', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1570,11 +1577,11 @@ end;
 {*********************************************************}
 procedure TALIOSVideoPlayer.setVolume(const Value: Single);
 {$IFDEF DEBUG}
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 {$ENDIF}
 begin
   {$IFDEF DEBUG}
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   fVolume := Value;
@@ -1585,7 +1592,7 @@ begin
 
   {$IFDEF DEBUG}
   ALLog('TALIOSVideoPlayer.setVolume', 'Value: ' + alFloattostrU(Value, ALDefaultFormatSettingsU) +
-                                       ' - timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+                                       ' - timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1597,12 +1604,12 @@ end;
 
 {************************************************************}
 procedure TALIOSVideoPlayer.doOnFrameRefresh(Sender: TObject);
-var aPixelBuffer: CVPixelBufferRef;
+var LPixelBuffer: CVPixelBufferRef;
     {$IFDEF DEBUG}
-    aStopWatch: TstopWatch;
+    LStopWatch: TstopWatch;
     {$ENDIF}
-    aPrevTextureRef: CVOpenGLESTextureRef;
-    aWidth, aHeight: integer;
+    LPrevTextureRef: CVOpenGLESTextureRef;
+    LWidth, LHeight: integer;
     T: CMTime;
 begin
 
@@ -1616,7 +1623,7 @@ begin
   if FPlayerItemVideoOutput = nil then exit;
 
   {$IFDEF DEBUG}
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   T := fPlayer.currentTime; // << Returns the current time of the current player item
@@ -1627,13 +1634,13 @@ begin
                                                                        // that was acquired previously. If you require multiple objects to acquire video output from the same AVPlayerItem object,
                                                                        // you should create separate AVPlayerItemVideoOutput objects for each.
 
-    aPixelBuffer := FPlayerItemVideoOutput.copyPixelBufferForItemTime(T, nil); // Acquires and returns an image that is appropriate to display at the specified time.
+    LPixelBuffer := FPlayerItemVideoOutput.copyPixelBufferForItemTime(T, nil); // Acquires and returns an image that is appropriate to display at the specified time.
                                                                                // itemTime: The time at which you want to retrieve the image from the item.
                                                                                // outItemTimeForDisplay: The time by which you intend to use the returned pixel buffer. You may specify nil for this
                                                                                //                        parameter if you do not have a specific deadline.
                                                                                // NODE: A pixel buffer containing the image data to display or nil if nothing should be displayed at the specified time.
                                                                                //       The caller is responsible for calling CVBufferRelease on the returned data when it is no longer needed.
-    if aPixelBuffer = 0 then begin // could be nil if nothing should be displayed
+    if LPixelBuffer = 0 then begin // could be nil if nothing should be displayed
       {$IFDEF DEBUG}
       ALLog('TALIOSVideoPlayer.FrameRefreshOnTimer', 'copyPixelBufferForItemTime:nil', TalLogType.warn);
       {$ENDIF}
@@ -1642,9 +1649,9 @@ begin
     try
 
       //-----
-      aPrevTextureRef := fTextureRef;
-      aWidth := CVPixelBufferGetWidth(aPixelBuffer); // Returns the width of the pixel buffer.
-      aHeight := CVPixelBufferGetHeight(aPixelBuffer); // Returns the height of the pixel buffer.
+      LPrevTextureRef := fTextureRef;
+      LWidth := CVPixelBufferGetWidth(LPixelBuffer); // Returns the width of the pixel buffer.
+      LHeight := CVPixelBufferGetHeight(LPixelBuffer); // Returns the height of the pixel buffer.
 
       //-----
       // This function either creates a new or returns a cached CVOpenGLESTexture texture object mapped to the
@@ -1658,12 +1665,12 @@ begin
       // CVOpenGLESTextureCacheCreateTextureFromImage function
       if CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, // allocator: The CFAllocator to use for allocating the texture object. This parameter can be NULL.
                                                       fvideoTextureCacheRef, // textureCache: The texture cache object that will manage the texture.
-                                                      aPixelBuffer, // sourceImage: The CVImageBuffer that you want to create a texture from.
+                                                      LPixelBuffer, // sourceImage: The CVImageBuffer that you want to create a texture from.
                                                       nil,  // textureAttributes: A CFDictionary containing the attributes to be used for creating the CVOpenGLESTexture objects. This parameter can be NULL.
                                                       GL_TEXTURE_2D, // target: The target texture. GL_TEXTURE_2D and GL_RENDERBUFFER are the only targets currently supported.
                                                       GL_RGBA,  // internalFormat: The number of color components in the texture. Examples are GL_RGBA, GL_LUMINANCE, GL_RGBA8_OES, GL_RED, and GL_RG.
-                                                      aWidth, // width: The width of the texture image.
-                                                      aHeight, // height The height of the texture image.
+                                                      LWidth, // width: The width of the texture image.
+                                                      LHeight, // height The height of the texture image.
                                                       GL_BGRA_EXT,  // format: The format of the pixel data. Examples are GL_RGBA and GL_LUMINANCE.
                                                       GL_UNSIGNED_BYTE, // type: The data type of the pixel data. One example is GL_UNSIGNED_BYTE.
                                                       0,  // planeIndex: The plane of the CVImageBuffer to map bind. Ignored for non-planar CVImageBuffers.
@@ -1689,15 +1696,15 @@ begin
       glBindTexture(GL_TEXTURE_2D, 0);
 
       //-----
-      if aPrevTextureRef <> 0 then
-        cfRElease(pointer(aPrevTextureRef));
+      if LPrevTextureRef <> 0 then
+        cfRElease(pointer(LPrevTextureRef));
 
       //-----
-      {$IF CompilerVersion > 33} // rio
+      {$IF CompilerVersion > 34} // sydney
         {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
       {$ENDIF}
-      TALTextureAccessPrivate(fBitmap).FWidth := aWidth;
-      TALTextureAccessPrivate(fBitmap).FHeight := aHeight; // we can't use setsize because it's will finalise the texture
+      TALTextureAccessPrivate(fBitmap).FWidth := LWidth;
+      TALTextureAccessPrivate(fBitmap).FHeight := LHeight; // we can't use setsize because it's will finalise the texture
                                                            // but with/height are used only in
                                                            // procedure TCanvasHelper.TexRect(const DestCorners, SrcCorners: TCornersF; const Texture: TTexture; const Color1, Color2, Color3, Color4: TAlphaColor);
                                                            // begin
@@ -1715,7 +1722,7 @@ begin
         FonFrameAvailableEvent(self);
 
     finally
-      CVPixelBufferRelease(aPixelBuffer);
+      CVPixelBufferRelease(LPixelBuffer);
     end;
 
     //-----
@@ -1724,9 +1731,9 @@ begin
     {$IFDEF DEBUG}
     inc(fFrameRefreshCounter);
     if fFrameRefreshCounter mod 1000 = 0 then begin
-      aStopWatch.Stop;
+      LStopWatch.Stop;
       fFrameRefreshCounter := 0;
-      ALLog('TALIOSVideoPlayer.FrameRefreshOnTimer', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU) +
+      ALLog('TALIOSVideoPlayer.FrameRefreshOnTimer', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU) +
                                                      ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
     end;
     {$ENDIF}
@@ -1768,7 +1775,7 @@ end;
 
 {************************************}
 procedure TALIOSVideoPlayer.doOnReady;
-var aPixelBufferAttributes: NSMutableDictionary;
+var LPixelBufferAttributes: NSMutableDictionary;
 begin
 
   //AVPlayerItemStatusFailed = 2;
@@ -1803,17 +1810,17 @@ begin
     //https://forums.developer.apple.com/thread/27589
     //http://stackoverflow.com/questions/24800742/iosavplayeritemvideooutput-hasnewpixelbufferforitemtime-doesnt-work-correctly
     if FPlayerItemVideoOutput = nil then begin
-      aPixelBufferAttributes := TNSMutableDictionary.Create;
+      LPixelBufferAttributes := TNSMutableDictionary.Create;
       try
-        aPixelBufferAttributes.setObject(TNSNumber.OCClass.numberWithInt(kCVPixelFormatType_32BGRA), Pointer(kCVPixelBufferPixelFormatTypeKey));
-        FPlayerItemVideoOutput := TAVPlayerItemVideoOutput.Wrap(TAVPlayerItemVideoOutput.Alloc.initWithPixelBufferAttributes(aPixelBufferAttributes)); // Initializes and returns a video output object using the specified
+        LPixelBufferAttributes.setObject(TNSNumber.OCClass.numberWithInt(kCVPixelFormatType_32BGRA), Pointer(kCVPixelBufferPixelFormatTypeKey));
+        FPlayerItemVideoOutput := TAVPlayerItemVideoOutput.Wrap(TAVPlayerItemVideoOutput.Alloc.initWithPixelBufferAttributes(LPixelBufferAttributes)); // Initializes and returns a video output object using the specified
                                                                                                                                                        // pixel buffer attributes.
                                                                                                                                                        // The pixel buffer attributes required for video output. For a list
                                                                                                                                                        // of pixel buffer attributes you can include in this dictionary, see
                                                                                                                                                        // the CVPixelBuffer.h header file in the Core Video framework.
       finally
-        aPixelBufferAttributes.release;
-        aPixelBufferAttributes := nil;
+        LPixelBufferAttributes.release;
+        LPixelBufferAttributes := nil;
       end;
       FPlayerItemVideoOutput.retain;
       FPlayerItem.addOutput(FPlayerItemVideoOutput);
@@ -1998,8 +2005,8 @@ end;
 {$ENDIF}
 {$ENDREGION}
 
-{$REGION '_MACOS'}
-{$IF defined(_MACOS)}
+{$REGION 'ALMacOS'}
+{$IF defined(ALMacOS)}
 
 {*************************************}
 constructor TALMacOSVideoPlayer.Create;
@@ -2106,7 +2113,7 @@ begin
   fVideoPlayerControl := TALIOSVideoPlayer.Create;
   {$ELSEIF defined(MSWINDOWS)}
   fVideoPlayerControl := TALWinVideoPlayer.Create;
-  {$ELSEIF defined(_MACOS)}
+  {$ELSEIF defined(ALMacOS)}
   fVideoPlayerControl := TALMacOSVideoPlayer.Create;
   {$ENDIF}
   //-----
@@ -2312,7 +2319,7 @@ end;
 {************************************}
 procedure TALVideoPlayerSurface.Paint;
 {$IF DEFINED(IOS) or DEFINED(ANDROID)}
-var aDestRect: TrectF;
+var LDestRect: TrectF;
 {$endif}
 begin
 
@@ -2322,11 +2329,11 @@ begin
   if (fVideoPlayer.bitmap = nil) or
      (fVideoPlayer.bitmap.IsEmpty) then exit;
 
-  aDestRect := canvas.AlignToPixel(
+  LDestRect := canvas.AlignToPixel(
                  TRectF.Create(0, 0, fVideoPlayer.bitmap.Width, fVideoPlayer.bitmap.Height).
                    FitInto(LocalRect));
 
-  TCustomCanvasGpu(Canvas).DrawTexture(aDestRect, // ATexRect
+  TCustomCanvasGpu(Canvas).DrawTexture(LDestRect, // ATexRect
                                        TRectF.Create(0,
                                                      0,
                                                      fVideoPlayer.bitmap.Width,

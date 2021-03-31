@@ -5,6 +5,7 @@
   
   <%VersionInfoPListKeys%>
   <%ExtraInfoPListKeys%>
+  <%StoryboardInfoPListKey%>
  
   <key>FacebookAutoLogAppEventsEnabled</key>
   <false/>

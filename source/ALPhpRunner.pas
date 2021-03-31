@@ -1,78 +1,75 @@
-{*****************************************************************
-product:      ALPhpRunner
-Description:  ALPHPRunnerEngine is a simple but useful component for
-              easily use php (any version) as a scripting language
-              in Delphi applications. ALPhpRunnerEngine allows to
-              execute the PHP scripts within the Delphi program without
-              a WebServer. ALPHPRunnerEngine use the CGI/FastCGI
-              interface (php-cgi.exe) of PHP to communicate with PHP engine.
+{*******************************************************************************
+ALPHPRunnerEngine is a simple but useful component for
+easily use php (any version) as a scripting language
+in Delphi applications. ALPhpRunnerEngine allows to
+execute the PHP scripts within the Delphi program without
+a WebServer. ALPHPRunnerEngine use the CGI/FastCGI
+interface (php-cgi.exe) of PHP to communicate with PHP engine.
 
-Note :        If you use fastCGI (Socket) interface, you will need to start
-              php-cgi separatly:
+Note :
+If you use fastCGI (Socket) interface, you will need to start
+php-cgi separatly:
 
-              php-cgi.exe -b host:port
-              php-cgi.exe -b 127.0.0.1:8002
+php-cgi.exe -b host:port
+php-cgi.exe -b 127.0.0.1:8002
 
-              Security
-              --------
-              Be sure to run the php binary as an appropriate userid
-              Also, firewall out the port that PHP is listening on. In addition,
-              you can set the environment variable FCGI_WEB_SERVER_ADDRS to
-              control who can connect to the FastCGI.
-              Set it to a comma separated list of IP addresses, e.g.:
+Security
+--------
+Be sure to run the php binary as an appropriate userid
+Also, firewall out the port that PHP is listening on. In addition,
+you can set the environment variable FCGI_WEB_SERVER_ADDRS to
+control who can connect to the FastCGI.
+Set it to a comma separated list of IP addresses, e.g.:
 
-              export FCGI_WEB_SERVER_ADDRS=199.170.183.28,199.170.183.71
+export FCGI_WEB_SERVER_ADDRS=199.170.183.28,199.170.183.71
 
-              Tuning
-              ------
-              There are a few tuning parameters that can be tweaked to control
-              the performance of FastCGI PHP. The following are environment
-              variables that can be set before running the PHP binary:
+Tuning
+------
+There are a few tuning parameters that can be tweaked to control
+the performance of FastCGI PHP. The following are environment
+variables that can be set before running the PHP binary:
 
-              PHP_FCGI_CHILDREN  (default value: 0)
-              !!! NOT WORK ON WINDOWS !!!
+PHP_FCGI_CHILDREN  (default value: 0)
+!!! NOT WORK ON WINDOWS !!!
 
-              This controls how many child processes the PHP process spawns. When the
-              fastcgi starts, it creates a number of child processes which handle one
-              page request at a time. Value 0 means that PHP willnot start additional
-              processes and main process will handle FastCGI requests by itself. Note that
-              this process may die (because of PHP_FCGI_MAX_REQUESTS) and it willnot
-              respawned automatic. Values 1 and above force PHP start additioanl processes
-              those will handle requests. The main process will restart children in case of
-              their death. So by default, you will be able to handle 1 concurrent PHP page
-              requests. Further requests will be queued. Increasing this number will allow
-              for better concurrency, especially if you have pages that take a significant
-              time to create, or supply a lot of data (e.g. downloading huge files via PHP).
-              On the other hand, having more processes running will use more RAM, and letting
-              too many PHP pages be generated concurrently will mean that each request will
-              be slow. We recommend a value of 8 for a fairly busy site. If you have many,
-              long-running PHP scripts, then you may need to increase this further.
+This controls how many child processes the PHP process spawns. When the
+fastcgi starts, it creates a number of child processes which handle one
+page request at a time. Value 0 means that PHP willnot start additional
+processes and main process will handle FastCGI requests by itself. Note that
+this process may die (because of PHP_FCGI_MAX_REQUESTS) and it willnot
+respawned automatic. Values 1 and above force PHP start additioanl processes
+those will handle requests. The main process will restart children in case of
+their death. So by default, you will be able to handle 1 concurrent PHP page
+requests. Further requests will be queued. Increasing this number will allow
+for better concurrency, especially if you have pages that take a significant
+time to create, or supply a lot of data (e.g. downloading huge files via PHP).
+On the other hand, having more processes running will use more RAM, and letting
+too many PHP pages be generated concurrently will mean that each request will
+be slow. We recommend a value of 8 for a fairly busy site. If you have many,
+long-running PHP scripts, then you may need to increase this further.
 
-              PHP_FCGI_MAX_REQUESTS (default value: 500)
-              !!! set MaxRequestCount of TALPhpRunnerEngine < PHP_FCGI_MAX_REQUESTS !!!
+PHP_FCGI_MAX_REQUESTS (default value: 500)
+!!! set MaxRequestCount of TALPhpRunnerEngine < PHP_FCGI_MAX_REQUESTS !!!
 
-              This controls how many requests each child process will handle before
-              exitting. When one process exits, another will be created. This tuning is
-              necessary because several PHP functions are known to have memory leaks. If the
-              PHP processes were left around forever, they would be become very inefficient.
-**************************************************************}
+This controls how many requests each child process will handle before
+exitting. When one process exits, another will be created. This tuning is
+necessary because several PHP functions are known to have memory leaks. If the
+PHP processes were left around forever, they would be become very inefficient.
+*******************************************************************************}
 
 unit ALPhpRunner;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
-Uses Winapi.Windows,
-     Winapi.WinSock2,
-     System.Classes,
-     System.Contnrs,
-     System.SyncObjs,
-     ALHttpClient,
-     ALCommon,
-     ALStringList;
+Uses
+  Winapi.Windows,
+  Winapi.WinSock2,
+  System.Classes,
+  System.Contnrs,
+  System.SyncObjs,
+  ALHttpClient,
+  ALCommon,
+  ALStringList;
 
 {###############################################################################
 Below the list of some server variables.
@@ -197,11 +194,6 @@ code of Php5Isapi.dll
   URL
 ###############################################################################}
 
-{$IF CompilerVersion < 18.5}
-Type
-  TStartupInfoA = TStartupInfo;
-{$IFEND}
-
 type
 
   {---------------------------------}
@@ -234,7 +226,7 @@ type
   private
   protected
     procedure CheckError(Error: Boolean); virtual; abstract;
-    Function  IOWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer; virtual; abstract;
+    Function  IOWrite(const Buf; len: Integer): Integer; virtual; abstract;
     Function  IORead(var buf; len: Integer): Integer; virtual; abstract;
     Procedure SendRequest(const aRequest:AnsiString); virtual;
     function  ReadResponse: AnsiString; virtual;
@@ -260,7 +252,7 @@ type
     procedure SetTCPNoDelay(const Value: boolean);
   protected
     procedure CheckError(Error: Boolean); override;
-    Function  IOWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer; override;
+    Function  IOWrite(const Buf; len: Integer): Integer; override;
     Function  IORead(var buf; len: Integer): Integer; override;
   public
     constructor Create; overload; virtual;
@@ -290,7 +282,7 @@ type
     Ftimeout: integer;
   protected
     procedure CheckError(Error: Boolean); override;
-    Function  IOWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer; override;
+    Function  IOWrite(const Buf; len: Integer): Integer; override;
     Function  IORead(var buf; len: Integer): Integer; override;
     Property  RequestCount: Integer read FRequestCount;
   public
@@ -353,12 +345,13 @@ type
 
 implementation
 
-Uses system.sysutils,
-     ALWinSock,
-     ALString,
-     AlExecute,
-     ALWindows,
-     AlCGI;
+Uses
+  system.sysutils,
+  ALWinSock,
+  ALString,
+  AlExecute,
+  ALWindows,
+  AlCGI;
 
 {*****************************************************************************}
 procedure TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: TALStrings;
@@ -366,27 +359,27 @@ procedure TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: TALStrings;
                                                    ResponseContentStream: Tstream;
                                                    ResponseHeader: TALHTTPResponseHeader;
                                                    Const EncodeParams: Boolean=True);
-Var aURLEncodedContentStream: TALStringStream;
+Var LURLEncodedContentStream: TALStringStream;
     I: Integer;
 begin
-  aURLEncodedContentStream := TALStringStream.create('');
+  LURLEncodedContentStream := TALStringStream.create('');
   try
 
     if EncodeParams then ALHTTPEncodeParamNameValues(PostDataStrings);
     With PostDataStrings do
       for i := 0 to Count - 1 do
-        If i < Count - 1 then aURLEncodedContentStream.WriteString(Strings[i] + '&')
-        else aURLEncodedContentStream.WriteString(Strings[i]);
+        If i < Count - 1 then LURLEncodedContentStream.WriteString(Strings[i] + '&')
+        else LURLEncodedContentStream.WriteString(Strings[i]);
 
     ServerVariables.Values['REQUEST_METHOD'] := 'POST';
     ServerVariables.Values['CONTENT_TYPE'] := 'application/x-www-form-urlencoded';
 
     Execute(ServerVariables,
-            aURLEncodedContentStream,
+            LURLEncodedContentStream,
             ResponseContentStream,
             ResponseHeader);
   finally
-    aURLEncodedContentStream.free;
+    LURLEncodedContentStream.free;
   end;
 end;
 
@@ -491,19 +484,19 @@ function TALPhpFastCgiRunnerEngine.ReadResponse: AnsiString;
 
   {------------------------------------------------------------}
   Procedure InternalRead(var aStr: AnsiString; aCount: Longint);
-  var aBuffStr: AnsiString;
-      aBuffStrLength: Integer;
+  var LBuffStr: AnsiString;
+      LBuffStrLength: Integer;
   Begin
     if aCount <= 0 then exit;
-    Setlength(aBuffStr,8192); // use a 8 ko buffer
+    Setlength(LBuffStr,8192); // use a 8 ko buffer
                               // we can also use IOCtlSocket(Socket, FIONREAD, @Tam) Use to determine the amount of
                               // data pending in the network's input buffer that can be read from socket
 
     while aCount > 0 do begin
-      aBuffStrLength := IORead(pointer(aBuffStr)^, length(aBuffStr));
-      If aBuffStrLength <= 0 then raise Exception.Create('Connection close gracefully!');
-      aStr := aStr + AlCopyStr(aBuffStr,1,aBuffStrLength);
-      dec(aCount,aBuffStrLength);
+      LBuffStrLength := IORead(pointer(LBuffStr)^, length(LBuffStr));
+      If LBuffStrLength <= 0 then raise Exception.Create('Connection close gracefully!');
+      aStr := aStr + AlCopyStr(LBuffStr,1,LBuffStrLength);
+      dec(aCount,LBuffStrLength);
     end;
   End;
 
@@ -623,15 +616,15 @@ procedure TALPhpFastCgiRunnerEngine.Execute(ServerVariables: TALStrings;
 
   {----------------------------------------------}
   function InternalAddServerVariables: AnsiString;
-  var aValue : AnsiString;
+  var LValue : AnsiString;
       I : integer;
   begin
 
     {build result}
     Result := '';
     for I := 0 to ServerVariables.Count - 1 do begin
-      aValue := ServerVariables.ValueFromIndex[i];
-      if aValue <> '' then InternalAddParam(Result, ServerVariables.Names[I], aValue);
+      LValue := ServerVariables.ValueFromIndex[i];
+      if LValue <> '' then InternalAddParam(Result, ServerVariables.Names[I], LValue);
     end;
 
     {finalize Result with an empty FCGI_PARAMS}
@@ -640,8 +633,8 @@ procedure TALPhpFastCgiRunnerEngine.Execute(ServerVariables: TALStrings;
 
   end;
 
-var aResponseStr: AnsiString;
-    aFormatedRequestStr : AnsiString;
+var LResponseStr: AnsiString;
+    LFormatedRequestStr : AnsiString;
     Tam : word;
     P1: integer;
     S1 : AnsiString;
@@ -649,7 +642,7 @@ var aResponseStr: AnsiString;
 begin
 
   {init aFormatedRequestStr from aRequestStr}
-  aFormatedRequestStr := '';
+  LFormatedRequestStr := '';
   if assigned(RequestContentStream) then begin
     P1 := 1;
     setlength(S1, 8184);
@@ -657,7 +650,7 @@ begin
     while P1 <= RequestContentStream.Size do begin
       Tam := RequestContentStream.Read(pointer(S1)^, 8184); // ok i decide to plit the message in 8ko, because php send me in FCGI_STDOUT message split in 8ko (including 8 bytes of header)
       inc(P1, Tam);
-      aFormatedRequestStr := aFormatedRequestStr + #1             +#5         +#0          +#1          +AnsiChar(hi(Tam)) +AnsiChar(lo(Tam)) +#0            +#0       +AlCopyStr(S1,1,Tam);
+      LFormatedRequestStr := LFormatedRequestStr + #1             +#5         +#0          +#1          +AnsiChar(hi(Tam)) +AnsiChar(lo(Tam)) +#0            +#0       +AlCopyStr(S1,1,Tam);
                                                  //FCGI_VERSION_1 +FCGI_STDIN +requestIdB1 +requestIdB0 +contentLengthB1   +contentLengthB0   +paddingLength +reserved +contentData[contentLength]
     end;
 
@@ -670,21 +663,21 @@ begin
   else ServerVariables.Values['CONTENT_LENGTH']  := '0';
 
   {finalize the aFormatedRequestStr with an empty FCGI_STDIN}
-  aFormatedRequestStr :=  aFormatedRequestStr + #1             +#5         +#0          +#1          +#0              +#0              +#0            +#0;
+  LFormatedRequestStr :=  LFormatedRequestStr + #1             +#5         +#0          +#1          +#0              +#0              +#0            +#0;
                                               //FCGI_VERSION_1 +FCGI_STDIN +requestIdB1 +requestIdB0 +contentLengthB1 +contentLengthB0 +paddingLength +reserved
 
   SendRequest(#1               +#1                 +#0          +#1          +#0              +#8              +#0            +#0       +#0     +#1             +#1             +#0       +#0       +#0       +#0       +#0      +
               //FCGI_VERSION_1 +FCGI_BEGIN_REQUEST +requestIdB1 +requestIdB0 +contentLengthB1 +contentLengthB0 +paddingLength +reserved +roleB1 +FCGI_RESPONDER +FCGI_KEEP_CONN +reserved +reserved +reserved +reserved +reserved
                                                                                                                                         //contentData[contentLength]-----------------------------------------------------
               InternalAddServerVariables +
-              aFormatedRequestStr);
+              LFormatedRequestStr);
 
   {----------}
-  aResponseStr := ReadResponse;
-  P1 := AlPos(#13#10#13#10,aResponseStr);
+  LResponseStr := ReadResponse;
+  P1 := AlPos(#13#10#13#10,LResponseStr);
   if P1 <= 0 then raise Exception.Create('The Php has encountered an error while processing the request!');
-  ResponseHeader.RawHeaderText := AlCopyStr(aResponseStr,1,P1-1);
-  if P1 + 4 <= length(aResponseStr) then ResponseContentStream.WriteBuffer(aResponseStr[P1 + 4], length(aResponseStr) - P1 - 3);
+  ResponseHeader.RawHeaderText := AlCopyStr(LResponseStr,1,P1-1);
+  if P1 + 4 <= length(LResponseStr) then ResponseContentStream.WriteBuffer(LResponseStr[P1 + 4], length(LResponseStr) - P1 - 3);
 
 end;
 
@@ -697,9 +690,9 @@ End;
 
 {*************************************************}
 constructor TALPhpSocketFastCgiRunnerEngine.Create;
-var aWSAData: TWSAData;
+var LWSAData: TWSAData;
 begin
-  CheckError(WSAStartup(MAKEWORD(2,2), aWSAData) <> 0);
+  CheckError(WSAStartup(MAKEWORD(2,2), LWSAData) <> 0);
   Fconnected:= False;
   FSocketDescriptor:= INVALID_SOCKET;
   FSendTimeout := 60000; // 60 seconds
@@ -730,19 +723,11 @@ procedure TALPhpSocketFastCgiRunnerEngine.Connect(const aHost: AnsiString; const
     SockAddr.sin_family:=AF_INET;
     SockAddr.sin_port:=swap(Port);
     SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(Server));
-    {$IF CompilerVersion >= 23} {Delphi XE2}
     If SockAddr.sin_addr.S_addr = INADDR_NONE then begin
-    {$ELSE}
-    If SockAddr.sin_addr.S_addr = integer(INADDR_NONE) then begin
-    {$IFEND}
       checkError(ALHostToIP(Server, IP));
       SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(IP));
     end;
-    {$IF CompilerVersion >= 23} {Delphi XE2}
     CheckError(Winapi.WinSock2.Connect(FSocketDescriptor,TSockAddr(SockAddr),SizeOf(SockAddr))=SOCKET_ERROR);
-    {$ELSE}
-    CheckError(WinSock.Connect(FSocketDescriptor,SockAddr,SizeOf(SockAddr))=SOCKET_ERROR);
-    {$IFEND}
   end;
 
 begin
@@ -799,32 +784,32 @@ end;
 {*******************************************************************************************************************}
 // http://blogs.technet.com/b/nettracer/archive/2010/06/03/things-that-you-may-want-to-know-about-tcp-keepalives.aspx
 procedure TALPhpSocketFastCgiRunnerEngine.SetKeepAlive(const Value: boolean);
-var aIntBool: integer;
+var LIntBool: integer;
 begin
   FKeepAlive := Value;
   if FConnected then begin
     // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
     // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
     // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
-    if FKeepAlive then aIntBool := 1
-    else aIntBool := 0;
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_KEEPALIVE,PAnsiChar(@aIntBool),SizeOf(aIntBool))=SOCKET_ERROR);
+    if FKeepAlive then LIntBool := 1
+    else LIntBool := 0;
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_KEEPALIVE,PAnsiChar(@LIntBool),SizeOf(LIntBool))=SOCKET_ERROR);
   end;
 end;
 
 {***************************************************************************************************************************************************************************************************************}
 // https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_MRG/1.1/html/Realtime_Tuning_Guide/sect-Realtime_Tuning_Guide-Application_Tuning_and_Deployment-TCP_NODELAY_and_Small_Buffer_Writes.html
 procedure TALPhpSocketFastCgiRunnerEngine.SetTCPNoDelay(const Value: boolean);
-var aIntBool: integer;
+var LIntBool: integer;
 begin
   fTCPNoDelay := Value;
   if FConnected then begin
     // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
     // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
     // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
-    if fTCPNoDelay then aIntBool := 1
-    else aIntBool := 0;
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,TCP_NODELAY,PAnsiChar(@aIntBool),SizeOf(aIntBool))=SOCKET_ERROR);
+    if fTCPNoDelay then LIntBool := 1
+    else LIntBool := 0;
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,TCP_NODELAY,PAnsiChar(@LIntBool),SizeOf(LIntBool))=SOCKET_ERROR);
   end;
 end;
 
@@ -835,8 +820,8 @@ begin
   CheckError(Result = SOCKET_ERROR);
 end;
 
-{******************************************************************************************************************************}
-function TALPhpSocketFastCgiRunnerEngine.IOWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer;
+{*********************************************************************************}
+function TALPhpSocketFastCgiRunnerEngine.IOWrite(const Buf; len: Integer): Integer;
 begin
   Result := Send(FSocketDescriptor,buf,len,0);
   CheckError(Result =  SOCKET_ERROR);
@@ -875,8 +860,8 @@ end;
 
 {**********************************************************************************************}
 procedure TALPhpNamedPipeFastCgiRunnerEngine.Connect(const aPhpInterpreterFilename: AnsiString);
-Var aStartupInfo: TStartupInfoA;
-    aEnvironment: AnsiString;
+Var LStartupInfo: TStartupInfoA;
+    LEnvironment: AnsiString;
 begin
   if FConnected then raise Exception.Create('Already connected');
 
@@ -909,26 +894,26 @@ begin
     Try
 
   		checkerror(not SetHandleInformation(fServerterminationEvent, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT));
-      aEnvironment := AlGetEnvironmentString + '_FCGI_SHUTDOWN_EVENT_' + '=' + ALIntToStr(fServerterminationEvent) + #0#0;
+      LEnvironment := AlGetEnvironmentString + '_FCGI_SHUTDOWN_EVENT_' + '=' + ALIntToStr(fServerterminationEvent) + #0#0;
 
       // Set up the start up info struct.
-      ZeroMemory(@aStartupInfo,sizeof(TStartupInfo));
-      aStartupInfo.cb := sizeof(TStartupInfo);
-      aStartupInfo.lpReserved := nil;
-      aStartupInfo.lpReserved2 := nil;
-      aStartupInfo.cbReserved2 := 0;
-      aStartupInfo.lpDesktop := nil;
-      aStartupInfo.dwFlags := STARTF_USESTDHANDLES;
+      ZeroMemory(@LStartupInfo,sizeof(TStartupInfo));
+      LStartupInfo.cb := sizeof(TStartupInfo);
+      LStartupInfo.lpReserved := nil;
+      LStartupInfo.lpReserved2 := nil;
+      LStartupInfo.cbReserved2 := 0;
+      LStartupInfo.lpDesktop := nil;
+      LStartupInfo.dwFlags := STARTF_USESTDHANDLES;
       //FastCGI on NT will set the listener pipe HANDLE in the stdin of
       //the new process.  The fact that there is a stdin and NULL handles
       //for stdout and stderr tells the FastCGI process that this is a
       //FastCGI process and not a CGI process.
-      aStartupInfo.hStdInput  := FServerPipe;
-      aStartupInfo.hStdOutput := INVALID_HANDLE_VALUE;
-      aStartupInfo.hStdError  := INVALID_HANDLE_VALUE;
+      LStartupInfo.hStdInput  := FServerPipe;
+      LStartupInfo.hStdOutput := INVALID_HANDLE_VALUE;
+      LStartupInfo.hStdError  := INVALID_HANDLE_VALUE;
 
       //Make the listener socket inheritable.
-      checkerror(not SetHandleInformation(aStartupInfo.hStdInput, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT));
+      checkerror(not SetHandleInformation(LStartupInfo.hStdInput, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT));
 
       // Launch the process that you want to redirect.
       CheckError(Not CreateProcessA(PAnsiChar(aPhpInterpreterFilename),   // pointer to name of executable module
@@ -937,9 +922,9 @@ begin
                                     NiL,                                  // pointer to thread security attributes
                                     TrUE,                                 // handle inheritance flag
                                     CREATE_NO_WINDOW,                     // creation flags
-                                    PAnsiChar(aEnvironment),              // pointer to new environment block
+                                    PAnsiChar(LEnvironment),              // pointer to new environment block
                                     nil,                                  // pointer to current directory name
-                                    aStartupInfo,                         // pointer to STARTUPINFO
+                                    LStartupInfo,                         // pointer to STARTUPINFO
                                     fServerProcessInformation));          // pointer to PROCESS_INFORMATION
 
       CheckError(not WaitNamedPipeA(PAnsiChar(fPipePath), fTimeout));
@@ -1036,8 +1021,8 @@ begin
   Until GetTickCount64 - StartTickCount > fTimeout;
 end;
 
-{*********************************************************************************************************************************}
-function TALPhpNamedPipeFastCgiRunnerEngine.IOWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer;
+{************************************************************************************}
+function TALPhpNamedPipeFastCgiRunnerEngine.IOWrite(const Buf; len: Integer): Integer;
 Var lpNumberOfBytesWritten: DWORD;
 begin
   CheckError(not WriteFile(FClientPipe,Buf,len,lpNumberOfBytesWritten,nil));
@@ -1171,25 +1156,25 @@ procedure TALPhpNamedPipeFastCgiManager.Execute(ServerVariables: TALStrings;
                                                 RequestContentStream: Tstream;
                                                 ResponseContentStream: Tstream;
                                                 ResponseHeader: TALHTTPResponseHeader);
-Var aPhpRunnerEngine: TALPhpNamedPipeFastCgiRunnerEngine;
+Var LPhpRunnerEngine: TALPhpNamedPipeFastCgiRunnerEngine;
 begin
-  aPhpRunnerEngine := AcquirePHPRunnerEngine;
+  LPhpRunnerEngine := AcquirePHPRunnerEngine;
   try
 
     try
 
-      aPhpRunnerEngine.Execute(ServerVariables,
+      LPhpRunnerEngine.Execute(ServerVariables,
                                RequestContentStream,
                                ResponseContentStream,
                                ResponseHeader);
 
     Except
-      freeandnil(aPhpRunnerEngine);
+      freeandnil(LPhpRunnerEngine);
       raise;
     end;
 
   finally
-    ReleasePHPRunnerEngine(aPhpRunnerEngine)
+    ReleasePHPRunnerEngine(LPhpRunnerEngine)
   end;
 end;
 

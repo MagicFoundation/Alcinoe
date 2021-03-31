@@ -209,7 +209,7 @@ uses
   Grijjy.SymbolTranslator;
 
 {$RANGECHECKS OFF}
-{$OverFlowChecks Off}
+{$OverFlowChecks Off} // Else we have an integer overflow at this row: Result[I].CodeAddress := (CallStack.Stack[I, J] and not 1) – 4;
 
 type
   TgoExceptionReport = class(TInterfacedObject, IgoExceptionReport)
@@ -449,6 +449,8 @@ begin
   CallStack := nil;
   if (AExceptionObject = nil) then
     ExceptionMessage := 'Unknown Error'
+  //else if (AExceptionObject is EAbort) then
+  //  Exit //  do nothing
   else if (AExceptionObject is Exception) then
   begin
     E := Exception(AExceptionObject);
@@ -492,7 +494,6 @@ begin
 
   FReportingException := True;
   try
-
     Report := internalBuildExceptionReport(AExceptionObject, AExceptionAddress);
     try
       TMessageManager.DefaultManager.SendMessage(Self,
@@ -720,7 +721,7 @@ var
 function cxa_demangle(const mangled_name: MarshaledAString;
   output_buffer: MarshaledAString; length: NativeInt;
   out status: Integer): MarshaledAString; cdecl;
-  external 'libgnustl_static.a' name '__cxa_demangle';
+  external {$IF (RTLVersion < 34)}'libgnustl_static.a'{$ELSE}'libc++abi.a'{$ENDIF} name '__cxa_demangle';
 
 type
   { For each entry in the call stack, we save 7 values for inspection later.

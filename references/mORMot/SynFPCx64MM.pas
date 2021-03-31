@@ -29,7 +29,7 @@ unit SynFPCx64MM;
       consumption (especially Intel TBB) and do panic/SIGKILL on any GPF
     - Pascal alternatives (FastMM4,ScaleMM2,BrainMM) are Windows+Delphi specific
     - Our lockess round-robin of tiny blocks is a unique algorithm in MM AFAIK
-    - It was so fun deeping into SSE2 x86_64 assembly and Pierre's insight
+    - It was so fun diving into SSE2 x86_64 assembly and Pierre's insight
     - Resulting code is still easy to understand and maintain
 
     IMPORTANT NOTICE: seems stable on Linux and Win64 but feedback is welcome!
@@ -38,7 +38,7 @@ unit SynFPCx64MM;
 
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -57,7 +57,7 @@ unit SynFPCx64MM;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):

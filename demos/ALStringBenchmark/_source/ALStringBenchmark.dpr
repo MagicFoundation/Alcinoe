@@ -2,7 +2,7 @@ program ALStringBenchmark;
 
 uses
   Forms,
-  Unit1 in 'Unit1.pas' {Form1};
+  Unit1 in 'Unit1.pas' {Form18};
 
 {$R *.res}
 

@@ -17,7 +17,7 @@
     <i18n>
       <EnableI18N LFM="False"/>
     </i18n>
-    <BuildModes Count="11">
+    <BuildModes Count="15">
       <Item1 Name="default" Default="True"/>
       <Item2 Name="win32">
         <CompilerOptions>
@@ -53,7 +53,6 @@
           </CodeGeneration>
           <Linking>
             <Debugging>
-              <GenerateDebugInfo Value="False"/>
               <DebugInfoType Value="dsDwarf2Set"/>
               <UseExternalDbgSyms Value="True"/>
             </Debugging>
@@ -64,6 +63,20 @@
               <ShowNotes Value="False"/>
               <ShowHints Value="False"/>
             </Verbosity>
+            <OtherDefines Count="12">
+              <Define0 Value="FPC_NO_DEFAULT_MEMORYMANAGER"/>
+              <Define1 Value="FPC_SYNCMEM"/>
+              <Define2 Value="FPC_X64MM"/>
+              <Define3 Value="FPCMM_DEBUG"/>
+              <Define4 Value="FPCMM_ASSUMEMULTITHREAD"/>
+              <Define5 Value="FPCMM_REPORTMEMORYLEAKS"/>
+              <Define6 Value="FPCMM_LOCKLESSFREE"/>
+              <Define7 Value="FPCMM_SERVER"/>
+              <Define8 Value="FPCMM_BOOST"/>
+              <Define9 Value="FPC_FASTMM4"/>
+              <Define10 Value="DOPATCHTRTL"/>
+              <Define11 Value="FPC_X64MM_WIN"/>
+            </OtherDefines>
           </Other>
         </CompilerOptions>
       </Item2>
@@ -77,7 +90,7 @@
           <SearchPaths>
             <IncludeFiles Value="..;$(ProjOutDir)"/>
             <Libraries Value="..\static\$(TargetCPU)-$(TargetOS)"/>
-            <OtherUnitFiles Value="..;DDD\dom;DDD\infra"/>
+            <OtherUnitFiles Value="..;DDD\dom;DDD\infra;..\..\lib2\src\core"/>
             <UnitOutputDirectory Value="fpc\lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Conditionals Value="if TargetOS='darwin' then
@@ -96,15 +109,10 @@
             <TargetCPU Value="x86_64"/>
             <TargetOS Value="win64"/>
             <Optimizations>
-              <OptimizationLevel Value="3"/>
+              <OptimizationLevel Value="2"/>
             </Optimizations>
           </CodeGeneration>
           <Linking>
-            <Debugging>
-              <GenerateDebugInfo Value="False"/>
-              <DebugInfoType Value="dsDwarf2Set"/>
-              <UseExternalDbgSyms Value="True"/>
-            </Debugging>
             <LinkSmart Value="True"/>
           </Linking>
           <Other>
@@ -112,6 +120,25 @@
               <ShowNotes Value="False"/>
               <ShowHints Value="False"/>
             </Verbosity>
+            <CustomOptions Value="-dFPC_NO_DEFAULT_MEMORYMANAGER
+-dFPC_X64MM
+-dFPCMM_DEBUG
+-dFPCMM_REPORTMEMORYLEAKS
+-dFPC_X64MM_WIN"/>
+            <OtherDefines Count="12">
+              <Define0 Value="FPC_NO_DEFAULT_MEMORYMANAGER"/>
+              <Define1 Value="FPC_SYNCMEM"/>
+              <Define2 Value="FPC_X64MM"/>
+              <Define3 Value="FPCMM_DEBUG"/>
+              <Define4 Value="FPCMM_ASSUMEMULTITHREAD"/>
+              <Define5 Value="FPCMM_REPORTMEMORYLEAKS"/>
+              <Define6 Value="FPCMM_LOCKLESSFREE"/>
+              <Define7 Value="FPCMM_SERVER"/>
+              <Define8 Value="FPCMM_BOOST"/>
+              <Define9 Value="FPC_FASTMM4"/>
+              <Define10 Value="DOPATCHTRTL"/>
+              <Define11 Value="FPC_X64MM_WIN"/>
+            </OtherDefines>
           </Other>
         </CompilerOptions>
       </Item3>
@@ -149,7 +176,6 @@
           </CodeGeneration>
           <Linking>
             <Debugging>
-              <GenerateDebugInfo Value="False"/>
               <DebugInfoType Value="dsDwarf2Set"/>
               <UseExternalDbgSyms Value="True"/>
             </Debugging>
@@ -160,6 +186,21 @@
               <ShowNotes Value="False"/>
               <ShowHints Value="False"/>
             </Verbosity>
+            <CustomOptions Value="-OoNOSTACKFRAME"/>
+            <OtherDefines Count="12">
+              <Define0 Value="FPC_NO_DEFAULT_MEMORYMANAGER"/>
+              <Define1 Value="FPC_SYNCMEM"/>
+              <Define2 Value="FPC_X64MM"/>
+              <Define3 Value="FPCMM_DEBUG"/>
+              <Define4 Value="FPCMM_ASSUMEMULTITHREAD"/>
+              <Define5 Value="FPCMM_REPORTMEMORYLEAKS"/>
+              <Define6 Value="FPCMM_LOCKLESSFREE"/>
+              <Define7 Value="FPCMM_SERVER"/>
+              <Define8 Value="FPCMM_BOOST"/>
+              <Define9 Value="FPC_FASTMM4"/>
+              <Define10 Value="DOPATCHTRTL"/>
+              <Define11 Value="FPC_X64MM_WIN"/>
+            </OtherDefines>
           </Other>
         </CompilerOptions>
       </Item4>
@@ -197,9 +238,7 @@
           </CodeGeneration>
           <Linking>
             <Debugging>
-              <GenerateDebugInfo Value="False"/>
               <DebugInfoType Value="dsDwarf2Set"/>
-              <UseExternalDbgSyms Value="True"/>
             </Debugging>
             <LinkSmart Value="True"/>
           </Linking>
@@ -208,10 +247,32 @@
               <ShowNotes Value="False"/>
               <ShowHints Value="False"/>
             </Verbosity>
+            <CompilerMessages>
+              <IgnoredMessages idx5089="True"/>
+            </CompilerMessages>
+            <CustomOptions Value="-dFPC_NO_DEFAULT_MEMORYMANAGER
+-dFPC_X64MM
+-dFPCMM_DEBUG
+-dFPCMM_REPORTMEMORYLEAKS
+-dDOPATCHTRTL"/>
+            <OtherDefines Count="12">
+              <Define0 Value="FPC_NO_DEFAULT_MEMORYMANAGER"/>
+              <Define1 Value="FPC_SYNCMEM"/>
+              <Define2 Value="FPC_X64MM"/>
+              <Define3 Value="FPCMM_DEBUG"/>
+              <Define4 Value="FPCMM_ASSUMEMULTITHREAD"/>
+              <Define5 Value="FPCMM_REPORTMEMORYLEAKS"/>
+              <Define6 Value="FPCMM_LOCKLESSFREE"/>
+              <Define7 Value="FPCMM_SERVER"/>
+              <Define8 Value="FPCMM_BOOST"/>
+              <Define9 Value="FPC_FASTMM4"/>
+              <Define10 Value="DOPATCHTRTL"/>
+              <Define11 Value="FPC_X64MM_WIN"/>
+            </OtherDefines>
           </Other>
         </CompilerOptions>
       </Item5>
-      <Item6 Name="bsd32">
+      <Item6 Name="openbsd32">
         <CompilerOptions>
           <Version Value="11"/>
           <PathDelim Value="\"/>
@@ -237,10 +298,11 @@
             <Checks>
               <IOChecks Value="True"/>
             </Checks>
+            <TargetProcessor Value="pentiumm"/>
             <TargetCPU Value="i386"/>
-            <TargetOS Value="freebsd"/>
+            <TargetOS Value="openbsd"/>
             <Optimizations>
-              <OptimizationLevel Value="3"/>
+              <OptimizationLevel Value="2"/>
             </Optimizations>
           </CodeGeneration>
           <Linking>
@@ -259,7 +321,111 @@
           </Other>
         </CompilerOptions>
       </Item6>
-      <Item7 Name="bsd64">
+      <Item7 Name="openbsd64">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="fpc\bin\$(TargetCPU)-$(TargetOS)\TestSQL3"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="..;$(ProjOutDir)"/>
+            <Libraries Value="..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..;DDD\dom;DDD\infra"/>
+            <UnitOutputDirectory Value="fpc\lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <Conditionals Value="if TargetOS='darwin' then
+   CustomOptions := ' -Cg-';"/>
+          <Parsing>
+            <SyntaxOptions>
+              <SyntaxMode Value="Delphi"/>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Checks>
+              <IOChecks Value="True"/>
+            </Checks>
+            <TargetCPU Value="x86_64"/>
+            <TargetOS Value="openbsd"/>
+            <Optimizations>
+              <OptimizationLevel Value="2"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShowNotes Value="False"/>
+              <ShowHints Value="False"/>
+            </Verbosity>
+          </Other>
+        </CompilerOptions>
+      </Item7>
+      <Item8 Name="freebsd32">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="fpc\bin\$(TargetCPU)-$(TargetOS)\TestSQL3"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="..;$(ProjOutDir)"/>
+            <Libraries Value="..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..;DDD\dom;DDD\infra"/>
+            <UnitOutputDirectory Value="fpc\lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <Conditionals Value="if TargetOS='darwin' then
+   CustomOptions := ' -Cg-';"/>
+          <Parsing>
+            <SyntaxOptions>
+              <SyntaxMode Value="Delphi"/>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Checks>
+              <IOChecks Value="True"/>
+            </Checks>
+            <TargetCPU Value="i386"/>
+            <TargetOS Value="freebsd"/>
+            <Optimizations>
+              <OptimizationLevel Value="2"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShowNotes Value="False"/>
+              <ShowHints Value="False"/>
+            </Verbosity>
+            <OtherDefines Count="6">
+              <Define0 Value="FPC_CMEM"/>
+              <Define1 Value="FPC_NO_DEFAULT_MEMORYMANAGER"/>
+              <Define2 Value="FPC_SYNCMEM"/>
+              <Define3 Value="FPC_FASTMM4"/>
+              <Define4 Value="FPC_SYNTBB"/>
+              <Define5 Value="FPC_SYNJEMALLOC"/>
+            </OtherDefines>
+          </Other>
+        </CompilerOptions>
+      </Item8>
+      <Item9 Name="freebsd64">
         <CompilerOptions>
           <Version Value="11"/>
           <PathDelim Value="\"/>
@@ -288,7 +454,7 @@
             <TargetCPU Value="x86_64"/>
             <TargetOS Value="freebsd"/>
             <Optimizations>
-              <OptimizationLevel Value="3"/>
+              <OptimizationLevel Value="2"/>
             </Optimizations>
           </CodeGeneration>
           <Linking>
@@ -306,8 +472,8 @@
             </Verbosity>
           </Other>
         </CompilerOptions>
-      </Item7>
-      <Item8 Name="darwin32">
+      </Item9>
+      <Item10 Name="darwin32">
         <CompilerOptions>
           <Version Value="11"/>
           <PathDelim Value="\"/>
@@ -336,7 +502,7 @@
             <TargetCPU Value="i386"/>
             <TargetOS Value="darwin"/>
             <Optimizations>
-              <OptimizationLevel Value="3"/>
+              <OptimizationLevel Value="2"/>
             </Optimizations>
           </CodeGeneration>
           <Linking>
@@ -352,10 +518,18 @@
               <ShowNotes Value="False"/>
               <ShowHints Value="False"/>
             </Verbosity>
+            <OtherDefines Count="6">
+              <Define0 Value="FPC_CMEM"/>
+              <Define1 Value="FPC_NO_DEFAULT_MEMORYMANAGER"/>
+              <Define2 Value="FPC_SYNCMEM"/>
+              <Define3 Value="FPC_FASTMM4"/>
+              <Define4 Value="FPC_SYNTBB"/>
+              <Define5 Value="FPC_SYNJEMALLOC"/>
+            </OtherDefines>
           </Other>
         </CompilerOptions>
-      </Item8>
-      <Item9 Name="darwin64">
+      </Item10>
+      <Item11 Name="darwin64">
         <CompilerOptions>
           <Version Value="11"/>
           <PathDelim Value="\"/>
@@ -368,8 +542,8 @@
             <OtherUnitFiles Value="..;DDD\dom;DDD\infra"/>
             <UnitOutputDirectory Value="fpc\lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
-          <Conditionals Value="if TargetOS='darwin' then
-   CustomOptions := ' -Cg-';"/>
+          <Conditionals Value="//if TargetOS='darwin' then
+//   CustomOptions := ' -Cg-';"/>
           <Parsing>
             <SyntaxOptions>
               <SyntaxMode Value="Delphi"/>
@@ -384,7 +558,7 @@
             <TargetCPU Value="x86_64"/>
             <TargetOS Value="darwin"/>
             <Optimizations>
-              <OptimizationLevel Value="3"/>
+              <OptimizationLevel Value="2"/>
             </Optimizations>
           </CodeGeneration>
           <Linking>
@@ -400,10 +574,20 @@
               <ShowNotes Value="False"/>
               <ShowHints Value="False"/>
             </Verbosity>
+            <CustomOptions Value="-dFPC_NO_DEFAULT_MEMORYMANAGER
+-dFPC_CMEM"/>
+            <OtherDefines Count="6">
+              <Define0 Value="FPC_NO_DEFAULT_MEMORYMANAGER"/>
+              <Define1 Value="FPC_SYNCMEM"/>
+              <Define2 Value="FPC_X64MM"/>
+              <Define3 Value="FPCMM_DEBUG"/>
+              <Define4 Value="FPCMM_ASSUMEMULTITHREAD"/>
+              <Define5 Value="FPCMM_REPORTMEMORYLEAKS"/>
+            </OtherDefines>
           </Other>
         </CompilerOptions>
-      </Item9>
-      <Item10 Name="linarm32">
+      </Item11>
+      <Item12 Name="linarm32">
         <CompilerOptions>
           <Version Value="11"/>
           <PathDelim Value="\"/>
@@ -429,10 +613,11 @@
             <Checks>
               <IOChecks Value="True"/>
             </Checks>
+            <TargetProcessor Value="ARMV6"/>
             <TargetCPU Value="arm"/>
             <TargetOS Value="linux"/>
             <Optimizations>
-              <OptimizationLevel Value="3"/>
+              <OptimizationLevel Value="2"/>
             </Optimizations>
           </CodeGeneration>
           <Linking>
@@ -450,8 +635,8 @@
             </Verbosity>
           </Other>
         </CompilerOptions>
-      </Item10>
-      <Item11 Name="linarm64">
+      </Item12>
+      <Item13 Name="linarm64">
         <CompilerOptions>
           <Version Value="11"/>
           <PathDelim Value="\"/>
@@ -480,7 +665,7 @@
             <TargetCPU Value="aarch64"/>
             <TargetOS Value="linux"/>
             <Optimizations>
-              <OptimizationLevel Value="3"/>
+              <OptimizationLevel Value="2"/>
             </Optimizations>
           </CodeGeneration>
           <Linking>
@@ -498,7 +683,118 @@
             </Verbosity>
           </Other>
         </CompilerOptions>
-      </Item11>
+      </Item13>
+      <Item14 Name="androidarm32">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="fpc\bin\$(TargetCPU)-$(TargetOS)\TestSQL3"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="..;$(ProjOutDir)"/>
+            <Libraries Value="..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..;DDD\dom;DDD\infra"/>
+            <UnitOutputDirectory Value="fpc\lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <Conditionals Value="if TargetOS='darwin' then
+   CustomOptions := ' -Cg-';"/>
+          <Parsing>
+            <SyntaxOptions>
+              <SyntaxMode Value="Delphi"/>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Checks>
+              <IOChecks Value="True"/>
+            </Checks>
+            <TargetProcessor Value="ARMV6"/>
+            <TargetCPU Value="arm"/>
+            <TargetOS Value="android"/>
+            <Optimizations>
+              <OptimizationLevel Value="2"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShowNotes Value="False"/>
+              <ShowHints Value="False"/>
+            </Verbosity>
+            <OtherDefines Count="12">
+              <Define0 Value="FPC_NO_DEFAULT_MEMORYMANAGER"/>
+              <Define1 Value="FPC_SYNCMEM"/>
+              <Define2 Value="FPC_X64MM"/>
+              <Define3 Value="FPCMM_DEBUG"/>
+              <Define4 Value="FPCMM_ASSUMEMULTITHREAD"/>
+              <Define5 Value="FPCMM_REPORTMEMORYLEAKS"/>
+              <Define6 Value="FPCMM_LOCKLESSFREE"/>
+              <Define7 Value="FPCMM_SERVER"/>
+              <Define8 Value="FPCMM_BOOST"/>
+              <Define9 Value="FPC_FASTMM4"/>
+              <Define10 Value="DOPATCHTRTL"/>
+              <Define11 Value="FPC_X64MM_WIN"/>
+            </OtherDefines>
+          </Other>
+        </CompilerOptions>
+      </Item14>
+      <Item15 Name="androidarm64">
+        <CompilerOptions>
+          <Version Value="11"/>
+          <PathDelim Value="\"/>
+          <Target>
+            <Filename Value="fpc\bin\$(TargetCPU)-$(TargetOS)\TestSQL3"/>
+          </Target>
+          <SearchPaths>
+            <IncludeFiles Value="..;$(ProjOutDir)"/>
+            <Libraries Value="..\static\$(TargetCPU)-$(TargetOS)"/>
+            <OtherUnitFiles Value="..;DDD\dom;DDD\infra"/>
+            <UnitOutputDirectory Value="fpc\lib\$(TargetCPU)-$(TargetOS)"/>
+          </SearchPaths>
+          <Conditionals Value="if TargetOS='darwin' then
+   CustomOptions := ' -Cg-';"/>
+          <Parsing>
+            <SyntaxOptions>
+              <SyntaxMode Value="Delphi"/>
+              <IncludeAssertionCode Value="True"/>
+            </SyntaxOptions>
+          </Parsing>
+          <CodeGeneration>
+            <SmartLinkUnit Value="True"/>
+            <Checks>
+              <IOChecks Value="True"/>
+            </Checks>
+            <TargetCPU Value="aarch64"/>
+            <TargetOS Value="android"/>
+            <Optimizations>
+              <OptimizationLevel Value="2"/>
+            </Optimizations>
+          </CodeGeneration>
+          <Linking>
+            <Debugging>
+              <GenerateDebugInfo Value="False"/>
+              <DebugInfoType Value="dsDwarf2Set"/>
+              <UseExternalDbgSyms Value="True"/>
+            </Debugging>
+            <LinkSmart Value="True"/>
+          </Linking>
+          <Other>
+            <Verbosity>
+              <ShowNotes Value="False"/>
+              <ShowHints Value="False"/>
+            </Verbosity>
+          </Other>
+        </CompilerOptions>
+      </Item15>
     </BuildModes>
     <PublishOptions>
       <Version Value="2"/>
@@ -509,7 +805,7 @@
         <Mode0 Name="default"/>
       </Modes>
     </RunParams>
-    <Units Count="52">
+    <Units Count="59">
       <Unit0>
         <Filename Value="TestSQL3.dpr"/>
         <IsPartOfProject Value="True"/>
@@ -567,9 +863,8 @@
         <IsPartOfProject Value="True"/>
       </Unit13>
       <Unit14>
-        <Filename Value="..\SynBiDirSock.pas"/>
+        <Filename Value="..\SynBidirSock.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="SynBidirSock"/>
       </Unit14>
       <Unit15>
         <Filename Value="..\SynTests.pas"/>
@@ -719,6 +1014,35 @@
         <Filename Value="mORMotService.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit51>
+      <Unit52>
+        <Filename Value="..\SynCurl.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit52>
+      <Unit53>
+        <Filename Value="DDD\dom\dddDomCountry.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit53>
+      <Unit54>
+        <Filename Value="..\SynSSPI.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit54>
+      <Unit55>
+        <Filename Value="..\SynSSPIAuth.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit55>
+      <Unit56>
+        <Filename Value="..\SynBiDirSock.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="SynBidirSock"/>
+      </Unit56>
+      <Unit57>
+        <Filename Value="..\SynProtoRelay.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit57>
+      <Unit58>
+        <Filename Value="..\SynDBPostgres.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit58>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -746,9 +1070,6 @@
         <IOChecks Value="True"/>
         <StackChecks Value="True"/>
       </Checks>
-      <Optimizations>
-        <OptimizationLevel Value="2"/>
-      </Optimizations>
     </CodeGeneration>
     <Linking>
       <Debugging>
@@ -762,10 +1083,18 @@
         <ShowNotes Value="False"/>
         <ShowHints Value="False"/>
       </Verbosity>
+      <OtherDefines Count="6">
+        <Define0 Value="FPC_CMEM"/>
+        <Define1 Value="FPC_NO_DEFAULT_MEMORYMANAGER"/>
+        <Define2 Value="FPC_SYNCMEM"/>
+        <Define3 Value="FPC_FASTMM4"/>
+        <Define4 Value="FPC_SYNTBB"/>
+        <Define5 Value="FPC_SYNJEMALLOC"/>
+      </OtherDefines>
     </Other>
   </CompilerOptions>
   <Debugging>
-    <Exceptions Count="3">
+    <Exceptions Count="6">
       <Item1>
         <Name Value="EAbort"/>
       </Item1>
@@ -775,6 +1104,15 @@
       <Item3>
         <Name Value="EFOpenError"/>
       </Item3>
+      <Item4>
+        <Name Value="EInterfaceFactoryException"/>
+      </Item4>
+      <Item5>
+        <Name Value="EAssertionFailed"/>
+      </Item5>
+      <Item6>
+        <Name Value="EBusinessLayerException"/>
+      </Item6>
     </Exceptions>
   </Debugging>
 </CONFIG>

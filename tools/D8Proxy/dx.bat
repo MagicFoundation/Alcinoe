@@ -47,7 +47,7 @@ Echo.%_dxCmd% | findstr /C:"alcinoe-webrtc.jar">nul && (
 set _extraParams=%_extraParams% --release
 @echo _extraParams=%_extraParams% >> %logFile% 2>&1
 
-SET _d8Cmd=%_dxCmd:dx.bat"=d8.bat"!_extraParams! --lib C:\SDKs\android-sdk-windows\platforms\android-28\android.jar%
+SET _d8Cmd=%_dxCmd:dx.bat"=d8.bat"!_extraParams! --lib C:\SDKs\android\platforms\android-30\android.jar%
 SET _d8Cmd=%_d8Cmd:\classes.dex=%
 SET _d8Cmd=%_d8Cmd:--dex =%
 @echo _d8Cmd=%_d8Cmd% >> %logFile% 2>&1

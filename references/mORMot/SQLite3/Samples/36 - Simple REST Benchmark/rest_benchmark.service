@@ -1,0 +1,12 @@
+[Unit]
+Description=mORMot socket activation demo
+Documentation=https://synopse.info
+RefuseManualStart=true
+
+[Service]
+Restart=on-failure
+ExecStart="/home/pavelmash/dev/tmp/crypto_ssl/mORMot/SQLite3/Samples/36 - Simple REST Benchmark/RESTBenchmark"
+# starting from systemd v244 is possible to configure log limits per service as below
+# befote - only inside journald.conf
+# LogRateLimitIntervalSec=1s
+# LogRateLimitBurst=50000 # ~10 000 req / sec

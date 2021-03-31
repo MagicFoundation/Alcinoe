@@ -5,10 +5,10 @@ unit SyNodeSimpleProto;
 {
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - http://synopse.info
 
-    SyNode for mORMot Copyright (C) 2020 Pavel Mashlyakovsky & Vadim Orel
+    SyNode for mORMot Copyright (C) 2021 Pavel Mashlyakovsky & Vadim Orel
       pavel.mash at gmail.com
 
     Some ideas taken from

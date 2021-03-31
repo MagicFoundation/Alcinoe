@@ -1,0 +1,300 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{367A912B-9E16-4BD0-8FB7-73468BE36E9F}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="ALDatabaseBenchmark\_source\ALDatabaseBenchmark.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALFacebookLogin\_source\ALFacebookLogin.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALFmxControls\_source\ALFmxControls.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALJsonDoc\_source\AlJsonDocDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALLibPhoneNumber\_source\ALLibPhoneNumberDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALLiveVideoChat\server\_source\ALLiveVideoChatServer.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALNNTPClient\_source\ALNNTPClientDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALPhpRunner\_source\ALPhpRunnerDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALPOP3Client\_source\POP3ClientDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALSMTPClient\_source\ALSMTPClientDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALSortedListBenchmark\_source\ALSortedListBenchmark.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALSqlite3Client\_source\ALSqlite3clientDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALStressHTTPServer\_source\ALStressHTTPServer.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALStringBenchmark\_source\ALStringBenchmark.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALWebSpider\_source\ALWebSpiderDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALWinHTTPClient\_source\ALWinHTTPClientDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALWinInetHTTPClient\_source\ALWinInetHTTPClientDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALXmlDoc\_source\AlXmlDocDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALCipher\_source\ALCipherDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="ALRTTI\_source\ALRTTIDemo.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="ALDatabaseBenchmark">
+        <MSBuild Projects="ALDatabaseBenchmark\_source\ALDatabaseBenchmark.dproj"/>
+    </Target>
+    <Target Name="ALDatabaseBenchmark:Clean">
+        <MSBuild Projects="ALDatabaseBenchmark\_source\ALDatabaseBenchmark.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALDatabaseBenchmark:Make">
+        <MSBuild Projects="ALDatabaseBenchmark\_source\ALDatabaseBenchmark.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALFacebookLogin">
+        <MSBuild Projects="ALFacebookLogin\_source\ALFacebookLogin.dproj"/>
+    </Target>
+    <Target Name="ALFacebookLogin:Clean">
+        <MSBuild Projects="ALFacebookLogin\_source\ALFacebookLogin.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALFacebookLogin:Make">
+        <MSBuild Projects="ALFacebookLogin\_source\ALFacebookLogin.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALFirebaseMessaging">
+        <MSBuild Projects="ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj"/>
+    </Target>
+    <Target Name="ALFirebaseMessaging:Clean">
+        <MSBuild Projects="ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALFirebaseMessaging:Make">
+        <MSBuild Projects="ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALFmxControls">
+        <MSBuild Projects="ALFmxControls\_source\ALFmxControls.dproj"/>
+    </Target>
+    <Target Name="ALFmxControls:Clean">
+        <MSBuild Projects="ALFmxControls\_source\ALFmxControls.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALFmxControls:Make">
+        <MSBuild Projects="ALFmxControls\_source\ALFmxControls.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="AlJsonDocDemo">
+        <MSBuild Projects="ALJsonDoc\_source\AlJsonDocDemo.dproj"/>
+    </Target>
+    <Target Name="AlJsonDocDemo:Clean">
+        <MSBuild Projects="ALJsonDoc\_source\AlJsonDocDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AlJsonDocDemo:Make">
+        <MSBuild Projects="ALJsonDoc\_source\AlJsonDocDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALLibPhoneNumberDemo">
+        <MSBuild Projects="ALLibPhoneNumber\_source\ALLibPhoneNumberDemo.dproj"/>
+    </Target>
+    <Target Name="ALLibPhoneNumberDemo:Clean">
+        <MSBuild Projects="ALLibPhoneNumber\_source\ALLibPhoneNumberDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALLibPhoneNumberDemo:Make">
+        <MSBuild Projects="ALLibPhoneNumber\_source\ALLibPhoneNumberDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALLiveVideoChatClient">
+        <MSBuild Projects="ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj"/>
+    </Target>
+    <Target Name="ALLiveVideoChatClient:Clean">
+        <MSBuild Projects="ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALLiveVideoChatClient:Make">
+        <MSBuild Projects="ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALLiveVideoChatServer">
+        <MSBuild Projects="ALLiveVideoChat\server\_source\ALLiveVideoChatServer.dproj"/>
+    </Target>
+    <Target Name="ALLiveVideoChatServer:Clean">
+        <MSBuild Projects="ALLiveVideoChat\server\_source\ALLiveVideoChatServer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALLiveVideoChatServer:Make">
+        <MSBuild Projects="ALLiveVideoChat\server\_source\ALLiveVideoChatServer.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALNNTPClientDemo">
+        <MSBuild Projects="ALNNTPClient\_source\ALNNTPClientDemo.dproj"/>
+    </Target>
+    <Target Name="ALNNTPClientDemo:Clean">
+        <MSBuild Projects="ALNNTPClient\_source\ALNNTPClientDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALNNTPClientDemo:Make">
+        <MSBuild Projects="ALNNTPClient\_source\ALNNTPClientDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALPhpRunnerDemo">
+        <MSBuild Projects="ALPhpRunner\_source\ALPhpRunnerDemo.dproj"/>
+    </Target>
+    <Target Name="ALPhpRunnerDemo:Clean">
+        <MSBuild Projects="ALPhpRunner\_source\ALPhpRunnerDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALPhpRunnerDemo:Make">
+        <MSBuild Projects="ALPhpRunner\_source\ALPhpRunnerDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="POP3ClientDemo">
+        <MSBuild Projects="ALPOP3Client\_source\POP3ClientDemo.dproj"/>
+    </Target>
+    <Target Name="POP3ClientDemo:Clean">
+        <MSBuild Projects="ALPOP3Client\_source\POP3ClientDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="POP3ClientDemo:Make">
+        <MSBuild Projects="ALPOP3Client\_source\POP3ClientDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALSMTPClientDemo">
+        <MSBuild Projects="ALSMTPClient\_source\ALSMTPClientDemo.dproj"/>
+    </Target>
+    <Target Name="ALSMTPClientDemo:Clean">
+        <MSBuild Projects="ALSMTPClient\_source\ALSMTPClientDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALSMTPClientDemo:Make">
+        <MSBuild Projects="ALSMTPClient\_source\ALSMTPClientDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALSortedListBenchmark">
+        <MSBuild Projects="ALSortedListBenchmark\_source\ALSortedListBenchmark.dproj"/>
+    </Target>
+    <Target Name="ALSortedListBenchmark:Clean">
+        <MSBuild Projects="ALSortedListBenchmark\_source\ALSortedListBenchmark.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALSortedListBenchmark:Make">
+        <MSBuild Projects="ALSortedListBenchmark\_source\ALSortedListBenchmark.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALSqlite3clientDemo">
+        <MSBuild Projects="ALSqlite3Client\_source\ALSqlite3clientDemo.dproj"/>
+    </Target>
+    <Target Name="ALSqlite3clientDemo:Clean">
+        <MSBuild Projects="ALSqlite3Client\_source\ALSqlite3clientDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALSqlite3clientDemo:Make">
+        <MSBuild Projects="ALSqlite3Client\_source\ALSqlite3clientDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALStressHTTPServer">
+        <MSBuild Projects="ALStressHTTPServer\_source\ALStressHTTPServer.dproj"/>
+    </Target>
+    <Target Name="ALStressHTTPServer:Clean">
+        <MSBuild Projects="ALStressHTTPServer\_source\ALStressHTTPServer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALStressHTTPServer:Make">
+        <MSBuild Projects="ALStressHTTPServer\_source\ALStressHTTPServer.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALStringBenchmark">
+        <MSBuild Projects="ALStringBenchmark\_source\ALStringBenchmark.dproj"/>
+    </Target>
+    <Target Name="ALStringBenchmark:Clean">
+        <MSBuild Projects="ALStringBenchmark\_source\ALStringBenchmark.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALStringBenchmark:Make">
+        <MSBuild Projects="ALStringBenchmark\_source\ALStringBenchmark.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALWebSpiderDemo">
+        <MSBuild Projects="ALWebSpider\_source\ALWebSpiderDemo.dproj"/>
+    </Target>
+    <Target Name="ALWebSpiderDemo:Clean">
+        <MSBuild Projects="ALWebSpider\_source\ALWebSpiderDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALWebSpiderDemo:Make">
+        <MSBuild Projects="ALWebSpider\_source\ALWebSpiderDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALWinHTTPClientDemo">
+        <MSBuild Projects="ALWinHTTPClient\_source\ALWinHTTPClientDemo.dproj"/>
+    </Target>
+    <Target Name="ALWinHTTPClientDemo:Clean">
+        <MSBuild Projects="ALWinHTTPClient\_source\ALWinHTTPClientDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALWinHTTPClientDemo:Make">
+        <MSBuild Projects="ALWinHTTPClient\_source\ALWinHTTPClientDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALWinInetHTTPClientDemo">
+        <MSBuild Projects="ALWinInetHTTPClient\_source\ALWinInetHTTPClientDemo.dproj"/>
+    </Target>
+    <Target Name="ALWinInetHTTPClientDemo:Clean">
+        <MSBuild Projects="ALWinInetHTTPClient\_source\ALWinInetHTTPClientDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALWinInetHTTPClientDemo:Make">
+        <MSBuild Projects="ALWinInetHTTPClient\_source\ALWinInetHTTPClientDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="AlXmlDocDemo">
+        <MSBuild Projects="ALXmlDoc\_source\AlXmlDocDemo.dproj"/>
+    </Target>
+    <Target Name="AlXmlDocDemo:Clean">
+        <MSBuild Projects="ALXmlDoc\_source\AlXmlDocDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="AlXmlDocDemo:Make">
+        <MSBuild Projects="ALXmlDoc\_source\AlXmlDocDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALCipherDemo">
+        <MSBuild Projects="ALCipher\_source\ALCipherDemo.dproj"/>
+    </Target>
+    <Target Name="ALCipherDemo:Clean">
+        <MSBuild Projects="ALCipher\_source\ALCipherDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALCipherDemo:Make">
+        <MSBuild Projects="ALCipher\_source\ALCipherDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALFmxFilterEffectsDemo">
+        <MSBuild Projects="ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj"/>
+    </Target>
+    <Target Name="ALFmxFilterEffectsDemo:Clean">
+        <MSBuild Projects="ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALFmxFilterEffectsDemo:Make">
+        <MSBuild Projects="ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALRTTIDemo">
+        <MSBuild Projects="ALRTTI\_source\ALRTTIDemo.dproj"/>
+    </Target>
+    <Target Name="ALRTTIDemo:Clean">
+        <MSBuild Projects="ALRTTI\_source\ALRTTIDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALRTTIDemo:Make">
+        <MSBuild Projects="ALRTTI\_source\ALRTTIDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="ALDatabaseBenchmark;ALFacebookLogin;ALFirebaseMessaging;ALFmxControls;AlJsonDocDemo;ALLibPhoneNumberDemo;ALLiveVideoChatClient;ALLiveVideoChatServer;ALNNTPClientDemo;ALPhpRunnerDemo;POP3ClientDemo;ALSMTPClientDemo;ALSortedListBenchmark;ALSqlite3clientDemo;ALStressHTTPServer;ALStringBenchmark;ALWebSpiderDemo;ALWinHTTPClientDemo;ALWinInetHTTPClientDemo;AlXmlDocDemo;ALCipherDemo;ALFmxFilterEffectsDemo;ALRTTIDemo"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="ALDatabaseBenchmark:Clean;ALFacebookLogin:Clean;ALFirebaseMessaging:Clean;ALFmxControls:Clean;AlJsonDocDemo:Clean;ALLibPhoneNumberDemo:Clean;ALLiveVideoChatClient:Clean;ALLiveVideoChatServer:Clean;ALNNTPClientDemo:Clean;ALPhpRunnerDemo:Clean;POP3ClientDemo:Clean;ALSMTPClientDemo:Clean;ALSortedListBenchmark:Clean;ALSqlite3clientDemo:Clean;ALStressHTTPServer:Clean;ALStringBenchmark:Clean;ALWebSpiderDemo:Clean;ALWinHTTPClientDemo:Clean;ALWinInetHTTPClientDemo:Clean;AlXmlDocDemo:Clean;ALCipherDemo:Clean;ALFmxFilterEffectsDemo:Clean;ALRTTIDemo:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="ALDatabaseBenchmark:Make;ALFacebookLogin:Make;ALFirebaseMessaging:Make;ALFmxControls:Make;AlJsonDocDemo:Make;ALLibPhoneNumberDemo:Make;ALLiveVideoChatClient:Make;ALLiveVideoChatServer:Make;ALNNTPClientDemo:Make;ALPhpRunnerDemo:Make;POP3ClientDemo:Make;ALSMTPClientDemo:Make;ALSortedListBenchmark:Make;ALSqlite3clientDemo:Make;ALStressHTTPServer:Make;ALStringBenchmark:Make;ALWebSpiderDemo:Make;ALWinHTTPClientDemo:Make;ALWinInetHTTPClientDemo:Make;AlXmlDocDemo:Make;ALCipherDemo:Make;ALFmxFilterEffectsDemo:Make;ALRTTIDemo:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

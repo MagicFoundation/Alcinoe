@@ -6,7 +6,7 @@ unit SynDBODBC;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit SynDBODBC;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -292,13 +292,14 @@ type
   end;
 
 {$ifdef MSWINDOWS}
-/// List all ODBC drivers installed
+/// List all ODBC drivers installed, by reading the Windows Registry
 // - aDrivers is the output driver list container, which should be either nil (to
 // create a new TStringList), or any existing TStrings instance (may be from VCL
 // - aIncludeVersion: include the DLL driver version as <driver name>=<dll version>
 // in aDrivers (somewhat slower)
 function ODBCInstalledDriversList(const aIncludeVersion: Boolean; var aDrivers: TStrings): boolean;
 {$endif MSWINDOWS}
+
 
 implementation
 
@@ -1261,7 +1262,9 @@ begin
 end;
 
 procedure TODBCConnection.StartTransaction;
+var log: ISynLog;
 begin
+  log := SynDBLog.Enter(self,'StartTransaction');
   if TransactionCount>0 then
     raise EODBCException.CreateUTF8('% do not support nested transactions',[self]);
   inherited StartTransaction;
@@ -1702,14 +1705,9 @@ begin
             end;
           ftDouble: begin
             CValueType := SQL_C_DOUBLE;
-            if (fDBMS = dMSSQL) and (VInOut=paramIn) then begin
-              // MPV: prevent "Invalid character value for cast specification" error for small digits like 0.01, -0.0001
-              // verified under Linux for msodbcsql17
-              // FreeTDS throws cast error with this fix (and without also)
-              ParameterType := SQL_NUMERIC;
-              ColumnSize := 9;
-              DecimalDigits := 6;
-            end;
+	    // in case of "Invalid character value for cast specification" error
+            // for small digits like 0.01, -0.0001 under Linux msodbcsql17 should
+            // be updated to >= 17.5.2
             ParameterValue := pointer(@VInt64);
           end;
           ftCurrency:
@@ -1731,8 +1729,14 @@ begin
             if ansitext then begin
   retry:      VData := CurrentAnsiConvert.UTF8ToAnsi(VData);
               CValueType := SQL_C_CHAR;
-            end else
+            end else begin
               VData := Utf8DecodeToRawUnicode(VData);
+              if (fDBMS=dMSSQL) then begin // statements like CONTAINS(field, ?) do not accept NVARCHAR(max)
+                ColumnSize := length(VData) shr 1; // length in characters
+                if (ColumnSize > 4000) then // > 8000 bytes - use varchar(max)
+                  ColumnSize := 0;
+              end;
+            end;
           ftBlob:
             StrLen_or_Ind[p] := length(VData);
           else
@@ -2057,7 +2061,7 @@ begin
       end;
       FA.Init(TypeInfo(TSQLDBColumnDefineDynArray),Fields,@n);
       FA.Compare := SortDynArrayAnsiStringI; // FA.Find() case insensitive
-      fillchar(F,SizeOf(F),0);
+      FillcharFast(F,SizeOf(F),0);
       if fCurrentRow>0 then // Step done above
       repeat
         F.ColumnName := Trim(ColumnUTF8(3)); // Column*() should be done in order
@@ -2259,7 +2263,7 @@ begin
         Stmt.Step;
       end;
       PA.Init(TypeInfo(TSQLDBColumnDefineDynArray),Parameters,@n);
-      fillchar(P,SizeOf(P),0);
+      FillcharFast(P,SizeOf(P),0);
       if Stmt.fCurrentRow>0 then // Step done above
       repeat
         P.ColumnName := Trim(Stmt.ColumnUTF8(3)); // Column*() should be in order

@@ -6,7 +6,7 @@ unit SynDBFireDAC;
 {
   This file is part of Synopse framework.
 
-  Synopse framework. Copyright (C) 2020 Arnaud Bouchez
+  Synopse framework. Copyright (C) 2021 Arnaud Bouchez
   Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit SynDBFireDAC;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -209,6 +209,8 @@ const
   FIREDAC_PROVIDER: array[dOracle..high(TSQLDBDefinition)] of RawUTF8 = (
     'Ora','MSSQL','MSAcc','MySQL','SQLite','IB','','PG','DB2','Infx');
   {$endif}
+
+  
 implementation
 
 uses
@@ -425,6 +427,7 @@ begin
   inherited Create(aProperties);
   fDatabase := TADConnection.Create(nil);
   fDatabase.ResourceOptions.SilentMode := True; // no need for wait cursor
+  fDatabase.LoginPrompt := false;
   fDatabase.Params.Text :=
     (fProperties as TSQLDBFireDACConnectionProperties).fFireDACOptions.Text;
 end;

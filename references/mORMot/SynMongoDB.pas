@@ -6,7 +6,7 @@ unit SynMongoDB;
 {
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit SynMongoDB;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -1263,7 +1263,7 @@ type
     // be sent in the responseTo field from the database
     // - responseTo is the requestID taken from previous opQuery or opGetMore
     constructor Create(const FullCollectionName: RawUTF8;
-      opCode: TMongoOperation; requestID, responseTo: Integer); reintroduce;
+      opCode: TMongoOperation; requestID, responseTo: integer); reintroduce;
     /// append a query parameter as a BSON document
     // - param can be a TDocVariant, e.g. created with:
     // ! _JsonFast('{name:"John",age:{$gt:21}}');
@@ -1415,7 +1415,7 @@ type
     // $ { ReturnFieldsSelector: 1 }
     constructor Create(const FullCollectionName: RawUTF8;
       const Query, ReturnFieldsSelector: variant; NumberToReturn: integer;
-      NumberToSkip: Integer=0; Flags: TMongoQueryFlags=[]); reintroduce;
+      NumberToSkip: integer=0; Flags: TMongoQueryFlags=[]); reintroduce;
     /// write the main parameters of the request as JSON
     procedure ToJSON(W: TTextWriter; Mode: TMongoJSONMode); override;
     /// retrieve the NumberToReturn parameter as set to the constructor
@@ -1653,7 +1653,7 @@ type
     /// where in the cursor this reply is starting
     property StartingFrom: integer read fStartingFrom;
     /// number of documents in the reply
-    property DocumentCount: Integer read fNumberReturned;
+    property DocumentCount: integer read fNumberReturned;
     /// points to the first document binary
     // - i.e. just after the Reply header
     property FirstDocument: PAnsiChar read fFirstDocument;
@@ -1814,14 +1814,16 @@ type
     // - in case of any error, the error message is returned as text
     // - in case of success, this method will return ''
     function RunCommand(const aDatabaseName: RawUTF8;
-      const command: variant; var returnedValue: variant): RawUTF8; overload;
+      const command: variant; var returnedValue: variant;
+      flags: TMongoQueryFlags=[]): RawUTF8; overload;
     /// run a database command, supplied as a TDocVariant, TBSONVariant or a
     // string, and return the raw BSON document array of received items
     // - this overloaded method can be used on huge content to avoid the slower
     // conversion to an array of TDocVariant instances
     // - in case of success, this method will return TRUE, or FALSE on error
     function RunCommand(const aDatabaseName: RawUTF8;
-      const command: variant; var returnedValue: TBSONDocument): boolean; overload;
+      const command: variant; var returnedValue: TBSONDocument;
+      flags: TMongoQueryFlags=[]): boolean; overload;
 
     /// return TRUE if the Open method has successfully been called
     property Opened: boolean read GetOpened;
@@ -1850,17 +1852,20 @@ type
   // data because secondaries replicate operations from the primary with some
   // delay - ensure that your application can tolerate stale data if you choose
   // to use a non-primary mode
-  // - rpPrimary:	Default mode - all operations read from the current replica
+  // - rpPrimary: Default mode - all operations read from the current replica
   // set primary
   // - rpPrimaryPreferred: in most situations, operations read from the primary
   // but if it is unavailable, operations read from secondary members.
   // - rpPsecondary: all operations read from the secondary members
   // of the replica set
-  // - rpPsecondaryPreferred:	in most situations, operations read from
+  // - rpPsecondaryPreferred: in most situations, operations read from
   // secondary members but if no secondary members are available, operations
   // read from the primary
+  // rpNearest: read from the member of the replica set with the least network
+  // latency, irrespective of whether that member is a primary or secondary
+  // (in practice, we won't use latency, just a random distribution)
   TMongoClientReplicaSetReadPreference = (
-    rpPrimary, rpPrimaryPreferred, rpSecondary, rpSecondaryPreferred);
+    rpPrimary, rpPrimaryPreferred, rpSecondary, rpSecondaryPreferred, rpNearest);
 
   /// define Write Concern property of a MongoDB connection
   // - Write concern describes the guarantee that MongoDB provides when
@@ -1923,13 +1928,13 @@ type
     fLogReplyEventMaxSize: cardinal;
     fServerBuildInfo: variant;
     fServerBuildInfoNumber: cardinal;
-    fLatestReadConnectionIndex: integer;
-    procedure AfterOpen; virtual;
-    function GetOneReadConnection: TMongoConnection;
+    fLatestReadConnectionIndex: PtrInt;
+    procedure AfterOpen(ConnectionIndex: PtrInt); virtual;
     function GetBytesReceived: Int64;
     function GetBytesSent: Int64;
     function GetBytesTransmitted: Int64;
-    procedure Auth(const DatabaseName,UserName,Digest: RawUTF8; ForceMongoDBCR: boolean);
+    procedure Auth(const DatabaseName,UserName,Digest: RawUTF8;
+      ForceMongoDBCR: boolean; ConnectionIndex: PtrInt);
     function ReOpen: boolean;
   public
     /// prepare a connection to a MongoDB server or Replica Set
@@ -1937,7 +1942,7 @@ type
     // is called
     // - you can specify multiple hosts, as CSV values, if necessary
     // - depending on the platform, you may request for a TLS secured connection
-    constructor Create(const Host: RawUTF8; Port: Integer=MONGODB_DEFAULTPORT;
+    constructor Create(const Host: RawUTF8; Port: integer=MONGODB_DEFAULTPORT;
       aTLS: boolean=false; const SecondaryHostCSV: RawUTF8=''; const SecondaryPortCSV: RawUTF8=''); overload;
     /// connect to a database on a remote MongoDB primary server
     // - this method won't use authentication, and will return the corresponding
@@ -1967,6 +1972,8 @@ type
     // - will create a string from ServerBuildInfo object, e.g. as
     // $ 'MongoDB 3.2.0 mozjs mmapv1,wiredTiger'
     function ServerBuildInfoText: RawUTF8;
+    // select Connection in dependence of ReadPreference
+    function GetOneReadConnection: TMongoConnection;
     /// retrieve the server version and build information
     // - return the content as a TDocVariant document, e.g.
     // ! ServerBuildInfo.version = '2.4.9'
@@ -2156,7 +2163,7 @@ type
     // either null or the single returned document)
     // - if the query does not have any matching record, it will return null
     function FindDoc(const Criteria, Projection: Variant;
-      NumberToReturn: integer=1; NumberToSkip: Integer=0;
+      NumberToReturn: integer=1; NumberToSkip: integer=0;
       Flags: TMongoQueryFlags=[]): variant; overload;
     /// select documents in a collection and returns a dvArray TDocVariant
     // instance containing the selected documents
@@ -2173,7 +2180,7 @@ type
     // either null or the single returned document)
     // - if the query does not have any matching record, it will return null
     function FindDoc(Criteria: PUTF8Char; const Params: array of const;
-      NumberToReturn: integer=maxInt; NumberToSkip: Integer=0;
+      NumberToReturn: integer=maxInt; NumberToSkip: integer=0;
       Flags: TMongoQueryFlags=[]): variant; overload;
     /// find an existing document in a collection, by its _id field
     // - _id will identify the unique document to be retrieved
@@ -2197,7 +2204,7 @@ type
     // field names to retrieve, or a TDocVariant or TBSONVariant with
     // projection operators
     procedure FindDocs(var result: TVariantDynArray; const Projection: variant;
-      NumberToReturn: integer=maxInt; NumberToSkip: Integer=0;
+      NumberToReturn: integer=maxInt; NumberToSkip: integer=0;
       Flags: TMongoQueryFlags=[]); overload;
     /// select documents in a collection and returns a dynamic array of
     // TDocVariant instance containing the selected documents
@@ -2208,7 +2215,7 @@ type
     // projection operators
     procedure FindDocs(Criteria: PUTF8Char; const Params: array of const;
       var result: TVariantDynArray; const Projection: variant;
-      NumberToReturn: integer=maxInt; NumberToSkip: Integer=0;
+      NumberToReturn: integer=maxInt; NumberToSkip: integer=0;
       Flags: TMongoQueryFlags=[]); overload;
     /// select documents in a collection and returns a dynamic array of
     // TDocVariant instance containing the selected documents
@@ -2219,7 +2226,7 @@ type
     // field names to retrieve, or a TDocVariant or TBSONVariant with
     // projection operators
     function FindDocs(Criteria: PUTF8Char; const Params: array of const;
-      const Projection: variant; NumberToReturn: integer=maxInt; NumberToSkip: Integer=0;
+      const Projection: variant; NumberToReturn: integer=maxInt; NumberToSkip: integer=0;
       Flags: TMongoQueryFlags=[]): TVariantDynArray; overload;
 
     /// select documents in a collection and returns a JSON array of documents
@@ -2242,7 +2249,7 @@ type
     // directly into JSON, in either modMongoStrict or modMongoShell layout
     // (modNoMongo will do the same as modMongoStrict)
     function FindJSON(const Criteria, Projection: Variant;
-      NumberToReturn: integer=maxInt; NumberToSkip: Integer=0;
+      NumberToReturn: integer=maxInt; NumberToSkip: integer=0;
       Flags: TMongoQueryFlags=[]; Mode: TMongoJSONMode=modMongoStrict): RawUTF8; overload;
     /// select documents in a collection and returns a JSON array of documents
     // containing the selected documents
@@ -2258,14 +2265,14 @@ type
     // for one document - in this case, the returned instance won't be a '[..]'
     // JSON array, but either 'null' or a single '{..}' JSON object)
     function FindJSON(Criteria: PUTF8Char; const Params: array of const;
-      NumberToReturn: integer=maxInt; NumberToSkip: Integer=0;
+      NumberToReturn: integer=maxInt; NumberToSkip: integer=0;
       Flags: TMongoQueryFlags=[]; Mode: TMongoJSONMode=modMongoStrict): RawUTF8; overload;
     /// select documents in a collection and returns a JSON array of documents
     // containing the selected documents
     // - Criteria and Projection can specify the query selector as (extended)
     // JSON and parameters
     function FindJSON(Criteria: PUTF8Char; const CriteriaParams: array of const;
-      const Projection: variant; NumberToReturn: integer=maxInt; NumberToSkip: Integer=0;
+      const Projection: variant; NumberToReturn: integer=maxInt; NumberToSkip: integer=0;
       Flags: TMongoQueryFlags=[]; Mode: TMongoJSONMode=modMongoStrict): RawUTF8; overload;
 
     /// select documents in a collection and returns a TBSONDocument instance
@@ -2282,7 +2289,7 @@ type
     // - NumberToReturn can be left to its default maxInt value to return all
     // matching documents, or specify a limit (e.g. 1 for one document)
     function FindBSON(const Criteria, Projection: Variant;
-      NumberToReturn: integer=maxInt; NumberToSkip: Integer=0;
+      NumberToReturn: integer=maxInt; NumberToSkip: integer=0;
       Flags: TMongoQueryFlags=[]): TBSONDocument;
 
     /// insert one document, supplied as (extended) JSON and parameters,
@@ -2465,7 +2472,7 @@ type
     // - optional NumberToSkip can specify the number of matching documents
     // to skip before counting
     function FindCount(Criteria: PUTF8Char; const Args,Params: array of const;
-      MaxNumberToReturn: integer=0; NumberToSkip: Integer=0): Int64; overload;
+      MaxNumberToReturn: integer=0; NumberToSkip: integer=0): Int64; overload;
     /// returns TRUE if the collection has no document, FALSE otherwise
     // - is much faster than Count, especially for huge collections
     function IsEmpty: boolean;
@@ -2694,7 +2701,7 @@ var
     //betNull, betRegEx, betDeprecatedDbptr, betJS, betDeprecatedSymbol,
       0,        -1,           -1,             -1,        -1,
     //betJSScope, betInt32, betTimestamp, betInt64, betDecimal128
-      -1, sizeof(Integer), sizeof(Int64), SizeOf(Int64), Sizeof(TDecimal128));
+      -1, sizeof(integer), sizeof(Int64), SizeOf(Int64), Sizeof(TDecimal128));
 
   /// types which do not have an exact equivalency to a standard variant
   // type will be mapped as varUnknown - and will be changed into
@@ -3018,7 +3025,7 @@ str:Kind := betString;
 end;
 
 function TBSONElement.FromDocument(const doc: TBSONDocument): boolean;
-var n: Integer;
+var n: integer;
 begin
   FillCharFast(self,sizeof(self),0);
   n := length(doc);
@@ -3170,7 +3177,7 @@ begin
   result := false;
 end;
 
-procedure BSONToDoc(BSON: PByte; var Result: Variant; ExpectedBSONLen: Integer;
+procedure BSONToDoc(BSON: PByte; var Result: Variant; ExpectedBSONLen: integer;
   Option: TBSONDocArrayConversion);
 begin
   if Option=asBSONVariant then
@@ -3483,7 +3490,7 @@ begin
 end;
 
 procedure TBSONWriter.BSONAdjustDocumentsSize(BSON: PByteArray);
-var i: Integer;
+var i: integer;
 begin
   for i := 0 to fDocumentCount-1 do
   with fDocument[i] do
@@ -4180,7 +4187,7 @@ var bsonvalue: TBSONVariantData absolute Value;
     Return(betDecimal128,P+L+1,GotoEndOfObject);
   end;
   var Reg,Opt: PUTF8Char;
-      RegLen,OptLen: Integer;
+      RegLen,OptLen: integer;
   procedure ReturnRegEx(P: PUTF8Char; GotoEndOfObject: AnsiChar);
   var buf: PAnsiChar;
   begin
@@ -4486,7 +4493,7 @@ end;
 function BSON(const NameValuePairs: array of const): TBSONDocument;
 var W: TBSONWriter;
     name: RawUTF8;
-    a: Integer;
+    a: integer;
 procedure WriteValue;
 var ndx: cardinal;
 begin
@@ -4715,10 +4722,10 @@ const
   CLIENT_OPCODES = [opUpdate,opInsert,opQuery,opGetMore,opDelete,opKillCursors];
 
 var
-  GlobalRequestID: Integer;
+  GlobalRequestID: integer;
 
 constructor TMongoRequest.Create(const FullCollectionName: RawUTF8;
-  opCode: TMongoOperation; requestID, responseTo: Integer);
+  opCode: TMongoOperation; requestID, responseTo: integer);
 begin
   if not (opCode in CLIENT_OPCODES) then
     raise EMongoException.CreateUTF8('Unexpected %.Create(opCode=%)',[self,ToText(opCode)^]);
@@ -4875,7 +4882,7 @@ end;
 
 constructor TMongoRequestQuery.Create(const FullCollectionName: RawUTF8;
   const Query, ReturnFieldsSelector: variant; NumberToReturn: integer;
-  NumberToSkip: Integer=0; Flags: TMongoQueryFlags=[]);
+  NumberToSkip: integer; Flags: TMongoQueryFlags);
 begin
   inherited Create(FullCollectionName,opQuery,0,0);
   fNumberToReturn := NumberToReturn;
@@ -5490,10 +5497,10 @@ begin
 end;
 
 function TMongoConnection.RunCommand(const aDatabaseName: RawUTF8;
-  const command: variant; var returnedValue: variant): RawUTF8;
+  const command: variant; var returnedValue: variant; flags: TMongoQueryFlags): RawUTF8;
 begin
   GetDocumentsAndFree(
-    TMongoRequestQuery.Create(aDatabaseName+'.$cmd',command,null,1),
+    TMongoRequestQuery.Create(aDatabaseName+'.$cmd',command,null,1,0,flags),
     returnedValue);
   with _Safe(returnedValue)^ do
     if GetValueOrDefault('ok',1)<>0 then
@@ -5503,11 +5510,12 @@ begin
 end;
 
 function TMongoConnection.RunCommand(const aDatabaseName: RawUTF8;
-  const command: variant; var returnedValue: TBSONDocument): boolean;
+  const command: variant; var returnedValue: TBSONDocument;
+  flags: TMongoQueryFlags): boolean;
 var item: TBSONElement;
 begin
   returnedValue := GetBSONAndFree(
-    TMongoRequestQuery.Create(aDatabaseName+'.$cmd',command,null,1));
+    TMongoRequestQuery.Create(aDatabaseName+'.$cmd',command,null,1,0,flags));
   result := true;
   item.FromDocument(returnedValue);
   if item.DocItemToInteger('ok',1)=0 then
@@ -5647,7 +5655,7 @@ end;
 
 { TMongoClient }
 
-constructor TMongoClient.Create(const Host: RawUTF8; Port: Integer;
+constructor TMongoClient.Create(const Host: RawUTF8; Port: integer;
   aTLS: boolean; const SecondaryHostCSV, SecondaryPortCSV: RawUTF8);
 const PROT: array[boolean] of string[1] = ('', 's');
 var secHost: TRawUTF8DynArray;
@@ -5711,40 +5719,41 @@ begin
 end;
 
 function TMongoClient.GetOneReadConnection: TMongoConnection;
-function GetUnlockedSecondaryIndex: integer;
-var retry: integer;
-begin
-  if Length(fConnections)=1 then // no secondary? use primary
-    result := 0 else begin
-    for retry := 1 to 100 do begin // search for an inactive connection
-      result := fLatestReadConnectionIndex; // simple round-robin pattern
-      if result=high(fConnections) then
-        if ReadPreference=rpSecondary then
-          result := 1 else
-          result := 0 else
-        inc(result); // thread-safety is not an issue here
-      if (retry<=length(fConnections)) and not fConnections[result].Opened then
-      try
-        fConnections[result].Open;
-      except
-        on E: Exception do
-        begin
-          SleepHiRes(2);
-          continue;
+  function GetUnlockedSecondaryIndex: PtrInt;
+  var retry: integer;
+  begin
+    if Length(fConnections)=1 then // no secondary? use primary
+      result := 0 else begin
+      for retry := 1 to 100 do begin // search for an inactive connection
+        result := fLatestReadConnectionIndex; // simple round-robin pattern
+        if result=high(fConnections) then
+          if ReadPreference=rpSecondary then
+            result := 1 else
+            result := 0 else
+          inc(result); // thread-safety is not an issue here
+        if (retry<=length(fConnections)) and not fConnections[result].Opened then
+        try
+          fConnections[result].Open;
+        except
+          on E: Exception do
+          begin
+            SleepHiRes(2);
+            continue;
+          end;
         end;
+        if fConnections[result].Opened then
+          if fConnections[result].Locked then
+            if retry mod length(fConnections)=0 then
+              SleepHiRes(2) else
+              continue else
+            break;
       end;
-      if fConnections[result].Opened then
-        if fConnections[result].Locked then
-          if retry mod length(fConnections)=0 then
-            SleepHiRes(2) else
-            continue else
-          break;
+      if not fConnections[result].Opened then
+        result := 0; // safe fallback to primary member in worst case
+      fLatestReadConnectionIndex := result;
     end;
-    if not fConnections[result].Opened then
-      result := 0; // safe fallback to primary member in worst case
-    fLatestReadConnectionIndex := result;
   end;
-end;
+var n, retry: integer;
 begin
   case ReadPreference of
   rpPrimaryPreferred:
@@ -5753,7 +5762,15 @@ begin
       result := fConnections[0];
   rpSecondary, rpSecondaryPreferred:
     result := fConnections[GetUnlockedSecondaryIndex];
-  else // rpPrimary:
+  rpNearest: begin
+    n := Length(fConnections);
+    for retry := 1 to n*2 do begin
+      result := fConnections[Random32(n)];
+      if not result.Locked then
+        exit;
+    end;
+    result := fConnections[0]; // falback to the main instance
+  end else // rpPrimary or not handled yet
     result := fConnections[0];
   end;
 end;
@@ -5766,7 +5783,7 @@ begin
     if result=nil then begin // not already opened -> try now from primary host
       if not fConnections[0].Opened then begin
         fConnections[0].Open;
-        AfterOpen;
+        AfterOpen(0);
       end;
       result := TMongoDatabase.Create(Self,DatabaseName);
       fDatabases.AddObjectUnique(DatabaseName,@result);
@@ -5782,29 +5799,32 @@ end;
 function TMongoClient.OpenAuth(const DatabaseName,UserName,PassWord: RawUTF8;
   ForceMongoDBCR: boolean): TMongoDatabase;
 var digest: RawByteString;
+    i: PtrInt;
 begin
   if (self=nil) or (DatabaseName='') or (UserName='') or (PassWord='') then
     raise EMongoException.CreateUTF8('Invalid %.OpenAuth("%") call',[self,DatabaseName]);
   result := fDatabases.GetObjectFrom(DatabaseName);
-  if result=nil then  // not already opened -> try now from primary host
-  try // note: authentication works on a single database per socket connection
-    if not fConnections[0].Opened then
-    try
-      fConnections[0].Open; // socket connection
-      AfterOpen; // need ServerBuildInfoNumber just below
-      digest := PasswordDigest(UserName,Password);
-      Auth(DatabaseName,UserName,digest,ForceMongoDBCR);
-      with fGracefulReconnect do
-        if Enabled and (EncryptedDigest='') then begin
-          ForcedDBCR := ForceMongoDBCR;
-          User := UserName;
-          Database := DatabaseName;
-          EncryptedDigest := CryptDataForCurrentUser(digest,Database,true);
+  if result=nil then  // not already opened -> try now
+  try
+    // ensure we are opened and authenticated on all connections
+    for i := 0 to High(fConnections) do
+      if not fConnections[i].Opened then
+        try
+          fConnections[i].Open; // socket connection
+          AfterOpen(i); // need ServerBuildInfoNumber just below
+          digest := PasswordDigest(UserName,Password);
+          Auth(DatabaseName,UserName,digest,ForceMongoDBCR, i);
+          with fGracefulReconnect do
+            if Enabled and (EncryptedDigest='') then begin
+              ForcedDBCR := ForceMongoDBCR;
+              User := UserName;
+              Database := DatabaseName;
+              EncryptedDigest := CryptDataForCurrentUser(digest,Database,true);
+            end;
+        except
+          fConnections[i].Close;
+          raise;
         end;
-    except
-      fConnections[0].Close;
-      raise;
-    end;
     result := TMongoDatabase.Create(Self,DatabaseName);
     fDatabases.AddObjectUnique(DatabaseName,@result);
   finally
@@ -5813,7 +5833,7 @@ begin
 end;
 
 procedure TMongoClient.Auth(const DatabaseName,UserName,Digest: RawUTF8;
-  ForceMongoDBCR: boolean);
+  ForceMongoDBCR: boolean; ConnectionIndex: PtrInt);
 var res,bson: variant;
     err,nonce,first,key,user,msg,rnonce: RawUTF8;
     payload: RawByteString;
@@ -5840,7 +5860,7 @@ begin // caller should have made fConnections[0].Open
     // MONGODB-CR
     // http://docs.mongodb.org/meta-driver/latest/legacy/implement-authentication-in-driver
     bson := BSONVariant(['getnonce',1]);
-    err := fConnections[0].RunCommand(DatabaseName,bson,res);
+    err := fConnections[ConnectionIndex].RunCommand(DatabaseName,bson,res);
     if (err='') and not _Safe(res)^.GetAsRawUTF8('nonce',nonce) then
       err := 'missing returned nonce';
     if err<>'' then
@@ -5848,7 +5868,7 @@ begin // caller should have made fConnections[0].Open
         [self,DatabaseName,err,res]);
     key := MD5(nonce+UserName+Digest);
     bson := BSONVariant(['authenticate',1,'user',UserName,'nonce',nonce,'key',key]);
-    err := fConnections[0].RunCommand(DatabaseName,bson,res);
+    err := fConnections[ConnectionIndex].RunCommand(DatabaseName,bson,res);
     if err<>'' then
       raise EMongoException.CreateUTF8('%.OpenAuthCR("%") step2: % - res=%',
         [self,DatabaseName,err,res]);
@@ -5860,7 +5880,7 @@ begin // caller should have made fConnections[0].Open
     nonce := BinToBase64(@rnd,sizeof(rnd));
     FormatUTF8('n=%,r=%',[user,nonce],first);
     BSONVariantType.FromBinary('n,,'+first,bbtGeneric,bson);
-    err := fConnections[0].RunCommand(DatabaseName,BSONVariant([
+    err := fConnections[ConnectionIndex].RunCommand(DatabaseName,BSONVariant([
       'saslStart',1,'mechanism','SCRAM-SHA-1','payload',bson,'autoAuthorize',1]),res);
     CheckPayload;
     if err='' then begin
@@ -5882,7 +5902,7 @@ begin // caller should have made fConnections[0].Open
     HMAC_SHA1(server,msg,server);
     msg := key+',p='+BinToBase64(@client,SizeOf(client));
     BSONVariantType.FromBinary(msg,bbtGeneric,bson);
-    err := fConnections[0].RunCommand(DatabaseName,BSONVariant([
+    err := fConnections[ConnectionIndex].RunCommand(DatabaseName,BSONVariant([
       'saslContinue',1,'conversationId',res.conversationId,'payload',bson]),res);
     resp.Clear;
     CheckPayload;
@@ -5893,7 +5913,7 @@ begin // caller should have made fConnections[0].Open
         [self,DatabaseName,err,res]);
     if not res.done then begin
       // third empty challenge may be required
-      err := fConnections[0].RunCommand(DatabaseName,BSONVariant([
+      err := fConnections[ConnectionIndex].RunCommand(DatabaseName,BSONVariant([
         'saslContinue',1,'conversationId',res.conversationId,'payload','']),res);
      if (err='') and not res.done then
        err := 'SASL conversation failed to complete';
@@ -5904,10 +5924,10 @@ begin // caller should have made fConnections[0].Open
   end;
 end;
 
-procedure TMongoClient.AfterOpen;
+procedure TMongoClient.AfterOpen(ConnectionIndex: PtrInt);
 begin
   if VarIsEmptyOrNull(fServerBuildInfo) then begin
-    fConnections[0].RunCommand('admin','buildinfo',fServerBuildInfo);
+    fConnections[ConnectionIndex].RunCommand('admin','buildinfo',fServerBuildInfo);
     with _Safe(fServerBuildInfo)^.A['versionArray']^ do
       if Count=4 then
         fServerBuildInfoNumber := // e.g. 2040900 for MongoDB 2.4.9
@@ -5929,7 +5949,7 @@ begin
       if EncryptedDigest<>'' then
         try
           digest := CryptDataForCurrentUser(EncryptedDigest,Database,false);
-          Auth(Database,User,digest,ForcedDBCR);
+          Auth(Database,User,digest,ForcedDBCR,0);
         finally
           FillZero(digest);
         end;
@@ -5982,7 +6002,7 @@ var colls: TBSONIterator;
     full,db,coll: RawUTF8;
     resp,batch: variant;
     mc: TMongoCollection;
-    ndx: Integer;
+    ndx: integer;
 begin
   fClient := aClient;
   fName := aDatabaseName;
@@ -6245,7 +6265,7 @@ end;
 
 procedure TMongoCollection.EnsureIndex(const Keys: array of RawUTF8;
   Ascending, Unique: boolean);
-const Order: array[boolean] of Integer = (-1,1);
+const Order: array[boolean] of integer = (-1,1);
 var k,opt: variant;
     A: integer;
 begin
@@ -6275,7 +6295,7 @@ end;
 
 function TMongoCollection.FindCount(Criteria: PUTF8Char;
   const Args,Params: array of const;
-  MaxNumberToReturn: integer=0; NumberToSkip: Integer=0): Int64;
+  MaxNumberToReturn, NumberToSkip: integer): Int64;
 var cmd: RawUTF8;
     res: variant;
 begin
@@ -6296,7 +6316,7 @@ begin // much faster than Count>0 for huge collections
 end;
 
 function TMongoCollection.FindBSON(const Criteria, Projection: Variant;
-  NumberToReturn, NumberToSkip: Integer; Flags: TMongoQueryFlags): TBSONDocument;
+  NumberToReturn, NumberToSkip: integer; Flags: TMongoQueryFlags): TBSONDocument;
 begin
   result := Database.Client.GetOneReadConnection.GetBSONAndFree(
     TMongoRequestQuery.Create(fFullCollectionName,
@@ -6304,7 +6324,7 @@ begin
 end;
 
 function TMongoCollection.FindDoc(const Criteria, Projection: Variant;
-  NumberToReturn, NumberToSkip: Integer; Flags: TMongoQueryFlags): variant;
+  NumberToReturn, NumberToSkip: integer; Flags: TMongoQueryFlags): variant;
 begin
   Database.Client.GetOneReadConnection.GetDocumentsAndFree(
     TMongoRequestQuery.Create(fFullCollectionName,
@@ -6312,7 +6332,7 @@ begin
 end;
 
 function TMongoCollection.FindDoc(Criteria: PUTF8Char;
-  const Params: array of const; NumberToReturn, NumberToSkip: Integer;
+  const Params: array of const; NumberToReturn, NumberToSkip: integer;
   Flags: TMongoQueryFlags): variant;
 begin
   result := FindDoc(BSONVariant(Criteria,[],Params),null,
@@ -6321,7 +6341,7 @@ end;
 
 procedure TMongoCollection.FindDocs(Criteria: PUTF8Char;
   const Params: array of const; var result: TVariantDynArray;
-  const Projection: variant; NumberToReturn, NumberToSkip: Integer;
+  const Projection: variant; NumberToReturn, NumberToSkip: integer;
   Flags: TMongoQueryFlags);
 begin
   Database.Client.GetOneReadConnection.GetDocumentsAndFree(
@@ -6331,7 +6351,7 @@ begin
 end;
 
 function TMongoCollection.FindDocs(Criteria: PUTF8Char; const Params: array of const;
-  const Projection: variant; NumberToReturn,NumberToSkip: Integer;
+  const Projection: variant; NumberToReturn,NumberToSkip: integer;
   Flags: TMongoQueryFlags): TVariantDynArray;
 begin
   FindDocs(Criteria,Params,result,Projection,NumberToReturn,NumberToSkip,Flags);
@@ -6356,7 +6376,7 @@ begin
 end;
 
 procedure TMongoCollection.FindDocs(var result: TVariantDynArray;
-  const Projection: variant; NumberToReturn, NumberToSkip: Integer;
+  const Projection: variant; NumberToReturn, NumberToSkip: integer;
   Flags: TMongoQueryFlags);
 begin
   Database.Client.GetOneReadConnection.GetDocumentsAndFree(
@@ -6365,7 +6385,7 @@ begin
 end;
 
 function TMongoCollection.FindJSON(const Criteria, Projection: Variant;
-  NumberToReturn, NumberToSkip: Integer; Flags: TMongoQueryFlags;
+  NumberToReturn, NumberToSkip: integer; Flags: TMongoQueryFlags;
   Mode: TMongoJSONMode): RawUTF8;
 begin
   result := Database.Client.GetOneReadConnection.GetJSONAndFree(
@@ -6374,7 +6394,7 @@ begin
 end;
 
 function TMongoCollection.FindJSON(Criteria: PUTF8Char;
-  const Params: array of const; NumberToReturn, NumberToSkip: Integer;
+  const Params: array of const; NumberToReturn, NumberToSkip: integer;
   Flags: TMongoQueryFlags; Mode: TMongoJSONMode): RawUTF8;
 begin
   result := FindJSON(BSONVariant(Criteria,[],Params),null,
@@ -6383,7 +6403,7 @@ end;
 
 function TMongoCollection.FindJSON(
   Criteria: PUTF8Char; const CriteriaParams: array of const;
-  const Projection: variant; NumberToReturn, NumberToSkip: Integer;
+  const Projection: variant; NumberToReturn, NumberToSkip: integer;
   Flags: TMongoQueryFlags; Mode: TMongoJSONMode): RawUTF8;
 begin
   result := FindJSON(BSONVariant(Criteria,[],CriteriaParams),
@@ -6398,7 +6418,7 @@ begin
 end;
 
 procedure TMongoCollection.Insert(const Documents: TBSONDocument;
-  Flags: TMongoInsertFlags=[]; NoAcknowledge: boolean=false);
+  Flags: TMongoInsertFlags; NoAcknowledge: boolean);
 begin
   Database.Client.Connections[0].SendAndFree(TMongoRequestInsert.Create(
     fFullCollectionName,Documents,Flags),NoAcknowledge);
@@ -6612,19 +6632,24 @@ begin
 end;
 
 function div128bits9digits(var value: THash128Rec): PtrUInt;
-var r64: QWord;
+var r: QWord;
     i: PtrInt;
 begin
-  r64 := 0;
+  r := 0;
   for i := 0 to high(value.c) do begin
-    r64 := r64 shl 32;   // adjust remainder to match value of next dividend
-    inc(r64,value.c[i]); // add the divided to _rem
-    if r64=0 then
+    {$ifdef FPC_32} // circumvent bug at least with FPC 3.2
+    Int64Rec(r).Hi := Int64Rec(r).Lo;
+    Int64Rec(r).Lo := 0;
+    {$else}
+    r := r shl 32;    // adjust remainder to match value of next dividend
+    {$endif FPC_32}
+    inc(r,value.c[i]); // add the divided to _rem
+    if r=0 then
       continue;
-    value.c[i] := r64 div 1000000000;
-    dec(r64,QWord(value.c[i])*1000000000);
+    value.c[i] := r div 1000000000;
+    dec(r,QWord(value.c[i])*1000000000);
   end;
-  result := r64;
+  result := r;
 end;
 
 procedure append(var dest: PUTF8Char; var dig: PByte; digits: PtrInt);

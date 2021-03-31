@@ -2,10 +2,11 @@ unit ALIosUserNotificationsApi;
 
 interface
 
-uses iOSapi.CoreLocation,
-     iOSapi.CocoaTypes,
-     Macapi.ObjectiveC,
-     iOSapi.Foundation;
+uses
+  iOSapi.CoreLocation,
+  iOSapi.CocoaTypes,
+  Macapi.ObjectiveC,
+  iOSapi.Foundation;
 
 {$M+}
 

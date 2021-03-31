@@ -1,54 +1,3 @@
-Delphi Warrior
-==============
-
-Increase velocity and reduce technical debt through **quality code review 
-by 2 seniors <a href="https://www.embarcadero.com/embarcadero-mvp-program">MVP</a> delphi experts** for 
-less than 250 EUR/months.
-
-* We review within your tools to catch security threats, stop crashes, and fix performance issues before they reach production.
-* Get insight into coding best practices from top-tier delphi engineers. Share knowledge and collaborate effectively with your colleagues.
-* We work where you do (GitHub, GitLab, Bitbucket, etc.), no distraction or change of process required.
-* Onboard world-class delphi engineers in you team for less than 250 EUR/months.
-
-contact us now: <a href="mailto:contact@delphiwarrior.com">contact@delphiwarrior.com</a>
-
-<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/embarcadero_mvp.png?raw=true" alt="MVP Delphi" width="100" style="width:100px;"  />
-
-
-Stéphane Vander Clock
----------------------
-
-With more than 25 years of experience in the development of software applications 
-(Delphi engineering), member of the Embarcadero <a href="https://www.embarcadero.com/embarcadero-mvp-program">MVP program</a> 
-(Most Valuable Professionals) I excel in every stage of the life cycle of software development, 
-including design creation, coding, debugging, testing, and maintenance. I am able to perform the 
-following tasks:
-
-* Analysis and conception
-* Technical specifications 
-* Costs estimation
-* Development and Test
-* Documentation
-* Deployment
-
-Projects I was involved in let me work as a developer, analyst, architect and project manager 
-in various sectors such as retail, robotics, management, real estate, finance and even 
-online dating.
-
-
-Robin Valtot
-------------
-
-I have acquired a solid experience in Enterprise Resource Planning (ERP) development. 
-My priority is to have a clean code that implements new development standards that respond 
-to technical tests. I have been a member of the Embarcadero 
-<a href="https://www.embarcadero.com/embarcadero-mvp-program">MVP program</a> since 2017.
-Projects I was involved in let me work as a developer, analyst, architect and tech lead 
-in various research and development teams. I'm also a certified professional scrum master.
-
-<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/empty.png?raw=true" alt="" width="0" style="width:0px;"  />
-  
-
 Alcinoe
 =======
 
@@ -56,7 +5,7 @@ Alcinoe is a library of visual and non-visual components for Delphi. The compone
 be used in commercial as well as shareware and freeware and open source projects 
 without cost.
 
-Alcinoe is compatible with <b>Delphi RIO 10.3.3</b>
+Alcinoe is compatible with <b>Delphi Sydney 10.4.2</b>
 
 Please "star" (like) this project in GitHub! It's cost nothing but help
 to reference the code
@@ -96,7 +45,7 @@ Compiled demo
 #### Android #### 
 
 * https://tinyurl.com/zoxavr9 (ALFmxControl.apk)
-* https://tinyurl.com/yd7c4ofk (ALFirebaseMessagingDemo.apk)
+* https://tinyurl.com/na5fvy2d (ALFirebaseMessaging.apk)
 * https://tinyurl.com/y9gzos9f (ALFacebookLogin.apk)
 * https://tinyurl.com/yaft2wxr (ALFmxEffects.apk)
 * https://tinyurl.com/ydymo23w (ALLiveVideoChatClient.apk)
@@ -115,36 +64,26 @@ search path of your project.
 
 If you plan to use visual components at design time then you need to
 install the bpl. Launch Delphi and go in component > Install Packages... > and choose the 
-BPL located in <a href="https://github.com/Zeus64/alcinoe/tree/master/lib/bpl/alcinoe/Win32/rio">{alcinoe_rootdir}\lib\bpl\alcinoe\Win32\rio\Alcinoe_rio.bpl</a> (if you are in delphi Rio 
+BPL located in <a href="https://github.com/Zeus64/alcinoe/tree/master/lib/bpl/alcinoe/Win32/sydney">{alcinoe_rootdir}\lib\bpl\alcinoe\Win32\sydney\Alcinoe_sydney.bpl</a> (if you are in delphi Sydney 
 else choose the directory that correspond to your Delphi version). 
-You still need to add in your search path <a href="https://github.com/Zeus64/alcinoe/tree/master/source">{alcinoe_rootdir}\source\ </a>  
+You still need to add in your search path <a href="https://github.com/Zeus64/alcinoe/tree/master/source">{alcinoe_rootdir}\source\</a>  
   
-Alcinoe use sometime some advanced functions that need to patch the delphi RTL.
-For this you need to include in your project search path ALL the directories located
-under <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\ </a> (if you are in delphi Rio 
-else choose the directory that correspond to your Delphi version) like for exemple:
+Alcinoe also improuve a little the original delphi source code. In this way you will need
+to go in <a href="https://github.com/Zeus64/alcinoe/tree/master/embarcadero/sydney/10_4_2/">{alcinoe_rootdir}\embarcadero\sydney\10_4_2\</a>
+and run update.bat to retrieve and patch the original delphi source code. The batch file
+assume that the original source code is located in "c:\Program Files (x86)\Embarcadero\Studio\21.0\source\" 
+and that you have GIT in your path. After the batch copied and patched the Delphi source code you will 
+need to include this source code in your project search path.
 
-* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched\fmx">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\fmx</a>
-* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched\rtl\ios">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\ios</a>
-* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\patched\rtl\android">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\patched\rtl\android</a>
-
-If after this you have error like (for exemple)
-`[dcc32 Fatal Error] FMX.Types3D.pas(1023): F2051 Unit FMX.Materials was compiled with 
-a different version of FMX.Types3D.TMaterial`. then you need also to include in you search 
-path non patched units (here FMX.Materials.pas for exemple) that are located 
-in your `C:\Program Files (x86)\Embarcadero\Studio\20.0\source\` directory
-You can copy thoses files in (for exemple)
-  
-* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\originals\fmx">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\fmx</a>
-* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\originals\rtl\ios">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\ios</a>
-* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\originals\rtl\android">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\android</a>
-* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\originals\rtl\osx">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\osx</a>
-* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\originals\rtl\net">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\net</a>
-* <a href="https://github.com/Zeus64/alcinoe/tree/master/references\embarcadero\rio\10_3_3\originals\rtl\common">{alcinoe_rootdir}\references\embarcadero\rio\10_3_3\originals\rtl\common</a>
-  
-and then you need to add also all thoses directories to your project search path (add them 
-AFTER the previous entries you just made for the patched version)
-
+To finish more and more libraries use now Java 1.8 features (like webRTC, exoplayer, etc.). 
+In this way, we must do desugaring (Desugaring allows you to use these features on older 
+devices by replacing new bytecodes and language APIs with older ones during the build process). 
+With d8.bat (replacement of dx.bat), desugaring is turned on by default. So you can now 
+use most of the latest language changes while targeting older devices.
+Waiting that embarcadero swap to D8.bat, we must make DX.bat a "proxy" to D8.bat.
+For this just replace your original DX.bat (mine is located in c:\SDKs\android\build-tools\30.0.3\d8.bat)
+by the one located in <a href="https://github.com/Zeus64/alcinoe/tree/master/tools/D8Proxy/dx.bat">{alcinoe_rootdir}\tools\D8Proxy\dx.bat</a>.
+more details here: <a href="https://quality.embarcadero.com/browse/RSP-24155">https://quality.embarcadero.com/browse/RSP-24155</a>
 
 Full opengl video player for FireMonkey
 ---------------------------------------
@@ -308,12 +247,12 @@ You can send notification messages to drive user re-engagement and retention. Fo
 such as instant messaging, a message can transfer a payload of up to 4KB to a client app.
 
 
-Android/iOS Facebook SDK login
+Android/iOS VKontakte/Facebook SDK login
 ------------------------------
 
-The Facebook SDK for Android enables people to sign into your app with Facebook Login. 
-When people log into your app with Facebook they can grant permissions to your app so 
-you can retrieve information or perform actions on Facebook on their behalf.
+The VKontakte/Facebook SDK for Android enables people to sign into your app with VKontakte/Facebook Login. 
+When people log into your app with VKontakte/Facebook they can grant permissions to your app so 
+you can retrieve information or perform actions on VKontakte/Facebook on their behalf.
 
 
 Photo Editor Filters for Android/iOS
@@ -740,18 +679,6 @@ Unfortunately, in win64 we lost all the FastCode heritage.
 the functions will be around 2x to 10x more slower. 
 you can try to launch /demo/ALStringBenchMark/
 in win64 and Win32 to see the difference in speed.
-Sadly this makes the Win64 support of Delphi
-like a "gadget", because most of the app demanding the
-win64 support are Server App (or dll) and this king 
-of app need all the power. I just Hope that 
-embarcadero will improve the speed of the win64 
-functions, but I doubt they want to do them in asm 
-because they want to go in multi platform, and
-they not really want to do dedicated ASM for
-every platform, they instead want to improve 
-their compiler. but I think it's unrealistic to think 
-that their compiler will produce code which can compete
-with hand-optimized ASM.
 
 
 DELPHI D2009+ (UNICODE)
@@ -766,19 +693,10 @@ very hard, especially on application that assume that string
 is 8bit. Here a very good article about why to avoid to use 
 UFT-16: http://www.utf8everywhere.org/
 
-The main argument of embarcadero why choosing UTF16 instead 
-of UTF8 is because the windows API work in the background in 
-UTF16 and better to stay in the same way as the windows API. 
-This is still questionable when the strategy becomes to make 
-Delphi a multi platform product. 
-
 So I was facing the need to choose: stay in D2007, move to 
 FreePascal (that implement Unicode through UTF8) or migrate 
-to Unicode. After studying the Unicode migration and discover 
-that it’s will be very hard to do (even in the Delphi I 
-discover some bugs in their own source code due to the 
-migration from ansi to Unicode like for example 
-http://qc.embarcadero.com/wc/qcmain.aspx?d=106424). 
+to Unicode. After studying the Unicode migration I discover 
+that it’s will be very hard to do on my own projects. 
 Also on lot of my applications the migration to Unicode was 
 really unnecessary, as they was already working in UTF8, 
 receive their input request in utf8 and output their response 
@@ -794,20 +712,11 @@ AnsiString (8bit string). My first through was to replace
 everywhere in my code all the String by AnsiString. 
 Unfortunately,  most of the usefull and needed string function 
 in D2009+ are not available in 8bit string like inttostr, 
-strtoint, strtofloat, Tstrings, TstringStream, etc. that 
-simply unbelievable, in their way to go in 16bit string, 
-embarcadero remove the 8bit support ! of course we can still 
-do ansistring(inttostr(x)) but this is very pity (and slow).
-So I decided to make my component like a "framework" to help 
-fully support of 8bit string (mostly in UTF8). 
-
-I build a small application (available in /demo/ALStringToAnsiString/)
-to convert all string type and string function to their 
-ansistring equivalent. The conversion reflects my 
-programming style and quirks so you may need to tweak the 
-output or modify the converter so you have the code. Will 
-this work for your code? Probably not out of the Non Box but 
-you may only be left requiring only few little tweaks.
+strtoint, strtofloat, Tstrings, TstringStream, etc. Of course 
+we can still do ansistring(inttostr(x)) but this is very 
+pity (and slow). So I decided to make my component 
+like a "framework" to help fully support of 8bit string 
+(mostly in UTF8). 
 
 You can also go in /demo/ALStringBenchMark/ to find an 
 application to benchmark ansiString vs Unicode String and 
@@ -817,8 +726,7 @@ of the Unicode function (when they are implemented correctly,
 thanks to fastcode) will be close to the same speed as their 
 ansi equivalent. But no mistake, Unicode string will still 
 use 2x more memory and depending on the application, this may 
-be not acceptable (example application that load huge list of 
-string in a TStringList or in an XML object).
+be not acceptable.
 
 Under D2009+, ansiString Have now a codepage, and some 
 transliteration (OldCodePage => UTF16 => NewCodePage) will 
@@ -836,11 +744,4 @@ result in UTF8 => UTF16 => UTF8). This is why we use in
 all our code only AnsiString instead of UTF8String (even 
 when we assume that string contain only UTF8 char) to 
 avoid theses transliteration keep the rule to only use 
-AnsiString with SetMultiByteConversionCodePage and not type 
-like UTF8string or other
-
-Also about the compiler warning, when he detect a 
-transliteration you will have a warning, but he can not 
-always detect the transliteration Ex: MyFunctionNeedPWideChar(Pointer(aPansiChar))
-Here unfortunately you will not get any "warning" nor 
-any "error" from the compiler.
+AnsiString with SetMultiByteConversionCodePage.

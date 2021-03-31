@@ -2,11 +2,12 @@ unit ALAndroidWebRTCApi;
 
 interface
 
-uses Androidapi.JNIBridge,
-     Androidapi.JNI.GraphicsContentViewText,
-     Androidapi.JNI.JavaTypes,
-     Androidapi.JNI.App,
-     Androidapi.JNI.OpenGL;
+uses
+  Androidapi.JNIBridge,
+  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNI.JavaTypes,
+  Androidapi.JNI.App,
+  Androidapi.JNI.OpenGL;
 
 type
 

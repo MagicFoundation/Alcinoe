@@ -14,16 +14,7 @@ object MainLogView: TMainLogView
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
   OnShow = FormShow
-  LCLVersion = '1.7'
-  object Splitter2: TSplitter
-    Cursor = crVSplit
-    Left = 0
-    Height = 4
-    Top = 583
-    Width = 860
-    Align = alBottom
-    ResizeAnchor = akBottom
-  end
+  LCLVersion = '2.0.11.0'
   object Splitter3: TSplitter
     Left = 837
     Height = 583
@@ -146,17 +137,17 @@ object MainLogView: TMainLogView
     end
     object lblServerRoot: TLabel
       Left = 16
-      Height = 13
+      Height = 12
       Top = 48
-      Width = 62
+      Width = 70
       Caption = 'Server Root:'
       ParentColor = False
     end
     object lblServerPort: TLabel
       Left = 16
-      Height = 13
+      Height = 12
       Top = 90
-      Width = 59
+      Width = 67
       Caption = 'Server Port:'
       ParentColor = False
     end
@@ -182,10 +173,11 @@ object MainLogView: TMainLogView
       PopupMenu = FilterMenu
       Style = lbOwnerDrawFixed
       TabOrder = 3
+      TopIndex = -1
     end
     object EditSearch: TEdit
       Left = 16
-      Height = 21
+      Height = 30
       Hint = 'Search (Ctrl+F, F3 for next) '
       Top = 40
       Width = 85
@@ -231,9 +223,9 @@ object MainLogView: TMainLogView
     end
     object MergedProfile: TCheckBox
       Left = 22
-      Height = 19
+      Height = 23
       Top = 283
-      Width = 112
+      Width = 134
       Caption = 'Merge method calls'
       OnClick = MergedProfileClick
       TabOrder = 5
@@ -261,8 +253,8 @@ object MainLogView: TMainLogView
       Top = 336
       Width = 118
       Caption = ' Threads '
-      ClientHeight = 78
-      ClientWidth = 114
+      ClientHeight = 81
+      ClientWidth = 116
       TabOrder = 8
       object BtnThreadNext: TButton
         Left = 8
@@ -374,7 +366,7 @@ object MainLogView: TMainLogView
     end
     object edtServerRoot: TEdit
       Left = 16
-      Height = 21
+      Height = 30
       Top = 64
       Width = 121
       TabOrder = 11
@@ -382,7 +374,7 @@ object MainLogView: TMainLogView
     end
     object edtServerPort: TEdit
       Left = 16
-      Height = 21
+      Height = 30
       Top = 106
       Width = 121
       TabOrder = 12
@@ -415,18 +407,28 @@ object MainLogView: TMainLogView
       Width = 121
       ItemHeight = 0
       OnDblClick = lstDaysDblClick
+      ScrollWidth = 119
       TabOrder = 15
+      TopIndex = -1
     end
   end
-  object MemoBottom: TMemo
+  object Splitter2: TSplitter
+    Cursor = crVSplit
+    Left = 0
+    Height = 4
+    Top = 583
+    Width = 860
+    Align = alBottom
+    ResizeAnchor = akBottom
+  end
+  object PanelBottom: TPanel
     Left = 0
     Height = 52
     Top = 587
     Width = 860
     Align = alBottom
-    ReadOnly = True
-    ScrollBars = ssVertical
-    TabOrder = 3
+    TabOrder = 9
+    OnResize = PanelBottomResize
   end
   object List: TDrawGrid
     Left = 841
@@ -481,7 +483,7 @@ object MainLogView: TMainLogView
     Align = alLeft
     ClientHeight = 583
     ClientWidth = 148
-    TabOrder = 4
+    TabOrder = 3
     Visible = False
     object ThreadListBox: TCheckListBox
       Left = 1
@@ -494,6 +496,7 @@ object MainLogView: TMainLogView
       OnClickCheck = ThreadListBoxClickCheck
       OnDblClick = ThreadListBoxDblClick
       TabOrder = 0
+      TopIndex = -1
     end
     object pnlThreadBottom: TPanel
       Left = 1
@@ -525,7 +528,7 @@ object MainLogView: TMainLogView
     ClientHeight = 583
     ClientWidth = 257
     Constraints.MinWidth = 80
-    TabOrder = 5
+    TabOrder = 4
     Visible = False
     object Directory: TShellTreeView
       Left = 8
@@ -555,19 +558,19 @@ object MainLogView: TMainLogView
     end
   end
   object FilterMenu: TPopupMenu
-    left = 88
-    top = 16
+    Left = 88
+    Top = 16
   end
   object OpenDialog: TOpenDialog
     DefaultExt = '.log'
     Filter = 'Log|*.log;*.txt;*.synlz'
     Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
-    left = 40
-    top = 80
+    Left = 40
+    Top = 80
   end
   object ListMenu: TPopupMenu
-    left = 40
-    top = 16
+    Left = 40
+    Top = 16
     object ListMenuCopy: TMenuItem
       Caption = '&Copy'
       OnClick = ListMenuCopyClick
@@ -577,14 +580,14 @@ object MainLogView: TMainLogView
     Enabled = False
     Interval = 200
     OnTimer = tmrRefreshTimer
-    left = 88
-    top = 80
+    Left = 88
+    Top = 80
   end
   object dlgSaveList: TSaveDialog
     DefaultExt = '.log'
     Filter = 'log|*.log|txt|*.txt|synlz|*.synlz'
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
-    left = 136
-    top = 16
+    Left = 136
+    Top = 16
   end
 end

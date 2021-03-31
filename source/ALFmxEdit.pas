@@ -2,35 +2,34 @@ unit ALFmxEdit;
 
 interface
 
-{$IF defined(MACOS) and not defined(IOS)}
-  {$DEFINE _MACOS}
-{$ENDIF}
+{$I Alcinoe.inc}
 
-uses System.Types,
-     system.Classes,
-     System.UITypes,
-     {$IF defined(android)}
-     System.Messaging,
-     Androidapi.JNI.GraphicsContentViewText,
-     Androidapi.JNIBridge,
-     Androidapi.JNI.Widget,
-     Androidapi.JNI.JavaTypes,
-     ALAndroidNativeView,
-     ALAndroidApi,
-     {$ELSEIF defined(IOS)}
-     System.TypInfo,
-     iOSapi.Foundation,
-     iOSapi.UIKit,
-     Macapi.ObjectiveC,
-     Macapi.ObjCRuntime,
-     ALIosNativeView,
-     {$ELSE}
-     FMX.Edit,
-     {$ENDIF}
-     FMX.types,
-     Fmx.Graphics,
-     Fmx.controls,
-     ALFmxObjects;
+uses
+  System.Types,
+  system.Classes,
+  System.UITypes,
+  {$IF defined(android)}
+  System.Messaging,
+  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNIBridge,
+  Androidapi.JNI.Widget,
+  Androidapi.JNI.JavaTypes,
+  ALAndroidNativeView,
+  ALAndroidApi,
+  {$ELSEIF defined(IOS)}
+  System.TypInfo,
+  iOSapi.Foundation,
+  iOSapi.UIKit,
+  Macapi.ObjectiveC,
+  Macapi.ObjCRuntime,
+  ALIosNativeView,
+  {$ELSE}
+  FMX.Edit,
+  {$ENDIF}
+  FMX.types,
+  Fmx.Graphics,
+  Fmx.controls,
+  ALFmxObjects;
 
 Type
 
@@ -460,32 +459,33 @@ procedure Register;
 
 implementation
 
-uses {$IF defined(android)}
-     System.SysUtils,
-     Androidapi.Helpers,
-     Androidapi.Input,
-     Androidapi.KeyCodes,
-     Androidapi.JNI.App,
-     Androidapi.JNI.Util,
-     Androidapi.JNI.Os,
-     FMX.VirtualKeyboard,
-     FMX.Platform,
-     FMX.Platform.Android,
-     FMX.Helpers.Android,
-     FMX.Forms,
-     {$ELSEIF defined(IOS)}
-     System.SysUtils,
-     Macapi.CoreFoundation,
-     iOSapi.CoreGraphics,
-     iOSapi.CocoaTypes,
-     Macapi.Helpers,
-     iOSapi.CoreText,
-     FMX.Helpers.iOS,
-     FMX.Consts,
-     {$endif}
-     ALCommon,
-     ALString,
-     AlFmxCommon;
+uses
+  {$IF defined(android)}
+  System.SysUtils,
+  Androidapi.Helpers,
+  Androidapi.Input,
+  Androidapi.KeyCodes,
+  Androidapi.JNI.App,
+  Androidapi.JNI.Util,
+  Androidapi.JNI.Os,
+  FMX.VirtualKeyboard,
+  FMX.Platform,
+  FMX.Platform.Android,
+  FMX.Helpers.Android,
+  FMX.Forms,
+  {$ELSEIF defined(IOS)}
+  System.SysUtils,
+  Macapi.CoreFoundation,
+  iOSapi.CoreGraphics,
+  iOSapi.CocoaTypes,
+  Macapi.Helpers,
+  iOSapi.CoreText,
+  FMX.Helpers.iOS,
+  FMX.Consts,
+  {$endif}
+  ALCommon,
+  ALString,
+  AlFmxCommon;
 
 {**}
 type
@@ -721,7 +721,7 @@ end;
 
 {******************************************************************************************************************************************************************}
 constructor TalAndroidEdit.Create(const AOwner: TComponent; Const aIsMultiline: Boolean = False; const aDefStyleAttr: String = ''; const aDefStyleRes: String = '');
-var aScreenSrv: IFMXScreenService;
+var LScreenSrv: IFMXScreenService;
 begin
   {$IF defined(DEBUG)}
   ALLog('TALAndroidEdit.Create', 'start', TalLogType.VERBOSE);
@@ -729,7 +729,7 @@ begin
   //-----
   inherited create(AOwner);
   //-----
-  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, aScreenSrv) then FScreenScale := aScreenSrv.GetScreenScale
+  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, LScreenSrv) then FScreenScale := LScreenSrv.GetScreenScale
   else FScreenScale := 1;
   //-----
   FPadding := TBounds.Create(TRectF.Empty);
@@ -778,7 +778,7 @@ procedure TALAndroidEdit.DoSetInputType(const aKeyboardType: TVirtualKeyboardTyp
                                         const aPassword: Boolean;
                                         const aCheckSpelling: Boolean;
                                         const aIsMultiline: Boolean);
-var aInputType: integer;
+var LInputType: integer;
 begin
 
   // TYPE_CLASS_DATETIME: Class for dates and times.
@@ -821,45 +821,45 @@ begin
   // TYPE_TEXT_VARIATION_WEB_PASSWORD: Variation of TYPE_CLASS_TEXT: entering password inside of a web form.
 
   case aKeyboardType of
-    TVirtualKeyboardType.Alphabet:              aInputType := TJInputType.JavaClass.TYPE_CLASS_TEXT or TJInputType.JavaClass.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
-    TVirtualKeyboardType.URL:                   aInputType := TJInputType.JavaClass.TYPE_CLASS_TEXT or TJInputType.JavaClass.TYPE_TEXT_VARIATION_URI;
-    TVirtualKeyboardType.NamePhonePad:          aInputType := TJInputType.JavaClass.TYPE_CLASS_TEXT;
-    TVirtualKeyboardType.EmailAddress:          aInputType := TJInputType.JavaClass.TYPE_CLASS_TEXT or TJInputType.JavaClass.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
-    TVirtualKeyboardType.NumbersAndPunctuation: aInputType := TJInputType.JavaClass.TYPE_CLASS_NUMBER or TJInputType.JavaClass.TYPE_NUMBER_FLAG_DECIMAL;
-    TVirtualKeyboardType.NumberPad:             aInputType := TJInputType.JavaClass.TYPE_CLASS_NUMBER;
-    TVirtualKeyboardType.PhonePad:              aInputType := TJInputType.JavaClass.TYPE_CLASS_PHONE;
-    else {TVirtualKeyboardType.Default}         aInputType := TJInputType.JavaClass.TYPE_CLASS_TEXT;
+    TVirtualKeyboardType.Alphabet:              LInputType := TJInputType.JavaClass.TYPE_CLASS_TEXT or TJInputType.JavaClass.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
+    TVirtualKeyboardType.URL:                   LInputType := TJInputType.JavaClass.TYPE_CLASS_TEXT or TJInputType.JavaClass.TYPE_TEXT_VARIATION_URI;
+    TVirtualKeyboardType.NamePhonePad:          LInputType := TJInputType.JavaClass.TYPE_CLASS_TEXT;
+    TVirtualKeyboardType.EmailAddress:          LInputType := TJInputType.JavaClass.TYPE_CLASS_TEXT or TJInputType.JavaClass.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
+    TVirtualKeyboardType.NumbersAndPunctuation: LInputType := TJInputType.JavaClass.TYPE_CLASS_NUMBER or TJInputType.JavaClass.TYPE_NUMBER_FLAG_DECIMAL;
+    TVirtualKeyboardType.NumberPad:             LInputType := TJInputType.JavaClass.TYPE_CLASS_NUMBER;
+    TVirtualKeyboardType.PhonePad:              LInputType := TJInputType.JavaClass.TYPE_CLASS_PHONE;
+    else {TVirtualKeyboardType.Default}         LInputType := TJInputType.JavaClass.TYPE_CLASS_TEXT;
   end;
 
   if aPassword then begin
     case aKeyboardType of
-      TVirtualKeyboardType.NumbersAndPunctuation: aInputType := aInputType or TJInputType.JavaClass.TYPE_NUMBER_VARIATION_PASSWORD;
-      TVirtualKeyboardType.NumberPad:             aInputType := aInputType or TJInputType.JavaClass.TYPE_NUMBER_VARIATION_PASSWORD;
+      TVirtualKeyboardType.NumbersAndPunctuation: LInputType := LInputType or TJInputType.JavaClass.TYPE_NUMBER_VARIATION_PASSWORD;
+      TVirtualKeyboardType.NumberPad:             LInputType := LInputType or TJInputType.JavaClass.TYPE_NUMBER_VARIATION_PASSWORD;
       TVirtualKeyboardType.PhonePad:;
-      TVirtualKeyboardType.Alphabet:              aInputType := aInputType or TJInputType.JavaClass.TYPE_TEXT_VARIATION_PASSWORD;
-      TVirtualKeyboardType.URL:                   aInputType := aInputType or TJInputType.JavaClass.TYPE_TEXT_VARIATION_PASSWORD;
-      TVirtualKeyboardType.NamePhonePad:          aInputType := aInputType or TJInputType.JavaClass.TYPE_TEXT_VARIATION_PASSWORD;
-      TVirtualKeyboardType.EmailAddress:          aInputType := aInputType or TJInputType.JavaClass.TYPE_TEXT_VARIATION_PASSWORD;
-      else {TVirtualKeyboardType.Default}         aInputType := aInputType or TJInputType.JavaClass.TYPE_TEXT_VARIATION_PASSWORD;
+      TVirtualKeyboardType.Alphabet:              LInputType := LInputType or TJInputType.JavaClass.TYPE_TEXT_VARIATION_PASSWORD;
+      TVirtualKeyboardType.URL:                   LInputType := LInputType or TJInputType.JavaClass.TYPE_TEXT_VARIATION_PASSWORD;
+      TVirtualKeyboardType.NamePhonePad:          LInputType := LInputType or TJInputType.JavaClass.TYPE_TEXT_VARIATION_PASSWORD;
+      TVirtualKeyboardType.EmailAddress:          LInputType := LInputType or TJInputType.JavaClass.TYPE_TEXT_VARIATION_PASSWORD;
+      else {TVirtualKeyboardType.Default}         LInputType := LInputType or TJInputType.JavaClass.TYPE_TEXT_VARIATION_PASSWORD;
     end;
   end
   else if not aCheckSpelling then begin
     // https://stackoverflow.com/questions/61704644/why-type-text-flag-no-suggestions-is-not-working-to-disable-auto-corrections
     case aKeyboardType of
-      TVirtualKeyboardType.Alphabet:              aInputType := aInputType or TJInputType.JavaClass.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
+      TVirtualKeyboardType.Alphabet:              LInputType := LInputType or TJInputType.JavaClass.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
       TVirtualKeyboardType.URL:;
-      TVirtualKeyboardType.NamePhonePad:          aInputType := aInputType or TJInputType.JavaClass.TYPE_TEXT_FLAG_NO_SUGGESTIONS or TJInputType.JavaClass.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
+      TVirtualKeyboardType.NamePhonePad:          LInputType := LInputType or TJInputType.JavaClass.TYPE_TEXT_FLAG_NO_SUGGESTIONS or TJInputType.JavaClass.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
       TVirtualKeyboardType.EmailAddress:;
       TVirtualKeyboardType.NumbersAndPunctuation:;
       TVirtualKeyboardType.NumberPad:;
       TVirtualKeyboardType.PhonePad:;
-      else {TVirtualKeyboardType.Default}         aInputType := aInputType or TJInputType.JavaClass.TYPE_TEXT_FLAG_NO_SUGGESTIONS or TJInputType.JavaClass.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
+      else {TVirtualKeyboardType.Default}         LInputType := LInputType or TJInputType.JavaClass.TYPE_TEXT_FLAG_NO_SUGGESTIONS or TJInputType.JavaClass.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
     end;
   end;
 
-  if aIsMultiline then aInputType := aInputType or TJInputType.JavaClass.TYPE_TEXT_FLAG_MULTI_LINE;
+  if aIsMultiline then LInputType := LInputType or TJInputType.JavaClass.TYPE_TEXT_FLAG_MULTI_LINE;
 
-  fEditText.view.setInputType(aInputType);
+  fEditText.view.setInputType(LInputType);
 
 end;
 
@@ -910,17 +910,17 @@ end;
 
 {*********************************************************************************}
 procedure TALAndroidEdit.DoSetReturnKeyType(const aReturnKeyType: TReturnKeyType);
-var aimeOptions: integer;
+var LImeOptions: integer;
 begin
   case aReturnKeyType of
-    TReturnKeyType.Done:          aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_DONE;
-    TReturnKeyType.Go:            aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_NONE; // TJEditorInfo.JavaClass.IME_ACTION_GO; => https://stackoverflow.com/questions/44708338/setimeactionlabel-or-setimeoptions-not-work-i-always-have-caption-done-on-the
-    TReturnKeyType.Next:          aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_NONE; // TJEditorInfo.JavaClass.IME_ACTION_NEXT; => https://stackoverflow.com/questions/44708338/setimeactionlabel-or-setimeoptions-not-work-i-always-have-caption-done-on-the
-    TReturnKeyType.Search:        aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_NONE; // TJEditorInfo.JavaClass.IME_ACTION_SEARCH; => https://stackoverflow.com/questions/44708338/setimeactionlabel-or-setimeoptions-not-work-i-always-have-caption-done-on-the
-    TReturnKeyType.Send:          aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_NONE; // TJEditorInfo.JavaClass.IME_ACTION_SEND; => https://stackoverflow.com/questions/44708338/setimeactionlabel-or-setimeoptions-not-work-i-always-have-caption-done-on-the
-    else {TReturnKeyType.Default} aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_NONE;
+    TReturnKeyType.Done:          LImeOptions := TJEditorInfo.JavaClass.IME_ACTION_DONE;
+    TReturnKeyType.Go:            LImeOptions := TJEditorInfo.JavaClass.IME_ACTION_NONE; // TJEditorInfo.JavaClass.IME_ACTION_GO; => https://stackoverflow.com/questions/44708338/setimeactionlabel-or-setimeoptions-not-work-i-always-have-caption-done-on-the
+    TReturnKeyType.Next:          LImeOptions := TJEditorInfo.JavaClass.IME_ACTION_NONE; // TJEditorInfo.JavaClass.IME_ACTION_NEXT; => https://stackoverflow.com/questions/44708338/setimeactionlabel-or-setimeoptions-not-work-i-always-have-caption-done-on-the
+    TReturnKeyType.Search:        LImeOptions := TJEditorInfo.JavaClass.IME_ACTION_NONE; // TJEditorInfo.JavaClass.IME_ACTION_SEARCH; => https://stackoverflow.com/questions/44708338/setimeactionlabel-or-setimeoptions-not-work-i-always-have-caption-done-on-the
+    TReturnKeyType.Send:          LImeOptions := TJEditorInfo.JavaClass.IME_ACTION_NONE; // TJEditorInfo.JavaClass.IME_ACTION_SEND; => https://stackoverflow.com/questions/44708338/setimeactionlabel-or-setimeoptions-not-work-i-always-have-caption-done-on-the
+    else {TReturnKeyType.Default} LImeOptions := TJEditorInfo.JavaClass.IME_ACTION_NONE;
   end;
-  fEditText.view.setImeOptions(aimeOptions);
+  fEditText.view.setImeOptions(LImeOptions);
 end;
 
 {*********************************************************************}
@@ -1027,22 +1027,22 @@ end;
 
 {******************************************************}
 procedure TALAndroidEdit.OnFontChanged(Sender: TObject);
-var aTypeface: JTypeface;
-    aGravity: integer;
-    aFontColor: integer;
-    aFontSize: single;
-    aFontStyle: integer;
-    aFontFamily: String;
+var LTypeface: JTypeface;
+    LGravity: integer;
+    LFontColor: integer;
+    LFontSize: single;
+    LFontStyle: integer;
+    LFontFamily: String;
 begin
 
-  aFontColor := integer(ftextsettings.fontcolor);
-  aFontSize := ftextsettings.font.size;
+  LFontColor := integer(ftextsettings.fontcolor);
+  LFontSize := ftextsettings.font.size;
   if (TFontStyle.fsBold in ftextsettings.font.style) and
-     (TFontStyle.fsItalic in ftextsettings.font.style) then aFontStyle := TJTypeface.JavaClass.BOLD_ITALIC
-  else if (TFontStyle.fsBold in ftextsettings.font.style) then aFontStyle := TJTypeface.JavaClass.BOLD
-  else if (TFontStyle.fsItalic in ftextsettings.font.style) then aFontStyle := TJTypeface.JavaClass.ITALIC
-  else aFontStyle := TJTypeface.JavaClass.NORMAL;
-  aFontFamily := ftextsettings.font.Family;
+     (TFontStyle.fsItalic in ftextsettings.font.style) then LFontStyle := TJTypeface.JavaClass.BOLD_ITALIC
+  else if (TFontStyle.fsBold in ftextsettings.font.style) then LFontStyle := TJTypeface.JavaClass.BOLD
+  else if (TFontStyle.fsItalic in ftextsettings.font.style) then LFontStyle := TJTypeface.JavaClass.ITALIC
+  else LFontStyle := TJTypeface.JavaClass.NORMAL;
+  LFontFamily := ftextsettings.font.Family;
   //-----
   //top	              0x30	     	Push object to the top of its container, not changing its size.
   //bottom	          0x50	     	Push object to the bottom of its container, not changing its size.
@@ -1059,28 +1059,28 @@ begin
   //start	            0x00800003	Push object to the beginning of its container, not changing its size.
   //end	              0x00800005	Push object to the end of its container, not changing its size.
   case ftextsettings.HorzAlign of
-    TTextAlign.Center: aGravity := $01; // center_horizontal 0x01
-    TTextAlign.Leading: aGravity := $03; // left 0x03
-    TTextAlign.Trailing: aGravity := $05; // right 0x05
-    else aGravity := $03; // left 0x03
+    TTextAlign.Center: LGravity := $01; // center_horizontal 0x01
+    TTextAlign.Leading: LGravity := $03; // left 0x03
+    TTextAlign.Trailing: LGravity := $05; // right 0x05
+    else LGravity := $03; // left 0x03
   end;
   case ftextsettings.VertAlign of
-    TTextAlign.Center: aGravity := aGravity or $10; // center_vertical 0x10
-    TTextAlign.Leading: aGravity := aGravity or $30; // top 0x30
-    TTextAlign.Trailing: aGravity := aGravity or $50; // bottom 0x50
-    else aGravity := aGravity or $10; // center_vertical 0x10
+    TTextAlign.Center: LGravity := LGravity or $10; // center_vertical 0x10
+    TTextAlign.Leading: LGravity := LGravity or $30; // top 0x30
+    TTextAlign.Trailing: LGravity := LGravity or $50; // bottom 0x50
+    else LGravity := LGravity or $10; // center_vertical 0x10
   end;
 
   //-----
-  fEditText.view.setTextColor(aFontColor); // << Sets the text color for all the states (normal, selected, focused) to be this color.
-  fEditText.view.setTextSize(TJTypedValue.javaclass.COMPLEX_UNIT_DIP, aFontSize); // << Set the default text size to a given unit and value.
+  fEditText.view.setTextColor(LFontColor); // << Sets the text color for all the states (normal, selected, focused) to be this color.
+  fEditText.view.setTextSize(TJTypedValue.javaclass.COMPLEX_UNIT_DIP, LFontSize); // << Set the default text size to a given unit and value.
   //-----
-  aTypeface := TJTypeface.JavaClass.create(StringToJString(aFontFamily), aFontStyle);
-  fEditText.view.setTypeface(aTypeface); // << Sets the typeface and style in which the text should be displayed. Note that not all
+  LTypeface := TJTypeface.JavaClass.create(StringToJString(LFontFamily), LFontStyle);
+  fEditText.view.setTypeface(LTypeface); // << Sets the typeface and style in which the text should be displayed. Note that not all
                                     //    Typeface families actually have bold and italic variants, so you may need to use setTypeface(Typeface, int)
                                     //     to get the appearance that you actually want.
-  aTypeface := nil;
-  fEditText.view.setgravity(aGravity);
+  LTypeface := nil;
+  fEditText.view.setgravity(LGravity);
 
 end;
 
@@ -1387,7 +1387,7 @@ end;
 
 {***********************************************************************************************************************************************}
 function TALIosTextFieldDelegate.textField(textField: UITextField; shouldChangeCharactersInRange: NSRange; replacementString: NSString): Boolean;
-var aText: NSString;
+var LText: NSString;
 begin
   {$IF defined(DEBUG)}
   ALLog('TALIosTextFieldDelegate.textField', 'control.name: ' + FTextField.fEditControl.parent.Name +
@@ -1397,9 +1397,9 @@ begin
   if FTextField.FEditControl.maxLength > 0 then begin
 
     //https://stackoverflow.com/questions/433337/set-the-maximum-character-length-of-a-uitextfield
-    aText := TNSString.Wrap(textField.text);
-    if shouldChangeCharactersInRange.length + shouldChangeCharactersInRange.location > aText.length then exit(false);
-    result := aText.length + replacementString.length - shouldChangeCharactersInRange.length <= NSUInteger(FTextField.FEditControl.maxLength);
+    LText := TNSString.Wrap(textField.text);
+    if shouldChangeCharactersInRange.length + shouldChangeCharactersInRange.location > LText.length then exit(false);
+    result := LText.length + replacementString.length - shouldChangeCharactersInRange.length <= NSUInteger(FTextField.FEditControl.maxLength);
 
   end
   else Result := True;
@@ -1483,27 +1483,27 @@ end;
 
 {**********************************************************************}
 procedure TalIosEdit.SetKeyboardType(const Value: TVirtualKeyboardType);
-var aUIKeyboardType: UIKeyboardType;
+var LUIKeyboardType: UIKeyboardType;
 begin
   case Value of
-    TVirtualKeyboardType.NumbersAndPunctuation: aUIKeyboardType := UIKeyboardTypeNumbersAndPunctuation;
-    TVirtualKeyboardType.NumberPad:             aUIKeyboardType := UIKeyboardTypeNumberPad;
-    TVirtualKeyboardType.PhonePad:              aUIKeyboardType := UIKeyboardTypePhonePad;
-    TVirtualKeyboardType.Alphabet:              aUIKeyboardType := UIKeyboardTypeDefault;
-    TVirtualKeyboardType.URL:                   aUIKeyboardType := UIKeyboardTypeURL;
-    TVirtualKeyboardType.NamePhonePad:          aUIKeyboardType := UIKeyboardTypeNamePhonePad;
-    TVirtualKeyboardType.EmailAddress:          aUIKeyboardType := UIKeyboardTypeEmailAddress;
-    else {TVirtualKeyboardType.Default}         aUIKeyboardType := UIKeyboardTypeDefault;
+    TVirtualKeyboardType.NumbersAndPunctuation: LUIKeyboardType := UIKeyboardTypeNumbersAndPunctuation;
+    TVirtualKeyboardType.NumberPad:             LUIKeyboardType := UIKeyboardTypeNumberPad;
+    TVirtualKeyboardType.PhonePad:              LUIKeyboardType := UIKeyboardTypePhonePad;
+    TVirtualKeyboardType.Alphabet:              LUIKeyboardType := UIKeyboardTypeDefault;
+    TVirtualKeyboardType.URL:                   LUIKeyboardType := UIKeyboardTypeURL;
+    TVirtualKeyboardType.NamePhonePad:          LUIKeyboardType := UIKeyboardTypeNamePhonePad;
+    TVirtualKeyboardType.EmailAddress:          LUIKeyboardType := UIKeyboardTypeEmailAddress;
+    else {TVirtualKeyboardType.Default}         LUIKeyboardType := UIKeyboardTypeDefault;
   end;
-  FTextField.View.setKeyboardType(aUIKeyboardType);
+  FTextField.View.setKeyboardType(LUIKeyboardType);
 end;
 
 {********************************************************}
 function TalIosEdit.GetKeyboardType: TVirtualKeyboardType;
-var aUIKeyboardType: UIKeyboardType;
+var LUIKeyboardType: UIKeyboardType;
 begin
-  aUIKeyboardType := FTextField.View.KeyboardType;
-  case aUIKeyboardType of
+  LUIKeyboardType := FTextField.View.KeyboardType;
+  case LUIKeyboardType of
     UIKeyboardTypeNumbersAndPunctuation: result := TVirtualKeyboardType.NumbersAndPunctuation;
     UIKeyboardTypeNumberPad:             result := TVirtualKeyboardType.NumberPad;
     UIKeyboardTypePhonePad:              result := TVirtualKeyboardType.PhonePad;
@@ -1516,23 +1516,23 @@ end;
 
 {*************************************************************************************}
 procedure TalIosEdit.setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
-var aUITextAutoCapitalizationType: UITextAutoCapitalizationType;
+var LUITextAutoCapitalizationType: UITextAutoCapitalizationType;
 begin
   case Value of
-    TALAutoCapitalizationType.acWords:          aUITextAutoCapitalizationType := UITextAutoCapitalizationTypeWords;
-    TALAutoCapitalizationType.acSentences:      aUITextAutoCapitalizationType := UITextAutoCapitalizationTypeSentences;
-    TALAutoCapitalizationType.acAllCharacters:  aUITextAutoCapitalizationType := UITextAutoCapitalizationTypeAllCharacters;
-    else {TALAutoCapitalizationType.acNone}     aUITextAutoCapitalizationType := UITextAutoCapitalizationTypeNone;
+    TALAutoCapitalizationType.acWords:          LUITextAutoCapitalizationType := UITextAutoCapitalizationTypeWords;
+    TALAutoCapitalizationType.acSentences:      LUITextAutoCapitalizationType := UITextAutoCapitalizationTypeSentences;
+    TALAutoCapitalizationType.acAllCharacters:  LUITextAutoCapitalizationType := UITextAutoCapitalizationTypeAllCharacters;
+    else {TALAutoCapitalizationType.acNone}     LUITextAutoCapitalizationType := UITextAutoCapitalizationTypeNone;
   end;
-  FTextField.View.setAutoCapitalizationType(aUITextAutoCapitalizationType);
+  FTextField.View.setAutoCapitalizationType(LUITextAutoCapitalizationType);
 end;
 
 {***********************************************************************}
 function TalIosEdit.GetAutoCapitalizationType: TALAutoCapitalizationType;
-var aUITextAutoCapitalizationType: UITextAutoCapitalizationType;
+var LUITextAutoCapitalizationType: UITextAutoCapitalizationType;
 begin
-  aUITextAutoCapitalizationType := FTextField.View.AutoCapitalizationType;
-  case aUITextAutoCapitalizationType of
+  LUITextAutoCapitalizationType := FTextField.View.AutoCapitalizationType;
+  case LUITextAutoCapitalizationType of
     UITextAutoCapitalizationTypeWords:         result := TALAutoCapitalizationType.acWords;
     UITextAutoCapitalizationTypeSentences:     result := TALAutoCapitalizationType.acSentences;
     UITextAutoCapitalizationTypeAllCharacters: result := TALAutoCapitalizationType.acAllCharacters;
@@ -1573,25 +1573,25 @@ end;
 
 {*****************************************************************}
 procedure TalIosEdit.setReturnKeyType(const Value: TReturnKeyType);
-var aUIReturnKeyType: UIReturnKeyType;
+var LUIReturnKeyType: UIReturnKeyType;
 begin
   case Value of
-    TReturnKeyType.Done:           aUIReturnKeyType := UIReturnKeyDone;
-    TReturnKeyType.Go:             aUIReturnKeyType := UIReturnKeyGo;
-    TReturnKeyType.Next:           aUIReturnKeyType := UIReturnKeyNext;
-    TReturnKeyType.Search:         aUIReturnKeyType := UIReturnKeySearch;
-    TReturnKeyType.Send:           aUIReturnKeyType := UIReturnKeySend;
-    else {TReturnKeyType.Default}  aUIReturnKeyType := UIReturnKeyDefault;
+    TReturnKeyType.Done:           LUIReturnKeyType := UIReturnKeyDone;
+    TReturnKeyType.Go:             LUIReturnKeyType := UIReturnKeyGo;
+    TReturnKeyType.Next:           LUIReturnKeyType := UIReturnKeyNext;
+    TReturnKeyType.Search:         LUIReturnKeyType := UIReturnKeySearch;
+    TReturnKeyType.Send:           LUIReturnKeyType := UIReturnKeySend;
+    else {TReturnKeyType.Default}  LUIReturnKeyType := UIReturnKeyDefault;
   end;
-  FTextField.View.setReturnKeyType(aUIReturnKeyType);
+  FTextField.View.setReturnKeyType(LUIReturnKeyType);
 end;
 
 {***************************************************}
 function TalIosEdit.GetReturnKeyType: TReturnKeyType;
-var aUIReturnKeyType: UIReturnKeyType;
+var LUIReturnKeyType: UIReturnKeyType;
 begin
-  aUIReturnKeyType := FTextField.View.ReturnKeyType;
-  case aUIReturnKeyType of
+  LUIReturnKeyType := FTextField.View.ReturnKeyType;
+  case LUIReturnKeyType of
     UIReturnKeyDone:    result := TReturnKeyType.Done;
     UIReturnKeyGo:      result := TReturnKeyType.Go;
     UIReturnKeyNext:    result := TReturnKeyType.Next;
@@ -1630,33 +1630,33 @@ end;
 
 {*******************************************************************************************}
 procedure TalIosEdit.applyTextPromptWithColor(const aStr: String; const aColor: TAlphaColor);
-var aTextPromptAttr: NSMutableAttributedString;
-    aTextRange: NSRange;
-    aUIColor: UIColor;
+var LTextPromptAttr: NSMutableAttributedString;
+    LTextRange: NSRange;
+    LUIColor: UIColor;
 begin
   if (aColor = tAlphaColorRec.Null) or aStr.IsEmpty then FTextField.View.setPlaceholder(StrToNSStr(aStr))
   else begin
 
-    aTextPromptAttr := TNSMutableAttributedString.Wrap(TNSMutableAttributedString.Alloc.initWithString(StrToNSStr(aStr)));
+    LTextPromptAttr := TNSMutableAttributedString.Wrap(TNSMutableAttributedString.Alloc.initWithString(StrToNSStr(aStr)));
     try
 
-      aTextPromptAttr.beginEditing;
+      LTextPromptAttr.beginEditing;
       try
 
-        aTextRange := NSMakeRange(0, aStr.Length);
-        aUIColor := AlphaColorToUIColor(aColor);
-        aTextPromptAttr.addAttribute(NSForegroundColorAttributeName, (aUIColor as ILocalObject).GetObjectID, aTextRange);
+        LTextRange := NSMakeRange(0, aStr.Length);
+        LUIColor := AlphaColorToUIColor(aColor);
+        LTextPromptAttr.addAttribute(NSForegroundColorAttributeName, (LUIColor as ILocalObject).GetObjectID, LTextRange);
         //NOTE: if i try to release the aUIColor i have an exception
         //      so it's seam something acquire it
 
       finally
-        aTextPromptAttr.endEditing;
+        LTextPromptAttr.endEditing;
       end;
 
-      FTextField.View.setAttributedPlaceholder(aTextPromptAttr);
+      FTextField.View.setAttributedPlaceholder(LTextPromptAttr);
 
     finally
-      aTextPromptAttr.release;
+      LTextPromptAttr.release;
     end;
 
   end;
@@ -1694,20 +1694,20 @@ end;
 
 {*********************************}
 procedure TalIosEdit.DoFontChanged;
-var aDictionary: NSDictionary;
-    aFontRef: CTFontRef;
+var LDictionary: NSDictionary;
+    LFontRef: CTFontRef;
 begin
 
     //Font
-    aFontRef := ALGetCTFontRef(fTextSettings.Font.Family, fTextSettings.Font.Size, fTextSettings.Font.Style);
-    if aFontRef <> nil then begin
+    LFontRef := ALGetCTFontRef(fTextSettings.Font.Family, fTextSettings.Font.Size, fTextSettings.Font.Style);
+    if LFontRef <> nil then begin
       try
 
-        aDictionary := TNSDictionary.Wrap(
+        LDictionary := TNSDictionary.Wrap(
                          TNSDictionary.OCClass.dictionaryWithObject(
-                           aFontRef,
+                           LFontRef,
                            (TNSString.Wrap(kCTFontAttributeName) as ILocalObject).GetObjectID));
-        FTextField.View.setdefaultTextAttributes(aDictionary); // << Setting this property applies the specified attributes to the entire
+        FTextField.View.setdefaultTextAttributes(LDictionary); // << Setting this property applies the specified attributes to the entire
                                                                // << text of the text field. Unset attributes maintain their default values.
                                                                // << note: seam that i can't later call aDictionary.release or i have an error
 
@@ -1726,7 +1726,7 @@ begin
         //end;
 
       finally
-        CFRelease(aFontRef);
+        CFRelease(LFontRef);
       end;
     end;
 
@@ -1933,7 +1933,7 @@ end;
 destructor TALEdit.Destroy;
 begin
   ALFreeAndNil(FTextSettings);
-  ALFreeAndNil(fEditControl, false{adelayed}, false{aRefCountWarn}); // << will call disposeOF under ARC so it's ok
+  ALFreeAndNil(fEditControl);
   inherited;
 end;
 
@@ -2007,7 +2007,7 @@ begin
     fDefStyleAttr := Value;
     {$IFDEF ANDROID}
     if not (csLoading in componentState) then begin
-      ALFreeAndNil(fEditControl, false{adelayed}, false{aRefCountWarn}); // << will call disposeOF under ARC so it's ok
+      ALFreeAndNil(fEditControl);
       CreateEditControl;
     end;
     {$ENDIF}
@@ -2021,7 +2021,7 @@ begin
     fDefStyleRes := Value;
     {$IFDEF ANDROID}
     if not (csLoading in componentState) then begin
-      ALFreeAndNil(fEditControl, false{adelayed}, false{aRefCountWarn}); // << will call disposeOF under ARC so it's ok
+      ALFreeAndNil(fEditControl);
       CreateEditControl;
     end;
     {$ENDIF}
@@ -2296,19 +2296,19 @@ end;
 
 {***********************************************}
 procedure TALEdit.StrokeChanged(Sender: TObject);
-var aRect: TrectF;
+var LRect: TrectF;
 begin
   inherited StrokeChanged(Sender);
   if csLoading in componentState then exit;
   if FEditControl = nil then CreateEditControl;
   if Stroke.Kind = TbrushKind.None then fEditControl.Margins.Rect := TrectF.Create(0,0,0,0)
   else begin
-    aRect := TrectF.Create(0,0,0,0);
-    if (TSide.Top in Sides) then aRect.Top := Stroke.Thickness;
-    if (TSide.bottom in Sides) then aRect.bottom := Stroke.Thickness;
-    if (TSide.right in Sides) then aRect.right := Stroke.Thickness;
-    if (TSide.left in Sides) then aRect.left := Stroke.Thickness;
-    fEditControl.Margins.Rect := arect;
+    LRect := TrectF.Create(0,0,0,0);
+    if (TSide.Top in Sides) then LRect.Top := Stroke.Thickness;
+    if (TSide.bottom in Sides) then LRect.bottom := Stroke.Thickness;
+    if (TSide.right in Sides) then LRect.right := Stroke.Thickness;
+    if (TSide.left in Sides) then LRect.left := Stroke.Thickness;
+    fEditControl.Margins.Rect := LRect;
   end;
 end;
 
@@ -2369,7 +2369,7 @@ end;
 Procedure TALEdit.setSelection(const aStart: integer; const aStop: Integer);
 begin
   if FEditControl = nil then CreateEditControl;
-  {$IF defined(MSWINDOWS) or defined(_MACOS)}
+  {$IF defined(MSWINDOWS) or defined(ALMacOS)}
   FeditControl.SelStart := aStart;
   FeditControl.SelLength := aStop - aStart;
   {$ELSEIF defined(android)}
@@ -2381,7 +2381,7 @@ end;
 Procedure TALEdit.setSelection(const aindex: integer);
 begin
   if FEditControl = nil then CreateEditControl;
-  {$IF defined(MSWINDOWS) or defined(_MACOS)}
+  {$IF defined(MSWINDOWS) or defined(ALMacOS)}
   FeditControl.SelStart := aindex;
   {$ELSEIF defined(android)}
   FeditControl.setSelection(aindex);

@@ -1,4 +1,4 @@
-/// SQLite3 3.32.2 Database engine - statically linked for Windows/Linux
+/// SQLite3 3.34.1 Database engine - statically linked for Windows/Linux
 // - this unit is a part of the freeware Synopse mORMot framework,
 // licensed under a MPL/GPL/LGPL tri-license; version 1.18
 unit SynSQLite3Static;
@@ -6,7 +6,7 @@ unit SynSQLite3Static;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit SynSQLite3Static;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -47,7 +47,7 @@ unit SynSQLite3Static;
   ***** END LICENSE BLOCK *****
 
 
-    Statically linked SQLite3 3.32.2 engine with optional AES encryption
+    Statically linked SQLite3 3.34.1 engine with optional AES encryption
    **********************************************************************
 
   To be declared in your project uses clause:  will fill SynSQlite3.sqlite3
@@ -220,6 +220,13 @@ implementation
   {$endif ANDROID}
 
   {$ifdef FREEBSD}
+    {$ifdef CPUX86}
+    const _PREFIX = '';
+    {$L .\static\i386-freebsd\sqlite3.o}
+    {$ifdef FPC_CROSSCOMPILING}
+      {$linklib .\static\i386-freebsd\libgcc.a}
+    {$endif}
+    {$endif CPUX86}
     {$ifdef CPUX64}
     const _PREFIX = '';
     {$L .\static\x86_64-freebsd\sqlite3.o}
@@ -230,6 +237,13 @@ implementation
   {$endif FREEBSD}
 
   {$ifdef OPENBSD}
+    {$ifdef CPUX86}
+      const _PREFIX = '';
+      {$L .\static\i386-openbsd\sqlite3.o}
+      {$ifdef FPC_CROSSCOMPILING}
+        {$linklib .\static\i386-openbsd\libgcc.a}
+      {$endif}
+    {$endif CPUX86}
     {$ifdef CPUX64}
       const _PREFIX = '';
       {$L .\static\x86_64-openbsd\sqlite3.o}
@@ -1128,7 +1142,8 @@ function sqlite3_trace_v2(DB: TSQLite3DB; Mask: integer; Callback: TSQLTraceCall
 
 const
   // error message if statically linked sqlite3.o(bj) does not match this
-  EXPECTED_SQLITE3_VERSION = {$ifdef ANDROID}''{$else}'3.32.2'{$endif};
+  // - Android may be a little behind, so we don't check exact version
+  EXPECTED_SQLITE3_VERSION = {$ifdef ANDROID}''{$else}'3.34.1'{$endif};
 
 constructor TSQLite3LibraryStatic.Create;
 var error: RawUTF8;
@@ -1250,8 +1265,10 @@ begin
   LogToTextFile(error); // annoyning enough on all platforms
   // SynSQLite3Log.Add.Log() would do nothing: we are in .exe initialization
   {$ifdef MSWINDOWS} // PITA popup
-  MessageBoxA(0,pointer(error),' WARNING: deprecated SQLite3 engine',MB_OK or MB_ICONWARNING);
-  {$endif}
+  // better than a MessageBox() especially for services
+  raise Exception.CreateFmt('Deprecated SQLite3 engine: %s',
+    [error, ExeVersion.ProgramName]);
+  {$endif MSWINDOWS}
 end;
 
 destructor TSQLite3LibraryStatic.Destroy;

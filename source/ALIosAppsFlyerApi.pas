@@ -2,8 +2,9 @@
 
 interface
 
-uses Macapi.ObjectiveC,
-     iOSapi.Foundation;
+uses
+  Macapi.ObjectiveC,
+  iOSapi.Foundation;
 
 {$M+}
 

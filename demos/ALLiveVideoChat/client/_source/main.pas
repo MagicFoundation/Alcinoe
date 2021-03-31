@@ -5,8 +5,7 @@ unit main;
 // must must use socket client (or similar like notification), but i was lazzy
 // to do for this demo
 //
-// do not forget to launch the ALLiveVideoChatServer and update below the value
-// of <Server_url>
+// do not forget to launch the ALLiveVideoChatServer
 //
 
 interface
@@ -17,7 +16,7 @@ uses
   FMX.Controls.Presentation, FMX.StdCtrls, ALCommon, ALFMXTypes3D, FMX.Objects,
   FMX.Canvas.GPU, algraphics, FMX.Types3D, FMX.Effects, FMX.Filter.Effects,
   ALFmxStdCtrls, ALFmxLayouts, FMX.Layouts, system.messaging,
-  IdHTTP, ALFmxFilterEffects, FMX.Edit;
+  IdHTTP, ALFmxFilterEffects, FMX.Edit, ALFmxObjects;
 
 type
   TForm1 = class(TForm)
@@ -26,6 +25,7 @@ type
     RemoteCameraLayout: TALLayout;
     ButtonHangUp: TButton;
     ServerUrlEdit: TEdit;
+    TextIntro: TALText;
     procedure FormCreate(Sender: TObject);
     procedure LocalCameraLayoutPaint(Sender: TObject; Canvas: TCanvas; const ARect: TRectF);
     procedure ButtonCallClick(Sender: TObject);
@@ -55,25 +55,103 @@ type
 var
   Form1: TForm1;
 
-const Server_url = 'http://192.168.0.10:3030';
-
 implementation
 
 {$R *.fmx}
 
-uses system.math,
-     system.math.vectors,
-     fmx.platform,
-     Grijjy.ErrorReporting,
-     alString;
+uses
+  system.math,
+  system.math.vectors,
+  fmx.platform,
+  Grijjy.ErrorReporting,
+  {$IF defined(ANDROID)}
+  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNI.JavaTypes,
+  FMX.Canvas.GPU.Helpers,
+  Androidapi.Gles2,
+  Androidapi.JNI.Net,
+  Androidapi.JNIBridge,
+  Androidapi.Helpers,
+  Androidapi.JNI.Os,
+  Androidapi.JNI.Location,
+  Androidapi.JNI.Provider,
+  Androidapi.JNI.App,
+  Posix.Sched,
+  FMX.Helpers.Android,
+  FMX.Platform.Android,
+  fmx.Context.GLES.Android,
+  alAndroidAPI,
+  {$ENDIF}
+  alString;
+
+{********************************************}
+function _EnableDeviceCameraAndAudio: boolean;
+{$IF defined(ANDROID)}
+var aIntent: JIntent;
+    aPermissions: TJavaObjectArray<JString>;
+    aSharedPreferences: JSharedPreferences;
+    aPreferenceEditor: JSharedPreferences_Editor;
+    aUri: Jnet_Uri;
+{$ENDIF}
+begin
+
+  result := True;
+
+  {$IF defined(ANDROID)}
+  if ((TJBuild_VERSION.JavaClass.SDK_INT >= 23) and {marshmallow}
+      ((MainActivity.checkSelfPermission(StringToJString('android.permission.CAMERA')) <> TJPackageManager.JavaClass.PERMISSION_GRANTED) or
+       (MainActivity.checkSelfPermission(StringToJString('android.permission.RECORD_AUDIO')) <> TJPackageManager.JavaClass.PERMISSION_GRANTED))) then begin
+
+    result := False;
+
+    //shouldShowRequestPermissionRationale return
+    // * true –  if the permission is already requested before but was denied
+    // * false – If the permission is requested first time.
+    //           If the permission is disabled by some device policy or the permission is already requested but the user denied it with checking Never ask again option in the permission dialog
+    aSharedPreferences := TJPreferenceManager.javaclass.getDefaultSharedPreferences(TAndroidHelper.Context.getApplicationContext);
+    if (not aSharedPreferences.getBoolean(StringToJString('permission_access_camera_and_audio_requested'), false)) or // << we never requested the camera and audio permission
+       (((MainActivity.checkSelfPermission(StringToJString('android.permission.CAMERA')) = TJPackageManager.JavaClass.PERMISSION_GRANTED) or
+         (MainActivity.shouldShowRequestPermissionRationale(StringToJString('android.permission.CAMERA')))) and // << the CAMERA permission was denied without checking Never ask
+        ((MainActivity.checkSelfPermission(StringToJString('android.permission.RECORD_AUDIO')) = TJPackageManager.JavaClass.PERMISSION_GRANTED) or
+         (MainActivity.shouldShowRequestPermissionRationale(StringToJString('android.permission.RECORD_AUDIO'))))) then begin  // << the RECORD_AUDIO permission was denied without checking Never ask
+
+      aPreferenceEditor := aSharedPreferences.edit;
+      aPreferenceEditor.putBoolean(StringToJstring('permission_access_camera_and_audio_requested'), true);
+      aPreferenceEditor.commit;
+      //----
+      aPermissions := TJavaObjectArray<JString>.create(2);
+      try
+        aPermissions.Items[0] := StringToJString('android.permission.CAMERA');
+        aPermissions.Items[1] := StringToJString('android.permission.RECORD_AUDIO');
+        MainActivity.requestPermissions(aPermissions, 0{requestCode});
+      finally
+        ALFreeAndNil(aPermissions);
+      end;
+
+    end
+    else begin
+
+      aIntent := TJIntent.JavaClass.init(TJSettings.JavaClass.ACTION_APPLICATION_DETAILS_SETTINGS);
+      aUri := TJnet_Uri.JavaClass.fromParts(StringToJString('package'), TAndroidHelper.Context.getPackageName(), nil);
+      aIntent.setData(aUri);
+      TAndroidHelper.Context.startActivity(aIntent);
+
+    end;
+  end;
+  {$ENDIF}
+
+end;
 
 {************************************************}
 procedure TForm1.ButtonCallClick(Sender: TObject);
-var aIceServers: TALWebRTCIceServers;
+var LIceServers: TALWebRTCIceServers;
+    LServerUrl: String;
 begin
 
-
+  if not _EnableDeviceCameraAndAudio then exit;
+  LServerUrl := ServerUrlEdit.text;
   ServerUrlEdit.visible := False;
+  TextIntro.Visible := False;
   ButtonCall.Enabled := false;
   ButtonHangUp.Enabled := True;
 
@@ -82,50 +160,50 @@ begin
   fMustcheckoffer := false;
   fMustcheckanswer := false;
 
-  setlength(aIceServers, 6);
-  with aIceServers[0] do begin
+  setlength(LIceServers, 6);
+  with LIceServers[0] do begin
     uri := 'stun:eu-turn1.xirsys.com';
     username := '';
     password := '';
   end;
   //-----
-  with aIceServers[0] do begin
+  with LIceServers[0] do begin
     uri := 'turn:eu-turn1.xirsys.com:80?transport=udp';
     username := '54c4553a-0427-11e9-bbd8-e8cee7e120e9';
     password := '54c455b2-0427-11e9-909e-55b82d8eaa45';
   end;
   //-----
-  with aIceServers[1] do begin
+  with LIceServers[1] do begin
     uri := 'turn:eu-turn1.xirsys.com:3478?transport=udp';
     username := '54c4553a-0427-11e9-bbd8-e8cee7e120e9';
     password := '54c455b2-0427-11e9-909e-55b82d8eaa45';
   end;
   //-----
-  with aIceServers[2] do begin
+  with LIceServers[2] do begin
     uri := 'turn:eu-turn1.xirsys.com:80?transport=tcp';
     username := '54c4553a-0427-11e9-bbd8-e8cee7e120e9';
     password := '54c455b2-0427-11e9-909e-55b82d8eaa45';
   end;
   //-----
-  with aIceServers[3] do begin
+  with LIceServers[3] do begin
     uri := 'turn:eu-turn1.xirsys.com:3478?transport=tcp';
     username := '54c4553a-0427-11e9-bbd8-e8cee7e120e9';
     password := '54c455b2-0427-11e9-909e-55b82d8eaa45';
   end;
   //-----
-  with aIceServers[4] do begin
+  with LIceServers[4] do begin
     uri := 'turns:eu-turn1.xirsys.com:443?transport=tcp';
     username := '54c4553a-0427-11e9-bbd8-e8cee7e120e9';
     password := '54c455b2-0427-11e9-909e-55b82d8eaa45';
   end;
   //-----
-  with aIceServers[5] do begin
+  with LIceServers[5] do begin
     uri := 'turns:eu-turn1.xirsys.com:5349?transport=tcp';
     username := '54c4553a-0427-11e9-bbd8-e8cee7e120e9';
     password := '54c455b2-0427-11e9-909e-55b82d8eaa45';
   end;
 
-  fWebRTC := TalWebRTC.Create(aIceServers, TALWebRTCPeerConnectionParameters.Create);
+  fWebRTC := TalWebRTC.Create(LIceServers, TALWebRTCPeerConnectionParameters.Create);
   fWebRTC.OnLocalFrameAvailable := OnLocalFrameAvailable;
   fWebRTC.OnRemoteFrameAvailable := OnRemoteFrameAvailable;
   fWebRTC.OnLocalDescription := OnLocalDescription;
@@ -149,7 +227,7 @@ begin
         lHTTP := TIdHTTP.Create;
         try
           ALLog('alwebrtc', 'enter', TALLogType.VERBOSE);
-          S1 := lHTTP.Post(Server_url, lParamList);
+          S1 := lHTTP.Post(LServerUrl, lParamList);
           if S1 <> '' then begin
             fMustcheckoffer := false;
             fMustcheckanswer := true;
@@ -192,7 +270,7 @@ begin
             lHTTP := TIdHTTP.Create;
             try
               ALLog('alwebrtc', 'check_offer', TALLogType.VERBOSE);
-              S1 := lHTTP.Post(Server_url, lParamList);
+              S1 := lHTTP.Post(LServerUrl, lParamList);
               if (S1 <> '') then begin
                 TThread.Synchronize(nil,
                   procedure
@@ -219,7 +297,7 @@ begin
             lHTTP := TIdHTTP.Create;
             try
               ALLog('alwebrtc', 'check_answer', TALLogType.VERBOSE);
-              S1 := lHTTP.Post(Server_url, lParamList);
+              S1 := lHTTP.Post(LServerUrl, lParamList);
               if (S1 <> '') then begin
                 TThread.Synchronize(nil,
                   procedure
@@ -244,7 +322,7 @@ begin
           lHTTP := TIdHTTP.Create;
           try
             ALLog('alwebrtc', 'check_candidate', TALLogType.VERBOSE);
-            S1 := lHTTP.Post(Server_url, lParamList);
+            S1 := lHTTP.Post(LServerUrl, lParamList);
             if (S1 <> '') then begin
               TThread.Synchronize(nil,
                 procedure
@@ -309,7 +387,6 @@ begin
   {$ENDIF}
 
   fWebRTC := nil;
-  ServerUrlEdit.text := Server_url;
 
 end;
 
@@ -326,7 +403,9 @@ end;
 
 {**************************************************************************************************************}
 procedure TForm1.onLocalDescription(Sender: TObject; const aType: TALWebRTCSDPType; const aDescription: String);
+var LServerUrl: String;
 begin
+  LServerUrl := ServerUrlEdit.text;
   if aType = TALWebRTCSDPType.OFFER then begin
 
     TThread.CreateAnonymousThread(
@@ -346,7 +425,7 @@ begin
           lHTTP := TIdHTTP.Create;
           try
             ALLog('alwebrtc.onLocalDescription', 'set_offer', TALLogType.VERBOSE);
-            S1 := lHTTP.Post(ServerUrlEdit.text, lParamList);
+            S1 := lHTTP.Post(LServerUrl, lParamList);
           finally
             lHTTP.Free;
             lParamList.Free;
@@ -380,7 +459,7 @@ begin
           lHTTP := TIdHTTP.Create;
           try
             ALLog('alwebrtc.onLocalDescription', 'set_answer', TALLogType.VERBOSE);
-            S1 := lHTTP.Post(ServerUrlEdit.text, lParamList);
+            S1 := lHTTP.Post(LServerUrl, lParamList);
             if S1 <> 'OK' then raise Exception.Create('Error 9A23C300-B64F-4C8F-989A-9D462B1D169D');
           finally
             lHTTP.Free;
@@ -400,10 +479,12 @@ end;
 
 {*******************************************************************************************}
 procedure TForm1.onIceCandidate(Sender: TObject; const aIceCandidate: TALWebRTCIceCandidate);
-var aTMPIceCandidate: TALWebRTCIceCandidate;
+var LTMPIceCandidate: TALWebRTCIceCandidate;
+    LServerUrl: String;
 begin
 
-  aTMPIceCandidate := aIceCandidate; // else can not capture symbol error under win32
+  LServerUrl := ServerUrlEdit.text;
+  LTMPIceCandidate := aIceCandidate; // else can not capture symbol error under win32
 
   TThread.CreateAnonymousThread(
     procedure
@@ -417,14 +498,14 @@ begin
         lParamList := TStringList.Create;
         lParamList.Add('user_id=' + inttostr(fUserID));
         lParamList.Add('action=set_candidate');
-        lParamList.Add('SdpMid='+ aTMPIceCandidate.SdpMid);
-        lParamList.Add('SdpMLineIndex='+ inttostr(aTMPIceCandidate.SdpMLineIndex));
-        lParamList.Add('Sdp='+ aTMPIceCandidate.Sdp);
+        lParamList.Add('SdpMid='+ LTMPIceCandidate.SdpMid);
+        lParamList.Add('SdpMLineIndex='+ inttostr(LTMPIceCandidate.SdpMLineIndex));
+        lParamList.Add('Sdp='+ LTMPIceCandidate.Sdp);
 
         lHTTP := TIdHTTP.Create;
         try
           ALLog('alwebrtc.onIceCandidate', 'set_candidate', TALLogType.VERBOSE);
-          S1 := lHTTP.Post(ServerUrlEdit.text, lParamList);
+          S1 := lHTTP.Post(LServerUrl, lParamList);
         finally
           lHTTP.Free;
           lParamList.Free;

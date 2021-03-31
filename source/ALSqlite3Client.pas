@@ -1,21 +1,21 @@
-{************************************************************
-product:      ALSqlite3Client
-Description:  An object to query Sqlite3 database and get
-              the result In Xml format or in Json/Bson format
-*************************************************************}
+{*******************************************************************************
+An object to query Sqlite3 database and get the result In Xml format or in
+Json/Bson format
+*******************************************************************************}
 
 unit AlSqlite3Client;
 
 interface
 
-Uses System.SysUtils,
-     System.Contnrs,
-     System.SyncObjs,
-     AlXmlDoc,
-     ALJsonDoc,
-     AlSqlite3Wrapper,
-     ALString,
-     ALStringList;
+Uses
+  System.SysUtils,
+  System.Contnrs,
+  System.SyncObjs,
+  AlXmlDoc,
+  ALJsonDoc,
+  AlSqlite3Wrapper,
+  ALString,
+  ALStringList;
 
 Type
 
@@ -310,11 +310,12 @@ Type
 
 implementation
 
-Uses Winapi.Windows,
-     System.classes,
-     System.Diagnostics,
-     ALCipher,
-     ALWindows;
+Uses
+  Winapi.Windows,
+  System.classes,
+  System.Diagnostics,
+  ALCipher,
+  ALWindows;
 
 {***********************************************************************************}
 constructor EALSqlite3Error.Create(const aErrorMsg: AnsiString; aErrorCode: Integer);
@@ -654,23 +655,23 @@ Procedure TalSqlite3Client.SelectData(const SQL: AnsiString;
                                       OnNewRowFunct: TalSqlite3ClientSelectJSONDataOnNewRowFunct;
                                       ExtData: Pointer);
 
-Var astmt: SQLite3_Stmt;
-    aStepResult: integer;
-    aColumnCount: Integer;
-    aColumnIndex: integer;
-    aColumnNames: Array of AnsiString;
-    aNewRec: TalJsonNode;
-    aValueRec: TalJsonNode;
-    aViewRec: TalJsonNode;
-    aRecIndex: integer;
-    aRecAdded: integer;
-    aContinue: Boolean;
-    aJsonDocument: TalJsonDocument;
-    aUpdateRowTagByFieldValue: Boolean;
-    aStopWatch: TStopWatch;
-    aCacheKey: ansiString;
-    aCacheStr: ansiString;
-    aTmpRowTag: ansiString;
+Var LStmt: SQLite3_Stmt;
+    LStepResult: integer;
+    LColumnCount: Integer;
+    LColumnIndex: integer;
+    LColumnNames: Array of AnsiString;
+    LNewRec: TalJsonNode;
+    LValueRec: TalJsonNode;
+    LViewRec: TalJsonNode;
+    LRecIndex: integer;
+    LRecAdded: integer;
+    LContinue: Boolean;
+    LJsonDocument: TalJsonDocument;
+    LUpdateRowTagByFieldValue: Boolean;
+    LStopWatch: TStopWatch;
+    LCacheKey: ansiString;
+    LCacheStr: ansiString;
+    LTmpRowTag: ansiString;
 
 begin
 
@@ -681,37 +682,37 @@ begin
   if assigned(OnNewRowFunct) then JsonDATA := nil;
 
   //clear the JsonDATA
-  if assigned(JsonDATA) then aJsonDocument := Nil
+  if assigned(JsonDATA) then LJsonDocument := Nil
   else begin
-    aJsonDocument := TALJsonDocument.create;
-    JsonDATA := aJsonDocument.Node;
+    LJsonDocument := TALJsonDocument.create;
+    JsonDATA := LJsonDocument.Node;
   end;
 
   try
 
     //init the TstopWatch
-    aStopWatch := TstopWatch.Create;
+    LStopWatch := TstopWatch.Create;
 
     //Handle the CacheThreshold
-    aCacheKey := '';
+    LCacheKey := '';
     If (CacheThreshold > 0) and
-       (not assigned(aJsonDocument)) and
+       (not assigned(LJsonDocument)) and
        ((Jsondata.ChildNodes.Count = 0) or  // else the save will not work
         (ViewTag <> '')) then begin
 
       //try to load from from cache
-      aCacheKey := ALStringHashSHA1(AlFormat('BSON#%s#%s#%s#%s', [RowTag,
+      LCacheKey := ALStringHashSHA1(AlFormat('BSON#%s#%s#%s#%s', [RowTag,
                                                                   alinttostr(Skip),
                                                                   alinttostr(First),
                                                                   SQL]));
-      if loadcachedData(aCacheKey, aCacheStr) then begin
+      if loadcachedData(LCacheKey, LCacheStr) then begin
 
         //init the aViewRec
-        if (ViewTag <> '') then aViewRec := Jsondata.AddChild(ViewTag, ntObject)
-        else aViewRec := Jsondata;
+        if (ViewTag <> '') then LViewRec := Jsondata.AddChild(ViewTag, ntObject)
+        else LViewRec := Jsondata;
 
         //assign the tmp data to the JsonData
-        aViewRec.LoadFromBsonString(aCacheStr, false{ClearChildNodes});
+        LViewRec.LoadFromBsonString(LCacheStr, false{ClearChildNodes});
 
         //exit
         exit;
@@ -721,87 +722,87 @@ begin
     end;
 
     //start the TstopWatch
-    aStopWatch.Reset;
-    aStopWatch.Start;
+    LStopWatch.Reset;
+    LStopWatch.Start;
 
     //prepare the query
-    astmt := nil;
-    CheckAPIError(FLibrary.sqlite3_prepare_v2(FSqlite3, PAnsiChar(SQL), length(SQL), astmt, nil) <> SQLITE_OK);
+    LStmt := nil;
+    CheckAPIError(FLibrary.sqlite3_prepare_v2(FSqlite3, PAnsiChar(SQL), length(SQL), LStmt, nil) <> SQLITE_OK);
     Try
 
       //Return the number of columns in the result set returned by the
       //prepared statement. This routine returns 0 if pStmt is an SQL statement
       //that does not return data (for example an UPDATE).
-      aColumnCount := FLibrary.sqlite3_column_count(astmt);
+      LColumnCount := FLibrary.sqlite3_column_count(LStmt);
 
       //init the aColumnNames array
-      setlength(aColumnNames,aColumnCount);
-      For aColumnIndex := 0 to aColumnCount - 1 do
-        aColumnNames[aColumnIndex] := FLibrary.sqlite3_column_name(astmt, aColumnIndex);
+      setlength(LColumnNames,LColumnCount);
+      For LColumnIndex := 0 to LColumnCount - 1 do
+        LColumnNames[LColumnIndex] := FLibrary.sqlite3_column_name(LStmt, LColumnIndex);
 
       //init the aViewRec
-      if (ViewTag <> '') and (not assigned(aJsonDocument)) then aViewRec := Jsondata.AddChild(ViewTag, ntObject)
-      else aViewRec := Jsondata;
+      if (ViewTag <> '') and (not assigned(LJsonDocument)) then LViewRec := Jsondata.AddChild(ViewTag, ntObject)
+      else LViewRec := Jsondata;
 
       //init aUpdateRowTagByFieldValue
       if AlPos('&>',RowTag) = 1 then begin
-        aTmpRowTag := ALcopyStr(RowTag,3,maxint);
-        aUpdateRowTagByFieldValue := aTmpRowTag <> '';
+        LTmpRowTag := ALcopyStr(RowTag,3,maxint);
+        LUpdateRowTagByFieldValue := LTmpRowTag <> '';
       end
       else begin
-        aTmpRowTag := RowTag;
-        aUpdateRowTagByFieldValue := False;
+        LTmpRowTag := RowTag;
+        LUpdateRowTagByFieldValue := False;
       end;
 
       //loop throught all row
-      aRecIndex := 0;
-      aRecAdded := 0;
+      LRecIndex := 0;
+      LRecAdded := 0;
       while True do begin
 
         //retrieve the next row
-        aStepResult := FLibrary.sqlite3_step(astmt);
+        LStepResult := FLibrary.sqlite3_step(LStmt);
 
         //break if no more row
-        if aStepResult = SQLITE_DONE then break
+        if LStepResult = SQLITE_DONE then break
 
         //download the row
-        else if aStepResult = SQLITE_ROW then begin
+        else if LStepResult = SQLITE_ROW then begin
 
           //process if > Skip
-          inc(aRecIndex);
-          If aRecIndex > Skip then begin
+          inc(LRecIndex);
+          If LRecIndex > Skip then begin
 
             //init NewRec
-            if (aTmpRowTag <> '') and (not assigned(aJsonDocument)) then aNewRec := aViewRec.AddChild(aTmpRowTag, ntObject)
-            Else aNewRec := aViewRec;
+            if (LTmpRowTag <> '') and (not assigned(LJsonDocument)) then LNewRec := LViewRec.AddChild(LTmpRowTag, ntObject)
+            Else LNewRec := LViewRec;
 
             //loop throught all column
-            For aColumnIndex := 0 to aColumnCount - 1 do begin
-              aValueRec := aNewRec.AddChild(ALlowercase(aColumnNames[aColumnIndex]));
-              Case FLibrary.sqlite3_column_type(astmt, aColumnIndex) of
-                SQLITE_INTEGER: aValueRec.int64 := FLibrary.sqlite3_column_int64(astmt, aColumnIndex);
-                SQLITE_FLOAT: aValueRec.Float := FLibrary.sqlite3_column_double(astmt, aColumnIndex);
-                SQLITE_TEXT: aValueRec.Text :=  AnsiString(FLibrary.sqlite3_column_text(astmt, aColumnIndex)); // Strings returned by sqlite3_column_text() and sqlite3_column_text16(), even empty strings, are always zero-terminated.
-                SQLITE_NULL: aValueRec.Null := true;
+            For LColumnIndex := 0 to LColumnCount - 1 do begin
+              LValueRec := LNewRec.AddChild(ALlowercase(LColumnNames[LColumnIndex]));
+              Case FLibrary.sqlite3_column_type(LStmt, LColumnIndex) of
+                SQLITE_INTEGER: LValueRec.int64 := FLibrary.sqlite3_column_int64(LStmt, LColumnIndex);
+                SQLITE_FLOAT: LValueRec.Float := FLibrary.sqlite3_column_double(LStmt, LColumnIndex);
+                SQLITE_TEXT: LValueRec.Text :=  AnsiString(FLibrary.sqlite3_column_text(LStmt, LColumnIndex)); // Strings returned by sqlite3_column_text() and sqlite3_column_text16(), even empty strings, are always zero-terminated.
+                SQLITE_NULL: LValueRec.Null := true;
                 //SQLITE_BLOB: todo
                 else raise Exception.Create('Unsupported column type');
               end;
-              if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
+              if LUpdateRowTagByFieldValue and (LValueRec.NodeName=LNewRec.NodeName) then LNewRec.NodeName := ALLowerCase(LValueRec.Text);
             end;
 
             //handle OnNewRowFunct
             if assigned(OnNewRowFunct) then begin
-              aContinue := True;
-              OnNewRowFunct(aNewRec, ViewTag, ExtData, aContinue);
-              if Not aContinue then Break;
+              LContinue := True;
+              OnNewRowFunct(LNewRec, ViewTag, ExtData, LContinue);
+              if Not LContinue then Break;
             end;
 
             //free the node if aJsonDocument
-            if assigned(aJsonDocument) then aJsonDocument.Node.ChildNodes.Clear;
+            if assigned(LJsonDocument) then LJsonDocument.Node.ChildNodes.Clear;
 
             //handle the First
-            inc(aRecAdded);
-            If (First > 0) and (aRecAdded >= First) then Break;
+            inc(LRecAdded);
+            If (First > 0) and (LRecAdded >= First) then Break;
 
           end;
 
@@ -814,32 +815,32 @@ begin
 
     Finally
       //free the memory used by the API
-      CheckAPIError(FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
+      CheckAPIError(FLibrary.sqlite3_finalize(LStmt) <> SQLITE_OK);
     End;
 
     //do the OnSelectDataDone
-    aStopWatch.Stop;
+    LStopWatch.Stop;
     OnSelectDataDone(SQL,
                      RowTag,
                      ViewTag,
                      Skip,
                      First,
                      CacheThreshold,
-                     aStopWatch.Elapsed.TotalMilliseconds);
+                     LStopWatch.Elapsed.TotalMilliseconds);
 
     //save to the cache
-    If aCacheKey <> '' then begin
+    If LCacheKey <> '' then begin
 
       //save the data
-      aViewRec.SaveToBsonString(aCacheStr);
-      SaveDataToCache(aCacheKey,
+      LViewRec.SaveToBsonString(LCacheStr);
+      SaveDataToCache(LCacheKey,
                       CacheThreshold,
-                      aCacheStr);
+                      LCacheStr);
 
     end;
 
   Finally
-    if assigned(aJsonDocument) then aJsonDocument.free;
+    if assigned(LJsonDocument) then LJsonDocument.free;
   End;
 
 end;
@@ -940,23 +941,23 @@ procedure TalSqlite3Client.SelectData(const SQL: AnsiString;
                                       ExtData: Pointer;
                                       const FormatSettings: TALFormatSettings);
 
-Var astmt: SQLite3_Stmt;
-    aStepResult: integer;
-    aColumnCount: Integer;
-    aColumnIndex: integer;
-    aColumnNames: Array of AnsiString;
-    aNewRec: TalXmlNode;
-    aValueRec: TalXmlNode;
-    aViewRec: TalXmlNode;
-    aRecIndex: integer;
-    aRecAdded: integer;
-    aContinue: Boolean;
-    aXmlDocument: TalXmlDocument;
-    aUpdateRowTagByFieldValue: Boolean;
-    aStopWatch: TStopWatch;
-    aCacheKey: ansiString;
-    aCacheStr: ansiString;
-    aTmpRowTag: ansiString;
+Var LStmt: SQLite3_Stmt;
+    LStepResult: integer;
+    LColumnCount: Integer;
+    LColumnIndex: integer;
+    LColumnNames: Array of AnsiString;
+    LNewRec: TalXmlNode;
+    LValueRec: TalXmlNode;
+    LViewRec: TalXmlNode;
+    LRecIndex: integer;
+    LRecAdded: integer;
+    LContinue: Boolean;
+    LXmlDocument: TalXmlDocument;
+    LUpdateRowTagByFieldValue: Boolean;
+    LStopWatch: TStopWatch;
+    LCacheKey: ansiString;
+    LCacheStr: ansiString;
+    LTmpRowTag: ansiString;
 
 begin
 
@@ -967,38 +968,38 @@ begin
   if assigned(OnNewRowFunct) then XMLDATA := nil;
 
   //clear the XMLDATA
-  if assigned(XMLDATA) then aXmlDocument := Nil
+  if assigned(XMLDATA) then LXmlDocument := Nil
   else begin
-    aXmlDocument := TALXmlDocument.create('root');
-    XMLDATA := aXmlDocument.DocumentElement;
+    LXmlDocument := TALXmlDocument.create('root');
+    XMLDATA := LXmlDocument.DocumentElement;
   end;
 
   try
 
     //init the TstopWatch
-    aStopWatch := TstopWatch.Create;
+    LStopWatch := TstopWatch.Create;
 
     //Handle the CacheThreshold
-    aCacheKey := '';
+    LCacheKey := '';
     If (CacheThreshold > 0) and
-       (not assigned(aXmlDocument)) and
+       (not assigned(LXmlDocument)) and
        ((XMLdata.ChildNodes.Count = 0) or  // else the save will not work
         (ViewTag <> '')) then begin
 
       //try to load from from cache
-      aCacheKey := ALStringHashSHA1(AlFormat('XML#%s#%s#%s#%s#%s', [RowTag,
+      LCacheKey := ALStringHashSHA1(AlFormat('XML#%s#%s#%s#%s#%s', [RowTag,
                                                                     alinttostr(Skip),
                                                                     alinttostr(First),
                                                                     ALGetFormatSettingsID(FormatSettings),
                                                                     SQL]));
-      if loadcachedData(aCacheKey, aCacheStr) then begin
+      if loadcachedData(LCacheKey, LCacheStr) then begin
 
         //init the aViewRec
-        if (ViewTag <> '') then aViewRec := XMLdata.AddChild(ViewTag)
-        else aViewRec := XMLdata;
+        if (ViewTag <> '') then LViewRec := XMLdata.AddChild(ViewTag)
+        else LViewRec := XMLdata;
 
         //assign the tmp data to the XMLData
-        aViewRec.LoadFromXML(aCacheStr, true{XmlContainOnlyChildNodes}, false{ClearChildNodes});
+        LViewRec.LoadFromXML(LCacheStr, true{XmlContainOnlyChildNodes}, false{ClearChildNodes});
 
         //exit
         exit;
@@ -1008,87 +1009,87 @@ begin
     end;
 
     //start the TstopWatch
-    aStopWatch.Reset;
-    aStopWatch.Start;
+    LStopWatch.Reset;
+    LStopWatch.Start;
 
     //prepare the query
-    astmt := nil;
-    CheckAPIError(FLibrary.sqlite3_prepare_v2(FSqlite3, PAnsiChar(SQL), length(SQL), astmt, nil) <> SQLITE_OK);
+    LStmt := nil;
+    CheckAPIError(FLibrary.sqlite3_prepare_v2(FSqlite3, PAnsiChar(SQL), length(SQL), LStmt, nil) <> SQLITE_OK);
     Try
 
       //Return the number of columns in the result set returned by the
       //prepared statement. This routine returns 0 if pStmt is an SQL statement
       //that does not return data (for example an UPDATE).
-      aColumnCount := FLibrary.sqlite3_column_count(astmt);
+      LColumnCount := FLibrary.sqlite3_column_count(LStmt);
 
       //init the aColumnNames array
-      setlength(aColumnNames,aColumnCount);
-      For aColumnIndex := 0 to aColumnCount - 1 do
-        aColumnNames[aColumnIndex] := FLibrary.sqlite3_column_name(astmt, aColumnIndex);
+      setlength(LColumnNames,LColumnCount);
+      For LColumnIndex := 0 to LColumnCount - 1 do
+        LColumnNames[LColumnIndex] := FLibrary.sqlite3_column_name(LStmt, LColumnIndex);
 
       //init the aViewRec
-      if (ViewTag <> '') and (not assigned(aXmlDocument)) then aViewRec := XMLdata.AddChild(ViewTag)
-      else aViewRec := XMLdata;
+      if (ViewTag <> '') and (not assigned(LXmlDocument)) then LViewRec := XMLdata.AddChild(ViewTag)
+      else LViewRec := XMLdata;
 
       //init aUpdateRowTagByFieldValue
       if AlPos('&>',RowTag) = 1 then begin
-        aTmpRowTag := ALcopyStr(RowTag,3,maxint);
-        aUpdateRowTagByFieldValue := aTmpRowTag <> '';
+        LTmpRowTag := ALcopyStr(RowTag,3,maxint);
+        LUpdateRowTagByFieldValue := LTmpRowTag <> '';
       end
       else begin
-        aTmpRowTag := RowTag;
-        aUpdateRowTagByFieldValue := False;
+        LTmpRowTag := RowTag;
+        LUpdateRowTagByFieldValue := False;
       end;
 
       //loop throught all row
-      aRecIndex := 0;
-      aRecAdded := 0;
+      LRecIndex := 0;
+      LRecAdded := 0;
       while True do begin
 
         //retrieve the next row
-        aStepResult := FLibrary.sqlite3_step(astmt);
+        LStepResult := FLibrary.sqlite3_step(LStmt);
 
         //break if no more row
-        if aStepResult = SQLITE_DONE then break
+        if LStepResult = SQLITE_DONE then break
 
         //download the row
-        else if aStepResult = SQLITE_ROW then begin
+        else if LStepResult = SQLITE_ROW then begin
 
           //process if > Skip
-          inc(aRecIndex);
-          If aRecIndex > Skip then begin
+          inc(LRecIndex);
+          If LRecIndex > Skip then begin
 
             //init NewRec
-            if (aTmpRowTag <> '') and (not assigned(aXmlDocument)) then aNewRec := aViewRec.AddChild(aTmpRowTag)
-            Else aNewRec := aViewRec;
+            if (LTmpRowTag <> '') and (not assigned(LXmlDocument)) then LNewRec := LViewRec.AddChild(LTmpRowTag)
+            Else LNewRec := LViewRec;
 
             //loop throught all column
-            For aColumnIndex := 0 to aColumnCount - 1 do begin
-              aValueRec := aNewRec.AddChild(ALlowercase(aColumnNames[aColumnIndex]));
-              Case FLibrary.sqlite3_column_type(astmt, aColumnIndex) of
-                SQLITE_FLOAT: aValueRec.Text := ALFloattostr(FLibrary.sqlite3_column_double(astmt, aColumnIndex), FormatSettings);
+            For LColumnIndex := 0 to LColumnCount - 1 do begin
+              LValueRec := LNewRec.AddChild(ALlowercase(LColumnNames[LColumnIndex]));
+              Case FLibrary.sqlite3_column_type(LStmt, LColumnIndex) of
+                SQLITE_FLOAT: LValueRec.Text := ALFloattostr(FLibrary.sqlite3_column_double(LStmt, LColumnIndex), FormatSettings);
                 SQLITE_INTEGER,
-                SQLITE3_TEXT: aValueRec.Text :=  AnsiString(FLibrary.sqlite3_column_text(astmt, aColumnIndex)); // Strings returned by sqlite3_column_text() and sqlite3_column_text16(), even empty strings, are always zero-terminated.
-                SQLITE_NULL: aValueRec.Text := fNullString;
+                SQLITE3_TEXT: LValueRec.Text :=  AnsiString(FLibrary.sqlite3_column_text(LStmt, LColumnIndex)); // Strings returned by sqlite3_column_text() and sqlite3_column_text16(), even empty strings, are always zero-terminated.
+                SQLITE_NULL: LValueRec.Text := fNullString;
                 //SQLITE_BLOB: todo
                 else raise Exception.Create('Unsupported column type');
               end;
-              if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
+              if LUpdateRowTagByFieldValue and (LValueRec.NodeName=LNewRec.NodeName) then LNewRec.NodeName := ALLowerCase(LValueRec.Text);
             end;
 
             //handle OnNewRowFunct
             if assigned(OnNewRowFunct) then begin
-              aContinue := True;
-              OnNewRowFunct(aNewRec, ViewTag, ExtData, aContinue);
-              if Not aContinue then Break;
+              LContinue := True;
+              OnNewRowFunct(LNewRec, ViewTag, ExtData, LContinue);
+              if Not LContinue then Break;
             end;
 
             //free the node if aXmlDocument
-            if assigned(aXmlDocument) then aXmlDocument.DocumentElement.ChildNodes.Clear;
+            if assigned(LXmlDocument) then LXmlDocument.DocumentElement.ChildNodes.Clear;
 
             //handle the First
-            inc(aRecAdded);
-            If (First > 0) and (aRecAdded >= First) then Break;
+            inc(LRecAdded);
+            If (First > 0) and (LRecAdded >= First) then Break;
 
           end;
 
@@ -1101,32 +1102,32 @@ begin
 
     Finally
       //free the memory used by the API
-      CheckAPIError(FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
+      CheckAPIError(FLibrary.sqlite3_finalize(LStmt) <> SQLITE_OK);
     End;
 
     //do the OnSelectDataDone
-    aStopWatch.Stop;
+    LStopWatch.Stop;
     OnSelectDataDone(SQL,
                      RowTag,
                      ViewTag,
                      Skip,
                      First,
                      CacheThreshold,
-                     aStopWatch.Elapsed.TotalMilliseconds);
+                     LStopWatch.Elapsed.TotalMilliseconds);
 
     //save to the cache
-    If aCacheKey <> '' then begin
+    If LCacheKey <> '' then begin
 
       //save the data
-      aViewRec.SaveToXML(aCacheStr, true{SaveOnlyChildNodes});
-      SaveDataToCache(aCacheKey,
+      LViewRec.SaveToXML(LCacheStr, true{SaveOnlyChildNodes});
+      SaveDataToCache(LCacheKey,
                       CacheThreshold,
-                      aCacheStr);
+                      LCacheStr);
 
     end;
 
   Finally
-    if assigned(aXmlDocument) then aXmlDocument.free;
+    if assigned(LXmlDocument) then LXmlDocument.free;
   End;
 
 end;
@@ -1226,53 +1227,53 @@ end;
 
 {***********************************************************}
 procedure TalSqlite3Client.UpdateData(const SQL: AnsiString);
-Var astmt: SQLite3_Stmt;
-    aStopWatch: TStopWatch;
+Var LStmt: SQLite3_Stmt;
+    LStopWatch: TStopWatch;
 begin
 
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
 
   //init the TstopWatch
-  aStopWatch := TstopWatch.Create;
+  LStopWatch := TstopWatch.Create;
 
   //start the TstopWatch
-  aStopWatch.Reset;
-  aStopWatch.Start;
+  LStopWatch.Reset;
+  LStopWatch.Start;
 
   //prepare the query
-  CheckAPIError(FLibrary.sqlite3_prepare_v2(FSqlite3, PAnsiChar(SQL), length(SQL), astmt, nil) <> SQLITE_OK);
+  CheckAPIError(FLibrary.sqlite3_prepare_v2(FSqlite3, PAnsiChar(SQL), length(SQL), LStmt, nil) <> SQLITE_OK);
   Try
 
     //retrieve the next row
-    CheckAPIError(not (FLibrary.sqlite3_step(astmt) in [SQLITE_DONE, SQLITE_ROW]));
+    CheckAPIError(not (FLibrary.sqlite3_step(LStmt) in [SQLITE_DONE, SQLITE_ROW]));
 
   Finally
     //free the memory used by the API
-    CheckAPIError(FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
+    CheckAPIError(FLibrary.sqlite3_finalize(LStmt) <> SQLITE_OK);
   End;
 
   //do the OnUpdateDataDone
-  aStopWatch.Stop;
+  LStopWatch.Stop;
   OnUpdateDataDone(SQL,
-                   aStopWatch.Elapsed.TotalMilliseconds);
+                   LStopWatch.Elapsed.TotalMilliseconds);
 
 end;
 
 {*********************************************************************}
 procedure TalSqlite3Client.UpdateData(const SQLs: array of AnsiString);
-var i: integer;
+var I: integer;
 begin
   for I := Low(SQLs) to High(SQLs) do
-    UpdateData(SQLs[i]);
+    UpdateData(SQLs[I]);
 end;
 
 {******************************************************}
 procedure TalSqlite3Client.UpdateData(SQLs: TALStrings);
-var i: integer;
+var I: integer;
 begin
   for I := 0 to sqls.Count - 1 do
-    UpdateData(SQLs[i]);
+    UpdateData(SQLs[I]);
 end;
 
 {************************************************************************************************}
@@ -1409,12 +1410,12 @@ end;
 
 {**************************************************************************************************}
 function TalSqlite3ConnectionPoolClient.AcquireConnection(const readonly: boolean = False): SQLite3;
-Var aTickCount: UInt64;
-    aDoPragma: Boolean;
+Var LTickCount: UInt64;
+    LDoPragma: Boolean;
 Begin
 
   //init aDoPragma
-  aDoPragma := False;
+  LDoPragma := False;
 
   //synchronize the code
   FConnectionPoolCS.Acquire;
@@ -1424,11 +1425,11 @@ Begin
     if FReleasingAllconnections then raise exception.Create('Can not acquire connection: currently releasing all connections');
 
     //delete the old unused connection
-    aTickCount := GetTickCount64;
-    if aTickCount - fLastConnectionGarbage > (60000 {every minutes})  then begin
+    LTickCount := GetTickCount64;
+    if LTickCount - fLastConnectionGarbage > (60000 {every minutes})  then begin
 
       while FConnectionPoolCount > 0 do begin
-        if aTickCount - FConnectionPool[0].Lastaccessdate > FConnectionMaxIdleTime then begin
+        if LTickCount - FConnectionPool[0].Lastaccessdate > FConnectionMaxIdleTime then begin
 
           Try
             FLibrary.sqlite3_close_v2(FConnectionPool[0].ConnectionHandle);
@@ -1449,7 +1450,7 @@ Begin
         end
         else break;
       end;
-      FLastConnectionGarbage := aTickCount;
+      FLastConnectionGarbage := LTickCount;
     end;
 
     //acquire the new connection from the pool
@@ -1463,7 +1464,7 @@ Begin
       Result := nil;
       Try
         CheckAPIError(result, fLibrary.sqlite3_open_v2(PAnsiChar(fDatabaseName), result, FOpenConnectionFlags, nil) <> SQLITE_OK);
-        aDoPragma := True;
+        LDoPragma := True;
       Except
         //A database connection handle is usually returned in *ppDb, even if an error occurs.
         //Whether or not an error occurs when it is opened, resources associated with the
@@ -1491,7 +1492,7 @@ Begin
 
   //execute the pragma here because before we can have an exception database is locked
   try
-    if aDoPragma then UpdateData(FOpenConnectionPragmaStatements,result);
+    if LDoPragma then UpdateData(FOpenConnectionPragmaStatements,result);
   Except
 
     //synchronize the code
@@ -1661,14 +1662,14 @@ end;
 {*****************************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.TransactionRollback(var ConnectionHandle: SQLite3;
                                                              const CloseConnection: Boolean = False);
-var aTmpCloseConnection: Boolean;
+var LTmpCloseConnection: Boolean;
 begin
 
   //security check
   if not assigned(ConnectionHandle) then raise exception.Create('Connection handle can not be null');
 
   //rollback the connection
-  aTmpCloseConnection := CloseConnection;
+  LTmpCloseConnection := CloseConnection;
   Try
     Try
       UpdateData('ROLLBACK TRANSACTION', ConnectionHandle);
@@ -1678,12 +1679,12 @@ begin
       //raising the exception here will hide the first exception message
       //it's not a problem to hide the error here because closing the
       //connection will normally rollback the data
-      aTmpCloseConnection := True;
+      LTmpCloseConnection := True;
     End;
   Finally
 
     //release the connection
-    ReleaseConnection(ConnectionHandle, aTmpCloseConnection);
+    ReleaseConnection(ConnectionHandle, LTmpCloseConnection);
 
   End;
 
@@ -1721,25 +1722,25 @@ Procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                     ExtData: Pointer;
                                                     const ConnectionHandle: SQLite3 = nil);
 
-Var astmt: SQLite3_Stmt;
-    aStepResult: integer;
-    aColumnCount: Integer;
-    aColumnIndex: integer;
-    aColumnNames: Array of AnsiString;
-    aNewRec: TalJsonNode;
-    aValueRec: TalJsonNode;
-    aViewRec: TalJsonNode;
-    aRecIndex: integer;
-    aRecAdded: integer;
-    aTmpConnectionHandle: SQLite3;
-    aOwnConnection: Boolean;
-    aContinue: Boolean;
-    aJsonDocument: TalJsonDocument;
-    aUpdateRowTagByFieldValue: Boolean;
-    aStopWatch: TStopWatch;
-    aCacheKey: ansiString;
-    aCacheStr: ansiString;
-    aTmpRowTag: ansiString;
+Var LStmt: SQLite3_Stmt;
+    LStepResult: integer;
+    LColumnCount: Integer;
+    LColumnIndex: integer;
+    LColumnNames: Array of AnsiString;
+    LNewRec: TalJsonNode;
+    LValueRec: TalJsonNode;
+    LViewRec: TalJsonNode;
+    LRecIndex: integer;
+    LRecAdded: integer;
+    LTmpConnectionHandle: SQLite3;
+    LOwnConnection: Boolean;
+    LContinue: Boolean;
+    LJsonDocument: TalJsonDocument;
+    LUpdateRowTagByFieldValue: Boolean;
+    LStopWatch: TStopWatch;
+    LCacheKey: ansiString;
+    LCacheStr: ansiString;
+    LTmpRowTag: ansiString;
 
 begin
 
@@ -1747,37 +1748,37 @@ begin
   if assigned(OnNewRowFunct) then JsonDATA := nil;
 
   //clear the JsonDATA
-  if assigned(JsonDATA) then aJsonDocument := Nil
+  if assigned(JsonDATA) then LJsonDocument := Nil
   else begin
-    aJsonDocument := TALJsonDocument.create;
-    JsonDATA := aJsonDocument.Node;
+    LJsonDocument := TALJsonDocument.create;
+    JsonDATA := LJsonDocument.Node;
   end;
 
   try
 
     //init the TstopWatch
-    aStopWatch := TstopWatch.Create;
+    LStopWatch := TstopWatch.Create;
 
     //Handle the CacheThreshold
-    aCacheKey := '';
+    LCacheKey := '';
     If (CacheThreshold > 0) and
-       (not assigned(aJsonDocument)) and
+       (not assigned(LJsonDocument)) and
        ((Jsondata.ChildNodes.Count = 0) or  // else the save will not work
         (ViewTag <> '')) then begin
 
       //try to load from from cache
-      aCacheKey := ALStringHashSHA1(AlFormat('BSON#%s#%s#%s#%s', [RowTag,
+      LCacheKey := ALStringHashSHA1(AlFormat('BSON#%s#%s#%s#%s', [RowTag,
                                                                   alinttostr(Skip),
                                                                   alinttostr(First),
                                                                   SQL]));
-      if loadcachedData(aCacheKey, aCacheStr) then begin
+      if loadcachedData(LCacheKey, LCacheStr) then begin
 
         //init the aViewRec
-        if (ViewTag <> '') then aViewRec := Jsondata.AddChild(ViewTag, ntObject)
-        else aViewRec := Jsondata;
+        if (ViewTag <> '') then LViewRec := Jsondata.AddChild(ViewTag, ntObject)
+        else LViewRec := Jsondata;
 
         //assign the tmp data to the JsonData
-        aViewRec.LoadFromBsonString(aCacheStr, false{ClearChildNodes});
+        LViewRec.LoadFromBsonString(LCacheStr, false{ClearChildNodes});
 
         //exit
         exit;
@@ -1787,137 +1788,137 @@ begin
     end;
 
     //acquire a connection and start the transaction if necessary
-    aTmpConnectionHandle := ConnectionHandle;
-    aOwnConnection := (not assigned(ConnectionHandle));
-    if aOwnConnection then TransactionStart(aTmpConnectionHandle, True);
+    LTmpConnectionHandle := ConnectionHandle;
+    LOwnConnection := (not assigned(ConnectionHandle));
+    if LOwnConnection then TransactionStart(LTmpConnectionHandle, True);
     Try
 
       //start the TstopWatch
-      aStopWatch.Reset;
-      aStopWatch.Start;
+      LStopWatch.Reset;
+      LStopWatch.Start;
 
       //prepare the query
-      astmt := nil;
-      CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_prepare_v2(aTmpConnectionHandle, PAnsiChar(SQL), length(SQL), astmt, nil) <> SQLITE_OK);
+      LStmt := nil;
+      CheckAPIError(LTmpConnectionHandle, FLibrary.sqlite3_prepare_v2(LTmpConnectionHandle, PAnsiChar(SQL), length(SQL), LStmt, nil) <> SQLITE_OK);
       Try
 
         //Return the number of columns in the result set returned by the
         //prepared statement. This routine returns 0 if pStmt is an SQL statement
         //that does not return data (for example an UPDATE).
-        aColumnCount := FLibrary.sqlite3_column_count(astmt);
+        LColumnCount := FLibrary.sqlite3_column_count(LStmt);
 
         //init the aColumnNames array
-        setlength(aColumnNames,aColumnCount);
-        For aColumnIndex := 0 to aColumnCount - 1 do
-          aColumnNames[aColumnIndex] := FLibrary.sqlite3_column_name(astmt, aColumnIndex);
+        setlength(LColumnNames,LColumnCount);
+        For LColumnIndex := 0 to LColumnCount - 1 do
+          LColumnNames[LColumnIndex] := FLibrary.sqlite3_column_name(LStmt, LColumnIndex);
 
         //init the aViewRec
-        if (ViewTag <> '') and (not assigned(aJsonDocument))  then aViewRec := Jsondata.AddChild(ViewTag, ntObject)
-        else aViewRec := Jsondata;
+        if (ViewTag <> '') and (not assigned(LJsonDocument))  then LViewRec := Jsondata.AddChild(ViewTag, ntObject)
+        else LViewRec := Jsondata;
 
         //init aUpdateRowTagByFieldValue
         if AlPos('&>',RowTag) = 1 then begin
-          aTmpRowTag := ALcopyStr(RowTag,3,maxint);
-          aUpdateRowTagByFieldValue := aTmpRowTag <> '';
+          LTmpRowTag := ALcopyStr(RowTag,3,maxint);
+          LUpdateRowTagByFieldValue := LTmpRowTag <> '';
         end
         else begin
-          aTmpRowTag := RowTag;
-          aUpdateRowTagByFieldValue := False;
+          LTmpRowTag := RowTag;
+          LUpdateRowTagByFieldValue := False;
         end;
 
         //loop throught all row
-        aRecIndex := 0;
-        aRecAdded := 0;
+        LRecIndex := 0;
+        LRecAdded := 0;
         while True do begin
 
           //retrieve the next row
-          aStepResult := FLibrary.sqlite3_step(astmt);
+          LStepResult := FLibrary.sqlite3_step(LStmt);
 
           //break if no more row
-          if aStepResult = SQLITE_DONE then break
+          if LStepResult = SQLITE_DONE then break
 
           //download the row
-          else if aStepResult = SQLITE_ROW then begin
+          else if LStepResult = SQLITE_ROW then begin
 
             //process if > Skip
-            inc(aRecIndex);
-            If aRecIndex > Skip then begin
+            inc(LRecIndex);
+            If LRecIndex > Skip then begin
 
               //init NewRec
-              if (aTmpRowTag <> '') and (not assigned(aJsonDocument))  then aNewRec := aViewRec.AddChild(aTmpRowTag, ntobject)
-              Else aNewRec := aViewRec;
+              if (LTmpRowTag <> '') and (not assigned(LJsonDocument))  then LNewRec := LViewRec.AddChild(LTmpRowTag, ntobject)
+              Else LNewRec := LViewRec;
 
               //loop throught all column
-              For aColumnIndex := 0 to aColumnCount - 1 do begin
-                aValueRec := aNewRec.AddChild(ALlowercase(aColumnNames[aColumnIndex]));
-                Case FLibrary.sqlite3_column_type(astmt, aColumnIndex) of
-                  SQLITE_INTEGER: aValueRec.int64 := FLibrary.sqlite3_column_int64(astmt, aColumnIndex);
-                  SQLITE_FLOAT: aValueRec.Float := FLibrary.sqlite3_column_double(astmt, aColumnIndex);
-                  SQLITE_TEXT: aValueRec.Text :=  AnsiString(FLibrary.sqlite3_column_text(astmt, aColumnIndex)); // Strings returned by sqlite3_column_text() and sqlite3_column_text16(), even empty strings, are always zero-terminated.
-                  SQLITE_NULL: aValueRec.Null := true;
+              For LColumnIndex := 0 to LColumnCount - 1 do begin
+                LValueRec := LNewRec.AddChild(ALlowercase(LColumnNames[LColumnIndex]));
+                Case FLibrary.sqlite3_column_type(LStmt, LColumnIndex) of
+                  SQLITE_INTEGER: LValueRec.int64 := FLibrary.sqlite3_column_int64(LStmt, LColumnIndex);
+                  SQLITE_FLOAT: LValueRec.Float := FLibrary.sqlite3_column_double(LStmt, LColumnIndex);
+                  SQLITE_TEXT: LValueRec.Text :=  AnsiString(FLibrary.sqlite3_column_text(LStmt, LColumnIndex)); // Strings returned by sqlite3_column_text() and sqlite3_column_text16(), even empty strings, are always zero-terminated.
+                  SQLITE_NULL: LValueRec.Null := true;
                   //SQLITE_BLOB: todo
                   else raise Exception.Create('Unsupported column type');
                 end;
-                if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
+                if LUpdateRowTagByFieldValue and (LValueRec.NodeName=LNewRec.NodeName) then LNewRec.NodeName := ALLowerCase(LValueRec.Text);
               end;
 
               //handle OnNewRowFunct
               if assigned(OnNewRowFunct) then begin
-                aContinue := True;
-                OnNewRowFunct(aNewRec, ViewTag, ExtData, aContinue);
-                if Not aContinue then Break;
+                LContinue := True;
+                OnNewRowFunct(LNewRec, ViewTag, ExtData, LContinue);
+                if Not LContinue then Break;
               end;
 
               //free the node if aJsonDocument
-              if assigned(aJsonDocument) then aJsonDocument.Node.ChildNodes.Clear;
+              if assigned(LJsonDocument) then LJsonDocument.Node.ChildNodes.Clear;
 
               //handle the First
-              inc(aRecAdded);
-              If (First > 0) and (aRecAdded >= First) then Break;
+              inc(LRecAdded);
+              If (First > 0) and (LRecAdded >= First) then Break;
 
             end;
 
           end
 
           //misc error, raise an exception
-          else CheckAPIError(aTmpConnectionHandle, True);
+          else CheckAPIError(LTmpConnectionHandle, True);
 
         end;
 
       Finally
         //free the memory used by the API
-        CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
+        CheckAPIError(LTmpConnectionHandle, FLibrary.sqlite3_finalize(LStmt) <> SQLITE_OK);
       End;
 
       //do the OnSelectDataDone
-      aStopWatch.Stop;
+      LStopWatch.Stop;
       OnSelectDataDone(SQL,
                        RowTag,
                        ViewTag,
                        Skip,
                        First,
                        CacheThreshold,
-                       aStopWatch.Elapsed.TotalMilliseconds);
+                       LStopWatch.Elapsed.TotalMilliseconds);
 
       //save to the cache
-      If aCacheKey <> '' then begin
+      If LCacheKey <> '' then begin
 
         //save the data
-        aViewRec.SaveToBsonString(aCacheStr);
-        SaveDataToCache(aCacheKey,
+        LViewRec.SaveToBsonString(LCacheStr);
+        SaveDataToCache(LCacheKey,
                         CacheThreshold,
-                        aCacheStr);
+                        LCacheStr);
 
       end;
 
       //commit the transaction and release the connection if owned
-      if aOwnConnection then TransactionCommit(aTmpConnectionHandle);
+      if LOwnConnection then TransactionCommit(LTmpConnectionHandle);
 
     except
       On E: Exception do begin
 
         //rollback the transaction and release the connection if owned
-        if aOwnConnection then TransactionRollback(aTmpConnectionHandle, true);
+        if LOwnConnection then TransactionRollback(LTmpConnectionHandle, true);
 
         //raise the error
         raise;
@@ -1926,7 +1927,7 @@ begin
     end;
 
   finally
-    if assigned(aJsonDocument) then aJsonDocument.free;
+    if assigned(LJsonDocument) then LJsonDocument.free;
   end;
 
 end;
@@ -2038,25 +2039,25 @@ procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                     const FormatSettings: TALFormatSettings;
                                                     const ConnectionHandle: SQLite3 = nil);
 
-Var astmt: SQLite3_Stmt;
-    aStepResult: integer;
-    aColumnCount: Integer;
-    aColumnIndex: integer;
-    aColumnNames: Array of AnsiString;
-    aNewRec: TalXmlNode;
-    aValueRec: TalXmlNode;
-    aViewRec: TalXmlNode;
-    aRecIndex: integer;
-    aRecAdded: integer;
-    aTmpConnectionHandle: SQLite3;
-    aOwnConnection: Boolean;
-    aContinue: Boolean;
-    aXmlDocument: TalXmlDocument;
-    aUpdateRowTagByFieldValue: Boolean;
-    aStopWatch: TStopWatch;
-    aCacheKey: ansiString;
-    aCacheStr: ansiString;
-    aTmpRowTag: ansiString;
+Var LStmt: SQLite3_Stmt;
+    LStepResult: integer;
+    LColumnCount: Integer;
+    LColumnIndex: integer;
+    LColumnNames: Array of AnsiString;
+    LNewRec: TalXmlNode;
+    LValueRec: TalXmlNode;
+    LViewRec: TalXmlNode;
+    LRecIndex: integer;
+    LRecAdded: integer;
+    LTmpConnectionHandle: SQLite3;
+    LOwnConnection: Boolean;
+    LContinue: Boolean;
+    LXmlDocument: TalXmlDocument;
+    LUpdateRowTagByFieldValue: Boolean;
+    LStopWatch: TStopWatch;
+    LCacheKey: ansiString;
+    LCacheStr: ansiString;
+    LTmpRowTag: ansiString;
 
 begin
 
@@ -2064,38 +2065,38 @@ begin
   if assigned(OnNewRowFunct) then XMLDATA := nil;
 
   //clear the XMLDATA
-  if assigned(XMLDATA) then aXmlDocument := Nil
+  if assigned(XMLDATA) then LXmlDocument := Nil
   else begin
-    aXmlDocument := TALXmlDocument.create('root');
-    XMLDATA := aXmlDocument.DocumentElement;
+    LXmlDocument := TALXmlDocument.create('root');
+    XMLDATA := LXmlDocument.DocumentElement;
   end;
 
   try
 
     //init the TstopWatch
-    aStopWatch := TstopWatch.Create;
+    LStopWatch := TstopWatch.Create;
 
     //Handle the CacheThreshold
-    aCacheKey := '';
+    LCacheKey := '';
     If (CacheThreshold > 0) and
-       (not assigned(aXmlDocument)) and
+       (not assigned(LXmlDocument)) and
        ((XMLdata.ChildNodes.Count = 0) or  // else the save will not work
         (ViewTag <> '')) then begin
 
       //try to load from from cache
-      aCacheKey := ALStringHashSHA1(AlFormat('XML#%s#%s#%s#%s#%s', [RowTag,
+      LCacheKey := ALStringHashSHA1(AlFormat('XML#%s#%s#%s#%s#%s', [RowTag,
                                                                     alinttostr(Skip),
                                                                     alinttostr(First),
                                                                     ALGetFormatSettingsID(FormatSettings),
                                                                     SQL]));
-      if loadcachedData(aCacheKey, aCacheStr) then begin
+      if loadcachedData(LCacheKey, LCacheStr) then begin
 
         //init the aViewRec
-        if (ViewTag <> '') then aViewRec := XMLdata.AddChild(ViewTag)
-        else aViewRec := XMLdata;
+        if (ViewTag <> '') then LViewRec := XMLdata.AddChild(ViewTag)
+        else LViewRec := XMLdata;
 
         //assign the tmp data to the XMLData
-        aViewRec.LoadFromXML(aCacheStr, true{XmlContainOnlyChildNodes}, false{ClearChildNodes});
+        LViewRec.LoadFromXML(LCacheStr, true{XmlContainOnlyChildNodes}, false{ClearChildNodes});
 
         //exit
         exit;
@@ -2105,137 +2106,137 @@ begin
     end;
 
     //acquire a connection and start the transaction if necessary
-    aTmpConnectionHandle := ConnectionHandle;
-    aOwnConnection := (not assigned(ConnectionHandle));
-    if aOwnConnection then TransactionStart(aTmpConnectionHandle, True);
+    LTmpConnectionHandle := ConnectionHandle;
+    LOwnConnection := (not assigned(ConnectionHandle));
+    if LOwnConnection then TransactionStart(LTmpConnectionHandle, True);
     Try
 
       //start the TstopWatch
-      aStopWatch.Reset;
-      aStopWatch.Start;
+      LStopWatch.Reset;
+      LStopWatch.Start;
 
       //prepare the query
-      astmt := nil;
-      CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_prepare_v2(aTmpConnectionHandle, PAnsiChar(SQL), length(SQL), astmt, nil) <> SQLITE_OK);
+      LStmt := nil;
+      CheckAPIError(LTmpConnectionHandle, FLibrary.sqlite3_prepare_v2(LTmpConnectionHandle, PAnsiChar(SQL), length(SQL), LStmt, nil) <> SQLITE_OK);
       Try
 
         //Return the number of columns in the result set returned by the
         //prepared statement. This routine returns 0 if pStmt is an SQL statement
         //that does not return data (for example an UPDATE).
-        aColumnCount := FLibrary.sqlite3_column_count(astmt);
+        LColumnCount := FLibrary.sqlite3_column_count(LStmt);
 
         //init the aColumnNames array
-        setlength(aColumnNames,aColumnCount);
-        For aColumnIndex := 0 to aColumnCount - 1 do
-          aColumnNames[aColumnIndex] := FLibrary.sqlite3_column_name(astmt, aColumnIndex);
+        setlength(LColumnNames,LColumnCount);
+        For LColumnIndex := 0 to LColumnCount - 1 do
+          LColumnNames[LColumnIndex] := FLibrary.sqlite3_column_name(LStmt, LColumnIndex);
 
         //init the aViewRec
-        if (ViewTag <> '') and (not assigned(aXmlDocument))  then aViewRec := XMLdata.AddChild(ViewTag)
-        else aViewRec := XMLdata;
+        if (ViewTag <> '') and (not assigned(LXmlDocument))  then LViewRec := XMLdata.AddChild(ViewTag)
+        else LViewRec := XMLdata;
 
         //init aUpdateRowTagByFieldValue
         if AlPos('&>',RowTag) = 1 then begin
-          aTmpRowTag := ALcopyStr(RowTag,3,maxint);
-          aUpdateRowTagByFieldValue := aTmpRowTag <> '';
+          LTmpRowTag := ALcopyStr(RowTag,3,maxint);
+          LUpdateRowTagByFieldValue := LTmpRowTag <> '';
         end
         else begin
-          aTmpRowTag := RowTag;
-          aUpdateRowTagByFieldValue := False;
+          LTmpRowTag := RowTag;
+          LUpdateRowTagByFieldValue := False;
         end;
 
         //loop throught all row
-        aRecIndex := 0;
-        aRecAdded := 0;
+        LRecIndex := 0;
+        LRecAdded := 0;
         while True do begin
 
           //retrieve the next row
-          aStepResult := FLibrary.sqlite3_step(astmt);
+          LStepResult := FLibrary.sqlite3_step(LStmt);
 
           //break if no more row
-          if aStepResult = SQLITE_DONE then break
+          if LStepResult = SQLITE_DONE then break
 
           //download the row
-          else if aStepResult = SQLITE_ROW then begin
+          else if LStepResult = SQLITE_ROW then begin
 
             //process if > Skip
-            inc(aRecIndex);
-            If aRecIndex > Skip then begin
+            inc(LRecIndex);
+            If LRecIndex > Skip then begin
 
               //init NewRec
-              if (aTmpRowTag <> '') and (not assigned(aXmlDocument))  then aNewRec := aViewRec.AddChild(aTmpRowTag)
-              Else aNewRec := aViewRec;
+              if (LTmpRowTag <> '') and (not assigned(LXmlDocument))  then LNewRec := LViewRec.AddChild(LTmpRowTag)
+              Else LNewRec := LViewRec;
 
               //loop throught all column
-              For aColumnIndex := 0 to aColumnCount - 1 do begin
-                aValueRec := aNewRec.AddChild(ALlowercase(aColumnNames[aColumnIndex]));
-                Case FLibrary.sqlite3_column_type(astmt, aColumnIndex) of
-                  SQLITE_FLOAT: aValueRec.Text := ALFloattostr(FLibrary.sqlite3_column_double(astmt, aColumnIndex), FormatSettings);
+              For LColumnIndex := 0 to LColumnCount - 1 do begin
+                LValueRec := LNewRec.AddChild(ALlowercase(LColumnNames[LColumnIndex]));
+                Case FLibrary.sqlite3_column_type(LStmt, LColumnIndex) of
+                  SQLITE_FLOAT: LValueRec.Text := ALFloattostr(FLibrary.sqlite3_column_double(LStmt, LColumnIndex), FormatSettings);
                   SQLITE_INTEGER,
-                  SQLITE3_TEXT: aValueRec.Text :=  AnsiString(FLibrary.sqlite3_column_text(astmt, aColumnIndex)); // Strings returned by sqlite3_column_text() and sqlite3_column_text16(), even empty strings, are always zero-terminated.
-                  SQLITE_NULL: aValueRec.Text := fNullString;
+                  SQLITE3_TEXT: LValueRec.Text :=  AnsiString(FLibrary.sqlite3_column_text(LStmt, LColumnIndex)); // Strings returned by sqlite3_column_text() and sqlite3_column_text16(), even empty strings, are always zero-terminated.
+                  SQLITE_NULL: LValueRec.Text := fNullString;
                   //SQLITE_BLOB: todo
                   else raise Exception.Create('Unsupported column type');
                 end;
-                if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
+                if LUpdateRowTagByFieldValue and (LValueRec.NodeName=LNewRec.NodeName) then LNewRec.NodeName := ALLowerCase(LValueRec.Text);
               end;
 
               //handle OnNewRowFunct
               if assigned(OnNewRowFunct) then begin
-                aContinue := True;
-                OnNewRowFunct(aNewRec, ViewTag, ExtData, aContinue);
-                if Not aContinue then Break;
+                LContinue := True;
+                OnNewRowFunct(LNewRec, ViewTag, ExtData, LContinue);
+                if Not LContinue then Break;
               end;
 
               //free the node if aXmlDocument
-              if assigned(aXmlDocument) then aXmlDocument.DocumentElement.ChildNodes.Clear;
+              if assigned(LXmlDocument) then LXmlDocument.DocumentElement.ChildNodes.Clear;
 
               //handle the First
-              inc(aRecAdded);
-              If (First > 0) and (aRecAdded >= First) then Break;
+              inc(LRecAdded);
+              If (First > 0) and (LRecAdded >= First) then Break;
 
             end;
 
           end
 
           //misc error, raise an exception
-          else CheckAPIError(aTmpConnectionHandle, True);
+          else CheckAPIError(LTmpConnectionHandle, True);
 
         end;
 
       Finally
         //free the memory used by the API
-        CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
+        CheckAPIError(LTmpConnectionHandle, FLibrary.sqlite3_finalize(LStmt) <> SQLITE_OK);
       End;
 
       //do the OnSelectDataDone
-      aStopWatch.Stop;
+      LStopWatch.Stop;
       OnSelectDataDone(SQL,
                        RowTag,
                        ViewTag,
                        Skip,
                        First,
                        CacheThreshold,
-                       aStopWatch.Elapsed.TotalMilliseconds);
+                       LStopWatch.Elapsed.TotalMilliseconds);
 
       //save to the cache
-      If aCacheKey <> '' then begin
+      If LCacheKey <> '' then begin
 
         //save the data
-        aViewRec.SaveToXML(aCacheStr, true{SaveOnlyChildNodes});
-        SaveDataToCache(aCacheKey,
+        LViewRec.SaveToXML(LCacheStr, true{SaveOnlyChildNodes});
+        SaveDataToCache(LCacheKey,
                         CacheThreshold,
-                        aCacheStr);
+                        LCacheStr);
 
       end;
 
       //commit the transaction and release the connection if owned
-      if aOwnConnection then TransactionCommit(aTmpConnectionHandle);
+      if LOwnConnection then TransactionCommit(LTmpConnectionHandle);
 
     except
       On E: Exception do begin
 
         //rollback the transaction and release the connection if owned
-        if aOwnConnection then TransactionRollback(aTmpConnectionHandle, true);
+        if LOwnConnection then TransactionRollback(LTmpConnectionHandle, true);
 
         //raise the error
         raise;
@@ -2244,7 +2245,7 @@ begin
     end;
 
   finally
-    if assigned(aXmlDocument) then aXmlDocument.free;
+    if assigned(LXmlDocument) then LXmlDocument.free;
   end;
 
 end;
@@ -2355,50 +2356,50 @@ end;
 {************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.UpdateData(const SQL: AnsiString;
                                                     const ConnectionHandle: SQLite3 = nil);
-Var astmt: SQLite3_Stmt;
-    aTmpConnectionHandle: SQLite3;
-    aOwnConnection: Boolean;
-    aStopWatch: TStopWatch;
+Var LStmt: SQLite3_Stmt;
+    LTmpConnectionHandle: SQLite3;
+    LOwnConnection: Boolean;
+    LStopWatch: TStopWatch;
 begin
 
   //acquire a connection and start the transaction if necessary
-  aTmpConnectionHandle := ConnectionHandle;
-  aOwnConnection := (not assigned(ConnectionHandle));
-  if aOwnConnection then TransactionStart(aTmpConnectionHandle, False);
+  LTmpConnectionHandle := ConnectionHandle;
+  LOwnConnection := (not assigned(ConnectionHandle));
+  if LOwnConnection then TransactionStart(LTmpConnectionHandle, False);
   Try
 
     //init the TstopWatch
-    aStopWatch := TstopWatch.Create;
+    LStopWatch := TstopWatch.Create;
 
     //start the TstopWatch
-    aStopWatch.Reset;
-    aStopWatch.Start;
+    LStopWatch.Reset;
+    LStopWatch.Start;
 
     //prepare the query
-    CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_prepare_v2(aTmpConnectionHandle, PAnsiChar(SQL), length(SQL), astmt, nil) <> SQLITE_OK);
+    CheckAPIError(LTmpConnectionHandle, FLibrary.sqlite3_prepare_v2(LTmpConnectionHandle, PAnsiChar(SQL), length(SQL), LStmt, nil) <> SQLITE_OK);
     Try
 
       //retrieve the next row
-      CheckAPIError(aTmpConnectionHandle, not (FLibrary.sqlite3_step(astmt) in [SQLITE_DONE, SQLITE_ROW]));
+      CheckAPIError(LTmpConnectionHandle, not (FLibrary.sqlite3_step(LStmt) in [SQLITE_DONE, SQLITE_ROW]));
 
     Finally
       //free the memory used by the API
-      CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
+      CheckAPIError(LTmpConnectionHandle, FLibrary.sqlite3_finalize(LStmt) <> SQLITE_OK);
     End;
 
     //do the OnUpdateDataDone
-    aStopWatch.Stop;
+    LStopWatch.Stop;
     OnUpdateDataDone(SQL,
-                     aStopWatch.Elapsed.TotalMilliseconds);
+                     LStopWatch.Elapsed.TotalMilliseconds);
 
     //commit the transaction and release the connection if owned
-    if aOwnConnection then TransactionCommit(aTmpConnectionHandle);
+    if LOwnConnection then TransactionCommit(LTmpConnectionHandle);
 
   except
     On E: Exception do begin
 
       //rollback the transaction and release the connection if owned
-      if aOwnConnection then TransactionRollback(aTmpConnectionHandle, true);
+      if LOwnConnection then TransactionRollback(LTmpConnectionHandle, true);
 
       //raise the error
       raise;
@@ -2411,30 +2412,30 @@ end;
 {**********************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.UpdateData(const SQLs: array of AnsiString;
                                                     const ConnectionHandle: SQLite3 = nil);
-Var aTmpConnectionHandle: SQLite3;
-    aOwnConnection: Boolean;
-    i: integer;
+Var LTmpConnectionHandle: SQLite3;
+    LOwnConnection: Boolean;
+    I: integer;
 begin
 
   //acquire a connection and start the transaction if necessary
-  aTmpConnectionHandle := ConnectionHandle;
-  aOwnConnection := (not assigned(ConnectionHandle));
-  if aOwnConnection then TransactionStart(aTmpConnectionHandle, False);
+  LTmpConnectionHandle := ConnectionHandle;
+  LOwnConnection := (not assigned(ConnectionHandle));
+  if LOwnConnection then TransactionStart(LTmpConnectionHandle, False);
   Try
 
     //update the data
     for I := Low(SQLs) to High(SQLs) do
-      UpdateData(SQLs[i],
-                 aTmpConnectionHandle);
+      UpdateData(SQLs[I],
+                 LTmpConnectionHandle);
 
     //commit the transaction and release the connection if owned
-    if aOwnConnection then TransactionCommit(aTmpConnectionHandle);
+    if LOwnConnection then TransactionCommit(LTmpConnectionHandle);
 
   except
     On E: Exception do begin
 
       //rollback the transaction and release the connection if owned
-      if aOwnConnection then TransactionRollback(aTmpConnectionHandle, true);
+      if LOwnConnection then TransactionRollback(LTmpConnectionHandle, true);
 
       //raise the error
       raise;
@@ -2447,30 +2448,30 @@ end;
 {*******************************************************************}
 procedure TalSqlite3ConnectionPoolClient.UpdateData(SQLs: TALStrings;
                                                     const ConnectionHandle: SQLite3 = nil);
-Var aTmpConnectionHandle: SQLite3;
-    aOwnConnection: Boolean;
-    i: integer;
+Var LTmpConnectionHandle: SQLite3;
+    LOwnConnection: Boolean;
+    I: integer;
 begin
 
   //acquire a connection and start the transaction if necessary
-  aTmpConnectionHandle := ConnectionHandle;
-  aOwnConnection := (not assigned(ConnectionHandle));
-  if aOwnConnection then TransactionStart(aTmpConnectionHandle, False);
+  LTmpConnectionHandle := ConnectionHandle;
+  LOwnConnection := (not assigned(ConnectionHandle));
+  if LOwnConnection then TransactionStart(LTmpConnectionHandle, False);
   Try
 
     //update the data
     for I := 0 to SQLs.Count - 1 do
-      UpdateData(SQLs[i],
-                 aTmpConnectionHandle);
+      UpdateData(SQLs[I],
+                 LTmpConnectionHandle);
 
     //commit the transaction and release the connection if owned
-    if aOwnConnection then TransactionCommit(aTmpConnectionHandle);
+    if LOwnConnection then TransactionCommit(LTmpConnectionHandle);
 
   except
     On E: Exception do begin
 
       //rollback the transaction and release the connection if owned
-      if aOwnConnection then TransactionRollback(aTmpConnectionHandle, true);
+      if LOwnConnection then TransactionRollback(LTmpConnectionHandle, true);
 
       //raise the error
       raise;

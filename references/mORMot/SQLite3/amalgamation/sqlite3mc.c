@@ -1,53 +1,99 @@
 /*
-** Wrapper around SQlite3 amalgamation file with proper options and code
+** Wrapper around SQlite3 amalgamation file for mORMot use
 **
 ** Please download and put sqlite3.c in amalgamation/ sub-folder
 ** from https://sqlite.org/download.html
-** then run ./patch.sh
+** then follow the amalgamation/ReadMe.md instructions
 */
 
 /*
-** Define all symbols expected by SynSQLite3Static.pas
+** Define conditionals / extensions specially tuned for mORMot
 **
 ** See also https://www.sqlite.org/compile.html#recommended_compile_time_options
 */
 
 #define SQLITE_DEFAULT_MEMSTATUS 0
 // don't need any debug here, and don't even define sqlite3_status()
+
 #define SQLITE_THREADSAFE 1
 // assuming multi-thread safety is made by caller - in our framework, there is
 // only one thread using the database connection at the same time, but there could
 // be multiple database connection at the same time (previous was 0 could be unsafe)
 // - this option is also needed by codecext.c
+
 #define SQLITE_OMIT_SHARED_CACHE 1
 // no need of shared cache in a threadsafe calling model
+
 #define SQLITE_OMIT_AUTOINIT 1
-//  sqlite3_initialize() is done in unit initialization -> no AUTOINIT
+// sqlite3_initialize() is done in unit initialization -> no AUTOINIT
+
 #define SQLITE_OMIT_DEPRECATED 1
-//  spare some code size
+// spare some code size
+
 #define SQLITE_LIKE_DOESNT_MATCH_BLOBS 1
 // historical function, never used
+
 #define SQLITE_ENABLE_FTS3 1
 #define SQLITE_ENABLE_FTS3_PARENTHESIS 1
 #define SQLITE_ENABLE_FTS4 1
 #define SQLITE_ENABLE_FTS5 1
-// enable all FTS engines
-#define SQLITE_ENABLE_RBU 1
-// "Resumable Bulk Update" (or OTA) is not used/published yet
+// enable all FTS engines https://www.sqlite.org/fts3.html https://www.sqlite.org/fts5.html
+
 #define SQLITE_ENABLE_JSON1 1
-// add JSON extension
+// enable JSON https://www.sqlite.org/json1.html
+
 #define SQLITE_MAX_EXPR_DEPTH 0
 // no SQL depth limit, since we trust the input and expect the best performance
-#define SQLITE_OMIT_LOAD_EXTENSION 1
-// we don't need/allow extension in an embedded engine
-#define SQLITE_OMIT_COMPILEOPTION_DIAGS 1
-// we don't need Compilation Options Diagnostics in our embedded engine
-#define SQLITE_OMIT_PROGRESS_CALLBACK 1
-// we don't need sqlite3_progress_handler() API function
-#define SQLITE_ENABLE_RTREE 1
-// the RTREE extension is now (from v.1.8/3.7) compiled into the engine
+
 #define SQLITE_ENABLE_DESERIALIZE
-// enables  sqlite3_serialize() and sqlite3_deserialize()
+// enable sqlite3_serialize() and sqlite3_deserialize()
+
+#define SQLITE_ENABLE_RTREE 1
+// enable RTREE https://sqlite.org/rtree.html
+
+#define SQLITE_ENABLE_GEOPOLY 1
+// enable GeoJSON over RTREE https://sqlite.org/geopoly.html 
+
+#define SQLITE_ENABLE_REGEXP 1
+// enable the compact https://www.sqlite.org/src/file?name=ext/misc/regexp.c
+// - can be overloaded with any other implementation
+
+#define SQLITE_ENABLE_RBU 1
+// enable "Resumable Bulk Update" (or OTA) https://www.sqlite.org/rbu.html
+
+#define SQLITE_ENABLE_SESSION 1
+#define SQLITE_ENABLE_PREUPDATE_HOOK 1
+// enable Sessions https://sqlite.org/sessionintro.html
+
+#define SQLITE_ENABLE_NORMALIZE 1
+// enable all https://sqlite.org/c3ref/expanded_sql.html functions
+
+#define YYTRACKMAXSTACKDEPTH 1
+// enable SQLITE_STATUS_PARSER_STACK support
+
+#define SQLITE_ENABLE_COLUMN_METADATA 1
+//enable column_database_name, column_table_name and column_origin_name support
+
+#define SQLITE_ENABLE_STMT_SCANSTATUS 1
+// enable stmt_scanstatus and stmt_scanstatus_reset support
+
+#define SQLITE_ENABLE_SNAPSHOT 1
+// support the sqlite3_snapshot object
+
+#define SQLITE_ENABLE_UNLOCK_NOTIFY 1
+// enable sqlite3_unlock_notify
+
+/*
+** Disabled conditionals / extensions
+*/
+
+// #define SQLITE_ENABLE_ICU
+// disabled because induces a huge dependency - use WIN32NOCASE (which calls
+// ICU on POSIX) or even better the UNICODENOCASE as available in mORMot 2
+
+// #define SQLITE_ENABLE_STAT4
+// adds additional logic to the ANALYZE command and to the Query Planner
+
 
 /*
 ** Define function for extra initilization
@@ -230,6 +276,18 @@ static unsigned char* CodecGetPageBuffer(Codec* codec)
 #include "codecext.c"
 
 /*
+** REGEXP
+*/
+#ifdef SQLITE_ENABLE_REGEXP
+/* Prototype for initialization function of REGEXP extension */
+#ifdef _WIN32
+__declspec(dllexport)
+#endif
+int sqlite3_regexp_init(sqlite3 *db, char **pzErrMsg, const sqlite3_api_routines *pApi);
+#include "regexp.c"
+#endif 
+
+/*
 ** Multi cipher VFS
 */
 
@@ -259,6 +317,17 @@ sqlite3mc_initialize(const char* arg)
     }
     rc = sqlite3mc_vfs_initialize(vfsDefault, 1);
   }
+
+  /*
+  ** Can be overloaded later with any other REGEXP engine
+  */
+  #ifdef SQLITE_ENABLE_REGEXP
+    if (rc == SQLITE_OK)
+    {
+      rc = sqlite3_auto_extension((void(*)(void)) sqlite3_regexp_init);
+    }
+  #endif  
+  
   return rc;
 }
 

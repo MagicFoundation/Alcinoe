@@ -1,126 +1,116 @@
-(*************************************************************
-product:      ALMongoDBClient
-Description:  Delphi Client for MongoDB database.
-              A Delphi driver (with connection pool) to access a
-              mongoDB server. a connection pool is a cache of database
-              connections maintained so that the connections can be reused
-              when future requests to the database are required.
-              In connection pooling, after a connection is created,
-              it is placed in the pool and it is used over again so that a
-              new connection does not have to be established. If all the
-              connections are being used, a new connection is made and is
-              added to the pool. Connection pooling also cuts down on the
-              amount of time a user must wait to establish a connection
-              to the database.
+(*******************************************************************************
+Delphi Client for MongoDB database.
+A Delphi driver (with connection pool) to access a
+mongoDB server. a connection pool is a cache of database
+connections maintained so that the connections can be reused
+when future requests to the database are required.
+In connection pooling, after a connection is created,
+it is placed in the pool and it is used over again so that a
+new connection does not have to be established. If all the
+connections are being used, a new connection is made and is
+added to the pool. Connection pooling also cuts down on the
+amount of time a user must wait to establish a connection
+to the database.
 
 
-              ---------
-              Exemple :
+---------
+Exemple :
 
-              aJSONDoc := TALJSONDocument.create;
-              aMongoDBClient := TAlMongoDBClient.create;
-              try
-                aMongoDBClient.Connect('', 0);
-                aMongoDBClient.SelectData('test.exemple',
+aJSONDoc := TALJSONDocument.create;
+aMongoDBClient := TAlMongoDBClient.create;
+try
+  aMongoDBClient.Connect('', 0);
+  aMongoDBClient.SelectData('test.exemple',
+                            '{fieldA:123}', // the query
+                            '{fieldA:1, fieldB:1}', // the return fields selector
+                            aJSONDoc.node);
+  aMongoDBClient.disconnect;
+  for i := 0 to aJSONDoc.node.childnodes.count - 1 do
+    with aJSONDoc.node.childnodes[i] do
+      writeln(aJSONDoc.node.childnodes[i].nodename + '=' + aJSONDoc.node.childnodes[i].text)
+finally
+  aMongoDBClient.free;
+  aJSONDoc.free;
+end;
+
+
+------------------------------
+Exemple with connection pool :
+
+aMongoDBConnectionPoolClient := TAlMongoDBConnectionPoolClient.create(aDBHost, aDBPort);
+try
+
+  ::Thread1::
+  aMongoDBConnectionPoolClient.SelectData('test.exemple',
                                           '{fieldA:123}', // the query
                                           '{fieldA:1, fieldB:1}', // the return fields selector
-                                          aJSONDoc.node);
-                aMongoDBClient.disconnect;
-                for i := 0 to aJSONDoc.node.childnodes.count - 1 do
-                  with aJSONDoc.node.childnodes[i] do
-                    writeln(aJSONDoc.node.childnodes[i].nodename + '=' + aJSONDoc.node.childnodes[i].text)
-              finally
-                aMongoDBClient.free;
-                aJSONDoc.free;
-              end;
+                                          aLocalVarJSONDOC.node);
+
+  ::Thread2::
+  aMongoDBConnectionPoolClient.SelectData('test.exemple',
+                                          '{fieldA:999}', // the query
+                                          '{fieldA:1, fieldB:1}', // the return fields selector
+                                          aLocalVarJSONDOC.node);
+
+finally
+  aMongoDBClient.free;
+end;
 
 
-              ------------------------------
-              Exemple with connection pool :
+-------------------------
+Exemple tail monitoring :
 
-              aMongoDBConnectionPoolClient := TAlMongoDBConnectionPoolClient.create(aDBHost, aDBPort);
-              try
+aMongoDBTailMonitoringThread := TAlMongoDBTailMonitoringThread.Create(aDBHost,
+                                                                      aDBPort,
+                                                                      'test.cappedCollectionExemple'
+                                                                      '{}', // the query
+                                                                      '{fieldA:1, fieldB:1}', // the return fields selector
 
-                ::Thread1::
-                aMongoDBConnectionPoolClient.SelectData('test.exemple',
-                                                        '{fieldA:123}', // the query
-                                                        '{fieldA:1, fieldB:1}', // the return fields selector
-                                                        aLocalVarJSONDOC.node);
+                                                                      Procedure (Sender: TObject; JSONRowData: TALJSONNode)
+                                                                      begin
+                                                                        writeln('New item added in cappedCollectionExemple: ' + JSONRowData.childnodes['fieldA'].text);
+                                                                      end,
 
-                ::Thread2::
-                aMongoDBConnectionPoolClient.SelectData('test.exemple',
-                                                        '{fieldA:999}', // the query
-                                                        '{fieldA:1, fieldB:1}', // the return fields selector
-                                                        aLocalVarJSONDOC.node);
-
-              finally
-                aMongoDBClient.free;
-              end;
-
-
-              -------------------------
-              Exemple tail monitoring :
-
-              aMongoDBTailMonitoringThread := TAlMongoDBTailMonitoringThread.Create(aDBHost,
-                                                                                    aDBPort,
-                                                                                    'test.cappedCollectionExemple'
-                                                                                    '{}', // the query
-                                                                                    '{fieldA:1, fieldB:1}', // the return fields selector
-
-                                                                                    Procedure (Sender: TObject; JSONRowData: TALJSONNode)
-                                                                                    begin
-                                                                                      writeln('New item added in cappedCollectionExemple: ' + JSONRowData.childnodes['fieldA'].text);
-                                                                                    end,
-
-                                                                                    procedure (Sender: TObject; Error: Exception)
-                                                                                    begin
-                                                                                      writeln(Error.message);
-                                                                                    end);
-              ....
-              aMongoDBTailMonitoringThread.free;
-**************************************************************)
+                                                                      procedure (Sender: TObject; Error: Exception)
+                                                                      begin
+                                                                        writeln(Error.message);
+                                                                      end);
+....
+aMongoDBTailMonitoringThread.free;
+*******************************************************************************)
 
 unit ALMongoDBClient;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
+uses
+  winapi.WinSock2,
+  system.Contnrs,
+  system.Classes,
+  System.SyncObjs,
+  System.SysUtils,
+  ALCommon,
+  ALStringList,
+  ALJSONDoc;
 
-uses winapi.WinSock2,
-     system.Contnrs,
-     system.Classes,
-     System.SyncObjs,
-     System.SysUtils,
-     ALCommon,
-     ALStringList,
-     ALJSONDoc;
-
-const MONGO_OP_REPLY = 1; //Reply to a client request. responseTo is set
-      MONGO_OP_MSG = 1000; //generic msg command followed by a string
-      MONGO_OP_UPDATE = 2001; //update document
-      MONGO_OP_INSERT = 2002; //insert new document
-      MONGO_RESERVED = 2003; //formerly used for OP_GET_BY_OID
-      MONGO_OP_QUERY = 2004; //query a collection
-      MONGO_OP_GET_MORE = 2005; //Get more data from a query. See Cursors
-      MONGO_OP_DELETE = 2006; //Delete documents
-      MONGO_OP_KILL_CURSORS = 2007; //Tell database client is done with a cursor
+const
+  MONGO_OP_REPLY = 1; //Reply to a client request. responseTo is set
+  MONGO_OP_MSG = 1000; //generic msg command followed by a string
+  MONGO_OP_UPDATE = 2001; //update document
+  MONGO_OP_INSERT = 2002; //insert new document
+  MONGO_RESERVED = 2003; //formerly used for OP_GET_BY_OID
+  MONGO_OP_QUERY = 2004; //query a collection
+  MONGO_OP_GET_MORE = 2005; //Get more data from a query. See Cursors
+  MONGO_OP_DELETE = 2006; //Delete documents
+  MONGO_OP_KILL_CURSORS = 2007; //Tell database client is done with a cursor
 
 type
 
-    {--------------------------------------}
-    {$IF CompilerVersion >= 23} {Delphi XE2}
+    {----------------------------------------------------------------------------------------}
     TALMongoDBClientSelectDataOnNewRowFunct = reference to Procedure(JSONRowData: TALJSONNode;
                                                                      const ViewTag: AnsiString;
                                                                      ExtData: Pointer;
                                                                      Var Continue: Boolean);
-    {$ELSE}
-    TALMongoDBClientSelectDataOnNewRowFunct = Procedure(JSONRowData: TALJSONNode;
-                                                        const ViewTag: AnsiString;
-                                                        ExtData: Pointer;
-                                                        Var Continue: Boolean);
-    {$IFEND}
 
     {-------------------------------------------------------------------------------------}
     TALMongoDBClientRunCommandOnNewBatchRowFunct = TALMongoDBClientSelectDataOnNewRowFunct;
@@ -219,7 +209,7 @@ type
                           const aKeepAlive: Boolean;
                           const aTCPNoDelay: Boolean); virtual;
       Procedure DoDisconnect(var aSocketDescriptor: TSocket); virtual;
-      Function SocketWrite(aSocketDescriptor: TSocket; {$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer; Virtual;
+      Function SocketWrite(aSocketDescriptor: TSocket; const Buf; len: Integer): Integer; Virtual;
       Function SocketRead(aSocketDescriptor: TSocket; var buf; len: Integer): Integer; Virtual;
       Function SendCmd(aSocketDescriptor: TSocket;
                        const aCmd: AnsiString;
@@ -877,13 +867,9 @@ type
       property Port: integer read fPort;
     end;
 
-    {$IF CompilerVersion >= 23} {Delphi XE2}
+    {-------------------------------------------------------------------------------------------------------}
     TAlMongoDBTailMonitoringThreadEvent = reference to Procedure (Sender: TObject; JSONRowData: TALJSONNode);
     TAlMongoDBTailMonitoringThreadException = reference to procedure (Sender: TObject; Error: Exception);
-    {$ELSE}
-    TAlMongoDBTailMonitoringThreadEvent = Procedure (Sender: TObject; JSONRowData: TALJSONNode) of object;
-    TAlMongoDBTailMonitoringThreadException = procedure (Sender: TObject; Error: Exception) of object;
-    {$IFEND}
 
     {---------------------------------------------}
     TAlMongoDBTailMonitoringThread = class(TThread)
@@ -915,13 +901,14 @@ type
 
 implementation
 
-uses Winapi.Windows,
-     System.Diagnostics,
-     System.math,
-     ALCipher,
-     AlWinsock,
-     ALWindows,
-     ALString;
+uses
+  Winapi.Windows,
+  System.Diagnostics,
+  System.math,
+  ALCipher,
+  AlWinsock,
+  ALWindows,
+  ALString;
 
 {***************************************************************************************************************************************}
 constructor EAlMongoDBClientException.Create(const aMsg: AnsiString; const aErrorCode: integer; const aCloseConnection: Boolean = False);
@@ -975,20 +962,11 @@ procedure TAlBaseMongoDBClient.DoConnect(var aSocketDescriptor: TSocket;
     LSockAddr.sin_family:=AF_INET;
     LSockAddr.sin_port:=swap(Port);
     LSockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(Server));
-    {$IF CompilerVersion >= 23} {Delphi XE2}
     If LSockAddr.sin_addr.S_addr = INADDR_NONE then begin
-    {$ELSE}
-    If SockAddr.sin_addr.S_addr = integer(INADDR_NONE) then begin
-    {$IFEND}
       CheckOSError(not ALHostToIP(Server, LIP));
       LSockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(LIP));
     end;
-    {$IF CompilerVersion >= 23} {Delphi XE2}
     CheckOSError(Winapi.WinSock2.Connect(aSocketDescriptor,TSockAddr(LSockAddr),SizeOf(LSockAddr))=SOCKET_ERROR);
-    {$ELSE}
-    CheckError(WinSock.Connect(aSocketDescriptor,SockAddr,SizeOf(SockAddr))=SOCKET_ERROR);
-    {$IFEND}
-
   end;
 
 begin
@@ -2143,8 +2121,8 @@ begin
   // virtual
 end;
 
-{***************************************************************************************************************************************************}
-Function TAlBaseMongoDBClient.SocketWrite(aSocketDescriptor: TSocket; {$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer;
+{******************************************************************************************************}
+Function TAlBaseMongoDBClient.SocketWrite(aSocketDescriptor: TSocket; const Buf; len: Integer): Integer;
 begin
   Result := Send(aSocketDescriptor,Buf,len,0);
   CheckOSError(Result =  SOCKET_ERROR);

@@ -6,7 +6,7 @@ unit SynDBVCL;
 {
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit SynDBVCL;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -60,7 +60,7 @@ uses
   SynTable,
   SynDB,
   DB,
-  DBCommon,
+  {$ifndef FPC}DBCommon,{$endif}
   SynVirtualDataSet;
 
 type
@@ -80,7 +80,8 @@ type
     // - by default, ColumnDataSize would be computed from the supplied data,
     // unless you set IgnoreColumnDataSize=true to set the value to 0 (and
     // force e.g. SynDBVCL TSynBinaryDataSet.InternalInitFieldDefs define the
-    // field as ftDefaultMemo)
+    // field as ftDefaultMemo) or you define some FieldDefs.Items[].Size values
+    // for ftUTF8 column sizes before calling this From() method
     procedure From(const BinaryData: RawByteString;
       DataRowPosition: PCardinalDynArray=nil; IgnoreColumnDataSize: boolean=false); overload; virtual;
     /// initialize the virtual TDataSet from a SynDB TSQLDBStatement result set
@@ -89,7 +90,8 @@ type
     // - by default, ColumnDataSize would be computed from the supplied data,
     // unless you set IgnoreColumnDataSize=true to set the value to 0 (and
     // force e.g. SynDBVCL TSynBinaryDataSet.InternalInitFieldDefs define the
-    // field as ftDefaultMemo)
+    // field as ftDefaultMemo) or you define some FieldDefs.Items[].Size values
+    // for ftUTF8 column sizes before calling this From() method
     procedure From(Statement: TSQLDBStatement; MaxRowCount: cardinal=0;
       IgnoreColumnDataSize: boolean=false); overload; virtual;
     /// finalize the class instance
@@ -139,7 +141,8 @@ type
     // - by default, ColumnDataSize would be computed from the supplied data,
     // unless you set IgnoreColumnDataSize=true to set the value to 0 (and
     // force e.g. SynDBVCL TSynBinaryDataSet.InternalInitFieldDefs define the
-    // field as ftDefaultMemo)
+    // field as ftDefaultMemo) or you define some FieldDefs.Items[].Size values
+    // for ftUTF8 column sizes before calling this From() method
     procedure From(Statement: TSQLDBStatement; MaxRowCount: cardinal=0;
       IgnoreColumnDataSize: boolean=false); override;
     /// the associated connection properties
@@ -260,33 +263,49 @@ begin
 end;
 
 procedure TSynBinaryDataSet.InternalInitFieldDefs;
-var F: integer;
+var F,custom: integer;
     DBType: TFieldType;
+    ExistingName: TRawUTF8DynArray; // FieldDefs.Items[].Name
+    ExistingSize: TIntegerDynArray; // FieldDefs.Items[].Size
 begin
+  if FieldDefs.Count>0 then begin // custom column sizes
+    SetLength(ExistingName,FieldDefs.Count);
+    SetLength(ExistingSize,FieldDefs.Count);
+    for F := 0 to FieldDefs.Count-1 do
+      with FieldDefs.Items[F] do begin
+        ExistingName[F] := StringToUtf8(Name);
+        ExistingSize[F] := Size;
+      end;
+  end;
   FieldDefs.Clear;
   if fDataAccess=nil then
     exit;
   for F := 0 to fDataAccess.ColumnCount-1 do
     with fDataAccess.Columns[F] do begin
-    case ColumnType of
-    SynTable.ftInt64:
-      DBType := ftLargeint;
-    SynTable.ftDate:
-      DBType := ftDateTime;
-    SynTable.ftUTF8:
-      if ColumnDataSize=0 then
-        DBType := ftDefaultMemo else
-        DBType := ftWideString; // means UnicodeString for Delphi 2009+
-    SynTable.ftBlob:
-      DBType := ftBlob;
-    SynTable.ftDouble, SynTable.ftCurrency:
-      DBType := ftFloat;                  
-    else
-      raise EDatabaseError.CreateFmt(
-        'GetFieldData ColumnType=%s',[TSQLDBFieldTypeToString(ColumnType)]);
+      if ExistingName<>nil then begin
+        custom := FindRawUTF8(ExistingName,ColumnName);
+        if custom>=0 then // retrieve custom max column length from FieldDefs
+          ColumnDataSize := ExistingSize[custom];
+      end;
+      case ColumnType of
+      SynTable.ftInt64:
+        DBType := ftLargeint;
+      SynTable.ftDate:
+        DBType := ftDateTime;
+      SynTable.ftUTF8:
+        if ColumnDataSize=0 then
+          DBType := ftDefaultMemo else // no size
+          DBType := ftWideString; // means UnicodeString for Delphi 2009+
+      SynTable.ftBlob:
+        DBType := ftBlob;
+      SynTable.ftDouble, SynTable.ftCurrency:
+        DBType := ftFloat;                  
+      else
+        raise EDatabaseError.CreateFmt(
+          'GetFieldData ColumnType=%s',[TSQLDBFieldTypeToString(ColumnType)]);
+      end;
+      FieldDefs.Add(UTF8ToString(ColumnName),DBType,ColumnDataSize);
     end;
-    FieldDefs.Add(UTF8ToString(ColumnName),DBType,ColumnDataSize);
-  end;
 end;
 
 function TSynBinaryDataSet.GetRowFieldData(Field: TField;
@@ -390,7 +409,8 @@ end;
 
 function TSynDBSQLDataSet.PSGetTableName: string;
 begin
-  result := GetTableNameFromSQL(fCommandText);
+  // ToDo We miss GetTableNameFromSQL in FPC, Delphi function from DBCommon
+  result := {$ifdef FPC}''{$else}GetTableNameFromSQL(fCommandText){$endif};
 end;
 
 function TSynDBSQLDataSet.PSIsSQLBased: Boolean;

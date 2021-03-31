@@ -3,6 +3,7 @@ package com.alcinoe.installreferrer;
 import android.content.Context;
 import android.util.Log;
 import android.os.Handler;
+import android.os.Looper;
 import com.android.installreferrer.api.InstallReferrerClient;
 import com.android.installreferrer.api.InstallReferrerStateListener;
 import com.android.installreferrer.api.InstallReferrerClient.InstallReferrerResponse;
@@ -130,7 +131,7 @@ public class ALInstallReferrer {
 
             mRetries++;
 
-            final Handler handler = new Handler();
+            final Handler handler = new Handler(Looper.getMainLooper());
             handler.postDelayed(new Runnable() {
               @Override
               public void run() {

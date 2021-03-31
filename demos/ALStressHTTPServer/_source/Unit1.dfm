@@ -24,16 +24,21 @@ object Form1: TForm1
     TabOrder = 0
     Properties.ActivePage = TabSheet1
     Properties.CustomButtons.Buttons = <>
-    ClientRectBottom = 615
-    ClientRectRight = 1008
-    ClientRectTop = 24
+    ClientRectBottom = 610
+    ClientRectLeft = 5
+    ClientRectRight = 1003
+    ClientRectTop = 27
     object TabSheet1: TcxTabSheet
       Caption = 'Application'
       Color = 15066860
       ParentColor = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
-        1008
-        591)
+        998
+        583)
       object Label4: TcxLabel
         Left = 11
         Top = 8
@@ -76,13 +81,13 @@ object Form1: TForm1
         ParentFont = False
         TabOrder = 0
         Height = 124
-        Width = 1008
+        Width = 998
       end
       object GridThread: TcxGrid
         Left = 0
         Top = 226
-        Width = 1008
-        Height = 346
+        Width = 998
+        Height = 338
         Align = alBottom
         Anchors = [akLeft, akTop, akRight, akBottom]
         Font.Charset = ANSI_CHARSET
@@ -257,8 +262,8 @@ object Form1: TForm1
       end
       object StatusBar1: TStatusBar
         Left = 0
-        Top = 572
-        Width = 1008
+        Top = 564
+        Width = 998
         Height = 19
         Color = 15525605
         Font.Charset = DEFAULT_CHARSET
@@ -310,6 +315,7 @@ object Form1: TForm1
     object TabSheet2: TcxTabSheet
       Caption = 'Configuration'
       ImageIndex = 1
+      ExplicitLeft = 0
       ExplicitTop = 0
       ExplicitWidth = 0
       ExplicitHeight = 0

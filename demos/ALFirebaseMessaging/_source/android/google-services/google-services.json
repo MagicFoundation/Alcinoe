@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "596768615416",
+    "firebase_url": "https://ALFirebaseMessaging-97d45.firebaseio.com",
+    "project_id": "ALFirebaseMessaging-97d45",
+    "storage_bucket": "ALFirebaseMessaging-97d45.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:596768615416:android:478ee35511076a59",
+        "android_client_info": {
+          "package_name": "com.ALFirebaseMessaging.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "596768615416-k9s0bb7ca09jm101895e2g0t9oae1pu7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAT7ei3tt2sggSN-0kOf-xzFh9FoaH6yTY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

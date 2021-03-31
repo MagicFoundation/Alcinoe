@@ -37,15 +37,14 @@
     {$endif FPC_X64MM_WIN}
     {$ifdef Unix} // we may also be on Darwin / OSX
       {$ifdef Darwin}
-        iosxwstr, // optional WideString manager for Mac, but won't hurt
+        // iosxwstr, // optional WideString manager for Mac
       {$else}
-        cwstring, // optional WideString manager, but won't hurt
+        // cwstring, // optional WideString manager
       {$endif Darwin}
     {$else}
       {$ifopt D-} // at the moment, debug mode with cmem causes trouble
         //cmem, // default FPC's heap manager is very RAM hungry (one heap per thread)
       {$endif}
-    //FastMM4,  // need the latest version, e.g. from lib\kylix sub folder
     {$endif Unix}
   {$else}  // enable FastMM4 on older versions of Delphi
     {$IFDEF CONDITIONALEXPRESSIONS}

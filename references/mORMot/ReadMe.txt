@@ -2,7 +2,7 @@
   Synopse mORMot framework
 
 An Open Source Client-Server ORM/SOA framework
- (c) 2008-2020 Synopse Informatique
+ (c) 2008-2021 Synopse Informatique
   https://synopse.info
   http://mormot.net
 
@@ -13,6 +13,7 @@ Contributors
   AlexPirate
   Alfred Glaenzer (alf)
   Andre Heider (dhewg)
+  Antoine Simard (AntoineGS)
   Arnaud Bouchez
   ASiwon
   Aweste
@@ -52,6 +53,7 @@ Contributors
   Martin Eckes
   Martin Suer
   Mapes
+  Matkov
   Maxim Masiutin
   Mazinsw
   MChaos

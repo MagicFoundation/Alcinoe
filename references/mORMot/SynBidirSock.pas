@@ -6,7 +6,7 @@ unit SynBidirSock;
 {
     This file is part of the Synopse framework.
 
-    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,11 +25,12 @@ unit SynBidirSock;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
   - Alfred (alf)
+  - AntoineGS
   - f-vicente
   - nortg
 
@@ -1071,7 +1072,8 @@ type
     // once it has been upgraded to WebSockets
     constructor Create(const aPort: SockString; OnStart,OnStop: TNotifyThreadEvent;
       const ProcessName: SockString; ServerThreadPoolCount: integer=2;
-      KeepAliveTimeOut: integer=30000; HeadersNotFiltered: boolean=false); override;
+      KeepAliveTimeOut: integer=30000; HeadersNotFiltered: boolean=false;
+      CreateSuspended: boolean = false); override;
     /// close the server
     destructor Destroy; override;
     /// will send a given frame to all connected clients
@@ -1289,7 +1291,6 @@ implementation
 
 { -------------- high-level SynCrtSock classes depending on SynCommons }
 
-
 { THttpRequestCached }
 
 constructor THttpRequestCached.Create(const aURI: RawUTF8;
@@ -1341,6 +1342,11 @@ begin
     headin := headin+fTokenHeader;
   end;
   if fSocket<>nil then begin
+    if connectionClose in fSocket.HeaderFlags then begin
+      // server may close after a few requests (e.g. nginx keepalive_requests)
+      FreeAndNil(fSocket);
+      fSocket := THttpClientSocket.Open(fURI.Server,fURI.Port)
+    end;
     status := fSocket.Get(aAddress,fKeepAlive,headin);
     result := fSocket.Content;
   end else
@@ -3152,7 +3158,7 @@ end;
 
 constructor TWebSocketServer.Create(const aPort: SockString; OnStart,OnStop: TNotifyThreadEvent;
   const ProcessName: SockString; ServerThreadPoolCount, KeepAliveTimeOut: integer;
-  HeadersNotFiltered: boolean);
+  HeadersNotFiltered: boolean; CreateSuspended: boolean);
 begin
   // override with custom processing classes
   fSocketClass := TWebSocketServerSocket;
@@ -3165,7 +3171,7 @@ begin
   fCanNotifyCallback := true;
   // start the server
   inherited Create(aPort,OnStart,OnStop,ProcessName,ServerThreadPoolCount,
-    KeepAliveTimeOut,HeadersNotFiltered);
+    KeepAliveTimeOut,HeadersNotFiltered,CreateSuspended);
 end;
 
 function TWebSocketServer.WebSocketProcessUpgrade(ClientSock: THttpServerSocket;
@@ -3475,7 +3481,7 @@ var Ctxt: THttpServerRequest;
 begin
   if fProcess<>nil then begin
     if fProcess.fClientThread.fThreadState=sCreate then
-      sleep(10); // allow TWebSocketProcessClientThread.Execute warmup
+      sleep(10); // paranoid warmup of TWebSocketProcessClientThread.Execute
     if fProcess.fClientThread.fThreadState<>sRun then
       // WebSockets closed by server side
       result := STATUS_NOTIMPLEMENTED else begin
@@ -3604,11 +3610,16 @@ end;
 
 constructor TWebSocketProcessClient.Create(aSender: THttpClientWebSockets;
   aProtocol: TWebSocketProtocol; const aProcessName: RawUTF8);
+var endtix: Int64;
 begin
   fMaskSentFrames := FRAME_LEN_MASK; // https://tools.ietf.org/html/rfc6455#section-10.3
   inherited Create(aSender,aProtocol,0,nil,aSender.fSettings,aProcessName);
   // initialize the thread after everything is set (Execute may be instant)
   fClientThread := TWebSocketProcessClientThread.Create(self);
+  endtix := GetTickCount64+5000;
+  repeat // wait for TWebSocketProcess.ProcessLoop to initiate
+    SleepHiRes(0);
+  until fProcessEnded or (fState<>wpsCreate) or (GetTickCount64>endtix);
 end;
 
 destructor TWebSocketProcessClient.Destroy;
@@ -3641,20 +3652,19 @@ end;
 
 { TWebSocketProcessClientThread }
 
-constructor TWebSocketProcessClientThread.Create(
-  aProcess: TWebSocketProcessClient);
+constructor TWebSocketProcessClientThread.Create(aProcess: TWebSocketProcessClient);
 begin
   fProcess := aProcess;
   fProcess.fOwnerThread := self;
-  inherited Create(false);
+  inherited Create({suspended=}false);
 end;
 
 procedure TWebSocketProcessClientThread.Execute;
 begin
-  if fProcess<>nil then // may happen when debugging under FPC (alf)
-    SetCurrentThreadName('% % %',[fProcess.fProcessName,self,fProcess.Protocol.Name]);
-  fThreadState := sRun;
   try
+    fThreadState := sRun;
+    if fProcess<>nil then // may happen when debugging under FPC (alf)
+      SetCurrentThreadName('% % %',[fProcess.fProcessName,self,fProcess.Protocol.Name]);
     WebSocketLog.Add.Log(sllDebug,'Execute: before ProcessLoop %', [fProcess], self);
     if not Terminated and (fProcess<>nil) then
       fProcess.ProcessLoop;
@@ -3666,9 +3676,9 @@ begin
           OnWebSocketsClosed(self);
   except // ignore any exception in the thread
   end;
+  fThreadState := sFinished; // safely set final state
   if (fProcess<>nil) and (fProcess.fState=wpsClose) then
-    fThreadState := sClosed else
-    fThreadState := sFinished;
+    fThreadState := sClosed;
   WebSocketLog.Add.Log(sllDebug,'Execute: done (%)',[ToText(fThreadState)^],self);
 end;
 

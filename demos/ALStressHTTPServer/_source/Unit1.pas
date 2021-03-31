@@ -581,7 +581,7 @@ begin
           while P1 > 0 do begin
             inc(p1,5);
             P2 := AlPosEx('''',aLowerCaseBody, P1 + 1);
-            if P2 > P1 then atmpurl := ALUTF8HTMLDecode(AlCopyStr(aBody, P1+1, P2 - P1 - 1))
+            if P2 > P1 then atmpurl := ALHTMLDecode(AlCopyStr(aBody, P1+1, P2 - P1 - 1))
             else break;
             if (AlPos(aHostName, alLowerCase(atmpUrl))=1) then LstUrl.Add(atmpUrl);
             P1 := AlposEx('href=''http://',aLowerCaseBody, P2+ 1);
@@ -591,7 +591,7 @@ begin
           while P1 > 0 do begin
             inc(p1,5);
             P2 := AlPosEx('"',aLowerCaseBody, P1 + 1);
-            if P2 > P1 then atmpurl := ALUTF8HTMLDecode(AlCopyStr(aBody, P1+1, P2 - P1 - 1))
+            if P2 > P1 then atmpurl := ALHTMLDecode(AlCopyStr(aBody, P1+1, P2 - P1 - 1))
             else break;
             if (AlPos(aHostName, alLowerCase(atmpUrl))=1) then LstUrl.Add(atmpUrl);
             P1 := AlposEx('href="http://',aLowerCaseBody, P2+ 1);
@@ -601,7 +601,7 @@ begin
           while P1 > 0 do begin
             inc(p1,5);
             P2 := AlPosEx('''',aLowerCaseBody, P1 + 1);
-            if P2 > P1+2 then atmpurl := aHostName + ALUTF8HTMLDecode(AlCopyStr(aBody, P1+1, P2 - P1 - 1))
+            if P2 > P1+2 then atmpurl := aHostName + ALHTMLDecode(AlCopyStr(aBody, P1+1, P2 - P1 - 1))
             else break;
             if (AlPos(aHostName, alLowerCase(atmpUrl))=1) then LstUrl.Add(atmpUrl);
             P1 := AlposEx('href=''/',aLowerCaseBody, P2+ 1);
@@ -611,7 +611,7 @@ begin
           while P1 > 0 do begin
             inc(p1,5);
             P2 := AlPosEx('"',aLowerCaseBody, P1 + 1);
-            if P2 > P1+2 then atmpurl := aHostName + ALUTF8HTMLDecode(AlCopyStr(aBody, P1+1, P2 - P1 - 1))
+            if P2 > P1+2 then atmpurl := aHostName + ALHTMLDecode(AlCopyStr(aBody, P1+1, P2 - P1 - 1))
             else break;
             if (AlPos(aHostName, alLowerCase(atmpUrl))=1) then LstUrl.Add(atmpUrl);
             P1 := AlposEx('href="/',aLowerCaseBody, P2+ 1);

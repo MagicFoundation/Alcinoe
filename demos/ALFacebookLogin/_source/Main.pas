@@ -14,7 +14,7 @@ uses
   alStringList,
   alfmxCommon,
   alFaceBook,
-  alcommon;
+  alcommon, FMX.Memo.Types, ALFmxObjects;
 
 type
   TForm1 = class(TForm)
@@ -23,6 +23,7 @@ type
     ButtonLogoutFromFacebook: TButton;
     ButtonGetCurrentTokenInfos: TButton;
     ButtonGetCurrentUserInfos: TButton;
+    TextIntro: TALText;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ButtonFacebookLoginClick(Sender: TObject);

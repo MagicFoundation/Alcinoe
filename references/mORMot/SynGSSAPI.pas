@@ -6,7 +6,7 @@ unit SynGSSAPI;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit SynGSSAPI;
 
   The Initial Developer of the Original Code is pavelmash/ssoftpro.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -303,46 +303,46 @@ type
   // - used to hold information between calls to ServerSSPIAuth
   TSecContextDynArray = array of TSecContext;
 
-  /// Sets aSecHandle fields to empty state for a given connection ID
-  procedure InvalidateSecContext(var aSecContext: TSecContext; aConnectionID: Int64);
+/// Sets aSecHandle fields to empty state for a given connection ID
+procedure InvalidateSecContext(var aSecContext: TSecContext; aConnectionID: Int64);
 
-  /// Free aSecContext on client or server side
-  procedure FreeSecContext(var aSecContext: TSecContext);
+/// Free aSecContext on client or server side
+procedure FreeSecContext(var aSecContext: TSecContext);
 
-  /// Encrypts a message
-  // - aSecContext must be set e.g. from previous success call to ServerSSPIAuth
-  // or ClientSSPIAuth
-  // - aPlain contains data that must be encrypted
-  // - returns encrypted message
-  function SecEncrypt(var aSecContext: TSecContext; const aPlain: TGSSAPIBuffer): TGSSAPIBuffer;
+/// Encrypts a message
+// - aSecContext must be set e.g. from previous success call to ServerSSPIAuth
+// or ClientSSPIAuth
+// - aPlain contains data that must be encrypted
+// - returns encrypted message
+function SecEncrypt(var aSecContext: TSecContext; const aPlain: TGSSAPIBuffer): TGSSAPIBuffer;
 
-  /// Decrypts a message
-  // - aSecContext must be set e.g. from previous success call to ServerSSPIAuth
-  // or ClientSSPIAuth
-  // - aEncrypted contains data that must be decrypted
-  // - returns decrypted message
-  function SecDecrypt(var aSecContext: TSecContext; const aEncrypted: TGSSAPIBuffer): TGSSAPIBuffer;
+/// Decrypts a message
+// - aSecContext must be set e.g. from previous success call to ServerSSPIAuth
+// or ClientSSPIAuth
+// - aEncrypted contains data that must be decrypted
+// - returns decrypted message
+function SecDecrypt(var aSecContext: TSecContext; const aEncrypted: TGSSAPIBuffer): TGSSAPIBuffer;
 
-  /// Checks the return value of GSSAPI call and raises ESynGSSAPI exception
-  // when it indicates failure
-  procedure GSSCheck(AMajorStatus, AMinorStatus: Cardinal; const APrefix: String = '');
+/// Checks the return value of GSSAPI call and raises ESynGSSAPI exception
+// when it indicates failure
+procedure GSSCheck(AMajorStatus, AMinorStatus: Cardinal; const APrefix: String = '');
 
-  /// Lists supported security mechanisms in form
-  // sasl:name:description
-  // - not all mechanisms provide human readable name and description
-  procedure GSSEnlistMechsSupported(MechList: TStringList);
+/// Lists supported security mechanisms in form
+// sasl:name:description
+// - not all mechanisms provide human readable name and description
+procedure GSSEnlistMechsSupported(MechList: TStringList);
 
-  /// Dynamically load GSSAPI library
-  // - in multithreaded server application you must call LoadGSSAPI
-  //   at startup to avoid race condition (if you do not use mORMot.pas)
-  procedure LoadGSSAPI;
+/// Dynamically load GSSAPI library
+// - in multithreaded server application you must call LoadGSSAPI
+//   at startup to avoid race condition (if you do not use mORMot.pas)
+procedure LoadGSSAPI;
 
-  /// Call this function to check whether GSSAPI library loaded or not
-  function GSSAPILoaded: Boolean;
+/// Call this function to check whether GSSAPI library loaded or not
+function GSSAPILoaded: Boolean;
 
-  /// Call this function to check whether GSSAPI library loaded
-  // and raise exception if not.
-  procedure RequireGSSAPI;
+/// Call this function to check whether GSSAPI library loaded
+// and raise exception if not.
+procedure RequireGSSAPI;
 
 implementation
 
@@ -432,14 +432,16 @@ end;
 procedure RequireGSSAPI;
 begin
   if GSSAPILibrary=0 then
-    raise ENotSupportedException.Create('No GSSAPI library found - please install either MIT or Heimdal GSSAPI implementation');
+    raise ENotSupportedException.Create(
+      'No GSSAPI library found - please install ' +
+      'either MIT or Heimdal GSSAPI implementation');
 end;
 
 function gss_compare_oid(oid1, oid2: gss_OID): Boolean;
 begin
   if (oid1<>nil) and (oid2<>nil) then begin
-    Result := (oid1^.length = oid2^.length)
-      and CompareMem(oid1^.elements, oid2^.elements, oid1^.length);
+    Result := (oid1^.length = oid2^.length) and
+              CompareMem(oid1^.elements, oid2^.elements, oid1^.length);
   end
   else
     Result := False;

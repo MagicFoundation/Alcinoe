@@ -1,10 +1,10 @@
 {
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
-    Scripting support for mORMot Copyright (C) 2020 Pavel Mashlyakovsky
+    Scripting support for mORMot Copyright (C) 2021 Pavel Mashlyakovsky
       pavel.mash at gmail.com
 
   *** BEGIN LICENSE BLOCK *****

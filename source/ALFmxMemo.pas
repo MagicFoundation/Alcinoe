@@ -2,33 +2,32 @@ unit ALFmxMemo;
 
 interface
 
-{$IF defined(MACOS) and not defined(IOS)}
-  {$DEFINE _MACOS}
-{$ENDIF}
+{$I Alcinoe.inc}
 
-uses System.Types,
-     system.Classes,
-     System.UITypes,
-     {$IF defined(ANDROID)}
-     ALANdroidApi,
-     {$ELSEIF defined(IOS)}
-     System.TypInfo,
-     iOSapi.Foundation,
-     iOSapi.UIKit,
-     Macapi.ObjectiveC,
-     Macapi.ObjCRuntime,
-     ALIosNativeView,
-     ALIosScrollBox,
-     {$ELSE}
-     FMX.StdCtrls,
-     FMX.Memo.style,
-     FMX.Memo,
-     {$ENDIF}
-     FMX.types,
-     Fmx.Graphics,
-     Fmx.controls,
-     AlFMXEdit,
-     ALFmxObjects;
+uses
+  System.Types,
+  system.Classes,
+  System.UITypes,
+  {$IF defined(ANDROID)}
+  ALANdroidApi,
+  {$ELSEIF defined(IOS)}
+  System.TypInfo,
+  iOSapi.Foundation,
+  iOSapi.UIKit,
+  Macapi.ObjectiveC,
+  Macapi.ObjCRuntime,
+  ALIosNativeView,
+  ALIosScrollBox,
+  {$ELSE}
+  FMX.StdCtrls,
+  FMX.Memo.style,
+  FMX.Memo,
+  {$ENDIF}
+  FMX.types,
+  Fmx.Graphics,
+  Fmx.controls,
+  AlFMXEdit,
+  ALFmxObjects;
 
 {$REGION ' IOS'}
 {$IF defined(ios)}
@@ -174,7 +173,7 @@ type
 {$ENDREGION}
 
 {$REGION ' WINDOWS / MACOS'}
-{$IF defined(MSWINDOWS) or defined(_MACOS)}
+{$IF defined(MSWINDOWS) or defined(ALMacOS)}
 type
 
   {**************************}
@@ -354,25 +353,26 @@ procedure Register;
 
 implementation
 
-uses {$IF defined(ANDROID)}
-     {$ELSEIF defined(IOS)}
-     System.SysUtils,
-     Macapi.CoreFoundation,
-     iOSapi.CocoaTypes,
-     Macapi.Helpers,
-     iOSapi.CoreText,
-     FMX.Helpers.iOS,
-     ALString,
-     {$ELSE}
-     FMX.Styles.Objects,
-     FMX.BehaviorManager,
-     FMX.Layouts,
-     {$ENDIF}
-     system.Math,
-     system.Math.Vectors,
-     fmx.consts,
-     ALCommon,
-     AlFmxCommon;
+uses
+  {$IF defined(ANDROID)}
+  {$ELSEIF defined(IOS)}
+  System.SysUtils,
+  Macapi.CoreFoundation,
+  iOSapi.CocoaTypes,
+  Macapi.Helpers,
+  iOSapi.CoreText,
+  FMX.Helpers.iOS,
+  ALString,
+  {$ELSE}
+  FMX.Styles.Objects,
+  FMX.BehaviorManager,
+  FMX.Layouts,
+  {$ENDIF}
+  system.Math,
+  system.Math.Vectors,
+  fmx.consts,
+  ALCommon,
+  AlFmxCommon;
 
 {**}
 type
@@ -401,12 +401,12 @@ end;
 
 {*********************************}
 constructor TALIosTextView.Create;
-var aUIColor: UIColor;
+var LUIColor: UIColor;
 begin
   inherited;
   View.setExclusiveTouch(True);
-  aUIColor := AlphaColorToUIColor(TalphaColorRec.Null);
-  View.setbackgroundColor(aUIColor);
+  LUIColor := AlphaColorToUIColor(TalphaColorRec.Null);
+  View.setbackgroundColor(LUIColor);
   //NOTE: if i try to release the aUIColor i have an exception
   //      so it's seam something acquire it
 end;
@@ -484,17 +484,17 @@ end;
 
 {********************************************************************************}
 procedure TALIosTextViewDelegate.textViewDidChangeSelection(textView: UITextView);
-var aSelectedTextRange: NSRange;
+var LSelectedTextRange: NSRange;
 begin
   {$IF defined(DEBUG)}
   //ALLog('TALIosTextViewDelegate.textViewDidChangeSelection', '', TalLogType.VERBOSE);
   {$ENDIF}
   if FTextView.FMemoControl.fTextPromptVisible then begin
-    aSelectedTextRange := textView.selectedRange;
-    if (aSelectedTextRange.location <> 0) or (aSelectedTextRange.length <> 0) then begin // << else i have a infinite loop when i cut a big text
-      aSelectedTextRange.location := 0;
-      aSelectedTextRange.length := 0;
-      textView.setSelectedRange(aSelectedTextRange);
+    LSelectedTextRange := textView.selectedRange;
+    if (LSelectedTextRange.location <> 0) or (LSelectedTextRange.length <> 0) then begin // << else i have a infinite loop when i cut a big text
+      LSelectedTextRange.location := 0;
+      LSelectedTextRange.length := 0;
+      textView.setSelectedRange(LSelectedTextRange);
     end;
   end;
 end;
@@ -612,14 +612,14 @@ end;
 
 {****************************************}
 function TALIosMemo.getLineCount: integer;
-var aLineHeight: Single;
+var LLineHeight: Single;
 begin
-  aLineHeight := getLineHeight;
-  if compareValue(aLineHeight, 0, Tepsilon.Position) > 0 then result := round(FTextView.View.contentSize.height / aLineHeight)
+  LLineHeight := getLineHeight;
+  if compareValue(LLineHeight, 0, Tepsilon.Position) > 0 then result := round(FTextView.View.contentSize.height / LLineHeight)
   else result := 0;
   {$IF defined(DEBUG)}
   ALLog('TALIosMemo.getLineCount', 'ContentBounds.Height: ' + floattostr(FTextView.View.contentSize.height) +
-                                   ' - LineHeight: ' + floattostr(aLineHeight) +
+                                   ' - LineHeight: ' + floattostr(LLineHeight) +
                                    ' - LineCount: ' + inttostr(result) +
                                    ' - Width: ' + floattostr(Width) +
                                    ' - Height: ' + floattostr(Height), TalLogType.VERBOSE);
@@ -628,27 +628,27 @@ end;
 
 {**********************************************************************}
 procedure TALIosMemo.SetKeyboardType(const Value: TVirtualKeyboardType);
-var aUIKeyboardType: UIKeyboardType;
+var LUIKeyboardType: UIKeyboardType;
 begin
   case Value of
-    TVirtualKeyboardType.NumbersAndPunctuation: aUIKeyboardType := UIKeyboardTypeNumbersAndPunctuation;
-    TVirtualKeyboardType.NumberPad:             aUIKeyboardType := UIKeyboardTypeNumberPad;
-    TVirtualKeyboardType.PhonePad:              aUIKeyboardType := UIKeyboardTypePhonePad;
-    TVirtualKeyboardType.Alphabet:              aUIKeyboardType := UIKeyboardTypeDefault;
-    TVirtualKeyboardType.URL:                   aUIKeyboardType := UIKeyboardTypeURL;
-    TVirtualKeyboardType.NamePhonePad:          aUIKeyboardType := UIKeyboardTypeNamePhonePad;
-    TVirtualKeyboardType.EmailAddress:          aUIKeyboardType := UIKeyboardTypeEmailAddress;
-    else {TVirtualKeyboardType.Default}         aUIKeyboardType := UIKeyboardTypeDefault;
+    TVirtualKeyboardType.NumbersAndPunctuation: LUIKeyboardType := UIKeyboardTypeNumbersAndPunctuation;
+    TVirtualKeyboardType.NumberPad:             LUIKeyboardType := UIKeyboardTypeNumberPad;
+    TVirtualKeyboardType.PhonePad:              LUIKeyboardType := UIKeyboardTypePhonePad;
+    TVirtualKeyboardType.Alphabet:              LUIKeyboardType := UIKeyboardTypeDefault;
+    TVirtualKeyboardType.URL:                   LUIKeyboardType := UIKeyboardTypeURL;
+    TVirtualKeyboardType.NamePhonePad:          LUIKeyboardType := UIKeyboardTypeNamePhonePad;
+    TVirtualKeyboardType.EmailAddress:          LUIKeyboardType := UIKeyboardTypeEmailAddress;
+    else {TVirtualKeyboardType.Default}         LUIKeyboardType := UIKeyboardTypeDefault;
   end;
-  FTextView.View.setKeyboardType(aUIKeyboardType);
+  FTextView.View.setKeyboardType(LUIKeyboardType);
 end;
 
 {********************************************************}
 function TALIosMemo.GetKeyboardType: TVirtualKeyboardType;
-var aUIKeyboardType: UIKeyboardType;
+var LUIKeyboardType: UIKeyboardType;
 begin
-  aUIKeyboardType := FTextView.View.KeyboardType;
-  case aUIKeyboardType of
+  LUIKeyboardType := FTextView.View.KeyboardType;
+  case LUIKeyboardType of
     UIKeyboardTypeNumbersAndPunctuation: result := TVirtualKeyboardType.NumbersAndPunctuation;
     UIKeyboardTypeNumberPad:             result := TVirtualKeyboardType.NumberPad;
     UIKeyboardTypePhonePad:              result := TVirtualKeyboardType.PhonePad;
@@ -661,23 +661,23 @@ end;
 
 {*************************************************************************************}
 procedure TALIosMemo.setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
-var aUITextAutoCapitalizationType: UITextAutoCapitalizationType;
+var LUITextAutoCapitalizationType: UITextAutoCapitalizationType;
 begin
   case Value of
-    TALAutoCapitalizationType.acWords:          aUITextAutoCapitalizationType := UITextAutoCapitalizationTypeWords;
-    TALAutoCapitalizationType.acSentences:      aUITextAutoCapitalizationType := UITextAutoCapitalizationTypeSentences;
-    TALAutoCapitalizationType.acAllCharacters:  aUITextAutoCapitalizationType := UITextAutoCapitalizationTypeAllCharacters;
-    else {TALAutoCapitalizationType.acNone}     aUITextAutoCapitalizationType := UITextAutoCapitalizationTypeNone;
+    TALAutoCapitalizationType.acWords:          LUITextAutoCapitalizationType := UITextAutoCapitalizationTypeWords;
+    TALAutoCapitalizationType.acSentences:      LUITextAutoCapitalizationType := UITextAutoCapitalizationTypeSentences;
+    TALAutoCapitalizationType.acAllCharacters:  LUITextAutoCapitalizationType := UITextAutoCapitalizationTypeAllCharacters;
+    else {TALAutoCapitalizationType.acNone}     LUITextAutoCapitalizationType := UITextAutoCapitalizationTypeNone;
   end;
-  FTextView.View.setAutoCapitalizationType(aUITextAutoCapitalizationType);
+  FTextView.View.setAutoCapitalizationType(LUITextAutoCapitalizationType);
 end;
 
 {***********************************************************************}
 function TALIosMemo.GetAutoCapitalizationType: TALAutoCapitalizationType;
-var aUITextAutoCapitalizationType: UITextAutoCapitalizationType;
+var LUITextAutoCapitalizationType: UITextAutoCapitalizationType;
 begin
-  aUITextAutoCapitalizationType := FTextView.View.AutoCapitalizationType;
-  case aUITextAutoCapitalizationType of
+  LUITextAutoCapitalizationType := FTextView.View.AutoCapitalizationType;
+  case LUITextAutoCapitalizationType of
     UITextAutoCapitalizationTypeWords:         result := TALAutoCapitalizationType.acWords;
     UITextAutoCapitalizationTypeSentences:     result := TALAutoCapitalizationType.acSentences;
     UITextAutoCapitalizationTypeAllCharacters: result := TALAutoCapitalizationType.acAllCharacters;
@@ -718,25 +718,25 @@ end;
 
 {*****************************************************************}
 procedure TALIosMemo.setReturnKeyType(const Value: TReturnKeyType);
-var aUIReturnKeyType: UIReturnKeyType;
+var LUIReturnKeyType: UIReturnKeyType;
 begin
   case Value of
-    TReturnKeyType.Done:           aUIReturnKeyType := UIReturnKeyDone;
-    TReturnKeyType.Go:             aUIReturnKeyType := UIReturnKeyGo;
-    TReturnKeyType.Next:           aUIReturnKeyType := UIReturnKeyNext;
-    TReturnKeyType.Search:         aUIReturnKeyType := UIReturnKeySearch;
-    TReturnKeyType.Send:           aUIReturnKeyType := UIReturnKeySend;
-    else {TReturnKeyType.Default}  aUIReturnKeyType := UIReturnKeyDefault;
+    TReturnKeyType.Done:           LUIReturnKeyType := UIReturnKeyDone;
+    TReturnKeyType.Go:             LUIReturnKeyType := UIReturnKeyGo;
+    TReturnKeyType.Next:           LUIReturnKeyType := UIReturnKeyNext;
+    TReturnKeyType.Search:         LUIReturnKeyType := UIReturnKeySearch;
+    TReturnKeyType.Send:           LUIReturnKeyType := UIReturnKeySend;
+    else {TReturnKeyType.Default}  LUIReturnKeyType := UIReturnKeyDefault;
   end;
-  FTextView.View.setReturnKeyType(aUIReturnKeyType);
+  FTextView.View.setReturnKeyType(LUIReturnKeyType);
 end;
 
 {***************************************************}
 function TALIosMemo.GetReturnKeyType: TReturnKeyType;
-var aUIReturnKeyType: UIReturnKeyType;
+var LUIReturnKeyType: UIReturnKeyType;
 begin
-  aUIReturnKeyType := FTextView.View.ReturnKeyType;
-  case aUIReturnKeyType of
+  LUIReturnKeyType := FTextView.View.ReturnKeyType;
+  case LUIReturnKeyType of
     UIReturnKeyDone:    result := TReturnKeyType.Done;
     UIReturnKeyGo:      result := TReturnKeyType.Go;
     UIReturnKeyNext:    result := TReturnKeyType.Next;
@@ -861,13 +861,13 @@ end;
 
 {*********************************}
 procedure TALIosMemo.DoFontChanged;
-var aTextAttr: NSMutableAttributedString;
-    aTextRange: NSRange;
-    aUIColor: UIColor;
-    aFontRef: CTFontRef;
-    aParagraphStyle: NSMutableParagraphStyle;
-    aStr: NSString;
-    aNeedResetText: Boolean;
+var LTextAttr: NSMutableAttributedString;
+    LTextRange: NSRange;
+    LUIColor: UIColor;
+    LFontRef: CTFontRef;
+    LParagraphStyle: NSMutableParagraphStyle;
+    LStr: NSString;
+    LNeedResetText: Boolean;
 begin
 
   {$IF defined(DEBUG)}
@@ -876,60 +876,60 @@ begin
                                     ' - TextPromptColor: ' + inttostr(fTextPromptColor), TalLogType.VERBOSE);
   {$ENDIF}
 
-  if fTextPromptVisible then aStr := StrToNsStr(fTextPrompt)
-  else aStr := FTextView.View.text;
-  if aStr.length = 0 then begin
-    aStr := StrToNsStr(' ');
-    aNeedResetText := True;
+  if fTextPromptVisible then LStr := StrToNsStr(fTextPrompt)
+  else LStr := FTextView.View.text;
+  if LStr.length = 0 then begin
+    LStr := StrToNsStr(' ');
+    LNeedResetText := True;
   end
-  else aNeedResetText := False;
+  else LNeedResetText := False;
 
-  aTextAttr := TNSMutableAttributedString.Wrap(TNSMutableAttributedString.Alloc.initWithString(aStr));
+  LTextAttr := TNSMutableAttributedString.Wrap(TNSMutableAttributedString.Alloc.initWithString(LStr));
   try
 
-    aTextAttr.beginEditing;
+    LTextAttr.beginEditing;
     try
 
-      aTextRange := NSMakeRange(0, aStr.Length);
+      LTextRange := NSMakeRange(0, LStr.Length);
 
-      aFontRef := ALGetCTFontRef(fTextSettings.Font.Family, fTextSettings.Font.Size, fTextSettings.Font.Style);
-      if aFontRef <> nil then begin
+      LFontRef := ALGetCTFontRef(fTextSettings.Font.Family, fTextSettings.Font.Size, fTextSettings.Font.Style);
+      if LFontRef <> nil then begin
         try
-          aTextAttr.addAttribute(TNSString.Wrap(kCTFontAttributeName), aFontRef, aTextRange);
+          LTextAttr.addAttribute(TNSString.Wrap(kCTFontAttributeName), LFontRef, LTextRange);
         finally
-          CFRelease(aFontRef);
+          CFRelease(LFontRef);
         end;
       end;
 
       if fTextPromptVisible then begin
-        if (fTextPromptColor = TalphaColorRec.Null) then aUIColor := AlphaColorToUIColor(TalphaColorRec.Lightgray)
-        else aUIColor := AlphaColorToUIColor(fTextPromptColor);
+        if (fTextPromptColor = TalphaColorRec.Null) then LUIColor := AlphaColorToUIColor(TalphaColorRec.Lightgray)
+        else LUIColor := AlphaColorToUIColor(fTextPromptColor);
       end
-      else aUIColor := AlphaColorToUIColor(fTextSettings.FontColor);
-      aTextAttr.addAttribute(NSForegroundColorAttributeName, (aUIColor as ILocalObject).GetObjectID, aTextRange);
+      else LUIColor := AlphaColorToUIColor(fTextSettings.FontColor);
+      LTextAttr.addAttribute(NSForegroundColorAttributeName, (LUIColor as ILocalObject).GetObjectID, LTextRange);
       //NOTE: if i try to release the aUIColor i have an exception
       //      so it's seam something acquire it
 
-      aParagraphStyle := TNSMutableParagraphStyle.Alloc;
+      LParagraphStyle := TNSMutableParagraphStyle.Alloc;
       try
-        aParagraphStyle.init;
-        aParagraphStyle.setlineHeightMultiple(fLineSpacingMultiplier);
-        aParagraphStyle.setLineSpacing(fLineSpacingExtra);
-        aParagraphStyle.setAlignment(TextAlignToUITextAlignment(fTextSettings.HorzAlign));
-        aTextAttr.addAttribute(NSParagraphStyleAttributeName, (aParagraphStyle as ILocalObject).GetObjectID, aTextRange);
+        LParagraphStyle.init;
+        LParagraphStyle.setlineHeightMultiple(fLineSpacingMultiplier);
+        LParagraphStyle.setLineSpacing(fLineSpacingExtra);
+        LParagraphStyle.setAlignment(TextAlignToUITextAlignment(fTextSettings.HorzAlign));
+        LTextAttr.addAttribute(NSParagraphStyleAttributeName, (LParagraphStyle as ILocalObject).GetObjectID, LTextRange);
       finally
-        aParagraphStyle.release;
+        LParagraphStyle.release;
       end;
 
     finally
-      aTextAttr.endEditing;
+      LTextAttr.endEditing;
     end;
 
-    FTextView.View.setAttributedText(aTextAttr);
-    if aNeedResetText then FTextView.View.setText(StrToNSStr('')); // << the only way i found to force the setAttributedText else with empty String setAttributedText not work :(
+    FTextView.View.setAttributedText(LTextAttr);
+    if LNeedResetText then FTextView.View.setText(StrToNSStr('')); // << the only way i found to force the setAttributedText else with empty String setAttributedText not work :(
 
   finally
-    aTextAttr.release;
+    LTextAttr.release;
   end;
 
 end;
@@ -942,8 +942,8 @@ end;
 
 {****************************************************}
 procedure TALIosMemo.SetPadding(const Value: TBounds);
-var aUIEdgeInsets: UIEdgeInsets;
-    aPaddingLeft, aPaddingRight: Single;
+var LUIEdgeInsets: UIEdgeInsets;
+    LPaddingLeft, LPaddingRight: Single;
 begin
 
   //unfortunatly padding bottom is not very well
@@ -954,22 +954,22 @@ begin
 
   FPadding.Assign(Value);
 
-  aPaddingLeft := FPadding.left;
-  aPaddingRight := FPadding.right;
+  LPaddingLeft := FPadding.left;
+  LPaddingRight := FPadding.right;
   FPadding.left := 0;
   FPadding.right := 0;
   try
     margins := FPadding;
   finally
-    FPadding.left := aPaddingleft;
-    FPadding.right := aPaddingright;
+    FPadding.left := LPaddingLeft;
+    FPadding.right := LPaddingRight;
   end;
 
-  aUIEdgeInsets.top := 0;
-  aUIEdgeInsets.left := Value.left;
-  aUIEdgeInsets.bottom := 0;
-  aUIEdgeInsets.right := Value.right;
-  fTextView.View.setTextContainerInset(aUIEdgeInsets);
+  LUIEdgeInsets.top := 0;
+  LUIEdgeInsets.left := Value.left;
+  LUIEdgeInsets.bottom := 0;
+  LUIEdgeInsets.right := Value.right;
+  fTextView.View.setTextContainerInset(LUIEdgeInsets);
 
 end;
 
@@ -1000,14 +1000,14 @@ end;
 
 {**************************}
 procedure TALIosMemo.Resize;
-var aContentOffset: NSPoint;
+var LContentOffset: NSPoint;
 begin
   inherited;
   FTextView.size := Size.size;
   if compareValue(FTextView.View.contentSize.height, Size.size.cy, Tepsilon.Position) <= 0 then begin
-    aContentOffset.x := 0;
-    aContentOffset.y := 0;
-    FTextView.View.setContentOffset(aContentOffset, false{animated}); // << Scroll to top to avoid wrong contentOffset" artefact when line count changes
+    LContentOffset.x := 0;
+    LContentOffset.y := 0;
+    FTextView.View.setContentOffset(LContentOffset, false{animated}); // << Scroll to top to avoid wrong contentOffset" artefact when line count changes
   end;
 end;
 
@@ -1128,7 +1128,7 @@ end;
 {$ENDREGION}
 
 {$REGION ' WINDOWS / MACOS'}
-{$IF defined(MSWINDOWS) or defined(_MACOS)}
+{$IF defined(MSWINDOWS) or defined(ALMacOS)}
 
 {***************************************************}
 constructor TALStyledMemo.Create(AOwner: TComponent);
@@ -1193,7 +1193,7 @@ end;
 
 {**************************************************************}
 procedure TALStyledMemo.OnApplyStyleLookupImpl(sender: Tobject);
-Var aScrollBar: TScrollBar;
+Var LScrollBar: TScrollBar;
     I, j, k, l: integer;
 begin
 
@@ -1221,11 +1221,11 @@ begin
               end;
               for l := 0 to controls[i].Controls[j].Controls[k].controls.Count - 1 do begin
                 if (controls[i].Controls[j].Controls[k].Controls[l] is TScrollBar) then begin // << TScrollBar
-                  aScrollBar := controls[i].Controls[j].Controls[k].Controls[l] as TScrollBar;
-                  with aScrollBar do begin
+                  LScrollBar := controls[i].Controls[j].Controls[k].Controls[l] as TScrollBar;
+                  with LScrollBar do begin
                     if Align = TalignLayout.Right then begin
                       Align := TalignLayout.None;
-                      FVertScrollBar := aScrollBar;
+                      FVertScrollBar := LScrollBar;
                       SetPadding(FPadding);
                     end;
                   end;
@@ -1254,22 +1254,22 @@ end;
 
 {*****************************}
 procedure TALStyledMemo.Resize;
-var aText: String;
+var LText: String;
 begin
   inherited;
-  aText := Lines.Text;   // => need to do this bullsheet because sometime the lines are not corectly aligned and it's the
+  LText := Lines.Text;   // => need to do this bullsheet because sometime the lines are not corectly aligned and it's the
   Lines.Text := '';      // => only way i found to force this function to run: TStyledMemo.TLines.RenderLayouts;
-  Lines.Text := aText;   // => i m lazzy to open a bug report (and to make the bug demo program) for emb, i do not work for them after all ...
+  Lines.Text := LText;   // => i m lazzy to open a bug report (and to make the bug demo program) for emb, i do not work for them after all ...
   realignScrollBars;
 end;
 
 {*******************************************************}
 procedure TALStyledMemo.SetPadding(const Value: TBounds);
-var aRect: Trectf;
+var LRect: Trectf;
 begin
-  aRect := Value.Rect;
-  if fVertScrollBar <> nil then aRect.Right := aRect.Right + fVertScrollBar.Width;
-  margins.Rect := aRect;
+  LRect := Value.Rect;
+  if fVertScrollBar <> nil then LRect.Right := LRect.Right + fVertScrollBar.Width;
+  margins.Rect := LRect;
   FPadding.Assign(Value);
 end;
 
@@ -1282,18 +1282,18 @@ end;
 {**********************************************************************}
 // to correct this bug: https://quality.embarcadero.com/browse/RSP-19119
 procedure TALStyledMemo.KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState);
-var aTmpKey: Word;
-    aTmpKeyChar: System.WideChar;
+var LTmpKey: Word;
+    LTmpKeyChar: System.WideChar;
 begin
-  aTmpKey := Key;
+  LTmpKey := Key;
   inherited;
-  if aTmpKey = vkBack then begin
-    aTmpKeyChar := ' ';
-    aTmpKey := ord(aTmpKeyChar);
-    inherited KeyDown(aTmpKey, aTmpKeyChar, []);
-    aTmpKeyChar := #0;
-    aTmpKey := vkBack;
-    inherited KeyDown(aTmpKey, aTmpKeyChar, []);
+  if LTmpKey = vkBack then begin
+    LTmpKeyChar := ' ';
+    LTmpKey := ord(LTmpKeyChar);
+    inherited KeyDown(LTmpKey, LTmpKeyChar, []);
+    LTmpKeyChar := #0;
+    LTmpKey := vkBack;
+    inherited KeyDown(LTmpKey, LTmpKeyChar, []);
   end;
 end;
 
@@ -1337,13 +1337,13 @@ end;
 
 {*****************************************************}
 procedure TALStyledMemo.OnFontChanged(Sender: TObject);
-var aPreviousColor: TalphaColor;
+var LPreviousColor: TalphaColor;
 begin
   fTextPromptControl.TextSettings.BeginUpdate;
   try
-    aPreviousColor := fTextPromptControl.Color;
+    LPreviousColor := fTextPromptControl.Color;
     fTextPromptControl.TextSettings.Assign(FTextSettings);
-    fTextPromptControl.color := aPreviousColor;
+    fTextPromptControl.color := LPreviousColor;
   finally
     fTextPromptControl.TextSettings.EndUpdate;
   end;
@@ -1359,10 +1359,10 @@ end;
 
 {*******************************************}
 function TALStyledMemo.getLineCount: integer;
-var aLineHeight: Single;
+var LLineHeight: Single;
 begin
-  aLineHeight := getLineHeight;
-  if compareValue(aLineHeight, 0, Tepsilon.Position) > 0 then result := round(ContentBounds.Height / aLineHeight)
+  LLineHeight := getLineHeight;
+  if compareValue(LLineHeight, 0, Tepsilon.Position) > 0 then result := round(ContentBounds.Height / LLineHeight)
   else result := 0;
 end;
 
@@ -1420,7 +1420,7 @@ destructor TALMemo.Destroy;
 begin
   ALFreeAndNil(fPadding);
   ALFreeAndNil(FTextSettings);
-  ALFreeAndNil(fMemoControl, false{adelayed}, false{aRefCountWarn}); // << will call disposeOF under ARC so it's ok
+  ALFreeAndNil(fMemoControl);
   inherited;
 end;
 
@@ -1493,7 +1493,7 @@ begin
   if Value <> fDefStyleAttr then begin
     fDefStyleAttr := Value;
     {$IFDEF ANDROID}
-    ALFreeAndNil(FMemoControl, false{adelayed}, false{aRefCountWarn}); // << will call disposeOF under ARC so it's ok
+    ALFreeAndNil(FMemoControl);
     CreateMemoControl;
     {$ENDIF}
   end;
@@ -1798,19 +1798,19 @@ end;
 
 {***********************************************}
 procedure TALMemo.StrokeChanged(Sender: TObject);
-var aRect: TrectF;
+var LRect: TrectF;
 begin
   inherited StrokeChanged(Sender);
   if csLoading in componentState then exit;
   if FMemoControl = nil then CreateMemoControl;
   if Stroke.Kind = TbrushKind.None then FMemoControl.Margins.Rect := TrectF.Create(0,0,0,0)
   else begin
-    aRect := TrectF.Create(0,0,0,0);
-    if (TSide.Top in Sides) then aRect.Top := Stroke.Thickness;
-    if (TSide.bottom in Sides) then aRect.bottom := Stroke.Thickness;
-    if (TSide.right in Sides) then aRect.right := Stroke.Thickness;
-    if (TSide.left in Sides) then aRect.left := Stroke.Thickness;
-    FMemoControl.Margins.Rect := arect;
+    LRect := TrectF.Create(0,0,0,0);
+    if (TSide.Top in Sides) then LRect.Top := Stroke.Thickness;
+    if (TSide.bottom in Sides) then LRect.bottom := Stroke.Thickness;
+    if (TSide.right in Sides) then LRect.right := Stroke.Thickness;
+    if (TSide.left in Sides) then LRect.left := Stroke.Thickness;
+    FMemoControl.Margins.Rect := LRect;
   end;
 end;
 
@@ -1871,7 +1871,7 @@ end;
 Procedure TALMemo.setSelection(const aStart: integer; const aStop: Integer);
 begin
   if FMemoControl = nil then CreateMemoControl;
-  {$IF defined(MSWINDOWS) or defined(_MACOS)}
+  {$IF defined(MSWINDOWS) or defined(ALMacOS)}
   FMemoControl.SelStart := aStart;
   FMemoControl.SelLength := aStop - aStart;
   {$ELSEIF defined(android)}
@@ -1883,7 +1883,7 @@ end;
 Procedure TALMemo.setSelection(const aindex: integer);
 begin
   if FMemoControl = nil then CreateMemoControl;
-  {$IF defined(MSWINDOWS) or defined(_MACOS)}
+  {$IF defined(MSWINDOWS) or defined(ALMacOS)}
   FMemoControl.SelStart := aindex;
   {$ELSEIF defined(android)}
   FMemoControl.setSelection(aindex);

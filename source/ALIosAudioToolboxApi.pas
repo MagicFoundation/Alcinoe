@@ -2,7 +2,8 @@ unit ALIosAudioToolboxApi;
 
 interface
 
-uses Macapi.CoreFoundation;
+uses
+  Macapi.CoreFoundation;
 
 {$M+}
 

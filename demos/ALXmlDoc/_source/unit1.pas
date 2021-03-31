@@ -107,26 +107,24 @@ begin
   aStack := Tstack.Create;
   try
 
-      For i := 0 to aNode.ChildNodes.Count - 1 do
-        aStack.Push(pointer(ANode.ChildNodes[i]));
+    For i := 0 to aNode.ChildNodes.Count - 1 do
+      aStack.Push(pointer(ANode.ChildNodes[i]));
 
-      While astack.Count > 0 do begin
-        inc(result);
-        aNode := ixmlNode(astack.Pop);
-        If assigned(ANode.ChildNodes) then
-          For i := 0 to ANode.ChildNodes.Count - 1 do
-            aStack.Push(pointer(ANode.ChildNodes[i]));
+    While astack.Count > 0 do begin
+      inc(result);
+      aNode := ixmlNode(astack.Pop);
+      If assigned(ANode.ChildNodes) then
+        For i := 0 to ANode.ChildNodes.Count - 1 do
+          aStack.Push(pointer(ANode.ChildNodes[i]));
 
-        If assigned(ANode.AttributeNodes) then
-          For i := 0 to ANode.AttributeNodes.Count - 1 do
-            aStack.Push(pointer(ANode.AttributeNodes[i]));
-      end;
-
+      If assigned(ANode.AttributeNodes) then
+        For i := 0 to ANode.AttributeNodes.Count - 1 do
+          aStack.Push(pointer(ANode.AttributeNodes[i]));
+    end;
 
   finally
     aStack.Free;
   end;
-
 end;
 
 {********************************************************}
@@ -138,21 +136,20 @@ begin
   aStack := Tstack.Create;
   try
 
-      For i := 0 to aNode.ChildNodes.Count - 1 do
-        aStack.Push(pointer(ANode.ChildNodes[i]));
+    For i := 0 to aNode.ChildNodes.Count - 1 do
+      aStack.Push(pointer(ANode.ChildNodes[i]));
 
-      While astack.Count > 0 do begin
-        inc(result);
-        aNode := TalxmlNode(astack.Pop);
-        If assigned(ANode.ChildNodes) then
-          For i := 0 to ANode.ChildNodes.Count - 1 do
-            aStack.Push(pointer(ANode.ChildNodes[i]));
+    While astack.Count > 0 do begin
+      inc(result);
+      aNode := TalxmlNode(astack.Pop);
+      If assigned(ANode.ChildNodes) then
+        For i := 0 to ANode.ChildNodes.Count - 1 do
+          aStack.Push(pointer(ANode.ChildNodes[i]));
 
-        If assigned(ANode.AttributeNodes) then
-          For i := 0 to ANode.attributeNodes.Count - 1 do
-            aStack.Push(pointer(ANode.AttributeNodes[i]));
-      end;
-
+      If assigned(ANode.AttributeNodes) then
+        For i := 0 to ANode.attributeNodes.Count - 1 do
+          aStack.Push(pointer(ANode.AttributeNodes[i]));
+    end;
 
   finally
     aStack.Free;
@@ -195,7 +192,6 @@ begin
     end;
 
   end;
-
 end;
 
 {******************************************************************}

@@ -1,27 +1,32 @@
-{*************************************************************
-Description:  TALHttpClient is a ancestor of class like
-              TALWinInetHttpClient or TALWinHttpClient
+{*******************************************************************************
+TALHttpClient is a ancestor of class like TALWinInetHttpClient or
+TALWinHttpClient
 
-Link :        http://www.w3.org/TR/REC-html40/interact/forms.html#h-17.1
-              http://www.ietf.org/rfc/rfc1867.txt
-              http://www.ietf.org/rfc/rfc2388.txt
-              http://www.w3.org/MarkUp/html-spec/html-spec_8.html
-              http://www.cs.tut.fi/~jkorpela/forms/methods.html
-              http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
-              http://wp.netscape.com/newsref/std/cookie_spec.html
-**************************************************************}
+http://www.w3.org/TR/REC-html40/interact/forms.html#h-17.1
+http://www.ietf.org/rfc/rfc1867.txt
+http://www.ietf.org/rfc/rfc2388.txt
+http://www.w3.org/MarkUp/html-spec/html-spec_8.html
+http://www.cs.tut.fi/~jkorpela/forms/methods.html
+http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
+http://wp.netscape.com/newsref/std/cookie_spec.html
+*******************************************************************************}
 
 unit ALHttpClient;
 
 interface
 
-uses System.SysUtils,
-     System.Classes,
-     {$IFDEF MSWINDOWS}
-     Winapi.Wininet,
-     {$ENDIF}
-     ALStringList,
-     ALMultiPartParser;
+{$IF CompilerVersion > 34} // sydney
+  {$MESSAGE WARN 'Check if Web.HTTPApp was not updated and adjust the IFDEF'}
+{$IFEND}
+
+uses
+  System.SysUtils,
+  System.Classes,
+  {$IFDEF MSWINDOWS}
+  Winapi.Wininet,
+  {$ENDIF}
+  ALStringList,
+  ALMultiPartParser;
 
 type
 
@@ -113,6 +118,7 @@ type
     FPath: AnsiString;
     FDomain: AnsiString;
     FExpires: TDateTime;
+    FSameSite: AnsiString;
     FSecure: Boolean;
     FHttpOnly: Boolean;
   protected
@@ -123,9 +129,10 @@ type
     procedure AssignTo(Dest: TPersistent); override;
     property Name: AnsiString read FName write FName;
     property Value: AnsiString read FValue write FValue;
-    property Domain: AnsiString read FDomain write FDomain;
     property Path: AnsiString read FPath write FPath;
+    property Domain: AnsiString read FDomain write FDomain;
     property Expires: TDateTime read FExpires write FExpires;
+    property SameSite: AnsiString read FSameSite write FSameSite;
     property Secure: Boolean read FSecure write FSecure;
     property HttpOnly: Boolean read FHttpOnly write FHttpOnly;
     property HeaderValue: AnsiString read GetHeaderValue write SetHeaderValue;
@@ -144,6 +151,7 @@ type
                  const Path: AnsiString;
                  const Domain: AnsiString;
                  const Expires: int64; // unixDateTime format
+                 const SameSite: AnsiString;
                  const Secure: Boolean;
                  const HttpOnly: Boolean): TALHTTPCookie; overload;
     property Items[Index: Integer]: TALHTTPCookie read GetCookie write SetCookie; default;
@@ -487,10 +495,12 @@ type
   TALIPv6Binary = array[1..16] of AnsiChar;
 
 function ALZeroIpV6: TALIPv6Binary;
+Function ALIsValidIPv6BinaryStr(const aIPV6BinaryStr: ansiString): boolean;
 function ALTryIPV6StrToBinary(aIPv6Str: ansiString; var aIPv6Bin: TALIPv6Binary): Boolean;
 function ALIPV6StrTobinary(const aIPv6: AnsiString): TALIPv6Binary;
 function ALBinaryToIPv6Str(const aIPv6: TALIPv6Binary): ansiString;
 function ALBinaryStrToIPv6Binary(const aIPV6BinaryStr: ansiString): TALIPv6Binary;
+function ALBinaryStrToIPv6Str(const aIPV6BinaryStr: ansiString): ansiString;
 function ALIPv6EndOfRange(const aStartIPv6: TALIPv6Binary; aMaskLength: integer): TALIPv6Binary;
 procedure ALIPv6SplitParts(const aIPv6: TALIPv6Binary;
                            var aLowestPart: UInt64;
@@ -503,16 +513,17 @@ Const
 
 implementation
 
-uses {$IFDEF MSWINDOWS}
-     Winapi.Windows,
-     {$ENDIF}
-     Web.HttpApp,
-     System.DateUtils,
-     System.SysConst,
-     System.Math,
-     system.AnsiStrings,
-     AlCommon,
-     ALString;
+uses
+  {$IFDEF MSWINDOWS}
+  Winapi.Windows,
+  {$ENDIF}
+  Web.HttpApp,
+  System.DateUtils,
+  System.SysConst,
+  System.Math,
+  system.AnsiStrings,
+  AlCommon,
+  ALString;
 
 {***********************************************************************************}
 function AlStringFetch(var AInput: AnsiString; const ADelim: AnsiString): AnsiString;
@@ -539,6 +550,7 @@ begin
   FPath := '';
   FDomain := '';
   FExpires := ALNullDate;
+  FSameSite := '';
   FSecure := False;
   FHttpOnly := false;
 end;
@@ -550,9 +562,10 @@ begin
     with TALHTTPCookie(Dest) do begin
       Name := Self.FName;
       Value := Self.FValue;
-      Domain := Self.FDomain;
       Path := Self.FPath;
+      Domain := Self.FDomain;
       Expires := Self.FExpires;
+      SameSite := Self.FSameSite;
       Secure := Self.FSecure;
       HttpOnly := Self.FHttpOnly;
     end
@@ -571,6 +584,7 @@ begin
                                                  ALDefaultFormatSettings),
                                 [AlRfc822DayOfWeekNames[DayOfWeek(Expires)],
                                  ALRfc822MonthOfTheYearNames[MonthOf(Expires)]]);
+  if SameSite <> '' then Result := Result + ALFormat('SameSite=%s; ', [SameSite]);
   if Secure then Result := Result + 'secure; ';
   if HttpOnly then Result := Result + 'httponly';
   if ALCopyStr(Result, Length(Result) - 1, MaxInt) = '; ' then SetLength(Result, Length(Result) - 2);
@@ -582,8 +596,8 @@ end;
 // HSID=AYQEVn….DKrdst; Domain=.foo.com; Path=/; Expires=Wed, 13-Jan-2021 22:23:01 GMT; HttpOnly
 // SSID=Ap4P….GTEq; Domain=.foo.com; Path=/; Expires=Wed, 13-Jan-2021 22:23:01 GMT; Secure; HttpOnly
 procedure TALHTTPCookie.SetHeaderValue(Const aValue: AnsiString);
-Var aCookieProp: TALStringList;
-    aCookieStr: AnsiString;
+Var LCookieProp: TALStringList;
+    LCookieStr: AnsiString;
 begin
 
   FName:= '';
@@ -591,36 +605,39 @@ begin
   FPath:= '';
   FDomain:= '';
   FExpires:= ALNullDate;
+  FSameSite := '';
   FSecure:= False;
   FHttpOnly := False;
 
-  aCookieProp := TALStringList.Create;
+  LCookieProp := TALStringList.Create;
   try
 
-    aCookieStr := ALTrim(AValue);
-    while aCookieStr <> '' do
-      aCookieProp.Add(ALTrim(AlStringFetch(aCookieStr, ';')));
-    if aCookieProp.Count = 0 then exit;
+    LCookieStr := ALTrim(AValue);
+    while LCookieStr <> '' do
+      LCookieProp.Add(ALTrim(AlStringFetch(LCookieStr, ';')));
+    if LCookieProp.Count = 0 then exit;
 
     // Exemple of aCookieProp content :
     //   LSID=DQAAAK…Eaem_vYg
     //   Domain=docs.foo.com
     //   Path=/accounts
     //   Expires=Wed, 13-Jan-2021 22:23:01 GMT
+    //   SameSite=None
     //   Secure
     //   HttpOnly
 
-    FName := aCookieProp.Names[0];
-    FValue := aCookieProp.ValueFromIndex[0];
-    FPath := aCookieProp.values['PATH'];
+    FName := LCookieProp.Names[0];
+    FValue := LCookieProp.ValueFromIndex[0];
+    FPath := LCookieProp.values['PATH'];
     if FPath = '' then FPath := '/';
-    if not ALTryRfc822StrToGmtDateTime(aCookieProp.values['EXPIRES'], FExpires) then FExpires := ALNullDate;
-    FDomain := aCookieProp.values['DOMAIN'];
-    FSecure := aCookieProp.IndexOf('SECURE') <> -1;
-    FHttpOnly := aCookieProp.IndexOf('HTTPONLY') <> -1;
+    FDomain := LCookieProp.values['DOMAIN'];
+    if not ALTryRfc822StrToGmtDateTime(LCookieProp.values['EXPIRES'], FExpires) then FExpires := ALNullDate;
+    FSameSite := LCookieProp.values['SAMESITE'];
+    FSecure := LCookieProp.IndexOf('SECURE') <> -1;
+    FHttpOnly := LCookieProp.IndexOf('HTTPONLY') <> -1;
 
   finally
-    AlFreeAndNil(aCookieProp);
+    AlFreeAndNil(LCookieProp);
   end;
 
 end;
@@ -637,6 +654,7 @@ function TALHTTPCookieCollection.Add(const Name: AnsiString;
                                      const Path: AnsiString;
                                      const Domain: AnsiString;
                                      const Expires: int64; // unixDateTime format
+                                     const SameSite: AnsiString;
                                      const Secure: Boolean;
                                      const HttpOnly: boolean): TALHTTPCookie;
 begin
@@ -646,6 +664,7 @@ begin
   result.Path := Path;
   result.Domain := Domain;
   result.Expires := unixtoDateTime(Expires);
+  result.SameSite := SameSite;
   result.Secure := Secure;
   result.HttpOnly := HttpOnly;
 end;
@@ -727,27 +746,28 @@ end;
 
 {*********************************************************************************}
 procedure TALHTTPResponseHeader.SetRawHeaderText(Const aRawHeaderText: AnsiString);
-Var aRawHeaderLst: TALStringList;
-    j: integer;
-    AStatusLine: AnsiString;
+
+Var LRawHeaderLst: TALStringList;
+    J: integer;
+    LStatusLine: AnsiString;
 
   {-------------------------------------------------------------}
   Function internalGetValue(const aName: AnsiString): AnsiString;
-  Var i: Integer;
+  Var I: Integer;
   Begin
-    I := aRawHeaderLst.IndexOfName(aName);
+    I := LRawHeaderLst.IndexOfName(aName);
     If I >= 0 then Begin
-      result := ALTrim(aRawHeaderLst.ValueFromIndex[i]);
-      aRawHeaderLst.Delete(i);
+      result := ALTrim(LRawHeaderLst.ValueFromIndex[I]);
+      LRawHeaderLst.Delete(I);
     end
     else result := '';
   end;
 
 begin
-  aRawHeaderLst := TALStringList.create;
+  LRawHeaderLst := TALStringList.create;
   try
-    aRawHeaderLst.NameValueSeparator := ':';
-    aRawHeaderLst.Text := aRawHeaderText;
+    LRawHeaderLst.NameValueSeparator := ':';
+    LRawHeaderLst.Text := aRawHeaderText;
 
     FAcceptRanges := internalGetValue('Accept-Ranges');
     FAge:= internalGetValue('Age');
@@ -779,31 +799,31 @@ begin
     FWWWAuthenticate := internalGetValue('WWW-Authenticate');
 
     FCookies.clear;
-    J := aRawHeaderLst.IndexOfName('Set-Cookie');
+    J := LRawHeaderLst.IndexOfName('Set-Cookie');
     While J >= 0 do begin
-      If ALTrim(aRawHeaderLst.ValueFromIndex[j]) <> '' then
-        Cookies.Add.HeaderValue := ALTrim(aRawHeaderLst.ValueFromIndex[j]);
-      aRawHeaderLst.Delete(j);
-      J := aRawHeaderLst.IndexOfName('Set-Cookie');
+      If ALTrim(LRawHeaderLst.ValueFromIndex[J]) <> '' then
+        Cookies.Add.HeaderValue := ALTrim(LRawHeaderLst.ValueFromIndex[J]);
+      LRawHeaderLst.Delete(J);
+      J := LRawHeaderLst.IndexOfName('Set-Cookie');
     end;
 
-    If aRawHeaderLst.Count > 0 then begin
-      AStatusLine := aRawHeaderLst[0]; //HTTP/1.1 200 OK | 200 OK | status: 200 OK
-      FHttpProtocolVersion := ALTrim(AlStringFetch(AstatusLine,' '));
+    If LRawHeaderLst.Count > 0 then begin
+      LStatusLine := LRawHeaderLst[0]; //HTTP/1.1 200 OK | 200 OK | status: 200 OK
+      FHttpProtocolVersion := ALTrim(AlStringFetch(LStatusLine,' '));
       If AlIsInteger(FHttpProtocolVersion) then begin
         FStatusCode := FHttpProtocolVersion;
         FHttpProtocolVersion := '';
       end
-      else FStatusCode := ALTrim(AlStringFetch(AstatusLine,' '));
-      FReasonPhrase := ALTrim(AstatusLine);
+      else FStatusCode := ALTrim(AlStringFetch(LStatusLine,' '));
+      FReasonPhrase := ALTrim(LStatusLine);
 
       If not AlIsInteger(FStatusCode) then begin
         FHttpProtocolVersion := '';
-        AStatusLine := internalGetValue('Status');
-        FStatusCode := ALTrim(AlStringFetch(AStatusLine,' '));
-        FReasonPhrase := ALTrim(AlStringFetch(AStatusLine,' '));
+        LStatusLine := internalGetValue('Status');
+        FStatusCode := ALTrim(AlStringFetch(LStatusLine,' '));
+        FReasonPhrase := ALTrim(AlStringFetch(LStatusLine,' '));
       end
-      else aRawHeaderLst.Delete(0);
+      else LRawHeaderLst.Delete(0);
     end
     else begin
       FStatusCode := '';
@@ -812,13 +832,13 @@ begin
     end;
 
     FCustomHeaders.clear;
-    For j := 0 to aRawHeaderLst.count - 1 do
-      If ALTrim(aRawHeaderLst[j]) <> '' then
-        FCustomHeaders.Add(aRawHeaderLst[j]);
+    For J := 0 to LRawHeaderLst.count - 1 do
+      If ALTrim(LRawHeaderLst[J]) <> '' then
+        FCustomHeaders.Add(LRawHeaderLst[J]);
 
     FRawHeaderText := aRawHeaderText;
   finally
-    AlFreeAndNil(aRawHeaderLst);
+    AlFreeAndNil(LRawHeaderLst);
   end;
 end;
 
@@ -941,21 +961,21 @@ end;
 
 {*********************************************************}
 Function TALHTTPRequestHeader.GetRawHeaderText: AnsiString;
-Var aName: ansiString;
-    aValue: ansiString;
-    i : integer;
+Var LName: ansiString;
+    LValue: ansiString;
+    I : integer;
 begin
   result := '';
-  For i := 0 to FHeaders.count - 1 do begin
-    aName := ALTrim(FHeaders.names[i]);
-    aValue := alTrim(FHeaders.ValueFromIndex[i]);
-    If (aName <> '') and (aValue <> '') then
-      result := result + aName + ': ' + aValue + #13#10;
+  For I := 0 to FHeaders.count - 1 do begin
+    LName := ALTrim(FHeaders.names[I]);
+    LValue := alTrim(FHeaders.ValueFromIndex[I]);
+    If (LName <> '') and (LValue <> '') then
+      result := result + LName + ': ' + LValue + #13#10;
   end;
   If FCookies.Count > 0 then begin
-    aValue := AlStringReplace(ALTrim(FCookies.text), #13#10, '; ', [rfReplaceAll]);
-    if aValue <> '' then
-      result := result + 'Cookie: ' + aValue + #13#10;
+    LValue := AlStringReplace(ALTrim(FCookies.text), #13#10, '; ', [rfReplaceAll]);
+    if LValue <> '' then
+      result := result + 'Cookie: ' + LValue + #13#10;
   end;
 end;
 
@@ -973,23 +993,23 @@ end;
 
 {********************************************************************************}
 procedure TALHTTPRequestHeader.SetRawHeaderText(const aRawHeaderText: AnsiString);
-Var aTmpHeaders: TALStringList;
-    i: integer;
+Var LTmpHeaders: TALStringList;
+    I: integer;
 begin
-  aTmpHeaders := TALStringList.create;
+  LTmpHeaders := TALStringList.create;
   try
 
-    aTmpHeaders.NameValueSeparator := ':';
-    aTmpHeaders.Text := aRawHeaderText;
+    LTmpHeaders.NameValueSeparator := ':';
+    LTmpHeaders.Text := aRawHeaderText;
 
     FHeaders.clear;
     FCookies.clear;
-    For i := 0 to aTmpHeaders.count - 1 do
-      setHeaderValue(ALTrim(aTmpHeaders.Names[i]),
-                     alTrim(aTmpHeaders.ValueFromIndex[i]));
+    For I := 0 to LTmpHeaders.count - 1 do
+      setHeaderValue(ALTrim(LTmpHeaders.Names[I]),
+                     alTrim(LTmpHeaders.ValueFromIndex[I]));
 
   finally
-    AlFreeAndNil(aTmpHeaders);
+    AlFreeAndNil(LTmpHeaders);
   end;
 end;
 
@@ -1002,14 +1022,14 @@ end;
 
 {*******************************************************************}
 procedure ALHTTPEncodeParamNameValues(const ParamValues: TALStrings);
-var i: Integer;
+var I: Integer;
     LPos: integer;
     LStr: AnsiString;
 begin
-  for i := 0 to ParamValues.Count - 1 do begin
-    LStr := ParamValues[i];
+  for I := 0 to ParamValues.Count - 1 do begin
+    LStr := ParamValues[I];
     LPos := AlPos(ParamValues.NameValueSeparator, LStr);
-    if LPos > 0 then ParamValues[i] := ALHTTPEncode(AlCopyStr(LStr, 1, LPos-1)) + '=' + ALHTTPEncode(AlCopyStr(LStr, LPos+1, MAXINT));
+    if LPos > 0 then ParamValues[I] := ALHTTPEncode(AlCopyStr(LStr, 1, LPos-1)) + '=' + ALHTTPEncode(AlCopyStr(LStr, LPos+1, MAXINT));
   end;
 end;
 
@@ -1058,7 +1078,7 @@ Var SchemeName,
     Password,
     UrlPath,
     ExtraInfo: AnsiString;
-var PortNumber: integer;
+    PortNumber: integer;
 begin
   if AlInternetCrackUrl(aUrl,
                         SchemeName,
@@ -1100,10 +1120,10 @@ end;
 
 {**********************************************************************}
 Function AlExtractDomainNameFromUrl(const aUrl: AnsiString): AnsiString;
-var aIPv4Num: Cardinal;
+var LIPv4Num: Cardinal;
 begin
   Result := AlExtractHostNameFromUrl(aUrl);
-  if not ALTryIPV4StrToNumeric(Result, aIPv4Num) then begin
+  if not ALTryIPV4StrToNumeric(Result, LIPv4Num) then begin
     while length(AlStringReplace(Result,
                                  '.',
                                  '',
@@ -1223,7 +1243,7 @@ Function AlInternetCrackUrl(const aUrl: AnsiString;
                                 Anchor: AnsiString; // not the anchor is never send to the server ! it's only used on client side
                             const Query: TALStrings;
                             var PortNumber: integer): Boolean;
-var aExtraInfo: AnsiString;
+var LExtraInfo: AnsiString;
     P1: integer;
 begin
   Result := AlInternetCrackUrl(aUrl,
@@ -1232,19 +1252,19 @@ begin
                                UserName,
                                Password,
                                UrlPath,
-                               aExtraInfo,
+                               LExtraInfo,
                                PortNumber);
   if result then begin
-    P1 := AlPos('#',aExtraInfo);
+    P1 := AlPos('#',LExtraInfo);
     if P1 > 0 then begin
-      Anchor := AlCopyStr(aExtraInfo, P1+1, MaxInt);
-      delete(aExtraInfo, P1, Maxint);
+      Anchor := AlCopyStr(LExtraInfo, P1+1, MaxInt);
+      delete(LExtraInfo, P1, Maxint);
     end
     else Anchor := '';
-    if (aExtraInfo <> '') and (aExtraInfo[1] = '?') then begin
-      if AlPos('&amp;', aExtraInfo) > 0 then Query.LineBreak := '&amp;'
+    if (LExtraInfo <> '') and (LExtraInfo[1] = '?') then begin
+      if AlPos('&amp;', LExtraInfo) > 0 then Query.LineBreak := '&amp;'
       else Query.LineBreak := '&';
-      Query.text := AlCopyStr(aExtraInfo,2,Maxint);
+      Query.text := AlCopyStr(LExtraInfo,2,Maxint);
     end
     else Query.clear;
   end
@@ -1320,9 +1340,9 @@ end;
 
 {*****************************************************************}
 Function AlRemoveAnchorFromUrl(const aUrl: AnsiString): AnsiString;
-var aAnchor: AnsiString;
+var LAnchor: AnsiString;
 begin
-  result := AlRemoveAnchorFromUrl(aUrl,aAnchor);
+  result := AlRemoveAnchorFromUrl(aUrl,LAnchor);
 end;
 
 {****************}
@@ -1357,15 +1377,15 @@ Function  AlCombineUrl(const RelativeUrl,
                              Anchor: AnsiString;
                        const Query: TALStrings): AnsiString;
 Var S1 : AnsiString;
-    aBool: Boolean;
+    LBool: Boolean;
 begin
   if Query.Count > 0 then begin
 
     if Query.LineBreak = #13#10 then begin
-      aBool := True;
+      LBool := True;
       Query.LineBreak := '&';
     end
-    else aBool := False;
+    else LBool := False;
 
     try
 
@@ -1379,7 +1399,7 @@ begin
       if S1 <> '' then S1 := '?' + S1;
 
     finally
-      if aBool then Query.LineBreak := #13#10;
+      if LBool then Query.LineBreak := #13#10;
     end;
 
   end
@@ -1394,18 +1414,18 @@ end;
 {*********************************************************************}
 {aValue is a GMT TDateTime - result is "Sun, 06 Nov 1994 08:49:37 GMT"}
 function  ALGMTDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
-var aDay, aMonth, aYear: Word;
+var LDay, LMonth, LYear: Word;
 begin
   DecodeDate(aValue,
-             aYear,
-             aMonth,
-             aDay);
+             LYear,
+             LMonth,
+             LDay);
 
   Result := ALFormat('%s, %.2d %s %.4d %s %s',
                      [AlRfc822DayOfWeekNames[DayOfWeek(aValue)],
-                      aDay,
-                      ALRfc822MonthOfTheYearNames[aMonth],
-                      aYear,
+                      LDay,
+                      ALRfc822MonthOfTheYearNames[LMonth],
+                      LYear,
                       ALFormatDateTime('hh":"nn":"ss', aValue, ALDefaultFormatSettings),
                       'GMT']);
 end;
@@ -1458,104 +1478,104 @@ Function  ALTryRfc822StrToGMTDateTime(const S: AnsiString; out Value: TDateTime)
   end;
 
 Var P1,P2: Integer;
-    ADateStr : AnsiString;
-    aLst: TALStringList;
-    aMonthLabel: AnsiString;
-    aFormatSettings: TALformatSettings;
-    aTimeZoneStr: AnsiString;
-    aTimeZoneDelta: TDateTime;
+    LDateStr : AnsiString;
+    LLst: TALStringList;
+    LMonthLabel: AnsiString;
+    LFormatSettings: TALformatSettings;
+    LTimeZoneStr: AnsiString;
+    LTimeZoneDelta: TDateTime;
 
 Begin
 
-  ADateStr := S; // Wdy, DD-Mon-YYYY HH:MM:SS GMT
+  LDateStr := S; // Wdy, DD-Mon-YYYY HH:MM:SS GMT
                  // Wdy, DD-Mon-YYYY HH:MM:SS +0200
                  // 23 Aug 2004 06:48:46 -0700
-  P1 := AlPos(',',ADateStr);
-  If P1 > 0 then delete(ADateStr,1,P1); // DD-Mon-YYYY HH:MM:SS GMT
+  P1 := AlPos(',',LDateStr);
+  If P1 > 0 then delete(LDateStr,1,P1); // DD-Mon-YYYY HH:MM:SS GMT
                                         // DD-Mon-YYYY HH:MM:SS +0200
                                         // 23 Aug 2004 06:48:46 -0700
-  ADateStr := ALTrim(ADateStr); // DD-Mon-YYYY HH:MM:SS GMT
+  LDateStr := ALTrim(LDateStr); // DD-Mon-YYYY HH:MM:SS GMT
                                 // DD-Mon-YYYY HH:MM:SS +0200
                                 // 23 Aug 2004 06:48:46 -0700
 
-  P1 := AlPos(':',ADateStr);
-  P2 := AlPos('-',ADateStr);
+  P1 := AlPos(':',LDateStr);
+  P2 := AlPos('-',LDateStr);
   While (P2 > 0) and (P2 < P1) do begin
-    aDateStr[P2] := ' ';
-    P2 := AlPosEx('-',ADateStr,P2);
+    LDateStr[P2] := ' ';
+    P2 := AlPosEx('-',LDateStr,P2);
   end; // DD Mon YYYY HH:MM:SS GMT
        // DD Mon YYYY HH:MM:SS +0200
        // 23 Aug 2004 06:48:46 -0700
-  While Alpos('  ',ADateStr) > 0 do ADateStr := AlStringReplace(ADateStr,'  ',' ',[RfReplaceAll]); // DD Mon YYYY HH:MM:SS GMT
+  While Alpos('  ',LDateStr) > 0 do LDateStr := AlStringReplace(LDateStr,'  ',' ',[RfReplaceAll]); // DD Mon YYYY HH:MM:SS GMT
                                                                                                    // DD Mon YYYY HH:MM:SS +0200
                                                                                                    // 23 Aug 2004 06:48:46 -0700
 
-  Alst := TALStringList.create;
+  LLst := TALStringList.create;
   Try
 
-    Alst.Text :=  AlStringReplace(ADateStr,' ',#13#10,[RfReplaceall]);
-    If Alst.Count < 5 then begin
+    LLst.Text :=  AlStringReplace(LDateStr,' ',#13#10,[RfReplaceall]);
+    If LLst.Count < 5 then begin
       Result := False;
       Exit;
     end;
 
-    aMonthLabel := ALTrim(Alst[1]); // Mon
+    LMonthLabel := ALTrim(LLst[1]); // Mon
                                     // Mon
                                     // Aug
     P1 := 1;
-    While (p1 <= 12) and (not ALSameText(ALRfc822MonthOfTheYearNames[P1],aMonthLabel)) do inc(P1);
+    While (p1 <= 12) and (not ALSameText(ALRfc822MonthOfTheYearNames[P1],LMonthLabel)) do inc(P1);
     If P1 > 12 then begin
       Result := False;
       Exit;
     end;
 
-    aFormatSettings := ALDefaultFormatSettings;
-    aFormatSettings.DateSeparator := '/';
-    aFormatSettings.TimeSeparator := ':';
-    aFormatSettings.ShortDateFormat := 'dd/mm/yyyy';
-    aFormatSettings.ShortTimeFormat := 'hh:nn:zz';
+    LFormatSettings := ALDefaultFormatSettings;
+    LFormatSettings.DateSeparator := '/';
+    LFormatSettings.TimeSeparator := ':';
+    LFormatSettings.ShortDateFormat := 'dd/mm/yyyy';
+    LFormatSettings.ShortTimeFormat := 'hh:nn:zz';
 
-    aTimeZoneStr := ALTrim(Alst[4]); // GMT
+    LTimeZoneStr := ALTrim(LLst[4]); // GMT
                                      // +0200
                                      // -0700
-    aTimeZoneStr := AlStringReplace(aTimeZoneStr,'(','',[]);
-    aTimeZoneStr := AlStringReplace(aTimeZoneStr,')','',[]);
-    aTimeZoneStr := ALTrim(aTimeZoneStr);
-    If aTimeZoneStr = '' then Begin
+    LTimeZoneStr := AlStringReplace(LTimeZoneStr,'(','',[]);
+    LTimeZoneStr := AlStringReplace(LTimeZoneStr,')','',[]);
+    LTimeZoneStr := ALTrim(LTimeZoneStr);
+    If LTimeZoneStr = '' then Begin
       Result := False;
       Exit;
     end
-    else If (Length(aTimeZoneStr) >= 5) and
-            (aTimeZoneStr[1] in ['+','-']) and
-            (aTimeZoneStr[2] in ['0'..'9']) and
-            (aTimeZoneStr[3] in ['0'..'9']) and
-            (aTimeZoneStr[4] in ['0'..'9']) and
-            (aTimeZoneStr[5] in ['0'..'9']) then begin
-      aTimeZoneDelta := ALStrToDateTime(AlCopyStr(aTimeZoneStr,2,2) + ':' + AlCopyStr(aTimeZoneStr,4,2) + ':00', aFormatSettings);
-      if aTimeZoneStr[1] = '+' then aTimeZoneDelta := -1*aTimeZoneDelta;
+    else If (Length(LTimeZoneStr) >= 5) and
+            (LTimeZoneStr[1] in ['+','-']) and
+            (LTimeZoneStr[2] in ['0'..'9']) and
+            (LTimeZoneStr[3] in ['0'..'9']) and
+            (LTimeZoneStr[4] in ['0'..'9']) and
+            (LTimeZoneStr[5] in ['0'..'9']) then begin
+      LTimeZoneDelta := ALStrToDateTime(AlCopyStr(LTimeZoneStr,2,2) + ':' + AlCopyStr(LTimeZoneStr,4,2) + ':00', LFormatSettings);
+      if LTimeZoneStr[1] = '+' then LTimeZoneDelta := -1*LTimeZoneDelta;
     end
-    else If ALSameText(aTimeZoneStr,'GMT') then  aTimeZoneDelta := 0
-    else If ALSameText(aTimeZoneStr,'UTC') then  aTimeZoneDelta := 0
-    else If ALSameText(aTimeZoneStr,'UT')  then  aTimeZoneDelta := 0
-    else If ALSameText(aTimeZoneStr,'EST') then aTimeZoneDelta := ALStrToDateTime('05:00:00', aFormatSettings)
-    else If ALSameText(aTimeZoneStr,'EDT') then aTimeZoneDelta := ALStrToDateTime('04:00:00', aFormatSettings)
-    else If ALSameText(aTimeZoneStr,'CST') then aTimeZoneDelta := ALStrToDateTime('06:00:00', aFormatSettings)
-    else If ALSameText(aTimeZoneStr,'CDT') then aTimeZoneDelta := ALStrToDateTime('05:00:00', aFormatSettings)
-    else If ALSameText(aTimeZoneStr,'MST') then aTimeZoneDelta := ALStrToDateTime('07:00:00', aFormatSettings)
-    else If ALSameText(aTimeZoneStr,'MDT') then aTimeZoneDelta := ALStrToDateTime('06:00:00', aFormatSettings)
-    else If ALSameText(aTimeZoneStr,'PST') then aTimeZoneDelta := ALStrToDateTime('08:00:00', aFormatSettings)
-    else If ALSameText(aTimeZoneStr,'PDT') then aTimeZoneDelta := ALStrToDateTime('07:00:00', aFormatSettings)
+    else If ALSameText(LTimeZoneStr,'GMT') then  LTimeZoneDelta := 0
+    else If ALSameText(LTimeZoneStr,'UTC') then  LTimeZoneDelta := 0
+    else If ALSameText(LTimeZoneStr,'UT')  then  LTimeZoneDelta := 0
+    else If ALSameText(LTimeZoneStr,'EST') then LTimeZoneDelta := ALStrToDateTime('05:00:00', LFormatSettings)
+    else If ALSameText(LTimeZoneStr,'EDT') then LTimeZoneDelta := ALStrToDateTime('04:00:00', LFormatSettings)
+    else If ALSameText(LTimeZoneStr,'CST') then LTimeZoneDelta := ALStrToDateTime('06:00:00', LFormatSettings)
+    else If ALSameText(LTimeZoneStr,'CDT') then LTimeZoneDelta := ALStrToDateTime('05:00:00', LFormatSettings)
+    else If ALSameText(LTimeZoneStr,'MST') then LTimeZoneDelta := ALStrToDateTime('07:00:00', LFormatSettings)
+    else If ALSameText(LTimeZoneStr,'MDT') then LTimeZoneDelta := ALStrToDateTime('06:00:00', LFormatSettings)
+    else If ALSameText(LTimeZoneStr,'PST') then LTimeZoneDelta := ALStrToDateTime('08:00:00', LFormatSettings)
+    else If ALSameText(LTimeZoneStr,'PDT') then LTimeZoneDelta := ALStrToDateTime('07:00:00', LFormatSettings)
     else begin
       Result := False;
       Exit;
     end;
 
-    ADateStr := ALTrim(Alst[0]) + '/' + InternalMonthWithLeadingChar(ALIntToStr(P1)) + '/' + ALTrim(Alst[2]) + ' ' + ALTrim(Alst[3]); // DD/MM/YYYY HH:MM:SS
-    Result := ALTryStrToDateTime(ADateStr,Value,AformatSettings);
-    If Result then Value := Value + aTimeZoneDelta;
+    LDateStr := ALTrim(LLst[0]) + '/' + InternalMonthWithLeadingChar(ALIntToStr(P1)) + '/' + ALTrim(LLst[2]) + ' ' + ALTrim(LLst[3]); // DD/MM/YYYY HH:MM:SS
+    Result := ALTryStrToDateTime(LDateStr,Value,LFormatSettings);
+    If Result then Value := Value + LTimeZoneDelta;
 
   finally
-    AlFreeAndNil(aLst);
+    AlFreeAndNil(LLst);
   end;
 
 end;
@@ -1676,9 +1696,15 @@ begin
   FillChar(result, 16, #0);
 end;
 
+{*************************************************************************}
+Function ALIsValidIPv6BinaryStr(const aIPV6BinaryStr: ansiString): boolean;
+begin
+  result := (length(aIPV6BinaryStr) = 16) and (aIPV6BinaryStr <> ALZeroIpV6)
+end;
+
 {****************************************************************************************}
 Function ALTryIPV6StrToBinary(aIPv6Str: ansiString; var aIPv6Bin: TALIPv6Binary): Boolean;
-var aLstIpv6Part: TALStringList;
+var LLstIpv6Part: TALStringList;
     S1: ansiString;
     P1: integer;
     i: integer;
@@ -1709,14 +1735,14 @@ begin
   if (P1 > 0) then delete(aIPv6Str,P1,maxint); // fe80:3438:7667:5c77:ce27
 
   //----------
-  aLstIpv6Part := TALStringList.Create;
+  LLstIpv6Part := TALStringList.Create;
   try
 
     //----------
-    aLstIpv6Part.Text := AlStringReplace(aIPv6Str, ':', #13#10, [rfReplaceALL]);
+    LLstIpv6Part.Text := AlStringReplace(aIPv6Str, ':', #13#10, [rfReplaceALL]);
 
     //----------
-    if (aLstIpv6Part.Count > 8) then begin
+    if (LLstIpv6Part.Count > 8) then begin
       Result := False;
       Exit;
     end;
@@ -1733,35 +1759,35 @@ begin
     // FF02::2 => FF02:0:0:0:0:0:0:2
     I := 0;
     while i <= 7 do begin
-      if i >= aLstIpv6Part.Count then begin
+      if i >= LLstIpv6Part.Count then begin
         result := False;
         Exit;
       end
-      else if (aLstIpv6Part[i] = '') then begin
-        aLstIpv6Part[i] := '0000';
-        while aLstIpv6Part.Count < 8 do begin
-          aLstIpv6Part.Insert(i,'0000');
+      else if (LLstIpv6Part[i] = '') then begin
+        LLstIpv6Part[i] := '0000';
+        while LLstIpv6Part.Count < 8 do begin
+          LLstIpv6Part.Insert(i,'0000');
           inc(i);
         end;
       end
       else begin
-        if length(aLstIpv6Part[i]) > 4 then begin
+        if length(LLstIpv6Part[i]) > 4 then begin
           result := False;
           Exit;
         end
-        else if length(aLstIpv6Part[i]) < 4 then begin
-          SetLength(S1,4-length(aLstIpv6Part[i]));
+        else if length(LLstIpv6Part[i]) < 4 then begin
+          SetLength(S1,4-length(LLstIpv6Part[i]));
           FillChar(S1[1], length(S1), '0');
-          aLstIpv6Part[i] := S1 + aLstIpv6Part[i];
+          LLstIpv6Part[i] := S1 + LLstIpv6Part[i];
         end;
       end;
       inc(i);
     end;
 
     //----------
-    for I := 0 to aLstIpv6Part.Count - 1 do begin
+    for I := 0 to LLstIpv6Part.Count - 1 do begin
 
-      S1 := AlUpperCase(AlCopyStr(aLstIpv6Part[i], 1, 2));
+      S1 := AlUpperCase(AlCopyStr(LLstIpv6Part[i], 1, 2));
       if (not ALTryStrToInt('$' + S1, P1)) or
          (not (P1 in [0..255])) then begin
         Result := False;
@@ -1769,7 +1795,7 @@ begin
       end;
       aIPv6Bin[(i*2) + 1] := AnsiChar(P1);
 
-      S1 := AlUpperCase(AlCopyStr(aLstIpv6Part[i], 3, 2));
+      S1 := AlUpperCase(AlCopyStr(LLstIpv6Part[i], 3, 2));
       if (not ALTryStrToInt('$' + S1, P1)) or
          (not (P1 in [0..255])) then begin
         Result := False;
@@ -1782,7 +1808,7 @@ begin
     Result := True;
 
   finally
-    AlFreeAndNil(aLstIpv6Part);
+    AlFreeAndNil(LLstIpv6Part);
   end;
 
 end;
@@ -1797,13 +1823,13 @@ End;
 Function ALBinaryToIPv6Str(const aIPv6: TALIPv6Binary): ansiString;
 Begin
 
-  Result := ALIntToHex(ord(aIPv6[1]), 2)  + ALIntToHex(ord(aIPv6[2]), 2)   + ':' +
-            ALIntToHex(ord(aIPv6[3]), 2)  + ALIntToHex(ord(aIPv6[4]), 2)   + ':' +
-            ALIntToHex(ord(aIPv6[5]), 2)  + ALIntToHex(ord(aIPv6[6]), 2)   + ':' +
-            ALIntToHex(ord(aIPv6[7]), 2)  + ALIntToHex(ord(aIPv6[8]), 2)   + ':' +
-            ALIntToHex(ord(aIPv6[9]), 2)  + ALIntToHex(ord(aIPv6[10]), 2)   + ':' +
-            ALIntToHex(ord(aIPv6[11]), 2) + ALIntToHex(ord(aIPv6[12]), 2)  + ':' +
-            ALIntToHex(ord(aIPv6[13]), 2) + ALIntToHex(ord(aIPv6[14]), 2)  + ':' +
+  Result := ALIntToHex(ord(aIPv6[1]), 2)  + ALIntToHex(ord(aIPv6[2]), 2)  + ':' +
+            ALIntToHex(ord(aIPv6[3]), 2)  + ALIntToHex(ord(aIPv6[4]), 2)  + ':' +
+            ALIntToHex(ord(aIPv6[5]), 2)  + ALIntToHex(ord(aIPv6[6]), 2)  + ':' +
+            ALIntToHex(ord(aIPv6[7]), 2)  + ALIntToHex(ord(aIPv6[8]), 2)  + ':' +
+            ALIntToHex(ord(aIPv6[9]), 2)  + ALIntToHex(ord(aIPv6[10]), 2) + ':' +
+            ALIntToHex(ord(aIPv6[11]), 2) + ALIntToHex(ord(aIPv6[12]), 2) + ':' +
+            ALIntToHex(ord(aIPv6[13]), 2) + ALIntToHex(ord(aIPv6[14]), 2) + ':' +
             ALIntToHex(ord(aIPv6[15]), 2) + ALIntToHex(ord(aIPv6[16]), 2);
 
 End;
@@ -1831,6 +1857,12 @@ Begin
   result[16] := aIPV6BinaryStr[16];
 
 End;
+
+{**************************************************************************}
+function ALBinaryStrToIPv6Str(const aIPV6BinaryStr: ansiString): ansiString;
+begin
+  result := ALBinaryToIPv6Str(ALBinaryStrToIPv6Binary(aIPV6BinaryStr));
+end;
 
 {********************************************************************************
 {This function calculates ending IPv6-address for a given start of IPv6-range and
@@ -1860,28 +1892,28 @@ function ALIPv6EndOfRange(const aStartIPv6: TALIPv6Binary; aMaskLength: integer)
     result := aValue or (1 shl (aBitNumber - 1));
   end;
 
-var aBitsCount: integer;
-    aByteNumber: integer;
-    aBitNumber: integer;
-    i: byte;
+var LBitsCount: integer;
+    LByteNumber: integer;
+    LBitNumber: integer;
+    I: byte;
 
 begin
   if (aMaskLength < 1) or
      (aMaskLength > 128) then raise Exception.CreateFmt('Wrong value for mask length IPv6: %d', [aMaskLength]);
 
   result := aStartIPv6;
-  aBitsCount := 128 - aMaskLength; // for example, 128 - 24 = 104
+  LBitsCount := 128 - aMaskLength; // for example, 128 - 24 = 104
 
   // scroll all the required bits and set them to 1;
   // 1st bit to set actually represents 1st bit of the 16th byte,
   // ...
   // 10th bit represents 2nd bit of the 15th byte et cetera
-  for i := 1 to aBitsCount do begin
+  for I := 1 to LBitsCount do begin
     // NOTE: these variables are uneseccarily but the code becomes to be a little
     //       more readable, we see immediately what each formula represents.
-    aByteNumber := 16 - (Ceil(i / 8)) + 1;
-    aBitNumber := 8 - ((Ceil(i / 8) * 8) - i);
-    result[aByteNumber] := AnsiChar(_setBitTo1(Ord(result[aByteNumber]), aBitNumber));
+    LByteNumber := 16 - (Ceil(I / 8)) + 1;
+    LBitNumber := 8 - ((Ceil(I / 8) * 8) - I);
+    result[LByteNumber] := AnsiChar(_setBitTo1(Ord(result[LByteNumber]), LBitNumber));
   end;
 end;
 
@@ -1889,24 +1921,24 @@ end;
 procedure ALIPv6SplitParts(const aIPv6: TALIPv6Binary;
                            var aLowestPart: UInt64;
                            var aHigestPart: UInt64);
-var aIntRec: Int64Rec;
-    i: integer;
+var LIntRec: Int64Rec;
+    I: integer;
 begin
   // get the Lowest Part
-  aIntRec.Lo := 0;
-  aIntRec.Hi := 0;
-  for i := 8 downto 1 do begin
-    aIntRec.Bytes[8 - i] := Ord(aIPv6[i]);
+  LIntRec.Lo := 0;
+  LIntRec.Hi := 0;
+  for I := 8 downto 1 do begin
+    LIntRec.Bytes[8 - I] := Ord(aIPv6[I]);
   end;
-  aLowestPart := UInt64(aIntRec);
+  aLowestPart := UInt64(LIntRec);
 
   // get the Higest Part
-  aIntRec.Lo := 0;
-  aIntRec.Hi := 0;
-  for i := 16 downto 9 do begin
-    aIntRec.Bytes[16 - i] := Ord(aIPv6[i]);
+  LIntRec.Lo := 0;
+  LIntRec.Hi := 0;
+  for I := 16 downto 9 do begin
+    LIntRec.Bytes[16 - I] := Ord(aIPv6[I]);
   end;
-  aHigestPart := UInt64(aIntRec);
+  aHigestPart := UInt64(LIntRec);
 end;
 
 {***********************************************************************************}
@@ -2026,36 +2058,36 @@ Function TALHTTPClient.Get(const aUrl:AnsiString;
                            const aRequestFields: TALStrings;
                            const ARequestHeaderValues: TALNameValueArray = nil;
                            Const aEncodeRequestFields: Boolean=True): AnsiString;
-var aResponseContent: TALStringStream;
+var LResponseContent: TALStringStream;
 begin
-  aResponseContent := TALStringStream.Create('');
+  LResponseContent := TALStringStream.Create('');
   try
     Get(aUrl,
         aRequestFields,
-        aResponseContent,
+        LResponseContent,
         nil,
         ARequestHeaderValues,
         aEncodeRequestFields);
-    result := aResponseContent.DataString;
+    result := LResponseContent.DataString;
   finally
-    AlFreeAndNil(aResponseContent);
+    AlFreeAndNil(LResponseContent);
   end;
 end;
 
 {************************************************}
 function TALHTTPClient.Get(const aUrl: AnsiString;
                            const ARequestHeaderValues: TALNameValueArray = nil): AnsiString;
-var aResponseContent: TALStringStream;
+var LResponseContent: TALStringStream;
 begin
-  aResponseContent := TALStringStream.Create('');
+  LResponseContent := TALStringStream.Create('');
   try
     Get(aUrl,
-        aResponseContent,
+        LResponseContent,
         nil,
         ARequestHeaderValues);
-    result := aResponseContent.DataString;
+    result := LResponseContent.DataString;
   finally
-    AlFreeAndNil(aResponseContent);
+    AlFreeAndNil(LResponseContent);
   end;
 end;
 
@@ -2065,9 +2097,9 @@ procedure TALHTTPClient.Post(const aUrl: AnsiString;
                              const aResponseContent: TStream;
                              const aResponseHeader: TALHTTPResponseHeader;
                              const ARequestHeaderValues: TALNameValueArray = nil);
-Var OldContentLengthValue: AnsiString;
+Var LOldContentLengthValue: AnsiString;
 begin
-  OldContentLengthValue := FrequestHeader.ContentLength;
+  LOldContentLengthValue := FrequestHeader.ContentLength;
   try
     If assigned(aPostDataStream) then FrequestHeader.ContentLength := ALIntToStr(aPostDataStream.Size)
     else FrequestHeader.ContentLength := '0';
@@ -2078,7 +2110,7 @@ begin
             aResponseContent,
             aResponseHeader);
   finally
-    FrequestHeader.ContentLength := OldContentLengthValue;
+    FrequestHeader.ContentLength := LOldContentLengthValue;
   end;
 end;
 
@@ -2099,18 +2131,18 @@ end;
 function TALHTTPClient.Post(const aUrl: AnsiString;
                             const aPostDataStream: TStream;
                             const ARequestHeaderValues: TALNameValueArray = nil): AnsiString;
-var aResponseContent: TALStringStream;
+var LResponseContent: TALStringStream;
 begin
-  aResponseContent := TALStringStream.Create('');
+  LResponseContent := TALStringStream.Create('');
   try
     post(aUrl,
          aPostDataStream,
-         aResponseContent,
+         LResponseContent,
          nil,
          ARequestHeaderValues);
-    result := aResponseContent.DataString;
+    result := LResponseContent.DataString;
   finally
-    AlFreeAndNil(aResponseContent);
+    AlFreeAndNil(LResponseContent);
   end;
 end;
 
@@ -2128,13 +2160,13 @@ procedure TALHTTPClient.PostUrlEncoded(const aUrl: AnsiString;
                                        const aResponseHeader: TALHTTPResponseHeader;
                                        const ARequestHeaderValues: TALNameValueArray = nil;
                                        Const aEncodeRequestFields: Boolean=True);
-Var aURLEncodedContentStream: TALStringStream;
-    OldRequestContentType: AnsiString;
+Var LURLEncodedContentStream: TALStringStream;
+    LOldRequestContentType: AnsiString;
     Str: AnsiString;
     I, P: Integer;
 begin
-  aURLEncodedContentStream := TALStringStream.create('');
-  OldRequestContentType := FrequestHeader.ContentType;
+  LURLEncodedContentStream := TALStringStream.create('');
+  LOldRequestContentType := FrequestHeader.ContentType;
   try
 
     if aEncodeRequestFields then begin
@@ -2143,27 +2175,27 @@ begin
         P := AlPos(aRequestFields.NameValueSeparator, Str);
         if P > 0 then Str := ALHTTPEncode(AlCopyStr(Str, 1, P-1)) + '=' + ALHTTPEncode(AlCopyStr(Str, P+1, MAXINT))
         else Str := ALHTTPEncode(Str);
-        If i < aRequestFields.Count - 1 then aURLEncodedContentStream.WriteString(Str + '&')
-        else aURLEncodedContentStream.WriteString(Str);
+        If i < aRequestFields.Count - 1 then LURLEncodedContentStream.WriteString(Str + '&')
+        else LURLEncodedContentStream.WriteString(Str);
       end;
     end
     else begin
       for i := 0 to aRequestFields.Count - 1 do begin
-        If i < aRequestFields.Count - 1 then aURLEncodedContentStream.WriteString(aRequestFields[i] + '&')
-        else aURLEncodedContentStream.WriteString(aRequestFields[i]);
+        If i < aRequestFields.Count - 1 then LURLEncodedContentStream.WriteString(aRequestFields[i] + '&')
+        else LURLEncodedContentStream.WriteString(aRequestFields[i]);
       end;
     end;
 
     FrequestHeader.ContentType := 'application/x-www-form-urlencoded';
     post(aUrl,
-         aURLEncodedContentStream,
+         LURLEncodedContentStream,
          aResponseContent,
          aResponseHeader,
          ARequestHeaderValues);
 
   finally
-    AlFreeAndNil(aURLEncodedContentStream);
-    FrequestHeader.ContentType := OldRequestContentType;
+    AlFreeAndNil(LURLEncodedContentStream);
+    FrequestHeader.ContentType := LOldRequestContentType;
   end;
 end;
 
@@ -2172,13 +2204,13 @@ function TALHTTPClient.PostUrlEncoded(const aUrl: AnsiString;
                                       const aRequestFields: TALStrings;
                                       const ARequestHeaderValues: TALNameValueArray = nil;
                                       Const aEncodeRequestFields: Boolean=True): AnsiString;
-Var aURLEncodedContentStream: TALStringStream;
-    OldRequestContentType: AnsiString;
+Var LURLEncodedContentStream: TALStringStream;
+    LOldRequestContentType: AnsiString;
     Str: AnsiString;
     I, P: Integer;
 begin
-  aURLEncodedContentStream := TALStringStream.create('');
-  OldRequestContentType := FrequestHeader.ContentType;
+  LURLEncodedContentStream := TALStringStream.create('');
+  LOldRequestContentType := FrequestHeader.ContentType;
   try
 
     if aEncodeRequestFields then begin
@@ -2187,23 +2219,23 @@ begin
         P := AlPos(aRequestFields.NameValueSeparator, Str);
         if P > 0 then Str := ALHTTPEncode(AlCopyStr(Str, 1, P-1)) + '=' + ALHTTPEncode(AlCopyStr(Str, P+1, MAXINT))
         else Str := ALHTTPEncode(Str);
-        If i < aRequestFields.Count - 1 then aURLEncodedContentStream.WriteString(Str + '&')
-        else aURLEncodedContentStream.WriteString(Str);
+        If i < aRequestFields.Count - 1 then LURLEncodedContentStream.WriteString(Str + '&')
+        else LURLEncodedContentStream.WriteString(Str);
       end;
     end
     else begin
       for i := 0 to aRequestFields.Count - 1 do begin
-        If i < aRequestFields.Count - 1 then aURLEncodedContentStream.WriteString(aRequestFields[i] + '&')
-        else aURLEncodedContentStream.WriteString(aRequestFields[i]);
+        If i < aRequestFields.Count - 1 then LURLEncodedContentStream.WriteString(aRequestFields[i] + '&')
+        else LURLEncodedContentStream.WriteString(aRequestFields[i]);
       end;
     end;
 
     FrequestHeader.ContentType := 'application/x-www-form-urlencoded';
-    Result := post(aUrl, aURLEncodedContentStream, ARequestHeaderValues);
+    Result := post(aUrl, LURLEncodedContentStream, ARequestHeaderValues);
 
   finally
-    AlFreeAndNil(aURLEncodedContentStream);
-    FrequestHeader.ContentType := OldRequestContentType;
+    AlFreeAndNil(LURLEncodedContentStream);
+    FrequestHeader.ContentType := LOldRequestContentType;
   end;
 end;
 
@@ -2214,22 +2246,22 @@ procedure TALHTTPClient.PostMultiPartFormData(const aUrl: AnsiString;
                                               const aResponseContent: TStream;
                                               const aResponseHeader: TALHTTPResponseHeader;
                                               const ARequestHeaderValues: TALNameValueArray = nil);
-Var aMultipartFormDataEncoder: TALMultipartFormDataEncoder;
-    OldRequestContentType: AnsiString;
+Var LMultipartFormDataEncoder: TALMultipartFormDataEncoder;
+    LOldRequestContentType: AnsiString;
 begin
-  aMultipartFormDataEncoder := TALMultipartFormDataEncoder.create;
-  OldRequestContentType := FrequestHeader.ContentType;
+  LMultipartFormDataEncoder := TALMultipartFormDataEncoder.create;
+  LOldRequestContentType := FrequestHeader.ContentType;
   try
-    aMultipartFormDataEncoder.Encode(aRequestFields, aRequestFiles);
-    FrequestHeader.ContentType := 'multipart/form-data; boundary='+aMultipartFormDataEncoder.DataStream.Boundary;
+    LMultipartFormDataEncoder.Encode(aRequestFields, aRequestFiles);
+    FrequestHeader.ContentType := 'multipart/form-data; boundary='+LMultipartFormDataEncoder.DataStream.Boundary;
     post(aUrl,
-         aMultipartFormDataEncoder.DataStream,
+         LMultipartFormDataEncoder.DataStream,
          aResponseContent,
          aResponseHeader,
          ARequestHeaderValues);
   finally
-    AlFreeAndNil(aMultipartFormDataEncoder);
-    FrequestHeader.ContentType := OldRequestContentType;
+    AlFreeAndNil(LMultipartFormDataEncoder);
+    FrequestHeader.ContentType := LOldRequestContentType;
   end;
 end;
 
@@ -2238,18 +2270,18 @@ function TALHTTPClient.PostMultiPartFormData(const aUrl: AnsiString;
                                              const aRequestFields: TALStrings;
                                              const aRequestFiles: TALMultiPartFormDataContents;
                                              const ARequestHeaderValues: TALNameValueArray = nil): AnsiString;
-Var aMultipartFormDataEncoder: TALMultipartFormDataEncoder;
-    OldRequestContentType: AnsiString;
+Var LMultipartFormDataEncoder: TALMultipartFormDataEncoder;
+    LOldRequestContentType: AnsiString;
 begin
-  aMultipartFormDataEncoder := TALMultipartFormDataEncoder.create;
-  OldRequestContentType := FrequestHeader.ContentType;
+  LMultipartFormDataEncoder := TALMultipartFormDataEncoder.create;
+  LOldRequestContentType := FrequestHeader.ContentType;
   try
-    aMultipartFormDataEncoder.Encode(aRequestFields, aRequestFiles);
-    FrequestHeader.ContentType := 'multipart/form-data; boundary='+aMultipartFormDataEncoder.DataStream.Boundary;
-    Result := post(aUrl, aMultipartFormDataEncoder.DataStream, ARequestHeaderValues);
+    LMultipartFormDataEncoder.Encode(aRequestFields, aRequestFiles);
+    FrequestHeader.ContentType := 'multipart/form-data; boundary='+LMultipartFormDataEncoder.DataStream.Boundary;
+    Result := post(aUrl, LMultipartFormDataEncoder.DataStream, ARequestHeaderValues);
   finally
-    AlFreeAndNil(aMultipartFormDataEncoder);
-    FrequestHeader.ContentType := OldRequestContentType;
+    AlFreeAndNil(LMultipartFormDataEncoder);
+    FrequestHeader.ContentType := LOldRequestContentType;
   end;
 end;
 
@@ -2270,17 +2302,17 @@ end;
 {************************************************}
 function TALHTTPClient.Head(const aUrl:AnsiString;
                             const ARequestHeaderValues: TALNameValueArray = nil) : AnsiString;
-var aResponseContent: TALStringStream;
+var LResponseContent: TALStringStream;
 begin
-  aResponseContent := TALStringStream.Create('');
+  LResponseContent := TALStringStream.Create('');
   try
     Head(aUrl,
-         aResponseContent,
+         LResponseContent,
          nil,
          ARequestHeaderValues);
-    result := aResponseContent.DataString;
+    result := LResponseContent.DataString;
   finally
-    AlFreeAndNil(aResponseContent);
+    AlFreeAndNil(LResponseContent);
   end;
 end;
 
@@ -2301,17 +2333,17 @@ end;
 {*************************************************}
 function TALHTTPClient.Trace(const aUrl:AnsiString;
                              const ARequestHeaderValues: TALNameValueArray = nil): AnsiString;
-var aResponseContent: TALStringStream;
+var LResponseContent: TALStringStream;
 begin
-  aResponseContent := TALStringStream.Create('');
+  LResponseContent := TALStringStream.Create('');
   try
     Trace(aUrl,
-          aResponseContent,
+          LResponseContent,
           nil,
           ARequestHeaderValues);
-    result := aResponseContent.DataString;
+    result := LResponseContent.DataString;
   finally
-    AlFreeAndNil(aResponseContent);
+    AlFreeAndNil(LResponseContent);
   end;
 end;
 
@@ -2321,9 +2353,9 @@ procedure TALHTTPClient.Put(const aUrl:AnsiString;
                             const aResponseContent: TStream;
                             const aResponseHeader: TALHTTPResponseHeader;
                             const ARequestHeaderValues: TALNameValueArray = nil);
-Var OldContentLengthValue: AnsiString;
+Var LOldContentLengthValue: AnsiString;
 begin
-  OldContentLengthValue := FrequestHeader.ContentLength;
+  LOldContentLengthValue := FrequestHeader.ContentLength;
   try
     If assigned(aPutDataStream) then FrequestHeader.ContentLength := ALIntToStr(aPutDataStream.Size)
     else FrequestHeader.ContentLength := '0';
@@ -2334,7 +2366,7 @@ begin
             aResponseContent,
             aResponseHeader);
   finally
-    FrequestHeader.ContentLength := OldContentLengthValue;
+    FrequestHeader.ContentLength := LOldContentLengthValue;
   end;
 end;
 
@@ -2342,18 +2374,18 @@ end;
 function TALHTTPClient.Put(const aURL: Ansistring;
                            const aPutDataStream: TStream;
                            const ARequestHeaderValues: TALNameValueArray = nil): AnsiString;
-var aResponseContent: TALStringStream;
+var LResponseContent: TALStringStream;
 begin
-  aResponseContent := TALStringStream.Create('');
+  LResponseContent := TALStringStream.Create('');
   try
     put(aUrl,
         aPutDataStream,
-        aResponseContent,
+        LResponseContent,
         nil,
         ARequestHeaderValues);
-    result := aResponseContent.DataString;
+    result := LResponseContent.DataString;
   finally
-    AlFreeAndNil(aResponseContent);
+    AlFreeAndNil(LResponseContent);
   end;
 end;
 
@@ -2374,17 +2406,17 @@ end;
 {***************************************************}
 function TALHTTPClient.Delete(const aURL: Ansistring;
                               const ARequestHeaderValues: TALNameValueArray = nil): AnsiString;
-var aResponseContent: TALStringStream;
+var LResponseContent: TALStringStream;
 begin
-  aResponseContent := TALStringStream.Create('');
+  LResponseContent := TALStringStream.Create('');
   try
     Delete(aUrl,
-           aResponseContent,
+           LResponseContent,
            nil,
            ARequestHeaderValues);
-    result := aResponseContent.DataString;
+    result := LResponseContent.DataString;
   finally
-    AlFreeAndNil(aResponseContent);
+    AlFreeAndNil(LResponseContent);
   end;
 end;
 
@@ -2405,17 +2437,17 @@ end;
 {****************************************************}
 function TALHTTPClient.Options(const aURL: Ansistring;
                                const ARequestHeaderValues: TALNameValueArray = nil): AnsiString;
-var aResponseContent: TALStringStream;
+var LResponseContent: TALStringStream;
 begin
-  aResponseContent := TALStringStream.Create('');
+  LResponseContent := TALStringStream.Create('');
   try
     Options(aUrl,
-            aResponseContent,
+            LResponseContent,
             nil,
             ARequestHeaderValues);
-    result := aResponseContent.DataString;
+    result := LResponseContent.DataString;
   finally
-    AlFreeAndNil(aResponseContent);
+    AlFreeAndNil(LResponseContent);
   end;
 end;
 

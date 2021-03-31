@@ -5,7 +5,7 @@ unit SynMemoEx;
 {
     This file is part of Synopse extended TMemo
 
-    Synopse SynMemoEx. Copyright (C) 2020 Arnaud Bouchez
+    Synopse SynMemoEx. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -24,7 +24,7 @@ unit SynMemoEx;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -62,6 +62,8 @@ unit SynMemoEx;
   - Unicode compatibility
 
 }
+
+{$I Synopse.inc}
 
 interface
 
@@ -102,14 +104,19 @@ uses
   StdCtrls,
   ClipBrd,
   Menus
-  {$ifdef UNICODE}, UITypes{$endif};
+  {$ifdef FPC}  // FPC compatibility by alf (alfred) - thanks for the patch!
+  , LCLType
+  {$endif FPC}
+  {$ifdef UNICODE}
+  , UITypes
+  {$endif UNICODE};
 
 const
   RAEditorCompletionChars: set of AnsiChar =
     [#8, '_', '0'..'9', 'A'..'Z', 'a'..'z'];
   Separators: set of AnsiChar =
     [#0, ' ', '-', #13, #10, '.', ',', '/', '\', ':', '+', '%', '*', '(', ')',
-    ';', '=', '{', '}', '[', ']', '{', '}', '|', '!', '@', '"'];
+    ';', '=', '{', '}', '[', ']',  '|', '!', '@', '"'];
   GutterRightMargin = 2;
 
   WM_EDITCOMMAND = WM_USER + $101;
@@ -343,6 +350,7 @@ type
     {$ENDIF MEMOEX_DEFLAYOUT}
   end;
 
+  EComplete = class(EAbort);
   EMemoExError = class(Exception);
 
   {$IFDEF MEMOEX_UNDO}
@@ -835,7 +843,10 @@ type
     property Align;
     property Enabled;
     property Color;
+    {$ifndef FPC}
     property Ctl3D;
+    property OnCanResize;
+    {$endif FPC}
     property Font;
     property ParentColor;
     property ParentFont;
@@ -854,7 +865,6 @@ type
     property ParentBiDiMode;
     property WantTabs default true;
     property WordWrap default true;
-    property OnCanResize;
     property OnConstrainedResize;
     property OnDockDrop;
     property OnDockOver;
@@ -1106,10 +1116,12 @@ function Min(x, y: integer): integer; {$ifdef HASINLINE}inline;{$endif}
 implementation
 
 uses
+  {$ifndef FPC}
   Consts,
+  {$endif FPC}
   RTLConsts;
 
-{$ifdef UNICODE}
+{$ifndef CPUX86}
 function PosEx(const SubStr, S: string; Offset: Integer = 1): Integer; inline;
 begin
   Result := System.Pos(SubStr, S, Offset);
@@ -2264,7 +2276,9 @@ begin
   dec(FMemoEx.FUpdateLock);
   if FMemoEx.FUpdateLock = 0 then
   begin
-    {$IFDEF MEMOEX_EDITOR}    FMemoEx.CantUndo; {$ENDIF MEMOEX_EDITOR}
+    {$IFDEF MEMOEX_EDITOR}
+    FMemoEx.CantUndo;
+    {$ENDIF MEMOEX_EDITOR}
     FMemoEx.TextAllChanged;
     FMemoEx.SetCaretInternal(0, 0);
   end;
@@ -2766,8 +2780,10 @@ begin
     FCellRect.Height := Max(1, Size.cy);
     EditorClient.Canvas.Font := Font;
     Size := EditorClient.Canvas.TextExtent(BiggestSymbol);
+    {
     if FCellRect.Width <> Max(1, Size.cx) then
       raise EMemoExError.CreateFmt('Font %s has inconsistent width vs style', [Font.Name]);
+    }
     FDrawBitmap.Canvas.Font.Assign(Font);
     FDrawBitmap.Canvas.Brush.Assign(EditorClient.Canvas.Brush);
     FDrawBitmap.Width := Width;
@@ -3466,8 +3482,6 @@ begin
 end;
 
 {$IFDEF MEMOEX_EDITOR}
-type
-  EComplete = class(EAbort);
 
 procedure TCustomMemoEx.Command(ACommand: TEditCommand);
 var

@@ -1,51 +1,51 @@
-(**************************************************************
-Contributors: Igor Ivkin (igor@arkadia.com)
-product:      ALLibPhoneNumber
-Description:  ALLibPhoneNumber is a wrapper for a several functions that use
-              Google's C++ library libphonenumber to parse and format
-              phone numbers written in a free form.
-              This wrapper requires few DLLs to be working correctly.
-              These DLLs are distributed in the folder "lib/dll".
+(*******************************************************************************
+Contributors:
+Igor Ivkin (igor@arkadia.com)
 
-              This wrapper is based on a custom DLL-modification that provides three
-              main functions:
-              1. To convert a given string phone written in a free form to Int64.
-              2. To convert phone given as Int64 to international format defined for its country.
-              3. To define a type of the phone (landing line, mobile, toll-free etc).
-**************************************************************)
+ALLibPhoneNumber is a wrapper for a several functions that use
+Google's C++ library libphonenumber to parse and format
+phone numbers written in a free form.
+This wrapper requires few DLLs to be working correctly.
+These DLLs are distributed in the folder "lib/dll".
+
+This wrapper is based on a custom DLL-modification that provides three
+main functions:
+1. To convert a given string phone written in a free form to Int64.
+2. To convert phone given as Int64 to international format defined for its country.
+3. To define a type of the phone (landing line, mobile, toll-free etc).
+*******************************************************************************)
 
 unit ALLibPhoneNumber;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
-uses system.Classes,
-     system.sysutils;
+uses
+  system.Classes,
+  system.sysutils;
 
 function ALStrPhoneNumberToInt64(const PhoneNumber, CountryCode: AnsiString): Int64; overload;
 function ALStrPhoneNumberToInt64(PhoneNumber: AnsiString): Int64; overload;
 function ALInt64PhoneNumberToStr(PhoneNumber: Int64): AnsiString;
 function ALGetPhoneNumberType(PhoneNumber: Int64): integer;
 
-const cALFixedLine = 0;
-      cALMobile = 1;
-      cALFixedLineOrMobil = 2; // mostly for US
-      cALTollFree = 3;
-      cALPremiumRate = 4;
-      cALSharedCost = 5; // see http://en.wikipedia.org/wiki/Shared_Cost_Service
-      cALVoIP = 6;
-      cALPersonalNumber = 7;
-      cALPager = 8;
-      cALUAN = 9; // see "Universal Access Numbers"
-      cALVoiceMail = 10;
-      cALUnknown = 11;
+const
+  cALFixedLine = 0;
+  cALMobile = 1;
+  cALFixedLineOrMobil = 2; // mostly for US
+  cALTollFree = 3;
+  cALPremiumRate = 4;
+  cALSharedCost = 5; // see http://en.wikipedia.org/wiki/Shared_Cost_Service
+  cALVoIP = 6;
+  cALPersonalNumber = 7;
+  cALPager = 8;
+  cALUAN = 9; // see "Universal Access Numbers"
+  cALVoiceMail = 10;
+  cALUnknown = 11;
 
 implementation
 
-uses alString;
+uses
+  alString;
 
 function _StrPhoneNumberToInt64(phoneNumber, countryCode: PAnsiChar): Int64; cdecl; external 'libphonenumber.dll';
 function _Int64PhoneNumberToStr(phoneNumber: Int64; buffer: PAnsiChar): Cardinal; cdecl; external 'libphonenumber.dll';
@@ -76,7 +76,7 @@ function ALStrPhoneNumberToInt64(PhoneNumber: AnsiString): Int64;
     end;
   end;
 
-var aCountryCode: AnsiString;
+var LCountryCode: AnsiString;
     P1, P2: integer;
 begin
 
@@ -84,24 +84,24 @@ begin
   if _IsDecimal(PhoneNumber) and alTryStrToInt64(PhoneNumber, result) then exit; // if their is not the '+' sign we can do nothing because ALStrPhoneNumberToInt64 will return 0
                                                                                  // if alTryStrToInt64 not success it's mean it's a tooo big number, so better to return 0
 
-  aCountryCode := '';
+  LCountryCode := '';
   P1 := AlPos('[',PhoneNumber);  // look if their is some prefix or suffix like [FR] to give an hint about the country
   while P1 > 0 do begin
     P2 := ALPosEx(']', PhoneNumber, P1+1);
     if P2 = P1 + 3 then begin
-      aCountryCode := ALUpperCase(ALCopyStr(PhoneNumber, P1+1, 2)); // [FR] 06.34.54.12.22 => FR
-      if (length(aCountryCode) = 2) and
-         (aCountryCode[1] in ['A'..'Z']) and
-         (aCountryCode[2] in ['A'..'Z']) then begin
+      LCountryCode := ALUpperCase(ALCopyStr(PhoneNumber, P1+1, 2)); // [FR] 06.34.54.12.22 => FR
+      if (length(LCountryCode) = 2) and
+         (LCountryCode[1] in ['A'..'Z']) and
+         (LCountryCode[2] in ['A'..'Z']) then begin
         delete(PhoneNumber,P1,4); // "[FR] 06.34.54.12.22" => " 06.34.54.12.22"
         PhoneNumber := ALtrim(PhoneNumber); // " 06.34.54.12.22" => "06.34.54.12.22"
         break; // break the loop, we found the country code hint
       end
-      else aCountryCode := '';
+      else LCountryCode := '';
     end;
     P1 := AlPosEx('[',PhoneNumber, P1+1);
   end;
-  result := ALStrPhoneNumberToInt64(PhoneNumber, aCountryCode); //even if the aPhoneNumber is already an integer we need to format it
+  result := ALStrPhoneNumberToInt64(PhoneNumber, LCountryCode); //even if the aPhoneNumber is already an integer we need to format it
                                                                 //because user can gave us +330625142445 but it's must be stored as
                                                                 //                         +33625142445
 

@@ -1,28 +1,28 @@
-{*************************************************************
-product:      ALWinInetHttpClient
-Description:  TALWinInetHttpClient is a is easy to use WinInet-based
-              HTTP client component which allows to post and get
-              any data from the Web via HTTP protocol. TALWinInetHttpClient
-              component can retrieve documents or files using HTTP protocol;
-              that is connect to a HTTP server also known as a webserver.
-              It can also trigger a CGI/ISAPI/NSAPI script and post data
-              using either GET or POST method.
+{*******************************************************************************
+TALWinInetHttpClient is a is easy to use WinInet-based
+HTTP client component which allows to post and get
+any data from the Web via HTTP protocol. TALWinInetHttpClient
+component can retrieve documents or files using HTTP protocol;
+that is connect to a HTTP server also known as a webserver.
+It can also trigger a CGI/ISAPI/NSAPI script and post data
+using either GET or POST method.
 
-              The TALWinInetHttpClient can grab web contents both in binary
-              and text formats, supports cache of Internet Explorer,
-              can resume broken downloads, read data from password
-              protected directories and supports basic proxy
-              authentication scheme.
-**************************************************************}
+The TALWinInetHttpClient can grab web contents both in binary
+and text formats, supports cache of Internet Explorer,
+can resume broken downloads, read data from password
+protected directories and supports basic proxy
+authentication scheme.
+*******************************************************************************}
 
 unit ALWininetHttpClient;
 
 interface
 
-uses Winapi.Windows,
-     System.Classes,
-     WinApi.WinInet,
-     ALHttpClient;
+uses
+  Winapi.Windows,
+  System.Classes,
+  WinApi.WinInet,
+  ALHttpClient;
 
 const
   INTERNET_STATUS_COOKIE_SENT      = 320;
@@ -198,10 +198,11 @@ type
 
 implementation
 
-uses System.SysUtils,
-     System.Ansistrings,
-     ALCommon,
-     ALString;
+uses
+  System.SysUtils,
+  System.Ansistrings,
+  ALCommon,
+  ALString;
 
 {***************************************************************}
 procedure ALWininetHTTPCLientStatusCallback(hInternet: HINTERNET;
@@ -282,22 +283,22 @@ end;
 
 {*************************************************************}
 procedure TALWinInetHTTPClient.SetURL(const Value: AnsiString);
-Var aOldURLHost: AnsiString;
-    aOldUrlPort: INTERNET_PORT;
-    aOldURLScheme: TInternetScheme;
+Var LOldURLHost: AnsiString;
+    LOldUrlPort: INTERNET_PORT;
+    LOldURLScheme: TInternetScheme;
 begin
   If Value <> Url then Begin
-    aOldURLHost := FURLHost;
-    aOldURLPort := FURLPort;
-    aOldURLScheme := FURLScheme;
+    LOldURLHost := FURLHost;
+    LOldUrlPort := FURLPort;
+    LOldURLScheme := FURLScheme;
     InitURL(Value);
 
     { Here we disconnect if a new URL comes in with a
       new host...this ensures that we don't keep a
       connection to a wrong host }
-    If (aOldURLHost <> FURLHost) or
-       (aOldURLPort <> FURLPort) or
-       (aOldURLScheme <> FURLScheme) then Disconnect;
+    If (LOldURLHost <> FURLHost) or
+       (LOldUrlPort <> FURLPort) or
+       (LOldURLScheme <> FURLScheme) then Disconnect;
 
     Furl := Value;
   end;
@@ -494,15 +495,15 @@ function TALWinInetHTTPClient.Send(const aRequestMethod: TALHTTPMethod;
     end;
   end;
 
-var aNumberOfBytesWritten: DWord;
+var LNumberOfBytesWritten: DWord;
     dwFlags: DWORD;
     BuffLen: Cardinal;
     BuffSize, Len: cardinal;
     INBuffer: INTERNET_BUFFERSA;
     Buffer: TMemoryStream;
     AcceptTypes: array of PAnsiChar;
-    aHeader: AnsiString;
-    aOption: DWord;
+    LHeader: AnsiString;
+    LOption: DWord;
 
 begin
 
@@ -536,16 +537,16 @@ begin
 
     { Timeouts }
     if ConnectTimeout > 0 then begin
-      aOption := ConnectTimeout;
-      CheckError(not InternetSetOptionA(Result, INTERNET_OPTION_CONNECT_TIMEOUT, Pointer(@aOption), SizeOf(aOption)));
+      LOption := ConnectTimeout;
+      CheckError(not InternetSetOptionA(Result, INTERNET_OPTION_CONNECT_TIMEOUT, Pointer(@LOption), SizeOf(LOption)));
     end;
     if SendTimeout > 0 then begin
-      aOption := SendTimeout;
-      CheckError(not InternetSetOptionA(Result, INTERNET_OPTION_SEND_TIMEOUT, Pointer(@aOption), SizeOf(aOption)));
+      LOption := SendTimeout;
+      CheckError(not InternetSetOptionA(Result, INTERNET_OPTION_SEND_TIMEOUT, Pointer(@LOption), SizeOf(LOption)));
     end;
     if ReceiveTimeout > 0 then begin
-      aOption := ReceiveTimeout;
-      CheckError(not InternetSetOptionA(Result, INTERNET_OPTION_RECEIVE_TIMEOUT, Pointer(@aOption), SizeOf(aOption)));
+      LOption := ReceiveTimeout;
+      CheckError(not InternetSetOptionA(Result, INTERNET_OPTION_RECEIVE_TIMEOUT, Pointer(@LOption), SizeOf(LOption)));
     end;
 
     { proxy user name and password }
@@ -553,10 +554,10 @@ begin
     If proxyParams.ProxyPassword <> '' then CheckError(not InternetSetOptionA(Result, INTERNET_OPTION_PROXY_PASSWORD, PAnsiChar(ProxyParams.ProxyPassword), length(ProxyParams.ProxyPassword)));
 
     {set the header}
-    aHeader := requestHeader.RawHeaderText;
+    LHeader := requestHeader.RawHeaderText;
     HttpAddRequestHeadersA(Result,
-                           PAnsiChar(aHeader),
-                           Length(aHeader),
+                           PAnsiChar(LHeader),
+                           Length(LHeader),
                            HTTP_ADDREQ_FLAG_REPLACE or HTTP_ADDREQ_FLAG_ADD);
 
     If assigned(aRequestDataStream) then begin
@@ -602,9 +603,9 @@ begin
             CheckError(not InternetWriteFile(Result,
                                              Buffer.Memory,
                                              Len,
-                                             aNumberOfBytesWritten));
-            if aNumberOfBytesWritten < Len then
-              aRequestDataStream.Position := aRequestDataStream.Position - (Len - aNumberOfBytesWritten);
+                                             LNumberOfBytesWritten));
+            if LNumberOfBytesWritten < Len then
+              aRequestDataStream.Position := aRequestDataStream.Position - (Len - LNumberOfBytesWritten);
 
             { Posting Data Event }
             if Assigned(OnUploadProgress) then
@@ -662,8 +663,8 @@ var Size: DWord;
     Index: DWord;
     ContentlengthDownloaded,
     ContentLength: DWord;
-    aStr: AnsiString;
-    aBuffer: Tbytes;
+    LStr: AnsiString;
+    LBuffer: Tbytes;
 
 begin
 
@@ -672,14 +673,14 @@ begin
     Size := 4096;
     While true do begin
       Index := 0;
-      SetLength(aStr, Size);
+      SetLength(LStr, Size);
       If HttpQueryInfoA(aContext,
                         HTTP_QUERY_RAW_HEADERS_CRLF,
-                        pointer(aStr),
+                        pointer(LStr),
                         Size,
                         Index) then begin
-        SetLength(aStr, Size);
-        aResponseHeader.RawHeaderText := aStr;
+        SetLength(LStr, Size);
+        aResponseHeader.RawHeaderText := LStr;
         break;
       end
       else checkError(GetLastError <> ERROR_INSUFFICIENT_BUFFER);
@@ -707,12 +708,12 @@ begin
                                               0));
 
     if Size > 0 then begin
-      if dWord(length(aBuffer)) <> Size then SetLength(aBuffer, Size);
+      if dWord(length(LBuffer)) <> Size then SetLength(LBuffer, Size);
       CheckError(not InternetReadFile(aContext,
-                                      @aBuffer[0],
+                                      @LBuffer[0],
                                       Size,
                                       Downloaded));
-      aResponseContent.Writebuffer(pointer(aBuffer)^, Downloaded);
+      aResponseContent.Writebuffer(pointer(LBuffer)^, Downloaded);
       if Assigned(onDownloadProgress) then begin
         inc(ContentlengthDownloaded, Downloaded);
         onDownloadProgress(self, ContentlengthDownloaded, ContentLength);
@@ -732,14 +733,14 @@ begin
     Size := 256;
     While true do begin
       Index := 0;
-      SetLength(aStr, Size);
+      SetLength(LStr, Size);
       if HttpQueryInfoA(aContext,
                         HTTP_QUERY_STATUS_TEXT,
-                        pointer(aStr),
+                        pointer(LStr),
                         Size,
                         Index) then begin
-        SetLength(aStr, Size);
-        raise EALHTTPClientException.CreateFmt('%s (%d) - ''%s''', [aStr, Status, URL], Status);
+        SetLength(LStr, Size);
+        raise EALHTTPClientException.CreateFmt('%s (%d) - ''%s''', [LStr, Status, URL], Status);
       end
       else checkError(GetLastError <> ERROR_INSUFFICIENT_BUFFER);
     end;
@@ -754,35 +755,35 @@ procedure TALWinInetHTTPClient.Execute(const aUrl:AnsiString;
                                        const ARequestHeaderValues: TALNameValueArray;
                                        const aResponseContent: TStream;
                                        const aResponseHeader: TALHTTPResponseHeader);
-var aContext: HINTERNET;
-    aOldRawRequestHeaderText: AnsiString;
-    aRestoreRequestHeader: Boolean;
-    i: integer;
+var LContext: HINTERNET;
+    LOldRawRequestHeaderText: AnsiString;
+    LRestoreRequestHeader: Boolean;
+    I: integer;
 begin
   SetURL(aURL);
   if URL = '' then raise EALHTTPClientException.Create(CALHTTPCLient_MsgEmptyURL);
 
-  aRestoreRequestHeader := False;
+  LRestoreRequestHeader := False;
   if length(ARequestHeaderValues) > 0 then begin
-    aRestoreRequestHeader := True;
-    aOldRawRequestHeaderText := requestHeader.RawHeaderText;
+    LRestoreRequestHeader := True;
+    LOldRawRequestHeaderText := requestHeader.RawHeaderText;
     for I := Low(ARequestHeaderValues) to High(ARequestHeaderValues) do
-      requestHeader.setHeaderValue(alTrim(ARequestHeaderValues[i].Name),
-                                   alTrim(ARequestHeaderValues[i].Value));
+      requestHeader.setHeaderValue(alTrim(ARequestHeaderValues[I].Name),
+                                   alTrim(ARequestHeaderValues[I].Value));
   end;
 
   try
 
-    aContext := Send(aRequestMethod, aRequestDataStream);
+    LContext := Send(aRequestMethod, aRequestDataStream);
     try
-      Receive(aContext, aResponseContent, aResponseHeader);
+      Receive(LContext, aResponseContent, aResponseHeader);
     finally
-      InternetCloseHandle(aContext);
+      InternetCloseHandle(LContext);
     end;
 
   finally
-    if aRestoreRequestHeader then
-      requestHeader.RawHeaderText := aOldRawRequestHeaderText;
+    if LRestoreRequestHeader then
+      requestHeader.RawHeaderText := LOldRawRequestHeaderText;
   end;
 end;
 

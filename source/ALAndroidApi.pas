@@ -13,12 +13,13 @@ interface
 //  short        SmallInt
 //  void         N/A
 
-uses Androidapi.JNI.Widget,
-     Androidapi.JNI.GraphicsContentViewText,
-     Androidapi.JNI.Util,
-     Androidapi.JNIBridge,
-     Androidapi.JNI.Net,
-     Androidapi.JNI.JavaTypes;
+uses
+  Androidapi.JNI.Widget,
+  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNI.Util,
+  Androidapi.JNIBridge,
+  Androidapi.JNI.Net,
+  Androidapi.JNI.JavaTypes;
 
 type
 

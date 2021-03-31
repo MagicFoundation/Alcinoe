@@ -1,33 +1,15 @@
-{*************************************************************
-product:      ALCipher (Private Key Encryption/Decryption Primitives)
-Description:  Delphi library for cryptography. It provides support for
-              AES, Blowfish, SHA, MD5
-**************************************************************}
-
 unit ALCipher;
 
 interface
 
-{$IF CompilerVersion < 29} {Delphi XE8}
-  {$IF defined(CPUX64)} // The CPU supports the x86-64 instruction set, and is in a 64-bit environment. *New* in XE2/x64
-    {$DEFINE CPU64BITS} // The CPU is in a 64-bit environment, such as DCC64.EXE. *New* in XE8
-  {$ENDIF}
-  {$IF defined(CPUX86)} //   The CPU supports the x86-64 instruction set, and is in a 64-bit environment. *New* in XE2/x64
-    {$DEFINE CPU32BITS} // The CPU is in a 32-bit environment, such as DCC32.EXE. *New* in XE8
-  {$ENDIF}
-{$ENDIF}
+{$I Alcinoe.inc}
 
-{$A+} {Word Align Data}
-{$Q-} {Overflow Checking}
-{$R-} {Range-Checking}
+{.$A+} {Word Align Data}
+{.$Q-} {Overflow Checking}
+{.$R-} {Range-Checking}
 {.$V-} {Var-String Checking}
 {.$B-} {Complete Boolean Evaluation}
 {.$I+} {Input/Output-Checking}
-
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
 
 uses
   system.sysutils,
@@ -35,10 +17,10 @@ uses
   winapi.windows,
   {$ELSE}
   system.types,
-  {$IFEND}
+  {$ENDIF}
   {$IF CompilerVersion >= 32} // tokyo
   system.hash,
-  {$IFEND}
+  {$ENDIF}
   System.Classes,
   ALCommon;
 
@@ -50,11 +32,10 @@ type
 
 { Cipher exception }
 type
-  {$IFNDEF NEXTGEN}
+  {$IFNDEF ALHideAnsiString}
   EALCipherException = class(EALException);
-  {$ELSE}
-  EALCipherException = class(EALExceptionU);
   {$ENDIF}
+  EALCipherExceptionU = class(EALExceptionU);
 
 { encryption key types }
 type
@@ -65,11 +46,13 @@ type
 type
   TALkeyDerivationFunction = (MD5, SHA2);
 
+
+
 //////////////////////
 ////// Blowfish //////
 //////////////////////
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 
 { encryption block types }
 type
@@ -102,7 +85,7 @@ procedure ALBFEncryptStream(InStream, OutStream: TStream; const Key: AnsiString;
 procedure ALBFEncryptStreamCBC(InStream, OutStream : TStream; const Key : TAlCipherKey128; Encrypt : Boolean); overload;
 procedure ALBFEncryptStreamCBC(InStream, OutStream: TStream; const Key: AnsiString; Encrypt : Boolean); overload;
 
-{$ENDIF}
+{$ENDIF !ALHideAnsiString}
 
 
 
@@ -111,14 +94,16 @@ procedure ALBFEncryptStreamCBC(InStream, OutStream: TStream; const Key: AnsiStri
 ////////////////////////////
 
 type
-  TALRDLVector = {$IF CompilerVersion <= 32} packed {$IFEND} record // << under tokyo :
-                                                                    // << https://quality.embarcadero.com/browse/RSP-20976
-                                                                    // << without the keyword packed i have under tokyo ios64 compiler this strange error:
-                                                                    // << Backend error: Function return type does not match operand type of return inst!
-                                                                    // <<   ret void
-                                                                    // << i64Function return type does not match operand type of return inst!
-                                                                    // <<   ret void
-                                                                    // << i64
+
+  // under tokyo :
+  // https://quality.embarcadero.com/browse/RSP-20976
+  // without the keyword packed i have under tokyo ios64 compiler this strange error:
+  // Backend error: Function return type does not match operand type of return inst!
+  //   ret void
+  // i64Function return type does not match operand type of return inst!
+  //   ret void
+  // i64
+  TALRDLVector = {$IF CompilerVersion <= 32} packed {$IFEND} record
     case Byte of
       0 : (dw : DWord);
       1 : (bt : array[0..3] of Byte);
@@ -148,7 +133,7 @@ procedure ALEncryptRDL(const Context : TALRDLContext; var Block : TALRDLBlock);
 procedure ALEncryptRDLCBC(const Context : TALRDLContext; const Prev : TALRDLBlock; var Block : TALRDLBlock);
 procedure ALRDLEncryptStream(const InStream, OutStream : TStream; const Key; const KeySize : FixedInt; const Encrypt : Boolean); overload;
 procedure ALRDLEncryptStreamCBC(const InStream, OutStream : TStream; const Key; const KeySize : FixedInt; const Encrypt : Boolean); overload;
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 procedure ALRDLEncryptString(const InString: AnsiString; var OutString : AnsiString; const Key; const KeySize : FixedInt; const Encrypt : Boolean); overload;
 function  ALRDLEncryptString(const InString: AnsiString; const Key; const KeySize : FixedInt; const Encrypt : Boolean) : AnsiString; overload;
 procedure ALRDLEncryptString(const InString: AnsiString; var OutString : AnsiString; const Key: AnsiString; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean); overload;
@@ -181,7 +166,7 @@ procedure ALRDLEncryptStreamCBCU(const InStream, OutStream : TStream; const Key:
 type
   TALMD5Digest  = TALCipherKey128;         { 128 bits - MD5 }
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 procedure ALStringHashMD5(var Digest : TALMD5Digest; const Str : AnsiString); overload;
 function  ALStringHashMD5(const Str : AnsiString; const HexEncode: boolean = true): AnsiString; overload;
 {$ENDIF}
@@ -197,7 +182,7 @@ function  ALStringHashMD5U(const Str: String; Const encoding: Tencoding): String
 type
   TALSHA1Digest = array [0..19] of Byte;         { 160 bits - SHA-1 }
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 procedure ALStringHashSHA1(var Digest: TALSHA1Digest; const Str: AnsiString); overload;
 function  ALStringHashSHA1(const Str: AnsiString; const HexEncode: boolean = true): AnsiString; overload;
 {$ENDIF}
@@ -212,14 +197,14 @@ function  ALStringHashSHA1U(const Str: String; Const encoding: Tencoding): Strin
 
 {$IF CompilerVersion >= 32} // tokyo
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 procedure ALStringHashSHA2(var Digest: TBytes; const Str: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256); overload;
 function  ALStringHashSHA2(const Str: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const HexEncode: boolean = true): AnsiString; overload;
 {$ENDIF}
 procedure ALStringHashSHA2U(var Digest: Tbytes; const Str: String; Const encoding: Tencoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256); overload;
 function  ALStringHashSHA2U(const Str: String; Const encoding: Tencoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): String; overload; // result will be hexencoded
 
-{$IFEND}
+{$ENDIF}
 
 
 
@@ -244,7 +229,7 @@ function ALBCryptSelfTest: Boolean;
 ////// HMAC algorithms //////
 /////////////////////////////
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 function  ALCalcHMACSHA1(const Str, Key : AnsiString): AnsiString;
 function  ALCalcHMACMD5(const Str, Key : AnsiString): AnsiString;
 {$ENDIF}
@@ -262,32 +247,26 @@ function  ALCalcHMACMD5(const Str, Key : AnsiString): AnsiString;
  //So you would not use this new crc32c() function to replace the zlib's crc32()
  //function, but as a convenient very fast hashing function at application level.
 
-{$IFNDEF NEXTGEN}
+{$IFDEF ALCPUX}
+{$IFNDEF ALHideAnsiString}
 
-type
-  TALStringHashCrc32 = function(Const str: AnsiString): cardinal;
-  TALHashCrc32 = function(buf: PAnsiChar; len: cardinal): cardinal;
-  TALStringHashCrc64 = function(Const str: AnsiString): int64;
-  TALHashCrc64 = function(buf: PAnsiChar; len: cardinal): int64;
+/// compute CRC32 checksum on the supplied buffer
+// - this variable will use the fastest mean available, e.g. SSE 4.2
+var ALStringHashCrc32: function(Const str: AnsiString): cardinal;
+var ALHashCrc32: function(buf: PAnsiChar; len: cardinal): cardinal;
 
-var
-  /// compute CRC32 checksum on the supplied buffer
-  // - this variable will use the fastest mean available, e.g. SSE 4.2
-  ALStringHashCrc32: TALStringHashCrc32;
-  ALHashCrc32: TALHashCrc32;
-
-
-  /// compute CRC64 checksum on the supplied buffer, cascading two crc32c
-  // - will use SSE 4.2 hardware accelerated instruction, if available
-  // - will combine two crc32() calls into a single Int64 result
-  // - by design, such combined hashes cannot be cascaded
-  ALStringHashCrc64: TALStringHashCrc64;
-  ALHashCrc64: TALHashCrc64;
+/// compute CRC64 checksum on the supplied buffer, cascading two crc32c
+// - will use SSE 4.2 hardware accelerated instruction, if available
+// - will combine two crc32() calls into a single Int64 result
+// - by design, such combined hashes cannot be cascaded
+var ALStringHashCrc64: function(Const str: AnsiString): int64;
+var ALHashCrc64: function(buf: PAnsiChar; len: cardinal): int64;
 
 // test the implementation of the CRC32
 procedure ALTestCRC32Implementation(const aSavedResultsFilename: AnsiString = '');
 
 {$ENDIF}
+{$ENDIF ALCPUX}
 
 
 
@@ -300,9 +279,8 @@ procedure ALRandomBytes(const Dest; const Len: Cardinal); overload;
 function ALRandomBytes(const Len: Cardinal): TBytes; overload;
 function ALRandomByteStr(const Len: Cardinal): ansiString;
 {$ENDIF}
-
-function ALRandom32(const ARange: Cardinal): cardinal;
-function ALRandom64(const ARange: UInt64): UInt64;
+var ALRandom32: function(const ARange: Cardinal): cardinal;
+var ALRandom64: function(const ARange: UInt64): UInt64;
 
 
 
@@ -310,13 +288,10 @@ function ALRandom64(const ARange: UInt64): UInt64;
 ////// Fnv1a //////
 ///////////////////
 
-{$IFNDEF NEXTGEN}
-
+{$IFNDEF ALHideAnsiString}
 function ALFnv1aInt32(const str: ansiString): int32; inline;
 function ALFnv1aInt64(const str: ansiString): Int64; inline;
-
 {$ENDIF}
-
 function ALFnv1aInt32U(const str: String; Const encoding: Tencoding): int32; inline;
 function ALFnv1aInt64U(const str: String; Const encoding: Tencoding): Int64; inline;
 
@@ -343,6 +318,7 @@ function ALRSA256Sign(const aData: AnsiString; // bytes string
 
 {$IFDEF MSWINDOWS}
 {$WARN SYMBOL_PLATFORM OFF}
+
 const
   crypt32 = 'crypt32.dll';
   bcrypt = 'bcrypt.dll';
@@ -547,7 +523,7 @@ function BCryptSignHash(hKey: BCRYPT_KEY_HANDLE;
                         dwFlags: ULONG): NTSTATUS; stdcall; external bcrypt delayed;
 
 {$WARN SYMBOL_PLATFORM ON}
-{$ENDIF}
+{$ENDIF MSWINDOWS}
 
 implementation
 
@@ -555,6 +531,7 @@ uses
   {$IF defined(MSWINDOWS)}
   winapi.MMSystem,
   System.SysConst,
+  system.Threading,
   {$IFEND}
   system.Math,
   ALFiles,
@@ -568,7 +545,7 @@ const
 
 {*********************************************************************}
 procedure ALCipherXorMemPrim(var Mem1;  const Mem2;  Count : Cardinal);
-{$IF defined(NEXTGEN) or defined(CPU64BITS)}
+{$IF not defined(CPUX86)}
 var
   PMem1, PMem2: PFixedUInt;
   Rest: Integer;
@@ -635,8 +612,7 @@ asm
   pop  edi
   pop  esi
 end;
-{$ifend}
-
+{$ENDIF}
 
 
 
@@ -661,7 +637,7 @@ type
 
 {******************************************}
 function ALCipherRolX(I, C : DWord) : DWord;
-{$IF defined(NEXTGEN) or defined(CPU64BITS)}
+{$IF not defined(CPUX86)}
 begin
    Result := (I shl (C and 31)) or (I shr (32-(C and 31)));
 end;
@@ -937,7 +913,7 @@ begin
   ALFinalizeMD5(Context, Digest);
 end;
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 
 {***************************************************************************}
 procedure ALStringHashMD5(var Digest : TALMD5Digest; const Str : AnsiString);
@@ -983,7 +959,7 @@ end;
 {$REGION ' CompilerVersion >= 32'}
 {$IF CompilerVersion >= 32} // tokyo
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 
 {*************************************************************************}
 procedure ALStringHashMD5(var Digest: TALMD5Digest; const Str: AnsiString);
@@ -1035,7 +1011,7 @@ Begin
   Result := ALBinToHexU(PByte(LBytes)^, length(LBytes));
 end;
 
-{$IFEND}
+{$ENDIF}
 {$ENDREGION}
 
 
@@ -1248,7 +1224,7 @@ begin
   ALFinalizeSHA1( Context, Digest );
 end;
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 
 {*****************************************************************************}
 procedure ALStringHashSHA1(var Digest : TALSHA1Digest; const Str : AnsiString);
@@ -1294,7 +1270,7 @@ end;
 {$REGION ' CompilerVersion >= 32'}
 {$IF CompilerVersion >= 32} // tokyo
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 
 {***************************************************************************}
 procedure ALStringHashSHA1(var Digest: TALSHA1Digest; const Str: AnsiString);
@@ -1346,7 +1322,7 @@ Begin
   Result := ALBinToHexU(PByte(LBytes)^, length(LBytes));
 end;
 
-{$IFEND}
+{$ENDIF}
 {$ENDREGION}
 
 
@@ -1357,7 +1333,7 @@ end;
 
 {$IF CompilerVersion >= 32} // tokyo
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 
 {************************************************************************************************************************************************}
 procedure ALStringHashSHA2(var Digest: TBytes; const Str: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256);
@@ -1405,7 +1381,7 @@ begin
   Result := ALBinToHexU(PByte(LBytes)^, length(LBytes));
 end;
 
-{$IFEND}
+{$ENDIF}
 
 
 
@@ -1415,11 +1391,10 @@ end;
 
 //
 // Taken from https://github.com/JackTrapper/bcrypt-for-delphi
+// Was not my best idea, now I would prefere to use Cryptography API: Next Generation
+// with PBKDF2+SHA512. No so strong as bcrypt but at least the algo is
+// widely test and used by microsoft and no need to maintain it.
 //
-
-{$IF CompilerVersion > 33} // rio
-  {$MESSAGE WARN 'Check if https://github.com/JackTrapper/bcrypt-for-delphi bcrypt.pas was not updated from references\bcrypt-for-delphi\Bcrypt.pas and adjust the IFDEF'}
-{$IFEND}
 
 {$IFDEF MSWINDOWS}
 
@@ -1665,7 +1640,8 @@ begin
   result := ALRandomBytes(BCRYPT_SALT_LEN);
 end;
 
-{**********************************************************************************************}
+{***********************}
+{$Q-} {Overflow Checking}
 class procedure TBCrypt.BlowfishEncryptECB(const Data: TBlowfishData; InData, OutData: Pointer);
 var
   xL, xR: LongWord;
@@ -1700,6 +1676,9 @@ begin
   PLongWord(OutData)^ := xR;
   PLongWord(UIntPtr(OutData)+4)^ := xL;
 end;
+{$IF defined(ALOverflowCheckingON)}
+  {$Q+} {Overflow Checking}
+{$IFEND}
 
 {**************************************************************************************}
 class function TBCrypt.CryptCore(const Cost: Integer; key, salt: array of Byte): TBytes;
@@ -2806,7 +2785,7 @@ begin
   result := TBcrypt.SelfTest;
 end;
 
-{$ENDIF}
+{$ENDIF MSWINDOWS}
 
 
 
@@ -2814,7 +2793,7 @@ end;
 ////// HMAC algorithms //////
 /////////////////////////////
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 
 {****************************************************************}
 function  ALCalcHMACSHA1(const Str, Key : AnsiString): AnsiString;
@@ -2898,7 +2877,7 @@ begin
   result := ALStringHashMD5(o_key_pad + i_key_pad); // result := hash(o_key_pad + hash(i_key_pad + message))
 end;
 
-{$ENDIF}
+{$ENDIF !ALHideAnsiString}
 
 
 
@@ -3426,7 +3405,7 @@ begin
   {process all except the last block}
   for I := 1 to BlockCount - 1 do begin
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
-      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
     ALEncryptRDL(Context, Block);
     OutStream.WriteBuffer(Block, SizeOf(Block));
   end;
@@ -3437,7 +3416,7 @@ begin
     {set actual number of bytes to read}
     I := (InStream.Size mod SizeOf(Block));
     if InStream.Read(Block, I) <> I then
-      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
 
     {store number of bytes as last byte in last block}
     PByteArray(@Block)^[SizeOf(Block)-1] := I;
@@ -3448,7 +3427,7 @@ begin
   end else begin
     {encrypted file is always a multiple of the block size}
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
-      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
     ALEncryptRDL(Context, Block);
 
     {get actual number of bytes encoded}
@@ -3490,7 +3469,7 @@ begin
     ALMove(I, Block[8], 4);
     I := ALRandom32(Maxint); // random based on randseed
     ALMove(I, Block[12], 4);
-    {$IFEND}
+    {$ENDIF}
     ALEncryptRDL(Context, Block);
     OutStream.WriteBuffer(Block, SizeOf(Block));
     IV := Block;
@@ -3509,7 +3488,7 @@ begin
   {process all except the last block}
   for I := 1 to BlockCount - 1 do begin
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
-      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
 
     if Encrypt then begin
       ALEncryptRDLCBC(Context, IV, Block);
@@ -3529,7 +3508,7 @@ begin
     {set actual number of bytes to read}
     I := (InStream.Size mod SizeOf(Block));
     if InStream.Read(Block, I) <> I then
-      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
 
     {store number of bytes as last byte in last block}
     PByteArray(@Block)^[SizeOf(Block)-1] := I;
@@ -3540,7 +3519,7 @@ begin
   end else begin
     {encrypted file is always a multiple of the block size}
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
-      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
     ALEncryptRDLCBC(Context, IV, Block);
 
     {get actual number of bytes encoded}
@@ -3551,7 +3530,7 @@ begin
   end;
 end;
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 
 {******************************************************}
 procedure AlRDLEncryptString(const InString: AnsiString;
@@ -3761,7 +3740,7 @@ begin
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
-{$ENDIF}
+{$ENDIF !ALHideAnsiString}
 
 {***************************************************}
 procedure AlRDLEncryptStringU(const InString: String;
@@ -3872,7 +3851,7 @@ procedure AlRDLEncryptStringU(const InString: String;
 var aCipherKey128: TALCipherKey128;
 {$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
-{$IFEND}
+{$ENDIF}
 begin
   if keyDerivationFunction = MD5 then begin
     ALStringHashMD5U(aCipherKey128, Key, encoding);
@@ -3883,8 +3862,8 @@ begin
     ALStringHashSHA2U(aCipherKey256, Key, encoding);
     AlRDLEncryptStringU(InString,OutString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding, UseBase64);
   end
-  {$IFEND}
-  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
+  {$ENDIF}
+  else raise EALCipherExceptionU.Create(cAlCryptKDFNotSupported);
 end;
 
 {******************************************************}
@@ -3898,7 +3877,7 @@ procedure AlRDLEncryptStringCBCU(const InString: String;
 var aCipherKey128: TALCipherKey128;
 {$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
-{$IFEND}
+{$ENDIF}
 begin
   if keyDerivationFunction = MD5 then begin
     ALStringHashMD5U(aCipherKey128, Key, encoding);
@@ -3909,8 +3888,8 @@ begin
     ALStringHashSHA2U(aCipherKey256, Key, encoding);
     AlRDLEncryptStringCBCU(InString, OutString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding, UseBase64);
   end
-  {$IFEND}
-  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
+  {$ENDIF}
+  else raise EALCipherExceptionU.Create(cAlCryptKDFNotSupported);
 end;
 
 {***************************************************}
@@ -3923,7 +3902,7 @@ function  AlRDLEncryptStringU(const InString: String;
 var aCipherKey128: TALCipherKey128;
 {$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
-{$IFEND}
+{$ENDIF}
 begin
   if keyDerivationFunction = MD5 then begin
     ALStringHashMD5U(aCipherKey128, Key, encoding);
@@ -3934,8 +3913,8 @@ begin
     ALStringHashSHA2U(aCipherKey256, Key, encoding);
     Result := AlRDLEncryptStringU(InString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding, UseBase64);
   end
-  {$IFEND}
-  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
+  {$ENDIF}
+  else raise EALCipherExceptionU.Create(cAlCryptKDFNotSupported);
 end;
 
 {******************************************************}
@@ -3948,7 +3927,7 @@ function  AlRDLEncryptStringCBCU(const InString: String;
 var aCipherKey128: TALCipherKey128;
 {$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
-{$IFEND}
+{$ENDIF}
 begin
   if keyDerivationFunction = MD5 then begin
     ALStringHashMD5U(aCipherKey128, Key, encoding);
@@ -3959,8 +3938,8 @@ begin
     ALStringHashSHA2U(aCipherKey256, Key, encoding);
     result := AlRDLEncryptStringCBCU(InString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding, UseBase64);
   end
-  {$IFEND}
-  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
+  {$ENDIF}
+  else raise EALCipherExceptionU.Create(cAlCryptKDFNotSupported);
 end;
 
 {***************************************************************}
@@ -3972,7 +3951,7 @@ procedure AlRDLEncryptStreamU(const InStream, OutStream: TStream;
 var aCipherKey128: TALCipherKey128;
 {$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
-{$IFEND}
+{$ENDIF}
 begin
   if keyDerivationFunction = MD5 then begin
     ALStringHashMD5U(aCipherKey128, Key, encoding);
@@ -3983,8 +3962,8 @@ begin
     ALStringHashSHA2U(aCipherKey256, Key, encoding);
     AlRDLEncryptStream(InStream, OutStream, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
-  {$IFEND}
-  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
+  {$ENDIF}
+  else raise EALCipherExceptionU.Create(cAlCryptKDFNotSupported);
 end;
 
 {******************************************************************}
@@ -3996,7 +3975,7 @@ procedure AlRDLEncryptStreamCBCU(const InStream, OutStream: TStream;
 var aCipherKey128: TALCipherKey128;
 {$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
-{$IFEND}
+{$ENDIF}
 begin
   if keyDerivationFunction = MD5 then begin
     ALStringHashMD5U(aCipherKey128, Key, encoding);
@@ -4007,8 +3986,8 @@ begin
     ALStringHashSHA2U(aCipherKey256, Key, encoding);
     AlRDLEncryptStreamCBC(InStream, OutStream, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
-  {$IFEND}
-  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
+  {$ENDIF}
+  else raise EALCipherExceptionU.Create(cAlCryptKDFNotSupported);
 end;
 
 
@@ -4017,7 +3996,7 @@ end;
 ////// Blowfish //////
 //////////////////////
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 
 type
   TALBFBlockEx = packed record
@@ -4415,7 +4394,8 @@ begin
   {in total, 521 iterations are required to generate all required subkeys. }
 end;
 
-{*********************************************************************************************}
+{***********************}
+{$Q-} {Overflow Checking}
 procedure ALEncryptBF(const Context : TALBFContext; var Block : TALBFBlock; Encrypt : Boolean);
 var
   I : Integer;
@@ -4458,6 +4438,9 @@ begin
      Block[0] := Block[0] xor Context.PBox[0];
   end;
 end;
+{$IF defined(ALOverflowCheckingON)}
+  {$Q+} {Overflow Checking}
+{$IFEND}
 
 {*****************************************************************************}
 procedure ALEncryptBFCBC(const Context : TALBFContext; const Prev : TALBFBlock;
@@ -4561,7 +4544,7 @@ begin
   {process all except the last block}
   for I := 1 to BlockCount - 1 do begin
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
-      raise EALCipherException.Create(cAlCryptInvalidFileFormat);
+      raise EALCipherExceptionU.Create(cAlCryptInvalidFileFormat);
     ALEncryptBF(Context, Block, Encrypt);
     OutStream.WriteBuffer(Block, SizeOf(Block));
   end;
@@ -4572,7 +4555,7 @@ begin
     {set actual number of bytes to read}
     I := (InStream.Size mod SizeOf(Block));
     if InStream.Read(Block, I) <> I then
-      raise EAlCipherException.Create(cALCryptInvalidFileFormat);
+      raise EAlCipherExceptionU.Create(cALCryptInvalidFileFormat);
 
     {store number of bytes as last byte in last block}
     PByteArray(@Block)^[SizeOf(Block)-1] := I;
@@ -4583,7 +4566,7 @@ begin
   end else begin
     {encrypted file is always a multiple of the block size}
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
-      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
     ALEncryptBF(Context, Block, Encrypt);
 
     {get actual number of bytes encoded}
@@ -4636,7 +4619,7 @@ begin
   {process all except the last block}
   for I := 1 to BlockCount - 1 do begin
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
-      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
 
     if Encrypt then begin
       ALEncryptBFCBC(Context, IV, Block, Encrypt);
@@ -4656,7 +4639,7 @@ begin
     {set actual number of bytes to read}
     I := (InStream.Size mod SizeOf(Block));
     if InStream.Read(Block, I) <> I then
-      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
 
     {store number of bytes as last byte in last block}
     PByteArray(@Block)^[SizeOf(Block)-1] := I;
@@ -4667,7 +4650,7 @@ begin
   end else begin
     {encrypted file is always a multiple of the block size}
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
-      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
     ALEncryptBFCBC(Context, IV, Block, Encrypt);
 
     {get actual number of bytes encoded}
@@ -4740,7 +4723,7 @@ begin
   ALBFEncryptStreamCBC(InStream, OutStream, aCipherKey128, Encrypt);
 end;
 
-{$ENDIF}
+{$ENDIF !ALHideAnsiString}
 
 
 
@@ -4754,6 +4737,7 @@ end;
 procedure ALRandomBytes(const Dest; const Len: Cardinal);
 var hProv: HCRYPTPROV;
 begin
+  if Len = 0 then exit;
   if (not CryptAcquireContextA(@hProv,
                                nil,
                                nil,
@@ -4770,6 +4754,10 @@ end;
 function ALRandomBytes(const Len: Cardinal): TBytes;
 var hProv: HCRYPTPROV;
 begin
+  if Len = 0 then begin
+    SetLength(Result,0);
+    exit;
+  end;
   if (not CryptAcquireContextA(@hProv,
                                nil,
                                nil,
@@ -4787,6 +4775,7 @@ end;
 function ALRandomByteStr(const Len: Cardinal): AnsiString;
 var hProv: HCRYPTPROV;
 begin
+  if Len = 0 then exit('');
   if (not CryptAcquireContextA(@hProv,
                                nil,
                                nil,
@@ -4800,59 +4789,128 @@ begin
   end;
 end;
 
-//
-// Taken from https://github.com/synopse/mORMot.git
-// https://synopse.info
-// http://mormot.net
-//
+{$ENDIF MSWINDOWS}
 
-{$IF CompilerVersion > 34} // sydney
-  {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
-{$IFEND}
+{$IFDEF ALCPUX}
 
-{***********************************************}
-// from synCrypto.pas of Synopse mORMot framework
-// get 32-bit value from NIST SP 800-90A compliant RDRAND Intel x86/x64 opcode
+{*******************************************************************************************************************}
 // https://software.intel.com/en-us/articles/intel-digital-random-number-generator-drng-software-implementation-guide
-function RdRand32: cardinal;
-{$IF defined(CPU64BITS)}
-asm .noframe
-{$else}
+function _TryRdRand32(out Value: Cardinal): Boolean;
 asm
-{$ifend}
-  // rdrand eax: same opcodes for x86 and x64
-  db $0f, $c7, $f0
-  // returns in eax, ignore carry flag (eax=0 won't hurt)
+{$if defined(CPUX64)}
+  .noframe
+  // rdrand eax
+  db   $0f
+  db   $c7
+  db   $f0
+  jnc  @fail
+  mov  [rcx],eax
+{$elseif defined(CPUX86)}
+  // rdrand ecx
+  db   $0f
+  db   $c7
+  db   $f1
+  jnc  @fail
+  mov  [eax],ecx
+{$else}
+  {$Message Fatal 'TryRdRand32 not implemented for this platform'}
+{$endif}
+  mov  eax,1
+  ret
+@fail:
+  xor  eax,eax
 end;
 
-{****************************************************}
-function ALRandom32(const ARange: Cardinal): cardinal;
-var aBytes: Tbytes;
+{*******************************************************************************************************************}
+// https://software.intel.com/en-us/articles/intel-digital-random-number-generator-drng-software-implementation-guide
+{$if defined(CPUX64)}
+function _TryRdRand64(out Value: UInt64): Boolean;
+asm
+  .noframe
+  // rdrand rax
+  db   $48  // REX.W = 1
+  db   $0f
+  db   $c7
+  db   $f0
+  jnc  @fail
+  mov  [rcx],rax
+  mov  eax,1
+  ret
+@fail:
+  xor  eax,eax
+end;
+{$endif}
+
+{***********************************************************}
+function ALRandom32_RdRand(const ARange: Cardinal): cardinal;
+var I: integer;
 begin
-  if cfRAND in ALCpuFeatures then begin
-    result := RdRand32 mod ARange;
-    exit;
-  end;
+  //https://software.intel.com/content/www/us/en/develop/articles/intel-digital-random-number-generator-drng-software-implementation-guide.html
+  //It is recommended that applications attempt 10 retries in a tight
+  //loop in the unlikely event that the RDRAND instruction does not return a
+  //random number. This number is based on a binomial probability argument: given
+  //the design margins of the DRNG, the odds of ten failures in a row are
+  //astronomically small and would in fact be an indication of a larger CPU issue.
+  for I := 1 to 10 do
+    if _TryRdRand32(result) then
+      exit(Result mod ARange);
+  raise Exception.Create('RDRand failed!');
+end;
+
+{*******************************************************}
+function ALRandom64_RdRand(const ARange: UInt64): UInt64;
+{$if defined(CPUX64)}
+var I: integer;
+{$ENDIF}
+begin
+  //https://software.intel.com/content/www/us/en/develop/articles/intel-digital-random-number-generator-drng-software-implementation-guide.html
+  //It is recommended that applications attempt 10 retries in a tight
+  //loop in the unlikely event that the RDRAND instruction does not return a
+  //random number. This number is based on a binomial probability argument: given
+  //the design margins of the DRNG, the odds of ten failures in a row are
+  //astronomically small and would in fact be an indication of a larger CPU issue.
+  {$if defined(CPUX64)}
+  for I := 1 to 10 do
+    if _TryRdRand64(result) then
+      exit(Result mod ARange);
+  {$ELSE}
+  Result := (UInt64(ALRandom32_RdRand(ALMAXUInt)) shl 32) or ((UInt64(ALRandom32_RdRand(ALMAXUInt)) shl 32) shr 32);
+  exit(result mod ARange);
+  {$ENDIF}
+  raise Exception.Create('RDRand failed!');
+end;
+
+{$ENDIF ALCPUX}
+
+{************************************************************}
+function ALRandom32_Default(const ARange: Cardinal): cardinal;
+{$IFDEF MSWINDOWS}
+var aBytes: Tbytes;
+{$ENDIF}
+begin
+  {$IFDEF MSWINDOWS}
   aBytes := ALRandomBytes(sizeOf(result));
   move(aBytes[0],result,sizeOf(result));
   result := result mod ARange;
-end;
-
-{$ELSE}
-
-{****************************************************}
-function ALRandom32(const ARange: Cardinal): cardinal;
-begin
+  {$ELSE}
   result := cardinal(Random(integer(ARange)));
+  {$ENDIF}
 end;
 
+{********************************************************}
+function ALRandom64_Default(const ARange: UInt64): UInt64;
+{$IFDEF MSWINDOWS}
+var aBytes: Tbytes;
 {$ENDIF}
-
-{************************************************}
-function ALRandom64(const ARange: UInt64): UInt64;
 begin
-  Result := (UInt64(ALRandom32(ALMAXUInt)) shl 32) or ((UInt64(ALRandom32(ALMAXUInt)) shl 32) shr 32);
+  {$IFDEF MSWINDOWS}
+  aBytes := ALRandomBytes(sizeOf(result));
+  move(aBytes[0],result,sizeOf(result));
   result := result mod ARange;
+  {$ELSE}
+  Result := (UInt64(Random(ALMAXUInt)) shl 32) or ((UInt64(Random(ALMAXUInt)) shl 32) shr 32);
+  result := result mod ARange;
+  {$ENDIF}
 end;
 
 
@@ -4861,7 +4919,8 @@ end;
 ////// CRC32 //////
 ///////////////////
 
-{$IFNDEF NEXTGEN}
+{$IFDEF ALCPUX}
+{$IFNDEF ALHideAnsiString}
 
 //!!!!! ///////////////////////////////////////////////////////////// !!!!!//
 //!!!!! WARNINGS : DON'T CHANGE THE IMPLEMENTATION OF THE FUNCTIONS   !!!!!//
@@ -4928,8 +4987,8 @@ begin // on ARM, we use slicing-by-4 to avoid polluting smaller L1 cache
   result := not result;
 end;
 
-{****************}
-{$ifdef CPU32BITS}
+{*************}
+{$ifdef CPUX86}
 function crc32cfast(crc: cardinal; buf: PAnsiChar; len: cardinal): cardinal;
 asm  // adapted from Aleksandr Sharahov code and Maxim Masiutin remarks
         test    edx, edx
@@ -5003,8 +5062,8 @@ asm  // adapted from Aleksandr Sharahov code and Maxim Masiutin remarks
 end;
 {$endif}
 
-{****************}
-{$ifdef CPU64BITS}
+{*************}
+{$ifdef CPUX64}
 function crc32cfast(crc: cardinal; buf: PAnsiChar; len: cardinal): cardinal;
 asm .noframe
         {$ifndef win64}
@@ -5085,8 +5144,8 @@ asm .noframe
 end;
 {$endif}
 
-{****************}
-{$ifdef CPU32BITS}
+{*************}
+{$ifdef CPUX86}
 function crc32csse42(crc: cardinal; buf: PAnsiChar; len: cardinal): cardinal;
 asm // eax=crc, edx=buf, ecx=len
         not     eax
@@ -5128,8 +5187,8 @@ asm // eax=crc, edx=buf, ecx=len
 end;
 {$endif}
 
-{****************}
-{$ifdef CPU64BITS}
+{*************}
+{$ifdef CPUX64}
 function crc32csse42(crc: cardinal; buf: PAnsiChar; len: cardinal): cardinal;
 asm .noframe // ecx=crc, rdx=buf, r8=len (Linux: edi,rsi,edx)
         mov     eax, crc
@@ -5226,20 +5285,27 @@ begin
   hilo.Hi := Crc32cfast(hilo.Lo,buf,len);
 end;
 
+{******************************************************}
+function crc32cBy4SSE42(crc, value: cardinal): cardinal;
+{$IF defined(CPUX64)}
+asm .noframe
+  mov     eax, crc
+  crc32   eax, value
+end;
+{$else}
+asm // eax=crc, edx=value
+  db      $F2, $0F, $38, $F1, $C2
+end;
+{$endif}
+
 {********************************************************************************}
 procedure ALTestCRC32Implementation(const aSavedResultsFilename: AnsiString = '');
-var LData: ansiString;
-    LCharset: Array of ansiChar;
-    LCrc32csse42Result: cardinal;
-    LCrc32cfastResult: cardinal;
-    LCrc32cfastpurepascalResult: cardinal;
+var LCharset: Array of ansiChar;
     LStringList: TalStringList;
     LSaveResults: Boolean;
-    I: integer;
+    J: integer;
 begin
-  if not (cfSSE42 in ALCpuFeatures) then
-    raise Exception.Create('test failed!');
-  //-----
+  if @ALHashCrc32 <> @Crc32csse42_3 then raise Exception.Create('SSE 4.2 not supported!');
   LSaveResults := aSavedResultsFilename <> '';
   LStringList := TalStringList.Create;
   try
@@ -5248,7 +5314,12 @@ begin
        (ALFileExists(aSavedResultsFilename)) then begin
       LSaveResults := False;
       LStringList.LoadFromFile(aSavedResultsFilename);
-      for I := 0 to LStringList.Count - 1 do begin
+      TParallel.For(1, LStringList.Count - 1, procedure(I: Integer)
+      var LData: ansiString;
+          LCrc32csse42Result: cardinal;
+          LCrc32cfastResult: cardinal;
+          LCrc32cfastpurepascalResult: cardinal;
+      begin
         LData := ALBase64DecodeString(LStringList.ValueFromIndex[i]);
         LCrc32cfastResult:=Crc32cfast(0, Pointer(LData), Length(LData));
         LCrc32csse42Result:=Crc32csse42(0, Pointer(LData), Length(LData));
@@ -5256,23 +5327,56 @@ begin
         if LCrc32cfastResult <> LCrc32cfastpurepascalResult then raise Exception.Create('test failed!');
         if LCrc32cfastResult <> LCrc32csse42Result then raise Exception.Create('test failed!');
         if LCrc32cfastResult <> ALStrToUInt(LStringList.Names[i]) then raise Exception.Create('test failed!');
-      end;
+      end);
     end;
     //-----
     setlength(LCharset, 255);
-    for I := low(LCharset) to high(LCharset) do
-      LCharset[i] := ansichar(i);
+    for J := low(LCharset) to high(LCharset) do
+      LCharset[J] := ansichar(J);
     //-----
-    for I := 0 to 1000000 do begin
+    TParallel.For(1, 1000000, procedure(I: Integer)
+    var LData: ansiString;
+        LCrc32csse42Result: cardinal;
+        LCrc32cfastResult: cardinal;
+        LCrc32cfastpurepascalResult: cardinal;
+    begin
       LData := ALRandomStr(random(65536), LCharset);
       LCrc32cfastResult:=Crc32cfast(0, Pointer(LData), Length(LData));
       LCrc32csse42Result:=Crc32csse42(0, Pointer(LData), Length(LData));
       LCrc32cfastpurepascalResult:=Crc32cfastpurepascal(0, Pointer(LData), Length(LData));
       if LCrc32cfastResult <> LCrc32cfastpurepascalResult then raise Exception.Create('test failed!');
       if LCrc32cfastResult <> LCrc32csse42Result then raise Exception.Create('test failed!');
-      if LSaveResults and (I mod 1000 = 0) then
-        LStringList.add(ALUintToStr(LCrc32cfastResult) + LStringList.NameValueSeparator + ALBase64EncodeString(LData));
-    end;
+      if LSaveResults and (I mod 1000 = 0) then begin
+        TMonitor.Enter(LStringList);
+        try
+          LStringList.add(ALUintToStr(LCrc32cfastResult) + LStringList.NameValueSeparator + ALBase64EncodeString(LData));
+        finally
+          TMonitor.Exit(LStringList);
+        end;
+      end;
+    end);
+    //-----
+    TParallel.For(1, 100, procedure(I: Integer)
+    var LData: ansiString;
+        LCrc32csse42Result: cardinal;
+        LCrc32cfastResult: cardinal;
+        LCrc32cfastpurepascalResult: cardinal;
+    begin
+      LData := ALRandomStr(random(134217728), LCharset);
+      LCrc32cfastResult:=Crc32cfast(0, Pointer(LData), Length(LData));
+      LCrc32csse42Result:=Crc32csse42(0, Pointer(LData), Length(LData));
+      LCrc32cfastpurepascalResult:=Crc32cfastpurepascal(0, Pointer(LData), Length(LData));
+      if LCrc32cfastResult <> LCrc32cfastpurepascalResult then raise Exception.Create('test failed!');
+      if LCrc32cfastResult <> LCrc32csse42Result then raise Exception.Create('test failed!');
+      if LSaveResults and (I mod 1000 = 0) then begin
+        TMonitor.Enter(LStringList);
+        try
+          LStringList.add(ALUintToStr(LCrc32cfastResult) + LStringList.NameValueSeparator + ALBase64EncodeString(LData));
+        finally
+          TMonitor.Exit(LStringList);
+        end;
+      end;
+    end);
     //-----
     if LSaveResults then
       LStringList.SaveToFile(aSavedResultsFilename);
@@ -5282,7 +5386,8 @@ begin
   end;
 end;
 
-{$ENDIF}
+{$ENDIF !ALHideAnsiString}
+{$ENDIF ALCPUX}
 
 
 
@@ -5290,8 +5395,9 @@ end;
 ////// Fnv1a //////
 ///////////////////
 
-{***************}
-{$IFNDEF NEXTGEN}
+{************************}
+{$IFNDEF ALHideAnsiString}
+{$Q-} {Overflow Checking}
 //http://programmers.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed
 //https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
 //http://www.isthe.com/chongo/tech/comp/fnv/index.html#FNV-param
@@ -5302,9 +5408,13 @@ begin
    for i:=low(str) to high(str) do
       Result := (Result xor Ord(str[i])) * 1099511628211;
 end;
+{$IF defined(ALOverflowCheckingON)}
+  {$Q+} {Overflow Checking}
+{$IFEND}
 {$ENDIF}
 
-{**************************************************************************}
+{***********************}
+{$Q-} {Overflow Checking}
 function ALFnv1aInt64U(const str: String; Const encoding: Tencoding): Int64;
 var abytes: Tbytes;
     i : Integer;
@@ -5314,9 +5424,13 @@ begin
   for i:=low(aBytes) to high(aBytes) do
     Result := (Result xor aBytes[i]) * 10995116282118;
 end;
+{$IF defined(ALOverflowCheckingON)}
+  {$Q+} {Overflow Checking}
+{$ENDIF}
 
-{***************}
-{$IFNDEF NEXTGEN}
+{************************}
+{$IFNDEF ALHideAnsiString}
+{$Q-} {Overflow Checking}
 function ALFnv1aInt32(const str: ansiString): int32;
 var i : Integer;
 begin
@@ -5324,9 +5438,13 @@ begin
    for i:=low(str) to high(str) do
       Result := (Result xor Ord(str[i])) * 16777619;
 end;
+{$IF defined(ALOverflowCheckingON)}
+  {$Q+} {Overflow Checking}
+{$IFEND}
 {$ENDIF}
 
-{**************************************************************************}
+{***********************}
+{$Q-} {Overflow Checking}
 function ALFnv1aInt32U(const str: String; Const encoding: Tencoding): int32;
 var abytes: Tbytes;
     i : Integer;
@@ -5336,6 +5454,9 @@ begin
   for i:=low(aBytes) to high(aBytes) do
     Result := (Result xor aBytes[i]) * 16777619;
 end;
+{$IF defined(ALOverflowCheckingON)}
+  {$Q+} {Overflow Checking}
+{$ENDIF}
 
 
 
@@ -5822,6 +5943,8 @@ begin
 end;
 {$IFEND}
 
+
+
 //////////////////
 ////// Init //////
 //////////////////
@@ -5829,17 +5952,73 @@ end;
 {********************}
 procedure _InitCipher;
 
-{$IFNDEF NEXTGEN}
+{$IFDEF ALCPUX}
+{$IFNDEF ALHideAnsiString}
 var i,n: integer;
     crc: cardinal;
+{$ENDIF}
 {$ENDIF}
 
 begin
 
-  //init randseed
   randomize;
+  ALRandom32 := ALRandom32_Default;
+  ALRandom64 := ALRandom64_Default;
 
-  {$IFNDEF NEXTGEN}
+  {$IFDEF ALCPUX}
+
+  //https://en.wikipedia.org/wiki/CPUID#EAX.3D1:_Processor_Info_and_Feature_Bits
+  //The processor info and feature flags are manufacturer specific but usually the
+  //Intel values are used by other manufacturers for the sake of compatibility.
+  //Bit 00 = $00000001
+  //Bit 01 = $00000002
+  //Bit 02 = $00000004
+  //Bit 03 = $00000008
+  //Bit 04 = $00000010
+  //Bit 05 = $00000020
+  //Bit 06 = $00000040
+  //Bit 07 = $00000080
+  //Bit 08 = $00000100
+  //Bit 09 = $00000200
+  //Bit 10 = $00000400
+  //Bit 11 = $00000800
+  //Bit 12 = $00001000
+  //Bit 13 = $00002000
+  //Bit 14 = $00004000
+  //Bit 15 = $00008000
+  //Bit 16 = $00010000
+  //Bit 17 = $00020000
+  //Bit 18 = $00040000
+  //Bit 19 = $00080000
+  //Bit 20 = $00100000
+  //Bit 21 = $00200000
+  //Bit 22 = $00400000
+  //Bit 23 = $00800000
+  //Bit 24 = $01000000
+  //Bit 25 = $02000000
+  //Bit 26 = $04000000
+  //Bit 27 = $08000000
+  //Bit 28 = $10000000
+  //Bit 29 = $20000000
+  //Bit 30 = $40000000
+  //Bit 31 = $80000000
+  {$WARN SYMBOL_PLATFORM OFF}
+  if (CPUIDTable[1].ECX and $40000000{Bit 30}) <> 0 then begin
+    ALRandom32 := ALRandom32_RdRand;
+    ALRandom64 := ALRandom64_RdRand;
+    try
+      if (ALRandom32_RdRand(ALMaxUint) = ALRandom32_RdRand(ALMaxUint)) or             // most probably a RDRAND bug,
+         (ALRandom64_RdRand(ALMaxUint64) = ALRandom64_RdRand(ALMaxUint64)) then begin // e.g. on AMD Rizen 3000
+        ALRandom32 := ALRandom32_Default;
+        ALRandom64 := ALRandom64_Default;
+      end;
+    except
+      // may trigger an illegal instruction exception on some Ivy Bridge
+      ALRandom32 := ALRandom32_Default;
+      ALRandom64 := ALRandom64_Default;
+    end;
+  end;
+  {$WARN SYMBOL_PLATFORM ON}
 
   //
   // Taken from https://github.com/synopse/mORMot.git
@@ -5850,6 +6029,31 @@ begin
   {$IF CompilerVersion > 34} // sydney
     {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
   {$IFEND}
+
+  {$IFNDEF ALHideAnsiString}
+  ALStringHashCrc32 := @Crc32cfast_2;
+  ALHashCrc32 := @Crc32cfast_3;
+  ALStringHashCrc64 := @Crc64cfast_2;
+  ALHashCrc64 := @Crc64cfast_3;
+
+  {$WARN SYMBOL_PLATFORM OFF}
+  if (CPUIDTable[1].ECX and $00100000{Bit 20}) <> 0 then begin
+    ALStringHashCrc32 := @Crc32csse42_2;
+    ALHashCrc32 := @Crc32csse42_3;
+    ALStringHashCrc64 := @Crc64csse42_2;
+    ALHashCrc64 := @Crc64csse42_3;
+    try
+      if crc32cBy4SSE42(0,1)<>3712330424 then
+        raise EALExceptionU.Create('Invalid crc32cBy4SSE42');
+    except
+      // disable now on illegal instruction or incorrect result
+      ALStringHashCrc32 := @Crc32cfast_2;
+      ALHashCrc32 := @Crc32cfast_3;
+      ALStringHashCrc64 := @Crc64cfast_2;
+      ALHashCrc64 := @Crc64cfast_3;
+    end;
+  end;
+  {$WARN SYMBOL_PLATFORM ON}
 
   // initialize tables for crc32cfast()
   for i := 0 to 255 do begin
@@ -5867,21 +6071,9 @@ begin
       crc32ctab[n,i] := crc;
     end;
   end;
-  ALInitCpuFeatures;
-  if cfSSE42 in ALCpuFeatures then begin
-    ALStringHashCrc32 := @Crc32csse42_2;
-    ALHashCrc32 := @Crc32csse42_3;
-    ALStringHashCrc64 := @Crc64csse42_2;
-    ALHashCrc64 := @Crc64csse42_3;
-  end
-  else begin
-    ALStringHashCrc32 := @Crc32cfast_2;
-    ALHashCrc32 := @Crc32cfast_3;
-    ALStringHashCrc64 := @Crc64cfast_2;
-    ALHashCrc64 := @Crc64cfast_3;
-  end;
+  {$ENDIF !ALHideAnsiString}
 
-  {$ENDIF}
+  {$ENDIF ALCPUX}
 
 end;
 

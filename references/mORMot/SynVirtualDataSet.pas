@@ -6,7 +6,7 @@ unit SynVirtualDataSet;
 {
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit SynVirtualDataSet;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -77,7 +77,7 @@ uses
 type
   {$ifndef UNICODE} // defined as TRecordBuffer = PByte in newer DB.pas
   TRecordBuffer = PChar;
-  {$endif}
+  {$endif UNICODE}
   PDateTimeRec = ^TDateTimeRec;
 
   /// read-only virtual TDataSet able to access any content
@@ -779,7 +779,7 @@ begin
           W.AddDateTime(AsDateTime);
           W.Add('"');
         end;
-        ftString, ftFixedChar, ftMemo: begin
+        ftString, ftFixedChar, ftMemo, ftGuid: begin
           W.Add('"');
           W.AddAnsiString({$ifdef UNICODE}AsAnsiString{$else}AsString{$endif},
             twJSONEscape);

@@ -6,7 +6,7 @@
           android:versionName="%versionName%"
           android:installLocation="%installLocation%">
    
-    <uses-sdk android:minSdkVersion="%minSdkVersion%" android:targetSdkVersion="%targetSdkVersion%" /> <!-- This is the platform API where NativeActivity was introduced. -->
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="%targetSdkVersion%" /> <!-- This is the platform API where NativeActivity was introduced. -->
    
     <%uses-permission%>
    

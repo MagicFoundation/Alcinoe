@@ -22,8 +22,23 @@
     </div><!-- container -->
     <div class="blog-footer">
       <p>Proudly using the Open Source <a href="http://mormot.net">mORMot ORM/SOA/MVC Framework</a>.<br>
+      {{{main.blog.engine}}}<br>
       <small>{{{main.blog.copyright}}} - page generated in [[GENERATION_TIME_TAG]]</small></p>
-      <p><a href="#">Back to top</a></p>
+      <ul class="pager">
+        <li><a href="#">Back to top</a></li>
+        <li><a href=rss>RSS feed</a></li>
+        <li><a href=https://synopse.info/forum/viewtopic.php?id=25>Synopse</a></li>
+        <li><a href=https://synopse.info/forum>Support Forum</a></li>
+        <li><a href=https://github.com/synopse>On Github</a></li>
+      </ul>
+      {{#main.session}}
+      <p>
+        <form class="navbar-form" action="logout">
+        <span class="navbar-text">Signed in as <a href=AuthorView?id={{AuthorID}}>{{AuthorName}}</a></span>
+        <button class="btn" type="submit">Logout</button>
+        </form>
+      </p>
+      {{/main.session}}
     </div>
   </body>
 </html>

@@ -2,9 +2,10 @@ unit ALAndroidInstallReferrerApi;
 
 interface
 
-uses Androidapi.JNI.GraphicsContentViewText,
-     Androidapi.JNIBridge,
-     Androidapi.JNI.JavaTypes;
+uses
+  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNIBridge,
+  Androidapi.JNI.JavaTypes;
 
 type
 

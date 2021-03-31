@@ -44,20 +44,16 @@ type
     ALButton33: TButton;
     ALButton34: TButton;
     ALButton35: TButton;
-    ALButton36: TButton;
-    ALButton37: TButton;
-    ALButton38: TButton;
-    ALButton39: TButton;
-    ALButton41: TButton;
-    ALButton42: TButton;
     ALButton40: TButton;
     ALButton43: TButton;
-    ALButton44: TButton;
     ALButton45: TButton;
     ALButton46: TButton;
-    ALButton47: TButton;
     Button1: TButton;
     Button2: TButton;
+    Button3: TButton;
+    Button4: TButton;
+    Panel1: TPanel;
+    Label1: TLabel;
     procedure FormClick(Sender: TObject);
     procedure ALButton1Click(Sender: TObject);
     procedure ALButton2Click(Sender: TObject);
@@ -89,25 +85,19 @@ type
     procedure ALButton29Click(Sender: TObject);
     procedure ALButton30Click(Sender: TObject);
     procedure ALButton31Click(Sender: TObject);
-    procedure ALButton39Click(Sender: TObject);
-    procedure ALButton42Click(Sender: TObject);
-    procedure ALButton37Click(Sender: TObject);
-    procedure ALButton38Click(Sender: TObject);
-    procedure ALButton36Click(Sender: TObject);
     procedure ALButton16Click(Sender: TObject);
     procedure ALButton32Click(Sender: TObject);
-    procedure ALButton41Click(Sender: TObject);
     procedure ALButton33Click(Sender: TObject);
     procedure ALButton34Click(Sender: TObject);
     procedure ALButton35Click(Sender: TObject);
     procedure ALButton40Click(Sender: TObject);
-    procedure ALButton44Click(Sender: TObject);
     procedure ALButton43Click(Sender: TObject);
     procedure ALButton45Click(Sender: TObject);
-    procedure ALButton47Click(Sender: TObject);
     procedure ALButton46Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
   private
   public
   end;
@@ -435,145 +425,205 @@ begin
 end;
 
 procedure TForm1.ALButton5Click(Sender: TObject);
-Var S1: AnsiString;
+Var S1,S2,S3,S4,S5: AnsiString;
     i: integer;
     StartDate: TdateTime;
 begin
   StartDate := Now;
   S1 := ALRandomStr(50);
+  S2 := ALRandomStr(1);
+  S3 := ALRandomStr(3);
+  S4 := ALRandomStr(8);
+  S5 := ALRandomStr(20);
   For i := 0 to 2000 do begin
-    ALPos(AlRandomStr(1),S1);
-    ALPos(AlRandomStr(3),S1);
-    ALPos(AlRandomStr(8),S1);
-    ALPos(AlRandomStr(20),S1);
+    ALPos(S2,S1);
+    ALPos(S3,S1);
+    ALPos(S4,S1);
+    ALPos(S5,S1);
   end;
 
   S1 := ALRandomStr(200);
+  S2 := ALRandomStr(1);
+  S3 := ALRandomStr(3);
+  S4 := ALRandomStr(8);
+  S5 := ALRandomStr(20);
   For i := 0 to 2000 do begin
-    ALPos(AlRandomStr(1),S1);
-    ALPos(AlRandomStr(3),S1);
-    ALPos(AlRandomStr(8),S1);
-    ALPos(AlRandomStr(20),S1);
+    ALPos(S2,S1);
+    ALPos(S3,S1);
+    ALPos(S4,S1);
+    ALPos(S5,S1);
   end;
 
   S1 := ALRandomStr(3000);
+  S2 := ALRandomStr(1);
+  S3 := ALRandomStr(3);
+  S4 := ALRandomStr(8);
+  S5 := ALRandomStr(20);
   For i := 0 to 2000 do begin
-    ALPos(AlRandomStr(1),S1);
-    ALPos(AlRandomStr(3),S1);
-    ALPos(AlRandomStr(8),S1);
-    ALPos(AlRandomStr(20),S1);
+    ALPos(S2,S1);
+    ALPos(S3,S1);
+    ALPos(S4,S1);
+    ALPos(S5,S1);
   end;
 
   S1 := ALRandomStr(4000);
+  S2 := ALRandomStr(1);
+  S3 := ALRandomStr(3);
+  S4 := ALRandomStr(8);
+  S5 := ALRandomStr(20);
   For i := 0 to 2000 do begin
-    ALPos(AlRandomStr(1),S1);
-    ALPos(AlRandomStr(3),S1);
-    ALPos(AlRandomStr(8),S1);
-    ALPos(AlRandomStr(20),S1);
+    ALPos(S2,S1);
+    ALPos(S3,S1);
+    ALPos(S4,S1);
+    ALPos(S5,S1);
   end;
 
   S1 := ALRandomStr(300000);
+  S2 := ALRandomStr(1);
+  S3 := ALRandomStr(3);
+  S4 := ALRandomStr(8);
+  S5 := ALRandomStr(20);
   For i := 0 to 2000 do begin
-    ALPos(AlRandomStr(1),S1);
-    ALPos(AlRandomStr(3),S1);
-    ALPos(AlRandomStr(8),S1);
-    ALPos(AlRandomStr(20),S1);
+    ALPos(S2,S1);
+    ALPos(S3,S1);
+    ALPos(S4,S1);
+    ALPos(S5,S1);
   end;
   Showmessage('40,000 ALPos in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
 procedure TForm1.ALButton6Click(Sender: TObject);
-Var S1: String;
+Var S1,S2,S3,S4,S5: String;
     i: integer;
     StartDate: TdateTime;
 begin
   StartDate := Now;
-  S1 := AlRandomStrU(50);
+  S1 := ALRandomStrU(50);
+  S2 := ALRandomStrU(1);
+  S3 := ALRandomStrU(3);
+  S4 := ALRandomStrU(8);
+  S5 := ALRandomStrU(20);
   For i := 0 to 2000 do begin
-    Pos(AlRandomStrU(1),S1);
-    Pos(AlRandomStrU(3),S1);
-    Pos(AlRandomStrU(8),S1);
-    Pos(AlRandomStrU(20),S1);
+    Pos(S2,S1);
+    Pos(S3,S1);
+    Pos(S4,S1);
+    Pos(S5,S1);
   end;
 
-  S1 := AlRandomStrU(200);
+  S1 := ALRandomStrU(200);
+  S2 := ALRandomStrU(1);
+  S3 := ALRandomStrU(3);
+  S4 := ALRandomStrU(8);
+  S5 := ALRandomStrU(20);
   For i := 0 to 2000 do begin
-    Pos(AlRandomStrU(1),S1);
-    Pos(AlRandomStrU(3),S1);
-    Pos(AlRandomStrU(8),S1);
-    Pos(AlRandomStrU(20),S1);
+    Pos(S2,S1);
+    Pos(S3,S1);
+    Pos(S4,S1);
+    Pos(S5,S1);
   end;
 
-  S1 := AlRandomStrU(3000);
+  S1 := ALRandomStrU(3000);
+  S2 := ALRandomStrU(1);
+  S3 := ALRandomStrU(3);
+  S4 := ALRandomStrU(8);
+  S5 := ALRandomStrU(20);
   For i := 0 to 2000 do begin
-    Pos(AlRandomStrU(1),S1);
-    Pos(AlRandomStrU(3),S1);
-    Pos(AlRandomStrU(8),S1);
-    Pos(AlRandomStrU(20),S1);
+    Pos(S2,S1);
+    Pos(S3,S1);
+    Pos(S4,S1);
+    Pos(S5,S1);
   end;
 
-  S1 := AlRandomStrU(4000);
+  S1 := ALRandomStrU(4000);
+  S2 := ALRandomStrU(1);
+  S3 := ALRandomStrU(3);
+  S4 := ALRandomStrU(8);
+  S5 := ALRandomStrU(20);
   For i := 0 to 2000 do begin
-    Pos(AlRandomStrU(1),S1);
-    Pos(AlRandomStrU(3),S1);
-    Pos(AlRandomStrU(8),S1);
-    Pos(AlRandomStrU(20),S1);
+    Pos(S2,S1);
+    Pos(S3,S1);
+    Pos(S4,S1);
+    Pos(S5,S1);
   end;
 
-  S1 := AlRandomStrU(300000);
+  S1 := ALRandomStrU(300000);
+  S2 := ALRandomStrU(1);
+  S3 := ALRandomStrU(3);
+  S4 := ALRandomStrU(8);
+  S5 := ALRandomStrU(20);
   For i := 0 to 2000 do begin
-    Pos(AlRandomStrU(1),S1);
-    Pos(AlRandomStrU(3),S1);
-    Pos(AlRandomStrU(8),S1);
-    Pos(AlRandomStrU(20),S1);
+    Pos(S2,S1);
+    Pos(S3,S1);
+    Pos(S4,S1);
+    Pos(S5,S1);
   end;
   Showmessage('40,000 Pos in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
 procedure TForm1.ALButton31Click(Sender: TObject);
-Var S1: AnsiString;
+Var S1,S2,S3,S4,S5: AnsiString;
     i: integer;
     StartDate: TdateTime;
 begin
   StartDate := Now;
   S1 := ALRandomStr(50);
+  S2 := ALRandomStr(1);
+  S3 := ALRandomStr(3);
+  S4 := ALRandomStr(8);
+  S5 := ALRandomStr(20);
   For i := 0 to 2000 do begin
-    POS(AlRandomStr(1),S1);
-    POS(AlRandomStr(3),S1);
-    POS(AlRandomStr(8),S1);
-    POS(AlRandomStr(20),S1);
+    Pos(S2,S1);
+    Pos(S3,S1);
+    Pos(S4,S1);
+    Pos(S5,S1);
   end;
 
   S1 := ALRandomStr(200);
+  S2 := ALRandomStr(1);
+  S3 := ALRandomStr(3);
+  S4 := ALRandomStr(8);
+  S5 := ALRandomStr(20);
   For i := 0 to 2000 do begin
-    POS(AlRandomStr(1),S1);
-    POS(AlRandomStr(3),S1);
-    POS(AlRandomStr(8),S1);
-    POS(AlRandomStr(20),S1);
+    Pos(S2,S1);
+    Pos(S3,S1);
+    Pos(S4,S1);
+    Pos(S5,S1);
   end;
 
   S1 := ALRandomStr(3000);
+  S2 := ALRandomStr(1);
+  S3 := ALRandomStr(3);
+  S4 := ALRandomStr(8);
+  S5 := ALRandomStr(20);
   For i := 0 to 2000 do begin
-    POS(AlRandomStr(1),S1);
-    POS(AlRandomStr(3),S1);
-    POS(AlRandomStr(8),S1);
-    POS(AlRandomStr(20),S1);
+    Pos(S2,S1);
+    Pos(S3,S1);
+    Pos(S4,S1);
+    Pos(S5,S1);
   end;
 
   S1 := ALRandomStr(4000);
+  S2 := ALRandomStr(1);
+  S3 := ALRandomStr(3);
+  S4 := ALRandomStr(8);
+  S5 := ALRandomStr(20);
   For i := 0 to 2000 do begin
-    POS(AlRandomStr(1),S1);
-    POS(AlRandomStr(3),S1);
-    POS(AlRandomStr(8),S1);
-    POS(AlRandomStr(20),S1);
+    Pos(S2,S1);
+    Pos(S3,S1);
+    Pos(S4,S1);
+    Pos(S5,S1);
   end;
 
   S1 := ALRandomStr(300000);
+  S2 := ALRandomStr(1);
+  S3 := ALRandomStr(3);
+  S4 := ALRandomStr(8);
+  S5 := ALRandomStr(20);
   For i := 0 to 2000 do begin
-    POS(AlRandomStr(1),S1);
-    POS(AlRandomStr(3),S1);
-    POS(AlRandomStr(8),S1);
-    POS(AlRandomStr(20),S1);
+    Pos(S2,S1);
+    Pos(S3,S1);
+    Pos(S4,S1);
+    Pos(S5,S1);
   end;
   Showmessage('40,000 Pos in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -602,20 +652,6 @@ begin
   StartDate := Now;
   For i := 0 to 1000000 do begin
     S1 := Datetostr(Random(10000), aFormatSettings);
-  end;
-  Showmessage('1,000,000 Datetostr in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
-end;
-
-procedure TForm1.ALButton39Click(Sender: TObject);
-var i: integer;
-    StartDate: TdateTime;
-    aFormatSettings: TformatSettings;
-    S1: AnsiString;
-begin
-  GetLocaleFormatSettings(1033, aFormatSettings);
-  StartDate := Now;
-  For i := 0 to 1000000 do begin
-    S1 := AnsiString(Datetostr(Random(10000), aFormatSettings));
   end;
   Showmessage('1,000,000 Datetostr in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -652,22 +688,6 @@ begin
   Showmessage('1,000,000 TrystrToDateTime in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
-procedure TForm1.ALButton42Click(Sender: TObject);
-var i: integer;
-    StartDate: TdateTime;
-    aFormatSettings: TformatSettings;
-    S1: ansiString;
-    D1: TdateTime;
-begin
-  GetLocaleFormatSettings(1033, aFormatSettings);
-  StartDate := Now;
-  S1 := '12/10/2012';
-  For i := 0 to 1000000 do begin
-    TrystrToDateTime(String(S1), D1, aFormatSettings);
-  end;
-  Showmessage('1,000,000 TrystrToDateTime in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
-end;
-
 procedure TForm1.ALButton17Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -689,20 +709,7 @@ begin
   StartDate := Now;
   For i := 0 to 10000000 do begin
     S1 := ALRandomStrU(5,['0','1','2','3','4','5','6','7','8','9']);
-    StrToInt(String(S1));
-  end;
-  Showmessage('10,000,000 StrToInt in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
-end;
-
-procedure TForm1.ALButton37Click(Sender: TObject);
-var i: integer;
-    StartDate: TdateTime;
-    S1: AnsiString;
-begin
-  StartDate := Now;
-  For i := 0 to 10000000 do begin
-    S1 := ALRandomStr(5,['0','1','2','3','4','5','6','7','8','9']);
-    StrToInt(String(S1));
+    StrToInt(S1);
   end;
   Showmessage('10,000,000 StrToInt in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -733,19 +740,6 @@ begin
   Showmessage('10,000,000 StrToInt64 in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
-procedure TForm1.ALButton38Click(Sender: TObject);
-var i: integer;
-    StartDate: TdateTime;
-    S1: ansiString;
-begin
-  StartDate := Now;
-  For i := 0 to 10000000 do begin
-    S1 := ALRandomStr(10,['0','1','2','3','4','5','6','7','8','9']);
-    StrToInt64(String(S1));
-  end;
-  Showmessage('10,000,000 StrToInt64 in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
-end;
-
 procedure TForm1.ALButton15Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -766,18 +760,6 @@ begin
   StartDate := Now;
   For i := 0 to 10000000 do begin
     S1 := Inttostr(Random(maxint));
-  end;
-  Showmessage('10,000,000 Inttostr in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
-end;
-
-procedure TForm1.ALButton36Click(Sender: TObject);
-var i: integer;
-    StartDate: TdateTime;
-    S1: AnsiString;
-begin
-  StartDate := Now;
-  For i := 0 to 10000000 do begin
-    S1 := AnsiString(Inttostr(Random(maxint)));
   end;
   Showmessage('10,000,000 Inttostr in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -939,20 +921,6 @@ begin
   Showmessage('5,000,000 FloatToStr in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
-procedure TForm1.ALButton41Click(Sender: TObject);
-var i: integer;
-    StartDate: TdateTime;
-    aFormatSettings: TformatSettings;
-    S1: ansiString;
-begin
-  GetLocaleFormatSettings(1033, aFormatSettings);
-  StartDate := Now;
-  For i := 0 to 5000000 do begin
-    S1 := ansiString(FloatToStr(random(MaxInt) / random(Maxint), aFormatSettings));
-  end;
-  Showmessage('5,000,000 FloatToStr in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
-end;
-
 procedure TForm1.ALButton9Click(Sender: TObject);
 Var i: integer;
     StartDate: TdateTime;
@@ -1017,6 +985,102 @@ begin
   end;
   StopWatch.Stop;
   Showmessage('50,000 Base64Encode in: ' + formatFloat('0.,',StopWatch.Elapsed.TotalMilliseconds) + ' ms');
+end;
+
+procedure TForm1.Button3Click(Sender: TObject);
+Var S1: AnsiString;
+    i: integer;
+    StartDate: TdateTime;
+begin
+  StartDate := Now;
+  S1 := ALRandomStr(50, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  For i := 0 to 2000 do begin
+    ALPosExIgnoreCase(AlRandomStr(1),S1,1+random(50));
+    ALPosExIgnoreCase(AlRandomStr(3),S1,1+random(50));
+    ALPosExIgnoreCase(AlRandomStr(8),S1,1+random(50));
+    ALPosExIgnoreCase(AlRandomStr(20),S1,1+random(50));
+  end;
+
+  S1 := ALRandomStr(200, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  For i := 0 to 2000 do begin
+    ALPosExIgnoreCase(AlRandomStr(1),S1,1+random(50));
+    ALPosExIgnoreCase(AlRandomStr(3),S1,1+random(50));
+    ALPosExIgnoreCase(AlRandomStr(8),S1,1+random(50));
+    ALPosExIgnoreCase(AlRandomStr(20),S1,1+random(50));
+  end;
+
+  S1 := ALRandomStr(3000, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  For i := 0 to 2000 do begin
+    ALPosExIgnoreCase(AlRandomStr(1),S1,1+random(50));
+    ALPosExIgnoreCase(AlRandomStr(3),S1,1+random(50));
+    ALPosExIgnoreCase(AlRandomStr(8),S1,1+random(50));
+    ALPosExIgnoreCase(AlRandomStr(20),S1,1+random(50));
+  end;
+
+  S1 := ALRandomStr(4000, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  For i := 0 to 2000 do begin
+    ALPosExIgnoreCase(AlRandomStr(1),S1,1+random(50));
+    ALPosExIgnoreCase(AlRandomStr(3),S1,1+random(50));
+    ALPosExIgnoreCase(AlRandomStr(8),S1,1+random(50));
+    ALPosExIgnoreCase(AlRandomStr(20),S1,1+random(50));
+  end;
+
+  S1 := ALRandomStr(300000, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  For i := 0 to 2000 do begin
+    ALPosExIgnoreCase(AlRandomStr(1),S1,1+random(50));
+    ALPosExIgnoreCase(AlRandomStr(3),S1,1+random(50));
+    ALPosExIgnoreCase(AlRandomStr(8),S1,1+random(50));
+    ALPosExIgnoreCase(AlRandomStr(20),S1,1+random(50));
+  end;
+  Showmessage('40,000 ALPosExIgnoreCase in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
+end;
+
+procedure TForm1.Button4Click(Sender: TObject);
+Var S1: String;
+    i: integer;
+    StartDate: TdateTime;
+begin
+  StartDate := Now;
+  S1 := ALRandomStrU(50, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  For i := 0 to 2000 do begin
+    ALPosExIgnoreCaseU(AlRandomStrU(1),S1,1+random(50));
+    ALPosExIgnoreCaseU(AlRandomStrU(3),S1,1+random(50));
+    ALPosExIgnoreCaseU(AlRandomStrU(8),S1,1+random(50));
+    ALPosExIgnoreCaseU(AlRandomStrU(20),S1,1+random(50));
+  end;
+
+  S1 := ALRandomStrU(200, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  For i := 0 to 2000 do begin
+    ALPosExIgnoreCaseU(AlRandomStrU(1),S1,1+random(50));
+    ALPosExIgnoreCaseU(AlRandomStrU(3),S1,1+random(50));
+    ALPosExIgnoreCaseU(AlRandomStrU(8),S1,1+random(50));
+    ALPosExIgnoreCaseU(AlRandomStrU(20),S1,1+random(50));
+  end;
+
+  S1 := ALRandomStrU(3000, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  For i := 0 to 2000 do begin
+    ALPosExIgnoreCaseU(AlRandomStrU(1),S1,1+random(50));
+    ALPosExIgnoreCaseU(AlRandomStrU(3),S1,1+random(50));
+    ALPosExIgnoreCaseU(AlRandomStrU(8),S1,1+random(50));
+    ALPosExIgnoreCaseU(AlRandomStrU(20),S1,1+random(50));
+  end;
+
+  S1 := ALRandomStrU(4000, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  For i := 0 to 2000 do begin
+    ALPosExIgnoreCaseU(AlRandomStrU(1),S1,1+random(50));
+    ALPosExIgnoreCaseU(AlRandomStrU(3),S1,1+random(50));
+    ALPosExIgnoreCaseU(AlRandomStrU(8),S1,1+random(50));
+    ALPosExIgnoreCaseU(AlRandomStrU(20),S1,1+random(50));
+  end;
+
+  S1 := ALRandomStrU(300000, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  For i := 0 to 2000 do begin
+    ALPosExIgnoreCaseU(AlRandomStrU(1),S1,1+random(50));
+    ALPosExIgnoreCaseU(AlRandomStrU(3),S1,1+random(50));
+    ALPosExIgnoreCaseU(AlRandomStrU(8),S1,1+random(50));
+    ALPosExIgnoreCaseU(AlRandomStrU(20),S1,1+random(50));
+  end;
+  Showmessage('40,000 ALPosExIgnoreCase in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
 procedure TForm1.ALButton10Click(Sender: TObject);
@@ -1331,24 +1395,6 @@ begin
   Showmessage('3,000,000 Format in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
-
-procedure TForm1.ALButton44Click(Sender: TObject);
-var i: integer;
-    StartDate: TdateTime;
-    aFormatSettings: TformatSettings;
-    S1: AnsiString;
-begin
-  GetLocaleFormatSettings(1033, aFormatSettings);
-  StartDate := Now;
-  For i := 0 to 1000000 do begin
-    S1 := AnsiString(Format('xxx %s xxxx %s xxxx', [AlRandomStr(10), AlRandomStr(20)], aFormatSettings));
-    S1 := AnsiString(Format('xxx %*.*f xxx', [random(10), random(5), random(MaxInt) / random(MaxInt)], aFormatSettings));
-    S1 := AnsiString(Format('xxx %12.2m', [random(MaxInt) / random(MaxInt)], aFormatSettings));
-  end;
-  Showmessage('3,000,000 Format in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
-end;
-
-
 procedure TForm1.ALButton45Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -1377,22 +1423,6 @@ begin
   S1 := '121.23928322';
   For i := 0 to 10000000 do begin
     TryStrToFloat(S1, E1, aFormatSettings);
-  end;
-  Showmessage('10,000,000 ALTrystrFloat in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
-end;
-
-procedure TForm1.ALButton47Click(Sender: TObject);
-var i: integer;
-    StartDate: TdateTime;
-    aFormatSettings: TformatSettings;
-    S1: AnsiString;
-    E1: Extended;
-begin
-  GetLocaleFormatSettings(1033, aFormatSettings);
-  StartDate := Now;
-  S1 := '121.23928322';
-  For i := 0 to 10000000 do begin
-    TryStrToFloat(String(S1), E1, aFormatSettings);
   end;
   Showmessage('10,000,000 ALTrystrFloat in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;

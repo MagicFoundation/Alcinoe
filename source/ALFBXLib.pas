@@ -1,23 +1,25 @@
-{*************************************************************
-Author(s):    Henri Gourvest <hgourvest@progdigy.com>
-              Olivier Guilbaud <oguilb@free.fr>
-              Volkan Ceylan <volkance@hotmail.com>
-              The Original Code is the UIB code (version 2.1)
+{*******************************************************************************
+Author(s):
+Henri Gourvest <hgourvest@progdigy.com>
+Olivier Guilbaud <oguilb@free.fr>
+Volkan Ceylan <volkance@hotmail.com>
+The Original Code is the UIB code (version 2.1)
 
-              The Initial Developer of the Original Code is
-              Henri Gourvest <hgourvest@progdigy.com>. Portions
-              created by the Initial Developer are Copyright (C)
-              by the Initial Developer. All Rights Reserved.
+The Initial Developer of the Original Code is
+Henri Gourvest <hgourvest@progdigy.com>. Portions
+created by the Initial Developer are Copyright (C)
+by the Initial Developer. All Rights Reserved.
 
-product:      ALFBX (Alcinoe FireBird Express) - ALFBXLib
-Description:  ALFBX (Alcinoe FireBird Express) does for the Firebird
-              API what Delphi does for the WINDOWS API! Create high
-              performance client/server applications based on FireBird
-              without the BDE or ODBC.
+Description:
+ALFBX (Alcinoe FireBird Express) does for the Firebird
+API what Delphi does for the WINDOWS API! Create high
+performance client/server applications based on FireBird
+without the BDE or ODBC.
 
-Link :        https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 419)
-              http://www.progdigy.com/modules.php?name=UIB
-**************************************************************}
+Link :
+https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 419)
+http://www.progdigy.com/modules.php?name=UIB
+*******************************************************************************}
 
 unit ALFBXLib;
 
@@ -27,10 +29,6 @@ unit ALFBXLib;
   {$MINENUMSIZE 4}
 
 interface
-
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
 
 uses Winapi.Windows,
      System.SysUtils,

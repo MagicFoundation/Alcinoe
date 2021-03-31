@@ -1,0 +1,5 @@
+SYMBOLS {
+  global: 
+    _ZN*;
+    _ZZ*;
+};

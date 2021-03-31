@@ -1,6 +1,6 @@
 unit ALIosScrollBox;
 
-{$IF CompilerVersion > 33} // rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.ScrollBox.iOS.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -8,13 +8,14 @@ interface
 
 {$SCOPEDENUMS ON}
 
-uses System.TypInfo,
-     Macapi.ObjectiveC,
-     iOSapi.Foundation,
-     iOSapi.UIKit,
-     iOSapi.CocoaTypes,
-     iOSApi.CoreGraphics,
-     ALIosNativeView;
+uses
+  System.TypInfo,
+  Macapi.ObjectiveC,
+  iOSapi.Foundation,
+  iOSapi.UIKit,
+  iOSapi.CocoaTypes,
+  iOSApi.CoreGraphics,
+  ALIosNativeView;
 
 type
 

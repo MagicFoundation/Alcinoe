@@ -12,6 +12,7 @@ object Form1: TForm1
   DesignerMasterStyle = 0
   object ButtonFacebookLogin: TButton
     Align = Top
+    Position.Y = 86.000000000000000000
     Size.Width = 463.000000000000000000
     Size.Height = 65.000000000000000000
     Size.PlatformDefault = False
@@ -22,18 +23,19 @@ object Form1: TForm1
   object Memo1: TMemo
     Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
     DataDetectorTypes = []
+    ReadOnly = True
     TextSettings.WordWrap = True
     Align = Client
     Size.Width = 463.000000000000000000
-    Size.Height = 458.000000000000000000
+    Size.Height = 372.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 4
     Viewport.Width = 459.000000000000000000
-    Viewport.Height = 454.000000000000000000
+    Viewport.Height = 368.000000000000000000
   end
   object ButtonLogoutFromFacebook: TButton
     Align = Top
-    Position.Y = 65.000000000000000000
+    Position.Y = 151.000000000000000000
     Size.Width = 463.000000000000000000
     Size.Height = 65.000000000000000000
     Size.PlatformDefault = False
@@ -43,7 +45,7 @@ object Form1: TForm1
   end
   object ButtonGetCurrentTokenInfos: TButton
     Align = Top
-    Position.Y = 130.000000000000000000
+    Position.Y = 216.000000000000000000
     Size.Width = 463.000000000000000000
     Size.Height = 65.000000000000000000
     Size.PlatformDefault = False
@@ -53,12 +55,33 @@ object Form1: TForm1
   end
   object ButtonGetCurrentUserInfos: TButton
     Align = Top
-    Position.Y = 195.000000000000000000
+    Position.Y = 281.000000000000000000
     Size.Width = 463.000000000000000000
     Size.Height = 65.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 0
     Text = 'Get Current User Profile Infos'
     OnClick = ButtonGetCurrentUserInfosClick
+  end
+  object TextIntro: TALText
+    Align = Top
+    AutoSize = True
+    Margins.Left = 15.000000000000000000
+    Margins.Top = 15.000000000000000000
+    Margins.Right = 15.000000000000000000
+    Margins.Bottom = 15.000000000000000000
+    Position.X = 15.000000000000000000
+    Position.Y = 15.000000000000000000
+    Size.Width = 433.000000000000000000
+    Size.Height = 56.000000000000000000
+    Size.PlatformDefault = False
+    Text = 
+      'You must run '#13#10'Alcinoe\embarcadero\<yourDelphiVersion>\update.ba' +
+      't'#13#10' to retrieve and patch the original delphi source code.'
+    TextSettings.Font.Size = 14.000000000000000000
+    TextSettings.Font.StyleExt = {00070000000000000004000000}
+    TextSettings.FontColor = claCrimson
+    TextSettings.WordWrap = True
+    TextSettings.HorzAlign = Center
   end
 end

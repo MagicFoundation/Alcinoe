@@ -2,13 +2,14 @@ unit ALAndroidFacebookApi;
 
 interface
 
-uses Androidapi.JNI.GraphicsContentViewText,
-     Androidapi.JNIBridge,
-     Androidapi.JNI.JavaTypes,
-     Androidapi.JNI.Os,
-     Androidapi.JNI.Net,
-     Androidapi.JNI.App,
-     ALAndroidApi;
+uses
+  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNIBridge,
+  Androidapi.JNI.JavaTypes,
+  Androidapi.JNI.Os,
+  Androidapi.JNI.Net,
+  Androidapi.JNI.App,
+  ALAndroidApi;
 
 type
 

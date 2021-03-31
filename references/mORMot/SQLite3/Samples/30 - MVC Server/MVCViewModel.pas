@@ -12,6 +12,7 @@ uses
   SynCommons,
   SynLog,
   SynTests,
+  SynCrtSock,
   mORMot,
   mORMotMVC,
   MVCModel;
@@ -31,8 +32,9 @@ type
       out Comments: TObjectList);
     procedure AuthorView(
       var ID: TID; out Author: TSQLAuthor; out Articles: variant);
-    function Login(
-      const LogonName,PlainPassword: RawUTF8): TMVCAction;
+    procedure LoginView;
+    function Login(const LogonName,PlainPassword,
+      NewPlainPassword1,NewPlainPassword2: RawUTF8): TMVCAction;
     function Logout: TMVCAction;
     function ArticleComment(ID: TID; const Title,Comment: RawUTF8): TMVCAction;
     function ArticleMatch(const Match: RawUTF8): TMVCAction;
@@ -71,7 +73,13 @@ type
     procedure TagToText(const Value: variant; out result: variant);
   public
     procedure Start(aServer: TSQLRestServer); reintroduce;
+  published
+    // low-level blog/post blog/tag blog/rss endpoints
+    procedure Post(Ctxt: TSQLRestServerURIContext);
+    procedure Tag(Ctxt: TSQLRestServerURIContext);
+    procedure Rss(Ctxt: TSQLRestServerURIContext);
   public
+    // IBlogApplication implemented methods
     procedure Default(var Scope: variant);
     procedure ArticleView(ID: TID;
       var WithComments: boolean; Direction: integer; var Scope: variant;
@@ -79,7 +87,9 @@ type
       out Comments: TObjectList);
     procedure AuthorView(
       var ID: TID; out Author: TSQLAuthor; out Articles: variant);
-    function Login(const LogonName,PlainPassword: RawUTF8): TMVCAction;
+    procedure LoginView;
+    function Login(const LogonName,PlainPassword,
+      NewPlainPassword1,NewPlainPassword2: RawUTF8): TMVCAction;
     function Logout: TMVCAction;
     function ArticleComment(ID: TID; const Title,Comment: RawUTF8): TMVCAction;
     function ArticleMatch(const Match: RawUTF8): TMVCAction;
@@ -130,6 +140,10 @@ begin
   finally
     Free;
   end;
+  _Safe(fBlogMainInfo)^.AddValue('engine',RawUTF8ToVariant(
+    'Website powered by mORMot MVC '+SYNOPSE_FRAMEWORK_VERSION+
+    ', compiled with '+GetDelphiCompilerVersion+
+    ', running on '+RawUTF8(ToText(OSVersion32))+'.'));
 end;
 
 procedure TBlogApplication.MonthToText(const Value: variant;
@@ -172,29 +186,28 @@ begin
   auto := TSQLRecord.AutoFree([ // avoid several try..finally
     @info,TSQLBlogInfo, @article,TSQLArticle, @comment,TSQLComment, @tag,TSQLTag]);
   if not RestModel.Retrieve('',info) then begin // retrieve first item
-    tmp := StringFromFile('/home/ab/Downloads/2020-01-16-a8003957c2ae6bde5be6ea279c9c9ce4-backup.txt');
+    tmp := StringFromFile(ExeVersion.ProgramFilePath+'2021-01-20-16-37-default-backup.txt');
     info.Language := 'en';
     if tmp<>'' then begin
       info.Title := 'Synopse Blog';
       info.Description := 'Articles, announcements, news, updates and more '+
-        'about our Open Source projects';
+        'about Synopse Open Source projects';
       info.About := 'Latest information about Synopse Open Source librairies, '+
         'mainly the mORMot ORM/SOA/MVC framework, and SynPDF.';
+      info.Link := 'https://blog.synopse.info';
     end else begin
       info.Title := 'mORMot BLOG';
       info.Description := 'Sample Blog Web Application using Synopse mORMot MVC';
       info.About := TSynTestCase.RandomTextParagraph(10,'!');
+      info.Link := 'http://localhost:8092';
     end;
-    info.About := info.About+#13#10'Website powered by mORMot MVC '+
-      SYNOPSE_FRAMEWORK_VERSION+', compiled with '+GetDelphiCompilerVersion+
-      ', running on '+ToText(OSVersion32)+'.';
     info.Copyright := '&copy;'+ToUTF8(CurrentYear)+'<a href=https://synopse.info>Synopse Informatique</a>';
     RestModel.Add(info,true);
   end;
   if RestModel.TableHasRows(TSQLArticle) then
     exit;
   if tmp<>'' then begin
-    DotClearFlatImport(RestModel,tmp,fTagsLookup,'http://blog.synopse.info',
+    DotClearFlatImport(RestModel,tmp,fTagsLookup,'https://blog.synopse.info',
       (TMVCRunOnRestServer(fMainRunner).Views as TMVCViewsMustache).ViewStaticFolder);
     exit;
   end;  
@@ -271,19 +284,23 @@ begin
     fDefaultData.AddNewProp('tags',fTagsLookup.GetAsDocVariantArray,info);
 end;
 
-procedure TBlogApplication.FlushAnyCache;
-begin
-  inherited FlushAnyCache; // call fMainRunner.NotifyContentChanged
-  fDefaultData.Clear;
-end;
-
-
-{ TBlogApplication - Commands }
-
 const
   ARTICLE_FIELDS = 'RowID,Title,Tags,Abstract,ContentHtml,Author,AuthorName,CreatedAt';
   ARTICLE_DEFAULT_LIMIT = ' limit 20';
   ARTICLE_DEFAULT_ORDER: RawUTF8 = 'order by RowID desc'+ARTICLE_DEFAULT_LIMIT;
+
+procedure TBlogApplication.FlushAnyCache;
+begin
+  inherited FlushAnyCache; // call fMainRunner.NotifyContentChanged
+  fDefaultData.Clear;
+  // get last 20 articles
+  fDefaultData.SetValue('Articles',
+    RestModel.RetrieveDocVariantArray(TSQLArticle,'',
+      ARTICLE_DEFAULT_ORDER,[],ARTICLE_FIELDS,nil,@fDefaultLastID));
+end;
+
+
+{ TBlogApplication - Commands }
 
 procedure TBlogApplication.Default(var Scope: variant);
 var scop: PDocVariantData;
@@ -320,14 +337,12 @@ begin
       whereClause := whereClause+' and IntegerDynArrayContains(Tags,?)';
   end;
   SetVariantNull(Scope);
-  if (lastID=0) and (tag=0) then begin // use simple cache if no parameters
-    if not fDefaultData.AddExistingProp('Articles',Scope) then begin
-      articles := RestModel.RetrieveDocVariantArray(TSQLArticle,'',
-        ARTICLE_DEFAULT_ORDER,[],ARTICLE_FIELDS,nil,@fDefaultLastID);
-      fDefaultData.AddNewProp('Articles',articles,Scope);
-    end;
+  if (lastID=0) and (tag=0) then begin
+    // use simple cache if no parameters
+    fDefaultData.AddExistingProp('Articles',Scope); // set by FlushAnyCache
     lastID := fDefaultLastID;
-  end else begin // use more complex request using lastID + tag parameters
+  end else begin
+    // use more complex request using lastID + tag parameters
     articles := RestModel.RetrieveDocVariantArray(TSQLArticle,'',
       whereClause+ARTICLE_DEFAULT_ORDER,[lastID,tag],ARTICLE_FIELDS,nil,@lastID);
     scope := _ObjFast(['Articles',articles]);
@@ -370,12 +385,31 @@ begin
     raise EMVCApplication.CreateGotoError(HTTP_NOTFOUND);
 end;
 
-function TBlogApplication.Login(const LogonName, PlainPassword: RawUTF8): TMVCAction;
+procedure TBlogApplication.LoginView;
+begin
+end;
+
+function TBlogApplication.Login(const LogonName, PlainPassword,
+  NewPlainPassword1, NewPlainPassword2: RawUTF8): TMVCAction;
 var Author: TSQLAuthor;
     SessionInfo: TCookieData;
+    newpwd: RawUTF8;
 begin
-  if CurrentSession.CheckAndRetrieve<>0 then begin
-    GotoError(result,HTTP_BADREQUEST);
+  if LogonName='' then begin
+    GotoView(result,'LoginView',[]);
+    exit;
+  end;
+  newpwd := Trim(NewPlainPassword1);
+  if newpwd<>'' then begin
+    if (newpwd<>NewPlainPassword2) or
+       (newpwd=PlainPassword) or
+       (CurrentSession.CheckAndRetrieve(@SessionInfo,TypeInfo(TCookieData))=0) or
+       (SessionInfo.AuthorName<>LogonName) then begin
+      GotoError(result,HTTP_NOTACCEPTABLE);
+      exit;
+    end;
+  end else if CurrentSession.CheckAndRetrieve<>0 then begin
+    GotoError(result,'Already Logged In',HTTP_BADREQUEST);
     exit;
   end;
   Author := TSQLAuthor.Create(RestModel,'LogonName=?',[LogonName]);
@@ -385,6 +419,10 @@ begin
       SessionInfo.AuthorID := Author.ID;
       SessionInfo.AuthorRights := Author.Rights;
       CurrentSession.Initialize(@SessionInfo,TypeInfo(TCookieData));
+      if newpwd<>'' then begin
+        Author.SetPlainPassword(newpwd);
+        RestModel.Update(Author,'HashedPassword');
+      end;
       GotoDefault(result);
     end else
       GotoError(result,sErrorInvalidLogin);
@@ -479,6 +517,83 @@ begin
       end else
         RestModel.Update(Article);
   end;
+end;
+
+procedure TBlogApplication.Post(Ctxt: TSQLRestServerURIContext);
+var hash, id: Int64;
+begin
+  hash := ComputeLegacyHash(pointer(UrlDecode(Ctxt.URIAfterRoot,5,-1)));
+  id := RestModel.OneFieldValueInt64(TSQLArticle,'ID',
+    FormatUTF8('LegacyHash=:(%):', [hash]));
+  Ctxt.Redirect(FormatUTF8('/%/articleview?id=%',[RestModel.Model.Root,id]));
+end;
+
+procedure TBlogApplication.Tag(Ctxt: TSQLRestServerURIContext);
+var
+  id: integer;
+begin
+  id := fTagsLookup.GetIDFromIdent(copy(Ctxt.UriAfterRoot, 5, 100));
+  Ctxt.Redirect(FormatUTF8('/%/default?scope={tag:%}',[RestModel.Model.Root,id]));
+end;
+
+function Esc(const Msg: RawUTF8): RawUTF8;
+var i: integer;
+    ins: RawUTF8;
+begin
+  // fast enough for our purpose to compute some RSS cache
+  result := Msg;
+  for i := length(Msg) downto 1 do begin
+    case Msg[i] of
+      '"': ins := '&quot';
+      '&': ins := '&amp';
+      '<': ins := '&lt';
+      '>': ins := '&gt';
+      else Continue;
+    end;
+    result[i] := ';';
+    insert(ins,result,i);
+   end;
+end;
+
+procedure TBlogApplication.Rss(Ctxt: TSQLRestServerURIContext);
+  function ComputeRss: variant;
+  var xml, lng, link: RawUTF8;
+      art: integer;
+  begin
+    with _Safe(fBlogMainInfo)^ do
+    begin
+      link := U['Link'];
+      if (link<>'') and (link[length(link)]='/') then
+        SetLength(link,length(link)-1);
+      lng := U['Language'];
+      if lng='' then
+        lng := 'en_US';
+      FormatUTF8('<?xml version="1.0" encoding="UTF-8"?><rss version="2.0">'+
+        '<channel><title>%</title>'+
+        '<link>%</link><description>%</description>'+
+        '<lastBuildDate>%</lastBuildDate><language>%</language>',
+        [Esc(U['Title']),link,Esc(U['Description']),
+         DateTimeToHTTPDate(NowUTC,'+0000'),lng],xml);
+    end;
+    with _Safe(fDefaultData.GetValue('Articles'))^ do
+      for art := 0 to Count-1 do
+        with _Safe(Values[art])^ do
+          xml := FormatUTF8('%'#13'<item><title>%</title>'+
+            '<link>%/articleview?id=%</link><pubDate>%</pubDate><category>blog</category>'+
+            '<dc:creator>%</dc:creator><description><![CDATA[%]]></description>'+
+            '<content:encoded><![CDATA[%]]></content:encoded></item>',
+            [xml,Esc(U['Title']),link,I['ID'],
+             DateTimeToHTTPDate(TimeLogToDateTime(I['CreatedAt']),'+0000'),
+             Esc(U['AuthorName']),U['Abstract'],U['Content']]);
+    RawUTF8ToVariant(xml+'</channel></rss>',result);
+  end;
+var
+  rss: variant;
+begin
+  if not fDefaultData.ExistsOrLock('rss',rss) then
+    fDefaultData.ReplaceAndUnlock('rss',ComputeRss,rss);
+  Ctxt.Returns(ToUTF8(rss),HTTP_SUCCESS,
+    HEADER_CONTENT_TYPE+'application/rss+xml; charset=UTF-8',{handle304=}true);
 end;
 
 initialization

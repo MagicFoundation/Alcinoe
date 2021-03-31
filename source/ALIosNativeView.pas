@@ -1,6 +1,6 @@
 unit ALIosNativeView;
 
-{$IF CompilerVersion > 33} // rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.Presentation.iOS.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -8,17 +8,18 @@ interface
 
 {$SCOPEDENUMS ON}
 
-uses System.TypInfo,
-     System.Types,
-     System.Classes,
-     Macapi.ObjectiveC,
-     iOSapi.Foundation,
-     iOSapi.UIKit,
-     iOSApi.CoreGraphics,
-     FMX.Controls,
-     FMX.Forms,
-     FMX.ZOrder.iOS,
-     FMX.Types;
+uses
+  System.TypInfo,
+  System.Types,
+  System.Classes,
+  Macapi.ObjectiveC,
+  iOSapi.Foundation,
+  iOSapi.UIKit,
+  iOSApi.CoreGraphics,
+  FMX.Controls,
+  FMX.Forms,
+  FMX.ZOrder.iOS,
+  FMX.Types;
 
 type
 

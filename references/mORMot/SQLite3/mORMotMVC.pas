@@ -6,7 +6,7 @@ unit mORMotMVC;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit mORMotMVC;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -84,7 +84,7 @@ type
   TMVCViewFlags = set of (viewHasGenerationTimeTag);
 
   /// define a particular rendered View
-  // - as rendered by TMVCViewsAbtract.Render() method
+  // - as rendered by TMVCViewsAbstract.Render() method
   TMVCView = record
     /// the low-level content of this View
     Content: RawByteString;
@@ -95,7 +95,7 @@ type
   end;
 
   /// an abstract class able to implement Views
-  TMVCViewsAbtract = class
+  TMVCViewsAbstract = class
   protected
     fFactory: TInterfaceFactory;
     fLogClass: TSynLogClass;
@@ -105,7 +105,8 @@ type
     fViewGenerationTimeTag: RawUTF8;
     procedure SetViewTemplateFolder(const aFolder: TFileName);
     /// overriden implementations should return the rendered content
-    procedure Render(methodIndex: Integer; const Context: variant; var View: TMVCView); virtual; abstract;
+    procedure Render(methodIndex: Integer; const Context: variant;
+      var View: TMVCView); virtual; abstract;
     /// return the static file contents - from fViewStaticFolder by default
     // - called if cacheStatic has been defined
     function GetStaticFile(const aFileName: TFileName): RawByteString; virtual;
@@ -148,7 +149,7 @@ type
   end;
 
   /// a class able to implement Views using Mustache templates
-  TMVCViewsMustache = class(TMVCViewsAbtract)
+  TMVCViewsMustache = class(TMVCViewsAbstract)
   protected
     fViewTemplateFileTimestampMonitor: cardinal;
     fViewPartials: TSynMustachePartials;
@@ -163,8 +164,8 @@ type
       FileExt: TFileName;
       ContentType: RawUTF8;
       Locker: IAutoLocker;
-      FileTimestamp: TDateTime;
-      FileTimestampCheckTick: Int64;
+      FileAgeLast: PtrUInt;
+      FileAgeCheckTick: Int64;
       Flags: TMVCViewFlags;
     end;
     function GetRenderer(methodIndex: integer; var view: TMVCView): TSynMustache;
@@ -173,7 +174,7 @@ type
     /// return the template file contents
     function GetTemplate(const aFileName: TFileName): RawUTF8; virtual;
     /// return the template file date and time
-    function GetTemplateAge(const aFileName: TFileName): TDateTime; virtual;
+    function GetTemplateAge(const aFileName: TFileName): PtrUInt; virtual;
     /// overriden implementations should return the rendered content
     procedure Render(methodIndex: Integer; const Context: variant; var View: TMVCView); override;
     // some helpers defined here to avoid SynCrypto link in SynMustache
@@ -400,7 +401,7 @@ type
 
   TMVCApplication = class;
 
-  /// abtract MVC rendering execution context
+  /// abstract MVC rendering execution context
   // - you shoud not execute this abstract class, but any of the inherited class
   // - one instance inherited from this class would be allocated for each event
   // - may return some data (when inheriting from TMVCRendererReturningData), or
@@ -511,9 +512,9 @@ type
   // an optional simple in-memory cache
   TMVCRunWithViews = class(TMVCRun)
   protected
-    fViews: TMVCViewsAbtract;
+    fViews: TMVCViewsAbstract;
     fCacheLocker: IAutoLocker;
-    fCache: array of record
+    fCache: array of record // fCache[MethodIndex]
       Policy: TMVCRendererCachePolicy;
       TimeOutSeconds: cardinal;
       RootValue: RawUTF8;
@@ -523,7 +524,7 @@ type
   public
     /// link this runner class to a specified MVC application
     constructor Create(aApplication: TMVCApplication;
-      aViews: TMVCViewsAbtract=nil); reintroduce;
+      aViews: TMVCViewsAbstract=nil); reintroduce;
     /// method called to flush the caching mechanism for a MVC command
     procedure NotifyContentChangedForMethod(aMethodIndex: integer); override;
     /// defines the caching policy for a given MVC command
@@ -537,7 +538,7 @@ type
     /// finalize this instance
     destructor Destroy; override;
     /// read-write access to the associated MVC Views instance
-    property Views: TMVCViewsAbtract read fViews;
+    property Views: TMVCViewsAbstract read fViews;
   end;
 
   /// the kinds of optional content which may be published
@@ -587,7 +588,7 @@ type
     // - aPublishOptions could be used to specify integration with the server
     constructor Create(aApplication: TMVCApplication;
       aRestServer: TSQLRestServer=nil; const aSubURI: RawUTF8='';
-      aViews: TMVCViewsAbtract=nil; aPublishOptions: TMVCPublishOptions=
+      aViews: TMVCViewsAbstract=nil; aPublishOptions: TMVCPublishOptions=
         [low(TMVCPublishOption)..high(TMVCPublishOption)]); reintroduce;
     /// define some content for a static file
     // - only used if cacheStatic has been defined
@@ -645,7 +646,7 @@ type
   // - you should inherit from this class, then implement an interface inheriting
   // from IMVCApplication to define the various commands of the application
   // - here the Model would be a TSQLRest instance, Views will be defined by
-  // TMVCViewsAbtract (e.g. TMVCViewsMustache), and the ViewModel/Controller
+  // TMVCViewsAbstract (e.g. TMVCViewsMustache), and the ViewModel/Controller
   // will be implemented with IMVCApplication methods of the inherited class
   // - inherits from TInjectableObject, so that you could resolve dependencies
   // via services or stubs, following the IoC pattern
@@ -726,9 +727,9 @@ const
 implementation
 
 
-{ TMVCViewsAbtract }
+{ TMVCViewsAbstract }
 
-constructor TMVCViewsAbtract.Create(aInterface: PTypeInfo; aLogClass: TSynLogClass);
+constructor TMVCViewsAbstract.Create(aInterface: PTypeInfo; aLogClass: TSynLogClass);
 begin
   inherited Create;
   fFactory := TInterfaceFactory.Get(aInterface);
@@ -739,13 +740,13 @@ begin
   fViewGenerationTimeTag := '[[GENERATION_TIME_TAG]]';
 end;
 
-procedure TMVCViewsAbtract.SetViewTemplateFolder(const aFolder: TFileName);
+procedure TMVCViewsAbstract.SetViewTemplateFolder(const aFolder: TFileName);
 begin
   fViewTemplateFolder := IncludeTrailingPathDelimiter(aFolder);
   fViewStaticFolder := IncludeTrailingPathDelimiter(fViewTemplateFolder+STATIC_URI);
 end;
 
-function TMVCViewsAbtract.GetStaticFile(const aFileName: TFileName): RawByteString;
+function TMVCViewsAbstract.GetStaticFile(const aFileName: TFileName): RawByteString;
 begin
   result := StringFromFile(fViewStaticFolder + aFileName);
 end;
@@ -1144,7 +1145,7 @@ begin
 end;
 
 function TMVCViewsMustache.GetRenderer(methodIndex: integer; var view: TMVCView): TSynMustache;
-var age: TDateTime;
+var age: PtrUInt;
 begin
   if cardinal(methodIndex)>=fFactory.MethodsCount then
     raise EMVCException.CreateUTF8('%.Render(methodIndex=%)',[self,methodIndex]);
@@ -1155,11 +1156,11 @@ begin
       raise EMVCException.CreateUTF8('%.Render(''%''): Missing Template in ''%''',
         [self,MethodName,SearchPattern]);
     if (Mustache=nil) or ((fViewTemplateFileTimestampMonitor<>0) and
-       (FileTimestampCheckTick<GetTickCount64)) then begin
+       (FileAgeCheckTick<GetTickCount64)) then begin
       age := GetTemplateAge(ShortFileName);
-      if (Mustache=nil) or (age<>FileTimestamp) then begin
+      if (Mustache=nil) or (age<>FileAgeLast) then begin
         Mustache := nil; // no Mustache.Free: TSynMustache instances are cached
-        FileTimestamp := age;
+        FileAgeLast := age;
         Template := GetTemplate(ShortFileName);
         if Template<>'' then
         try
@@ -1174,7 +1175,7 @@ begin
           raise EMVCException.CreateUTF8('%.Render(''%''): Missing Template in ''%''',
             [self,ShortFileName,SearchPattern]);
         if fViewTemplateFileTimestampMonitor<>0 then
-          FileTimestampCheckTick := GetTickCount64+
+          FileAgeCheckTick := GetTickCount64+
             Int64(fViewTemplateFileTimestampMonitor)*Int64(1000);
       end;
     end;
@@ -1195,10 +1196,12 @@ begin
   result := AnyTextFileToRawUTF8(ViewTemplateFolder+aFileName,true);
 end;
 
-function TMVCViewsMustache.GetTemplateAge(const aFileName: TFileName): TDateTime;
+{$WARN SYMBOL_DEPRECATED OFF} // we don't need TDateTime, just values to compare
+function TMVCViewsMustache.GetTemplateAge(const aFileName: TFileName): PtrUInt;
 begin
-  result := FileAgeToDateTime(ViewTemplateFolder+aFileName);
+  result := FileAge(ViewTemplateFolder+aFileName);
 end;
+{$WARN SYMBOL_DEPRECATED ON}
 
 procedure TMVCViewsMustache.Render(methodIndex: Integer; const Context: variant;
   var View: TMVCView);
@@ -1488,6 +1491,7 @@ begin
           [self,aRestModel,fFactory.InterfaceTypeInfo^.Name,URI]) else
         // TServiceCustomAnswer maps TMVCAction in TMVCApplication.RunOnRestServer
         ArgsResultIsServiceCustomAnswer := true;
+  FlushAnyCache;
 end;
 
 destructor TMVCApplication.Destroy;
@@ -1736,7 +1740,7 @@ end;
 { TMVCRunWithViews }
 
 constructor TMVCRunWithViews.Create(aApplication: TMVCApplication;
-  aViews: TMVCViewsAbtract);
+  aViews: TMVCViewsAbstract);
 begin
   inherited Create(aApplication);
   fViews := aViews;
@@ -1790,7 +1794,7 @@ end;
 
 constructor TMVCRunOnRestServer.Create(aApplication: TMVCApplication;
   aRestServer: TSQLRestServer; const aSubURI: RawUTF8;
-  aViews: TMVCViewsAbtract; aPublishOptions: TMVCPublishOptions);
+  aViews: TMVCViewsAbstract; aPublishOptions: TMVCPublishOptions);
 var m: integer;
     bypass: boolean;
     method: RawUTF8;

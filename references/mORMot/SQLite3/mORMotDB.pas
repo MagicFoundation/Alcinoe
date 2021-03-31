@@ -6,7 +6,7 @@ unit mORMotDB;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit mORMotDB;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -79,7 +79,8 @@ type
   // - Handled=FALSE would let the default ID computation take place
   // - note that execution of this method would be protected by a mutex, so
   // it would be thread-safe
-  TOnEngineAddComputeID = function(Sender: TSQLRestStorageExternal; var Handled: Boolean): TID of object;
+  TOnEngineAddComputeID = function(Sender: TSQLRestStorageExternal;
+    var Handled: Boolean): TID of object;
 
   /// REST server with direct access to a SynDB-based external database
   // - handle all REST commands, using the external SQL database connection,
@@ -119,21 +120,25 @@ type
     fBatchIDs: TIDDynArray;
     /// get fFieldsExternal[] index using fFieldsExternalToInternal[] mapping
     // - do handle ID/RowID fields and published methods
-    function InternalFieldNameToFieldExternalIndex(const InternalFieldName: RawUTF8): integer;
+    function InternalFieldNameToFieldExternalIndex(
+      const InternalFieldName: RawUTF8): integer;
     /// create, prepare and bound inlined parameters to a thread-safe statement
     // - this implementation will call the ThreadSafeConnection virtual method,
     // then bound inlined parameters as :(1234): and call its Execute method
     // - should return nil on error, and not raise an exception
     function PrepareInlinedForRows(const aSQL: RawUTF8): ISQLDBStatement;
     /// overloaded method using FormatUTF8() and binding SynDB parameters
-    function PrepareDirectForRows(SQLFormat: PUTF8Char; const Args, Params: array of const): ISQLDBStatement;
+    function PrepareDirectForRows(SQLFormat: PUTF8Char;
+      const Args, Params: array of const): ISQLDBStatement;
     /// create, prepare, bound inlined parameters and execute a thread-safe statement
     // - this implementation will call the ThreadSafeConnection virtual method,
     // then bound inlined parameters as :(1234): and call its Execute method
     // - should return nil on error, and not raise an exception
-    function ExecuteInlined(const aSQL: RawUTF8; ExpectResults: Boolean): ISQLDBRows; overload;
+    function ExecuteInlined(const aSQL: RawUTF8;
+      ExpectResults: Boolean): ISQLDBRows; overload;
     /// overloaded method using FormatUTF8() and inlined parameters
-    function ExecuteInlined(SQLFormat: PUTF8Char; const Args: array of const; ExpectResults: Boolean): ISQLDBRows; overload;
+    function ExecuteInlined(SQLFormat: PUTF8Char; const Args: array of const;
+      ExpectResults: Boolean): ISQLDBRows; overload;
     /// overloaded method using FormatUTF8() and binding SynDB parameters
     function ExecuteDirect(SQLFormat: PUTF8Char; const Args, Params: array of const;
       ExpectResults: Boolean): ISQLDBRows;
@@ -146,10 +151,12 @@ type
     function EngineExecute(const aSQL: RawUTF8): boolean; override;
     function EngineLockedNextID: TID; virtual;
     function EngineAdd(TableModelIndex: integer; const SentData: RawUTF8): TID; override;
-    function EngineUpdate(TableModelIndex: integer; ID: TID; const SentData: RawUTF8): boolean; override;
+    function EngineUpdate(TableModelIndex: integer; ID: TID; const
+       SentData: RawUTF8): boolean; override;
     function EngineDeleteWhere(TableModelIndex: integer; const SQLWhere: RawUTF8;
       const IDs: TIDDynArray): boolean; override;
-    function EngineList(const SQL: RawUTF8; ForceAJAX: Boolean=false; ReturnedRowCount: PPtrInt=nil): RawUTF8; override;
+    function EngineList(const SQL: RawUTF8; ForceAJAX: Boolean=false;
+      ReturnedRowCount: PPtrInt=nil): RawUTF8; override;
     // BLOBs should be access directly, not through slower JSON Base64 encoding
     function EngineRetrieveBlob(TableModelIndex: integer; aID: TID;
       BlobField: PPropInfo; out BlobData: TSQLRawBlob): boolean; override;
@@ -224,7 +231,8 @@ type
     // - must be ended with Commit on success
     // - must be aborted with Rollback if any SQL statement failed
     // - return true if no transaction is active, false otherwise
-    function TransactionBegin(aTable: TSQLRecordClass; SessionID: cardinal=1): boolean; override;
+    function TransactionBegin(aTable: TSQLRecordClass;
+      SessionID: cardinal=1): boolean; override;
     /// end a transaction (implements REST END Member)
     // - write all pending SQL statements to the external database
     procedure Commit(SessionID: cardinal=1; RaiseException: boolean=false); override;
@@ -363,8 +371,8 @@ type
     // and TSQLRestStorageExternal as the related static class
     // - no particular class is supplied here, since it will depend on the
     // associated Static TSQLRestStorageExternal instance
-    class procedure GetTableModuleProperties(var aProperties: TVirtualTableModuleProperties);
-      override;
+    class procedure GetTableModuleProperties(
+      var aProperties: TVirtualTableModuleProperties); override;
     /// called to determine the best way to access the virtual table
     // - will prepare the request for TSQLVirtualTableCursor.Search()
     // - this overridden method will let the external DB engine perform the search,
@@ -391,7 +399,8 @@ type
     /// called to update a virtual table row content
     // - column order follows the Structure method, i.e. StoredClassProps.Fields[] order
     // - returns true on success, false otherwise
-    function Update(oldRowID, newRowID: Int64; var Values: TSQLVarDynArray): boolean; override;
+    function Update(oldRowID, newRowID: Int64;
+      var Values: TSQLVarDynArray): boolean; override;
   end;
 
 
@@ -440,7 +449,8 @@ function VirtualTableExternalRegister(aModel: TSQLModel;
 // definitions, in a fluent interface:
 function VirtualTableExternalMap(aModel: TSQLModel;
   aClass: TSQLRecordClass; aExternalDB: TSQLDBConnectionProperties;
-  const aExternalTableName: RawUTF8=''; aMapping: TSQLRecordPropertiesMappingOptions=[]): PSQLRecordPropertiesMapping;
+  const aExternalTableName: RawUTF8='';
+  aMapping: TSQLRecordPropertiesMappingOptions=[]): PSQLRecordPropertiesMapping;
 
 type
   /// all possible options for VirtualTableExternalRegisterAll/TSQLRestExternalDBCreate
@@ -504,6 +514,7 @@ function TSQLRestExternalDBCreate(aModel: TSQLModel;
 
 
 implementation
+
 
 function VirtualTableExternalRegister(aModel: TSQLModel; aClass: TSQLRecordClass;
   aExternalDB: TSQLDBConnectionProperties; const aExternalTableName: RawUTF8;
@@ -577,7 +588,8 @@ end;
 
 function VirtualTableExternalMap(aModel: TSQLModel;
   aClass: TSQLRecordClass; aExternalDB: TSQLDBConnectionProperties;
-  const aExternalTableName: RawUTF8; aMapping: TSQLRecordPropertiesMappingOptions): PSQLRecordPropertiesMapping;
+  const aExternalTableName: RawUTF8;
+  aMapping: TSQLRecordPropertiesMappingOptions): PSQLRecordPropertiesMapping;
 begin
   if VirtualTableExternalRegister(aModel,aClass,aExternalDB,aExternalTableName,aMapping) then
     result := @aModel.Props[aClass].ExternalDB else
@@ -657,7 +669,7 @@ constructor TSQLRestStorageExternal.Create(aClass: TSQLRecordClass;
        {$ifndef NOVARIANTS}
        ftUTF8,      // sftVariant
        ftUTF8,      // sftNullable (retrieved from Prop.SQLFieldTypeStored)
-       {$endif}
+       {$endif NOVARIANTS}
        ftBlob,      // sftBlob
        ftBlob,      // sftBlobDynArray
        ftBlob,      // sftBlobCustom

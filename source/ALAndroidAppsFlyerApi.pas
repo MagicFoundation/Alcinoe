@@ -2,10 +2,11 @@ unit ALAndroidAppsFlyerApi;
 
 interface
 
-uses Androidapi.JNIBridge,
-     Androidapi.JNI.App,
-     Androidapi.JNI.GraphicsContentViewText,
-     Androidapi.JNI.JavaTypes;
+uses
+  Androidapi.JNIBridge,
+  Androidapi.JNI.App,
+  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNI.JavaTypes;
 
 type
 

@@ -2,8 +2,9 @@ unit ALZLibEx;
 
 interface
 
-uses system.classes,
-     ZLibEx;
+uses
+  system.classes,
+  ZLibEx;
 
 Function  ALZInflate4Browser(const s: AnsiString): AnsiString;
 Function  ALZDeflate4Browser(const s: AnsiString): AnsiString;

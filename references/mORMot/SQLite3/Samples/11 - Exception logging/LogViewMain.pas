@@ -3,6 +3,7 @@ unit LogViewMain;
 
 interface
 
+{$I Synopse.inc}
 
 uses
   {$ifdef MSWINDOWS}
@@ -34,7 +35,9 @@ uses
   {$endif}
   SynCommons,
   SynLog,
+  {$ifndef FPC}
   SynMemoEx,
+  {$endif}
   mORMotHttpServer;
 
 type
@@ -155,7 +158,11 @@ type
     procedure ThreadListNameRefresh(Index: integer);
     procedure ReceivedOne(const Text: RawUTF8);
   public
+    {$ifdef FPC}
+    MemoBottom: TMemo; // for LCL compatibility
+    {$else}
     MemoBottom: TMemoEx;
+    {$endif}
     destructor Destroy; override;
     property LogFileName: TFileName write SetLogFileName;
   end;
@@ -332,7 +339,11 @@ begin
   ProfileList.ColWidths[0] := 60;
   ProfileList.ColWidths[1] := 1000;
   ProfileList.Hide;
+  {$ifdef FPC}
+  MemoBottom := TMemo.Create(self);
+  {$else}
   MemoBottom := TMemoEx.Create(self);
+  {$endif}
   MemoBottom.Parent := PanelBottom;
   MemoBottom.Align := alClient;
   MemoBottom.Font.Height := -11;
@@ -1077,9 +1088,11 @@ end;
 procedure TMainLogView.PanelBottomResize(Sender: TObject);
 var w: integer;
 begin
+  {$ifndef FPC}
   w := MemoBottom.CellRect.Width;
   if w > 0 then
     MemoBottom.RightMargin := (PanelBottom.ClientWidth div w) - 7;
+  {$endif}
 end;
 
 end.

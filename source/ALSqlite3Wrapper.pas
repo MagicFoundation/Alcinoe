@@ -17,11 +17,8 @@ unit ALSqlite3Wrapper;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
-Uses Winapi.Windows;
+Uses
+  Winapi.Windows;
 
 type
   SQLite3 = Pointer;
@@ -167,7 +164,8 @@ type
 
 implementation
 
-Uses System.sysutils;
+Uses
+  System.sysutils;
 
 {***********************************}
 constructor TALSqlite3Library.Create;

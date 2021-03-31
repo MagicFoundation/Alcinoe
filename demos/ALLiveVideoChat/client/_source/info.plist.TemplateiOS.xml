@@ -4,9 +4,6 @@
 <dict>
 <%VersionInfoPListKeys%>
 <%ExtraInfoPListKeys%>
-
-	<key>NSMicrophoneUsageDescription</key>
-	<string>The reason for accessing the microphone</string>
-
+<%StoryboardInfoPListKey%>
 </dict>
 </plist>

@@ -1,42 +1,45 @@
-{*************************************************************
-Author(s):    Jedi Project - JCL
-              Barry Kelly
-              Matthias Thoma (mthoma)
-              Petr Vones (pvones)
-              Robert Marquardt (marquardt)
-              Robert Rossmair (rrossmair)
+{*******************************************************************************
+Author(s):
+Jedi Project - JCL
+Barry Kelly
+Matthias Thoma (mthoma)
+Petr Vones (pvones)
+Robert Marquardt (marquardt)
+Robert Rossmair (rrossmair)
 
-product:      Alcinoe Expression Evaluator
-Description:  This unit contains expression evaluators, each tailored for different usage
-              patterns. It also contains the component objects, so that a customized
-              expression evaluator can be assembled relatively easily.
+Description:
+This unit contains expression evaluators, each tailored for different usage
+patterns. It also contains the component objects, so that a customized
+expression evaluator can be assembled relatively easily.
 
-Note :        operator priority (as implemented in this unit)
-              all binary operators are associated from left to right
-              all unary operators are associated from right to left
+Note :
+operator priority (as implemented in this unit)
+all binary operators are associated from left to right
+all unary operators are associated from right to left
 
-             (highest) not bnot(bitwise) +(unary) -(unary)            (level 3)
-             * / div mod and band(bitwise) shl shr in                 (level 2)
-             +(binary) -(binary) or xor bor(bitwise) bxor(bitwise)    (level 1)
-             (lowest)  < <= > >= cmp = <>                             (level 0)
+(highest) not bnot(bitwise) +(unary) -(unary)            (level 3)
+* / div mod and band(bitwise) shl shr in                 (level 2)
++(binary) -(binary) or xor bor(bitwise) bxor(bitwise)    (level 1)
+(lowest)  < <= > >= cmp = <>                             (level 0)
 
-             details on cmp operator:
-             "1.5 cmp 2.0" returns -1.0 because 1.5 < 2.0
-             "1.5 cmp 1.5" returns 0.0 because 1.5 = 1.5
-             "1.5 cmp 0.0" returns 1.0 because 1.5 > 0.0
-**************************************************************}
+details on cmp operator:
+"1.5 cmp 2.0" returns -1.0 because 1.5 < 2.0
+"1.5 cmp 1.5" returns 0.0 because 1.5 = 1.5
+"1.5 cmp 0.0" returns 1.0 because 1.5 > 0.0
+*******************************************************************************}
 
 unit ALExprEval;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+{$IF CompilerVersion > 34} // sydney
+  {$MESSAGE WARN 'Check if https://github.com/project-jedi/jcl.git jcl\source\common\JclExprEval.pas was not updated from references\jcl\source\common\JclExprEval.pas and adjust the IFDEF'}
 {$IFEND}
 
-uses System.SysUtils,
-     System.Classes,
-     ALStringList;
+uses
+  System.SysUtils,
+  System.Classes,
+  ALStringList;
 
 type
   EALExprEvalError = class(Exception);
@@ -861,11 +864,12 @@ resourcestring
 
 implementation
 
-uses System.Types,
-     System.Math,
-     System.Contnrs,
-     ALString,
-     ALCipher;
+uses
+  System.Types,
+  System.Math,
+  System.Contnrs,
+  ALString,
+  ALCipher;
 
 {*****************************************************}
 function ALEvaluator_Max(A, B: TALFloat80): TALFloat80;

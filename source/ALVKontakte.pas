@@ -132,6 +132,7 @@ uses
   {$ELSEIF defined(IOS)}
   iOSapi.Foundation,
   Macapi.Helpers,
+  FMX.Platform,
   FMX.Helpers.iOS,
   FMX.Platform.iOS,
   {$ENDIF}
@@ -236,16 +237,16 @@ procedure TALVKontakteLogin.logIn(const aScopes: TArray<String>);
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
-  var aArrayList: JArrayList;
-      aCollection: JCollection;
-      AString: String;
-      AScope: JVKScope;
+  var LArrayList: JArrayList;
+      LCollection: JCollection;
+      LString: String;
+      LScope: JVKScope;
   {$ENDIF}
   {$ENDREGION}
 
   {$REGION ' IOS'}
   {$IF defined(IOS)}
-  var ANSPermissions: NSArray;
+  var LNSPermissions: NSArray;
   {$ENDIF}
   {$ENDREGION}
 
@@ -254,13 +255,13 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  aArrayList := TJArrayList.JavaClass.init(Length(aScopes));
-  for AString in aScopes do begin
-    AScope := TJVKScope.JavaClass.valueOf(StringToJString(ALUppercaseU(AString)));
-    aArrayList.add(AScope);
+  LArrayList := TJArrayList.JavaClass.init(Length(aScopes));
+  for LString in aScopes do begin
+    LScope := TJVKScope.JavaClass.valueOf(StringToJString(ALUppercaseU(LString)));
+    LArrayList.add(LScope);
   end;
-  aCollection := TJCollection.Wrap((aArrayList as ILocalObject).GetObjectID);
-  TJVK.JavaClass.login(TAndroidHelper.Activity, aCollection);
+  LCollection := TJCollection.Wrap((LArrayList as ILocalObject).GetObjectID);
+  TJVK.JavaClass.login(TAndroidHelper.Activity, LCollection);
 
   {$ENDIF}
   {$ENDREGION}
@@ -268,11 +269,11 @@ begin
   {$REGION ' IOS'}
   {$IF defined(IOS)}
 
-  ANSPermissions := ALStringsToNSArray(aScopes);
+  LNSPermissions := ALStringsToNSArray(aScopes);
   try
-    TVKSdk.OCClass.authorize(ANSPermissions);
+    TVKSdk.OCClass.authorize(LNSPermissions);
   finally
-    ANSPermissions.release;
+    LNSPermissions.release;
   end;
 
   {$ENDIF}
@@ -307,7 +308,7 @@ function TALVKontakteLogin.CurrentUserId: String;
 
   {$REGION ' IOS'}
   {$IF defined(ios)}
-  var aToken: VKAccessToken;
+  var LToken: VKAccessToken;
   {$ENDIF}
   {$ENDREGION}
 
@@ -324,9 +325,9 @@ begin
   {$REGION ' IOS'}
   {$IF defined(IOS)}
 
-  aToken := TVKSdk.OCClass.accessToken;
-  if aToken = nil then result := ''
-  else result := NSStrToStr(aToken.userID)
+  LToken := TVKSdk.OCClass.accessToken;
+  if LToken = nil then result := ''
+  else result := NSStrToStr(LToken.userID)
 
   {$ENDIF}
   {$ENDREGION}
@@ -363,30 +364,30 @@ end;
 
 {***********************************************************************}
 procedure TALVKontakteLogin.TAuthCallback.onLogin(token: JVKAccessToken);
-var aTokenStr: String;
-    aUserID: Integer;
-    aEmail: String;
+var LTokenStr: String;
+    LUserID: Integer;
+    LEmail: String;
 begin
 
   if (token <> nil) and (token.isValid) then begin
-    aUserID := Token.getUserId;
-    aEmail := JStringToString(Token.getEmail);
-    aTokenStr := JStringToString(Token.getAccessToken);
+    LUserID := Token.getUserId;
+    LEmail := JStringToString(Token.getEmail);
+    LTokenStr := JStringToString(Token.getAccessToken);
   end
   else begin
-    aUserID := 0;
-    aEmail := '';
-    aTokenStr := '';
+    LUserID := 0;
+    LEmail := '';
+    LTokenStr := '';
   end;
   {$IFDEF DEBUG}
-  allog('TALVKontakteLogin.TAuthCallback.onSuccess', 'UserID: ' + ALintToStrU(aUserID) +
-                                                     ' - Email: ' + aEmail +
-                                                     ' - Token: ' + aTokenStr +
+  allog('TALVKontakteLogin.TAuthCallback.onSuccess', 'UserID: ' + ALintToStrU(LUserID) +
+                                                     ' - Email: ' + LEmail +
+                                                     ' - Token: ' + LTokenStr +
                                                      ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.info);
   {$ENDIF}
 
   if assigned(fVKontakteLogin.fOnsuccess) then
-    fVKontakteLogin.fOnsuccess(ALinttoStrU(aUserID), aEmail, aTokenStr);
+    fVKontakteLogin.fOnsuccess(ALinttoStrU(LUserID), LEmail, LTokenStr);
 
 end;
 
@@ -670,54 +671,36 @@ Type
   //if i don't don't this i have internal error
   _TVKontakteProcOfObjectWrapper = class(Tobject)
   public
-    class procedure applicationOpenURLWithSourceAnnotationHandler(const Sender: TObject; const M: TMessage);
-    class procedure applicationOpenURLWithOptionsHandler(const Sender: TObject; const M: TMessage);
+    class procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
   end;
 
-{****************************************************************************}
-// To bypass compile errors you must add a custom modified FMX.Platform.iOS to
-// your project, see the instructions at https://github.com/grijjy/DelphiSocialFrameworks for more details
-class procedure _TVKontakteProcOfObjectWrapper.applicationOpenURLWithSourceAnnotationHandler(const Sender: TObject; const M: TMessage);
-var LValue: TAppDelegate_applicationOpenURLWithSourceAnnotation;
+{**********************************************************************************************************************}
+class procedure _TVKontakteProcOfObjectWrapper.ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
 begin
   if not _ALVKontakteInitialised then exit;
-  if M is TAppDelegateMessage_applicationOpenURLWithSourceAnnotation then begin
-    LValue := (M as TAppDelegateMessage_applicationOpenURLWithSourceAnnotation).value;
-    {$IFDEF DEBUG}
-    allog('_TVKontakteProcOfObjectWrapper.applicationOpenURLWithSourceAnnotationHandler', 'url: ' + NSStrToStr(LValue.Url.absoluteString) +
-                                                                                          ' - fromApplication: ' + NSStrToStr(LValue.SourceApplication) +
-                                                                                          ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
-    {$ENDIF}
-    TVKSdk.OCClass.processOpenURL(LValue.Url, LValue.SourceApplication);
-  end;
-end;
+  if M is TApplicationEventMessage then begin
+    var LValue := (M as TApplicationEventMessage).value;
+    if LValue.Event = TApplicationEvent.OpenURL then begin
 
-{****************************************************************************************************************************}
-class procedure _TVKontakteProcOfObjectWrapper.applicationOpenURLWithOptionsHandler(const Sender: TObject; const M: TMessage);
-var LValue: TAppDelegate_applicationOpenURLWithOptions;
-    LPointer: Pointer;
-begin
-  if not _ALVKontakteInitialised then exit;
-  if M is TAppDelegateMessage_applicationOpenURLWithOptions then begin
-    LValue := (M as TAppDelegateMessage_applicationOpenURLWithOptions).Value;
-    if (LValue.Options <> nil) then begin
-      LPointer := LValue.Options.valueForKey(UIApplicationOpenURLOptionsSourceApplicationKey);
-      if LPointer <> nil then begin
-        {$IFDEF DEBUG}
-        allog('_TVKontakteProcOfObjectWrapper.applicationOpenURLWithOptionsHandler', 'url: ' + NSStrToStr(LValue.Url.absoluteString) +
-                                                                                     ' - fromApplication: ' + NSStrToStr(TNSString.Wrap(LPointer)) +
-                                                                                     ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
-        {$ENDIF}
-        TVKSdk.OCClass.processOpenURL(LValue.Url, TNSString.Wrap(LPointer));
+      var Lcontext := TiOSOpenApplicationContext(LValue.Context);
+      {$IFDEF DEBUG}
+      ALLog('_TVKontakteProcOfObjectWrapper.ApplicationEventMessageHandler', 'Url: ' + Lcontext.URL);
+      {$ENDIF}
+
+      //application:openURL:options: (iOS 9 and up)
+      If TOSVersion.Check(9) then begin
+        if (Lcontext.Context <> nil) then begin
+          var LPointer := TNSDictionary.Wrap(Lcontext.Context).valueForKey(UIApplicationOpenURLOptionsSourceApplicationKey);
+          if LPointer <> nil then TVKSdk.OCClass.processOpenURL(StrToNSUrl(Lcontext.Url), TNSString.Wrap(LPointer))
+          else TVKSdk.OCClass.processOpenURL(StrToNSUrl(Lcontext.Url), nil);
+        end;
       end
+
+      //application:openURL:sourceApplication:annotation: (iOS 8 and older)
       else begin
-        {$IFDEF DEBUG}
-        allog('_TVKontakteProcOfObjectWrapper.applicationOpenURLWithOptionsHandler', 'url: ' + NSStrToStr(LValue.Url.absoluteString) +
-                                                                                     ' - fromApplication: null' +
-                                                                                     ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
-        {$ENDIF}
-        TVKSdk.OCClass.processOpenURL(LValue.Url, nil);
+        TVKSdk.OCClass.processOpenURL(StrToNSUrl(Lcontext.Url), StrToNSStr(Lcontext.SourceApp));
       end;
+
     end;
   end;
 end;
@@ -731,8 +714,7 @@ initialization
 
   {$REGION ' IOS'}
   {$IF defined(IOS)}
-  TMessageManager.DefaultManager.SubscribeToMessage(TAppDelegateMessage_applicationOpenURLWithSourceAnnotation, _TVKontakteProcOfObjectWrapper.applicationOpenURLWithSourceAnnotationHandler);
-  TMessageManager.DefaultManager.SubscribeToMessage(TAppDelegateMessage_applicationOpenURLWithOptions, _TVKontakteProcOfObjectWrapper.applicationOpenURLWithOptionsHandler);
+  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, _TVKontakteProcOfObjectWrapper.ApplicationEventMessageHandler);
   {$ENDIF}
   {$ENDREGION}
 
@@ -741,8 +723,7 @@ finalization
 
   {$REGION ' IOS'}
   {$IF defined(IOS)}
-  TMessageManager.DefaultManager.Unsubscribe(TAppDelegateMessage_applicationOpenURLWithSourceAnnotation, _TVKontakteProcOfObjectWrapper.applicationOpenURLWithSourceAnnotationHandler);
-  TMessageManager.DefaultManager.Unsubscribe(TAppDelegateMessage_applicationOpenURLWithOptions, _TVKontakteProcOfObjectWrapper.applicationOpenURLWithOptionsHandler);
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, _TVKontakteProcOfObjectWrapper.ApplicationEventMessageHandler);
   {$ENDIF}
   {$ENDREGION}
 

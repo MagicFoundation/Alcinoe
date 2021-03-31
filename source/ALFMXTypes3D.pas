@@ -2,17 +2,18 @@ unit ALFMXTypes3D;
 
 interface
 
-uses System.Classes,
-     {$IFDEF ANDROID}
-     Androidapi.JNI.GraphicsContentViewText,
-     FMX.Context.GLES.Android,
-     {$ELSEIF defined(IOS)}
-     FMX.Context.GLES.iOS,
-     {$ENDIF}
-     FMX.types,
-     FMX.Types3D,
-     FMX.Materials.Canvas,
-     ALFmxFilterEffects;
+uses
+  System.Classes,
+  {$IFDEF ANDROID}
+  Androidapi.JNI.GraphicsContentViewText,
+  FMX.Context.GLES.Android,
+  {$ELSEIF defined(IOS)}
+  FMX.Context.GLES.iOS,
+  {$ENDIF}
+  FMX.types,
+  FMX.Types3D,
+  FMX.Materials.Canvas,
+  ALFmxFilterEffects;
 
 type
 
@@ -95,7 +96,7 @@ type
   end;
 
   {************************}
-  {$IF CompilerVersion > 33} // rio
+  {$IF CompilerVersion > 34} // sydney
     {$MESSAGE WARN 'Check if FMX.Types3D.TTexture still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALTextureAccessPrivate = class(TInterfacedPersistent)
@@ -142,30 +143,15 @@ type
     class property Def420YpCbCr8PlanarMaterial: TALCanvas420YpCbCr8PlanarTextureMaterial read getDef420YpCbCr8PlanarMaterial;
   end;
 
-  {****************************}
-  //420YpCbCr8BiPlanarVideoRange
-  //the Y data (luminance) and the CbCr data (chroma or color information)
-  //are in two separate memory areas called planes. If you have a full range
-  //format, then the values from 0 to 255 are used for each luma or chroma
-  //value. Video range format only use values from 16 to 235 (for some
-  //historical reasons). The term 420 indicates how much luma and how much
-  //chroma information the format contains. It basically says that there is
-  //luma information for each pixel and chroma information for each 2x2 block.
-  //420YpCbCr8Planar
-  //Planar Component Y'CbCr 8-bit 4:2:0
-  TALTextureFormat = (f420YpCbCr8BiPlanarVideoRange, f420YpCbCr8Planar);
-
   {************************************}
   TALBiPlanarTexture = class(TALTexture)
   private
     FSecondTexture: TTexture;
-    FFormat: TALTextureFormat;
   protected
   public
     constructor Create; override;
     destructor Destroy; override;
     property SecondTexture: TTexture read FSecondTexture;
-    property Format: TALTextureFormat read fformat write fformat;
   end;
 
   {**********************************}
@@ -173,14 +159,12 @@ type
   private
     FSecondTexture: TTexture;
     FThirdTexture: TTexture;
-    FFormat: TALTextureFormat;
   protected
   public
     constructor Create; override;
     destructor Destroy; override;
     property SecondTexture: TTexture read FSecondTexture;
     property ThirdTexture: TTexture read FThirdTexture;
-    property Format: TALTextureFormat read fformat write fformat;
   end;
 
   {**************}
@@ -196,25 +180,24 @@ procedure ALInitializeExternalOESTexture(const Texture: TALTexture);
 
 implementation
 
-uses system.sysutils,
-     {$IF defined(ANDROID)}
-     Androidapi.JNI.OpenGL,
-     Androidapi.Gles2,
-     Androidapi.Gles2ext,
-     FMX.Context.GLES,
-     {$ENDIF}
-     fmx.graphics,
-     fmx.surfaces,
-     FMX.Consts,
-     AlString,
-     ALCommon;
+uses
+  system.sysutils,
+  {$IF defined(ANDROID)}
+  Androidapi.JNI.OpenGL,
+  Androidapi.Gles2,
+  Androidapi.Gles2ext,
+  FMX.Context.GLES,
+  {$ENDIF}
+  fmx.graphics,
+  fmx.surfaces,
+  FMX.Consts,
+  AlString,
+  ALCommon;
 
 {$IFDEF DEBUG}
-{$IF CompilerVersion > 33} // rio
-  {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-23154 was corrected and adjust the IFDEF'}
-{$ENDIF}
-var TotalMemoryUsedByTextures: {$IF defined(IOS32)}int32{$ELSE}int64{$ENDIF};        // << https://quality.embarcadero.com/browse/RSP-23154
-    LastTotalMemoryUsedByTexturesLog: {$IF defined(IOS32)}int32{$ELSE}int64{$ENDIF}; // << https://quality.embarcadero.com/browse/RSP-23154
+var
+  TotalMemoryUsedByTextures: {$IF defined(IOS32)}int32{$ELSE}int64{$ENDIF};        // << https://quality.embarcadero.com/browse/RSP-23154
+  LastTotalMemoryUsedByTexturesLog: {$IF defined(IOS32)}int32{$ELSE}int64{$ENDIF}; // << https://quality.embarcadero.com/browse/RSP-23154
 {$ENDIF}
 
 {****************************}
@@ -306,7 +289,7 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 33} // Rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.assign is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 //
@@ -339,67 +322,40 @@ begin
   {$ENDIF}
 
   if Source is TBitmap then begin
-    {$IF CompilerVersion >= 32} // tokyo
-    //TMonitor.Enter(Self);
-    //try
-    {$ENDIF}
-      if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
-      PixelFormat := TBitmap(Source).PixelFormat;
-      Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
-      TALTextureAccessPrivate(self).fTextureScale := TBitmap(Source).BitmapScale;
-      SetSize(TBitmap(Source).Width, TBitmap(Source).Height);
-      if TBitmap(Source).Map(TMapAccess.Read, M) then
-      try
-        UpdateTexture(M.Data, M.Pitch);
-      finally
-        TBitmap(Source).Unmap(M);
-      end;
-    {$IF CompilerVersion >= 32} // tokyo
-    //finally
-    //  TMonitor.exit(Self);
-    //end;
-    {$ENDIF}
+    if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
+    PixelFormat := TBitmap(Source).PixelFormat;
+    Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
+    TALTextureAccessPrivate(self).fTextureScale := TBitmap(Source).BitmapScale;
+    SetSize(TBitmap(Source).Width, TBitmap(Source).Height);
+    if TBitmap(Source).Map(TMapAccess.Read, M) then
+    try
+      UpdateTexture(M.Data, M.Pitch);
+    finally
+      TBitmap(Source).Unmap(M);
+    end;
   end
 
   else if Source is TBitmapSurface then begin
-    {$IF CompilerVersion >= 32} // tokyo
-    //TMonitor.Enter(Self);
-    //try
-    {$ENDIF}
-      if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
-      Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
-      SetSize(TBitmapSurface(Source).Width, TBitmapSurface(Source).Height);
-      UpdateTexture(TBitmapSurface(Source).Bits, TBitmapSurface(Source).Pitch);
-    {$IF CompilerVersion >= 32} // tokyo
-    //finally
-    //  TMonitor.exit(Self);
-    //end;
-    {$ENDIF}
+    if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
+    Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
+    SetSize(TBitmapSurface(Source).Width, TBitmapSurface(Source).Height);
+    UpdateTexture(TBitmapSurface(Source).Bits, TBitmapSurface(Source).Pitch);
   end
 
   else if Source is TTexture then begin
-    {$IF CompilerVersion >= 32} // tokyo
-    //TMonitor.Enter(Self);
-    //try
-    {$ENDIF}
-      if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
-      TALTextureAccessPrivate(self).FWidth := TTexture(Source).width;
-      TALTextureAccessPrivate(self).FHeight := TTexture(Source).height;
-      TALTextureAccessPrivate(self).FPixelFormat := TTexture(Source).PixelFormat;
-      TALTextureAccessPrivate(self).FHandle := TTexture(Source).Handle;
-      TALTextureAccessPrivate(self).FStyle := TTexture(Source).Style + [TTextureStyle.Volatile];
-      TALTextureAccessPrivate(self).FMagFilter := TTexture(Source).MagFilter;
-      TALTextureAccessPrivate(self).FMinFilter := TTexture(Source).MinFilter;
-      TALTextureAccessPrivate(self).FTextureScale := TTexture(Source).TextureScale;
-      //FRequireInitializeAfterLost: Boolean;
-      //FBits: Pointer;
-      //FContextLostId: Integer;
-      //FContextResetId: Integer;
-    {$IF CompilerVersion >= 32} // tokyo
-    //finally
-    //  TMonitor.exit(Self);
-    //end;
-    {$ENDIF}
+    if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
+    TALTextureAccessPrivate(self).FWidth := TTexture(Source).width;
+    TALTextureAccessPrivate(self).FHeight := TTexture(Source).height;
+    TALTextureAccessPrivate(self).FPixelFormat := TTexture(Source).PixelFormat;
+    TALTextureAccessPrivate(self).FHandle := TTexture(Source).Handle;
+    TALTextureAccessPrivate(self).FStyle := TTexture(Source).Style + [TTextureStyle.Volatile];
+    TALTextureAccessPrivate(self).FMagFilter := TTexture(Source).MagFilter;
+    TALTextureAccessPrivate(self).FMinFilter := TTexture(Source).MinFilter;
+    TALTextureAccessPrivate(self).FTextureScale := TTexture(Source).TextureScale;
+    //FRequireInitializeAfterLost: Boolean;
+    //FBits: Pointer;
+    //FContextLostId: Integer;
+    //FContextResetId: Integer;
   end
 
   else inherited ;
@@ -428,63 +384,49 @@ begin
   if PixelFormat <> TPixelFormat.None then AtomicDecrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
   {$ENDIF}
 
-  {$IF CompilerVersion > 33} // rio
+  {$IF CompilerVersion > 34} // sydney
     {$MESSAGE WARN 'Check if the full flow of FMX.Types3D.TTexture.Assign is still the same as below and adjust the IFDEF'}
   {$ENDIF}
-  {$IF CompilerVersion >= 32} // tokyo
-  //TMonitor.Enter(Self);
-  //try
-  {$ENDIF}
-    if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
-    Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
-    SetSize(Source.getWidth, Source.getHeight);
-    if not (IsEmpty) then begin
-      if PixelFormat = TPixelFormat.None then PixelFormat := TCustomAndroidContext.PixelFormat;
-      {$IF CompilerVersion <= 31} // berlin
-      TCustomAndroidContext.SharedContext; // >> because stupidly CreateSharedContext is protected :(
-      if TCustomAndroidContext.IsContextAvailable then
-      {$ELSE} // Tokyo
-      if TCustomAndroidContext.Valid then
-      {$ENDIF}
-      begin
-        glActiveTexture(GL_TEXTURE0);
-        glGenTextures(1, @Tex);
-        glBindTexture(GL_TEXTURE_2D, Tex);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        case MagFilter of
-          TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-          TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        end;
-        if TTextureStyle.MipMaps in Style then
-        begin
-          case MinFilter of
-            TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-            TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-          end;
-        end
-        else
-        begin
-          case MinFilter of
-            TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          end;
-        end;
-        TJGLUtils.JavaClass.texImage2D(GL_TEXTURE_2D, // target: Integer;
-                                       0, // level: Integer;
-                                       Source, // bitmap: JBitmap;
-                                       0); // border: Integer  => glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nil);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        ITextureAccess(self).Handle := Tex;
-        if (TCustomAndroidContext.GLHasAnyErrors()) then
-          RaiseContextExceptionFmt(@SCannotCreateTexture, ['TALTexture']);
+  if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
+  Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
+  SetSize(Source.getWidth, Source.getHeight);
+  if not (IsEmpty) then begin
+    if PixelFormat = TPixelFormat.None then PixelFormat := TCustomAndroidContext.PixelFormat;
+    if TCustomAndroidContext.Valid then
+    begin
+      glActiveTexture(GL_TEXTURE0);
+      glGenTextures(1, @Tex);
+      glBindTexture(GL_TEXTURE_2D, Tex);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+      case MagFilter of
+        TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       end;
+      if TTextureStyle.MipMaps in Style then
+      begin
+        case MinFilter of
+          TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+          TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        end;
+      end
+      else
+      begin
+        case MinFilter of
+          TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+          TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        end;
+      end;
+      TJGLUtils.JavaClass.texImage2D(GL_TEXTURE_2D, // target: Integer;
+                                     0, // level: Integer;
+                                     Source, // bitmap: JBitmap;
+                                     0); // border: Integer  => glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nil);
+      glBindTexture(GL_TEXTURE_2D, 0);
+      ITextureAccess(self).Handle := Tex;
+      if (TCustomAndroidContext.GLHasAnyErrors()) then
+        RaiseContextExceptionFmt(@SCannotCreateTexture, ['TALTexture']);
     end;
-  {$IF CompilerVersion >= 32} // tokyo
-  //finally
-  //  TMonitor.exit(Self);
-  //end;
-  {$ENDIF}
+  end;
 
   {$IFDEF DEBUG}
   if PixelFormat <> TPixelFormat.None then AtomicIncrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
@@ -502,7 +444,7 @@ constructor TALBiPlanarTexture.Create;
 begin
   inherited;
   FSecondTexture := TALTexture.Create;
-  FFormat := TALTextureFormat.f420YpCbCr8BiPlanarVideoRange;
+  Material := Def420YpCbCr8BiPlanarVideoRangeMaterial;
 end;
 
 {************************************}
@@ -518,7 +460,7 @@ begin
   inherited;
   FSecondTexture := TALTexture.Create;
   FThirdTexture := TALTexture.Create;
-  FFormat := TALTextureFormat.f420YpCbCr8Planar;
+  Material := Def420YpCbCr8PlanarMaterial;
 end;
 
 {**********************************}
@@ -530,7 +472,7 @@ begin
 end;
 
 {*************************}
-{$IF CompilerVersion > 33} // rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.Context.GLES.TCustomContextOpenGL.DoInitializeTexture still has the same implementation and adjust the IFDEF'}
 {$ENDIF}
 {$IF defined(ANDROID)}
@@ -546,26 +488,11 @@ begin
   if Texture.PixelFormat = TPixelFormat.None then Texture.PixelFormat := TALCustomContextIOSAccess.PixelFormat;
   {$ENDIF}
 
-  {$IF CompilerVersion >= 32} // tokyo
-
   {$IFDEF ANDROID}
   if TALCustomAndroidContextAccess.valid then
   {$ELSEIF defined(IOS)}
   if TALCustomContextIOSAccess.valid then
   {$ENDIF}
-
-  {$ELSE}
-
-  {$IFDEF ANDROID}
-  TALCustomAndroidContextAccess.CreateSharedContext;
-  if TALCustomAndroidContextAccess.IsContextAvailable then
-  {$ELSEIF defined(IOS)}
-  TALCustomContextIOSAccess.CreateSharedContext;
-  if TALCustomContextIOSAccess.IsContextAvailable then
-  {$ENDIF}
-
-  {$ENDIF}
-
   begin
     glActiveTexture(GL_TEXTURE0);
     glGenTextures(1, @Tex);
@@ -591,24 +518,41 @@ begin
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nil);
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, 0);
     ITextureAccess(Texture).Handle := Tex;
-    {$IFDEF ANDROID}
-    if (TALCustomAndroidContextAccess.GLHasAnyErrors()) then
-      RaiseContextExceptionFmt(@SCannotCreateTexture, [TALCustomAndroidContextAccess.ClassName]);
-    {$ELSEIF defined(IOS)}
-    if (TALCustomContextIOSAccess.GLHasAnyErrors()) then
-      RaiseContextExceptionFmt(@SCannotCreateTexture, [TALCustomContextIOSAccess.ClassName]);
+
+    {$IF CompilerVersion <= 33} // rio
+
+      {$IFDEF ANDROID}
+      if (TALCustomAndroidContextAccess.GLHasAnyErrors()) then
+        RaiseContextExceptionFmt(@SCannotCreateTexture, [TALCustomAndroidContextAccess.ClassName]);
+      {$ELSEIF defined(IOS)}
+      if (TALCustomContextIOSAccess.GLHasAnyErrors()) then
+        RaiseContextExceptionFmt(@SCannotCreateTexture, [TALCustomContextIOSAccess.ClassName]);
+      {$ENDIF}
+
+    {$ELSE}
+
+      {$IFDEF ANDROID}
+      TGlesDiagnostic.RaiseIfHasError(@SCannotCreateTexture, [TALCustomAndroidContextAccess.ClassName]);
+      {$ELSEIF defined(IOS)}
+      TGlesDiagnostic.RaiseIfHasError(@SCannotCreateTexture, [TALCustomContextIOSAccess.ClassName]);
+      {$ENDIF}
+
     {$ENDIF}
+
   end;
 end;
 {$ENDIF}
 
 {************************}
-{$IF CompilerVersion > 33} // Rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvasExternalOESTextureMaterial.DoInitialize;
 begin
   FVertexShader := TShaderManager.RegisterShaderFromData('cnv_texture.fvs', TContextShaderKind.VertexShader, '', [
+
+    {$REGION 'TContextShaderArch.DX9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX9, [
       $00, $02, $FE, $FF, $FE, $FF, $1F, $00, $43, $54, $41, $42, $1C, $00, $00, $00, $53, $00, $00, $00, $00, $02, $FE, $FF, $01, $00, $00, $00, $1C, $00, $00, $00, $00, $01, $00, $20, $4C, $00, $00, $00,
       $30, $00, $00, $00, $02, $00, $00, $00, $04, $00, $00, $00, $3C, $00, $00, $00, $00, $00, $00, $00, $4D, $56, $50, $4D, $61, $74, $72, $69, $78, $00, $AB, $AB, $03, $00, $03, $00, $04, $00, $04, $00,
@@ -619,6 +563,11 @@ begin
       $01, $00, $00, $02, $00, $00, $03, $E0, $02, $00, $E4, $90, $01, $00, $00, $02, $00, $00, $0F, $D0, $01, $00, $E4, $90, $FF, $FF, $00, $00], [
       TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 0, 4)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.DX11_level_9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX11_level_9, [
       $44, $58, $42, $43, $09, $25, $BD, $36, $32, $98, $40, $33, $C7, $18, $0B, $ED, $E6, $C0, $C3, $D4, $01, $00, $00, $00, $80, $04, $00, $00, $06, $00, $00, $00, $38, $00, $00, $00, $20, $01, $00, $00,
       $50, $02, $00, $00, $CC, $02, $00, $00, $9C, $03, $00, $00, $0C, $04, $00, $00, $41, $6F, $6E, $39, $E0, $00, $00, $00, $E0, $00, $00, $00, $00, $02, $FE, $FF, $AC, $00, $00, $00, $34, $00, $00, $00,
@@ -651,6 +600,45 @@ begin
       $0F, $00, $00, $00, $53, $56, $5F, $50, $6F, $73, $69, $74, $69, $6F, $6E, $00, $54, $45, $58, $43, $4F, $4F, $52, $44, $00, $43, $4F, $4C, $4F, $52, $00, $AB], [
       TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 0, 64)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.Metal'}
+    {$IF defined(MACOS)}
+    TContextShaderSource.Create(
+      TContextShaderArch.Metal,
+      TEncoding.UTF8.GetBytes(
+        'using namespace metal;'+
+
+        'struct Vertex {'+
+          '<#VertexDeclaration#>'+
+        '};'+
+
+        'struct ProjectedVertex {'+
+          'float4 position [[position]];'+
+          'float2 textureCoord;'+
+          'float4 color;'+
+          'float pointSize [[point_size]];'+
+        '};'+
+
+        'vertex ProjectedVertex vertexShader(constant Vertex *vertexArray [[buffer(0)]],'+
+                                            'const unsigned int vertexId [[vertex_id]],'+
+                                            'constant float4x4 &MVPMatrix [[buffer(1)]]) {'+
+          'Vertex in = vertexArray[vertexId];'+
+          'ProjectedVertex out;'+
+          'out.position = float4(in.position[0], in.position[1], in.position[2], 1) * MVPMatrix;'+
+          'out.textureCoord = in.texcoord0;'+
+          'out.color = float4(float(in.color0[2])/255,float(in.color0[1])/255,float(in.color0[0])/255,float(in.color0[3])/255);'+
+          'out.pointSize = 1.0f;'+
+          'return out;'+
+        '}'
+      ),
+      [TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 1, 4)]
+    ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.GLSL'}
     //attribute vec2 a_TexCoord0;
     //attribute vec4 a_Color;
     //attribute vec3 a_Position;
@@ -696,8 +684,13 @@ begin
       $50, $6F, $73, $69, $74, $69, $6F, $6E, $20, $3D, $20, $5F, $72, $30, $30, $30, $33, $3B, $0D, $0A, $7D, $20, $0D, $0A], [
       TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 0, 4)]
     )
+    {$ENDREGION}
+
   ]);
   FPixelShader := TShaderManager.RegisterShaderFromData('cnv_texture.fps', TContextShaderKind.PixelShader, '', [
+
+    {$REGION 'TContextShaderArch.DX9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX9, [
       $00, $02, $FF, $FF, $FE, $FF, $1F, $00, $43, $54, $41, $42, $1C, $00, $00, $00, $53, $00, $00, $00, $00, $02, $FF, $FF, $01, $00, $00, $00, $1C, $00, $00, $00, $00, $01, $00, $20, $4C, $00, $00, $00,
       $30, $00, $00, $00, $03, $00, $00, $00, $01, $00, $00, $00, $3C, $00, $00, $00, $00, $00, $00, $00, $74, $65, $78, $74, $75, $72, $65, $30, $00, $AB, $AB, $AB, $04, $00, $0C, $00, $01, $00, $01, $00,
@@ -707,6 +700,11 @@ begin
       $00, $00, $0F, $80, $00, $00, $E4, $80, $00, $00, $E4, $90, $01, $00, $00, $02, $00, $08, $0F, $80, $00, $00, $E4, $80, $FF, $FF, $00, $00], [
       TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.DX11_level_9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX11_level_9, [
       $44, $58, $42, $43, $46, $A5, $E7, $2F, $D8, $00, $2D, $BE, $FD, $AB, $93, $DB, $30, $8A, $D3, $32, $01, $00, $00, $00, $40, $03, $00, $00, $06, $00, $00, $00, $38, $00, $00, $00, $CC, $00, $00, $00,
       $7C, $01, $00, $00, $F8, $01, $00, $00, $98, $02, $00, $00, $0C, $03, $00, $00, $41, $6F, $6E, $39, $8C, $00, $00, $00, $8C, $00, $00, $00, $00, $02, $FF, $FF, $64, $00, $00, $00, $28, $00, $00, $00,
@@ -731,6 +729,36 @@ begin
       $00, $00, $00, $00, $00, $00, $00, $00, $03, $00, $00, $00, $00, $00, $00, $00, $0F, $00, $00, $00, $53, $56, $5F, $54, $61, $72, $67, $65, $74, $00, $AB, $AB], [
       TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.Metal'}
+    {$IF defined(MACOS)}
+    TContextShaderSource.Create(
+      TContextShaderArch.Metal,
+      TEncoding.UTF8.GetBytes(
+        'using namespace metal;'+
+
+        'struct ProjectedVertex {'+
+          'float4 position [[position]];'+
+          'float2 textureCoord;'+
+          'float4 color;'+
+          'float pointSize [[point_size]];'+
+        '};'+
+
+        'fragment float4 fragmentShader(const ProjectedVertex in [[stage_in]],'+
+                                       'const texture2d<float> texture0 [[texture(0)]],'+
+                                       'const sampler texture0Sampler [[sampler(0)]]) {'+
+          'const float4 colorSample = texture0.sample(texture0Sampler, in.textureCoord);'+
+          'return colorSample * in.color;'+
+        '}'
+      ),
+      [TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
+    ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.GLSL'}
     //
     //ORIGINAL:
     //
@@ -773,6 +801,8 @@ begin
       ),
       [TContextShaderVariable.Create('texture0',    TContextShaderVariableKind.Texture, 0, 0)]
     )
+    {$ENDREGION}
+
   ]);
 end;
 
@@ -798,12 +828,15 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 33} // Rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvasExternalOESColorAdjustEffectTextureMaterial.DoInitialize;
 begin
   FVertexShader := TShaderManager.RegisterShaderFromData('cnv_texture.fvs', TContextShaderKind.VertexShader, '', [
+
+    {$REGION 'TContextShaderArch.DX9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX9, [
       $00, $02, $FE, $FF, $FE, $FF, $1F, $00, $43, $54, $41, $42, $1C, $00, $00, $00, $53, $00, $00, $00, $00, $02, $FE, $FF, $01, $00, $00, $00, $1C, $00, $00, $00, $00, $01, $00, $20, $4C, $00, $00, $00,
       $30, $00, $00, $00, $02, $00, $00, $00, $04, $00, $00, $00, $3C, $00, $00, $00, $00, $00, $00, $00, $4D, $56, $50, $4D, $61, $74, $72, $69, $78, $00, $AB, $AB, $03, $00, $03, $00, $04, $00, $04, $00,
@@ -814,6 +847,11 @@ begin
       $01, $00, $00, $02, $00, $00, $03, $E0, $02, $00, $E4, $90, $01, $00, $00, $02, $00, $00, $0F, $D0, $01, $00, $E4, $90, $FF, $FF, $00, $00], [
       TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 0, 4)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.DX11_level_9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX11_level_9, [
       $44, $58, $42, $43, $09, $25, $BD, $36, $32, $98, $40, $33, $C7, $18, $0B, $ED, $E6, $C0, $C3, $D4, $01, $00, $00, $00, $80, $04, $00, $00, $06, $00, $00, $00, $38, $00, $00, $00, $20, $01, $00, $00,
       $50, $02, $00, $00, $CC, $02, $00, $00, $9C, $03, $00, $00, $0C, $04, $00, $00, $41, $6F, $6E, $39, $E0, $00, $00, $00, $E0, $00, $00, $00, $00, $02, $FE, $FF, $AC, $00, $00, $00, $34, $00, $00, $00,
@@ -846,6 +884,45 @@ begin
       $0F, $00, $00, $00, $53, $56, $5F, $50, $6F, $73, $69, $74, $69, $6F, $6E, $00, $54, $45, $58, $43, $4F, $4F, $52, $44, $00, $43, $4F, $4C, $4F, $52, $00, $AB], [
       TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 0, 64)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.Metal'}
+    {$IF defined(MACOS)}
+    TContextShaderSource.Create(
+      TContextShaderArch.Metal,
+      TEncoding.UTF8.GetBytes(
+        'using namespace metal;'+
+
+        'struct Vertex {'+
+          '<#VertexDeclaration#>'+
+        '};'+
+
+        'struct ProjectedVertex {'+
+          'float4 position [[position]];'+
+          'float2 textureCoord;'+
+          'float4 color;'+
+          'float pointSize [[point_size]];'+
+        '};'+
+
+        'vertex ProjectedVertex vertexShader(constant Vertex *vertexArray [[buffer(0)]],'+
+                                            'const unsigned int vertexId [[vertex_id]],'+
+                                            'constant float4x4 &MVPMatrix [[buffer(1)]]) {'+
+          'Vertex in = vertexArray[vertexId];'+
+          'ProjectedVertex out;'+
+          'out.position = float4(in.position[0], in.position[1], in.position[2], 1) * MVPMatrix;'+
+          'out.textureCoord = in.texcoord0;'+
+          'out.color = float4(float(in.color0[2])/255,float(in.color0[1])/255,float(in.color0[0])/255,float(in.color0[3])/255);'+
+          'out.pointSize = 1.0f;'+
+          'return out;'+
+        '}'
+      ),
+      [TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 1, 4)]
+    ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.GLSL'}
     //attribute vec2 a_TexCoord0;
     //attribute vec4 a_Color;
     //attribute vec3 a_Position;
@@ -891,8 +968,13 @@ begin
       $50, $6F, $73, $69, $74, $69, $6F, $6E, $20, $3D, $20, $5F, $72, $30, $30, $30, $33, $3B, $0D, $0A, $7D, $20, $0D, $0A], [
       TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 0, 4)]
     )
+    {$ENDREGION}
+
   ]);
   FPixelShader := TShaderManager.RegisterShaderFromData('cnv_texture.fps', TContextShaderKind.PixelShader, '', [
+
+    {$REGION 'TContextShaderArch.DX9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX9, [
       $00, $02, $FF, $FF, $FE, $FF, $1F, $00, $43, $54, $41, $42, $1C, $00, $00, $00, $53, $00, $00, $00, $00, $02, $FF, $FF, $01, $00, $00, $00, $1C, $00, $00, $00, $00, $01, $00, $20, $4C, $00, $00, $00,
       $30, $00, $00, $00, $03, $00, $00, $00, $01, $00, $00, $00, $3C, $00, $00, $00, $00, $00, $00, $00, $74, $65, $78, $74, $75, $72, $65, $30, $00, $AB, $AB, $AB, $04, $00, $0C, $00, $01, $00, $01, $00,
@@ -902,6 +984,11 @@ begin
       $00, $00, $0F, $80, $00, $00, $E4, $80, $00, $00, $E4, $90, $01, $00, $00, $02, $00, $08, $0F, $80, $00, $00, $E4, $80, $FF, $FF, $00, $00], [
       TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.DX11_level_9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX11_level_9, [
       $44, $58, $42, $43, $46, $A5, $E7, $2F, $D8, $00, $2D, $BE, $FD, $AB, $93, $DB, $30, $8A, $D3, $32, $01, $00, $00, $00, $40, $03, $00, $00, $06, $00, $00, $00, $38, $00, $00, $00, $CC, $00, $00, $00,
       $7C, $01, $00, $00, $F8, $01, $00, $00, $98, $02, $00, $00, $0C, $03, $00, $00, $41, $6F, $6E, $39, $8C, $00, $00, $00, $8C, $00, $00, $00, $00, $02, $FF, $FF, $64, $00, $00, $00, $28, $00, $00, $00,
@@ -926,6 +1013,36 @@ begin
       $00, $00, $00, $00, $00, $00, $00, $00, $03, $00, $00, $00, $00, $00, $00, $00, $0F, $00, $00, $00, $53, $56, $5F, $54, $61, $72, $67, $65, $74, $00, $AB, $AB], [
       TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.Metal'}
+    {$IF defined(MACOS)}
+    TContextShaderSource.Create(
+      TContextShaderArch.Metal,
+      TEncoding.UTF8.GetBytes(
+        'using namespace metal;'+
+
+        'struct ProjectedVertex {'+
+          'float4 position [[position]];'+
+          'float2 textureCoord;'+
+          'float4 color;'+
+          'float pointSize [[point_size]];'+
+        '};'+
+
+        'fragment float4 fragmentShader(const ProjectedVertex in [[stage_in]],'+
+                                       'const texture2d<float> texture0 [[texture(0)]],'+
+                                       'const sampler texture0Sampler [[sampler(0)]]) {'+
+          'const float4 colorSample = texture0.sample(texture0Sampler, in.textureCoord);'+
+          'return colorSample * in.color;'+
+        '}'
+      ),
+      [TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
+    ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.GLSL'}
     //
     //ORIGINAL:
     //
@@ -978,6 +1095,8 @@ begin
        TContextShaderVariable.Create('Gamma',       TContextShaderVariableKind.Float,   0, 1),
        TContextShaderVariable.Create('texture0',    TContextShaderVariableKind.Texture, 0, 0)]
     )
+    {$ENDREGION}
+
   ]);
 end;
 
@@ -996,12 +1115,15 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 33} // Rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8BiPlanarVideoRangeTextureMaterial.DoInitialize;
 begin
   FVertexShader := TShaderManager.RegisterShaderFromData('cnv_texture.fvs', TContextShaderKind.VertexShader, '', [
+
+    {$REGION 'TContextShaderArch.DX9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX9, [
       $00, $02, $FE, $FF, $FE, $FF, $1F, $00, $43, $54, $41, $42, $1C, $00, $00, $00, $53, $00, $00, $00, $00, $02, $FE, $FF, $01, $00, $00, $00, $1C, $00, $00, $00, $00, $01, $00, $20, $4C, $00, $00, $00,
       $30, $00, $00, $00, $02, $00, $00, $00, $04, $00, $00, $00, $3C, $00, $00, $00, $00, $00, $00, $00, $4D, $56, $50, $4D, $61, $74, $72, $69, $78, $00, $AB, $AB, $03, $00, $03, $00, $04, $00, $04, $00,
@@ -1012,6 +1134,11 @@ begin
       $01, $00, $00, $02, $00, $00, $03, $E0, $02, $00, $E4, $90, $01, $00, $00, $02, $00, $00, $0F, $D0, $01, $00, $E4, $90, $FF, $FF, $00, $00], [
       TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 0, 4)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.DX11_level_9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX11_level_9, [
       $44, $58, $42, $43, $09, $25, $BD, $36, $32, $98, $40, $33, $C7, $18, $0B, $ED, $E6, $C0, $C3, $D4, $01, $00, $00, $00, $80, $04, $00, $00, $06, $00, $00, $00, $38, $00, $00, $00, $20, $01, $00, $00,
       $50, $02, $00, $00, $CC, $02, $00, $00, $9C, $03, $00, $00, $0C, $04, $00, $00, $41, $6F, $6E, $39, $E0, $00, $00, $00, $E0, $00, $00, $00, $00, $02, $FE, $FF, $AC, $00, $00, $00, $34, $00, $00, $00,
@@ -1044,6 +1171,45 @@ begin
       $0F, $00, $00, $00, $53, $56, $5F, $50, $6F, $73, $69, $74, $69, $6F, $6E, $00, $54, $45, $58, $43, $4F, $4F, $52, $44, $00, $43, $4F, $4C, $4F, $52, $00, $AB], [
       TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 0, 64)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.Metal'}
+    {$IF defined(MACOS)}
+    TContextShaderSource.Create(
+      TContextShaderArch.Metal,
+      TEncoding.UTF8.GetBytes(
+        'using namespace metal;'+
+
+        'struct Vertex {'+
+          '<#VertexDeclaration#>'+
+        '};'+
+
+        'struct ProjectedVertex {'+
+          'float4 position [[position]];'+
+          'float2 textureCoord;'+
+          'float4 color;'+
+          'float pointSize [[point_size]];'+
+        '};'+
+
+        'vertex ProjectedVertex vertexShader(constant Vertex *vertexArray [[buffer(0)]],'+
+                                            'const unsigned int vertexId [[vertex_id]],'+
+                                            'constant float4x4 &MVPMatrix [[buffer(1)]]) {'+
+          'Vertex in = vertexArray[vertexId];'+
+          'ProjectedVertex out;'+
+          'out.position = float4(in.position[0], in.position[1], in.position[2], 1) * MVPMatrix;'+
+          'out.textureCoord = in.texcoord0;'+
+          'out.color = float4(float(in.color0[2])/255,float(in.color0[1])/255,float(in.color0[0])/255,float(in.color0[3])/255);'+
+          'out.pointSize = 1.0f;'+
+          'return out;'+
+        '}'
+      ),
+      [TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 1, 4)]
+    ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.GLSL'}
     //attribute vec2 a_TexCoord0;
     //attribute vec4 a_Color;
     //attribute vec3 a_Position;
@@ -1089,8 +1255,13 @@ begin
       $50, $6F, $73, $69, $74, $69, $6F, $6E, $20, $3D, $20, $5F, $72, $30, $30, $30, $33, $3B, $0D, $0A, $7D, $20, $0D, $0A], [
       TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 0, 4)]
     )
+    {$ENDREGION}
+
   ]);
   FPixelShader := TShaderManager.RegisterShaderFromData('cnv_texture.fps', TContextShaderKind.PixelShader, '', [
+
+    {$REGION 'TContextShaderArch.DX9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX9, [
       $00, $02, $FF, $FF, $FE, $FF, $1F, $00, $43, $54, $41, $42, $1C, $00, $00, $00, $53, $00, $00, $00, $00, $02, $FF, $FF, $01, $00, $00, $00, $1C, $00, $00, $00, $00, $01, $00, $20, $4C, $00, $00, $00,
       $30, $00, $00, $00, $03, $00, $00, $00, $01, $00, $00, $00, $3C, $00, $00, $00, $00, $00, $00, $00, $74, $65, $78, $74, $75, $72, $65, $30, $00, $AB, $AB, $AB, $04, $00, $0C, $00, $01, $00, $01, $00,
@@ -1100,6 +1271,11 @@ begin
       $00, $00, $0F, $80, $00, $00, $E4, $80, $00, $00, $E4, $90, $01, $00, $00, $02, $00, $08, $0F, $80, $00, $00, $E4, $80, $FF, $FF, $00, $00], [
       TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.DX11_level_9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX11_level_9, [
       $44, $58, $42, $43, $46, $A5, $E7, $2F, $D8, $00, $2D, $BE, $FD, $AB, $93, $DB, $30, $8A, $D3, $32, $01, $00, $00, $00, $40, $03, $00, $00, $06, $00, $00, $00, $38, $00, $00, $00, $CC, $00, $00, $00,
       $7C, $01, $00, $00, $F8, $01, $00, $00, $98, $02, $00, $00, $0C, $03, $00, $00, $41, $6F, $6E, $39, $8C, $00, $00, $00, $8C, $00, $00, $00, $00, $02, $FF, $FF, $64, $00, $00, $00, $28, $00, $00, $00,
@@ -1124,6 +1300,36 @@ begin
       $00, $00, $00, $00, $00, $00, $00, $00, $03, $00, $00, $00, $00, $00, $00, $00, $0F, $00, $00, $00, $53, $56, $5F, $54, $61, $72, $67, $65, $74, $00, $AB, $AB], [
       TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.Metal'}
+    {$IF defined(MACOS)}
+    TContextShaderSource.Create(
+      TContextShaderArch.Metal,
+      TEncoding.UTF8.GetBytes(
+        'using namespace metal;'+
+
+        'struct ProjectedVertex {'+
+          'float4 position [[position]];'+
+          'float2 textureCoord;'+
+          'float4 color;'+
+          'float pointSize [[point_size]];'+
+        '};'+
+
+        'fragment float4 fragmentShader(const ProjectedVertex in [[stage_in]],'+
+                                       'const texture2d<float> texture0 [[texture(0)]],'+
+                                       'const sampler texture0Sampler [[sampler(0)]]) {'+
+          'const float4 colorSample = texture0.sample(texture0Sampler, in.textureCoord);'+
+          'return colorSample * in.color;'+
+        '}'
+      ),
+      [TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
+    ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.GLSL'}
     //
     //ORIGINAL:
     //
@@ -1184,6 +1390,8 @@ begin
       [TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0),
        TContextShaderVariable.Create('texture1', TContextShaderVariableKind.Texture, 1, 0)]
     )
+    {$ENDREGION}
+
   ]);
 end;
 
@@ -1209,12 +1417,15 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 33} // Rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8BiPlanarVideoRangeColorAdjustEffectTextureMaterial.DoInitialize;
 begin
   FVertexShader := TShaderManager.RegisterShaderFromData('cnv_texture.fvs', TContextShaderKind.VertexShader, '', [
+
+    {$REGION 'TContextShaderArch.DX9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX9, [
       $00, $02, $FE, $FF, $FE, $FF, $1F, $00, $43, $54, $41, $42, $1C, $00, $00, $00, $53, $00, $00, $00, $00, $02, $FE, $FF, $01, $00, $00, $00, $1C, $00, $00, $00, $00, $01, $00, $20, $4C, $00, $00, $00,
       $30, $00, $00, $00, $02, $00, $00, $00, $04, $00, $00, $00, $3C, $00, $00, $00, $00, $00, $00, $00, $4D, $56, $50, $4D, $61, $74, $72, $69, $78, $00, $AB, $AB, $03, $00, $03, $00, $04, $00, $04, $00,
@@ -1225,6 +1436,11 @@ begin
       $01, $00, $00, $02, $00, $00, $03, $E0, $02, $00, $E4, $90, $01, $00, $00, $02, $00, $00, $0F, $D0, $01, $00, $E4, $90, $FF, $FF, $00, $00], [
       TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 0, 4)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.DX11_level_9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX11_level_9, [
       $44, $58, $42, $43, $09, $25, $BD, $36, $32, $98, $40, $33, $C7, $18, $0B, $ED, $E6, $C0, $C3, $D4, $01, $00, $00, $00, $80, $04, $00, $00, $06, $00, $00, $00, $38, $00, $00, $00, $20, $01, $00, $00,
       $50, $02, $00, $00, $CC, $02, $00, $00, $9C, $03, $00, $00, $0C, $04, $00, $00, $41, $6F, $6E, $39, $E0, $00, $00, $00, $E0, $00, $00, $00, $00, $02, $FE, $FF, $AC, $00, $00, $00, $34, $00, $00, $00,
@@ -1257,6 +1473,45 @@ begin
       $0F, $00, $00, $00, $53, $56, $5F, $50, $6F, $73, $69, $74, $69, $6F, $6E, $00, $54, $45, $58, $43, $4F, $4F, $52, $44, $00, $43, $4F, $4C, $4F, $52, $00, $AB], [
       TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 0, 64)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.Metal'}
+    {$IF defined(MACOS)}
+    TContextShaderSource.Create(
+      TContextShaderArch.Metal,
+      TEncoding.UTF8.GetBytes(
+        'using namespace metal;'+
+
+        'struct Vertex {'+
+          '<#VertexDeclaration#>'+
+        '};'+
+
+        'struct ProjectedVertex {'+
+          'float4 position [[position]];'+
+          'float2 textureCoord;'+
+          'float4 color;'+
+          'float pointSize [[point_size]];'+
+        '};'+
+
+        'vertex ProjectedVertex vertexShader(constant Vertex *vertexArray [[buffer(0)]],'+
+                                            'const unsigned int vertexId [[vertex_id]],'+
+                                            'constant float4x4 &MVPMatrix [[buffer(1)]]) {'+
+          'Vertex in = vertexArray[vertexId];'+
+          'ProjectedVertex out;'+
+          'out.position = float4(in.position[0], in.position[1], in.position[2], 1) * MVPMatrix;'+
+          'out.textureCoord = in.texcoord0;'+
+          'out.color = float4(float(in.color0[2])/255,float(in.color0[1])/255,float(in.color0[0])/255,float(in.color0[3])/255);'+
+          'out.pointSize = 1.0f;'+
+          'return out;'+
+        '}'
+      ),
+      [TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 1, 4)]
+    ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.GLSL'}
     //attribute vec2 a_TexCoord0;
     //attribute vec4 a_Color;
     //attribute vec3 a_Position;
@@ -1302,8 +1557,13 @@ begin
       $50, $6F, $73, $69, $74, $69, $6F, $6E, $20, $3D, $20, $5F, $72, $30, $30, $30, $33, $3B, $0D, $0A, $7D, $20, $0D, $0A], [
       TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 0, 4)]
     )
+    {$ENDREGION}
+
   ]);
   FPixelShader := TShaderManager.RegisterShaderFromData('cnv_texture.fps', TContextShaderKind.PixelShader, '', [
+
+    {$REGION 'TContextShaderArch.DX9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX9, [
       $00, $02, $FF, $FF, $FE, $FF, $1F, $00, $43, $54, $41, $42, $1C, $00, $00, $00, $53, $00, $00, $00, $00, $02, $FF, $FF, $01, $00, $00, $00, $1C, $00, $00, $00, $00, $01, $00, $20, $4C, $00, $00, $00,
       $30, $00, $00, $00, $03, $00, $00, $00, $01, $00, $00, $00, $3C, $00, $00, $00, $00, $00, $00, $00, $74, $65, $78, $74, $75, $72, $65, $30, $00, $AB, $AB, $AB, $04, $00, $0C, $00, $01, $00, $01, $00,
@@ -1313,6 +1573,11 @@ begin
       $00, $00, $0F, $80, $00, $00, $E4, $80, $00, $00, $E4, $90, $01, $00, $00, $02, $00, $08, $0F, $80, $00, $00, $E4, $80, $FF, $FF, $00, $00], [
       TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.DX11_level_9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX11_level_9, [
       $44, $58, $42, $43, $46, $A5, $E7, $2F, $D8, $00, $2D, $BE, $FD, $AB, $93, $DB, $30, $8A, $D3, $32, $01, $00, $00, $00, $40, $03, $00, $00, $06, $00, $00, $00, $38, $00, $00, $00, $CC, $00, $00, $00,
       $7C, $01, $00, $00, $F8, $01, $00, $00, $98, $02, $00, $00, $0C, $03, $00, $00, $41, $6F, $6E, $39, $8C, $00, $00, $00, $8C, $00, $00, $00, $00, $02, $FF, $FF, $64, $00, $00, $00, $28, $00, $00, $00,
@@ -1337,6 +1602,36 @@ begin
       $00, $00, $00, $00, $00, $00, $00, $00, $03, $00, $00, $00, $00, $00, $00, $00, $0F, $00, $00, $00, $53, $56, $5F, $54, $61, $72, $67, $65, $74, $00, $AB, $AB], [
       TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.Metal'}
+    {$IF defined(MACOS)}
+    TContextShaderSource.Create(
+      TContextShaderArch.Metal,
+      TEncoding.UTF8.GetBytes(
+        'using namespace metal;'+
+
+        'struct ProjectedVertex {'+
+          'float4 position [[position]];'+
+          'float2 textureCoord;'+
+          'float4 color;'+
+          'float pointSize [[point_size]];'+
+        '};'+
+
+        'fragment float4 fragmentShader(const ProjectedVertex in [[stage_in]],'+
+                                       'const texture2d<float> texture0 [[texture(0)]],'+
+                                       'const sampler texture0Sampler [[sampler(0)]]) {'+
+          'const float4 colorSample = texture0.sample(texture0Sampler, in.textureCoord);'+
+          'return colorSample * in.color;'+
+        '}'
+      ),
+      [TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
+    ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.GLSL'}
     //
     //ORIGINAL:
     //
@@ -1407,6 +1702,8 @@ begin
        TContextShaderVariable.Create('texture0',    TContextShaderVariableKind.Texture, 0, 0),
        TContextShaderVariable.Create('texture1',    TContextShaderVariableKind.Texture, 1, 0)]
     )
+    {$ENDREGION}
+
   ]);
 end;
 
@@ -1433,12 +1730,15 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 33} // Rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8PlanarTextureMaterial.DoInitialize;
 begin
   FVertexShader := TShaderManager.RegisterShaderFromData('cnv_texture.fvs', TContextShaderKind.VertexShader, '', [
+
+    {$REGION 'TContextShaderArch.DX9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX9, [
       $00, $02, $FE, $FF, $FE, $FF, $1F, $00, $43, $54, $41, $42, $1C, $00, $00, $00, $53, $00, $00, $00, $00, $02, $FE, $FF, $01, $00, $00, $00, $1C, $00, $00, $00, $00, $01, $00, $20, $4C, $00, $00, $00,
       $30, $00, $00, $00, $02, $00, $00, $00, $04, $00, $00, $00, $3C, $00, $00, $00, $00, $00, $00, $00, $4D, $56, $50, $4D, $61, $74, $72, $69, $78, $00, $AB, $AB, $03, $00, $03, $00, $04, $00, $04, $00,
@@ -1449,6 +1749,11 @@ begin
       $01, $00, $00, $02, $00, $00, $03, $E0, $02, $00, $E4, $90, $01, $00, $00, $02, $00, $00, $0F, $D0, $01, $00, $E4, $90, $FF, $FF, $00, $00], [
       TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 0, 4)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.DX11_level_9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX11_level_9, [
       $44, $58, $42, $43, $09, $25, $BD, $36, $32, $98, $40, $33, $C7, $18, $0B, $ED, $E6, $C0, $C3, $D4, $01, $00, $00, $00, $80, $04, $00, $00, $06, $00, $00, $00, $38, $00, $00, $00, $20, $01, $00, $00,
       $50, $02, $00, $00, $CC, $02, $00, $00, $9C, $03, $00, $00, $0C, $04, $00, $00, $41, $6F, $6E, $39, $E0, $00, $00, $00, $E0, $00, $00, $00, $00, $02, $FE, $FF, $AC, $00, $00, $00, $34, $00, $00, $00,
@@ -1481,6 +1786,45 @@ begin
       $0F, $00, $00, $00, $53, $56, $5F, $50, $6F, $73, $69, $74, $69, $6F, $6E, $00, $54, $45, $58, $43, $4F, $4F, $52, $44, $00, $43, $4F, $4C, $4F, $52, $00, $AB], [
       TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 0, 64)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.Metal'}
+    {$IF defined(MACOS)}
+    TContextShaderSource.Create(
+      TContextShaderArch.Metal,
+      TEncoding.UTF8.GetBytes(
+        'using namespace metal;'+
+
+        'struct Vertex {'+
+          '<#VertexDeclaration#>'+
+        '};'+
+
+        'struct ProjectedVertex {'+
+          'float4 position [[position]];'+
+          'float2 textureCoord;'+
+          'float4 color;'+
+          'float pointSize [[point_size]];'+
+        '};'+
+
+        'vertex ProjectedVertex vertexShader(constant Vertex *vertexArray [[buffer(0)]],'+
+                                            'const unsigned int vertexId [[vertex_id]],'+
+                                            'constant float4x4 &MVPMatrix [[buffer(1)]]) {'+
+          'Vertex in = vertexArray[vertexId];'+
+          'ProjectedVertex out;'+
+          'out.position = float4(in.position[0], in.position[1], in.position[2], 1) * MVPMatrix;'+
+          'out.textureCoord = in.texcoord0;'+
+          'out.color = float4(float(in.color0[2])/255,float(in.color0[1])/255,float(in.color0[0])/255,float(in.color0[3])/255);'+
+          'out.pointSize = 1.0f;'+
+          'return out;'+
+        '}'
+      ),
+      [TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 1, 4)]
+    ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.GLSL'}
     //attribute vec2 a_TexCoord0;
     //attribute vec4 a_Color;
     //attribute vec3 a_Position;
@@ -1526,8 +1870,13 @@ begin
       $50, $6F, $73, $69, $74, $69, $6F, $6E, $20, $3D, $20, $5F, $72, $30, $30, $30, $33, $3B, $0D, $0A, $7D, $20, $0D, $0A], [
       TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 0, 4)]
     )
+    {$ENDREGION}
+
   ]);
   FPixelShader := TShaderManager.RegisterShaderFromData('cnv_texture.fps', TContextShaderKind.PixelShader, '', [
+
+    {$REGION 'TContextShaderArch.DX9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX9, [
       $00, $02, $FF, $FF, $FE, $FF, $1F, $00, $43, $54, $41, $42, $1C, $00, $00, $00, $53, $00, $00, $00, $00, $02, $FF, $FF, $01, $00, $00, $00, $1C, $00, $00, $00, $00, $01, $00, $20, $4C, $00, $00, $00,
       $30, $00, $00, $00, $03, $00, $00, $00, $01, $00, $00, $00, $3C, $00, $00, $00, $00, $00, $00, $00, $74, $65, $78, $74, $75, $72, $65, $30, $00, $AB, $AB, $AB, $04, $00, $0C, $00, $01, $00, $01, $00,
@@ -1537,6 +1886,11 @@ begin
       $00, $00, $0F, $80, $00, $00, $E4, $80, $00, $00, $E4, $90, $01, $00, $00, $02, $00, $08, $0F, $80, $00, $00, $E4, $80, $FF, $FF, $00, $00], [
       TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.DX11_level_9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX11_level_9, [
       $44, $58, $42, $43, $46, $A5, $E7, $2F, $D8, $00, $2D, $BE, $FD, $AB, $93, $DB, $30, $8A, $D3, $32, $01, $00, $00, $00, $40, $03, $00, $00, $06, $00, $00, $00, $38, $00, $00, $00, $CC, $00, $00, $00,
       $7C, $01, $00, $00, $F8, $01, $00, $00, $98, $02, $00, $00, $0C, $03, $00, $00, $41, $6F, $6E, $39, $8C, $00, $00, $00, $8C, $00, $00, $00, $00, $02, $FF, $FF, $64, $00, $00, $00, $28, $00, $00, $00,
@@ -1561,6 +1915,36 @@ begin
       $00, $00, $00, $00, $00, $00, $00, $00, $03, $00, $00, $00, $00, $00, $00, $00, $0F, $00, $00, $00, $53, $56, $5F, $54, $61, $72, $67, $65, $74, $00, $AB, $AB], [
       TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.Metal'}
+    {$IF defined(MACOS)}
+    TContextShaderSource.Create(
+      TContextShaderArch.Metal,
+      TEncoding.UTF8.GetBytes(
+        'using namespace metal;'+
+
+        'struct ProjectedVertex {'+
+          'float4 position [[position]];'+
+          'float2 textureCoord;'+
+          'float4 color;'+
+          'float pointSize [[point_size]];'+
+        '};'+
+
+        'fragment float4 fragmentShader(const ProjectedVertex in [[stage_in]],'+
+                                       'const texture2d<float> texture0 [[texture(0)]],'+
+                                       'const sampler texture0Sampler [[sampler(0)]]) {'+
+          'const float4 colorSample = texture0.sample(texture0Sampler, in.textureCoord);'+
+          'return colorSample * in.color;'+
+        '}'
+      ),
+      [TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
+    ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.GLSL'}
     //
     //ORIGINAL:
     //
@@ -1624,6 +2008,8 @@ begin
        TContextShaderVariable.Create('texture1', TContextShaderVariableKind.Texture, 1, 0),
        TContextShaderVariable.Create('texture2', TContextShaderVariableKind.Texture, 2, 0)]
     )
+    {$ENDREGION}
+
   ]);
 end;
 
@@ -1649,12 +2035,15 @@ begin
 end;
 
 {************************}
-{$IF CompilerVersion > 33} // Rio
+{$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8PlanarColorAdjustEffectTextureMaterial.DoInitialize;
 begin
   FVertexShader := TShaderManager.RegisterShaderFromData('cnv_texture.fvs', TContextShaderKind.VertexShader, '', [
+
+    {$REGION 'TContextShaderArch.DX9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX9, [
       $00, $02, $FE, $FF, $FE, $FF, $1F, $00, $43, $54, $41, $42, $1C, $00, $00, $00, $53, $00, $00, $00, $00, $02, $FE, $FF, $01, $00, $00, $00, $1C, $00, $00, $00, $00, $01, $00, $20, $4C, $00, $00, $00,
       $30, $00, $00, $00, $02, $00, $00, $00, $04, $00, $00, $00, $3C, $00, $00, $00, $00, $00, $00, $00, $4D, $56, $50, $4D, $61, $74, $72, $69, $78, $00, $AB, $AB, $03, $00, $03, $00, $04, $00, $04, $00,
@@ -1665,6 +2054,11 @@ begin
       $01, $00, $00, $02, $00, $00, $03, $E0, $02, $00, $E4, $90, $01, $00, $00, $02, $00, $00, $0F, $D0, $01, $00, $E4, $90, $FF, $FF, $00, $00], [
       TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 0, 4)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.DX11_level_9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX11_level_9, [
       $44, $58, $42, $43, $09, $25, $BD, $36, $32, $98, $40, $33, $C7, $18, $0B, $ED, $E6, $C0, $C3, $D4, $01, $00, $00, $00, $80, $04, $00, $00, $06, $00, $00, $00, $38, $00, $00, $00, $20, $01, $00, $00,
       $50, $02, $00, $00, $CC, $02, $00, $00, $9C, $03, $00, $00, $0C, $04, $00, $00, $41, $6F, $6E, $39, $E0, $00, $00, $00, $E0, $00, $00, $00, $00, $02, $FE, $FF, $AC, $00, $00, $00, $34, $00, $00, $00,
@@ -1697,6 +2091,45 @@ begin
       $0F, $00, $00, $00, $53, $56, $5F, $50, $6F, $73, $69, $74, $69, $6F, $6E, $00, $54, $45, $58, $43, $4F, $4F, $52, $44, $00, $43, $4F, $4C, $4F, $52, $00, $AB], [
       TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 0, 64)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.Metal'}
+    {$IF defined(MACOS)}
+    TContextShaderSource.Create(
+      TContextShaderArch.Metal,
+      TEncoding.UTF8.GetBytes(
+        'using namespace metal;'+
+
+        'struct Vertex {'+
+          '<#VertexDeclaration#>'+
+        '};'+
+
+        'struct ProjectedVertex {'+
+          'float4 position [[position]];'+
+          'float2 textureCoord;'+
+          'float4 color;'+
+          'float pointSize [[point_size]];'+
+        '};'+
+
+        'vertex ProjectedVertex vertexShader(constant Vertex *vertexArray [[buffer(0)]],'+
+                                            'const unsigned int vertexId [[vertex_id]],'+
+                                            'constant float4x4 &MVPMatrix [[buffer(1)]]) {'+
+          'Vertex in = vertexArray[vertexId];'+
+          'ProjectedVertex out;'+
+          'out.position = float4(in.position[0], in.position[1], in.position[2], 1) * MVPMatrix;'+
+          'out.textureCoord = in.texcoord0;'+
+          'out.color = float4(float(in.color0[2])/255,float(in.color0[1])/255,float(in.color0[0])/255,float(in.color0[3])/255);'+
+          'out.pointSize = 1.0f;'+
+          'return out;'+
+        '}'
+      ),
+      [TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 1, 4)]
+    ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.GLSL'}
     //attribute vec2 a_TexCoord0;
     //attribute vec4 a_Color;
     //attribute vec3 a_Position;
@@ -1742,8 +2175,13 @@ begin
       $50, $6F, $73, $69, $74, $69, $6F, $6E, $20, $3D, $20, $5F, $72, $30, $30, $30, $33, $3B, $0D, $0A, $7D, $20, $0D, $0A], [
       TContextShaderVariable.Create('MVPMatrix', TContextShaderVariableKind.Matrix, 0, 4)]
     )
+    {$ENDREGION}
+
   ]);
   FPixelShader := TShaderManager.RegisterShaderFromData('cnv_texture.fps', TContextShaderKind.PixelShader, '', [
+
+    {$REGION 'TContextShaderArch.DX9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX9, [
       $00, $02, $FF, $FF, $FE, $FF, $1F, $00, $43, $54, $41, $42, $1C, $00, $00, $00, $53, $00, $00, $00, $00, $02, $FF, $FF, $01, $00, $00, $00, $1C, $00, $00, $00, $00, $01, $00, $20, $4C, $00, $00, $00,
       $30, $00, $00, $00, $03, $00, $00, $00, $01, $00, $00, $00, $3C, $00, $00, $00, $00, $00, $00, $00, $74, $65, $78, $74, $75, $72, $65, $30, $00, $AB, $AB, $AB, $04, $00, $0C, $00, $01, $00, $01, $00,
@@ -1753,6 +2191,11 @@ begin
       $00, $00, $0F, $80, $00, $00, $E4, $80, $00, $00, $E4, $90, $01, $00, $00, $02, $00, $08, $0F, $80, $00, $00, $E4, $80, $FF, $FF, $00, $00], [
       TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.DX11_level_9'}
+    {$IF defined(MSWindows)}
     TContextShaderSource.Create(TContextShaderArch.DX11_level_9, [
       $44, $58, $42, $43, $46, $A5, $E7, $2F, $D8, $00, $2D, $BE, $FD, $AB, $93, $DB, $30, $8A, $D3, $32, $01, $00, $00, $00, $40, $03, $00, $00, $06, $00, $00, $00, $38, $00, $00, $00, $CC, $00, $00, $00,
       $7C, $01, $00, $00, $F8, $01, $00, $00, $98, $02, $00, $00, $0C, $03, $00, $00, $41, $6F, $6E, $39, $8C, $00, $00, $00, $8C, $00, $00, $00, $00, $02, $FF, $FF, $64, $00, $00, $00, $28, $00, $00, $00,
@@ -1777,6 +2220,36 @@ begin
       $00, $00, $00, $00, $00, $00, $00, $00, $03, $00, $00, $00, $00, $00, $00, $00, $0F, $00, $00, $00, $53, $56, $5F, $54, $61, $72, $67, $65, $74, $00, $AB, $AB], [
       TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
     ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.Metal'}
+    {$IF defined(MACOS)}
+    TContextShaderSource.Create(
+      TContextShaderArch.Metal,
+      TEncoding.UTF8.GetBytes(
+        'using namespace metal;'+
+
+        'struct ProjectedVertex {'+
+          'float4 position [[position]];'+
+          'float2 textureCoord;'+
+          'float4 color;'+
+          'float pointSize [[point_size]];'+
+        '};'+
+
+        'fragment float4 fragmentShader(const ProjectedVertex in [[stage_in]],'+
+                                       'const texture2d<float> texture0 [[texture(0)]],'+
+                                       'const sampler texture0Sampler [[sampler(0)]]) {'+
+          'const float4 colorSample = texture0.sample(texture0Sampler, in.textureCoord);'+
+          'return colorSample * in.color;'+
+        '}'
+      ),
+      [TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
+    ),
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'TContextShaderArch.GLSL'}
     //
     //ORIGINAL:
     //
@@ -1850,6 +2323,8 @@ begin
        TContextShaderVariable.Create('texture1',    TContextShaderVariableKind.Texture, 1, 0),
        TContextShaderVariable.Create('texture2',    TContextShaderVariableKind.Texture, 2, 0)]
     )
+    {$ENDREGION}
+
   ]);
 end;
 

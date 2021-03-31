@@ -1,45 +1,41 @@
-{*************************************************************
-product:      ALGSMComm - SMS Components
-Description:  The TAlGSMComm component implements SMS text messaging
-              through the text-mode interface defined in the GSM
-              Technical Specification 07.05, version 5.1.0, dated
-              December 1996.  There are several variations of this spec,
-              used throughout Nokia, Siemens, Ericsson, etc models.
-              We have tested the Nokia 6230 in-house, but the Nokia 7190,
-              8890, 6210 and 9110 models should work as well.  Phones
-              from other manufacturers will also work, as long as they
-              implement the text-mode interface.  About 1/4 of the
-              current phones are capable of being connected to a PC
-              (through IR or serial cable), about 1/3 of those are
-              text-mode only, 1/3 are PDU mode only, and the other 1/3
-              support both text and PDU mode.  Some phones (such as the
-              Nokia 5190) support SMS, but they use a proprietary protocol,
-              which TALGSMComm does not support.
+{*******************************************************************************
+The TAlGSMComm component implements SMS text messaging
+through the text-mode interface defined in the GSM
+Technical Specification 07.05, version 5.1.0, dated
+December 1996.  There are several variations of this spec,
+used throughout Nokia, Siemens, Ericsson, etc models.
+We have tested the Nokia 6230 in-house, but the Nokia 7190,
+8890, 6210 and 9110 models should work as well.  Phones
+from other manufacturers will also work, as long as they
+implement the text-mode interface.  About 1/4 of the
+current phones are capable of being connected to a PC
+(through IR or serial cable), about 1/3 of those are
+text-mode only, 1/3 are PDU mode only, and the other 1/3
+support both text and PDU mode.  Some phones (such as the
+Nokia 5190) support SMS, but they use a proprietary protocol,
+which TALGSMComm does not support.
 
-              To test your phone, connect the phone to your PC through
-              the serial cable or IR device (consult your phone's documentation
-              for details on how to connect). Enter "AT"<CR> into a terminal
-              window to verify the connection is established (you should receive
-              "OK" from the phone), then enter "AT+CMGF=?"<CR>. The response
-              should contain a "1", indicating that it supports text-mode.
-              If both of these tests pass, then your phone meets the basic
-              requirements.
+To test your phone, connect the phone to your PC through
+the serial cable or IR device (consult your phone's documentation
+for details on how to connect). Enter "AT"<CR> into a terminal
+window to verify the connection is established (you should receive
+"OK" from the phone), then enter "AT+CMGF=?"<CR>. The response
+should contain a "1", indicating that it supports text-mode.
+If both of these tests pass, then your phone meets the basic
+requirements.
 
-Link :        http://www.nobbi.com/pduspy.htm
-              http://rednaxela.net/pdu.php
-              http://www.dreamfabric.com/sms/
-**************************************************************}
+http://www.nobbi.com/pduspy.htm
+http://rednaxela.net/pdu.php
+http://www.dreamfabric.com/sms/
+*******************************************************************************}
 
 unit ALGSMComm;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
-uses Winapi.Windows,
-     AlStringList;
+uses
+  Winapi.Windows,
+  AlStringList;
 
 Type
 
@@ -85,8 +81,9 @@ function  AlGSMComm_GSM7BitDefaultAlphabetToUnicode(const aMessage: AnsiString; 
 
 implementation
 
-uses System.SysUtils,
-     ALString;
+uses
+  System.SysUtils,
+  ALString;
 
 {*****************************************************************************************}
 function AlGSMComm_UnicodeToGSM7BitDefaultAlphabet(const aMessage: WideString): AnsiString;
@@ -297,30 +294,30 @@ function AlGSMComm_UnicodeToGSM7BitDefaultAlphabet(const aMessage: WideString): 
     If Result then inc(aGSMStringCurrentIndex);
   end;
 
-Var aWideString: WideString;
-    ResultCurrentIndex: integer;
+Var LWideString: WideString;
+    LResultCurrentIndex: integer;
     i: Integer;
 Begin
   SetLength(result,length(aMessage) * 2);
-  ResultCurrentIndex := 1;
+  LResultCurrentIndex := 1;
 
   For i := 1 to length(aMessage) do begin
     If not InternalLookupChar(aMessage[i],
                               Result,
-                              ResultCurrentIndex) then begin
-      aWideString := ALWideRemoveDiacritic(aMessage[i]);
-      If (aWideString = '') or
-         (not InternalLookupChar(aWideString[1],
+                              LResultCurrentIndex) then begin
+      LWideString := ALWideRemoveDiacritic(aMessage[i]);
+      If (LWideString = '') or
+         (not InternalLookupChar(LWideString[1],
                                  Result,
-                                 ResultCurrentIndex))
+                                 LResultCurrentIndex))
       then Begin
-        Result[ResultCurrentIndex] := AnsiChar($20); // SPACE
-        inc(ResultCurrentIndex);
+        Result[LResultCurrentIndex] := AnsiChar($20); // SPACE
+        inc(LResultCurrentIndex);
       end
     end;
   end;
 
-  SetLength(result,ResultCurrentIndex - 1);
+  SetLength(result,LResultCurrentIndex - 1);
 end;
 
 {****************************************************************************}
@@ -535,26 +532,26 @@ function AlGSMComm_GSM7BitDefaultAlphabetToUnicode(const aMessage: AnsiString;
     If Result then inc(aUnicodeStringCurrentIndex);
   end;
 
-Var ResultCurrentIndex: integer;
-    aMessageCurrentIndex: Integer;
+Var LResultCurrentIndex: integer;
+    LMessageCurrentIndex: Integer;
 
 Begin
   SetLength(result,length(aMessage));
-  ResultCurrentIndex := 1;
-  aMessageCurrentIndex := 1;
+  LResultCurrentIndex := 1;
+  LMessageCurrentIndex := 1;
 
-  While aMessageCurrentIndex <= length(aMessage) do begin
+  While LMessageCurrentIndex <= length(aMessage) do begin
     If not InternalLookupChar(aMessage,
-                              aMessageCurrentIndex,
+                              LMessageCurrentIndex,
                               Result,
-                              ResultCurrentIndex) then begin
-      Result[ResultCurrentIndex] := WideChar($0020); // SPACE
-      inc(ResultCurrentIndex);
+                              LResultCurrentIndex) then begin
+      Result[LResultCurrentIndex] := WideChar($0020); // SPACE
+      inc(LResultCurrentIndex);
     end;
-    inc(aMessageCurrentIndex);
+    inc(LMessageCurrentIndex);
   end;
 
-  SetLength(result,ResultCurrentIndex - 1);
+  SetLength(result,LResultCurrentIndex - 1);
 end;
 
 {****************************************}
@@ -595,7 +592,7 @@ function AlGSMComm_BuildPDUMessage(aSMSCenter, aSMSAddress: ansiString; const aM
     end;
   end;
 
-var aLength, I: Integer;
+var LLength, I: Integer;
     S: AnsiString;
 begin
   {clean the aSMSCenter and aSMSAddress from unwanted char}
@@ -605,27 +602,27 @@ begin
   {write the SMSC information}
   if aSMSCenter = '' then result := '00' {write Length of SMSC information. Here the length is 0, which means that the SMSC stored in the phone should be used.}
   else begin
-    aLength := Length(aSMSCenter);
-    if Odd(aLength) then aLength := aLength + 1; {If The length of the phone number is odd (11), so a trailing F has been added to form proper octets}
-    aLength := 1 + (aLength Div 2); {Length of the SMSC information in octect}
+    LLength := Length(aSMSCenter);
+    if Odd(LLength) then LLength := LLength + 1; {If The length of the phone number is odd (11), so a trailing F has been added to form proper octets}
+    LLength := 1 + (LLength Div 2); {Length of the SMSC information in octect}
 
     {Write the Length of the SMSC information}
-    If aLength < 10 then result := '0' + ALIntToStr(aLength)
-    else result := ALIntToStr(aLength);
+    If LLength < 10 then result := '0' + ALIntToStr(LLength)
+    else result := ALIntToStr(LLength);
 
     {write the Type-of-address of the SMSC. (91 means international format of the phone number)}
     result := result + '91';
 
     {Write SMSCenter to PDU message (in decimal semi-octets)}
-    aLength := Length(aSMSCenter);
+    LLength := Length(aSMSCenter);
     I := 1;
-    while I < aLength do begin
+    while I < LLength do begin
       result := result + aSMSCenter[I+1] + aSMSCenter[I];
       I := I + 2;
     end;
 
     {If The length of the phone number is odd (11), so a trailing F has been added to form proper octets.}
-    if Odd(aLength) then result := result + 'F' + aSMSCenter[aLength];
+    if Odd(LLength) then result := result + 'F' + aSMSCenter[LLength];
   end;
 
   {Write the First octet of the SMS-SUBMIT message.}
@@ -641,15 +638,15 @@ begin
   result := result + '91';
 
   {Write The phone number in semi octet}
-  aLength := Length(aSMSAddress);
+  LLength := Length(aSMSAddress);
   I := 1;
-  while I < aLength do begin
+  while I < LLength do begin
     result := result + aSMSAddress[I+1] + aSMSAddress[I];
     I := I + 2;
   end;
 
   {If The length of the phone number is odd (11), therefore a trailing F has been added}
-  if Odd(aLength) then result := result + 'F' + aSMSAddress[aLength];
+  if Odd(LLength) then result := result + 'F' + aSMSAddress[LLength];
 
   {TP-PID. Protocol identifier}
   result := result + '00';
@@ -741,10 +738,10 @@ Procedure AlGSMComm_DecodePDUMessage(const aPDUMessage: AnsiString; Var aSMSCent
     if Result[Length(Result)] = #0 then Result := ALCopyStr(Result, 1, pred(Length(Result)));
   end;
 
-var aLength, I: Integer;
-    aFirstOctet: ansiString;
-    aDSCOctet: ansiString;
-    aUdhLength: Integer;
+var LLength, I: Integer;
+    LFirstOctet: ansiString;
+    LDSCOctet: ansiString;
+    LUdhLength: Integer;
 
 begin
 
@@ -755,16 +752,16 @@ begin
   I := 1; //07913386094000F0040B913386184131F900006040722172728007F43AA87D0AC301
 
   {Length of the SMSC information (in this case 7 octets)}
-  aLength := ALStrToInt('$' + AlCopyStr(aPDUMessage, i, 2)); //07
+  LLength := ALStrToInt('$' + AlCopyStr(aPDUMessage, i, 2)); //07
   inc(I,2); //913386094000F0040B913386184131F900006040722172728007F43AA87D0AC301
-  if aLength > 0 then begin
+  if LLength > 0 then begin
 
     //Type-of-address of the SMSC. (91 means international format of the phone number)
     inc(I,2); //3386094000F0040B913386184131F900006040722172728007F43AA87D0AC301
 
     //Service center number(in decimal semi-octets). The length of the phone number is odd (11),
     //so a trailing F has been added to form proper octets. The phone number of this service center is "+33689004000".
-    while I < (aLength*2 + 3) do begin
+    while I < (LLength*2 + 3) do begin
       if aPDUMessage[I] = 'F' then aSMSCenter := aSMSCenter + aPDUMessage[I+1]
       else aSMSCenter := aSMSCenter + aPDUMessage[I+1] + aPDUMessage[I]; //33689004000
       inc(I,2); //040B913386184131F900006040722172728007F43AA87D0AC301
@@ -775,20 +772,20 @@ begin
   //First octet of this SMS-DELIVER message.
   //Bit no	  7	       6	      5	       4	        3	       2	     1	    0
   //Name	  TP-RP	  TP-UDHI  	TP-SRI	(unused)	(unused)	TP-MMS	TP-MTI	TP-MTI
-  aFirstOctet := ALIntToBit(ALStrToInt('$'+AlCopyStr(aPDUMessage,I,2)), 8);
+  LFirstOctet := ALIntToBit(ALStrToInt('$'+AlCopyStr(aPDUMessage,I,2)), 8);
   inc(I,2); //0B913386184131F900006040722172728007F43AA87D0AC301
 
   //Address-Length. Length of the sender number (0B hex = 11 dec)
-  aLength := (ALStrToInt('$' + AlCopyStr(aPDUMessage,I,2))); //11
+  LLength := (ALStrToInt('$' + AlCopyStr(aPDUMessage,I,2))); //11
   inc(I,2); //913386184131F900006040722172728007F43AA87D0AC301
 
   //Type-of-address of the sender number
   inc(I,2); //3386184131F900006040722172728007F43AA87D0AC301
 
   //Change aLength to Octets
-  if Odd(aLength) then inc(aLength,1); //12
-  aLength := aLength + I;
-  while I < (aLength) do begin
+  if Odd(LLength) then inc(LLength,1); //12
+  LLength := LLength + I;
+  while I < (LLength) do begin
     if aPDUMessage[I] = 'F' then aSMSAddress := aSMSAddress + aPDUMessage[I+1]
     else aSMSAddress := aSMSAddress + aPDUMessage[I+1] + aPDUMessage[I]; //33688114139
     inc(I,2); //00006040722172728007F43AA87D0AC301
@@ -798,7 +795,7 @@ begin
   inc(I,2); //006040722172728007F43AA87D0AC301
 
   //TP-DCS Data coding scheme
-  aDSCOctet := ALIntToBit(ALStrToInt('$'+AlCopyStr(aPDUMessage,I,2)), 8);
+  LDSCOctet := ALIntToBit(ALStrToInt('$'+AlCopyStr(aPDUMessage,I,2)), 8);
   inc(I,2); //6040722172728007F43AA87D0AC301
 
   //TP-SCTS. Time stamp (semi-octets)
@@ -810,34 +807,34 @@ begin
   inc(I,2); //F43AA87D0AC301
 
   //TP-UDHI
-  if aFirstOctet[2] = '1' then begin
-    aUdhLength := (ALStrToInt('$' + AlCopyStr(aPDUMessage,I,2))) + 1; //6
-    inc(i,aUdhLength * 2);
+  if LFirstOctet[2] = '1' then begin
+    LUdhLength := (ALStrToInt('$' + AlCopyStr(aPDUMessage,I,2))) + 1; //6
+    inc(i,LUdhLength * 2);
   end
-  else aUdhLength := 0;
+  else LUdhLength := 0;
 
   // NumLength is the length of the message
-  aLength := Length(aPDUMessage); // 14
+  LLength := Length(aPDUMessage); // 14
 
   // 7-bit alphabet
   aMessage := '';
-  if (aDSCOctet[5] = '0') and (aDSCOctet[6] = '0') then begin
-    while I <= aLength - 1 do begin
+  if (LDSCOctet[5] = '0') and (LDSCOctet[6] = '0') then begin
+    while I <= LLength - 1 do begin
       aMessage := aMessage + AnsiChar(ALStrToInt(ansiChar('$') + ansiChar(aPDUMessage[I]) + ansiChar(aPDUMessage[I+1])));
       inc(I,2);
     end;
-    aMessage := ansiString(AlGSMComm_GSM7BitDefaultAlphabetToUnicode(_7bitPDUToString(aMessage, aUdhLength)))
+    aMessage := ansiString(AlGSMComm_GSM7BitDefaultAlphabetToUnicode(_7bitPDUToString(aMessage, LUdhLength)))
   end
   // 8-bit alphabet
-  else if (aDSCOctet[5] = '0') and (aDSCOctet[6] = '1') then begin
-    while I <= aLength - 1 do begin
+  else if (LDSCOctet[5] = '0') and (LDSCOctet[6] = '1') then begin
+    while I <= LLength - 1 do begin
       aMessage := aMessage + AnsiChar(ALStrToInt(ansiChar('$') + ansiChar(aPDUMessage[I]) + ansiChar(aPDUMessage[I+1])));
       inc(I,2);
     end;
   end
   // 16-bit alphabet
-  else if (aDSCOctet[5] = '1') and (aDSCOctet[6] = '0') then begin
-    while I <= aLength - 3 do begin
+  else if (LDSCOctet[5] = '1') and (LDSCOctet[6] = '0') then begin
+    while I <= LLength - 3 do begin
       aMessage := aMessage + ansiString( WideChar(ALStrToInt(ansiChar('$') +
                                                              ansiChar(aPDUMessage[I]) +
                                                              ansiChar(aPDUMessage[I+1]) +
@@ -991,7 +988,7 @@ procedure TAlGSMComm.SendSMSinPDUMode(const aSMSCenter, //Service Center Address
                                             aSMSAddress: AnsiString; //phone number of the recipient
                                       aMessage: AnsiString; //The body of the message, can be in PDU (EncodeMessageInPDU need to be false) or in GSM 7 bit charset (EncodeMessageInPDU need to be true)
                                       const EncodeMessageInPDU: Boolean=True); //if we need to encode the aMessage in PDU
-Var aLength: Integer;
+Var LLength: Integer;
     Str: AnsiString;
 begin
   If Not Fconnected then raise EALException.Create('Not Connected!');
@@ -1019,10 +1016,10 @@ begin
                                                                    aMessage);
 
   Str := AlCopyStr(aMessage,1,2);
-  If not ALTryStrToInt(str,aLength) then aLength := 0;
-  aLength := (Length(aMessage) div 2) - aLength - 1;
+  If not ALTryStrToInt(str,LLength) then LLength := 0;
+  LLength := (Length(aMessage) div 2) - LLength - 1;
 
-  SendCmd('AT+CMGS='+ALIntToStr(aLength)+#13);
+  SendCmd('AT+CMGS='+ALIntToStr(LLength)+#13);
   GetATCmdlinefeedResponse('AT+CMGS command error!');
   SendCmd(aMessage + #26);
   GetATCmdOkResponse('AT+CMGS command error!');
@@ -1073,9 +1070,9 @@ procedure TAlGSMComm.ListAllSMSinPDUMode(aLstMessage: TALStrings; MemStorage: An
   {-----------------------------------}
   Procedure InternalFulfillLstMessage;
   Var P1, P2: Integer;
-      aIndex: Integer;
-      Str: AnsiString;
-      aStat: integer;
+      LIndex: Integer;
+      LStr: AnsiString;
+      LStat: integer;
   Begin
 
     //AT+CMGL
@@ -1088,29 +1085,29 @@ procedure TAlGSMComm.ListAllSMSinPDUMode(aLstMessage: TALStrings; MemStorage: An
     // normally i must say AT+CMGL=4 but i don't know why on some phone (B2100i for exemple)
     // their is no AT+CMGL=4 (instead AT+CMGL=5)
 
-    aStat := 0;
-    while aStat <= 1 do begin
+    LStat := 0;
+    while LStat <= 1 do begin
 
       {Receive Message}
-      SendCmd('AT+CMGL='+alinttostr(aStat)+#13);
-      GetATCmdOkResponse(Str, 'AT+CMGL command error!');
+      SendCmd('AT+CMGL='+alinttostr(LStat)+#13);
+      GetATCmdOkResponse(LStr, 'AT+CMGL command error!');
 
       {fullfill aLstMessage}
-      P1 := AlPos('+CMGL: ',str);
+      P1 := AlPos('+CMGL: ',LStr);
       While P1 > 0 do begin
         Inc(P1,7);
-        P2 := AlPosEx(',',Str,P1);
+        P2 := AlPosEx(',',LStr,P1);
         If P2 <= 0 then raise EALException.Create('AT+CMGL parse error!');
-        aIndex := ALStrToInt(AlCopyStr(Str,P1,P2-P1));
-        P1 := ALPosEx(#13#10,Str,P2);
+        LIndex := ALStrToInt(AlCopyStr(LStr,P1,P2-P1));
+        P1 := ALPosEx(#13#10,LStr,P2);
         If P1 <= 0 then raise EALException.Create('AT+CMGL parse error!');
         P1 := P1 + 2;
-        P2 := ALPosEx(#13#10,Str,P1);
+        P2 := ALPosEx(#13#10,LStr,P1);
         If P2 <= 0 then raise EALException.Create('AT+CMGL parse error!');
-        if aLstMessage.IndexOfName(ALIntToStr(aIndex)) < 0 then aLstMessage.Add(ALIntToStr(aIndex)+aLstMessage.NameValueSeparator+ALTrim(AlCopyStr(Str,P1,P2-P1)));
-        P1 := AlPosEx('+CMGL: ',str,P2);
+        if aLstMessage.IndexOfName(ALIntToStr(LIndex)) < 0 then aLstMessage.Add(ALIntToStr(LIndex)+aLstMessage.NameValueSeparator+ALTrim(AlCopyStr(LStr,P1,P2-P1)));
+        P1 := AlPosEx('+CMGL: ',LStr,P2);
       end;
-      inc(aStat);
+      inc(LStat);
 
     end;
   end;
@@ -1166,75 +1163,75 @@ end;
 Procedure TAlGSMComm.SendCmd(const aCmd: AnsiString);
 Var P: PAnsiChar;
     L: Integer;
-    ByteSent: integer;
-    aStart: Cardinal;
+    LByteSent: integer;
+    LStart: Cardinal;
 Begin
-  aStart := GetTickCount;
+  LStart := GetTickCount;
   If aCmd <> '' then begin
     p:=@aCmd[1]; // pchar
     l:=length(aCmd);
     while l>0 do begin
-      if (aStart + Ftimeout) < GetTickCount then raise EALException.Create('Timeout!');
-      ByteSent:=SerialWrite(p^,l);
-      inc(p,ByteSent);
-      dec(l,ByteSent);
+      if (LStart + Ftimeout) < GetTickCount then raise EALException.Create('Timeout!');
+      LByteSent:=SerialWrite(p^,l);
+      inc(p,LByteSent);
+      dec(l,LByteSent);
     end;
   end;
 end;
 
 {******************************************}
 function TAlGSMComm.GetResponse: AnsiString;
-Var aBuffStr: AnsiString;
-    aBuffStrLength: Integer;
-    aStart: Cardinal;
+Var LBuffStr: AnsiString;
+    LBuffStrLength: Integer;
+    LStart: Cardinal;
 Begin
-  aStart := GetTickCount;
+  LStart := GetTickCount;
   Result := '';
   repeat
-    if (aStart + Ftimeout) < GetTickCount then raise EALException.Create('Timeout!');
-    Setlength(aBuffStr,512); //The maximum total length
-    aBuffStrLength := SerialRead(aBuffStr[1], length(aBuffStr));
-    Result := Result + AlCopyStr(aBuffStr,1,aBuffStrLength);
-  until aBuffStrLength <> 512;
+    if (LStart + Ftimeout) < GetTickCount then raise EALException.Create('Timeout!');
+    Setlength(LBuffStr,512); //The maximum total length
+    LBuffStrLength := SerialRead(LBuffStr[1], length(LBuffStr));
+    Result := Result + AlCopyStr(LBuffStr,1,LBuffStrLength);
+  until LBuffStrLength <> 512;
 end;
 
 {************************************************************************}
 procedure TAlGSMComm.GetATCmdlinefeedResponse(const ErrorMsg: AnsiString);
-Var aResponse: AnsiString;
-    aStart: Cardinal;
+Var LResponse: AnsiString;
+    LStart: Cardinal;
 Begin
-  aStart := GetTickCount;
-  aResponse := alUppercase(GetResponse);
-  While (Alpos('>'#32, aResponse) <= 0) do Begin
-    if (aStart + Ftimeout) < GetTickCount then Raise EALException.Create('Timeout!')
-    else if (Alpos(#13#10'ERROR'#13#10, aResponse) > 0) then raise EALException.Create(ErrorMsg + ' (' + ALTrim(AlStringReplace(aResponse, #13#10, ' ', [rfReplaceALL])) + ')' );
-    aResponse := aResponse + alUppercase(GetResponse);
+  LStart := GetTickCount;
+  LResponse := alUppercase(GetResponse);
+  While (Alpos('>'#32, LResponse) <= 0) do Begin
+    if (LStart + Ftimeout) < GetTickCount then Raise EALException.Create('Timeout!')
+    else if (Alpos(#13#10'ERROR'#13#10, LResponse) > 0) then raise EALException.Create(ErrorMsg + ' (' + ALTrim(AlStringReplace(LResponse, #13#10, ' ', [rfReplaceALL])) + ')' );
+    LResponse := LResponse + alUppercase(GetResponse);
   end;
 end;
 
 {******************************************************************}
 procedure TAlGSMComm.GetATCmdOkResponse(const ErrorMsg: AnsiString);
-Var aResponse: AnsiString;
+Var LResponse: AnsiString;
 Begin
-  GetATCmdOkResponse(aResponse, ErrorMsg);
+  GetATCmdOkResponse(LResponse, ErrorMsg);
 end;
 
 {********************************************************************************************}
 Procedure TAlGSMComm.GetATCmdOkResponse(var Response: AnsiString; Const ErrorMsg: AnsiString);
-Var aStart: Cardinal;
-    aTmpErrorMsg: AnsiString;
+Var LStart: Cardinal;
+    LTmpErrorMsg: AnsiString;
     ln: integer;
     P1: Integer;
 Begin
-  aStart := GetTickCount;
+  LStart := GetTickCount;
   Response := alUppercase(GetResponse);
   While (Alpos(#13#10'OK'#13#10, Response) <= 0) do Begin
-    if (aStart + Ftimeout) < GetTickCount then Raise EALException.Create('Timeout!')
+    if (LStart + Ftimeout) < GetTickCount then Raise EALException.Create('Timeout!')
     else if (Alpos(#13#10'ERROR'#13#10, Response) > 0) or ALMatchesMask(Response, '*'#13#10'+CMS ERROR: *'#13#10'*') then begin
       P1 := AlPos(#13#10'+CMS ERROR:', Response);
-      if P1 > 0 then aTmpErrorMsg := ErrorMsg + ' (' +ALTrim(AlCopyStr(Response, P1, Maxint)) + ')' // +CMS ERROR: 38
-      else aTmpErrorMsg := ErrorMsg;
-      raise EALException.Create(aTmpErrorMsg);
+      if P1 > 0 then LTmpErrorMsg := ErrorMsg + ' (' +ALTrim(AlCopyStr(Response, P1, Maxint)) + ')' // +CMS ERROR: 38
+      else LTmpErrorMsg := ErrorMsg;
+      raise EALException.Create(LTmpErrorMsg);
     end;
     ln := length(Response);
     Response := Response + alUppercase(GetResponse);

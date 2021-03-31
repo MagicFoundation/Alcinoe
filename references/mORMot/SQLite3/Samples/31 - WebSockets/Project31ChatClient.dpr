@@ -8,6 +8,7 @@ uses
   SysUtils,
   Classes,
   SynCommons,
+  SynTable,
   mORMot,
   mORMotHttpClient,
   Project31ChatCallbackInterface in 'Project31ChatCallbackInterface.pas';

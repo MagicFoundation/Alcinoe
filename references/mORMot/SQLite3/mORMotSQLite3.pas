@@ -6,7 +6,7 @@ unit mORMotSQLite3;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit mORMotSQLite3;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -118,7 +118,7 @@ type
   // - SQL statements for record retrieval from ID are prepared for speed
   TSQLRestServerDB = class(TSQLRestServer)
   private
-    /// internal copy of the SQLite3 database engine
+    /// access to the associated SQLite3 database engine
     fDB: TSQLDataBase;
     /// initialized by Create(aModel,aDBFileName)
     fOwnedDB: TSQLDataBase;
@@ -511,7 +511,8 @@ type
 // - returns the created TSQLVirtualTableModule instance (which will be a
 // TSQLVirtualTableModuleSQLite3 instance in fact)
 // - will raise an exception of failure
-function RegisterVirtualTableModule(aModule: TSQLVirtualTableClass; aDatabase: TSQLDataBase): TSQLVirtualTableModule;
+function RegisterVirtualTableModule(aModule: TSQLVirtualTableClass;
+  aDatabase: TSQLDataBase): TSQLVirtualTableModule;
 
 
 implementation
@@ -519,7 +520,8 @@ implementation
 {$ifdef SQLVIRTUALLOGS}
 uses
   mORMotDB;
-{$endif}
+{$endif SQLVIRTUALLOGS}
+
 
 { TSQLTableDB }
 
@@ -2186,7 +2188,7 @@ begin
       TSQLRestStorageExternal(Table.Static).ComputeSQL(prepared^);
     SQLite3Log.Add.Log(sllDebug,'vt_BestIndex(%) plan=% -> cost=% rows=%',
       [sqlite3.VersionNumber,ord(Prepared^.EstimatedCost),pInfo.estimatedCost,pInfo.estimatedRows]);
-    {$endif}
+    {$endif SQLVIRTUALLOGS}
   finally
     if result<>SQLITE_OK then
       sqlite3.free_(Prepared); // avoid memory leak on error

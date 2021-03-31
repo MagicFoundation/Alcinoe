@@ -6,7 +6,7 @@ unit PasZip;
 {
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
     This library is free software; you can redistribute it and/or modify it
@@ -52,7 +52,7 @@ uses
   Windows,
 {$else}
   Types,
-{$endif}
+{$endif MSWINDOWS}
   SysUtils;
 
 type
@@ -62,10 +62,11 @@ type
 {$else}
   RawByteZip = AnsiString;
   TZipName = AnsiString;
-{$endif}
+{$endif HASCODEPAGE}
+
 {$ifdef DELPHI5OROLDER}
   PCardinal = ^cardinal;
-{$endif}
+{$endif DELPHI5OROLDER}
 
 /// compress memory using the ZLib DEFLATE algorithm
 function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
@@ -81,6 +82,7 @@ function UncompressString(const data: RawByteZip): RawByteZip;
 
 
 {$ifdef MSWINDOWS} { use Windows MapFile }
+
 function CompressFile(const srcFile, dstFile: TFileName; failIfGrow: boolean = false): boolean;
 
 function UncompressFile(const srcFile, dstFile: TFileName;
@@ -169,7 +171,7 @@ const
     $cabac28a, $53b39330, $24b4a3a6, $bad03605, $cdd70693, $54de5729, $23d967bf,
     $b3667a2e, $c4614ab8, $5d681b02, $2a6f2b94, $b40bbe37, $c30c8ea1, $5a05df1b,
     $2d02ef8d);
-{$endif}
+{$endif DYNAMIC_CRC_TABLE}
 
 {$ifdef MSWINDOWS}
 
@@ -304,9 +306,9 @@ type
     constructor Create(const aFileName: TFileName); overload;
     /// compress (using the deflate method) a memory buffer, and add it to the zip file
     // - by default, the 1st of January, 2010 is used if not date is supplied
-    procedure AddDeflated(const aZipName: TZipName; Buf: pointer; Size:
-      integer; CompressLevel: integer = 6; FileAge: integer = 1 + 1 shl 5 + 30
-      shl 9); overload;
+    procedure AddDeflated(const aZipName: TZipName;
+      Buf: pointer; Size: integer; CompressLevel: integer = 6;
+      FileAge: integer = 1 + 1 shl 5 + 30 shl 9); overload;
     /// compress (using the deflate method) a file, and add it to the zip file
     procedure AddDeflated(const aFileName: TFileName; RemovePath: boolean = true;
       CompressLevel: integer = 6); overload;
@@ -345,10 +347,10 @@ begin // should be fast enough in practice, especially inlined
   repeat
     Dst^ := PByteArray(Src)[PtrUInt(Dst)];
     inc(Dst);
-  until PtrUInt(Dst)=Count;
+  until PtrUInt(Dst) = Count;
 end;
 {$else}
-procedure MoveWithOverlap(Src: PByte; Dst: PByte; Count: Integer);
+procedure MoveWithOverlap(Src: PByte; Dst: PByte; Count: integer);
   {$ifdef FPC} nostackframe; assembler; {$endif}
 asm // eax=source edx=dest ecx=count
         push    edx
@@ -370,7 +372,7 @@ asm // eax=source edx=dest ecx=count
         pop     edi
 @exit:
 end;
-{$endif}
+{$endif PUREPASCAL}
 
 //----------------- general library stuff
 
@@ -415,20 +417,19 @@ type
   );
 
   // inflate codes private state
-  PInflateCodesState = ^TInflateCodesState;
   TInflateCodesState = record
     Mode: TInflateCodesMode;    // current inflate codes mode
     // mode dependent information
     Len: Cardinal;
-    Sub: record                 // submode
+    Sub: record                // submode
       case Byte of
-        0:(Code: record         // if Len or Distance, where in tree
+        0:(Code: record        // if Len or Distance, where in tree
            Tree: PInflateHuft; // pointer into tree
-           need: Cardinal;    // bits needed
+           need: Cardinal;     // bits needed
         end);
-        1:(lit: Cardinal);      // if icmLit, literal
-        2:(copy: record         // if EXT or icmCopy, where and how much
-           get: Cardinal;     // bits to get for extra
+        1:(lit: Cardinal);     // if icmLit, literal
+        2:(copy: record        // if EXT or icmCopy, where and how much
+           get: Cardinal;      // bits to get for extra
            Distance: Cardinal; // distance back to copy from
         end);
     end;
@@ -438,8 +439,10 @@ type
     LiteralTree: PInflateHuft;  // literal/length/eob tree
     DistanceTree: PInflateHuft; // distance tree
   end;
+  PInflateCodesState = ^TInflateCodesState;
 
-  TInflateBlockMode = (ibmZType,     // get type bits (3, including end bit)
+  TInflateBlockMode = (
+    ibmZType,     // get type bits (3, including end bit)
     ibmLens,      // get lengths for stored
     ibmStored,    // processing stored block
     ibmTable,     // get table lengths
@@ -452,27 +455,26 @@ type
   );
 
   // inflate blocks semi-private state
-  PInflateBlocksState = ^TInflateBlocksState;
   TInflateBlocksState = record
-    Mode: TInflateBlockMode;     // current inflate block mode
+    Mode: TInflateBlockMode; // current inflate block mode
     // mode dependent information
-    Sub: record                        // submode
+    Sub: record                       // submode
       case Byte of
-        0: (left: Cardinal);            // if ibmStored, bytes left to copy
-        1: (Trees: record               // if DistanceTree, decoding info for trees
+        0: (left: Cardinal);          // if ibmStored, bytes left to copy
+        1: (Trees: record             // if DistanceTree, decoding info for trees
             Table: Cardinal;          // table lengths (14 Bits)
             Index: Cardinal;          // index into blens (or BitOrder)
             blens: TPACardinal;       // bit lengths of codes
             BB: Cardinal;             // bit length tree depth
             TB: PInflateHuft;         // bit length decoding tree
           end);
-        2: (decode: record              // if ibmCodes, current state
+        2: (decode: record            // if ibmCodes, current state
             TL: PInflateHuft;
             TD: PInflateHuft;         // trees to free
             codes: PInflateCodesState;
           end);
     end;
-    Last: Boolean;                     // True if this block is the last block
+    Last: boolean;                     // True if this block is the last block
     // mode independent information
     bitk: Cardinal;                    // bits in bit buffer
     bitb: Cardinal;                    // bit buffer
@@ -482,6 +484,7 @@ type
     read: PByte;                       // window read pointer
     write: PByte;                      // window write pointer
   end;
+  PInflateBlocksState = ^TInflateBlocksState;
 
   // The application must update NextInput and AvailableInput when AvailableInput has dropped to zero. It must update
   // NextOutput and AvailableOutput when AvailableOutput has dropped to zero. All other fields are set by the
@@ -540,21 +543,21 @@ type
     fc: record
       case Byte of
         0:
-          (Frequency: Word); // frequency count
+          (Frequency: word); // frequency count
         1:
-          (Code: Word); // bit string
+          (Code: word); // bit string
     end;
     dl: record
       case Byte of
         0:
-          (dad: Word);  // father node in Huffman tree
+          (dad: word);  // father node in Huffman tree
         1:
-          (Len: Word);  // length of bit string
+          (Len: word);  // length of bit string
     end;
   end;
   TLiteralTree = array[0..HEAP_SIZE - 1] of TTreeEntry; // literal and length tree
-  TDistanceTree = array[0..2 * D_CODES] of TTreeEntry; // distance tree
-  THuffmanTree = array[0..2 * BL_CODES] of TTreeEntry; // Huffman tree for bit lengths
+  TDistanceTree = array[0..2 * D_CODES] of TTreeEntry;  // distance tree
+  THuffmanTree = array[0..2 * BL_CODES] of TTreeEntry;  // Huffman tree for bit lengths
   PTree = ^TTree;
   TTree = array[0..(MaxInt div SizeOf(TTreeEntry)) - 1] of TTreeEntry; // generic tree type
 
@@ -562,15 +565,15 @@ type
   TStaticTreeDescriptor = record
     StaticTree: PTree;        // static tree or nil
     ExtraBits: TPAInteger; // extra bits for each code or nil
-    ExtraBase: Integer;       // base index for ExtraBits
-    Elements: Integer;        // max number of elements in the tree
-    MaxLength: Integer;       // max bit length for the codes
+    ExtraBase: integer;       // base index for ExtraBits
+    Elements: integer;        // max number of elements in the tree
+    MaxLength: integer;       // max bit length for the codes
   end;
 
   PTreeDescriptor = ^TTreeDescriptor;
   TTreeDescriptor = record
     DynamicTree: PTree;
-    MaxCode: Integer;                        // largest code with non zero frequency
+    MaxCode: integer;                        // largest code with non zero frequency
     StaticDescriptor: PStaticTreeDescriptor; // the corresponding static tree
   end;
 
@@ -578,9 +581,9 @@ type
   TDeflateState = record
     ZState: PZState;            // pointer back to this zlib stream
     PendingBuffer: TPAByte;  // output still pending
-    PendingBufferSize: Integer;
+    PendingBufferSize: integer;
     PendingOutput: PByte;       // next pending byte to output to the stream
-    Pending: Integer;           // nb of bytes in the pending buffer
+    Pending: integer;           // nb of bytes in the pending buffer
     WindowSize: Cardinal;       // LZ77 window size (32K by default)
     WindowBits: Cardinal;       // log2(WindowSize) (8..16)
     WindowMask: Cardinal;       // WindowSize - 1
@@ -596,7 +599,7 @@ type
 
     // Actual size of Window: 2 * WSize, except when the user input buffer
     // is directly used as sliding window.
-    CurrentWindowSize: Integer;
+    CurrentWindowSize: integer;
 
     // Link to older string with same hash index. to limit the size of this
     // array to 64K, this link is maintained only for the last 32K strings.
@@ -616,10 +619,10 @@ type
 
     // Window position at the beginning of the current output block. Gets
     // negative when the window is moved backwards.
-    BlockStart: Integer;
+    BlockStart: integer;
     MatchLength: Cardinal;      // length of best match
     PreviousMatch: Cardinal;    // previous match
-    MatchAvailable: Boolean;    // set if previous match exists
+    MatchAvailable: boolean;    // set if previous match exists
     StringStart: Cardinal;      // start of string to insert
     MatchStart: Cardinal;       // start of matching string
     Lookahead: Cardinal;        // number of valid bytes ahead in window
@@ -635,11 +638,11 @@ type
     DistanceDescriptor: TTreeDescriptor; // Descriptor for distance tree
     BitLengthDescriptor: TTreeDescriptor; // Descriptor for bit length tree
 
-    BitLengthCounts: array[0..MAX_BITS] of Word; // number of codes at each bit length for an optimal tree
+    BitLengthCounts: array[0..MAX_BITS] of word; // number of codes at each bit length for an optimal tree
 
-    Heap: array[0..2 * L_CODES] of Integer; // heap used to build the Huffman trees
-    HeapLength: Integer;        // number of elements in the heap
-    HeapMaximum: Integer;       // element of largest frequency
+    Heap: array[0..2 * L_CODES] of integer; // heap used to build the Huffman trees
+    HeapLength: integer;        // number of elements in the heap
+    HeapMaximum: integer;       // element of largest frequency
     // The sons of Heap[N] are Heap[2 * N] and Heap[2 * N + 1]. Heap[0] is not used.
     // The same heap array is used to build all trees.
 
@@ -669,13 +672,13 @@ type
     // Buffer for distances. To simplify the code, DistanceBuffer and LiteralBuffer have
     // the same number of elements. To use different lengths, an extra flag array would be necessary.
     DistanceBuffer: TPAWord;
-    OptimalLength: Integer;     // bit length of current block with optimal trees
-    StaticLength: Integer;      // bit length of current block with static trees
-    CompressedLength: Integer;  // total bit length of compressed file
+    OptimalLength: integer;     // bit length of current block with optimal trees
+    StaticLength: integer;      // bit length of current block with static trees
+    CompressedLength: integer;  // total bit length of compressed file
     Matches: Cardinal;          // number of string matches in current block
-    LastEOBLength: Integer;     // bit length of EOB code for last block
-    BitsBuffer: Word;           // Output buffer. Bits are inserted starting at the bottom (least significant bits).
-    ValidBits: Integer;         // Number of valid bits in BitsBuffer. All Bits above the last valid bit are always zero.
+    LastEOBLength: integer;     // bit length of EOB code for last block
+    BitsBuffer: word;           // Output buffer. Bits are inserted starting at the bottom (least significant bits).
+    ValidBits: integer;         // Number of valid bits in BitsBuffer. All Bits above the last valid bit are always zero.
   end;
 
 //----------------- Huffmann trees
@@ -853,7 +856,7 @@ const
   );
 
   // first normalized distance for each code (0 = distance of 1)
-  BaseDistance: array[0..D_CODES - 1] of Integer = (
+  BaseDistance: array[0..D_CODES - 1] of integer = (
        0,     1,     2,     3,     4,     6,     8,    12,    16,    24,
       32,    48,    64,    96,   128,   192,   256,   384,   512,   768,
     1024,  1536,  2048,  3072,  4096,  6144,  8192, 12288, 16384, 24576
@@ -867,17 +870,19 @@ const
   REPZ_11_138 = 18; // repeat a zero length 11-138 times  (7 Bits of repeat count)
 
   // extra bits for each length code
-  ExtraLengthBits: array[0..LENGTH_CODES - 1] of Integer = (
-    0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0
+  ExtraLengthBits: array[0..LENGTH_CODES - 1] of integer = (
+    0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3,
+    4, 4, 4, 4, 5, 5, 5, 5, 0
   );
 
   // extra bits for each distance code
-  ExtraDistanceBits: array[0..D_CODES - 1] of Integer = (
-    0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10 ,10, 11, 11, 12, 12, 13, 13
+  ExtraDistanceBits: array[0..D_CODES - 1] of integer = (
+    0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8,
+    9, 9, 10 ,10, 11, 11, 12, 12, 13, 13
   );
 
   // extra bits for each bit length code
-  ExtraBitLengthBits: array[0..BL_CODES - 1] of Integer = (
+  ExtraBitLengthBits: array[0..BL_CODES - 1] of integer = (
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 7
   );
 
@@ -918,10 +923,11 @@ const
 //----------------- Inflate support
 
 const
-  InflateMask: array[0..16] of Cardinal = ($0000, $0001, $0003, $0007, $000F,
-    $001F, $003F, $007F, $00FF, $01FF, $03FF, $07FF, $0FFF, $1FFF, $3FFF, $7FFF, $FFFF);
+  InflateMask: array[0..16] of Cardinal = (
+    $0000, $0001, $0003, $0007, $000F, $001F, $003F, $007F,
+    $00FF, $01FF, $03FF, $07FF, $0FFF, $1FFF, $3FFF, $7FFF, $FFFF);
 
-function InflateFlush(var S: TInflateBlocksState; var Z: TZState; R: Integer): Integer;
+function InflateFlush(var S: TInflateBlocksState; var Z: TZState; R: integer): integer;
 // copies as much as possible from the sliding window to the output area
 var
   N: Cardinal;
@@ -952,7 +958,8 @@ begin
   Inc(Q, N);
 
   // see if more to copy at beginning of window
-  if Q = S.zend then begin
+  if Q = S.zend then
+  begin
     // wrap pointers
     Q := S.Window;
     if S.write = S.zend then
@@ -976,11 +983,11 @@ begin
   Z.NextOutput := P;
   S.Read := Q;
 
-  Result := R;
+  result := R;
 end;
 
 function InflateFast(LiteralBits, DistanceBits: Cardinal; TL, TD: PInflateHuft;
-  var S: TInflateBlocksState; var Z: TZState): Integer;
+  var S: TInflateBlocksState; var Z: TZState): integer;
 // Called with number of bytes left to write in window at least 258 (the maximum string length) and number of input
 // bytes available at least ten. The ten bytes are six bytes for the longest length/distance pair plus four bytes for
 // overloading the bit buffer.
@@ -1017,7 +1024,8 @@ begin
   // assume called with (M >= 258) and (N >= 10)
   repeat
     // get literal/length Code
-    while K < 20 do begin
+    while K < 20 do
+    begin
       Dec(N);
       BitsBuffer := BitsBuffer or (cardinal(P^) shl K);
       Inc(K, 8);
@@ -1027,7 +1035,8 @@ begin
     Temp := @PHuftField(TL)[BitsBuffer and ml];
 
     Extra := Temp.exop;
-    if Extra = 0 then begin
+    if Extra = 0 then
+    begin
       BitsBuffer := BitsBuffer shr Temp.Bits;
       Dec(K, Temp.Bits);
       Q^ := Temp.Base;
@@ -1043,14 +1052,16 @@ begin
       BitsBuffer := BitsBuffer shr Temp.Bits;
       Dec(K, Temp.Bits);
 
-      if (Extra and 16) <> 0 then begin
+      if (Extra and 16) <> 0 then
+      begin
         // get extra bits for length
         Extra := Extra and 15;
         C := Temp.Base + (BitsBuffer and InflateMask[Extra]);
         BitsBuffer := BitsBuffer shr Extra;
         Dec(K, Extra);
         // decode distance base of block to copy
-        while K < 15 do begin
+        while K < 15 do
+        begin
           Dec(N);
           BitsBuffer := BitsBuffer or (Cardinal(P^) shl K);
           Inc(P);
@@ -1062,10 +1073,12 @@ begin
         repeat
           BitsBuffer := BitsBuffer shr Temp.Bits;
           Dec(K, Temp.Bits);
-          if (Extra and 16) <> 0 then begin
+          if (Extra and 16) <> 0 then
+          begin
             // get extra bits to add to distance base
             Extra := Extra and 15;
-            while K < Extra do begin
+            while K < Extra do
+            begin
               Dec(N);
               BitsBuffer := BitsBuffer or (Cardinal(P^) shl K);
               Inc(P);
@@ -1077,19 +1090,22 @@ begin
             // do the copy
             Dec(M, C);
             // offset before Dest
-            if (PtrUInt(Q) - PtrUInt(S.Window)) >= D then begin
+            if (PtrUInt(Q) - PtrUInt(S.Window)) >= D then
+            begin
               // copy without extra
               R := Q;
               Dec(R, D);
             end
-            else begin
+            else
+            begin
               // offset after destination,
               // bytes from offset to end
               Extra := D - (PtrUInt(Q) - PtrUInt(S.Window));
               R := S.zend;
               // pointer to offset
               Dec(R, Extra);
-              if C > Extra then begin
+              if C > Extra then
+              begin
                 // copy to end of window
                 Dec(C, Extra);
                 MoveWithOverlap(R, Q, Extra);
@@ -1104,11 +1120,13 @@ begin
             inc(Q,Extra);
             Break;
           end
-          else if (Extra and 64) = 0 then begin
+          else if (Extra and 64) = 0 then
+          begin
             Inc(Temp, Temp.Base + (BitsBuffer and InflateMask[Extra]));
             Extra := Temp.exop;
           end
-          else begin
+          else
+          begin
             C := Z.AvailableInput - N;
             if (K shr 3) < C then
               C := K shr 3;
@@ -1121,17 +1139,19 @@ begin
             Inc(Z.TotalInput, PtrUInt(P) - PtrUInt(Z.NextInput));
             Z.NextInput := P;
             S.write := Q;
-            Result := Z_DATA_ERROR;
-            Exit;
+            result := Z_DATA_ERROR;
+            exit;
           end;
         until False;
         Break;
       end;
 
-      if (Extra and 64) = 0 then begin
+      if (Extra and 64) = 0 then
+      begin
         Inc(Temp, Temp.Base + (BitsBuffer and InflateMask[Extra]));
         Extra := Temp.exop;
-        if Extra = 0 then begin
+        if Extra = 0 then
+        begin
           BitsBuffer := BitsBuffer shr Temp.Bits;
           Dec(K, Temp.Bits);
           Q^ := Temp.Base;
@@ -1140,7 +1160,8 @@ begin
           Break;
         end;
       end
-      else if (Extra and 32) <> 0 then begin
+      else if (Extra and 32) <> 0 then
+      begin
         C := Z.AvailableInput - N;
         if (K shr 3) < C then
           C := K shr 3;
@@ -1153,10 +1174,11 @@ begin
         Inc(Z.TotalInput, PtrUInt(P) - PtrUInt(Z.NextInput));
         Z.NextInput := P;
         S.write := Q;
-        Result := Z_STREAM_END;
-        Exit;
+        result := Z_STREAM_END;
+        exit;
       end
-      else begin
+      else
+      begin
         C := Z.AvailableInput - N;
         if (K shr 3) < C then
           C := K shr 3;
@@ -1169,8 +1191,8 @@ begin
         Inc(Z.TotalInput, PtrUInt(P) - PtrUInt(Z.NextInput));
         Z.NextInput := P;
         S.write := Q;
-        Result := Z_DATA_ERROR;
-        Exit;
+        result := Z_DATA_ERROR;
+        exit;
       end;
     until False;
     if (M < 258) or (N < 10) then
@@ -1190,21 +1212,21 @@ begin
   Inc(Z.TotalInput, PtrUInt(P) - PtrUInt(Z.NextInput));
   Z.NextInput := P;
   S.write := Q;
-  Result := Z_OK;
+  result := Z_OK;
 end;
 
 function InflateCodesNew(LiteralBits: Cardinal; DistanceBits: Cardinal; TL, TD:
   PInflateHuft; var Z: TZState): PInflateCodesState;
 begin
   GetMem(result, SizeOf(TInflateCodesState));
-  Result.Mode := icmStart;
-  Result.LiteralTreeBits := LiteralBits;
-  Result.DistanceTreeBits := DistanceBits;
-  Result.LiteralTree := TL;
-  Result.DistanceTree := TD;
+  result.Mode := icmStart;
+  result.LiteralTreeBits := LiteralBits;
+  result.DistanceTreeBits := DistanceBits;
+  result.LiteralTree := TL;
+  result.DistanceTree := TD;
 end;
 
-function InflateCodes(var S: TInflateBlocksState; var Z: TZState; R: Integer): Integer;
+function InflateCodes(var S: TInflateBlocksState; var Z: TZState; R: integer): integer;
 var
   J: Cardinal;          // temporary storage
   Temp: PInflateHuft;
@@ -1232,11 +1254,13 @@ begin
     M := PtrUInt(S.zend) - PtrUInt(Q);
 
   // process input and output based on current state
-  while True do begin
+  while True do
+  begin
     case C.Mode of
       icmStart:
         begin
-          if (M >= 258) and (N >= 10) then begin
+          if (M >= 258) and (N >= 10) then
+          begin
             S.bitb := BitsBuffer;
             S.bitk := K;
             Z.AvailableInput := N;
@@ -1255,7 +1279,8 @@ begin
               M := PtrUInt(S.read) - PtrUInt(Q) - 1
             else
               M := PtrUInt(S.zend) - PtrUInt(Q);
-            if R <> Z_OK then begin
+            if R <> Z_OK then
+            begin
               if R = Z_STREAM_END then
                 C.mode := icmWash
               else
@@ -1270,18 +1295,20 @@ begin
       icmLen: // I: get length/literal/eob next
         begin
           J := C.sub.Code.need;
-          while K < J do begin
+          while K < J do
+          begin
             if N <> 0 then
               R := Z_OK
-            else begin
+            else
+            begin
               S.bitb := BitsBuffer;
               S.bitk := K;
               Z.AvailableInput := N;
               Inc(Z.TotalInput, PtrUInt(P) - PtrUInt(Z.NextInput));
               Z.NextInput := P;
               S.write := Q;
-              Result := InflateFlush(S, Z, R);
-              Exit;
+              result := InflateFlush(S, Z, R);
+              exit;
             end;
             Dec(N);
             BitsBuffer := BitsBuffer or (Cardinal(P^) shl K);
@@ -1295,26 +1322,30 @@ begin
 
           Extra := Temp.exop;
           // literal
-          if Extra = 0 then begin
+          if Extra = 0 then
+          begin
             C.sub.lit := Temp.Base;
             C.mode := icmLit;
             Continue;
           end;
           // length
-          if (Extra and 16) <> 0 then begin
+          if (Extra and 16) <> 0 then
+          begin
             C.sub.copy.get := Extra and 15;
             C.Len := Temp.Base;
             C.mode := icmLenNext;
             Continue;
           end;
           // next table
-          if (Extra and 64) = 0 then begin
+          if (Extra and 64) = 0 then
+          begin
             C.sub.Code.need := Extra;
             C.sub.Code.Tree := @PHuftField(Temp)[Temp.Base];
             Continue;
           end;
           // end of block
-          if (Extra and 32) <> 0 then begin
+          if (Extra and 32) <> 0 then
+          begin
             C.mode := icmWash;
             Continue;
           end;
@@ -1327,24 +1358,26 @@ begin
           Inc(Z.TotalInput, PtrUInt(P) - PtrUInt(Z.NextInput));
           Z.NextInput := P;
           S.write := Q;
-          Result := InflateFlush(S, Z, R);
-          Exit;
+          result := InflateFlush(S, Z, R);
+          exit;
         end;
       icmLenNext: // I: getting length extra (have base)
         begin
           J := C.sub.copy.get;
-          while K < J do begin
+          while K < J do
+          begin
             if N <> 0 then
               R := Z_OK
-            else begin
+            else
+            begin
               S.bitb := BitsBuffer;
               S.bitk := K;
               Z.AvailableInput := N;
               Inc(Z.TotalInput, PtrUInt(P) - PtrUInt(Z.NextInput));
               Z.NextInput := P;
               S.write := Q;
-              Result := InflateFlush(S, Z, R);
-              Exit;
+              result := InflateFlush(S, Z, R);
+              exit;
             end;
             Dec(N);
             BitsBuffer := BitsBuffer or (Cardinal(P^) shl K);
@@ -1361,18 +1394,20 @@ begin
       icmDistance: // I: get distance next
         begin
           J := C.sub.Code.need;
-          while K < J do begin
+          while K < J do
+          begin
             if N <> 0 then
               R := Z_OK
-            else begin
+            else
+            begin
               S.bitb := BitsBuffer;
               S.bitk := K;
               Z.AvailableInput := N;
               Inc(Z.TotalInput, PtrUInt(P) - PtrUInt(Z.NextInput));
               Z.NextInput := P;
               S.write := Q;
-              Result := InflateFlush(S, Z, R);
-              Exit;
+              result := InflateFlush(S, Z, R);
+              exit;
             end;
             Dec(N);
             BitsBuffer := BitsBuffer or (PtrUInt(P^) shl K);
@@ -1385,14 +1420,16 @@ begin
 
           Extra := Temp.exop;
           // distance
-          if (Extra and 16) <> 0 then begin
+          if (Extra and 16) <> 0 then
+          begin
             C.sub.copy.get := Extra and 15;
             C.sub.copy.Distance := Temp.Base;
             C.mode := icmDistExt;
             Continue;
           end;
           // next table
-          if (Extra and 64) = 0 then begin
+          if (Extra and 64) = 0 then
+          begin
             C.sub.Code.need := Extra;
             C.sub.Code.Tree := @PHuftField(Temp)[Temp.Base];
             Continue;
@@ -1406,24 +1443,26 @@ begin
           Inc(Z.TotalInput, PtrUInt(P) - PtrUInt(Z.NextInput));
           Z.NextInput := P;
           S.write := Q;
-          Result := InflateFlush(S, Z, R);
-          Exit;
+          result := InflateFlush(S, Z, R);
+          exit;
         end;
       icmDistExt: // I: getting distance extra
         begin
           J := C.sub.copy.get;
-          while K < J do begin
+          while K < J do
+          begin
             if N <> 0 then
               R := Z_OK
-            else begin
+            else
+            begin
               S.bitb := BitsBuffer;
               S.bitk := K;
               Z.AvailableInput := N;
               Inc(Z.TotalInput, PtrUInt(P) - PtrUInt(Z.NextInput));
               Z.NextInput := P;
               S.write := Q;
-              Result := InflateFlush(S, Z, R);
-              Exit;
+              result := InflateFlush(S, Z, R);
+              exit;
             end;
             Dec(N);
             BitsBuffer := BitsBuffer or (Cardinal(P^) shl K);
@@ -1439,21 +1478,26 @@ begin
         begin
           F := Q;
           Dec(F, C.sub.copy.Distance);
-          if (PtrUInt(Q) - PtrUInt(S.Window)) < C.sub.copy.Distance then begin
+          if (PtrUInt(Q) - PtrUInt(S.Window)) < C.sub.copy.Distance then
+          begin
             F := S.zend;
             Dec(F, C.sub.copy.Distance - (PtrUInt(Q) - PtrUInt(S.Window)));
           end;
 
-          while C.Len <> 0 do begin
-            if M = 0 then begin
-              if (Q = S.zend) and (S.read <> S.Window) then begin
+          while C.Len <> 0 do
+          begin
+            if M = 0 then
+            begin
+              if (Q = S.zend) and (S.read <> S.Window) then
+              begin
                 Q := S.Window;
                 if PtrUInt(Q) < PtrUInt(S.read) then
                   M := PtrUInt(S.read) - PtrUInt(Q) - 1
                 else
                   M := PtrUInt(S.zend) - PtrUInt(Q);
               end;
-              if M = 0 then begin
+              if M = 0 then
+              begin
                 S.write := Q;
                 R := InflateFlush(S, Z, R);
                 Q := S.write;
@@ -1461,22 +1505,24 @@ begin
                   M := PtrUInt(S.read) - PtrUInt(Q) - 1
                 else
                   M := PtrUInt(S.zend) - PtrUInt(Q);
-                if (Q = S.zend) and (S.read <> S.Window) then begin
+                if (Q = S.zend) and (S.read <> S.Window) then
+                begin
                   Q := S.Window;
                   if PtrUInt(Q) < PtrUInt(S.read) then
                     M := PtrUInt(S.read) - PtrUInt(Q) - 1
                   else
                     M := PtrUInt(S.zend) - PtrUInt(Q);
                 end;
-                if M = 0 then begin
+                if M = 0 then
+                begin
                   S.bitb := BitsBuffer;
                   S.bitk := K;
                   Z.AvailableInput := N;
                   Inc(Z.TotalInput, PtrUInt(P) - PtrUInt(Z.NextInput));
                   Z.NextInput := P;
                   S.write := Q;
-                  Result := InflateFlush(S, Z, R);
-                  Exit;
+                  result := InflateFlush(S, Z, R);
+                  exit;
                 end;
               end;
             end;
@@ -1493,15 +1539,18 @@ begin
         end;
       icmLit: // O: got literal, waiting for output space
         begin
-          if M = 0 then begin
-            if (Q = S.zend) and (S.read <> S.Window) then begin
+          if M = 0 then
+          begin
+            if (Q = S.zend) and (S.read <> S.Window) then
+            begin
               Q := S.Window;
               if PtrUInt(Q) < PtrUInt(S.read) then
                 M := PtrUInt(S.read) - PtrUInt(Q) - 1
               else
                 M := PtrUInt(S.zend) - PtrUInt(Q);
             end;
-            if M = 0 then begin
+            if M = 0 then
+            begin
               S.write := Q;
               R := InflateFlush(S, Z, R);
               Q := S.write;
@@ -1509,22 +1558,24 @@ begin
                 M := PtrUInt(S.read) - PtrUInt(Q) - 1
               else
                 M := PtrUInt(S.zend) - PtrUInt(Q);
-              if (Q = S.zend) and (S.read <> S.Window) then begin
+              if (Q = S.zend) and (S.read <> S.Window) then
+              begin
                 Q := S.Window;
                 if PtrUInt(Q) < PtrUInt(S.read) then
                   M := PtrUInt(S.read) - PtrUInt(Q) - 1
                 else
                   M := PtrUInt(S.zend) - PtrUInt(Q);
               end;
-              if M = 0 then begin
+              if M = 0 then
+              begin
                 S.bitb := BitsBuffer;
                 S.bitk := K;
                 Z.AvailableInput := N;
                 Inc(Z.TotalInput, PtrUInt(P) - PtrUInt(Z.NextInput));
                 Z.NextInput := P;
                 S.write := Q;
-                Result := InflateFlush(S, Z, R);
-                Exit;
+                result := InflateFlush(S, Z, R);
+                exit;
               end;
             end;
           end;
@@ -1537,7 +1588,8 @@ begin
       icmWash: // O: got eob, possibly More output
         begin
           // return unused byte, if any
-          if K > 7 then begin
+          if K > 7 then
+          begin
             Dec(K, 8);
             Inc(N);
             Dec(P);
@@ -1550,15 +1602,16 @@ begin
             M := PtrUInt(S.read) - PtrUInt(Q) - 1
           else
             M := PtrUInt(S.zend) - PtrUInt(Q);
-          if S.read <> S.write then begin
+          if S.read <> S.write then
+          begin
             S.bitb := BitsBuffer;
             S.bitk := K;
             Z.AvailableInput := N;
             Inc(Z.TotalInput, PtrUInt(P) - PtrUInt(Z.NextInput));
             Z.NextInput := P;
             S.write := Q;
-            Result := InflateFlush(S, Z, R);
-            Exit;
+            result := InflateFlush(S, Z, R);
+            exit;
           end;
           C.mode := icmZEnd;
         end;
@@ -1571,8 +1624,8 @@ begin
           Inc(Z.TotalInput, PtrUInt(P) - PtrUInt(Z.NextInput));
           Z.NextInput := P;
           S.write := Q;
-          Result := InflateFlush(S, Z, R);
-          Exit;
+          result := InflateFlush(S, Z, R);
+          exit;
         end;
       icmBadCode: // X: got error
         begin
@@ -1583,8 +1636,8 @@ begin
           Inc(Z.TotalInput, PtrUInt(P) - PtrUInt(Z.NextInput));
           Z.NextInput := P;
           S.write := Q;
-          Result := InflateFlush(S, Z, R);
-          Exit;
+          result := InflateFlush(S, Z, R);
+          exit;
         end;
     else
       begin
@@ -1595,13 +1648,11 @@ begin
         Inc(Z.TotalInput, PtrUInt(P) - PtrUInt(Z.NextInput));
         Z.NextInput := P;
         S.write := Q;
-        Result := InflateFlush(S, Z, R);
-        Exit;
+        result := InflateFlush(S, Z, R);
+        exit;
       end;
     end;
   end;
-
-  Result := Z_STREAM_ERROR;
 end;
 
 type
@@ -1617,7 +1668,8 @@ const
   // Tables for deflate from PKZIP'S appnote.txt
   // copy lengths for literal codes 257..285 (actually lengths - 2; also see note #13 above about 258)
   CopyLengths: TDeflateLengths = (3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15,
-    17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258, 0, 0);
+    17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195,
+    227, 258, 0, 0);
   INVALID_CODE = 112;
   // extra bits for literal codes 257..285
   CopyLiteralExtra: TDeflateLengths = (0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,
@@ -1667,7 +1719,7 @@ const
 
 function BuildHuffmanTables(const B: TACardinal; N, S: Cardinal; const D,
   Extra: TDeflateLengths; Temp: PPInflateHuft; var M: Cardinal; HP: PHuftField;
-  var HN: Cardinal; var V: TDeflateWorkArea): Integer;
+  var HN: Cardinal; var V: TDeflateWorkArea): integer;
 
 // Given a list of code lengths and a maximum table size, make a set of tables to decode that set of codes. Returns Z_OK
 // on success, Z_BUF_ERROR if the given code set is incomplete (the tables are still built in this case), Z_DATA_ERROR
@@ -1690,20 +1742,20 @@ function BuildHuffmanTables(const B: TACardinal; N, S: Cardinal; const D,
 var
   A: Cardinal;                     // counter for codes of length K
   F: Cardinal;                     // I repeats in table every F entries
-  G: Integer;                      // maximum code Length
-  H: Integer;                      // table Level
+  G: integer;                      // maximum code Length
+  H: integer;                      // table Level
   I: Cardinal;                     // counter, current code
   J: Cardinal;                     // counter
-  K: Integer;                      // number of bits in current code
-  L: Integer;			                 // bits per table (returned in M)
+  K: integer;                      // number of bits in current code
+  L: integer;			                 // bits per table (returned in M)
   Mask: Cardinal;                  // (1 shl W) - 1, to avoid cc - O bug on HP
   P: TPCardinal;                   // pointer into C[], B[], or V[]
   Q: PInflateHuft;                 // points to current table
   R: TInflateHuft;                 // table entry for structure assignment
   XP: TPCardinal;                  // pointer into X
-  Y: Integer;                      // number of dummy codes added
+  Y: integer;                      // number of dummy codes added
   Z: Cardinal;                     // number of entries in current table
-  W: Integer;                      // bits before this table = (L * H)
+  W: integer;                      // bits before this table = (L * H)
   C: array[0..BMAX] of Cardinal;   // bit length count table
   U: array[0..BMAX - 1] of PInflateHuft; // table stack
   X: array[0..BMAX] of Cardinal;   // bit offsets, then code stack
@@ -1716,11 +1768,12 @@ begin
     Inc(C[B[I]]);
 
   // nil input -> all zero length codes
-  if C[0] = N then begin
+  if C[0] = N then
+  begin
     Temp^ := nil;
     M := 0;
-    Result := Z_OK;
-    Exit;
+    result := Z_OK;
+    exit;
   end;
 
   // find minimum and maximum length, bound [M] by those
@@ -1743,28 +1796,32 @@ begin
 
   // adjust last length count to fill out codes if needed
   Y := 1 shl J;
-  while J < I do begin
+  while J < I do
+  begin
     Dec(Y, C[J]);
-    if Y < 0 then begin
+    if Y < 0 then
+    begin
       // bad input: more codes than bits
-      Result := Z_DATA_ERROR;
-      Exit;
+      result := Z_DATA_ERROR;
+      exit;
     end;
     Inc(J);
     Y := Y shl 1;
   end;
   Dec(Y, C[I]);
-  if Y < 0 then begin
+  if Y < 0 then
+  begin
     // bad input: more codes than bits
-    Result := Z_DATA_ERROR;
-    Exit;
+    result := Z_DATA_ERROR;
+    exit;
   end;
   Inc(C[I], Y);
 
   // generate starting offsets into the value table for each length
   X[1] := 0;
   J := 0;
-  for I := 1 to G - 1 do begin
+  for I := 1 to G - 1 do
+  begin
     inc(J, C[I]);
     X[I + 1] := J;
   end;
@@ -1839,8 +1896,8 @@ begin
         Z := 1 shl J;
         // allocate new table (note: doesn't matter for fixed)
         if HN + Z > MANY then begin
-          Result := Z_MEM_ERROR;
-          Exit;
+          result := Z_MEM_ERROR;
+          exit;
         end;
 
         Q := @HP[HN];
@@ -1919,20 +1976,20 @@ begin
 
   // Return Z_BUF_ERROR if we were given an incomplete table
   if (Y <> 0) and (G <> 1) then
-    Result := Z_BUF_ERROR
+    result := Z_BUF_ERROR
   else
-    Result := Z_OK;
+    result := Z_OK;
 end;
 
 function InflateTreesBits(var C: TACardinal; var BB: Cardinal; var TB:
-  PInflateHuft; HP: PHuftField; var Z: TZState): Integer;
+  PInflateHuft; HP: PHuftField; var Z: TZState): integer;
 // C holds 19 code lengths
 // BB - bits tree desired/actual depth
 // TB - bits tree result
 // HP - space for trees
 // Z - for messages
 var
-  R: Integer;
+  R: integer;
   HN: Cardinal;            // hufts used in space
   V: TDeflateWorkArea;     // work area for BuildHuffmanTables
 begin
@@ -1940,12 +1997,12 @@ begin
   R := BuildHuffmanTables(C, 19, 19, CopyLengths, CopyLiteralExtra, @TB, BB, HP, HN, V);
   if (R = Z_BUF_ERROR) or (BB = 0) then
     R := Z_DATA_ERROR;
-  Result := R;
+  result := R;
 end;
 
 function InflateTreesDynamic(NL: Cardinal; ND: Cardinal; var C: TACardinal;
   var LiteralBits: Cardinal; var DistanceBits: Cardinal; var TL: PInflateHuft;
-  var TD: PInflateHuft; HP: PHuftField; var Z: TZState): Integer;
+  var TD: PInflateHuft; HP: PHuftField; var Z: TZState): integer;
 // NL - number of literal/length codes
 // ND - number of distance codes
 // C - code lengths
@@ -1956,19 +2013,19 @@ function InflateTreesDynamic(NL: Cardinal; ND: Cardinal; var C: TACardinal;
 // HP - space for trees
 // Z - for messages
 var
-  R: Integer;
+  R: integer;
   HN: Cardinal;          // hufts used in space
   V: TDeflateWorkArea;   // work area for BuildHuffmanTables
 begin
   HN := 0;
   // allocate work area
-  Result := Z_OK;
+  result := Z_OK;
   // build literal/length tree
   R := BuildHuffmanTables(C, NL, 257, CopyLengths, CopyLiteralExtra, @TL,
     LiteralBits, HP, HN, V);
   if (R <> Z_OK) or (LiteralBits = 0) then begin
-    Result := R;
-    Exit;
+    result := R;
+    exit;
   end;
   // build distance tree
   R := BuildHuffmanTables(TPACardinal(@C[NL])^, ND, 0, CopyOffsets, CopyExtra, @TD,
@@ -1978,7 +2035,7 @@ begin
       R := Z_DATA_ERROR
     else if R <> Z_MEM_ERROR then
       R := Z_DATA_ERROR;
-    Result := R;
+    result := R;
   end;
 end;
 
@@ -1988,7 +2045,7 @@ const
 
 var
   // build fixed tables only once -> keep them here
-  FixedBuild: Boolean;
+  FixedBuild: boolean;
   FixedTablesMemory: array[0..FIXEDH - 1] of TInflateHuft;
   FixedLiteralBits: Cardinal;
   FixedDistanceBits: Cardinal;
@@ -1996,9 +2053,9 @@ var
   FixedDistanceTable: array[0..32 - 1] of TInflateHuft;
 
 function InflateTreesFixed(var LiteralBits: Cardinal; var DistanceBits: Cardinal;
-  var TL, TD: PInflateHuft; var Z: TZState): Integer;
+  var TL, TD: PInflateHuft; var Z: TZState): integer;
 var
-  K: Integer;             // temporary variable
+  K: integer;             // temporary variable
   C: TDeflateWorkArea;    // length list for BuildHuffmanTables
   V: TDeflateWorkArea;    // work area for BuildHuffmanTables
   F: Cardinal;            // number of hufts used in FixedTablesMemory
@@ -2030,7 +2087,7 @@ begin
   DistanceBits := FixedDistanceBits;
   TL := @FixedLiteralTable;
   TD := @FixedDistanceTable;
-  Result := Z_OK;
+  result := Z_OK;
 end;
 
 
@@ -2091,7 +2148,7 @@ var
 begin
   GetMem(S, SizeOf(TInflateBlocksState));
   if S = nil then
-    Result := S
+    result := S
   else
   try
     GetMem(S.hufts, SizeOf(TInflateHuft) * MANY);
@@ -2100,7 +2157,7 @@ begin
     Inc(S.zend, W);
     S.mode := ibmZType;
     InflateBlockReset(S^, Z);
-    Result := S;
+    result := S;
   except
     if Assigned(S.Window) then
       FreeMem(S.Window);
@@ -2111,7 +2168,7 @@ begin
   end;
 end;
 
-function InflateBlocks(var S: TInflateBlocksState; var Z: TZState; R: Integer): Integer;
+function InflateBlocks(var S: TInflateBlocksState; var Z: TZState; R: integer): integer;
 // R contains the initial return code
 var
   Temp: Cardinal;
@@ -2128,7 +2185,7 @@ var
   I, J, C: Cardinal;
   CodeState: PInflateCodesState;
 
-  function UpdatePointers: Integer;
+  function UpdatePointers: integer;
   begin
     S.bitb := B;
     S.bitk := K;
@@ -2136,7 +2193,7 @@ var
     Inc(Z.TotalInput, PtrUInt(P) - PtrUInt(Z.NextInput));
     Z.NextInput := P;
     S.write := Q;
-    Result := InflateFlush(S, Z, R);
+    result := InflateFlush(S, Z, R);
   end;
 
 begin
@@ -2160,8 +2217,8 @@ begin
             if N <> 0 then
               R := Z_OK
             else begin
-              Result := UpdatePointers;
-              Exit;
+              result := UpdatePointers;
+              exit;
             end;
             Dec(N);
             B := B or (Cardinal(P^) shl K);
@@ -2170,7 +2227,7 @@ begin
           end;
 
           Temp := B and 7;
-          S.last := Boolean(Temp and 1);
+          S.last := boolean(Temp and 1);
           case Temp shr 1 of
             0: // stored
               begin
@@ -2190,8 +2247,8 @@ begin
                   TL, TD, Z);
                 if S.sub.decode.codes = nil then begin
                   R := Z_MEM_ERROR;
-                  Result := UpdatePointers;
-                  Exit;
+                  result := UpdatePointers;
+                  exit;
                 end;
                 B := B shr 3;
                 Dec(K, 3);
@@ -2209,8 +2266,8 @@ begin
                 Dec(K, 3);
                 S.mode := ibmBlockBad;
                 R := Z_DATA_ERROR;
-                Result := UpdatePointers;
-                Exit;
+                result := UpdatePointers;
+                exit;
               end;
           end;
         end;
@@ -2220,8 +2277,8 @@ begin
             if N <> 0 then
               R := Z_OK
             else begin
-              Result := UpdatePointers;
-              Exit;
+              result := UpdatePointers;
+              exit;
             end;
             Dec(N);
             B := B or (Cardinal(P^) shl K);
@@ -2232,8 +2289,8 @@ begin
           if (((not B) shr 16) and $FFFF) <> (B and $FFFF) then begin
             S.mode := ibmBlockBad;
             R := Z_DATA_ERROR;
-            Result := UpdatePointers;
-            Exit;
+            result := UpdatePointers;
+            exit;
           end;
           S.sub.left := B and $FFFF;
           K := 0;
@@ -2248,8 +2305,8 @@ begin
       ibmStored:
         begin
           if N = 0 then begin
-            Result := UpdatePointers;
-            Exit;
+            result := UpdatePointers;
+            exit;
           end;
 
           if M = 0 then begin
@@ -2278,8 +2335,8 @@ begin
               end;
 
               if M = 0 then begin
-                Result := UpdatePointers;
-                Exit;
+                result := UpdatePointers;
+                exit;
               end;
             end;
           end;
@@ -2309,8 +2366,8 @@ begin
             if N <> 0 then
               R := Z_OK
             else begin
-              Result := UpdatePointers;
-              Exit;
+              result := UpdatePointers;
+              exit;
             end;
             Dec(N);
             B := B or (Cardinal(P^) shl K);
@@ -2323,8 +2380,8 @@ begin
           if ((Temp and $1F) > 29) or (((Temp shr 5) and $1F) > 29) then begin
             S.mode := ibmBlockBad;
             R := Z_DATA_ERROR;
-            Result := UpdatePointers;
-            Exit;
+            result := UpdatePointers;
+            exit;
           end;
           Temp := 258 + (Temp and $1F) + ((Temp shr 5) and $1F);
           GetMem(S.sub.trees.blens, Temp * SizeOf(Cardinal));
@@ -2341,8 +2398,8 @@ begin
               if N <> 0 then
                 R := Z_OK
               else begin
-                Result := UpdatePointers;
-                Exit;
+                result := UpdatePointers;
+                exit;
               end;
               Dec(N);
               B := B or (Cardinal(P^) shl K);
@@ -2367,8 +2424,8 @@ begin
             R := Temp;
             if R = Z_DATA_ERROR then
               S.mode := ibmBlockBad;
-            Result := UpdatePointers;
-            Exit;
+            result := UpdatePointers;
+            exit;
           end;
           S.sub.trees.Index := 0;
           S.mode := ibmDistTree;
@@ -2384,8 +2441,8 @@ begin
               if N <> 0 then
                 R := Z_OK
               else begin
-                Result := UpdatePointers;
-                Exit;
+                result := UpdatePointers;
+                exit;
               end;
               Dec(N);
               B := B or (Cardinal(P^) shl K);
@@ -2419,8 +2476,8 @@ begin
                 if N <> 0 then
                   R := Z_OK
                 else begin
-                  Result := UpdatePointers;
-                  Exit;
+                  result := UpdatePointers;
+                  exit;
                 end;
                 Dec(N);
                 B := B or (Cardinal(P^) shl K);
@@ -2442,8 +2499,8 @@ begin
                 FreeMem(S.sub.trees.blens);
                 S.mode := ibmBlockBad;
                 R := Z_DATA_ERROR;
-                Result := UpdatePointers;
-                Exit;
+                result := UpdatePointers;
+                exit;
               end;
 
               if C = 16 then
@@ -2467,17 +2524,17 @@ begin
             S.sub.trees.blens^, LiteralBits, DistanceBits, TL, TD, S.hufts, Z);
           FreeMem(S.sub.trees.blens);
           if Temp <> Z_OK then begin
-            if Integer(Temp) = Z_DATA_ERROR then
+            if integer(Temp) = Z_DATA_ERROR then
               S.mode := ibmBlockBad;
             R := Temp;
-            Result := UpdatePointers;
-            Exit;
+            result := UpdatePointers;
+            exit;
           end;
           CodeState := InflateCodesNew(LiteralBits, DistanceBits, TL, TD, Z);
           if CodeState = nil then begin
             R := Z_MEM_ERROR;
-            Result := UpdatePointers;
-            Exit;
+            result := UpdatePointers;
+            exit;
           end;
           S.sub.decode.codes := CodeState;
           S.mode := ibmCodes;
@@ -2494,8 +2551,8 @@ begin
           R := InflateCodes(S, Z, R);
 
           if R <> Z_STREAM_END then begin
-            Result := InflateFlush(S, Z, R);
-            Exit;
+            result := InflateFlush(S, Z, R);
+            exit;
           end;
           R := Z_OK;
           Freemem(S.sub.decode.codes);
@@ -2521,27 +2578,27 @@ begin
           R := InflateFlush(S, Z, R);
           Q := S.write;
           if S.read <> S.write then begin
-            Result := UpdatePointers;
-            Exit;
+            result := UpdatePointers;
+            exit;
           end;
           S.mode := ibmBlockDone;
         end;
       ibmBlockDone:
         begin
           R := Z_STREAM_END;
-          Result := UpdatePointers;
-          Exit;
+          result := UpdatePointers;
+          exit;
         end;
       ibmBlockBad:
         begin
           R := Z_DATA_ERROR;
-          Result := UpdatePointers;
-          Exit;
+          result := UpdatePointers;
+          exit;
         end;
     else
       R := Z_STREAM_ERROR;
-      Result := UpdatePointers;
-      Exit;
+      result := UpdatePointers;
+      exit;
     end; // case S.mode of
   end;
 end;
@@ -2596,7 +2653,7 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
         if (Scan^ <> Match^) then
           Break;
       until (PtrUInt(Scan) >= PtrUInt(StrEnd));
-      result := MAX_MATCH - Integer(PtrUInt(StrEnd) - PtrUInt(Scan));
+      result := MAX_MATCH - integer(PtrUInt(StrEnd) - PtrUInt(Scan));
     end;
 
   const
@@ -2676,9 +2733,9 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
     until (CurrentMatch <= Limit) or (ChainLength = 0);
 
     if BestLen <= S.Lookahead then
-      Result := BestLen
+      result := BestLen
     else
-      Result := S.Lookahead;
+      result := S.Lookahead;
   end;
 
   procedure FillWindow(var S: TDeflateState);
@@ -2688,7 +2745,7 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
   // On exit at least one byte has been read, or AvailableInput = 0. Reads are performed for at least two bytes (required
   // for the zip translate_eol option -> not supported here).
 
-    function ReadBuffer(ZState: PZState; Buffer: PByte; Size: Cardinal): Integer;
+    function ReadBuffer(ZState: PZState; Buffer: PByte; Size: Cardinal): integer;
     // Reads a new buffer from the current input stream, updates the Adler32 and total number of bytes read.  All Deflate
     // input goes through this function so some applications may wish to modify it to avoid allocating a large
     // ZState.NextInput buffer and copying from it (see also FlushPending).
@@ -2699,14 +2756,14 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
       if Len > Size then
         Len := Size;
       if Len = 0 then begin
-        Result := 0;
-        Exit;
+        result := 0;
+        exit;
       end;
       Dec(ZState.AvailableInput, Len);
       Move(ZState.NextInput^, Buffer^, Len);
       Inc(ZState.NextInput, Len);
       Inc(ZState.TotalInput, Len);
-      Result := Len;
+      result := Len;
     end;
 
   var
@@ -2715,7 +2772,7 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
     More: Cardinal; // amount of free space at the end of the window
   begin
     repeat
-      More := S.CurrentWindowSize - Integer(S.Lookahead) - Integer(S.StringStart);
+      More := S.CurrentWindowSize - integer(S.Lookahead) - integer(S.StringStart);
       if (More = 0) and (S.StringStart = 0) and (S.Lookahead = 0) then
         More := S.WindowSize
       else if More = Cardinal(-1) then begin
@@ -2729,7 +2786,7 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
         Dec(S.MatchStart, S.WindowSize);
         Dec(S.StringStart, S.WindowSize);
           // we now have StringStart >= MaxDistance
-        Dec(S.BlockStart, Integer(S.WindowSize));
+        Dec(S.BlockStart, integer(S.WindowSize));
 
           // Slide the hash table (could be avoided with 32 bit values at the expense of memory usage). We slide even when
           // Level = 0 to keep the hash table consistent if we switch back to Level > 0 later. (Using Level 0 permanently
@@ -2757,7 +2814,7 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
       end;
 
       if S.ZState.AvailableInput = 0 then
-        Exit;
+        exit;
 
       // If there was no sliding:
       //    StringStart <= S.WindowSize + MaxDistance - 1 and Lookahead <= MIN_LOOKAHEAD - 1 and
@@ -2785,7 +2842,7 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
 
   procedure InitializeBlock(var S: TDeflateState);
   var
-    N: Integer;
+    N: integer;
   begin
     // initialize the trees
     for N := 0 to L_CODES - 1 do
@@ -2801,7 +2858,7 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
     S.LastLiteral := 0;
   end;
 
-  procedure FlushBlockOnly(var S: TDeflateState; EOF: Boolean);
+  procedure FlushBlockOnly(var S: TDeflateState; EOF: boolean);
   // Flushs the current block with given end-of-file flag.
   // StringStart must be set to the end of the current match.
 
@@ -2832,7 +2889,7 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
     end;
 
     function TreeFlushBlock(var S: TDeflateState; Buffer: PByte; StoredLength:
-      Integer; EOF: Boolean): Integer;
+      integer; EOF: boolean): integer;
     // Determines the best encoding for the current block: dynamic trees, static trees or store, and outputs the encoded
     // block. Buffer contains the input block (or nil if too old), StoredLength the length of this block and EOF if this
     // is the last block.
@@ -2841,37 +2898,37 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
       procedure BuildTree(var S: TDeflateState; var Descriptor: TTreeDescriptor);
       // Constructs a Huffman tree and assigns the code bit strings and lengths.
       // Updates the total bit length for the current block. The field Frequency must be set for all tree elements on entry.
-      // Result: the fields Len and Code are set to the optimal bit length and corresponding Code. The length OptimalLength
+      // result: the fields Len and Code are set to the optimal bit length and corresponding Code. The length OptimalLength
       // is updated; StaticLength is also updated if STree is not nil. The field MaxCode is set.
 
-        procedure GenerateCodes(Tree: PTree; MaxCode: Integer; const
-          BitLengthCounts: array of Word);
+        procedure GenerateCodes(Tree: PTree; MaxCode: integer; const
+          BitLengthCounts: array of word);
         // Generates the codes for a given tree and bit counts (which need not be optimal).
         // The array BitLengthCounts contains the bit length statistics for the given tree and the field Len is set for all
         // Tree elements. MaxCode is the largest code with non zero frequency and BitLengthCounts are the number of codes at
         // each bit length.
         // On exit the field code is set for all tree elements of non zero code length.
 
-          function BitReverse(Code: Word; Len: Integer): Word;
+          function BitReverse(Code: word; Len: integer): word;
           // Reverses the first Len bits of Code, using straightforward code (a faster
           // imMethod would use a table)
           begin
-            Result := 0;
+            result := 0;
             repeat
-              Result := Result or (Code and 1);
+              result := result or (Code and 1);
               Code := Code shr 1;
-              Result := Result shl 1;
+              result := result shl 1;
               Dec(Len);
             until Len <= 0;
-            Result := Result shr 1;
+            result := result shr 1;
           end;
 
         var
-          NextCode: array[0..MAX_BITS] of Word; // next code value for each bit length
-          Code: Word;      // running code value
-          Bits: Integer;   // bit Index
-          N: Integer;      // code Index
-          Len: Integer;
+          NextCode: array[0..MAX_BITS] of word; // next code value for each bit length
+          Code: word;      // running code value
+          Bits: integer;   // bit Index
+          N: integer;      // code Index
+          Len: integer;
         begin
           Code := 0;
           // The distribution counts are first used to generate the code values without bit reversal.
@@ -2889,12 +2946,12 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
           end;
         end;
 
-        procedure RestoreHeap(var S: TDeflateState; const Tree: TTree; K: Integer);
+        procedure RestoreHeap(var S: TDeflateState; const Tree: TTree; K: integer);
         // Restores the heap property by moving down tree starting at node K,
         // exchanging a Node with the smallest of its two sons if necessary, stopping
         // when the heap property is re-established (each father smaller than its two sons).
         var
-          V, J: Integer;
+          V, J: integer;
         begin
           V := S.Heap[K];
           J := K shl 1;  // left son of K
@@ -2927,21 +2984,21 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
           TTreeDescriptor);
         // Computes the optimal bit lengths for a tree and update the total bit length for the current block.
         // The fields Frequency and dad are set, Heap[HeapMaximum] and above are the tree nodes sorted by increasing frequency.
-        // Result: The field Len is set to the optimal bit length, the array BitLengthCounts contains the frequencies for each
+        // result: The field Len is set to the optimal bit length, the array BitLengthCounts contains the frequencies for each
         // bit length. The length OptimalLength is updated. StaticLength is also updated if STree is not nil.
         var
           Tree: PTree;
-          MaxCode: Integer;
+          MaxCode: integer;
           STree: PTree;
           Extra: TPAInteger;
-          Base: Integer;
-          MaxLength: Integer;
-          H: Integer;          // heap Index
-          N, M: Integer;       // iterate over the tree elements
-          Bits: Word;          // bit length
-          ExtraBits: Integer;
-          F: Word;             // frequency
-          Overflow: Integer;   // number of elements with bit length too large
+          Base: integer;
+          MaxLength: integer;
+          H: integer;          // heap Index
+          N, M: integer;       // iterate over the tree elements
+          Bits: word;          // bit length
+          ExtraBits: integer;
+          F: word;             // frequency
+          Overflow: integer;   // number of elements with bit length too large
         begin
           Tree := Descriptor.DynamicTree;
           MaxCode := Descriptor.MaxCode;
@@ -2974,13 +3031,13 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
             if N >= Base then
               ExtraBits := Extra[N - Base];
             F := Tree[N].fc.Frequency;
-            Inc(S.OptimalLength, Integer(F) * (Bits + ExtraBits));
+            Inc(S.OptimalLength, integer(F) * (Bits + ExtraBits));
             if Assigned(STree) then
-              Inc(S.StaticLength, Integer(F) * (STree[N].dl.Len + ExtraBits));
+              Inc(S.StaticLength, integer(F) * (STree[N].dl.Len + ExtraBits));
           end;
           // This happens for example on obj2 and pic of the Calgary corpus
           if Overflow = 0 then
-            Exit;
+            exit;
 
           // find the first bit length which could increase
           repeat
@@ -3011,7 +3068,7 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
                 Continue;
               if Tree[M].dl.Len <> Bits then begin
                 Inc(S.OptimalLength, (Bits - Tree[M].dl.Len) * Tree[M].fc.Frequency);
-                Tree[M].dl.Len := Word(Bits);
+                Tree[M].dl.Len := word(Bits);
               end;
               Dec(N);
             end;
@@ -3021,10 +3078,10 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
       var
         Tree: PTree;
         STree: PTree;
-        Elements: Integer;
-        N, M: Integer;    // iterate over heap elements
-        MaxCode: Integer; // largest code with non zero frequency
-        Node: Integer;    // new node being created
+        Elements: integer;
+        N, M: integer;    // iterate over heap elements
+        MaxCode: integer; // largest code with non zero frequency
+        Node: integer;    // new node being created
 
       begin
         Tree := Descriptor.DynamicTree;
@@ -3100,8 +3157,8 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
           else
             S.Depth[Node] := Byte(S.Depth[M] + 1);
 
-          Tree[M].dl.Dad := Word(Node);
-          Tree[N].dl.Dad := Word(Node);
+          Tree[M].dl.Dad := word(Node);
+          Tree[N].dl.Dad := word(Node);
           // and insert the new node in the heap
           S.Heap[1] := Node;
           Inc(Node);
@@ -3125,7 +3182,7 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
         if S.ValidBits > 8 then begin
           S.PendingBuffer[S.Pending] := Byte(S.BitsBuffer and $FF);
           Inc(S.Pending);
-          S.PendingBuffer[S.Pending] := Byte(Word(S.BitsBuffer) shr 8);
+          S.PendingBuffer[S.Pending] := Byte(word(S.BitsBuffer) shr 8);
           Inc(S.Pending);
         end
         else if S.ValidBits > 0 then begin
@@ -3136,13 +3193,13 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
         S.ValidBits := 0;
       end;
 
-      procedure SendBits(var S: TDeflateState; Value: Word; Length: Integer);
+      procedure SendBits(var S: TDeflateState; Value: word; Length: integer);
       // Value contains what is to be sent
       // Length is the number of bits to send
       begin
         // If there's not enough room in BitsBuffer use (valid) bits from BitsBuffer and
         // (16 - ValidBits) bits from Value, leaving (width - (16 - ValidBits)) unused bits in Value.
-        if (S.ValidBits > Integer(BufferSize) - Length) then begin
+        if (S.ValidBits > integer(BufferSize) - Length) then begin
           S.BitsBuffer := S.BitsBuffer or (Value shl S.ValidBits);
           S.PendingBuffer[S.Pending] := S.BitsBuffer and $FF;
           Inc(S.Pending);
@@ -3157,23 +3214,23 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
         end;
       end;
 
-      procedure SendAllTrees(var S: TDeflateState; lcodes, dcodes, blcodes: Integer);
+      procedure SendAllTrees(var S: TDeflateState; lcodes, dcodes, blcodes: integer);
       // Sends the header for a block using dynamic Huffman trees: the counts, the
       // lengths of the bit length codes, the literal tree and the distance tree.
       // lcodes must be >= 257, dcodes >= 1 and blcodes >= 4
 
         procedure SendTree(var S: TDeflateState; const Tree: array of TTreeEntry;
-          MaxCode: Integer);
+          MaxCode: integer);
         // Sends the given tree in compressed form using the codes in BitLengthTree.
         // MaxCode is the tree's largest code of non zero frequency.
         var
-          N: Integer;           // iterates over all tree elements
-          PreviousLen: Integer; // last emitted length
-          CurrentLen: Integer;  // length of current code
-          NextLen: Integer;     // length of next code
-          Count: Integer;       // repeat count of the current code
-          MaxCount: Integer;    // max repeat count
-          MinCount: Integer;    // min repeat count
+          N: integer;           // iterates over all tree elements
+          PreviousLen: integer; // last emitted length
+          CurrentLen: integer;  // length of current code
+          NextLen: integer;     // length of next code
+          Count: integer;       // repeat count of the current code
+          MaxCount: integer;    // max repeat count
+          MinCount: integer;    // min repeat count
         begin
           PreviousLen := -1;
           NextLen := Tree[0].dl.Len;
@@ -3231,7 +3288,7 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
         end;
 
       var
-        Rank: Integer;
+        Rank: integer;
       begin
         SendBits(S, lcodes - 257, 5); // not +255 as stated in appnote.txt
         SendBits(S, dcodes - 1, 5);
@@ -3242,22 +3299,22 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
         SendTree(S, S.DistanceTree, dcodes - 1);
       end;
 
-      function BuildBitLengthTree(var S: TDeflateState): Integer;
+      function BuildBitLengthTree(var S: TDeflateState): integer;
       // Constructs the Huffman tree for the bit lengths and returns the Index in BitLengthOrder
       // of the last bit length code to send.
 
         procedure ScanTree(var S: TDeflateState; var Tree: array of TTreeEntry;
-          MaxCode: Integer);
+          MaxCode: integer);
         // Scans a given tree to determine the frequencies of the codes in the bit length tree.
         // MaxCode is the tree's largest code of non zero frequency.
         var
-          N: Integer;           // iterates over all tree elements
-          PreviousLen: Integer; // last emitted length
-          CurrentLen: Integer;  // Length of current code
-          NextLen: Integer;     // length of next code
-          Count: Integer;       // repeat count of the current xode
-          MaxCount: Integer;    // max repeat count
-          MinCount: Integer;    // min repeat count
+          N: integer;           // iterates over all tree elements
+          PreviousLen: integer; // last emitted length
+          CurrentLen: integer;  // Length of current code
+          NextLen: integer;     // length of next code
+          Count: integer;       // repeat count of the current xode
+          MaxCount: integer;    // max repeat count
+          MinCount: integer;    // min repeat count
         begin
           PreviousLen := -1;
           NextLen := Tree[0].dl.Len;
@@ -3269,7 +3326,7 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
             MaxCount := 138;
             MinCount := 3;
           end;
-          Tree[MaxCode + 1].dl.Len := Word($FFFF); // guard
+          Tree[MaxCode + 1].dl.Len := word($FFFF); // guard
 
           for N := 0 to MaxCode do begin
             CurrentLen := NextLen;
@@ -3317,21 +3374,21 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
 
         // Determine the number of bit length codes to send. The pkzip format requires that at least 4 bit length codes
         // be sent. (appnote.txt says 3 but the actual value used is 4.)
-        for Result := BL_CODES - 1 downto 3 do
-          if S.BitLengthTree[BitLengthOrder[Result]].dl.Len <> 0 then
+        for result := BL_CODES - 1 downto 3 do
+          if S.BitLengthTree[BitLengthOrder[result]].dl.Len <> 0 then
             Break;
 
         // update OptimalLength to include the bit length tree and counts
-        Inc(S.OptimalLength, 3 * (Result + 1) + 14);
+        Inc(S.OptimalLength, 3 * (result + 1) + 14);
       end;
 
       procedure TreeStroredBlock(var S: TDeflateState; Buffer: PByte;
-        StoredLength: Integer; EOF: Boolean);
+        StoredLength: integer; EOF: boolean);
       // sends a stored block
       // Buffer contains the input data, Len the buffer length and EOF is True if this is the last block for a file.
 
         procedure CopyBlock(var S: TDeflateState; Buffer: PByte; Len: Cardinal;
-          Header: Boolean);
+          Header: boolean);
         // copies a stored block, storing first the length and its one's complement if requested
         // Buffer contains the input data, Len the buffer length and Header is True if the block Header must be written too.
         begin
@@ -3339,13 +3396,13 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
           S.LastEOBLength := 8; // enough lookahead for Inflate
 
           if Header then begin
-            S.PendingBuffer[S.Pending] := Byte(Word(Len) and $FF);
+            S.PendingBuffer[S.Pending] := Byte(word(Len) and $FF);
             Inc(S.Pending);
-            S.PendingBuffer[S.Pending] := Byte(Word(Len) shr 8);
+            S.PendingBuffer[S.Pending] := Byte(word(Len) shr 8);
             Inc(S.Pending);
-            S.PendingBuffer[S.Pending] := Byte(Word(not Len) and $FF);
+            S.PendingBuffer[S.Pending] := Byte(word(not Len) and $FF);
             Inc(S.Pending);
-            S.PendingBuffer[S.Pending] := Byte(Word(not Len) shr 8);
+            S.PendingBuffer[S.Pending] := Byte(word(not Len) shr 8);
             Inc(S.Pending);
           end;
 
@@ -3359,7 +3416,7 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
 
       begin
         SendBits(S, (STORED_BLOCK shl 1) + Ord(EOF), 3);  // send block type
-        S.CompressedLength := (S.CompressedLength + 10) and Integer(not 7);
+        S.CompressedLength := (S.CompressedLength + 10) and integer(not 7);
         Inc(S.CompressedLength, (StoredLength + 4) shl 3);
 
         // copy with header
@@ -3371,10 +3428,10 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
       // sends the block data compressed using the given Huffman trees
       var
         Distance: Cardinal; // distance of matched string
-        lc: Integer;        // match length or unmatched char (if Distance = 0)
+        lc: integer;        // match length or unmatched char (if Distance = 0)
         I: Cardinal;
         Code: Cardinal;     // the code to send
-        Extra: Integer;     // number of extra bits to send
+        Extra: integer;     // number of extra bits to send
 
       begin
         I := 0;
@@ -3422,8 +3479,8 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
       end;
 
     var
-      OptimalByteLength, StaticByteLength: Integer; // OptimalLength and StaticLength in bytes
-      MacBLIndex: Integer;  // index of last bit length code of non zero frequency
+      OptimalByteLength, StaticByteLength: integer; // OptimalLength and StaticLength in bytes
+      MacBLIndex: integer;  // index of last bit length code of non zero frequency
     begin
       // construct the literal and distance trees
       // After this, OptimalLength and StaticLength are the total bit lengths of
@@ -3473,27 +3530,27 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
         Inc(S.CompressedLength, 7);
       end;
 
-      Result := S.CompressedLength shr 3;
+      result := S.CompressedLength shr 3;
     end;
 
   begin
     if S.BlockStart >= 0 then
       TreeFlushBlock(S, @S.Window[Cardinal(S.BlockStart)],
-        Integer(S.StringStart) - S.BlockStart, EOF)
+        integer(S.StringStart) - S.BlockStart, EOF)
     else
-      TreeFlushBlock(S, nil, Integer(S.StringStart) - S.BlockStart, EOF);
+      TreeFlushBlock(S, nil, integer(S.StringStart) - S.BlockStart, EOF);
     S.BlockStart := S.StringStart;
     FlushPending(S.ZState^);
   end;
 
-  function TreeTally(var S: TDeflateState; Distance: Cardinal; lc: Cardinal): Boolean;
+  function TreeTally(var S: TDeflateState; Distance: Cardinal; lc: Cardinal): boolean;
   // Saves the match info and tallies the frequency counts. Returns True if the current block must be flushed.
   // Distance is the distance of the matched string and lc either match length minus MIN_MATCH or the unmatch character
   // (if Distance = 0).
   var
-    Code: Word;
+    Code: word;
   begin
-    S.DistanceBuffer[S.LastLiteral] := Word(Distance);
+    S.DistanceBuffer[S.LastLiteral] := word(Distance);
     S.LiteralBuffer[S.LastLiteral] := Byte(lc);
     Inc(S.LastLiteral);
     if (Distance = 0) then begin
@@ -3512,7 +3569,7 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
       Inc(S.DistanceTree[Code].fc.Frequency);
     end;
 
-    Result := (S.LastLiteral = S.LiteralBufferSize - 1);
+    result := (S.LastLiteral = S.LiteralBufferSize - 1);
     // We avoid equality with LiteralBufferSize because stored blocks are restricted to 64K - 1 bytes.
   end;
 
@@ -3526,7 +3583,7 @@ function CompressMem(src, dst: pointer; srcLen, dstLen: integer): integer;
       and S.HashMask;
     MatchHead := S.Head[S.InsertHash];
     S.Previous[(Str) and S.WindowMask] := MatchHead;
-    S.Head[S.InsertHash] := Word(Str);
+    S.Head[S.InsertHash] := word(Str);
   end;
 
 const
@@ -3537,7 +3594,7 @@ var
   // We overlay PendingBuffer and DistanceBuffer + LiteralBuffer. This works since the average
   // output size for (length, distance) codes is <= 24 Bits.
   HashHead: Cardinal;  // head of the hash chain
-  BlockFlush: Boolean; // set if current block must be flushed
+  BlockFlush: boolean; // set if current block must be flushed
   S: TDeflateState;
 begin
   result := 0;
@@ -3558,14 +3615,14 @@ begin
     S.HashMask := S.HashSize - 1;
     S.HashShift := (S.HashBits + MIN_MATCH - 1) div MIN_MATCH;
     GetMem(S.Window, S.WindowSize * (2 * SizeOf(Byte)));
-    GetMem(S.Previous, S.WindowSize * SizeOf(Word));
-    GetMem(S.Head, S.HashSize * SizeOf(Word));
+    GetMem(S.Previous, S.WindowSize * SizeOf(word));
+    GetMem(S.Head, S.HashSize * SizeOf(word));
     S.LiteralBufferSize := 1 shl (CMemLevel + 6); // 16K elements by default
-    GetMem(Overlay, S.LiteralBufferSize * (SizeOf(Word) + 2));
+    GetMem(Overlay, S.LiteralBufferSize * (SizeOf(word) + 2));
     S.PendingBuffer := TPAByte(Overlay);
-    S.PendingBufferSize := S.LiteralBufferSize * (SizeOf(Word) + 2);
+    S.PendingBufferSize := S.LiteralBufferSize * (SizeOf(word) + 2);
     S.DistanceBuffer := @Overlay[S.LiteralBufferSize shr 1];
-    S.LiteralBuffer := @S.PendingBuffer[(1 + SizeOf(Word)) * S.LiteralBufferSize];
+    S.LiteralBuffer := @S.PendingBuffer[(1 + SizeOf(word)) * S.LiteralBufferSize];
     S.PendingOutput := PByte(S.PendingBuffer);
     S.LiteralDescriptor.DynamicTree := @S.LiteralTree;
     S.LiteralDescriptor.StaticDescriptor := @StaticLiteralDescriptor;
@@ -4323,7 +4380,7 @@ begin
           inc(Str1);
           inc(Str2);
         until false;
-        Result := ord(C1) - ord(C2);
+        result := ord(C1) - ord(C2);
       end
       else
         result := 1 // Str2=''
@@ -4366,20 +4423,20 @@ end;
 {$ifdef DELPHI5OROLDER}
 function DirectoryExists(const Directory: string): boolean;
 var
-  Code: Integer;
+  Code: integer;
 begin
   Code := GetFileAttributes(pointer(Directory));
   result := (Code <> -1) and (FILE_ATTRIBUTE_DIRECTORY and Code <> 0);
 end;
 {$endif}
 
-function ForceDirectories(const Dir: TFileName): Boolean;
+function ForceDirectories(const Dir: TFileName): boolean;
 begin
   if (Length(Dir) < 3) or DirectoryExists(Dir) or (ExtractFileDir(Dir) = Dir)
     then // avoid 'x:\' problem.
-    Result := true
+    result := true
   else
-    Result := ForceDirectories(ExtractFileDir(Dir)) and CreateDir(Dir);
+    result := ForceDirectories(ExtractFileDir(Dir)) and CreateDir(Dir);
 end;
 
 function TZipRead.CheckFile(aIndex: integer; DestPath: TFileName): boolean;
@@ -4678,7 +4735,7 @@ end;
 initialization
 {$ifdef DYNAMIC_CRC_TABLE}
   InitCrc32Tab;
-{$endif}
+{$endif DYNAMIC_CRC_TABLE}
 
 end.
 

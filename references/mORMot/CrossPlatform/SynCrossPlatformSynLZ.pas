@@ -8,7 +8,7 @@ interface
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -27,7 +27,7 @@ interface
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -86,10 +86,10 @@ type
 {$ifdef FPC}
   PBytes = PAnsiChar;
 {$else}
-  PtrUInt = {$ifdef CPUX64} NativeUInt {$else} cardinal {$endif};
+  PtrUInt = {$ifdef UNICODE} NativeUInt {$else} cardinal {$endif};
   TBytes = array[0..maxInt-1] of byte;
   PBytes = ^TBytes;
-{$endif}
+{$endif FPC}
 
 function SynLZcomp(src: pointer; size: cardinal; dst: pointer): cardinal;
 var dst_beg,          // initial dst value
@@ -190,7 +190,7 @@ function SynLZdecomp(src: pointer; size: cardinal; dst: pointer): cardinal;
 var last_hashed, // initial src and dst value
     src_end: PtrUInt;
     CW, CWbit: cardinal;
-    v, t, h, o: cardinal;
+    v, t, h, o: PtrUInt;
     i: integer;
     offset: array[0..4095] of PtrUInt; // 16KB hashing code
 label nextCW;

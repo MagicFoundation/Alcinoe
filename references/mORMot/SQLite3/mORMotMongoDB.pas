@@ -6,7 +6,7 @@ unit mORMotMongoDB;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit mORMotMongoDB;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -84,7 +84,7 @@ uses
   SynMongoDB;
 
 type
-  /// exeception class raised by this units
+  /// exception class raised by this units
   EORMMongoDBException = class(EORMException);
 
   /// how TSQLRestStorageMongoDB would compute the next ID to be inserted
@@ -190,6 +190,12 @@ type
     /// create one index for all specific FieldNames at once
     function CreateSQLMultiIndex(Table: TSQLRecordClass; const FieldNames: array of RawUTF8;
       Unique: boolean; IndexName: RawUTF8=''): boolean; override;
+    /// search for a field value, according to its SQL content representation
+    // - return true on success (i.e. if some values have been added to ResultID)
+    // - store the results into the ResultID dynamic array
+    // - faster than OneFieldValues method, which creates a temporary JSON content
+    function SearchField(const FieldName, FieldValue: RawUTF8;
+      out ResultID: TIDDynArray): boolean; override;
 
     /// drop the whole table content
     // - in practice, dropping the whole MongoDB database would be faster
@@ -990,6 +996,32 @@ function TSQLRestStorageMongoDB.AdaptSQLForEngineList(
   var SQL: RawUTF8): boolean;
 begin
   result := true; // we do not have any Virtual Table yet -> always accept
+end;
+
+function TSQLRestStorageMongoDB.SearchField(const FieldName, FieldValue: RawUTF8;
+  out ResultID: TIDDynArray): boolean;
+var query: variant;
+    id: TBSONIterator;
+    n: integer; // an external count is actually faster
+begin
+  if (fCollection = nil) or (FieldName = '') or (FieldValue = '') then
+    result := false else
+  try
+    // use {%:%} here since FieldValue is already JSON encoded
+    query := BSONVariant('{%:%}',
+      [fStoredClassMapping^.InternalToExternal(FieldName), FieldValue], []);
+    // retrieve the IDs for this query
+    if id.Init(fCollection.FindBSON(query, BSONVariant(['_id', 1]))) then begin
+      n := 0;
+      while id.Next do
+        AddInt64(TInt64DynArray(ResultID), n, id.Item.DocItemToInteger('_id'));
+      SetLength(ResultID, n);
+      result := true;
+    end else
+      result := false;
+  except
+    result := false;
+  end;
 end;
 
 function TSQLRestStorageMongoDB.GetJSONValues(const Res: TBSONDocument;

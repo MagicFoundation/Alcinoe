@@ -12,8 +12,8 @@ object Form1: TForm1
   DesignerMasterStyle = 0
   object RemoteCameraLayout: TALLayout
     HitTest = True
-    Position.X = 192.000000000000000000
-    Position.Y = 120.000000000000000000
+    Position.X = 184.000000000000000000
+    Position.Y = 384.000000000000000000
     Size.Width = 150.000000000000000000
     Size.Height = 150.000000000000000000
     Size.PlatformDefault = False
@@ -22,8 +22,8 @@ object Form1: TForm1
   end
   object LocalCameraLayout: TALLayout
     HitTest = True
-    Position.X = 23.000000000000000000
-    Position.Y = 121.000000000000000000
+    Position.X = 15.000000000000000000
+    Position.Y = 385.000000000000000000
     Size.Width = 150.000000000000000000
     Size.Height = 150.000000000000000000
     Size.PlatformDefault = False
@@ -31,10 +31,13 @@ object Form1: TForm1
     OnPaint = LocalCameraLayoutPaint
   end
   object ButtonCall: TButton
-    Margins.Bottom = 5.000000000000000000
-    Position.X = 24.000000000000000000
-    Position.Y = 16.000000000000000000
-    Size.Width = 81.000000000000000000
+    Align = Top
+    Margins.Left = 15.000000000000000000
+    Margins.Top = 15.000000000000000000
+    Margins.Right = 15.000000000000000000
+    Position.X = 15.000000000000000000
+    Position.Y = 142.000000000000000000
+    Size.Width = 489.000000000000000000
     Size.Height = 35.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
@@ -42,11 +45,14 @@ object Form1: TForm1
     OnClick = ButtonCallClick
   end
   object ButtonHangUp: TButton
+    Align = Top
     Enabled = False
-    Margins.Bottom = 5.000000000000000000
-    Position.X = 120.000000000000000000
-    Position.Y = 16.000000000000000000
-    Size.Width = 81.000000000000000000
+    Margins.Left = 15.000000000000000000
+    Margins.Top = 15.000000000000000000
+    Margins.Right = 15.000000000000000000
+    Position.X = 15.000000000000000000
+    Position.Y = 192.000000000000000000
+    Size.Width = 489.000000000000000000
     Size.Height = 35.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 3
@@ -55,12 +61,39 @@ object Form1: TForm1
   end
   object ServerUrlEdit: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
+    Align = Top
     TabOrder = 4
-    Position.X = 24.000000000000000000
-    Position.Y = 72.000000000000000000
-    Size.Width = 257.000000000000000000
+    Text = 'http://192.168.0.1:3030'
+    Position.X = 15.000000000000000000
+    Position.Y = 242.000000000000000000
+    Margins.Left = 15.000000000000000000
+    Margins.Top = 15.000000000000000000
+    Margins.Right = 15.000000000000000000
+    Size.Width = 489.000000000000000000
     Size.Height = 33.000000000000000000
     Size.PlatformDefault = False
     TextPrompt = 'Server url'
+  end
+  object TextIntro: TALText
+    Align = Top
+    AutoSize = True
+    Margins.Left = 15.000000000000000000
+    Margins.Top = 15.000000000000000000
+    Margins.Right = 15.000000000000000000
+    Position.X = 15.000000000000000000
+    Position.Y = 15.000000000000000000
+    Size.Width = 489.000000000000000000
+    Size.Height = 112.000000000000000000
+    Size.PlatformDefault = False
+    Text = 
+      'On iOS you must manually sign the WebRTC.framework, please read ' +
+      #13#10'.\ios\frameworks\readme.txt.'#13#10#13#10' You must also run '#13#10'Alcinoe\e' +
+      'mbarcadero\<yourDelphiVersion>\update.bat'#13#10' to retrieve and patc' +
+      'h the original delphi source code'
+    TextSettings.Font.Size = 14.000000000000000000
+    TextSettings.Font.StyleExt = {00070000000000000004000000}
+    TextSettings.FontColor = claCrimson
+    TextSettings.WordWrap = True
+    TextSettings.HorzAlign = Center
   end
 end

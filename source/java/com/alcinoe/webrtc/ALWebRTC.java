@@ -586,16 +586,16 @@ public class ALWebRTC {
     }
     mPeerConnection.addTrack(mLocalAudioTrack, mediaStreamLabels);
 
-    if (mPeerConnectionParameters.aecDump) {
-      try {
-        ParcelFileDescriptor aecDumpFileDescriptor = ParcelFileDescriptor.open(
-                                                       new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "Download/audio.aecdump"),
-                                                       ParcelFileDescriptor.MODE_READ_WRITE | ParcelFileDescriptor.MODE_CREATE | ParcelFileDescriptor.MODE_TRUNCATE);
-        mPeerConnectionFactory.startAecDump(aecDumpFileDescriptor.detachFd(), -1);
-      } catch (IOException e) {
-        Log.e(TAG, "Can not open aecdump file", e);
-      }
-    }
+    //if (mPeerConnectionParameters.aecDump) {
+    //  try {
+    //    ParcelFileDescriptor aecDumpFileDescriptor = ParcelFileDescriptor.open(
+    //                                                   new File(Environment.getExternalStorageDirectory().getPath() + File.separator + "Download/audio.aecdump"),
+    //                                                   ParcelFileDescriptor.MODE_READ_WRITE | ParcelFileDescriptor.MODE_CREATE | ParcelFileDescriptor.MODE_TRUNCATE);
+    //    mPeerConnectionFactory.startAecDump(aecDumpFileDescriptor.detachFd(), -1);
+    //  } catch (IOException e) {
+    //    Log.e(TAG, "Can not open aecdump file", e);
+    //  }
+    //}
 
     //return
     return true;
@@ -615,8 +615,8 @@ public class ALWebRTC {
 
     //free the objects
     mListener = null;
-    if ((mPeerConnectionParameters.aecDump) && 
-        (mPeerConnectionFactory != null)) { mPeerConnectionFactory.stopAecDump(); }
+    //if ((mPeerConnectionParameters.aecDump) && 
+    //    (mPeerConnectionFactory != null)) { mPeerConnectionFactory.stopAecDump(); }
     if (mDataChannel != null) {
       mDataChannel.dispose();
       mDataChannel = null;

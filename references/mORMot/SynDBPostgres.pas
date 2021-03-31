@@ -90,6 +90,7 @@ type
     fPGConn: pointer;
     // fServerSettings: set of (ssByteAasHex);
     // maintain fPrepared[] hash list to identify already cached
+    // - returns statement index in prepared cache array
     function PrepareCached(const aSQL: RawUTF8; aParamCount: integer;
       out aName: RawUTF8): integer;
     /// direct execution of SQL statement what do not returns a result
@@ -131,7 +132,6 @@ type
   TSQLDBPostgresStatement = class(TSQLDBStatementWithParamsAndColumns)
   protected
     fPreparedStmtName: RawUTF8; // = SHA-256 of the SQL
-    fParsedSQL: RawUTF8;
     fPreparedParamsCount: integer;
     fRes: pointer;
     fResStatus: integer;
@@ -322,12 +322,6 @@ type
   /// direct access to the libpq native Postgres protocol 3 library
   // - only the endpoints needed by this unit are imported
   TSQLDBPostgresLib = class(TSQLDBLib)
-  protected
-    /// raise an exception on error and clean result
-    // - will set pRes to nil if passed
-    // - if andClear is true - will call always PQ.Clear(res)
-    procedure Check(conn: PPGconn; res: PPGresult;
-      pRes: PPPGresult = nil; andClear: boolean = true);
   public
     LibVersion: function: integer; cdecl;
     IsThreadSafe: function: integer; cdecl;
@@ -365,6 +359,11 @@ type
     /// just a wrapper around FastSetString + GetValue/GetLength
     procedure GetRawUTF8(res: PPGresult; tup_num, field_num: integer;
       var result: RawUTF8);
+    /// raise an exception on error and clean result
+    // - will set pRes to nil if passed
+    // - if andClear is true - will call always PQ.Clear(res)
+    procedure Check(conn: PPGconn; res: PPGresult;
+      pRes: PPPGresult = nil; andClear: boolean = true);
   end;
 
 const
@@ -755,20 +754,18 @@ end;
 // see https://www.postgresql.org/docs/9.3/libpq-exec.html
 
 procedure TSQLDBPostgresStatement.Prepare(const aSQL: RawUTF8; ExpectResults: boolean);
-var
-  fromcache: integer;
 begin
   SQLLogBegin(sllDB);
   if aSQL = '' then
     raise ESQLDBPostgres.CreateUTF8('%.Prepare: empty statement', [self]);
   inherited Prepare(aSQL, ExpectResults); // will strip last ;
-  fPreparedParamsCount := ReplaceParamsByNumbers(fSQL, fParsedSQL, '$');
-  if (fPreparedParamsCount > 0) and (IdemPCharArray(pointer(fParsedSQL),
+  fPreparedParamsCount := ReplaceParamsByNumbers(fSQL, fSQLPrepared, '$');
+  if (fPreparedParamsCount > 0) and (IdemPCharArray(pointer(fSQLPrepared),
       ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'VALUES']) >= 0) then
   begin // preparable
-    fromcache := TSQLDBPostgresConnection(fConnection).PrepareCached(
-      fParsedSQL, fPreparedParamsCount, fPreparedStmtName);
-    SQLLogEnd(' name=% cache=%', [fPreparedStmtName, fromcache]);
+    fCacheIndex := TSQLDBPostgresConnection(fConnection).PrepareCached(
+      fSQLPrepared, fPreparedParamsCount, fPreparedStmtName);
+    SQLLogEnd(' name=% cache=%', [fPreparedStmtName, fCacheIndex]);
   end
   else
     SQLLogEnd;
@@ -784,7 +781,7 @@ var
   c: TSQLDBPostgresConnection;
 begin
   SQLLogBegin(sllSQL);
-  if fParsedSQL = '' then
+  if fSQLPrepared = '' then
     raise ESQLDBPostgres.CreateUTF8('%.ExecutePrepared: Statement not prepared', [self]);
   if fParamCount <> fPreparedParamsCount then
     raise ESQLDBPostgres.CreateUTF8('%.ExecutePrepared: Query expects % parameters ' +
@@ -839,9 +836,8 @@ begin
       pointer(fPGParams), pointer(fPGparamLengths), pointer(fPGParamFormats), PGFMT_TEXT)
   else if fPreparedParamsCount = 0 then
     // PQexec handles multiple SQL commands
-    fRes := PQ.Exec(c.fPGConn, pointer(fParsedSQL))
-  else
-    fRes := PQ.ExecParams(c.fPGConn, pointer(fParsedSQL), fPreparedParamsCount, nil,
+    fRes := PQ.Exec(c.fPGConn, pointer(fSQLPrepared)) else
+    fRes := PQ.ExecParams(c.fPGConn, pointer(fSQLPrepared), fPreparedParamsCount, nil,
       pointer(fPGParams), pointer(fPGparamLengths), pointer(fPGParamFormats), PGFMT_TEXT);
   PQ.Check(c.fPGConn, fRes, @fRes, {forceClean=}false);
   fResStatus := PQ.ResultStatus(fRes);

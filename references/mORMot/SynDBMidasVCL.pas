@@ -6,7 +6,7 @@ unit SynDBMidasVCL;
 {
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit SynDBMidasVCL;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -204,6 +204,7 @@ type
 function ToClientDataSet(aOwner: TComponent; aStatement: SynDB.TQuery;
   aMaxRowCount: integer=0): TSynDBDataSet; overload;
 
+{$ifndef FPC}
 /// fetch a SynDB TSQLDBStatement result set into a new VCL TClientDataSet
 // - if aMaxRowCount>0, will return up to the specified number of rows
 // - current implementation will return a TClientDataSet instance, created from
@@ -215,6 +216,7 @@ function ToClientDataSet(aOwner: TComponent; aStatement: SynDB.TQuery;
 // much less resources
 function ToClientDataSet(aOwner: TComponent; aStatement: TSQLDBStatement;
   aMaxRowCount: integer=0): TSynDBDataSet; overload;
+{$endif FPC}
 
 /// fetch a SynDB ISQLDBRows result set into a new VCL TClientDataSet
 // - this overloaded function can use directly a result of the
@@ -270,6 +272,7 @@ begin
     result := ToClientDataSet(aOwner,aStatement.PreparedSQLDBStatement.Instance,aMaxRowCount);
 end;
 
+{$ifndef FPC}
 function ToClientDataSet(aOwner: TComponent; aStatement: TSQLDBStatement;
   aMaxRowCount: integer): TSynDBDataSet;
 begin
@@ -284,6 +287,7 @@ begin
       FreeAndNil(result);
   end;
 end;
+{$endif FPC}
 
 function ToClientDataSet(aOwner: TComponent; aStatement: ISQLDBRows;
   aMaxRowCount: integer=0): TSynDBDataSet; overload;

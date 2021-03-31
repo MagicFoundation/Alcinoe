@@ -6,7 +6,7 @@ unit SynDBUniDAC;
 {
   This file is part of Synopse framework.
 
-  Synopse framework. Copyright (C) 2020 Arnaud Bouchez
+  Synopse framework. Copyright (C) 2021 Arnaud Bouchez
   Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit SynDBUniDAC;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -63,9 +63,11 @@ uses
   Classes,
   Contnrs,
   SynCommons,
+  SynTable,
   SynLog,
   SynDB,
   SynDBDataset,
+  SynOleDB, // for CoInit/CoUnInit
   Uni,
   UniProvider,
   UniScript;
@@ -173,6 +175,7 @@ type
   ///	implements a statement via a UniDAC connection
   TSQLDBUniDACStatement = class(TSQLDBDatasetStatement)
   protected
+    fBatchExecute: Boolean;
     /// initialize and set fQuery: TUniQuery internal field as expected
     procedure DatasetCreate; override;
     /// set fQueryParams internal field as expected
@@ -211,6 +214,7 @@ begin
       break;
     end;
   inherited Create(provider,aDatabaseName,aUserID,aPassWord);
+  fOnBatchInsert := nil; // MultipleValuesInsert is slower
   fSpecificOptions := TStringList.Create;
   opt := pointer(options);
   while opt<>nil do begin
@@ -220,37 +224,66 @@ begin
   end;
   case fDBMS of
   dSQLite: begin // UniDAC support of SQLite3 is just buggy
+    {$ifndef FPC}
+    {$ifndef UNICODE}
+    fForceUseWideString := true; // for non-unicode Delphi
+    {$endif}
+    fSpecificOptions.Values['UseUnicode'] := 'true'; // FPC strings have UTF8 encoding alays
+    {$endif}
     fSpecificOptions.Values['ForceCreateDatabase'] := 'true';
     fSQLCreateField[ftInt64] := ' BIGINT'; // SQLite3 INTEGER = 32bit for UniDAC
   end;
   dFirebird: begin
+    {$ifndef FPC}
     {$ifndef UNICODE}
-    fForceUseWideString := true;
+    fForceUseWideString := true; // for non-unicode Delphi
+    {$endif}
+    fSpecificOptions.Values['UseUnicode'] := 'true'; // FPC strings have UTF8 encoding alays
     {$endif}
     fSpecificOptions.Values['CharSet'] := 'UTF8';
-    fSpecificOptions.Values['UseUnicode'] := 'true';
     fSpecificOptions.Values['CharLength'] := '2';
     fSpecificOptions.Values['DescribeParams'] := 'true';
   end; // http://www.devart.com/unidac/docs/index.html?ibprov_article.htm
-    dOracle: begin
-      fSpecificOptions.Values['UseUnicode'] := 'true';
-      fSpecificOptions.Values['Direct'] := 'true';
-      fSpecificOptions.Values['HOMENAME'] := '';
-    end;
-    dMySQL: begin
-      // s.d. 30.11.19 Damit der Connect schneller geht ! CRVioTCP.pas WaitForConnect
-      fSpecificOptions.Values['MySQL.ConnectionTimeout'] := '0';
-    end;
+  dOracle: begin
+    {$ifndef FPC}
+    {$ifndef UNICODE}
+    fForceUseWideString := true; // for non-unicode Delphi
+    {$endif}
+    fSpecificOptions.Values['UseUnicode'] := 'true'; // FPC strings have UTF8 encoding alays
+    {$endif}
+    fSpecificOptions.Values['Direct'] := 'true';
+    fSpecificOptions.Values['HOMENAME'] := '';
+  end;
+  dMySQL: begin
+    {$ifndef FPC}
+    {$ifndef UNICODE}
+    fForceUseWideString := true; // for non-unicode Delphi
+    {$endif}
+    fSpecificOptions.Values['UseUnicode'] := 'true'; // FPC strings have UTF8 encoding alays
+    {$endif}
+    // s.d. 30.11.19 Damit der Connect schneller geht ! CRVioTCP.pas WaitForConnect
+    fSpecificOptions.Values['MySQL.ConnectionTimeout'] := '0';
+  end;
   dMSSQL: begin
+    {$ifndef UNICODE}
+    {$ifndef FPC}
+    fForceUseWideString := true; // for non-unicode Delphi
+    {$endif}
+    {$endif}
     if aUserID='' then
       fSpecificOptions.Values['Authentication'] := 'auWindows';
-      fSpecificOptions.Values['SQL Server.Provider'] := cMSSQLProvider;
-      // s.d. 30.11.19 Damit der Connect im Direct Mode so Schnell ist wie mit prAuto/OleDB
-      fSpecificOptions.Values['SQL Server.ConnectionTimeout'] := '0';
+    fSpecificOptions.Values['SQL Server.Provider'] := cMSSQLProvider;
+    // s.d. 30.11.19 Damit der Connect im Direct Mode so Schnell ist wie mit prAuto/OleDB
+    fSpecificOptions.Values['SQL Server.ConnectionTimeout'] := '0';
   end; // http://www.devart.com/unidac/docs/index.html?sqlprov_article.htm
   dPostgreSQL: begin  // thanks delphinium for the trick!
+    {$ifndef FPC}
+    {$ifndef UNICODE}
+    fForceUseWideString := true; // for non-unicode Delphi
+    {$endif}
+    fSpecificOptions.Values['UseUnicode'] := 'true'; // FPC strings have UTF8 encoding alays
+    {$endif}
     fSpecificOptions.Values['CharSet'] := 'UTF8';
-    fSpecificOptions.Values['UseUnicode'] := 'true';
   end;
   end;
 end;
@@ -281,10 +314,10 @@ begin
       Table := Owner;
       Owner := '';
     end;
-    if Owner = '' then
+    if (Owner='') and (fDBMS<>dOracle) then
       Owner := MainConnection.Properties.DatabaseName; // itSDS
     if Owner<>'' then
-      meta.Restrictions.Values['TABLE_SCHEMA'] := UTF8ToString(UpperCase(Owner))
+      meta.Restrictions.Values['TABLE_SCHEMA'] := UTF8ToString(UpperCase(Owner)) else
       meta.Restrictions.Values['SCOPE'] := 'LOCAL';
     meta.Restrictions.Values['TABLE_NAME'] := UTF8ToString(UpperCase(Table));
     meta.Open;
@@ -300,6 +333,7 @@ begin
       F.ColumnPrecision := meta.FieldByName('DATA_PRECISION').AsInteger;
       F.ColumnType := ColumnTypeNativeToDB(F.ColumnTypeNative,F.ColumnScale);
       if F.ColumnType=ftUnknown then begin // UniDAC metadata failed -> use SQL
+        Fields := nil;
         inherited GetFields(aTableName,Fields);
         exit;
       end;
@@ -321,6 +355,7 @@ var meta, indexs: TDAMetaData;
     n: integer;
     ColName: RawUTF8;
     ndxName: string;
+    Owner,Table: RawUTF8;
 begin
   SetLength(Indexes,0);
   FA.Init(TypeInfo(TSQLDBIndexDefineDynArray),Indexes,@n);
@@ -329,14 +364,27 @@ begin
   indexs := (MainConnection as TSQLDBUniDACConnection).fDatabase.CreateMetaData;
   try
     meta.MetaDataKind := 'Indexes';
-    meta.Restrictions.Values['TABLE_NAME'] := UTF8ToString(UpperCase(aTableName));
+    Split(aTableName,'.',Owner,Table);
+    if Table='' then begin
+      Table := Owner;
+      Owner := '';
+    end;
+    if (Owner='') and (fDBMS<>dOracle) then
+      Owner := MainConnection.Properties.DatabaseName; // itSDS
+    if Owner<>'' then
+      meta.Restrictions.Values['TABLE_SCHEMA'] := UTF8ToString(UpperCase(Owner)) else
+      meta.Restrictions.Values['SCOPE'] := 'LOCAL';
+    meta.Restrictions.Values['TABLE_NAME'] := UTF8ToString(UpperCase(Table));
     meta.Open;
     while not meta.Eof do begin
       ndxName := meta.FieldByName('INDEX_NAME').AsString;
       F.IndexName := StringToUTF8(ndxName);
       F.KeyColumns := '';
       indexs.MetaDataKind := 'indexcolumns';
-      indexs.Restrictions.Values['TABLE_NAME'] := UTF8ToString(UpperCase(aTableName));
+      if Owner<>'' then
+        indexs.Restrictions.Values['TABLE_SCHEMA'] := UTF8ToString(UpperCase(Owner)) else
+        indexs.Restrictions.Values['SCOPE'] := 'LOCAL';
+      indexs.Restrictions.Values['TABLE_NAME'] := UTF8ToString(UpperCase(Table));
       indexs.Restrictions.Values['INDEX_NAME'] := ndxName;
       indexs.Open;
       while not indexs.Eof do begin
@@ -398,7 +446,7 @@ begin
   if aLibraryLocation<>'' then begin
     result := result+'?ClientLibrary=';
     if aLibraryLocationAppendExePath then
-      result := result+StringToUTF8(ExtractFilePath(ParamStr(0)));
+      result := result+StringToUTF8(ExeVersion.ProgramFilePath);
     result := result+StringToUTF8(aLibraryLocation);
   end;
   if aServerName<>'' then begin
@@ -552,39 +600,170 @@ end;
 procedure TSQLDBUniDACStatement.DataSetBindSQLParam(const aArrayIndex,
   aParamIndex: integer; const aParam: TSQLDBParam);
 var P: TDAParam;
+    i: Integer;
+    tmp: RawUTF8;
+    StoreVoidStringAsNull: boolean;
 begin
   P := TDAParam(fQueryParams[aParamIndex]);
-  if P.InheritsFrom(TDAParam) then
-    with aParam do
-      if (VinOut<>paramInOut) and (VType=SynTable.ftBlob) then begin
-        P.ParamType := SQLParamTypeToDBParamType(VInOut);
-        if aArrayIndex>=0 then
-{$ifdef UNICODE}
-          P.SetBlobData(Pointer(VArray[aArrayIndex]),Length(VArray[aArrayIndex])) else
-          P.SetBlobData(Pointer(VData),Length(VData));
-{$else}   P.AsString := VArray[aArrayIndex] else
-          P.AsString := VData;
-{$endif}exit;
+  if not P.InheritsFrom(TDAParam) then begin
+    inherited DataSetBindSQLParam(aArrayIndex, aParamIndex, aParam);
+    Exit;
+  end;
+  if fDatasetSupportBatchBinding then
+    fBatchExecute := (aArrayIndex<0) and (fParamsArrayCount>0) else
+    fBatchExecute := false;
+  if fBatchExecute then
+    P.ValueCount := fParamsArrayCount else
+    P.ValueCount := 1;
+  with aParam do begin
+    P.ParamType := SQLParamTypeToDBParamType(VInOut);
+    if VinOut <> paramInOut then
+      case VType of
+        SynTable.ftNull:
+          if fBatchExecute then
+            for i := 0 to fParamsArrayCount-1 do
+              P.Values[i].Clear else
+            P.Clear;
+        SynTable.ftInt64: begin
+          if fBatchExecute then
+            for i := 0 to fParamsArrayCount-1 do
+              if VArray[i]='null' then
+                P.Values[i].Clear else
+                P.Values[i].AsLargeInt := GetInt64(pointer(VArray[i])) else
+          if aArrayIndex>=0 then
+            if VArray[aArrayIndex]='null' then
+              P.Clear else
+              P.AsLargeInt := GetInt64(pointer(VArray[aArrayIndex])) else
+            P.AsLargeInt := VInt64;
+        end;
+        SynTable.ftDouble:
+          if fBatchExecute then
+            for i := 0 to fParamsArrayCount-1 do
+              if VArray[i]='null' then
+                P.Values[i].Clear else
+                P.Values[i].AsFloat := GetExtended(pointer(VArray[i])) else
+          if aArrayIndex>=0 then
+            if VArray[aArrayIndex]='null' then
+              P.Clear else
+              P.AsFloat := GetExtended(pointer(VArray[aArrayIndex])) else
+            P.AsFloat := PDouble(@VInt64)^;
+        SynTable.ftCurrency:
+          if fBatchExecute then
+            for i := 0 to fParamsArrayCount-1 do
+              if VArray[i]='null' then
+                P.Values[i].Clear else
+                P.Values[i].AsCurrency := StrToCurrency(pointer(VArray[i])) else
+          if aArrayIndex>=0 then
+            if VArray[aArrayIndex]='null' then
+              P.Clear else
+              P.AsCurrency := StrToCurrency(pointer(VArray[aArrayIndex])) else
+            P.AsCurrency := PCurrency(@VInt64)^;
+        SynTable.ftDate:
+          if fBatchExecute then
+            for i := 0 to fParamsArrayCount-1 do
+            if VArray[i]='null' then
+              P.Values[i].Clear else begin
+              UnQuoteSQLStringVar(pointer(VArray[i]),tmp);
+              P.Values[i].AsDateTime := Iso8601ToDateTime(tmp);
+            end else
+          if aArrayIndex>=0 then
+            if VArray[aArrayIndex]='null' then
+              P.Clear else begin
+              UnQuoteSQLStringVar(pointer(VArray[aArrayIndex]),tmp);
+              P.AsDateTime := Iso8601ToDateTime(tmp);
+            end else
+              P.AsDateTime := PDateTime(@VInt64)^;
+        SynTable.ftUTF8:
+          if fBatchExecute then begin
+            StoreVoidStringAsNull := fConnection.Properties.StoreVoidStringAsNull;
+            for i := 0 to fParamsArrayCount-1 do
+              if (VArray[i]='null') or
+                 (StoreVoidStringAsNull and (VArray[i]=#39#39)) then
+                P.Values[i].Clear else begin
+              UnQuoteSQLStringVar(pointer(VArray[i]),tmp);
+              {$ifdef UNICODE}
+              P.Values[i].AsWideString := UTF8ToString(tmp);
+              {$else}
+              if fForceUseWideString then
+                P.Values[i].AsWideString := UTF8ToWideString(tmp) else
+                P.Values[i].AsString := UTF8ToString(tmp);
+              {$endif}
+            end
+          end else
+          if aArrayIndex>=0 then
+            if (VArray[aArrayIndex]='null') or
+               (fConnection.Properties.StoreVoidStringAsNull and
+                (VArray[aArrayIndex]=#39#39)) then
+              P.Clear else begin
+              UnQuoteSQLStringVar(pointer(VArray[aArrayIndex]),tmp);
+              {$ifdef UNICODE}
+              P.AsWideString := UTF8ToString(tmp);
+              {$else}
+              if fForceUseWideString then
+                P.AsWideString := UTF8ToWideString(tmp) else
+                P.AsString := UTF8ToString(tmp);
+              {$endif}
+          end else
+            if (VData='') and fConnection.Properties.StoreVoidStringAsNull then
+              P.Clear else
+              {$ifdef UNICODE}
+              P.AsWideString := UTF8ToString(VData);
+              {$else}
+              if not fForceUseWideString then
+                P.AsString := UTF8ToString(VData) else
+                P.AsWideString := UTF8ToWideString(VData);
+              {$endif}
+        SynTable.ftBlob:
+          if fBatchExecute then
+            for i := 0 to fParamsArrayCount-1 do
+              if VArray[i]='null' then
+                P.Values[i].Clear else begin
+                {$ifdef UNICODE}
+                P.Values[i].AsBlobRef.Clear;
+                P.Values[i].AsBlobRef.Write(0, Length(VArray[aArrayIndex]), Pointer(VArray[aArrayIndex])); end else
+                {$else}
+                P.Values[i].AsString := VArray[aArrayIndex]; end else
+                {$endif}
+          if aArrayIndex>=0 then
+            if VArray[aArrayIndex]='null' then
+              P.Clear else begin
+              {$ifdef UNICODE}
+              P.AsBlobRef.Clear;
+              P.AsBlobRef.Write(0, Length(VArray[aArrayIndex]), Pointer(VArray[aArrayIndex])); end else begin
+              P.AsBlobRef.Clear;
+              P.AsBlobRef.Write(0, Length(VData), Pointer(VData)); end;
+              {$else}
+              P.AsString := VArray[aArrayIndex] end else
+              P.AsString := VData;
+              {$endif}
+        else
+          raise ESQLDBUniDAC.CreateUTF8(
+            '%.DataSetBindSQLParam: invalid type % on bound parameter #%',
+            [Self,ord(VType),aParamIndex+1]);
       end;
-  inherited DataSetBindSQLParam(aArrayIndex, aParamIndex, aParam);
+  end;
 end;
 
 procedure TSQLDBUniDACStatement.DatasetCreate;
 begin
   fQuery := TUniQuery.Create(nil);
   TUniQuery(fQuery).Connection := (fConnection as TSQLDBUniDACConnection).Database;
+  fDatasetSupportBatchBinding := true;
 end;
 
 function TSQLDBUniDACStatement.DatasetPrepare(const aSQL: string): boolean;
 begin
   (fQuery as TUniQuery).SQL.Text := aSQL;
+  TUniQuery(fQuery).Prepare;
   fQueryParams := TUniQuery(fQuery).Params;
   result := fQueryParams<>nil;
 end;
 
 procedure TSQLDBUniDACStatement.DatasetExecSQL;
 begin
-  (fQuery as TUniQuery).Execute;
+  if fBatchExecute then
+    (fQuery as TUniQuery).Execute(fParamsArrayCount) else
+    (fQuery as TUniQuery).Execute;
 end;
 
 

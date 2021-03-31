@@ -6,7 +6,7 @@ unit SynZip;
 {
     This file is part of Synopse framework.
 
-    Synopse framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,11 +25,12 @@ unit SynZip;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
    - Alf
+   - Andre Heider (dhewg)
    - ehansen
    - jpdk
    - Gigo
@@ -692,6 +693,8 @@ type
   end;
 
   /// abstract write-only access for creating a .zip archive
+  // - update can be done manualy by using a TZipRead instance and the
+  // AddFromZip() method
   TZipWriteAbstract = class
   protected
     fAppendOffset: cardinal;
@@ -723,6 +726,8 @@ type
     // - by default, the 1st of January, 2010 is used if not date is supplied
     procedure AddStored(const aZipName: TFileName; Buf: pointer; Size: integer;
       FileAge: integer=1+1 shl 5+30 shl 9);
+    /// add a file from an already compressed zip entry
+    procedure AddFromZip(const ZipEntry: TZipEntry);
     /// append a file content into the destination file
     // - useful to add the initial Setup.exe file, e.g.
     procedure Append(const Content: ZipString);
@@ -732,8 +737,6 @@ type
 
   /// write-only access for creating a .zip archive file
   // - not to be used to update a .zip file, but to create a new one
-  // - update can be done manualy by using a TZipRead instance and the
-  // AddFromZip() method
   TZipWrite = class(TZipWriteAbstract)
   protected
     fFileName: TFileName;
@@ -759,8 +762,6 @@ type
     // - if Recursive is TRUE, would include files from nested sub-folders
     procedure AddFolder(const FolderName: TFileName; const Mask: TFileName=ZIP_FILES_ALL;
       Recursive: boolean=true; CompressLevel: integer=6);
-    /// add a file from an already compressed zip entry
-    procedure AddFromZip(const ZipEntry: TZipEntry);
     /// release associated memory, and close destination file
     destructor Destroy; override;
   end;
@@ -913,7 +914,7 @@ begin
       tmpsize := (Int64(Size)*11) div 10+12;
       Getmem(tmp,tmpSize);
       zzipSize := CompressMem(Buf,tmp,Size,tmpSize,CompressLevel);
-      InternalAdd(aZipName,tmp,zzipSize); // write stored data
+      InternalAdd(aZipName,tmp,zzipSize); // write deflated data and inc(Count)
       Freemem(tmp);
     end;
   end;
@@ -931,7 +932,19 @@ begin
     zfullSize := Size;
     zzipSize := Size;
     zlastMod := FileAge;
-    InternalAdd(aZipName,Buf,Size);
+    InternalAdd(aZipName,Buf,Size); // write stored data and inc(Count)
+  end;
+end;
+
+procedure TZipWriteAbstract.AddFromZip(const ZipEntry: TZipEntry);
+begin
+  if self=nil then
+    exit;
+  if Count>=length(Entry) then
+    SetLength(Entry,length(Entry)+20);
+  with Entry[Count] do begin
+    fhr.fileInfo := ZipEntry.infoLocal^;
+    InternalAdd(ZipEntry.zipName,ZipEntry.data,fhr.fileInfo.zzipSize);
   end;
 end;
 
@@ -1040,7 +1053,7 @@ begin
       raise ESynZipException.CreateFmt('%s file too big for .zip',[aFileName]);
     if Count>=length(Entry) then
       SetLength(Entry,length(Entry)+20);
-    OffsHead := InternalAdd(ZipName,nil,0);
+    OffsHead := InternalAdd(ZipName,nil,0); // write data and inc(Count)
     D := THandleStream.Create(Handle);
     Z := TSynZipCompressor.Create(D,CompressLevel);
     try
@@ -1071,18 +1084,6 @@ begin
     end;
   finally
     S.Free;
-  end;
-end;
-
-procedure TZipWrite.AddFromZip(const ZipEntry: TZipEntry);
-begin
-  if (self=nil) or (Handle<=0) then
-    exit;
-  if Count>=length(Entry) then
-    SetLength(Entry,length(Entry)+20);
-  with Entry[Count] do begin
-    fhr.fileInfo := ZipEntry.infoLocal^;
-    InternalAdd(ZipEntry.zipName,ZipEntry.data,fhr.fileInfo.zzipSize);
   end;
 end;
 

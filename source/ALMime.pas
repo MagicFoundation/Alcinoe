@@ -2,24 +2,23 @@ unit ALMime;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
-uses System.Types,
-     ALStringList;
+uses
+  System.Types,
+  ALStringList;
 
 //From indy
 Function  ALGetDefaultFileExtFromMimeContentType(aContentType: AnsiString): AnsiString;
 Function  ALGetDefaultMIMEContentTypeFromExt(const aExt: AnsiString): AnsiString;
 
-Var AlMimeContentTypeByExtList: TALStrings; {.htm=text/html}
-    AlExtbyMimeContentTypeList: TALStrings; {text/html=.htm}
+Var
+  AlMimeContentTypeByExtList: TALStrings; {.htm=text/html}
+  AlExtbyMimeContentTypeList: TALStrings; {text/html=.htm}
 
 implementation
 
-uses ALString,
-     AlCommon;
+uses
+  ALString,
+  AlCommon;
 
 {************************************************************************************}
 Function ALGetDefaultFileExtFromMimeContentType(aContentType: AnsiString): AnsiString;
@@ -51,7 +50,7 @@ end;
 
 {************************}
 procedure ALFillMimeTable;
-var i: integer;
+var I: integer;
 begin
   {NOTE:  All of these strings should never be translated
   because they are protocol specific and are important for some
@@ -480,7 +479,7 @@ begin
 
 
   for I := 0 to AlMimeContentTypeByExtList.Count - 1 do
-    AlExtbyMimeContentTypeList.Add(AlMimeContentTypeByExtList.ValueFromIndex[i] + '=' + AlMimeContentTypeByExtList.Names[i]);
+    AlExtbyMimeContentTypeList.Add(AlMimeContentTypeByExtList.ValueFromIndex[I] + '=' + AlMimeContentTypeByExtList.Names[I]);
 
 end;
 

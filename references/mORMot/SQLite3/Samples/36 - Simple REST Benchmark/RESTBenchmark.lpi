@@ -39,9 +39,19 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="../..;../../..;$(ProjOutDir;$(ProjOutDir)"/>
+      <Libraries Value="../../../static/$(TargetCPU)-$(TargetOS)"/>
       <OtherUnitFiles Value="../..;../../.."/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
+    <CodeGeneration>
+      <SmartLinkUnit Value="True"/>
+    </CodeGeneration>
+    <Linking>
+      <Debugging>
+        <UseExternalDbgSyms Value="True"/>
+      </Debugging>
+      <LinkSmart Value="True"/>
+    </Linking>
   </CompilerOptions>
   <Debugging>
     <Exceptions Count="1">

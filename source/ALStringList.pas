@@ -1,52 +1,61 @@
 {*************************************************************
-Description:  TALStringList
-              TALStringList Work the same as Delphi TstringList except that it's
-              allow to search a name=value using a quicksort algorithm when the
-              list is sorted. Also TALStringList use a locale independant
-              algorithme (based on the 8-bit ordinal value of each character)
-              instead of the AnsiCompareText and AnsiCompareStr used by the
-              Delphi TstringList. at the end the sort in TALStringList is up to
-              10x more faster than in Delphi TstringList. Also TALStringList is
-              not an unicode TstringList but an 100% Ansi StringList
+TALStringList
+TALStringList Work the same as Delphi TstringList except that it's
+allow to search a name=value using a quicksort algorithm when the
+list is sorted. Also TALStringList use a locale independant
+algorithme (based on the 8-bit ordinal value of each character)
+instead of the AnsiCompareText and AnsiCompareStr used by the
+Delphi TstringList. at the end the sort in TALStringList is up to
+10x more faster than in Delphi TstringList. Also TALStringList is
+not an unicode TstringList but an 100% Ansi StringList
 
-              TALNVStringList
-              TALNVStringList (NV for NameValue) is same as TALStringList (use
-              also a quicksort algorithme) except that here optimisation is
-              oriented for name/value list instead of string list.
+TALStringListU
+TALStringListU is the same as TALStringList but with unicode
+String
 
-              TALAVLStringList
-              TALAVLStringList is same as TALStringList except that it's use
-              internally a self-balancing binary Tree instead of a quicksort
-              algorithm
+TALNVStringList
+TALNVStringList (NV for NameValue) is same as TALStringList (use
+also a quicksort algorithme) except that here optimisation is
+oriented for name/value list instead of string list.
 
-              TALHashedStringList
-              TALHashedStringList is same as TALStringList except that it's use
-              an internal hash table instead of a quicksort algorithm. By using
-              TALHashedStringList instead of TALStringList, you can improve
-              performance when the list contains a large number of strings
-              (else if you list don't contain a lot of strings the performance
-              is lower than TALStringList because of the cost to calculate the
-              hash)
+TALNVStringListU
+TALNVStringList is the same as TALNVStringListU but with unicode
+String
+
+TALAVLStringList
+TALAVLStringList is same as TALStringList except that it's use
+internally a self-balancing binary Tree instead of a quicksort
+algorithm
+
+TALHashedStringList
+TALHashedStringList is same as TALStringList except that it's use
+an internal hash table instead of a quicksort algorithm. By using
+TALHashedStringList instead of TALStringList, you can improve
+performance when the list contains a large number of strings
+(else if your list don't contain a lot of strings the performance
+is lower than TALStringList because of the cost to calculate the
+hash)
 **************************************************************}
 
 unit ALStringList;
 
 interface
 
-Uses System.Classes,
-     System.Sysutils,
-     {$IFNDEF NEXTGEN}
-     System.Contnrs,
-     {$ENDIF}
-     System.Generics.Defaults,
-     System.Generics.Collections,
-     System.Math,
-     {$IFNDEF NEXTGEN}
-     AlAvlBinaryTRee,
-     {$ENDIF}
-     ALQuickSortList;
+{$I Alcinoe.inc}
 
-{$IFNDEF NEXTGEN}
+Uses
+  System.Classes,
+  System.Sysutils,
+  System.Generics.Defaults,
+  System.Generics.Collections,
+  System.Math,
+  {$IFNDEF ALHideAnsiString}
+  System.Contnrs,
+  AlAvlBinaryTRee,
+  {$ENDIF}
+  ALQuickSortList;
+
+{$IFNDEF ALHideAnsiString}
 
 Type
 
@@ -207,7 +216,7 @@ Type
     FNameValueOptimization: Boolean;
     procedure ExchangeItems(Index1, Index2: Integer);
     procedure Grow;
-    procedure QuickSort(L, R: Integer; SCompare: TALStringListSortCompare);
+    procedure QuickSort(L, R: Integer; ACompare: TALStringListSortCompare);
     procedure SetSorted(Value: Boolean);
     procedure SetCaseSensitive(const Value: Boolean);
   protected
@@ -284,7 +293,7 @@ Type
     FOwnsObject: Boolean;
     procedure ExchangeItems(Index1, Index2: Integer);
     procedure Grow;
-    procedure QuickSort(L, R: Integer; SCompare: TALNVStringListSortCompare);
+    procedure QuickSort(L, R: Integer; ACompare: TALNVStringListSortCompare);
     procedure SetSorted(Value: Boolean);
     procedure SetCaseSensitive(const Value: Boolean);
     Function ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean; //[added from TStringList]
@@ -380,7 +389,7 @@ Type
     FOnChanging: TNotifyEvent;
     FOwnsObject: Boolean;
     procedure ExchangeItems(Index1, Index2: Integer);
-    procedure QuickSort(L, R: Integer; SCompare: TALAVLStringListSortCompare);
+    procedure QuickSort(L, R: Integer; ACompare: TALAVLStringListSortCompare);
     procedure SetCaseSensitive(const Value: Boolean);
     function GetCaseSensitive: Boolean;
     Function ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean;
@@ -469,7 +478,7 @@ Type
     FOwnsObject: Boolean;
     FCaseSensitive: boolean;
     procedure ExchangeItems(Index1, Index2: Integer);
-    procedure QuickSort(L, R: Integer; SCompare: TALHashedStringListSortCompare);
+    procedure QuickSort(L, R: Integer; ACompare: TALHashedStringListSortCompare);
     procedure SetCaseSensitive(const Value: Boolean);
     function GetCaseSensitive: Boolean;
     Function ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean;
@@ -528,7 +537,7 @@ Type
     property OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
   end;
 
-{$ENDIF}
+{$ENDIF !ALHideAnsiString}
 
 type
 
@@ -548,7 +557,7 @@ type
   end;
 
   {------------------------}
-  {$IF CompilerVersion > 33} // rio
+  {$IF CompilerVersion > 34} // sydney
     {$MESSAGE WARN 'Check if System.classes.TStrings didn''t change and adjust the IFDEF'}
   {$IFEND}
   TALStringsU = class(TPersistent)
@@ -678,7 +687,7 @@ type
   TALStringListSortCompareU = reference to function(List: TALStringListU; Index1, Index2: Integer): Integer;
 
   {------------------------}
-  {$IF CompilerVersion > 33} // rio
+  {$IF CompilerVersion > 34} // sydney
     {$MESSAGE WARN 'Check if System.classes.TStringList didn''t change and adjust the IFDEF'}
   {$IFEND}
   TALStringListU = class(TALStringsU)
@@ -695,7 +704,7 @@ type
     FNameValueOptimization: Boolean;
     procedure ExchangeItems(Index1, Index2: Integer);
     procedure Grow;
-    procedure QuickSort(L, R: Integer; SCompare: TALStringListSortCompareU);
+    procedure QuickSort(L, R: Integer; ACompare: TALStringListSortCompareU);
     procedure SetSorted(Value: Boolean);
     procedure SetCaseSensitive(const Value: Boolean);
   protected
@@ -772,7 +781,7 @@ type
     FOwnsObject: Boolean;
     procedure ExchangeItems(Index1, Index2: Integer);
     procedure Grow;
-    procedure QuickSort(L, R: Integer; SCompare: TALNVStringListSortCompareU);
+    procedure QuickSort(L, R: Integer; ACompare: TALNVStringListSortCompareU);
     procedure SetSorted(Value: Boolean);
     procedure SetCaseSensitive(const Value: Boolean);
     Function ExtractNameValue(const S: String; var Name, Value: String): Boolean; //[added from TStringList]
@@ -838,16 +847,17 @@ type
 
 implementation
 
-Uses System.RTLConsts,
-     system.IOUtils,
-     {$IFNDEF NEXTGEN}
-     System.Ansistrings,
-     System.Hash,
-     {$ENDIF}
-     ALString,
-     ALCommon;
+Uses
+  System.RTLConsts,
+  system.IOUtils,
+  {$IFNDEF ALHideAnsiString}
+  System.Ansistrings,
+  System.Hash,
+  {$ENDIF}
+  ALString,
+  ALCommon;
 
-{$IFNDEF NEXTGEN}
+{$IFNDEF ALHideAnsiString}
 
 {************************************************************}
 constructor TALStringsEnumerator.Create(AStrings: TALStrings);
@@ -961,7 +971,7 @@ end;
 
 {***********************************************}
 procedure TALStrings.Assign(Source: TPersistent);
-var i: integer;
+var I: integer;
 begin
   if Source is TALStrings then
   begin
@@ -1001,7 +1011,7 @@ end;
 
 {***********************************************}
 procedure TALStrings.AssignTo(Dest: TPersistent);
-var i: integer;
+var I: integer;
 begin
   if Dest is TStrings then
   begin
@@ -1436,28 +1446,28 @@ end;
 
 {**********************************************************}
 procedure TALStrings.SaveToFile(const FileName: AnsiString);
-Var afileStream: TfileStream;
-    aTmpFilename: AnsiString;
+Var LFileStream: TfileStream;
+    LTmpFilename: AnsiString;
 begin
-  if ProtectedSave then aTmpFilename := FileName + '.~tmp'
-  else aTmpFilename := FileName;
+  if ProtectedSave then LTmpFilename := FileName + '.~tmp'
+  else LTmpFilename := FileName;
   try
 
-    aFileStream := TfileStream.Create(String(aTmpFilename),fmCreate);
+    LFileStream := TfileStream.Create(String(LTmpFilename),fmCreate);
     Try
-      SaveToStream(aFileStream);
+      SaveToStream(LFileStream);
     finally
-      ALFreeAndNil(aFileStream);
+      ALFreeAndNil(LFileStream);
     end;
 
-    if aTmpFilename <> FileName then begin
+    if LTmpFilename <> FileName then begin
       if TFile.Exists(String(FileName)) then TFile.Delete(String(FileName));
-      TFile.Move(String(aTmpFilename), String(FileName));
+      TFile.Move(String(LTmpFilename), String(FileName));
     end;
 
   except
-    if (aTmpFilename <> FileName) and
-       (TFile.Exists(String(aTmpFilename))) then TFile.Delete(String(aTmpFilename));
+    if (LTmpFilename <> FileName) and
+       (TFile.Exists(String(LTmpFilename))) then TFile.Delete(String(LTmpFilename));
     raise;
   end;
 end;
@@ -1504,7 +1514,7 @@ end;
 {*******************************************************}
 procedure TALStrings.SetTextStr(const Value: AnsiString);
 var
-  P, Start, LB: PAnsiChar;
+  P, PCurVal, PCurLB, PStartVal, PEndVal, PStartLB, PEndLB: PAnsiChar;
   S: AnsiString;
   LineBreakLen: Integer;
 begin
@@ -1512,35 +1522,74 @@ begin
   try
     Clear;
     P := Pointer(Value);
-    if P <> nil then
-      if ALCompareStr(LineBreak, sLineBreak) = 0 then
+    if P = nil then
+      Exit;
+
+    LineBreakLen := Length(LineBreak);
+    if LineBreakLen = 0 then
+    begin
+      Add(Value);
+      Exit;
+    end;
+
+    PEndVal := P + Length(Value);
+
+    // When LineBreak is:
+    // * sLineBreak - for compatibility with Windows, Posix and old macOS platforms,
+    //   we handle #13#10, #10 and #13 as it would be #13#10.
+    // * NOT sLineBreak - we use strict checking for LineBreak.
+    if ALCompareStr(LineBreak, sLineBreak) = 0 then
+    begin
+      while P < PEndVal do
       begin
-        // This is a lot faster than using StrPos/AnsiStrPos when
-        // LineBreak is the default (#13#10)
-        while P^ <> #0 do
-        begin
-          Start := P;
-          while not (P^ in [#0, #10, #13]) do Inc(P);
-          SetString(S, Start, P - Start);
-          Add(S);
-          if P^ = #13 then Inc(P);
-          if P^ = #10 then Inc(P);
-        end;
-      end
-      else
-      begin
-        LineBreakLen := Length(LineBreak);
-        while P^ <> #0 do
-        begin
-          Start := P;
-          LB := System.Ansistrings.StrPos(P, PAnsiChar(LineBreak));
-          while (P^ <> #0) and (P <> LB) do Inc(P);
-          SetString(S, Start, P - Start);
-          Add(S);
-          if P = LB then
-            Inc(P, LineBreakLen);
-        end;
+        PStartVal := P;
+        while (P < PEndVal) and not (P^ in [#10, #13]) do Inc(P);
+        SetString(S, PStartVal, P - PStartVal);
+        Add(S);
+        if P^ = #13 then Inc(P);
+        if P^ = #10 then Inc(P);
       end;
+      Exit;
+    end;
+
+    PStartLB := Pointer(LineBreak);
+    PEndLB := PStartLB + LineBreakLen;
+    PCurLB := PStartLB;
+    PStartVal := P;
+
+    while P < PEndVal do
+    begin
+      while (P < PEndVal) and (P^ <> PStartLB^) do
+        Inc(P);
+      if P < PEndVal then
+      begin
+        PCurVal := P + 1;
+        Inc(PCurLB);
+        while PCurLB < PEndLB do
+        begin
+          if PCurVal^ <> PCurLB^ then
+            Break;
+          Inc(PCurVal);
+          Inc(PCurLB)
+        end;
+        if PCurLB = PEndLB then
+        begin
+          SetString(S, PStartVal, P - PStartVal);
+          Add(S);
+          P := PCurVal;
+          PStartVal := P;
+        end
+        else
+          Inc(P);
+        PCurLB := PStartLB;
+      end;
+    end;
+
+    if P > PStartVal then
+    begin
+      SetString(S, PStartVal, P - PStartVal);
+      Add(S);
+    end;
   finally
     EndUpdate;
   end;
@@ -2120,17 +2169,24 @@ begin
 end;
 
 {***********************************************************************************}
-procedure TALStringList.QuickSort(L, R: Integer; SCompare: TALStringListSortCompare);
+procedure TALStringList.QuickSort(L, R: Integer; ACompare: TALStringListSortCompare);
 var
   I, J, P: Integer;
 begin
-  repeat
+  while L < R do
+  begin
+    if (R - L) = 1 then
+    begin
+      if ACompare(Self, L, R) > 0 then
+        ExchangeItems(L, R);
+      break;
+    end;
     I := L;
     J := R;
     P := (L + R) shr 1;
     repeat
-      while SCompare(Self, I, P) < 0 do Inc(I);
-      while SCompare(Self, J, P) > 0 do Dec(J);
+      while (I <> P) and (ACompare(Self, I, P) < 0) do Inc(I);
+      while (J <> P) and (ACompare(Self, J, P) > 0) do Dec(J);
       if I <= J then
       begin
         if I <> J then
@@ -2143,9 +2199,19 @@ begin
         Dec(J);
       end;
     until I > J;
-    if L < J then QuickSort(L, J, SCompare);
-    L := I;
-  until I >= R;
+    if (J - L) > (R - I) then
+    begin
+      if I < R then
+        QuickSort(I, R, ACompare);
+      R := J;
+    end
+    else
+    begin
+      if L < J then
+        QuickSort(L, J, ACompare);
+      L := I;
+    end;
+  end;
 end;
 
 {********************************************************}
@@ -2437,20 +2503,20 @@ end;
 
 {*********************************************************************************}
 function TALNVStringList.AddObject(const S: AnsiString; AObject: TObject): Integer;
-Var aName, aValue: AnsiString;
+Var LName, LValue: AnsiString;
 begin
   if not Sorted then begin
     Result := FCount;
     InsertItem(Result, S, AObject);
   end
   else begin
-    if ExtractNameValue(S, aName, aValue) then begin
-      if FindNameValue(aName, aValue, Result) then
+    if ExtractNameValue(S, LName, LValue) then begin
+      if FindNameValue(LName, LValue, Result) then
         case Duplicates of
           dupIgnore: Exit;
           dupError: Error(@SDuplicateString, 0);
         end;
-      InsertItem(Result, aName, aValue, AObject);
+      InsertItem(Result, LName, LValue, AObject);
     end
     else begin
       if FindName(s, false{WithNvS}, Result) then
@@ -2909,18 +2975,18 @@ end;
 
 {*************************************************************}
 function TALNVStringList.IndexOf(const S: AnsiString): Integer;
-Var aName, aValue: AnsiString;
+Var LName, LValue: AnsiString;
 begin
-  if ExtractNameValue(S, aName, aValue) then begin
+  if ExtractNameValue(S, LName, LValue) then begin
     if not Sorted then begin
       for Result := 0 to FCount - 1 do
         if Flist[Result].FNVS and
-           (CompareStrings(Flist[Result].FName, aName) = 0) and
-           (CompareStrings(Flist[Result].FValue, aValue) = 0) then Exit;
+           (CompareStrings(Flist[Result].FName, LName) = 0) and
+           (CompareStrings(Flist[Result].FValue, LValue) = 0) then Exit;
       Result := -1;
     end
     else begin
-      if not FindNameValue(aName, aValue, Result) then Result := -1;
+      if not FindNameValue(LName, LValue, Result) then Result := -1;
     end;
   end
   else begin
@@ -3100,17 +3166,24 @@ begin
 end;
 
 {***************************************************************************************}
-procedure TALNVStringList.QuickSort(L, R: Integer; SCompare: TALNVStringListSortCompare);
+procedure TALNVStringList.QuickSort(L, R: Integer; ACompare: TALNVStringListSortCompare);
 var
   I, J, P: Integer;
 begin
-  repeat
+  while L < R do
+  begin
+    if (R - L) = 1 then
+    begin
+      if ACompare(Self, L, R) > 0 then
+        ExchangeItems(L, R);
+      break;
+    end;
     I := L;
     J := R;
     P := (L + R) shr 1;
     repeat
-      while SCompare(Self, I, P) < 0 do Inc(I);
-      while SCompare(Self, J, P) > 0 do Dec(J);
+      while (I <> P) and (ACompare(Self, I, P) < 0) do Inc(I);
+      while (J <> P) and (ACompare(Self, J, P) > 0) do Dec(J);
       if I <= J then
       begin
         if I <> J then
@@ -3123,9 +3196,19 @@ begin
         Dec(J);
       end;
     until I > J;
-    if L < J then QuickSort(L, J, SCompare);
-    L := I;
-  until I >= R;
+    if (J - L) > (R - I) then
+    begin
+      if I < R then
+        QuickSort(I, R, ACompare);
+      R := J;
+    end
+    else
+    begin
+      if L < J then
+        QuickSort(L, J, ACompare);
+      L := I;
+    end;
+  end;
 end;
 
 {**********************************************************}
@@ -3707,34 +3790,34 @@ end;
 
 {**************************************************************}
 function TALAVLStringList.IndexOf(const S: AnsiString): Integer;
-Var aName, aValue: AnsiString;
-    aNode: TALAVLStringListBinaryTreeNode;
+Var LName, LValue: AnsiString;
+    LNode: TALAVLStringListBinaryTreeNode;
 begin
-  if ExtractNameValue(S, aName, aValue) then begin
-    aNode := TALAVLStringListBinaryTreeNode(FAVLBinTree.FindNode(aName));
-    if (not assigned(aNode))
+  if ExtractNameValue(S, LName, LValue) then begin
+    LNode := TALAVLStringListBinaryTreeNode(FAVLBinTree.FindNode(LName));
+    if (not assigned(LNode))
        or
        ((CaseSensitive) and
-        (aNode.Val <> aValue))
+        (LNode.Val <> LValue))
        or
        ((not CaseSensitive) and
-        (not ALSametext(aNode.Val, aValue)))
+        (not ALSametext(LNode.Val, LValue)))
     then result := -1
-    else result := aNode.idx;
+    else result := LNode.idx;
   end
   else begin
-    aNode := TALAVLStringListBinaryTreeNode(FAVLBinTree.FindNode(S));
-    if (not assigned(aNode)) or (aNode.Nvs) then result := -1
-    else result := aNode.idx;
+    LNode := TALAVLStringListBinaryTreeNode(FAVLBinTree.FindNode(S));
+    if (not assigned(LNode)) or (LNode.Nvs) then result := -1
+    else result := LNode.idx;
   end;
 end;
 
 {*********************************************************************}
 function TALAVLStringList.IndexOfName(const Name: ansistring): Integer;
-Var aNode: TALAVLStringListBinaryTreeNode;
+Var LNode: TALAVLStringListBinaryTreeNode;
 begin
-  aNode := TALAVLStringListBinaryTreeNode(FAVLBinTree.FindNode(Name));
-  if assigned(aNode) then result := aNode.Idx
+  LNode := TALAVLStringListBinaryTreeNode(FAVLBinTree.FindNode(Name));
+  if assigned(LNode) then result := LNode.Idx
   else result := -1;
 end;
 
@@ -3783,25 +3866,25 @@ end;
 
 {********************************************************************************************************}
 procedure TALAVLStringList.InsertItem(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
-Var aNode: TALAVLStringListBinaryTreeNode;
-    i: integer;
+Var LNode: TALAVLStringListBinaryTreeNode;
+    I: integer;
 begin
   Changing;
 
-  aNode := TALAVLStringListBinaryTreeNode.Create;
-  aNode.Idx := Index;
-  aNode.ID := Name;
-  aNode.Val := Value;
-  aNode.Nvs := True;
-  aNode.Obj := AObject;
-  if not FAVLBinTree.AddNode(aNode) then begin
-    ALFreeAndNil(aNode);
+  LNode := TALAVLStringListBinaryTreeNode.Create;
+  LNode.Idx := Index;
+  LNode.ID := Name;
+  LNode.Val := Value;
+  LNode.Nvs := True;
+  LNode.Obj := AObject;
+  if not FAVLBinTree.AddNode(LNode) then begin
+    ALFreeAndNil(LNode);
     case Duplicates of
       dupIgnore: Exit;
       else Error(@SDuplicateString, 0);
     end;
   end;
-  FNodeList.Insert(Index, aNode);
+  FNodeList.Insert(Index, LNode);
   for i := Index + 1 to FNodeList.Count - 1 do
     TALAVLStringListBinaryTreeNode(FNodelist[i]).Idx := i;
 
@@ -3810,28 +3893,28 @@ end;
 
 {*******************************************************************************************}
 procedure TALAVLStringList.InsertItem(Index: Integer; const S: AnsiString; AObject: TObject);
-Var aName, AValue: AnsiString;
-    aNvs: Boolean;
-    aNode: TALAVLStringListBinaryTreeNode;
-    i: integer;
+Var LName, AValue: AnsiString;
+    LNvs: Boolean;
+    LNode: TALAVLStringListBinaryTreeNode;
+    I: integer;
 begin
   Changing;
 
-  aNvs := ExtractNameValue(S, aName, aValue);
-  aNode := TALAVLStringListBinaryTreeNode.Create;
-  aNode.Idx := Index;
-  aNode.ID := aName;
-  aNode.Val := aValue;
-  aNode.Nvs := aNvs;
-  aNode.Obj := AObject;
-  if not FAVLBinTree.AddNode(aNode) then begin
-    ALFreeAndNil(aNode);
+  LNvs := ExtractNameValue(S, LName, aValue);
+  LNode := TALAVLStringListBinaryTreeNode.Create;
+  LNode.Idx := Index;
+  LNode.ID := LName;
+  LNode.Val := aValue;
+  LNode.Nvs := LNvs;
+  LNode.Obj := AObject;
+  if not FAVLBinTree.AddNode(LNode) then begin
+    ALFreeAndNil(LNode);
     case Duplicates of
       dupIgnore: Exit;
       else Error(@SDuplicateString, 0);
     end;
   end;
-  FNodeList.Insert(Index, aNode);
+  FNodeList.Insert(Index, LNode);
   for i := Index + 1 to FNodeList.Count - 1 do
     TALAVLStringListBinaryTreeNode(FNodelist[i]).Idx := i;
 
@@ -3840,37 +3923,37 @@ end;
 
 {******************************************************************}
 procedure TALAVLStringList.Put(Index: Integer; const S: AnsiString);
-Var aNewName, aNewValue: AnsiString;
-    aNewNvs: Boolean;
-    aNewNode, aOldNode: TALAVLStringListBinaryTreeNode;
+Var LNewName, LNewValue: AnsiString;
+    LNewNvs: Boolean;
+    LNewNode, LOldNode: TALAVLStringListBinaryTreeNode;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
     Error(@SListIndexError, Index);
   Changing;
 
-  aNewNvs := ExtractNameValue(S, aNewName, aNewValue);
-  aOldNode := TALAVLStringListBinaryTreeNode(FNodeList[index]);
-  if (CaseSensitive and (aOldNode.ID <> aNewName)) or
-     ((not CaseSensitive) and (not ALSametext(aOldNode.ID, aNewName))) then begin
-    aNewNode := TALAVLStringListBinaryTreeNode.Create;
-    aNewNode.Idx := Index;
-    aNewNode.ID := aNewName;
-    aNewNode.Val := ANewValue;
-    aNewNode.NVS := aNewNvs;
-    aNewNode.Obj := aOldNode.Obj;
-    if not FAVLBinTree.AddNode(aNewNode) then begin
-      ALFreeAndNil(aNewNode);
+  LNewNvs := ExtractNameValue(S, LNewName, LNewValue);
+  LOldNode := TALAVLStringListBinaryTreeNode(FNodeList[index]);
+  if (CaseSensitive and (LOldNode.ID <> LNewName)) or
+     ((not CaseSensitive) and (not ALSametext(LOldNode.ID, LNewName))) then begin
+    LNewNode := TALAVLStringListBinaryTreeNode.Create;
+    LNewNode.Idx := Index;
+    LNewNode.ID := LNewName;
+    LNewNode.Val := LNewValue;
+    LNewNode.NVS := LNewNvs;
+    LNewNode.Obj := LOldNode.Obj;
+    if not FAVLBinTree.AddNode(LNewNode) then begin
+      ALFreeAndNil(LNewNode);
       case Duplicates of
         dupIgnore: Exit;
         else Error(@SDuplicateString, 0);
       end;
     end;
-    FNodeList[Index] := aNewNode;
-    FAVLBinTree.DeleteNode(aOldNode.ID);
+    FNodeList[Index] := LNewNode;
+    FAVLBinTree.DeleteNode(LOldNode.ID);
   end
   else begin
-    aOldNode.Val := aNewValue;
-    aOldNode.NVS := aNewNVS;
+    LOldNode.Val := LNewValue;
+    LOldNode.NVS := LNewNvs;
   end;
 
   Changed;
@@ -3901,17 +3984,24 @@ begin
 end;
 
 {*****************************************************************************************}
-procedure TALAVLStringList.QuickSort(L, R: Integer; SCompare: TALAVLStringListSortCompare);
+procedure TALAVLStringList.QuickSort(L, R: Integer; ACompare: TALAVLStringListSortCompare);
 var
   I, J, P: Integer;
 begin
-  repeat
+  while L < R do
+  begin
+    if (R - L) = 1 then
+    begin
+      if ACompare(Self, L, R) > 0 then
+        ExchangeItems(L, R);
+      break;
+    end;
     I := L;
     J := R;
     P := (L + R) shr 1;
     repeat
-      while SCompare(Self, I, P) < 0 do Inc(I);
-      while SCompare(Self, J, P) > 0 do Dec(J);
+      while (I <> P) and (ACompare(Self, I, P) < 0) do Inc(I);
+      while (J <> P) and (ACompare(Self, J, P) > 0) do Dec(J);
       if I <= J then
       begin
         if I <> J then
@@ -3924,9 +4014,19 @@ begin
         Dec(J);
       end;
     until I > J;
-    if L < J then QuickSort(L, J, SCompare);
-    L := I;
-  until I >= R;
+    if (J - L) > (R - I) then
+    begin
+      if I < R then
+        QuickSort(I, R, ACompare);
+      R := J;
+    end
+    else
+    begin
+      if L < J then
+        QuickSort(L, J, ACompare);
+      L := I;
+    end;
+  end;
 end;
 
 {***********************************************************}
@@ -4400,31 +4500,31 @@ end;
 
 {*****************************************************************}
 function TALHashedStringList.IndexOf(const S: AnsiString): Integer;
-Var aName, aValue: AnsiString;
-    aNode: TALHashedStringListDictionaryNode;
+Var LName, LValue: AnsiString;
+    LNode: TALHashedStringListDictionaryNode;
 begin
-  if ExtractNameValue(S, aName, aValue) then begin
-    if (not fDictionary.TryGetValue(aName,aNode))
+  if ExtractNameValue(S, LName, LValue) then begin
+    if (not fDictionary.TryGetValue(LName,LNode))
        or
        ((CaseSensitive) and
-        (aNode.Val <> aValue))
+        (LNode.Val <> LValue))
        or
        ((not CaseSensitive) and
-        (not ALSametext(aNode.Val, aValue)))
+        (not ALSametext(LNode.Val, LValue)))
     then result := -1
-    else result := aNode.idx;
+    else result := LNode.idx;
   end
   else begin
-    if (not fDictionary.TryGetValue(S,aNode)) or (aNode.Nvs) then result := -1
-    else result := aNode.idx;
+    if (not fDictionary.TryGetValue(S,LNode)) or (LNode.Nvs) then result := -1
+    else result := LNode.idx;
   end;
 end;
 
 {************************************************************************}
 function TALHashedStringList.IndexOfName(const Name: ansistring): Integer;
-Var aNode: TALHashedStringListDictionaryNode;
+Var LNode: TALHashedStringListDictionaryNode;
 begin
-  if fDictionary.TryGetValue(Name,aNode) then result := aNode.Idx
+  if fDictionary.TryGetValue(Name,LNode) then result := LNode.Idx
   else result := -1;
 end;
 
@@ -4456,7 +4556,7 @@ end;
 
 {**************************************************************}
 procedure TALHashedStringList.Move(CurIndex, NewIndex: Integer);
-var i: integer;
+var I: integer;
 begin
   if CurIndex <> NewIndex then
   begin
@@ -4473,30 +4573,30 @@ end;
 
 {********************************************************************************************************}
 procedure TALHashedStringList.InsertItem(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
-Var aNode: TALHashedStringListDictionaryNode;
-    i: integer;
+Var LNode: TALHashedStringListDictionaryNode;
+    I: integer;
 begin
   Changing;
 
-  aNode := TALHashedStringListDictionaryNode.Create;
-  aNode.Idx := Index;
-  aNode.ID := Name;
-  aNode.Val := Value;
-  aNode.Nvs := True;
-  aNode.Obj := AObject;
+  LNode := TALHashedStringListDictionaryNode.Create;
+  LNode.Idx := Index;
+  LNode.ID := Name;
+  LNode.Val := Value;
+  LNode.Nvs := True;
+  LNode.Obj := AObject;
   {$IF CompilerVersion <= 32} // tokyo
   if not Fdictionary.ContainsKey(Name) then Fdictionary.Add(Name,aNode)
   else begin
   {$ELSE}
-  if not Fdictionary.TryAdd(Name,aNode) then begin
+  if not Fdictionary.TryAdd(Name,LNode) then begin
   {$ENDIF}
-    ALFreeAndNil(aNode);
+    ALFreeAndNil(LNode);
     case Duplicates of
       dupIgnore: Exit;
       else Error(@SDuplicateString, 0);
     end;
   end;
-  FNodeList.Insert(Index, aNode);
+  FNodeList.Insert(Index, LNode);
   for i := Index + 1 to FNodeList.Count - 1 do
     FNodelist[i].Idx := i;
 
@@ -4505,33 +4605,33 @@ end;
 
 {**********************************************************************************************}
 procedure TALHashedStringList.InsertItem(Index: Integer; const S: AnsiString; AObject: TObject);
-Var aName, AValue: AnsiString;
-    aNvs: Boolean;
-    aNode: TALHashedStringListDictionaryNode;
-    i: integer;
+Var LName, LValue: AnsiString;
+    LNvs: Boolean;
+    LNode: TALHashedStringListDictionaryNode;
+    I: integer;
 begin
   Changing;
 
-  aNvs := ExtractNameValue(S, aName, aValue);
-  aNode := TALHashedStringListDictionaryNode.Create;
-  aNode.Idx := Index;
-  aNode.ID := aName;
-  aNode.Val := aValue;
-  aNode.Nvs := aNvs;
-  aNode.Obj := AObject;
+  LNvs := ExtractNameValue(S, LName, LValue);
+  LNode := TALHashedStringListDictionaryNode.Create;
+  LNode.Idx := Index;
+  LNode.ID := LName;
+  LNode.Val := LValue;
+  LNode.Nvs := LNvs;
+  LNode.Obj := AObject;
   {$IF CompilerVersion <= 32} // tokyo
   if not Fdictionary.ContainsKey(aName) then Fdictionary.Add(aName,aNode)
   else begin
   {$ELSE}
-  if not Fdictionary.TryAdd(aName,aNode) then begin
+  if not Fdictionary.TryAdd(LName,LNode) then begin
   {$ENDIF}
-    ALFreeAndNil(aNode);
+    ALFreeAndNil(LNode);
     case Duplicates of
       dupIgnore: Exit;
       else Error(@SDuplicateString, 0);
     end;
   end;
-  FNodeList.Insert(Index, aNode);
+  FNodeList.Insert(Index, LNode);
   for i := Index + 1 to FNodeList.Count - 1 do
     FNodelist[i].Idx := i;
 
@@ -4540,42 +4640,42 @@ end;
 
 {*********************************************************************}
 procedure TALHashedStringList.Put(Index: Integer; const S: AnsiString);
-Var aNewName, aNewValue: AnsiString;
-    aNewNvs: Boolean;
-    aNewNode, aOldNode: TALHashedStringListDictionaryNode;
+Var LNewName, LNewValue: AnsiString;
+    LNewNvs: Boolean;
+    LNewNode, LOldNode: TALHashedStringListDictionaryNode;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
     Error(@SListIndexError, Index);
   Changing;
 
-  aNewNvs := ExtractNameValue(S, aNewName, aNewValue);
-  aOldNode := FNodeList[index];
-  if (CaseSensitive and (aOldNode.ID <> aNewName)) or
-     ((not CaseSensitive) and (not ALSametext(aOldNode.ID, aNewName))) then begin
-    aNewNode := TALHashedStringListDictionaryNode.Create;
-    aNewNode.Idx := Index;
-    aNewNode.ID := aNewName;
-    aNewNode.Val := ANewValue;
-    aNewNode.NVS := aNewNvs;
-    aNewNode.Obj := aOldNode.Obj;
+  LNewNvs := ExtractNameValue(S, LNewName, LNewValue);
+  LOldNode := FNodeList[index];
+  if (CaseSensitive and (LOldNode.ID <> LNewName)) or
+     ((not CaseSensitive) and (not ALSametext(LOldNode.ID, LNewName))) then begin
+    LNewNode := TALHashedStringListDictionaryNode.Create;
+    LNewNode.Idx := Index;
+    LNewNode.ID := LNewName;
+    LNewNode.Val := LNewValue;
+    LNewNode.NVS := LNewNvs;
+    LNewNode.Obj := LOldNode.Obj;
     {$IF CompilerVersion <= 32} // tokyo
     if not Fdictionary.ContainsKey(aNewName) then Fdictionary.Add(aNewName, aNewNode)
     else begin
     {$ELSE}
-    if not Fdictionary.TryAdd(aNewName, aNewNode) then begin
+    if not Fdictionary.TryAdd(LNewName, LNewNode) then begin
     {$ENDIF}
-      ALFreeAndNil(aNewNode);
+      ALFreeAndNil(LNewNode);
       case Duplicates of
         dupIgnore: Exit;
         else Error(@SDuplicateString, 0);
       end;
     end;
-    FNodeList[Index] := aNewNode;
-    Fdictionary.Remove(aOldNode.ID);
+    FNodeList[Index] := LNewNode;
+    Fdictionary.Remove(LOldNode.ID);
   end
   else begin
-    aOldNode.Val := aNewValue;
-    aOldNode.NVS := aNewNVS;
+    LOldNode.Val := LNewValue;
+    LOldNode.NVS := LNewNvs;
   end;
 
   Changed;
@@ -4613,17 +4713,24 @@ begin
 end;
 
 {***********************************************************************************************}
-procedure TALHashedStringList.QuickSort(L, R: Integer; SCompare: TALHashedStringListSortCompare);
+procedure TALHashedStringList.QuickSort(L, R: Integer; ACompare: TALHashedStringListSortCompare);
 var
   I, J, P: Integer;
 begin
-  repeat
+  while L < R do
+  begin
+    if (R - L) = 1 then
+    begin
+      if ACompare(Self, L, R) > 0 then
+        ExchangeItems(L, R);
+      break;
+    end;
     I := L;
     J := R;
     P := (L + R) shr 1;
     repeat
-      while SCompare(Self, I, P) < 0 do Inc(I);
-      while SCompare(Self, J, P) > 0 do Dec(J);
+      while (I <> P) and (ACompare(Self, I, P) < 0) do Inc(I);
+      while (J <> P) and (ACompare(Self, J, P) > 0) do Dec(J);
       if I <= J then
       begin
         if I <> J then
@@ -4636,9 +4743,19 @@ begin
         Dec(J);
       end;
     until I > J;
-    if L < J then QuickSort(L, J, SCompare);
-    L := I;
-  until I >= R;
+    if (J - L) > (R - I) then
+    begin
+      if I < R then
+        QuickSort(I, R, ACompare);
+      R := J;
+    end
+    else
+    begin
+      if L < J then
+        QuickSort(L, J, ACompare);
+      L := I;
+    end;
+  end;
 end;
 
 {**************************************************************}
@@ -4731,7 +4848,7 @@ end;
 type
 
   {************************}
-  {$IF CompilerVersion > 33} // rio
+  {$IF CompilerVersion > 34} // sydney
     {$MESSAGE WARN 'Check if System.Generics.Collections.TObjectDictionary<TKey,TValue> was not updated and adjust the IFDEF'}
   {$ENDIF}
   TALObjectDictionaryAccessPrivate<TKey,TValue> = class(TObjectDictionary<TKey,TValue>)
@@ -4741,16 +4858,16 @@ type
 
 {*******************************************************************}
 procedure TALHashedStringList.SetCaseSensitive(const Value: Boolean);
-var aTmpDictionary: TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>;
-    i: integer;
+var LTmpDictionary: TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>;
+    I: integer;
 begin
   if fCaseSensitive <> Value then begin
-    aTmpDictionary := CreateDictionary(count, Value);
+    LTmpDictionary := CreateDictionary(count, Value);
     for I := 0 to FnodeList.Count - 1 do
-      aTmpDictionary.Add(FNodeList[i].ID,FNodeList[i]);
+      LTmpDictionary.Add(FNodeList[i].ID,FNodeList[i]);
     TALObjectDictionaryAccessPrivate<ansiString, TALHashedStringListDictionaryNode>(Fdictionary).fOwnerships := [];
     ALFreeAndNil(Fdictionary);
-    FDictionary := aTmpDictionary;
+    FDictionary := LTmpDictionary;
   end;
 end;
 
@@ -4899,7 +5016,7 @@ begin
   end;
 end;
 
-{$ENDIF}
+{$ENDIF !ALHideAnsiString}
 
 {**************************************************************}
 constructor TALStringsEnumeratorU.Create(AStrings: TALStringsU);
@@ -5026,7 +5143,7 @@ end;
 
 {************************************************}
 procedure TALStringsU.Assign(Source: TPersistent);
-var i: integer;
+var I: integer;
 begin
   if Source is TALStringsU then
   begin
@@ -5076,7 +5193,7 @@ end;
 
 {************************************************}
 procedure TALStringsU.AssignTo(Dest: TPersistent);
-var i: integer;
+var I: integer;
 begin
   if Dest is TStrings then
   begin
@@ -5544,28 +5661,28 @@ end;
 
 {****************************************************************************}
 procedure TALStringsU.SaveToFile(const FileName: string; Encoding: TEncoding);
-Var afileStream: TfileStream;
-    aTmpFilename: String;
+Var LFileStream: TfileStream;
+    LTmpFilename: String;
 begin
-  if ProtectedSave then aTmpFilename := FileName + '.~tmp'
-  else aTmpFilename := FileName;
+  if ProtectedSave then LTmpFilename := FileName + '.~tmp'
+  else LTmpFilename := FileName;
   try
 
-    aFileStream := TfileStream.Create(aTmpFilename,fmCreate);
+    LFileStream := TfileStream.Create(LTmpFilename,fmCreate);
     Try
-      SaveToStream(aFileStream, Encoding);
+      SaveToStream(LFileStream, Encoding);
     finally
-      ALFreeAndNil(aFileStream);
+      ALFreeAndNil(LFileStream);
     end;
 
-    if aTmpFilename <> FileName then begin
+    if LTmpFilename <> FileName then begin
       if TFile.Exists(FileName) then TFile.Delete(FileName);
-      TFile.Move(aTmpFilename, FileName);
+      TFile.Move(LTmpFilename, FileName);
     end;
 
   except
-    if (aTmpFilename <> FileName) and
-       (TFile.Exists(aTmpFilename)) then TFile.Delete(aTmpFilename);
+    if (LTmpFilename <> FileName) and
+       (TFile.Exists(LTmpFilename)) then TFile.Delete(LTmpFilename);
     raise;
   end;
 end;
@@ -5627,43 +5744,82 @@ end;
 {$WARN WIDECHAR_REDUCED OFF}
 procedure TALStringsU.SetTextStr(const Value: String);
 var
-  P, Start, LB: PChar;
-  S: String;
+  P, PCurVal, PCurLB, PStartVal, PEndVal, PStartLB, PEndLB: PChar;
+  S: string;
   LineBreakLen: Integer;
 begin
   BeginUpdate;
   try
     Clear;
     P := Pointer(Value);
-    if P <> nil then
-      if ALCompareStrU(LineBreak, sLineBreak) = 0 then
+    if P = nil then
+      Exit;
+
+    LineBreakLen := Length(LineBreak);
+    if LineBreakLen = 0 then
+    begin
+      Add(Value);
+      Exit;
+    end;
+
+    PEndVal := P + Length(Value);
+
+    // When LineBreak is:
+    // * sLineBreak - for compatibility with Windows, Posix and old macOS platforms,
+    //   we handle #13#10, #10 and #13 as it would be #13#10.
+    // * NOT sLineBreak - we use strict checking for LineBreak.
+    if ALCompareStrU(LineBreak, sLineBreak) = 0 then
+    begin
+      while P < PEndVal do
       begin
-        // This is a lot faster than using StrPos/AnsiStrPos when
-        // LineBreak is the default (#13#10)
-        while P^ <> #0 do
-        begin
-          Start := P;
-          while not (P^ in [#0, #10, #13]) do Inc(P);
-          SetString(S, Start, P - Start);
-          Add(S);
-          if P^ = #13 then Inc(P);
-          if P^ = #10 then Inc(P);
-        end;
-      end
-      else
-      begin
-        LineBreakLen := Length(LineBreak);
-        while P^ <> #0 do
-        begin
-          Start := P;
-          LB := StrPos(P, PChar(LineBreak));
-          while (P^ <> #0) and (P <> LB) do Inc(P);
-          SetString(S, Start, P - Start);
-          Add(S);
-          if P = LB then
-            Inc(P, LineBreakLen);
-        end;
+        PStartVal := P;
+        while (P < PEndVal) and not (P^ in [#10, #13]) do Inc(P);
+        SetString(S, PStartVal, P - PStartVal);
+        Add(S);
+        if P^ = #13 then Inc(P);
+        if P^ = #10 then Inc(P);
       end;
+      Exit;
+    end;
+
+    PStartLB := Pointer(LineBreak);
+    PEndLB := PStartLB + LineBreakLen;
+    PCurLB := PStartLB;
+    PStartVal := P;
+
+    while P < PEndVal do
+    begin
+      while (P < PEndVal) and (P^ <> PStartLB^) do
+        Inc(P);
+      if P < PEndVal then
+      begin
+        PCurVal := P + 1;
+        Inc(PCurLB);
+        while PCurLB < PEndLB do
+        begin
+          if PCurVal^ <> PCurLB^ then
+            Break;
+          Inc(PCurVal);
+          Inc(PCurLB)
+        end;
+        if PCurLB = PEndLB then
+        begin
+          SetString(S, PStartVal, P - PStartVal);
+          Add(S);
+          P := PCurVal;
+          PStartVal := P;
+        end
+        else
+          Inc(P);
+        PCurLB := PStartLB;
+      end;
+    end;
+
+    if P > PStartVal then
+    begin
+      SetString(S, PStartVal, P - PStartVal);
+      Add(S);
+    end;
   finally
     EndUpdate;
   end;
@@ -6256,17 +6412,24 @@ begin
 end;
 
 {*************************************************************************************}
-procedure TALStringListU.QuickSort(L, R: Integer; SCompare: TALStringListSortCompareU);
+procedure TALStringListU.QuickSort(L, R: Integer; ACompare: TALStringListSortCompareU);
 var
   I, J, P: Integer;
 begin
-  repeat
+  while L < R do
+  begin
+    if (R - L) = 1 then
+    begin
+      if ACompare(Self, L, R) > 0 then
+        ExchangeItems(L, R);
+      break;
+    end;
     I := L;
     J := R;
     P := (L + R) shr 1;
     repeat
-      while SCompare(Self, I, P) < 0 do Inc(I);
-      while SCompare(Self, J, P) > 0 do Dec(J);
+      while (I <> P) and (ACompare(Self, I, P) < 0) do Inc(I);
+      while (J <> P) and (ACompare(Self, J, P) > 0) do Dec(J);
       if I <= J then
       begin
         if I <> J then
@@ -6279,9 +6442,19 @@ begin
         Dec(J);
       end;
     until I > J;
-    if L < J then QuickSort(L, J, SCompare);
-    L := I;
-  until I >= R;
+    if (J - L) > (R - I) then
+    begin
+      if I < R then
+        QuickSort(I, R, ACompare);
+      R := J;
+    end
+    else
+    begin
+      if L < J then
+        QuickSort(L, J, ACompare);
+      L := I;
+    end;
+  end;
 end;
 
 {*********************************************************}
@@ -6573,20 +6746,20 @@ end;
 
 {******************************************************************************}
 function TALNVStringListU.AddObject(const S: String; AObject: TObject): Integer;
-Var aName, aValue: String;
+Var LName, LValue: String;
 begin
   if not Sorted then begin
     Result := FCount;
     InsertItem(Result, S, AObject);
   end
   else begin
-    if ExtractNameValue(S, aName, aValue) then begin
-      if FindNameValue(aName, aValue, Result) then
+    if ExtractNameValue(S, LName, LValue) then begin
+      if FindNameValue(LName, LValue, Result) then
         case Duplicates of
           dupIgnore: Exit;
           dupError: Error(@SDuplicateString, 0);
         end;
-      InsertItem(Result, aName, aValue, AObject);
+      InsertItem(Result, LName, LValue, AObject);
     end
     else begin
       if FindName(s, false{WithNvS}, Result) then
@@ -7031,18 +7204,18 @@ end;
 
 {**********************************************************}
 function TALNVStringListU.IndexOf(const S: String): Integer;
-Var aName, aValue: String;
+Var LName, LValue: String;
 begin
-  if ExtractNameValue(S, aName, aValue) then begin
+  if ExtractNameValue(S, LName, LValue) then begin
     if not Sorted then begin
       for Result := 0 to FCount - 1 do
         if Flist[Result].FNVS and
-           (CompareStrings(Flist[Result].FName, aName) = 0) and
-           (CompareStrings(Flist[Result].FValue, aValue) = 0) then Exit;
+           (CompareStrings(Flist[Result].FName, LName) = 0) and
+           (CompareStrings(Flist[Result].FValue, LValue) = 0) then Exit;
       Result := -1;
     end
     else begin
-      if not FindNameValue(aName, aValue, Result) then Result := -1;
+      if not FindNameValue(LName, LValue, Result) then Result := -1;
     end;
   end
   else begin
@@ -7222,17 +7395,24 @@ begin
 end;
 
 {*****************************************************************************************}
-procedure TALNVStringListU.QuickSort(L, R: Integer; SCompare: TALNVStringListSortCompareU);
+procedure TALNVStringListU.QuickSort(L, R: Integer; ACompare: TALNVStringListSortCompareU);
 var
   I, J, P: Integer;
 begin
-  repeat
+  while L < R do
+  begin
+    if (R - L) = 1 then
+    begin
+      if ACompare(Self, L, R) > 0 then
+        ExchangeItems(L, R);
+      break;
+    end;
     I := L;
     J := R;
     P := (L + R) shr 1;
     repeat
-      while SCompare(Self, I, P) < 0 do Inc(I);
-      while SCompare(Self, J, P) > 0 do Dec(J);
+      while (I <> P) and (ACompare(Self, I, P) < 0) do Inc(I);
+      while (J <> P) and (ACompare(Self, J, P) > 0) do Dec(J);
       if I <= J then
       begin
         if I <> J then
@@ -7245,9 +7425,19 @@ begin
         Dec(J);
       end;
     until I > J;
-    if L < J then QuickSort(L, J, SCompare);
-    L := I;
-  until I >= R;
+    if (J - L) > (R - I) then
+    begin
+      if I < R then
+        QuickSort(I, R, ACompare);
+      R := J;
+    end
+    else
+    begin
+      if L < J then
+        QuickSort(L, J, ACompare);
+      L := I;
+    end;
+  end;
 end;
 
 {***********************************************************}

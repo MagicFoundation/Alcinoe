@@ -5,7 +5,7 @@ unit SynSSPI;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -24,7 +24,7 @@ unit SynSSPI;
 
   The Initial Developer of the Original Code is Chaa.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -393,8 +393,6 @@ function CertCloseStore; external crypt32;
 function CertFindCertificateInStore; external crypt32;
 
 
-(* ========================= High-Level SSPI / SChannel API wrappers  === *)
-
 { TSecBuffer }
 
 procedure TSecBuffer.Init(aType: cardinal; aData: pointer;
@@ -404,6 +402,7 @@ begin
   pvBuffer := aData;
   cbBuffer := aSize;
 end;
+
 
 { TSecBufferDesc }
 
@@ -415,6 +414,9 @@ begin
   cBuffers := aBuffersCount;
 end;
 
+
+
+(* ========================= High-Level SSPI / SChannel API wrappers  === *)
 
 procedure InvalidateSecContext(var aSecContext: TSecContext; aConnectionID: Int64);
 begin

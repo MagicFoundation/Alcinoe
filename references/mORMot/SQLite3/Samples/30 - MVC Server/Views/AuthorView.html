@@ -1,15 +1,25 @@
 {{>header}}
 {{>masthead}}
-      <div class="blog-header">
-        <h1 class="blog-title">User {{Author.LogonName}}</h1>
-		<div class="lead blog-description">{{Author.FirstName}} {{Author.FamilyName}}
-		</div>
-      </div>
-      <div class="row">
-      <div class="col-sm-8 panel">
-	  <div class="panel-heading">Information about <strong>{{Author.LogonName}}</strong></div>
-	  <div class="panel-body">
-      {{{TSQLAuthor.HtmlTable Author}}}
-	  </div>
+<div class="blog-header">
+  <h1 class="blog-title">User {{Author.LogonName}}</h1>
+  <div class="lead blog-description">{{Author.FirstName}} {{Author.FamilyName}}
+  </div>
+</div>
+<div class="row">
+<div class="col-sm-8 panel">
+  <div class="panel-heading">Information about <strong>{{Author.LogonName}}</strong></div>
+<div class="panel-body">
+  {{{TSQLAuthor.HtmlTable Author}}}
+  {{#main.session}}
+  <form class="navbar-form" action="login" method="post">
+    <span class="navbar-text">Change <strong>{{AuthorName}}</strong> Password:</span>
+    <input type="text" class="form-control" name="LogonName" placeholder="Username">
+    <input type="password" class="form-control" name="PlainPassword" placeholder="Old Password">
+    <input type="password" class="form-control" name="NewPlainPassword1" placeholder="New Password">
+    <input type="password" class="form-control" name="NewPlainPassword2" placeholder="Repeat New Password">
+    <button class="btn" type="submit">Change</button>
+  </form>
+  {{/main.session}}
+</div>
 {{>articlerow}}
 {{>footer}}

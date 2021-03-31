@@ -1,35 +1,31 @@
-{*************************************************************
-product:      ALMemCachedClient
-Description:  Delphi Client for memcached database.
+{*******************************************************************************
+Delphi Client for memcached database.
 
-              What is Memcached?  Free & open source, high-performance,
-              distributed memory object caching system, generic in
-              nature, but intended for use in speeding up dynamic web
-              applications by alleviating database load.
+What is Memcached?  Free & open source, high-performance,
+distributed memory object caching system, generic in
+nature, but intended for use in speeding up dynamic web
+applications by alleviating database load.
 
-              Memcached is an in-memory key-value store for small chunks
-              of arbitrary data (strings, objects) from results of
-              database calls, API calls, or page rendering.
+Memcached is an in-memory key-value store for small chunks
+of arbitrary data (strings, objects) from results of
+database calls, API calls, or page rendering.
 
-              Memcached is simple yet powerful. Its simple design promotes
-              quick deployment, ease of development, and solves many
-              problems facing large data caches.
-**************************************************************}
+Memcached is simple yet powerful. Its simple design promotes
+quick deployment, ease of development, and solves many
+problems facing large data caches.
+*******************************************************************************}
 
 unit ALMemCachedClient;
 
 interface
 
-{$IF CompilerVersion >= 25} {Delphi XE4}
-  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
-{$IFEND}
-
-uses Winapi.WinSock2,
-     System.Contnrs,
-     System.SyncObjs,
-     System.Diagnostics,
-     ALCommon,
-     ALString;
+uses
+  Winapi.WinSock2,
+  System.Contnrs,
+  System.SyncObjs,
+  System.Diagnostics,
+  ALCommon,
+  ALString;
 
 type
 
@@ -92,7 +88,7 @@ type
                           const aKeepAlive: Boolean;
                           const aTCPNoDelay: Boolean);
       Procedure DoDisconnect(var aSocketDescriptor: TSocket); virtual;
-      Function SocketWrite(aSocketDescriptor: TSocket; {$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer; Virtual;
+      Function SocketWrite(aSocketDescriptor: TSocket; const Buf; len: Integer): Integer; Virtual;
       Function SocketRead(aSocketDescriptor: TSocket; var buf; len: Integer): Integer; Virtual;
       Function SendCmd(aSocketDescriptor: TSocket;
                        const aCmd: AnsiString;
@@ -316,12 +312,13 @@ type
 
 implementation
 
-uses Winapi.Windows,
-     System.Classes,
-     System.SysUtils,
-     ALStringList,
-     AlWinsock,
-     ALWindows;
+uses
+  Winapi.Windows,
+  System.Classes,
+  System.SysUtils,
+  ALStringList,
+  AlWinsock,
+  ALWindows;
 
 {**************************************************************************************************************}
 constructor EAlMemCachedClientException.Create(const aMsg: AnsiString; const aCloseConnection: Boolean = False);
@@ -341,9 +338,9 @@ end;
 
 {****************************************}
 constructor TAlBaseMemCachedClient.Create;
-var aWSAData: TWSAData;
+var LWSAData: TWSAData;
 begin
-  CheckError(WSAStartup(MAKEWORD(2,2), aWSAData) <> 0);
+  CheckError(WSAStartup(MAKEWORD(2,2), LWSAData) <> 0);
   FSendTimeout := 10000; // 10 seconds
   FReceiveTimeout := 10000; // 10 seconds
   FKeepAlive := True;
@@ -371,7 +368,7 @@ end;
 // clients wouldn't need to use such long keys); the key must not include
 // control characters or whitespace.
 procedure TAlBaseMemCachedClient.CheckKey(const Key: AnsiString);
-var i: integer;
+var I: integer;
 begin
   if Key = '' then raise EAlMemCachedClientException.Create('Key can not be empty');
   if Length(Key) > 250 then raise EAlMemCachedClientException.CreateFmt('Length limit of a key is 250 characters, key: %s', [Key]);
@@ -399,20 +396,11 @@ procedure TAlBaseMemCachedClient.DoConnect(var aSocketDescriptor: TSocket;
     SockAddr.sin_family:=AF_INET;
     SockAddr.sin_port:=swap(Port);
     SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(Server));
-    {$IF CompilerVersion >= 23} {Delphi XE2}
     If SockAddr.sin_addr.S_addr = INADDR_NONE then begin
-    {$ELSE}
-    If SockAddr.sin_addr.S_addr = integer(INADDR_NONE) then begin
-    {$IFEND}
       checkError(not ALHostToIP(Server, IP));
       SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(IP));
     end;
-    {$IF CompilerVersion >= 23} {Delphi XE2}
     CheckError(WinApi.WinSock2.Connect(aSocketDescriptor,TSockAddr(SockAddr),SizeOf(SockAddr))=SOCKET_ERROR);
-    {$ELSE}
-    CheckError(WinSock.Connect(aSocketDescriptor,SockAddr,SizeOf(SockAddr))=SOCKET_ERROR);
-    {$IFEND}
-
   end;
 
 begin
@@ -451,10 +439,10 @@ Function TAlBaseMemCachedClient.SendCmd(aSocketDescriptor: TSocket;
 Var P: PAnsiChar;
     L: Integer;
     ByteSent: integer;
-    aStopWatch: TStopWatch;
+    LStopWatch: TStopWatch;
 begin
 
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
 
   p:=@aCmd[1]; // pchar
   l:=length(aCmd);
@@ -473,8 +461,8 @@ begin
     result := '';
   end;
 
-  aStopWatch.Stop;
-  OnCmdDone(aCmd, aStopWatch.Elapsed.TotalMilliseconds);
+  LStopWatch.Stop;
+  OnCmdDone(aCmd, LStopWatch.Elapsed.TotalMilliseconds);
 
 end;
 
@@ -482,12 +470,12 @@ end;
 function TAlBaseMemCachedClient.SendCmd(aSocketDescriptor: TSocket;
                                         const aCmd: AnsiString;
                                         aResponseType: TAlMemCachedClient_responseType): AnsiString;
-Var aGETStoredItems: TAlMemCachedClient_StoredItems;
+Var LGETStoredItems: TAlMemCachedClient_StoredItems;
 begin
   result := SendCmd(aSocketDescriptor,
                     aCmd,
                     aResponseType,
-                    aGETStoredItems);
+                    LGETStoredItems);
 end;
 
 {*******************************************************************}
@@ -520,56 +508,56 @@ end;
 function TAlBaseMemCachedClient.GetResponse(aSocketDescriptor: TSocket;
                                             aResponseType: TAlMemCachedClient_responseType;
                                             var aGETStoredItems: TAlMemCachedClient_StoredItems): AnsiString;
-Var aBytesReceived: Integer;
-    aResultPos: Integer;
-    aHeaderStartPos: Integer;
-    aDataStartPos: Integer;
-    aDataLength: Integer;
-    aFlags: integer;
-    aCasID: Int64;
-    aKey: AnsiString;
-    aLst: TalStringList;
-    aResponseStatus: ansiString;
-    aResponseStatusStartPos: integer;
-const aBuffSize: integer = 4096;
+Var LBytesReceived: Integer;
+    LResultPos: Integer;
+    LHeaderStartPos: Integer;
+    LDataStartPos: Integer;
+    LDataLength: Integer;
+    LFlags: integer;
+    LCasID: Int64;
+    LKey: AnsiString;
+    LLst: TalStringList;
+    LResponseStatus: ansiString;
+    LResponseStatusStartPos: integer;
+const LBuffSize: integer = 4096;
 begin
 
   //init local var
-  aDataStartPos := -1;
-  aDataLength := -1;
-  aFlags := -1;
-  aCasID := -1;
-  aKey := '';
+  LDataStartPos := -1;
+  LDataLength := -1;
+  LFlags := -1;
+  LCasID := -1;
+  LKey := '';
   setlength(aGETStoredItems, 0);
-  Setlength(Result,aBuffSize);
-  aResultPos := 0;
+  Setlength(Result,LBuffSize);
+  LResultPos := 0;
 
   //loop still we receive the full answer
   While True do begin
 
     //expnd the buffer
-    if aResultPos = length(Result) then setlength(Result, length(Result) + aBuffSize);
+    if LResultPos = length(Result) then setlength(Result, length(Result) + LBuffSize);
 
     //read string from socket
-    aBytesReceived := SocketRead(aSocketDescriptor, Result[aResultPos+1], length(Result) - aResultPos);
-    If aBytesReceived <= 0 then raise EALException.Create('Connection close gracefully!');
-    aResultPos := aResultPos + aBytesReceived;
+    LBytesReceived := SocketRead(aSocketDescriptor, Result[LResultPos+1], length(Result) - LResultPos);
+    If LBytesReceived <= 0 then raise EALException.Create('Connection close gracefully!');
+    LResultPos := LResultPos + LBytesReceived;
 
     //all en response finish by #10 - so use #10 as a key
-    If (Result[aResultPos] = #10) then begin
+    If (Result[LResultPos] = #10) then begin
 
       // ...#13#10END#13#10
       //                ^aResultPos
 
       //init aResponseStatus
-      if (aResponseType <> rpCRLF) then aResponseStatusStartPos := aResultPos - 2  // ...#13#10END#13#10
+      if (aResponseType <> rpCRLF) then LResponseStatusStartPos := LResultPos - 2  // ...#13#10END#13#10
                                                                                    //            ^aResponseStatusStartPos
-      else aResponseStatusStartPos := aResultPos - 1; // ...#13#10END#13#10
+      else LResponseStatusStartPos := LResultPos - 1; // ...#13#10END#13#10
                                                       //             ^aResponseStatusStartPos
-      while (aResponseStatusStartPos > 1) and (result[aResponseStatusStartPos] <> #13) do dec(aResponseStatusStartPos); // ...#13#10END#13#10
+      while (LResponseStatusStartPos > 1) and (result[LResponseStatusStartPos] <> #13) do dec(LResponseStatusStartPos); // ...#13#10END#13#10
                                                                                                                         //    ^^^^^^^^^aResponseStatusStartPos
-      aResponseStatus := AlCopyStr(Result, aResponseStatusStartPos, aResultPos-aResponseStatusStartPos+1); // #13#10END#13#10
-      if (aResponseType <> rpCRLF) then aResponseStatus := ALTrim(aResponseStatus); // END
+      LResponseStatus := AlCopyStr(Result, LResponseStatusStartPos, LResultPos-LResponseStatusStartPos+1); // #13#10END#13#10
+      if (aResponseType <> rpCRLF) then LResponseStatus := ALTrim(LResponseStatus); // END
 
 
       // rpEND Response
@@ -583,8 +571,8 @@ begin
       // END\r\n
       //
       if (aResponseType = rpEND) and
-         (aResponseStatus = 'END') then begin
-        Setlength(Result,aResponseStatusStartPos-1); // STAT pid 5048\r\n
+         (LResponseStatus = 'END') then begin
+        Setlength(Result,LResponseStatusStartPos-1); // STAT pid 5048\r\n
                                                      // STAT uptime 27\r\n
                                                      // STAT evictions 0\r\n
                                                      // STAT reclaimed 0
@@ -598,9 +586,9 @@ begin
       // OK\r\n
       //
       else if (aResponseType = rpOK) and
-              (aResponseStatusStartPos=1) and
-              (aResponseStatus = 'OK') then begin
-        Result := aResponseStatus;  // OK
+              (LResponseStatusStartPos=1) and
+              (LResponseStatus = 'OK') then begin
+        Result := LResponseStatus;  // OK
         Break;
       end
 
@@ -612,12 +600,12 @@ begin
       // STORED\r\n
       //
       else if (aResponseType = rpSTORAGE) and
-              (aResponseStatusStartPos=1) and
-              ((aResponseStatus = 'STORED') or
-               (aResponseStatus = 'NOT_STORED') or
-               (aResponseStatus = 'EXISTS') or
-               (aResponseStatus = 'NOT_FOUND')) then begin
-        Result := aResponseStatus; // STORED
+              (LResponseStatusStartPos=1) and
+              ((LResponseStatus = 'STORED') or
+               (LResponseStatus = 'NOT_STORED') or
+               (LResponseStatus = 'EXISTS') or
+               (LResponseStatus = 'NOT_FOUND')) then begin
+        Result := LResponseStatus; // STORED
         Break;
       end
 
@@ -628,10 +616,10 @@ begin
       // DELETED\r\n
       //
       else if (aResponseType = rpDELETE) and
-              (aResponseStatusStartPos=1) and
-              ((aResponseStatus = 'DELETED') or
-               (aResponseStatus = 'NOT_FOUND')) then begin
-        Result := aResponseStatus; // DELETED
+              (LResponseStatusStartPos=1) and
+              ((LResponseStatus = 'DELETED') or
+               (LResponseStatus = 'NOT_FOUND')) then begin
+        Result := LResponseStatus; // DELETED
         Break;
       end
 
@@ -642,10 +630,10 @@ begin
       // 130\r\n
       //
       else if (aResponseType = rpINCRDECR) and
-              (aResponseStatusStartPos=1) and
-              ((ALIsInt64(aResponseStatus)) or
-               (aResponseStatus = 'NOT_FOUND')) then begin
-        Result := aResponseStatus; // DELETED
+              (LResponseStatusStartPos=1) and
+              ((ALIsInt64(LResponseStatus)) or
+               (LResponseStatus = 'NOT_FOUND')) then begin
+        Result := LResponseStatus; // DELETED
         Break;
       end
 
@@ -655,10 +643,10 @@ begin
       // actually seam to not work on my version of memcached
       //
       else if (aResponseType = rpINCRDECR) and
-              (aResponseStatusStartPos=1) and
-              ((aResponseStatus = 'TOUCHED') or
-               (aResponseStatus = 'NOT_FOUND')) then begin
-        Result := aResponseStatus; // TOUCHED
+              (LResponseStatusStartPos=1) and
+              ((LResponseStatus = 'TOUCHED') or
+               (LResponseStatus = 'NOT_FOUND')) then begin
+        Result := LResponseStatus; // TOUCHED
         Break;
       end
 
@@ -683,98 +671,98 @@ begin
       // END\r\n
       //
       else if (aResponseType in [rpRETRIEVAL, rpRETRIEVALS]) and
-              (aResponseStatus = 'END') then begin
+              (LResponseStatus = 'END') then begin
 
         //no item founded
-        if aResponseStatusStartPos = 1 then begin
+        if LResponseStatusStartPos = 1 then begin
           Result := '';
           Break;
         end;
 
         //init 1rt item
-        if aDataStartPos < 0 then begin
-          aDataStartPos := 1;
-          while (aDataStartPos < aResultPos) and (Result[aDataStartPos] <> #13) do inc(aDataStartPos); // VALUE hihi 0 4 12\r\nAZER\r\nVALUE hoho 0 10 13\r\nAZDFUJNERT\r\nVALUE haha 0 5 14\r\nAZIUD\r\nEND\r\n
+        if LDataStartPos < 0 then begin
+          LDataStartPos := 1;
+          while (LDataStartPos < LResultPos) and (Result[LDataStartPos] <> #13) do inc(LDataStartPos); // VALUE hihi 0 4 12\r\nAZER\r\nVALUE hoho 0 10 13\r\nAZDFUJNERT\r\nVALUE haha 0 5 14\r\nAZIUD\r\nEND\r\n
                                                                                                        // ^^^^^^^^^^^^^^^^^^aDataStartPos
-          aLst := TalStringList.Create;
+          LLst := TalStringList.Create;
           try
-            aLst.LineBreak := ' ';
-            aLst.Text := ALCopyStr(Result,1, aDataStartPos-1); // VALUE
+            LLst.LineBreak := ' ';
+            LLst.Text := ALCopyStr(Result,1, LDataStartPos-1); // VALUE
                                                                // hihi
                                                                // 0
                                                                // 4
                                                                // 12
             if aResponseType = rpRETRIEVALS then begin
-              if (aLst.Count <> 5) or
-                 (not alTryStrToInt(aLst[2], aflags)) or
-                 (not alTryStrToInt(aLst[3], aDataLength)) or
-                 (not alTryStrToInt64(aLst[4], aCasID)) then raise EALException.CreateFmt('Memcache Error: Response does not conform to protocol - %s', [ALcopyStr(Result, 1, aResultPos)]);
+              if (LLst.Count <> 5) or
+                 (not alTryStrToInt(LLst[2], LFlags)) or
+                 (not alTryStrToInt(LLst[3], LDataLength)) or
+                 (not alTryStrToInt64(LLst[4], LCasID)) then raise EALException.CreateFmt('Memcache Error: Response does not conform to protocol - %s', [ALcopyStr(Result, 1, LResultPos)]);
             end
             else begin
-              aCasID := 0;
-              if (aLst.Count <> 4) or
-                 (not alTryStrToInt(aLst[2], aflags)) or
-                 (not alTryStrToInt(aLst[3], aDataLength)) then raise EALException.CreateFmt('Memcache Error: Response does not conform to protocol - %s', [ALcopyStr(Result, 1, aResultPos)]);
+              LCasID := 0;
+              if (LLst.Count <> 4) or
+                 (not alTryStrToInt(LLst[2], LFlags)) or
+                 (not alTryStrToInt(LLst[3], LDataLength)) then raise EALException.CreateFmt('Memcache Error: Response does not conform to protocol - %s', [ALcopyStr(Result, 1, LResultPos)]);
             end;
-            aKey := aLst[1];
-            aDataStartPos := aDataStartPos + 2; // VALUE hihi 0 4 12\r\nAZER\r\nVALUE hoho 0 10 13\r\nAZDFUJNERT\r\nVALUE haha 0 5 14\r\nAZIUD\r\nEND\r\n
+            LKey := LLst[1];
+            LDataStartPos := LDataStartPos + 2; // VALUE hihi 0 4 12\r\nAZER\r\nVALUE hoho 0 10 13\r\nAZDFUJNERT\r\nVALUE haha 0 5 14\r\nAZIUD\r\nEND\r\n
                                                 //                      ^ aDataStartPos
 
           finally
-            aLst.Free;
+            LLst.Free;
           end;
         end;
 
         //loop on all other items
-        while aDataStartPos + aDataLength < aResponseStatusStartPos do begin
+        while LDataStartPos + LDataLength < LResponseStatusStartPos do begin
           setlength(aGETStoredItems, length(aGETStoredItems) + 1);
-          aGETStoredItems[high(aGETStoredItems)].key := aKey;
-          aGETStoredItems[high(aGETStoredItems)].flags := aFlags;
-          aGETStoredItems[high(aGETStoredItems)].cas_id := aCasID;
-          aGETStoredItems[high(aGETStoredItems)].data := AlcopyStr(Result, aDataStartPos, aDataLength);
+          aGETStoredItems[high(aGETStoredItems)].key := LKey;
+          aGETStoredItems[high(aGETStoredItems)].flags := LFlags;
+          aGETStoredItems[high(aGETStoredItems)].cas_id := LCasID;
+          aGETStoredItems[high(aGETStoredItems)].data := AlcopyStr(Result, LDataStartPos, LDataLength);
 
-          aHeaderStartPos := aDataStartPos + aDataLength + 2; // VALUE hihi 0 4 12\r\nAZER\r\nVALUE hoho 0 10 13\r\nAZDFUJNERT\r\nVALUE haha 0 5 14\r\nAZIUD\r\nEND\r\n
+          LHeaderStartPos := LDataStartPos + LDataLength + 2; // VALUE hihi 0 4 12\r\nAZER\r\nVALUE hoho 0 10 13\r\nAZDFUJNERT\r\nVALUE haha 0 5 14\r\nAZIUD\r\nEND\r\n
                                                               //                              ^aHeaderStartPos
-          aDataStartPos := aHeaderStartPos;
-          while (aDataStartPos < aResultPos) and (Result[aDataStartPos] <> #13) do inc(aDataStartPos); // VALUE hihi 0 4 12\r\nAZER\r\nVALUE hoho 0 10 13\r\nAZDFUJNERT\r\nVALUE haha 0 5 14\r\nAZIUD\r\nEND\r\n
+          LDataStartPos := LHeaderStartPos;
+          while (LDataStartPos < LResultPos) and (Result[LDataStartPos] <> #13) do inc(LDataStartPos); // VALUE hihi 0 4 12\r\nAZER\r\nVALUE hoho 0 10 13\r\nAZDFUJNERT\r\nVALUE haha 0 5 14\r\nAZIUD\r\nEND\r\n
                                                                                                        //                              ^^^^^^^^^^^^^^^^^^^aDataStartPos
-          aLst := TalStringList.Create;
+          LLst := TalStringList.Create;
           try
-            aLst.LineBreak := ' ';
-            aLst.Text := ALCopyStr(Result,aHeaderStartPos, aDataStartPos - aHeaderStartPos); // VALUE
+            LLst.LineBreak := ' ';
+            LLst.Text := ALCopyStr(Result,LHeaderStartPos, LDataStartPos - LHeaderStartPos); // VALUE
                                                                                              // hoho
                                                                                              // 0
                                                                                              // 10
                                                                                              // 13
             if aResponseType = rpRETRIEVALS then begin
-              if (aLst.Count <> 5) or
-                 (not alTryStrToInt(aLst[2], aflags)) or
-                 (not alTryStrToInt(aLst[3], aDataLength)) or
-                 (not alTryStrToInt64(aLst[4], aCasID)) then raise EALException.Createfmt('Memcache Error: Response does not conform to protocol - %s', [ALcopyStr(Result, 1, aResultPos)]);
+              if (LLst.Count <> 5) or
+                 (not alTryStrToInt(LLst[2], LFlags)) or
+                 (not alTryStrToInt(LLst[3], LDataLength)) or
+                 (not alTryStrToInt64(LLst[4], LCasID)) then raise EALException.Createfmt('Memcache Error: Response does not conform to protocol - %s', [ALcopyStr(Result, 1, LResultPos)]);
             end
             else begin
-              aCasID := 0;
-              if (aLst.Count <> 4) or
-                 (not alTryStrToInt(aLst[2], aflags)) or
-                 (not alTryStrToInt(aLst[3], aDataLength)) then raise EALException.Createfmt('Memcache Error: Response does not conform to protocol - %s', [ALcopyStr(Result, 1, aResultPos)]);
+              LCasID := 0;
+              if (LLst.Count <> 4) or
+                 (not alTryStrToInt(LLst[2], LFlags)) or
+                 (not alTryStrToInt(LLst[3], LDataLength)) then raise EALException.Createfmt('Memcache Error: Response does not conform to protocol - %s', [ALcopyStr(Result, 1, LResultPos)]);
             end;
-            aKey := aLst[1];
-            aDataStartPos := aDataStartPos + 2; // VALUE hihi 0 4 12\r\nAZER\r\nVALUE hoho 0 10 13\r\nAZDFUJNERT\r\nVALUE haha 0 5 14\r\nAZIUD\r\nEND\r\n
+            LKey := LLst[1];
+            LDataStartPos := LDataStartPos + 2; // VALUE hihi 0 4 12\r\nAZER\r\nVALUE hoho 0 10 13\r\nAZDFUJNERT\r\nVALUE haha 0 5 14\r\nAZIUD\r\nEND\r\n
                                                 //                                                    ^ aDataStartPos
 
           finally
-            aLst.Free;
+            LLst.Free;
           end;
 
         end;
 
         //if we are at the end of the item
-        if (aResponseStatusStartPos = aDataStartPos + aDataLength) then begin
+        if (LResponseStatusStartPos = LDataStartPos + LDataLength) then begin
           setlength(aGETStoredItems, length(aGETStoredItems) + 1);
-          aGETStoredItems[high(aGETStoredItems)].key := aKey;
-          aGETStoredItems[high(aGETStoredItems)].flags := aFlags;
-          aGETStoredItems[high(aGETStoredItems)].cas_id := aCasID;
-          aGETStoredItems[high(aGETStoredItems)].data := AlcopyStr(Result, aDataStartPos, aDataLength);
+          aGETStoredItems[high(aGETStoredItems)].key := LKey;
+          aGETStoredItems[high(aGETStoredItems)].flags := LFlags;
+          aGETStoredItems[high(aGETStoredItems)].cas_id := LCasID;
+          aGETStoredItems[high(aGETStoredItems)].data := AlcopyStr(Result, LDataStartPos, LDataLength);
           Result := '';
           Break;
         end;
@@ -788,15 +776,15 @@ begin
       // VERSION 1.4.5_4_gaa7839e\r\n
       //
       else if (aResponseType = rpCRLF) and
-              (aResponseStatus = #13#10) then begin
-        Setlength(Result,aResponseStatusStartPos-1); // VERSION 1.4.5_4_gaa7839e
+              (LResponseStatus = #13#10) then begin
+        Setlength(Result,LResponseStatusStartPos-1); // VERSION 1.4.5_4_gaa7839e
         Break;
       end
 
       // ERROR Response
-      else if (aResponseStatus = 'ERROR') and (aResponseStatusStartPos=1) then raise EALException.Create('Memcached Error - Nonexistent command')
-      else if (ALpos('SERVER_ERROR', aResponseStatus) = 1) and (aResponseStatusStartPos=1) then raise EALException.Createfmt('Memcached Error - Server error - %s', [aResponseStatus])
-      else if (ALpos('CLIENT_ERROR', aResponseStatus) = 1) and (aResponseStatusStartPos=1) then raise EAlMemCachedClientException.Create(ALformat('Memcached Error - Client error in the input line - %s', [aResponseStatus]));
+      else if (LResponseStatus = 'ERROR') and (LResponseStatusStartPos=1) then raise EALException.Create('Memcached Error - Nonexistent command')
+      else if (ALpos('SERVER_ERROR', LResponseStatus) = 1) and (LResponseStatusStartPos=1) then raise EALException.Createfmt('Memcached Error - Server error - %s', [LResponseStatus])
+      else if (ALpos('CLIENT_ERROR', LResponseStatus) = 1) and (LResponseStatusStartPos=1) then raise EAlMemCachedClientException.Create(ALformat('Memcached Error - Client error in the input line - %s', [LResponseStatus]));
 
     end;
 
@@ -845,46 +833,46 @@ function TAlBaseMemCachedClient.DoGet(aSocketDescriptor: TSocket;
                                       const key: ansiString;
                                       var flags: integer;
                                       var data: ansiString): boolean;
-var aGETStoredItems: TAlMemCachedClient_StoredItems;
+var LGETStoredItems: TAlMemCachedClient_StoredItems;
 begin
   CheckKey(key);
-  SendCmd(aSocketDescriptor, 'get ' + Key + #13#10, rpRetrieval, aGETStoredItems);
-  if length(aGETStoredItems) <> 1 then begin
+  SendCmd(aSocketDescriptor, 'get ' + Key + #13#10, rpRetrieval, LGETStoredItems);
+  if length(LGETStoredItems) <> 1 then begin
     result := False;
     flags := 0;
     data := '';
   end
   else begin
     result := True;
-    flags := aGETStoredItems[0].flags;
-    data := aGETStoredItems[0].data;
+    flags := LGETStoredItems[0].flags;
+    data := LGETStoredItems[0].data;
   end;
 end;
 
 {***************************************************************}
 function TAlBaseMemCachedClient.DoGet(aSocketDescriptor: TSocket;
                                       const key: ansiString): AnsiString;
-var aGETStoredItems: TAlMemCachedClient_StoredItems;
+var LGETStoredItems: TAlMemCachedClient_StoredItems;
 begin
   CheckKey(key);
-  SendCmd(aSocketDescriptor, 'get ' + Key + #13#10, rpRetrieval, aGETStoredItems);
-  if length(aGETStoredItems) <> 1 then raise EAlMemCachedClientException.Create('Not found');
-  result := aGETStoredItems[0].data;
+  SendCmd(aSocketDescriptor, 'get ' + Key + #13#10, rpRetrieval, LGETStoredItems);
+  if length(LGETStoredItems) <> 1 then raise EAlMemCachedClientException.Create('Not found');
+  result := LGETStoredItems[0].data;
 end;
 
 {***************************************************************}
 function TAlBaseMemCachedClient.DoGet(aSocketDescriptor: TSocket;
                                       const keys: array of ansiString): TAlMemCachedClient_StoredItems;
-var aStrKeys: AnsiString;
+var LStrKeys: AnsiString;
     I: integer;
 begin
   if length(keys) = 0 then raise EAlMemCachedClientException.Create('At least one key must be provided');
-  aStrKeys := '';
+  LStrKeys := '';
   for I := low(keys) to High(keys) do begin
     CheckKey(keys[i]);
-    aStrKeys := aStrKeys + keys[i] + ' ';
+    LStrKeys := LStrKeys + keys[i] + ' ';
   end;
-  SendCmd(aSocketDescriptor, 'get ' + AlTrim(aStrKeys) + #13#10, rpRetrieval, result);
+  SendCmd(aSocketDescriptor, 'get ' + AlTrim(LStrKeys) + #13#10, rpRetrieval, result);
 end;
 
 {****************************************************************}
@@ -893,11 +881,11 @@ function TAlBaseMemCachedClient.DoGets(aSocketDescriptor: TSocket;
                                        var flags: integer;
                                        var cas_id: int64;
                                        var data: ansiString): boolean;
-var aGETStoredItems: TAlMemCachedClient_StoredItems;
+var LGETStoredItems: TAlMemCachedClient_StoredItems;
 begin
   CheckKey(key);
-  SendCmd(aSocketDescriptor, 'gets ' + Key + #13#10, rpRetrievals, aGETStoredItems);
-  if length(aGETStoredItems) <> 1 then begin
+  SendCmd(aSocketDescriptor, 'gets ' + Key + #13#10, rpRetrievals, LGETStoredItems);
+  if length(LGETStoredItems) <> 1 then begin
     result := False;
     flags := 0;
     cas_id := 0;
@@ -905,25 +893,25 @@ begin
   end
   else begin
     result := True;
-    flags := aGETStoredItems[0].flags;
-    cas_id := aGETStoredItems[0].cas_id;
-    data := aGETStoredItems[0].data;
+    flags := LGETStoredItems[0].flags;
+    cas_id := LGETStoredItems[0].cas_id;
+    data := LGETStoredItems[0].data;
   end;
 end;
 
 {****************************************************************}
 function TAlBaseMemCachedClient.DoGets(aSocketDescriptor: TSocket;
                                        const keys: array of ansiString): TAlMemCachedClient_StoredItems;
-var aStrKeys: AnsiString;
+var LStrKeys: AnsiString;
     I: integer;
 begin
   if length(keys) = 0 then raise EAlMemCachedClientException.Create('At least one key must be provided');
-  aStrKeys := '';
+  LStrKeys := '';
   for I := low(keys) to High(keys) do begin
     CheckKey(keys[i]);
-    aStrKeys := aStrKeys + keys[i] + ' ';
+    LStrKeys := LStrKeys + keys[i] + ' ';
   end;
-  SendCmd(aSocketDescriptor, 'gets ' + AlTrim(aStrKeys) + #13#10, rpRetrievals, result);
+  SendCmd(aSocketDescriptor, 'gets ' + AlTrim(LStrKeys) + #13#10, rpRetrievals, result);
 end;
 
 {**************************************************************}
@@ -988,18 +976,18 @@ procedure TAlBaseMemCachedClient.DoSet(aSocketDescriptor: TSocket;
                                        const flags: integer;
                                        const exptime:integer;
                                        const data: ansiString);
-var aResultCode: AnsiString;
+var LResultCode: AnsiString;
 begin
   CheckKey(key);
   if flags < 0 then raise EAlMemCachedClientException.Create('flags must be upper or equal to 0');
-  aResultCode := SendCmd(aSocketDescriptor,
+  LResultCode := SendCmd(aSocketDescriptor,
                          'set '+Key+' '+
                                 AlintToStr(flags)+' '+
                                 ALInttostr(exptime) + ' ' +
                                 ALIntToStr(length(data)) + #13#10 +
                                 data + #13#10,
                          rpStorage);
-  if aResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(aResultCode);
+  if LResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
 {************************************************************************}
@@ -1010,18 +998,18 @@ procedure TAlBaseMemCachedClient.DoAdd(aSocketDescriptor: TSocket;
                                        const flags: integer;
                                        const exptime:integer;
                                        const data: ansiString);
-var aResultCode: AnsiString;
+var LResultCode: AnsiString;
 begin
   CheckKey(key);
   if flags < 0 then raise EAlMemCachedClientException.Create('flags must be upper or equal to 0');
-  aResultCode := SendCmd(aSocketDescriptor,
+  LResultCode := SendCmd(aSocketDescriptor,
                          'add '+Key+' '+
                                 AlintToStr(flags)+' '+
                                 ALInttostr(exptime) + ' ' +
                                 ALIntToStr(length(data)) + #13#10 +
                                 data + #13#10,
                          rpStorage);
-  if aResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(aResultCode);
+  if LResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
 {****************************************************************}
@@ -1032,18 +1020,18 @@ procedure TAlBaseMemCachedClient.DoReplace(aSocketDescriptor: TSocket;
                                            const flags: integer;
                                            const exptime:integer;
                                            const data: ansiString);
-var aResultCode: AnsiString;
+var LResultCode: AnsiString;
 begin
   CheckKey(key);
   if flags < 0 then raise EAlMemCachedClientException.Create('flags must be upper or equal to 0');
-  aResultCode := SendCmd(aSocketDescriptor,
+  LResultCode := SendCmd(aSocketDescriptor,
                          'replace '+Key+' '+
                                     AlintToStr(flags)+' '+
                                     ALInttostr(exptime) + ' ' +
                                     ALIntToStr(length(data)) + #13#10 +
                                     data + #13#10,
                          rpStorage);
-  if aResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(aResultCode);
+  if LResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
 {***********************************************************************}
@@ -1054,17 +1042,17 @@ end;
 procedure TAlBaseMemCachedClient.DoAppend(aSocketDescriptor: TSocket;
                                           const key: ansiString;
                                           const data: ansiString);
-var aResultCode: AnsiString;
+var LResultCode: AnsiString;
 begin
   CheckKey(key);
-  aResultCode := SendCmd(aSocketDescriptor,
+  LResultCode := SendCmd(aSocketDescriptor,
                          'append '+Key+' '+
                                    '0 '+
                                    '0 ' +
                                    ALIntToStr(length(data)) + #13#10 +
                                    data + #13#10,
                          rpStorage);
-  if aResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(aResultCode);
+  if LResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
 {*************************************************************************}
@@ -1075,17 +1063,17 @@ end;
 procedure TAlBaseMemCachedClient.DoPrepend(aSocketDescriptor: TSocket;
                                            const key: ansiString;
                                            const data: ansiString);
-var aResultCode: AnsiString;
+var LResultCode: AnsiString;
 begin
   CheckKey(key);
-  aResultCode := SendCmd(aSocketDescriptor,
+  LResultCode := SendCmd(aSocketDescriptor,
                          'prepend '+Key+' '+
                                     '0 '+
                                     '0 ' +
                                     ALIntToStr(length(data)) + #13#10 +
                                     data + #13#10,
                          rpStorage);
-  if aResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(aResultCode);
+  if LResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
 {*********************************************************************}
@@ -1097,11 +1085,11 @@ function TAlBaseMemCachedClient.DoCas(aSocketDescriptor: TSocket;
                                       const exptime:integer;
                                       const cas_id: int64;
                                       const data: ansiString): boolean;
-var aResultCode: AnsiString;
+var LResultCode: AnsiString;
 begin
   CheckKey(key);
   if flags < 0 then raise EAlMemCachedClientException.Create('flags must be upper or equal to 0');
-  aResultCode := SendCmd(aSocketDescriptor,
+  LResultCode := SendCmd(aSocketDescriptor,
                          'cas '+Key+' '+
                                 AlintToStr(flags)+' '+
                                 ALInttostr(exptime) + ' ' +
@@ -1109,9 +1097,9 @@ begin
                                 ALIntToStr(cas_id) + #13#10 +
                                 data + #13#10,
                          rpStorage);
-  if aResultCode = 'EXISTS' then result := False
-  else if aResultCode = 'STORED' then result := True
-  else raise EAlMemCachedClientException.Create(aResultCode);
+  if LResultCode = 'EXISTS' then result := False
+  else if LResultCode = 'STORED' then result := True
+  else raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
 {************************************************************}
@@ -1136,13 +1124,13 @@ end;
 // of all existing items.
 function TAlBaseMemCachedClient.DoDelete(aSocketDescriptor: TSocket;
                                          const key: ansiString): boolean;
-var aResultCode: AnsiString;
+var LResultCode: AnsiString;
 begin
   CheckKey(key);
-  aResultCode := SendCmd(aSocketDescriptor, 'delete ' + Key + #13#10, rpDelete);
-  if aResultCode = 'NOT_FOUND' then result := False
-  else if aResultCode = 'DELETED' then result := True
-  else raise EAlMemCachedClientException.Create(aResultCode);
+  LResultCode := SendCmd(aSocketDescriptor, 'delete ' + Key + #13#10, rpDelete);
+  if LResultCode = 'NOT_FOUND' then result := False
+  else if LResultCode = 'DELETED' then result := True
+  else raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
 {*****************************************************************}
@@ -1190,22 +1178,22 @@ end;
 function TAlBaseMemCachedClient.DoIncr(aSocketDescriptor: TSocket;
                                        const key: ansiString;
                                        const Value: int64): int64;
-var aResultCode: AnsiString;
+var LResultCode: AnsiString;
 begin
   CheckKey(key);
-  aResultCode := SendCmd(aSocketDescriptor, 'incr ' + Key + ' ' + aLintToStr(Value) + #13#10, rpINCRDECR);
-  if not ALTryStrToInt64(aResultCode, Result) then raise EAlMemCachedClientException.Create(aResultCode);
+  LResultCode := SendCmd(aSocketDescriptor, 'incr ' + Key + ' ' + aLintToStr(Value) + #13#10, rpINCRDECR);
+  if not ALTryStrToInt64(LResultCode, Result) then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
 {****************************************************************}
 function TAlBaseMemCachedClient.DoDecr(aSocketDescriptor: TSocket;
                                        const key: ansiString;
                                        const Value: int64): int64;
-var aResultCode: AnsiString;
+var LResultCode: AnsiString;
 begin
   CheckKey(key);
-  aResultCode := SendCmd(aSocketDescriptor, 'decr ' + Key + ' ' + aLintToStr(Value) + #13#10, rpINCRDECR);
-  if not ALTryStrToInt64(aResultCode, Result) then raise EAlMemCachedClientException.Create(aResultCode);
+  LResultCode := SendCmd(aSocketDescriptor, 'decr ' + Key + ' ' + aLintToStr(Value) + #13#10, rpINCRDECR);
+  if not ALTryStrToInt64(LResultCode, Result) then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
 {******************************************************************************}
@@ -1234,11 +1222,11 @@ end;
 procedure TAlBaseMemCachedClient.DoTouch(aSocketDescriptor: TSocket;
                                          const key: ansiString;
                                          const exptime:integer);
-var aResultCode: AnsiString;
+var LResultCode: AnsiString;
 begin
   CheckKey(key);
-  aResultCode := SendCmd(aSocketDescriptor, 'touch ' + Key + ' ' + ALInttostr(exptime) + #13#10, rpTOUCH);
-  if aResultCode <> 'TOUCHED' then raise EAlMemCachedClientException.Create(aResultCode);
+  LResultCode := SendCmd(aSocketDescriptor, 'touch ' + Key + ' ' + ALInttostr(exptime) + #13#10, rpTOUCH);
+  if LResultCode <> 'TOUCHED' then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
 {**********************************************************************}
@@ -1600,8 +1588,8 @@ begin
   // virtual
 end;
 
-{*****************************************************************************************************************************************************}
-Function TAlBaseMemCachedClient.SocketWrite(aSocketDescriptor: TSocket; {$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer;
+{********************************************************************************************************}
+Function TAlBaseMemCachedClient.SocketWrite(aSocketDescriptor: TSocket; const Buf; len: Integer): Integer;
 begin
   Result := Send(aSocketDescriptor,Buf,len,0);
   CheckError(Result =  SOCKET_ERROR);
@@ -1629,27 +1617,27 @@ end;
 {***********************************************************************************************************************}
 // // http://blogs.technet.com/b/nettracer/archive/2010/06/03/things-that-you-may-want-to-know-about-tcp-keepalives.aspx
 procedure TAlBaseMemCachedClient.DoSetKeepAlive(aSocketDescriptor: TSocket; const Value: boolean);
-var aIntBool: integer;
+var LIntBool: integer;
 begin
   // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
   // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
   // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
-  if Value then aIntBool := 1
-  else aIntBool := 0;
-  CheckError(setsockopt(aSocketDescriptor,SOL_SOCKET,SO_KEEPALIVE,PAnsiChar(@aIntBool),SizeOf(aIntBool))=SOCKET_ERROR);
+  if Value then LIntBool := 1
+  else LIntBool := 0;
+  CheckError(setsockopt(aSocketDescriptor,SOL_SOCKET,SO_KEEPALIVE,PAnsiChar(@LIntBool),SizeOf(LIntBool))=SOCKET_ERROR);
 end;
 
 {***************************************************************************************************************************************************************************************************************}
 // https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_MRG/1.1/html/Realtime_Tuning_Guide/sect-Realtime_Tuning_Guide-Application_Tuning_and_Deployment-TCP_NODELAY_and_Small_Buffer_Writes.html
 procedure TAlBaseMemCachedClient.DoSetTCPNoDelay(aSocketDescriptor: TSocket; const Value: boolean);
-var aIntBool: integer;
+var LIntBool: integer;
 begin
   // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
   // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
   // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
-  if Value then aIntBool := 1
-  else aIntBool := 0;
-  CheckError(setsockopt(aSocketDescriptor,SOL_SOCKET,TCP_NODELAY,PAnsiChar(@aIntBool),SizeOf(aIntBool))=SOCKET_ERROR);
+  if Value then LIntBool := 1
+  else LIntBool := 0;
+  CheckError(setsockopt(aSocketDescriptor,SOL_SOCKET,TCP_NODELAY,PAnsiChar(@LIntBool),SizeOf(LIntBool))=SOCKET_ERROR);
 end;
 
 {********************************************************************}
@@ -1975,7 +1963,7 @@ end;
 
 {*******************************************************************}
 function TAlMemCachedConnectionPoolClient.AcquireConnection: TSocket;
-Var aTickCount: int64;
+Var LTickCount: int64;
 Begin
 
   //synchronize the code
@@ -1986,10 +1974,10 @@ Begin
     if FReleasingAllconnections then raise exception.Create('Can not acquire connection: currently releasing all connections');
 
     //delete the old unused connection
-    aTickCount := GetTickCount64;
-    if aTickCount - fLastConnectionGarbage > (60000 {every minutes})  then begin
+    LTickCount := GetTickCount64;
+    if LTickCount - fLastConnectionGarbage > (60000 {every minutes})  then begin
       while FConnectionPoolCount > 0 do begin
-        if aTickCount - FConnectionPool[0].Lastaccessdate > FConnectionMaxIdleTime then begin
+        if LTickCount - FConnectionPool[0].Lastaccessdate > FConnectionMaxIdleTime then begin
 
           Try
             DoDisconnect(FConnectionPool[0].SocketDescriptor);
@@ -2008,7 +1996,7 @@ Begin
         end
         else break;
       end;
-      FLastConnectionGarbage := aTickCount;
+      FLastConnectionGarbage := LTickCount;
     end;
 
     //acquire the new connection from the pool
@@ -2169,18 +2157,18 @@ end;
 function TAlMemCachedConnectionPoolClient.Get(const key: ansiString;
                                               var flags: integer;
                                               var data: ansiString): boolean;
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    result := DoGet(aSocketDescriptor,
+    result := DoGet(LSocketDescriptor,
                     key,
                     flags,
                     data);
-    ReleaseConnection(aSocketDescriptor);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;
@@ -2190,15 +2178,15 @@ end;
 
 {*******************************************************************************}
 function TAlMemCachedConnectionPoolClient.Get(const key: ansiString): AnsiString;
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    result := DoGet(aSocketDescriptor, key);
-    ReleaseConnection(aSocketDescriptor);
+    result := DoGet(LSocketDescriptor, key);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;
@@ -2208,15 +2196,15 @@ end;
 
 {*************************************************************************************************************}
 function TAlMemCachedConnectionPoolClient.Get(const keys: array of ansiString): TAlMemCachedClient_StoredItems;
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    result := DoGet(aSocketDescriptor, keys);
-    ReleaseConnection(aSocketDescriptor);
+    result := DoGet(LSocketDescriptor, keys);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;
@@ -2229,19 +2217,19 @@ function TAlMemCachedConnectionPoolClient.Gets(const key: ansiString;
                                                var flags: integer;
                                                var cas_id: int64;
                                                var data: ansiString): boolean;
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    result := DoGets(aSocketDescriptor,
+    result := DoGets(LSocketDescriptor,
                      key,
                      flags,
                      cas_id,
                      data);
-    ReleaseConnection(aSocketDescriptor);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;
@@ -2251,15 +2239,15 @@ end;
 
 {**************************************************************************************************************}
 function TAlMemCachedConnectionPoolClient.Gets(const keys: array of ansiString): TAlMemCachedClient_StoredItems;
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    result := DoGets(aSocketDescriptor, keys);
-    ReleaseConnection(aSocketDescriptor);
+    result := DoGets(LSocketDescriptor, keys);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;
@@ -2272,19 +2260,19 @@ Procedure TAlMemCachedConnectionPoolClient._Set(const key: ansiString;
                                                 const flags: integer;
                                                 const exptime:integer;
                                                 const data: ansiString);
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    DoSet(aSocketDescriptor,
+    DoSet(LSocketDescriptor,
           key,
           flags,
           exptime,
           data);
-    ReleaseConnection(aSocketDescriptor);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;
@@ -2297,19 +2285,19 @@ procedure TAlMemCachedConnectionPoolClient.Add(const key: ansiString;
                                                const flags: integer;
                                                const exptime:integer;
                                                const data: ansiString);
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    DoAdd(aSocketDescriptor,
+    DoAdd(LSocketDescriptor,
           key,
           flags,
           exptime,
           data);
-    ReleaseConnection(aSocketDescriptor);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;
@@ -2322,19 +2310,19 @@ procedure TAlMemCachedConnectionPoolClient.Replace(const key: ansiString;
                                                    const flags: integer;
                                                    const exptime:integer;
                                                    const data: ansiString);
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    DoReplace(aSocketDescriptor,
+    DoReplace(LSocketDescriptor,
               key,
               flags,
               exptime,
               data);
-    ReleaseConnection(aSocketDescriptor);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;
@@ -2345,17 +2333,17 @@ end;
 {**********************************************************************}
 procedure TAlMemCachedConnectionPoolClient.Append(const key: ansiString;
                                                   const data: ansiString);
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    DoAppend(aSocketDescriptor,
+    DoAppend(LSocketDescriptor,
              key,
              data);
-    ReleaseConnection(aSocketDescriptor);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;
@@ -2366,17 +2354,17 @@ end;
 {***********************************************************************}
 procedure TAlMemCachedConnectionPoolClient.Prepend(const key: ansiString;
                                                    const data: ansiString);
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    DoPrepend(aSocketDescriptor,
+    DoPrepend(LSocketDescriptor,
               key,
               data);
-    ReleaseConnection(aSocketDescriptor);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;
@@ -2390,20 +2378,20 @@ function TAlMemCachedConnectionPoolClient.Cas(const key: ansiString;
                                               const exptime:integer;
                                               const cas_id: int64;
                                               const data: ansiString): boolean;
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    result := DoCas(aSocketDescriptor,
+    result := DoCas(LSocketDescriptor,
                     key,
                     flags,
                     exptime,
                     Cas_ID,
                     data);
-    ReleaseConnection(aSocketDescriptor);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;
@@ -2413,15 +2401,15 @@ end;
 
 {*******************************************************************************}
 function TAlMemCachedConnectionPoolClient.Delete(const key: ansiString): boolean;
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    result := DoDelete(aSocketDescriptor, key);
-    ReleaseConnection(aSocketDescriptor);
+    result := DoDelete(LSocketDescriptor, key);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;
@@ -2432,15 +2420,15 @@ end;
 {*******************************************************************}
 function TAlMemCachedConnectionPoolClient.Incr(const key: ansiString;
                                                const Value: int64): int64;
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    result := DoIncr(aSocketDescriptor, key, Value);
-    ReleaseConnection(aSocketDescriptor);
+    result := DoIncr(LSocketDescriptor, key, Value);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;
@@ -2451,15 +2439,15 @@ end;
 {*******************************************************************}
 function TAlMemCachedConnectionPoolClient.Decr(const key: ansiString;
                                                const Value: int64): int64;
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    result := DoDecr(aSocketDescriptor, key, Value);
-    ReleaseConnection(aSocketDescriptor);
+    result := DoDecr(LSocketDescriptor, key, Value);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;
@@ -2470,17 +2458,17 @@ end;
 {*********************************************************************}
 procedure TAlMemCachedConnectionPoolClient.Touch(const key: ansiString;
                                                  const exptime:integer);
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    DoTouch(aSocketDescriptor,
+    DoTouch(LSocketDescriptor,
             key,
             exptime);
-    ReleaseConnection(aSocketDescriptor);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;
@@ -2490,15 +2478,15 @@ end;
 
 {**********************************************************************************}
 function TAlMemCachedConnectionPoolClient.Stats(const args: AnsiString): AnsiString;
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    result := DoStats(aSocketDescriptor, args);
-    ReleaseConnection(aSocketDescriptor);
+    result := DoStats(LSocketDescriptor, args);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;
@@ -2508,15 +2496,15 @@ end;
 
 {*******************************************************************}
 procedure TAlMemCachedConnectionPoolClient.Flush_all(delay: integer);
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    DoFlush_all(aSocketDescriptor,delay);
-    ReleaseConnection(aSocketDescriptor);
+    DoFlush_all(LSocketDescriptor,delay);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;
@@ -2526,15 +2514,15 @@ end;
 
 {************************************************************}
 function TAlMemCachedConnectionPoolClient.Version: AnsiString;
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    result := DoVersion(aSocketDescriptor);
-    ReleaseConnection(aSocketDescriptor);
+    result := DoVersion(LSocketDescriptor);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;
@@ -2544,15 +2532,15 @@ end;
 
 {*******************************************************************}
 procedure TAlMemCachedConnectionPoolClient.Verbosity(level: integer);
-var aSocketDescriptor: TSocket;
+var LSocketDescriptor: TSocket;
 begin
-  aSocketDescriptor := AcquireConnection;
+  LSocketDescriptor := AcquireConnection;
   try
-    DoVerbosity(aSocketDescriptor, level);
-    ReleaseConnection(aSocketDescriptor);
+    DoVerbosity(LSocketDescriptor, level);
+    ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(aSocketDescriptor,
+      ReleaseConnection(LSocketDescriptor,
                         (not (E Is EAlMemCachedClientException)) or
                         (E as EAlMemCachedClientException).CloseConnection);
       raise;

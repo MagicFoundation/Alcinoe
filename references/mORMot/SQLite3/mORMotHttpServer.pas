@@ -6,7 +6,7 @@ unit mORMotHttpServer;
 {
     This file is part of Synopse mORMot framework.
 
-    Synopse mORMot framework. Copyright (C) 2020 Arnaud Bouchez
+    Synopse mORMot framework. Copyright (C) 2021 Arnaud Bouchez
       Synopse Informatique - https://synopse.info
 
   *** BEGIN LICENSE BLOCK *****
@@ -25,7 +25,7 @@ unit mORMotHttpServer;
 
   The Initial Developer of the Original Code is Arnaud Bouchez.
 
-  Portions created by the Initial Developer are Copyright (C) 2020
+  Portions created by the Initial Developer are Copyright (C) 2021
   the Initial Developer. All Rights Reserved.
 
   Contributor(s):
@@ -577,7 +577,6 @@ begin
   if aURI='' then
     fHosts.Delete(aDomain) else
     fHosts.Add(aDomain,aURI); // e.g. Add('project1.com','root1')
-
 end;
 
 constructor TSQLHttpServer.Create(const aPort: AnsiString;
@@ -950,6 +949,8 @@ begin
     if hostroot<>'' then begin
       if ((result=HTTP_MOVEDPERMANENTLY) or (result=HTTP_TEMPORARYREDIRECT)) then begin
         redirect := FindIniNameValue(P,'LOCATION: ');
+        if (redirect<>'') and (redirect[1]='/') then
+          delete(redirect,1,1); // what is needed for real URI doesn't help here
         hostlen := length(hostroot);
         if (length(redirect)>hostlen) and (redirect[hostlen+1]='/') and
            IdemPropNameU(hostroot,pointer(redirect),hostlen) then

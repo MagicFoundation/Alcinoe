@@ -29,7 +29,7 @@ Compiled demo
 * https://svn.code.sf.net/p/alcinoe/code/demos/ALWinHTTPClient/win32/ALWinHTTPClientDemo.exe
 * https://svn.code.sf.net/p/alcinoe/code/demos/ALWinInetHTTPClient/win32/ALWinInetHTTPClientDemo.exe
 * https://svn.code.sf.net/p/alcinoe/code/demos/ALSortedListBenchmark/win32/ALSortedListBenchmark.exe
-* https://svn.code.sf.net/p/alcinoe/code/demos/ALCipherDemo/win32/ALCipherDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/demos/ALCipher/win32/ALCipherDemo.exe
 * https://svn.code.sf.net/p/alcinoe/code/demos/ALJsonDoc/win32/AljsonDocDemo.exe
 * https://svn.code.sf.net/p/alcinoe/code/demos/ALNNTPClient/win32/ALNNTPClientDemo.exe
 * https://svn.code.sf.net/p/alcinoe/code/demos/ALPhpRunner/win32/ALPhpRunnerDemo.exe
@@ -47,7 +47,7 @@ Compiled demo
 * https://tinyurl.com/zoxavr9 (ALFmxControl.apk)
 * https://tinyurl.com/na5fvy2d (ALFirebaseMessaging.apk)
 * https://tinyurl.com/y9gzos9f (ALFacebookLogin.apk)
-* https://tinyurl.com/yaft2wxr (ALFmxEffects.apk)
+* https://tinyurl.com/mzf8adyk (ALFmxFilterEffects.apk)
 * https://tinyurl.com/ydymo23w (ALLiveVideoChatClient.apk)
 
 #### iOS #### 
@@ -66,10 +66,10 @@ If you plan to use visual components at design time then you need to
 install the bpl. Launch Delphi and go in component > Install Packages... > and choose the 
 BPL located in <a href="https://github.com/Zeus64/alcinoe/tree/master/lib/bpl/alcinoe/Win32/sydney">{alcinoe_rootdir}\lib\bpl\alcinoe\Win32\sydney\Alcinoe_sydney.bpl</a> (if you are in delphi Sydney 
 else choose the directory that correspond to your Delphi version). 
-You still need to add in your search path <a href="https://github.com/Zeus64/alcinoe/tree/master/source">{alcinoe_rootdir}\source\</a>  
+You still need to add in your search path <a href="https://github.com/Zeus64/alcinoe/tree/master/source">{alcinoe_rootdir}\source</a>  
   
 Alcinoe also improuve a little the original delphi source code. In this way you will need
-to go in <a href="https://github.com/Zeus64/alcinoe/tree/master/embarcadero/sydney/10_4_2/">{alcinoe_rootdir}\embarcadero\sydney\10_4_2\</a>
+to go in <a href="https://github.com/Zeus64/alcinoe/tree/master/embarcadero/sydney/10_4_2/">{alcinoe_rootdir}\embarcadero\sydney\10_4_2</a>
 and run update.bat to retrieve and patch the original delphi source code. The batch file
 assume that the original source code is located in "c:\Program Files (x86)\Embarcadero\Studio\21.0\source\" 
 and that you have GIT in your path. After the batch copied and patched the Delphi source code you will 
@@ -101,9 +101,9 @@ to be easy to customize and extend. Under iOS I use AVPlayer with support
 also HLS like ExoPlayer does
 
 <p align="left">
-  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-1.jpg?raw=true" alt="video player for FireMonkey" width="280" style="width:280px;"/>
-  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-2.jpg?raw=true" alt="video player for FireMonkey" width="280" style="width:280px;"/>
-  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-3.jpg?raw=true" alt="video player for FireMonkey" width="280" style="width:280px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-2.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-3.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
 </p>
 
 

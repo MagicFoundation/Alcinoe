@@ -3,12 +3,6 @@
 /demos/ALLiveVideoChat/client/_source/ios/frameworks/WebRTC.framework/Info.plist
 /demos/ALLiveVideoChat/client/_source/ios/frameworks/WebRTC.framework/LICENSE.md
 /demos/ALLiveVideoChat/client/_source/ios/frameworks/WebRTC.framework/WebRTC
-*.rsm 
-*.dcu 
-*.identcache 
-*.dproj.local 
-*.groupproj.local 
-*.stat
 /embarcadero/rio/10_3_3/fmx
 /embarcadero/rio/10_3_3/rtl
 /embarcadero/sydney/10_4_2/rtl

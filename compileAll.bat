@@ -54,6 +54,10 @@ SET FileName=%ProjectDir%\*.dproj.local
 del %FileName% /s
 if exist %FileName% goto ERROR
 
+SET FileName=%ProjectDir%\*.groupproj.local
+del %FileName% /s
+if exist %FileName% goto ERROR
+
 SET FileName=%ProjectDir%\*.deployproj.local
 del %FileName% /s
 if exist %FileName% goto ERROR

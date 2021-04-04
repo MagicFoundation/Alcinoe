@@ -3438,7 +3438,8 @@ begin
   end;
 end;
 
-{******************************************************************}
+{***********************}
+{$Q-} {Overflow Checking}
 procedure AlRDLEncryptStreamCBC(const InStream, OutStream : TStream;
                                 const Key;
                                 const KeySize : FixedInt;
@@ -3529,6 +3530,9 @@ begin
     OutStream.WriteBuffer(Block, I);
   end;
 end;
+{$IF defined(ALOverflowCheckingON)}
+  {$Q+} {Overflow Checking}
+{$ENDIF}
 
 {$IFNDEF ALHideAnsiString}
 
@@ -4908,7 +4912,7 @@ begin
   move(aBytes[0],result,sizeOf(result));
   result := result mod ARange;
   {$ELSE}
-  Result := (UInt64(Random(ALMAXUInt)) shl 32) or ((UInt64(Random(ALMAXUInt)) shl 32) shr 32);
+  Result := (UInt64(Random(ALMAXInt)) shl 32) or ((UInt64(Random(ALMAXInt)) shl 32) shr 32);
   result := result mod ARange;
   {$ENDIF}
 end;

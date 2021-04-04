@@ -4481,6 +4481,7 @@ end;
 {$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if system.SysUtils.TryStrToDateTime is still the same and adjust the IFDEF'}
 {$IFEND}
+{$R-} {Range-Checking}
 function ALTryStrToDateTime(const S: AnsiString; out Value: TDateTime;
   const AFormatSettings: TALFormatSettings): Boolean;
 var
@@ -4575,6 +4576,9 @@ begin
   else
     Result := ALTryStrToTime(S, Value, AFormatSettings)
 end;
+{$IF defined(ALRangeCheckingON)}
+  {$R+} {Range-Checking}
+{$IFEND}
 
 {*******************************************}
 function ALStrToDateTime(const S: AnsiString;
@@ -5492,27 +5496,32 @@ begin
   Result := _ALIntToHex(Value, digits);
 end;
 
-{**************************************************************************}
-procedure _ALBinToHex(Buffer: PAnsiChar; Text: PAnsiChar; BufSize: Integer); overload;
+{$ENDIF !ALHideAnsiString}
+
+{******************************************************************}
+procedure _ALBinToHex(Buffer: PByte; Text: PByte; BufSize: Integer);
 const
-  Convert: array[0..15] of AnsiChar = AnsiString('0123456789abcdef');
+  B2HConvert: array[0..15] of Byte = ($30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $61, $62, $63, $64, $65, $66);
 var
   I: Integer;
 begin
-  for I := 0 to BufSize - 1 do
+  for I := 0  to BufSize - 1 do
   begin
-    Text[0] := Convert[Byte(Buffer[I]) shr 4];
-    Text[1] := Convert[Byte(Buffer[I]) and $F];
-    Inc(Text, 2);
+    Text[I * 2] := B2HConvert[Buffer[I] shr 4];
+    Text[I * 2 + 1] := B2HConvert[Buffer[I] and $0F];
   end;
 end;
+
+{$IFNDEF ALHideAnsiString}
 
 {******************************************************************************}
 Function  ALTryBinToHex(const aBin: AnsiString; out Value: AnsiString): boolean;
 begin
   if aBin = '' then exit(false);
   setlength(Value,length(aBin) * 2);
-  _ALBinToHex(PansiChar(aBin),pansiChar(Value),length(aBin));
+  _ALBinToHex(PByte(@aBin[low(aBin)]),
+              PByte(@Value[low(Value)]),
+              length(aBin));
   result := true;
 end;
 
@@ -5528,7 +5537,9 @@ Function  ALTryBinToHex(const aBin; aBinSize : Cardinal; out Value: AnsiString):
 begin
   if aBinSize = 0 then exit(false);
   setlength(Value, aBinSize * 2);
-  _ALBinToHex(@aBin,pansiChar(Value),aBinSize);
+  _ALBinToHex(PByte(@aBin),
+              PByte(@Value[low(Value)]),
+              aBinSize);
   result := true;
 end;
 
@@ -5558,30 +5569,14 @@ end;
 
 {$ENDIF !ALHideAnsiString}
 
-{*********************************************************************************************************************}
-procedure _ALBinToHex(const Buffer: TBytes; BufOffset: Integer; var Text: TBytes; TextOffset: Integer; Count: Integer); overload;
-const
-  B2HConvert: array[0..15] of Byte = ($30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $61, $62, $63, $64, $65, $66);
-var
-  I: Integer;
-begin
-  for I := 0  to Count - 1 do
-  begin
-    Text[TextOffset + I * 2] := B2HConvert[Buffer[BufOffset + I] shr 4];
-    Text[TextOffset + I * 2 + 1] := B2HConvert[Buffer[BufOffset + I] and $0F];
-  end;
-end;
-
 {***********************************************************************}
 Function  ALTryBinToHexU(const aBin: TBytes; out Value: String): boolean;
 var bufOut: TBytes;
 begin
   if length(aBin) = 0 then exit(false);
   setlength(bufOut,length(aBin) * 2);
-  _ALBintoHex(aBin, // Buffer: TBytes
-              0, // BufOffset: Integer;
-              bufOut, // Text: TBytes;
-              0, // TextOffset: Integer;
+  _ALBintoHex(Pbyte(@aBin[0]), // Buffer: TBytes
+              Pbyte(@bufOut[0]), // Text: TBytes;
               length(aBin)); // Count: Integer
   Value := Tencoding.UTF8.GetString(bufOut); // UTF8 is good because bufOut must contain only low ascii chars
   result := true;
@@ -5600,10 +5595,8 @@ var bufOut: TBytes;
 begin
   if aBinSize = 0 then exit(false);
   setlength(bufOut,aBinSize * 2);
-  _ALBintoHex(Tbytes(@aBin), // Buffer: TBytes
-              0, // BufOffset: Integer;
-              bufOut, // Text: TBytes;
-              0, // TextOffset: Integer;
+  _ALBintoHex(Pbyte(@aBin), // Buffer: TBytes
+              Pbyte(@bufOut[0]), // Text: TBytes;
               aBinSize); // Count: Integer
   Value := Tencoding.UTF8.GetString(bufOut); // UTF8 is good because bufOut must contain only low ascii chars
   result := true;
@@ -9949,7 +9942,8 @@ var l: Integer;
 begin
    l:=aStream.Size-aStream.Position;
    SetLength(result, l);
-   aStream.ReadBuffer(result[0], l);
+   if L > 0 then
+     aStream.ReadBuffer(result[0], l);
 end;
 
 {******************************************************************************************************}

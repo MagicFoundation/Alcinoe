@@ -247,7 +247,7 @@ function  ALCalcHMACMD5(const Str, Key : AnsiString): AnsiString;
  //So you would not use this new crc32c() function to replace the zlib's crc32()
  //function, but as a convenient very fast hashing function at application level.
 
-{$IFDEF ALCPUX}
+{$IFDEF ALCPUXASM}
 {$IFNDEF ALHideAnsiString}
 
 /// compute CRC32 checksum on the supplied buffer
@@ -266,7 +266,7 @@ var ALHashCrc64: function(buf: PAnsiChar; len: cardinal): int64;
 procedure ALTestCRC32Implementation(const aSavedResultsFilename: AnsiString = '');
 
 {$ENDIF}
-{$ENDIF ALCPUX}
+{$ENDIF ALCPUXASM}
 
 
 
@@ -4795,7 +4795,7 @@ end;
 
 {$ENDIF MSWINDOWS}
 
-{$IFDEF ALCPUX}
+{$IFDEF ALCPUXASM}
 
 {*******************************************************************************************************************}
 // https://software.intel.com/en-us/articles/intel-digital-random-number-generator-drng-software-implementation-guide
@@ -4884,7 +4884,7 @@ begin
   raise Exception.Create('RDRand failed!');
 end;
 
-{$ENDIF ALCPUX}
+{$ENDIF ALCPUXASM}
 
 {************************************************************}
 function ALRandom32_Default(const ARange: Cardinal): cardinal;
@@ -4923,7 +4923,7 @@ end;
 ////// CRC32 //////
 ///////////////////
 
-{$IFDEF ALCPUX}
+{$IFDEF ALCPUXASM}
 {$IFNDEF ALHideAnsiString}
 
 //!!!!! ///////////////////////////////////////////////////////////// !!!!!//
@@ -5391,7 +5391,7 @@ begin
 end;
 
 {$ENDIF !ALHideAnsiString}
-{$ENDIF ALCPUX}
+{$ENDIF ALCPUXASM}
 
 
 
@@ -5956,7 +5956,7 @@ end;
 {********************}
 procedure _InitCipher;
 
-{$IFDEF ALCPUX}
+{$IFDEF ALCPUXASM}
 {$IFNDEF ALHideAnsiString}
 var i,n: integer;
     crc: cardinal;
@@ -5969,7 +5969,7 @@ begin
   ALRandom32 := ALRandom32_Default;
   ALRandom64 := ALRandom64_Default;
 
-  {$IFDEF ALCPUX}
+  {$IFDEF ALCPUXASM}
 
   //https://en.wikipedia.org/wiki/CPUID#EAX.3D1:_Processor_Info_and_Feature_Bits
   //The processor info and feature flags are manufacturer specific but usually the
@@ -6077,7 +6077,7 @@ begin
   end;
   {$ENDIF !ALHideAnsiString}
 
-  {$ENDIF ALCPUX}
+  {$ENDIF ALCPUXASM}
 
 end;
 

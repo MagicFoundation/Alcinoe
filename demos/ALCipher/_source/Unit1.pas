@@ -505,6 +505,8 @@ begin
     aStopWatch.Start;
     aHash := ALBinToHex(aData);
     aStopWatch.Stop;
+    if ALHexToBin(aHash) <> aData then
+      raise Exception.Create('Test failed!');
     inc(acounter);
     if millisecondsbetween(now, aLastGUIUpdate) > 200 then begin
       aLastGUIUpdate := now;
@@ -872,6 +874,7 @@ end;
 
 procedure TForm1.Button18Click(Sender: TObject);
 Var aData: Tbytes;
+    aData2: Tbytes;
     aHash: String;
     aCounter: integer;
     aStopWatch: TstopWatch;
@@ -904,6 +907,10 @@ begin
     aStopWatch.Start;
     aHash := ALBinToHexU(aData);
     aStopWatch.Stop;
+    aData2 := ALHexToBinU(aHash);
+    if (length(aData2) <> length(aData)) or
+       (not comparemem(@aData2[0], @aData[0], length(aData2))) then
+      raise Exception.Create('Test failed!');
     inc(acounter);
     if millisecondsbetween(now, aLastGUIUpdate) > 200 then begin
       aLastGUIUpdate := now;

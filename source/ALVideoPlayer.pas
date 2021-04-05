@@ -361,6 +361,7 @@ type
     procedure seekTo(const msec: Int64);
     procedure setLooping(const looping: Boolean);
     procedure setVolume(const Value: Single);
+    procedure setPlaybackSpeed(const Value: single);
     property bitmap: TBitmap read fbitmap;
     property OnError: TNotifyEvent read fOnErrorEvent write fOnErrorEvent;
     property OnPrepared: TNotifyEvent read fOnPreparedEvent write fOnPreparedEvent;
@@ -2089,6 +2090,11 @@ end;
 
 {***********************************************************}
 procedure TALMacOSVideoPlayer.setVolume(const Value: Single);
+begin
+end;
+
+{******************************************************************}
+procedure TALMacOSVideoPlayer.setPlaybackSpeed(const Value: single);
 begin
 end;
 

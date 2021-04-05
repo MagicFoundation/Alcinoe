@@ -11,6 +11,10 @@
   {$DEFINE ALCPUX} // The CPU is in an Intel 386 or supports the x86-64 instruction set on any platform.
 {$ENDIF}
 
+{$IF defined(ALCPUX) and defined(MSWINDOWS)}
+  {$DEFINE ALCPUXASM} // The CPU is in an Intel 386 or supports the x86-64 instruction set on any platform AND the compiler support the inline Assembly Code
+{$ENDIF}
+
 {$IFDEF CPUX86} // CPU is an Intel 386 or later on any platform. *New* in XE2/x64
   {$DEFINE X86ASM} // Duplicate of CPUX86 used in original delphi source code to activate usage of ASM code
 {$ELSE}

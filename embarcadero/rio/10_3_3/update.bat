@@ -15,18 +15,20 @@ mkdir %FileName%
 mkdir %FileName%\ios
 mkdir %FileName%\android
 
-echo Copy "c:\Program Files (x86)\Embarcadero\Studio\20.0\source\fmx" to "%ProjectDir%\fmx"
-xcopy "c:\Program Files (x86)\Embarcadero\Studio\20.0\source\fmx" "%ProjectDir%\fmx"
+set EmbDir=c:\Program Files (x86)\Embarcadero\Studio\20.0\source
+
+echo Copy "%EmbDir%\fmx" to "%ProjectDir%\embarcadero\rio\10_3_3\fmx"
+xcopy "%EmbDir%\fmx" "%ProjectDir%\embarcadero\rio\10_3_3\fmx"
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
-echo Copy "c:\Program Files (x86)\Embarcadero\Studio\20.0\source\rtl\ios" to "%ProjectDir%\rtl\ios"
-xcopy "c:\Program Files (x86)\Embarcadero\Studio\20.0\source\rtl\ios" "%ProjectDir%\rtl\ios"
+echo Copy "%EmbDir%\rtl\ios" to "%ProjectDir%\embarcadero\rio\10_3_3\rtl\ios"
+xcopy "%EmbDir%\rtl\ios" "%ProjectDir%\embarcadero\rio\10_3_3\rtl\ios"
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
-echo Copy "c:\Program Files (x86)\Embarcadero\Studio\20.0\source\rtl\android" to "%ProjectDir%\rtl\android"
-xcopy "c:\Program Files (x86)\Embarcadero\Studio\20.0\source\rtl\android" "%ProjectDir%\rtl\android"
+echo Copy "%EmbDir%\rtl\android" to "%ProjectDir%\embarcadero\rio\10_3_3\rtl\android"
+xcopy "%EmbDir%\rtl\android" "%ProjectDir%\embarcadero\rio\10_3_3\rtl\android"
 IF ERRORLEVEL 1 goto ERROR
 echo.
 

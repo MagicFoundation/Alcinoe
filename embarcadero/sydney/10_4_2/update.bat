@@ -1,32 +1,34 @@
 @echo off
 
+set EmbDir=c:\Program Files (x86)\Embarcadero\Studio\21.0\source
+
 FOR %%a IN ("%%~dp0") DO set "ProjectDir=%%~dpa"
 IF %ProjectDir:~-1%==\ SET ProjectDir=%ProjectDir:~0,-1%
 
-SET FileName=%ProjectDir%\fmx
+SET FileName=%ProjectDir%\embarcadero\sydney\10_4_2\fmx
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 mkdir %FileName%
 
-SET FileName=%ProjectDir%\rtl
+SET FileName=%ProjectDir%\embarcadero\sydney\10_4_2\rtl
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 mkdir %FileName%
 mkdir %FileName%\ios
 mkdir %FileName%\android
 
-echo Copy "c:\Program Files (x86)\Embarcadero\Studio\21.0\source\fmx" to "%ProjectDir%\fmx"
-xcopy "c:\Program Files (x86)\Embarcadero\Studio\21.0\source\fmx" "%ProjectDir%\fmx"
+echo Copy "%EmbDir%\fmx" to "%ProjectDir%\embarcadero\sydney\10_4_2\fmx"
+xcopy "%EmbDir%\fmx" "%ProjectDir%\embarcadero\sydney\10_4_2\fmx"
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
-echo Copy "c:\Program Files (x86)\Embarcadero\Studio\21.0\source\rtl\ios" to "%ProjectDir%\rtl\ios"
-xcopy "c:\Program Files (x86)\Embarcadero\Studio\21.0\source\rtl\ios" "%ProjectDir%\rtl\ios"
+echo Copy "%EmbDir%\rtl\ios" to "%ProjectDir%\embarcadero\sydney\10_4_2\rtl\ios"
+xcopy "%EmbDir%\rtl\ios" "%ProjectDir%\embarcadero\sydney\10_4_2\rtl\ios"
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
-echo Copy "c:\Program Files (x86)\Embarcadero\Studio\21.0\source\rtl\android" to "%ProjectDir%\rtl\android"
-xcopy "c:\Program Files (x86)\Embarcadero\Studio\21.0\source\rtl\android" "%ProjectDir%\rtl\android"
+echo Copy "%EmbDir%\rtl\android" to "%ProjectDir%\embarcadero\sydney\10_4_2\rtl\android"
+xcopy "%EmbDir%\rtl\android" "%ProjectDir%\embarcadero\sydney\10_4_2\rtl\android"
 IF ERRORLEVEL 1 goto ERROR
 echo.
 

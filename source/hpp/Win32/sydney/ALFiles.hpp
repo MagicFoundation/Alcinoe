@@ -35,6 +35,8 @@ extern DELPHI_PACKAGE System::TDateTime __fastcall ALGetFileCreationDateTime(con
 extern DELPHI_PACKAGE System::TDateTime __fastcall ALGetFileLastWriteDateTime(const System::AnsiString aFileName);
 extern DELPHI_PACKAGE System::TDateTime __fastcall ALGetFileLastAccessDateTime(const System::AnsiString aFileName);
 extern DELPHI_PACKAGE void __fastcall ALSetFileCreationDateTime(const System::AnsiString aFileName, const System::TDateTime aCreationDateTime);
+extern DELPHI_PACKAGE void __fastcall ALSetFileLastWriteDateTime(const System::AnsiString aFileName, const System::TDateTime aLastWriteDateTime);
+extern DELPHI_PACKAGE void __fastcall ALSetFileLastAccessDateTime(const System::AnsiString aFileName, const System::TDateTime aLastAccessDateTime);
 extern DELPHI_PACKAGE bool __fastcall ALIsDirectoryEmpty(const System::AnsiString directory);
 extern DELPHI_PACKAGE bool __fastcall ALFileExists(const System::AnsiString Path);
 extern DELPHI_PACKAGE bool __fastcall ALDirectoryExists(const System::AnsiString Directory);

@@ -847,29 +847,26 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\iOSDevice64\Debug\ALLiveVideoChatClient" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="iOSDevice64">
-                        <RemoteName>ALLiveVideoChatClient</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="ios\frameworks\WebRTC.framework\_CodeSignature\CodeResources" Configuration="Debug" Class="File">
-                    <Platform Name="iOSDevice32">
-                        <RemoteDir>.\Frameworks\WebRTC.framework\_CodeSignature</RemoteDir>
-                        <Operation>1</Operation>
-                        <RemoteName>CodeResources</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png" Configuration="Debug" Class="iPhone_LaunchDark3x">
-                    <Platform Name="iOSDevice64">
-                        <RemoteName>FM_LaunchScreenImage_iPhoneDark@3x.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png" Configuration="Release" Class="Android_LauncherIcon192">
                     <Platform Name="Android">
                         <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\Android64\Release\colors.xml" Configuration="Release" Class="Android_Colors">
+                    <Platform Name="Android64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so" Configuration="Release" Class="AndroidLibnativeArmeabiv7aFile">
+                    <Platform Name="Android64">
+                        <RemoteName>libALLiveVideoChatClient.so</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\iOSDevice64\Debug\ALLiveVideoChatClient" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="iOSDevice64">
+                        <RemoteName>ALLiveVideoChatClient</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -886,14 +883,17 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\Android64\Release\colors.xml" Configuration="Release" Class="Android_Colors">
-                    <Platform Name="Android64">
+                <DeployFile LocalName="ios\frameworks\WebRTC.framework\_CodeSignature\CodeResources" Configuration="Debug" Class="File">
+                    <Platform Name="iOSDevice32">
+                        <RemoteDir>.\Frameworks\WebRTC.framework\_CodeSignature</RemoteDir>
+                        <Operation>1</Operation>
+                        <RemoteName>CodeResources</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so" Configuration="Release" Class="AndroidLibnativeArmeabiv7aFile">
-                    <Platform Name="Android64">
-                        <RemoteName>libALLiveVideoChatClient.so</RemoteName>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png" Configuration="Debug" Class="iPhone_LaunchDark3x">
+                    <Platform Name="iOSDevice64">
+                        <RemoteName>FM_LaunchScreenImage_iPhoneDark@3x.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

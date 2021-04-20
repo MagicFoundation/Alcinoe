@@ -14,6 +14,7 @@ IF EXIST %FileName% goto ERROR
 mkdir %FileName%
 mkdir %FileName%\ios
 mkdir %FileName%\android
+mkdir %FileName%\win
 
 echo Copy "c:\Program Files (x86)\Embarcadero\Studio\21.0\source\fmx" to "%ProjectDir%\fmx"
 xcopy "c:\Program Files (x86)\Embarcadero\Studio\21.0\source\fmx" "%ProjectDir%\fmx"
@@ -30,10 +31,17 @@ xcopy "c:\Program Files (x86)\Embarcadero\Studio\21.0\source\rtl\android" "%Proj
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
+echo Copy "c:\Program Files (x86)\Embarcadero\Studio\21.0\source\rtl\win" to "%ProjectDir%\rtl\win"
+xcopy "c:\Program Files (x86)\Embarcadero\Studio\21.0\source\rtl\win" "%ProjectDir%\rtl\win"
+IF ERRORLEVEL 1 goto ERROR
+echo.
+
 echo Patch the source code
 git apply sydney_10_4_2.patch -v
 IF ERRORLEVEL 1 goto ERROR
 echo.
+
+FOR %%a IN ("%ProjectDir%\rtl\win\*") DO IF /i NOT "%%~nxa"=="Winapi.Isapi2.pas" DEL "%%a"
 
 :FINISHED
 @echo Finished

@@ -6,7 +6,7 @@
     <PropertyGroup>
         <DeviceId Condition="'$(Platform)'=='Android'"/>
         <DeviceId Condition="'$(Platform)'=='Android64'"/>
-        <DeviceId Condition="'$(Platform)'=='iOSDevice64'"/>
+        <DeviceId Condition="'$(Platform)'=='iOSDevice64'">62b33d7c49d0205577b0ff7e84ca992988118bd2</DeviceId>
         <DeviceId Condition="'$(Platform)'=='iOSSimulator'">3D44E3BB-68B0-429A-BDFB-EAA8C58E49B9</DeviceId>
     </PropertyGroup>
     <ItemGroup Condition="'$(Platform)'=='iOSDevice64'">
@@ -684,18 +684,18 @@
             <Overwrite>True</Overwrite>
             <Required>True</Required>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-hdpi\ic_launcher.png" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFmxControls\res\drawable-hdpi\</RemoteDir>
+        <DeployFile Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFmxControls\res\drawable-xxxhdpi\</RemoteDir>
             <RemoteName>ic_launcher.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
+            <DeployClass>Android_LauncherIcon192</DeployClass>
+            <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFmxControls\res\drawable-mdpi\</RemoteDir>
-            <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+        <DeployFile Include="android\res\drawable-hdpi\ic_launcher.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\res\drawable-hdpi\</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -712,11 +712,11 @@
             <Overwrite>True</Overwrite>
             <Required>True</Required>
         </DeployFile>
-        <DeployFile Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFmxControls\res\drawable-xxxhdpi\</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
-            <DeployClass>Android_LauncherIcon192</DeployClass>
-            <Operation>1</Operation>
+        <DeployFile Include="android\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\res\drawable-mdpi\</RemoteDir>
+            <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -1139,19 +1139,19 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-xxhdpi\text_select_handle_middle_mtrl_alpha.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFmxControls\res\drawable-xxhdpi\</RemoteDir>
-            <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-            <DeployClass>File</DeployClass>
+        <DeployFile Include="resources\radio_checked_88x88.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\assets\internal\</RemoteDir>
+            <RemoteName>radio_checked_88x88.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="resources\radio_checked_88x88.png" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFmxControls\assets\internal\</RemoteDir>
-            <RemoteName>radio_checked_88x88.png</RemoteName>
-            <DeployClass>ProjectFile</DeployClass>
+        <DeployFile Include="android\res\drawable-xxhdpi\text_select_handle_middle_mtrl_alpha.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFmxControls\res\drawable-xxhdpi\</RemoteDir>
+            <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+            <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
@@ -1410,15 +1410,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="android\res\drawable-hdpi\ic_launcher.png" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFmxControls\res\drawable-hdpi\</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="..\Android64\Release\colors.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFmxControls\res\values\</RemoteDir>
             <RemoteName>colors.xml</RemoteName>
@@ -1433,6 +1424,15 @@
             <RemoteName>libALFmxControls.so</RemoteName>
             <DeployClass>AndroidLibnativeArmeabiv7aFile</DeployClass>
             <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="android\res\drawable-hdpi\ic_launcher.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\res\drawable-hdpi\</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>

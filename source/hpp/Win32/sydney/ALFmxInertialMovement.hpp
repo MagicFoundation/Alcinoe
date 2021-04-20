@@ -83,6 +83,7 @@ private:
 	
 private:
 	NativeUInt FTimerHandle;
+	int fmouseEventConsumed;
 	bool FTimerActive;
 	double FVelocityFactor;
 	bool FEnabled;
@@ -106,7 +107,6 @@ private:
 	bool FCancelTargetX;
 	bool FCancelTargetY;
 	System::Classes::TNotifyEvent FOnStart;
-	System::Classes::TNotifyEvent FOnTimer;
 	System::Classes::TNotifyEvent FOnChanged;
 	System::Classes::TNotifyEvent FOnStop;
 	bool FDown;
@@ -243,10 +243,10 @@ public:
 	void __fastcall EndUpdate();
 	__property int UpdateCount = {read=FUpdateCount, nodefault};
 	__property System::Classes::TNotifyEvent OnStart = {read=FOnStart, write=FOnStart};
-	__property System::Classes::TNotifyEvent OnTimer = {read=FOnTimer, write=FOnTimer};
 	__property System::Classes::TNotifyEvent OnChanged = {read=FOnChanged, write=FOnChanged};
 	__property System::Classes::TNotifyEvent OnStop = {read=FOnStop, write=FOnStop};
 	__property int DeadZone = {read=FDeadZone, write=FDeadZone, default=8};
+	__property int mouseEventConsumed = {read=fmouseEventConsumed, write=fmouseEventConsumed, nodefault};
 	__property bool TimerActive = {read=FTimerActive, nodefault};
 	
 __published:
@@ -269,6 +269,7 @@ static const System::Int8 ALDefaultMinVelocity = System::Int8(0xa);
 static const System::Word ALDefaultMaxVelocity = System::Word(0x1388);
 static const System::Int8 ALDefaultDeadZone = System::Int8(0x8);
 static const System::Int8 ALDefaultVelocityFactor = System::Int8(0x1);
+extern DELPHI_PACKAGE System::Generics::Collections::TList__1<TALAniCalculations*>* ALAniCalcTimerProcs;
 }	/* namespace Alfmxinertialmovement */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALFMXINERTIALMOVEMENT)
 using namespace Alfmxinertialmovement;

@@ -375,7 +375,7 @@ function  ALUTF8CharCount(const S: AnsiString): Integer;
 Function  ALUTF8ByteTrunc(const s:AnsiString; const Count: Integer): AnsiString;
 Function  ALUTF8CharTrunc(const s:AnsiString; const Count: Integer): AnsiString;
 Function  ALUTF8Encode(const S: RawByteString; const aCodePage: Word): AnsiString;
-Function  ALUTF8decode(const S: UTF8String; const aCodePage: Word): AnsiString;
+Function  ALStringDecode(const S: AnsiString; const aCodePage: Word): AnsiString;
 Function  ALGetCodePageFromCharSetName(Acharset:AnsiString): Word;
 {$IF defined(MSWINDOWS)}
 Function  ALGetCodePageFromLCID(const aLCID:Integer): Word;
@@ -615,6 +615,7 @@ Procedure ALSplitTextAndTag(Const SourceString, TagStart, TagEnd: AnsiString;
 ////////////////////////////
 
 {$IFNDEF ALHideAnsiString}
+Function  ALUTF8Decode(const S: UTF8String; const aCodePage: Word): AnsiString; deprecated 'use ALStringDecode instead';
 Function  ALUTF8TitleCase(const s:AnsiString): AnsiString; deprecated 'use ALTitleCase instead with SetMultiByteConversionCodePage(CP_UTF8)';
 Function  ALUTF8SentenceCase(const s:AnsiString): AnsiString; deprecated 'use ALSentenceCase instead with SetMultiByteConversionCodePage(CP_UTF8)';
 {$IF defined(MSWINDOWS)}
@@ -11034,21 +11035,15 @@ end;
 Function ALUTF8Encode(const S: RawByteString; const aCodePage: Word): AnsiString;
 var TmpS: RawByteString;
 begin
-  //Result := UTF8Encode(ALStringToWideString(S, aCodePage));
-  //it's look like the code below is a little (15%) more faster then
-  //the previous implementation, and it's compatible with OSX
   TmpS := S;
   SetCodePage(TmpS, aCodePage, False);
   result := UTF8Encode(String(TmpS));
 end;
 
-{****************************************************************************}
-Function ALUTF8decode(const S: UTF8String; const aCodePage: Word): AnsiString;
+{******************************************************************************}
+Function ALStringDecode(const S: AnsiString; const aCodePage: Word): AnsiString;
 begin
-  //Result := ALWideStringToString(UTF8ToWideString(S), aCodePage);
-  //it's look like the code below is a little (15%) more faster then
-  //the previous implementation, and it's compatible with OSX
-  result := ansiString(S);
+  result := S;
   SetCodePage(RawByteString(Result), aCodePage, true);
 end;
 
@@ -11777,6 +11772,13 @@ end;
 //////////////////
 
 {$IFNDEF ALHideAnsiString}
+
+{**********}
+//deprecated
+Function  ALUTF8Decode(const S: UTF8String; const aCodePage: Word): AnsiString; deprecated 'use ALStringDecode instead';
+begin
+  result := ALStringDecode(ansiString(s), aCodePage);
+end;
 
 {**********}
 //deprecated

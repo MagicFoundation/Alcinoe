@@ -549,7 +549,7 @@ extern DELPHI_PACKAGE int __fastcall ALUTF8CharCount(const System::AnsiString S)
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALUTF8ByteTrunc(const System::AnsiString s, const int Count);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALUTF8CharTrunc(const System::AnsiString s, const int Count);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALUTF8Encode(const System::RawByteString S, const System::Word aCodePage);
-extern DELPHI_PACKAGE System::AnsiString __fastcall ALUTF8decode(const System::UTF8String S, const System::Word aCodePage);
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALStringDecode(const System::AnsiString S, const System::Word aCodePage);
 extern DELPHI_PACKAGE System::Word __fastcall ALGetCodePageFromCharSetName(System::AnsiString Acharset);
 extern DELPHI_PACKAGE System::Word __fastcall ALGetCodePageFromLCID(const int aLCID);
 extern DELPHI_PACKAGE bool __fastcall ALExtractExpression(const System::AnsiString S, const char OpenChar, const char CloseChar, const char *QuoteChars, const int QuoteChars_High, const char EscapeQuoteChar, int &StartPos, int &EndPos);
@@ -560,6 +560,7 @@ extern DELPHI_PACKAGE void __fastcall ALExtractHeaderFieldsWithQuoteEscaped(cons
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALHTTPEncodeU(const System::UnicodeString AStr);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALHTTPDecodeU(const System::UnicodeString AStr);
 extern DELPHI_PACKAGE void __fastcall ALExtractHeaderFieldsWithQuoteEscapedU(const System::Sysutils::TSysCharSet &Separators, const System::Sysutils::TSysCharSet &WhiteSpace, const System::Sysutils::TSysCharSet &Quotes, System::WideChar * Content, Alstringlist::TALStringsU* Strings, bool HttpDecode, bool StripQuotes = false);
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALUTF8Decode _DEPRECATED_ATTRIBUTE1("use ALStringDecode instead") (const System::UTF8String S, const System::Word aCodePage);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALUTF8TitleCase _DEPRECATED_ATTRIBUTE1("use ALTitleCase instead with SetMultiByteConversionCodePage(CP_UTF8)") (const System::AnsiString s);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALUTF8SentenceCase _DEPRECATED_ATTRIBUTE1("use ALSentenceCase instead with SetMultiByteConversionCodePage(CP_UTF8)") (const System::AnsiString s);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALUTF8Normalize _DEPRECATED_ATTRIBUTE1("use ALStringNormalize instead with SetMultiByteConversionCodePage(CP_UTF8)") (const System::AnsiString S, const char WordSeparator, const char *SymbolsToIgnore, const int SymbolsToIgnore_High)/* overload */;

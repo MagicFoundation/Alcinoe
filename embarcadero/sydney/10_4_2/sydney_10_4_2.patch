@@ -1,7 +1,7 @@
 Index: fmx/FMX.Canvas.GPU.Helpers.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.Helpers.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.Helpers.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.Helpers.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.Helpers.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.Helpers.pas	(working copy)
 @@ -12,11 +12,12 @@
  
@@ -54,7 +54,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.Helpers.pas b/embarcad
 Index: fmx/FMX.Canvas.GPU.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.pas	(working copy)
 @@ -72,6 +72,8 @@
  procedure RegisterCanvasClasses;
@@ -81,7 +81,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.pas b/embarcadero/sydn
 Index: fmx/FMX.Context.GLES.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Context.GLES.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Context.GLES.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Context.GLES.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.Context.GLES.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.Context.GLES.pas	(working copy)
 @@ -188,7 +188,7 @@
  {$IFDEF MACOS}
@@ -112,7 +112,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Context.GLES.pas b/embarcadero/sy
 Index: fmx/FMX.Controls.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Controls.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Controls.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Controls.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.Controls.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.Controls.pas	(working copy)
 @@ -113,7 +113,7 @@
      /// <summary>Register a class to create hint instances. When a new THint instance is needed, the registered classes are invoked
@@ -309,7 +309,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Controls.pas b/embarcadero/sydney
 Index: fmx/FMX.Dialogs.iOS.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Dialogs.iOS.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Dialogs.iOS.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Dialogs.iOS.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.Dialogs.iOS.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.Dialogs.iOS.pas	(working copy)
 @@ -246,7 +246,7 @@
    try
@@ -359,7 +359,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Dialogs.iOS.pas b/embarcadero/syd
 Index: fmx/FMX.Edit.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Edit.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Edit.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Edit.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.Edit.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.Edit.pas	(working copy)
 @@ -11,6 +11,7 @@
  
@@ -372,7 +372,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Edit.pas b/embarcadero/sydney/10_
 Index: fmx/FMX.Filter.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Filter.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Filter.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Filter.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.Filter.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.Filter.pas	(working copy)
 @@ -11,6 +11,7 @@
  
@@ -420,7 +420,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Filter.pas b/embarcadero/sydney/1
 Index: fmx/FMX.Forms.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Forms.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Forms.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Forms.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.Forms.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.Forms.pas	(working copy)
 @@ -9,6 +9,7 @@
  
@@ -472,7 +472,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Forms.pas b/embarcadero/sydney/10
 Index: fmx/FMX.Graphics.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Graphics.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Graphics.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Graphics.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.Graphics.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.Graphics.pas	(working copy)
 @@ -2949,6 +2949,9 @@
    if FFontColor <> Value then
@@ -496,7 +496,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Graphics.pas b/embarcadero/sydney
 Index: fmx/FMX.Materials.Canvas.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Materials.Canvas.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Materials.Canvas.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Materials.Canvas.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.Materials.Canvas.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.Materials.Canvas.pas	(working copy)
 @@ -440,18 +440,46 @@
      {$ENDREGION}
@@ -560,7 +560,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Materials.Canvas.pas b/embarcader
 Index: fmx/FMX.Platform.iOS.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Platform.iOS.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Platform.iOS.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Platform.iOS.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.Platform.iOS.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.Platform.iOS.pas	(working copy)
 @@ -1,4 +1,4 @@
 -{*******************************************************}
@@ -668,7 +668,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Platform.iOS.pas b/embarcadero/sy
 Index: fmx/FMX.Platform.UI.Android.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Platform.UI.Android.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Platform.UI.Android.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Platform.UI.Android.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.Platform.UI.Android.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.Platform.UI.Android.pas	(working copy)
 @@ -18,7 +18,7 @@
    Androidapi.JNI.Embarcadero, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Widget, Androidapi.JNI.JavaTypes,
@@ -727,7 +727,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Platform.UI.Android.pas b/embarca
 Index: fmx/FMX.StrokeBuilder.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.StrokeBuilder.pas b/embarcadero/sydney/10_4_2/fmx/FMX.StrokeBuilder.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.StrokeBuilder.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.StrokeBuilder.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.StrokeBuilder.pas	(working copy)
 @@ -1074,9 +1074,11 @@
    FUndeterminedMode := True;
@@ -747,7 +747,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.StrokeBuilder.pas b/embarcadero/s
 Index: fmx/FMX.Types3D.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Types3D.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Types3D.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Types3D.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.Types3D.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.Types3D.pas	(working copy)
 @@ -3089,6 +3089,7 @@
    begin
@@ -760,7 +760,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Types3D.pas b/embarcadero/sydney/
 Index: fmx/FMX.VirtualKeyboard.Android.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.VirtualKeyboard.Android.pas b/embarcadero/sydney/10_4_2/fmx/FMX.VirtualKeyboard.Android.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.VirtualKeyboard.Android.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.VirtualKeyboard.Android.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.VirtualKeyboard.Android.pas	(working copy)
 @@ -213,8 +213,15 @@
    VKRect.TopLeft := ConvertPixelToPoint(TPointF.Create(newFrame.Left, newFrame.Top)).Round;
@@ -783,7 +783,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.VirtualKeyboard.Android.pas b/emb
 Index: fmx/FMX.WebBrowser.Android.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Android.pas b/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Android.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Android.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Android.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Android.pas	(working copy)
 @@ -70,6 +70,7 @@
      FChildrenContainer: JViewGroup;
@@ -871,7 +871,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Android.pas b/embarcad
 Index: fmx/FMX.WebBrowser.Cocoa.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Cocoa.pas b/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Cocoa.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Cocoa.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Cocoa.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Cocoa.pas	(working copy)
 @@ -45,6 +45,7 @@
  
@@ -952,7 +952,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Cocoa.pas b/embarcader
 Index: fmx/FMX.WebBrowser.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.pas b/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.pas	(working copy)
 @@ -40,6 +40,7 @@
      function GetParent: TFmxObject;
@@ -988,7 +988,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.pas b/embarcadero/sydn
 Index: fmx/FMX.WebBrowser.Win.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Win.pas b/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Win.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Win.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Win.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Win.pas	(working copy)
 @@ -70,6 +70,7 @@
      procedure SetWebBrowserControl(const AValue: TCustomWebBrowser);
@@ -1013,7 +1013,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Win.pas b/embarcadero/
 Index: rtl/android/Androidapi.JNI.App.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.App.pas b/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.App.pas
---- a/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.App.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.App.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.App.pas	(working copy)
 @@ -16,7 +16,8 @@
    Androidapi.JNI.JavaTypes,
@@ -1084,7 +1084,7 @@ diff --git a/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.App.pas b/emba
 Index: rtl/android/Androidapi.JNI.Location.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.Location.pas b/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.Location.pas
---- a/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.Location.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.Location.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.Location.pas	(working copy)
 @@ -660,6 +660,7 @@
      procedure unregisterGnssMeasurementsCallback(callback: JGnssMeasurementsEvent_Callback); cdecl;
@@ -1097,7 +1097,7 @@ diff --git a/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.Location.pas b
 Index: rtl/ios/iOSapi.AVFoundation.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.AVFoundation.pas b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.AVFoundation.pas
---- a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.AVFoundation.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.AVFoundation.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.AVFoundation.pas	(working copy)
 @@ -730,6 +730,8 @@
      function timedMetadata: NSArray; cdecl;
@@ -1111,7 +1111,7 @@ diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.AVFoundation.pas b/embarca
 Index: rtl/ios/iOSapi.CoreImage.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreImage.pas b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreImage.pas
---- a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreImage.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreImage.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreImage.pas	(working copy)
 @@ -218,8 +218,25 @@
    end;
@@ -1143,7 +1143,7 @@ diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreImage.pas b/embarcader
 Index: rtl/ios/iOSapi.CoreLocation.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreLocation.pas b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreLocation.pas
---- a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreLocation.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreLocation.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreLocation.pas	(working copy)
 @@ -33,7 +33,7 @@
    kCLAuthorizationStatusNotDetermined = 0;
@@ -1212,7 +1212,7 @@ diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreLocation.pas b/embarca
 Index: rtl/ios/iOSapi.Foundation.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Foundation.pas b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Foundation.pas
---- a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Foundation.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Foundation.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Foundation.pas	(working copy)
 @@ -5566,8 +5566,28 @@
        downloadTask: NSURLSessionDownloadTask; didResumeAtOffset: Int64; expectedTotalBytes: Int64); cdecl;
@@ -1303,7 +1303,7 @@ diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Foundation.pas b/embarcade
 Index: rtl/ios/iOSapi.Security.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Security.pas b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Security.pas
---- a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Security.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Security.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Security.pas	(working copy)
 @@ -620,6 +620,8 @@
  function kSecAttrKeyClassSymmetric: NSString;
@@ -1336,7 +1336,7 @@ diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Security.pas b/embarcadero
 Index: rtl/ios/iOSapi.UIKit.pas
 ===================================================================
 diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.UIKit.pas b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.UIKit.pas
---- a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.UIKit.pas	(revision 25103)
+--- a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.UIKit.pas	(revision 25178)
 +++ b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.UIKit.pas	(working copy)
 @@ -3828,7 +3828,7 @@
      function currentUserNotificationSettings: UIUserNotificationSettings; cdecl;
@@ -1458,3 +1458,17 @@ diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.UIKit.pas b/embarcadero/sy
  {$IF defined(IOS) and NOT defined(CPUARM)}
  
  initialization
+Index: rtl/win/Winapi.Isapi2.pas
+===================================================================
+diff --git a/embarcadero/sydney/10_4_2/rtl/win/Winapi.Isapi2.pas b/embarcadero/sydney/10_4_2/rtl/win/Winapi.Isapi2.pas
+--- a/embarcadero/sydney/10_4_2/rtl/win/Winapi.Isapi2.pas	(revision 25178)
++++ b/embarcadero/sydney/10_4_2/rtl/win/Winapi.Isapi2.pas	(working copy)
+@@ -397,7 +397,7 @@
+     dwReserved: DWORD): Pointer; stdcall;
+ 
+   TFilterServerSupportFunctionProc = function (var pfc{: THTTP_FILTER_CONTEXT};
+-    sfReq: DWORD; pData: Pointer; ul1, ul2: DWORD): BOOL; stdcall;
++    sfReq: DWORD; pData: Pointer; ul1, ul2: ULONG_PTR): BOOL; stdcall; // https://quality.embarcadero.com/browse/RSP-33754
+ 
+   PHTTP_FILTER_CONTEXT = ^THTTP_FILTER_CONTEXT;
+   THTTP_FILTER_CONTEXT = record

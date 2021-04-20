@@ -33,6 +33,8 @@ function  ALGetFileCreationDateTime(const aFileName: Ansistring): TDateTime;
 function  ALGetFileLastWriteDateTime(const aFileName: Ansistring): TDateTime;
 function  ALGetFileLastAccessDateTime(const aFileName: Ansistring): TDateTime;
 Procedure ALSetFileCreationDateTime(Const aFileName: Ansistring; Const aCreationDateTime: TDateTime);
+Procedure ALSetFileLastWriteDateTime(Const aFileName: Ansistring; Const aLastWriteDateTime: TDateTime);
+Procedure ALSetFileLastAccessDateTime(Const aFileName: Ansistring; Const aLastAccessDateTime: TDateTime);
 function  ALIsDirectoryEmpty(const directory: ansiString): boolean;
 function  ALFileExists(const Path: ansiString): boolean;
 function  ALDirectoryExists(const Directory: Ansistring): Boolean;
@@ -312,6 +314,42 @@ Begin
     if (not SystemTimeToFileTime(LSystemTime, LFiletime)) or
        (not LocalFileTimeToFileTime(LFiletime, LFiletime)) or
        (not setFileTime(LHandle, @LFiletime, nil, nil)) then raiselastOsError;
+  finally
+    fileClose(LHandle);
+  end;
+End;
+
+{*****************************************************************************************************}
+Procedure ALSetFileLastWriteDateTime(Const aFileName: Ansistring; Const aLastWriteDateTime: TDateTime);
+Var LHandle: Thandle;
+    LSystemTime: TsystemTime;
+    LFiletime: TfileTime;
+Begin
+  LHandle := System.sysUtils.fileOpen(String(aFileName), fmOpenWrite or fmShareDenyNone);
+  if LHandle = INVALID_HANDLE_VALUE then raiseLastOsError;
+  Try
+    dateTimeToSystemTime(aLastWriteDateTime, LSystemTime);
+    if (not SystemTimeToFileTime(LSystemTime, LFiletime)) or
+       (not LocalFileTimeToFileTime(LFiletime, LFiletime)) or
+       (not setFileTime(LHandle, nil, nil, @LFiletime)) then raiselastOsError;
+  finally
+    fileClose(LHandle);
+  end;
+End;
+
+{*******************************************************************************************************}
+Procedure ALSetFileLastAccessDateTime(Const aFileName: Ansistring; Const aLastAccessDateTime: TDateTime);
+Var LHandle: Thandle;
+    LSystemTime: TsystemTime;
+    LFiletime: TfileTime;
+Begin
+  LHandle := System.sysUtils.fileOpen(String(aFileName), fmOpenWrite or fmShareDenyNone);
+  if LHandle = INVALID_HANDLE_VALUE then raiseLastOsError;
+  Try
+    dateTimeToSystemTime(aLastAccessDateTime, LSystemTime);
+    if (not SystemTimeToFileTime(LSystemTime, LFiletime)) or
+       (not LocalFileTimeToFileTime(LFiletime, LFiletime)) or
+       (not setFileTime(LHandle, nil, @LFiletime, nil)) then raiselastOsError;
   finally
     fileClose(LHandle);
   end;

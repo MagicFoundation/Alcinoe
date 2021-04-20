@@ -1,3 +1,7 @@
+__history
+__recovery
+.svn
+dcu
 /tools/AddRJavaToClassesDex/AddRJavaToClassesDex.log
 /demos/ALLiveVideoChat/client/_source/ios/frameworks/WebRTC.framework/_CodeSignature
 /demos/ALLiveVideoChat/client/_source/ios/frameworks/WebRTC.framework/Info.plist

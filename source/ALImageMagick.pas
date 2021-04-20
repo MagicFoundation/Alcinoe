@@ -461,6 +461,15 @@ type
     //number_properties: the number properties associated with this wand.
     MagickGetImageProperties: function(wand: PMagickWand; const pattern: PansiChar; number_properties: Psize_t): ppansiChar; cdecl;
 
+    //MagickSetImageProperty() associates a property with an image.
+    //The format of the MagickSetImageProperty method is:
+    //MagickBooleanType MagickSetImageProperty(MagickWand *wand, const char *property,const char *value)
+    //A description of each parameter follows:
+    //wand: the magick wand.
+    //property: the property.
+    //value: the value.
+    MagickSetImageProperty: function(wand: PMagickWand; const &property: PansiChar; const value: PansiChar): MagickBooleanType; cdecl;
+
     //MagickGetColorspace() gets the wand colorspace type.
     //The format of the MagickGetColorspace method is:
     //ColorspaceType MagickGetColorspace(MagickWand *wand)
@@ -767,6 +776,7 @@ begin
   {$REGION 'https://www.imagemagick.org/api/magick-property.php'}
   MagickGetImageProperty := GetProcAddress(FlibMagickWand,'MagickGetImageProperty');
   MagickGetImageProperties := GetProcAddress(FlibMagickWand,'MagickGetImageProperties');
+  MagickSetImageProperty := GetProcAddress(FlibMagickWand,'MagickSetImageProperty');
   MagickGetColorspace := GetProcAddress(FlibMagickWand,'MagickGetColorspace');
   MagickSetColorspace := GetProcAddress(FlibMagickWand,'MagickSetColorspace');
   MagickGetImageProfile := GetProcAddress(FlibMagickWand,'MagickGetImageProfile');

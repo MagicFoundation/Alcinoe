@@ -185,7 +185,7 @@ procedure ALWininetFTPCLientStatusCallback(InternetSession: hInternet;
 begin
   with TALWinInetFTPClient(Context) do begin
 
-    {fire the On Status change event}
+    {fire the OnStatusChange event}
     if Assigned(FOnStatusChange) then
       FOnStatusChange(TALWininetFTPClient(Context),
                       InternetStatus,
@@ -324,12 +324,14 @@ procedure TALWinInetFTPClient.Connect;
     if wFtpIo_Passive in InternetOptions then Result := result or INTERNET_FLAG_PASSIVE;
   end;
 
-const AccessTypeArr: Array[TALWinInetFTPInternetOpenAccessType] of DWord = (INTERNET_OPEN_TYPE_DIRECT,
-                                                                            INTERNET_OPEN_TYPE_PRECONFIG,
-                                                                            INTERNET_OPEN_TYPE_PRECONFIG_WITH_NO_AUTOPROXY,
-                                                                            INTERNET_OPEN_TYPE_PROXY);
+const
+  AccessTypeArr: Array[TALWinInetFTPInternetOpenAccessType] of DWord = (INTERNET_OPEN_TYPE_DIRECT,
+                                                                        INTERNET_OPEN_TYPE_PRECONFIG,
+                                                                        INTERNET_OPEN_TYPE_PRECONFIG_WITH_NO_AUTOPROXY,
+                                                                        INTERNET_OPEN_TYPE_PROXY);
 
-var InternetSetStatusCallbackResult: PFNInternetStatusCallback;
+var
+  LSetStatusCallbackResult: PFNInternetStatusCallback;
 
 begin
   { Yes, but what if we're connected to a different Host/Port?? }
@@ -353,8 +355,8 @@ begin
 
     {Register the callback function}
     if assigned(OnStatusChange) then begin
-      InternetSetStatusCallbackResult := InternetSetStatusCallback(FInetRoot, @ALWininetFTPCLientStatusCallback);
-      CheckError(InternetSetStatusCallbackResult = pointer(INTERNET_INVALID_STATUS_CALLBACK));
+      LSetStatusCallbackResult := InternetSetStatusCallback(FInetRoot, @ALWininetFTPCLientStatusCallback);
+      CheckError(LSetStatusCallbackResult = pointer(INTERNET_INVALID_STATUS_CALLBACK));
     end;
 
     {init FInetConnect}

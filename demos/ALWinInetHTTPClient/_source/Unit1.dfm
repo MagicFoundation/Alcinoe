@@ -1,7 +1,7 @@
 object Form1: TForm1
   Left = 377
   Top = 296
-  Caption = 'TALWinInetHttpClient test'
+  Caption = 'TALWinInetHttpClient'
   ClientHeight = 608
   ClientWidth = 796
   Color = clBtnFace
@@ -42,9 +42,10 @@ object Form1: TForm1
     TabOrder = 1
     Properties.ActivePage = TabSheet1
     Properties.CustomButtons.Buttons = <>
-    ClientRectBottom = 589
-    ClientRectRight = 796
-    ClientRectTop = 24
+    ClientRectBottom = 584
+    ClientRectLeft = 5
+    ClientRectRight = 791
+    ClientRectTop = 27
     object TabSheet1: TcxTabSheet
       Caption = 'Main'
       object GroupBox9: TcxGroupBox
@@ -61,17 +62,17 @@ object Form1: TForm1
         Style.IsFontAssigned = True
         TabOrder = 0
         Height = 193
-        Width = 796
+        Width = 786
         object Panel150: TPanel
-          Left = 2
-          Top = 18
-          Width = 792
+          Left = 3
+          Top = 15
+          Width = 780
           Height = 45
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 1
           DesignSize = (
-            792
+            780
             45)
           object Label1: TcxLabel
             Left = 10
@@ -99,10 +100,10 @@ object Form1: TForm1
             Style.IsFontAssigned = True
             TabOrder = 0
             Text = 'http://www.wikipedia.org'
-            Width = 305
+            Width = 295
           end
           object ButtonPost: TcxButton
-            Left = 407
+            Left = 397
             Top = 6
             Width = 50
             Height = 25
@@ -118,7 +119,7 @@ object Form1: TForm1
             OnClick = ButtonPostClick
           end
           object ButtonGet: TcxButton
-            Left = 352
+            Left = 342
             Top = 6
             Width = 50
             Height = 25
@@ -134,7 +135,7 @@ object Form1: TForm1
             OnClick = ButtonGetClick
           end
           object ButtonHead: TcxButton
-            Left = 462
+            Left = 452
             Top = 6
             Width = 50
             Height = 25
@@ -150,7 +151,7 @@ object Form1: TForm1
             OnClick = ButtonHeadClick
           end
           object ButtonTrace: TcxButton
-            Left = 518
+            Left = 508
             Top = 6
             Width = 50
             Height = 25
@@ -166,7 +167,7 @@ object Form1: TForm1
             OnClick = ButtonTraceClick
           end
           object ButtonOptions: TcxButton
-            Left = 574
+            Left = 564
             Top = 6
             Width = 50
             Height = 25
@@ -182,7 +183,7 @@ object Form1: TForm1
             OnClick = ButtonOptionsClick
           end
           object ButtonPut: TcxButton
-            Left = 630
+            Left = 620
             Top = 6
             Width = 50
             Height = 25
@@ -198,7 +199,7 @@ object Form1: TForm1
             OnClick = ButtonPutClick
           end
           object ButtonDelete: TcxButton
-            Left = 686
+            Left = 676
             Top = 6
             Width = 50
             Height = 25
@@ -215,10 +216,10 @@ object Form1: TForm1
           end
         end
         object Panel151: TPanel
-          Left = 2
-          Top = 63
-          Width = 792
-          Height = 128
+          Left = 3
+          Top = 60
+          Width = 780
+          Height = 124
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
@@ -226,7 +227,7 @@ object Form1: TForm1
             Left = 0
             Top = 0
             Width = 392
-            Height = 128
+            Height = 124
             Align = alLeft
             BevelOuter = bvNone
             TabOrder = 1
@@ -252,7 +253,7 @@ object Form1: TForm1
             object MemoPostDataStrings: TcxMemo
               AlignWithMargins = True
               Left = 8
-              Top = 38
+              Top = 36
               Margins.Left = 8
               Margins.Top = 0
               Align = alClient
@@ -266,7 +267,9 @@ object Form1: TForm1
               Style.Font.Style = []
               Style.IsFontAssigned = True
               TabOrder = 1
-              Height = 87
+              ExplicitTop = 38
+              ExplicitHeight = 83
+              Height = 85
               Width = 381
             end
             object CheckBoxUrlEncodePostData: TcxCheckBox
@@ -288,8 +291,8 @@ object Form1: TForm1
           object Panel153: TPanel
             Left = 399
             Top = 0
-            Width = 393
-            Height = 128
+            Width = 381
+            Height = 124
             Align = alClient
             BevelOuter = bvNone
             TabOrder = 0
@@ -339,15 +342,15 @@ object Form1: TForm1
               Style.Font.Style = []
               Style.IsFontAssigned = True
               TabOrder = 2
-              Height = 91
-              Width = 387
+              Height = 87
+              Width = 375
             end
           end
           object cxSplitter3: TcxSplitter
             Left = 392
             Top = 0
             Width = 7
-            Height = 128
+            Height = 124
           end
         end
       end
@@ -364,19 +367,19 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 1
-        Height = 355
-        Width = 796
+        Height = 347
+        Width = 786
         object Panel5: TPanel
-          Left = 2
-          Top = 18
+          Left = 3
+          Top = 15
           Width = 267
-          Height = 335
+          Height = 323
           Align = alLeft
           BevelOuter = bvNone
           TabOrder = 0
           DesignSize = (
             267
-            335)
+            323)
           object Label2: TcxLabel
             Left = 5
             Top = 6
@@ -389,6 +392,7 @@ object Form1: TForm1
             Top = 24
             Anchors = [akLeft, akTop, akRight, akBottom]
             ParentFont = False
+            Properties.ReadOnly = True
             Properties.ScrollBars = ssBoth
             Properties.WordWrap = False
             Style.Font.Charset = DEFAULT_CHARSET
@@ -398,22 +402,22 @@ object Form1: TForm1
             Style.Font.Style = []
             Style.IsFontAssigned = True
             TabOrder = 1
-            Height = 275
+            Height = 248
             Width = 260
           end
         end
         object Panel6: TPanel
-          Left = 276
-          Top = 18
-          Width = 518
-          Height = 335
+          Left = 277
+          Top = 15
+          Width = 506
+          Height = 323
           Align = alClient
           BevelOuter = bvNone
           Caption = 'Panel5'
           TabOrder = 1
           DesignSize = (
-            518
-            335)
+            506
+            323)
           object Label3: TcxLabel
             Left = 2
             Top = 6
@@ -426,6 +430,7 @@ object Form1: TForm1
             Top = 24
             Anchors = [akLeft, akTop, akRight, akBottom]
             ParentFont = False
+            Properties.ReadOnly = True
             Properties.ScrollBars = ssBoth
             Properties.WordWrap = False
             Style.Font.Charset = DEFAULT_CHARSET
@@ -435,11 +440,11 @@ object Form1: TForm1
             Style.Font.Style = []
             Style.IsFontAssigned = True
             TabOrder = 1
-            Height = 275
-            Width = 505
+            Height = 248
+            Width = 495
           end
           object ButtonSaveToFile: TcxButton
-            Left = 425
+            Left = 415
             Top = 1
             Width = 82
             Height = 21
@@ -456,17 +461,17 @@ object Form1: TForm1
           end
         end
         object cxSplitter1: TcxSplitter
-          Left = 269
-          Top = 18
+          Left = 270
+          Top = 15
           Width = 7
-          Height = 335
+          Height = 323
           Control = Panel5
         end
       end
       object Panel3: TPanel
         Left = 0
         Top = 0
-        Width = 796
+        Width = 786
         Height = 10
         Align = alTop
         BevelOuter = bvNone
@@ -477,7 +482,7 @@ object Form1: TForm1
       object cxSplitter2: TcxSplitter
         Left = 0
         Top = 203
-        Width = 796
+        Width = 786
         Height = 7
         AlignSplitter = salTop
       end
@@ -486,8 +491,8 @@ object Form1: TForm1
       Caption = 'Configuration'
       ImageIndex = 1
       DesignSize = (
-        796
-        565)
+        786
+        557)
       object GroupBox3: TcxGroupBox
         Left = 7
         Top = 11
@@ -1111,10 +1116,10 @@ object Form1: TForm1
         Style.IsFontAssigned = True
         TabOrder = 7
         DesignSize = (
-          323
-          542)
-        Height = 542
-        Width = 323
+          313
+          528)
+        Height = 534
+        Width = 313
         object Label8: TcxLabel
           Left = 9
           Top = 22
@@ -1137,8 +1142,8 @@ object Form1: TForm1
           Style.IsFontAssigned = True
           TabOrder = 0
           OnClick = OnCfgEditCHange
-          Height = 495
-          Width = 304
+          Height = 487
+          Width = 294
         end
       end
     end

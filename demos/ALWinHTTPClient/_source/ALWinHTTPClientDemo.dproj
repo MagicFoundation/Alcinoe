@@ -1,6 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{6A54BFF6-17B7-450B-953F-DF7D084E7265}</ProjectGuid>
+        <ProjectGuid>{3842AB21-98F2-40C4-86DB-4BCE185CFF1B}</ProjectGuid>
         <MainSource>ALWinHTTPClientDemo.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>

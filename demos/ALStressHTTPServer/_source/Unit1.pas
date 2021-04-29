@@ -2,9 +2,9 @@ unit Unit1;
 
 interface
 
-uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+uses Windows, winapi.winhttp, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
      Dialogs, StdCtrls, shellapi, ExtCtrls, ComCtrls, AlHttpClient, AlWinHttpClient,
-     AlStringList, AlWinHttpWrapper, cxStyles, cxCustomData, cxGraphics, cxFilter,
+     AlStringList, cxStyles, cxCustomData, cxGraphics, cxFilter,
      cxData, cxDataStorage, cxEdit, cxDropDownEdit, cxImageComboBox, cxSpinEdit,
      cxGridLevel, cxGridCustomTableView, cxGridTableView, cxClasses, cxControls,
      cxGridCustomView, cxGrid, Spin, dxSkinsCore, dxSkinFoggy, dxSkinscxPCPainter, cxPCdxBarPopupMenu,
@@ -179,10 +179,10 @@ type
     Rank: integer;
     procedure Execute; override;
     procedure OnHttpDownloadProgress(sender: Tobject; Read: Integer; Total: Integer);
-    procedure OnHttpStatusChange(sender: Tobject;
-                                 InternetStatus: DWord;
-                                 StatusInformation: Pointer;
-                                 StatusInformationLength: DWord);
+    procedure OnHttpStatus(sender: Tobject;
+                           InternetStatus: DWord;
+                           StatusInformation: Pointer;
+                           StatusInformationLength: DWord);
   Public
     constructor Create(CreateSuspended: Boolean; aRank: integer);
     destructor Destroy; override;
@@ -542,7 +542,7 @@ begin
 
         with aHttpClient do begin
           OnDownloadProgress := OnHttpDownloadProgress;
-          OnStatusChange := OnHttpStatusChange;
+          OnStatus := OnHttpStatus;
           UserName := Form1.HttpClientUserName;
           Password := Form1.HttpClientPassword;
           ConnectTimeout := Form1.HttpClientConnectTimeout;
@@ -665,11 +665,11 @@ begin
   FBytesRead := Read;
 end;
 
-{*************************************************************}
-procedure TStressHttpThread.OnHttpStatusChange(sender: Tobject;
-                                               InternetStatus: DWord;
-                                               StatusInformation: Pointer;
-                                               StatusInformationLength: DWord);
+{*******************************************************}
+procedure TStressHttpThread.OnHttpStatus(sender: Tobject;
+                                         InternetStatus: DWord;
+                                         StatusInformation: Pointer;
+                                         StatusInformationLength: DWord);
 begin
   if InternetStatus = WINHTTP_CALLBACK_STATUS_RESOLVING_NAME then FHttpStatusStartTime := GettickCount64
   else if InternetStatus = WINHTTP_CALLBACK_STATUS_NAME_RESOLVED then begin

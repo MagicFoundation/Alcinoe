@@ -40,8 +40,7 @@ uses
   cxClasses,
   dxBarBuiltInMenu,
   ALString,
-  AlWinHttpClient,
-  AlWinHttpWrapper;
+  AlWinHttpClient;
 
 type
   TForm1 = class(TForm)
@@ -142,14 +141,14 @@ type
     FDownloadSpeedStartTime: TdateTime;
     FDownloadSpeedBytesRead: Integer;
     FDownloadSpeedBytesNotRead: Integer;
-    fMustInitWinHTTP: Boolean;
+    fMustinitWinHTTPClient: Boolean;
     FHTTPResponseStream: TALStringStream;
-    procedure initWinHTTP;
+    procedure initWinHTTPClient;
     function AnsiStrTo8bitUnicodeString(s: AnsiString): String;
   public
-    procedure OnHttpClientStatusChange(sender: Tobject; InternetStatus: DWord; StatusInformation: Pointer; StatusInformationLength: DWord);
-    procedure OnHttpDownloadProgress(sender: Tobject; Read: Integer; Total: Integer);
-    procedure OnHttpUploadProgress(sender: Tobject; Sent: Integer; Total: Integer);
+    procedure OnHttpClientStatus(sender: Tobject; InternetStatus: DWord; StatusInformation: Pointer; StatusInformationLength: DWord);
+    procedure OnHttpClientDownloadProgress(sender: Tobject; Read: Integer; Total: Integer);
+    procedure OnHttpClientUploadProgress(sender: Tobject; Sent: Integer; Total: Integer);
   end;
 
 var
@@ -158,6 +157,7 @@ var
 implementation
 
 Uses
+  Winapi.WinHTTP,
   system.AnsiStrings,
   DateUtils,
   HttpApp,
@@ -170,11 +170,11 @@ Uses
 
 {$R *.dfm}
 
-{***************************}
-procedure TForm1.initWinHTTP;
+{*********************************}
+procedure TForm1.initWinHTTPClient;
 Begin
-  if not fMustInitWinHTTP then Exit;
-  fMustInitWinHTTP := False;
+  if not fMustinitWinHTTPClient then Exit;
+  fMustinitWinHTTPClient := False;
   With FWinHTTPClient do begin
     UserName := AnsiString(EditUserName.Text);
     Password := AnsiString(EditPassword.Text);
@@ -214,11 +214,11 @@ Begin
   end;
 end;
 
-{********************************************************}
-procedure TForm1.OnHttpClientStatusChange(Sender: Tobject;
-                                          InternetStatus: DWord;
-                                          StatusInformation: Pointer;
-                                          StatusInformationLength: DWord);
+{**************************************************}
+procedure TForm1.OnHttpClientStatus(Sender: Tobject;
+                                    InternetStatus: DWord;
+                                    StatusInformation: Pointer;
+                                    StatusInformationLength: DWord);
 var StatusStr: AnsiString;
 begin
   case InternetStatus of
@@ -251,8 +251,8 @@ begin
  application.ProcessMessages;
 end;
 
-{*****************************************************************************}
-procedure TForm1.OnHttpDownloadProgress(sender: Tobject; Read, Total: Integer);
+{***********************************************************************************}
+procedure TForm1.OnHttpClientDownloadProgress(sender: Tobject; Read, Total: Integer);
 Var In1, In2: integer;
 begin
  if MainStatusBar.Panels[1].Text = '' then Begin
@@ -270,8 +270,8 @@ begin
  application.ProcessMessages;
 end;
 
-{***************************************************************************}
-procedure TForm1.OnHttpUploadProgress(sender: Tobject; Sent, Total: Integer);
+{*********************************************************************************}
+procedure TForm1.OnHttpClientUploadProgress(sender: Tobject; Sent, Total: Integer);
 begin
  MainStatusBar.Panels[1].Text := 'Send '+IntToStr(sent) + ' bytes of '+IntToStr(total) + ' bytes';
  application.ProcessMessages;
@@ -293,7 +293,7 @@ begin
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
   MainStatusBar.Panels[2].Text := '';
-  initWinHTTP;
+  initWinHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
   AHTTPResponseHeader := TALHTTPResponseHeader.Create;
@@ -320,7 +320,7 @@ begin
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
   MainStatusBar.Panels[2].Text := '';
-  initWinHTTP;
+  initWinHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
   AHTTPResponseHeader := TALHTTPResponseHeader.Create;
@@ -354,7 +354,7 @@ begin
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
   MainStatusBar.Panels[2].Text := '';
-  initWinHTTP;
+  initWinHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
   AHTTPResponseHeader := TALHTTPResponseHeader.Create;
@@ -381,7 +381,7 @@ begin
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
   MainStatusBar.Panels[2].Text := '';
-  initWinHTTP;
+  initWinHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
   AHTTPResponseHeader := TALHTTPResponseHeader.Create;
@@ -408,7 +408,7 @@ begin
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
   MainStatusBar.Panels[2].Text := '';
-  initWinHTTP;
+  initWinHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
   AHTTPResponseHeader := TALHTTPResponseHeader.Create;
@@ -440,7 +440,7 @@ begin
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
   MainStatusBar.Panels[2].Text := '';
-  initWinHTTP;
+  initWinHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
   AHTTPResponseHeader := TALHTTPResponseHeader.Create;
@@ -532,7 +532,7 @@ begin
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
   MainStatusBar.Panels[2].Text := '';
-  initWinHTTP;
+  initWinHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
   AHTTPResponseHeader := TALHTTPResponseHeader.Create;
@@ -616,13 +616,13 @@ end;
 {************************************************}
 procedure TForm1.OnCfgEditChange(Sender: TObject);
 begin
-  fMustInitWinHTTP := True;
+  fMustinitWinHTTPClient := True;
 end;
 
 {*****************************************************************}
 procedure TForm1.OnCfgEditKeyPress(Sender: TObject; var Key: Char);
 begin
-  fMustInitWinHTTP := True;
+  fMustinitWinHTTPClient := True;
 end;
 
 {******************************************************}
@@ -641,15 +641,15 @@ end;
 {*******************************************}
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  fMustInitWinHTTP := True;
+  fMustinitWinHTTPClient := True;
   FWinHttpClient := TaLWinHttpClient.Create;
   fHTTPResponseStream := TALStringStream.Create('');
   with FWinHttpClient do begin
     AccessType := wHttpAt_NO_PROXY;
     InternetOptions := [];
-    OnStatusChange := OnHttpClientStatusChange;
-    OnDownloadProgress := OnHttpDownloadProgress;
-    OnUploadProgress := OnHttpUploadProgress;
+    OnStatus := OnHttpClientStatus;
+    OnDownloadProgress := OnHttpClientDownloadProgress;
+    OnUploadProgress := OnHttpClientUploadProgress;
     MemoRequestRawHeader.Text := String(RequestHeader.RawHeaderText);
   end;
   MemoResponseRawHeader.Height := MemoResponseRawHeader.Parent.Height - MemoResponseRawHeader.top - 6;

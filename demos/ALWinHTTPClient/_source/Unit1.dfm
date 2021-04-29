@@ -1,7 +1,7 @@
 object Form1: TForm1
   Left = 377
   Top = 296
-  Caption = 'TALWinHttpClient test'
+  Caption = 'TALWinHttpClient'
   ClientHeight = 608
   ClientWidth = 796
   Color = clBtnFace
@@ -71,6 +71,7 @@ object Form1: TForm1
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 1
+          ExplicitTop = -4
           DesignSize = (
             780
             45)
@@ -223,6 +224,8 @@ object Form1: TForm1
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
+          ExplicitTop = 41
+          ExplicitHeight = 144
           object Panel152: TPanel
             Left = 0
             Top = 0
@@ -231,6 +234,7 @@ object Form1: TForm1
             Align = alLeft
             BevelOuter = bvNone
             TabOrder = 1
+            ExplicitHeight = 144
             object Label4: TcxLabel
               AlignWithMargins = True
               Left = 8
@@ -253,7 +257,7 @@ object Form1: TForm1
             object MemoPostDataStrings: TcxMemo
               AlignWithMargins = True
               Left = 8
-              Top = 36
+              Top = 38
               Margins.Left = 8
               Margins.Top = 0
               Align = alClient
@@ -267,9 +271,8 @@ object Form1: TForm1
               Style.Font.Style = []
               Style.IsFontAssigned = True
               TabOrder = 1
-              ExplicitTop = 38
-              ExplicitHeight = 84
-              Height = 86
+              ExplicitHeight = 86
+              Height = 84
               Width = 381
             end
             object CheckBoxUrlEncodePostData: TcxCheckBox
@@ -286,6 +289,7 @@ object Form1: TForm1
               State = cbsChecked
               TabOrder = 2
               Transparent = True
+              ExplicitWidth = 121
             end
           end
           object Panel153: TPanel
@@ -300,6 +304,7 @@ object Form1: TForm1
             Align = alClient
             BevelOuter = bvNone
             TabOrder = 0
+            ExplicitHeight = 144
             object Label7: TcxLabel
               AlignWithMargins = True
               Left = 3
@@ -311,6 +316,7 @@ object Form1: TForm1
               Caption = 'Format "Name=FileName"'
               ParentFont = False
               Transparent = True
+              ExplicitTop = 21
             end
             object Label5: TcxLabel
               AlignWithMargins = True
@@ -392,6 +398,8 @@ object Form1: TForm1
           Align = alLeft
           BevelOuter = bvNone
           TabOrder = 0
+          ExplicitTop = -4
+          ExplicitHeight = 341
           DesignSize = (
             267
             322)
@@ -407,7 +415,7 @@ object Form1: TForm1
             Top = 24
             Anchors = [akLeft, akTop, akRight, akBottom]
             ParentFont = False
-            Properties.ReadOnly = False
+            Properties.ReadOnly = True
             Properties.ScrollBars = ssBoth
             Properties.WordWrap = False
             Style.Font.Charset = DEFAULT_CHARSET
@@ -417,7 +425,8 @@ object Form1: TForm1
             Style.Font.Style = []
             Style.IsFontAssigned = True
             TabOrder = 1
-            Height = 248
+            ExplicitHeight = 229
+            Height = 210
             Width = 260
           end
         end
@@ -430,6 +439,8 @@ object Form1: TForm1
           BevelOuter = bvNone
           Caption = 'Panel5'
           TabOrder = 1
+          ExplicitTop = -4
+          ExplicitHeight = 341
           DesignSize = (
             506
             322)
@@ -445,7 +456,7 @@ object Form1: TForm1
             Top = 24
             Anchors = [akLeft, akTop, akRight, akBottom]
             ParentFont = False
-            Properties.ReadOnly = False
+            Properties.ReadOnly = True
             Properties.ScrollBars = ssBoth
             Properties.WordWrap = False
             Style.Font.Charset = DEFAULT_CHARSET
@@ -455,7 +466,8 @@ object Form1: TForm1
             Style.Font.Style = []
             Style.IsFontAssigned = True
             TabOrder = 1
-            Height = 248
+            ExplicitHeight = 229
+            Height = 210
             Width = 495
           end
           object ButtonSaveToFile: TcxButton
@@ -494,10 +506,6 @@ object Form1: TForm1
     object TabSheet2: TcxTabSheet
       Caption = 'Configuration'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 24
-      ExplicitWidth = 796
-      ExplicitHeight = 565
       DesignSize = (
         786
         557)
@@ -675,7 +683,6 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 3
-        ExplicitTop = 416
         Height = 126
         Width = 481
         object CheckBoxInternetOption_BYPASS_PROXY_CACHE: TcxCheckBox
@@ -997,8 +1004,6 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 7
-        ExplicitWidth = 491
-        ExplicitHeight = 399
         DesignSize = (
           481
           385)
@@ -1025,8 +1030,6 @@ object Form1: TForm1
           Style.Font.Style = []
           Style.IsFontAssigned = True
           TabOrder = 0
-          ExplicitWidth = 469
-          ExplicitHeight = 339
           Height = 331
           Width = 459
         end

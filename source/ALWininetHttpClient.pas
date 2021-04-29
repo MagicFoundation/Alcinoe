@@ -89,8 +89,8 @@ type
   {--------------------------------------------------------------------------------}
   TALWininetHttpClientInternetOptionSet = Set of TAlWininetHttpClientInternetOption;
 
-  {------------------------------------}
-  {TAlWinInetHTTPClientStatusChangeEvent
+  {------------------------------}
+  {TAlWinInetHTTPClientStatusEvent
 
    InternetStatus
    can be one of the following value:
@@ -144,7 +144,7 @@ type
 
    StatusInformationLength
    Size of the data pointed to by StatusInformation.}
-  TAlWinInetHTTPClientStatusChangeEvent  = procedure(sender: Tobject; InternetStatus: DWord; StatusInformation: LPVOID; StatusInformationLength: DWord) of object;
+  TAlWinInetHTTPClientStatusEvent  = procedure(sender: Tobject; InternetStatus: DWord; StatusInformation: LPVOID; StatusInformationLength: DWord) of object;
 
   {-----------------------------------------}
   TALWinInetHTTPClient = class(TALHTTPClient)
@@ -154,17 +154,17 @@ type
     FConnected: Boolean;
     FURL: AnsiString;
     FURLHost: AnsiString;
-    FURLSite: AnsiString;
+    FURLPath: AnsiString;
     FURLPort: INTERNET_PORT;
     FURLScheme: TInternetScheme;
     FInetRoot: HINTERNET;
     FInetConnect: HINTERNET;
-    FOnStatusChange: TAlWinInetHTTPClientStatusChangeEvent;
+    FOnStatus: TAlWinInetHTTPClientStatusEvent;
     FIgnoreSecurityErrors: Boolean;
     procedure InitURL(const Value: AnsiString);
     procedure SetAccessType(const Value: TALWinInetHttpInternetOpenAccessType);
     procedure SetInternetOptions(const Value: TAlWininetHTTPClientInternetOptionSet);
-    procedure SetOnStatusChange(const Value: TAlWinInetHTTPClientStatusChangeEvent);
+    procedure SetOnStatus(const Value: TAlWinInetHTTPClientStatusEvent);
   protected
     procedure CheckError(ErrCode: DWORD); overload;
     procedure CheckError(Error: Boolean); overload;
@@ -192,7 +192,7 @@ type
     procedure Disconnect;
     property  AccessType: TALWinInetHttpInternetOpenAccessType read FAccessType write SetAccessType default wHttpAt_Preconfig;
     property  InternetOptions: TAlWininetHTTPClientInternetOptionSet read FInternetOptions write SetInternetOptions default [wHttpIo_Keep_connection];
-    property  OnStatusChange: TAlWinInetHTTPClientStatusChangeEvent read FOnStatusChange write SetOnStatusChange;
+    property  OnStatus: TAlWinInetHTTPClientStatusEvent read FOnStatus write SetOnStatus;
     property  IgnoreSecurityErrors: Boolean read FIgnoreSecurityErrors write FIgnoreSecurityErrors;
   end;
 
@@ -214,14 +214,15 @@ begin
   if dwContext = 0 then exit;
   with TALWinInetHTTPClient(dwContext) do begin
 
-    {fire the On Status change event}
-    if Assigned(FOnStatusChange) then
-      FOnStatusChange(TALWininetHttpClient(dwContext),
-                      dwInternetStatus,
-                      lpvStatusInformation,
-                      dwStatusInformationLength);
+    {fire the OnStatus event}
+    if Assigned(FOnStatus) then
+      FOnStatus(
+        TALWininetHttpClient(dwContext),
+        dwInternetStatus,
+        lpvStatusInformation,
+        dwStatusInformationLength);
 
-    {fire the On redirect event}
+    {fire the OnRedirect event}
     If (dwInternetStatus = INTERNET_STATUS_REDIRECT) and Assigned(OnRedirect) then
       OnRedirect(TALWinInetHttpClient(dwContext), AnsiString(PAnsiChar(lpvStatusInformation)));
 
@@ -237,10 +238,10 @@ begin
   FConnected := False;
   FURL:= '';
   FURLHost := '';
-  FURLSite := '';
+  FURLPath := '';
   FURLPort := INTERNET_DEFAULT_HTTP_PORT;
   FURLScheme := INTERNET_SCHEME_DEFAULT;
-  FOnStatusChange := nil;
+  FOnStatus := nil;
   FAccessType := wHttpAt_Preconfig;
   FInternetOptions := [wHttpIo_Keep_connection];
   RequestHeader.UserAgent := 'Mozilla/3.0 (compatible; TALWinInetHTTPClient)';
@@ -322,12 +323,12 @@ begin
     FURLScheme := URLComp.nScheme;
     FURLPort := URLComp.nPort;
     FURLHost := ALCopyStr(Value, URLComp.lpszHostName - P + 1, URLComp.dwHostNameLength);
-    FURLSite := ALCopyStr(Value, URLComp.lpszUrlPath - P + 1, URLComp.dwUrlPathLength);
+    FURLPath := ALCopyStr(Value, URLComp.lpszUrlPath - P + 1, URLComp.dwUrlPathLength);
   end
   else begin
     FURLPort := INTERNET_DEFAULT_HTTP_PORT;
     FURLHost := '';
-    FURLSite := '';
+    FURLPath := '';
     FURLScheme := INTERNET_SCHEME_DEFAULT;
   end;
 end;
@@ -373,14 +374,17 @@ procedure TALWinInetHTTPClient.Connect;
     if whttpIo_Offline in InternetOptions then Result := result or INTERNET_FLAG_OFFLINE;
   end;
 
-const AccessTypeArr: Array[TALWinInetHttpInternetOpenAccessType] of DWord = (INTERNET_OPEN_TYPE_DIRECT,
-                                                                             INTERNET_OPEN_TYPE_PRECONFIG,
-                                                                             INTERNET_OPEN_TYPE_PRECONFIG_WITH_NO_AUTOPROXY,
-                                                                             INTERNET_OPEN_TYPE_PROXY);
+const
+  AccessTypeArr: Array[TALWinInetHttpInternetOpenAccessType] of DWord = (INTERNET_OPEN_TYPE_DIRECT,
+                                                                         INTERNET_OPEN_TYPE_PRECONFIG,
+                                                                         INTERNET_OPEN_TYPE_PRECONFIG_WITH_NO_AUTOPROXY,
+                                                                         INTERNET_OPEN_TYPE_PROXY);
 
-var InternetSetStatusCallbackResult: PFNInternetStatusCallback;
-    ProxyStr: AnsiString;
-    ProxyPtr: PAnsiChar;
+var
+  LSetStatusCallbackResult: PFNInternetStatusCallback;
+  ProxyStr: AnsiString;
+  ProxyPtr: PAnsiChar;
+
 begin
   { Yes, but what if we're connected to a different Host/Port?? }
   { So take advantage of a cached handle, we'll assume that
@@ -409,9 +413,9 @@ begin
   try
 
     {Register the callback function}
-    if assigned(OnStatusChange) or assigned(OnRedirect) then begin
-      InternetSetStatusCallbackResult := InternetSetStatusCallback(FInetRoot, @ALWininetHTTPCLientStatusCallback);
-      CheckError(InternetSetStatusCallbackResult = pointer(INTERNET_INVALID_STATUS_CALLBACK));
+    if assigned(OnStatus) or assigned(OnRedirect) then begin
+      LSetStatusCallbackResult := InternetSetStatusCallback(FInetRoot, @ALWininetHTTPCLientStatusCallback);
+      CheckError(LSetStatusCallbackResult = pointer(INTERNET_INVALID_STATUS_CALLBACK));
     end;
 
     {init FInetConnect}
@@ -496,12 +500,12 @@ function TALWinInetHTTPClient.Send(const aRequestMethod: TALHTTPMethod;
   end;
 
 var LNumberOfBytesWritten: DWord;
-    dwFlags: DWORD;
-    BuffLen: Cardinal;
-    BuffSize, Len: cardinal;
-    INBuffer: INTERNET_BUFFERSA;
-    Buffer: TMemoryStream;
-    AcceptTypes: array of PAnsiChar;
+    LDwFlags: DWORD;
+    LBuffLen: Cardinal;
+    LBuffSize, LLen: cardinal;
+    LINBuffer: INTERNET_BUFFERSA;
+    LBuffer: TMemoryStream;
+    LAcceptTypes: array of PAnsiChar;
     LHeader: AnsiString;
     LOption: DWord;
 
@@ -510,29 +514,29 @@ begin
   { Connect }
   Connect;
 
-  SetLength(AcceptTypes, 2);
-  AcceptTypes[0] := PAnsiChar(RequestHeader.Accept);
-  AcceptTypes[1] := nil;
+  SetLength(LAcceptTypes, 2);
+  LAcceptTypes[0] := PAnsiChar(RequestHeader.Accept);
+  LAcceptTypes[1] := nil;
 
   Result := HttpOpenRequestA(FInetConnect,
                              InternalGetHttpOpenRequestVerb,
-                             PAnsiChar(FURLSite),
+                             PAnsiChar(FURLPath),
                              InternalGetHttpProtocolVersion,
                              PAnsiChar(requestHeader.Referer),
-                             Pointer(AcceptTypes),
+                             Pointer(LAcceptTypes),
                              InternalGetHttpOpenRequestFlags,
                              DWORD_PTR(Self));
   CheckError(not Assigned(Result));
   try
 
     if FIgnoreSecurityErrors and (FURLScheme = INTERNET_SCHEME_HTTPS) then begin
-      BuffLen := SizeOf(dwFlags);
-      CheckError(not InternetQueryOptionA(Result, INTERNET_OPTION_SECURITY_FLAGS, Pointer(@dwFlags), BuffLen));
-      dwFlags := dwFlags or
+      LBuffLen := SizeOf(LDwFlags);
+      CheckError(not InternetQueryOptionA(Result, INTERNET_OPTION_SECURITY_FLAGS, Pointer(@LDwFlags), LBuffLen));
+      LDwFlags := LDwFlags or
         SECURITY_FLAG_IGNORE_REVOCATION or
         SECURITY_FLAG_IGNORE_UNKNOWN_CA or
         SECURITY_FLAG_IGNORE_WRONG_USAGE;
-      CheckError(not InternetSetOptionA(Result, INTERNET_OPTION_SECURITY_FLAGS, Pointer(@dwFlags), SizeOf(dwFlags)));
+      CheckError(not InternetSetOptionA(Result, INTERNET_OPTION_SECURITY_FLAGS, Pointer(@LDwFlags), SizeOf(LDwFlags)));
     end;
 
     { Timeouts }
@@ -562,54 +566,54 @@ begin
 
     If assigned(aRequestDataStream) then begin
       aRequestDataStream.Position := 0;
-      BuffSize := aRequestDataStream.Size;
+      LBuffSize := aRequestDataStream.Size;
     end
-    else BuffSize := 0;
+    else LBuffSize := 0;
 
-    if BuffSize > UploadBufferSize then begin
-      Buffer := TMemoryStream.Create;
+    if LBuffSize > UploadBufferSize then begin
+      LBuffer := TMemoryStream.Create;
       try
-        Buffer.SetSize(UploadBufferSize);
+        LBuffer.SetSize(UploadBufferSize);
 
         { Init Input Buffer }
-        INBuffer.dwStructSize := SizeOf(INBuffer);
-        INBuffer.Next := nil;
-        INBuffer.lpcszHeader := nil;
-        INBuffer.dwHeadersLength := 0;
-        INBuffer.dwHeadersTotal := 0;
-        INBuffer.lpvBuffer := nil;
-        INBuffer.dwBufferLength := 0;
-        INBuffer.dwBufferTotal := BuffSize;
-        INBuffer.dwOffsetLow := 0;
-        INBuffer.dwOffsetHigh := 0;
+        LINBuffer.dwStructSize := SizeOf(LINBuffer);
+        LINBuffer.Next := nil;
+        LINBuffer.lpcszHeader := nil;
+        LINBuffer.dwHeadersLength := 0;
+        LINBuffer.dwHeadersTotal := 0;
+        LINBuffer.lpvBuffer := nil;
+        LINBuffer.dwBufferLength := 0;
+        LINBuffer.dwBufferTotal := LBuffSize;
+        LINBuffer.dwOffsetLow := 0;
+        LINBuffer.dwOffsetHigh := 0;
 
         { Start POST }
         CheckError(not HttpSendRequestExA(Result,
-                                          @INBuffer,
+                                          @LINBuffer,
                                           nil,
                                           HSR_INITIATE or HSR_SYNC,
                                           DWORD_PTR(Self)));
         try
           while True do begin
             { Calc length of data to send }
-            Len := BuffSize - aRequestDataStream.Position;
-            if Len > UploadBufferSize then Len := UploadBufferSize;
+            LLen := LBuffSize - aRequestDataStream.Position;
+            if LLen > UploadBufferSize then LLen := UploadBufferSize;
             { Bail out if zip.. }
-            if Len = 0 then break;
+            if LLen = 0 then break;
             { Read data in buffer and write out}
-            Len := aRequestDataStream.Read(Buffer.Memory^, Len);
-            if Len = 0 then raise EALHTTPClientException.Create(CALHTTPCLient_MsgInvalidHTTPRequest);
+            LLen := aRequestDataStream.Read(LBuffer.Memory^, LLen);
+            if LLen = 0 then raise EALHTTPClientException.Create(CALHTTPCLient_MsgInvalidHTTPRequest);
 
             CheckError(not InternetWriteFile(Result,
-                                             Buffer.Memory,
-                                             Len,
+                                             LBuffer.Memory,
+                                             LLen,
                                              LNumberOfBytesWritten));
-            if LNumberOfBytesWritten < Len then
-              aRequestDataStream.Position := aRequestDataStream.Position - (Len - LNumberOfBytesWritten);
+            if LNumberOfBytesWritten < LLen then
+              aRequestDataStream.Position := aRequestDataStream.Position - (LLen - LNumberOfBytesWritten);
 
             { Posting Data Event }
             if Assigned(OnUploadProgress) then
-              OnUploadProgress(self, aRequestDataStream.Position, BuffSize);
+              OnUploadProgress(self, aRequestDataStream.Position, LBuffSize);
           end;
         finally
           CheckError(not HttpEndRequestA(Result,
@@ -618,21 +622,21 @@ begin
                                          0));
         end;
       finally
-        AlFreeAndNil(Buffer);
+        AlFreeAndNil(LBuffer);
       end;
     end
 
-    else if BuffSize > 0 then begin
-      Buffer := TMemoryStream.Create;
+    else if LBuffSize > 0 then begin
+      LBuffer := TMemoryStream.Create;
       try
-        Buffer.CopyFrom(aRequestDataStream, 0);
+        LBuffer.CopyFrom(aRequestDataStream, 0);
         CheckError(not HttpSendRequestA(Result,
                                         nil,
                                         0,
-                                        Buffer.Memory,
-                                        Buffer.size));
+                                        LBuffer.Memory,
+                                        LBuffer.size));
       finally
-        AlFreeAndNil(Buffer);
+        AlFreeAndNil(LBuffer);
       end;
     end
 
@@ -656,13 +660,13 @@ procedure  TALWinInetHTTPClient.Receive(const aContext: HINTERNET;
                                         const aResponseContent: TStream;
                                         const aResponseHeader: TALHTTPResponseHeader);
 
-var Size: DWord;
-    Downloaded: DWord;
-    Status: DWord;
-    Len: DWord;
-    Index: DWord;
-    ContentlengthDownloaded,
-    ContentLength: DWord;
+var LSize: DWord;
+    LDownloaded: DWord;
+    LStatus: DWord;
+    LLen: DWord;
+    LIndex: DWord;
+    LContentlengthDownloaded,
+    LContentLength: DWord;
     LStr: AnsiString;
     LBuffer: Tbytes;
 
@@ -670,16 +674,16 @@ begin
 
   {read the header}
   If assigned(aResponseHeader) then begin
-    Size := 4096;
+    LSize := 4096;
     While true do begin
-      Index := 0;
-      SetLength(LStr, Size);
+      LIndex := 0;
+      SetLength(LStr, LSize);
       If HttpQueryInfoA(aContext,
                         HTTP_QUERY_RAW_HEADERS_CRLF,
                         pointer(LStr),
-                        Size,
-                        Index) then begin
-        SetLength(LStr, Size);
+                        LSize,
+                        LIndex) then begin
+        SetLength(LStr, LSize);
         aResponseHeader.RawHeaderText := LStr;
         break;
       end
@@ -689,58 +693,58 @@ begin
 
   { read content-length }
   if assigned(onDownloadProgress) then begin
-    Index := 0;
-    Len := SizeOf(ContentLength);
+    LIndex := 0;
+    LLen := SizeOf(LContentLength);
     if not HttpQueryInfoA(aContext,
                           HTTP_QUERY_CONTENT_LENGTH or HTTP_QUERY_FLAG_NUMBER,
-                          @ContentLength,
-                          Len,
-                          Index) then ContentLength := 0;
+                          @LContentLength,
+                          LLen,
+                          LIndex) then LContentLength := 0;
   end;
 
   { Read data }
-  Len := 0;
-  ContentlengthDownloaded := 0;
+  LLen := 0;
+  LContentlengthDownloaded := 0;
   repeat
     CheckError(not InternetQueryDataAvailable(aContext,
-                                              Size,
+                                              LSize,
                                               0,
                                               0));
 
-    if Size > 0 then begin
-      if dWord(length(LBuffer)) <> Size then SetLength(LBuffer, Size);
+    if LSize > 0 then begin
+      if dWord(length(LBuffer)) <> LSize then SetLength(LBuffer, LSize);
       CheckError(not InternetReadFile(aContext,
                                       @LBuffer[0],
-                                      Size,
-                                      Downloaded));
-      aResponseContent.Writebuffer(pointer(LBuffer)^, Downloaded);
+                                      LSize,
+                                      LDownloaded));
+      aResponseContent.Writebuffer(pointer(LBuffer)^, LDownloaded);
       if Assigned(onDownloadProgress) then begin
-        inc(ContentlengthDownloaded, Downloaded);
-        onDownloadProgress(self, ContentlengthDownloaded, ContentLength);
+        inc(LContentlengthDownloaded, LDownloaded);
+        onDownloadProgress(self, LContentlengthDownloaded, LContentLength);
       end;
     end;
-  until Size = 0;
+  until LSize = 0;
 
   { Handle error from status}
-  Index := 0;
-  Len := SizeOf(Status);
+  LIndex := 0;
+  LLen := SizeOf(LStatus);
   if HttpQueryInfoA(aContext,
                     HTTP_QUERY_STATUS_CODE or HTTP_QUERY_FLAG_NUMBER,
-                    @Status,
-                    Len,
-                    Index) and
-     (Status >= 300) then begin
-    Size := 256;
+                    @LStatus,
+                    LLen,
+                    LIndex) and
+     (LStatus >= 300) then begin
+    LSize := 256;
     While true do begin
-      Index := 0;
-      SetLength(LStr, Size);
+      LIndex := 0;
+      SetLength(LStr, LSize);
       if HttpQueryInfoA(aContext,
                         HTTP_QUERY_STATUS_TEXT,
                         pointer(LStr),
-                        Size,
-                        Index) then begin
-        SetLength(LStr, Size);
-        raise EALHTTPClientException.CreateFmt('%s (%d) - ''%s''', [LStr, Status, URL], Status);
+                        LSize,
+                        LIndex) then begin
+        SetLength(LStr, LSize);
+        raise EALHTTPClientException.CreateFmt('%s (%d) - ''%s''', [LStr, LStatus, URL], LStatus);
       end
       else checkError(GetLastError <> ERROR_INSUFFICIENT_BUFFER);
     end;
@@ -796,11 +800,11 @@ begin
   end;
 end;
 
-{***************************************************************************************************}
-procedure TALWinInetHTTPClient.SetOnStatusChange(const Value: TAlWinInetHTTPClientStatusChangeEvent);
+{***************************************************************************************}
+procedure TALWinInetHTTPClient.SetOnStatus(const Value: TAlWinInetHTTPClientStatusEvent);
 begin
   Disconnect;
-  FOnStatusChange := Value;
+  FOnStatus := Value;
 end;
 
 {************************************************************************************}

@@ -72,6 +72,9 @@
         <Projects Include="ALRTTI\_source\ALRTTIDemo.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="ALWinHTTPWebSocketClient\_source\ALWinHTTPWebSocketClientDemo.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -287,14 +290,23 @@
     <Target Name="ALRTTIDemo:Make">
         <MSBuild Projects="ALRTTI\_source\ALRTTIDemo.dproj" Targets="Make"/>
     </Target>
+    <Target Name="ALWinHTTPWebSocketClientDemo">
+        <MSBuild Projects="ALWinHTTPWebSocketClient\_source\ALWinHTTPWebSocketClientDemo.dproj"/>
+    </Target>
+    <Target Name="ALWinHTTPWebSocketClientDemo:Clean">
+        <MSBuild Projects="ALWinHTTPWebSocketClient\_source\ALWinHTTPWebSocketClientDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALWinHTTPWebSocketClientDemo:Make">
+        <MSBuild Projects="ALWinHTTPWebSocketClient\_source\ALWinHTTPWebSocketClientDemo.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="ALDatabaseBenchmark;ALFacebookLogin;ALFirebaseMessaging;ALFmxControls;AlJsonDocDemo;ALLibPhoneNumberDemo;ALLiveVideoChatClient;ALLiveVideoChatServer;ALNNTPClientDemo;ALPhpRunnerDemo;POP3ClientDemo;ALSMTPClientDemo;ALSortedListBenchmark;ALSqlite3clientDemo;ALStressHTTPServer;ALStringBenchmark;ALWebSpiderDemo;ALWinHTTPClientDemo;ALWinInetHTTPClientDemo;AlXmlDocDemo;ALCipherDemo;ALFmxFilterEffectsDemo;ALRTTIDemo"/>
+        <CallTarget Targets="ALDatabaseBenchmark;ALFacebookLogin;ALFirebaseMessaging;ALFmxControls;AlJsonDocDemo;ALLibPhoneNumberDemo;ALLiveVideoChatClient;ALLiveVideoChatServer;ALNNTPClientDemo;ALPhpRunnerDemo;POP3ClientDemo;ALSMTPClientDemo;ALSortedListBenchmark;ALSqlite3clientDemo;ALStressHTTPServer;ALStringBenchmark;ALWebSpiderDemo;ALWinHTTPClientDemo;ALWinInetHTTPClientDemo;AlXmlDocDemo;ALCipherDemo;ALFmxFilterEffectsDemo;ALRTTIDemo;ALWinHTTPWebSocketClientDemo"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="ALDatabaseBenchmark:Clean;ALFacebookLogin:Clean;ALFirebaseMessaging:Clean;ALFmxControls:Clean;AlJsonDocDemo:Clean;ALLibPhoneNumberDemo:Clean;ALLiveVideoChatClient:Clean;ALLiveVideoChatServer:Clean;ALNNTPClientDemo:Clean;ALPhpRunnerDemo:Clean;POP3ClientDemo:Clean;ALSMTPClientDemo:Clean;ALSortedListBenchmark:Clean;ALSqlite3clientDemo:Clean;ALStressHTTPServer:Clean;ALStringBenchmark:Clean;ALWebSpiderDemo:Clean;ALWinHTTPClientDemo:Clean;ALWinInetHTTPClientDemo:Clean;AlXmlDocDemo:Clean;ALCipherDemo:Clean;ALFmxFilterEffectsDemo:Clean;ALRTTIDemo:Clean"/>
+        <CallTarget Targets="ALDatabaseBenchmark:Clean;ALFacebookLogin:Clean;ALFirebaseMessaging:Clean;ALFmxControls:Clean;AlJsonDocDemo:Clean;ALLibPhoneNumberDemo:Clean;ALLiveVideoChatClient:Clean;ALLiveVideoChatServer:Clean;ALNNTPClientDemo:Clean;ALPhpRunnerDemo:Clean;POP3ClientDemo:Clean;ALSMTPClientDemo:Clean;ALSortedListBenchmark:Clean;ALSqlite3clientDemo:Clean;ALStressHTTPServer:Clean;ALStringBenchmark:Clean;ALWebSpiderDemo:Clean;ALWinHTTPClientDemo:Clean;ALWinInetHTTPClientDemo:Clean;AlXmlDocDemo:Clean;ALCipherDemo:Clean;ALFmxFilterEffectsDemo:Clean;ALRTTIDemo:Clean;ALWinHTTPWebSocketClientDemo:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="ALDatabaseBenchmark:Make;ALFacebookLogin:Make;ALFirebaseMessaging:Make;ALFmxControls:Make;AlJsonDocDemo:Make;ALLibPhoneNumberDemo:Make;ALLiveVideoChatClient:Make;ALLiveVideoChatServer:Make;ALNNTPClientDemo:Make;ALPhpRunnerDemo:Make;POP3ClientDemo:Make;ALSMTPClientDemo:Make;ALSortedListBenchmark:Make;ALSqlite3clientDemo:Make;ALStressHTTPServer:Make;ALStringBenchmark:Make;ALWebSpiderDemo:Make;ALWinHTTPClientDemo:Make;ALWinInetHTTPClientDemo:Make;AlXmlDocDemo:Make;ALCipherDemo:Make;ALFmxFilterEffectsDemo:Make;ALRTTIDemo:Make"/>
+        <CallTarget Targets="ALDatabaseBenchmark:Make;ALFacebookLogin:Make;ALFirebaseMessaging:Make;ALFmxControls:Make;AlJsonDocDemo:Make;ALLibPhoneNumberDemo:Make;ALLiveVideoChatClient:Make;ALLiveVideoChatServer:Make;ALNNTPClientDemo:Make;ALPhpRunnerDemo:Make;POP3ClientDemo:Make;ALSMTPClientDemo:Make;ALSortedListBenchmark:Make;ALSqlite3clientDemo:Make;ALStressHTTPServer:Make;ALStringBenchmark:Make;ALWebSpiderDemo:Make;ALWinHTTPClientDemo:Make;ALWinInetHTTPClientDemo:Make;AlXmlDocDemo:Make;ALCipherDemo:Make;ALFmxFilterEffectsDemo:Make;ALRTTIDemo:Make;ALWinHTTPWebSocketClientDemo:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -1971,10 +1971,10 @@ begin
   FOnDownloadProgress := nil;
   FOnRedirect := nil;
   FProxyParams := TALHTTPClientProxyParams.Create;
+  FProxyParams.OnChange := OnProxyParamsChange;
   FRequestHeader := TALHTTPRequestHeader.Create;
   FRequestHeader.UserAgent := 'Mozilla/3.0 (compatible; TALHTTPClient)';
   FProtocolVersion := HTTPpv_1_1;
-  FProxyParams.OnChange := OnProxyParamsChange;
 end;
 
 {*******************************}

@@ -87,10 +87,10 @@ begin
   FOnConnected := nil;
   FOnDisconnected := nil;
   FProxyParams := TALHttpClientProxyParams.Create;
+  FProxyParams.OnChange := OnProxyParamsChange;
   FRequestHeader := TALHTTPRequestHeader.Create;
   FRequestHeader.UserAgent := 'Mozilla/3.0 (compatible; TALWebSocketClient)';
   FProtocolVersion := HTTPpv_1_1;
-  FProxyParams.OnChange := OnProxyParamsChange;
   fAutoReconnect := True;
 end;
 

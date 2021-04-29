@@ -61,7 +61,6 @@ type
     FReceiveBuffer: AnsiString;
     FFragmentReceiveBuffer: AnsiString;
     FSendqueue: Tqueue<TALWinHTTPWebSocketClientSendQueueItem>;
-    procedure InitURL(const Value: AnsiString);
     procedure SetAccessType(const Value: TALWinHTTPClientInternetOpenAccessType);
     procedure Reconnect;
     function DoSend(const aData: AnsiString;
@@ -128,12 +127,12 @@ uses
   ALCommon,
   ALString;
 
-{********************************************************************}
-procedure ALWinHTTPWebSocketClientStatusCallback(hInternet: HINTERNET;
-                                                 dwContext: DWORD_PTR;
-                                                 dwInternetStatus: DWORD;
-                                                 lpvStatusInformation: LPVOID;
-                                                 dwStatusInformationLength: DWORD); stdcall;
+{*********************************************************************************}
+procedure ALWinHTTPWebSocketClientInetWebSocketStatusCallback(hInternet: HINTERNET;
+                                                              dwContext: DWORD_PTR;
+                                                              dwInternetStatus: DWORD;
+                                                              lpvStatusInformation: LPVOID;
+                                                              dwStatusInformationLength: DWORD); stdcall;
 begin
 
   TThread.Synchronize(nil, // << As we use WINHTTP_FLAG_ASYNC we must synch the event with the main thread
@@ -142,10 +141,6 @@ begin
         LBool: Boolean;
         LStatus: _WINHTTP_WEB_SOCKET_STATUS;
         LData: ansiString;
-        LSetStatusCallbackResult: TWinHttpStatusCallback;
-        LDWordPtrOption: DWord_ptr;
-        LSendQueueItems: TArray<TALWinHTTPWebSocketClientSendQueueItem>;
-        I: integer;
     begin
 
       {check if dwContext is still active}
@@ -165,56 +160,12 @@ begin
             lpvStatusInformation,
             dwStatusInformationLength);
 
-        {WINHTTP_CALLBACK_STATUS_SENDREQUEST_COMPLETE}
-        If (dwInternetStatus = WINHTTP_CALLBACK_STATUS_SENDREQUEST_COMPLETE) then begin
-          LWebSocketClient.CheckError(not WinHttpReceiveResponse(LWebSocketClient.FInetRequest, nil));
-        end
-
-        {WINHTTP_CALLBACK_STATUS_HEADERS_AVAILABLE}
-        else if dwInternetStatus = WINHTTP_CALLBACK_STATUS_HEADERS_AVAILABLE then begin
-
-          {Upgrade to WebSocket}
-          LWebSocketClient.FInetWebSocket := WinHttpWebSocketCompleteUpgrade(LWebSocketClient.FInetRequest, 0);
-          LWebSocketClient.CheckError(not Assigned(LWebSocketClient.FInetWebSocket));
-
-          {Register the callback function}
-          LDWordPtrOption := DWORD_PTR(LWebSocketClient.fContext);
-          LWebSocketClient.CheckError(not WinHttpSetOption(LWebSocketClient.FInetWebSocket, WINHTTP_OPTION_CONTEXT_VALUE, Pointer(@LDWordPtrOption), sizeof(LDWordPtrOption)));
-          LSetStatusCallbackResult := WinHttpSetStatusCallback(LWebSocketClient.FInetWebSocket, // _In_       HINTERNET               hInternet,
-                                                               @ALWinHTTPWebSocketClientStatusCallback, // _In_       WINHTTP_STATUS_CALLBACK lpfnInternetCallback,
-                                                               WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS, // _In_       DWORD                   dwNotificationFlags,
-                                                               0); // _Reserved_ DWORD_PTR               dwReserved
-          LWebSocketClient.CheckError(@LSetStatusCallbackResult = @WINHTTP_INVALID_STATUS_CALLBACK);
-
-          {start to read the socket}
-          if not LWebSocketClient.Receive then exit;
-
-          {init FWebSocketReady}
-          LWebSocketClient.FWebSocketReady := True;
-
-          {Send the item in queue}
-          LSendQueueItems := LWebSocketClient.FSendqueue.ToArray;
-          for I := low(LSendQueueItems) to high(LSendQueueItems) do
-            if not LWebSocketClient.DoSend(LSendQueueItems[i].Data, LSendQueueItems[i].IsUTF8, False{aEnqueue}) then exit;
-
-        end
-
         {WINHTTP_CALLBACK_STATUS_REQUEST_ERROR}
-        else If (dwInternetStatus = WINHTTP_CALLBACK_STATUS_REQUEST_ERROR) then begin
+        If (dwInternetStatus = WINHTTP_CALLBACK_STATUS_REQUEST_ERROR) then begin
           if Assigned(LWebSocketClient.OnError) then
             LWebSocketClient.OnError(
               LWebSocketClient,
               'An error occurred while sending an HTTP request');
-          if LWebSocketClient.AutoReconnect then
-            LWebSocketClient.Reconnect;
-        end
-
-        {WINHTTP_CALLBACK_STATUS_SECURE_FAILURE}
-        else If (dwInternetStatus = WINHTTP_CALLBACK_STATUS_SECURE_FAILURE) then begin
-          if Assigned(LWebSocketClient.OnError) then
-            LWebSocketClient.OnError(
-              LWebSocketClient,
-              'One or more errors were encountered while retrieving a Secure Sockets Layer (SSL) certificate from the server');
           if LWebSocketClient.AutoReconnect then
             LWebSocketClient.Reconnect;
         end
@@ -261,6 +212,107 @@ begin
           if LWebSocketClient.FSendqueue.Count > 0 then
             LWebSocketClient.FSendqueue.Dequeue;
         end;
+
+      Except
+        on E: Exception do begin
+          if assigned(LWebSocketClient.OnError) then LWebSocketClient.OnError(LWebSocketClient, AnsiString(E.Message));
+          if LWebSocketClient.AutoReconnect then LWebSocketClient.Reconnect
+          else raise;
+        end;
+      end;
+
+    end);
+
+end;
+
+{****************************************************************************}
+procedure ALWinHTTPWebSocketClientInetRootStatusCallback(hInternet: HINTERNET;
+                                                         dwContext: DWORD_PTR;
+                                                         dwInternetStatus: DWORD;
+                                                         lpvStatusInformation: LPVOID;
+                                                         dwStatusInformationLength: DWORD); stdcall;
+begin
+
+  TThread.Synchronize(nil, // << As we use WINHTTP_FLAG_ASYNC we must synch the event with the main thread
+    procedure
+    var LWebSocketClient: TALWinHTTPWebSocketClient;
+        LBool: Boolean;
+        LSetStatusCallbackResult: TWinHttpStatusCallback;
+        LDWordPtrOption: DWord_ptr;
+        LSendQueueItems: TArray<TALWinHTTPWebSocketClientSendQueueItem>;
+        I: integer;
+    begin
+
+      {check if dwContext is still active}
+      if (TALWinHTTPWebSocketClient.ActiveWebSocketClient = nil) or
+         (not TALWinHTTPWebSocketClient.ActiveWebSocketClient.TryGetValue(dwContext, LBool)) then exit;
+
+      {init LWebSocketClient}
+      LWebSocketClient := TALWinHTTPWebSocketClientContext(dwContext).WebSocketClient;
+
+      Try
+
+        {fire the OnStatusChange event}
+        if Assigned(LWebSocketClient.FOnStatus) then
+          LWebSocketClient.FOnStatus(
+            LWebSocketClient,
+            dwInternetStatus,
+            lpvStatusInformation,
+            dwStatusInformationLength);
+
+        {WINHTTP_CALLBACK_STATUS_SENDREQUEST_COMPLETE}
+        If (dwInternetStatus = WINHTTP_CALLBACK_STATUS_SENDREQUEST_COMPLETE) then begin
+          LWebSocketClient.CheckError(not WinHttpReceiveResponse(LWebSocketClient.FInetRequest, nil));
+        end
+
+        {WINHTTP_CALLBACK_STATUS_HEADERS_AVAILABLE}
+        else if dwInternetStatus = WINHTTP_CALLBACK_STATUS_HEADERS_AVAILABLE then begin
+
+          {Upgrade to WebSocket}
+          LWebSocketClient.FInetWebSocket := WinHttpWebSocketCompleteUpgrade(LWebSocketClient.FInetRequest, 0);
+          LWebSocketClient.CheckError(not Assigned(LWebSocketClient.FInetWebSocket));
+
+          {Register the callback function}
+          LDWordPtrOption := DWORD_PTR(LWebSocketClient.fContext);
+          LWebSocketClient.CheckError(not WinHttpSetOption(LWebSocketClient.FInetWebSocket, WINHTTP_OPTION_CONTEXT_VALUE, Pointer(@LDWordPtrOption), sizeof(LDWordPtrOption)));
+          LSetStatusCallbackResult := WinHttpSetStatusCallback(LWebSocketClient.FInetWebSocket, // _In_       HINTERNET               hInternet,
+                                                               @ALWinHTTPWebSocketClientInetWebSocketStatusCallback, // _In_       WINHTTP_STATUS_CALLBACK lpfnInternetCallback,
+                                                               WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS, // _In_       DWORD                   dwNotificationFlags,
+                                                               0); // _Reserved_ DWORD_PTR               dwReserved
+          LWebSocketClient.CheckError(@LSetStatusCallbackResult = @WINHTTP_INVALID_STATUS_CALLBACK);
+
+          {start to read the socket}
+          if not LWebSocketClient.Receive then exit;
+
+          {init FWebSocketReady}
+          LWebSocketClient.FWebSocketReady := True;
+
+          {Send the item in queue}
+          LSendQueueItems := LWebSocketClient.FSendqueue.ToArray;
+          for I := low(LSendQueueItems) to high(LSendQueueItems) do
+            if not LWebSocketClient.DoSend(LSendQueueItems[i].Data, LSendQueueItems[i].IsUTF8, False{aEnqueue}) then exit;
+
+        end
+
+        {WINHTTP_CALLBACK_STATUS_REQUEST_ERROR}
+        else If (dwInternetStatus = WINHTTP_CALLBACK_STATUS_REQUEST_ERROR) then begin
+          if Assigned(LWebSocketClient.OnError) then
+            LWebSocketClient.OnError(
+              LWebSocketClient,
+              'An error occurred while sending an HTTP request');
+          if LWebSocketClient.AutoReconnect then
+            LWebSocketClient.Reconnect;
+        end
+
+        {WINHTTP_CALLBACK_STATUS_SECURE_FAILURE}
+        else If (dwInternetStatus = WINHTTP_CALLBACK_STATUS_SECURE_FAILURE) then begin
+          if Assigned(LWebSocketClient.OnError) then
+            LWebSocketClient.OnError(
+              LWebSocketClient,
+              'One or more errors were encountered while retrieving a Secure Sockets Layer (SSL) certificate from the server');
+          if LWebSocketClient.AutoReconnect then
+            LWebSocketClient.Reconnect;
+        end
 
       Except
         on E: Exception do begin
@@ -350,16 +402,6 @@ end;
 
 {******************************************************************}
 procedure TALWinHTTPWebSocketClient.SetURL(const Value: AnsiString);
-begin
-  If Value <> Url then Begin
-    Disconnect;
-    InitURL(Value);
-    Furl := Value;
-  end;
-end;
-
-{*******************************************************************}
-procedure TALWinHTTPWebSocketClient.InitURL(const Value: AnsiString);
 Var LSchemeName,
     LHostName,
     LUserName,
@@ -368,29 +410,33 @@ Var LSchemeName,
     LExtraInfo: AnsiString;
     LPortNumber: integer;
 begin
-  if Value <> '' then begin
-    if not AlInternetCrackUrl(
-             Value, // aUrl: AnsiString;
-             LSchemeName, // Var LSchemeName: AnsiString;
-             LHostName, // Var LHostName: AnsiString;
-             LUserName, // Var LUserName: AnsiString;
-             LPassword, // Var LPassword: AnsiString;
-             LUrlPath, // Var LUrlPath: AnsiString;
-             LExtraInfo, // Var LExtraInfo: AnsiString;
-             LPortNumber) then
-      raise EALHTTPClientException.CreateFmt(CALHTTPCLient_MsgInvalidURL, [Value]);
-    if ALSameText(LSchemeName, 'wss') then FURLScheme := INTERNET_SCHEME_HTTPS
-    else if ALSameText(LSchemeName, 'ws') then FURLScheme := INTERNET_SCHEME_HTTP
-    else raise Exception.Createfmt('Unknown scheme (%s)',[LSchemeName]);
-    FURLPort := LPortNumber;
-    FURLHost := LHostName;
-    FURLPath := LUrlPath;
-  end
-  else begin
-    FURLPort := INTERNET_DEFAULT_HTTP_PORT;
-    FURLHost := '';
-    FURLPath := '';
-    FURLScheme := INTERNET_SCHEME_HTTP;
+  If Value <> Url then Begin
+    Disconnect;
+    if Value <> '' then begin
+      if not AlInternetCrackUrl(
+               Value, // aUrl: AnsiString;
+               LSchemeName, // Var LSchemeName: AnsiString;
+               LHostName, // Var LHostName: AnsiString;
+               LUserName, // Var LUserName: AnsiString;
+               LPassword, // Var LPassword: AnsiString;
+               LUrlPath, // Var LUrlPath: AnsiString;
+               LExtraInfo, // Var LExtraInfo: AnsiString;
+               LPortNumber) then
+        raise EALHTTPClientException.CreateFmt(CALHTTPCLient_MsgInvalidURL, [Value]);
+      if ALSameText(LSchemeName, 'wss') then FURLScheme := INTERNET_SCHEME_HTTPS
+      else if ALSameText(LSchemeName, 'ws') then FURLScheme := INTERNET_SCHEME_HTTP
+      else raise Exception.Createfmt('Unknown scheme (%s)',[LSchemeName]);
+      FURLPort := LPortNumber;
+      FURLHost := LHostName;
+      FURLPath := LUrlPath;
+    end
+    else begin
+      FURLPort := INTERNET_DEFAULT_HTTP_PORT;
+      FURLHost := '';
+      FURLPath := '';
+      FURLScheme := INTERNET_SCHEME_HTTP;
+    end;
+    Furl := Value;
   end;
 end;
 
@@ -467,7 +513,7 @@ begin
 
     {Register the callback function}
     LSetStatusCallbackResult := WinHttpSetStatusCallback(FInetRoot, // _In_       HINTERNET               hInternet,
-                                                         @ALWinHTTPWebSocketClientStatusCallback, // _In_       WINHTTP_STATUS_CALLBACK lpfnInternetCallback,
+                                                         @ALWinHTTPWebSocketClientInetRootStatusCallback, // _In_       WINHTTP_STATUS_CALLBACK lpfnInternetCallback,
                                                          WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS, // _In_       DWORD                   dwNotificationFlags,
                                                          0); // _Reserved_ DWORD_PTR               dwReserved
     CheckError(@LSetStatusCallbackResult = @WINHTTP_INVALID_STATUS_CALLBACK);

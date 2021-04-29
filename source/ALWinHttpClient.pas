@@ -171,7 +171,6 @@ type
     FInetRoot: HINTERNET;
     FInetConnect: HINTERNET;
     FOnStatus: TALWinHttpClientStatusEvent;
-    procedure InitURL(const Value: AnsiString);
     procedure SetAccessType(const Value: TALWinHttpClientInternetOpenAccessType);
     procedure SetOnStatus(const Value: TALWinHttpClientStatusEvent);
   protected
@@ -291,52 +290,55 @@ end;
 
 {*********************************************************}
 procedure TALWinHttpClient.SetURL(const Value: AnsiString);
-Var LOldURLHost: AnsiString;
-    LOldUrlPort: INTERNET_PORT;
-    LOldURLScheme: INTERNET_SCHEME;
+Var LSchemeName,
+    LHostName,
+    LUserName,
+    LPassword,
+    LUrlPath,
+    LExtraInfo: AnsiString;
+    LScheme: INTERNET_SCHEME;
+    LPortNumber: integer;
 begin
   If Value <> Url then Begin
-    LOldURLHost := FURLHost;
-    LOldUrlPort := FURLPort;
-    LOldURLScheme := FURLScheme;
-    InitURL(Value);
 
-    { Here we disconnect if a new URL comes in with a
-      new host...this ensures that we don't keep a
-      connection to a wrong host }
-    If (LOldURLHost <> FURLHost) or
-       (LOldUrlPort <> FURLPort) or
-       (LOldURLScheme <> FURLScheme) then Disconnect;
+    if Value <> '' then begin
+      if not AlInternetCrackUrl(
+               Value, // aUrl: AnsiString;
+               LSchemeName, // Var LSchemeName: AnsiString;
+               LHostName, // Var LHostName: AnsiString;
+               LUserName, // Var LUserName: AnsiString;
+               LPassword, // Var LPassword: AnsiString;
+               LUrlPath, // Var LUrlPath: AnsiString;
+               LExtraInfo, // Var LExtraInfo: AnsiString;
+               LPortNumber) then
+        raise EALHTTPClientException.CreateFmt(CALHTTPCLient_MsgInvalidURL, [Value]);
+      //-----
+      if ALSameText(LSchemeName, 'https') then LScheme := INTERNET_SCHEME_HTTPS
+      else if ALSameText(LSchemeName, 'http') then LScheme := INTERNET_SCHEME_HTTP
+      else raise Exception.Createfmt('Unknown scheme (%s)',[LSchemeName]);
+      //-----
+      { Here we disconnect if a new URL comes in with a
+        new host...this ensures that we don't keep a
+        connection to a wrong host }
+      If (LHostName <> FURLHost) or
+         (LPortNumber <> FURLPort) or
+         (LScheme <> FURLScheme) then Disconnect;
+      //-----
+      FURLPort := LPortNumber;
+      FURLHost := LHostName;
+      FURLPath := LUrlPath;
+      FURLScheme := LScheme;
+    end
+    else begin
+      disconnect;
+      FURLPort := INTERNET_DEFAULT_HTTP_PORT;
+      FURLHost := '';
+      FURLPath := '';
+      FURLScheme := INTERNET_SCHEME_HTTP;
+    end;
 
     Furl := Value;
-  end;
-end;
 
-{**********************************************************}
-procedure TALWinHttpClient.InitURL(const Value: AnsiString);
-var URLComp: TURLComponents;
-    P: PWideChar;
-begin
-  if Value <> '' then begin
-    FillChar(URLComp, SizeOf(URLComp), 0);
-    URLComp.dwStructSize := SizeOf(URLComp);
-    URLComp.dwSchemeLength := 1;
-    URLComp.dwHostNameLength := 1;
-    URLComp.dwURLPathLength := 1;
-    P := PWideChar(String(Value));
-    if (not WinHttpCrackUrl(P, 0, 0, URLComp)) or
-       (not (URLComp.nScheme in [INTERNET_SCHEME_HTTP, INTERNET_SCHEME_HTTPS])) then
-      raise EALHTTPClientException.CreateFmt(CALHTTPCLient_MsgInvalidURL, [Value]);
-    FURLScheme := URLComp.nScheme;
-    FURLPort := URLComp.nPort;
-    FURLHost := ALCopyStr(Value, URLComp.lpszHostName - P + 1, URLComp.dwHostNameLength);
-    FURLPath := ALCopyStr(Value, URLComp.lpszUrlPath - P + 1, URLComp.dwUrlPathLength);
-  end
-  else begin
-    FURLPort := INTERNET_DEFAULT_HTTP_PORT;
-    FURLHost := '';
-    FURLPath := '';
-    FURLScheme := INTERNET_SCHEME_HTTP;
   end;
 end;
 

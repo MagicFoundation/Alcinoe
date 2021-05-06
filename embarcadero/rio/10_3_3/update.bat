@@ -31,7 +31,7 @@ IF ERRORLEVEL 1 goto ERROR
 echo.
 
 echo Patch the source code
-git apply rio_10_3_3.patch -v
+git apply --ignore-space-change --ignore-whitespace rio_10_3_3.patch -v
 IF ERRORLEVEL 1 goto ERROR
 echo.
 

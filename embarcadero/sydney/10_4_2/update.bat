@@ -37,7 +37,7 @@ IF ERRORLEVEL 1 goto ERROR
 echo.
 
 echo Patch the source code
-git apply sydney_10_4_2.patch -v
+git apply --ignore-space-change --ignore-whitespace sydney_10_4_2.patch -v
 IF ERRORLEVEL 1 goto ERROR
 echo.
 

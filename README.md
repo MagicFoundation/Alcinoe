@@ -28,6 +28,7 @@ Compiled demo
 
 * https://svn.code.sf.net/p/alcinoe/code/demos/ALWinHTTPClient/win32/ALWinHTTPClientDemo.exe
 * https://svn.code.sf.net/p/alcinoe/code/demos/ALWinInetHTTPClient/win32/ALWinInetHTTPClientDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/demos/ALWinHTTPWebSocketClient/win32/ALWinHTTPWebSocketClientDemo.exe
 * https://svn.code.sf.net/p/alcinoe/code/demos/ALSortedListBenchmark/win32/ALSortedListBenchmark.exe
 * https://svn.code.sf.net/p/alcinoe/code/demos/ALCipher/win32/ALCipherDemo.exe
 * https://svn.code.sf.net/p/alcinoe/code/demos/ALJsonDoc/win32/AljsonDocDemo.exe
@@ -548,6 +549,17 @@ Example tail monitoring :
                                       end);
     ....
     aMongoDBTailMonitoringThread.free;
+
+
+WebSocket client
+----------------
+
+WebSocket Client for Delphi implemented on the top of WinHTTP.
+The WebSocket is a communication protocol, that makes it possible 
+to open a two-way interactive communication session between the 
+user’s browser and a server. With this, you can send messages to 
+a server and receive event-driven responses without having to 
+poll the server for a reply.
 
 
 Fast TStringList

@@ -1,17 +1,47 @@
 @echo off
 
-REM ----------------------------------------------
-REM Update the path below according to your system
-REM ----------------------------------------------
+REM -------------------
+REM Choose the compiler
+REM -------------------
 
-set DELPHI_NAME=sydney
-call "C:\Program Files (x86)\Embarcadero\Studio\21.0\bin\rsvars.bat"
-IF ERRORLEVEL 1 goto ERROR
+:CHOOSE_COMPILER
+
+set COMPILER=
+  
+cls
+echo 1) Rio
+echo 2) Sydney
+
+set COMPILER=
+set /P COMPILER=Enter number to select a compiler: %=%
+more < nul > nul & REM This instruction to clear the ERRORLEVEL as instruction below set ERRORLEVEL to 1 if empty input
+
+if "%COMPILER%"=="1" (
+  set DELPHI_NAME=rio
+  set DELPHI_VERSION=20.0
+  goto INIT_LOCAL_VARS
+)
+if "%COMPILER%"=="2" (
+  set DELPHI_NAME=sydney
+  set DELPHI_VERSION=21.0
+  goto INIT_LOCAL_VARS
+)
+
+goto CHOOSE_COMPILER
 
 
 REM ---------------
 REM Init local vars
 REM ---------------
+
+:INIT_LOCAL_VARS
+
+FOR /F "usebackq tokens=3*" %%A IN (`reg query "HKCU\Software\Embarcadero\BDS\%DELPHI_VERSION%" /v RootDir`) DO set DelphiRootDir=%%A %%B 
+set DelphiRootDir=%DelphiRootDir:~0,-1%
+set DelphiBinDir=%DelphiRootDir%bin
+
+call "%DelphiBinDir%\rsvars.bat"
+IF ERRORLEVEL 1 goto ERROR
 
 FOR %%a IN ("%%~dp0") DO set "ProjectDir=%%~dpa"
 IF %ProjectDir:~-1%==\ SET ProjectDir=%ProjectDir:~0,-1%
@@ -90,7 +120,7 @@ REM ----------
 REM Build jars 
 REM ----------
 
-call compileJar.bat off
+call compileJar.bat off "%DelphiRootDir%"
 IF ERRORLEVEL 1 goto ERROR
 
 

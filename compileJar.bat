@@ -4,12 +4,22 @@ REM ----------------------------------------------
 REM Update the path below according to your system
 REM ----------------------------------------------
 
-if x%ANDROID% == x set ANDROID="C:\SDKs\android"
+set ANDROID="C:\SDKs\android"
 set ANDROID_PLATFORM=%ANDROID%\platforms\android-30
-set FMX_JAR="C:\Program Files (x86)\Embarcadero\Studio\21.0\lib\android\release\fmx.jar"
-set JDK_PATH1_8="C:\Program Files\AdoptOpenJDK\jdk-8.0.282.8-hotspot\bin"
+set JDK_PATH="C:\Program Files\AdoptOpenJDK\jdk-8.0.282.8-hotspot\bin"
+set DEFAULT_DELPHI_VERSION=21.0
+
+
+REM -----------------
+REM Update local vars
+REM -----------------
 set CONFIRM=%1
-if x%CONFIRM% == x set CONFIRM=on
+if "x%CONFIRM%" == "x" set CONFIRM=on
+set DelphiRootDirFromParams=%~2
+FOR /F "usebackq tokens=3*" %%A IN (`reg query "HKCU\Software\Embarcadero\BDS\%DEFAULT_DELPHI_VERSION%" /v RootDir`) DO set DelphiRootDirFromReg=%%A %%B 
+set DelphiRootDirFromReg=%DelphiRootDirFromReg:~0,-1%
+set FMX_JAR="%DelphiRootDirFromParams%lib\android\release\fmx.jar"
+if "x%DelphiRootDirFromParams%" == "x" set FMX_JAR="%DelphiRootDirFromReg%lib\android\release\fmx.jar"
 
 
 REM ---------------
@@ -35,7 +45,7 @@ IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
 mkdir source\output 2> nul
-%JDK_PATH1_8%\javac^
+%JDK_PATH%\javac^
  -Xlint:unchecked^
  -Xlint:deprecation^
  -cp %ANDROID_PLATFORM%\android.jar;^
@@ -49,7 +59,7 @@ SET FileName=source\output\com\alcinoe\*.class
 if exist %FileName% del %FileName%
 if exist %FileName% goto ERROR
 
-%JDK_PATH1_8%\jar cf lib\jar\com.alcinoe\com.alcinoe.common\alcinoe-common.jar -C source\output com\alcinoe\
+%JDK_PATH%\jar cf lib\jar\com.alcinoe\com.alcinoe.common\alcinoe-common.jar -C source\output com\alcinoe\
 IF ERRORLEVEL 1 goto ERROR
 
 SET FileName=source\output
@@ -70,7 +80,7 @@ IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
 mkdir source\output 2> nul
-%JDK_PATH1_8%\javac^
+%JDK_PATH%\javac^
  -Xlint:unchecked^
  -Xlint:deprecation^
  -cp %ANDROID_PLATFORM%\android.jar;^
@@ -82,7 +92,7 @@ SET FileName=source\output\com\alcinoe\*.class
 if exist %FileName% del %FileName%
 if exist %FileName% goto ERROR
 
-%JDK_PATH1_8%\jar cf lib\jar\com.alcinoe\com.alcinoe.datepicker\alcinoe-datepicker.jar -C source\output com\alcinoe\
+%JDK_PATH%\jar cf lib\jar\com.alcinoe\com.alcinoe.datepicker\alcinoe-datepicker.jar -C source\output com\alcinoe\
 IF ERRORLEVEL 1 goto ERROR
 
 SET FileName=source\output
@@ -103,7 +113,7 @@ IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
 mkdir source\output 2> nul
-%JDK_PATH1_8%\javac^
+%JDK_PATH%\javac^
  -Xlint:unchecked^
  -Xlint:deprecation^
  -cp %ANDROID_PLATFORM%\android.jar;^
@@ -115,7 +125,7 @@ SET FileName=source\output\com\alcinoe\*.class
 if exist %FileName% del %FileName%
 if exist %FileName% goto ERROR
 
-%JDK_PATH1_8%\jar cf lib\jar\com.alcinoe\com.alcinoe.edittext\alcinoe-edittext.jar -C source\output com\alcinoe\
+%JDK_PATH%\jar cf lib\jar\com.alcinoe\com.alcinoe.edittext\alcinoe-edittext.jar -C source\output com\alcinoe\
 IF ERRORLEVEL 1 goto ERROR
 
 SET FileName=source\output
@@ -136,7 +146,7 @@ IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
 mkdir source\output 2> nul
-%JDK_PATH1_8%\javac^
+%JDK_PATH%\javac^
  -Xlint:unchecked^
  -Xlint:deprecation^
  -cp %ANDROID_PLATFORM%\android.jar;^
@@ -150,7 +160,7 @@ SET FileName=source\output\com\alcinoe\*.class
 if exist %FileName% del %FileName%
 if exist %FileName% goto ERROR
 
-%JDK_PATH1_8%\jar cf lib\jar\com.alcinoe\com.alcinoe.webrtc\alcinoe-webrtc.jar -C source\output com\alcinoe\
+%JDK_PATH%\jar cf lib\jar\com.alcinoe\com.alcinoe.webrtc\alcinoe-webrtc.jar -C source\output com\alcinoe\
 IF ERRORLEVEL 1 goto ERROR
 
 SET FileName=source\output
@@ -171,7 +181,7 @@ IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
 mkdir source\output 2> nul
-%JDK_PATH1_8%\javac^
+%JDK_PATH%\javac^
  -Xlint:unchecked^
  -Xlint:deprecation^
  -cp %ANDROID_PLATFORM%\android.jar;^
@@ -184,7 +194,7 @@ SET FileName=source\output\com\alcinoe\*.class
 if exist %FileName% del %FileName%
 if exist %FileName% goto ERROR
 
-%JDK_PATH1_8%\jar cf lib\jar\com.alcinoe\com.alcinoe.appsflyer\alcinoe-appsflyer.jar -C source\output com\alcinoe\
+%JDK_PATH%\jar cf lib\jar\com.alcinoe\com.alcinoe.appsflyer\alcinoe-appsflyer.jar -C source\output com\alcinoe\
 IF ERRORLEVEL 1 goto ERROR
 
 SET FileName=source\output
@@ -205,7 +215,7 @@ IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
 mkdir source\output 2> nul
-%JDK_PATH1_8%\javac^
+%JDK_PATH%\javac^
  -Xlint:unchecked^
  -cp %ANDROID_PLATFORM%\android.jar;%FMX_JAR%;^
 lib\jar\com.android.support\support-core-utils.jar;^
@@ -223,7 +233,7 @@ SET FileName=source\output\com\alcinoe\*.class
 if exist %FileName% del %FileName%
 if exist %FileName% goto ERROR
 
-%JDK_PATH1_8%\jar cf lib\jar\com.alcinoe\com.alcinoe.firebase\alcinoe-firebase.jar -C source\output com\alcinoe\
+%JDK_PATH%\jar cf lib\jar\com.alcinoe\com.alcinoe.firebase\alcinoe-firebase.jar -C source\output com\alcinoe\
 IF ERRORLEVEL 1 goto ERROR
 
 SET FileName=source\output
@@ -244,7 +254,7 @@ IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
 mkdir source\output 2> nul
-%JDK_PATH1_8%\javac^
+%JDK_PATH%\javac^
  -Xlint:unchecked^
  -Xlint:deprecation^
  -cp %ANDROID_PLATFORM%\android.jar;^
@@ -259,7 +269,7 @@ SET FileName=source\output\com\alcinoe\*.class
 if exist %FileName% del %FileName%
 if exist %FileName% goto ERROR
 
-%JDK_PATH1_8%\jar cf lib\jar\com.alcinoe\com.alcinoe.facebook\alcinoe-facebook.jar -C source\output com\alcinoe\
+%JDK_PATH%\jar cf lib\jar\com.alcinoe\com.alcinoe.facebook\alcinoe-facebook.jar -C source\output com\alcinoe\
 IF ERRORLEVEL 1 goto ERROR
 
 SET FileName=source\output
@@ -280,7 +290,7 @@ IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
 mkdir source\output 2> nul
-%JDK_PATH1_8%\javac^
+%JDK_PATH%\javac^
  -Xlint:unchecked^
  -Xlint:deprecation^
  -cp %ANDROID_PLATFORM%\android.jar;^
@@ -293,7 +303,7 @@ SET FileName=source\output\com\alcinoe\*.class
 if exist %FileName% del %FileName%
 if exist %FileName% goto ERROR
 
-%JDK_PATH1_8%\jar cf lib\jar\com.alcinoe\com.alcinoe.installreferrer\alcinoe-installreferrer.jar -C source\output com\alcinoe\
+%JDK_PATH%\jar cf lib\jar\com.alcinoe\com.alcinoe.installreferrer\alcinoe-installreferrer.jar -C source\output com\alcinoe\
 IF ERRORLEVEL 1 goto ERROR
 
 SET FileName=source\output

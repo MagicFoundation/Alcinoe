@@ -428,7 +428,7 @@ begin
       else raise Exception.Createfmt('Unknown scheme (%s)',[LSchemeName]);
       FURLPort := LPortNumber;
       FURLHost := LHostName;
-      FURLPath := LUrlPath;
+      FURLPath := LUrlPath + LExtraInfo;
     end
     else begin
       FURLPort := INTERNET_DEFAULT_HTTP_PORT;

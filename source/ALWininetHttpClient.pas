@@ -319,7 +319,7 @@ begin
       //-----
       FURLPort := LPortNumber;
       FURLHost := LHostName;
-      FURLPath := LUrlPath;
+      FURLPath := LUrlPath + LExtraInfo;
       FURLScheme := LScheme;
     end
     else begin

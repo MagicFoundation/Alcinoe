@@ -427,7 +427,7 @@ Function  AlExtractShemeFromUrl(const aUrl: AnsiString): TInternetScheme;
 Function  AlExtractHostNameFromUrl(const aUrl: AnsiString): AnsiString;
 Function  AlExtractDomainNameFromUrl(const aUrl: AnsiString): AnsiString;
 Function  AlExtractUrlPathFromUrl(const aUrl: AnsiString): AnsiString;
-Function  AlInternetCrackUrl(aUrl: AnsiString;
+Function  AlInternetCrackUrl(const aUrl: AnsiString;
                              Var SchemeName,
                                  HostName,
                                  UserName,
@@ -1152,8 +1152,8 @@ begin
   else result := '';
 end;
 
-{********************************************}
-Function  AlInternetCrackUrl(aUrl: AnsiString;
+{**************************************************}
+Function  AlInternetCrackUrl(const aUrl: AnsiString;
                              Var SchemeName,
                                  HostName,
                                  UserName,
@@ -1164,33 +1164,31 @@ Function  AlInternetCrackUrl(aUrl: AnsiString;
 Var P1, P2: Integer;
     S1: AnsiString;
 begin
-  SchemeName := '';
-  HostName := '';
-  UserName := '';
-  Password := '';
-  UrlPath := '';
-  ExtraInfo := '';
-  PortNumber := 0;
+  HostName := aUrl;
   Result := True;
-
-  P1 := AlPos('://', aUrl);  // ftp://xxxx:yyyyy@ftp.yoyo.com:21/path/filename.xxx?param1=value1
+  P1 := AlPos('://', HostName);  // ftp://xxxx:yyyyy@ftp.yoyo.com:21/path/filename.xxx?param1=value1
   if P1 > 0 then begin
-    SchemeName := AlCopyStr(aUrl, 1, P1-1); // ftp
-    delete(aUrl,1, P1+2);                   // xxxx:yyyyy@ftp.yoyo.com:21/path/filename.xxx?param1=value1
-    P1 := AlPos('?',aUrl);
+    SchemeName := AlCopyStr(HostName, 1, P1-1); // ftp
+    delete(HostName,1, P1+2);                   // xxxx:yyyyy@ftp.yoyo.com:21/path/filename.xxx?param1=value1
+    P2 := AlPos('#',HostName);
+    P1 := AlPos('?',HostName);
+    if (P1 > 0) and (P2 > 0) then P1 := Min(P1,P2)
+    else if (P2 > 0) then P1 := P2;
     if P1 > 0 then begin
-      ExtraInfo := AlCopyStr(aUrl, P1, Maxint); // ?param1=value1
-      delete(aUrl, P1, Maxint);                 // xxxx:yyyyy@ftp.yoyo.com:21/path/filename.xxx
-    end;
-    P1 := AlPos('/',aUrl);
+      ExtraInfo := AlCopyStr(HostName, P1, Maxint); // ?param1=value1
+      delete(HostName, P1, Maxint);                 // xxxx:yyyyy@ftp.yoyo.com:21/path/filename.xxx
+    end
+    else ExtraInfo := '';
+    P1 := AlPos('/',HostName);
     if P1 > 0 then begin
-      UrlPath := AlCopyStr(aUrl, P1, Maxint); // /path/filename.xxx
-      delete(aUrl, P1, Maxint);               // xxxx:yyyyy@ftp.yoyo.com:21
-    end;
-    P1 := ALLastDelimiter('@',aUrl);
+      UrlPath := AlCopyStr(HostName, P1, Maxint); // /path/filename.xxx
+      delete(HostName, P1, Maxint);               // xxxx:yyyyy@ftp.yoyo.com:21
+    end
+    else UrlPath := '';
+    P1 := ALLastDelimiter('@',HostName);
     if P1 > 0 then begin
-      S1 := AlCopyStr(aUrl, 1, P1-1); // xxxx:yyyyy
-      delete(aUrl,1, P1);             // ftp.yoyo.com:21
+      S1 := AlCopyStr(HostName, 1, P1-1); // xxxx:yyyyy
+      delete(HostName,1, P1);             // ftp.yoyo.com:21
       P1 := Alpos(':', S1);
       if P1 > 0 then begin
         UserName := AlCopyStr(S1,1,P1-1);      // xxxx
@@ -1200,14 +1198,19 @@ begin
         UserName := S1;
         Password := '';
       end;
+    end
+    else begin
+      UserName := '';
+      Password := '';
     end;
-    P2 := AlPos(']', aUrl); // to handle ipV6 url like [::1]:8080
-    P1 := AlPosEx(':',aUrl, P2+1);
+    P2 := AlPos(']', HostName); // to handle ipV6 url like [::1]:8080
+    P1 := AlPosEx(':',HostName, P2+1);
     if P1 > 0 then begin
-      S1 := AlCopyStr(aUrl, P1+1, Maxint); // 21
-      delete(aUrl, P1, Maxint);            // ftp.yoyo.com
+      S1 := AlCopyStr(HostName, P1+1, Maxint); // 21
+      delete(HostName, P1, Maxint);            // ftp.yoyo.com
       if not ALTryStrToInt(S1, PortNumber) then PortNumber := 0;
-    end;
+    end
+    else PortNumber := 0;
     if PortNumber = 0 then begin
       if ALSameText(SchemeName, 'http') then PortNumber := 80
       else if ALSameText(SchemeName, 'https') then PortNumber := 443
@@ -1216,10 +1219,7 @@ begin
       else if ALSameText(SchemeName, 'ftp') then PortNumber := 21
       else result := False;
     end;
-    if result then begin
-      HostName := aUrl;
-      result := HostName <> '';
-    end;
+    If result then result := HostName <> '';
   end
   else result := False;
 
@@ -1274,7 +1274,6 @@ begin
     Anchor := '';
     Query.clear;
   end;
-
 end;
 
 {***********************************************}

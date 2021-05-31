@@ -7,16 +7,16 @@ FOR %%a IN ("%%~dp0") DO set "ProjectDir=%%~dpa"
 IF %ProjectDir:~-1%==\ SET ProjectDir=%ProjectDir:~0,-1%
 
 SET FileName=%ProjectDir%\fmx
-IF EXIST %FileName% rmdir /s /q %FileName%
-IF EXIST %FileName% goto ERROR
-mkdir %FileName%
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
+IF EXIST "%FileName%" goto ERROR
+mkdir "%FileName%"
 
 SET FileName=%ProjectDir%\rtl
-IF EXIST %FileName% rmdir /s /q %FileName%
-IF EXIST %FileName% goto ERROR
-mkdir %FileName%
-mkdir %FileName%\ios
-mkdir %FileName%\android
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
+IF EXIST "%FileName%" goto ERROR
+mkdir "%FileName%"
+mkdir "%FileName%\ios"
+mkdir "%FileName%\android"
 
 echo Copy "%EmbSourceDir%\fmx" to "%ProjectDir%\fmx"
 xcopy "%EmbSourceDir%\fmx" "%ProjectDir%\fmx"

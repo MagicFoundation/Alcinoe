@@ -40,8 +40,10 @@ IF ERRORLEVEL 1 goto ERROR
 echo.
 
 echo Patch the source code
-git apply --ignore-space-change --ignore-whitespace sydney_10_4_2.patch -v
+CHDIR ".\..\..\..\"
+git apply --ignore-space-change --ignore-whitespace .\embarcadero\sydney\10_4_2\sydney_10_4_2.patch -v
 IF ERRORLEVEL 1 goto ERROR
+CHDIR "%ProjectDir%"
 echo.
 
 FOR %%a IN ("%ProjectDir%\rtl\win\*") DO IF /i NOT "%%~nxa"=="Winapi.Isapi2.pas" DEL "%%a"

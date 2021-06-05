@@ -1,6 +1,14 @@
 @echo off
 
 REM ----------------------------------------------
+REM Update the path below according to your system
+REM ----------------------------------------------
+
+set librariesRootPath=C:\Dev\Alcinoe\lib\jar
+set AndroidPlatformsSDKRootPath=C:\SDKs\android\platforms\android-30
+
+
+REM ----------------------------------------------
 REM 
 REM This batch file is a proxy to D8.bat
 REM https://quality.embarcadero.com/browse/RSP-21513
@@ -9,8 +17,6 @@ REM
 REM ----------------------------------------------
 
 setlocal enableextensions enabledelayedexpansion
-
-set librariesRootPath=C:\Dev\Alcinoe\lib\jar
 
 set FOLDER=%0
 for /D %%D in (%FOLDER%) do (
@@ -47,7 +53,7 @@ Echo.%_dxCmd% | findstr /C:"alcinoe-webrtc.jar">nul && (
 set _extraParams=%_extraParams% --release
 @echo _extraParams=%_extraParams% >> %logFile% 2>&1
 
-SET _d8Cmd=%_dxCmd:dx.bat"=d8.bat"!_extraParams! --lib C:\SDKs\android\platforms\android-30\android.jar%
+SET _d8Cmd=%_dxCmd:dx.bat"=d8.bat"!_extraParams! --lib !AndroidPlatformsSDKRootPath!\android.jar%
 SET _d8Cmd=%_d8Cmd:\classes.dex=%
 SET _d8Cmd=%_d8Cmd:--dex =%
 @echo _d8Cmd=%_d8Cmd% >> %logFile% 2>&1

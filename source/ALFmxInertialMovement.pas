@@ -7,6 +7,7 @@ unit ALFmxInertialMovement;
 interface
 
 {$SCOPEDENUMS ON}
+{$DEFINE IPUB_FIXES}
 
 uses
   System.Types,
@@ -51,6 +52,13 @@ const
   ALDecelerationRateNormal = 1.95;
   ALDecelerationRateFast = 9.5;
   ALDefaultElasticity = 100;
+  // ---------------------------------------------------------------------------
+  // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+  // Added ElasticityDecelerationFactor property to be able to reproduce, in a
+  // similar way, the UIScrollView of the iOS using the value "1.3"
+  {$IFDEF IPUB_FIXES} // -------------------------------------------------------
+  ALDefaultElasticityDecelerationFactor = 1;
+  {$ENDIF} // ------------------------------------------------------------------
   ALDefaultMinVelocity = 10;
   ALDefaultMaxVelocity = 5000;
   ALDefaultDeadZone = 8;
@@ -149,6 +157,13 @@ type
     FDownPosition: TALPointD;
     FUpdateTimerCount: Integer;
     FElasticity: Double;
+    // -------------------------------------------------------------------------
+    // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+    // Added ElasticityDecelerationFactor property to be able to reproduce, in a
+    // similar way, the UIScrollView of the iOS using the value "1.3"
+    {$IFDEF IPUB_FIXES} // -----------------------------------------------------
+    FElasticityDecelerationFactor: Double;
+    {$ENDIF} // ----------------------------------------------------------------
     FDecelerationRate: Double;
     FStorageTime: Double;
     FInDoStart: Boolean;
@@ -185,6 +200,13 @@ type
     function GetTargetCount: Integer;
     function DecelerationRateStored: Boolean;
     function ElasticityStored: Boolean;
+    // -------------------------------------------------------------------------
+    // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+    // Added ElasticityDecelerationFactor property to be able to reproduce, in a
+    // similar way, the UIScrollView of the iOS using the value "1.3"
+    {$IFDEF IPUB_FIXES} // -----------------------------------------------------
+    function ElasticityDecelerationFactorStored: Boolean;
+    {$ENDIF} // ----------------------------------------------------------------
     function StorageTimeStored: Boolean;
     function VelocityFactorStored: boolean;
     procedure CalcVelocity(const Time: TDateTime = 0);
@@ -292,6 +314,13 @@ type
     property Interval: Word read FInterval write SetInterval default ALDefaultIntervalOfAni;
     property DecelerationRate: Double read FDecelerationRate write FDecelerationRate stored DecelerationRateStored nodefault;
     property Elasticity: Double read FElasticity write FElasticity stored ElasticityStored nodefault;
+    // -------------------------------------------------------------------------
+    // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+    // Added ElasticityDecelerationFactor property to be able to reproduce, in a
+    // similar way, the UIScrollView of the iOS using the value "1.3"
+    {$IFDEF IPUB_FIXES} // -----------------------------------------------------
+    property ElasticityDecelerationFactor: Double read FElasticityDecelerationFactor write FElasticityDecelerationFactor stored ElasticityDecelerationFactorStored nodefault;
+    {$ENDIF} // ----------------------------------------------------------------
     property StorageTime: Double read FStorageTime write FStorageTime stored StorageTimeStored nodefault;
     property VelocityFactor: Double read FVelocityFactor write FVelocityFactor stored VelocityFactorStored nodefault; // << this is a factor to apply to the calculated velocity of the scroll (to boost a the velocity)
     property OnCalcVelocity: TNotifyEvent read FOnCalcVelocity write FOnCalcVelocity; // << we this you can dynamically calc the velocity
@@ -459,6 +488,13 @@ begin
     SetTargets(LTargets);
     DecelerationRate := LSource.DecelerationRate;
     Elasticity := LSource.Elasticity;
+    // -------------------------------------------------------------------------
+    // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+    // Added ElasticityDecelerationFactor property to be able to reproduce, in a
+    // similar way, the UIScrollView of the iOS using the value "1.3"
+    {$IFDEF IPUB_FIXES} // -----------------------------------------------------
+    ElasticityDecelerationFactor := LSource.ElasticityDecelerationFactor;
+    {$ENDIF} // ----------------------------------------------------------------
     StorageTime := LSource.StorageTime;
     VelocityFactor := LSource.VelocityFactor;
   end
@@ -477,6 +513,13 @@ begin
     SetTargets([]);
     DecelerationRate := ALDecelerationRateNormal;
     Elasticity := ALDefaultElasticity;
+    // -------------------------------------------------------------------------
+    // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+    // Added ElasticityDecelerationFactor property to be able to reproduce, in a
+    // similar way, the UIScrollView of the iOS using the value "1.3"
+    {$IFDEF IPUB_FIXES} // -----------------------------------------------------
+    ElasticityDecelerationFactor := ALDefaultElasticityDecelerationFactor;
+    {$ENDIF} // ----------------------------------------------------------------
     StorageTime := ALDefaultStorageTime;
     VelocityFactor := ALDefaultVelocityFactor;
   end
@@ -835,6 +878,13 @@ var
         ElasticityFactor := 1;
       aT := (LSign * Ceil(Elasticity * ElasticityFactor * R));
       aT := aT + (aTDecelerationRate / DecelerationRate * 8);
+      // -----------------------------------------------------------------------
+      // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+      // Added ElasticityDecelerationFactor property to be able to reproduce, in
+      // a similar way, the UIScrollView of the iOS using the value "1.3"
+      {$IFDEF IPUB_FIXES} // ---------------------------------------------------
+      at := at * ElasticityDecelerationFactor;
+      {$ENDIF} // --------------------------------------------------------------
     end
     else
     begin
@@ -843,6 +893,25 @@ var
     end;
 
     dV := aT * DeltaTime;
+    // -------------------------------------------------------------------------
+    // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+    // Added ElasticityDecelerationFactor property to be able to reproduce, in a
+    // similar way, the UIScrollView of the iOS using the value "1.3"
+    {$IFDEF IPUB_FIXES} // -----------------------------------------------------
+    if EnableTarget then
+    begin
+      if (Velocity < 0) and (dV > 0) then
+      begin
+        Velocity := Velocity / ElasticityDecelerationFactor;
+        Tmp := Velocity;
+      end
+      else if (Velocity > 0) and (dV < 0) then
+      begin
+        Velocity := Velocity / ElasticityDecelerationFactor;
+        Tmp := Velocity;
+      end;
+    end;
+    {$ENDIF} // ----------------------------------------------------------------
     if (Velocity > 0) and (dV < 0) and (-dV > Velocity) then
       dV := -Velocity
     else if (Velocity < 0) and (dV > 0) and (dV > -Velocity) then
@@ -928,6 +997,17 @@ function TALAniCalculations.ElasticityStored: Boolean;
 begin
   Result := not SameValue(FElasticity, ALDefaultElasticity);
 end;
+
+// -----------------------------------------------------------------------------
+// [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+// Added ElasticityDecelerationFactor property to be able to reproduce, in a
+// similar way, the UIScrollView of the iOS using the value "1.3"
+{$IFDEF IPUB_FIXES} // ---------------------------------------------------------
+function TALAniCalculations.ElasticityDecelerationFactorStored: Boolean;
+begin
+  Result := not SameValue(FElasticityDecelerationFactor, ALDefaultElasticityDecelerationFactor);
+end;
+{$ENDIF} // --------------------------------------------------------------------
 
 {***************************************}
 procedure TALAniCalculations.BeginUpdate;

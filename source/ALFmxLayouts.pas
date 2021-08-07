@@ -7,6 +7,7 @@ unit ALFmxLayouts;
 interface
 
 {$SCOPEDENUMS ON}
+{$DEFINE IPUB_FIXES}
 
 uses
   System.Classes,
@@ -73,6 +74,12 @@ type
     procedure Resize; override;
   public
     constructor Create(AOwner: TComponent); override;
+    // -------------------------------------------------------------------------
+    // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+    // Expose the IsTracking property. It is very usefull in many cases
+    {$IFDEF IPUB_FIXES} // -----------------------------------------------------
+    property IsTracking;
+    {$ENDIF} // ----------------------------------------------------------------
   published
     property Locked stored false;
     property Min stored false;
@@ -105,7 +112,16 @@ type
     FShowScrollBars: Boolean;
     FAutoHide: Boolean;
     FMouseEvents: Boolean;
+    // -------------------------------------------------------------------------
+    // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+    // Improving the compatibility with TCustomScrollBox. This is important 
+    // because in a custom scrollbox we can easily change the parent class of
+    // TScrollBox to TALScrollBox
+    {$IFDEF IPUB_FIXES} // -----------------------------------------------------
+    FOnViewportPositionChange: TPositionChangeEvent;
+    {$ELSE} // -----------------------------------------------------------------
     FOnViewportPositionChange: TALScrollBoxPositionChangeEvent;
+    {$ENDIF} // ----------------------------------------------------------------
     fOnScrollBarInit: TALScrollBoxBarInit;
     fOnAniStart: TnotifyEvent;
     fOnAniStop: TnotifyEvent;
@@ -131,6 +147,17 @@ type
   protected
     procedure Loaded; override;
     procedure DoAddObject(const AObject: TFmxObject); override;
+    // -------------------------------------------------------------------------
+    // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+    // Improving the compatibility with TCustomScrollBox. This is important 
+    // because in a custom scrollbox we can easily change the parent class of
+    // TScrollBox to TALScrollBox
+    {$IFDEF IPUB_FIXES} // -----------------------------------------------------
+    procedure DoRealignContent(R: TRectF); virtual;
+    function IsAddToContent(const AObject: TFmxObject): Boolean; virtual;
+    procedure ViewportPositionChange(const AOldViewportPosition, 
+	  ANewViewportPosition: TPointF; const AContentSizeChanged: Boolean); virtual;
+    {$ENDIF} // ----------------------------------------------------------------
     procedure DoRealign; override;
     function CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar; virtual;
     function CreateContent: TALScrollBoxContent; virtual;
@@ -140,15 +167,33 @@ type
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure DoMouseLeave; override;
-    {$IFNDEF ALDPK}
+    // -------------------------------------------------------------------------
+    // [Stephane Vander Clock - github.com/Zeus64] - 28/05/2020 - Delphi 10.4
+    // https://quality.embarcadero.com/browse/RSP-24397
+    {$IFDEF DELPHI_FIXES} // ---------------------------------------------------
     procedure ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single); override;
     procedure ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure ChildrenMouseLeave(const AObject: TControl); override;
-    {$ENDIF}
+    {$ENDIF} // ----------------------------------------------------------------
     procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); override;
+    // -------------------------------------------------------------------------
+    // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+    // Expose to write the fields fAnchoredContentOffset, fHScrollBar and 
+    // fVScrollBar in descendant classes. The fAnchoredContentOffset could be
+    // changed in an override of DoCalcContentBounds method will be very
+    // usefull. The fHScrollBar and fVScrollBar fields need to be acessed to be
+    // created by custom descendent classes. The TALScrollBox have access to
+    // these private fields because is in same unit, but others custom classes
+    // should have access too.
+    {$IFDEF IPUB_FIXES} // -----------------------------------------------------
+    property AnchoredContentOffset: TPointF read FAnchoredContentOffset write FAnchoredContentOffset;
+    property HScrollBar: TALScrollBoxBar read fHScrollBar write fHScrollBar;
+    property VScrollBar: TALScrollBoxBar read fVScrollBar write fVScrollBar;
+    {$ELSE} // -----------------------------------------------------------------
     property HScrollBar: TALScrollBoxBar read fHScrollBar;
     property VScrollBar: TALScrollBoxBar read fVScrollBar;
+    {$ENDIF} // ----------------------------------------------------------------
     property MaxContentWidth: Single read fMaxContentWidth write fMaxContentWidth stored isMaxContentWidthStored;
     property MaxContentHeight: Single read fMaxContentHeight write fMaxContentHeight stored isMaxContentHeightStored;
   public
@@ -163,7 +208,16 @@ type
     property AutoHide: Boolean read FAutoHide write SetAutoHide default True;
     property DisableMouseWheel: Boolean read FDisableMouseWheel write FDisableMouseWheel default False;
     property ShowScrollBars: Boolean read FShowScrollBars write SetShowScrollBars default True;
+    // -------------------------------------------------------------------------
+    // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+    // Improving the compatibility with TCustomScrollBox. This is important 
+    // because in a custom scrollbox we can easily change the parent class of
+    // TScrollBox to TALScrollBox
+    {$IFDEF IPUB_FIXES} // -----------------------------------------------------
+    property OnViewportPositionChange: TPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
+    {$ELSE} // -----------------------------------------------------------------
     property OnViewportPositionChange: TALScrollBoxPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
+    {$ENDIF} // ----------------------------------------------------------------
     property DeadZoneBeforeAcquireScrolling: Integer read FDeadZoneBeforeAcquireScrolling write FDeadZoneBeforeAcquireScrolling default 32;
     property OnScrollBarInit: TALScrollBoxBarInit read fOnScrollBarInit write fOnScrollBarInit;
     property ClipChildren default true;
@@ -401,6 +455,13 @@ uses
   FMX.Effects,
   FMX.utils,
   FMX.Ani,
+  // ---------------------------------------------------------------------------
+  // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+  // Fixing to avoid the scrollbox to movement when the user click in one
+  // ITextInput control inside the scrollbox, like TEdit
+  {$IFDEF IPUB_FIXES} // -------------------------------------------------------
+  FMX.Text,
+  {$ENDIF} // ------------------------------------------------------------------
   AlFmxCommon,
   ALCommon;
 
@@ -447,6 +508,64 @@ end;
 {**********************************************}
 procedure TALScrollBoxAniCalculations.DoChanged;
 
+// -----------------------------------------------------------------------------
+// [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+// Fix the pixel alignment of ViewportPosition and minor improvements
+{$IFDEF IPUB_FIXES} // ---------------------------------------------------------
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _getPixelAlignedViewportPosition(const AOffset: TPointF): TPointF;
+  var X, Y: Single;
+  begin
+    X := (Round((ViewportPosition.X + AOffset.X) * FScreenScale) / FScreenScale) - AOffset.X;
+    Y := (Round((ViewportPosition.Y + AOffset.Y) * FScreenScale) / FScreenScale) - AOffset.Y;
+    Result := TPointF.Create(X - FScrollBox.fAnchoredContentOffset.X,  // FScrollBox.fAnchoredContentOffset.X is already pixel aligned and if present then x = 0 so return -FScrollBox.fAnchoredContentOffset.X
+                             Y - FScrollBox.fAnchoredContentOffset.Y); // FScrollBox.fAnchoredContentOffset.Y is already pixel aligned and if present then y = 0 so return -FScrollBox.fAnchoredContentOffset.Y
+  end;
+
+var
+  LViewportPositionAligned: TPointF;
+  LOffset: TPointF;
+begin
+  if (not (csDestroying in FScrollBox.ComponentState)) then begin
+
+    if FScrollBox.Content <> nil then
+      LOffset := FScrollBox.Content.AbsoluteRect.TopLeft
+    else
+      LOffset := TPointF.Zero;
+
+    LViewportPositionAligned := _getPixelAlignedViewportPosition(LOffset);
+    if not fLastViewportPosition.EqualsTo(LViewportPositionAligned, TEpsilon.Position) then
+    begin
+      //update FScrollBox.Content.Position
+      if FScrollBox.Content <> nil then
+        FScrollBox.Content.Position.Point := -LViewportPositionAligned;
+
+      //update the Shown
+      if (not Down) and LowVelocity then Shown := False
+      else Shown := true;
+
+      //update the opacity of the scrollBar
+      if FScrollBox.VScrollBar <> nil then FScrollBox.VScrollBar.Opacity := Opacity;
+      if FScrollBox.HScrollBar <> nil then FScrollBox.HScrollBar.Opacity := Opacity;
+
+      //update the VScrollBar/HScrollBar
+      if not FScrollBox.fdisableScrollChange then begin
+        FScrollBox.fdisableScrollChange := True;
+        try
+          if FScrollBox.VScrollBar <> nil then FScrollBox.VScrollBar.Value := ViewportPosition.Y;
+          if FScrollBox.HScrollBar <> nil then FScrollBox.HScrollBar.Value := ViewportPosition.X;
+        finally
+          FScrollBox.fdisableScrollChange := False;
+        end;
+      end;
+
+      //fire the OnViewportPositionChange
+      FScrollBox.ViewportPositionChange(fLastViewportPosition, LViewportPositionAligned, False);
+      fLastViewportPosition := LViewportPositionAligned;
+    end;
+
+  end;
+{$ELSE} // ---------------------------------------------------------------------
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _getPixelAlignedViewportPosition: TPointF;
   var X, Y: Single;
@@ -493,6 +612,7 @@ begin
     fLastViewportPosition := LNewViewportPosition;
 
   end;
+{$ENDIF} // --------------------------------------------------------------------
   inherited DoChanged;
 end;
 
@@ -648,8 +768,23 @@ procedure TALCustomScrollBox.DoRealign;
   begin
     if fVScrollBar <> nil then begin
       fVScrollBar.Enabled := AContentRect.Height > Height;
+      // -----------------------------------------------------------------------
+      // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+      // Fix the bars in desktop when the mouse is over the scrollbox
+      {$IFDEF IPUB_FIXES} // ---------------------------------------------------
+      {$IF defined(Android) or defined(iOS)}
       fVScrollBar.Visible := FShowScrollBars and
                              ((AContentRect.Height > Height) or (not FAutoHide));
+      {$ELSE}
+      fVScrollBar.Visible := (IsMouseOver or fVScrollBar.IsMouseOver or fVScrollBar.Thumb.IsMouseOver or fVScrollBar.IsTracking) and
+                             ((AContentRect.Height > Height) or (not FAutoHide));
+      if fVScrollBar.Visible then
+        fVScrollBar.BringToFront;
+      {$ENDIF}
+      {$ELSE} // ---------------------------------------------------------------
+      fVScrollBar.Visible := FShowScrollBars and
+                             ((AContentRect.Height > Height) or (not FAutoHide));
+      {$ENDIF} // --------------------------------------------------------------
       fVScrollBar.ValueRange.BeginUpdate;
       try
         fVScrollBar.ValueRange.Min := 0;
@@ -658,10 +793,24 @@ procedure TALCustomScrollBox.DoRealign;
       finally
         fVScrollBar.ValueRange.EndUpdate;
       end;
+      // -----------------------------------------------------------------------
+      // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+      // Added possibility to change the bars position by the padding of the 
+      // FContent. This is usefull because sometimes we have an control over the
+      // scrollbox (like a navigation menu) and we don't want the bars inside
+      // the navigation menu like any control of the scrollbox, then we can just
+      // set the FContent padding
+      {$IFDEF IPUB_FIXES} // ---------------------------------------------------
+      fVScrollBar.SetBounds(width - fVScrollBar.Width - fVScrollBar.Margins.Right - FContent.Padding.Right,
+                            fVScrollBar.Margins.top + FContent.Padding.Top,
+                            fVScrollBar.Width,
+                            height-fVScrollBar.Margins.top-fVScrollBar.Margins.bottom - FContent.Padding.Top - FContent.Padding.Bottom);
+      {$ELSE} // ---------------------------------------------------------------
       fVScrollBar.SetBounds(width - fVScrollBar.Width - fVScrollBar.Margins.Right,
                             fVScrollBar.Margins.top,
                             fVScrollBar.Width,
                             height-fVScrollBar.Margins.top-fVScrollBar.Margins.bottom);
+      {$ENDIF} // --------------------------------------------------------------
     end;
   end;
 
@@ -670,8 +819,23 @@ procedure TALCustomScrollBox.DoRealign;
   begin
     if fHScrollBar <> nil then begin
       fHScrollBar.Enabled := AContentRect.Width > Width;
+      // -----------------------------------------------------------------------
+      // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+      // Fix the bars in desktop when the mouse is over the scrollbox
+      {$IFDEF IPUB_FIXES} // ---------------------------------------------------
+      {$IF defined(Android) or defined(iOS)}
       fHScrollBar.Visible := FShowScrollBars and
                              ((AContentRect.Width > Width) or (not FAutoHide));
+      {$ELSE}
+      fHScrollBar.Visible := (IsMouseOver or fHScrollBar.IsMouseOver or fHScrollBar.Thumb.IsMouseOver or fHScrollBar.IsTracking) and
+                             ((AContentRect.Width > Width) or (not FAutoHide));
+      if fHScrollBar.Visible then
+        fHScrollBar.BringToFront;
+      {$ENDIF}
+      {$ELSE} // ---------------------------------------------------------------
+      fHScrollBar.Visible := FShowScrollBars and
+                             ((AContentRect.Width > Width) or (not FAutoHide));
+      {$ENDIF} // --------------------------------------------------------------
       fHScrollBar.ValueRange.BeginUpdate;
       try
         fHScrollBar.ValueRange.Min := 0;
@@ -680,10 +844,24 @@ procedure TALCustomScrollBox.DoRealign;
       finally
         fHScrollBar.ValueRange.EndUpdate;
       end;
+      // -----------------------------------------------------------------------
+      // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+      // Added possibility to change the bars position by the padding of the 
+      // FContent. This is usefull because sometimes we have an control over the
+      // scrollbox (like a navigation menu) and we don't want the bars inside
+      // the navigation menu like any control of the scrollbox, then we can just
+      // set the FContent padding
+      {$IFDEF IPUB_FIXES} // ---------------------------------------------------
+      fHScrollBar.SetBounds(fHScrollBar.Margins.left +  FContent.Padding.Left,
+                            height - fHScrollBar.Height - fHScrollBar.Margins.bottom - FContent.Padding.Bottom,
+                            width - fHScrollBar.Margins.left - fHScrollBar.Margins.right -  FContent.Padding.Left -  FContent.Padding.Right,
+                            fHScrollBar.Height);
+      {$ELSE} // ---------------------------------------------------------------
       fHScrollBar.SetBounds(fHScrollBar.Margins.left,
                             height - fHScrollBar.Height - fHScrollBar.Margins.bottom,
                             width - fHScrollBar.Margins.left - fHScrollBar.Margins.right,
                             fHScrollBar.Height);
+      {$ENDIF} // --------------------------------------------------------------
     end;
   end;
 
@@ -724,6 +902,14 @@ begin
         _UpdateHScrollBar(LContentRect);
         _UpdateAnimationTargets(LContentRect);
         fAniCalculations.DoChanged;
+        // ---------------------------------------------------------------------
+        // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+        // Improving the compatibility with TCustomScrollBox. This is important
+        // because in a custom scrollbox we can easily change the parent class of
+        // TScrollBox to TALScrollBox
+        {$IFDEF IPUB_FIXES} // -------------------------------------------------
+        DoRealignContent(LContentRect);
+        {$ENDIF} // ------------------------------------------------------------
       end
       else LDoRealignAgain := True;
     end;
@@ -736,8 +922,48 @@ begin
 
 end;
 
+// -----------------------------------------------------------------------------
+// [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+// Improving the compatibility with TCustomScrollBox. This is important 
+// because in a custom scrollbox we can easily change the parent class of 
+// TScrollBox to TALScrollBox
+{$IFDEF IPUB_FIXES} // ---------------------------------------------------------
+{*********************************************************************************************}
+procedure TALCustomScrollBox.DoRealignContent(R: TRectF);
+begin
+end;
+
+{*********************************************************************************************}
+function TALCustomScrollBox.IsAddToContent(const AObject: TFmxObject): Boolean;
+begin
+  Result := (FContent <> nil) and
+     (AObject <> FContent) and
+     (not (AObject is TEffect)) and
+     (not (AObject is TAnimation)) and
+     (not (AObject is TALScrollBoxBar));
+end;
+
+{*********************************************************************************************}
+procedure TALCustomScrollBox.ViewportPositionChange(const AOldViewportPosition, 
+  ANewViewportPosition: TPointF; const AContentSizeChanged: Boolean);
+begin
+  if Assigned(FOnViewportPositionChange) then
+    FOnViewportPositionChange(Self, AOldViewportPosition, ANewViewportPosition,
+      AContentSizeChanged);
+end;
+{$ENDIF} // --------------------------------------------------------------------
+
 {*********************************************************************************************}
 function TALCustomScrollBox.CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar;
+// -----------------------------------------------------------------------------
+// [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+// Added a small margins in bars by default to the bars don't "leave" the screen 
+// especially in maximized forms on windows
+{$IFDEF IPUB_FIXES} // ---------------------------------------------------------
+const
+  SCROLL_BAR_PARALLEL_MARGIN = {$IFDEF MSWINDOWS}3{$ELSE}2{$ENDIF};
+  SCROLL_BAR_TIP_MARGIN = 4;
+{$ENDIF} // --------------------------------------------------------------------
 begin
   Result := TALScrollBoxBar.Create(self);
   Result.Parent := self;
@@ -746,6 +972,16 @@ begin
   Result.Locked := True;
   Result.Beginupdate;
   try
+    // -------------------------------------------------------------------------
+    // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+    // Added a small margins in bars by default to the bars don't "leave" the
+    // screen especially in maximized forms on windows
+    {$IFDEF IPUB_FIXES} // -----------------------------------------------------
+    if aOrientation = TOrientation.Vertical then
+      Result.Margins.Rect := TRectF.Create(0, SCROLL_BAR_TIP_MARGIN, SCROLL_BAR_PARALLEL_MARGIN, SCROLL_BAR_TIP_MARGIN)
+    else if aOrientation = TOrientation.Horizontal then
+      Result.Margins.Rect := TRectF.Create(SCROLL_BAR_TIP_MARGIN, 0, SCROLL_BAR_TIP_MARGIN, SCROLL_BAR_PARALLEL_MARGIN);
+    {$ENDIF} // ----------------------------------------------------------------
     Result.Orientation := aOrientation;
     result.Thumb.HitTest := not HasTouchScreen; // at design time (windows) will be always true = default value
                                                 // this mean that true will be never save in the dfm! only false
@@ -821,6 +1057,14 @@ end;
 {*****************************************************************************************************}
 procedure TALCustomScrollBox.internalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
+  // ---------------------------------------------------------------------------
+  // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+  // Fixed tracking with mouse in desktop, it was firing to movements at same 
+  // time (the tracking (bars dragging) and the tap operations (mouse down, 
+  // move, up))
+  {$IFDEF IPUB_FIXES} // -------------------------------------------------------
+  if (not (Assigned(FVScrollBar) and FVScrollBar.IsTracking)) and (not (Assigned(FHScrollBar) and FHScrollBar.IsTracking)) then
+  {$ENDIF} // ------------------------------------------------------------------
   FMouseEvents := true;
   inherited;
   if (not fScrollingAcquiredByOther) and FMouseEvents and (Button = TMouseButton.mbLeft) then begin
@@ -843,6 +1087,25 @@ begin
          (abs(fMouseDownPos.y - y) > fDeadZoneBeforeAcquireScrolling))) then setScrollingAcquiredByMe(True);
     AniCalculations.MouseMove(X, Y);
   end;
+  // ---------------------------------------------------------------------------
+  // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+  // Fix the bars in desktop when the mouse is over the scrollbox
+  {$IFDEF IPUB_FIXES} // -------------------------------------------------------
+  {$IF not defined(ANDROID) and not defined(iOS)}
+  if Assigned(FHScrollBar) then
+  begin
+    FHScrollBar.Visible := FHScrollBar.Enabled or (fAniCalculations.ViewportPosition.X <> 0);
+    if FHScrollBar.Visible then
+      FHScrollBar.BringToFront;
+  end;
+  if Assigned(FVScrollBar) then
+  begin
+    FVScrollBar.Visible := FVScrollBar.Enabled or (fAniCalculations.ViewportPosition.Y <> 0);
+    if FVScrollBar.Visible then
+      FVScrollBar.BringToFront;
+  end;
+  {$ENDIF}
+  {$ENDIF} // ------------------------------------------------------------------
 end;
 
 {***************************************************************************************************}
@@ -865,6 +1128,19 @@ begin
     AniCalculations.MouseLeave;
     FMouseEvents := False;
   end;
+  // ---------------------------------------------------------------------------
+  // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+  // Fix the bars in desktop when the mouse is not over the scrollbox. This is 
+  // how modern apps work, the scroll only appears when the mouse is inside the 
+  // scrollbox
+  {$IFDEF IPUB_FIXES} // -------------------------------------------------------
+  {$IF not defined(ANDROID) and not defined(iOS)}
+  if Assigned(FHScrollBar) then
+    FHScrollBar.Visible := False;
+  if Assigned(FVScrollBar) then
+    FVScrollBar.Visible := False;
+  {$ENDIF}
+  {$ENDIF} // ------------------------------------------------------------------
 end;
 
 {*********************************************************************************************}
@@ -899,49 +1175,123 @@ end;
 Type
   _TALControlAccessProtected = class(Tcontrol);
 
+// -----------------------------------------------------------------------------
+// [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+// Fixing to avoid the scrollbox to movement when the user click in one
+// ITextInput control inside the scrollbox, like TEdit
+{$IFDEF IPUB_FIXES} // ---------------------------------------------------------
+function CheckControlInParentTree(AControl, AParent: TControl): Boolean;
+begin
+  Result := False;
+  while Assigned(AControl) do
+  begin
+    if AControl.Parent = AParent then
+      Exit(True);
+    if AControl.Parent is TControl then
+      AControl := TControl(AControl.Parent)
+    else
+      Break;
+  end;
+end;
+{$ENDIF} // --------------------------------------------------------------------
+
 {*************}
-{$IFNDEF ALDPK}
+// -----------------------------------------------------------------------------
+// [Stephane Vander Clock - github.com/Zeus64] - 28/05/2020 - Delphi 10.4
+// https://quality.embarcadero.com/browse/RSP-24397
+{$IFDEF DELPHI_FIXES} // -------------------------------------------------------
 procedure TALCustomScrollBox.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 var P: Tpointf;
 begin
+  // ---------------------------------------------------------------------------
+  // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+  // Fixing to avoid the scrollbox to movement when the user click in one
+  // ITextInput control inside the scrollbox, like TEdit
+  {$IFDEF IPUB_FIXES} // -------------------------------------------------------
+  if (Assigned(Root) and Assigned(Root.Captured) and (TControl(Root.Captured) <> AObject)) or
+    Supports(AObject, ITextInput) or
+    (Assigned(Root) and Supports(Root.Focused, ICaret) and
+      ((TObject(Root.Captured) = TObject(Root.Focused)) or
+        CheckControlInParentTree(AObject, TControl(Root.Focused)))) then
+  begin
+    Exit;
+  end;
+  {$ENDIF} // ------------------------------------------------------------------
   if not aObject.AutoCapture then _TALControlAccessProtected(aObject).capture;
   P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseDown(Button, Shift, P.X, P.Y);
   inherited;
 end;
-{$ENDIF}
+{$ENDIF} // --------------------------------------------------------------------
 
 {*************}
-{$IFNDEF ALDPK}
+// -----------------------------------------------------------------------------
+// [Stephane Vander Clock - github.com/Zeus64] - 28/05/2020 - Delphi 10.4
+// https://quality.embarcadero.com/browse/RSP-24397
+{$IFDEF DELPHI_FIXES} // -------------------------------------------------------
 procedure TALCustomScrollBox.ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);
 var P: Tpointf;
 begin
+  // ---------------------------------------------------------------------------
+  // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+  // Fixing to avoid the scrollbox to movement when the user click in one
+  // ITextInput control inside the scrollbox, like TEdit
+  {$IFDEF IPUB_FIXES} // -------------------------------------------------------
+  if (Assigned(Root) and Assigned(Root.Captured) and (TControl(Root.Captured) <> AObject)) or
+    Supports(AObject, ITextInput) or
+    (Assigned(Root) and Supports(Root.Focused, ICaret) and
+      ((TObject(Root.Captured) = TObject(Root.Focused)) or
+        CheckControlInParentTree(AObject, TControl(Root.Focused)))) then
+  begin
+    Exit;
+  end;
+  {$ENDIF} // ------------------------------------------------------------------
   P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseMove(Shift, P.X, P.Y);
   inherited;
 end;
-{$ENDIF}
+{$ENDIF} // --------------------------------------------------------------------
 
 {*************}
-{$IFNDEF ALDPK}
+// -----------------------------------------------------------------------------
+// [Stephane Vander Clock - github.com/Zeus64] - 28/05/2020 - Delphi 10.4
+// https://quality.embarcadero.com/browse/RSP-24397
+{$IFDEF DELPHI_FIXES} // -------------------------------------------------------
 procedure TALCustomScrollBox.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 var P: Tpointf;
 begin
+  // ---------------------------------------------------------------------------
+  // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+  // Fixing to avoid the scrollbox to movement when the user click in one
+  // ITextInput control inside the scrollbox, like TEdit
+  {$IFDEF IPUB_FIXES} // -------------------------------------------------------
+  if (Assigned(Root) and Assigned(Root.Captured) and (TControl(Root.Captured) <> AObject)) or
+    Supports(AObject, ITextInput) or
+    (Assigned(Root) and Supports(Root.Focused, ICaret) and
+      ((TObject(Root.Captured) = TObject(Root.Focused)) or
+        CheckControlInParentTree(AObject, TControl(Root.Focused)))) then
+  begin
+    Exit;
+  end;
+  {$ENDIF} // ------------------------------------------------------------------
   if not aObject.AutoCapture then _TALControlAccessProtected(aObject).releasecapture;
   P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseUp(Button, Shift, P.X, P.Y);
   inherited;
 end;
-{$ENDIF}
+{$ENDIF} // --------------------------------------------------------------------
 
 {*************}
-{$IFNDEF ALDPK}
+// -----------------------------------------------------------------------------
+// [Stephane Vander Clock - github.com/Zeus64] - 28/05/2020 - Delphi 10.4
+// https://quality.embarcadero.com/browse/RSP-24397
+{$IFDEF DELPHI_FIXES} // -------------------------------------------------------
 procedure TALCustomScrollBox.ChildrenMouseLeave(const AObject: TControl);
 begin
   internalMouseLeave;
   inherited;
 end;
-{$ENDIF}
+{$ENDIF} // --------------------------------------------------------------------
 
 {*****************************************************************************************************}
 procedure TALCustomScrollBox.MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean);
@@ -972,11 +1322,24 @@ end;
 {******************************************************************}
 procedure TALCustomScrollBox.DoAddObject(const AObject: TFmxObject);
 begin
+  // ---------------------------------------------------------------------------
+  // [iPub - github.com/viniciusfbb] - 06/08/2021 - Delphi 10.4
+  // Improving the compatibility with TCustomScrollBox. This is important 
+  // because in a custom scrollbox we can easily change the parent class of 
+  // TScrollBox to TALScrollBox
+  {$IFDEF IPUB_FIXES} // -------------------------------------------------------
+  if IsAddToContent(AObject) then
+  begin
+    FContent.AddObject(AObject);
+    Realign;
+  end
+  {$ELSE} // -------------------------------------------------------------------
   if (FContent <> nil) and
      (AObject <> FContent) and
      (not (AObject is TEffect)) and
      (not (AObject is TAnimation)) and
      (not (AObject is TALScrollBoxBar)) then FContent.AddObject(AObject)
+  {$ENDIF} // ------------------------------------------------------------------
   else inherited;
 end;
 

@@ -516,8 +516,14 @@ procedure TALScrollBoxAniCalculations.DoChanged;
   function _getPixelAlignedViewportPosition(const AOffset: TPointF): TPointF;
   var X, Y: Single;
   begin
-    X := (Round((ViewportPosition.X + AOffset.X) * FScreenScale) / FScreenScale) - AOffset.X;
-    Y := (Round((ViewportPosition.Y + AOffset.Y) * FScreenScale) / FScreenScale) - AOffset.Y;
+    if SameValue(ViewportPosition.X, 0, TEpsilon.Position) then
+      X := 0
+    else
+      X := (Round((ViewportPosition.X + AOffset.X) * FScreenScale) / FScreenScale) - AOffset.X;
+    if SameValue(ViewportPosition.Y, 0, TEpsilon.Position) then
+      Y := 0
+    else
+      Y := (Round((ViewportPosition.Y + AOffset.Y) * FScreenScale) / FScreenScale) - AOffset.Y;
     Result := TPointF.Create(X - FScrollBox.fAnchoredContentOffset.X,  // FScrollBox.fAnchoredContentOffset.X is already pixel aligned and if present then x = 0 so return -FScrollBox.fAnchoredContentOffset.X
                              Y - FScrollBox.fAnchoredContentOffset.Y); // FScrollBox.fAnchoredContentOffset.Y is already pixel aligned and if present then y = 0 so return -FScrollBox.fAnchoredContentOffset.Y
   end;
@@ -528,8 +534,8 @@ var
 begin
   if (not (csDestroying in FScrollBox.ComponentState)) then begin
 
-    if FScrollBox.Content <> nil then
-      LOffset := FScrollBox.Content.AbsoluteRect.TopLeft
+    if FScrollBox <> nil then
+      LOffset := FScrollBox.AbsoluteRect.TopLeft
     else
       LOffset := TPointF.Zero;
 

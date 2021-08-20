@@ -620,18 +620,18 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Platform.iOS.pas b/embarcadero/sy
 +  // not the case on iOS. Honestly I can not say if this is really usefull or
 +  // just useless (I will need a recent Iphone to test, actually on iphone 7 I
 +  // see no difference)
-+  for var i := ALAniCalcTimerProcs.Count - 1 downto 0 do begin
-+    var LAniCalcTimerProc := ALAniCalcTimerProcs[i];
-+    if LAniCalcTimerProc.Down then begin
-+      if LAniCalcTimerProc.mouseEventConsumed > 0 then begin
-+        LAniCalcTimerProc.mouseEventConsumed := -1;
-+        exit;
-+      end
-+      else if LAniCalcTimerProc.mouseEventConsumed = 0 then
-+        LAniCalcTimerProc.mouseEventConsumed := 1;
-+      Break;
-+    end;
-+  end;
++  for var i := ALAniCalcTimerProcs.Count - 1 downto 0 do 
++    if (ALAniCalcTimerProcs[I].Down) and (not ALAniCalcTimerProcs[I].mouseEventConsumed = 0) then
++      Exit;
++  
++  
++  
++  
++  
++  
++  
++  
++  
 +
    if Supports(Form, IPaintControl, PaintControl) then
      try

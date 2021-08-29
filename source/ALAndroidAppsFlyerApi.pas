@@ -56,6 +56,7 @@ type
 
 implementation
 
+{**********************}
 procedure RegisterTypes;
 begin
   TRegTypes.RegisterType('ALAndroidAppsFlyerApi.JAppsFlyerConversionListener', TypeInfo(ALAndroidAppsFlyerApi.JAppsFlyerConversionListener));
@@ -66,4 +67,3 @@ initialization
   RegisterTypes;
 
 end.
-

@@ -370,7 +370,8 @@ function TzSpecificLocalTimeToSystemTimeEx(lpTimeZoneInformation: PDynamicTimeZo
 {$WARNINGS ON}
 Function ALGetDynamicTimeZoneInformations: Tarray<TDynamicTimeZoneInformation>;
 Function ALGetDynamicTimeZoneInformation(const aTimeZoneKeyName: String): TDynamicTimeZoneInformation;
-{$ENDIF MSWINDOWS}
+function ALFileTimeToDateTime(const AFileTime: TFileTime): TDateTime;
+{$ENDIF}
 function AlLocalDateTimeToUTC(Const aLocalDateTime: TDateTime): TdateTime; overload;
 function AlUTCDateTimeToLocal(Const aUTCDateTime: TDateTime): TdateTime; overload;
 {$IFDEF MSWINDOWS}
@@ -1909,6 +1910,16 @@ begin
   raise Exception.Create('Unknown TimeZoneKeyName');
 end;
 {$ENDIF}
+
+{****************}
+{$IFDEF MSWINDOWS}
+function ALFileTimeToDateTime(Const AFileTime: TFileTime): TDateTime;
+var LSystemTime: TSystemTime;
+begin
+  if not FileTimeToSystemTime(AFileTime, LSystemTime) then raiseLastOsError;
+  result := SystemTimeToDateTime(LSystemTime);
+end;
+{$ENDIF MSWINDOWS}
 
 {************************************************************************}
 function AlLocalDateTimeToUTC(Const aLocalDateTime: TDateTime): TdateTime;

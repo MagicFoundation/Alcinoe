@@ -44,6 +44,7 @@ interface
 {.$H+} {Long string}
 {.$B-} {Boolean short-circuit evaluation}
 {.$R-} {Range-Checking}
+{$SCOPEDENUMS ON}
 
 uses
   {$IFDEF MSWINDOWS}
@@ -57,7 +58,8 @@ uses
   {$IFDEF MACOS}
   Macapi.CoreFoundation,
   {$ENDIF MACOS}
-  ALStringList;
+  ALStringList,
+  ALCommon;
 
 resourcestring
   SALInvalidFormat = 'Format ''%s'' invalid or incompatible with argument';
@@ -168,7 +170,7 @@ type
     {$MESSAGE WARN 'Check if System.Masks.pas is still the same and adjust the IFDEF'}
   {$IFEND}
 
-  EALMaskException = class(Exception);
+  EALMaskException = class(EALException);
 
   TALMask = class
   private type
@@ -179,12 +181,12 @@ type
     TALMaskState = record
       SkipTo: Boolean;
       case State: TALMaskStates of
-        msLiteral: (Literal: ansiChar);
-        msAny: ();
-        msSet: (
+        TALMaskStates.msLiteral: (Literal: ansiChar);
+        TALMaskStates.msAny: ();
+        TALMaskStates.msSet: (
           Negate: Boolean;
           CharSet: PALMaskSet);
-        msMBCSLiteral: (LeadByte, TrailByte: ansiChar);
+        TALMaskStates.msMBCSLiteral: (LeadByte, TrailByte: ansiChar);
     end;
 
   private
@@ -308,7 +310,7 @@ function  ALExtractQuotedStr(var Src: PAnsiChar; Quote: AnsiChar): AnsiString;
 function  ALExtractFilePath(const FileName: AnsiString): AnsiString; inline;
 function  ALExtractFileDir(const FileName: AnsiString): AnsiString; inline;
 function  ALExtractFileDrive(const FileName: AnsiString): AnsiString; inline;
-function  ALExtractFileName(const FileName: AnsiString): AnsiString; inline;
+function  ALExtractFileName(const FileName: AnsiString; const RemoveFileExt: Boolean=false): AnsiString; inline;
 function  ALExtractFileExt(const FileName: AnsiString): AnsiString; inline;
 function  ALLastDelimiter(const Delimiters, S: AnsiString): Integer;
 function  ALIsPathDelimiter(const S: AnsiString; Index: Integer; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): Boolean;
@@ -404,6 +406,52 @@ procedure ALExtractHeaderFieldsWithQuoteEscaped(Separators,
                                                 StripQuotes: Boolean = False);
 {$ENDIF !ALHideAnsiString}
 
+type
+
+  {************************}
+  {$IF CompilerVersion > 34} // sydney
+    {$MESSAGE WARN 'Check if System.Masks.pas is still the same and adjust the IFDEF'}
+  {$IFEND}
+
+  EALMaskExceptionU = class(EALExceptionU);
+
+  {$WARN WIDECHAR_REDUCED OFF}
+
+  TALMaskU = class
+  private type
+    // WideChar Reduced to ByteChar in set expressions.
+    TALMaskSet = set of Char;
+    PALMaskSet = ^TALMaskSet;
+    TALMaskStates = (msLiteral, msAny, msSet, msMBCSLiteral);
+    TALMaskState = record
+      SkipTo: Boolean;
+      case State: TALMaskStates of
+        TALMaskStates.msLiteral: (Literal: Char);
+        TALMaskStates.msAny: ();
+        TALMaskStates.msSet: (
+          Negate: Boolean;
+          CharSet: PALMaskSet);
+        TALMaskStates.msMBCSLiteral: (LeadByte, TrailByte: Char);
+    end;
+
+  private
+    FMaskStates: array of TALMaskState;
+
+  protected
+    function InitMaskStates(const Mask: string): Integer;
+    procedure DoneMaskStates;
+    function MatchesMaskStates(const Filename: string): Boolean;
+
+  public
+    constructor Create(const MaskValue: string);
+    destructor Destroy; override;
+    function Matches(const Filename: string): Boolean;
+  end;
+
+  function  ALMatchesMaskU(const Filename, Mask: String): Boolean;
+
+  {$WARN WIDECHAR_REDUCED ON}
+
 Function  ALNewGUIDBytes: TBytes;
 function  ALGUIDToStringU(const Guid: TGUID; const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): string;
 Function  ALNewGUIDStringU(const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): String;
@@ -491,6 +539,11 @@ var       ALTrimRightU: function(const S: string): string;
 function  ALQuotedStrU(const S: String; const Quote: Char = ''''): String;
 var       ALDequotedStrU: function(const S: string; AQuote: Char): string;
 function  ALExtractQuotedStrU(var Src: PChar; Quote: Char): String;
+function  ALExtractFilePathU(const FileName: String): String; inline;
+function  ALExtractFileDirU(const FileName: String): String; inline;
+function  ALExtractFileDriveU(const FileName: String): String; inline;
+function  ALExtractFileNameU(const FileName: String; const RemoveFileExt: Boolean=false): String; inline;
+function  ALExtractFileExtU(const FileName: String): String; inline;
 var       ALLastDelimiterU: function(const Delimiters, S: string): Integer;
 function  ALIsPathDelimiterU(const S: String; Index: Integer; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): Boolean;
 function  ALIncludeTrailingPathDelimiterU(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String;
@@ -649,8 +702,7 @@ uses
   System.Ansistrings,
   {$ENDIF}
   System.Character,
-  System.Math,
-  ALcommon;
+  System.Math;
 
 {$IFNDEF ALHideAnsiString}
 
@@ -1001,16 +1053,16 @@ Begin
   Result := ALGUIDToStringU(LGUID, WithoutBracket, WithoutHyphen);
 End;
 
+{***}
+const
+  MaxCards = 30;
+
 {$IFNDEF ALHideAnsiString}
 
 //This warning is already raised in the interface
 //{$IF CompilerVersion > 34} // sydney
 //  {$MESSAGE WARN 'Check if System.Masks.pas is still the same and adjust the IFDEF'}
 //{$IFEND}
-
-{***}
-const
-  MaxCards = 30;
 
 {***************************************************************}
 function TALMask.InitMaskStates(const Mask: ansistring): Integer;
@@ -1049,14 +1101,14 @@ var
       FMaskStates[I].SkipTo := SkipTo;
       FMaskStates[I].State := MaskState;
       case MaskState of
-        msLiteral: FMaskStates[I].Literal := UpCase(Literal);
-        msSet:
+        TALMaskStates.msLiteral: FMaskStates[I].Literal := UpCase(Literal);
+        TALMaskStates.msSet:
           begin
             FMaskStates[I].Negate := Negate;
             New(FMaskStates[I].CharSet);
             FMaskStates[I].CharSet^ := CharSet;
           end;
-        msMBCSLiteral:
+        TALMaskStates.msMBCSLiteral:
           begin
             FMaskStates[I].LeadByte := LeadByte;
             FMaskStates[I].TrailByte := TrailByte;
@@ -1101,7 +1153,7 @@ var
       Inc(P);
     end;
     if (P^ <> ']') or (CharSet = []) then InvalidMask;
-    WriteScan(msSet);
+    WriteScan(TALMaskStates.msSet);
   end;
 
 begin
@@ -1113,7 +1165,7 @@ begin
   begin
     case P^ of
       '*': SkipTo := True;
-      '?': if not SkipTo then WriteScan(msAny);
+      '?': if not SkipTo then WriteScan(TALMaskStates.msAny);
       '[':  ScanSet;
     else
       //if IsLeadChar(P^) then
@@ -1126,13 +1178,13 @@ begin
       //else
       begin
         Literal := P^;
-        WriteScan(msLiteral);
+        WriteScan(TALMaskStates.msLiteral);
       end;
     end;
     Inc(P);
   end;
   Literal := #0;
-  WriteScan(msLiteral);
+  WriteScan(TALMaskStates.msLiteral);
   Result := I;
 end;
 
@@ -1179,11 +1231,11 @@ var
       if FMaskStates[I].SkipTo then
       begin
         case FMaskStates[I].State of
-          msLiteral:
+          TALMaskStates.msLiteral:
             while (P^ <> #0) and (UpCase(P^) <> FMaskStates[I].Literal) do Inc(P);
-          msSet:
+          TALMaskStates.msSet:
             while (P^ <> #0) and not (FMaskStates[I].Negate xor (UpCase(P^) in FMaskStates[I].CharSet^)) do Inc(P);
-          msMBCSLiteral:
+          TALMaskStates.msMBCSLiteral:
             while (P^ <> #0) do
             begin
               if (P^ <> FMaskStates[I].LeadByte) then Inc(P, 2)
@@ -1199,15 +1251,15 @@ var
           Push(@P[1], I);
       end;
       case FMaskStates[I].State of
-        msLiteral: if UpCase(P^) <> FMaskStates[I].Literal then Exit;
-        msSet: if not (FMaskStates[I].Negate xor (UpCase(P^) in FMaskStates[I].CharSet^)) then Exit;
-        msMBCSLiteral:
+        TALMaskStates.msLiteral: if UpCase(P^) <> FMaskStates[I].Literal then Exit;
+        TALMaskStates.msSet: if not (FMaskStates[I].Negate xor (UpCase(P^) in FMaskStates[I].CharSet^)) then Exit;
+        TALMaskStates.msMBCSLiteral:
           begin
             if P^ <> FMaskStates[I].LeadByte then Exit;
             Inc(P);
             if P^ <> FMaskStates[I].TrailByte then Exit;
           end;
-        msAny:
+        TALMaskStates.msAny:
           if P^ = #0 then
           begin
             Result := False;
@@ -1237,7 +1289,7 @@ var
   I: Integer;
 begin
   for I := Low(FMaskStates) to High(FMaskStates) do
-    if FMaskStates[I].State = msSet then Dispose(FMaskStates[I].CharSet);
+    if FMaskStates[I].State = TALMaskStates.msSet then Dispose(FMaskStates[I].CharSet);
 end;
 
 {****************************************************}
@@ -1280,6 +1332,288 @@ begin
     CMask.Free;
   end;
 end;
+
+{$ENDIF !ALHideAnsiString}
+
+//This warning is already raised in the interface
+//{$IF CompilerVersion > 34} // sydney
+//  {$MESSAGE WARN 'Check if System.Masks.pas is still the same and adjust the IFDEF'}
+//{$IFEND}
+
+{$WARN WIDECHAR_REDUCED OFF}
+
+{************************************************************}
+function TALMaskU.InitMaskStates(const Mask: string): Integer;
+var
+  I: Integer;
+  SkipTo: Boolean;
+  Literal: Char;
+  LeadByte, TrailByte: Char;
+  P: PChar;
+  Negate: Boolean;
+  CharSet: TALMaskSet;
+  Cards: Integer;
+
+  procedure InvalidMask;
+  begin
+    raise EALMaskExceptionU.CreateResFmt(@SInvalidMask, [Mask,
+      P - PChar(Mask) + 1]);
+  end;
+
+  procedure Reset;
+  begin
+    SkipTo := False;
+    Negate := False;
+    CharSet := [];
+  end;
+
+  procedure WriteScan(MaskState: TALMaskStates);
+  begin
+    if I <= High(FMaskStates) then
+    begin
+      if SkipTo then
+      begin
+        Inc(Cards);
+        if Cards > MaxCards then InvalidMask;
+      end;
+      FMaskStates[I].SkipTo := SkipTo;
+      FMaskStates[I].State := MaskState;
+      case MaskState of
+        TALMaskStates.msLiteral: FMaskStates[I].Literal := UpCase(Literal);
+        TALMaskStates.msSet:
+          begin
+            FMaskStates[I].Negate := Negate;
+            New(FMaskStates[I].CharSet);
+            FMaskStates[I].CharSet^ := CharSet;
+          end;
+        TALMaskStates.msMBCSLiteral:
+          begin
+            FMaskStates[I].LeadByte := LeadByte;
+            FMaskStates[I].TrailByte := TrailByte;
+          end;
+      end;
+    end;
+    Inc(I);
+    Reset;
+  end;
+
+  procedure ScanSet;
+  var
+    LastChar: Char;
+    C: Char;
+  begin
+    Inc(P);
+    if P^ = '!' then
+    begin
+      Negate := True;
+      Inc(P);
+    end;
+    LastChar := #0;
+    while not (P^ in [#0, ']']) do
+    begin
+      // MBCS characters not supported in msSet!
+      //if IsLeadChar(P^) then
+      //   Inc(P)
+      //else
+      case P^ of
+        '-':
+          if LastChar = #0 then InvalidMask
+          else
+          begin
+            Inc(P);
+            for C := LastChar to UpCase(P^) do
+              CharSet := CharSet + [C];
+          end;
+      else
+        LastChar := UpCase(P^);
+        CharSet := CharSet + [LastChar];
+      end;
+      Inc(P);
+    end;
+    if (P^ <> ']') or (CharSet = []) then InvalidMask;
+    WriteScan(TALMaskStates.msSet);
+  end;
+
+begin
+  P := PChar(Mask);
+  I := 0;
+  Cards := 0;
+  Reset;
+  while P^ <> #0 do
+  begin
+    case P^ of
+      '*': SkipTo := True;
+      '?': if not SkipTo then WriteScan(TALMaskStates.msAny);
+      '[':  ScanSet;
+    else
+      //if IsLeadChar(P^) then
+      //begin
+      //  LeadByte := P^;
+      //  Inc(P);
+      //  TrailByte := P^;
+      //  WriteScan(msMBCSLiteral);
+      //end
+      //else
+      begin
+        Literal := P^;
+        WriteScan(TALMaskStates.msLiteral);
+      end;
+    end;
+    Inc(P);
+  end;
+  Literal := #0;
+  WriteScan(TALMaskStates.msLiteral);
+  Result := I;
+end;
+
+{*******************************************************************}
+function TALMaskU.MatchesMaskStates(const Filename: string): Boolean;
+type
+  TStackRec = record
+    sP: PChar;
+    sI: Integer;
+  end;
+var
+  T: Integer;
+  S: array of TStackRec;
+  I: Integer;
+  P: PChar;
+
+  procedure Push(P: PChar; I: Integer);
+  begin
+    S[T].sP := P;
+    S[T].sI := I;
+    Inc(T);
+  end;
+
+  function Pop(var P: PChar; var I: Integer): Boolean;
+  begin
+    if T = 0 then
+      Result := False
+    else
+    begin
+      Dec(T);
+      P := S[T].sP;
+      I := S[T].sI;
+      Result := True;
+    end;
+  end;
+
+  function Matches(P: PChar; Start: Integer): Boolean;
+  var
+    I: Integer;
+  begin
+    Result := False;
+    for I := Start to High(FMaskStates) do
+    begin
+      if FMaskStates[I].SkipTo then
+      begin
+        case FMaskStates[I].State of
+          TALMaskStates.msLiteral:
+            while (P^ <> #0) and (UpCase(P^) <> FMaskStates[I].Literal) do Inc(P);
+          TALMaskStates.msSet:
+            while (P^ <> #0) and not (FMaskStates[I].Negate xor (UpCase(P^) in FMaskStates[I].CharSet^)) do Inc(P);
+          TALMaskStates.msMBCSLiteral:
+            while (P^ <> #0) do
+            begin
+              if (P^ <> FMaskStates[I].LeadByte) then Inc(P, 2)
+              else
+              begin
+                Inc(P);
+                if (P^ = FMaskStates[I].TrailByte) then Break;
+                Inc(P);
+              end;
+            end;
+        end;
+        if P^ <> #0 then
+          Push(@P[1], I);
+      end;
+      case FMaskStates[I].State of
+        TALMaskStates.msLiteral: if UpCase(P^) <> FMaskStates[I].Literal then Exit;
+        TALMaskStates.msSet: if not (FMaskStates[I].Negate xor (UpCase(P^) in FMaskStates[I].CharSet^)) then Exit;
+        TALMaskStates.msMBCSLiteral:
+          begin
+            if P^ <> FMaskStates[I].LeadByte then Exit;
+            Inc(P);
+            if P^ <> FMaskStates[I].TrailByte then Exit;
+          end;
+        TALMaskStates.msAny:
+          if P^ = #0 then
+          begin
+            Result := False;
+            Exit;
+          end;
+      end;
+      Inc(P);
+    end;
+    Result := True;
+  end;
+
+begin
+  SetLength(S, MaxCards);
+  Result := True;
+  T := 0;
+  P := PChar(Filename);
+  I := Low(FMaskStates);
+  repeat
+    if Matches(P, I) then Exit;
+  until not Pop(P, I);
+  Result := False;
+end;
+
+{********************************}
+procedure TALMaskU.DoneMaskStates;
+var
+  I: Integer;
+begin
+  for I := Low(FMaskStates) to High(FMaskStates) do
+    if FMaskStates[I].State = TALMaskStates.msSet then Dispose(FMaskStates[I].CharSet);
+end;
+
+{***************************************************}
+constructor TALMaskU.Create(const MaskValue: string);
+var
+  Size: Integer;
+begin
+  inherited Create;
+  SetLength(FMaskStates, 1);
+  Size := InitMaskStates(MaskValue);
+  DoneMaskStates;
+
+  SetLength(FMaskStates, Size);
+  InitMaskStates(MaskValue);
+end;
+
+{**************************}
+destructor TALMaskU.Destroy;
+begin
+  DoneMaskStates;
+  SetLength(FMaskStates, 0);
+  inherited;
+end;
+
+{*********************************************************}
+function TALMaskU.Matches(const Filename: string): Boolean;
+begin
+  Result := MatchesMaskStates(Filename);
+end;
+
+{*************************************************************}
+function ALMatchesMaskU(const Filename, Mask: string): Boolean;
+var
+  CMask: TALMaskU;
+begin
+  CMask := TALMaskU.Create(Mask);
+  try
+    Result := CMask.Matches(Filename);
+  finally
+    CMask.Free;
+  end;
+end;
+
+{$WARN WIDECHAR_REDUCED OFF}
+
+{$IFNDEF ALHideAnsiString}
 
 {***************************************************************************************}
 procedure ALConvertErrorFmt(ResString: PResStringRec; const Args: array of const); local;
@@ -4267,15 +4601,15 @@ function ALGetDateOrder(const DateFormat: AnsiString): TALDateOrder;
 var
   I: Integer;
 begin
-  Result := doMDY;
+  Result := TALDateOrder.doMDY;
   I := low(ansiString);
   while I <= High(DateFormat) do
   begin
     case AnsiChar(Ord(DateFormat[I]) and $DF) of
-      'E': Result := doYMD;
-      'Y': Result := doYMD;
-      'M': Result := doMDY;
-      'D': Result := doDMY;
+      'E': Result := TALDateOrder.doYMD;
+      'Y': Result := TALDateOrder.doYMD;
+      'M': Result := TALDateOrder.doMDY;
+      'D': Result := TALDateOrder.doDMY;
     else
       Inc(I);
       Continue;
@@ -4350,8 +4684,8 @@ begin
   begin
     if not ALScanNumber(S, Pos, N3, L3) then Exit;
     case DateOrder of
-      doMDY: begin Y := N3; YearLen := L3; M := N1; D := N2; end;
-      doDMY: begin Y := N3; YearLen := L3; M := N2; D := N1; end;
+      TALDateOrder.doMDY: begin Y := N3; YearLen := L3; M := N1; D := N2; end;
+      TALDateOrder.doDMY: begin Y := N3; YearLen := L3; M := N2; D := N1; end;
       else{doYMD:} begin Y := N1; YearLen := L1; M := N2; D := N3; end;
     end;
     if EraYearOffset > 0 then
@@ -4367,7 +4701,7 @@ begin
   end else
   begin
     Y := CurrentYear;
-    if DateOrder = doDMY then
+    if DateOrder = TALDateOrder.doDMY then
     begin
       D := N1; M := N2;
     end else
@@ -8661,10 +8995,11 @@ begin
   Result := ExtractFileDrive(FileName);
 end;
 
-{******************************************************************}
-function  ALExtractFileName(const FileName: AnsiString): AnsiString;
+{******************************************************************************************************}
+function  ALExtractFileName(const FileName: AnsiString; const RemoveFileExt: Boolean=false): AnsiString;
 begin
   Result := ExtractFileName(FileName);
+  if RemoveFileExt then result := ALCopyStr(result, 1, length(Result) - length(ALExtractFileExt(FileName)));
 end;
 
 {*****************************************************************}
@@ -8725,6 +9060,37 @@ begin
 end;
 
 {$ENDIF !ALHideAnsiString}
+
+{***********************************************************}
+function  ALExtractFilePathU(const FileName: String): String;
+begin
+  Result := ExtractFilePath(FileName);
+end;
+
+{**********************************************************}
+function  ALExtractFileDirU(const FileName: String): String;
+begin
+  Result := ExtractFileDir(FileName);
+end;
+
+{************************************************************}
+function  ALExtractFileDriveU(const FileName: String): String;
+begin
+  Result := ExtractFileDrive(FileName);
+end;
+
+{***********************************************************************************************}
+function  ALExtractFileNameU(const FileName: String; const RemoveFileExt: Boolean=false): String;
+begin
+  Result := ExtractFileName(FileName);
+  if RemoveFileExt then result := ALCopyStrU(result, 1, length(Result) - length(ALExtractFileExtU(FileName)));
+end;
+
+{**********************************************************}
+function  ALExtractFileExtU(const FileName: String): String;
+begin
+  Result := ExtractFileExt(FileName);
+end;
 
 {***********************************************************************************************************************************************}
 function ALIsPathDelimiterU(const S: String; Index: Integer; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): Boolean;

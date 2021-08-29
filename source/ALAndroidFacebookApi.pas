@@ -332,6 +332,7 @@ type
 
 implementation
 
+{**********************}
 procedure RegisterTypes;
 begin
   TRegTypes.RegisterType('ALAndroidFacebookApi.JALFacebookShareLinkDialog', TypeInfo(ALAndroidFacebookApi.JALFacebookShareLinkDialog));

@@ -871,6 +871,7 @@ type
 
 implementation
 
+{**********************}
 procedure RegisterTypes;
 begin
   TRegTypes.RegisterType('ALAndroidExoPlayerApi.JBandwidthMeter', TypeInfo(ALAndroidExoPlayerApi.JBandwidthMeter));

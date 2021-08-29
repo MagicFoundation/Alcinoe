@@ -158,10 +158,12 @@ Type
     procedure InsertObject(Index: Integer; const S: AnsiString; AObject: TObject); virtual;
     procedure InsertNameValue(Index: Integer; const Name, Value: AnsiString); virtual; // [added from Tstrings]
     procedure InsertNameValueObject(Index: Integer; const Name, Value: AnsiString; AObject: TObject); virtual; // [added from Tstrings]
-    procedure LoadFromFile(const FileName: AnsiString); virtual;
+    procedure LoadFromFile(const FileName: AnsiString); overload; virtual;
+    procedure LoadFromFile(const FileName: String); overload; virtual;
     procedure LoadFromStream(Stream: TStream); virtual;
     procedure Move(CurIndex, NewIndex: Integer); virtual;
-    procedure SaveToFile(const FileName: AnsiString); virtual;
+    procedure SaveToFile(const FileName: AnsiString); overload; virtual;
+    procedure SaveToFile(const FileName: String); overload; virtual;
     procedure SaveToStream(Stream: TStream); virtual;
     procedure SetText(Text: PAnsiChar); virtual;
     function ToStringArray: TArray<AnsiString>;
@@ -1385,6 +1387,12 @@ end;
 
 {************************************************************}
 procedure TALStrings.LoadFromFile(const FileName: AnsiString);
+begin
+  LoadFromFile(String(FileName));
+end;
+
+{********************************************************}
+procedure TALStrings.LoadFromFile(const FileName: String);
 var
   Stream: TStream;
 begin
@@ -1446,14 +1454,20 @@ end;
 
 {**********************************************************}
 procedure TALStrings.SaveToFile(const FileName: AnsiString);
+begin
+  SaveToFile(String(FileName));
+end;
+
+{******************************************************}
+procedure TALStrings.SaveToFile(const FileName: String);
 Var LFileStream: TfileStream;
-    LTmpFilename: AnsiString;
+    LTmpFilename: String;
 begin
   if ProtectedSave then LTmpFilename := FileName + '.~tmp'
   else LTmpFilename := FileName;
   try
 
-    LFileStream := TfileStream.Create(String(LTmpFilename),fmCreate);
+    LFileStream := TfileStream.Create(LTmpFilename,fmCreate);
     Try
       SaveToStream(LFileStream);
     finally
@@ -1461,13 +1475,13 @@ begin
     end;
 
     if LTmpFilename <> FileName then begin
-      if TFile.Exists(String(FileName)) then TFile.Delete(String(FileName));
-      TFile.Move(String(LTmpFilename), String(FileName));
+      if TFile.Exists(FileName) then TFile.Delete(FileName);
+      TFile.Move(LTmpFilename, FileName);
     end;
 
   except
     if (LTmpFilename <> FileName) and
-       (TFile.Exists(String(LTmpFilename))) then TFile.Delete(String(LTmpFilename));
+       (TFile.Exists(LTmpFilename)) then TFile.Delete(LTmpFilename);
     raise;
   end;
 end;
@@ -4778,30 +4792,32 @@ end;
 {***********************************************************************************************************************************************************}
 function TALHashedStringList.CreateDictionary(ACapacity: integer; aCaseSensitive: boolean): TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>;
 begin
-  if aCaseSensitive then result := TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>.create([doOwnsValues],
-                                                                                                           ACapacity,
-                                                                                                           TDelegatedEqualityComparer<ansiString>.Create(
-                                                                                                             function(const Left, Right: ansiString): Boolean
-                                                                                                             begin
-                                                                                                               Result := ALSameText(Left, Right);
-                                                                                                             end,
-                                                                                                             function(const Value: ansiString): Integer
-                                                                                                             begin
-                                                                                                               Result := THashBobJenkins.GetHashValue(PAnsiChar(Value)^, Length(Value) * SizeOf(AnsiChar));
-                                                                                                             end))
-  else result := TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>.create([doOwnsValues],
-                                                                                         ACapacity,
-                                                                                         TDelegatedEqualityComparer<ansiString>.Create(
-                                                                                           function(const Left, Right: ansiString): Boolean
-                                                                                           begin
-                                                                                             Result := ALSameText(Left, Right);
-                                                                                           end,
-                                                                                           function(const Value: ansiString): Integer
-                                                                                           var LLowerValue: ansiString;
-                                                                                           begin
-                                                                                             LLowerValue := ALLowerCase(Value);
-                                                                                             Result := THashBobJenkins.GetHashValue(PAnsiChar(LLowerValue)^, Length(LLowerValue) * SizeOf(AnsiChar));
-                                                                                           end));
+  if aCaseSensitive then result := TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>.create(
+                                     [doOwnsValues],
+                                     ACapacity,
+                                     TDelegatedEqualityComparer<ansiString>.Create(
+                                       function(const Left, Right: ansiString): Boolean
+                                       begin
+                                         Result := ALSameText(Left, Right);
+                                       end,
+                                       function(const Value: ansiString): Integer
+                                       begin
+                                         Result := THashBobJenkins.GetHashValue(PAnsiChar(Value)^, Length(Value) * SizeOf(AnsiChar));
+                                       end))
+  else result := TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>.create(
+                   [doOwnsValues],
+                   ACapacity,
+                   TDelegatedEqualityComparer<ansiString>.Create(
+                     function(const Left, Right: ansiString): Boolean
+                     begin
+                       Result := ALSameText(Left, Right);
+                     end,
+                     function(const Value: ansiString): Integer
+                     var LLowerValue: ansiString;
+                     begin
+                       LLowerValue := ALLowerCase(Value);
+                       Result := THashBobJenkins.GetHashValue(PAnsiChar(LLowerValue)^, Length(LLowerValue) * SizeOf(AnsiChar));
+                     end));
 end;
 
 {***************************************************************************}

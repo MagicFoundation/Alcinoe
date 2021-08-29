@@ -154,6 +154,7 @@ type
 
 implementation
 
+{**********************}
 procedure RegisterTypes;
 begin
   TRegTypes.RegisterType('ALAndroidFirebaseApi.JFirebaseOptions', TypeInfo(ALAndroidFirebaseApi.JFirebaseOptions));

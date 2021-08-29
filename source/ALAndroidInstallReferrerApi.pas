@@ -44,6 +44,7 @@ type
 
 implementation
 
+{**********************}
 procedure RegisterTypes;
 begin
   TRegTypes.RegisterType('ALAndroidApi.JALInstallReferrerListener', TypeInfo(ALAndroidInstallReferrerApi.JALInstallReferrerListener));

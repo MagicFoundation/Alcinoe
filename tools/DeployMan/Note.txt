@@ -1,1 +1,3 @@
-Download it from : https://github.com/grijjy/DelphiSocialFrameworks/tree/master/DeployMan
+Taken from https://github.com/grijjy/GrijjyDeployMan
+Thanks to Erik & Allen!
+https://blog.grijjy.com/

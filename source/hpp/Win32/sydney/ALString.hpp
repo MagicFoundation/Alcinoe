@@ -19,6 +19,7 @@
 #include <System.Classes.hpp>
 #include <System.Contnrs.hpp>
 #include <ALStringList.hpp>
+#include <ALCommon.hpp>
 
 //-- user supplied -----------------------------------------------------------
 
@@ -29,6 +30,8 @@ struct TALFormatSettings;
 class DELPHICLASS TALStringStream;
 class DELPHICLASS EALMaskException;
 class DELPHICLASS TALMask;
+class DELPHICLASS EALMaskExceptionU;
+class DELPHICLASS TALMaskU;
 class DELPHICLASS TALBasePrecompiledTag;
 class DELPHICLASS TALPrecompiledTag;
 //-- type declarations -------------------------------------------------------
@@ -134,23 +137,25 @@ public:
 #pragma pack(pop)
 
 #pragma pack(push,4)
-class PASCALIMPLEMENTATION EALMaskException : public System::Sysutils::Exception
+class PASCALIMPLEMENTATION EALMaskException : public Alcommon::EALException
 {
-	typedef System::Sysutils::Exception inherited;
+	typedef Alcommon::EALException inherited;
 	
 public:
-	/* Exception.Create */ inline __fastcall EALMaskException(const System::UnicodeString Msg) : System::Sysutils::Exception(Msg) { }
-	/* Exception.CreateFmt */ inline __fastcall EALMaskException(const System::UnicodeString Msg, const System::TVarRec *Args, const int Args_High) : System::Sysutils::Exception(Msg, Args, Args_High) { }
-	/* Exception.CreateRes */ inline __fastcall EALMaskException(NativeUInt Ident)/* overload */ : System::Sysutils::Exception(Ident) { }
-	/* Exception.CreateRes */ inline __fastcall EALMaskException(System::PResStringRec ResStringRec)/* overload */ : System::Sysutils::Exception(ResStringRec) { }
-	/* Exception.CreateResFmt */ inline __fastcall EALMaskException(NativeUInt Ident, const System::TVarRec *Args, const int Args_High)/* overload */ : System::Sysutils::Exception(Ident, Args, Args_High) { }
-	/* Exception.CreateResFmt */ inline __fastcall EALMaskException(System::PResStringRec ResStringRec, const System::TVarRec *Args, const int Args_High)/* overload */ : System::Sysutils::Exception(ResStringRec, Args, Args_High) { }
-	/* Exception.CreateHelp */ inline __fastcall EALMaskException(const System::UnicodeString Msg, int AHelpContext) : System::Sysutils::Exception(Msg, AHelpContext) { }
-	/* Exception.CreateFmtHelp */ inline __fastcall EALMaskException(const System::UnicodeString Msg, const System::TVarRec *Args, const int Args_High, int AHelpContext) : System::Sysutils::Exception(Msg, Args, Args_High, AHelpContext) { }
-	/* Exception.CreateResHelp */ inline __fastcall EALMaskException(NativeUInt Ident, int AHelpContext)/* overload */ : System::Sysutils::Exception(Ident, AHelpContext) { }
-	/* Exception.CreateResHelp */ inline __fastcall EALMaskException(System::PResStringRec ResStringRec, int AHelpContext)/* overload */ : System::Sysutils::Exception(ResStringRec, AHelpContext) { }
-	/* Exception.CreateResFmtHelp */ inline __fastcall EALMaskException(System::PResStringRec ResStringRec, const System::TVarRec *Args, const int Args_High, int AHelpContext)/* overload */ : System::Sysutils::Exception(ResStringRec, Args, Args_High, AHelpContext) { }
-	/* Exception.CreateResFmtHelp */ inline __fastcall EALMaskException(NativeUInt Ident, const System::TVarRec *Args, const int Args_High, int AHelpContext)/* overload */ : System::Sysutils::Exception(Ident, Args, Args_High, AHelpContext) { }
+	/* EALException.Create */ inline __fastcall EALMaskException(const System::AnsiString Msg) : Alcommon::EALException(Msg) { }
+	/* EALException.CreateFmt */ inline __fastcall EALMaskException(const System::AnsiString Msg, const System::TVarRec *Args, const int Args_High) : Alcommon::EALException(Msg, Args, Args_High) { }
+	
+public:
+	/* Exception.CreateRes */ inline __fastcall EALMaskException(NativeUInt Ident)/* overload */ : Alcommon::EALException(Ident) { }
+	/* Exception.CreateRes */ inline __fastcall EALMaskException(System::PResStringRec ResStringRec)/* overload */ : Alcommon::EALException(ResStringRec) { }
+	/* Exception.CreateResFmt */ inline __fastcall EALMaskException(NativeUInt Ident, const System::TVarRec *Args, const int Args_High)/* overload */ : Alcommon::EALException(Ident, Args, Args_High) { }
+	/* Exception.CreateResFmt */ inline __fastcall EALMaskException(System::PResStringRec ResStringRec, const System::TVarRec *Args, const int Args_High)/* overload */ : Alcommon::EALException(ResStringRec, Args, Args_High) { }
+	/* Exception.CreateHelp */ inline __fastcall EALMaskException(const System::UnicodeString Msg, int AHelpContext) : Alcommon::EALException(Msg, AHelpContext) { }
+	/* Exception.CreateFmtHelp */ inline __fastcall EALMaskException(const System::UnicodeString Msg, const System::TVarRec *Args, const int Args_High, int AHelpContext) : Alcommon::EALException(Msg, Args, Args_High, AHelpContext) { }
+	/* Exception.CreateResHelp */ inline __fastcall EALMaskException(NativeUInt Ident, int AHelpContext)/* overload */ : Alcommon::EALException(Ident, AHelpContext) { }
+	/* Exception.CreateResHelp */ inline __fastcall EALMaskException(System::PResStringRec ResStringRec, int AHelpContext)/* overload */ : Alcommon::EALException(ResStringRec, AHelpContext) { }
+	/* Exception.CreateResFmtHelp */ inline __fastcall EALMaskException(System::PResStringRec ResStringRec, const System::TVarRec *Args, const int Args_High, int AHelpContext)/* overload */ : Alcommon::EALException(ResStringRec, Args, Args_High, AHelpContext) { }
+	/* Exception.CreateResFmtHelp */ inline __fastcall EALMaskException(NativeUInt Ident, const System::TVarRec *Args, const int Args_High, int AHelpContext)/* overload */ : Alcommon::EALException(Ident, Args, Args_High, AHelpContext) { }
 	/* Exception.Destroy */ inline __fastcall virtual ~EALMaskException() { }
 	
 };
@@ -168,7 +173,7 @@ private:
 	
 	typedef TALMaskSet *PALMaskSet;
 	
-	enum DECLSPEC_DENUM TALMaskStates : unsigned char { msLiteral, msAny, msSet, msMBCSLiteral };
+	enum class DECLSPEC_DENUM TALMaskStates : unsigned char { msLiteral, msAny, msSet, msMBCSLiteral };
 	
 	#pragma pack(push,8)
 	struct DECLSPEC_DRECORD TALMaskState
@@ -215,6 +220,92 @@ public:
 	__fastcall TALMask(const System::AnsiString MaskValue);
 	__fastcall virtual ~TALMask();
 	bool __fastcall Matches(const System::AnsiString Filename);
+};
+
+#pragma pack(pop)
+
+#pragma pack(push,4)
+class PASCALIMPLEMENTATION EALMaskExceptionU : public Alcommon::EALExceptionU
+{
+	typedef Alcommon::EALExceptionU inherited;
+	
+public:
+	/* Exception.Create */ inline __fastcall EALMaskExceptionU(const System::UnicodeString Msg) : Alcommon::EALExceptionU(Msg) { }
+	/* Exception.CreateFmt */ inline __fastcall EALMaskExceptionU(const System::UnicodeString Msg, const System::TVarRec *Args, const int Args_High) : Alcommon::EALExceptionU(Msg, Args, Args_High) { }
+	/* Exception.CreateRes */ inline __fastcall EALMaskExceptionU(NativeUInt Ident)/* overload */ : Alcommon::EALExceptionU(Ident) { }
+	/* Exception.CreateRes */ inline __fastcall EALMaskExceptionU(System::PResStringRec ResStringRec)/* overload */ : Alcommon::EALExceptionU(ResStringRec) { }
+	/* Exception.CreateResFmt */ inline __fastcall EALMaskExceptionU(NativeUInt Ident, const System::TVarRec *Args, const int Args_High)/* overload */ : Alcommon::EALExceptionU(Ident, Args, Args_High) { }
+	/* Exception.CreateResFmt */ inline __fastcall EALMaskExceptionU(System::PResStringRec ResStringRec, const System::TVarRec *Args, const int Args_High)/* overload */ : Alcommon::EALExceptionU(ResStringRec, Args, Args_High) { }
+	/* Exception.CreateHelp */ inline __fastcall EALMaskExceptionU(const System::UnicodeString Msg, int AHelpContext) : Alcommon::EALExceptionU(Msg, AHelpContext) { }
+	/* Exception.CreateFmtHelp */ inline __fastcall EALMaskExceptionU(const System::UnicodeString Msg, const System::TVarRec *Args, const int Args_High, int AHelpContext) : Alcommon::EALExceptionU(Msg, Args, Args_High, AHelpContext) { }
+	/* Exception.CreateResHelp */ inline __fastcall EALMaskExceptionU(NativeUInt Ident, int AHelpContext)/* overload */ : Alcommon::EALExceptionU(Ident, AHelpContext) { }
+	/* Exception.CreateResHelp */ inline __fastcall EALMaskExceptionU(System::PResStringRec ResStringRec, int AHelpContext)/* overload */ : Alcommon::EALExceptionU(ResStringRec, AHelpContext) { }
+	/* Exception.CreateResFmtHelp */ inline __fastcall EALMaskExceptionU(System::PResStringRec ResStringRec, const System::TVarRec *Args, const int Args_High, int AHelpContext)/* overload */ : Alcommon::EALExceptionU(ResStringRec, Args, Args_High, AHelpContext) { }
+	/* Exception.CreateResFmtHelp */ inline __fastcall EALMaskExceptionU(NativeUInt Ident, const System::TVarRec *Args, const int Args_High, int AHelpContext)/* overload */ : Alcommon::EALExceptionU(Ident, Args, Args_High, AHelpContext) { }
+	/* Exception.Destroy */ inline __fastcall virtual ~EALMaskExceptionU() { }
+	
+};
+
+#pragma pack(pop)
+
+#pragma pack(push,4)
+class PASCALIMPLEMENTATION TALMaskU : public System::TObject
+{
+	typedef System::TObject inherited;
+	
+	
+private:
+	typedef System::Set<char, _DELPHI_SET_CHAR(0), _DELPHI_SET_CHAR(255)> TALMaskSet;
+	
+	typedef TALMaskSet *PALMaskSet;
+	
+	enum class DECLSPEC_DENUM TALMaskStates : unsigned char { msLiteral, msAny, msSet, msMBCSLiteral };
+	
+	#pragma pack(push,8)
+	struct DECLSPEC_DRECORD TALMaskState
+	{
+	public:
+		bool SkipTo;
+		
+	public:
+		TALMaskU::TALMaskStates State;
+		union
+		{
+			struct 
+			{
+				System::WideChar LeadByte;
+				System::WideChar TrailByte;
+			};
+			struct 
+			{
+				bool Negate;
+				TALMaskU::TALMaskSet *CharSet;
+			};
+			struct 
+			{
+				System::WideChar Literal;
+			};
+			
+		};
+	};
+	#pragma pack(pop)
+	
+	
+	typedef System::DynamicArray<TALMaskState> _TALMaskU__1;
+	
+	
+private:
+	_TALMaskU__1 FMaskStates;
+	
+protected:
+	int __fastcall InitMaskStates(const System::UnicodeString Mask);
+	void __fastcall DoneMaskStates();
+	bool __fastcall MatchesMaskStates(const System::UnicodeString Filename);
+	
+public:
+	__fastcall TALMaskU(const System::UnicodeString MaskValue);
+	__fastcall virtual ~TALMaskU();
+	bool __fastcall Matches(const System::UnicodeString Filename);
 };
 
 #pragma pack(pop)
@@ -337,6 +428,7 @@ extern DELPHI_PACKAGE System::DynamicArray<System::Byte> __fastcall ALNewGUIDByt
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALGUIDToStringU(const GUID &Guid, const bool WithoutBracket = false, const bool WithoutHyphen = false);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALNewGUIDStringU(const bool WithoutBracket = false, const bool WithoutHyphen = false);
 extern DELPHI_PACKAGE bool __fastcall ALMatchesMask(const System::AnsiString Filename, const System::AnsiString Mask);
+extern DELPHI_PACKAGE bool __fastcall ALMatchesMaskU(const System::UnicodeString Filename, const System::UnicodeString Mask);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALFormat(const System::AnsiString Format, const System::TVarRec *Args, const int Args_High)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALFormat(const System::AnsiString Format, const System::TVarRec *Args, const int Args_High, System::AnsiString &Result)/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALFormat(const System::AnsiString Format, const System::TVarRec *Args, const int Args_High, const TALFormatSettings &AFormatSettings)/* overload */;
@@ -472,7 +564,7 @@ extern DELPHI_PACKAGE System::UnicodeString __fastcall ALExtractQuotedStrU(Syste
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALExtractFilePath(const System::AnsiString FileName);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALExtractFileDir(const System::AnsiString FileName);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALExtractFileDrive(const System::AnsiString FileName);
-extern DELPHI_PACKAGE System::AnsiString __fastcall ALExtractFileName(const System::AnsiString FileName);
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALExtractFileName(const System::AnsiString FileName, const bool RemoveFileExt = false);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALExtractFileExt(const System::AnsiString FileName);
 extern DELPHI_PACKAGE int __fastcall ALLastDelimiter(const System::AnsiString Delimiters, const System::AnsiString S);
 extern DELPHI_PACKAGE bool __fastcall ALIsPathDelimiter(const System::AnsiString S, int Index, const System::AnsiString PathDelimiter = "\\");
@@ -480,6 +572,11 @@ extern DELPHI_PACKAGE System::AnsiString __fastcall ALIncludeTrailingPathDelimit
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALExcludeTrailingPathDelimiter(const System::AnsiString S, const System::AnsiString PathDelimiter = "\\");
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALIncludeLeadingPathDelimiter(const System::AnsiString S, const System::AnsiString PathDelimiter = "\\");
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALExcludeLeadingPathDelimiter(const System::AnsiString S, const System::AnsiString PathDelimiter = "\\");
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALExtractFilePathU(const System::UnicodeString FileName);
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALExtractFileDirU(const System::UnicodeString FileName);
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALExtractFileDriveU(const System::UnicodeString FileName);
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALExtractFileNameU(const System::UnicodeString FileName, const bool RemoveFileExt = false);
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALExtractFileExtU(const System::UnicodeString FileName);
 extern DELPHI_PACKAGE bool __fastcall ALIsPathDelimiterU(const System::UnicodeString S, int Index, const System::UnicodeString PathDelimiter = L"\\");
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALIncludeTrailingPathDelimiterU(const System::UnicodeString S, const System::UnicodeString PathDelimiter = L"\\");
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALExcludeTrailingPathDelimiterU(const System::UnicodeString S, const System::UnicodeString PathDelimiter = L"\\");

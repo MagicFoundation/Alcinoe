@@ -148,10 +148,12 @@ public:
 	virtual void __fastcall InsertObject(int Index, const System::AnsiString S, System::TObject* AObject);
 	virtual void __fastcall InsertNameValue(int Index, const System::AnsiString Name, const System::AnsiString Value);
 	virtual void __fastcall InsertNameValueObject(int Index, const System::AnsiString Name, const System::AnsiString Value, System::TObject* AObject);
-	virtual void __fastcall LoadFromFile(const System::AnsiString FileName);
+	virtual void __fastcall LoadFromFile(const System::AnsiString FileName)/* overload */;
+	virtual void __fastcall LoadFromFile(const System::UnicodeString FileName)/* overload */;
 	virtual void __fastcall LoadFromStream(System::Classes::TStream* Stream);
 	virtual void __fastcall Move(int CurIndex, int NewIndex);
-	virtual void __fastcall SaveToFile(const System::AnsiString FileName);
+	virtual void __fastcall SaveToFile(const System::AnsiString FileName)/* overload */;
+	virtual void __fastcall SaveToFile(const System::UnicodeString FileName)/* overload */;
 	virtual void __fastcall SaveToStream(System::Classes::TStream* Stream);
 	virtual void __fastcall SetText(char * Text);
 	System::DynamicArray<System::AnsiString> __fastcall ToStringArray();

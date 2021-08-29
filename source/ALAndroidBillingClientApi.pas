@@ -407,6 +407,7 @@ type
 
 implementation
 
+{**********************}
 procedure RegisterTypes;
 begin
   TRegTypes.RegisterType('ALAndroidBillingClientApi.JBillingClient', TypeInfo(ALAndroidBillingClientApi.JBillingClient));

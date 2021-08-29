@@ -174,6 +174,33 @@ type
     ShortPixel);
 
 type
+  // Verified with imagemagick 7.0.7-18
+  CompressionType = (
+    UndefinedCompression,
+    B44ACompression,
+    B44Compression,
+    BZipCompression,
+    DXT1Compression,
+    DXT3Compression,
+    DXT5Compression,
+    FaxCompression,
+    Group4Compression,
+    JBIG1Compression,        // ISO/IEC std 11544 / ITU-T rec T.82
+    JBIG2Compression,        // ISO/IEC std 14492 / ITU-T rec T.88
+    JPEG2000Compression,     // ISO/IEC std 15444-1 */
+    JPEGCompression,
+    LosslessJPEGCompression,
+    LZMACompression,         // Lempel-Ziv-Markov chain algorithm
+    LZWCompression,
+    NoCompression,
+    PizCompression,
+    Pxr24Compression,
+    RLECompression,
+    ZipCompression,
+    ZipSCompression
+  );
+
+type
  PaintMethod = (
   UndefinedMethod,
   PointMethod,
@@ -408,6 +435,21 @@ type
     //A description of each parameter follows:
     //wand: the magick wand.
     MagickGetImageHeight: function(wand: PMagickWand): size_t; cdecl;
+
+    //MagickGetImageCompression() gets the image compression.
+    //The format of the MagickGetImageCompression method is:
+    //CompressionType MagickGetImageCompression(MagickWand *wand)
+    //A description of each parameter follows:
+    //wand: the magick wand.
+    MagickGetImageCompression: function(wand: PMagickWand): CompressionType; cdecl;
+
+    //MagickSetImageCompression() sets the image compression.
+    //The format of the MagickSetImageCompression method is:
+    //MagickBooleanType MagickSetImageCompression(MagickWand *wand, const CompressionType compression)
+    //A description of each parameter follows:
+    //wand: the magick wand.
+    //compression: the image compression type.
+    MagickSetImageCompression: function(wand: PMagickWand; const compression: CompressionType): MagickBooleanType; cdecl;
 
     //MagickGetImageCompressionQuality() gets the image compression quality.
     //The format of the MagickGetImageCompressionQuality method is:
@@ -767,6 +809,8 @@ begin
   MagickTransformImageColorspace := GetProcAddress(FlibMagickWand,'MagickTransformImageColorspace');
   MagickGetImageWidth := GetProcAddress(FlibMagickWand,'MagickGetImageWidth');
   MagickGetImageHeight := GetProcAddress(FlibMagickWand,'MagickGetImageHeight');
+  MagickGetImageCompression := GetProcAddress(FlibMagickWand,'MagickGetImageCompression');
+  MagickSetImageCompression := GetProcAddress(FlibMagickWand,'MagickSetImageCompression');
   MagickGetImageCompressionQuality := GetProcAddress(FlibMagickWand,'MagickGetImageCompressionQuality');
   MagickSetImageCompressionQuality := GetProcAddress(FlibMagickWand,'MagickSetImageCompressionQuality');
   MagickAutoOrientImage := GetProcAddress(FlibMagickWand,'MagickAutoOrientImage');

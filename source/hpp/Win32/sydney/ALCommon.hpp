@@ -335,6 +335,7 @@ extern DELPHI_PACKAGE double __fastcall ALIfThen(bool AValue, const double ATrue
 extern DELPHI_PACKAGE System::Extended __fastcall ALIfThen(bool AValue, const System::Extended ATrue, const System::Extended AFalse = 0.000000E+00)/* overload */;
 extern DELPHI_PACKAGE System::DynamicArray<_TIME_DYNAMIC_ZONE_INFORMATION> __fastcall ALGetDynamicTimeZoneInformations(void);
 extern DELPHI_PACKAGE _TIME_DYNAMIC_ZONE_INFORMATION __fastcall ALGetDynamicTimeZoneInformation(const System::UnicodeString aTimeZoneKeyName);
+extern DELPHI_PACKAGE System::TDateTime __fastcall ALFileTimeToDateTime(const _FILETIME &AFileTime);
 extern DELPHI_PACKAGE System::TDateTime __fastcall AlLocalDateTimeToUTC(const System::TDateTime aLocalDateTime)/* overload */;
 extern DELPHI_PACKAGE System::TDateTime __fastcall AlLocalDateTimeToUTC(const System::UnicodeString aTimeZoneKeyName, System::TDateTime aLocalDateTime)/* overload */;
 extern DELPHI_PACKAGE System::TDateTime __fastcall AlLocalDateTimeToUTC(const _TIME_DYNAMIC_ZONE_INFORMATION &aTimeZoneInformation, System::TDateTime aLocalDateTime)/* overload */;

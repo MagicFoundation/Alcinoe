@@ -58,14 +58,22 @@ procedure ALWinExec(const aUserName: ANSIString;
                     const aCommandLine: ANSIString;
                     const aCurrentDirectory: AnsiString;
                     const aLogonFlags: dword = 0); overload;
+function ALWinExecU(const aCommandLine: String;
+                    const aCurrentDirectory: String;
+                    const aEnvironment: String;
+                    const aInputStream: Tstream;
+                    const aOutputStream: TStream;
+                    const aOwnerThread: TThread = nil): Dword; overload;
+function ALWinExecU(const aCommandLine: String;
+                    const aInputStream: Tstream;
+                    const aOutputStream: TStream;
+                    const aOwnerThread: TThread = nil): Dword; overload;
 function ALWinExecAndWait(const aCommandLine:AnsiString;
                           const aCurrentDirectory: AnsiString;
                           const aEnvironment: AnsiString;
                           const aVisibility : integer):DWORD; overload;
 function ALWinExecAndWait(const aCommandLine:AnsiString;
                           const aVisibility : integer):DWORD; overload;
-Function ALWinExecAndWaitV2(const aCommandLine: AnsiString;
-                            const aVisibility: integer): DWORD;
 function ALNTSetPrivilege(const sPrivilege: AnsiString; bEnabled: Boolean): Boolean;
 function ALStartService(const aServiceName: AnsiString; const aComputerName: AnsiString = ''; const aTimeOut: integer = 180): boolean;
 function ALStopService(const aServiceName: AnsiString; const aComputerName: AnsiString = ''; const aTimeOut: integer = 180): boolean;
@@ -401,60 +409,163 @@ begin
                              aVisibility);
 end;
 
-{*********************************************************}
-{*  ALWinExecAndWaitV2:                                   }
-{*  The routine will process paint messages and messages  }
-{*  send from other threads while it waits.               }
-Function ALWinExecAndWaitV2(const aCommandLine: AnsiString;
-                            const aVisibility: integer): DWORD;
+{*************************************************}
+function ALWinExecU(const aCommandLine: String;
+                    const aCurrentDirectory: String;
+                    const aEnvironment: String;
+                    const aInputStream: Tstream;
+                    const aOutputStream: TStream;
+                    const aOwnerThread: TThread = nil): Dword;
 
-  {------------------------------------------}
-  Procedure WaitFor( processHandle: THandle );
-  Var msg: TMsg;
-      ret: DWORD;
-  Begin
-    Repeat
+var LOutputReadPipe,LOutputWritePipe: THANDLE;
+    LInputReadPipe,LInputWritePipe: THANDLE;
 
-      ret := MsgWaitForMultipleObjects(1,               { 1 handle to wait on }
-                                       processHandle,   { the handle }
-                                       False,           { wake on any event }
-                                       INFINITE,        { wait without timeout }
-                                       QS_PAINT or      { wake on paint messages }
-                                       QS_SENDMESSAGE); { or messages from other threads }
+  {-----------------------------}
+  procedure InternalProcessInput;
+  var LBytesWritten: Dword;
+      LBuffer: Tbytes;
+      P: cardinal;
+  begin
+    If (aInputStream <> nil) and (aInputStream.size > 0) then begin
+      SetLength(LBuffer,aInputStream.size);
+      aInputStream.readBuffer(pointer(LBuffer)^,aInputStream.size);
+      P := 0;
+      While true do begin
+        if (aOwnerThread <> nil) and (aOwnerThread.checkTerminated) then break;
+        if not WriteFile(LInputWritePipe,     // handle to file to write to
+                         LBuffer[P],          // pointer to data to write to file
+                         cardinal(length(LBuffer)) - P, // number of bytes to write
+                         LBytesWritten,       // pointer to number of bytes written
+                         nil) then RaiseLastOSError; // pointer to structure needed for overlapped I/O
+        If LBytesWritten = Dword(length(LBuffer)) then break
+        else P := P + LBytesWritten;
+      end;
+    end;
+  end;
 
-      If ret = WAIT_FAILED Then Exit;
-      If ret = (WAIT_OBJECT_0 + 1) Then
-        While PeekMessage( msg, 0, WM_PAINT, WM_PAINT, PM_REMOVE ) Do
-          DispatchMessage( msg );
+  {------------------------------}
+  procedure InternalProcessOutput;
+  var LBytesInPipe: Cardinal;
+      LBytesRead: Dword;
+      LBuffer: TBytes;
+  begin
+    While true do begin
 
-    Until ret = WAIT_OBJECT_0;
-  End;
+      if (aOwnerThread <> nil) and (aOwnerThread.checkTerminated) then break;
 
-Var StartupInfo:TStartupInfoA;
-    ProcessInfo:TProcessInformation;
+      If not PeekNamedPipe(LOutputReadPipe,  // handle to pipe to copy from
+                           nil,              // pointer to data buffer
+                           0,                // size, in bytes, of data buffer
+                           nil,              // pointer to number of bytes read
+                           @LBytesInPipe,    // pointer to total number of bytes available
+                           nil) then break;  // pointer to unread bytes in this message
+
+      if LBytesInPipe > 0 then begin
+        SetLength(LBuffer, LBytesInPipe);
+        if not ReadFile(LOutputReadPipe,             // handle of file to read
+                        pointer(LBuffer)^,           // address of buffer that receives data
+                        LBytesInPipe,                // number of bytes to read
+                        LBytesRead,                  // address of number of bytes read
+                        nil) then RaiseLastOSError;  // address of structure for data
+        If (LBytesRead > 0) and (aOutputStream <> nil) then aOutputStream.WriteBuffer(pointer(LBuffer)^, LBytesRead);
+      end
+      else break;
+
+    end;
+  end;
+
+Var LProcessInformation: TProcessInformation;
+    LStartupInfo: TStartupInfo;
+    LSecurityAttributes: TSecurityAttributes;
+    LPEnvironment: Pointer;
+    LPCurrentDirectory: Pointer;
+
+begin
+
+  // Set up the security attributes struct.
+  LSecurityAttributes.nLength := sizeof(TSecurityAttributes);
+  LSecurityAttributes.lpSecurityDescriptor := NiL;
+  LSecurityAttributes.bInheritHandle := TRUE;
+
+  // Create the child output pipe.
+  if not CreatePipe(LOutputReadPipe,          // address of variable for read handle
+                    LOutputWritePipe,         // address of variable for write handle
+                    @LSecurityAttributes,     // pointer to security attributes
+                    0) then RaiseLastOSError; // number of bytes reserved for pipe
+
+  Try
+
+    // Create the child input pipe.
+    if not CreatePipe(LInputReadPipe,           // address of variable for read handle
+                      LInputWritePipe,          // address of variable for write handle
+                      @LSecurityAttributes,     // pointer to security attributes
+                      0) then RaiseLastOSError; // number of bytes reserved for pipe
+
+    Try
+
+      // Set up the start up info struct.
+      ZeroMemory(@LStartupInfo,sizeof(TStartupInfo));
+      LStartupInfo.cb := sizeof(TStartupInfo);
+      LStartupInfo.dwFlags := STARTF_USESTDHANDLES;
+      LStartupInfo.hStdOutput := LOutputWritePipe;
+      LStartupInfo.hStdInput  := LInputReadPipe;
+      LStartupInfo.hStdError  := LOutputWritePipe;
+
+      if aEnvironment <> '' then LPEnvironment := PChar(aEnvironment)
+      else LPEnvironment := nil;
+      if aCurrentDirectory <> '' then LPCurrentDirectory := PChar(aCurrentDirectory)
+      else LPCurrentDirectory := nil;
+
+      // Launch the process that you want to redirect.
+      if not CreateProcess(nil,                  // pointer to name of executable module
+                           PChar(aCommandLine),  // pointer to command line string
+                           @LSecurityAttributes, // pointer to process security attributes
+                           NiL,                  // pointer to thread security attributes
+                           TrUE,                 // handle inheritance flag
+                           CREATE_NO_WINDOW,     // creation flags
+                           LPEnvironment,        // pointer to new environment block
+                           LPCurrentDirectory,   // pointer to current directory name
+                           LStartupInfo,         // pointer to STARTUPINFO
+                           LProcessInformation) then RaiseLastOSError; // pointer to PROCESS_INFORMATION
+      Try
+
+        InternalProcessInput;
+        while (WaitForSingleObject(LProcessInformation.hProcess, 1{to not use 100% CPU usage}) = WAIT_TIMEOUT) do begin
+          InternalProcessOutput;
+          if (aOwnerThread <> nil) and (aOwnerThread.checkTerminated) then break;
+        end;
+        InternalProcessOutput;
+        if not GetExitCodeProcess(LProcessInformation.hProcess, Cardinal(Result)) then raiseLastOsError;
+
+      finally
+        if not CloseHandle(LProcessInformation.hThread) then raiseLastOsError;
+        if not CloseHandle(LProcessInformation.hProcess) then raiseLastOsError;
+      end;
+
+    Finally
+      if not CloseHandle(LInputReadPipe) then raiseLastOsError;
+      if not CloseHandle(LInputWritePipe) then raiseLastOsError;
+    end;
+
+  Finally
+    if not CloseHandle(LOutputReadPipe) then raiseLastOsError;
+    if not CloseHandle(LOutputWritePipe) then raiseLastOsError;
+  end;
+
+end;
+
+{*********************************************}
+function ALWinExecU(const aCommandLine: String;
+                    const aInputStream: Tstream;
+                    const aOutputStream: TStream;
+                    const aOwnerThread: TThread = nil): Dword;
 Begin
-  FillChar(StartupInfo,Sizeof(StartupInfo),#0);
-  StartupInfo.cb := Sizeof(StartupInfo);
-  StartupInfo.dwFlags := STARTF_USESHOWWINDOW;
-  StartupInfo.wShowWindow := aVisibility;
-  If not CreateProcessA(nil,
-                        PAnsiChar(aCommandLine),  { pointer to command line string }
-                        nil,                      { pointer to process security attributes }
-                        nil,                      { pointer to thread security attributes }
-                        false,                    { handle inheritance flag }
-                        CREATE_NEW_CONSOLE or     { creation flags }
-                        NORMAL_PRIORITY_CLASS,
-                        nil,                      { pointer to new environment block }
-                        nil,                      { pointer to current directory name }
-                        StartupInfo,              { pointer to STARTUPINFO }
-                        ProcessInfo)              { pointer to PROCESS_INF }
-  Then Result := DWORD(-1)   { failed, GetLastError has error code }
-  Else Begin
-     Waitfor(ProcessInfo.hProcess);
-     GetExitCodeProcess(ProcessInfo.hProcess, Result);
-     CloseHandle( ProcessInfo.hProcess );
-     CloseHandle( ProcessInfo.hThread );
-  End;
+  Result := ALWinExecU(aCommandLine,
+                       '',
+                       '',
+                       aInputStream,
+                       aOutputStream,
+                       aOwnerThread);
 End;
 
 {*******************************************************************************************************************}

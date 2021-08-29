@@ -25,7 +25,7 @@ namespace Alfiles
 //-- var, const, procedure ---------------------------------------------------
 extern DELPHI_PACKAGE bool __fastcall AlEmptyDirectory(System::AnsiString Directory, bool SubDirectory, const System::AnsiString *IgnoreFiles, const int IgnoreFiles_High, const bool RemoveEmptySubDirectory = true, const System::AnsiString FileNameMask = "*", const System::TDateTime MinFileAge = 0.000000E+00)/* overload */;
 extern DELPHI_PACKAGE bool __fastcall AlEmptyDirectory(const System::AnsiString Directory, bool SubDirectory, const bool RemoveEmptySubDirectory = true, const System::AnsiString FileNameMask = "*", const System::TDateTime MinFileAge = 0.000000E+00)/* overload */;
-extern DELPHI_PACKAGE bool __fastcall AlCopyDirectory(System::AnsiString SrcDirectory, System::AnsiString DestDirectory, bool SubDirectory, const System::AnsiString FileNameMask = "*", const bool FailIfExists = true);
+extern DELPHI_PACKAGE bool __fastcall AlCopyDirectory(System::AnsiString SrcDirectory, System::AnsiString DestDirectory, bool SubDirectory, const System::AnsiString FileNameMask = "*", const bool FailIfExists = true, const bool SkipIfExists = false);
 extern DELPHI_PACKAGE __int64 __fastcall AlGetFileSize(const System::AnsiString AFileName);
 extern DELPHI_PACKAGE System::AnsiString __fastcall AlGetFileVersion(const System::AnsiString AFileName);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALGetModuleFileNameWithoutExtension(void);
@@ -47,6 +47,20 @@ extern DELPHI_PACKAGE bool __fastcall ALRenameFile(const System::AnsiString OldN
 extern DELPHI_PACKAGE bool __fastcall AlEmptyDirectoryU(System::UnicodeString Directory, bool SubDirectory, const System::UnicodeString *IgnoreFiles, const int IgnoreFiles_High, const bool RemoveEmptySubDirectory = true, const System::UnicodeString FileNameMask = L"*", const System::TDateTime MinFileAge = 0.000000E+00)/* overload */;
 extern DELPHI_PACKAGE bool __fastcall AlEmptyDirectoryU(const System::UnicodeString Directory, bool SubDirectory, const bool RemoveEmptySubDirectory = true, const System::UnicodeString FileNameMask = L"*", const System::TDateTime MinFileAge = 0.000000E+00)/* overload */;
 extern DELPHI_PACKAGE __int64 __fastcall ALGetFileSizeU(const System::UnicodeString FileName);
+extern DELPHI_PACKAGE bool __fastcall AlCopyDirectoryU(System::UnicodeString SrcDirectory, System::UnicodeString DestDirectory, bool SubDirectory, const System::UnicodeString FileNameMask = L"*", const bool FailIfExists = true, const bool SkipIfExists = false);
+extern DELPHI_PACKAGE System::TDateTime __fastcall ALGetFileCreationDateTimeU(const System::UnicodeString aFileName);
+extern DELPHI_PACKAGE System::TDateTime __fastcall ALGetFileLastWriteDateTimeU(const System::UnicodeString aFileName);
+extern DELPHI_PACKAGE System::TDateTime __fastcall ALGetFileLastAccessDateTimeU(const System::UnicodeString aFileName);
+extern DELPHI_PACKAGE void __fastcall ALSetFileCreationDateTimeU(const System::UnicodeString aFileName, const System::TDateTime aCreationDateTime);
+extern DELPHI_PACKAGE void __fastcall ALSetFileLastWriteDateTimeU(const System::UnicodeString aFileName, const System::TDateTime aLastWriteDateTime);
+extern DELPHI_PACKAGE void __fastcall ALSetFileLastAccessDateTimeU(const System::UnicodeString aFileName, const System::TDateTime aLastAccessDateTime);
+extern DELPHI_PACKAGE bool __fastcall ALIsDirectoryEmptyU(const System::UnicodeString directory);
+extern DELPHI_PACKAGE bool __fastcall ALFileExistsU(const System::UnicodeString Path);
+extern DELPHI_PACKAGE bool __fastcall ALDirectoryExistsU(const System::UnicodeString Directory);
+extern DELPHI_PACKAGE bool __fastcall ALCreateDirU(const System::UnicodeString Dir);
+extern DELPHI_PACKAGE bool __fastcall ALRemoveDirU(const System::UnicodeString Dir);
+extern DELPHI_PACKAGE bool __fastcall ALDeleteFileU(const System::UnicodeString FileName);
+extern DELPHI_PACKAGE bool __fastcall ALRenameFileU(const System::UnicodeString OldName, const System::UnicodeString NewName);
 }	/* namespace Alfiles */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALFILES)
 using namespace Alfiles;

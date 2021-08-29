@@ -168,6 +168,7 @@ type
 
 implementation
 
+{**********************}
 procedure RegisterTypes;
 begin
   TRegTypes.RegisterType('ALAndroidGoogleApi.JTask', TypeInfo(ALAndroidGoogleApi.JTask));

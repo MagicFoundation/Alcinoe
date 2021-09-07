@@ -4,9 +4,8 @@ https://quality.embarcadero.com/browse/RSP-28003
 Usage: 
 DprojNormalizer.exe "<DprojFilename>" <createBackup>(ie: true/false)
 
-Note: this tools is not 100% efficient, for exemple it's consider that
-you can only enable/disable some default deployements but it's not
-consider that you could also update the deployment paths, etc. in short
-this tool delete every default items in deployment section of the 
-Dproj except thoses where enabled is overriden to false. 
-!! Use with caution and always make a backup of your Dproj !!
+DprojNormalizer will order all nodes so that the Dproj stay consistent
+between each commit for easy diff compare. It's will also remove
+from deployement all unnecessary items like all items that 
+are automatiquelly added by the IDE every time you open the DPROJ (icons, 
+launchscreen, binary, etc.)

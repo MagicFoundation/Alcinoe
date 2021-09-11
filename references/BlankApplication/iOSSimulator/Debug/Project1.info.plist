@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>Project1</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>Project1</string>
+	<key>CFBundleIdentifier</key>
+	<string>Project1</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>7.1</string>
+	<key>CFBundleVersion</key>
+	<string>1.0.0</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.0</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<true/>
+	<key>CFBundleExecutable</key>
+	<string>Project1</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>The reason for accessing the location information of the user</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>The reason for accessing the location information of the user</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>The reason for accessing the location information of the user</string>
+	<key>UIBackgroundModes</key>
+	<array>
+	</array>
+	<key>NSContactsUsageDescription</key>
+	<string>The reason for accessing the contacts</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>The reason for accessing the photo library</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>The reason for adding to the photo library</string>
+	<key>NSCameraUsageDescription</key>
+	<string>The reason for accessing the camera</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>The reason for accessing the face id</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>The reason for accessing the microphone</string>
+	<key>NSSiriUsageDescription</key>
+	<string>The reason for accessing Siri</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>The reason for accessing bluetooth</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>The reason for accessing bluetooth peripherals</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>The reason for accessing the calendar data</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>The reason for accessing the reminders</string>
+	<key>NSMotionUsageDescription</key>
+	<string>The reason for accessing the accelerometer</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>The reason for requesting to send user data to Apple's speech recognition servers</string>
+
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+	</array>
+
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+
+</dict>
+</plist>

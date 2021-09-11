@@ -60,9 +60,20 @@ IF ERRORLEVEL 1 goto ERROR
 call "%ProjectDir%\tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\demos\" "false"
 IF ERRORLEVEL 1 goto ERROR
 
-call "%ProjectDir%\tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\tools\" "false"
+call "%ProjectDir%\tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\tools\DeployProjNormalizer\" "false"
 IF ERRORLEVEL 1 goto ERROR
 
+call "%ProjectDir%\tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\tools\DprojNormalizer\" "false"
+IF ERRORLEVEL 1 goto ERROR
+
+call "%ProjectDir%\tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\tools\DprojVersioning\" "false"
+IF ERRORLEVEL 1 goto ERROR
+
+call "%ProjectDir%\tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\tools\UnitNormalizer\" "false"
+IF ERRORLEVEL 1 goto ERROR
+
+call "%ProjectDir%\tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\tools\XmlMerge\" "false"
+IF ERRORLEVEL 1 goto ERROR
 
 REM -----------------
 REM clean directories
@@ -164,18 +175,6 @@ FOR /d /R %%J IN (Android64) DO (
 CHDIR "%ProjectDir%\"
 
 CHDIR "%ProjectDir%\demos\"
-FOR /d /R %%J IN (iOSSimulator) DO (	  
-  Echo.%%J | findstr /C:"_source">nul && (
-    REM do not delete inside /_source/
-  ) || (
-    IF EXIST "%%J" echo rmdir - %%J			
-    IF EXIST "%%J" rmdir /s /q "%%J"
-    if EXIST "%%J" goto ERROR
-  )
-)
-CHDIR "%ProjectDir%\"
-
-CHDIR "%ProjectDir%\demos\"
 FOR /d /R %%J IN (iOSDevice64) DO (	  
   Echo.%%J | findstr /C:"_source">nul && (
     REM do not delete inside /_source/
@@ -232,6 +231,9 @@ FOR /R %%J IN (*.dproj) DO (
 )
 CHDIR "%ProjectDir%\"
 
+call tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALFmxControls\_source\ALFmxControls.dproj" "false"
+IF ERRORLEVEL 1 goto ERROR
+
 CHDIR "%ProjectDir%\demos\"
 MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=Android /t:Build
 IF ERRORLEVEL 1 PAUSE
@@ -241,13 +243,14 @@ MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=
 IF ERRORLEVEL 1 PAUSE
 MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=Android64 /t:Deploy
 IF ERRORLEVEL 1 PAUSE
-REM MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=iOSSimulator /t:Build
-REM IF ERRORLEVEL 1 PAUSE
 MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
 IF ERRORLEVEL 1 PAUSE
 REM MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=OSX64 /t:Build
 REM IF ERRORLEVEL 1 PAUSE
 CHDIR "%ProjectDir%\"
+
+call tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj" "false"
+IF ERRORLEVEL 1 goto ERROR
 
 CHDIR "%ProjectDir%\demos\"
 MSBuild ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj /p:Config=Release /p:Platform=Android /t:Build
@@ -258,13 +261,14 @@ MSBuild ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj /p:Config=Release 
 IF ERRORLEVEL 1 PAUSE
 MSBuild ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj /p:Config=Release /p:Platform=Android64 /t:Deploy
 IF ERRORLEVEL 1 PAUSE
-REM MSBuild ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj /p:Config=Release /p:Platform=iOSSimulator /t:Build
-REM IF ERRORLEVEL 1 PAUSE
 MSBuild ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
 IF ERRORLEVEL 1 PAUSE
 REM MSBuild ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj /p:Config=Release /p:Platform=OSX64 /t:Build
 REM IF ERRORLEVEL 1 PAUSE
 CHDIR "%ProjectDir%\"
+
+call tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALFacebookLogin\_source\ALFacebookLogin.dproj" "false"
+IF ERRORLEVEL 1 goto ERROR
 
 CHDIR "%ProjectDir%\demos\"
 MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=Android /t:Build
@@ -275,13 +279,14 @@ MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platf
 IF ERRORLEVEL 1 PAUSE
 MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=Android64 /t:Deploy
 IF ERRORLEVEL 1 PAUSE
-REM MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=iOSSimulator /t:Build
-REM IF ERRORLEVEL 1 PAUSE
 MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
 IF ERRORLEVEL 1 PAUSE
 REM MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=OSX64 /t:Build
 REM IF ERRORLEVEL 1 PAUSE
 CHDIR "%ProjectDir%\"
+
+call tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj" "false"
+IF ERRORLEVEL 1 goto ERROR
 
 CHDIR "%ProjectDir%\demos\"
 MSBuild ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj /p:Config=Release /p:Platform=Android /t:Build
@@ -292,13 +297,14 @@ MSBuild ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj /p:Config=Releas
 IF ERRORLEVEL 1 PAUSE
 MSBuild ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj /p:Config=Release /p:Platform=Android64 /t:Deploy
 IF ERRORLEVEL 1 PAUSE
-REM MSBuild ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj /p:Config=Release /p:Platform=iOSSimulator /t:Build
-REM IF ERRORLEVEL 1 PAUSE
 MSBuild ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
 IF ERRORLEVEL 1 PAUSE
 REM MSBuild ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj /p:Config=Release /p:Platform=OSX64 /t:Build
 REM IF ERRORLEVEL 1 PAUSE
 CHDIR "%ProjectDir%\"
+
+call tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj" "false"
+IF ERRORLEVEL 1 goto ERROR
 
 CHDIR "%ProjectDir%\demos\"
 MSBuild ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj /p:Config=Release /p:Platform=Android /t:Build
@@ -309,8 +315,6 @@ MSBuild ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj /p:Config=Rel
 IF ERRORLEVEL 1 PAUSE
 MSBuild ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj /p:Config=Release /p:Platform=Android64 /t:Deploy
 IF ERRORLEVEL 1 PAUSE
-REM MSBuild ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj /p:Config=Release /p:Platform=iOSSimulator /t:Build
-REM IF ERRORLEVEL 1 PAUSE
 MSBuild ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
 IF ERRORLEVEL 1 PAUSE
 REM MSBuild ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj /p:Config=Release /p:Platform=OSX64 /t:Build

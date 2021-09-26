@@ -16,14 +16,20 @@ to reference the code
 Example of an app made with Alcinoe: KisKis
 -------------------------------------------
 
-
-<a href="https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160">
-  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/youtube_kiskis.jpg?raw=true" alt="KisKis" width="200" style="width:200px;" />
-</a>
-
-* YouTube: https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160
-* iOS: https://itunes.apple.com/us/app/id1420049759
-* Android: https://play.google.com/store/apps/details?id=club.kiskis.app&hl=en
+<table border="0">
+  <tr>
+    <td>
+      <a href="https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160">
+        <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/youtube_kiskis.jpg?raw=true" alt="KisKis" width="200" style="width:200px;" />
+      </a>
+    </td>
+    <td>
+      * YouTube: https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160
+      * iOS: https://itunes.apple.com/us/app/id1420049759
+      * Android: https://play.google.com/store/apps/details?id=club.kiskis.app&hl=en
+    </td>
+  </tr>
+</table>
 
 
 Compiled demo
@@ -93,6 +99,7 @@ For this just replace your original DX.bat (mine is located in c:\SDKs\android\b
 by the one located in <a href="https://github.com/Zeus64/alcinoe/tree/master/tools/D8Proxy/dx.bat">{alcinoe_rootdir}\tools\D8Proxy\dx.bat</a>.
 more details here: <a href="https://quality.embarcadero.com/browse/RSP-24155">https://quality.embarcadero.com/browse/RSP-24155</a>
 
+
 Full opengl video player for FireMonkey
 ---------------------------------------
 
@@ -157,7 +164,6 @@ top of the form (so off course no z-order with FireMonkey control)
 </p>
 
 <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-22.png?raw=true" alt="Drawing" width="457" style="width:457px;"/>
-
 
 
 Fast/double-buffered FireMonkey controls with native draw
@@ -226,7 +232,6 @@ a high speed without being dependent of the form.quality
 <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-9.jpg?raw=true" alt="TALCircle" />
 
 
-
 Improved FireMonkey controls
 ----------------------------
 
@@ -245,7 +250,6 @@ Improved FireMonkey controls
 </p>
 
 
-
 Confetti Falling Animation
 --------------------------
 
@@ -253,7 +257,6 @@ ALConfetti is a vanilla Delphi library for creating a configurable, high-perform
 falling animation.
 
 <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;"  />
-
 
 
 Firebase cloud messaging
@@ -284,7 +287,6 @@ enhance, make your photos beautiful and expressive in just minutes!
   &nbsp;&nbsp;&nbsp;
   <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-19.jpg?raw=true" alt="video player for FireMonkey" width="320" style="width:320px;"/>
 </p>
-
 
 
 Json Parser

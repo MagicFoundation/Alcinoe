@@ -17,7 +17,9 @@ Example of an app made with Alcinoe: KisKis
 -------------------------------------------
 
 <p align="center">
-  [<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/youtube_kiskis.jpg?raw=true" alt="KisKis" width="200" style="width:200px;" />](https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160)
+  <a href="https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160">
+    <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/youtube_kiskis.jpg?raw=true" alt="KisKis" width="200" style="width:200px;" />
+  </a>
 </p>
 
 * YouTube: https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160

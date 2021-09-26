@@ -16,7 +16,9 @@ to reference the code
 Example of an app made with Alcinoe: KisKis
 -------------------------------------------
 
-[<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/youtube_kiskis.jpg?raw=true" alt="KisKis" width="300" style="width:300px;" />](https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160)
+<p align="center">
+  [<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/youtube_kiskis.jpg?raw=true" alt="KisKis" width="200" style="width:200px;" />](https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160)
+</p>
 
 * YouTube: https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160
 * iOS: https://itunes.apple.com/us/app/id1420049759

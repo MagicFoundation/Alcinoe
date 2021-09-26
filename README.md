@@ -16,6 +16,8 @@ to reference the code
 Example of an app made with Alcinoe: KisKis
 -------------------------------------------
 
+[<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/youtube_kiskis.jpg?raw=true" alt="KisKis" width="300" style="width:300px;" />](https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160)
+
 * YouTube: https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160
 * iOS: https://itunes.apple.com/us/app/id1420049759
 * Android: https://play.google.com/store/apps/details?id=club.kiskis.app&hl=en
@@ -42,6 +44,7 @@ Compiled demo
 * https://svn.code.sf.net/p/alcinoe/code/demos/ALWebSpider/win32/ALWebSpiderDemo.exe
 * https://svn.code.sf.net/p/alcinoe/code/demos/ALXmlDoc/win32/AlXmlDocDemo.exe
 * https://svn.code.sf.net/p/alcinoe/code/demos/ALLiveVideoChat/server/Win32/Release/ALLiveVideoChatServer.exe
+* https://svn.code.sf.net/p/alcinoe/code/demos/ALConfetti/Win32/Release/ALConfettiDemo.exe
 
 #### Android #### 
 
@@ -50,6 +53,7 @@ Compiled demo
 * https://tinyurl.com/y9gzos9f (ALFacebookLogin.apk)
 * https://tinyurl.com/mzf8adyk (ALFmxFilterEffects.apk)
 * https://tinyurl.com/ydymo23w (ALLiveVideoChatClient.apk)
+* https://tinyurl.com/yeankev2 (ALConfettiDemo.apk)
 
 #### iOS #### 
 
@@ -230,12 +234,22 @@ Improved FireMonkey controls
 <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-5.jpg?raw=true" alt="RangeTrackBar" width="600" style="width:600px;"  />
 
 <p align="left">
-  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-15.jpg?raw=true" alt="video player for FireMonkey" width="280" style="width:280px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-15.jpg?raw=true" alt="video player for FireMonkey" width="250" style="width:250px;"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-14.jpg?raw=true" alt="video player for FireMonkey" width="280" style="width:280px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-14.jpg?raw=true" alt="video player for FireMonkey" width="250" style="width:250px;"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-16.jpg?raw=true" alt="video player for FireMonkey" width="280" style="width:280px;"/>
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/img-16.jpg?raw=true" alt="video player for FireMonkey" width="250" style="width:250px;"/>
 </p>
+
+
+
+Confetti Falling Animation
+--------------------------
+
+ALConfetti is a vanilla Delphi library for creating a configurable, high-performance confetti 
+falling animation.
+
+<img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;"  />
 
 
 

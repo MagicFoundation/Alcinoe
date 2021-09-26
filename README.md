@@ -16,11 +16,10 @@ to reference the code
 Example of an app made with Alcinoe: KisKis
 -------------------------------------------
 
-<p align="center">
-  <a href="https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160">
-    <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/youtube_kiskis.jpg?raw=true" alt="KisKis" width="200" style="width:200px;" />
-  </a>
-</p>
+
+<a href="https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160">
+  <img src="https://github.com/Zeus64/alcinoe/blob/master/references/DocImages/youtube_kiskis.jpg?raw=true" alt="KisKis" width="200" style="width:200px;" />
+</a>
 
 * YouTube: https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160
 * iOS: https://itunes.apple.com/us/app/id1420049759

@@ -14,15 +14,15 @@ uses
   Androidapi.JNIBridge,
   Androidapi.JNI.Widget,
   Androidapi.JNI.JavaTypes,
-  ALAndroidNativeView,
   ALAndroidApi,
+  ALFmxAndroidNativeView,
   {$ELSEIF defined(IOS)}
   System.TypInfo,
   iOSapi.Foundation,
   iOSapi.UIKit,
   Macapi.ObjectiveC,
   Macapi.ObjCRuntime,
-  ALIosNativeView,
+  ALFmxIosNativeView,
   {$ELSE}
   FMX.Edit,
   {$ENDIF}

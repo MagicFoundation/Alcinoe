@@ -1,4 +1,4 @@
-unit ALIosNativeView;
+unit ALFmxIosNativeView;
 
 {$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.Presentation.iOS.pas was not updated and adjust the IFDEF'}

@@ -16,8 +16,8 @@ uses
   iOSapi.UIKit,
   Macapi.ObjectiveC,
   Macapi.ObjCRuntime,
-  ALIosNativeView,
-  ALIosScrollBox,
+  ALFmxIosNativeView,
+  ALFmxIosScrollBox,
   {$ELSE}
   FMX.StdCtrls,
   FMX.Memo.style,

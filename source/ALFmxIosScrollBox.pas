@@ -1,4 +1,4 @@
-unit ALIosScrollBox;
+unit ALFmxIosScrollBox;
 
 {$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.ScrollBox.iOS.pas was not updated and adjust the IFDEF'}
@@ -15,7 +15,7 @@ uses
   iOSapi.UIKit,
   iOSapi.CocoaTypes,
   iOSApi.CoreGraphics,
-  ALIosNativeView;
+  ALFmxIosNativeView;
 
 type
 

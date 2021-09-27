@@ -9,21 +9,21 @@ REM -------------------
 set COMPILER=
   
 cls
-echo 1) Rio
-echo 2) Sydney
+echo 1) Sydney
+echo 2) Rio
 
 set COMPILER=
 set /P COMPILER=Enter number to select a compiler: %=%
 more < nul > nul & REM This instruction to clear the ERRORLEVEL as instruction below set ERRORLEVEL to 1 if empty input
 
 if "%COMPILER%"=="1" (
-  set DELPHI_NAME=rio
-  set DELPHI_VERSION=20.0
+  set DELPHI_NAME=sydney
+  set DELPHI_VERSION=21.0
   goto INIT_LOCAL_VARS
 )
 if "%COMPILER%"=="2" (
-  set DELPHI_NAME=sydney
-  set DELPHI_VERSION=21.0
+  set DELPHI_NAME=rio
+  set DELPHI_VERSION=20.0
   goto INIT_LOCAL_VARS
 )
 
@@ -267,6 +267,24 @@ REM MSBuild ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj /p:Config=Rele
 REM IF ERRORLEVEL 1 PAUSE
 CHDIR "%ProjectDir%\"
 
+call tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALConfetti\_source\ALConfettiDemo.dproj" "false"
+IF ERRORLEVEL 1 goto ERROR
+
+CHDIR "%ProjectDir%\demos\"
+MSBuild ALConfetti\_source\ALConfettiDemo.dproj /p:Config=Release /p:Platform=Android /t:Build
+IF ERRORLEVEL 1 PAUSE
+MSBuild ALConfetti\_source\ALConfettiDemo.dproj /p:Config=Release /p:Platform=Android /t:Deploy
+IF ERRORLEVEL 1 PAUSE
+MSBuild ALConfetti\_source\ALConfettiDemo.dproj /p:Config=Release /p:Platform=Android64 /t:Build
+IF ERRORLEVEL 1 PAUSE
+MSBuild ALConfetti\_source\ALConfettiDemo.dproj /p:Config=Release /p:Platform=Android64 /t:Deploy
+IF ERRORLEVEL 1 PAUSE
+MSBuild ALConfetti\_source\ALConfettiDemo.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
+IF ERRORLEVEL 1 PAUSE
+REM MSBuild ALConfetti\_source\ALConfettiDemo.dproj /p:Config=Release /p:Platform=OSX64 /t:Build
+REM IF ERRORLEVEL 1 PAUSE
+CHDIR "%ProjectDir%\"
+
 call tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALFacebookLogin\_source\ALFacebookLogin.dproj" "false"
 IF ERRORLEVEL 1 goto ERROR
 
@@ -367,6 +385,30 @@ IF ERRORLEVEL 1 goto ERROR
 xcopy "%ProjectDir%\demos\%FileName%\Android64\%FileName%.apk" "%ProjectDir%\demos\%FileName%\Android64\Release\%FileName%\bin"
 IF ERRORLEVEL 1 goto ERROR
 del "%ProjectDir%\demos\%FileName%\Android64\%FileName%.apk"
+if exist "%FileName%" goto ERROR
+
+
+SET FileName=ALConfetti
+xcopy "%ProjectDir%\demos\%FileName%\Android\Release\%FileName%Demo\bin\%FileName%Demo.apk" "%ProjectDir%\demos\%FileName%\Android"
+IF ERRORLEVEL 1 goto ERROR
+IF EXIST "%ProjectDir%\demos\%FileName%\Android\Release" rmdir /s /q "%ProjectDir%\demos\%FileName%\Android\Release"
+IF EXIST "%ProjectDir%\demos\%FileName%\Android\Release" goto ERROR
+mkdir "%ProjectDir%\demos\%FileName%\Android\Release\%FileName%Demo\bin\"
+IF ERRORLEVEL 1 goto ERROR
+xcopy "%ProjectDir%\demos\%FileName%\Android\%FileName%Demo.apk" "%ProjectDir%\demos\%FileName%\Android\Release\%FileName%Demo\bin"
+IF ERRORLEVEL 1 goto ERROR
+del "%ProjectDir%\demos\%FileName%\Android\%FileName%Demo.apk"
+if exist "%FileName%" goto ERROR
+
+xcopy "%ProjectDir%\demos\%FileName%\Android64\Release\%FileName%Demo\bin\%FileName%Demo.apk" "%ProjectDir%\demos\%FileName%\Android64"
+IF ERRORLEVEL 1 goto ERROR
+IF EXIST "%ProjectDir%\demos\%FileName%\Android64\Release" rmdir /s /q "%ProjectDir%\demos\%FileName%\Android64\Release"
+IF EXIST "%ProjectDir%\demos\%FileName%\Android64\Release" goto ERROR
+mkdir "%ProjectDir%\demos\%FileName%\Android64\Release\%FileName%Demo\bin\"
+IF ERRORLEVEL 1 goto ERROR
+xcopy "%ProjectDir%\demos\%FileName%\Android64\%FileName%Demo.apk" "%ProjectDir%\demos\%FileName%\Android64\Release\%FileName%Demo\bin"
+IF ERRORLEVEL 1 goto ERROR
+del "%ProjectDir%\demos\%FileName%\Android64\%FileName%Demo.apk"
 if exist "%FileName%" goto ERROR
 
 

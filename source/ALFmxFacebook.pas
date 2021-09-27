@@ -3,8 +3,7 @@ This unit was (originaly) inspired by
 https://blog.grijjy.com/2017/01/23/using-facebook-sdk-native-framework-for-ios-and-android-for-social-login-and-more-part-1/
 https://blog.grijjy.com/2017/01/30/embed-facebook-sdk-for-android-in-your-delphi-mobile-app-part-2/
 *******************************************************************************}
-
-unit ALFacebook;
+unit ALFmxFacebook;
 
 interface
 
@@ -155,7 +154,6 @@ uses
   Androidapi.JNI.app,
   Androidapi.JNI.Os,
   Androidapi.JNI.net,
-  FMX.Helpers.Android,
   {$ELSEIF defined(IOS)}
   Macapi.Helpers,
   iOSapi.Helpers,

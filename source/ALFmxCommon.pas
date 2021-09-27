@@ -660,7 +660,7 @@ uses
   ALFmxObjects,
   AlFmxStdCtrls,
   ALStringList,
-  ALGraphics,
+  ALFmxGraphics,
   ALString,
   AlCommon;
 

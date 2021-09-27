@@ -6,11 +6,20 @@ interface
 // https://www.imagemagick.org/script/magick-wand.php
 // https://www.imagemagick.org/MagickWand/
 //
-
+// This wrapper is Build from the 7.1.0-8 version of ImageMagick
+// dll: /lib/dll/imagemagick
+// include: /references/ImageMagick/include/
+//
+// When updating the dll to a new version of imagemagick always
+// compare and update the include located in
+// /references/ImageMagick/include/ with the include provided with
+// the new version of imagemagick
+//
 
 {$MINENUMSIZE 4} // https://stackoverflow.com/questions/48953749/why-this-c-to-pascal-conversion-crash
 
-uses winapi.windows;
+uses
+  winapi.windows;
 
 const
   WandExport = 'CORE_RL_MagickWand_.dll';
@@ -126,6 +135,7 @@ type
     SentinelFilter); // a count of all the filters, not a real filter
 
 type
+  //taken from colorspace.h not from accelerate-kernels-private.h
   ColorspaceType = (
     UndefinedColorspace,
     CMYColorspace,           // negated linear RGB colorspace
@@ -149,7 +159,7 @@ type
     Rec601YCbCrColorspace,
     Rec709YCbCrColorspace,
     RGBColorspace,           // Linear RGB colorspace
-    scRGBColorspace,         // ??? */
+    scRGBColorspace,         // ???
     sRGBColorspace,          // Default: non-linear sRGB colorspace
     TransparentColorspace,
     xyYColorspace,
@@ -160,7 +170,11 @@ type
     YIQColorspace,
     YPbPrColorspace,
     YUVColorspace,
-    LinearGRAYColorspace);     // Single Channel greyscale (linear) image
+    LinearGRAYColorspace,    // Single Channel greyscale (linear) image
+    JzazbzColorspace,
+    DisplayP3Colorspace,
+    Adobe98Colorspace,
+    ProPhotoColorspace);
 
 type
   StorageType = (
@@ -174,7 +188,6 @@ type
     ShortPixel);
 
 type
-  // Verified with imagemagick 7.0.7-18
   CompressionType = (
     UndefinedCompression,
     B44ACompression,
@@ -187,7 +200,7 @@ type
     Group4Compression,
     JBIG1Compression,        // ISO/IEC std 11544 / ITU-T rec T.82
     JBIG2Compression,        // ISO/IEC std 14492 / ITU-T rec T.88
-    JPEG2000Compression,     // ISO/IEC std 15444-1 */
+    JPEG2000Compression,     // ISO/IEC std 15444-1
     JPEGCompression,
     LosslessJPEGCompression,
     LZMACompression,         // Lempel-Ziv-Markov chain algorithm
@@ -197,21 +210,27 @@ type
     Pxr24Compression,
     RLECompression,
     ZipCompression,
-    ZipSCompression
+    ZipSCompression,
+    ZstdCompression,
+    WebPCompression,
+    DWAACompression,
+    DWABCompression,
+    BC7Compression
   );
 
 type
  PaintMethod = (
-  UndefinedMethod,
-  PointMethod,
-  ReplaceMethod,
-  FloodfillMethod,
-  FillToBorderMethod,
-  ResetMethod);
+   UndefinedMethod,
+   PointMethod,
+   ReplaceMethod,
+   FloodfillMethod,
+   FillToBorderMethod,
+   ResetMethod);
 
 type
-  MagickBooleanType = (MagickFalse = 0,
-                       MagickTrue = 1);
+  MagickBooleanType = (
+    MagickFalse = 0,
+    MagickTrue = 1);
 
 type
   PMagickWand = pointer;
@@ -224,7 +243,7 @@ type
     FlibMagickWand: THandle;
   public
 
-    {$REGION 'https://www.imagemagick.org/api/magick-wand.php'}
+    {$REGION 'https://www.imagemagick.org/api/magick-wand.php - MagickWand.h'}
 
     //MagickWandGenesis() initializes the MagickWand environment.
     //The format of the MagickWandGenesis method is:
@@ -283,7 +302,7 @@ type
 
     {$ENDREGION}
 
-    {$REGION 'https://www.imagemagick.org/api/magick-image.php'}
+    {$REGION 'https://www.imagemagick.org/api/magick-image.php - magick-image.h'}
 
     //MagickNextImage() sets the next image in the wand as the current image.
     //It is typically used after MagickResetIterator(), after which its first use will set the first image as the current image (unless the wand is empty).
@@ -483,7 +502,7 @@ type
 
     {$ENDREGION}
 
-    {$REGION 'https://www.imagemagick.org/api/magick-property.php'}
+    {$REGION 'https://www.imagemagick.org/api/magick-property.php - magick-property.h'}
 
     //MagickGetImageProperty() returns a value associated with the specified property. Use MagickRelinquishMemory() to free the value when you are finished with it.
     //The format of the MagickGetImageProperty method is:
@@ -579,7 +598,7 @@ type
 
     {$ENDREGION}
 
-    {$REGION 'https://www.imagemagick.org/api/pixel-wand.php'}
+    {$REGION 'https://www.imagemagick.org/api/pixel-wand.php - pixel-wand.h'}
 
     //NewPixelWand() returns a new pixel wand.
     //The format of the NewPixelWand method is:
@@ -652,7 +671,7 @@ type
 
     {$ENDREGION}
 
-    {$REGION 'https://www.imagemagick.org/api/drawing-wand.php'}
+    {$REGION 'https://www.imagemagick.org/api/drawing-wand.php - drawing-wand.h'}
 
     //NewDrawingWand() returns a drawing wand required for all other methods in the API.
     //The format of the NewDrawingWand method is:
@@ -737,17 +756,15 @@ type
     {$ENDREGION}
 
   public
-    constructor Create(aImageMagickHome: String;
-                       const aThreadLimit: integer = -1); virtual;
+    constructor Create(aImageMagickHome: String; const aThreadLimit: integer = 0); virtual;
     destructor Destroy; override;
   end;
 
 Var
   ALImageMagickLib: TALImageMagickLibrary;
 
-{*******************************************************************}
-procedure alCreateImageMagickLibrary(const aImageMagickHome: String;
-                                     const aThreadLimit: integer = -1);
+{****************************************************************************************************}
+procedure alCreateImageMagickLibrary(const aImageMagickHome: String; const aThreadLimit: integer = 0);
 procedure alFreeImageMagickLibrary;
 procedure RaiseLastMagickWandError(const wand: PMagickWand);
 procedure RaiseLastPixelWandError(const wand: PPixelWand);
@@ -755,31 +772,40 @@ procedure RaiseLastDrawingWandError(const wand: PDrawingWand);
 
 implementation
 
-uses system.sysutils,
-     alCommon;
+uses
+  system.IOUtils,
+  system.sysutils,
+  alCommon;
 
-{****************************************************************}
-constructor TALImageMagickLibrary.Create(aImageMagickHome: String;
-                                         const aThreadLimit: integer = -1);
-Var LPath: String;
+{*************************}
+{$WARN SYMBOL_PLATFORM OFF}
+function _wputenv_s(varname: PChar; value_string: PChar): integer; cdecl; external 'ucrtbase.dll' delayed;
+{$WARN SYMBOL_PLATFORM ON}
+
+{**************************************************************************************************}
+constructor TALImageMagickLibrary.Create(aImageMagickHome: String; const aThreadLimit: integer = 0);
 begin
 
   // http://www.imagemagick.org/script/resources.php
   aImageMagickHome := ExcludeTrailingPathDelimiter(aImageMagickHome);
-  LPath := getEnvironmentVariable('PATH');
+  var LPath := getEnvironmentVariable('PATH');
   if ((pos(aImageMagickHome, LPath) <= 0) and
-      (not setEnvironmentVariable(PChar('PATH'), pChar(LPath + ';' + aImageMagickHome)))) or
-     (not setEnvironmentVariable(PChar('MAGICK_HOME'), pChar(aImageMagickHome))) or
-     (not setEnvironmentVariable(PChar('MAGICK_CONFIGURE_PATH'), pChar(aImageMagickHome))) or
-     (not setEnvironmentVariable(PChar('MAGICK_CODER_FILTER_PATH'), pChar(aImageMagickHome + '\modules\filters'))) or
-     (not setEnvironmentVariable(PChar('MAGICK_CODER_MODULE_PATH'), pChar(aImageMagickHome + '\modules\coders'))) then raiseLastOsError;
+      (not setEnvironmentVariable(PChar('PATH'), pChar(LPath + ';' + aImageMagickHome)))) then raiseLastOsError;
+
+  // http://www.imagemagick.org/script/resources.php
+  // https://stackoverflow.com/questions/69199708/setenvironmentvariable-does-not-seem-to-set-values-that-can-be-retrieved-by-ge
+  // https://stackoverflow.com/questions/69199952/how-to-call-putenv-from-delphi/69200498
+  if (_wputenv_s(PChar('MAGICK_HOME'), pChar(aImageMagickHome)) <> 0) or
+     (_wputenv_s(PChar('MAGICK_CONFIGURE_PATH'), pChar(aImageMagickHome)) <> 0) or
+     (_wputenv_s(PChar('MAGICK_CODER_FILTER_PATH'), pChar(TPath.Combine(aImageMagickHome, 'modules\filters'))) <> 0) or
+     (_wputenv_s(PChar('MAGICK_CODER_MODULE_PATH'), pChar(TPath.Combine(aImageMagickHome, 'modules\coders'))) <> 0) then raiseLastOsError;
 
   //https://www.imagemagick.org/discourse-server/viewtopic.php?f=6&t=33662
   //https://stackoverflow.com/questions/49266246/imagemagick-wand-use-only-one-single-cpu
-  if (aThreadLimit > -1) and
-     (not setEnvironmentVariable(PChar('MAGICK_THREAD_LIMIT'), pChar(Inttostr(aThreadLimit)))) then raiseLastOsError;
+  if (aThreadLimit > 0) and
+     (_wputenv_s(PChar('MAGICK_THREAD_LIMIT'), pChar(Inttostr(aThreadLimit))) <> 0) then raiseLastOsError;
 
-  FlibMagickWand := LoadLibrary(pChar(aImageMagickHome + '\CORE_RL_MagickWand_.dll' ));
+  FlibMagickWand := LoadLibrary(pChar(TPath.Combine(aImageMagickHome, 'CORE_RL_MagickWand_.dll')));
   if FlibMagickWand = 0 then raiseLastOsError;
 
   {$REGION 'https://www.imagemagick.org/api/magick-wand.php'}
@@ -906,9 +932,8 @@ begin
   raise Exception.create(string(LDescription));
 end;
 
-{******************************************************************}
-procedure alCreateImageMagickLibrary(const aImageMagickHome: String;
-                                     const aThreadLimit: integer = -1);
+{****************************************************************************************************}
+procedure alCreateImageMagickLibrary(const aImageMagickHome: String; const aThreadLimit: integer = 0);
 begin
   if assigned(ALImageMagickLib) then exit;
   ALImageMagickLib := TALImageMagickLibrary.Create(aImageMagickHome, aThreadLimit);

@@ -22,7 +22,7 @@ uses
   Androidapi.JNI.JavaTypes,
   ALAndroidFirebaseApi,
   ALAndroidApi,
-  ALGraphics,
+  ALFmxGraphics,
   {$ENDIF}
   {$IF defined(IOS)}
   iOSapi.Foundation,
@@ -36,7 +36,7 @@ uses
   system.Messaging,
   alString,
   alStringList,
-  alFirebase,
+  alFmxFirebase,
   alcommon,
   FMX.Memo.Types,
   ALFmxObjects;

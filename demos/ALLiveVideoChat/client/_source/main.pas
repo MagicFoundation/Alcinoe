@@ -12,9 +12,9 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, ALWebRTC,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, ALFmxWebRTC,
   FMX.Controls.Presentation, FMX.StdCtrls, ALCommon, ALFMXTypes3D, FMX.Objects,
-  FMX.Canvas.GPU, algraphics, FMX.Types3D, FMX.Effects, FMX.Filter.Effects,
+  FMX.Canvas.GPU, ALFmxGraphics, FMX.Types3D, FMX.Effects, FMX.Filter.Effects,
   ALFmxStdCtrls, ALFmxLayouts, FMX.Layouts, system.messaging,
   IdHTTP, ALFmxFilterEffects, FMX.Edit, ALFmxObjects;
 

@@ -8,7 +8,7 @@ uses
   FMX.Controls.Presentation, FMX.Objects, ALFmxObjects, FMX.Layouts,
   ALFmxLayouts, fmx.types3D, ALFmxCommon, System.ImageList,
   FMX.ImgList, ALFmxStdCtrls, ALFmxTabControl,
-  FMX.ScrollBox, FMX.Edit, ALFmxEdit, ALVideoPlayer, ALDatePickerDialog, FMX.Effects,
+  FMX.ScrollBox, FMX.Edit, ALFmxEdit, ALFmxVideoPlayer, ALFmxDatePickerDialog, FMX.Effects,
   {$IF Defined(IOS) or Defined(ANDROID)}
   Grijjy.ErrorReporting,
   {$ENDIF}

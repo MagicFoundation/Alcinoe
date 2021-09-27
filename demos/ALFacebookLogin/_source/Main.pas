@@ -13,8 +13,10 @@ uses
   alString,
   alStringList,
   alfmxCommon,
-  alFaceBook,
-  alcommon, FMX.Memo.Types, ALFmxObjects;
+  alFmxFaceBook,
+  alcommon,
+  FMX.Memo.Types,
+  ALFmxObjects;
 
 type
   TForm1 = class(TForm)

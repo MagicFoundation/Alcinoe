@@ -1,11 +1,11 @@
 /*
-  Copyright 1999-2018 ImageMagick Studio LLC, a non-profit organization
+  Copyright 1999-2021 ImageMagick Studio LLC, a non-profit organization
   dedicated to making software imaging solutions freely available.
   
-  You may not use this file except in compliance with the License.
+  You may not use this file except in compliance with the License.  You may
   obtain a copy of the License at
   
-    https://www.imagemagick.org/script/license.php
+    https://imagemagick.org/script/license.php
   
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -39,7 +39,7 @@ extern MagickPrivate void
 static inline RandomInfo **DestroyRandomInfoThreadSet(
   RandomInfo **random_info)
 {
-  register ssize_t
+  ssize_t
     i;
 
   assert(random_info != (RandomInfo **) NULL);
@@ -51,7 +51,7 @@ static inline RandomInfo **DestroyRandomInfoThreadSet(
 
 static inline RandomInfo **AcquireRandomInfoThreadSet(void)
 {
-  register ssize_t
+  ssize_t
     i;
 
   RandomInfo
@@ -65,7 +65,7 @@ static inline RandomInfo **AcquireRandomInfoThreadSet(void)
     sizeof(*random_info));
   if (random_info == (RandomInfo **) NULL)
     ThrowFatalException(ResourceLimitFatalError,"MemoryAllocationFailed");
-  (void) ResetMagickMemory(random_info,0,number_threads*sizeof(*random_info));
+  (void) memset(random_info,0,number_threads*sizeof(*random_info));
   for (i=0; i < (ssize_t) number_threads; i++)
     random_info[i]=AcquireRandomInfo();
   return(random_info);

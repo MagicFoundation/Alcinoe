@@ -1,11 +1,11 @@
 /*
-  Copyright 1999-2018 ImageMagick Studio LLC, a non-profit organization
+  Copyright 1999-2021 ImageMagick Studio LLC, a non-profit organization
   dedicated to making software imaging solutions freely available.
   
-  You may not use this file except in compliance with the License.
+  You may not use this file except in compliance with the License.  You may
   obtain a copy of the License at
   
-    https://www.imagemagick.org/script/license.php
+    https://imagemagick.org/script/license.php
   
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -47,9 +47,6 @@ extern "C" {
 #  undef inline
 # endif
 #endif
-#if __cplusplus > 199711L
-#define register
-#endif
 
 #define MAGICKCORE_CHECK_VERSION(major,minor,micro) \
   ((MAGICKCORE_MAJOR_VERSION > (major)) || \
@@ -62,6 +59,7 @@ extern "C" {
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <math.h>
 #include <sys/types.h>
 #include <time.h>
@@ -162,6 +160,7 @@ extern "C" {
 #include "MagickCore/utility.h"
 #include "MagickCore/version.h"
 #include "MagickCore/vision.h"
+#include "MagickCore/visual-effects.h"
 #include "MagickCore/xml-tree.h"
 #include "MagickCore/xwindow.h"
 

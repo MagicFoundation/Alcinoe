@@ -1,11 +1,11 @@
 /*
-  Copyright 1999-2018 ImageMagick Studio LLC, a non-profit organization
+  Copyright 1999-2021 ImageMagick Studio LLC, a non-profit organization
   dedicated to making software imaging solutions freely available.
   
-  You may not use this file except in compliance with the License.
+  You may not use this file except in compliance with the License.  You may
   obtain a copy of the License at
   
-    https://www.imagemagick.org/script/license.php
+    https://imagemagick.org/script/license.php
   
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,8 +33,25 @@ typedef enum
   SVGCompliance = 0x0001,
   X11Compliance = 0x0002,
   XPMCompliance = 0x0004,
+  MVGCompliance = 0x0008,
   AllCompliance = 0x7fffffff
 } ComplianceType;
+
+typedef enum
+{
+  UndefinedIlluminant = 5,
+  AIlluminant = 0,
+  BIlluminant = 1,
+  CIlluminant = 2,
+  D50Illuminant = 3,
+  D55Illuminant = 4,
+  D65Illuminant = 5,
+  D75Illuminant = 6,
+  EIlluminant = 7,
+  F2Illuminant = 8,
+  F7Illuminant = 9,
+  F11Illuminant = 10
+} IlluminantType;
 
 typedef struct _ColorInfo
 {

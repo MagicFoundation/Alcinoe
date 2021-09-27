@@ -271,7 +271,7 @@ namespace Magick
     std::string format(void) const;
 
     // Formats the specified expression
-    // More info here: http://www.imagemagick.org/script/escape.php
+    // More info here: https://imagemagick.org/script/escape.php
     std::string formatExpression(const std::string expression);
 
     // Gamma level of the image
@@ -397,6 +397,10 @@ namespace Magick
     // The number of pixel rows in the image
     size_t rows(void) const;
 
+    // Image sampling factor
+    void samplingFactor(const std::string &samplingFactor_);
+    std::string samplingFactor(void) const;
+
     // Image scene number
     void scene(const size_t scene_);
     size_t scene(void) const;
@@ -512,9 +516,11 @@ namespace Magick
 
     // Image representation type (also see type operation)
     //   Available types:
-    //    Bilevel        Grayscale       GrayscaleMatte
-    //    Palette        PaletteMatte    TrueColor
-    //    TrueColorMatte ColorSeparation ColorSeparationMatte
+    //    Bilevel         PaletteBilevelAlpha
+    //    Grayscale       GrayscaleAlpha
+    //    Palette         PaletteAlpha
+    //    TrueColor       TrueColorAlpha
+    //    ColorSeparation ColorSeparationAlpha
     void type(const ImageType type_);
     ImageType type(void) const;
 
@@ -1065,6 +1071,8 @@ namespace Magick
 
     // Local contrast enhancement
     void localContrast(const double radius_,const double strength_);
+    void localContrastChannel(const ChannelType channel_,const double radius_,
+      const double strength_);
 
     // Magnify image by integral size
     void magnify(void);

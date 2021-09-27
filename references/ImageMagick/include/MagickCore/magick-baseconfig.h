@@ -1,3 +1,5 @@
+#ifndef _MAGICKCORE_MAGICK_BASECONFIG_H
+#define _MAGICKCORE_MAGICK_BASECONFIG_H 1
 /*
   ImageMagick build feature configuration.  Please note that
   disabling a feature via this header file may not be sufficient to
@@ -68,8 +70,8 @@
 /*
   Define to enable OpenCL
 */
-#undef MAGICKCORE__OPENCL
-#undef MAGICKCORE_HAVE_CL_CL_H
+#define MAGICKCORE__OPENCL
+#define MAGICKCORE_HAVE_CL_CL_H
 
 /*
   Exclude deprecated methods in MagickCore API
@@ -79,12 +81,17 @@
 /*
   Define to only use the built-in (in-memory) settings.
 */
-//#define MAGICKCORE_ZERO_CONFIGURATION_SUPPORT
+#define MAGICKCORE_ZERO_CONFIGURATION_SUPPORT 0
 
 /*
   Define to use the bzip2 compression library
 */
 #define MAGICKCORE_BZLIB_DELEGATE
+
+/*
+  Define to use the CAIRO library
+*/
+#define MAGICKCORE_CAIRO_DELEGATE
 
 /*
   Define to use the OpenEXR library
@@ -97,6 +104,11 @@
 #define MAGICKCORE_FLIF_DELEGATE
 
 /*
+  Define to use the FreeType (TrueType & Postscript font support) library
+*/
+#define MAGICKCORE_FREETYPE_DELEGATE
+
+/*
   Define to use the Jasper JPEG v2 library
 */
 #define MAGICKCORE_JP2_DELEGATE
@@ -107,15 +119,25 @@
 #define MAGICKCORE_JPEG_DELEGATE
 
 /*
+  Define to use the jpeg-xl library
+*/
+#define MAGICKCORE_JXL_DELEGATE
+
+/*
   Define to use the "little" Color Management System (LCMS) library
 */
 #define MAGICKCORE_LCMS_DELEGATE
 #define MAGICKCORE_HAVE_LCMS2_H
 
 /*
-  Define to use the libde265 library
+  Define to use the libheif library
 */
 #define MAGICKCORE_HEIC_DELEGATE
+
+/*
+  Define to use the lzma compression library
+*/
+#define MAGICKCORE_LZMA_DELEGATE
 
 /*
   Define to use the Raw library
@@ -126,12 +148,16 @@
   Define to use the RSVG library
 */
 #define MAGICKCORE_RSVG_DELEGATE
-#define MAGICKCORE_CAIRO_DELEGATE
 
 /*
   Define to use the GNOME XML library
 */
 #define MAGICKCORE_XML_DELEGATE
+
+/*
+  Define if you have ZIP library
+*/
+#define MAGICKCORE_ZIP_DELEGATE
 
 /*
   Define to use the Liquid Rescale library
@@ -154,19 +180,20 @@
 #define MAGICKCORE_PNG_DELEGATE
 
 /*
+  Define to use the raqm library
+*/
+#define MAGICKCORE_RAQM_DELEGATE
+
+/*
   Define to use the TIFF library
 */
 #define MAGICKCORE_TIFF_DELEGATE
 
 /*
-  Define to use the FreeType (TrueType & Postscript font support) library
-*/
-#define MAGICKCORE_FREETYPE_DELEGATE
-
-/*
   Define to use the WebP library
 */
 #define MAGICKCORE_WEBP_DELEGATE
+#define MAGICKCORE_WEBPMUX_DELEGATE
 
 /*
   Define to use the zlib ZIP compression library
@@ -232,19 +259,8 @@
 #  define _WIN32_WINNT  0x0502
 #endif
 
-/*
-  Use Visual C++ C inline method extension to improve performance
-*/
 #define _magickcore_inline __inline
-
-/*
-  Visual C++ does not define restrict by default.
-*/
-#if (_MSC_VER >= 1400)
-#  define _magickcore_restrict __restrict
-#else
-#  define _magickcore_restrict
-#endif
+#define _magickcore_restrict __restrict
 
 /*
   Visual C++ does not define double_t, float_t, or ssize_t by default.
@@ -274,100 +290,13 @@ typedef long ssize_t;
 #endif
 #define __func__  __FUNCTION__
 
-/*
-  Define to 1 if you have the <ft2build.h> header file.
-*/
-#define MAGICKCORE_HAVE_FT2BUILD_H 1
+#define MAGICKCORE_SIZEOF_VOID_P 8
 
-/*
-  Define to 1 if you have the `ftruncate' function.
-*/
-#define MAGICKCORE_HAVE_FTRUNCATE 1
-
-/*
-  Define to support memory mapping files for improved performance
-*/
-#define MAGICKCORE_HAVE_MMAP 1
-
-/*
-  Define to 1 if you have the `raise' function.
-*/
-#define MAGICKCORE_HAVE_RAISE 1
-
-/*
-  Define to 1 if you have the `memmove' function.
-*/
-#define MAGICKCORE_HAVE_MEMMOVE 1
-
-/*
-  Define to 1 if you have the `strtod_l' function.
-*/
-#if defined(_VISUALC_) && (_MSC_VER >= 1400)
 #define MAGICKCORE_HAVE_STRTOD_L 1
-#endif
-
-/*
-  Define to 1 if you have the `sysconf' function.
-*/
-#define MAGICKCORE_HAVE_SYSCONF 1
-
-/*
-  Define to 1 if you have the `vfprintf_l' function.
-*/
-#if defined(_VISUALC_) && (_MSC_VER >= 1400)
 #define MAGICKCORE_HAVE_VFPRINTF_L 1
-#endif
-
-/*
-  Define to 1 if you have the `vsnprintf' function.
-*/
 #define MAGICKCORE_HAVE_VSNPRINTF 1
-
-/*
-  Define to 1 if you have the `vsnprintf_' function.
-*/
-#if defined(_VISUALC_) && (_MSC_VER >= 1400)
 #define MAGICKCORE_HAVE_VSNPRINTF_L 1
-#endif
-
-/*
-  Define to 1 if you have the `popen' function.
-*/
-#define MAGICKCORE_HAVE_POPEN 1
-
-/*
-  Define to 1 if you have the `strcasecmp' function.
-*/
-#define MAGICKCORE_HAVE_STRCASECMP 1
-
-/*
-  Define to 1 if you have the `strncasecmp' function.
-*/
-#define MAGICKCORE_HAVE_STRNCASECMP 1
-
-/*
-  Define to 1 if you have the `tempnam' function.
-*/
-#define MAGICKCORE_HAVE_TEMPNAM 1
-
-/*
-  Define to include the <sys/types.h> header file
-*/
-#define MAGICKCORE_HAVE_SYS_TYPES_H 1
-
-/*
-  Define to 1 if you have the `_wfopen' function.
-*/
-#define MAGICKCORE_HAVE__WFOPEN 1
-
-/*
-  Define to 1 if you have the `_wstat' function.
-*/
-#define MAGICKCORE_HAVE__WSTAT 1
-
-#if defined(_VISUALC_) && (_MSC_VER >= 1310)
 #define MAGICKCORE_HAVE__ALIGNED_MALLOC 1
-#endif
 #define MAGICKCORE_HAVE_VSNPRINTF 1
 #define MAGICKCORE_HAVE_GETTIMEOFDAY
 #define MAGICKCORE_HAVE_SETVBUF 1
@@ -442,11 +371,15 @@ typedef long ssize_t;
 #endif
 #pragma warning(disable: 4101) /* 'identifier' : unreferenced local variable */
 #pragma warning(disable: 4201) /* nonstandard extension used : nameless struct/union */
+#pragma warning(disable: 4204) /* nonstandard extension used: non-constant aggregate initializer */
 #pragma warning(disable: 4130) /* 'operator' : logical operation on address of string constant */
 #pragma warning(disable: 4459) /* 'identifier' : declaration of 'foo' hides global declaration */
+#pragma warning(disable: 6993) /* Code analysis ignores OpenMP constructs; analyzing single-threaded code */
 #endif
 
 /* only report these warnings once per file */
 #pragma warning(once: 4100) /* 'identifier' : unreferenced formal parameter */
 #pragma warning(once: 4456) /* 'identifier' : declaration of 'foo' hides previous local declaration */
 #pragma warning(once: 4459) /* 'identifier' : declaration of 'foo' hides global declaration */
+
+#endif

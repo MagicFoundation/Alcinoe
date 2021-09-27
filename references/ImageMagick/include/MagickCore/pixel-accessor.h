@@ -1,11 +1,11 @@
 /*
-  Copyright 1999-2018 ImageMagick Studio LLC, a non-profit organization
+  Copyright 1999-2021 ImageMagick Studio LLC, a non-profit organization
   dedicated to making software imaging solutions freely available.
 
-  You may not use this file except in compliance with the License.
+  You may not use this file except in compliance with the License.  You may
   obtain a copy of the License at
 
-    https://www.imagemagick.org/script/license.php
+    https://imagemagick.org/script/license.php
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -139,6 +139,14 @@ static inline size_t GetPixelChannels(const Image *magick_restrict image)
   return(image->number_channels);
 }
 
+static inline Quantum GetPixelCompositeMask(const Image *magick_restrict image,
+  const Quantum *magick_restrict pixel)
+{
+  if (image->channel_map[CompositeMaskPixelChannel].traits == UndefinedPixelTrait)
+    return((Quantum) QuantumRange);
+  return(pixel[image->channel_map[CompositeMaskPixelChannel].offset]);
+}
+
 static inline Quantum GetPixelCr(const Image *magick_restrict image,
   const Quantum *magick_restrict pixel)
 {
@@ -206,8 +214,18 @@ static inline MagickRealType GetPixelInfoChannel(
     case RedPixelChannel: return(pixel_info->red);
     case GreenPixelChannel: return(pixel_info->green);
     case BluePixelChannel: return(pixel_info->blue);
-    case BlackPixelChannel: return(pixel_info->black);
-    case AlphaPixelChannel: return(pixel_info->alpha);
+    case BlackPixelChannel:
+    {
+      if (pixel_info->colorspace != CMYKColorspace)
+        return(0.0);
+      return(pixel_info->black);
+    }
+    case AlphaPixelChannel:
+    {
+      if (pixel_info->alpha_trait == UndefinedPixelTrait)
+        return(OpaqueAlpha);
+      return(pixel_info->alpha);
+    }
     case IndexPixelChannel: return(pixel_info->index);
     default: return((MagickRealType) 0.0);
   }
@@ -391,27 +409,24 @@ static inline void GetPixelInfoPixel(const Image *magick_restrict image,
       pixel_info->fuzz=image->fuzz;
       pixel_info->depth=image->depth;
       pixel_info->alpha_trait=image->alpha_trait;
-    }
-  if (pixel != (Quantum *) NULL)
-    {
-      pixel_info->red=(MagickRealType)
-        pixel[image->channel_map[RedPixelChannel].offset];
-      pixel_info->green=(MagickRealType)
-        pixel[image->channel_map[GreenPixelChannel].offset];
-      pixel_info->blue=(MagickRealType)
-        pixel[image->channel_map[BluePixelChannel].offset];
-      if (image->channel_map[BlackPixelChannel].traits != UndefinedPixelTrait)
-        pixel_info->black=(MagickRealType)
-          pixel[image->channel_map[BlackPixelChannel].offset];
-      if (image->channel_map[AlphaPixelChannel].traits != UndefinedPixelTrait)
+      if (pixel != (Quantum *) NULL)
         {
-          pixel_info->alpha=(MagickRealType)
-            pixel[image->channel_map[AlphaPixelChannel].offset];
-          pixel_info->alpha_trait=BlendPixelTrait;
+          pixel_info->red=(MagickRealType)
+            pixel[image->channel_map[RedPixelChannel].offset];
+          pixel_info->green=(MagickRealType)
+            pixel[image->channel_map[GreenPixelChannel].offset];
+          pixel_info->blue=(MagickRealType)
+            pixel[image->channel_map[BluePixelChannel].offset];
+          if (image->channel_map[BlackPixelChannel].traits != UndefinedPixelTrait)
+            pixel_info->black=(MagickRealType)
+              pixel[image->channel_map[BlackPixelChannel].offset];
+          if (image->channel_map[AlphaPixelChannel].traits != UndefinedPixelTrait)
+            pixel_info->alpha=(MagickRealType)
+              pixel[image->channel_map[AlphaPixelChannel].offset];
+          if (image->channel_map[IndexPixelChannel].traits != UndefinedPixelTrait)
+            pixel_info->index=(MagickRealType)
+              pixel[image->channel_map[IndexPixelChannel].offset];
         }
-      if (image->channel_map[IndexPixelChannel].traits != UndefinedPixelTrait)
-        pixel_info->index=(MagickRealType)
-      pixel[image->channel_map[IndexPixelChannel].offset];
     }
 }
 
@@ -455,6 +470,8 @@ static inline MagickBooleanType IsPixelAtDepth(const Quantum pixel,
   Quantum
     quantum;
 
+  if (range == 0)
+    return(MagickTrue);
 #if !defined(MAGICKCORE_HDRI_SUPPORT)
   quantum=(Quantum) (((MagickRealType) QuantumRange*((QuantumAny)
     (((MagickRealType) range*pixel)/QuantumRange+0.5)))/range+0.5);
@@ -629,7 +646,7 @@ static inline void SetPixelb(const Image *magick_restrict image,
 static inline void SetPixelBackgoundColor(const Image *magick_restrict image,
   Quantum *magick_restrict pixel)
 {
-  register ssize_t
+  ssize_t
     i;
 
   for (i=0; i < (ssize_t) GetPixelChannels(image); i++)
@@ -718,6 +735,13 @@ static inline void SetPixelChannelTraits(Image *image,
   const PixelChannel channel,const PixelTrait traits)
 {
   image->channel_map[channel].traits=traits;
+}
+
+static inline void SetPixelCompositeMask(const Image *magick_restrict image,
+  const Quantum mask,Quantum *magick_restrict pixel)
+{
+  if (image->channel_map[CompositeMaskPixelChannel].traits != UndefinedPixelTrait)
+    pixel[image->channel_map[CompositeMaskPixelChannel].offset]=mask;
 }
 
 static inline void SetPixelCr(const Image *magick_restrict image,

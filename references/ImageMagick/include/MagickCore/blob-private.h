@@ -1,11 +1,11 @@
 /*
-  Copyright 1999-2018 ImageMagick Studio LLC, a non-profit organization
+  Copyright 1999-2021 ImageMagick Studio LLC, a non-profit organization
   dedicated to making software imaging solutions freely available.
   
-  You may not use this file except in compliance with the License.
+  You may not use this file except in compliance with the License.  You may
   obtain a copy of the License at
   
-    https://www.imagemagick.org/script/license.php
+    https://imagemagick.org/script/license.php
   
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -67,7 +67,8 @@ extern MagickExport const struct stat
   *GetBlobProperties(const Image *);
 
 extern MagickExport const void
-  *ReadBlobStream(Image *,const size_t,void *,ssize_t *);
+  *ReadBlobStream(Image *,const size_t,void *magick_restrict ,ssize_t *)
+    magick_hot_spot;
 
 extern MagickExport double
   ReadBlobDouble(Image *);
@@ -77,6 +78,7 @@ extern MagickExport float
 
 extern MagickExport int
   EOFBlob(const Image *),
+  ErrorBlob(const Image *),
   ReadBlobByte(Image *);
 
 extern MagickExport MagickBooleanType

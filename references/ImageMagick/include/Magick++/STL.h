@@ -873,6 +873,10 @@ namespace Magick
     void depth(size_t depth_);
     size_t depth(void) const;
 
+    // Ping the image instead of reading it
+    void ping(const bool flag_);
+    bool ping(void) const;
+
     // Suppress all warning messages. Error messages are still reported.
     void quiet(const bool quiet_);
     bool quiet(void) const;
@@ -2118,6 +2122,9 @@ namespace Magick
       {
         const MagickCore::MagickInfo *magick_info =
           MagickCore::GetMagickInfo( coder_list[i], exceptionInfo );
+        if (!magick_info)
+          continue;
+
         coder_list[i]=(char *)
           MagickCore::RelinquishMagickMemory( coder_list[i] );
 
@@ -2150,10 +2157,10 @@ namespace Magick
           container_->push_back( coderInfo );
         }
         // Intentionally ignore missing module errors
-        catch ( Magick::ErrorModule )
-          {
-            continue;
-          }
+        catch (Magick::ErrorModule&)
+        {
+          continue;
+        }
       }
     coder_list=(char **) MagickCore::RelinquishMagickMemory( coder_list );
     ThrowPPException(false);
@@ -2232,7 +2239,7 @@ namespace Magick
   template<class InputIterator >
   void combineImages(Image *combinedImage_,InputIterator first_,
     InputIterator last_,const ChannelType channel_,
-    const ColorspaceType colorspace_)
+    const ColorspaceType colorspace_ = MagickCore::sRGBColorspace)
   {
     MagickCore::Image
       *image;
@@ -2642,6 +2649,36 @@ namespace Magick
     unlinkImages(first_,last_ );
 
     ThrowPPException(first_->quiet());
+  }
+
+  // Ping images into existing container (appending to container)
+  template<class Container>
+  void pingImages(Container *sequence_,const std::string &imageSpec_,
+    ReadOptions &options)
+  {
+    options.ping(true);
+    readImages(sequence_,imageSpec_,options);
+  }
+
+  template<class Container>
+  void pingImages(Container *sequence_,const std::string &imageSpec_)
+  {
+    ReadOptions options;
+    pingImages(sequence_,imageSpec_,options);
+  }
+
+  template<class Container>
+  void pingImages(Container *sequence_,const Blob &blob_,ReadOptions &options)
+  {
+    options.ping(true);
+    readImages(sequence_,blob_,options);
+  }
+
+  template<class Container>
+  void pingImages(Container *sequence_,const Blob &blob_)
+  {
+    ReadOptions options;
+    pingImages(sequence_,blob_,options);
   }
 
   // Adds the names of the profiles of the image to the container.

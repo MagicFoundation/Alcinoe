@@ -1,11 +1,11 @@
 /*
-  Copyright 1999-2018 ImageMagick Studio LLC, a non-profit organization
+  Copyright 1999-2021 ImageMagick Studio LLC, a non-profit organization
   dedicated to making software imaging solutions freely available.
 
-  You may not use this file except in compliance with the License.
+  You may not use this file except in compliance with the License.  You may
   obtain a copy of the License at
 
-    https://www.imagemagick.org/script/license.php
+    https://imagemagick.org/script/license.php
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,7 +29,7 @@ extern "C" {
 #define MaxMultibyteCodes  6
 
 extern MagickPrivate MagickBooleanType
-  IsGlob(const char *);
+  IsGlob(const char *) magick_attribute((__pure__));
 
 typedef struct
 {
@@ -51,16 +51,17 @@ static UTFInfo
     { 0xFE, 0xFC, 0x7ffffff, 0x4000000 },  /* 6 byte sequence */
   };
 
-static inline unsigned char *ConvertLatin1ToUTF8(const unsigned char *content)
+static inline unsigned char *ConvertLatin1ToUTF8(
+  const unsigned char *magick_restrict content)
 {
   int
     c;
 
-  register const unsigned char
-    *p;
+  const unsigned char
+    *magick_restrict p;
 
-  register unsigned char
-    *q;
+  unsigned char
+    *magick_restrict q;
 
   size_t
     length;
@@ -92,15 +93,16 @@ static inline unsigned char *ConvertLatin1ToUTF8(const unsigned char *content)
   return(utf8);
 }
 
-static inline int GetNextUTFCode(const char *text,unsigned int *octets)
+static inline int GetNextUTFCode(const char *magick_restrict text,
+  unsigned int *magick_restrict octets)
 {
   int
     code;
 
-  register ssize_t
+  ssize_t
     i;
 
-  register int
+  int
     c,
     unicode;
 
@@ -133,7 +135,7 @@ static inline int GetNextUTFCode(const char *text,unsigned int *octets)
   return(-1);
 }
 
-static inline int GetUTFCode(const char *text)
+static inline int GetUTFCode(const char *magick_restrict text)
 {
   unsigned int
     octets;
@@ -141,7 +143,7 @@ static inline int GetUTFCode(const char *text)
   return(GetNextUTFCode(text,&octets));
 }
 
-static inline unsigned int GetUTFOctets(const char *text)
+static inline unsigned int GetUTFOctets(const char *magick_restrict text)
 {
   unsigned int
     octets;

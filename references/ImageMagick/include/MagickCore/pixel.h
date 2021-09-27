@@ -1,11 +1,11 @@
 /*
-  Copyright 1999-2018 ImageMagick Studio LLC, a non-profit organization
+  Copyright 1999-2021 ImageMagick Studio LLC, a non-profit organization
   dedicated to making software imaging solutions freely available.
 
-  You may not use this file except in compliance with the License.
+  You may not use this file except in compliance with the License.  You may
   obtain a copy of the License at
 
-    https://www.imagemagick.org/script/license.php
+    https://imagemagick.org/script/license.php
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-#define MaxPixelChannels  32
+#define MaxPixelChannels  64
 #undef index
 
 /*
@@ -36,9 +36,12 @@ typedef enum
   RedChannel = 0x0001,
   GrayChannel = 0x0001,
   CyanChannel = 0x0001,
+  LChannel = 0x0001,
   GreenChannel = 0x0002,
   MagentaChannel = 0x0002,
+  aChannel = 0x0002,
   BlueChannel = 0x0004,
+  bChannel = 0x0002,
   YellowChannel = 0x0004,
   BlackChannel = 0x0008,
   AlphaChannel = 0x0010,
@@ -46,7 +49,8 @@ typedef enum
   IndexChannel = 0x0020,             /* Color Index Table? */
   ReadMaskChannel = 0x0040,          /* Pixel is Not Readable? */
   WriteMaskChannel = 0x0080,         /* Pixel is Write Protected? */
-  MetaChannel = 0x0100,              /* ???? */
+  MetaChannel = 0x0100,              /* not used */
+  CompositeMaskChannel = 0x0200,     /* SVG mask */
   CompositeChannels = 0x001F,
   AllChannels = 0x7ffffff,
   /*
@@ -86,6 +90,7 @@ typedef enum
   ReadMaskPixelChannel = 6,
   WriteMaskPixelChannel = 7,
   MetaPixelChannel = 8,
+  CompositeMaskPixelChannel = 9,
   IntensityPixelChannel = MaxPixelChannels,  /* ???? */
   CompositePixelChannel = MaxPixelChannels,  /* ???? */
   SyncPixelChannel = MaxPixelChannels+1      /* not a real channel */
@@ -119,14 +124,14 @@ typedef enum
   MeshInterpolatePixel,       /* Triangular Mesh interpolation */
   NearestInterpolatePixel,    /* Nearest Neighbour Only */
   SplineInterpolatePixel      /* Cubic Spline (blurred) interpolation */
-  /* FilterInterpolatePixel,  ** Use resize filter - (very slow) */
 } PixelInterpolateMethod;
 
 typedef enum
 {
   UndefinedPixelMask = 0x000000,
   ReadPixelMask = 0x000001,
-  WritePixelMask = 0x000002
+  WritePixelMask = 0x000002,
+  CompositePixelMask = 0x000004
 } PixelMask;
 
 typedef enum
@@ -217,19 +222,21 @@ extern MagickExport MagickBooleanType
     const size_t,const char *,const StorageType,void *,ExceptionInfo *),
   ImportImagePixels(Image *,const ssize_t,const ssize_t,const size_t,
     const size_t,const char *,const StorageType,const void *,ExceptionInfo *),
-  InterpolatePixelChannel(const Image *,const CacheView_ *,
+  InterpolatePixelChannel(const Image *magick_restrict,const CacheView_ *,
     const PixelChannel,const PixelInterpolateMethod,const double,const double,
     double *,ExceptionInfo *),
-  InterpolatePixelChannels(const Image *,const CacheView_ *,const Image *,
-    const PixelInterpolateMethod,const double,const double,Quantum *,
-    ExceptionInfo *),
+  InterpolatePixelChannels(const Image *magick_restrict,const CacheView_ *,
+    const Image * magick_restrict,const PixelInterpolateMethod,const double,
+    const double,Quantum *,ExceptionInfo *),
   InterpolatePixelInfo(const Image *,const CacheView_ *,
     const PixelInterpolateMethod,const double,const double,PixelInfo *,
     ExceptionInfo *),
   IsFuzzyEquivalencePixel(const Image *,const Quantum *,const Image *,
-    const Quantum *),
-  IsFuzzyEquivalencePixelInfo(const PixelInfo *,const PixelInfo *),
-  SetPixelMetaChannels(Image *,const size_t,ExceptionInfo *);
+    const Quantum *) magick_attribute((__pure__)),
+  IsFuzzyEquivalencePixelInfo(const PixelInfo *,const PixelInfo *)
+    magick_attribute((__pure__)),
+  SetPixelMetaChannels(Image *,const size_t,ExceptionInfo *),
+  SortImagePixels(Image *,ExceptionInfo *);
 
 extern MagickExport MagickRealType
   GetPixelInfoIntensity(const Image *magick_restrict,

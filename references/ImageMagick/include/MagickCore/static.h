@@ -1,12 +1,12 @@
 /*
-  Copyright 1999-2018 ImageMagick Studio LLC, a non-profit organization
+  Copyright 1999-2021 ImageMagick Studio LLC, a non-profit organization
   dedicated to making software imaging solutions freely available.
-  
-  You may not use this file except in compliance with the License.
+
+  You may not use this file except in compliance with the License.  You may
   obtain a copy of the License at
-  
-    https://www.imagemagick.org/script/license.php
-  
+
+    https://imagemagick.org/script/license.php
+
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,9 +28,14 @@ extern MagickExport MagickBooleanType
   RegisterStaticModule(const char *,ExceptionInfo *exception),
   UnregisterStaticModule(const char *);
 
+extern MagickExport void
+  RegisterStaticModules(void),
+  UnregisterStaticModules(void);
+
 extern ModuleExport size_t
   RegisterAAIImage(void),
   RegisterARTImage(void),
+  RegisterASHLARImage(void),
   RegisterAVIImage(void),
   RegisterAVSImage(void),
   RegisterBIEImage(void),
@@ -44,6 +49,7 @@ extern ModuleExport size_t
   RegisterCLIPImage(void),
   RegisterCLIPBOARDImage(void),
   RegisterCMYKImage(void),
+  RegisterCUBEImage(void),
   RegisterCUTImage(void),
   RegisterDCMImage(void),
   RegisterDCXImage(void),
@@ -63,9 +69,10 @@ extern ModuleExport size_t
   RegisterEPSIImage(void),
   RegisterEPTImage(void),
   RegisterEXRImage(void),
+  RegisterFARBFELDImage(void),
   RegisterFAXImage(void),
-  RegisterFDImage(void),
   RegisterFITSImage(void),
+  RegisterFL32Image(void),
   RegisterFLIFImage(void),
   RegisterFPXImage(void),
   RegisterG3Image(void),
@@ -92,6 +99,7 @@ extern ModuleExport size_t
   RegisterJPEGImage(void),
   RegisterJSONImage(void),
   RegisterJP2Image(void),
+  RegisterJXLImage(void),
   RegisterLABELImage(void),
   RegisterMACImage(void),
   RegisterMAGICKImage(void),
@@ -113,6 +121,7 @@ extern ModuleExport size_t
   RegisterNULLImage(void),
   RegisterP7Image(void),
   RegisterPBMImage(void),
+  RegisterORAImage(void),
   RegisterOTBImage(void),
   RegisterPALMImage(void),
   RegisterPANGOImage(void),
@@ -165,6 +174,7 @@ extern ModuleExport size_t
   RegisterTIFFImage(void),
   RegisterTILEImage(void),
   RegisterTIMImage(void),
+  RegisterTIM2Image(void),
   RegisterTTFImage(void),
   RegisterTXTImage(void),
   RegisterUILImage(void),
@@ -173,6 +183,7 @@ extern ModuleExport size_t
   RegisterVDAImage(void),
   RegisterVICARImage(void),
   RegisterVIDImage(void),
+  RegisterVIDEOImage(void),
   RegisterVIFFImage(void),
   RegisterVIPSImage(void),
   RegisterVSTImage(void),
@@ -189,12 +200,14 @@ extern ModuleExport size_t
   RegisterXTRNImage(void),
   RegisterXVImage(void),
   RegisterXWDImage(void),
+  RegisterYAMLImage(void),
   RegisterYCBCRImage(void),
   RegisterYUVImage(void);
 
 extern ModuleExport void
   UnregisterAAIImage(void),
   UnregisterARTImage(void),
+  UnregisterASHLARImage(void),
   UnregisterAVIImage(void),
   UnregisterAVSImage(void),
   UnregisterBIEImage(void),
@@ -208,6 +221,7 @@ extern ModuleExport void
   UnregisterCLIPImage(void),
   UnregisterCLIPBOARDImage(void),
   UnregisterCMYKImage(void),
+  UnregisterCUBEImage(void),
   UnregisterCUTImage(void),
   UnregisterDCMImage(void),
   UnregisterDCXImage(void),
@@ -227,9 +241,10 @@ extern ModuleExport void
   UnregisterEPSIImage(void),
   UnregisterEPTImage(void),
   UnregisterEXRImage(void),
+  UnregisterFARBFELDImage(void),
   UnregisterFAXImage(void),
-  UnregisterFDImage(void),
   UnregisterFITSImage(void),
+  UnregisterFL32Image(void),
   UnregisterFLIFImage(void),
   UnregisterFPXImage(void),
   UnregisterG3Image(void),
@@ -256,6 +271,7 @@ extern ModuleExport void
   UnregisterJPEGImage(void),
   UnregisterJP2Image(void),
   UnregisterJSONImage(void),
+  UnregisterJXLImage(void),
   UnregisterLABELImage(void),
   UnregisterLOCALEImage(void),
   UnregisterMACImage(void),
@@ -278,6 +294,7 @@ extern ModuleExport void
   UnregisterNULLImage(void),
   UnregisterP7Image(void),
   UnregisterPBMImage(void),
+  UnregisterORAImage(void),
   UnregisterOTBImage(void),
   UnregisterPALMImage(void),
   UnregisterPANGOImage(void),
@@ -330,6 +347,7 @@ extern ModuleExport void
   UnregisterTIFFImage(void),
   UnregisterTILEImage(void),
   UnregisterTIMImage(void),
+  UnregisterTIM2Image(void),
   UnregisterTTFImage(void),
   UnregisterTXTImage(void),
   UnregisterUILImage(void),
@@ -338,6 +356,7 @@ extern ModuleExport void
   UnregisterVDAImage(void),
   UnregisterVICARImage(void),
   UnregisterVIDImage(void),
+  UnregisterVIDEOImage(void),
   UnregisterVIFFImage(void),
   UnregisterVIPSImage(void),
   UnregisterVSTImage(void),
@@ -354,12 +373,9 @@ extern ModuleExport void
   UnregisterXTRNImage(void),
   UnregisterXVImage(void),
   UnregisterXWDImage(void),
+  UnregisterYAMLImage(void),
   UnregisterYCBCRImage(void),
   UnregisterYUVImage(void);
-
-extern MagickExport void
-  RegisterStaticModules(void),
-  UnregisterStaticModules(void);
 
 #if defined(__cplusplus) || defined(c_plusplus)
 }

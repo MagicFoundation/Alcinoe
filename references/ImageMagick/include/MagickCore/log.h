@@ -1,11 +1,11 @@
 /*
-  Copyright 1999-2018 ImageMagick Studio LLC, a non-profit organization
+  Copyright 1999-2021 ImageMagick Studio LLC, a non-profit organization
   dedicated to making software imaging solutions freely available.
   
-  You may not use this file except in compliance with the License.
+  You may not use this file except in compliance with the License.  You may
   obtain a copy of the License at
   
-    https://www.imagemagick.org/script/license.php
+    https://imagemagick.org/script/license.php
   
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,7 +45,7 @@ typedef enum
   ExceptionEvent = 0x00100,   /* Log Errors and Warnings immediately */
   ImageEvent = 0x00200,
   LocaleEvent = 0x00400,
-  ModuleEvent = 0x00800,      /* Loding of coder and filter modules */
+  ModuleEvent = 0x00800,      /* Log coder and filter modules */
   PixelEvent = 0x01000,
   PolicyEvent = 0x02000,
   ResourceEvent = 0x04000,
@@ -78,7 +78,7 @@ extern MagickExport LogEventType
   SetLogEventMask(const char *);
 
 extern MagickExport MagickBooleanType
-  IsEventLogging(void),
+  IsEventLogging(void) magick_attribute((__pure__)),
   ListLogInfo(FILE *,ExceptionInfo *),
   LogMagickEvent(const LogEventType,const char *,const char *,const size_t,
     const char *,...) magick_attribute((__format__ (__printf__,5,6))),

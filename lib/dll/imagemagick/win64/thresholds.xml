@@ -91,7 +91,7 @@
   <threshold map="o4x4" alias="4x4">
     <!--
        From "Dithering Algorithms"
-       http://www.efg2.com/Lab/Library/ImageProcessing/DHALF.TXT
+       https://efg2.com/Lab/Library/ImageProcessing/DHALF.TXT
      -->
     <description>Ordered 4x4 (dispersed)</description>
     <levels width="4" height="4" divisor="17">
@@ -168,7 +168,7 @@
 
   Initially added by Anthony Thyssen, IM v6.2.9-5 using techniques from
   "Dithering & Halftoning" by Gernot Haffmann
-  http://www.fho-emden.de/~hoffmann/hilb010101.pdf
+  https://fho-emden.de/~hoffmann/hilb010101.pdf
 
   These patterns initially start as circles, but then form square
   pattern at the 50% threshold level, before forming negated circles,

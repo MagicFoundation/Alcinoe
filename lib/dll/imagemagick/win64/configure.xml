@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE configuremap [
-<!ELEMENT configuremap (configure)+>
-<!ELEMENT configure (#PCDATA)>
-<!ATTLIST configure name CDATA #REQUIRED>
-<!ATTLIST configure value CDATA #REQUIRED>
+  <!ELEMENT configuremap (configure)+>
+  <!ATTLIST configuremap xmlns CDATA #FIXED ''>
+  <!ELEMENT configure EMPTY>
+  <!ATTLIST configure xmlns CDATA #FIXED '' name NMTOKEN #REQUIRED
+    value CDATA #REQUIRED>
 ]>
+<!--
+  ImageMagick build configuration.
+-->
 <configuremap>
+  <configure name="CC" value="VS2019"/>
+  <configure name="COPYRIGHT" value="Copyright (C) 1999-2021 ImageMagick Studio LLC"/>
+  <configure name="CXX" value="VS2019"/>
+  <configure name="DOCUMENTATION_PATH" value="unavailable"/>
+  <configure name="LIB_VERSION_NUMBER" value="7,1,0,8"/>
+  <configure name="LIB_VERSION" value="0x710"/>
   <configure name="NAME" value="ImageMagick"/>
-  <configure name="LIB_VERSION" value="0x707"/>
-  <configure name="LIB_VERSION_NUMBER" value="7,0,7,23"/>
-  <configure name="RELEASE_DATE" value="2018-02-01"/>
-  <configure name="VERSION" value="7.0.7"/>
-  <configure name="CC" value="vs10"/>
-  <configure name="HOST" value="Windows"/>
-  <configure name="DELEGATES" value="bzlib freetype jpeg jp2 lcms png raw tiff x11 xml wmf zlib"/>
-  <configure name="FEATURES" value="OpenMP"/>
-  <configure name="COPYRIGHT" value="Copyright (C) 1999-2018 ImageMagick Studio LLC"/>
-  <configure name="WEBSITE" value="http://www.imagemagick.org"/>
+  <configure name="QuantumDepth" value="1"/>
+  <configure name="RELEASE_DATE" value="2021-09-18"/>
+  <configure name="TARGET_CPU" value="x64"/>
+  <configure name="TARGET_OS" value="Windows"/>
+  <configure name="VERSION" value="7.1.0"/>
+  <configure name="WEBSITE" value="https://imagemagick.org"/>
 </configuremap>

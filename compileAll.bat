@@ -83,10 +83,6 @@ SET FileName=%ProjectDir%\*.rsm
 del "%FileName%" /s
 if exist "%FileName%" goto ERROR
 
-SET FileName=%ProjectDir%\*.stat
-del "%FileName%" /s
-if exist "%FileName%" goto ERROR
-
 SET FileName=%ProjectDir%\*.identcache
 del "%FileName%" /s
 if exist "%FileName%" goto ERROR

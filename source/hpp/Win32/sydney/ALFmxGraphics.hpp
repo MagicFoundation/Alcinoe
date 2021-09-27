@@ -2,10 +2,10 @@
 // Copyright (c) 1995, 2021 by Embarcadero Technologies, Inc.
 // All rights reserved
 
-// (DO NOT EDIT: machine generated header) 'ALGraphics.pas' rev: 34.00 (Windows)
+// (DO NOT EDIT: machine generated header) 'ALFmxGraphics.pas' rev: 34.00 (Windows)
 
-#ifndef AlgraphicsHPP
-#define AlgraphicsHPP
+#ifndef AlfmxgraphicsHPP
+#define AlfmxgraphicsHPP
 
 #pragma delphiheader begin
 #pragma option push
@@ -22,7 +22,7 @@
 
 //-- user supplied -----------------------------------------------------------
 
-namespace Algraphics
+namespace Alfmxgraphics
 {
 //-- forward type declarations -----------------------------------------------
 __interface DELPHIINTERFACE TALResizeImageGetDestSizeFunct;
@@ -175,13 +175,13 @@ extern DELPHI_PACKAGE System::UnicodeString __fastcall AlDetectImageExtensionU(S
 extern DELPHI_PACKAGE System::UnicodeString __fastcall AlDetectImageExtensionU(const System::UnicodeString aFileName)/* overload */;
 extern DELPHI_PACKAGE System::Uitypes::TAlphaColor __fastcall ALPrepareColor(const System::Uitypes::TAlphaColor SrcColor, const float Opacity);
 extern DELPHI_PACKAGE System::Uitypes::TAlphaColor __fastcall ALAlphaBlendColors(const System::Uitypes::TAlphaColor *aBackToFrontColors, const int aBackToFrontColors_High);
-}	/* namespace Algraphics */
-#if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALGRAPHICS)
-using namespace Algraphics;
+}	/* namespace Alfmxgraphics */
+#if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALFMXGRAPHICS)
+using namespace Alfmxgraphics;
 #endif
 #pragma pack(pop)
 #pragma option pop
 
 #pragma delphiheader end.
 //-- end unit ----------------------------------------------------------------
-#endif	// AlgraphicsHPP
+#endif	// AlfmxgraphicsHPP

@@ -1134,6 +1134,9 @@ begin
   {$ENDIF}
 end;
 
+initialization
+  RegisterFmxClasses([TALLayout, TALScrollBox, TALVertScrollBox, TALHorzScrollBox]);
+
 end.
 
 

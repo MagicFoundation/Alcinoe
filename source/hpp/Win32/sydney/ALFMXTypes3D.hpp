@@ -2,7 +2,7 @@
 // Copyright (c) 1995, 2021 by Embarcadero Technologies, Inc.
 // All rights reserved
 
-// (DO NOT EDIT: machine generated header) 'ALFMXTypes3D.pas' rev: 34.00 (Windows)
+// (DO NOT EDIT: machine generated header) 'ALFmxTypes3D.pas' rev: 34.00 (Windows)
 
 #ifndef Alfmxtypes3dHPP
 #define Alfmxtypes3dHPP

@@ -1,4 +1,4 @@
-unit ALVKontakte;
+unit ALFmxVKontakte;
 
 interface
 
@@ -135,8 +135,8 @@ uses
   FMX.Platform,
   FMX.Helpers.iOS,
   FMX.Platform.iOS,
-  {$ENDIF}
   ALFmxCommon,
+  {$ENDIF}
   AlString,
   alcommon;
 

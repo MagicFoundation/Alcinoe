@@ -1,4 +1,4 @@
-unit ALGraphics;
+unit ALFmxGraphics;
 
 interface
 

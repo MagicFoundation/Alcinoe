@@ -105,7 +105,7 @@
 // ANDROID: data & custom notification message  + app BACKGROUND / NO RUNNING    : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message
 *******************************************************************************)
 
-unit ALFirebase;
+unit ALFmxFirebase;
 
 interface
 

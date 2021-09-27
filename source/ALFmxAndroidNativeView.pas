@@ -1,4 +1,4 @@
-unit ALAndroidNativeView;
+unit ALFmxAndroidNativeView;
 
 {$IF CompilerVersion > 34} // sydney
   {$MESSAGE WARN 'Check if FMX.Presentation.Android.pas was not updated and adjust the IFDEF'}

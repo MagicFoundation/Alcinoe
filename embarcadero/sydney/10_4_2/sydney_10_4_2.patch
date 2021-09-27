@@ -14,7 +14,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.Helpers.pas b/embarcad
 -  System.Types, System.UITypes, FMX.Types, FMX.Types3D, FMX.Materials.Canvas, FMX.Graphics, 
 -  System.Math.Vectors;
 +  System.Types, System.UITypes, FMX.Types, FMX.Types3D, FMX.Materials.Canvas, FMX.Graphics,
-+  System.Math.Vectors, ALFMXTypes3D;
++  System.Math.Vectors, ALFmxTypes3D;
  
  type
    TDrawingMode = (Normal, WriteStencilInvert, ReadStencil, ClearStencil);

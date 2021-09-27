@@ -2,10 +2,10 @@
 // Copyright (c) 1995, 2021 by Embarcadero Technologies, Inc.
 // All rights reserved
 
-// (DO NOT EDIT: machine generated header) 'ALVideoPlayer.pas' rev: 34.00 (Windows)
+// (DO NOT EDIT: machine generated header) 'ALFmxVideoPlayer.pas' rev: 34.00 (Windows)
 
-#ifndef AlvideoplayerHPP
-#define AlvideoplayerHPP
+#ifndef AlfmxvideoplayerHPP
+#define AlfmxvideoplayerHPP
 
 #pragma delphiheader begin
 #pragma option push
@@ -16,16 +16,16 @@
 #include <SysInit.hpp>
 #include <System.Classes.hpp>
 #include <System.SyncObjs.hpp>
+#include <FMX.Types.hpp>
 #include <FMX.Graphics.hpp>
 #include <ALFmxCommon.hpp>
 #include <ALFmxObjects.hpp>
 #include <FMX.Objects.hpp>
 #include <FMX.Controls.hpp>
-#include <FMX.Types.hpp>
 
 //-- user supplied -----------------------------------------------------------
 
-namespace Alvideoplayer
+namespace Alfmxvideoplayer
 {
 //-- forward type declarations -----------------------------------------------
 class DELPHICLASS TALWinVideoPlayer;
@@ -163,13 +163,13 @@ static const System::Int8 vpsStopped = System::Int8(0x5);
 static const System::Int8 vpsPlaybackCompleted = System::Int8(0x6);
 static const System::Int8 vpsError = System::Int8(0x7);
 extern DELPHI_PACKAGE void __fastcall Register(void);
-}	/* namespace Alvideoplayer */
-#if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALVIDEOPLAYER)
-using namespace Alvideoplayer;
+}	/* namespace Alfmxvideoplayer */
+#if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALFMXVIDEOPLAYER)
+using namespace Alfmxvideoplayer;
 #endif
 #pragma pack(pop)
 #pragma option pop
 
 #pragma delphiheader end.
 //-- end unit ----------------------------------------------------------------
-#endif	// AlvideoplayerHPP
+#endif	// AlfmxvideoplayerHPP

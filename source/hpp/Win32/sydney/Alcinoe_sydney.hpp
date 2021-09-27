@@ -23,18 +23,19 @@
 #include <ALFmxInertialMovement.hpp>
 #include <ALFmxEdit.hpp>
 #include <ALCommon.hpp>
-#include <ALFMXTypes3D.hpp>
+#include <ALFmxTypes3D.hpp>
 #include <ALStringList.hpp>
 #include <ALString.hpp>
 #include <ALQuickSortList.hpp>
 #include <ALMime.hpp>
 #include <ALCipher.hpp>
 #include <ALAVLBinaryTree.hpp>
-#include <ALVideoPlayer.hpp>
+#include <ALFmxVideoPlayer.hpp>
 #include <ALFmxMemo.hpp>
-#include <ALGraphics.hpp>
+#include <ALFmxGraphics.hpp>
 #include <ALFmxFilterEffects.hpp>
 #include <ALFmxAni.hpp>
+#include <ALFmxConfetti.hpp>
 #include <ALFiles.hpp>
 #include <System.UITypes.hpp>	// (rtl)
 #include <Winapi.Windows.hpp>	// (rtl)

@@ -34,7 +34,7 @@ uses
   FMX.textlayout,
   FMX.graphics,
   FMX.objects,
-  alGraphics,
+  ALFmxGraphics,
   ALFmxCommon;
 
 type

@@ -822,8 +822,8 @@ uses
   FMX.Platform,
   fmx.consts,
   fmx.utils,
-  alGraphics,
-  AlCommon,
+  ALCommon,
+  ALFmxGraphics,
   ALFmxCommon;
 
 {*****************************************************}
@@ -2734,7 +2734,7 @@ begin
 end;
 
 initialization
-  RegisterFmxClasses([TALAniIndicator, TALCheckBox, TALRadioButton, TALScrollBar, TALTrackBar, TALRangeTrackBar, TALSwitch]);
+  RegisterFmxClasses([TALAniIndicator, TALScrollBar, TALTrackBar, TALRangeTrackBar, TALCheckBox, TALRadioButton, TALSwitch]);
   {$IFDEF debug}
   AlDebugAniIndicatorMakeBufBitmapStopWatch := TstopWatch.Create;
   AlDebugCheckBoxMakeBufBitmapStopWatch := TstopWatch.Create;

@@ -32,7 +32,7 @@ INSTALLATION
 3) after it's must be quite easy, just read the source code or look the sample
    located at demos\alfmxcontrols
 *******************************************************************************)
-unit ALVideoPlayer;
+unit ALFmxVideoPlayer;
 
 interface
 
@@ -57,9 +57,9 @@ uses
   iOSapi.Foundation,
   iOSapi.AVFoundation,
   iOSapi.CoreVideo,
-  Fmx.types,
   AlFmxTypes3D,
   {$endIF}
+  Fmx.types,
   Fmx.graphics,
   ALFmxCommon,
   AlFmxObjects;
@@ -477,7 +477,7 @@ uses
   androidapi.jni.net,
   FMX.Canvas.GPU,
   AlString,
-  ALGraphics,
+  ALFmxGraphics,
   {$ENDIF}
   {$IF defined(IOS)}
   System.RTLConsts,
@@ -490,7 +490,7 @@ uses
   FMX.Context.GLES.iOS,
   FMX.Types3D,
   AlString,
-  ALGraphics,
+  ALFmxGraphics,
   {$ENDIF}
   fmx.controls,
   AlCommon;
@@ -2356,6 +2356,8 @@ begin
 end;
 
 initialization
+
+  RegisterFmxClasses([TALVideoPlayerSurface]);
 
   {$REGION 'ANDROID'}
   {$IF defined(ANDROID)}

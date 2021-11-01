@@ -237,6 +237,7 @@ protected:
 	virtual void __fastcall InsertItem(int Index, const System::AnsiString S, System::TObject* AObject);
 	virtual void __fastcall AssignTo(System::Classes::TPersistent* Dest);
 	virtual void __fastcall init(bool OwnsObjects);
+	virtual bool __fastcall Find(const System::AnsiString S, int &Index);
 	
 public:
 	__fastcall virtual TALStringList()/* overload */;
@@ -249,7 +250,6 @@ public:
 	virtual void __fastcall Delete(int Index);
 	virtual System::TObject* __fastcall ExtractObject(int Index)/* overload */;
 	virtual void __fastcall Exchange(int Index1, int Index2);
-	virtual bool __fastcall Find(const System::AnsiString S, int &Index);
 	bool __fastcall FindName(const System::AnsiString S, int &Index);
 	virtual int __fastcall IndexOf(const System::AnsiString S);
 	virtual int __fastcall IndexOfName(const System::AnsiString Name);
@@ -334,6 +334,7 @@ protected:
 	virtual void __fastcall InsertItem(int Index, const System::AnsiString Name, const System::AnsiString Value, System::TObject* AObject)/* overload */;
 	virtual void __fastcall AssignTo(System::Classes::TPersistent* Dest);
 	virtual void __fastcall init(bool OwnsObjects);
+	virtual bool __fastcall Find(const System::AnsiString S, int &Index);
 	
 public:
 	__fastcall virtual TALNVStringList()/* overload */;
@@ -348,7 +349,6 @@ public:
 	virtual void __fastcall Delete(int Index);
 	virtual System::TObject* __fastcall ExtractObject(int Index)/* overload */;
 	virtual void __fastcall Exchange(int Index1, int Index2);
-	virtual bool __fastcall Find(const System::AnsiString S, int &Index);
 	bool __fastcall FindName(const System::AnsiString Name, int &Index)/* overload */;
 	bool __fastcall FindName(const System::AnsiString Name, bool WithNvS, int &Index)/* overload */;
 	bool __fastcall FindNameValue(const System::AnsiString Name, const System::AnsiString Value, int &Index);
@@ -749,6 +749,7 @@ protected:
 	virtual void __fastcall InsertItem(int Index, const System::UnicodeString S, System::TObject* AObject);
 	virtual void __fastcall AssignTo(System::Classes::TPersistent* Dest);
 	virtual void __fastcall init(bool OwnsObjects);
+	virtual bool __fastcall Find(const System::UnicodeString S, int &Index);
 	
 public:
 	__fastcall virtual TALStringListU()/* overload */;
@@ -761,7 +762,6 @@ public:
 	virtual void __fastcall Delete(int Index);
 	virtual System::TObject* __fastcall ExtractObject(int Index)/* overload */;
 	virtual void __fastcall Exchange(int Index1, int Index2);
-	virtual bool __fastcall Find(const System::UnicodeString S, int &Index);
 	bool __fastcall FindName(const System::UnicodeString S, int &Index);
 	virtual int __fastcall IndexOf(const System::UnicodeString S);
 	virtual int __fastcall IndexOfName(const System::UnicodeString Name);
@@ -846,6 +846,7 @@ protected:
 	virtual void __fastcall InsertItem(int Index, const System::UnicodeString Name, const System::UnicodeString Value, System::TObject* AObject)/* overload */;
 	virtual void __fastcall AssignTo(System::Classes::TPersistent* Dest);
 	virtual void __fastcall init(bool OwnsObjects);
+	virtual bool __fastcall Find(const System::UnicodeString S, int &Index);
 	
 public:
 	__fastcall virtual TALNVStringListU()/* overload */;
@@ -860,7 +861,6 @@ public:
 	virtual void __fastcall Delete(int Index);
 	virtual System::TObject* __fastcall ExtractObject(int Index)/* overload */;
 	virtual void __fastcall Exchange(int Index1, int Index2);
-	virtual bool __fastcall Find(const System::UnicodeString S, int &Index);
 	bool __fastcall FindName(const System::UnicodeString Name, int &Index)/* overload */;
 	bool __fastcall FindName(const System::UnicodeString Name, bool WithNvS, int &Index)/* overload */;
 	bool __fastcall FindNameValue(const System::UnicodeString Name, const System::UnicodeString Value, int &Index);

@@ -157,7 +157,8 @@ const
   cALJSONOperationError         = 'This operation can not be performed with a node of type %s';
   cALJSONParseError             = 'JSON Parse error';
   cALBSONParseError             = 'BSON Parse error';
-  cALJSONImmutable              = 'The document is immutable';
+  CALJSONSortedListError        = 'Operation not allowed on sorted node list';
+  cALJSONDuplicateNodeName      = 'Node list does not allow duplicates';
 
 type
 
@@ -195,10 +196,10 @@ type
           W2:  LongWord);
   end;
 
-  TALJSONDocOption = (doNodeAutoCreate, // create only ntText Node !
+  TALJSONDocOption = (doNodeAutoCreate, // create only ntText Node!
                       doNodeAutoIndent, // affect only the SaveToStream
-                      doProtectedSave,     // save first to a tmp file and then later rename the tmp file to the desired filename
-                      doImmutable); // the doc is immutable and can not be updated (usefull when sharing a document across multiple threads)
+                      doProtectedSave, // save first to a tmp file and then later rename the tmp file to the desired filename
+                      doSorted); // Node lists of object nodes are sorted by node names
   TALJSONDocOptions = set of TALJSONDocOption;
 
   TALJSONParseOption = (poIgnoreControlCharacters, // don't decode escaped characters (like \") and not encode them also (when save / load)
@@ -253,6 +254,8 @@ type
   TALJSONNodeList = class(Tobject)
   Private
     FCapacity: Integer;
+    FSorted: Boolean;
+    FDuplicates: TDuplicates;
     FCount: integer;
     FList: TALJSONPointerList;
     [weak] FOwner: TALJSONNode;
@@ -265,10 +268,18 @@ type
     function Get(Index: Integer): TALJSONNode;
     function GetNodeByIndex(Const Index: Integer): TALJSONNode;
     function GetNodeByName(Const Name: AnsiString): TALJSONNode;
+    function CompareNodeNames(const S1, S2: AnsiString): Integer;
+    function Find(const NodeName: AnsiString; var Index: Integer): Boolean;
+    procedure InternalInsert(Index: Integer; const Node: TALJSONNode);
   public
     constructor Create(Owner: TALJSONNode);
     destructor Destroy; override;
+    procedure Sort;
     procedure CustomSort(Compare: TALJSONNodeListSortCompare);
+    property Duplicates: TDuplicates read FDuplicates write FDuplicates;
+    procedure SetSorted(Value: Boolean; Recurse: Boolean); overload;
+    procedure SetSorted(Value: Boolean); overload;
+    property Sorted: Boolean read FSorted write SetSorted;
     function Add(const Node: TALJSONNode): Integer;
     function Delete(const Index: Integer): Integer; overload;
     function Delete(const Name: AnsiString): Integer; overload;
@@ -316,6 +327,7 @@ type
     procedure SetNodeValue(const Value: AnsiString; const NodeSubType: TALJSONNodeSubType); overload; virtual;
     procedure SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType); overload; virtual;
     procedure SetNodeValue(const StrValue: AnsiString; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType); overload; virtual;
+    procedure SetNodeName(const NodeName: AnsiString);
     function GetOwnerDocument: TALJSONDocument;
     procedure SetOwnerDocument(const Value: TALJSONDocument);
     function GetParentNode: TALJSONNode;
@@ -331,7 +343,7 @@ type
                          Var buffer: ansiString);
   public
     constructor Create(const NodeName: AnsiString); virtual;
-    procedure MultiThreadPrepare;
+    procedure MultiThreadPrepare(const aOnlyChildNodes: Boolean = False);
     function GetText(const default: AnsiString): AnsiString; overload;
     function GetText: AnsiString; overload;
     procedure SetText(const Value: AnsiString);
@@ -452,7 +464,7 @@ type
     procedure SetChildNodeValueBinarySubType(const path: array of ansiString; const value: byte); overload;
     procedure SetChildNodeValueNull(const path: array of ansiString); overload;
     property HasChildNodes: Boolean read GetHasChildNodes;
-    property NodeName: AnsiString read fNodeName write fNodeName;
+    property NodeName: AnsiString read fNodeName write SetNodeName;
     property NodeType: TALJSONNodeType read GetNodeType;
     property NodeValue: AnsiString read GetNodeValueStr; // same as text property but without formating
     property NodeSubType: TALJSONNodeSubType read GetNodeSubType;
@@ -540,7 +552,8 @@ type
     FNodeIndentStr: AnsiString;
     FOptions: TALJSONDocOptions;
     FParseOptions: TALJSONParseOptions;
-    fPathSeparator: AnsiChar;
+    FDuplicates: TDuplicates;
+    FPathSeparator: AnsiChar;
     FOnParseStartDocument: TAlJSONParseDocument;
     FOnParseEndDocument: TAlJSONParseDocument;
     FonParseText: TAlJSONParseTextEvent;
@@ -585,7 +598,7 @@ type
     constructor Create(const aActive: Boolean = True); overload; virtual;
     constructor Create(const aFormatSettings: TALformatSettings; const aActive: Boolean = True); overload; virtual;
     destructor Destroy; override;
-    procedure MultiThreadPrepare;
+    procedure MultiThreadPrepare(const aOnlyChildNodes: Boolean = False);
     procedure Clear;
     function AddChild(const NodeName: AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode; overload;
     function AddChild(const Path: array of AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode; overload;
@@ -665,6 +678,7 @@ type
     property NodeIndentStr: AnsiString read GetNodeIndentStr write SetNodeIndentStr;
     property Options: TALJSONDocOptions read GetOptions write SetOptions;
     property ParseOptions: TALJSONParseOptions read GetParseOptions write SetParseOptions;
+    property Duplicates: TDuplicates read FDuplicates write FDuplicates; // In pair with doSorted in options
     property PathSeparator: ansiChar read GetPathSeparator write SetPathSeparator;
     property JSON: AnsiString read GetJSON write SetJSON;
     property BSON: AnsiString read GetBSON write SetBSON;
@@ -780,6 +794,8 @@ type
   TALJSONNodeListU = class(Tobject)
   Private
     FCapacity: Integer;
+    FSorted: Boolean;
+    FDuplicates: TDuplicates;
     FCount: integer;
     FList: TALJSONPointerListU;
     [weak] FOwner: TALJSONNodeU;
@@ -792,10 +808,18 @@ type
     function Get(Index: Integer): TALJSONNodeU;
     function GetNodeByIndex(Const Index: Integer): TALJSONNodeU;
     function GetNodeByName(Const Name: String): TALJSONNodeU;
+    function CompareNodeNames(const S1, S2: String): Integer;
+    function Find(const NodeName: String; var Index: Integer): Boolean;
+    procedure InternalInsert(Index: Integer; const Node: TALJSONNodeU);
   public
     constructor Create(Owner: TALJSONNodeU);
     destructor Destroy; override;
+    procedure Sort;
     procedure CustomSort(Compare: TALJSONNodeListSortCompareU);
+    property Duplicates: TDuplicates read FDuplicates write FDuplicates;
+    procedure SetSorted(Value: Boolean; Recurse: Boolean); overload;
+    procedure SetSorted(Value: Boolean); overload;
+    property Sorted: Boolean read FSorted write SetSorted;
     function Add(const Node: TALJSONNodeU): Integer;
     function Delete(const Index: Integer): Integer; overload;
     function Delete(const Name: String): Integer; overload;
@@ -843,6 +867,7 @@ type
     procedure SetNodeValue(const Value: String; const NodeSubType: TALJSONNodeSubType); overload; virtual;
     procedure SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType); overload; virtual;
     procedure SetNodeValue(const StrValue: String; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType); overload; virtual;
+    procedure SetNodeName(const NodeName: String);
     function GetOwnerDocument: TALJSONDocumentU;
     procedure SetOwnerDocument(const Value: TALJSONDocumentU);
     function GetParentNode: TALJSONNodeU;
@@ -859,7 +884,7 @@ type
                          Var buffer: String);
   public
     constructor Create(const NodeName: String); virtual;
-    procedure MultiThreadPrepare;
+    procedure MultiThreadPrepare(const aOnlyChildNodes: Boolean = False);
     function GetText(const default: String): String; overload;
     function GetText: String; overload;
     procedure SetText(const Value: String);
@@ -982,7 +1007,7 @@ type
     procedure SetChildNodeValueBinarySubType(const path: array of String; const value: byte); overload;
     procedure SetChildNodeValueNull(const path: array of String); overload;
     property HasChildNodes: Boolean read GetHasChildNodes;
-    property NodeName: String read fNodeName write fNodeName;
+    property NodeName: String read fNodeName write SetNodeName;
     property NodeType: TALJSONNodeType read GetNodeType;
     property NodeValue: String read GetNodeValueStr; // same as text property but without formating
     property NodeSubType: TALJSONNodeSubType read GetNodeSubType;
@@ -1070,7 +1095,8 @@ type
     FNodeIndentStr: String;
     FOptions: TALJSONDocOptions;
     FParseOptions: TALJSONParseOptions;
-    fPathSeparator: Char;
+    FDuplicates: TDuplicates;
+    FPathSeparator: Char;
     FOnParseStartDocument: TAlJSONParseDocumentU;
     FOnParseEndDocument: TAlJSONParseDocumentU;
     FonParseText: TAlJSONParseTextEventU;
@@ -1113,7 +1139,7 @@ type
     constructor Create(const aActive: Boolean = True); overload; virtual;
     constructor Create(const aFormatSettings: TALformatSettingsU; const aActive: Boolean = True); overload; virtual;
     destructor Destroy; override;
-    procedure MultiThreadPrepare;
+    procedure MultiThreadPrepare(const aOnlyChildNodes: Boolean = False);
     procedure Clear;
     function AddChild(const NodeName: String; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU; overload;
     function AddChild(const Path: array of String; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU; overload;
@@ -1195,6 +1221,7 @@ type
     property NodeIndentStr: String read GetNodeIndentStr write SetNodeIndentStr;
     property Options: TALJSONDocOptions read GetOptions write SetOptions;
     property ParseOptions: TALJSONParseOptions read GetParseOptions write SetParseOptions;
+    property Duplicates: TDuplicates read FDuplicates write FDuplicates; // In pair with doSorted in options
     property PathSeparator: Char read GetPathSeparator write SetPathSeparator;
     property JSON: String read GetJSON write SetJSON;
     property BSON: Tbytes read GetBSON write SetBSON;
@@ -1786,12 +1813,6 @@ begin
   end;
 end;
 
-{***********************************************************************************}
-function ALNodeMatches(const Node: TALJSONNode; const NodeName: AnsiString): Boolean;
-begin
-  Result := (Node.NodeName = NodeName);
-end;
-
 {********************************************************************************************}
 {Call CreateNode to create a new generic JSON node. The resulting node does not have a parent,
  but can be added to the ChildNodes list of any node in the document.}
@@ -1814,7 +1835,8 @@ begin
   inherited create;
   FDocumentNode:= nil;
   FParseOptions:= [];
-  fPathSeparator := '.';
+  FDuplicates := dupAccept;
+  FPathSeparator := '.';
   FOnParseStartDocument := nil;
   FOnParseEndDocument := nil;
   FonParseText := nil;
@@ -1843,15 +1865,14 @@ end;
 destructor TALJSONDocument.Destroy;
 begin
   if fFormatSettings <> @ALDefaultFormatSettings then dispose(fFormatSettings);
-  Options := Options - [doImmutable];
   ReleaseDoc;
   inherited;
 end;
 
-{*******************************************}
-procedure TALJSONDocument.MultiThreadPrepare;
+{***********************************************************************************}
+procedure TALJSONDocument.MultiThreadPrepare(const aOnlyChildNodes: Boolean = False);
 begin
-  node.MultiThreadPrepare;
+  node.MultiThreadPrepare(aOnlyChildNodes);
 end;
 
 {******************************}
@@ -1877,7 +1898,6 @@ procedure TALJSONDocument.SetActive(const Value: Boolean);
 begin
   if Value <> GetActive then begin
     if Value then begin
-      if (doImmutable in Options) then ALJSONDocError(cALJSONImmutable);
       FDocumentNode := TALJSONObjectNode.Create;
       FDocumentNode.SetOwnerDocument(Self);
     end
@@ -3024,9 +3044,6 @@ Begin
   // NOTE: ContainerNode must be ntobject or nil (sax mode)
   //
 
-  //error if Immutable
-  if (doImmutable in Options) then ALJSONDocError(cALJSONImmutable);
-
   //event fonParseStartDocument
   DoParseStartDocument;
 
@@ -4002,9 +4019,6 @@ Begin
   // NOTE: ContainerNode must be ntobject or nil (sax mode)
   //
 
-  //error if Immutable
-  if (doImmutable in Options) then ALJSONDocError(cALJSONImmutable);
-
   //event fonParseStartDocument
   DoParseStartDocument;
 
@@ -4079,7 +4093,6 @@ end;
 {***********************************}
 procedure TALJSONDocument.ReleaseDoc;
 begin
-  if (doImmutable in Options) then ALJSONDocError(cALJSONImmutable);
   if assigned(FDocumentNode) then FreeAndNil(FDocumentNode);
 end;
 
@@ -4669,7 +4682,12 @@ end;
  *Value is the set of options to assign.}
 procedure TALJSONDocument.SetOptions(const Value: TALJSONDocOptions);
 begin
+  var LSortedChanged := (doSorted in FOptions) <> (doSorted in Value);
   FOptions := Value;
+  if LSortedChanged and assigned(FDocumentNode) then begin
+    Var LNodeList := FDocumentNode.InternalGetChildNodes;
+    if LNodeList <> nil then LNodeList.SetSorted(doSorted in FOptions, True{Recurse})
+  end;
 end;
 
 {**********************************************}
@@ -4747,7 +4765,6 @@ end;
 {Creates the object that implements the ChildNodes property}
 function TALJSONNode.CreateChildList: TALJSONNodeList;
 begin
-  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
   result := TALJSONNodeList.Create(Self);
 end;
 
@@ -5544,6 +5561,24 @@ begin
   ALJsonDocError(CALJsonOperationError,GetNodeType);
 end;
 
+{************************************************************}
+procedure TALJSONNode.SetNodeName(const NodeName: AnsiString);
+begin
+  if fNodeName <> NodeName then begin
+    fNodeName := NodeName;
+    Var LParentNode := FParentNode;
+    if (LParentNode <> nil) and (LParentNode.ChildNodes.Sorted) then begin
+      var LNode := LParentNode.ChildNodes.Extract(self);
+      Try
+        LParentNode.ChildNodes.Add(LNode);
+      except
+        ALFreeAndNil(LNode);
+        raise;
+      End;
+    end;
+  end;
+end;
+
 {***********************************}
 {Returns the text value of the node.}
 function TALJSONNode.GetText: AnsiString;
@@ -6029,12 +6064,16 @@ var I: Integer;
     LNodeList: TALJSONNodeList;
 begin
   if FDocument <> Value then begin
-    if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
     FDocument := Value;
     LNodeList := InternalGetChildNodes;
-    if Assigned(LNodeList) then
+    if Assigned(LNodeList) then begin
+      if Assigned(FDocument) then begin
+        LNodeList.Duplicates := FDocument.Duplicates;
+        LNodeList.SetSorted(doSorted in FDocument.Options);
+      end;
       for I := 0 to LNodeList.Count - 1 do
         LNodeList[I].SetOwnerDocument(Value);
+    end;
   end;
 end;
 
@@ -6050,7 +6089,6 @@ end;
 procedure TALJSONNode.SetParentNode(const Value: TALJSONNode);
 begin
   if FParentNode <> Value then begin
-    if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
     If assigned(Value) then SetOwnerDocument(Value.OwnerDocument)
     else SetOwnerDocument(nil);
     FParentNode := Value;
@@ -6112,10 +6150,10 @@ end;
 {***************************************************************}
 //will create all the nodevalue and childnodelist to be sure that
 //multiple thread can safely read at the same time the node
-procedure TALJSONNode.MultiThreadPrepare;
+procedure TALJSONNode.MultiThreadPrepare(const aOnlyChildNodes: Boolean = False);
 var I: integer;
 begin
-  if NodeType = ntText then begin
+  if (not aOnlyChildNodes) and (NodeType = ntText) then begin
 
     case NodeSubType of
       nstFloat,
@@ -6155,14 +6193,13 @@ begin
 
   else begin
     For I := 0 to ChildNodes.Count - 1 do
-      ChildNodes[I].MultiThreadPrepare;
+      ChildNodes[I].MultiThreadPrepare(aOnlyChildNodes);
   end;
 end;
 
 {******************************************************************************************************************************************}
 function TALJSONNode.AddChild(const NodeName: AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode;
 begin
-  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
   Result := ALCreateJSONNode(NodeName,NodeType);
   Try
     ChildNodes.Insert(Index, Result);
@@ -6197,7 +6234,6 @@ end;
 function TALJSONNode.DeleteChild(const NodeName: AnsiString): boolean;
 var I: integer;
 begin
-  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
   I := ChildNodes.IndexOf(NodeName);
   if I >= 0 then begin
     ChildNodes.Delete(I);
@@ -6212,7 +6248,6 @@ var LNode: TALJSONNode;
     LTmpNode: TALJSONNode;
     I: integer;
 begin
-  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
   LNode := Self;
   for I := low(path) to high(path) - 1 do begin
     LTmpNode := LNode.ChildNodes.findNode(path[I]);
@@ -7112,7 +7147,6 @@ end;
 {*********************************************************************}
 procedure TALJSONObjectNode.SetChildNodes(const Value: TALJSONNodeList);
 begin
-  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
   If Assigned(FChildNodes) then FreeAndNil(FchildNodes);
   FChildNodes := Value;
 end;
@@ -7160,7 +7194,6 @@ end;
 {*********************************************************************}
 procedure TALJSONArrayNode.SetChildNodes(const Value: TALJSONNodeList);
 begin
-  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
   If Assigned(FChildNodes) then FreeAndNil(FchildNodes);
   FChildNodes := Value;
 end;
@@ -7213,7 +7246,6 @@ begin
   else begin
 
     if not (nvInt64 in fRawNodeValueDefined) then ALJsonDocError(CALJsonOperationError,GetNodeType);
-    if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
 
     case fNodeSubType of
       nstFloat: ALFloatToStr(GetFloat, fRawNodeValueStr, ALDefaultFormatSettings);
@@ -7251,7 +7283,6 @@ begin
   else begin
 
     if not (nvStr in fRawNodeValueDefined) then ALJsonDocError(CALJsonOperationError,GetNodeType);
-    if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
 
     case fNodeSubType of
       nstFloat: begin
@@ -7299,7 +7330,6 @@ end;
 {*****************************************************************************************************}
 procedure TALJSONTextNode.SetNodeValue(const Value: AnsiString; const NodeSubType: TALJSONNodeSubType);
 begin
-  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
   fNodeSubType := NodeSubType;
   fRawNodeValueStr := Value;
   fRawNodeValueDefined := [nvStr];
@@ -7308,7 +7338,6 @@ end;
 {************************************************************************************************}
 procedure TALJSONTextNode.SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType);
 begin
-  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
   fNodeSubType := NodeSubType;
   fRawNodeValueInt64 := Value;
   if (NodeSubType in [nstBinary, nstRegEx]) then fRawNodeValueDefined := fRawNodeValueDefined + [nvInt64] // keep the fNodeValueStr
@@ -7318,7 +7347,6 @@ end;
 {*********************************************************************************************************************************}
 procedure TALJSONTextNode.SetNodeValue(const StrValue: AnsiString; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType);
 begin
-  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocError(cALJSONImmutable);
   fNodeSubType := NodeSubType;
   fRawNodeValueStr := StrValue;
   fRawNodeValueInt64 := Int64Value;
@@ -7332,6 +7360,15 @@ begin
   FCount:= 0;
   FCapacity := 0;
   FOwner := Owner;
+  FSorted := False;
+  if assigned(FOwner.OwnerDocument) then begin
+    FDuplicates := FOwner.OwnerDocument.Duplicates;
+    SetSorted(doSorted in FOwner.OwnerDocument.Options);
+  end
+  else begin
+    FDuplicates := dupAccept;
+    SetSorted(False);
+  end;
 end;
 
 {*********************************}
@@ -7339,6 +7376,43 @@ destructor TALJSONNodeList.Destroy;
 begin
   Clear;
   inherited;
+end;
+
+{***********************************************************************************}
+{Locates the index for a node name in a sorted list and indicates whether a node name
+ with that value already exists in the list. Use Find to obtain the index in a
+ sorted list where the node name S should be added. If the node name S, or a node
+ name that differs from S only in case, already exists in the list, Find returns true.
+ If the list does not contain a node name that matches S, Find returns false.
+ The index where S should go is returned in the Index parameter.
+ The value of Index is zero-based, where the first node name has the index 0, the
+ second node name has the index 1, and so on.
+ Note: Only use Find with sorted lists. For unsorted lists, use the IndexOf method instead.
+ Tip: If the node name string is not found (thus return value of Find is False) then Index
+      is set to the index of the first node name in the list that sorts immediately before
+      or after S.}
+function TALJSONNodeList.Find(const NodeName: AnsiString; var Index: Integer): Boolean;
+var
+  L, H, I, C: Integer;
+begin
+  Result := False;
+  L := 0;
+  H := FCount - 1;
+  while L <= H do
+  begin
+    I := (L + H) shr 1;
+    C := CompareNodeNames(FList[I].NodeName, NodeName);
+    if C < 0 then L := I + 1 else
+    begin
+      H := I - 1;
+      if C = 0 then
+      begin
+        Result := True;
+        if Duplicates <> dupAccept then L := I;
+      end;
+    end;
+  end;
+  Index := L;
 end;
 
 {*************************************}
@@ -7368,15 +7442,18 @@ end;
  index of the second node, and so on. If the specified node is not in the list, IndexOf returns -1.}
 function TALJSONNodeList.IndexOf(const Name: AnsiString; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
-  if Direction = TDirection.FromBeginning then begin
-    for Result := 0 to Count - 1 do
-      if ALNodeMatches(Get(Result), Name) then Exit;
+  if not Sorted then begin
+    if Direction = TDirection.FromBeginning then begin
+      for Result := 0 to Count - 1 do
+        if CompareNodeNames(Get(Result).NodeName, Name) = 0 then Exit;
+    end
+    else begin
+      for Result := Count - 1 downto 0 do
+        if CompareNodeNames(Get(Result).NodeName, Name) = 0 then Exit;
+    end;
+    Result := -1;
   end
-  else begin
-    for Result := Count - 1 downto 0 do
-      if ALNodeMatches(Get(Result), Name) then Exit;
-  end;
-  Result := -1;
+  else if not Find(Name, Result) then Result := -1;
 end;
 
 {******************************************************************************************************************************}
@@ -7533,6 +7610,12 @@ begin
   if not Assigned(Result) then ALJSONDocError(CALJSONNodeNotFound, [Name]);
 end;
 
+{***************************************************************************}
+function TALJSONNodeList.CompareNodeNames(const S1, S2: AnsiString): Integer;
+begin
+  Result := AlCompareStr(S1, S2)
+end;
+
 {***************************************************************************************}
 procedure TALJSONNodeList.QuickSort(L, R: Integer; ACompare: TALJSONNodeListSortCompare);
 var
@@ -7579,10 +7662,24 @@ begin
   end;
 end;
 
+{**********************************************************************************************}
+function ALJSONNodeListCompareNodeName(List: TALJSONNodeList; Index1, Index2: Integer): Integer;
+begin
+  Result := List.CompareNodeNames(
+              List[Index1].NodeName,
+              List[Index2].NodeName);
+end;
+
+{*****************************}
+procedure TALJSONNodeList.Sort;
+begin
+  CustomSort(ALJSONNodeListCompareNodeName);
+end;
+
 {************************************************************************}
 procedure TALJSONNodeList.CustomSort(Compare: TALJSONNodeListSortCompare);
 begin
-  if (FList <> nil) and (Count > 1) then
+  if (not Sorted) and (FList <> nil) and (Count > 1) then
     QuickSort(0, Count - 1, Compare);
 end;
 
@@ -7593,8 +7690,33 @@ end;
  *Node is the node to add to the list.}
 function TALJSONNodeList.Add(const Node: TALJSONNode): Integer;
 begin
-  Insert(-1, Node);
-  Result := FCount - 1;
+  if not Sorted then
+    Result := FCount
+  else
+    if Find(Node.NodeName, Result) then
+      case Duplicates of
+        dupIgnore: begin
+                     ALFreeAndNil(Node);
+                     Exit;
+                   end;
+        dupError: ALJSONDocError(cALJSONDuplicateNodeName);
+      end;
+  InternalInsert(Result, Node);
+end;
+
+{********************************************************************************}
+procedure TALJSONNodeList.InternalInsert(Index: Integer; const Node: TALJSONNode);
+begin
+  if FCount = FCapacity then Grow;
+  if Index < FCount then
+    ALMove(
+      FList[Index],
+      FList[Index + 1],
+      (FCount - Index) * SizeOf(Pointer));
+  Pointer(FList[index]) := nil;
+  FList[index] := Node;
+  Inc(FCount);
+  Node.SetParentNode(Fowner);
 end;
 
 {********************************************************}
@@ -7605,21 +7727,12 @@ end;
  *Node is the node to add to the list.}
 procedure TALJSONNodeList.Insert(Index: Integer; const Node: TALJSONNode);
 begin
-  if Index = -1 then begin
-    index := FCount;
-    if index = FCapacity then Grow;
-  end
+  if Index = -1 then Add(Node)
   else begin
+    if Sorted then ALJSONDocError(CALJSONSortedListError);
     if (Index < 0) or (Index > FCount) then ALJSONDocError(CALJSONListIndexError, [Index]);
-    if FCount = FCapacity then Grow;
-    if Index < FCount then ALMove(FList[Index],
-                                  FList[Index + 1],
-                                  (FCount - Index) * SizeOf(Pointer));
+    InternalInsert(Index, Node);
   end;
-  Pointer(FList[index]) := nil;
-  FList[index] := Node;
-  Inc(FCount);
-  Node.SetParentNode(Fowner);
 end;
 
 {**************************************}
@@ -7711,7 +7824,8 @@ var Index: Integer;
 begin
   Index := indexOf(OldNode);
   Result := Extract(Index);
-  Insert(Index, NewNode);
+  if not sorted then Insert(Index, NewNode)
+  else Add(NewNode);
 end;
 
 {*******************************}
@@ -7727,12 +7841,18 @@ end;
 
 {*****************************}
 procedure TALJSONNodeList.Grow;
+{$IF CompilerVersion <= 32}{tokyo}
 var Delta: Integer;
+{$endif}
 begin
+  {$IF CompilerVersion <= 32}{tokyo}
   if FCapacity > 64 then Delta := FCapacity div 4
   else if FCapacity > 8 then Delta := 16
   else Delta := 4;
   SetCapacity(FCapacity + Delta);
+  {$else}
+  SetCapacity(GrowCollection(FCapacity, FCount + 1));
+  {$endif}
 end;
 
 {**********************************************************}
@@ -7743,6 +7863,31 @@ begin
     SetLength(FList, NewCapacity);
     FCapacity := NewCapacity;
   end;
+end;
+
+{********************************************************************}
+procedure TALJSONNodeList.SetSorted(Value: Boolean; Recurse: Boolean);
+begin
+  if FSorted <> Value then
+  begin
+    if owner is TALJSONObjectNode then begin
+      if Value then Sort;
+      FSorted := Value;
+    end
+    else FSorted := False;
+  end;
+  if Recurse then begin
+    for Var I := 0 to count-1 do begin
+      Var LNodeList := Get(i).InternalGetChildNodes;
+      if LNodeList <> nil then LNodeList.SetSorted(Value,Recurse);
+    end;
+  end;
+end;
+
+{**************************************************}
+procedure TALJSONNodeList.SetSorted(Value: Boolean);
+begin
+  SetSorted(Value, False);
 end;
 
 {****************************************************}
@@ -8665,12 +8810,6 @@ begin
   end;
 end;
 
-{*********************************************************************************}
-function ALNodeMatchesU(const Node: TALJSONNodeU; const NodeName: String): Boolean;
-begin
-  Result := (Node.NodeName = NodeName);
-end;
-
 {********************************************************************************************}
 {Call CreateNode to create a new generic JSON node. The resulting node does not have a parent,
  but can be added to the ChildNodes list of any node in the document.}
@@ -8693,7 +8832,8 @@ begin
   inherited create;
   FDocumentNode:= nil;
   FParseOptions:= [];
-  fPathSeparator := '.';
+  FDuplicates := dupAccept;
+  FPathSeparator := '.';
   FOnParseStartDocument := nil;
   FOnParseEndDocument := nil;
   FonParseText := nil;
@@ -8722,15 +8862,14 @@ end;
 destructor TALJSONDocumentU.Destroy;
 begin
   if fFormatSettings <> @ALDefaultFormatSettingsU then dispose(fFormatSettings);
-  Options := Options - [doImmutable];
   ReleaseDoc;
   inherited;
 end;
 
-{********************************************}
-procedure TALJSONDocumentU.MultiThreadPrepare;
+{************************************************************************************}
+procedure TALJSONDocumentU.MultiThreadPrepare(const aOnlyChildNodes: Boolean = False);
 begin
-  node.MultiThreadPrepare;
+  node.MultiThreadPrepare(aOnlyChildNodes);
 end;
 
 {*******************************}
@@ -8756,7 +8895,6 @@ procedure TALJSONDocumentU.SetActive(const Value: Boolean);
 begin
   if Value <> GetActive then begin
     if Value then begin
-      if (doImmutable in Options) then ALJSONDocErrorU(cALJSONImmutable);
       FDocumentNode := TALJSONObjectNodeU.Create;
       FDocumentNode.SetOwnerDocument(Self);
     end
@@ -9850,9 +9988,6 @@ Begin
   // NOTE: ContainerNode must be ntobject or nil (sax mode)
   //
 
-  //error if Immutable
-  if (doImmutable in Options) then ALJSONDocErrorU(cALJSONImmutable);
-
   //event fonParseStartDocument
   DoParseStartDocument;
 
@@ -10726,9 +10861,6 @@ Begin
   // NOTE: ContainerNode must be ntobject or nil (sax mode)
   //
 
-  //error if Immutable
-  if (doImmutable in Options) then ALJSONDocErrorU(cALJSONImmutable);
-
   //event fonParseStartDocument
   DoParseStartDocument;
 
@@ -10794,7 +10926,6 @@ end;
 {************************************}
 procedure TALJSONDocumentU.ReleaseDoc;
 begin
-  if (doImmutable in Options) then ALJSONDocErrorU(cALJSONImmutable);
   if assigned(FDocumentNode) then ALFreeAndNil(FDocumentNode);
 end;
 
@@ -11396,7 +11527,12 @@ end;
  *Value is the set of options to assign.}
 procedure TALJSONDocumentU.SetOptions(const Value: TALJSONDocOptions);
 begin
+  var LSortedChanged := (doSorted in FOptions) <> (doSorted in Value);
   FOptions := Value;
+  if LSortedChanged and assigned(FDocumentNode) then begin
+    Var LNodeList := FDocumentNode.InternalGetChildNodes;
+    if LNodeList <> nil then LNodeList.SetSorted(doSorted in FOptions, True{Recurse})
+  end;
 end;
 
 {**********************************************}
@@ -11474,7 +11610,6 @@ end;
 {Creates the object that implements the ChildNodes property}
 function TALJSONNodeU.CreateChildList: TALJSONNodeListU;
 begin
-  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
   result := TALJSONNodeListU.Create(Self);
 end;
 
@@ -12271,6 +12406,24 @@ begin
   ALJSONDocErrorU(CALJsonOperationError,GetNodeType);
 end;
 
+{*********************************************************}
+procedure TALJSONNodeU.SetNodeName(const NodeName: String);
+begin
+  if fNodeName <> NodeName then begin
+    fNodeName := NodeName;
+    Var LParentNode := FParentNode;
+    if (LParentNode <> nil) and (LParentNode.ChildNodes.Sorted) then begin
+      var LNode := LParentNode.ChildNodes.Extract(self);
+      Try
+        LParentNode.ChildNodes.Add(LNode);
+      except
+        ALFreeAndNil(LNode);
+        raise;
+      End;
+    end;
+  end;
+end;
+
 {***********************************}
 {Returns the text value of the node.}
 function TALJSONNodeU.GetText: String;
@@ -12756,12 +12909,16 @@ var I: Integer;
     LNodeList: TALJSONNodeListU;
 begin
   if FDocument <> Value then begin
-    if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
     FDocument := Value;
     LNodeList := InternalGetChildNodes;
-    if Assigned(LNodeList) then
+    if Assigned(LNodeList) then begin
+      if Assigned(FDocument) then begin
+        LNodeList.Duplicates := FDocument.Duplicates;
+        LNodeList.SetSorted(doSorted in FDocument.Options);
+      end;
       for I := 0 to LNodeList.Count - 1 do
         LNodeList[I].SetOwnerDocument(Value);
+    end;
   end;
 end;
 
@@ -12777,7 +12934,6 @@ end;
 procedure TALJSONNodeU.SetParentNode(const Value: TALJSONNodeU);
 begin
   if FParentNode <> Value then begin
-    if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
     If assigned(Value) then SetOwnerDocument(Value.OwnerDocument)
     else SetOwnerDocument(nil);
     FParentNode := Value;
@@ -12839,10 +12995,10 @@ end;
 {***************************************************************}
 //will create all the nodevalue and childnodelist to be sure that
 //multiple thread can safely read at the same time the node
-procedure TALJSONNodeU.MultiThreadPrepare;
+procedure TALJSONNodeU.MultiThreadPrepare(const aOnlyChildNodes: Boolean = False);
 var I: integer;
 begin
-  if NodeType = ntText then begin
+  if (not aOnlyChildNodes) and (NodeType = ntText) then begin
 
     case NodeSubType of
       nstFloat,
@@ -12882,14 +13038,13 @@ begin
 
   else begin
     For I := 0 to ChildNodes.Count - 1 do
-      ChildNodes[I].MultiThreadPrepare;
+      ChildNodes[I].MultiThreadPrepare(aOnlyChildNodes);
   end;
 end;
 
 {****************************************************************************************************************************************}
 function TALJSONNodeU.AddChild(const NodeName: String; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU;
 begin
-  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
   Result := ALCreateJSONNodeU(NodeName,NodeType);
   Try
     ChildNodes.Insert(Index, Result);
@@ -12924,7 +13079,6 @@ end;
 function TALJSONNodeU.DeleteChild(const NodeName: String): boolean;
 var I: integer;
 begin
-  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
   I := ChildNodes.IndexOf(NodeName);
   if I >= 0 then begin
     ChildNodes.Delete(I);
@@ -12939,7 +13093,6 @@ var LNode: TALJSONNodeU;
     LTmpNode: TALJSONNodeU;
     I: integer;
 begin
-  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
   LNode := Self;
   for I := low(path) to high(path) - 1 do begin
     LTmpNode := LNode.ChildNodes.findNode(path[I]);
@@ -13877,7 +14030,6 @@ end;
 {************************************************************************}
 procedure TALJSONObjectNodeU.SetChildNodes(const Value: TALJSONNodeListU);
 begin
-  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
   If Assigned(FChildNodes) then ALFreeAndNil(FchildNodes);
   FChildNodes := Value;
 end;
@@ -13925,7 +14077,6 @@ end;
 {***********************************************************************}
 procedure TALJSONArrayNodeU.SetChildNodes(const Value: TALJSONNodeListU);
 begin
-  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
   If Assigned(FChildNodes) then ALFreeAndNil(FchildNodes);
   FChildNodes := Value;
 end;
@@ -13978,7 +14129,6 @@ begin
   else begin
 
     if not (nvInt64 in fRawNodeValueDefined) then ALJSONDocErrorU(CALJsonOperationError,GetNodeType);
-    if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
 
     case fNodeSubType of
       nstFloat: ALFloatToStrU(GetFloat, fRawNodeValueStr, ALDefaultFormatSettingsU);
@@ -14016,7 +14166,6 @@ begin
   else begin
 
     if not (nvStr in fRawNodeValueDefined) then ALJSONDocErrorU(CALJsonOperationError,GetNodeType);
-    if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(CALJsonOperationError,GetNodeType);
 
     case fNodeSubType of
       nstFloat: begin
@@ -14064,7 +14213,6 @@ end;
 {**************************************************************************************************}
 procedure TALJSONTextNodeU.SetNodeValue(const Value: String; const NodeSubType: TALJSONNodeSubType);
 begin
-  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
   fNodeSubType := NodeSubType;
   fRawNodeValueStr := Value;
   fRawNodeValueDefined := [nvStr];
@@ -14073,7 +14221,6 @@ end;
 {*************************************************************************************************}
 procedure TALJSONTextNodeU.SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType);
 begin
-  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
   fNodeSubType := NodeSubType;
   fRawNodeValueInt64 := Value;
   if (NodeSubType in [nstBinary, nstRegEx]) then fRawNodeValueDefined := fRawNodeValueDefined + [nvInt64] // keep the fNodeValueStr
@@ -14083,7 +14230,6 @@ end;
 {******************************************************************************************************************************}
 procedure TALJSONTextNodeU.SetNodeValue(const StrValue: String; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType);
 begin
-  if Assigned(FDocument) and (doImmutable in FDocument.Options) then ALJSONDocErrorU(cALJSONImmutable);
   fNodeSubType := NodeSubType;
   fRawNodeValueStr := StrValue;
   fRawNodeValueInt64 := Int64Value;
@@ -14097,6 +14243,15 @@ begin
   FCount:= 0;
   FCapacity := 0;
   FOwner := Owner;
+  FSorted := False;
+  if assigned(FOwner.OwnerDocument) then begin
+    FDuplicates := FOwner.OwnerDocument.Duplicates;
+    SetSorted(doSorted in FOwner.OwnerDocument.Options);
+  end
+  else begin
+    FDuplicates := dupAccept;
+    SetSorted(False);
+  end;
 end;
 
 {**********************************}
@@ -14104,6 +14259,43 @@ destructor TALJSONNodeListU.Destroy;
 begin
   Clear;
   inherited;
+end;
+
+{***********************************************************************************}
+{Locates the index for a node name in a sorted list and indicates whether a node name
+ with that value already exists in the list. Use Find to obtain the index in a
+ sorted list where the node name S should be added. If the node name S, or a node
+ name that differs from S only in case, already exists in the list, Find returns true.
+ If the list does not contain a node name that matches S, Find returns false.
+ The index where S should go is returned in the Index parameter.
+ The value of Index is zero-based, where the first node name has the index 0, the
+ second node name has the index 1, and so on.
+ Note: Only use Find with sorted lists. For unsorted lists, use the IndexOf method instead.
+ Tip: If the node name string is not found (thus return value of Find is False) then Index
+      is set to the index of the first node name in the list that sorts immediately before
+      or after S.}
+function TALJSONNodeListU.Find(const NodeName: String; var Index: Integer): Boolean;
+var
+  L, H, I, C: Integer;
+begin
+  Result := False;
+  L := 0;
+  H := FCount - 1;
+  while L <= H do
+  begin
+    I := (L + H) shr 1;
+    C := CompareNodeNames(FList[I].NodeName, NodeName);
+    if C < 0 then L := I + 1 else
+    begin
+      H := I - 1;
+      if C = 0 then
+      begin
+        Result := True;
+        if Duplicates <> dupAccept then L := I;
+      end;
+    end;
+  end;
+  Index := L;
 end;
 
 {*************************************}
@@ -14133,15 +14325,18 @@ end;
  index of the second node, and so on. If the specified node is not in the list, IndexOf returns -1.}
 function TALJSONNodeListU.IndexOf(const Name: String; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
-  if Direction = TDirection.FromBeginning then begin
-    for Result := 0 to Count - 1 do
-      if ALNodeMatchesU(Get(Result), Name) then Exit;
+  if not Sorted then begin
+    if Direction = TDirection.FromBeginning then begin
+      for Result := 0 to Count - 1 do
+        if CompareNodeNames(Get(Result).NodeName, Name) = 0 then Exit;
+    end
+    else begin
+      for Result := Count - 1 downto 0 do
+        if CompareNodeNames(Get(Result).NodeName, Name) = 0 then Exit;
+    end;
+    Result := -1;
   end
-  else begin
-    for Result := Count - 1 downto 0 do
-      if ALNodeMatchesU(Get(Result), Name) then Exit;
-  end;
-  Result := -1;
+  else if not Find(Name, Result) then Result := -1;
 end;
 
 {***************************************************************************************************************************}
@@ -14298,6 +14493,12 @@ begin
   if not Assigned(Result) then ALJSONDocErrorU(CALJSONNodeNotFound, [Name]);
 end;
 
+{************************************************************************}
+function TALJSONNodeListU.CompareNodeNames(const S1, S2: String): Integer;
+begin
+  Result := AlCompareStrU(S1, S2)
+end;
+
 {*****************************************************************************************}
 procedure TALJSONNodeListU.QuickSort(L, R: Integer; ACompare: TALJSONNodeListSortCompareU);
 var
@@ -14344,10 +14545,24 @@ begin
   end;
 end;
 
+{************************************************************************************************}
+function ALJSONNodeListCompareNodeNameU(List: TALJSONNodeListU; Index1, Index2: Integer): Integer;
+begin
+  Result := List.CompareNodeNames(
+              List[Index1].NodeName,
+              List[Index2].NodeName);
+end;
+
+{******************************}
+procedure TALJSONNodeListU.Sort;
+begin
+  CustomSort(ALJSONNodeListCompareNodeNameU);
+end;
+
 {**************************************************************************}
 procedure TALJSONNodeListU.CustomSort(Compare: TALJSONNodeListSortCompareU);
 begin
-  if (FList <> nil) and (Count > 1) then
+  if (not Sorted) and (FList <> nil) and (Count > 1) then
     QuickSort(0, Count - 1, Compare);
 end;
 
@@ -14358,8 +14573,33 @@ end;
  *Node is the node to add to the list.}
 function TALJSONNodeListU.Add(const Node: TALJSONNodeU): Integer;
 begin
-  Insert(-1, Node);
-  Result := FCount - 1;
+  if not Sorted then
+    Result := FCount
+  else
+    if Find(Node.NodeName, Result) then
+      case Duplicates of
+        dupIgnore: begin
+                     ALFreeAndNil(Node);
+                     Exit;
+                   end;
+        dupError: ALJSONDocErrorU(cALJSONDuplicateNodeName);
+      end;
+  InternalInsert(Result, Node);
+end;
+
+{**********************************************************************************}
+procedure TALJSONNodeListU.InternalInsert(Index: Integer; const Node: TALJSONNodeU);
+begin
+  if FCount = FCapacity then Grow;
+  if Index < FCount then
+    ALMove(
+      FList[Index],
+      FList[Index + 1],
+      (FCount - Index) * SizeOf(Pointer));
+  Pointer(FList[index]) := nil;
+  FList[index] := Node;
+  Inc(FCount);
+  Node.SetParentNode(Fowner);
 end;
 
 {********************************************************}
@@ -14370,21 +14610,12 @@ end;
  *Node is the node to add to the list.}
 procedure TALJSONNodeListU.Insert(Index: Integer; const Node: TALJSONNodeU);
 begin
-  if Index = -1 then begin
-    index := FCount;
-    if index = FCapacity then Grow;
-  end
+  if Index = -1 then Add(Node)
   else begin
+    if Sorted then ALJSONDocErrorU(CALJSONSortedListError);
     if (Index < 0) or (Index > FCount) then ALJSONDocErrorU(CALJSONListIndexError, [Index]);
-    if FCount = FCapacity then Grow;
-    if Index < FCount then ALMove(FList[Index],
-                                  FList[Index + 1],
-                                  (FCount - Index) * SizeOf(Pointer));
+    InternalInsert(Index, Node);
   end;
-  Pointer(FList[index]) := nil;
-  FList[index] := Node;
-  Inc(FCount);
-  Node.SetParentNode(Fowner);
 end;
 
 {**************************************}
@@ -14476,7 +14707,8 @@ var Index: Integer;
 begin
   Index := indexOf(OldNode);
   Result := Extract(Index);
-  Insert(Index, NewNode);
+  if not sorted then Insert(Index, NewNode)
+  else Add(NewNode);
 end;
 
 {*******************************}
@@ -14492,12 +14724,18 @@ end;
 
 {******************************}
 procedure TALJSONNodeListU.Grow;
+{$IF CompilerVersion <= 32}{tokyo}
 var Delta: Integer;
+{$endif}
 begin
+  {$IF CompilerVersion <= 32}{tokyo}
   if FCapacity > 64 then Delta := FCapacity div 4
   else if FCapacity > 8 then Delta := 16
   else Delta := 4;
   SetCapacity(FCapacity + Delta);
+  {$else}
+  SetCapacity(GrowCollection(FCapacity, FCount + 1));
+  {$endif}
 end;
 
 {***********************************************************}
@@ -14508,6 +14746,31 @@ begin
     SetLength(FList, NewCapacity);
     FCapacity := NewCapacity;
   end;
+end;
+
+{*********************************************************************}
+procedure TALJSONNodeListU.SetSorted(Value: Boolean; Recurse: Boolean);
+begin
+  if FSorted <> Value then
+  begin
+    if owner is TALJSONObjectNodeU then begin
+      if Value then Sort;
+      FSorted := Value;
+    end
+    else FSorted := False;
+  end;
+  if Recurse then begin
+    for Var I := 0 to count-1 do begin
+      Var LNodeList := Get(i).InternalGetChildNodes;
+      if LNodeList <> nil then LNodeList.SetSorted(Value,Recurse);
+    end;
+  end;
+end;
+
+{***************************************************}
+procedure TALJSONNodeListU.SetSorted(Value: Boolean);
+begin
+  SetSorted(Value, False);
 end;
 
 {*****************************************************}

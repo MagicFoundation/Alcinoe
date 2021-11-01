@@ -45,6 +45,7 @@ object Form1: TForm1
     Align = alBottom
     Color = clWhite
     TabOrder = 0
+    Anchors = [akLeft, akTop, akRight, akBottom]
     DefaultCanvas = 'TGDIPlusCanvas'
     PrintMargins = (
       15

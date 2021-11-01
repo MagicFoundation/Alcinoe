@@ -2,42 +2,48 @@ unit Unit1;
 
 interface
 
-uses Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-     StdCtrls, ALString, ALJsonDoc, ExtCtrls,
-     ALStringList, Shellapi, Vcl.Dialogs,
-     Contnrs, alFiles, diagnostics, superobject, DBXJSON, DBXplatform, IOUtils,
-     dwsJSON, Execute.JSON, system.Generics.collections,
-     system.UITypes, system.JSON;
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
+  StdCtrls, ALString, ALJsonDoc, ExtCtrls,
+  ALStringList, Shellapi, Vcl.Dialogs,
+  Contnrs, alFiles, diagnostics, superobject, DBXplatform, IOUtils,
+  dwsJSON, system.Generics.collections,
+  system.UITypes, system.JSON, Vcl.ComCtrls, VclTee.TeeGDIPlus,
+  Vcl.Samples.Spin, VCLTee.TeEngine, VCLTee.Series, VCLTee.TeeProcs,
+  VCLTee.Chart;
 
 type
 
   TForm1 = class(TForm)
-    ButtonLoadXmlWithALXmlDocument: TButton;
-    MemoLoadJsonDocument: TMemo;
-    ButtonCreateDynamicallyJsonDocument: TButton;
-    ButtonSaveToBson: TButton;
-    MemoLoadJsonDocumentSAXMODEResult: TMemo;
-    MemoCreateDynamicallyJsonDocument: TMemo;
+    MainOpenDialog: TOpenDialog;
+    PageControl1: TPageControl;
+    TabSheet1: TTabSheet;
+    TabSheet2: TTabSheet;
     Label1: TLabel;
+    ButtonLoadXmlWithALXmlDocument: TButton;
+    MemoJson: TMemo;
+    ButtonCreateDynamicallyJsonDocument: TButton;
+    MemoSaxModeEvents: TMemo;
     MemoBSON: TMemo;
     Button1: TButton;
-    Button3: TButton;
-    MainOpenDialog: TOpenDialog;
-    Button2: TButton;
-    Button4: TButton;
-    Button5: TButton;
-    Button6: TButton;
-    Button7: TButton;
+    Label2: TLabel;
+    Chart1: TChart;
+    Series1: TBarSeries;
+    Series2: TBarSeries;
+    Series3: TBarSeries;
+    Series4: TBarSeries;
+    Series5: TBarSeries;
+    BtnRunBenchmark: TButton;
+    SpinEditNbItems: TSpinEdit;
+    CheckBoxTALJsonDocJSON: TCheckBox;
+    CheckBoxTALJsonDocUJSON: TCheckBox;
+    CheckBoxSuperObject: TCheckBox;
+    CheckBoxSystemJSON: TCheckBox;
+    CheckBoxDwsJSON: TCheckBox;
     procedure ButtonLoadXmlWithALXmlDocumentClick(Sender: TObject);
     procedure ButtonCreateDynamicallyJsonDocumentClick(Sender: TObject);
-    procedure ButtonSaveToBsonClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
-    procedure Button4Click(Sender: TObject);
-    procedure Button5Click(Sender: TObject);
-    procedure Button6Click(Sender: TObject);
-    procedure Button7Click(Sender: TObject);
+    procedure BtnRunBenchmarkClick(Sender: TObject);
   private
   public
   end;
@@ -50,6 +56,7 @@ implementation
 {$R *.dfm}
 
 {$WARNINGS OFF}
+
 
 {**************************************}
 function GetTotalMemoryAllocated: int64;
@@ -78,722 +85,139 @@ begin
 
 end;
 
-{**************************************************}
-function scrollAllNode(aNode: TalJsonNode): Integer; overload;
-Var aStack: Tstack;
-    i: integer;
-begin
-  Result := 0;
-  aStack := Tstack.Create;
-  try
-
-    if aNode.NodeType in [ntArray, ntObject] then
-      For i := 0 to aNode.ChildNodes.Count - 1 do
-        aStack.Push(pointer(ANode.ChildNodes[i]));
-
-    While astack.Count > 0 do begin
-      inc(result);
-      aNode := TalJsonNode(astack.Pop);
-      if aNode.NodeType in [ntArray, ntObject] then
-        For i := 0 to ANode.ChildNodes.Count - 1 do
-          aStack.Push(pointer(ANode.ChildNodes[i]));
-    end;
-
-  finally
-    aStack.Free;
-  end;
-
-end;
-
-{***************************************************}
-function scrollAllNode(aNode: TalJsonNodeU): Integer; overload;
-Var aStack: Tstack;
-    i: integer;
-begin
-  Result := 0;
-  aStack := Tstack.Create;
-  try
-
-    if aNode.NodeType in [ntArray, ntObject] then
-      For i := 0 to aNode.ChildNodes.Count - 1 do
-        aStack.Push(pointer(ANode.ChildNodes[i]));
-
-    While astack.Count > 0 do begin
-      inc(result);
-      aNode := TalJsonNodeU(astack.Pop);
-      if aNode.NodeType in [ntArray, ntObject] then
-        For i := 0 to ANode.ChildNodes.Count - 1 do
-          aStack.Push(pointer(ANode.ChildNodes[i]));
-    end;
-
-  finally
-    aStack.Free;
-  end;
-
-end;
-
-{***************************************************}
-function scrollAllNode(aNode: ISuperObject): Integer; overload;
-Var aStack: Tstack;
-    item: ISuperObject;
-begin
-  Result := 0;
-  aStack := Tstack.Create;
-  try
-
-    for item in aNode do
-      aStack.Push(pointer(item));
-
-    While astack.Count > 0 do begin
-      inc(result);
-      aNode := ISuperObject(astack.Pop);
-        For item in ANode do
-          aStack.Push(pointer(item));
-    end;
-
-  finally
-    aStack.Free;
-  end;
-
-end;
-
-{*************************************************}
-function scrollAllNode(aNode: TJSONValue): Integer; overload;
-Var aStack: Tstack;
-    item: TJSONValue;
-    pair: TjsonPair;
-begin
-  Result := 0;
-  aStack := Tstack.Create;
-  try
-
-    if aNode is TJSONArray then
-      for item in (aNode as TJSONArray) do
-        aStack.Push(pointer(item))
-    else  if aNode is TJSONObject then
-      for pair in (aNode as TJSONObject) do
-         aStack.Push(pointer(pair.JsonValue));
-
-    While astack.Count > 0 do begin
-      inc(result);
-      aNode := TJSONValue(astack.Pop);
-      if aNode is TJSONArray then
-        For item in (aNode as TJSONArray) do
-          aStack.Push(pointer(item))
-        else  if aNode is TJSONObject then
-          for pair in (aNode as TJSONObject) do
-             aStack.Push(pointer(pair.JsonValue))
-    end;
-
-  finally
-    aStack.Free;
-  end;
-
-end;
-
-{****************************************************}
-function scrollAllNode(aNode: TdwsJSONValue): Integer; overload;
-Var aStack: Tstack;
-    item: TdwsJSONValue;
-begin
-  Result := 0;
-  aStack := Tstack.Create;
-  try
-
-    if aNode is TdwsJSONArray then
-      for item in (aNode as TdwsJSONArray) do
-        aStack.Push(pointer(item))
-    else  if aNode is TdwsJSONObject then
-      for item in (aNode as TdwsJSONObject) do
-         aStack.Push(pointer(item));
-
-    While astack.Count > 0 do begin
-      inc(result);
-      aNode := TdwsJSONValue(astack.Pop);
-      if aNode is TdwsJSONArray then
-        For item in (aNode as TdwsJSONArray) do
-          aStack.Push(pointer(item))
-        else  if aNode is TdwsJSONObject then
-          for item in (aNode as TdwsJSONObject) do
-             aStack.Push(pointer(item))
-    end;
-
-  finally
-    aStack.Free;
-  end;
-
-end;
-
 {********************************************************************}
 procedure TForm1.ButtonLoadXmlWithALXmlDocumentClick(Sender: TObject);
-Var aALJsonDocument: TALJsonDocument;
-    aALJsonDocumentU: TALJsonDocumentU;
 begin
 
-  //clear MemoLoadJsonDocumentSAXMODEResult
-  MemoLoadJsonDocumentSAXMODEResult.Lines.Clear;
+  //clear MemoJSON
+  MemoSaxModeEvents.Lines.Clear;
+  MemoBSON.lines.Clear;
+  MemoSaxModeEvents.Lines.Clear;
 
   if messageDlg('Use unicode version of TalJsonDoc (ie: TalJsonDocU)?', mtConfirmation, [TMsgDlgBtn.mbNo, TMsgDlgBtn.mbYes], 0) = MrNo then begin
 
     //exemple 1 load the JSON doc in memory
-    aALJsonDocument := TALJsonDocument.Create;
+    var LALJsonDocument := TALJsonDocument.Create;
     try
-      aALJsonDocument.LoadFromJSONString(AnsiString(MemoLoadJsonDocument.Lines.Text));
-      aALJsonDocument.Options := [doNodeAutoIndent];
-      MemoLoadJsonDocument.Lines.Text := String(aALJsonDocument.JSON);
+      LALJsonDocument.LoadFromJSONString(AnsiString(MemoJSON.Lines.Text));
+      LALJsonDocument.Options := [doNodeAutoIndent];
+      MemoJSON.Lines.Text := String(LALJsonDocument.JSON);
+      var LBsonStr := LALJsonDocument.BSON;
+      for var I := 1 to length(LBsonStr) do
+        MemoBSON.Lines.add(Inttostr(ord(LBsonStr[i])));
     finally
-      aALJsonDocument.Free;
+      LALJsonDocument.Free;
     end;
 
     //exemple 2 load the JSON doc in SAX MODE
-    aALJsonDocument := TALJsonDocument.Create;
+    LALJsonDocument := TALJsonDocument.Create;
     try
-      aALJsonDocument.onParseText := procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType)
+      LALJsonDocument.onParseText := procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType)
                                      begin
                                        case NodeSubType of
-                                         nstFloat: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + string(ALFloatToStr(Args[0].VExtended^, ALDefaultFormatSettings)));
-                                         nstText: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
+                                         nstFloat: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + string(ALFloatToStr(Args[0].VExtended^, ALDefaultFormatSettings)));
+                                         nstText: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
                                          nstObject: ;
                                          nstArray: ;
-                                         nstObjectID: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'ObjectId("'+string(ALBinToHex(ansiString(Args[0].VAnsiString)))+'")');
-                                         nstBoolean: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + String(ALBoolToStr(Args[0].VBoolean,'true','false')));
-                                         nstDateTime: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + string(ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettings)));
-                                         nstNull: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'null');
-                                         nstRegEx: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
-                                         nstBinary: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'BinData('+inttostr(Args[1].VInteger)+', "'+string(ansiString(ALBase64EncodeString(ansiString(Args[0].VAnsiString))))+'")');
-                                         nstJavascript: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
-                                         nstInt32: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'NumberInt('+inttostr(Args[0].VInteger)+')');
-                                         nstTimestamp: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'Timestamp('+inttostr(int64(cardinal(Args[0].VInteger)))+', '+inttostr(int64(cardinal(Args[1].VInteger)))+')');
-                                         nstInt64: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
+                                         nstObjectID: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + 'ObjectId("'+string(ALBinToHex(ansiString(Args[0].VAnsiString)))+'")');
+                                         nstBoolean: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + String(ALBoolToStr(Args[0].VBoolean,'true','false')));
+                                         nstDateTime: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + string(ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettings)));
+                                         nstNull: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + 'null');
+                                         nstRegEx: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
+                                         nstBinary: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + 'BinData('+inttostr(Args[1].VInteger)+', "'+string(ansiString(ALBase64EncodeString(ansiString(Args[0].VAnsiString))))+'")');
+                                         nstJavascript: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
+                                         nstInt32: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + 'NumberInt('+inttostr(Args[0].VInteger)+')');
+                                         nstTimestamp: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + 'Timestamp('+inttostr(int64(cardinal(Args[0].VInteger)))+', '+inttostr(int64(cardinal(Args[1].VInteger)))+')');
+                                         nstInt64: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
                                        end;
                                      end;
 
-      aALJsonDocument.LoadFromJSONString(AnsiString(MemoLoadJsonDocument.Lines.Text), true{saxMode});
+      LALJsonDocument.LoadFromJSONString(AnsiString(MemoJSON.Lines.Text), true{saxMode});
     finally
-      aALJsonDocument.Free;
+      LALJsonDocument.Free;
     end;
 
   end
   else begin
 
     //exemple 1 load the JSON doc in memory
-    aALJsonDocumentU := TALJsonDocumentU.Create;
+    var LALJsonDocumentU := TALJsonDocumentU.Create;
     try
-      aALJsonDocumentU.LoadFromJSONString(MemoLoadJsonDocument.Lines.Text);
-      aALJsonDocumentU.Options := [doNodeAutoIndent];
-      MemoLoadJsonDocument.Lines.Text := aALJsonDocumentU.JSON;
+      LALJsonDocumentU.LoadFromJSONString(MemoJSON.Lines.Text);
+      LALJsonDocumentU.Options := [doNodeAutoIndent];
+      MemoJSON.Lines.Text := LALJsonDocumentU.JSON;
+      var LBsonBytes := LALJsonDocumentU.BSON;
+      for var I := 0 to length(LBsonBytes) - 1 do
+        MemoBSON.Lines.add(Inttostr(LBsonBytes[i]));
     finally
-      aALJsonDocumentU.Free;
+      LALJsonDocumentU.Free;
     end;
 
     //exemple 2 load the JSON doc in SAX MODE
-    aALJsonDocumentU := TALJsonDocumentU.Create;
+    LALJsonDocumentU := TALJsonDocumentU.Create;
     try
-      aALJsonDocumentU.onParseText := procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType)
-                                     begin
-                                       case NodeSubType of
-                                         nstFloat: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + ALFloatToStrU(Args[0].VExtended^, ALDefaultFormatSettingsU));
-                                         nstText: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + String(Args[0].VUnicodeString));
-                                         nstObject: ;
-                                         nstArray: ;
-                                         nstObjectID: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + 'ObjectId("'+string(Args[0].VUnicodeString)+'")');
-                                         nstBoolean: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + ALBoolToStrU(Args[0].VBoolean,'true','false'));
-                                         nstDateTime: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + ALFormatDateTimeU('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettingsU));
-                                         nstNull: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + 'null');
-                                         nstRegEx: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + String(Args[0].VUnicodeString));
-                                         nstBinary: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + 'BinData('+ALinttostrU(Args[1].VInteger)+', "'+String(Args[0].VunicodeString)+'")');
-                                         nstJavascript: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + String(Args[0].VUnicodeString));
-                                         nstInt32: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + 'NumberInt('+alinttostrU(Args[0].VInteger)+')');
-                                         nstTimestamp: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + 'Timestamp('+alinttostrU(int64(cardinal(Args[0].VInteger)))+', '+alinttostrU(int64(cardinal(Args[1].VInteger)))+')');
-                                         nstInt64: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
-                                       end;
-                                     end;
+      LALJsonDocumentU.onParseText := procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType)
+                                      begin
+                                        case NodeSubType of
+                                          nstFloat: MemoSaxModeEvents.Lines.Add(Path + '=' + ALFloatToStrU(Args[0].VExtended^, ALDefaultFormatSettingsU));
+                                          nstText: MemoSaxModeEvents.Lines.Add(Path + '=' + String(Args[0].VUnicodeString));
+                                          nstObject: ;
+                                          nstArray: ;
+                                          nstObjectID: MemoSaxModeEvents.Lines.Add(Path + '=' + 'ObjectId("'+string(Args[0].VUnicodeString)+'")');
+                                          nstBoolean: MemoSaxModeEvents.Lines.Add(Path + '=' + ALBoolToStrU(Args[0].VBoolean,'true','false'));
+                                          nstDateTime: MemoSaxModeEvents.Lines.Add(Path + '=' + ALFormatDateTimeU('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettingsU));
+                                          nstNull: MemoSaxModeEvents.Lines.Add(Path + '=' + 'null');
+                                          nstRegEx: MemoSaxModeEvents.Lines.Add(Path + '=' + String(Args[0].VUnicodeString));
+                                          nstBinary: MemoSaxModeEvents.Lines.Add(Path + '=' + 'BinData('+ALinttostrU(Args[1].VInteger)+', "'+String(Args[0].VunicodeString)+'")');
+                                          nstJavascript: MemoSaxModeEvents.Lines.Add(Path + '=' + String(Args[0].VUnicodeString));
+                                          nstInt32: MemoSaxModeEvents.Lines.Add(Path + '=' + 'NumberInt('+alinttostrU(Args[0].VInteger)+')');
+                                          nstTimestamp: MemoSaxModeEvents.Lines.Add(Path + '=' + 'Timestamp('+alinttostrU(int64(cardinal(Args[0].VInteger)))+', '+alinttostrU(int64(cardinal(Args[1].VInteger)))+')');
+                                          nstInt64: MemoSaxModeEvents.Lines.Add(Path + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
+                                        end;
+                                      end;
 
-      aALJsonDocumentU.LoadFromJSONString(MemoLoadJsonDocument.Lines.Text, true{saxMode});
+      LALJsonDocumentU.LoadFromJSONString(MemoJSON.Lines.Text, true{saxMode});
     finally
-      aALJsonDocumentU.Free;
+      LALJsonDocumentU.Free;
     end;
 
   end;
-
-end;
-
-{*********************************************}
-procedure TForm1.Button2Click(Sender: TObject);
-var obj: ISuperObject;
-    aNodeCount: Integer;
-    MemoryUsage: Int64;
-    aStopWatch: TstopWatch;
-begin
-  If MainOpenDialog.Execute then begin
-
-    MemoCreateDynamicallyJsonDocument.Lines.Clear;
-    MemoryUsage := GetTotalMemoryAllocated;
-    Try
-
-      aStopWatch := TstopWatch.StartNew;
-      obj := TSuperObject.ParseFile(MainOpenDialog.FileName, false);
-      aStopWatch.Stop;
-      MemoCreateDynamicallyJsonDocument.Lines.Add('Time to load all nodes: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-      aStopWatch := TstopWatch.StartNew;
-      aNodeCount := scrollAllNode(obj);
-      aStopWatch.Stop;
-      MemoCreateDynamicallyJsonDocument.Lines.Add('Time scroll all nodes: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-      MemoCreateDynamicallyJsonDocument.Lines.Add('Memory used: ' + FormatFloat('0,',(GetTotalMemoryAllocated - MemoryUsage)) + ' bytes');
-      MemoCreateDynamicallyJsonDocument.Lines.Add('Number of nodes created: ' + FormatFloat('0,',aNodeCount));
-      aStopWatch := TStopWatch.StartNew;
-      obj.SaveTo(string(ALGetModulePath) + 'sample.txt');
-      aStopWatch.Stop;
-      MemoCreateDynamicallyJsonDocument.Lines.Add('Time to save the JSON to disk: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-      ALDeleteFile(ALGetModulePath + 'sample.txt');
-
-    except
-      on E: Exception do
-        MemoCreateDynamicallyJsonDocument.Lines.Add('Error: ' + E.Message);
-    end;
-
-  end;
-end;
-
-{*********************************************}
-procedure TForm1.Button3Click(Sender: TObject);
-Var aALJsonDocument: TALJsonDocument;
-    aALJsonDocumentU: TALJsonDocumentU;
-    aNodeCount: Integer;
-    MemoryUsage: int64;
-    aStopWatch: TstopWatch;
-begin
-  If MainOpenDialog.Execute then begin
-
-    screen.Cursor := CrHourglass;
-    MemoCreateDynamicallyJsonDocument.Lines.Clear;
-    MemoryUsage := GetTotalMemoryAllocated;
-    Try
-
-      aALJsonDocument:= TALJsonDocument.Create;
-      Try
-        aStopWatch := TstopWatch.StartNew;
-        aALJsonDocument.LoadFromJsonFile(AnsiString(MainOpenDialog.FileName));
-        aStopWatch.Stop;
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDoc: Time to load all nodes: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-        aStopWatch := TstopWatch.StartNew;
-        aNodeCount := scrollAllNode(aALJsonDocument.Node);
-        aStopWatch.Stop;
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDoc: Time scroll all nodes: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDoc: Memory used: ' + FormatFloat('0,',(GetTotalMemoryAllocated - MemoryUsage)) + ' bytes');
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDoc: Number of nodes created: ' + FormatFloat('0,',aNodeCount));
-        aStopWatch := TStopWatch.StartNew;
-        aALJsonDocument.SaveToJsonFile(ALGetModulePath + 'sample.txt');
-        aStopWatch.Stop;
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDoc: Time to save the JSON to disk: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-        ALDeleteFile(ALGetModulePath + 'sample.txt');
-      finally
-        aALJsonDocument.Free;
-      end;
-
-      MemoCreateDynamicallyJsonDocument.Lines.Add('');
-      MemoCreateDynamicallyJsonDocument.Lines.Add('');
-
-      aALJsonDocumentU:= TALJsonDocumentU.Create;
-      Try
-        aStopWatch := TstopWatch.StartNew;
-        aALJsonDocumentU.LoadFromJsonFile(MainOpenDialog.FileName);
-        aStopWatch.Stop;
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDocU: Time to load all nodes: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-        aStopWatch := TstopWatch.StartNew;
-        aNodeCount := scrollAllNode(aALJsonDocumentU.Node);
-        aStopWatch.Stop;
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDocU: Time scroll all nodes: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDocU: Memory used: ' + FormatFloat('0,',(GetTotalMemoryAllocated - MemoryUsage)) + ' bytes');
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDocU: Number of nodes created: ' + FormatFloat('0,',aNodeCount));
-        aStopWatch := TStopWatch.StartNew;
-        aALJsonDocumentU.SaveToJsonFile(String(ALGetModulePath + 'sample.txt'));
-        aStopWatch.Stop;
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDocU: Time to save the JSON to disk: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-        ALDeleteFile(ALGetModulePath + 'sample.txt');
-      finally
-        aALJsonDocumentU.Free;
-      end;
-
-    except
-      on E: Exception do
-        MemoCreateDynamicallyJsonDocument.Lines.Add('Error: ' + E.Message);
-    end;
-    screen.Cursor := CrDefault;
-
-  end;
-end;
-
-{*********************************************}
-procedure TForm1.Button4Click(Sender: TObject);
-Var aNodeCount: Integer;
-    MemoryUsage: int64;
-    JSONValue: TJSONValue;
-    aStopWatch: TstopWatch;
-begin
-  If MainOpenDialog.Execute then begin
-
-    MemoCreateDynamicallyJsonDocument.Lines.Clear;
-    MemoryUsage := GetTotalMemoryAllocated;
-    Try
-
-      aStopWatch := TstopWatch.StartNew;
-      JSONValue:= TJSONObject.ParseJSONValue(TFile.ReadAllText(MainOpenDialog.FileName));
-      Try
-        aStopWatch.Stop;
-        MemoCreateDynamicallyJsonDocument.Lines.Add('Time to load all nodes: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-        aStopWatch := TstopWatch.StartNew;
-        aNodeCount := scrollAllNode(JSONValue);
-        aStopWatch.Stop;
-        MemoCreateDynamicallyJsonDocument.Lines.Add('Time scroll all nodes: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-        MemoCreateDynamicallyJsonDocument.Lines.Add('Memory used: ' + FormatFloat('0,',(GetTotalMemoryAllocated - MemoryUsage)) + ' bytes');
-        MemoCreateDynamicallyJsonDocument.Lines.Add('Number of nodes created: ' + FormatFloat('0,',aNodeCount));
-      finally
-        JSONValue.Free;
-      end;
-
-    except
-      on E: Exception do
-        MemoCreateDynamicallyJsonDocument.Lines.Add('Error: ' + E.Message);
-    end;
-
-  end;
-end;
-
-{*********************************************}
-procedure TForm1.Button5Click(Sender: TObject);
-Var aNodeCount: Integer;
-    MemoryUsage: int64;
-    JSONValue: TdwsJSONValue;
-    aStopWatch: TstopWatch;
-begin
-  If MainOpenDialog.Execute then begin
-
-    MemoCreateDynamicallyJsonDocument.Lines.Clear;
-    MemoryUsage := GetTotalMemoryAllocated;
-    Try
-
-      aStopWatch := TstopWatch.StartNew;
-      JSONValue:= TdwsJSONValue.ParseFile(MainOpenDialog.FileName);
-      Try
-        aStopWatch.Stop;
-        MemoCreateDynamicallyJsonDocument.Lines.Add('Time to load all nodes: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-        aStopWatch := TstopWatch.StartNew;
-        aNodeCount := scrollAllNode(JSONValue);
-        aStopWatch.Stop;
-        MemoCreateDynamicallyJsonDocument.Lines.Add('Time scroll all nodes: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-        MemoCreateDynamicallyJsonDocument.Lines.Add('Memory used: ' + FormatFloat('0,',(GetTotalMemoryAllocated - MemoryUsage)) + ' bytes');
-        MemoCreateDynamicallyJsonDocument.Lines.Add('Number of nodes created: ' + FormatFloat('0,',aNodeCount));
-      finally
-        JSONValue.Free;
-      end;
-
-    except
-      on E: Exception do
-        MemoCreateDynamicallyJsonDocument.Lines.Add('Error: ' + E.Message);
-    end;
-
-  end;
-end;
-
-{*********************************************}
-procedure TForm1.Button6Click(Sender: TObject);
-Var aALJsonDocument: TALJsonDocument;
-    aALJsonDocumentU: TALJsonDocumentU;
-    aNodeCount: Integer;
-    MemoryUsage: int64;
-    aStopWatch: TstopWatch;
-begin
-  If MainOpenDialog.Execute then begin
-
-    screen.Cursor := crHourglass;
-    MemoCreateDynamicallyJsonDocument.Lines.Clear;
-    MemoryUsage := GetTotalMemoryAllocated;
-    Try
-
-      aALJsonDocument:= TALJsonDocument.Create;
-      Try
-        aStopWatch := TstopWatch.StartNew;
-        aALJsonDocument.LoadFrombsonFile(AnsiString(MainOpenDialog.FileName));
-        aStopWatch.Stop;
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDoc: Time to load all nodes: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-        aStopWatch := TstopWatch.StartNew;
-        aNodeCount := scrollAllNode(aALJsonDocument.Node);
-        aStopWatch.Stop;
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDoc: Time scroll all nodes: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDoc: Memory used: ' + FormatFloat('0,',(GetTotalMemoryAllocated - MemoryUsage)) + ' bytes');
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDoc: Number of nodes created: ' + FormatFloat('0,',aNodeCount));
-        aStopWatch := TStopWatch.StartNew;
-        aALJsonDocument.SaveTobsonFile(ALGetModulePath + 'sample.txt');
-        aStopWatch.Stop;
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDoc: Time to save the JSON to disk: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-        ALDeleteFile(ALGetModulePath + 'sample.txt');
-      finally
-        aALJsonDocument.Free;
-      end;
-
-      MemoCreateDynamicallyJsonDocument.Lines.Add('');
-      MemoCreateDynamicallyJsonDocument.Lines.Add('');
-
-      aALJsonDocumentU:= TALJsonDocumentU.Create;
-      Try
-        aStopWatch := TstopWatch.StartNew;
-        aALJsonDocumentU.LoadFrombsonFile(MainOpenDialog.FileName);
-        aStopWatch.Stop;
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDocU: Time to load all nodes: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-        aStopWatch := TstopWatch.StartNew;
-        aNodeCount := scrollAllNode(aALJsonDocumentU.Node);
-        aStopWatch.Stop;
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDocU: Time scroll all nodes: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDocU: Memory used: ' + FormatFloat('0,',(GetTotalMemoryAllocated - MemoryUsage)) + ' bytes');
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDocU: Number of nodes created: ' + FormatFloat('0,',aNodeCount));
-        aStopWatch := TStopWatch.StartNew;
-        aALJsonDocumentU.SaveTobsonFile(string(ALGetModulePath) + 'sample.txt');
-        aStopWatch.Stop;
-        MemoCreateDynamicallyJsonDocument.Lines.Add('TALJSONDocU: Time to save the JSON to disk: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-        ALDeleteFile(ALGetModulePath + 'sample.txt');
-      finally
-        aALJsonDocumentU.Free;
-      end;
-
-    except
-      on E: Exception do
-        MemoCreateDynamicallyJsonDocument.Lines.Add('Error: ' + E.Message);
-    end;
-    screen.Cursor := crdefault;
-
-  end;
-end;
-
-type
-  TMyObject = class
-    Name: string;
-    Date: TDateTime;
-    Nums: array of Integer;
-    Plus: string;
-  end;
-
-procedure TForm1.Button7Click(Sender: TObject);
-  var
-    t: TMyObject;
-    s: string;
-    i: integer;
-    aStopWatch: TstopWatch;
-    aALJsonDocument: TALJsonDocument;
-    S2: ansiString;
-
-begin
-
-    MemoCreateDynamicallyJsonDocument.Lines.Clear;
-    Try
-
-      aStopWatch := TstopWatch.StartNew;
-      for I := 0 to 100000 do begin
-        t := TMyObject.Create;
-        t.Name := 'Paul';
-        t.Date := Now();
-        setlength(t.Nums, 3);
-        t.Nums[0] := 1;
-        t.Nums[2] := 2;
-        t.Nums[3] := 3;
-        t.Plus := 'plus';
-        s := t.toJSON(); // {"Name":"Paul","Date":"2015-11-23T19:33:25","Nums":[1,0,2],"Plus":"plus"}
-        t.Free;
-        t := TMyObject.Create;
-        t.FromJSON(s);
-        t.Free;
-      end;
-      aStopWatch.Stop;
-      MemoCreateDynamicallyJsonDocument.Lines.Add('Time to save/load 100000 objects with EXECUTE.json: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-
-        aStopWatch := TstopWatch.StartNew;
-        for I := 0 to 100000 do begin
-          aALJsonDocument:= TALJsonDocument.Create;
-          aALJsonDocument.addchild('Name').Text := 'Stephane';
-          aALJsonDocument.addchild('Date').DateTime := Now;
-          with aALJsonDocument.addchild('Nums', ntArray) do begin
-            addchild.Float := 1;
-            addchild.Float := 2;
-            addchild.Float := 3;
-          end;
-          aALJsonDocument.addchild('Plus').Text := 'plus';
-          aALJsonDocument.SaveToBSONString(S2); // {"Name":"Stephane","Date":ISODate("2015-11-23T19:44:53.057Z"),"Nums":[1,2,3],"Plus":"plus"}
-          aALJsonDocument.Free;
-          aALJsonDocument:= TALJsonDocument.Create;
-          aALJsonDocument.LoadFromBSONString(S2);
-          aALJsonDocument.Free;
-        end;
-        aStopWatch.Stop;
-        MemoCreateDynamicallyJsonDocument.Lines.Add('Time to save/load 100000 objects with TalJsonDoc: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
-
-    except
-      on E: Exception do
-        MemoCreateDynamicallyJsonDocument.Lines.Add('Error: ' + E.Message);
-    end;
 
 end;
 
 {*************************************************************************}
 procedure TForm1.ButtonCreateDynamicallyJsonDocumentClick(Sender: TObject);
-Var aALJsonDocument: TALJsonDocument;
-    aALJsonDocumentU: TALJsonDocumentU;
-    aBytes: Tbytes;
-begin
-
-  if messageDlg('Use unicode version of TalJsonDoc (ie: TalJsonDocU)?', mtConfirmation, [TMsgDlgBtn.mbNo, TMsgDlgBtn.mbYes], 0) = MrNo then begin
-
-    aALJsonDocument:= TALJsonDocument.Create(true);
-    Try
-
-      aALJsonDocument.addchild('_id').float := 1.32;
-      with aALJsonDocument.addchild('name', ntObject) do begin
-        addchild('first').text := 'John';
-        addchild('last').text := 'Backus';
-      end;
-      aALJsonDocument.addchild('birth').datetime := Now;
-      with aALJsonDocument.addchild('contribs', ntArray) do begin
-        addchild.text := 'Fortran';
-        addchild.text := 'ALGOL';
-        addchild.text := 'Backus-Naur Form';
-        addchild.text := 'FP';
-      end;
-      with aALJsonDocument.addchild('awards', ntArray) do begin
-        with addchild(ntObject) do begin
-          addchild('award').text := 'National Medal of Science';
-          addchild('year').int32 := 1975;
-          addchild('by').text := 'National Science Foundation';
-        end;
-        with addchild(ntObject) do begin
-          addchild('award').text := 'Turing Award';
-          addchild('year').int32 := 1977;
-          addchild('by').text := 'ACM';
-        end;
-      end;
-      aALJsonDocument.addchild('spouse');
-      aALJsonDocument.addchild('address', ntObject);
-      aALJsonDocument.addchild('phones', ntArray);
-      with aALJsonDocument.AddChild('regex') do begin
-        RegEx := '<TAG\b[^>]*>(.*?)</TAG>';
-        RegExOptions := [preMultiLine, preCaseLess];
-      end;
-      with aALJsonDocument.AddChild('binary') do begin
-        binary := #1#2#3#4#5;
-        BinarySubType := 0;
-      end;
-      aALJsonDocument.AddChild('ObjectId').ObjectId := #1#2#3#4#5#6#7#8#9#0#1#2;
-
-      aALJsonDocument.Options := [doNodeAutoIndent];
-      MemoCreateDynamicallyJsonDocument.Lines.Text := String(aALJsonDocument.JSON);
-
-    finally
-      aALJsonDocument.Free;
-    end;
-
-  end
-  else begin
-
-    aALJsonDocumentU:= TALJsonDocumentU.Create(true);
-    Try
-
-      aALJsonDocumentU.addchild('_id').float := 1.32;
-      with aALJsonDocumentU.addchild('name', ntObject) do begin
-        addchild('first').text := 'John';
-        addchild('last').text := 'Backus';
-      end;
-      aALJsonDocumentU.addchild('birth').datetime := Now;
-      with aALJsonDocumentU.addchild('contribs', ntArray) do begin
-        addchild.text := 'Fortran';
-        addchild.text := 'ALGOL';
-        addchild.text := 'Backus-Naur Form';
-        addchild.text := 'FP';
-      end;
-      with aALJsonDocumentU.addchild('awards', ntArray) do begin
-        with addchild(ntObject) do begin
-          addchild('award').text := 'National Medal of Science';
-          addchild('year').int32 := 1975;
-          addchild('by').text := 'National Science Foundation';
-        end;
-        with addchild(ntObject) do begin
-          addchild('award').text := 'Turing Award';
-          addchild('year').int32 := 1977;
-          addchild('by').text := 'ACM';
-        end;
-      end;
-      aALJsonDocumentU.addchild('spouse');
-      aALJsonDocumentU.addchild('address', ntObject);
-      aALJsonDocumentU.addchild('phones', ntArray);
-      with aALJsonDocumentU.AddChild('regex') do begin
-        RegEx := '<TAG\b[^>]*>(.*?)</TAG>';
-        RegExOptions := [preMultiLine, preCaseLess];
-      end;
-      with aALJsonDocumentU.AddChild('binary') do begin
-        setlength(aBytes, 5);
-        Abytes[0] := 1;
-        Abytes[1] := 2;
-        Abytes[2] := 3;
-        Abytes[3] := 4;
-        Abytes[4] := 5;
-        binary := ALBase64EncodeBytesU(Abytes);
-        BinarySubType := 0;
-      end;
-      setlength(aBytes, 12);
-      Abytes[0] := 1;
-      Abytes[1] := 2;
-      Abytes[2] := 3;
-      Abytes[3] := 4;
-      Abytes[4] := 5;
-      Abytes[5] := 6;
-      Abytes[6] := 7;
-      Abytes[7] := 8;
-      Abytes[8] := 9;
-      Abytes[9] := 0;
-      Abytes[10] := 1;
-      Abytes[11] := 2;
-      aALJsonDocumentU.AddChild('ObjectId').ObjectId := albinToHexU(Abytes);
-
-      aALJsonDocumentU.Options := [doNodeAutoIndent];
-      MemoCreateDynamicallyJsonDocument.Lines.Text := aALJsonDocumentU.JSON;
-
-    finally
-      aALJsonDocumentU.Free;
-    end;
-
-  end;
-
-end;
-
-{******************************************************}
-procedure TForm1.ButtonSaveToBsonClick(Sender: TObject);
-Var aALJsonDocument: TALJsonDocument;
-    aALJsonDocumentU: TALJsonDocumentU;
-    aBsonStr: AnsiString;
-    aBsonBytes: Tbytes;
-    aBytes: Tbytes;
+Var LALJsonDocument: TALJsonDocument;
+    LALJsonDocumentU: TALJsonDocumentU;
+    LBsonStr: AnsiString;
+    LBsonBytes: Tbytes;
+    LBytes: Tbytes;
     i: integer;
 begin
 
-  //clear MemoLoadJsonDocumentSAXMODEResult
-  MemoCreateDynamicallyJsonDocument.Lines.Clear;
+  //clear MemoJSON
+  MemoJSON.Lines.Clear;
   MemoBSON.Lines.Clear;
+  MemoSaxModeEvents.Lines.Clear;
 
- if messageDlg('Use unicode version of TalJsonDoc (ie: TalJsonDocU)?', mtConfirmation, [TMsgDlgBtn.mbNo, TMsgDlgBtn.mbYes], 0) = MrNo then begin
+  if messageDlg('Use unicode version of TalJsonDoc (ie: TalJsonDocU)?', mtConfirmation, [TMsgDlgBtn.mbNo, TMsgDlgBtn.mbYes], 0) = MrNo then begin
 
-    aALJsonDocument:= TALJsonDocument.Create(true);
+    LALJsonDocument:= TALJsonDocument.Create(true);
     Try
 
-      aALJsonDocument.addchild('_id').float := 1.32;
-      with aALJsonDocument.addchild('name', ntObject) do begin
+      LALJsonDocument.addchild('_id').float := 1.32;
+      with LALJsonDocument.addchild('name', ntObject) do begin
         addchild('first').text := 'John';
         addchild('last').text := 'Backus';
       end;
-      aALJsonDocument.addchild('birth').datetime := Now;
-      with aALJsonDocument.addchild('contribs', ntArray) do begin
+      LALJsonDocument.addchild('birth').datetime := Now;
+      with LALJsonDocument.addchild('contribs', ntArray) do begin
         addchild.text := 'Fortran';
         addchild.text := 'ALGOL';
         addchild.text := 'Backus-Naur Form';
         addchild.text := 'FP';
       end;
-      with aALJsonDocument.addchild('awards', ntArray) do begin
+      with LALJsonDocument.addchild('awards', ntArray) do begin
         with addchild(ntObject) do begin
           addchild('award').text := 'National Medal of Science';
           addchild('year').int32 := 1975;
@@ -805,48 +229,48 @@ begin
           addchild('by').text := 'ACM';
         end;
       end;
-      aALJsonDocument.addchild('spouse');
-      aALJsonDocument.addchild('address', ntObject);
-      aALJsonDocument.addchild('phones', ntArray);
-      with aALJsonDocument.AddChild('regex') do begin
+      LALJsonDocument.addchild('spouse');
+      LALJsonDocument.addchild('address', ntObject);
+      LALJsonDocument.addchild('phones', ntArray);
+      with LALJsonDocument.AddChild('regex') do begin
         RegEx := '<TAG\b[^>]*>(.*?)</TAG>';
         RegExOptions := [preMultiLine, preCaseLess];
       end;
-      with aALJsonDocument.AddChild('binary') do begin
+      with LALJsonDocument.AddChild('binary') do begin
         binary := #1#2#3#4#5;
         BinarySubType := 0;
       end;
-      aALJsonDocument.AddChild('ObjectId').ObjectId := #1#2#3#4#5#6#7#8#9#0#1#2;
+      LALJsonDocument.AddChild('ObjectId').ObjectId := #1#2#3#4#5#6#7#8#9#0#1#2;
 
-      aALJsonDocument.Options := [doNodeAutoIndent];
-      MemoCreateDynamicallyJsonDocument.Lines.Text := String(aALJsonDocument.JSON);
-      aBsonStr := aALJsonDocument.BSON;
-      for I := 1 to length(aBsonStr) do
-        MemoBSON.Lines.add(Inttostr(ord(aBsonStr[i])));
+      LALJsonDocument.Options := [doNodeAutoIndent];
+      MemoJSON.Lines.Text := String(LALJsonDocument.JSON);
+      LBsonStr := LALJsonDocument.BSON;
+      for I := 1 to length(LBsonStr) do
+        MemoBSON.Lines.add(Inttostr(ord(LBsonStr[i])));
 
     finally
-      aALJsonDocument.Free;
+      LALJsonDocument.Free;
     end;
 
    end
    else begin
 
-      aALJsonDocumentU:= TALJsonDocumentU.Create(true);
+      LALJsonDocumentU:= TALJsonDocumentU.Create(true);
       Try
 
-        aALJsonDocumentU.addchild('_id').float := 1.32;
-        with aALJsonDocumentU.addchild('name', ntObject) do begin
+        LALJsonDocumentU.addchild('_id').float := 1.32;
+        with LALJsonDocumentU.addchild('name', ntObject) do begin
           addchild('first').text := 'John';
           addchild('last').text := 'Backus';
         end;
-        aALJsonDocumentU.addchild('birth').datetime := Now;
-        with aALJsonDocumentU.addchild('contribs', ntArray) do begin
+        LALJsonDocumentU.addchild('birth').datetime := Now;
+        with LALJsonDocumentU.addchild('contribs', ntArray) do begin
           addchild.text := 'Fortran';
           addchild.text := 'ALGOL';
           addchild.text := 'Backus-Naur Form';
           addchild.text := 'FP';
         end;
-        with aALJsonDocumentU.addchild('awards', ntArray) do begin
+        with LALJsonDocumentU.addchild('awards', ntArray) do begin
           with addchild(ntObject) do begin
             addchild('award').text := 'National Medal of Science';
             addchild('year').int32 := 1975;
@@ -858,101 +282,526 @@ begin
             addchild('by').text := 'ACM';
           end;
         end;
-        aALJsonDocumentU.addchild('spouse');
-        aALJsonDocumentU.addchild('address', ntObject);
-        aALJsonDocumentU.addchild('phones', ntArray);
-        with aALJsonDocumentU.AddChild('regex') do begin
+        LALJsonDocumentU.addchild('spouse');
+        LALJsonDocumentU.addchild('address', ntObject);
+        LALJsonDocumentU.addchild('phones', ntArray);
+        with LALJsonDocumentU.AddChild('regex') do begin
           RegEx := '<TAG\b[^>]*>(.*?)</TAG>';
           RegExOptions := [preMultiLine, preCaseLess];
         end;
-        with aALJsonDocumentU.AddChild('binary') do begin
-          setlength(aBytes, 5);
-          Abytes[0] := 1;
-          Abytes[1] := 2;
-          Abytes[2] := 3;
-          Abytes[3] := 4;
-          Abytes[4] := 5;
-          binary := ALBase64EncodeBytesU(Abytes);
+        with LALJsonDocumentU.AddChild('binary') do begin
+          setlength(LBytes, 5);
+          LBytes[0] := 1;
+          LBytes[1] := 2;
+          LBytes[2] := 3;
+          LBytes[3] := 4;
+          LBytes[4] := 5;
+          binary := ALBase64EncodeBytesU(LBytes);
           BinarySubType := 0;
         end;
-        setlength(aBytes, 12);
-        Abytes[0] := 1;
-        Abytes[1] := 2;
-        Abytes[2] := 3;
-        Abytes[3] := 4;
-        Abytes[4] := 5;
-        Abytes[5] := 6;
-        Abytes[6] := 7;
-        Abytes[7] := 8;
-        Abytes[8] := 9;
-        Abytes[9] := 0;
-        Abytes[10] := 1;
-        Abytes[11] := 2;
-        aALJsonDocumentU.AddChild('ObjectId').ObjectId := albinToHexU(Abytes);
+        setlength(LBytes, 12);
+        LBytes[0] := 1;
+        LBytes[1] := 2;
+        LBytes[2] := 3;
+        LBytes[3] := 4;
+        LBytes[4] := 5;
+        LBytes[5] := 6;
+        LBytes[6] := 7;
+        LBytes[7] := 8;
+        LBytes[8] := 9;
+        LBytes[9] := 0;
+        LBytes[10] := 1;
+        LBytes[11] := 2;
+        LALJsonDocumentU.AddChild('ObjectId').ObjectId := albinToHexU(LBytes);
 
-        aALJsonDocumentU.Options := [doNodeAutoIndent];
-        MemoCreateDynamicallyJsonDocument.Lines.Text := aALJsonDocumentU.JSON;
-        aBsonBytes := aALJsonDocumentU.BSON;
-        for I := 0 to length(aBsonBytes) - 1 do
-          MemoBSON.Lines.add(Inttostr(aBsonBytes[i]));
+        LALJsonDocumentU.Options := [doNodeAutoIndent];
+        MemoJSON.Lines.Text := LALJsonDocumentU.JSON;
+        LBsonBytes := LALJsonDocumentU.BSON;
+        for I := 0 to length(LBsonBytes) - 1 do
+          MemoBSON.Lines.add(Inttostr(LBsonBytes[i]));
 
       finally
-        aALJsonDocumentU.Free;
+        LALJsonDocumentU.Free;
       end;
 
    end;
 end;
 
+{*****************************************************}
+procedure TForm1.BtnRunBenchmarkClick(Sender: TObject);
+
+  const
+    _iterationcount: integer = 1000000;
+
+  function _scrollAllNode(aNode: TalJsonNode): Integer; overload;
+  Var LStack: Tstack;
+      i: integer;
+  begin
+    Result := 0;
+    LStack := Tstack.Create;
+    try
+
+      if aNode.NodeType in [ntArray, ntObject] then
+        For i := 0 to aNode.ChildNodes.Count - 1 do
+          LStack.Push(pointer(ANode.ChildNodes[i]));
+
+      While LStack.Count > 0 do begin
+        inc(result);
+        aNode := TalJsonNode(LStack.Pop);
+        if aNode.NodeType in [ntArray, ntObject] then
+          For i := 0 to ANode.ChildNodes.Count - 1 do
+            LStack.Push(pointer(ANode.ChildNodes[i]));
+      end;
+
+    finally
+      LStack.Free;
+    end;
+
+  end;
+
+  function _scrollAllNode(aNode: TalJsonNodeU): Integer; overload;
+  Var LStack: Tstack;
+      i: integer;
+  begin
+    Result := 0;
+    LStack := Tstack.Create;
+    try
+
+      if aNode.NodeType in [ntArray, ntObject] then
+        For i := 0 to aNode.ChildNodes.Count - 1 do
+          LStack.Push(pointer(ANode.ChildNodes[i]));
+
+      While LStack.Count > 0 do begin
+        inc(result);
+        aNode := TalJsonNodeU(LStack.Pop);
+        if aNode.NodeType in [ntArray, ntObject] then
+          For i := 0 to ANode.ChildNodes.Count - 1 do
+            LStack.Push(pointer(ANode.ChildNodes[i]));
+      end;
+
+    finally
+      LStack.Free;
+    end;
+
+  end;
+
+  function _scrollAllNode(aNode: ISuperObject): Integer; overload;
+  Var LStack: Tstack;
+      Litem: ISuperObject;
+  begin
+    Result := 0;
+    LStack := Tstack.Create;
+    try
+
+      for Litem in aNode do
+        LStack.Push(pointer(Litem));
+
+      While LStack.Count > 0 do begin
+        inc(result);
+        aNode := ISuperObject(LStack.Pop);
+          For Litem in ANode do
+            LStack.Push(pointer(Litem));
+      end;
+
+    finally
+      LStack.Free;
+    end;
+
+  end;
+
+  function _scrollAllNode(aNode: TJSONValue): Integer; overload;
+  Var LStack: Tstack;
+      Litem: TJSONValue;
+      Lpair: TjsonPair;
+  begin
+    Result := 0;
+    LStack := Tstack.Create;
+    try
+
+      if aNode is TJSONArray then
+        for Litem in (aNode as TJSONArray) do
+          LStack.Push(pointer(Litem))
+      else  if aNode is TJSONObject then
+        for Lpair in (aNode as TJSONObject) do
+           LStack.Push(pointer(Lpair.JsonValue));
+
+      While LStack.Count > 0 do begin
+        inc(result);
+        aNode := TJSONValue(LStack.Pop);
+        if aNode is TJSONArray then
+          For Litem in (aNode as TJSONArray) do
+            LStack.Push(pointer(Litem))
+          else  if aNode is TJSONObject then
+            for Lpair in (aNode as TJSONObject) do
+               LStack.Push(pointer(Lpair.JsonValue))
+      end;
+
+    finally
+      LStack.Free;
+    end;
+
+  end;
+
+  function _scrollAllNode(aNode: TdwsJSONValue): Integer; overload;
+  Var LStack: Tstack;
+      Litem: TdwsJSONValue;
+  begin
+    Result := 0;
+    LStack := Tstack.Create;
+    try
+
+      if aNode is TdwsJSONArray then
+        for Litem in (aNode as TdwsJSONArray) do
+          LStack.Push(pointer(Litem))
+      else  if aNode is TdwsJSONObject then
+        for Litem in (aNode as TdwsJSONObject) do
+           LStack.Push(pointer(Litem));
+
+      While LStack.Count > 0 do begin
+        inc(result);
+        aNode := TdwsJSONValue(LStack.Pop);
+        if aNode is TdwsJSONArray then
+          For Litem in (aNode as TdwsJSONArray) do
+            LStack.Push(pointer(Litem))
+          else  if aNode is TdwsJSONObject then
+            for Litem in (aNode as TdwsJSONObject) do
+               LStack.Push(pointer(Litem))
+      end;
+
+    finally
+      LStack.Free;
+    end;
+
+  end;
+
+  procedure _DoTALJsonDocJSONBench(Count: integer);
+  begin
+    //var LMemoryUsage := GetTotalMemoryAllocated;
+    var LALJsonDocument:= TALJsonDocument.Create;
+    Try
+      var LStopWatch := TstopWatch.StartNew;
+      LALJsonDocument.LoadFromJsonFile('..\sample.json');
+      LStopWatch.Stop;
+      chart1.Series[0].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Load (JSON)');
+      application.ProcessMessages;
+      //----
+      LALJsonDocument.Clear;
+      LStopWatch := TstopWatch.StartNew;
+      LALJsonDocument.LoadFromBsonFile('..\sample.bson');
+      LStopWatch.Stop;
+      chart1.Series[0].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Load (BSON)');
+      application.ProcessMessages;
+      //----
+      LStopWatch := TstopWatch.StartNew;
+      _scrollAllNode(LALJsonDocument.Node);
+      LStopWatch.Stop;
+      chart1.Series[0].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Scroll all nodes');
+      application.ProcessMessages;
+      //----
+      //MemoMemoryUsed.Lines.Add('TALJsonDocument: ' + FormatFloat('0,',(GetTotalMemoryAllocated - LMemoryUsage)) + ' bytes');
+      //application.ProcessMessages;
+      //----
+      for var I := 1 to count - 1 do
+        LALJsonDocument.Node.AddChild(ALLowerCase(ALRandomStr(7)));
+      //----
+      LStopWatch := TstopWatch.StartNew;
+      for var i := 1 to _iterationcount do
+        LALJsonDocument.Node.ChildNodes.FindNode(ALLowerCase(ALRandomStr(7)));
+      LStopWatch.Stop;
+      chart1.Series[0].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Find (unsorted)');
+      application.ProcessMessages;
+      //----
+      LALJsonDocument.Options := LALJsonDocument.Options + [doSorted];
+      LStopWatch := TstopWatch.StartNew;
+      for var i := 1 to _iterationcount do
+        LALJsonDocument.Node.ChildNodes.FindNode(ALLowerCase(ALRandomStr(7)));
+      LStopWatch.Stop;
+      chart1.Series[0].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Find (sorted)');
+      application.ProcessMessages;
+      //----
+      LStopWatch := TStopWatch.StartNew;
+      LALJsonDocument.SaveToJsonFile(ALGetModulePath + '~tmp.json');
+      LStopWatch.Stop;
+      ALDeleteFile(ALGetModulePath + '~tmp.json');
+      chart1.Series[0].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Save (JSON)');
+      application.ProcessMessages;
+      //----
+      LStopWatch := TStopWatch.StartNew;
+      LALJsonDocument.SaveToBsonFile(ALGetModulePath + '~tmp.bson');
+      LStopWatch.Stop;
+      ALDeleteFile(ALGetModulePath + '~tmp.bson');
+      chart1.Series[0].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Save (BSON)');
+      application.ProcessMessages;
+    finally
+      LALJsonDocument.Free;
+    end;
+  end;
+
+  procedure _DoTALJsonDocUJSONBench(Count: integer);
+  begin
+    //var LMemoryUsage := GetTotalMemoryAllocated;
+    var LALJsonDocument:= TALJsonDocumentU.Create;
+    Try
+      var LStopWatch := TstopWatch.StartNew;
+      LALJsonDocument.LoadFromJsonFile('..\sample.json');
+      LStopWatch.Stop;
+      chart1.Series[1].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Load (JSON)');
+      application.ProcessMessages;
+      //----
+      LALJsonDocument.Clear;
+      LStopWatch := TstopWatch.StartNew;
+      LALJsonDocument.LoadFromBsonFile('..\sample.bson');
+      LStopWatch.Stop;
+      chart1.Series[1].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Load (BSON)');
+      application.ProcessMessages;
+      //----
+      LStopWatch := TstopWatch.StartNew;
+      _scrollAllNode(LALJsonDocument.Node);
+      LStopWatch.Stop;
+      chart1.Series[1].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Scroll all nodes');
+      application.ProcessMessages;
+      //----
+      //MemoMemoryUsed.Lines.Add('TALJsonDocumentU: ' + FormatFloat('0,',(GetTotalMemoryAllocated - LMemoryUsage)) + ' bytes');
+      //application.ProcessMessages;
+      //----
+      for var I := 1 to count - 1 do
+        LALJsonDocument.Node.AddChild(ALLowerCase(ALRandomStr(7)));
+      //----
+      LStopWatch := TstopWatch.StartNew;
+      for var i := 1 to _iterationcount do
+        LALJsonDocument.Node.ChildNodes.FindNode(ALLowerCase(ALRandomStr(7)));
+      LStopWatch.Stop;
+      chart1.Series[1].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Find (unsorted)');
+      application.ProcessMessages;
+      //----
+      LALJsonDocument.Options := LALJsonDocument.Options + [doSorted];
+      LStopWatch := TstopWatch.StartNew;
+      for var i := 1 to _iterationcount do
+        LALJsonDocument.Node.ChildNodes.FindNode(ALLowerCase(ALRandomStr(7)));
+      LStopWatch.Stop;
+      chart1.Series[1].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Find (sorted)');
+      application.ProcessMessages;
+      //----
+      LStopWatch := TStopWatch.StartNew;
+      LALJsonDocument.SaveToJsonFile(ALGetModulePath + '~tmp.json');
+      LStopWatch.Stop;
+      ALDeleteFile(ALGetModulePath + '~tmp.json');
+      chart1.Series[1].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Save (JSON)');
+      application.ProcessMessages;
+      //----
+      LStopWatch := TStopWatch.StartNew;
+      LALJsonDocument.SaveToBsonFile(ALGetModulePath + '~tmp.bson');
+      LStopWatch.Stop;
+      ALDeleteFile(ALGetModulePath + '~tmp.bson');
+      chart1.Series[1].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Save (BSON)');
+      application.ProcessMessages;
+    finally
+      LALJsonDocument.Free;
+    end;
+  end;
+
+  procedure _DoSystemJSONBench(Count: integer);
+  begin
+    //var LMemoryUsage := GetTotalMemoryAllocated;
+    var LStopWatch := TstopWatch.StartNew;
+    var LJSONValue:= TJSONObject.ParseJSONValue(TFile.ReadAllText('..\sample.json'));
+    Try
+      LStopWatch.Stop;
+      chart1.Series[2].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Load (JSON)');
+      application.ProcessMessages;
+      //-----
+      chart1.Series[2].AddY(0, 'Load (BSON)');
+      //-----
+      LStopWatch := TstopWatch.StartNew;
+      _scrollAllNode(LJSONValue);
+      LStopWatch.Stop;
+      chart1.Series[2].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Scroll all nodes');
+      application.ProcessMessages;
+      //----
+      //MemoMemoryUsed.Lines.Add('System.JSON: ' + FormatFloat('0,',(GetTotalMemoryAllocated - LMemoryUsage)) + ' bytes');
+      //application.ProcessMessages;
+      //----
+      for var I := 1 to count - 1 do
+        TJSONObject(LJSONValue).AddPair(ALLowerCase(ALRandomStr(7)), '');
+      //----
+      LStopWatch := TstopWatch.StartNew;
+      for var i := 1 to _iterationcount do
+        LJSONValue.FindValue(ALLowerCaseU(ALRandomStrU(7)));
+      LStopWatch.Stop;
+      chart1.Series[2].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Find (unsorted)');
+      application.ProcessMessages;
+      //----
+      chart1.Series[2].AddY(0, 'Find (sorted)');
+      //-----
+      LStopWatch := TStopWatch.StartNew;
+      TFile.WriteAllText(ALGetModulePath + '~tmp.json', LJSONValue.ToString);
+      LStopWatch.Stop;
+      ALDeleteFile(ALGetModulePath + '~tmp.json');
+      chart1.Series[2].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Save (JSON)');
+      application.ProcessMessages;
+      //----
+      chart1.Series[2].AddY(0, 'Save (BSON)');
+      application.ProcessMessages;
+    finally
+      LJSONValue.Free;
+    end;
+  end;
+
+  procedure _DodwsJSONBench(Count: integer);
+  begin
+    //var LMemoryUsage := GetTotalMemoryAllocated;
+    var LStopWatch := TstopWatch.StartNew;
+    var LJSONValue:= TdwsJSONValue.ParseFile('..\sample.json');
+    Try
+      LStopWatch.Stop;
+      chart1.Series[3].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Load (JSON)');
+      application.ProcessMessages;
+      //-----
+      chart1.Series[3].AddY(0, 'Load (BSON)');
+      //-----
+      LStopWatch := TstopWatch.StartNew;
+      _scrollAllNode(LJSONValue);
+      LStopWatch.Stop;
+      chart1.Series[3].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Scroll all nodes');
+      application.ProcessMessages;
+      //----
+      //MemoMemoryUsed.Lines.Add('dwsJSON: ' + FormatFloat('0,',(GetTotalMemoryAllocated - LMemoryUsage)) + ' bytes');
+      //application.ProcessMessages;
+      //----
+      for var I := 1 to count - 1 do
+        TdwsJSONObject(LJSONValue).AddValue(ALLowerCase(ALRandomStr(7)), '');
+      //----
+      LStopWatch := TstopWatch.StartNew;
+      for var i := 1 to _iterationcount do
+        LJSONValue.Items[ALLowerCaseU(ALRandomStrU(7))];
+      LStopWatch.Stop;
+      chart1.Series[3].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Find (unsorted)');
+      application.ProcessMessages;
+      //----
+      chart1.Series[3].AddY(0, 'Find (sorted)');
+      //----
+      LStopWatch := TStopWatch.StartNew;
+      TFile.WriteAllText(ALGetModulePath + '~tmp.json', LJSONValue.ToString);
+      LStopWatch.Stop;
+      ALDeleteFile(ALGetModulePath + '~tmp.json');
+      chart1.Series[3].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Save (JSON)');
+      application.ProcessMessages;
+      //----
+      chart1.Series[3].AddY(0, 'Save (BSON)');
+      application.ProcessMessages;
+    finally
+      LJSONValue.Free;
+    end;
+  end;
+
+  procedure _DoSuperObjectBench(Count: integer);
+  begin
+    //var LMemoryUsage := GetTotalMemoryAllocated;
+    var LStopWatch := TstopWatch.StartNew;
+    var Lobj := TSuperObject.ParseFile('..\sample.json', false);
+    LStopWatch.Stop;
+    chart1.Series[4].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Load (JSON)');
+    application.ProcessMessages;
+    //-----
+    chart1.Series[4].AddY(0, 'Load (BSON)');
+    //-----
+    LStopWatch := TstopWatch.StartNew;
+    _scrollAllNode(Lobj);
+    LStopWatch.Stop;
+    chart1.Series[4].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'scroll all nodes');
+    application.ProcessMessages;
+    //----
+    //MemoMemoryUsed.Lines.Add('SuperObject: ' + FormatFloat('0,',(GetTotalMemoryAllocated - LMemoryUsage)) + ' bytes');
+    //application.ProcessMessages;
+    //----
+    for var I := 1 to count - 1 do
+      Lobj.S[ALLowerCase(ALRandomStr(7))] := '';
+    //----
+    LStopWatch := TstopWatch.StartNew;
+    for var i := 1 to _iterationcount do
+      Lobj[ALLowerCaseU(ALRandomStrU(7))];
+    LStopWatch.Stop;
+    chart1.Series[4].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Find (unsorted)');
+    application.ProcessMessages;
+    //----
+    chart1.Series[4].AddY(0, 'Find (sorted)');
+    //----
+    LStopWatch := TStopWatch.StartNew;
+    Lobj.SaveTo(string(ALGetModulePath) + '~tmp.json');
+    LStopWatch.Stop;
+    ALDeleteFile(ALGetModulePath + '~tmp.json');
+    chart1.Series[4].AddY(LStopWatch.Elapsed.TotalMilliseconds, 'Save (JSON)');
+    application.ProcessMessages;
+    //----
+    chart1.Series[4].AddY(0, 'Save (BSON)');
+    application.ProcessMessages;
+  end;
+
+begin
+
+  chart1.Series[0].Clear;
+  chart1.Series[1].Clear;
+  chart1.Series[2].Clear;
+  chart1.Series[3].Clear;
+  chart1.Series[4].Clear;
+  if CheckBoxTALJsonDocJSON.Checked then _DoTALJsonDocJSONBench(StrToInt(SpinEditNbItems.Text));
+  if CheckBoxTALJsonDocUJSON.Checked then _DoTALJsonDocUJSONBench(StrToInt(SpinEditNbItems.Text));
+  if CheckBoxSystemJSON.Checked then _DoSystemJSONBench(StrToInt(SpinEditNbItems.Text));
+  if CheckBoxdwsJSON.Checked then _DodwsJSONBench(StrToInt(SpinEditNbItems.Text));
+  if CheckBoxSuperObject.Checked then _DoSuperObjectBench(StrToInt(SpinEditNbItems.Text));
+
+end;
+
 {*********************************************}
 procedure TForm1.Button1Click(Sender: TObject);
-var aBsonStr: AnsiString;
-    aALJsonDocument: TALJsonDocument;
-    aALJsonDocumentU: TALJsonDocumentU;
+var LBsonStr: AnsiString;
+    LALJsonDocument: TALJsonDocument;
+    LALJsonDocumentU: TALJsonDocumentU;
     i: integer;
 begin
-  aBsonStr := '';
+  LBsonStr := '';
   for I := 0 to MemoBSON.Lines.Count - 1 do
-    aBsonStr := aBsonStr + AnsiChar(StrToInt(MemoBSON.Lines[i]));
-  MemoCreateDynamicallyJsonDocument.Lines.Clear;
+    LBsonStr := LBsonStr + AnsiChar(StrToInt(MemoBSON.Lines[i]));
+  MemoJSON.Lines.Clear;
+  MemoSaxModeEvents.lines.clear;
 
   if messageDlg('Use unicode version of TalJsonDoc (ie: TalJsonDocU)?', mtConfirmation, [TMsgDlgBtn.mbNo, TMsgDlgBtn.mbYes], 0) = MrNo then begin
 
     //exemple 1 load the JSON doc in memory
-    aALJsonDocument := TALJsonDocument.Create;
+    LALJsonDocument := TALJsonDocument.Create;
     try
-      aALJsonDocument.LoadFromBSONString(aBsonStr);
-      aALJsonDocument.Options := [doNodeAutoIndent];
-      MemoCreateDynamicallyJsonDocument.Lines.Text := String(aALJsonDocument.JSON);
+      LALJsonDocument.LoadFromBSONString(LBsonStr);
+      LALJsonDocument.Options := [doNodeAutoIndent];
+      MemoJSON.Lines.Text := String(LALJsonDocument.JSON);
     finally
-      aALJsonDocument.Free;
+      LALJsonDocument.Free;
     end;
 
     //exemple 2 load the JSON doc in SAX MODE
-    MemoLoadJsonDocumentSAXMODEResult.Lines.Clear;
-    aALJsonDocument := TALJsonDocument.Create;
+    LALJsonDocument := TALJsonDocument.Create;
     try
-      aALJsonDocument.onParseText := procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType)
+      LALJsonDocument.onParseText := procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType)
                                      begin
                                        case NodeSubType of
-                                         nstFloat: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + string(ALFloatToStr(Args[0].VExtended^, ALDefaultFormatSettings)));
-                                         nstText: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
+                                         nstFloat: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + string(ALFloatToStr(Args[0].VExtended^, ALDefaultFormatSettings)));
+                                         nstText: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
                                          nstObject: ;
                                          nstArray: ;
-                                         nstObjectID: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'ObjectId("'+string(ALBinToHex(ansiString(Args[0].VAnsiString)))+'")');
-                                         nstBoolean: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + String(ALBoolToStr(Args[0].VBoolean,'true','false')));
-                                         nstDateTime: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + string(ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettings)));
-                                         nstNull: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'null');
-                                         nstRegEx: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
-                                         nstBinary: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'BinData('+inttostr(Args[1].VInteger)+', "'+string(ansiString(ALBase64EncodeString(ansiString(Args[0].VAnsiString))))+'")');
-                                         nstJavascript: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
-                                         nstInt32: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'NumberInt('+inttostr(Args[0].VInteger)+')');
-                                         nstTimestamp: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'Timestamp('+inttostr(int64(cardinal(Args[0].VInteger)))+', '+inttostr(int64(cardinal(Args[1].VInteger)))+')');
-                                         nstInt64: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
+                                         nstObjectID: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + 'ObjectId("'+string(ALBinToHex(ansiString(Args[0].VAnsiString)))+'")');
+                                         nstBoolean: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + String(ALBoolToStr(Args[0].VBoolean,'true','false')));
+                                         nstDateTime: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + string(ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettings)));
+                                         nstNull: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + 'null');
+                                         nstRegEx: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
+                                         nstBinary: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + 'BinData('+inttostr(Args[1].VInteger)+', "'+string(ansiString(ALBase64EncodeString(ansiString(Args[0].VAnsiString))))+'")');
+                                         nstJavascript: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
+                                         nstInt32: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + 'NumberInt('+inttostr(Args[0].VInteger)+')');
+                                         nstTimestamp: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + 'Timestamp('+inttostr(int64(cardinal(Args[0].VInteger)))+', '+inttostr(int64(cardinal(Args[1].VInteger)))+')');
+                                         nstInt64: MemoSaxModeEvents.Lines.Add(String(Path) + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
                                        end;
                                      end;
-      aALJsonDocument.LoadFromBSONString(aBsonStr, true{saxMode});
+      LALJsonDocument.LoadFromBSONString(LBsonStr, true{saxMode});
     finally
-      aALJsonDocument.Free;
+      LALJsonDocument.Free;
     end;
 
   end
@@ -960,41 +809,40 @@ begin
 
 
     //exemple 1 load the JSON doc in memory
-    aALJsonDocumentU := TALJsonDocumentU.Create;
+    LALJsonDocumentU := TALJsonDocumentU.Create;
     try
-      aALJsonDocumentU.LoadFromBSONBytes(BytesOf(aBsonStr));
-      aALJsonDocumentU.Options := [doNodeAutoIndent];
-      MemoCreateDynamicallyJsonDocument.Lines.Text := String(aALJsonDocumentU.JSON);
+      LALJsonDocumentU.LoadFromBSONBytes(BytesOf(LBsonStr));
+      LALJsonDocumentU.Options := [doNodeAutoIndent];
+      MemoJSON.Lines.Text := String(LALJsonDocumentU.JSON);
     finally
-      aALJsonDocumentU.Free;
+      LALJsonDocumentU.Free;
     end;
 
     //exemple 2 load the JSON doc in SAX MODE
-    MemoLoadJsonDocumentSAXMODEResult.Lines.Clear;
-    aALJsonDocumentU := TALJsonDocumentU.Create;
+    LALJsonDocumentU := TALJsonDocumentU.Create;
     try
-      aALJsonDocumentU.onParseText := procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType)
+      LALJsonDocumentU.onParseText := procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType)
                                        begin
                                          case NodeSubType of
-                                           nstFloat: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + ALFloatToStrU(Args[0].VExtended^, ALDefaultFormatSettingsU));
-                                           nstText: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + String(Args[0].VUnicodeString));
+                                           nstFloat: MemoSaxModeEvents.Lines.Add(Path + '=' + ALFloatToStrU(Args[0].VExtended^, ALDefaultFormatSettingsU));
+                                           nstText: MemoSaxModeEvents.Lines.Add(Path + '=' + String(Args[0].VUnicodeString));
                                            nstObject: ;
                                            nstArray: ;
-                                           nstObjectID: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + 'ObjectId("'+String(Args[0].VUnicodeString)+'")');
-                                           nstBoolean: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + ALBoolToStrU(Args[0].VBoolean,'true','false'));
-                                           nstDateTime: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + ALFormatDateTimeU('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettingsU));
-                                           nstNull: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + 'null');
-                                           nstRegEx: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + String(Args[0].VUnicodeString));
-                                           nstBinary: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + 'BinData('+ALinttostrU(Args[1].VInteger)+', "'+String(Args[0].VunicodeString)+'")');
-                                           nstJavascript: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + String(Args[0].VUnicodeString));
-                                           nstInt32: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + 'NumberInt('+alinttostrU(Args[0].VInteger)+')');
-                                           nstTimestamp: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + 'Timestamp('+alinttostrU(int64(cardinal(Args[0].VInteger)))+', '+alinttostrU(int64(cardinal(Args[1].VInteger)))+')');
-                                           nstInt64: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(Path + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
+                                           nstObjectID: MemoSaxModeEvents.Lines.Add(Path + '=' + 'ObjectId("'+String(Args[0].VUnicodeString)+'")');
+                                           nstBoolean: MemoSaxModeEvents.Lines.Add(Path + '=' + ALBoolToStrU(Args[0].VBoolean,'true','false'));
+                                           nstDateTime: MemoSaxModeEvents.Lines.Add(Path + '=' + ALFormatDateTimeU('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettingsU));
+                                           nstNull: MemoSaxModeEvents.Lines.Add(Path + '=' + 'null');
+                                           nstRegEx: MemoSaxModeEvents.Lines.Add(Path + '=' + String(Args[0].VUnicodeString));
+                                           nstBinary: MemoSaxModeEvents.Lines.Add(Path + '=' + 'BinData('+ALinttostrU(Args[1].VInteger)+', "'+String(Args[0].VunicodeString)+'")');
+                                           nstJavascript: MemoSaxModeEvents.Lines.Add(Path + '=' + String(Args[0].VUnicodeString));
+                                           nstInt32: MemoSaxModeEvents.Lines.Add(Path + '=' + 'NumberInt('+alinttostrU(Args[0].VInteger)+')');
+                                           nstTimestamp: MemoSaxModeEvents.Lines.Add(Path + '=' + 'Timestamp('+alinttostrU(int64(cardinal(Args[0].VInteger)))+', '+alinttostrU(int64(cardinal(Args[1].VInteger)))+')');
+                                           nstInt64: MemoSaxModeEvents.Lines.Add(Path + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
                                          end;
                                        end;
-      aALJsonDocumentU.LoadFromBSONBytes(BytesOf(aBsonStr), true{saxMode});
+      LALJsonDocumentU.LoadFromBSONBytes(BytesOf(LBsonStr), true{saxMode});
     finally
-      aALJsonDocumentU.Free;
+      LALJsonDocumentU.Free;
     end;
 
   end;

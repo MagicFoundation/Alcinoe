@@ -236,6 +236,7 @@ Type
     procedure InsertItem(Index: Integer; const S: AnsiString; AObject: TObject); virtual;
     procedure AssignTo(Dest: TPersistent); override; //[added from Tstrings]
     procedure init(OwnsObjects: Boolean); virtual; //[added from TStringList]
+    function Find(const S: AnsiString; var Index: Integer): Boolean; virtual;
   public
     constructor Create; overload; override;
     constructor Create(OwnsObjects: Boolean); reintroduce; overload;
@@ -247,7 +248,6 @@ Type
     procedure Delete(Index: Integer); override;
     function  ExtractObject(Index: Integer): TObject; overload; virtual;
     procedure Exchange(Index1, Index2: Integer); override;
-    function Find(const S: AnsiString; var Index: Integer): Boolean; virtual;
     function FindName(const S: AnsiString; var Index: Integer): Boolean; // [added from TStringList]
     function IndexOf(const S: AnsiString): Integer; override;
     function IndexOfName(const Name: AnsiString): Integer; override; // [added from TStringList]
@@ -325,6 +325,7 @@ Type
     procedure InsertItem(Index: Integer; const Name, Value: AnsiString; AObject: TObject); overload; virtual; //[added from TStringList]
     procedure AssignTo(Dest: TPersistent); override; //[added from Tstrings]
     procedure init(OwnsObjects: Boolean); virtual; //[added from TStringList]
+    function Find(const S: AnsiString; var Index: Integer): Boolean; virtual;
   public
     constructor Create; overload; override;
     constructor Create(OwnsObjects: Boolean); reintroduce; overload;
@@ -338,7 +339,6 @@ Type
     procedure Delete(Index: Integer); override;
     function  ExtractObject(Index: Integer): TObject; overload; virtual;
     procedure Exchange(Index1, Index2: Integer); override;
-    function Find(const S: AnsiString; var Index: Integer): Boolean; virtual;
     function FindName(const Name: AnsiString; var Index: Integer): Boolean; overload; // [added from TStringList]
     function FindName(const Name: AnsiString; WithNvS: boolean; var Index: Integer): Boolean; overload; // [added from TStringList]
     function FindNameValue(const Name, Value: AnsiString; var Index: Integer): Boolean;  // [added from TStringList]
@@ -724,6 +724,7 @@ type
     procedure InsertItem(Index: Integer; const S: String; AObject: TObject); virtual;
     procedure AssignTo(Dest: TPersistent); override; //[added from Tstrings]
     procedure init(OwnsObjects: Boolean); virtual; //[added from TStringList]
+    function Find(const S: String; var Index: Integer): Boolean; virtual;
   public
     constructor Create; overload; override;
     constructor Create(OwnsObjects: Boolean); reintroduce; overload;
@@ -735,7 +736,6 @@ type
     procedure Delete(Index: Integer); override;
     function  ExtractObject(Index: Integer): TObject; overload; virtual;
     procedure Exchange(Index1, Index2: Integer); override;
-    function Find(const S: String; var Index: Integer): Boolean; virtual;
     function FindName(const S: String; var Index: Integer): Boolean; // [added from TStringList]
     function IndexOf(const S: String): Integer; override;
     function IndexOfName(const Name: String): Integer; override; // [added from TStringList]
@@ -813,6 +813,7 @@ type
     procedure InsertItem(Index: Integer; const Name, Value: String; AObject: TObject); overload; virtual; //[added from TStringList]
     procedure AssignTo(Dest: TPersistent); override; //[added from Tstrings]
     procedure init(OwnsObjects: Boolean); virtual; //[added from TStringList]
+    function Find(const S: String; var Index: Integer): Boolean; virtual;
   public
     constructor Create; overload; override;
     constructor Create(OwnsObjects: Boolean); reintroduce; overload;
@@ -826,7 +827,6 @@ type
     procedure Delete(Index: Integer); override;
     function  ExtractObject(Index: Integer): TObject; overload; virtual;
     procedure Exchange(Index1, Index2: Integer); override;
-    function Find(const S: String; var Index: Integer): Boolean; virtual;
     function FindName(const Name: String; var Index: Integer): Boolean; overload; // [added from TStringList]
     function FindName(const Name: String; WithNvS: boolean; var Index: Integer): Boolean; overload; // [added from TStringList]
     function FindNameValue(const Name, Value: String; var Index: Integer): Boolean;  // [added from TStringList]

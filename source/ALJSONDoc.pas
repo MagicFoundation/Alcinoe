@@ -276,7 +276,9 @@ type
     destructor Destroy; override;
     procedure Sort;
     procedure CustomSort(Compare: TALJSONNodeListSortCompare);
-    property Duplicates: TDuplicates read FDuplicates write FDuplicates;
+    procedure SetDuplicates(Value: TDuplicates; Recurse: Boolean); overload;
+    procedure SetDuplicates(Value: TDuplicates); overload;
+    property Duplicates: TDuplicates read FDuplicates write SetDuplicates;
     procedure SetSorted(Value: Boolean; Recurse: Boolean); overload;
     procedure SetSorted(Value: Boolean); overload;
     property Sorted: Boolean read FSorted write SetSorted;
@@ -594,6 +596,7 @@ type
     procedure SetJSON(const Value: ansiString);
     procedure SetBSON(const Value: ansiString);
     procedure SetNodeIndentStr(const Value: AnsiString);
+    procedure SetDuplicates(const Value: TDuplicates);
   public
     constructor Create(const aActive: Boolean = True); overload; virtual;
     constructor Create(const aFormatSettings: TALformatSettings; const aActive: Boolean = True); overload; virtual;
@@ -678,7 +681,7 @@ type
     property NodeIndentStr: AnsiString read GetNodeIndentStr write SetNodeIndentStr;
     property Options: TALJSONDocOptions read GetOptions write SetOptions;
     property ParseOptions: TALJSONParseOptions read GetParseOptions write SetParseOptions;
-    property Duplicates: TDuplicates read FDuplicates write FDuplicates; // In pair with doSorted in options
+    property Duplicates: TDuplicates read FDuplicates write SetDuplicates; // In pair with doSorted in options
     property PathSeparator: ansiChar read GetPathSeparator write SetPathSeparator;
     property JSON: AnsiString read GetJSON write SetJSON;
     property BSON: AnsiString read GetBSON write SetBSON;
@@ -816,7 +819,9 @@ type
     destructor Destroy; override;
     procedure Sort;
     procedure CustomSort(Compare: TALJSONNodeListSortCompareU);
-    property Duplicates: TDuplicates read FDuplicates write FDuplicates;
+    procedure SetDuplicates(Value: TDuplicates; Recurse: Boolean); overload;
+    procedure SetDuplicates(Value: TDuplicates); overload;
+    property Duplicates: TDuplicates read FDuplicates write SetDuplicates;
     procedure SetSorted(Value: Boolean; Recurse: Boolean); overload;
     procedure SetSorted(Value: Boolean); overload;
     property Sorted: Boolean read FSorted write SetSorted;
@@ -1135,6 +1140,7 @@ type
     procedure SetJSON(const Value: String);
     procedure SetBSON(const Value: Tbytes);
     procedure SetNodeIndentStr(const Value: String);
+    procedure SetDuplicates(const Value: TDuplicates);
   public
     constructor Create(const aActive: Boolean = True); overload; virtual;
     constructor Create(const aFormatSettings: TALformatSettingsU; const aActive: Boolean = True); overload; virtual;
@@ -1221,7 +1227,7 @@ type
     property NodeIndentStr: String read GetNodeIndentStr write SetNodeIndentStr;
     property Options: TALJSONDocOptions read GetOptions write SetOptions;
     property ParseOptions: TALJSONParseOptions read GetParseOptions write SetParseOptions;
-    property Duplicates: TDuplicates read FDuplicates write FDuplicates; // In pair with doSorted in options
+    property Duplicates: TDuplicates read FDuplicates write SetDuplicates; // In pair with doSorted in options
     property PathSeparator: Char read GetPathSeparator write SetPathSeparator;
     property JSON: String read GetJSON write SetJSON;
     property BSON: Tbytes read GetBSON write SetBSON;
@@ -4668,6 +4674,18 @@ begin
   FNodeIndentStr := Value;
 end;
 
+{****************************************************************}
+procedure TALJSONDocument.SetDuplicates(const Value: TDuplicates);
+begin
+  if FDuplicates <> Value then begin
+    FDuplicates := Value;
+    if assigned(FDocumentNode) then begin
+      Var LNodeList := FDocumentNode.InternalGetChildNodes;
+      if LNodeList <> nil then LNodeList.SetDuplicates(FDuplicates, True{Recurse})
+    end;
+  end;
+end;
+
 {*****************************************}
 {Returns the value of the Options property.
  GetOptions is the read implementation of the Options property.}
@@ -7863,6 +7881,24 @@ begin
     SetLength(FList, NewCapacity);
     FCapacity := NewCapacity;
   end;
+end;
+
+{****************************************************************************}
+procedure TALJSONNodeList.SetDuplicates(Value: TDuplicates; Recurse: Boolean);
+begin
+  FDuplicates := Value;
+  if Recurse then begin
+    for Var I := 0 to count-1 do begin
+      Var LNodeList := Get(i).InternalGetChildNodes;
+      if LNodeList <> nil then LNodeList.SetDuplicates(Value,Recurse);
+    end;
+  end;
+end;
+
+{**********************************************************}
+procedure TALJSONNodeList.SetDuplicates(Value: TDuplicates);
+begin
+  SetDuplicates(Value, False);
 end;
 
 {********************************************************************}
@@ -11513,6 +11549,18 @@ begin
   FNodeIndentStr := Value;
 end;
 
+{*****************************************************************}
+procedure TALJSONDocumentu.SetDuplicates(const Value: TDuplicates);
+begin
+  if FDuplicates <> Value then begin
+    FDuplicates := Value;
+    if assigned(FDocumentNode) then begin
+      Var LNodeList := FDocumentNode.InternalGetChildNodes;
+      if LNodeList <> nil then LNodeList.SetDuplicates(FDuplicates, True{Recurse})
+    end;
+  end;
+end;
+
 {*****************************************}
 {Returns the value of the Options property.
  GetOptions is the read implementation of the Options property.}
@@ -14746,6 +14794,24 @@ begin
     SetLength(FList, NewCapacity);
     FCapacity := NewCapacity;
   end;
+end;
+
+{*****************************************************************************}
+procedure TALJSONNodeListU.SetDuplicates(Value: TDuplicates; Recurse: Boolean);
+begin
+  FDuplicates := Value;
+  if Recurse then begin
+    for Var I := 0 to count-1 do begin
+      Var LNodeList := Get(i).InternalGetChildNodes;
+      if LNodeList <> nil then LNodeList.SetDuplicates(Value,Recurse);
+    end;
+  end;
+end;
+
+{***********************************************************}
+procedure TALJSONNodeListU.SetDuplicates(Value: TDuplicates);
+begin
+  SetDuplicates(Value, False);
 end;
 
 {*********************************************************************}

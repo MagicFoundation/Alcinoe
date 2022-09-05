@@ -104,11 +104,6 @@ IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"
 
-SET FileName=%ProjectDir%\source\hpp\Win32\%DELPHI_NAME%
-IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-if exist "%FileName%" goto ERROR
-mkdir "%FileName%"
-
 SET FileName=%ProjectDir%\lib\bpl\alcinoe\Win32\%DELPHI_NAME%
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR

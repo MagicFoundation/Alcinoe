@@ -1,0 +1,17 @@
+[Linker]
+ExeDescription=JEDI Code Library DUnit tests
+[Directories]
+SearchPath=$(DELPHI)\Lib\Debug;..\..\..\..\dunit\src
+Conditionals=
+[Parameters]
+[Version Info]
+IncludeVerInfo=1
+AutoIncBuild=0
+MajorVer=1
+MinorVer=94
+Release=1
+[Version Info Keys]
+CompanyName=Project JEDI
+FileDescription=JEDI Code Library DUnit testing
+FileVersion=1.94.1.0
+ProductVersion=1.94.1.0

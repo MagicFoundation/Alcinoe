@@ -1,0 +1,161 @@
+@@IJclListener
+<GROUP Notifications>
+Summary
+  Interface for listener implementations.
+Description
+  IJclListener defines the interface required in a notifier/listener pattern
+  setup. It consists of a single method, called by the notifier for each message
+  being passed to it.
+
+  See the <LINK @@BaseServices.Notifications, topic on notifier/listener pattern>
+  for more information on how to use this and related interfaces.
+Donator
+  Marcel Bestebroer
+--------------------------------------------------------------------------------
+@@IJclListener.Notification
+Summary
+  Notification callback.
+Description
+  Notification is called by the notifier's <LINK IJclNotifier.Notify, Notify>
+  method if the listener is registered with the notifier.
+
+  The provided message is passed on from the process calling the
+  <LINK IJclNotifier.Notify, Notify> method. Most real world implementations
+  will have implemented additional interfaces (or an interface derived from
+  IJclNotificationMessage) to provide actual information on the nature of the
+  notification.
+Parameters
+  msg - A message containing additional information on the nature of the
+          notification.
+--------------------------------------------------------------------------------
+@@IJclNotifier
+<GROUP Notifications>
+Summary
+  Interface for notifier implementations.
+Description
+  IJclNotifier defines the interface required in a notifier/listener pattern
+  setup. It consists of a two management methods and a notifier method.
+
+  See the <LINK @@BaseServices.Notifications, topic on notifier/listener pattern>
+  for more information on how to use this and related interfaces.
+Donator
+  Marcel Bestebroer
+--------------------------------------------------------------------------------
+@@IJclNotifier.Add
+Summary
+  Adds a listener to the notifier.
+Description
+  Add will register the specified listener with the notifier. If the specified
+  listener is already registered with the notifier, nothing will happen.
+Parameters
+  listener - The IJclListener implementation to register with the notifier.
+--------------------------------------------------------------------------------
+@@IJclNotifier.Notify
+Summary
+  Notifies all listeners of an event.
+Description
+  Notify will iterate all registered listeners and call their
+  <LINK IJclNotificationMessage.Notification, Notification> method, passing the
+  provided message.
+Parameters
+  msg - A message containing additional information on the nature of the
+          notification. The message is passed on to the listeners currently
+          registered with the notifier.
+--------------------------------------------------------------------------------
+@@IJclNotifier.Remove
+Summary
+  Removes a listener from the notifier.
+Description
+  Remove will unregister the specified listener from the notifier. If the
+  specified listener is not registered with the notifier, nothing will happen.
+Parameters
+  listener - The IJclListener implementation to unregister from the notifier.
+--------------------------------------------------------------------------------
+@@IJclNotificationMessage
+<GROUP Notifications>
+Summary
+  Interface for notification message implementations.
+Description
+  IJclNotificationMessage defines the interface required in a notifier/listener
+  pattern setup. It serves as a place holder to various notification messages
+  and implementers will either use a derived interface or additional interface
+  to provide process-specific information.
+
+  See the <LINK @@BaseServices.Notifications, topic on notifier/listener pattern>
+  for more information on how to use this and related interfaces.
+Donator
+  Marcel Bestebroer
+--------------------------------------------------------------------------------
+@@TJclBaseNotifier
+<GROUP Notifications>
+Summary
+  Base implementation of IJclNotifier.
+Description
+  TJclBaseNotifier is a base implementation of IJclNotifier. It provides
+  notification in a sequential order, using the same order in which listeners
+  were registered.
+
+*Thread safety *
+  If the unit is compiled with the THREADSAFE define, all access to the
+  notifier list is protected using a multi-read/exclusive-write synchronization
+  object.
+
+  Sending notifications is seen as a read-only operation since the list is not
+  modified.
+
+  Note that TJclBaseNotifier does not create threads when generating the
+  notifications. Each listener is notified in a sequential manner, where each
+  listener will have to wait for the previous listener to finish. A call to the
+  IJclNotifier.Notify will thus not finish until all listeners have processed
+  the notification.
+
+* Notes *
+  Using this implementation does not imply TJclBaseListener or
+  TJclBaseNotificationMessage have to be used; TJclBaseNotifier will handle
+  any IJclListener and IJclNotificationMessage implementation.
+Donator
+  Marcel Bestebroer
+--------------------------------------------------------------------------------
+@@TJclBaseNotifier.Add
+<ALIAS IJclNotifier.Add>
+--------------------------------------------------------------------------------
+@@TJclBaseNotifier.Notify
+<ALIAS IJclNotifier.Notify>
+--------------------------------------------------------------------------------
+@@TJclBaseNotifier.Remove
+<ALIAS IJclNotifier.Remove>
+--------------------------------------------------------------------------------
+@@TJclBaseNotificationMessage
+<GROUP Notifications>
+Summary
+  Base implementation of IJclNotificationMessage.
+Description
+  TJclBaseNotificationMessage is a base implementation of IJclNotificationMessage.
+  Since the interface only serves as a place holder, you should create
+  derivatives of this class, implementing either one or more additional
+  interfaces, or implementing an interface derived from IJclNotificationMessage.
+
+* Notes *
+  Using this implementation does not imply TJclBaseNotifier or
+  TJclBaseListener have to be used; TJclBaseNotificationMessage will be handled
+  by any IJclListener and IJclNotificationMessage implementation.
+Donator
+  Marcel Bestebroer
+--------------------------------------------------------------------------------
+@@TJclBaseListener
+<GROUP Notifications>
+Summary
+  Base implementation of IJclListener.
+Description
+  TJclBaseListener is a base implementation of IJclListener. It declares an
+  empty, virtual implementation for the Notification method. Descendants should
+  override the method to process the notification messages.
+
+* Notes *
+  Using this implementation does not imply TJclBaseNotifier or
+  TJclBaseNotificationMessage have to be used; TJclBaseListener will handle
+  any IJclNotifier and IJclNotificationMessage implementation.
+Donator
+  Marcel Bestebroer
+--------------------------------------------------------------------------------
+

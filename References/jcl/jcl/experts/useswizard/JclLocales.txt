@@ -1,0 +1,11 @@
+JclLocalesInfoList
+TJclLocaleDateFormats
+TJclLocalesDays
+TJclLocalesMonths
+TJclKeyboardLayoutList
+TJclKeyboardLayout
+TJclKeybLayoutFlag
+TJclAvailableKeybLayout
+TJclLocaleInfo
+TJclLocalesKind
+TJclLocalesList

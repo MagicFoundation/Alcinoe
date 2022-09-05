@@ -1,0 +1,13 @@
+FreeTokenInformation
+CreateNullDacl
+CreateInheritable
+LookupAccountBySid
+QueryTokenInformation
+GetInteractiveUserName
+IsPrivilegeEnabled
+EnableProcessPrivilege
+EnableThreadPrivilege
+IsAdministrator
+GetPrivilegeDisplayName
+GetUserObjectName
+SetUserObjectFullAccess

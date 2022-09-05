@@ -1,0 +1,15 @@
+20070529 : Read blob truncates last byte for ADO - by zx - See http://zeos.firmos.at/viewtopic.php?t=1250
+
+20070530 : Error handling empty string values (makes them NULLS) - by zx - see http://zeos.firmos.at/viewtopic.php?t=1255
+
+20070603 : TZAdoDatabaseMetadata.GetColumns doesn't fetch database and schema names. - by zx - See http://zeos.firmos.at/viewtopic.php?t=1252
+
+20070603 : Set autocommit issue when transaction isolation=tiNone - by zx - See http://zeos.firmos.at/viewtopic.php?t=1251
+
+20080325 : ADO and MsAccess Post() problem - by FrankSL - See http://zeos.firmos.at/viewtopic.php?t=1769
+
+20080920 : method calls (GetSchemaNames() and GetCatalogNames()) ran into an exception - by mdaems - See http://zeos.firmos.at/viewtopic.php?t=1774
+
+20081213 : Column type metadata request for MSSQL returns no type - by cytrinox - See http://zeos.firmos.at/viewtopic.php?t=2155
+
+20090402 : SQLServer default GUID fieldlength incorrect - by JWBokx - See http://zeos.firmos.at/viewtopic.php?t=2300

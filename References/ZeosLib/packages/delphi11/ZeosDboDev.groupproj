@@ -1,0 +1,134 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{6c337a05-41a2-4a84-b176-c57f5e15e0c9}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="ZComponent.dproj" />
+    <Projects Include="ZComponentDesign.dproj" />
+    <Projects Include="ZCore.dproj" />
+    <Projects Include="ZDbc.dproj" />
+    <Projects Include="ZParseSql.dproj" />
+    <Projects Include="ZPlain.dproj" />
+    <Projects Include="ZTestComponentAll.dproj" />
+    <Projects Include="ZTestCoreAll.dproj" />
+    <Projects Include="ZTestDbcAll.dproj" />
+    <Projects Include="ZTestFramework.dproj" />
+    <Projects Include="ZTestParseSqlAll.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+<BorlandProject xmlns=""><Default.Personality></Default.Personality></BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="ZCore">
+    <MSBuild Projects="ZCore.dproj" Targets="" />
+  </Target>
+  <Target Name="ZCore:Clean">
+    <MSBuild Projects="ZCore.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ZCore:Make">
+    <MSBuild Projects="ZCore.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ZPlain">
+    <MSBuild Projects="ZPlain.dproj" Targets="" />
+  </Target>
+  <Target Name="ZPlain:Clean">
+    <MSBuild Projects="ZPlain.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ZPlain:Make">
+    <MSBuild Projects="ZPlain.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ZParseSql">
+    <MSBuild Projects="ZParseSql.dproj" Targets="" />
+  </Target>
+  <Target Name="ZParseSql:Clean">
+    <MSBuild Projects="ZParseSql.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ZParseSql:Make">
+    <MSBuild Projects="ZParseSql.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ZDbc">
+    <MSBuild Projects="ZDbc.dproj" Targets="" />
+  </Target>
+  <Target Name="ZDbc:Clean">
+    <MSBuild Projects="ZDbc.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ZDbc:Make">
+    <MSBuild Projects="ZDbc.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ZComponent">
+    <MSBuild Projects="ZComponent.dproj" Targets="" />
+  </Target>
+  <Target Name="ZComponent:Clean">
+    <MSBuild Projects="ZComponent.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ZComponent:Make">
+    <MSBuild Projects="ZComponent.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ZComponentDesign">
+    <MSBuild Projects="ZComponentDesign.dproj" Targets="" />
+  </Target>
+  <Target Name="ZComponentDesign:Clean">
+    <MSBuild Projects="ZComponentDesign.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ZComponentDesign:Make">
+    <MSBuild Projects="ZComponentDesign.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ZTestFramework">
+    <MSBuild Projects="ZTestFramework.dproj" Targets="" />
+  </Target>
+  <Target Name="ZTestFramework:Clean">
+    <MSBuild Projects="ZTestFramework.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ZTestFramework:Make">
+    <MSBuild Projects="ZTestFramework.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ZTestCoreAll">
+    <MSBuild Projects="ZTestCoreAll.dproj" Targets="" />
+  </Target>
+  <Target Name="ZTestCoreAll:Clean">
+    <MSBuild Projects="ZTestCoreAll.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ZTestCoreAll:Make">
+    <MSBuild Projects="ZTestCoreAll.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ZTestParseSqlAll">
+    <MSBuild Projects="ZTestParseSqlAll.dproj" Targets="" />
+  </Target>
+  <Target Name="ZTestParseSqlAll:Clean">
+    <MSBuild Projects="ZTestParseSqlAll.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ZTestParseSqlAll:Make">
+    <MSBuild Projects="ZTestParseSqlAll.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ZTestDbcAll">
+    <MSBuild Projects="ZTestDbcAll.dproj" Targets="" />
+  </Target>
+  <Target Name="ZTestDbcAll:Clean">
+    <MSBuild Projects="ZTestDbcAll.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ZTestDbcAll:Make">
+    <MSBuild Projects="ZTestDbcAll.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ZTestComponentAll">
+    <MSBuild Projects="ZTestComponentAll.dproj" Targets="" />
+  </Target>
+  <Target Name="ZTestComponentAll:Clean">
+    <MSBuild Projects="ZTestComponentAll.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ZTestComponentAll:Make">
+    <MSBuild Projects="ZTestComponentAll.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="ZCore;ZPlain;ZParseSql;ZDbc;ZComponent;ZComponentDesign;ZTestFramework;ZTestCoreAll;ZTestParseSqlAll;ZTestDbcAll;ZTestComponentAll" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="ZCore:Clean;ZPlain:Clean;ZParseSql:Clean;ZDbc:Clean;ZComponent:Clean;ZComponentDesign:Clean;ZTestFramework:Clean;ZTestCoreAll:Clean;ZTestParseSqlAll:Clean;ZTestDbcAll:Clean;ZTestComponentAll:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="ZCore:Make;ZPlain:Make;ZParseSql:Make;ZDbc:Make;ZComponent:Make;ZComponentDesign:Make;ZTestFramework:Make;ZTestCoreAll:Make;ZTestParseSqlAll:Make;ZTestDbcAll:Make;ZTestComponentAll:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>

@@ -1,0 +1,588 @@
+@@LibrariesProcessesandThreads.AppInstances
+<GROUP LibrariesProcessesandThreads>
+<TITLE Application Instance Management>
+<TOPICORDER 300>
+--------------------------------------------------------------------------------
+@@JclAppInst.pas
+Description:
+  This unit contains a class and support routines for controlling the number of
+  concurrent instances of your application that can exist at any time. In
+  addition there is support for simple interprocess communication between these
+  instance including a notification mechanism.
+--------------------------------------------------------------------------------
+@@AI_INSTANCECREATED
+Summary:
+  WParam field for instance creation notifications
+Description:
+  When an application instance is created TJclAppInstances
+  sends a notification message to all other running instances.
+  The message value is determined by the MessageId property,
+  the WParam field is set to AI_INSTANCECREATED, and the LParam
+  field is set to the Process ID of the instance being created.
+  Note that the message is also sent to the application
+  instance under construction.
+See also:
+  AI_INSTANCEDESTROYED
+  AI_USERMSG
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@AI_INSTANCEDESTROYED
+Summary:
+  WParam field for instance destruction notifications
+Description:
+  When an application instance is destroyed TJclAppInstances
+  sends a notification message to all other running instances.
+  The message value is determined by the MessageId property,
+  the WParam field is set to AI_INSTANCEDESTROYED, and the
+  LParam field is set to the Process ID of the instance being
+  destroyed. Note that the message is also sent to the
+  application instance which is exiting.
+See also:
+  AI_INSTANCECREATED
+  AI_USERMSG
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@AI_USERMSG
+Summary:
+  WParam field for user-defined notification messages.
+Description:
+  When an application uses the UserNotify method of TJclAppInstances
+  the class sends a message to all running instances with a
+  message value determined by the MessageID property, WParam
+  set to AI_USERMSG and LParam set to the parameter specified
+  in the method call.
+See also:
+  AI_INSTANCECREATED
+  AI_INSTANCEDESTROYED
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances
+Summary:
+  TJclAppInstances allows you to control the number of
+  application instances the user can run.
+Description:
+  TJclAppInstances is a class which allows you to control the
+  number of instances of your application that the user can run
+  simultaneously. In addition the class has a built in method
+  for simple communication among running instances. The
+  application programmer can use this as desired but it's also
+  used to send notifications. For example, when an application
+  starts running or terminates, the class automatically sends a
+  notification about this event to all other instances. To use
+  TJclAppInstances include JclAppInst and somewhere during
+  start up (eg in the project source before the
+  Application.Initialize call) call JclAppInstances.TJclAppInstances.CheckInstance(X)
+  or JclAppInstances.TJclAppInstances.CheckSingleInstance.
+  The first call determines whether or not at most X instances
+  are already running, but does nothing else, while the second
+  call immediately terminates the application when another
+  instance is already running.
+
+  To receive notifications you must override the WndProc of
+  your main form and include the following code (or something
+  along those lines):
+  
+  procedure TForm1.WndProc(var Msg: TMessage);
+  begin
+    if Msg.Msg = JclAppInstances.MessageId then
+      case Msg.WParam of
+        AI_INSTANCECREATED: [another instance was created]
+        AI_INSTANCEDESTROYED: [another instance was destroyed]
+        AI_USERMSG: [user defined message (TJclAppInstances.UserNotify)]
+      end;
+    inherited WndProc(Msg);
+  end;
+  
+  Note that in both instance creation and instance destruction
+  the Msg.LParam field contains the process ID of the affected
+  instance (which could be the instance itself). Also,
+  notifications as well as user messages are sent to both the
+  main form and to the application message queue. Therefore
+  instead of overriding WndProc you could have also used the
+  TApplication.OnMessage event.
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.BringAppWindowToFront
+Summary:
+  Brings the specified window to the foreground.
+Description:
+  BringAppWindowToFront puts the thread that created the
+  specified window to the foreground and activates the window.
+  Keyboard input is directed to the window, and various visual
+  cues are changed for the user. The system assigns a slightly
+  higher priority to the thread that created the foreground
+  window than it does to other threads (from the Platform SDK).
+Parameters
+  Wnd -  Handle of the window to bring to the foreground.
+Result:
+  Returns if the function succeeds it returns True, otherwise it
+  returns False.
+See also:
+  TJclAppInstances.SetForegroundWindow98
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.GetApplicationWnd
+Summary:
+  Returns a handle to the application window of a process.
+Description:
+  Returns a handle to the invisible window created by the process with the
+  specified ProcessID.
+Parameters:
+  ProcessID - Process ID of the application for which you want to retrieve a handle to the application window. This specified application must be a Delphi application otherwise the function fails.
+Result:
+  If the function succeeds it returns the requested handle, otherwise it returns 0.
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.KillInstance
+Summary:
+  Terminates the application.
+Description:
+  KillInstance terminates the application by calling Halt.
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.SetForegroundWindow98
+Summary:
+  Brings the specified window to the foreground.
+Description:
+  SetForegroundWindow98 puts the thread that created the
+  specified window to the foreground and activates the window.
+  Keyboard input is directed to the window, and various visual
+  cues are changed for the user. The system assigns a slightly
+  higher priority to the thread that created the foreground
+  window than it does to other threads (from the Platform SDK).
+Parameters:
+  Wnd -  Handle of the window to bring into the foreground.
+Result:
+  If the function succeeds it returns True, otherwise it
+  returns False.
+See also:
+ TJclAppInstances.BringAppWindowToFront
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.CheckInstance
+Summary:
+  Check the number of running instances.
+Description:
+  CheckInstance determines whether fewer than MaxInstances
+  application instances are running. If this is true, the
+  process is registered as a running instance and a
+  notification is sent to all other running instances,
+  otherwise the function does nothing. Note that unlike TJclAppInstances.CheckSingleInstance,
+  the application is not terminated and none of the already
+  running instances is brought to the foreground. It's up to
+  the application programmer to decide what to do if the
+  function fails. You could, for example, terminate the
+  application yourself by calling TJclAppInstances.KillInstance.
+Parameters:
+  MaxInstances - Maximum count of running instances
+Result:
+  If fewer than MaxInstances applications are running the
+  result is True, otherwise the result is False.
+See also:
+  TJclAppInstances.CheckSingleInstance
+  TJclAppInstances.CheckMultipleInstances
+  TJclAppInstances.KillInstance
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.CheckMultipleInstances
+Summary:
+  Check the number of running instances.
+Description:
+  CheckMultipleInstances determines whether fewer than
+  MaxInstances application instances are running. If this is
+  true, the process is registered as a running instance and a
+  notification is sent to all other running instances,
+  otherwise the method brings the first instance of the
+  application to the foreground and then terminates itself (as
+  such the routine never returns).
+Parameters
+  MaxInstances - Maximum count of instances
+See also:
+ TJclAppInstances.CheckSingleInstance
+ TJclAppInstances.CheckInstance
+ TJclAppInstances.KillInstance
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.CheckSingleInstance
+Summary:
+  Checks whether this is the one and only running instance.
+Description:
+  CheckSingleInstance checks whether the caller is the only
+  instance of this process. If it's not, the application is
+  immediately terminated and the existing instance of the
+  process is brought into the foreground.
+See also:
+TJclAppInstances.CheckInstance
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.SendData
+Summary:
+  Sends data to all instances.
+Description:
+  SendData sends some generic data to all instances of this
+  application. The data is send using a WM_COPYDATA message
+  directed at the window whose classname equals the
+  WindowClassName parameter.
+Parameters:
+  WindowClassName - The class name of the Window to send the
+                    data to.
+  DataKind        - User defined value to identify the type of
+                    data being send. Note that you cannot
+                    specify AppInstDataKindNoData
+                    (defined as \-1) as this parameter.
+  Data            - The data to be send.
+  Size            - The size, in bytes, of the data pointed to by Data.
+  OriginatorWnd   - Handle of the window from which the message is send.
+Result:
+  If the function succeeds it returns True, otherwise it returns False.
+See also:
+  TJclAppInstances.SendString
+  TJclAppInstances.SendStrings
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.SendString
+Summary:
+  Sends a string to all instances.
+Description:
+  SendString sends a string to all instances of this
+  application. The string is send using a WM_COPYDATA message
+  directed at the window whose classname equals the
+  WindowClassName parameter.
+Parameters:
+  WindowClassName - The class name of the Window to send the data to.
+  DataKind        - User defined value to identify the type of
+                    data being send. Note that you cannot
+                    specify AppInstDataKindNoData
+                    (defined as \-1) as this parameter.
+  S               - The string to send.
+  OriginatorWnd   - Handle of the window from which the message is send.
+Result:
+  If the function succeeds it returns True, otherwise it returns False.
+See also:
+  TJclAppInstances.SendData
+  TJclAppInstances.SendStrings
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.SendStrings
+Summary:
+  Sends a list of string to all instances.
+Description:
+  SendStrings sends a list of strings to all instances of this
+  application. The strings are send using a WM_COPYDATA message
+  directed at the window whose classname equals the
+  WindowClassName parameter.
+Parameters:
+  WindowClassName - The class name of the Window to send the data to.
+  DataKind        - User defined value to identify the type of
+                    data being send. Note that you cannot
+                    specify AppInstDataKindNoData
+                    (defined as \-1) as this parameter.
+  Strings         - The string list to send.
+  OriginatorWnd   - Handle of the window from which the message is send.
+Result:
+  If the function succeeds it returns True, otherwise it returns False.
+See also:
+  TJclAppInstances.SendData
+  TJclAppInstances.SendString
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.SwitchTo
+Summary:
+  SwitchTo brings the application determined by TJclAppInstances.ProcessIDs[Index]
+  to the foreground.
+Description:
+  SwitchTo brings the application determined by TJclAppInstances.ProcessIDs[Index]
+  to the foreground.
+Parameters:
+  Index - Zero based index into the TJclAppInstances.ProcessIDs
+          array property of the instance to switch to.
+Result:
+  If the function succeeds it returns True, otherwise it returns False.
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.UserNotify
+Summary:
+  Sends a user defined message to all running instances.
+Description:
+  UserNotify sends a notification message to all running
+  instances with WParam set to AI_USERMSG and LParam set
+  to the specified parameter.
+Parameters:
+  Param - Message to send.
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.AppWnds
+Summary:
+  Returns the HWND of a specific application index.
+Description:
+  Use the AppWnds property to determine the handle of the
+  invisible window created by one of the application instances.
+  Index is zero based and determines for which application
+  instance a handle is returned. It can be at most TJclAppInstances.InstanceCount
+  - 1 and selects one of the application instances from the TJclAppInstances.ProcessIDs
+  property.
+See also:
+  TJclAppInstances.InstanceCount
+  TJclAppInstances.ProcessIDs
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.InstanceIndex
+Summary:
+  Returns the index into the TJclAppInstances.ProcessIDs array for a process.
+Description:
+  Read the InstanceIndex property to determine the zero based
+  index into the TJclAppInstances.ProcessIDs
+  array property of a specific application instance. The array
+  index is the process ID of the application instance for which
+  you want to know the index. Upon failure the property reads -1.
+See also:
+  TJclAppInstances.ProcessIDs
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.InstanceCount
+Summary:
+  Returns the number of application instances.
+Description:
+  The InstanceCount property returns the number of application
+  instances that registered with theTJclAppInstances.
+  Among others you can use this to determine the highest valid
+  index into the TJclAppInstances.ProcessIDs array property.
+See also:
+  TJclAppInstances.ProcessIDs
+  TJclAppInstances.AppWnds
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.MessageID
+Summary:
+  Returns the message ID used for sending notification messages.
+Description:
+  Read MessageId to learn the message ID used by TJclAppInstances
+  to send notification messages (ie instance creation and destruction).
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.ProcessIDs
+Summary:
+  Process IDs of all application instances which are sharing
+  the TJclAppInstances.
+Description:
+  The ProcessIDs array property contains the process IDs of all
+  application instances which are sharing the TJclAppInstances.
+  In effect it contains the process IDs of all running
+  instances. The array is zero based and the highest valid
+  index is given by TJclAppInstances.InstanceCount
+  property. If an invalid index is specified the property reads 0.
+  Note that it is possible that in between reading TJclAppInstances.InstanceCount
+  and ProcessIDs, or reading ProcessIDs and it, an instance
+  terminates thereby invalidating the process ID. Always check
+  the result before and after using the returned process ID.
+See also:
+  TJclAppInstances.InstanceCount
+  TJclAppInstances.AppWnds
+  TJclAppInstances.InstanceIndex
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@JclAppInstances@string
+Summary:
+  Returns an instance of the TJclAppInstances class, creating one if necessary.
+Description:
+  The JclAppInstances function returns an instance of the TJclAppInstances
+  class, creating one if necessary. The parameterless overload
+  creates a TJclAppInstances whose internal name is
+  based on the process name itself while the overload with the
+  UniqueAppIdGuidStr parameter alllows you to customize the
+  internal name to ensure uniqueness.
+Parameters:
+  UniqueAppIdGuidStr - A user defined string used to customize
+                       naming of internal objects to ensure
+                       system wide uniqueness. It's recommended
+                       you use an actual GUID.
+Result:
+  Returns an instance of the TJclAppInstances class
+  which allows you to further control other instances of the
+  application and communicate with them. See the documentation
+  of TJclAppInstances for more detail on using the TJclAppInstances class.
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@ReadMessageCheck
+Summary:
+  Determines the type of message.
+Description:
+  ReadMessageCheck determines whether the specified message is
+  a JclAppInstance IPC message and returns it's data kind. Use
+  the IgnoredOriginatorWnd to filter message send by the same
+  window as the routine is being called from. Call this routine
+  from an overridden WndProc, for example. See the AppInstance
+  demo application for an example usage.
+Parameters:
+  Message              - The message to check (equals the
+                         single parameter of the WndProc).
+  IgnoredOriginatorWnd - Specify the handle of the window to
+                         filter. If the message was send from
+                         that same window, the function returns False.
+Result:
+  If the message contains was not send from the window
+  specified by the IgnoredOriginatorWnd window, the functon
+  returns the data kind value of the message, otherwise it
+  returns False.
+See also:
+  ReadMessageData
+  ReadMessageString
+  ReadMessageStrings
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@ReadMessageData
+Summary:
+  Returns the data from a JclAppInstance IPC message.
+Description:
+  ReadMessageData returns the data encapsulated in the message
+  which is assumed to be a JclAppInstance IPC message send by
+  one of the TJclAppInstance.SendXxx methods. You can use ReadMessageCheck
+  to determine the kind of data the message contains.
+Parameters:
+  Message - The message to extract the data from.
+  Data    - Returns the data buffer. This buffer is allocated
+            by the function and must be released by the caller.
+  Size    - Returns the size of the data buffer.
+See also:
+  ReadMessageCheck
+  ReadMessageString
+  ReadMessageStrings
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@ReadMessageString
+<GROUP LibrariesProcessesandThreads.AppInstances>
+Summary:
+  Returns the data string from a JclAppInstance IPC message.
+Description:
+  ReadMessageString returns the data string encapsulated in the message which is assumed
+  to be a JclAppInstance IPC message send by one of the TJclAppInstance.SendXxx methods.
+Parameters:
+  Message - The message from which to extract the string data.
+  S - Returns the string data.
+See also:
+  ReadMessageCheck
+  ReadMessageData
+  ReadMessageStrings
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@ReadMessageStrings
+Summary:
+  Returns the data string list from a JclAppInstance IPC message.
+Description:
+  ReadMessageStrings returns the data string list encapsulated
+  in the message which is assumed to be a JclAppInstance IPC
+  message send by one of the TJclAppInstance.SendXxx methods.
+Parameters:
+  Message - The message from which to extract the string list.
+  Strings - Returns the string list data. The caller must
+            supply a valid instance of a TStrings derived
+            class. Existing items in the list are removed.
+See also:
+  ReadMessageCheck
+  ReadMessageData
+  ReadMessageString
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstDataKind
+Summary:
+  Data type to specify the kind of data being sent between
+  process. This open enumeration has two predefined values:
+  AppInstDataKindNoData and AppInstCmdLineDataKind.
+See also:
+  AppInstDataKindNoData
+  AppInstCmdLineDataKind
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@AppInstCmdLineDataKind
+Summary:
+  Data kind returned by ReadMessageCheck when the data
+  contains the command line for the sender process.
+See also:
+  TJclAppInstDataKind
+  AppInstDataKindNoData
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@AppInstDataKindNoData
+Summary:
+  Data kind returned by ReadMessageCheck when the
+  message doesn't contain data about Application Instance Management.
+See also:
+  TJclAppInstDataKind
+  AppInstCmdLineDataKind
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.Create
+Summary:
+  Create a new instance of the TJclAppInstances class.
+Notes:
+  Do not use this constructor directly to avoid multiples
+  instance for this object type. The JclAppInstances
+  function return a reference to a unique instance for this
+  application.
+See also:
+  JclAppInstances
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.Destroy
+Summary:
+  Destroy the TJclAppInstances instance.
+Notes:
+  Do not call this destructor to the reference returned by a
+  call to JclAppInstances. This instance is managed by
+  the JclAppInst unit and must not be freed elsewhere.
+See also:
+  JclAppInstances 
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclAppInstances.SendCmdLineParams@string@THandle
+Summary:
+  Send the command line to all instances.
+Description:
+  A call to this function broadcasts this application command
+  line to all windows that matches the specified class name.
+Parameters:
+  WindowClassName - The class name of the Window to send the data to.
+  OriginatorWnd - Handle of the window from which the message is send.
+Result:
+  This function returns true on success, false otherwise.
+See also:
+  TJclAppInstances.SendString
+  TJclAppInstances.SendStrings
+  TJclAppInstances.SendData
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@JclAppInstances
+<COMBINE JclAppInstances@string>
+TODO

@@ -1,0 +1,14 @@
+EJclStreamError
+TJclBufferedStream
+TJclEasyStream
+TJclEmptyStream
+TJclEventStream
+TJclFileStream
+TJclHandleStream
+TJclMultiplexStream
+TJclNullStream
+TJclRandomStream
+TJclStream
+TJclStreamDecorator
+TSeekOrigin
+TStreamNotifyEvent

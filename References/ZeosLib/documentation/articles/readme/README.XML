@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "file:/c:/docbook/dtd/docbookx.dtd" [
+<!ENTITY % global.entities SYSTEM "file:/c:/docbook/include/global.xml">
+<!-- e-novative DocBook environment --><!-- global entities                --><!-- (c) 2002 e-novative GmbH       --><!-- http://www.e-novative.de       --><!ENTITY global_entity "global entity (can be included in every document)">
+<!ENTITY % entities SYSTEM "entities.xml">
+<!-- >e-novative> DocBook Environment (eDE)                                  --><!-- (c) 2002 e-novative GmbH, Munich, Germany                               --><!-- http://www.e-novative.de                                                --><!-- DocBook entities template                                               --><!-- This file is part of eDE                                                --><!-- eDE is free software; you can redistribute it and/or modify             --><!-- it under the terms of the GNU General Public License as published by    --><!-- the Free Software Foundation; either version 2 of the License, or       --><!-- (at your option) any later version.                                     --><!-- eDE is distributed in the hope that it will be useful,                  --><!-- but WITHOUT ANY WARRANTY; without even the implied warranty of          --><!-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           --><!-- GNU General Public License for more details.                            --><!-- You should have received a copy of the GNU General Public License       --><!-- along with eDe; if not, write to the Free Software                   --><!-- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA --><!ENTITY local_entity "local entity (defined per document)">
+]>
+<article>
+	<articleinfo>
+		<title>ZeosDBO Technical Info</title>
+		<pubdate>09 July 2004 (Updated 29/5/2008)</pubdate>
+		<corpauthor>ZeosLib Development Group</corpauthor>
+	</articleinfo>
+	<para>ZeosDBO is a database middleware components for Borland development tools, including Delphi, C++ Builder and Kylix.</para>
+	<para>The following compilers are supported:</para>
+	<itemizedlist spacing="compact">
+		<listitem>
+			<simpara>Delphi 5 - 7 and 9-11</simpara>
+		</listitem>
+		<listitem>
+			<simpara>Lazarus (FreePascal)</simpara>
+		</listitem>
+		<listitem>
+			<simpara>MSEide+MSEgui (FreePascal)</simpara>
+		</listitem>
+		<listitem>
+			<simpara>C++ Builder 5 - 6</simpara>
+		</listitem>
+		<listitem>
+			<simpara>Kylix 2 - 3</simpara>
+		</listitem>
+	</itemizedlist>
+	<para>ZeosDBO supports direct connectivity to the following databases using the vendor provided, native interface:</para>
+	<itemizedlist spacing="compact">
+		<listitem>
+			<simpara>MySQL 3.20 - 5.0</simpara>
+		</listitem>
+		<listitem>
+			<simpara>PostgreSQL 6.5 - 8.1</simpara>
+		</listitem>
+		<listitem>
+			<simpara>Firebird 1.0 - 2.0</simpara>
+		</listitem>
+		<listitem>
+			<simpara>Interbase 5.0 - 7.5</simpara>
+		</listitem>
+		<listitem>
+			<simpara>Microsoft SQL Server 7, 2000</simpara>
+		</listitem>
+		<listitem>
+			<simpara>Sybase ASE 12.0, 12.5</simpara>
+		</listitem>
+		<listitem>
+			<simpara>Oracle 9i</simpara>
+		</listitem>
+		<listitem>
+			<simpara>SQLite 2.8, 3.5</simpara>
+		</listitem>
+	</itemizedlist>
+	<para>For other databases we propose to use implemented Active Data Objects (ADO) Bridge.</para>
+	<para>Advantages of using ZeosDBO:</para>
+	<itemizedlist spacing="compact">
+		<listitem>
+			<simpara>Platform independance. The ZeosDBO is highly generic. Applications written in ZeosDBO can be migrated across databases without major changes.</simpara>
+		</listitem>
+		<listitem>
+			<simpara>ZeosDBO is open source, written for usability and extensibility.</simpara>
+		</listitem>
+		<listitem>
+			<simpara>ZeosDBO leverages the amazing power of the Delphi development environment without relying on a performance killing middleware.</simpara>
+		</listitem>
+		<listitem>
+			<simpara>ZeosDBO is an extremely thin abstraction layer, unlike 'thick' layered protocols like ADO and BDE.</simpara>
+		</listitem>
+	</itemizedlist>
+	<para>Package contents:</para>
+	<orderedlist spacing="compact">
+		<listitem>
+			<simpara><classname>ZCore</classname> - Core classes and interfaces. Contains Java style objects and collections as well as compatibility types and functions.</simpara>
+		</listitem>
+		<listitem>
+			<simpara><classname>ZParseSql</classname> - SQL specific for syntax and lexical analysis.</simpara>
+		</listitem>
+		<listitem>
+			<simpara><classname>ZPlain</classname> - Native plain API to supported SQL servers.</simpara>
+		</listitem>
+		<listitem>
+			<simpara><classname>ZDbc</classname> - Port of Java Database Connectivity API (JDBC 2.0). DBC API acts as intermediate layer between Plain API and highlevel <classname>TDataset</classname> or <classname>DBExpress</classname> components</simpara>
+		</listitem>
+		<listitem>
+			<simpara><classname>ZComponent</classname> - visual components descended from <classname>TDataset</classname>.</simpara>
+		</listitem>
+	<listitem>
+      <simpara><classname>ZComponentDesign</classname> - design time components. This package is not available for all compilers. If present it's only needed to install the components in the IDE.</simpara>
+    </listitem>
+   </orderedlist>
+	<para>Installed components:</para>
+	<orderedlist spacing="compact">
+		<listitem>
+			<simpara><classname>TZConnection</classname>: This component encapsulates the database connection and transaction management.</simpara>
+		</listitem>
+		<listitem>
+			<simpara><classname>TZReadOnlyQuery</classname>: TDataset component to execute SQL queries and process data in read-only mode.</simpara>
+		</listitem>
+		<listitem>
+			<simpara><classname>TZQuery</classname>: TDataset component which allows data modifications in regular and cached mode.</simpara>
+		</listitem>
+		<listitem>
+			<simpara><classname>TZUpdateSQL</classname>: Analog of standard TUpdateSQL component to explicite definition of Insert/Update/Delete SQL statements for TDataset modifications.</simpara>
+		</listitem>
+		<listitem>
+			<simpara><classname>TZStoredProc</classname>: The component to execute SQL stored procedures.</simpara>
+		</listitem>
+		<listitem>
+			<simpara><classname>TZSQLProcessor</classname>: The component to execute SQL scripts for different SQL and various delimiter types.</simpara>
+		</listitem>
+		<listitem>
+			<simpara><classname>TZSQLMonitor</classname>: The component to monitor all outgoing SQL queries and other logging information.</simpara>
+		</listitem>
+		<listitem>
+			<simpara><classname>TZSQLMetadata</classname>: Specialized TDataset component which provides an access to database metadata such as tables, columns, indices, etc.</simpara>
+		</listitem>
+	</orderedlist>
+	<para>The project home page is here (for news, links and other project info): <ulink url="http://zeosfirmos.at/portal.php">http://zeos.firmos.at</ulink></para>
+	<para>The sourceforge development site is located here (for technical resources and anonymous web based cvs access):<ulink url="http://www.sourceforge.net/projects/zeoslib"> http://www.sourceforge.net/projects/zeoslib</ulink></para>
+	<para>Thank you for using our software,</para>
+	<para>The ZeosLib Development Group</para>
+</article>

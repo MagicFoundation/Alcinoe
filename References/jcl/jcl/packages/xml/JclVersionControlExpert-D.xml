@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Package Name="JclVersionControlExpert" Design="-1">
+  <Description>JCL Integration of version control systems in the IDE</Description>
+  <GUID>{25BAE228-713B-4418-BDC7-9327F48A663B}</GUID>
+  <C6PFlags>-LUdesignide</C6PFlags>
+  <C6Libs/>
+  <CompilerDefines>RELEASE</CompilerDefines>
+  <ImageBase>58200000</ImageBase>
+  <Requires>
+    <Package Name="rtl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="vcl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="designide" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="Jcl-R" Targets="all" Condition=""/>
+    <Package Name="JclVcl-R" Targets="all" Condition=""/>
+    <Package Name="JclBaseExpert-D" Targets="all" Condition=""/>
+  </Requires>
+  <Contains>
+    <File Name="..\..\experts\versioncontrol\JclVersionControlImpl.pas" Targets="runtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\versioncontrol\JclVersionCtrlCommonOptions.pas" Targets="runtimeIDE" Formname="JclVersionCtrlOptionsFrame: TFrame" Condition=""/>
+  </Contains>
+</Package>

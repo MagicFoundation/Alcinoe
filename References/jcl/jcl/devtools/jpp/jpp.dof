@@ -1,0 +1,4 @@
+[Directories]
+OutputDir=..
+UsePackages=0
+SearchPath=..\..\source\include

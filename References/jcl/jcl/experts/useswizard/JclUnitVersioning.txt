@@ -1,0 +1,10 @@
+TCustomUnitVersioningProvider
+TUnitVersion
+TUnitVersioning
+TUnitVersioningModule
+GetUnitVersioning
+RegisterUnitVersion
+UnregisterUnitVersion
+TUnitVersionInfo
+PUnitVersionInfo
+TUnitVersioningProviderClass

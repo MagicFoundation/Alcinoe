@@ -1,0 +1,168 @@
+object FormMain: TFormMain
+  Left = 0
+  Top = 0
+  Caption = 'Exception Logging'
+  ClientHeight = 480
+  ClientWidth = 320
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  DesignerMasterStyle = 0
+  object ButtonAV: TButton
+    Align = Top
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 52.000000000000000000
+    Size.Width = 304.000000000000000000
+    Size.Height = 33.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 10
+    Text = 'Access Violation in Form'
+    OnClick = ButtonAVClick
+  end
+  object ButtonAVOverridden: TButton
+    Align = Top
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 93.000000000000000000
+    Size.Width = 304.000000000000000000
+    Size.Height = 33.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 6
+    Text = 'Access Violation in Overridden Method'
+    OnClick = ButtonAVOverriddenClick
+  end
+  object ButtonDivByZero: TButton
+    Align = Top
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 175.000000000000000000
+    Size.Width = 304.000000000000000000
+    Size.Height = 33.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 5
+    Text = 'Division By Zero'
+    OnClick = ButtonDivByZeroClick
+  end
+  object ButtonFileNotFound: TButton
+    Align = Top
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 216.000000000000000000
+    Size.Width = 304.000000000000000000
+    Size.Height = 33.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 4
+    Text = 'File Not Found'
+    OnClick = ButtonFileNotFoundClick
+  end
+  object ButtonInvalidObjCCall: TButton
+    Align = Top
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 257.000000000000000000
+    Size.Width = 304.000000000000000000
+    Size.Height = 33.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+    Text = 'Invalid Objective-C Call'
+    OnClick = ButtonInvalidObjCCallClick
+  end
+  object ButtonAVThread: TButton
+    Align = Top
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 134.000000000000000000
+    Size.Width = 304.000000000000000000
+    Size.Height = 33.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 8
+    Text = 'Access Violation in Thread'
+    OnClick = ButtonAVThreadClick
+  end
+  object ToolBar: TToolBar
+    Size.Width = 320.000000000000000000
+    Size.Height = 44.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object LabelHeader: TLabel
+      Align = Client
+      Size.Width = 320.000000000000000000
+      Size.Height = 44.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = 'toollabel'
+      TextSettings.HorzAlign = Center
+      Text = 'Exception Logging Sample'
+    end
+  end
+  object ButtonCustomException: TButton
+    Align = Top
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 339.000000000000000000
+    Size.Width = 304.000000000000000000
+    Size.Height = 33.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Text = 'Raise Custom Exception'
+    OnClick = ButtonCustomExceptionClick
+  end
+  object ButtonHandledFileNotFound: TButton
+    Align = Top
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 380.000000000000000000
+    Size.Width = 304.000000000000000000
+    Size.Height = 33.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 9
+    Text = 'Handled File Not Found in Form'
+    OnClick = ButtonHandledFileNotFoundClick
+  end
+  object ButtonHandledFileNotFoundThread: TButton
+    Align = Top
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 421.000000000000000000
+    Size.Width = 304.000000000000000000
+    Size.Height = 33.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 7
+    Text = 'Handled File Not Found in Thread'
+    OnClick = ButtonHandledFileNotFoundThreadClick
+  end
+  object ButtonInvalidJavaCall: TButton
+    Align = Top
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 298.000000000000000000
+    Size.Width = 304.000000000000000000
+    Size.Height = 33.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    Text = 'Invalid Java Call'
+    OnClick = ButtonInvalidJavaCallClick
+  end
+end

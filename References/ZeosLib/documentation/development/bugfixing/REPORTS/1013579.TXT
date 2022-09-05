@@ -1,0 +1,35 @@
+================================================================================
+//               ZEOS Library Bug Reporting / Bug Fixing Form                 //
+================================================================================
+
+Bug ID               : 1013579                      Priority      : 5
+Submitted by         : nobody                       Date Submitted: 2004-08-22 00:51
+Quality assurance by : stefanglienke                Closed as of  : 2005-06-07 13:52
+Assigned to          : stefanglienke                Closed by     : stefanglienke
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : n/a
+ZEOSLib Version      : 6.5.1 alpha
+Component/Class      : TZTable
+
+--------------------------------------------------------------------------------
+
+Error Description:
+
+When I execute a refresh on a table with a field whose 
+name is "E-mail" I obtain the following error: 
+TZTablename: Field "E" not found.
+I use Delphi 7, zeosdbo-6.5.0-alpha, firebird 1.5
+
+--------------------------------------------------------------------------------
+
+Actions done form Bugfixing:
+
+Changed following line in DefineKeyFields (ZDatasetUtils.pas):
+- if Pos(' ', Temp) > 0 then Temp := '"' + Temp + '"';
++ if (Pos(' ', Temp) > 0) or (Pos('-', Temp) > 0) then Temp := '"' + Temp + '"';
+
+================================================================================
+
+

@@ -1,0 +1,30 @@
+================================================================================
+//                        ZEOS Library Feature add Form                       //
+================================================================================
+
+Bug ID               : 987280                       Priority      : 5
+Submitted by         : softworkdss                  Date Submitted: 2004-07-08 15:16
+Quality assurance by : stefanglienke                Closed as of  : 2005-06-03 12:56
+Assigned to          : stefanglienke                Closed by     : stefanglienke
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : n/a
+ZEOSLib Version      : 6.5.1 alpha
+Component/Class      : n/a
+
+--------------------------------------------------------------------------------
+
+Requested Feature:
+
+Add PropertyEditor for TField-properties in several components
+
+--------------------------------------------------------------------------------
+
+Actions done for adding the new feature:
+
+Added already when changed and added several property-editors to components.
+
+================================================================================
+
+

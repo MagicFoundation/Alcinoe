@@ -1,0 +1,1 @@
+This directory is intended as a common place for FPC compiled files targetting Win32 on arch i386.

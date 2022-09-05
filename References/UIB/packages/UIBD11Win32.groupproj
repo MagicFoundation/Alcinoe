@@ -1,0 +1,44 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{73e7d27b-1027-4191-9986-34737345e952}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="UIBD11Win32D.dproj" />
+    <Projects Include="UIBD11Win32R.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+<BorlandProject xmlns=""><Default.Personality></Default.Personality></BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="UIBD11Win32R">
+    <MSBuild Projects="UIBD11Win32R.dproj" Targets="" />
+  </Target>
+  <Target Name="UIBD11Win32R:Clean">
+    <MSBuild Projects="UIBD11Win32R.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="UIBD11Win32R:Make">
+    <MSBuild Projects="UIBD11Win32R.dproj" Targets="Make" />
+  </Target>
+  <Target Name="UIBD11Win32D">
+    <MSBuild Projects="UIBD11Win32D.dproj" Targets="" />
+  </Target>
+  <Target Name="UIBD11Win32D:Clean">
+    <MSBuild Projects="UIBD11Win32D.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="UIBD11Win32D:Make">
+    <MSBuild Projects="UIBD11Win32D.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="UIBD11Win32R;UIBD11Win32D" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="UIBD11Win32R:Clean;UIBD11Win32D:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="UIBD11Win32R:Make;UIBD11Win32D:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>

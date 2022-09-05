@@ -1,0 +1,10 @@
+EPCREError
+TJclAnsiRegEx
+InitializeLocaleSupport
+TerminateLocaleSupport
+TJclAnsiCaptureOffset
+TJclAnsiRegExOption
+PPCREIntArray
+TJclAnsiRegExOptions
+TPCREIntArray
+JCL_PCRE_ERROR_STUDYFAILED

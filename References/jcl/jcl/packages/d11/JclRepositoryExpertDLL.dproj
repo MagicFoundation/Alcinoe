@@ -1,0 +1,107 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{D93FF823-44C6-49D4-B9B3-30F1F60082F5}</ProjectGuid>
+    <MainSource>JclRepositoryExpertDLL.dpr</MainSource>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+    <DCC_UsePackage>rtl;vcl;designide;Jcl;JclContainers;JclBaseExpert;JclDeveloperTools</DCC_UsePackage>
+    <DCC_Define>BCB;WIN32;CONDITIONALEXPRESSIONS;VER180;VER185;RELEASE</DCC_Define>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Version>7.0</Version>
+    <DCC_DebugInformation>False</DCC_DebugInformation>
+    <DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
+    <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+    <DCC_DcuOutput>..\..\lib\d11</DCC_DcuOutput>
+    <DCC_ObjOutput>..\..\lib\d11</DCC_ObjOutput>
+    <DCC_HppOutput>..\..\lib\d11</DCC_HppOutput>
+    <DCC_DcpOutput>..\..\lib\d11</DCC_DcpOutput>
+    <DCC_UnitSearchPath>..\..\lib\d11;..\..\source\include</DCC_UnitSearchPath>
+    <DCC_ResourcePath>..\..\lib\d11;..\..\source\include</DCC_ResourcePath>
+    <DCC_ObjPath>..\..\lib\d11;..\..\source\include</DCC_ObjPath>
+    <DCC_IncludePath>..\..\lib\d11;..\..\source\include</DCC_IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <Version>7.0</Version>
+    <DCC_DcuOutput>..\..\lib\d11\debug</DCC_DcuOutput>
+    <DCC_ObjOutput>..\..\lib\d11\debug</DCC_ObjOutput>
+    <DCC_HppOutput>..\..\lib\d11\debug</DCC_HppOutput>
+    <DCC_DcpOutput>..\..\lib\d11\debug</DCC_DcpOutput>
+    <DCC_UnitSearchPath>..\..\lib\d11\debug;..\..\source\include</DCC_UnitSearchPath>
+    <DCC_ResourcePath>..\..\lib\d11\debug;..\..\source\include</DCC_ResourcePath>
+    <DCC_ObjPath>..\..\lib\d11\debug;..\..\source\include</DCC_ObjPath>
+    <DCC_IncludePath>..\..\lib\d11\debug;..\..\source\include</DCC_IncludePath>    
+  </PropertyGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Delphi.Personality</Borland.Personality>
+    <Borland.ProjectType>Package</Borland.ProjectType>
+    <BorlandProject>
+      <BorlandProject xmlns=""> 
+        <Delphi.Personality>
+          <Parameters>
+            <Parameters Name="UseLauncher">False</Parameters>
+            <Parameters Name="LoadAllSymbols">True</Parameters>
+            <Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+          </Parameters>
+          <VersionInfo>
+           <VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+           <VersionInfo Name="AutoIncBuild">False</VersionInfo>
+           <VersionInfo Name="MajorVer">2</VersionInfo>
+           <VersionInfo Name="MinorVer">7</VersionInfo>
+           <VersionInfo Name="Release">0</VersionInfo>
+           <VersionInfo Name="Build">5300</VersionInfo>
+           <VersionInfo Name="Debug">False</VersionInfo>
+           <VersionInfo Name="PreRelease">False</VersionInfo>
+           <VersionInfo Name="Special">False</VersionInfo>
+           <VersionInfo Name="Private">False</VersionInfo>
+           <VersionInfo Name="DLL">False</VersionInfo>
+           <VersionInfo Name="Locale">1033</VersionInfo>
+           <VersionInfo Name="CodePage">1252</VersionInfo>
+         </VersionInfo>
+         <VersionInfoKeys>
+          <VersionInfoKeys Name="CompanyName">Project JEDI</VersionInfoKeys>
+          <VersionInfoKeys Name="FileDescription">JCL Package containing repository wizards</VersionInfoKeys>
+          <VersionInfoKeys Name="FileVersion">2.7.0.5300</VersionInfoKeys>
+          <VersionInfoKeys Name="InternalName">JclRepositoryExpertDLL</VersionInfoKeys>
+          <VersionInfoKeys Name="LegalCopyright">Copyright (C) 1999, 2014 Project JEDI</VersionInfoKeys>
+          <VersionInfoKeys Name="LegalTrademarks"/>
+          <VersionInfoKeys Name="OriginalFilename">JclRepositoryExpertDLL110.dll</VersionInfoKeys>
+          <VersionInfoKeys Name="ProductName">JEDI Code Library</VersionInfoKeys>
+          <VersionInfoKeys Name="ProductVersion">2.7 Build 5300</VersionInfoKeys>
+         </VersionInfoKeys>
+         <Source>
+           <Source Name="MainSource">JclRepositoryExpertDLL.dpr</Source>
+         </Source>
+         <Package_Options>
+           <Package_Options Name="LibSuffix">110</Package_Options>
+         </Package_Options>
+       </Delphi.Personality>
+    </BorlandProject>
+  </BorlandProject>
+  </ProjectExtensions>
+  <Import Project="$(MSBuildBinPath)\Borland.Delphi.Targets" />
+  <ItemGroup>
+    <DelphiCompile Include="JclRepositoryExpertDLL.dpr">
+      <MainSource>MainSource</MainSource>
+    </DelphiCompile>
+    <DCCReference Include="rtl.dcp"/>
+    <DCCReference Include="vcl.dcp"/>
+    <DCCReference Include="designide.dcp"/>
+    <DCCReference Include="Jcl.dcp"/>
+    <DCCReference Include="JclContainers.dcp"/>
+    <DCCReference Include="JclBaseExpert.dcp"/>
+    <DCCReference Include="JclDeveloperTools.dcp"/>
+    <DCCReference Include="..\..\experts\repository\JclOtaRepositoryUtils.pas"/>
+    <DCCReference Include="..\..\experts\repository\JclOtaRepositoryReg.pas"/>
+    <DCCReference Include="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgRepository.pas"/>
+    <DCCReference Include="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgWizard.pas"/>
+    <DCCReference Include="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgFileFrame.pas"/>
+    <DCCReference Include="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgFormFrame.pas"/>
+    <DCCReference Include="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgSystemFrame.pas"/>
+    <DCCReference Include="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgLogFrame.pas"/>
+    <DCCReference Include="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgTraceFrame.pas"/>
+    <DCCReference Include="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgThreadFrame.pas"/>
+    <DCCReference Include="..\..\experts\repository\ExceptionDialog\JclOtaExcDlgIgnoreFrame.pas"/>
+  </ItemGroup>
+</Project>

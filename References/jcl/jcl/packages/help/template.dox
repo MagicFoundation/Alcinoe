@@ -1,0 +1,57 @@
+﻿; This is a Doc-O-Matic version 6.5.1.1382 project file.
+; This file is maintained by Doc-O-Matic, do not edit manually.
+<%%% BEGIN PACKAGEONLY %%%>
+<%%% DO NOT GENERATE %%%>
+<%%% END PACKAGEONLY %%%>
+<%%% BEGIN DESIGNONLY %%%>
+<%%% DO NOT GENERATE %%%>
+<%%% END DESIGNONLY %%%>
+<%%% BEGIN PROGRAMONLY %%%>
+<%%% DO NOT GENERATE %%%>
+<%%% END PROGRAMONLY %%%>
+<%%% BEGIN LIBRARYONLY %%%>
+<%%% DO NOT GENERATE %%%>
+<%%% END LIBRARYONLY %%%>
+
+[*Control*]
+MasterFile=..\..\..\help\JclTemplate.dox
+
+[Configurations\CHM\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\Compatibility]
+ContentFile=%NAME%contents.html
+IndexFile=%NAME%idx.html
+
+[Configurations\H2\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\Compatibility]
+ContentFile=%NAME%contents.html
+IndexFile=%NAME%idx.html
+
+[Configurations\H2\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\HTMLHelp]
+Help2Collection=%NAME%_COL_MASTER.HxC
+Help2ID=%NAME%
+HTMLHelp2Filename=..\..\help\%NAME%.HxS
+
+[Configurations\HLP\{C81B476F-5DE3-416C-A73A-9674B8ECC110}\Basic]
+HLPFilename=..\..\help\%NAME%.hlp
+
+[Configurations\HTML\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\Compatibility]
+ContentFile=%NAME%contents.html
+IndexFile=%NAME%idx.html
+
+[Project Database Files]
+Count=%REQUIRECOUNT%
+<%%% START REQUIRES %%%>
+File%INDEX0%=%NAME%.doxdb
+<%%% END REQUIRES %%%>
+
+[Source Files]
+Count=%CONTAINCOUNT%
+<%%% START FILES %%%>
+File%INDEX0%=%FILENAME%
+<%%% END FILES %%%>
+
+[General]
+Copyright=%COPYRIGHT%
+Summary=Documentation of the %DESCRIPTION%
+Title=%DESCRIPTION%
+VersionBuild=%BUILD_NUMBER%
+VersionMajor=%VERSION_MAJOR_NUMBER%
+VersionMinor=%VERSION_MINOR_NUMBER%

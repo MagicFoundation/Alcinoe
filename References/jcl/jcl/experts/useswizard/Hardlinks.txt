@@ -1,0 +1,6 @@
+TFNCreateHardLinkA
+TFNCreateHardLinkW
+bRtdlFunctionsLoaded
+CreateHardLinkA
+CreateHardLinkW
+hNtDll

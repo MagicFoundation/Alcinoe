@@ -1,0 +1,131 @@
+	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{2F16B01B-57C8-4EB1-A0C4-421B3008A4F6}</ProjectGuid>
+			<MainSource>JclSIMDViewExpert.dpk</MainSource>
+			<ProjectVersion>12.0</ProjectVersion>
+			<Config Condition="'$(Config)'==''">Release</Config>
+			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+			<DCC_Define>BCB;WIN32;CONDITIONALEXPRESSIONS;VER200;RELEASE</DCC_Define>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_Release)'!=''">
+			<Cfg_Release>true</Cfg_Release>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_Debug)'!=''">
+			<Cfg_Debug>true</Cfg_Debug>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_WriteableConstants>true</DCC_WriteableConstants>
+			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
+			<DllSuffix>120</DllSuffix>
+			<GenDll>true</GenDll>
+			<GenPackage>true</GenPackage>
+			<DCC_ImageBase>$58080000</DCC_ImageBase>
+			<DCC_UsePackage>rtl;vcl;designide;Jcl;JclBaseExpert</DCC_UsePackage>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_Release)'!=''">
+			<DCC_AssertionsAtRuntime>false</DCC_AssertionsAtRuntime>
+			<DCC_DebugInformation>False</DCC_DebugInformation>
+			<DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
+			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+			<DCC_DcuOutput>..\..\lib\d12</DCC_DcuOutput>
+			<DCC_ObjOutput>..\..\lib\d12</DCC_ObjOutput>
+			<DCC_HppOutput>..\..\lib\d12</DCC_HppOutput>
+			<DCC_DcpOutput>..\..\lib\d12</DCC_DcpOutput>
+			<DCC_UnitSearchPath>..\..\lib\d12;..\..\source\include</DCC_UnitSearchPath>
+			<DCC_ResourcePath>..\..\lib\d12;..\..\source\include</DCC_ResourcePath>
+			<DCC_ObjPath>..\..\lib\d12;..\..\source\include</DCC_ObjPath>
+			<DCC_IncludePath>..\..\lib\d12;..\..\source\include</DCC_IncludePath>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_Debug)'!=''">
+			<DCC_DebugInformation>True</DCC_DebugInformation>
+			<DCC_LocalDebugSymbols>True</DCC_LocalDebugSymbols>
+			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
+			<DCC_DcuOutput>..\..\lib\d12\debug</DCC_DcuOutput>
+			<DCC_ObjOutput>..\..\lib\d12\debug</DCC_ObjOutput>
+			<DCC_HppOutput>..\..\lib\d12\debug</DCC_HppOutput>
+			<DCC_DcpOutput>..\..\lib\d12\debug</DCC_DcpOutput>
+			<DCC_UnitSearchPath>..\..\lib\d12\debug;..\..\source\include</DCC_UnitSearchPath>
+			<DCC_ResourcePath>..\..\lib\d12\debug;..\..\source\include</DCC_ResourcePath>
+			<DCC_ObjPath>..\..\lib\d12\debug;..\..\source\include</DCC_ObjPath>
+			<DCC_IncludePath>..\..\lib\d12\debug;..\..\source\include</DCC_IncludePath>
+		</PropertyGroup>
+		<ItemGroup>
+			<DelphiCompile Include="JclSIMDViewExpert.dpk">
+				<MainSource>MainSource</MainSource>
+			</DelphiCompile>
+			<DCCReference Include="rtl.dcp"/>
+			<DCCReference Include="vcl.dcp"/>
+			<DCCReference Include="designide.dcp"/>
+			<DCCReference Include="Jcl.dcp"/>
+			<DCCReference Include="JclBaseExpert.dcp"/>
+			<DCCReference Include="..\..\experts\debug\simdview\JclSIMDViewForm.pas"/>
+			<DCCReference Include="..\..\experts\debug\simdview\JclSIMDView.pas"/>
+			<DCCReference Include="..\..\experts\debug\simdview\JclSIMDUtils.pas"/>
+			<DCCReference Include="..\..\experts\debug\simdview\JclSIMDModifyForm.pas"/>
+			<DCCReference Include="..\..\experts\debug\simdview\JclSIMDCpuInfo.pas"/>
+			<BuildConfiguration Include="Base">
+				<Key>Base</Key>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Release">
+				<Key>Cfg_Release</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Debug">
+				<Key>Cfg_Debug</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+		</ItemGroup>
+		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+		<ProjectExtensions>
+			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
+			<Borland.ProjectType>Package</Borland.ProjectType>
+			<Borland.PersonalityVersion>1.0</Borland.PersonalityVersion>
+			<BorlandProject>
+				<Delphi.Personality>
+					<Parameters>
+						<Parameters Name="UseLauncher">False</Parameters>
+						<Parameters Name="LoadAllSymbols">True</Parameters>
+						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+					</Parameters>
+					<VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
+						<VersionInfo Name="MajorVer">2</VersionInfo>
+						<VersionInfo Name="MinorVer">7</VersionInfo>
+						<VersionInfo Name="Release">0</VersionInfo>
+						<VersionInfo Name="Build">5300</VersionInfo>
+						<VersionInfo Name="Debug">False</VersionInfo>
+						<VersionInfo Name="PreRelease">False</VersionInfo>
+						<VersionInfo Name="Special">False</VersionInfo>
+						<VersionInfo Name="Private">False</VersionInfo>
+						<VersionInfo Name="DLL">False</VersionInfo>
+						<VersionInfo Name="Locale">1033</VersionInfo>
+						<VersionInfo Name="CodePage">1252</VersionInfo>
+					</VersionInfo>
+					<VersionInfoKeys>
+						<VersionInfoKeys Name="CompanyName">Project JEDI</VersionInfoKeys>
+						<VersionInfoKeys Name="FileDescription">JCL Debug Window of XMM registers</VersionInfoKeys>
+						<VersionInfoKeys Name="FileVersion">2.7.0.5300</VersionInfoKeys>
+						<VersionInfoKeys Name="InternalName">JclSIMDViewExpert</VersionInfoKeys>
+						<VersionInfoKeys Name="LegalCopyright">Copyright (C) 1999, 2014 Project JEDI</VersionInfoKeys>
+						<VersionInfoKeys Name="LegalTrademarks"/>
+						<VersionInfoKeys Name="OriginalFilename">JclSIMDViewExpert120.bpl</VersionInfoKeys>
+						<VersionInfoKeys Name="ProductName">JEDI Code Library</VersionInfoKeys>
+						<VersionInfoKeys Name="ProductVersion">2.7 Build 5300</VersionInfoKeys>
+					</VersionInfoKeys>
+					<Source>
+						<Source Name="MainSource">JclSIMDViewExpert.dpk</Source>
+					</Source>
+					<Excluded_Packages/>
+				</Delphi.Personality>
+			</BorlandProject>
+			<ProjectFileVersion>12</ProjectFileVersion>
+		</ProjectExtensions>
+	</Project>

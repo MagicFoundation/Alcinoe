@@ -1,0 +1,1187 @@
+@@Windows_Specific.Win32API
+<GROUP Windows_Specific>
+<TITLE Win32 API>
+<TOPICORDER 100>
+--------------------------------------------------------------------------------
+@@COMIMAGE_FLAGS_32BITREQUIRED
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+--------------------------------------------------------------------------------
+@@IMAGE_BASE_RELOCATION
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+--------------------------------------------------------------------------------
+@@COMIMAGE_FLAGS_IL_LIBRARY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+--------------------------------------------------------------------------------
+@@SECURITY_DIALUP_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+--------------------------------------------------------------------------------
+@@SECURITY_NETWORK_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+--------------------------------------------------------------------------------
+@@SECURITY_BATCH_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+--------------------------------------------------------------------------------
+@@SECURITY_INTERACTIVE_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_SERVICE_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_ANONYMOUS_LOGON_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_PROXY_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_ENTERPRISE_CONTROLLERS_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_SERVER_LOGON_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_PRINCIPAL_SELF_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SID_IQueryInfo
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TH32CS_SNAPMODULE
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@MAX_MODULE_NAME32
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_AUTHENTICATED_USER_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_RESTRICTED_CODE_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_TERMINAL_SERVER_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_LOGON_IDS_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_LOGON_IDS_RID_COUNT
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_LOCAL_SYSTEM_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_NT_NON_UNIQUE
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_BUILTIN_DOMAIN_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_USER_RID_ADMIN
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_USER_RID_GUEST
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_USER_RID_KRBTGT
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_GROUP_RID_ADMINS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_GROUP_RID_USERS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_GROUP_RID_GUESTS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_GROUP_RID_COMPUTERS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_GROUP_RID_CONTROLLERS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_GROUP_RID_CERT_ADMINS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_GROUP_RID_SCHEMA_ADMINS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_GROUP_RID_ENTERPRISE_ADMINS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_GROUP_RID_POLICY_ADMINS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_ALIAS_RID_ADMINS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_ALIAS_RID_USERS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_ALIAS_RID_GUESTS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_ALIAS_RID_POWER_USERS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_ALIAS_RID_ACCOUNT_OPS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_ALIAS_RID_SYSTEM_OPS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_ALIAS_RID_PRINT_OPS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_ALIAS_RID_BACKUP_OPS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_ALIAS_RID_REPLICATOR
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_ALIAS_RID_RAS_SERVERS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DOMAIN_ALIAS_RID_PREW2KCOMPACCESS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_CREATE_TOKEN_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_ASSIGNPRIMARYTOKEN_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_LOCK_MEMORY_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_INCREASE_QUOTA_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_UNSOLICITED_INPUT_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_MACHINE_ACCOUNT_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_TCB_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_SECURITY_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_TAKE_OWNERSHIP_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_LOAD_DRIVER_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_SYSTEM_PROFILE_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_SYSTEMTIME_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_PROF_SINGLE_PROCESS_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_INC_BASE_PRIORITY_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_CREATE_PAGEFILE_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_CREATE_PERMANENT_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_BACKUP_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_RESTORE_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_SHUTDOWN_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_DEBUG_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_AUDIT_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_SYSTEM_ENVIRONMENT_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_CHANGE_NOTIFY_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_REMOTE_SHUTDOWN_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_UNDOCK_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_SYNC_AGENT_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_ENABLE_DELEGATION_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_DESCRIPTOR_REVISION
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_DESCRIPTOR_REVISION1
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_DESCRIPTOR_MIN_LENGTH
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@COMPRESSION_FORMAT_NONE
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@COMPRESSION_FORMAT_DEFAULT
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@COMPRESSION_FORMAT_LZNT1
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FILE_SUPPORTS_SPARSE_FILES
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FILE_SUPPORTS_REPARSE_POINTS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IO_REPARSE_TAG_MOUNT_POINT
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IO_REPARSE_TAG_HSM
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IO_REPARSE_TAG_SIS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FILE_ATTRIBUTE_DEVICE
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FILE_ATTRIBUTE_SPARSE_FILE
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FILE_ATTRIBUTE_REPARSE_POINT
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FILE_ATTRIBUTE_NOT_CONTENT_INDEXED
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FILE_ATTRIBUTE_ENCRYPTED
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FILE_DEVICE_FILE_SYSTEM
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@METHOD_BUFFERED
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@METHOD_IN_DIRECT
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@METHOD_OUT_DIRECT
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@METHOD_NEITHER
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FILE_ANY_ACCESS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FILE_SPECIAL_ACCESS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FILE_READ_ACCESS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FILE_WRITE_ACCESS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FILE_WRITE_DATA
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FILE_READ_DATA
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FSCTL_GET_COMPRESSION
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FSCTL_SET_COMPRESSION
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FSCTL_LOCK_VOLUME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FSCTL_UNLOCK_VOLUME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FSCTL_SET_SPARSE
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FSCTL_SET_ZERO_DATA
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FSCTL_QUERY_ALLOCATED_RANGES
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FSCTL_SET_REPARSE_POINT
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FSCTL_GET_REPARSE_POINT
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FSCTL_DELETE_REPARSE_POINT
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FSCTL_REQUEST_OPLOCK_LEVEL_1
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FSCTL_REQUEST_OPLOCK_LEVEL_2
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FSCTL_REQUEST_BATCH_OPLOCK
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FSCTL_REQUEST_FILTER_OPLOCK
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FSCTL_OPLOCK_BREAK_ACKNOWLEDGE
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FSCTL_OPBATCH_ACK_CLOSE_PENDING
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FSCTL_OPLOCK_BREAK_NOTIFY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FSCTL_OPLOCK_BREAK_ACK_NO_2
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_SIZEOF_BASE_RELOCATION
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_REL_BASED_ABSOLUTE
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_REL_BASED_HIGH
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_REL_BASED_LOW
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_REL_BASED_HIGHLOW
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_REL_BASED_HIGHADJ
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_REL_BASED_MIPS_JMPADDR
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_REL_BASED_SECTION
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_REL_BASED_REL32
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_REL_BASED_MIPS_JMPADDR16
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_REL_BASED_IA64_IMM64
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_REL_BASED_DIR64
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_REL_BASED_HIGH3ADJ
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_DEBUG_TYPE_BORLAND
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@COMIMAGE_FLAGS_ILONLY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@COMIMAGE_FLAGS_STRONGNAMESIGNED
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@COMIMAGE_FLAGS_TRACKDEBUGDATA
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@KLF_SETFORPROCESS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@DATE_YEARMONTH
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@VER_SUITE_SMALLBUSINESS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@VER_SUITE_ENTERPRISE
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@VER_SUITE_BACKOFFICE
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@VER_SUITE_COMMUNICATIONS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@VER_SUITE_TERMINAL
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@VER_SUITE_SMALLBUSINESS_RESTRICTED
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@VER_SUITE_EMBEDDEDNT
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@VER_SUITE_DATACENTER
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@VER_SUITE_SINGLEUSERTS
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@VER_SUITE_PERSONAL
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@VER_SUITE_SERVERAPPLIANCE
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_NULL_SID_AUTHORITY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_WORLD_SID_AUTHORITY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_LOCAL_SID_AUTHORITY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_CREATOR_SID_AUTHORITY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_NON_UNIQUE_AUTHORITY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_NULL_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_LOCAL_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_CREATOR_OWNER_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_CREATOR_GROUP_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_CREATOR_OWNER_SERVER_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_CREATOR_GROUP_SERVER_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_NT_AUTHORITY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SECURITY_WORLD_RID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TIME_ZONE_ID_INVALID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TIME_ZONE_ID_UNKNOWN
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TIME_ZONE_ID_STANDARD
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TIME_ZONE_ID_DAYLIGHT
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@VER_NT_WORKSTATION
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@VER_NT_DOMAIN_CONTROLLER
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@VER_NT_SERVER
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@FILE_FLAG_OPEN_REPARSE_POINT
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@RT_HTML
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@RT_MANIFEST
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_RESOURCE_NAME_IS_STRING
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_RESOURCE_DATA_IS_DIRECTORY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@MAXIMUM_REPARSE_DATA_BUFFER_SIZE
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IO_REPARSE_TAG_RESERVED_ZERO
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IO_REPARSE_TAG_RESERVED_ONE
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IO_REPARSE_TAG_RESERVED_RANGE
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IO_REPARSE_TAG_VALID_VALUES
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_ORDINAL_FLAG
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@NCBNAMSZ
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@MAX_LANA
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@NRC_GOODRET
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@NCBASTAT
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@NCBRESET
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@NCBENUM
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@REPARSE_DATA_BUFFER_HEADER_SIZE
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@REPARSE_GUID_DATA_BUFFER_HEADER_SIZE
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_BOUND_FORWARDER_REF
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_BOUND_IMPORT_DESCRIPTOR
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_EXPORT_DIRECTORY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_IMPORT_BY_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_IMPORT_DESCRIPTOR
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_RESOURCE_DATA_ENTRY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_RESOURCE_DIR_STRING_U
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_RESOURCE_DIRECTORY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_RESOURCE_DIRECTORY_ENTRY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_THUNK_DATA
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_TLS_DIRECTORY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PAdapterStatus
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PANonObjectHeader
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PFileAllocatedRangeBuffer
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PImageExportDirectory
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PImageImportByName
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PImageThunkData
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PImageTlsDirectory
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PImageImportDescriptor
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PImageBoundImportDescriptor
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PImageBoundForwarderRef
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PLanaEnum
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PModuleInfo
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PNameBuffer
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PNCB
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@POSVersionInfoEx
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PPImageSectionHeader
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PPSID
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PReparseDataBuffer
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PReparsePointInformation
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TANonObjectHeader
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TImageExportDirectory
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TImageImportByName
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TImageThunkData
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TImageTlsDirectory
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TImageImportDescriptor
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TImageBoundImportDescriptor
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TImageBoundForwarderRef
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TImgDelayDescr
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PFileZeroDataInformation
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PImageBaseRelocation
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PImageCor20Header
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PImageLoadConfigDirectory
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PImageResourceDataEntry
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PImageResourceDirectory
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PImageResourceDirectoryEntry
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PImageResourceDirStringU
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@PImgDelayDescr
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TCoCreateInstanceExProc
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TFileAllocatedRangeBuffer
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TFileZeroDataInformation
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TImageBaseRelocation
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TImageCor20Header
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TImageLoadConfigDirectory
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TImageResourceDataEntry
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TImageResourceDirectory
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TImageResourceDirectoryEntry
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TImageResourceDirStringU
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TLoadedImage
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TModuleInfo
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TNCBPostProc
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TReparseDataBuffer
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TReparsePointInformation
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@_FILE_ZERO_DATA_INFORMATION
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@_FILE_ALLOCATED_RANGE_BUFFER
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@_IMAGE_IMPORT_BY_NAME
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@_IMAGE_THUNK_DATA
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@_IMAGE_TLS_DIRECTORY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@_IMAGE_IMPORT_DESCRIPTOR
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@_IMAGE_BOUND_IMPORT_DESCRIPTOR
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@_IMAGE_BOUND_FORWARDER_REF
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@_IMAGE_RESOURCE_DIRECTORY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@_IMAGE_RESOURCE_DIRECTORY_ENTRY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@_IMAGE_RESOURCE_DATA_ENTRY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@_IMAGE_RESOURCE_DIR_STRING_U
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@_IMAGE_BASE_RELOCATION
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@_MODULEINFO
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@_REPARSE_DATA_BUFFER
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@_REPARSE_POINT_INFORMATION
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@ANON_OBJECT_HEADER
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@ASTAT
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IContextMenu2
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_COR20_HEADER
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IMAGE_LOAD_CONFIG_DIRECTORY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@ImgDelayDescr
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@IQueryInfo
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@SE_OBJECT_TYPE
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TAdapterStatus
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@tagMODULEENTRY32
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TLanaEnum
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TNameBuffer
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TNCB
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TOSVersionInfoEx
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@_IMAGE_EXPORT_DIRECTORY
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@TModuleEntry32
+<GROUP Windows_Specific.Win32API>
+<INCLUDE winconst.inc>
+------------------------------------------------------------------------------
+@@_FILE_ALLOCATED_RANGE_BUFFER
+<GROUP Windows_Specific.Win32API>
+Summary:
+  The FILE_ALLOCATED_RANGE_BUFFER structure is used to
+  indicate a range of bytes in a file.
+Description:
+  The FILE_ALLOCATED_RANGE_BUFFER structure is used with
+  the FSCTL_QUERY_ALLOCATED_RANGES
+  control code to indicate a range of bytes in a file. On input
+  to the FSCTL_QUERY_ALLOCATED_RANGES control code, the
+  structure indicates the range of the file to search. On
+  output, the operation retrieves an array of FILE_ALLOCATED_RANGE_BUFFER
+  structures to indicate the allocated ranges within the search range.
+Platforms:
+  Windows NT/2000/XP/Vista: Included in Windows 2000 and later.
+  Windows 95/98/ME: Unsupported.
+Donator:
+  Marcel van Brakel
+------------------------------------------------------------------------------
+@@_FILE_ALLOCATED_RANGE_BUFFER.Length
+<GROUP Windows_Specific.Win32API>
+Summary:
+  Size in bytes of the range.
+Description:
+  Size in bytes of the range.
+--------------------------------------------------------------------------------
+@@_DLLVERSIONINFO
+<GROUP Windows_Specific.Win32API>
+Summary:
+  Receives dynamic-link library (DLL)-specific version information.
+Description:
+  This record is used by SHDllGetVersion to return version information about a specified DLL.
+See also:
+  SHDllGetVersion
+Donator:
+  Marcel van Brakel
+
+
+
+
+
+

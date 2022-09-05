@@ -1,0 +1,815 @@
+(*$JPPDEFINEMACRO JCLHASHSETIMP(SELFCLASSNAME, BUCKETTYPENAME, OWNERSHIPDECLARATION, OWNERSHIPPARAMETERNAME,
+  COLLECTIONINTERFACENAME, ITRCLASSNAME, ITRINTERFACENAME, MOVEARRAYPROCEDURENAME,
+  CONSTKEYWORD, PARAMETERNAME, TYPENAME, DEFAULTVALUE, RELEASERFUNCTIONNAME)
+//=== { SELFCLASSNAME } ====================================================
+
+constructor SELFCLASSNAME.Create(ACapacity: IntegerOWNERSHIPDECLARATION);
+begin
+  inherited Create(OWNERSHIPPARAMETERNAME);
+  SetCapacity(ACapacity);
+  FHashToRangeFunction := JclSimpleHashToRange;
+end;
+
+destructor SELFCLASSNAME.Destroy;
+begin
+  FReadOnly := False;
+  Clear;
+  inherited Destroy;
+end;
+
+function SELFCLASSNAME.Add(CONSTKEYWORDPARAMETERNAME: TYPENAME): Boolean;
+var
+  Index: Integer;
+  Bucket: BUCKETTYPENAME;
+  I: Integer;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := False;
+    if FAllowDefaultElements or (not ItemsEqual(PARAMETERNAME, DEFAULTVALUE)) then
+    begin
+      Index := FHashToRangeFunction(Hash(PARAMETERNAME), FCapacity);
+      Bucket := FBuckets[Index];
+      if Bucket <> nil then
+      begin
+        for I := 0 to Bucket.Size - 1 do
+          if ItemsEqual(Bucket.Entries[I], PARAMETERNAME) then
+            Exit;
+      end
+      else
+      begin
+        Bucket := BUCKETTYPENAME.Create;
+        SetLength(Bucket.Entries, 1);
+        FBuckets[Index] := Bucket;
+      end;
+
+      if Bucket.Size = Length(Bucket.Entries) then
+        SetLength(Bucket.Entries, CalcGrowCapacity(Bucket.Size, Bucket.Size));
+
+      if Bucket.Size < Length(Bucket.Entries) then
+      begin
+        Bucket.Entries[Bucket.Size] := PARAMETERNAME;
+        Inc(Bucket.Size);
+        Inc(FSize);
+        Result := True;
+      end;
+    end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.AddAll(const ACollection: COLLECTIONINTERFACENAME): Boolean;
+var
+  It: ITRINTERFACENAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := False;
+    if ACollection = nil then
+      Exit;
+    Result := True;
+    It := ACollection.First;
+    while It.HasNext do
+      Result := Add(It.Next) and Result;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+procedure SELFCLASSNAME.AssignDataTo(Dest: TJclAbstractContainerBase);
+var
+  I, J: Integer;
+  SelfBucket, NewBucket: BUCKETTYPENAME;
+  ADest: SELFCLASSNAME;
+  ACollection: COLLECTIONINTERFACENAME;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO LOCK}
+    inherited AssignDataTo(Dest);
+    if Dest is SELFCLASSNAME then
+    begin
+      ADest := SELFCLASSNAME(Dest);
+      ADest.Clear;
+      for I := 0 to FCapacity - 1 do
+      begin
+        SelfBucket := FBuckets[I];
+        if SelfBucket <> nil then
+        begin
+          NewBucket := BUCKETTYPENAME.Create;
+          SetLength(NewBucket.Entries, SelfBucket.Size);
+          for J := 0 to SelfBucket.Size - 1 do
+            NewBucket.Entries[J] := SelfBucket.Entries[J];
+          NewBucket.Size := SelfBucket.Size;
+          ADest.FBuckets[I] := NewBucket;
+        end;
+      end;
+    end
+    else
+    if Supports(IInterface(Dest), COLLECTIONINTERFACENAME, ACollection) then
+    begin
+      ACollection.Clear;
+      ACollection.AddAll(Self);
+    end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+procedure SELFCLASSNAME.AssignPropertiesTo(Dest: TJclAbstractContainerBase);
+begin
+  inherited AssignPropertiesto(Dest);
+  if Dest is SELFCLASSNAME then
+    SELFCLASSNAME(Dest).FHashToRangeFunction := FHashToRangeFunction;
+end;
+
+procedure SELFCLASSNAME.Clear;
+var
+  I, J: Integer;
+  Bucket: BUCKETTYPENAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    for I := 0 to FCapacity - 1 do
+    begin
+      Bucket := FBuckets[I];
+      if Bucket <> nil then
+      begin
+        for J := 0 to Bucket.Size - 1 do
+          RELEASERFUNCTIONNAME(Bucket.Entries[J]);
+        FreeAndNil(FBuckets[I]);
+      end;
+    end;
+    FSize := 0;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.CollectionEquals(const ACollection: COLLECTIONINTERFACENAME): Boolean;
+var
+  I, J: Integer;
+  It: ITRINTERFACENAME;
+  Bucket: BUCKETTYPENAME;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := False;
+    if ACollection = nil then
+      Exit;
+    if FSize <> ACollection.Size then
+      Exit;
+    It := ACollection.First;
+    for I := 0 to FCapacity - 1 do
+    begin
+      Bucket := FBuckets[I];
+      if Bucket <> nil then
+        for J := 0 to Bucket.Size - 1 do
+          if not ItemsEqual(Bucket.Entries[J], It.Next) then
+            Exit;
+    end;
+    Result := True;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.Contains(CONSTKEYWORDPARAMETERNAME: TYPENAME): Boolean;
+var
+  I: Integer;
+  Bucket: BUCKETTYPENAME;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := False;
+    Bucket := FBuckets[FHashToRangeFunction(Hash(PARAMETERNAME), FCapacity)];
+    if Bucket <> nil then
+      for I := 0 to Bucket.Size - 1 do
+        if ItemsEqual(Bucket.Entries[I], PARAMETERNAME) then
+        begin
+          Result := True;
+          Break;
+        end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.ContainsAll(const ACollection: COLLECTIONINTERFACENAME): Boolean;
+var
+  It: ITRINTERFACENAME;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := True;
+    if ACollection = nil then
+      Exit;
+    It := ACollection.First;
+    while Result and It.HasNext do
+      Result := Contains(It.Next);
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.Extract(CONSTKEYWORDPARAMETERNAME: TYPENAME): Boolean;
+var
+  Bucket: BUCKETTYPENAME;
+  I, NewCapacity: Integer;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := False;
+    Bucket := FBuckets[FHashToRangeFunction(Hash(PARAMETERNAME), FCapacity)];
+    if Bucket <> nil then
+    begin
+      for I := 0 to Bucket.Size - 1 do
+        if ItemsEqual(Bucket.Entries[I], PARAMETERNAME) then
+        begin
+          Result := True;
+          Bucket.Entries[I] := DEFAULTVALUE;
+          if I < Length(Bucket.Entries) - 1 then
+            MOVEARRAYPROCEDURENAME(Bucket.Entries, I + 1, I, Bucket.Size - I - 1);
+          Dec(Bucket.Size);
+          Dec(FSize);
+          Break;
+        end;
+
+      NewCapacity := CalcPackCapacity(Length(Bucket.Entries), Bucket.Size);
+      if NewCapacity < Length(Bucket.Entries) then
+        SetLength(Bucket.Entries, NewCapacity);
+    end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.ExtractAll(const ACollection: COLLECTIONINTERFACENAME): Boolean;
+var
+  It: ITRINTERFACENAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := False;
+    if ACollection = nil then
+      Exit;
+    Result := True;
+    It := ACollection.First;
+    while It.HasNext do
+      Result := Extract(It.Next) and Result;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.First: ITRINTERFACENAME;
+var
+  ABucketIndex, AItemIndex: Integer;
+  ABucket: BUCKETTYPENAME;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO LOCK}
+    ABucketIndex := 0;
+    ABucket := nil;
+    while ABucketIndex < FCapacity do
+    begin
+      ABucket := FBuckets[ABucketIndex];
+      if (ABucket <> nil) and (ABucket.Size > 0) then
+        Break;
+      Inc(ABucketIndex);
+    end;
+    if ABucket <> nil then
+      AItemIndex := 0
+    else
+      AItemIndex := -1;
+    Result := ITRCLASSNAME.Create(Self, ABucketIndex, AItemIndex,  False, isFirst);
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+{$IFDEF SUPPORTS_FOR_IN}
+function SELFCLASSNAME.GetEnumerator: ITRINTERFACENAME;
+begin
+  Result := First;
+end;
+{$ENDIF SUPPORTS_FOR_IN}
+
+procedure SELFCLASSNAME.Intersect(const ACollection: COLLECTIONINTERFACENAME);
+begin
+  RetainAll(ACollection);
+end;
+
+function SELFCLASSNAME.IsEmpty: Boolean;
+begin
+  Result := FSize = 0;
+end;
+
+function SELFCLASSNAME.Last: ITRINTERFACENAME;
+var
+  ABucketIndex, AItemIndex: Integer;
+  ABucket: BUCKETTYPENAME;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO LOCK}
+    ABucketIndex := FCapacity - 1;
+    ABucket := nil;
+    while ABucketIndex >= 0 do
+    begin
+      ABucket := FBuckets[ABucketIndex];
+      if (ABucket <> nil) and (ABucket.Size > 0) then
+        Break;
+      Dec(ABucketIndex);
+    end;
+    if ABucket <> nil then
+      AItemIndex := ABucket.Size - 1
+    else
+      AItemIndex := -1;
+    Result := ITRCLASSNAME.Create(Self, ABucketIndex, AItemIndex,  False, isLast);
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+procedure SELFCLASSNAME.Pack;
+var
+  I: Integer;
+  Bucket: BUCKETTYPENAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    for I := 0 to FCapacity - 1 do
+    begin
+      Bucket := FBuckets[I];
+      if Bucket <> nil then
+      begin
+        if Bucket.Size > 0 then
+          SetLength(Bucket.Entries, Bucket.Size)
+        else
+          FreeAndNil(FBuckets[I]);
+      end;
+    end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.Remove(CONSTKEYWORDPARAMETERNAME: TYPENAME): Boolean;
+var
+  Extracted: TYPENAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := Extract(PARAMETERNAME);
+    if Result then
+    begin
+      Extracted := PARAMETERNAME;
+      RELEASERFUNCTIONNAME(Extracted);
+    end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.RemoveAll(const ACollection: COLLECTIONINTERFACENAME): Boolean;
+var
+  It: ITRINTERFACENAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := False;
+    if ACollection = nil then
+      Exit;
+    Result := True;
+    It := ACollection.First;
+    while It.HasNext do
+      Result := Remove(It.Next) and Result;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.RetainAll(const ACollection: COLLECTIONINTERFACENAME): Boolean;
+var
+  I, J, NewCapacity: Integer;
+  Bucket: BUCKETTYPENAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := False;
+    if ACollection = nil then
+      Exit;
+    Result := True;
+    for I := 0 to FCapacity - 1 do
+    begin
+      Bucket := FBuckets[I];
+      if Bucket <> nil then
+      begin
+        for J := Bucket.Size - 1 downto 0 do
+          if not ACollection.Contains(Bucket.Entries[I]) then
+        begin
+          Bucket.Entries[J] := RELEASERFUNCTIONNAME(Bucket.Entries[J]);
+          if J < Length(Bucket.Entries) - 1 then
+            MOVEARRAYPROCEDURENAME(Bucket.Entries, J + 1, J, Bucket.Size - J - 1);
+          Dec(Bucket.Size);
+          Dec(FSize);
+        end;
+
+        NewCapacity := CalcPackCapacity(Length(Bucket.Entries), Bucket.Size);
+        if NewCapacity < Length(Bucket.Entries) then
+          SetLength(Bucket.Entries, NewCapacity);
+      end;
+    end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+procedure SELFCLASSNAME.SetCapacity(Value: Integer);
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    if FSize = 0 then
+    begin
+      SetLength(FBuckets, Value);
+      inherited SetCapacity(Value);
+    end
+    else
+      raise EJclOperationNotSupportedError.Create;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.Size: Integer;
+begin
+  Result := FSize;
+end;
+
+procedure SELFCLASSNAME.Subtract(const ACollection: COLLECTIONINTERFACENAME);
+begin
+  RemoveAll(ACollection);
+end;
+
+procedure SELFCLASSNAME.Union(const ACollection: COLLECTIONINTERFACENAME);
+begin
+  AddAll(ACollection);
+end;
+*)
+(*$JPPDEFINEMACRO JCLHASHSETITRIMP(SELFCLASSNAME, HASHSETCLASSNAME, BUCKETTYPENAME, ITRINTERFACENAME,
+  CONSTKEYWORD, PARAMETERNAME, TYPENAME, DEFAULTVALUE, GETTERFUNCTIONNAME, SETTERPROCEDURENAME)
+//=== { SELFCLASSNAME } ============================================
+
+constructor SELFCLASSNAME.Create(AOwnHashSet: HASHSETCLASSNAME;
+  ABucketIndex, AItemIndex: Integer; AValid: Boolean; AStart: TItrStart);
+begin
+  inherited Create(AValid);
+  FOwnHashSet := AOwnHashSet;
+  FBucketIndex := ABucketIndex;
+  FItemIndex := AItemIndex;
+  FStart := AStart;
+end;
+
+function SELFCLASSNAME.Add(CONSTKEYWORDPARAMETERNAME: TYPENAME): Boolean;
+begin
+  Result := FOwnHashSet.Add(PARAMETERNAME);
+end;
+
+procedure SELFCLASSNAME.AssignPropertiesTo(Dest: TJclAbstractIterator);
+var
+  ADest: SELFCLASSNAME;
+begin
+  inherited AssignPropertiesTo(Dest);
+  if Dest is SELFCLASSNAME then
+  begin
+    ADest := SELFCLASSNAME(Dest);
+    ADest.FBucketIndex := FBucketIndex;
+    ADest.FItemIndex := FItemIndex;
+    ADest.FOwnHashSet := FOwnHashSet;
+    ADest.FStart := FStart;
+  end;
+end;
+
+function SELFCLASSNAME.CreateEmptyIterator: TJclAbstractIterator;
+begin
+  Result := SELFCLASSNAME.Create(FOwnHashSet, FBucketIndex, FItemIndex, Valid, FStart);
+end;
+
+procedure SELFCLASSNAME.Extract;
+var
+  PARAMETERNAME: TYPENAME;
+begin
+  {$IFDEF THREADSAFE}
+  FOwnHashSet.WriteLock;
+  try
+  {$ENDIF THREADSAFE}
+    CheckValid;
+    PARAMETERNAME := GETTERFUNCTIONNAME;
+    Valid := False;
+    FOwnHashSet.Extract(PARAMETERNAME);
+  {$IFDEF THREADSAFE}
+  finally
+    FOwnHashSet.ReadUnlock;
+  end;
+  {$ENDIF THREADSAFE}
+end;
+
+function SELFCLASSNAME.GETTERFUNCTIONNAME: TYPENAME;
+var
+  ABucket: BUCKETTYPENAME;
+begin
+  {$IFDEF THREADSAFE}
+  FOwnHashSet.ReadLock;
+  try
+  {$ENDIF THREADSAFE}
+    CheckValid;
+    Result := DEFAULTVALUE;
+    ABucket := FOwnHashSet.FBuckets[FBucketIndex - 1];
+    if (ABucket <> nil) and (FItemIndex < ABucket.Size) then
+      Result := ABucket.Entries[FItemIndex]
+    else
+    if not FOwnHashSet.ReturnDefaultElements then
+      raise EJclNoSuchElementError.Create('');
+  {$IFDEF THREADSAFE}
+  finally
+    FOwnHashSet.ReadUnlock;
+  end;
+  {$ENDIF THREADSAFE}
+end;
+
+function SELFCLASSNAME.HasNext: Boolean;
+var
+  ABucketIndex, AItemIndex: Integer;
+  ABucket: BUCKETTYPENAME;
+  SkipCurrent: Boolean;
+begin
+  {$IFDEF THREADSAFE}
+  FOwnHashSet.ReadLock;
+  try
+  {$ENDIF THREADSAFE}
+    Result := True;
+    ABucketIndex := FBucketIndex;
+    AItemIndex := FItemIndex;
+    SkipCurrent := Valid;
+    while ABucketIndex < FOwnHashSet.FCapacity do
+    begin
+      ABucket := FOwnHashSet.FBuckets[ABucketIndex];
+      if ABucket <> nil then
+      begin
+        if (AItemIndex < (ABucket.Size - 1)) or
+          ((not SkipCurrent) and (AItemIndex < ABucket.Size)) then
+          Exit;
+      end;
+      AItemIndex := 0;
+      Inc(ABucketIndex);
+      SkipCurrent := False;
+    end;
+    Result := False;
+  {$IFDEF THREADSAFE}
+  finally
+    FOwnHashSet.ReadUnlock;
+  end;
+  {$ENDIF THREADSAFE}
+end;
+
+function SELFCLASSNAME.HasPrevious: Boolean;
+var
+  ABucketIndex, AItemIndex: Integer;
+  ABucket: BUCKETTYPENAME;
+  SkipCurrent: Boolean;
+begin
+  {$IFDEF THREADSAFE}
+  FOwnHashSet.ReadLock;
+  try
+  {$ENDIF THREADSAFE}
+    Result := True;
+    ABucketIndex := FBucketIndex;
+    AItemIndex := FItemIndex;
+    SkipCurrent := Valid;
+    while ABucketIndex >= 0 do
+    begin
+      ABucket := FOwnHashSet.FBuckets[ABucketIndex];
+      if ABucket <> nil then
+      begin
+        if (AItemIndex > 0) or
+          ((not SkipCurrent) and (AItemIndex >= 0)) then
+          Exit;
+      end;
+      AItemIndex := MaxInt;
+      Dec(ABucketIndex);
+      SkipCurrent := False;
+    end;
+    Result := False;
+  {$IFDEF THREADSAFE}
+  finally
+    FOwnHashSet.ReadUnlock;
+  end;
+  {$ENDIF THREADSAFE}
+end;
+
+function SELFCLASSNAME.Insert(CONSTKEYWORDPARAMETERNAME: TYPENAME): Boolean;
+begin
+  raise EJclOperationNotSupportedError.Create;
+end;
+
+function SELFCLASSNAME.IteratorEquals(const AIterator: ITRINTERFACENAME): Boolean;
+var
+  Obj: TObject;
+  ItrObj: SELFCLASSNAME;
+begin
+  Result := False;
+  if AIterator = nil then
+    Exit;
+  Obj := AIterator.GetIteratorReference;
+  if Obj is SELFCLASSNAME then
+  begin
+    ItrObj := SELFCLASSNAME(Obj);
+    Result := (FOwnHashSet = ItrObj.FOwnHashSet) and (FBucketIndex = ItrObj.FBucketIndex) and (FItemIndex = ItrObj.FItemIndex) and (Valid = ItrObj.Valid);
+  end;
+end;
+
+{$IFDEF SUPPORTS_FOR_IN}
+function SELFCLASSNAME.MoveNext: Boolean;
+var
+  ABucket: BUCKETTYPENAME;
+  SkipCurrent: Boolean;
+begin
+  {$IFDEF THREADSAFE}
+  FOwnHashSet.ReadLock;
+  try
+  {$ENDIF THREADSAFE}
+    if Valid then
+    begin
+      SkipCurrent := True;
+      while FBucketIndex < FOwnHashSet.FCapacity do
+      begin
+        ABucket := FOwnHashSet.FBuckets[FBucketIndex];
+        if ABucket <> nil then
+        begin
+          if (not SkipCurrent) and (FItemIndex < ABucket.Size) then
+            Break;
+          if FItemIndex < (ABucket.Size - 1) then
+          begin
+            Inc(FItemIndex);
+            Break;
+          end;
+        end;
+        FItemIndex := 0;
+        Inc(FBucketIndex);
+        SkipCurrent := False;
+      end;
+    end
+    else
+      Valid := True;
+
+    Result := (FBucketIndex >= 0) and (FItemIndex >= 0) and
+              (FBucketIndex < FOwnHashSet.FCapacity);
+    if Result then
+    begin
+      ABucket := FOwnHashSet.FBuckets[FBucketIndex];
+      Result := (ABucket <> nil) and (FItemIndex < ABucket.Size);
+    end;
+  {$IFDEF THREADSAFE}
+  finally
+    FOwnHashSet.ReadUnlock;
+  end;
+  {$ENDIF THREADSAFE}
+end;
+{$ENDIF SUPPORTS_FOR_IN}
+
+function SELFCLASSNAME.Next: TYPENAME;
+var
+  ABucket: BUCKETTYPENAME;
+  SkipCurrent: Boolean;
+begin
+  {$IFDEF THREADSAFE}
+  FOwnHashSet.ReadLock;
+  try
+  {$ENDIF THREADSAFE}
+    if Valid then
+    begin
+      SkipCurrent := True;
+      while FBucketIndex < FOwnHashSet.FCapacity do
+      begin
+        ABucket := FOwnHashSet.FBuckets[FBucketIndex];
+        if ABucket <> nil then
+        begin
+          if (not SkipCurrent) and (FItemIndex < ABucket.Size) then
+            Break;
+          if FItemIndex < (ABucket.Size - 1) then
+          begin
+            Inc(FItemIndex);
+            Break;
+          end;
+        end;
+        FItemIndex := 0;
+        Inc(FBucketIndex);
+        SkipCurrent := False;
+      end;
+    end
+    else
+      Valid := True;
+
+    Result := DEFAULTVALUE;
+    if (FBucketIndex >= 0) and (FItemIndex >= 0) and
+       (FBucketIndex < FOwnHashSet.FCapacity) then
+    begin
+      ABucket := FOwnHashSet.FBuckets[FBucketIndex];
+      if (ABucket <> nil) and
+         (FItemIndex < ABucket.Size) then
+        Result := ABucket.Entries[FItemIndex]
+      else
+      if not FOwnHashSet.ReturnDefaultElements then
+        raise EJclNoSuchElementError.Create('');
+    end
+    else
+    if not FOwnHashSet.ReturnDefaultElements then
+      raise EJclNoSuchElementError.Create('');
+  {$IFDEF THREADSAFE}
+  finally
+    FOwnHashSet.ReadUnlock;
+  end;
+  {$ENDIF THREADSAFE}
+end;
+
+function SELFCLASSNAME.NextIndex: Integer;
+begin
+  // No index
+  raise EJclOperationNotSupportedError.Create;
+end;
+
+function SELFCLASSNAME.Previous: TYPENAME;
+var
+  ABucket: BUCKETTYPENAME;
+  SkipCurrent: Boolean;
+begin
+  {$IFDEF THREADSAFE}
+  FOwnHashSet.ReadLock;
+  try
+  {$ENDIF THREADSAFE}
+    if Valid then
+    begin
+      SkipCurrent := True;
+      while FBucketIndex >= 0 do
+      begin
+        ABucket := FOwnHashSet.FBuckets[FBucketIndex];
+        if (ABucket <> nil) and (FItemIndex < 0) then
+          FItemIndex := ABucket.Size - 1;
+        if ABucket <> nil then
+        begin
+          if (not SkipCurrent) and (FItemIndex >= 0) and (FItemIndex < ABucket.Size) then
+            Break;
+          if (FItemIndex > 0) and (FItemIndex < ABucket.Size) then
+          begin
+            Dec(FItemIndex);
+            Break;
+          end;
+        end;
+        FItemIndex := -1;
+        Dec(FBucketIndex);
+        SkipCurrent := False;
+      end;
+    end
+    else
+      Valid := True;
+
+    Result := DEFAULTVALUE;
+    if (FBucketIndex >= 0) and (FItemIndex >= 0) and
+       (FBucketIndex < FOwnHashSet.FCapacity) then
+    begin
+      ABucket := FOwnHashSet.FBuckets[FBucketIndex];
+      if (ABucket <> nil) and
+         (FItemIndex < ABucket.Size) then
+        Result := ABucket.Entries[FItemIndex]
+      else
+      if not FOwnHashSet.ReturnDefaultElements then
+        raise EJclNoSuchElementError.Create('');
+    end
+    else
+    if not FOwnHashSet.ReturnDefaultElements then
+      raise EJclNoSuchElementError.Create('');
+  {$IFDEF THREADSAFE}
+  finally
+    FOwnHashSet.ReadUnlock;
+  end;
+  {$ENDIF THREADSAFE}
+end;
+
+function SELFCLASSNAME.PreviousIndex: Integer;
+begin
+  // No index
+  raise EJclOperationNotSupportedError.Create;
+end;
+
+procedure SELFCLASSNAME.Remove;
+begin
+
+end;
+
+procedure SELFCLASSNAME.Reset;
+var
+  ABucket: BUCKETTYPENAME;
+begin
+  {$IFDEF THREADSAFE}
+  FOwnHashSet.ReadLock;
+  try
+  {$ENDIF THREADSAFE}
+    Valid := False;
+    case FStart of
+      isFirst:
+        begin
+          FBucketIndex := 0;
+          ABucket := nil;
+          while FBucketIndex < FOwnHashSet.FCapacity do
+          begin
+            ABucket := FOwnHashSet.FBuckets[FBucketIndex];
+            if (ABucket <> nil) and (ABucket.Size > 0) then
+              Break;
+            Inc(FBucketIndex);
+          end;
+          if ABucket <> nil then
+            FItemIndex := 0
+          else
+            FItemIndex := -1;
+        end;
+      isLast:
+        begin
+          FBucketIndex := FOwnHashSet.FCapacity - 1;
+          ABucket := nil;
+          while FBucketIndex >= 0 do
+          begin
+            ABucket := FOwnHashSet.FBuckets[FBucketIndex];
+            if (ABucket <> nil) and (ABucket.Size > 0) then
+              Break;
+            Dec(FBucketIndex);
+          end;
+          if ABucket <> nil then
+            FItemIndex := ABucket.Size - 1
+          else
+            FItemIndex := -1;
+        end;
+    end;
+  {$IFDEF THREADSAFE}
+  finally
+    FOwnHashSet.ReadUnlock;
+  end;
+  {$ENDIF THREADSAFE}
+end;
+
+procedure SELFCLASSNAME.SETTERPROCEDURENAME(CONSTKEYWORDPARAMETERNAME: TYPENAME);
+begin
+  raise EJclOperationNotSupportedError.Create;
+end;
+*)

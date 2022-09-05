@@ -1,0 +1,1155 @@
+@@Windows_Specific.Shell
+<GROUP Windows_Specific>
+<TITLE Shell>
+<TOPICORDER 500>
+--------------------------------------------------------------------------------
+@@Windows_Specific.Shell.FilesandFolders
+<GROUP Windows_Specific.Shell>
+<TITLE Files and Folders>
+<TOPICORDER 100>
+--------------------------------------------------------------------------------
+@@Windows_Specific.Shell.MemoryManagement
+<GROUP Windows_Specific.Shell>
+<TITLE Memory Management>
+<TOPICORDER 200>
+--------------------------------------------------------------------------------
+@@Windows_Specific.Shell.Miscellaneous
+<GROUP Windows_Specific.Shell>
+<TITLE Miscellaneous>
+<TOPICORDER 300>
+--------------------------------------------------------------------------------
+@@Windows_Specific.Shell.PathsandPIDLs
+<GROUP Windows_Specific.Shell>
+<TITLE Paths and PIDLs>
+<TOPICORDER 400>
+--------------------------------------------------------------------------------
+@@Windows_Specific.Shell.Shortcuts
+<GROUP Windows_Specific.Shell>
+<TITLE Shortcuts>
+<TOPICORDER 500>
+--------------------------------------------------------------------------------
+@@GetSpecialFolderLocation
+<GROUP Windows_Specific.Shell.FilesandFolders>
+Summary:
+  Returns special folder location path.
+Description:
+  The GetSpecialFolderLocation function returns the location path of the special
+  folder specified.
+Parameters:
+  FolderID - Special folder ID to locate. One of the CSIDL_XXX constants must be specified here (see ShlObj.pas for the full list).
+Result:
+  If the function succeeds the result is the location path of the special folder.
+  Otherwise the result is an empty string.
+See also:
+  OpenSpecialFolder
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@OpenFolder
+<GROUP Windows_Specific.Shell.FilesandFolders>
+Summary:
+  Opens a folder in Explorer.
+Description:
+  The OpenFolder function opens Explorer with the specified Folder as the root
+  of the namespace (root of the lefthand treeview).
+Parameters:
+  Folder - Path of the folder to open. You can either specify a fully qualified path or a relative one, which will be relative to the current directory.
+  Parent - Handle of the window to serve as the parent of any dialogs displayed.
+Result:
+  If the function succeeds the result is True, otherwise it is False. You can call
+  GetLastError to get more detailed information about the reason of failure.
+See also:
+  OpenSpecialFolder
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@OpenSpecialFolder
+<GROUP Windows_Specific.Shell.FilesandFolders>
+Summary:
+  Opens a special folder in Explorer.
+Description:
+  The OpenSpecialFolder function opens Explorer with the specified Folder as the root
+  of the namespace (root of the lefthand treeview).
+Parameters:
+  FolderID - Special folder ID to open. One of the CSIDL_XXX constants must be specified here (see ShlObj.pas for the full list).
+  Parent - Handle of the window to serve as the parent of any dialogs displayed.
+Result:
+  If the function succeeds the result is True, otherwise it is False.
+See also:
+  OpenFolder
+  GetSpecialFolderLocation
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@SHDeleteFolder
+<GROUP Windows_Specific.Shell.FilesandFolders>
+Summary:
+  Deletes the specified folder.
+Description:
+  SHDeleteFolder deletes the specified folder, either permanently or to the recycle
+  bin depending on the Options parameter. Additionally the function provides
+  visual feedback by displaying the familiar delete folder dialog you also see
+  when deleting a folder through explorer.
+Parameters:
+  Parent - Handle of the window to serve as the parent of any dialogs displayed by this function. Specify GetDesktopWindow to use the desktop as the parent.
+  Folder - The folder to delete.
+  Options - Set of options that control the behavior of this function. See TSHDeleteOptions for more information.
+Result:
+  If the function succeeds the result is True, otherwise it is False.
+See also:
+  TSHDeleteOptions
+  SHDeleteFiles
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@SHDeleteFiles
+<GROUP Windows_Specific.Shell.FilesandFolders>
+Summary:
+  Deletes one or more files.
+Description:
+  SHDeleteFiles delete a single file, multiple files or even files specified with
+  a wildcard expression such as *.dcu. If doSilent is not specified the function
+  provides visual feedback of its progress by showing the familiar delete files
+  dialog you also see when deleting files through Explorer. In addition the
+  function allows for deletion to the recycle bin through the doAllowUndo flag.
+Parameters:
+  Parent - Handle of the window to serve as the parent of any dialogs displayed by this function. Specify GetDesktopWindow to use the desktop as the parent.
+  Files - Files to delete. This can be a single fully qualified filename, a list of files separated by a #0 or a wildcard expression (e.g. *.*). If Files specifies a (single) folder then make sure it is not ended in a backslash. In this latter case, the function deletes all files in the folder and then deletes the folder itself. The folder cannot have subfolders or the function fails.
+  Options - Set of options that control the behavior of this function. See TSHDeleteOptions for more information.
+Result:
+  If the function succeeds the result is True, otherwise it is False.
+See also:
+  TSHDeleteOptions
+  SHDeleteFolder
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@SHRenameFile
+<GROUP Windows_Specific.Shell.FilesandFolders>
+Summary:
+  Renames a file.
+Description:
+  SHRenameFile renames the specified file. Options allows you to control the
+  behavior of the function. For example, if you specify [roRenameOnCollision] the
+  function automatically modifies the destination filename in case the specified
+  file already exists.
+Parameters:
+  Src - Fully qualified name of the source file (the original name).
+  Dest - Fully qualified name of the destination file (the name to rename Src to).
+  Options - Set of options that control the behavior of this function. See TSHRenameOptions for more information.
+Result:
+  If the function succeeds the result is True, otherwise it is False.
+Notes:
+  Use this function only to rename a single file.
+See also:
+  TSHDeleteOptions
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TSHRenameOption
+<GROUP Windows_Specific.Shell.FilesandFolders>
+Summary:
+  Enumeration used by SHRenameFile to specify the rename options.
+Description:
+  Enumeration used by SHRenameFile to specify the rename options.
+See also:
+  SHRenameFile
+Donator:
+  Marcel van Brakel
+@@TSHRenameOption.roSilent
+  Perform the operation without any user interface feedback, including errors.
+@@TSHRenameOption.roRenameOnCollision
+  If renaming causes a naming conflict (ie the file already exists) then automatically rename the destination file. This will usually result in a name like 'Copy of ...'. If not specified the renaming fails in case of a conflict.
+@@TSHRenameOptions
+<GROUP Windows_Specific.Shell.FilesandFolders>
+<COMBINE TSHRenameOption>
+--------------------------------------------------------------------------------
+@@TSHDeleteOption
+<GROUP Windows_Specific.Shell.FilesandFolders>
+Summary:
+  Enumeration used by SHDeleteFiles and SHDeleteFolder to specify the deletion options.
+Description:
+  Enumeration used by SHDeleteFiles and SHDeleteFolder to specify the deletion options.
+See also:
+  SHDeleteFiles
+  SHDeleteFolder
+Donator:
+  Marcel van Brakel
+@@TSHDeleteOption.doSilent
+  Perform the operation without any user interface feedback, including errors.
+@@TSHDeleteOption.doAllowUndo
+  If possible, allow the operation to be undone through the recycle bin.
+@@TSHDeleteOption.doFilesOnly
+  If a wildcard expression is specified, only delete files, not folders.
+@@TSHDeleteOptions
+<GROUP Windows_Specific.Shell.FilesandFolders>
+<COMBINE TSHDeleteOption>
+--------------------------------------------------------------------------------
+@@TEnumFolderRec
+<GROUP Windows_Specific.Shell.FilesandFolders>
+Summary:
+  The TEnumFolderRec is used to return information about an item that was found during the enumeration of a folder using the SHEnumFolderFirst and SHEnumFolderNext functions. It also holds data needed to perform the enumeration. Because of this you must always call SHEnumFolderClose to release these resources if SHEnumFolderFirst returned True.
+Description:
+  The TEnumFolderRec is used to return information about an item that was found during the enumeration of a folder using the SHEnumFolderFirst and SHEnumFolderNext functions. It also holds data needed to perform the enumeration. Because of this you must always call SHEnumFolderClose to release these resources if SHEnumFolderFirst returned True.
+Notes:
+  The returned icons are the 'plain' icons. You can use code such as below to transform them into how the shell displays them:   <P class="syntax">   if (F.Attributes and SFGAO_SHARE) = SFGAO_SHARE then     OverlayIconShared(F.IconLarge, F.IconSmall);   You can also use the Folder member to get additional info about the found item:   <P class="syntax">   S := GetItemInfoTip(F.Folder, F.Item);   
+Donator:
+  Marcel van Brakel
+@@TEnumFolderRec.DisplayName
+  The display name of the item
+@@TEnumFolderRec.Attributes
+  Attributes of the item (see IShellFolder.GetAttributesOf)
+@@TEnumFolderRec.IconLarge
+  The large icon
+@@TEnumFolderRec.IconSmall
+  The small icon
+@@TEnumFolderRec.Item
+  Readonly! Item identifier list representing this item. Relative to Folder
+@@TEnumFolderRec.EnumIdList
+  Don't touch! Interface used for enumeration.
+@@TEnumFolderRec.Folder
+  IShellFolder interface of the folder we are enumerating.
+--------------------------------------------------------------------------------
+@@TEnumFolderFlag
+<GROUP Windows_Specific.Shell.FilesandFolders>
+Summary:
+  Enumeration used by SHEnumFolderFirst to specify the type of items to include in the enumeration.
+Description:
+  Enumeration used by SHEnumFolderFirst to specify the type of items to include in the enumeration.
+See also:
+  SHEnumFolderFirst
+  SHEnumFolderNext
+  SHEnumFolderClose
+Donator:
+  Marcel van Brakel
+@@TEnumFolderFlag.efFolders
+  include folder items in the enumeration
+@@TEnumFolderFlag.efNonFolders
+  include non folder items in the enumeration
+@@TEnumFolderFlag.efIncludeHidden
+  include hidden items in the enumeration
+@@TEnumFolderFlags
+<GROUP Windows_Specific.Shell.FilesandFolders>
+<COMBINE TEnumFolderFlag>
+--------------------------------------------------------------------------------
+@@SHEnumFolderFirst
+<GROUP Windows_Specific.Shell.FilesandFolders>
+Summary:
+  Begins the enumeration of the items in a folder.
+Description:
+  SHEnumFolderFirst begins the enumeration of all items in the specified folder that
+  match the specified Flags. If the function succeeds then the return value is True
+  and the F parameter will contain information
+  about the found item such as its name and attributes. To continue the enumeration
+  call SHEnumFolderNext. To close the enumeration and release the
+  resources held call SHEnumFolderClose. If the function fails the
+  return value is False. This might indicate an error such as a non-existing
+  function, or indicate that the folder is empty. The flags parameter allows you
+  to put a number of restrictions on the items that are included in the enumeration.
+  To define the folder to enumeration use the Folder string parameter, supply a
+  fully qualified path, or the SpecialFolder parameter which can be set to one of
+  the CSIDL_XXX constants.
+Parameters:
+  Flags - Flags that determine what type of items to include in the enumeration.
+  F - Record that returns information about the items found and holds data used to continue the enumeration with a later call the SHEnumFolderNext.
+  SpecialFolder - One of the CSIDL_XXX constants that identify the special folder to enumerate.
+  Folder - Fully qualified name of the folder you want to enumerate.
+Result:
+  If the function succeeds it returns True and the Types\TEnumFolderRec record
+  is filled with information about the first found item. If the function fails the
+  return value is False. In this latter case you cannot call SHEnumFolderNext and
+  don't need to call SHEnumFolderClose. If the function succeeded you can continue
+  the enumeration with SHEnumFolderNext
+Notes:
+  If SHEnumFolderFirst returns False there is no need to call SHEnumFolderClose.
+  Passing an empty string as the Folder parameter will enumerate 'My Computer'.
+See also:
+  SHEnumFolderNext
+  SHEnumFolderClose
+  TEnumFolderRec
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@SHEnumFolderClose
+<GROUP Windows_Specific.Shell.FilesandFolders>
+Summary:
+  Closes an enumeration sequence started by SHEnumFolderFirst.
+Description:
+  This function closes a folder enumeration initiated earlier with SHEnumFolderFirst.
+  You must call this function to release resources held during the enumeration. Note
+  that it is only necessary to call this function if SHEnumFolderFirst returned True.
+Parameters:
+  F - The TEnumFolderRec used during the enumeration.
+See also:
+  SHEnumFolderFirst
+  SHEnumFolderNext
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@SHEnumFolderNext
+<GROUP Windows_Specific.Shell.FilesandFolders>
+Summary:
+  Retrieves the next item in the enumeration matching the attributes specified by a previous call to SHEnumFolderFirst.
+Description:
+  SHEnumFolderNext retrieves the next item in the enumeration of a folder that
+  was previously started with SHEnumFolderFirst. If the function succeeds it returns
+  True and the F parameter is filled with the information about the next item. If
+  it fails then the function returns False. The most likely case is that there
+  are no more items in the folder. You should always end an enumeration by
+  calling SHEnumFolderClose.
+Parameters:
+  F - TEnumFolderRec that was returned by SHEnumFolderFirst
+Result:
+  If the function finds a next item it returns True. If there is no next item or
+  an error occurred it returns False.
+See also:
+  SHEnumFolderFirst
+  SHEnumFolderClose
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@DisplayPropDialog
+<GROUP Windows_Specific.Shell.FilesandFolders>
+Summary:
+  Displays the properties sheet of a shell item.
+Description:
+  Displays the properties sheet of the item specified by FileName or Item. The
+  window defined by handle is used as the parent of this dialog. To make the
+  desktop the parent of the dialog use the return value of GetDesktopWindow.
+Parameters:
+  Handle - Handle of the window to use as the parent for all windows displayed by this function.
+  FileName - Fully qualified name of the file whose properties dialog you want to display.
+  Item - Pidl of the item whose properties dialog you want to display.
+Result:
+  If the function succeeds it returns True, otherwise it returns False. You can call
+  GetLastError to get more detailed information about the reason of failure.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@DisplayContextMenuPidl
+<GROUP Windows_Specific.Shell.FilesandFolders>
+Summary:
+  Displays the context menu of a shell item.
+Description:
+  Displays the context menu of the item specified by Item at position Pos using
+  window defined by Handle as the parent for the menu. Folder should be the parent
+  folder of the specified Item, which should be relative to the folder. The function
+  returns True on success on False on failure. Note that when the user selects an
+  item from the menu, the action defined by that item is also executed.
+Parameters:
+  Handle - Handle of the window to use as the parent for all windows displayed by this function.
+  Folder - The parent folder of the specified item.
+  Item - The Item for which to display a context menu. Should be relative to Folder.
+  Pos - Position, in client coordinates relative to the window identified by Handle, of the top, left corner of the context menu.
+Result:
+  If the function succeeds the result is True, if it fails the result is False.
+See also:
+  DisplayContextMenu
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@DisplayContextMenu
+<GROUP Windows_Specific.Shell.FilesandFolders>
+Summary:
+  Displays the context menu of a shell item.
+Description:
+  Displays the context menu of the file specified by FileName at position Pos using
+  the window defined by Handle as the parent for the menu. The function returns
+  True on success and False on failure. Note that when the user selects an item
+  from the menu, the action defined by that item is also executed.
+Parameters:
+  Handle - Handle of the window to use as the parent for all windows displayed by this function.
+  FileName - Fully qualified name of the file for which you want to display a context menu.
+  Pos - Position, in client coordinates relative to the window identified by Handle, of the top, left corner of the context menu.
+Result:
+  If the function succeeds the result is True, if it fails the result is False.
+See also:
+  DisplayContextMenuPidl
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@OverlayIcon
+<GROUP Windows_Specific.Shell.Miscellaneous>
+Summary:
+  Overlays Icon with OverlayIcon.
+Description:
+  OverlayIcon will overlay Icon with Overlay and return the result in Icon. If the
+  function succeeds the return value is True. If it fails the return value is
+  False in which case Icon retains its old value. The Large parameter controls
+  whether the icons are assumed to be large (True) or small (False).
+Parameters:
+  Icon - Handle of the icon which you want to overlay.
+  Overlay - Handle of the overlay icon.
+  Large - If True Icon and Overlay are assumed to be large icons, if False they are assumed to be small icons. See Notes.
+Result:
+  If the function succeeds the result is True and Icon contains a handle to the
+  overlayed version. If the function fails the return value is False.
+Notes:
+  The dimensions of large and small are determined by using the GetSystemMetrics function with SM_CXICON, SM_CXSMICON respectively.
+See also:
+  OverlayIconShortcut
+  OverlayIconShared
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@OverlayIconShortCut
+<GROUP Windows_Specific.Shell.Miscellaneous>
+Summary:
+  Overlays an icon with the system 'shortcut' icon.
+Description:
+  OverlayIconShortCut overlays the icon passed in with the icon that the shell
+  uses to represent a shortcut. This function uses the OverlayIcon
+  function internally and the notes about icon sizes mentioned there apply here.
+Parameters:
+  Large - On input this must be a valid handle to a large icon. On exit this will be the handle of that same icon, overlayed with the shortcut icon.
+  Small - On input this must be a valid handle to a small icon. On exit this will be the handle of that same icon, overlayed with the shortcut icon.
+Result:
+  If the function succeeds it returns True, if it fails it returns False.
+See also:
+  OverlayIcon
+  OverlayIconShared
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@OverlayIconShared
+<GROUP Windows_Specific.Shell.Miscellaneous>
+Summary:
+  Overlays an icon with the system 'shared' icon.
+Description:
+  OverlayIconShortCut overlays the icon passed in with the icon that the shell
+  uses to represent a shared item. This function uses the OverlayIcon
+  function internally and the notes about icon sizes mentioned there apply here.
+Parameters:
+  Large - On input this must be a valid handle to a large icon. On exit this will be the handle of that same icon, overlayed with the shared folder icon.
+  Small - On input this must be a valid handle to a small icon. On exit this will be the handle of that same icon, overlayed with the shared folder icon.
+Result:
+  If the function succeeds it returns True, if it fails it returns False.
+See also:
+  OverlayIcon
+  OverlayIconShortCut
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GetSystemIcon
+<GROUP Windows_Specific.Shell.Miscellaneous>
+Summary:
+  Retrieves the icon at the specified index from the system imagelist.
+Description:
+  GetSystemIcon returns the icon at specified index from the system imagelist. If
+  the function succeeds the result is a handle to that icon, otherwise it is 0. The
+  caller is responsible for eventually releasing the icon by calling DestroyIcon.
+  You can use the Flags parameter to modify the behavior of this function. You can
+  pass a combination of the flags specified in the documentation of SHGetFileInfo
+  API function. The most used flags are: SHGFI_SMALLICON and SHGFI_LARGEICON which
+  cause the function to return a small and large sized icon respectively. If you
+  pass in 0 then the function sets Flags to SHGFI_SHELLICONSIZE.
+Parameters:
+  IconIndex - The index into the system imagelist of the icon you want to retrieve.
+  Flags - Flags that further specify the returned icon. This can be a combination of the SHGFI_x flags listed in the documentation of SHGetFileInfo. For example, you can set this flag to SHGFI_SMALLICON to get its small icon.
+Result:
+  Handle of the requested icon or 0 on failure. The caller is responsible for
+  destroying the icon when it is no longer used. Do that by calling the DestroyIcon
+  API function.
+Notes:
+  If you assign the returned handle to the Handle property of a TIcon you don't have to explicitly destroy the icon any longer. TIcon does that for you.
+  This function requires COM to be initialized. Delphi normally does that for you but you may have to call CoInitialize yourself depending on the circumstances.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@SHDllGetVersion
+<GROUP Windows_Specific.Shell.Miscellaneous>
+Summary:
+  Reads version information from the specified file.
+Description:
+  SHDllGetVersion attempts to read version information from the specified file using
+  the well-known DllGetVersion exported function. This function is exported by all
+  the newer Windows shell related DLLs starting with shell version 4.71. FileName
+  should be the fully qualified name of the file for which to return version
+  information. If the function succeeds then the result is True, otherwise the result
+  is False and the Version record contains garbage.
+Parameters:
+  FileName - The fully qualified path name of the file for which you want to retrieve version information. Most likely the name of a shell DLL. If the DLL can be found on the search path then the filename is sufficient (for example Shell32.dll does not have to include the path).
+  Version - Record which is filled with version information if the function succeeds. See TDllVersionInfo
+Result:
+  If the function succeeds the return value is True and the Version record is filled
+  with the version information. If the function fails the return value is False and
+  the Version record contains whatever it contained on entry.
+See also:
+  TDllVersionInfo
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@ShellExec
+<GROUP Windows_Specific.Shell.Miscellaneous>
+Summary:
+  Performs an action on a file.
+Description:
+  ShellExec is a wrapper for the Win32 API function ShellExecuteEx which alleviates
+  some of the complexities of this function by providing defaults for some
+  of its lesser used parameters. This function performs an action specified on a
+  file which can be anything from executing the file to opening it using the associated
+  editor.
+Parameters:
+  FileName - Name of the file or object on which to perform the action.
+  Parameters - Application parameters. The parameters must be separated by spaces. To include double quotation marks, enclose each mark in a pair of quotation marks. This parameter defaults to an empty string.
+  Verb - Specifies the action to be performed. The available verbs depend on the type of object specified in the FileName parameter but some of the more commonly used ones are 'open', 'print' and 'edit'. See the Platform SDK documentation for more information. This parameter defaults to an empty string which causes the default verb to be executed (usually 'open').
+  CmdShow - Flags that specify how the application should display when it is opened. See the Platform SDK documentation on ShellExecute for more information. Commonly used values are SW_HIDE and SW_SHOW. This parameter defaults to SW_SHOWNORMAL.
+Result:
+  If the function succeeds it returns True, otherwise it returns False. You can call
+  GetLastError to get more detailed information about the reason of failure.
+See also:
+  ShellExecAndWait
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@ShellExecAndWait
+<GROUP Windows_Specific.Shell.Miscellaneous>
+Summary:
+  Performs an action on a file.
+Description:
+  ShellExexAndWait is a wrapper for the Win32 API function ShellExecuteEx which alleviates
+  some of the complexities of this function by providing defaults for some
+  of its lesser used parameters. This function performs an action specified on a
+  file which can be anything from executing the file to opening it using the associated
+  editor. This routine is identical to ShellExec except that this function waits
+  for the action to be completed. For example, when using this file to open a HTML
+  document, the function will launch the default webbrowser and then wait until the
+  browser terminates, only then will this function call return to its caller.
+Parameters:
+  FileName - Name of the file or object on which to perform the action.
+  Parameters - Application parameters. The parameters must be separated by spaces. To include double quotation marks, enclose each mark in a pair of quotation marks. This parameter defaults to an empty string.
+  Verb - Specifies the action to be performed. The available verbs depend on the type of object specified in the FileName parameter but some of the more commonly used ones are 'open', 'print' and 'edit'. See the Platform SDK documentation for more information. This parameter defaults to an empty string which causes the default verb to be executed (usually 'open').
+  CmdShow - Flags that specify how the application should display when it is opened. See the Platform SDK documentation on ShellExecute for more information. Commonly used values are SW_HIDE and SW_SHOW. This parameter defaults to SW_SHOWNORMAL.
+Result:
+  If the function succeeds it returns True, otherwise it returns False. You can call
+  GetLastError to get more detailed information about the reason of failure.
+See also:
+  ShellExec
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@ShellOpenAs
+<GROUP Windows_Specific.Shell.Miscellaneous>
+Summary:
+  Invokes the shell's "Open With..." dialog for the specified file.
+Description:
+  The ShellOpenAs function invokes the shell's "Open With..." dialog with the
+  specified filename selected. This allows the user to select an application to
+  open the file with, or dismiss opening all together. If the user selects an
+  application and clicks the OK button the shell executes the selected application
+  and instructs it to open the specified file.
+Parameters:
+  FileName - The fully qualified name of the file for which to invoke the "Open With..." dialog. The caller is responsible for ensuring that the specified file actually exists, this function nor the shell does so. If the file does not exist the eventually invoke application, if any, is the one to determine that fact (and will likely display an error message).
+Result:
+  If the function succeeds it returns True, otherwise it returns False. Note that
+  the invocation of the dialog is asynchronously so at the time the function returns
+  the dialog likely is not on screen yet. The result therefore doesn't indicate
+  whether or not the user selected an application but only whether or not the
+  dialog can be shown in the first place.
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@ShellRasDial
+<GROUP Windows_Specific.Shell.Miscellaneous>
+Summary:
+  Invokes the RAS Connect dialog.
+Description:
+  The ShellRasDial function invoked the RAS Connect dialog (the one you get when
+  you double click a RAS connection) for the specified connection.
+Parameters:
+  EntryName - The name of the dial up connection to invoke. This name must be the exact name of an existing dial up connection.
+Result:
+  If the function succeeds it returns True, otherwise it fails. Reasons for possible
+  failure are an incorrect (non-existing) entry name, the user pressing the Cancel
+  button in the dialog or failure to connect.
+Donator:
+  Anonymous
+--------------------------------------------------------------------------------
+@@ShellRunControlPanel
+<GROUP Windows_Specific.Shell.Miscellaneous>
+Summary:
+  Executes a control panel application.
+Description:
+  ShellRunControlPanel executes a control panel application.
+Parameters:
+  NameOrFileName - Filename of the control panel application to execute (a .cpl)
+  AppletNumber - Zero based index of the applet to execute. Most control panel applications only implement a single applet so this parameter is most often 0. However, for those control panel applications that implement multiple applets you can use this index to choose the applet to execute. For example, on Windows 2000 main.cpl implements two applets, Mouse Properties (index 0) and Keyboard Properties (index 1).
+Result:
+  If the control panel application can be executed the function returns True,
+  otherwise it returns False. Note that the application is executed asynchronously
+  so the application may not be running yet when the function returns. Note that
+  passing an invalid index causes the function to return True (it only checks
+  validity of the filename) but the applet will not be shown (obviously).
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TJclFileExeType
+<GROUP Windows_Specific.Shell.Miscellaneous>
+Summary:
+  Enumeration use by GetFileExeType representing a type of executable file.
+Description:
+  Enumeration use by GetFileExeType representing a type of executable file.
+Donator:
+  Petr Vones
+@@TJclFileExeType.etError
+  Error, executable file type couldn't be determined.
+@@TJclFileExeType.etMsDos
+  MS DOS executable (.exe, .com or .bat)
+@@TJclFileExeType.etWin16
+  16 bit Windows executable.
+@@TJclFileExeType.etWin32Gui
+  32 bit Windows GUI executable.
+@@TJclFileExeType.etWin32Con
+  32 bit Windows console executable.
+--------------------------------------------------------------------------------
+@@GetFileExeType
+<GROUP Windows_Specific.Shell.Miscellaneous>
+Summary:
+  Returns the type of executable file.
+Description:
+  GetFileExeType returns the type of executable file of the specified file.
+Parameters:
+  FileName - Fully qualified name of the file to test.
+Result:
+  If the function succeeds it returns the type of executable file represented by
+  the TJclFileExeType type. If the function fails it returns etError.
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@ShellFindExecutable
+<GROUP Windows_Specific.Shell.Miscellaneous>
+Summary:
+  Returns the executable associated with a file.
+Description:
+  ShellFindExecutable returns the name of the application that is associated with
+  the specified file. That is, the application that would be executed when you
+  double click the document (file).
+Parameters:
+  FileName - Fully qualified name of the file for which to determine the associated application.
+  DefaultDir - TODO
+Result:
+  If the function succeeds it returns the name of the application associated with
+  the specified file. If the function fails it returns an empty string.
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@SHReallocMem
+<GROUP Windows_Specific.Shell.MemoryManagement>
+Summary:
+  Reallocates (changes the size) a block of memory in the shell's memory space. The contents of the block prior to reallocation are reserved but there is no guarantee that the pointer will retain its value. The newly allocated block may be on a different address if there is not enough room to expand it in place. Also the actual size of the allocated block maybe slightly larger then the requested size because of additional maintenance data (not accessible).
+Description:
+  SHReallocMem reallocates a specified memory block to a new size using the shell's
+  memory allocator. If on input P is not nil then it must point to a block of
+  memory previously allocated with the shell's memory allocator (SHGetMem or SHAllocMem).
+Parameters:
+  P - On input pointer to a memory block previously allocated with either SHGetMem SHAllocMem or nil. In the latter case SHReallocMem functions just like SHGetMem.
+  Count - Total size, in bytes, to (re)allocate. If 0 then the memory pointed to be P (if not nil) is freed.
+Result:
+  If the function succeeds it returns True and P contains the address of the reallocated
+  memory block. If the function fails it returns False, and P will retain its value.
+See also:
+  SHAllocMem
+  SHGetMem
+  SHFreeMem
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@SHGetMem
+<GROUP Windows_Specific.Shell.MemoryManagement>
+Summary:
+  Allocates memory using the Shell's memory allocator.
+Description:
+  SHAllocMem allocates the specified amount of memory using the Shell's memory
+  allocator. If the allocation succeeds then P is set to point to the allocated
+  memory and the return value will be True. You should assume that the memory
+  contains random values. On failure, P retains its value and the return value
+  will be False.
+Parameters:
+  P - Pointer variable which returns the address of the allocated memory block
+  Count - Size, in byte, of the block of memory to allocate.
+Result:
+  If the function succeeds it returns True and P contains the address of the allocated
+  memory block. If the function fails then it returns False and P will be set to nil.
+See also:
+  SHAllocMem
+  SHFreeMem
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@SHAllocMem
+<GROUP Windows_Specific.Shell.MemoryManagement>
+Summary:
+  Allocates memory using the Shell's memory allocator.
+Description:
+  SHAllocMem allocates the specified amount of memory using the Shell's memory
+  allocator. If the allocation succeeds then the memory block is initialized to
+  all 0's, P is set to point to the allocated memory and the return value will be
+  True. On failure, P retains its value and the return value will be False.
+Parameters:
+  P - Pointer variable which returns the address of the allocated memory block
+  Count - Size, in bytes, of the block of memory to allocate.
+Result:
+  If the function succeeds it returns True and P contains the address of the allocated
+  memory block. If the function fails it returns False and P will be set to nil.
+See also:
+  SHGetMem
+  SHFreeMem
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@SHFreeMem
+<GROUP Windows_Specific.Shell.MemoryManagement>
+Summary:
+  Frees the memory pointed to by P.
+Description:
+  SHFreeMem frees the memory pointed to by P in the Shell's memory space. The memory
+  must be allocated by the Shell's memory allocator. On success P is set to nil
+  and the return value is True. On failure P retains its value and the return
+  value is False.
+Parameters:
+  P - Pointer to the memory block to free. If the function succeeds this parameter is set to nil.
+Result:
+  If the function succeeds it returns True, if it fails it returns False. The latter
+  case means that either the shell's memory allocator couldn't be retrieved or that
+  the memory block wasn't allocated by the shell. Either case, the memory is not
+  freed and the P parameter retains its value.
+See also:
+  SHAllocMem
+  SHGetMem
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TShellLink
+<GROUP Windows_Specific.Shell.Shortcuts>
+Summary:
+  The TShellLink record is used when creating or resolving shortcuts with the ShellLinkCreate , ShellLinkCreateSystem and ShellLinkResolve functions.
+Description:
+  The TShellLink record is used when creating or resolving shortcuts with the ShellLinkCreate , ShellLinkCreateSystem and ShellLinkResolve functions.
+Notes:
+  To avoid problems you should set the IdList field to nil before using this record.
+  You must call ShellLinkFree when you no longer need the ShellLink record.
+  The shell shortcut functions rely on COM internally and as such you should ensure COM is propertly initialized by calling the Win32 CoInitialize(nil) function before using these functions.
+See also:
+  ShellLinkCreate
+  ShellLinkCreateSystem
+  ShellLinkResolve
+Donator:
+  Marcel van Brakel
+@@TShellLink.Arguments
+  Command line arguments associated with the shell link
+@@TShellLink.ShowCmd
+  The show command (SW_XXX constant)
+@@TShellLink.WorkingDirectory
+  Working directory of the shell link
+@@TShellLink.IdList
+  List of item identifiers (pidl's)
+@@TShellLink.Target
+  Target (fully qualified) of the shell link
+@@TShellLink.Description
+  Description of the shell link (also used as a popup hint in shell version 5 and up).
+@@TShellLink.IconLocation
+  Location (fully qualified filename) of the file that contains the icon for this shell link
+@@TShellLink.IconIndex
+  Index of the icon in the file specified by IconLocation
+@@TShellLink.HotKey
+  Hotkey that activates the shell link. Modifiers, such as CTRL, ALT and SHIFT can be assigned as the high byte of the hotkey field (used 1, 2 and 4 for shift, control and alt respectively).
+@@PShellLink
+<GROUP Windows_Specific.Shell.Shortcuts>
+<COMBINE TShellLink>
+--------------------------------------------------------------------------------
+@@ShellLinkFree
+<GROUP Windows_Specific.Shell.Shortcuts>
+Summary:
+  Releases resources held by the ShellLink record.
+Description:
+  ShellLinkFree releases the resources held by the TShellLink
+  parameter. You must call this function when you no longer need the record,
+  otherwise your application leaks memory.
+Parameters:
+  ShellLink - The TShellLink record used earlier in ShellLinkCreate, ShellLinkCreateSystem or ShellLinkResolve.
+See also:
+  ShellLinkResolve
+  ShellLinkCreate
+  ShellLinkCreateSystem
+  TShellLink
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@ShellLinkResolve
+<GROUP Windows_Specific.Shell.Shortcuts>
+Summary:
+  Resolves a shortcut.
+Description:
+  ShellLinkResolve resolves the ShellLink specified by FileName parameter and returns
+  information about it in the ShellLink parameter.
+  On success the return value is S_OK, on failure an OLE error code.
+Parameters:
+  FileName - Fully qualified name of the shortcut file to resolve.
+  ShellLink - TShellLink record which retrieves the details about the specified shortcut.
+Result:
+  If the function succeeds it returns S_OK. If it fails it returns an OLE error code.
+Notes:
+  You must free the TShellLink record by calling ShellLinkFree
+See also:
+  ShellLinkCreate
+  ShellLinkCreateSystem
+  ShellLinkFree
+  TShellLink
+Donator:
+  Marcel van Brakel
+Contributor:
+  Rik Barker
+--------------------------------------------------------------------------------
+@@ShellLinkCreate
+<GROUP Windows_Specific.Shell.Shortcuts>
+Summary:
+  Creates a new shortcut.
+Description:
+  ShellLinkCreate creates a new shortcut specified by filename. If the function
+  succeeds it returns S_OK otherwise it returns an OLE error code.
+  See TShellLink for information about the ShellLink
+  parameter.
+Parameters:
+  ShellLink - TShellLink record with the details about the shortcut to create.
+  FileName - Fully qualified Filename for the new shortcut.
+Result:
+  If the function succeeds the shortcut is created and the return value is S_OK. If
+  the function fails the return value is an OLE error code.
+Notes:
+  You must free the TShellLink record by calling ShellLinkFree
+See also:
+  ShellLinkCreateSystem
+  ShellLinkResolve
+  ShellLinkFree
+  TShellLink
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@ShellLinkCreateSystem
+<GROUP Windows_Specific.Shell.Shortcuts>
+Summary:
+  Creates a new shortcut in the specified system folder.
+Description:
+  ShellLinkCreateSystem creates a new shortcut specified by FileName in the system
+  folder specified by the Folder parameter (CSIDL_XXX constants). FileName can
+  contain a path but not a drive specification. See TShellLink for information about the ShortCut parameter. If the function succeeds it returns
+  S_OK otherwise it returns an OLE error code.
+Parameters:
+  ShellLink - TShellLink record with the details about the shortcut to create.
+  Folder - The folder in which to create the shortcut. This must be set to one of the CSIDL_XXX constants.
+  FileName - Filename for the new shortcut. This can include a folder but no drive indication.
+Result:
+  If the function succeeds the shortcut is created and the return value is S_OK. If
+  the function fails the return value is an OLE error code.
+Notes:
+  You must free the TShellLink record by calling ShellLinkFree
+See also:
+  ShellLinkCreate
+  ShellLinkResolve
+  ShellLinkFree
+  TShellLink
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@ShellLinkGetIcon
+<GROUP Windows_Specific.Shell.Shortcuts>
+Summary:
+  Returns the icon associate with a shell link.
+Description:
+  ShellLinkGetIcon obtains the icon for the specified link. Due to the fact that
+  Windows does not document how the shell itself determines the icon to display,
+  the returned icon may be different than the one the shell actually dispays.
+Parameters:
+  Link - ShellLink record specifying the shell link for which to obtain the icon. This is, for example, the recor as initialized by ShellLinkResolve.
+  Icon - TIcon instance which receives the icon associated with the shell link.
+Result:
+  If the function succeeds it returns True, otherwise it returns False.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@SHGetItemInfoTip
+<GROUP Windows_Specific.Shell.Miscellaneous>
+Summary:
+  Returns the item's info tip.
+Description:
+  GetItemInfoTip returns the infotip (hint) associated with the specified item.
+  Set Item to the item identifier for which you want to retrieve the infotip and set
+  Folder to the parent of the supplied item. If the function fails or the specified
+  item does not have an infotip the result is an empty string.
+Parameters:
+  Folder - Parent folder of the Item
+  Item - Item for which to retrieve the infotip
+Result:
+  The item's infotip or an empty string if the function fails.
+Notes:
+  The returned string may contain multiple carriage return linefeed (#13#10) combinations
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@StrRetFreeMem
+<GROUP Windows_Specific.Shell.PathsandPIDLs>
+Summary:
+  Frees the memory associated with the StrRet record.
+Description:
+  If the supplied StrRet record is of type STRRET_WSTR then this function frees
+  the memory associated with this record's pOleStr member. If the StrRet record
+  is a different type this function does nothing.
+Parameters:
+  StrRet - The TStrRet record for which to free the memory associated with the pOleStr member.
+Result:
+  If the function releases the memory it returns True. If it fails to free the
+  memory or the StrRet record is not of STRRET_WSTR type then the return value is False.
+See also:
+  StrRetToString
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@StrRetToString
+<GROUP Windows_Specific.Shell.PathsandPIDLs>
+Summary:
+  Converts a TStrRet record to a string.
+Description:
+  StrRetToString converts the StrRet record to a Delphi long string. If the function
+  succeeds it returns the converted string, if it fails it returns an empty string.
+  If Free is set to False you must manually release the memory associated with the
+  StrRet.pOleStr member by using the StrRetFreeMem.
+  function.
+Parameters:
+  IdList - The item identifier list for which the TStrRet record is supplied in the StrRet parameter (only used when StrRet.uType = STRRET_OFFSET).
+  StrRet - The TStrRet record to convert to a string.
+  Free - Determines whether the memory associated with the pOleStr member of StrRet is freed (only applies if StrRet.uType = STRRET_WSTR).
+Result:
+  If the function succeeds it returns the string extracted from the StrRet parameter.
+  If it fails the return value is an empty string.
+Notes:
+  Windows 2000 introduced StrRetToStr and StrRetToBuf which can be used instead.
+See also:
+  StrRetFreeMem
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PidlToPath
+<GROUP Windows_Specific.Shell.PathsandPIDLs>
+Summary:
+  Converts an item identifier list to a path.
+Description:
+  PidlToPath converts the supplied item identifier list to its path representation.
+  If the function succeeds the path representation is returned as the function
+  result. On failure the function returns an empty string.
+Parameters:
+  IdList - The item identifier list to convert to a path.
+Result:
+  If the function succeeds it returns the path of the specified pidl. If it fails
+  it returns an empty string.
+See also:
+  PathToPidl
+  PathToPidlBind
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PathToPidl
+<GROUP Windows_Specific.Shell.PathsandPIDLs>
+Summary:
+  Converts a path to an item identifier list.
+Description:
+  PathToPidl converts the supplied path to an item identifier list relative to the
+  folder given by the Folder parameter. If the Folder parameter is nil then the
+  resulting item identifier list will be relative to the desktop, in other words:
+  it's an absolute item identifier list. If the function fails the result is nil.
+Parameters:
+  Path - The fully qualified path to convert to an item identifier list
+  Folder - The folder that the returned pidl must be relative to. If you specify nil then the returned pidl will be relative to the desktop.
+Result:
+  If the function succeeds the return value is the item identifier list of the
+  specified path, relative to the specified Folder. If the function fails the
+  return value is nil. Note that the caller is responsible for eventually releasing
+  the memory associated with the returned pidl by calling PidlFree.
+See also:
+  PidlToPath
+  PathToPidlBind
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PathToPidlBind
+<GROUP Windows_Specific.Shell.PathsandPIDLs>
+Summary:
+  Converts a path to an item identifier list and binds to its parent folder.
+Description:
+  PathToPidlBind converts the supplied path given by FileName to an item identifier
+  list and binds to the parent folder of this item. The item identifier list is
+  returned as the function result and the bound folder is returned in the Folder
+  parameter. If the function fails both result and the Folder are set to nil.
+Parameters:
+  FileName - The fully qualified name of the file or folder you want to bind to.
+  Folder - On successful return contains a reference to the parent folder of the specified item.
+Result:
+  If the function succeeds the return value is the item identifier list of the
+  specified FileName, relative to the returned Folder. If the function fails the
+  return value is nil. Note that the caller is responsible for eventually releasing
+  the memory associated with the returned pidl by calling PidlFree.
+Notes:
+  This function will correctly handle drives but you should use DriveToPidlBind
+See also:
+  PathToPidl
+  PidlToPath
+  DriveToPidlBind
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@DriveToPidlBind
+<GROUP Windows_Specific.Shell.PathsandPIDLs>
+Summary:
+  Converts a drive to an item identifier list and binds to the CSIDL_DRIVES folder.
+Description:
+  DriveToPidlBind converts the specified drive to an item identifier list and binds
+  Folder to the CSIDL_DRIVES special folder (which is the parent of all drives).
+  You should specify drive as "c:" or "c:\" where c can be replaced by any valid
+  drive. If the function fails both Folder and the result are set to nil.
+Parameters:
+  DriveName - The drive you want to bind to. Pass in "x:" or "x:\" (replace 'x' with the required drive).
+  Folder - On success the Folder contains a reference to the parent of the specified drive. This will always be the CSIDL_DRIVES folder.
+Result:
+  If the function succeeds the return value is the item identifier list of the
+  specified drive, relative to the returned Folder. On failure the return value
+  is nil. Note that the caller is responsible for eventually releasing the returned
+  pidl by calling PidlFree.
+See also:
+  PathToPidlBind
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PidlBindToParent
+<GROUP Windows_Specific.Shell.PathsandPIDLs>
+Summary:
+  Binds the Folder to the parent folder of the specified item identifier.
+Description:
+  PidlBindToParent binds Folder to the parent folder of the absolute item identifier
+  specified in IdList. The function also returns an item identifier for the IdList
+  but relative to the parent folder. If the function succeeds it returns True, on
+  failure it returns False
+Parameters:
+  IdList - The item identifier list to whose parent folder you want to bind.
+  Folder - On return contains a reference to the parent folder of IdList.
+  Last - Item identifier list of IdList but relative to Folder.
+Result:
+  If the function succeeds the return value is True, otherwise the return value is
+  False. In this latter case the Folder and Last parameter will contain nil on return.
+See also:
+  PathToPidlBind
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PidlCompare
+<GROUP Windows_Specific.Shell.PathsandPIDLs>
+Summary:
+  Compares two item identifier lists.
+Description:
+  PidlCompare compares the two supplied item identifier lists (pidl's). If they are
+  equal the result is True, otherwise the result is False. Note that if both pidl's
+  are nil they considered equal. Equality is determined by directly comparing the
+  memory block that the item identifier lists point to. This may lead to incorrect
+  results because a namespace extension is free to implement a pidl in any way
+  it likes. To compare pidl's in a reliable manner you must use the IShellFolder's
+  CompareIDs method.
+Parameters:
+  Pidl1 - An item identifier list to compare against Pidl2
+  Pidl2 - An item identifier list to compare against Pidl1
+Result:
+  If the two pidl's are equal the function returns True, if they are not equal it
+  returns False.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PidlCopy
+<GROUP Windows_Specific.Shell.PathsandPIDLs>
+Summary:
+  Copies the item identifier list from source into destination.
+Description:
+  PidlCopy copies the item identifier list given by source into dest. If the item
+  identifier list was successfully copied the result is True, otherwise the result
+  is False. Note that the item identifier list given by Dest is not freed before
+  the copy operation. Also, if Source is nil then Dest will be set to nil and the
+  return value is False.
+Parameters:
+  Source - The item identifier to copy.
+  Dest - The item identifier that receives a copy of Source. Note that you must eventually free this item identifier by calling PidlFree.
+Result:
+  If the function succeeds then the return value is True, otherwise it is False.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PidlFree
+<GROUP Windows_Specific.Shell.PathsandPIDLs>
+Summary:
+  Frees the given item identifier list.
+Description:
+  PidlFree frees the memory associated with the item identifier list given by IdList.
+  If the memory was successfully freed the IdList is set to nil and the function
+  returns True. If the memory could not be freed the result is False. This function
+  assumes that the memory associated with the item identifier was allocated by the
+  Shell's memory allocator and will fail if this is not the case.
+Parameters:
+  IdList - The item identifier list whose associated memory shall be freed.
+Result:
+  If the function succeeds the return value is True and IdList is set to nil. If
+  the function fails the return value is False and the IdList parameter will retain
+  its value.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PidlGetDepth
+<GROUP Windows_Specific.Shell.PathsandPIDLs>
+Summary:
+  Returns the depth of the given item identifier list.
+Description:
+  PidlGetDepth returns the number of items in the item identifier list excluding
+  the zero terminator.
+Parameters:
+  Pidl - The item identifier list for which to determine the depth.
+Result:
+  The depth of the item identifier list. If the supplied pidl is either unassigned
+  or empty the function returns 0. If the pidl is invalid (depth is greater than
+  MAX_PATH) the function returns -1.
+See also:
+  PidlGetLength
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PidlGetLength
+<GROUP Windows_Specific.Shell.PathsandPIDLs>
+Summary:
+  Returns the length of the given item identifier list.
+Description:
+  PidlGetLength returns the size in bytes of the item identifier list, excluding
+  the zero terminator. Note that by definition the length of a pidl should equal
+  IMalloc.GetSize(Pidl) - 2. This function does not rely on that and instead walks
+  the entire list, summing the size of the individual item identifiers.
+Parameters:
+  Pidl - The item identifier list for which to calculate the length.
+Result:
+  The length, in bytes, of the item identifier list. If the supplied pidl is either
+  unassigned or empty the result value is 0. If the pidl is invalid (depth greater
+  than MAX_PATH) the function returns -1.
+See also:
+  PidlGetDepth
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PidlGetNext
+<GROUP Windows_Specific.Shell.PathsandPIDLs>
+Summary:
+  Returns the next item identifier in the supplied item identifier list.
+Description:
+  PidlGetNext returns the next item identifier in the supplied item identifier list
+  or nil if there is no next item identifier (the null terminating pidl is not
+  considered an item identifier). The returned item identifier is simply a pointer
+  and as such should not be freed using PidlFree.
+Parameters:
+  Pidl - Item identifier list for which to retrieve the next element.
+Result:
+  The next element in the supplied item identifier list, or nil if there is no next element.
+See also:
+  PidlGetDepth
+  PidlGetLength
+Donator:
+  Marcel van Brakel

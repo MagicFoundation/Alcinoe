@@ -1,0 +1,138 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!-- C++Builder XML Project -->
+<PROJECT>
+  <MACROS>
+    <VERSION value="BCB.06.00"/>
+    <PROJECT value="build\ZTestDbcAll.exe"/>
+    <OBJFILES value="build\ZTestDbcAll.obj build\TestFrameWork.obj build\TextTestRunner.obj 
+      build\ZTestDbcUtils.obj build\ZTestDbcCachedResultSet.obj 
+      build\ZTestDbcGeneric.obj build\ZTestDbcInterbaseMetadata.obj 
+      build\ZTestDbcMetadata.obj build\ZTestDbcMsSql.obj build\ZTestDbcMySql.obj 
+      build\ZTestDbcMySqlMetadata.obj build\ZTestDbcPostgreSql.obj 
+      build\ZTestDbcPostgreSqlMetadata.obj build\ZTestDbcResolver.obj 
+      build\ZTestDbcResultSet.obj build\ZTestDbcResultSetMetadata.obj 
+      build\ZTestDbcCache.obj build\ZTestDbcSqLite.obj build\ZTestDbcOracle.obj"/>
+    <RESFILES value=""/>
+    <IDLFILES value=""/>
+    <IDLGENFILES value=""/>
+    <DEFFILE value=""/>
+    <RESDEPEN value="$(RESFILES)"/>
+    <LIBFILES value=""/>
+    <LIBRARIES value=""/>
+    <SPARELIBS value="rtl.lib"/>
+    <PACKAGES value="rtl.bpi vcl.bpi dbrtl.bpi vcldb.bpi"/>
+    <PATHCPP value=".;"/>
+    <PATHPAS value=".;..\..\test\external;..\..\test\external;..\..\test\dbc;..\..\test\dbc;..\..\test\dbc;..\..\test\dbc;..\..\test\dbc;..\..\test\dbc;..\..\test\dbc;..\..\test\dbc;..\..\test\dbc;..\..\test\dbc;..\..\test\dbc;..\..\test\dbc;..\..\test\dbc;..\..\test\dbc;..\..\test\dbc;..\..\test\dbc"/>
+    <PATHRC value=".;"/>
+    <PATHASM value=".;"/>
+    <DEBUGLIBPATH value="$(BCB)\lib\debug"/>
+    <RELEASELIBPATH value="$(BCB)\lib\release"/>
+    <LINKER value="ilink32"/>
+    <USERDEFINES value=""/>
+    <SYSDEFINES value="NO_STRICT;_RTLDLL;USEPACKAGES"/>
+    <MAINSOURCE value="ZTestDbcAll.bpf"/>
+    <INCLUDEPATH value="..\..\test\dbc;..\..\test\external;$(BCB)\include;$(BCB)\include\vcl;build"/>
+    <LIBPATH value="$(BCB)\Projects\Lib;..\..\test\dbc;..\..\test\external;$(BCB)\lib\obj;$(BCB)\lib;build"/>
+    <WARNINGS value="-w-par"/>
+    <OTHERFILES value=""/>
+  </MACROS>
+  <OPTIONS>
+    <IDLCFLAGS value="-I..\..\test\dbc -I..\..\test\external -I$(BCB)\include 
+      -I$(BCB)\include\vcl -Ibuild -src_suffix cpp -boa"/>
+    <CFLAG1 value="-Od -Vx -Ve -X- -r- -a8 -6 -b- -k -y -v -vi- -tWC -tWM -c"/>
+    <PFLAGS value="-N2build -N0build -$YD -$W -$R -$Q -$O- -$A8 -v -JPHNE -M"/>
+    <RFLAGS value=""/>
+    <AFLAGS value="/mx /w2 /zd"/>
+    <LFLAGS value="-Ibuild -D&quot;&quot; -ap -Tpe -x -Gn -v"/>
+    <OTHERFILES value=""/>
+  </OPTIONS>
+  <LINKER>
+    <ALLOBJ value="c0x32.obj $(PACKAGES) Memmgr.Lib sysinit.obj $(OBJFILES)"/>
+    <ALLRES value="$(RESFILES)"/>
+    <ALLLIB value="$(LIBFILES) $(LIBRARIES) import32.lib cp32mti.lib"/>
+    <OTHERFILES value=""/>
+  </LINKER>
+  <FILELIST>
+      <FILE FILENAME="ZTestDbcAll.bpf" FORMNAME="" UNITNAME="ZTestDbcAll" CONTAINERID="BPF" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="ZTestDbcAll.cpp" FORMNAME="" UNITNAME="ZTestDbcAll" CONTAINERID="CCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\test\external\TestFrameWork.pas" FORMNAME="" UNITNAME="TestFrameWork" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\test\external\TextTestRunner.pas" FORMNAME="" UNITNAME="TextTestRunner" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\test\dbc\ZTestDbcUtils.pas" FORMNAME="" UNITNAME="ZTestDbcUtils" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\test\dbc\ZTestDbcCachedResultSet.pas" FORMNAME="" UNITNAME="ZTestDbcCachedResultSet" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\test\dbc\ZTestDbcGeneric.pas" FORMNAME="" UNITNAME="ZTestDbcGeneric" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\test\dbc\ZTestDbcInterbaseMetadata.pas" FORMNAME="" UNITNAME="ZTestDbcInterbaseMetadata" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\test\dbc\ZTestDbcMetadata.pas" FORMNAME="" UNITNAME="ZTestDbcMetadata" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\test\dbc\ZTestDbcMsSql.pas" FORMNAME="" UNITNAME="ZTestDbcMsSql" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\test\dbc\ZTestDbcMySql.pas" FORMNAME="" UNITNAME="ZTestDbcMySql" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\test\dbc\ZTestDbcMySqlMetadata.pas" FORMNAME="" UNITNAME="ZTestDbcMySqlMetadata" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\test\dbc\ZTestDbcPostgreSql.pas" FORMNAME="" UNITNAME="ZTestDbcPostgreSql" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\test\dbc\ZTestDbcPostgreSqlMetadata.pas" FORMNAME="" UNITNAME="ZTestDbcPostgreSqlMetadata" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\test\dbc\ZTestDbcResolver.pas" FORMNAME="" UNITNAME="ZTestDbcResolver" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\test\dbc\ZTestDbcResultSet.pas" FORMNAME="" UNITNAME="ZTestDbcResultSet" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\test\dbc\ZTestDbcResultSetMetadata.pas" FORMNAME="" UNITNAME="ZTestDbcResultSetMetadata" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\test\dbc\ZTestDbcCache.pas" FORMNAME="" UNITNAME="ZTestDbcCache" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\test\dbc\ZTestDbcSqLite.pas" FORMNAME="" UNITNAME="ZTestDbcSqLite.pas" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+      <FILE FILENAME="..\..\test\dbc\ZTestDbcOracle.pas" FORMNAME="" UNITNAME="ZTestDbcOracle.pas" CONTAINERID="PascalCompiler" DESIGNCLASS="" LOCALCOMMAND=""/>
+  </FILELIST>
+  <BUILDTOOLS>
+  </BUILDTOOLS>
+
+  <IDEOPTIONS>
+[Version Info]
+IncludeVerInfo=0
+AutoIncBuild=0
+MajorVer=1
+MinorVer=0
+Release=0
+Build=0
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=1033
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=
+FileDescription=
+FileVersion=1.0.0.0
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=
+ProductName=
+ProductVersion=1.0.0.0
+Comments=
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl;build
+
+[Parameters]
+RunParams=
+Launcher=
+UseLauncher=0
+DebugCWD=
+HostApplication=
+RemoteHost=
+RemotePath=
+RemoteLauncher=
+RemoteCWD=
+RemoteDebug=0
+
+[Compiler]
+ShowInfoMsgs=0
+LinkDebugVcl=0
+LinkCGLIB=0
+
+[CORBA]
+AddServerUnit=1
+AddClientUnit=1
+PrecompiledHeaders=1
+
+[Language]
+ActiveLang=
+ProjectLang=
+RootDir=
+  </IDEOPTIONS>
+</PROJECT>

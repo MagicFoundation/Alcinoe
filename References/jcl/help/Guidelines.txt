@@ -1,0 +1,55 @@
+--------------------------------------------------------------------------------
+@@EntryName
+<GROUP Category.SubCategory>
+Summary:
+  This is a sample summary.
+Description:
+  This is a sample description.
+Parameters:
+  P1 - P1 parameter description.
+  P2 - P2 parameter description.
+Result:
+  This is a sample result description.
+Notes:
+  This is a sample note.
+Exceptions:
+  E1 - E1 exception description.
+  E2 - E2 exception description.
+Example:
+  This is a code sample.
+Platforms:
+  Windows
+  Unix
+Requirements:
+  This is a requirement sample.
+Visibility:
+  Public
+  Private
+See also:
+  Seealso1
+  Seealso2
+Donators:
+  Donator1
+  Donator2
+Contributors:
+  Contributor1
+  Contributor2
+--------------------------------------------------------------------------------
+
+HINTS
+-----
+
+* The section are listed in the specific order outlined in the sample.
+* Sentences are always ended with a '.'.
+* "Notes" is always spelled with an 's' at the end.
+* If one donator only then spell "Donator" instead of "Donators".
+* If one contributor only then spell "Contributor" instead of "Contributors".
+* If a section is missing entries, use the TODO keyword.
+* "Platforms" section is rarely used.
+* "Exceptions", "Example", "Requirements" and "Visibility" sections are very rarely used.
+* "See Also:" -> "See also:" (lowercase 'a').
+* No '\' char when a new line starts.
+* In "See also" section, one reference per line.
+* Make sure that ':' is present after section name.
+* "Returns:" -> "Result:".
+* Make sure that "Parameters" and "Result" entries are ended with a '.' char.

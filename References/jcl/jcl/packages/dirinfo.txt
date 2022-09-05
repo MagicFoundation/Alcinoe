@@ -1,0 +1,12 @@
+JCL package directory; version-specific packages are located in the respective subdirectories.
+
+Files located in jcl/packages:
+
+JclPackagesCxy.bpg:	Borland project group file for C++Builder version x.y packages
+JclPackagesDxy.bpg:	Borland project group file for Delphi version x.y packages
+BCB.bmk:		bpr2mak Borland Make template file for C++Builder/Win32
+bcb.gmk:		bpr2mak GNU Make template file for Kylix/C++
+
+Files not intended for end users:
+
+JclDevPackagesDnn.bpg:	Borland project group file for Delphi version nn development packages

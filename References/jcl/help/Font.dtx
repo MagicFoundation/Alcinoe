@@ -1,0 +1,42 @@
+--------------------------------------------------------------------------------
+@@SetObjectFontToSystemFont@TObject@TFontType
+Summary:
+  This procedure sets the font of an object to the proper font based on the
+  object type and the Windows operation system version.
+Description:
+  Almost each Windows operating system version comes with a different font set
+  applicable to various UI objects. The SetObjectFontToSystemFont procedure
+  enables support of multiple Windows operating system versions while setting
+  font type to the correct "style".
+Parameters:
+  AObject - The object which font is to be changed.
+  FontType - The font type. It is set to ftAuto by default.
+See also:
+  TFontType
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@TFontType
+Summary:
+  Defines which font type will be applied to objects.
+Description:
+  Here are the possible values for TFontType:
+
+    * ftAuto    - The font type (style) will be selected automatically based on
+                  object type (TFont, TMemo, TRichEdit or others).
+    * ftCaption - The font type will be forced to "Caption" style. It usually applies
+                  to anything different from TMemo and TRichEdit objects.
+                  Here are the fonts used:
+                    * Segoe UI 9 on Windows Vista/Server 2008
+                    * Tahoma 8 on Windows 2000/XP
+                    * MS Sans Serif 8 on other Windows versions 
+    * ftContent - The font type will be forced to "Content" style. It usually applies
+                  to TMemo and TRichEdit objects. 
+                  Here are the fonts used:
+                    * Calibri UI 9 on Windows Vista/Server 2008
+                    * Verdana 8 on Windows 2000/XP
+                    * MS Sans Serif 8 on other Windows versions 
+See also:
+  SetObjectFontToSystemFont
+Donator:
+  Jean-Fabien Connault

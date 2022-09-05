@@ -1,0 +1,3574 @@
+@@JclSysInfo.pas
+<GROUP SystemInformationRoutines>
+Summary:
+  This unit contains routines and classes to retrieve various pieces of system information.
+  Examples are the location of standard folders, settings of environment variables,
+  processor details and the OS version.
+--------------------------------------------------------------------------------
+@@SystemInformationRoutines.CommonFolders
+<GROUP SystemInformationRoutines>
+<TITLE Common Folders>
+<TOPICORDER 100>
+--------------------------------------------------------------------------------
+@@SystemInformationRoutines.Environment
+<GROUP SystemInformationRoutines>
+<TITLE Environment>
+<TOPICORDER 200>
+--------------------------------------------------------------------------------
+@@SystemInformationRoutines.Hardware
+<GROUP SystemInformationRoutines>
+<TITLE Hardware>
+<TOPICORDER 300>
+--------------------------------------------------------------------------------
+@@SystemInformationRoutines.Identification
+<GROUP SystemInformationRoutines>
+<TITLE Identification>
+<TOPICORDER 400>
+--------------------------------------------------------------------------------
+@@SystemInformationRoutines.Keyboard
+<GROUP SystemInformationRoutines>
+<TITLE Keyboard>
+<TOPICORDER 500>
+--------------------------------------------------------------------------------
+@@SystemInformationRoutines.Memory
+<GROUP SystemInformationRoutines>
+<TITLE Memory>
+<TOPICORDER 600>
+--------------------------------------------------------------------------------
+@@SystemInformationRoutines.PowerManagement
+<GROUP SystemInformationRoutines>
+<TITLE Power Management>
+<TOPICORDER 700>
+--------------------------------------------------------------------------------
+@@SystemInformationRoutines.ProcessesTasksandModules
+<GROUP SystemInformationRoutines>
+<TITLE Processes\, Tasks and Modules>
+<TOPICORDER 800>
+--------------------------------------------------------------------------------
+@@SystemInformationRoutines.VersionInformation
+<GROUP SystemInformationRoutines>
+<TITLE Version Information>
+<TOPICORDER 900>
+--------------------------------------------------------------------------------
+@@SystemInformationRoutines.UserAccountControl
+<GROUP SystemInformationRoutines>
+<TITLE User Account Control>
+<TOPICORDER 1000>
+--------------------------------------------------------------------------------
+@@RunningProcessesList
+<GROUP SystemInformationRoutines.ProcessesTasksandModules>
+Summary:
+  Returns a list of all running processes.
+Description:
+  RunningProcessesList fills the List parameter with a list of all running processes.
+Parameters:
+  List - The list which is filled with the names of all running processes. Note that if this function is executed NT 3 or NT 4 the Objects property of the list contains INVALID_HANDLE_VALUE, on all other systems the Objects property is filled with the ToolHelp Process ID which you can use to further investigate the process.
+  FullPath - If True the names of processes in the list are expanded to include the full path of the executable file. If False only the process name (filename of the executable) is put in the list.
+Result:
+  If the function succeeds it returns True, otherwise it returns False. In the latter
+  case the contents of the list is undefined.
+Notes:
+  On Windows NT/2000 there exists two processes with PIDs 0 and 2 (8 on Windows 2000) which do not map to an executable image file. The names of these processes are fabricated by the routine as "System Idle Process" and "System Process" respectively.
+Donators:
+  Petr Vones (Windows)
+  Robert Rossmair (Unix)
+--------------------------------------------------------------------------------
+@@LoadedModulesList
+<GROUP SystemInformationRoutines.ProcessesTasksandModules>
+Summary:
+  Returns the list of modules loaded by a process.
+Description:
+  Returns a list of modules (dynamic link libraries) which are in use (loaded) by
+  the process specified by ProcessID.
+Parameters:
+  List - List which receives the name of each loaded module. Each entry contains the full path to the modules image file.
+  ProcessID - Process ID of the process for which you want a list of loaded modules. To get the list of modules for the current process pass in the return value of the GetCurrentProcessID API function.
+Result:
+  If the function it returns True, otherwise it returns False. In this latter case
+  the contents of the list are undefined.
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@GetTasksList
+<GROUP SystemInformationRoutines.ProcessesTasksandModules>
+Summary:
+  Returns a list of running tasks.
+Description:
+  Returns a list of running tasks. This is similar to the items visible on the
+  Applications tab of the Windows NT task manager. The routine uses a similar method
+  to discover all running tasks (described on http://msdn.microsoft.com/library/periodic/period97/win321197.htm)
+  but is not always accurate.
+Parameters:
+  List - List which receives the running tasks.
+Result:
+  If the function succeeds it returns True, otherwise it returns False. In this
+  latter case the contents of the list are undefined.
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@IsWindowResponding
+<GROUP SystemInformationRoutines.ProcessesTasksandModules>
+Summary:
+  Determines whether a windows is responding to messages.
+Description:
+  The IsWindowResponding function determines whether the window specified by the
+  Wnd parameter is still responding to messages. In effect this determines whether
+  the window "is hung" by the user perception. In reality the thread which "owns"
+  the window may not actually be hung but is too busy (in some kind of loop or by
+  a blocking wait operation) to receive messages.
+Parameters:
+  Wnd - Handle to the window which you want to test.
+  Timeout - Timeout in milliseconds. The function send a bogus message to the window and then waits the specified time out value before returning. If the window responds to the message within the timeout value or Windows itself detects, by some other means, that the specified window is hung, the function may return earlier.
+Result:
+  If the window is not responding the function returns False, otherwise it returns
+  True.
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@GetWindowIcon
+<GROUP SystemInformationRoutines.ProcessesTasksandModules>
+Summary:
+  Returns the icon of a window.
+Description:
+  Returns a handle to the icon of the specified window.
+Parameters:
+  Wnd - Handle to the window for which to retrieve an icon.
+  LargeIcon - If True the function returns the large icon. If False the function returns the small icon. Note that the dimension of large and small can be retrieved by the GetSystemMetrics API function using the SM_C<X>ICON and SM_C<X>SMICON flags respectively (where <X> is either X or Y for the width and height respectively).
+Result:
+  If the function succeeds it returns a handle to the requested icon, otherwise
+  it returns 0. In case of success you must release the handle by calling the
+  DestroyIcon API function.
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TerminateTask
+<GROUP SystemInformationRoutines.ProcessesTasksandModules>
+Summary:
+  Terminates the application which owns the specified window.
+Description:
+  Terminates the application which owns the specified window. For further details
+  see the TerminateApp function/
+Parameters:
+  Wnd - Handle to a top-level window owned by the application you wish to terminate.
+  Timeout - Timeout value, in milliseconds, indicating the time to wait between sending the WM_CLOSE message and forcefully terminating the application. You should set this timeout value to at least 5 seconds.
+Result:
+  If the function succeeds to normally terminate the application (through the WM_CLOSE
+  message) it returns taClean. If the function had to terminate the application by
+  a call to TerminateProcess it returns taKill. If the function fails to terminate
+  the application it returns taError.
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@TerminateApp
+<GROUP SystemInformationRoutines.ProcessesTasksandModules>
+Summary:
+  Terminates the application specified by ProcessID.
+Description:
+  Terminates the application specified by ProcessID. The function first attempts
+  to terminate the application normally by sending it a WM_CLOSE message. If the
+  application doesn't terminate itself in response to that message and within the
+  specified timeout period, the function continues to forcefully terminate the
+  application using the TerminateProcess function. In this latter case the application
+  gets no change whatsoever to clean up it's resources and as such this may lead
+  to data loss. Be carefull and very sure there's no other way! The logic used
+  by this function is described in knowledge base article Q178893.
+Parameters:
+  ProcessID - Process ID of the application to terminate.
+  Timeout - Timeout value, in milliseconds, indicating the time to wait between sending the WM_CLOSE message and forcefully terminating the application. You should set this timeout value to at least 5 seconds.
+Result:
+  If the function succeeds to normally terminate the application (through the WM_CLOSE
+  message) it returns taClean. If the function had to terminate the application by
+  a call to TerminateProcess it returns taKill. If the function fails to terminate
+  the application it returns taError.
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@GetProcessNameFromWnd
+<GROUP SystemInformationRoutines.ProcessesTasksandModules>
+Summary:
+  Returns the name of the process which owns a specific window.
+Description:
+  GetProcessNameFrmWnd returns the name of the process which owns the window as
+  specified by the window's handle. Note that in order to find the process identifier
+  of the process that owns the specified window, you can use the GetWindowThreadProcessId
+  API function.
+Parameters:
+  Wnd - Handle of the window for which to return the process name. This can be any type of window, including child windows such as buttons or edit boxes.
+Result:
+  If the function succeeds it returns the name of the process that owns the windows,
+  if it fails the result is an empty string.
+See also:
+  GetPidFromProcessName
+  GetProcessNameFromPid
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@GetProcessNameFromPid
+<GROUP SystemInformationRoutines.ProcessesTasksandModules>
+Summary:
+  Returns the name of the process which is identified by PID.
+Description:
+  GetProcessNameFromPid returns the name of the process specified by it's process
+  identifier (PID).
+Parameters:
+  PID - Process identifier of the process whose name to retrieve.
+Result:
+  If the function succeeds it returns the name of the process, if it fails it
+  returns an empty string.
+See also:
+  GetProcessNameFromWnd
+  GetPidFromProcessName
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GetShellProcessName
+<GROUP SystemInformationRoutines.ProcessesTasksandModules>
+Summary:
+  Returns the name of the shell process.
+Description:
+  GetShellProcessName returns the name of the shell process as defined in the registry.
+  If the registry does not explicitly specify a shell process "explorer.exe" is returned
+  as a default.
+Result:
+  The name of the shell process executable.
+See also:
+  GetShellProcessHandle
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GetShellProcessHandle
+<GROUP SystemInformationRoutines.ProcessesTasksandModules>
+Summary:
+  Returns a handle to the shell process.
+Description:
+  GetShellProcessHandle returns a handle to the shell process, if any. The handle is
+  opened with full access (PROCESS_ALL_ACCESS) and must be closed by the caller using
+  the CloseHandle Windows API function.
+Result:
+  If the function succeeds it returns a handle to the shell process. Upon failure the
+  function raises an exception (EOSError).
+See also:
+  GetShellProcessName
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GetPidFromProcessName
+<GROUP SystemInformationRoutines.ProcessesTasksandModules>
+Summary:
+  Returns the process identifier (PID) for the process identified by processname.
+Description:
+  GetPidFromProcessName returns the process identifier (PID) of the process
+  identifier by ProcessName. The specified ProcessName must be the full name of
+  the process, that is including the extension, as it appears in task manager for
+  example.
+Parameters:
+  ProcessName - Name of the process, including extension, of the process for which to retrieve the process identifier.
+Result:
+  If the function succeeds it returns the process identifier of the specified
+  process. If the function fails it returns INVALID_HANDLE_VALUE. Most common
+  reason of failure is that the specified process doesn't exist (isn't running) or
+  you didn't specify the full name of the process.
+See also:
+  GetProcessNameFromWnd
+  GetProcessNameFromPid
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@RoundToAllocGranularityPtr
+<GROUP SystemInformationRoutines>
+Summary:
+  Rounds an address to an allocation boundary.
+Description:
+  Some Win32 API routines that take pointer parameters require that the specified
+  address is a multiple of the allocation granularity. On current Intel platforms
+  (x86) this is 64K. RoundToAllocGranularityPtr rounds the given 32 bit address
+  to a system defined allocation granularity boundary. You can have the function
+  round upwards or downwards by specifying True or False for the Up parameter
+  respectively. This function also exists for 64 bit pointers.
+Parameters:
+  Value - The address to adjust.
+  Up - If True the function rounds the address up to the next multiple of the allocation granularity, if False it rounds the address down to the previous multiple of the allocation granularity.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@ProcessorCount
+<GROUP SystemInformationRoutines.Hardware>
+Summary:
+  Number of processors.
+Description:
+  ProcessorCount contains the number of processors in the system. Initialized during
+  unit initialization.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@AllocGranularity
+<GROUP SystemInformationRoutines.Memory>
+Summary:
+  Systems memory allocation granularity.
+Description:
+  AllocGranularity contains the systems virtual memory allocation granularity.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PageSize
+<GROUP SystemInformationRoutines.Memory>
+Summary:
+  Holds the value of the system's virtual memory page size
+Description:
+  Specifies the page size and the granularity of page protection and commitment.
+  This is the page size used by the VirtualAlloc function.
+Platform:
+  Windows
+--------------------------------------------------------------------------------
+@@GetCommonAppdataFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the application data folder for all users.
+Description:
+  GetCommonAppdataFolder returns the folder holding application data shared by
+  all users. A typical path is C:\Documents and Settings\All Users\Application Data.
+Result:
+  The current directory for the calling process or an empty string on failure.
+Notes:
+  Requires shell v5.00 and upwards.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetCommonAppdataFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@GetCurrentFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the current directory.
+Description:
+  GetCurrentFolder returns the current directory (folder) for the calling process.
+Result:
+  The current directory for the calling process or an empty string on failure.
+Donators:
+  Robert Marquardt (Win32)
+  Robert Rossmair (Unix)
+--------------------------------------------------------------------------------
+@@DelEnvironmentVar
+<GROUP SystemInformationRoutines.Environment>
+Summary:
+  Deletes a environment variable.
+Description:
+  DelEnvironmentVar deletes the environment variable specified by Name in the calling
+  process's environment block.
+Parameters:
+  Name - Name of the environment variable to delete.
+Result:
+  If the function succeeds it returns True, otherwise it returns False.
+See also:
+  ExpandEnvironmentVar
+  GetEnvironmentVar
+  GetEnvironmentVars
+  SetEnvironmentVar
+Donators:
+  Marcel van Brakel (Win32)
+  André Snepvangers (Unix)
+--------------------------------------------------------------------------------
+@@ExpandEnvironmentVar
+<GROUP SystemInformationRoutines.Environment>
+Summary:
+  Expands the environment variable.
+Description:
+  ExpandEnvironmentVar expands an environment variable. If the variable contains
+  environment variable strings, for example %systemroot%, then these are replaced
+  by the system defined values for that specific variable. If the variable does
+  not exist it is left intact.
+Parameters:
+  Value - On input the string which may contain environment variable strings that you want to expand. On exit a copy of the input with environment variables replaced by their system defined value, if they exist.
+Result:
+  If the function succeeds it returns True, otherwise it returns False. In the latter
+  case the content of Value is undefined.
+See also:
+  DelEnvironmentVar
+  GetEnvironmentVar
+  GetEnvironmentVars
+  SetEnvironmentVar
+Donators:
+  Marcel van Brakel (Win32)
+  André Snepvangers (Unix)
+--------------------------------------------------------------------------------
+@@GetEnvironmentVar
+<GROUP SystemInformationRoutines.Environment>
+Summary:
+  Retrieves the value of an environment variable.
+Description:
+  GetEnvironmentVar retrieves the value of the specified environment variable from
+  the process environment block. Depending on the value of the Expand parameter,
+  the returned string may contain environment variable strings such as %systemroot%.
+  To expand the string, thereby replacing the strings with their system defined
+  value, use ExpandEnvironmentVar.
+Parameters:
+  Name - Name of the environment variable to retrieve.
+  Value - Receives the value of the specified environment variable, if it exists.
+  Expand - If True the returned value has the embedded environment strings expanded. If False these string are left unexpanded.
+Result:
+  If the function succeeds it returns True, otherwise it returns False.
+See also:
+  DelEnvironmentVar
+  ExpandEnvironmentVar
+  GetEnvironmentVars
+  SetEnvironmentVar
+Donators:
+  Marcel van Brakel (Win32)
+  André Snepvangers (Unix)
+--------------------------------------------------------------------------------
+@@GetEnvironmentVars
+<GROUP SystemInformationRoutines.Environment>
+Summary:
+  Retrieves a list of all environment variables.
+Description:
+  GetEnvironmentVars is similar to GetEnvironmentVar except that it
+  retrieves a list of environment variables in the process environment block and
+  their values. If Expand is set to True any embedded environment strings, such
+  as %systemroot% are replaced by their system defined value before exit. 
+  Use of this function is not recommended by Microsoft. Instead you should
+  use GetEnvironmentVar to query the value of specific environment
+  variables.
+Parameters:
+  Vars - Receives the list of environment variables and their values.
+  Expand - If True the individual items have the embedded environment strings expanded to their system defined value before exit. If False this expansion is not done.
+Result:
+  If the function succeeds in retrieving the environment strings it returns True,
+  on failure it returns False. Note that a result of True does not necessarily mean
+  that environment string expansion was successful for all variables.
+See also:
+  DelEnvironmentVar
+  ExpandEnvironmentVar
+  GetEnvironmentVar
+  SetEnvironmentVar
+Donators:
+  Marcel van Brakel (Win32)
+  Robert Rossmair (Unix)
+--------------------------------------------------------------------------------
+@@SetEnvironmentVar
+<GROUP SystemInformationRoutines.Environment>
+Summary:
+  Sets the value of an environment variable.
+Description:
+  SetEnvironmentVar sets the value of the specified environment variable to the
+  supplied value. If the variable does not exists it is created first.
+Parameters:
+  Name - Name of the environment variable to set.
+  Value - New value for the specified environment variable.
+Result:
+  If the function succeeds it returns True, otherwise it returns False.
+See also:
+  DelEnvironmentVar
+  ExpandEnvironmentVar
+  GetEnvironmentVar
+  GetEnvironmentVars
+Donators:
+  Marcel van Brakel (Win32)
+  André Snepvangers (Unix)
+--------------------------------------------------------------------------------
+@@TWindowsVersion
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Enumeration of Windows versions. Used as function result by GetWindowsVersion
+Description:
+  Enumeration of Windows versions. Used as function result by GetWindowsVersion
+See also:
+  GetWindowsVersion
+Donator:
+  Marcel van Brakel
+  Jean-Fabien Connault
+@@TWindowsVersion.wvUnknown
+  Anonymous Windows version. This can happen when a new Windows version is released
+  after JCL or if you are running a Windows version with a different build number
+  than expected. For example a beta version.
+@@TWindowsVersion.wvWin95
+  Windows 95
+@@TWindowsVersion.wvWin95OSR2
+  Windows 95 OSR 2 Windows 98
+@@TWindowsVersion.wvWin98SE
+  Windows 98 Second Edition
+@@TWindowsVersion.wvWinME
+  Windows Millenium
+@@TWindowsVersion.wvWin2000
+  Windows 2000
+@@TWindowsVersion.wvWinNT31
+  Windows NT 3.1
+@@TWindowsVersion.wvWinNT35
+  Windows NT 3.5
+@@TWindowsVersion.wvWinNT351
+  Windows NT 3.51
+@@TWindowsVersion.wvWinNT4
+  Windows NT 4.0
+@@TWindowsVersion.wvWin2000
+  Windows 2000
+@@TWindowsVersion.wvWinXP
+  Windows XP
+@@TWindowsVersion.wvWin2003
+  Windows Server 2003
+@@TWindowsVersion.wvWin2003R2
+  Windows Server 2003 R2
+@@TWindowsVersion.wvWinVista
+  Windows Vista
+@@TWindowsVersion.wvWinServer2008
+  Windows Server 2008
+@@TWindowsVersion.wvWin7
+  Windows 7
+@@TWindowsVersion.wvWinServer2008R2
+  Windows Server 2008 R2
+@@TWindowsVersion.wvWin8
+  Windows 8
+@@TWindowsVersion.wvWin8RT
+  Windows RT
+@@TWindowsVersion.wvWinServer2012
+  Windows Server 2012
+@@TWindowsVersion.wvWin81
+  Windows 8.1
+@@TWindowsVersion.wvWin81RT
+  Windows RT 8.1
+@@TWindowsVersion.wvWinServer2012R2
+  Windows Server 2012 R2
+--------------------------------------------------------------------------------
+@@TWindowsEdition
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Enumeration of Windows editions. Used as function result by GetWindowsEdition
+Description:
+  Enumeration of Windows editions. Used as function result by GetWindowsEdition
+See also:
+  GetWindowsEdition
+Donator:
+  Jean-Fabien Connault
+@@TWindowsEdition.weUnknown
+  Anonymous Windows ediion. This can happen when a new Windows edition is released
+  after JCL or if you are running a Windows edition.
+@@TWindowsEdition.weWinXPHome
+  Windows XP Home Edition
+@@TWindowsEdition.weWinXPPro
+  Windows XP Professional
+@@TWindowsEdition.weWinXPHomeN
+  Windows XP Home Edition N
+@@TWindowsEdition.weWinXPProN
+  Windows XP Home Professional N
+@@TWindowsEdition.weWinXPHomeK
+  Windows XP Home Edition K
+@@TWindowsEdition.weWinXPProK
+  Windows XP Professional K
+@@TWindowsEdition.weWinXPHomeKN
+  Windows XP Home Edition KN
+@@TWindowsEdition.weWinXPProKN
+  Windows XP Professional KN
+@@TWindowsEdition.weWinXPStarter
+  Windows XP Starter Edition
+@@TWindowsEdition.weWinXPMediaCenter
+  Windows XP Media Center Edition
+@@TWindowsEdition.weWinXPTablet
+  Windows XP Tablet PC Edition
+@@TWindowsEdition.weWinVistaStarter
+  Windows Vista Starter
+@@TWindowsEdition.weWinVistaHomeBasic
+  Windows Vista Home Basic
+@@TWindowsEdition.weWinVistaHomeBasicN
+  Windows Vista Home Basic N
+@@TWindowsEdition.weWinVistaHomePremium
+  Windows Vista Home Premium
+@@TWindowsEdition.weWinVistaBusiness
+  Windows Vista Business
+@@TWindowsEdition.weWinVistaBusinessN
+  Windows Vista Business N
+@@TWindowsEdition.weWinVistaEnterprise
+  Windows Vista Enterprise
+@@TWindowsEdition.weWinVistaUltimate
+  Windows Vista Ultimate
+@@TWindowsEdition.weWin7Starter
+  Windows 7 Starter
+@@TWindowsEdition.weWin7HomeBasic
+  Windows 7 Home Basic
+@@TWindowsEdition.weWin7HomePremium
+  Windows 7 Home Premium
+@@TWindowsEdition.weWin7Professional
+  Windows 7 Professional
+@@TWindowsEdition.weWin7Enterprise
+  Windows 7 Enterprise
+@@TWindowsEdition.weWin7Ultimate
+  Windows 7 Ultimate
+@@TWindowsEdition.weWin8
+  Windows 8
+@@TWindowsEdition.weWin8Professional
+  Windows 8 Professional
+@@TWindowsEdition.weWin8Enterprise
+  Windows 8 Enterprise
+@@TWindowsEdition.weWin8RT
+  Windows RT
+@@TWindowsEdition.weWin81
+  Windows 8.1
+@@TWindowsEdition.weWin81Professional
+  Windows 8.1 Professional
+@@TWindowsEdition.weWin81Enterprise
+  Windows 8.1 Enterprise
+@@TWindowsEdition.weWin81RT
+  Windows RT 8.1
+--------------------------------------------------------------------------------
+@@GetWindowsVersion
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns the Windows version.
+Description:
+  GetWindowsVersion returns the Windows version as an enumerated type.
+Result:
+  The Windows version, see TWindowsVersion for the possible values.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Marcel van Brakel
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@GetWindowsEdition
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns the Windows edition.
+Description:
+  GetWindowsEdition returns the Windows edition as an enumerated type.
+Result:
+  The Windows edition, see TWindowsEdition for the possible values.
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@GetOSVersionString
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns the operation system version as a string.
+Description:
+  GetOSVersionString returns the operation system version and release/service
+  pack information as a string. For example, 'Linux 2.6.5' or 'Windows 2000 SP4'.
+Result:
+  The operating sytem version and release/service pack information as a string,
+  or an empty string if the OS is not recognized.
+See also:
+  GetWindowsVersionString
+  GetWindowsServicePackVersionString
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@GetWindowsVersionString
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns the Windows version as a string.
+Description:
+  GetWindowsVersionString returns the Windows version as a string. For example, 'Windows Vista'.
+Notes:
+  The result does not contain the Windows edition string. For example, 'Ultimate'.
+  The Windows edition string is retrieved using the GetWindowsEditionString function.
+  To obtain the Windows product string (For Example 'Windows Vista Ultimate'), the
+  GetWindowsProductString function should be used.
+Result:
+  The Windows version as a string or an empty string if the OS is not recognized.
+See also:
+  GetWindowsVersion
+  GetWindowsEditionString
+  GetWindowsProductString
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@GetWindowsEditionString
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns the Windows edition as a string.
+Description:
+  GetWindowsEditionString returns the Windows edition as a string. For example, 'Ultimate'.
+Notes:
+  The result does not contain the Windows version string. For example, 'Windows Vista'.
+  The Windows version string is retrieved using the GetWindowsVersionString function.
+  To obtain the Windows product string (For Example 'Windows Vista Ultimate'), the
+  GetWindowsProductString function should be used.
+Result:
+  The Windows edition as a string or an empty string if the edition is not recognized.
+See also:
+  GetWindowsEdition
+  GetWindowsVersionString
+  GetWindowsProductString
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@GetWindowsProductString
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns the Windows product as a string.
+Description:
+  GetWindowsProductString returns the Windows product as a string. For example, 'Windows Vista Ultimate'.
+  The Windows product string is equivalent to the concatenation of the Windows version string
+  and the Windows edition string.
+Notes:
+  The Windows version string alone is retrieved using the GetWindowsVersionString function. For example, 'Windows Vista'.
+  The Windows edition string alone is retrieved using the GetWindowsEditionString function. For example, 'Ultimate'.
+Result:
+  The Windows product as a string or an empty string if the product is not recognized.
+See also:
+  GetWindowsEditionString
+  GetWindowsVersionString
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@GetWindowsBuildNumber
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns the Windows build number.
+Description:
+  Returns the Windows build number.
+Result:
+  The Windows build number.
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@GetWindowsServicePackVersion
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns the installed service pack.
+Description:
+  Returns the major version number of the latest installed Windows Service Pack.
+Result:
+  The major version number of the latest installed Service Pack. In case of failure, or it
+  no Service Pack is installed, the function returns 0.
+See also:
+  GetWindowsVersion
+  GetWindowsServicePackVersionString
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@GetWindowsServicePackVersionString
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns the installed service pack as a string.
+Description:
+  Returns the major version number of the latest installed Windows Service Pack as a string.
+Result:
+  The major version number of the latest installed Service Pack. In case of failure, or if
+  no Service Pack is installed, the function returns an empty string.
+See also:
+  GetWindowsServicePackVersion
+  GetWindowsVersionString
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@TestFDIVInstruction
+<GROUP SystemInformationRoutines.Hardware>
+Summary:
+  Tests the processor for the flawed FDIV instruction.
+Description:
+  TestFDIVInstruction tests the processor for the correctness of the FDIV instruction.
+  Older pentium processors had a bug in this instruction that caused incorrect
+  results under specific circumstances. Modern processors do not exhibit this bug.
+Result:
+  If the FDIV instruction is OK the function returns True, if it is flawed the
+  function returns False.
+See also:
+  GetCpuInfo
+  TCpuInfo
+  TestFDIVInstruction
+  GetCpuSpeed
+Donator:
+  Bryan Coutch
+--------------------------------------------------------------------------------
+@@CPUID
+<GROUP SystemInformationRoutines.Hardware>
+Summary:
+  Returns information about the processor.
+Description:
+  CPUID is used by GetCpuInfo for obtaining information about the processor.
+  You can call this function directly but it is recommend you use GetCpuInfo
+  instead. If you do call CPUID then keep in mind that the ISFDIVOK, FrequencyInfo
+  and MMX fields of the returned TCpuInfo record contain undefined data.
+Result:
+  CPUID returns information about the processor through a TCpuInfo record.
+See also:
+  GetCpuInfo
+  TCpuInfo
+  TestFDIVInstruction
+  GetCpuSpeed
+Donator:
+  Bryan Coutch
+--------------------------------------------------------------------------------
+@@GetCpuSpeed
+<GROUP SystemInformationRoutines.Hardware>
+Summary:
+  Returns information about the processor speed.
+Description:
+  GetCpuSpeed calculates the speed (frequency) of a processor. It returns the
+  information in a TFreqInfo record which includes the actual calculated
+  speed as well as a normalized speed.
+Parameters:
+  CpuSpeed - Receives the CPU speed. See the description of TFreqInfo for more information about the members of this record.
+Result:
+  If the function succeeds it returns True, otherwise it returns False. In the latter
+  case the content of the CpuSpeed parameter is undefined.
+See also:
+  GetCpuInfo
+  TFreqInfo
+Donator:
+  Bryan Coutch
+--------------------------------------------------------------------------------
+@@RoundFrequency
+<GROUP SystemInformationRoutines.Hardware>
+Summary:
+  Normalizes a frequency.
+Description:
+  RoundFrequency rounds a frequency as obtained from GetCpuSpeed to a
+  normalized frequency. For example, if GetCpuSpeed returns a calculated frequency
+  of 266.13 MHz then RoundFrequency will return the normalized 266 MHz.
+Parameters:
+  Frequency - The frequency to round (normalize) in MHz.
+Result:
+  The normalized frequency in MHz.
+Donator:
+  Bryan Coutch
+--------------------------------------------------------------------------------
+@@GetMacAddresses
+<GROUP SystemInformationRoutines.Hardware>
+Summary:
+  Retrieves the MAC addresses for a computer.
+Description:
+  GetMacAddresses returns a list of all MAC addresses for the specified computer.
+  The computer can be the local computer or a computer on the network.
+Parameters:
+  Machine - Netbios name of the computer who's MAC addresses you want. This can be the 'standard' computer name of a computer on the network or a '*' for the local computer (you can also use the local computer name or an empty string).
+  Addresses - On output a list of all MAC address found.
+Result:
+  The function returns the number of MAC addresses that are available for the
+  specified computer. The Addresses list may contain fewer addresses though. The
+  function attempts to get all the addresses but might fail for some of them, in
+  which case it continues to retrieve the remaining addresses. In case of complete
+  failure the function returns -1 and the Addresses list will be empty.
+Notes:
+  This function is an adapted conversion from the Platform SDK example described in knowledge base article Q118623.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@ReadTimeStampCounter
+<GROUP SystemInformationRoutines.Hardware>
+Summary:
+  Reads the time stamp counter.
+Description:
+  The ReadTimeStampCounter function reads and returns the current value of the time stamp counter.
+  The time-stamp counter counts CPU clocks from the time the processor is reset,
+  where it is initialized to an unknown count. This is a 64 bit count and therefore
+  it can accumulate counts for almost 2500 years (based on a 200MHz processor)
+  before a rollover occurs. You may want to consider inlining this instruction as
+  opposed to calling this function. If you do, the resulting 64 bit integer
+  containing the count is returned in the combination EDX:EAX.
+Result:
+  The current value of the time stamp counter.
+Notes:
+  This instruction is only available on Pentium (and higher) processors.
+Donator:
+  Azret Botash
+--------------------------------------------------------------------------------
+@@GetVolumeSerialNumber
+<GROUP SystemInformationRoutines.Identification>
+Summary:
+  Returns the volume serial number for the specified drive.
+Description:
+  GetVolumeSerialNumber returns the serial number for the specified volume. You
+  may specify a volume (e.g. 'c:\') or a UNC name.
+Parameters:
+  Drive - The volume for which to retrieve the serial number. You must specify the root-directory of a drive (e.g. 'c:\') or a full UNC name in which case you must follow it with an additional backslash.
+Result:
+  If the function succeeds it returns the serial number of the specified volume.
+  If the function fails it returns an empty string.
+Donator:
+  John C Molyneux
+--------------------------------------------------------------------------------
+@@GetVolumeFileSystem
+<GROUP SystemInformationRoutines.Identification>
+Summary:
+  Returns the name of the filesystem of the specified volume.
+Description:
+  GetVolumeFileSystem returns the name of the filesystem of the specified volume.
+  This can be a string such as 'FAT' or 'NTFS'. You may specify a volume (e.g. 'c:\')
+  or a UNC name.
+Parameters:
+  Drive - The volume for which to filesystem name. You must specify the root-directory of a drive (e.g. 'c:\') or a full UNC name in which case you must follow it with an additional backslash.
+Result:
+  If the function succeeds it returns the name of the filesystem of the specified
+  volume. If the function fails it returns an empty string.
+Donator:
+  John C Molyneux
+--------------------------------------------------------------------------------
+@@GetVolumeName
+<GROUP SystemInformationRoutines.Identification>
+Summary:
+  Returns the name for the specified drive.
+Description:
+  GetVolumeName returns the name of the specified volume. You
+  may specify a volume (e.g. 'c:\') or a UNC name.
+Parameters:
+  Drive - The volume for which to retrieve the name. You must specify the root-directory of a drive (e.g. 'c:\') or a full UNC name in which case you must follow it with an additional backslash.
+Result:
+  If the function succeeds it returns the name of the specified volume.
+  If the function fails it returns an empty string.
+Donator:
+  John C Molyneux
+--------------------------------------------------------------------------------
+@@GetIPAddress
+<GROUP SystemInformationRoutines.Identification>
+Summary:
+  Returns the IP address of a host.
+Description:
+  GetIPAddress attempts to resolve a hostname to an IP address. If the function
+  succeeds it returns the IP address in dotted decimal notation. You can call
+  GetIPAddress with GetLocalComputerName or an empty string as the HostName
+  parameter to get the IP address of the local computer. This function assumes
+  IPv4 addresses and only returns one IP address, even if the specified host has
+  more then one.
+Parameters:
+  HostName - The name of the host computer who's IP address you want. If an empty string is passed the function returns the IP address of the local computer.
+Result:
+  If the function succeeds it returns the IP address of the specified host in the
+  dotted decimal notation. If the function fails it returns an empty string.
+Donator:
+  John C Molyneux
+--------------------------------------------------------------------------------
+@@TIntelSpecific
+<GROUP SystemInformationRoutines.Hardware>
+Summary:
+  Describes the cache of an Intel processor.
+Description:
+  Describes the cache of an Intel processor.
+Donator:
+  Bryan Coutch
+@@TIntelSpecific.L2Cache
+  Size of the level 2 cache in Kb.
+@@TIntelSpecific.CacheDescriptors
+  Detailed information about the data and instruction caches. You can map these entries to a descriptive string by using the IntelCacheDescription global variable. The entry in that array for which the D member matches the value in the CacheDescriptors array is the entry who's I member contains the descriptive string. You can use the IntelCacheDescription function to get that string.
+--------------------------------------------------------------------------------
+@@TCyrixSpecific
+<GROUP SystemInformationRoutines.Hardware>
+Summary:
+  Describes the cache of a Cyrix processor.
+Description:
+  Describes the cache of a Cyrix processor.
+Donator:
+  Bryan Coutch
+@@TCyrixSpecific.L1CacheInfo
+  Describes the level 1 cache. If an entry contains the value $80 it denotes a '16KB L1 Cache, 4-way set associative, 16 byte line size' cache.
+@@TCyrixSpecific.TLBInfo
+  Describes the TLB. If an entry contains the value $70 it denotes a 'TLB, 4Kb pages, 4-way set associative, 32 entries' TLB.
+--------------------------------------------------------------------------------
+@@TAMDSpecific
+<GROUP SystemInformationRoutines.Hardware>
+Summary:
+  Describes the cache of an AMD processor.
+Description:
+  Describes the cache of an AMD processor.
+Donator:
+  Bryan Coutch
+@@TAMDSpecific.L1DataCache
+  Describes the level 1 data cache. The entries have the following meaning:    * L1DataCache[0] Line size in bytes  * L1DataCache[1] Lines per tag  * L1DataCache[2] Associativity ($FF is fully associative)  * L1DataCache[3] Size in Kb  
+--------------------------------------------------------------------------------
+@@TCacheInfo
+<GROUP SystemInformationRoutines.Hardware>
+Summary:
+  The IntelCacheDescription global variable uses this type to provide a mapping from a cache descriptor to a cache entry description.
+Description:
+  The IntelCacheDescription global variable uses this type to provide a mapping from a cache descriptor to a cache entry description.
+Donator:
+  Bryan Coutch
+@@TCacheInfo.D
+  Descriptor used to match a cache descriptor to it's representative string.
+@@TCacheInfo.I
+  Description of cache.
+--------------------------------------------------------------------------------
+@@TFreqInfo
+<GROUP SystemInformationRoutines.Hardware>
+Summary:
+  Record used as a field in the TCpuInfo record which contains frequency information about the CPU. This information is calculated when you call GetCpuInfo.
+Description:
+  Record used as a field in the TCpuInfo record which contains frequency information about the CPU. This information is calculated when you call GetCpuInfo.
+Donator:
+  Bryan Coutch
+@@TFreqInfo.RawFreq
+  The raw frequency of the CPU in MHz.
+@@TFreqInfo.NormFreq
+  The normalized frequency of the CPU in MHz.
+@@TFreqInfo.InCycles
+  The elapsed, internal clock cycles during the test.
+@@TFreqInfo.ExTicks
+  The time, in microseconds, that elapsed during the test.
+--------------------------------------------------------------------------------
+@@TCpuInfo
+<GROUP SystemInformationRoutines.Hardware>
+Summary:
+  The TCpuInfo record is used by GetCpuInfo and returns the requested processor information.
+Description:
+  The TCpuInfo record is used by GetCpuInfo and returns the requested processor information.
+Donator:
+  Bryan Coutch
+@@TCpuInfo.HasInstruction
+  True if the processor supports CPU identification instructions. If False the MMX, Features and FrequencyInfo fields do not contain valid data.
+@@TCpuInfo.MMX
+  True if the processor supports the MMX extension instructions.
+@@TCpuInfo.IsFDIVOK
+  True if the FDIV instruction is OK, False if it's flawed.
+@@TCpuInfo.HasCacheInfo
+  True if the processor specific subrecords contain valid cache information data. If False the IntelSpecific, CyrixSpecific and AMDSpecific subrecords do not contain valid data.
+@@TCpuInfo.HasExtendedInfo
+  Denotes whether or not the AMD or Cyrix processors have the extended CPUID instruction. This affects the possible flags in the Features field. If False the Features member does not contain any of the extended Cyrix and AMD flags (the ones starting with an 'E').
+@@TCpuInfo.CpuType
+  Denotes the CPU vendor, can be one of the following values: CPU_TYPE_INTEL, CPU_TYPE_CYRIX, CPU_TYPE_AMD.
+@@TCpuInfo.PType
+  Denotes the CPU: Type 0 = Normal, 1 = Overdrive
+@@TCpuInfo.Family
+  Processor family. For example, for Intel processors a value of 4 denotes a 486, 5 a Pentium and 6 a Pentium Pro. The family and model members are used together to form a descriptive string in the CpuName member.
+@@TCpuInfo.Model
+  The specific model within a processor family. For example, for an Intel processor with family 6 (Pentium Pro) a value of 1 denotes a Pentium Pro while a 3 denotes a Pentium II. The family and model members are used together to form a descriptive string in the CpuName member.
+@@TCpuInfo.Stepping
+  TODO
+@@TCpuInfo.Features
+  Contains a set of flags detailing the features of the processor. The possible flags are processor specific. See Flags for more information.
+@@TCpuInfo.FrequencyInfo
+  Contains processor freqeuncy information.
+@@TCpuInfo.VendorIDString
+  Contains a string describing the processor's vendor.
+@@TCpuInfo.Manufacturer
+  Contains a string describing the processor's manufacturer.
+@@TCpuInfo.CpuName
+  Contains a descriptive string for the processor (for example "Pentium II Xeon").
+@@TCpuInfo.IntelSpecific
+  Contains Intel processor specific information. Only valid if HasCacheInfo is True.
+@@TCpuInfo.CyrixSpecific
+  Contains Cyrix processor specific information. Only valid if HasCacheInfo is True.
+@@TCpuInfo.AMDSpecific
+  Contains AMD processor specific information. Only valid if HasCacheInfo is True.
+--------------------------------------------------------------------------------
+@@GetCpuInfo
+<GROUP SystemInformationRoutines.Hardware>
+Summary:
+  Returns information about the CPU.
+Description:
+  GetCpuInfo returns extensive information about the CPU (Central Processing Unit).
+  It returns 'generic' information such as type, speed and manufacturer information
+  as well as brand specific information for Intel, AMD, Cyrix, and Transmeta
+  processors. This function includes support for the Intel 486 to Pentium 4, 
+  AMD AM486 to Athlon, Cyrix Media GX to 6x86MX, and Crusoe.
+Parameters:
+  CpuInfo - Record to receive processor information.
+Donator:
+  Bryan Coutch
+--------------------------------------------------------------------------------
+@@GetIntelCacheDescription
+<GROUP SystemInformationRoutines.Hardware>
+Summary:
+  Returns a descriptive string for an Intel cache descriptor.
+Description:
+  GetIntelCacheDescription returns a descriptive string for an Intel cache descriptor.
+  This is something like: 'Instruction TLB, 4Kb pages, 4-way set associative, 32 entries'.
+Parameters:
+  D - The descriptor for which you want a descriptive string. This is usually one of the entries in the TIntelSpecific.CacheDescriptors array.
+Result:
+  The descriptive string for the specified descriptor. If a description isn't
+  available the function returns an empty string.
+See also:
+  TIntelSpecific
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GetCommonFilesFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the Windows Common Files directory.
+Description:
+  GetCommonFilesFolder returns the Windows Common Files folder as read from the
+  registry. On a default installation of Windows 2000/XP/Vista this is a string such as
+  c:\Program Files\Common Files.
+Result:
+  The Windows Common Files folder. If the function fails it returns an empty string.
+Notes:
+  You can use the SHGetFolderPath API function to get many more common directories.
+See also:
+  GetProgramFilesFolder
+Donator:
+  Carl Clark
+--------------------------------------------------------------------------------
+@@GetLocalComputerName
+<GROUP SystemInformationRoutines.Identification>
+Summary:
+  Returns the name of the local computer.
+Description:
+  The GetLocalComputerName function retrieves the NetBIOS name of the local computer.
+  This name is established at system startup, when the system reads it from the
+  registry. If the local computer is a node in a cluster, GetLocalComputerName returns
+  the name of the cluster.
+Result:
+  The local computer name or an empty string on failure.
+Notes:
+  If you're running Windows 2000 you can use the GetComputerNameEx function for more detailed control over exactly which name you want.
+See also:
+  GetLocalUserName
+Donators:
+  Nick Hodges (Win32)
+  André Snepvangers (Unix)
+--------------------------------------------------------------------------------
+@@GetLocalUserName
+<GROUP SystemInformationRoutines.Identification>
+Summary:
+  Returns the name of the current user.
+Description:
+  Returns the name of the user associated with the current thread. That is the
+  user currently logged on to the system. If the current thread is impersonating
+  a client, the function returns the name of that client.
+Result:
+  The local user name or an empty string on failure.
+Notes:
+  If you're running Windows 2000 you can use the GetUserNameEx function to control
+  the format of the returned name.
+See also:
+  GetLocalComputerName
+Donators:
+  Nick Hodges (Win32)
+  André Snepvangers (Unix)
+--------------------------------------------------------------------------------
+@@GetProgramFilesFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the Windows Program Files directory.
+Description:
+  GetProgramFilesFolder returns the Windows Program Files folder as read from the
+  registry. On a default installation of Windows 2000/XP/Vista this is a string such as
+  c:\Program Files.
+Result:
+  The Windows Program Files folder. If the function fails it returns an empty string.
+Notes:
+  You can use the SHGetFolderPath API function to get many more common directories.
+See also:
+  GetCommonFilesFolder
+Donator:
+  Carl Clark
+--------------------------------------------------------------------------------
+@@GetRegisteredCompany
+<GROUP SystemInformationRoutines.Identification>
+Summary:
+  Returns the registered company.
+Description:
+  Returns the registered company string for the local computer as read from the
+  registry.
+Result:
+  The registered company string or an empty string on failure.
+See also:
+  GetRegisteredOwner
+Donator:
+  Nick Hodges
+--------------------------------------------------------------------------------
+@@GetRegisteredOwner
+<GROUP SystemInformationRoutines.Identification>
+Summary:
+  Returns the registered owner.
+Description:
+  Returns the registered owner string for the local computer as read from the registry.
+Result:
+  The registered owner string or an empty string on failure.
+See also:
+  GetRegisteredCompany
+Donator:
+  Nick Hodges
+--------------------------------------------------------------------------------
+@@GetBIOSDate
+<GROUP SystemInformationRoutines.Identification>
+Summary:
+  Returns the BIOS date.
+Description:
+  Returns the date the BIOS release date.
+Result:
+  The BIOS release date, if successful. The system base date (12/30/1899), if
+  there has been a problem.
+Notes: This information is accurate only if you have not updated or
+  changed the BIOS since you last ran Windows Setup.
+See also:
+  GetBIOSName
+  GetBIOSCopyright
+  GetBIOSExtendedInfo
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetBIOSName
+<GROUP SystemInformationRoutines.Identification>
+Summary:
+  Returns the BIOS name.
+Description:
+  Returns the name of the BIOS.
+Result:
+  The BIOS name, if successful. An empty string otherwise.
+Notes:
+  This information is accurate only if you have not updated or
+  changed the BIOS since you last ran Windows 95/98 or Windows Millennium
+  Edition (Me) Setup.
+  The result is valid for Win9x/ME only; under Windows NT/2000/XP/2003/Vista/Server 2008,
+  an empty string is returned.
+See also:
+  GetBIOSDate
+  GetBIOSCopyright
+  GetBIOSExtendedInfo
+Donator:
+  James Azarja
+--------------------------------------------------------------------------------
+@@GetBIOSCopyright
+<GROUP SystemInformationRoutines.Identification>
+Summary:
+  Returns the BIOS copyright string.
+Description:
+  Returns the BIOS copyright string.
+Result:
+  The BIOS copyright, if successful. An  empty string otherwise.
+See also:
+  GetBIOSDate
+  GetBIOSName
+  GetBIOSExtendedInfo
+Donator:
+  James Azarja
+--------------------------------------------------------------------------------
+@@GetBIOSExtendedInfo
+<GROUP SystemInformationRoutines.Identification>
+Summary:
+  Returns extended information on the BIOS.
+Description:
+  Returns extended information on the BIOS.
+Result:
+  The BIOS extended information, if successful. An  empty string otherwise.
+See also:
+  GetBIOSDate
+  GetBIOSName
+  GetBIOSCopyright
+Donator:
+  James Azarja
+--------------------------------------------------------------------------------
+@@GetWindowsFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the Windows folder.
+Description:
+  The GetWindowsFolder function retrieves the path of the Windows directory. The
+  Windows directory contains such files as Win32-based applications, initialization
+  files, and help files. On a default installation of Windows 2000 this is c:\winnt.
+  On a default installation of Windows XP/Vista this is c:\windows.
+Result:
+  The Windows directory or an empty string on failure.
+See also:
+  GetWindowsSystemFolder
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@GetWindowsSystemFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the Windows system directory.
+Description:
+  The GetWindowsSystemFolder function retrieves the path of the Windows system directory.
+  The Windows system directory contains such files as dynamic-link libraries, drivers,
+  and font files. On a default installation of Windows 2000 this is c:\winnt\system32.
+  On a default installation of Windows XP/Vista this is c:\windows\system32.
+Result:
+  The Windows system directory or an empty string on failure.
+See also:
+  GetWindowsFolder
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@GetWindowsTempFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the Windows temp folder.
+Description:
+  The GetWindowsTempFolder function retrieves the path of the directory designated for
+  temporary files. Normally this is the folder specified by the TMP or TEMP environment
+  variable. If TMP and TEMP do not exist then for Windows 95/98 the result is the current
+  directory and for Windows NT/2000 the result is the Windows directory.
+Result:
+  The Windows folder designated for temporary files.
+Donator:
+  Nick Hodges
+--------------------------------------------------------------------------------
+@@IsWin95
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows 95.
+Description:
+  IsWin95 returns whether or not the system is running Windows 95.
+Result:
+  If the system is running Windows 95 the result is True otherwise the result is False.
+See also:
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Nick Hodges
+--------------------------------------------------------------------------------
+@@IsWin95OSR2
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows 95 OSR 2.
+Description:
+  IsWin95OSR2 returns whether or not the system is running Windows 95 OSR 2.
+Result:
+  If the system is running Windows 95 OSR 2 the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Nick Hodges
+--------------------------------------------------------------------------------
+@@IsWin98
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows 98.
+Description:
+  IsWin98 returns whether or not the system is running Windows 98.
+Result:
+  If the system is running Windows 98 the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Nick Hodges
+--------------------------------------------------------------------------------
+@@IsWin98SE
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows 98 SE.
+Description:
+  IsWin98SE returns whether or not the system is running Windows 98 Second Edition.
+Result:
+  If the system is running Windows 98 SE the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Nick Hodges
+--------------------------------------------------------------------------------
+@@IsWinME
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows Millenium.
+Description:
+  IsWinME returns whether or not the system is running Windows Millenium.
+Result:
+  If the system is running Windows Millenium the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Nick Hodges
+--------------------------------------------------------------------------------
+@@IsWinNT
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows NT.
+Description:
+  IsWinNT returns whether or not the system is running Windows NT.
+Result:
+  If the system is running Windows NT the result is True otherwise the result is False.
+  You can use the IsWinNT3, IsWinNT31, IsWinNT35, IsWinNT351, IsWinNT4, IsWin2K, IsWinXP,
+  IsWin2003, IsWin2003R2, IsWinVista, IsWinServer2008, IsWin7 or IsWinServer2008R2 to further
+  distinguish between the different NT versions.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Nick Hodges
+--------------------------------------------------------------------------------
+@@IsWinNT3
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows NT 3.
+Description:
+  IsWinNT3 returns whether or not the system is running Windows NT 3.
+Result:
+  If the system is running Windows NT 3 the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Nick Hodges
+--------------------------------------------------------------------------------
+@@IsWinNT31
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows NT 3.1.
+Description:
+  IsWinNT31 returns whether or not the system is running Windows NT 3.1.
+Result:
+  If the system is running Windows NT 3.1 the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Nick Hodges
+--------------------------------------------------------------------------------
+@@IsWinNT35
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows NT 3.5.
+Description:
+  IsWinNT35 returns whether or not the system is running Windows NT 3.5.
+Result:
+  If the system is running Windows NT 3.5 the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Nick Hodges
+--------------------------------------------------------------------------------
+@@IsWinNT351
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows NT 3.5.1.
+Description:
+  IsWinNT351 returns whether or not the system is running Windows NT 3.5.1.
+Result:
+  If the system is running Windows NT 3.5.1 the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Nick Hodges
+--------------------------------------------------------------------------------
+@@IsWinNT4
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows NT 4.
+Description:
+  IsWinNT4 returns whether or not the system is running Windows NT 4.
+Result:
+  If the system is running Windows NT 4 the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Nick Hodges
+--------------------------------------------------------------------------------
+@@IsWin2K
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows 2000.
+Description:
+  IsWin2K returns whether or not the system is running Windows 2000.
+Result:
+  If the system is running Windows 2000 the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@IsWinXP
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows XP.
+Description:
+  IsWinXP returns whether or not the system is running Windows XP.
+Result:
+  If the system is running Windows XP (32 or 64 bit) the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@IsWin2003
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows Server 2003.
+Description:
+  IsWin2003 returns whether or not the system is running Windows Server 2003.
+Result:
+  If the system is running Windows Server 2003 the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@IsWin2003R2
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows Server 2003 R2.
+Description:
+  IsWin2003 returns whether or not the system is running Windows Server 2003 R2.
+Result:
+  If the system is running Windows Server 2003 R2 the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWinVista
+  IsWinServer2008
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@IsWinVista
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows Vista.
+Description:
+  IsWinVista returns whether or not the system is running Windows Vista.
+Result:
+  If the system is running Windows Vista the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinServer2008
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Florent Ouchet
+--------------------------------------------------------------------------------
+@@IsWin7
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows 7.
+Description:
+  IsWin7 returns whether or not the system is running Windows 7.
+Result:
+  If the system is running Windows 7 the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@IsWinServer2008
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows Server 2008.
+Description:
+  IsWinServer2008 returns whether or not the system is running Windows Server 2008.
+Result:
+  If the system is running Windows Server 2008 the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Florent Ouchet
+--------------------------------------------------------------------------------
+@@IsWinServer2008R2
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows Server 2008 R2.
+Description:
+  IsWinServer2008R2 returns whether or not the system is running Windows Server 2008 R2.
+Result:
+  If the system is running Windows Server 2008 R2 the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWin7
+  IsWinServer2008
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@IsWin8
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows 8.
+Description:
+  IsWin8 returns whether or not the system is running Windows 8.
+Result:
+  If the system is running Windows 8 the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWinServer2008R2
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@IsWinServer2012
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows Server 2008.
+Description:
+  IsWinServer2012 returns whether or not the system is running Windows Server 2012.
+Result:
+  If the system is running Windows Server 2012 the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@IsWin81
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows 8.1.
+Description:
+  IsWin81 returns whether or not the system is running Windows 8.1.
+Result:
+  If the system is running Windows 8.1 the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWinServer2012R2
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@IsWinServer2012R2
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns whether the system is running Windows Server 2012 R2.
+Description:
+  IsWinServer2012R2 returns whether or not the system is running Windows Server 2012 R2.
+Result:
+  If the system is running Windows Server 2012 R2 the result is True otherwise the result is False.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@NtProductType
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns the Windows NT product type.
+Description:
+  NtProductType returns which edition of Windows NT is running on the system.
+Result:
+  The edition of Windows NT. This is one of the values in the TNtProductType
+  enumeration which is defined as:
+  TNtProductType = (ptUnknown, ptWorkStation, ptServer, ptAdvancedServer, ptPersonal, ptProfessional, ptDatacenterServer);
+   * ptUnknown Edition could not be determined. Most likely the system is not running NT
+   * ptWorkStation The system is running Windows NT workstation or Windows 2000 professional.
+   * ptServer The system is running Windows NT/2000 Server
+   * ptAdvancedServer The system is running Windows NT/2000 Server as a (primary or backup) domain controller.
+   * ptPersonal The system is running Windows XP Personal
+   * ptProfessional The system is running Windows 2000/XP Professional
+   * ptDatacenterServer The system is running Windows 2000 DataCenter Server
+Notes:
+  On platforms other then Windows NT/2000 this function always returns ptUnknown.
+See also:
+  IsWin95
+  IsWin95OSR2
+  IsWin98
+  IsWin98SE
+  IsWinME
+  IsWinNT
+  IsWinNT3
+  IsWinNT31
+  IsWinNT35
+  IsWinNT351
+  IsWinNT4
+  IsWin2K
+  IsWinXP
+  IsWin2003
+  IsWin2003R2
+  IsWinVista
+  IsWinServer2008
+  IsWin7
+  IsWinServer2008R2
+  IsWin8
+  IsWinServer2012
+  IsWin81
+  IsWinServer2012R2
+Donator:
+  Marcel van Brakel
+Contributors:
+  Scott Price
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@NtProductTypeString
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns the Windows NT product type as a string.
+Description:
+  NtProductTypeString returns the NT product type as a string. For example 'Workstation'.
+Result:
+  The NT product type as a string or an empty string if the product type is not recognized.
+See also:
+  NtProductType
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@CreateEnvironmentBlock
+<GROUP SystemInformationRoutines.Environment>
+Summary:
+  Prepares a new environment block for CreateProcAsUserEx
+Description:
+  CreateEnvironmentBlock prepares a process environment block. It is used
+  by CreateProcAsUserEx,
+  which launches a new process with a new environment block. By setting the appropriate
+  options, you can determine whether the function will include the current environment
+  block within the new environment block. Also, you can add a customized set of environment
+  variables by supplying the AdditionalVars parameter.
+Parameters:
+  Options - Determines whether the global and / or user related environment variables will be included in the result.
+  AdditionalVars - This list contains additional strings for the new environment block. The entries in this list must be name / value pairs (e.g. 'name=value'). You may pass a nil value in this parameter, which makes the function behave exactly as CreateProcAsUser.
+Result:
+  As the result, you will receive a PChar containing a list of environment variables. This
+  PChar can directly be used with functions like CreateProcAsUserEx.
+Notes:
+  The caller is responsible to release the returned PChar when it is no longer needed.
+See also:
+  CreateProcAsUserEx
+  CreateProcAsUser
+  TEnvironmentOptions
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@TEnvironmentOption
+<GROUP SystemInformationRoutines.Environment>
+Summary:
+  This set of options for CreateEnvironmentBlock will determine which environment variables will be copied to the new environemt block.
+Description:
+  This set of options for CreateEnvironmentBlock will determine which environment variables will be copied to the new environemt block.
+See also:
+  CreateEnvironmentBlock
+Donator:
+  Peter Friese
+@@TEnvironmentOption.eoLocalMachine
+  Copy the environment block defined globally for the local machine.
+@@TEnvironmentOption.eoCurrentUser
+  Copy the environment of the user that is running the process.
+@@TEnvironmentOption.eoAdditional
+  Copy additional name / value pairs to the new environment block. These additional pairs
+  must be passed in the AdditionalVars parameter of the CreateEnvironmentBlock function.
+@@TEnvironmentOptions
+<GROUP SystemInformationRoutines.Environment>
+<COMBINE TEnvironmentOption>
+--------------------------------------------------------------------------------
+@@GetUserDomainName
+<GROUP SystemInformationRoutines.Identification>
+Summary:
+  Returns the name of the domain where a user account resides.
+Description:
+  GetUserDomainName returns the name of the domain where a user account resides.
+  Under Win9x/ME, an empty string will be returned.
+Parameters:
+  CurUser - The name of the user account to look up.
+Result:
+  As the result, you will receive the name of the domain the user is defined in,
+  or an empty string if the function fails.
+Notes:
+  The function tries to find the user account on the local system first. Next, the
+  primary domain is checked. If the name is not found there, trusted domains are checked.
+  GetUserDomainName relies on LookupAccountName, which is not implemented by Win9x/ME,
+  and will return an empty result string on these platforms.
+See also:
+  GetDomainName
+  GetLocalUserName
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetDomainName
+<GROUP SystemInformationRoutines.Identification>
+Summary:
+  Returns the name of the domain where the current user account resides.
+Description:
+  GetDomainName returns the name of the domain where the user account associated
+  with the calling thread resides. In client application this will usually be the
+  interactively logged on user, but in server applications this could be any user
+  that is currently impersonated.
+Result:
+  The name of the domain where the user account resides, or an empty string if
+  the function fails.
+Notes:
+  The function determines the name of the domain by checking which domain the currently
+  logged in user is belonging to. Under Win9x/ME, the result will be an empty string.
+See also:
+  GetUserDomainName
+  GetLocalUserName
+Donators:
+  Peter Friese (Win32)
+  André Snepvangers (Unix)
+--------------------------------------------------------------------------------
+@@GetDesktopFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the virtual folder representing the Windows desktop.
+Description:
+  GetDesktopFolder returns the name of the virtual folder (directory) representing
+  the Windows desktop. On a standard Windows NT 4.0 installation, this is equivalent
+  to "C:\WINNT\Profiles\%Username%\Desktop".
+Result:
+  A string containing the local path to the desktop directory.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetCommonAppdataFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetProgramsFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the file system directory containing the current user's program groups.
+Description:
+  GetProgramsFolder returns the name of the file system directory containing the user's
+  program groups (which are in fact file system directories themselves) and program shortcuts
+  (which are special files). On a standard Windows NT 4.0 installation, this is equivalent
+  to "C:\WINNT\Profiles\%Username%\Start Menu\Program Files".
+Result:
+  A string containing the local path to the programs directory.
+Notes:
+  Applications that need to add program groups and program shortcuts should place them
+  into the directory returned by this function.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetCommonAppdataFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetPersonalFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the directory that serves as a common repository for documents.
+Description:
+  GetPersonalFolder returns the name of the directory that serves as a common
+  repository for documents. On a standard Windows NT 4.0 installation,
+  this is equivalent to "C:\WINNT\Profiles\%Username%freter\Personal Files".
+Result:
+  A string containing the local path to the current user's personal files folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetCommonAppdataFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donators:
+  Peter Friese (Win32)
+  André Snepvangers (Unix)
+--------------------------------------------------------------------------------
+@@GetFavoritesFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the directory that serves as a common repository for the user's
+  favorite items.
+Description:
+  GetFavoritesFolder returns the name of the directory that serves as a common repository
+  for the user's favorite items. On a standard Windows NT 4.0 installation, this is equivalent
+  to "C:\WINNT\Profiles\%Username%\Favorites".
+Result:
+  A string containing the local path to the current user's favorite files folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetCommonAppdataFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetStartupFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the directory that corresponds to the user's Startup program group.
+Description:
+  GetStartupFolder returns the name of the directory that corresponds to the user's Startup
+  program group. The system starts these programs whenever any user logs onto Windows NT
+  or starts Windows 95. On a standard Windows NT 4.0 installation, this directory is
+  equivalent to "C:\WINNT\Profiles\%Username%\Start Menu\Program Files\Startup".
+Result:
+  A string containing the local path to the current user's startup files folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetCommonAppdataFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetRecentFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the file system directory that contains the user's most recently
+  used documents.
+Description:
+  GetRecentFolder returns the name of the file system directory that contains the user's
+  most recently used documents. On a standard Windows NT 4.0 installation, this directory
+  is equivalent to "C:\WINNT\Profiles\%Username%\Recent".
+Result:
+  A string containing the local path to the current user's recently used files folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetCommonAppdataFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetSendToFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the file system directory that contains Send To menu items.
+Description:
+  GetSendToFolder returns the name of the file system directory that contains SendTo
+  menu items. On a standard Windows NT 4.0 installation, this directory is equivalent
+  to "C:\WINNT\Profiles\%Username%\SendTo".
+Result:
+  A string containing the local path to the current user's SendTo files folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetCommonAppdataFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetStartmenuFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the file system directory containing Start menu items.
+Description:
+  GetStartmenuFolder returns the name of the file system directory containing Start
+  menu items. On a standard Windows NT 4.0 installation, this directory is equivalent
+  to "C:\WINNT\Profiles\%Username%\SendTo".
+Result:
+  A string containing the local path to the current user's Start menu folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetCommonAppdataFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetDesktopDirectoryFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the file system directory used to physically store file objects
+  on the desktop.
+Description:
+  GetDesktopDirectoryFolder returns the name of the file system directory used to
+  physically store file objects on the desktop (not to be confused with the desktop
+  folder itself). On a standard Windows NT 4.0 installation, this directory is
+  equivalent to "C:\WINNT\Profiles\%Username%\Desktop".
+Result:
+  A string containing the local path to the current user's desktop folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetCommonAppdataFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetNethoodFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the file system directory containing objects that appear in
+  the network neighborhood.
+Description:
+  GetNetHoodFolder returns the name of the file system directory containing objects
+  that appear in the network neighborhood. On a standard Windows NT 4.0 installation,
+  this directory is equivalent to "C:\WINNT\Profiles\%Username%\Nethood".
+Result:
+  A string containing the local path to the current user's nethood folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetCommonAppdataFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetFontsFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the file system directory containing fonts.
+Description:
+  GetFontsFolder returns the name of the file system directory containing fonts.
+  On a standard Windows NT 4.0 installation, this directory is equivalent to "C:\WINNT\Fonts".
+Result:
+  A string containing the local path to the system's fonts folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetCommonAppdataFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetCommonStartmenuFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the file system directory that contains the programs and
+  folders that appear on the Start menu for all users.
+Description:
+  GetCommonStartmenuFolder returns the name of the file system directory that
+  contains the programs and folders that appear on the Start menu for all users.
+  On a standard Windows NT 4.0 installation, this directory is equivalent to
+  "C:\WINNT\Profiles\All Users\Start Menu".
+Result:
+  A string containing the local path to the system's Start menu folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetCommonAppdataFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetCommonProgramsFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the file system directory that contains the directories for
+  the common program groups that appear on the Start menu for all users.
+Description:
+  Returns the name of the file system directory that contains the directories for
+  the common program groups that appear on the Start menu for all users. On
+  a standard Windows NT 4.0 installation, this directory is equivalent
+  to "C:\WINNT\Profiles\All Users\Start Menu\Program Files".
+Result:
+  A string containing the local path to the system's programs folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetCommonAppdataFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetCommonStartupFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the file system directory that contains the programs that
+  appear in the Startup folder for all users.
+Description:
+  GetCommonStartupFolder returns the name of the file system directory that contains
+  the programs that appear in the Startup folder for all users. On a standard Windows
+  NT 4.0 installation, this directory is equivalent to
+  "C:\WINNT\Profiles\All Users\Start Menu\Program File\Startup".
+Result:
+  A string containing the local path to the system's Startup folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonDesktopdirectoryFolder
+  GetCommonAppdataFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetCommonDesktopdirectoryFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the file system directory that contains files and folders that
+  appear on the desktop for all users.
+Description:
+  GetCommonDesktopdirectoryFolder returns the name of the file system directory that
+  contains files and folders that appear on the desktop for all users. On a standard
+  Windows NT 4.0 installation, this directory is equivalent to
+  "C:\WINNT\Profiles\All Users\Desktop".
+Result:
+  A string containing the local path to the system's desktop folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonAppdataFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetAppdataFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the file system directory that serves as a common repository
+  for application-specific data.
+Description:
+  GetAppdataFolder Returns the name of the file system directory that serves as a
+  common repository for application-specific data. On a standard Windows NT 4.0
+  installation, this directory is equivalent to "C:\WINNT\Profiles\%Username%\Application Data".
+Result:
+  A string containing the local path to the current user's application data folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetPrinthoodFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the file system directory that serves as a common repository for printer links.
+Description:
+  GetPrinthoodFolder Returns the name of the file system directory that serves as a common repository
+  for printer links. On a standard Windows NT 4.0 installation, this directory is
+  equivalent to "C:\WINNT\Profiles\%Username%\Printhood".
+Result:
+  A string containing the local path to the current user's printhood folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetAppdataFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetCommonFavoritesFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the file system directory that serves as a common repository for all users' favorite items.
+Description:
+  GetCommonFavoritesFolder returns the name of the file system directory that serves
+  as a common repository for all users' favorite items.
+Result:
+  A string containing the local path to the systems's favorites files folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetTemplatesFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the file system directory that serves as a common repository for document templates.
+Description:
+  GetTemplatesFolder returns the name of the file system directory that serves as
+  a common repository for document templates.
+Result:
+  A string containing the local path to the current user's templates folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetInternetCacheFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the file system directory that serves as a common repository
+  for temporary Internet files.
+Description:
+  GetInternetCacheFolder returns the name of the file system directory that serves
+  as a common repository for temporary Internet files.
+Result:
+  A string containing the local path to the current user's internet cache folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetCookiesFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetCookiesFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the file system directory that serves as a common repository
+  for Internet cookies.
+Description:
+  GetCookiesFolder returns the name of the file system directory that serves as a
+  common repository for Internet cookies.
+Result:
+  A string containing the local path to the current user's internet cookies folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetHistoryFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetHistoryFolder
+<GROUP SystemInformationRoutines.CommonFolders>
+Summary:
+  Returns the name of the file system directory that serves as a common repository
+  for Internet history items.
+Description:
+  GetHistoryFolder returns the name of the file system directory that serves as a
+  common repository for Internet history items.
+Result:
+  A string containing the local path to the current user's internet history folder.
+See also:
+  GetCommonFilesFolder
+  GetCurrentFolder
+  GetProgramFilesFolder
+  GetWindowsFolder
+  GetWindowsSystemFolder
+  GetWindowsTempFolder
+  GetDesktopFolder
+  GetPersonalFolder
+  GetFavoritesFolder
+  GetStartupFolder
+  GetRecentFolder
+  GetSendToFolder
+  GetStartmenuFolder
+  GetDesktopDirectoryFolder
+  GetNethoodFolder
+  GetFontsFolder
+  GetCommonStartmenuFolder
+  GetCommonProgramsFolder
+  GetCommonStartupFolder
+  GetCommonDesktopdirectoryFolder
+  GetAppdataFolder
+  GetPrinthoodFolder
+  GetCommonFavoritesFolder
+  GetTemplatesFolder
+  GetInternetCacheFolder
+  GetCookiesFolder
+  GetProgramsFolder
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetAPMLineStatus
+<GROUP SystemInformationRoutines.PowerManagement>
+Summary:
+  Returns the line status of the APM system.
+Description:
+  This function checks the line status of the APM system. If the PC is connected
+  to a power plug, it is considered "online", otherwise "offline".
+Result:
+  The status of the APM system, see TAPMLineStatus for possible values.
+See also:
+  TAPMLineStatus
+  GetAPMBatteryFlag
+  TAPMBatteryFlag
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@TAPMLineStatus
+<GROUP SystemInformationRoutines.PowerManagement>
+Summary:
+  Enumeration of APM line stati. Used as function result by
+Description:
+  Enumeration of APM line stati. Used as function result by
+See also:
+  GetAPMLineStatus
+  GetAPMBatteryFlag
+  TAPMBatteryFlag
+Donator:
+  Peter Friese
+@@TAPMLineStatus.alsUnknown
+  Anonymous line status. This will be the result if the function could not determine the current line status.
+@@TAPMLineStatus.alsOnline
+  The PC is connected to a power plug.
+@@TAPMLineStatus.alsOffline
+  The PC is not connected to a power plug. That is, it is using the built-in battery.
+--------------------------------------------------------------------------------
+@@TAPMBatteryFlag
+<GROUP SystemInformationRoutines.PowerManagement>
+Summary:
+  Enumeration of APM battery flags. Used as function result by
+Description:
+  Enumeration of APM battery flags. Used as function result by
+See also:
+  GetAPMLineStatus
+  GetAPMBatteryFlag
+  TAPMLineStatus
+Donator:
+  Peter Friese
+@@TAPMBatteryFlag.abfUnknown
+  Anonymous battery status. The system could not read the battery status.
+@@TAPMBatteryFlag.abfHigh
+  The battery is charged.
+@@TAPMBatteryFlag.abfLow
+  The battery is semi-charged.
+@@TAPMBatteryFlag.abfCritical
+  The battery is almost empty. The user should close all applications and shut down the system in order to prevent loss of data.
+@@TAPMBatteryFlag.abfCharging
+  The battery is being charged.
+@@TAPMBatteryFlag.abfNoBattery
+  No battery present. Under normal circumstances, the system is attached to a power plug when you get this result.
+--------------------------------------------------------------------------------
+@@GetAPMBatteryFlag
+<GROUP SystemInformationRoutines.PowerManagement>
+Summary:
+  Returns the charge status of the system battery.
+Description:
+  This function returns the charge status of the system battery.
+Result:
+  The status of the system battery, see TAPMBatteryFlag for possible values.
+See also:
+  TAPMBatteryFlag
+  GetAPMLineStatus
+  TAPMLineStatus
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetAPMBatteryLifePercent
+<GROUP SystemInformationRoutines.PowerManagement>
+Summary:
+  Returns the percentage of full battery charge remaining.
+Description:
+  Returns the percentage of full battery charge remaining. The range of this value
+  may be within 0 to 100, or 255 if the percentage is unknown.
+Result:
+  The percentage of full battery charge remaining.
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetAPMBatteryLifeTime
+<GROUP SystemInformationRoutines.PowerManagement>
+Summary:
+  Returns the number of seconds of battery life reamining, or -1 if this time is unknown.
+Description:
+  Returns the number of seconds of battery life reamining, or -1 if this time is
+  Anonymous.
+Result:
+  The remaining battery life time in seconds.
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetAPMBatteryFullLifeTime
+<GROUP SystemInformationRoutines.PowerManagement>
+Summary:
+  Returns the number of seconds of battery life minutes when at full charge, or -1
+  if full batery lifetime is unknown.
+Description:
+  Returns the number of seconds of battery life minutes when at full charge, or -1
+  if full batery lifetime is unknown.
+Result:
+  The number of seconds of battery life time when at full charge.
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetMaxAppAddress
+<GROUP SystemInformationRoutines.Memory>
+Summary:
+  Returns a pointer to the highest memory address available to applications and DLLs.
+Description:
+  Returns a pointer to the highest memory address available to applications and DLLs.
+  You can typecast the return value to a pointer to directly point to the specified
+  memory address.
+Result:
+  The highest memory address available to applications and DLLs, casted into an
+  integer.
+See also:
+  GetMinAppAddress
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetMinAppAddress
+<GROUP SystemInformationRoutines.Memory>
+Summary:
+  Returns a pointer to the lowest memory address available to applications and DLLs.
+Description:
+  Returns a pointer to the lowest memory address available to applications and DLLs.
+  You can typecast the return value to a pointer to directly point to the specified
+  memory address.
+Result:
+  The lowest memory address available to applications and DLLs, casted into an
+  integer.
+See also:
+  GetMaxAppAddress
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetMemoryLoad
+<GROUP SystemInformationRoutines.Memory>
+Summary:
+  Returns the current system memory load.
+Description:
+  This function returns the current system memory load. The result is a value
+  between 0 and 100.
+Result:
+  The current system memory load.
+See also:
+  GetSwapFileUsage
+Donators:
+  Peter Friese (Win32)
+  André Snepvangers (Unix)
+--------------------------------------------------------------------------------
+@@GetSwapFileSize
+<GROUP SystemInformationRoutines.Memory>
+Summary:
+  Returns the current pagefile size.
+Description:
+  Returns the current system pagefile size in bytes.
+Result:
+  The current system pagefile size in bytes.
+See also:
+  GetSwapFileUsage
+Donators:
+  Peter Friese (Win32)
+  André Snepvangers (Unix)
+--------------------------------------------------------------------------------
+@@GetSwapFileUsage
+<GROUP SystemInformationRoutines.Memory>
+Summary:
+  Returns the percentage of swap file space occupied.
+Description:
+  Returns the percentage of swap file space occupied. This is a value between 0
+  and 100.
+Result:
+  The percentage of swap file space occupied.
+See also:
+  GetMemoryLoad
+  GetSwapFileSize
+Donators:
+  Peter Friese (Win32)
+  André Snepvangers (Unix)
+--------------------------------------------------------------------------------
+@@GetTotalPhysicalMemory
+<GROUP SystemInformationRoutines.Memory>
+Summary:
+  Returns the total size of physical memory.
+Description:
+  Returns the total size of physical memory in bytes.
+Result:
+  The total size of physical memory.
+See also:
+  GetFreePhysicalMemory
+Donators:
+  Peter Friese (Win32)
+  André Snepvangers (Unix)
+--------------------------------------------------------------------------------
+@@GetFreePhysicalMemory
+<GROUP SystemInformationRoutines.Memory>
+Summary:
+  Returns the size of free physical memory.
+Description:
+  Returns the size of free physical memory in bytes.
+Result:
+  The size of free physical memory.
+See also:
+  GetTotalPhysicalMemory
+Donators:
+  Peter Friese (Win32)
+  André Snepvangers (Unix)
+--------------------------------------------------------------------------------
+@@GetTotalPageFileMemory
+<GROUP SystemInformationRoutines.Memory>
+Summary:
+  Returns the amount of pagefile memory.
+Description:
+  Returns the total size of pagefile memory available to the system.
+Result:
+  The total size of pagefile memory.
+See also:
+  GetFreePageFileMemory
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetFreePageFileMemory
+<GROUP SystemInformationRoutines.Memory>
+Summary:
+  Returns the amount of free pagefile memory.
+Description:
+  Returns the amount of free pagefile memory.
+Result:
+  The amount of free pagefile memory.
+See also:
+  GetTotalPageFileMemory
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetTotalVirtualMemory
+<GROUP SystemInformationRoutines.Memory>
+Summary:
+  Returns the amount of virtual memory.
+Description:
+  Returns the total size of virtual memory available to the system.
+Result:
+  The total size of virtual memory.
+See also:
+  GetFreeVirtualMemory
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetFreeVirtualMemory
+<GROUP SystemInformationRoutines.Memory>
+Summary:
+  Returns the amount of free virtual memory.
+Description:
+  Returns the amount of free virtual memory.
+Result:
+  The amount of free virtual memory.
+See also:
+  GetTotalVirtualMemory
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetKeyState
+<GROUP SystemInformationRoutines.Keyboard>
+Summary:
+  Returns the state of a key.
+Description:
+  Returns the state of the virtual key passed. You can use any of the VK_* constants
+  defined in Windows.pas.
+Parameters:
+  VirtualKey - Any virtual key code, for example VK_NUMLOCK. See Windows.pas for more constants.
+Result:
+  True, if the key is pressed or toggled. False otherwise.
+See also:
+  GetNumLockKeyState
+  GetScrollLockKeyState
+  GetCapsLockKeyState
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetNumLockKeyState
+<GROUP SystemInformationRoutines.Keyboard>
+Summary:
+  Returns the state of the Numlock key.
+Description:
+  Returns the state of the Numlock key. If Numlock is on, true will be returned and
+  false otherwise.
+Result:
+  True, if the NumLock toggled. False otherwise.
+See also:
+  GetKeyState
+  GetScrollLockKeyState
+  GetCapsLockKeyState
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetScrollLockKeyState
+<GROUP SystemInformationRoutines.Keyboard>
+Summary:
+  Returns the state of the ScrollLock key.
+Description:
+  Returns the state of the ScrollLock key. If ScrollLock is on, true will be
+  returned and false otherwise.
+Result:
+  True, if the ScrollLock toggled. False otherwise.
+See also:
+  GetKeyState
+  GetNumLockKeyState
+  GetCapsLockKeyState
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetCapsLockKeyState
+<GROUP SystemInformationRoutines.Keyboard>
+Summary:
+  Returns the state of the CapsLock key.
+Description:
+  Returns the state of the CapsLock key. If CapsLock is on, true will be
+  returned and false otherwise.
+Result:
+  True, if the CapsLock toggled. False otherwise.
+See also:
+  GetKeyState
+  GetNumLockKeyState
+  GetScrollLockKeyState
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetOpenGLVersion
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns the current OpenGL library version string (for window rendering)
+Description:
+  Takes a WinControl against which to perform the tests, and then returns
+  the information provided by the OpenGL library (if any) relating to
+  the version and vendor in the parameters passed.
+Parameters:
+  Win - Handle of the window to use for rendering
+  Version - the string to receive the library version information
+  Vendor - the string to receive the library vendor information
+Result:
+  Surfaces the information provided by the OpenGL library (if any) relating to
+  the version and vendor of the OpenGL library in the parameters passed.
+Donator:
+  Scott Price
+Contributor:
+  Anonymous
+--------------------------------------------------------------------------------
+@@GetOpenGLVersionBitmapRendering
+<GROUP SystemInformationRoutines.VersionInformation>
+Summary:
+  Returns the current OpenGL library version string.
+Description:
+  Takes a WinControl against which to perform the tests, and then returns
+  the Version String information provided by the current OpenGL library.
+Parameters:
+  Win - Handle of the window to use for rendering
+  Version - the string to receive the library version information
+  Vendor - the string to receive the library vendor information
+Result:
+  Surfaces the information provided by the OpenGL library (if any) relating to
+  the version and vendor of the OpenGL library in the parameters passed.
+Donator:
+  Anonymous

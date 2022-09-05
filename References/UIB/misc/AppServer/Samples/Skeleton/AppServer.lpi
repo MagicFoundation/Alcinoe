@@ -1,0 +1,237 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <ProjectOptions>
+    <PathDelim Value="\"/>
+    <Version Value="5"/>
+    <General>
+      <Flags>
+        <MainUnitHasUsesSectionForAllUnits Value="False"/>
+        <MainUnitHasCreateFormStatements Value="False"/>
+        <MainUnitHasTitleStatement Value="False"/>
+      </Flags>
+      <MainUnit Value="0"/>
+      <IconPath Value="./"/>
+      <TargetFileExt Value=".exe"/>
+      <ActiveEditorIndexAtStart Value="1"/>
+    </General>
+    <VersionInfo>
+      <ProjectVersion Value=""/>
+      <Language Value=""/>
+      <CharSet Value=""/>
+    </VersionInfo>
+    <PublishOptions>
+      <Version Value="2"/>
+      <IgnoreBinaries Value="False"/>
+      <IncludeFileFilter Value="*.(pas|pp|inc|lfm|lpr|lrs|lpi|lpk|sh|xml)"/>
+      <ExcludeFileFilter Value="*.(bak|ppu|ppw|o|so);*~;backup"/>
+    </PublishOptions>
+    <RunParams>
+      <local>
+        <FormatVersion Value="1"/>
+        <LaunchingApplication PathPlusParams="/usr/X11R6/bin/xterm -T 'Lazarus Run Output' -e $(LazarusDir)/tools/runwait.sh $(TargetCmdLine)"/>
+      </local>
+    </RunParams>
+    <Units Count="6">
+      <Unit0>
+        <Filename Value="AppServer.dpr"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="AppServer"/>
+        <CursorPos X="9" Y="7"/>
+        <TopLine Value="1"/>
+        <EditorIndex Value="0"/>
+        <UsageCount Value="22"/>
+        <Loaded Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="TestLib.pas"/>
+        <UnitName Value="TestLib"/>
+        <CursorPos X="1" Y="1"/>
+        <TopLine Value="1"/>
+        <EditorIndex Value="1"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="..\..\src\PDGSocketStub.pas"/>
+        <UnitName Value="PDGSocketStub"/>
+        <CursorPos X="73" Y="399"/>
+        <TopLine Value="378"/>
+        <EditorIndex Value="5"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="TestLib_Server.pas"/>
+        <UnitName Value="TestLib_Server"/>
+        <CursorPos X="1" Y="109"/>
+        <TopLine Value="96"/>
+        <EditorIndex Value="4"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="..\..\..\..\source\uib.pas"/>
+        <UnitName Value="uib"/>
+        <CursorPos X="1" Y="1"/>
+        <TopLine Value="1"/>
+        <EditorIndex Value="2"/>
+        <UsageCount Value="21"/>
+        <Loaded Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="..\..\..\..\source\uibase.pas"/>
+        <UnitName Value="uibase"/>
+        <CursorPos X="10" Y="677"/>
+        <TopLine Value="656"/>
+        <EditorIndex Value="3"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+      </Unit5>
+    </Units>
+    <JumpHistory Count="29" HistoryIndex="28">
+      <Position1>
+        <Filename Value="TestLib.pas"/>
+        <Caret Line="82" Column="12" TopLine="61"/>
+      </Position1>
+      <Position2>
+        <Filename Value="TestLib.pas"/>
+        <Caret Line="8" Column="55" TopLine="1"/>
+      </Position2>
+      <Position3>
+        <Filename Value="TestLib.pas"/>
+        <Caret Line="125" Column="41" TopLine="104"/>
+      </Position3>
+      <Position4>
+        <Filename Value="TestLib.pas"/>
+        <Caret Line="82" Column="17" TopLine="61"/>
+      </Position4>
+      <Position5>
+        <Filename Value="TestLib.pas"/>
+        <Caret Line="8" Column="55" TopLine="1"/>
+      </Position5>
+      <Position6>
+        <Filename Value="TestLib_Server.pas"/>
+        <Caret Line="70" Column="32" TopLine="56"/>
+      </Position6>
+      <Position7>
+        <Filename Value="TestLib_Server.pas"/>
+        <Caret Line="1" Column="1" TopLine="1"/>
+      </Position7>
+      <Position8>
+        <Filename Value="TestLib.pas"/>
+        <Caret Line="124" Column="18" TopLine="96"/>
+      </Position8>
+      <Position9>
+        <Filename Value="TestLib.pas"/>
+        <Caret Line="8" Column="58" TopLine="1"/>
+      </Position9>
+      <Position10>
+        <Filename Value="TestLib.pas"/>
+        <Caret Line="7" Column="26" TopLine="1"/>
+      </Position10>
+      <Position11>
+        <Filename Value="TestLib.pas"/>
+        <Caret Line="124" Column="18" TopLine="103"/>
+      </Position11>
+      <Position12>
+        <Filename Value="..\..\..\..\source\uib.pas"/>
+        <Caret Line="16" Column="30" TopLine="1"/>
+      </Position12>
+      <Position13>
+        <Filename Value="..\..\..\..\source\uib.pas"/>
+        <Caret Line="35" Column="57" TopLine="14"/>
+      </Position13>
+      <Position14>
+        <Filename Value="..\..\..\..\source\uib.pas"/>
+        <Caret Line="653" Column="121" TopLine="632"/>
+      </Position14>
+      <Position15>
+        <Filename Value="..\..\..\..\source\uib.pas"/>
+        <Caret Line="317" Column="6" TopLine="323"/>
+      </Position15>
+      <Position16>
+        <Filename Value="..\..\..\..\source\uib.pas"/>
+        <Caret Line="653" Column="121" TopLine="632"/>
+      </Position16>
+      <Position17>
+        <Filename Value="..\..\..\..\source\uib.pas"/>
+        <Caret Line="746" Column="17" TopLine="726"/>
+      </Position17>
+      <Position18>
+        <Filename Value="..\..\..\..\source\uib.pas"/>
+        <Caret Line="747" Column="11" TopLine="726"/>
+      </Position18>
+      <Position19>
+        <Filename Value="..\..\..\..\source\uib.pas"/>
+        <Caret Line="2128" Column="12" TopLine="2118"/>
+      </Position19>
+      <Position20>
+        <Filename Value="..\..\..\..\source\uib.pas"/>
+        <Caret Line="2183" Column="34" TopLine="2179"/>
+      </Position20>
+      <Position21>
+        <Filename Value="..\..\..\..\source\uib.pas"/>
+        <Caret Line="2182" Column="11" TopLine="2162"/>
+      </Position21>
+      <Position22>
+        <Filename Value="..\..\..\..\source\uib.pas"/>
+        <Caret Line="2319" Column="38" TopLine="2317"/>
+      </Position22>
+      <Position23>
+        <Filename Value="..\..\..\..\source\uib.pas"/>
+        <Caret Line="2279" Column="38" TopLine="2277"/>
+      </Position23>
+      <Position24>
+        <Filename Value="..\..\..\..\source\uib.pas"/>
+        <Caret Line="2231" Column="16" TopLine="2229"/>
+      </Position24>
+      <Position25>
+        <Filename Value="..\..\..\..\source\uib.pas"/>
+        <Caret Line="2108" Column="26" TopLine="2105"/>
+      </Position25>
+      <Position26>
+        <Filename Value="..\..\..\..\source\uib.pas"/>
+        <Caret Line="3205" Column="25" TopLine="3182"/>
+      </Position26>
+      <Position27>
+        <Filename Value="..\..\..\..\source\uib.pas"/>
+        <Caret Line="3179" Column="29" TopLine="3178"/>
+      </Position27>
+      <Position28>
+        <Filename Value="..\..\..\..\source\uib.pas"/>
+        <Caret Line="3190" Column="1" TopLine="3169"/>
+      </Position28>
+      <Position29>
+        <Filename Value="TestLib.pas"/>
+        <Caret Line="109" Column="17" TopLine="103"/>
+      </Position29>
+    </JumpHistory>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="5"/>
+    <PathDelim Value="\"/>
+    <Parsing>
+      <SyntaxOptions>
+        <D2Extensions Value="False"/>
+      </SyntaxOptions>
+    </Parsing>
+    <CodeGeneration>
+      <Generate Value="Faster"/>
+    </CodeGeneration>
+    <Other>
+      <CustomOptions Value="-dCONSOLEAPP
+"/>
+      <CompilerPath Value="$(CompPath)"/>
+    </Other>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="2">
+      <Item1>
+        <Name Value="ECodetoolError"/>
+      </Item1>
+      <Item2>
+        <Name Value="EFOpenError"/>
+      </Item2>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

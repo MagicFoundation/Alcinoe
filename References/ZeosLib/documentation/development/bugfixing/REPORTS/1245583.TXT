@@ -1,0 +1,72 @@
+================================================================================
+//               ZEOS Library Bug Reporting / Bug Fixing Form                 //
+================================================================================
+
+Bug ID               : 1245583                      Priority      : 5
+Submitted by         : dliakh                       Date Submitted: 2005-07-27 00:29
+Quality assurance by : stefanglienke                Closed as of  : 2005-08-24 11:55
+Assigned to          : stefanglienke                Closed by     : stefanglienke
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : Interbase/Firebird
+ZEOSLib Version      : 6.5.1 alpha
+Component/Class      : TZInterbase6DatabaseMetadata.GetTables
+
+--------------------------------------------------------------------------------
+
+Error Description:
+
+ When using ZeosDBO 6.5.1 over Interbase, I noticed that
+in the metadata, all user tables were being reported as
+type VIEW. I have traced this bug to the unit
+ZDbcInterbase6Metadata. The function
+TZInterbase6DatabaseMetadata.GetTables has the
+following code:
+
+if SystemFlag = 0 then
+begin
+  BLR := GetBlobByName('RDB$VIEW_SOURCE');
+  if BLR.Length = 0 then
+    TableType := 'TABLE'
+  else TableType := 'VIEW';
+end else
+  TableType := 'SYSTEM TABLE';
+
+This should be
+
+if SystemFlag = 0 then
+begin
+  BLR := GetBlobByName('RDB$VIEW_SOURCE');
+  if BLR.IsEmpty then
+    TableType := 'TABLE'
+  else TableType := 'VIEW';
+end else
+  TableType := 'SYSTEM TABLE';
+
+or
+
+if SystemFlag = 0 then
+begin
+  BLR := GetBlobByName('RDB$VIEW_SOURCE');
+  if BLR.Length = -1 then
+    TableType := 'TABLE'
+  else TableType := 'VIEW';
+end else
+  TableType := 'SYSTEM TABLE';
+
+This is because the BLR is null if the item is a table,
+and the Blob length is -1 in this case.
+
+--------------------------------------------------------------------------------
+
+Actions done form Bugfixing:
+
+Changed as described in Patch:
+
+<- if BLR.Length = 0 then
+-> if BLR.IsEmpty then
+
+================================================================================
+
+

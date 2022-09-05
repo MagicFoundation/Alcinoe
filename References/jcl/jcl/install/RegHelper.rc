@@ -1,0 +1,23 @@
+
+1 VERSIONINFO
+FILEVERSION 2,0,0,2552
+PRODUCTVERSION 2,0,0,2552
+FILEOS 0x40004
+FILETYPE 0x1
+{
+BLOCK "StringFileInfo"
+{
+	BLOCK "040904B0"
+	{
+		VALUE "CompanyName", "Project Jedi\0"
+		VALUE "FileDescription", "Help Registration Helper\0"
+		VALUE "FileVersion", "2.0.0.2552\0"
+		VALUE "InternalName", "RegHelper.exe\0"
+		VALUE "LegalCopyright", "Copyright (C) 2007 Project JEDI\0"
+		VALUE "OriginalFilename", "RegHelper.exe\0"
+		VALUE "ProductName", "JEDI Code Library\0"
+		VALUE "ProductVersion", "2.0.0.2552\0"
+	}
+}
+
+}

@@ -1,0 +1,264 @@
+Performance Test 30/05/03 (6.0.9)
+=================================
+
+Test was performed in the next conditions:
+
+Hardware: Intel Pentium IV 2.4GHz /512Mb
+OS: Windows 2000
+SQL Server: MySQL 4.0 Max
+SQL Server Protocol: MySQL 3.23
+Table: high_load
+Record Count: 10000
+Compiler: Delphi 6
+
+
+
+DUnit / Testing
+...Running API: PLAIN, Test: CONNECT, Records: 10000]
+  Try 1 - 20 ms.
+  Try 2 - 10 ms.
+  Try 3 - 0 ms.
+  Average time for 3 tries - 10 ms.
+
+.Running API: PLAIN, Test: INSERT, Records: 10000]
+  Try 1 - 1191 ms.
+  Try 2 - 1242 ms.
+  Try 3 - 1222 ms.
+  Average time for 3 tries - 1218 ms.
+
+.Running API: PLAIN, Test: OPEN, Records: 10000]
+  Try 1 - 80 ms.
+  Try 2 - 80 ms.
+  Try 3 - 80 ms.
+  Average time for 3 tries - 80 ms.
+
+.Running API: PLAIN, Test: FETCH, Records: 10000]
+  Try 1 - 100 ms.
+  Try 2 - 91 ms.
+  Try 3 - 100 ms.
+  Average time for 3 tries - 97 ms.
+
+.Running API: PLAIN, Test: SORT, Records: 10000]
+  Skipped...
+.Running API: PLAIN, Test: FILTER, Records: 10000]
+  Skipped...
+.Running API: PLAIN, Test: UPDATE, Records: 10000]
+  Try 1 - 1402 ms.
+  Try 2 - 1402 ms.
+  Try 3 - 1412 ms.
+  Average time for 3 tries - 1405 ms.
+
+.Running API: PLAIN, Test: DELETE, Records: 10000]
+  Try 1 - 1181 ms.
+  Try 2 - 872 ms.
+  Try 3 - 871 ms.
+  Average time for 3 tries - 974 ms.
+
+...Running API: DBC, Test: CONNECT, Records: 10000]
+  Try 1 - 0 ms.
+  Try 2 - 0 ms.
+  Try 3 - 0 ms.
+  Average time for 3 tries - 0 ms.
+
+.Running API: DBC, Test: INSERT, Records: 10000]
+  Try 1 - 2874 ms.
+  Try 2 - 2904 ms.
+  Try 3 - 2885 ms.
+  Average time for 3 tries - 2887 ms.
+
+.Running API: DBC, Test: OPEN, Records: 10000]
+  Try 1 - 90 ms.
+  Try 2 - 80 ms.
+  Try 3 - 90 ms.
+  Average time for 3 tries - 86 ms.
+
+.Running API: DBC, Test: FETCH, Records: 10000]
+  Try 1 - 130 ms.
+  Try 2 - 120 ms.
+  Try 3 - 130 ms.
+  Average time for 3 tries - 126 ms.
+
+.Running API: DBC, Test: SORT, Records: 10000]
+  Skipped...
+.Running API: DBC, Test: FILTER, Records: 10000]
+  Skipped...
+.Running API: DBC, Test: UPDATE, Records: 10000]
+  Try 1 - 3225 ms.
+  Try 2 - 3195 ms.
+  Try 3 - 3164 ms.
+  Average time for 3 tries - 3194 ms.
+
+.Running API: DBC, Test: DELETE, Records: 10000]
+  Try 1 - 2614 ms.
+  Try 2 - 2203 ms.
+  Try 3 - 2183 ms.
+  Average time for 3 tries - 2333 ms.
+
+..Running API: DBC-CACHED, Test: CONNECT, Records: 10000]
+  Try 1 - 0 ms.
+  Try 2 - 0 ms.
+  Try 3 - 0 ms.
+  Average time for 3 tries - 0 ms.
+
+.Running API: DBC-CACHED, Test: INSERT, Records: 10000]
+  Try 1 - 3475 ms.
+  Try 2 - 3425 ms.
+  Try 3 - 3465 ms.
+  Average time for 3 tries - 3455 ms.
+
+.Running API: DBC-CACHED, Test: OPEN, Records: 10000]
+  Try 1 - 90 ms.
+  Try 2 - 91 ms.
+  Try 3 - 80 ms.
+  Average time for 3 tries - 87 ms.
+
+.Running API: DBC-CACHED, Test: FETCH, Records: 10000]
+  Try 1 - 170 ms.
+  Try 2 - 170 ms.
+  Try 3 - 170 ms.
+  Average time for 3 tries - 170 ms.
+
+.Running API: DBC-CACHED, Test: SORT, Records: 10000]
+  Skipped...
+.Running API: DBC-CACHED, Test: FILTER, Records: 10000]
+  Skipped...
+.Running API: DBC-CACHED, Test: UPDATE, Records: 10000]
+  Try 1 - 3986 ms.
+  Try 2 - 3996 ms.
+  Try 3 - 3966 ms.
+  Average time for 3 tries - 3982 ms.
+
+.Running API: DBC-CACHED, Test: DELETE, Records: 10000]
+  Try 1 - 3334 ms.
+  Try 2 - 0 ms.
+  Try 3 - 10 ms.
+  Average time for 3 tries - 1114 ms.
+
+..Running API: DATASET, Test: CONNECT, Records: 10000]
+  Try 1 - 10 ms.
+  Try 2 - 0 ms.
+  Try 3 - 0 ms.
+  Average time for 3 tries - 3 ms.
+
+.Running API: DATASET, Test: INSERT, Records: 10000]
+  Try 1 - 3976 ms.
+  Try 2 - 3916 ms.
+  Try 3 - 3975 ms.
+  Average time for 3 tries - 3955 ms.
+
+.Running API: DATASET, Test: OPEN, Records: 10000]
+  Try 1 - 90 ms.
+  Try 2 - 90 ms.
+  Try 3 - 90 ms.
+  Average time for 3 tries - 90 ms.
+
+.Running API: DATASET, Test: FETCH, Records: 10000]
+  Try 1 - 240 ms.
+  Try 2 - 231 ms.
+  Try 3 - 230 ms.
+  Average time for 3 tries - 233 ms.
+
+.Running API: DATASET, Test: SORT, Records: 10000]
+  Skipped...
+.Running API: DATASET, Test: FILTER, Records: 10000]
+  Skipped...
+.Running API: DATASET, Test: UPDATE, Records: 10000]
+  Try 1 - 4516 ms.
+  Try 2 - 4427 ms.
+  Try 3 - 4506 ms.
+  Average time for 3 tries - 4483 ms.
+
+.Running API: DATASET, Test: DELETE, Records: 10000]
+  Try 1 - 3636 ms.
+  Try 2 - 10 ms.
+  Try 3 - 10 ms.
+  Average time for 3 tries - 1218 ms.
+
+..Running API: OLD-ZEOS, Test: CONNECT, Records: 10000]
+  Try 1 - 10 ms.
+  Try 2 - 0 ms.
+  Try 3 - 0 ms.
+  Average time for 3 tries - 3 ms.
+
+.Running API: OLD-ZEOS, Test: INSERT, Records: 10000]
+  Try 1 - 6078 ms.
+  Try 2 - 6179 ms.
+  Try 3 - 6139 ms.
+  Average time for 3 tries - 6132 ms.
+
+.Running API: OLD-ZEOS, Test: OPEN, Records: 10000]
+  Try 1 - 80 ms.
+  Try 2 - 80 ms.
+  Try 3 - 80 ms.
+  Average time for 3 tries - 80 ms.
+
+.Running API: OLD-ZEOS, Test: FETCH, Records: 10000]
+  Try 1 - 171 ms.
+  Try 2 - 180 ms.
+  Try 3 - 170 ms.
+  Average time for 3 tries - 173 ms.
+
+.Running API: OLD-ZEOS, Test: SORT, Records: 10000]
+  Skipped...
+.Running API: OLD-ZEOS, Test: FILTER, Records: 10000]
+  Skipped...
+.Running API: OLD-ZEOS, Test: UPDATE, Records: 10000]
+  Try 1 - 6970 ms.
+  Try 2 - 6960 ms.
+  Try 3 - 6940 ms.
+  Average time for 3 tries - 6956 ms.
+
+.Running API: OLD-ZEOS, Test: DELETE, Records: 10000]
+  Try 1 - 4487 ms.
+  Try 2 - 0 ms.
+  Try 3 - 0 ms.
+  Average time for 3 tries - 1495 ms.
+
+..Running API: BDE, Test: CONNECT, Records: 10000]
+  Try 1 - 60 ms.
+  Try 2 - 10 ms.
+  Try 3 - 20 ms.
+  Average time for 3 tries - 30 ms.
+
+.Running API: BDE, Test: INSERT, Records: 10000]
+  Try 1 - 3605 ms.
+  Try 2 - 3585 ms.
+  Try 3 - 3625 ms.
+  Average time for 3 tries - 3605 ms.
+
+.Running API: BDE, Test: OPEN, Records: 10000]
+  Try 1 - 80 ms.
+  Try 2 - 90 ms.
+  Try 3 - 90 ms.
+  Average time for 3 tries - 86 ms.
+
+.Running API: BDE, Test: FETCH, Records: 10000]
+  Try 1 - 230 ms.
+  Try 2 - 241 ms.
+  Try 3 - 250 ms.
+  Average time for 3 tries - 240 ms.
+
+.Running API: BDE, Test: SORT, Records: 10000]
+  Skipped...
+.Running API: BDE, Test: FILTER, Records: 10000]
+  Skipped...
+.Running API: BDE, Test: UPDATE, Records: 10000]
+E.Running API: BDE, Test: DELETE, Records: 10000]
+E
+Time: 0:02:30.827
+
+FAILURES!!!
+Test Results:
+Run:            48
+Failures:        0
+Errors:          2
+There were 2 errors:
+  1) TestUpdate: EDBEngineError
+     at 
+      "Couldn't perform the edit because another user changed the record."
+  2) TestDelete: EDBEngineError
+     at 
+      "Couldn't perform the edit because another user changed the record."
+
+
+

@@ -1,0 +1,64 @@
+Any application that uses MySQL Embedded server will have the following requirements:
+
+NEEDED:
+1) The libmysqld (MySQL embedded server) Lib file (dll or so). 
+   You can locate this library file at lib/mysql folder in ZeosLib distribution files.
+   The specified libmysqld lib (dll or so), in this case libmysql41d file have to go in the
+   application's executable folder or in any folder included in the PATH environment variable.
+
+EXISTING OR AT LEAST SPECIFIED:
+2) Existing "<APP Folder>/data" folder or the one specified in "--datadir" Server variable 
+   that will be the data folder for mysql. By default MySQL Embedded Server will take as DataDir
+   the application's executable folder ("<APP Folder>/"), but for convenience, if the "--datadir" is
+   not specified, ZeosLib by default will set the DataDir as "--datadir=./data".
+
+3) Existing "<APP Folder>/shared/english" folder or the one specified in "--language" Server variable 
+   that contains the "errmsg.sys" file.
+   By Default MySQL Embedded server takes as language folder '<APP Folder>/shared/english'
+
+4) Existing "<APP Folder>/shared/charsets" folder or the one specified in "--character-sets-dir" 
+   Server variable that contains the charsets configuration files.
+   By Default MySQL Embedded server takes as charset folder '<APP Folder>/shared/charsets'.
+
+OPTIONAL:
+5) The "--basedir" Server variable, will contain the basedir of the MySQL server.
+   By Default MySQL Embedded server takes as base folder the same application's excutable folder ("./") 
+   This is needed if the above server folder variables are not specified and they're not located
+   as subfolders of the applications base folder.
+   
+6) If you need speed optimization try to disable InnoDB support specifying the "--skip-innodb"
+   parameter. Check Embedded demo for example.
+
+7) Also try to set the key buffer size to 32M or more by setting "--key_buffer_size=<NN>M|K", 
+   Where <NN> is the size in "M" (Megabytes) or "K"(Kilobytes).
+   Examples: "--key_buffer_size=32M"
+             "--key_buffer_size=4096K"
+
+8) MySQL embedded server will also try to open the mysql server time zone's tables. 
+   So you can optionally have a 'mysql' database with the following tables (time_zone*.*): 
+   - time_zone
+   - time_zone_leap_second
+   - time_zone_name
+   - time_zone_transition
+   - time_zone_transition_type
+   This is optional and only for 4.1 and above. They're only needed to prevent the embeded server 
+   to write a record in the error log file each time the application starts.
+
+9) Embedded Server options can also be set using a 'my.ini' file, that have to be in the same exe's folder.
+   For more info about How to use Embedded INI options, check MySQL documentation.
+
+NOTES: 
+      - To see how to configure the above server variables and settings needed to make the 
+        MySQL embedded server running, check the "EmbeddedConnection.Properties" Property 
+        of the Connection component in the embedded demo. 
+      
+      - The server specific arguments are specified by the "ServerArgument%N" prefix,
+        Where "%N" is an argument secuential number. The "ServerArgument%N" prefix is used only by
+        ZeosLib. This prefix will help ZeosLib to identify which Connection parameters are 
+        Server specific.
+
+      - Check MySQL Help file for more info about Embedded Server usage, limitations, Server specific
+        parameters and how to use them.
+
+Regards
+fduenas - ZeosLib Developement Team Member 

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Package Name="JclDeveloperTools" Design="0">
+  <Description>JEDI Code Library Developer Tools package</Description>
+  <GUID>{2AE59B42-1430-423F-99D0-FB8F17DF798B}</GUID>
+  <C5PFlags/>
+  <C6PFlags/>
+  <C5Libs/>
+  <C6Libs/>
+  <CompilerDefines>RELEASE</CompilerDefines>
+  <ImageBase>48800000</ImageBase>
+  <Requires>
+    <Package Name="rtl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="FCL" Targets="fpc" Condition=""/>
+    <Package Name="..\..\..\help\VCL" Targets="help" Condition=""/>
+    <Package Name="..\..\..\help\JEDI" Targets="help" Condition=""/>
+    <Package Name="Jcl-R" Targets="all" Condition=""/>
+    <Package Name="JclContainers-R" Targets="all" Condition=""/>
+  </Requires>
+  <Platforms>
+    <Platform Name="Win32" Condition=""/>
+    <Platform Name="Win64" Condition=""/>
+  </Platforms>
+  <Contains>
+    <File Name="..\..\source\common\JclCompilerUtils.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclDevToolsResources.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclExprEval.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclIDEUtils.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorAlgorithmsTemplates.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorArrayListsTemplates.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorArraySetsTemplates.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorBinaryTreesTemplates.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorContainer1DTemplates.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorContainer2DTemplates.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorContainerIntfTemplates.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorContainerKnownMaps.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorContainerKnownTypes.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorContainerTemplates.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorContainerTypes.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorExcDlgTemplates.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorHashMapsTemplates.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorHashSetsTemplates.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorLexer.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorLinkedListsTemplates.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorParser.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorQueuesTemplates.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorSortedMapsTemplates.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorStacksTemplates.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorTemplates.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorTreesTemplates.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPreProcessorVectorsTemplates.pas" Targets="runtimeIDE,help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclUsesUtils.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclHelpUtils.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclMsBuild.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\MSHelpServices_TLB.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Common.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\ExprEval.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\JclDeveloperTools.dtx" Targets="help" Formname="" Condition=""/>
+  </Contains>
+</Package>

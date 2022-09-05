@@ -1,0 +1,1169 @@
+@@UnitConversions.AngleConversion
+<GROUP UnitConversions>
+<TITLE Angle Conversion>
+<TOPICORDER 100>
+--------------------------------------------------------------------------------
+@@UnitConversions.CoordinateConversion
+<GROUP UnitConversions>
+<TITLE Coordinate Conversion>
+<TOPICORDER 200>
+--------------------------------------------------------------------------------
+@@UnitConversions.LengthConversion
+<GROUP UnitConversions>
+<TITLE Length Conversion>
+<TOPICORDER 300>
+--------------------------------------------------------------------------------
+@@UnitConversions.MassConversion
+<GROUP UnitConversions>
+<TITLE Mass Conversion>
+<TOPICORDER 400>
+--------------------------------------------------------------------------------
+@@UnitConversions.Power
+<GROUP UnitConversions>
+<TITLE Power>
+<TOPICORDER 500>
+--------------------------------------------------------------------------------
+@@UnitConversions.PressureConversion
+<GROUP UnitConversions>
+<TITLE Pressure Conversion>
+<TOPICORDER 600>
+--------------------------------------------------------------------------------
+@@UnitConversions.TemperatureConversion
+<GROUP UnitConversions>
+<TITLE Temperature Conversion>
+<TOPICORDER 700>
+--------------------------------------------------------------------------------
+@@UnitConversions.Velocity
+<GROUP UnitConversions>
+<TITLE Velocity>
+<TOPICORDER 800>
+--------------------------------------------------------------------------------
+@@UnitConversions.VolumeConversion
+<GROUP UnitConversions>
+<TITLE Volume Conversion>
+<TOPICORDER 900>
+--------------------------------------------------------------------------------
+@@UnitConversions.Miscellaneous
+<GROUP UnitConversions>
+<TITLE Volume Conversion>
+<TOPICORDER 1000>
+--------------------------------------------------------------------------------
+@@MakePercentage
+<GROUP UnitConversions.Miscellaneous>
+Summary:
+  Hehe, no way...
+Description:
+  I dare not describe this function's purpose. See the Notes section below. As a
+  tribute to that wonderful article this function has been designated the alias
+  HowAOneLinerCanBiteYou. You are encouraged to use that alias in your applications
+  as opposed to the much more readable and self-explanatory name MakePercentage :-)
+Parameters:
+  Step - Sorry, no can do.
+  Max - No idea, but I do know that passing 0 will trigger an assertion if you have assertions enabled or a runtime error (EDivByZero) if not.
+Result:
+  All I have to say about this is that it is very well possible that the result
+  may be larger than 100 and that the sign of the arguments is preserved so it is
+  possible that the result is negative.
+Notes:
+  For a very educational dissection of this function have a look at the article written by Robert Marquardt entitled " Lessons in good programming or how a one liner can bite you" available at the Voyager section on the JEDI website.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@HowAOneLinerCanBiteYou
+<ALIAS MakePercentage>
+--------------------------------------------------------------------------------
+@@CelsiusToKelvin
+<GROUP UnitConversions.TemperatureConversion>
+Summary:
+  Converts a temperature from celsius to kelvin.
+Description:
+  The CelsiusToKelvin routine converts the specified temperature from degrees Celsius to degrees Kelvin.
+Parameters:
+  T - The temperature, in Celsius, to convert to Kelvin.
+Result:
+  The temperature after conversion to degrees Kelvin.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@CelsiusToFahrenheit
+<GROUP UnitConversions.TemperatureConversion>
+Summary:
+  Converts a temperature from Celsius to Fahrenheit.
+Description:
+  The CelsiusToFahrenheit routine converts the specified temperature from degrees Celsius to degrees Fahrenheit.
+  Have a look at the source. It has been implemented to be an example of selfdocumenting code.
+Parameters:
+  T - The temperature, in Celsius, to convert to Fahrenheit.
+Result:
+  The temperature after conversion to degrees Fahrenheit.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@KelvinToCelsius
+<GROUP UnitConversions.TemperatureConversion>
+Summary:
+  Converts a temperature from Kelvin to Celsius.
+Description:
+  The KelvinToCelsius routine converts the specified temperature from degrees Kelvin to degrees Celsius.
+Parameters:
+  T - The temperature, in Kelvin, to convert to Celsius.
+Result:
+  The temperature after conversion to degrees Celsius.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@KelvinToFahrenheit
+<GROUP UnitConversions.TemperatureConversion>
+Summary:
+  Converts a temperature from Kelvin to Fahrenheit.
+Description:
+  The KelvinToFahrenheit routine converts the specified temperature from degrees Kelvin to degrees Fahrenheit.
+Parameters:
+  T - The temperature, in Kelvin, to convert to Fahrenheit.
+Result:
+  The temperature after conversion to degrees Fahrenheit.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@FahrenheitToCelsius
+<GROUP UnitConversions.TemperatureConversion>
+Summary:
+  Converts a temperature from Fahrenheit to Celsius.
+Description:
+  The FahrenheitToCelsius routine converts the specified temperature from degrees Fahrenheit to degrees Celsius.
+  Have a look at the source. It has been implemented to be an example of selfdocumenting code.
+Parameters:
+  T - The temperature, in Fahrenheit, to convert to Celsius.
+Result:
+  The temperature after conversion to degrees Celsius.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@FahrenheitToKelvin
+<GROUP UnitConversions.TemperatureConversion>
+Summary:
+  Converts a temperature from Fahrenheit to Kelvin.
+Description:
+  The FahrenheitToKelvin routine converts the specified temperature from degrees Fahrenheit to degrees Kelvin.
+Parameters:
+  T - The temperature, in Fahrenheit, to convert to Kelvin.
+Result:
+  The temperature after conversion to degrees Kelvin.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@CycleToDeg
+<GROUP UnitConversions.AngleConversion>
+Summary:
+  Converts an angle from cycles to degrees.
+Description:
+  The CycleToDeg routine converts the specified angle, in cycles, to the corresponding angle in degrees.
+Parameters:
+  Cycles - The angle, in cycles, to convert to degrees.
+Result:
+  The angle after conversion to degrees.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@CycleToGrad
+<GROUP UnitConversions.AngleConversion>
+Summary:
+  Converts an angle from cycles to gradians.
+Description:
+  The CycleToGrad routine converts the specified angle, in cycles, to the corresponding angle in gradians.
+Parameters:
+  Cycles - The angle, in cycles, to convert to gradians.
+Result:
+  The angle after conversion to gradians.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@CycleToRad
+<GROUP UnitConversions.AngleConversion>
+Summary:
+  Converts an angle from cycles to radians.
+Description:
+  The CycleToRad routine converts the specified angle, in cycles, to the corresponding angle in radians.
+Parameters:
+  Cycles - The angle, in cycles, to convert to radians.
+Result:
+  The angle after conversion to radians.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@DegToCycle
+<GROUP UnitConversions.AngleConversion>
+Summary:
+  Converts an angle from degrees to cycles.
+Description:
+  The DegToCycle routine converts the specified angle, in degrees, to the corresponding angle in cycles.
+Parameters:
+  Degrees - The angle, in degrees, to convert to cycles.
+Result:
+  The angle after conversion to cycles.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@DegToGrad
+<GROUP UnitConversions.AngleConversion>
+Summary:
+  Converts an angle from degrees to gradians.
+Description:
+  The DegToGrad routine converts the specified angle, in degrees, to the corresponding angle in gradians.
+Parameters:
+  Degrees - The angle, in degrees, to convert to gradians.
+Result:
+  The angle after conversion to gradians.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@DegToRad
+<GROUP UnitConversions.AngleConversion>
+Summary:
+  Converts an angle from degrees to radians.
+Description:
+  The DegToRad routine converts the specified angle, in degrees, to the corresponding angle in radians.
+Parameters:
+  Degrees - The angle, in degrees, to convert to radians.
+Result:
+  The angle after conversion to radians.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GradToCycle
+<GROUP UnitConversions.AngleConversion>
+Summary:
+  Converts an angle from gradians to cycles.
+Description:
+  The GradToCycle routine converts the specified angle, in gradians, to the corresponding angle in cycles.
+Parameters:
+  Grads - The angle, in gradians, to convert to cycles.
+Result:
+  The angle after conversion to cycles.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GradToDeg
+<GROUP UnitConversions.AngleConversion>
+Summary:
+  Converts an angle from gradians to degrees.
+Description:
+  The GradToDeg routine converts the specified angle, in gradians, to the corresponding angle in degrees.
+Parameters:
+  Grads - The angle, in gradians, to convert to degrees.
+Result:
+  The angle after conversion to degrees.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GradToRad
+<GROUP UnitConversions.AngleConversion>
+Summary:
+  Converts an angle from gradians to radians.
+Description:
+  The GradToRad routine converts the specified angle, in gradians, to the corresponding angle in radians.
+Parameters:
+  Grads - The angle, in gradians, to convert to radians.
+Result:
+  The angle after conversion to radians.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@RadToCycle
+<GROUP UnitConversions.AngleConversion>
+Summary:
+  Converts an angle from radians to cycles.
+Description:
+  The RadToCycle routine converts the specified angle, in radians, to the corresponding angle in cycles.
+Parameters:
+  Radians - The angle, in radians, to convert to cycles.
+Result:
+  The angle after conversion to cycles.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@RadToDeg
+<GROUP UnitConversions.AngleConversion>
+Summary:
+  Converts an angle from radians to degrees.
+Description:
+  The RadToDeg routine converts the specified angle, in radians, to the corresponding angle in degrees.
+Parameters:
+  Radians - The angle, in radians, to convert to degrees.
+Result:
+  The angle after conversion to degrees.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@RadToGrad
+<GROUP UnitConversions.AngleConversion>
+Summary:
+  Converts an angle from radians to gradians.
+Description:
+  The RadToGrad routine converts the specified angle, in radians, to the corresponding angle in gradians.
+Parameters:
+  Radians - The angle, in radians, to convert to gradians.
+Result:
+  The angle after conversion to gradians.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@DmsToDeg
+<GROUP UnitConversions.AngleConversion>
+Summary:
+  Converts an angle given in DMS representation to degrees.
+Description:
+  The DmsToDeg function converts an angle given in DMS (degrees, minutes, seconds) representation
+  to degrees. This is the inverse function to DegToDms.
+
+  The M and S arguments are required to be not less than zero and not greater than 60, otherwise
+  the function will yield an domain error exception.
+Parameters:
+  D - Arc degrees.
+  M - Arc minutes.
+  S - Arc seconds.
+Result:
+  The angle in degrees.
+See also:
+  DegToDms
+  DmsToRad
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@DmsToRad
+<GROUP UnitConversions.AngleConversion>
+Summary:
+  Converts an angle given in DMS representation to radians.
+Description:
+  The DmsToRad function converts an angle given in DMS (degrees, minutes, seconds) representation
+  to radians.
+  
+  The M and S arguments are required to be not less than zero and not greater than 60, otherwise
+  the function will yield an domain error exception.
+Parameters:
+  D - Arc degrees.
+  M - Arc minutes.
+  S - Arc seconds.
+Result:
+  Returns the angle in radians.
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@DegToDms@Float@Integer@Integer@Float
+<GROUP UnitConversions.AngleConversion>
+Summary:
+  Converts an angle given in degrees to DMS representation.
+Description:
+  The DegToDms routine converts an angle given in arc degrees
+  to DMS (degrees, minutes, seconds) representation.
+
+  Note that the output of this routine is not intended to be
+  fed to calculations (since the sign of the minute and second
+  fractions is not preserved), but for display only.
+Parameters:
+  D - Receives the degrees.
+  Degrees - The angle (in degrees) to split into integral degrees, minutes and seconds.
+  M - Receives the minutes.
+  S - Receives the seconds.
+See also:
+  DmsToDeg
+  DegToDmsStr
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@DegToDmsStr
+<GROUP UnitConversions.AngleConversion>
+Summary:
+  Returns a string representation of a given angle in degrees.
+Description:
+  The DegToDmsStr routine returns a string representation of
+  the input angle as used e.g. in cartography.
+Parameters:
+  Degrees - The angle in degrees.
+  SecondPrecision - Specifies the number of digits after the decimal point for the arc seconds
+  component; default is 3 decimal digits.
+Result:
+  A string representation composed as follows: <arc degrees>° <arc minutes>' <arc seconds>"
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@CartesianToPolar
+<GROUP UnitConversions.CoordinateConversion>
+Summary:
+  Converts cartesian to polar coordinates.
+Description:
+  CartesianToPolar converts the supplied coordinates from the cartesian (or
+  rectangular) system to the corresponding coordinates in the polar coordinate system.
+Parameters:
+  X - X element of the coordinate in the cartesian system to convert.
+  Y - Y element of the coordinate in the cartesian system to convert.
+  Rho - Receives the Rho part of the converted coordinate.
+  Theta - Receives the Theta part of the converted coordinate.
+See also:
+  PolarToCartesian
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@PolarToCartesian
+<GROUP UnitConversions.CoordinateConversion>
+Summary:
+  Converts polar to cartesian coordinates
+Description:
+  PolarToCartesion converts the supplied coordinates from the polar coordinate
+  system to the corresponding coordinates in the cartesian (or rectangular) system.
+Parameters:
+  Rho - Rho part of the coordinate in the polar system to convert.
+  Theta - Theta part of the coordinate in the polar system to convert.
+  X - Receives the X element of the converted coordinate.
+  Y - Receives the Y element of the converted coordinate.
+See also:
+  CartesianToPolar
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@CartesianToCylinder
+<GROUP UnitConversions.CoordinateConversion>
+Summary:
+  Converts cartesian to cylinder coordinates.
+Description:
+  CartesianToCylinder converts the supplied coordinates from the cartesian coordinate
+  system to the corresponding coordinates in the cylinder coordinate system.
+Parameters:
+  X - TODO
+  Y - TODO
+  Z - TODO
+  R - TODO
+  Phi - TODO
+  Zeta - TODO
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@CartesianToSpheric
+<GROUP UnitConversions.CoordinateConversion>
+Summary:
+  Converts cartesian to spheric coordinates.
+Description:
+  CartesianToSpheric converts the supplied coordinates from the cartesian coordinate
+  system to the corresponding coordinates in the spheric coordinate system.
+Parameters:
+  X - X element of the coordinate in the cartesian system to convert.
+  Y - Y element of the coordinate in the cartesian system to convert.
+  Z - Z element of the coordinate in the cartesian system to convert.
+  Rho - TODO
+  Phi - TODO
+  Theta - TODO
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@CylinderToCartesian
+<GROUP UnitConversions.CoordinateConversion>
+Summary:
+  Converts cylinder to cartesian coordinates.
+Description:
+  CylinderToCartesian converts the supplied coordinates from the cylinder coordinate
+  system to the corresponding coordinates in the cartesian coordinate system.
+Parameters:
+  R - TODO
+  Phi - TODO
+  Zeta - TODO
+  X - TODO
+  Y - TODO
+  Z - TODO
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@SphericToCartesian
+<GROUP UnitConversions.CoordinateConversion>
+Summary:
+  Converts spheric to cartesian coordinates.
+Description:
+  SphericToCartesian converts the supplied coordinates from the spheric coordinate
+  system to the corresponding coordinates in the cartesian coordinate system.
+Parameters:
+  Rho - TODO
+  Theta - TODO
+  Phi - TODO
+  X - TODO
+  Y - TODO
+  Z - TODO
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@CmToInch
+<GROUP UnitConversions.LengthConversion>
+Summary:
+  Converts a length from centimeters to inches.
+Description:
+  The CmToInch routine converts the specified length, in centimeters, to the corresponding length in inches.
+Parameters:
+  Cm - The length, in centimeters, to convert to inches.
+Result:
+  The length after conversion to inches.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@InchToCm
+<GROUP UnitConversions.LengthConversion>
+Summary:
+  Converts a length from inches to centimeters.
+Description:
+  The InchToCm routine converts the specified length, in inches, to the corresponding length in centimeters.
+Parameters:
+  Inch - The length, in inches, to convert to centimeters.
+Result:
+  The length after conversion to centimeters.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@FeetToMetre
+<GROUP UnitConversions.LengthConversion>
+Summary:
+  Converts a length from feet to meters.
+Description:
+  The FeetToMetre routine converts the specified length, in feet, to the corresponding length in meters.
+Parameters:
+  Feet - The length, in feet, to convert to meters.
+Result:
+  The length after conversion to meters.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@MetreToFeet
+<GROUP UnitConversions.LengthConversion>
+Summary:
+  Converts a length from meters to feet.
+Description:
+  The MetreToFeet routine converts the specified length, in meters, to the corresponding length in feet.
+Parameters:
+  Metre - The length, in meters, to convert to feet.
+Result:
+  The length after conversion to feet.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@YardToMetre
+<GROUP UnitConversions.LengthConversion>
+Summary:
+  Converts a length from yards to meters.
+Description:
+  The YardToMetre routine converts the specified length, in yards, to the corresponding length in meters.
+Parameters:
+  Yard - The length, in yards, to convert to meters.
+Result:
+  The length after conversion to meters.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@MetreToYard
+<GROUP UnitConversions.LengthConversion>
+Summary:
+  Converts a length from meters to yards.
+Description:
+  The MetreToYard routine converts the specified length, in meters, to the corresponding length in yards.
+Parameters:
+  Metre - The length, in meters, to convert to yards.
+Result:
+  The length after conversion to yards.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@NmToKm
+<GROUP UnitConversions.LengthConversion>
+Summary:
+  Converts a length from nautic miles to kilometers.
+Description:
+  The NmToKm routine converts the specified length, in nautic miles, to the corresponding length in kilometers.
+Parameters:
+  Nm - The length, in nautic miles, to convert to kilometers.
+Result:
+  The length after conversion to kilometers.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@KmToNm
+<GROUP UnitConversions.LengthConversion>
+Summary:
+  Converts a length from kilometers to nautic miles.
+Description:
+  The KmToNm routine converts the specified length, in kilometers, to the corresponding length in nautic miles.
+Parameters:
+  Km - The length, in kilometers, to convert to nautic miles.
+Result:
+  The length after conversion to nautic miles.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@KmToSm
+<GROUP UnitConversions.LengthConversion>
+Summary:
+  Converts a length from kilometers to statute miles.
+Description:
+  The KmToSm routine converts the specified length, in kilometers, to the corresponding length in statute miles.
+Parameters:
+  Km - The length, in kilometers, to convert to statute miles.
+Result:
+  The length after conversion to statute miles.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@SmToKm
+<GROUP UnitConversions.LengthConversion>
+Summary:
+  Converts a length from statute miles to kilometers.
+Description:
+  The SmToKm routine converts the specified length, in statute miles, to the corresponding length in kilometers.
+Parameters:
+  Sm - The length, in statute miles, to convert to kilometers.
+Result:
+  The length after conversion to kilometers.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PascalToBar
+<GROUP UnitConversions.PressureConversion>
+Summary:
+  Converts a pressure from Pascal to bar.
+Description:
+  The PascalToBar routine converts the specified pressure, in Pascal, to the corresponding pressure in bar.
+Parameters:
+  Pa - The pressure, in Pascal, to convert to bar.
+Result:
+  The pressure after conversion to bar.
+Donator:
+  Matthias Thoma
+--------------------------------------------------------------------------------
+@@PascalToAt
+<GROUP UnitConversions.PressureConversion>
+Summary:
+  Converts a pressure from Pascal to at.
+Description:
+  The PascalToAt routine converts the specified pressure, in Pascal, to the corresponding pressure in at.
+Parameters:
+  Pa - The pressure, in Pascal, to convert to at.
+Result:
+  The pressure after conversion to at.
+Donator:
+  Matthias Thoma
+--------------------------------------------------------------------------------
+@@PascalToTorr
+<GROUP UnitConversions.PressureConversion>
+Summary:
+  Converts a pressure from Pascal to torr.
+Description:
+  The PascalToTorr routine converts the specified pressure, in Pascal, to the corresponding pressure in torr.
+Parameters:
+  Pa - The pressure, in Pascal, to convert to torr.
+Result:
+  The pressure after conversion to torr.
+Donator:
+  Matthias Thoma
+--------------------------------------------------------------------------------
+@@BarToPascal
+<GROUP UnitConversions.PressureConversion>
+Summary:
+  Converts a pressure from bar to Pascal.
+Description:
+  The BarToPascal routine converts the specified pressure, in bar, to the corresponding pressure in Pascal.
+Parameters:
+  Bar - The pressure, in bar, to convert to Pascal.
+Result:
+  The pressure after conversion to Pascal.
+Donator:
+  Matthias Thoma
+--------------------------------------------------------------------------------
+@@AtToPascal
+<GROUP UnitConversions.PressureConversion>
+Summary:
+  Converts a pressure from at to Pascal.
+Description:
+  The AtToPascal routine converts the specified pressure, in at, to the corresponding pressure in Pascal.
+Parameters:
+  At - The pressure, in at, to convert to Pascal.
+Result:
+  The pressure after conversion to Pascal.
+Donator:
+  Matthias Thoma
+--------------------------------------------------------------------------------
+@@TorrToPascal
+<GROUP UnitConversions.PressureConversion>
+Summary:
+  Converts a pressure from torr to Pascal.
+Description:
+  The TorrToPascal routine converts the specified pressure, in torr, to the corresponding pressure in Pascal.
+Parameters:
+  Torr - The pressure, in torr, to convert to Pascal.
+Result:
+  The pressure after conversion to Pascal.
+Donator:
+  Matthias Thoma
+--------------------------------------------------------------------------------
+@@LitreToGalUs
+<GROUP UnitConversions.VolumeConversion>
+Summary:
+  Converts a volume from litres to US Gallons.
+Description:
+  The LitreToGalUs routine converts the specified volume, in litres, to the corresponding volume in US Gallons.
+Parameters:
+  Litre - The volume, in litres, to convert to US Gallons.
+Result:
+  The volume after conversion to US Gallons.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GalUsToLitre
+<GROUP UnitConversions.VolumeConversion>
+Summary:
+  Converts a volume from US Gallons to Litres.
+Description:
+  The GalUsToLitre routine converts the specified volume, in US Gallons, to the corresponding volume in Litres.
+Parameters:
+  GalUs - The volume, in US Gallons, to convert to Litres.
+Result:
+  The volume after conversion to Litres.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GalUsToGalCan
+<GROUP UnitConversions.VolumeConversion>
+Summary:
+  Converts a volume from US Gallons to Canadian Gallons.
+Description:
+  The GalUsToGalCan routine converts the specified volume, in US Gallons, to the corresponding volume in Canadian Gallons.
+Parameters:
+  GalUs - The volume, in US Gallons, to convert to Canadian Gallons.
+Result:
+  The volume after conversion to Canadian Gallons.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GalCanToGalUs
+<GROUP UnitConversions.VolumeConversion>
+Summary:
+  Converts a volume from Canadian Gallons to US Gallons.
+Description:
+  The GalCanToGalUs routine converts the specified volume, in Canadian Gallons, to the corresponding volume in US Gallons.
+Parameters:
+  GalCan - The volume, in Canadian Gallons, to convert to US Gallons.
+Result:
+  The volume after conversion to US Gallons.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GalUsToGalUk
+<GROUP UnitConversions.VolumeConversion>
+Summary:
+  Converts a volume from US Gallons to UK Gallons.
+Description:
+  The GalUsToGalUk routine converts the specified volume, in US Gallons, to the corresponding volume in UK Gallons.
+Parameters:
+  GalUs - The volume, in US Gallons, to convert to UK Gallons.
+Result:
+  The volume after conversion to UK Gallons.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GalUkToGalUs
+<GROUP UnitConversions.VolumeConversion>
+Summary:
+  Converts a volume from UK Gallons to US Gallons.
+Description:
+  The GalUkToGalUs routine converts the specified volume, in UK Gallons, to the corresponding volume in US Gallons.
+Parameters:
+  GalUk - The volume, in UK Gallons, to convert to US Gallons.
+Result:
+  The volume after conversion to US Gallons.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@LitreToGalCan
+<GROUP UnitConversions.VolumeConversion>
+Summary:
+  Converts a volume from litres to Canadian Gallons.
+Description:
+  The LitreToGalCan routine converts the specified volume, in litres, to the corresponding volume in Canadian Gallons.
+Parameters:
+  Litre - The volume, in litres, to convert to Canadian Gallons.
+Result:
+  The volume after conversion to Canadian Gallons.
+Donator:
+  Allan Lyons
+--------------------------------------------------------------------------------
+@@GalCanToLitre
+<GROUP UnitConversions.VolumeConversion>
+Summary:
+  Converts a volume from Canadian Gallons to Litres.
+Description:
+  The GalCanToLitre routine converts the specified volume, in Canadian Gallons, to the corresponding volume in Litres.
+Parameters:
+  GalCan - The volume, in Canadian Gallons, to convert to Litres.
+Result:
+  The volume after conversion to Litres.
+Donator:
+  Allan Lyons
+--------------------------------------------------------------------------------
+@@LitreToGalUk
+<GROUP UnitConversions.VolumeConversion>
+Summary:
+  Converts a volume from litres to UK Gallons.
+Description:
+  The LitreToGalUk routine converts the specified volume, in litres, to the corresponding volume in UK Gallons.
+Parameters:
+  Litre - The volume, in litres, to convert to UK Gallons.
+Result:
+  The volume after conversion to UK Gallons.
+Donator:
+  Allan Lyons
+--------------------------------------------------------------------------------
+@@GalUkToLitre
+<GROUP UnitConversions.VolumeConversion>
+Summary:
+  Converts a volume from UK Gallons to Litres.
+Description:
+  The GalUkToLitre routine converts the specified volume, in UK Gallons, to the corresponding volume in Litres.
+Parameters:
+  GalUs - The volume, in UK Gallons, to convert to Litres.
+Result:
+  The volume after conversion to Litres.
+Donator:
+  Allan Lyons
+--------------------------------------------------------------------------------
+@@KgToLb
+<GROUP UnitConversions.MassConversion>
+Summary:
+  Converts a mass from kilograms to pounds.
+Description:
+  The KgToLb routine converts the specified mass, in kilograms, to the corresponding mass in pounds.
+Parameters:
+  Kg - The mass, in kilograms, to convert to pounds.
+Result:
+  The mass after conversion to pounds.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@KgToKarat
+<GROUP UnitConversions.MassConversion>
+Summary:
+  Converts a mass from kilograms to karat.
+Description:
+  The KgToKarat routine converts the specified mass, in kilograms, to the corresponding
+  mass in karat.
+Parameters:
+  Kg - The mass, in kilograms, to convert to karat.
+Result:
+  The mass after conversion to karat.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@LbToKg
+<GROUP UnitConversions.MassConversion>
+Summary:
+  Converts a mass from pounds to kilograms.
+Description:
+  The LbToKg routine converts the specified mass, in pounds, to the corresponding mass in kilograms.
+Parameters:
+  Kg - The mass, in pounds, to convert to kilograms.
+Result:
+  The mass after conversion to kilograms.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@KgToOz
+<GROUP UnitConversions.MassConversion>
+Summary:
+  Converts a mass from kilograms to ounce.
+Description:
+  The KgToOz routine converts the specified mass, in kilograms, to the corresponding mass in ounces.
+Parameters:
+  Kg - The mass, in kilograms, to convert to ounces.
+Result:
+  The mass after conversion to ounces.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@OzToKg
+<GROUP UnitConversions.MassConversion>
+Summary:
+  Converts a mass from pounds to kilograms.
+Description:
+  The OzToKg routine converts the specified mass, in ounces, to the corresponding mass in kilograms.
+Parameters:
+  Kg - The mass, in ounces, to convert to kilograms.
+Result:
+  The mass after conversion to kilograms.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@QrUsToKg
+<GROUP UnitConversions.MassConversion>
+Summary:
+  Converts a mass from quarter(US) to kilograms.
+Description:
+  The QrUsToKg routine converts the specified mass, in quarters, to the corresponding mass in kilograms.
+Parameters:
+  nQr - The mass, in quarters, to convert to kilograms.
+Result:
+  The mass after conversion to kilograms.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@QrUkToKg
+<GROUP UnitConversions.MassConversion>
+Summary:
+  Converts a mass from quarter(UK) to kilograms.
+Description:
+  The QrUkToKg routine converts the specified mass, in quarters, to the corresponding mass in kilograms.
+Parameters:
+  nQr - The mass, in quarters, to convert to kilograms.
+Result:
+  The mass after conversion to kilograms.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@KaratToKg
+<GROUP UnitConversions.MassConversion>
+Summary:
+  Converts a mass from karat to kilograms.
+Description:
+  The KaratToKg routine converts the specified mass, in karat, to the corresponding mass in kilograms.
+Parameters:
+  nQr - The mass, in karat, to convert to kilograms.
+Result:
+  The mass after conversion to kilograms.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@CwtUsToKg
+<GROUP UnitConversions.MassConversion>
+Summary:
+  Converts a mass from centweight to kilograms.
+Description:
+  The CwtUsToKg routine converts the specified mass, in centweight, to the corresponding mass in kilograms.
+Parameters:
+  nCwt - The mass, in centweight, to convert to kilograms.
+Result:
+  The mass after conversion to kilograms.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@CwtUkToKg
+<GROUP UnitConversions.MassConversion>
+Summary:
+  Converts a mass from centweight to kilograms.
+Description:
+  The CwtUkToKg routine converts the specified mass, in centweight, to the corresponding mass in kilograms.
+Parameters:
+  nCwt - The mass, in centweight, to convert to kilograms.
+Result:
+  The mass after conversion to kilograms.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@StonToKg
+<GROUP UnitConversions.MassConversion>
+Summary:
+  Converts a mass from short ton to kilograms.
+Description:
+  The StonToKg routine converts the specified mass, in short ton, to the corresponding mass in kilograms.
+Parameters:
+  nSTon - The mass, in short ton, to convert to kilograms.
+Result:
+  The mass after conversion to kilograms.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@LtonToKg
+<GROUP UnitConversions.MassConversion>
+Summary:
+  Converts a mass from long ton to kilograms.
+Description:
+  The LtonToKg routine converts the specified mass, in long ton, to the corresponding mass in kilograms.
+Parameters:
+  nLTon - The mass, in long ton, to convert to kilograms.
+Result:
+  The mass after conversion to kilograms.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@KgToCwtUs
+<GROUP UnitConversions.MassConversion>
+Summary:
+  Converts a mass from kilograms to centweight.
+Description:
+  The KgToCwtUs routine converts the specified mass, in kilograms, to the corresponding mass in centweight.
+Parameters:
+  Kg - The mass, in kilograms, to convert to centweight.
+Result:
+  The mass after conversion to centweight.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@KgToCwtUk
+<GROUP UnitConversions.MassConversion>
+Summary:
+  Converts a mass from kilograms to centweight.
+Description:
+  The KgToCwtUk routine converts the specified mass, in kilograms, to the corresponding mass in centweight.
+Parameters:
+  Kg - The mass, in kilograms, to convert to centweight.
+Result:
+  The mass after conversion to centweight.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@KgToQrUs
+<GROUP UnitConversions.MassConversion>
+Summary:
+  Converts a mass from kilograms to quarter.
+Description:
+  The KgToQrUs routine converts the specified mass, in kilograms, to the corresponding mass in quarter.
+Parameters:
+  Kg - The mass, in kilograms, to convert to quarter.
+Result:
+  The mass after conversion to quarter.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@KgToQrUk
+<GROUP UnitConversions.MassConversion>
+Summary:
+  Converts a mass from kilograms to quarter.
+Description:
+  The KgToQrUk routine converts the specified mass, in kilograms, to the corresponding mass in quarter.
+Parameters:
+  Kg - The mass, in kilograms, to convert to quarter.
+Result:
+  The mass after conversion to quarter.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@KgToSton
+<GROUP UnitConversions.MassConversion>
+Summary:
+  Converts a mass from kilograms to short ton.
+Description:
+  The KgToSton routine converts the specified mass, in kilograms, to the corresponding mass in short ton.
+Parameters:
+  Kg - The mass, in kilograms, to convert to short ton.
+Result:
+  The mass after conversion to short ton.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@KgToLton
+<GROUP UnitConversions.MassConversion>
+Summary:
+  Converts a mass from kilograms to long ton.
+Description:
+  The KgToLton routine converts the specified mass, in kilograms, to the corresponding mass in long ton.
+Parameters:
+  Kg - The mass, in kilograms, to convert to long ton.
+Result:
+  The mass after conversion to long ton.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@KnotToMs
+<GROUP UnitConversions.Velocity>
+Summary:
+  Converts a velocity from knot to meters per second.
+Description:
+  The KnotToMs routine converts the specified velocity, in knots, to the corresponding velocity in meters per second.
+Parameters:
+  Knot - The velocity, in Knot, to convert to meters per second.
+Result:
+  The velocity after conversion to meters per second.
+Donator:
+  Manlio Laschena
+--------------------------------------------------------------------------------
+@@HpElectricToWatt
+<GROUP UnitConversions.Power>
+Summary:
+  Converts a power from horsepower to Watt.
+Description:
+  The HpElectricToWatt routine converts the specified power, in horsepower, to the corresponding power in Watt.
+Parameters:
+  HpE - The power, in horsepower, to convert to Watt.
+Result:
+  The power after conversion to Watt.
+Donator:
+  Manlio Laschena
+--------------------------------------------------------------------------------
+@@HpMetricToWatt
+<GROUP UnitConversions.Power>
+Summary:
+  Converts a power from metric horsepower to Watt.
+Description:
+  The HpMetricToWatt routine converts the specified power, in metric horsepower, to the corresponding power in Watt.
+Parameters:
+  HpM - The power, in metric horsepower, to convert to Watt.
+Result:
+  The power after conversion to Watt.
+Donator:
+  Manlio Laschena
+--------------------------------------------------------------------------------
+@@MsToKnot
+<GROUP UnitConversions.Velocity>
+Summary:
+  Converts a velocity from meters per second to knots.
+Description:
+  The MsToKnot routine converts the specified velocity, in meters per second, to the corresponding velocity in knots.
+Parameters:
+  ms - The velocity, in meters per second, to convert to knots.
+Result:
+  The velocity after conversion to knots.
+Donator:
+  Manlio Laschena
+--------------------------------------------------------------------------------
+@@WattToHpElectric
+<GROUP UnitConversions.Power>
+Summary:
+  Converts a power from Watt to horsepower.
+Description:
+  The WattToHpElectric routine converts the specified power, in Watt, to the corresponding power in horsepower.
+Parameters:
+  W - The power, in Watt, to convert to horsepower.
+Result:
+  The power after conversion to horsepower.
+Donator:
+  Manlio Laschena
+--------------------------------------------------------------------------------
+@@WattToHpMetric
+<GROUP UnitConversions.Power>
+Summary:
+  Converts a power from Watt to metric horsepower.
+Description:
+  The WattToHpMetric routine converts the specified power, in Watt, to the corresponding power in metric horsepower.
+Parameters:
+  W - The power, in Watt, to convert to metric horsepower.
+Result:
+  The power after conversion to metric horsepower.
+Donator:
+  Manlio Laschena
+--------------------------------------------------------------------------------
+@@CelsiusAbsoluteZero
+  This constant is representating the absolute zero point in degree Celsius.
+-------------------------------------------------------------------------------
+@@KelvinAbsoluteZero
+  This constant is representating the absolute zero point in degree Kelvin.
+-------------------------------------------------------------------------------
+@@FahrenheitAbsoluteZero
+  This constant is representating the absolute zero point in degree Fahrenheit.
+-------------------------------------------------------------------------------
+@@CelsiusBoilingPoint
+  This constant is representating the boiling point of water in degree Celsius.
+-------------------------------------------------------------------------------
+@@KelvinBoilingPoint
+  This constant is representating the boiling point of water in degree Kelvin.
+-------------------------------------------------------------------------------
+@@FahrenheitBoilingPoint
+  This constant is representating the boiling point of water in degree Fahrenheit.
+-------------------------------------------------------------------------------
+@@CelsiusFreezingPoint
+  This constant is representating the freezing point of water in degree Celsius.
+-------------------------------------------------------------------------------
+@@KelvinFreezingPoint
+  This constant is representating the freezing point of water in degree Kelvin.
+-------------------------------------------------------------------------------
+@@FahrenheitFreezingPoint
+  This constant is representating the freezing point of water in degree Fahrenheit.
+-------------------------------------------------------------------------------

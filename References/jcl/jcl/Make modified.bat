@@ -1,0 +1,1 @@
+Install.bat /AutoAcceptMPL /AcceptInformations /AcceptConfirmations /Install /CloseOnSuccess %*

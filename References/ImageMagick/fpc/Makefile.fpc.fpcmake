@@ -1,0 +1,32 @@
+#
+#   Makefile.fpc for Free Pascal GTK 2.x.y Bindings
+#
+
+[package]
+name=imagemagick
+version=3.0.4
+
+[require]
+libc=y
+
+[target]
+units=buildim 
+exampledirs=
+implicitunits=magick_wand imagemagick
+
+[compiler]
+includedir=src
+sourcedir=src tests
+
+[install]
+buildunit=buildim
+fpcpackage=y
+
+[shared]
+build=n
+
+[default]
+fpcdir=../..
+
+[rules]
+.NOTPARALLEL:

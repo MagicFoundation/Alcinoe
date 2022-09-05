@@ -1,0 +1,243 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Make">
+<!--
+{**************************************************************************************************}
+{                                                                                                  }
+{ Project JEDI Code Library (JCL)                                                                  }
+{                                                                                                  }
+{ The contents of this file are subject to the Mozilla Public License Version 1.1 (the "License"); }
+{ you may not use this file except in compliance with the License. You may obtain a copy of the    }
+{ License at http://www.mozilla.org/MPL/                                                           }
+{                                                                                                  }
+{ Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF   }
+{ ANY KIND, either express or implied. See the License for the specific language governing rights  }
+{ and limitations under the License.                                                               }
+{                                                                                                  }
+{ The Original Code is make.proj.                                                                  }
+{                                                                                                  }
+{ The Initial Developer of the Original Code is Andreas Hausladen.                                 }
+{ Portions created by Andreas Hausladen Copyright (C) 2010 Andreas Hausladen. All rights reserved. }
+{                                                                                                  }
+{ Contributor(s):                                                                                  }
+{                                                                                                  }
+{**************************************************************************************************}
+-->
+	<PropertyGroup>
+		<Platform Condition=" '$(Platform)' == '' ">win32</Platform>
+		<BDSLIB>$(BDS)\lib</BDSLIB>
+		<PLATFORM>$(Platform)</PLATFORM>
+		<ProjectVersion>12.0</ProjectVersion> <!-- must be not empty, value doesn't matter -->
+	</PropertyGroup>
+	<Import Condition=" Exists('$(BDS)\Bin\CodeGear.Common.Targets') " Project="$(BDS)\Bin\CodeGear.Common.Targets"/>
+
+	
+	<!-- Make/Clean/Rebuild targets -->
+	<Target Name="Make" DependsOnTargets="CheckEnv;CompileJclSources;CompilePackages" />
+	<Target Name="Clean" DependsOnTargets="CheckEnv;DeleteOutputFiles" />
+	<Target Name="Rebuild" DependsOnTargets="Clean;Make" />
+
+
+	<!-- Delphi Version -->
+	<PropertyGroup>
+		<EditionDirVersion></EditionDirVersion>
+
+		<!--
+		<EditionDirVersion Condition=" Exists('$(BDS)\bin\dcc60.dll') ">d6</EditionDirVersion>
+		<EditionDirVersion Condition=" Exists('$(BDS)\bin\dcc70.dll') ">d7</EditionDirVersion>
+		<EditionDirVersion Condition=" Exists('$(BDS)\bin\dcc90.dll') ">d9</EditionDirVersion>
+		<EditionDirVersion Condition=" Exists('$(BDS)\bin\dcc100.dll') and Exists('$(BDS)\bin\bordbk100N.dll') ">d10</EditionDirVersion>
+		<EditionDirVersion Condition=" Exists('$(BDS)\bin\dcc100.dll') and Exists('$(BDS)\bin\bordbk105N.dll') ">d11</EditionDirVersion>
+		-->
+		<EditionDirVersion Condition=" Exists('$(BDS)\bin\dcc120.dll')   ">d12</EditionDirVersion> <!-- 2009 -->
+		<EditionDirVersion Condition=" Exists('$(BDS)\bin\dcc140.dll')   ">d14</EditionDirVersion> <!-- 2010 -->
+		<EditionDirVersion Condition=" Exists('$(BDS)\bin\dcc150.dll')   ">d15</EditionDirVersion> <!-- XE   -->
+		<EditionDirVersion Condition=" Exists('$(BDS)\bin\dcc32160.dll') ">d16</EditionDirVersion> <!-- XE2 -->
+		<EditionDirVersion Condition=" Exists('$(BDS)\bin\dcc32170.dll') ">d17</EditionDirVersion> <!-- XE3 -->
+		<EditionDirVersion Condition=" Exists('$(BDS)\bin\dcc32180.dll') ">d18</EditionDirVersion> <!-- XE4 -->
+		<EditionDirVersion Condition=" Exists('$(BDS)\bin\dcc32190.dll') ">d19</EditionDirVersion> <!-- XE5 -->
+		<EditionDirVersion Condition=" Exists('$(BDS)\bin\dcc32200.dll') ">d20</EditionDirVersion> <!-- XE6 -->
+		<EditionDirVersion Condition=" Exists('$(BDS)\bin\dcc32210.dll') ">d21</EditionDirVersion> <!-- XE7 -->
+		<EditionDirVersion Condition=" Exists('$(BDS)\bin\dcc32220.dll') ">d22</EditionDirVersion> <!-- XE8 -->
+		<EditionDirVersion Condition=" Exists('$(BDS)\bin\dcc32230.dll') ">d23</EditionDirVersion> <!-- 10 Seattle -->
+		<EditionDirVersion Condition=" Exists('$(BDS)\bin\dcc32240.dll') ">d24</EditionDirVersion> <!-- 10.1 Berlin -->
+		<EditionDirVersion Condition=" Exists('$(BDS)\bin\dcc32250.dll') ">d25</EditionDirVersion> <!-- 10.2 ? -->
+
+		<LibDirVersion>$(EditionDirVersion)\$(Platform)</LibDirVersion>
+		<LibDirVersion Condition=" '$(EditionDirVersion)' == 'd12' or '$(EditionDirVersion)' == 'd14' or '$(EditionDirVersion)' == 'd15' ">$(EditionDirVersion)</LibDirVersion>
+		<JclIncEditionVersion>$(EditionDirVersion)$(Platform)</JclIncEditionVersion>
+		<JclIncEditionVersion Condition=" '$(EditionDirVersion)' == 'd12' or '$(EditionDirVersion)' == 'd14' or '$(EditionDirVersion)' == 'd15' ">$(EditionDirVersion)</JclIncEditionVersion>
+	</PropertyGroup>
+
+
+	<PropertyGroup>
+		<DCC Condition=" '$(Platform)' == 'win32' ">&quot;$(BDS)\bin\dcc32.exe&quot; --no-config -Q</DCC>
+		<DCC Condition=" '$(Platform)' == 'win64' ">&quot;$(BDS)\bin\dcc64.exe&quot; --no-config -Q</DCC>
+
+		<BCBCompile>false</BCBCompile>
+		<BCBCompile Condition=" Exists('$(BDS)\bin\bccide.dll') or '$(ForceBCBCompile)' == 'true' ">true</BCBCompile>
+
+		<UnitScopeRequired>true</UnitScopeRequired>
+		<UnitScopeRequired Condition=" '$(EditionDirVersion)' == 'd12' or '$(EditionDirVersion)' == 'd14' or '$(EditionDirVersion)' == 'd15' ">false</UnitScopeRequired>
+		<UnitScopeOption Condition=" '$(UnitScopeRequired)' == 'true' ">-nsSystem;System.Win;WinAPI;Vcl;Vcl.Imaging;Vcl.Samples;Vcl.Shell;Web</UnitScopeOption>
+
+		<!-- Use Delphi XE+ properties -->
+		<DelphiLibraryPath Condition=" '$(DelphiLibraryPath)' == '' ">$(Win32LibraryPath)</DelphiLibraryPath>
+		<DelphiDebugDCUPath Condition=" '$(DelphiDebugDCUPath)' == '' ">$(Win32DebugDCUPath)</DelphiDebugDCUPath>
+		<DelphiDLLOutputPath Condition=" '$(DelphiDLLOutputPath)' == '' ">$(Win32DLLOutputPath)</DelphiDLLOutputPath>
+		<DelphiDCPOutput Condition=" '$(DelphiDCPOutput)' == '' ">$(Win32DCPOutput)</DelphiDCPOutput>
+
+		<!-- Directories -->
+		<JclDir>$(MSBuildProjectDirectory)</JclDir>
+
+		<IncludeDirs>$(JclDir)\source\include</IncludeDirs>
+		<UnitDirs>$(JclDir)\source\common;$(JclDir)\source\windows;$(JclDir)\source\vcl;$(JclDir)\devtools\jpp;$(JclDir)\devtools\jpp\Templates</UnitDirs>
+		<ResDirs>$(UnitDirs)</ResDirs>
+		<DcuOutDir Condition=" '$(DcuOutDir)' == '' ">$(JclDir)\lib\$(LibDirVersion)</DcuOutDir>
+		<ObjOutDir Condition=" '$(ObjOutDir)' == '' ">$(DcuOutDir)</ObjOutDir>
+		<DcpOutDir Condition=" '$(DcpOutDir)' == '' ">$(DcuOutDir)</DcpOutDir>
+		<HppOutDir Condition=" '$(HppOutDir)' == '' ">$(BDSCOMMONDIR)\hpp</HppOutDir>
+		<BplOutDir Condition=" '$(BplOutDir)' == '' ">$(DelphiDLLOutputPath)</BplOutDir>
+		<DebugDcuOutDir Condition=" '$(DebugDcuOutDir)' == '' ">$(DcuOutDir)\debug</DebugDcuOutDir>
+		<DebugObjOutDir Condition=" '$(DebugObjOutDir)' == '' ">$(ObjOutDir)\debug</DebugObjOutDir>
+
+		<!-- Compiler command line options -->
+		<BaseOptions>$(BaseOptions) -M -D_RTLDLL;NO_STRICT;USEPACKAGES $(UnitScopeOption)</BaseOptions>
+		<BaseOptions Condition=" '$(UserDefines)' != '' ">$(BaseOptions) -D$(UsertDefines)</BaseOptions>
+		<BaseOptions Condition=" '$(BCBCompile)' == 'true' ">$(BaseOptions) -JPHNE --BCB</BaseOptions>
+		<BaseOptions>$(BaseOptions) -$X+ -$G+ -$H+ -$P+ -$U- -$T- -$V+ -$J+ -$Z1 -$J+</BaseOptions>
+		<BaseOptions>$(BaseOptions) -I&quot;$(IncludeDirs)&quot; -U&quot;$(UnitDirs)&quot; -R&quot;$(ResDirs)&quot;</BaseOptions>
+
+		<!-- Release Configuration -->
+		<ReleaseOptions>$(BaseOptions)</ReleaseOptions>
+		<ReleaseOptions>$(ReleaseOptions) -$C- -$D- -$I- -$L- -$O+ -$Q- -$R- -$W- -$Y-</ReleaseOptions>
+		<ReleaseOptions>$(ReleaseOptions) -N0&quot;$(DcuOutDir)&quot; -NO&quot;$(ObjOutDir)&quot; -N1&quot;$(HppOutDir)&quot;</ReleaseOptions>
+		<ReleaseOptions>$(ReleaseOptions) -U&quot;$(DelphiLibraryPath)&quot;</ReleaseOptions>
+
+		<!-- Debug Configuration -->
+		<DebugOptions>$(BaseOptions)</DebugOptions>
+		<DebugOptions>$(DebugOptions) -$C+ -$D+ -$I+ -$L+ -$O- -$Q+ -$R+ -$W+ -$Y+</DebugOptions>
+		<DebugOptions>$(DebugOptions) -N0&quot;$(DebugDcuOutDir)&quot; -NO&quot;$(DebugObjOutDir)&quot; -N1&quot;$(HppOutDir)&quot;</DebugOptions>
+		<DebugOptions>$(DebugOptions) -U&quot;$(DelphiDebugDCUPath);$(DelphiLibraryPath)&quot;</DebugOptions>
+		
+		<!-- Package Configuration -->
+		<PackageOptions Condition=" '$(BCBCompile)' == 'true' ">$(PackageOptions) -JL -DBCB</PackageOptions>
+		<PackageOptions>$(PackageOptions) $(UnitScopeOption)</PackageOptions>
+		<PackageOptions>$(PackageOptions) -DRELEASE</PackageOptions>
+		<PackageOptions>$(PackageOptions) -LN&quot;$(DcuOutDir)&quot;</PackageOptions>
+		<PackageOptions>$(PackageOptions) -LE&quot;$(BplOutDir)&quot;</PackageOptions>
+		<PackageOptions>$(PackageOptions) -N0&quot;$(DcuOutDir)&quot; -NO&quot;$(ObjOutDir)&quot; -N1&quot;$(HppOutDir)&quot; -NB&quot;$(DcuOutDir)&quot;</PackageOptions>
+		<PackageOptions>$(PackageOptions) -I&quot;$(IncludeDirs)&quot; -R&quot;$(ResDirs)&quot;</PackageOptions>
+		<PackageOptions>$(PackageOptions) -U&quot;$(DcuOutDir);$(DcpOutDir);$(DelphiLibraryPath)&quot;</PackageOptions>
+
+		<JclIncTplFile>$(JclDir)\source\include\jcl.template.inc</JclIncTplFile>
+		<JclIncFile>$(JclDir)\source\include\jcl$(JclIncEditionVersion).inc</JclIncFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- JCL Source files -->
+		<JclSources Include="$(JclDir)\source\Common\*.pas">
+			<WorkDir>$(JclDir)\source\Common</WorkDir>
+		</JclSources>
+		<JclSources Include="$(JclDir)\source\Windows\*.pas">
+			<WorkDir>$(JclDir)\source\Windows</WorkDir>
+		</JclSources>
+		<JclSources Include="$(JclDir)\source\Vcl\*.pas">
+			<WorkDir>$(JclDir)\source\Vcl</WorkDir>
+		</JclSources>
+		<JclSources Include="$(JclDir)\devtools\jpp\*.pas">
+			<WorkDir>$(JclDir)\devtools\jpp</WorkDir>
+		</JclSources>
+		<JclSources Include="$(JclDir)\devtools\jpp\Templates\*.pas">
+			<WorkDir>$(JclDir)\devtools\jpp\Templates</WorkDir>
+		</JclSources>
+
+		<!-- Resource files -->
+		<JclResFiles Include="$(JclDir)\source\Common\*.res" />
+		<JclResFiles Include="$(JclDir)\source\Windows\*.res" />
+		<JclResFiles Include="$(JclDir)\source\Vcl\*.res" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<!-- Package names -->
+		<Packages Include="
+			Jcl;
+			JclContainers;
+			JclDeveloperTools;
+			JclVcl
+			" />
+		<!-- IDE Experts (Win32 only) -->
+		<Packages Condition=" '$(Platform)' == 'win32' " Include="
+			JclBaseExpert;
+			JclDebugExpert;
+			JclProjectAnalysisExpert;
+			JclFavoriteFoldersExpert;
+			JclRepositoryExpert;
+			JclSIMDViewExpert;
+			JclStackTraceViewerExpert;
+			" />
+
+		<!-- BPL output files for "/t:Clean" -->
+		<PackageOutputFiles Include="$(BplOutDir)\Jcl*.bpl" />
+		<PackageOutputFiles Include="$(BplOutDir)\Jcl*.map" />
+		<PackageOutputFiles Include="$(BplOutDir)\Jcl*.tds" />
+		<PackageOutputFiles Include="$(BplOutDir)\Jcl*.jdbg" />	
+	</ItemGroup>
+
+	<!-- Output filenames -->
+	<PropertyGroup>
+		<JclSourcesOutput>@(JclSources->'$(DcuOutDir)\%(Filename).dcu');@(JclSources->'$(DebugDcuOutDir)\%(Filename).dcu');</JclSourcesOutput>
+		<JclBcbSourceOutput>@(JclSources->'$(ObjOutDir)\%(Filename).obj');@(JclSources->'$(DebugObjOutDir)\%(Filename).obj');@(JclSources->'$(HppOutDir)\%(Filename).hpp')</JclBcbSourceOutput>
+		<JclSourcesOutput Condition=" '$(BCBCompile)' == 'true' ">$(JclSourcesOutput);$(JclBcbSourceOutput)</JclSourcesOutput>
+		<JclResFileOutput>@(JclResFiles->'$(DcuOutDir)\%(Filename)%(Extension)');@(JclResFiles->'$(DebugDcuOutDir)\%(Filename)%(Extension)')</JclResFileOutput>
+	</PropertyGroup>
+
+
+	<!-- Targets -->
+	
+	<Target Name="CheckEnv">
+		<Error Condition=" '$(BDS)' == '' " Text="BDS environment variable isn't set. You must execute rsvars.bat before using msbuild." />
+		<Error Condition=" '$(EditionDirVersion)' == '' " Text="RAD Studio version couldn't be identified. Have you executed rsvars.bat?" />
+	</Target>
+	
+	<!-- Create output directories -->
+	<Target Name="CreateOutputDirectories">
+		<MakeDir Directories="$(DcuOutDir);$(DebugDcuOutDir);$(ObjOutDir);$(DebugObjOutDir);$(HppOutDir);$(DcpOutDir);$(BplOutDir)" />
+	</Target>
+
+	<!-- Copy *.res files to the dcu output directories -->
+	<Target Name="CopyResFiles" Inputs="@(JclResFiles)" Outputs="$(JclResFileOutput)">
+		<Copy SourceFiles="@(JclResFiles)" DestinationFolder="$(DcuOutDir)" />
+	</Target>
+
+	<!-- Create JclXXX.inc file if it doesn't exist -->
+	<Target Name="CreateJclIniFile">
+		<Copy Condition=" !Exists('$(JclIncFile)') " SourceFiles="$(JclIncTplFile)" DestinationFiles="$(JclIncFile)" />
+	</Target>
+
+	<!-- Use Batching via "%(JclSources.WorkDir)" for the source files -->
+	<Target Name="CompileJclSources" Inputs="@(JclSources);$(JclResFiles);$(JclIncFile)" Outputs="$(JclSourcesOutput)" DependsOnTargets="CreateOutputDirectories;CopyResFiles;CreateJclIniFile">
+		<Exec Command="$(DCC) @(JclSources->'%(Filename)', ' ') $(ReleaseOptions)" WorkingDirectory="%(JclSources.WorkDir)" />
+		<Exec Command="$(DCC) @(JclSources->'%(Filename)', ' ') $(DebugOptions)" WorkingDirectory="%(JclSources.WorkDir)" />
+	</Target>
+
+	<!-- Use Batching via "%(Packages.FileName)" for the packages -->
+	<Target Name="CompilePackages"
+			Inputs="@(JclSources);$(JclResFiles);$(JclIncFile);@(Packages->'$(JclDir)\Packages\$(EditionDirVersion)\%(Filename).dpk')"
+			Outputs="@(Packages->'$(DcpOutDir)\%(Filename).dcp')" DependsOnTargets="CompileJclSources">
+		<Exec Command="$(DCC) %(Packages.FileName).dpk $(PackageOptions)" WorkingDirectory="$(JclDir)\Packages\$(EditionDirVersion)" />
+	</Target>
+
+	<Target Name="DeleteOutputFiles">
+		<Delete Files="$(JclSourcesOutput)" />
+		<Delete Files="$(JclBcbSourceOutput)" />
+		<Delete Files="$(JclResFileOutput)" />
+	
+		<Delete Files="@(Packages->'$(DcpOutDir)\%(identity).dcu')" />
+		<Delete Files="@(Packages->'$(DcpOutDir)\%(identity).dcp')" />
+		<Delete Files="@(Packages->'$(DcpOutDir)\%(identity).bpi')" />
+		<Delete Files="@(Packages->'$(DcpOutDir)\%(identity).lib')" />
+		<Delete Files="@(Packages->'$(DcpOutDir)\%(identity).lst')" />
+
+		<Delete Files="@(PackageOutputFiles)" />
+	</Target>
+	
+</Project>

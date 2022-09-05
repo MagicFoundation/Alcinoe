@@ -1,0 +1,136 @@
+<html>
+<!-- Creation date: 12/07/2002 -->
+<head>
+<title></title>
+<meta name="Description" content="">
+<meta name="Keywords" content="">
+<meta name="Author" content="RANDOM">
+<meta name="Generator" content="AceHTML 4 Pro">
+<link href="SeldonWeb.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<center><h1>Algorithms</h1></center>
+
+<h2>Apply</h2>
+<h3>Prototypes</h3>
+<code>
+  TIntfApplyFunction = <b>function</b> (AObject: IInterface): IInterface;<br>
+  TStrApplyFunction = <b>function</b> (<b>const</b> AObject: <b>string</b>): <b>string</b>;<br>
+  TApplyFunction = <b>function</b> (AObject: TObject): TObject;<br>
+	<br>
+	<b>procedure</b> Apply(First: IIntfIterator; Count: Integer; F: TIntfApplyFunction); <b>overload</b>;<br>
+	<b>procedure</b> Apply(First: IStrIterator; Count: Integer; F: TStrApplyFunction); <b>overload</b>;<br>
+	<b>procedure</b> Apply(First: IIterator; Count: Integer; F: TApplyFunction); <b>overload</b>;<br>
+</code>
+
+<h3>Description</h3>
+<p>Apply a function <i>F</i> to <i>Count</i> objects from <i>First</i>.</p>
+<p><i>F</i> is a callback function that implements any modification of <i>AObject</i>. The modified object must be returned by the function.</p>
+
+<h2>Find</h2>
+<h3>Prototypes</h3>
+<code>
+  TIntfCompare = <b>function</b> (Obj1, Obj2: IInterface): Integer;<br>
+  TStrCompare = <b>function</b> (<b>const</b> Obj, Obj2: <b>string</b>): Integer;<br>
+  TCompare = <b>function</b> (Obj1, Obj2: TObject): Integer;<br>
+	<br>
+	<b>function</b> Find(First: IIntfIterator; Count: Integer; AObject: IInterface; AComparator: TIntfCompare): IIntfIterator; <b>overload</b>;<br>
+	<b>function</b> Find(First: IStrIterator; Count: Integer; <b>const</b> AObject: <b>string</b>; AComparator: TStrCompare): IStrIterator; <b>overload</b>;<br>
+	<b>function</b> Find(First: IIterator; Count: Integer; AObject: TObject;	AComparator: TCompare): IIterator; <b>overload</b>;<br>
+</code>
+
+<h3>Description</h3>
+<p>Find the first object that the function <i>AComparator</i> return 0 with <i>AObject</i>.</p> 
+<p>The algorithm treats <i>Count</i> objects from <i>First</i>.</p>
+<p>The algorithm return an iterator pointing to the found object else nil.</p>
+<p>The callback function <i>AComparator</i> must be return 0 when the 2 objects are equal.</p>
+
+<h2>CountObject</h2>
+<h3>Prototypes</h3>
+<code>
+  TIntfCompare = <b>function</b> (Obj1, Obj2: IInterface): Integer;<br>
+  TStrCompare = <b>function</b> (<b>const</b> Obj, Obj2: <b>string</b>): Integer;<br>
+  TCompare = <b>function</b> (Obj1, Obj2: TObject): Integer;<br>
+	<br>
+	<b>function</b> CountObject(First: IIntfIterator; Count: Integer; AObject: IInterface; AComparator: TIntfCompare): Integer; <b>overload</b>;<br>
+	<b>function</b> CountObject(First: IStrIterator; Count: Integer; <b>const</b> AObject: <b>string</b>; AComparator: TStrCompare): Integer; <b>overload</b>;<br>
+	<b>function</b> CountObject(First: IIterator; Count: Integer; AObject: TObject; AComparator: TCompare): Integer; <b>overload</b>;<br>
+</code>
+
+<h3>Description</h3>
+<p>Find and count all objects that the function <i>AComparator</i> return 0 with <i>AObject</i>.</p>
+<p>The algorithm treats <i>Count</i> objects from <i>First</i>.</p>
+<p>The algorithm return the number of objects found.</p>
+<p>The callback function <i>AComparator</i> must be return 0 when the 2 objects are equal.</p>
+
+<h2>Copy</h2>
+<h3>Prototypes</h3>
+<code>
+	<b>procedure</b> Copy(First: IIntfIterator; Count: Integer; Output: IIntfIterator); <b>overload</b>;<br>
+	<b>procedure</b> Copy(First: IStrIterator; Count: Integer; Output: IStrIterator); <b>overload</b>;<br>
+	<b>procedure</b> Copy(First: IIterator; Count: Integer; Output: IIterator); <b>overload</b>;<br>
+</code>
+
+<h3>Description</h3>
+<p>Copy <i>Count</i> objects from <i>First</i> to <i>Output</i>.</p>
+<p>The elements in the <i>Output</i> must be exist. The algorithm does not create them.</p>
+
+<h2>Generate</h2>
+<h3>Prototypes</h3>
+<code>
+	<b>procedure</b> Generate(List: IIntfList; Count: Integer; AObject: IInterface); <b>overload</b>;<br>
+	<b>procedure</b> Generate(List: IStrList; Count: Integer; <b>const</b> AObject: <b>string</b>); <b>overload</b>;<br>
+	<b>procedure</b> Generate(List: IList; Count: Integer; AObject: TObject); <b>overload</b>;<br>
+</code>
+
+<h3>Description</h3>
+<p>Add the value <i>AObject</i> in the <i>List</i> <i>Count</i> times.</p>
+<p>The algorithm create new element for each value added.</p>
+
+<h2>Fill</h2>
+<h3>Prototypes</h3>
+<code>
+	<b>procedure</b> Fill(First: IIntfIterator; Count: Integer; AObject: IInterface); <b>overload</b>;<br>
+	<b>procedure</b> Fill(First: IStrIterator; Count: Integer; <b>const</b> AObject: <b>string</b>); <b>overload</b>;<br>
+	<b>procedure</b> Fill(First: IIterator; Count: Integer; AObject: TObject); <b>overload</b>;<br>
+</code>
+
+<h3>Description</h3>
+<p>Fill with the value <i>AObject</i> <i>Count</i> objects from <i>First</i>.</p>
+<p>The elements in the <i>First</i> must be exist. The algorithm does not create them.</p>
+
+<h2>Reverse</h2>
+<h3>Prototypes</h3>
+<code>
+	<b>procedure</b> Reverse(First, Last: IIntfIterator); <b>overload</b>;<br>
+	<b>procedure</b> Reverse(First, Last: IStrIterator); <b>overload</b>;<br>
+	<b>procedure</b> Reverse(First, Last: IIterator); <b>overload</b>;<br>
+</code>
+
+<h3>Description</h3>
+<p>Reverse all objects between <i>First</i> and <i>Last</i>.</p>
+<p>Iterators must be bidirectionnal.</p>
+
+<h2>Sort</h2>
+<h3>Prototypes</h3>
+<code>
+  TIntfSortProc = <b>procedure</b> (AList: IIntfList; L, R: Integer; AComparator: TIntfCompare);<br>
+  TStrSortProc = <b>procedure</b> (AList: IStrList; L, R: Integer; AComparator: TStrCompare);<br>
+  TSortProc = <b>procedure</b> (AList: IList; L, R: Integer; AComparator: TCompare);<br>
+	<br>
+  TIntfCompare = <b>function</b> (Obj1, Obj2: IInterface): Integer;<br>
+  TStrCompare = <b>function</b> (<b>const</b> Obj, Obj2: <b>string</b>): Integer;<br>
+  TCompare = <b>function</b> (Obj1, Obj2: TObject): Integer;<br>
+	<br>
+	<b>procedure</b> Sort(AList: IIntfList; First, Last: Integer; AComparator: TIntfCompare); <b>overload</b>;<br>
+	<b>procedure</b> Sort(AList: IStrList; First, Last: Integer; AComparator: TStrCompare); <b>overload</b>;<br>
+	<b>procedure</b> Sort(AList: IList; First, Last: Integer; AComparator: TCompare); <b>overload</b>;<br>
+</code>
+
+<h3>Description</h3>
+<p>Sort objects in <i>AList</i> from <i>First</i> to <i>Last</i> using <i>AComparator</i> function.</p>
+<p>The callback function <i>AComparator</i> must be return 0 when the 2 objects are equal, a number &gt; 0 if Obj1 &gt; Obj2 and a number &lt; 0 if Obj1 &lt; Obj2.</p>
+<p>The default algorithm used is QuickSort. You can change it by assigning global variables <i>IntfSortProc</i>, <i>StrSortProc</i> and <i>SortProc</i></p>
+
+</body>
+</html>

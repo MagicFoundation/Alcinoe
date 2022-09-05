@@ -1,0 +1,142 @@
+object Form1: TForm1
+  Caption = 'Form1'
+  ClientHeight = 451
+  ClientWidth = 576
+  PixelsPerInch = 96
+  Visible = True
+  HorzScrollBar.Page = 577
+  VertScrollBar.Increment = 45
+  VertScrollBar.Page = 452
+  VertScrollBar.Smooth = True
+  Left = 315
+  Height = 451
+  Top = 366
+  Width = 576
+  object Panel1: TPanel
+    Align = alTop
+    ClientHeight = 41
+    ClientWidth = 576
+    FullRepaint = False
+    TabOrder = 0
+    TabStop = True
+    Height = 41
+    Width = 576
+    object btnConnect: TSpeedButton
+      Caption = 'Connect'
+      NumGlyphs = 0
+      OnClick = SpeedButton1Click
+      Left = 436
+      Height = 22
+      Top = 8
+      Width = 108
+    end
+    object Label1: TLabel
+      Caption = 'DataBase'
+      Left = 16
+      Height = 17
+      Top = 10
+      Width = 65
+    end
+    object edDataBase: TEdit
+      TabOrder = 1
+      Text = '/opt/interbase/examples/employee.gdb'
+      Left = 80
+      Height = 19
+      Top = 8
+      Width = 352
+    end
+  end
+  object Panel2: TPanel
+    Align = alTop
+    BevelOuter = bvNone
+    Caption = 'Panel2'
+    ClientHeight = 87
+    ClientWidth = 576
+    FullRepaint = False
+    TabOrder = 1
+    TabStop = True
+    Height = 87
+    Top = 41
+    Width = 576
+    object Panel3: TPanel
+      Align = alRight
+      ClientHeight = 87
+      ClientWidth = 119
+      FullRepaint = False
+      TabOrder = 0
+      TabStop = True
+      Left = 457
+      Height = 87
+      Width = 119
+      object btnOpen: TButton
+        Caption = 'Open '
+        Enabled = False
+        OnClick = btnOpenClick
+        TabOrder = 0
+        Left = 12
+        Height = 25
+        Top = 17
+        Width = 99
+      end
+    end
+    object moSQL: TMemo
+      Align = alClient
+      TabOrder = 1
+      Height = 87
+      Width = 457
+    end
+  end
+  object SG: TStringGrid
+    Color = clWhite
+    ColCount = 5
+    DefaultColWidth = 64
+    DefaultRowHeight = 24
+    FixedColor = clBtnFace
+    GridLineWidth = 0
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goSmoothScroll]
+    RowCount = 5
+    ScrollBars = ssAutoBoth
+    TabOrder = 2
+    TabStop = True
+    VisibleColCount = 4
+    VisibleRowCount = 4
+    Height = 323
+    Top = 128
+    Width = 576
+    Cells = (
+      0
+    )
+  end
+  object UIBBase: TUIBDataBase
+    Params.Strings = (
+      'sql_dialect=3'
+      'lc_ctype=NONE'
+      'password=masterkey'
+      'user_name=SYSDBA'
+    )
+    UserName = 'SYSDBA'
+    PassWord = 'masterkey'
+    LibraryName = 'gds32.dll'
+    left = 152
+    top = 386
+  end
+  object UIBTrs: TUIBTransaction
+    DataBase = UIBBase
+    Options = [tpConcurrency, tpWait, tpWrite, tpReadCommitted]
+    left = 152
+    top = 422
+  end
+  object Qry: TUIBQuery
+    SQL.Strings = (
+      'select'
+      '*'
+      'from'
+      'street'
+      'where'
+      'street_id = :street_id2'
+    )
+    Transaction = UIBTrs
+    left = 152
+    top = 456
+  end
+end

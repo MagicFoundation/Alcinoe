@@ -1,0 +1,5 @@
+USEUNIT("..\..\experts\debug\threadnames\ThreadExpertSharedNames.pas");
+USEUNIT("..\..\experts\debug\threadnames\ThreadExpertUnit.pas");
+USEDEF("JclThreadNameExpertDLL.def");
+Project file
+DllEntryPoint

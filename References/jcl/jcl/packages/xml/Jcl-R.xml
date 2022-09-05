@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="no"?>
+<Package Name="Jcl" Design="0">
+  <Description>JEDI Code Library RTL package</Description>
+  <GUID>{44DB645B-C167-410D-9334-38AF9F0C7913}</GUID>
+  <Properties>
+    <Property Name="C6PFlags" Value=""/>
+    <Property Name="C6Libs" Value=""/>
+    <Property Name="CompilerDefines" Value="RELEASE"/>
+    <Property Name="ImageBase" Value="48000000"/>
+    <Property Name="VersionMajorNumber" Value=""/>
+    <Property Name="VersionMinorNumber" Value=""/>
+    <Property Name="ReleaseNumber" Value=""/>
+  </Properties>
+  <Platforms>
+    <Platform Name="Win32" Condition=""/>
+    <Platform Name="Win64" Condition=""/>
+  </Platforms>
+  <Requires>
+    <Package Name="rtl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="FCL" Targets="fpc" Condition=""/>
+    <Package Name="..\..\..\help\VCL" Targets="help" Condition=""/>
+    <Package Name="..\..\..\help\JEDI" Targets="help" Condition=""/>
+  </Requires>
+  <Contains>
+    <File Name="..\..\source\include\crossplatform.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcl.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jclc6.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jclcs1.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld6.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld7.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld8.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld9.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld10.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld11.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld12.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld14.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld15.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld16.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jclfpc.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\unixonly.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\windowsonly.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\common\bzip2.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\Jcl8087.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclAnsiStrings.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclBase.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclCharsets.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclComplex.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclCompression.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclCounter.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclDateTime.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclFileUtils.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclIniFiles.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclLogic.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclMath.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclMIDI.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclMime.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclNotify.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclPCRE.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclResources.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclRTTI.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclSchedule.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclSimpleXml.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclStatistics.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclStreams.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclStringConversions.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclStringLists.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclStrings.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclSynch.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclSysInfo.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclSysUtils.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclUnicode.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclUnitConv.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclUnitVersioning.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclUnitVersioningProviders.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclValidation.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclWideStrings.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\pcre.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\zlibh.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\include\crossplatform.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcl.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jclc6.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jclcs1.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld6.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld7.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld8.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld9.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld10.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld11.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld12.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld14.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld15.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jcld16.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\jclfpc.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\unixonly.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\include\windowsonly.inc" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\Hardlinks.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclAppInst.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclCIL.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclCLR.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclCOM.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclConsole.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclCppException.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclDebug.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclDebugSerialization.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclDebugXMLDeserializer.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclDebugXMLSerializer.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclDotNet.pas" Targets="Pascal,BCB" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclHookExcept.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclLANMan.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclLocales.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclMapi.pas" Targets="help,Delphi,BCB" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclMetadata.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclMiscel.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclMsdosSys.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclMultimedia.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclNTFS.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclPeImage.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclRegistry.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclSecurity.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclShell.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclStructStorage.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclSvcCtrl.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclTask.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclTD32.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclTimeZones.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclWin32.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclWin32Ex.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\JclWinMIDI.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\mscoree_TLB.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\mscorlib_TLB.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\MSTask.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\sevenzip.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\source\windows\Snmp.pas" Targets="Windows" Formname="" Condition=""/>
+    <File Name="..\..\..\help\8087.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\AppInst.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Base.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Com.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Common.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Complex.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Counter.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\CppExceptions.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\DateTime.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Debug.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\FileUtils.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Hardlinks.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\IncludedFiles.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\IniFiles.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Jcl.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\LANMan.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Locales.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Logic.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Mapi.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Math.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Midi.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Mime.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Miscel.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Multimedia.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Notify.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\NTFS.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\pcre.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\PE.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Registry.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\RTTI.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Schedule.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Security.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Shell.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Statistics.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Streams.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Strings.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\SvcCtrl.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Synch.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\SysInfo.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\SysUtils.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Unicode.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\UnitConv.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\WideStrings.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Win32.dtx" Targets="help" Formname="" Condition=""/>
+  </Contains>
+</Package>

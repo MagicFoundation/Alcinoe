@@ -1,0 +1,53 @@
+object Form_Main: TForm_Main
+  Left = 394
+  Height = 396
+  Top = 139
+  Width = 657
+  Caption = 'Lazarus SQLite Example'
+  ClientHeight = 396
+  ClientWidth = 657
+  Position = poScreenCenter
+  LCLVersion = '1.0.12.0'
+  object Memo_Result: TMemo
+    Left = 154
+    Height = 396
+    Top = 0
+    Width = 503
+    Align = alClient
+    BorderStyle = bsNone
+    Color = 4207920
+    Font.Color = 16773344
+    ParentFont = False
+    ScrollBars = ssVertical
+    TabOrder = 0
+  end
+  object Panel_Actions: TPanel
+    Left = 0
+    Height = 396
+    Top = 0
+    Width = 154
+    Align = alLeft
+    BevelOuter = bvNone
+    ClientHeight = 396
+    ClientWidth = 154
+    TabOrder = 1
+    object Button_DB_Read: TButton
+      Left = 8
+      Height = 33
+      Top = 48
+      Width = 136
+      Caption = 'Read Database'
+      OnClick = Button_DB_ReadClick
+      TabOrder = 0
+    end
+    object Button_DB_Create: TButton
+      Left = 8
+      Height = 33
+      Top = 8
+      Width = 136
+      Caption = 'Create Database'
+      OnClick = Button_DB_CreateClick
+      TabOrder = 1
+    end
+  end
+end

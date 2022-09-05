@@ -1,0 +1,1120 @@
+@@MemoryClassesandObjects.ClassManipulation
+<GROUP MemoryClassesandObjects>
+<TITLE Class Manipulation>
+<TOPICORDER 100>
+--------------------------------------------------------------------------------
+@@MemoryClassesandObjects.ClassManipulation.DMT
+<GROUP MemoryClassesandObjects.ClassManipulation>
+<TITLE DMT>
+<TOPICORDER 100>
+--------------------------------------------------------------------------------
+@@MemoryClassesandObjects.ClassManipulation.Miscellanuous
+<GROUP MemoryClassesandObjects.ClassManipulation>
+<TITLE Miscellanuous>
+<TOPICORDER 200>
+--------------------------------------------------------------------------------
+@@MemoryClassesandObjects.ClassManipulation.VMT
+<GROUP MemoryClassesandObjects.ClassManipulation>
+<TITLE VMT>
+<TOPICORDER 300>
+--------------------------------------------------------------------------------
+@@MemoryClassesandObjects.Guards
+<GROUP MemoryClassesandObjects>
+<TITLE Guards>
+<TOPICORDER 200>
+--------------------------------------------------------------------------------
+@@MemoryClassesandObjects.Guards.IMultiSafeGuard
+<GROUP MemoryClassesandObjects.Guards>
+<TITLE IMultiSafeGuard>
+<TOPICORDER 100>
+--------------------------------------------------------------------------------
+@@MemoryClassesandObjects.Guards.ISafeGuard
+<GROUP MemoryClassesandObjects.Guards>
+<TITLE ISafeGuard>
+<TOPICORDER 200>
+--------------------------------------------------------------------------------
+@@MemoryClassesandObjects.Miscellanuous
+<GROUP MemoryClassesandObjects>
+<TITLE Miscellanuous>
+<TOPICORDER 300>
+--------------------------------------------------------------------------------
+@@MemoryClassesandObjects.Pointermanipulation
+<GROUP MemoryClassesandObjects>
+<TITLE Pointer manipulation>
+<TOPICORDER 400>
+--------------------------------------------------------------------------------
+@@PWideCharOrNil
+<GROUP BaseServices.Pointermanipulation>
+Summary:
+  Explicit replacement for PWideChar typecast.
+Description:
+  PWideCharOrNil returns a pointer to the first character of the specified string
+  or nil of the string is empty. This is identical to simply typecasting to
+  PWideChar except that this function makes the behaviour of the typecast explicit
+   (and independent of the compiler).
+Parameters:
+  S - The string for which to return a PWideChar.
+Result:
+  If the specified string is empty the funtion returns nil, otherwise it returns
+  a pointer to the first character of the string.
+See also:
+  PCharOrNil
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@PCharOrNil
+<GROUP BaseServices.Pointermanipulation>
+Summary:
+  Explicit replacement for PChar typecast.
+Description:
+  PCharOrNil returns a pointer to the first character of the specified string or
+  nil if the string is empty. This is identical to simply typecasting to PChar
+  except that this function makes the behaviour of the typecast explicit (and
+  independent of the compiler).
+Parameters:
+  S - The string for which to return a PChar.
+Result:
+  If the specified string is empty the funtion returns nil, otherwise it returns
+  a pointer to the first character of the string.
+See also:
+  PWideCharOrNil
+Donator:
+  Petr Vones
+--------------------------------------------------------------------------------
+@@IntToStrZeroPad
+<GROUP BaseServices.Numericformattingroutines>
+Summary:
+  Converts an integer to a string an left pads it with zero's.
+Description:
+  IntToStrZeroPad converts the specified integer value to a string containing the
+  decimal representation of that number and left pads it with zero's if the
+  resulting string is less than the specified number of characters.
+Parameters:
+  Value - The integer value to convert to a string.
+  Count - The number of characters in the resulting string. If the string is less than the specified number, the string is left padded with zero's until the string is the specified number of characters long.
+Result:
+  The string representation of the specified integer value, left padded with zero's.
+  I don't know of any input that can cause this function to fail, but in the
+  unlikely event that it does, it does so by raising an exception.
+Donator:
+  Anthony Steele
+--------------------------------------------------------------------------------
+@@Iff
+<GROUP BaseServices>
+Summary:
+  Replacement for the C++ ternary conditional operator.
+Description:
+  Iff is a replacement for the C/C++ ternary conditional operator ?:. It evaluates
+  the specified boolean expression and depending on the outcome returns either
+  the specified TruePart or FalsePart parameter.
+  The difference to the C/C++ operator is that both expressions are evaluated.
+Parameters:
+  Condition - The expression which determines which of the other parameters is returned as the function result.
+  TruePart - The function result if Condition evaluates to True.
+  FalsePart - The function result if Condition evaluates to False.
+Result:
+  If Condition evaluates to True TruePart is returned, otherwise FalsePart is returned.
+Donator:
+  Bernhard Berger
+--------------------------------------------------------------------------------
+@@SizeOfMem
+<GROUP MemoryClassesandObjects.Pointermanipulation>
+Summary:
+  Returns the size of a memory block given a pointer.
+Description:
+  SizeOfMem returns the size of the memory block pointed to by the specified pointer.
+  This routine depends on information peeked from the standard Delphi memory manager
+  implemention (in GetMem.inc) and will not work when a custom memory manager
+  replacement is in use. Also, it will only work for memory allocated using the
+  AllocMem, GetMem and New routines; that is, using the Delphi memory manager.
+Parameters:
+  P - Pointer to the memory block whose size to retrieve.
+Result:
+  The total size of the memory block pointed to by P. Note that the current
+  implementation uses a 4 byte header to store some additonal information (such as
+  the size) about the memory block. These 4 bytes are included in the result. To get
+  the size of the block available to the user (the size specified when the block
+  was allocated) simply subtract 4. If the function fails to determine the size of
+  the memory, for example because it detected that the Delphi memory manager was
+  replaced by a custom memory manager, it returns -1.
+Donator:
+  Robert R. Marsh
+--------------------------------------------------------------------------------
+@@FreeAndNil
+<GROUP MemoryClassesandObjects.Pointermanipulation>
+Summary:
+  Frees an object reference and replaces it with nil.
+Description:
+  FreeAndNil frees the object instance pointed to by Obj and replaces the reference
+  with nil. This ensures that the reference is nil after the object has been
+  destroyed and helps debugging. Do not use this routine on objects or generic
+  pointers which are not TObject descendants. For generic pointers you can use
+  the FreeMemAndNil procedure.
+Parameters:
+  Obj - Reference to an instance of a TObject descendant to free. Upon return the Obj variable has been reset to nil so future references ensure a relatively easy to understand access violation.
+See also:
+  FreeMemAndNil
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@FreeMemAndNil
+<GROUP MemoryClassesandObjects.Pointermanipulation>
+Summary:
+  Frees a block of memory and sets the reference to nil.
+Description:
+  FreeMemAndNil frees the memory pointed to by P and replaces the reference
+  with nil. This ensures that the reference is nil after the memory has been
+  released and helps debugging. Do not use this routine on objects or TObject
+  descendants. For TObject (descendants) you can use the FreeAndNil procedure.
+Parameters:
+  P - Reference to the memory block to release. Upon return the P variable has been reset to nil so future references ensure a relatively easy to understand access violation.
+See also:
+  FreeAndNil
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GetAndFillMem
+<GROUP MemoryClassesandObjects.Pointermanipulation>
+Summary:
+  Allocates memory and fills it with the specified value.
+Description:
+  GetAndFillMem allocates a block of memory from the heap of the specified size
+  and fills each byte in that block with the specified value.
+Parameters:
+  P - Receives a pointer to the allocated memory block.
+  Size - Size, in bytes, of the block of memory to allocate.
+  Value - Value with which to fill the memory block.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GetVirtualMethodCount
+<GROUP MemoryClassesandObjects.ClassManipulation.VMT>
+Summary:
+  Returns the number of virtual methods of a class.
+Description:
+  GetVirtualMethodCount returns the number of virtual methods of the specified
+  class. This includes the methods declared in the class itself and all its
+  parent classes. However, the result does not include the virtual methods declared
+  in TObject. The result includes all abstract methods.
+Parameters:
+  AClass - The class for which to get the number of virtual methods.
+Result:
+  The number of virtual methods of the given class.
+See also:
+  GetVirtualMethod
+  SetVirtualMethod
+Donator:
+  Python
+--------------------------------------------------------------------------------
+@@GetVirtualMethod
+<GROUP MemoryClassesandObjects.ClassManipulation.VMT>
+Summary:
+  Returns a pointer to the virtual method from the specified class with the given index.
+Description:
+  Returns the virtual method from the specified class with the given index. There
+  is no checking performed that the given index actually is a virtual method, and the
+  return value is undefined for invalid indices.
+Parameters:
+  AClass - The class for which to get a virtual method.
+  Index - The index of the virtual method to be retrieved. If the index is invalid the result is undefined. Valid indices are 0 to GetVirtualMethodCount - 1.
+Result:
+  The result is a pointer to the virtual method. If the method is an abstract
+  method the value returned is a pointer to System._AbstractError.
+See also:
+  GetVirtualMethodCount
+  SetVirtualMethod
+Donator:
+  Python
+--------------------------------------------------------------------------------
+@@SetVirtualMethod
+<GROUP MemoryClassesandObjects.ClassManipulation.VMT>
+Summary:
+  Changes a virtual method to the given method.
+Description:
+  Changes a virtual method to the given method. Do NOT
+  use this function. There should be no need to use this function
+  unless your implementing a very dirty hack. There is no checking
+  performed that the Index is a valid virtual method index. The function only
+  changes the pointer in the VMT of the specified class, not the static references
+  to this method, which are made when an anchestor uses inherited to call the virtual
+  method. This procedure changes the executable code (with the risk of completly
+  destroying your application) and uses WriteProcessMemory to accomplish that.
+  The function is multiprocessor safe.
+Parameters:
+  AClass - The class for which to set a virtual method.
+  Index - The index of the virtual method to be set.
+  Method - The new address of the virtual method.
+See also:
+  GetVirtualMethodCount
+  GetVirtualMethod
+Donator:
+  Python
+--------------------------------------------------------------------------------
+@@GetDynamicMethodCount
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+Summary:
+  Returns the number of dynamic methods of a class.
+Description:
+  GetDynamicMethodCount returns the number of dynamic methods for the specified
+  class (including abstract methods). This only includes dynamic methods declared
+  in the class itself, not the methods delcared in ancestor classes.
+Parameters:
+  AClass - The class for which to get the number of dynamic methods.
+Result:
+  The number of dynamic methods of the specified class.
+Donator:
+  Python
+--------------------------------------------------------------------------------
+@@GetDynamicIndexList
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+Summary:
+  Returns the list of indices of the dynamic methods.
+Description:
+  Returns the list of indices for the dynamic methods, not including the indices
+  of the dynamic methods from inherited classes.
+  Use this list in combination with GetDynamicAddressList
+  and GetDynamicMethodCount to get all dynamic methods with their indices.
+  The number of entries in the returned array that contain meaningful data is
+  returned by GetDynamicMethodCount. The returned pointer points directly
+  into the class structure and should not be modified.
+Parameters:
+  AClass - The class for which to get dynamic method index list.
+Result:
+  Pointer to an array containing the indices. Do not modify this array!
+See also:
+  TDynamicIndexList
+Donator:
+  Python
+--------------------------------------------------------------------------------
+@@TDynamicIndexList
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+Summary:
+  List of valid indices in a dynamic method table.
+Description:
+  List of indices of valid entries in a dynamic method table. Use GetDynamicMethodCount
+  to get the count of valid entries in this list.
+Donator:
+  Python
+@@PDynamicIndexList
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+<COMBINE TDynamicIndexList>
+--------------------------------------------------------------------------------
+@@GetDynamicAddressList
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+Summary:
+  Returns the list of addresses for the dynamic methods of a class.
+Description:
+  Returns the list of addresses for the dynamic methods of the specified class.
+  Use this list in combination with GetDynamicIndexList
+  and GetDynamicMethodCount to get all dynamic methods and their indices.
+  The number of entries in the returned array that contain meaningful data is
+  returned by GetDynamicMethodCount. The returned pointer points directly into
+  the class structure and should not be modified.
+Parameters:
+  AClass - The class for which to get dynamic method address list.
+Result:
+  Pointer to an array containing the addresses. Do not modify this array!
+See also:
+  TDynamicAddressList
+Donator:
+  Python
+--------------------------------------------------------------------------------
+@@TDynamicAddressList
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+Summary:
+  List of addresses of a dynamic methods
+Description:
+  List of addresses of the dynamic methods, use GetDynamicMethodCount
+  to get the indices of valid entries in the list.
+Donator:
+  Python
+@@PDynamicAddressList
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+<COMBINE TDynamicAddressList>
+--------------------------------------------------------------------------------
+@@HasDynamicMethod
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+Summary:
+  Test if the class (or one of its ancestors) has a dynamic method with the given index.
+Description:
+  Test if the class (or one of its ancestors) has a dynamic method with the given index.
+Parameters:
+  AClass - The class for which to test for the dynamic method.
+  Index - The index for which to test.
+Result:
+  If the class contains a dynamic method with the given index the result is True,
+  otherwise the result is False.
+Donator:
+  Python
+--------------------------------------------------------------------------------
+@@GetDynamicMethod
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+Summary:
+  Returns a pointer to a specific dynamic method.
+Description:
+  Returns (the most recent version of) the dynamic method with the given index.
+  If there is no dynamic method with the given index an abstract error will be
+  raised, however, if the dynamic method is an abstract method,
+  System._AbstractError is returned.
+Parameters:
+  AClass - The class for which to get the dynamic method.
+  Index - The index for which to get.
+Result:
+  Returns a pointer to the dynamic method, or System._AbstractError if the
+  dynamic method is an abstract method.
+Donator:
+  Python
+--------------------------------------------------------------------------------
+@@GetInitTable
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+Summary:
+  Returns the initialization table of a class.
+Description:
+  GetInitTable returns the initialization table of the specified class.
+  TODO This is abracadabra to me :-) Need to contact author for further explanation
+  about this (eg what does the init table look like).
+  The initialization table is a record type info, from which the size is set to zero, but
+  still has info about the fields which needs to be initialized, but only for
+  the fields not already existing in an inherited class. It is used when a new
+  object is created to initialize its fields.
+Parameters:
+  AClass - The class for which to get the initialization table.
+Result:
+  The result is a pointer to the initialization table. Do not modify this structure!
+Donator:
+  Python
+--------------------------------------------------------------------------------
+@@GetFieldTable
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+Summary:
+  Returns the field table of a class.
+Description:
+  GetFieldTable returns a pointer to the field table of the specified class.
+  A field table contains information about the published fields in a class.
+Parameters:
+  AClass - The class for which to retrieve the field table.
+Result:
+  Pointer to the field table. Do not modify this structure!
+See also:
+  TFieldTable
+Donator:
+  Python
+--------------------------------------------------------------------------------
+@@TFieldTable
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+Summary:
+  TODO
+Description:
+  TODO
+Donator:
+  Python
+@@TFieldTable.EntryCount
+  Number of entries in the field table.
+@@TFieldTable.FieldClassTable
+  Table with classes, used by the entries IDX property.
+@@TFieldTable.FirstEntry
+  First entry (if it exists), this is a variable length structure.
+@@PFieldTable
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+<COMBINE TFieldTable>
+--------------------------------------------------------------------------------
+@@TFieldClassTable
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+Summary:
+  List of classes used by the fields entries.
+Description:
+  List of classes used by the fields entries.
+See also:
+  TFieldEntry
+Donator:
+  Python
+@@TFieldClassTable.Count
+  Number of classes in the Classes array.
+@@TFieldClassTable.Classes
+  Array of classes. The highest valid index in this array is Count - 1.
+@@PFieldClassTable
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+<COMBINE TFieldClassTable>
+--------------------------------------------------------------------------------
+@@TFieldEntry
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+Summary:
+  TFieldEntry contains information about a field of a class.
+Description:
+  TFieldEntry contains information about a field of a class.
+Donator:
+  Python
+@@TFieldEntry.OffSet
+  OffSet of the field. TODO relative to what?
+@@TFieldEntry.IDX
+  Index for the classtype in the class list.
+@@TFieldEntry.Name
+  Name of the field.
+@@PFieldEntry
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+<COMBINE TFieldEntry>
+--------------------------------------------------------------------------------
+@@GetMethodTable
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+Summary:
+  Returns the method table of a class.
+Description:
+  GetMethodTable returns a pointer to the method table of the specified class.
+  The method table contains information about the published methods declared in the
+  class.
+Parameters:
+  AClass - The class for which to retrieve the method table.
+Result:
+  Pointer to the method table. Do not modify this structure!
+See also:
+  TMethodTable
+Donator:
+  Python
+--------------------------------------------------------------------------------
+@@TMethodTable
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+Summary:
+  Structure for the Method Table
+Description:
+  Method Table Structure. Gives a description of method, with Count the number
+  of methods, followed by count numbers of a variable length structure for each
+  entry.
+See also:
+  GetMethodTable
+  GetMethodEntry
+  TMethodEntry
+Donator:
+  Python
+@@TMethodTable.Count
+  Number of TMethodEntries after count.
+@@TMethodTable.FirstEntry
+  First entry (if exists) of the method entries.
+@@PMethodTable
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+<COMBINE TMethodTable>
+--------------------------------------------------------------------------------
+@@GetMethodEntry
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+Summary:
+  Returns an entry from the method table.
+Description:
+  GetMethodEntry returns the entry with the given index from the method table.
+  There is no checking performed that the given Index is valid.
+Parameters:
+  MethodTable - The method table to get the entry from
+  Index - The index of the entry to retrieve.
+Result:
+  Pointer to the method table entry from the method table with
+  the given index. Do not modify this structure!
+See also:
+  TMethodEntry
+  GetMethodTable
+Donator:
+  Python
+--------------------------------------------------------------------------------
+@@TMethodEntry
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+Summary:
+  Entry of a method table use by TMethodTable.
+Description:
+  Entry of a method table use by TMethodTable.
+Donator:
+  Python
+@@TMethodEntry.EntrySize
+  Size of the TMethodEntry. Use this to go to the next MethodEntry.
+@@TMethodEntry.Address
+  Pointer to the method.
+@@TMethodEntry.Name
+  Name of the method.
+@@PMethodEntry
+<GROUP MemoryClassesandObjects.ClassManipulation.DMT>
+<COMBINE TMethodEntry>
+--------------------------------------------------------------------------------
+@@SetClassParent
+<GROUP MemoryClassesandObjects.ClassManipulation.Miscellanuous>
+Summary:
+  Modifies the class parent for the given class.
+Description:
+  Changes the parent of AClass to become NewClassParent.
+  Do NOT use this function. There should be
+  no need to use this function unless you are implementing a very dirty hack.
+  This procedure changes the executable code (with the risk of completly destroying
+  your application) and uses WriteProcessMemory for this.
+  The function is multiprocessor safe.
+Parameters:
+  AClass - The class whose parent to change.
+  NewClassParent - The new parent for AClass.
+See also:
+  GetClassParent
+Donator:
+  Python
+--------------------------------------------------------------------------------
+@@GetClassParent
+<GROUP MemoryClassesandObjects.ClassManipulation.Miscellanuous>
+Summary:
+  Returns the parent of the class.
+Description:
+  Returns the parent class of the given class. That is, it returns the type of the
+  immediate ancestor of the specified class. This is the same as TObject.ClassParent.
+Parameters:
+  AClass - The class for which to retrieve the parent class.
+Result:
+  The parent class (type of the immediate ancestor) of the specified class or nil
+  of the specified class is TObject.
+See also:
+  SetClassParent
+Donator:
+  Python
+--------------------------------------------------------------------------------
+@@IsClass
+<GROUP MemoryClassesandObjects.ClassManipulation.Miscellanuous>
+Summary:
+  Returns whether a pointer points to a class.
+Description:
+  IsClass tests whether the specified pointer points to a class. Currently the
+  implementation only test whether the Self pointer actually points to the class itself.
+Parameters:
+  Address - The address to test. Note that this should be the equivalent of Obj.ClassType where Obj is an instance of TObject or descendant class.
+Result:
+  The result is True if the Address is a class otherwise it is False.
+See also:
+  IsObject
+Donator:
+  Python
+--------------------------------------------------------------------------------
+@@IsObject
+<GROUP MemoryClassesandObjects.ClassManipulation.Miscellanuous>
+Summary:
+  Returns whether a pointer points to an object.
+Description:
+  IsObject tests whether the specified pointer points to an object. Currently the
+  implementation only test whether the Self pointer actually points to the object itself.
+Parameters:
+  Address - The address to test. Note that this should be a TObject or TObject descendant.
+Result:
+  The result is True if the Address is an object otherwise it is False.
+See also:
+  IsClass
+Donator:
+  Python
+--------------------------------------------------------------------------------
+@@ISafeGuard
+<GROUP MemoryClassesandObjects.Guards.ISafeGuard>
+Summary:
+  Interface used to provide automatic resource destruction.
+Description:
+  ISafeGuard is the interface used by the Guard functions to provide automatic
+  resource destruction. A safeguard is an interface which gets associated with the
+  resource and ensures that when execution leaves the scope at which the safeguard
+  variable is declared, the resource is released (e.g. memory freed or object destroyed).
+  Since a safeguard is an interface and Delphi ensures that interfaces are released
+  even when an exception is raised, you can use a safeguard to ensure that a resource
+  always gets freed without having to explicitly code it. For example: 
+
+   var
+     SafeGuard: ISafeGuard;
+     Strings: TStrings;
+   begin
+     Strings := TStrings(Guard(TStringList.Create, SafeGuard));
+     String.ReadFromFile('d:\delphi\jcl\source\JclBase.pas');
+     // code to manipulate strings goes here
+     Strings.SaveToFile('d:\delphi\jcl\source\JclBase.pas');
+   end;
+   
+  In the above code, the TStrings object is associated with the SafeGuard. No matter
+  how the function terminates, the safeguard ensures that the TStrings object is
+  destroyed. Usually you will simply store the returned safeguard interface pointer
+  in a variable at the appropriate scope and forget about it. However, the ISafeGuard
+  interface does provide some additional functionality which may be useful at times.
+See also:
+  Guard
+  GuardGetMem
+  GuardAllocMem
+Donator:
+  Rudy Velthuis
+--------------------------------------------------------------------------------
+@@ISafeGuard.ReleaseItem
+Summary:
+  Disassociates the resource from the safeguard.
+Description:
+  ReleaseItem returns a pointer to the associated resource and then disassociates it
+  with the safeguard. This means that when execution leaves the scope in which
+  the interface variable is declared, the resource will not be automatically freed.
+  By using ReleaseItem you are handed back the responsibility to explicitly release
+  the resource.
+Result:
+  Pointer to the resource associated with the safeguard.
+Donator:
+  Rudy Velthuis
+--------------------------------------------------------------------------------
+@@ISafeGuard.GetItem
+Summary:
+  Returns a pointer to the resource associated with the safeguard.
+Description:
+  The GetItem method returns a pointer to the resource associated with the safeguard.
+  Usually you will hold on to this pointer when you associated it with the safeguard,
+  however you can use the safeguard as the storage for the resource pointer itself.
+Result:
+  Pointer to the resource associated with the safeguard.
+Donator:
+  Rudy Velthuis
+--------------------------------------------------------------------------------
+@@ISafeGuard.FreeItem
+Summary:
+  Frees the memory of the associated resource.
+Description:
+  The FreeItem method frees the resource associated with the safeguard. You should
+  never call this method directly, it is called automatically when execution leaves
+  the scope in which the interface variable is declared.
+Donator:
+  Rudy Velthuis
+--------------------------------------------------------------------------------
+@@ISafeGuard.Item
+Summary:
+  Returns a pointer to the protected resource.
+Description:
+  The Item property returns a pointer to the associated resource protected by the
+  safeguard. You'll have to cast the pointer to the appropriate type.
+Donator:
+  Rudy Velthuis
+--------------------------------------------------------------------------------
+@@IMultiSafeGuard
+<GROUP MemoryClassesandObjects.Guards.IMultiSafeGuard>
+Summary:
+  Interface used to provide automatic resource destruction for multiple resources.
+Description:
+  IMultiSafeGuard is the interface used by the Guard functions to provide automatic
+  resource destruction for multiple resources. A safeguard is an interface which gets
+  associated with the resources and ensures that when execution leaves the scope at
+  which the safeguard variable is declared, the resources are released (e.g. memory
+  freed or objects destroyed). Since a safeguard is an interface and Delphi ensures
+  that interfaces are released even when an exception is raised, you can use a
+  safeguard to ensure that a resource always gets freed without having to explicitly
+  code it. For example: 
+
+   var
+     SafeGuard: IMultiSafeGuard;
+     O1, O2: TObject;
+   begin
+     O1 := Guard(TObject.Create, SafeGuard);
+     O2 := Guard(TObject.Create, SafeGuard);
+     // use O1 and O2 here
+   end;
+   
+  In the above code, the objects are associated with the SafeGuard. No matter
+  how the function terminates, the safeguard ensures that the objects are
+  destroyed. Usually you will simply store the returned safeguard interface pointer
+  in a variable at the appropriate scope and forget about it. However, the ISafeGuard
+  interface does provide some additional functionality which may be useful at times.
+Notes:
+  You can use IMultiSafeGuard to guard multiple memory allocations or multiple objects. However, a single IMultiSafeGuard interface can only store one or the other, you can not mix memory and objects in a single IMultiSafeGuard.
+See also:
+  Guard
+  ISafeGuard
+Donator:
+  Team JEDI
+--------------------------------------------------------------------------------
+@@IMultiSafeGuard.ReleaseItem
+Summary:
+  Disassociates the resource from the safeguard.
+Description:
+  ReleaseItem returns a pointer to the associated resource and then disassociates it
+  with the safeguard. This means that when execution leaves the scope in which
+  the interface variable is declared, the resource will not be automatically freed.
+  By using ReleaseItem you are handed back the responsibility to explicitly release
+  the resource.
+Result:
+  Pointer to the resource associated with the safeguard.
+Donator:
+  Team JEDI
+--------------------------------------------------------------------------------
+@@IMultiSafeGuard.GetItem
+Summary:
+  Returns a pointer to the resource associated with the safeguard.
+Description:
+  The GetItem method returns a pointer to the resource associated with the safeguard.
+  Usually you will hold on to this pointer when you associated it with the safeguard,
+  however you can use the safeguard as the storage for the resource pointer itself.
+Result:
+  Pointer to the resource associated with the safeguard.
+Donator:
+  Team JEDI
+--------------------------------------------------------------------------------
+@@IMultiSafeGuard.FreeItem
+Summary:
+  Frees the memory of the associated resource.
+Description:
+  The FreeItem method frees the resource associated with the safeguard. You should
+  never call this method directly, it is called automatically when execution leaves
+  the scope in which the interface variable is declared.
+Donator:
+  Team JEDI
+--------------------------------------------------------------------------------
+@@IMultiSafeGuard.Count
+Summary:
+  Returns the number of items guarded by the interface.
+Description:
+  The Count property returns the number of items guarded by the interface.
+Donator:
+  Team JEDI
+--------------------------------------------------------------------------------
+@@IMultiSafeGuard.Items
+Summary:
+  Returns a pointer to the protected resource.
+Description:
+  The Items property provides zero-based indexed access to the items guarded by the
+  interface. The total numer of items can be learned from the Count property.
+  You'll have to cast the pointer to the appropriate type.
+Donator:
+  Team JEDI
+--------------------------------------------------------------------------------
+@@Guard
+<GROUP MemoryClassesandObjects.Guards>
+Summary:
+  Associates a resource, pointer or object reference, with a safeguard.
+Description:
+  Associates a resource, pointer or object reference, with a safeguard. A safeguard
+  is an interface which gets associated with the resource and ensures that when
+  execution leaves the scope at which the safeguard variable is declared, the
+  resource is released (e.g. memory freed or object destroyed). Since a safeguard is
+  an interface and Delphi ensures that interfaces are released even when an exception
+  is raised, you can use a safeguard to ensure that a resource always gets freed
+  without having to explicitly code it. For example: 
+
+   var
+     SafeGuard: ISafeGuard;
+     Strings: TStrings;
+   begin
+     Strings := TStrings(Guard(TStringList.Create, SafeGuard));
+     String.ReadFromFile('d:\delphi\jcl\source\JclBase.pas');
+     // code to manipulate strings goes here
+     Strings.SaveToFile('d:\delphi\jcl\source\JclBase.pas');
+   end;
+   
+  In the above code, the TStrings object is associated with the SafeGuard. No matter
+  how the function terminates, the safeguard ensures that the TStrings object is
+  destroyed. Usually you will simply store the returned safeguard interface pointer
+  in a variable at the appropriate scope and forget about it. However, the ISafeGuard
+  interface does provide some additional functionality which may be useful at times.
+  See the ISafeGuard interface for more information.
+Parameters:
+  Mem - The pointer (or object in the case of the overloaded Guard function) which to associate with the safeguard.
+  SafeGuard - The guard variable to associate the resource with.
+Result:
+  Copy of the Mem (or Obj) parameter. This is merely a convenience which allows
+  you to create the resource embedded inside the function call as demonstrated above.
+See also:
+  GuardGetMem
+  GuardAllocMem
+  ISafeGuard
+Donator:
+  Rudy Velthuis
+--------------------------------------------------------------------------------
+@@GuardGetMem
+<GROUP MemoryClassesandObjects.Guards>
+Summary:
+  Allocates a specified amount of memory and associates it with a safeguard.
+Description:
+  GuardGetMem allocates the specified amount of memory and associates it with a
+  safeguard. A pointer to the allocated memory is returned as the function result.
+  By using GuardGetMem you ensure that no matter how the scope in which the memory
+  is allocated is left (e.g. by an exception or explicit Exit), the memory will be
+  freed. See Guard for a more detailed description.
+Parameters:
+  Size - Size, in bytes, of the memory to allocate. This memory is allocated using the standard GetMem function and as such is uninitialized.
+  SafeGuard - Receives a pointer to the ISafeGuard interface which is associated with the allocated memory.
+Result:
+  Pointer to the block of allocated memory.
+See also:
+  Guard
+  GuardAllocMem
+  ISafeGuard
+Donator:
+  Rudy Velthuis
+--------------------------------------------------------------------------------
+@@GuardAllocMem
+<GROUP MemoryClassesandObjects.Guards>
+Summary:
+  Allocates a specified amount of memory and associates it with a safeguard.
+Description:
+  GuardGetMem allocates the specified amount of memory and associates it with a
+  safeguard. This function is identical to GuardGetMem except that the function
+  uses AllocMem internally, as opposed to GetMem. As such the allocated memory is
+  initialized with all zeros. A pointer to the allocated memory is returned as the
+  function result. By using GuardGetMem you ensure that no matter how the scope in
+  which the memory is allocated is left (e.g. by an exception or explicit Exit), the
+  memory will be freed. See Guard for a more detailed description.
+Parameters:
+  Size - Size, in bytes, of the memory to allocate. This memory is allocated using the standard AllocMem function and as such is initialized to all zeros.
+  SafeGuard - Receives a pointer to the ISafeGuard interface which is associated with the allocated memory.
+Result:
+  Pointer to the block of allocated memory.
+See also:
+  Guard
+  GuardGetMem
+  ISafeGuard
+Donator:
+  Rudy Velthuis
+--------------------------------------------------------------------------------
+@@ClearObjectList
+<GROUP MemoryClassesandObjects.Miscellanuous>
+Summary:
+  Clears the contents of a TList which contains objects.
+Description:
+  ClearObjectList clears the contents of the specified list. The routine assumes that each
+  item in the list is a TObject descendant and frees these objects before removing
+  them from the list. If the list contains items other than TObject descendants,
+  the result is unpredictable (likely an access violation will occur).
+Parameters:
+  List - The list to clear.
+See also:
+  FreeObjectList
+Donator:
+  Heri Bender
+--------------------------------------------------------------------------------
+@@FreeObjectList
+<GROUP MemoryClassesandObjects.Miscellanuous>
+Summary:
+  Clears the contents of a TList which contains objects.
+Description:
+  FreeObjectList clears the contents of the specified list and then frees the list itself.
+  The routine assumes that each item in the list is a TObject descendant and frees
+  these objects before removing them from the list. If the list contains items other
+  than TObject descendants, the result is unpredictable (likely an access violation
+  will occur).
+Parameters:
+  List - The list to free.
+See also:
+  ClearObjectList
+Donator:
+  Heri Bender
+--------------------------------------------------------------------------------
+@@TModuleHandle
+<GROUP BaseServices.Dynamicloading>
+Summary:
+  OS independent type for loaded modules.
+Description:
+  OS independent type for loaded modules.
+Donator:
+  Robert Marquardt
+--------------------------------------------------------------------------------
+@@INVALID_MODULEHANDLE_VALUE
+<GROUP BaseServices.Dynamicloading>
+Summary:
+  OS independent value for variables of type TModuleHandle.
+Description:
+  OS independent value for variables of type TModuleHandle.
+  Denotes that the variable does not contain a valid handle to a module.
+Donator:
+  Robert Marquardt
+--------------------------------------------------------------------------------
+@@LoadModule
+<GROUP BaseServices.Dynamicloading>
+Summary:
+  Loads the dynamic module (DLL) from file FileName.
+Description:
+  The dynamic module (DLL) is loaded into memory and its initialization code
+  is executed. This is an OS independent replacement for LoadLibrary.
+  The function does nothing but reports success if Module is not initialized
+  to INVALID_MODULEHANDLE_VALUE to prevent multiple loads.
+Parameters:
+  Module - Receives the handle of the loaded module.
+  FileName - File name of the module to load.
+Result:
+  The function returns True if the module could be loaded False otherwise.
+See also:
+  LoadModuleEx
+  UnloadModule
+Donator:
+  Robert Marquardt
+--------------------------------------------------------------------------------
+@@LoadModuleEx
+<GROUP BaseServices.Dynamicloading>
+Summary:
+  Loads the dynamic module (DLL) from file FileName.
+Description:
+  The dynamic module (DLL) is loaded into memory and its initialization code
+  is executed if the flags allow that.
+  This is an OS independent replacement for LoadLibraryEx.
+  Flags are OS dependent. For Windows its the flags of LoadLibraryEx.
+  The function does nothing but reports success if Module is not initialized
+  to INVALID_MODULEHANDLE_VALUE to prevent multiple loads.
+Parameters:
+  Module - Receives the handle of the loaded module.
+  FileName - File name of the module to load.
+  Flags - Additional loading flags.
+See also:
+  LoadModule
+  UnloadModule
+Donator:
+  Robert Marquardt
+--------------------------------------------------------------------------------
+@@UnloadModule
+<GROUP BaseServices.Dynamicloading>
+Summary:
+  Unloads a dynamic module (DLL) from memory.
+Description:
+  Unloads a dynamic module (DLL) loaded with LoadModule or
+Parameters:
+  Module - Contains the handle of the module to unload.
+See also:
+  LoadModule
+  LoadModuleEx
+Donator:
+  Robert Marquardt
+--------------------------------------------------------------------------------
+@@GetModuleSymbol
+<GROUP BaseServices.Dynamicloading>
+Summary:
+  Gives access to the exported symbol SymbolName from the loaded module Module.
+Description:
+  Gives access to the exported symbol SymbolName from the loaded module Module.
+  Normally this is the name of an exported function.
+Parameters:
+  Module - Handle to the loaded module.
+  SymbolName - Name of the exported symbol to access.
+Result:
+  The pointer to the exported symbol. Normally this is a "pointer to function"
+  as C calls it. In Pascal its a function type. nil is returned for symbols
+  not contained in the module.
+See also:
+  GetModuleSymbolEx
+Donator:
+  Robert Marquardt
+--------------------------------------------------------------------------------
+@@GetModuleSymbolEx
+<GROUP BaseServices.Dynamicloading>
+Summary:
+  Gives access to the exported symbol SymbolName from the loaded module Module.
+Description:
+  Gives access to the exported symbol SymbolName from the loaded module Module.
+  Normally this is the name of an exported function.
+  Accu is updated by "Accu := Accu and (Result <> nil);". This allows to
+  call GetModuleSymbolEx for many symbols and render a global result for
+  successfully accessing all symbols.
+Parameters:
+  Module - Handle to the loaded module.
+  SymbolName - Name of the exported symbol to access.
+  Accu - Success accumulator to be updated.
+Result:
+  The pointer to the exported symbol. Normally this is a "pointer to function"
+  as C calls it. In Pascal its a function type. nil is returned for symbols
+  not contained in the module and Accu will contain False.
+See also:
+  GetModuleSymbol
+Donator:
+  Robert Marquardt
+--------------------------------------------------------------------------------
+@@ReadModuleData
+<GROUP BaseServices.Dynamicloading>
+Summary:
+  Reads the data of an exported variable.
+Description:
+  ReadModuleData copies the contents of the exported variable SymbolName to
+  Buffer. Size tells the amount of bytes to be copied.
+  This function allows to access variables in dynamic modules which are
+  not directly accessible in Pascal.
+  Beware! You are accessing the DLL memory image directly.
+  Be sure to access a variable not a function and be sure
+  to read the correct amount of data.
+Parameters:
+  Module - Handle to the loaded module.
+  SymbolName - Name of the exported variable to access.
+  Buffer - The untyped destination of the copy.
+  Size - Amount of bytes to copy.
+See also:
+  WriteModuleData
+Donator:
+  Robert Marquardt
+--------------------------------------------------------------------------------
+@@WriteModuleData
+<GROUP BaseServices.Dynamicloading>
+Summary:
+  Writes the data of an exported variable.
+Description:
+  WriteModuleData copies the contents of Buffer to the exported variable SymbolName.
+  Size tells the amount of bytes to be copied.
+  This function allows to set variables in dynamic modules which are
+  not directly accessible in Pascal.
+  BEWARE! You are accessing the DLL memory image directly.
+  Be sure to access a variable not a function and be sure
+  to write the correct amount of data.
+  The changes are not persistent. They get lost when the
+  DLL is unloaded.
+Parameters:
+  Module - Handle to the loaded module.
+  SymbolName - Name of the exported variable to access.
+  Buffer - The untyped source of the copy.
+  Size - Amount of bytes to copy.
+See also:
+  ReadModuleData
+Donator:
+  Robert Marquardt
+--------------------------------------------------------------------------------
+@@TJclNumericFormat
+<GROUP BaseServices.Numericformattingroutines>
+Summary
+  TODO
+Description:
+  TODO
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@StrToBoolean
+<GROUP BaseServices.ConversionUtilities>
+Summary:
+  Returns a boolean representation of the string values 'True' and 'False'.
+Description:
+  StrToBoolean returns a boolean representation of the string values 'True' or 'False'.
+  Note that it is not case sensitive.
+Parameters:
+  S - The string value for which you want the boolean representation.
+Result:
+  If S equals 'True' or 'T' or '1' the boolean True is returned.
+  If S equals 'False' or 'F' or '0' the boolean False is returned.
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@BooleanToStr
+<GROUP BaseServices.ConversionUtilities>
+Summary:
+  Returns a string representation of the boolean values True and False.
+Description:
+  BooleanToStr returns a string representation of the boolean values True or False.
+Parameters:
+  B - The boolean value for which you want the string representation.
+Result:
+  If B is True the result is the string 'True'.
+  if B is False the result is the string 'False'.
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@IntToBool
+<GROUP BaseServices.ConversionUtilities>
+Summary:
+  Returns a boolean representation of an integer value.
+Description:
+  IntToBool returns a boolean representation of an integer value.
+Parameters:
+  I - The integer value for which you want the boolean representation.
+Result:
+  If I does not equal 0 (1 for example) the result is the boolean True.
+  if I equals 0 the result is the boolean False.
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@BoolToInt
+<GROUP BaseServices.ConversionUtilities>
+Summary:
+  Returns an integer representation of a boolean value.
+Description:
+  BoolToInt returns an integer representation of the boolean values True or False.
+  Thus, if B equals True the string 'True' is returned, if B equals False the
+  string 'False' is returned.
+Parameters:
+  B - The boolean value for which you want the integer representation.
+Result:
+  If B is True the result is 1.
+  if B is False the result is 0.
+Donator:
+  Jean-Fabien Connault

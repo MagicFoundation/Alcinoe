@@ -1,0 +1,43 @@
+================================================================================
+//               ZEOS Library Bug Reporting / Bug Fixing Form                 //
+================================================================================
+
+Bug ID               : 1113306                      Priority      : 5
+Submitted by         : fabianbecker                 Date Submitted: 2005-01-31 18:20
+Quality assurance by : stefanglienke                Closed as of  : 2005-06-02 16:51
+Assigned to          : stefanglienke                Closed by     : stefanglienke
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : n/a
+ZEOSLib Version      : 6.5.1 alpha
+Component/Class      : TZQuery
+
+--------------------------------------------------------------------------------
+
+Error Description:
+
+The "Properties" parameter in
+TZAbstractRODataset.CreateStatement wasn't used, but if
+we look at TZAbstractDataset.CreateStatement we find
+that it calls "inherited CreateStatement(SQL, Temp)",
+where "temp" define the values of "UpdateMode" and
+"WhereMode". This way the values of "UpdateMode" and
+"WhereMode" in TZAbstractDataset have no mean.
+
+I'm working with ZEOSDBO + ADO + ACCESS. If a table has
+widestring columns, these columns are updated only if
+UpdateMode = umUpdateAll. To make it work, I need to
+change the setting of FUpdateAll in
+"TZGenericCachedResolver.Create" (line 189 in
+ZDbcGenericResolver.pas) to "FUpdateAll := true".
+
+--------------------------------------------------------------------------------
+
+Actions done form Bugfixing:
+
+Fixed as described in Patch 1166961
+
+================================================================================
+
+

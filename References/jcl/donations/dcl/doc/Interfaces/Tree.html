@@ -1,0 +1,74 @@
+<html>
+<!-- Creation date: 07/12/2002 -->
+<head>
+<title></title>
+<meta name="Description" content="">
+<meta name="Keywords" content="">
+<meta name="Author" content="RANDOM">
+<meta name="Generator" content="AceHTML 4 Pro">
+<link href="../SeldonWeb.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<center><h1>IIntfTree/IStrTree/ITree</h1></center>
+
+<h2>Unit</h2>
+	DCL_intf
+
+<h2>Inheritance</h2>
+	<p>Derived from <a href="Collection.html">IIntfCollection/IStrCollection/ICollection</a></p>
+
+<h2>Methods</h2>
+
+<code>TTraverseOrder = (toPreOrder, toOrder, toPostOrder);</code>
+
+<h3>IIntfTree</h3>
+<code>
+    <b>function</b> GetTraverseOrder: TTraverseOrder;<br>
+    <b>procedure</b> SetTraverseOrder(Value: TTraverseOrder);<br>
+    <b>property</b> TraverseOrder: TTraverseOrder <b>read</b> GetTraverseOrder <b>write</b> SetTraverseOrder;<br>
+</code>
+
+<h3>IStrTree</h3>
+<code>
+    <b>function</b> GetTraverseOrder: TTraverseOrder;<br>
+    <b>procedure</b> SetTraverseOrder(Value: TTraverseOrder);<br>
+    <b>property</b> TraverseOrder: TTraverseOrder <b>read</b> GetTraverseOrder <b>write</b> SetTraverseOrder;<br>
+</code>
+
+<h3>ITree</h3>
+<code>
+    <b>function</b> GetTraverseOrder: TTraverseOrder;<br>
+    <b>procedure</b> SetTraverseOrder(Value: TTraverseOrder);<br>
+    <b>property</b> TraverseOrder: TTraverseOrder <b>read</b> GetTraverseOrder <b>write</b> SetTraverseOrder;<br>
+</code>
+
+<h2>Description</h2>
+
+<p>A tree is hierarchical container with parents/childs concepts.</p>
+
+<table border="1" width="80%" align="center" bgcolor="white" cellpadding="5" cellspacing="0">
+  <tr>
+  	<th bgcolor="silver"> Method	</td>
+		<th bgcolor="silver"> Description </td>
+  </tr>
+  <tr>
+    <td>GetTraverseOrder</td>
+    <td>
+			Return the current traverse order (PreOrder, Order or PostOrder) of the tree. The traverse order is used for iterators.
+		</td>
+  </tr>
+  <tr>
+    <td>SetTraverseOrder</td>
+    <td>
+			Set the traverse order (PreOrder, Order or PostOrder) of the tree. The traverse order is used for iterators.
+		</td>
+  </tr>
+</table>
+
+<h2>Implemented By</h2>
+	<ul>
+		<li> <a href="../Classes/BinaryTree.html">BinaryTree</a>
+	</ul>
+
+</body>
+</html>

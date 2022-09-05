@@ -1,0 +1,129 @@
+//====================================================//
+// ZEOS Bug Tracker on SourceForge - open Bug Reports //
+//====================================================//
+
+------------------------------------------------------------------------------------------------------------------------------------------
+    Bug  Open Date         Summary                                                       P  SQL Server      ZEOS Ver.  S-App  Solution
+------------------------------------------------------------------------------------------------------------------------------------------
+ 953065  2004-05-13 00:34  sp_jbdc_columns and sp_columns error                          9  MSSQL/SYBASE    6.1.5 ?      N
+ 953072  2004-05-13 00:50  'Row data is not available.' error (MSSQL and SYBASE)         9  MSSQL/SYBASE    6.1.5 ?      N
+1000217  2004-07-29 10:16  Client DataSet and DataSet Provider                           9  ?               6.5.x        Y
+1003266  2004-08-04 06:33  problem applying updates master/detail                        9  FB 1.03         6.1.5        Y
+1177394  2005-04-05 15:00  Bug using View                                                9  FB 1.5          6.5.1        Y
+
+1100198  2005-01-11 06:58  Zeos 6.5.1 + ADO + WideString + Lookup = trouble              7  MSACCESS (ADO)  6.5.1        N    -> comment
+1172432  2005-03-29 02:15  6.1.5: No dynamic library from the list libpq73.dll found     7  PostGre 7.3     6.1.5        N    -> comment
+
+ 937790  2004-04-19 03:40  ZeosDBO with MS SQL Server 6.5                                5  MSSQL 6.5       6.1.4        N
+ 938705  2004-04-20 10:16  ZUpdateSQL params behavior when fieldnames have blank spaces  5  MSACCESS (ADO)  ?            N    -> comment
+ 953079  2004-05-13 01:08  sp_spaceused error (SYBASE)                                   5  SYBASE          ?            N
+ 966265  2004-06-03 20:46  Field tokenizer problem                                       5  MSACCESS (ADO)  6.1.5        Y
+ 983977  2004-07-02 03:30  Error in create temp table                                    5  ?               6.1.5        N
+ 984207  2004-07-02 10:36  Row data is not avaible                                       5  MSSQL 2000      ?            N
+ 989909  2004-07-12 22:58  TZConnection.Connected wrong value                            5  FB 1.5 (SServ)  ?            N
+ 993190  2004-07-18 01:12  PGSQL: Wrong select result data set                           5  PostGre 7.4.2   6.5.1        N    ? -> comment
+ 997359  2004-07-24 20:26  Zeos 6.5+K3+FB 1.5 - Do not work!                             5  FB 1.5          6.1.5        N    -> comment
+ 998653  2004-07-27 05:00  memory leek with stored procedures                            5  FB 1.5          ?            N    ? -> comment
+1003091  2004-08-04 00:52  Errors on loading stored procedures parameters                5  FB 1.5          6.5.1        N
+1006447  2004-08-10 00:36  ADO exception: Occurs when parameters are null values         5  MSACCESS (ADO)  6.5.1        N    ? -> comment
+1008725  2004-08-13 07:34  SELECT * FROM flats => ORA-00255                              5  Oracle 9i       ?            N
+1011996  2004-08-18 23:37  "invalid statement handle" when disconnecting from FB 1.5.1   5  FB 1.5          6.1.5        N
+1028614  2004-09-15 07:53  Error with ZeosDBO 6.1.5 and MS SQL Server 2000               5  MSSQL 2000      6.1.5        N
+1039535  2004-10-03 12:16  Error Transliterating Cyrilic Letters                         5  FB 1.0          6.1.5        N
+1041566  2004-10-06 08:58  Firebird embedded close db error                              5  FB 1.5, emb.    6.1.5        N    -> comment
+1063038  2004-11-09 04:11  Cannot insert into some tables (Tablename too long?)          5  Oracle 9i       ?            Y
+1063453  2004-11-09 14:24  **SERIOUS bug that corrupts text in databound controls**      5  PostGre         6.1.5        N    P #1064475
+1065308  2004-11-12 08:52  Problems with ZConnection and Machineid                       5  ?               6.5.1        N
+1066083  2004-11-14 02:29  Can not run show full processlist (MySQL)                     5  MySQL           6.5.1        N
+1066200  2004-11-14 08:50  ADO and MSSQL Server 2000                                     5  MSSQL 2000      ?            N
+1075245  2004-11-29 05:37  Condition `true = true' on Delphi.                            5  ?               ?            N
+1075367  2004-11-29 08:34  Error while opening big textblob                              5  FB 1.5          6.1.5        Y
+1087025  2004-12-17 04:35  Stored Procedure Not Committed                                5  FB 1.5          6.1.5        N
+1087265  2004-12-17 12:52  doesn't show text formed correctly (.rtf)                     5  PostGre 7.4.1   ?4.5.0?      N
+1095826  2005-01-04 07:45  Accsess violation -> is this a Bug? <-                        5  ?               ?            N    -> comment
+1096629  2005-01-05 10:29  Codepage cpWin1250                                            5  MySQL 4.1.8     6.5.1        N
+1100115  2005-01-11 04:49  Port-# with MSSQL                                             5  MSSQL           ?            N
+1108202  2005-01-24 00:52  Required fielsd doesn't work                                  5  MySQL 4.1.1     6.5.1        N    -> comment
+1115319  2005-02-03 02:59  mysql: zeos doesn’t allow ':=' operator                       5  MySQL 4.0.23a   6.5.1        N    -> comment
+1117882  2005-02-07 06:17  Table names starting with number                              5  MySQL 4.0.23a   6.1.5        N
+1118419  2005-02-07 23:24  TZZDatabase.GetTableNames bug                                 5  MSSQL/MySQL     5.5          N    -> comment
+1118833  2005-02-08 11:00  v6.5.1 + ADO: ExecSQL cannot perform UPDATEs                  5  ? (ADO)         6.5.1        N    ? -> comment
+1119370  2005-02-09 07:53  "Range check error" message                                   5  MySQL 4.19      6.5.1 (K3)   N
+1120431  2005-02-10 15:04  "select sum" on sqlite return 0 only                          5  SQLite          ?            N    -> comment
+1121559  2005-02-12 15:49  codepage Win1253 missing                                      5  ?               6.1.5        N
+1128988  2005-02-17 13:04  I don't get login with user and password using Zeos           5  MySQL 4.0/4.1   6.5.1        N
+1143877  2005-02-18 08:05  field type wrongly assigned using UNION and sqlite            5  SQLite 2.8      ? (BCB)      N    -> comment
+1144834  2005-02-20 07:26  Cannot access database file after ZConnection1.Disconnect;    5  FB 1.5.2, emb   6.1.5        Y    -> comment
+1150860  2005-02-24 01:22  incorrect output TEXT datatype data, containing slashes (\)   5  PostGre 7.4.6   ? (BCB)      N    B #1063453
+1151714  2005-02-25 04:02  Read TIMESTAMP not refresh.                                   5  PostGre 7.4     ?            N    -> comment
+1153751  2005-02-28 12:16  Multiple TZQuery.Create/Free results in exception             5  MySQL 3.23/4.1  6.5.1        N    -> comment
+1158593  2005-03-07 13:18  ADO Access .dbf file "Interface not supported"                5  DBase (ADO)     ?            N    -> comment
+1164910  2005-03-16 16:18  Range check error when open too many field                    5  ?               ?            N
+1165083  2005-03-17 01:03  6.5.1 latin5 support problem with mysql4.1                    5  MySQL 4.1       6.5.1        N    B #1170948
+1168385  2005-03-22 06:48  Connected on exe load error if ip addr is not a mysql server  5  MySQL           6.5.1        N
+1170341  2005-03-24 20:48  Zeos threads/dll stay alive erroneously                       5  ?               ?            N
+1170948  2005-03-26 02:26  6.5.1 latin5 patch ?                                          5  MySQL 4.1       6.5.1        N    P #1179718
+1171333  2005-03-27 03:08  Table name error when database contains a dot (fix included)  5  MySQL           ?            N    -> comment
+1171920  2005-03-28 08:05  EZDatabaseError Can't Get ErrorCode                           5  ?               ?            N
+1176939  2005-04-05 03:27  Incorrect filter parsing in ZAbstractRODataset.               5  ?               ?            N
+1179430  2005-04-08 13:04  PostgreSQL System Catalog Where last field                    5  PostGre         ?            N
+1182940  2005-04-14 03:22  Dataset Filter does not works correct                         5  ?               ?            N
+1186735  2005-04-20 08:02  Cached updates question. -> is this a bug? <-                 5  ?               ?            N
+1203292  2005-05-16 20:50  requested database driver was not found                       5  SYBASE          ? (K3)       N
+
+ 921978  2004-03-23 11:58  Unshow SQLHourGlass in Linux                                  3  ?               ? (K3)       N
+
+
+
+//====================================================//
+// ZEOS Bug Tracker on SourceForge - Feature Requests //
+//====================================================//
+
+---------------------------------------------------------------------------------------
+    Bug  Open Date         Summary
+---------------------------------------------------------------------------------------
+1079988  2004-12-06 05:36  Suggestion for ZeosDBO (FireBird)
+1100120  2005-01-11 04:53  Version-Info
+1106515  2005-01-20 23:20  2 Suggested enhancements for ZeosDBO
+1118840  2005-02-08 11:15  v6.5.1 and updates of "complex" queries (see Patch #1124086)
+
+
+
+//============================================//
+// ZEOS Bug Tracker on SourceForge - Bugfixes //
+//============================================//
+
+----------------------------------------------------------------------------------------------------
+    Bug  Open Date         Summary
+----------------------------------------------------------------------------------------------------
+
+
+
+//====================================================================//
+// ZEOS Bug Tracker on SourceForge - PostGre 8.0 (not supported, yet) //
+//====================================================================//
+
+
+---------------------------------------------------------------------------------------
+    Bug  Open Date         Summary
+---------------------------------------------------------------------------------------
+1121564  2005-02-12 15:59  blob is ruined (non unicod codepage): psql 8.0 and ZDBO6.5.1
+1124680  2005-02-17 04:31  oid field doesnt support (see comment)
+
+
+
+//============//
+// Fixed Bugs //
+//============//
+
+
+------------------------------------------------------------------------
+    Bug  Summary
+------------------------------------------------------------------------
+
+
+//============//
+// Known Bugs //
+//============//
+
+

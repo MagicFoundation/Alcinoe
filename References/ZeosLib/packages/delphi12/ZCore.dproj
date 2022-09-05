@@ -1,0 +1,153 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{1a98c0b7-eb38-4725-9569-1c0bf5beb099}</ProjectGuid>
+			<MainSource>ZCore.dpk</MainSource>
+			<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+			<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+			<DCC_DependencyCheckOutputName>C:\Documents and Settings\All Users\Documentos\RAD Studio\5.0\Bpl\ZCore110.bpl</DCC_DependencyCheckOutputName>
+			<ProjectVersion>12.0</ProjectVersion>
+			<Config Condition="'$(Config)'==''">Debug</Config>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+			<Cfg_1>true</Cfg_1>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+			<Cfg_2>true</Cfg_2>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_ImageBase>00400000</DCC_ImageBase>
+			<DesignOnlyPackage>false</DesignOnlyPackage>
+			<DllSuffix>120</DllSuffix>
+			<DCC_Description>Zeos Core Classes and Interfaces</DCC_Description>
+			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
+			<DCC_DependencyCheckOutputName>build\ZCore120.bpl</DCC_DependencyCheckOutputName>
+			<DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
+			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
+			<GenDll>true</GenDll>
+			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+			<DCC_SymbolReferenceInfo>1</DCC_SymbolReferenceInfo>
+			<GenPackage>true</GenPackage>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1)'!=''">
+			<DCC_DependencyCheckOutputName>build\ZCore120.bpl</DCC_DependencyCheckOutputName>
+			<Version>7.0</Version>
+			<DCC_DebugInformation>False</DCC_DebugInformation>
+			<DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
+			<DCC_IntegerOverflowCheck>True</DCC_IntegerOverflowCheck>
+			<DCC_GenerateStackFrames>True</DCC_GenerateStackFrames>
+			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+			<DCC_DcuOutput>build</DCC_DcuOutput>
+			<DCC_ObjOutput>build</DCC_ObjOutput>
+			<DCC_HppOutput>build</DCC_HppOutput>
+			<DCC_BplOutput>build</DCC_BplOutput>
+			<DCC_DcpOutput>build</DCC_DcpOutput>
+			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+			<DCC_UnitSearchPath>build;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<DCC_ResourcePath>$(BDSCOMMONDIR)\Bpl;$(DCC_ResourcePath)</DCC_ResourcePath>
+			<DCC_ObjPath>$(BDSCOMMONDIR)\Bpl;$(DCC_ObjPath)</DCC_ObjPath>
+			<DCC_IncludePath>$(BDSCOMMONDIR)\Bpl;$(DCC_IncludePath)</DCC_IncludePath>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2)'!=''">
+			<DCC_DependencyCheckOutputName>build\ZCore120.bpl</DCC_DependencyCheckOutputName>
+			<Version>7.0</Version>
+			<DCC_IntegerOverflowCheck>True</DCC_IntegerOverflowCheck>
+			<DCC_GenerateStackFrames>True</DCC_GenerateStackFrames>
+			<DCC_DcuOutput>build</DCC_DcuOutput>
+			<DCC_ObjOutput>build</DCC_ObjOutput>
+			<DCC_HppOutput>build</DCC_HppOutput>
+			<DCC_BplOutput>build</DCC_BplOutput>
+			<DCC_DcpOutput>build</DCC_DcpOutput>
+			<DCC_UnitSearchPath>build;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<DCC_ResourcePath>$(BDSCOMMONDIR)\Bpl;$(DCC_ResourcePath)</DCC_ResourcePath>
+			<DCC_ObjPath>$(BDSCOMMONDIR)\Bpl;$(DCC_ObjPath)</DCC_ObjPath>
+			<DCC_IncludePath>$(BDSCOMMONDIR)\Bpl;$(DCC_IncludePath)</DCC_IncludePath>
+		</PropertyGroup>
+		<ItemGroup>
+			<DelphiCompile Include="ZCore.dpk">
+				<MainSource>MainSource</MainSource>
+			</DelphiCompile>
+			<DCCReference Include="rtl.dcp"/>
+			<DCCReference Include="..\..\src\core\ZVariant.pas"/>
+			<DCCReference Include="..\..\src\core\ZCollections.pas"/>
+			<DCCReference Include="..\..\src\core\ZCompatibility.pas"/>
+			<DCCReference Include="..\..\src\core\ZExpression.pas"/>
+			<DCCReference Include="..\..\src\core\ZExprParser.pas"/>
+			<DCCReference Include="..\..\src\core\ZExprToken.pas"/>
+			<DCCReference Include="..\..\src\core\ZMatchPattern.pas"/>
+			<DCCReference Include="..\..\src\core\ZSysUtils.pas"/>
+			<DCCReference Include="..\..\src\core\ZTokenizer.pas"/>
+			<DCCReference Include="..\..\src\core\ZVariables.pas"/>
+			<DCCReference Include="..\..\src\core\ZClasses.pas"/>
+			<DCCReference Include="..\..\src\core\ZMessages.pas"/>
+            <DCCReference Include="..\..\src\core\ZURL.pas" />
+            <DCCReference Include="..\..\src\core\ZFunctions.pas" />
+            <DCCReference Include="..\..\src\core\ZFunctionsConvert.pas" />
+            <DCCReference Include="..\..\src\core\ZFunctionsDateTime.pas" />
+            <DCCReference Include="..\..\src\core\ZFunctionsMath.pas" />
+            <DCCReference Include="..\..\src\core\ZFunctionsOther.pas" />
+            <DCCReference Include="..\..\src\core\ZFunctionsStrings.pas" />
+			<BuildConfiguration Include="Base">
+				<Key>Base</Key>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Debug">
+				<Key>Cfg_2</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Release">
+				<Key>Cfg_1</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+		</ItemGroup>
+		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+		<ProjectExtensions>
+			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
+			<Borland.ProjectType>Package</Borland.ProjectType>
+			<BorlandProject>
+				<Delphi.Personality>
+					<Parameters>
+						<Parameters Name="UseLauncher">False</Parameters>
+						<Parameters Name="LoadAllSymbols">True</Parameters>
+						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+					</Parameters>
+					<VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
+						<VersionInfo Name="MajorVer">1</VersionInfo>
+						<VersionInfo Name="MinorVer">0</VersionInfo>
+						<VersionInfo Name="Release">0</VersionInfo>
+						<VersionInfo Name="Build">0</VersionInfo>
+						<VersionInfo Name="Debug">False</VersionInfo>
+						<VersionInfo Name="PreRelease">False</VersionInfo>
+						<VersionInfo Name="Special">False</VersionInfo>
+						<VersionInfo Name="Private">False</VersionInfo>
+						<VersionInfo Name="DLL">False</VersionInfo>
+						<VersionInfo Name="Locale">1031</VersionInfo>
+						<VersionInfo Name="CodePage">1252</VersionInfo>
+					</VersionInfo>
+					<VersionInfoKeys>
+						<VersionInfoKeys Name="CompanyName"/>
+						<VersionInfoKeys Name="FileDescription"/>
+						<VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+						<VersionInfoKeys Name="InternalName"/>
+						<VersionInfoKeys Name="LegalCopyright"/>
+						<VersionInfoKeys Name="LegalTrademarks"/>
+						<VersionInfoKeys Name="OriginalFilename"/>
+						<VersionInfoKeys Name="ProductName"/>
+						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+					</VersionInfoKeys>
+					<Source>
+						<Source Name="MainSource">ZCore.dpk</Source>
+					</Source>
+				</Delphi.Personality>
+			</BorlandProject>
+			<ProjectFileVersion>12</ProjectFileVersion>
+		</ProjectExtensions>
+	</Project>

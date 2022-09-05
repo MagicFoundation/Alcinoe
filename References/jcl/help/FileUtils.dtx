@@ -1,0 +1,2737 @@
+@@FilesandIO.FilesandDirectories
+<GROUP FilesandIO>
+<TITLE Files and Directories>
+<TOPICORDER 100>
+--------------------------------------------------------------------------------
+@@FilesandIO.FilesandDirectories.FileSearch
+<GROUP FilesandIO.FilesandDirectories>
+<TITLE File Search>
+<TOPICORDER 100>
+--------------------------------------------------------------------------------
+@@FilesandIO.FilesandDirectories.FileVersionInfo
+<GROUP FilesandIO.FilesandDirectories>
+<TITLE File Version Information>
+<TOPICORDER 200>
+--------------------------------------------------------------------------------
+@@FilesandIO.FileSystems
+<GROUP FilesandIO>
+<TITLE File Systems>
+<TOPICORDER 200>
+--------------------------------------------------------------------------------
+@@FilesandIO.FileSystems.NTFS
+<GROUP FilesandIO.FileSystems>
+<TITLE NTFS>
+<TOPICORDER 100>
+--------------------------------------------------------------------------------
+@@FilesandIO.PathManipulation
+<GROUP FilesandIO>
+<TITLE Path manipulation>
+<TOPICORDER 300>
+--------------------------------------------------------------------------------
+@@FilesandIO.Streams
+<GROUP FilesandIO>
+<TITLE Streams>
+<TOPICORDER 400>
+--------------------------------------------------------------------------------
+@@FilesandIO.Streams.FileMapping
+<GROUP FilesandIO.Streams>
+<TITLE File Mapping>
+<TOPICORDER 100>
+--------------------------------------------------------------------------------
+@@DriveLetters
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Set of valid characters to use as drive letters.
+Description:
+  DriveLetters is a set of characters which can be used to designate a drive under
+  the Windows operating system.
+Platform:
+  Windows
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PathDevicePrefix
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Prefix used to specify a physical device under Windows.
+Description:
+  PathDevicePrefix is the character string used in Windows to specify a physical
+  device such as a harddisk. To be precise its a prefix to indicate the "path name"
+  of any driver.
+Platform:
+  Windows
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PathSeparator
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Character used as path element separator.
+Description:
+  PathSeparator is the character used by the file system to separate the elements
+  of a path such as the drive, directories and the filename. The value of this
+  constant is conditionally defined as a forward or backward slash depening on the
+  targetted operating system (Linux and Windows respectively).
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PathUncPrefix
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Prefix for UNC path names.
+Description:
+  Character string used a prefix for UNC paths. A full UNC path is of the
+  form: \\Server\Share or \\?\UNC\Server\Share.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GetSizeOfFile
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Returns the size of a file.
+Description:
+  The GetSizeOfFile returns the size, in bytes of the specified file. Note that
+  the returned value is the actual size of the file. This may, and most likely will,
+  differ from the storage the file actually occupies on the disk.
+Parameters:
+  FileName - Fully qualified name of the file for which to determine the size.
+  Handle - Handle of the file for which to determine the size. This handle must have been opened with sufficient rights (GENERIC_READ at the very least). The function assumes the handle is valid and silently fails if it is not.
+Result:
+  The size of the file, in bytes. If the function fails to determine the size of
+  the file it raises an exception.
+Donator:
+  David Hervieux (Win32)
+Contributor:
+  Robert Rossmair (Unix)
+--------------------------------------------------------------------------------
+@@TJclFileMappingView
+<GROUP FilesandIO.Streams.FileMapping>
+Summary:
+  Implements a file mapping view object.
+Description:
+  TJclFileMappingView implements the view for a filemapping object. Do not construct
+  objects of this class directly, instead use the TJclCustomFileMapping.Add method.
+  A TJclFileMappingView object can be used to read from and write to a specific
+  area in a filemapping. You can create multiple views including ones that overlap.
+  The Operating System guarantees that multiple views remain coherent as long as
+  they are created from the same filemapping object. Standard Win32 view
+  objects provide an abstraction to manipulate a file as if it were a block of
+  memory using pointers. TJclFileMappingView takes this a bit further by allowing
+  you to use the familiar TStream interface to manipulate the view. If you so desire
+  you can still use the 'memory' directly by using the Memory property.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclFileMappingView.Create
+Summary:
+  Creates an instance of TJclFileMappingView.
+Description:
+  The Create and CreateAt create an instance of TJclFileMappingView. You should not
+  create instances of TJclFileMappingView directly. Instead use the Add and AddAt
+  methods of TJclCustomFileMapping. The Access, Size, ViewOffset and Address parameters
+  map directly to the Access, Count, Offset and Address parameters of the AddAt
+  method. The FileMap parameter specifies the TJclCustomFileMapping object for
+  which the view is created and cannot be nil.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclFileMappingView.Flush
+Summary:
+  Flush writes the modified parts of the view back to the disk.
+Description:
+  Flush writes the modified parts of the view back to the disk. Note that to
+  guarantee that this works across a network as well the underlying file must be
+  opened with FILE_FLAG_WRITE_THROUGH.
+Parameters:
+  Count - The number of bytes to flush. Specifying 0 causes the entire view to be flushed.
+Result:
+  If the function succeeds it returns True, otherwise it returns False.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclFileMappingView.Write
+Summary:
+  Write attempts to write up to Count bytes from Buffer to the View.
+Description:
+  Write attempts to write up to Count bytes from Buffer to the View. It returns
+  the number of bytes actually written and updates the stream's position accordingly.
+  Note that since a view cannot automatically expand in size, like some stream
+  classes do when you write past the end, the function ignores request that would
+  cause it to write past the end. In such cases the result is 0.
+Parameters:
+  Buffer - Buffer holding the data to write to the view.
+  Cound - Number of bytes to write from Buffer.
+Result:
+  The number of bytes that were actually written to the view.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclFileMappingView.LoadFromStream
+Summary:
+  Copies the contents of the specified stream.
+Description:
+  LoadFromStream attempts to read the contents of the specified stream object into
+  the view. If the size of the specified stream is larger than what the view can
+  hold an exception is raised (a view will not expand in size).
+Parameters:
+  Stream - The stream from which to copy the contents. The contents are read starting at
+  position 0 up to the end of the stream. The stream's size must be smaller than or equal
+  to the view's size or an exception is raised.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclFileMappingView.LoadFromFile
+Summary:
+  Copies the contents of the specified file.
+Description:
+  LoadFromFile attempts to read the contents of the specified file into
+  the view. If the size of the specified file is larger than what the view can
+  hold an exception is raised (a view will not expand in size).
+Parameters:
+  FileName - Name of the file whose contents to copy into the view.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclFileMappingView.Index
+Summary:
+  Index into the owning TJclCustomFileMapping's Views list.
+Description:
+  Index contains the Index into the owning TJclCustomFileMapping object's Views list.
+  Do not cache this index since it may change when other views are added or deleted.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclFileMappingView.FileMapping
+Summary:
+  The owning TJclCustomFileMapping object.
+Description:
+  Reference to the TJclCustomFileMapping object that this View was created from. The
+  View remains owned by that object until it is destroyed.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclFileMappingView.Offset
+Summary:
+  Offset into the filemapping.
+Description:
+  Offset contains the Offset into the filemapping that this view was created for.
+  Since the offset must always be a multiple of the system's allocation granularity
+  this value may not be the same value you specified when the view was created.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclCustomFileMapping
+<GROUP FilesandIO.Streams.FileMapping>
+Summary:
+  Wrapper for Win32 filemapping object.
+Description:
+  TJclCustomFileMapping is a wrapper for a Win32 filemapping object. In a nutshell,
+  a filemapping is an abstraction of a disk file which allows you to manipulate the
+  file as if it were just another block of memory, as such you manipulate it using
+  pointers. The filemapping object itself is only used to maintain the association
+  with the file, while a filemapping view object is used to manipulate (part of) the
+  file. You can create multiple views of a (part of a) file which are guaranteed to
+  remain coherent. Additionally you can create a filemapping object which is
+  associated with the swap file as opposed to an actual disk file. Since multiple
+  processes can open a handle to the same filemapping, this is an ideal way to
+  share data between multiple processes.
+  Unless you are opening a filemapping object as opposed to creating one, you should
+  not use this class directly. Instead use the derived TJclFileMapping and
+  TJclSwapFileMapping classes. These two classes only differ in their constructors
+  but do prevent you from a common mistake (related to the return value of CreateFile).
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclCustomFileMapping.Open
+Summary:
+  Creates an instance of TJclCustomFileMapping and opens a filemapping object.
+Description:
+  The Open constructor creates an instance of TJclCustomFileMapping and attempts
+  to open the named filemapping object. If the specified object does not exist the
+  constructor fails by raising an exception.
+Parameters:
+  Name - Name of the filemapping object to open. If no filemapping object with the specified name exists, the function raises an exception.
+  InheritHandle - Specifies whether the filemapping object's handle can be inherited by child processes.
+  DesiredAccess=Specifies the desired access to the filemapping object. This can be one of the following values - Specifies the desired access to the filemapping object. This can be one of the following values:   <TABLE>
+Value                Meaning
+-------------------  ------------------------------------------------------------------------------------------------------------------------------------------------------------
+FILE_MAP_WRITE       Read-write access. The target file-mapping object must have been created with PAGE_READWRITE protection. A read-write view of the file is mapped.
+FILE_MAP_READ        Read-only access. The target file-mapping object must have been created with PAGE_READWRITE or PAGE_READ protection. A read-only view of the file is mapped.
+FILE_MAP_ALL_ACCESS  Same as FILE_MAP_WRITE.
+FILE_MAP_COPY        Copy-on-write access. The target file-mapping object must have been created with PAGE_WRITECOPY protection. A copy-on-write view of the file is mapped.
+</TABLE>
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclCustomFileMapping.Add
+Summary:
+  Create a new view and adds it to the list.
+Description:
+  The Add method creates a new TJclFileMappingView object and adds it to the internal
+  Views list.
+Parameters:
+  Access - Specifies the access for the view. See the Win32 help file or the Platform SDK under MapViewOfFile for more information.
+  Count - Number of bytes to map. If you specify 0 the entire file is mapped.
+  Offset - The Offset, in bytes, into the file from which to begin the mapping. The supplied offset is implicitly rounded towards a multiple of the systems allocation granularity. See the RoundOffsetView property for the details.
+Result:
+  The Index into the Views array of the newly created View object.
+See also:
+  AddAt
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclCustomFileMapping.AddAt
+Summary:
+  Creates a new view and adds it to the list.
+Description:
+  The AddAt method creates a new TJclFileMappingView object and adds it to the internal
+  Views list. The difference between Add and this method is that you
+  can specify a base address at which the view must be mapped. Note however that
+  the supplied Address is implicitly rounded towards a multiple of the systems
+  allocation granularity and if the system cannot map the view at the resulting
+  address, it won't map at all!
+Parameters:
+  Access - Specifies the access for the view. See the Win32 help file or the Platform SDK under MapViewOfFile for more information.
+  Count - Number of bytes to map. If you specify 0 the entire file is mapped.
+  Offset - The Offset, in bytes, into the file from which to begin the mapping. The supplied offset is implicitly rounded towards a multiple of the systems allocation granularity. See the RoundOffsetView property for the details.
+  Address - Address at which the view should be mapped. The value is rounded to a multiple of the system allocation granularity. See the RoundOffsetView property for the details.
+Result:
+  The Index into the Views array of the newly created View object.
+See also:
+  Add
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclCustomFileMapping.Delete
+Summary:
+  Deletes the View at the specified Index.
+Description:
+  The Delete method destroys the View object at the specified Index (into the Views
+  array) and removes it from the list. Outstanding references are implicitly
+  invalidated by this since the object no longer exists. If the Index is invalid
+  the function raises an exception.
+Parameters:
+  Index - Index into the Views array of the View object to destroy. Must be a valid index or an exception is raised.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclCustomFileMapping.IndexOf
+Summary:
+  Returns the index of the specified view object.
+Description:
+  The IndexOf method returns the Index of the supplied View object in the Views
+  list. Alternatively you can use the Views Index property.
+Parameters:
+  View - The View object whose Index into the Views list you want to know.
+Result:
+  The Index into the Views array property of the specified View. If the View does
+  not exist in the array the function returns -1.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclCustomFileMapping.Count
+Summary:
+  The number of View objects in the Views list.
+Description:
+  The Count property returns the number of view objects managed by the object and
+  previously created using the Add
+  or the AddAt method.
+  The individual TJclFileMappingView objects can be accessed using the Views array
+  property.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclCustomFileMapping.Existed
+Summary:
+  Returns whether the filemapping object already existed on creation.
+Description:
+  The Existed property returns whether the filemapping object already existed during
+  creation. This only applies if you used the Open constructor or specified a name
+  in the constructor and another process had already created the filemapping with
+  the same name.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclCustomFileMapping.Handle
+Summary:
+  Handle of the filemapping object.
+Description:
+  Handle contains the handle of the underlying Win32 filemapping object. You can
+  use it, for example, to share the filemapping with another process through
+  handle inheritance. Never close the handle manually, this is done automatically
+  at destruction.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclCustomFileMapping.Name
+Summary:
+  Name of the filemapping.
+Description:
+  The Name property contains the name of the filemapping object as specified during
+  construction.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclCustomFileMapping.RoundViewOffset
+Summary:
+  Rounding used when creating view objects.
+Description:
+  A filemapping view must be created with its offset being a multiple of the systems'
+  memory allocation granularity (usually 64K). Additionally, when you use the
+  AddAt method, the specified base address must also be a multiple of the allocation
+  granularity. The RoundViewOffset determines how the TJclFileMappingView class
+  rounds the supplied offset and/or base address values when these conditions are
+  not met. You can have the class automatically round upwards or downwards.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclCustomFileMapping.Views
+Summary:
+  List of all view objects managed by this class.
+Description:
+  The Views property contains all views that were created for this filemapping
+  using the Add or AddAt method. The number of Views in this list can be determined
+  using the Count property. When a View is created it is automatically
+  added to the list and when a view is destroyed is is removed from the list.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclFileMapping
+<GROUP FilesandIO.Streams.FileMapping>
+Summary:
+  Implements a filemapping object backed by an actual disk file.
+Description:
+  TJclFileMapping is a specification of a filemapping object. It only differs from
+  TJclCustomFileMapping in the implementation of its constructor. Use this class
+  when you want to map an actual disk file.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclFileMapping.Create
+Summary:
+  Creates an instance of a TJclFileMapping object.
+Description:
+  Creates an instance of a TJclFileMapping object. The filemapping object is backed
+  by an actual disk file and it is the callers responsibility to ensure the disk file
+  actually exists. As such the FileHandle parameter must be a valid handle or the
+  FileName, FileMode combination must be valid.
+Parameters:
+  FileName - Fully qualified name of the file to map.
+  FileMode - Access mode to open the file with. See the "File open mode constants" topic in the Delphi help for a list of valid values.
+  FileHandle - Handle to a disk file. Must be a valid handle.
+  Name - Name for the filemapping object. Specifying a name allows another process to open the same filemapping object.
+  Protect - Protection attributes for the filemapping object. See the Win32 help file or Platform SDK for the allowed values (look at the description of the CreateFileMapping function, flProtect parameter).
+  MaximumSize - Maximum size of the filemapping object. If you specify 0 the filemapping will be the same size as the underlying disk file (which is not allowed to have a size of 0 itself).
+  SecAttr - Security attributes for the filemapping. See the Win32 help file or Platform SDK for details.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclFileMapping.FileHandle
+Summary:
+  Handle of the underlying file.
+Description:
+  Copy of the handle passed to the constructor. Mostly for your convenience, the
+  class does not actually use the handle. However, it is copied using DuplicateHandle
+  and closed on destruction. As such, you can use it as a storage place for the
+  filehandle in case you need it later. Note that you are not supposed to manipulate
+  a file both through a filemapping and the file manipulation routines since the
+  operating system can no longer guarantee that the two remain coherent. If you must
+  use the handle after the TJclFileMapping class has been destroyed then you must
+  copy it using DuplicateHandle. Note that if you decide to use the Handle as such
+  you are still required to close the original handle using CloseHandle!
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclSwapFileMapping
+<GROUP FilesandIO.Streams.FileMapping>
+Summary:
+  Implements a filemapping object backed by the swap file.
+Description:
+  TJclSwapFileMapping is a specification of a filemapping object. It only differs
+  from TJclCustomFileMapping in the implementation of its constructor. Use this
+  class when you want to create a filemapping backed by the systems swap file (ideal
+  for cross-process communication).
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclSwapFileMapping.Create
+Summary:
+  Creates an instance of a TJclSwapFileMapping object.
+Description:
+  Creates an instance of a TJclSwapFileMapping object. The filemapping object is
+  backed by the swap file.
+Parameters:
+  Name - Name for the filemapping object. Specifying a name allows another process to open the same filemapping object.
+  Protect - Protection attributes for the filemapping object. See the Win32 help file or Platform SDK for the allowed values (look at the description of the CreateFileMapping function, flProtect parameter).
+  MaximumSize - Maximum size of the filemapping object. Cannot be 0.
+  SecAttr - Security attributes for the filemapping. See the Win32 help file or Platform SDK for details.
+Donator:
+  Wim De Cleen
+--------------------------------------------------------------------------------
+@@TJclTempFileStream
+<GROUP FilesandIO.Streams>
+Summary:
+  Implements a temporary file stream.
+Description:
+  TJclTempFileStream implements a temporary file stream. The stream is created
+  in a system defined folder reserved for temporary files and is automatically
+  deleted when the object is freed. The stream object is opened with full access
+  rights and in such manner that the stream cannot be opened by another thread.
+Platforms:
+  Windows
+  Unix
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclTempFileStream.FileName
+<GROUP FilesandIO.Streams>
+Summary:
+  The fully qualified name of the temporary file.
+Description:
+  FileName returns the fully qualified name of the file that is used by the
+  TJclTempFileStream object. This is mostly for informational purposes since the
+  file cannot be opened again using CreateFile.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclTempFileStream.Create
+<GROUP FilesandIO.Streams>
+Summary:
+  Creates an instance of TJclTempFileStream.
+Description:
+  Create creates a temporary file in the temporary folder as returned by
+  GetTempPath. The file is created with read and write access and is deleted as
+  soon as it is closed. The file cannot be opened by another call to CreateFile.
+  The file is created with the temporary attribute which means the system will
+  attempt to keep the file's data in memory rather than caching it. Therefore you
+  should free the object as soon as possible using the Free destructor. The file
+  is automatically deleted when the object is destroyed.
+Parameters:
+  Prefix - On input the first three characters of the string are used to form the name of the temporary file (can be empty). On return, assuming the function succeeded, the FileName property contains the actual name of the temporary file, including the path.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@FileGetTypeName
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Returns a string that describes the file's type.
+Description:
+  FileGetTypeName returns a string that describes the specified file's type. For
+  example, if the file is of type .pas the returned string
+  is 'Delphi Source File' (assuming Delphi 5 is installed). If the file type is not
+  registered or the function fails it returns a string of the form '.PAS File' where
+   '.PAS' is replaced with the file's extension.
+Parameters:
+  FileName - The name of the file for which you want to know the type name. The file does not have to exist physically.
+Result:
+  String that describes the file type.
+Platform:
+  Windows
+Donator:
+  Pelle F. S. Liljendal
+--------------------------------------------------------------------------------
+@@FindUnusedFileName
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Returns a unique filename composed of the specified parts and a unique number.
+Description:
+  FindUnusedFileName returns a unique filename composed of the FileName, 
+  NumberPrefix, a sequential number and FileExt. If a file of the form 
+  FileName.FileExt doesn't exist, this is returned. If such a file already exists,
+  NumberPrefix and a sequential number are appended to FileName.
+  e.g. FindUnusedFileName('c:\MyFile', '.txt', '.backup-') would return the first 
+  unused filename in the following list:
+    c:\MyFile.txt
+    c:\MyFile.backup-1.txt
+    c:\MyFile.backup-2.txt
+    etc.
+Parameters:
+  FileName - Name part of the filename
+  FileExt - Extension part of the filename
+  NumberPrefix - Optional text that is inserted before the unique number
+Result:
+  A unique filename composed of the specified parts and a number to make it unique.
+Donator:
+  Anthony Steele
+--------------------------------------------------------------------------------
+@@ForceDirectories
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Creates all the directories along a directory path if they do not already exist.
+Description:
+  Creates all the directories along a directory path if they do not already exist.
+  Note that this routine was copied from FileCtrl.pas to avoid a dependency on that
+  unit, see source code further more details.
+Parameters:
+  Name - Directory path to be created, if it doesn't exist already.
+Result:
+  ForceDirectories returns True if it successfully creates all necessary directories,
+  False if it could not create a needed directory.
+Notes:
+  Do not call ForceDirectories with an empty string. Doing so causes ForceDirectories
+  to raise an exception.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@FileGetDisplayName
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Returns the display name of a path.
+Description:
+  FileGetDisplayName returns the display name of the specified file. Usually the
+  display name will be equal to the long filename without the extension, but this
+  is not necessarily always true.
+Parameters:
+  FileName - The name of the file for which you want to know the display name. The file must
+             physically exist on the drive or the function fails.
+Result:
+  If the function succeeds it returns the display name of the supplied file. If the
+  function fails the result is a copy of the supplied filename.
+See also:
+  PathGetShortName
+  PathGetLongName
+  FileGetTypeName
+Donator:
+  Pelle F. S. Liljendal
+--------------------------------------------------------------------------------
+@@FileGetOwnerName
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Returns the name of the owner of a file.
+Description:
+  FileGetOwnerName returns the name of the owner of the specified file.
+Parameters:
+  FileName - The name of the file for which you want to know the owner.
+Result:
+  If the function succeeds it returns the owner name of the supplied file. If the
+  function fails the result is an empty string.
+Note:
+  Not supported on Windows 95/98/ME.
+Platforms:
+  Windows
+  Unix
+See also:
+  FileGetGroupName
+Donator:
+  Scott Price
+Contributor:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@FileGetGroupName
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Returns the name of the owner of a file.
+Description:
+  FileGetGroupName returns the name of the group of the specified file.
+Parameters:
+  FileName - The name of the file for which you want to know the group it belongs to.
+Result:
+  If the function succeeds it returns the name of the group (Windows: the primary group)
+  to which the supplied file belongs. If the function fails the result is an empty string.
+Note:
+  Not supported on Windows 95/98/ME.
+Platforms:
+  Windows
+  Unix
+See also:
+  FileGetOwnerName
+Donator:
+  Scott Price
+Contributor:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@PathCanonicalize
+Summary:
+  If possible, shortens a path by resolving relative path elements ('.', '..').
+Description:
+  Canonicalizes a path. Meaning, it parses the specified path for the character
+  sequences '.' and '..' where '.' means skip over the next path part and '..'
+  means remove the previous path part.
+
+  For example:
+    c:\users\.\delphi\data => c:\users\delphi\data
+    c:\users\..\delphi\data => c:\delphi\data
+    c:\users\.\delphi\.. => c:\users
+    c:\users\.\..\data => c:\data
+
+  Thus, the '.' and '..' sequences have similar meaning to their counterparts in
+  the filesystem.
+Parameters:
+  Path - The path to canonicalize.
+Result:
+  The canonicalized path.
+Notes:
+  (Kylix) Libc.canonicalize_file_name() is different in that it converts
+  relative paths to absolute ones - and thus needs to evaluate the program's
+  environment.
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@PathGetLongName
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Returns the long name of a path.
+Description:
+  PathGetLongName returns the long name of a given path. Can be
+  used for shell paths which include GUIDs.
+Parameters:
+  Path -   The path for which you want to know the long name. The path must physically exist on the
+           drive or the function fails.
+Result:
+  If the function succeeds it returns the long name of the supplied path. If the
+  function fails the result is a copy of the supplied Path.
+Category: Files and IO
+Platform:
+  Windows
+See also:
+  PathGetShortName
+Donator:
+  Rudy Velthuis
+--------------------------------------------------------------------------------
+@@PathGetLongName2
+<GROUP FilesandIO.PathManipulation>
+Summary
+  Returns the long name of a path.
+Description
+  Deprecated, do not use. PathGetLongName2 has been changed to be a mere wrapper
+  around PathGetLongName.
+Parameters:
+  Path -   The path for which you want to know the long name. The
+           path must physically exist on the drive or the function
+           fails.
+Result:
+  If the function succeeds it returns the long name of the
+  supplied path. If the function fails the result is a copy of
+  the supplied Path.
+Platform:
+  Windows
+See also:
+  PathGetLongName
+--------------------------------------------------------------------------------
+@@PathGetShortName
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Returns the short name of a path.
+Description:
+  PathGetShortName returns the short name of the given path.
+Parameters:
+  Path - The path for which you want the short name. The path must physically exist on
+  the specified drive and the drive must support short name aliases or the function will fail.
+Result:
+  If the function succeeds it returns the short name of the given path. If it fails
+  it returns a copy of the supplied path.
+Platform:
+  Windows
+See also:
+  PathGetLongName
+Donator:
+  Rudy Velthuis
+--------------------------------------------------------------------------------
+@@PathGetRelativePath
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  TODO
+Description:
+  TODO
+Result:
+  TODO
+Donator:
+  Olivier Sannier
+Contributor:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@PathGetTempPath
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Retrieves the path of the directory designated for temporary files.
+Description:
+  The GetTempPath function retrieves the path of the directory
+  designated for temporary files.
+Result:
+  The path of the directory designated for temporary files.
+Platforms:
+  Windows
+  Unix
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@PathIsChild
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Checks whether Path is a child of Base.
+Description:
+  The PathIsChild routine determines whether the directory specified by Path is
+  a child directory, either immediate or several levels deep, of the specified
+  Base path. For example, 'c:\winnt\system32' is a child of 'c:\winnt'.
+Parameters:
+  Path - The path to test.
+  Base - The base path to compare path against.
+Result:
+  If Path is a child of Base the function returns True, otherwise it returns False.
+See also:
+  PathIsDiskDevice
+  PathIsUnc
+Donator:
+  Anthony Steele
+--------------------------------------------------------------------------------
+@@PathIsAbsolute
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Tests if a path is an absolute path.
+Description:
+  PathIsAbsolute tests whether the supplied path is an absolute path. An absolute
+  path in this context is a path which specifies a drive of the form 'c:\' or,
+  under Linux, starts with a '/' character.
+Parameters:
+  Path - The path to test.
+Result:
+  If the path is an absolute path the function returns True, otherwise it returns False.
+See also:
+  PathIsDiskDevice
+  PathIsUnc
+Donator:
+  Robert Marquardt
+--------------------------------------------------------------------------------
+@@PathIsDiskDevice
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Tests whether a path denotes a disk device.
+Description:
+  PathIsDiskDevice tests whether the supplied path denotes a disk device. On Win32
+  systems the path to a disk device is always prepended with '\\.\' and that's
+  what the function tests.
+Parameters:
+  Path - The path to test.
+Result:
+  If the path denotes a disk device the result is True, otherwise the result is False.
+See also:
+  PathIsUnc
+  PathIsAbsolute
+Donators:
+  Robert Marquardt (Win32)
+  André Snepvangers (Unix)
+Contributor:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@PathIsUNC
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Tests whether a path is a UNC path.
+Description:
+  PathIsUNC tests whether or not the supplied path is a valid UNC path. That is,
+  it tests whether the path is prepended with '\\', and whether the machine and share
+  components are valid, if present. Note that a machine is considered valid if it's
+  constructed using characters from the set [a-z, A-Z, 0-9, -, _]. Other charactes,
+  technically including the underscore, result in non-standard machine names which
+  cannot be found on a network unless Microsoft DNS is in use (which is why PathIsUNC
+  considers them as invalid and returns False for such paths).
+Parameters:
+  Path - The path to test.
+Result:
+  If the supplied path is a UNC path the function returns True, otherwise it returns False.
+See also:
+  PathIsDiskDevice
+  PathIsAbsolute
+Donator:
+  Robert Marquardt
+--------------------------------------------------------------------------------
+@@PathExtractElements
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Extracts all elements from a path.
+Description:
+  PathExtractElements splits the supplied path into its elements such as drive,
+  path and filename. Depending on the supplied path any of the out parameters can
+  be an empty string on return.
+Parameters:
+  Source - String that represents a path that you want to split into its elements.
+  Drive - Drive indicator. This is a string in the form "c:\".
+  Path - Path of the file, without drive or filename. Leading and trailing directory separators are trimmed.
+  FileName - Name of the file, without the extension part.
+  Ext - File extension including the dot (.).
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PathAddSeparator
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Forces the string to end with a directory separator.
+Description:
+  Adds a path directory separator to the end of the string to create the correct
+  syntax for a path. If the string already has a trailing separator, no separator
+  will be added. Note that on Windows a separator is a backslash while on Linux it's
+  a forward slash, this is handled correctly by this function.
+Parameters:
+  Path - A string that represents a path and which should be forced to end with a directory separator.
+Result:
+  The resulting string is the path, ending in a directory separator.
+See also:
+  PathRemoveSeparator
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PathAddExtension
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Adds the extension to a path.
+Description:
+  PathAddExtension adds the specified extension to the supplied path. If the path
+  already has an extension the function does nothing. Note that the dot (.) in the
+  extension is optional, if it's not specified the function inserts it.
+Parameters:
+  Path - Path to append the extension to.
+  Extension - The extension to append to path.
+Result:
+  The Path with extension appended or Path if it already had an extension.
+See also:
+  PathRemoveExtension
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PathAppend
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Concatenates two paths.
+Description:
+  PathAppend concatenates the two paths, separating the two with a backslash thereby
+  preserving the correct syntax of a path.
+Parameters:
+  Path - The base path to which Append is appended. This path optionally ends in a backslash.
+  Append - The path to append to the base path. This path may start with a backslash.
+Result:
+  The concatenation of the two paths.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PathBuildRoot
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Creates a root path for the given drive number.
+Description:
+  PathBuildRoot creates a root path for the gives drive number. That is, if you
+  pass in 0, 1, 2, you'll get back 'a:\', 'b:\' and 'c:\' respectively.
+Parameters:
+  Drive - Drive number. Must be in the range 0..25 or an EJclPathError exception is raised.
+Result:
+  The root path for the given drive.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PathCommonPrefix
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Compares two paths for a common prefix.
+Description:
+  PathCommonPrefix compares the two paths to determine if they have a common
+  prefix. The function returns the number of prefix characters they have in common.
+  For example, if Path1 is 'c:\winnt\system32' and Path 2 is 'c:\winnt\system' the
+  result will be 9 which equals 'c:\winnt\'.
+Parameters:
+  Path1 - The first path name
+  Path2 - The second path name
+Result:
+  The number of common prefix characters.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PathCompactPath
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Compacts a path to fit within the given pixel width.
+Description:
+  PathCompactPath compacts, or truncates, the path to fit within the given pixel
+  width by replacing part of the string with an ellipsis (...). The specified device
+  context is used to retrieve the font metrics which determine how a string maps
+  to a pixel width. Note the existence of two overloads allowing you to pass in
+  either an HDC or TCanvas (descendant). The TCanvas overload simply delegates the
+  work to the first overload passing in Canvas.Handle for the DC parameter.
+Parameters:
+  DC - Device context used for retrieving font metrics. This should be the canvas on which you eventually intend to display the compacted path.
+  Path - The path to compact or truncate.
+  Width - Width, in pixels, that the path will be forced to fit within.
+  CmpFmt - Determines which part of the string is replaced with an ellipsis. Valid values are:   <TABLE>
+cpCenter  Replaces characters in the middle of the string with an ellipsis
+cpEnd     Replaces characters at the end of the string with an ellipsis
+</TABLE>
+
+Result:
+  The compacted path or an empty string if the function fails.
+Notes:
+  If Width is smaller than the most compacted path then the result is the most compacted
+  path, even though it does not fit within the specified width.
+Platform:
+  Windows
+Donator:
+  Marcel van Brakel
+Contributor:
+  Anonymous
+--------------------------------------------------------------------------------
+@@PathExtractFileDirFixed
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Extracts drive and directory parts from a filename.
+Description:
+  PathExtractFileDirFixed extracts the drive and directory parts from the filename
+  specified by S. The resulting path is always terminated with the PathSeparator
+  character (a backslash or a forward slahs depending on the target OS) regardless
+  of whether a drive and/or directory is present in the filename.
+Parameters:
+  S - The filename from which to extract the drive and directory parts.
+Result:
+  The drive and directory part of the specified filename, terminated with a
+  PathSeparator. If the filename does not contain a drive and directory specification
+  the resulting string is a single PathSeparator character.
+Donator:
+  Anthony Steele
+--------------------------------------------------------------------------------
+@@PathExtractFileNameNoExt
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Extracts the filename without the extension.
+Description:
+  Returns the filename part of the supplied path without the extension.
+Parameters:
+  Path - The Path from which to extract a filename.
+Result:
+  The filename part of the path, without extension.
+See also:
+  PathRemoveExtension
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PathRemoveExtension
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Removes the extension from a path.
+Description:
+  PathRemoveExtension removes the extension part from the supplied path, if it exists.
+Parameters:
+  Path - The path from which to remove the extension.
+Result:
+  Path without the extension part.
+See also:
+  PathExtractFileNameNoExt
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PathRemoveSeparator
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Removes a trailing directory separator from a path.
+Description:
+  PathRemoveSeparator removes the trailing directory separator from the path. If
+  there is no trailing directory separator the function does nothing.
+Parameters:
+  Path - The path from which to remove the trailing directory separator.
+Result:
+  The Path without a trailing directory separator.
+Notes:
+  The function only removes one trailing directory separator.
+See also:
+  PathAddSeparator
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GetModulePath
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Returns the filename of a module.
+Description:
+  GetModulePath returns the fully qualified filename of the executable file that
+  houses the module specified by the Module parameter.
+Parameters:
+  Module - Handle of the module whose path you are querying for. This, for example, is
+  the handle returned by LoadLibrary (or LoadLibraryEx) or the address at which the module
+  is loaded (in Win32 a module handle is the base address at which a module is loaded).
+Result:
+  The fully qualified filename of the specified module, or an empty string on failure.
+Donator:
+  Azret Botash
+--------------------------------------------------------------------------------
+@@FileGetTempName
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Returns the name for a temporary file.
+Description:
+  FileGetTempName constructs a fully qualified filename based on system settings
+   (such as a designated folder for temporary files) and the supplied prefix. As
+  the name suggests, this is mostly useful when you need to create a temporary
+  file.
+
+  Warning (Unix): Between the time the pathname is constructed and the file is created
+  another process might have created a file with the same name using tmpnam,
+  leading to a possible security hole. The implementation generates names which
+  can hardly be predicted, but when opening the file you should use the O_EXCL
+  flag. Using tmpfile or mkstemp is a safe way to avoid this problem.
+Parameters:
+  Prefix - On input the first three characters of the string are used to form the name of
+  the temporary file (can be empty).
+Result:
+  If the function succeeds it returns a fully qualified filename. If it fails it
+  returns an empty string.
+Platforms:
+  Windows
+  Unix
+Donators:
+  Marcel van Brakel (Windows)
+  Robert Rossmair (Unix)
+--------------------------------------------------------------------------------
+@@FileCreateTemp
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Creates a temporary file.
+Description:
+  FileCreateTemp creates a temporary file in the temporary folder as returned by
+  GetTempPath. The file is created with read and write access and is deleted as
+  soon as it is closed. The file cannot be opened by another call to CreateFile.
+  The file is created with the temporary attribute which means the system will
+  attempt to keep the file's data in memory rather than caching it. Therefore you
+  should close the file as soon as possible using CloseHandle.
+Parameters:
+  Prefix - On input the first three characters of the string are used to form the name of
+  the temporary file (can be empty). On return, assuming the function succeeded, Prefix
+  contains the actual name of the temporary file, including the path. On failure the contents
+  of Prefix are undefined.
+Result:
+  If the function succeeds the result is a handle to the temporary file, on failure
+  the function returns INVALID_HANDLE_VALUE.
+Platforms:
+  Windows
+  Unix
+Donators:
+  Marcel van Brakel (Windows)
+  Robert Rossmair (Unix)
+--------------------------------------------------------------------------------
+@@FileBackup
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Backup file by creating a copy of the file with a backup file extension (*.~*).
+Description:
+  Backup file by creating a copy of the file with a backup file extension (*.~*).
+Parameters:
+  FileName - The name of the file to backup.
+  Move - If set to True, the original file is renamed to the backup file. Default is False.
+Result:
+  True on success, False otherwise. If the function fails, call GetLastError to
+  to get extended error information, or RaiseLastOSError to pass the information
+  on to the user.
+Platforms:
+  Windows
+  Unix
+See also:
+  FileRestore
+Donator:
+  Jean-Fabien Connault
+Contributor:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@FileCopy
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Copies a file.
+Description:
+  The FileCopy function copies an existing file to a new file.
+Parameters:
+  ExistingFileName - The existing file.
+  NewFileName      - Specifies the name of the new file, or name of a directory where the
+                     copy will be created.
+  ReplaceExisting  - Specifies how to proceed if a file of the same name as that
+                     specified by NewFileName already exists. If this parameter is False and the
+                     new file already exists, the function fails. If this parameter is True and
+                     the new file already exists, the function overwrites the existing file and
+                     succeeds.
+Result:
+  If the function succeeds, the return value is True; False otherwise
+Platforms:
+  Windows
+  Unix
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@FileDelete
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Delete file with the option to send it to recycle bin.
+Description:
+  Delete file with the option to send it to recycle bin.
+Parameters:
+  FileName         - The name of the file to delete.
+  MoveToRecycleBin - If True, the file is move to the recycle bin/trash can (and
+                     still might be restored later); if False, it is to be deleted,
+                     allowing no recovery later.
+Result:
+  If the file has been successfully deleted the function returns True, otherwise
+  it returns False.
+Platforms:
+  Windows
+  Unix
+Donator:
+  Jean-Fabien Connault
+Contributor:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@FileExists
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Tests whether a file exists.
+Description:
+  FileExists tests whether the specified file exists. Unlike the FileExists function
+  from the Delphi RTL, this function suppresses potential dialog raises due to a
+  disk not being available.
+Parameters:
+  FileName - The fully qualified name of the file whose existence to test.
+Result:
+  If the file exists the function returns True, otherwise it returns False.
+Donator:
+  Pelle F. S. Liljendal
+--------------------------------------------------------------------------------
+@@FileMove
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Move file from one location to another one.
+Description:
+  Move file from one location to another one.
+Parameters:
+  ExistingFileName - The existing file.
+  NewFileName - Specifies the new file name, or the name of a directory
+  where the file shall be moved to.
+Result:
+  True, if the file was successfully moved, False, if not.
+Platforms:
+  Windows
+  Unix
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@FileRestore
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Restore file by renaming the backup filename to original filename.
+Description:
+  Restore file by renaming the backup filename to original filename.
+Parameters:
+  FileName - The name of the file to restore.
+Result:
+  True on success, False otherwise. If the function fails, call GetLastError to
+  to get extended error information, or RaiseLastOSError to pass the information
+  on to the user.
+Platforms:
+  Windows
+  Unix
+See also:
+  FileBackup
+Donator:
+  Jean-Fabien Connault
+Contributor:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@ShredFile
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Shreds the contents of the file and then deletes it.
+Description:
+  The ShredFile functions overwrites the contents of the specified file and then
+  deletes the file. This ensures that even if the underlying filesystem does not
+  physically remove the file, its contents are effectively inaccessible.
+Parameters:
+  FileName - The fully qualified name of the file to shred.
+  Times - Number of file overwrites. Defaults to 1.
+Donator:
+  Pelle F. S. Liljendal
+--------------------------------------------------------------------------------
+@@FileGetSize
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Returns the size of the specified file.
+Description:
+  FileGetSize returns the size, in bytes, of the specified file. Note that this
+  function is limited to files whose size is no larger than 2GB.
+Parameters:
+  FileName - The fully qualified name of the file.
+Result:
+  If the function succeeds it returns the size, in bytes, of the specified file.
+  If the function fails, for example because the file does not exist, the result
+  is -1.
+Donator:
+  Pelle F. S. Liljendal
+--------------------------------------------------------------------------------
+@@GetFileAttributeListEx
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Converts attributes flag to a stringlist.
+Description:
+  GetFileAttributeListEx converts the file attributes specified by A to a list of
+  string representations of the attributes included in A. This is similar to
+  the GetFileAttributeList function except that this function handles
+  all documented attributes, including those specific to the NTFS filesystem,
+  where GetFileAttributeList only handles the standard attributes.
+Parameters:
+  List - TStrings derivative that receives the strings.
+  Attr - Attributes of a file, for example retrieved by GetFileAttributes.
+See also:
+  GetFileAttributeList
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GetFileAttributeList
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Converts attributes flag to a stringlist.
+Description:
+  GetFileAttributeList converts the file attributes specified by A to a list of
+  string representations of the attributes included in A. This function only handles
+  the 'standard' file attributes as specified by the faXXX constants in SysUtils.pas.
+Parameters:
+  List - TStrings derivative that receives the strings.
+  Attr - Attributes of a file, usually you'll pass in TSearchRec.Attr.
+See also:
+  GetFileAttributeListEx
+Donator:
+  Charlie Calvert
+--------------------------------------------------------------------------------
+@@GetDirectorySize
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Returns the size of a directory.
+Description:
+  GetDirectorySize returns the size, in bytes, of a directory. That is, the combined
+  sizes of all files contained within the directory.
+Parameters:
+  Path - The directory whose size to determine.
+Result:
+  The combined size, in bytes, of all the files contained in the directory. If the
+  function fails, for example because the specified directory doesn't exists, it
+  returns -1.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GetDriveTypeStr
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Returns the type of drive.
+Description:
+  GetDriveTypeStr returns the type of the specified drive (hard disk, removable,
+  cd-rom etc.) in string representation.
+Parameters:
+  Drive - Drive letter of the drive for which to query the type, e.g. 'a'.
+Result:
+  String representation of the type of the specified drive.
+Donator:
+  John C Molyneux
+--------------------------------------------------------------------------------
+@@SetFileLastWrite
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Sets the file's last-write time stamp.
+Description:
+  SetFileLastWrite sets the specified file's last-write timestamp to the supplied
+  datetime. This routine cannot be used to set the last-write timestamp of a
+  directory. Use SetDirLastWrite for that.
+Parameters:
+  FileName - The name of the file for which to set the time of last write.
+  DateTime - The date and time to set the file's last write stamp to. You must supply the UTC based date and time. To convert from a local date and time use the LocalDateTimeToDateTime function from JclDateTime.
+Result:
+  If the function succeeds the result is True, otherwise it's False.
+See also:
+  SetFileLastAccess
+  SetFileCreation
+  GetFileLastAccess
+  GetFileLastWrite
+  GetFileCreation
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@SetFileLastAccess
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Sets the file's last-access time stamp.
+Description:
+  SetFileLastAccess sets the specified file's last-access timestamp to the supplied
+  datetime. This routine cannot be used to set the last-access timestamp of a
+  directory. Use SetDirLastAccess for that.
+Parameters:
+  FileName - The name of the file for which to set the time of last access.
+  DateTime - The date and time to set the file's last access stamp to. You must supply the UTC based date and time. To convert from a local date and time use the LocalDateTimeToDateTime function from JclDateTime.
+Result:
+  If the function succeeds the result is True, otherwise it's False.
+See also:
+  SetFileLastWrite
+  SetFileCreation
+  GetFileLastAccess
+  GetFileLastWrite
+  GetFileCreation
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@SetFileCreation
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Sets the file's creation time stamp.
+Description:
+  SetFileCreation sets the specified file's creation timestamp to the supplied
+  datetime. This routine cannot be used to set the creation timestamp of a
+  directory. See SetDirCreation for that.
+Parameters:
+  FileName - The name of the file for which to set the time of creation.
+  DateTime - The date and time to set the file's creation stamp to. You must supply the UTC based date and time. To convert from a local date and time use the LocalDateTimeToDateTime function from JclDateTime.
+Result:
+  If the function succeeds the result is True, otherwise it's False.
+See also:
+  SetFileLastWrite
+  SetFileLastAccess
+  GetFileLastAccess
+  GetFileLastWrite
+  GetFileCreation
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@SetDirLastWrite
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Sets the directory's last-write time stamp.
+Description:
+  SetDirLastWrite sets the specified directories last-write timestamp to the supplied
+  datetime. This routine cannot be used to set the last-write timestamp of a
+  file. Use SetFileLastWrite for that. This routine only works on
+  Windows NT/Windows 2000 and for it to succeed the caller must have backup
+  privileges (SE_BACKUP_NAME and SE_RESTORE_NAME).
+Parameters:
+  DirName - The name of the directory for which to set the time of last write.
+  DateTime - The date and time to set the file's last write stamp to. You must supply the UTC based date and time. To convert from a local date and time use the LocalDateTimeToDateTime function from JclDateTime.
+Result:
+  If the function succeeds the result is True, otherwise it's False.
+See also:
+  SetDirLastAccess
+  SetDirCreation
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@SetDirLastAccess
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Sets the directory's last-write time stamp.
+Description:
+  SetDirLastWrite sets the specified directories last-access timestamp to the supplied
+  datetime. This routine cannot be used to set the last-access timestamp of a
+  file. Use SetFileLastAccess for that. This routine only works on
+  Windows NT/Windows 2000 and for it to succeed the caller must have backup
+  privileges (SE_BACKUP_NAME and SE_RESTORE_NAME).
+Parameters:
+  DirName - The name of the directory for which to set the time of last write.
+  DateTime - The date and time to set the file's last write stamp to. You must supply the UTC based date and time. To convert from a local date and time use the LocalDateTimeToDateTime function from JclDateTime.
+Result:
+  If the function succeeds the result is True, otherwise it's False.
+See also:
+  SetDirLastWrite
+  SetDirCreation
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@SetDirCreation
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Sets the directory's last-write time stamp.
+Description:
+  SetDirLastWrite sets the specified directories creation timestamp to the supplied
+  datetime. This routine cannot be used to set the creation timestamp of a
+  file. Use SetFileCreation for that. This routine only works on
+  Windows NT/Windows 2000 and for it to succeed the caller must have backup
+  privileges (SE_BACKUP_NAME and SE_RESTORE_NAME).
+Parameters:
+  DirName - The name of the directory for which to set the time of last write.
+  DateTime - The date and time to set the file's last write stamp to. You must supply the UTC based date and time. To convert from a local date and time use the LocalDateTimeToDateTime function from JclDateTime.
+Result:
+  If the function succeeds the result is True, otherwise it's False.
+See also:
+  SetDirLastAccess
+  SetDirLastWrite
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@IsDirectory
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Tests if the file is a directory.
+Description:
+  IsDirectory returns whether or not the specified file is a directory.
+Parameters:
+  FileName - The name of the file you want to test.
+Result:
+  If the specified file is a directory the function returns True, otherwise it
+  returns False. Note that if the specified file is the root of a drive (e.g. 'c:\')
+  the function returns True, if the file does not exist the function returns False.
+Donators:
+  Marcel van Brakel (Win32)
+  Robert Rossmair (Unix)
+--------------------------------------------------------------------------------
+@@LockVolume
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Locks the specified volume.
+Description:
+  LockVolume locks the specified volume. Locking a volume will give exclusive access
+  to the specified volume to whoever owns the lock. Subsequent access to the
+  volume must be performed through the returned handle. When you're done with the
+  volume you must call UnLockVolume. Note that to lock a volume there
+  can be no open files on the volume (even a single open file, by whatever process,
+  will cause the function to fail).
+Parameters:
+  Volume - The volume to lock this must be a string in the format:    * X: Where X is the volume to lock, for example 'a:'  * PHYSICALDRIVEX Where X is the 0 based hard disk number, for example 'PHYSICALDRIVE0'. Note: Do not prepend the Volume name with a '\\.\'. This is done by the function.
+  Handle - Receives a handle of the locked device upon successful return.
+Result:
+  If the function succeeds in locking the volume it returns True and a handle to
+  the specified device in the Handle parameter. If it fails the function returns
+  False and the Handle parameter is undefined.
+Notes:
+  You must have administrative privileges to lock a volume.
+  The device is, according to Microsoft recommendations, opened with no buffering. This action imposes a number of 'limitations' for subsequent access to the device. For example the alignment of buffers must be on a multiple of the volume's sector size. See the Platform SDK for details.
+Platform:
+  Windows
+See also:
+  UnlockVolume
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@OpenVolume
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Opens a handle to the specified volume.
+Description:
+  OpenVolume opens a handle for the specified volume with read/write access.
+  Subsequent access to the volume must be performed through the returned handle.
+  When you're done with the volume you must call CloseVolume.
+Parameters:
+  Drive - The drive letter corresponding to the volume to open.
+Result:
+  If the function succeeds it returns a handle to the specified volume.
+  If it fails the function returns INVALID_HANDLE_VALUE.
+Notes:
+  You must have administrative privileges to open a volume.
+  This action imposes a number of 'limitations' for subsequent access to the volume. For example the alignment of buffers must be on a multiple of the volume's sector size. See the Platform SDK on CreateFile for details.
+Platform:
+  Windows
+See also:
+  CloseVolume
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@CloseVolume
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Closes a handle for a previously opened volume.
+Description:
+  CloseVolume closes the handle to a volume previously opened with OpenVolume.
+Parameters:
+  Handle - The handle previously returned from OpenVolume. If the function succeeds in closing the volume the handle is closed and no longer valid.
+Result:
+  If the function succeeds it returns True, otherwise it returns False. The latter
+  case either means that the specified handle was invalid or that the device
+  could not be closed. In either case the Handle parameter is unaffected and
+  retains its value.
+Platform:
+  Windows
+See also:
+  OpenVolume
+Donator:
+  Massimo Maria Ghisalberti
+--------------------------------------------------------------------------------
+@@CreateEmptyFile
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Creates a new file with a zero length.
+Description:
+  CreateEmptyFile creates a new file with size of zero, that is without content.
+  If a file with the same name already exists but isn't opened, the file is
+  overwritten. Upon failure an exception is raised, for example if a file with the
+  same name already exists but is opened.
+Parameters:
+  FileName - Name of the file to create.
+Platform:
+  Windows
+Donator:
+  Anthony Steele
+--------------------------------------------------------------------------------
+@@GetFileInformation
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Returns information about a file.
+Description:
+  GetFileInformation returns a TSearchRec record containing information about the
+  specified file such as creation time, filesize and so forth.
+Parameters:
+  FileName - Fully qualified name of the file for which to retrieve information.
+Result:
+  If the function succeeds it returns a TSearchRec with information about the file.
+  The Delphi help contains documentation for this record. If the function fails,
+  for example because it can't find the file, it raises an EWin32Error exception.
+See also:
+  GetStandardFileInfo
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@GetStandardFileInfo
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Returns information about a file.
+Description:
+  GetStandardFileInfo returns standard information about the specified file such as
+  creation time, filesize and attributes.
+Parameters:
+  FileName - Fully qualified name of the file for which to retrieve information.
+Result:
+  If the function succeeds it returns a TWin32FileAttributeData record with
+  information about the file. The Platform SDK contains documentation for this record.
+  If the function fails, for example because it can't find the file, it raises an
+  EFileUtilsError exception.
+See also:
+  GetFileInformation
+Donator:
+  Marcel van Brakel
+Contributor:
+  Anonymous
+--------------------------------------------------------------------------------
+@@GetFileAgeCoherence
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Tests the file age coherence of a file.
+Description:
+  GetFileAgeCoherence tests whether the specified file's age is coherent. That is,
+  it tests whether or not the file creation time is at least earlier than the
+  file's last write time.
+Parameters:
+  FileName - The name of the file whose age coherence to test.
+Result:
+  If the file's age is coherent the result is True, otherwise it's False.
+See also:
+  GetFileLastWrite
+  GetFileLastAccess
+  GetFileCreation
+Donator:
+  Massimo Maria Ghisalberti
+--------------------------------------------------------------------------------
+@@GetFileLastWrite
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Returns the date/time that the file was last written to.
+Description:
+  GetFileLastWrite returns the date/time that the specified file was last written to.
+  The return value is a UTC based TFileTime value which can be converted to the
+  familiar TDateTime by using FileTimeToDateTime function.
+Parameters:
+  FileName - The name of the file for which to retrieve the time of last write.
+Result:
+  The date/time the file was last written to, in TFileTime format. On failure the
+  function raises an exception.
+See also:
+  GetFileAgeCoherence
+  GetFileLastAccess
+  GetFileCreation
+Donator:
+  Massimo Maria Ghisalberti
+--------------------------------------------------------------------------------
+@@GetFileLastAccess
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Returns the date/time that the file was last accessed.
+Description:
+  GetFileLastAccess returns the date/time that the specified file was last accessed.
+  The return value is a UTC based TFileTime value which can be converted to the
+  familiar TDateTime by using the FileTimeToDateTime function.
+Parameters:
+  FileName - The name of the file for which to retrieve the time of last access.
+Result:
+  The date/time the file was last accessed. On failure the function raises an exception.
+See also:
+  GetFileAgeCoherence
+  GetFileLastWrite
+  GetFileCreation
+Donator:
+  Massimo Maria Ghisalberti
+--------------------------------------------------------------------------------
+@@GetFileCreation
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Returns the date/time that the file was created.
+Description:
+  GetFileCreation returns the date/time that the specified file was created.
+  The return value is a UTC based TFileTime value which can be converted to the
+  familiar TDateTime by using the FileTimeToDateTime function.
+Parameters:
+  FileName - The name of the file for which to retrieve the time of creation.
+Result:
+  The date/time the file was created. On failure the function raises an exception.
+Platform:
+  Windows
+See also:
+  GetFileAgeCoherence
+  GetFileLastAccess
+  GetFileLastWrite
+Donator:
+  Massimo Maria Ghisalberti
+--------------------------------------------------------------------------------
+@@BuildFileList
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Builds a list of files and folders in a directory.
+Description:
+  BuildFileList builds a list of files and folders in the specified Path that
+  matches the specified attributes. This is simply a convenient wrapper for the
+  FindFirst, FindNext and FindClose functions.
+Parameters:
+  Path - Directory and filename mask for which you want to build the list. For example this can be 'c:\winnt\*.dll'. This parameter works like the Path parameter in FindFirst. In Windows it is case insensitive and applies to short and long filenames, so "*.*" will find all files. In Linux it's case sensitive and "*.*" will find only files that contain a ".".
+  Attr - The Attr parameter specifies the special files to include in addition to all normal files. Choose from these file attribute constants when specifying the Attr parameter (declared in SysUtils.pas):    * faReadOnly Read-only files  * faHidden Hidden files  * faSysFile System files  * faVolumeID Volume ID files  * faDirectory Directory files  * faArchive Archive files  * faAnyFile Any file  
+  List - A TStrings descendant in which the file list that matched the Path and Attr parameters is returned. Note that this list is not cleared by the routine before the found entries are added.
+Result:
+  If the function succeeds it returns True, otherwise it returns False. In case of
+  failure the list contains the entries that were retrieved up to the point of
+  failure.
+See also:
+  AdvBuildFileList
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@AdvBuildFileList
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  AdvBuildFileList works like BuildFileList if called with only three parameters, but it accepts two optional parameters for extended functionality.
+Description:
+  AdvBuildFileList builds a list of files and folders in the specified Path that
+  matches the specified attributes.
+Parameters:
+  Path - Directory and file name mask for which you want to build the list. For example this can be 'c:\winnt\*.dll'. This parameter works like the Path parameter in FindFirst. In Windows it is case insensitive and applies to short and long filenames, so "*.*" will find all files. In Linux it's case sensitive and "*.*" will find only files that contain a ".".
+  Attr - The Attr parameter specifies the special files to include in addition to all normal files. Choose from these file attribute constants when specifying the Attr parameter (declared in SysUtils.pas):    * faReadOnly Read-only files  * faHidden Hidden files  * faSysFile System files  * faVolumeID Volume ID files  * faDirectory Directory files  * faArchive Archive files  * faAnyFile Any file
+  List - A TStrings descendant in which the file list according to the parameters is returned. Note that this list is not cleared by the routine before the found entries are added.
+  Options - Set of additional option:    * flFullNames: if set, the full path is included with each listed file name.  *  flRecursive: if set, all subdirectories of the directory given in PATH are scanned.  * flMaskedSubfolders: if set, files are only listed if their directory path, relative to the directory given in the Path parameter, matches the Subfolder Mask parameter.
+  SubfoldersMask - if flMaskedSubfolders is set, the remaining directory path, relative to the directory given in the Path parameter, is matched against this parameter. In Windows the matching is done case insensitively, in Linux it's done case sensitively. In Windows (with long file names enabled) only the long name is matched, so "*.*" will find only directories that contain a ".".
+Result:
+  If the function succeeds it returns True, otherwise it returns False. In case of
+  failure the list contains the entries that were retrieved up to the point of
+  failure.
+See also:
+  BuildFileList
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TFileListOptions
+<GROUP FilesandIO.FilesandDirectories>
+
+<TABLE>
+Options                Description
+-------------------    ------------------------------------------------------
+flFullNames            If this flag is included, then filenames are added to
+                       the list including the complete path, otherwise just
+                       the filenames are added to the list. For example:
+                       "C:WindowsNOTEPAD.EXE" when using flFullNames,
+                       "NOTEPAD.EXE" when not using it.
+flRecursive            Search the specified path and subfolders for files to
+                       include in the list.
+flMaskedSubfolders     Only search folders than match the SubfoldersMask
+                       parameter (currently broken).
+</TABLE>
+
+Summary:
+  An enumeration describing the set of available file list options.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TDelTreeProgress
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Progress callback routine for the DelTreeEx function.
+Description:
+  TDelTreeProgress is the function signature for the Progress parameter of the
+  DelTreeEx function. This function is called just before the file is deleted. You
+  can use this callback routine to display progress to the user. To allow DelTreeEx
+  to continue deleting files return True, to abort the deletion return False.
+Parameters:
+  FileName - The name of the file that is about to be deleted.
+  Attr - The attributes of the file. See GetFileAttributes in the Platform SDK for a full list of attribute flags.
+Result:
+  If you return True DelTreeEx deletes the specified file and continues with the
+  next one. If you return False DeltreeEx aborts immediately.
+Notes:
+  Returning False will abort the entire deletion process, not just for the specified file only.
+See also:
+  DelTreeEx
+Donator:
+  John C Molyneux
+--------------------------------------------------------------------------------
+@@DelTree
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Recursively deletes a folder.
+Description:
+  DelTree recursively deletes a folder much like the DOS command. That is, it deletes
+  a folder and everything in it. If parts of the folder tree cannot be deleted, eg
+  because some files may be currently open, the function attempts to delete as
+  much as possible before returning.
+Parameters:
+  Path - The folder to delete. Must be fully qualified. May have a trailing backslash but that's optional.
+Result:
+  If the function succeeds in deleting the folder the result is True, if the function
+  fails the result is False. In case of failure the function attempts to delete
+  as much as possible before returning. Thus on failure part of the folder may have
+  been deleted while some files and folders may still exist. Failure is usually due
+  to insufficient access rights or because some files are currently open (locked).
+Notes:
+  The deletions are permanent! Deletions are not recoverable through the recycle bin.
+See also:
+  DelTreeEx
+Donator:
+  John C Molyneux
+Contributor:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@DelTreeEx
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Recursively deletes a folder.
+Description:
+  DelTree recursively deletes a folder much like the DOS command. That is, it deletes
+  a folder and everything in it. If parts of the folder tree cannot be deleted, eg
+  because some files may be currently open, the function attempts to delete as
+  much as possible before returning or immediately returns, depending on the
+  AbortOnFailure parameter. The function is capable of providing the caller with
+  progress information through the Progress function parameter.
+Parameters:
+  Path - The folder to delete. Must be fully qualified. May have a trailing backslash but that's optional.
+  AbortOnFailure - If True the function immediately returns when it encounters a file or directory it cannot delete. If False the function continues attempting to delete the remaining Files. In either case, if one or more files couldn't be deleted the function result is False.
+  Progress - Function that is called just before a file is deleted. This allows you to display progress to the user and even abort the deletion. This parameter is optional (you can specify nil). See TDelTreeProgress For more information.
+Result:
+  If the function succeeds in deleting the folder the result is True, if the function
+  fails the result is False. In case of failure the function attempts to delete
+  as much as possible before returning or continues deleting depending on the
+  AbortOnFailure parameter. Thus on failure part of the folder may have been deleted
+  while some files and folders may still exist. Failure is usually due to insufficient
+  access rights or because some files are currently open (locked).
+Notes:
+  The deletions are permanent! Deletions are not recoverable through the recycle bin.
+See also:
+  DelTree
+Donator:
+  John C Molyneux
+Contributor:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@DirectoryExists
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Determines whether a directory exists.
+Description:
+  DirectoryExists determines whether the specified directory exists.
+Parameters:
+  Name - The directory to check for existence. If Name is not fully qualified it is interpreted as relative to the current directory.
+Result:
+  If the directory exists the function returns True, otherwise it returns False.
+Notes:
+  This function is a replacement for the FileUtils.DirectoryExists function from the Delphi RTL to avoid dependency on that particular unit. There's nothing wrong with that function except that the unit uses Forms etc. which add significant resources and startup time to your application (if it doesn't use these units already).
+Donator:
+  Anonymous (Win32)
+Contributor:
+  Robert Rossmair (Unix)
+--------------------------------------------------------------------------------
+@@DiskInDrive
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Tests whether there is a disk in the specified drive.
+Description:
+  DiskInDrive tests whether or not there is a disk present in the specified drive.
+  The drive can be any volume from a to z, specified either in lowercase or uppercase.
+  The function returns whether or not the drive is accessible, for removable media
+  this indicates whether or not the drive has a 'disk' present, for other type of
+  media it indicates if the drive exists.
+Parameters:
+  Drive - The volume to test. Valid drives are 'a'..'z' and 'A'..'Z'.
+Result:
+  If the drive is accessible, a disk is present, and the result is True. If the drive
+  is not accessible or an error occurred the function returns False.
+Platform:
+  Windows
+Donator:
+  John C Molyneux
+--------------------------------------------------------------------------------
+@@TFileFlags
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Description:
+* ffDebug
+  Included if the file contains debugging information or is compiled with debugging features enabled.
+* ffInfoInferred
+  The file's version structure was created dynamically; therefore, some of the properties may be empty or incorrect. This flag should never be set in a file's VS_VERSIONINFO data.
+* ffPatched
+  The file has been modified and is not identical to the original shipping file of the same version number.
+* ffPreRelease
+  The file is a development version, not a commercially released product.
+* ffPrivateBuild
+  The file was not built using standard release procedures.
+* ffSpecialBuild
+  The file was built by the original company using standard release procedures but is a variation of the normal file of the same version number.
+Platform:
+  Windows
+See also:
+  TJclFileVersionInfo
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@VersionResourceAvailable
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Tests if a file has a version resource.
+Description:
+  VersionResourceAvailable tests whether or not the specified file has an accessible
+  version resource. You can use this function to test before using the TJclFileVersionInfo
+  class to avoid an exception during construction.
+Parameters:
+  FileName - The fully qualified name of the file to test.
+Result:
+  If the specified file contains a version resource the result is True, if it does
+  not or the file could not be found the result is False.
+Platform:
+  Windows
+See also:
+  TJclFileVersionInfo
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@OSIdentToString
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Maps an OS identifier as to a string.
+Description:
+  OSIdentToString maps an OS identifier as returned by TJclFileVersionInfo.FileOS to
+  a string. An example is "Win32 API, running on Windows/NT".
+Parameters:
+  OSIdent - An OS identifier returned by FileOS property of TJclFileVersionInfo.
+Result:
+  String representation of the OS identifier.
+Platform:
+  Windows
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Enables reading of version information from executables.
+Description:
+  TJclFileVersionInfo is a class that enables you to read the version information
+  from an executable file (exe, dll etc.). Naturally the executable itself has to
+  have a version resource linked in. Besides allowing you to read standard version
+  key such as ProductName and FileVersion this class also allows you to read custom
+  keys through the UserKeys property.
+Platform:
+  Windows
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.LanguageCount
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Number of languages in the version resource.
+Description:
+  LanguageCount returns the number of distinct languages for which translations
+  are available in the version resource.
+See also:
+  LanguageIndex
+  LanguageIds
+  LanguageNames
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.LanguageIndex
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Index into the LanguageIds array of the 'active' language.
+Description:
+  Selects one of the languages in the LanguageIds list as the active language. After
+  setting this all string properties return values in that specific language.
+See also:
+  LanguageCount
+  LanguageIds
+  LanguageNames
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.LanguageIds
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  List of supported languages.
+Description:
+  List of language IDs for which the version resource contains translated strings.
+  Use the LanguageIndex property to set the language in which you want the class to
+  return string properties. Use the LanguageNames property to get readable names
+  for these identifiers.
+See also:
+  LanguageCount
+  LanguageIndex
+  LanguageNames
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.LanguageNames
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  List of supported languages.
+Description:
+  List of languages for which the version resource contains translated strings.
+  Use the LanguageIndex property to set the language in which you want the class to
+  return string properties. Use the LanguageIds property to get language identifiers.
+See also:
+  LanguageCount
+  LanguageIndex
+  LanguageIds
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.Comments
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Returns the comment string.
+Description:
+  Comments returns the value of the comments string key.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.CompanyName
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Returns the company name string.
+Description:
+  CompanyName returns the value of the company name string key.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.FileDescription
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Returns the file description string.
+Description:
+  FileDescription returns the value of the file description string key.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.FileFlags
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Set of flags that specify the attributes of the file.
+Description:
+  FileFlags is a set of flags that specify the attributes of the file such as debug
+  and special build. See TFileFlags for more information on all the
+  possible values in this set.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.FileOS
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Depicts the OS for which this file was designed.
+Description:
+  Specifies the operating system for which this file was designed. You can use
+  the OSIdentToString function to map this value to a descriptive string.
+  This member can be one of the following values:
+    <TABLE>
+Flag            Description
+--------------  ------------------------------------------------------------------------------
+VOS_DOS         The file was designed for MS-DOS.
+VOS_NT          The file was designed for Windows&nbsp;NT/Windows&nbsp;2000.
+VOS__WINDOWS16  The file was designed for 16-bit Windows.
+VOS__WINDOWS32  The file was designed for the Win32 API.
+VOS_OS216       The file was designed for 16-bit OS/2.
+VOS_OS232       The file was designed for 32-bit OS/2.
+VOS__PM16       The file was designed for 16-bit Presentation Manager.
+VOS__PM32       The file was designed for 32-bit Presentation Manager.
+VOS_UNKNOWN     The operating system for which the file was designed is unknown to the system.
+</TABLE>
+
+    An application can combine these values to indicate that the file was designed for one operating system running on another. The following dwFileOS values are examples of this, but are not a complete list:
+    <TABLE>
+Flag               Description
+-----------------  -------------------------------------------------------------------------------------
+VOS_DOS_WINDOWS16  The file was designed for 16-bit Windows running on MS-DOS.
+VOS_DOS_WINDOWS32  The file was designed for the Win32 API running on MS-DOS.
+VOS_NT_WINDOWS32   The file was designed for the Win32 API running on Windows&nbsp;NT/Windows&nbsp;2000.
+VOS_OS216_PM16     The file was designed for 16-bit Presentation Manager running on 16-bit OS/2.
+VOS_OS232_PM32     The file was designed for 32-bit Presentation Manager running on 32-bit OS/2.
+</TABLE>
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.FileSubType
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Specifies the function of the file.
+Description:
+  FileSubType specifies the function of the file and serves as a further specification
+  of the FileType. The possible values depend on the FileType property.
+
+  If dwFileType is VFT_DRV, dwFileSubtype can be one of the following values:
+<TABLE>
+Flag                  Description
+--------------------  ------------------------------------------
+VFT2_UNKNOWN          The driver type is unknown by the system.
+VFT2_DRV_COMM         The file contains a communications driver.
+VFT2_DRV_PRINTER      The file contains a printer driver.
+VFT2_DRV_KEYBOARD     The file contains a keyboard driver.
+VFT2_DRV_LANGUAGE     The file contains a language driver.
+VFT2_DRV_DISPLAY      The file contains a display driver.
+VFT2_DRV_MOUSE        The file contains a mouse driver.
+VFT2_DRV_NETWORK      The file contains a network driver.
+VFT2_DRV_SYSTEM       The file contains a system driver.
+VFT2_DRV_INSTALLABLE  The file contains an installable driver.
+VFT2_DRV_SOUND        The file contains a sound driver.
+</TABLE>
+
+  If dwFileType is VFT_FONT, dwFileSubtype can be one of the following values:
+<TABLE>
+Flag                Description
+------------------  ---------------------------------------
+VFT2_UNKNOWN        The font type is unknown by the system.
+VFT2_FONT_RASTER    The file contains a raster font.
+VFT2_FONT_VECTOR    The file contains a vector font.
+VFT2_FONT_TRUETYPE  The file contains a TrueType font.
+</TABLE>
+
+  If dwFileType is VFT_VXD, dwFileSubtype contains the virtual device identifier included in the virtual device control block.
+  All dwFileSubtype values not listed here are reserved for future use by Microsoft.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.FileType
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Depicts the general type of the file.
+Description:
+  FileType returns a constant which depicts the general type of file from which
+  the version resource was read. This can be one of the following values:
+<TABLE>
+Flag            Description
+--------------  --------------------------------------------------------------------------------------------------------------------------------------------
+VFT_UNKNOWN     The file type is unknown to the system.
+VFT_APP         The file contains an application.
+VFT_DLL         The file contains a dynamic-link library (DLL).
+VFT_DRV         The file contains a device driver. If dwFileType is VFT_DRV, dwFileSubtype contains a more specific description of the driver.
+VFT_FONT        The file contains a font. If dwFileType is VFT_FONT, dwFileSubtype contains a more specific description of the font file.
+VFT_VXD         The file contains a virtual device.
+VFT_STATIC_LIB  The file contains a static-link library.
+</TABLE>
+
+  All other values are reserved for future use by Microsoft.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.FileVersion
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Returns the FileVersion string.
+Description:
+  FileVersion returns the value of the file version string key.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.InternalName
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Returns the internal name string.
+Description:
+  InternalName returns the value of the internal name string key.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.VersionLanguageId
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Returns the language identifier of the version resource.
+Description:
+  VersionLanguage returns the language identifier of the version resource.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.VersionLanguageName
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Returns the language name of the version resource.
+Description:
+  VersionLanguage returns the language name of the version resource.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.LegalCopyright
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Returns the legal copyright string.
+Description:
+  LegalCopyright returns the value of the legal copyright string key.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.LegalTradeMarks
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Returns the LegalTradeMarks string.
+Description:
+  LegalTradeMarks returns the value of the legal trademarks string key.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.OriginalFilename
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  OriginalFileName returns the value of the original filename string key.
+Description:
+  Returns the original filename string.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.ProductName
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Returns the product name string.
+Description:
+  ProductName returns the value of the product name string key.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.ProductVersion
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Returns the product version string.
+Description:
+  ProductVersion returns the value of the product version string key.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.SpecialBuild
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Returns the special build module attribute.
+Description:
+  SpecialBuild is set to true if the executable has the special build module attribute
+  set in its version resource. If it doesn't SpecialBuild is False.
+See also:
+  PrivateBuild
+  FileFlags
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.PrivateBuild
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Returns the private build module attribute.
+Description:
+  PrivateBuild is set to true if the executable has the private build module attribute
+  set in its version resource. If it doesn't PrivateBuild is False.
+See also:
+  SpecialBuild
+  FileFlags
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.Items
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Allows for reading user defined keys.
+Description:
+  UserKeys allows for reading of non standard, or custom, keys within a version
+  resource. This is implemented as an array with a string index. The key you
+  want to read is used as an index into this array. For example:
+  S := V.UserKeys['MyKey']; The property returns the value of the key 'MyKey'.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.BinFileVersion
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Returns the binary file version string.
+Description:
+  BinFileVersion returns the value of the binary file version string key.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.BinProductVersion
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Returns the binary product string.
+Description:
+  The BinProductVersion returns the value of the binary product version string key.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.Attach
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Creates an instance of TJclFileVersionInfo using the supplied buffer.
+Description:
+  The Attach constructor creates an instance of the TJclFileVersionInfo class and
+  attaches it to the specified buffer. If successful you can use the properties
+  of TJclFileVersionInfo to start reading the version resource information
+  from the executable. Use this constructor if you already have read the version info
+  into a buffer but still want to use this class for convenience.
+Parameters:
+  Buffer - Buffer containing the version info resource.
+Notes:
+  To include version information in your own projects select "Project | Options" and go to the "Version Info" tab.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TJclFileVersionInfo.Create
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Creates an instance of TJclFileVersionInfo.
+Description:
+  The Create constructor creates an instance of the TJclFileVersionInfo class and
+  attaches it to the executable specified by FileName. If successful you can use
+  the properties of TJclFileVersionInfo to start reading the version resource information
+  from the executable. If the constructor cannot read the version resource from
+  the specified file (e.g. because the file does not exist or does not have a version
+  resource) an exception is raised (using RaiseLastWin32Error). To avoid the
+  exception and check beforehand if the file has a version resource you can use
+  the VersionResourceAvailable
+  function.
+Parameters:
+  AFileName - The fully qualified name of the file whose version resource to read.
+Notes:
+  To include version information in your own projects select "Project | Options" and go to the "Version Info" tab.
+See also:
+  Attach
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@DeleteDirectory
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Deletes specified directory or moves it to recycle bin.
+Description:
+  Delete the specified directory either permanently or moves it to
+  recycle bin. The behaviour depends on the value of
+  MoveToRecycleBin parameter.
+Parameters:
+  DirectoryName    - Directory to be deleted.
+  MoveToRecycleBin - If True the directory will be moved to
+                     the system Recycle Bin instead of being
+                     deleted.
+Platforms:
+  Windows NT/2000/Vista: Requires Windows NT 3.1 or later.
+  Windows 95/98: Requires Windows 95 or later.
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@CopyDirectory
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Copies specified directory to a new directory.
+Description
+  Copy the existing directory to a new directory.
+  If the new directory name already exists then the existing directory is copied
+  inside the new directory.
+  If the new directory name does not exist then the existing directory is copied
+  as the new directory.
+Parameters:
+  ExistingDirectoryName - Source directory.
+  NewDirectoryName      - Destination directory.
+Platforms:
+  Windows NT/2000/Vista: Requires Windows NT 3.1 or later.
+  Windows 95/98: Requires Windows 95 or later.
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@MoveDirectory
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Moves specified directory to a new directory.
+Description:
+  Move the existing directory to a new directory.
+  If the new directory name already exists then the existing directory is moved
+  inside the new directory.
+  If the new directory name does not exist then the existing directory is moved
+  (renamed) as the new directory.
+Parameters:
+  ExistingDirectoryName - Source directory.
+  NewDirectoryName      - Destination directory.
+Platforms:
+  Windows NT/2000/Vista: Requires Windows NT 3.1 or later.
+  Windows 95/98: Requires Windows 95 or later.
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@GetBackupFileName
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Returns a file name that can be used for backup purposes.
+Description:
+  Returns a file name that can be used for backup purposes.
+  Basically it prepends the file extention with a tilde (~).
+  If file does not contain extension, the function does nothing.
+Parameters:
+  FileName - File name that is used to construct file name of backup file.
+See also:
+  IsBackupFileName
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@IsBackupFileName
+<GROUP FilesandIO.PathManipulation>
+Summary:
+  Checks if a file name is a backup file name or not.
+Description:
+  Returns True if the specified file name is a backup file name (file extension starts with a tilde).
+  Returns False if the specified file name is not a backup file name (file extension doesn't start with a tilde).
+Parameters:
+  FileName - File name to check.
+See also:
+  GetBackupFileName
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@OSFileTypeToString
+<GROUP FilesandIO.FileSystems>
+Summary:
+  Maps a file type identifier to a string.
+Description:
+  Maps a file type as returned by TJclFileVersionInfo.FileType
+  and TJclFileVersionInfo.FileSubType identifier to its string
+  representation.
+Parameters:
+  OSFileSubType - File subtype identifier. You can use a value returned
+                  by TJclFileVersionInfo.FileSubType member. Can be
+                  omitted. Default value is 0.
+  OSFileType -    File type identifier. You can use a value returned by
+                  TJclFileVersionInfo.FileType member.
+Result:
+  If there is no an appropriate value for FileType passed the
+  function returns an empty string.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@PathExtractPathDepth
+Summary:
+  Returns Depth parts of the path excluding drive.
+Description
+  Returns first Depth parts of the specified path excluding drive letter
+  and colon.
+Example:
+  PathExtractPathDepth('c:\users\brakelm\data', 2) => 'c:\users\brakelm'
+Parameters:
+  Depth - Specifies the maximum of path parts to return.
+  Path - The path to extract parts from.
+See also:
+  PathGetDepth
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@PathGetDepth
+Summary:
+  Returns the depth of the path specified by Path parameter.
+Description:
+  Returns the depth of the path specified by Path parameter, that is the number
+  of subdirectories in the path.
+Parameters:
+  Path - The path to count the depth of.
+See also:
+   PathExtractPathDepth
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@UnlockVolume
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Tries to unlock the volume represented by the handle passed.
+Description:
+  Attempts to unlock the volume specified by the handle that
+  was previously locked by LockVolume function.
+Note:
+  This function calls Windows API DeviceIOControl function.
+  Although Microsoft provides the way to call this function in
+  Windows 95/98/ME environment, the implementation of
+  UnlockVolume does not allow its usage under those operating
+  systems.
+
+  If the function succeedes the handle associated with the
+  volume is getting freed and you should not use it again as
+  its value will be INVALID_HANDLE_VALUE. However the
+  handle remains valid if the function fails.
+Parameters:
+  Handle - Handle of the volume to be unlocked previously obtained
+           calling LockVolume function. Also this handle can be obtained
+           by calling CreateFile Windows API function directly.
+Result:
+  Returns True if the function succeeded, False otherwise.
+Platforms:
+  Windows NT/2000/Vista: Requires Windows NT 4 or later.
+  Windows 95/98: Unsupported.
+Donator:
+  Rudy Velthuis
+--------------------------------------------------------------------------------
+@@Win32DeleteFile
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Delete file with the option to send it to recycle bin.
+Description:
+  Delete file with the option to send it to recycle bin.
+Parameters:
+  FileName         - The name of the file to delete.
+  MoveToRecycleBin - If True, the file is move to the recycle bin/trash can (and
+                     still might be restored later); if False, it is to be deleted,
+                     allowing no recovery later.
+Result:
+  If the file has been successfully deleted the function returns True, otherwise
+  it returns False.
+Note:
+  Obsolete. Use FileDelete instead.
+See also:
+  FileDelete
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@Win32MoveFileReplaceExisting
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  TODO
+Description:
+  TODO
+Parameters:
+  ExistingFilename -
+  NewFileName -
+Result:
+  True on success, False otherwise.
+Note:
+  Obsolete. Use FileMove instead.
+Platform:
+  Windows
+Donator:
+  Anonymous
+--------------------------------------------------------------------------------
+@@Win32BackupFile
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Backup file by creating a copy of the file with a backup file extension (*.~*).
+Description:
+  Backup file by creating a copy of the file with a backup file extension (*.~*).
+Parameters:
+  FileName - The name of the file to backup.
+  Move - If set to True, the original file is renamed to the backup file. Default is False.
+Result:
+  True on success, False otherwise. If the function fails, call GetLastError to
+  to get extended error information, or RaiseLastOSError to pass the information
+  on to the user.
+Note:
+  Obsolete. Use FileBackup instead.
+See also:
+  FileBackup
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@Win32RestoreFile
+<GROUP FilesandIO.FilesandDirectories>
+Summary:
+  Restore file by renaming the backup filename to original filename.
+Description:
+  Restore file by renaming the backup filename to original filename.
+Parameters:
+  FileName - The name of the file to restore.
+Result:
+  True on success, False otherwise. If the function fails, call GetLastError to
+  to get extended error information, or RaiseLastOSError to pass the information
+  on to the user.
+Note:
+  Obsolete. Use FileRestore instead.
+See also:
+  FileRestore
+Donator:
+  Jean-Fabien Connault
+--------------------------------------------------------------------------------
+@@VersionFixedFileInfo
+<GROUP FilesandIO.FilesandDirectories.FileVersionInfo>
+Summary:
+  Retrieves the root block of version information resource from the specified
+  file.
+Description:
+  The VersionFixedFileInfo function retrieves the root
+  block of version information resource from the file specified
+  by the FileName parameter.
+Parameters:
+  FileName  - The fully qualified file name, the version information
+              resource of which should be retrieved.
+  FixedInfo - Output parameter. Contains the root block of version
+              information resource if function succeedes.
+Result:
+  Function returns True if version information resources
+  was retrieved successfully, False otherwise.
+See also:
+  VersionResourceAvailable
+  TJclFileVersionInfo
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@CreateSymbolicLink
+<GROUP FilesandIO.FilesandDirectories>
+Parameters:
+  Name - The name of the symbolic link.
+  Target - The file the link points to.
+Platforms:
+  Unix
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@SymbolicLinkTarget
+<GROUP FilesandIO.FilesandDirectories>
+Parameters:
+  Name - The name of the symbolic link
+Result:
+  The file the link points to.
+Platforms:
+  Unix
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@TFileSearchOptions
+<GROUP FilesandIO.FilesandDirectories.FileSearch>
+Summary:
+  TODO
+Description:
+  TODO
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@TAttributeInterest
+<GROUP FilesandIO.FilesandDirectories.FileSearch>
+Summary:
+  Defines the interest a file search operation may have in specific file
+  attributes.
+Description:
+  Specifies how a given file attribute shall affect file search results.
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@TAttributeInterest.aiIgnored
+File search matching is not affected by this attribute.
+--------------------------------------------------------------------------------
+@@TAttributeInterest.aiRequired
+The attribute is required for a file to be included in the search result set.
+--------------------------------------------------------------------------------
+@@TAttributeInterest.aiRejected
+The attribute causes a file to be excluded from the search result set.
+--------------------------------------------------------------------------------
+@@VerifyFileAttributeMask
+<GROUP FilesandIO.FilesandDirectories.FileSearch>
+Parameters:
+  RejectedAttributes - TODO
+  RequiredAttributes - TODO
+Result:
+  TODO
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@IsFileAttributeMatch
+<GROUP FilesandIO.FilesandDirectories.FileSearch>
+Parameters:
+  FileAttributes - TODO
+  RejectedAttributes - TODO
+  RequiredAttributes - TODO
+Result:
+  TODO
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@FileAttributesStr
+<GROUP FilesandIO.FilesandDirectories>
+Parameters:
+  FileInfo - TODO
+Result:
+  TODO
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@IsFileNameMatch
+<GROUP FilesandIO.FilesandDirectories.FileSearch>
+Parameters:
+  FileName - TODO
+  Mask - TODO
+  CaseSensitive - default is False for Windows, True else
+Result:
+  TODO
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@EnumFiles
+<GROUP FilesandIO.FilesandDirectories.FileSearch>
+Parameters:
+  Path - TODO
+  HandleFile - TODO
+  RejectedAttributes - TODO; default = faRejectedByDefault.
+  RequiredAttributes - TODO
+  Abort - default = nil);
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@EnumDirectories
+<GROUP FilesandIO.FilesandDirectories.FileSearch>
+Parameters:
+  Root - TODO
+  HandleDirectory - TODO
+  IncludeHiddenDirectories - TODO
+  SubDirectoriesMask - TODO
+  Abort - TODO
+  ResolveSymLinks - (Unix only)
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@TJclCustomFileAttrMask
+<GROUP FilesandIO.FilesandDirectories.FileSearch>
+Summary:
+  TODO
+Description:
+  TODO
+Platforms:
+  Windows
+  Unix
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@TJclFileAttributeMask
+<GROUP FilesandIO.FilesandDirectories.FileSearch>
+Summary:
+  TODO
+Description:
+  TODO
+Platforms:
+  Windows
+  Unix
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@TJclFileEnumerator
+<GROUP FilesandIO.FilesandDirectories.FileSearch>
+Summary:
+  TODO
+Description:
+  TODO
+Platforms:
+  Windows
+  Unix
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@IJclFileEnumerator
+<GROUP FilesandIO.FilesandDirectories.FileSearch>
+Summary:
+  Interface for thread-based file search.
+Description:
+  TODO
+Platforms:
+  Windows
+  Unix
+Donator:
+  Robert Rossmair
+--------------------------------------------------------------------------------
+@@FileSearch
+<GROUP FilesandIO.FilesandDirectories.FileSearch>
+Summary:
+  TODO
+Description:
+  TODO
+Result:
+  TODO
+Platforms:
+  Windows
+  Unix
+Donator:
+  Robert Rossmair

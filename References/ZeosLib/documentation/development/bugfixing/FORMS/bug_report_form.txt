@@ -1,0 +1,34 @@
+================================================================================
+//               ZEOS Library Bug Reporting / Bug Fixing Form                 //
+================================================================================
+
+Bug ID               : 1234567                      Priority      : [1-9]
+Submitted by         : Username                     Date Submitted: DD.MM.YYYY
+Quality assurance by : QA Team Member               Closed as of  : DD.MM.YYYY
+Assigned to          : Developer                    Closed by     : Team Member
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : SQL Server, Version x.y
+ZEOSLib Version      : x.y.z [stable/gamma/beta/alpha]
+Component/Class      : TZxyz
+
+--------------------------------------------------------------------------------
+
+Error Description:
+
+Place the error text here. It may be obtained from Bug Report's Summary or
+from the Comments (both in SourceForge's Bug Tracker) by copy&paste. You can
+also write the description by yourself or make a short form of the data
+mentioned above.
+
+--------------------------------------------------------------------------------
+
+Actions done for Bugfixing:
+
+Log all your doings to fix the bug here and do not forget to document your
+changes in sourcecode, also.
+
+================================================================================
+
+

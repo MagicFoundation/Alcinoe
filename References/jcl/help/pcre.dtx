@@ -1,0 +1,797 @@
+@@pcre
+<GROUP JCL>
+Summary:
+  Header conversions and dynamic library loading routines for pcre.dll
+  (Perl-compatible Regular Expressions).
+Description:
+  Header conversions and dynamic library loading routines for pcre.dll
+  (Perl-compatible Regular Expressions).
+  
+  Requires pcre.dll for the Windows platform.
+  Requires libpcre.so.0 for UNIX and Linux platforms.
+  The PCRE code can be statically linked as well.
+Notes:
+  If you enable static linking of a DLL, this means that the
+  pcre.dll *must* be in the users path or an AV will occur at startup.
+See also:
+  JclPCRE
+--------------------------------------------------------------------------------
+@@JclPCRE
+<GROUP JCL>
+Summary:
+  Contains an implementation of a Perl-compatible Regular
+  Expression engine.
+Description:
+  Contains an implementation of a Perl-compatible Regular
+  Expression engine.
+  
+  Requires the header conversions and dynamic library loading
+  code in pcre.pas.
+  
+  Requires resource strings in JclResources.pas.
+  
+  Requires pcre.dll. The latest release of PCRE is always
+  available using FTP from
+  ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/.
+  
+  During unit initialization, the pcre.dll dynamic link library
+  is loaded and mapped for use by the Perl-compatible Regular
+  Expression engine.
+  
+  During unit finalization, the pcre.dll dynamic link library
+  is unloaded.
+See also:
+  pcre
+--------------------------------------------------------------------------------
+@@EPCREError
+Summary:
+  Exception raised an error occurs loading or accessing the PCRE.DLL
+  library.
+Description:
+  EPCREError represents an exception raised an error occurs loading the
+  PCRE.DLL library, or when a result code is returned from PCRE.DLL that
+  represents an error. EPCREError allows applications to use exception
+  handling to trap the exceptions specific to the JclPCRE implementation.
+
+  EPCREError extends its' ancestor class by adding the ErrorCode property
+  and the CreateRes method.
+
+  EPCREError exceptions can be raised when the PCRE.DLL library cannot be
+  loaded because it is not installed on the local computer, or when it
+  cannot be located in the search path at run-time.
+
+  EPCREError may also be raised when executing methods or accessing
+  properties in TJclRegExBase that result in numeric return values from
+  PCRE.DLL representing an error.
+
+<table>
+Method                  Description
+----------------------  -----------------------------------------------
+TJclRegExBase.Compile       Raised when the regular expression argument is
+                        an empty string ('').
+TJclRegExBase.Captures      Raised when the Capture at the requested index
+                        cannot be accessed using PCRE.DLL.
+</table>
+
+  EPCREError exception messages use string values located in
+  JclResources.pas that represent the ErrorCode for the instance.
+
+See also:
+  EPCREError.CreateRes
+  EPCREError.ErrorCode
+  TJclRegExBase.Compile
+  TJclRegExBase.Captures
+--------------------------------------------------------------------------------
+@@EPCREError.ErrorCode
+Summary:
+  Represents the numeric value for the exception.
+Description:
+  ErrorCode is a read-only property that represents the numeric value for
+  the exception. ErrorCode is updated using an argument value passed to
+  the CreateRes constructor.
+
+  Use Message to access the string containing the description of the
+  exception.
+See also:
+  Message
+  EPCREError.CreateRes
+--------------------------------------------------------------------------------
+@@EPCREError.CreateRes@PResStringRec@Integer
+Summary:
+  Constructor for the object instance.
+Description:
+  CreateRes is an alternate constructor for the exception.  Arguments
+  passed to the constructor are used to set the value for the ErrorCode
+  and Message properties in the object instance.
+Parameters:
+  ResStringRec - String to use as the \description of the error message.
+  ErrorCode - Numeric value for the exception.
+See also:
+  Message
+  EPCREError.ErrorCode
+--------------------------------------------------------------------------------
+@@TJclRegExBase
+Summary:
+  Implements a regular expression engine based on the Perl-compatible
+  Regular Expression library.
+Description:
+  TJclRegExBase implements a regular expression engine based on the
+  Perl-compatible Regular Expression library.
+
+  TJclRegExBase requires the header conversions and import routines in
+  pcre.pas, and the PCRE.DLL dynamic link library.
+
+  TJclRegExBase provides properties and methods that act as wrappers to
+  routines in the PCRE.DLL library.
+
+  Use Compile to examine, study, and localize a regular expression.
+
+  Use Match to compare a text subject against the compiled regular
+  expression.
+
+  Use CaptureCount to determine the total number of captured character
+  classes for the regular expression.
+
+  Use Captures to access captured character classes by their
+  ordinal position.
+
+  Use CaptureRanges to access the starting and ending positions for
+  captured character classes by their ordinal position.
+
+  Use ErrorMessage to access the description of an error returned from
+  the PCRE.DLL library.
+
+  Use ErrorOffset to determine the offset into a regular expression where
+  an error was detected by the PCRE.DLL library.
+
+  Use Options read or write values that affect the configuration and
+  behavior of the PCRE.DLL library.
+
+  For more information about using TJclRegExBase, please refer to the topic:
+  Using the JCL PCRE Classes
+See also:
+  Compile
+  Match
+  CaptureCount
+  Captures
+  CaptureRanges
+  ErrorMessage
+  ErrorOffset
+  Options
+  JclPCRE_Using
+--------------------------------------------------------------------------------
+@@TJclRegExBase.Compile@string@Boolean@Boolean@Boolean
+Summary
+Converts a regular expression into the form required for the
+PCRE.DLL library.
+Description
+Compile is a method used to convert a regular expression into
+the form required for the PCRE.DLL library, and to optionally
+perform optimization and localization for the regular
+expression.
+
+Pattern indicates the regular expression to be compiled.
+Pattern must contain a string that meets the syntax and
+semantics of the regular expressions supported by PCRE. The
+power of regular expressions comes from the ability to
+include alternatives and repetitions in the pattern. These
+are encoded in the pattern by the use of metacharacters,
+which do not stand for themselves but instead are interpreted
+in some special way.
+
+There are two different sets of metacharacters: those that
+are recognized anywhere in the pattern except within square
+brackets, and those that are recognized in square brackets.
+Outside square brackets, the metacharacters are as follows:
+
+<table>
+Metacharacter   \Description
+--------------  -----------------------------------------------------
+\\              general escape character with several uses
+^               assert start of string (or line, in multiline mode)
+$               assert end of string (or line, in multiline mode)
+.               match any character except newline (by default)
+[               start character class definition
+|               start of alternative branch
+(               start subpattern
+)               end subpattern
+?               extends the meaning of ( also 0 or 1 quantifier also
+                 quantifier minimizer
+\*              0 or more quantifier
+\+              1 or more quantifier also "possessive quantifier"
+{               start min/max quantifier
+</table>
+
+Part of a pattern that is in square brackets is called a
+"character class". In a character class the only
+metacharacters are:
+
+<table>
+Metacharacter   \Description
+--------------  --------------------------------------------------
+\\              general escape character
+^               negate the class, but only if the first character
+\-              indicates character range
+[               POSIX character class (followed by POSIX syntax)
+]               terminates the character class
+</table>
+
+Please refer to the documentation in PCRE Patterns for a more
+detailed description of regular expressions and
+metacharacters.
+
+Study indicates if the regular expression should be inspected
+for additional information that can be extracted to speed up
+matching performance. Set Study to True if the same compiled
+regular expression will be used in multiple calls to the
+Match method.
+
+UserLocale indicates that a non-standard locale is in use on
+the local machine, and show be used to override the character
+tables built into the PCRE library. Set UserLocale to True to
+force the users' locale to be used instead of the default
+encodings in the PCRE library.
+
+Values in the Options property are used to configure the
+regular expression engine in the PCRE library, and to alter
+the run-time behavior of pattern matching. Set values in the
+Options property prior to calling Compile or Match to control
+the configuration and behavior of the PCRE library.
+
+Refer to the documentation for TJclRegExOption for a
+\description of the values used in the Options property.
+
+The compiled regular expression representing Pattern is
+stored internally in TJclRegExBase for subsequent use in the
+Match method. An EPCREError exception is raised if Pattern
+contains an empty string ('').
+
+Compile returns a Boolean value that indicates if the regular
+expression in Pattern is successfully compiled (and
+\optionally optimized).
+
+Use the ErrorMessage and ErrorOffset properties to determine
+the type and location of a syntax error detected in the
+Pattern argument.
+
+Use the Match method to comapre a text subject using the
+compiled regular expression.
+Parameters
+Pattern :     Regular expression to use when comparing a text
+              subject using the regular expression engine.
+Study :       Indicates if optimization is required for the
+              regular expression.
+UserLocale :  Indicates if non\-standard localization is
+              required for the regular expression.
+JITCompile :  Enable the Just-In-Time compilation of this
+              regular expression.
+Returns
+Boolean - True indicates successful completion of the method.
+Exceptions
+EPCREError - Exception raised when the regular expression in
+Pattern contains an empty string ('').
+See Also
+Options Match ErrorMessage ErrorOffset TJclRegExOption
+TJclRegExOptions EPCREError
+
+@@TJclRegExBase.Destroy
+Summary:
+  Destructor for object instance.
+Description:
+  Destroy is the Destructor for object instance.
+See also:
+  Create
+--------------------------------------------------------------------------------
+@@TJclRegExBase.Match@string@Cardinal
+Summary:
+  Examines a text subject for values that match a compiled regular expression.
+Description:
+  Match is a method used to compare the text subject specified in Subject
+  to the compiled Perl-compatible regular expression using algorithms in
+  the PCRE library.
+
+  StartOffset is an offset into Subject where the comparison should be
+  started.  The default value for StartOffset is 1, and indicates the
+  first character in the Delphi string data type.
+
+  Match returns a Boolean value that indicates if any of the text in
+  Subject matches the compiled regular expression. Match can return False
+  if there is no compiled regular expression (from the Compile method)
+  for the comparison, or when the value in Subject is an empty string ('').
+
+  Values in the Options property are used to configure the regular
+  expression engine in the PCRE library, and to alter the run-time
+  behavior of pattern matching. Set values in the Options property prior
+  to calling Compile or Match to control the configuration and behavior
+  of the PCRE library.
+
+  Refer to the documentation for TJclRegExOption for a detailed
+  description of the values used in the Options property.
+
+  Use Compile to create the compile regular expression for use in the
+  Match method.
+
+  The set of strings that result from comparison to a regular expression
+  are represented using the Captures property. Values in Captures are
+  accessed using the ordinal position of character groups or classes from
+  the regular expression.  Use CaptureCount to determine the number of
+  strings resulting from the comparison.  Use CaptureRanges to access the
+  starting and ending offsets into the Subject where captured character
+  classes were detected in the Match method.
+Parameters:
+  Subject - Values to compare to the regular expression.
+  StartOffset - Offset in Subject to begin the comparison.  Default value is 1.
+Result:
+  Boolean - True when values in Subject match the regular expression.
+See also:
+  Compile
+  Captures
+  CaptureRanges
+  CaptureCount
+  Options
+  TJclRegExOption
+  TJclRegExOptions
+--------------------------------------------------------------------------------
+@@TJclRegExBase.CaptureCount
+Summary:
+  Number of strings in the result for a comparison performed using the
+  Match method.
+Description:
+  CaptureCount is a read-only Integer property that represents the number
+  of strings in the result for a comparison performed using the Match
+  method.
+
+  The value in CaptureCount is updated when Match returns True.  Its'
+  minimum value should be 1 (for a literal match involving no
+  metacharacters or metacharacter classes) up to the number of strings
+  required to represent the metacharacters and metacharacter classes in
+  the regular expression.
+
+  CaptureCount can also be used to determine the range of ordinal
+  positions allowed when accessing indexed values in the Captures and
+  CaptureRanges properties.  The range of values is guaranteed to be in
+  the range 0 up to CaptureCount-1.
+
+  Use Captures to access a result string by its' ordinal position.
+
+  Use CaptureRanges to access the starting and ending offsets into the
+  text subject by its' ordinal position.
+See also:
+  Match
+  Compile
+  Captures
+  CaptureRanges
+--------------------------------------------------------------------------------
+@@TJclRegExBase.CaptureRanges
+Summary:
+  Indicates the location of a string in a text subject resulting from a
+  call to the Match method.
+Description:
+  CaptureRanges is an read-only CaptureRanges property that
+  indicates the location of a string in a text subject resulting from a
+  call to the Match method. CaptureRanges is an indexed property, and
+  provides access to each string in the result by its' ordinal position.
+
+  Use CaptureCount to determine the total number of strings in the result
+  from the Match method. The range of values is in CaptureRanges and
+  Captures is guaranteed to be in the range 0 up to CaptureCount-1.
+
+  Use Captures to access the strings resulting from a call to the Match
+  method.
+
+  See the documentation in TJclCaptureRange for a detailed
+  description of the members in the structure.
+See also:
+  CaptureCount
+  Captures
+  Match
+  Compile
+  TJclCaptureRange
+--------------------------------------------------------------------------------
+@@TJclRegExBase.Captures
+Summary:
+  Strings resulting from a call to the Match method.
+Description:
+  Captures is a read-only string property that provides access to
+  strings resulting from a call to the Match method. Captures is an
+  indexed property that provides access to each string in the result set
+  by its' ordinal position. Each string in Captures corresponds to a
+  match for metacharacters and character classes specifed in the compiled
+  regular expression.
+
+  Use CaptureRanges to access the starting and ending offsets of the
+  Capture string in the text subject.
+
+  Use CaptureCount to determine the total number of strings in the result
+  from the Match method. The index values used to access the Captures and
+  CaptureRanges properties is guaranteed to be in the range 0 up to
+  CaptureCount-1.
+Notes:
+  The size of the string returned fro the Capture property is
+  limited to 1025 characters (the size of the buffer allocated for string
+  retrieval).
+Exceptions:
+  EPCREError - Raised when an index value exceeds the number of strings
+  in the captured results.
+See also:
+  CaptureCount
+  CaptureRanges
+  Match
+  EPCREError
+--------------------------------------------------------------------------------
+@@TJclRegExBase.ErrorMessage
+Summary:
+  Represents an error message generated when compiling a regular
+  expression.
+Description:
+  ErrorMessage is a read-only String property that represents an
+  error message generated when compiling a regular expression.
+
+  ErrorMessage represents the inital error found in the semantics or
+  syntax of the regular expression passed as an argument to the Compile
+  method.
+
+  ErrorMessage may contain the following:
+
+<table>
+Value   Meaning
+------  ------------------------------------------------------------
+0       no error
+1       \\ at end of pattern
+2       \\c at end of pattern
+3       unrecognized character follows \\
+4       numbers out of order in {} quantifier
+5       number too big in {} quantifier
+6       missing terminating ] for character class
+7       invalid escape sequence in character class
+8       range out of order in character class
+9       nothing to repeat
+10      operand of unlimited repeat could match the empty string
+11      internal error: unexpected repeat
+12      unrecognized character after (?
+13      POSIX named classes are supported only within a class
+14      missing )
+15      reference to non-existent subpattern
+16      erroffset passed as NULL
+17      Anonymous option bit(s) set
+18      missing ) after comment
+19      parentheses nested too deeply
+20      regular expression too large
+21      failed to get memory
+22      unmatched parentheses
+23      internal error: code overflow
+24      unrecognized character after (?<
+25      lookbehind assertion is not fixed length
+26      malformed number or name after (?(
+27      conditional group contains more than two branches
+28      assertion expected after (?(
+29      (?R or (?digits must be followed by )
+30      Anonymous POSIX class name
+31      POSIX collating elements are not supported
+32      this version of PCRE is not compiled with PCRE_UTF8 support
+33      spare error
+34      character value in \x{...} sequence is too large
+35      invalid condition (?(0)
+36      \\C not allowed in lookbehind assertion
+37      PCRE does not support \\L, \\l, \\N, \\U, or \\u
+38      number after (?C is > 255
+39      closing ) for (?C expected
+40      recursive call could loop indefinitely
+41      unrecognized character after (?P
+42      syntax error after (?P
+43      two named subpatterns have the same name
+44      invalid UTF-8 string
+45      support for \\P, \\p, and \\X has not been compiled
+46      malformed \\P or \\p sequence
+47      Anonymous property name after \\P or \\p
+48      subpattern name is too long (maximum 32 characters)
+49      too many named subpatterns (maximum 10,000)
+50      repeated subpattern is too long
+51      octal value is greater than \\377 (not in UTF-8 mode)
+</table>
+
+  Use ErrorOffset to locate the offset into the regular expression string
+  where the error is located.
+
+Notes:
+  ErrorMessage and ErrorOffset are not related to EPCREError
+  exception messages generated at run-time by the PCRE library.
+See also:
+  ErrorOffset
+  Compile
+--------------------------------------------------------------------------------
+@@TJclRegExBase.ErrorOffset
+Summary:
+  Represents the location of an error generated when compiling a regular
+  expression.
+Description:
+  ErrorOffset is a read-only Integer property that represents the offset
+  into a regular expression string where an error has been detected.
+  ErrorOffset represents the location of the inital error found in the
+  semantics or syntax of the regular expression passed as an argument to
+  the Compile method.
+
+  Use ErrorMessage to get the description of the error in the regular
+  expression string.
+Notes:
+  ErrorMessage and ErrorOffset are not related to EPCREError
+  exception messages generated at run-time by the PCRE library.
+See also:
+  ErrorMessage
+  Compile
+--------------------------------------------------------------------------------
+@@TJclRegExBase.Options
+Summary:
+  Flags for configuring and controlling the run-time behavior of the
+  regular expression engine.
+Description:
+  Options is a TJclRegExOptions property that represents the set of
+  option flags for configuring and modifying the behavior of the regular
+  expression engine.  Options can contain a set of values from the
+  TJclRegExOption enumeration.
+
+  See the document in TJclRegExOption for a detailed description of
+  values in the enumeration.
+
+  Values in the Options property are passed to the PCRE library during
+  execution of the Compile and Match methods. Set values in the Options
+  property prior to calling the Compile or Match methods.
+See also:
+  TJclRegExOptions
+  TJclRegExOption
+  Compile
+  Match
+--------------------------------------------------------------------------------
+@@TJclCaptureRange
+Summary:
+  Represents the starting and ending offsets for captured string results
+  in the TJclRegExBase class.
+Description:
+  TJclCaptureRange is a record type with members that represent the
+  starting and ending offsets for captured string results in the
+  TJclRegExBase class.
+
+  TJclCaptureRange instances are allocated and updated when reading
+  the indexed values in the TJclRegExBase.Captures property.
+
+Notes:
+  At the present time, the values in TJclCaptureRange members
+  represent zero-based offsets.  Since were dealing with Delphi strings
+  in the result(s), this is likely to be changed to Pascal-style
+  string offsets where the initial offset into the string is 1 instead of 0.
+See also:
+  TJclCaptureRange.FirstPos
+  TJclCaptureRange.LastPos
+  TJclRegExBase
+  TJclRegExBase.Captures
+--------------------------------------------------------------------------------
+@@TJclCaptureRange.FirstPos
+Summary:
+  TODO
+Description:
+  FirstPos represents the starting offset into a text subject for a
+  captured result string.
+See also:
+  TJclRegExBase.Captures
+  TJclRegExBase.CaptureRanges
+--------------------------------------------------------------------------------
+@@TJclCaptureRange.LastPos
+Summary:
+  TODO
+Description:
+  LastPos represents the ending offset into a text subject for a
+  captured result string.
+See also:
+  TJclRegExBase.Captures
+  TJclRegExBase.CaptureRanges
+--------------------------------------------------------------------------------
+@@TJclRegExOption
+Summary:
+  Represents bit flags used to configure or modify the PCRE regular
+  expression engine.
+Description:
+  TJclRegExOption is an enumerated type that represents bit flags
+  that can be used to configure or modify the behavior of the PCRE
+  regular expression engine.  Values in TJclRegExOption affect the
+  execution of the TJclRegExBase.Compile and TJclRegExBase.Match methods.
+
+  TJclRegExOption include the following values (and their PCRE
+  equivalents):
+
+<table>
+Value             PCRE                  Meaning
+----------------  --------------------  -------------------------------
+roIgnoreCase      PCRE_CASELESS         Do caseless matching
+roMultiLine       PCRE_MULTILINE        \^ and \$ match new lines
+                                          within data
+roDotAll          PCRE_DOTALL           \. matches anything including
+                                          the new lines
+roExtended        PCRE_EXTENDED         Ignore whitespace and comments
+roAnchored        PCRE_ANCHORED         Force pattern anchoring
+roDollarEndOnly   PCRE_DOLLAR_ENDONLY   \$ not to match newline at end
+roExtra           PCRE_EXTRA            PCRE extra features
+roNotBOL          PCRE_NOTBOL           First character of the subject
+                                          string is not the beginning
+                                          of a line
+roNotEOL          PCRE_NOTEOL           End of the subject string is
+                                          not the end of a line
+roUnGreedy        PCRE_UNGREEDY         Invert greediness of
+                                          quantifiers
+roNotEmpty        PCRE_NOTEMPTY
+roUTF8            PCRE_UTF8             Run in UTF-8 mode
+</table>
+
+  Values in TJclRegExOption can be assigned to the
+  TJclRegExOptions set type as used in the TJclRegExBase.Options
+  property.
+
+Notes:
+  PCRE must be built with UTF-8 support in order to use roUTF8.
+See also:
+  TJclRegExBase.Compile
+  TJclRegExBase.Match
+  TJclRegExBase.Options
+--------------------------------------------------------------------------------
+@@TPCREIntArray
+Summary:
+  TODO
+Description:
+  TODO
+See also:
+  TODO
+--------------------------------------------------------------------------------
+@@PPCREIntArray
+Summary:
+  TODO
+Description:
+  TODO
+See also:
+  TODO
+--------------------------------------------------------------------------------
+@@TJclRegExOptions
+Summary:
+  Represents the set of bit flags to use for configuring and
+  controlling the TJclRegExBase regular expression engine.
+Description:
+  Represents the set of TJclRegExOption bit flags to use for
+  configuring and controlling the TJclRegExBase regular expression
+  engine.
+See also:
+  TJclRegExBase
+  TJclRegExOption
+--------------------------------------------------------------------------------
+@@JclPCRE_Intro
+<GROUP JclPCRE>
+<TITLE JclPCRE Introduction>
+Summary:
+  An introduction to the JCL implementation of a Perl-compatible Regular
+  Expression engine.
+Description:
+  The JCL (JEDI Code Library) contains an implementation of a
+  Perl-compatible Regular Expression engine in the file pas. This
+  unit requires the header conversions and dynamic library loading code
+  availbe in the file pcre.pas. It also requires resource strings defined
+  in the file JclResources.pas.
+
+  JclPCRE requires pcre.dll. The latest release of PCRE is always
+  available using FTP from
+  ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/. pcre.dll must
+  be available in the search path on any machine that uses the JCLs' pcre
+  wrapper classes.
+See also:
+  JclPCRE_Using
+  JclPCRE
+  pcre
+--------------------------------------------------------------------------------
+@@JclPCRE_Using
+<GROUP JclPCRE>
+<TITLE Using the JCL PCRE Classes>
+Summary:
+  Using the JCL PCRE Classes.
+Description:
+  The JCL PCRE classes provide access to functions and structures in
+  pcre.dll through the use of TJclRegExBase and TJclRegExOptions
+  classes.
+
+  TJclRegExBase is a class that provides properties and methods
+  that act as wrappers for routines and structures found in the
+  pcre.dll dynamic link library.
+
+  TJclRegExBase is a non-visual object; it cannot be used on
+  the design surfaces of an IDE. It does not, however, require
+  any installation other that being availble in the search path
+  for the compiler. Simply add the pas unit to the
+  "uses" clause in your application.
+
+<code>
+  uses
+    Classes, Windows, SysUtils, Forms, Dialogs,
+    ActnList, ComCtrls, StdCtrls, Controls,
+    JclPCRE;
+</code>
+
+  In your program, you would normally allocate an instance of
+  TJclRegExBase and configure its' options in the
+  TJclRegExBase.Options property.
+
+<code>
+  var
+    RE: TJclRegExBase;
+    REO: JclRegExOptions;
+  ...
+
+  RE := TJclRegExBase.Create;
+  REO := [roIgnoreCase, roMultiLine, roUnGreedy];
+  RE.Options := REO;
+</code>
+
+  TJclRegExBase.Options is used primarily to control the behavior of the
+  regular expression engine during calls to the TJclRegExBase.Compile and
+  TJclRegExBase.Match methods. Values in the JclRegExOptions set
+  reflect the attributes passed or retrieved using routines in pcre.dll.
+  See JclRegExOptions and JclRegExOption for a detailed
+  description of values.
+
+  Use the TJclRegExBase.Compile method to specify the
+  Perl-compatible regular expression to use when matching a
+  text subject. TJclRegExBase.Compile is essentially a wrapper
+  around the pcre_compile(), pcre_compile2(), pcre_study(), and
+  pcre_maketables() functions in pcre.dll.
+
+  See the documentation for the TJclRegExBase.Compile method
+  for more details about arguments to the method.
+
+  Perl-compatible Regular Expressions are very flexible and
+  very powerful. With all of that utility comes some
+  complexity. Please refer to the pcrepattern documentation for
+  a detailed description of the syntax and semantics of
+  Perl-compatible Regular Expressions.
+
+  Use the TJclRegExBase.ErrorMessage and
+  TJclRegExBase.ErrorOffset properties to examine errors
+  detected when compiling the regular expression.
+
+  Use the TJclRegExBase.Match method to compare the compiled
+  regular expression against a given subject string using a
+  matching algorithm that is similar to Perl's. The
+  TJclRegExBase.Match method is a wrapper around the
+  pcre_exec() function in pcre.dll.
+
+  TJclRegExBase.Match returns a boolean value to indicate that
+  elements of the regular expression exist in the subject text.
+  Use the TJclRegExBase.CaptureCount property to find the
+  number of matching strings found for the regular expression.
+  Use the TJclRegExBase.Captures property to access the string
+  values by their ordinal position. Use the
+  TJclRegExBase.CaptureRanges property to access the offsets
+  into the subject text where the string match was located.
+
+<code>
+  // look for HTML anchor with HREF attribute
+  RE.Compile('\<a\\s+href\\s*=\\s*(["'])?(.*)(["'])?(.*)\>\\s*(.*)\\s*\<\\/a\>',
+    False, False);
+
+  if not RE.Match(memoHTML.Lines.Text) then
+  begin
+    MessageDlg('No matches found', mtInformation, [mbOK], 0);
+  end
+  else
+  begin
+    ShowMessage('Found: ' +
+      Copy(memoHTML.Lines.Text, RE.CaptureRanges[0].FirstPos,
+        RE.CaptureRanges[0].LastPos - RE.CaptureRanges[0].FirstPos + 1));
+  end;
+</code>
+
+  TJclRegExBase may raise exceptions when using its' properties
+  and methods. These exceptions can normally be handled in your
+  application code by responding to EPCREError exception
+  instances.
+See also:
+  TJclRegExBase
+  TJclRegExOptions
+  TJclRegExOption
+  EPCREError
+  pcrepattern
+  pcre_compile
+  pcre_exec

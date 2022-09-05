@@ -1,0 +1,338 @@
+@@Windows_Specific.LANManager
+<GROUP Windows_Specific>
+<TITLE LAN Manager>
+<TOPICORDER 300>
+--------------------------------------------------------------------------------
+@@Windows_Specific.LANManager.Auxilliaryfunctions
+<GROUP Windows_Specific.LANManager>
+<TITLE Auxilliary functions>
+<TOPICORDER 100>
+--------------------------------------------------------------------------------
+@@Windows_Specific.LANManager.GroupManagement
+<GROUP Windows_Specific.LANManager>
+<TITLE Group Management>
+<TOPICORDER 200>
+--------------------------------------------------------------------------------
+@@Windows_Specific.LANManager.UserManagement
+<GROUP Windows_Specific.LANManager>
+<TITLE User Management>
+<TOPICORDER 300>
+--------------------------------------------------------------------------------
+@@CreateAccount
+<GROUP Windows_Specific.LANManager.UserManagement>
+Summary:
+  Creates a new user account on a Windows NT machine.
+Description:
+  CreateAccount creates a new user account on a Windows NT machine using the LAN
+  Manager API. Thus, you cannot create user accounts on Windows 9x or Windows Me
+  machines.
+Parameters:
+  Server - The name of the server to create the user account on. If this parameter is the empty string, the account will be created on the local machine.
+  Username - Specifies the name of the user account.
+  Fullname - The full name of the user.
+  Password - The password for the user account.
+  Description - A comment to be associated with this user account. This parameter can be empty.
+  Homedir - The user's home directory. This parameter can be empty.
+  Script - Path to the user's logon script (which can be a .CMD, .EXE or .BAT file). This parameter can be empty.
+Result:
+  If the function succeeds it returns True, otherwise it returns False.
+Notes:
+  If the function returns False, the user can retrieve extended error information by calling RaiseLastOSException.
+See also:
+  CreateLocalAccount
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@CreateLocalAccount
+<GROUP Windows_Specific.LANManager.UserManagement>
+Summary:
+  Creates a new user account on a local Windows NT machine.
+Description:
+  CreateAccount creates a new user account on the local Windows NT machine using the LAN
+  Manager API. Thus, you cannot create user accounts on Windows 9x or Windows Me
+  machines.
+Parameters:
+  Username - Specifies the name of the user account.
+  Fullname - The full name of the user.
+  Password - The password for the user account.
+  Description - A comment to be associated with this user account. This parameter can be empty.
+  Homedir - The user's home directory. This parameter can be empty.
+  Script - Path to the user's logon script (which can be a .CMD, .EXE or .BAT file). This parameter can be empty.
+Result:
+  If the function succeeds it returns True, otherwise it returns False.
+Notes:
+  If the function returns False, the user can retrieve extended error information by calling RaiseLastOSException.
+See also:
+  CreateAccount
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@DeleteAccount
+<GROUP Windows_Specific.LANManager.UserManagement>
+Summary:
+  Deletes a user account from the given Windows NT machine.
+Description:
+  DeleteAccount permanently removes the given user account from the account database
+  on the Windows NT machine specified by Servername.
+Parameters:
+  Servername - The name of the Windows NT machine to delete the account from. If this parameter is empty, the account will be deleted from the local machine.
+  Username - Specifies the name of the user account.
+Result:
+  If the function succeeds it returns True, otherwise it returns False.
+Notes:
+  If the function returns False, the user can retrieve extended error information by calling RaiseLastOSException.
+  If you want to delete a user account from the domain account database, you should keep in mind to supply the name of the primary domain controller (PDC) in the parameter Servername.
+  If the user name is not found in the user account database specified, it will fail.
+See also:
+  DeleteLocalAccount
+  CreateLocalAccount
+  CreateAccount
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@DeleteLocalAccount
+<GROUP Windows_Specific.LANManager.UserManagement>
+Summary:
+  Deletes a user account from the local Windows NT machine.
+Description:
+  DeleteAccount permanently removes the given user account from the local account
+  database on a Windows NT machine.
+Parameters:
+  Username - Specifies the name of the user account.
+Result:
+  If the function succeeds it returns True, otherwise it returns False.
+Notes:
+  If the function returns False, the user can retrieve extended error information by calling RaiseLastOSException.
+  If you want to delete a user account from the domain account database, you should keep in mind to supply the name of the primary domain controller (PDC) in the parameter Servername.
+  If the user name is not found in the user account database specified, it will fail.
+See also:
+  DeleteAccount
+  CreateLocalAccount
+  CreateAccount
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@CreateLocalGroup
+<GROUP Windows_Specific.LANManager.GroupManagement>
+Summary:
+  Creates a local group on a Windows NT machine.
+Description:
+  CreateLocalGroup creates a local group in the acount database on the Windows NT
+  machine specified by Server.
+Parameters:
+  Server - The name of the machine to create the group account on.
+  Groupname - The name of the group to be created.
+  Description - A description for the group.
+Result:
+  If the function succeeds it returns True, otherwise it returns False.
+Notes:
+  If the function returns False, the user can retrieve extended error information by calling RaiseLastOSException.
+See also:
+  CreateGlobalGroup
+  DeleteLocalGroup
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@CreateGlobalGroup
+<GROUP Windows_Specific.LANManager.GroupManagement>
+Summary:
+  Creates a global group on a Windows NT machine.
+Description:
+  CreateGlobalGroup creates a global group in the acount database on the Windows NT
+  machine specified by Server.
+Parameters:
+  Server - The name of the machine to create the group account on.
+  Groupname - The name of the group to be created.
+  Description - A description for the group.
+Result:
+  If the function succeeds it returns True, otherwise it returns False.
+Notes:
+  If the function returns False, the user can retrieve extended error information by calling RaiseLastOSException.
+See also:
+  CreateLocalGroup
+  DeleteLocalGroup
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@DeleteLocalGroup
+<GROUP Windows_Specific.LANManager.GroupManagement>
+Summary:
+  Deletes a local group from a Windows NT machine.
+Description:
+  DeleteLocalGroup deletes a local group from the acount database on the Windows NT
+  machine specified by Server.
+Parameters:
+  Server - The name of the machine to delete the group account from.
+  Groupname - The name of the group to be deleted.
+Result:
+  If the function succeeds it returns True, otherwise it returns False.
+Notes:
+  If the function returns False, the user can retrieve extended error information by calling RaiseLastOSException.
+See also:
+  CreateLocalGroup
+  CreateGlobalGroup
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetLocalGroups
+<GROUP Windows_Specific.LANManager.GroupManagement>
+Summary:
+  Retrieves a list of local groups on a Windows NT machine.
+Description:
+  GetLocalGroups retrieves a list of local groups from the account database
+  specified by Server.
+Parameters:
+  Server - The name of the machine retrieve the list of groups from.
+  Groups - This string list will contain the group names.
+Result:
+  If the function succeeds it returns True, otherwise it returns False.
+Notes:
+  If the function returns False, the user can retrieve extended error information by calling RaiseLastOSException.
+See also:
+  GetGlobalGroups
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GetGlobalGroups
+<GROUP Windows_Specific.LANManager.GroupManagement>
+Summary:
+  Retrieves a list of global groups on a Windows NT machine.
+Description:
+  GetLocalGroups retrieves a list of global groups from the account database
+  specified by Server.
+Parameters:
+  Server - The name of the machine to retrieve the list of groups from.
+  Groups - This string list will contain the group names.
+Result:
+  If the function succeeds it returns True, otherwise it returns False.
+Notes:
+  If the function returns False, the user can retrieve extended error information by calling RaiseLastOSException.
+See also:
+  GetLocalGroups
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@LocalGroupExists
+<GROUP Windows_Specific.LANManager.GroupManagement>
+Summary:
+  Checks whether a given group exists in the local account database.
+Description:
+  LocalGroupExists checks whether the group specified in the parameter Group exists
+  in the local account database.
+Parameters:
+  Group - The name of the account to check for.
+Result:
+  If the account exists, the function returns True, otherwise it returns False.
+Notes:
+  If the function returns False, the user can retrieve extended error information by calling RaiseLastOSException.
+See also:
+  GlobalGroupExists
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@GlobalGroupExists
+<GROUP Windows_Specific.LANManager.GroupManagement>
+Summary:
+  Checks whether a given group exists in the local account database of the given server.
+Description:
+  GlobalGroupExists checks whether the group specified in the parameter Group exists
+  in the local account database of the server specified in the parameter Server.
+Parameters:
+  Server - The name of the server to check.
+  Group - The name of the account to check for.
+Result:
+  If the account exists, the function returns True, otherwise it returns False.
+Notes:
+  If the function returns False, the user can retrieve extended error information by calling RaiseLastOSException.
+See also:
+  LocalGroupExists
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@AddAccountToLocalGroup
+<GROUP Windows_Specific.LANManager.GroupManagement>
+Summary:
+  Adds an account to a local group.
+Description:
+  AddAccountToLocalGroup adds an existing account to a local group in the local
+  account database. The account can be a local or global account.
+Parameters:
+  Accountname - The name of the account to add to the local group. This can be a global or local account.
+  Groupname - The name of the group the account is added to.
+Result:
+  If the function succeeds, the result is True, otherwise it is False.
+Notes:
+  If the function returns False, the user can retrieve extended error information by calling RaiseLastOSException.
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@LookupGroupName
+<GROUP Windows_Specific.LANManager.GroupManagement>
+Summary:
+  Returns the textual representation of a well-know account.
+Description:
+  LookupGroupName returns the textual description of a well-known group account.
+Parameters:
+  Server - This server's account database will be scanned.
+  RID - A well known group name.
+Result:
+  Textual represantation of the well known group name.
+See also:
+  TNetWellKnownRID
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@ParseAccountName
+<GROUP Windows_Specific.LANManager.Auxilliaryfunctions>
+Summary:
+  Split up a qualified account name.
+Description:
+  ParseAccountName splits up a qualified account name (like DOMAIN-JEDI\PeterF)
+  into it's two parts domain and user name.
+Parameters:
+  QualifiedName - The qualified name to split up.
+  Domain - Returns the name of the domain specified in the qualified name.
+  UserName - Returns the name of the user specified in the qualified name.
+Notes:
+  If the parameter QualifiedName does not contain a fully qualified account name, the function will assume that the QualifiedName is the user's name.
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@IsLocalAccount
+<GROUP Windows_Specific.LANManager.Auxilliaryfunctions>
+Summary:
+  Checks whether an accoun is a local account.
+Description:
+  IsLocalAccount whether the account name specified in AccountName is a local account.
+Parameters:
+  AccountName - The name of the account to be checked.
+Result:
+  If the account is a local account, the functin returns True, otherwise it returns
+  False.
+Donator:
+  Peter Friese
+--------------------------------------------------------------------------------
+@@TNetWellKnownRID
+<GROUP Windows_Specific.LANManager.GroupManagement>
+Summary:
+  Well-known group accounts.
+Description:
+  TNetWellKnownRID is an enumeration of well-known group accounts on Windows NT and
+  Windows 2000 machines. It is used in conjunction with LookupGroupName.
+Donator:
+  Peter Friese
+@@TNetWellKnownRID.wkrAdmins
+  The administrators' group.
+@@TNetWellKnownRID.wkrUsers
+  The users' group.
+@@TNetWellKnownRID.wkrGuests
+  The guests' group.
+@@TNetWellKnownRID.wkrPowerUsers
+  The power users' group.
+@@TNetWellKnownRID.wkrBackupOPs
+  The backup operators' group.
+@@TNetWellKnownRID.wkrReplicator
+  The replicators' group.
+@@TNetWellKnownRID.wkrEveryone
+  All users belong to the everyone group.
+--------------------------------------------------------------------------------

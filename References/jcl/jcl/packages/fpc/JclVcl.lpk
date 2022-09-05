@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <Package Version="3">
+    <PathDelim Value="\"/>
+    <Name Value="JclVcl"/>
+    <AddToProjectUsesSection Value="False"/>
+    <Author Value="Project JEDI"/>
+    <AutoUpdate Value="OnRebuildingAll"/>
+    <CompilerOptions>
+      <Version Value="9"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <IncludeFiles Value="..\..\source\include\"/>
+        <OtherUnitFiles Value=".;..\..\source\vcl;;..\..\lib\fpc\$(TargetCPU)-$(TargetOS)"/>
+        <UnitOutputDirectory Value="..\..\lib\fpc\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+      <Parsing>
+        <Style Value="1"/>
+        <SyntaxOptions>
+          <SyntaxMode Value="Delphi"/>
+          <CStyleOperator Value="False"/>
+          <UseAnsiStrings Value="False"/>
+        </SyntaxOptions>
+      </Parsing>
+      <CodeGeneration>
+        <Optimizations>
+          <VariablesInRegisters Value="True"/>
+          <OptimizationLevel Value="3"/>
+        </Optimizations>
+      </CodeGeneration>
+      <Linking>
+        <Debugging>
+          <UseLineInfoUnit Value="False"/>
+        </Debugging>
+      </Linking>
+      <Other>
+        <CompilerPath Value="$(CompPath)"/>
+      </Other>
+    </CompilerOptions>
+    <Description Value="JEDI Code Library VCL package"/>
+    <License Value="Copyright (C) 1999, 2014 Project JEDI"/>
+    <Version Major="2" Minor="7" Release="0" Build="5300"/>
+    <Files Count="8">
+      <Item1>
+        <Filename Value="..\..\source\vcl\JclGraphUtils.pas"/>
+        <UnitName Value="JclGraphUtils"/>
+      </Item1>
+      <Item2>
+        <Filename Value="..\..\source\vcl\JclGraphics.pas"/>
+        <UnitName Value="JclGraphics"/>
+      </Item2>
+      <Item3>
+        <Filename Value="..\..\source\vcl\JclFont.pas"/>
+        <UnitName Value="JclFont"/>
+      </Item3>
+      <Item4>
+        <Filename Value="..\..\source\vcl\JclVclResources.pas"/>
+        <UnitName Value="JclVclResources"/>
+      </Item4>
+      <Item5>
+        <Filename Value="..\..\source\vcl\JclVersionControl.pas"/>
+        <UnitName Value="JclVersionControl"/>
+      </Item5>
+      <Item6>
+        <Filename Value="..\..\source\vcl\JclVersionCtrlCVSImpl.pas"/>
+        <UnitName Value="JclVersionCtrlCVSImpl"/>
+      </Item6>
+      <Item7>
+        <Filename Value="..\..\source\vcl\JclVersionCtrlGITImpl.pas"/>
+        <UnitName Value="JclVersionCtrlGITImpl"/>
+      </Item7>
+      <Item8>
+        <Filename Value="..\..\source\vcl\JclVersionCtrlSVNImpl.pas"/>
+        <UnitName Value="JclVersionCtrlSVNImpl"/>
+      </Item8>
+    </Files>
+    <RequiredPkgs Count="3">
+      <Item1>
+        <PackageName Value="FCL"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="LCL"/>
+      </Item2>
+      <Item3>
+        <PackageName Value="Jcl"/>
+      </Item3>
+    </RequiredPkgs>
+    <UsageOptions>
+      <IncludePath Value="..\..\source\include\"/>
+      <LibraryPath Value="$(PkgOutDir)\"/>
+      <ObjectPath Value="..\..\lib\fpc\$(TargetCPU)-$(TargetOS)\"/>
+      <UnitPath Value="$(PkgOutDir)\"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <IgnoreBinaries Value="False"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

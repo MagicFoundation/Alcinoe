@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <PersonalityInfo>
+    <Option>
+      <Option Name="Personality">Default.Personality</Option>
+      <Option Name="ProjectType"></Option>
+      <Option Name="Version">1.0</Option>
+      <Option Name="GUID">{90322E9F-4353-4EE0-AE43-54D743F61068}</Option>
+    </Option>
+  </PersonalityInfo>
+  <Default.Personality>
+    
+    <Projects>
+      <Projects Name="Jcl90.bpl">d9\Jcl.bdsproj</Projects>
+      <Projects Name="JclVcl90.bpl">d9\JclVcl.bdsproj</Projects>
+      <Projects Name="JclContainers90.bpl">d9\JclContainers.bdsproj</Projects>
+      <Projects Name="JclDeveloperTools90.bpl">d9\JclDeveloperTools.bdsproj</Projects>
+      <Projects Name="JclBaseExpert90.bpl">d9\JclBaseExpert.bdsproj</Projects>
+      <Projects Name="JclDebugExpert90.bpl">d9\JclDebugExpert.bdsproj</Projects>
+      <Projects Name="JclFavoriteFoldersExpert90.bpl">d9\JclFavoriteFoldersExpert.bdsproj</Projects>
+      <Projects Name="JclProjectAnalysisExpert90.bpl">d9\JclProjectAnalysisExpert.bdsproj</Projects>
+      <Projects Name="JclRepositoryExpert90.bpl">d9\JclRepositoryExpert.bdsproj</Projects>
+      <Projects Name="JclSIMDViewExpert90.bpl">d9\JclSIMDViewExpert.bdsproj</Projects>
+      <Projects Name="JclStackTraceViewerExpert90.bpl">d9\JclStackTraceViewerExpert.bdsproj</Projects>
+      <Projects Name="JclVersionControlExpert90.bpl">d9\JclVersionControlExpert.bdsproj</Projects>
+      <Projects Name="Targets">Jcl90.bpl JclVcl90.bpl JclContainers90.bpl JclDeveloperTools90.bpl JclBaseExpert90.bpl JclDebugExpert90.bpl JclFavoriteFoldersExpert90.bpl JclProjectAnalysisExpert90.bpl JclRepositoryExpert90.bpl JclSIMDViewExpert90.bpl JclStackTraceViewerExpert90.bpl JclVersionControlExpert90.bpl</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+</BorlandProject>

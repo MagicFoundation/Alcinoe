@@ -1,0 +1,5 @@
+[Directories]
+UnitOutputDir=..\..\lib\c6
+SearchPath=..\..\source\include
+Conditionals=BCB;WIN32;CONDITIONALEXPRESSIONS;VER140;RELEASE
+

@@ -1,0 +1,55 @@
+================================================================================
+//               ZEOS Library Bug Reporting / Bug Fixing Form                 //
+================================================================================
+
+Bug ID               : 1126163                      Priority      : 5
+Submitted by         : fabianbecker                 Date Submitted: 2005-02-17 19:53
+Quality assurance by : stefanglienke                Closed as of  : 2005-06-08 15:23
+Assigned to          : stefanglienke                Closed by     : stefanglienke
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : n/a
+ZEOSLib Version      : 6.5.1 alpha
+Component/Class      : TZAbstractRODataset
+
+--------------------------------------------------------------------------------
+
+Error Description:
+
+I´m using ZeosDBO v6.5.1 + ADO protocol, and I found a
+strange behavior with some filtered queries (using
+OnFilterRecord).
+
+With an open (and filtered) TZQuery (for instance
+zquery1) when we do:
+
+zquery1.close;
+zquery1.open;
+
+for some queries after open the query has no records
+(even when before close it has some records). But, if
+we do:
+
+zquery1.close;
+zquery1.filtered := false;
+zquery1.open;
+zquery1.filtered := true;
+
+it works fine (like any other dataset).
+
+Other issue is that filtering by OnFilterRecord
+does'snt make "live" filters. If the filter condition
+in the OnFilterRecord event changes we need to close
+and reopen the query to filter take effect.
+
+--------------------------------------------------------------------------------
+
+Actions done form Bugfixing:
+
+Changed TZAbstractRODataset.FilterRow
+See Patch 1156789
+
+================================================================================
+
+

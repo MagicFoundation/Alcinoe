@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- >e-novative> DocBook Environment (eDE)                                  -->
+<!-- (c) 2002 e-novative GmbH, Munich, Germany                               -->
+<!-- http://www.e-novative.de                                                -->
+<!-- DocBook article template                                                -->
+<!-- This file is part of eDE                                                -->
+<!-- eDE is free software; you can redistribute it and/or modify             -->
+<!-- it under the terms of the GNU General Public License as published by    -->
+<!-- the Free Software Foundation; either version 2 of the License, or       -->
+<!-- (at your option) any later version.                                     -->
+<!-- eDE is distributed in the hope that it will be useful,                  -->
+<!-- but WITHOUT ANY WARRANTY; without even the implied warranty of          -->
+<!-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           -->
+<!-- GNU General Public License for more details.                            -->
+<!-- You should have received a copy of the GNU General Public License       -->
+<!-- along with eDe; if not, write to the Free Software                   -->
+<!-- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA -->
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "file:/c:/docbook/dtd/docbookx.dtd" [
+<!ENTITY % global.entities SYSTEM "file:/c:/docbook/include/global.xml">
+<!-- e-novative DocBook environment --><!-- global entities                --><!-- (c) 2002 e-novative GmbH       --><!-- http://www.e-novative.de       --><!ENTITY global_entity "global entity (can be included in every document)">
+<!ENTITY % entities SYSTEM "entities.xml">
+<!-- >e-novative> DocBook Environment (eDE)                                  --><!-- (c) 2002 e-novative GmbH, Munich, Germany                               --><!-- http://www.e-novative.de                                                --><!-- DocBook entities template                                               --><!-- This file is part of eDE                                                --><!-- eDE is free software; you can redistribute it and/or modify             --><!-- it under the terms of the GNU General Public License as published by    --><!-- the Free Software Foundation; either version 2 of the License, or       --><!-- (at your option) any later version.                                     --><!-- eDE is distributed in the hope that it will be useful,                  --><!-- but WITHOUT ANY WARRANTY; without even the implied warranty of          --><!-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           --><!-- GNU General Public License for more details.                            --><!-- You should have received a copy of the GNU General Public License       --><!-- along with eDe; if not, write to the Free Software                   --><!-- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA --><!ENTITY local_entity "local entity (defined per document)">
+]>
+<article>
+	<articleinfo>
+		<title>Overview of the Zeos Database Objects Architecture</title>
+		<pubdate>26 November 2003 (Updated 29/5/2008 by Mark Daems)</pubdate>
+		<author>
+			<firstname>Sergey</firstname>
+			<surname>Seroukhov</surname>
+		</author>
+		<author>
+			<firstname>Merlin</firstname>
+			<surname>Moncure</surname>
+		</author>
+	</articleinfo>
+	<para>Direct access to SQL databases continues to be a vital technology even in today's enterprise environment. Thousands of two-tier client server applications are developed and maintained in the international business community. Most of them are built off of specially designed application programming interfaces (APIs) to retrieve relational data and execute SQL statements.</para>
+	<para>Currently, there is several standardized and widely used APIs to access SQL databases, such as ODBC, JDBC, and ADO. Borland also released their proprietary database middleware interface for its development tools, called the Borland Database Engine (BDE). Despite being freely distributed with Borland's popular line of application development tools, the BDE was unpopular because of complexities in installation and poor performance. As Delphi became one of the leading application development tools for the Windows platform, individuals and companies proposed alternative interfaces to the BDE. These <quote>BDE Alternatives</quote> optimized access to the database by directly using the native database driver, providing performance and feature advantages with respect to the BDE.</para>
+	<para>Realizing the limitations of the BDE, Borland proposed a new type of database interface called dbExpress. This interface was designed to broker access between Delphi and virtually any relational database through 3rd party drivers. Borland significantly improved the performance of dbExpress with respect to the BDE, but the implementation was buggy and supported only a limited subset of SQL that hampered functionality.</para>
+	<para>The Zeos Database Object component library (ZeosLib) is one of the best-known BDE alternatives. Originally the library was developed for MySQL and PostgreSQL databases, but support for other vendors was soon added. During the development process, certain limitations of the original design became more and more apparent. These limitations began to put a strain on the overall architecture and the development team decided a ground up rewrite was the best way to proceed. The new design was built to handle an extended feature list with several new requirements:
+
+		<orderedlist>
+			<listitem>
+				<simpara>Support for different compilers</simpara>
+			</listitem>
+			<listitem>
+				<simpara>Versioning database driver system</simpara>
+			</listitem>
+			<listitem>
+				<simpara><quote>Database Insensitive</quote> design for cross-database development</simpara>
+			</listitem>
+			<listitem>
+				<simpara>Support for multiple high level interfaces (TDataset, dbExpress, Midas)</simpara>
+			</listitem>
+			<listitem>
+				<simpara>Extensible feature system for server specific support</simpara>
+			</listitem>
+		</orderedlist></para>
+	<sect1>
+		<title>General Overview</title>
+		<para>To address multiple and sometimes inconsistent requirements the development team had to completely rethink the new architecture. It is complex with respect to previous designs but not over-designed. Each module put into the new design was carefully considered and carries special unique features. In this article we'll try to present you the new architecture and explain its purpose.</para>
+		<para>From a top-down view the library is separated into three logical layers:
+
+			<orderedlist>
+				<listitem>
+					<simpara>Plain API Layer</simpara>
+				</listitem>
+				<listitem>
+					<simpara>Database Connectivity Layer</simpara>
+				</listitem>
+				<listitem>
+					<simpara>Component Layer</simpara>
+				</listitem>
+			</orderedlist></para>
+		<mediaobject>
+			<imageobject>
+				<imagedata fileref="images/Overview001.gif" format="GIF"/>
+			</imageobject>
+		</mediaobject>
+		<para>The Plain API implements low-level functions specific to each SQL server. The Component API encapsulates the main library interface that is utilized by application developers. The DBC API is the middleware that retrieves, stores and modifies data for the high level components.</para>
+		<para>Each layer has several horizontal and/or vertical sub-layers semi-independently from each other (see picture 1). Let's go through each layer and look how all that works.</para>
+	</sect1>
+	<sect1>
+		<title>Plain API Layer</title>
+		<para>ZeosDBO components do not communicate directly with SQL servers. Instead they use native client libraries provided with SQL databases. The Plain API layer provides an access to functions of native client libraries, constants and data structures (usually written in plain C) from the Object Pascal language or C++.</para>
+		<para>That functionality was the original basis for ZeosDBO. Support for multiple versions of client libraries and SQL servers was the main deficiency of earlier designs...</para>
+		<para>Native library calls (dynamic libraries in Windows and shared libraries in Unix) are represented in programming language as regular functions. For example:
+
+<programlisting>ZPlainMySql323.pas:
+
+function mysql_init(Handle: PMYSQL): PMYSQL; external 'libmysql.dll';</programlisting></para>
+		<para>Usually database APIs do not significantly change between versions. But because function calls do not allow polymorphism adding support for new versions of the Plain API is coding intensive. Hard coded approaches are inflexible and error-prone, which limit long term feasibility.
+
+<programlisting>if Version = 'mysql-3.23' then
+  ZPlainMySql323.mysql_init(...)
+else ZPlainMySql40.mysql_init(...);</programlisting></para>
+		<para>To implement polymorphism, simplify source code, and provide insulation from changes in SQL server protocols a new extremely thin interface layer was added into ZeosDBO. That layer is called <quote>Plain Drivers</quote> and implemented as follows:
+
+<programlisting>// Generic MySQL driver interface
+IZMySQLDriver = interface ...
+  function mysql_init(...)
+end;
+
+// MySQL driver for version 3.23
+TZMySQL323Driver = class (TInterfacedObject, IZMySQLDriver)
+  function mysql_init(...)
+end;
+
+// MySQL driver for version 4.0
+TZMySQL40Driver = class (TInterfacedObject, IZMySQLDriver)
+  function mysql_init(...)
+end;
+
+function TZMySQL323Driver.mysql_init(...)
+begin
+  Result := ZPlainMySql323.mysql_init(...);
+end;
+
+function TZMySQL40Driver.mysql_init(...)
+begin
+  Result := ZPlainMySql40.mysql_init(...);
+end;</programlisting></para>
+		<para>Using such thin class wrapper allows easy addition of new client interfaces. The specific functionality that requires overriding is encapsulated in the Plain driver. The rest of the code now has a uniform method of providing native database calls, without requiring specific knowledge about the database server.
+
+<programlisting>// Initialize plain driver
+PlainDriver: IZMySqlDriver;
+
+if Version = 'mysql-3.23' then
+  PlainDriver := TZMySQL323Driver.Create()
+else PlainDriver := TZMySQL40Driver.Create();
+
+// Use plain driver
+PlainDriver.mysql_init(...)</programlisting></para>
+		<para>With this approach it is possible to use the same API for different SQL servers, independently of version.</para>
+	</sect1>
+	<sect1>
+		<title>Database Connectivity Layer</title>
+		<para>With native access provided to the database, Delphi database aware components can now expect database specific functionality in a uniform manner. However, each SQL server has different semantics that must be designed into the components to provide a universal generic interface. The main goal of the Zeos Database Objects is to provide this generic interface to the application developer.</para>
+		<para>In older versions of ZeosDBO, the intermediate interface was implemented as a class wrapper to the MySQL and PostgreSQL connection objects. These two databases have very similar capabilities so design of intermediate API was not complex. However, support for other SQL servers added new and very specific features. After several extensions to support these features the class architecture became was not clearly defined. Ultimately, the interface broke its encapsulation rules and the high level components were forced to make low level database calls.</para>
+		<para>To overcome this difficulty in the new version, the overall design was an abstract approach with an intermediate interface. Design of such an interface is not trivial. So to avoid new mistakes it was decided to avoid a proprietary design, and instead draw inspiration from a well-known database API.</para>
+		<para>As a prototype for the intermediate interface the development team chose JDBC 2.0. JDBC is one of the latest and more popular APIs in that database community. It covers various abstractions such as statements, result sets, stored procedures, blobs, and very rich metadata definitions.</para>
+		<para>JDBC API is implemented in Java through set of interfaces. Borland compilers support interfaces, so porting JDBC from Java to Object Pascal was straightforward. Data types and method names were generally preserved. Overloaded methods were avoided because of poor support in the C++ Builder family of compilers.</para>
+		<para>The main DBC interfaces are presented on picture 2.
+
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="images/Overview002.gif" format="GIF"/>
+				</imageobject>
+			</mediaobject></para>
+		<para>Standard JDBC interfaces provide a uniform client API. To address functionality specific to different SQL servers, two general approaches were chosen.</para>
+		<para>1. Developers may initialize database connection object with list of string parameters. Each parameter switches server specific settings. For JDBC that method is not new.</para>
+		<para>Example: parameters can be defined in Connection URL -
+
+<programlisting>zdbc:mysql://localhost/database?compress=true</programlisting>
+
+or parameters can be passed to connection factory method
+
+<programlisting>Params.Values['compress'] := 'true';
+Connection := DriverManager.CreateConnectionWithParams(Url, Params);</programlisting></para>
+		<para>Additionally in ZeosDBO developers extended other DBC interfaces to initialize other object with specific parameters, particularly Statement object:
+
+<programlisting>Params.Values['oidasblod'] := 'true';
+Statement := Connection.CreateStatementWithParams(Params);</programlisting></para>
+		<para> 2. In Object Pascal each class is able to implement multiple interfaces simultaneously.
+We used that to extend standard JDBC interfaces with new methods specific for each particular SQL server. Now each class known not only a standard interface but a server specific interface as well:
+
+<programlisting>IZMySQLConnection = interface (IZConnection)
+  function Ping(...);
+  function Kill(..);
+end;
+
+TZMySQLConnection = class (TInterfacedObject, IZConnection, IZMySQLConnection);
+...
+end;</programlisting></para>
+		<para>The next step in porting JDBC to Object Pascal was an implementation of cached data access. Actually, many servers provide support for sequential data access only. Caching data on the client side is the important element to implement random data access for the retrieved result sets. On the other hand, many high-level database interfaces use even more sophisticated caching algorithms. So implementation of universal caching algorithms in one place can be a compact and efficient solution.</para>
+		<para>Cached DBC layer has only few classes:
+
+			<orderedlist>
+				<listitem>
+					<simpara><classname>TZRowAccessor</classname> - organize storage and access to fields of one single cached record in result set (pattern Flyweight).</simpara>
+				</listitem>
+				<listitem>
+					<simpara><classname>TZCachedResultSet</classname> - is a cached result set with random data access. It works on the top of another native non-cached result set with sequencial data access (pattern Decorator).</simpara>
+				</listitem>
+				<listitem>
+					<simpara><classname>IZCachedResolver</classname> - is an interface to handle special logic to post modified data back to SQL server (pattern Delegator).</simpara>
+				</listitem>
+			</orderedlist></para>
+		<para>The good thing about DBC interfaces that they are so generic, that additionally to regular SQL drivers it's easy to implement special adapters to other database interfaces such as Active Data Objects (ADO) for example.</para>
+		<para>DBC interfaces are generic, so providing support for additional databases or connectivity layers such as ADO is trivial.</para>
+	</sect1>
+	<sect1>
+		<title>Component Layer</title>
+		<para>The last top layer in ZeosDBO library implements dbware components. These components are used for development in Delphi, C++ Builder or Kylix. Currently Borland compilers support several standards for dbware components:
+
+			<orderedlist>
+				<listitem>
+					<simpara><classname>TDataset</classname> descendent components</simpara>
+				</listitem>
+				<listitem>
+					<simpara>DbExpress drivers</simpara>
+				</listitem>
+				<listitem>
+					<simpara>Data providers for multi-tier Midas technology</simpara>
+				</listitem>
+			</orderedlist></para>
+		<para>At the time of this writing this article ZeosDBO library only supported TDataset descendent components. Implementation of other component types is scheduled for future versions.</para>
+		<para>The component class diagram is presented on picture 3:
+
+			<mediaobject>
+				<imageobject>
+					<imagedata fileref="images/Overview003.gif" format="GIF"/>
+				</imageobject>
+			</mediaobject><orderedlist>
+				<listitem>
+					<simpara><classname>TZAbstractRODataset</classname>, <classname>TZAbstractDataset</classname>, <classname>TZAbstractStoredProc</classname> - abstract classes for <classname>TDataset</classname> descendant components</simpara>
+				</listitem>
+				<listitem>
+					<simpara><classname>TZReadOnlyQuery</classname>, <classname>TZQuery</classname>, <classname>TZStoredProc</classname> - universal <classname>TDataset</classname> descendant components</simpara>
+				</listitem>
+				<listitem>
+					<simpara><classname>TZReadOnlyXXSQLQuery</classname>, <classname>TZXXSQLQuery</classname>, <classname>TZXXSQLStoredProc</classname> - <classname>TDatasets</classname> specific for each supported SQL server. The way how they are propagating server specific functions is described in the previous chapter about DBC Layer.</simpara>
+				</listitem>
+				<listitem>
+					<simpara><classname>TZSQLMonitor</classname>, <classname>TZUpdateSQL</classname>, <classname>TZSQLProcessor</classname> - generic auxiliary components</simpara>
+				</listitem>
+			</orderedlist></para>
+		<para><classname>TDataset</classname> uses maximum the DBC layer functionality to read, modify and store data. Additionally it implements extra functions to filter, search and sort data, connect to visual components and many other things.</para>
+	</sect1>
+	<sect1>
+		<title>Epilog</title>
+		<para>In this article we described the main ideas of the new architecture of Zeos Database Objects component library for native database access. This architecture was introduced in version 6.0 and demonstrated high flexibility and effectiveness. In version 6.1 the code was seriously revised and optimized, but the main principles of the architecture was not changed.</para>
+		<para>Functionality and flexibility incorporated in the architecture will meet adapt to new requirements in the future. Support for new SQL servers will be added as well as access to SQL specific functionality and support for other high level interfaces like dbExpress and Midas.</para>
+		<para>To familiarize with the library you may visit the project website at <ulink url="http://zeos.firmos.at">http://zeos.firmos.at</ulink> or the development page on SourceForge at<ulink url="http://www.sourceforge.net/projects/zeoslib">http://www.sourceforge.net/projects/zeoslib</ulink></para>
+	</sect1>
+</article>

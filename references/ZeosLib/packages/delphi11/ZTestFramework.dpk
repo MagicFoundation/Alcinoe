@@ -1,0 +1,61 @@
+package ZTestFramework;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS ON}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'Zeos Testing Framework'}
+{$LIBSUFFIX '110'}
+{$IMPLICITBUILD OFF}
+
+requires
+  ZComponent,
+  ZDbc,
+  ZPlain,
+  ZParseSql,
+  ZCore,
+  rtl,
+  dbrtl,
+  dsnap,
+  dsnapcon,
+  vcl,
+  vclactnband,
+  vclx,
+  designide;
+
+contains
+  ZTestConfig in '..\..\test\framework\ZTestConfig.pas',
+  ZTestConsts in '..\..\test\framework\ZTestConsts.pas',
+  ZTestDefinitions in '..\..\test\framework\ZTestDefinitions.pas',
+  ZSqlTestCase in '..\..\test\framework\ZSqlTestCase.pas',
+  ZTestCase in '..\..\test\framework\ZTestCase.pas',
+  ZBugReport in '..\..\test\framework\ZBugReport.pas',
+  ZPerformanceTestCase in '..\..\test\framework\ZPerformanceTestCase.pas',
+  TestFramework in '..\..\..\..\DUnit\src\TestFramework.pas',
+  MemCheck in '..\..\test\external\MemCheck.pas';
+
+{TextTestRunner in '..\..\test\external\TextTestRunner.pas',
+  GUITestRunner in '..\..\test\external\GUITestRunner.pas',
+  ZMidasTestServer_TLB in '..\..\test\framework\ZMidasTestServer_TLB.pas',
+  ZMidasTestCase in '..\..\test\framework\ZMidasTestCase.pas';}
+
+  {ZRemoteDM: TRemoteDataModule;}
+
+end.

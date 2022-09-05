@@ -1,0 +1,247 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{C9850B7F-D3CD-428F-B469-AF468B01C9DA}</ProjectGuid>
+			<ProjectType>CppPackage</ProjectType>
+			<MainSource>ZParseSql.cpp</MainSource>
+			<Config Condition="'$(Config)'==''">Debug</Config>
+			<ProjectVersion>12.0</ProjectVersion>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+			<Cfg_1>true</Cfg_1>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+			<Cfg_2>true</Cfg_2>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base)'!=''">
+			<LinkPackageImports>rtl.bpi</LinkPackageImports>
+			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
+			<IncludePath>..\..\src\parsesql;$(IncludePath)</IncludePath>
+			<PackageImports>ZCore.bpi;rtl.bpi</PackageImports>
+			<BRCC_Defines>NO_STRICT;USEPACKAGES;$(BRCC_Defines)</BRCC_Defines>
+			<DCC_ObjOutput>build\</DCC_ObjOutput>
+			<ILINK_FullDebugInfo>true</ILINK_FullDebugInfo>
+			<TASM_Defines>NO_STRICT;USEPACKAGES;$(TASM_Defines)</TASM_Defines>
+			<DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
+			<BCC_Defines>NO_STRICT;$(BCC_Defines)</BCC_Defines>
+			<ILINK_AppType>Windows</ILINK_AppType>
+			<DCC_UnitSearchPath>.\;$(BDS)\lib;$(BDS)\lib\obj;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<DCC_IncludePath>.\;$(BDS)\lib;$(BDS)\lib\obj;$(DCC_IncludePath)</DCC_IncludePath>
+			<BRCC_OutputDir>build\</BRCC_OutputDir>
+			<BRCC_IncludePath>..\..\src\parsesql;$(BDS)\include;$(BDS)\include\vcl;build;$(BDS)\include\dinkumware;$(BRCC_IncludePath)</BRCC_IncludePath>
+			<ILINK_GenerateLibFile>true</ILINK_GenerateLibFile>
+			<BCC_SourceDebuggingOn>true</BCC_SourceDebuggingOn>
+			<BRCC_UserSuppliedOptions> -I..\..\src\parsesql;$(BDS)\include;$(BDS)\include\vcl;build;$(BDS)\include\dinkumware</BRCC_UserSuppliedOptions>
+			<TASM_IncludePath>..\..\src\parsesql;$(BDS)\include;$(BDS)\include\vcl;build;$(BDS)\include\dinkumware;$(TASM_IncludePath)</TASM_IncludePath>
+			<UsePackages>true</UsePackages>
+			<BCC_IncludePath>..\..\src\parsesql;$(BDS)\include;$(BDS)\include\vcl;build;$(BDS)\include\dinkumware;$(BCC_IncludePath)</BCC_IncludePath>
+			<ILINK_GenerateImportLibrary>true</ILINK_GenerateImportLibrary>
+			<BCC_GenerateMultithreaded>true</BCC_GenerateMultithreaded>
+			<AllPackageLibs>rtl.lib</AllPackageLibs>
+			<FinalOutputDir>.</FinalOutputDir>
+			<BCC_DisableOptimizations>true</BCC_DisableOptimizations>
+			<ILINK_IntermediateOutputPath>build</ILINK_IntermediateOutputPath>
+			<TASM_AdditionalSwitches> /w2 build\</TASM_AdditionalSwitches>
+			<TASM_Debugging>Full</TASM_Debugging>
+			<ILINK_Description>Zeos SQL Parsing Classes and Interfaces</ILINK_Description>
+			<ILINK_WinAppType>Package</ILINK_WinAppType>
+			<DCC_DcuOutput>build\</DCC_DcuOutput>
+			<Multithreaded>true</Multithreaded>
+			<BCC_UserSuppliedOptions> -6 -Vx -r- -k -Ve</BCC_UserSuppliedOptions>
+			<ILINK_LibraryPath>$(BDS)\Projects\Lib;..\..\src\parsesql;$(BDS)\lib\obj;$(BDS)\lib;build;$(RELEASELIBPATH);$(BDS)\lib\psdk;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+			<BCC_DebugLineNumbers>true</BCC_DebugLineNumbers>
+			<OutputExt>bpl</OutputExt>
+			<BCC_OutputDir>build\</BCC_OutputDir>
+			<BCC_InlineFunctionExpansion>false</BCC_InlineFunctionExpansion>
+			<DCC_AdditionalSwitches> -M</DCC_AdditionalSwitches>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1)'!=''">
+			<BCC_Defines>_DEBUG;$(BCC_Defines);$(BCC_Defines)</BCC_Defines>
+			<ILINK_LibraryPath>$(BDS)\lib\debug;$(ILINK_LibraryPath);$(ILINK_LibraryPath)</ILINK_LibraryPath>
+			<IntermediateOutputDir>Debug_Build</IntermediateOutputDir>
+			<DCC_Define>DEBUG;$(DCC_Define);$(DCC_Define)</DCC_Define>
+			<DCC_AdditionalSwitches> -M -V</DCC_AdditionalSwitches>
+			<ILINK_DisableIncrementalLinking>true</ILINK_DisableIncrementalLinking>
+			<TASM_DisplaySourceLines>true</TASM_DisplaySourceLines>
+			<DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2)'!=''">
+			<BCC_Defines>NDEBUG;$(BCC_Defines);$(BCC_Defines)</BCC_Defines>
+			<BCC_UserSuppliedOptions> -6 -Vx -r- -k -Ve -r</BCC_UserSuppliedOptions>
+			<BCC_OptimizeForSpeed>true</BCC_OptimizeForSpeed>
+			<IntermediateOutputDir>Release_Build</IntermediateOutputDir>
+			<DCC_AdditionalSwitches> -M -$O+</DCC_AdditionalSwitches>
+			<TASM_Debugging>None</TASM_Debugging>
+			<ILINK_LibraryPath>$(BDS)\lib\release;$(ILINK_LibraryPath);$(ILINK_LibraryPath)</ILINK_LibraryPath>
+			<BCC_InlineFunctionExpansion>true</BCC_InlineFunctionExpansion>
+		</PropertyGroup>
+		<ItemGroup>
+			<DelphiCompile Include="..\..\src\parsesql\ZSelectSchema.pas">
+				<BuildOrder>41</BuildOrder>
+				<BuildOrder>0</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\parsesql\ZSybaseAnalyser.pas">
+				<BuildOrder>44</BuildOrder>
+				<BuildOrder>1</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\parsesql\ZScriptParser.pas">
+				<BuildOrder>38</BuildOrder>
+				<BuildOrder>2</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\parsesql\ZPostgreSqlAnalyser.pas">
+				<BuildOrder>32</BuildOrder>
+				<BuildOrder>3</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\parsesql\ZPostgreSqlToken.pas">
+				<BuildOrder>35</BuildOrder>
+				<BuildOrder>4</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\parsesql\ZOracleToken.pas">
+				<BuildOrder>56</BuildOrder>
+				<BuildOrder>5</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\parsesql\ZSqLiteAnalyser.pas">
+				<BuildOrder>59</BuildOrder>
+				<BuildOrder>6</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\parsesql\ZOracleAnalyser.pas">
+				<BuildOrder>53</BuildOrder>
+				<BuildOrder>7</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\parsesql\ZSybaseToken.pas">
+				<BuildOrder>47</BuildOrder>
+				<BuildOrder>8</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\parsesql\ZSqLiteToken.pas">
+				<BuildOrder>50</BuildOrder>
+				<BuildOrder>9</BuildOrder>
+			</DelphiCompile>
+			<PackageImport Include="rtl.bpi">
+				<BuildOrder>11</BuildOrder>
+				<BuildOrder>10</BuildOrder>
+			</PackageImport>
+			<DelphiCompile Include="..\..\src\parsesql\ZGenericSqlAnalyser.pas">
+				<BuildOrder>14</BuildOrder>
+				<BuildOrder>11</BuildOrder>
+			</DelphiCompile>
+			<PackageImport Include="ZCore.bpi">
+				<BuildOrder>8</BuildOrder>
+				<BuildOrder>12</BuildOrder>
+			</PackageImport>
+			<CppCompile Include="ZParseSql.cpp">
+				<BuildOrder>2</BuildOrder>
+				<BuildOrder>13</BuildOrder>
+			</CppCompile>
+			<ResFiles Include="ZParseSql.res">
+				<BuildOrder>5</BuildOrder>
+				<BuildOrder>14</BuildOrder>
+			</ResFiles>
+			<DelphiCompile Include="..\..\src\parsesql\ZMySqlAnalyser.pas">
+				<BuildOrder>26</BuildOrder>
+				<BuildOrder>15</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\parsesql\ZMySqlToken.pas">
+				<BuildOrder>29</BuildOrder>
+				<BuildOrder>16</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\parsesql\ZInterbaseToken.pas">
+				<BuildOrder>23</BuildOrder>
+				<BuildOrder>17</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\parsesql\ZGenericSqlToken.pas">
+				<BuildOrder>17</BuildOrder>
+				<BuildOrder>18</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\parsesql\ZInterbaseAnalyser.pas">
+				<BuildOrder>20</BuildOrder>
+				<BuildOrder>19</BuildOrder>
+			</DelphiCompile>
+			<BuildConfiguration Include="Base">
+				<Key>Base</Key>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Release">
+				<Key>Cfg_2</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Debug">
+				<Key>Cfg_1</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+		</ItemGroup>
+		<Import Project="$(BDS)\Bin\CodeGear.Cpp.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Cpp.Targets')"/>
+		<ProjectExtensions>
+			<Borland.Personality>CPlusPlusBuilder.Personality.12</Borland.Personality>
+			<Borland.ProjectType>CppPackage</Borland.ProjectType>
+			<BorlandProject>
+				<CPlusPlusBuilder.Personality>
+					<VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
+						<VersionInfo Name="MajorVer">7</VersionInfo>
+						<VersionInfo Name="MinorVer">0</VersionInfo>
+						<VersionInfo Name="Release">0</VersionInfo>
+						<VersionInfo Name="Build">0</VersionInfo>
+						<VersionInfo Name="Debug">False</VersionInfo>
+						<VersionInfo Name="PreRelease">False</VersionInfo>
+						<VersionInfo Name="Special">False</VersionInfo>
+						<VersionInfo Name="Private">False</VersionInfo>
+						<VersionInfo Name="DLL">False</VersionInfo>
+						<VersionInfo Name="Locale">1033</VersionInfo>
+						<VersionInfo Name="CodePage">1252</VersionInfo>
+					</VersionInfo>
+					<VersionInfoKeys>
+						<VersionInfoKeys Name="CompanyName"/>
+						<VersionInfoKeys Name="FileDescription"/>
+						<VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+						<VersionInfoKeys Name="InternalName"/>
+						<VersionInfoKeys Name="LegalCopyright"/>
+						<VersionInfoKeys Name="LegalTrademarks"/>
+						<VersionInfoKeys Name="OriginalFilename"/>
+						<VersionInfoKeys Name="ProductName"/>
+						<VersionInfoKeys Name="ProductVersion">7.0.0.0</VersionInfoKeys>
+						<VersionInfoKeys Name="Comments"/>
+					</VersionInfoKeys>
+					<Debugging>
+						<Debugging Name="DebugSourceDirs">$(BCB)\source\vcl;build</Debugging>
+					</Debugging>
+					<Parameters>
+						<Parameters Name="RunParams"/>
+						<Parameters Name="Launcher"/>
+						<Parameters Name="UseLauncher">False</Parameters>
+						<Parameters Name="DebugCWD"/>
+						<Parameters Name="HostApplication"/>
+						<Parameters Name="RemoteHost"/>
+						<Parameters Name="RemotePath"/>
+						<Parameters Name="RemoteLauncher"/>
+						<Parameters Name="RemoteCWD"/>
+						<Parameters Name="RemoteDebug">False</Parameters>
+						<Parameters Name="RemoteParams"/>
+						<Parameters Name="UseRemoteLauncher">False</Parameters>
+						<Parameters Name="Debug Symbols Search Path"/>
+						<Parameters Name="LoadAllSymbols">True</Parameters>
+						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+					</Parameters>
+					<Compiler>
+						<Compiler Name="ShowInfoMsgs">0</Compiler>
+						<Compiler Name="LinkDebugVcl">0</Compiler>
+						<Compiler Name="LinkCGLIB">0</Compiler>
+					</Compiler>
+					<ProjectProperties>
+						<ProjectProperties Name="AutoShowDeps">False</ProjectProperties>
+						<ProjectProperties Name="ManagePaths">True</ProjectProperties>
+						<ProjectProperties Name="VerifyPackages">True</ProjectProperties>
+					</ProjectProperties>
+					<Source>
+						<Source Name="MainSource">ZParseSql.cpp</Source>
+					</Source>
+				</CPlusPlusBuilder.Personality>
+			</BorlandProject>
+			<ProjectFileVersion>12</ProjectFileVersion>
+		</ProjectExtensions>
+	</Project>

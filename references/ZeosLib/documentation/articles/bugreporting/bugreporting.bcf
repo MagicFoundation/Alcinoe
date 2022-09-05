@@ -1,0 +1,253 @@
+#Blog Content File#
+
+[]
+docbooktype=Article
+bdf=c:\docbook\dtd\docbook_article.bdf
+btf=c:\docbook\template\docbook_article.btf
+out=d:\workshop\zeosdbo_rework\documentation\repository\bugreporting\bugreporting.xml
+indent=3
+
+[*ArticleInfo: Building Tests]
+. Bug Reporting in ZEOS Library
+
+   [Author: Michael Seeger]
+   . Michael
+   . Seeger
+   . miseeger*at*users*dot*sourceforge*dot*net
+
+   [FlexParagraph: Additional Data]
+   . <date>2005-06-23</date>
+     <abstract>
+       <para>
+          The currect bug reporting procedure is absolutely critical to improve 
+          the quality of ZEOS. It defines steps to fix bugs, to notify the reported 
+          user about the change and update the test harness to ensure the bug will 
+          never happen again. Unfortunately in free ware projets it's hard to maintain 
+          good test coverage. The Bug Report procedure allows to improve the test 
+          coverage and to increase the stability of the Libary afterward, when the code is
+          written and released. It relieves developers because writing tests is partially 
+          moved to responsibilities of QA group.
+       </para>
+     </abstract>
+
+[ArticleInfo*]
+
+[*Section: 1) Recommendation]
+. Recommendation
+. Recommendation to a Bug Report
+
+   [FlexParagraph: ]
+   . <para>
+       A "valid" bug report has to contain the following informations:
+     </para>
+     <itemizedlist>
+       <listitem>
+         <para>Database server and server version</para>
+       </listitem>
+       <listitem>
+         <para>Version of used components</para>
+       </listitem>
+       <listitem>
+         <para>Name component or class that raised the error</para>
+       </listitem>
+       <listitem>
+         <para>Information about user properties for components and/or classes</para>
+       </listitem>
+       <listitem>
+         <para>Exact description of the error</para>
+       </listitem>
+       <listitem>
+         <para>Sql query and table(s) structure and table(s) data for user specified table(s)</para>
+       </listitem>
+     </itemizedlist>
+     <para>
+       If it is necessary and possible the user may be asked for a sample application that
+       reproduces the error
+     </para>
+
+[Section*]
+
+[*Section: 2) Bug Reporting / Fixing Proecedure]
+. FixingProcedure
+. Bug Fixing Proecedure
+
+   [FlexParagraph: ]
+   . <orderedlist numeration="arabic">
+        <listitem>
+           <para>User submits a bug report on SourceForge Bug Tracker.</para>
+        </listitem>
+        <listitem>
+           <para>
+             Elaborate information about the bug and close the bug if it has no sense.
+             Notify the user about the action taken and exlain why this was done
+             (performed by QA Group)
+           </para>
+        </listitem>
+        <listitem>
+           <para>
+             Implement a Bug Report Test Case which relicates the problem (performed by
+             QA Group)
+           </para>
+        </listitem>
+        <listitem>
+           <para>Switch the bug to the responsible developer</para>
+        </listitem>
+        <listitem>
+           <para>
+             Fix the bug. Document yor changes in sourcecode, carefully! (performed by
+             responsible developer)
+           </para>
+        </listitem>
+        <listitem>
+           <para>
+             Fill out the bug report e-Form and document your doings, carefully!
+             The given Template (bug_report_form.txt has to be saved as <filename>
+             BugID.txt</filename> where <filename>ID</filename> means the Bug's 
+             ID from the SourceForge Bug Tracker.
+           </para>
+        </listitem>
+        <listitem>
+           <para>
+             Close the bug report and notify the user about the changes done (if possible)
+             and mention when it will be officially released (performed by responsible
+             developer)
+           </para>
+        </listitem>            
+     </orderedlist>
+
+[Section*]
+
+[*Section: 3) Bug Reporting / Fixing Test]
+. FixingText
+. Bug Fixing Test
+
+   [FlexParagraph]
+   . <para>
+       Bug Report Tests is a special category of tests it is obvious that bugs may 
+       happen in all groups of finctional tests described before. From that p
+       erspective Bug Report Tests should repeat the hierarchy of functional tests:
+     </para>
+     <para>
+       <orderedlist numeration="arabic">
+         <listitem>
+            <para>TZAbstractBugReportTestCase - a base abstract class for Bug Report Tests.</para>
+         </listitem>
+         <listitem>
+           <para>
+             TZGenericBugReport, TZPortableSQLBugReport and TZSpecificSQLBugReport - abstract
+             classes for "Generic", "SQL Prtable" and "SQL Specific" tests.
+           </para>
+         </listitem>
+         <listitem>
+           <para>
+             TZCompPortableSQLBugReport, TZCompMySQLBugReport, TZCompInterbaseBugReport,
+             TZDbcPortableSQLBugReport, TZDbcMySQLBugReport, TZDbcInterbaseBugReport, etc. -
+             specific test cases.
+           </para>
+         </listitem>
+       </orderedlist>
+     </para>
+
+   [FlexParagraph]
+   . <para>
+     For Bug Report Test cases we set a convention to name test methodes as "Test" + ID, where
+     ID is a unique number of associated bug report in Bug Tracker on SourceForge. That convention
+     allows us to do following things:
+     </para>
+     <para>
+       <orderedlist numeration="arabic">
+         <listitem>
+            <para>Enforce creation of bug repot for each found bug.</para>
+         </listitem>
+         <listitem>
+           <para>Easy navigate between bug reports and related test cases.</para>
+         </listitem>
+         <listitem>
+           <para>
+             TZCompPortableSQLBugReport, TZCompMySQLBugReport, TZCompInterbaseBugReport,
+             TZDbcPortableSQLBugReport, TZDbcMySQLBugReport, TZDbcInterbaseBugReport, etc. -
+             specific test cases.
+           </para>
+         </listitem>
+       </orderedlist>
+     </para>
+
+   [FlexParagraph]
+   . <para>
+       During bug fixing developer usually have to run a specific test case many times. 
+       To speed up the process we added to TZAbstractBugReportTestCase class a convenient 
+       function called SkipClosed. If SkipClosed property ist set to true for "bugreport" 
+       category in configuration file, SkipClosed returns true and allows to skip 
+       completed tests for fixed bugs. It dramatically decreases number of tests to run 
+       and makes developer's vork much more productive.
+     </para>
+
+[Section*]
+
+[*Section: 4) Sample Bugreport Testcase]
+. SampleBRTestCase
+. Sample Bug Report Testcase
+
+   [FlexParagraph]
+   . <para>
+        <programlisting>
+        UNIT ZTestCompCore;
+        &nbsp;
+        INTERFACE
+        &nbsp;   
+        {$I ZBugReport.inc}
+        &nbsp;   
+        USES Classed, DB, TestFramework, ZDataset, ZConnection, ZDbcIntfs, ZBugReport,
+             ZCompatibility, ZSqlUpdate, ZSqlProcessor;
+        &nbsp;        
+        TYPE ZTestCompCoreBugReport = class (TZPortableSQLBugReportTestCase)
+                :
+                published
+                   :
+                   Procedure Test833197;
+                   :
+             End;
+        &nbsp;        
+        IMPLEMENTATION
+        &nbsp;   
+        :
+        &nbsp;   
+        {** Bugreport #833197:
+         Refresh problem with filtered data. }
+        &nbsp;    
+        Procedure ZTestCompCoreBugReport.Test833197;
+        Var Connection: TZConnection;
+            Query     : TZQuery;
+        Begin
+           If SkipClosed Then Exit;
+           &nbsp;      
+           Connection       := Self.CreateDatasetConnection;
+           Query            := TZQuery.Create (nil);
+           Query.Connection := Connection;
+           Query.SQL.Text   := 'SELECT * FROM poeple';
+           &nbsp;      
+           Try
+              Query.Open;
+              Query.Filter   := 'p_name = "Aleksey Petrov"';
+              Query.Filtered := True;
+              CheckEquals (1, Query.RecordCount);
+              Query.Refresh;
+              CheckEquals (1, Query.RecordCount);
+              Query.Close;
+           Finally
+              Connection.Free;
+              Query.Free;
+           End;
+        End; // Test833197
+        &nbsp;      
+        :
+        &nbsp;      
+        INITIALIZATION
+        &nbsp;      
+           TestFramework.RegisterTest (ZTestCompCoreBugReort.Suite);
+        &nbsp;      
+        End.   
+        </programlisting>
+     </para>
+
+[Section*]

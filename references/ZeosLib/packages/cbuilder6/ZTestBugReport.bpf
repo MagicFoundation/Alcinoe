@@ -1,0 +1,18 @@
+USEUNIT("ZTestBugReport.cpp");
+USEUNIT("..\..\test\external\TestFrameWork.pas");
+USEUNIT("..\..\test\external\TextTestRunner.pas");
+USEUNIT("..\..\test\bugreport\ZTestBugDbcPostgreSql.pas");
+USEUNIT("..\..\test\bugreport\ZTestBugCompDbLib.pas");
+USEUNIT("..\..\test\bugreport\ZTestBugCompInterbase.pas");
+USEUNIT("..\..\test\bugreport\ZTestBugBugCompMSSql.pas");
+USEUNIT("..\..\test\bugreport\ZTestBugCompBugMySql.pas");
+USEUNIT("..\..\test\bugreport\ZTestBugCompBugPostgreSql.pas");
+USEUNIT("..\..\test\bugreport\ZTestBugDbcBugCore.pas");
+USEUNIT("..\..\test\bugreport\ZTestBugBugDbcDbLib.pas");
+USEUNIT("..\..\test\bugreport\ZTestBugDbcInterbase.pas");
+USEUNIT("..\..\test\bugreport\ZTestBugDbcDbcMySql.pas");
+USEUNIT("..\..\test\bugreport\ZTestBugCompCore.pas");
+//---------------------------------------------------------------------------
+This file is used by the project manager only and should be treated like the project file
+
+main

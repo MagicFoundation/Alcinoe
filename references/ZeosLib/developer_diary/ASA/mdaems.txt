@@ -1,0 +1,3 @@
+20080310 : Invalid argument to time encode - by Stressman - See Mantis Bug 94
+
+20080316 : Added possibility to connect using TCP/IP - by Stressman - See Mantis Bug 95

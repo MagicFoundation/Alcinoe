@@ -1,0 +1,49 @@
+================================================================================
+//               ZEOS Library Bug Reporting / Bug Fixing Form                 //
+================================================================================
+
+Bug ID               : 1173358                      Priority      : 5
+Submitted by         : nobody                       Date Submitted: 2005-03-30 16:45
+Quality assurance by : stefanglienke                Closed as of  : 2005-06-02 12:10
+Assigned to          : stefanglienke                Closed by     : stefanglienke
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : n/a
+ZEOSLib Version      : 6.5.1 alpha
+Component/Class      : TZMySQLPreparedStatement
+
+--------------------------------------------------------------------------------
+
+Error Description:
+
+This is really a bug in Delphi according to me, but alas 
+we need to fix our source to make things work like 
+expected.
+
+Step1: Go to Control panel->Regional options->Time
+Then change the time seperator from ":" to "."
+
+Step2: Write a little function with
+
+ShowMessage(FormatDateTime('yyyy-mm-dd 
+hh:nn:ss',Now));
+
+Step3: Execute the function.
+We all would expect it to return 2005-03-30 14:20:50, 
+but instead it returns 2005-03-30 14.20.50!!
+
+This totally messes with MySQL's ability to handle 
+times correctly.
+
+--------------------------------------------------------------------------------
+
+Actions done form Bugfixing:
+
+Delphi replaces : and / with the local Date-/Time-Seperators when using 
+Date-Format-Functions.
+Fixed Bug by using DecodeDate and Format to "manually" format the Date/Time.
+
+================================================================================
+
+

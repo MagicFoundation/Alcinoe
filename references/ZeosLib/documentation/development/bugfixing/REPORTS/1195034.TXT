@@ -1,0 +1,38 @@
+================================================================================
+//               ZEOS Library Bug Reporting / Bug Fixing Form                 //
+================================================================================
+
+Bug ID               : 1195034                      Priority      : 5
+Submitted by         : hombergs                     Date Submitted: 2005-05-04 09:55
+Quality assurance by : stefanglienke                Closed as of  : 2005-05-04 17:03
+Assigned to          : stefanglienke                Closed by     : stefanglienke
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : n/a
+ZEOSLib Version      : 6.5.1 alpha
+Component/Class      : n/a
+
+--------------------------------------------------------------------------------
+
+Error Description:
+
+I installed the new CVS version of Zeos and compiled it with FPC/
+Lazarus under Linux.
+When I connect to a Firebird Database I get a Range Check Error 
+message and the connection state switch back to false.
+The same happens with the SQLite driver.
+The MySQL and PostgreSQL drivers are working.
+
+--------------------------------------------------------------------------------
+
+Actions done form Bugfixing:
+
+FPC/Lazarus defines HMODULE as longint but when the cryptolib
+for IB/
+FB is loaded the return pointer was negative.
+So I redefine HMODULE as longword in ZCompatibily. (by hombergs)
+
+================================================================================
+
+

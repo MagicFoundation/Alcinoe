@@ -1,0 +1,46 @@
+================================================================================
+//               ZEOS Library Bug Reporting / Bug Fixing Form                 //
+================================================================================
+
+Bug ID               : 983424                       Priority      : 9
+Submitted by         : stefano_campri               Date Submitted: 2004-07-01 15:17
+Quality assurance by : stefanglienke                Closed as of  : 2005-06-06 12:52
+Assigned to          : stefanglienke                Closed by     : stefanglienke
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : n/a
+ZEOSLib Version      : 6.5.1 alpha
+Component/Class      : TZConnection
+
+--------------------------------------------------------------------------------
+
+Error Description:
+
+evenif i set ZConnection.SQLHourGlass true the mouse 
+pointer looks like arrow 
+
+try to debugging i saw when 
+procedure TZConnection.ShowSQLHourGlass is called 
+DBScreen is always nil 
+
+how to fix it ? 
+have you any experience with this issue ?
+
+--------------------------------------------------------------------------------
+
+Actions done form Bugfixing:
+
+This is no bug of Zeos.
+
+DBScreen is not nil when using the unit DB which is used by 
+several units of zeos, BUT is is initialized with a class-object
+which is not changing the cursor, the user sees (Forms.
+Screen.Cursor). This Object is initialized in unit DBCtrls.
+
+If you want to see the SQLHourGlass then you should add the 
+unit DBCtrls to your uses-clause.
+
+================================================================================
+
+

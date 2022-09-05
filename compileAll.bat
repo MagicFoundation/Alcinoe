@@ -54,25 +54,25 @@ REM -------------------
 REM Normalize all units
 REM -------------------
 
-call "%ProjectDir%\tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\source\" "false"
+call "%ProjectDir%\Tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\source\" "false"
 IF ERRORLEVEL 1 goto ERROR
 
-call "%ProjectDir%\tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\demos\" "false"
+call "%ProjectDir%\Tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\demos\" "false"
 IF ERRORLEVEL 1 goto ERROR
 
-call "%ProjectDir%\tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\tools\DeployProjNormalizer\" "false"
+call "%ProjectDir%\Tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\Tools\DeployProjNormalizer\" "false"
 IF ERRORLEVEL 1 goto ERROR
 
-call "%ProjectDir%\tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\tools\DprojNormalizer\" "false"
+call "%ProjectDir%\Tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\Tools\DprojNormalizer\" "false"
 IF ERRORLEVEL 1 goto ERROR
 
-call "%ProjectDir%\tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\tools\DprojVersioning\" "false"
+call "%ProjectDir%\Tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\Tools\DprojVersioning\" "false"
 IF ERRORLEVEL 1 goto ERROR
 
-call "%ProjectDir%\tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\tools\UnitNormalizer\" "false"
+call "%ProjectDir%\Tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\Tools\UnitNormalizer\" "false"
 IF ERRORLEVEL 1 goto ERROR
 
-call "%ProjectDir%\tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\tools\XmlMerge\" "false"
+call "%ProjectDir%\Tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\Tools\XmlMerge\" "false"
 IF ERRORLEVEL 1 goto ERROR
 
 REM -----------------
@@ -222,7 +222,7 @@ FOR /R %%J IN (*.dproj) DO (
 )
 CHDIR "%ProjectDir%\"
 
-call tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALFmxControls\_source\ALFmxControls.dproj" "false"
+call Tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALFmxControls\_source\ALFmxControls.dproj" "false"
 IF ERRORLEVEL 1 goto ERROR
 
 CHDIR "%ProjectDir%\demos\"
@@ -240,7 +240,7 @@ REM MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platf
 REM IF ERRORLEVEL 1 PAUSE
 CHDIR "%ProjectDir%\"
 
-call tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj" "false"
+call Tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj" "false"
 IF ERRORLEVEL 1 goto ERROR
 
 CHDIR "%ProjectDir%\demos\"
@@ -258,7 +258,7 @@ REM MSBuild ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj /p:Config=Rele
 REM IF ERRORLEVEL 1 PAUSE
 CHDIR "%ProjectDir%\"
 
-call tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALConfetti\_source\ALConfettiDemo.dproj" "false"
+call Tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALConfetti\_source\ALConfettiDemo.dproj" "false"
 IF ERRORLEVEL 1 goto ERROR
 
 CHDIR "%ProjectDir%\demos\"
@@ -276,7 +276,7 @@ REM MSBuild ALConfetti\_source\ALConfettiDemo.dproj /p:Config=Release /p:Platfor
 REM IF ERRORLEVEL 1 PAUSE
 CHDIR "%ProjectDir%\"
 
-call tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALFacebookLogin\_source\ALFacebookLogin.dproj" "false"
+call Tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALFacebookLogin\_source\ALFacebookLogin.dproj" "false"
 IF ERRORLEVEL 1 goto ERROR
 
 CHDIR "%ProjectDir%\demos\"
@@ -294,7 +294,7 @@ REM MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:P
 REM IF ERRORLEVEL 1 PAUSE
 CHDIR "%ProjectDir%\"
 
-call tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj" "false"
+call Tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj" "false"
 IF ERRORLEVEL 1 goto ERROR
 
 CHDIR "%ProjectDir%\demos\"
@@ -312,7 +312,7 @@ REM MSBuild ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj /p:Config=Re
 REM IF ERRORLEVEL 1 PAUSE
 CHDIR "%ProjectDir%\"
 
-call tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj" "false"
+call Tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\demos\ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj" "false"
 IF ERRORLEVEL 1 goto ERROR
 
 CHDIR "%ProjectDir%\demos\"

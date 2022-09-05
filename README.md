@@ -89,7 +89,7 @@ With d8.bat (replacement of dx.bat), desugaring is turned on by default. So you 
 use most of the latest language changes while targeting older devices.
 Waiting that embarcadero swap to D8.bat, we must make DX.bat a "proxy" to D8.bat.
 For this just replace your original DX.bat (mine is located in c:\SDKs\android\build-tools\30.0.3\d8.bat)
-by the one located in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/tools/D8Proxy/dx.bat">{alcinoe_rootdir}\tools\D8Proxy\dx.bat</a>.
+by the one located in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/D8Proxy/dx.bat">{alcinoe_rootdir}\Tools\D8Proxy\dx.bat</a>.
 more details here: <a href="https://quality.embarcadero.com/browse/RSP-24155">https://quality.embarcadero.com/browse/RSP-24155</a>
 
 

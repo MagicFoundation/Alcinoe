@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 
 REM ----------------------------------------------
 REM Add this Post Build event (android platform) :
-REM C:\Dev\Alcinoe\tools\AddRJavaToClassesDex\AddRJavaToClassesDex.bat "$(PROJECTDIR)" "$(OUTPUTPATH)" "$(SDKAaptPath)" "$(SDKApiLevelPath)" "$(JavaDxPath)" "$(JDKPath)" true/false(true if you build an .aab package, false if you build an .apk)
+REM C:\Dev\Alcinoe\Tools\AddRJavaToClassesDex\AddRJavaToClassesDex.bat "$(PROJECTDIR)" "$(OUTPUTPATH)" "$(SDKAaptPath)" "$(SDKApiLevelPath)" "$(JavaDxPath)" "$(JDKPath)" true/false(true if you build an .aab package, false if you build an .apk)
 REM 
 REM Example of the generated content of each params : 
 REM $(PROJECTDIR) = C:\MyProject\_source

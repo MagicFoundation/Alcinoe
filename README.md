@@ -10,14 +10,14 @@ Alcinoe is compatible with <b>Delphi Sydney 10.4.2</b>
 Please "star" (like) this project in GitHub! It's cost nothing but help
 to reference the code
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/img-24.jpg?raw=true" alt="like" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-24.jpg?raw=true" alt="like" />
 
 
 Example of app made with Alcinoe
 --------------------------------
 
 <a href="https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/youtube_kiskis2.jpg?raw=true" alt="KisKis" />
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/youtube_kiskis2.jpg?raw=true" alt="KisKis" />
 </a>
 
 * iOS: https://itunes.apple.com/us/app/id1420049759
@@ -109,9 +109,9 @@ to be easy to customize and extend. Under iOS I use AVPlayer with support
 also HLS like ExoPlayer does
 
 <p align="left">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/img-1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/img-2.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/img-3.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-2.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-3.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
 </p>
 
 
@@ -129,7 +129,7 @@ TALWebRTC component makes it easy to add video and audio chat into
 your applications, which opens up a whole new world of interactivity
 
 <p align="center">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/img-25.jpg?raw=true" alt="Delphi WebRTC wrapper" />
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-25.jpg?raw=true" alt="Delphi WebRTC wrapper" />
 </p>
 
 
@@ -151,12 +151,12 @@ top of the form (so off course no z-order with FireMonkey control)
 
 
 <p align="left">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/img-20.png?raw=true" alt="Drawing" width="240" style="width:240px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-20.png?raw=true" alt="Drawing" width="240" style="width:240px;"/>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/img-21.png?raw=true" alt="Drawing" width="240" style="width:240px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-21.png?raw=true" alt="Drawing" width="240" style="width:240px;"/>
 </p>
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/img-22.png?raw=true" alt="Drawing" width="457" style="width:457px;"/>
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-22.png?raw=true" alt="Drawing" width="457" style="width:457px;"/>
 
 
 Fast/double-buffered FireMonkey controls with native draw
@@ -168,9 +168,9 @@ Fast/double-buffered FireMonkey controls with native draw
 * Glyph
 * etc.
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/img-23.png?raw=true" alt="TALRectangle" width="600" style="width:600px;" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-23.png?raw=true" alt="TALRectangle" width="600" style="width:600px;" />
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/img-8.jpg?raw=true" alt="TALRectangle" width="600" style="width:600px;" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-8.jpg?raw=true" alt="TALRectangle" width="600" style="width:600px;" />
 
 #### The fact ####
 
@@ -222,7 +222,7 @@ To resolve this, I build the buffer of my control using NATIVE
 ANDROID/IOS API. In this way we will have a high quality draw at also
 a high speed without being dependent of the form.quality
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/img-9.jpg?raw=true" alt="TALCircle" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-9.jpg?raw=true" alt="TALCircle" />
 
 
 Improved FireMonkey controls
@@ -232,14 +232,14 @@ Improved FireMonkey controls
 * TabControl
 * RangeTrackBar
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/img-5.jpg?raw=true" alt="RangeTrackBar" width="600" style="width:600px;"  />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-5.jpg?raw=true" alt="RangeTrackBar" width="600" style="width:600px;"  />
 
 <p align="left">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/img-15.jpg?raw=true" alt="video player for FireMonkey" width="250" style="width:250px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-15.jpg?raw=true" alt="video player for FireMonkey" width="250" style="width:250px;"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/img-14.jpg?raw=true" alt="video player for FireMonkey" width="250" style="width:250px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-14.jpg?raw=true" alt="video player for FireMonkey" width="250" style="width:250px;"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/img-16.jpg?raw=true" alt="video player for FireMonkey" width="250" style="width:250px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-16.jpg?raw=true" alt="video player for FireMonkey" width="250" style="width:250px;"/>
 </p>
 
 
@@ -249,7 +249,7 @@ Confetti Falling Animation
 ALConfetti is a vanilla Delphi library for creating a configurable, high-performance confetti 
 falling animation.
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;"  />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;"  />
 
 
 Firebase cloud messaging
@@ -276,9 +276,9 @@ With TALColorAdjustEffect, gorgeous photo filters with one-tap auto
 enhance, make your photos beautiful and expressive in just minutes! 
 
 <p align="left">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/img-18.jpg?raw=true" alt="video player for FireMonkey" width="320" style="width:320px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-18.jpg?raw=true" alt="video player for FireMonkey" width="320" style="width:320px;"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/references/DocImages/img-19.jpg?raw=true" alt="video player for FireMonkey" width="320" style="width:320px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-19.jpg?raw=true" alt="video player for FireMonkey" width="320" style="width:320px;"/>
 </p>
 
 

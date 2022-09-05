@@ -8,7 +8,7 @@ interface
 //
 // This wrapper is Build from the 7.1.0-8 version of ImageMagick
 // dll: /lib/dll/imagemagick
-// include: /references/ImageMagick/include/
+// include: /References/ImageMagick/include/
 //
 // When updating the dll to a new version of imagemagick always
 // compare and update the include located in

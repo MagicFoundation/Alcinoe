@@ -61,6 +61,7 @@ uses
   {$endIF}
   Fmx.types,
   Fmx.graphics,
+  ALFmxGraphics,
   ALFmxCommon,
   AlFmxObjects;
 
@@ -400,11 +401,7 @@ type
     FTagFloat: Double;
     FTagString: String;
     //-----
-    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
-    function GetBitmap: TalTexture;
-    {$ELSE}
-    function GetBitmap: TBitmap;
-    {$ENDIF}
+    function GetBitmap: TALRasterImage;
     procedure doOnCompletion(Sender: TObject);
     procedure doOnError(Sender: TObject);
     procedure doOnPrepared(Sender: TObject);
@@ -427,11 +424,7 @@ type
     procedure setLooping(const looping: Boolean);
     procedure setVolume(const Value: Single);
     procedure setPlaybackSpeed(const Value: single);
-    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
-    property Bitmap: TALTexture read Getbitmap;
-    {$ELSE}
-    property Bitmap: TBitmap read Getbitmap;
-    {$ENDIF}
+    property Bitmap: TALRasterImage read Getbitmap;
     property OnError: TNotifyEvent read fOnErrorEvent write fOnErrorEvent;
     property OnPrepared: TNotifyEvent read fOnPreparedEvent write fOnPreparedEvent;
     property OnFrameAvailable: TNotifyEvent read fOnFrameAvailableEvent write fOnFrameAvailableEvent;
@@ -445,8 +438,7 @@ type
     property TagString: String read FTagString write FTagString;
   end;
 
-  {*************************}
-  [ComponentPlatforms($FFFF)]
+  {*****************************************}
   TALVideoPlayerSurface = class(TALRectangle)
   private
     fVideoPlayer: TALVideoPlayer;
@@ -477,7 +469,6 @@ uses
   androidapi.jni.net,
   FMX.Canvas.GPU,
   AlString,
-  ALFmxGraphics,
   {$ENDIF}
   {$IF defined(IOS)}
   System.RTLConsts,
@@ -490,7 +481,6 @@ uses
   FMX.Context.GLES.iOS,
   FMX.Types3D,
   AlString,
-  ALFmxGraphics,
   {$ENDIF}
   fmx.controls,
   AlCommon;
@@ -2163,12 +2153,8 @@ begin
   result := fVideoPlayerControl.getDuration;
 end;
 
-{************************************}
-{$IF DEFINED(IOS) or DEFINED(ANDROID)}
-function TALVideoPlayer.GetBitmap: TalTexture;
-{$ELSE}
-function TALVideoPlayer.GetBitmap: Tbitmap;
-{$ENDIF}
+{************************************************}
+function TALVideoPlayer.GetBitmap: TALRasterImage;
 begin
   result := fVideoPlayerControl.Bitmap;
 end;
@@ -2324,9 +2310,6 @@ end;
 
 {************************************}
 procedure TALVideoPlayerSurface.Paint;
-{$IF DEFINED(IOS) or DEFINED(ANDROID)}
-var LDestRect: TrectF;
-{$endif}
 begin
 
   inherited paint;
@@ -2335,17 +2318,18 @@ begin
   if (fVideoPlayer.bitmap = nil) or
      (fVideoPlayer.bitmap.IsEmpty) then exit;
 
-  LDestRect := canvas.AlignToPixel(
-                 TRectF.Create(0, 0, fVideoPlayer.bitmap.Width, fVideoPlayer.bitmap.Height).
-                   FitInto(LocalRect));
+  var LDestRect := canvas.AlignToPixel(
+                     TRectF.Create(0, 0, fVideoPlayer.bitmap.Width, fVideoPlayer.bitmap.Height).
+                       FitInto(LocalRect));
 
-  TCustomCanvasGpu(Canvas).DrawTexture(LDestRect, // ATexRect
-                                       TRectF.Create(0,
-                                                     0,
-                                                     fVideoPlayer.bitmap.Width,
-                                                     fVideoPlayer.bitmap.Height), // ARect
-                                       ALPrepareColor(TCustomCanvasGpu.ModulateColor, AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
-                                       fVideoPlayer.bitmap);
+  TCustomCanvasGpu(Canvas).DrawTexture(
+    LDestRect, // ATexRect
+    TRectF.Create(
+      0, 0,
+      fVideoPlayer.bitmap.Width,
+      fVideoPlayer.bitmap.Height), // ARect
+    ALPrepareColor(TCustomCanvasGpu.ModulateColor, AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
+    fVideoPlayer.bitmap);
   {$endif}
 
 end;

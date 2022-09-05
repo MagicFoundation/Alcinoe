@@ -345,7 +345,7 @@ type
                          Var buffer: ansiString);
   public
     constructor Create(const NodeName: AnsiString); virtual;
-    procedure MultiThreadPrepare(const aOnlyChildNodes: Boolean = False);
+    procedure MultiThreadPrepare(const aOnlyChildList: Boolean = False);
     function GetText(const default: AnsiString): AnsiString; overload;
     function GetText: AnsiString; overload;
     procedure SetText(const Value: AnsiString);
@@ -423,6 +423,7 @@ type
     function GetChildNodeValueRegExOptions(const nodeName: ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
     function GetChildNodeValueBinary(const nodeName: ansiString; const default: AnsiString): AnsiString; overload;  // return a "byte" string
     function GetChildNodeValueBinarySubType(const nodeName: ansiString; const default: byte): byte; overload;
+    function GetChildNodeValueNull(const nodeName: ansiString): Boolean; overload;
     function GetChildNode(const path: array of ansiString): TALJSONNode; overload;
     function GetChildNodeValueText(const path: array of ansiString; const default: AnsiString): AnsiString; overload;
     function GetChildNodeValueFloat(const path: array of ansiString; const default: Double): Double; overload;
@@ -437,6 +438,7 @@ type
     function GetChildNodeValueRegExOptions(const path: array of ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
     function GetChildNodeValueBinary(const path: array of ansiString; const default: AnsiString): AnsiString; overload;  // return a "byte" string
     function GetChildNodeValueBinarySubType(const path: array of ansiString; const default: byte): byte; overload;
+    function GetChildNodeValueNull(const path: array of ansiString): Boolean; overload;
     procedure SetChildNodeValueText(const nodeName: ansiString; const value: AnsiString); overload;
     procedure SetChildNodeValueFloat(const nodeName: ansiString; const value: Double); overload;
     procedure SetChildNodeValueDateTime(const nodeName: ansiString; const value: TDateTime); overload;
@@ -601,11 +603,12 @@ type
     constructor Create(const aActive: Boolean = True); overload; virtual;
     constructor Create(const aFormatSettings: TALformatSettings; const aActive: Boolean = True); overload; virtual;
     destructor Destroy; override;
-    procedure MultiThreadPrepare(const aOnlyChildNodes: Boolean = False);
+    procedure MultiThreadPrepare(const aOnlyChildList: Boolean = False);
     procedure Clear;
     function AddChild(const NodeName: AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode; overload;
     function AddChild(const Path: array of AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode; overload;
     function CreateNode(const NodeName: AnsiString; NodeType: TALJSONNodeType): TALJSONNode;
+    function ExtractNode: TALJSONNode;
     function IsEmptyDoc: Boolean;
     procedure LoadFromJSONString(const Str: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
     procedure LoadFromJSONStream(const Stream: TStream; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
@@ -634,6 +637,7 @@ type
     function GetChildNodeValueRegExOptions(const nodeName: ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
     function GetChildNodeValueBinary(const nodeName: ansiString; const default: AnsiString): AnsiString; overload;  // return a "byte" string
     function GetChildNodeValueBinarySubType(const nodeName: ansiString; const default: byte): byte; overload;
+    function GetChildNodeValueNull(const nodeName: ansiString): Boolean; overload;
     function GetChildNode(const path: array of ansiString): TALJSONNode; overload;
     function GetChildNodeValueText(const path: array of ansiString; const default: AnsiString): AnsiString; overload;
     function GetChildNodeValueFloat(const path: array of ansiString; const default: Double): Double; overload;
@@ -648,6 +652,7 @@ type
     function GetChildNodeValueRegExOptions(const path: array of ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
     function GetChildNodeValueBinary(const path: array of ansiString; const default: AnsiString): AnsiString; overload;  // return a "byte" string
     function GetChildNodeValueBinarySubType(const path: array of ansiString; const default: byte): byte; overload;
+    function GetChildNodeValueNull(const path: array of ansiString): Boolean; overload;
     procedure SetChildNodeValueText(const nodeName: ansiString; const value: AnsiString); overload;
     procedure SetChildNodeValueFloat(const nodeName: ansiString; const value: Double); overload;
     procedure SetChildNodeValueDateTime(const nodeName: ansiString; const value: TDateTime); overload;
@@ -889,7 +894,7 @@ type
                          Var buffer: String);
   public
     constructor Create(const NodeName: String); virtual;
-    procedure MultiThreadPrepare(const aOnlyChildNodes: Boolean = False);
+    procedure MultiThreadPrepare(const aOnlyChildList: Boolean = False);
     function GetText(const default: String): String; overload;
     function GetText: String; overload;
     procedure SetText(const Value: String);
@@ -969,6 +974,7 @@ type
     function GetChildNodeValueRegExOptions(const nodeName: String; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
     function GetChildNodeValueBinary(const nodeName: String; const default: String): String; overload;  // return a base64 encoded string
     function GetChildNodeValueBinarySubType(const nodeName: String; const default: byte): byte; overload;
+    function GetChildNodeValueNull(const nodeName: String): Boolean; overload;
     function GetChildNode(const path: array of String): TALJSONNodeU; overload;
     function GetChildNodeValueText(const path: array of String; const default: String): String; overload;
     function GetChildNodeValueFloat(const path: array of String; const default: Double): Double; overload;
@@ -983,6 +989,7 @@ type
     function GetChildNodeValueRegExOptions(const path: array of String; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
     function GetChildNodeValueBinary(const path: array of String; const default: String): String; overload;  // return a base64 encoded string
     function GetChildNodeValueBinarySubType(const path: array of String; const default: byte): byte; overload;
+    function GetChildNodeValueNull(const path: array of String): Boolean; overload;
     procedure SetChildNodeValueText(const nodeName: String; const value: String); overload;
     procedure SetChildNodeValueFloat(const nodeName: String; const value: Double); overload;
     procedure SetChildNodeValueDateTime(const nodeName: String; const value: TDateTime); overload;
@@ -1145,11 +1152,12 @@ type
     constructor Create(const aActive: Boolean = True); overload; virtual;
     constructor Create(const aFormatSettings: TALformatSettingsU; const aActive: Boolean = True); overload; virtual;
     destructor Destroy; override;
-    procedure MultiThreadPrepare(const aOnlyChildNodes: Boolean = False);
+    procedure MultiThreadPrepare(const aOnlyChildList: Boolean = False);
     procedure Clear;
     function AddChild(const NodeName: String; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU; overload;
     function AddChild(const Path: array of String; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeU; overload;
     function CreateNode(const NodeName: String; NodeType: TALJSONNodeType): TALJSONNodeU;
+    function ExtractNode: TALJSONNodeU;
     function IsEmptyDoc: Boolean;
     procedure LoadFromJSONString(const Str: String; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
     procedure LoadFromJSONStream(const Stream: TStream; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
@@ -1180,6 +1188,7 @@ type
     function GetChildNodeValueRegExOptions(const nodeName: String; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
     function GetChildNodeValueBinary(const nodeName: String; const default: String): String; overload;  // return a base64 encoded string
     function GetChildNodeValueBinarySubType(const nodeName: String; const default: byte): byte; overload;
+    function GetChildNodeValueNull(const nodeName: String): Boolean; overload;
     function GetChildNode(const path: array of String): TALJSONNodeU; overload;
     function GetChildNodeValueText(const path: array of String; const default: String): String; overload;
     function GetChildNodeValueFloat(const path: array of String; const default: Double): Double; overload;
@@ -1194,6 +1203,7 @@ type
     function GetChildNodeValueRegExOptions(const path: array of String; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
     function GetChildNodeValueBinary(const path: array of String; const default: String): String; overload;  // return a base64 encoded string
     function GetChildNodeValueBinarySubType(const path: array of String; const default: byte): byte; overload;
+    function GetChildNodeValueNull(const path: array of String): Boolean; overload;
     procedure SetChildNodeValueText(const nodeName: String; const value: String); overload;
     procedure SetChildNodeValueFloat(const nodeName: String; const value: Double); overload;
     procedure SetChildNodeValueDateTime(const nodeName: String; const value: TDateTime); overload;
@@ -1876,9 +1886,9 @@ begin
 end;
 
 {***********************************************************************************}
-procedure TALJSONDocument.MultiThreadPrepare(const aOnlyChildNodes: Boolean = False);
+procedure TALJSONDocument.MultiThreadPrepare(const aOnlyChildList: Boolean = False);
 begin
-  node.MultiThreadPrepare(aOnlyChildNodes);
+  node.MultiThreadPrepare(aOnlyChildList);
 end;
 
 {******************************}
@@ -4270,7 +4280,7 @@ begin
   LoadFromBSONString(Value, False{saxMode}, true{ClearChildNodes});
 end;
 
-{***********************************}
+{************************************}
 procedure TALJSONDocument.CheckActive;
 begin
   if not Assigned(FDocumentNode) then ALJSONDocError(CALJSONNotActive);
@@ -4387,6 +4397,12 @@ begin
 end;
 
 {**********************************************************************************}
+function TALJSONDocument.GetChildNodeValueNull(const nodeName: ansiString): Boolean;
+begin
+  result := Node.GetChildNodeValueNull(nodeName);
+end;
+
+{**********************************************************************************}
 function TALJSONDocument.GetChildNode(const path: array of ansiString): TALJSONNode;
 begin
   result := Node.GetChildNode(path);
@@ -4468,6 +4484,12 @@ end;
 function TALJSONDocument.GetChildNodeValueBinarySubType(const path: array of ansiString; const default: byte): byte;
 begin
   result := Node.GetChildNodeValueBinarySubType(path, default);
+end;
+
+{***************************************************************************************}
+function TALJSONDocument.GetChildNodeValueNull(const path: array of ansiString): Boolean;
+begin
+  result := Node.GetChildNodeValueNull(path);
 end;
 
 {***************************************************************************************************}
@@ -4636,6 +4658,17 @@ end;
 procedure TALJSONDocument.SetChildNodeValueNull(const path: array of ansiString);
 begin
   Node.SetChildNodeValueNull(path);
+end;
+
+{************************************************}
+function TALJSONDocument.ExtractNode: TALJSONNode;
+begin
+  if assigned(FDocumentNode) then begin
+    result := FDocumentNode;
+    result.SetOwnerDocument(nil);
+    FDocumentNode := nil;
+  end
+  else result := nil;
 end;
 
 {************************************************************************}
@@ -4930,6 +4963,15 @@ begin
 end;
 
 {******************************************************************************}
+function TALJSONNode.GetChildNodeValueNull(const nodeName: ansiString): Boolean;
+var LNode: TALJSONNode;
+begin
+  LNode := ChildNodes.findNode(nodeName);
+  if (LNode = nil) then result := true
+  else result := LNode.GetNull;
+end;
+
+{******************************************************************************}
 function TALJSONNode.GetChildNode(const path: array of ansiString): TALJSONNode;
 var I: integer;
 begin
@@ -5172,6 +5214,24 @@ begin
   LNode := LNode.ChildNodes.findNode(path[high(path)]);
   if (LNode = nil) then result := default
   else result := LNode.GetBinarySubType(default);
+end;
+
+{***********************************************************************************}
+function TALJSONNode.GetChildNodeValueNull(const path: array of ansiString): Boolean;
+var LNode: TALJSONNode;
+    I: integer;
+begin
+  LNode := Self;
+  for I := low(path) to high(path) - 1 do begin
+    LNode := LNode.ChildNodes.findNode(path[I]);
+    if (LNode = nil) then begin
+      result := True;
+      exit;
+    end;
+  end;
+  LNode := LNode.ChildNodes.findNode(path[high(path)]);
+  if (LNode = nil) then result := true
+  else result := LNode.GetNull;
 end;
 
 {***********************************************************************************************}
@@ -6168,10 +6228,10 @@ end;
 {***************************************************************}
 //will create all the nodevalue and childnodelist to be sure that
 //multiple thread can safely read at the same time the node
-procedure TALJSONNode.MultiThreadPrepare(const aOnlyChildNodes: Boolean = False);
+procedure TALJSONNode.MultiThreadPrepare(const aOnlyChildList: Boolean = False);
 var I: integer;
 begin
-  if (not aOnlyChildNodes) and (NodeType = ntText) then begin
+  if (not aOnlyChildList) and (NodeType = ntText) then begin
 
     case NodeSubType of
       nstFloat,
@@ -6209,9 +6269,9 @@ begin
 
   end
 
-  else begin
+  else if (NodeType in [ntObject,ntArray]) then begin
     For I := 0 to ChildNodes.Count - 1 do
-      ChildNodes[I].MultiThreadPrepare(aOnlyChildNodes);
+      ChildNodes[I].MultiThreadPrepare(aOnlyChildList);
   end;
 end;
 
@@ -8903,9 +8963,9 @@ begin
 end;
 
 {************************************************************************************}
-procedure TALJSONDocumentU.MultiThreadPrepare(const aOnlyChildNodes: Boolean = False);
+procedure TALJSONDocumentU.MultiThreadPrepare(const aOnlyChildList: Boolean = False);
 begin
-  node.MultiThreadPrepare(aOnlyChildNodes);
+  node.MultiThreadPrepare(aOnlyChildList);
 end;
 
 {*******************************}
@@ -11261,6 +11321,12 @@ begin
   result := Node.GetChildNodeValueBinarySubType(nodeName, default);
 end;
 
+{*******************************************************************************}
+function TALJSONDocumentU.GetChildNodeValueNull(const nodeName: String): Boolean;
+begin
+  result := Node.GetChildNodeValueNull(nodeName);
+end;
+
 {********************************************************************************}
 function TALJSONDocumentU.GetChildNode(const path: array of String): TALJSONNodeU;
 begin
@@ -11343,6 +11409,12 @@ end;
 function TALJSONDocumentU.GetChildNodeValueBinarySubType(const path: array of String; const default: byte): byte;
 begin
   result := Node.GetChildNodeValueBinarySubType(path, default);
+end;
+
+{************************************************************************************}
+function TALJSONDocumentU.GetChildNodeValueNull(const path: array of String): Boolean;
+begin
+  result := Node.GetChildNodeValueNull(path);
 end;
 
 {********************************************************************************************}
@@ -11511,6 +11583,17 @@ end;
 procedure TALJSONDocumentU.SetChildNodeValueNull(const path: array of String);
 begin
   Node.SetChildNodeValueNull(path);
+end;
+
+{**************************************************}
+function TALJSONDocumentU.ExtractNode: TALJSONNodeU;
+begin
+  if assigned(FDocumentNode) then begin
+    result := FDocumentNode;
+    result.SetOwnerDocument(nil);
+    FDocumentNode := nil;
+  end
+  else result := nil;
 end;
 
 {************************************************************************}
@@ -11804,6 +11887,15 @@ begin
   else result := LNode.GetBinarySubType(default);
 end;
 
+{***************************************************************************}
+function TALJSONNodeU.GetChildNodeValueNull(const nodeName: String): Boolean;
+var LNode: TALJSONNodeU;
+begin
+  LNode := ChildNodes.findNode(nodeName);
+  if (LNode = nil) then result := true
+  else result := LNode.GetNull;
+end;
+
 {****************************************************************************}
 function TALJSONNodeU.GetChildNode(const path: array of String): TALJSONNodeU;
 var I: integer;
@@ -12047,6 +12139,24 @@ begin
   LNode := LNode.ChildNodes.findNode(path[high(path)]);
   if (LNode = nil) then result := default
   else result := LNode.GetBinarySubType(default);
+end;
+
+{********************************************************************************}
+function TALJSONNodeU.GetChildNodeValueNull(const path: array of String): Boolean;
+var LNode: TALJSONNodeU;
+    I: integer;
+begin
+  LNode := Self;
+  for I := low(path) to high(path) - 1 do begin
+    LNode := LNode.ChildNodes.findNode(path[I]);
+    if (LNode = nil) then begin
+      result := True;
+      exit;
+    end;
+  end;
+  LNode := LNode.ChildNodes.findNode(path[high(path)]);
+  if (LNode = nil) then result := true
+  else result := LNode.GetNull;
 end;
 
 {****************************************************************************************}
@@ -13043,10 +13153,10 @@ end;
 {***************************************************************}
 //will create all the nodevalue and childnodelist to be sure that
 //multiple thread can safely read at the same time the node
-procedure TALJSONNodeU.MultiThreadPrepare(const aOnlyChildNodes: Boolean = False);
+procedure TALJSONNodeU.MultiThreadPrepare(const aOnlyChildList: Boolean = False);
 var I: integer;
 begin
-  if (not aOnlyChildNodes) and (NodeType = ntText) then begin
+  if (not aOnlyChildList) and (NodeType = ntText) then begin
 
     case NodeSubType of
       nstFloat,
@@ -13084,9 +13194,9 @@ begin
 
   end
 
-  else begin
+  else if (NodeType in [ntObject,ntArray]) then begin
     For I := 0 to ChildNodes.Count - 1 do
-      ChildNodes[I].MultiThreadPrepare(aOnlyChildNodes);
+      ChildNodes[I].MultiThreadPrepare(aOnlyChildList);
   end;
 end;
 

@@ -9,10 +9,165 @@ uses
   {$IFDEF MSWINDOWS}
   Winapi.Windows,
   {$ENDIF}
+  system.Classes,
+  system.Generics.Collections,
+  system.SyncObjs,
   system.sysutils,
   system.types;
 
 {$I Alcinoe.inc}
+
+type
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALWorkerThreadRefProc = reference to procedure(var AExtData: Tobject);
+  TALWorkerThreadObjProc = procedure(var AExtData: Tobject) of object;
+  TALWorkerThreadGetPriorityFunc = function(const AExtData: Tobject): Int64 of object;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALWorkerThreadRequest = Class(Tobject)
+  private
+    FRefProc: TALWorkerThreadRefProc;
+    FObjProc: TALWorkerThreadObjProc;
+    FExtData: Tobject;
+    FPriority: Int64;
+    FGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+    FSignal: TEvent;
+    function GetPriority: Int64; inline;
+  public
+    constructor Create(
+                  const AProc: TALWorkerThreadRefProc;
+                  const AExtData: Tobject;
+                  const APriority: Int64;
+                  const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+                  const ASignal: TEvent); overload;
+    constructor Create(
+                  const AProc: TALWorkerThreadobjProc;
+                  const AExtData: Tobject;
+                  const APriority: Int64;
+                  const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+                  const ASignal: TEvent); overload;
+    destructor Destroy; override;
+    property RefProc: TALWorkerThreadRefProc read FRefProc;
+    property ObjProc: TALWorkerThreadObjProc read FObjProc;
+    property ExtData: Tobject read FExtData;
+    property Priority: Int64 read GetPriority;
+    property Signal: TEvent read FSignal;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALWorkerThreadPool = class;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALWorkerThread = class(TThread)
+  private
+    FWorkerThreadPool: TALWorkerThreadPool;
+    FSignal: TEvent;
+    FWaiting: Boolean;
+  protected
+    procedure Execute; override;
+  public
+    constructor Create(const aWorkerThreadPool: TALWorkerThreadPool);
+    destructor Destroy; override;
+    property Signal: TEvent read FSignal;
+    property Waiting: Boolean read fWaiting write fWaiting;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALWorkerThreadPool = Class(Tobject)
+  public
+    type
+      TPriorityDirection = (lessThan, GreaterThan);
+  private
+    fMaxThreadCount: integer;
+    fPriorityStartingPoint: int64;
+    fPriorityDirection: TPriorityDirection;
+    fThreads: TObjectList<TALWorkerThread>;
+    fRequests: TObjectList<TALWorkerThreadRequest>;
+    function GetPriorityDirection: TPriorityDirection;
+    function GetPriorityStartingPoint: int64;
+    procedure SetPriorityDirection(const Value: TPriorityDirection);
+    procedure SetPriorityStartingPoint(const Value: int64);
+  protected
+    procedure EnqueueRequest(const ARequest: TALWorkerThreadRequest);
+    function DequeueRequest: TALWorkerThreadRequest;
+  public
+    constructor Create(const AMaxThreadCount: integer);
+    destructor Destroy; override;
+    //TALWorkerThreadRefProc
+    procedure ExecuteProc(
+                const AProc: TALWorkerThreadRefProc;
+                const AExtData: Tobject; // ExtData will be free by the worker thread
+                const APriority: Int64;
+                const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+                Const AAsync: Boolean = True); overload; virtual;
+    procedure ExecuteProc(
+                const AProc: TALWorkerThreadRefProc;
+                const AExtData: Tobject; // ExtData will be free by the worker thread
+                const APriority: Int64;
+                Const AAsync: Boolean = True); overload;
+    procedure ExecuteProc(
+                const AProc: TALWorkerThreadRefProc;
+                const AExtData: Tobject; // ExtData will be free by the worker thread
+                const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+                Const AAsync: Boolean = True); overload;
+    procedure ExecuteProc(
+                const AProc: TALWorkerThreadRefProc;
+                const APriority: Int64;
+                Const AAsync: Boolean = True); overload;
+    procedure ExecuteProc(
+                const AProc: TALWorkerThreadRefProc;
+                const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+                Const AAsync: Boolean = True); overload;
+    procedure ExecuteProc(
+                const AProc: TALWorkerThreadRefProc;
+                const AExtData: Tobject; // ExtData will be free by the worker thread
+                Const AAsync: Boolean = True); overload;
+    procedure ExecuteProc(
+                const AProc: TALWorkerThreadRefProc;
+                Const AAsync: Boolean = True); overload;
+    //TALWorkerThreadObjProc
+    procedure ExecuteProc(
+                const AProc: TALWorkerThreadObjProc;
+                const AExtData: Tobject; // ExtData will be free by the worker thread
+                const APriority: Int64;
+                const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+                Const AAsync: Boolean = True); overload; virtual;
+    procedure ExecuteProc(
+                const AProc: TALWorkerThreadObjProc;
+                const AExtData: Tobject; // ExtData will be free by the worker thread
+                const APriority: Int64;
+                Const AAsync: Boolean = True); overload;
+    procedure ExecuteProc(
+                const AProc: TALWorkerThreadObjProc;
+                const AExtData: Tobject; // ExtData will be free by the worker thread
+                const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+                Const AAsync: Boolean = True); overload;
+    procedure ExecuteProc(
+                const AProc: TALWorkerThreadObjProc;
+                const APriority: Int64;
+                Const AAsync: Boolean = True); overload;
+    procedure ExecuteProc(
+                const AProc: TALWorkerThreadObjProc;
+                const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+                Const AAsync: Boolean = True); overload;
+    procedure ExecuteProc(
+                const AProc: TALWorkerThreadObjProc;
+                const AExtData: Tobject; // ExtData will be free by the worker thread
+                Const AAsync: Boolean = True); overload;
+    procedure ExecuteProc(
+                const AProc: TALWorkerThreadObjProc;
+                Const AAsync: Boolean = True); overload;
+    //When we Dequeue a Request, we look for the request with a priority
+    //the most closest to PriorityStartingPoint in the PriorityDirection.
+    //Exemple if we have in the queue the requests with those priorities: 25, 75, 100, 125, 150
+    //and if PriorityStartingPoint = 110, PriorityDirection = lessThan then
+    //dequeue will return the request with a priority of 100. in the opposite
+    //way if PriorityStartingPoint = 110, PriorityDirection = greaterThan then
+    //dequeue will return 125
+    property PriorityStartingPoint: int64 read GetPriorityStartingPoint write SetPriorityStartingPoint;
+    property PriorityDirection: TPriorityDirection read GetPriorityDirection write SetPriorityDirection;
+  end;
 
 {$IF CompilerVersion <= 25} // xe4
 type
@@ -57,6 +212,7 @@ type
     function DotProduct(const APoint: TALPointD): Double; inline;
 
     procedure Offset(const APoint: TALPointD); overload; inline;
+    procedure Offset(const APoint: TPointf); overload; inline;
     procedure Offset(const ADeltaX, ADeltaY: Double); overload; inline;
     procedure Offset(const APoint: TPoint); overload; inline;
 
@@ -74,6 +230,7 @@ type
     function Ceiling: TPoint;
     function Truncate: TPoint;
     function Round: TPoint;
+    function ReducePrecision: TPointf;
     /// <summary> Rounds the current point to the specified scale value
     /// <param name="AScale"> The scale of scene </param>
     /// <param name="APlaceBetweenPixels"> If <c>True</c> (by default) the resulting point moves to half scale </param>
@@ -107,6 +264,7 @@ type
     cy: Double;
   public
     constructor Create(P: TALSizeD); overload;
+    constructor Create(P: TSizeF); overload;
     constructor Create(const X, Y: Double); overload;
     // operator overloads
     class operator Equal(const Lhs, Rhs: TALSizeD): Boolean;
@@ -121,6 +279,7 @@ type
     function Ceiling: TSize;
     function Truncate: TSize;
     function Round: TSize;
+    function ReducePrecision: TSizeF;
 
     // metods
     function Add(const Point: TALSizeD): TALSizeD;
@@ -154,6 +313,7 @@ type
     constructor Create(const Left, Top, Right, Bottom: Double); overload;               // at Left, Top, Right, and Bottom
     constructor Create(const P1, P2: TALPointD; Normalize: Boolean = False); overload;  // with corners specified by p1 and p2
     constructor Create(const R: TALRectD; Normalize: Boolean = False); overload;
+    constructor Create(const R: TRectF; Normalize: Boolean = False); overload;
     constructor Create(const R: TRect; Normalize: Boolean = False); overload;
 
     // operator overloads
@@ -238,10 +398,12 @@ type
     // offsets the rectangle origin relative to current position
     procedure Offset(const DX, DY: Double); overload;
     procedure Offset(const Point: TALPointD); overload;
+    procedure Offset(const Point: TPointf); overload;
 
     // sets new origin
     procedure SetLocation(const X, Y: Double); overload;
     procedure SetLocation(const Point: TALPointD); overload;
+    procedure SetLocation(const Point: TPointf); overload;
 
     // inflate by DX and DY
     procedure Inflate(const DX, DY: Double); overload;
@@ -255,6 +417,7 @@ type
     function Ceiling: TRect;
     function Truncate: TRect;
     function Round: TRect;
+    function ReducePrecision: TRectF;
 
     function EqualsTo(const R: TALRectD; const Epsilon: Double = 0): Boolean;
 
@@ -417,19 +580,452 @@ const
 implementation
 
 uses
-  system.Classes,
   system.math,
-  system.generics.collections,
+  system.Rtti,
   {$IF defined(ANDROID)}
+  Posix.Sched,
   Androidapi.JNI.JavaTypes,
   Androidapi.Helpers,
   ALAndroidApi,
   {$ENDIF}
   {$IF defined(IOS)}
+  Posix.Sched,
   Macapi.Helpers,
   {$ENDIF}
   system.DateUtils,
   ALString;
+
+{****************************************}
+constructor TALWorkerThreadRequest.Create(
+              const AProc: TALWorkerThreadRefProc;
+              const AExtData: Tobject;
+              const APriority: Int64;
+              const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+              const ASignal: TEvent);
+begin
+  FRefProc := AProc;
+  FExtData := AExtData;
+  FPriority := APriority;
+  FGetPriorityFunc := AGetPriorityFunc;
+  FSignal := ASignal;
+end;
+
+{****************************************}
+constructor TALWorkerThreadRequest.Create(
+              const AProc: TALWorkerThreadObjProc;
+              const AExtData: Tobject;
+              const APriority: Int64;
+              const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+              const ASignal: TEvent);
+begin
+  FObjProc := AProc;
+  FExtData := AExtData;
+  FPriority := APriority;
+  FGetPriorityFunc := AGetPriorityFunc;
+  FSignal := ASignal;
+end;
+
+{****************************************}
+destructor TALWorkerThreadRequest.Destroy;
+begin
+  ALFreeAndNil(FExtData);
+  inherited;
+end;
+
+{*************************************************}
+function TALWorkerThreadRequest.GetPriority: Int64;
+begin
+  if Assigned(FGetPriorityFunc) then result := fGetPriorityFunc(FExtData)
+  else result := FPriority;
+end;
+
+{*******************************************************************************}
+constructor TALWorkerThread.Create(const aWorkerThreadPool: TALWorkerThreadPool);
+begin
+  inherited Create(True);
+  FSignal := TEvent.Create(nil{EventAttributes}, false{ManualReset}, false{InitialState}, ''{Name});
+  FWaiting := False;
+  FWorkerThreadPool := aWorkerThreadPool;
+  {$IF defined(ANDROID) or defined(IOS)}
+  Policy := SCHED_OTHER;
+  priority := sched_get_priority_min(SCHED_OTHER);
+  {$ENDIF}
+end;
+
+{*********************************}
+destructor TALWorkerThread.Destroy;
+begin
+  Terminate;
+  FSignal.setevent;
+  WaitFor;
+  ALfreeandNil(FSignal);
+  inherited;
+end;
+
+{********************************}
+procedure TALWorkerThread.Execute;
+begin
+  while not terminated do begin
+
+    //Try to get a request in the queue
+    var LWorkerThreadRequest := FWorkerThreadPool.DequeueRequest;
+    if LWorkerThreadRequest <> nil then begin
+      try
+        try
+          {$IF defined(ios)}
+          //If you write a loop that creates many temporary objects.
+          //You may use an autorelease pool block inside the loop to
+          //dispose of those objects before the next iteration. Using an
+          //autorelease pool block in the loop helps to reduce the maximum
+          //memory footprint of the application.
+          var LAutoReleasePool := TNSAutoreleasePool.Create;
+          try
+          {$ENDIF}
+            {$IFDEF DEBUG}
+            //ALLog(
+            //  ClassName + '.Execute',
+            //  'Request.Priority:' + AlinttostrU(LWorkerThreadRequest.Priority) + ' | ' +
+            //  'PriorityStartingPoint:' + AlinttostrU(FWorkerThreadPool.PriorityStartingPoint) + ' | ' +
+            //  'PriorityDirection:' + TRttiEnumerationType.GetName(FWorkerThreadPool.PriorityDirection),
+            //  TalLogType.verbose);
+            {$ENDIF}
+            if assigned(LWorkerThreadRequest.ObjProc) then LWorkerThreadRequest.ObjProc(LWorkerThreadRequest.FExtData)
+            else LWorkerThreadRequest.RefProc(LWorkerThreadRequest.FExtData);
+          {$IF defined(ios)}
+          finally
+            LAutoReleasePool.release;
+          end;
+          {$ENDIF}
+        finally
+          if LWorkerThreadRequest.Signal <> nil then LWorkerThreadRequest.Signal.SetEvent;
+          alFreeAndNil(LWorkerThreadRequest);
+        end;
+      except
+        //hide the exception
+      end;
+    end
+
+    // else wait the signal
+    else begin
+      FWaiting := True;
+      fSignal.WaitFor(INFINITE);
+      FWaiting := False;
+    end;
+
+  end;
+end;
+
+{*********************************************************************}
+constructor TALWorkerThreadPool.Create(const AMaxThreadCount: integer);
+begin
+  FMaxThreadCount := AMaxThreadCount;
+  fPriorityStartingPoint := 0;
+  fPriorityDirection := TPriorityDirection.GreaterThan;
+  fThreads:= TObjectList<TALWorkerThread>.create(true{aOwnObjects});
+  fRequests:= TObjectList<TALWorkerThreadRequest>.create(true{aOwnObjects});
+end;
+
+{**************************************}
+destructor TALWorkerThreadPool.Destroy;
+begin
+  ALFreeandNil(fThreads);
+  ALFreeandNil(fRequests);
+  inherited;
+end;
+
+{********************************************************************}
+function TALWorkerThreadPool.GetPriorityDirection: TPriorityDirection;
+begin
+  //sizeof fPriorityDirection is 1 that mean read and write are ATOMIC
+  //no need to use any Interlock mechanism
+  result := fPriorityDirection;
+end;
+
+{**********************************************************************************}
+procedure TALWorkerThreadPool.SetPriorityDirection(const Value: TPriorityDirection);
+begin
+  //sizeof fPriorityDirection is 1 that mean read and write are ATOMIC
+  //no need to use any Interlock mechanism
+  fPriorityDirection := Value;
+end;
+
+{***********************************************************}
+function TALWorkerThreadPool.GetPriorityStartingPoint: int64;
+begin
+  result := AtomicCmpExchange(FPriorityStartingPoint{Target},0{NewValue},0{Comparand});
+end;
+
+{*************************************************************************}
+procedure TALWorkerThreadPool.SetPriorityStartingPoint(const Value: int64);
+begin
+  AtomicExchange(FPriorityStartingPoint{Target},Value{Value});
+end;
+
+{***********************************************************************************}
+procedure TALWorkerThreadPool.EnqueueRequest(const ARequest: TALWorkerThreadRequest);
+begin
+
+  //add the request in fRequests
+  TMonitor.Enter(fRequests);
+  try
+    fRequests.Add(ARequest);
+  finally
+    TMonitor.Exit(fRequests);
+  end;
+
+  //-----
+  TMonitor.Enter(fThreads);
+  try
+
+    //look if their is a WAITING thread available
+    for var i := 0 to fThreads.Count - 1 do begin
+      if fThreads[i].Waiting then begin
+        fThreads[i].Waiting := False;
+        fThreads[i].Signal.SetEvent;
+        Exit;
+      end;
+    end;
+
+    //if their no waiting thread available AND lower than FMaxThreadCount working thread: create a new one
+    if (fThreads.Count < FMaxThreadCount) then begin
+      var LWorkerThread := TALWorkerThread.Create(self);
+      try
+        fThreads.Add(LWorkerThread);
+      except
+        ALFreeandNil(LWorkerThread);
+        raise;
+      end;
+      LWorkerThread.Start;
+    end
+
+    //else all the threads are busy just signal all of then (in case)
+    else begin
+      for var i := 0 to fThreads.Count - 1 do
+        fThreads[i].Signal.SetEvent;
+    end;
+
+  finally
+    TMonitor.Exit(fThreads);
+  end;
+
+end;
+
+{******************************************************************}
+function TALWorkerThreadPool.DequeueRequest: TALWorkerThreadRequest;
+begin
+  var LPriorityStartingPoint := GetPriorityStartingPoint;
+  TMonitor.Enter(fRequests);
+  try
+
+    var LLesserThanFoundIndex := -1;
+    Var LLesserThanFoundCompare := -ALMaxint64;
+    var LGreaterThanFoundIndex := -1;
+    Var LGreaterThanFoundCompare := ALMaxint64;
+
+    for Var I := 0 to fRequests.Count - 1 do begin
+      var LCompare := fRequests[i].Priority - LPriorityStartingPoint;
+      if (LCompare > 0) then begin
+        if (LCompare < LGreaterThanFoundCompare) then begin
+          LGreaterThanFoundCompare := LCompare;
+          LGreaterThanFoundIndex := i;
+        end
+      end
+      else if (LCompare < 0) then begin
+        if (LCompare > LLesserThanFoundCompare) then begin
+          LLesserThanFoundCompare := LCompare;
+          LLesserThanFoundIndex := i;
+        end
+      end
+      else begin
+        LGreaterThanFoundIndex := i;
+        LLesserThanFoundIndex := i;
+        break;
+      end;
+    end;
+
+    if (PriorityDirection = GreaterThan) then begin
+      if LGreaterThanFoundIndex > -1 then result := fRequests.ExtractAt(LGreaterThanFoundIndex)
+      else if LLesserThanFoundIndex > -1 then result := fRequests.ExtractAt(LLesserThanFoundIndex)
+      else result := nil;
+    end
+    else begin
+      if LLesserThanFoundIndex > -1 then result := fRequests.ExtractAt(LLesserThanFoundIndex)
+      else if LGreaterThanFoundIndex > -1 then result := fRequests.ExtractAt(LGreaterThanFoundIndex)
+      else result := nil;
+    end;
+
+  finally
+    TMonitor.Exit(fRequests);
+  end;
+end;
+
+{****************************************}
+procedure TALWorkerThreadPool.ExecuteProc(
+            const AProc: TALWorkerThreadRefProc;
+            const AExtData: Tobject; // ExtData will be free by the worker thread
+            const APriority: Int64;
+            const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+            Const AAsync: Boolean = True);
+begin
+  Var LSignal: TEvent := nil;
+  if not AAsync then LSignal := TEvent.Create(nil{EventAttributes}, false{ManualReset}, false{InitialState}, ''{Name});
+  try
+    var LWorkerThreadRequest := TALWorkerThreadRequest.Create(
+                                  AProc,
+                                  AExtData,
+                                  APriority,
+                                  AGetPriorityFunc,
+                                  LSignal);
+    try
+      EnqueueRequest(LWorkerThreadRequest);
+    except
+      ALFreeAndNil(LWorkerThreadRequest);
+      Raise;
+    end;
+    if assigned(LSignal) then LSignal.WaitFor(INFINITE);
+  finally
+    ALFreeAndNil(LSignal);
+  end;
+end;
+
+{****************************************}
+procedure TALWorkerThreadPool.ExecuteProc(
+            const AProc: TALWorkerThreadRefProc;
+            const AExtData: Tobject; // ExtData will be free by the worker thread
+            const APriority: Int64;
+            Const AAsync: Boolean = True);
+begin
+  ExecuteProc(AProc, AExtData, APriority, nil{AGetPriorityFunc}, AAsync);
+end;
+
+{****************************************}
+procedure TALWorkerThreadPool.ExecuteProc(
+            const AProc: TALWorkerThreadRefProc;
+            const AExtData: Tobject; // ExtData will be free by the worker thread
+            const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+            Const AAsync: Boolean = True);
+begin
+  ExecuteProc(AProc, AExtData, 0{APriority}, AGetPriorityFunc, AAsync);
+end;
+
+{****************************************}
+procedure TALWorkerThreadPool.ExecuteProc(
+            const AProc: TALWorkerThreadRefProc;
+            const APriority: Int64;
+            Const AAsync: Boolean = True);
+begin
+  ExecuteProc(AProc, nil{AExtData}, APriority, nil{AGetPriorityFunc}, AAsync);
+end;
+
+{****************************************}
+procedure TALWorkerThreadPool.ExecuteProc(
+            const AProc: TALWorkerThreadRefProc;
+            const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+            Const AAsync: Boolean = True);
+begin
+  ExecuteProc(AProc, nil{AExtData}, 0{APriority}, AGetPriorityFunc, AAsync);
+end;
+
+{****************************************}
+procedure TALWorkerThreadPool.ExecuteProc(
+            const AProc: TALWorkerThreadRefProc;
+            const AExtData: Tobject; // ExtData will be free by the worker thread
+            Const AAsync: Boolean = True);
+begin
+  ExecuteProc(AProc, AExtData, 0{APriority}, nil{AGetPriorityFunc}, AAsync);
+end;
+
+{****************************************}
+procedure TALWorkerThreadPool.ExecuteProc(
+            const AProc: TALWorkerThreadRefProc;
+            Const AAsync: Boolean = True);
+begin
+  ExecuteProc(AProc, nil{AExtData}, 0{APriority}, nil{AGetPriorityFunc}, AAsync);
+end;
+
+{****************************************}
+procedure TALWorkerThreadPool.ExecuteProc(
+            const AProc: TALWorkerThreadObjProc;
+            const AExtData: Tobject; // ExtData will be free by the worker thread
+            const APriority: Int64;
+            const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+            Const AAsync: Boolean = True);
+begin
+  Var LSignal: TEvent := nil;
+  if not AAsync then LSignal := TEvent.Create(nil{EventAttributes}, false{ManualReset}, false{InitialState}, ''{Name});
+  try
+    var LWorkerThreadRequest := TALWorkerThreadRequest.Create(
+                                  AProc,
+                                  AExtData,
+                                  APriority,
+                                  AGetPriorityFunc,
+                                  LSignal);
+    try
+      EnqueueRequest(LWorkerThreadRequest);
+    except
+      ALFreeAndNil(LWorkerThreadRequest);
+      Raise;
+    end;
+    if assigned(LSignal) then LSignal.WaitFor(INFINITE);
+  finally
+    ALFreeAndNil(LSignal);
+  end;
+end;
+
+{****************************************}
+procedure TALWorkerThreadPool.ExecuteProc(
+            const AProc: TALWorkerThreadObjProc;
+            const AExtData: Tobject; // ExtData will be free by the worker thread
+            const APriority: Int64;
+            Const AAsync: Boolean = True);
+begin
+  ExecuteProc(AProc, AExtData, APriority, nil{AGetPriorityFunc}, AAsync);
+end;
+
+{****************************************}
+procedure TALWorkerThreadPool.ExecuteProc(
+            const AProc: TALWorkerThreadObjProc;
+            const AExtData: Tobject; // ExtData will be free by the worker thread
+            const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+            Const AAsync: Boolean = True);
+begin
+  ExecuteProc(AProc, AExtData, 0{APriority}, AGetPriorityFunc, AAsync);
+end;
+
+{****************************************}
+procedure TALWorkerThreadPool.ExecuteProc(
+            const AProc: TALWorkerThreadObjProc;
+            const APriority: Int64;
+            Const AAsync: Boolean = True);
+begin
+  ExecuteProc(AProc, nil{AExtData}, APriority, nil{AGetPriorityFunc}, AAsync);
+end;
+
+{****************************************}
+procedure TALWorkerThreadPool.ExecuteProc(
+            const AProc: TALWorkerThreadObjProc;
+            const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
+            Const AAsync: Boolean = True);
+begin
+  ExecuteProc(AProc, nil{AExtData}, 0{APriority}, AGetPriorityFunc, AAsync);
+end;
+
+{****************************************}
+procedure TALWorkerThreadPool.ExecuteProc(
+            const AProc: TALWorkerThreadObjProc;
+            const AExtData: Tobject; // ExtData will be free by the worker thread
+            Const AAsync: Boolean = True);
+begin
+  ExecuteProc(AProc, AExtData, 0{APriority}, nil{AGetPriorityFunc}, AAsync);
+end;
+
+{****************************************}
+procedure TALWorkerThreadPool.ExecuteProc(
+            const AProc: TALWorkerThreadObjProc;
+            Const AAsync: Boolean = True);
+begin
+  ExecuteProc(AProc, nil{AExtData}, 0{APriority}, nil{AGetPriorityFunc}, AAsync);
+end;
 
 type
 
@@ -885,6 +1481,12 @@ begin
   Self := Self + APoint;
 end;
 
+{************************************************}
+procedure TALPointD.Offset(const APoint: TPointf);
+begin
+  Self.Offset(TALPointD.Create(APoint));
+end;
+
 {*********************************************************}
 procedure TALPointD.Offset(const ADeltaX, ADeltaY: Double);
 begin
@@ -935,6 +1537,13 @@ function TALPointD.Round: TPoint;
 begin
   Result.X := System.Round(X);
   Result.Y := System.Round(Y);
+end;
+
+{******************************************}
+function TALPointD.ReducePrecision: TPointf;
+begin
+  Result.X := Single(X);
+  Result.Y := Single(Y);
 end;
 
 {**************************************************************************************************}
@@ -1083,6 +1692,14 @@ end;
 constructor TALRectD.Create(const R: TALRectD; Normalize: Boolean);
 begin
   Self := R;
+  if Normalize then NormalizeRect;
+end;
+
+{***************************************************************}
+constructor TALRectD.Create(const R: TRectF; Normalize: Boolean);
+begin
+  Self.Left := R.Left; Self.Top := R.Top;
+  Self.Right := R.Right; Self.Bottom := R.Bottom;
   if Normalize then NormalizeRect;
 end;
 
@@ -1381,6 +1998,13 @@ begin
 end;
 
 {**********************************************}
+procedure TALRectD.Offset(const Point: TPointf);
+begin
+  TopLeft.Offset(Point);
+  BottomRight.Offset(Point);
+end;
+
+{**********************************************}
 procedure TALRectD.Offset(const DX, DY: Double);
 begin
   TopLeft.Offset(DX, DY);
@@ -1395,6 +2019,12 @@ end;
 
 {*****************************************************}
 procedure TALRectD.SetLocation(const Point: TALPointD);
+begin
+  Offset(Point.X - Left, Point.Y - Top);
+end;
+
+{***************************************************}
+procedure TALRectD.SetLocation(const Point: TPointf);
 begin
   Offset(Point.X - Left, Point.Y - Top);
 end;
@@ -1458,6 +2088,13 @@ function TALRectD.Round: TRect;
 begin
   Result.TopLeft := TopLeft.Round;
   Result.BottomRight := BottomRight.Round;
+end;
+
+{****************************************}
+function TALRectD.ReducePrecision: TRectF;
+begin
+  Result.TopLeft := TopLeft.ReducePrecision;
+  Result.BottomRight := BottomRight.ReducePrecision;
 end;
 
 {******************************************************************}
@@ -1541,6 +2178,13 @@ begin
   cy := P.cy;
 end;
 
+{*************************************}
+constructor TALSizeD.Create(P: TSizeF);
+begin
+  cx := P.cx;
+  cy := P.cy;
+end;
+
 {*****************************************************}
 function TALSizeD.Distance(const P2: TALSizeD): Double;
 begin
@@ -1611,6 +2255,13 @@ function TALSizeD.Round: TSize;
 begin
   Result.cx := Trunc(cx + 0.5);
   Result.cy := Trunc(cy + 0.5);
+end;
+
+{****************************************}
+function TALSizeD.ReducePrecision: TSizeF;
+begin
+  Result.cx := Single(cx);
+  Result.cy := Single(cy);
 end;
 
 {********************************}
@@ -1701,8 +2352,15 @@ end;
 
 {***********************************************************************************************}
 procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO);
-{$IF defined(IOS) or defined(MSWINDOWS)}
-var LMsg: String;
+{$IF defined(MSWINDOWS)}
+var
+  LMsg: String;
+{$ENDIF}
+{$IF defined(IOS)}
+var
+  LMsg: String;
+  LMsgPart: String;
+  P: integer;
 {$ENDIF}
 begin
   if ALEnqueueLog then begin
@@ -1728,30 +2386,34 @@ begin
       TalLogType.ASSERT: TJLog.JavaClass.wtf(StringToJString(Tag), StringToJString(msg)); // << wtf for What a Terrible Failure but everyone know that it's for what the fuck !
     end;
     {$ELSEIF defined(IOS)}
-    // https://forums.developer.apple.com/thread/4685
-    //if _type <> TalLogType.VERBOSE  then begin // because log on ios slow down the app so skip verbosity
-      if msg <> '' then LMsg := ' => ' + msg
-      else LMsg := '';
+    if msg <> '' then LMsg := Tag + ' => ' + msg
+    else LMsg := Tag;
+    //On iOS NSLog is limited to 1024 Bytes so if the
+    //message is > 1024 bytes split it
+    P := 1;
+    while P <= length(LMsg) do begin
+      LMsgPart := ALcopyStrU(LMsg, P, 990); // to stay safe
+      inc(P, 990);
       case _type of
-        TalLogType.VERBOSE: NSLog(StringToID('[V] ' + Tag + LMsg));
-        TalLogType.DEBUG:   NSLog(StringToID('[D][V] ' + Tag + LMsg));
-        TalLogType.INFO:    NSLog(StringToID('[I][D][V] ' + Tag + LMsg));
-        TalLogType.WARN:    NSLog(StringToID('[W][I][D][V] ' + Tag + LMsg));
-        TalLogType.ERROR:   NSLog(StringToID('[E][W][I][D][V] ' + Tag + LMsg));
-        TalLogType.ASSERT:  NSLog(StringToID('[A][E][W][I][D][V] ' + Tag + LMsg));
+        TalLogType.VERBOSE: NSLog(StringToID('[V] ' + LMsgPart));
+        TalLogType.DEBUG:   NSLog(StringToID('[D][V] ' + LMsgPart));
+        TalLogType.INFO:    NSLog(StringToID('[I][D][V] ' + LMsgPart));
+        TalLogType.WARN:    NSLog(StringToID('[W][I][D][V] ' + LMsgPart));
+        TalLogType.ERROR:   NSLog(StringToID('[E][W][I][D][V] ' + LMsgPart));
+        TalLogType.ASSERT:  NSLog(StringToID('[A][E][W][I][D][V] ' + LMsgPart));
       end;
-    //end;
+    end;
     {$ELSEIF defined(MSWINDOWS)}
     if _type <> TalLogType.VERBOSE  then begin // because log on windows slow down the app so skip verbosity
-      if msg <> '' then LMsg := ' => ' + stringReplace(msg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
-      else LMsg := '';
+      if msg <> '' then LMsg := Tag + ' => ' + stringReplace(msg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
+      else LMsg := Tag;
       case _type of
-        TalLogType.VERBOSE: OutputDebugString(pointer('[V] ' + Tag + LMsg + ' |'));
-        TalLogType.DEBUG:   OutputDebugString(pointer('[D][V] ' + Tag + LMsg + ' |'));
-        TalLogType.INFO:    OutputDebugString(pointer('[I][D][V] ' + Tag + LMsg + ' |'));
-        TalLogType.WARN:    OutputDebugString(pointer('[W][I][D][V] ' + Tag + LMsg + ' |'));
-        TalLogType.ERROR:   OutputDebugString(pointer('[E][W][I][D][V] ' + Tag + LMsg + ' |'));
-        TalLogType.ASSERT:  OutputDebugString(pointer('[A][E][W][I][D][V] ' + Tag + LMsg + ' |'));
+        TalLogType.VERBOSE: OutputDebugString(pointer('[V] ' + LMsg + ' |'));
+        TalLogType.DEBUG:   OutputDebugString(pointer('[D][V] ' + LMsg + ' |'));
+        TalLogType.INFO:    OutputDebugString(pointer('[I][D][V] ' + LMsg + ' |'));
+        TalLogType.WARN:    OutputDebugString(pointer('[W][I][D][V] ' + LMsg + ' |'));
+        TalLogType.ERROR:   OutputDebugString(pointer('[E][W][I][D][V] ' + LMsg + ' |'));
+        TalLogType.ASSERT:  OutputDebugString(pointer('[A][E][W][I][D][V] ' + LMsg + ' |'));
       end;
     end;
     {$IFEND}

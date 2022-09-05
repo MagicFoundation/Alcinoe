@@ -21,8 +21,7 @@ uses
 
 type
 
-  {*************************}
-  [ComponentPlatforms($FFFF)]
+  {************************}
   TALLayout = class(TLayout)
   protected
     procedure DoRealign; override;
@@ -171,13 +170,10 @@ type
     property OnAniStop: TnotifyEvent read fOnAniStop write fOnAniStop;
   end;
 
-  {*************************}
-  [ComponentPlatforms($FFFF)]
+  {**************************************}
   TALScrollBox = class(TALCustomScrollBox)
   protected
     procedure Paint; override;
-  public
-    constructor Create(AOwner: TComponent); override;
   published
     property HScrollBar;
     property VScrollBar;
@@ -241,15 +237,13 @@ type
     property OnAniStop;
   end;
 
-  {*************************}
-  [ComponentPlatforms($FFFF)]
+  {******************************************}
   TALVertScrollBox = class(TALCustomScrollBox)
   protected
     function CalcContentBounds: TRectF; override;
     procedure Paint; override;
+    function CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar; override;
     function CreateAniCalculations: TALScrollBoxAniCalculations; override;
-  public
-    constructor Create(AOwner: TComponent); override;
   published
     property MaxContentWidth;
     property VScrollBar;
@@ -313,15 +307,13 @@ type
     property OnAniStop;
   end;
 
-  {*************************}
-  [ComponentPlatforms($FFFF)]
+  {******************************************}
   TALHorzScrollBox = class(TALCustomScrollBox)
   protected
     function CalcContentBounds: TRectF; override;
     procedure Paint; override;
+    function CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar; override;
     function CreateAniCalculations: TALScrollBoxAniCalculations; override;
-  public
-    constructor Create(AOwner: TComponent); override;
   published
     property MaxContentHeight;
     property HScrollBar;
@@ -407,14 +399,18 @@ uses
 {*******************************************************************************************************}
 // http://stackoverflow.com/questions/39317984/does-the-delphi-firemonkey-dorealign-implemented-correctly
 // https://quality.embarcadero.com/browse/RSP-15768
+// https://quality.embarcadero.com/browse/RSP-36647
 // often we assign some event to some control onresize (like TText with autosize=True) to
 // resize their parentcontrols to the same size as them. But in this way the problem is that if
 // we resize the parentcontrol during it's dorealign process then it will not call again dorealign
+{$IF CompilerVersion > 34} // sydney
+  {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-36647 was not corrected and adjust the IFDEF'}
+{$ENDIF}
 procedure TALLayout.DoRealign;
 var LOriginalSize: TpointF;
 begin
   LOriginalSize := Size.Size;
-  inherited;
+  inherited DoRealign;
   if not LOriginalSize.EqualsTo(Size.Size) then DoRealign;
 end;
 
@@ -583,8 +579,10 @@ begin
   fMaxContentHeight := 0;
   fAnchoredContentOffset := TpointF.Create(0,0);
   //-----
-  FVScrollBar := nil;
-  FHScrollBar := nil;
+  //important FVScrollBar & FHScrollBar must be created BEFORE FContent (else FVScrollBar & FHScrollBar will be added to the TabList of FContent)
+  //https://github.com/pleriche/FastMM5/issues/31
+  FVScrollBar := CreateScrollBar(Torientation.Vertical);
+  FHScrollBar := CreateScrollBar(Torientation.Horizontal);
   FContent := CreateContent;
   //-----
   fMouseDownPos := TpointF.Create(0,0);
@@ -1021,14 +1019,6 @@ begin
   FContent.Sort(Compare);
 end;
 
-{**************************************************}
-constructor TALScrollBox.Create(AOwner: TComponent);
-begin
-  inherited;
-  FVScrollBar := CreateScrollBar(Torientation.Vertical);
-  FHScrollBar := CreateScrollBar(Torientation.Horizontal);
-end;
-
 {***************************}
 procedure TALScrollBox.Paint;
 begin
@@ -1048,11 +1038,11 @@ begin
   else Result.Width := Width;
 end;
 
-{******************************************************}
-constructor TALVertScrollBox.Create(AOwner: TComponent);
+{*******************************************************************************************}
+function TALVertScrollBox.CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar;
 begin
-  inherited;
-  FVScrollBar := CreateScrollBar(Torientation.Vertical);
+  if aOrientation <> TOrientation.Vertical then exit(nil);
+  result := inherited CreateScrollBar(aOrientation);
 end;
 
 {***************************************************************************}
@@ -1082,11 +1072,11 @@ begin
   else Result.Height := Height;
 end;
 
-{******************************************************}
-constructor TALHorzScrollBox.Create(AOwner: TComponent);
+{*******************************************************************************************}
+function TALHorzScrollBox.CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar;
 begin
-  inherited;
-  FHScrollBar := CreateScrollBar(Torientation.Horizontal);
+  if aOrientation <> TOrientation.Horizontal then exit(nil);
+  result := inherited CreateScrollBar(aOrientation);
 end;
 
 {***************************************************************************}

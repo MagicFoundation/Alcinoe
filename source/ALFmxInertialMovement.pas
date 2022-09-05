@@ -25,7 +25,7 @@ uses
   {$ENDIF}
   {$IFDEF ANDROID}
   Androidapi.JNIBridge,
-  ALAndroidApi,
+  Androidapi.JNI.GraphicsContentViewText,
   {$ENDIF}
   FMX.Types,
   ALCommon;
@@ -104,7 +104,6 @@ type
     end;
 
   private
-    FChoreographer: JChoreographer;
     FChoreographerFrameCallback: TChoreographerFrameCallback;
 
   {$ELSE}
@@ -114,7 +113,10 @@ type
 
   {$ENDIF}
   private
-    fmouseEventConsumed: Integer;
+    class var FPlatformTimer: IFMXTimerService;
+    class procedure InitPlatformTimer; inline;
+  private
+    FTag: NativeInt;
     FTimerActive: Boolean;
     FVelocityFactor: Double;
     FEnabled: Boolean;
@@ -128,7 +130,6 @@ type
     FlastTickCalc: Double;
     FLastTimeCalc: TDateTime;
     [Weak] FOwner: TPersistent;
-    FPlatformTimer: IFMXTimerService;
     FPointTime: TList<TPointTime>;
     FTargets: array of TTarget;
     FMinTarget: TTarget;
@@ -281,13 +282,14 @@ type
     property LowVelocity: Boolean read GetLowVelocity;
     procedure BeginUpdate;
     procedure EndUpdate;
+    function IsUpdating: Boolean;
     property UpdateCount: Integer read FUpdateCount;
     property OnStart: TNotifyEvent read FOnStart write FOnStart;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
     property OnStop: TNotifyEvent read FOnStop write FOnStop;
     property DeadZone: Integer read FDeadZone write FDeadZone default ALDefaultDeadZone;
-    property mouseEventConsumed: Integer read fmouseEventConsumed write fmouseEventConsumed; // used only internally
     property TimerActive: boolean read FTimerActive;
+    property Tag: NativeInt read FTag write FTag default 0;
   published
     property Interval: Word read FInterval write SetInterval default ALDefaultIntervalOfAni;
     property DecelerationRate: Double read FDecelerationRate write FDecelerationRate stored DecelerationRateStored nodefault;
@@ -296,9 +298,6 @@ type
     property VelocityFactor: Double read FVelocityFactor write FVelocityFactor stored VelocityFactorStored nodefault; // << this is a factor to apply to the calculated velocity of the scroll (to boost a the velocity)
     property OnCalcVelocity: TNotifyEvent read FOnCalcVelocity write FOnCalcVelocity; // << we this you can dynamically calc the velocity
   end;
-
-var
-  ALAniCalcTimerProcs: Tlist<TALAniCalculations>;
 
 implementation
 
@@ -378,34 +377,30 @@ begin
   {$ENDIF}
   fAniCalculations.Calculate;
   if fAniCalculations.FTimerActive then
-    fAniCalculations.fChoreographer.postFrameCallback(self);
+    TJChoreographer.JavaClass.getInstance.postFrameCallback(self);
 end;
 
 {$ENDIF}
 
-{*********************************************************}
+{*************}
+//[MultiThread]
+//We can create a TALAniCalculations from a background thread
+//but we can use it only in the main thread
 constructor TALAniCalculations.Create(AOwner: TPersistent);
 begin
   inherited Create;
   FOwner := AOwner;
   {$IFDEF IOS}
-  fDisplayLinkListener := TDisplayLinkListener.Create(self);
-  fDisplayLink := TCADisplayLink.Wrap(TCADisplayLink.OCClass.displayLinkWithTarget(fDisplayLinkListener.GetObjectID, sel_getUid('displayLinkUpdated')));
-  fDisplayLink.retain;
-  fDisplayLink.addToRunLoop(TNSRunLoop.Wrap(TNSRunLoop.OCClass.currentRunLoop), NSRunLoopCommonModes); // I don't really know with is the best, NSDefaultRunLoopMode or NSRunLoopCommonModes
-  fDisplayLink.setPaused(true);
+  fDisplayLinkListener := nil;
+  fDisplayLink := nil;
   {$ELSEIF defined(ANDROID)}
-  fChoreographer := TJChoreographer.JavaClass.getInstance;
-  fChoreographerFrameCallback := TChoreographerFrameCallback.create(self);
+  fChoreographerFrameCallback := nil;
   {$ELSE}
   FTimerHandle := TFmxHandle(-1);
   {$ENDIF}
   FTimerActive := False;
-  fmouseEventConsumed := 0;
   BeginUpdate;
   FPointTime := TList<TPointTime>.Create;
-  if not TPlatformServices.Current.SupportsPlatformService(IFMXTimerService, FPlatformTimer) then
-    raise EUnsupportedPlatformService.Create('IFMXTimerService');
   Assign(nil);
 end;
 
@@ -414,10 +409,13 @@ destructor TALAniCalculations.Destroy;
 begin
   StopTimer;
   {$IFDEF IOS}
-  fDisplayLink.invalidate; // Removes the display link from all run loop modes.
-                           // Removing the display link from all run loop modes causes it to be released by the run loop. The display link also releases the target.
-                           // invalidate is thread safe meaning that it can be called from a thread separate to the one in which the display link is running.
-  fDisplayLink.release;
+  if fDisplayLink <> nil then begin
+    // Removes the display link from all run loop modes.
+    // Removing the display link from all run loop modes causes it to be released by the run loop. The display link also releases the target.
+    // invalidate is thread safe meaning that it can be called from a thread separate to the one in which the display link is running.
+    fDisplayLink.invalidate;
+    fDisplayLink.release;
+  end;
   AlFreeAndNil(fDisplayLinkListener);
   {$ELSEIF defined(ANDROID)}
   alFreeAndNil(fChoreographerFrameCallback);
@@ -433,6 +431,18 @@ begin
   if not AutoShowing then
     FOpacity := ALMaxOpacity;
   EndUpdate;
+end;
+
+{***************************************************}
+class Procedure TALAniCalculations.InitPlatformTimer;
+begin
+  {$IF defined(DEBUG)}
+  if TThread.Current.ThreadID <> MainThreadID then
+    raise Exception.Create('InitPlatformTimer must be called from the main thread');
+  {$ENDIF}
+  if (FPlatformTimer = nil) and
+     (not TPlatformServices.Current.SupportsPlatformService(IFMXTimerService, FPlatformTimer)) then
+    raise EUnsupportedPlatformService.Create('IFMXTimerService');
 end;
 
 {*******************************************************}
@@ -461,6 +471,7 @@ begin
     Elasticity := LSource.Elasticity;
     StorageTime := LSource.StorageTime;
     VelocityFactor := LSource.VelocityFactor;
+    Tag := LSource.tag;
   end
   else if Source = nil then
   begin
@@ -479,6 +490,7 @@ begin
     Elasticity := ALDefaultElasticity;
     StorageTime := ALDefaultStorageTime;
     VelocityFactor := ALDefaultVelocityFactor;
+    Tag := 0;
   end
   else
     inherited;
@@ -572,6 +584,7 @@ var
 begin
   if FDown <> Value then
   begin
+    InitPlatformTimer;
     T := FPlatformTimer.getTick/SecsPerDay;
     if Value then
     begin
@@ -664,7 +677,7 @@ begin
   begin
     if Value and (FInterval > 0) then
     begin
-      if UpdateCount = 0 then
+      if Not IsUpdating then
       begin
         InternalStart;
         StartTimer;
@@ -687,7 +700,7 @@ begin
   begin
     StopTimer;
     FInterval := Value;
-    if FEnabled and (FInterval > 0) and (UpdateCount <= 0) then
+    if FEnabled and (FInterval > 0) and (not IsUpdating) then
       StartTimer;
   end;
 end;
@@ -768,14 +781,23 @@ begin
   {$IFDEF DEBUG}
   //ALLog('TALAniCalculations.StartTimer', 'TALAniCalculations.StartTimer', TalLogType.verbose);
   {$ENDIF}
+  InitPlatformTimer;
   FlastTickCalc := FPlatformTimer.getTick;
   FTimerActive := True;
-  if ALAniCalcTimerProcs <> nil then ALAniCalcTimerProcs.Add(self);
 
   {$IFDEF IOS}
+  if fDisplayLinkListener = nil then
+    fDisplayLinkListener := TDisplayLinkListener.Create(self);
+  if fDisplayLink = nil then begin
+    fDisplayLink := TCADisplayLink.Wrap(TCADisplayLink.OCClass.displayLinkWithTarget(fDisplayLinkListener.GetObjectID, sel_getUid('displayLinkUpdated')));
+    fDisplayLink.retain;
+    fDisplayLink.addToRunLoop(TNSRunLoop.Wrap(TNSRunLoop.OCClass.currentRunLoop), NSRunLoopCommonModes); // I don't really know with is the best, NSDefaultRunLoopMode or NSRunLoopCommonModes
+  end;
   fDisplayLink.setPaused(False);
   {$ELSEIF defined(ANDROID)}
-  fChoreographer.postFrameCallback(fChoreographerFrameCallback);
+  if fChoreographerFrameCallback = nil then
+    fChoreographerFrameCallback := TChoreographerFrameCallback.create(self);
+  TJChoreographer.JavaClass.getInstance.postFrameCallback(fChoreographerFrameCallback);
   {$ELSE}
   if FTimerHandle = TFmxHandle(-1) then
   begin
@@ -794,15 +816,17 @@ begin
   //ALLog('TALAniCalculations.StopTimer', 'TALAniCalculations.StopTimer', TalLogType.verbose);
   {$ENDIF}
   FTimerActive := False;
-  if ALAniCalcTimerProcs <> nil then ALAniCalcTimerProcs.Remove(self);
 
   {$IFDEF IOS}
-  fDisplayLink.setPaused(True);
+  if fDisplayLink <> nil then
+    fDisplayLink.setPaused(True);
   {$ELSEIF defined(ANDROID)}
-  fChoreographer.removeFrameCallback(fChoreographerFrameCallback);
+  if fChoreographerFrameCallback <> nil then
+    TJChoreographer.JavaClass.getInstance.removeFrameCallback(fChoreographerFrameCallback);
   {$ELSE}
   if FTimerHandle <> TFmxHandle(-1) then
   begin
+    InitPlatformTimer;
     FPlatformTimer.DestroyTimer(FTimerHandle);
     FTimerHandle := TFmxHandle(-1);
   end;
@@ -938,8 +962,14 @@ end;
 {*************************************}
 procedure TALAniCalculations.EndUpdate;
 begin
-  if FUpdateCount > 0 then
+  if IsUpdating then
     Dec(FUpdateCount);
+end;
+
+{**********************************************}
+function TALAniCalculations.IsUpdating: Boolean;
+begin
+  result := FUpdateCount > 0;
 end;
 
 {**********************************************************}
@@ -972,8 +1002,10 @@ function TALAniCalculations.DoStopScrolling(CurrentTime: TDateTime = 0): Boolean
 var
   T: Double;
 begin
-  if CurrentTime = 0 then
+  if CurrentTime = 0 then begin
+    InitPlatformTimer;
     CurrentTime := FPlatformTimer.getTick/SecsPerDay;
+  end;
   T := (CurrentTime - FUpDownTime) * SecsPerDay;
   Result := Down and (not Moved) and (T >= ALStopTime);
   if Result then
@@ -995,12 +1027,14 @@ end;
 Procedure TALAniCalculations.WakeUpTimer;
 begin
   if not FTimerActive then exit;
-  if FPlatformTimer.GetTick - FlastTickCalc > 0.04 then begin // normally Calculate must be called every 0.016 seconds.
-                                                              // but in heavy situation, especially on ios, the CADisplay link
-                                                              // could never fire. I saw it on iphone 5 playing webRTC + filter
-                                                              // the GPU was so busy that the CADisplay link never fire.
-                                                              // so if it's was not called for more than 0.04 seconds (0.016*2 + 0.016/2)
-                                                              // then call it again
+  // normally Calculate must be called every 0.016 seconds.
+  // but in heavy situation, especially on ios, the CADisplay link
+  // could never fire. I saw it on iphone 5 playing webRTC + filter
+  // the GPU was so busy that the CADisplay link never fire.
+  // so if it's was not called for more than 0.04 seconds (0.016*2 + 0.016/2)
+  // then call it again. this procedure must be manually called by the client
+  InitPlatformTimer;
+  if FPlatformTimer.GetTick - FlastTickCalc > 0.04 then begin
     {$IFDEF DEBUG}
     ALLog('TALAniCalculations.WakeUpTimer', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.warn);
     {$ENDIF}
@@ -1031,17 +1065,17 @@ begin
     // why ? because their is 16ms between each paint, BUT if you call very often the paint,
     // then maybe you can miss some move event resulting in drop frame (not really dropped
     // but as you miss the move event look like it's dropped because it's didn't move)
+    //
     // ex:
     // T=0 paint (ok)
     // T=16 mouse move (ok)
     // T=16 paint OK
     // T=32 paint (aie we didn't receive yet the move move, that maybe is in the nanosecond later) result in drop frame
-
-    {$IFDEF ANDROID}
-
+    //
     //
     // this is handled in the unit FMX.Platform.UI.Android by adding this in TFormRender.Render
     //
+    // ALAniCalcTimerProcs: Tlist<TALAniCalculations>;
     // for var i := ALAniCalcTimerProcs.Count - 1 downto 0 do begin
     //   var LAniCalcTimerProc := ALAniCalcTimerProcs[i];
     //   if LAniCalcTimerProc.Down then begin
@@ -1051,29 +1085,10 @@ begin
     //   end;
     // end;
     //
+    // finally it's handled in FMX.Platform.UI.Android by using JChoreographer_FrameCallback for TFormRender instead of JRunnable
+    // https://quality.embarcadero.com/browse/RSP-38660
 
-    {$ENDIF}
-    {$IFDEF IOS}
-
-    //
-    // this is handled in the unit FMX.Platform.iOS by adding this in TFMXGLKView3D/TFMXMTKView3D.drawRect
-    //
-    // for var i := ALAniCalcTimerProcs.Count - 1 downto 0 do begin
-    //   var LAniCalcTimerProc := ALAniCalcTimerProcs[i];
-    //   if LAniCalcTimerProc.Down then begin
-    //     if LAniCalcTimerProc.mouseEventConsumed > 0 then begin
-    //       LAniCalcTimerProc.mouseEventConsumed := -1;
-    //       exit;
-    //     end
-    //     else if LAniCalcTimerProc.mouseEventConsumed = 0 then
-    //       LAniCalcTimerProc.mouseEventConsumed := 1;
-    //     Break;
-    //   end;
-    // end;
-    //
-
-    {$ENDIF}
-
+    InitPlatformTimer;
     FlastTickCalc := FPlatformTimer.getTick;
     T := FlastTickCalc/SecsPerDay;
     IsInit := FLastTimeCalc > 0;
@@ -1496,6 +1511,7 @@ procedure TALAniCalculations.InternalChanged;
 var
   T: TDateTime;
 begin
+  InitPlatformTimer;
   T := FPlatformTimer.getTick/SecsPerDay;
   if (FLastTimeChanged = 0) or (Abs(T - FLastTimeChanged) * SecsPerDay >= ALEpsilonTime) then
   begin
@@ -1518,7 +1534,7 @@ begin
   if FAutoShowing <> Value then
   begin
     FAutoShowing := Value;
-    if UpdateCount > 0 then
+    if IsUpdating then
     begin
       if AutoShowing then
         FOpacity := 0
@@ -1544,8 +1560,10 @@ var
 begin
   if Time > 0 then
     FLastTimeCalc := Time
-  else
+  else begin
+    InitPlatformTimer;
     FLastTimeCalc := FPlatformTimer.getTick/SecsPerDay;
+  end;
   Clear(FLastTimeCalc);
   if Averaging then
     I := 0
@@ -1666,8 +1684,10 @@ function TALAniCalculations.AddPointTime(const X, Y: Double; const Time: TDateTi
 begin
   if Time > 0 then
     Result.Time := Time
-  else
+  else begin
+    InitPlatformTimer;
     Result.Time := FPlatformTimer.getTick/SecsPerDay;
+  end;
   Result.Point.X := X;
   Result.Point.Y := Y;
   Result.Point := PosToView(Result.Point);
@@ -1691,7 +1711,6 @@ end;
 {***************************************************}
 procedure TALAniCalculations.MouseDown(X, Y: Double);
 begin
-  fmouseEventConsumed := 0;
   if Down then
     Exit;
   Down := True;
@@ -1717,7 +1736,6 @@ begin
   //ALLog('TALAniCalculations.MouseMove', 'x: '  + ALFormatFloatU('0', x, alDefaultFormatSettingsU) +
   //                                      ' - y: '  + ALFormatFloatU('0', y, alDefaultFormatSettingsU), TalLogType.verbose);
   {$ENDIF}
-  fmouseEventConsumed := 0;
   if Down and ([ttVertical, ttHorizontal] * TouchTracking <> []) then
   begin
     if not FMoved then
@@ -1770,7 +1788,6 @@ end;
 {*************************************************}
 procedure TALAniCalculations.MouseUp(X, Y: Double);
 begin
-  fmouseEventConsumed := 0;
   if Down then
   begin
     MouseMove(X, Y);
@@ -1789,12 +1806,12 @@ procedure TALAniCalculations.MouseLeave;
 var
   PointTime: TPointTime;
 begin
-  fmouseEventConsumed := 0;
   if Down then
   begin
     if PositionCount > 0 then
     begin
       PointTime := FPointTime[PositionCount - 1];
+      InitPlatformTimer;
       PointTime.Time := FPlatformTimer.getTick/SecsPerDay;
       FPointTime[PositionCount - 1] := PointTime;
     end;
@@ -1814,7 +1831,6 @@ var
   DX, DY: Double;
   NewTarget: TTarget;
 begin
-  fmouseEventConsumed := 0;
   DX := RoundTo(X, ALEpsilonRange);
   DY := RoundTo(Y, ALEpsilonRange);
   if (DX <> 0) or (DY <> 0) then
@@ -1888,6 +1904,9 @@ end;
 
 initialization
   ALEpsilonRange := Trunc(Log10(ALEpsilonPoint));
-  ALAniCalcTimerProcs := nil;
+  //Unfortunatly, under android (at least) we can not initialize
+  //TALAniCalculations.FPlatformTimer in the initialization section
+  //else the app crash at startup
+  TALAniCalculations.FPlatformTimer := nil;
 
 end.

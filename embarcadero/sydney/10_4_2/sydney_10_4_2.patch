@@ -1,8 +1,8 @@
 Index: fmx/FMX.Canvas.GPU.Helpers.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.Helpers.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.Helpers.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.Helpers.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.Helpers.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.Canvas.GPU.Helpers.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.Canvas.GPU.Helpers.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.Canvas.GPU.Helpers.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.Canvas.GPU.Helpers.pas	(working copy)
 @@ -12,11 +12,12 @@
  
  interface
@@ -14,7 +14,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.Helpers.pas b/embarcad
 -  System.Types, System.UITypes, FMX.Types, FMX.Types3D, FMX.Materials.Canvas, FMX.Graphics, 
 -  System.Math.Vectors;
 +  System.Types, System.UITypes, FMX.Types, FMX.Types3D, FMX.Materials.Canvas, FMX.Graphics,
-+  System.Math.Vectors, ALFmxTypes3D;
++  System.Math.Vectors, ALFMXTypes3D;
  
  type
    TDrawingMode = (Normal, WriteStencilInvert, ReadStencil, ClearStencil);
@@ -53,9 +53,9 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.Helpers.pas b/embarcad
    end else if FCurrentMaterial <> FSolidMat then
 Index: fmx/FMX.Canvas.GPU.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.Canvas.GPU.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.Canvas.GPU.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.Canvas.GPU.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.Canvas.GPU.pas	(working copy)
 @@ -72,6 +72,8 @@
  procedure RegisterCanvasClasses;
  procedure UnregisterCanvasClasses;
@@ -78,11 +78,76 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Canvas.GPU.pas b/embarcadero/sydn
  initialization
    TCustomCanvasGpu.ModulateColor := $FFFFFFFF;
    TCustomCanvasGpu.AlignToPixels := False;
+Index: fmx/FMX.Context.GLES.Android.pas
+===================================================================
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.Context.GLES.Android.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.Context.GLES.Android.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.Context.GLES.Android.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.Context.GLES.Android.pas	(working copy)
+@@ -405,18 +405,17 @@
+   end
+   else
+   begin
+-    if not FThreadDictionary.TryGetValue(TThread.CurrentThread.ThreadID, Pair) then
+-    begin
+-      Pair.Context := eglCreateContext(FSharedDisplay, FSharedConfig, FSharedContext, @ContextAttributes[0]);
+-      Pair.Surface := CreateEGLSurface(1, 1);
+-
+-      TMonitor.Enter(FThreadDictionary);
+-      try
++    TMonitor.Enter(FThreadDictionary); // https://quality.embarcadero.com/browse/RSP-34481
++    try                                //
++      if not FThreadDictionary.TryGetValue(TThread.CurrentThread.ThreadID, Pair) then
++      begin
++        Pair.Context := eglCreateContext(FSharedDisplay, FSharedConfig, FSharedContext, @ContextAttributes[0]);
++        Pair.Surface := CreateEGLPBufferSurface(1, 1); // https://quality.embarcadero.com/browse/RSP-34482
+         FThreadDictionary.Add(TThread.CurrentThread.ThreadID, Pair);
+-      finally
+-        TMonitor.Exit(FThreadDictionary);
+       end;
+-    end;
++    finally                              //
++      TMonitor.Exit(FThreadDictionary);  // https://quality.embarcadero.com/browse/RSP-34481
++    end;                                 //
+     if eglGetCurrentContext <> Pair.Context then
+       Result := eglMakeCurrent(FSharedDisplay, Pair.Surface, Pair.Surface, Pair.Context) <> EGL_FALSE;
+   end;
+Index: fmx/FMX.Context.GLES.iOS.pas
+===================================================================
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.Context.GLES.iOS.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.Context.GLES.iOS.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.Context.GLES.iOS.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.Context.GLES.iOS.pas	(working copy)
+@@ -100,17 +100,17 @@
+     Result := FSharedContext
+   else
+   begin
+-    if not FThreadDictionary.TryGetValue(TThread.CurrentThread.ThreadID, Result) then
+-    begin
+-      Result := TEAGLContext.Wrap(TEAGLContext.Alloc.initWithAPI(kEAGLRenderingAPIOpenGLES2, FSharedContext.sharegroup));
+-      Result.retain;
+-      TMonitor.Enter(FThreadDictionary);
+-      try
++    TMonitor.Enter(FThreadDictionary); // https://quality.embarcadero.com/browse/RSP-34481
++    try                                //
++      if not FThreadDictionary.TryGetValue(TThread.CurrentThread.ThreadID, Result) then
++      begin
++        Result := TEAGLContext.Wrap(TEAGLContext.Alloc.initWithAPI(kEAGLRenderingAPIOpenGLES2, FSharedContext.sharegroup));
++        Result.retain;
+         FThreadDictionary.Add(TThread.CurrentThread.ThreadID, Result);
+-      finally
+-        TMonitor.Exit(FThreadDictionary);
+       end;
+-    end;
++    finally                              //
++      TMonitor.Exit(FThreadDictionary);  // https://quality.embarcadero.com/browse/RSP-34481
++    end;                                 //
+   end;
+ end;
+ 
 Index: fmx/FMX.Context.GLES.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Context.GLES.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Context.GLES.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Context.GLES.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.Context.GLES.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.Context.GLES.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.Context.GLES.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.Context.GLES.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.Context.GLES.pas	(working copy)
 @@ -188,7 +188,7 @@
  {$IFDEF MACOS}
    Macapi.CoreFoundation,
@@ -111,9 +176,9 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Context.GLES.pas b/embarcadero/sy
          glActiveTexture(GL_TEXTURE0);
 Index: fmx/FMX.Controls.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Controls.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Controls.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Controls.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.Controls.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.Controls.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.Controls.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.Controls.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.Controls.pas	(working copy)
 @@ -113,7 +113,7 @@
      /// <summary>Register a class to create hint instances. When a new THint instance is needed, the registered classes are invoked
      /// to create the needed instance.</summary>
@@ -308,9 +373,9 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Controls.pas b/embarcadero/sydney
  {$ELSE !LONGINT64}
 Index: fmx/FMX.Dialogs.iOS.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Dialogs.iOS.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Dialogs.iOS.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Dialogs.iOS.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.Dialogs.iOS.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.Dialogs.iOS.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.Dialogs.iOS.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.Dialogs.iOS.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.Dialogs.iOS.pas	(working copy)
 @@ -246,7 +246,7 @@
    try
      AlertView := TUIAlertView.Wrap(AlertView.initWithTitle(StrToNSStr(Translate(MsgTitles[ADialogType])), StrToNSStr(AMessage),
@@ -358,9 +423,9 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Dialogs.iOS.pas b/embarcadero/syd
        SetLength(FResults, Length(FResults) + 1);
 Index: fmx/FMX.Edit.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Edit.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Edit.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Edit.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.Edit.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.Edit.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.Edit.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.Edit.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.Edit.pas	(working copy)
 @@ -11,6 +11,7 @@
  
  interface
@@ -371,9 +436,9 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Edit.pas b/embarcadero/sydney/10_
  uses
 Index: fmx/FMX.Filter.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Filter.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Filter.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Filter.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.Filter.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.Filter.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.Filter.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.Filter.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.Filter.pas	(working copy)
 @@ -11,6 +11,7 @@
  
  interface
@@ -419,9 +484,9 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Filter.pas b/embarcadero/sydney/1
  
 Index: fmx/FMX.Forms.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Forms.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Forms.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Forms.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.Forms.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.Forms.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.Forms.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.Forms.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.Forms.pas	(working copy)
 @@ -9,6 +9,7 @@
  
  unit FMX.Forms;
@@ -430,7 +495,67 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Forms.pas b/embarcadero/sydney/10
  {$MINENUMSIZE 4}
  {$H+}
  
-@@ -5986,6 +5987,7 @@
+@@ -4249,7 +4250,10 @@
+ 
+ procedure TCommonCustomForm.SetHovered(const Value: IControl);
+ begin
+-  if (Value <> FHovered) then
++  //https://quality.embarcadero.com/browse/RSP-36612
++  if ((Value <> nil) and (FHovered = nil)) or
++     ((Value = nil) and (FHovered <> nil)) or
++     ((Value <> nil) and (FHovered <> nil) and (Value.GetObject <> FHovered.GetObject)) then
+   begin
+     if FHovered <> nil then
+     begin
+@@ -4682,7 +4686,10 @@
+     LControl := AControl
+   else
+     LControl := nil;
+-  if LControl <> FLastHinted then
++  //https://quality.embarcadero.com/browse/RSP-36612
++  if ((LControl <> nil) and (FLastHinted = nil)) or
++     ((LControl = nil) and (FLastHinted <> nil)) or
++     ((LControl <> nil) and (FLastHinted <> nil) and (LControl.GetObject <> FLastHinted.GetObject)) then
+   begin
+     if Application.ShowHint and (LControl <> nil) then
+     begin
+@@ -5454,7 +5461,10 @@
+ 
+ procedure TCommonCustomForm.SetCaptured(const Value: IControl);
+ begin
+-  if FCaptured <> Value then
++  //https://quality.embarcadero.com/browse/RSP-36612
++  if ((Value <> nil) and (FCaptured = nil)) or
++     ((Value = nil) and (FCaptured <> nil)) or
++     ((Value <> nil) and (FCaptured <> nil) and (Value.GetObject <> FCaptured.GetObject)) then
+   begin
+     if FCaptured <> nil then
+     begin
+@@ -5743,7 +5753,10 @@
+ 
+ procedure TCommonCustomForm.SetActiveControl(const AControl: IControl);
+ begin
+-  if AControl <> FActiveControl then
++  //https://quality.embarcadero.com/browse/RSP-36612
++  if ((AControl <> nil) and (FActiveControl = nil)) or
++     ((AControl = nil) and (FActiveControl <> nil)) or
++     ((AControl <> nil) and (FActiveControl <> nil) and (AControl.GetObject <> FActiveControl.GetObject)) then
+   begin
+     if FActiveControl <> nil then
+       FActiveControl.RemoveFreeNotify(Self);
+@@ -5964,8 +5977,9 @@
+ procedure TCustomForm.EndUpdate;
+ begin
+   inherited;
+-  if FUpdating = 0 then
+-    Realign;
++  //https://quality.embarcadero.com/browse/RSP-36652
++  //if FUpdating = 0 then
++  //  Realign;
+ end;
+ 
+ procedure TCustomForm.AddUpdateRect(R: TRectF);
+@@ -5986,6 +6000,7 @@
      TGlyphsManager.Default.DisableGlyphPopulation := Active;
  end;
  
@@ -438,7 +563,7 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Forms.pas b/embarcadero/sydney/10
  procedure TCustomForm.PaintBackground;
  var
    I: Integer;
-@@ -5996,22 +5998,26 @@
+@@ -5996,22 +6011,26 @@
    else
      ClearColor := TAlphaColorRec.Null;
  
@@ -469,11 +594,23 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Forms.pas b/embarcadero/sydney/10
    end
    else
    begin
+@@ -6213,6 +6232,11 @@
+ 
+ procedure TCustomForm.Realign;
+ begin
++  //https://quality.embarcadero.com/browse/RSP-36653
++  if FDisableAlign then
++    Exit;
++  if (FUpdating > 0) then
++    Exit;
+   if not (csDesigning in ComponentState) then
+   begin
+     if FLastWidth <= 0 then
 Index: fmx/FMX.Graphics.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Graphics.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Graphics.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Graphics.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.Graphics.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.Graphics.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.Graphics.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.Graphics.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.Graphics.pas	(working copy)
 @@ -2949,6 +2949,9 @@
    if FFontColor <> Value then
    begin
@@ -495,9 +632,9 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Graphics.pas b/embarcadero/sydney
  procedure TCanvas.MeasureLines(const ALines: TLineMetricInfo; const ARect: TRectF; const AText: string; const WordWrap: Boolean; const Flags: TFillTextFlags;
 Index: fmx/FMX.Materials.Canvas.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Materials.Canvas.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Materials.Canvas.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Materials.Canvas.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.Materials.Canvas.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.Materials.Canvas.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.Materials.Canvas.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.Materials.Canvas.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.Materials.Canvas.pas	(working copy)
 @@ -440,18 +440,46 @@
      {$ENDREGION}
  
@@ -559,43 +696,25 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Materials.Canvas.pas b/embarcader
  
 Index: fmx/FMX.Platform.iOS.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Platform.iOS.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Platform.iOS.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Platform.iOS.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.Platform.iOS.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.Platform.iOS.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.Platform.iOS.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.Platform.iOS.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.Platform.iOS.pas	(working copy)
 @@ -1,4 +1,4 @@
 -{*******************************************************}
 +﻿{*******************************************************}
  {                                                       }
  {              Delphi FireMonkey Platform               }
  {                                                       }
-@@ -73,7 +73,8 @@
+@@ -73,7 +73,7 @@
    FMX.Context.GLES, FMX.Forms3D, FMX.Utils, FMX.Graphics.iOS, FMX.Context.GLES.iOS, FMX.Controls.iOS, FMX.Gestures.iOS,
    FMX.Helpers.iOS, FMX.Dialogs.iOS, FMX.Platform, FMX.Platform.Timer.iOS, FMX.Platform.SaveState.iOS,
    FMX.MultiTouch.iOS, FMX.Platform.Metrics.iOS, FMX.Platform.Device.iOS, FMX.Platform.Screen.iOS,
 -  FMX.Platform.Logger.iOS, FMX.Controls.Presentation;
-+  FMX.Platform.Logger.iOS, FMX.Controls.Presentation, system.Generics.Collections, ALFmxInertialMovement,
-+  ALFmxEdit, ALFmxMemo; // // https://quality.embarcadero.com/browse/RSP-33594
++  FMX.Platform.Logger.iOS, FMX.Controls.Presentation, ALFmxEdit, ALFmxMemo; // // https://quality.embarcadero.com/browse/RSP-33594
  
  type
  
-@@ -1214,6 +1215,7 @@
- constructor TPlatformCocoaTouch.Create;
- begin
-   inherited;
-+  ALAniCalcTimerProcs := Tlist<TALAniCalculations>.create; // added to support ALFmxInertialMovement
-   FTimerService := TCocoaTouchTimerService.Create;
-   FMetricsServices := TCocoaTouchMetricsServices.Create;
-   FGraphicServices := TCocoaTouchGraphicServices.Create;
-@@ -1250,6 +1252,8 @@
-   CFRelease(FRunLoopObserver);
-   System.Classes.WakeMainThread := nil;
-   FreeAndNil(FWakeHandler);
-+  ALAniCalcTimerProcs.Free; // added to support ALFmxInertialMovement
-+  ALAniCalcTimerProcs := nil;
-   inherited;
- end;
- 
-@@ -2270,7 +2274,10 @@
+@@ -2270,7 +2270,10 @@
  
    function IsNativeControl(const AControl: TFmxObject): Boolean;
    begin
@@ -607,128 +726,63 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Platform.iOS.pas b/embarcadero/sy
    end;
  
  begin
-@@ -3601,6 +3608,28 @@
- var
-   PaintControl: IPaintControl;
- begin
-+
-+  // Process all the pending input events before to redraw the form
-+  // NOTE: I mostly replicate here what I does in Android (You can see
-+  // my comments in FMX.Platform.UI.Android to have a full explanation of why
-+  // I need to do it), but in android it's a little difference because MouseMove
-+  // is continuously firing every few ms and they do not use choregrapher. That
-+  // not the case on iOS. Honestly I can not say if this is really usefull or
-+  // just useless (I will need a recent Iphone to test, actually on iphone 7 I
-+  // see no difference)
-+  for var i := ALAniCalcTimerProcs.Count - 1 downto 0 do begin
-+    var LAniCalcTimerProc := ALAniCalcTimerProcs[i];
-+    if LAniCalcTimerProc.Down then begin
-+      if LAniCalcTimerProc.mouseEventConsumed > 0 then begin
-+        LAniCalcTimerProc.mouseEventConsumed := -1;
-+        exit;
-+      end
-+      else if LAniCalcTimerProc.mouseEventConsumed = 0 then
-+        LAniCalcTimerProc.mouseEventConsumed := 1;
-+      Break;
-+    end;
-+  end;
-+
-   if Supports(Form, IPaintControl, PaintControl) then
-     try
-       PaintControl.PaintRects([Form.ClientRect]);
-@@ -3650,6 +3679,28 @@
- var
-   PaintControl: IPaintControl;
- begin
-+
-+  // Process all the pending input events before to redraw the form
-+  // NOTE: I mostly replicate here what I does in Android (You can see
-+  // my comments in FMX.Platform.UI.Android to have a full explanation of why
-+  // I need to do it), but in android it's a little difference because MouseMove
-+  // is continuously firing every few ms and they do not use choregrapher. That
-+  // not the case on iOS. Honestly I can not say if this is really usefull or
-+  // just useless (I will need a recent Iphone to test, actually on iphone 7 I
-+  // see no difference)
-+  for var i := ALAniCalcTimerProcs.Count - 1 downto 0 do begin
-+    var LAniCalcTimerProc := ALAniCalcTimerProcs[i];
-+    if LAniCalcTimerProc.Down then begin
-+      if LAniCalcTimerProc.mouseEventConsumed > 0 then begin
-+        LAniCalcTimerProc.mouseEventConsumed := -1;
-+        exit;
-+      end
-+      else if LAniCalcTimerProc.mouseEventConsumed = 0 then
-+        LAniCalcTimerProc.mouseEventConsumed := 1;
-+      Break;
-+    end;
-+  end;
-+
-   if Supports(Form, IPaintControl, PaintControl) then
-     try
-       PaintControl.PaintRects([Form.ClientRect]);
 Index: fmx/FMX.Platform.UI.Android.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Platform.UI.Android.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Platform.UI.Android.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Platform.UI.Android.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.Platform.UI.Android.pas	(working copy)
-@@ -18,7 +18,7 @@
-   Androidapi.JNI.Embarcadero, Androidapi.JNI.GraphicsContentViewText, Androidapi.JNI.Widget, Androidapi.JNI.JavaTypes,
-   Androidapi.Input, Androidapi.NativeActivity, Androidapi.Helpers, FMX.Forms, FMX.Types, FMX.Types3D, FMX.KeyMapping,
-   FMX.Helpers.Android, FMX.Controls, FMX.Text, FMX.Graphics, FMX.Gestures, FMX.VirtualKeyboard, FMX.Consts, FMX.Utils,
--  FMX.Platform, FMX.MultiTouch.Android, FMX.ZOrder.Android, FMX.Platform.Text.Android;
-+  FMX.Platform, FMX.MultiTouch.Android, FMX.ZOrder.Android, FMX.Platform.Text.Android, ALFmxInertialMovement;
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.Platform.UI.Android.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.Platform.UI.Android.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.Platform.UI.Android.pas	(working copy)
+@@ -28,7 +28,7 @@
+   TTextServiceAndroid = class;
  
- type
+   /// <summary>Render of form. It is responsible for drawing FireMonkey form on native Surface.</summary>
+-  TFormRender = class(TJavaLocal, JRunnable)
++  TFormRender = class(TJavaLocal, JChoreographer_FrameCallback) // https://quality.embarcadero.com/browse/RSP-38660
+   private
+     [Weak] FHandle: TAndroidWindowHandle;
+     FIsNeededUpdate: Boolean;
+@@ -38,8 +38,8 @@
+     constructor Create(const AHandle: TAndroidWindowHandle);
+     destructor Destroy; override;
  
-@@ -469,6 +469,7 @@
- constructor TWindowServiceAndroid.Create;
+-    { JRunnable }
+-    procedure run; cdecl;
++    { JChoreographer_FrameCallback } // https://quality.embarcadero.com/browse/RSP-38660
++    procedure doFrame(frameTimeNanos: Int64); cdecl; // https://quality.embarcadero.com/browse/RSP-38660
+ 
+     /// <summary>Renders form Immediately.</summary>
+     procedure Render;
+@@ -2300,7 +2300,7 @@
  begin
-   inherited Create;
-+  ALAniCalcTimerProcs := Tlist<TALAniCalculations>.create; // added to support ALFmxInertialMovement
-   FScale := UndefinedScreenScale;
-   if not TPlatformServices.Current.SupportsPlatformService(IFMXTimerService, FTimerService) then
-     raise Exception.CreateFmt(SUnsupportedPlatformService, ['IFMXTimerService']);
-@@ -498,6 +499,8 @@
-   FVirtualKeyboard := nil;
-   SetFocusedControl(nil);
-   FMouseDownControl := nil;
-+  ALAniCalcTimerProcs.Free; // added to support ALFmxInertialMovement
-+  ALAniCalcTimerProcs := nil;
+   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
+   AtomicIncrement(FRefCount);
+-  TAndroidHelper.MainHandler.removeCallbacks(Self);
++  TJChoreographer.JavaClass.getInstance.removeFrameCallback(Self); // https://quality.embarcadero.com/browse/RSP-38660
+   AtomicDecrement(FRefCount);
    inherited;
  end;
+@@ -2321,7 +2321,7 @@
+     end;
+ end;
  
-@@ -2313,6 +2316,27 @@
-   if FHandle.Holder = nil then
-     Exit;
+-procedure TFormRender.run;
++procedure TFormRender.doFrame(frameTimeNanos: Int64); // https://quality.embarcadero.com/browse/RSP-38660
+ begin
+   Render;
+   FIsNeededUpdate := False;
+@@ -2332,7 +2332,7 @@
+   if not FIsNeededUpdate then
+   begin
+     FIsNeededUpdate := True;
+-    TAndroidHelper.MainHandler.post(Self);
++    TJChoreographer.JavaClass.getInstance.postFrameCallback(Self); // https://quality.embarcadero.com/browse/RSP-38660
+   end;
+ end;
  
-+  // Process all the pending input events before to redraw the form
-+  // NOTE: when the mouse is down, MouseMove is continuously firing
-+  // I tried many conbinations, even migrating TFormRender to Choreographer
-+  // and the best performance I can achieve is simply like this. The main
-+  // problem is if we manually call repaint ourself (for exemple because of an
-+  // animation or a video playback at the same time we scroll the form).
-+  // In this way (if the repaint was not the result of a mousemove), the repaint
-+  // will delay the touchevent and thus it's will result in jerk. So the only
-+  // solution I found is to deactivate the repaint like this when we are moving
-+  // the finger on the screen. anyway remember that the MouseMove is
-+  // continuously firing (every few ms) so it's will not break any playback
-+  // animation.
-+  for var i := ALAniCalcTimerProcs.Count - 1 downto 0 do begin
-+    var LAniCalcTimerProc := ALAniCalcTimerProcs[i];
-+    if LAniCalcTimerProc.Down then begin
-+      if LAniCalcTimerProc.mouseEventConsumed > 0 then exit;
-+      LAniCalcTimerProc.mouseEventConsumed := 1;
-+      Break;
-+    end;
-+  end;
-+
-   if Supports(FHandle.Form, IPaintControl, PaintControl) then
-     try
-       PaintControl.PaintRects([FHandle.Form.ClientRect]);
 Index: fmx/FMX.StrokeBuilder.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.StrokeBuilder.pas b/embarcadero/sydney/10_4_2/fmx/FMX.StrokeBuilder.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.StrokeBuilder.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.StrokeBuilder.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.StrokeBuilder.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.StrokeBuilder.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.StrokeBuilder.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.StrokeBuilder.pas	(working copy)
 @@ -1074,9 +1074,11 @@
    FUndeterminedMode := True;
    InitArrayPointers;
@@ -746,9 +800,9 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.StrokeBuilder.pas b/embarcadero/s
  
 Index: fmx/FMX.Types3D.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Types3D.pas b/embarcadero/sydney/10_4_2/fmx/FMX.Types3D.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.Types3D.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.Types3D.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.Types3D.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.Types3D.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.Types3D.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.Types3D.pas	(working copy)
 @@ -3089,6 +3089,7 @@
    begin
      FContextLostId := -1;
@@ -759,9 +813,9 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.Types3D.pas b/embarcadero/sydney/
  
 Index: fmx/FMX.VirtualKeyboard.Android.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.VirtualKeyboard.Android.pas b/embarcadero/sydney/10_4_2/fmx/FMX.VirtualKeyboard.Android.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.VirtualKeyboard.Android.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.VirtualKeyboard.Android.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.VirtualKeyboard.Android.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.VirtualKeyboard.Android.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.VirtualKeyboard.Android.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.VirtualKeyboard.Android.pas	(working copy)
 @@ -213,8 +213,15 @@
    VKRect.TopLeft := ConvertPixelToPoint(TPointF.Create(newFrame.Left, newFrame.Top)).Round;
    VKRect.BottomRight := ConvertPixelToPoint(TPointF.Create(newFrame.Right, newFrame.Bottom)).Round;
@@ -782,9 +836,9 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.VirtualKeyboard.Android.pas b/emb
        FPreviousVKRect := VKRect;
 Index: fmx/FMX.WebBrowser.Android.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Android.pas b/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Android.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Android.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Android.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.WebBrowser.Android.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.WebBrowser.Android.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.WebBrowser.Android.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.WebBrowser.Android.pas	(working copy)
 @@ -70,6 +70,7 @@
      FChildrenContainer: JViewGroup;
      FURL: string;
@@ -870,9 +924,9 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Android.pas b/embarcad
  function TAndroidWBService.DoCreateWebBrowser: ICustomBrowser;
 Index: fmx/FMX.WebBrowser.Cocoa.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Cocoa.pas b/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Cocoa.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Cocoa.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Cocoa.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.WebBrowser.Cocoa.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.WebBrowser.Cocoa.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.WebBrowser.Cocoa.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.WebBrowser.Cocoa.pas	(working copy)
 @@ -45,6 +45,7 @@
  
    TCommonWebBrowserService = class(TInterfacedObject, ICustomBrowser)
@@ -924,6 +978,15 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Cocoa.pas b/embarcader
      ZOrderManager.UpdateOrderAndBounds(FWebControl);
      // WKWebView has a bug, It doesn't hide virtual keyboard itself, if we hide view from screen.
      // So we have to do it manually. If WebView is not visible and still have focus, we have to reset it.
+@@ -409,7 +409,7 @@
+   {$ELSE}
+     Bounds := TRectF.Create(0,0,FWebControl.Width,FWebControl.Height);
+     Bounds.Fit(FWebControl.AbsoluteRect);
+-    View := WindowHandleToPlatform(Form.Handle).View;
++    View := WindowHandleToPlatform(fForm.Handle).View;
+     View.addSubview(FWebView);
+     if SameValue(Bounds.Width, 0) or SameValue(Bounds.Height, 0) then
+       FWebView.setHidden(True)
 @@ -424,6 +424,24 @@
      FWebView.setHidden(True);
  end;
@@ -951,9 +1014,9 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Cocoa.pas b/embarcader
  function TCommonWBService.DoCreateWebBrowser: ICustomBrowser;
 Index: fmx/FMX.WebBrowser.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.pas b/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.WebBrowser.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.WebBrowser.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.WebBrowser.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.WebBrowser.pas	(working copy)
 @@ -40,6 +40,7 @@
      function GetParent: TFmxObject;
      function GetVisible : Boolean;
@@ -987,9 +1050,9 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.pas b/embarcadero/sydn
    if Assigned(FOnDidFailLoadWithError) then
 Index: fmx/FMX.WebBrowser.Win.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Win.pas b/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Win.pas
---- a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Win.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Win.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.WebBrowser.Win.pas b/Embarcadero/Sydney/10_4_2/fmx/FMX.WebBrowser.Win.pas
+--- a/Embarcadero/Sydney/10_4_2/fmx/FMX.WebBrowser.Win.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/fmx/FMX.WebBrowser.Win.pas	(working copy)
 @@ -70,6 +70,7 @@
      procedure SetWebBrowserControl(const AValue: TCustomWebBrowser);
      function GetVisible: Boolean;
@@ -1012,9 +1075,9 @@ diff --git a/embarcadero/sydney/10_4_2/fmx/FMX.WebBrowser.Win.pas b/embarcadero/
    case Command of
 Index: rtl/android/Androidapi.JNI.App.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.App.pas b/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.App.pas
---- a/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.App.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.App.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/rtl/android/Androidapi.JNI.App.pas b/Embarcadero/Sydney/10_4_2/rtl/android/Androidapi.JNI.App.pas
+--- a/Embarcadero/Sydney/10_4_2/rtl/android/Androidapi.JNI.App.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/rtl/android/Androidapi.JNI.App.pas	(working copy)
 @@ -16,7 +16,8 @@
    Androidapi.JNI.JavaTypes,
    Androidapi.JNI.Os,
@@ -1083,9 +1146,9 @@ diff --git a/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.App.pas b/emba
    TRegTypes.RegisterType('Androidapi.JNI.App.JActionBar_OnMenuVisibilityListener', TypeInfo(Androidapi.JNI.App.JActionBar_OnMenuVisibilityListener));
 Index: rtl/android/Androidapi.JNI.Location.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.Location.pas b/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.Location.pas
---- a/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.Location.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.Location.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/rtl/android/Androidapi.JNI.Location.pas b/Embarcadero/Sydney/10_4_2/rtl/android/Androidapi.JNI.Location.pas
+--- a/Embarcadero/Sydney/10_4_2/rtl/android/Androidapi.JNI.Location.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/rtl/android/Androidapi.JNI.Location.pas	(working copy)
 @@ -660,6 +660,7 @@
      procedure unregisterGnssMeasurementsCallback(callback: JGnssMeasurementsEvent_Callback); cdecl;
      procedure unregisterGnssNavigationMessageCallback(callback: JGnssNavigationMessage_Callback); cdecl;
@@ -1096,9 +1159,9 @@ diff --git a/embarcadero/sydney/10_4_2/rtl/android/Androidapi.JNI.Location.pas b
  
 Index: rtl/ios/iOSapi.AVFoundation.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.AVFoundation.pas b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.AVFoundation.pas
---- a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.AVFoundation.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.AVFoundation.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.AVFoundation.pas b/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.AVFoundation.pas
+--- a/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.AVFoundation.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.AVFoundation.pas	(working copy)
 @@ -730,6 +730,8 @@
      function timedMetadata: NSArray; cdecl;
      function tracks: NSArray; cdecl;
@@ -1110,9 +1173,9 @@ diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.AVFoundation.pas b/embarca
  
 Index: rtl/ios/iOSapi.CoreImage.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreImage.pas b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreImage.pas
---- a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreImage.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreImage.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.CoreImage.pas b/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.CoreImage.pas
+--- a/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.CoreImage.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.CoreImage.pas	(working copy)
 @@ -218,8 +218,25 @@
    end;
    TCIFaceFeature = class(TOCGenericImport<CIFaceFeatureClass, CIFaceFeature>)  end;
@@ -1142,9 +1205,9 @@ diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreImage.pas b/embarcader
  end.
 Index: rtl/ios/iOSapi.CoreLocation.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreLocation.pas b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreLocation.pas
---- a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreLocation.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreLocation.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.CoreLocation.pas b/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.CoreLocation.pas
+--- a/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.CoreLocation.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.CoreLocation.pas	(working copy)
 @@ -33,7 +33,7 @@
    kCLAuthorizationStatusNotDetermined = 0;
    kCLAuthorizationStatusRestricted = 1;
@@ -1211,9 +1274,9 @@ diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.CoreLocation.pas b/embarca
      function containsCoordinate(coordinate: CLLocationCoordinate2D): Boolean; cdecl;
 Index: rtl/ios/iOSapi.Foundation.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Foundation.pas b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Foundation.pas
---- a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Foundation.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Foundation.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.Foundation.pas b/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.Foundation.pas
+--- a/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.Foundation.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.Foundation.pas	(working copy)
 @@ -5566,8 +5566,28 @@
        downloadTask: NSURLSessionDownloadTask; didResumeAtOffset: Int64; expectedTotalBytes: Int64); cdecl;
    end;
@@ -1302,9 +1365,9 @@ diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Foundation.pas b/embarcade
      Result := GetProcAddress(FrameworkMod, PWideChar(ConstStr));
 Index: rtl/ios/iOSapi.Security.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Security.pas b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Security.pas
---- a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Security.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Security.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.Security.pas b/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.Security.pas
+--- a/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.Security.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.Security.pas	(working copy)
 @@ -620,6 +620,8 @@
  function kSecAttrKeyClassSymmetric: NSString;
  function kSecAttrKeyTypeRSA: NSString;
@@ -1335,9 +1398,9 @@ diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.Security.pas b/embarcadero
  initialization
 Index: rtl/ios/iOSapi.UIKit.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.UIKit.pas b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.UIKit.pas
---- a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.UIKit.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.UIKit.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.UIKit.pas b/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.UIKit.pas
+--- a/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.UIKit.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/rtl/ios/iOSapi.UIKit.pas	(working copy)
 @@ -3828,7 +3828,7 @@
      function currentUserNotificationSettings: UIUserNotificationSettings; cdecl;
      function delegate: UIApplicationDelegate; cdecl;
@@ -1460,9 +1523,9 @@ diff --git a/embarcadero/sydney/10_4_2/rtl/ios/iOSapi.UIKit.pas b/embarcadero/sy
  initialization
 Index: rtl/win/Winapi.Isapi2.pas
 ===================================================================
-diff --git a/embarcadero/sydney/10_4_2/rtl/win/Winapi.Isapi2.pas b/embarcadero/sydney/10_4_2/rtl/win/Winapi.Isapi2.pas
---- a/embarcadero/sydney/10_4_2/rtl/win/Winapi.Isapi2.pas	(revision 25178)
-+++ b/embarcadero/sydney/10_4_2/rtl/win/Winapi.Isapi2.pas	(working copy)
+diff --git a/Embarcadero/Sydney/10_4_2/rtl/win/Winapi.Isapi2.pas b/Embarcadero/Sydney/10_4_2/rtl/win/Winapi.Isapi2.pas
+--- a/Embarcadero/Sydney/10_4_2/rtl/win/Winapi.Isapi2.pas	(revision 26937)
++++ b/Embarcadero/Sydney/10_4_2/rtl/win/Winapi.Isapi2.pas	(working copy)
 @@ -397,7 +397,7 @@
      dwReserved: DWORD): Pointer; stdcall;
  

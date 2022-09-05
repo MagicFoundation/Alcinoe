@@ -60,3 +60,7 @@
 {$IF defined(MACOS) and not defined(IOS)}
   {$DEFINE ALMacOS} 
 {$ENDIF}
+
+{$IF not defined(MSWINDOWS)}
+  {$DEFINE ALHttpGzipAuto}
+{$ENDIF}

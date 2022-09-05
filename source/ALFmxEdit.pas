@@ -168,6 +168,7 @@ type
     destructor Destroy; override;
     procedure RecalcOpacity; override;
     procedure RecalcEnabled; override;
+    function HasNativeView: boolean;
     Procedure AddNativeView;
     Procedure RemoveNativeView;
     Procedure setSelection(const aStart: integer; const aStop: Integer); overload;
@@ -300,6 +301,7 @@ type
     destructor Destroy; override;
     procedure RecalcOpacity; override;
     procedure RecalcEnabled; override;
+    function HasNativeView: boolean;
     Procedure AddNativeView;
     Procedure RemoveNativeView;
     function PointInObjectLocal(X: Single; Y: Single): Boolean; override;
@@ -324,8 +326,7 @@ type
 
 type
 
-  {*************************}
-  [ComponentPlatforms($FFFF)]
+  {***************************}
   TALEdit = class(TALRectangle)
   private
     fDefStyleAttr: String;
@@ -402,6 +403,7 @@ type
     {$ELSEIF defined(IOS)}
     property IosTextField: TALIosTextField read GetIosTextField;
     {$ENDIF}
+    function HasNativeView: boolean;
     Procedure AddNativeView;
     Procedure RemoveNativeView;
     Procedure setSelection(const aStart: integer; const aStop: Integer); overload;
@@ -1181,6 +1183,12 @@ begin
   FEditText.SetAbsoluteEnabled(AbsoluteEnabled);
 end;
 
+{*********************************************}
+function TalAndroidEdit.HasNativeView: boolean;
+begin
+  result := visible;
+end;
+
 {*************************************}
 Procedure TalAndroidEdit.AddNativeView;
 begin
@@ -1811,6 +1819,12 @@ begin
   FTextField.SetAbsoluteEnabled(AbsoluteEnabled);
 end;
 
+{*****************************************}
+function TalIosEdit.HasNativeView: boolean;
+begin
+  result := visible;
+end;
+
 {*********************************}
 Procedure TalIosEdit.AddNativeView;
 begin
@@ -2345,6 +2359,17 @@ function TALEdit.GetContainFocus: Boolean;
 begin
   if FEditControl = nil then CreateEditControl;
   result := isFocused or FEditControl.IsFocused;
+end;
+
+{**************************************}
+function TALEdit.HasNativeView: Boolean;
+begin
+  if FEditControl = nil then CreateEditControl;
+  {$IF defined(android) or defined(ios)}
+  result := FeditControl.HasNativeView;
+  {$ELSE}
+  result := false;
+  {$ENDIF}
 end;
 
 {******************************}

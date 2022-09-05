@@ -58,9 +58,11 @@ contains
   ALFmxFilterEffects in 'ALFmxFilterEffects.pas',
   ALFmxAni in 'ALFmxAni.pas',
   ALFmxConfetti in 'ALFmxConfetti.pas',
-  ALFiles in 'ALFiles.pas';
+  ALFiles in 'ALFiles.pas',
+  ALFmxBreakText in 'ALFmxBreakText.pas';
 
 end.
+
 
 
 

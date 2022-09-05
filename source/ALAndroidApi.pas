@@ -35,8 +35,6 @@ type
   JPreferenceManager = interface;
   JAsyncTask_Status = interface;
   JAsyncTask = interface;
-  JChoreographer = interface;
-  JChoreographer_FrameCallback = interface;
   JALBroadcastReceiverListener = interface;
   JALBroadcastReceiver = interface;
   JRuntime = interface;
@@ -268,35 +266,6 @@ type
     function get(timeout: Int64; &unit: JTimeUnit): JObject; cdecl; overload;
   end;
   TJAsyncTask = class(TJavaGenericImport<JAsyncTaskClass, JAsyncTask>) end;
-
-  {*******************************************}
-  JChoreographerClass = interface(JObjectClass)
-    ['{EEA5A7FB-9148-4A16-A835-50622172A47D}']
-    {class} function getInstance: JChoreographer; cdecl;
-  end;
-
-  {*******************************************}
-  [JavaSignature('android/view/Choreographer')]
-  JChoreographer = interface(JObject)
-    ['{C5D38D1C-AA30-49D7-A98F-E1A4E2AFED4D}']
-    procedure removeFrameCallback(callback: JChoreographer_FrameCallback); cdecl;
-    procedure postFrameCallback(callback: JChoreographer_FrameCallback); cdecl;
-    procedure postFrameCallbackDelayed(callback: JChoreographer_FrameCallback; delayMillis: Int64); cdecl;
-  end;
-  TJChoreographer = class(TJavaGenericImport<JChoreographerClass, JChoreographer>) end;
-
-  {*******************************************************}
-  JChoreographer_FrameCallbackClass = interface(IJavaClass)
-    ['{5E2EB024-1023-47DA-A6D2-606B779E70C2}']
-    procedure doFrame(frameTimeNanos: Int64); cdecl;
-  end;
-
-  {*********************************************************}
-  [JavaSignature('android/view/Choreographer$FrameCallback')]
-  JChoreographer_FrameCallback = interface(IJavaInstance)
-    ['{305C5D2F-8277-401F-A56A-784912F8CF6E}']
-  end;
-  TJChoreographer_FrameCallback = class(TJavaGenericImport<JChoreographer_FrameCallbackClass, JChoreographer_FrameCallback>) end;
 
   {*******************************************************}
   JALBroadcastReceiverListenerClass = interface(IJavaClass)
@@ -827,8 +796,6 @@ begin
   TRegTypes.RegisterType('ALAndroidApi.JPreferenceManager', TypeInfo(ALAndroidApi.JPreferenceManager));
   TRegTypes.RegisterType('ALAndroidApi.JAsyncTask_Status', TypeInfo(ALAndroidApi.JAsyncTask_Status));
   TRegTypes.RegisterType('ALAndroidApi.JAsyncTask', TypeInfo(ALAndroidApi.JAsyncTask));
-  TRegTypes.RegisterType('ALAndroidApi.JChoreographer', TypeInfo(ALAndroidApi.JChoreographer));
-  TRegTypes.RegisterType('ALAndroidApi.JChoreographer_FrameCallback', TypeInfo(ALAndroidApi.JChoreographer_FrameCallback));
   TRegTypes.RegisterType('ALAndroidApi.JALBroadcastReceiverListener', TypeInfo(ALAndroidApi.JALBroadcastReceiverListener));
   TRegTypes.RegisterType('ALAndroidApi.JALBroadcastReceiver', TypeInfo(ALAndroidApi.JALBroadcastReceiver));
   TRegTypes.RegisterType('ALAndroidApi.JRuntime', TypeInfo(ALAndroidApi.JRuntime));

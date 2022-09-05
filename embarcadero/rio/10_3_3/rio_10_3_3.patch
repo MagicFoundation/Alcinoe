@@ -1,8 +1,8 @@
 Index: fmx/FMX.Ani.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Ani.pas b/embarcadero/rio/10_3_3/fmx/FMX.Ani.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.Ani.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.Ani.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.Ani.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.Ani.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.Ani.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.Ani.pas	(working copy)
 @@ -11,6 +11,7 @@
  
  interface
@@ -74,9 +74,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Ani.pas b/embarcadero/rio/10_3_3/fmx
      end;
 Index: fmx/FMX.Canvas.D2D.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Canvas.D2D.pas b/embarcadero/rio/10_3_3/fmx/FMX.Canvas.D2D.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.Canvas.D2D.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.Canvas.D2D.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.Canvas.D2D.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.Canvas.D2D.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.Canvas.D2D.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.Canvas.D2D.pas	(working copy)
 @@ -103,8 +103,8 @@
    private
      FStateBlock: ID2D1DrawingStateBlock;
@@ -558,9 +558,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Canvas.D2D.pas b/embarcadero/rio/10_
  end.
 Index: fmx/FMX.Canvas.GPU.Helpers.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Canvas.GPU.Helpers.pas b/embarcadero/rio/10_3_3/fmx/FMX.Canvas.GPU.Helpers.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.Canvas.GPU.Helpers.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.Canvas.GPU.Helpers.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.Canvas.GPU.Helpers.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.Canvas.GPU.Helpers.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.Canvas.GPU.Helpers.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.Canvas.GPU.Helpers.pas	(working copy)
 @@ -12,11 +12,12 @@
  
  interface
@@ -612,9 +612,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Canvas.GPU.Helpers.pas b/embarcadero
    end else if FCurrentMaterial <> FSolidMat then
 Index: fmx/FMX.Canvas.GPU.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Canvas.GPU.pas b/embarcadero/rio/10_3_3/fmx/FMX.Canvas.GPU.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.Canvas.GPU.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.Canvas.GPU.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.Canvas.GPU.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.Canvas.GPU.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.Canvas.GPU.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.Canvas.GPU.pas	(working copy)
 @@ -73,6 +73,8 @@
  procedure RegisterCanvasClasses;
  procedure UnregisterCanvasClasses;
@@ -639,9 +639,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Canvas.GPU.pas b/embarcadero/rio/10_
    TCustomCanvasGpu.AlignToPixels := False;
 Index: fmx/FMX.Context.GLES.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Context.GLES.pas b/embarcadero/rio/10_3_3/fmx/FMX.Context.GLES.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.Context.GLES.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.Context.GLES.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.Context.GLES.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.Context.GLES.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.Context.GLES.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.Context.GLES.pas	(working copy)
 @@ -150,7 +150,7 @@
  {$IFDEF MACOS}
    Macapi.CoreFoundation,
@@ -691,9 +691,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Context.GLES.pas b/embarcadero/rio/1
          glActiveTexture(GL_TEXTURE0);
 Index: fmx/FMX.Controls.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Controls.pas b/embarcadero/rio/10_3_3/fmx/FMX.Controls.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.Controls.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.Controls.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.Controls.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.Controls.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.Controls.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.Controls.pas	(working copy)
 @@ -113,7 +113,7 @@
      /// <summary>Register a class to create hint instances. When a new THint instance is needed, the registered classes are invoked
      /// to create the needed instance.</summary>
@@ -879,9 +879,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Controls.pas b/embarcadero/rio/10_3_
  {$ELSE !LONGINT64}
 Index: fmx/FMX.Dialogs.iOS.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Dialogs.iOS.pas b/embarcadero/rio/10_3_3/fmx/FMX.Dialogs.iOS.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.Dialogs.iOS.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.Dialogs.iOS.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.Dialogs.iOS.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.Dialogs.iOS.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.Dialogs.iOS.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.Dialogs.iOS.pas	(working copy)
 @@ -242,7 +242,7 @@
    try
      AlertView := TUIAlertView.Wrap(AlertView.initWithTitle(StrToNSStr(Translate(MsgTitles[ADialogType])), StrToNSStr(AMessage),
@@ -929,9 +929,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Dialogs.iOS.pas b/embarcadero/rio/10
        SetLength(FResults, Length(FResults) + 1);
 Index: fmx/FMX.Filter.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Filter.pas b/embarcadero/rio/10_3_3/fmx/FMX.Filter.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.Filter.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.Filter.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.Filter.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.Filter.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.Filter.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.Filter.pas	(working copy)
 @@ -11,6 +11,7 @@
  
  interface
@@ -977,9 +977,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Filter.pas b/embarcadero/rio/10_3_3/
  
 Index: fmx/FMX.Forms.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Forms.pas b/embarcadero/rio/10_3_3/fmx/FMX.Forms.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.Forms.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.Forms.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.Forms.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.Forms.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.Forms.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.Forms.pas	(working copy)
 @@ -9,6 +9,7 @@
  
  unit FMX.Forms;
@@ -1026,9 +1026,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Forms.pas b/embarcadero/rio/10_3_3/f
    begin
 Index: fmx/FMX.Graphics.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Graphics.pas b/embarcadero/rio/10_3_3/fmx/FMX.Graphics.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.Graphics.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.Graphics.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.Graphics.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.Graphics.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.Graphics.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.Graphics.pas	(working copy)
 @@ -2859,6 +2859,9 @@
    if FFontColor <> Value then
    begin
@@ -1060,9 +1060,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Graphics.pas b/embarcadero/rio/10_3_
  procedure TCanvas.MeasureLines(const ALines: TLineMetricInfo; const ARect: TRectF; const AText: string; const WordWrap: Boolean; const Flags: TFillTextFlags;
 Index: fmx/FMX.Materials.Canvas.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Materials.Canvas.pas b/embarcadero/rio/10_3_3/fmx/FMX.Materials.Canvas.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.Materials.Canvas.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.Materials.Canvas.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.Materials.Canvas.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.Materials.Canvas.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.Materials.Canvas.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.Materials.Canvas.pas	(working copy)
 @@ -269,18 +269,46 @@
        $00, $00, $00, $00, $00, $00, $00, $00, $03, $00, $00, $00, $00, $00, $00, $00, $0F, $00, $00, $00, $53, $56, $5F, $54, $61, $72, $67, $65, $74, $00, $AB, $AB], [
        TContextShaderVariable.Create('texture0', TContextShaderVariableKind.Texture, 0, 0)]
@@ -1124,9 +1124,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Materials.Canvas.pas b/embarcadero/r
  end;
 Index: fmx/FMX.Platform.Android.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Platform.Android.pas b/embarcadero/rio/10_3_3/fmx/FMX.Platform.Android.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.Platform.Android.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.Platform.Android.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.Platform.Android.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.Platform.Android.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.Platform.Android.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.Platform.Android.pas	(working copy)
 @@ -100,6 +100,8 @@
      FRunning: Boolean;
      FTerminating: Boolean;
@@ -1216,9 +1216,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Platform.Android.pas b/embarcadero/r
        TMessageManager.DefaultManager.SendMessage(Self, TSaveStateMessage.Create);
 Index: fmx/FMX.Platform.iOS.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Platform.iOS.pas b/embarcadero/rio/10_3_3/fmx/FMX.Platform.iOS.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.Platform.iOS.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.Platform.iOS.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.Platform.iOS.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.Platform.iOS.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.Platform.iOS.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.Platform.iOS.pas	(working copy)
 @@ -11,18 +11,75 @@
  
  interface
@@ -1547,9 +1547,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Platform.iOS.pas b/embarcadero/rio/1
  procedure TNotificationCenterDelegate.userNotificationCenter(center: UNUserNotificationCenter;
 Index: fmx/FMX.Platform.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Platform.pas b/embarcadero/rio/10_3_3/fmx/FMX.Platform.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.Platform.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.Platform.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.Platform.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.Platform.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.Platform.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.Platform.pas	(working copy)
 @@ -417,7 +417,8 @@
  
    TPushDeviceTokenData = record
@@ -1574,9 +1574,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Platform.pas b/embarcadero/rio/10_3_
  { TPushFailToRegisterData }
 Index: fmx/FMX.Platform.UI.Android.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Platform.UI.Android.pas b/embarcadero/rio/10_3_3/fmx/FMX.Platform.UI.Android.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.Platform.UI.Android.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.Platform.UI.Android.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.Platform.UI.Android.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.Platform.UI.Android.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.Platform.UI.Android.pas	(working copy)
 @@ -420,7 +420,8 @@
  uses
    System.SysUtils, System.Math, System.Rtti, System.RTLConsts, System.DateUtils, System.Diagnostics,
@@ -1634,9 +1634,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Platform.UI.Android.pas b/embarcader
        // If previous form doesn't have allocated surface holder, we should wait when form will take it
 Index: fmx/FMX.StrokeBuilder.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.StrokeBuilder.pas b/embarcadero/rio/10_3_3/fmx/FMX.StrokeBuilder.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.StrokeBuilder.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.StrokeBuilder.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.StrokeBuilder.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.StrokeBuilder.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.StrokeBuilder.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.StrokeBuilder.pas	(working copy)
 @@ -1074,9 +1074,11 @@
    FUndeterminedMode := True;
    InitArrayPointers;
@@ -1654,9 +1654,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.StrokeBuilder.pas b/embarcadero/rio/
  
 Index: fmx/FMX.Types3D.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Types3D.pas b/embarcadero/rio/10_3_3/fmx/FMX.Types3D.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.Types3D.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.Types3D.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.Types3D.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.Types3D.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.Types3D.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.Types3D.pas	(working copy)
 @@ -456,8 +456,11 @@
      FBits: Pointer;
      FContextLostId: Integer;
@@ -1780,9 +1780,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.Types3D.pas b/embarcadero/rio/10_3_3
  procedure TTexture.SetStyle(const Value: TTextureStyles);
 Index: fmx/FMX.VirtualKeyboard.Android.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.VirtualKeyboard.Android.pas b/embarcadero/rio/10_3_3/fmx/FMX.VirtualKeyboard.Android.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.VirtualKeyboard.Android.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.VirtualKeyboard.Android.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.VirtualKeyboard.Android.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.VirtualKeyboard.Android.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.VirtualKeyboard.Android.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.VirtualKeyboard.Android.pas	(working copy)
 @@ -36,6 +36,7 @@
    private
      FKeyboardStateListener: TKeyboardStateChangedListener;
@@ -1841,9 +1841,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.VirtualKeyboard.Android.pas b/embarc
  end.
 Index: fmx/FMX.WebBrowser.Android.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.Android.pas b/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.Android.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.Android.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.Android.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.WebBrowser.Android.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.WebBrowser.Android.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.WebBrowser.Android.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.WebBrowser.Android.pas	(working copy)
 @@ -20,7 +20,7 @@
  uses
    System.Classes, System.Types, System.StrUtils, System.SysUtils,  System.RTLConsts, Androidapi.JNI.Webkit,
@@ -1958,9 +1958,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.Android.pas b/embarcadero
  function TAndroidWBService.DoCreateWebBrowser: ICustomBrowser;
 Index: fmx/FMX.WebBrowser.Cocoa.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.Cocoa.pas b/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.Cocoa.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.Cocoa.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.Cocoa.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.WebBrowser.Cocoa.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.WebBrowser.Cocoa.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.WebBrowser.Cocoa.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.WebBrowser.Cocoa.pas	(working copy)
 @@ -130,6 +130,7 @@
  
    TCommonWebBrowserService = class(TInterfacedObject, ICustomBrowser)
@@ -2038,9 +2038,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.Cocoa.pas b/embarcadero/r
  function TCommonWBService.DoCreateWebBrowser: ICustomBrowser;
 Index: fmx/FMX.WebBrowser.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.pas b/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.WebBrowser.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.WebBrowser.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.WebBrowser.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.WebBrowser.pas	(working copy)
 @@ -40,6 +40,7 @@
      function GetParent: TFmxObject;
      function GetVisible : Boolean;
@@ -2083,9 +2083,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.pas b/embarcadero/rio/10_
    if Assigned(FOnDidFailLoadWithError) then
 Index: fmx/FMX.WebBrowser.Win.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.Win.pas b/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.Win.pas
---- a/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.Win.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.Win.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/fmx/FMX.WebBrowser.Win.pas b/Embarcadero/Rio/10_3_3/fmx/FMX.WebBrowser.Win.pas
+--- a/Embarcadero/Rio/10_3_3/fmx/FMX.WebBrowser.Win.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/fmx/FMX.WebBrowser.Win.pas	(working copy)
 @@ -69,6 +69,7 @@
      procedure SetWebBrowserControl(const AValue: TCustomWebBrowser);
      function GetVisible: Boolean;
@@ -2108,9 +2108,9 @@ diff --git a/embarcadero/rio/10_3_3/fmx/FMX.WebBrowser.Win.pas b/embarcadero/rio
    case Command of
 Index: rtl/android/Androidapi.JNI.App.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/rtl/android/Androidapi.JNI.App.pas b/embarcadero/rio/10_3_3/rtl/android/Androidapi.JNI.App.pas
---- a/embarcadero/rio/10_3_3/rtl/android/Androidapi.JNI.App.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/rtl/android/Androidapi.JNI.App.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/rtl/android/Androidapi.JNI.App.pas b/Embarcadero/Rio/10_3_3/rtl/android/Androidapi.JNI.App.pas
+--- a/Embarcadero/Rio/10_3_3/rtl/android/Androidapi.JNI.App.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/rtl/android/Androidapi.JNI.App.pas	(working copy)
 @@ -16,7 +16,8 @@
    Androidapi.JNI.JavaTypes,
    Androidapi.JNI.Os,
@@ -2179,9 +2179,9 @@ diff --git a/embarcadero/rio/10_3_3/rtl/android/Androidapi.JNI.App.pas b/embarca
    TRegTypes.RegisterType('Androidapi.JNI.App.JActionBar_OnMenuVisibilityListener', TypeInfo(Androidapi.JNI.App.JActionBar_OnMenuVisibilityListener));
 Index: rtl/android/Androidapi.JNI.Location.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/rtl/android/Androidapi.JNI.Location.pas b/embarcadero/rio/10_3_3/rtl/android/Androidapi.JNI.Location.pas
---- a/embarcadero/rio/10_3_3/rtl/android/Androidapi.JNI.Location.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/rtl/android/Androidapi.JNI.Location.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/rtl/android/Androidapi.JNI.Location.pas b/Embarcadero/Rio/10_3_3/rtl/android/Androidapi.JNI.Location.pas
+--- a/Embarcadero/Rio/10_3_3/rtl/android/Androidapi.JNI.Location.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/rtl/android/Androidapi.JNI.Location.pas	(working copy)
 @@ -660,6 +660,7 @@
      procedure unregisterGnssMeasurementsCallback(callback: JGnssMeasurementsEvent_Callback); cdecl;
      procedure unregisterGnssNavigationMessageCallback(callback: JGnssNavigationMessage_Callback); cdecl;
@@ -2192,9 +2192,9 @@ diff --git a/embarcadero/rio/10_3_3/rtl/android/Androidapi.JNI.Location.pas b/em
  
 Index: rtl/ios/iOSapi.AVFoundation.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/rtl/ios/iOSapi.AVFoundation.pas b/embarcadero/rio/10_3_3/rtl/ios/iOSapi.AVFoundation.pas
---- a/embarcadero/rio/10_3_3/rtl/ios/iOSapi.AVFoundation.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/rtl/ios/iOSapi.AVFoundation.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.AVFoundation.pas b/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.AVFoundation.pas
+--- a/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.AVFoundation.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.AVFoundation.pas	(working copy)
 @@ -131,7 +131,12 @@
    AVPlayerStatusFailed = 2;
    AVPlayerStatusReadyToPlay = 1;
@@ -2250,9 +2250,9 @@ diff --git a/embarcadero/rio/10_3_3/rtl/ios/iOSapi.AVFoundation.pas b/embarcader
      ['{A8ECC90F-6016-44A4-BB84-8FB720CF786D}']
 Index: rtl/ios/iOSapi.CoreImage.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/rtl/ios/iOSapi.CoreImage.pas b/embarcadero/rio/10_3_3/rtl/ios/iOSapi.CoreImage.pas
---- a/embarcadero/rio/10_3_3/rtl/ios/iOSapi.CoreImage.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/rtl/ios/iOSapi.CoreImage.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.CoreImage.pas b/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.CoreImage.pas
+--- a/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.CoreImage.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.CoreImage.pas	(working copy)
 @@ -218,8 +218,25 @@
    end;
    TCIFaceFeature = class(TOCGenericImport<CIFaceFeatureClass, CIFaceFeature>)  end;
@@ -2282,9 +2282,9 @@ diff --git a/embarcadero/rio/10_3_3/rtl/ios/iOSapi.CoreImage.pas b/embarcadero/r
  end.
 Index: rtl/ios/iOSapi.CoreLocation.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/rtl/ios/iOSapi.CoreLocation.pas b/embarcadero/rio/10_3_3/rtl/ios/iOSapi.CoreLocation.pas
---- a/embarcadero/rio/10_3_3/rtl/ios/iOSapi.CoreLocation.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/rtl/ios/iOSapi.CoreLocation.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.CoreLocation.pas b/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.CoreLocation.pas
+--- a/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.CoreLocation.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.CoreLocation.pas	(working copy)
 @@ -33,7 +33,7 @@
    kCLAuthorizationStatusNotDetermined = 0;
    kCLAuthorizationStatusRestricted = 1;
@@ -2351,9 +2351,9 @@ diff --git a/embarcadero/rio/10_3_3/rtl/ios/iOSapi.CoreLocation.pas b/embarcader
      function containsCoordinate(coordinate: CLLocationCoordinate2D): Boolean; cdecl;
 Index: rtl/ios/iOSapi.Foundation.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/rtl/ios/iOSapi.Foundation.pas b/embarcadero/rio/10_3_3/rtl/ios/iOSapi.Foundation.pas
---- a/embarcadero/rio/10_3_3/rtl/ios/iOSapi.Foundation.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/rtl/ios/iOSapi.Foundation.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.Foundation.pas b/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.Foundation.pas
+--- a/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.Foundation.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.Foundation.pas	(working copy)
 @@ -1651,6 +1651,10 @@
      procedure performSelectorOnMainThread(aSelector: SEL; withObject: Pointer; waitUntilDone: Boolean;
        modes: NSArray); cdecl;
@@ -2453,9 +2453,9 @@ diff --git a/embarcadero/rio/10_3_3/rtl/ios/iOSapi.Foundation.pas b/embarcadero/
      Result := GetProcAddress(FrameworkMod, PWideChar(ConstStr));
 Index: rtl/ios/iOSapi.Security.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/rtl/ios/iOSapi.Security.pas b/embarcadero/rio/10_3_3/rtl/ios/iOSapi.Security.pas
---- a/embarcadero/rio/10_3_3/rtl/ios/iOSapi.Security.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/rtl/ios/iOSapi.Security.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.Security.pas b/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.Security.pas
+--- a/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.Security.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.Security.pas	(working copy)
 @@ -620,6 +620,8 @@
  function kSecAttrKeyClassSymmetric: NSString;
  function kSecAttrKeyTypeRSA: NSString;
@@ -2486,9 +2486,9 @@ diff --git a/embarcadero/rio/10_3_3/rtl/ios/iOSapi.Security.pas b/embarcadero/ri
  initialization
 Index: rtl/ios/iOSapi.UIKit.pas
 ===================================================================
-diff --git a/embarcadero/rio/10_3_3/rtl/ios/iOSapi.UIKit.pas b/embarcadero/rio/10_3_3/rtl/ios/iOSapi.UIKit.pas
---- a/embarcadero/rio/10_3_3/rtl/ios/iOSapi.UIKit.pas	(revision 25033)
-+++ b/embarcadero/rio/10_3_3/rtl/ios/iOSapi.UIKit.pas	(working copy)
+diff --git a/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.UIKit.pas b/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.UIKit.pas
+--- a/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.UIKit.pas	(revision 25033)
++++ b/Embarcadero/Rio/10_3_3/rtl/ios/iOSapi.UIKit.pas	(working copy)
 @@ -1385,7 +1385,18 @@
    {$EXTERNALSYM UIUserInterfaceSizeClassCompact}
    UIUserInterfaceSizeClassRegular = 2;

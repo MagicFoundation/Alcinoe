@@ -13,6 +13,6 @@ To create the patch file:
 * Right click on it and select "TortoiseSVN > Create patch..."
 * Click OK
 * Select "Save in Git format" and save the file somewhere 
-* Update now the patch file by updating in it all paths to reflect the alcinoe SVN: 
+* Update now the patch file by updating in it all paths to reflect the Alcinoe SVN: 
   "embarcadero/<delphiName ex:sydney>/<delphiVersion ex:10_4_2>" 
    

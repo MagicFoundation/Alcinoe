@@ -18,7 +18,7 @@ this is very pity (and slow if you do this often). So I decided to make a
 "8 bit string framework" to help fully support of 8 bit string (but mostly
 in Unicode UTF8 as I thing local string must absolutely be avoided).
 
-In alcinoe generaly 8 bit string functions/classes will be call ALxxx and
+In Alcinoe generaly 8 bit string functions/classes will be call ALxxx and
 16 bit string functions/classes will be called ALxxxU (U for UnicodeString but
 was not the most clever choice as 8 bit string can be also Unicode but as emba
 call their 16 bit string UnicodeString we go in the same way). Under

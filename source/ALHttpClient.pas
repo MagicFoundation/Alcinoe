@@ -1,16 +1,6 @@
 {*******************************************************************************
-TALHttpClient is a ancestor of class like TALWinInetHttpClient or
-TALWinHttpClient
-
-http://www.w3.org/TR/REC-html40/interact/forms.html#h-17.1
-http://www.ietf.org/rfc/rfc1867.txt
-http://www.ietf.org/rfc/rfc2388.txt
-http://www.w3.org/MarkUp/html-spec/html-spec_8.html
-http://www.cs.tut.fi/~jkorpela/forms/methods.html
-http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
-http://wp.netscape.com/newsref/std/cookie_spec.html
+TALHttpClient is a ancestor of class like TALWinInetHttpClient or TALWinHttpClient
 *******************************************************************************}
-
 unit ALHttpClient;
 
 interface
@@ -19,14 +9,20 @@ interface
   {$MESSAGE WARN 'Check if Web.HTTPApp was not updated and adjust the IFDEF'}
 {$IFEND}
 
+{$I Alcinoe.inc}
+
 uses
+  {$IFNDEF ALHideAnsiString}
   System.SysUtils,
-  System.Classes,
   {$IFDEF MSWINDOWS}
   Winapi.Wininet,
   {$ENDIF}
   ALStringList,
-  ALMultiPartParser;
+  ALMultiPartParser,
+  {$ENDIF}
+  System.Classes;
+
+{$IFNDEF ALHideAnsiString}
 
 type
 
@@ -412,7 +408,6 @@ type
     property  OnRedirect: TAlHTTPClientRedirectEvent read FOnRedirect write SetOnRedirect;
   end;
 
-{Http Function}
 procedure ALHTTPEncodeParamNameValues(const ParamValues: TALStrings);
 procedure ALExtractHTTPFields(Separators,
                               WhiteSpace,
@@ -506,6 +501,12 @@ procedure ALIPv6SplitParts(const aIPv6: TALIPv6Binary;
                            var aLowestPart: UInt64;
                            var aHigestPart: UInt64);
 
+procedure ALDecompressHttpResponseContent(const aContentEncoding: AnsiString; var aContentStream: TMemoryStream);
+
+{$ENDIF}
+
+procedure ALDecompressHttpResponseContentU(const aContentEncoding: String; var aContentStream: TMemoryStream);
+
 Const
   cALHTTPCLient_MsgInvalidURL         = 'Invalid url ''%s'' - only supports ''http'' and ''https'' schemes';
   cALHTTPCLient_MsgInvalidHTTPRequest = 'Invalid HTTP Request: Length is 0';
@@ -513,10 +514,14 @@ Const
 
 implementation
 
+{$IFNDEF ALHideAnsiString}
 uses
   {$IFDEF MSWINDOWS}
   Winapi.Windows,
   {$ENDIF}
+  {$if not defined(ALHttpGzipAuto)}
+  system.zlib,
+  {$endif}
   Web.HttpApp,
   System.DateUtils,
   System.SysConst,
@@ -524,9 +529,12 @@ uses
   system.AnsiStrings,
   AlCommon,
   ALString;
+{$ENDIF}
 
-{***********************************************************************************}
-function AlStringFetch(var AInput: AnsiString; const ADelim: AnsiString): AnsiString;
+{$IFNDEF ALHideAnsiString}
+
+{************************************************************************************}
+function _AlStringFetch(var AInput: AnsiString; const ADelim: AnsiString): AnsiString;
 var
   LPos: Integer;
 begin
@@ -614,7 +622,7 @@ begin
 
     LCookieStr := ALTrim(AValue);
     while LCookieStr <> '' do
-      LCookieProp.Add(ALTrim(AlStringFetch(LCookieStr, ';')));
+      LCookieProp.Add(ALTrim(_AlStringFetch(LCookieStr, ';')));
     if LCookieProp.Count = 0 then exit;
 
     // Exemple of aCookieProp content :
@@ -809,19 +817,19 @@ begin
 
     If LRawHeaderLst.Count > 0 then begin
       LStatusLine := LRawHeaderLst[0]; //HTTP/1.1 200 OK | 200 OK | status: 200 OK
-      FHttpProtocolVersion := ALTrim(AlStringFetch(LStatusLine,' '));
+      FHttpProtocolVersion := ALTrim(_AlStringFetch(LStatusLine,' '));
       If AlIsInteger(FHttpProtocolVersion) then begin
         FStatusCode := FHttpProtocolVersion;
         FHttpProtocolVersion := '';
       end
-      else FStatusCode := ALTrim(AlStringFetch(LStatusLine,' '));
+      else FStatusCode := ALTrim(_AlStringFetch(LStatusLine,' '));
       FReasonPhrase := ALTrim(LStatusLine);
 
       If not AlIsInteger(FStatusCode) then begin
         FHttpProtocolVersion := '';
         LStatusLine := internalGetValue('Status');
-        FStatusCode := ALTrim(AlStringFetch(LStatusLine,' '));
-        FReasonPhrase := ALTrim(AlStringFetch(LStatusLine,' '));
+        FStatusCode := ALTrim(_AlStringFetch(LStatusLine,' '));
+        FReasonPhrase := ALTrim(_AlStringFetch(LStatusLine,' '));
       end
       else LRawHeaderLst.Delete(0);
     end
@@ -1942,6 +1950,64 @@ begin
   aHigestPart := UInt64(LIntRec);
 end;
 
+{***************************************************************************************************************}
+procedure ALDecompressHttpResponseContent(const aContentEncoding: AnsiString; var aContentStream: TMemoryStream);
+begin
+  {$if not defined(ALHttpGzipAuto)}
+  if ALSameText(aContentEncoding, 'gzip') then begin
+    aContentStream.position := 0;
+    var LDecompressionStream := TDecompressionStream.Create(aContentStream, 15 + 16); // 15 is the default mode.
+                                                                                      // 16 is to enable gzip mode.  http://www.zlib.net/manual.html#Advanced
+    try
+      var LTmpStream := TmemoryStream.Create;
+      try
+        LTmpStream.CopyFrom(LDecompressionStream, 0{Count});
+        ALFreeAndNil(aContentStream);
+        aContentStream := LTmpStream;
+        LTmpStream := nil;
+      except
+        AlFreeAndNil(LTmpStream);
+        raise;
+      end;
+    finally
+      alFreeAndNil(LDecompressionStream);
+    end;
+  end;
+  {$ENDIF}
+  aContentStream.Position := 0;
+end;
+
+{$ENDIF}
+
+{************************************************************************************************************}
+procedure ALDecompressHttpResponseContentU(const aContentEncoding: String; var aContentStream: TMemoryStream);
+begin
+  {$if not defined(ALHttpGzipAuto)}
+  if ALSameTextU(aContentEncoding, 'gzip') then begin
+    aContentStream.position := 0;
+    var LDecompressionStream := TDecompressionStream.Create(aContentStream, 15 + 16); // 15 is the default mode.
+                                                                                      // 16 is to enable gzip mode.  http://www.zlib.net/manual.html#Advanced
+    Try
+      var LTmpStream := TmemoryStream.Create;
+      try
+        LTmpStream.CopyFrom(LDecompressionStream, 0{Count});
+        ALFreeAndNil(aContentStream);
+        aContentStream := LTmpStream;
+        LTmpStream := nil;
+      except
+        AlFreeAndNil(LTmpStream);
+        raise;
+      end;
+    finally
+      alFreeAndNil(LDecompressionStream);
+    end;
+  end;
+  {$ENDIF}
+  aContentStream.Position := 0;
+end;
+
+{$IFNDEF ALHideAnsiString}
+
 {***********************************************************************************}
 constructor EALHTTPClientException.Create(const Msg: AnsiString; SCode: Integer = 0);
 begin
@@ -2531,6 +2597,8 @@ begin
     DoChange(3);
   end;
 end;
+
+{$ENDIF}
 
 end.
 

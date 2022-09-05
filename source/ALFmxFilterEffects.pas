@@ -601,7 +601,6 @@ Type
     function filter: TFilter;
   end;
 
-  [ComponentPlatforms($FFFF)]
   TALColorAdjustEffect = class(TImageFXEffect)
   private
     function GetContrast: Single;

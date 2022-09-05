@@ -100,7 +100,6 @@ type
   //also from smartphone to tablet i notice that to keep a good ratio i must increase all the font size, and image by 15%. So using multires
   //bitmap and if i want to avoid any resize (the purpose of multires bitmap as i understand) i must have 10 bitmaps per image !!
   //so all of this to say that multi-res bitmap is a fundamentally wrong concept
-  [ComponentPlatforms($FFFF)]
   TALImage = class(TControl)
   private
     fExifOrientationInfo: TalExifOrientationInfo;
@@ -109,11 +108,7 @@ type
     fResourceName: String;
     FWrapMode: TALImageWrapMode;
     FScreenScale: single;
-    {$IF DEFINED(ALUseTexture)}
-    fBufBitmap: TTexture;
-    {$ELSE}
-    fBufBitmap: Tbitmap;
-    {$ENDIF}
+    fBufBitmap: TALRasterImage;
     fBufBitmapRect: TRectF;
     fBufSize: TsizeF;
     procedure SetWrapMode(const Value: TALImageWrapMode);
@@ -121,19 +116,11 @@ type
     procedure setResourceName(const Value: String);
   protected
     procedure Paint; override;
-    {$IF DEFINED(ALUseTexture)}
-    property BufBitmap: TTexture read fBufBitmap;
-    {$ELSE}
-    property BufBitmap: Tbitmap read fBufBitmap;
-    {$ENDIF}
+    property BufBitmap: TALRasterImage read fBufBitmap;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    {$IF DEFINED(ALUseTexture)}
-    function MakeBufBitmap: TTexture; virtual;
-    {$ELSE}
-    function MakeBufBitmap: Tbitmap; virtual;
-    {$ENDIF}
+    function MakeBufBitmap: TALRasterImage; virtual;
     procedure clearBufBitmap; virtual;
   published
     property Align;
@@ -189,17 +176,12 @@ type
     {$ENDIF}
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~}
-  [ComponentPlatforms($FFFF)]
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALRectangle = class(TRectangle)
   private
     FScreenScale: single;
     fdoubleBuffered: boolean;
-    {$IF DEFINED(ALUseTexture)}
-    fBufBitmap: TTexture;
-    {$ELSE}
-    fBufBitmap: Tbitmap;
-    {$ENDIF}
+    fBufBitmap: TALRasterImage;
     fBufBitmapRect: TRectF;
     fBufSize: TsizeF;
     fShadow: TALShadow;
@@ -213,36 +195,23 @@ type
     procedure StrokeChanged(Sender: TObject); override;
     procedure ShadowChanged(Sender: TObject); virtual;
     procedure Paint; override;
-    {$IF DEFINED(ALUseTexture)}
-    property BufBitmap: TTexture read fBufBitmap;
-    {$ELSE}
-    property BufBitmap: Tbitmap read fBufBitmap;
-    {$ENDIF}
+    property BufBitmap: TALRasterImage read fBufBitmap;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    {$IF DEFINED(ALUseTexture)}
-    function MakeBufBitmap: TTexture; virtual;
-    {$ELSE}
-    function MakeBufBitmap: Tbitmap; virtual;
-    {$ENDIF}
+    function MakeBufBitmap: TALRasterImage; virtual;
     procedure clearBufBitmap; virtual;
   published
     property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default true;
     property shadow: TALShadow read fshadow write SetShadow;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~}
-  [ComponentPlatforms($FFFF)]
+  {~~~~~~~~~~~~~~~~~~~~~~~~}
   TALCircle = class(TCircle)
   private
     FScreenScale: single;
     fdoubleBuffered: boolean;
-    {$IF DEFINED(ALUseTexture)}
-    fBufBitmap: TTexture;
-    {$ELSE}
-    fBufBitmap: Tbitmap;
-    {$ENDIF}
+    fBufBitmap: TALRasterImage;
     fBufBitmapRect: TRectF;
     fBufSize: TsizeF;
     fShadow: TALShadow;
@@ -256,56 +225,35 @@ type
     procedure StrokeChanged(Sender: TObject); override;
     procedure ShadowChanged(Sender: TObject); virtual;
     procedure Paint; override;
-    {$IF DEFINED(ALUseTexture)}
-    property BufBitmap: TTexture read fBufBitmap;
-    {$ELSE}
-    property BufBitmap: Tbitmap read fBufBitmap;
-    {$ENDIF}
+    property BufBitmap: TALRasterImage read fBufBitmap;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    {$IF DEFINED(ALUseTexture)}
-    function MakeBufBitmap: TTexture; virtual;
-    {$ELSE}
-    function MakeBufBitmap: Tbitmap; virtual;
-    {$ENDIF}
+    function MakeBufBitmap: TALRasterImage; virtual;
     procedure clearBufBitmap; virtual;
   published
     property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default true;
     property shadow: TALShadow read fshadow write SetShadow;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~}
-  [ComponentPlatforms($FFFF)]
+  {~~~~~~~~~~~~~~~~~~~~}
   TALLine = class(TLine)
   private
     FScreenScale: single;
     fdoubleBuffered: boolean;
-    {$IF DEFINED(ALUseTexture)}
-    fBufBitmap: TTexture;
-    {$ELSE}
-    fBufBitmap: Tbitmap;
-    {$ENDIF}
+    fBufBitmap: TALRasterImage;
     fBufBitmapRect: TRectF;
     fBufSize: TsizeF;
     procedure SetdoubleBuffered(const Value: Boolean);
   protected
     procedure FillChanged(Sender: TObject); override;
     procedure StrokeChanged(Sender: TObject); override;
-    {$IF DEFINED(ALUseTexture)}
-    property BufBitmap: TTexture read fBufBitmap;
-    {$ELSE}
-    property BufBitmap: Tbitmap read fBufBitmap;
-    {$ENDIF}
+    property BufBitmap: TALRasterImage read fBufBitmap;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Paint; override;
-    {$IF DEFINED(ALUseTexture)}
-    function MakeBufBitmap: TTexture; virtual;
-    {$ELSE}
-    function MakeBufBitmap: Tbitmap; virtual;
-    {$ENDIF}
+    function MakeBufBitmap: TALRasterImage; virtual;
     procedure clearBufBitmap; virtual;
   published
     property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default true;
@@ -319,11 +267,7 @@ type
   private
     FScreenScale: single;
     [weak] fTextControl: TALText;
-    {$IF DEFINED(ALUseTexture)}
-    fBufBitmap: TTexture;
-    {$ELSE}
-    fBufBitmap: Tbitmap;
-    {$ENDIF}
+    fBufBitmap: TALRasterImage;
     fBufBitmapRect: TRectF;
     //-----
     fBufHorizontalAlign: TTextAlign;
@@ -354,11 +298,7 @@ type
   public
     constructor Create(const ACanvas: TCanvas; const aTextControl: TALText); reintroduce;
     destructor Destroy; override;
-    {$IF DEFINED(ALUseTexture)}
-    function MakeBufBitmap: TTexture; virtual;
-    {$ELSE}
-    function MakeBufBitmap: Tbitmap; virtual;
-    {$ENDIF}
+    function MakeBufBitmap: TALRasterImage; virtual;
     procedure clearBufBitmap; virtual;
     procedure ConvertToPath(const APath: TPathData); override;
   end;
@@ -375,7 +315,6 @@ type
   //       style to not have MakeBufBitmap called several times (applystyle
   //       don't call beginupdate/endupdate (crazy!!), so everytime a property of the
   //       TALText is updated, MakeBufBitmap is call again)
-  [ComponentPlatforms($FFFF)]
   TALText = class(TControl)
   private
     fRestoreLayoutUpdateAfterLoaded: boolean;
@@ -399,11 +338,7 @@ type
     procedure SetStroke(const Value: TStrokeBrush);
     function IsCornersStored: Boolean;
     function IsSidesStored: Boolean;
-    {$IF DEFINED(ALUseTexture)}
-    function GetBufBitmap: TTexture;
-    {$ELSE}
-    function GetBufBitmap: Tbitmap;
-    {$ENDIF}
+    function GetBufBitmap: TALRasterImage;
     function GetdoubleBuffered: Boolean;
     procedure SetdoubleBuffered(const Value: Boolean);
     procedure SetText(const Value: string);
@@ -429,11 +364,7 @@ type
     function IsMaxWidthStored: Boolean;
     function IsMaxHeightStored: Boolean;
   protected
-    {$IF DEFINED(ALUseTexture)}
-    property BufBitmap: TTexture read GetBufBitmap;
-    {$ELSE}
-    property BufBitmap: Tbitmap read GetBufBitmap;
-    {$ENDIF}
+    property BufBitmap: TALRasterImage read GetBufBitmap;
     procedure PaddingChanged; override;
     procedure FillChanged(Sender: TObject); virtual;
     procedure StrokeChanged(Sender: TObject); virtual;
@@ -462,11 +393,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure SetNewScene(AScene: IScene); override;
-    {$IF DEFINED(ALUseTexture)}
-    function MakeBufBitmap: TTexture; virtual;
-    {$ELSE}
-    function MakeBufBitmap: Tbitmap; virtual;
-    {$ENDIF}
+    function MakeBufBitmap: TALRasterImage; virtual;
     procedure clearBufBitmap; virtual;
     procedure BeginUpdate; override; // this is neccessary because the MakeBufBitmap is not only call during the paint,
     procedure EndUpdate; override;   // but also when any property changed because need to retrieve the dimension
@@ -588,6 +515,7 @@ uses
   FMX.Surfaces,
   ALFmxTypes3D,
   {$ENDIF}
+  ALFmxBreakText,
   ALCommon;
 
 {**********************************************}
@@ -619,12 +547,8 @@ begin
   ALFreeAndNil(fBufBitmap);
 end;
 
-{*************************}
-{$IF DEFINED(ALUseTexture)}
-function TALImage.MakeBufBitmap: TTexture;
-{$ELSE}
-function TALImage.MakeBufBitmap: Tbitmap;
-{$ENDIF}
+{**********************************************}
+function TALImage.MakeBufBitmap: TALRasterImage;
 
 {$IFDEF ALDPK}
 var LFileName: String;
@@ -651,7 +575,6 @@ begin
   fBufSize := Size.Size;
 
   {$IFDEF debug}
-  ALLog('TALImage.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
   inc(AlDebugImageMakeBufBitmapCount);
   AlDebugImageMakeBufBitmapStopWatch.Start;
   try
@@ -785,6 +708,7 @@ begin
   finally
     AlDebugImageMakeBufBitmapStopWatch.Stop;
   end;
+  if result <> nil then ALLog('TALImage.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
   {$endif}
 
 end;
@@ -875,18 +799,20 @@ begin
 
   {$IF DEFINED(ALUseTexture)}
 
-  TCustomCanvasGpu(Canvas).DrawTexture(canvas.AlignToPixel(fBufBitmapRect), // ATexRect (destRec)
-                                       TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), // ARect (srcRec)
-                                       ALPrepareColor(TCustomCanvasGpu.ModulateColor, AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
-                                       fBufBitmap);
+  TCustomCanvasGpu(Canvas).DrawTexture(
+    canvas.AlignToPixel(fBufBitmapRect), // ATexRect (destRec)
+    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), // ARect (srcRec)
+    ALPrepareColor(TCustomCanvasGpu.ModulateColor, AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
+    fBufBitmap);
 
   {$ELSE}
 
-  canvas.DrawBitmap(fBufBitmap,
-                    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), {SrcRect}
-                    canvas.AlignToPixel(fBufBitmapRect), {DestRect}
-                    AbsoluteOpacity, {opacity}
-                    true{highSpeed});
+  canvas.DrawBitmap(
+    fBufBitmap,
+    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), {SrcRect}
+    canvas.AlignToPixel(fBufBitmapRect), {DestRect}
+    AbsoluteOpacity, {opacity}
+    true{highSpeed});
 
   {$ENDIF}
 
@@ -997,12 +923,8 @@ begin
   if FUpdating = 0 then Repaint;
 end;
 
-{*************************}
-{$IF DEFINED(ALUseTexture)}
-function TALRectangle.MakeBufBitmap: TTexture;
-{$ELSE}
-function TALRectangle.MakeBufBitmap: Tbitmap;
-{$ENDIF}
+{**************************************************}
+function TALRectangle.MakeBufBitmap: TALRasterImage;
 
 var LSaveStrokeThickness: single;
     LSaveShadowOffsetX: single;
@@ -1050,7 +972,6 @@ begin
   fBufSize := Size.Size;
 
   {$IFDEF debug}
-  ALLog('TALRectangle.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
   inc(AlDebugRectangleMakeBufBitmapCount);
   AlDebugRectangleMakeBufBitmapStopWatch.Start;
   try
@@ -1082,21 +1003,23 @@ begin
     {$IFDEF ANDROID}
 
     //create the drawing surface
-    ALCreateDrawingSurface(LBitmap, // Var aBitmap: Jbitmap;
-                           LCanvas, // var aCanvas: Jcanvas;
-                           round(fBufBitmapRect.Width * FScreenScale), // const w: integer;
-                           round(fBufBitmapRect.height * FScreenScale));// const h: integer)
+    ALCreateDrawingSurface(
+      LBitmap, // Var aBitmap: Jbitmap;
+      LCanvas, // var aCanvas: Jcanvas;
+      round(fBufBitmapRect.Width * FScreenScale), // const w: integer;
+      round(fBufBitmapRect.height * FScreenScale));// const h: integer)
     try
 
-       ALPaintRectangle(LCanvas, // const aBitmap: Jbitmap;
-                        LRect, // const Rect: TrectF;
-                        Fill, // const Fill: TBrush;
-                        Stroke, // const Stroke: TStrokeBrush;
-                        Shadow, // const Shadow: TALShadow
-                        Sides, // const Sides: TSides;
-                        Corners, // const Corners: TCorners;
-                        XRadius * fScreenScale, // const XRadius: Single = 0;
-                        YRadius * fScreenScale); // const YRadius: Single = 0);
+       ALPaintRectangle(
+         LCanvas, // const aBitmap: Jbitmap;
+         LRect, // const Rect: TrectF;
+         Fill, // const Fill: TBrush;
+         Stroke, // const Stroke: TStrokeBrush;
+         Shadow, // const Shadow: TALShadow
+         Sides, // const Sides: TSides;
+         Corners, // const Corners: TCorners;
+         XRadius * fScreenScale, // const XRadius: Single = 0;
+         YRadius * fScreenScale); // const YRadius: Single = 0);
 
       fBufBitmap := ALJBitmaptoTexture(LBitmap);
 
@@ -1107,31 +1030,34 @@ begin
     {$ELSEIF DEFINED(IOS)}
 
     //create the drawing surface
-    ALCreateDrawingSurface(LBitmapSurface, // var aBitmapSurface: TbitmapSurface;
-                           LContext, //    Var aContext: CGContextRef;
-                           LColorSpace, // Var aColorSpace: CGColorSpaceRef;
-                           round(fBufBitmapRect.Width * FScreenScale), // const w: integer;
-                           round(fBufBitmapRect.height * FScreenScale));// const h: integer)
+    ALCreateDrawingSurface(
+      LBitmapSurface, // var aBitmapSurface: TbitmapSurface;
+      LContext, //    Var aContext: CGContextRef;
+      LColorSpace, // Var aColorSpace: CGColorSpaceRef;
+      round(fBufBitmapRect.Width * FScreenScale), // const w: integer;
+      round(fBufBitmapRect.height * FScreenScale));// const h: integer)
     try
 
-       ALPaintRectangle(LContext, // const aContext: CGContextRef;
-                        LColorSpace, // const aColorSpace: CGColorSpaceRef;
-                        LBitmapSurface.Height, // const aGridHeight: Single;
-                        LRect, // const Rect: TrectF;
-                        Fill, // const Fill: TBrush;
-                        Stroke, // const Stroke: TStrokeBrush;
-                        Shadow, // const Shadow: TALShadow
-                        Sides, // const Sides: TSides;
-                        Corners, // const Corners: TCorners;
-                        XRadius * fScreenScale, // const XRadius: Single = 0;
-                        YRadius * fScreenScale); // const YRadius: Single = 0);
+       ALPaintRectangle(
+         LContext, // const aContext: CGContextRef;
+         LColorSpace, // const aColorSpace: CGColorSpaceRef;
+         LBitmapSurface.Height, // const aGridHeight: Single;
+         LRect, // const Rect: TrectF;
+         Fill, // const Fill: TBrush;
+         Stroke, // const Stroke: TStrokeBrush;
+         Shadow, // const Shadow: TALShadow
+         Sides, // const Sides: TSides;
+         Corners, // const Corners: TCorners;
+         XRadius * fScreenScale, // const XRadius: Single = 0;
+         YRadius * fScreenScale); // const YRadius: Single = 0);
 
       fBufBitmap := ALBitmapSurfacetoTexture(LBitmapSurface);
 
     finally
-      ALFreeDrawingSurface(LBitmapSurface, // var aBitmapSurface: TbitmapSurface;
-                           LContext, // Var aContext: CGContextRef;
-                           LColorSpace); // Var aColorSpace: CGColorSpaceRef;
+      ALFreeDrawingSurface(
+        LBitmapSurface, // var aBitmapSurface: TbitmapSurface;
+        LContext, // Var aContext: CGContextRef;
+        LColorSpace); // Var aColorSpace: CGColorSpaceRef;
     end;
 
     {$ENDIF}
@@ -1153,6 +1079,7 @@ begin
   finally
     AlDebugRectangleMakeBufBitmapStopWatch.Stop;
   end;
+  if result <> nil then ALLog('TALRectangle.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
   {$endif}
 
 end;
@@ -1170,18 +1097,20 @@ begin
 
   {$IF DEFINED(ALUseTexture)}
 
-  TCustomCanvasGpu(Canvas).DrawTexture(canvas.AlignToPixel(fBufBitmapRect), // ATexRect (destRec)
-                                       TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), // ARect (srcRec)
-                                       ALPrepareColor(TCustomCanvasGpu.ModulateColor, AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
-                                       fBufBitmap);
+  TCustomCanvasGpu(Canvas).DrawTexture(
+    canvas.AlignToPixel(fBufBitmapRect), // ATexRect (destRec)
+    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), // ARect (srcRec)
+    ALPrepareColor(TCustomCanvasGpu.ModulateColor, AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
+    fBufBitmap);
 
   {$ELSE}
 
-  canvas.DrawBitmap(fBufBitmap,
-                    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), {SrcRect}
-                    canvas.AlignToPixel(fBufBitmapRect), {DestRect}
-                    AbsoluteOpacity, {opacity}
-                    true{highSpeed});
+  canvas.DrawBitmap(
+    fBufBitmap,
+    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), {SrcRect}
+    canvas.AlignToPixel(fBufBitmapRect), {DestRect}
+    AbsoluteOpacity, {opacity}
+    true{highSpeed});
 
   {$ENDIF}
 
@@ -1277,12 +1206,8 @@ begin
   if FUpdating = 0 then Repaint;
 end;
 
-{*************************}
-{$IF DEFINED(ALUseTexture)}
-function TALCircle.MakeBufBitmap: TTexture;
-{$ELSE}
-function TALCircle.MakeBufBitmap: Tbitmap;
-{$ENDIF}
+{***********************************************}
+function TALCircle.MakeBufBitmap: TALRasterImage;
 
 var LSaveStrokeThickness: single;
     LSaveShadowOffsetX: single;
@@ -1317,7 +1242,6 @@ begin
   fBufSize := Size.Size;
 
   {$IFDEF debug}
-  ALLog('TALCircle.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
   inc(AlDebugCircleMakeBufBitmapCount);
   AlDebugCircleMakeBufBitmapStopWatch.Start;
   try
@@ -1349,17 +1273,19 @@ begin
     {$IFDEF ANDROID}
 
     //create the drawing surface
-    ALCreateDrawingSurface(LBitmap, // Var aBitmap: Jbitmap;
-                           LCanvas, // var aCanvas: Jcanvas;
-                           round(fBufBitmapRect.Width * FScreenScale), // const w: integer;
-                           round(fBufBitmapRect.Height * FScreenScale));// const h: integer)
+    ALCreateDrawingSurface(
+      LBitmap, // Var aBitmap: Jbitmap;
+      LCanvas, // var aCanvas: Jcanvas;
+      round(fBufBitmapRect.Width * FScreenScale), // const w: integer;
+      round(fBufBitmapRect.Height * FScreenScale));// const h: integer)
     try
 
-      ALPaintCircle(LCanvas, // const aBitmap: Jbitmap;
-                    LRect, // const Rect: TrectF;
-                    Fill, // const Fill: TBrush;
-                    Stroke, // const Stroke: TStrokeBrush;
-                    Shadow); // const Shadow: TALShadow
+      ALPaintCircle(
+        LCanvas, // const aBitmap: Jbitmap;
+        LRect, // const Rect: TrectF;
+        Fill, // const Fill: TBrush;
+        Stroke, // const Stroke: TStrokeBrush;
+        Shadow); // const Shadow: TALShadow
 
       fBufBitmap := ALJBitmaptoTexture(LBitmap);
 
@@ -1370,27 +1296,30 @@ begin
     {$ELSEIF DEFINED(IOS)}
 
      //create the drawing surface
-    ALCreateDrawingSurface(LBitmapSurface, // var aBitmapSurface: TbitmapSurface;
-                           LContext, //    Var aContext: CGContextRef;
-                           LColorSpace, // Var aColorSpace: CGColorSpaceRef;
-                           round(fBufBitmapRect.Width * FScreenScale), // const w: integer;
-                           round(fBufBitmapRect.Height * FScreenScale));// const h: integer)
+    ALCreateDrawingSurface(
+      LBitmapSurface, // var aBitmapSurface: TbitmapSurface;
+      LContext, //    Var aContext: CGContextRef;
+      LColorSpace, // Var aColorSpace: CGColorSpaceRef;
+      round(fBufBitmapRect.Width * FScreenScale), // const w: integer;
+      round(fBufBitmapRect.Height * FScreenScale));// const h: integer)
     try
 
-      ALPaintCircle(LContext, // const aContext: CGContextRef;
-                    LColorSpace, // const aColorSpace: CGColorSpaceRef;
-                    LBitmapSurface.Height, // const aGridHeight: Single;
-                    LRect, // const Rect: TrectF;
-                    Fill, // const Fill: TBrush;
-                    Stroke, // const Stroke: TStrokeBrush;
-                    Shadow); // const Shadow: TALShadow
+      ALPaintCircle(
+        LContext, // const aContext: CGContextRef;
+        LColorSpace, // const aColorSpace: CGColorSpaceRef;
+        LBitmapSurface.Height, // const aGridHeight: Single;
+        LRect, // const Rect: TrectF;
+        Fill, // const Fill: TBrush;
+        Stroke, // const Stroke: TStrokeBrush;
+        Shadow); // const Shadow: TALShadow
 
       fBufBitmap := ALBitmapSurfacetoTexture(LBitmapSurface);
 
     finally
-      ALFreeDrawingSurface(LBitmapSurface, // var aBitmapSurface: TbitmapSurface;
-                           LContext, // Var aContext: CGContextRef;
-                           LColorSpace); // Var aColorSpace: CGColorSpaceRef;
+      ALFreeDrawingSurface(
+        LBitmapSurface, // var aBitmapSurface: TbitmapSurface;
+        LContext, // Var aContext: CGContextRef;
+        LColorSpace); // Var aColorSpace: CGColorSpaceRef;
     end;
 
     {$ENDIF}
@@ -1412,6 +1341,7 @@ begin
   finally
     AlDebugCircleMakeBufBitmapStopWatch.Stop;
   end;
+  if result <> nil then ALLog('TALCircle.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
   {$endif}
 
 end;
@@ -1429,18 +1359,20 @@ begin
 
   {$IF DEFINED(ALUseTexture)}
 
-  TCustomCanvasGpu(Canvas).DrawTexture(canvas.AlignToPixel(fBufBitmapRect), // ATexRect (destRec)
-                                       TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), // ARect (srcRec)
-                                       ALPrepareColor(TCustomCanvasGpu.ModulateColor, AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
-                                       fBufBitmap);
+  TCustomCanvasGpu(Canvas).DrawTexture(
+    canvas.AlignToPixel(fBufBitmapRect), // ATexRect (destRec)
+    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), // ARect (srcRec)
+    ALPrepareColor(TCustomCanvasGpu.ModulateColor, AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
+    fBufBitmap);
 
   {$ELSE}
 
-  canvas.DrawBitmap(fBufBitmap,
-                    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), {SrcRect}
-                    canvas.AlignToPixel(fBufBitmapRect), {DestRect}
-                    AbsoluteOpacity, {opacity}
-                    true{highSpeed});
+  canvas.DrawBitmap(
+    fBufBitmap,
+    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), {SrcRect}
+    canvas.AlignToPixel(fBufBitmapRect), {DestRect}
+    AbsoluteOpacity, {opacity}
+    true{highSpeed});
 
   {$ENDIF}
 
@@ -1499,12 +1431,8 @@ begin
   inherited;
 end;
 
-{*************************}
-{$IF DEFINED(ALUseTexture)}
-function TALLine.MakeBufBitmap: TTexture;
-{$ELSE}
-function TALLine.MakeBufBitmap: Tbitmap;
-{$ENDIF}
+{*********************************************}
+function TALLine.MakeBufBitmap: TALRasterImage;
 
 {$IF defined(ANDROID)}
 var LBitmap: Jbitmap;
@@ -1542,7 +1470,6 @@ begin
   fBufSize := Size.Size;
 
   {$IFDEF debug}
-  ALLog('TALLine.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
   inc(AlDebugLineMakeBufBitmapCount);
   AlDebugLineMakeBufBitmapStopWatch.Start;
   try
@@ -1577,10 +1504,11 @@ begin
   LRect := TrectF.Create(0,0,round(fBufBitmapRect.Width * FScreenScale), round(fBufBitmapRect.height * FScreenScale));
 
   //create the drawing surface
-  ALCreateDrawingSurface(LBitmap, // Var aBitmap: Jbitmap;
-                         LCanvas, // var aCanvas: Jcanvas;
-                         round(LRect.Width), // const w: integer;
-                         round(LRect.Height));// const h: integer)
+  ALCreateDrawingSurface(
+    LBitmap, // Var aBitmap: Jbitmap;
+    LCanvas, // var aCanvas: Jcanvas;
+    round(LRect.Width), // const w: integer;
+    round(LRect.Height));// const h: integer)
   try
 
     //create the canvas and the paint
@@ -1600,23 +1528,26 @@ begin
       if Stroke.Kind = TBrushKind.Solid then begin
         LPaint.setColor(integer(Stroke.Color));
         case lineType of
-          TLineType.Diagonal: LCanvas.drawLine(LRect.left {startX},
-                                               LRect.top {startY},
-                                               LRect.right {stopX},
-                                               LRect.Bottom {stopY},
-                                               LPaint);
+          TLineType.Diagonal: LCanvas.drawLine(
+                                LRect.left {startX},
+                                LRect.top {startY},
+                                LRect.right {stopX},
+                                LRect.Bottom {stopY},
+                                LPaint);
           TLineType.Top,
-          TLineType.Bottom: LCanvas.drawLine(LRect.left {startX},
-                                             (LRect.bottom - LRect.top) / 2 {startY},
-                                             LRect.right {stopX},
-                                             (LRect.bottom - LRect.top) / 2 {stopY},
-                                             LPaint);
+          TLineType.Bottom: LCanvas.drawLine(
+                              LRect.left {startX},
+                              (LRect.bottom - LRect.top) / 2 {startY},
+                              LRect.right {stopX},
+                              (LRect.bottom - LRect.top) / 2 {stopY},
+                              LPaint);
           TLineType.Left,
-          TLineType.Right: LCanvas.drawLine((LRect.right - LRect.left) / 2 {startX},
-                                            LRect.top {startY},
-                                            (LRect.right - LRect.left) / 2 {stopX},
-                                            LRect.bottom {stopY},
-                                            LPaint);
+          TLineType.Right: LCanvas.drawLine(
+                             (LRect.right - LRect.left) / 2 {startX},
+                             LRect.top {startY},
+                             (LRect.right - LRect.left) / 2 {stopX},
+                             LRect.bottom {stopY},
+                             LPaint);
         end;
       end;
 
@@ -1661,11 +1592,12 @@ begin
   LRect := TrectF.Create(0,0,round(fBufBitmapRect.Width * FScreenScale), round(fBufBitmapRect.height * FScreenScale));
 
   //create the drawing surface
-  ALCreateDrawingSurface(LBitmapSurface, // var aBitmapSurface: TbitmapSurface;
-                         LContext, //    Var aContext: CGContextRef;
-                         LColorSpace, // Var aColorSpace: CGColorSpaceRef;
-                         round(LRect.Width), // const w: integer;
-                         round(LRect.Height));// const h: integer)
+  ALCreateDrawingSurface(
+    LBitmapSurface, // var aBitmapSurface: TbitmapSurface;
+    LContext, //    Var aContext: CGContextRef;
+    LColorSpace, // Var aColorSpace: CGColorSpaceRef;
+    round(LRect.Width), // const w: integer;
+    round(LRect.Height));// const h: integer)
   try
 
     //stroke the circle
@@ -1704,9 +1636,10 @@ begin
     fBufBitmap := ALBitmapSurfacetoTexture(LBitmapSurface);
 
   finally
-    ALFreeDrawingSurface(LBitmapSurface, // var aBitmapSurface: TbitmapSurface;
-                         LContext, // Var aContext: CGContextRef;
-                         LColorSpace); // Var aColorSpace: CGColorSpaceRef;
+    ALFreeDrawingSurface(
+      LBitmapSurface, // var aBitmapSurface: TbitmapSurface;
+      LContext, // Var aContext: CGContextRef;
+      LColorSpace); // Var aColorSpace: CGColorSpaceRef;
   end;
 
   {$ENDIF}
@@ -1717,6 +1650,7 @@ begin
   finally
     AlDebugLineMakeBufBitmapStopWatch.Stop;
   end;
+  if result <> nil then ALLog('TALLine.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
   {$endif}
 
 end;
@@ -1734,18 +1668,20 @@ begin
 
   {$IF DEFINED(ALUseTexture)}
 
-  TCustomCanvasGpu(Canvas).DrawTexture(canvas.AlignToPixel(fBufBitmapRect), // ATexRect (destRec)
-                                       TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), // ARect (srcRec)
-                                       ALPrepareColor(TCustomCanvasGpu.ModulateColor, AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
-                                       fBufBitmap);
+  TCustomCanvasGpu(Canvas).DrawTexture(
+    canvas.AlignToPixel(fBufBitmapRect), // ATexRect (destRec)
+    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), // ARect (srcRec)
+    ALPrepareColor(TCustomCanvasGpu.ModulateColor, AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
+    fBufBitmap);
 
   {$ELSE}
 
-  canvas.DrawBitmap(fBufBitmap,
-                    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), {SrcRect}
-                    canvas.AlignToPixel(fBufBitmapRect), {DestRect}
-                    AbsoluteOpacity, {opacity}
-                    true{highSpeed});
+  canvas.DrawBitmap(
+    fBufBitmap,
+    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), {SrcRect}
+    canvas.AlignToPixel(fBufBitmapRect), {DestRect}
+    AbsoluteOpacity, {opacity}
+    true{highSpeed});
 
   {$ENDIF}
 
@@ -1778,12 +1714,8 @@ begin
   inherited;
 end;
 
-{*************************}
-{$IF DEFINED(ALUseTexture)}
-function TALDoubleBufferedTextLayout.MakeBufBitmap: TTexture;
-{$ELSE}
-function TALDoubleBufferedTextLayout.MakeBufBitmap: Tbitmap;
-{$ENDIF}
+{*****************************************************************}
+function TALDoubleBufferedTextLayout.MakeBufBitmap: TALRasterImage;
 var LOptions: TALDrawMultiLineTextOptions;
 begin
 
@@ -1871,9 +1803,6 @@ begin
   fBufText := fTextControl.Text;
 
   {$IFDEF debug}
-  ALLog('TALDoubleBufferedTextLayout.MakeBufBitmap', 'Name: ' + fTextControl.Name +
-                                                     'text:' + fBufText +
-                                                     ' - MaxSize: '+floattostr(fBufSize.cX)+'x'+floattostr(fBufSize.cY), TalLogType.verbose);
   inc(AlDebugTextMakeBufBitmapCount);
   AlDebugTextMakeBufBitmapStopWatch.Start;
   try
@@ -1953,18 +1882,12 @@ begin
     LOptions.TextIsHtml := FBufTextIsHtml;
 
     //build fBufBitmap
-    fBufBitmap := ALDrawMultiLineText(fBufText, // const aText: String; // support only basic html tag like <b>...</b>, <i>...</i>, <font color="#ffffff">...</font> and <span id="xxx">...</span>
-                                      fBufBitmapRect, // var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
-                                      fBufTextBreaked,
-                                      fBufAllTextDrawed,
-                                      LOptions);
-    {$IFDEF debug}
-    ALLog('TALDoubleBufferedTextLayout.MakeBufBitmap.ALDrawMultiLineText', 'Name: ' + fTextControl.Name +
-                                                                           'text:' + fBufText +
-                                                                           ' - fBufBitmapRect: '+floattostr(fBufBitmapRect.width)+'x'+floattostr(fBufBitmapRect.height) +
-                                                                           ' - fBufTextBreaked: '+ BoolToStr(fBufTextBreaked, true) +
-                                                                           ' - fBufAllTextDrawed: '+ BoolToStr(fBufAllTextDrawed, true), TalLogType.verbose);
-    {$endif}
+    fBufBitmap := ALDrawMultiLineText(
+                    fBufText, // const aText: String; // support only basic html tag like <b>...</b>, <i>...</i>, <font color="#ffffff">...</font> and <span id="xxx">...</span>
+                    fBufBitmapRect, // var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
+                    fBufTextBreaked,
+                    fBufAllTextDrawed,
+                    LOptions);
 
     //align fbufBitmapRect
     if LOptions.AutoSize and (not fBufAutosize) then begin
@@ -2004,6 +1927,13 @@ begin
   finally
     AlDebugTextMakeBufBitmapStopWatch.Stop;
   end;
+  if result <> nil then
+    ALLog(
+      'TALDoubleBufferedTextLayout.MakeBufBitmap',
+      'Name: ' + fTextControl.Name + ' | ' +
+      'text:' + fBufText + ' | ' +
+      'MaxSize: '+floattostr(fBufSize.cX)+'x'+floattostr(fBufSize.cY),
+      TalLogType.verbose);
   {$endif}
 
 end;
@@ -2048,19 +1978,20 @@ begin
 
   {$IF DEFINED(ALUseTexture)}
 
-  TCustomCanvasGpu(ACanvas).DrawTexture(ACanvas.AlignToPixel(LDestRect), // ATexRect (destRec)
-                                        TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), // ARect (srcRec)
-                                        ALPrepareColor(TCustomCanvasGpu.ModulateColor, Opacity), // https://quality.embarcadero.com/browse/RSP-15432
-                                        fBufBitmap);
-
+  TCustomCanvasGpu(ACanvas).DrawTexture(
+    ACanvas.AlignToPixel(LDestRect), // ATexRect (destRec)
+    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), // ARect (srcRec)
+    ALPrepareColor(TCustomCanvasGpu.ModulateColor, Opacity), // https://quality.embarcadero.com/browse/RSP-15432
+    fBufBitmap);
 
   {$ELSE}
 
-  aCanvas.DrawBitmap(fBufBitmap,
-                     TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), {SrcRect}
-                     aCanvas.AlignToPixel(LDestRect), {DestRect}
-                     Opacity, {opacity}
-                     true{highSpeed});
+  aCanvas.DrawBitmap(
+    fBufBitmap,
+    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), {SrcRect}
+    aCanvas.AlignToPixel(LDestRect), {DestRect}
+    Opacity, {opacity}
+    true{highSpeed});
 
   {$ENDIF}
 
@@ -2721,12 +2652,8 @@ begin
   TALDoubleBufferedTextLayout(Layout).clearBufBitmap;
 end;
 
-{*************************}
-{$IF DEFINED(ALUseTexture)}
-function TALText.MakeBufBitmap: TTexture;
-{$ELSE}
-function TALText.MakeBufBitmap: Tbitmap;
-{$ENDIF}
+{*********************************************}
+function TALText.MakeBufBitmap: TALRasterImage;
 begin
   if not doubleBuffered then exit(nil);
   FLayout.BeginUpdate;
@@ -2763,12 +2690,8 @@ begin
   end;
 end;
 
-{*************************}
-{$IF DEFINED(ALUseTexture)}
-function TALText.GetBufBitmap: TTexture;
-{$ELSE}
-function TALText.GetBufBitmap: Tbitmap;
-{$ENDIF}
+{********************************************}
+function TALText.GetBufBitmap: TALRasterImage;
 begin
   if not doubleBuffered then exit(nil);
   result := TALDoubleBufferedTextLayout(Layout).fBufBitmap;
@@ -2862,12 +2785,11 @@ end;
 //unfortunatly the way the beginupdate/endupdate and
 //realign work is not very efficient for TALText.
 //because when we do endupdate then we will first
-//call endupdate to the most far away childreen, and
-//go up like :
+//call endupdate to the most far away childreen:
 //  acontrol1
 //    acontrol2
 //      aalText1
-//then doing acontrol1.endupdate then we will do in this order :
+//So when we do acontrol1.endupdate we will do in this order :
 //      aalText1.endupdate => realign and then adjustsize
 //    acontrol2.endupdate => realign and then maybe again TalText1.adjustsize
 //  acontrol1.endupdate => realign and then maybe again TalText1.adjustsize

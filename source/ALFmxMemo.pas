@@ -148,6 +148,7 @@ type
     function getLineCount: integer;
     procedure RecalcOpacity; override;
     procedure RecalcEnabled; override;
+    function HasNativeView: boolean;
     Procedure AddNativeView;
     Procedure RemoveNativeView;
     function PointInObjectLocal(X: Single; Y: Single): Boolean; override;
@@ -220,8 +221,7 @@ type
 
 type
 
-  {*************************}
-  [ComponentPlatforms($FFFF)]
+  {***************************}
   TALMemo = class(TALRectangle)
   private
     fPadding: TBounds;
@@ -297,6 +297,7 @@ type
     {$ELSEIF defined(IOS)}
     property IosTextView: TALIosTextView read GetIosTextView;
     {$ENDIF}
+    function HasNativeView: boolean;
     Procedure AddNativeView;
     Procedure RemoveNativeView;
     Procedure setSelection(const aStart: integer; const aStop: Integer); overload;
@@ -1054,6 +1055,12 @@ begin
   FTextView.SetAbsoluteEnabled(AbsoluteEnabled);
 end;
 
+{*****************************************}
+function TALIosMemo.HasNativeView: boolean;
+begin
+  result := visible;
+end;
+
 {*********************************}
 Procedure TALIosMemo.AddNativeView;
 begin
@@ -1353,6 +1360,7 @@ end;
 {*******************************************}
 function TALStyledMemo.getLineHeight: Single;
 begin
+  ApplyStyleLookup;
   if fStyledMemo <> nil then result := _TStyledMemoProtectedAccess(fStyledMemo).GetLineHeight
   else result := 0;
 end;
@@ -1847,6 +1855,17 @@ function TALMemo.GetContainFocus: Boolean;
 begin
   if FMemoControl = nil then CreateMemoControl;
   result := isFocused or FMemoControl.IsFocused;
+end;
+
+{**************************************}
+function TALMemo.hasNativeView: boolean;
+begin
+  if FMemoControl = nil then CreateMemoControl;
+  {$IF defined(android) or defined(ios)}
+  result := FMemoControl.hasNativeView;
+  {$ELSE}
+  result := false;
+  {$ENDIF}
 end;
 
 {******************************}

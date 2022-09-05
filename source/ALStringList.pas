@@ -168,6 +168,7 @@ Type
     procedure SetText(Text: PAnsiChar); virtual;
     function ToStringArray: TArray<AnsiString>;
     function ToObjectArray: TArray<TObject>;
+    function ToNameValueArray: TArray<TPair<AnsiString, AnsiString>>;
     property Capacity: Integer read GetCapacity write SetCapacity;
     property CommaText: AnsiString read GetCommaText write SetCommaText;
     property Count: Integer read GetCount;
@@ -650,6 +651,7 @@ type
     procedure SetText(Text: PChar); virtual;
     function ToStringArray: TArray<String>;
     function ToObjectArray: TArray<TObject>;
+    function ToNameValueArray: TArray<TPair<String, String>>;
     property Capacity: Integer read GetCapacity write SetCapacity;
     property CommaText: String read GetCommaText write SetCommaText;
     property Count: Integer read GetCount;
@@ -1747,6 +1749,16 @@ begin
   SetLength(Result, Count);
   for I := 0 to Count - 1 do
     Result[I] := Objects[I];
+end;
+
+{**************************************************************************}
+function TALStrings.ToNameValueArray: TArray<TPair<AnsiString, AnsiString>>;
+var
+  I: Integer;
+begin
+  SetLength(Result, Count);
+  for I := 0 to Count - 1 do
+    Result[I] := TPair<AnsiString, AnsiString>.create(Names[i], ValueFromIndex[I]);
 end;
 
 {*******************************}
@@ -6006,6 +6018,16 @@ begin
   SetLength(Result, Count);
   for I := 0 to Count - 1 do
     Result[I] := Objects[I];
+end;
+
+{*******************************************************************}
+function TALStringsU.ToNameValueArray: TArray<TPair<String, String>>;
+var
+  I: Integer;
+begin
+  SetLength(Result, Count);
+  for I := 0 to Count - 1 do
+    Result[I] := TPair<String, String>.create(Names[i], ValueFromIndex[I]);
 end;
 
 {********************************}

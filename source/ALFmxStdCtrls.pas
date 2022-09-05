@@ -30,13 +30,13 @@ uses
   FMX.actnlist,
   FMX.ImgList,
   ALFmxAni,
+  ALFmxGraphics,
   ALFmxInertialMovement,
   ALFmxObjects;
 
 type
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~}
-  [ComponentPlatforms($FFFF)]
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALAniIndicator = class(Tcontrol)
   private
     fTimer: TTimer;
@@ -46,11 +46,7 @@ type
     fResourceName: String;
     fFrameIndex: TSmallPoint;
     FScreenScale: single;
-    {$IF DEFINED(ALUseTexture)}
-    fBufBitmap: TTexture;
-    {$ELSE}
-    fBufBitmap: Tbitmap;
-    {$ENDIF}
+    fBufBitmap: TALRasterImage;
     fBufBitmapRect: TRectF;
     fBufSize: TsizeF;
     procedure setResourceName(const Value: String);
@@ -58,22 +54,14 @@ type
     function ResourceNameStored: Boolean;
   protected
     procedure Paint; override;
-    {$IF DEFINED(ALUseTexture)}
-    property BufBitmap: TTexture read fBufBitmap;
-    {$ELSE}
-    property BufBitmap: Tbitmap read fBufBitmap;
-    {$ENDIF}
+    property BufBitmap: TALRasterImage read fBufBitmap;
     function EnabledStored: Boolean; override;
     procedure SetEnabled(const Value: Boolean); override;
     function GetDefaultSize: TSizeF; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    {$IF DEFINED(ALUseTexture)}
-    function MakeBufBitmap: TTexture; virtual;
-    {$ELSE}
-    function MakeBufBitmap: Tbitmap; virtual;
-    {$ENDIF}
+    function MakeBufBitmap: TALRasterImage; virtual;
     procedure clearBufBitmap; virtual;
   published
     property Align;
@@ -272,8 +260,7 @@ type
     property OnTracking: TNotifyEvent read FOnTracking write FOnTracking;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~}
-  [ComponentPlatforms($FFFF)]
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALTrackBar = class(TALCustomTrack)
   protected
     function GetDefaultSize: TSizeF; override;
@@ -356,8 +343,7 @@ type
     {$ENDIF}
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~}
-  [ComponentPlatforms($FFFF)]
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALScrollBar = class(TALCustomTrack)
   protected
     function GetDefaultSize: TSizeF; override;
@@ -435,8 +421,7 @@ type
     {$ENDIF}
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~}
-  [ComponentPlatforms($FFFF)]
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALRangeTrackBar = class(TALCustomTrack)
   private
     FMaxValueRange: TValueRange;
@@ -536,16 +521,11 @@ type
     {$ENDIF}
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~}
-  [ComponentPlatforms($FFFF)]
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALCheckBox = class(TControl)
   private
     FScreenScale: single;
-    {$IF DEFINED(ALUseTexture)}
-    fBufBitmap: TTexture;
-    {$ELSE}
-    fBufBitmap: Tbitmap;
-    {$ENDIF}
+    fBufBitmap: TALRasterImage;
     fBufBitmapRect: TRectF;
     fBufSize: TsizeF;
     FbufResourceName: String;
@@ -562,11 +542,7 @@ type
     procedure SetWrapMode(const Value: TALImageWrapMode);
   protected
     procedure Paint; override;
-    {$IF DEFINED(ALUseTexture)}
-    property BufBitmap: TTexture read fBufBitmap;
-    {$ELSE}
-    property BufBitmap: Tbitmap read fBufBitmap;
-    {$ENDIF}
+    property BufBitmap: TALRasterImage read fBufBitmap;
     procedure DoChanged; virtual;
     function GetDefaultSize: TSizeF; override;
     function GetIsChecked: Boolean; virtual;
@@ -576,11 +552,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    {$IF DEFINED(ALUseTexture)}
-    function MakeBufBitmap: TTexture; virtual;
-    {$ELSE}
-    function MakeBufBitmap: Tbitmap; virtual;
-    {$ENDIF}
+    function MakeBufBitmap: TALRasterImage; virtual;
     procedure clearBufBitmap; virtual;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
@@ -650,8 +622,7 @@ type
     {$ENDIF}
   end;
 
-  {*************************}
-  [ComponentPlatforms($FFFF)]
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALRadioButton = class(TALCheckBox)
   private
     FGroupName: string;
@@ -690,8 +661,7 @@ type
     property HitTest default false;
   end;
 
-  {*************************}
-  [ComponentPlatforms($FFFF)]
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALSwitch = class(TControl)
   public const
     DefaultSwitchAnimationDuration = 0.2;
@@ -823,7 +793,6 @@ uses
   fmx.consts,
   fmx.utils,
   ALCommon,
-  ALFmxGraphics,
   ALFmxCommon;
 
 {*****************************************************}
@@ -874,12 +843,8 @@ begin
   ALFreeAndNil(fBufBitmap);
 end;
 
-{*************************}
-{$IF DEFINED(ALUseTexture)}
-function TALAniIndicator.MakeBufBitmap: TTexture;
-{$ELSE}
-function TALAniIndicator.MakeBufBitmap: Tbitmap;
-{$ENDIF}
+{*****************************************************}
+function TALAniIndicator.MakeBufBitmap: TALRasterImage;
 
 {$IFDEF ALDPK}
 var LFileName: String;
@@ -970,24 +935,30 @@ begin
 
   {$IF DEFINED(ALUseTexture)}
 
-  TCustomCanvasGpu(Canvas).DrawTexture(canvas.AlignToPixel(fBufBitmapRect), // ATexRect (destRec)
-                                       TRectF.Create(TPointF.Create(fFrameIndex.x * Width * fScreenScale,
-                                                                    fFrameIndex.Y * Height * fScreenScale),
-                                                     Width * fScreenScale,
-                                                     Height * fScreenScale), // ARect
-                                       ALPrepareColor(TCustomCanvasGpu.ModulateColor, AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
-                                       fBufBitmap);
+  TCustomCanvasGpu(Canvas).DrawTexture(
+    canvas.AlignToPixel(fBufBitmapRect), // ATexRect (destRec)
+    TRectF.Create(
+      TPointF.Create(
+        fFrameIndex.x * Width * fScreenScale,
+        fFrameIndex.Y * Height * fScreenScale),
+      Width * fScreenScale,
+      Height * fScreenScale), // ARect
+    ALPrepareColor(TCustomCanvasGpu.ModulateColor, AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
+    fBufBitmap);
 
   {$ELSE}
 
-  canvas.DrawBitmap(fBufBitmap,
-                    TRectF.Create(TPointF.Create(fFrameIndex.x * Width * fScreenScale,
-                                                 fFrameIndex.Y * Height * fScreenScale),
-                                  Width * fScreenScale,
-                                  Height * fScreenScale), // SrcRect
-                    canvas.AlignToPixel(fBufBitmapRect), {DestRect}
-                    AbsoluteOpacity, {opacity}
-                    true{highSpeed});
+  canvas.DrawBitmap(
+    fBufBitmap,
+    TRectF.Create(
+      TPointF.Create(
+        fFrameIndex.x * Width * fScreenScale,
+        fFrameIndex.Y * Height * fScreenScale),
+      Width * fScreenScale,
+      Height * fScreenScale), // SrcRect
+    canvas.AlignToPixel(fBufBitmapRect), {DestRect}
+    AbsoluteOpacity, {opacity}
+    true{highSpeed});
 
   {$ENDIF}
 
@@ -2027,12 +1998,8 @@ begin
   end;
 end;
 
-{*************************}
-{$IF DEFINED(ALUseTexture)}
-function TALCheckbox.MakeBufBitmap: TTexture;
-{$ELSE}
-function TALCheckbox.MakeBufBitmap: Tbitmap;
-{$ENDIF}
+{*************************************************}
+function TALCheckbox.MakeBufBitmap: TALRasterImage;
 
 var LResourceName: String;
     {$IFDEF ALDPK}
@@ -2198,18 +2165,20 @@ begin
 
   {$IF DEFINED(ALUseTexture)}
 
-  TCustomCanvasGpu(Canvas).DrawTexture(canvas.AlignToPixel(fBufBitmapRect), // ATexRect (destRec)
-                                       TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), // ARect (srcRec)
-                                       ALPrepareColor(TCustomCanvasGpu.ModulateColor, AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
-                                       fBufBitmap);
+  TCustomCanvasGpu(Canvas).DrawTexture(
+    canvas.AlignToPixel(fBufBitmapRect), // ATexRect (destRec)
+    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), // ARect (srcRec)
+    ALPrepareColor(TCustomCanvasGpu.ModulateColor, AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
+    fBufBitmap);
 
   {$ELSE}
 
-  canvas.DrawBitmap(fBufBitmap,
-                    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), {SrcRect}
-                    canvas.AlignToPixel(fBufBitmapRect), {DestRect}
-                    AbsoluteOpacity, {opacity}
-                    true{highSpeed});
+  canvas.DrawBitmap(
+    fBufBitmap,
+    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), {SrcRect}
+    canvas.AlignToPixel(fBufBitmapRect), {DestRect}
+    AbsoluteOpacity, {opacity}
+    true{highSpeed});
 
   {$ENDIF}
 

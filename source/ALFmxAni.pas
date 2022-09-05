@@ -20,7 +20,7 @@ uses
   {$ENDIF}
   {$IFDEF ANDROID}
   Androidapi.JNIBridge,
-  ALAndroidApi,
+  Androidapi.JNI.GraphicsContentViewText,
   {$ENDIF}
   FMX.Types;
 
@@ -41,7 +41,6 @@ type
       procedure doFrame(frameTimeNanos: Int64); cdecl;
     end;
   private
-    FChoreographer: JChoreographer;
     FChoreographerFrameCallback: TChoreographerFrameCallback;
   private
     FTimerEvent: TNotifyEvent;
@@ -229,8 +228,7 @@ type
     procedure Stop; virtual;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~}
-  [ComponentPlatforms($FFFF)]
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALFloatPropertyAnimation = class(TALCustomPropertyAnimation)
   private
     FStartFromCurrent: Boolean;
@@ -297,8 +295,7 @@ type
     property Overshoot: Single read getOvershoot write setOvershoot Stored OvershootStored;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~}
-  [ComponentPlatforms($FFFF)]
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALColorPropertyAnimation = class(TALCustomPropertyAnimation)
   private
     FStartFromCurrent: Boolean;
@@ -402,7 +399,7 @@ begin
     fChoreographerThread.FTimerEvent(fChoreographerThread);
 
   if fChoreographerThread.Enabled then
-    fChoreographerThread.fChoreographer.postFrameCallback(self);
+    TJChoreographer.JavaClass.getInstance.postFrameCallback(self);
 
 end;
 
@@ -410,7 +407,6 @@ end;
 constructor TALChoreographerThread.Create(AOwner: TComponent);
 begin
   inherited create;
-  fChoreographer := TJChoreographer.JavaClass.getInstance;
   fChoreographerFrameCallback := TChoreographerFrameCallback.create(self);
   FTimerEvent := nil;
   Interval := 1;
@@ -429,8 +425,8 @@ procedure TALChoreographerThread.SetEnabled(const Value: Boolean);
 begin
   if FEnabled <> Value then begin
     FEnabled := Value;
-    if FEnabled then fChoreographer.postFrameCallback(fChoreographerFrameCallback)
-    else fChoreographer.removeFrameCallback(fChoreographerFrameCallback);
+    if FEnabled then TJChoreographer.JavaClass.getInstance.postFrameCallback(fChoreographerFrameCallback)
+    else TJChoreographer.JavaClass.getInstance.removeFrameCallback(fChoreographerFrameCallback);
   end;
 end;
 

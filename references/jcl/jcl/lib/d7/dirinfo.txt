@@ -1,1 +1,0 @@
-This directory is intended a common place for .dcu files of Delphi 7 packages.

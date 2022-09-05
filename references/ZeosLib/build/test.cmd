@@ -1,3 +1,0 @@
-@echo off
-echo Testing ZEOSDBO ...
-call ant -q -buildfile test.xml

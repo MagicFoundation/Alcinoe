@@ -1,8 +1,0 @@
-// IoAPI.h
-
-{$IFDEF MSWINDOWS}
-
-function CancelIo(hFile: THandle): BOOL; stdcall;
-{$EXTERNALSYM CancelIo}
-
-{$ENDIF MSWINDOWS}

@@ -1,5 +1,0 @@
-To create VCL.doxdb, compile and execute VCLLinks.exe, its project file is located at http://projectjedi.svn.sf.net/viewvc/projectjedi/trunk/helpsync/DocOMaticTools/vcllinks/
-
-Then execute:
- - VCLLinks query VCL.xml
- - VCLLinks convert VCL.xml VCL.doxdb

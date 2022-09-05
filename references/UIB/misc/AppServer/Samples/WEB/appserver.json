@@ -1,7 +1,0 @@
-{"database":
-	{"databasename":"EMPLOYEE",
-	 "username":"SYSDBA",
-	 "password":"masterkey",
-     "characterset": "UTF8",
-     "sqldialect":3}
-}

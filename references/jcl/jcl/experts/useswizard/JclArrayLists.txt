@@ -1,3 +1,0 @@
-TJclIntfArrayList
-TJclStrArrayList
-TJclArrayList

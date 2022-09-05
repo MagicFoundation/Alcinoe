@@ -1,7 +1,0 @@
-option batch continue
-option confirm off
-option transfer binary
-open jcl.web.sourceforge.net
-synchronize remote -delete C:\dev\jcl\website\sourceforge\daily /home/groups/j/jc/jcl/htdocs/daily
-close
-exit

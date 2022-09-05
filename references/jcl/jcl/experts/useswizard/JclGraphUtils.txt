@@ -1,4 +1,0 @@
-DottedLineTo
-SetBitmapColors
-PPointArray
-TPointArray

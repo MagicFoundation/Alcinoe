@@ -1,1 +1,0 @@
-This is the place where VCL dependent units reside.

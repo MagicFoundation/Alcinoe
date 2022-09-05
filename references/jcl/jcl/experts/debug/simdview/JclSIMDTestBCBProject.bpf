@@ -1,5 +1,0 @@
-USEUNIT("JclSIMDTestBCB.cpp");
-//---------------------------------------------------------------------------
-Ce fichier est uniquement utilisé par le gestionnaire de projets et doit être traité comme le fichier projet
-
-main 

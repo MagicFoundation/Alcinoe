@@ -1,13 +1,0 @@
-USEUNIT("ZTestPerformance.cpp");
-USEUNIT("..\..\test\external\TestFrameWork.pas");
-USEUNIT("..\..\test\external\TextTestRunner.pas");
-USEUNIT("..\..\test\performance\ZTestBdePerformance.pas");
-USEUNIT("..\..\test\performance\ZTestDatasetPerformance.pas");
-USEUNIT("..\..\test\performance\ZTestDbcPerformance.pas");
-USEUNIT("..\..\test\performance\ZTestDbxPerformance.pas");
-USEUNIT("..\..\test\performance\ZTestIbxPerformance.pas");
-USEUNIT("..\..\test\performance\ZTestOldZeosPerformance.pas");
-USEUNIT("..\..\test\performance\ZTestPlainPerformance.pas");
-This file is used by the project manager only and should be treated like the project file
-
-main

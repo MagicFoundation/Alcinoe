@@ -1,15 +1,0 @@
-USEUNIT("ZTestComponentAll.cpp");
-USEUNIT("..\..\test\external\TestFrameWork.pas");
-USEUNIT("..\..\test\external\TextTestRunner.pas");
-USEUNIT("..\..\test\component\ZTestSqlTypes.pas");
-USEUNIT("..\..\test\component\ZTestDataSetGeneric.pas");
-USEUNIT("..\..\test\component\ZTestExecuteSql.pas");
-USEUNIT("..\..\test\component\ZTestSqlProcessor.pas");
-USEUNIT("..\..\test\component\ZTestSqlStrings.pas");
-USEUNIT("..\..\test\component\ZTestStoredProcedure.pas");
-USEUNIT("..\..\test\component\ZTestData.pas");
-USEUNIT("..\..\test\component\ZTestMidas.pas");
-//---------------------------------------------------------------------------
-This file is used by the project manager only and should be treated like the project file
-
-main

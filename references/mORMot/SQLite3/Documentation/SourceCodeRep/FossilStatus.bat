@@ -1,1 +1,0 @@
-fossil status>%1

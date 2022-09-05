@@ -1,2 +1,0 @@
-Donator:
-  Marcel van Brakel

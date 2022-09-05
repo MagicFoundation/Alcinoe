@@ -1,1 +1,0 @@
-20080212 : Wrong clearing of allocated data for SQLDA - by Stressman - Mantis Bug 93

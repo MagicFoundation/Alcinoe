@@ -1,1 +1,0 @@
-regsvr32 "C:\dev\uib\trunk\misc\ShellExtention\UIBFileHandler.dll"

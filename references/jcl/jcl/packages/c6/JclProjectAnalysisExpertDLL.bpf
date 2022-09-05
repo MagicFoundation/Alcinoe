@@ -1,5 +1,0 @@
-USEUNIT("..\..\experts\projectanalyzer\JclProjectAnalyzerFrm.pas");
-USEUNIT("..\..\experts\projectanalyzer\JclProjectAnalyzerImpl.pas");
-USEDEF("JclProjectAnalysisExpertDLL.def");
-Project file
-DllEntryPoint

@@ -1,3 +1,0 @@
-Some ideas for this or next release
-
-- Can't we check which DLL we are using when the user decides to chose the generic 'mysql' protocol. Just open the DLL and get the library version and then swap to the right protocol.

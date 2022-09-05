@@ -1,3 +1,0 @@
-TJclVector
-TJclStrVector
-TJclIntfVector

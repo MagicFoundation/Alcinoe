@@ -1,3 +1,0 @@
-version=3
-https://github.com/googlei18n/libphonenumber/tags \
-  .*/archive/libphonenumber-(\d[\d\.]+)\.tar\.gz

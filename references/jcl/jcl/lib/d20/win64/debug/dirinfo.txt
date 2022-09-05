@@ -1,1 +1,0 @@
-This directory is intended as a common place for debug .dcu files of Delphi 20 Win64 packages.

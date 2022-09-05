@@ -1,1 +1,0 @@
-This is the directory where prototype units reside.

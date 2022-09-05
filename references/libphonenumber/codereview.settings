@@ -1,4 +1,0 @@
-# This file is used by gcl to get repository specific information.
-CODE_REVIEW_SERVER: codereview.appspot.com
-TRY_ON_UPLOAD: False
-VIEW_VC: https://github.com/googlei18n/libphonenumber/commit/

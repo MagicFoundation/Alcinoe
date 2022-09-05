@@ -1,1 +1,0 @@
-This directory is intended a common place for compiled files of Delphi 2005 packages.

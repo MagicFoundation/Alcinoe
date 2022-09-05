@@ -1,5 +1,0 @@
-USEUNIT("..\..\experts\versioncontrol\JclVersionControlImpl.pas");
-USEUNIT("..\..\experts\versioncontrol\JclVersionCtrlCommonOptions.pas");
-USEDEF("JclVersionControlExpertDLL.def");
-Project file
-DllEntryPoint

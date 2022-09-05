@@ -1,6 +1,0 @@
-IJclWinMidiOut
-GetMidiOutputs
-MidiInCheck
-MidiOut
-MidiOutCheck
-TStereoChannel

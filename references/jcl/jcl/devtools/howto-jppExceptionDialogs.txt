@@ -1,2 +1,0 @@
-JPP (JEDI PreProcessor) executable has to be placed in this directory.
-It can be built from the source jppExceptionDialogs.dpr available in the jpp subdirectory.

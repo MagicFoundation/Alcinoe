@@ -1,3 +1,0 @@
-TJclStack
-TJclIntfStack
-TJclStrStack

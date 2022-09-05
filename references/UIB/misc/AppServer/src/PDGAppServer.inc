@@ -1,3 +1,0 @@
-{$IFDEF FPC}
-  {.$THREADING ON}
-{$ENDIF}

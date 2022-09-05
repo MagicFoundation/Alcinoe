@@ -1,1 +1,0 @@
-brc32.exe -r -foZComponent.dcr ZComponent.rc

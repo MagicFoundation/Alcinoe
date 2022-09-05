@@ -1,1 +1,0 @@
-This directory is intended as a common place for C++Builder 6 packages.

@@ -1,4 +1,0 @@
-function IsPwrSuspendAllowed: BOOL; stdcall;
-function IsPwrHibernateAllowed: BOOL; stdcall;
-function IsPwrShutdownAllowed: BOOL; stdcall;
-function SetSuspendState(Hibernate, ForceCritical, DisableWakeEvent: BOOL): BOOL; stdcall;

@@ -1,4 +1,0 @@
-TJclDefaultUnitVersioningProvider
-TJclUnitVersioningList
-TJclUnitVersioningProviderModule
-InsertUnitVersioningSection

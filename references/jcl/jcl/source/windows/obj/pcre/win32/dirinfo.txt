@@ -1,1 +1,0 @@
-This is the directory where object files of PCRE (http://www.pcre.org/) for win32 reside.

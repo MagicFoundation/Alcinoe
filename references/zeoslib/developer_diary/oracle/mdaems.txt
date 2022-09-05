@@ -1,9 +1,0 @@
-20060531 : Bad tiReadCommited corrected - See http://zeos.firmos.at/viewtopic.php?t=570
-
-20061024 : Applied Oracle BLOB and Sequence patch - written by martinrame - See http://zeos.firmos.at/viewtopic.php?t=850
-
-20081102 : Added TZOracleCachedResolver class because oracle doesn't support queries without FROM clause - by mdaems - See http://zeos.firmos.at/viewtopic.php?t=2080
-
-20090103 : Connections are now made using the OCIEnvNlsCreate method instead of OCIEnvInit and use UTF8 client charset id on FPC/Lazarus - by mdaems/elidorio2 - See http://zeos.firmos.at/viewtopic.php?t=2172
-
-20090107 : Made previous change depend on Connection property 'codepage' - See http://zeos.firmos.at/viewtopic.php?t=2172

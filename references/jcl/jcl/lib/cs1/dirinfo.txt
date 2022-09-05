@@ -1,1 +1,0 @@
-This directory is intended as a common place for .dcu files of C#Builder 1 packages.

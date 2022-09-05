@@ -395,7 +395,7 @@ begin
 
         //From DPROJ:
         //-----------
-        //<DeployFile Class="File" Configuration="Debug" LocalName="..\..\..\..\..\Alcinoe\lib\jar\org.webrtc\jni\arm64-v8a\libjingle_peerconnection_so.so">
+        //<DeployFile Class="File" Configuration="Debug" LocalName="..\..\..\..\..\Alcinoe\Lib\jar\org.webrtc\jni\arm64-v8a\libjingle_peerconnection_so.so">
         //  <Platform Name="Android">
         //    <Overwrite>true</Overwrite>
         //    <RemoteDir>library\lib\arm64-v8a\</RemoteDir>
@@ -411,7 +411,7 @@ begin
         //
         //To DEPLOYPROJ:
         //--------------
-        //<DeployFile Include="..\..\..\..\..\Alcinoe\lib\jar\org.webrtc\jni\arm64-v8a\libjingle_peerconnection_so.so" Condition="''$(Config)''==''Debug''">
+        //<DeployFile Include="..\..\..\..\..\Alcinoe\Lib\jar\org.webrtc\jni\arm64-v8a\libjingle_peerconnection_so.so" Condition="''$(Config)''==''Debug''">
         //  <DeployClass>File</DeployClass>
         //  <LocalCommand/>
         //  <Operation>0</Operation>

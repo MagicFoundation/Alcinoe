@@ -6095,7 +6095,7 @@ end;
 //
 
 {$IF CompilerVersion > 34} // sydney
-  {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from References\mORMot\SynCommons.pas and adjust the IFDEF'}
 {$IFEND}
 
 type
@@ -12271,7 +12271,7 @@ begin
   //
 
   {$IF CompilerVersion > 34} // sydney
-    {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from references\mORMot\SynCommons.pas and adjust the IFDEF'}
+    {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from References\mORMot\SynCommons.pas and adjust the IFDEF'}
   {$IFEND}
 
   Fillchar(ConvertBase64ToBin,256,255); // invalid value set to -1

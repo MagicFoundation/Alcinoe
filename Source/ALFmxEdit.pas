@@ -103,7 +103,7 @@ type
 
   {****************************************************************}
   // the design of the androidText can be done in the res/styles.xml
-  // please see the example of the demos\AlFmxcontrols.dproj
+  // please see the example of the Demos\ALFmxControls.dproj
   TALAndroidEdit = class(TControl)
   private
     FEditText: TALAndroidEditText;

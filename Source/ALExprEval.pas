@@ -33,7 +33,7 @@ unit ALExprEval;
 interface
 
 {$IF CompilerVersion > 34} // sydney
-  {$MESSAGE WARN 'Check if https://github.com/project-jedi/jcl.git jcl\source\common\JclExprEval.pas was not updated from references\jcl\source\common\JclExprEval.pas and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if https://github.com/project-jedi/jcl.git jcl\source\common\JclExprEval.pas was not updated from References\jcl\source\common\JclExprEval.pas and adjust the IFDEF'}
 {$IFEND}
 
 uses

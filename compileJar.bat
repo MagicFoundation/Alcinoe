@@ -26,7 +26,7 @@ REM ---------------
 REM clean directory
 REM ---------------
 
-SET FileName=lib\jar\com.alcinoe
+SET FileName=Lib\jar\com.alcinoe
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 mkdir %FileName%
@@ -38,31 +38,31 @@ REM ------------------------
 
 echo Build alcinoe-common.jar
 
-mkdir lib\jar\com.alcinoe\com.alcinoe.common
+mkdir Lib\jar\com.alcinoe\com.alcinoe.common
 
-SET FileName=source\output
+SET FileName=Source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
-mkdir source\output 2> nul
+mkdir Source\output 2> nul
 %JDK_PATH%\javac^
  -Xlint:unchecked^
  -Xlint:deprecation^
  -cp %ANDROID_PLATFORM%\android.jar;^
- -d source\output^
- source\java\com\alcinoe\util\*.java^
- source\java\com\alcinoe\content\*.java^
- source\java\com\alcinoe\location\*.java
+ -d Source\output^
+ Source\java\com\alcinoe\util\*.java^
+ Source\java\com\alcinoe\content\*.java^
+ Source\java\com\alcinoe\location\*.java
 IF ERRORLEVEL 1 goto ERROR
 
-SET FileName=source\output\com\alcinoe\*.class
+SET FileName=Source\output\com\alcinoe\*.class
 if exist %FileName% del %FileName%
 if exist %FileName% goto ERROR
 
-%JDK_PATH%\jar cf lib\jar\com.alcinoe\com.alcinoe.common\alcinoe-common.jar -C source\output com\alcinoe\
+%JDK_PATH%\jar cf Lib\jar\com.alcinoe\com.alcinoe.common\alcinoe-common.jar -C Source\output com\alcinoe\
 IF ERRORLEVEL 1 goto ERROR
 
-SET FileName=source\output
+SET FileName=Source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
@@ -73,29 +73,29 @@ REM ----------------------------
 
 echo Build alcinoe-datepicker.jar
 
-mkdir lib\jar\com.alcinoe\com.alcinoe.datepicker
+mkdir Lib\jar\com.alcinoe\com.alcinoe.datepicker
 
-SET FileName=source\output
+SET FileName=Source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
-mkdir source\output 2> nul
+mkdir Source\output 2> nul
 %JDK_PATH%\javac^
  -Xlint:unchecked^
  -Xlint:deprecation^
  -cp %ANDROID_PLATFORM%\android.jar;^
- -d source\output^
- source\java\com\alcinoe\datepicker\*.java
+ -d Source\output^
+ Source\java\com\alcinoe\datepicker\*.java
 IF ERRORLEVEL 1 goto ERROR
 
-SET FileName=source\output\com\alcinoe\*.class
+SET FileName=Source\output\com\alcinoe\*.class
 if exist %FileName% del %FileName%
 if exist %FileName% goto ERROR
 
-%JDK_PATH%\jar cf lib\jar\com.alcinoe\com.alcinoe.datepicker\alcinoe-datepicker.jar -C source\output com\alcinoe\
+%JDK_PATH%\jar cf Lib\jar\com.alcinoe\com.alcinoe.datepicker\alcinoe-datepicker.jar -C Source\output com\alcinoe\
 IF ERRORLEVEL 1 goto ERROR
 
-SET FileName=source\output
+SET FileName=Source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
@@ -106,29 +106,29 @@ REM --------------------------
 
 echo Building alcinoe-edittext.jar
 
-mkdir lib\jar\com.alcinoe\com.alcinoe.edittext
+mkdir Lib\jar\com.alcinoe\com.alcinoe.edittext
 
-SET FileName=source\output
+SET FileName=Source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
-mkdir source\output 2> nul
+mkdir Source\output 2> nul
 %JDK_PATH%\javac^
  -Xlint:unchecked^
  -Xlint:deprecation^
  -cp %ANDROID_PLATFORM%\android.jar;^
- -d source\output^
- source\java\com\alcinoe\edittext\*.java
+ -d Source\output^
+ Source\java\com\alcinoe\edittext\*.java
 IF ERRORLEVEL 1 goto ERROR
 
-SET FileName=source\output\com\alcinoe\*.class
+SET FileName=Source\output\com\alcinoe\*.class
 if exist %FileName% del %FileName%
 if exist %FileName% goto ERROR
 
-%JDK_PATH%\jar cf lib\jar\com.alcinoe\com.alcinoe.edittext\alcinoe-edittext.jar -C source\output com\alcinoe\
+%JDK_PATH%\jar cf Lib\jar\com.alcinoe\com.alcinoe.edittext\alcinoe-edittext.jar -C Source\output com\alcinoe\
 IF ERRORLEVEL 1 goto ERROR
 
-SET FileName=source\output
+SET FileName=Source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
@@ -139,31 +139,31 @@ REM ------------------------
 
 echo Build alcinoe-webrtc.jar
 
-mkdir lib\jar\com.alcinoe\com.alcinoe.webrtc
+mkdir Lib\jar\com.alcinoe\com.alcinoe.webrtc
 
-SET FileName=source\output
+SET FileName=Source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
-mkdir source\output 2> nul
+mkdir Source\output 2> nul
 %JDK_PATH%\javac^
  -Xlint:unchecked^
  -Xlint:deprecation^
  -cp %ANDROID_PLATFORM%\android.jar;^
-lib\jar\com.android.support\support-annotations.jar;^
-lib\jar\org.webrtc\webrtc.jar^
- -d source\output^
- source\java\com\alcinoe\webrtc\*.java
+Lib\jar\com.android.support\support-annotations.jar;^
+Lib\jar\org.webrtc\webrtc.jar^
+ -d Source\output^
+ Source\java\com\alcinoe\webrtc\*.java
 IF ERRORLEVEL 1 goto ERROR
 
-SET FileName=source\output\com\alcinoe\*.class
+SET FileName=Source\output\com\alcinoe\*.class
 if exist %FileName% del %FileName%
 if exist %FileName% goto ERROR
 
-%JDK_PATH%\jar cf lib\jar\com.alcinoe\com.alcinoe.webrtc\alcinoe-webrtc.jar -C source\output com\alcinoe\
+%JDK_PATH%\jar cf Lib\jar\com.alcinoe\com.alcinoe.webrtc\alcinoe-webrtc.jar -C Source\output com\alcinoe\
 IF ERRORLEVEL 1 goto ERROR
 
-SET FileName=source\output
+SET FileName=Source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
@@ -174,30 +174,30 @@ REM ---------------------------
 
 echo Build alcinoe-appsflyer.jar
 
-mkdir lib\jar\com.alcinoe\com.alcinoe.appsflyer
+mkdir Lib\jar\com.alcinoe\com.alcinoe.appsflyer
 
-SET FileName=source\output
+SET FileName=Source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
-mkdir source\output 2> nul
+mkdir Source\output 2> nul
 %JDK_PATH%\javac^
  -Xlint:unchecked^
  -Xlint:deprecation^
  -cp %ANDROID_PLATFORM%\android.jar;^
-lib\jar\com.appsflyer\af-android-sdk.jar^
- -d source\output^
- source\java\com\alcinoe\appsflyer\*.java
+Lib\jar\com.appsflyer\af-android-sdk.jar^
+ -d Source\output^
+ Source\java\com\alcinoe\appsflyer\*.java
 IF ERRORLEVEL 1 goto ERROR
 
-SET FileName=source\output\com\alcinoe\*.class
+SET FileName=Source\output\com\alcinoe\*.class
 if exist %FileName% del %FileName%
 if exist %FileName% goto ERROR
 
-%JDK_PATH%\jar cf lib\jar\com.alcinoe\com.alcinoe.appsflyer\alcinoe-appsflyer.jar -C source\output com\alcinoe\
+%JDK_PATH%\jar cf Lib\jar\com.alcinoe\com.alcinoe.appsflyer\alcinoe-appsflyer.jar -C Source\output com\alcinoe\
 IF ERRORLEVEL 1 goto ERROR
 
-SET FileName=source\output
+SET FileName=Source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
@@ -208,35 +208,35 @@ REM --------------------------
 
 echo Build alcinoe-firebase.jar
 
-mkdir lib\jar\com.alcinoe\com.alcinoe.firebase
+mkdir Lib\jar\com.alcinoe\com.alcinoe.firebase
 
-SET FileName=source\output
+SET FileName=Source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
-mkdir source\output 2> nul
+mkdir Source\output 2> nul
 %JDK_PATH%\javac^
  -Xlint:unchecked^
  -cp %ANDROID_PLATFORM%\android.jar;%FMX_JAR%;^
-lib\jar\com.android.support\support-core-utils.jar;^
-lib\jar\com.android.support\support-compat.jar;^
-lib\jar\com.android.support\support-annotations.jar;^
-lib\jar\com.google.android.gms\play-services-basement.jar;^
-lib\jar\com.google.firebase\firebase-iid.jar;^
-lib\jar\com.google.firebase\firebase-messaging.jar^
- -d source\output^
- source\java\com\alcinoe\firebase\iid\*.java^
- source\java\com\alcinoe\firebase\messaging\*.java
+Lib\jar\com.android.support\support-core-utils.jar;^
+Lib\jar\com.android.support\support-compat.jar;^
+Lib\jar\com.android.support\support-annotations.jar;^
+Lib\jar\com.google.android.gms\play-services-basement.jar;^
+Lib\jar\com.google.firebase\firebase-iid.jar;^
+Lib\jar\com.google.firebase\firebase-messaging.jar^
+ -d Source\output^
+ Source\java\com\alcinoe\firebase\iid\*.java^
+ Source\java\com\alcinoe\firebase\messaging\*.java
 IF ERRORLEVEL 1 goto ERROR
 
-SET FileName=source\output\com\alcinoe\*.class
+SET FileName=Source\output\com\alcinoe\*.class
 if exist %FileName% del %FileName%
 if exist %FileName% goto ERROR
 
-%JDK_PATH%\jar cf lib\jar\com.alcinoe\com.alcinoe.firebase\alcinoe-firebase.jar -C source\output com\alcinoe\
+%JDK_PATH%\jar cf Lib\jar\com.alcinoe\com.alcinoe.firebase\alcinoe-firebase.jar -C Source\output com\alcinoe\
 IF ERRORLEVEL 1 goto ERROR
 
-SET FileName=source\output
+SET FileName=Source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
@@ -247,32 +247,32 @@ REM --------------------------
 
 echo Build alcinoe-facebook.jar
 
-mkdir lib\jar\com.alcinoe\com.alcinoe.facebook
+mkdir Lib\jar\com.alcinoe\com.alcinoe.facebook
 
-SET FileName=source\output
+SET FileName=Source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
-mkdir source\output 2> nul
+mkdir Source\output 2> nul
 %JDK_PATH%\javac^
  -Xlint:unchecked^
  -Xlint:deprecation^
  -cp %ANDROID_PLATFORM%\android.jar;^
-lib\jar\com.android.support\support-fragment.jar;^
-lib\jar\com.android.support\support-annotations.jar;^
-lib\jar\com.facebook.android\facebook-common.jar;^
- -d source\output^
- source\java\com\alcinoe\facebook\*.java
+Lib\jar\com.android.support\support-fragment.jar;^
+Lib\jar\com.android.support\support-annotations.jar;^
+Lib\jar\com.facebook.android\facebook-common.jar;^
+ -d Source\output^
+ Source\java\com\alcinoe\facebook\*.java
 IF ERRORLEVEL 1 goto ERROR
 
-SET FileName=source\output\com\alcinoe\*.class
+SET FileName=Source\output\com\alcinoe\*.class
 if exist %FileName% del %FileName%
 if exist %FileName% goto ERROR
 
-%JDK_PATH%\jar cf lib\jar\com.alcinoe\com.alcinoe.facebook\alcinoe-facebook.jar -C source\output com\alcinoe\
+%JDK_PATH%\jar cf Lib\jar\com.alcinoe\com.alcinoe.facebook\alcinoe-facebook.jar -C Source\output com\alcinoe\
 IF ERRORLEVEL 1 goto ERROR
 
-SET FileName=source\output
+SET FileName=Source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
@@ -283,30 +283,30 @@ REM ---------------------------------
 
 echo Build alcinoe-installreferrer.jar
 
-mkdir lib\jar\com.alcinoe\com.alcinoe.installreferrer
+mkdir Lib\jar\com.alcinoe\com.alcinoe.installreferrer
 
-SET FileName=source\output
+SET FileName=Source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
-mkdir source\output 2> nul
+mkdir Source\output 2> nul
 %JDK_PATH%\javac^
  -Xlint:unchecked^
  -Xlint:deprecation^
  -cp %ANDROID_PLATFORM%\android.jar;^
-lib\jar\com.android.installreferrer\installreferrer.jar;^
- -d source\output^
- source\java\com\alcinoe\installreferrer\*.java
+Lib\jar\com.android.installreferrer\installreferrer.jar;^
+ -d Source\output^
+ Source\java\com\alcinoe\installreferrer\*.java
 IF ERRORLEVEL 1 goto ERROR
 
-SET FileName=source\output\com\alcinoe\*.class
+SET FileName=Source\output\com\alcinoe\*.class
 if exist %FileName% del %FileName%
 if exist %FileName% goto ERROR
 
-%JDK_PATH%\jar cf lib\jar\com.alcinoe\com.alcinoe.installreferrer\alcinoe-installreferrer.jar -C source\output com\alcinoe\
+%JDK_PATH%\jar cf Lib\jar\com.alcinoe\com.alcinoe.installreferrer\alcinoe-installreferrer.jar -C Source\output com\alcinoe\
 IF ERRORLEVEL 1 goto ERROR
 
-SET FileName=source\output
+SET FileName=Source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 

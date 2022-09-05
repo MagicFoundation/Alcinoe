@@ -24,13 +24,13 @@ too hard to manage and debug the both compiler
 INSTALLATION
 1) on android you will need to patch the RTL because it's not support
    GL_TEXTURE_EXTERNAL_OES https://quality.embarcadero.com/browse/RSP-16830
-   see sample of the patched library in demos\alfmxcontrols
+   see sample of the patched library in Demos\ALFmxControls
 2) on android we use exoplayer so you must add the exoplayer libraries
-   (lib\jar\exoplayer\exoplayer-core.jar and if you need HLS support
-   lib\jar\exoplayer\exoplayer-hls.jar) in
+   (Lib\jar\exoplayer\exoplayer-core.jar and if you need HLS support
+   Lib\jar\exoplayer\exoplayer-hls.jar) in
    project manager > target platforms> Android > libraries
 3) after it's must be quite easy, just read the source code or look the sample
-   located at demos\alfmxcontrols
+   located at Demos\ALFmxControls
 *******************************************************************************)
 unit ALFmxVideoPlayer;
 

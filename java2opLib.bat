@@ -24,9 +24,9 @@ REM call initjava2op
 REM ----------------
 
 set filenames=
-for /f %%G in ('dir .\lib\jar\*.jar /s /b /a-d') do (
-  if not "%%~G" == "%CD%\lib\jar\org.webrtc\webrtc.jar" (
-    if not "%%~G" == "%CD%\lib\jar\org.jetbrains.kotlin\kotlin-stdlib.jar" (
+for /f %%G in ('dir .\Lib\jar\*.jar /s /b /a-d') do (
+  if not "%%~G" == "%CD%\Lib\jar\org.webrtc\webrtc.jar" (
+    if not "%%~G" == "%CD%\Lib\jar\org.jetbrains.kotlin\kotlin-stdlib.jar" (
       set filenames=!filenames! %%~G
     )
   )

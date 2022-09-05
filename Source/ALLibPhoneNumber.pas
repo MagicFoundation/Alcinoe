@@ -6,7 +6,7 @@ ALLibPhoneNumber is a wrapper for a several functions that use
 Google's C++ library libphonenumber to parse and format
 phone numbers written in a free form.
 This wrapper requires few DLLs to be working correctly.
-These DLLs are distributed in the folder "lib/dll".
+These DLLs are distributed in the folder "Lib/dll".
 
 This wrapper is based on a custom DLL-modification that provides three
 main functions:

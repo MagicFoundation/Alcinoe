@@ -30,23 +30,23 @@ Compiled demo
 
 #### Win32 #### 
 
-* https://svn.code.sf.net/p/alcinoe/code/demos/ALWinHTTPClient/win32/ALWinHTTPClientDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/demos/ALWinInetHTTPClient/win32/ALWinInetHTTPClientDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/demos/ALWinHTTPWebSocketClient/win32/ALWinHTTPWebSocketClientDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/demos/ALSortedListBenchmark/win32/ALSortedListBenchmark.exe
-* https://svn.code.sf.net/p/alcinoe/code/demos/ALCipher/win32/ALCipherDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/demos/ALJsonDoc/win32/AljsonDocDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/demos/ALNNTPClient/win32/ALNNTPClientDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/demos/ALPhpRunner/win32/ALPhpRunnerDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/demos/ALPOP3Client/win32/POP3ClientDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/demos/ALSMTPClient/win32/ALSMTPClientDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/demos/ALSqlite3Client/win32/ALSqlite3clientDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/demos/ALStressHTTPServer/win32/ALStressHTTPServer.exe
-* https://svn.code.sf.net/p/alcinoe/code/demos/ALStringBenchmark/win32/ALStringBenchmark.exe
-* https://svn.code.sf.net/p/alcinoe/code/demos/ALWebSpider/win32/ALWebSpiderDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/demos/ALXmlDoc/win32/AlXmlDocDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/demos/ALLiveVideoChat/server/Win32/Release/ALLiveVideoChatServer.exe
-* https://svn.code.sf.net/p/alcinoe/code/demos/ALConfetti/Win32/Release/ALConfettiDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/Demos/ALWinHTTPClient/win32/ALWinHTTPClientDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/Demos/ALWinInetHTTPClient/win32/ALWinInetHTTPClientDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/Demos/ALWinHTTPWebSocketClient/win32/ALWinHTTPWebSocketClientDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/Demos/ALSortedListBenchmark/win32/ALSortedListBenchmark.exe
+* https://svn.code.sf.net/p/alcinoe/code/Demos/ALCipher/win32/ALCipherDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/Demos/ALJsonDoc/win32/AljsonDocDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/Demos/ALNNTPClient/win32/ALNNTPClientDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/Demos/ALPhpRunner/win32/ALPhpRunnerDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/Demos/ALPOP3Client/win32/POP3ClientDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/Demos/ALSMTPClient/win32/ALSMTPClientDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/Demos/ALSqlite3Client/win32/ALSqlite3clientDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/Demos/ALStressHTTPServer/win32/ALStressHTTPServer.exe
+* https://svn.code.sf.net/p/alcinoe/code/Demos/ALStringBenchmark/win32/ALStringBenchmark.exe
+* https://svn.code.sf.net/p/alcinoe/code/Demos/ALWebSpider/win32/ALWebSpiderDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/Demos/ALXmlDoc/win32/AlXmlDocDemo.exe
+* https://svn.code.sf.net/p/alcinoe/code/Demos/ALLiveVideoChat/server/Win32/Release/ALLiveVideoChatServer.exe
+* https://svn.code.sf.net/p/alcinoe/code/Demos/ALConfetti/Win32/Release/ALConfettiDemo.exe
 
 #### Android #### 
 
@@ -66,17 +66,17 @@ Install Alcinoe
 ---------------
 
 If you don't plan to use any Alcinoe visual components at design time, then
-you don't need to install anything, just add <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/source">{alcinoe_rootdir}\source</a> in the 
+you don't need to install anything, just add <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Source">{alcinoe_rootdir}\Source</a> in the 
 search path of your project. 
 
 If you plan to use visual components at design time then you need to
 install the bpl. Launch Delphi and go in component > Install Packages... > and choose the 
-BPL located in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/lib/bpl/alcinoe/Win32/sydney">{alcinoe_rootdir}\lib\bpl\alcinoe\Win32\sydney\Alcinoe_sydney.bpl</a> (if you are in delphi Sydney 
+BPL located in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Lib/bpl/alcinoe/Win32/sydney">{alcinoe_rootdir}\Lib\bpl\alcinoe\Win32\sydney\Alcinoe_sydney.bpl</a> (if you are in delphi Sydney 
 else choose the directory that correspond to your Delphi version). 
-You still need to add in your search path <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/source">{alcinoe_rootdir}\source</a>  
+You still need to add in your search path <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Source">{alcinoe_rootdir}\Source</a>  
   
 Alcinoe also improuve a little the original delphi source code. In this way you will need
-to go in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/embarcadero/sydney/10_4_2/">{alcinoe_rootdir}\embarcadero\sydney\10_4_2</a>
+to go in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/sydney/10_4_2/">{alcinoe_rootdir}\Embarcadero\sydney\10_4_2</a>
 and run update.bat to retrieve and patch the original delphi source code. The batch file
 assume that the original source code is located in "c:\Program Files (x86)\Embarcadero\Studio\21.0\source\" 
 and that you have GIT in your path. After the batch copied and patched the Delphi source code you will 
@@ -452,7 +452,7 @@ Example :
     begin
     
       //Create the ImageMagick Library
-      alCreateImageMagickLibrary({alcinoe_rootdir} + '\lib\dll\imagemagick\win32\imagemagick', min(2, System.CPUCount){aThreadLimit});
+      alCreateImageMagickLibrary({alcinoe_rootdir} + '\Lib\dll\imagemagick\win32\imagemagick', min(2, System.CPUCount){aThreadLimit});
       try
       
         //create the wand pointer

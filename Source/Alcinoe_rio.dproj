@@ -86,10 +86,10 @@
         <DCC_HppOutput>.\hpp\$(Platform)\rio\</DCC_HppOutput>
         <DesignOnlyPackage>true</DesignOnlyPackage>
         <DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
-        <DCC_DcpOutput>..\lib\bpl\alcinoe\$(Platform)\rio\</DCC_DcpOutput>
+        <DCC_DcpOutput>..\Lib\bpl\alcinoe\$(Platform)\rio\</DCC_DcpOutput>
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_BplOutput>..\lib\bpl\alcinoe\$(Platform)\rio\</DCC_BplOutput>
+        <DCC_BplOutput>..\Lib\bpl\alcinoe\$(Platform)\rio\</DCC_BplOutput>
         <SanitizedProjectName>Alcinoe_rio</SanitizedProjectName>
         <GenPackage>true</GenPackage>
         <VerInfo_Locale>1033</VerInfo_Locale>
@@ -97,7 +97,7 @@
         <DCC_Description>Alcinoe</DCC_Description>
         <GenDll>true</GenDll>
         <DCC_DcuOutput>.\dcu\$(Platform)\rio\</DCC_DcuOutput>
-        <DCC_ExeOutput>..\lib\bpl\alcinoe\$(Platform)\</DCC_ExeOutput>
+        <DCC_ExeOutput>..\Lib\bpl\alcinoe\$(Platform)\</DCC_ExeOutput>
         <DCC_E>false</DCC_E>
         <DCC_N>false</DCC_N>
         <DCC_S>false</DCC_S>
@@ -245,13 +245,13 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\lib\bpl\alcinoe\Win32\rio\Alcinoe_rio.bpl" Configuration="Release" Class="ProjectOutput">
+                <DeployFile LocalName="..\Lib\bpl\alcinoe\Win32\rio\Alcinoe_rio.bpl" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>Alcinoe_rio.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\lib\dpk\Alcinoe_rio.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\Lib\dpk\Alcinoe_rio.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>Alcinoe_rio.bpl</RemoteName>
                         <Overwrite>true</Overwrite>

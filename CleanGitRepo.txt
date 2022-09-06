@@ -1,0 +1,20 @@
+If you need to remove files from the git history
+to get back space you can do it with git-filter-repo:
+
+* Clone https://github.com/newren/git-filter-repo.git 
+* Download Python Windows embeddable package (64-bit) from https://www.python.org/downloads/windows/
+* Clone https://github.com/MagicFoundation/Alcinoe.git somewhere (!that important to stay safe!)
+* Launch a command prompt in the Cloned Alcinoe root directory
+* set PATH=C:\Dev\git-filter-repo;%PATH%
+* set PATH=c:\Program Files\Python;%PATH%
+* git filter-repo --path-glob "Demos/*.exe" --invert-paths --force
+* git filter-repo --path-glob "Demos/*.apk" --invert-paths --force
+* git remote add origin https://github.com/MagicFoundation/Alcinoe.git
+* git push --force --all origin
+
+-------------------------------
+
+You can also analyze the list of directories/files that 
+can be deleted like this:
+
+git filter-repo --analyze

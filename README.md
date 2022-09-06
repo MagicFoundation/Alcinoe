@@ -23,45 +23,7 @@ Example of app made with Alcinoe
 * iOS: https://itunes.apple.com/us/app/id1420049759
 * Android: https://play.google.com/store/apps/details?id=club.kiskis.app&hl=en
 
-  
-  
-Compiled demo
--------------
-
-#### Win32 #### 
-
-* https://svn.code.sf.net/p/alcinoe/code/Demos/ALWinHTTPClient/win32/ALWinHTTPClientDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/Demos/ALWinInetHTTPClient/win32/ALWinInetHTTPClientDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/Demos/ALWinHTTPWebSocketClient/win32/ALWinHTTPWebSocketClientDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/Demos/ALSortedListBenchmark/win32/ALSortedListBenchmark.exe
-* https://svn.code.sf.net/p/alcinoe/code/Demos/ALCipher/win32/ALCipherDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/Demos/ALJsonDoc/win32/AljsonDocDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/Demos/ALNNTPClient/win32/ALNNTPClientDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/Demos/ALPhpRunner/win32/ALPhpRunnerDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/Demos/ALPOP3Client/win32/POP3ClientDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/Demos/ALSMTPClient/win32/ALSMTPClientDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/Demos/ALSqlite3Client/win32/ALSqlite3clientDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/Demos/ALStressHTTPServer/win32/ALStressHTTPServer.exe
-* https://svn.code.sf.net/p/alcinoe/code/Demos/ALStringBenchmark/win32/ALStringBenchmark.exe
-* https://svn.code.sf.net/p/alcinoe/code/Demos/ALWebSpider/win32/ALWebSpiderDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/Demos/ALXmlDoc/win32/AlXmlDocDemo.exe
-* https://svn.code.sf.net/p/alcinoe/code/Demos/ALLiveVideoChat/server/Win32/Release/ALLiveVideoChatServer.exe
-* https://svn.code.sf.net/p/alcinoe/code/Demos/ALConfetti/Win32/Release/ALConfettiDemo.exe
-
-#### Android #### 
-
-* https://tinyurl.com/zoxavr9 (ALFmxControl.apk)
-* https://tinyurl.com/na5fvy2d (ALFirebaseMessaging.apk)
-* https://tinyurl.com/y9gzos9f (ALFacebookLogin.apk)
-* https://tinyurl.com/mzf8adyk (ALFmxFilterEffects.apk)
-* https://tinyurl.com/ydymo23w (ALLiveVideoChatClient.apk)
-* https://tinyurl.com/yeankev2 (ALConfettiDemo.apk)
-
-#### iOS #### 
-
-Please ask apple how to do
-
-
+    
 Install Alcinoe
 ---------------
 

@@ -1,0 +1,1720 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Condition="Exists(&#39;$(BDS)\bin\CodeGear.Deployment.targets&#39;)" Project="$(BDS)\bin\CodeGear.Deployment.targets"/>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Android&#39;">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
+      <DeployClass>Android_LauncherIcon144</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png">
+      <DeployClass>Android_LauncherIcon192</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png">
+      <DeployClass>Android_LauncherIcon36</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-ldpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png">
+      <DeployClass>Android_LauncherIcon48</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png">
+      <DeployClass>Android_LauncherIcon72</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png">
+      <DeployClass>Android_LauncherIcon96</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png">
+      <DeployClass>Android_NotificationIcon24</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>ic_notification.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png">
+      <DeployClass>Android_NotificationIcon36</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>ic_notification.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png">
+      <DeployClass>Android_NotificationIcon48</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>ic_notification.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png">
+      <DeployClass>Android_NotificationIcon72</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>ic_notification.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png">
+      <DeployClass>Android_NotificationIcon96</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_notification.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png">
+      <DeployClass>Android_SplashImage426</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-small\</RemoteDir>
+      <RemoteName>splash_image.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png">
+      <DeployClass>Android_SplashImage470</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-normal\</RemoteDir>
+      <RemoteName>splash_image.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png">
+      <DeployClass>Android_SplashImage640</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-large\</RemoteDir>
+      <RemoteName>splash_image.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png">
+      <DeployClass>Android_SplashImage960</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xlarge\</RemoteDir>
+      <RemoteName>splash_image.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
+      <DeployClass>AndroidLibnativeArmeabiFile</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\armeabi\</RemoteDir>
+      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
+      <DeployClass>AndroidLibnativeMipsFile</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\mips\</RemoteDir>
+      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\AndroidManifest.xml">
+      <DeployClass>ProjectAndroidManifest</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\</RemoteDir>
+      <RemoteName>AndroidManifest.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\classes.dex">
+      <DeployClass>AndroidClassesDexFile</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\classes\</RemoteDir>
+      <RemoteName>classes.dex</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\libALFmxFilterEffectsDemo.so">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\armeabi-v7a\</RemoteDir>
+      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
+      <DeployClass>Android_LauncherIcon144</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png">
+      <DeployClass>Android_LauncherIcon192</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png">
+      <DeployClass>Android_LauncherIcon36</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-ldpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png">
+      <DeployClass>Android_LauncherIcon48</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png">
+      <DeployClass>Android_LauncherIcon72</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png">
+      <DeployClass>Android_LauncherIcon96</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png">
+      <DeployClass>Android_NotificationIcon24</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>ic_notification.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png">
+      <DeployClass>Android_NotificationIcon36</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>ic_notification.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png">
+      <DeployClass>Android_NotificationIcon48</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>ic_notification.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png">
+      <DeployClass>Android_NotificationIcon72</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>ic_notification.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png">
+      <DeployClass>Android_NotificationIcon96</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_notification.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png">
+      <DeployClass>Android_SplashImage426</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-small\</RemoteDir>
+      <RemoteName>splash_image.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png">
+      <DeployClass>Android_SplashImage470</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-normal\</RemoteDir>
+      <RemoteName>splash_image.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png">
+      <DeployClass>Android_SplashImage640</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-large\</RemoteDir>
+      <RemoteName>splash_image.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png">
+      <DeployClass>Android_SplashImage960</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xlarge\</RemoteDir>
+      <RemoteName>splash_image.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
+      <DeployClass>AndroidLibnativeArmeabiFile</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\armeabi\</RemoteDir>
+      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
+      <DeployClass>AndroidLibnativeMipsFile</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\mips\</RemoteDir>
+      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\AndroidManifest.xml">
+      <DeployClass>ProjectAndroidManifest</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\</RemoteDir>
+      <RemoteName>AndroidManifest.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\classes.dex">
+      <DeployClass>AndroidClassesDexFile</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\classes\</RemoteDir>
+      <RemoteName>classes.dex</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\colors.xml">
+      <DeployClass>Android_Colors</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\values\</RemoteDir>
+      <RemoteName>colors.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\libALFmxFilterEffectsDemo.so">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\armeabi-v7a\</RemoteDir>
+      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\splash_image_def.xml">
+      <DeployClass>AndroidSplashImageDef</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable\</RemoteDir>
+      <RemoteName>splash_image_def.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\strings.xml">
+      <DeployClass>Android_Strings</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\values\</RemoteDir>
+      <RemoteName>strings.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\styles-v21.xml">
+      <DeployClass>AndroidSplashStylesV21</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\values-v21\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\styles.xml">
+      <DeployClass>AndroidSplashStyles</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\values\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
+  </ItemGroup>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Android64&#39;">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
+      <DeployClass>Android_LauncherIcon144</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png">
+      <DeployClass>Android_LauncherIcon192</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png">
+      <DeployClass>Android_LauncherIcon36</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-ldpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png">
+      <DeployClass>Android_LauncherIcon48</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png">
+      <DeployClass>Android_LauncherIcon72</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png">
+      <DeployClass>Android_LauncherIcon96</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png">
+      <DeployClass>Android_SplashImage426</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-small\</RemoteDir>
+      <RemoteName>splash_image.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png">
+      <DeployClass>Android_SplashImage470</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-normal\</RemoteDir>
+      <RemoteName>splash_image.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png">
+      <DeployClass>Android_SplashImage640</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-large\</RemoteDir>
+      <RemoteName>splash_image.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png">
+      <DeployClass>Android_SplashImage960</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xlarge\</RemoteDir>
+      <RemoteName>splash_image.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so">
+      <DeployClass>AndroidLibnativeArmeabiv7aFile</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\armeabi-v7a\</RemoteDir>
+      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
+      <DeployClass>AndroidLibnativeArmeabiFile</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\armeabi\</RemoteDir>
+      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
+      <DeployClass>AndroidLibnativeMipsFile</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\mips\</RemoteDir>
+      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\AndroidManifest.xml">
+      <DeployClass>ProjectAndroidManifest</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\</RemoteDir>
+      <RemoteName>AndroidManifest.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\classes.dex">
+      <DeployClass>AndroidClassesDexFile</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\classes\</RemoteDir>
+      <RemoteName>classes.dex</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\libALFmxFilterEffectsDemo.so">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\arm64-v8a\</RemoteDir>
+      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
+      <DeployClass>Android_LauncherIcon144</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png">
+      <DeployClass>Android_LauncherIcon192</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png">
+      <DeployClass>Android_LauncherIcon36</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-ldpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png">
+      <DeployClass>Android_LauncherIcon48</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png">
+      <DeployClass>Android_LauncherIcon72</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png">
+      <DeployClass>Android_LauncherIcon96</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png">
+      <DeployClass>Android_SplashImage426</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-small\</RemoteDir>
+      <RemoteName>splash_image.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png">
+      <DeployClass>Android_SplashImage470</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-normal\</RemoteDir>
+      <RemoteName>splash_image.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png">
+      <DeployClass>Android_SplashImage640</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-large\</RemoteDir>
+      <RemoteName>splash_image.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png">
+      <DeployClass>Android_SplashImage960</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xlarge\</RemoteDir>
+      <RemoteName>splash_image.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so">
+      <DeployClass>AndroidLibnativeArmeabiv7aFile</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\armeabi-v7a\</RemoteDir>
+      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
+      <DeployClass>AndroidLibnativeArmeabiFile</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\armeabi\</RemoteDir>
+      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
+      <DeployClass>AndroidLibnativeMipsFile</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\mips\</RemoteDir>
+      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\AndroidManifest.xml">
+      <DeployClass>ProjectAndroidManifest</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\</RemoteDir>
+      <RemoteName>AndroidManifest.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\classes.dex">
+      <DeployClass>AndroidClassesDexFile</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\classes\</RemoteDir>
+      <RemoteName>classes.dex</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\colors.xml">
+      <DeployClass>Android_Colors</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\values\</RemoteDir>
+      <RemoteName>colors.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\libALFmxFilterEffectsDemo.so">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\arm64-v8a\</RemoteDir>
+      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\splash_image_def.xml">
+      <DeployClass>AndroidSplashImageDef</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable\</RemoteDir>
+      <RemoteName>splash_image_def.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\strings.xml">
+      <DeployClass>Android_Strings</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\values\</RemoteDir>
+      <RemoteName>strings.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\styles-v21.xml">
+      <DeployClass>AndroidSplashStylesV21</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\values-v21\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\styles.xml">
+      <DeployClass>AndroidSplashStyles</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\values\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
+  </ItemGroup>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;OSX64&#39;">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
+      <DeployClass>ProjectOSXResource</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\Contents\Resources\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.icns</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSX64\Debug\ALFmxFilterEffectsDemo">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\Contents\MacOS\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSX64\Debug\ALFmxFilterEffectsDemo.dSYM">
+      <DeployClass>ProjectOSXDebug</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSX64\Debug\ALFmxFilterEffectsDemo.entitlements">
+      <DeployClass>ProjectOSXEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSX64\Debug\ALFmxFilterEffectsDemo.info.plist">
+      <DeployClass>ProjectOSXInfoPList</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\Contents\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
+      <DeployClass>ProjectOSXResource</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\Contents\Resources\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.icns</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSX64\Release\ALFmxFilterEffectsDemo">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\Contents\MacOS\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSX64\Release\ALFmxFilterEffectsDemo.dSYM">
+      <DeployClass>ProjectOSXDebug</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSX64\Release\ALFmxFilterEffectsDemo.entitlements">
+      <DeployClass>ProjectOSXEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSX64\Release\ALFmxFilterEffectsDemo.info.plist">
+      <DeployClass>ProjectOSXInfoPList</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\Contents\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+  </ItemGroup>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win32&#39;"/>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win64&#39;"/>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;iOSDevice64&#39;">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
+      <DeployClass>iPad_AppIcon152</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_152x152.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png">
+      <DeployClass>iPad_AppIcon167</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_167x167.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageDark_2x.png">
+      <DeployClass>iPad_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPadDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImage_2x.png">
+      <DeployClass>iPad_Launch2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPad@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png">
+      <DeployClass>iPad_Notification40</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png">
+      <DeployClass>iPad_Setting58</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png">
+      <DeployClass>iPad_SpotLight80</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png">
+      <DeployClass>iOS_AppStore1024</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_1024x1024.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
+      <DeployClass>iPhone_AppIcon120</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_120x120.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png">
+      <DeployClass>iPhone_AppIcon180</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_180x180.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png">
+      <DeployClass>iPhone_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png">
+      <DeployClass>iPhone_LaunchDark3x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@3x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png">
+      <DeployClass>iPhone_Launch2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhone@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png">
+      <DeployClass>iPhone_Launch3x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhone@3x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png">
+      <DeployClass>iPhone_Notification40</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_60x60.png">
+      <DeployClass>iPhone_Notification60</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_60x60.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png">
+      <DeployClass>iPhone_Setting58</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_87x87.png">
+      <DeployClass>iPhone_Setting87</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_87x87.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png">
+      <DeployClass>iPhone_Spotlight120</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_120x120.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png">
+      <DeployClass>iPhone_Spotlight80</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSDevice64\Debug\ALFmxFilterEffectsDemo">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSDevice64\Debug\ALFmxFilterEffectsDemo.dSYM">
+      <DeployClass>ProjectiOSDeviceDebug</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSDevice64\Debug\ALFmxFilterEffectsDemo.entitlements">
+      <DeployClass>ProjectiOSEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSDevice64\Debug\ALFmxFilterEffectsDemo.info.plist">
+      <DeployClass>ProjectiOSInfoPList</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSDevice64\Debug\ALFmxFilterEffectsDemo.launchscreen">
+      <DeployClass>ProjectiOSLaunchScreen</DeployClass>
+      <LocalCommand/>
+      <Operation>64</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.launchscreen</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
+      <DeployClass>iPad_AppIcon152</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_152x152.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png">
+      <DeployClass>iPad_AppIcon167</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_167x167.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageDark_2x.png">
+      <DeployClass>iPad_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPadDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImage_2x.png">
+      <DeployClass>iPad_Launch2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPad@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png">
+      <DeployClass>iPad_Notification40</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png">
+      <DeployClass>iPad_Setting58</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png">
+      <DeployClass>iPad_SpotLight80</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png">
+      <DeployClass>iOS_AppStore1024</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_1024x1024.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
+      <DeployClass>iPhone_AppIcon120</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_120x120.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png">
+      <DeployClass>iPhone_AppIcon180</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_180x180.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png">
+      <DeployClass>iPhone_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png">
+      <DeployClass>iPhone_LaunchDark3x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@3x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png">
+      <DeployClass>iPhone_Launch2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhone@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png">
+      <DeployClass>iPhone_Launch3x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhone@3x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png">
+      <DeployClass>iPhone_Notification40</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_60x60.png">
+      <DeployClass>iPhone_Notification60</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_60x60.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png">
+      <DeployClass>iPhone_Setting58</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_87x87.png">
+      <DeployClass>iPhone_Setting87</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_87x87.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png">
+      <DeployClass>iPhone_Spotlight120</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_120x120.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png">
+      <DeployClass>iPhone_Spotlight80</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSDevice64\Release\ALFmxFilterEffectsDemo">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSDevice64\Release\ALFmxFilterEffectsDemo.dSYM">
+      <DeployClass>ProjectiOSDeviceDebug</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSDevice64\Release\ALFmxFilterEffectsDemo.entitlements">
+      <DeployClass>ProjectiOSEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSDevice64\Release\ALFmxFilterEffectsDemo.info.plist">
+      <DeployClass>ProjectiOSInfoPList</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSDevice64\Release\ALFmxFilterEffectsDemo.launchscreen">
+      <DeployClass>ProjectiOSLaunchScreen</DeployClass>
+      <LocalCommand/>
+      <Operation>64</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.launchscreen</RemoteName>
+    </DeployFile>
+  </ItemGroup>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;iOSSimulator&#39;">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
+      <DeployClass>iPad_AppIcon152</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_152x152.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png">
+      <DeployClass>iPad_AppIcon167</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_167x167.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageDark_2x.png">
+      <DeployClass>iPad_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPadDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImage_2x.png">
+      <DeployClass>iPad_Launch2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPad@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png">
+      <DeployClass>iPad_Notification40</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png">
+      <DeployClass>iPad_Setting58</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png">
+      <DeployClass>iPad_SpotLight80</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
+      <DeployClass>iPhone_AppIcon120</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_120x120.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png">
+      <DeployClass>iPhone_AppIcon180</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_180x180.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png">
+      <DeployClass>iPhone_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png">
+      <DeployClass>iPhone_LaunchDark3x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@3x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png">
+      <DeployClass>iPhone_Launch2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhone@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png">
+      <DeployClass>iPhone_Launch3x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhone@3x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png">
+      <DeployClass>iPhone_Notification40</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_60x60.png">
+      <DeployClass>iPhone_Notification60</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_60x60.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png">
+      <DeployClass>iPhone_Setting58</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_87x87.png">
+      <DeployClass>iPhone_Setting87</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_87x87.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png">
+      <DeployClass>iPhone_Spotlight120</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_120x120.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png">
+      <DeployClass>iPhone_Spotlight80</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimulator\Debug\ALFmxFilterEffectsDemo">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimulator\Debug\ALFmxFilterEffectsDemo.info.plist">
+      <DeployClass>ProjectiOSInfoPList</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimulator\Debug\ALFmxFilterEffectsDemo.launchscreen">
+      <DeployClass>ProjectiOSLaunchScreen</DeployClass>
+      <LocalCommand/>
+      <Operation>64</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.launchscreen</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
+      <DeployClass>iPad_AppIcon152</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_152x152.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png">
+      <DeployClass>iPad_AppIcon167</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_167x167.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageDark_2x.png">
+      <DeployClass>iPad_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPadDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImage_2x.png">
+      <DeployClass>iPad_Launch2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPad@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png">
+      <DeployClass>iPad_Notification40</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png">
+      <DeployClass>iPad_Setting58</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png">
+      <DeployClass>iPad_SpotLight80</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
+      <DeployClass>iPhone_AppIcon120</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_120x120.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png">
+      <DeployClass>iPhone_AppIcon180</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_180x180.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png">
+      <DeployClass>iPhone_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png">
+      <DeployClass>iPhone_LaunchDark3x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@3x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png">
+      <DeployClass>iPhone_Launch2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhone@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png">
+      <DeployClass>iPhone_Launch3x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhone@3x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png">
+      <DeployClass>iPhone_Notification40</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_60x60.png">
+      <DeployClass>iPhone_Notification60</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_60x60.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png">
+      <DeployClass>iPhone_Setting58</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_87x87.png">
+      <DeployClass>iPhone_Setting87</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_87x87.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png">
+      <DeployClass>iPhone_Spotlight120</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_120x120.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png">
+      <DeployClass>iPhone_Spotlight80</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimulator\Release\ALFmxFilterEffectsDemo">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimulator\Release\ALFmxFilterEffectsDemo.info.plist">
+      <DeployClass>ProjectiOSInfoPList</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimulator\Release\ALFmxFilterEffectsDemo.launchscreen">
+      <DeployClass>ProjectiOSLaunchScreen</DeployClass>
+      <LocalCommand/>
+      <Operation>64</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.launchscreen</RemoteName>
+    </DeployFile>
+    <DeployFile Include="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib">
+      <DeployClass>DependencyModule</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\</RemoteDir>
+      <RemoteName>libcgunwind.1.0.dylib</RemoteName>
+    </DeployFile>
+    <DeployFile Include="$(BDS)\Redist\iossimulator\libpcre.dylib">
+      <DeployClass>DependencyModule</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\</RemoteDir>
+      <RemoteName>libpcre.dylib</RemoteName>
+    </DeployFile>
+  </ItemGroup>
+  <ProjectExtensions>
+    <ProjectFileVersion>12</ProjectFileVersion>
+  </ProjectExtensions>
+</Project>

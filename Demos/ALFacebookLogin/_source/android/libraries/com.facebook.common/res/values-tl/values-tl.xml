@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">Puntahan ang &lt;b>facebook.com/device&lt;/b> at ilagay ang code na ipinapakita sa itaas.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">Hindi inaasahang error habang dina-download ang larawan.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">Ang pag-log in sa WebView ay nangangailangan ng pahintulot sa INTERNET</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">Nagustuhan</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">I-like</string>
+    <string gender="unknown" name="com_facebook_loading">Naglo-load...</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">I-cancel</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">Mag-log in</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Magpatuloy gamit ang Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Mag-log in sa Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">Mag-log out</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">Mag-log out</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">Mag-log-in bilang: %1$s.</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Naka-log in gamit ang Facebook</string>
+    <string gender="unknown" name="com_facebook_send_button_text">Ipadala</string>
+    <string gender="unknown" name="com_facebook_share_button_text">I-share</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">Para ikonekta ang iyong account, buksan ang Facebook app sa iyong cellphone at tumingin ng mga notification.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- O -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">Hindi ikaw?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">Magpatuloy bilang %1$s</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">I-confirm ang Pag-log in</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">Ikaw ang may kontrol - piliin anong impormasyon ang gusto mong i-share sa mga app.</string>
+</resources>

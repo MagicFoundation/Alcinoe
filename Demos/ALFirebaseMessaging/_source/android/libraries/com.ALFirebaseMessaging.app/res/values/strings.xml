@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  
+  <!-- taken from google-services.json -->
+  <string name="default_web_client_id" translatable="false">596768615416-k9s0bb7ca09jm101895e2g0t9oae1pu7.apps.googleusercontent.com</string> <!-- {YOUR_CLIENT}/oauth_client/client_id (client_type == 3) -->
+  <string name="firebase_database_url" translatable="false">https://ALFirebaseMessaging-97d45.firebaseio.com</string> <!-- project_info/firebase_url -->
+  <string name="gcm_defaultSenderId" translatable="false">596768615416</string> <!-- project_info/project_number -->
+  <string name="google_api_key" translatable="false">AIzaSyAT7ei3tt2sggSN-0kOf-xzFh9FoaH6yTY</string> <!-- {YOUR_CLIENT}/api_key/current_key -->
+  <string name="google_app_id" translatable="false">1:596768615416:android:478ee35511076a59</string> <!-- {YOUR_CLIENT}/client_info/mobilesdk_app_id -->
+  <string name="google_crash_reporting_api_key" translatable="false">AIzaSyAT7ei3tt2sggSN-0kOf-xzFh9FoaH6yTY</string> <!-- {YOUR_CLIENT}/api_key/current_key -->
+  <string name="google_storage_bucket" translatable="false">ALFirebaseMessaging-97d45.appspot.com</string> <!-- project_info/storage_bucket -->
+    
+</resources>

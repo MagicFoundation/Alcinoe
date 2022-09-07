@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">Keresd fel a &lt;b>facebook.com/device&lt;/b> címet, és írd be a fent megjelenített kódot.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">Váratlan hiba történt a kép letöltésekor.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">A WebView-bejelentkezéshez „INTERNET” jogosultság szükséges.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">AndroidManifest hiba</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">Kedvelt</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">Tetszik</string>
+    <string gender="unknown" name="com_facebook_loading">Betöltés…</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">Mégsem</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">Belépés</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Folytatás a Facebookkal</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Bejelentkezés Facebookkal</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">Kijelentkezés</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">Kijelentkezés</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">Bejelentkezve %1$s néven</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Bejelentkezve a Facebook használatával</string>
+    <string gender="unknown" name="com_facebook_send_button_text">Küldés</string>
+    <string gender="unknown" name="com_facebook_share_button_text">Megosztás</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">A fiók hozzákapcsolásához nyisd meg a mobilkészülékeden a Facebook alkalmazást, és nézd meg az értesítéseket.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- VAGY -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">Nem te vagy az?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">Folytatás mint %1$s</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">Bejelentkezés megerősítése</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">Te irányítasz – válaszd ki, milyen adatokat szeretnél megosztani az alkalmazásokkal.</string>
+</resources>

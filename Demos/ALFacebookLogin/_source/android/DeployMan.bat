@@ -1,0 +1,1 @@
+start ..\..\..\..\Tools\DeployMan\DeployMan.exe

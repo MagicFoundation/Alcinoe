@@ -1,0 +1,26 @@
+object DemoForm: TDemoForm
+  Left = 0
+  Top = 0
+  ClientHeight = 480
+  ClientWidth = 638
+  Quality = HighPerformance
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnClose = FormClose
+  OnPaint = FormPaint
+  DesignerMasterStyle = 0
+  object ALText1: TALText
+    Align = Top
+    AutoSize = True
+    Margins.Top = 10.000000000000000000
+    Margins.Bottom = 10.000000000000000000
+    Position.Y = 10.000000000000000000
+    Size.Width = 638.000000000000000000
+    Size.Height = 16.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'FPS Analyzing start when velocity > 500'
+    TextSettings.HorzAlign = Center
+  end
+end

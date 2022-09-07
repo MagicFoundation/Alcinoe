@@ -1,0 +1,1159 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  ClientHeight = 491
+  ClientWidth = 487
+  Quality = HighPerformance
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnResize = FormResize
+  OnVirtualKeyboardShown = FormVirtualKeyboardShown
+  OnVirtualKeyboardHidden = FormVirtualKeyboardHidden
+  DesignerMasterStyle = 0
+  object ALVertScrollBox1: TALVertScrollBox
+    VScrollBar.Thumb.Fill.Color = x47000000
+    VScrollBar.Thumb.Stroke.Kind = None
+    VScrollBar.Thumb.OnMouseDown = VScrollBarThumbMouseDown
+    VScrollBar.Thumb.OnMouseMove = VScrollBarThumbMouseMove
+    VScrollBar.Thumb.OnMouseUp = VScrollBarThumbMouseUp
+    VScrollBar.Thumb.OnMouseLeave = VScrollBarThumbMouseLeave
+    VScrollBar.Size.Width = 4.000000000000000000
+    VScrollBar.Size.Height = 491.000000000000000000
+    VScrollBar.Size.PlatformDefault = False
+    VScrollBar.TabOrder = 3
+    AniCalculations.VelocityFactor = 2.000000000000000000
+    Align = Client
+    Size.Width = 487.000000000000000000
+    Size.Height = 491.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    OnClick = ALVertScrollBox1Click
+    OnViewportPositionChange = ALVertScrollBox1ViewportPositionChange
+    OnScrollBarInit = ALVertScrollBox1ScrollBarInit
+    object Button1: TButton
+      Align = Top
+      CanFocus = False
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 199.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Launch Demo with Delphi Controls'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button1Click
+    end
+    object Button2: TButton
+      Align = Top
+      CanFocus = False
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 150.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Text = 'Launch Demo with Alcinoe Controls'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button2Click
+    end
+    object Button15: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 999.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 28
+      Text = 'Bench TALText Paint'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button15Click
+    end
+    object Button4: TButton
+      Align = Top
+      ClipParent = True
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 297.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 16
+      Text = 'Bench TRectangle (stroke + corners) Paint'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button4Click
+    end
+    object Text1: TText
+      Align = Top
+      HitTest = False
+      Position.Y = 338.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 11.000000000000000000
+    end
+    object Button5: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 248.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 23
+      Text = 'Bench TALRectangle (stroke + corners) Paint'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button255Click
+    end
+    object Button3: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 1048.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 26
+      Text = 'Bench TText Paint'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button3Click
+    end
+    object Text4: TText
+      Align = Top
+      HitTest = False
+      Position.Y = 1089.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 11.000000000000000000
+    end
+    object Button6: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 386.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 20
+      Text = 'Bench TALRectangle (stroke) Paint'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button6Click
+    end
+    object Button7: TButton
+      Align = Top
+      ClipParent = True
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 435.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 13
+      Text = 'Bench TRectangle (stroke) Paint'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button7Click
+    end
+    object Text2: TText
+      Align = Top
+      HitTest = False
+      Position.Y = 476.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 11.000000000000000000
+    end
+    object Button8: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 524.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 18
+      Text = 'Bench TALRectangle Paint'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button8Click
+    end
+    object Button9: TButton
+      Align = Top
+      ClipParent = True
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 573.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 10
+      Text = 'Bench TRectangle Paint'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button9Click
+    end
+    object Text5: TText
+      Align = Top
+      HitTest = False
+      Position.Y = 614.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 11.000000000000000000
+    end
+    object Button13: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 1728.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 34
+      Text = 'Bench Tline'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button13Click
+    end
+    object Text10: TText
+      Align = Top
+      HitTest = False
+      Position.Y = 1769.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 11.000000000000000000
+    end
+    object Button16: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 1679.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 33
+      Text = 'Bench TALline'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button16Click
+    end
+    object Button17: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 1462.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 36
+      Text = 'Bench TALcheckbox (without text)'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button17Click
+    end
+    object Button18: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 1511.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 37
+      Text = 'Bench Tcheckbox (without text)'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button18Click
+    end
+    object Text3: TText
+      Align = Top
+      HitTest = False
+      Position.Y = 1552.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 11.000000000000000000
+    end
+    object Button20: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 2809.921875000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 111
+      Text = 'TALRangeTrackbar'
+      TextSettings.Font.Size = 13.000000000000000000
+    end
+    object Text7: TText
+      Align = Top
+      AutoSize = True
+      HitTest = False
+      Margins.Left = 16.000000000000000000
+      Margins.Top = 15.000000000000000000
+      Margins.Right = 16.000000000000000000
+      Margins.Bottom = 15.000000000000000000
+      Position.X = 16.000000000000000000
+      Position.Y = 2630.000000000000000000
+      Size.Width = 455.000000000000000000
+      Size.Height = 31.921875000000000000
+      Size.PlatformDefault = False
+      Text = 
+        'Note that the verticalscrollbar is deactivated when you move lef' +
+        't <-> right in the TALTrackbar / TalTabControl'
+    end
+    object Text9: TText
+      Align = Top
+      HitTest = False
+      Position.Y = 951.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 11.000000000000000000
+    end
+    object Button21: TButton
+      Align = Top
+      ClipParent = True
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 910.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      Text = 'Bench TCircle Paint'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button21Click
+    end
+    object Button22: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 861.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 7
+      Text = 'Bench TALCircle Paint'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button22Click
+    end
+    object ALRectangle9: TALRectangle
+      Align = Top
+      Fill.Color = claWhite
+      Position.Y = 2315.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 300.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Kind = None
+      object ALTabControl1: TALTabControl
+        Align = Top
+        Size.Width = 487.000000000000000000
+        Size.Height = 300.000000000000000000
+        Size.PlatformDefault = False
+        TabIndex = 0
+        OnResize = ALTabControl1Resize
+        OnViewportPositionChange = ALTabControl1ViewportPositionChange
+        OnAniTransitionInit = ALTabControl1AniTransitionInit
+        object ALTabItem1: TALTabItem
+          IsSelected = True
+          object ALText3: TALText
+            Tag = 1
+            AutoSize = True
+            Position.X = 104.000000000000000000
+            Position.Y = 222.000000000000000000
+            Size.Width = 96.000000000000000000
+            Size.Height = 19.000000000000000000
+            Size.PlatformDefault = False
+            Text = 'TALTabControl'
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            OnResize = ALTabControl1Resize
+          end
+          object ALText4: TALText
+            Tag = 2
+            AutoSize = True
+            Position.X = 54.000000000000000000
+            Position.Y = 250.000000000000000000
+            Size.Width = 197.000000000000000000
+            Size.Height = 19.000000000000000000
+            Size.PlatformDefault = False
+            Text = 'Please swap also with the finger'
+            TextSettings.Font.Size = 14.000000000000000000
+            OnResize = ALTabControl1Resize
+          end
+          object alImage1: TALImage
+            Align = Center
+            HitTest = False
+            Margins.Bottom = 65.000000000000000000
+            Size.Width = 251.000000000000000000
+            Size.Height = 180.000000000000000000
+            Size.PlatformDefault = False
+            ResourceName = 'one_720x720'
+          end
+        end
+        object ALTabItem2: TALTabItem
+          IsSelected = False
+          object ALText1: TALText
+            Tag = 1
+            AutoSize = True
+            Position.X = 104.000000000000000000
+            Position.Y = 222.000000000000000000
+            Size.Width = 96.000000000000000000
+            Size.Height = 19.000000000000000000
+            Size.PlatformDefault = False
+            Text = 'TALTabControl'
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            OnResize = ALTabControl1Resize
+          end
+          object ALText2: TALText
+            Tag = 2
+            AutoSize = True
+            Position.X = 54.000000000000000000
+            Position.Y = 250.000000000000000000
+            Size.Width = 197.000000000000000000
+            Size.Height = 19.000000000000000000
+            Size.PlatformDefault = False
+            Text = 'Please swap also with the finger'
+            TextSettings.Font.Size = 14.000000000000000000
+            OnResize = ALTabControl1Resize
+          end
+          object Image2: TALImage
+            Align = Center
+            HitTest = False
+            Margins.Bottom = 65.000000000000000000
+            Size.Width = 180.000000000000000000
+            Size.Height = 180.000000000000000000
+            Size.PlatformDefault = False
+            ResourceName = 'two_720x720'
+          end
+        end
+        object ALTabItem3: TALTabItem
+          IsSelected = False
+          object ALText5: TALText
+            Tag = 1
+            AutoSize = True
+            Locked = True
+            Position.X = 104.000000000000000000
+            Position.Y = 222.000000000000000000
+            Size.Width = 96.000000000000000000
+            Size.Height = 19.000000000000000000
+            Size.PlatformDefault = False
+            Text = 'TALTabControl'
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            OnResize = ALTabControl1Resize
+          end
+          object ALText6: TALText
+            Tag = 2
+            AutoSize = True
+            Locked = True
+            Position.X = 54.000000000000000000
+            Position.Y = 250.000000000000000000
+            Size.Width = 197.000000000000000000
+            Size.Height = 19.000000000000000000
+            Size.PlatformDefault = False
+            Text = 'Please swap also with the finger'
+            TextSettings.Font.Size = 14.000000000000000000
+            OnResize = ALTabControl1Resize
+          end
+          object Image3: TALImage
+            Align = Center
+            HitTest = False
+            Margins.Bottom = 65.000000000000000000
+            Size.Width = 180.000000000000000000
+            Size.Height = 180.000000000000000000
+            Size.PlatformDefault = False
+            ResourceName = 'tree_720x720'
+          end
+        end
+        object ALTabItem4: TALTabItem
+          IsSelected = False
+          object ALText7: TALText
+            Tag = 1
+            AutoSize = True
+            Position.X = 104.000000000000000000
+            Position.Y = 222.000000000000000000
+            Size.Width = 96.000000000000000000
+            Size.Height = 19.000000000000000000
+            Size.PlatformDefault = False
+            Text = 'TALTabControl'
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            OnResize = ALTabControl1Resize
+          end
+          object ALText8: TALText
+            Tag = 2
+            AutoSize = True
+            Position.X = 54.000000000000000000
+            Position.Y = 250.000000000000000000
+            Size.Width = 197.000000000000000000
+            Size.Height = 19.000000000000000000
+            Size.PlatformDefault = False
+            Text = 'Please swap also with the finger'
+            TextSettings.Font.Size = 14.000000000000000000
+            OnResize = ALTabControl1Resize
+          end
+          object image4: TALImage
+            Align = Center
+            HitTest = False
+            Margins.Bottom = 65.000000000000000000
+            Size.Width = 180.000000000000000000
+            Size.Height = 180.000000000000000000
+            Size.PlatformDefault = False
+            ResourceName = 'four_720x720'
+          end
+        end
+      end
+    end
+    object ALRangeTrackBar1: TALRangeTrackBar
+      MinThumb.Fill.Kind = None
+      MinThumb.Stroke.Kind = None
+      MinThumb.XRadius = 16.000000000000000000
+      MinThumb.YRadius = 16.000000000000000000
+      MinThumb.Glyph.Size.Width = 36.000000000000000000
+      MinThumb.Glyph.Size.Height = 36.000000000000000000
+      MinThumb.Glyph.Size.PlatformDefault = False
+      MinThumb.Glyph.ResourceName = 'thumb_144x144'
+      MaxThumb.Fill.Kind = None
+      MaxThumb.Stroke.Kind = None
+      MaxThumb.XRadius = 16.000000000000000000
+      MaxThumb.YRadius = 16.000000000000000000
+      MaxThumb.Glyph.Size.Width = 36.000000000000000000
+      MaxThumb.Glyph.Size.Height = 36.000000000000000000
+      MaxThumb.Glyph.Size.PlatformDefault = False
+      MaxThumb.Glyph.ResourceName = 'thumb_144x144'
+      BackGround.Align = VertCenter
+      BackGround.Fill.Color = xFFC5C5C5
+      BackGround.Position.X = 16.000000000000000000
+      BackGround.Position.Y = 17.000000000000000000
+      BackGround.Size.Width = 405.000000000000000000
+      BackGround.Size.Height = 2.000000000000000000
+      BackGround.Size.PlatformDefault = False
+      BackGround.Stroke.Kind = None
+      Highlight.Fill.Color = xFF167EFC
+      Highlight.Size.Width = 401.000000000000000000
+      Highlight.Size.Height = 2.000000000000000000
+      Highlight.Size.PlatformDefault = False
+      Highlight.Stroke.Kind = None
+      Align = Top
+      MaxValue = 100.000000000000000000
+      Orientation = Horizontal
+      Margins.Left = 25.000000000000000000
+      Margins.Top = 8.000000000000000000
+      Margins.Right = 25.000000000000000000
+      Position.X = 25.000000000000000000
+      Position.Y = 2765.921875000000000000
+      Size.Width = 437.000000000000000000
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 51
+    end
+    object ALTrackBar1: TALTrackBar
+      Thumb.Fill.Color = claWhite
+      Thumb.Stroke.Color = xFFD5D5D5
+      Thumb.XRadius = 16.000000000000000000
+      Thumb.YRadius = 16.000000000000000000
+      Thumb.Glyph.Size.Width = 32.000000000000000000
+      Thumb.Glyph.Size.Height = 32.000000000000000000
+      Thumb.Glyph.Size.PlatformDefault = False
+      BackGround.Align = VertCenter
+      BackGround.Fill.Color = xFFC5C5C5
+      BackGround.Position.X = 16.000000000000000000
+      BackGround.Position.Y = 15.000000000000000000
+      BackGround.Size.Width = 405.000000000000000000
+      BackGround.Size.Height = 2.000000000000000000
+      BackGround.Size.PlatformDefault = False
+      BackGround.Stroke.Kind = None
+      Highlight.Fill.Color = xFF167EFC
+      Highlight.Size.Width = 0.000000000000000000
+      Highlight.Size.Height = 2.000000000000000000
+      Highlight.Size.PlatformDefault = False
+      Highlight.Stroke.Kind = None
+      Align = Top
+      Orientation = Horizontal
+      Margins.Left = 25.000000000000000000
+      Margins.Right = 25.000000000000000000
+      Position.X = 25.000000000000000000
+      Position.Y = 2676.921875000000000000
+      Size.Width = 437.000000000000000000
+      Size.Height = 32.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 57
+    end
+    object Button14: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 2716.921875000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 53
+      Text = 'TALTrackbar'
+      TextSettings.Font.Size = 13.000000000000000000
+    end
+    object Layout3: TLayout
+      Align = Top
+      Margins.Left = 25.000000000000000000
+      Margins.Top = 8.000000000000000000
+      Margins.Right = 25.000000000000000000
+      Position.X = 25.000000000000000000
+      Position.Y = 1402.000000000000000000
+      Size.Width = 437.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 75
+    end
+    object Layout4: TLayout
+      Align = Top
+      Margins.Left = 25.000000000000000000
+      Margins.Top = 8.000000000000000000
+      Margins.Right = 25.000000000000000000
+      Position.X = 25.000000000000000000
+      Position.Y = 1432.000000000000000000
+      Size.Width = 437.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 62
+    end
+    object Text11: TALText
+      Align = Top
+      AutoSize = True
+      Margins.Left = 16.000000000000000000
+      Margins.Top = 15.000000000000000000
+      Margins.Right = 16.000000000000000000
+      Margins.Bottom = 15.000000000000000000
+      Position.X = 16.000000000000000000
+      Position.Y = 2914.921875000000000000
+      Size.Width = 455.000000000000000000
+      Size.Height = 96.000000000000000000
+      Size.PlatformDefault = False
+      Text = 
+        'Below the Native Android/IOS TALEdit/TALMemo (On windows/mac use' +
+        ' standart TEdit/TMemo). You can try under Android to move the sc' +
+        'reen on the horizontal when editing to see one of the advantage ' +
+        'of using native editText. On marshmallow and up you can also see' +
+        ' badly written word underlined in red and correction popup. <b>T' +
+        'he drawback of these controls is that under android they not scr' +
+        'oll very well  so you must avoid to use it on some scrollbox.</b' +
+        '>'
+      TextSettings.WordWrap = True
+      TextIsHtml = True
+    end
+    object Button12: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 1226.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 19
+      Text = 'HTML TEXT'
+      TextSettings.Font.Size = 13.000000000000000000
+    end
+    object ALText9: TALText
+      Align = Top
+      AutoSize = True
+      Padding.Left = 12.000000000000000000
+      Padding.Top = 12.000000000000000000
+      Padding.Right = 12.000000000000000000
+      Padding.Bottom = 12.000000000000000000
+      Margins.Left = 25.000000000000000000
+      Margins.Top = 12.000000000000000000
+      Margins.Right = 25.000000000000000000
+      Margins.Bottom = 5.000000000000000000
+      Position.X = 25.000000000000000000
+      Position.Y = 1141.000000000000000000
+      Size.Width = 437.000000000000000000
+      Size.Height = 72.000000000000000000
+      Size.PlatformDefault = False
+      Text = 
+        'This is a simple <font color="#ffda242c">colored</font> multilin' +
+        'e <b>HTML</b> text that work on <i>android / ios / macos / windo' +
+        'ws</i> and that is fast as TALText (The same double buffered eng' +
+        'ine)'
+      TextSettings.WordWrap = True
+      TextSettings.HorzAlign = Center
+      Fill.Color = claYellowgreen
+      Fill.Kind = Solid
+      XRadius = 8.000000000000000000
+      YRadius = 8.000000000000000000
+      TextIsHtml = True
+    end
+    object Text8: TALText
+      Align = Top
+      AutoSize = True
+      Margins.Left = 16.000000000000000000
+      Margins.Top = 15.000000000000000000
+      Margins.Right = 16.000000000000000000
+      Margins.Bottom = 15.000000000000000000
+      Position.X = 16.000000000000000000
+      Position.Y = 15.000000000000000000
+      Size.Width = 455.000000000000000000
+      Size.Height = 112.000000000000000000
+      Size.PlatformDefault = False
+      Text = 
+        'You must run '#13#10'Alcinoe\Embarcadero\<yourDelphiVersion>\update.ba' +
+        't'#13#10' to retrieve and patch the original delphi source code.'#13#10#13#10'Th' +
+        'is form use Alcinoe Double buffered control but it'#39's not fast be' +
+        'cause we rebuild all the buffers on each paint to retrieve stati' +
+        'stics'
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claCrimson
+      TextSettings.WordWrap = True
+      TextSettings.HorzAlign = Center
+    end
+    object ALVideoPlayerSurface1: TALVideoPlayerSurface
+      Touch.InteractiveGestures = [DoubleTap]
+      Align = Top
+      Position.Y = 1809.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 300.000000000000000000
+      Size.PlatformDefault = False
+      OnClick = ALVideoPlayerSurface1DblClick
+      onVideoSizeChanged = ALVideoPlayerSurface1VideoSizeChanged
+      object Text12: TText
+        Align = Top
+        HitTest = False
+        Margins.Left = 16.000000000000000000
+        Margins.Right = 16.000000000000000000
+        Position.X = 16.000000000000000000
+        Size.Width = 455.000000000000000000
+        Size.Height = 33.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Z-order work !'
+        TextSettings.Font.Size = 14.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        TextSettings.FontColor = claIvory
+      end
+      object MonochromeEffect1: TMonochromeEffect
+        Enabled = False
+      end
+      object BandedSwirlEffect1: TBandedSwirlEffect
+        Enabled = False
+        Bands = 6.000000000000000000
+        Strength = 1.000000000000000000
+        AspectRatio = 1.500000000000000000
+      end
+      object MagnifyEffect1: TMagnifyEffect
+        Enabled = False
+        Radius = 0.250000000000000000
+        Magnification = 2.000000000000000000
+        AspectRatio = 1.500000000000000000
+      end
+      object RippleEffect1: TRippleEffect
+        Enabled = False
+        Amplitude = 0.100000001490116100
+        Frequency = 50.000000000000000000
+        Phase = 1.000000000000000000
+        AspectRatio = 0.500000000000000000
+      end
+      object SmoothMagnifyEffect1: TSmoothMagnifyEffect
+        Enabled = False
+        InnerRadius = 0.200000002980232200
+        OuterRadius = 0.400000005960464500
+        Magnification = 2.000000000000000000
+        AspectRatio = 1.500000000000000000
+      end
+      object WaveEffect1: TWaveEffect
+        Enabled = False
+        Time = 0.000000000000000000
+        WaveSize = 32.000000000000000000
+      end
+      object PaperSketchEffect1: TPaperSketchEffect
+        Enabled = False
+        brushSize = 3.000000000000000000
+      end
+      object PencilStrokeEffect1: TPencilStrokeEffect
+        Enabled = False
+        brushSize = 1.000000000000000000
+      end
+      object PixelateEffect1: TPixelateEffect
+        Enabled = False
+        BlockCount = 50.000000000000000000
+      end
+      object ContrastEffect1: TContrastEffect
+        Enabled = False
+        Brightness = 0.400000005960464500
+        Contrast = 1.000000000000000000
+      end
+      object TilerEffect1: TTilerEffect
+        Enabled = False
+        VerticalTileCount = 4.000000000000000000
+        HorizontalTileCount = 3.000000000000000000
+        HorizontalOffset = 0.000000000000000000
+        VerticalOffset = 0.000000000000000000
+      end
+      object MaskToAlphaEffect1: TMaskToAlphaEffect
+        Enabled = False
+      end
+      object EmbossEffect1: TEmbossEffect
+        Enabled = False
+        Amount = 0.500000000000000000
+        Width = 3.000000000000000000
+      end
+      object PinchEffect1: TPinchEffect
+        Enabled = False
+        Radius = 0.250000000000000000
+        Strength = 3.000000000000000000
+        AspectRatio = 1.500000000000000000
+      end
+    end
+    object ALText10: TALText
+      Align = Top
+      AutoSize = True
+      Margins.Left = 15.000000000000000000
+      Margins.Top = 15.000000000000000000
+      Margins.Right = 15.000000000000000000
+      Margins.Bottom = 15.000000000000000000
+      Position.X = 15.000000000000000000
+      Position.Y = 2124.000000000000000000
+      Size.Width = 457.000000000000000000
+      Size.Height = 176.000000000000000000
+      Size.PlatformDefault = False
+      Text = 
+        'This video player is fully integrated in the form because it'#39's <' +
+        'b>draw directly on the canvas via OpenGL</b>. So it'#39's behave exa' +
+        'ctly like other control (z-order work) and the speed is fast (I ' +
+        'test it without any problem at 60fps). Legacy delphi video playe' +
+        'r is just a native android/ios control in a standalone transpare' +
+        'nt windows placed on the top of the form, so without z-order and' +
+        ' scrolling animation is disaster. Finally as we have the texture' +
+        ' of each frame, we can apply on it all the effect we want (black' +
+        ' and white, noise, etc..) ! You can try to <b>double click</b> o' +
+        'n the video to see the effect in action ... <b>Note: </b> Delphi' +
+        ' berlin do not support GL_TEXTURE_EXTERNAL_OES (requiered by and' +
+        'roid), so we must update the original delphi source code (only f' +
+        'ew lines of code is neccessary to make it working). Also note th' +
+        'at this video player support <b>adaptative streaming (HLS)</b> o' +
+        'n Android/iOs'
+      TextSettings.WordWrap = True
+      TextSettings.HorzAlign = Center
+      TextIsHtml = True
+    end
+    object ALLayout1: TALLayout
+      Align = Top
+      Position.Y = 1267.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 78.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 114
+      object ALAniIndicator1: TALAniIndicator
+        Align = Center
+        Enabled = True
+      end
+    end
+    object Button19: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 1353.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 14
+      Text = 'TALAniIndicator'
+      TextSettings.Font.Size = 13.000000000000000000
+    end
+    object ALRectangle1: TALRectangle
+      Align = Top
+      Fill.Color = claBurlywood
+      Margins.Left = 30.000000000000000000
+      Margins.Top = 30.000000000000000000
+      Margins.Right = 30.000000000000000000
+      Margins.Bottom = 30.000000000000000000
+      Position.X = 30.000000000000000000
+      Position.Y = 684.000000000000000000
+      Size.Width = 427.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      XRadius = 8.000000000000000000
+      YRadius = 8.000000000000000000
+      shadow.enabled = True
+    end
+    object Button10: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 772.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 5
+      Text = 'TalRectangle with fast drawing shadow'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button22Click
+    end
+    object Text6: TText
+      Align = Top
+      HitTest = False
+      Position.Y = 813.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 11.000000000000000000
+    end
+    object ALRectangle3: TALRectangle
+      Align = Top
+      Fill.Color = claWhite
+      Position.Y = 3170.921875000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      Stroke.Kind = None
+      object ALEdit1: TALEdit
+        Align = Client
+        Size.Width = 387.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        TextSettings.Font.Size = 14.000000000000000000
+        TextPrompt = 'Write single line here'
+        OnEnter = ALEditEnter
+        OnExit = ALEditExit
+      end
+      object Layout1: TLayout
+        Align = Right
+        Position.X = 437.000000000000000000
+        TabOrder = 1
+        object Image1: TImage
+          MultiResBitmap = <
+            item
+              Width = 44
+              Height = 44
+              PNG = {
+                89504E470D0A1A0A0000000D494844520000002C0000002C08060000001E845A
+                01000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                0467494441545847CD99574B2B4114C7CF187BEFBD7745B0813E8A3EF9B1EE57
+                F159417C5041B10B2A4AB0A1A228A2A8A0D8B0D7B9F31F6772935C4D59B7E407
+                CBEECE86E4BF67CE9C3261EFEFEF7C737393D6D7D7C9E57251737333D5D5D551
+                747434452251676767B4BDBD4D2F2F2FF4F4F4441B1B1BB4B8B848B7B7B7EA23
+                9105EBEFEFE7575757EAF61FB0766363A3B47842420231C6D4136771F5F6F6FE
+                F9FCFC54B7FFE09CD3F9F939EDEFEFD3EBEBAB7491F8F8788A8A8A529F70861F
+                2DEC0DAC9B9A9A4A454545545555457979798E09677373737C6B6B4BDD0606C2
+                61E5E2E2626A6F6F972F61376C6F6F8F4F4E4EAADBD081851B1A1AE401E17645
+                1526DC810F0E0E92086F6A283C929292A8B2B292CACACA28272787626262D413
+                6B600F0F0F7C787898AEAFAFD59031929393293F3F5FC6F0828202CB7C9C89F8
+                CB676767E9E0E0400D19073E0EA1F0F18E8E0ECAC8C8504FCC837D7C7C70B7DB
+                4D38CC0471BCBABA5A5A3C333393626363D593DFC144BCE5BBBBBB343F3F6FD8
+                8F0391989848252525545E5E2E5DE5B7C2A5E0D3D3539A9E9EA6FBFB7B356C3E
+                C896B9B9B9327BE2058C2205A36E4068BBB8B850C3D6024B77767652767676D8
+                8B530A7E7B7BA38989093A3A3A52C3D683F0875058535323C32112522848C1B8
+                585858209499EAD636201416AFA8A8A0D2D2D2A03EEE118C8587F0F65D216407
+                B078565616B5B4B4481FFFA93AF408BEBCBCA4A1A1214B2245B8C0E2ADADADD2
+                55E2E2E2D4E8171EC1221ED3C8C808A1A08F0460715D1D2283A204001EC100E9
+                796969894E4E4EE40B4402F069581A09087EEE231840280AF6C7C747D9323D3F
+                3FCB6B9CF5BDF71911C60E9039BBBABAFE171C2E7841F483810E18409FF1792C
+                6C1CDA3878F9504019FB6BC1FE4004162E2C8F435FEBB3F7ACE1FAEEEE8E8275
+                3C1AB84750C178AC2DE46F31FCB0FF1884690B7A1F78117C97B785C3B51516A0
+                8F605C1E1F1FD3CECE8E6CF3210847B85F6C3648DF0875DDDDDDBE82B1998228
+                E1B4400DB2209209D237AA3D1F97109D070D0C0CC869751AC460643BB45E8585
+                853E758647305C616C6C4CFA9853201DA35B417A866521DC3F457B04AFAEAED2
+                F2F2B223EE80A946A909A1C86E3FD511400A864814F0A2E557C3F6806E046917
+                530FCB06ABD480148C98887AD8AE3A02AB1EFD1EC214BA10FF02271052303A8D
+                A9A929BAB9B951C3D680A946D18E6E232525C5D05680147C7878483333339644
+                0888443F8702A6A9A949C6532342354C641CB9A18D3D61A15D0D9B034A42DD31
+                233C99B19DC5447EE7688FB0A96D16A8AC500ED6D6D6527A7A7A488B29549828
+                40F8F8F8B8290B0E71137D19767DE0A356C044B5243703513919013EAAF7D5EA
+                EBEB2DDF3B66A2BB909B8146FC173E8AD084956FD7263773BBDD1C192E1C30F5
+                D8C1C1DE3082BF9DFF38B1D1D1511ECA068A0E4F58F548A1696969EA89BDB0BE
+                BE3E1EA845C134A33541EAD4992950AEB79A804E87E96E6B6BA39E9E1E999DE0
+                A74E8A054C240CBEB6B6A66EBF406ED7FFD17D57E2390913EEC05756563C7118
+                19096211F0230FA2BFC460A1F87052A97D0000000049454E44AE426082}
+            end>
+          Align = Center
+          Size.Width = 22.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
+        end
+      end
+      object Layout2: TLayout
+        Align = Left
+        TabOrder = 2
+        object Image5: TImage
+          MultiResBitmap = <
+            item
+              Width = 64
+              Height = 64
+              PNG = {
+                89504E470D0A1A0A0000000D4948445200000040000000400806000000AA6971
+                DE000000017352474200AECE1CE90000000467414D410000B18F0BFC61050000
+                09AF49444154785EED5B6B6C9B57197EFD25711C378E53E79EB46993745D685A
+                46CAC6604CDB10A0B10924B61FFC98401B3FC68FA2899BD649434C05891F1D1A
+                08B11F20218D092406624C0C4177013A4611ED2ABA2DBDA4699B7BE35C1DC789
+                1D27CE8DE739F171BFB8B6F37D59D226364F75F4B9BEC47E9FEF3DEFFBBCEF39
+                C7B104C83A807F243C372F9D5351B91C8E8A3F1A93B199988CC7E66502238831
+                BFB82453784F647E41BD3F194579869438F325CFE190525C3DF97952E52A901D
+                6E97941516C8EE6297ECF5B8C58BD71CF1CF7C507C2002A6E717A53D149181E8
+                AC74C3E8D1993965F0248C8C2E2CCA0CC6ECE2A2C416962486EB22BE6A0E8344
+                A4020D771A0E71C4AF05B8BA40CA361051886B31AE2505F9520152766F73493D
+                C63EAF5B3C786EADB04DC0F4C282B4052372726C12D7B08CCEC61411347AD9C8
+                F81B371024874693101F3CA30524DC55E195833E8F22CB0E2C1340B7FDE7C884
+                FCB16F54AEC0CDF9FF59DCE11B60EFAA28340C71E71BF08A2279B8BE5C3E5DED
+                0341D688589500BAED99F1B0FCF462BF9C9B88C8BC3D87B929B8B5C42DDFFED0
+                4EF97879891898469990910006AF17BA06E5F73D2312C61DDF4A60FCF87263B5
+                3C8AC169928E869404F089DEC88C3C77A14FDE1A9E587E728BE26EC4866FC11B
+                F6788A527A434A0238C77FD2DE2F2746436A0A6C65D0E83BCB3C8A8466EFB6EB
+                3CC1885F13F023A5BDD03928A702935BDE7842C7B017BB86E4EAF46CFCD96B58
+                4100F3F6EBFE71791BD19E113E5B402D72622424C706022A659BB18280F31035
+                AF0F8E4B08C12FDB409DF2066C3B3B118E3FB38C0401CCEB14379726A737456E
+                5F6FD026C6B613F06E92A19120A03B3C23C78782327723A4DC4DC202E201A737
+                6DD5500450C25E80FB93A16C078D3F0F41A7639C2220145B907F23E591A16C07
+                2D647A9F884F0345C0786C4EC9DC5CC13904C2C0EC9C22C3E05DEF40E01B45ED
+                9E2B606FA23D34AD34822280773FFB9D7F25746167CCC37206855C031B390BC8
+                78C61C32404F24FBA37F327A50ECCDC07663381A8330D85AA5EE7A80C2CF3F1D
+                13E3220260AEE2F2D4B418A92AA4B5800D4D362CAB5C4EA92D2A944A5CF9FFD5
+                3A32443EDE936FA47F9FD330545334D32850CDD4F8072C6210DEEF38D2D6BDF4
+                87DE91F853F6C156F63ED4D96C59B3535B01C3D9C9655798A9F532DBE4F03235
+                E752549824ECDEAA52A5CC4E07A65439AEC10627DB5A75EE42D529CE04769AAF
+                E08EBE1F0CA7FC9E5478686785389E78A763E9F81ABB3ECD256EB9BFD627F754
+                96828022D5AD4D06E71A65F69B8341558D518098F158538D7CB379876AB9FDE2
+                B25F7E8DBA5DE3F375E572B8A55EB63B576F7B338D9F4631F7A30B7D62755AF3
+                771BA1350640DEB5A75A76C9A38D35B21744D078E6D529FC3DF6127551C5BB78
+                7B59897CED965AF94A63B5541739D5F31ACD1EB79A3E5E4C97DAA4D7EEADF25A
+                325E833D6A3B723E0439ECF8C2F1B6252E6AD801FBEF4FEEAB9796D2E516D3B2
+                FB4ECA6BFE71E98BCCAA1F51946F280FA19B35798AD4E74630258E9EEF539EA0
+                71B4B5491EAC2B538F7FD33DA45ED778FE8EBD8A6882BD8A5F99BC2319547503
+                F86E06B698C58A7627A6ACC15C68075CB27AA4A14A9ABD6E653CEFF46F7B86E5
+                99F7BBE5AFFE80BC1B9C923668ED77E08E2F21B61C3A7D49FE3210509F653786
+                B1612D20796F82E074E3EF98629C6A568D27F8DB0DAA213BF86C8D4F6E870730
+                721334FEB9F67E19C5DC36F712F8889EE14796F97E5BB73C7EB2430E9FE94425
+                B6B67843CFA667651AF62C21011042C9412913381F5BB717AB3E3BD18508FFB3
+                8E01F5381378D74F8E85A47D123587DD5FB981A0EDAA18B28A5D98330D88F63A
+                D6BF3A30869473635424532BF545BAC174CA946C178EFD7F3E6599814F21201D
+                46E4DF81BC4C3C72E2C2754D46467D8AA0542991F99973D91C07AC06414EB1B3
+                C8F1E9C058C6CEEFDF1060EDC4195B0470FE3F85BC4CB6897BDE38A36A6B0D2A
+                B2076BCBE43335DB53DE8D0882E06B0894FF180A267EA45502AC80AB5847CFF7
+                A6ECFFA7832D9F2153E61943896A861B467F0CCA8D02E30EE4FEE4711F8CA1B8
+                49D60256300DA1C4749D6EB0BCA50AB45BD8D922208A1F6176AF8F20209A4135
+                F79FD190D2041711F0F4E8C10FD4601A75E5D95BC327CEC140669174E3E9F7BA
+                E4E5BE11B503C50E0CAA30AB18C6FC1D9EB9E65E9FAC58E99E4C835C5879F2BF
+                57E4D0A94B89F1C373BDB6535432C2B8B394B8E9063BDA9C8E76BFC7E0DE1BAB
+                6041D331194D6C7179A8BE5C6E4BF202E6FE007E0883961E94C69B11B4DDC8CB
+                5086268386BF351C944EB8B466FAD9834D72009298E5682AF0796E6AD2A064CD
+                B025E186A20031CC702505B2D5F0EE7858A51A3DD798839F3DB8471E40F46F84
+                462807ABEC03E85D5DCC0A4FEFDFA5B403CDE6862AF3D2D4CD046F8E61A7DA22
+                289C7E078DFFEAD5802A7509EA82EF1DD82D3FB8AD419E4069FBF89E5A39B4B7
+                4E8E1C6890673EBC5B11433086BC8D543532635D7D6E247CB0DD36010483CD2F
+                AFF83106A52B1EE1A9D4180F1E46F5F75853B57C6957A57CB4CCA35225496390
+                7AB17348AD4099F7196925CAB092B472AD96EC08BE6323F626B104CFFBE237BE
+                73E4EC1ADAE24C876CA7B3E3338E40E70401DCE4A88B24822B4E5C8038866AED
+                A5DE61F9975A995D99A7D932DB57EA962178C7318824C6170D9ACC929B7FFF95
+                FE31B580B39E60B7C9F1F34B57979EB750D0A403CDD59B1779E5DE3D37461435
+                023D85B12230BB7C4D750FE9390D88150CB0DC5DAAA715C1D7387D1838FBA1EE
+                CCAFAD07BE7E6B9D38FED43FBAF45D8888F502938103FF589CC6B3E5A6056396
+                C1AECD7A8246735E6F76E3895B3C6E316A90C6B8D332D7C058B5735B21A53099
+                584E53B98446D8CCCD944A0972FF5CAE81539F7590415768F51527BA3CB98256
+                F635A904C90237177345275740F1C77306D4202AFAF99C05B21F822357B0BFB4
+                58D52AF47A4580D79987DADEABE644B6831672037529441BA108A05EE7022777
+                54673BA83A29AFD9BF24120280A52B1B90E9EAFA6C003DFCAECA52D5DED74810
+                400DCF73375CE8CC460A68133DFC3E10C0BEA4468200A205D3E0FE1ADF8A0E4E
+                B680851ADBFA071000CD584100AB2FBDDEAFE748368052FFEE4AAF5A7FE0E12A
+                33AEB3922DAEAF36D5C89D65AB1F38DA0AA00D0721F4787648AF6899F1FF3343
+                A908D0D0A7C6B8041E4DEE576D72B0D0E13E067A3357B3D3F9724602087DE6E6
+                C7EDFDD72D846E5650DAF3AEB3E5B59AB85B95000D2E7B1D1F0ECA2B7D63AA11
+                CAF61417412C7D788371EDE4A84B1E40A0FB5C6D99E5BD459609D0E0D9E1F7E0
+                11A7C626E11111B95967878B91D678BA9CEECDB3C39FC05C6FDDEEB17C6456C3
+                36016658393DCEC135C3C4E9713C4ED7E2A6BBAAC50A5E31682853B3F9F4380F
+                4D57BA0A543787678569FCDA4F8F8BFC0FD0F952B303C5DD0D0000000049454E
+                44AE426082}
+            end>
+          Align = Center
+          Size.Width = 32.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+        end
+      end
+    end
+    object ALMemo1: TALMemo
+      Align = Top
+      Fill.Color = xFF0087B4
+      Padding.Left = 8.000000000000000000
+      Padding.Top = 8.000000000000000000
+      Padding.Right = 8.000000000000000000
+      Padding.Bottom = 8.000000000000000000
+      Margins.Bottom = 25.000000000000000000
+      Position.Y = 3025.921875000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 120.000000000000000000
+      Size.PlatformDefault = False
+      DefStyleAttr = 'BlueBGTextViewStyle'
+      TabOrder = 112
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.FontColor = claWhite
+      TextPrompt = 'Write multiple lines here'
+      TextPromptColor = xFF80C3DA
+      LineSpacingMultiplier = 1.200000047683716000
+      TintColor = claWhite
+      OnExit = ALMemo1Exit
+    end
+    object Button11: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 1630.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 45
+      Text = 'TALSwitch'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button11Click
+    end
+    object Layout5: TLayout
+      Align = Top
+      Margins.Left = 25.000000000000000000
+      Margins.Top = 8.000000000000000000
+      Margins.Right = 25.000000000000000000
+      Position.X = 25.000000000000000000
+      Position.Y = 1600.000000000000000000
+      Size.Width = 437.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 54
+      object ALSwitch1: TALSwitch
+        HitTest = True
+        Size.Width = 44.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        Thumb.Fill.Color = claWhite
+        Thumb.Size.Width = 22.000000000000000000
+        Thumb.Size.Height = 22.000000000000000000
+        Thumb.Size.PlatformDefault = False
+        Thumb.Stroke.Color = xFFD5D5D5
+        Thumb.XRadius = 11.000000000000000000
+        Thumb.YRadius = 11.000000000000000000
+        BackGround.Align = VertCenter
+        BackGround.Fill.Color = xFFC5C5C5
+        BackGround.Position.X = 6.000000000000000000
+        BackGround.Position.Y = 4.000000000000000000
+        BackGround.Size.Width = 32.000000000000000000
+        BackGround.Size.Height = 14.000000000000000000
+        BackGround.Size.PlatformDefault = False
+        BackGround.Stroke.Kind = None
+        BackGround.XRadius = 7.000000000000000000
+        BackGround.YRadius = 7.000000000000000000
+        AnimationDuration = 0.200000002980232200
+        OnChange = ALSwitch1Change
+      end
+    end
+    object Button23: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 2858.921875000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 98
+      Text = 'TALDatePickerDialog'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button23Click
+    end
+  end
+end

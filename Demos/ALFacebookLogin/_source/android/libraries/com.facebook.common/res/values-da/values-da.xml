@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">Gå til &lt;b>facebook.com/device&lt;/b> og indtast koden, som er vist ovenfor.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">Uventet fejl under download af billede.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">WebView-login kræver INTERNET-tilladelse</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">Fejl i AndroidManifest</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">Synes godt om</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">Synes godt om</string>
+    <string gender="unknown" name="com_facebook_loading">Indlæser …</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">Annuller</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">Log på</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Fortsæt med Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Log på med Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">Log af</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">Log af</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">Logget på som %1$s</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Logget på med Facebook</string>
+    <string gender="unknown" name="com_facebook_share_button_text">Del</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">For at tilslutte din konto skal du åbne Facebook-appen på din mobilenhed og se efter, om der er notifikationer.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- ELLER -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">Ikke dig?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">Fortsæt som %1$s</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">Bekræft login</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">Du har kontrollen – Vælg, hvilke informationer du vil dele med apps.</string>
+</resources>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">前往&lt;b>facebook.com/device&lt;/b&amp;gt，並輸入上方顯示的代碼。</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">下載圖像時無預警發生錯誤。</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">WebView 登入需要網路使用權限</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">AndroidManifest 錯誤</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">已說讚</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">讚</string>
+    <string gender="unknown" name="com_facebook_loading">載入中......</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">取消</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">登入</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">以 Facebook 帳號繼續</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">使用 Facebook 帳號登入</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">登出</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">登出</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">以%1$s身分登入</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">已使用 Facebook 登入</string>
+    <string gender="unknown" name="com_facebook_send_button_text">送出</string>
+    <string gender="unknown" name="com_facebook_share_button_text">分享</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">若要連結帳號，請在行動裝置上開啟 Facebook 應用程式，然後查看通知。</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- 或 -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">不是你？</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">以%1$s的身分繼續</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">確認登入</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">一切操之在你：自行選擇要分享給應用程式的資訊種類。</string>
+</resources>

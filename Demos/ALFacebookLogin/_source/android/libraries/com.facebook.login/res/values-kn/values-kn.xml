@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">&lt;b>facebook.com/device&lt;/b> ಗೆ ಭೇಟಿ ನೀಡಿ ಮತ್ತು ಮೇಲೆ ತೋರಿಸಿದ ಕೋಡ್ ಅನ್ನು ನಮೂದಿಸಿ.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">ಚಿತ್ರವನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡುವಾಗ ಅನಿರೀಕ್ಷಿತ ದೋಷ.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">ವೆಬ್ ವೀಕ್ಷಣೆ ಲಾಗಿನ್‌ಗೆ ಇಂಟರ್ನೆಟ್ ಅನುಮತಿಯ ಅಗತ್ಯವಿದೆ</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">Android ಮ್ಯಾನಿಫೆಸ್ಟ್ ದೋಷ</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">ಇಷ್ಟಪಟ್ಟಿದ್ದಾರೆ</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">ಇಷ್ಟ</string>
+    <string gender="unknown" name="com_facebook_loading">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">ರದ್ದುಮಾಡು</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">ಲಾಗ್ ಇನ್</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Facebook ನೊಂದಿಗೆ ಮುಂದುವರಿಸಿ</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Facebook ನೊಂದಿಗೆ ಲಾಗ್ ಇನ್ ಮಾಡಿ</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">ಲಾಗ್ ಔಟ್</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">ಲಾಗ್ ಔಟ್</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">%1$s ಎಂದು ಲಾಗಿನ್ ಮಾಡಲಾಗಿದೆ</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Facebook ಬಳಸಿ ಲಾಗಿನ್ ಮಾಡಲಾಗಿದೆ</string>
+    <string gender="unknown" name="com_facebook_send_button_text">ಕಳುಹಿಸಿ</string>
+    <string gender="unknown" name="com_facebook_share_button_text">ಹಂಚಿರಿ</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಸಂಪರ್ಕಿಸಲು, ನಿಮ್ಮ ಮೊಬೈಲ್ ಸಾಧನದಲ್ಲಿ Facebook ಅಪ್ಲಿಕೇಶನ್ ತೆರೆಯಿರಿ ಮತ್ತು ಅಧಿಸೂಚನೆಗಳಿಗಾಗಿ ಪರಿಶೀಲಿಸಿ.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- ಅಥವಾ -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">ನೀವಲ್ಲವೇ?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">%1$s ಎಂದು ಮುಂದುವರಿಸಿ</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">ಲಾಗಿನ್ ಖಚಿತಪಡಿಸಿ</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">ನೀವು ನಿಯಂತ್ರಣದಲ್ಲಿದ್ದಿರಿ- ಅಪ್ಲಿಕೇಶನ್‌ಗಳೊಂದಿಗೆ ನೀವು ಯಾವ ಮಾಹಿತಿಯನ್ನು ಹಂಚಿಕೊಳ್ಳಬೇಕೆಂದು ಆಯ್ಕೆಮಾಡಿ.</string>
+</resources>

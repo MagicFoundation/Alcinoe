@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- BEGIN_INCLUDE(manifest) -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+        package="%package%"
+        android:versionCode="%versionCode%"
+        android:versionName="%versionName%"
+        android:installLocation="%installLocation%">
+
+    <!-- This is the platform API where NativeActivity was introduced. -->
+    <uses-sdk android:minSdkVersion="14" 
+              android:targetSdkVersion="22" /> <!-- android:minSdkVersion="14" instead of android:minSdkVersion="%minSdkVersion%"
+                                                    android:targetSdkVersion="22" instead of android:targetSdkVersion="%targetSdkVersion%" -->
+
+    <!-- support-fragment.jar -->
+    <!-- support-core-utils.jar -->
+    <!-- support-compat.jar -->
+    <!-- support-core-ui.jar -->
+    <!-- support-media-compat.jar -->
+    <!-- support-vector-drawable.jar -->
+    <!-- animated-vector-drawable.jar -->
+    <!-- customtabs.jar -->
+    <meta-data android:name="android.support.VERSION" android:value="25.3.1" />
+
+    <!-- <%uses-permission%> -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- facebook (https://developers.facebook.com/docs/facebook-login/android/) --> 
+        
+    <uses-feature android:glEsVersion="0x00020000" android:required="True"/>
+
+    <application android:persistent="%persistent%" 
+        android:restoreAnyVersion="%restoreAnyVersion%" 
+        android:label="%label%" 
+        android:debuggable="%debuggable%" 
+        android:largeHeap="%largeHeap%"
+        android:icon="@mipmap/ic_launcher"
+        android:theme="%theme%"
+        android:hardwareAccelerated="%hardwareAccelerated%">
+
+      <%application-meta-data%>
+  		
+  		<%services%>
+    
+        <!-- Our activity is a subclass of the built-in NativeActivity framework class.
+             This will take care of integrating with our NDK code. -->
+        <activity android:name="com.embarcadero.firemonkey.FMXNativeActivity"
+                android:label="%activityLabel%"
+                android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
+                android:launchMode="singleTask">
+              
+            <!-- Tell NativeActivity the name of our .so -->
+            <meta-data android:name="android.app.lib_name"
+                android:value="%libNameValue%" />
+          
+            <intent-filter>  
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter> 
+      
+        </activity>
+        
+      <!-- facebook-common.jar -->
+      <activity android:name="com.facebook.FacebookActivity" 
+                android:theme="@style/com_facebook_activity_theme" 
+                android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation" 
+                android:label="@string/app_name" /> <!-- android:label="@string/app_name" taken from https://developers.facebook.com/docs/facebook-login/android/ -->
+      <activity android:name="com.facebook.CustomTabMainActivity" />
+      <activity android:name="com.facebook.CustomTabActivity"
+                android:exported="true">
+        <intent-filter> <!-- this intent-filter is taken from https://developers.facebook.com/docs/facebook-login/android/ -->
+          <action android:name="android.intent.action.VIEW" />
+          <category android:name="android.intent.category.DEFAULT" />
+          <category android:name="android.intent.category.BROWSABLE" />
+          <data android:scheme="@string/fb_login_protocol_scheme" />
+        </intent-filter>
+        <intent-filter>
+          <action android:name="android.intent.action.VIEW" />
+          <category android:name="android.intent.category.DEFAULT" />
+          <category android:name="android.intent.category.BROWSABLE" />
+          <data android:host="cct.%package%"
+                android:scheme="fbconnect" />
+        </intent-filter>
+      </activity>
+
+        <%activity%>
+      
+        <%receivers%>
+                       
+      <!-- facebook-core.jar
+           The initialization ContentProvider will call FacebookSdk.sdkInitialize automatically
+           with the application context. This config is merged in with the host app's manifest,
+           but there can only be one provider with the same authority activated at any given
+           point; so if the end user has two or more different apps that use Facebook SDK, only the
+           first one will be able to use the provider. To work around this problem, we use the
+           following placeholder in the authority to identify each host application as if it was
+           a completely different provider. -->
+      <provider android:name="com.facebook.internal.FacebookInitProvider"
+                android:authorities="%package%.FacebookInitProvider"
+                android:exported="false" />
+      <receiver android:name="com.facebook.CurrentAccessTokenExpirationBroadcastReceiver"
+                android:exported="false" >
+        <intent-filter>
+          <action android:name="com.facebook.sdk.ACTION_CURRENT_ACCESS_TOKEN_CHANGED" />
+        </intent-filter>
+      </receiver>
+      
+      <!-- https://developers.facebook.com/docs/android/getting-started -->
+      <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>   
+      
+      <!-- facebook-android-sdk.jar (https://developers.facebook.com/docs/app-events/android/#manual-activation) -->
+      <meta-data android:name="com.facebook.sdk.AutoLogAppEventsEnabled" android:value="false"/>
+      
+    </application>
+
+</manifest>
+<!-- END_INCLUDE(manifest) -->

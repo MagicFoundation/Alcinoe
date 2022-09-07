@@ -6,9 +6,9 @@ __recovery
 *.deployproj.local
 *.rsm
 dcu
-/Demos/*.exe
-/Demos/*.apk
-/Demos/*.dll
+/Demos/**/*.exe
+/Demos/**/*.apk
+/Demos/**/*.dll
 /Demos/ALLiveVideoChat/client/_source/ios/frameworks/WebRTC.framework/_CodeSignature
 /Demos/ALLiveVideoChat/client/_source/ios/frameworks/WebRTC.framework/Info.plist
 /Demos/ALLiveVideoChat/client/_source/ios/frameworks/WebRTC.framework/LICENSE.md

@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{77B8D6DC-099C-4BCB-8030-87F798733847}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="client\_source\ALLiveVideoChatClient.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="server\_source\ALLiveVideoChatServer.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="ALLiveVideoChatClient">
+        <MSBuild Projects="client\_source\ALLiveVideoChatClient.dproj"/>
+    </Target>
+    <Target Name="ALLiveVideoChatClient:Clean">
+        <MSBuild Projects="client\_source\ALLiveVideoChatClient.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALLiveVideoChatClient:Make">
+        <MSBuild Projects="client\_source\ALLiveVideoChatClient.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="ALLiveVideoChatServer">
+        <MSBuild Projects="server\_source\ALLiveVideoChatServer.dproj"/>
+    </Target>
+    <Target Name="ALLiveVideoChatServer:Clean">
+        <MSBuild Projects="server\_source\ALLiveVideoChatServer.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALLiveVideoChatServer:Make">
+        <MSBuild Projects="server\_source\ALLiveVideoChatServer.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="ALLiveVideoChatClient;ALLiveVideoChatServer"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="ALLiveVideoChatClient:Clean;ALLiveVideoChatServer:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="ALLiveVideoChatClient:Make;ALLiveVideoChatServer:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

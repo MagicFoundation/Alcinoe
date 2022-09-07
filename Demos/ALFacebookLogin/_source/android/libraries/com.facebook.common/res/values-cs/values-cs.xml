@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string gender="unknown" name="com_facebook_device_auth_instructions">Přejděte na &lt;b>facebook.com/device&lt;/b> a zadejte nahoře uvedený kód.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">Neočekávaná chyba při stahování obrázku.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">WebView vyžaduje oprávnění pro INTERNET</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">Chyba AndroidManifest</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">To se mi už líbí</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">To se mi líbí</string>
+    <string gender="unknown" name="com_facebook_loading">Načítání...</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">Zrušit</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">Přihlášení</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Pokračovat přes Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Přihlásit se přes Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">Odhlásit se</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">Odhlásit se</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">Přihlášen(a) jako: %1$s</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Přihlášení přes Facebook</string>
+    <string gender="unknown" name="com_facebook_send_button_text">Odeslat</string>
+    <string gender="unknown" name="com_facebook_share_button_text">Sdílet</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">Pokud chcete připojit svůj účet, spusťte aplikaci Facebook ve svém mobilním zařízení a zkontrolujte upozornění.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- NEBO -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">Nejste to vy?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">Pokračovat jako %1$s</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">Potvrďte přihlášení</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">Je to jen na vás – nastavte si, které informace chcete s aplikacemi sdílet.</string>
+</resources>

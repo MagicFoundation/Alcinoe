@@ -1,5 +1,10 @@
+-------------
+CLEAR HISTORY
+-------------
+
 If you need to remove files from the git history
-to get back space you can do it with git-filter-repo:
+(to get back space for exemple) you can do it with 
+git-filter-repo:
 
 * Clone https://github.com/newren/git-filter-repo.git 
 * Download Python Windows embeddable package (64-bit) from https://www.python.org/downloads/windows/
@@ -12,9 +17,15 @@ to get back space you can do it with git-filter-repo:
 * git remote add origin https://github.com/MagicFoundation/Alcinoe.git
 * git push --force --all origin
 
--------------------------------
-
 You can also analyze the list of directories/files that 
-can be deleted like this:
+can be deleted with this command:
 
 git filter-repo --analyze
+
+
+-----------------------
+REMAME FILE (case only)
+-----------------------
+
+* git mv xxx xxx2
+* git mv xxx2 XXX

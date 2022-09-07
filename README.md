@@ -38,11 +38,12 @@ else choose the directory that correspond to your Delphi version).
 You still need to add in your search path <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Source">{alcinoe_rootdir}\Source</a>  
   
 Alcinoe also improuve a little the original delphi source code. In this way you will need
-to go in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/sydney/10_4_2/">{alcinoe_rootdir}\Embarcadero\sydney\10_4_2</a>
-and run update.bat to retrieve and patch the original delphi source code. The batch file
-assume that the original source code is located in "c:\Program Files (x86)\Embarcadero\Studio\21.0\source\" 
-and that you have GIT in your path. After the batch copied and patched the Delphi source code you will 
-need to include this source code in your project search path.
+to go in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Sydney/10_4_2/">{alcinoe_rootdir}\Embarcadero\Sydney\10_4_2</a>
+and run <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Sydney/10_4_2/update.bat">update.bat</a> to retrieve and patch 
+the original delphi source code. The batch file assume that the original source code is located in 
+"c:\Program Files (x86)\Embarcadero\Studio\21.0\source\" and that you have GIT in your path. 
+You will need also to include in your project search path all subdirectories located in 
+<a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Sydney/10_4_2/">{alcinoe_rootdir}\Embarcadero\Sydney\10_4_2</a>.
 
 To finish more and more libraries use now Java 1.8 features (like webRTC, exoplayer, etc.). 
 In this way, we must do desugaring (Desugaring allows you to use these features on older 

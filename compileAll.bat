@@ -99,12 +99,12 @@ SET FileName=%ProjectDir%\*.deployproj.local
 del "%FileName%" /s
 if exist "%FileName%" goto ERROR
 
-SET FileName=%ProjectDir%\Source\dcu\Win32\%DELPHI_NAME%
+SET FileName=%ProjectDir%\Source\dcu\win32\%DELPHI_NAME%
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"
 
-SET FileName=%ProjectDir%\Lib\bpl\alcinoe\Win32\%DELPHI_NAME%
+SET FileName=%ProjectDir%\Lib\bpl\alcinoe\win32\%DELPHI_NAME%
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"
@@ -510,7 +510,7 @@ REM ----
 
 :FINISHED
 
-SET FileName=%ProjectDir%\Source\dcu\Win32\%DELPHI_NAME%
+SET FileName=%ProjectDir%\Source\dcu\win32\%DELPHI_NAME%
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"

@@ -41,7 +41,7 @@ echo.
 
 echo Patch the source code
 CHDIR ".\..\..\..\"
-git apply --ignore-space-change --ignore-whitespace .\Embarcadero\sydney\10_4_2\sydney_10_4_2.patch -v
+git apply --ignore-space-change --ignore-whitespace .\Embarcadero\Sydney\10_4_2\sydney_10_4_2.patch -v
 IF ERRORLEVEL 1 goto ERROR
 CHDIR "%ProjectDir%"
 echo.

@@ -33,7 +33,7 @@ search path of your project.
 
 If you plan to use visual components at design time then you need to
 install the bpl. Launch Delphi and go in component > Install Packages... > and choose the 
-BPL located in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Lib/bpl/alcinoe/Win32/sydney">{alcinoe_rootdir}\Lib\bpl\alcinoe\Win32\sydney\Alcinoe_sydney.bpl</a> (if you are in delphi Sydney 
+BPL located in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Lib/bpl/alcinoe/win32/sydney">{alcinoe_rootdir}\Lib\bpl\alcinoe\win32\sydney\Alcinoe_sydney.bpl</a> (if you are in delphi Sydney 
 else choose the directory that correspond to your Delphi version). 
 You still need to add in your search path <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Source">{alcinoe_rootdir}\Source</a>  
   
@@ -639,22 +639,6 @@ And much more
 * SMTP Client
 * Xml Parser 
 * etc ...
-
-
-Where can I get it?
--------------------
-
-#### SVN ####
-
-you can access the last svn version at:
-svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code 
-or with a web browser at:
-http://alcinoe.svn.sourceforge.net/viewvc/alcinoe/
-
-#### GIT ####
-
-You can also find the last version on github at 
-https://github.com/MagicFoundation/Alcinoe
 
 
 WIN64

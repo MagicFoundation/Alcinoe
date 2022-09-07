@@ -4,7 +4,7 @@ REM ----------------------------------------------
 REM Update the path below according to your system
 REM ----------------------------------------------
 
-set librariesRootPath=C:\Dev\Alcinoe\Lib\jar
+set librariesRootPath=C:\Dev\MagicFoundation\Alcinoe\Lib\jar
 set AndroidPlatformsSDKRootPath=C:\SDKs\android\platforms\android-30
 
 

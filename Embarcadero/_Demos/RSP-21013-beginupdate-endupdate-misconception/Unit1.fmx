@@ -1,0 +1,52 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 480
+  ClientWidth = 640
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Start: TButton
+    Align = Top
+    Size.Width = 640.000000000000000000
+    Size.Height = 49.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    Text = 'Start'
+    OnClick = StartClick
+  end
+  object MasterControl: TRectangle
+    Align = Top
+    Fill.Color = claBurlywood
+    Position.Y = 49.000000000000000000
+    Size.Width = 640.000000000000000000
+    Size.Height = 225.000000000000000000
+    Size.PlatformDefault = False
+  end
+  object Text1: TText
+    Align = Top
+    AutoSize = True
+    Position.Y = 274.000000000000000000
+    Size.Width = 640.000000000000000000
+    Size.Height = 50.000000000000000000
+    Size.PlatformDefault = False
+  end
+  object Text2: TText
+    Align = Top
+    AutoSize = True
+    Position.Y = 324.000000000000000000
+    Size.Width = 640.000000000000000000
+    Size.Height = 50.000000000000000000
+    Size.PlatformDefault = False
+  end
+  object Text3: TText
+    Align = Top
+    AutoSize = True
+    Position.Y = 374.000000000000000000
+    Size.Width = 640.000000000000000000
+    Size.Height = 50.000000000000000000
+    Size.PlatformDefault = False
+  end
+end

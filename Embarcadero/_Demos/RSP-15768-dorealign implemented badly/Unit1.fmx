@@ -1,0 +1,33 @@
+object Form6: TForm6
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 480
+  ClientWidth = 640
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Rectangle1: TRectangle
+    Align = Center
+    Fill.Color = claGold
+    Size.Width = 206.000000000000000000
+    Size.Height = 113.000000000000000000
+    Size.PlatformDefault = False
+    object Rectangle2: TRectangle
+      Align = Client
+      Fill.Color = claBlack
+      Size.Width = 206.000000000000000000
+      Size.Height = 113.000000000000000000
+      Size.PlatformDefault = False
+      OnResize = Rectangle2Resize
+    end
+  end
+  object Button1: TButton
+    Position.X = 72.000000000000000000
+    Position.Y = 104.000000000000000000
+    TabOrder = 1
+    Text = 'Button1'
+    OnClick = Button1Click
+  end
+end

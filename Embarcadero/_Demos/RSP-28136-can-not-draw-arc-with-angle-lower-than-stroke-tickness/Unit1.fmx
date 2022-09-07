@@ -1,0 +1,37 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 480
+  ClientWidth = 269
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Arc1: TArc
+    Position.X = 16.000000000000000000
+    Position.Y = 136.000000000000000000
+    Size.Width = 150.000000000000000000
+    Size.Height = 150.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Thickness = 15.000000000000000000
+    EndAngle = 10.000000000000000000
+  end
+  object Text1: TText
+    Align = Top
+    AutoSize = True
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Margins.Bottom = 8.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 8.000000000000000000
+    Size.Width = 256.562500000000000000
+    Size.Height = 63.843750000000000000
+    Size.PlatformDefault = False
+    Text = 
+      'When you run this demo under android/iOS you will not see the Ar' +
+      'c. Rename the _FMX.StrokeBuilder.pas in FMX.StrokeBuilder.pas an' +
+      'd rebuild to see the fix'
+  end
+end

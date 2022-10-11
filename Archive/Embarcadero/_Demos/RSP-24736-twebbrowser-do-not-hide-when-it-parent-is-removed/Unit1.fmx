@@ -1,0 +1,39 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 480
+  ClientWidth = 245
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Button1: TButton
+    Align = Top
+    Position.Y = 95.804687500000000000
+    Size.Width = 245.000000000000000000
+    Size.Height = 49.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    Text = 'Show the Frame with WebBrowser'
+    OnClick = Button1Click
+  end
+  object Text1: TText
+    Align = Top
+    AutoSize = True
+    Margins.Left = 8.000000000000000000
+    Margins.Top = 8.000000000000000000
+    Margins.Right = 8.000000000000000000
+    Margins.Bottom = 8.000000000000000000
+    Position.X = 8.000000000000000000
+    Position.Y = 8.000000000000000000
+    Size.Width = 229.000000000000000000
+    Size.Height = 79.804687500000000000
+    Size.PlatformDefault = False
+    Text = 
+      'Run this demo under Android. After showing the frame see that de' +
+      'stroying the frame a little later will not remove the webbrowser' +
+      '. rename all _fmx*.pas to fmx*.pas and compile again to see the ' +
+      'fix'
+  end
+end

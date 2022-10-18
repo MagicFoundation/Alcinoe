@@ -8,6 +8,7 @@ uses
   System.AnsiStrings,
   System.SysUtils,
   System.Classes,
+  system.Math,
   ALXmlDoc,
   ALCommon,
   ALStringList,
@@ -81,7 +82,9 @@ begin
               //----
               (aPlatformName = 'iOSDevice64') or
               (aPlatformName = 'iOSSimulator') or
-              (aPlatformName = 'OSX64'),
+              (aPlatformName = 'iOSSimARM64') or
+              (aPlatformName = 'OSX64') or
+              (aPlatformName = 'OSXARM64'),
               //----
               '.app');
 end;
@@ -239,11 +242,24 @@ begin
     SetMultiByteConversionCodePage(CP_UTF8);
 
     //init LDProjFilename / LDeployProjFilename / LProjectName / LOnlySort
-    var LDProjFilename := ALTrim(ansiString(paramstr(1)));
-    if LDProjFilename = '' then raise Exception.Create('Usage: DeployProjNormalizer.exe "<DprojFilename>" <createBackup>(ie: true/false)');
-    var LProjectName := ALExtractFileName(LDProjFilename, true{RemoveFileExt});
-    var LDeployProjFilename := ALExtractFilePath(LDProjFilename) + LProjectName + '.deployproj';
-    var LCreateBackup := not ALSameText(ALTrim(ansiString(paramstr(2))), 'false');
+    var LDProjFilename: String;
+    var LCreateBackup: Boolean;
+    var LParamLst := TALStringListU.Create;
+    try
+      for var I := 1 to ParamCount do
+        LParamLst.Add(ParamStr(i));
+      LDProjFilename := ALTrimU(LParamLst.Values['-DProj']);
+      LCreateBackup := not ALSameTextU(ALTrimU(LParamLst.Values['-CreateBackup']), 'false');
+    finally
+      ALFreeAndNil(LParamLst);
+    end;
+    if LDProjFilename = '' then begin
+      LDProjFilename := ALTrimU(paramstr(1));
+      LCreateBackup := not ALSameTextU(ALTrimU(paramstr(2)), 'false');
+    end;
+    if LDProjFilename = '' then raise Exception.Create('Usage: DeployProjNormalizer.exe -DProj="<DprojFilename>" -CreateBackup=<true/false>');
+    var LProjectName := ALExtractFileName(AnsiString(LDProjFilename), true{RemoveFileExt});
+    var LDeployProjFilename := ALExtractFilePathU(LDProjFilename) + String(LProjectName) + '.deployproj';
 
     //create the LDProjXmlDoc / LDeployProjXmlDoc
     var LDProjXmlDoc := TALXmlDocument.Create('Project');
@@ -291,8 +307,8 @@ begin
       if LDeploymentNode = nil then raise Exception.Create('ProjectExtensions.BorlandProject.Deployment node not found!');
 
       //check version attribute <Deployment Version="3">
-      if LDeploymentNode.Attributes['Version'] <> '3' then
-        raise Exception.Create('ProjectExtensions.BorlandProject.Deployment.Version is not in the expected value (3)');
+      //if LDeploymentNode.Attributes['Version'] <> '3' then
+      //  raise Exception.Create('ProjectExtensions.BorlandProject.Deployment.Version is not in the expected value (3)');
 
       //init LItemGroupNode
       var LItemGroupNode := LDProjXmlDoc.DocumentElement.ChildNodes.FindNode('ItemGroup');
@@ -324,6 +340,7 @@ begin
       end;
 
       //init LProperties
+      var LProjectVersion: Single := 0;
       for var I := 0 to LDProjXmlDoc.DocumentElement.ChildNodes.Count - 1 do begin
         Var LPropertyGroupNode := LDProjXmlDoc.DocumentElement.ChildNodes[i];
         if (LPropertyGroupNode.NodeName = 'PropertyGroup') and
@@ -339,10 +356,15 @@ begin
         else if (LPropertyGroupNode.NodeName = 'PropertyGroup') and
                 (LPropertyGroupNode.attributes['Condition'] = '') then begin
           Var LProjectVersionNode := LPropertyGroupNode.ChildNodes.FindNode('ProjectVersion');
-          if (LProjectVersionNode = nil) or (LProjectVersionNode.Text <> '19.2') then
-            raise Exception.Create('Unsupported Delphi compiler');
+          if (LProjectVersionNode = nil) or
+             ((LProjectVersionNode.Text <> '19.2' {Sydney}) and
+              (LProjectVersionNode.Text <> '19.5' {Alexandria})) then
+            raise Exception.Create('Unsupported Delphi compiler. Please consult Readme.txt');
+          LProjectVersion := ALStrToFloat(LProjectVersionNode.Text, ALDefaultFormatSettings);
         end;
       end;
+      if SameValue(LProjectVersion, 0) then
+        raise Exception.Create('Unsupported Delphi compiler. Please consult Readme.txt');
 
       //Merge DeployClass in DeployFile
       for var I := LDeploymentNode.ChildNodes.Count - 1 downto 0 do begin
@@ -395,7 +417,7 @@ begin
 
         //From DPROJ:
         //-----------
-        //<DeployFile Class="File" Configuration="Debug" LocalName="..\..\..\..\..\Alcinoe\Lib\jar\org.webrtc\jni\arm64-v8a\libjingle_peerconnection_so.so">
+        //<DeployFile Class="File" Configuration="Debug" LocalName="..\..\..\..\..\Alcinoe\Libraries\jar\org.webrtc\jni\arm64-v8a\libjingle_peerconnection_so.so">
         //  <Platform Name="Android">
         //    <Overwrite>true</Overwrite>
         //    <RemoteDir>library\lib\arm64-v8a\</RemoteDir>
@@ -411,7 +433,7 @@ begin
         //
         //To DEPLOYPROJ:
         //--------------
-        //<DeployFile Include="..\..\..\..\..\Alcinoe\Lib\jar\org.webrtc\jni\arm64-v8a\libjingle_peerconnection_so.so" Condition="''$(Config)''==''Debug''">
+        //<DeployFile Include="..\..\..\..\..\Alcinoe\Libraries\jar\org.webrtc\jni\arm64-v8a\libjingle_peerconnection_so.so" Condition="''$(Config)''==''Debug''">
         //  <DeployClass>File</DeployClass>
         //  <LocalCommand/>
         //  <Operation>0</Operation>
@@ -525,8 +547,10 @@ begin
             var LPlatformName := LplatForms[J];
             var LRemoteDir: AnsiString;
             if ALsametext(LPlatformName, 'iOSDevice64') or
-               ALsametext(LPlatformName, 'iOSSimulator') then LRemoteDir := _getProjectRoot(LProjectName, LPlatformName) + '\StartUp\Documents\'
-            else if ALsametext(LPlatformName, 'OSX64') then LRemoteDir := _getProjectRoot(LProjectName, LPlatformName) + '\Contents\Resources\StartUp\'
+               ALsametext(LPlatformName, 'iOSSimulator') or
+               ALSameText(LplatFormName, 'iOSSimARM64') then LRemoteDir := _getProjectRoot(LProjectName, LPlatformName) + '\StartUp\Documents\'
+            else if ALsametext(LPlatformName, 'OSX64') or
+                    ALsametext(LPlatformName, 'OSXARM64') then LRemoteDir := _getProjectRoot(LProjectName, LPlatformName) + '\Contents\Resources\StartUp\'
             else if ALsametext(LPlatformName, 'Android') or
                     ALsametext(LPlatformName, 'Android64') then LRemoteDir := _getProjectRoot(LProjectName, LPlatformName) + '\assets\internal\'
             else continue;
@@ -830,7 +854,8 @@ begin
           end;
 
           if ALSameText(LplatFormName, 'iOSDevice64') or
-             ALSameText(LplatFormName, 'iOSSimulator') then begin
+             ALSameText(LplatFormName, 'iOSSimulator') or
+             ALSameText(LplatFormName, 'iOSSimARM64') then begin
 
             //<iOS_AppStore1024>$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png</iOS_AppStore1024>
             _addDeployFile(
@@ -1345,7 +1370,28 @@ begin
           //Android/Android64
           //The classes.dex file is a Dalvik Executable file that all Android applications must have. This file contains
           //the Java libraries that the application uses.
-          if (ALSameText(LplatFormName, 'Android') or ALSameText(LplatFormName, 'Android64')) then
+          if (ALSameText(LplatFormName, 'Android') or ALSameText(LplatFormName, 'Android64')) and
+             (compareValue(LProjectVersion, 19.5{Alexandria}) >= 0) then
+            _addDeployFile(
+              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TalStringList;
+              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
+              LConfigName, // const aCondition: String;
+              _getExeOutputDir(LProperties,LConfigs,LPlatFormName,LConfigName) + _getProjectRoot(LProjectName, LPlatformName) + '.classes', // const aInclude: String;
+              'AndroidClasses', // const aDeployClass: String;
+              '', // const aLocalCommand: String;
+              '64', // const aOperation: String;
+              'True', // aOverwrite: String;
+              '', // const aRemoteCommand: String;
+              _getProjectRoot(LProjectName, LPlatformName) + '\classes\', // const aRemoteDir: String;
+              _getProjectRoot(LProjectName, LPlatformName) + '.classes', // const aRemoteName: String;
+              ''); // aRequired: AnsiString
+
+          //-----------------
+          //Android/Android64
+          //The classes.dex file is a Dalvik Executable file that all Android applications must have. This file contains
+          //the Java libraries that the application uses.
+          if (ALSameText(LplatFormName, 'Android') or ALSameText(LplatFormName, 'Android64')) and
+             (compareValue(LProjectVersion, 19.5{Alexandria}) < 0) then
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TalStringList;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
@@ -1363,7 +1409,8 @@ begin
           //-----
           //OSX64
           //The main binary
-          if (ALSameText(LplatFormName, 'OSX64')) then
+          if (ALSameText(LplatFormName, 'OSX64')) or
+             (ALSameText(LplatFormName, 'OSXARM64')) then
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TalStringList;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
@@ -1382,7 +1429,10 @@ begin
           //OSX64
           //Debugging Information
           //https://developer.apple.com/documentation/xcode/building-your-app-to-include-debugging-information
-          if (ALSameText(LplatFormName, 'OSX64')) then
+          if ((ALSameText(LplatFormName, 'OSX64')) or
+              (ALSameText(LplatFormName, 'OSXARM64'))) and
+             ((compareValue(LProjectVersion, 19.5{Alexandria}) < 0) or
+              (ALSameText(LConfigName, 'Debug'))) then
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TalStringList;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
@@ -1400,7 +1450,8 @@ begin
           //-----
           //OSX64
           //Key-value pairs that grant an executable permission to use a service or technology.
-          if (ALSameText(LplatFormName, 'OSX64')) then
+          if (ALSameText(LplatFormName, 'OSX64')) or
+             (ALSameText(LplatFormName, 'OSXARM64')) then
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TalStringList;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
@@ -1421,7 +1472,8 @@ begin
           //where the system can easily access it. macOS and iOS use Info.plist files to determine
           //what icon to display for a bundle, what document types an app supports, and many other
           //behaviors that have an impact outside the bundle itself.
-          if (ALSameText(LplatFormName, 'OSX64')) then
+          if (ALSameText(LplatFormName, 'OSX64')) or
+             (ALSameText(LplatFormName, 'OSXARM64')) then
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TalStringList;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
@@ -1438,7 +1490,8 @@ begin
 
           //-----
           //OSX64
-          if (ALSameText(LplatFormName, 'OSX64')) then
+          if (ALSameText(LplatFormName, 'OSX64')) or
+             (ALSameText(LplatFormName, 'OSXARM64')) then
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TalStringList;
               LProperties, // const aProperties: TALStringList;
@@ -1460,7 +1513,8 @@ begin
           //iOSDevice64
           //The main binary
           if (ALSameText(LplatFormName, 'iOSDevice64')) or
-             (ALSameText(LplatFormName, 'iOSSimulator')) then
+             (ALSameText(LplatFormName, 'iOSSimulator')) or
+             (ALSameText(LplatFormName, 'iOSSimARM64')) then
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TalStringList;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
@@ -1479,7 +1533,10 @@ begin
           //iOSDevice64
           //Debugging Information
           //https://developer.apple.com/documentation/xcode/building-your-app-to-include-debugging-information
-          if (ALSameText(LplatFormName, 'iOSDevice64')) then
+          if ((ALSameText(LplatFormName, 'iOSDevice64')) or
+              (ALSameText(LplatFormName, 'iOSSimARM64'))) and
+             ((compareValue(LProjectVersion, 19.5{Alexandria}) < 0) or
+              (ALSameText(LConfigName, 'Debug'))) then
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TalStringList;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
@@ -1497,7 +1554,8 @@ begin
           //-----------
           //iOSDevice64
           //Key-value pairs that grant an executable permission to use a service or technology.
-          if (ALSameText(LplatFormName, 'iOSDevice64')) then
+          if (ALSameText(LplatFormName, 'iOSDevice64')) or
+             (ALSameText(LplatFormName, 'iOSSimARM64')) then
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TalStringList;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
@@ -1519,7 +1577,8 @@ begin
           //what icon to display for a bundle, what document types an app supports, and many other
           //behaviors that have an impact outside the bundle itself.
           if (ALSameText(LplatFormName, 'iOSDevice64')) or
-             (ALSameText(LplatFormName, 'iOSSimulator')) then
+             (ALSameText(LplatFormName, 'iOSSimulator')) or
+             (ALSameText(LplatFormName, 'iOSSimARM64')) then
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TalStringList;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
@@ -1542,7 +1601,8 @@ begin
           //enhance the perception of your app as quick to launch and immediately ready for use.
           //Every app must supply a launch screen.
           if (ALSameText(LplatFormName, 'iOSDevice64')) or
-             (ALSameText(LplatFormName, 'iOSSimulator')) then
+             (ALSameText(LplatFormName, 'iOSSimulator')) or
+             (ALSameText(LplatFormName, 'iOSSimARM64')) then
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TalStringList;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
@@ -1599,8 +1659,8 @@ begin
 
       //save the backup of DeployProj
       if (LCreateBackup) and
-         (ALFileExists(LDeployProjFilename)) and
-         (not ALFileExists(LDeployProjFilename + '.bak')) then begin
+         (ALFileExistsU(LDeployProjFilename)) and
+         (not ALFileExistsU(LDeployProjFilename + '.bak')) then begin
         var LBackupDeployProjXmlDoc := TALXmlDocument.Create('Project');
         try
           LBackupDeployProjXmlDoc.Options := [];

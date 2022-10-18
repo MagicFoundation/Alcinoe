@@ -75,20 +75,14 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
-        <Cfg_2_Win32>true</Cfg_2_Win32>
-        <CfgParent>Cfg_2</CfgParent>
-        <Cfg_2>true</Cfg_2>
-        <Base>true</Base>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <DCC_UnitSearchPath>..\..\..\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\..\..\..\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <SanitizedProjectName>AndroidMerger</SanitizedProjectName>
         <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
-        <DCC_ExeOutput>..\</DCC_ExeOutput>
+        <DCC_ExeOutput>..\..\</DCC_ExeOutput>
         <DCC_E>false</DCC_E>
         <DCC_N>false</DCC_N>
         <DCC_S>false</DCC_S>
@@ -182,7 +176,6 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_UsePackage>DBXSqliteDriver;IndyIPCommon;RESTComponents;bindcompdbx;DBXInterBaseDriver;vcl;IndyIPServer;vclactnband;vclFireDAC;IndySystem;tethering;svnui;dsnapcon;FireDACADSDriver;FireDACMSAccDriver;fmxFireDAC;vclimg;FireDAC;vcltouch;vcldb;bindcompfmx;svn;FireDACSqliteDriver;FireDACPgDriver;inetdb;soaprtl;DbxCommonDriver;FireDACIBDriver;fmx;fmxdae;xmlrtl;soapmidas;fmxobj;vclwinx;rtl;DbxClientDriver;CustomIPTransport;vcldsnap;dbexpress;IndyCore;vclx;bindcomp;appanalytics;dsnap;FireDACCommon;IndyIPClient;EurekaLogCore;bindcompvcl;RESTBackendComponents;VCLRESTComponents;soapserver;dbxcds;VclSmp;adortl;vclie;bindengine;DBXMySQLDriver;CloudService;dsnapxml;FireDACMySQLDriver;dbrtl;IndyProtocols;inetdbxpress;Grijjy.Package.RTL;FireDACCommonODBC;FireDACCommonDriver;Grijjy.Package.FMX;inet;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
-        <Debugger_RunParams>C:\Temp\res\result C:\Temp\res\facebook-android-sdk\res C:\Temp\res\play-services-appinvite\res C:\Temp\res\play-services-basement\res</Debugger_RunParams>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <Manifest_File>(None)</Manifest_File>
         <DCC_ConsoleTarget>true</DCC_ConsoleTarget>
@@ -193,6 +186,7 @@
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <Debugger_RunParams>-Libraries=&quot;.\_Build\Test\SampleApp;..\..\libraries\jar\android.arch.core\arch-core-runtime-1.1.1.aar;..\..\libraries\jar\android.arch.lifecycle\arch-lifecycle-livedata-core-1.1.1.aar;..\..\libraries\jar\android.arch.lifecycle\arch-lifecycle-runtime-1.1.1.aar;..\..\libraries\jar\android.arch.lifecycle\arch-lifecycle-viewmodel-1.1.1.aar;..\..\libraries\jar\com.android.billingclient\billing-3.0.1.aar;..\..\libraries\jar\com.android.installreferrer\installreferrer-1.1.aar;..\..\libraries\jar\com.android.support\animated-vector-drawable-27.1.0.aar;..\..\libraries\jar\com.android.support\appcompat-v7-27.1.0.aar;..\..\libraries\jar\com.android.support\cardview-v7-27.1.0.aar;..\..\libraries\jar\com.android.support\customtabs-27.1.0.aar;..\..\libraries\jar\com.android.support\support-compat-27.1.0.aar;..\..\libraries\jar\com.android.support\support-core-ui-27.1.0.aar;..\..\libraries\jar\com.android.support\support-core-utils-27.1.0.aar;..\..\libraries\jar\com.android.support\support-fragment-27.1.0.aar;..\..\libraries\jar\com.android.support\support-media-compat-27.1.0.aar;..\..\libraries\jar\com.android.support\support-vector-drawable-27.1.0.aar;..\..\libraries\jar\com.facebook.android\facebook-common-5.15.1.aar;..\..\libraries\jar\com.facebook.android\facebook-core-5.15.1.aar;..\..\libraries\jar\com.facebook.android\facebook-login-5.15.1.aar;..\..\libraries\jar\com.facebook.android\facebook-share-5.15.1.aar;..\..\libraries\jar\com.google.android.exoplayer\exoplayer-core-2.6.1.aar;..\..\libraries\jar\com.google.android.exoplayer\exoplayer-hls-2.6.1.aar;..\..\libraries\jar\com.google.android.gms\play-services-auth-api-phone-12.0.1.aar;..\..\libraries\jar\com.google.android.gms\play-services-auth-base-12.0.1.aar;..\..\libraries\jar\com.google.android.gms\play-services-auth-12.0.1.aar;..\..\libraries\jar\com.google.android.gms\play-services-base-12.0.1.aar;..\..\libraries\jar\com.google.android.gms\play-services-basement-12.0.1.aar;..\..\libraries\jar\com.google.android.gms\play-services-location-12.0.1.aar;..\..\libraries\jar\com.google.android.gms\play-services-tasks-12.0.1.aar;..\..\libraries\jar\com.google.firebase\firebase-analytics-impl-12.0.1.aar;..\..\libraries\jar\com.google.firebase\firebase-analytics-12.0.1.aar;..\..\libraries\jar\com.google.firebase\firebase-common-12.0.1.aar;..\..\libraries\jar\com.google.firebase\firebase-iid-12.0.1.aar;..\..\libraries\jar\com.google.firebase\firebase-messaging-12.0.1.aar;..\..\libraries\jar\com.parse.bolts\bolts-android-1.4.0.aar;..\..\libraries\jar\com.parse.bolts\bolts-applinks-1.4.0.aar;..\..\libraries\jar\com.vk\androidsdk-2.2.3.aar;..\..\libraries\jar\org.webrtc\google-webrtc-1.0.25331.aar&quot; -OutputDir=&quot;.\_Build\Test\Merged\&quot; -DProj=&quot;.\_Build\Test\Sample.dproj&quot; -AndroidManifest=&quot;.\_Build\Test\AndroidManifest.template.xml&quot; -DProjNormalizer=&quot;..\DProjNormalizer\DProjNormalizer.exe&quot; -RJarSwapper=&quot;..\RJarSwapper\RJarSwapper.bat&quot;</Debugger_RunParams>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -207,7 +201,6 @@
         <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
-        <Debugger_RunParams>-Libraries=&quot;.\_Test\SampleApp;.\_Test\..\..\..\libraries\jar\android.arch.core\arch-core-runtime-1.1.1.aar;.\_Test\..\..\..\libraries\jar\android.arch.lifecycle\arch-lifecycle-livedata-core-1.1.1.aar;.\_Test\..\..\..\libraries\jar\android.arch.lifecycle\arch-lifecycle-runtime-1.1.1.aar;.\_Test\..\..\..\libraries\jar\android.arch.lifecycle\arch-lifecycle-viewmodel-1.1.1.aar;.\_Test\..\..\..\libraries\jar\com.android.billingclient\billing-3.0.1.aar;.\_Test\..\..\..\libraries\jar\com.android.installreferrer\installreferrer-1.1.aar;.\_Test\..\..\..\libraries\jar\com.android.support\animated-vector-drawable-27.1.0.aar;.\_Test\..\..\..\libraries\jar\com.android.support\appcompat-v7-27.1.0.aar;.\_Test\..\..\..\libraries\jar\com.android.support\cardview-v7-27.1.0.aar;.\_Test\..\..\..\libraries\jar\com.android.support\customtabs-27.1.0.aar;.\_Test\..\..\..\libraries\jar\com.android.support\support-compat-27.1.0.aar;.\_Test\..\..\..\libraries\jar\com.android.support\support-core-ui-27.1.0.aar;.\_Test\..\..\..\libraries\jar\com.android.support\support-core-utils-27.1.0.aar;.\_Test\..\..\..\libraries\jar\com.android.support\support-fragment-27.1.0.aar;.\_Test\..\..\..\libraries\jar\com.android.support\support-media-compat-27.1.0.aar;.\_Test\..\..\..\libraries\jar\com.android.support\support-vector-drawable-27.1.0.aar;.\_Test\..\..\..\libraries\jar\com.facebook.android\facebook-common-5.15.1.aar;.\_Test\..\..\..\libraries\jar\com.facebook.android\facebook-core-5.15.1.aar;.\_Test\..\..\..\libraries\jar\com.facebook.android\facebook-login-5.15.1.aar;.\_Test\..\..\..\libraries\jar\com.facebook.android\facebook-share-5.15.1.aar;.\_Test\..\..\..\libraries\jar\com.google.android.exoplayer\exoplayer-core-2.6.1.aar;.\_Test\..\..\..\libraries\jar\com.google.android.exoplayer\exoplayer-hls-2.6.1.aar;.\_Test\..\..\..\libraries\jar\com.google.android.gms\play-services-auth-api-phone-12.0.1.aar;.\_Test\..\..\..\libraries\jar\com.google.android.gms\play-services-auth-base-12.0.1.aar;.\_Test\..\..\..\libraries\jar\com.google.android.gms\play-services-auth-12.0.1.aar;.\_Test\..\..\..\libraries\jar\com.google.android.gms\play-services-base-12.0.1.aar;.\_Test\..\..\..\libraries\jar\com.google.android.gms\play-services-basement-12.0.1.aar;.\_Test\..\..\..\libraries\jar\com.google.android.gms\play-services-location-12.0.1.aar;.\_Test\..\..\..\libraries\jar\com.google.android.gms\play-services-tasks-12.0.1.aar;.\_Test\..\..\..\libraries\jar\com.google.firebase\firebase-analytics-impl-12.0.1.aar;.\_Test\..\..\..\libraries\jar\com.google.firebase\firebase-analytics-12.0.1.aar;.\_Test\..\..\..\libraries\jar\com.google.firebase\firebase-common-12.0.1.aar;.\_Test\..\..\..\libraries\jar\com.google.firebase\firebase-iid-12.0.1.aar;.\_Test\..\..\..\libraries\jar\com.google.firebase\firebase-messaging-12.0.1.aar;.\_Test\..\..\..\libraries\jar\com.parse.bolts\bolts-android-1.4.0.aar;.\_Test\..\..\..\libraries\jar\com.parse.bolts\bolts-applinks-1.4.0.aar;.\_Test\..\..\..\libraries\jar\com.vk\androidsdk-2.2.3.aar;.\_Test\..\..\..\libraries\jar\org.webrtc\google-webrtc-1.0.25331.aar&quot; -OutputDir=&quot;.\_Test\Merged\&quot; -DProj=&quot;.\_Test\Sample.dproj&quot; -AndroidManifest=&quot;.\_Test\AndroidManifest.template.xml&quot; -DProjNormalizer=&quot;..\DProjNormalizer\DProjNormalizer.exe&quot; -RJarSwapper=&quot;..\RJarSwapper\RJarSwapper.bat&quot;</Debugger_RunParams>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <Manifest_File>(None)</Manifest_File>
         <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
@@ -217,9 +210,6 @@
         <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
         <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
         <DCC_DebugInformation>0</DCC_DebugInformation>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <Debugger_RunParams>c:\temp\res\res c:\temp\res\libraries\com.facebook.common\res c:\temp\res\libraries\com.facebook.share\res c:\temp\res\libraries\com.facebook.login\res</Debugger_RunParams>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">

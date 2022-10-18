@@ -250,9 +250,7 @@
     </activity>
     
     <!-- com.facebook.core -->
-    <!-- !! <provider android:name="com.facebook.internal.FacebookInitProvider"
-              android:authorities="%package%.FacebookInitProvider"
-              android:exported="false"/> !! -->
+    <!-- !! <provider android:name="com.facebook.internal.FacebookInitProvider" android:authorities="%package%.FacebookInitProvider" android:exported="false"/> !! -->
     <receiver android:name="com.facebook.CurrentAccessTokenExpirationBroadcastReceiver"
               android:exported="false">
       <intent-filter>

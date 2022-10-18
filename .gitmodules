@@ -1,4 +1,4 @@
 
 [submodule "Tools/DeployMan/_source"]
-	path = Tools/DeployMan/_source
+	path = Tools/DeployMan/_Source
 	url = https://github.com/grijjy/GrijjyDeployMan.git

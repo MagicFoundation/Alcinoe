@@ -13,96 +13,6 @@ uses
   ALString,
   ALCommon;
 
-{*************************************************************}
-Function _FormatFunctionCall(Const aSourceStr: String): String;
-Begin
-
-  //LNumberOfChars := aPaint.breakText(
-  //                    LLine {text},
-  //                    true {measureForwards},
-  //                    LMaxWidth - LLineIndent, {maxWidth}
-  //                    LMeasuredWidth {measuredWidth}); // http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
-  //                                                     // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
-  //                                                     // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
-  //                                                     //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
-  //                                                     //   it's return for exemple 9 when height = 11
-
-  var LSourceLst := TALStringList.create;
-  Try
-    LSourceLst.text := LSourceStr;
-    Var LUnclosedParenthese := 0;
-    Var LAfterImplementation := False;
-    var LinCurlyBrackets: Boolean := False; // {
-    var LinAsteriskBracket: Boolean := False; // (*
-    var LBeginLine: Integer := -1;
-    var LEndLine: Integer := -1;
-    var J := 1;
-    While J <= LSourceLst.Count - 1 do begin
-      Var LSourceLine := LSourceLst[J];
-      if ALSameText(LSourceLine,'implementation') then LAfterImplementation := True;
-      if not LAfterImplementation then begin
-        inc(J);
-        continue;
-      end;
-      var LInQuote: Boolean := False; // '
-      var LInDoubleSlash: Boolean := False; // //
-      var K: integer := Low(LSourceLine);
-      While K < High(LSourceLine) do begin
-        //-----
-        var LCurrChar := LSourceLine[k];
-        var LPrevChar := LSourceLine[k-1];
-        inc(k);
-        //-----
-        if LInDoubleSlash then continue;
-        //-----
-        if (LinCurlyBrackets) and (LCurrChar <> '}') then continue;
-        if (LinCurlyBrackets) and (LCurrChar = '}') then LinCurlyBrackets := False;
-        //-----
-        if (LinAsteriskBracket) and (LCurrChar <> ')') then continue;
-        if (LinAsteriskBracket) and (LCurrChar = ')') and (LPrevChar = '*') then LinAsteriskBracket := false;
-        //-----
-        if (LCurrChar = '/') and (LPrevChar= '/') then begin
-          LInDoubleSlash := true;
-          continue;
-        end;
-        //-----
-        if (LCurrChar = '{') then begin
-          LinCurlyBrackets := true;
-          continue;
-        end;
-        //-----
-        if (LCurrChar = '*') and (LPrevChar= '(') then begin
-          LinAsteriskBracket := true;
-          inc(k);
-          continue;
-        end;
-        //-----
-        if LCurrChar = '''' then LInQuote := not LInQuote;
-        if LInQuote then continue;
-        //-----
-        if LCurrChar = '(' then begin
-          if LUnclosedParenthese = 0 then LBeginLine := K - 1;
-          inc(LUnclosedParenthese);
-          continue;
-        end;
-        if LCurrChar = ')' then begin
-          if LUnclosedParenthese = 0 then raise Exception.Create('Error 0C208CA1-87C3-4972-83AF-61AC039927AD');
-          dec(LUnclosedParenthese);
-          if LUnclosedParenthese = 0 then LEndLine := K - 1;
-          continue;
-        end;
-        //-----
-      end;
-
-      inc(j);
-    end;
-    LSourceStr := ALTrim(LSourceLst.text) + #13#10;
-  Finally
-    ALFreeAndNil(LSourceLst);
-  End;
-End;
-
-
 begin
 
   try
@@ -113,10 +23,26 @@ begin
     {$ENDIF}
     SetMultiByteConversionCodePage(CP_UTF8);
 
-    var LProjectDirectory := ansiString(paramstr(1));
-    var LCreateBackup := not ALSameText(ALTrim(ansiString(paramstr(2))), 'false');
+    //init LRootDirectory / LCreateBackup
+    var LRootDirectory: String;
+    var LCreateBackup: Boolean;
+    var LParamLst := TALStringListU.Create;
+    try
+      for var I := 1 to ParamCount do
+        LParamLst.Add(ParamStr(i));
+      LRootDirectory := ALTrimU(LParamLst.Values['-Dir']);
+      LCreateBackup := not ALSameTextU(ALTrimU(LParamLst.Values['-CreateBackup']), 'false');
+    finally
+      ALFreeAndNil(LParamLst);
+    end;
+    if LRootDirectory = '' then begin
+      LRootDirectory := ALTrimU(paramstr(1));
+      LCreateBackup := not ALSameTextU(ALTrimU(paramstr(2)), 'false');
+    end;
+    if LRootDirectory = '' then raise Exception.Create('Usage: UnitNormalizer.exe -Dir="<Directory>" -CreateBackup=<true/false>');
 
-    var LFiles := TDirectory.GetFiles(string(LProjectDirectory), '*.pas', TSearchOption.soAllDirectories);
+    //loop on all *.pas in LRootDirectory
+    var LFiles := TDirectory.GetFiles(string(LRootDirectory), '*.pas', TSearchOption.soAllDirectories);
     for var I := Low(LFiles) to High(LFiles) do begin
 
       {$REGION 'Init LSourceStr'}
@@ -149,97 +75,6 @@ begin
       {$REGION 'replace <space>#13 by #13#10'}
       while ALpos(' '#13#10,LSourceStr) > 0 do
         LSourceStr := ALStringReplace(LSourceStr,' '#13#10,#13#10,[rfReplaceALL]);
-      {$ENDREGION}
-
-      {$REGION 'Add *** on the top of procedure/function/contructor/destructor'}
-      Var LSourceLst := TALStringList.create;
-      Try
-        LSourceLst.text := LSourceStr;
-        Var LAfterImplementation := False;
-        var J := 1;
-        While J <= LSourceLst.Count - 1 do begin
-          Var LSourceLine := LSourceLst[J];
-          if ALSameText(LSourceLine,'implementation') then LAfterImplementation := True;
-          if not LAfterImplementation then begin
-            inc(j);
-            continue;
-          end;
-          if (ALPosExIgnoreCase('Procedure ', LSourceLine) = 1) or
-             (ALPosExIgnoreCase('Function ', LSourceLine) = 1) or
-             (ALPosExIgnoreCase('Class Procedure ', LSourceLine) = 1) or
-             (ALPosExIgnoreCase('Class Function ', LSourceLine) = 1) or
-             (ALPosExIgnoreCase('Constructor ', LSourceLine) = 1) or
-             (ALPosExIgnoreCase('Destructor ', LSourceLine) = 1) then begin
-            Var LPreviousSourceLine := LSourceLst[J - 1];
-            if (LPreviousSourceLine = '') or
-               (ALPos('{*', LSourceLine) = 1) then begin
-              var LNewPreviousSourceLine: AnsiString;
-              setlength(LNewPreviousSourceLine, length(LSourceLine));
-              FillChar(LNewPreviousSourceLine[low(LNewPreviousSourceLine)], length(LNewPreviousSourceLine), Ord('*'));
-              LNewPreviousSourceLine[low(LNewPreviousSourceLine)] := '{';
-              LNewPreviousSourceLine[high(LNewPreviousSourceLine)] := '}';
-              if LPreviousSourceLine = '' then begin
-                LSourceLst.Insert(J-1,'');
-                inc(j);
-              end;
-              LSourceLst[J-1] := LNewPreviousSourceLine;
-            end;
-          end;
-          inc(j);
-        end;
-        LSourceStr := ALTrim(LSourceLst.text) + #13#10;
-      Finally
-        ALFreeAndNil(LSourceLst);
-      End;
-      {$ENDREGION}
-
-      {$REGION 'Add ~~~ on the top of procedure/function declared inside a procedure or function'}
-      LSourceLst := TALStringList.create;
-      Try
-        LSourceLst.text := LSourceStr;
-        Var LAfterImplementation := False;
-        var J := 1;
-        While J <= LSourceLst.Count - 1 do begin
-          Var LSourceLine := LSourceLst[J];
-          if ALSameText(LSourceLine,'implementation') then LAfterImplementation := True;
-          if not LAfterImplementation then begin
-            inc(J);
-            continue;
-          end;
-          if (ALPosExIgnoreCase('Procedure ', LSourceLine) <> 1) and
-             (ALPosExIgnoreCase('Function ', LSourceLine) <> 1) and
-             ((ALPosExIgnoreCase('Procedure ', ALTrim(LSourceLine)) = 1) or
-              (ALPosExIgnoreCase('Function ', ALTrim(LSourceLine)) = 1)) then begin
-            Var LPreviousSourceLine := LSourceLst[J - 1];
-            if (LPreviousSourceLine = '') or
-               (ALPos('{~', ALTrim(LSourceLine)) = 1) then begin
-              var LNewPreviousSourceLine: AnsiString;
-              setlength(LNewPreviousSourceLine, length(LSourceLine));
-              FillChar(LNewPreviousSourceLine[low(LNewPreviousSourceLine)], length(LNewPreviousSourceLine), Ord('~'));
-              Var LLn := 0;
-              for var K := low(LSourceLine) to High(LSourceLine) do
-                if LSourceLine[k] = ' ' then inc(LLn)
-                else break;
-              FillChar(LNewPreviousSourceLine[low(LNewPreviousSourceLine)], LLn, Ord(' '));
-              LNewPreviousSourceLine[LLn+1] := '{';
-              LNewPreviousSourceLine[high(LNewPreviousSourceLine)] := '}';
-              if LPreviousSourceLine = '' then begin
-                LSourceLst.Insert(J-1,'');
-                inc(j);
-              end;
-              LSourceLst[J-1] := LNewPreviousSourceLine;
-            end;
-          end;
-          inc(j);
-        end;
-        LSourceStr := ALTrim(LSourceLst.text) + #13#10;
-      Finally
-        ALFreeAndNil(LSourceLst);
-      End;
-      {$ENDREGION}
-
-      {$REGION 'format procedure/function call'}
-
       {$ENDREGION}
 
       {$REGION 'Save the file'}

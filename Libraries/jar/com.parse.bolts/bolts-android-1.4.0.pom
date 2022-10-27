@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.parse.bolts</groupId>
+  <artifactId>bolts-android</artifactId>
+  <version>1.4.0</version>
+  <name>Bolts-Android</name>
+  <description>Bolts is a collection of low-level libraries designed to make developing mobile apps easier.</description>
+  <url>https://github.com/BoltsFramework/Bolts-Android</url>
+  <licenses>
+    <license>
+      <name>BSD 2-Clause License</name>
+      <url>https://github.com/BoltsFramework/Bolts-Android/blob/master/LICENSE</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>parse</id>
+      <name>Parse</name>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git@github.com:BoltsFramework/Bolts-Android.git</connection>
+    <developerConnection>scm:git@github.com:BoltsFramework/Bolts-Android.git</developerConnection>
+    <url>https://github.com/BoltsFramework/Bolts-Android</url>
+  </scm>
+  <dependencies>
+    <dependency>
+      <groupId>com.parse.bolts</groupId>
+      <artifactId>bolts-tasks</artifactId>
+      <version>1.4.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.parse.bolts</groupId>
+      <artifactId>bolts-applinks</artifactId>
+      <version>1.4.0</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project>

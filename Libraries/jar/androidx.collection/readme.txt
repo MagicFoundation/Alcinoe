@@ -1,3 +1,2 @@
 You can download the archive from: 
-https://maven.google.com/androidx/collection/collection/1.1.0/collection-1.1.0.jar
-
+https://maven.google.com/web/index.html#androidx.collection:collection:1.1.0

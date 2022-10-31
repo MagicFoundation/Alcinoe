@@ -27,12 +27,13 @@ details on cmp operator:
 "1.5 cmp 1.5" returns 0.0 because 1.5 = 1.5
 "1.5 cmp 0.0" returns 1.0 because 1.5 > 0.0
 *******************************************************************************}
-
 unit ALExprEval;
 
 interface
 
-{$IF CompilerVersion > 34} // sydney
+{$I Alcinoe.inc}
+
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if https://github.com/project-jedi/jcl.git jcl\source\common\JclExprEval.pas was not updated from References\jcl\source\common\JclExprEval.pas and adjust the IFDEF'}
 {$IFEND}
 
@@ -398,6 +399,7 @@ type
     function IntegerDivide(ALeft, ARight: TALExprNode): TALExprNode; virtual; abstract;
     function Modulo(ALeft, ARight: TALExprNode): TALExprNode; virtual; abstract;
     function Negate(AValue: TALExprNode): TALExprNode; virtual; abstract;
+    function Power(ALeft, ARight: TALExprNode): TALExprNode; virtual; abstract;
 
     function Compare(ALeft, ARight: TALExprNode): TALExprNode; virtual; abstract;
     function CompareEqual(ALeft, ARight: TALExprNode): TALExprNode; virtual; abstract;
@@ -548,6 +550,7 @@ type
     function IntegerDivide(ALeft, ARight: TALExprNode): TALExprNode; override;
     function Modulo(ALeft, ARight: TALExprNode): TALExprNode; override;
     function Negate(AValue: TALExprNode): TALExprNode; override;
+    function Power(ALeft, ARight: TALExprNode): TALExprNode; override;
 
     function Compare(ALeft, ARight: TALExprNode): TALExprNode; override;
     function CompareEqual(ALeft, ARight: TALExprNode): TALExprNode; override;
@@ -1168,6 +1171,13 @@ begin
         Result := NodeFactory.Multiply(Result, CompileExprLevel3(True));
       etForwardSlash:
         Result := NodeFactory.Divide(Result, CompileExprLevel3(True));
+      etArrow:
+        Result := NodeFactory.Power(Result, CompileExprLevel3(True));
+      etPercent:
+        begin
+          Result := NodeFactory.Divide(Result, NodeFactory.LoadConst(100));
+          Lexer.NextTok;             // Other operators calls NextTok via CompileExprLevel3(True)
+        end;
       etIdentifier: // div, mod, and, shl, shr, band
         if ALSameText(Lexer.TokenAsString, 'div') then
           Result := NodeFactory.IntegerDivide(Result, CompileExprLevel3(True))
@@ -1407,6 +1417,13 @@ begin
         Result := Result * EvalExprLevel3(True);
       etForwardSlash:
         Result := Result / EvalExprLevel3(True);
+      etArrow:
+        Result := Power(Result, EvalExprLevel3(True));
+      etPercent:
+        begin
+          Result := Result / 100;
+          Lexer.NextTok;        // Other operators calls NextTok via EvalExprLevel3(True)
+        end;
       etIdentifier: // div, mod, and, shl, shr, band, in
         if ALSameText(Lexer.TokenAsString, 'in') then
         begin
@@ -2018,6 +2035,12 @@ type
     procedure Execute; override;
   end;
 
+  {-----------------------------------------}
+  TALExprPowerVmOp = class(TALExprBinaryVmOp)
+  public
+    procedure Execute; override;
+  end;
+
   {-------------------------------------------}
   TALExprCompareVmOp = class(TALExprBinaryVmOp)
   public
@@ -2365,6 +2388,12 @@ end;
 procedure TALExprDivideVmOp.Execute;
 begin
   FOutput := FLeft^ / FRight^;
+end;
+
+{*********************************}
+procedure TALExprPowerVmOp.Execute;
+begin
+  FOutput := Power(FLeft^ , FRight^);
 end;
 
 {***********************************}
@@ -3259,6 +3288,12 @@ end;
 function TALExprVirtMachNodeFactory.Negate(AValue: TALExprNode): TALExprNode;
 begin
   Result := AddNode(TALExprUnaryVmNode.Create(TALExprNegateVmOp, [AValue]));
+end;
+
+{*********************************************************************************}
+function TALExprVirtMachNodeFactory.Power(ALeft, ARight: TALExprNode): TALExprNode;
+begin
+  Result := AddNode(TALExprBinaryVmNode.Create(TALExprPowerVmOp, [ALeft, ARight]));
 end;
 
 {***********************************************************************}

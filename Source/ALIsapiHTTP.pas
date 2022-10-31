@@ -2,7 +2,9 @@ unit ALIsapiHTTP;
 
 interface
 
-{$IF CompilerVersion > 34} // sydney
+{$I Alcinoe.inc}
+
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if Web.Win.IsapiHTTP / Web.HTTPApp was not updated and adjust the IFDEF'}
 {$IFEND}
 
@@ -181,7 +183,8 @@ type
                              const ADomain, APath: AnsiString;
                              AExpires: TDateTime;
                              ASecure: Boolean;
-                             const AHttpOnly: Boolean = False);
+                             const AHttpOnly: Boolean = False;
+                             const ASameSite: AnsiString = '');
     procedure SetCustomHeader(const Name, Value: AnsiString);
     property Cookies: TALHttpCookieCollection read FCookies;
     property HTTPRequest: TALWebRequest read FHTTPRequest;
@@ -729,7 +732,8 @@ procedure TALWebResponse.SetCookieField(Values: TALStrings;
                                         const ADomain, APath: AnsiString;
                                         AExpires: TDateTime;
                                         ASecure: Boolean;
-                                        const AHttpOnly: Boolean = False);
+                                        const AHttpOnly: Boolean = False;
+                                        const ASameSite: AnsiString = '');
 var
   I: Integer;
 begin
@@ -742,6 +746,7 @@ begin
       Expires := AExpires;
       Secure := ASecure;
       HttpOnly := AHttpOnly;
+      SameSite := ASameSite;
     end;
 end;
 
@@ -978,7 +983,10 @@ begin
                                        nil) then raiseLastOsError;
     fSentInAsync := True;
   end
-  else if ContentStream = nil then HTTPRequest.WriteString(Content)
+  else if ContentStream = nil then begin
+    if not HTTPRequest.WriteString(Content) then
+      raise Exception.Create('Failed to send content');
+  end
   else if ContentStream <> nil then begin
     SendStream(ContentStream);
     ContentStream := nil; // Drop the stream
@@ -1007,7 +1015,8 @@ var Buffer: array[0..8191] of Byte;
 begin
   while AStream.Position < AStream.Size do begin
     BytesToSend := AStream.Read(Buffer, SizeOf(Buffer));
-    FHTTPRequest.WriteClient(Buffer, BytesToSend);
+    if FHTTPRequest.WriteClient(Buffer, BytesToSend) <> BytesToSend then
+      raise Exception.Create('Failed to send stream');
   end;
 end;
 

@@ -1,10 +1,12 @@
 unit ALFmxAni;
 
-{$IF CompilerVersion > 34} // sydney
-  {$MESSAGE WARN 'Check if FMX.Ani.pas was not updated and adjust the IFDEF'}
-{$ENDIF}
-
 interface
+
+{$I Alcinoe.inc}
+
+{$IFNDEF ALCompilerVersionSupported}
+  {$MESSAGE WARN 'Check if FMX.Layouts.pas was not updated and adjust the IFDEF'}
+{$ENDIF}
 
 uses
   System.Classes,
@@ -157,7 +159,7 @@ type
     procedure Start; virtual;
     procedure Stop; virtual;
     procedure StopAtCurrent; virtual;
-    procedure ProcessTick(time, deltaTime: Single);
+    procedure ProcessTick(const ATime, ADeltaTime: Single);
     property Running: Boolean read FRunning;
     property Pause: Boolean read FPause write FPause;
     property AnimationType: TAnimationType read FAnimationType write FAnimationType default TAnimationType.In;
@@ -695,8 +697,8 @@ begin
     FOnFinish(Self);
 end;
 
-{**********************************************************}
-procedure TALAnimation.ProcessTick(time, deltaTime: Single);
+{******************************************************************}
+procedure TALAnimation.ProcessTick(const ATime, ADeltaTime: Single);
 begin
   inherited;
 
@@ -707,7 +709,7 @@ begin
   begin
     if FDelayTime > 0 then
     begin
-      FDelayTime := FDelayTime - deltaTime;
+      FDelayTime := FDelayTime - ADeltaTime;
       if FDelayTime <= 0 then
       begin
         FDelayTime := 0;
@@ -724,9 +726,9 @@ begin
   end;
 
   if FInverse then
-    FTime := FTime - deltaTime
+    FTime := FTime - ADeltaTime
   else
-    FTime := FTime + deltaTime;
+    FTime := FTime + ADeltaTime;
   if FTime >= FDuration then
   begin
     FTime := FDuration;

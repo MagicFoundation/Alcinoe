@@ -5,11 +5,11 @@ unit ALHttpClient;
 
 interface
 
-{$IF CompilerVersion > 34} // sydney
+{$I Alcinoe.inc}
+
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if Web.HTTPApp was not updated and adjust the IFDEF'}
 {$IFEND}
-
-{$I Alcinoe.inc}
 
 uses
   {$IFNDEF ALHideAnsiString}

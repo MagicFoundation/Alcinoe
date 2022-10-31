@@ -2,6 +2,8 @@ unit ALFmxFilterEffects;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   system.classes,
   FMX.types,
@@ -587,7 +589,7 @@ Type
     property Gamma: Single read fGamma write fGamma;
   end;
 
-  {$IF CompilerVersion > 34} // sydney
+  {$IFNDEF ALCompilerVersionSupported}
     {$MESSAGE WARN 'Check if FMX.Filter.Effects.TFilterBaseFilter still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALFilterBaseFilterAccessPrivate = class(TFmxObject)

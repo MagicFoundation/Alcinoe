@@ -3315,14 +3315,4 @@ implementation
   //Result := CocoaPointerConst(libWebRTC, 'kRTCSessionDescriptionErrorCode');
 //end;
 
-{$IF defined(CPUARM)}
-
-procedure StubProc1;  cdecl; external 'WebRTC' name 'OBJC_CLASS_$_RTCPeerConnectionFactory';
-
-{$ELSE}
-
-// i don't know how to do under ios simulator :(
-
-{$ENDIF}
-
 end.

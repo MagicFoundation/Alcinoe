@@ -1947,17 +1947,23 @@ begin
     LLayout.Trimming := TTextTrimming.Character;
     LLayout.VerticalAlign := TTextAlign.Leading;
     LLayout.HorizontalAlign := TTextAlign.Leading;
-    LLayout.WordWrap := False;
-    if (atext <> '') and (atext.Chars[atext.Length - 1].IsLowSurrogate) then LLayout.Text := atext + ' '  // << https://quality.embarcadero.com/browse/RSP-16649
+    //seam to not work when LLayout.WordWrap := False;
+    //https://quality.embarcadero.com/browse/RSP-39734
+    LLayout.WordWrap := True;
+    //https://quality.embarcadero.com/browse/RSP-16649
+    if (atext <> '') and (atext.Chars[atext.Length - 1].IsLowSurrogate) then LLayout.Text := atext + ' '
     else LLayout.Text := atext;
     LLayout.EndUpdate;
     aMeasuredWidth := LLayout.TextWidth;
-    result := LLayout.PositionAtPoint(TpointF.Create(aMeasuredWidth - Tepsilon.Position,0)); // << on macos this function is buggy and you need to update fmx.canvas.mac (see https://quality.embarcadero.com/browse/RSP-16648 and https://quality.embarcadero.com/browse/RSP-16649)
-                                                                                             // << - Tepsilon.Position because if PositionAtPoint = exactly aMeasuredWidth then it's return -1
-    result := min(atext.Length, result); // remove the extra space we added because of https://quality.embarcadero.com/browse/RSP-16649
+    //On macos this function is buggy and you need to update fmx.canvas.mac
+    //see https://quality.embarcadero.com/browse/RSP-16648 and https://quality.embarcadero.com/browse/RSP-16649
+    //Tepsilon.Position because if PositionAtPoint = exactly aMeasuredWidth then it's return -1
+    result := LLayout.PositionAtPoint(TpointF.Create(aMeasuredWidth - Tepsilon.Position,0));
+    // remove the extra space we added because of https://quality.embarcadero.com/browse/RSP-16649
+    result := min(atext.Length, result);
     if result < 0 then result := 0;
   finally
-    LLayout.Free;
+    ALFreeAndNil(LLayout);
   end;
 end;
 {$ENDIF}

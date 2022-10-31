@@ -99,7 +99,7 @@ function ALNSSetToStrings(const ANSSet: NSSet): TArray<String>;
 
 Type
 
-  {$IF CompilerVersion > 34} // sydney
+  {$IFNDEF ALCompilerVersionSupported}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALControlAccessPrivate = class(TFmxObject)
@@ -250,7 +250,7 @@ Type
     FExplicitHeight: Single;
   end;
 
-  {$IF CompilerVersion > 34} // sydney
+  {$IFNDEF ALCompilerVersionSupported}
     {$MESSAGE WARN 'Check if FMX.TextLayout.TTextLayout still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALTextLayoutAccessPrivate = class abstract
@@ -529,7 +529,7 @@ end;
 
 {****************}
 {$IF defined(IOS)}
-{$IF CompilerVersion > 34} // sydney
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if  FMX.Canvas.Mac.TTextLayoutCT.GetCTFontRef is still the same as below and adjust the IFDEF'}
 {$ENDIF}
 function  ALGetCTFontRef(const AFontFamily: String; const aFontSize: single; const aFontStyle: TFontStyles): CTFontRef;

@@ -520,12 +520,14 @@ var LJListIceServers: JList;
 {$REGION ' IOS'}
 {$IF defined(ios)}
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {$IFNDEF ALCompilerVersionSupported}
+    {$MESSAGE WARN 'Check if FMX.Context.GLES.TCustomContextOpenGL.DoInitializeTexture still has the same implementation and adjust the IFDEF'}
+  {$ENDIF}
   procedure _InitTexture(const aTexture: TTexture);
   var Tex: GLuint;
   begin
     aTexture.Style := aTexture.Style - [TTextureStyle.MipMaps];
-
     if TALCustomContextIOSAccess.valid then
     begin
       glActiveTexture(GL_TEXTURE0);
@@ -552,8 +554,7 @@ var LJListIceServers: JList;
       //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nil);
       glBindTexture(GL_TEXTURE_2D, 0);
       ITextureAccess(aTexture).Handle := Tex;
-      if (TALCustomContextIOSAccess.GLHasAnyErrors()) then
-        RaiseContextExceptionFmt(@SCannotCreateTexture, [TALCustomContextIOSAccess.ClassName]);
+      TGlesDiagnostic.RaiseIfHasError(@SCannotCreateTexture, [TALCustomContextIOSAccess.ClassName]);
     end;
   end;
 
@@ -2489,7 +2490,7 @@ begin
     glBindTexture(GL_TEXTURE_2D, 0);
 
     //-----
-    {$IF CompilerVersion > 34} // sydney
+    {$IFNDEF ALCompilerVersionSupported}
       {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
     {$ENDIF}
     TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.FLocalBitmap).FWidth := LLumaWidth;

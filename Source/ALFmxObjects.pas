@@ -1,12 +1,12 @@
 unit ALFmxObjects;
 
-{$IF CompilerVersion > 34} // sydney
-  {$MESSAGE WARN 'Check if FMX.Objects.pas was not updated and adjust the IFDEF'}
-{$ENDIF}
+interface
 
 {$I Alcinoe.inc}
 
-interface
+{$IFNDEF ALCompilerVersionSupported}
+  {$MESSAGE WARN 'Check if FMX.Objects.pas was not updated and adjust the IFDEF'}
+{$ENDIF}
 
 uses
   System.Classes,

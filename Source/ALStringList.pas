@@ -36,7 +36,6 @@ performance when the list contains a large number of strings
 is lower than TALStringList because of the cost to calculate the
 hash)
 **************************************************************}
-
 unit ALStringList;
 
 interface
@@ -140,8 +139,8 @@ Type
     function AddNameValueObject(const Name, Value: AnsiString; AObject: TObject): Integer; virtual; // [added from Tstrings]
     procedure Append(const S: AnsiString);
     procedure AddStrings(Strings: TALStrings); overload; virtual;
-    procedure AddStrings(const Strings: TArray<AnsiString>); overload;
-    procedure AddStrings(const Strings: TArray<AnsiString>; const Objects: TArray<TObject>); overload;
+    procedure AddStrings(const Strings: array of AnsiString); overload;
+    procedure AddStrings(const Strings: array of AnsiString; const Objects: array of TObject); overload;
     procedure Assign(Source: TPersistent); override;
     procedure BeginUpdate;
     procedure Clear; virtual; abstract;
@@ -559,8 +558,8 @@ type
     property Current: String read GetCurrent;
   end;
 
-  {------------------------}
-  {$IF CompilerVersion > 34} // sydney
+  {----------------------------------}
+  {$IFNDEF ALCompilerVersionSupported}
     {$MESSAGE WARN 'Check if System.classes.TStrings didn''t change and adjust the IFDEF'}
   {$IFEND}
   TALStringsU = class(TPersistent)
@@ -621,8 +620,8 @@ type
     function AddNameValueObject(const Name, Value: String; AObject: TObject): Integer; virtual; // [added from Tstrings]
     procedure Append(const S: String);
     procedure AddStrings(Strings: TALStringsU); overload; virtual;
-    procedure AddStrings(const Strings: TArray<String>); overload;
-    procedure AddStrings(const Strings: TArray<String>; const Objects: TArray<TObject>); overload;
+    procedure AddStrings(const Strings: array of string); overload;
+    procedure AddStrings(const Strings: array of string; const Objects: array of TObject); overload;
     procedure Assign(Source: TPersistent); override;
     procedure BeginUpdate;
     procedure Clear; virtual; abstract;
@@ -690,8 +689,8 @@ type
   TALStringItemListU = array of TALStringItemU;
   TALStringListSortCompareU = reference to function(List: TALStringListU; Index1, Index2: Integer): Integer;
 
-  {------------------------}
-  {$IF CompilerVersion > 34} // sydney
+  {----------------------------------}
+  {$IFNDEF ALCompilerVersionSupported}
     {$MESSAGE WARN 'Check if System.classes.TStringList didn''t change and adjust the IFDEF'}
   {$IFEND}
   TALStringListU = class(TALStringsU)
@@ -943,8 +942,8 @@ begin
   end;
 end;
 
-{*****************************************************************}
-procedure TALStrings.AddStrings(const Strings: TArray<AnsiString>);
+{******************************************************************}
+procedure TALStrings.AddStrings(const Strings: array of AnsiString);
 var
   I: Integer;
 begin
@@ -957,8 +956,8 @@ begin
   end;
 end;
 
-{*************************************************************************************************}
-procedure TALStrings.AddStrings(const Strings: TArray<AnsiString>; const Objects: TArray<TObject>);
+{***************************************************************************************************}
+procedure TALStrings.AddStrings(const Strings: array of AnsiString; const Objects: array of TObject);
 var
   I: Integer;
 begin
@@ -1581,10 +1580,8 @@ begin
       begin
         PCurVal := P + 1;
         Inc(PCurLB);
-        while PCurLB < PEndLB do
+        while (PCurLB < PEndLB) and (PCurVal < PEndVal) and (PCurVal^ = PCurLB^) do
         begin
-          if PCurVal^ <> PCurLB^ then
-            Break;
           Inc(PCurVal);
           Inc(PCurLB)
         end;
@@ -4875,11 +4872,11 @@ end;
 
 type
 
-  {************************}
-  {$IF CompilerVersion > 34} // sydney
+  {**********************************}
+  {$IFNDEF ALCompilerVersionSupported}
     {$MESSAGE WARN 'Check if System.Generics.Collections.TObjectDictionary<TKey,TValue> was not updated and adjust the IFDEF'}
   {$ENDIF}
-  TALObjectDictionaryAccessPrivate<TKey,TValue> = class(TObjectDictionary<TKey,TValue>)
+  _TObjectDictionaryAccessPrivate<K,V> = class(TObjectDictionary<K,V>)
   private
     FOwnerships: TDictionaryOwnerships;
   end;
@@ -4893,7 +4890,7 @@ begin
     LTmpDictionary := CreateDictionary(count, Value);
     for I := 0 to FnodeList.Count - 1 do
       LTmpDictionary.Add(FNodeList[i].ID,FNodeList[i]);
-    TALObjectDictionaryAccessPrivate<ansiString, TALHashedStringListDictionaryNode>(Fdictionary).fOwnerships := [];
+    _TObjectDictionaryAccessPrivate<ansiString, TALHashedStringListDictionaryNode>(Fdictionary).fOwnerships := [];
     ALFreeAndNil(Fdictionary);
     FDictionary := LTmpDictionary;
   end;
@@ -5139,8 +5136,8 @@ begin
   end;
 end;
 
-{**************************************************************}
-procedure TALStringsU.AddStrings(const Strings: TArray<String>);
+{***************************************************************}
+procedure TALStringsU.AddStrings(const Strings: array of string);
 var
   I: Integer;
 begin
@@ -5153,8 +5150,8 @@ begin
   end;
 end;
 
-{**********************************************************************************************}
-procedure TALStringsU.AddStrings(const Strings: TArray<String>; const Objects: TArray<TObject>);
+{************************************************************************************************}
+procedure TALStringsU.AddStrings(const Strings: array of string; const Objects: array of TObject);
 var
   I: Integer;
 begin
@@ -5597,15 +5594,8 @@ end;
 
 {*********************************************************}
 procedure TALStringsU.LoadFromFile(const FileName: String);
-var
-  Stream: TStream;
 begin
-  Stream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
-  try
-    LoadFromStream(Stream);
-  finally
-    ALFreeAndNil(Stream);
-  end;
+  LoadFromFile(FileName, nil);
 end;
 
 {******************************************************************************}
@@ -5823,10 +5813,8 @@ begin
       begin
         PCurVal := P + 1;
         Inc(PCurLB);
-        while PCurLB < PEndLB do
+        while (PCurLB < PEndLB) and (PCurVal < PEndVal) and (PCurVal^ = PCurLB^) do
         begin
-          if PCurVal^ <> PCurLB^ then
-            Break;
           Inc(PCurVal);
           Inc(PCurLB)
         end;

@@ -521,7 +521,7 @@ begin
   inc(fTotalFramesProcessed);
   {$ENDIF}
 
-  {$IF CompilerVersion > 34} // sydney
+  {$IFNDEF ALCompilerVersionSupported}
     {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
   {$ENDIF}
   if (fVideoPlayerControl.fbitmap.Width <> fVideoPlayerControl.fVideoWidth) or
@@ -1691,7 +1691,7 @@ begin
         cfRElease(pointer(LPrevTextureRef));
 
       //-----
-      {$IF CompilerVersion > 34} // sydney
+      {$IFNDEF ALCompilerVersionSupported}
         {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
       {$ENDIF}
       TALTextureAccessPrivate(fBitmap).FWidth := LWidth;

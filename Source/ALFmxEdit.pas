@@ -104,7 +104,7 @@ type
   {****************************************************************}
   // the design of the androidText can be done in the res/styles.xml
   // please see the example of the Demos\ALFmxControls.dproj
-  TALAndroidEdit = class(TControl)
+  TALAndroidEdit = class(TControl, IControlTypeSupportable)
   private
     FEditText: TALAndroidEditText;
     FPadding: TBounds;
@@ -150,6 +150,9 @@ type
     procedure SetMaxLength(const Value: integer);
     function GetMaxLength: integer;
     procedure ApplicationEventHandler(const Sender: TObject; const M : TMessage);
+    { IControlTypeSupportable }
+    function GetControlType: TControlType;
+    procedure SetControlType(const Value: TControlType);
   protected
     procedure AncestorVisibleChanged(const Visible: Boolean); override;
     procedure AncestorParentChanged; override;
@@ -251,8 +254,8 @@ type
     function textFieldShouldReturn(textField: UITextField): Boolean; cdecl;
   end;
 
-  {**************************}
-  TALIosEdit = class(TControl)
+  {***************************************************}
+  TALIosEdit = class(TControl, IControlTypeSupportable)
   private
     FTextField: TALIosTextField;
     fTextPromptColor: TalphaColor;
@@ -283,6 +286,9 @@ type
     procedure SetText(const Value: String);
     procedure DoFontChanged;
     procedure OnFontChanged(Sender: TObject);
+    { IControlTypeSupportable }
+    function GetControlType: TControlType;
+    procedure SetControlType(const Value: TControlType);
   protected
     procedure AncestorVisibleChanged(const Visible: Boolean); override;
     procedure AncestorParentChanged; override;
@@ -1126,6 +1132,20 @@ begin
      ((M as TApplicationEventMessage).Value.Event = TApplicationEvent.EnteredBackground) then resetfocus;
 end;
 
+{***************************************************}
+function TALAndroidEdit.GetControlType: TControlType;
+begin
+  //We need GetControlType in TALIosEdit but not really in TALAndroidEdit
+  //but I prefer to keep the same logic of TALIosEdit in TALAndroidEdit
+  Result := TControlType.Platform;
+end;
+
+{*****************************************************************}
+procedure TALAndroidEdit.SetControlType(const Value: TControlType);
+begin
+  // The ControlType cannot be changed
+end;
+
 {*************************************}
 procedure TalAndroidEdit.DoRootChanged;
 begin
@@ -1748,6 +1768,20 @@ end;
 procedure TalIosEdit.OnFontChanged(Sender: TObject);
 begin
   DoFontChanged;
+end;
+
+{***********************************************}
+function TalIosEdit.GetControlType: TControlType;
+begin
+  //we need ControlType because in function TFMXViewBase.canBecomeFirstResponder: Boolean;
+  //we use it in IsNativeControl to determine if it's a native control or not
+  Result := TControlType.Platform;
+end;
+
+{*************************************************************}
+procedure TalIosEdit.SetControlType(const Value: TControlType);
+begin
+  // The ControlType cannot be changed
 end;
 
 {*************************************************}

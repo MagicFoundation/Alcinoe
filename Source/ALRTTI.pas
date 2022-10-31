@@ -8,6 +8,8 @@ unit ALRtti;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   System.Rtti,
   System.RTLConsts,
@@ -460,13 +462,13 @@ uses
 
 {***}
 const
-  {$IF CompilerVersion > 34} // sydney
+  {$IFNDEF ALCompilerVersionSupported}
     {$MESSAGE WARN 'Check if System.TypInfo.BooleanIdents is still the same and adjust the IFDEF'}
   {$IFEND}
   ALBooleanIdents: array [Boolean] of AnsiString = ('False', 'True');
 
-{************************}
-{$IF CompilerVersion > 34} // sydney
+{**********************************}
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if System.TypInfo.AfterString is still the same and adjust the IFDEF'}
 {$IFEND}
 // P points a length field of ShortString.
@@ -475,8 +477,8 @@ begin
   Result := P + P^ + 1;
 end;
 
-{************************}
-{$IF CompilerVersion > 34} // sydney
+{**********************************}
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if System.TypInfo.GetEnumName(TypeInfo: PTypeInfo; Value: Integer... is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALGetEnumName(TypeInfo: PTypeInfo; Value: Integer): ansistring;
@@ -525,8 +527,8 @@ begin
   result := ALGetEnumName(PropInfo^.PropType^, Value);
 end;
 
-{************************}
-{$IF CompilerVersion > 34} // sydney
+{**********************************}
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if System.TypInfo.GetEnumNameValue(TypeInfo: PTypeInfo... is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALGetEnumNameValue(TypeInfo: PTypeInfo; const Name: AnsiString): Integer;
@@ -566,8 +568,8 @@ begin
   Result := -1;
 end;
 
-{************************}
-{$IF CompilerVersion > 34} // sydney
+{**********************************}
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if System.TypInfo.GetEnumValue(TypeInfo: PTypeInfo... is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALTryGetEnumValue(TypeInfo: PTypeInfo; const Name: ansistring; Var EnumValue: Integer): boolean;
@@ -620,14 +622,14 @@ end;
 
 {**}
 type
-  {$IF CompilerVersion > 34} // sydney
+  {$IFNDEF ALCompilerVersionSupported}
     {$MESSAGE WARN 'Check if System.TypInfo.TLargestSet/PLargestSet is still the same and adjust the IFDEF'}
   {$IFEND}
   TLargestSet = set of byte;
   PLargestSet = ^TLargestSet;
 
-{************************}
-{$IF CompilerVersion > 34} // sydney
+{**********************************}
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if System.TypInfo.SetToString(TypeInfo: PTypeInfo; Value: Integer... is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALSetToString(TypeInfo: PTypeInfo; Value: Integer; const Brackets: Boolean = False): ansistring;
@@ -664,8 +666,8 @@ begin
     Result := '[' + Result + ']';
 end;
 
-{************************}
-{$IF CompilerVersion > 34} // sydney
+{**********************************}
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if System.TypInfo.SetToString(PropInfo: PPropInfo; Value: Integer... is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALSetToString(PropInfo: PPropInfo; Value: Integer; const Brackets: Boolean = False): ansistring;
@@ -673,8 +675,8 @@ begin
   Result := ALSetToString(PropInfo^.PropType^, Value, Brackets);
 end;
 
-{************************}
-{$IF CompilerVersion > 34} // sydney
+{**********************************}
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if System.TypInfo.StringToSet(TypeInfo: PTypeInfo; const Value: string)... is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALTryStringToSet(TypeInfo: PTypeInfo; const Value: ansistring; Var SetInt: Integer): Boolean;

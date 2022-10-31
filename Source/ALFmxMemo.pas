@@ -87,8 +87,8 @@ type
     function textViewShouldInteractWithTextAttachmentInRange(textView: UITextView; shouldInteractWithTextAttachment: NSTextAttachment; inRange: NSRange): Boolean; cdecl;
   end;
 
-  {**************************}
-  TALIosMemo = class(TControl)
+  {***************************************************}
+  TALIosMemo = class(TControl, IControlTypeSupportable)
   private
     FPadding: TBounds;
     FTextView: TALIosTextView;
@@ -128,6 +128,9 @@ type
     procedure OnFontChanged(Sender: TObject);
     procedure SetPadding(const Value: TBounds);
     function GetPadding: TBounds;
+    { IControlTypeSupportable }
+    function GetControlType: TControlType;
+    procedure SetControlType(const Value: TControlType);
   protected
     procedure AncestorVisibleChanged(const Visible: Boolean); override;
     procedure AncestorParentChanged; override;
@@ -978,6 +981,20 @@ end;
 function TALIosMemo.GetPadding: TBounds;
 begin
   result := FPadding;
+end;
+
+{***********************************************}
+function TALIosMemo.GetControlType: TControlType;
+begin
+  //we need ControlType because in function TFMXViewBase.canBecomeFirstResponder: Boolean;
+  //we use it in IsNativeControl to determine if it's a native control or not
+  Result := TControlType.Platform;
+end;
+
+{*************************************************************}
+procedure TALIosMemo.SetControlType(const Value: TControlType);
+begin
+  // The ControlType cannot be changed
 end;
 
 {*************************************************}

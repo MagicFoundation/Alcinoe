@@ -1,4 +1,4 @@
-package Alcinoe_rio;
+package AlcinoeAlexandria;
 
 {$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
@@ -57,9 +57,12 @@ contains
   ALFmxGraphics in 'ALFmxGraphics.pas',
   ALFmxFilterEffects in 'ALFmxFilterEffects.pas',
   ALFmxAni in 'ALFmxAni.pas',
-  ALFiles in 'ALFiles.pas';
+  ALFmxConfetti in 'ALFmxConfetti.pas',
+  ALFiles in 'ALFiles.pas',
+  ALFmxBreakText in 'ALFmxBreakText.pas';
 
 end.
+
 
 
 

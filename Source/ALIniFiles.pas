@@ -1,16 +1,17 @@
 {*******************************************************************************
 Description:  AnsiString version of delphi Unicode Tinifile
 *******************************************************************************}
-
-{$IF CompilerVersion > 34} // sydney
-  {$MESSAGE WARN 'Check if System.IniFiles still has the exact same fields and adjust the IFDEF'}
-{$ENDIF}
-
 unit ALIniFiles;
 
 {$R-,T-,H+,X+}
 
 interface
+
+{$I Alcinoe.inc}
+
+{$IFNDEF ALCompilerVersionSupported}
+  {$MESSAGE WARN 'Check if System.IniFiles still has the exact same fields and adjust the IFDEF'}
+{$ENDIF}
 
 uses
   System.SysUtils,

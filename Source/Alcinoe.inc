@@ -1,3 +1,13 @@
+//https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Compiler_Versions
+{$IF (CompilerVersion <= 35.0) and (not defined(RTLVersion113))} // This mean <= Delphi Alexandria 11.2
+  //When updating this block then first create the define ALCompilerVersionSupported_TMP that
+  //is set for the current compiler version, then progressively replace in all source
+  //files ALCompilerVersionSupported by ALCompilerVersionSupported_TMP and when everything done
+  //delete ALCompilerVersionSupported_TMP from here and replace in all files ALCompilerVersionSupported_TMP
+  //by ALCompilerVersionSupported
+  {$DEFINE ALCompilerVersionSupported}
+{$ENDIF}
+
 {$IF CompilerVersion < 29} {Delphi XE8}
   {$IF defined(CPUX64)} // The CPU supports the x86-64 instruction set, and is in a 64-bit environment. *New* in XE2/x64
     {$DEFINE CPU64BITS} // The CPU is in a 64-bit environment, such as DCC64.EXE. *New* in XE8

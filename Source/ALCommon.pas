@@ -2,6 +2,8 @@ unit ALCommon;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   {$IFDEF IOS}
   iOSapi.Foundation,
@@ -14,8 +16,6 @@ uses
   system.SyncObjs,
   system.sysutils,
   system.types;
-
-{$I Alcinoe.inc}
 
 type
 
@@ -181,8 +181,8 @@ type
 
   TALPointDType = array [0..1] of Double;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IF CompilerVersion > 34} // sydney
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {$IFNDEF ALCompilerVersionSupported}
     {$MESSAGE WARN 'Check if System.Types.TPointf still having the same implementation and adjust the IFDEF'}
   {$IFEND}
   PALPointD = ^TALPointD;
@@ -254,8 +254,8 @@ type
           Y: Double;);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IF CompilerVersion > 34} // sydney
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {$IFNDEF ALCompilerVersionSupported}
     {$MESSAGE WARN 'Check if System.Types.TSizef still having the same implementation and adjust the IFDEF'}
   {$IFEND}
   PALSizeD = ^TALSizeD;
@@ -293,8 +293,8 @@ type
     property Height: Double read cy write cy;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IF CompilerVersion > 34} // sydney
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {$IFNDEF ALCompilerVersionSupported}
     {$MESSAGE WARN 'Check if System.Types.TRectf still having the same implementation and adjust the IFDEF'}
   {$IFEND}
   PALRectD = ^TALRectD;
@@ -440,8 +440,8 @@ type
     1: (TopLeft, BottomRight: TALPointD);
   end;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~}
-{$IF CompilerVersion > 34} // sydney
+{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if functions below implemented in System.Types still having the same implementation and adjust the IFDEF'}
 {$IFEND}
 function ALRectWidth(const Rect: TRect): Integer; inline; overload;
@@ -523,7 +523,7 @@ function  ALIfThen(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString 
 function  ALIfThenU(AValue: Boolean; const ATrue: String; AFalse: String = ''): String; overload; inline;
 
 {$IFDEF MSWINDOWS}
-{$IF CompilerVersion > 34} // sydney
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if EnumDynamicTimeZoneInformation/SystemTimeToTzSpecificLocalTimeEx/TzSpecificLocalTimeToSystemTimeEx are still not declared in Winapi.Windows and adjust the IFDEF'}
 {$ENDIF}
 {$WARNINGS OFF}

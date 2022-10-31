@@ -1,10 +1,12 @@
 unit ALFmxLayouts;
 
-{$IF CompilerVersion > 34} // sydney
+interface
+
+{$I Alcinoe.inc}
+
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if FMX.Layouts.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
-
-interface
 
 {$SCOPEDENUMS ON}
 
@@ -399,12 +401,11 @@ uses
 {*******************************************************************************************************}
 // http://stackoverflow.com/questions/39317984/does-the-delphi-firemonkey-dorealign-implemented-correctly
 // https://quality.embarcadero.com/browse/RSP-15768
-// https://quality.embarcadero.com/browse/RSP-36647
 // often we assign some event to some control onresize (like TText with autosize=True) to
 // resize their parentcontrols to the same size as them. But in this way the problem is that if
 // we resize the parentcontrol during it's dorealign process then it will not call again dorealign
-{$IF CompilerVersion > 34} // sydney
-  {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-36647 was not corrected and adjust the IFDEF'}
+{$IFNDEF ALCompilerVersionSupported}
+  {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-15768 was not corrected and adjust the IFDEF'}
 {$ENDIF}
 procedure TALLayout.DoRealign;
 var LOriginalSize: TpointF;

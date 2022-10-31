@@ -2,6 +2,8 @@ unit ALFmxTypes3D;
 
 interface
 
+{$I Alcinoe.inc}
+
 uses
   System.Classes,
   {$IFDEF ANDROID}
@@ -95,8 +97,8 @@ type
     property ShaderVariables: TALColorAdjustShaderVariables read fShaderVariables;
   end;
 
-  {************************}
-  {$IF CompilerVersion > 34} // sydney
+  {**********************************}
+  {$IFNDEF ALCompilerVersionSupported}
     {$MESSAGE WARN 'Check if FMX.Types3D.TTexture still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALTextureAccessPrivate = class(TInterfacedPersistent)
@@ -211,6 +213,8 @@ begin
    //to have the possibility to recreate later the texture if we lost the
    //context. From Berlin we don't lost anymore the context when the app go
    //in background/foreground so it's useless to set it to false
+   //In Alexandria they now add by default TTextureStyle.Volatile in style but
+   //keep the code below, it's can not hurt
    Style := Style + [TTextureStyle.Volatile];
 
    //init fMaterial
@@ -288,8 +292,8 @@ begin
 
 end;
 
-{************************}
-{$IF CompilerVersion > 34} // sydney
+{**********************************}
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.assign is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 //
@@ -384,8 +388,8 @@ begin
   if PixelFormat <> TPixelFormat.None then AtomicDecrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
   {$ENDIF}
 
-  {$IF CompilerVersion > 34} // sydney
-    {$MESSAGE WARN 'Check if the full flow of FMX.Types3D.TTexture.Assign is still the same as below and adjust the IFDEF'}
+  {$IFNDEF ALCompilerVersionSupported}
+    {$MESSAGE WARN 'Check if the full flow of FMX.Types3D.TTexture.Assign and FMX.Context.GLES.TCustomContextOpenGL.DoInitializeTexture are still the same as below and adjust the IFDEF'}
   {$ENDIF}
   if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
   Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
@@ -423,8 +427,7 @@ begin
                                      0); // border: Integer  => glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nil);
       glBindTexture(GL_TEXTURE_2D, 0);
       ITextureAccess(self).Handle := Tex;
-      if (TCustomAndroidContext.GLHasAnyErrors()) then
-        RaiseContextExceptionFmt(@SCannotCreateTexture, ['TALTexture']);
+      TGlesDiagnostic.RaiseIfHasError(@SCannotCreateTexture, [ClassName]);
     end;
   end;
 
@@ -471,8 +474,8 @@ begin
   inherited;
 end;
 
-{*************************}
-{$IF CompilerVersion > 34} // sydney
+{**********************************}
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if FMX.Context.GLES.TCustomContextOpenGL.DoInitializeTexture still has the same implementation and adjust the IFDEF'}
 {$ENDIF}
 {$IF defined(ANDROID)}
@@ -481,18 +484,8 @@ var Tex: GLuint;
 begin
   Texture.Material := Texture.DefExternalOESMaterial;
   Texture.Style := Texture.Style - [TTextureStyle.MipMaps];
-
-  {$IFDEF ANDROID}
   if Texture.PixelFormat = TPixelFormat.None then Texture.PixelFormat := TALCustomAndroidContextAccess.PixelFormat;
-  {$ELSEIF defined(IOS)}
-  if Texture.PixelFormat = TPixelFormat.None then Texture.PixelFormat := TALCustomContextIOSAccess.PixelFormat;
-  {$ENDIF}
-
-  {$IFDEF ANDROID}
   if TALCustomAndroidContextAccess.valid then
-  {$ELSEIF defined(IOS)}
-  if TALCustomContextIOSAccess.valid then
-  {$ENDIF}
   begin
     glActiveTexture(GL_TEXTURE0);
     glGenTextures(1, @Tex);
@@ -518,33 +511,13 @@ begin
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nil);
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, 0);
     ITextureAccess(Texture).Handle := Tex;
-
-    {$IF CompilerVersion <= 33} // rio
-
-      {$IFDEF ANDROID}
-      if (TALCustomAndroidContextAccess.GLHasAnyErrors()) then
-        RaiseContextExceptionFmt(@SCannotCreateTexture, [TALCustomAndroidContextAccess.ClassName]);
-      {$ELSEIF defined(IOS)}
-      if (TALCustomContextIOSAccess.GLHasAnyErrors()) then
-        RaiseContextExceptionFmt(@SCannotCreateTexture, [TALCustomContextIOSAccess.ClassName]);
-      {$ENDIF}
-
-    {$ELSE}
-
-      {$IFDEF ANDROID}
-      TGlesDiagnostic.RaiseIfHasError(@SCannotCreateTexture, [TALCustomAndroidContextAccess.ClassName]);
-      {$ELSEIF defined(IOS)}
-      TGlesDiagnostic.RaiseIfHasError(@SCannotCreateTexture, [TALCustomContextIOSAccess.ClassName]);
-      {$ENDIF}
-
-    {$ENDIF}
-
+    TGlesDiagnostic.RaiseIfHasError(@SCannotCreateTexture, [TALCustomAndroidContextAccess.ClassName]);
   end;
 end;
 {$ENDIF}
 
-{************************}
-{$IF CompilerVersion > 34} // sydney
+{**********************************}
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvasExternalOESTextureMaterial.DoInitialize;
@@ -764,21 +737,11 @@ begin
     //
     //varying vec4 COLOR0;
     //varying vec4 TEX0;
-    //vec4 _ret_0;
-    //float _TMP1;
-    //float _TMP0;
-    //vec2 _c0008;
     //uniform sampler2D _texture0;
+    //
     //void main()
     //{
-    //    vec4 _texColor;
-    //    _TMP0 = fract(TEX0.x);
-    //    _TMP1 = fract(TEX0.y);
-    //    _c0008 = vec2(_TMP0, _TMP1);
-    //    _texColor = texture2D(_texture0, _c0008);
-    //    _ret_0 = _texColor*COLOR0;
-    //    gl_FragColor = _ret_0;
-    //    return;
+    //  gl_FragColor = texture2D(_texture0, TEX0.xy) * COLOR0;
     //}
     //
     TContextShaderSource.Create(
@@ -827,8 +790,8 @@ begin
   fshaderVariables.UpdateContext(Context);
 end;
 
-{************************}
-{$IF CompilerVersion > 34} // sydney
+{**********************************}
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvasExternalOESColorAdjustEffectTextureMaterial.DoInitialize;
@@ -1048,21 +1011,11 @@ begin
     //
     //varying vec4 COLOR0;
     //varying vec4 TEX0;
-    //vec4 _ret_0;
-    //float _TMP1;
-    //float _TMP0;
-    //vec2 _c0008;
     //uniform sampler2D _texture0;
+    //
     //void main()
     //{
-    //    vec4 _texColor;
-    //    _TMP0 = fract(TEX0.x);
-    //    _TMP1 = fract(TEX0.y);
-    //    _c0008 = vec2(_TMP0, _TMP1);
-    //    _texColor = texture2D(_texture0, _c0008);
-    //    _ret_0 = _texColor*COLOR0;
-    //    gl_FragColor = _ret_0;
-    //    return;
+    //  gl_FragColor = texture2D(_texture0, TEX0.xy) * COLOR0;
     //}
     //
     TContextShaderSource.Create(
@@ -1114,8 +1067,8 @@ begin
   Context.SetShaderVariable('texture1', CbCrTexture);
 end;
 
-{************************}
-{$IF CompilerVersion > 34} // sydney
+{**********************************}
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8BiPlanarVideoRangeTextureMaterial.DoInitialize;
@@ -1335,21 +1288,11 @@ begin
     //
     //varying vec4 COLOR0;
     //varying vec4 TEX0;
-    //vec4 _ret_0;
-    //float _TMP1;
-    //float _TMP0;
-    //vec2 _c0008;
     //uniform sampler2D _texture0;
+    //
     //void main()
     //{
-    //    vec4 _texColor;
-    //    _TMP0 = fract(TEX0.x);
-    //    _TMP1 = fract(TEX0.y);
-    //    _c0008 = vec2(_TMP0, _TMP1);
-    //    _texColor = texture2D(_texture0, _c0008);
-    //    _ret_0 = _texColor*COLOR0;
-    //    gl_FragColor = _ret_0;
-    //    return;
+    //  gl_FragColor = texture2D(_texture0, TEX0.xy) * COLOR0;
     //}
     //
     TContextShaderSource.Create(
@@ -1416,8 +1359,8 @@ begin
   fshaderVariables.UpdateContext(Context);
 end;
 
-{************************}
-{$IF CompilerVersion > 34} // sydney
+{**********************************}
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8BiPlanarVideoRangeColorAdjustEffectTextureMaterial.DoInitialize;
@@ -1637,21 +1580,11 @@ begin
     //
     //varying vec4 COLOR0;
     //varying vec4 TEX0;
-    //vec4 _ret_0;
-    //float _TMP1;
-    //float _TMP0;
-    //vec2 _c0008;
     //uniform sampler2D _texture0;
+    //
     //void main()
     //{
-    //    vec4 _texColor;
-    //    _TMP0 = fract(TEX0.x);
-    //    _TMP1 = fract(TEX0.y);
-    //    _c0008 = vec2(_TMP0, _TMP1);
-    //    _texColor = texture2D(_texture0, _c0008);
-    //    _ret_0 = _texColor*COLOR0;
-    //    gl_FragColor = _ret_0;
-    //    return;
+    //  gl_FragColor = texture2D(_texture0, TEX0.xy) * COLOR0;
     //}
     //
     TContextShaderSource.Create(
@@ -1729,8 +1662,8 @@ begin
   Context.SetShaderVariable('texture2', CrTexture);
 end;
 
-{************************}
-{$IF CompilerVersion > 34} // sydney
+{**********************************}
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8PlanarTextureMaterial.DoInitialize;
@@ -1950,21 +1883,11 @@ begin
     //
     //varying vec4 COLOR0;
     //varying vec4 TEX0;
-    //vec4 _ret_0;
-    //float _TMP1;
-    //float _TMP0;
-    //vec2 _c0008;
     //uniform sampler2D _texture0;
+    //
     //void main()
     //{
-    //    vec4 _texColor;
-    //    _TMP0 = fract(TEX0.x);
-    //    _TMP1 = fract(TEX0.y);
-    //    _c0008 = vec2(_TMP0, _TMP1);
-    //    _texColor = texture2D(_texture0, _c0008);
-    //    _ret_0 = _texColor*COLOR0;
-    //    gl_FragColor = _ret_0;
-    //    return;
+    //  gl_FragColor = texture2D(_texture0, TEX0.xy) * COLOR0;
     //}
     //
     TContextShaderSource.Create(
@@ -2034,8 +1957,8 @@ begin
   fshaderVariables.UpdateContext(Context);
 end;
 
-{************************}
-{$IF CompilerVersion > 34} // sydney
+{**********************************}
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8PlanarColorAdjustEffectTextureMaterial.DoInitialize;
@@ -2255,21 +2178,11 @@ begin
     //
     //varying vec4 COLOR0;
     //varying vec4 TEX0;
-    //vec4 _ret_0;
-    //float _TMP1;
-    //float _TMP0;
-    //vec2 _c0008;
     //uniform sampler2D _texture0;
+    //
     //void main()
     //{
-    //    vec4 _texColor;
-    //    _TMP0 = fract(TEX0.x);
-    //    _TMP1 = fract(TEX0.y);
-    //    _c0008 = vec2(_TMP0, _TMP1);
-    //    _texColor = texture2D(_texture0, _c0008);
-    //    _ret_0 = _texColor*COLOR0;
-    //    gl_FragColor = _ret_0;
-    //    return;
+    //  gl_FragColor = texture2D(_texture0, TEX0.xy) * COLOR0;
     //}
     //
     TContextShaderSource.Create(

@@ -240,7 +240,7 @@ function  ALCalcHMACMD5(const Str, Key : AnsiString): AnsiString;
 ////// CRC //////
 /////////////////
 
- //http://blog.synopse.info/post/2014/05/25/New-crc32c%28%29-function-using-optimized-asm-and-SSE-4.2-instruction
+ //https://blog.synopse.info/?post/2014/05/25/New-crc32c%28%29-function-using-optimized-asm-and-SSE-4.2-instruction
  //In fact, most popular file formats and protocols (Ethernet, MPEG-2, ZIP, RAR,
  //7-Zip, GZip, and PNG) use the polynomial $04C11DB7, while Intel's hardware
  //implementation is based on another polynomial, $1EDC6F41 (used in iSCSI and Btrfs).
@@ -252,18 +252,18 @@ function  ALCalcHMACMD5(const Str, Key : AnsiString): AnsiString;
 
 /// compute CRC32 checksum on the supplied buffer
 // - this variable will use the fastest mean available, e.g. SSE 4.2
-var ALStringHashCrc32: function(Const str: AnsiString): cardinal;
-var ALHashCrc32: function(buf: PAnsiChar; len: cardinal): cardinal;
+var ALStringHashCrc32c: function(Const str: AnsiString): cardinal;
+var ALHashCrc32c: function(buf: PAnsiChar; len: cardinal): cardinal;
 
 /// compute CRC64 checksum on the supplied buffer, cascading two crc32c
 // - will use SSE 4.2 hardware accelerated instruction, if available
 // - will combine two crc32() calls into a single Int64 result
 // - by design, such combined hashes cannot be cascaded
-var ALStringHashCrc64: function(Const str: AnsiString): int64;
-var ALHashCrc64: function(buf: PAnsiChar; len: cardinal): int64;
+var ALStringHashCrc64c: function(Const str: AnsiString): int64;
+var ALHashCrc64c: function(buf: PAnsiChar; len: cardinal): int64;
 
 // test the implementation of the CRC32
-procedure ALTestCRC32Implementation(const aSavedResultsFilename: AnsiString = '');
+function ALTestCrc32cImplementation: Boolean;
 
 {$ENDIF}
 {$ENDIF ALCPUXASM}
@@ -4940,7 +4940,7 @@ end;
 // http://mormot.net
 //
 
-{$IF CompilerVersion > 34} // sydney
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from References\mORMot\SynCommons.pas and adjust the IFDEF'}
 {$IFEND}
 
@@ -5302,92 +5302,37 @@ asm // eax=crc, edx=value
 end;
 {$endif}
 
-{********************************************************************************}
-procedure ALTestCRC32Implementation(const aSavedResultsFilename: AnsiString = '');
+{*******************************************}
+function ALTestCrc32cImplementation: Boolean;
 var LCharset: Array of ansiChar;
-    LStringList: TalStringList;
-    LSaveResults: Boolean;
+    LCrc32csse42Result: cardinal;
+    LCrc32cfastResult: cardinal;
+    LCrc32cfastpurepascalResult: cardinal;
+    LData: ansiString;
     J: integer;
 begin
-  if @ALHashCrc32 <> @Crc32csse42_3 then raise Exception.Create('SSE 4.2 not supported!');
-  LSaveResults := aSavedResultsFilename <> '';
-  LStringList := TalStringList.Create;
-  try
-
-    if (aSavedResultsFilename <> '') and
-       (ALFileExists(aSavedResultsFilename)) then begin
-      LSaveResults := False;
-      LStringList.LoadFromFile(aSavedResultsFilename);
-      TParallel.For(1, LStringList.Count - 1, procedure(I: Integer)
-      var LData: ansiString;
-          LCrc32csse42Result: cardinal;
-          LCrc32cfastResult: cardinal;
-          LCrc32cfastpurepascalResult: cardinal;
-      begin
-        LData := ALBase64DecodeString(LStringList.ValueFromIndex[i]);
-        LCrc32cfastResult:=Crc32cfast(0, Pointer(LData), Length(LData));
-        LCrc32csse42Result:=Crc32csse42(0, Pointer(LData), Length(LData));
-        LCrc32cfastpurepascalResult:=Crc32cfastpurepascal(0, Pointer(LData), Length(LData));
-        if LCrc32cfastResult <> LCrc32cfastpurepascalResult then raise Exception.Create('test failed!');
-        if LCrc32cfastResult <> LCrc32csse42Result then raise Exception.Create('test failed!');
-        if LCrc32cfastResult <> ALStrToUInt(LStringList.Names[i]) then raise Exception.Create('test failed!');
-      end);
-    end;
-    //-----
-    setlength(LCharset, 255);
-    for J := low(LCharset) to high(LCharset) do
-      LCharset[J] := ansichar(J);
-    //-----
-    TParallel.For(1, 1000000, procedure(I: Integer)
-    var LData: ansiString;
-        LCrc32csse42Result: cardinal;
-        LCrc32cfastResult: cardinal;
-        LCrc32cfastpurepascalResult: cardinal;
-    begin
-      LData := ALRandomStr(random(65536), LCharset);
-      LCrc32cfastResult:=Crc32cfast(0, Pointer(LData), Length(LData));
-      LCrc32csse42Result:=Crc32csse42(0, Pointer(LData), Length(LData));
-      LCrc32cfastpurepascalResult:=Crc32cfastpurepascal(0, Pointer(LData), Length(LData));
-      if LCrc32cfastResult <> LCrc32cfastpurepascalResult then raise Exception.Create('test failed!');
-      if LCrc32cfastResult <> LCrc32csse42Result then raise Exception.Create('test failed!');
-      if LSaveResults and (I mod 1000 = 0) then begin
-        TMonitor.Enter(LStringList);
-        try
-          LStringList.add(ALUintToStr(LCrc32cfastResult) + LStringList.NameValueSeparator + ALBase64EncodeString(LData));
-        finally
-          TMonitor.Exit(LStringList);
-        end;
-      end;
-    end);
-    //-----
-    TParallel.For(1, 100, procedure(I: Integer)
-    var LData: ansiString;
-        LCrc32csse42Result: cardinal;
-        LCrc32cfastResult: cardinal;
-        LCrc32cfastpurepascalResult: cardinal;
-    begin
-      LData := ALRandomStr(random(134217728), LCharset);
-      LCrc32cfastResult:=Crc32cfast(0, Pointer(LData), Length(LData));
-      LCrc32csse42Result:=Crc32csse42(0, Pointer(LData), Length(LData));
-      LCrc32cfastpurepascalResult:=Crc32cfastpurepascal(0, Pointer(LData), Length(LData));
-      if LCrc32cfastResult <> LCrc32cfastpurepascalResult then raise Exception.Create('test failed!');
-      if LCrc32cfastResult <> LCrc32csse42Result then raise Exception.Create('test failed!');
-      if LSaveResults and (I mod 1000 = 0) then begin
-        TMonitor.Enter(LStringList);
-        try
-          LStringList.add(ALUintToStr(LCrc32cfastResult) + LStringList.NameValueSeparator + ALBase64EncodeString(LData));
-        finally
-          TMonitor.Exit(LStringList);
-        end;
-      end;
-    end);
-    //-----
-    if LSaveResults then
-      LStringList.SaveToFile(aSavedResultsFilename);
-
-  finally
-    ALFreeAndNil(LStringList);
+  if @ALHashCrc32c <> @Crc32csse42_3 then
+    Exit(False);
+  //--
+  if ALStringHashCrc32c('The journey of a thousand miles begins with one step') <> 1161513780 then
+    Exit(False);
+  //--
+  setlength(LCharset, 255);
+  for J := low(LCharset) to high(LCharset) do
+    LCharset[J] := ansichar(J);
+  //--
+  For var i := 1 to 1000 do begin
+    LData := ALRandomStr(random(65536), LCharset);
+    LCrc32cfastResult:=Crc32cfast(0, Pointer(LData), Length(LData));
+    LCrc32csse42Result:=Crc32csse42(0, Pointer(LData), Length(LData));
+    LCrc32cfastpurepascalResult:=Crc32cfastpurepascal(0, Pointer(LData), Length(LData));
+    if LCrc32cfastResult <> LCrc32cfastpurepascalResult then
+      Exit(False);
+    if LCrc32cfastResult <> LCrc32csse42Result then
+      Exit(False);
   end;
+  //--
+  Result := true;
 end;
 
 {$ENDIF !ALHideAnsiString}
@@ -6030,31 +5975,31 @@ begin
   // http://mormot.net
   //
 
-  {$IF CompilerVersion > 34} // sydney
+  {$IFNDEF ALCompilerVersionSupported}
     {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from References\mORMot\SynCommons.pas and adjust the IFDEF'}
   {$IFEND}
 
   {$IFNDEF ALHideAnsiString}
-  ALStringHashCrc32 := @Crc32cfast_2;
-  ALHashCrc32 := @Crc32cfast_3;
-  ALStringHashCrc64 := @Crc64cfast_2;
-  ALHashCrc64 := @Crc64cfast_3;
+  ALStringHashCrc32c := @Crc32cfast_2;
+  ALHashCrc32c := @Crc32cfast_3;
+  ALStringHashCrc64c := @Crc64cfast_2;
+  ALHashCrc64c := @Crc64cfast_3;
 
   {$WARN SYMBOL_PLATFORM OFF}
   if (CPUIDTable[1].ECX and $00100000{Bit 20}) <> 0 then begin
-    ALStringHashCrc32 := @Crc32csse42_2;
-    ALHashCrc32 := @Crc32csse42_3;
-    ALStringHashCrc64 := @Crc64csse42_2;
-    ALHashCrc64 := @Crc64csse42_3;
+    ALStringHashCrc32c := @Crc32csse42_2;
+    ALHashCrc32c := @Crc32csse42_3;
+    ALStringHashCrc64c := @Crc64csse42_2;
+    ALHashCrc64c := @Crc64csse42_3;
     try
       if crc32cBy4SSE42(0,1)<>3712330424 then
         raise EALExceptionU.Create('Invalid crc32cBy4SSE42');
     except
       // disable now on illegal instruction or incorrect result
-      ALStringHashCrc32 := @Crc32cfast_2;
-      ALHashCrc32 := @Crc32cfast_3;
-      ALStringHashCrc64 := @Crc64cfast_2;
-      ALHashCrc64 := @Crc64cfast_3;
+      ALStringHashCrc32c := @Crc32cfast_2;
+      ALHashCrc32c := @Crc32cfast_3;
+      ALStringHashCrc64c := @Crc64cfast_2;
+      ALHashCrc64c := @Crc64cfast_3;
     end;
   end;
   {$WARN SYMBOL_PLATFORM ON}

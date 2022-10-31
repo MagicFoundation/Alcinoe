@@ -65,6 +65,8 @@ Function  AlCopyDirectoryU(SrcDirectory,
                            Const FileNameMask: String = '*';
                            Const FailIfExists: Boolean = True;
                            Const SkipIfExists: Boolean = False): Boolean;
+function  ALGetModuleNameU: String;
+function  ALGetModulePathU: String;
 function  ALGetFileCreationDateTimeU(const aFileName: String): TDateTime;
 function  ALGetFileLastWriteDateTimeU(const aFileName: String): TDateTime;
 function  ALGetFileLastAccessDateTimeU(const aFileName: String): TDateTime;
@@ -562,6 +564,21 @@ begin
       System.sysutils.FindClose(sr);
     end;
   end
+end;
+
+{********************************}
+function ALGetModuleNameU: String;
+var ModName: array[0..MAX_PATH] of Char;
+begin
+  SetString(Result, ModName, Winapi.Windows.GetModuleFileNameW(HInstance, ModName, SizeOf(ModName)));
+  If ALposU('\\?\',result) = 1 then delete(Result,1,4);
+end;
+
+{********************************}
+function ALGetModulePathU: String;
+begin
+  Result:=ALExtractFilePathU(ALGetModuleNameU);
+  If (length(result) > 0) and (result[length(result)] <> '\') then result := result + '\';
 end;
 
 {***********************************************************************}

@@ -76,10 +76,11 @@ type
                     ntDocFragment,      //[not implemented yet !] The node represents a document fragment. A document fragment node associates a node or subtree with a document without actually being contained in the document. Document fragment nodes can have child nodes of type ntElement, ntProcessingInstr, ntComment, ntText, ntCData, and ntEntityRef. It never appears as the child of another node.
                     ntNotation);        //[not implemented yet !] A node represents a notation in the document type declaration. It always appears as the child of an ntDocType node and never has any child nodes.
 
-  TALXMLDocOption = (//doAttrNull,      //[deleted from TALXMLDocOption] When reading the value of an attribute that does not exist, the value is given as a Null Variant (as opposed to a value of an empty string).
-                     //doAutoSave,      //[deleted from TALXMLDocOption] When the XML document closes, any changes are automatically saved back to the XML document file or to the XML property.
-                     doNodeAutoCreate,  //If the application tries to read a node by name, using the Nodes property of an IXMLNodeList interface, and that node does not exist, then the application creates a new node using the specified name.
-                     doNodeAutoIndent); //When formatting the XML text from the parsed set of nodes, child nodes are automatically indented from their parent nodes.
+  TALXMLDocOption = (//doAttrNull,           //[deleted from TALXMLDocOption] When reading the value of an attribute that does not exist, the value is given as a Null Variant (as opposed to a value of an empty string).
+                     //doAutoSave,           //[deleted from TALXMLDocOption] When the XML document closes, any changes are automatically saved back to the XML document file or to the XML property.
+                     doNodeAutoCreate,       //If the application tries to read a node by name, using the Nodes property of an IXMLNodeList interface, and that node does not exist, then the application creates a new node using the specified name.
+                     doNodeAutoIndent,       //When formatting the XML text from the parsed set of nodes, child nodes are automatically indented from their parent nodes.
+                     doAttributeAutoIndent); //[added from TXMLDocOption] Attribute nodes are automatically indented from their parent nodes.
   TALXMLDocOptions = set of TALXMLDocOption;
 
   TALXMLParseOption = (//poResolveExternals,   //[not implemented yet !] External definitions (resolvable namespaces, DTD external subsets, and external entity references) are resolved at parse time
@@ -662,10 +663,12 @@ type
     function CreateElement(const TagOrData: AnsiString): TALXMLNode;  //[Replace from TXMLDocument] function CreateElement(const TagOrData, NamespaceURI: AnsiString): TALXMLNode;
     function CreateNode(const NameOrData: AnsiString; NodeType: TALXMLNodeType = ntElement; const AddlData: AnsiString = ''): TALXMLNode;
     function IsEmptyDoc: Boolean;
-    procedure LoadFromFile(const AFileName: AnsiString; const saxMode: Boolean = False); //[Replace from TXMLDocument]  procedure LoadFromFile(const AFileName: AnsiString = '');
+    procedure LoadFromFile(const AFileName: String; const saxMode: Boolean = False); overload; //[Replace from TXMLDocument]  procedure LoadFromFile(const AFileName: AnsiString = '');
+    procedure LoadFromFile(const AFileName: AnsiString; const saxMode: Boolean = False); overload; //[Replace from TXMLDocument]  procedure LoadFromFile(const AFileName: AnsiString = '');
     procedure LoadFromStream(const Stream: TStream; const saxMode: Boolean = False); //[Replace from TXMLDocument] procedure LoadFromStream(const Stream: TStream; EncodingType: TALXMLEncodingType = xetUnknown);
     procedure LoadFromXML(const XML: AnsiString; const saxMode: Boolean = False); //[Replace from TXMLDocument]  procedure LoadFromXML(const XML: AnsiString); overload;
-    procedure SaveToFile(const AFileName: AnsiString);
+    procedure SaveToFile(const AFileName: String); overload;
+    procedure SaveToFile(const AFileName: AnsiString); overload;
     procedure SaveToStream(const Stream: TStream);
     procedure SaveToXML(var XML: AnsiString);
     property ChildNodes: TALXMLNodeList read GetChildNodes;
@@ -1035,41 +1038,6 @@ Var buffer: AnsiString;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  Procedure CheckAttributes(TagParams: TALStrings);
-  Var I: integer;
-      S1, S2, S3: AnsiString;
-      L1: integer;
-      P1: integer;
-  Begin
-    I := 0;
-    While I <= TagParams.Count - 3 do begin
-      S1 := TagParams[I];
-      S2 := TagParams[I+1];
-      S3 := TagParams[I+2];
-      L1 := length(S1);
-      P1 := AlPos('=',S1);
-      IF (P1 <= 0) and
-         (S2 = '=') then begin {aname = "obie2.html"}
-        TagParams[I] := S1 + S2 + S3;
-        tagParams.Delete(I+2);
-        tagParams.Delete(I+1);
-      end
-      else if (L1 > 0) and
-              (P1 = L1) then begin {aname= "obie2.html"}
-        TagParams[I] := S1 + S2;
-        tagParams.Delete(I+1);
-      end
-      else if (L1 > 0) and
-              (P1 <= 0) and
-              (AlPos('=',S2) = 1)  then begin {aname ="obie2.html"}
-        TagParams[I] := S1 + S2;
-        tagParams.Delete(I+1);
-      end;
-      inc(I);
-    end;
-  end;
-
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function GetPathStr(Const ExtraItems: ansiString = ''): ansiString;
   var I, L, Size, Count: Integer;
@@ -1269,10 +1237,29 @@ Var buffer: AnsiString;
                               lstParams,              //Strings
                               False,                  //Decode
                               False);                 //StripQuotes
-        CheckAttributes(LstParams);
-        For I := 0 to LstParams.Count - 1 do begin
+        I := 0;
+        While I <= LstParams.Count - 1 do begin
           LContent := LstParams.ValueFromIndex[I];
           LContentLn := length(LContent);
+          //handle case like name= "value" / name ="value" / name = "value"
+          //ALExtractHeaderFields will make 2 lines:
+          //  name=
+          //  "value"
+          //instead of one line
+          //  name="value"
+          if (LContentLn = 0) and (i < LstParams.Count - 1) then begin // name= "value"
+            LContent := LstParams[I+1];
+            if LContent = '=' then begin // name = "value"
+              LstParams.Delete(i+1);
+              if i >= LstParams.Count - 1 then ALXmlDocError(CALXmlParseError);
+              LContent := LstParams[I+1];
+            end
+            else if (LContent <> '') and (LContent[low(LContent)] = '=') then // name ="value"
+              delete(LContent,1,1);
+            LContentLn := length(LContent);
+            LstParams[I] := LstParams.Names[I] + '=' + LContent;
+            LstParams.Delete(i+1);
+          end;
           if (LContentLn < 2) or
              (LContent[1] <> LContent[LContentLn]) or
              (not (LContent[1] in ['''','"'])) then ALXmlDocError(CALXmlParseError)
@@ -1283,6 +1270,7 @@ Var buffer: AnsiString;
             end
             else LstParams[I] := LstParams.Names[I] + '=' + alCopyStr(LContent,2,LContentLn-2)
           end;
+          inc(i);
         end;
 
         if NotSaxMode then
@@ -1434,15 +1422,21 @@ end;
  *AFileName is the name of the XML document to load from disk. If AFileName is an empty string, TALXMLDocument uses the value of the
   FileName property. If AFileName is not an empty string, TALXMLDocument changes the FileName property to AFileName.
  Once you have loaded an XML document, any changes you make to the document are not saved back to disk until you call the SaveToFile method.}
-procedure TALXMLDocument.LoadFromFile(const AFileName: AnsiString; const saxMode: Boolean = False);
+procedure TALXMLDocument.LoadFromFile(const AFileName: String; const saxMode: Boolean = False);
 var FileStream: TFileStream;
 begin
-  FileStream := TFileStream.Create(string(aFileName), fmOpenRead or fmShareDenyWrite);
+  FileStream := TFileStream.Create(aFileName, fmOpenRead or fmShareDenyWrite);
   try
     LoadFromStream(FileStream, saxMode);
   finally
     FileStream.Free;
   end;
+end;
+
+{*************************************************************************************************}
+procedure TALXMLDocument.LoadFromFile(const AFileName: AnsiString; const saxMode: Boolean = False);
+begin
+  LoadFromFile(String(AFileName), saxMode);
 end;
 
 {****************************************************}
@@ -1481,15 +1475,21 @@ end;
 {Saves the XML document to disk.
  Call SaveToFile to save any modifications you have made to the parsed XML document.
  AFileName is the name of the file to save. If AFileName is an empty string, TXMLDocument uses the value of the FileName property.}
-procedure TALXMLDocument.SaveToFile(const AFileName: AnsiString);
+procedure TALXMLDocument.SaveToFile(const AFileName: String);
 Var LfileStream: TfileStream;
 begin
-  LfileStream := TfileStream.Create(String(AFileName),fmCreate);
+  LfileStream := TfileStream.Create(AFileName,fmCreate);
   Try
     SaveToStream(LfileStream);
   finally
     LfileStream.Free;
   end;
+end;
+
+{***************************************************************}
+procedure TALXMLDocument.SaveToFile(const AFileName: AnsiString);
+begin
+  SaveToFile(String(AFileName));
 end;
 
 {************************************************}
@@ -2269,8 +2269,10 @@ Var NodeStack: Tstack;
     CurrentNode: TalxmlNode;
     CurrentParentNode: TalxmlNode;
     EncodeXmlReferences: Boolean;
+    AttributeAutoIndent: Boolean;
     BufferString: AnsiString;
     BufferStringPos: Integer;
+    CharCountFromLastNewLine: Integer;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure WriteBuffer2Stream(const buffer: ansiString; BufferLength: Integer);
@@ -2280,10 +2282,15 @@ Var NodeStack: Tstack;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure WriteStr2Buffer(const str:AnsiString);
-  var L: integer;
+  var L, P: integer;
   Begin
     L := Length(Str);
     if l = 0 then exit;
+    if AttributeAutoIndent then begin
+      P := ALLastDelimiter(#10, str);
+      if P > 0 then CharCountFromLastNewLine := L - P
+      else CharCountFromLastNewLine := CharCountFromLastNewLine + L;
+    end;
     if L >= BufferSize then begin
       WriteBuffer2Stream(BufferString,BufferStringPos);
       BufferStringPos := 0;
@@ -2304,10 +2311,25 @@ Var NodeStack: Tstack;
   Procedure WriteAttributeNode2Stream(aAttributeNode:TALXmlNode);
   Begin
     with aAttributeNode do
-      if EncodeXmlReferences then WriteStr2Buffer(' ' + NodeName + '="' + ALXMLTextElementEncode(text) + '"')
+      if EncodeXmlReferences then begin
+        WriteStr2Buffer(NodeName);
+        WriteStr2Buffer('="');
+        WriteStr2Buffer(ALXMLTextElementEncode(text));
+        WriteStr2Buffer('"');
+      end
       else begin
-        if alpos('"',text) > 0 then WriteStr2Buffer(' ' + NodeName + '=''' + text + '''')
-        else WriteStr2Buffer(' ' + NodeName + '="' + text + '"');
+        if alpos('"',text) > 0 then begin
+          WriteStr2Buffer(NodeName);
+          WriteStr2Buffer('=''');
+          WriteStr2Buffer(text);
+          WriteStr2Buffer('''');
+        end
+        else begin
+          WriteStr2Buffer(NodeName);
+          WriteStr2Buffer('="');
+          WriteStr2Buffer(text);
+          WriteStr2Buffer('"');
+        end;
       end;
   end;
 
@@ -2322,15 +2344,21 @@ Var NodeStack: Tstack;
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure WriteCDATANode2Stream(aTextNode:TALXmlNode);
   Begin
-    with aTextNode do
-      WriteStr2Buffer('<![CDATA[' + text + ']]>');
+    with aTextNode do begin
+      WriteStr2Buffer('<![CDATA[');
+      WriteStr2Buffer(text);
+      WriteStr2Buffer(']]>');
+    end;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure WriteCommentNode2Stream(aCommentNode:TALXmlNode);
   Begin
-    with acommentNode do
-      WriteStr2Buffer('<!--' + text + '-->');
+    with acommentNode do begin
+      WriteStr2Buffer('<!--');
+      WriteStr2Buffer(text);
+      WriteStr2Buffer('-->');
+    end;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -2338,11 +2366,14 @@ Var NodeStack: Tstack;
   Var LText: AnsiString;
   Begin
     with aProcessingInstrNode do begin
-      WriteStr2Buffer('<?'+NodeName);
+      WriteStr2Buffer('<?');
+      WriteStr2Buffer(NodeName);
 
       LText := Text;
-      If LText <> '' then
-        WriteStr2Buffer(' ' + LText);
+      If LText <> '' then begin
+        WriteStr2Buffer(' ');
+        WriteStr2Buffer(LText);
+      end;
 
       WriteStr2Buffer('?>');
     end;
@@ -2350,18 +2381,29 @@ Var NodeStack: Tstack;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure WriteStartElementNode2Stream(aElementNode:TALXmlNode);
-  var I: integer;
+  var I, J: integer;
       LNodeList: TALXmlNodeList;
       LTagEnclosed: Boolean;
+      LCharCountFromLastNewLine: integer;
   Begin
     with aElementNode do begin
-      WriteStr2Buffer('<'+NodeName);
+      WriteStr2Buffer('<');
+      WriteStr2Buffer(NodeName);
 
       LNodeList := InternalGetAttributeNodes;
-      If assigned(LNodeList) then
+      If assigned(LNodeList) then begin
+        LCharCountFromLastNewLine := CharCountFromLastNewLine;
         with LNodeList do
-          For I := 0 to Count - 1 do
+          For I := 0 to Count - 1 do begin
+            if AttributeAutoIndent and (I > 0) then begin
+              WriteStr2Buffer(#13#10);
+              For J := 0 to LCharCountFromLastNewLine do
+                WriteStr2Buffer(' ');
+            end
+            else WriteStr2Buffer(' ');
             WriteAttributeNode2Stream(Nodes[I]);
+          end;
+      end;
 
       LTagEnclosed := True;
       LNodeList := InternalGetChildNodes;
@@ -2382,8 +2424,11 @@ Var NodeStack: Tstack;
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure WriteEndElementNode2Stream(aElementNode:TALXmlNode);
   Begin
-    with aElementNode do
-      WriteStr2Buffer('</'+NodeName+'>');
+    with aElementNode do begin
+      WriteStr2Buffer('</');
+      WriteStr2Buffer(NodeName);
+      WriteStr2Buffer('>');
+    end;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -2412,8 +2457,16 @@ begin
     Setlength(BufferString, BufferSize * 2);
     BufferStringPos := 0;
 
-    {EncodeXmlReferences from ParseOptions}
-    EncodeXmlReferences := not (poIgnoreXmlReferences in FDocument.ParseOptions);
+    {EncodeXmlReferences and AttributeAutoIndent}
+    if FDocument = nil then begin
+      EncodeXmlReferences := True;
+      AttributeAutoIndent := false;
+    end
+    else begin
+      EncodeXmlReferences := not (poIgnoreXmlReferences in FDocument.ParseOptions);
+      AttributeAutoIndent := doAttributeAutoIndent in FDocument.Options;
+    end;
+    CharCountFromLastNewLine := 0;
 
     {SaveOnlyChildNodes}
     If SaveOnlyChildNodes or (NodeType = ntDocument) then WriteDocumentNode2Stream(self)
@@ -3176,7 +3229,7 @@ var LNodeList: TALXMLNodelist;
     I: integer;
 begin
   LNodeList := InternalGetChildNodes;
-  If assigned(LNodeList) then
+  If (Node.NodeType = ntelement) and (assigned(LNodeList)) then
     For I:=0 to LNodeList.Count - 1 do
       If LNodeList[I].NodeType = ntelement then alXmlDocError(CalXMLOnlyOneTopLevelError);
 

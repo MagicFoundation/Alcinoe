@@ -1,10 +1,12 @@
 unit ALFmxInertialMovement;
 
-{$IF CompilerVersion > 34} // sydney
+interface
+
+{$I Alcinoe.inc}
+
+{$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if FMX.InertialMovement.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
-
-interface
 
 {$SCOPEDENUMS ON}
 

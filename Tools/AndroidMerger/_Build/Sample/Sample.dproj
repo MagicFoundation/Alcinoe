@@ -3834,18 +3834,6 @@
             <RemoteName>values.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="Merged\res\values\strings.xml">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\values</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\values</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-          </Platform>
-        </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="Merged\res\values\values.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -6772,18 +6760,6 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-zu</RemoteDir>
             <RemoteName>values.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="Merged\res\values\strings.xml">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\values</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\values</RemoteDir>
-            <RemoteName>strings.xml</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="Merged\res\values\values.xml">

@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><resources>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
     <string name="common_google_play_services_unknown_issue">%1$s հավելվածը Google Play ծառայությունների հետ կապված խնդիր ունի: Փորձեք նորից:</string>
     <string name="common_google_play_services_enable_button" msgid="2523291102206661146">Միացնել</string>
     <string name="common_google_play_services_enable_text" msgid="227660514972886228">%1$s հավելվածը չի աշխատի մինչև չմիացնեք Google Play ծառայությունները:</string>

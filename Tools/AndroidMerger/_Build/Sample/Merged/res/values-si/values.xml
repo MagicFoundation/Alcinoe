@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><resources>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
     <string name="common_google_play_services_unknown_issue">%1$s හට Google Play සේවා සමගින් ගැටලු ඇත. කරුණාකර නැවත උත්සාහ කරන්න.</string>
     <string name="common_google_play_services_enable_button" msgid="2523291102206661146">සබල කරන්න</string>
     <string name="common_google_play_services_enable_text" msgid="227660514972886228">ඔබ Google Play සේවා සබල කරන්නේ නම් මිස %1$s වැඩ නොකරනු ඇත.</string>

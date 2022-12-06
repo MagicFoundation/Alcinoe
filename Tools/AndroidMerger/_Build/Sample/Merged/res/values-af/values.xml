@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><resources>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
     <string name="common_google_play_services_unknown_issue">%1$s ondervind probleme met Google Play Dienste. Probeer asseblief weer.</string>
     <string name="common_google_play_services_enable_button" msgid="2523291102206661146">Aktiveer</string>
     <string name="common_google_play_services_enable_text" msgid="227660514972886228">%1$s sal nie werk nie tensy jy Google Play Dienste aktiveer.</string>

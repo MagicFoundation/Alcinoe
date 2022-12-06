@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><resources>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
     <string name="common_google_play_services_unknown_issue">%1$s သည် Google Play ဝန်ဆောင်မှုများနှင့် ပြဿနာအနည်းငယ် ရှိနေပါသည်။ ထပ်လုပ်ကြည့်ပါ။</string>
     <string name="common_google_play_services_enable_button" msgid="2523291102206661146">ဖွင့်ရန်</string>
     <string name="common_google_play_services_enable_text" msgid="227660514972886228">Google Play ဝန်ဆောင်မှုများကို မဖွင့်သ၍ %1$s သည်အလုပ်လုပ်မည်မဟုတ်ပါ။</string>

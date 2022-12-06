@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><resources>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
     <string name="common_google_play_services_unknown_issue">Η εφαρμογή %1$s αντιμετωπίζει κάποιο πρόβλημα με τις υπηρεσίες Google Play. Προσπαθήστε ξανά.</string>
     <string name="common_google_play_services_enable_button" msgid="2523291102206661146">Ενεργοποίηση</string>
     <string name="common_google_play_services_enable_text" msgid="227660514972886228">Η εφαρμογή %1$s δεν θα λειτουργήσει εάν δεν έχετε ενεργοποιήσει τις υπηρεσίες Google Play.</string>

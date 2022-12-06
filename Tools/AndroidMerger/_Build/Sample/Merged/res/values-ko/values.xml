@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><resources>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
     <string name="common_google_play_services_unknown_issue">%1$s에서 Google Play 서비스를 사용하는 데 문제가 있습니다. 다시 시도하세요.</string>
     <string name="common_google_play_services_enable_button" msgid="2523291102206661146">사용 설정</string>
     <string name="common_google_play_services_enable_text" msgid="227660514972886228">Google Play 서비스를 사용하도록 설정해야 %1$s이(가) 작동합니다.</string>

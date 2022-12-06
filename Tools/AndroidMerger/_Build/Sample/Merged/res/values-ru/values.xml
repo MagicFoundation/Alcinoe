@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><resources>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
     <string name="common_google_play_services_unknown_issue">Приложению \"%1$s\" не удается подключиться к сервисам Google Play. Повторите попытку.</string>
     <string name="common_google_play_services_enable_button" msgid="2523291102206661146">Включить</string>
     <string name="common_google_play_services_enable_text" msgid="227660514972886228">Для работы приложения \"%1$s\" требуется включить сервисы Google Play.</string>

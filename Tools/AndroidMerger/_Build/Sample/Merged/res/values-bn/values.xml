@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><resources>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
     <string name="common_google_play_services_unknown_issue">Google Play পরিষেবাগুলির সাথে %1$s এর সমস্যা হচ্ছে৷ অনুগ্রহ করে আবার চেষ্টা করুন৷</string>
     <string name="common_google_play_services_enable_button" msgid="2523291102206661146">সক্ষম করুন</string>
     <string name="common_google_play_services_enable_text" msgid="227660514972886228">আপনি Google Play পরিষেবা সক্ষম না করা পর্যন্ত %1$s কাজ করবে না।</string>

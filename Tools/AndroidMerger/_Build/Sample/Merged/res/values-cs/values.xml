@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><resources>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
     <string name="common_google_play_services_unknown_issue">Aplikace %1$s má potíže se službami Google Play. Zkuste to prosím znovu.</string>
     <string name="common_google_play_services_enable_button" msgid="2523291102206661146">Povolit</string>
     <string name="common_google_play_services_enable_text" msgid="227660514972886228">Ke spuštění aplikace %1$s je třeba aktivovat služby Google Play.</string>

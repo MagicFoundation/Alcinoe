@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><resources>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
     <string name="common_google_play_services_unknown_issue">Google Play സേവനങ്ങളുമായി ബന്ധപ്പെട്ട് %1$s ആപ്പിനെന്തോ പ്രശ്നമുണ്ട്. വീണ്ടും ശ്രമിക്കുക.</string>
     <string name="common_google_play_services_enable_button" msgid="2523291102206661146">പ്രവർത്തനക്ഷമമാക്കുക</string>
     <string name="common_google_play_services_enable_text" msgid="227660514972886228">നിങ്ങൾ Google Play സേവനങ്ങൾ പ്രവർത്തനക്ഷമമാക്കുന്നില്ലെങ്കിൽ %1$s പ്രവർത്തിക്കില്ല.</string>

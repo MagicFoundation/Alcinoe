@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><resources>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
     <string name="common_google_play_services_unknown_issue">「%1$s」存取 Google Play 服務時發生問題。請稍後再試一次。</string>
     <string name="common_google_play_services_enable_button" msgid="2523291102206661146">啟用</string>
     <string name="common_google_play_services_enable_text" msgid="227660514972886228">您必須啟用 Google Play 服務，方可執行「%1$s」。</string>

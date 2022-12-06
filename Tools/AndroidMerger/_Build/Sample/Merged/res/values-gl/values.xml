@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><resources>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
     <string name="common_google_play_services_unknown_issue">%1$s ten problemas cos servizos de Google Play. Téntao de novo.</string>
     <string name="common_google_play_services_enable_button" msgid="2523291102206661146">Activar</string>
     <string name="common_google_play_services_enable_text" msgid="227660514972886228">%1$s non funcionará a menos que actives os servizos de Google Play.</string>

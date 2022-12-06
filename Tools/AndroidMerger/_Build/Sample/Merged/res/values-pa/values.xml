@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?><resources>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
     <string name="common_google_play_services_unknown_issue">%1$s ਨੂੰ Google Play ਸੇਵਾਵਾਂ ਨਾਲ ਸਮੱਸਿਆ ਆ ਰਹੀ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।</string>
     <string name="common_google_play_services_enable_button" msgid="2523291102206661146">ਚਾਲੂ ਕਰੋ</string>
     <string name="common_google_play_services_enable_text" msgid="227660514972886228">%1$s ਕੰਮ ਨਹੀਂ ਕਰੇਗਾ ਜਦੋਂ ਤੱਕ ਤੁਸੀਂ Google Play ਸੇਵਾਵਾਂ ਨੂੰ ਚਾਲੂ ਨਹੀਂ ਕਰਦੇ ਹੋ।</string>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- BEGIN_INCLUDE(manifest) -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="%package%"
+          android:versionCode="%versionCode%"
+          android:versionName="%versionName%"
+          android:installLocation="%installLocation%">
+
+  <uses-sdk android:minSdkVersion="%minSdkVersion%"
+            android:targetSdkVersion="%targetSdkVersion%"/>
+  
+  <%uses-permission%>
+  
+  <uses-feature android:glEsVersion="0x00020000"
+                android:required="true"/>
+  
+  <queries>
+    
+    <%queries-child-elements%>
+    
+  </queries>
+  
+  <!-- ============================================ -->
+  <!-- AndroidMerger auto-generated section (BEGIN) -->
+  <!-- ============================================ -->
+  
+  <!-- ===== androidx.core ===== -->
+  <!-- <application android:appComponentFactory="androidx.core.app.CoreComponentFactory"/> -->
+  <!-- ===== com.google.firebase.messaging ===== -->
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+  <uses-permission android:name="android.permission.WAKE_LOCK"/>
+  <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+  <!-- ===== com.google.android.datatransport.backend.cct ===== -->
+  <uses-permission android:name="android.permission.INTERNET"/>
+  
+  <!-- ========================================== -->
+  <!-- AndroidMerger auto-generated section (END) -->
+  <!-- ========================================== -->
+  
+  <application android:persistent="%persistent%"
+               android:restoreAnyVersion="%restoreAnyVersion%"
+               android:label="%label%"
+               android:debuggable="%debuggable%"
+               android:largeHeap="%largeHeap%"
+               android:icon="%icon%"
+               android:theme="%theme%"
+               android:hardwareAccelerated="%hardwareAccelerated%"
+               android:resizeableActivity="false"
+               android:requestLegacyExternalStorage="true">
+  
+    <%provider%>
+  
+    <%application-meta-data%>
+  
+    <%uses-libraries%>
+  
+    <%services%>
+  
+    <!-- Our activity is a subclass of the built-in NativeActivity framework class.
+         This will take care of integrating with our NDK code. -->
+    <activity android:name="com.embarcadero.firemonkey.FMXNativeActivity"
+              android:exported="true"
+              android:label="%activityLabel%"
+              android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
+              android:launchMode="singleTask">
+        <!-- Tell NativeActivity the name of our .so -->
+        <meta-data android:name="android.app.lib_name"
+                   android:value="%libNameValue%"/>
+
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN"/>
+
+            <category android:name="android.intent.category.LAUNCHER"/>
+        </intent-filter>
+    </activity>
+    
+    <%activity%>
+
+    <%receivers%>
+    
+    <!-- ============================================ -->
+    <!-- AndroidMerger auto-generated section (BEGIN) -->
+    <!-- ============================================ -->
+    
+    <!-- ===== com.google.android.gms.common ===== -->
+    <meta-data android:name="com.google.android.gms.version"
+               android:value="@integer/google_play_services_version"/>
+    <!-- ===== com.google.firebase.messaging ===== -->
+    <receiver android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver"
+              android:exported="true"
+              android:permission="com.google.android.c2dm.permission.SEND">
+      <intent-filter>
+        <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+      </intent-filter>
+    </receiver>
+    <service android:name="com.google.firebase.messaging.FirebaseMessagingService"
+             android:directBootAware="true"
+             android:exported="false">
+      <intent-filter android:priority="-500">
+        <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+      </intent-filter>
+    </service>
+    <!-- ===== com.google.firebase ===== -->
+    <service android:name="com.google.firebase.components.ComponentDiscoveryService"
+             android:exported="false"
+             android:directBootAware="true">
+      <meta-data android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar"
+                 android:value="com.google.firebase.components.ComponentRegistrar"/>
+      <!-- ===== com.google.firebase.datatransport ===== -->
+      <meta-data android:name="com.google.firebase.components:com.google.firebase.datatransport.TransportRegistrar"
+                 android:value="com.google.firebase.components.ComponentRegistrar"/>
+      <!-- ===== com.google.firebase.installations ===== -->
+      <meta-data android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar"
+                 android:value="com.google.firebase.components.ComponentRegistrar"/>
+    </service>
+    <!-- ===== com.google.android.datatransport.backend.cct ===== -->
+    <service android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+             android:exported="false">
+      <meta-data android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
+                 android:value="cct"/>
+    </service>
+    <!-- ===== com.google.android.datatransport.runtime ===== -->
+    <service android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
+             android:exported="false"
+             android:permission="android.permission.BIND_JOB_SERVICE"/>
+    <receiver android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
+              android:exported="false"/>
+    <!-- ===== com.google.android.gms.base ===== -->
+    <activity android:name="com.google.android.gms.common.api.GoogleApiActivity"
+              android:theme="@android:style/Theme.Translucent.NoTitleBar"
+              android:exported="false"/>
+    <!-- ===== com.google.firebase ===== -->
+    <provider android:name="com.google.firebase.provider.FirebaseInitProvider"
+              android:authorities="%package%.firebaseinitprovider"
+              android:directBootAware="true"
+              android:exported="false"
+              android:initOrder="100"/>
+    
+    <!-- ========================================== -->
+    <!-- AndroidMerger auto-generated section (END) -->
+    <!-- ========================================== -->
+    
+  </application>
+  
+</manifest>
+<!-- END_INCLUDE(manifest) -->

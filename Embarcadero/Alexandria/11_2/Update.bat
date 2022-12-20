@@ -26,15 +26,19 @@ xcopy "%EmbSourceDir%\fmx" "%ProjectDir%\fmx"
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
-echo Copy "%EmbSourceDir%\rtl\ios" to "%ProjectDir%\rtl\ios"
-xcopy "%EmbSourceDir%\rtl\ios" "%ProjectDir%\rtl\ios"
-IF ERRORLEVEL 1 goto ERROR
-echo.
+IF EXIST "%EmbSourceDir%\rtl\ios" (
+  echo Copy "%EmbSourceDir%\rtl\ios" to "%ProjectDir%\rtl\ios"
+  xcopy "%EmbSourceDir%\rtl\ios" "%ProjectDir%\rtl\ios"
+  IF ERRORLEVEL 1 goto ERROR
+  echo.
+)
 
-echo Copy "%EmbSourceDir%\rtl\android" to "%ProjectDir%\rtl\android"
-xcopy "%EmbSourceDir%\rtl\android" "%ProjectDir%\rtl\android"
-IF ERRORLEVEL 1 goto ERROR
-echo.
+IF EXIST "%EmbSourceDir%\rtl\android" (
+  echo Copy "%EmbSourceDir%\rtl\android" to "%ProjectDir%\rtl\android"
+  xcopy "%EmbSourceDir%\rtl\android" "%ProjectDir%\rtl\android"
+  IF ERRORLEVEL 1 goto ERROR
+  echo.
+)
 
 echo Copy "%EmbSourceDir%\rtl\win" to "%ProjectDir%\rtl\win"
 xcopy "%EmbSourceDir%\rtl\win" "%ProjectDir%\rtl\win"
@@ -44,7 +48,6 @@ echo.
 echo Patch the source code
 CHDIR ".\..\..\..\"
 git apply --ignore-space-change --ignore-whitespace .\Embarcadero\Alexandria\11_2\Alexandria_11_2.patch -v
-IF ERRORLEVEL 1 goto ERROR
 CHDIR "%ProjectDir%"
 echo.
 

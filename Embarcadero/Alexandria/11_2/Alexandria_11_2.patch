@@ -1,7 +1,7 @@
 Index: fmx/FMX.Canvas.GPU.Helpers.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Canvas.GPU.Helpers.pas b/Embarcadero/Alexandria/11_2/fmx/FMX.Canvas.GPU.Helpers.pas
---- a/Embarcadero/Alexandria/11_2/fmx/FMX.Canvas.GPU.Helpers.pas	(revision 27005)
+--- a/Embarcadero/Alexandria/11_2/fmx/FMX.Canvas.GPU.Helpers.pas	(revision 1)
 +++ b/Embarcadero/Alexandria/11_2/fmx/FMX.Canvas.GPU.Helpers.pas	(working copy)
 @@ -12,11 +12,12 @@
  
@@ -54,7 +54,7 @@ diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Canvas.GPU.Helpers.pas b/Embarc
 Index: fmx/FMX.Canvas.GPU.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Canvas.GPU.pas b/Embarcadero/Alexandria/11_2/fmx/FMX.Canvas.GPU.pas
---- a/Embarcadero/Alexandria/11_2/fmx/FMX.Canvas.GPU.pas	(revision 27005)
+--- a/Embarcadero/Alexandria/11_2/fmx/FMX.Canvas.GPU.pas	(revision 1)
 +++ b/Embarcadero/Alexandria/11_2/fmx/FMX.Canvas.GPU.pas	(working copy)
 @@ -72,6 +72,8 @@
  procedure RegisterCanvasClasses;
@@ -81,9 +81,17 @@ diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Canvas.GPU.pas b/Embarcadero/Al
 Index: fmx/FMX.Context.GLES.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Context.GLES.pas b/Embarcadero/Alexandria/11_2/fmx/FMX.Context.GLES.pas
---- a/Embarcadero/Alexandria/11_2/fmx/FMX.Context.GLES.pas	(revision 27005)
+--- a/Embarcadero/Alexandria/11_2/fmx/FMX.Context.GLES.pas	(revision 1)
 +++ b/Embarcadero/Alexandria/11_2/fmx/FMX.Context.GLES.pas	(working copy)
-@@ -188,7 +188,7 @@
+@@ -11,6 +11,7 @@
+ 
+ interface
+ 
++{$HINTS OFF}
+ {$SCOPEDENUMS ON}
+ 
+ uses
+@@ -188,7 +189,7 @@
  {$IFDEF MACOS}
    Macapi.CoreFoundation,
  {$ENDIF}
@@ -92,7 +100,7 @@ diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Context.GLES.pas b/Embarcadero/
  
  class procedure TGlesDiagnostic.CollectErrors;
  const
-@@ -1307,8 +1307,15 @@
+@@ -1307,8 +1308,15 @@
  
          if Texture = nil then
            glBindTexture(GL_TEXTURE_2D, 0)
@@ -112,7 +120,7 @@ diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Context.GLES.pas b/Embarcadero/
 Index: fmx/FMX.Controls.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Controls.pas b/Embarcadero/Alexandria/11_2/fmx/FMX.Controls.pas
---- a/Embarcadero/Alexandria/11_2/fmx/FMX.Controls.pas	(revision 27005)
+--- a/Embarcadero/Alexandria/11_2/fmx/FMX.Controls.pas	(revision 1)
 +++ b/Embarcadero/Alexandria/11_2/fmx/FMX.Controls.pas	(working copy)
 @@ -115,7 +115,7 @@
      /// <summary>Register a class to create hint instances. When a new THint instance is needed, the registered classes are invoked
@@ -309,7 +317,7 @@ diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Controls.pas b/Embarcadero/Alex
 Index: fmx/FMX.Filter.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Filter.pas b/Embarcadero/Alexandria/11_2/fmx/FMX.Filter.pas
---- a/Embarcadero/Alexandria/11_2/fmx/FMX.Filter.pas	(revision 27005)
+--- a/Embarcadero/Alexandria/11_2/fmx/FMX.Filter.pas	(revision 1)
 +++ b/Embarcadero/Alexandria/11_2/fmx/FMX.Filter.pas	(working copy)
 @@ -11,6 +11,7 @@
  
@@ -357,7 +365,7 @@ diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Filter.pas b/Embarcadero/Alexan
 Index: fmx/FMX.Forms.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Forms.pas b/Embarcadero/Alexandria/11_2/fmx/FMX.Forms.pas
---- a/Embarcadero/Alexandria/11_2/fmx/FMX.Forms.pas	(revision 27005)
+--- a/Embarcadero/Alexandria/11_2/fmx/FMX.Forms.pas	(revision 1)
 +++ b/Embarcadero/Alexandria/11_2/fmx/FMX.Forms.pas	(working copy)
 @@ -9,6 +9,7 @@
  
@@ -415,10 +423,23 @@ diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Forms.pas b/Embarcadero/Alexand
    begin
      if FActiveControl <> nil then
        FActiveControl.RemoveFreeNotify(Self);
+Index: fmx/FMX.Graphics.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Graphics.pas b/Embarcadero/Alexandria/11_2/fmx/FMX.Graphics.pas
+--- a/Embarcadero/Alexandria/11_2/fmx/FMX.Graphics.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_2/fmx/FMX.Graphics.pas	(working copy)
+@@ -14,6 +14,7 @@
+ 
+ interface
+ 
++{$HINTS OFF}
+ {$SCOPEDENUMS ON}
+ 
+ uses
 Index: fmx/FMX.Platform.UI.Android.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/Alexandria/11_2/fmx/FMX.Platform.UI.Android.pas
---- a/Embarcadero/Alexandria/11_2/fmx/FMX.Platform.UI.Android.pas	(revision 27005)
+--- a/Embarcadero/Alexandria/11_2/fmx/FMX.Platform.UI.Android.pas	(revision 1)
 +++ b/Embarcadero/Alexandria/11_2/fmx/FMX.Platform.UI.Android.pas	(working copy)
 @@ -26,7 +26,7 @@
    TAndroidMotionManager = class;
@@ -474,10 +495,24 @@ diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Platform.UI.Android.pas b/Embar
  begin
    Render;
    FIsNeededUpdate := False;
+Index: fmx/FMX.Presentation.Android.Style.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Presentation.Android.Style.pas b/Embarcadero/Alexandria/11_2/fmx/FMX.Presentation.Android.Style.pas
+--- a/Embarcadero/Alexandria/11_2/fmx/FMX.Presentation.Android.Style.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_2/fmx/FMX.Presentation.Android.Style.pas	(working copy)
+@@ -71,7 +71,7 @@
+   end;
+ 
+   /// <summary>Render of native view.</summary>
+-  TAndroidPresentationRender = class(TRender<TAndroidNativeScene>, JRunnable)
++  TAndroidPresentationRender = class(TRender<TAndroidNativeScene>, JChoreographer_FrameCallback)
+   public
+     procedure Render; override;
+   end;
 Index: fmx/FMX.VirtualKeyboard.Android.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.VirtualKeyboard.Android.pas b/Embarcadero/Alexandria/11_2/fmx/FMX.VirtualKeyboard.Android.pas
---- a/Embarcadero/Alexandria/11_2/fmx/FMX.VirtualKeyboard.Android.pas	(revision 27005)
+--- a/Embarcadero/Alexandria/11_2/fmx/FMX.VirtualKeyboard.Android.pas	(revision 1)
 +++ b/Embarcadero/Alexandria/11_2/fmx/FMX.VirtualKeyboard.Android.pas	(working copy)
 @@ -215,8 +215,15 @@
    VKRect.TopLeft := ConvertPixelToPoint(TPointF.Create(newFrame.Left, newFrame.Top)).Round;
@@ -500,7 +535,7 @@ diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.VirtualKeyboard.Android.pas b/E
 Index: rtl/android/Androidapi.JNI.App.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_2/rtl/android/Androidapi.JNI.App.pas b/Embarcadero/Alexandria/11_2/rtl/android/Androidapi.JNI.App.pas
---- a/Embarcadero/Alexandria/11_2/rtl/android/Androidapi.JNI.App.pas	(revision 27005)
+--- a/Embarcadero/Alexandria/11_2/rtl/android/Androidapi.JNI.App.pas	(revision 1)
 +++ b/Embarcadero/Alexandria/11_2/rtl/android/Androidapi.JNI.App.pas	(working copy)
 @@ -16,7 +16,8 @@
    Androidapi.JNI.JavaTypes,
@@ -571,7 +606,7 @@ diff --git a/Embarcadero/Alexandria/11_2/rtl/android/Androidapi.JNI.App.pas b/Em
 Index: rtl/ios/iOSapi.AVFoundation.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.AVFoundation.pas b/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.AVFoundation.pas
---- a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.AVFoundation.pas	(revision 27005)
+--- a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.AVFoundation.pas	(revision 1)
 +++ b/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.AVFoundation.pas	(working copy)
 @@ -730,6 +730,8 @@
      function timedMetadata: NSArray; cdecl;
@@ -585,7 +620,7 @@ diff --git a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.AVFoundation.pas b/Embar
 Index: rtl/ios/iOSapi.CoreImage.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.CoreImage.pas b/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.CoreImage.pas
---- a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.CoreImage.pas	(revision 27005)
+--- a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.CoreImage.pas	(revision 1)
 +++ b/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.CoreImage.pas	(working copy)
 @@ -218,8 +218,25 @@
    end;
@@ -617,7 +652,7 @@ diff --git a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.CoreImage.pas b/Embarcad
 Index: rtl/ios/iOSapi.CoreLocation.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.CoreLocation.pas b/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.CoreLocation.pas
---- a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.CoreLocation.pas	(revision 27005)
+--- a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.CoreLocation.pas	(revision 1)
 +++ b/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.CoreLocation.pas	(working copy)
 @@ -33,7 +33,7 @@
    kCLAuthorizationStatusNotDetermined = 0;
@@ -686,7 +721,7 @@ diff --git a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.CoreLocation.pas b/Embar
 Index: rtl/ios/iOSapi.Foundation.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.Foundation.pas b/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.Foundation.pas
---- a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.Foundation.pas	(revision 27005)
+--- a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.Foundation.pas	(revision 1)
 +++ b/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.Foundation.pas	(working copy)
 @@ -5566,8 +5566,28 @@
        downloadTask: NSURLSessionDownloadTask; didResumeAtOffset: Int64; expectedTotalBytes: Int64); cdecl;
@@ -721,7 +756,7 @@ diff --git a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.Foundation.pas b/Embarca
 Index: rtl/ios/iOSapi.Security.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.Security.pas b/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.Security.pas
---- a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.Security.pas	(revision 27005)
+--- a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.Security.pas	(revision 1)
 +++ b/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.Security.pas	(working copy)
 @@ -620,6 +620,8 @@
  function kSecAttrKeyClassSymmetric: NSString;
@@ -754,7 +789,7 @@ diff --git a/Embarcadero/Alexandria/11_2/rtl/ios/iOSapi.Security.pas b/Embarcade
 Index: rtl/win/Winapi.Isapi2.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_2/rtl/win/Winapi.Isapi2.pas b/Embarcadero/Alexandria/11_2/rtl/win/Winapi.Isapi2.pas
---- a/Embarcadero/Alexandria/11_2/rtl/win/Winapi.Isapi2.pas	(revision 27005)
+--- a/Embarcadero/Alexandria/11_2/rtl/win/Winapi.Isapi2.pas	(revision 1)
 +++ b/Embarcadero/Alexandria/11_2/rtl/win/Winapi.Isapi2.pas	(working copy)
 @@ -397,7 +397,7 @@
      dwReserved: DWORD): Pointer; stdcall;

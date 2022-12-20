@@ -50,6 +50,18 @@ echo.
 
 FOR %%a IN ("%ProjectDir%\rtl\win\*") DO IF /i NOT "%%~nxa"=="Winapi.Isapi2.pas" DEL "%%a"
 
+REM add <UTF8BOM>{$HINTS OFF}{ at the beginning of each .pas
+SET TmpFileName=%ProjectDir%\~temp.pas
+set "RemoveUTF8BOM=(pause & pause & pause)>nul"
+for /f "delims=" %%a IN ('dir /b /s %ProjectDir%\*.pas') do (
+  IF EXIST "%TmpFileName%" del "%TmpFileName%"
+  IF EXIST "%TmpFileName%" goto ERROR
+  echo ﻿{$HINTS OFF}{>"%TmpFileName%"
+  type "%%a">>"%TmpFileName%"
+  del "%%a"
+  move "%TmpFileName%" "%%a" >nul
+)
+
 :FINISHED
 @echo Finished
 PAUSE

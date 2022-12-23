@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="common_google_play_services_unknown_issue">%1$s ondervind probleme met Google Play Dienste. Probeer asseblief weer.</string>
+    <string name="common_google_play_services_enable_button" msgid="2523291102206661146">Aktiveer</string>
+    <string name="common_google_play_services_enable_text" msgid="227660514972886228">%1$s sal nie werk nie tensy jy Google Play Dienste aktiveer.</string>
+    <string name="common_google_play_services_enable_title" msgid="5122002158466380389">Aktiveer Google Play Dienste</string>
+    <string name="common_google_play_services_install_button" msgid="7153882981874058840">Installeer</string>
+    <string name="common_google_play_services_install_text">%1$s sal nie sonder Google Play Dienste werk nie, wat nie op jou toestel is nie.</string>
+    <string name="common_google_play_services_install_title" msgid="7215213145546190223">Kry Google Play Dienste</string>
+    <string name="common_google_play_services_notification_channel_name">Beskikbaarheid van Google Play Dienste</string>
+    <string name="common_google_play_services_notification_ticker">Google Play Services-fout</string>
+    <string name="common_google_play_services_unsupported_text">%1$s sal nie werk sonder Google Play Dienste nie, wat nie deur jou toestel gesteun word nie.</string>
+    <string name="common_google_play_services_update_button" msgid="6556509956452265614">Dateer op</string>
+    <string name="common_google_play_services_update_text" msgid="9053896323427875356">%1$s sal nie werk nie tensy jy Google Play Dienste opdateer.</string>
+    <string name="common_google_play_services_update_title" msgid="6006316683626838685">Dateer Google Play Dienste op</string>
+    <string name="common_google_play_services_updating_text">%1$s sal nie sonder Google Play Dienste werk nie, wat tans opdateer.</string>
+    <string name="common_google_play_services_wear_update_text">Nuwe weergawe van Google Play Dienste is nodig. Dit sal binnekort self opdateer.</string>
+    <string name="common_open_on_phone">Maak oop op foon</string>
+    <string name="common_signin_button_text">Meld aan</string>
+    <string name="common_signin_button_text_long">Meld aan met Google</string>
+</resources>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="common_google_play_services_unknown_issue">Aplikace %1$s má potíže se službami Google Play. Zkuste to prosím znovu.</string>
+    <string name="common_google_play_services_enable_button" msgid="2523291102206661146">Povolit</string>
+    <string name="common_google_play_services_enable_text" msgid="227660514972886228">Ke spuštění aplikace %1$s je třeba aktivovat služby Google Play.</string>
+    <string name="common_google_play_services_enable_title" msgid="5122002158466380389">Aktivace služeb Google Play</string>
+    <string name="common_google_play_services_install_button" msgid="7153882981874058840">Instalovat</string>
+    <string name="common_google_play_services_install_text">Ke spuštění aplikace %1$s jsou potřeba služby Google Play, které v zařízení nemáte.</string>
+    <string name="common_google_play_services_install_title" msgid="7215213145546190223">Instalace služeb Google Play</string>
+    <string name="common_google_play_services_notification_channel_name">Dostupnost služeb Google Play</string>
+    <string name="common_google_play_services_notification_ticker">Chyba služeb Google Play</string>
+    <string name="common_google_play_services_unsupported_text">Ke spuštění aplikace %1$s jsou potřeba služby Google Play, které v tomto zařízení nejsou podporovány.</string>
+    <string name="common_google_play_services_update_button" msgid="6556509956452265614">Aktualizovat</string>
+    <string name="common_google_play_services_update_text" msgid="9053896323427875356">Ke spuštění aplikace %1$s je třeba aktualizovat služby Google Play.</string>
+    <string name="common_google_play_services_update_title" msgid="6006316683626838685">Aktualizace služeb Google Play</string>
+    <string name="common_google_play_services_updating_text">Ke spuštění aplikace %1$s jsou potřeba služby Google Play, které jsou právě aktualizovány.</string>
+    <string name="common_google_play_services_wear_update_text">Je vyžadována nová verze služeb Google Play. Nová verze se brzy sama nainstaluje.</string>
+    <string name="common_open_on_phone">Otevřít v telefonu</string>
+    <string name="common_signin_button_text">Přihlásit se</string>
+    <string name="common_signin_button_text_long">Přihlásit se k účtu Google</string>
+</resources>

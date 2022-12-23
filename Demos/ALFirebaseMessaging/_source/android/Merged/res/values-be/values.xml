@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="common_google_play_services_unknown_issue">У праграмы %1$s узніклі праблемы са службамі Google Play. Паўтарыце спробу.</string>
+    <string name="common_google_play_services_enable_button" msgid="2523291102206661146">Уключыць</string>
+    <string name="common_google_play_services_enable_text" msgid="227660514972886228">%1$s не будзе працаваць, пакуль вы не ўключыце службы Google Play.</string>
+    <string name="common_google_play_services_enable_title" msgid="5122002158466380389">Уключыць службы Google Play</string>
+    <string name="common_google_play_services_install_button" msgid="7153882981874058840">Усталяваць</string>
+    <string name="common_google_play_services_install_text">%1$s не будзе працаваць без службаў Google Play, якія адсутнічаюць на вашай прыладзе.</string>
+    <string name="common_google_play_services_install_title" msgid="7215213145546190223">Атрымаць службы Google Play</string>
+    <string name="common_google_play_services_notification_channel_name">Даступнасць сэрвісаў Google Play</string>
+    <string name="common_google_play_services_notification_ticker">Памылка службаў Google Play</string>
+    <string name="common_google_play_services_unsupported_text">%1$s не будзе працаваць без службаў Google Play, якія не падтрымліваюцца вашай прыладай.</string>
+    <string name="common_google_play_services_update_button" msgid="6556509956452265614">Абнавіць</string>
+    <string name="common_google_play_services_update_text" msgid="9053896323427875356">%1$s не будзе працаваць, пакуль вы не абновіце службы Google Play.</string>
+    <string name="common_google_play_services_update_title" msgid="6006316683626838685">Абнаўленне службаў Google Play</string>
+    <string name="common_google_play_services_updating_text">%1$s не будзе працаваць без службаў Google Play, якія ў цяперашні час абнаўляюцца.</string>
+    <string name="common_google_play_services_wear_update_text">Патрабуецца новая версія служб Google Play. Яна абновіцца аўтаматычна ў бліжэйшы час.</string>
+    <string name="common_open_on_phone">Адкрыць на тэлефоне</string>
+    <string name="common_signin_button_text">Увайсцi</string>
+    <string name="common_signin_button_text_long">Увайсці праз Google</string>
+</resources>

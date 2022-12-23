@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="common_google_play_services_unknown_issue">Aplikacija %1$s ima težave s storitvami Google Play. Poskusite znova.</string>
+    <string name="common_google_play_services_enable_button" msgid="2523291102206661146">Omogoči</string>
+    <string name="common_google_play_services_enable_text" msgid="227660514972886228">Aplikacija %1$s ne bo delovala, če ne omogočite storitev Google Play.</string>
+    <string name="common_google_play_services_enable_title" msgid="5122002158466380389">Omogočanje storitev Google Play</string>
+    <string name="common_google_play_services_install_button" msgid="7153882981874058840">Namesti</string>
+    <string name="common_google_play_services_install_text">Aplikacija %1$s ne deluje brez storitev Google Play, vendar teh ni v napravi.</string>
+    <string name="common_google_play_services_install_title" msgid="7215213145546190223">Namestitev storitev Google Play</string>
+    <string name="common_google_play_services_notification_channel_name">Dostopnost storitev Google Play</string>
+    <string name="common_google_play_services_notification_ticker">Napaka storitev Google Play</string>
+    <string name="common_google_play_services_unsupported_text">Aplikacija %1$s ne deluje brez storitev Google Play, ki jih vaša naprava ne podpira.</string>
+    <string name="common_google_play_services_update_button" msgid="6556509956452265614">Posodobi</string>
+    <string name="common_google_play_services_update_text" msgid="9053896323427875356">Aplikacija %1$s ne bo delovala, če ne posodobite storitev Google Play.</string>
+    <string name="common_google_play_services_update_title" msgid="6006316683626838685">Posodobitev storitev Google Play</string>
+    <string name="common_google_play_services_updating_text">Aplikacija %1$s ne deluje brez storitev Google Play, ki se trenutno posodabljajo.</string>
+    <string name="common_google_play_services_wear_update_text">Potrebujete novo različico storitev Google Play. V kratkem se bodo posodobile.</string>
+    <string name="common_open_on_phone">Odpiranje v telefonu</string>
+    <string name="common_signin_button_text">Prijava</string>
+    <string name="common_signin_button_text_long">Prijava z računom Google</string>
+</resources>

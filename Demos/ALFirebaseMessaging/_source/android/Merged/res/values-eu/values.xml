@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="common_google_play_services_unknown_issue">%1$s aplikazioak arazoak ditu Google Play Services-ekin. Saiatu berriro.</string>
+    <string name="common_google_play_services_enable_button" msgid="2523291102206661146">Gaitu</string>
+    <string name="common_google_play_services_enable_text" msgid="227660514972886228">%1$s aplikazioak ez du funtzionatuko Google Play Services gaitzen ez baduzu.</string>
+    <string name="common_google_play_services_enable_title" msgid="5122002158466380389">Gaitu Google Play Services</string>
+    <string name="common_google_play_services_install_button" msgid="7153882981874058840">Instalatu</string>
+    <string name="common_google_play_services_install_text">%1$s ez da exekutatuko Google Play Services gabe, baina ez dago halakorik gailuan.</string>
+    <string name="common_google_play_services_install_title" msgid="7215213145546190223">Lortu Google Play Services</string>
+    <string name="common_google_play_services_notification_channel_name">Google Play Services-en erabilgarritasuna</string>
+    <string name="common_google_play_services_notification_ticker">Google Play Services-en errorea</string>
+    <string name="common_google_play_services_unsupported_text">%1$s aplikazioa ezin da erabili Google Play Services gabe, baina zure gailua ez da harekin bateragarria.</string>
+    <string name="common_google_play_services_update_button" msgid="6556509956452265614">Eguneratu</string>
+    <string name="common_google_play_services_update_text" msgid="9053896323427875356">%1$s ez da exekutatuko Google Play Services eguneratzen ez baduzu.</string>
+    <string name="common_google_play_services_update_title" msgid="6006316683626838685">Eguneratu Google Play Services</string>
+    <string name="common_google_play_services_updating_text">%1$s ez da exekutatuko Google Play Services gabe; zerbitzu hori eguneratzen ari da.</string>
+    <string name="common_google_play_services_wear_update_text">Google Play Services-en bertsio berria behar da. Berehala eguneratuko da automatikoki.</string>
+    <string name="common_open_on_phone">Ireki telefonoan</string>
+    <string name="common_signin_button_text">Hasi saioa</string>
+    <string name="common_signin_button_text_long">Hasi saioa Google-ko kontuarekin</string>
+</resources>

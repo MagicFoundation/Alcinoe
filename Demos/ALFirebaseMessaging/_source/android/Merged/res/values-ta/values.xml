@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="common_google_play_services_unknown_issue">Google Play சேவைகளில் சிக்கல் ஏற்பட்டதால், %1$s ஆப்ஸை அணுக முடியவில்லை. மீண்டும் முயலவும்.</string>
+    <string name="common_google_play_services_enable_button" msgid="2523291102206661146">இயக்கு</string>
+    <string name="common_google_play_services_enable_text" msgid="227660514972886228">Google Play சேவைகளை இயக்கினால் மட்டுமே, %1$s செயல்படும்.</string>
+    <string name="common_google_play_services_enable_title" msgid="5122002158466380389">Google Play சேவைகளை இயக்கவும்</string>
+    <string name="common_google_play_services_install_button" msgid="7153882981874058840">நிறுவு</string>
+    <string name="common_google_play_services_install_text">Google Play சேவைகள் இருந்தால் மட்டுமே, %1$s இயங்கும். அவை உங்கள் சாதனத்தில் இல்லை.</string>
+    <string name="common_google_play_services_install_title" msgid="7215213145546190223">Google Play சேவைகளைப் பெறவும்</string>
+    <string name="common_google_play_services_notification_channel_name">கிடைக்கும் Google Play சேவைகள்</string>
+    <string name="common_google_play_services_notification_ticker">Google Play சேவைகள் பிழை</string>
+    <string name="common_google_play_services_unsupported_text">Google Play சேவைகள் இருந்தால் மட்டுமே %1$s ஆப்ஸ் இயங்கும். ஆனால், உங்கள் சாதனத்தில் அவை ஆதரிக்கப்படவில்லை.</string>
+    <string name="common_google_play_services_update_button" msgid="6556509956452265614">புதுப்பி</string>
+    <string name="common_google_play_services_update_text" msgid="9053896323427875356">Google Play சேவைகளை இயக்கினால் மட்டுமே, %1$s செயல்படும்.</string>
+    <string name="common_google_play_services_update_title" msgid="6006316683626838685">Google Play சேவைகளைப் புதுப்பிக்கவும்</string>
+    <string name="common_google_play_services_updating_text">தற்போது புதுப்பிக்கப்படும், Google Play சேவைகள் இருந்தால் மட்டுமே, %1$s செயல்படும்.</string>
+    <string name="common_google_play_services_wear_update_text">Google Play சேவைகளின் புதிய பதிப்பு தேவை. அது விரைவில் தானாகவே புதுப்பிக்கப்படும்.</string>
+    <string name="common_open_on_phone">மொபைலில் திற</string>
+    <string name="common_signin_button_text">உள்நுழைக</string>
+    <string name="common_signin_button_text_long">Google மூலம் உள்நுழைக</string>
+</resources>

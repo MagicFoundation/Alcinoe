@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="common_google_play_services_unknown_issue">%1$s har problemer med Google Play-tjenester. Prøv på nytt.</string>
+    <string name="common_google_play_services_enable_button" msgid="2523291102206661146">Aktivér</string>
+    <string name="common_google_play_services_enable_text" msgid="227660514972886228">%1$s fungerer ikke med mindre du slår på Google Play-tjenester.</string>
+    <string name="common_google_play_services_enable_title" msgid="5122002158466380389">Slå på Google Play-tjenester</string>
+    <string name="common_google_play_services_install_button" msgid="7153882981874058840">Installer</string>
+    <string name="common_google_play_services_install_text">%1$s kan ikke kjøre uten Google Play-tjenester, som ikke er installert på enheten din.</string>
+    <string name="common_google_play_services_install_title" msgid="7215213145546190223">Installer Google Play-tjenester</string>
+    <string name="common_google_play_services_notification_channel_name">Google Play Tjenester-tilgjengelighet</string>
+    <string name="common_google_play_services_notification_ticker">Google Play Tjenester-feil</string>
+    <string name="common_google_play_services_unsupported_text">%1$s kan ikke kjøre uten Google Play-tjenester, som ikke støttes av enheten din.</string>
+    <string name="common_google_play_services_update_button" msgid="6556509956452265614">Oppdater</string>
+    <string name="common_google_play_services_update_text" msgid="9053896323427875356">%1$s kjører ikke med mindre du oppdaterer Google Play Tjenester.</string>
+    <string name="common_google_play_services_update_title" msgid="6006316683626838685">Oppdater Google Play-tjenester</string>
+    <string name="common_google_play_services_updating_text">%1$s kjører ikke uten Google Play-tjenester, som oppdateres akkurat nå.</string>
+    <string name="common_google_play_services_wear_update_text">Du må installere en ny versjon av Google Play-tjenester. Appen oppdateres automatisk om en kort stund.</string>
+    <string name="common_open_on_phone">Åpne på telefonen</string>
+    <string name="common_signin_button_text">Logg på</string>
+    <string name="common_signin_button_text_long">Logg på med Google</string>
+</resources>

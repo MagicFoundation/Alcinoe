@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="common_google_play_services_unknown_issue">%1$s ilovasini Google Play xizmatlariga ulab bo‘lmadi. Qaytadan urinib ko‘ring.</string>
+    <string name="common_google_play_services_enable_button" msgid="2523291102206661146">Yoqish</string>
+    <string name="common_google_play_services_enable_text" msgid="227660514972886228">Google Play xizmatlari yoqilmaguncha, %1$s ishlamaydi.</string>
+    <string name="common_google_play_services_enable_title" msgid="5122002158466380389">Google Play xizmatlarini yoqish</string>
+    <string name="common_google_play_services_install_button" msgid="7153882981874058840">O‘rnatish</string>
+    <string name="common_google_play_services_install_text">%1$s ishlashi uchun qurilmangizda Google Play xizmatlarini o‘rnatish lozim.</string>
+    <string name="common_google_play_services_install_title" msgid="7215213145546190223">Google Play xizmatlarini o‘rnatish</string>
+    <string name="common_google_play_services_notification_channel_name">Google Play xizmatlarining mavjudligi</string>
+    <string name="common_google_play_services_notification_ticker">Google Play xizmatlari xatosi</string>
+    <string name="common_google_play_services_unsupported_text">%1$s ilovasi Google Play xizmatlarisiz ishlamaydi, biroq qurilmangiz ularni qo‘llab-quvvatlamaydi.</string>
+    <string name="common_google_play_services_update_button" msgid="6556509956452265614">Yangilash</string>
+    <string name="common_google_play_services_update_text" msgid="9053896323427875356">Google Play xizmatlari yangilanmaguncha, %1$s ishga tushmaydi.</string>
+    <string name="common_google_play_services_update_title" msgid="6006316683626838685">Google Play xizmatlarini yangilash</string>
+    <string name="common_google_play_services_updating_text">%1$s ilovasining ishlashi uchun zarur Google Play xizmatlari hozirda yangilanmoqda.</string>
+    <string name="common_google_play_services_wear_update_text">Google Play xizmatlarining yangi versiyasi zarur. U o‘zini qisqa vaqt ichida yangilaydi.</string>
+    <string name="common_open_on_phone">Telefonda ochish</string>
+    <string name="common_signin_button_text">Kirish</string>
+    <string name="common_signin_button_text_long">Google orqali kirish</string>
+</resources>

@@ -28,22 +28,22 @@ Install Alcinoe
 ---------------
 
 If you don't plan to use any Alcinoe visual components at design time, then
-you don't need to install anything, just add <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Source">{alcinoe_rootdir}\Source</a> in the 
+you don't need to install anything, just add <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Source">{alcinoe}\Source</a> in the 
 search path of your project. 
 
 If you plan to use visual components at design time then you need to
 install the bpl. Launch Delphi and go in component > Install Packages... > and choose the 
-BPL located in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Lib/bpl/alcinoe/win32/sydney">{alcinoe_rootdir}\Lib\bpl\alcinoe\win32\sydney\Alcinoe_sydney.bpl</a> (if you are in delphi Sydney 
+BPL located in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Libraries/bpl/Alcinoe/Win32/Alexandria">{alcinoe}\Libraries\bpl\Alcinoe\Win32\Alexandria\AlcinoeAlexandria.bpl</a> (if you are in delphi Sydney 
 else choose the directory that correspond to your Delphi version). 
-You still need to add in your search path <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Source">{alcinoe_rootdir}\Source</a>  
+You still need to add in your search path <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Source">{alcinoe}\Source</a>  
   
 Alcinoe also improuve a little the original delphi source code. In this way you will need
-to go in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Sydney/10_4_2/">{alcinoe_rootdir}\Embarcadero\Sydney\10_4_2</a>
+to go in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Sydney/10_4_2/">{alcinoe}\Embarcadero\Sydney\10_4_2</a>
 and run <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Sydney/10_4_2/update.bat">update.bat</a> to retrieve and patch 
 the original delphi source code. The batch file assume that the original source code is located in 
 "c:\Program Files (x86)\Embarcadero\Studio\21.0\source\" and that you have GIT in your path. 
 You will need also to include in your project search path all subdirectories located in 
-<a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Sydney/10_4_2/">{alcinoe_rootdir}\Embarcadero\Sydney\10_4_2</a>.
+<a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Sydney/10_4_2/">{alcinoe}\Embarcadero\Sydney\10_4_2</a>.
 
 To finish more and more libraries use now Java 1.8 features (like webRTC, exoplayer, etc.). 
 In this way, we must do desugaring (Desugaring allows you to use these features on older 
@@ -52,8 +52,37 @@ With d8.bat (replacement of dx.bat), desugaring is turned on by default. So you 
 use most of the latest language changes while targeting older devices.
 Waiting that embarcadero swap to D8.bat, we must make DX.bat a "proxy" to D8.bat.
 For this just replace your original DX.bat (mine is located in c:\SDKs\android\build-tools\30.0.3\d8.bat)
-by the one located in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/D8Proxy/dx.bat">{alcinoe_rootdir}\Tools\D8Proxy\dx.bat</a>.
+by the one located in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/D8Proxy/dx.bat">{alcinoe}\Tools\D8Proxy\dx.bat</a>.
 more details here: <a href="https://quality.embarcadero.com/browse/RSP-24155">https://quality.embarcadero.com/browse/RSP-24155</a>
+
+
+AndroidMerger: Integrate AAR SDK in FMX Android app
+===================================================
+                                 
+An Android library, also called as Android Archive, includes 
+everything you need to build an app like source files, 
+resource files, manifest etc. This is the reason why AARs are 
+different from JARs. AARs can contain resource files as well 
+other than compiled byte code. 
+
+Adding such library to Delphi project is long and convoluted 
+process consisting of extracting resources from library, 
+manually adding them to Delphi deployment files, compiling 
+R.Java class, checking dependancies, etc.
+
+With AndroidMerger all of the above can now be done 
+automatically in a single command line. In brief AndroidMerger will:
+ 
+* Use graddle or internal implementation to list all dependencies.
+* Download libraries and dependancies from local or central maven repository.
+* Merge the resources of all AARs inside a single directory.
+* Merge the AndroidManifest files of all AARs inside AndroidManifest.template.xml.
+* Merge google-services.json in the resources of the project.
+* Create the R.jar with all resource IDs using aapt or aapt2.
+* Update the project file (*.dproj) to include all resources.
+* Generate the Delphi native bridge file from the Java libraries.
+
+<a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/AndroidMerger">{alcinoe}/Tools/AndroidMerger</a>
 
 
 Full opengl video player for FireMonkey
@@ -212,20 +241,26 @@ Confetti Falling Animation
 ALConfetti is a vanilla Delphi library for creating a configurable, high-performance confetti 
 falling animation.
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;"  />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
 
 
 Firebase cloud messaging
 ------------------------
 
-A cross-platform method of using Firebase Cloud Messaging (FCM) to receive push notifications
-Using FCM, you can notify a client app that new email or other data is available to sync. 
-You can send notification messages to drive user re-engagement and retention. For use cases 
-such as instant messaging, a message can transfer a payload of up to 4KB to a client app.
+Delphi implementation of the latest Firebase cloud messaging (FCM) with HTTP V1 protocol that will permit 
+you to send alert notification with image in Android and iOS. You can start exploring this feature 
+with the demo located at <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFirebaseMessaging">{alcinoe}\Demos\ALFirebaseMessaging</a>
+
+
+Google OAuth 2.0 Access Token
+-----------------------------
+
+Google APIs use the OAuth 2.0 protocol for authentication and authorization. You can use the function
+ALGenerateGoogleOAuth2AccessToken to generate an OAuth 2.0 Access Token.
 
 
 Android/iOS VKontakte/Facebook SDK login
-------------------------------
+----------------------------------------
 
 The VKontakte/Facebook SDK for Android enables people to sign into your app with VKontakte/Facebook Login. 
 When people log into your app with VKontakte/Facebook they can grant permissions to your app so 
@@ -374,11 +409,12 @@ To load and save from BSON :
 
 To parse an JSON document in Sax Mode :
 
-    MyJsonDoc.onParseText := procedure (Sender: TObject;
-                                        const Path: AnsiString;
-                                        const name: AnsiString;
-                                        const Args: array of const;
-                                        NodeSubType: TALJSONNodeSubType)
+    MyJsonDoc.onParseText := procedure(
+                               Sender: TObject;
+                               const Path: AnsiString;
+                               const name: AnsiString;
+                               const Args: array of const;
+                               NodeSubType: TALJSONNodeSubType)
       begin
         case NodeSubType of
           nstFloat: Writeln(Path + '=' + ALFloatToStr(Args[0].VExtended^, ALDefaultFormatSettings));
@@ -415,7 +451,7 @@ Example :
     begin
     
       //Create the ImageMagick Library
-      alCreateImageMagickLibrary({alcinoe_rootdir} + '\Lib\dll\imagemagick\win32\imagemagick', min(2, System.CPUCount){aThreadLimit});
+      alCreateImageMagickLibrary({alcinoe} + '\Libraries\dll\imagemagick\win32\imagemagick', min(2, System.CPUCount){aThreadLimit});
       try
       
         //create the wand pointer
@@ -470,10 +506,11 @@ Example :
     aMongoDBClient := TAlMongoDBClient.create;
     try
       aMongoDBClient.Connect('', 0);
-      aMongoDBClient.SelectData('test.exemple',
-                                '{fieldA:123}', // the query
-                                '{fieldA:1, fieldB:1}', // the return fields selector
-                                aJSONDoc.node);
+      aMongoDBClient.SelectData(
+        'test.exemple',
+        '{fieldA:123}', // the query
+        '{fieldA:1, fieldB:1}', // the return fields selector
+        aJSONDoc.node);
       aMongoDBClient.disconnect;
       for i := 0 to aJSONDoc.node.childnodes.count - 1 do
         with aJSONDoc.node.childnodes[i] do
@@ -489,17 +526,19 @@ Example with connection pool :
     try
     
       ::Thread1::
-      aMongoDBConnectionPoolClient.SelectData('test.example',
-                                              '{fieldA:123}', // the query
-                                              '{fieldA:1, fieldB:1}', // the return fields selector
-                                              aLocalVarJSONDOC.node);
-    
+      aMongoDBConnectionPoolClient.SelectData(
+        'test.example',
+        '{fieldA:123}', // the query
+        '{fieldA:1, fieldB:1}', // the return fields selector
+        aLocalVarJSONDOC.node);
+
       ::Thread2::
-      aMongoDBConnectionPoolClient.SelectData('test.example',
-                                              '{fieldA:999}', // the query
-                                              '{fieldA:1, fieldB:1}', // the return fields selector
-                                              aLocalVarJSONDOC.node);
-    
+      aMongoDBConnectionPoolClient.SelectData(
+        'test.example',
+        '{fieldA:999}', // the query
+        '{fieldA:1, fieldB:1}', // the return fields selector
+        aLocalVarJSONDOC.node);
+
     finally
       aMongoDBClient.free;
     end;

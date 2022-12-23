@@ -204,6 +204,7 @@
     <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     <Manifest_File>(None)</Manifest_File>
     <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
+    <Debugger_RunParams>-LocalMavenRepositoryDir=&#34;..\..\Libraries\jar\&#34; -Libraries=&#34;com.alcinoe:alcinoe-firebase-messaging:1.0.0&#34; -OutputDir=&#34;.\_Build\Sample\Merged\&#34; -DProj=&#34;_Build\Sample\Sample.dproj&#34; -AndroidManifest=&#34;_Build\Sample\AndroidManifest.template.xml&#34; -DProjNormalizer=&#34;..\DProjNormalizer\DProjNormalizer.exe&#34; -RJarSwapper=&#34;..\RJarSwapper\RJarSwapper.bat&#34; -UseGradle=true -GoogleServicesJson=&#34;_Build\Sample\google-services.json&#34;</Debugger_RunParams>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2)&#39;!=&#39;&#39;">
     <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>

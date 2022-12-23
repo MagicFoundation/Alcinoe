@@ -47,6 +47,7 @@ begin
 
       {$REGION 'Init LSourceStr'}
       var LSourceStr := ALGetStringFromFile(ansiString(LFiles[i]));
+      var LOriginalSourceStr := LSourceStr;
       {$ENDREGION}
 
       {$REGION 'skip unicode file'}
@@ -78,12 +79,14 @@ begin
       {$ENDREGION}
 
       {$REGION 'Save the file'}
-      if LCreateBackup then begin
-        if ALFileExists(ansiString(LFiles[i]) + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [ansiString(LFiles[i]) + '.bak']);
-        if not ALrenameFile(ansiString(LFiles[i]), ansiString(LFiles[i]) + '.bak') then raiseLastOsError;
+      if LOriginalSourceStr <> LSourceStr then begin
+        if LCreateBackup then begin
+          if ALFileExists(ansiString(LFiles[i]) + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [ansiString(LFiles[i]) + '.bak']);
+          if not ALrenameFile(ansiString(LFiles[i]), ansiString(LFiles[i]) + '.bak') then raiseLastOsError;
+        end;
+        ALSaveStringToFile(LSourceStr,ansiString(LFiles[i]));
+        Writeln('Updated '+ LFiles[i]);
       end;
-      ALSaveStringToFile(LSourceStr,ansiString(LFiles[i]));
-      Writeln('Updated '+ LFiles[i]);
       {$ENDREGION}
 
     end;

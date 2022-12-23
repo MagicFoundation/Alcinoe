@@ -21,7 +21,7 @@ automatically in a single command line. In brief AndroidMerger will:
 * Merge the AndroidManifest files of all AARs inside AndroidManifest.template.xml.
 * Merge google-services.json in the resources of the project.
 * Create the R.jar with all resource IDs using aapt or aapt2.
-* Update the project file (*.dproj) to include all resources.
+* Update the project file (.dproj) to include all resources.
 * Generate the Delphi native bridge file from the Java libraries.
    
 Merge the AndroidManifest file of all AARs
@@ -94,8 +94,8 @@ Example
     -UseGradle=true
 ```
  
-you can also check the ALFacebookLogin Demo and in particular the script:
-{Alcinoe}\Demos\ALFacebookLogin\_source\android\MergeLibraries.bat
+You can also check the ALFacebookLogin Demo and in particular the script:
+[{Alcinoe}\Demos\ALFacebookLogin\_source\android\MergeLibraries.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFacebookLogin/_source/android/MergeLibraries.bat)
 
 Note
 ----
@@ -146,4 +146,4 @@ ic_launcher.png, etc. Then include this dir in the -libraries path like :
 AndroidMerger.exe -Libraries="androidx.appcompat:appcompat:1.5.1;<mydir>" ...
 ```
 
-You can look the {Alcinoe}\Demos\ALFirebaseMessaging as an example
+You can look the [{Alcinoe}\Demos\ALFirebaseMessaging](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFirebaseMessaging) as example

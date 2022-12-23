@@ -61,6 +61,7 @@ of the comment node:
 Usage
 -----
 
+```
   AndroidMerger.exe
     -Libraries: Paths to libraries (aar, jar, directory, maven name). Separate paths with ';'.
     -DownloadDependencies: Download dependencies from local or central maven repository. Default true
@@ -76,10 +77,12 @@ Usage
     -UseGradle: Use Gradle build tool to retrieve the dependencies. default false
     -GenerateNativeBridgeFile: Generate in OutputDir the Delphi native bridge file from the Java libraries.
     -NoInteraction: Non-interactive mode.
+```
 
 Example
 -------
 
+```
   AndroidMerger.exe^
     -Libraries=com.facebook.android:facebook-android-sdk:15.1.0;c:\MyLibs\af-android.aar;c:\MyProject\Android\ToMerge^
     -LocalMavenRepositoryDir=c:\LocalMavenRepository\^
@@ -89,7 +92,8 @@ Example
     -DProjNormalizer=c:\Alcinoe\Tools\DeployProjNormalizer\DeployProjNormalizer.exe^
     -RJarSwapper=c:\Alcinoe\Tools\RJarSwapper\RJarSwapper.bat
     -UseGradle=true
-    
+```
+ 
 you can also check the ALFacebookLogin Demo and in particular the script:
 {Alcinoe}\Demos\ALFacebookLogin\_source\android\MergeLibraries.bat
 

@@ -137,7 +137,8 @@ begin
                                            RemoveEmptySubDirectory,
                                            fileNameMask,
                                            MinFileAge);
-                If result and RemoveEmptySubDirectory then RemoveDir(string(Directory) + LSR.Name);
+                If result and RemoveEmptySubDirectory then
+                  result := RemoveDir(string(Directory) + LSR.Name);
               end;
             end
             else If ((FileNameMask = '*') or
@@ -465,7 +466,8 @@ begin
                                             RemoveEmptySubDirectory,
                                             fileNameMask,
                                             MinFileAge);
-                If result and RemoveEmptySubDirectory then RemoveDir(Directory + LSR.Name);
+                If result and RemoveEmptySubDirectory then
+                  result := RemoveDir(Directory + LSR.Name);
               end;
             end
             else If ((FileNameMask = '*') or

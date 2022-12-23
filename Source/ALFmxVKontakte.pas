@@ -342,7 +342,7 @@ procedure TALVKontakteLogin.ActivityResultHandler(const Sender: TObject; const M
 begin
 
   {$IFDEF DEBUG}
-  allog('TALVKontakteLogin.ActivityResultHandler', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  allog('TALVKontakteLogin.ActivityResultHandler', TalLogType.VERBOSE);
   {$ENDIF}
 
   if M is TMessageResultNotification then begin
@@ -382,8 +382,7 @@ begin
   {$IFDEF DEBUG}
   allog('TALVKontakteLogin.TAuthCallback.onSuccess', 'UserID: ' + ALintToStrU(LUserID) +
                                                      ' - Email: ' + LEmail +
-                                                     ' - Token: ' + LTokenStr +
-                                                     ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.info);
+                                                     ' - Token: ' + LTokenStr, TalLogType.info);
   {$ENDIF}
 
   if assigned(fVKontakteLogin.fOnsuccess) then
@@ -396,8 +395,7 @@ procedure TALVKontakteLogin.TAuthCallback.onLoginFailed(errorCode: Integer);
 begin
 
   {$IFDEF DEBUG}
-  allog('TALVKontakteLogin.TAuthCallback.onError', 'ErrorCode: ' + ALIntToStrU(errorCode) +
-                                                   ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
+  allog('TALVKontakteLogin.TAuthCallback.onError', 'ErrorCode: ' + ALIntToStrU(errorCode), TalLogType.error);
   {$ENDIF}
 
   if errorCode = TJVKAuthCallback.javaclass.AUTH_CANCELED then begin
@@ -434,14 +432,12 @@ begin
   if (result <> nil) and (result.token <> nil) then
     allog('TALVKontakteLogin.TSdkDelegate.vkSdkAccessAuthorizationFinishedWithResult.onSuccess', 'UserID: ' + NSStrToStr(result.token.userId) +
                                                                                                  ' - Email: ' + NSStrToStr(result.token.Email) +
-                                                                                                 ' - Token: ' + NSStrToStr(result.token.accessToken) +
-                                                                                                 ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose)
+                                                                                                 ' - Token: ' + NSStrToStr(result.token.accessToken), TalLogType.verbose)
   else if (result <> nil) and (result.error <> nil) then
     allog('TALVKontakteLogin.TSdkDelegate.vkSdkAccessAuthorizationFinishedWithResult.onError', 'ErrorCode: ' + ALIntToStrU(result.error.code) +
-                                                                                               ' - ErrorDescription: ' + NSStrToStr(result.error.localizedDescription) +
-                                                                                               ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error)
+                                                                                               ' - ErrorDescription: ' + NSStrToStr(result.error.localizedDescription), TalLogType.error)
   else
-    allog('TALVKontakteLogin.TSdkDelegate.vkSdkAccessAuthorizationFinishedWithResult.onError', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
+    allog('TALVKontakteLogin.TSdkDelegate.vkSdkAccessAuthorizationFinishedWithResult.onError', TalLogType.error);
   {$ENDIF}
 
   if (result <> nil) and (result.token <> nil) then begin
@@ -466,7 +462,7 @@ end;
 procedure TALVKontakteLogin.TSdkDelegate.vkSdkUserAuthorizationFailed;
 begin
   {$IFDEF DEBUG}
-  allog('TALVKontakteLogin.TSdkDelegate.vkSdkUserAuthorizationFailed', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
+  allog('TALVKontakteLogin.TSdkDelegate.vkSdkUserAuthorizationFailed', TalLogType.error);
   {$ENDIF}
 end;
 
@@ -477,7 +473,7 @@ end;
 procedure TALVKontakteLogin.TSdkDelegate.vkSdkAuthorizationStateUpdatedWithResult(result: VKAuthorizationResult);
 begin
   {$IFDEF DEBUG}
-  allog('TALVKontakteLogin.TSdkDelegate.vkSdkAuthorizationStateUpdatedWithResult', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
+  allog('TALVKontakteLogin.TSdkDelegate.vkSdkAuthorizationStateUpdatedWithResult', TalLogType.error);
   {$ENDIF}
 end;
 
@@ -488,7 +484,7 @@ end;
 procedure TALVKontakteLogin.TSdkDelegate.vkSdkAccessTokenUpdated(newToken: VKAccessToken; oldToken: VKAccessToken);
 begin
   {$IFDEF DEBUG}
-  allog('TALVKontakteLogin.TSdkDelegate.vkSdkAccessTokenUpdated', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
+  allog('TALVKontakteLogin.TSdkDelegate.vkSdkAccessTokenUpdated', TalLogType.error);
   {$ENDIF}
 end;
 
@@ -498,7 +494,7 @@ end;
 procedure TALVKontakteLogin.TSdkDelegate.vkSdkTokenHasExpired(expiredToken: VKAccessToken);
 begin
   {$IFDEF DEBUG}
-  allog('TALVKontakteLogin.TSdkDelegate.vkSdkTokenHasExpired', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
+  allog('TALVKontakteLogin.TSdkDelegate.vkSdkTokenHasExpired', TalLogType.error);
   {$ENDIF}
 end;
 
@@ -516,7 +512,7 @@ procedure TALVKontakteLogin.TSdkUIDelegate.vkSdkShouldPresentViewController(cont
 var LWindow: UIWindow;
 begin
   {$IFDEF DEBUG}
-  allog('TALVKontakteLogin.TSdkUIDelegate.vkSdkShouldPresentViewController', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
+  allog('TALVKontakteLogin.TSdkUIDelegate.vkSdkShouldPresentViewController', TalLogType.error);
   {$ENDIF}
   LWindow := SharedApplication.keyWindow;
   if (LWindow <> nil) and (LWindow.rootViewController <> nil) then
@@ -532,7 +528,7 @@ end;
 procedure TALVKontakteLogin.TSdkUIDelegate.vkSdkNeedCaptchaEnter(captchaError: VKError);
 begin
   {$IFDEF DEBUG}
-  allog('TALVKontakteLogin.TSdkUIDelegate.vkSdkNeedCaptchaEnter', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
+  allog('TALVKontakteLogin.TSdkUIDelegate.vkSdkNeedCaptchaEnter', TalLogType.error);
   {$ENDIF}
 end;
 
@@ -541,7 +537,7 @@ end;
 procedure TALVKontakteLogin.TSdkUIDelegate.vkSdkWillDismissViewController(controller: UIViewController);
 begin
   {$IFDEF DEBUG}
-  allog('TALVKontakteLogin.TSdkUIDelegate.vkSdkWillDismissViewController', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
+  allog('TALVKontakteLogin.TSdkUIDelegate.vkSdkWillDismissViewController', TalLogType.error);
   {$ENDIF}
 end;
 
@@ -550,7 +546,7 @@ end;
 procedure TALVKontakteLogin.TSdkUIDelegate.vkSdkDidDismissViewController(controller: UIViewController);
 begin
   {$IFDEF DEBUG}
-  allog('TALVKontakteLogin.TSdkUIDelegate.vkSdkDidDismissViewController', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
+  allog('TALVKontakteLogin.TSdkUIDelegate.vkSdkDidDismissViewController', TalLogType.error);
   {$ENDIF}
 end;
 

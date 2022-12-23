@@ -531,11 +531,9 @@ begin
   {$IF defined(DEBUG)}
   if event <> nil then ALLog('TALAndroidEditText.TALKeyPreImeListener.onKeyPreIme', 'control.name: ' + FEditText.FEditControl.parent.Name +
                                                                                     ' - keyCode: ' + inttostr(keyCode) +
-                                                                                    ' - event: ' + JstringToString(event.toString) +
-                                                                                    ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE)
+                                                                                    ' - event: ' + JstringToString(event.toString), TalLogType.VERBOSE)
   else ALLog('TALAndroidEditText.TALKeyPreImeListener.onKeyPreIme', 'control.name: ' + FEditText.FEditControl.parent.Name +
-                                                                    ' - keyCode: ' + inttostr(keyCode) +
-                                                                    ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+                                                                    ' - keyCode: ' + inttostr(keyCode), TalLogType.VERBOSE);
   {$ENDIF}
   if ((event = nil) or (event.getAction = AKEY_EVENT_ACTION_UP)) and
      (keyCode = AKEYCODE_BACK) then begin
@@ -559,8 +557,7 @@ procedure TALAndroidEditText.TALTextWatcher.afterTextChanged(s: JEditable);
 begin
 
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidEditText.TALTextWatcher.afterTextChanged', 'control.name: ' + FEditText.FEditControl.parent.Name +
-                                                              ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  ALLog('TALAndroidEditText.TALTextWatcher.afterTextChanged', 'control.name: ' + FEditText.FEditControl.parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
 
   if assigned(FEditText.fEditControl.fOnChangeTracking) then
@@ -594,11 +591,9 @@ begin
   {$IF defined(DEBUG)}
    if event <> nil then ALLog('TALAndroidEditText.TALEditorActionListener.onEditorAction', 'control.name: ' + FEditText.FEditControl.parent.Name +
                                                                                            ' - actionId: ' + inttostr(actionId) +
-                                                                                           ' - event: ' + JstringToString(event.toString) +
-                                                                                           ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE)
+                                                                                           ' - event: ' + JstringToString(event.toString), TalLogType.VERBOSE)
    else ALLog('TALAndroidEditText.TALEditorActionListener.onEditorAction', 'control.name: ' + FEditText.FEditControl.parent.Name +
-                                                                           ' - actionId: ' + inttostr(actionId) +
-                                                                           ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+                                                                           ' - actionId: ' + inttostr(actionId), TalLogType.VERBOSE);
   {$ENDIF}
   //IME_ACTION_DONE: the action key performs a "done" operation, typically meaning there is nothing more to input and the IME will be closed.
   //IME_ACTION_GO: the action key performs a "go" operation to take the user to the target of the text they typed. Typically used, for example, when entering a URL.
@@ -1276,16 +1271,14 @@ end;
 procedure TalAndroidEdit.DoEnter;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TalAndroidEdit.DoEnter', 'control.name: ' + parent.Name +
-                                  ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  ALLog('TalAndroidEdit.DoEnter', 'control.name: ' + parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
   inherited DoEnter;
   FEditText.SetFocus;
   if IsFocused then begin
     ALVirtualKeyboardVisible := True;
     {$IF defined(DEBUG)}
-    ALLog('TalAndroidEdit.showVirtualKeyboard', 'control.name: ' + parent.Name +
-                                                ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+    ALLog('TalAndroidEdit.showVirtualKeyboard', 'control.name: ' + parent.Name, TalLogType.VERBOSE);
     {$ENDIF}
     MainActivity.getVirtualKeyboard.showFor(FEditText.View);
   end;
@@ -1295,8 +1288,7 @@ end;
 procedure TalAndroidEdit.DoExit;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TalAndroidEdit.DoExit', 'control.name: ' + parent.Name +
-                                 ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  ALLog('TalAndroidEdit.DoExit', 'control.name: ' + parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
   inherited DoExit;
   FEditText.ResetFocus;
@@ -1305,7 +1297,7 @@ begin
   begin
     If not ALVirtualKeyboardVisible then begin
       {$IF defined(DEBUG)}
-      ALLog('TalAndroidEdit.hideVirtualKeyboard', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+      ALLog('TalAndroidEdit.hideVirtualKeyboard', TalLogType.VERBOSE);
       {$ENDIF}
       MainActivity.getVirtualKeyboard.hide;
     end;
@@ -1372,8 +1364,7 @@ end;
 procedure TALIosTextField.ControlEventEditingChanged;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosTextField.ControlEventEditingChanged', 'control.name: ' + fEditControl.parent.Name +
-                                                      ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  ALLog('TALIosTextField.ControlEventEditingChanged', 'control.name: ' + fEditControl.parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
   if assigned(fEditControl.fOnChangeTracking) then
     fEditControl.fOnChangeTracking(fEditControl);
@@ -1383,8 +1374,7 @@ end;
 procedure TALIosTextField.ControlEventEditingDidEnd;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosTextField.ControlEventEditingDidEnd', 'control.name: ' + fEditControl.parent.Name +
-                                                     ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  ALLog('TALIosTextField.ControlEventEditingDidEnd', 'control.name: ' + fEditControl.parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
   if assigned(fEditControl.fOnChangeTracking) then
     fEditControl.fOnChangeTracking(fEditControl);  // << when we change the word via the sugestion (clicking on the selection) then ControlEventEditingChanged is not fired
@@ -1419,8 +1409,7 @@ var LText: NSString;
 begin
   {$IF defined(DEBUG)}
   ALLog('TALIosTextFieldDelegate.textField', 'control.name: ' + FTextField.fEditControl.parent.Name +
-                                             ' - replacementString: ' + NSStrToStr(replacementString) +
-                                             ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+                                             ' - replacementString: ' + NSStrToStr(replacementString), TalLogType.VERBOSE);
   {$ENDIF}
   if FTextField.FEditControl.maxLength > 0 then begin
 
@@ -1437,8 +1426,7 @@ end;
 procedure TALIosTextFieldDelegate.textFieldDidBeginEditing(textField: UITextField);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosTextFieldDelegate.textFieldDidBeginEditing', 'control.name: ' + FTextField.fEditControl.parent.Name +
-                                                            ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  ALLog('TALIosTextFieldDelegate.textFieldDidBeginEditing', 'control.name: ' + FTextField.fEditControl.parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
   if not FTextField.Control.IsFocused then
     FTextField.Control.SetFocus;
@@ -1471,8 +1459,7 @@ end;
 function TALIosTextFieldDelegate.textFieldShouldReturn(textField: UITextField): Boolean;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosTextFieldDelegate.textFieldShouldReturn', 'control.name: ' + FTextField.FEditControl.parent.Name +
-                                                         ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  ALLog('TALIosTextFieldDelegate.textFieldShouldReturn', 'control.name: ' + FTextField.FEditControl.parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
   FTextField.ControlEventEditingDidEnd;
   if assigned(FTextField.fEditControl.fOnReturnKey) then begin
@@ -1902,8 +1889,7 @@ end;
 procedure TalIosEdit.DoEnter;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TalIosEdit.DoEnter', 'control.name: ' + parent.Name +
-                              ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  ALLog('TalIosEdit.DoEnter', 'control.name: ' + parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
   inherited DoEnter;
   FTextField.SetFocus;
@@ -1913,8 +1899,7 @@ end;
 procedure TalIosEdit.DoExit;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TalIosEdit.DoExit', 'control.name: ' + parent.Name +
-                             ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  ALLog('TalIosEdit.DoExit', 'control.name: ' + parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
   inherited DoExit;
   FTextField.ResetFocus;

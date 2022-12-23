@@ -7073,7 +7073,7 @@ end;
 function ALExcludeTrailingPathDelimiter(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString;
 begin
   Result := S;
-  if ALIsPathDelimiter(Result, Length(Result), PathDelimiter) then
+  while ALIsPathDelimiter(Result, Length(Result), PathDelimiter) do
     SetLength(Result, Length(Result)-1);
 end;
 
@@ -7142,7 +7142,7 @@ end;
 function ALExcludeTrailingPathDelimiterU(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String;
 begin
   Result := S;
-  if ALIsPathDelimiterU(Result, Length(Result), PathDelimiter) then
+  While ALIsPathDelimiterU(Result, Length(Result), PathDelimiter) do
     SetLength(Result, Length(Result)-1);
 end;
 

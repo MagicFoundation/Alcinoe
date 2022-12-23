@@ -313,6 +313,19 @@ function ALRSA256Sign(const aData: AnsiString; // bytes string
 
 
 ////////////////////
+////// OAuth2 //////
+////////////////////
+
+{$IF defined(MSWINDOWS)}
+function ALGenerateGoogleOAuth2AccessToken(
+           const aServiceAccountEmail: ansiString;
+           const aScope: ansiString;
+           const aPrivateKey: ansiString): AnsiString;
+{$ENDIF}
+
+
+
+////////////////////
 ////// WINAPI //////
 ////////////////////
 
@@ -531,7 +544,11 @@ uses
   {$IF defined(MSWINDOWS)}
   winapi.MMSystem,
   System.SysConst,
-  system.Threading,
+  System.Threading,
+  System.DateUtils,
+  AlWinHTTPClient,
+  ALJsonDoc,
+  ALHTML,
   {$IFEND}
   system.Math,
   ALFiles,
@@ -5894,6 +5911,116 @@ end;
 
 
 
+////////////////////
+////// OAuth2 //////
+////////////////////
+
+{**********************}
+{$IF defined(MSWINDOWS)}
+var
+  _GoogleOAuth2AccessTokens: TALNVStringList;
+{$ENDIF}
+
+{**********************}
+{$IF defined(MSWINDOWS)}
+function ALGenerateGoogleOAuth2AccessToken(
+           const aServiceAccountEmail: ansiString;
+           const aScope: ansiString;
+           const aPrivateKey: ansiString): AnsiString;
+begin
+
+  //lock the access
+  TMonitor.Enter(_GoogleOAuth2AccessTokens);
+  Try
+
+    var LTokensListKey := aServiceAccountEmail + #30{record separator} + aScope;
+    Var I := _GoogleOAuth2AccessTokens.IndexOfName(LTokensListKey);
+    if I >= 0 then begin
+      if UnixToDateTime({$IF defined(WIN64)}int64{$ELSE}integer{$ENDIF}(_GoogleOAuth2AccessTokens.Objects[i])) > ALUTCNow then begin
+        result := _GoogleOAuth2AccessTokens.ValueFromIndex[i];
+        Exit;
+      end;
+      _GoogleOAuth2AccessTokens.Delete(i);
+    end;
+
+    //Using OAuth 2.0 for Server to Server Applications
+    //https://developers.google.com/identity/protocols/oauth2/service-account#httprest
+
+    //Forming the JWT header
+    var LJWT := ansiString('eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9'); // Base64url representation of {"alg":"RS256","typ":"JWT"}
+
+    //Forming the JWT claim set
+    var LNow := ALUtcNow;
+    var LJWTclaim := '{'+
+                       '"iss":"'+ALJavascriptEncode(aServiceAccountEmail)+'",'+ // The email address of the service account
+                       '"scope":"'+ALJavascriptEncode(aScope)+'",'+ // A space-delimited list of the permissions that the application requests.
+                       '"aud":"https://oauth2.googleapis.com/token",'+ // A descriptor of the intended target of the assertion. When making an access token request this value is always https://oauth2.googleapis.com/token.
+                       '"exp":'+ALIntToStr(DateTimeToUnix(IncHour(LNow,1)))+','+ // The expiration time of the assertion, specified as seconds since 00:00:00 UTC, January 1, 1970. This value has a maximum of 1 hour after the issued time.
+                       '"iat":'+ALIntToStr(DateTimeToUnix(LNow))+ // The time the assertion was issued, specified as seconds since 00:00:00 UTC, January 1, 1970.
+                     '}';
+    LJWT := LJWT + '.' + ALURLBase64EncodeString(LJWTclaim);
+
+    //Computing the signature
+    LJWT := LJWT + '.' + ALURLBase64EncodeString(ALRSA256Sign(LJWT,aPrivateKey));
+
+    //Making the access token request
+    var LWinHttpClient := TAlWinHTTPClient.Create;
+    var LRequestFields := TALStringList.Create;
+    var LJsonDoc := TalJsonDocument.Create;
+    try
+
+      //init the aWinHttpClient
+      with LWinHttpClient do begin
+        AccessType := wHttpAt_NO_PROXY;
+        InternetOptions := [TAlWinHttpClientInternetOption(wHttpIo_Keep_connection), TAlWinHttpClientInternetOption(wHttpIo_SECURE)];
+        ConnectTimeout := 60000;
+        SendTimeout := 60000;
+        ReceiveTimeout := 60000;
+      end;
+
+      //init LRequestFields
+      LRequestFields.AddNameValue('grant_type', 'urn:ietf:params:oauth:grant-type:jwt-bearer');
+      LRequestFields.AddNameValue('assertion', LJWT);
+
+      //Renew the token
+      var S1 := LWinHttpClient.PostUrlEncoded('https://oauth2.googleapis.com/token', LRequestFields);
+
+      //Handling the response
+      //{
+      //  "access_token": "1/8xbJqaOZXSUZbHLl5EOtu1pxz3fmmetKx9W8CV4t79M",
+      //  "scope": "https://www.googleapis.com/auth/prediction"
+      //  "token_type": "Bearer",
+      //  "expires_in": 3600
+      //}
+      LJsonDoc.LoadFromJSONString(S1);
+      Result := LJsonDoc.GetChildNodeValueText('access_token', '');
+      if result = '' then
+        raise Exception.Create('Error 8CBF4FB7-7878-4225-A26D-14369A49081A');
+
+      //update _GoogleOAuth2AccessTokens
+      _GoogleOAuth2AccessTokens.AddNameValueObject(
+        LTokensListKey,
+        result,
+        pointer(
+          {$IF defined(WIN64)}int64{$ELSE}integer{$ENDIF}(
+            DateTimeToUnix(
+              IncSecond(ALUtcNow, LJsonDoc.GetChildNodeValueInt32('expires_in', 0) div 2)))));
+
+    finally
+      alfreeAndNil(LJsonDoc);
+      alFreeAndNil(LWinHttpClient);
+      alFreeAndNil(LRequestFields);
+    end;
+
+  finally
+    TMonitor.Exit(_GoogleOAuth2AccessTokens);
+  end;
+
+end;
+{$ENDIF}
+
+
+
 //////////////////
 ////// Init //////
 //////////////////
@@ -6024,9 +6151,19 @@ begin
 
   {$ENDIF ALCPUXASM}
 
+  {$IF defined(MSWINDOWS)}
+  _GoogleOAuth2AccessTokens := TALNVStringList.Create;
+  _GoogleOAuth2AccessTokens.NameValueSeparator := #31; // Unit separator
+  _GoogleOAuth2AccessTokens.Duplicates := DupError;
+  _GoogleOAuth2AccessTokens.Sorted := True;
+  {$ENDIF}
+
 end;
 
 initialization
   _InitCipher;
+
+finalization
+  AlFreeAndNil(_GoogleOAuth2AccessTokens);
 
 end.

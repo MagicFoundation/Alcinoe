@@ -696,7 +696,7 @@ var LNativeWin: JWindow;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.Start', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALWebRTC.Start', TalLogType.verbose);
   {$ENDIF}
 
   {$REGION ' ANDROID'}
@@ -742,7 +742,7 @@ var LNativeWin: JWindow;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.Stop', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALWebRTC.Stop', TalLogType.verbose);
   {$ENDIF}
 
   {$REGION ' ANDROID'}
@@ -1065,11 +1065,13 @@ procedure TALWebRTC.TAndroidWebRTCListener.onLocalFrameAvailable(textureId: inte
 begin
 
   {$IFDEF DEBUG}
-  //allog('TALWebRTC.TAndroidWebRTCListener.onLocalFrameAvailable','textureId: ' + alinttostrU(textureId) +
-  //                                                               ' - width: ' + alinttostrU(width) +
-  //                                                               ' - height: ' + alinttostrU(height) +
-  //                                                               ' - rotation: ' + alinttostrU(rotation) +
-  //                                                               ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  //allog(
+  //  'TALWebRTC.TAndroidWebRTCListener.onLocalFrameAvailable',
+  //  'textureId: ' + alinttostrU(textureId) +
+  //  ' - width: ' + alinttostrU(width) +
+  //  ' - height: ' + alinttostrU(height) +
+  //  ' - rotation: ' + alinttostrU(rotation),
+  //  TalLogType.VERBOSE);
   {$ENDIF}
 
   TALTextureAccessPrivate(fWebRTC.fLocalBitmap).FHandle := textureId;
@@ -1086,11 +1088,13 @@ procedure TALWebRTC.TAndroidWebRTCListener.onRemoteFrameAvailable(textureId: int
 begin
 
   {$IFDEF DEBUG}
-  //allog('TALWebRTC.TAndroidWebRTCListener.onRemoteFrameAvailable','textureId: ' + alinttostrU(textureId) +
-  //                                                                ' - width: ' + alinttostrU(width) +
-  //                                                                ' - height: ' + alinttostrU(height) +
-  //                                                                ' - rotation: ' + alinttostrU(rotation) +
-  //                                                                ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  //allog(
+  //  'TALWebRTC.TAndroidWebRTCListener.onRemoteFrameAvailable',
+  //  'textureId: ' + alinttostrU(textureId) +
+  //  ' - width: ' + alinttostrU(width) +
+  //  ' - height: ' + alinttostrU(height) +
+  //  ' - rotation: ' + alinttostrU(rotation),
+  //  TalLogType.VERBOSE);
   {$ENDIF}
 
   TALTextureAccessPrivate(fWebRTC.fRemoteBitmap).FHandle := textureId;
@@ -1108,8 +1112,7 @@ var LSDPType: TALWebRTCSDPType;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TAndroidWebRTCListener.onLocalDescription','sdp.description: ' + JstringToString(sdp.description) +
-                                                              ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  allog('TALWebRTC.TAndroidWebRTCListener.onLocalDescription','sdp.description: ' + JstringToString(sdp.description), TalLogType.VERBOSE);
   {$ENDIF}
 
   if assigned(fWebRTC.fonLocalDescriptionEvent) then begin
@@ -1130,8 +1133,7 @@ begin
   allog('TALWebRTC.TAndroidWebRTCListener.onIceCandidate','candidate.sdpMLineIndex: ' + ALinttostrU(candidate.sdpMLineIndex) +
                                                           ' - candidate.sdpMid: ' + JstringToString(candidate.sdpMid) +
                                                           ' - candidate.serverUrl: ' + JstringToString(candidate.serverUrl) +
-                                                          ' - candidate.sdp: ' + JstringToString(candidate.sdp) +
-                                                          ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+                                                          ' - candidate.sdp: ' + JstringToString(candidate.sdp), TalLogType.VERBOSE);
   {$ENDIF}
 
   if assigned(fWebRTC.fonIceCandidateEvent) then
@@ -1150,7 +1152,7 @@ var LIceCandidates: TALWebRTCIceCandidates;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TAndroidWebRTCListener.onIceCandidatesRemoved','ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  allog('TALWebRTC.TAndroidWebRTCListener.onIceCandidatesRemoved', TalLogType.VERBOSE);
   {$ENDIF}
 
   if assigned(fWebRTC.fonIceCandidatesRemovedEvent) then begin
@@ -1172,8 +1174,7 @@ var LState: TALWebRTCIceConnectionState;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TAndroidWebRTCListener.onIceConnectionChange','newState: ' + JstringToString(newState.toString) +
-                                                                 ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  allog('TALWebRTC.TAndroidWebRTCListener.onIceConnectionChange','newState: ' + JstringToString(newState.toString), TalLogType.VERBOSE);
   {$ENDIF}
 
   if assigned(fWebRTC.fonIceConnectionChangeEvent) then begin
@@ -1195,9 +1196,7 @@ procedure TALWebRTC.TAndroidWebRTCListener.onError(code: Integer; description: J
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TAndroidWebRTCListener.onError','code: ' + ALinttoStrU(code) +
-                                                   ' - description: ' + JstringToString(description) +
-                                                   ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
+  allog('TALWebRTC.TAndroidWebRTCListener.onError','code: ' + ALinttoStrU(code) + ' - description: ' + JstringToString(description), TalLogType.error);
   {$ENDIF}
 
   if assigned(fWebRTC.fOnErrorEvent) then
@@ -1231,7 +1230,7 @@ Var LWebRTCConfig: RTCAudioSessionConfiguration;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALiOSWebRTC.Create', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALiOSWebRTC.Create', TalLogType.verbose);
   {$ENDIF}
 
   FreeOnTerminate := True;
@@ -1280,7 +1279,7 @@ destructor TALiOSWebRTC.Destroy;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALiOSWebRTC.Destroy', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALiOSWebRTC.Destroy', TalLogType.verbose);
   {$ENDIF}
 
   if not terminated then begin
@@ -1335,9 +1334,7 @@ begin
     Except
       on E: Exception do begin
         {$IFDEF DEBUG}
-        allog('TALiOSWebRTC.Execute.Error','code: 0' +
-                                           ' - description: ' + e.Message +
-                                           ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
+        allog('TALiOSWebRTC.Execute.Error','code: 0 - description: ' + e.Message , TalLogType.error);
         {$ENDIF}
         TThread.Synchronize(nil,
           procedure
@@ -1898,10 +1895,8 @@ var LErrorStr: String;
 begin
 
   {$IFDEF DEBUG}
-  if (error <> nil) then allog('TALWebRTC.CreateSessionDescriptionCompletionHandler', 'Failed to create session description. Error: ' + NSStrToStr(error.localizedDescription) +
-                                                                                      ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error)
-  else allog('TALWebRTC.CreateSessionDescriptionCompletionHandler', 'Session description successfully created' +
-                                                                    ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  if (error <> nil) then allog('TALWebRTC.CreateSessionDescriptionCompletionHandler', 'Failed to create session description. Error: ' + NSStrToStr(error.localizedDescription), TalLogType.error)
+  else allog('TALWebRTC.CreateSessionDescriptionCompletionHandler', 'Session description successfully created', TalLogType.verbose);
   {$ENDIF}
 
   //check if error
@@ -1954,8 +1949,7 @@ var LSDPType: TALWebRTCSDPType;
 begin
 
   {$IFDEF DEBUG}
-  if (error <> nil) then allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Failed to set session description. Error: ' + NSStrToStr(error.localizedDescription) +
-                                                                                   ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
+  if (error <> nil) then allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Failed to set session description. Error: ' + NSStrToStr(error.localizedDescription), TalLogType.error);
   {$ENDIF}
 
   //check if error
@@ -1980,9 +1974,7 @@ begin
 
       // We've just set our local SDP so time to send it.
       {$IFDEF DEBUG}
-      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Local SDP set succesfully' +
-                                                                ' - sdp.description: ' + NSStrToStr(fLocalSdp.sdp) +
-                                                                ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Local SDP set succesfully - sdp.description: ' + NSStrToStr(fLocalSdp.sdp), TalLogType.verbose);
       {$ENDIF}
 
       if fLocalSdp.&type = RTCSdpTypeOffer then LSDPType := TALWebRTCSDPType.OFFER
@@ -2009,8 +2001,7 @@ begin
       // We've just set remote description, so drain remote
       // and send local ICE candidates.
       {$IFDEF DEBUG}
-      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Remote SDP set succesfully' +
-                                                                ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Remote SDP set succesfully', TalLogType.verbose);
       {$ENDIF}
 
       Enqueue(
@@ -2031,9 +2022,7 @@ begin
       // We've just set our local SDP so time to send it, drain
       // remote and send local ICE candidates.
       {$IFDEF DEBUG}
-      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Local SDP set succesfully' +
-                                                                ' - sdp.description: ' + NsStrToStr(fLocalSdp.sdp) +
-                                                                ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Local SDP set succesfully - sdp.description: ' + NsStrToStr(fLocalSdp.sdp), TalLogType.verbose);
       {$ENDIF}
 
       if fLocalSdp.&type = RTCSdpTypeOffer then LSDPType := TALWebRTCSDPType.OFFER
@@ -2066,8 +2055,7 @@ begin
       // We've just set remote SDP - do nothing for now -
       // answer will be created soon.
       {$IFDEF DEBUG}
-      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Remote SDP set succesfully' +
-                                                                ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Remote SDP set succesfully', TalLogType.verbose);
       {$ENDIF}
 
     end;
@@ -2187,7 +2175,7 @@ end;
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidChangeSignalingState(peerConnection: RTCPeerConnection; didChangeSignalingState: RTCSignalingState);
 begin
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidChangeSignalingState', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidChangeSignalingState', TalLogType.verbose);
   {$ENDIF}
 end;
 
@@ -2195,7 +2183,7 @@ end;
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidAddStream(peerConnection: RTCPeerConnection; didAddStream: RTCMediaStream);
 begin
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidAddStream', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidAddStream', TalLogType.verbose);
   {$ENDIF}
 end;
 
@@ -2203,7 +2191,7 @@ end;
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidRemoveStream(peerConnection: RTCPeerConnection; didRemoveStream: RTCMediaStream);
 begin
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidRemoveStream', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidRemoveStream', TalLogType.verbose);
   {$ENDIF}
 end;
 
@@ -2212,7 +2200,7 @@ procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionShouldNegotiate(pee
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionShouldNegotiate', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionShouldNegotiate', TalLogType.verbose);
   {$ENDIF}
 
   // No need to do anything; AppRTC follows a pre-agreed-upon
@@ -2226,7 +2214,7 @@ var LState: TALWebRTCIceConnectionState;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidChangeIceConnectionState', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidChangeIceConnectionState', TalLogType.verbose);
   {$ENDIF}
 
   if didChangeIceConnectionState = RTCIceConnectionStateCONNECTED then LState := TALWebRTCIceConnectionState.CONNECTED
@@ -2253,7 +2241,7 @@ end;
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidChangeIceGatheringState(peerConnection: RTCPeerConnection; didChangeIceGatheringState: RTCIceGatheringState);
 begin
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidChangeIceGatheringState', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidChangeIceGatheringState', TalLogType.verbose);
   {$ENDIF}
 end;
 
@@ -2263,7 +2251,7 @@ var LWebRTCIceCandidate: TALWebRTCIceCandidate;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidGenerateIceCandidate', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidGenerateIceCandidate', TalLogType.verbose);
   {$ENDIF}
 
   LWebRTCIceCandidate := TALWebRTCIceCandidate.Create(
@@ -2289,7 +2277,7 @@ var LWebRTCIceCandidates: TALWebRTCIceCandidates;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidRemoveIceCandidates', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidRemoveIceCandidates', TalLogType.verbose);
   {$ENDIF}
 
   setlength(LWebRTCIceCandidates, didRemoveIceCandidates.count);
@@ -2315,7 +2303,7 @@ end;
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidOpenDataChannel(peerConnection: RTCPeerConnection; didOpenDataChannel: RTCDataChannel);
 begin
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidOpenDataChannel', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidOpenDataChannel', TalLogType.verbose);
   {$ENDIF}
 end;
 
@@ -2323,7 +2311,7 @@ end;
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidStartReceivingOnTransceiver(peerConnection: RTCPeerConnection; didStartReceivingOnTransceiver: RTCRtpTransceiver);
 begin
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidStartReceivingOnTransceiver', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidStartReceivingOnTransceiver', TalLogType.verbose);
   {$ENDIF}
 end;
 
@@ -2331,7 +2319,7 @@ end;
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidAddReceiverStreams(peerConnection: RTCPeerConnection; didAddReceiver: RTCRtpReceiver; streams: NSArray);
 begin
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidAddReceiverStreams', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidAddReceiverStreams', TalLogType.verbose);
   {$ENDIF}
 end;
 
@@ -2339,7 +2327,7 @@ end;
 procedure TALiOSWebRTC.TPeerConnectionDelegate.peerConnectionDidRemoveReceiver(peerConnection: RTCPeerConnection; didRemoveReceiver: RTCRtpReceiver);
 begin
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidRemoveReceiver', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALWebRTC.TPeerConnectionDelegate.peerConnectionDidRemoveReceiver', TalLogType.verbose);
   {$ENDIF}
 end;
 
@@ -2354,7 +2342,7 @@ end;
 procedure TALiOSWebRTC.TLocalVideoTrackRenderer.setSize(size: CGSize);
 begin
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TLocalVideoTrackRenderer.setSize', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALWebRTC.TLocalVideoTrackRenderer.setSize', TalLogType.verbose);
   {$ENDIF}
 end;
 
@@ -2363,7 +2351,7 @@ procedure TALiOSWebRTC.TLocalVideoTrackRenderer.renderFrame(frame: RTCVideoFrame
 begin
 
   {$IFDEF DEBUG}
-  //allog('TALWebRTC.TLocalVideoTrackRenderer.renderFrame', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  //allog('TALWebRTC.TLocalVideoTrackRenderer.renderFrame', TalLogType.verbose);
   {$ENDIF}
 
   TThread.synchronize(nil,
@@ -2563,7 +2551,7 @@ procedure TALiOSWebRTC.TRemoteVideoTrackRenderer.setSize(size: CGSize);
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TRemoteVideoTrackRenderer.setSize', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  allog('TALWebRTC.TRemoteVideoTrackRenderer.setSize', TalLogType.verbose);
   {$ENDIF}
 
 end;
@@ -2573,7 +2561,7 @@ procedure TALiOSWebRTC.TRemoteVideoTrackRenderer.renderFrame(frame: RTCVideoFram
 begin
 
   {$IFDEF DEBUG}
-  //allog('TALWebRTC.TRemoteVideoTrackRenderer.renderFrame', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  //allog('TALWebRTC.TRemoteVideoTrackRenderer.renderFrame', TalLogType.verbose);
   {$ENDIF}
 
   //-----

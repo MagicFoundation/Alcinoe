@@ -1121,8 +1121,7 @@ end;
 procedure TALIosMemo.DoEnter;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosMemo.DoEnter', 'control.name: ' + parent.Name +
-                              ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  ALLog('TALIosMemo.DoEnter', 'control.name: ' + parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
   inherited DoEnter;
   FTextView.SetFocus;
@@ -1132,8 +1131,7 @@ end;
 procedure TALIosMemo.DoExit;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosMemo.DoExit', 'control.name: ' + parent.Name +
-                             ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  ALLog('TALIosMemo.DoExit', 'control.name: ' + parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
   inherited DoExit;
   FTextView.ResetFocus;

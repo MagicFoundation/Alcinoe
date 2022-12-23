@@ -41,6 +41,7 @@ const
   SE_MANAGE_VOLUME_NAME = 'SeManageVolumePrivilege';
 
 function AlGetEnvironmentString: AnsiString;
+function AlGetEnvironmentStringU: String;
 function ALWinExec(const aCommandLine: AnsiString;
                    const aCurrentDirectory: AnsiString;
                    const aEnvironment: AnsiString;
@@ -117,6 +118,34 @@ begin
 
   finally
     FreeEnvironmentStringsA(P);
+  end;
+end;
+
+{***************************************}
+Function AlGetEnvironmentStringU: String;
+var P, Q : PChar;
+    I : Integer;
+begin
+  P := PChar(GetEnvironmentStringsW);
+  try
+
+    I := 0;
+    Q := P;
+    if Q^ <> #0 then begin
+      Repeat
+        While Q^ <> #0 do begin
+         Inc(Q);
+         Inc(I);
+        end;
+        Inc(Q);
+        Inc(I);
+      Until Q^ = #0;
+    end;
+    SetLength(Result, I);
+    if I > 0 then ALMove(P^, Pointer(Result)^, I*sizeof(char));
+
+  finally
+    FreeEnvironmentStringsW(P);
   end;
 end;
 
@@ -409,7 +438,7 @@ begin
                              aVisibility);
 end;
 
-{*************************************************}
+{*********************************************}
 function ALWinExecU(const aCommandLine: String;
                     const aCurrentDirectory: String;
                     const aEnvironment: String;
@@ -522,7 +551,7 @@ begin
                            @LSecurityAttributes, // pointer to process security attributes
                            NiL,                  // pointer to thread security attributes
                            TrUE,                 // handle inheritance flag
-                           CREATE_NO_WINDOW,     // creation flags
+                           CREATE_NO_WINDOW or CREATE_UNICODE_ENVIRONMENT, // creation flags
                            LPEnvironment,        // pointer to new environment block
                            LPCurrentDirectory,   // pointer to current directory name
                            LStartupInfo,         // pointer to STARTUPINFO

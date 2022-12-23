@@ -318,8 +318,7 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALAndroidFocusChangedListener.onFocusChange', 'control.parent.name: ' + self.view.Control.parent.Name + // control is TALAndroidEdit and Control.parent is TalEdit
                                                         ' - hasFocus: ' + ALBoolToStrU(hasFocus) +
-                                                        ' - control.IsFocused: ' + ALBoolToStrU(self.View.Control.IsFocused) +
-                                                        ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+                                                        ' - control.IsFocused: ' + ALBoolToStrU(self.View.Control.IsFocused), TalLogType.VERBOSE);
   {$ENDIF}
 
   // Since view can get focus without us, we synchronize native focus and fmx focus. For example, when user makes a tap

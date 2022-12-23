@@ -178,8 +178,7 @@ begin
   //allog('TALDatePickerDialog.TDatePickerDialogListener.onClick','which: ' + alinttostrU(which) +
   //                                                              ' - year: ' + alinttostrU(year) +
   //                                                              ' - month: ' + alinttostrU(month) +
-  //                                                              ' - dayOfMonth: ' + alinttostrU(dayOfMonth) +
-  //                                                              ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  //                                                              ' - dayOfMonth: ' + alinttostrU(dayOfMonth), TalLogType.VERBOSE);
   {$ENDIF}
 
   if assigned(fDatePickerDialog.fOnClose) then begin

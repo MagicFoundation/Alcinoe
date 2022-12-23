@@ -394,7 +394,7 @@ procedure TALChoreographerThread.TChoreographerFrameCallback.doFrame(frameTimeNa
 begin
 
   {$IFDEF DEBUG}
-  //ALLog('TALChoreographerThread.TChoreographerFrameCallback.doFrame', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  //ALLog('TALChoreographerThread.TChoreographerFrameCallback.doFrame', TalLogType.verbose);
   {$ENDIF}
 
   if assigned(fChoreographerThread.FTimerEvent) then
@@ -454,7 +454,7 @@ procedure TALDisplayLinkThread.TDisplayLinkListener.displayLinkUpdated;
 begin
 
   {$IFDEF DEBUG}
-  //ALLog('TALDisplayLinkThread.TDisplayLinkListener.displayLinkUpdated', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  //ALLog('TALDisplayLinkThread.TDisplayLinkListener.displayLinkUpdated', TalLogType.verbose);
   {$ENDIF}
 
   if assigned(fDisplayLinkThread.FTimerEvent) then
@@ -565,7 +565,7 @@ begin
                                                      // so if it's was not called for more than 0.04 seconds (0.016*2 + 0.016/2)
                                                      // then call it again
     {$IFDEF DEBUG}
-    ALLog('TALAniThread.WakeUpTimer', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.warn);
+    ALLog('TALAniThread.WakeUpTimer', TalLogType.warn);
     {$ENDIF}
     DoSyncTimer(nil);
   end;

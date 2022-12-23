@@ -1315,11 +1315,8 @@ Var buffer: AnsiString;
 
       if (notSaxMode) then begin
         if not assigned(WorkingNode) then ALXmlDocError(CALXmlParseError);
-        if (WorkingNode.NodeType <> ntdocument) then begin  // ntdocument can not have any text node, so simply skip whiteSpace comment (else error)
-          If UseContainerNodeInsteadOfAddingChildNode then ALXmlDocError(CALXmlParseError); // because if not we need to delete and recreate the container node and this can cause trouble in the calling function
-          WorkingNode.ChildNodes.Add(CreateNode(Str1, ntText, ''));
-        end
-        else if (ALTrim(Str1) <> '') then ALXmlDocError(CALXmlParseError);
+        If UseContainerNodeInsteadOfAddingChildNode then ALXmlDocError(CALXmlParseError); // because if not we need to delete and recreate the container node and this can cause trouble in the calling function
+        WorkingNode.ChildNodes.Add(CreateNode(Str1, ntText, ''));
       end;
 
       DoParseText(GetPathStr, Str1);
@@ -1682,7 +1679,17 @@ end;
  *Value is the set of options to assign.}
 procedure TALXMLDocument.SetOptions(const Value: TALXMLDocOptions);
 begin
+  var FPrevOptions := FOptions;
   FOptions := Value;
+  if (doNodeAutoIndent in FOptions) and
+     (not (doNodeAutoIndent in FPrevOptions)) and
+     (Active) and
+     (Node.ChildNodes.Count = 2) and
+     (Node.ChildNodes[0] = GetPrologNode) and
+     (Node.ChildNodes[1] = GetDocumentElement) then begin
+    Node.ChildNodes.Add(
+      Node.ChildNodes.Extract(1));
+  end;
 end;
 
 {**********************************************}
@@ -2495,9 +2502,6 @@ begin
         end;
 
       CurrentParentNode := CurrentNode.ParentNode;
-      If assigned(CurrentParentNode) and
-         (CurrentParentNode.nodeType = ntDocument) and
-         (CurrentNode.nodeType <> ntelement) then WriteStr2Buffer(#13#10);
     end;
 
     {Write the buffer}
@@ -3233,7 +3237,7 @@ begin
     For I:=0 to LNodeList.Count - 1 do
       If LNodeList[I].NodeType = ntelement then alXmlDocError(CalXMLOnlyOneTopLevelError);
 
-  If Not (Node.NodeType in [ntelement, ntProcessingInstr, ntComment, ntDocType]) then ALXmlDocError(CALXMLParameterIsIncorrect);
+  If Not (Node.NodeType in [ntelement, ntProcessingInstr, ntComment, nttext, ntDocType]) then ALXmlDocError(CALXMLParameterIsIncorrect);
 
   inherited;
 end;
@@ -3540,6 +3544,7 @@ procedure TALXMLNodeList.Insert(Index: Integer; const Node: TALXMLNode);
       IndentNode: TALXMLNode;
       IndentStr: AnsiString;
   begin
+    IndentStr := '';
     for I := 1 to Len do IndentStr := IndentStr + Owner.OwnerDocument.NodeIndentStr;
     if Break then IndentStr := SLineBreak + IndentStr;
     with Owner do
@@ -3551,20 +3556,27 @@ var TrailIndent, NewIndex: Integer;
 
 begin
   { Determine if we should add do formatting here }
-  if Assigned(Owner.ParentNode) and
-     Assigned(Owner.OwnerDocument) and
+  if Assigned(Owner.OwnerDocument) and
      (doNodeAutoIndent in Owner.OwnerDocument.Options) and
      (not (Node.NodeType in [ntText, ntAttribute])) then
   begin
-    { Insert formatting before the node }
-    if Count = 0 then InsertFormattingNode(Owner.ParentNode.NestingLevel, -1);
-    if Index = -1 then InsertFormattingNode(1, -1, False);
-    { Insert the actual node }
-    NewIndex := InternalInsert(Index, Node);
-    { Insert formatting after the node }
-    if Index = -1 then TrailIndent := Owner.ParentNode.NestingLevel
-    else TrailIndent := Owner.NestingLevel;
-    InsertFormattingNode(TrailIndent, NewIndex + 1)
+    if Assigned(Owner.ParentNode) then begin
+      { Insert formatting before the node }
+      if Count = 0 then InsertFormattingNode(Owner.ParentNode.NestingLevel, -1);
+      if Index = -1 then InsertFormattingNode(1, -1, False);
+      { Insert the actual node }
+      NewIndex := InternalInsert(Index, Node);
+      { Insert formatting after the node }
+      if Index = -1 then TrailIndent := Owner.ParentNode.NestingLevel
+      else TrailIndent := Owner.NestingLevel;
+      InsertFormattingNode(TrailIndent, NewIndex + 1)
+    end
+    else begin
+      { Insert formatting before the node }
+      if (Count > 0) and (Index = -1) then InsertFormattingNode(0, -1);
+      { Insert the actual node }
+      InternalInsert(Index, Node);
+    end;
   end
   else InternalInsert(Index, Node);
 end;

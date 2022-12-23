@@ -488,7 +488,7 @@ procedure TALFacebookLogin.ActivityResultHandler(const Sender: TObject; const M:
 begin
 
   {$IFDEF DEBUG}
-  allog('TALFacebookLogin.ActivityResultHandler', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
+  allog('TALFacebookLogin.ActivityResultHandler', TalLogType.VERBOSE);
   {$ENDIF}
 
   if M is TMessageResultNotification then begin
@@ -514,7 +514,7 @@ procedure TALFacebookLogin.TLoginCallback.onCancel;
 begin
 
   {$IFDEF DEBUG}
-  allog('TALFacebookLogin.TLoginCallback.onCancel', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.warn);
+  allog('TALFacebookLogin.TLoginCallback.onCancel', TalLogType.warn);
   {$ENDIF}
 
   if assigned(fFacebookLogin.fOnCancel) then
@@ -532,8 +532,7 @@ begin
   if error <> nil then LErrorMsg := JStringToString(error.toString)
   else LErrorMsg := '';
   {$IFDEF DEBUG}
-  allog('TALFacebookLogin.TLoginCallback.onError', 'Error: ' + LErrorMsg +
-                                                   ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
+  allog('TALFacebookLogin.TLoginCallback.onError', 'Error: ' + LErrorMsg, TalLogType.error);
   {$ENDIF}
 
   if assigned(fFacebookLogin.fOnError) then
@@ -572,8 +571,7 @@ begin
   end;
   {$IFDEF DEBUG}
   allog('TALFacebookLogin.TLoginCallback.onSuccess', 'UserID: ' + LUserIDStr +
-                                                     ' - Token: ' + LTokenStr +
-                                                     ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.info);
+                                                     ' - Token: ' + LTokenStr, TalLogType.info);
   {$ENDIF}
 
   if assigned(fFacebookLogin.fOnsuccess) then
@@ -600,9 +598,8 @@ begin
   if (error <> nil) or (result = nil) then begin
 
     {$IFDEF DEBUG}
-    if error <> nil then allog('TALFacebookLogin.logInWithReadPermissionsHandler.onError', NSStrToStr(error.localizedDescription) +
-                                                                                           ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error)
-    else allog('TALFacebookLogin.logInWithReadPermissionsHandler.onError', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
+    if error <> nil then allog('TALFacebookLogin.logInWithReadPermissionsHandler.onError', NSStrToStr(error.localizedDescription), TalLogType.error)
+    else allog('TALFacebookLogin.logInWithReadPermissionsHandler.onError', TalLogType.error);
     {$ENDIF}
 
     if assigned(fOnError) then begin
@@ -616,7 +613,7 @@ begin
   else if result.isCancelled then begin
 
     {$IFDEF DEBUG}
-    allog('TALFacebookLogin.logInWithReadPermissionsHandler.onCancel', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.warn);
+    allog('TALFacebookLogin.logInWithReadPermissionsHandler.onCancel', TalLogType.warn);
     {$ENDIF}
 
     if assigned(fOnCancel) then
@@ -642,9 +639,7 @@ begin
     end;
 
     {$IFDEF DEBUG}
-    allog('TALFacebookLogin.logInWithReadPermissionsHandler.onSuccess', 'UserID: ' + LUserIDStr +
-                                                                        ' - Token: ' + LTokenStr +
-                                                                        ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.info);
+    allog('TALFacebookLogin.logInWithReadPermissionsHandler.onSuccess', 'UserID: ' + LUserIDStr + ' - Token: ' + LTokenStr, TalLogType.info);
     {$ENDIF}
 
     if assigned(fOnsuccess) then
@@ -813,8 +808,7 @@ begin
   {$IFDEF DEBUG}
   allog('TALFacebookGraphRequest.TGraphRequestCallback.onCompleted', 'response: ' + LRawResponse +
                                                                      ' - ErrorCode: ' + alinttoStrU(LErrorCode) +
-                                                                     ' - ErrorMsg: ' + LErrorMsg +
-                                                                     ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+                                                                     ' - ErrorMsg: ' + LErrorMsg, TalLogType.verbose);
   {$ENDIF}
 
   if assigned(fFacebookGraphRequest.fOnCompleted) then
@@ -860,8 +854,7 @@ begin
   {$IFDEF DEBUG}
   allog('TALFacebookGraphRequest.TGraphRequestCallback.onCompleted', 'response: ' + LRawResponse +
                                                                      ' - ErrorCode: ' + alinttoStrU(LErrorCode) +
-                                                                     ' - ErrorMsg: ' + LErrorMsg +
-                                                                     ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+                                                                     ' - ErrorMsg: ' + LErrorMsg, TalLogType.verbose);
   {$ENDIF}
 
   if assigned(fOnCompleted) then

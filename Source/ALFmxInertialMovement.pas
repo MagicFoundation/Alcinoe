@@ -375,7 +375,7 @@ end;
 procedure TALAniCalculations.TChoreographerFrameCallback.doFrame(frameTimeNanos: Int64);
 begin
   {$IFDEF DEBUG}
-  //ALLog('TALAniCalculations.TChoreographerFrameCallback.doFrame', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  //ALLog('TALAniCalculations.TChoreographerFrameCallback.doFrame', TalLogType.verbose);
   {$ENDIF}
   fAniCalculations.Calculate;
   if fAniCalculations.FTimerActive then
@@ -1038,7 +1038,7 @@ begin
   InitPlatformTimer;
   if FPlatformTimer.GetTick - FlastTickCalc > 0.04 then begin
     {$IFDEF DEBUG}
-    ALLog('TALAniCalculations.WakeUpTimer', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.warn);
+    ALLog('TALAniCalculations.WakeUpTimer', TalLogType.warn);
     {$ENDIF}
     Calculate;
   end;

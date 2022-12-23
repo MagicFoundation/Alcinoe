@@ -45,12 +45,9 @@ contains
   ALFmxInertialMovement in 'ALFmxInertialMovement.pas',
   ALFmxEdit in 'ALFmxEdit.pas',
   ALCommon in 'ALCommon.pas',
-  ALFmxTypes3D in 'ALFmxTypes3D.pas',
   ALStringList in 'ALStringList.pas',
   ALString in 'ALString.pas',
   ALQuickSortList in 'ALQuickSortList.pas',
-  ALMime in 'ALMime.pas',
-  ALCipher in 'ALCipher.pas',
   ALAVLBinaryTree in 'ALAVLBinaryTree.pas',
   ALFmxVideoPlayer in 'ALFmxVideoPlayer.pas',
   ALFmxMemo in 'ALFmxMemo.pas',
@@ -58,11 +55,6 @@ contains
   ALFmxFilterEffects in 'ALFmxFilterEffects.pas',
   ALFmxAni in 'ALFmxAni.pas',
   ALFmxConfetti in 'ALFmxConfetti.pas',
-  ALFiles in 'ALFiles.pas',
   ALFmxBreakText in 'ALFmxBreakText.pas';
 
 end.
-
-
-
-

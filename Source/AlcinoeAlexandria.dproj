@@ -235,9 +235,7 @@
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
     <DCCReference Include="ALAVLBinaryTree.pas"/>
-    <DCCReference Include="ALCipher.pas"/>
     <DCCReference Include="ALCommon.pas"/>
-    <DCCReference Include="ALFiles.pas"/>
     <DCCReference Include="ALFmxAni.pas"/>
     <DCCReference Include="ALFmxBreakText.pas"/>
     <DCCReference Include="ALFmxCommon.pas"/>
@@ -252,9 +250,7 @@
     <DCCReference Include="ALFmxObjects.pas"/>
     <DCCReference Include="ALFmxStdCtrls.pas"/>
     <DCCReference Include="ALFmxTabControl.pas"/>
-    <DCCReference Include="ALFmxTypes3D.pas"/>
     <DCCReference Include="ALFmxVideoPlayer.pas"/>
-    <DCCReference Include="ALMime.pas"/>
     <DCCReference Include="ALQuickSortList.pas"/>
     <DCCReference Include="ALString.pas"/>
     <DCCReference Include="ALStringList.pas"/>

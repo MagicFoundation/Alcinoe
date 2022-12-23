@@ -15,7 +15,8 @@ uses
   system.Generics.Collections,
   system.SyncObjs,
   system.sysutils,
-  system.types;
+  system.types,
+  System.UITypes;
 
 type
 
@@ -492,7 +493,8 @@ function ALGetCallStackCustomLogsU(Const aPrependTimeStamp: boolean = True; Cons
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 Type TalLogType = (VERBOSE, DEBUG, INFO, WARN, ERROR, ASSERT);
-procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO);
+procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO); overload;
+procedure ALLog(Const Tag: String; const _type: TalLogType = TalLogType.INFO); overload;
 Var ALEnqueueLog: Boolean; // We can use this flag to enqueue the log when the device just started and when we didn't yet
 procedure ALPrintLogQueue; // pluged the device to the monitoring tool, so that we can print the log a little later
 
@@ -551,6 +553,40 @@ function ALUnixMsToDateTime(const aValue: Int64): TDateTime;
 function ALDateTimeToUnixMs(const aValue: TDateTime): Int64;
 Function ALInc(var x: integer; Count: integer): Integer;
 var ALMove: procedure (const Source; var Dest; Count: NativeInt);
+{$IFDEF MSWINDOWS}
+type
+  TALConsoleColor = (
+    ccRed,
+    ccDarkRed,
+    ccBlue,
+    ccDarkBlue,
+    ccGreen,
+    ccDarkGreen,
+    ccYellow,
+    ccDarkYellow,
+    ccAqua,
+    ccDarkAqua,
+    ccPurple,
+    ccDarkPurple,
+    ccGrey,
+    ccBlack,
+    ccWhite,
+    ccDarkWhite);
+
+function ALConsoleForegroundColorToCode(const AColor : TALConsoleColor): Word;
+function ALConsoleBackgroundColorToCode(const AColor : TALConsoleColor): Word;
+function ALConsoleCodeToForegroundColor(const ACode : Word): TALConsoleColor;
+function ALConsoleCodeToBackgroundColor(const ACode : Word): TALConsoleColor;
+procedure ALGetConsoleColors(out AForegroundColor: TALConsoleColor; out ABackgroundColor: TALConsoleColor);
+procedure ALSetConsoleColors(const AForegroundColor: TALConsoleColor; const ABackgroundColor: TALConsoleColor);
+Procedure ALWriteLN(const AStr: AnsiString); overload;
+Procedure ALWriteLN(const AStr: AnsiString; const aForegroundColor: TALConsoleColor); overload;
+Procedure ALWriteLN(const AStr: AnsiString; const aForegroundColor: TALConsoleColor; const aBackgroundColor: TALConsoleColor); overload;
+Procedure ALWriteLN(const AStr: String); overload;
+Procedure ALWriteLN(const AStr: String; const aForegroundColor: TALConsoleColor); overload;
+Procedure ALWriteLN(const AStr: String; const aForegroundColor: TALConsoleColor; const aBackgroundColor: TALConsoleColor); overload;
+{$ENDIF}
+
 
 {~~~}
 const
@@ -1048,19 +1084,21 @@ type
     Tag: String;
     msg: String;
     _type: TalLogType;
+    ThreadID: TThreadID;
   public
-    class function Create(const ATag: String; const AMsg: String; Const aType: TalLogType): _TALLogQueueItem; static; inline;
+    class function Create(const ATag: String; const AMsg: String; Const aType: TalLogType; Const aThreadID: TThreadID): _TALLogQueueItem; static; inline;
   end;
 
 var
   _ALLogQueue: TList<_TALLogQueueItem>;
 
-{************************************************************************************************************************}
-class function _TALLogQueueItem.Create(const ATag: String; const AMsg: String; Const aType: TalLogType): _TALLogQueueItem;
+{****************************************************************************************************************************************************}
+class function _TALLogQueueItem.Create(const ATag: String; const AMsg: String; Const aType: TalLogType; Const aThreadID: TThreadID): _TALLogQueueItem;
 begin
   Result.Tag := aTag;
   Result.Msg := aMsg;
   Result._Type := aType;
+  Result.ThreadID := aThreadID;
 end;
 
 {***********************************************}
@@ -2350,18 +2388,8 @@ begin
   Result := ALTrimU(Result);
 end;
 
-{***********************************************************************************************}
-procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO);
-{$IF defined(MSWINDOWS)}
-var
-  LMsg: String;
-{$ENDIF}
-{$IF defined(IOS)}
-var
-  LMsg: String;
-  LMsgPart: String;
-  P: integer;
-{$ENDIF}
+{*********************************************************************************************************}
+procedure _ALLog(Const Tag: String; Const msg: String; const _type: TalLogType; const ThreadID: TThreadID);
 begin
   if ALEnqueueLog then begin
     Tmonitor.Enter(_ALLogQueue);
@@ -2370,41 +2398,51 @@ begin
         _TALLogQueueItem.Create(
           Tag, // const ATag: String;
           Msg, // const AMsg: String;
-          _Type)); // Const aType: TalLogType
+          _Type, // Const aType: TalLogType
+          ThreadID));
     finally
       Tmonitor.Exit(_ALLogQueue);
     end;
   end
   else begin
     {$IF defined(ANDROID)}
+    var LMsg: String;
+    if Msg <> '' then LMsg := msg
+    else LMsg := '<empty>';
+    if ThreadID <> MainThreadID then LMsg := '['+alinttostrU(ThreadID)+'] ' + LMsg;
     case _type of
-      TalLogType.VERBOSE: TJLog.JavaClass.v(StringToJString(Tag), StringToJString(msg));
-      TalLogType.DEBUG: TJLog.JavaClass.d(StringToJString(Tag), StringToJString(msg));
-      TalLogType.INFO: TJLog.JavaClass.i(StringToJString(Tag), StringToJString(msg));
-      TalLogType.WARN: TJLog.JavaClass.w(StringToJString(Tag), StringToJString(msg));
-      TalLogType.ERROR: TJLog.JavaClass.e(StringToJString(Tag), StringToJString(msg));
-      TalLogType.ASSERT: TJLog.JavaClass.wtf(StringToJString(Tag), StringToJString(msg)); // << wtf for What a Terrible Failure but everyone know that it's for what the fuck !
+      TalLogType.VERBOSE: TJLog.JavaClass.v(StringToJString(Tag), StringToJString(LMsg));
+      TalLogType.DEBUG: TJLog.JavaClass.d(StringToJString(Tag), StringToJString(LMsg));
+      TalLogType.INFO: TJLog.JavaClass.i(StringToJString(Tag), StringToJString(LMsg));
+      TalLogType.WARN: TJLog.JavaClass.w(StringToJString(Tag), StringToJString(LMsg));
+      TalLogType.ERROR: TJLog.JavaClass.e(StringToJString(Tag), StringToJString(LMsg));
+      TalLogType.ASSERT: TJLog.JavaClass.wtf(StringToJString(Tag), StringToJString(LMsg)); // << wtf for What a Terrible Failure but everyone know that it's for what the fuck !
     end;
     {$ELSEIF defined(IOS)}
+    var LMsg: String;
     if msg <> '' then LMsg := Tag + ' => ' + msg
     else LMsg := Tag;
+    var LThreadID: String;
+    if ThreadID <> MainThreadID then LThreadID := '['+alinttostrU(ThreadID)+']'
+    else LThreadID := '';
     //On iOS NSLog is limited to 1024 Bytes so if the
     //message is > 1024 bytes split it
-    P := 1;
+    var P: integer := 1;
     while P <= length(LMsg) do begin
-      LMsgPart := ALcopyStrU(LMsg, P, 990); // to stay safe
-      inc(P, 990);
+      var LMsgPart := ALcopyStrU(LMsg, P, 950); // to stay safe
+      inc(P, 950);
       case _type of
-        TalLogType.VERBOSE: NSLog(StringToID('[V] ' + LMsgPart));
-        TalLogType.DEBUG:   NSLog(StringToID('[D][V] ' + LMsgPart));
-        TalLogType.INFO:    NSLog(StringToID('[I][D][V] ' + LMsgPart));
-        TalLogType.WARN:    NSLog(StringToID('[W][I][D][V] ' + LMsgPart));
-        TalLogType.ERROR:   NSLog(StringToID('[E][W][I][D][V] ' + LMsgPart));
-        TalLogType.ASSERT:  NSLog(StringToID('[A][E][W][I][D][V] ' + LMsgPart));
+        TalLogType.VERBOSE: NSLog(StringToID('[V]'+LThreadID+' ' + LMsgPart));
+        TalLogType.DEBUG:   NSLog(StringToID('[D][V]'+LThreadID+' ' + LMsgPart));
+        TalLogType.INFO:    NSLog(StringToID('[I][D][V]'+LThreadID+' ' + LMsgPart));
+        TalLogType.WARN:    NSLog(StringToID('[W][I][D][V]'+LThreadID+' ' + LMsgPart));
+        TalLogType.ERROR:   NSLog(StringToID('[E][W][I][D][V]'+LThreadID+' ' + LMsgPart));
+        TalLogType.ASSERT:  NSLog(StringToID('[A][E][W][I][D][V]'+LThreadID+' ' + LMsgPart));
       end;
     end;
     {$ELSEIF defined(MSWINDOWS)}
     if _type <> TalLogType.VERBOSE  then begin // because log on windows slow down the app so skip verbosity
+      var LMsg: String;
       if msg <> '' then LMsg := Tag + ' => ' + stringReplace(msg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
       else LMsg := Tag;
       case _type of
@@ -2420,6 +2458,18 @@ begin
   end;
 end;
 
+{***********************************************************************************************}
+procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO);
+begin
+  _ALLog(Tag, msg, _type, TThread.Current.ThreadID);
+end;
+
+{****************************************************************************}
+procedure ALLog(Const Tag: String; const _type: TalLogType = TalLogType.INFO);
+begin
+  _ALLog(Tag, '', _type, TThread.Current.ThreadID);
+end;
+
 {************************}
 procedure ALPrintLogQueue;
 var LOldEnqueueLogValue: Boolean;
@@ -2431,7 +2481,7 @@ begin
   try
     for I := 0 to _ALLogQueue.Count - 1 do
       with _ALLogQueue[i] do
-        ALLog(Tag, Msg, _type);
+        _ALLog(Tag, Msg, _type, ThreadID);
     _ALLogQueue.Clear;
   finally
     Tmonitor.Exit(_ALLogQueue);
@@ -2778,6 +2828,207 @@ begin
   result := MilliSecondsBetween(UnixDateDelta, aValue);
   if aValue < UnixDateDelta then result := -result;
 end;
+
+{****************}
+{$IFDEF MSWINDOWS}
+function ALConsoleForegroundColorToCode(const AColor : TALConsoleColor): Word;
+begin
+  case AColor of
+    TALConsoleColor.ccRed : Result := FOREGROUND_RED or FOREGROUND_INTENSITY;
+    TALConsoleColor.ccDarkRed : Result := FOREGROUND_RED;
+    TALConsoleColor.ccBlue : Result := FOREGROUND_BLUE or FOREGROUND_INTENSITY;
+    TALConsoleColor.ccDarkBlue : Result := FOREGROUND_BLUE;
+    TALConsoleColor.ccGreen : Result := FOREGROUND_GREEN or FOREGROUND_INTENSITY;
+    TALConsoleColor.ccDarkGreen : Result := FOREGROUND_GREEN;
+    TALConsoleColor.ccYellow : Result := FOREGROUND_GREEN or FOREGROUND_RED or FOREGROUND_INTENSITY;
+    TALConsoleColor.ccDarkYellow : Result := FOREGROUND_GREEN or FOREGROUND_RED;
+    TALConsoleColor.ccAqua : Result := FOREGROUND_GREEN or FOREGROUND_BLUE or FOREGROUND_INTENSITY;
+    TALConsoleColor.ccDarkAqua : Result := FOREGROUND_GREEN or FOREGROUND_BLUE;
+    TALConsoleColor.ccPurple : Result := FOREGROUND_BLUE or FOREGROUND_RED or FOREGROUND_INTENSITY;
+    TALConsoleColor.ccDarkPurple : Result := FOREGROUND_BLUE or FOREGROUND_RED;
+    TALConsoleColor.ccGrey : Result := FOREGROUND_INTENSITY;
+    TALConsoleColor.ccBlack : Result := 0;
+    TALConsoleColor.ccWhite : Result := FOREGROUND_BLUE or FOREGROUND_GREEN or FOREGROUND_RED or FOREGROUND_INTENSITY;
+    TALConsoleColor.ccDarkWhite : Result := FOREGROUND_BLUE or FOREGROUND_GREEN or FOREGROUND_RED;
+    else raise Exception.Create('Unknown color');
+  end;
+end;
+{$ENDIF}
+
+{****************}
+{$IFDEF MSWINDOWS}
+function ALConsoleBackgroundColorToCode(const AColor : TALConsoleColor): Word;
+begin
+  case AColor of
+    TALConsoleColor.ccRed : Result := BACKGROUND_RED or BACKGROUND_INTENSITY;
+    TALConsoleColor.ccDarkRed : Result := BACKGROUND_RED;
+    TALConsoleColor.ccBlue : Result := BACKGROUND_BLUE or BACKGROUND_INTENSITY;
+    TALConsoleColor.ccDarkBlue : Result := BACKGROUND_BLUE;
+    TALConsoleColor.ccGreen : Result := BACKGROUND_GREEN or BACKGROUND_INTENSITY;
+    TALConsoleColor.ccDarkGreen : Result := BACKGROUND_GREEN;
+    TALConsoleColor.ccYellow : Result := BACKGROUND_GREEN or BACKGROUND_RED or BACKGROUND_INTENSITY;
+    TALConsoleColor.ccDarkYellow : Result := BACKGROUND_GREEN or BACKGROUND_RED;
+    TALConsoleColor.ccAqua : Result := BACKGROUND_GREEN or BACKGROUND_BLUE or BACKGROUND_INTENSITY;
+    TALConsoleColor.ccDarkAqua : Result := BACKGROUND_GREEN or BACKGROUND_BLUE;
+    TALConsoleColor.ccPurple : Result := BACKGROUND_BLUE or BACKGROUND_RED or BACKGROUND_INTENSITY;
+    TALConsoleColor.ccDarkPurple : Result := BACKGROUND_BLUE or BACKGROUND_RED;
+    TALConsoleColor.ccGrey : Result := BACKGROUND_INTENSITY;
+    TALConsoleColor.ccBlack : Result := 0;
+    TALConsoleColor.ccWhite : Result := BACKGROUND_BLUE or BACKGROUND_GREEN or BACKGROUND_RED or BACKGROUND_INTENSITY;
+    TALConsoleColor.ccDarkWhite : Result := BACKGROUND_BLUE or BACKGROUND_GREEN or BACKGROUND_RED;
+    else raise Exception.Create('Unknown color');
+  end;
+end;
+{$ENDIF}
+
+{****************}
+{$IFDEF MSWINDOWS}
+function ALConsoleCodeToForegroundColor(const ACode : Word): TALConsoleColor;
+begin
+  case ACode of
+    FOREGROUND_RED or FOREGROUND_INTENSITY: Result := TALConsoleColor.ccRed;
+    FOREGROUND_RED: Result := TALConsoleColor.ccDarkRed;
+    FOREGROUND_BLUE or FOREGROUND_INTENSITY: Result := TALConsoleColor.ccBlue;
+    FOREGROUND_BLUE: Result := TALConsoleColor.ccDarkBlue;
+    FOREGROUND_GREEN or FOREGROUND_INTENSITY: Result := TALConsoleColor.ccGreen;
+    FOREGROUND_GREEN: Result := TALConsoleColor.ccDarkGreen;
+    FOREGROUND_GREEN or FOREGROUND_RED or FOREGROUND_INTENSITY: Result := TALConsoleColor.ccYellow;
+    FOREGROUND_GREEN or FOREGROUND_RED: Result := TALConsoleColor.ccDarkYellow;
+    FOREGROUND_GREEN or FOREGROUND_BLUE or FOREGROUND_INTENSITY: Result := TALConsoleColor.ccAqua;
+    FOREGROUND_GREEN or FOREGROUND_BLUE: Result := TALConsoleColor.ccDarkAqua;
+    FOREGROUND_BLUE or FOREGROUND_RED or FOREGROUND_INTENSITY: Result := TALConsoleColor.ccPurple;
+    FOREGROUND_BLUE or FOREGROUND_RED: Result := TALConsoleColor.ccDarkPurple;
+    FOREGROUND_INTENSITY: Result := TALConsoleColor.ccGrey;
+    0: Result := TALConsoleColor.ccBlack;
+    FOREGROUND_BLUE or FOREGROUND_GREEN or FOREGROUND_RED or FOREGROUND_INTENSITY: Result := TALConsoleColor.ccWhite;
+    FOREGROUND_BLUE or FOREGROUND_GREEN or FOREGROUND_RED: Result := TALConsoleColor.ccDarkWhite;
+    else raise Exception.Create('Unknown code');
+  end;
+end;
+{$ENDIF}
+
+{****************}
+{$IFDEF MSWINDOWS}
+function ALConsoleCodeToBackgroundColor(const ACode : Word): TALConsoleColor;
+begin
+  case ACode of
+    BACKGROUND_RED or BACKGROUND_INTENSITY: Result := TALConsoleColor.ccRed;
+    BACKGROUND_RED: Result := TALConsoleColor.ccDarkRed;
+    BACKGROUND_BLUE or BACKGROUND_INTENSITY: Result := TALConsoleColor.ccBlue;
+    BACKGROUND_BLUE: Result := TALConsoleColor.ccDarkBlue;
+    BACKGROUND_GREEN or BACKGROUND_INTENSITY: Result := TALConsoleColor.ccGreen;
+    BACKGROUND_GREEN: Result := TALConsoleColor.ccDarkGreen;
+    BACKGROUND_GREEN or BACKGROUND_RED or BACKGROUND_INTENSITY: Result := TALConsoleColor.ccYellow;
+    BACKGROUND_GREEN or BACKGROUND_RED: Result := TALConsoleColor.ccDarkYellow;
+    BACKGROUND_GREEN or BACKGROUND_BLUE or BACKGROUND_INTENSITY: Result := TALConsoleColor.ccAqua;
+    BACKGROUND_GREEN or BACKGROUND_BLUE: Result := TALConsoleColor.ccDarkAqua;
+    BACKGROUND_BLUE or BACKGROUND_RED or BACKGROUND_INTENSITY: Result := TALConsoleColor.ccPurple;
+    BACKGROUND_BLUE or BACKGROUND_RED: Result := TALConsoleColor.ccDarkPurple;
+    BACKGROUND_INTENSITY: Result := TALConsoleColor.ccGrey;
+    0: Result := TALConsoleColor.ccBlack;
+    BACKGROUND_BLUE or BACKGROUND_GREEN or BACKGROUND_RED or BACKGROUND_INTENSITY: Result := TALConsoleColor.ccWhite;
+    BACKGROUND_BLUE or BACKGROUND_GREEN or BACKGROUND_RED: Result := TALConsoleColor.ccDarkWhite;
+    else raise Exception.Create('Unknown code');
+  end;
+end;
+{$ENDIF}
+
+{****************}
+{$IFDEF MSWINDOWS}
+procedure ALGetConsoleColors(out AForegroundColor: TALConsoleColor; out ABackgroundColor: TALConsoleColor);
+var LConsoleInfo: _CONSOLE_SCREEN_BUFFER_INFO;
+    LStdOut: THandle;
+begin
+  LStdOut := GetStdHandle(STD_OUTPUT_HANDLE);
+  if LStdOut = INVALID_HANDLE_VALUE then RaiseLastOsError;
+  if GetConsoleScreenBufferInfo(LStdOut, LConsoleInfo) then begin
+    AForegroundColor := ALConsoleCodeToForegroundColor(LConsoleInfo.wAttributes and (FOREGROUND_BLUE or FOREGROUND_GREEN or FOREGROUND_RED or FOREGROUND_INTENSITY));
+    ABackgroundColor := ALConsoleCodeToBackgroundColor(LConsoleInfo.wAttributes and (BACKGROUND_BLUE or BACKGROUND_GREEN or BACKGROUND_RED or BACKGROUND_INTENSITY));
+  end
+  else RaiseLastOsError;
+end;
+{$ENDIF}
+
+{****************}
+{$IFDEF MSWINDOWS}
+procedure ALSetConsoleColors(const AForegroundColor: TALConsoleColor; const ABackgroundColor: TALConsoleColor);
+var LStdOut: THandle;
+begin
+  LStdOut := GetStdHandle(STD_OUTPUT_HANDLE);
+  if LStdOut = INVALID_HANDLE_VALUE then RaiseLastOsError;
+  SetConsoleTextAttribute(
+    LStdOut,
+    ALConsoleForegroundColorToCode(AForegroundColor) or ALConsoleBackgroundColorToCode(ABackgroundColor));
+end;
+{$ENDIF}
+
+{****************}
+{$IFDEF MSWINDOWS}
+Procedure ALWriteLN(const AStr: AnsiString);
+begin
+  System.Write(AStr);
+end;
+{$ENDIF}
+
+{****************}
+{$IFDEF MSWINDOWS}
+Procedure ALWriteLN(const AStr: AnsiString; const aForegroundColor: TALConsoleColor);
+var LForegroundColor: TALConsoleColor;
+    LBackgroundColor: TALConsoleColor;
+begin
+  ALGetConsoleColors(LForegroundColor, LBackgroundColor);
+  ALSetConsoleColors(AForegroundColor, LBackgroundColor);
+  System.Writeln(AStr);
+  ALSetConsoleColors(LForegroundColor, LBackgroundColor);
+end;
+{$ENDIF}
+
+{****************}
+{$IFDEF MSWINDOWS}
+Procedure ALWriteLN(const AStr: AnsiString; const aForegroundColor: TALConsoleColor; const aBackgroundColor: TALConsoleColor);
+var LForegroundColor: TALConsoleColor;
+    LBackgroundColor: TALConsoleColor;
+begin
+  ALGetConsoleColors(LForegroundColor, LBackgroundColor);
+  ALSetConsoleColors(AForegroundColor, ABackgroundColor);
+  System.Writeln(AStr);
+  ALSetConsoleColors(LForegroundColor, LBackgroundColor);
+end;
+{$ENDIF}
+
+{****************}
+{$IFDEF MSWINDOWS}
+Procedure ALWriteLN(const AStr: String);
+begin
+  System.Write(AStr);
+end;
+{$ENDIF}
+
+{****************}
+{$IFDEF MSWINDOWS}
+Procedure ALWriteLN(const AStr: String; const aForegroundColor: TALConsoleColor);
+var LForegroundColor: TALConsoleColor;
+    LBackgroundColor: TALConsoleColor;
+begin
+  ALGetConsoleColors(LForegroundColor, LBackgroundColor);
+  ALSetConsoleColors(AForegroundColor, LBackgroundColor);
+  System.Writeln(AStr);
+  ALSetConsoleColors(LForegroundColor, LBackgroundColor);
+end;
+{$ENDIF}
+
+{****************}
+{$IFDEF MSWINDOWS}
+Procedure ALWriteLN(const AStr: String; const aForegroundColor: TALConsoleColor; const aBackgroundColor: TALConsoleColor);
+var LForegroundColor: TALConsoleColor;
+    LBackgroundColor: TALConsoleColor;
+begin
+  ALGetConsoleColors(LForegroundColor, LBackgroundColor);
+  ALSetConsoleColors(AForegroundColor, ABackgroundColor);
+  System.Writeln(AStr);
+  ALSetConsoleColors(LForegroundColor, LBackgroundColor);
+end;
+{$ENDIF}
 
 {***********************************}
 {$IF CompilerVersion >= 34} // sydney

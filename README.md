@@ -28,22 +28,22 @@ Install Alcinoe
 ---------------
 
 If you don't plan to use any Alcinoe visual components at design time, then
-you don't need to install anything, just add <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Source">{alcinoe}\Source</a> in the 
+you don't need to install anything, just add [{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) in the 
 search path of your project. 
 
 If you plan to use visual components at design time then you need to
 install the bpl. Launch Delphi and go in component > Install Packages... > and choose the 
-BPL located in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Libraries/bpl/Alcinoe/Win32/Alexandria">{alcinoe}\Libraries\bpl\Alcinoe\Win32\Alexandria\AlcinoeAlexandria.bpl</a> (if you are in delphi Sydney 
+BPL located in [{alcinoe}\Libraries\bpl\Alcinoe\Win32\Alexandria\AlcinoeAlexandria.bpl](https://github.com/MagicFoundation/Alcinoe/tree/master/Libraries/bpl/Alcinoe/Win32/Alexandria) (if you are in delphi Sydney 
 else choose the directory that correspond to your Delphi version). 
-You still need to add in your search path <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Source">{alcinoe}\Source</a>  
+You still need to add in your search path [{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source)  
   
 Alcinoe also improuve a little the original delphi source code. In this way you will need
-to go in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Sydney/10_4_2/">{alcinoe}\Embarcadero\Sydney\10_4_2</a>
-and run <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Sydney/10_4_2/update.bat">update.bat</a> to retrieve and patch 
+to go in [{alcinoe}\Embarcadero\Sydney\10_4_2](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Sydney/10_4_2/)
+and run [update.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Sydney/10_4_2/update.bat) to retrieve and patch 
 the original delphi source code. The batch file assume that the original source code is located in 
 "c:\Program Files (x86)\Embarcadero\Studio\21.0\source\" and that you have GIT in your path. 
 You will need also to include in your project search path all subdirectories located in 
-<a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Sydney/10_4_2/">{alcinoe}\Embarcadero\Sydney\10_4_2</a>.
+[{alcinoe}\Embarcadero\Sydney\10_4_2](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Sydney/10_4_2/).
 
 To finish more and more libraries use now Java 1.8 features (like webRTC, exoplayer, etc.). 
 In this way, we must do desugaring (Desugaring allows you to use these features on older 
@@ -52,8 +52,8 @@ With d8.bat (replacement of dx.bat), desugaring is turned on by default. So you 
 use most of the latest language changes while targeting older devices.
 Waiting that embarcadero swap to D8.bat, we must make DX.bat a "proxy" to D8.bat.
 For this just replace your original DX.bat (mine is located in c:\SDKs\android\build-tools\30.0.3\d8.bat)
-by the one located in <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/D8Proxy/dx.bat">{alcinoe}\Tools\D8Proxy\dx.bat</a>.
-more details here: <a href="https://quality.embarcadero.com/browse/RSP-24155">https://quality.embarcadero.com/browse/RSP-24155</a>
+by the one located in [{alcinoe}\Tools\D8Proxy\dx.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/D8Proxy/dx.bat).
+more details here: [https://quality.embarcadero.com/browse/RSP-24155](https://quality.embarcadero.com/browse/RSP-24155)
 
 
 AndroidMerger: Integrate AAR SDK in FMX Android app
@@ -79,10 +79,42 @@ automatically in a single command line. In brief AndroidMerger will:
 * Merge the AndroidManifest files of all AARs inside AndroidManifest.template.xml.
 * Merge google-services.json in the resources of the project.
 * Create the R.jar with all resource IDs using aapt or aapt2.
-* Update the project file (*.dproj) to include all resources.
+* Update the project file (.dproj) to include all resources.
 * Generate the Delphi native bridge file from the Java libraries.
 
-<a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/AndroidMerger">{alcinoe}/Tools/AndroidMerger</a>
+Learn more at [{alcinoe}/Tools/AndroidMerger](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/AndroidMerger)
+
+
+DeployMan
+=========
+                                 
+A tool to simplify the deployment of files and folders for iOS and Android 
+apps written in Delphi. It is especially useful if you need to deploy 
+a lot of files, such as 3rd party SDKs. 
+
+Learn more at [{alcinoe}/Tools/DeployMan](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DeployMan)
+  
+
+DeployProjNormalizer
+====================
+
+This tool will create from the dproj a new deployproj file
+from scratch and will normalize it (ie: order the node so that you
+can compare different revision with diff compare tools).
+
+Learn more at [{alcinoe}/Tools/DeployProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DeployProjNormalizer)
+
+
+DProjNormalizer
+===============
+
+DProjNormalizer will order all nodes so that the Dproj stay consistent
+between each commit for easy diff compare. It's will also remove
+from deployement all unnecessary items like all items that 
+are automatiquelly added by the IDE every time you open the DPROJ (icons, 
+launchscreen, binary, etc.)
+
+Learn more at [{alcinoe}/Tools/DProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DProjNormalizer)
 
 
 Full opengl video player for FireMonkey
@@ -249,7 +281,7 @@ Firebase cloud messaging
 
 Delphi implementation of the latest Firebase cloud messaging (FCM) with HTTP V1 protocol that will permit 
 you to send alert notification with image in Android and iOS. You can start exploring this feature 
-with the demo located at <a href="https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFirebaseMessaging">{alcinoe}\Demos\ALFirebaseMessaging</a>
+with the demo located at [{alcinoe}\Demos\ALFirebaseMessaging](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFirebaseMessaging)
 
 
 Google OAuth 2.0 Access Token
@@ -325,6 +357,7 @@ that is made on the top of unicode string (so UTF-16)
 
 Example :
 
+```
     {
       _id: 1, // comments
       name: { first: "John", last: "Backus" },
@@ -342,9 +375,11 @@ Example :
       address: {},
       phones: []
     }
+```
 
 To access the document nodes :
 
+```
     MyJsonDoc.loadFromJson(AJsonStr, False);
     MyJsonDoc.ParseOptions := [poAllowComments]; // to allow comments inside the JSON source
     MyJsonDoc.childnodes['_id'].int32;
@@ -358,16 +393,20 @@ To access the document nodes :
       MyJsonDoc.childnodes['awards'].childnodes[i].childnodes['year'].text;
       MyJsonDoc.childnodes['awards'].childnodes[i].childnodes['by'].text;
     end;
+```
 
 Or if you are not sure of the existence of the nodes before to access 
 them or you don't want to check it you can also do :
 
+```
     MyJsonDoc.GetChildNodeValueInt32('_id', 0{default if node not exists});
     MyJsonDoc.GetChildNodeValueText(['name','first'], ''{default if node not exists});
     MyJsonDoc.GetChildNodeValueDateTime('birth', Now{default if node not exists});
+```
 
 To create the document nodes :
 
+```
     MyJsonDoc.addchild('_id').int32 := 1;
     with MyJsonDoc.addchild('name', ntObject) do begin
       addchild('first').text := 'John';
@@ -395,20 +434,26 @@ To create the document nodes :
     MyJsonDoc.addchild('spouse');
     MyJsonDoc.addchild('address', ntObject);
     MyJsonDoc.addchild('phones', ntArray);
+```
 
 You can also create/update nodes like this :
 
+```
     MyJsonDoc.SetChildNodeValueInt32('_id', 0);
     MyJsonDoc.SetChildNodeValueText(['name','first'], 'John');
     MyJsonDoc.SetChildNodeValueDateTime('birth', Now);
+```
 
 To load and save from BSON :
 
+```
     MyJsonDoc.LoadFromFile(aBSONFileName, False{saxMode}, True{BSON});
     MyJsonDoc.SaveToFile(aBSONFileName, False{saxMode}, True{BSON});
+```
 
 To parse an JSON document in Sax Mode :
 
+```
     MyJsonDoc.onParseText := procedure(
                                Sender: TObject;
                                const Path: AnsiString;
@@ -432,7 +477,7 @@ To parse an JSON document in Sax Mode :
         end;
       end;
     MyJsonDoc.LoadFromJSON(AJsonStr, true{saxMode});
-
+```
 
 ImageMagick wrapper for Delphi
 ------------------------------
@@ -447,6 +492,7 @@ text, lines, polygons, ellipses and Bézier curves.
 
 Example :
 
+```
     var aWand: PMagickWand;
     begin
     
@@ -482,7 +528,7 @@ Example :
       end;
 
     end;
-
+```
 
 MongoDb client
 --------------
@@ -502,6 +548,7 @@ to the database.
 
 Example :
 
+```
     aJSONDoc := TALJSONDocument.create;
     aMongoDBClient := TAlMongoDBClient.create;
     try
@@ -519,9 +566,11 @@ Example :
       aMongoDBClient.free;
       aJSONDoc.free;
     end;
+```
 
 Example with connection pool :
 
+```
     aMongoDBConnectionPoolClient := TAlMongoDBConnectionPoolClient.create(aDBHost, aDBPort);
     try
     
@@ -542,9 +591,11 @@ Example with connection pool :
     finally
       aMongoDBClient.free;
     end;
+```
 
 Example tail monitoring :
 
+```
     aMongoDBTailMonitoringThread := TAlMongoDBTailMonitoringThread.Create(
                                       aDBHost,
                                       aDBPort,
@@ -563,6 +614,7 @@ Example tail monitoring :
                                       end);
     ....
     aMongoDBTailMonitoringThread.free;
+```
 
 
 WebSocket client
@@ -653,9 +705,9 @@ which TALGSMComm does not support.
 
 To test your phone, connect the phone to your PC through
 the serial cable or IR device (consult your phone's documentation
-for details on how to connect). Enter "AT"<CR> into a terminal
+for details on how to connect). Enter ```"AT"<CR>``` into a terminal
 window to verify the connection is established (you should receive
-"OK" from the phone), then enter "AT+CMGF=?"<CR>. The response
+"OK" from the phone), then enter ```"AT+CMGF=?"<CR>.``` The response
 should contain a "1", indicating that it supports text-mode.
 If both of these tests pass, then your phone meets the basic
 requirements.
@@ -701,7 +753,7 @@ instead of choosing to implement Unicode through 8bit string
 (UTF8).  This cause the migration of some Delphi app < d2009 
 very hard, especially on application that assume that string 
 is 8bit. Here a very good article about why to avoid to use 
-UFT-16: http://www.utf8everywhere.org/
+UFT-16: [utf8everywhere.org](http://www.utf8everywhere.org/)
 
 So I was facing the need to choose: stay in D2007, move to 
 FreePascal (that implement Unicode through UTF8) or migrate 

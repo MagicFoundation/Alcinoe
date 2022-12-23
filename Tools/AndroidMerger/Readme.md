@@ -13,13 +13,16 @@ manually adding them to Delphi deployment files, compiling
 R.Java class, checking dependancies, etc.
 
 With AndroidMerger all of the above can now be done 
-automatically in a single command line. 
+automatically in a single command line. In brief AndroidMerger will:
  
+* Use graddle or internal implementation to list all dependencies.
+* Download libraries and dependancies from local or central maven repository.
 * Merge the resources of all AARs inside a single directory.
-* Merge the AndroidManifest file of all AARs inside AndroidManifest.template.xml.
+* Merge the AndroidManifest files of all AARs inside AndroidManifest.template.xml.
+* Merge google-services.json in the resources of the project.
 * Create the R.jar with all resource IDs using aapt or aapt2.
 * Update the project file (*.dproj) to include all resources.
-* Check if all dependancies are included   
+* Generate the Delphi native bridge file from the Java libraries.
    
 Merge the AndroidManifest file of all AARs
 ------------------------------------------
@@ -28,6 +31,7 @@ All AndroidManifest files will be merged inside AndroidManifest.template.xml.
 Auto-generated sections like below will be added to the 
 AndroidManifest.template.xml:
 
+```
   <!-- ============================================ -->
   <!-- AndroidMerger auto-generated section (BEGIN) -->
   <!-- ============================================ -->
@@ -37,43 +41,57 @@ AndroidManifest.template.xml:
   <!-- ========================================== -->
   <!-- AndroidMerger auto-generated section (END) -->
   <!-- ========================================== --> 
-   
+```
+
 Everytime you will launch AndroidMerger, those sections will be recreated.
 If you want to disable an element inside those auto-generated sections
 and make this change persistent to AndroidMerger like for example:
 
+```
   <provider android:name="com.facebook.internal.FacebookInitProvider" />
+```
 
 then just comment the element by adding "!!" at the begin and the end 
 of the comment node: 
 
+```
   <!-- !! <provider android:name="com.facebook.internal.FacebookInitProvider" /> !! -->
-      
+```
+   
 Usage
 -----
 
   AndroidMerger.exe
-    -Libraries: Paths to aar libraries or directories. Separate paths with ';'.
+    -Libraries: Paths to libraries (aar, jar, directory, maven name). Separate paths with ';'.
+    -DownloadDependencies: Download dependencies from local or central maven repository. Default true
+    -LocalMavenRepositoryDir: Directory on the local machine where to stores all artifacts.
     -OutputDir: Path where all libraries will be merged.
     -DProj: Path to the project file (*.dproj).
     -AndroidManifest: Path to the AndroidManifest.template.xml of the project.
+    -Configurations: Default Debug;Release. Separate Configurations with ';'.
+    -Platforms: Default Android;Android64. Separate Platforms with ';'.
+    -GoogleServicesJson: Path to the google-services.json
     -DProjNormalizer: Path to the Alcinoe DProjNormalizer tool.
     -RJarSwapper: Path to the Alcinoe RJarSwapper tool.
+    -UseGradle: Use Gradle build tool to retrieve the dependencies. default false
+    -GenerateNativeBridgeFile: Generate in OutputDir the Delphi native bridge file from the Java libraries.
     -NoInteraction: Non-interactive mode.
 
 Example
 -------
 
   AndroidMerger.exe^
-    -Libraries=c:\MyLibs\facebook-share-5.15.1.aar;c:\mylibs\af-android-sdk.jar;c:\mylibs\MyLib\;c:\mylibs\af-android-sdk.jar^
+    -Libraries=com.facebook.android:facebook-android-sdk:15.1.0;c:\MyLibs\af-android.aar;c:\MyProject\Android\ToMerge^
+    -LocalMavenRepositoryDir=c:\LocalMavenRepository\^
     -OutputDir=c:\MyProject\Android\Merged^
     -DProj=c:\MyProject\MyProject.dproj^
     -AndroidManifest=c:\MyProject\AndroidManifest.template.xml^
     -DProjNormalizer=c:\Alcinoe\Tools\DeployProjNormalizer\DeployProjNormalizer.exe^
-    -RJarSwapper:c:\Alcinoe\Tools\RJarSwapper\RJarSwapper.bat
+    -RJarSwapper=c:\Alcinoe\Tools\RJarSwapper\RJarSwapper.bat
+    -UseGradle=true
     
 you can also check the ALFacebookLogin Demo and in particular the script:
-<Alcinoe>\Demos\ALFacebookLogin\_source\android\MergeLibraries.bat
+{Alcinoe}\Demos\ALFacebookLogin\_source\android\MergeLibraries.bat
 
 Note
 ----
@@ -103,6 +121,7 @@ You cannot add the resources below via the project option.
   
 Instead you must create a directory with this structure:
 
+```
   <mydir>
     res
       drawable-hdpi
@@ -111,14 +130,16 @@ Instead you must create a directory with this structure:
       drawable-xxhdpi
       drawable-xxxhdpi
       ...
+```
 
 and put in it all the needed resources. for exemple in drawable-hdpi you 
 can add the file $(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png that 
-you rename in ic_launcher.png, in drawable-hdpi the file 
-$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png that you rename in 
-ic_launcher.png, etc. 
+you renamed in ic_launcher.png, in drawable-hdpi the file 
+$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png that you renamed in 
+ic_launcher.png, etc. Then include this dir in the -libraries path like :
 
-Then include this dir in the -libraries path like :
+```
 AndroidMerger.exe -Libraries="androidx.appcompat:appcompat:1.5.1;<mydir>" ...
+```
 
-You can look the <alcinoe>\Demos\ALFirebaseMessaging as an example
+You can look the {Alcinoe}\Demos\ALFirebaseMessaging as an example

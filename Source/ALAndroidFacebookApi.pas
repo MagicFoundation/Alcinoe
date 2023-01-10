@@ -1,6 +1,21 @@
+//
+// Made from Facebook SDK version 15.2.0
+//
 unit ALAndroidFacebookApi;
 
 interface
+
+{$I Alcinoe.inc}
+
+{$IFNDEF ALCompilerVersionSupported}
+  //Please run <Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorAndroid.bat
+  //with the library identifiers com.facebook.android:facebook-android-sdk:xx.xx.xx where xx.xx.xx
+  //is the last version of the facebook-android-sdk and gave also the path to
+  //<Alcinoe>\Source\ALAndroidFacebookApi.pas to build the compare source file. Then make a diff
+  //compare between the new generated ALAndroidFacebookApi.pas and this one to see if the api
+  //signature is still the same
+  {$MESSAGE WARN 'Check if the api signature of the last version of facebook sdk (android) is still the same'}
+{$IFEND}
 
 uses
   Androidapi.JNI.GraphicsContentViewText,
@@ -28,8 +43,6 @@ type
   JFacebookSdk = interface;
   JGraphResponse = interface;
   JGraphRequest_Callback = interface;
-  JGraphRequest_GraphJSONArrayCallback = interface;
-  JGraphRequest_GraphJSONObjectCallback = interface;
   JGraphRequest = interface;
 
   {*******************************************************}
@@ -38,7 +51,7 @@ type
     {class} function canShow: boolean; cdecl;
     {class} procedure show(activity: JActivity; contentUrl: Jnet_Uri; quote: JString); cdecl;
   end;
-  [JavaSignature('com/alcinoe/facebook/ALFacebookShareLinkDialog')]
+  [JavaSignature('com/alcinoe/facebook/share/ALFacebookShareLinkDialog')]
   JALFacebookShareLinkDialog = interface(JObject)
     ['{CB1C33F4-A26F-4543-8899-63D25EF5C6E0}']
   end;
@@ -47,10 +60,6 @@ type
   {*********************************************************}
   JFacebookExceptionClass = interface(JRuntimeExceptionClass)
     ['{BE0539B7-F533-4942-8B5E-C21399C1F8A7}']
-    {class} function init: JFacebookException; cdecl; overload;
-    {class} function init(throwable: JThrowable): JFacebookException; cdecl; overload;
-    {class} function init(message: JString): JFacebookException; cdecl; overload;
-    {class} function init(format: JString; throwable: JThrowable): JFacebookException; cdecl; overload;
   end;
   [JavaSignature('com/facebook/FacebookException')]
   JFacebookException = interface(JRuntimeException)
@@ -75,7 +84,6 @@ type
   JCallbackManager_FactoryClass = interface(JObjectClass)
     ['{A93E1F7B-1AFC-4A9A-95B9-C26F24DFFDA5}']
     {class} function create: JCallbackManager; cdecl;
-    {class} function init: JCallbackManager_Factory; cdecl;
   end;
   [JavaSignature('com/facebook/CallbackManager$Factory')]
   JCallbackManager_Factory = interface(JObject)
@@ -103,8 +111,6 @@ type
   JLoginManager = interface(JObject)
     ['{33506ADC-2297-4A95-B617-43C27D79BA12}']
     procedure logInWithPublishPermissions(activity: JActivity; permissions: JCollection); cdecl; overload;
-    procedure logInWithPublishPermissions(fragment: JFragment; permissions: JCollection); cdecl; overload;
-    procedure logInWithReadPermissions(fragment: JFragment; permissions: JCollection); cdecl; overload;
     procedure logInWithReadPermissions(activity: JActivity; permissions: JCollection); cdecl; overload;
     procedure logOut; cdecl;
     procedure registerCallback(callbackManager: JCallbackManager; callback: JFacebookCallback); cdecl;
@@ -114,23 +120,13 @@ type
   {*********************************************}
   JAccessTokenClass = interface(JParcelableClass)
     ['{D45F97E4-A070-459B-B7FF-63DB58993826}']
-    {class} function _GetACCESS_TOKEN_KEY: JString; cdecl;
-    {class} function _GetEXPIRES_IN_KEY: JString; cdecl;
-    {class} function _GetUSER_ID_KEY: JString; cdecl;
     {class} function getCurrentAccessToken: JAccessToken; cdecl;
     {class} procedure setCurrentAccessToken(accessToken: JAccessToken); cdecl;
-    {class} property ACCESS_TOKEN_KEY: JString read _GetACCESS_TOKEN_KEY;
-    {class} property EXPIRES_IN_KEY: JString read _GetEXPIRES_IN_KEY;
-    {class} property USER_ID_KEY: JString read _GetUSER_ID_KEY;
   end;
   [JavaSignature('com/facebook/AccessToken')]
   JAccessToken = interface(JParcelable)
     ['{8056F0A5-7707-44BA-9991-BAF2B464474F}']
-    function describeContents: Integer; cdecl;
-    function getApplicationId: JString; cdecl;
     function getDeclinedPermissions: JSet; cdecl;
-    function getExpires: JDate; cdecl;
-    function getLastRefresh: JDate; cdecl;
     function getPermissions: JSet; cdecl;
     function getToken: JString; cdecl;
     function getUserId: JString; cdecl;
@@ -146,21 +142,15 @@ type
   JLoginResult = interface(JObject)
     ['{35E02E47-4492-41D1-AF13-5485EE1A15F8}']
     function getAccessToken: JAccessToken; cdecl;
-    function getRecentlyDeniedPermissions: JSet; cdecl;
-    function getRecentlyGrantedPermissions: JSet; cdecl;
   end;
   TJLoginResult = class(TJavaGenericImport<JLoginResultClass, JLoginResult>) end;
 
   {**************************************}
   JHttpMethodClass = interface(JEnumClass)
     ['{169D72DB-480A-439B-B2E5-00F540752436}']
-    {class} function _GetDELETE: JHttpMethod; cdecl;
     {class} function _GetGET: JHttpMethod; cdecl;
     {class} function _GetPOST: JHttpMethod; cdecl;
-    {class} function valueOf(name: JString): JHttpMethod; cdecl;
-    {class} function values: TJavaObjectArray<JHttpMethod>; cdecl;
-    {class} property DELETE: JHttpMethod read _GetDELETE;
-    {class} property GET: JHttpMethod read _GetGET;
+    {class} property &GET: JHttpMethod read _GetGET;
     {class} property POST: JHttpMethod read _GetPOST;
   end;
   [JavaSignature('com/facebook/HttpMethod')]
@@ -182,79 +172,20 @@ type
   {******************************************************}
   JFacebookRequestErrorClass = interface(JParcelableClass)
     ['{692CE587-75C4-4D60-9A3E-310D061F8693}']
-    {class} function _GetINVALID_ERROR_CODE: Integer; cdecl;
-    {class} function _GetINVALID_HTTP_STATUS_CODE: Integer; cdecl;
-    {class} property INVALID_ERROR_CODE: Integer read _GetINVALID_ERROR_CODE;
-    {class} property INVALID_HTTP_STATUS_CODE: Integer read _GetINVALID_HTTP_STATUS_CODE;
   end;
   [JavaSignature('com/facebook/FacebookRequestError')]
   JFacebookRequestError = interface(JParcelable)
     ['{A2A8F82F-F83C-4032-8FAF-3483ECC3B14C}']
-    function describeContents: Integer; cdecl;
-    function getBatchRequestResult: JObject; cdecl;
     function getErrorCode: Integer; cdecl;
     function getErrorMessage: JString; cdecl;
-    function getErrorRecoveryMessage: JString; cdecl;
-    function getErrorType: JString; cdecl;
-    function getErrorUserMessage: JString; cdecl;
-    function getErrorUserTitle: JString; cdecl;
-    function getException: JFacebookException; cdecl;
-    function getRequestResult: JJSONObject; cdecl;
-    function getRequestResultBody: JJSONObject; cdecl;
-    function getRequestStatusCode: Integer; cdecl;
-    function getSubErrorCode: Integer; cdecl;
   end;
   TJFacebookRequestError = class(TJavaGenericImport<JFacebookRequestErrorClass, JFacebookRequestError>) end;
 
   {*****************************************}
   JFacebookSdkClass = interface(JObjectClass)
     ['{0B655652-B6FA-45AD-BDF3-A357B5DDA839}']
-    {class} function _GetAPPLICATION_ID_PROPERTY: JString; cdecl;
-    {class} function _GetAPPLICATION_NAME_PROPERTY: JString; cdecl;
-    {class} function _GetCLIENT_TOKEN_PROPERTY: JString; cdecl;
-    {class} function _GetWEB_DIALOG_THEME: JString; cdecl;
-    //{class} procedure addLoggingBehavior(behavior: JLoggingBehavior); cdecl;
-    //{class} procedure clearLoggingBehaviors; cdecl;
-    {class} function getApplicationContext: JContext; cdecl;
-    {class} function getApplicationId: JString; cdecl;
-    {class} function getApplicationName: JString; cdecl;
-    {class} function getApplicationSignature(context: JContext): JString; cdecl;
-    {class} function getCacheDir: JFile; cdecl;
-    {class} function getCallbackRequestCodeOffset: Integer; cdecl;
-    {class} function getClientToken: JString; cdecl;
-    //{class} function getExecutor: JExecutor; cdecl;
-    {class} function getFacebookDomain: JString; cdecl;
-    {class} function getGraphApiVersion: JString; cdecl;
-    //{class} function getLimitEventAndDataUsage(context: JContext): Boolean; cdecl;
-    //{class} function getLoggingBehaviors: JSet; cdecl;
-    {class} function getOnProgressThreshold: Int64; cdecl;
-    {class} function getSdkVersion: JString; cdecl;
-    {class} function isDebugEnabled: Boolean; cdecl;
-    {class} function isFacebookRequestCode(requestCode: Integer): Boolean; cdecl;
     {class} function isInitialized: Boolean; cdecl;
-    {class} function isLegacyTokenUpgradeSupported: Boolean; cdecl;
-    //{class} function isLoggingBehaviorEnabled(behavior: JLoggingBehavior): Boolean; cdecl;
-    //{class} procedure publishInstallAsync(context: JContext; applicationId: JString); cdecl;
-    //{class} procedure removeLoggingBehavior(behavior: JLoggingBehavior); cdecl;
-    {class} procedure sdkInitialize(applicationContext: JContext); cdecl; overload;
-    //{class} procedure sdkInitialize(applicationContext: JContext; callback: JFacebookSdk_InitializeCallback); cdecl; overload;
-    {class} procedure sdkInitialize(applicationContext: JContext; callbackRequestCodeOffset: Integer); cdecl; overload;
-    //{class} procedure sdkInitialize(applicationContext: JContext; callbackRequestCodeOffset: Integer; callback: JFacebookSdk_InitializeCallback); cdecl; overload;
-    {class} procedure setApplicationId(applicationId: JString); cdecl;
-    {class} procedure setApplicationName(applicationName: JString); cdecl;
-    {class} procedure setCacheDir(cacheDir: JFile); cdecl;
-    {class} procedure setClientToken(clientToken: JString); cdecl;
-    {class} procedure setExecutor(executor: JExecutor); cdecl;
-    {class} procedure setFacebookDomain(facebookDomain: JString); cdecl;
-    {class} procedure setGraphApiVersion(graphApiVersion: JString); cdecl;
-    {class} procedure setIsDebugEnabled(enabled: Boolean); cdecl;
-    {class} procedure setLegacyTokenUpgradeSupported(supported: Boolean); cdecl;
-    {class} procedure setLimitEventAndDataUsage(context: JContext; limitEventUsage: Boolean); cdecl;
-    {class} procedure setOnProgressThreshold(threshold: Int64); cdecl;
-    {class} property APPLICATION_ID_PROPERTY: JString read _GetAPPLICATION_ID_PROPERTY;
-    {class} property APPLICATION_NAME_PROPERTY: JString read _GetAPPLICATION_NAME_PROPERTY;
-    {class} property CLIENT_TOKEN_PROPERTY: JString read _GetCLIENT_TOKEN_PROPERTY;
-    {class} property WEB_DIALOG_THEME: JString read _GetWEB_DIALOG_THEME;
+    {class} procedure sdkInitialize(applicationContext: JContext); cdecl;
   end;
   [JavaSignature('com/facebook/FacebookSdk')]
   JFacebookSdk = interface(JObject)
@@ -265,19 +196,12 @@ type
   {*******************************************}
   JGraphResponseClass = interface(JObjectClass)
     ['{2CF25531-06CA-4423-A804-2DAD41F6DEF4}']
-    {class} function _GetNON_JSON_RESPONSE_PROPERTY: JString; cdecl;
-    {class} function _GetSUCCESS_KEY: JString; cdecl;
-    {class} property NON_JSON_RESPONSE_PROPERTY: JString read _GetNON_JSON_RESPONSE_PROPERTY;
-    {class} property SUCCESS_KEY: JString read _GetSUCCESS_KEY;
   end;
   [JavaSignature('com/facebook/GraphResponse')]
   JGraphResponse = interface(JObject)
     ['{678C170B-168A-42DA-9CE6-E7BFB8325A19}']
     function getError: JFacebookRequestError; cdecl;
-    function getJSONArray: JJSONArray; cdecl;
-    function getJSONObject: JJSONObject; cdecl;
     function getRawResponse: JString; cdecl;
-    function getRequest: JGraphRequest; cdecl;
   end;
   TJGraphResponse = class(TJavaGenericImport<JGraphResponseClass, JGraphResponse>) end;
 
@@ -291,28 +215,6 @@ type
     procedure onCompleted(response: JGraphResponse); cdecl;
   end;
   TJGraphRequest_Callback = class(TJavaGenericImport<JGraphRequest_CallbackClass, JGraphRequest_Callback>) end;
-
-  {***************************************************************}
-  JGraphRequest_GraphJSONArrayCallbackClass = interface(IJavaClass)
-    ['{CF9973A9-8B24-47A4-8059-782813324F77}']
-  end;
-  [JavaSignature('com/facebook/GraphRequest$GraphJSONArrayCallback')]
-  JGraphRequest_GraphJSONArrayCallback = interface(IJavaInstance)
-    ['{3FFD5147-3AB8-475E-AA40-03C4B36D28D7}']
-    procedure onCompleted(objects: JJSONArray; response: JGraphResponse); cdecl;
-  end;
-  TJGraphRequest_GraphJSONArrayCallback = class(TJavaGenericImport<JGraphRequest_GraphJSONArrayCallbackClass, JGraphRequest_GraphJSONArrayCallback>) end;
-
-  {****************************************************************}
-  JGraphRequest_GraphJSONObjectCallbackClass = interface(IJavaClass)
-    ['{AD9164C8-F6AF-410A-92B4-AF5D65373228}']
-  end;
-  [JavaSignature('com/facebook/GraphRequest$GraphJSONObjectCallback')]
-  JGraphRequest_GraphJSONObjectCallback = interface(IJavaInstance)
-    ['{50212943-589E-44A6-87CB-96801BCD6D1A}']
-    procedure onCompleted(&object: JJSONObject; response: JGraphResponse); cdecl;
-  end;
-  TJGraphRequest_GraphJSONObjectCallback = class(TJavaGenericImport<JGraphRequest_GraphJSONObjectCallbackClass, JGraphRequest_GraphJSONObjectCallback>) end;
 
   {******************************************}
   JGraphRequestClass = interface(JObjectClass)
@@ -349,8 +251,6 @@ begin
   TRegTypes.RegisterType('ALAndroidFacebookApi.JFacebookSdk', TypeInfo(ALAndroidFacebookApi.JFacebookSdk));
   TRegTypes.RegisterType('ALAndroidFacebookApi.JGraphResponse', TypeInfo(ALAndroidFacebookApi.JGraphResponse));
   TRegTypes.RegisterType('ALAndroidFacebookApi.JGraphRequest_Callback', TypeInfo(ALAndroidFacebookApi.JGraphRequest_Callback));
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JGraphRequest_GraphJSONArrayCallback', TypeInfo(ALAndroidFacebookApi.JGraphRequest_GraphJSONArrayCallback));
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JGraphRequest_GraphJSONObjectCallback', TypeInfo(ALAndroidFacebookApi.JGraphRequest_GraphJSONObjectCallback));
   TRegTypes.RegisterType('ALAndroidFacebookApi.JGraphRequest', TypeInfo(ALAndroidFacebookApi.JGraphRequest));
 end;
 

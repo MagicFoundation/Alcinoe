@@ -1,4 +1,4 @@
-package com.alcinoe.facebook;
+package com.alcinoe.facebook.share;
 
 import com.facebook.share.widget.ShareDialog;
 import com.facebook.share.model.ShareLinkContent;
@@ -11,12 +11,6 @@ public class ALFacebookShareLinkDialog {
       return ShareDialog.canShow(ShareLinkContent.class);
   }
         
-  /**
-   * @param contentDescription The contentDescription of the link.
-   * @param contentTitle The link contentTitle.
-   * @param imageUrl The network URL of an image.
-   * @param quote The text quoted from the link.
-   */
   public static void show(final Activity activity,
                           final Uri contentUrl,
                           final String quote) {

@@ -1,8 +1,21 @@
-﻿unit ALIosFirebaseCommonApi;
+﻿//
+// Made from firebase-messaging 10.2.0
+//
+unit ALIosFirebaseCoreApi;
 
 interface
 
 {$I Alcinoe.inc}
+
+{$IFNDEF ALCompilerVersionSupported}
+  //Pleast update <Alcinoe>\Libraries\ios\firebase\ to the last one and then run
+  //<Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorIOS.bat
+  //and gave the path to <Alcinoe>\Source\ALIosFirebaseCoreApi.pas to build
+  //the compare source file. Then make a diff compare between the new generated
+  //ALIosFirebaseCoreApi.pas and this one to see if the api signature is
+  //still the same
+  {$MESSAGE WARN 'Check if the api signature of the last version of Firebase sdk (ios) is still the same'}
+{$IFEND}
 
 uses
   Macapi.ObjectiveC,
@@ -26,7 +39,7 @@ type
 
 implementation
 
-procedure ClangRTLoader; cdecl; external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a';
+procedure libclangrtiosLoader; cdecl; external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a';
 procedure FirebaseCoreInternalLoader; cdecl; external framework 'FirebaseCoreInternal';
 procedure FirebaseCoreLoader; cdecl; external framework 'FirebaseCore';
 procedure FBLPromisesLoader; cdecl; external framework 'FBLPromises';

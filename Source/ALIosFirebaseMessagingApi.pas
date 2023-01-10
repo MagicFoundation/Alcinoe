@@ -1,6 +1,21 @@
+//
+// Made from firebase-messaging 10.2.0
+//
 unit ALIosFirebaseMessagingApi;
 
 interface
+
+{$I Alcinoe.inc}
+
+{$IFNDEF ALCompilerVersionSupported}
+  //Pleast update <Alcinoe>\Libraries\ios\firebase\ to the last one and then run
+  //<Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorIOS.bat
+  //and gave the path to <Alcinoe>\Source\ALIosFirebaseMessagingApi.pas to build
+  //the compare source file. Then make a diff compare between the new generated
+  //ALIosFirebaseMessagingApi.pas and this one to see if the api signature is
+  //still the same
+  {$MESSAGE WARN 'Check if the api signature of the last version of Firebase Messaging (ios) is still the same'}
+{$IFEND}
 
 uses
   Macapi.ObjectiveC,
@@ -18,8 +33,7 @@ type
   //https://firebase.google.com/docs/reference/ios/firebasemessaging/api/reference/Protocols/FIRMessagingDelegate.html
   FIRMessagingDelegate = interface(IObjectiveC)
   ['{9784786A-515F-41F0-84C3-8F298623275E}']
-    [MethodName('messaging:didReceiveRegistrationToken:')]
-    procedure messagingDidReceiveRegistrationToken(messaging: FIRMessaging; fcmToken: NSString); cdecl;
+    procedure messaging(messaging: FIRMessaging; fcmToken: NSString); cdecl;
   end;
 
   {*********************************************************************************************}
@@ -44,7 +58,7 @@ type
 implementation
 
 uses
-  ALiOSFirebaseCommonAPI;
+  ALiOSFirebaseCoreAPI; // [MANDATORY] Because we need it's initialization/finalization section
 
 procedure FirebaseMessagingLoader; cdecl; external framework 'FirebaseMessaging';
 

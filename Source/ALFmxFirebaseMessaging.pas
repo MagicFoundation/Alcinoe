@@ -1,238 +1,238 @@
-//******************************************************************************
-//  A cross-platform method of using Firebase Cloud Messaging (FCM) to receive
-//  push notifications
-//
-// Setup (ANDROID)
-// ---------------
-//
-// On android you just need to include the library com.alcinoe:alcinoe-firebase-messaging:1.0.0
-// in the project. You also need to include google-services.json. You can do all
-// of this with the help of AndroidMerger. you can see an exemple in
-// <Alcinoe>\Demos\ALFirebaseMessaging\_source\android\MergeLibraries.bat
-//
-//
-// Setup (IOS)
-// -----------
-//
-// 1) In the Project > Option > Building > Delphi Compiler > Linking > Options
-//    passed to the LD linker add -ObjC (like asked in
-//    https://firebase.google.com/docs/ios/setup#integrate-without-swift-pm)
-//
-// 2) In project > option > Building > Delphi Compiler > FRAMEWORK search path
-//    you need to add the following path:
-//    <Alcinoe>\Libraries\ios\firebase\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64
-//    <Alcinoe>\Libraries\ios\firebase\FirebaseAnalytics\FirebaseInstallations.xcframework\ios-arm64
-//    <Alcinoe>\Libraries\ios\firebase\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64
-//    <Alcinoe>\Libraries\ios\firebase\FirebaseAnalytics\FirebaseCore.xcframework\ios-arm64
-//    <Alcinoe>\Libraries\ios\firebase\FirebaseAnalytics\FirebaseCoreInternal.xcframework\ios-arm64
-//    <Alcinoe>\Libraries\ios\firebase\FirebaseMessaging\FirebaseMessaging.xcframework\ios-arm64
-//    <Alcinoe>\Libraries\ios\firebase\FirebaseAnalytics\nanopb.xcframework\ios-arm64
-//    <Alcinoe>\Libraries\ios\firebase\FirebaseMessaging\GoogleDataTransport.xcframework\ios-arm64
-//
-// 3) Under Tools, Options, SDK Manager you will need to add the following
-//    frameworks for ios64 and Ios64 simulator:
-//
-//    Path on remote machine                                                                    |  File mask |  Path Type     |  Include subdirectories
-//    $(SDKROOT)/usr/lib/swift                                                                  |  *         |  Library path  |  no
-//    $(SDKROOT)/../../../../../Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos      |  *         |  Library path  |  no
-//    $(SDKROOT)/../../../../../Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/iphoneos  |  *         |  Library path  |  no
-//    $(SDKROOT)/../../../../../Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.5/iphoneos  |  *         |  Library path  |  no
-//
-//    https://quality.embarcadero.com/browse/RSP-38700
-//    You will need to manually copy the content of (assuming c:\SDKs is your BDSPLATFORMSDKSDIR)
-//    c:\SDKs\iPhoneOS16.1.sdk\Applications\Xcode.app\Contents\Developer\Toolchains\XcodeDefault.xctoolchain\usr\lib\swift  to  c:\SDKs\iPhoneOS16.1.sdk\usr\lib\swift
-//    c:\SDKs\iPhoneOS16.1.sdk\Applications\Xcode.app\Contents\Developer\Toolchains\XcodeDefault.xctoolchain\usr\lib\swift-5.0  to  c:\SDKs\iPhoneOS16.1.sdk\usr\lib\swift-5.0
-//    c:\SDKs\iPhoneOS16.1.sdk\Applications\Xcode.app\Contents\Developer\Toolchains\XcodeDefault.xctoolchain\usr\lib\swift-5.5  to  c:\SDKs\iPhoneOS16.1.sdk\usr\lib\swift-5.5
-//    and then you can delete the folder c:\SDKs\iPhoneOS16.1.sdk\Applications\
-//
-// 4) In the Project > Option > Building > Delphi Compiler > Linking >
-//    Options passed to the LD linker add -rpath /usr/lib/swift
-//    this because of this bug: https://quality.embarcadero.com/browse/RSP-38700
-//
-// 5) You must deploy the GoogleService-Info.plist to the root of the app. You
-//    can use DeployMan for this. you can see an exemple in
-//    <Alcinoe>\Demos\ALFirebaseMessaging\_source\ios\DeployMan.bat.
-//    All info regarding generating the GoogleService-Info.plist can be found at
-//    https://firebase.google.com/docs/ios/setup
-//
-// 6) If you want the iOS app to be able to receive data notification in
-//    background you must add in info.plist.TemplateiOS.xml
-//
-//      <key>UIBackgroundModes</key>
-//      <array>
-//        <string>remote-notification</string>
-//      </array>
-//
-// 7) If you want to show an image in an ios alert, you must add a service
-//    extension to the project.
-//
-//    Their is actually 2 difficulties with this way:
-//    1/ You need to sign the plugin yourself
-//       codesign --remove-signature /YourPathto/NotificationService
-//       codesign -s <Identity> /YourPathto/NotificationService
-//       https://quality.embarcadero.com/browse/RSP-40216
-//    2/ The bundle identifier of the app extension must start with the
-//       bundle identifier of the delphi project. That mean we can not create a
-//       reusable app extension for different projects.
-//       https://stackoverflow.com/questions/74854659/how-to-change-from-command-line-the-bundle-identifier-of-an-app-extension
-//
-//    You can use the template of an app extension:
-//    * Replace in <alcinoe>\References\iOSNotification\iOSNotification.xcodeproj\project.pbxproj
-//      all occurences of com.ALFirebaseMessaging.app by the bundle identifiers
-//      of your delphi app
-//    * copy the content of <alcinoe>\References\iOSNotification\ somewhere in
-//      the macos. ex: /Users/<username>/Documents/iOSNotification
-//    * in the macos run
-//      xcodebuild -project /Users/<username>/Documents/iOSNotification/iOSNotification.xcodeproj -scheme iOSNotification -configuration Release -sdk iphoneos CONFIGURATION_BUILD_DIR=/Users/<username>/Documents/Compiled
-//    * copy the content of /Users/<username>/Documents/Compiled/iOSNotification.app/PlugIns/
-//      in a local folder to your project and with DeployMan instruct the dproj
-//      to deploy those file with your app. see an exemple of the DeployMan
-//      command in <Alcinoe>\Demos\ALFirebaseMessaging\_source\ios\DeployMan.bat
-//
-//    Or You can create the app extension in the following way:
-//    * Launch Xcode and select "create a new xcode project"
-//    * Select ios app as a template for the new project
-//      * Enter the productname you want. Ex: iOSNotification
-//      * Select your team (you need one just to be able to compile the
-//        project)
-//      * Enter the organization identifier of your project. Ex:
-//        com.ALFirebaseMessaging.app, doesn't matter if not exact you will
-//        change it later
-//      * Select SwiftUI for the Interface
-//      * Select Swift for the language
-//      * Uncheck "use core data"
-//      * Uncheck "Include tests"
-//      * Click "Next" and Save it anywhere you want. ex:
-//        /Users/<username>/Documents and do not forget in the finder dialog
-//        to uncheck "create git repository on my mac"
-//    * In Xcode, with your app project open, navigate to File > Add Packages.
-//    * When prompted, add the Firebase Apple platforms SDK repository:
-//      https://github.com/firebase/firebase-ios-sdk
-//      * Dependancy rule: Exact version - 10.2.0 (or the version of firebase
-//        you use)
-//      * click "Add Package"
-//      * Choose only FirebaseMessaging library and click again to
-//        "Add Package"
-//    * In Xcode, select File > New > Target to add a new target to your
-//      project.
-//    * In the iOS > Application Extension section, select the Notification
-//      Service Extension target.
-//      * Enter the productname you want. Ex NotificationService
-//      * Select your team (you need one just to be able to compile the
-//        project)
-//      * Language: Objective-c
-//      * Project: The main project
-//      * Embed in application: The main project
-//      * click "finish"
-//      * in the popup dialog Activate "notificationservice" scheme: click
-//        cancel
-//    * in the left panel of xcode select your project. Ex ALiOSNotification
-//    * In target select the app. Ex ALiOSNotification
-//      * Select the General tab
-//        * Minimum Deployments: iOS 15
-//      * Select the signing & capabilities tab
-//        * Select "ALL" capabillity
-//        * Bundle Identifier: the bundle identifier of your delphi app
-//          (without the team id) Ex: com.ALFirebaseMessaging.app
-//    * In target select the service extension. Ex NotificationService
-//      * Select the General tab
-//        * Deployment info: iOS 11
-//        * Under "Framework and Libraries" click on the "+"
-//          * Select FirebaseMessaging
-//        * then select the signing & capabilities tab
-//          * Bundle Identifier: the bundle identifier of your delphi app
-//            (without the team id) + .notificationservice. Ex:
-//            com.ALFirebaseMessaging.app.notificationservice
-//    * in the left panel of xcode select the app extension.
-//      Ex NotificationService
-//    * Select the file NotificationService.m
-//      * add below the line #import "NotificationService.h":
-//        #import "FirebaseMessaging/FirebaseMessaging.h"
-//      * remove the line:
-//        // Modify the notification content here as you wish
-//        self.bestAttemptContent.title = [NSString stringWithFormat:@"%@ [modified]", self.bestAttemptContent.title];
-//      * replace self.contentHandler(self.bestAttemptContent); by:
-//        [[FIRMessaging extensionHelper] populateNotificationContent:self.bestAttemptContent withContentHandler:contentHandler];
-//    * in xcode, do File > Save
-//    * close xcode
-//    * from a command line build the project with a command line like for exemple :
-//      xcodebuild -project /Users/<username>/Documents/iOSNotification/iOSNotification.xcodeproj -scheme iOSNotification -configuration Release -sdk iphoneos CONFIGURATION_BUILD_DIR=/Users/<username>/Documents/Compiled
-//    * copy the content of /Users/<username>/Documents/Compiled/iOSNotification.app/PlugIns/
-//      in a local folder to your project and with DeployMan instruct the dproj
-//      to deploy those file with your app. see an exemple of the DeployMan
-//      command in <Alcinoe>\Demos\ALFirebaseMessaging\_source\ios\DeployMan.bat
-//
-//
-// Regarding Badge
-// ---------------
-//
-// iOS doesn't sum the badge numbers you send to the app. It just displays the
-// latest badge number sent from your server. For example You server should send
-// a push notification with badge number of 10 if that's the badge number you
-// want to display.
-//
-//   const payload = {
-//     ...
-//     "aps":{
-//       "alert":"test alert",
-//       "badge":5,
-//       "sound":"default"
-//     }
-//   }
-//
-//  https://developer.android.com/develop/ui/views/notifications/badges
-//  on android, By default, each notification increments a number displayed on
-//  the long- press menu (visible in figure 1), but you can override this number
-//  for your app
-//
-//
-// Note
-// ----
-//
-// To know when a notification was "pushed" by an user you can look in the data
-// payload for the presence of notification.presented=1 It's added by the
-// ALFirebaseMessaging Framework to each notification presented to end user so
-// it's mean user tapped on it. This is the behavior of the notification in iOS/android:
-//
-// IOS: data notification          + app in FOREGROUND     : NO ALERT - NO BADGE - we receive the data message         - via TApplicationDelegate.applicationDidReceiveRemoteNotificationWithFetchCompletionHandler                            > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
-// IOS: alert notification         + app in FOREGROUND     : NO ALERT - NO BADGE - we receive the alert message        - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:notification:completionHandler > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
-// IOS: data + alert notification  + app in FOREGROUND     : NO ALERT - NO BADGE - we receive the alert + data message - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:notification:completionHandler > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
-// ---
-// IOS: data notification          + app in BACKGROUND (1) : NO ALERT - NO BADGE - we receive the data message                                                                             - via TApplicationDelegate.applicationDidReceiveRemoteNotificationWithFetchCompletionHandler                        > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
-// IOS: data notification          + app in BACKGROUND (2) : NO ALERT - NO BADGE - WHEN the app will BECAME FOREGROUND: we receive only the LAST SENT data message                         - via TApplicationDelegate.applicationDidReceiveRemoteNotificationWithFetchCompletionHandler                        > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
-// IOS: data notification          + app in BACKGROUND (3) : NO ALERT - NO BADGE - we NEVER receive the data message
-// IOS: alert notification         + app in BACKGROUND     : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the alert message (with notification.presented=1)        - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
-// IOS: data + alert notification  + app in BACKGROUND     : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the alert + data message (with notification.presented=1) - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
-// ---
-// IOS: data notification          + app NOT RUNNING (1)   : NO ALERT - NO BADGE - we receive the data message                                                                                                   - via TApplicationDelegate.applicationDidFinishLaunchingWithOptions > TALFirebaseMessaging.StartupNotificationMessageHandler > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.applicationDidReceiveRemoteNotification  | and also via TApplicationDelegate.applicationDidReceiveRemoteNotificationWithFetchCompletionHandler > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
-// IOS: data notification          + app NOT RUNNING (2)   : NO ALERT - NO BADGE - WHEN the app will BECAME FOREGROUND: we receive only the LAST SENT data message                                               - via TApplicationDelegate.applicationDidReceiveRemoteNotificationWithFetchCompletionHandler                                                                                           > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
-// IOS: alert notification         + app NOT RUNNING       : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the notification message (with notification.presented=1)                       - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler                                                                    > TALFirebaseMessaging.applicationDidReceiveRemoteNotification  | and also via TApplicationDelegate.applicationDidFinishLaunchingWithOptions > TALFirebaseMessaging.StartupNotificationMessageHandler > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
-// IOS: data + alert notification  + app NOT RUNNING       : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message and the notification message (with notification.presented=1)  - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler                                                                    > TALFirebaseMessaging.applicationDidReceiveRemoteNotification  | and also via TApplicationDelegate.applicationDidFinishLaunchingWithOptions > TALFirebaseMessaging.StartupNotificationMessageHandler > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
-//
-//   (1) We are lucky (for exemple We didn't launch any other app from the time the app goes in background and in the info.plist we have <key>UIBackgroundModes</key><array><string>remote-notification</string></array> and we follow https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/pushing_background_updates_to_your_app?language=objc)
-//   (2) We was unlucky in (1) (For exemple we launch another app from the time the app goes in background)
-//   (3) We receive the data message when the app was in background and then the user (or the system) kill the app
-//   (*) All of this is just a total bullsheet from apple/ios as it's mean you will never know if you will fall in (1), (2),
-//       (3) or even in another case I didn't observe here.
-//       That mean on ios data notifications are totaly useless in most of case! in firebase legacy HTTP it's was corrected
-//       by the firebase messaging framework but in firebase http V1 they deprecated this essential feature:
-//       https://stackoverflow.com/questions/74789738/on-ios-only-last-sent-data-message-is-retrieved-when-the-app-back-online
-//
-// -----
-//
-// ANDROID: data notification          + app in FOREGROUND : NO ALERT - NO BADGE - we receive the data message                        - via ALFirebaseMessagingService.onMessageReceived > TALFirebaseMessaging.TNewMessageObserver.onChanged
-// ANDROID: alert notification         + app in FOREGROUND : NO ALERT - NO BADGE - we receive the notification message                - via ALFirebaseMessagingService.onMessageReceived > TALFirebaseMessaging.TNewMessageObserver.onChanged
-// ANDROID: data + alert notification  + app in FOREGROUND : NO ALERT - NO BADGE - we receive the motification message + data message - via ALFirebaseMessagingService.onMessageReceived > TALFirebaseMessaging.TNewMessageObserver.onChanged
-// -------
-// ANDROID: data notification          + app in BACKGROUND : NO ALERT - NO BADGE - we receive the data message                                                                                                  - via ALFirebaseMessagingService.onMessageReceived > TALFirebaseMessaging.TNewMessageObserver.onChanged
-// ANDROID: alert notification         + app in BACKGROUND : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the notification message (with notification.presented=1)                      - via TALFirebaseMessaging.StartupNotificationMessageHandler (TMessageReceivedNotification) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
-// ANDROID: data + alert notification  + app in BACKGROUND : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message and the notification message (with notification.presented=1) - via TALFirebaseMessaging.StartupNotificationMessageHandler (TMessageReceivedNotification) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
-// -------
-// ANDROID: data notification          + app NOT RUNNING   : NO ALERT - NO BADGE - we NEVER receive the data message (actually we receive it in the ALFirebaseMessagingService only)
-// ANDROID: alert notification         + app NOT RUNNING   : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the notification message (with notification.presented=1)                      - via TALFirebaseMessaging.StartupNotificationMessageHandler (TApplicationEventMessage.FinishedLaunching) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
-// ANDROID: data + alert notification  + app NOT RUNNING   : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message and the notification message (with notification.presented=1) - via TALFirebaseMessaging.StartupNotificationMessageHandler (TApplicationEventMessage.FinishedLaunching) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
-//
-//******************************************************************************
+(*******************************************************************************
+ A cross-platform method of using Firebase Cloud Messaging (FCM) to receive
+ push notifications
+
+Setup (ANDROID)
+---------------
+
+On android you just need to include the library com.alcinoe:alcinoe-firebase-messaging:1.0.0
+in the project. You also need to include google-services.json. You can do all
+of this with the help of AndroidMerger. you can see an exemple in
+<Alcinoe>\Demos\ALFirebaseMessaging\_source\android\MergeLibraries.bat
+
+
+Setup (IOS)
+-----------
+
+1) In the Project > Option > Building > Delphi Compiler > Linking > Options
+   passed to the LD linker add -ObjC (like asked in
+   https://firebase.google.com/docs/ios/setup#integrate-without-swift-pm)
+
+2) In project > option > Building > Delphi Compiler > FRAMEWORK search path
+   you need to add the following path:
+   <Alcinoe>\Libraries\ios\firebase\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\firebase\FirebaseAnalytics\FirebaseInstallations.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\firebase\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\firebase\FirebaseAnalytics\FirebaseCore.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\firebase\FirebaseAnalytics\FirebaseCoreInternal.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\firebase\FirebaseMessaging\FirebaseMessaging.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\firebase\FirebaseAnalytics\nanopb.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\firebase\FirebaseMessaging\GoogleDataTransport.xcframework\ios-arm64
+
+3) Under Tools, Options, SDK Manager you will need to add the following
+   frameworks for ios64 and Ios64 simulator:
+
+   Path on remote machine                                                                    |  File mask |  Path Type     |  Include subdirectories
+   $(SDKROOT)/usr/lib/swift                                                                  |  *         |  Library path  |  no
+   $(SDKROOT)/../../../../../Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos      |  *         |  Library path  |  no
+   $(SDKROOT)/../../../../../Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/iphoneos  |  *         |  Library path  |  no
+   $(SDKROOT)/../../../../../Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.5/iphoneos  |  *         |  Library path  |  no
+
+   https://quality.embarcadero.com/browse/RSP-38700
+   You will need to manually copy the content of (assuming c:\SDKs is your BDSPLATFORMSDKSDIR)
+   c:\SDKs\iPhoneOS16.1.sdk\Applications\Xcode.app\Contents\Developer\Toolchains\XcodeDefault.xctoolchain\usr\lib\swift  to  c:\SDKs\iPhoneOS16.1.sdk\usr\lib\swift
+   c:\SDKs\iPhoneOS16.1.sdk\Applications\Xcode.app\Contents\Developer\Toolchains\XcodeDefault.xctoolchain\usr\lib\swift-5.0  to  c:\SDKs\iPhoneOS16.1.sdk\usr\lib\swift-5.0
+   c:\SDKs\iPhoneOS16.1.sdk\Applications\Xcode.app\Contents\Developer\Toolchains\XcodeDefault.xctoolchain\usr\lib\swift-5.5  to  c:\SDKs\iPhoneOS16.1.sdk\usr\lib\swift-5.5
+   and then you can delete the folder c:\SDKs\iPhoneOS16.1.sdk\Applications\
+
+4) In the Project > Option > Building > Delphi Compiler > Linking >
+   Options passed to the LD linker add -rpath /usr/lib/swift
+   this because of this bug: https://quality.embarcadero.com/browse/RSP-38700
+
+5) You must deploy the GoogleService-Info.plist to the root of the app. You
+   can use DeployMan for this. you can see an exemple in
+   <Alcinoe>\Demos\ALFirebaseMessaging\_source\ios\DeployMan.bat.
+   All info regarding generating the GoogleService-Info.plist can be found at
+   https://firebase.google.com/docs/ios/setup
+
+6) If you want the iOS app to be able to receive data notification in
+   background you must add in info.plist.TemplateiOS.xml
+
+     <key>UIBackgroundModes</key>
+     <array>
+       <string>remote-notification</string>
+     </array>
+
+7) If you want to show an image in an ios alert, you must add a service
+   extension to the project.
+
+   Their is actually 2 difficulties with this way:
+   1/ You need to sign the plugin yourself
+      codesign --remove-signature /YourPathto/NotificationService
+      codesign -s <Identity> /YourPathto/NotificationService
+      https://quality.embarcadero.com/browse/RSP-40216
+   2/ The bundle identifier of the app extension must start with the
+      bundle identifier of the delphi project. That mean we can not create a
+      reusable app extension for different projects.
+      https://stackoverflow.com/questions/74854659/how-to-change-from-command-line-the-bundle-identifier-of-an-app-extension
+
+   You can use the template of an app extension:
+   * Replace in <alcinoe>\References\iOSNotification\iOSNotification.xcodeproj\project.pbxproj
+     all occurences of com.ALFirebaseMessaging.app by the bundle identifiers
+     of your delphi app
+   * copy the content of <alcinoe>\References\iOSNotification\ somewhere in
+     the macos. ex: /Users/<username>/Documents/iOSNotification
+   * in the macos run
+     xcodebuild -project /Users/<username>/Documents/iOSNotification/iOSNotification.xcodeproj -scheme iOSNotification -configuration Release -sdk iphoneos CONFIGURATION_BUILD_DIR=/Users/<username>/Documents/Compiled
+   * copy the content of /Users/<username>/Documents/Compiled/iOSNotification.app/PlugIns/
+     in a local folder to your project and with DeployMan instruct the dproj
+     to deploy those file with your app. see an exemple of the DeployMan
+     command in <Alcinoe>\Demos\ALFirebaseMessaging\_source\ios\DeployMan.bat
+
+   Or You can create the app extension in the following way:
+   * Launch Xcode and select "create a new xcode project"
+   * Select ios app as a template for the new project
+     * Enter the productname you want. Ex: iOSNotification
+     * Select your team (you need one just to be able to compile the
+       project)
+     * Enter the organization identifier of your project. Ex:
+       com.ALFirebaseMessaging.app, doesn't matter if not exact you will
+       change it later
+     * Select SwiftUI for the Interface
+     * Select Swift for the language
+     * Uncheck "use core data"
+     * Uncheck "Include tests"
+     * Click "Next" and Save it anywhere you want. ex:
+       /Users/<username>/Documents and do not forget in the finder dialog
+       to uncheck "create git repository on my mac"
+   * In Xcode, with your app project open, navigate to File > Add Packages.
+   * When prompted, add the Firebase Apple platforms SDK repository:
+     https://github.com/firebase/firebase-ios-sdk
+     * Dependancy rule: Exact version - 10.2.0 (or the version of firebase
+       you use)
+     * click "Add Package"
+     * Choose only FirebaseMessaging library and click again to
+       "Add Package"
+   * In Xcode, select File > New > Target to add a new target to your
+     project.
+   * In the iOS > Application Extension section, select the Notification
+     Service Extension target.
+     * Enter the productname you want. Ex NotificationService
+     * Select your team (you need one just to be able to compile the
+       project)
+     * Language: Objective-c
+     * Project: The main project
+     * Embed in application: The main project
+     * click "finish"
+     * in the popup dialog Activate "notificationservice" scheme: click
+       cancel
+   * in the left panel of xcode select your project. Ex ALiOSNotification
+   * In target select the app. Ex ALiOSNotification
+     * Select the General tab
+       * Minimum Deployments: iOS 15
+     * Select the signing & capabilities tab
+       * Select "ALL" capabillity
+       * Bundle Identifier: the bundle identifier of your delphi app
+         (without the team id) Ex: com.ALFirebaseMessaging.app
+   * In target select the service extension. Ex NotificationService
+     * Select the General tab
+       * Deployment info: iOS 11
+       * Under "Framework and Libraries" click on the "+"
+         * Select FirebaseMessaging
+       * then select the signing & capabilities tab
+         * Bundle Identifier: the bundle identifier of your delphi app
+           (without the team id) + .notificationservice. Ex:
+           com.ALFirebaseMessaging.app.notificationservice
+   * in the left panel of xcode select the app extension.
+     Ex NotificationService
+   * Select the file NotificationService.m
+     * add below the line #import "NotificationService.h":
+       #import "FirebaseMessaging/FirebaseMessaging.h"
+     * remove the line:
+       // Modify the notification content here as you wish
+       self.bestAttemptContent.title = [NSString stringWithFormat:@"%@ [modified]", self.bestAttemptContent.title];
+     * replace self.contentHandler(self.bestAttemptContent); by:
+       [[FIRMessaging extensionHelper] populateNotificationContent:self.bestAttemptContent withContentHandler:contentHandler];
+   * in xcode, do File > Save
+   * close xcode
+   * from a command line build the project with a command line like for exemple :
+     xcodebuild -project /Users/<username>/Documents/iOSNotification/iOSNotification.xcodeproj -scheme iOSNotification -configuration Release -sdk iphoneos CONFIGURATION_BUILD_DIR=/Users/<username>/Documents/Compiled
+   * copy the content of /Users/<username>/Documents/Compiled/iOSNotification.app/PlugIns/
+     in a local folder to your project and with DeployMan instruct the dproj
+     to deploy those file with your app. see an exemple of the DeployMan
+     command in <Alcinoe>\Demos\ALFirebaseMessaging\_source\ios\DeployMan.bat
+
+
+Regarding Badge
+---------------
+
+iOS doesn't sum the badge numbers you send to the app. It just displays the
+latest badge number sent from your server. For example You server should send
+a push notification with badge number of 10 if that's the badge number you
+want to display.
+
+  const payload = {
+    ...
+    "aps":{
+      "alert":"test alert",
+      "badge":5,
+      "sound":"default"
+    }
+  }
+
+ https://developer.android.com/develop/ui/views/notifications/badges
+ on android, By default, each notification increments a number displayed on
+ the long- press menu (visible in figure 1), but you can override this number
+ for your app
+
+
+Note
+----
+
+To know when a notification was "pushed" by an user you can look in the data
+payload for the presence of notification.presented=1 It's added by the
+ALFirebaseMessaging Framework to each notification presented to end user so
+it's mean user tapped on it. This is the behavior of the notification in iOS/android:
+
+IOS: data notification          + app in FOREGROUND     : NO ALERT - NO BADGE - we receive the data message         - via TApplicationDelegate.applicationDidReceiveRemoteNotificationWithFetchCompletionHandler                            > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
+IOS: alert notification         + app in FOREGROUND     : NO ALERT - NO BADGE - we receive the alert message        - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:notification:completionHandler > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
+IOS: data + alert notification  + app in FOREGROUND     : NO ALERT - NO BADGE - we receive the alert + data message - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:notification:completionHandler > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
+---
+IOS: data notification          + app in BACKGROUND (1) : NO ALERT - NO BADGE - we receive the data message                                                                             - via TApplicationDelegate.applicationDidReceiveRemoteNotificationWithFetchCompletionHandler                        > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
+IOS: data notification          + app in BACKGROUND (2) : NO ALERT - NO BADGE - WHEN the app will BECAME FOREGROUND: we receive only the LAST SENT data message                         - via TApplicationDelegate.applicationDidReceiveRemoteNotificationWithFetchCompletionHandler                        > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
+IOS: data notification          + app in BACKGROUND (3) : NO ALERT - NO BADGE - we NEVER receive the data message
+IOS: alert notification         + app in BACKGROUND     : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the alert message (with notification.presented=1)        - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
+IOS: data + alert notification  + app in BACKGROUND     : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the alert + data message (with notification.presented=1) - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
+---
+IOS: data notification          + app NOT RUNNING (1)   : NO ALERT - NO BADGE - we receive the data message                                                                                                   - via TApplicationDelegate.applicationDidFinishLaunchingWithOptions > TALFirebaseMessaging.StartupNotificationMessageHandler > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.applicationDidReceiveRemoteNotification  | and also via TApplicationDelegate.applicationDidReceiveRemoteNotificationWithFetchCompletionHandler > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
+IOS: data notification          + app NOT RUNNING (2)   : NO ALERT - NO BADGE - WHEN the app will BECAME FOREGROUND: we receive only the LAST SENT data message                                               - via TApplicationDelegate.applicationDidReceiveRemoteNotificationWithFetchCompletionHandler                                                                                           > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
+IOS: alert notification         + app NOT RUNNING       : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the notification message (with notification.presented=1)                       - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler                                                                    > TALFirebaseMessaging.applicationDidReceiveRemoteNotification  | and also via TApplicationDelegate.applicationDidFinishLaunchingWithOptions > TALFirebaseMessaging.StartupNotificationMessageHandler > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
+IOS: data + alert notification  + app NOT RUNNING       : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message and the notification message (with notification.presented=1)  - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler                                                                    > TALFirebaseMessaging.applicationDidReceiveRemoteNotification  | and also via TApplicationDelegate.applicationDidFinishLaunchingWithOptions > TALFirebaseMessaging.StartupNotificationMessageHandler > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
+
+  (1) We are lucky (for exemple We didn't launch any other app from the time the app goes in background and in the info.plist we have <key>UIBackgroundModes</key><array><string>remote-notification</string></array> and we follow https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/pushing_background_updates_to_your_app?language=objc)
+  (2) We was unlucky in (1) (For exemple we launch another app from the time the app goes in background)
+  (3) We receive the data message when the app was in background and then the user (or the system) kill the app
+
+  NOTE: All of this is just a total bullsheet from apple/ios as it's mean you will never know if you will fall in (1), (2),
+  (3) or even in another case I didn't observe here.
+  That mean on ios data notifications are totaly useless in most of case! in firebase legacy HTTP it's was corrected
+  by the firebase messaging framework but in firebase http V1 they deprecated this essential feature:
+  https://stackoverflow.com/questions/74789738/on-ios-only-last-sent-data-message-is-retrieved-when-the-app-back-online
+
+-----
+
+ANDROID: data notification          + app in FOREGROUND : NO ALERT - NO BADGE - we receive the data message                        - via ALFirebaseMessagingService.onMessageReceived > TALFirebaseMessaging.TNewMessageObserver.onChanged
+ANDROID: alert notification         + app in FOREGROUND : NO ALERT - NO BADGE - we receive the notification message                - via ALFirebaseMessagingService.onMessageReceived > TALFirebaseMessaging.TNewMessageObserver.onChanged
+ANDROID: data + alert notification  + app in FOREGROUND : NO ALERT - NO BADGE - we receive the motification message + data message - via ALFirebaseMessagingService.onMessageReceived > TALFirebaseMessaging.TNewMessageObserver.onChanged
+-------
+ANDROID: data notification          + app in BACKGROUND : NO ALERT - NO BADGE - we receive the data message                                                                                                  - via ALFirebaseMessagingService.onMessageReceived > TALFirebaseMessaging.TNewMessageObserver.onChanged
+ANDROID: alert notification         + app in BACKGROUND : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the notification message (with notification.presented=1)                      - via TALFirebaseMessaging.StartupNotificationMessageHandler (TMessageReceivedNotification) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
+ANDROID: data + alert notification  + app in BACKGROUND : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message and the notification message (with notification.presented=1) - via TALFirebaseMessaging.StartupNotificationMessageHandler (TMessageReceivedNotification) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
+-------
+ANDROID: data notification          + app NOT RUNNING   : NO ALERT - NO BADGE - we NEVER receive the data message (actually we receive it in the ALFirebaseMessagingService only)
+ANDROID: alert notification         + app NOT RUNNING   : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the notification message (with notification.presented=1)                      - via TALFirebaseMessaging.StartupNotificationMessageHandler (TApplicationEventMessage.FinishedLaunching) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
+ANDROID: data + alert notification  + app NOT RUNNING   : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message and the notification message (with notification.presented=1) - via TALFirebaseMessaging.StartupNotificationMessageHandler (TApplicationEventMessage.FinishedLaunching) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
+*******************************************************************************)
 
 unit ALFmxFirebaseMessaging;
 
@@ -267,7 +267,7 @@ uses
   iOSapi.UserNotifications,
   ALIosFirebaseMessagingApi,
   {$ENDIF}
-  ALFmxFirebaseCommon, // [MANDATORY] Because we need it's initialization/finalization section
+  ALFmxFirebaseCore, // [MANDATORY] Because we need it's initialization/finalization section
   alJsonDoc,
   ALStringList;
 

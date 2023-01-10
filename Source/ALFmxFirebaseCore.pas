@@ -1,4 +1,4 @@
-unit ALFmxFirebaseCommon;
+unit ALFmxFirebaseCore;
 
 interface
 
@@ -10,14 +10,14 @@ uses
   system.SysUtils,
   Fmx.Platform,
   {$IF defined(ios)}
-  ALIosFirebaseCommonApi,
+  ALIosFirebaseCoreApi,
   {$ENDIF}
   ALCommon,
   ALString;
 
 
-{*********************************************************************************************}
-procedure ALFmxFirebaseCommonApplicationEventHandler(const Sender: TObject; const M: TMessage);
+{*******************************************************************************************}
+procedure ALFmxFirebaseCoreApplicationEventHandler(const Sender: TObject; const M: TMessage);
 begin
 
   {$REGION ' IOS'}
@@ -35,7 +35,7 @@ begin
       // 4) BecameActive event received
       {$IF defined(debug)}
       allog(
-        'ALFmxFirebaseCommon._ApplicationEventHandler',
+        'ALFmxFirebaseCoreApplicationEventHandler',
         'FinishedLaunching',
         TalLogType.VERBOSE);
       {$ENDIF}
@@ -49,9 +49,9 @@ begin
 end;
 
 initialization
-  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ALFmxFirebaseCommonApplicationEventHandler);
+  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ALFmxFirebaseCoreApplicationEventHandler);
 
 finalization
-  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ALFmxFirebaseCommonApplicationEventHandler);
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ALFmxFirebaseCoreApplicationEventHandler);
 
 end.

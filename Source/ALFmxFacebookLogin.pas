@@ -1,21 +1,66 @@
-{*******************************************************************************
-This unit was (originaly) inspired by
-https://blog.grijjy.com/2017/01/23/using-facebook-sdk-native-framework-for-ios-and-android-for-social-login-and-more-part-1/
-https://blog.grijjy.com/2017/01/30/embed-facebook-sdk-for-android-in-your-delphi-mobile-app-part-2/
-*******************************************************************************}
-unit ALFmxFacebook;
+(*******************************************************************************
+When people log into your app with Facebook, they can grant permissions to your
+app so you can retrieve information or perform actions on Facebook on their
+behalf.
+
+Setup (ANDROID)
+---------------
+
+https://developers.facebook.com/docs/facebook-login/android/
+
+1) follow the step described in ALFmxFacebookCore
+
+2) On android you just need to include the library
+     * com.facebook.android:facebook-login:15.2.0
+   in the project. You can do this with the help of AndroidMerger. You can see
+   an exemple in <Alcinoe>\Demos\ALFacebookLogin\_source\android\MergeLibraries.bat
+
+3) https://developers.facebook.com/docs/facebook-login/android/
+   Add an activity for Facebook, and an activity and intent filter for Chrome
+   Custom Tabs inside your application element:
+
+    <activity android:name="com.facebook.FacebookActivity"
+              android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+              android:theme="@style/com_facebook_activity_theme"
+              android:label="%label%"/>
+    <activity android:name="com.facebook.CustomTabActivity"
+              android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="@string/fb_login_protocol_scheme" />
+      </intent-filter>
+    </activity>
+
+
+Setup (IOS)
+-----------
+
+https://developers.facebook.com/docs/facebook-login/ios/
+
+1) follow the step described in ALFmxFacebookCore
+
+*******************************************************************************)
+unit ALFmxFacebookLogin;
 
 interface
 
+{$I Alcinoe.inc}
+
+{$IFNDEF ALCompilerVersionSupported}
+  {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-27606 is implemented and if yes update the previous documentation regarding "Setup (IOS)"'}
+{$IFEND}
+
 uses
-  system.Classes,
   {$IF defined(android)}
   Androidapi.JNI.JavaTypes,
   Androidapi.JNIBridge,
   ALAndroidFacebookApi,
   {$ELSEIF defined(IOS)}
   iOSapi.Foundation,
-  ALIosFacebookApi,
+  ALIosFacebookCoreKitApi,
+  ALIosFacebookLoginKitApi,
   {$ENDIF}
   system.Messaging;
 
@@ -28,13 +73,11 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALFacebookLogin = class(TObject)
+
+  {$REGION 'ANDROID'}
+  {$IF defined(android)}
   private
-
-    {$REGION ' ANDROID'}
-    {$IF defined(android)}
     type
-
-      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
       TLoginCallback = class(TJavaLocal, JFacebookCallback)
       private
         [Weak] fFacebookLogin: TALFacebookLogin;
@@ -44,33 +87,25 @@ type
         procedure onError(error: JFacebookException); cdecl;
         procedure onSuccess(result: JObject); cdecl;
       end;
-
-    {$ENDIF}
-    {$ENDREGION}
-
   private
-
-    {$REGION ' ANDROID'}
-    {$IF defined(android)}
     FLoginCallback: TLoginCallback;
     FCallbackManager: JCallbackManager;
     procedure ActivityResultHandler(const Sender: TObject; const M: TMessage);
-    {$ENDIF}
-    {$ENDREGION}
+  {$ENDIF}
+  {$ENDREGION}
 
-    {$REGION ' IOS'}
-    {$IF defined(IOS)}
+  {$REGION 'IOS'}
+  {$IF defined(IOS)}
+  private
     FLoginManager: FBSDKLoginManager;
     procedure logInWithPermissionsHandler(result: FBSDKLoginManagerLoginResult; error: NSError);
-    {$ENDIF}
-    {$ENDREGION}
+  {$ENDIF}
+  {$ENDREGION}
 
   private
-
     fOnCancel: TALFacebookLoginOnCancelEvent;
     fOnError: TALFacebookLoginOnErrorEvent;
     fOnSuccess: TALFacebookLoginOnSuccessEvent;
-
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -90,13 +125,11 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALFacebookGraphRequest = class(TObject)
+
+  {$REGION 'ANDROID'}
+  {$IF defined(android)}
   private
-
-    {$REGION ' ANDROID'}
-    {$IF defined(android)}
     type
-
-      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
       TGraphRequestCallback = class(TJavaLocal, JGraphRequest_Callback)
       private
         [Weak] fFacebookGraphRequest: TALFacebookGraphRequest;
@@ -104,46 +137,25 @@ type
         constructor Create(const aFacebookGraphRequest: TALFacebookGraphRequest);
         procedure onCompleted(response: JGraphResponse); cdecl;
       end;
-
-    {$ENDIF}
-    {$ENDREGION}
-
   private
-
-    {$REGION ' ANDROID'}
-    {$IF defined(android)}
     FGraphRequestCallback: TGraphRequestCallback;
-    {$ENDIF}
-    {$ENDREGION}
+  {$ENDIF}
+  {$ENDREGION}
 
-    {$REGION ' IOS'}
-    {$IF defined(IOS)}
-    procedure GraphRequestCompletionHandler(connection: FBSDKGraphRequestConnection; result: Pointer; error: NSError);
-    {$ENDIF}
-    {$ENDREGION}
+  {$REGION 'IOS'}
+  {$IF defined(IOS)}
+  procedure GraphRequestCompletionHandler(connection: FBSDKGraphRequestConnecting; result: pointer; error: NSError);
+  {$ENDIF}
+  {$ENDREGION}
 
   private
-
     fOnCompleted: TALFacebookGraphRequestOnCompletedEvent;
-
   public
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Request(const aGraphPath: String; aParameters: Tarray<String>; const aHttpMethod: string = 'GET');
     property onCompleted: TALFacebookGraphRequestOnCompletedEvent read fOnCompleted write fOnCompleted;
   end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALFacebookShareDialog = class(TObject)
-  private
-  public
-    class function ShowShareLinkDialog(const aLinkUrl: String): boolean;
-  end;
-
-
-
-{***********************}
-procedure ALInitFacebook;
 
 implementation
 
@@ -153,42 +165,14 @@ uses
   Androidapi.Helpers,
   Androidapi.JNI.app,
   Androidapi.JNI.Os,
-  Androidapi.JNI.net,
   {$ELSEIF defined(IOS)}
   Macapi.Helpers,
-  iOSapi.Helpers,
   FMX.Platform,
-  FMX.Platform.iOS,
   {$ENDIF}
+  ALFmxFacebookCore, // [MANDATORY] Because we need it's initialization/finalization section
   ALFmxCommon,
   AlString,
   alcommon;
-
-{*}
-var
-  _ALFacebookInitialised: Boolean;
-
-{***********************}
-procedure ALInitFacebook;
-begin
-  if not _ALFacebookInitialised then begin
-
-    {$REGION ' ANDROID'}
-    {$IF defined(android)}
-    TJFacebookSdk.JavaClass.sdkInitialize(TAndroidHelper.Context);
-    {$ENDIF}
-    {$ENDREGION}
-
-    {$REGION ' IOS'}
-    {$IF defined(ios)}
-    TFBSDKApplicationDelegate.OCClass.initializeSDK(nil{launchOptions});
-    {$ENDIF}
-    {$ENDREGION}
-
-    _ALFacebookInitialised := True;
-
-  end;
-end;
 
 {**********************************}
 constructor TALFacebookLogin.Create;
@@ -201,24 +185,25 @@ begin
   fOnSuccess := nil;
   ALInitFacebook;
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(android)}
 
-    TMessageManager.DefaultManager.SubscribeToMessage(TMessageResultNotification, ActivityResultHandler);
-    FLoginCallback := TLoginCallback.Create(Self);
-    //-----
-    FCallbackManager := TJCallbackManager_Factory.JavaClass.create;
-    TJloginManager.JavaClass.getInstance.registerCallback(FCallbackManager, FLoginCallback);
+  TMessageManager.DefaultManager.SubscribeToMessage(TMessageResultNotification, ActivityResultHandler);
+  FLoginCallback := TLoginCallback.Create(Self);
+  //-----
+  FCallbackManager := TJCallbackManager_Factory.JavaClass.create;
+  TJloginManager.JavaClass.getInstance.registerCallback(FCallbackManager, FLoginCallback);
 
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' IOS'}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
 
-    FLoginManager := TFBSDKLoginManager.Create; // https://stackoverflow.com/questions/42222508/why-we-need-to-do-retain-for-objective-c-object-field
-                                                // In general, if you create such a class with Create, alloc, copy, mutableCopy, new... then retain
-                                                // is called for you. Then you need to call release or autorelease.
+  // https://stackoverflow.com/questions/42222508/why-we-need-to-do-retain-for-objective-c-object-field
+  // In general, if you create such a class with Create, alloc, copy, mutableCopy, new... then retain
+  // is called for you. Then you need to call release or autorelease.
+  FLoginManager := TFBSDKLoginManager.Create;
 
   {$ENDIF}
   {$ENDREGION}
@@ -233,20 +218,20 @@ begin
   fOnError := nil;
   fOnSuccess := nil;
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(android)}
 
-    TMessageManager.DefaultManager.Unsubscribe(TMessageResultNotification, ActivityResultHandler);
-    AlFreeAndNil(FLoginCallback);
-    FCallbackManager := nil;
+  TMessageManager.DefaultManager.Unsubscribe(TMessageResultNotification, ActivityResultHandler);
+  AlFreeAndNil(FLoginCallback);
+  FCallbackManager := nil;
 
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' IOS'}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
 
-    FLoginManager.release;
+  FLoginManager.release;
 
   {$ENDIF}
   {$ENDREGION}
@@ -259,36 +244,22 @@ end;
 //Logs the user in with the requested publish permissions.
 //Permissions Reference: https://developers.facebook.com/docs/facebook-login/permissions#reference-public_profile
 procedure TALFacebookLogin.logInWithReadPermissions(const APermissions: TArray<String>);
-
-  {$REGION ' ANDROID'}
-  {$IF defined(android)}
-  var LArrayList: JArrayList;
-      LCollection: JCollection;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION ' IOS'}
-  {$IF defined(IOS)}
-  var LNSPermissions: NSArray;
-  {$ENDIF}
-  {$ENDREGION}
-
 begin
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(android)}
 
-  LArrayList := ALStringsToJArrayList(APermissions);
-  LCollection := TJCollection.Wrap((LArrayList as ILocalObject).GetObjectID);
+  var LArrayList := ALStringsToJArrayList(APermissions);
+  var LCollection := TJCollection.Wrap((LArrayList as ILocalObject).GetObjectID);
   TJloginManager.JavaClass.getInstance.logInWithReadPermissions(TAndroidHelper.Activity, LCollection);
 
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' IOS'}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
 
-  LNSPermissions := ALStringsToNSArray(APermissions);
+  var LNSPermissions := ALStringsToNSArray(APermissions);
   try
     FLoginManager.logInWithPermissions(LNSPermissions, nil, logInWithPermissionsHandler);
   finally
@@ -304,18 +275,18 @@ end;
 procedure TALFacebookLogin.logout;
 begin
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(android)}
 
-    TJloginManager.JavaClass.getInstance.logout;
+  TJloginManager.JavaClass.getInstance.logout;
 
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' IOS'}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
 
-    FloginManager.logout;
+  FloginManager.logout;
 
   {$ENDIF}
   {$ENDREGION}
@@ -324,37 +295,24 @@ end;
 
 {*********************************************}
 function TALFacebookLogin.CurrentToken: String;
-
-  {$REGION ' ANDROID'}
-  {$IF defined(android)}
-  var LToken: JAccessToken;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION ' IOS'}
-  {$IF defined(ios)}
-  var LToken: FBSDKAccessToken;
-  {$ENDIF}
-  {$ENDREGION}
-
 begin
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(android)}
 
-    LToken := TJAccessToken.JavaClass.getCurrentAccessToken;
-    if LToken = nil then Result := ''
-    else Result := JStringToString(LToken.GetToken);
+  var LToken := TJAccessToken.JavaClass.getCurrentAccessToken;
+  if LToken = nil then Result := ''
+  else Result := JStringToString(LToken.GetToken);
 
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' IOS'}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
 
-    LToken := TFBSDKAccessToken.OCClass.currentAccessToken;
-    if LToken = nil then result := ''
-    else result := NSStrToStr(LToken.tokenString);
+  var LToken := TFBSDKAccessToken.OCClass.currentAccessToken;
+  if LToken = nil then result := ''
+  else result := NSStrToStr(LToken.tokenString);
 
   {$ENDIF}
   {$ENDREGION}
@@ -363,37 +321,24 @@ end;
 
 {**********************************************}
 function TALFacebookLogin.CurrentUserId: String;
-
-  {$REGION ' ANDROID'}
-  {$IF defined(android)}
-  var LToken: JAccessToken;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION ' IOS'}
-  {$IF defined(ios)}
-  var LToken: FBSDKAccessToken;
-  {$ENDIF}
-  {$ENDREGION}
-
 begin
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(android)}
 
-    LToken := TJAccessToken.JavaClass.getCurrentAccessToken;
-    if LToken = nil then Result := ''
-    else Result := JStringToString(LToken.getUserId);
+  var LToken := TJAccessToken.JavaClass.getCurrentAccessToken;
+  if LToken = nil then Result := ''
+  else Result := JStringToString(LToken.getUserId);
 
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' IOS'}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
 
-    LToken := TFBSDKAccessToken.OCClass.currentAccessToken;
-    if LToken = nil then result := ''
-    else result := NSStrToStr(LToken.userID)
+  var LToken := TFBSDKAccessToken.OCClass.currentAccessToken;
+  if LToken = nil then result := ''
+  else result := NSStrToStr(LToken.userID)
 
   {$ENDIF}
   {$ENDREGION}
@@ -402,37 +347,24 @@ end;
 
 {******************************************************************}
 function TALFacebookLogin.CurrentGrantedPermissions: TArray<String>;
-
-  {$REGION ' ANDROID'}
-  {$IF defined(android)}
-  var LToken: JAccessToken;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION ' IOS'}
-  {$IF defined(ios)}
-  var LToken: FBSDKAccessToken;
-  {$ENDIF}
-  {$ENDREGION}
-
 begin
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(android)}
 
-    LToken := TJAccessToken.JavaClass.getCurrentAccessToken;
-    if LToken = nil then setlength(Result, 0)
-    else Result := ALJsetToStrings(LToken.getPermissions);
+  var LToken := TJAccessToken.JavaClass.getCurrentAccessToken;
+  if LToken = nil then setlength(Result, 0)
+  else Result := ALJsetToStrings(LToken.getPermissions);
 
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' IOS'}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
 
-    LToken := TFBSDKAccessToken.OCClass.currentAccessToken;
-    if LToken = nil then setlength(result, 0)
-    else result := ALNSSetToStrings(LToken.permissions);
+  var LToken := TFBSDKAccessToken.OCClass.currentAccessToken;
+  if LToken = nil then setlength(result, 0)
+  else result := ALNSSetToStrings(LToken.permissions);
 
   {$ENDIF}
   {$ENDREGION}
@@ -441,37 +373,24 @@ end;
 
 {*****************************************************************}
 function TALFacebookLogin.CurrentDeniedPermissions: TArray<String>;
-
-  {$REGION ' ANDROID'}
-  {$IF defined(android)}
-  var LToken: JAccessToken;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION ' IOS'}
-  {$IF defined(ios)}
-  var LToken: FBSDKAccessToken;
-  {$ENDIF}
-  {$ENDREGION}
-
 begin
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(android)}
 
-    LToken := TJAccessToken.JavaClass.getCurrentAccessToken;
-    if LToken = nil then setlength(Result, 0)
-    else Result := ALJsetToStrings(LToken.getDeclinedPermissions);
+  var LToken := TJAccessToken.JavaClass.getCurrentAccessToken;
+  if LToken = nil then setlength(Result, 0)
+  else Result := ALJsetToStrings(LToken.getDeclinedPermissions);
 
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' IOS'}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
 
-    LToken := TFBSDKAccessToken.OCClass.currentAccessToken;
-    if LToken = nil then setlength(result, 0)
-    else result := ALNSSetToStrings(LToken.declinedPermissions)
+  var LToken := TFBSDKAccessToken.OCClass.currentAccessToken;
+  if LToken = nil then setlength(result, 0)
+  else result := ALNSSetToStrings(LToken.declinedPermissions)
 
   {$ENDIF}
   {$ENDREGION}
@@ -570,8 +489,11 @@ begin
     setlength(LDeniedPermissions, 0);
   end;
   {$IFDEF DEBUG}
-  allog('TALFacebookLogin.TLoginCallback.onSuccess', 'UserID: ' + LUserIDStr +
-                                                     ' - Token: ' + LTokenStr, TalLogType.info);
+  allog(
+    'TALFacebookLogin.TLoginCallback.onSuccess',
+    'UserID: ' + LUserIDStr + ' | ' +
+    'Token: ' + LTokenStr,
+    TalLogType.info);
   {$ENDIF}
 
   if assigned(fFacebookLogin.fOnsuccess) then
@@ -639,7 +561,7 @@ begin
     end;
 
     {$IFDEF DEBUG}
-    allog('TALFacebookLogin.logInWithReadPermissionsHandler.onSuccess', 'UserID: ' + LUserIDStr + ' - Token: ' + LTokenStr, TalLogType.info);
+    allog('TALFacebookLogin.logInWithReadPermissionsHandler.onSuccess', 'UserID: ' + LUserIDStr + ' | Token: ' + LTokenStr, TalLogType.info);
     {$ENDIF}
 
     if assigned(fOnsuccess) then
@@ -661,10 +583,10 @@ begin
   fonCompleted := nil;
   ALInitFacebook;
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(android)}
 
-    FGraphRequestCallback := TGraphRequestCallback.Create(Self);
+  FGraphRequestCallback := TGraphRequestCallback.Create(Self);
 
   {$ENDIF}
   {$ENDREGION}
@@ -677,10 +599,10 @@ begin
 
   fOnCompleted := nil;
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(android)}
 
-    AlFreeAndNil(FGraphRequestCallback);
+  AlFreeAndNil(FGraphRequestCallback);
 
   {$ENDIF}
   {$ENDREGION}
@@ -711,67 +633,49 @@ end;
 //Note: The /me node is a special endpoint that translates to the user_id of the person (or the page_id of the Facebook Page)
 //      whose access token is currently being used to make the API calls
 procedure TALFacebookGraphRequest.Request(const aGraphPath: String; aParameters: Tarray<String>; const aHttpMethod: string = 'GET');
-
-  {$REGION ' IOS'}
-  {$IF defined(IOS)}
-  var LGraphRequest: FBSDKGraphRequest;
-      LNSDictParameters: NSMutableDictionary;
-      LName, LValue: String;
-      I: integer;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION ' ANDROID'}
-  {$IF defined(android)}
-  var LBundle: JBundle;
-      LName, LValue: String;
-      LJName, LJValue: JString;
-      LGraphRequest: JGraphRequest;
-      LJHttpMethod: JHttpMethod;
-      I: integer;
-  {$ENDIF}
-  {$ENDREGION}
-
 begin
 
-  {$REGION ' ANDROID'}
+  {$REGION 'ANDROID'}
   {$IF defined(android)}
 
-  LBundle := TJBundle.JavaClass.init;
-  for i := Low(aparameters) to High(aparameters) do begin
+  var LBundle := TJBundle.JavaClass.init;
+  for var i := Low(aparameters) to High(aparameters) do begin
+    var LName, LValue: String;
     _ExtractNameValue(aparameters[i], LName, LValue);
-    LJName := StringToJstring(LName);
-    LJValue := StringToJstring(LValue);
+    var LJName := StringToJstring(LName);
+    var LJValue := StringToJstring(LValue);
     LBundle.putString(LJName, LJValue);
-    LJName := nil;  // << because of
-    LJValue := nil; // << https://quality.embarcadero.com/browse/RSP-14187
   end;
+  var LJHttpMethod: JHttpMethod;
   if AlSameTextU(aHttpMethod, 'POST') then LJHttpMethod := TJHttpMethod.JavaClass.POST
   else LJHttpMethod := TJHttpMethod.JavaClass.GET;
-  LGraphRequest := TJGraphRequest.JavaClass.init(TJAccessToken.JavaClass.getCurrentAccessToken, StringToJstring(aGraphPath), LBundle, LJHttpMethod, FGraphRequestCallback);
+  var LGraphRequest := TJGraphRequest.JavaClass.init(TJAccessToken.JavaClass.getCurrentAccessToken, StringToJstring(aGraphPath), LBundle, LJHttpMethod, FGraphRequestCallback);
   LGraphRequest.executeAsync;
 
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION ' IOS'}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
-
-  LNSDictParameters := TNSMutableDictionary.Create;
+  var LNSDictParameters := TNSMutableDictionary.Create;
   try
-    for i := Low(aparameters) to High(aparameters) do begin
+    for var i := Low(aparameters) to High(aparameters) do begin
+      var LName, LValue: String;
       _ExtractNameValue(aparameters[i], LName, LValue);
       LNSDictParameters.setValue(StringToID(LName), StrToNsStr(LValue));
     end;
-    LGraphRequest := TFBSDKGraphRequest.Wrap(TFBSDKGraphRequest.Alloc.initWithGraphPathParametersHTTPMethod(StrToNSStr(aGraphPath), // graphPath: NSString;
-                                                                                                            LNSDictParameters, // parameters: NSDictionary;
-                                                                                                            StrToNSStr(aHTTPMethod)));//HTTPMethod: NSString
+    var LGraphRequest := TFBSDKGraphRequest.Alloc.initWithGraphPathParametersHTTPMethod(
+                           StrToNSStr(aGraphPath), // graphPath: NSString;
+                           LNSDictParameters, // parameters: NSDictionary;
+                           StrToNSStr(aHTTPMethod));//HTTPMethod: NSString
+    try
+      LGraphRequest.startWithCompletion(GraphRequestCompletionHandler);
+    finally
+      LGraphRequest.release;
+    end;
   finally
     LNSDictParameters.release;
   end;
-  LGraphRequest.startWithCompletionHandler(GraphRequestCompletionHandler);
-  LGraphRequest.release; // https://stackoverflow.com/questions/44176681/delphi-ios-release-retain-and-reference-counting-with-objective-c-object
-
   {$ENDIF}
   {$ENDREGION}
 
@@ -806,9 +710,12 @@ begin
     end;
   end;
   {$IFDEF DEBUG}
-  allog('TALFacebookGraphRequest.TGraphRequestCallback.onCompleted', 'response: ' + LRawResponse +
-                                                                     ' - ErrorCode: ' + alinttoStrU(LErrorCode) +
-                                                                     ' - ErrorMsg: ' + LErrorMsg, TalLogType.verbose);
+  allog(
+    'TALFacebookGraphRequest.TGraphRequestCallback.onCompleted',
+    'response: ' + LRawResponse + ' | ' +
+    'ErrorCode: ' + alinttoStrU(LErrorCode) + ' | ' +
+    'ErrorMsg: ' + LErrorMsg,
+    TalLogType.verbose);
   {$ENDIF}
 
   if assigned(fFacebookGraphRequest.fOnCompleted) then
@@ -823,7 +730,7 @@ end;
 {$IF defined(IOS)}
 
 {****************************************************************************************************************************************}
-procedure TALFacebookGraphRequest.GraphRequestCompletionHandler(connection: FBSDKGraphRequestConnection; result: Pointer; error: NSError);
+procedure TALFacebookGraphRequest.GraphRequestCompletionHandler(connection: FBSDKGraphRequestConnecting; result: pointer; error: NSError);
 var LRawResponse: String;
     LErrorCode: integer;
     LErrorMsg: String;
@@ -852,9 +759,12 @@ begin
   end;
 
   {$IFDEF DEBUG}
-  allog('TALFacebookGraphRequest.TGraphRequestCallback.onCompleted', 'response: ' + LRawResponse +
-                                                                     ' - ErrorCode: ' + alinttoStrU(LErrorCode) +
-                                                                     ' - ErrorMsg: ' + LErrorMsg, TalLogType.verbose);
+  allog(
+    'TALFacebookGraphRequest.GraphRequestCompletionHandler',
+    'response: ' + LRawResponse + ' | ' +
+    'ErrorCode: ' + alinttoStrU(LErrorCode) + ' | ' +
+    'ErrorMsg: ' + LErrorMsg,
+    TalLogType.verbose);
   {$ENDIF}
 
   if assigned(fOnCompleted) then
@@ -864,119 +774,5 @@ end;
 
 {$ENDIF}
 {$ENDREGION}
-
-{*****************************************************************************************}
-class function TALFacebookShareDialog.ShowShareLinkDialog(const aLinkUrl: String): boolean;
-begin
-
-  ALInitFacebook;
-  result := False;
-
-  {$REGION ' ANDROID'}
-  {$IF defined(android)}
-
-    if TJALFacebookShareLinkDialog.javaclass.canshow then begin
-      result := True;
-      TJALFacebookShareLinkDialog.javaclass.Show(
-        TAndroidHelper.Activity,
-        StrToJURI(aLinkUrl), // contentUrl: Jnet_Uri;
-        nil) //quote: JString
-    end;
-
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION ' IOS'}
-  {$IF defined(IOS)}
-
-    var LFBSDKShareDialog := TFBSDKShareDialog.create;
-    try
-      if LFBSDKShareDialog.canshow then begin
-        Result := True;
-        var LFBSDKShareLinkContent := TFBSDKShareLinkContent.create;
-        try
-          LFBSDKShareLinkContent.setContentURL(StrToNSUrl(aLinkUrl));
-          LFBSDKShareDialog.setShareContent(LFBSDKShareLinkContent);
-          LFBSDKShareDialog.show;
-        finally
-          LFBSDKShareLinkContent.release;
-        end;
-      end;
-    finally
-      LFBSDKShareDialog.release;
-    end;
-
-  {$ENDIF}
-  {$ENDREGION}
-
-end;
-
-
-{$REGION ' IOS'}
-{$IF defined(IOS)}
-
-Type
-
-  {*******************************************}
-  //if i don't don't this i have internal error
-  _TFacebookProcOfObjectWrapper = class(Tobject)
-  public
-    class procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
-  end;
-
-{*********************************************************************************************************************}
-class procedure _TFacebookProcOfObjectWrapper.ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
-begin
-  if not _ALFacebookInitialised then exit;
-  if M is TApplicationEventMessage then begin
-    var LValue := (M as TApplicationEventMessage).value;
-    if LValue.Event = TApplicationEvent.OpenURL then begin
-
-      var Lcontext := TiOSOpenApplicationContext(LValue.Context);
-      {$IFDEF DEBUG}
-      ALLog('_TFacebookProcOfObjectWrapper.ApplicationEventMessageHandler', 'Url: ' + Lcontext.URL);
-      {$ENDIF}
-
-      //application:openURL:options: (iOS 9 and up)
-      If TOSVersion.Check(9) then begin
-        var LFBSDKApplicationDelegate := TFBSDKApplicationDelegate.Wrap(TFBSDKApplicationDelegate.OCClass.sharedInstance);
-        LFBSDKApplicationDelegate.applicationOpenURLOptions(TiOSHelper.SharedApplication, // application: UIApplication
-                                                            StrToNSUrl(Lcontext.Url),  // openURL: NSURL;
-                                                            TNSDictionary.Wrap(Lcontext.Context)); // options: NSDictionary
-      end
-
-      //application:openURL:sourceApplication:annotation: (iOS 8 and older)
-      else begin
-        var LFBSDKApplicationDelegate := TFBSDKApplicationDelegate.Wrap(TFBSDKApplicationDelegate.OCClass.sharedInstance);
-        LFBSDKApplicationDelegate.applicationOpenURLSourceApplicationAnnotation(TiOSHelper.SharedApplication, // application: UIApplication;
-                                                                                StrToNSUrl(Lcontext.Url),  // openURL: NSURL;
-                                                                                StrToNsStr(Lcontext.SourceApp),  // sourceApplication: NSString;
-                                                                                Lcontext.Context); // annotation: Pointer
-      end;
-
-    end;
-  end;
-end;
-
-{$ENDIF}
-{$ENDREGION}
-
-initialization
-
-  _ALFacebookInitialised := False;
-
-  {$REGION ' IOS'}
-  {$IF defined(IOS)}
-  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, _TFacebookProcOfObjectWrapper.ApplicationEventMessageHandler);
-  {$ENDIF}
-  {$ENDREGION}
-
-finalization
-
-  {$REGION ' IOS'}
-  {$IF defined(IOS)}
-  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, _TFacebookProcOfObjectWrapper.ApplicationEventMessageHandler);
-  {$ENDIF}
-  {$ENDREGION}
 
 end.

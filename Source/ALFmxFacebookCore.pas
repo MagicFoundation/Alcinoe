@@ -77,7 +77,20 @@ Setup (IOS)
 
 https://developers.facebook.com/docs/ios/getting-started
 
-1) https://developers.facebook.com/docs/ios/getting-started
+1) follow the step bescribed described in ALFmxFirebaseMessaging
+     1) : LD linker add -ObjC
+     3) : Add the libswift frameworks for ios64 and Ios64 simulator
+     4) : LD linker add -rpath /usr/lib/swift
+
+2) In project > option > Building > Delphi Compiler > FRAMEWORK search path
+   you need to add the following path:
+   <Alcinoe>\Libraries\ios\facebook\FBSDKLoginKit.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\facebook\FBSDKShareKit.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\facebook\FBSDKCoreKit_Basics.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\facebook\FBSDKCoreKit.xcframework\ios-arm64
+   <Alcinoe>\Libraries\ios\facebook\FBAEMKit.xcframework\ios-arm64
+
+3) https://developers.facebook.com/docs/ios/getting-started
    Configure the Info.plist file with an XML snippet that contains data about
    your app.
 
@@ -97,7 +110,7 @@ https://developers.facebook.com/docs/ios/getting-started
     <key>FacebookDisplayName</key>
     <string>APP-NAME</string>
 
-2) https://developers.facebook.com/docs/ios/getting-started
+4) https://developers.facebook.com/docs/ios/getting-started
    To use any of the Facebook dialogs (e.g., Login, Share, App Invites, etc.)
    that can perform an app switch to Facebook apps, your application's
    Info.plist also needs to include the following:
@@ -108,7 +121,7 @@ https://developers.facebook.com/docs/ios/getting-started
       <string>fb-messenger-share-api</string>
     </array>
 
-3) https://developers.facebook.com/docs/app-events/getting-started-app-events-ios/
+5) https://developers.facebook.com/docs/app-events/getting-started-app-events-ios/
    Disable Automatically Logged Events
    To disable automatic event logging, open the application's Info.plist as code
    in Xcode and add the following XML to the property dictionary:
@@ -116,7 +129,7 @@ https://developers.facebook.com/docs/ios/getting-started
     <key>FacebookAutoLogAppEventsEnabled</key>
     <false/>
 
-4) https://developers.facebook.com/docs/app-events/getting-started-app-events-ios/
+6) https://developers.facebook.com/docs/app-events/getting-started-app-events-ios/
    Disable Collection of Advertiser IDs
    To disable collection of advertiser-id, open the application's .plist as
    code in Xcode and add the following XML to the property dictionary:
@@ -124,7 +137,7 @@ https://developers.facebook.com/docs/ios/getting-started
      <key>FacebookAdvertiserIDCollectionEnabled</key>
      <false/>
 
-3) To disable automatic SDK initialization (the alcinoe framework will do it for
+7) To disable automatic SDK initialization (the alcinoe framework will do it for
    you when you will use any facebook functions below), you can set
    ALInitFacebookSDKAtStartup := false
    in the begin .. end section of your dpr

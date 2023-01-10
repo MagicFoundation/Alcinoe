@@ -359,8 +359,7 @@ type
           FFirebaseMessaging: TALFirebaseMessaging;
         public
           constructor Create(const AFirebaseMessaging: TALFirebaseMessaging);
-          [MethodName('messaging:didReceiveRegistrationToken:')]
-          procedure messagingDidReceiveRegistrationToken(messaging: FIRMessaging; fcmToken: NSString); cdecl;
+          procedure messaging(messaging: FIRMessaging; fcmToken: NSString); cdecl;
         end;
     private
       fFIRMessagingDelegate: TFIRMessagingDelegate;
@@ -1153,10 +1152,10 @@ end;
 //but may be called more often, if token is invalidated or updated. In this method, you should perform operations such as:
 // * Uploading the FCM token to your application server, so targeted notifications can be sent.
 // * Subscribing to any topics.
-procedure TALFirebaseMessaging.TFIRMessagingDelegate.messagingDidReceiveRegistrationToken(messaging: FIRMessaging; fcmToken: NSString);
+procedure TALFirebaseMessaging.TFIRMessagingDelegate.messaging(messaging: FIRMessaging; fcmToken: NSString);
 begin
   {$IFDEF DEBUG}
-  allog('TALFirebaseMessaging.TFIRMessagingDelegate.messagingDidReceiveRegistrationToken', 'Token: ' + NSStrToStr(fcmToken), TalLogType.VERBOSE);
+  allog('TALFirebaseMessaging.TFIRMessagingDelegate.messaging', 'Token: ' + NSStrToStr(fcmToken), TalLogType.VERBOSE);
   {$ENDIF}
   FFirebaseMessaging.doTokenRefresh(NSStrToStr(fcmToken));
 end;

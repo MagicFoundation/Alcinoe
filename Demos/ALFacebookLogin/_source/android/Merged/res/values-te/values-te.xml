@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <string gender="unknown" name="com_facebook_device_auth_instructions">&lt;b>facebook.com/device&lt;/b>ని సందర్శించి పైన చూపిన కోడ్‌ను నమోదు చేయండి.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">ఒక చిత్రాన్ని డౌన్‌లోడ్ చేయడంలో అనుకోని లోపం సంభవించింది.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">WebView లాగిన్ కోసం ఇంటర్నెట్ అనుమతి అవసరమవుతుంది</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">AndroidManifest లోపం</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">లైక్ చేసారు</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">ఇష్టం</string>
+    <string gender="unknown" name="com_facebook_loading">లోడ్ చేస్తోంది…</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">రద్దు చేయి</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">లాగిన్</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Facebookతో కొనసాగించండి</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Facebookతో లాగిన్ చేయండి</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">లాగ్ అవుట్ చేయండి</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">లాగ్ అవుట్ చేయండి</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">వీరి వలె లాగిన్ చేసారు: %1$s</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Facebookని ఉపయోగించి లాగిన్ చేసారు</string>
+    <string gender="unknown" name="com_facebook_send_button_text">పంపండి</string>
+    <string gender="unknown" name="com_facebook_share_button_text">షేర్ చేయి</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">మీ ఖాతాను కనెక్ట్ చేసేందుకు, మీ మొబైల్ పరికరంలో Facebook యాప్‌ని తెరిచి, నోటిఫికేషన్‌లను తనిఖీ చేయండి.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- లేదా -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">మీరు కాదా?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">%1$sగా కొనసాగండి</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">లాగిన్‌ను నిర్ధారించండి</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">మీరు నియంత్రణలో ఉన్నారు - మీరు ఏ సమాచారాన్ని యాప్‌లతో పంచుకోవాలనుకుంటున్నారో ఎంచుకోండి.</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+    <string msgid="7903180715631665059" name="abc_action_bar_home_description">"హోమ్‌కు నావిగేట్ చేస్తుంది"</string>
+    <string msgid="6794660482873516081" name="abc_action_bar_up_description">"పైకి నావిగేట్ చేస్తుంది"</string>
+    <string msgid="1155814932213556626" name="abc_action_menu_overflow_description">"మరిన్ని ఎంపికలు"</string>
+    <string msgid="2571498368472823490" name="abc_action_mode_done">"పూర్తయింది"</string>
+    <string msgid="3732416590524162402" name="abc_activity_chooser_view_see_all">"అన్నీ చూడండి"</string>
+    <string msgid="1798588241954930982" name="abc_activitychooserview_choose_application">"యాప్‌ను ఎంచుకోండి"</string>
+    <string msgid="3403923230105792483" name="abc_capital_off">"ఆఫ్"</string>
+    <string msgid="7831734969929204599" name="abc_capital_on">"ఆన్"</string>
+    <string msgid="5725160506500770567" name="abc_menu_alt_shortcut_label">"Alt+"</string>
+    <string msgid="944415252197684443" name="abc_menu_ctrl_shortcut_label">"Ctrl+"</string>
+    <string msgid="129742188101734366" name="abc_menu_delete_shortcut_label">"delete"</string>
+    <string msgid="6840127756824236027" name="abc_menu_enter_shortcut_label">"enter"</string>
+    <string msgid="4974283687810130415" name="abc_menu_function_shortcut_label">"Function+"</string>
+    <string msgid="8046416353848716905" name="abc_menu_meta_shortcut_label">"Meta+"</string>
+    <string msgid="3271697756921353410" name="abc_menu_shift_shortcut_label">"Shift+"</string>
+    <string msgid="2304645930658438191" name="abc_menu_space_shortcut_label">"స్పేస్"</string>
+    <string msgid="8327365089695024394" name="abc_menu_sym_shortcut_label">"Sym+"</string>
+    <string msgid="3570106412128999382" name="abc_prepend_shortcut_label">"Menu+"</string>
+    <string msgid="940844115270746197" name="abc_search_hint">"వెతకండి…"</string>
+    <string msgid="1769270744562318534" name="abc_searchview_description_clear">"ప్రశ్నను తీసివేస్తుంది"</string>
+    <string msgid="908784302972860853" name="abc_searchview_description_query">"శోధన ప్రశ్న"</string>
+    <string msgid="5466662225065974044" name="abc_searchview_description_search">"శోధన"</string>
+    <string msgid="8203855622131699655" name="abc_searchview_description_submit">"ప్రశ్నని సమర్పిస్తుంది"</string>
+    <string msgid="3478748990613108725" name="abc_searchview_description_voice">"వాయిస్ శోధన"</string>
+    <string msgid="2650565705514630347" name="abc_shareactionprovider_share_with">"వీరితో షేర్ చేస్తుంది"</string>
+    <string msgid="9009661856846212431" name="abc_shareactionprovider_share_with_application">"<ns1:g id="APPLICATION_NAME">%s</ns1:g>తో షేర్ చేస్తుంది"</string>
+    <string msgid="6389460216547290468" name="abc_toolbar_collapse_description">"కుదిస్తుంది"</string>
+    <string msgid="730395136688082741" name="search_menu_title">"శోధన"</string>
+</resources>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <string gender="unknown" name="com_facebook_device_auth_instructions">前往&lt;b> facebook.com/device &lt;/b>並輸入上方顯示的代碼。</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">下載圖像時無預警發生錯誤。</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">WebView 登入需要網路使用權限</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">AndroidManifest 錯誤</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">已說讚</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">讚</string>
+    <string gender="unknown" name="com_facebook_loading">載入中......</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">取消</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">登入</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">以 Facebook 帳號繼續</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">使用 Facebook 帳號登入</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">登出</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">登出</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">已使用%1$s的身分登入</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">已使用 Facebook 登入</string>
+    <string gender="unknown" name="com_facebook_send_button_text">送出</string>
+    <string gender="unknown" name="com_facebook_share_button_text">分享</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">若要連結帳號，請在行動裝置上開啟 Facebook 應用程式，然後查看通知。</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- 或 -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">不是你？</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">以%1$s的身分繼續</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">確認登入</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">一切操之在你：自行選擇要分享給應用程式的資訊種類。</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+    <string msgid="7903180715631665059" name="abc_action_bar_home_description">"瀏覽首頁"</string>
+    <string msgid="6794660482873516081" name="abc_action_bar_up_description">"向上瀏覽"</string>
+    <string msgid="1155814932213556626" name="abc_action_menu_overflow_description">"更多選項"</string>
+    <string msgid="2571498368472823490" name="abc_action_mode_done">"完成"</string>
+    <string msgid="3732416590524162402" name="abc_activity_chooser_view_see_all">"查看全部"</string>
+    <string msgid="1798588241954930982" name="abc_activitychooserview_choose_application">"選擇應用程式"</string>
+    <string msgid="3403923230105792483" name="abc_capital_off">"關閉"</string>
+    <string msgid="7831734969929204599" name="abc_capital_on">"開啟"</string>
+    <string msgid="5725160506500770567" name="abc_menu_alt_shortcut_label">"Alt +"</string>
+    <string msgid="944415252197684443" name="abc_menu_ctrl_shortcut_label">"Ctrl +"</string>
+    <string msgid="129742188101734366" name="abc_menu_delete_shortcut_label">"Delete 鍵"</string>
+    <string msgid="6840127756824236027" name="abc_menu_enter_shortcut_label">"Enter 鍵"</string>
+    <string msgid="4974283687810130415" name="abc_menu_function_shortcut_label">"Fn +"</string>
+    <string msgid="8046416353848716905" name="abc_menu_meta_shortcut_label">"Meta +"</string>
+    <string msgid="3271697756921353410" name="abc_menu_shift_shortcut_label">"Shift +"</string>
+    <string msgid="2304645930658438191" name="abc_menu_space_shortcut_label">"空格鍵"</string>
+    <string msgid="8327365089695024394" name="abc_menu_sym_shortcut_label">"Sym +"</string>
+    <string msgid="3570106412128999382" name="abc_prepend_shortcut_label">"Menu +"</string>
+    <string msgid="940844115270746197" name="abc_search_hint">"搜尋…"</string>
+    <string msgid="1769270744562318534" name="abc_searchview_description_clear">"清除查詢"</string>
+    <string msgid="908784302972860853" name="abc_searchview_description_query">"搜尋查詢"</string>
+    <string msgid="5466662225065974044" name="abc_searchview_description_search">"搜尋"</string>
+    <string msgid="8203855622131699655" name="abc_searchview_description_submit">"提交查詢"</string>
+    <string msgid="3478748990613108725" name="abc_searchview_description_voice">"語音搜尋"</string>
+    <string msgid="2650565705514630347" name="abc_shareactionprovider_share_with">"分享對象"</string>
+    <string msgid="9009661856846212431" name="abc_shareactionprovider_share_with_application">"與「<ns1:g id="APPLICATION_NAME">%s</ns1:g>」分享"</string>
+    <string msgid="6389460216547290468" name="abc_toolbar_collapse_description">"收合"</string>
+    <string msgid="730395136688082741" name="search_menu_title">"搜尋"</string>
+</resources>

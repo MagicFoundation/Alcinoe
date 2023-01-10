@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <string gender="unknown" name="com_facebook_device_auth_instructions">&lt;b>facebook.com/device&lt;/b>를 방문하여 위 코드를 입력하세요.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">이미지를 다운로드하는 중 예기치 않은 오류가 발생했습니다.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">WebView 로그인에 인터넷 권한이 필요합니다</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">AndroidManifest 오류</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">좋아요</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">좋아요</string>
+    <string gender="unknown" name="com_facebook_loading">읽어들이는 중…</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">취소</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">로그인</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Facebook으로 계속하기</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Facebook으로 로그인</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">로그아웃</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">로그아웃</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">로그인 사용자: %1$s</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Facebook을 사용하여 로그인함</string>
+    <string gender="unknown" name="com_facebook_send_button_text">보내기</string>
+    <string gender="unknown" name="com_facebook_share_button_text">공유</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">계정에 연결하려면 모바일 기기에서 Facebook 앱을 열고 알림을 확인하세요.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- 또는 -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">회원님이 아닌가요?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">%1$s님으로 계속</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">로그인 확인</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">앱과 공유할 정보를 자유롭게 선택할 수 있습니다.</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+    <string msgid="7903180715631665059" name="abc_action_bar_home_description">"홈으로 이동"</string>
+    <string msgid="6794660482873516081" name="abc_action_bar_up_description">"위로 이동"</string>
+    <string msgid="1155814932213556626" name="abc_action_menu_overflow_description">"추가 옵션"</string>
+    <string msgid="2571498368472823490" name="abc_action_mode_done">"완료"</string>
+    <string msgid="3732416590524162402" name="abc_activity_chooser_view_see_all">"전체 보기"</string>
+    <string msgid="1798588241954930982" name="abc_activitychooserview_choose_application">"앱 선택"</string>
+    <string msgid="3403923230105792483" name="abc_capital_off">"사용 중지"</string>
+    <string msgid="7831734969929204599" name="abc_capital_on">"사용"</string>
+    <string msgid="5725160506500770567" name="abc_menu_alt_shortcut_label">"Alt+"</string>
+    <string msgid="944415252197684443" name="abc_menu_ctrl_shortcut_label">"Ctrl+"</string>
+    <string msgid="129742188101734366" name="abc_menu_delete_shortcut_label">"Delete"</string>
+    <string msgid="6840127756824236027" name="abc_menu_enter_shortcut_label">"Enter"</string>
+    <string msgid="4974283687810130415" name="abc_menu_function_shortcut_label">"Function+"</string>
+    <string msgid="8046416353848716905" name="abc_menu_meta_shortcut_label">"Meta+"</string>
+    <string msgid="3271697756921353410" name="abc_menu_shift_shortcut_label">"Shift+"</string>
+    <string msgid="2304645930658438191" name="abc_menu_space_shortcut_label">"스페이스바"</string>
+    <string msgid="8327365089695024394" name="abc_menu_sym_shortcut_label">"Sym+"</string>
+    <string msgid="3570106412128999382" name="abc_prepend_shortcut_label">"Menu+"</string>
+    <string msgid="940844115270746197" name="abc_search_hint">"검색..."</string>
+    <string msgid="1769270744562318534" name="abc_searchview_description_clear">"검색어 삭제"</string>
+    <string msgid="908784302972860853" name="abc_searchview_description_query">"검색어"</string>
+    <string msgid="5466662225065974044" name="abc_searchview_description_search">"검색"</string>
+    <string msgid="8203855622131699655" name="abc_searchview_description_submit">"검색어 보내기"</string>
+    <string msgid="3478748990613108725" name="abc_searchview_description_voice">"음성 검색"</string>
+    <string msgid="2650565705514630347" name="abc_shareactionprovider_share_with">"공유 대상:"</string>
+    <string msgid="9009661856846212431" name="abc_shareactionprovider_share_with_application">"<ns1:g id="APPLICATION_NAME">%s</ns1:g>과(와) 공유"</string>
+    <string msgid="6389460216547290468" name="abc_toolbar_collapse_description">"접기"</string>
+    <string msgid="730395136688082741" name="search_menu_title">"검색"</string>
+</resources>

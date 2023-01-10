@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <string gender="unknown" name="com_facebook_device_auth_instructions">Consultez &lt;b>facebook.com/device&lt;/b> et entrez le code affiché ci-dessous.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">Une erreur inattendue s’est produite lors du téléchargement d’une image.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">La connexion à WebView nécessite une autorisation INTERNET</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">Erreur AndroidManifest</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">J’aime déjà</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">J’aime</string>
+    <string gender="unknown" name="com_facebook_loading">Chargement…</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">Annuler</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">Connectez-vous</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Continuer avec Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Se connecter avec Facebook</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">Déconnexion</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">Déconnexion</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">Connecté(e) en tant que : %1$s</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Connecté(e) avec Facebook</string>
+    <string gender="unknown" name="com_facebook_send_button_text">Envoyer</string>
+    <string gender="unknown" name="com_facebook_share_button_text">Partager</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">Pour associer votre compte, ouvrez l’app Facebook sur votre appareil mobile et vérifiez les notifications.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- OU -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">Ce n’est pas vous ?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">Continuer en tant que %1$s</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">Confirmer la connexion</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">Vous avez le contrôle - choisissez les informations que vous voulez partager avec les apps.</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+    <string msgid="7903180715631665059" name="abc_action_bar_home_description">"Revenir à l\'accueil"</string>
+    <string msgid="6794660482873516081" name="abc_action_bar_up_description">"Revenir en haut de la page"</string>
+    <string msgid="1155814932213556626" name="abc_action_menu_overflow_description">"Autres options"</string>
+    <string msgid="2571498368472823490" name="abc_action_mode_done">"OK"</string>
+    <string msgid="3732416590524162402" name="abc_activity_chooser_view_see_all">"Tout afficher"</string>
+    <string msgid="1798588241954930982" name="abc_activitychooserview_choose_application">"Sélectionner une application"</string>
+    <string msgid="3403923230105792483" name="abc_capital_off">"NON"</string>
+    <string msgid="7831734969929204599" name="abc_capital_on">"OUI"</string>
+    <string msgid="5725160506500770567" name="abc_menu_alt_shortcut_label">"Alt+"</string>
+    <string msgid="944415252197684443" name="abc_menu_ctrl_shortcut_label">"Ctrl+"</string>
+    <string msgid="129742188101734366" name="abc_menu_delete_shortcut_label">"supprimer"</string>
+    <string msgid="6840127756824236027" name="abc_menu_enter_shortcut_label">"entrée"</string>
+    <string msgid="4974283687810130415" name="abc_menu_function_shortcut_label">"Fonction+"</string>
+    <string msgid="8046416353848716905" name="abc_menu_meta_shortcut_label">"Méta+"</string>
+    <string msgid="3271697756921353410" name="abc_menu_shift_shortcut_label">"Maj+"</string>
+    <string msgid="2304645930658438191" name="abc_menu_space_shortcut_label">"espace"</string>
+    <string msgid="8327365089695024394" name="abc_menu_sym_shortcut_label">"Sym+"</string>
+    <string msgid="3570106412128999382" name="abc_prepend_shortcut_label">"Menu+"</string>
+    <string msgid="940844115270746197" name="abc_search_hint">"Rechercher…"</string>
+    <string msgid="1769270744562318534" name="abc_searchview_description_clear">"Effacer la requête"</string>
+    <string msgid="908784302972860853" name="abc_searchview_description_query">"Requête de recherche"</string>
+    <string msgid="5466662225065974044" name="abc_searchview_description_search">"Rechercher"</string>
+    <string msgid="8203855622131699655" name="abc_searchview_description_submit">"Envoyer la requête"</string>
+    <string msgid="3478748990613108725" name="abc_searchview_description_voice">"Recherche vocale"</string>
+    <string msgid="2650565705514630347" name="abc_shareactionprovider_share_with">"Partager avec"</string>
+    <string msgid="9009661856846212431" name="abc_shareactionprovider_share_with_application">"Partager avec <ns1:g id="APPLICATION_NAME">%s</ns1:g>"</string>
+    <string msgid="6389460216547290468" name="abc_toolbar_collapse_description">"Réduire"</string>
+    <string msgid="730395136688082741" name="search_menu_title">"Rechercher"</string>
+</resources>

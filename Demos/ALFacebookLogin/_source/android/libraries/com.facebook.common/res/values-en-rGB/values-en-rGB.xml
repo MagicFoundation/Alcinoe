@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string gender="unknown" name="com_facebook_internet_permission_error_message">WebView login requires Internet permission</string>
-    <string gender="unknown" name="com_facebook_internet_permission_error_title">AndroidManifest error</string>
-    <string gender="unknown" name="com_facebook_loading">Loading\u2026</string>
-    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Log In With Facebook</string>
-    <string gender="unknown" name="com_facebook_tooltip_default">You\'re in control – choose what information you want to share with apps.</string>
-</resources>

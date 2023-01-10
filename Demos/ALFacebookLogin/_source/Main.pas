@@ -3,9 +3,20 @@ unit Main;
 interface
 
 uses
-  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.ScrollBox,
-  FMX.Memo, FMX.Controls.Presentation, FMX.StdCtrls,
+  System.SysUtils,
+  System.Types,
+  System.UITypes,
+  System.Classes,
+  System.Variants,
+  FMX.Types,
+  FMX.Controls,
+  FMX.Forms,
+  FMX.Graphics,
+  FMX.Dialogs,
+  FMX.ScrollBox,
+  FMX.Memo,
+  FMX.Controls.Presentation,
+  FMX.StdCtrls,
   {$IF Defined(IOS) or Defined(ANDROID)}
   Grijjy.ErrorReporting,
   {$ENDIF}
@@ -13,7 +24,8 @@ uses
   alString,
   alStringList,
   alfmxCommon,
-  alFmxFaceBook,
+  alFmxFaceBookLogin,
+  alFmxFaceBookShare,
   alcommon,
   FMX.Memo.Types,
   ALFmxObjects;
@@ -25,13 +37,14 @@ type
     ButtonLogoutFromFacebook: TButton;
     ButtonGetCurrentTokenInfos: TButton;
     ButtonGetCurrentUserInfos: TButton;
-    TextIntro: TALText;
+    ButtonShowShareLinkDialog: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ButtonFacebookLoginClick(Sender: TObject);
     procedure ButtonGetCurrentTokenInfosClick(Sender: TObject);
     procedure ButtonLogoutFromFacebookClick(Sender: TObject);
     procedure ButtonGetCurrentUserInfosClick(Sender: TObject);
+    procedure ButtonShowShareLinkDialogClick(Sender: TObject);
   private
     fFaceBookLogin: TalFacebookLogin;
     fFacebookGraphRequest: TALFacebookGraphRequest;
@@ -42,9 +55,6 @@ type
   private
     {$IF Defined(IOS) or Defined(ANDROID)}
     procedure ApplicationExceptionHandler(const Sender: TObject; const M: TMessage);
-    {$ENDIF}
-    {$IF Defined(MSWINDOWS) or Defined(_MACOS)}
-    procedure ApplicationExceptionHandler(Sender: TObject; E: Exception);
     {$ENDIF}
   public
   end;
@@ -63,8 +73,6 @@ begin
   {$IF Defined(IOS) or Defined(ANDROID)}
   Application.OnException := TgoExceptionReporter.ExceptionHandler;
   TMessageManager.DefaultManager.SubscribeToMessage(TgoExceptionReportMessage, ApplicationExceptionHandler);
-  {$ELSE}
-  Application.OnException := ApplicationExceptionHandler;
   {$ENDIF}
 
   fFaceBookLogin := TalFacebookLogin.Create;
@@ -114,14 +122,6 @@ begin
   Application.Terminate;
   {$ENDIF}
 
-end;
-{$ENDIF}
-
-{*****************************************}
-{$IF Defined(MSWINDOWS) or Defined(_MACOS)}
-procedure TForm1.ApplicationExceptionHandler(Sender: TObject; E: Exception);
-begin
-  Application.Terminate;
 end;
 {$ENDIF}
 
@@ -214,6 +214,12 @@ begin
   fFaceBookLogin.logout;
   memo1.lines.clear;
   memo1.lines.Add('Logged out');
+end;
+
+{***************************************************************}
+procedure TForm1.ButtonShowShareLinkDialogClick(Sender: TObject);
+begin
+  TALFacebookShareDialog.ShowShareLinkDialog('https://github.com/MagicFoundation/Alcinoe');
 end;
 
 initialization

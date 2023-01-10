@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <string gender="unknown" name="com_facebook_device_auth_instructions">Visit &lt;b>facebook.com/device&lt;/b> ಮತ್ತು ಮೇಲೆ ತೋರಿಸಿರುವ ಕೋಡ್ ಅನ್ನು ನಮೂದಿಸಿ.</string>
+    <string gender="unknown" name="com_facebook_image_download_unknown_error">ಚಿತ್ರವನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡುವಾಗ ಅನಿರೀಕ್ಷಿತ ದೋಷ.</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_message">ವೆಬ್ ವೀಕ್ಷಣೆ ಲಾಗಿನ್‌ಗೆ ಇಂಟರ್ನೆಟ್ ಅನುಮತಿಯ ಅಗತ್ಯವಿದೆ</string>
+    <string gender="unknown" name="com_facebook_internet_permission_error_title">Android ಮ್ಯಾನಿಫೆಸ್ಟ್ ದೋಷ</string>
+    <string gender="unknown" name="com_facebook_like_button_liked">ಇಷ್ಟಪಟ್ಟಿದ್ದಾರೆ</string>
+    <string gender="unknown" name="com_facebook_like_button_not_liked">ಇಷ್ಟ</string>
+    <string gender="unknown" name="com_facebook_loading">ಲೋಡ್ ಆಗುತ್ತಿದೆ...</string>
+    <string gender="unknown" name="com_facebook_loginview_cancel_action">ರದ್ದುಮಾಡಿ</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button">ಲಾಗ್ ಇನ್</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_continue">Facebook ನೊಂದಿಗೆ ಮುಂದುವರಿಸಿ</string>
+    <string gender="unknown" name="com_facebook_loginview_log_in_button_long">Facebook ನೊಂದಿಗೆ ಲಾಗ್ ಇನ್ ಮಾಡಿ</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_action">ಲಾಗ್ ಔಟ್</string>
+    <string gender="unknown" name="com_facebook_loginview_log_out_button">ಲಾಗ್ ಔಟ್</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_as">%1$s ಎಂದು ಲಾಗಿನ್ ಮಾಡಲಾಗಿದೆ</string>
+    <string gender="unknown" name="com_facebook_loginview_logged_in_using_facebook">Facebook ಬಳಸಿ ಲಾಗಿನ್ ಮಾಡಲಾಗಿದೆ</string>
+    <string gender="unknown" name="com_facebook_send_button_text">ಕಳುಹಿಸಿ</string>
+    <string gender="unknown" name="com_facebook_share_button_text">ಹಂಚಿಕೊಳ್ಳಿ</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions">ನಿಮ್ಮ ಖಾತೆಯನ್ನು ಸಂಪರ್ಕಿಸಲು, ನಿಮ್ಮ ಮೊಬೈಲ್ ಸಾಧನದಲ್ಲಿ Facebook ಅಪ್ಲಿಕೇಶನ್ ತೆರೆಯಿರಿ ಮತ್ತು ಅಧಿಸೂಚನೆಗಳಿಗಾಗಿ ಪರಿಶೀಲಿಸಿ.</string>
+    <string gender="unknown" name="com_facebook_smart_device_instructions_or">- ಅಥವಾ -</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_cancel">ನೀವಲ್ಲವೇ?</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_continue_as">%1$s ಎಂದು ಮುಂದುವರಿಸಿ</string>
+    <string gender="unknown" name="com_facebook_smart_login_confirmation_title">ಲಾಗಿನ್ ಖಚಿತಪಡಿಸಿ</string>
+    <string gender="unknown" name="com_facebook_tooltip_default">ನೀವು ನಿಯಂತ್ರಣದಲ್ಲಿದ್ದಿರಿ- ಅಪ್ಲಿಕೇಶನ್‌ಗಳೊಂದಿಗೆ ನೀವು ಯಾವ ಮಾಹಿತಿಯನ್ನು ಹಂಚಿಕೊಳ್ಳಬೇಕೆಂದು ಆಯ್ಕೆಮಾಡಿ.</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+    <string msgid="7903180715631665059" name="abc_action_bar_home_description">"ಹೋಮ್‌ಗೆ ನ್ಯಾವಿಗೇಟ್ ಮಾಡಿ"</string>
+    <string msgid="6794660482873516081" name="abc_action_bar_up_description">"ಮೇಲಕ್ಕೆ ನ್ಯಾವಿಗೇಟ್ ಮಾಡಿ"</string>
+    <string msgid="1155814932213556626" name="abc_action_menu_overflow_description">"ಇನ್ನಷ್ಟು ಆಯ್ಕೆಗಳು"</string>
+    <string msgid="2571498368472823490" name="abc_action_mode_done">"ಮುಗಿದಿದೆ"</string>
+    <string msgid="3732416590524162402" name="abc_activity_chooser_view_see_all">"ಎಲ್ಲವನ್ನೂ ನೋಡಿ"</string>
+    <string msgid="1798588241954930982" name="abc_activitychooserview_choose_application">"ಆ್ಯಪ್‌ವೊಂದನ್ನು ಆಯ್ಕೆಮಾಡಿ"</string>
+    <string msgid="3403923230105792483" name="abc_capital_off">"ಆಫ್"</string>
+    <string msgid="7831734969929204599" name="abc_capital_on">"ಆನ್"</string>
+    <string msgid="5725160506500770567" name="abc_menu_alt_shortcut_label">"Alt+"</string>
+    <string msgid="944415252197684443" name="abc_menu_ctrl_shortcut_label">"Ctrl+"</string>
+    <string msgid="129742188101734366" name="abc_menu_delete_shortcut_label">"delete"</string>
+    <string msgid="6840127756824236027" name="abc_menu_enter_shortcut_label">"enter"</string>
+    <string msgid="4974283687810130415" name="abc_menu_function_shortcut_label">"Function+"</string>
+    <string msgid="8046416353848716905" name="abc_menu_meta_shortcut_label">"Meta+"</string>
+    <string msgid="3271697756921353410" name="abc_menu_shift_shortcut_label">"Shift+"</string>
+    <string msgid="2304645930658438191" name="abc_menu_space_shortcut_label">"space"</string>
+    <string msgid="8327365089695024394" name="abc_menu_sym_shortcut_label">"Sym+"</string>
+    <string msgid="3570106412128999382" name="abc_prepend_shortcut_label">"Menu+"</string>
+    <string msgid="940844115270746197" name="abc_search_hint">"ಹುಡುಕಿ…"</string>
+    <string msgid="1769270744562318534" name="abc_searchview_description_clear">"ಪ್ರಶ್ನೆಯನ್ನು ತೆರವುಗೊಳಿಸಿ"</string>
+    <string msgid="908784302972860853" name="abc_searchview_description_query">"ಪ್ರಶ್ನೆಯನ್ನು ಹುಡುಕಿ"</string>
+    <string msgid="5466662225065974044" name="abc_searchview_description_search">"ಹುಡುಕಿ"</string>
+    <string msgid="8203855622131699655" name="abc_searchview_description_submit">"ಪ್ರಶ್ನೆಯನ್ನು ಸಲ್ಲಿಸಿ"</string>
+    <string msgid="3478748990613108725" name="abc_searchview_description_voice">"ಧ್ವನಿ ಹುಡುಕಾಟ"</string>
+    <string msgid="2650565705514630347" name="abc_shareactionprovider_share_with">"ಇವರೊಂದಿಗೆ ಹಂಚಿಕೊಳ್ಳಿ"</string>
+    <string msgid="9009661856846212431" name="abc_shareactionprovider_share_with_application">"<ns1:g id="APPLICATION_NAME">%s</ns1:g> ನೊಂದಿಗೆ ಹಂಚಿಕೊಳ್ಳಿ"</string>
+    <string msgid="6389460216547290468" name="abc_toolbar_collapse_description">"ಕುಗ್ಗಿಸಿ"</string>
+    <string msgid="730395136688082741" name="search_menu_title">"ಹುಡುಕಿ"</string>
+</resources>

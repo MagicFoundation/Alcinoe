@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <bool name="abc_action_bar_embed_tabs">false</bool>
+</resources>

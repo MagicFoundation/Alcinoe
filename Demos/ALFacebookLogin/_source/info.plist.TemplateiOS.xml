@@ -9,6 +9,8 @@
  
   <key>FacebookAutoLogAppEventsEnabled</key>
   <false/>
+  <key>FacebookAdvertiserIDCollectionEnabled</key>
+  <false/>
   <key>CFBundleURLTypes</key>
   <array>
     <dict>
@@ -20,17 +22,15 @@
   </array>
   <key>FacebookAppID</key>
   <string>224667374702876</string>
+  <key>FacebookClientToken</key>
+  <string>70f745f76d4ab40f76c1464d5626be3d</string>
   <key>FacebookDisplayName</key>
   <string>ALFacebookLogin</string>
   <key>LSApplicationQueriesSchemes</key>
   <array>
     <string>fbapi</string>
-    <string>fb-messenger-api</string>
-    <string>fbauth2</string>
-    <string>fbshareextension</string>
+    <string>fb-messenger-share-api</string>
   </array>
-  <key>NSPhotoLibraryUsageDescription</key>
-  <string>human-readable reason for photo access</string>
   
 </dict>
 </plist>

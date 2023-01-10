@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (c) Meta Platforms, Inc. and affiliates.
+    All rights reserved.
+
+    This source code is licensed under the license found in the
+    LICENSE file in the root directory of this source tree.
+-->
+
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@android:color/white" />
+    <corners
+        android:bottomLeftRadius="@dimen/com_facebook_auth_dialog_corner_radius"
+        android:bottomRightRadius="@dimen/com_facebook_auth_dialog_corner_radius"
+        android:topLeftRadius="@dimen/com_facebook_auth_dialog_corner_radius_oversized"
+        android:topRightRadius="@dimen/com_facebook_auth_dialog_corner_radius_oversized" />
+</shape>

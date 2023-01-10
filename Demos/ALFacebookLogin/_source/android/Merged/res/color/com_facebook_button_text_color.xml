@@ -1,0 +1,21 @@
+<!--
+    Copyright (c) Meta Platforms, Inc. and affiliates.
+    All rights reserved.
+
+    This source code is licensed under the license found in the
+    LICENSE file in the root directory of this source tree.
+-->
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:state_pressed="true"
+        android:color="@color/com_facebook_primary_button_pressed_text_color"
+        />
+    <item
+        android:state_enabled="false"
+        android:color="@color/com_facebook_primary_button_disabled_text_color"
+        />
+    <item
+        android:color="@color/com_facebook_primary_button_text_color"
+        />
+</selector>

@@ -128,11 +128,6 @@ begin
 
       //init LDeploymentNode
       var LDeploymentNode := LBorlandProjectNode.ChildNodes.FindNode('Deployment');
-      if LDeploymentNode = nil then raise Exception.Create('ProjectExtensions.BorlandProject.Deployment node not found!');
-
-      //check version attribute <Deployment Version="3">
-      //if LDeploymentNode.Attributes['Version'] <> '3' then
-      //  raise Exception.Create('ProjectExtensions.BorlandProject.Deployment.Version is not in the expected value (3)');
 
       //init LItemGroupNode
       var LItemGroupNode := LDProjXmlDoc.DocumentElement.ChildNodes.FindNode('ItemGroup');
@@ -171,42 +166,48 @@ begin
         LItemGroupNode.ChildNodes.add(LBuildConfigurationNodes[i]);
 
       //order LDeploymentNode
-      _SortAttributesByNodeName(LDeploymentNode);
-      _SortChildNodesByNodeNameAndAttributes(LDeploymentNode);
+      if LDeploymentNode <> nil then begin
+        _SortAttributesByNodeName(LDeploymentNode);
+        _SortChildNodesByNodeNameAndAttributes(LDeploymentNode);
+      end;
 
       //remove from deployment unnecessary items
       //https://quality.embarcadero.com/browse/RSP-28003
-      for var I := LDeploymentNode.ChildNodes.Count - 1 downto 0 do begin
-        var LEnabledNode: TALXmlNode := nil;
-        var LDeployFileNode := LDeploymentNode.ChildNodes[i];
-        if (ALSameText(LDeployFileNode.NodeName, 'DeployFile')) then begin
-          for var j := LDeployFileNode.ChildNodes.Count - 1 downto 0 do begin
-            LEnabledNode := LDeployFileNode.ChildNodes[j].ChildNodes.FindNode('Enabled');
-            if (LEnabledNode <> nil) and (ALSameText(LEnabledNode.Text,'false')) then break;
-          end;
-          if (not ALSameText(LDeployFileNode.attributes['Class'], 'File')) and
-             ((LEnabledNode = nil) or                                           // normally we can also update other properties of a deploy file not only
-              (not ALSameText(LEnabledNode.Text,'false'))) then                 // enabled, but i consider we can only update enabled
-            LDeploymentNode.ChildNodes.Delete(i);
-        end
-        else if (ALSameText(LDeployFileNode.NodeName, 'DeployClass')) or    // this DeployClass seam not correctly updated
-                (ALSameText(LDeployFileNode.NodeName, 'ProjectRoot')) then  // so I prefer to delete them (don't know what could be the consequence)
-          LDeploymentNode.ChildNodes.Delete(i);                             // and ProjectRoot seam also to be useless
+      if LDeploymentNode <> nil then begin
+        for var I := LDeploymentNode.ChildNodes.Count - 1 downto 0 do begin
+          var LEnabledNode: TALXmlNode := nil;
+          var LDeployFileNode := LDeploymentNode.ChildNodes[i];
+          if (ALSameText(LDeployFileNode.NodeName, 'DeployFile')) then begin
+            for var j := LDeployFileNode.ChildNodes.Count - 1 downto 0 do begin
+              LEnabledNode := LDeployFileNode.ChildNodes[j].ChildNodes.FindNode('Enabled');
+              if (LEnabledNode <> nil) and (ALSameText(LEnabledNode.Text,'false')) then break;
+            end;
+            if (not ALSameText(LDeployFileNode.attributes['Class'], 'File')) and
+               ((LEnabledNode = nil) or                                           // normally we can also update other properties of a deploy file not only
+                (not ALSameText(LEnabledNode.Text,'false'))) then                 // enabled, but i consider we can only update enabled
+              LDeploymentNode.ChildNodes.Delete(i);
+          end
+          else if (ALSameText(LDeployFileNode.NodeName, 'DeployClass')) or    // this DeployClass seam not correctly updated
+                  (ALSameText(LDeployFileNode.NodeName, 'ProjectRoot')) then  // so I prefer to delete them (don't know what could be the consequence)
+            LDeploymentNode.ChildNodes.Delete(i);                             // and ProjectRoot seam also to be useless
+        end;
       end;
 
       //put ProjectRoot at the end (don't know if it's matter)
-      var LProjectRootNodes: Tarray<TalXmlNode>;
-      setlength(LProjectRootNodes, 0);
-      while True do begin
-        var LProjectRootNode := LDeploymentNode.ChildNodes.FindNode('ProjectRoot');
-        if LProjectRootNode <> nil then begin
-          Setlength(LProjectRootNodes, length(LProjectRootNodes)+1);
-          LProjectRootNodes[length(LProjectRootNodes) - 1] := LDeploymentNode.ChildNodes.Extract(LProjectRootNode);
-        end
-        else break;
+      if LDeploymentNode <> nil then begin
+        var LProjectRootNodes: Tarray<TalXmlNode>;
+        setlength(LProjectRootNodes, 0);
+        while True do begin
+          var LProjectRootNode := LDeploymentNode.ChildNodes.FindNode('ProjectRoot');
+          if LProjectRootNode <> nil then begin
+            Setlength(LProjectRootNodes, length(LProjectRootNodes)+1);
+            LProjectRootNodes[length(LProjectRootNodes) - 1] := LDeploymentNode.ChildNodes.Extract(LProjectRootNode);
+          end
+          else break;
+        end;
+        for var I := Low(LProjectRootNodes) to High(LProjectRootNodes) do
+          LDeploymentNode.ChildNodes.add(LProjectRootNodes[i]);
       end;
-      for var I := Low(LProjectRootNodes) to High(LProjectRootNodes) do
-        LDeploymentNode.ChildNodes.add(LProjectRootNodes[i]);
 
       //Remove Empty ProjectExtensions Node
       _RemoveEmptyProjectExtensionsNode(LDProjXmlDoc.DocumentElement);

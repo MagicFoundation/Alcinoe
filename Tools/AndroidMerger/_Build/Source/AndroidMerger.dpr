@@ -3327,7 +3327,7 @@ begin
                     if not alSameText(LPlatformNode.NodeName, 'Platform') then raise Exception.Create('Error 65714071-86F2-4796-82F8-9F01C5C9824B');
                     var LName := LPlatformNode.Attributes['Name'];
                     if LName = '' then raise Exception.Create('Error 42C3C299-BA31-4B17-9EA4-8320E0048848');
-                    if (LPlatforms.IndexOfName(LName) >= 0) then begin
+                    if (LPlatforms.IndexOf(LName) >= 0) then begin
                       Var LremoteDirNode := LPlatformNode.ChildNodes.FindNode('RemoteDir');
                       if LremoteDirNode = nil then raise Exception.Create('Error 5427D8C2-7CC9-45DA-94A2-51B036B7BB50');
                       if (alposExIgnoreCase('res\', LremoteDirNode.Text) = 1) or
@@ -3435,31 +3435,88 @@ begin
               With LItemGroupNode.AddChild('JavaReference') do Attributes['Include'] := LLocalName;
             end;
 
+            //Update EnabledSysJars
+            for var I := 0 to LdprojXmlDoc.DocumentElement.ChildNodes.Count - 1 do begin
+              var LPropertyGroupNode := LdprojXmlDoc.DocumentElement.ChildNodes[i];
+              if LPropertyGroupNode.NodeName = 'PropertyGroup' then begin
+                Var LEnabledSysJarsNode := LPropertyGroupNode.ChildNodes.FindNode('EnabledSysJars');
+                if (LEnabledSysJarsNode <> nil) and (LEnabledSysJarsNode.Text <> '') then LEnabledSysJarsNode.Text := 'fmx.dex.jar';
+              end;
+            end;
+
+            //update DisabledSysJars
+            for var I := 0 to LdprojXmlDoc.DocumentElement.ChildNodes.Count - 1 do begin
+              var LPropertyGroupNode := LdprojXmlDoc.DocumentElement.ChildNodes[i];
+              if LPropertyGroupNode.NodeName = 'PropertyGroup' then begin
+                Var LDisabledSysJarsNode := LPropertyGroupNode.ChildNodes.FindNode('DisabledSysJars');
+                if LDisabledSysJarsNode <> nil then LPropertyGroupNode.ChildNodes.Remove(LDisabledSysJarsNode);
+              end;
+            end;
+
             //add the RJarSwapper command line
             if LRJarSwapper <> '' then begin
-              for var I := 0 to LdprojXmlDoc.DocumentElement.ChildNodes.Count - 1 do begin
-                var LPropertyGroupNode := LdprojXmlDoc.DocumentElement.ChildNodes[i];
-                if LPropertyGroupNode.NodeName = 'PropertyGroup' then begin
-                  var LCondition := LPropertyGroupNode.Attributes['Condition'];
-                  if ((ALposExIgnoreCase('Android', LCondition) > 0) and (LPlatforms.IndexOfName('Android') >= 0)) or
-                     ((ALposExIgnoreCase('Android64', LCondition) > 0) and (LPlatforms.IndexOfName('Android64') >= 0)) then begin
-                    Var LPreBuildEventNode := LPropertyGroupNode.ChildNodes.FindNode('PreBuildEvent');
-                    var LPreBuildEventXml: ansiString := '';
-                    if (LPreBuildEventNode <> nil) then LPreBuildEventNode.SaveToXML(LPreBuildEventXml, true{SaveOnlyChildNodes});
-                    if (LPreBuildEventXml <> '') and
-                       (alposExIgnoreCase('RJarSwapper.bat', LPreBuildEventXml) <= 0) then
-                      raise Exception.Create('Cannot set RJarSwapper.bat in PreBuildEvent because it''s not empty');
-                    if LPreBuildEventNode <> nil then LPropertyGroupNode.ChildNodes.Remove(LPreBuildEventNode);
-                    Var LIndex := LPropertyGroupNode.ChildNodes.IndexOf('PreBuildEventCancelOnError');
-                    if LIndex >= 0 then LPropertyGroupNode.ChildNodes.Delete(LIndex);
-                    LIndex := LPropertyGroupNode.ChildNodes.IndexOf('PreBuildEventExecuteWhen');
-                    if LIndex >= 0 then LPropertyGroupNode.ChildNodes.Delete(LIndex);
-                    if ALSameText(LCondition, '''$(Base_Android)''!=''''') or
-                       ALSameText(LCondition, '''$(Base_Android64)''!=''''') then begin
-                      LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LDProjFilename)+'" -BuildType="$(BT_BuildType)"';
+              var LRJarDir := ExtractRelativePath(ALExtractFilePathU(LDProjDir), LLibsOutputDir);
+              Var LConditions := TALstringList.Create;
+              try
+                if LPlatforms.IndexOf('Android') >= 0 then begin
+                  if LConfigs.IndexOf('Debug') >= 0 then LConditions.Add('Android=Debug');
+                  if LConfigs.IndexOf('Release') >= 0 then LConditions.Add('Android=Release');
+                end;
+                if LPlatforms.IndexOf('Android64') >= 0 then begin
+                  if LConfigs.IndexOf('Debug') >= 0 then LConditions.Add('Android64=Debug');
+                  if LConfigs.IndexOf('Release') >= 0 then LConditions.Add('Android64=Release');
+                end;
+                //----
+                for var I := 0 to LdprojXmlDoc.DocumentElement.ChildNodes.Count - 1 do begin
+                  var LPropertyGroupNode := LdprojXmlDoc.DocumentElement.ChildNodes[i];
+                  if LPropertyGroupNode.NodeName = 'PropertyGroup' then begin
+                    var LCondition := LPropertyGroupNode.Attributes['Condition'];
+                    var LPlatform: AnsiString := '';
+                    if (ALposExIgnoreCase('Android64', LCondition) > 0) then LPlatform := 'Android64'
+                    else if (ALposExIgnoreCase('Android', LCondition) > 0) then LPlatform := 'Android';
+                    if ((LPlatform = 'Android64') and (LPlatforms.IndexOf('Android64') >= 0)) or
+                       ((LPlatform = 'Android') and (LPlatforms.IndexOf('Android') >= 0)) then begin
+                      Var LPreBuildEventNode := LPropertyGroupNode.ChildNodes.FindNode('PreBuildEvent');
+                      var LPreBuildEventXml: ansiString := '';
+                      if (LPreBuildEventNode <> nil) then LPreBuildEventNode.SaveToXML(LPreBuildEventXml, true{SaveOnlyChildNodes});
+                      if (LPreBuildEventXml <> '') and
+                         (alposExIgnoreCase('RJarSwapper.bat', LPreBuildEventXml) <= 0) then
+                        raise Exception.Create('Cannot set RJarSwapper.bat in PreBuildEvent because it''s not empty');
+                      if LPreBuildEventNode <> nil then LPropertyGroupNode.ChildNodes.Remove(LPreBuildEventNode);
+                      Var LIndex := LPropertyGroupNode.ChildNodes.IndexOf('PreBuildEventCancelOnError');
+                      if LIndex >= 0 then LPropertyGroupNode.ChildNodes.Delete(LIndex);
+                      LIndex := LPropertyGroupNode.ChildNodes.IndexOf('PreBuildEventIgnoreExitCode');
+                      if LIndex >= 0 then LPropertyGroupNode.ChildNodes.Delete(LIndex);
+                      LIndex := LPropertyGroupNode.ChildNodes.IndexOf('PreBuildEventExecuteWhen');
+                      if LIndex >= 0 then LPropertyGroupNode.ChildNodes.Delete(LIndex);
+                      var J := LConditions.IndexOf(LPlatform+'=Debug');
+                      if (J >= 0) and
+                         (ALposExIgnoreCase('Debug', LCondition) > 0) then begin
+                        LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="false"';
+                        LConditions.Delete(J);
+                      end
+                      else begin
+                        J := LConditions.IndexOf(LPlatform+'=Release');
+                        if (J >= 0) and
+                           (ALposExIgnoreCase('Release', LCondition) > 0) then begin
+                          LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="true"';
+                          LConditions.Delete(J);
+                        end;
+                      end;
                     end;
                   end;
                 end;
+                //----
+                for var I := 0 to LConditions.Count - 1 do begin
+                  var LPropertyGroupNode := LdprojXmlDoc.DocumentElement.AddChild('PropertyGroup');
+                  LPropertyGroupNode.Attributes['Condition'] := '''$(Config)''=='''+LConditions.ValueFromIndex[i]+''' And ''$(Platform)''=='''+LConditions.Names[i]+'''';
+                  if ALSameText(LConditions.ValueFromIndex[i], 'Debug') then
+                    LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="false"'
+                  else if ALSameText(LConditions.ValueFromIndex[i], 'Release') then
+                    LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="true"';
+                end;
+              finally
+                ALFreeAndNil(LConditions);
               end;
             end;
 

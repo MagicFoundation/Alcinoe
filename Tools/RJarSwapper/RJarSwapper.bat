@@ -19,11 +19,11 @@ if "%-IsAabPackage%" == "true" goto IsAabPackage
 goto IsApkPackage
 
 :IsAabPackage 
-copy "%RJarDir%\r-aab.jar" "%RJarFile%"
+copy "%RJarDir%\r-aab.jar" "%RJarFile%" > nul
 goto EXIT
 
 :IsApkPackage
-copy "%RJarDir%\r-apk.jar" "%RJarFile%"
+copy "%RJarDir%\r-apk.jar" "%RJarFile%" > nul
 goto EXIT
 
 :ERROR

@@ -1239,39 +1239,39 @@ begin
           //Android/Android64
           //mips: code compiled for the MIPS32r1 and later architecture (32 bits, MIPS support has been removed from the Android NDK in r17).
           //this file is simply to show the message "Application does not support this device" at startup
-          if (ALSameText(LplatFormName, 'Android') or ALSameText(LplatFormName, 'Android64')) then
-            _addDeployFile(
-              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TalStringList;
-              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              LConfigName, // const aCondition: String;
-              '$(BDS)\lib\android\'+ALLowerCase(LConfigName)+'\mips\libnative-activity.so', // const aInclude: String;
-              'AndroidLibnativeMipsFile', // const aDeployClass: String;
-              '', // const aLocalCommand: String;
-              '1', // const aOperation: String;
-              'True', // aOverwrite: String;
-              '', // const aRemoteCommand: String;
-              _getProjectRoot(LProjectName, LPlatformName)+'\library\lib\mips\', // const aRemoteDir: String;
-              'lib'+LProjectName+'.so', // const aRemoteName: String;
-              ''); // aRequired: AnsiString
+          //if (ALSameText(LplatFormName, 'Android') or ALSameText(LplatFormName, 'Android64')) then
+          //  _addDeployFile(
+          //    LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TalStringList;
+          //    TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
+          //    LConfigName, // const aCondition: String;
+          //    '$(BDS)\lib\android\'+ALLowerCase(LConfigName)+'\mips\libnative-activity.so', // const aInclude: String;
+          //    'AndroidLibnativeMipsFile', // const aDeployClass: String;
+          //    '', // const aLocalCommand: String;
+          //    '1', // const aOperation: String;
+          //    'True', // aOverwrite: String;
+          //    '', // const aRemoteCommand: String;
+          //    _getProjectRoot(LProjectName, LPlatformName)+'\library\lib\mips\', // const aRemoteDir: String;
+          //    'lib'+LProjectName+'.so', // const aRemoteName: String;
+          //    ''); // aRequired: AnsiString
 
           //-----------------
           //Android/Android64
           //armeabi: code compiled for the old ARMv5 architecture (32 bits, ARMv5 support has been removed from Android NDK in r17)
           //this file is simply to show the message "Application does not support this device" at startup
-          if (ALSameText(LplatFormName, 'Android') or ALSameText(LplatFormName, 'Android64')) then
-            _addDeployFile(
-              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TalStringList;
-              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              LConfigName, // const aCondition: String;
-              '$(BDS)\lib\android\'+ALLowerCase(LConfigName)+'\armeabi\libnative-activity.so', // const aInclude: String;
-              'AndroidLibnativeArmeabiFile', // const aDeployClass: String;
-              '', // const aLocalCommand: String;
-              '1', // const aOperation: String;
-              'True', // aOverwrite: String;
-              '', // const aRemoteCommand: String;
-              _getProjectRoot(LProjectName, LPlatformName)+'\library\lib\armeabi\', // const aRemoteDir: String;
-              'lib'+LProjectName+'.so', // const aRemoteName: String;
-              ''); // aRequired: AnsiString
+          //if (ALSameText(LplatFormName, 'Android') or ALSameText(LplatFormName, 'Android64')) then
+          //  _addDeployFile(
+          //    LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TalStringList;
+          //    TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
+          //    LConfigName, // const aCondition: String;
+          //    '$(BDS)\lib\android\'+ALLowerCase(LConfigName)+'\armeabi\libnative-activity.so', // const aInclude: String;
+          //    'AndroidLibnativeArmeabiFile', // const aDeployClass: String;
+          //    '', // const aLocalCommand: String;
+          //    '1', // const aOperation: String;
+          //    'True', // aOverwrite: String;
+          //    '', // const aRemoteCommand: String;
+          //    _getProjectRoot(LProjectName, LPlatformName)+'\library\lib\armeabi\', // const aRemoteDir: String;
+          //    'lib'+LProjectName+'.so', // const aRemoteName: String;
+          //    ''); // aRequired: AnsiString
 
           //-----------------
           //Android/Android64
@@ -1312,21 +1312,24 @@ begin
                 '', // const aRemoteCommand: String;
                 _getProjectRoot(LProjectName, LPlatformName)+'\library\lib\armeabi-v7a\', // const aRemoteDir: String;
                 'lib'+LProjectName+'.so', // const aRemoteName: String;
-                '') // aRequired: AnsiString
-            else
-              _addDeployFile(
-                LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TalStringList;
-                TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-                LConfigName, // const aCondition: String;
-                '$(BDS)\lib\android\'+ALLowerCase(LConfigName)+'\armeabi-v7a\libnative-activity.so', // const aInclude: String;
-                'AndroidLibnativeArmeabiv7aFile', // const aDeployClass: String;
-                '', // const aLocalCommand: String;
-                '1', // const aOperation: String;
-                'True', // aOverwrite: String;
-                '', // const aRemoteCommand: String;
-                _getProjectRoot(LProjectName, LPlatformName)+'\library\lib\armeabi-v7a\', // const aRemoteDir: String;
-                'lib'+LProjectName+'.so', // const aRemoteName: String;
                 ''); // aRequired: AnsiString
+            //this file is simply to show the message "Application does not support this device" at startup
+            //but it's not present in the "release" directory (c:\Program Files (x86)\Embarcadero\Studio\22.0\lib\android\release\armeabi-v7a\)
+            //so I prefere to skip it - https://quality.embarcadero.com/browse/RSP-40256
+            //else
+            //  _addDeployFile(
+            //    LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TalStringList;
+            //    TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
+            //    LConfigName, // const aCondition: String;
+            //    '$(BDS)\lib\android\'+ALLowerCase(LConfigName)+'\armeabi-v7a\libnative-activity.so', // const aInclude: String;
+            //    'AndroidLibnativeArmeabiv7aFile', // const aDeployClass: String;
+            //    '', // const aLocalCommand: String;
+            //    '1', // const aOperation: String;
+            //    'True', // aOverwrite: String;
+            //    '', // const aRemoteCommand: String;
+            //    _getProjectRoot(LProjectName, LPlatformName)+'\library\lib\armeabi-v7a\', // const aRemoteDir: String;
+            //    'lib'+LProjectName+'.so', // const aRemoteName: String;
+            //    ''); // aRequired: AnsiString
           end;
 
           //---------

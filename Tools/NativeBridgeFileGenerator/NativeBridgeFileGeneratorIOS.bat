@@ -55,13 +55,21 @@ xcopy "%SystemRoot%" "%TMPDir%" /E /Q
 Set TMPSystemRoot=%TMPDir%
 
 
+REM --------------------------------------------------
+REM Copy to TMPDir all data from Alcinoe\Libraries\ios
+REM --------------------------------------------------
+
+echo Copy "%ALBaseDir%\Libraries\ios" to "%TMPDir%\System\Library\Frameworks"
+call "%ALBaseDir%\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorHelper.exe" -Action="Copy" -CustomFrameworksDir="%ALBaseDir%\Libraries\ios" -FrameworksDir="%TMPDir%\System\Library\Frameworks" -Platform="iOS"
+
+
 REM ------------------------------
 REM Ask the library framework path
 REM ------------------------------
 
 echo.
-echo Please copy all the custom Frameworks you need in a single
-echo directory and gave below the path to this directory (empty to skip):
+echo Please gave below the path where are located any custom Frameworks
+echo you would like also to parse (empty to skip):
 set CustomFrameworksPath=
 set /P CustomFrameworksPath=%=%
 more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
@@ -73,8 +81,20 @@ REM -------------------------------------------------
 
 if "%CustomFrameworksPath%" NEQ "" (
   echo Copy "%CustomFrameworksPath%" to "%TMPDir%\System\Library\Frameworks"
-  xcopy "%CustomFrameworksPath%" "%TMPDir%\System\Library\Frameworks" /E /Q
+  call "%ALBaseDir%\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorHelper.exe" -Action="Copy" -CustomFrameworksDir="%CustomFrameworksPath%" -FrameworksDir="%TMPDir%\System\Library\Frameworks" -Platform="iOS"
 )
+
+
+REM ---------------------------
+REM Ask the Compare Master File
+REM ---------------------------
+
+echo.
+echo Please gave below the path to the source file that
+echo you would like to compare with (empty to skip):
+set CompareMasterFile=
+set /P CompareMasterFile=%=%
+more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
 
 
 REM -----------------
@@ -102,6 +122,16 @@ REM -----------------
  -fblocks^
  --out:%OutputDir%
 IF ERRORLEVEL 1 goto ERROR
+
+
+REM -----------------------------------------------
+REM call NativeBridgeFileGeneratorHelper to compare
+REM -----------------------------------------------
+
+if "%CompareMasterFile%" NEQ "" (
+  echo Compare "%CompareMasterFile%" to "%TMPDir%\System\Library\Frameworks"
+  call "%ALBaseDir%\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorHelper.exe" -Action="Compare" -MasterFile="%CompareMasterFile%" -OutputDir="%OutputDir%" -Platform="iOS"
+)
 
 
 REM -------------

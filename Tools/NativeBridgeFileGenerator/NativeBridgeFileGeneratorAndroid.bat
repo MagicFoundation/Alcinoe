@@ -27,6 +27,18 @@ more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous
 
 
 REM ---------------------------
+REM Ask the Compare Master File
+REM ---------------------------
+
+echo.
+echo Please gave below the path to the source file that
+echo you would like to compare with (empty to skip):
+set CompareMasterFile=
+set /P CompareMasterFile=%=%
+more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
+
+
+REM ---------------------------
 REM Create TMPDir and OutputDir
 REM ---------------------------
 
@@ -44,11 +56,21 @@ REM -----------------------------------
 REM call java2op via AndroidMerger Tool
 REM -----------------------------------
 
-call "..\AndroidMerger\AndroidMerger.exe" -LocalMavenRepositoryDir="%ALBaseDir%\Libraries\jar\" -Libraries="%Library%" -DownloadDependencies=1 -OutputDir="%TMPDir%" -GenerateNativeBridgeFile=1 -NoInteraction=1
+call "..\AndroidMerger\AndroidMerger.exe" -LocalMavenRepositoryDir="%ALBaseDir%\Libraries\jar\" -Libraries="%Library%" -DownloadDependencies=1 -OutputDir="%TMPDir%" -GenerateNativeBridgeFile=1 -NoInteraction=1 -UseGradle=1
 IF ERRORLEVEL 1 goto ERROR
 
 xcopy "%TMPDir%\JavaInterfaces.pas" "%OutputDir%\JavaInterfaces.pas*" /V
 IF ERRORLEVEL 1 goto ERROR
+
+
+REM -----------------------------------------------
+REM call NativeBridgeFileGeneratorHelper to compare
+REM -----------------------------------------------
+
+if "%CompareMasterFile%" NEQ "" (
+  echo Compare "%CompareMasterFile%" to "%TMPDir%\System\Library\Frameworks"
+  call "%ALBaseDir%\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorHelper.exe" -Action="Compare" -MasterFile="%CompareMasterFile%" -OutputDir="%OutputDir%" -Platform="iOS"
+)
 
 
 REM -------------

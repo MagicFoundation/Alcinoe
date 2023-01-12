@@ -413,7 +413,7 @@ procedure MergeAndroidManifest(
                            ['alcinoe:disabled=1']) <> nil
     else
       LNodeIsDisabled := false; 
-    
+
     //recurse if Node Already Present and if Node have childnodes
     if (LAlreadyPresentNode <> nil) then begin
       Var LpackageNameAddedToDest: Boolean := False;
@@ -542,7 +542,7 @@ begin
               ALSameText(LSrcChildNode.NodeName, 'intent') then begin
         //https://developer.android.com/training/package-visibility/declaring#intent-filter-signature
         //i m not sure but it's look like the same as intent-filter. The <intent> element is never 
-        //matched between manifests. Each is treated as unique  and is added to the common parent 
+        //matched between manifests. Each is treated as unique  and is added to the common parent
         //element in the merged manifest.
         _SwapNodeToDest(
           LSrcChildNode, // const ANode: TALXmlNode;
@@ -1998,6 +1998,18 @@ begin
         {$REGION 'Init LParamLst'}
         for var I := 1 to ParamCount do
           LParamLst.Add(ParamStr(i));
+        {$IF defined(DEBUG)}
+        LParamLst.Clear;
+        LParamLst.add('-LocalMavenRepositoryDir=..\..\Libraries\jar\');
+        LParamLst.add('-Libraries=.\_Build\Sample\SampleApp;com.alcinoe:alcinoe-firebase-messaging:1.0.0');
+        LParamLst.add('-OutputDir=.\_Build\Sample\Merged\');
+        LParamLst.add('-DProj=_Build\Sample\Sample.dproj');
+        LParamLst.add('-AndroidManifest=_Build\Sample\AndroidManifest.template.xml');
+        LParamLst.add('-DProjNormalizer=..\DProjNormalizer\DProjNormalizer.exe');
+        LParamLst.add('-RJarSwapper=..\RJarSwapper\RJarSwapper.bat');
+        LParamLst.add('-UseGradle=true');
+        LParamLst.add('-GoogleServicesJson=_Build\Sample\google-services.json');
+        {$ENDIF}
         {$ENDREGION}
 
         {$REGION 'Init LDownloadDependencies'}
@@ -3053,7 +3065,7 @@ begin
             Var LInputStream := TMemorystream.Create;
             Var LOutputStream := TStringStream.Create;
             try
-              var LTmpcmdLine := LdelphiRootDir + '\bin\converters\java2op\Java2OP.exe -jar "'+LJarFile+'" -unit "'+LOutputDir+'\JavaInterfaces"';
+              var LTmpcmdLine := LdelphiRootDir + '\bin\converters\java2op\Java2OP.exe -jar "'+LJarFile+'" -unit "'+LOutputDir+'\JavaInterfaces_'+ALExtractFilenameU(LJarFile, true{RemoveFileExt})+'_'+ALintToStrU(ALDateTimeToUnixMs(Now))+'"';
               OverWrite(LTmpCmdLine);
               Var LTmpCmdLineResult := ALWinExecU(
                                          LTmpcmdLine, // const aCommandLine: String;
@@ -3072,24 +3084,24 @@ begin
             end;
           end;
           //--
-          Var LInputStream := TMemorystream.Create;
-          Var LOutputStream := TStringStream.Create;
-          try
-            LcmdLine := LcmdLine + ' -unit "'+LOutputDir+'\JavaInterfaces"';
-            OverWrite(LcmdLine);
-            Var LCmdLineResult := ALWinExecU(
-                                    LcmdLine, // const aCommandLine: String;
-                                    '', // const aCurrentDirectory: AnsiString;
-                                    GetEnvironmentStringWithJavaHomeUpdated, // const aEnvironment: AnsiString;
-                                    LInputStream, // const aInputStream: Tstream;
-                                    LOutputStream); //const aOutputStream: TStream;
-            if LCmdLineResult <> 0 then
-              raise Exception.Createfmt('Failed to execute %s'#13#10'%s', [LcmdLine, LOutputStream.DataString]);
-          finally
-            ALFreeandNil(LInputStream);
-            ALFreeandNil(LOutputStream);
-            if TFile.Exists(ALGetModulePathU + 'jar.log') then Tfile.Delete(ALGetModulePathU + 'jar.log');
-          end;
+          //Var LInputStream := TMemorystream.Create;
+          //Var LOutputStream := TStringStream.Create;
+          //try
+          //  LcmdLine := LcmdLine + ' -unit "'+LOutputDir+'\JavaInterfaces"';
+          //  OverWrite(LcmdLine);
+          //  Var LCmdLineResult := ALWinExecU(
+          //                          LcmdLine, // const aCommandLine: String;
+          //                          '', // const aCurrentDirectory: AnsiString;
+          //                          GetEnvironmentStringWithJavaHomeUpdated, // const aEnvironment: AnsiString;
+          //                          LInputStream, // const aInputStream: Tstream;
+          //                          LOutputStream); //const aOutputStream: TStream;
+          //  if LCmdLineResult <> 0 then
+          //    raise Exception.Createfmt('Failed to execute %s'#13#10'%s', [LcmdLine, LOutputStream.DataString]);
+          //finally
+          //  ALFreeandNil(LInputStream);
+          //  ALFreeandNil(LOutputStream);
+          //  if TFile.Exists(ALGetModulePathU + 'jar.log') then Tfile.Delete(ALGetModulePathU + 'jar.log');
+          //end;
         end;
         {$ENDREGION}
 

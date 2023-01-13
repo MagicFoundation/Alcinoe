@@ -215,19 +215,6 @@ constructor TALDatePickerDialog.create(const aBtnOKCaption: string;
                                        const aBtnCancelCaption: string = '';
                                        const aBtnClearCaption: string = '';
                                        const aTitle: String = '');
-
-  {$REGION ' IOS'}
-  {$IF defined(ios)}
-
-  var
-    LButtons: NSMutableArray;
-    LUIColor: UIColor;
-    LSingleTapGestureRecognizer: UITapGestureRecognizer;
-    LConstraint: NSLayoutConstraint;
-
-  {$ENDIF}
-  {$ENDREGION}
-
 begin
 
   inherited create;
@@ -255,6 +242,8 @@ begin
   // (Toolbar + Picker)
   FUIDatePicker := TUIDatePicker.Create;
   FUIDatePicker.setTimeZone(TNSTimeZone.Wrap(TNSTimeZone.OCClass.timeZoneForSecondsFromGMT(0)));
+  if TOSVersion.Check(13, 4) then
+    FUIDatePicker.setPreferredDatePickerStyle(UIDatePickerStyleWheels);
   FUIDatePicker.setDatePickerMode(UIDatePickerModeDate);
 
   { Subscribing to change orientation events }
@@ -262,7 +251,7 @@ begin
 
   { Creating Root view container for picker }
   FUIOverlayView := TUIView.Create;
-  LUIColor := AlphaColorToUIColor($32000000);
+  var LUIColor := AlphaColorToUIColor($32000000);
   FUIOverlayView.setBackgroundColor(LUIColor);
   FUIOverlayView.setAutoresizingMask(UIViewAutoresizingFlexibleWidth or
                                      UIViewAutoresizingFlexibleHeight or
@@ -271,7 +260,7 @@ begin
                                      UIViewAutoresizingFlexibleTopMargin or
                                      UIViewAutoresizingFlexibleBottomMargin);
   FUIOverlayView.setFrame(CGRect.Create(0, 0, screen.Size.Width, screen.Size.Height));
-  LSingleTapGestureRecognizer := TUITapGestureRecognizer.Wrap(TUITapGestureRecognizer.Alloc.initWithTarget(GetObjectID, sel_getUid('HandleTap')));
+  var LSingleTapGestureRecognizer := TUITapGestureRecognizer.Wrap(TUITapGestureRecognizer.Alloc.initWithTarget(GetObjectID, sel_getUid('HandleTap')));
   try
     LSingleTapGestureRecognizer.setDelegate(GetObjectID);
     LSingleTapGestureRecognizer.setNumberOfTapsRequired(1);
@@ -294,7 +283,7 @@ begin
   FUIToolBar.setAlpha(0.8);
   FUIContainerView.addSubview(FUIToolBar);
   FUIToolBar.setTranslatesAutoresizingMaskIntoConstraints(False);
-  LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUIToolBar), NSLayoutAttributeLeft,   NSLayoutRelationEqual, NSObjectToID(FUIContainerView),    NSLayoutAttributeLeft,           1, 0));
+  var LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUIToolBar), NSLayoutAttributeLeft,   NSLayoutRelationEqual, NSObjectToID(FUIContainerView),    NSLayoutAttributeLeft,           1, 0));
   LConstraint.setActive(True);
   LConstraint := TNSLayoutConstraint.Wrap(TNSLayoutConstraint.OCClass.constraintWithItem(NSObjectToID(FUIToolBar), NSLayoutAttributeRight,  NSLayoutRelationEqual, NSObjectToID(FUIContainerView),    NSLayoutAttributeRight,          1, 0));
   LConstraint.setActive(True);
@@ -302,7 +291,7 @@ begin
   LConstraint.setActive(True);
 
   { Creating Toolbar buttons }
-  LButtons := TNSMutableArray.Create;
+  var LButtons := TNSMutableArray.Create;
   try
 
     { Adding Flexible Separator }

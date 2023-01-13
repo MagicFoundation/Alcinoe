@@ -2895,44 +2895,44 @@ type
 //function kRTCVideoCodecVp9Name: NSString;
 
 //RTC_EXTERN void RTCSetupInternalTracer(void);
-procedure RTCSetupInternalTracer; cdecl; external 'WebRTC' name _PU + 'RTCSetupInternalTracer';
+procedure RTCSetupInternalTracer; cdecl; external framework 'WebRTC' name _PU + 'RTCSetupInternalTracer';
 
 //Starts capture to specified file. Must be a valid writable path.
 //Returns YES if capture starts.
 //RTC_EXTERN BOOL RTCStartInternalCapture(NSString* filePath);
-function RTCStartInternalCapture(filePath: Pointer { NSString }): Boolean; cdecl; external 'WebRTC' name _PU + 'RTCStartInternalCapture';
+function RTCStartInternalCapture(filePath: Pointer { NSString }): Boolean; cdecl; external framework 'WebRTC' name _PU + 'RTCStartInternalCapture';
 
 //RTC_EXTERN void RTCStopInternalCapture(void);
-procedure RTCStopInternalCapture; cdecl; external 'WebRTC' name _PU + 'RTCStopInternalCapture';
+procedure RTCStopInternalCapture; cdecl; external framework 'WebRTC' name _PU + 'RTCStopInternalCapture';
 
 //RTC_EXTERN void RTCShutdownInternalTracer(void);
-procedure RTCShutdownInternalTracer; cdecl; external 'WebRTC' name _PU + 'RTCShutdownInternalTracer';
+procedure RTCShutdownInternalTracer; cdecl; external framework 'WebRTC' name _PU + 'RTCShutdownInternalTracer';
 
 //Initialize field trials using a dictionary mapping field trial keys to their
 //values. See above for valid keys and values. Must be called before any other
 //call into WebRTC. See: webrtc/system_wrappers/include/field_trial.h
 //RTC_EXTERN void RTCInitFieldTrialDictionary(NSDictionary<NSString *, NSString *> *fieldTrials);
-procedure RTCInitFieldTrialDictionary(fieldTrials: Pointer { NSDictionary } ); cdecl; external 'WebRTC' name _PU + 'RTCInitFieldTrialDictionary';
+procedure RTCInitFieldTrialDictionary(fieldTrials: Pointer { NSDictionary } ); cdecl; external framework 'WebRTC' name _PU + 'RTCInitFieldTrialDictionary';
 
 //Initialize and clean up the SSL library. Failure is fatal. These call the
 //corresponding functions in webrtc/rtc_base/ssladapter.h.
 //RTC_EXTERN BOOL RTCInitializeSSL(void);
-function RTCInitializeSSL: Boolean; cdecl; external 'WebRTC' name _PU + 'RTCInitializeSSL';
+function RTCInitializeSSL: Boolean; cdecl; external framework 'WebRTC' name _PU + 'RTCInitializeSSL';
 
 //RTC_EXTERN BOOL RTCCleanupSSL(void);
-function RTCCleanupSSL: Boolean; cdecl; external 'WebRTC' name _PU + 'RTCCleanupSSL';
+function RTCCleanupSSL: Boolean; cdecl; external framework 'WebRTC' name _PU + 'RTCCleanupSSL';
 
 //Wrapper for rtc::LogMessage::LogToDebug.
 //Sets the minimum severity to be logged to console.
 //RTC_EXTERN void RTCSetMinDebugLogLevel(RTCLoggingSeverity severity);
-procedure RTCSetMinDebugLogLevel(severity: RTCLoggingSeverity); cdecl; external 'WebRTC' name _PU + 'RTCSetMinDebugLogLevel';
+procedure RTCSetMinDebugLogLevel(severity: RTCLoggingSeverity); cdecl; external framework 'WebRTC' name _PU + 'RTCSetMinDebugLogLevel';
 
-//procedure RTCLogEx(severity: RTCLoggingSeverity; log_string: Pointer { NSString } ); cdecl; external libWebRTC name _PU + 'RTCLogEx';
-//function RTCFileName(filePath: MarshaledAString): Pointer { NSString }; cdecl; external libWebRTC name _PU + 'RTCFileName';
-//function RTCFieldTrialMedianSlopeFilterValue(windowSize: LongWord; thresholdGain: Double): Pointer { NSString }; cdecl; external libWebRTC name _PU + 'RTCFieldTrialMedianSlopeFilterValue';
-//function RTCFieldTrialTrendlineFilterValue(windowSize: LongWord; smoothingCoeff: Double; thresholdGain: Double): Pointer { NSString }; cdecl; external libWebRTC name _PU + 'RTCFieldTrialTrendlineFilterValue';
-//procedure RTCEnableMetrics; cdecl; external libWebRTC name _PU + 'RTCEnableMetrics';
-//function RTCGetAndResetMetrics: Pointer { NSArray }; cdecl; external libWebRTC name _PU + 'RTCGetAndResetMetrics';
+//procedure RTCLogEx(severity: RTCLoggingSeverity; log_string: Pointer { NSString } ); cdecl; external framework libWebRTC name _PU + 'RTCLogEx';
+//function RTCFileName(filePath: MarshaledAString): Pointer { NSString }; cdecl; external framework libWebRTC name _PU + 'RTCFileName';
+//function RTCFieldTrialMedianSlopeFilterValue(windowSize: LongWord; thresholdGain: Double): Pointer { NSString }; cdecl; external framework libWebRTC name _PU + 'RTCFieldTrialMedianSlopeFilterValue';
+//function RTCFieldTrialTrendlineFilterValue(windowSize: LongWord; smoothingCoeff: Double; thresholdGain: Double): Pointer { NSString }; cdecl; external framework libWebRTC name _PU + 'RTCFieldTrialTrendlineFilterValue';
+//procedure RTCEnableMetrics; cdecl; external framework libWebRTC name _PU + 'RTCEnableMetrics';
+//function RTCGetAndResetMetrics: Pointer { NSArray }; cdecl; external framework libWebRTC name _PU + 'RTCGetAndResetMetrics';
 
 
 implementation

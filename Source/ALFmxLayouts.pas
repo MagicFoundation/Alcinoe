@@ -585,6 +585,8 @@ begin
   FVScrollBar := CreateScrollBar(Torientation.Vertical);
   FHScrollBar := CreateScrollBar(Torientation.Horizontal);
   FContent := CreateContent;
+  if FHScrollBar <> nil then FHScrollBar.BringToFront;
+  if FVScrollBar <> nil then FVScrollBar.BringToFront;
   //-----
   fMouseDownPos := TpointF.Create(0,0);
   FDeadZoneBeforeAcquireScrolling := 32;

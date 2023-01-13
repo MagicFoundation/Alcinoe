@@ -83,7 +83,6 @@ const
 
 type
 
-  {*****************}
   {$REGION 'ANDROID'}
   {$IF defined(ANDROID)}
   TALAndroidVideoPlayer = class(Tobject)
@@ -91,8 +90,8 @@ type
 
     type
 
-      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-      TALFrameAvailableListener = class(TJavaLocal, JSurfaceTexture_OnFrameAvailableListener)
+      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+      TFrameAvailableListener = class(TJavaLocal, JSurfaceTexture_OnFrameAvailableListener)
       private
         {$IF defined(DEBUG)}
         fTotalFramesProcessed: integer;
@@ -106,53 +105,66 @@ type
         procedure onFrameAvailable(surfaceTexture: JSurfaceTexture); cdecl;
       end;
 
-      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-      TALEventListener = class(TJavaLocal, JPlayer_EventListener)
+      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+      TPlayerListener = class(TJavaLocal, JPlayer_Listener)
       private
         [Weak] FVideoPlayerControl: TALAndroidVideoPlayer;
       public
         constructor Create(const aVideoPlayerControl: TALAndroidVideoPlayer);
-        procedure onTimelineChanged(timeline: JTimeline; manifest: JObject); cdecl;
-        procedure onTracksChanged(trackGroups: JTrackGroupArray; trackSelections: JTrackSelectionArray); cdecl;
-        procedure onLoadingChanged(isLoading: Boolean); cdecl;
-        procedure onPlayerStateChanged(playWhenReady: Boolean; playbackState: Integer); cdecl;
+        procedure onEvents(player: JPlayer; events: JPlayer_Events); cdecl;
+        procedure onTimelineChanged(timeline: JTimeline; reason: Integer); cdecl;
+        procedure onMediaItemTransition(mediaItem: JMediaItem; reason: Integer); cdecl;
+        procedure onTracksChanged(tracks: JTracks); cdecl;
+        procedure onMediaMetadataChanged(mediaMetadata: JMediaMetadata); cdecl;
+        procedure onPlaylistMetadataChanged(mediaMetadata: JMediaMetadata); cdecl;
+        procedure onIsLoadingChanged(isLoading: boolean); cdecl;
+        procedure onLoadingChanged(isLoading: boolean); cdecl;
+        procedure onAvailableCommandsChanged(availableCommands: JPlayer_Commands); cdecl;
+        procedure onTrackSelectionParametersChanged(parameters: JTrackSelectionParameters); cdecl;
+        procedure onPlayerStateChanged(playWhenReady: boolean; playbackState: Integer); cdecl;
+        procedure onPlaybackStateChanged(playbackState: Integer); cdecl;
+        procedure onPlayWhenReadyChanged(playWhenReady: boolean; reason: Integer); cdecl;
+        procedure onPlaybackSuppressionReasonChanged(playbackSuppressionReason: Integer); cdecl;
+        procedure onIsPlayingChanged(isPlaying: boolean); cdecl;
         procedure onRepeatModeChanged(repeatMode: Integer); cdecl;
-        procedure onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean); cdecl;
-        procedure onPlayerError(error: JExoPlaybackException); cdecl;
-        procedure onPositionDiscontinuity(reason: Integer); cdecl;
+        procedure onShuffleModeEnabledChanged(shuffleModeEnabled: boolean); cdecl;
+        procedure onPlayerError(error: JPlaybackException); cdecl;
+        procedure onPlayerErrorChanged(error: JPlaybackException); cdecl;
+        procedure onPositionDiscontinuity(reason: Integer); overload; cdecl;
+        procedure onPositionDiscontinuity(oldPosition: JPlayer_PositionInfo; newPosition: JPlayer_PositionInfo; reason: Integer); overload; cdecl;
         procedure onPlaybackParametersChanged(playbackParameters: JPlaybackParameters); cdecl;
+        procedure onSeekBackIncrementChanged(seekBackIncrementMs: Int64); cdecl;
+        procedure onSeekForwardIncrementChanged(seekForwardIncrementMs: Int64); cdecl;
+        procedure onMaxSeekToPreviousPositionChanged(maxSeekToPreviousPositionMs: Int64); cdecl;
         procedure onSeekProcessed; cdecl;
-      end;
-
-      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-      TALVideoListener = class(TJavaLocal, JSimpleExoPlayer_VideoListener)
-      private
-        [Weak] FVideoPlayerControl: TALAndroidVideoPlayer;
-      public
-        constructor Create(const aVideoPlayerControl: TALAndroidVideoPlayer);
-        procedure onVideoSizeChanged(width: Integer; height: Integer; unappliedRotationDegrees: Integer; pixelWidthHeightRatio: Single); cdecl;
+        procedure onAudioSessionIdChanged(audioSessionId: Integer); cdecl;
+        procedure onAudioAttributesChanged(audioAttributes: JAudioAttributes); cdecl;
+        procedure onVolumeChanged(volume: Single); cdecl;
+        procedure onSkipSilenceEnabledChanged(skipSilenceEnabled: boolean); cdecl;
+        procedure onDeviceInfoChanged(deviceInfo: JDeviceInfo); cdecl;
+        procedure onDeviceVolumeChanged(volume: Integer; muted: boolean); cdecl;
+        procedure onVideoSizeChanged(videoSize: JVideoSize); cdecl;
+        procedure onSurfaceSizeChanged(width: Integer; height: Integer); cdecl;
         procedure onRenderedFirstFrame; cdecl;
+        procedure onCues(cues: JList); overload; cdecl;
+        procedure onCues(cueGroup: JCueGroup); overload; cdecl;
+        procedure onMetadata(metadata: JMetadata); cdecl;
       end;
 
-  private
-    class var DefaultBandwidthMeter: JBandwidthMeter;
   private
     fHandler: JHandler;
-    fVideoTrackSelectionFactory: JTrackSelection_Factory;
-    fTrackSelector: JTrackSelector;
-    fSimpleExoPlayer: JSimpleExoPlayer;
+    fExoPlayer: JExoPlayer;
     fDataSourceFactory: JDataSource_Factory;
     fSurface: JSurface;
     fSurfaceTexture: JSurfaceTexture;
     fbitmap: TALTexture;
     fOnFrameAvailableEvent: TNotifyEvent;
-    FOnFrameAvailableListener: TALFrameAvailableListener;
+    FOnFrameAvailableListener: TFrameAvailableListener;
     fOnCompletionEvent: TNotifyEvent;
     fOnErrorEvent: TNotifyEvent;
-    fEventListener: TALEventListener;
+    FPlayerListener: TPlayerListener;
     FOnPreparedEvent: TnotifyEvent;
     fonVideoSizeChangedEvent: TALVideoSizeChangedNotifyEvent;
-    fVideoListener: TALVideoListener;
     fVideoWidth: integer;
     fVideoHeight: integer;
     fState: integer;
@@ -187,7 +199,6 @@ type
   {$endIF}
   {$ENDREGION}
 
-  {*************}
   {$REGION 'IOS'}
   {$IF defined(IOS)}
   TALIOSVideoPlayer = class(Tobject)
@@ -195,14 +206,14 @@ type
 
     type
 
-      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-      IALKVODelegate = interface(IObjectiveC)
+      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+      IKVODelegate = interface(IObjectiveC)
         ['{B0C6720A-79B7-4FD6-B9E3-77594E905B3C}']
         procedure observeValueForKeyPath(keyPath: NSString; ofObject: Pointer; change: NSDictionary; context: Pointer); cdecl;
       end;
 
-      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-      TALKVODelegate = class(TOCLocal, IALKVODelegate)
+      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+      TKVODelegate = class(TOCLocal, IKVODelegate)
       private
         [Weak] FVideoPlayerControl: TALIOSVideoPlayer;
       public
@@ -210,8 +221,8 @@ type
         procedure observeValueForKeyPath(keyPath: NSString; ofObject: Pointer; change: NSDictionary; context: Pointer); cdecl;
       end;
 
-      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-      IALNotificationsDelegate = interface(IObjectiveC)
+      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+      INotificationsDelegate = interface(IObjectiveC)
         ['{EF778992-B249-474F-B1AD-D64903EF7947}']
         procedure ItemDidPlayToEndTime; cdecl;
         procedure ItemFailedToPlayToEndTime; cdecl;
@@ -221,8 +232,8 @@ type
         procedure ItemNewErrorLogEntry; cdecl;
       end;
 
-      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-      TALNotificationsDelegate = class(TOCLocal, IALNotificationsDelegate)
+      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+      TNotificationsDelegate = class(TOCLocal, INotificationsDelegate)
       private
         [Weak] FVideoPlayerControl: TALIOSVideoPlayer;
       public
@@ -241,8 +252,8 @@ type
     FPlayer: AVPlayer;
     FPlayerItem: AVPlayerItem;
     FPlayerItemVideoOutput: AVPlayerItemVideoOutput;
-    FKVODelegate: TALKVODelegate;
-    fNotificationsDelegate: TALNotificationsDelegate;
+    FKVODelegate: TKVODelegate;
+    fNotificationsDelegate: TNotificationsDelegate;
     FFrameRefreshTimer: TTimer;
     fhasNONewPixelBufferForItemTimeCounter: integer;
     {$IFDEF DEBUG}
@@ -295,7 +306,6 @@ type
   {$endIF}
   {$ENDREGION}
 
-  {*******************}
   {$REGION 'MSWINDOWS'}
   {$IF defined(MSWINDOWS)}
   TALWinVideoPlayer = class(Tobject)
@@ -334,7 +344,6 @@ type
   {$endIF}
   {$ENDREGION}
 
-  {****************}
   {$REGION 'ALMacOS'}
   {$IF defined(ALMacOS)}
   TALMacOSVideoPlayer = class(Tobject)
@@ -488,8 +497,8 @@ uses
 {$REGION ' ANDROID'}
 {$IF defined(ANDROID)}
 
-{*******************************************************************************************************************}
-constructor TALAndroidVideoPlayer.TALFrameAvailableListener.Create(const aVideoPlayerControl: TALAndroidVideoPlayer);
+{*****************************************************************************************************************}
+constructor TALAndroidVideoPlayer.TFrameAvailableListener.Create(const aVideoPlayerControl: TALAndroidVideoPlayer);
 begin
   inherited Create;
   {$IF defined(DEBUG)}
@@ -500,11 +509,8 @@ begin
   fSdkInt := TJBuild_VERSION.JavaClass.SDK_INT;
 end;
 
-{************************************************************************************************************}
-procedure TALAndroidVideoPlayer.TALFrameAvailableListener.DoOnFrameAvailable(surfaceTexture: JSurfaceTexture);
-{$IF defined(DEBUG)}
-var LStopWatch: TStopWatch;
-{$ENDIF}
+{**********************************************************************************************************}
+procedure TALAndroidVideoPlayer.TFrameAvailableListener.DoOnFrameAvailable(surfaceTexture: JSurfaceTexture);
 begin
 
   //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found
@@ -513,33 +519,35 @@ begin
   {$IF defined(DEBUG)}
   if (fTotalFramesProcessed mod 1000 = 0) then begin
     fFpsStopWatch.Stop;
-    ALLog('TALAndroidVideoPlayer.onFrameAvailable', 'fps: ' + ALFormatFloatU('0.00', (fTotalFramesProcessed) / max(1, (ffpsStopWatch.Elapsed.TotalMilliseconds / 1000)), AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+    ALLog('TALAndroidVideoPlayer.TFrameAvailableListener.DoOnFrameAvailable', 'fps: ' + ALFormatFloatU('0.00', (fTotalFramesProcessed) / max(1, (ffpsStopWatch.Elapsed.TotalMilliseconds / 1000)), AlDefaultFormatSettingsU), TalLogType.VERBOSE);
     fTotalFramesProcessed := 0;
     fFpsStopWatch := TStopWatch.StartNew;
   end;
   inc(fTotalFramesProcessed);
   {$ENDIF}
 
-  {$IFNDEF ALCompilerVersionSupported}
-    {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
-  {$ENDIF}
   if (fVideoPlayerControl.fbitmap.Width <> fVideoPlayerControl.fVideoWidth) or
      (fVideoPlayerControl.fbitmap.Height <> fVideoPlayerControl.fVideoHeight) then begin
+    {$IFNDEF ALCompilerVersionSupported}
+      {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
+    {$ENDIF}
+    // we can't use setsize because it's will finalise the texture
+    // but with/height are used only in
+    // procedure TCanvasHelper.TexRect(const DestCorners, SrcCorners: TCornersF; const Texture: TTexture; const Color1, Color2, Color3, Color4: TAlphaColor);
+    // begin
+    //   ...
+    //   if (Texture = nil) or (Texture.Width < 1) or (Texture.Height < 1) then Exit
+    //   ...
+    //   InvTexSize := PointF(1 / Texture.Width, 1 / Texture.Height);
+    //   ...
+    // end
+    // so i don't need to finalize the texture !!
     TALTextureAccessPrivate(fVideoPlayerControl.fBitmap).FWidth := fVideoPlayerControl.fVideoWidth;
-    TALTextureAccessPrivate(fVideoPlayerControl.fBitmap).FHeight := fVideoPlayerControl.fVideoHeight; // we can't use setsize because it's will finalise the texture
-                                                                                                      // but with/height are used only in
-                                                                                                      // procedure TCanvasHelper.TexRect(const DestCorners, SrcCorners: TCornersF; const Texture: TTexture; const Color1, Color2, Color3, Color4: TAlphaColor);
-                                                                                                      // begin
-                                                                                                      //   ...
-                                                                                                      //   if (Texture = nil) or (Texture.Width < 1) or (Texture.Height < 1) then Exit
-                                                                                                      //   ...
-                                                                                                      //   InvTexSize := PointF(1 / Texture.Width, 1 / Texture.Height);
-                                                                                                      //   ...
-                                                                                                      // end
-                                                                                                      // so i don't need to finalize the texture !!
+    TALTextureAccessPrivate(fVideoPlayerControl.fBitmap).FHeight := fVideoPlayerControl.fVideoHeight;
   end;
 
   {$IF defined(DEBUG)}
+  var LStopWatch: TStopWatch;
   if (fTotalFramesProcessed mod 1000 = 0) then LStopWatch := TStopWatch.StartNew;
   {$ENDIF}
 
@@ -557,8 +565,8 @@ begin
 
 end;
 
-{**********************************************************************************************************}
-procedure TALAndroidVideoPlayer.TALFrameAvailableListener.onFrameAvailable(surfaceTexture: JSurfaceTexture);
+{********************************************************************************************************}
+procedure TALAndroidVideoPlayer.TFrameAvailableListener.onFrameAvailable(surfaceTexture: JSurfaceTexture);
 begin
 
   // https://developer.android.com/reference/android/graphics/SurfaceTexture.html
@@ -572,8 +580,8 @@ begin
   // the main thread (who already have the OpenGL ES context)
   //
   // NOTE: as i do setOnFrameAvailableListener(SurfaceTexture.OnFrameAvailableListener listener,Handler handler)
-  //       with handler = TJHandler.JavaClass.init(TJLooper.javaclass.getMainLooper()) then this event will be
-  //       always called from the main UI thread
+  // with handler = TJHandler.JavaClass.init(TJLooper.javaclass.getMainLooper()) then this event will be
+  // always called from the main UI thread
 
   if fSdkInt >= 21 {LOLLIPOP} then DoOnFrameAvailable(surfaceTexture)
   else begin
@@ -586,39 +594,95 @@ begin
 
 end;
 
-{**********************************************************************************************************}
-constructor TALAndroidVideoPlayer.TALEventListener.Create(const aVideoPlayerControl: TALAndroidVideoPlayer);
+{*********************************************************************************************************}
+constructor TALAndroidVideoPlayer.TPlayerListener.Create(const aVideoPlayerControl: TALAndroidVideoPlayer);
 begin
   inherited Create;
   fVideoPlayerControl := aVideoPlayerControl;
 end;
 
+{************************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onEvents(player: JPlayer; events: JPlayer_Events);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onEvents', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{******************************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onTimelineChanged(timeline: JTimeline; reason: Integer);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onTimelineChanged', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{************************************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onMediaItemTransition(mediaItem: JMediaItem; reason: Integer);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onMediaItemTransition', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{*******************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onTracksChanged(tracks: JTracks);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onTracksChanged', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{****************************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onMediaMetadataChanged(mediaMetadata: JMediaMetadata);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onMediaMetadataChanged', TalLogType.verbose);
+  {$ENDIF}
+end;
+
 {*******************************************************************************************************}
-procedure TALAndroidVideoPlayer.TALEventListener.onTimelineChanged(timeline: JTimeline; manifest: JObject);
+procedure TALAndroidVideoPlayer.TPlayerListener.onPlaylistMetadataChanged(mediaMetadata: JMediaMetadata);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.onTimelineChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlaylistMetadataChanged', TalLogType.verbose);
   {$ENDIF}
 end;
 
-{*************************************************************************************************************************************}
-procedure TALAndroidVideoPlayer.TALEventListener.onTracksChanged(trackGroups: JTrackGroupArray; trackSelections: JTrackSelectionArray);
+{*************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onIsLoadingChanged(isLoading: boolean);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.onTracksChanged', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onIsLoadingChanged', TalLogType.verbose);
   {$ENDIF}
 end;
 
-{************************************************************************************}
-procedure TALAndroidVideoPlayer.TALEventListener.onLoadingChanged(isLoading: Boolean);
+{***********************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onLoadingChanged(isLoading: boolean);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.onLoadingChanged','isLoading: ' + ALBoolToStrU(isLoading), TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onLoadingChanged', TalLogType.verbose);
   {$ENDIF}
 end;
 
-{********************************************************************************************************************}
-procedure TALAndroidVideoPlayer.TALEventListener.onPlayerStateChanged(playWhenReady: Boolean; playbackState: Integer);
+{**************************************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onAvailableCommandsChanged(availableCommands: JPlayer_Commands);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onAvailableCommandsChanged', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{***********************************************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onTrackSelectionParametersChanged(parameters: JTrackSelectionParameters);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onTrackSelectionParametersChanged', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{*******************************************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onPlayerStateChanged(playWhenReady: boolean; playbackState: Integer);
 begin
 
   //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found
@@ -630,8 +694,11 @@ begin
   //int STATE_ENDED = 4; => The player has finished playing the media.
 
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.onPlayerStateChanged','playWhenReady: ' + ALBoolToStrU(playWhenReady) +
-                                                     ' - playbackState: ' + ALIntToStrU(playbackState), TalLogType.verbose);
+  ALLog(
+    'TALAndroidVideoPlayer.onPlayerStateChanged',
+    'playWhenReady: ' + ALBoolToStrU(playWhenReady) + ' | ' +
+    'playbackState: ' + ALIntToStrU(playbackState),
+    TalLogType.verbose);
   {$ENDIF}
 
   if (playbackState = TJPlayer.JavaClass.STATE_READY) and
@@ -644,24 +711,56 @@ begin
 
 end;
 
-{****************************************************************************************}
-procedure TALAndroidVideoPlayer.TALEventListener.onRepeatModeChanged(repeatMode: Integer);
+{*********************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onPlaybackStateChanged(playbackState: Integer);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.onRepeatModeChanged','repeatMode: ' + ALIntToStrU(repeatMode), TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlaybackStateChanged', TalLogType.verbose);
   {$ENDIF}
 end;
 
-{********************************************************************************************************}
-procedure TALAndroidVideoPlayer.TALEventListener.onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean);
+{**************************************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onPlayWhenReadyChanged(playWhenReady: boolean; reason: Integer);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.onShuffleModeEnabledChanged','shuffleModeEnabled: ' + ALBoolToStrU(shuffleModeEnabled), TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlayWhenReadyChanged', TalLogType.verbose);
   {$ENDIF}
 end;
 
-{*******************************************************************************************}
-procedure TALAndroidVideoPlayer.TALEventListener.onPlayerError(error: JExoPlaybackException);
+{*********************************************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onPlaybackSuppressionReasonChanged(playbackSuppressionReason: Integer);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlaybackSuppressionReasonChanged', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{*************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onIsPlayingChanged(isPlaying: boolean);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onIsPlayingChanged', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{***************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onRepeatModeChanged(repeatMode: Integer);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onRepeatModeChanged', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{*******************************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onShuffleModeEnabledChanged(shuffleModeEnabled: boolean);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onShuffleModeEnabledChanged', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{***************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onPlayerError(error: JPlaybackException);
 begin
 
   //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found
@@ -676,74 +775,185 @@ begin
 
 end;
 
-{****************************************************************************************}
-procedure TALAndroidVideoPlayer.TALEventListener.onPositionDiscontinuity(reason: Integer);
+{**********************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onPlayerErrorChanged(error: JPlaybackException);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.onPositionDiscontinuity','reason: ' + ALIntToStrU(reason), TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlayerErrorChanged', TalLogType.verbose);
   {$ENDIF}
 end;
 
-{********************************************************************************************************************}
-procedure TALAndroidVideoPlayer.TALEventListener.onPlaybackParametersChanged(playbackParameters: JPlaybackParameters);
+{***************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onPositionDiscontinuity(reason: Integer);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.onPlaybackParametersChanged', TalLogType.error);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPositionDiscontinuity', TalLogType.verbose);
   {$ENDIF}
 end;
 
-{***************************************************************}
-procedure TALAndroidVideoPlayer.TALEventListener.onSeekProcessed;
+{*************************************************************************************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onPositionDiscontinuity(oldPosition: JPlayer_PositionInfo; newPosition: JPlayer_PositionInfo; reason: Integer);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.onSeekProcessed', TalLogType.error);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPositionDiscontinuity', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{*******************************************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onPlaybackParametersChanged(playbackParameters: JPlaybackParameters);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onPlaybackParametersChanged', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{*****************************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onSeekBackIncrementChanged(seekBackIncrementMs: Int64);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onSeekBackIncrementChanged', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{***********************************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onSeekForwardIncrementChanged(seekForwardIncrementMs: Int64);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onSeekForwardIncrementChanged', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{*********************************************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onMaxSeekToPreviousPositionChanged(maxSeekToPreviousPositionMs: Int64);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onMaxSeekToPreviousPositionChanged', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{**************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onSeekProcessed;
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onSeekProcessed', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{***********************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onAudioSessionIdChanged(audioSessionId: Integer);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onAudioSessionIdChanged', TalLogType.verbose);
   {$ENDIF}
 end;
 
 {**********************************************************************************************************}
-constructor TALAndroidVideoPlayer.TALVideoListener.Create(const aVideoPlayerControl: TALAndroidVideoPlayer);
+procedure TALAndroidVideoPlayer.TPlayerListener.onAudioAttributesChanged(audioAttributes: JAudioAttributes);
 begin
-  inherited Create;
-  fVideoPlayerControl := aVideoPlayerControl;
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onAudioAttributesChanged', TalLogType.verbose);
+  {$ENDIF}
 end;
 
-{*********************************************************************************************************************************************************************}
-procedure TALAndroidVideoPlayer.TALVideoListener.onVideoSizeChanged(width: Integer; height: Integer; unappliedRotationDegrees: Integer; pixelWidthHeightRatio: Single);
+{******************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onVolumeChanged(volume: Single);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onVolumeChanged', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{*******************************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onSkipSilenceEnabledChanged(skipSilenceEnabled: boolean);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onSkipSilenceEnabledChanged', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{*******************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onDeviceInfoChanged(deviceInfo: JDeviceInfo);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onDeviceInfoChanged', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{*****************************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onDeviceVolumeChanged(volume: Integer; muted: boolean);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onDeviceVolumeChanged', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{****************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onVideoSizeChanged(videoSize: JVideoSize);
 begin
 
   //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found
   if fVideoPlayerControl = nil then exit;
 
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.onVideoSizeChanged', 'width: ' + ALinttostrU(width) +
-                                                    ' - height: ' + ALinttostrU(height) +
-                                                    ' - unappliedRotationDegrees: ' + ALinttostrU(unappliedRotationDegrees) +
-                                                    ' - pixelWidthHeightRatio: ' + AlFloatToStrU(pixelWidthHeightRatio, ALDefaultFormatSettingsU), TalLogType.verbose);
+  ALLog(
+    'TALAndroidVideoPlayer.onVideoSizeChanged',
+    'width: ' + ALinttostrU(videoSize.width) + ' | ' +
+    'height: ' + ALinttostrU(videoSize.height),
+    TalLogType.verbose);
   {$ENDIF}
 
-  fVideoPlayerControl.FVideoWidth := width;
-  fVideoPlayerControl.fVideoHeight := height;
+  fVideoPlayerControl.FVideoWidth := videoSize.width;
+  fVideoPlayerControl.fVideoHeight := videoSize.height;
   if assigned(fVideoPlayerControl.fonVideoSizeChangedEvent) then
-    fVideoPlayerControl.fonVideoSizeChangedEvent(fVideoPlayerControl, width, height);
+    fVideoPlayerControl.fonVideoSizeChangedEvent(fVideoPlayerControl, videoSize.width, videoSize.height);
 
 end;
 
-{********************************************************************}
-procedure TALAndroidVideoPlayer.TALVideoListener.onRenderedFirstFrame;
+{****************************************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onSurfaceSizeChanged(width: Integer; height: Integer);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.onRenderedFirstFrame', TalLogType.verbose);
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onSurfaceSizeChanged', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{*******************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onRenderedFirstFrame;
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onRenderedFirstFrame', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{******************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onCues(cues: JList);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onCues', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{**************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onCues(cueGroup: JCueGroup);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onCues', TalLogType.verbose);
+  {$ENDIF}
+end;
+
+{******************************************************************************}
+procedure TALAndroidVideoPlayer.TPlayerListener.onMetadata(metadata: JMetadata);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.TPlayerListener.onMetadata', TalLogType.verbose);
   {$ENDIF}
 end;
 
 {***************************************}
 constructor TALAndroidVideoPlayer.Create;
-{$IFDEF DEBUG}
-var LStopWatch: TstopWatch;
-{$ENDIF}
 begin
   {$IFDEF DEBUG}
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   //-----
@@ -752,44 +962,37 @@ begin
   //-----
   fVideoWidth := 0;
   fVideoHeight := 0;
-
-  //-----
   fState := vpsIdle;
-
-  //----
-  if DefaultBandwidthMeter = nil then DefaultBandwidthMeter := TJDefaultBandwidthMeter.JavaClass.init;
   //-----
-  fHandler := TJHandler.JavaClass.init(TJLooper.javaclass.getMainLooper());
-  //-----
-  fvideoTrackSelectionFactory := TJAdaptiveTrackSelection_Factory.JavaClass.init(DefaultBandwidthMeter);
-  fTrackSelector := TJDefaultTrackSelector.JavaClass.init(fvideoTrackSelectionFactory);
-  fSimpleExoPlayer := TJExoPlayerFactory.JavaClass.newSimpleInstance(TAndroidHelper.Context, fTrackSelector);
+  fExoPlayer := TJExoPlayer_Builder.JavaClass.init(TAndroidHelper.Context).Build;
   //-----
   fonVideoSizeChangedEvent := nil;
-  fVideoListener := TALVideoListener.Create(Self);
-  fSimpleExoPlayer.addVideoListener(fVideoListener);
   //----
-  fDataSourceFactory := TJDefaultDataSourceFactory.javaclass.init(TAndroidHelper.Context,
-                                                                  TJUtil.javaclass.getUserAgent(TAndroidHelper.Context, TandroidHelper.Context.getPackageName),
-                                                                  TJTransferListener.Wrap(DefaultBandwidthMeter));
+  fDataSourceFactory := TJDefaultDataSource_Factory.javaclass.init(TAndroidHelper.Context);
   //-----
   fOnErrorEvent := nil;
   fOnPreparedEvent := nil;
   fOnCompletionEvent := nil;
-  fEventListener := TALEventListener.Create(Self);
-  fSimpleExoPlayer.AddListener(fEventListener);
+  FPlayerListener := TPlayerListener.Create(Self);
+  fExoPlayer.AddListener(FPlayerListener);
   //-----
   fBitmap := TalTexture.Create;
   ALInitializeEXTERNALOESTexture(fBitmap);
   fSurfaceTexture := TJSurfaceTexture.JavaClass.init(fBitmap.Handle);
   //-----
   fOnFrameAvailableEvent := nil;
-  FOnFrameAvailableListener := TALFrameAvailableListener.Create(Self);
-  if (TJBuild_VERSION.JavaClass.SDK_INT >= 21 {LOLLIPOP}) then fSurfaceTexture.setOnFrameAvailableListener(FOnFrameAvailableListener, fHandler)
-  else fSurfaceTexture.setOnFrameAvailableListener(FOnFrameAvailableListener);
+  FOnFrameAvailableListener := TFrameAvailableListener.Create(Self);
+  if (TJBuild_VERSION.JavaClass.SDK_INT >= 21 {LOLLIPOP}) then begin
+    fHandler := TJHandler.JavaClass.init(TJLooper.javaclass.getMainLooper());
+    fSurfaceTexture.setOnFrameAvailableListener(FOnFrameAvailableListener, fHandler)
+  end
+  else begin
+    fHandler := nil;
+    fSurfaceTexture.setOnFrameAvailableListener(FOnFrameAvailableListener);
+  end;
   //-----
   fSurface := TJSurface.JavaClass.init(fSurfaceTexture);
-  fSimpleExoPlayer.setVideoSurface(fSurface);
+  fExoPlayer.setVideoSurface(fSurface);
 
   //----
   {$IFDEF DEBUG}
@@ -801,30 +1004,23 @@ end;
 
 {***************************************}
 destructor TALAndroidVideoPlayer.Destroy;
-{$IFDEF DEBUG}
-var LStopWatch: TstopWatch;
-{$ENDIF}
 begin
   {$IFDEF DEBUG}
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   //-----
   //https://stackoverflow.com/questions/48577801/java-arc-on-the-top-of-delphi-invoke-error-method-xxx-not-found?noredirect=1#comment84156414_48577801
   fOnFrameAvailableListener.FVideoPlayerControl := nil;
-  fEventListener.FVideoPlayerControl := nil;
-  fVideoListener.FVideoPlayerControl := nil;
+  FPlayerListener.FVideoPlayerControl := nil;
   fSurfaceTexture.setOnFrameAvailableListener(nil);
-  fSimpleExoPlayer.removeVideoListener(fVideoListener);
-  fSimpleExoPlayer.removeListener(fEventListener);
+  fExoPlayer.removeListener(FPlayerListener);
 
   //-----
-  fSimpleExoPlayer.stop;
-  fSimpleExoPlayer.clearVideoSurface;
-  fSimpleExoPlayer.release;
-  fSimpleExoPlayer := nil;
-  fTrackSelector := nil;
-  fVideoTrackSelectionFactory := nil;
+  fExoPlayer.stop;
+  fExoPlayer.clearVideoSurface;
+  fExoPlayer.release;
+  fExoPlayer := nil;
   fDataSourceFactory := nil;
 
   //----
@@ -836,8 +1032,7 @@ begin
 
   //-----
   alfreeAndNil(fOnFrameAvailableListener);
-  alFreeAndNil(fEventListener);
-  alFreeAndNil(fVideoListener);
+  alFreeAndNil(FPlayerListener);
 
   //-----
   fHandler := nil;
@@ -859,7 +1054,7 @@ begin
     result := 0;
     exit;
   end;
-  Result := FSimpleExoPlayer.getCurrentPosition; // Returns the playback position in the current window, in milliseconds.
+  Result := fExoPlayer.getCurrentPosition; // Returns the playback position in the current window, in milliseconds.
 end;
 
 {************************************************}
@@ -869,8 +1064,8 @@ begin
     result := 0;
     exit;
   end;
-  Result := FSimpleExoPlayer.getDuration; // Returns the duration of the current window in milliseconds, or TIME_UNSET if the
-                                          // duration is not known.
+  Result := fExoPlayer.getDuration; // Returns the duration of the current window in milliseconds, or TIME_UNSET if the
+                                    // duration is not known.
 end;
 
 {*****************************************************}
@@ -901,39 +1096,31 @@ end;
 
 {*****************************************************************}
 procedure TALAndroidVideoPlayer.prepare(Const aDataSource: String);
-var LVideoSource: JMediaSource;
-    LExtractorMediaSourceFactory: JExtractorMediaSource_Factory;
-    LHlsMediaSourceFactory: JHlsMediaSource_Factory;
-    {$IFDEF DEBUG}
-    LStopWatch: TstopWatch;
-    {$ENDIF}
 begin
   {$IFDEF DEBUG}
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   //----
   if not SetState(vpsPreparing, vpsIdle) then raise Exception.Create('prepare can be call only in the idle state');
+  var LMediaItem := TJMediaItem.JavaClass.fromUri(StringToJString(aDataSource));
+  var LMediaSource: JMediaSource;
 
   //HLS datasource
   if alSameTextU(ExtractFileExt(aDataSource), '.m3u8') then begin
-    LHlsMediaSourceFactory := TJHlsMediaSource_Factory.JavaClass.init(fDataSourceFactory);
-    LVideoSource := LHlsMediaSourceFactory.createMediaSource(StrToJURI(aDataSource));
-    LHlsMediaSourceFactory := nil;
+    var LHlsMediaSourceFactory := TJHlsMediaSource_Factory.JavaClass.init(fDataSourceFactory);
+    LMediaSource := LHlsMediaSourceFactory.createMediaSource(LMediaItem);
   end
 
   //Other datasource
   else begin
-    LExtractorMediaSourceFactory := TJExtractorMediaSource_Factory.JavaClass.init(fDataSourceFactory);
-    LVideoSource := LExtractorMediaSourceFactory.createMediaSource(StrToJURI(aDataSource));
-    LExtractorMediaSourceFactory := nil;
+    var LProgressiveMediaSourceFactory := TJProgressiveMediaSource_Factory.JavaClass.init(fDataSourceFactory);
+    LMediaSource := LProgressiveMediaSourceFactory.createMediaSource(LMediaItem);
   end;
 
   //-----
-  fSimpleExoPlayer.prepare(LVideoSource);
-
-  //----
-  LVideoSource := nil;
+  fExoPlayer.setMediaSource(LMediaSource);
+  fExoPlayer.prepare;
 
   //----
   {$IFDEF DEBUG}
@@ -944,18 +1131,15 @@ end;
 
 {************************************}
 procedure TALAndroidVideoPlayer.pause;
-{$IFDEF DEBUG}
-var LStopWatch: TstopWatch;
-{$ENDIF}
 begin
   {$IFDEF DEBUG}
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   if not SetState(vpsPaused, vpsStarted) then exit;
-  FSimpleExoPlayer.setPlayWhenReady(false); // Sets whether playback should proceed when getPlaybackState() == STATE_READY.
-                                            // If the player is already in the ready state then this method can be used to pause and resume
-                                            // playback
+  fExoPlayer.setPlayWhenReady(false); // Sets whether playback should proceed when getPlaybackState() == STATE_READY.
+                                      // If the player is already in the ready state then this method can be used to pause and resume
+                                      // playback
 
   {$IFDEF DEBUG}
   LStopWatch.Stop;
@@ -965,18 +1149,15 @@ end;
 
 {************************************}
 procedure TALAndroidVideoPlayer.start;
-{$IFDEF DEBUG}
-var LStopWatch: TstopWatch;
-{$ENDIF}
 begin
   {$IFDEF DEBUG}
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   if not SetState(vpsStarted, [vpsPrepared, vpsPaused, vpsPlaybackCompleted]) then exit;
-  FSimpleExoPlayer.setPlayWhenReady(true); // Sets whether playback should proceed when getPlaybackState() == STATE_READY.
-                                           // If the player is already in the ready state then this method can be used to pause and resume
-                                           // playback
+  fExoPlayer.setPlayWhenReady(true); // Sets whether playback should proceed when getPlaybackState() == STATE_READY.
+                                     // If the player is already in the ready state then this method can be used to pause and resume
+                                     // playback
 
   {$IFDEF DEBUG}
   LStopWatch.Stop;
@@ -986,21 +1167,18 @@ end;
 
 {***********************************}
 procedure TALAndroidVideoPlayer.stop;
-{$IFDEF DEBUG}
-var LStopWatch: TstopWatch;
-{$ENDIF}
 begin
   {$IFDEF DEBUG}
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   if not SetState(vpsStopped, [vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then exit;
-  FSimpleExoPlayer.stop;   // Stops playback. Use setPlayWhenReady(false) rather than this method if the intention
-                           // is to pause playback.
-                           // Calling this method will cause the playback state to transition to STATE_IDLE. The
-                           // player instance can still be used, and release() must still be called on the player if
-                           // it's no longer required.
-                           // Calling this method does not reset the playback position.
+  fExoPlayer.stop;   // Stops playback. Use setPlayWhenReady(false) rather than this method if the intention
+                     // is to pause playback.
+                     // Calling this method will cause the playback state to transition to STATE_IDLE. The
+                     // player instance can still be used, and release() must still be called on the player if
+                     // it's no longer required.
+                     // Calling this method does not reset the playback position.
 
   {$IFDEF DEBUG}
   LStopWatch.Stop;
@@ -1012,51 +1190,51 @@ end;
 procedure TALAndroidVideoPlayer.seekTo(const msec: Int64);
 begin
   if not (GetState in [vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then exit;
-  FSimpleExoPlayer.seekTo(msec); // The seek position in the current window, or TIME_UNSET to seek to the window's default position.
+  fExoPlayer.seekTo(msec); // The seek position in the current window, or TIME_UNSET to seek to the window's default position.
 end;
 
 {*****************************************************************}
 procedure TALAndroidVideoPlayer.setLooping(const looping: Boolean);
-{$IFDEF DEBUG}
-var LStopWatch: TstopWatch;
-{$ENDIF}
 begin
   {$IFDEF DEBUG}
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   //int REPEAT_MODE_OFF = 0; => Normal playback without repetition.
   //int REPEAT_MODE_ONE = 1; => repeat the currently playing window infinitely.
   //int REPEAT_MODE_ALL = 2; => repeat the entire timeline infinitely.
 
-  if looping then FSimpleExoPlayer.setRepeatMode(TJPlayer.JavaClass.REPEAT_MODE_ALL)
-  else FSimpleExoPlayer.setRepeatMode(TJPlayer.JavaClass.REPEAT_MODE_OFF);
+  if looping then fExoPlayer.setRepeatMode(TJPlayer.JavaClass.REPEAT_MODE_ALL)
+  else fExoPlayer.setRepeatMode(TJPlayer.JavaClass.REPEAT_MODE_OFF);
 
   {$IFDEF DEBUG}
-  ALLog('TALAndroidVideoPlayer.setLooping', 'looping: ' + alBoolToStrU(looping) +
-                                            ' - timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog(
+    'TALAndroidVideoPlayer.setLooping',
+    'looping: ' + alBoolToStrU(looping) + ' | ' +
+    'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU),
+    TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
 {*************************************************************}
 procedure TALAndroidVideoPlayer.setVolume(const Value: Single);
 var LVolume: Single;
-    {$IFDEF DEBUG}
-    LStopWatch: TstopWatch;
-    {$ENDIF}
 begin
   {$IFDEF DEBUG}
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   LVolume := Value;
   if LVolume < 0 then LVolume := 0
   else if LVolume > 1 then LVolume := 1;
-  FSimpleExoPlayer.setVolume(LVolume); // Sets the audio volume, with 0 being silence and 1 being unity gain.
+  fExoPlayer.setVolume(LVolume); // Sets the audio volume, with 0 being silence and 1 being unity gain.
 
   {$IFDEF DEBUG}
-  ALLog('TALAndroidVideoPlayer.setVolume', 'Value: ' + alFloattostrU(Value, ALDefaultFormatSettingsU) +
-                                           ' - timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog(
+    'TALAndroidVideoPlayer.setVolume',
+    'Value: ' + alFloattostrU(Value, ALDefaultFormatSettingsU) + ' | ' +
+    'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU),
+    TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1065,7 +1243,7 @@ procedure TALAndroidVideoPlayer.setPlaybackSpeed(const Value: single);
 var LPlaybackParameters: JPlaybackParameters;
 begin
   LPlaybackParameters := tJPlaybackParameters.JavaClass.init(Value, 1);
-  FSimpleExoPlayer.setPlaybackParameters(LPlaybackParameters);
+  fExoPlayer.setPlaybackParameters(LPlaybackParameters);
   LPlaybackParameters := Nil;
 end;
 
@@ -1110,15 +1288,15 @@ const
                                        // << not 34 ms (1000 / 30 = 34) because we need also to take in account the
                                        // << timetaken to build the texture (around 2-4 ms)
 
-{************************************************************************************************}
-constructor TALIOSVideoPlayer.TALKVODelegate.Create(const aVideoPlayerControl: TALIOSVideoPlayer);
+{**********************************************************************************************}
+constructor TALIOSVideoPlayer.TKVODelegate.Create(const aVideoPlayerControl: TALIOSVideoPlayer);
 begin
   inherited Create;
   fVideoPlayerControl := aVideoPlayerControl;
 end;
 
-{**********************************************************************************************************************************************}
-procedure TALIOSVideoPlayer.TALKVODelegate.observeValueForKeyPath(keyPath: NSString; ofObject: Pointer; change: NSDictionary; context: Pointer);
+{********************************************************************************************************************************************}
+procedure TALIOSVideoPlayer.TKVODelegate.observeValueForKeyPath(keyPath: NSString; ofObject: Pointer; change: NSDictionary; context: Pointer);
 begin
 
   {$IF defined(DEBUG)}
@@ -1129,8 +1307,8 @@ begin
 
 end;
 
-{**********************************************************************************************************}
-constructor TALIOSVideoPlayer.TALNotificationsDelegate.Create(const aVideoPlayerControl: TALIOSVideoPlayer);
+{********************************************************************************************************}
+constructor TALIOSVideoPlayer.TNotificationsDelegate.Create(const aVideoPlayerControl: TALIOSVideoPlayer);
 begin
   inherited Create;
   fVideoPlayerControl := aVideoPlayerControl;
@@ -1138,7 +1316,7 @@ end;
 
 {************************************************}
 //Posted when the item has played to its end time.
-procedure TALIOSVideoPlayer.TALNotificationsDelegate.ItemDidPlayToEndTime;
+procedure TALIOSVideoPlayer.TNotificationsDelegate.ItemDidPlayToEndTime;
 begin
 
   {$IF defined(DEBUG)}
@@ -1153,7 +1331,7 @@ end;
 //Posted when the item failed to play to its end time.
 //The user info dictionary contains an error object that describes
 //the problem—see AVPlayerItemFailedToPlayToEndTimeErrorKey.
-procedure TALIOSVideoPlayer.TALNotificationsDelegate.ItemFailedToPlayToEndTime;
+procedure TALIOSVideoPlayer.TNotificationsDelegate.ItemFailedToPlayToEndTime;
 begin
 
   {$IF defined(DEBUG)}
@@ -1166,7 +1344,7 @@ end;
 
 {****************************************************************}
 //Posted when the item’s current time has changed discontinuously.
-procedure TALIOSVideoPlayer.TALNotificationsDelegate.ItemTimeJumped;
+procedure TALIOSVideoPlayer.TNotificationsDelegate.ItemTimeJumped;
 begin
   {$IF defined(DEBUG)}
   allog('TALIOSVideoPlayer.ItemTimeJumped', TalLogType.VERBOSE);
@@ -1180,7 +1358,7 @@ end;
 //in a timely fashion over a network. Playback of streaming media continues
 //once a sufficient amount of data is delivered. File-based playback does
 //not continue.
-procedure TALIOSVideoPlayer.TALNotificationsDelegate.ItemPlaybackStalled;
+procedure TALIOSVideoPlayer.TNotificationsDelegate.ItemPlaybackStalled;
 begin
 
   {$IF defined(DEBUG)}
@@ -1194,7 +1372,7 @@ end;
 
 {**************************************************}
 //Posted when a new access log entry has been added.
-procedure TALIOSVideoPlayer.TALNotificationsDelegate.ItemNewAccessLogEntry;
+procedure TALIOSVideoPlayer.TNotificationsDelegate.ItemNewAccessLogEntry;
 begin
   {$IF defined(DEBUG)}
   allog('TALIOSVideoPlayer.ItemNewAccessLogEntry', TalLogType.VERBOSE);
@@ -1205,7 +1383,7 @@ end;
 //Posted when a new error log entry has been added.
 //The notification’s object is the player item. The new log entry is
 //accessible via errorLog(), respectively.
-procedure TALIOSVideoPlayer.TALNotificationsDelegate.ItemNewErrorLogEntry;
+procedure TALIOSVideoPlayer.TNotificationsDelegate.ItemNewErrorLogEntry;
 begin
   {$IF defined(DEBUG)}
   allog('TALIOSVideoPlayer.ItemNewErrorLogEntry', TalLogType.VERBOSE);
@@ -1215,12 +1393,9 @@ end;
 {***********************************}
 constructor TALIOSVideoPlayer.Create;
 var LAudioSession: AVAudioSession;
-    {$IFDEF DEBUG}
-    LStopWatch: TstopWatch;
-    {$ENDIF}
 begin
   {$IFDEF DEBUG}
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   inherited;
@@ -1284,12 +1459,9 @@ end;
 
 {***********************************}
 destructor TALIOSVideoPlayer.Destroy;
-{$IFDEF DEBUG}
-var LStopWatch: TstopWatch;
-{$ENDIF}
 begin
   {$IFDEF DEBUG}
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   //-----
@@ -1408,15 +1580,12 @@ begin
     var LURL: NSUrl;
         LLowerDataSource: String;
         P: Pointer;
-        {$IFDEF DEBUG}
-        LStopWatch: TstopWatch;
-        {$ENDIF}
     begin
 
       try
 
         {$IFDEF DEBUG}
-        LStopWatch := TstopWatch.StartNew;
+        var LStopWatch := TstopWatch.StartNew;
         {$ENDIF}
 
         LLowerDataSource := ALLowerCaseU(aDataSource);
@@ -1442,7 +1611,7 @@ begin
         FPlayer.retain;
 
         //-----
-        fNotificationsDelegate := TALNotificationsDelegate.Create(self);
+        fNotificationsDelegate := TNotificationsDelegate.Create(self);
         TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemDidPlayToEndTime'), StringToID('AVPlayerItemDidPlayToEndTimeNotification'), (FPlayerItem as ILocalObject).GetObjectID);
         TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemFailedToPlayToEndTime'), StringToID('AVPlayerItemFailedToPlayToEndTimeNotification'), (FPlayerItem as ILocalObject).GetObjectID);
         TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemTimeJumped'), StringToID('AVPlayerItemTimeJumpedNotification'), (FPlayerItem as ILocalObject).GetObjectID);
@@ -1451,7 +1620,7 @@ begin
         TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewErrorLogEntry'), StringToID('AVPlayerItemNewErrorLogEntryNotification'), (FPlayerItem as ILocalObject).GetObjectID);
 
         //-----
-        FKVODelegate := TALKVODelegate.Create(self);
+        FKVODelegate := TKVODelegate.Create(self);
         FPlayer.addObserver(TNSObject.Wrap(FKVODelegate.GetObjectID), // observer: The object to register for KVO notifications. The observer must implement the key-value observing method observeValue(forKeyPath:of:change:context:).
                             StrToNSStr('status'), // keyPath: The key path, relative to the object receiving this message, of the property to observe. This value must not be nil.
                             NSKeyValueObservingOptionNew, // options: A combination of the NSKeyValueObservingOptions values that specifies what is included in observation notifications. For possible values, see NSKeyValueObservingOptions.
@@ -1464,9 +1633,12 @@ begin
         //-----
         {$IFDEF DEBUG}
         LStopWatch.Stop;
-        ALLog('TALIOSVideoPlayer.prepare', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU) +
-                                           ' - FPlayer.status: ' + alinttostrU(FPlayer.status) +
-                                           ' - FPlayerItem.status: ' + alinttostrU(FPlayerItem.status), TalLogType.VERBOSE);
+        ALLog(
+          'TALIOSVideoPlayer.prepare',
+          'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU) + ' | ' +
+          'FPlayer.status: ' + alinttostrU(FPlayer.status) + ' | ' +
+          'FPlayerItem.status: ' + alinttostrU(FPlayerItem.status),
+          TalLogType.VERBOSE);
         {$ENDIF}
 
       except
@@ -1481,12 +1653,9 @@ end;
 
 {********************************}
 procedure TALIOSVideoPlayer.pause;
-{$IFDEF DEBUG}
-var LStopWatch: TstopWatch;
-{$ENDIF}
 begin
   {$IFDEF DEBUG}
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   if not SetState(vpsPaused, vpsStarted) then exit;
@@ -1502,12 +1671,9 @@ end;
 
 {********************************}
 procedure TALIOSVideoPlayer.Start;
-{$IFDEF DEBUG}
-var LStopWatch: TstopWatch;
-{$ENDIF}
 begin
   {$IFDEF DEBUG}
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   if not SetState(vpsStarted, [vpsPrepared, vpsPaused, vpsPlaybackCompleted]) then exit;
@@ -1524,12 +1690,9 @@ end;
 
 {*******************************}
 procedure TALIOSVideoPlayer.Stop;
-{$IFDEF DEBUG}
-var LStopWatch: TstopWatch;
-{$ENDIF}
 begin
   {$IFDEF DEBUG}
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   if not SetState(vpsStopped, [vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then exit;
@@ -1558,12 +1721,9 @@ end;
 
 {*********************************************************}
 procedure TALIOSVideoPlayer.setVolume(const Value: Single);
-{$IFDEF DEBUG}
-var LStopWatch: TstopWatch;
-{$ENDIF}
 begin
   {$IFDEF DEBUG}
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   fVolume := Value;
@@ -1573,8 +1733,11 @@ begin
                                                            // A value of 0.0 indicates silence; a value of 1.0 (the default) indicates full audio volume for the player instance.
 
   {$IFDEF DEBUG}
-  ALLog('TALIOSVideoPlayer.setVolume', 'Value: ' + alFloattostrU(Value, ALDefaultFormatSettingsU) +
-                                       ' - timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog(
+    'TALIOSVideoPlayer.setVolume',
+    'Value: ' + alFloattostrU(Value, ALDefaultFormatSettingsU) + ' | ' +
+    'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU),
+    TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1587,9 +1750,6 @@ end;
 {************************************************************}
 procedure TALIOSVideoPlayer.doOnFrameRefresh(Sender: TObject);
 var LPixelBuffer: CVPixelBufferRef;
-    {$IFDEF DEBUG}
-    LStopWatch: TstopWatch;
-    {$ENDIF}
     LPrevTextureRef: CVOpenGLESTextureRef;
     LWidth, LHeight: integer;
     T: CMTime;
@@ -1605,7 +1765,7 @@ begin
   if FPlayerItemVideoOutput = nil then exit;
 
   {$IFDEF DEBUG}
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
   T := fPlayer.currentTime; // << Returns the current time of the current player item
@@ -1740,9 +1900,12 @@ begin
                                                 // you to decide whether to continue media playback.
     then begin
       {$IFDEF DEBUG}
-      ALLog('TALIOSVideoPlayer.FrameRefreshOnTimer', 'hasNewPixelBufferForItemTime:NO '+
-                                                     '- Pause and Restart '+
-                                                     ' - currentTime: ' + alinttostrU(fPlayer.currentTime.value), TalLogType.VERBOSE);
+      ALLog(
+        'TALIOSVideoPlayer.FrameRefreshOnTimer',
+        'hasNewPixelBufferForItemTime:NO ' + ' | ' +
+        'Pause and Restart ' + ' | ' +
+        'currentTime: ' + alinttostrU(fPlayer.currentTime.value),
+        TalLogType.VERBOSE);
       {$ENDIF}
       fPlayer.pause;
       fPlayer.play;
@@ -2330,23 +2493,9 @@ initialization
 
   RegisterFmxClasses([TALVideoPlayerSurface]);
 
-  {$REGION 'ANDROID'}
-  {$IF defined(ANDROID)}
-  TALAndroidVideoPlayer.DefaultBandwidthMeter := nil;
-  {$ENDIF}
-  {$ENDREGION}
-
   {$REGION 'IOS'}
   {$IF defined(IOS)}
   TALIosVideoPlayer.appAudioSessionActivated := False;
-  {$ENDIF}
-  {$ENDREGION}
-
-finalization
-
-  {$REGION 'ANDROID'}
-  {$IF defined(ANDROID)}
-  TALAndroidVideoPlayer.DefaultBandwidthMeter := nil;
   {$ENDIF}
   {$ENDREGION}
 

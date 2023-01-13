@@ -82,6 +82,9 @@ https://developers.facebook.com/docs/ios/getting-started
      3) : Add the libswift frameworks for ios64 and Ios64 simulator
      4) : LD linker add -rpath /usr/lib/swift
 
+2) in LD linker add add -w to remove the warning
+   "was built for newer iOS version (12.0) than being linked (11.0)"
+
 2) In project > option > Building > Delphi Compiler > FRAMEWORK search path
    you need to add the following path:
    <Alcinoe>\Libraries\ios\facebook\FBSDKLoginKit.xcframework\ios-arm64

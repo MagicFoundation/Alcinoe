@@ -4,7 +4,6 @@ Alcinoe
 Alcinoe is a library of visual and non-visual components for
 Delphi. The components can be used in commercial as well as 
 shareware and freeware and open source projects without cost.
-
 Alcinoe is compatible with <b>Delphi Alexandria 11.2</b>
 
 Please "star" (like) this project in GitHub! It's cost 
@@ -54,7 +53,7 @@ and all subdirectories located in [{alcinoe}\Embarcadero\Alexandria\11_2](https:
 
 
 AndroidMerger: Integrate AAR SDK in FMX Android app
-===================================================
+---------------------------------------------------
                                  
 An Android library, also called as Android Archive, includes 
 everything you need to build an app like source files, 
@@ -84,7 +83,7 @@ Learn more at [{alcinoe}/Tools/AndroidMerger](https://github.com/MagicFoundation
 
 
 DeployMan
-=========
+---------
                                  
 Simplify the deployment of files and folders for iOS and 
 Android apps written in Delphi. It is especially useful 
@@ -93,7 +92,7 @@ Learn more at [{alcinoe}/Tools/DeployMan](https://github.com/MagicFoundation/Alc
   
 
 DeployProjNormalizer
-====================
+--------------------
 
 Create from the dproj a new deployproj file from scratch 
 and normalize it (ie: order the node so that you can 
@@ -102,7 +101,7 @@ Learn more at [{alcinoe}/Tools/DeployProjNormalizer](https://github.com/MagicFou
 
 
 DProjNormalizer
-===============
+---------------
 
 Order all nodes in a DProj so that the Dproj stay consistent 
 between each commit for easy diff compare. It's will also 
@@ -344,38 +343,6 @@ but as the concept of SAX is well know I keep this name), support
 BSON format, and use a similar syntax than TALXMLDocument / TXMLDocument.
 TALJsonDocument can also export Json / Bson data in TALStringList.
 
-When it deals with parsing some (textual) content, two directions
-are usually envisaged. In the JSON world, you have usually to
-make a choice between:
-* A DOM parser, which creates an in-memory tree structure of
-  objects mapping the JSON content;
-* A SAX parser, which reads the JSON content, then call pre-defined
-  events for each JSON content element. 
-
-In fact, DOM parsers use internally a SAX parser to read the JSON
-content. Therefore, with the overhead of object creation and
-their property initialization, DOM parsers are typically three
-to five times slower than SAX (and use much much more memory to
-store all the nodes). But, DOM parsers are much more powerful for
-handling the data: as soon as it's mapped in native objects,
-code can access with no time to any given node, whereas a
-SAX-based access will have to read again the whole JSON content.
-
-Most JSON parser available in Delphi uses a DOM-like approach.
-For instance, the DBXJSON unit included since Delphi 2010
-or the SuperObject library create a class instance mapping
-each JSON node. In order to achieve best speed, TALJsonDocument
-implements DOM parser and also a SAX parser.
-
-TALJsonDocument can also support comments inside the JSON source
-that is an extension to the JSON specifications
-
-TALJsonDocument syntax is very similar to TALXMLdocument/TXMLDocument
-
-TALJsonDocument is available in 2 variants: TALJsonDocument that 
-is made on the top of ansiString (so UTF-8) and TALJsonDocumentU
-that is made on the top of unicode string (so UTF-16)
-
 Example :
 
 ```
@@ -401,104 +368,13 @@ Example :
 To access the document nodes :
 
 ```
-    MyJsonDoc.loadFromJson(AJsonStr, False);
-    MyJsonDoc.ParseOptions := [poAllowComments]; // to allow comments inside the JSON source
-    MyJsonDoc.childnodes['_id'].int32;
-    MyJsonDoc.childnodes['name'].childnodes['first'].text;
-    MyJsonDoc.childnodes['name'].childnodes['last'].text;
-    MyJsonDoc.childnodes['birth'].datetime;
-    for i := 0 to MyJsonDoc.childnodes['contribs'].ChildNodes.count - 1 do
-      MyJsonDoc.childnodes['contribs'].childnodes[i].text;
-    for i := 0 to MyJsonDoc.childnodes['awards'].ChildNodes.count - 1 do begin
-      MyJsonDoc.childnodes['awards'].childnodes[i].childnodes['award'].text;
-      MyJsonDoc.childnodes['awards'].childnodes[i].childnodes['year'].text;
-      MyJsonDoc.childnodes['awards'].childnodes[i].childnodes['by'].text;
-    end;
-```
-
-Or if you are not sure of the existence of the nodes before to access 
-them or you don't want to check it you can also do :
-
-```
     MyJsonDoc.GetChildNodeValueInt32('_id', 0{default if node not exists});
     MyJsonDoc.GetChildNodeValueText(['name','first'], ''{default if node not exists});
     MyJsonDoc.GetChildNodeValueDateTime('birth', Now{default if node not exists});
 ```
 
-To create the document nodes :
-
-```
-    MyJsonDoc.addchild('_id').int32 := 1;
-    with MyJsonDoc.addchild('name', ntObject) do begin
-      addchild('first').text := 'John';
-      addchild('last').text := 'Backus';
-    end;
-    MyJsonDoc.addchild('birth').dateTime := Now;
-    with MyJsonDoc.addchild('contribs', ntArray) do begin
-      addchild.text := 'Fortran';
-      addchild.text := 'ALGOL';
-      addchild.text := 'Backus-Naur Form';
-      addchild.text := 'FP';
-    end;
-    with MyJsonDoc.addchild('awards', ntArray) do begin
-      with addchild(ntObject) do begin
-        addchild('award').text := 'National Medal of Science';
-        addchild('year').int32 := 1975;
-        addchild('by').text := 'National Science Foundation';
-      end;
-      with addchild(ntObject) do begin
-        addchild('award').text := 'Turing Award';
-        addchild('year').int32 := 1977;
-        addchild('by').text := 'ACM';
-      end;
-    end;
-    MyJsonDoc.addchild('spouse');
-    MyJsonDoc.addchild('address', ntObject);
-    MyJsonDoc.addchild('phones', ntArray);
-```
-
-You can also create/update nodes like this :
-
-```
-    MyJsonDoc.SetChildNodeValueInt32('_id', 0);
-    MyJsonDoc.SetChildNodeValueText(['name','first'], 'John');
-    MyJsonDoc.SetChildNodeValueDateTime('birth', Now);
-```
-
-To load and save from BSON :
-
-```
-    MyJsonDoc.LoadFromFile(aBSONFileName, False{saxMode}, True{BSON});
-    MyJsonDoc.SaveToFile(aBSONFileName, False{saxMode}, True{BSON});
-```
-
-To parse an JSON document in Sax Mode :
-
-```
-    MyJsonDoc.onParseText := procedure(
-                               Sender: TObject;
-                               const Path: AnsiString;
-                               const name: AnsiString;
-                               const Args: array of const;
-                               NodeSubType: TALJSONNodeSubType)
-      begin
-        case NodeSubType of
-          nstFloat: Writeln(Path + '=' + ALFloatToStr(Args[0].VExtended^, ALDefaultFormatSettings));
-          nstText: Writeln(Path + '=' + ansiString(Args[0].VAnsiString));
-          nstObjectID: Writeln(Path + '=' + 'ObjectId("'+ALBinToHex(ansiString(Args[0].VAnsiString))+'")');
-          nstBoolean: Writeln(Path + '=' + ALBoolToStr(Args[0].VBoolean,'true','false'));
-          nstDateTime: Writeln(Path + '=' + ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettings));
-          nstNull: Writeln(Path + '=' + 'null');
-          nstRegEx: Writeln(Path + '=' + ansiString(Args[0].VAnsiString));
-          nstBinary: Writeln(Path + '=' + 'BinData('+inttostr(Args[1].VInteger)+', "'+ansiString(ALBase64EncodeStringNoCRLF(ansiString(Args[0].VAnsiString)))+'")');
-          nstJavascript: Writeln(Path + '=' + ansiString(Args[0].VAnsiString));
-          nstInt32: Writeln(Path + '=' + 'NumberInt('+inttostr(Args[0].VInteger)+')');
-          nstTimestamp: Writeln(Path + '=' + 'Timestamp('+inttostr(int64(cardinal(Args[0].VInteger)))+', '+inttostr(int64(cardinal(Args[1].VInteger)))+')');
-          nstInt64: Writeln(Path + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
-        end;
-      end;
-    MyJsonDoc.LoadFromJSON(AJsonStr, true{saxMode});
-```
+Learn more at [{alcinoe}/Source/ALJSONDoc.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALJSONDoc.pas)
+  
 
 ImageMagick wrapper for Delphi
 ------------------------------
@@ -551,10 +427,11 @@ Example :
     end;
 ```
 
+Learn more at [{alcinoe}/Source/ALImageMagick.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALImageMagick.pas)
+
 MongoDb client
 --------------
 
-Delphi Client for MongoDB database.
 A Delphi driver (with connection pool) to access a
 mongoDB server. a connection pool is a cache of database
 connections maintained so that the connections can be reused
@@ -565,77 +442,7 @@ new connection does not have to be established. If all the
 connections are being used, a new connection is made and is
 added to the pool. Connection pooling also cuts down on the
 amount of time a user must wait to establish a connection
-to the database.
-
-Example :
-
-```
-    aJSONDoc := TALJSONDocument.create;
-    aMongoDBClient := TAlMongoDBClient.create;
-    try
-      aMongoDBClient.Connect('', 0);
-      aMongoDBClient.SelectData(
-        'test.exemple',
-        '{fieldA:123}', // the query
-        '{fieldA:1, fieldB:1}', // the return fields selector
-        aJSONDoc.node);
-      aMongoDBClient.disconnect;
-      for i := 0 to aJSONDoc.node.childnodes.count - 1 do
-        with aJSONDoc.node.childnodes[i] do
-          writeln(aJSONDoc.node.childnodes[i].nodename + '=' + aJSONDoc.node.childnodes[i].text)
-    finally
-      aMongoDBClient.free;
-      aJSONDoc.free;
-    end;
-```
-
-Example with connection pool :
-
-```
-    aMongoDBConnectionPoolClient := TAlMongoDBConnectionPoolClient.create(aDBHost, aDBPort);
-    try
-    
-      ::Thread1::
-      aMongoDBConnectionPoolClient.SelectData(
-        'test.example',
-        '{fieldA:123}', // the query
-        '{fieldA:1, fieldB:1}', // the return fields selector
-        aLocalVarJSONDOC.node);
-
-      ::Thread2::
-      aMongoDBConnectionPoolClient.SelectData(
-        'test.example',
-        '{fieldA:999}', // the query
-        '{fieldA:1, fieldB:1}', // the return fields selector
-        aLocalVarJSONDOC.node);
-
-    finally
-      aMongoDBClient.free;
-    end;
-```
-
-Example tail monitoring :
-
-```
-    aMongoDBTailMonitoringThread := TAlMongoDBTailMonitoringThread.Create(
-                                      aDBHost,
-                                      aDBPort,
-                                      'test.cappedCollectionExemple'
-                                      '{}', // the query
-                                      '{fieldA:1, fieldB:1}', // the return fields selector
-  
-                                      Procedure (Sender: TObject; JSONRowData: TALJSONNode)
-                                      begin
-                                        writeln('New item added in cappedCollectionExemple: ' + JSONRowData.childnodes['fieldA'].text);
-                                      end,
-  
-                                      procedure (Sender: TObject; Error: Exception)
-                                      begin
-                                        writeln(Error.message);
-                                      end);
-    ....
-    aMongoDBTailMonitoringThread.free;
-```
+to the database. Learn more at [{alcinoe}/Source/ALMongoDBClient.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALMongoDBClient.pas)
 
 
 WebSocket client
@@ -660,22 +467,8 @@ algorithm (based on the 8-bit ordinal value of each character)
 instead of the AnsiCompareText and AnsiCompareStr used by the
 Delphi TStringList. at the end the sort in TALStringList is up to
 10x more faster than in Delphi TStringList. Also TALStringList is
-not an Unicode TStringList but an 100% Ansi StringList
-
-TALNVStringList (NV for NameValue) is same as TALStringList (use
-also a quicksort algorithm) except that here optimization is
-oriented for name/value list instead of string list.
-
-TALHashedStringList
-TALHashedStringList is same as TALStringList except that it's use
-an internal hash table instead of a quicksort algorithm. By using
-TALHashedStringList instead of TALStringList, you can improve
-performance when the list contains a large number of strings
-(else if you list don't contain a lot of strings the performance
-is lower than TALStringList because of the cost to calculate the
-hash)
-
-You can start exploring this feature with the demo located at 
+not an Unicode TStringList but an 100% Ansi StringList. You can 
+start exploring this feature with the demo located at 
 [{alcinoe}\Demos\ALSortedListBenchmark](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALSortedListBenchmark)
 
 
@@ -694,20 +487,11 @@ You can start exploring this feature with the demo located at
 Memcached Client
 ----------------
 
-Delphi Client for memcached database.
-
-What is Memcached?  Free & open source, high-performance,
+What is Memcached? Free & open source, high-performance,
 distributed memory object caching system, generic in
 nature, but intended for use in speeding up dynamic web
-applications by alleviating database load.
-
-Memcached is an in-memory key-value store for small chunks
-of arbitrary data (strings, objects) from results of
-database calls, API calls, or page rendering.
-
-Memcached is simple yet powerful. Its simple design promotes
-quick deployment, ease of development, and solves many
-problems facing large data caches.
+applications by alleviating database load. Learn more at 
+[{alcinoe}/Source/ALMemCachedClient.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALMemCachedClient.pas)
 
 
 GSM component
@@ -721,29 +505,16 @@ used throughout Nokia, Siemens, Ericsson, etc models.
 We have tested the Nokia 6230 in-house, but the Nokia 7190,
 8890, 6210 and 9110 models should work as well.  Phones
 from other manufacturers will also work, as long as they
-implement the text-mode interface.  About 1/4 of the
-current phones are capable of being connected to a PC
-(through IR or serial cable), about 1/3 of those are
-text-mode only, 1/3 are PDU mode only, and the other 1/3
-support both text and PDU mode.  Some phones (such as the
-Nokia 5190) support SMS, but they use a proprietary protocol,
-which TALGSMComm does not support.
-
-To test your phone, connect the phone to your PC through
-the serial cable or IR device (consult your phone's documentation
-for details on how to connect). Enter ```"AT"<CR>``` into a terminal
-window to verify the connection is established (you should receive
-"OK" from the phone), then enter ```"AT+CMGF=?"<CR>.``` The response
-should contain a "1", indicating that it supports text-mode.
-If both of these tests pass, then your phone meets the basic
-requirements.
+implement the text-mode interface. Learn more at 
+[{alcinoe}/Source/ALGSMComm.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALGSMComm.pas)
 
 
 SQLite3 Client
 --------------
 
 Query Sqlite3 database and get the result In Xml format 
-or in Json/Bson format. 
+or in Json/Bson format. Learn more at 
+[{alcinoe}/Source/ALSqlite3Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALSqlite3Client.pas)
 
 
 And much more

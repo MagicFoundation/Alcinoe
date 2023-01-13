@@ -151,16 +151,16 @@ implementation
 // this is also written in the firebase doc: https://firebase.google.com/docs/ios/setup (Add the ObjC linker flag in your Other Linker Settings in your target's build settings.)
 // but when i add -ObjC i have this error : https://stackoverflow.com/questions/49722316/why-under-ios-when-i-add-objc-i-have-error-ld-framework-not-found-fbsdkcorekit
 // so i Add instead -force_load:
-// -force_load C:\Dev\MagicFoundation\Alcinoe\lib\ios\firebase\FirebaseCore.framework\FirebaseCore
-// -force_load C:\Dev\MagicFoundation\Alcinoe\lib\ios\firebase\FirebaseCoreDiagnostics.framework\FirebaseCoreDiagnostics
-// -force_load C:\Dev\MagicFoundation\Alcinoe\lib\ios\firebase\FirebaseAnalytics.framework\FirebaseAnalytics
-// -force_load C:\Dev\MagicFoundation\Alcinoe\lib\ios\firebase\FirebaseDynamicLinks.framework\FirebaseDynamicLinks
-// -force_load C:\Dev\MagicFoundation\Alcinoe\lib\ios\firebase\FirebaseInstanceID.framework\FirebaseInstanceID
-// -force_load C:\Dev\MagicFoundation\Alcinoe\lib\ios\firebase\FirebaseMessaging.framework\FirebaseMessaging
-// -force_load C:\Dev\MagicFoundation\Alcinoe\lib\ios\firebase\FirebaseNanoPB.framework\FirebaseNanoPB
-// -force_load C:\Dev\MagicFoundation\Alcinoe\lib\ios\firebase\nanopb.framework\nanopb
-// -force_load C:\Dev\MagicFoundation\Alcinoe\lib\ios\firebase\Protobuf.framework\Protobuf
-// -force_load C:\Dev\MagicFoundation\Alcinoe\lib\ios\firebase\GoogleToolboxForMac.framework\GoogleToolboxForMac
+// -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseCore.framework\FirebaseCore
+// -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseCoreDiagnostics.framework\FirebaseCoreDiagnostics
+// -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseAnalytics.framework\FirebaseAnalytics
+// -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseDynamicLinks.framework\FirebaseDynamicLinks
+// -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseInstanceID.framework\FirebaseInstanceID
+// -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseMessaging.framework\FirebaseMessaging
+// -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\FirebaseNanoPB.framework\FirebaseNanoPB
+// -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\nanopb.framework\nanopb
+// -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\Protobuf.framework\Protobuf
+// -force_load C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\firebase\GoogleToolboxForMac.framework\GoogleToolboxForMac
 
 procedure StubProc1;  cdecl; external 'FirebaseCore'         name 'OBJC_CLASS_$_FIRApp';
 procedure StubProc2;  cdecl; external 'FirebaseInstanceID'   name 'OBJC_CLASS_$_FIRInstanceID';

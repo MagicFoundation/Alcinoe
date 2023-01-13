@@ -1,4 +1,6 @@
 @echo off
+SETLOCAL
+cls
 
 REM -------------------
 REM Choose the compiler
@@ -6,115 +8,158 @@ REM -------------------
 
 :CHOOSE_COMPILER
 
-set COMPILER=
-  
-cls
-echo 1) Sydney
-echo 2) Rio
+echo --------
+echo Compiler
+echo --------
+echo.
+
+echo 1) Alexandria
+echo 2) Sydney (deprecated)
 
 set COMPILER=
-set /P COMPILER=Enter number to select a compiler: %=%
-more < nul > nul & REM This instruction to clear the ERRORLEVEL as instruction below set ERRORLEVEL to 1 if empty input
+set /P COMPILER=Enter number to select a compiler (Empty to auto select): %=%
+more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
 
+if "%COMPILER%"=="" (
+  set ALDelphiVersion=
+  goto INIT_ENVIRONMENT
+)
 if "%COMPILER%"=="1" (
-  set DELPHI_NAME=sydney
-  set DELPHI_VERSION=21.0
-  goto INIT_LOCAL_VARS
+  set ALDelphiVersion=22.0
+  goto INIT_ENVIRONMENT
 )
 if "%COMPILER%"=="2" (
-  set DELPHI_NAME=rio
-  set DELPHI_VERSION=20.0
-  goto INIT_LOCAL_VARS
+  set ALDelphiVersion=21.0
+  goto INIT_ENVIRONMENT
 )
-
+echo.
 goto CHOOSE_COMPILER
 
 
-REM ---------------
-REM Init local vars
-REM ---------------
+REM ----------------
+REM Init Environment
+REM ----------------
 
-:INIT_LOCAL_VARS
+:INIT_ENVIRONMENT
 
-FOR /F "usebackq tokens=3*" %%A IN (`reg query "HKCU\Software\Embarcadero\BDS\%DELPHI_VERSION%" /v RootDir`) DO set DelphiRootDir=%%A %%B 
-set DelphiRootDir=%DelphiRootDir:~0,-1%
-set DelphiBinDir=%DelphiRootDir%bin
-
-call "%DelphiBinDir%\rsvars.bat"
+call .\InitEnvironment.bat
 IF ERRORLEVEL 1 goto ERROR
+echo.
 
-FOR %%a IN ("%%~dp0") DO set "ProjectDir=%%~dpa"
-IF %ProjectDir:~-1%==\ SET ProjectDir=%ProjectDir:~0,-1%
 
-set INPUT=
-set /P INPUT=Build demos (Y/N)?: %=%
+REM --------------
+REM Security check
+REM --------------
+
+if not exist "%ALBaseDir%\Source\Alcinoe.inc" goto ERROR
+
+
+REM ----------------------
+REM Download the libraries
+REM ----------------------
+
+:DOWNLOAD_LIBRARIES
+
+echo ---------
+echo LIBRARIES
+echo ---------
+echo.
+
+set ALDownloadLibraries=
+set /P ALDownloadLibraries=Download libraries (Y/N, default=Y)?: %=%
+more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
+echo.
+
+if "%ALDownloadLibraries%"=="" set ALDownloadLibraries=Y
+if "%ALDownloadLibraries%"=="y" set ALDownloadLibraries=Y
+if "%ALDownloadLibraries%"=="n" set ALDownloadLibraries=N
+if "%ALDownloadLibraries%"=="Y" goto DO_DOWNLOAD_LIBRARIES
+if "%ALDownloadLibraries%"=="N" goto BUILD_DPROJNORMALIZER
+goto DOWNLOAD_LIBRARIES
+
+:DO_DOWNLOAD_LIBRARIES
+
+call %ALBaseDir%\Libraries\ios\DownloadLibraries.bat
+IF ERRORLEVEL 1 goto ERROR
+echo.
+
+
+REM ----------------------------------------
+REM Build DProjNormalizer and UnitNormalizer
+REM ----------------------------------------
+
+:BUILD_DPROJNORMALIZER
+
+echo ----------------------------------------
+echo Build DProjNormalizer and UnitNormalizer
+echo ----------------------------------------
+echo.
+
+echo [36mMSBuild DProjNormalizer.dproj /p:config=Release /p:Platform=Win64[0m
+MSBuild "%ALBaseDir%\Tools\DProjNormalizer\_Source\DProjNormalizer.dproj" /p:Config=Release /p:Platform=Win64 /t:Build /verbosity:minimal
+IF ERRORLEVEL 1 goto ERROR
+echo.
+
+echo [36mMSBuild UnitNormalizer.dproj /p:config=Release /p:Platform=Win64[0m
+MSBuild "%ALBaseDir%\Tools\UnitNormalizer\_Source\UnitNormalizer.dproj" /p:Config=Release /p:Platform=Win64 /t:Build /verbosity:minimal
+IF ERRORLEVEL 1 goto ERROR
+echo.
 
 
 REM -------------------
 REM Normalize all units
 REM -------------------
 
-call "%ProjectDir%\Tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\Source\" "false"
+call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Source\" -CreateBackup="false"
 IF ERRORLEVEL 1 goto ERROR
 
-call "%ProjectDir%\Tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\Demos\" "false"
-IF ERRORLEVEL 1 goto ERROR
-
-call "%ProjectDir%\Tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\Tools\DeployProjNormalizer\" "false"
-IF ERRORLEVEL 1 goto ERROR
-
-call "%ProjectDir%\Tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\Tools\DprojNormalizer\" "false"
-IF ERRORLEVEL 1 goto ERROR
-
-call "%ProjectDir%\Tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\Tools\DprojVersioning\" "false"
-IF ERRORLEVEL 1 goto ERROR
-
-call "%ProjectDir%\Tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\Tools\UnitNormalizer\" "false"
-IF ERRORLEVEL 1 goto ERROR
-
-call "%ProjectDir%\Tools\UnitNormalizer\UnitNormalizer.exe" "%ProjectDir%\Tools\XmlMerge\" "false"
-IF ERRORLEVEL 1 goto ERROR
 
 REM -----------------
-REM clean directories
+REM Build & Run Tests
 REM -----------------
 
-SET FileName=%ProjectDir%\*.rsm
-del "%FileName%" /s
-if exist "%FileName%" goto ERROR
+:RUN_TESTS
 
-SET FileName=%ProjectDir%\*.identcache
-del "%FileName%" /s
-if exist "%FileName%" goto ERROR
+echo -----
+echo Tests
+echo -----
+echo.
 
-SET FileName=%ProjectDir%\*.dproj.local
-del "%FileName%" /s
-if exist "%FileName%" goto ERROR
+set ALRunTests=
+set /P ALRunTests=Run tests (Y/N, default=Y)?: %=%
+more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
+echo.
 
-SET FileName=%ProjectDir%\*.groupproj.local
-del "%FileName%" /s
-if exist "%FileName%" goto ERROR
+if "%ALRunTests%"=="" set ALRunTests=Y
+if "%ALRunTests%"=="y" set ALRunTests=Y
+if "%ALRunTests%"=="n" set ALRunTests=N
+if "%ALRunTests%"=="Y" goto DO_RUN_TESTS
+if "%ALRunTests%"=="N" goto BUILD_BPL
+goto RUN_TESTS
 
-SET FileName=%ProjectDir%\*.deployproj.local
-del "%FileName%" /s
-if exist "%FileName%" goto ERROR
+:DO_RUN_TESTS
 
-SET FileName=%ProjectDir%\Source\dcu\win32\%DELPHI_NAME%
-IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-if exist "%FileName%" goto ERROR
-mkdir "%FileName%"
-
-SET FileName=%ProjectDir%\Lib\bpl\alcinoe\win32\%DELPHI_NAME%
-IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-if exist "%FileName%" goto ERROR
-mkdir "%FileName%"
+call %ALBaseDir%\Tests\RunTests.bat
+IF ERRORLEVEL 1 goto ERROR
+echo.
 
 
 REM ---------
 REM Build bpl 
 REM ---------
 
-MSBuild "%ProjectDir%\Source\Alcinoe_%DELPHI_NAME%.dproj" /p:Config=Release /p:Platform=Win32
+:BUILD_BPL
+
+echo ---------
+echo Build BPL
+echo ---------
+echo.
+
+SET FileName=%ALBaseDir%\Libraries\bpl\Alcinoe\Win32\%ALDelphiName%
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
+if exist "%FileName%" goto ERROR
+
+Call :BUILD_PROJECT "%ALBaseDir%\Source" "" "Alcinoe%ALDelphiName%.dproj" "Win32"
 IF ERRORLEVEL 1 goto ERROR
 
 
@@ -122,404 +167,276 @@ REM ----------
 REM Build jars 
 REM ----------
 
-call compileJar.bat off "%DelphiRootDir%"
+:BUILD_JARS
+
+echo ----------
+echo Build Jars
+echo ----------
+echo.
+
+set ALBuildJars=
+set /P ALBuildJars=Build Jars (Y/N, default=Y)?: %=%
+more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
+echo.
+
+if "%ALBuildJars%"=="" set ALBuildJars=Y
+if "%ALBuildJars%"=="y" set ALBuildJars=Y
+if "%ALBuildJars%"=="n" set ALBuildJars=N
+if "%ALBuildJars%"=="Y" goto DO_BUILD_JARS
+if "%ALBuildJars%"=="N" goto BUILD_TOOLS
+goto BUILD_JARS
+
+:DO_BUILD_JARS
+
+call "%ALBaseDir%\compileJar.bat"
 IF ERRORLEVEL 1 goto ERROR
+echo.
 
 
 REM -----------
-REM Build Demos 
+REM Build Tools
 REM -----------
 
+:BUILD_TOOLS
 
-if "%INPUT%"=="Y" goto BUILD_DEMOS
-if "%INPUT%"=="y" goto BUILD_DEMOS
-goto FINISHED
+echo -----------
+echo Build Tools
+echo -----------
+echo.
+
+set ALBuildTools=
+set /P ALBuildTools=Build tools (Y/N, default=Y)?: %=%
+more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
+echo.
+
+if "%ALBuildTools%"=="" set ALBuildTools=Y
+if "%ALBuildTools%"=="y" set ALBuildTools=Y
+if "%ALBuildTools%"=="n" set ALBuildTools=N
+if "%ALBuildTools%"=="Y" goto DO_BUILD_TOOLS
+if "%ALBuildTools%"=="N" goto BUILD_DEMOS
+goto BUILD_TOOLS
+
+:DO_BUILD_TOOLS
+
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\AndroidMerger" "_Build\Source" "AndroidMerger.dproj" "Win64"
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\DeployMan" "_Build\Source" "DeployMan.dproj" "Win64"
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\DeployProjNormalizer" "_Source" "DeployProjNormalizer.dproj" "Win64"
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\DProjNormalizer" "_Source" "DProjNormalizer.dproj" "Win64"
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\DProjVersioning" "_Source" "DProjVersioning.dproj" "Win64"
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\NativeBridgeFileGenerator" "_Build\Source" "NativeBridgeFileGeneratorHelper.dproj" "Win64"
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\UnitNormalizer" "_Source" "UnitNormalizer.dproj" "Win64"
+
+
+REM -----------
+REM Build demos
+REM -----------
 
 :BUILD_DEMOS
 
-SET FileName=%ProjectDir%\Demos\*.vlb
-del "%FileName%" /s
+echo -----------
+echo Build demos
+echo -----------
+echo.
+
+set ALBuildDemos=
+set /P ALBuildDemos=Build demos (Y/N, default=Y)?: %=%
+more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
+
+if "%ALBuildDemos%"=="" set ALBuildDemos=Y
+if "%ALBuildDemos%"=="y" set ALBuildDemos=Y
+if "%ALBuildDemos%"=="n" set ALBuildDemos=N
+if "%ALBuildDemos%"=="Y" goto DO_BUILD_DEMOS
+if "%ALBuildDemos%"=="N" goto FINISHED
+goto BUILD_DEMOS
+
+:DO_BUILD_DEMOS
+
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALCipher" "_source" "ALCipherDemo.dproj"
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALConfetti" "_source" "ALConfettiDemo.dproj"
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALDatabaseBenchmark" "_source" "ALDatabaseBenchmark.dproj"
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFacebookLogin" "_source" "ALFacebookLogin.dproj"
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFirebaseMessaging" "_source" "ALFirebaseMessaging.dproj"
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxControls" "_source" "ALFmxControls.dproj"
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxFilterEffects" "_source" "ALFmxFilterEffectsDemo.dproj"
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALJsonDoc" "_source" "ALJsonDocDemo.dproj"
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALLibPhoneNumber" "_source" "ALLibPhoneNumberDemo.dproj"
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALLiveVideoChat\Client" "_source" "ALLiveVideoChatClient.dproj"
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALLiveVideoChat\Server" "_source" "ALLiveVideoChatServer.dproj"
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALNNTPClient" "_source" "ALNNTPClientDemo.dproj"
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALPhpRunner" "_source" "ALPhpRunnerDemo.dproj"
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALPOP3Client" "_source" "ALPOP3ClientDemo.dproj"
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALRTTI" "_source" "ALRTTIDemo.dproj"
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSMTPClient" "_source" "ALSMTPClientDemo.dproj"
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSortedListBenchmark" "_source" "ALSortedListBenchmark.dproj"
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSqlite3Client" "_source" "ALSqlite3clientDemo.dproj"
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALStressHTTPServer" "_source" "ALStressHTTPServer.dproj"
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALStringBenchmark" "_source" "ALStringBenchmark.dproj"
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWebSpider" "_source" "ALWebSpiderDemo.dproj"
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinHTTPClient" "_source" "ALWinHTTPClientDemo.dproj"
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinHTTPWebSocketClient" "_source" "ALWinHTTPWebSocketClientDemo.dproj"
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinInetHTTPClient" "_source" "ALWinInetHTTPClientDemo.dproj"
+Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALXmlDoc" "_source" "ALXmlDocDemo.dproj"
+
+xcopy "%ALBaseDir%\Libraries\dll\tbbmalloc\win32\tbbmalloc.dll" "%ALBaseDir%\Demos\ALDatabaseBenchmark\Win32" /s
+IF ERRORLEVEL 1 goto ERROR
+
+xcopy "%ALBaseDir%\Libraries\dll\tbbmalloc\win64\tbbmalloc.dll" "%ALBaseDir%\Demos\ALDatabaseBenchmark\Win64" /s
+IF ERRORLEVEL 1 goto ERROR
+
+goto FINISHED
+
+
+REM -----------------------
+REM Function BUILD_FMX_DEMO
+REM -----------------------
+
+:BUILD_FMX_DEMO
+
+SET FileName=%~1\Android\
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 
-CHDIR "%ProjectDir%\Demos\"
-FOR /d /R %%J IN (Android) DO (	  
-  Echo.%%J | findstr /C:"_source">nul && (
-    REM do not delete inside /_source/
-  ) || (
-    IF EXIST "%%J" echo rmdir - %%J			
-    IF EXIST "%%J" rmdir /s /q "%%J"
-    if EXIST "%%J" goto ERROR
-  )
-)
-CHDIR "%ProjectDir%\"
-
-CHDIR "%ProjectDir%\Demos\"
-FOR /d /R %%J IN (Android64) DO (	  
-  Echo.%%J | findstr /C:"_source">nul && (
-    REM do not delete inside /_source/
-  ) || (
-    IF EXIST "%%J" echo rmdir - %%J			
-    IF EXIST "%%J" rmdir /s /q "%%J"
-    if EXIST "%%J" goto ERROR
-  )
-)
-CHDIR "%ProjectDir%\"
-
-CHDIR "%ProjectDir%\Demos\"
-FOR /d /R %%J IN (iOSDevice64) DO (	  
-  Echo.%%J | findstr /C:"_source">nul && (
-    REM do not delete inside /_source/
-  ) || (
-    IF EXIST "%%J" echo rmdir - %%J			
-    IF EXIST "%%J" rmdir /s /q "%%J"
-    if EXIST "%%J" goto ERROR
-  )
-)
-CHDIR "%ProjectDir%\"
-
-CHDIR "%ProjectDir%\Demos\"
-FOR /d /R %%J IN (win32) DO (	  
-  Echo.%%J | findstr /C:"_source">nul && (
-    REM do not delete inside /_source/
-  ) || (
-    IF EXIST "%%J" echo rmdir - %%J			
-    IF EXIST "%%J" rmdir /s /q "%%J"
-    if EXIST "%%J" goto ERROR
-  )
-)
-CHDIR "%ProjectDir%\"
-
-CHDIR "%ProjectDir%\Demos\"
-FOR /d /R %%J IN (win64) DO (	  
-  Echo.%%J | findstr /C:"_source">nul && (
-    REM do not delete inside /_source/
-  ) || (
-    IF EXIST "%%J" echo rmdir - %%J			
-    IF EXIST "%%J" rmdir /s /q "%%J"
-    if EXIST "%%J" goto ERROR
-  )
-)
-CHDIR "%ProjectDir%\"
-
-CHDIR "%ProjectDir%\Demos\"
-FOR /d /R %%J IN (dcu) DO (	
-  IF EXIST "%%J" echo rmdir - %%J			
-  IF EXIST "%%J" (
-    rmdir /s /q "%%J"
-    if EXIST "%%J" goto ERROR
-    mkdir "%%J"
-  )
-)
-CHDIR "%ProjectDir%\"
-
-CHDIR "%ProjectDir%\Demos\"
-FOR /R %%J IN (*.dproj) DO (	
-  echo %%J			
-  MSBuild "%%J" /p:Config=Release /p:Platform=Win32 /t:Build
-  IF ERRORLEVEL 1 PAUSE
-  MSBuild "%%J" /p:Config=Release /p:Platform=Win64 /t:Build
-  IF ERRORLEVEL 1 PAUSE
-)
-CHDIR "%ProjectDir%\"
-
-call Tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\Demos\ALFmxControls\_source\ALFmxControls.dproj" "false"
-IF ERRORLEVEL 1 goto ERROR
-
-CHDIR "%ProjectDir%\Demos\"
-MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=Android /t:Build
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=Android /t:Deploy
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=Android64 /t:Build
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=Android64 /t:Deploy
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
-IF ERRORLEVEL 1 PAUSE
-REM MSBuild ALFmxControls\_source\ALFmxControls.dproj /p:Config=Release /p:Platform=OSX64 /t:Build
-REM IF ERRORLEVEL 1 PAUSE
-CHDIR "%ProjectDir%\"
-
-call Tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\Demos\ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj" "false"
-IF ERRORLEVEL 1 goto ERROR
-
-CHDIR "%ProjectDir%\Demos\"
-MSBuild ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj /p:Config=Release /p:Platform=Android /t:Build
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj /p:Config=Release /p:Platform=Android /t:Deploy
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj /p:Config=Release /p:Platform=Android64 /t:Build
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj /p:Config=Release /p:Platform=Android64 /t:Deploy
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
-IF ERRORLEVEL 1 PAUSE
-REM MSBuild ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj /p:Config=Release /p:Platform=OSX64 /t:Build
-REM IF ERRORLEVEL 1 PAUSE
-CHDIR "%ProjectDir%\"
-
-call Tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\Demos\ALConfetti\_source\ALConfettiDemo.dproj" "false"
-IF ERRORLEVEL 1 goto ERROR
-
-CHDIR "%ProjectDir%\Demos\"
-MSBuild ALConfetti\_source\ALConfettiDemo.dproj /p:Config=Release /p:Platform=Android /t:Build
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALConfetti\_source\ALConfettiDemo.dproj /p:Config=Release /p:Platform=Android /t:Deploy
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALConfetti\_source\ALConfettiDemo.dproj /p:Config=Release /p:Platform=Android64 /t:Build
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALConfetti\_source\ALConfettiDemo.dproj /p:Config=Release /p:Platform=Android64 /t:Deploy
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALConfetti\_source\ALConfettiDemo.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
-IF ERRORLEVEL 1 PAUSE
-REM MSBuild ALConfetti\_source\ALConfettiDemo.dproj /p:Config=Release /p:Platform=OSX64 /t:Build
-REM IF ERRORLEVEL 1 PAUSE
-CHDIR "%ProjectDir%\"
-
-call Tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\Demos\ALFacebookLogin\_source\ALFacebookLogin.dproj" "false"
-IF ERRORLEVEL 1 goto ERROR
-
-CHDIR "%ProjectDir%\Demos\"
-MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=Android /t:Build
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=Android /t:Deploy
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=Android64 /t:Build
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=Android64 /t:Deploy
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
-IF ERRORLEVEL 1 PAUSE
-REM MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=OSX64 /t:Build
-REM IF ERRORLEVEL 1 PAUSE
-CHDIR "%ProjectDir%\"
-
-call Tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\Demos\ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj" "false"
-IF ERRORLEVEL 1 goto ERROR
-
-CHDIR "%ProjectDir%\Demos\"
-MSBuild ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj /p:Config=Release /p:Platform=Android /t:Build
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj /p:Config=Release /p:Platform=Android /t:Deploy
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj /p:Config=Release /p:Platform=Android64 /t:Build
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj /p:Config=Release /p:Platform=Android64 /t:Deploy
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
-IF ERRORLEVEL 1 PAUSE
-REM MSBuild ALFmxFilterEffects\_source\ALFmxFilterEffectsDemo.dproj /p:Config=Release /p:Platform=OSX64 /t:Build
-REM IF ERRORLEVEL 1 PAUSE
-CHDIR "%ProjectDir%\"
-
-call Tools\DeployProjNormalizer\DeployProjNormalizer.exe "%ProjectDir%\Demos\ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj" "false"
-IF ERRORLEVEL 1 goto ERROR
-
-CHDIR "%ProjectDir%\Demos\"
-MSBuild ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj /p:Config=Release /p:Platform=Android /t:Build
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj /p:Config=Release /p:Platform=Android /t:Deploy
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj /p:Config=Release /p:Platform=Android64 /t:Build
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj /p:Config=Release /p:Platform=Android64 /t:Deploy
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
-IF ERRORLEVEL 1 PAUSE
-REM MSBuild ALLiveVideoChat\client\_source\ALLiveVideoChatClient.dproj /p:Config=Release /p:Platform=OSX64 /t:Build
-REM IF ERRORLEVEL 1 PAUSE
-CHDIR "%ProjectDir%\"
-
-
-SET FileName=ALFmxControls
-xcopy "%ProjectDir%\Demos\%FileName%\Android\Release\%FileName%\bin\%FileName%.apk" "%ProjectDir%\Demos\%FileName%\Android"
-IF ERRORLEVEL 1 goto ERROR
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android\Release" rmdir /s /q "%ProjectDir%\Demos\%FileName%\Android\Release"
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android\Release" goto ERROR
-mkdir "%ProjectDir%\Demos\%FileName%\Android\Release\%FileName%\bin\"
-IF ERRORLEVEL 1 goto ERROR
-xcopy "%ProjectDir%\Demos\%FileName%\Android\%FileName%.apk" "%ProjectDir%\Demos\%FileName%\Android\Release\%FileName%\bin"
-IF ERRORLEVEL 1 goto ERROR
-del "%ProjectDir%\Demos\%FileName%\Android\%FileName%.apk"
+SET FileName=%~1\Android64\
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 
-xcopy "%ProjectDir%\Demos\%FileName%\Android64\Release\%FileName%\bin\%FileName%.apk" "%ProjectDir%\Demos\%FileName%\Android64"
-IF ERRORLEVEL 1 goto ERROR
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android64\Release" rmdir /s /q "%ProjectDir%\Demos\%FileName%\Android64\Release"
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android64\Release" goto ERROR
-mkdir "%ProjectDir%\Demos\%FileName%\Android64\Release\%FileName%\bin\"
-IF ERRORLEVEL 1 goto ERROR
-xcopy "%ProjectDir%\Demos\%FileName%\Android64\%FileName%.apk" "%ProjectDir%\Demos\%FileName%\Android64\Release\%FileName%\bin"
-IF ERRORLEVEL 1 goto ERROR
-del "%ProjectDir%\Demos\%FileName%\Android64\%FileName%.apk"
+SET FileName=%~1\iOSDevice64\
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 
-
-SET FileName=ALFirebaseMessaging
-xcopy "%ProjectDir%\Demos\%FileName%\Android\Release\%FileName%\bin\%FileName%.apk" "%ProjectDir%\Demos\%FileName%\Android"
-IF ERRORLEVEL 1 goto ERROR
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android\Release" rmdir /s /q "%ProjectDir%\Demos\%FileName%\Android\Release"
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android\Release" goto ERROR
-mkdir "%ProjectDir%\Demos\%FileName%\Android\Release\%FileName%\bin\"
-IF ERRORLEVEL 1 goto ERROR
-xcopy "%ProjectDir%\Demos\%FileName%\Android\%FileName%.apk" "%ProjectDir%\Demos\%FileName%\Android\Release\%FileName%\bin"
-IF ERRORLEVEL 1 goto ERROR
-del "%ProjectDir%\Demos\%FileName%\Android\%FileName%.apk"
+SET FileName=%~1\iOSSimARM64\
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 
-xcopy "%ProjectDir%\Demos\%FileName%\Android64\Release\%FileName%\bin\%FileName%.apk" "%ProjectDir%\Demos\%FileName%\Android64"
-IF ERRORLEVEL 1 goto ERROR
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android64\Release" rmdir /s /q "%ProjectDir%\Demos\%FileName%\Android64\Release"
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android64\Release" goto ERROR
-mkdir "%ProjectDir%\Demos\%FileName%\Android64\Release\%FileName%\bin\"
-IF ERRORLEVEL 1 goto ERROR
-xcopy "%ProjectDir%\Demos\%FileName%\Android64\%FileName%.apk" "%ProjectDir%\Demos\%FileName%\Android64\Release\%FileName%\bin"
-IF ERRORLEVEL 1 goto ERROR
-del "%ProjectDir%\Demos\%FileName%\Android64\%FileName%.apk"
+SET FileName=%~1\OSX64\
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 
-
-SET FileName=ALConfetti
-xcopy "%ProjectDir%\Demos\%FileName%\Android\Release\%FileName%Demo\bin\%FileName%Demo.apk" "%ProjectDir%\Demos\%FileName%\Android"
-IF ERRORLEVEL 1 goto ERROR
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android\Release" rmdir /s /q "%ProjectDir%\Demos\%FileName%\Android\Release"
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android\Release" goto ERROR
-mkdir "%ProjectDir%\Demos\%FileName%\Android\Release\%FileName%Demo\bin\"
-IF ERRORLEVEL 1 goto ERROR
-xcopy "%ProjectDir%\Demos\%FileName%\Android\%FileName%Demo.apk" "%ProjectDir%\Demos\%FileName%\Android\Release\%FileName%Demo\bin"
-IF ERRORLEVEL 1 goto ERROR
-del "%ProjectDir%\Demos\%FileName%\Android\%FileName%Demo.apk"
+SET FileName=%~1\OSXARM64\
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 
-xcopy "%ProjectDir%\Demos\%FileName%\Android64\Release\%FileName%Demo\bin\%FileName%Demo.apk" "%ProjectDir%\Demos\%FileName%\Android64"
-IF ERRORLEVEL 1 goto ERROR
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android64\Release" rmdir /s /q "%ProjectDir%\Demos\%FileName%\Android64\Release"
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android64\Release" goto ERROR
-mkdir "%ProjectDir%\Demos\%FileName%\Android64\Release\%FileName%Demo\bin\"
-IF ERRORLEVEL 1 goto ERROR
-xcopy "%ProjectDir%\Demos\%FileName%\Android64\%FileName%Demo.apk" "%ProjectDir%\Demos\%FileName%\Android64\Release\%FileName%Demo\bin"
-IF ERRORLEVEL 1 goto ERROR
-del "%ProjectDir%\Demos\%FileName%\Android64\%FileName%Demo.apk"
+Call :BUILD_VCL_DEMO "%~1" "%~2" "%~3"
+Call :BUILD_PROJECT "%~1" "%~2" "%~3" "Android"
+Call :BUILD_PROJECT "%~1" "%~2" "%~3" "Android64"
+Call :BUILD_PROJECT "%~1" "%~2" "%~3" "iOSDevice64"
+REM Call :BUILD_PROJECT "%~1" "%~2" "%~3" "iOSSimARM64"
+REM Call :BUILD_PROJECT "%~1" "%~2" "%~3" "OSX64"
+REM Call :BUILD_PROJECT "%~1" "%~2" "%~3" "OSXARM64"
+
+EXIT /B 0
+
+
+REM -----------------------
+REM Function BUILD_VCL_DEMO
+REM -----------------------
+
+:BUILD_VCL_DEMO
+
+REM %~1 the base directory
+REM %~2 the source directory relative to the base directory
+REM %~3 the dproj filename without path
+
+SET FileName=%~1\Win32\
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 
-
-SET FileName=ALFacebookLogin
-xcopy "%ProjectDir%\Demos\%FileName%\Android\Release\%FileName%\bin\%FileName%.apk" "%ProjectDir%\Demos\%FileName%\Android"
-IF ERRORLEVEL 1 goto ERROR
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android\Release" rmdir /s /q "%ProjectDir%\Demos\%FileName%\Android\Release"
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android\Release" goto ERROR
-mkdir "%ProjectDir%\Demos\%FileName%\Android\Release\%FileName%\bin\"
-IF ERRORLEVEL 1 goto ERROR
-xcopy "%ProjectDir%\Demos\%FileName%\Android\%FileName%.apk" "%ProjectDir%\Demos\%FileName%\Android\Release\%FileName%\bin"
-IF ERRORLEVEL 1 goto ERROR
-del "%ProjectDir%\Demos\%FileName%\Android\%FileName%.apk"
+SET FileName=%~1\Win64\
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 
-xcopy "%ProjectDir%\Demos\%FileName%\Android64\Release\%FileName%\bin\%FileName%.apk" "%ProjectDir%\Demos\%FileName%\Android64"
-IF ERRORLEVEL 1 goto ERROR
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android64\Release" rmdir /s /q "%ProjectDir%\Demos\%FileName%\Android64\Release"
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android64\Release" goto ERROR
-mkdir "%ProjectDir%\Demos\%FileName%\Android64\Release\%FileName%\bin\"
-IF ERRORLEVEL 1 goto ERROR
-xcopy "%ProjectDir%\Demos\%FileName%\Android64\%FileName%.apk" "%ProjectDir%\Demos\%FileName%\Android64\Release\%FileName%\bin"
-IF ERRORLEVEL 1 goto ERROR
-del "%ProjectDir%\Demos\%FileName%\Android64\%FileName%.apk"
+Call :BUILD_PROJECT "%~1" "%~2" "%~3" "Win32"
+Call :BUILD_PROJECT "%~1" "%~2" "%~3" "Win64"
+
+EXIT /B 0
+
+
+REM ----------------------
+REM Function BUILD_PROJECT
+REM ----------------------
+
+:BUILD_PROJECT
+
+REM %~1 the base directory
+REM %~2 the source directory relative to the base directory
+REM %~3 the dproj filename without path
+REM %~4 the platform
+
+SET FileName=%~1\*.rsm
+if exist "%FileName%" del "%FileName%" /s
 if exist "%FileName%" goto ERROR
 
-
-SET FileName=ALFmxFilterEffects
-xcopy "%ProjectDir%\Demos\%FileName%\Android\Release\%FileName%Demo\bin\%FileName%Demo.apk" "%ProjectDir%\Demos\%FileName%\Android"
-IF ERRORLEVEL 1 goto ERROR
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android\Release" rmdir /s /q "%ProjectDir%\Demos\%FileName%\Android\Release"
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android\Release" goto ERROR
-mkdir "%ProjectDir%\Demos\%FileName%\Android\Release\%FileName%Demo\bin\"
-IF ERRORLEVEL 1 goto ERROR
-xcopy "%ProjectDir%\Demos\%FileName%\Android\%FileName%Demo.apk" "%ProjectDir%\Demos\%FileName%\Android\Release\%FileName%Demo\bin"
-IF ERRORLEVEL 1 goto ERROR
-del "%ProjectDir%\Demos\%FileName%\Android\%FileName%Demo.apk"
+SET FileName=%~1\*.identcache
+if exist "%FileName%" del "%FileName%" /s
 if exist "%FileName%" goto ERROR
 
-xcopy "%ProjectDir%\Demos\%FileName%\Android64\Release\%FileName%Demo\bin\%FileName%Demo.apk" "%ProjectDir%\Demos\%FileName%\Android64"
-IF ERRORLEVEL 1 goto ERROR
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android64\Release" rmdir /s /q "%ProjectDir%\Demos\%FileName%\Android64\Release"
-IF EXIST "%ProjectDir%\Demos\%FileName%\Android64\Release" goto ERROR
-mkdir "%ProjectDir%\Demos\%FileName%\Android64\Release\%FileName%Demo\bin\"
-IF ERRORLEVEL 1 goto ERROR
-xcopy "%ProjectDir%\Demos\%FileName%\Android64\%FileName%Demo.apk" "%ProjectDir%\Demos\%FileName%\Android64\Release\%FileName%Demo\bin"
-IF ERRORLEVEL 1 goto ERROR
-del "%ProjectDir%\Demos\%FileName%\Android64\%FileName%Demo.apk"
+SET FileName=%~1\*.dproj.local
+if exist "%FileName%" del "%FileName%" /s
 if exist "%FileName%" goto ERROR
 
-
-SET FileName=ALLiveVideoChatClient
-xcopy "%ProjectDir%\Demos\ALLiveVideoChat\client\Android\Release\%FileName%\bin\%FileName%.apk" "%ProjectDir%\Demos\ALLiveVideoChat\client\Android"
-IF ERRORLEVEL 1 goto ERROR
-IF EXIST "%ProjectDir%\Demos\ALLiveVideoChat\client\Android\Release" rmdir /s /q "%ProjectDir%\Demos\ALLiveVideoChat\client\Android\Release"
-IF EXIST "%ProjectDir%\Demos\ALLiveVideoChat\client\Android\Release" goto ERROR
-mkdir "%ProjectDir%\Demos\ALLiveVideoChat\client\Android\Release\%FileName%\bin\"
-IF ERRORLEVEL 1 goto ERROR
-xcopy "%ProjectDir%\Demos\ALLiveVideoChat\client\Android\%FileName%.apk" "%ProjectDir%\Demos\ALLiveVideoChat\client\Android\Release\%FileName%\bin"
-IF ERRORLEVEL 1 goto ERROR
-del "%ProjectDir%\Demos\ALLiveVideoChat\client\Android\%FileName%.apk"
+SET FileName=%~1\*.groupproj.local
+if exist "%FileName%" del "%FileName%" /s
 if exist "%FileName%" goto ERROR
 
-xcopy "%ProjectDir%\Demos\ALLiveVideoChat\client\Android64\Release\%FileName%\bin\%FileName%.apk" "%ProjectDir%\Demos\ALLiveVideoChat\client\Android64"
-IF ERRORLEVEL 1 goto ERROR
-IF EXIST "%ProjectDir%\Demos\ALLiveVideoChat\client\Android64\Release" rmdir /s /q "%ProjectDir%\Demos\ALLiveVideoChat\client\Android64\Release"
-IF EXIST "%ProjectDir%\Demos\ALLiveVideoChat\client\Android64\Release" goto ERROR
-mkdir "%ProjectDir%\Demos\ALLiveVideoChat\client\Android64\Release\%FileName%\bin\"
-IF ERRORLEVEL 1 goto ERROR
-xcopy "%ProjectDir%\Demos\ALLiveVideoChat\client\Android64\%FileName%.apk" "%ProjectDir%\Demos\ALLiveVideoChat\client\Android64\Release\%FileName%\bin"
-IF ERRORLEVEL 1 goto ERROR
-del "%ProjectDir%\Demos\ALLiveVideoChat\client\Android64\%FileName%.apk"
+SET FileName=%~1\*.deployproj.local
+if exist "%FileName%" del "%FileName%" /s
 if exist "%FileName%" goto ERROR
 
-CHDIR "%ProjectDir%\Demos\"
-FOR /d /R %%J IN (dcu) DO (	
-  IF EXIST "%%J" echo rmdir - %%J			
-  IF EXIST "%%J" (
-    rmdir /s /q "%%J"
-    if EXIST "%%J" goto ERROR
-    mkdir "%%J"
-  )
-)
-CHDIR "%ProjectDir%\"
-
-CHDIR "%ProjectDir%\Demos\"
-FOR /d /R %%J IN (iOSDevice64) DO (	  
-  Echo.%%J | findstr /C:"_source">nul && (
-    REM do not delete inside /_source/
-  ) || (
-    IF EXIST "%%J" echo rmdir - %%J			
-    IF EXIST "%%J" rmdir /s /q "%%J"
-    if EXIST "%%J" goto ERROR
-  )
-)
-CHDIR "%ProjectDir%\"
-
-xcopy "%ProjectDir%\Lib\dll\tbbmalloc\win32\tbbmalloc.dll" "%ProjectDir%\Demos\ALDatabaseBenchmark\win32" /s
-IF ERRORLEVEL 1 goto ERROR
-
-xcopy "%ProjectDir%\Lib\dll\tbbmalloc\win64\tbbmalloc.dll" "%ProjectDir%\Demos\ALDatabaseBenchmark\win64" /s
-IF ERRORLEVEL 1 goto ERROR
-
-
-REM ----
-REM EXIT
-REM ----
-
-:FINISHED
-
-SET FileName=%ProjectDir%\Source\dcu\win32\%DELPHI_NAME%
+SET FileName=%~1\%~2\dcu\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"
 
-@echo Finished
+call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%~1\%~2" -CreateBackup="false"
+IF ERRORLEVEL 1 goto ERROR
+
+call "%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe" -DProj="%~1\%~2\%~3" -CreateBackup="false"
+IF ERRORLEVEL 1 goto ERROR
+
+echo.
+echo [36mMSBuild %~3 /p:config=Release /p:Platform=%~4[0m
+MSBuild "%~1\%~2\%~3" /p:Config=Release /p:Platform=%~4 /t:Build /verbosity:minimal
+IF ERRORLEVEL 1 goto ERROR
+echo.
+
+SET ALDeploy=N
+if "%~4"=="Android" Set ALDeploy=Y
+if "%~4"=="Android64" Set ALDeploy=Y
+if "%ALDeploy%"=="Y" (
+
+  if exist *.deployproj del *.deployproj /s
+  if exist *.deployproj goto ERROR
+
+  call "%ALBaseDir%\Tools\DeployProjNormalizer\DeployProjNormalizer.exe" -DProj="%~1\%~2\%~3" -CreateBackup="false"
+  IF ERRORLEVEL 1 goto ERROR
+
+  MSBuild "%~1\%~2\%~3" /p:Config=Release /p:Platform=%~4 /t:Deploy /verbosity:minimal
+  IF ERRORLEVEL 1 goto ERROR
+
+)
+
+SET FileName=%~1\%~2\dcu\
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
+if exist "%FileName%" goto ERROR
+mkdir "%FileName%"
+
+EXIT /B 0
+
+
+REM -------------------
+REM FINISHED/ERROR/EXIT
+REM -------------------
+
+:FINISHED
+
+echo.
+echo Finished
 PAUSE
-goto EXIT 
+goto EXIT
 
 :ERROR
-pause
+
+PAUSE
+EXIT /B 1
 
 :EXIT

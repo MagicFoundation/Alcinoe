@@ -83,6 +83,10 @@ call %ALBaseDir%\Libraries\ios\DownloadLibraries.bat
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
+call %ALBaseDir%\Libraries\jar\DownloadLibraries.bat
+IF ERRORLEVEL 1 goto ERROR
+echo.
+
 
 REM ----------------------------------------
 REM Build DProjNormalizer and UnitNormalizer

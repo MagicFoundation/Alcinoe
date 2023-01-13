@@ -2311,13 +2311,14 @@ begin
               end;
               if not LInDependanciesTree then continue;
               if LLine = '' then break;
+              if alsametext(LLine, 'No dependencies') then break;
               while (LLine <> '') and (LLine[low(LLine)] in ['+','|','\','-', ' ']) do
                 delete(LLine, 1, 1); // androidx.annotation:annotation:1.1.0 -> 1.3.0
               Var LLst := TALstringList.Create;
               Try
                 LLst.LineBreak := ':';
                 LLst.Text := LLine;
-                if LLst.Count <> 3 then raise Exception.Create('Error 43963A52-56D3-4B57-AA34-816194BCADCE');
+                if LLst.Count <> 3 then raise Exception.Create('Error 43963A52-56D3-4B57-AA34-816194BCADCE ('+String(LLine)+')');
                 var LDependencyGroupID := LLst[0]; // androidx.annotation
                 var LDependencyArtifactID := LLst[1]; // annotation
                 var LDependencyVersion := LLst[2]; // 1.1.0 -> 1.3.0 (*)
@@ -3069,8 +3070,6 @@ begin
               OverWrite(LTmpCmdLine);
               Var LTmpCmdLineResult := ALWinExecU(
                                          LTmpcmdLine, // const aCommandLine: String;
-                                         '', // const aCurrentDirectory: AnsiString;
-                                         GetEnvironmentStringWithJavaHomeUpdated, // const aEnvironment: AnsiString;
                                          LInputStream, // const aInputStream: Tstream;
                                          LOutputStream); //const aOutputStream: TStream;
               if LTmpCmdLineResult <> 0 then

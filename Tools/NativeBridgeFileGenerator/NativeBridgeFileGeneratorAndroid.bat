@@ -59,7 +59,7 @@ REM -----------------------------------
 call "..\AndroidMerger\AndroidMerger.exe" -LocalMavenRepositoryDir="%ALBaseDir%\Libraries\jar\" -Libraries="%Library%" -DownloadDependencies=1 -OutputDir="%TMPDir%" -GenerateNativeBridgeFile=1 -NoInteraction=1 -UseGradle=1
 IF ERRORLEVEL 1 goto ERROR
 
-xcopy "%TMPDir%\JavaInterfaces.pas" "%OutputDir%\JavaInterfaces.pas*" /V
+xcopy "%TMPDir%\JavaInterfaces*.pas" "%OutputDir%\" /V
 IF ERRORLEVEL 1 goto ERROR
 
 

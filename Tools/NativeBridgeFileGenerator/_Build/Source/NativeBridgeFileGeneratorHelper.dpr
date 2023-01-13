@@ -223,7 +223,7 @@ begin
         if not TDirectory.exists(LFrameworksDir) then raise Exception.CreateFmt('%s does not exist', [LFrameworksDir]);
         {$ENDREGION}
 
-        {$REGION 'Init LCustomFrameworksDir'}
+        {$REGION 'Do the Copy'}
         var LDirectories := TDirectory.GetDirectories(
                               LCustomFrameworksDir, //const Path,
                               '*.framework', // SearchPattern: string;
@@ -293,9 +293,9 @@ begin
         P1 := ALpos('TRegTypes.RegisterType(''', LOutputSrc);
         while P1 > 0 do begin
           Inc(P1, length('TRegTypes.RegisterType('''));
-          var P2 := ALpos('JavaInterfaces.', LOutputSrc, P1);
-          if P2 < P1 then raise Exception.Create('Error 06C293BC-5FFC-4115-B8F2-1CFC7A560EA7');
-          inc(P2, length('JavaInterfaces'));
+          var P2 := ALpos('''', LOutputSrc, P1);
+          while (P2 > P1) and (LOutputSrc[P2] <> '.') do dec(P2);
+          if (P2 <= P1) then raise Exception.Create('Error 5CB01B8E-AD0B-45CF-B184-427E6EAE2EDB');
           delete(LOutputSrc, P1, P2-P1);
           insert(ALExtractFileName(ansiString(LMasterFile), true{RemoveFileExt}), LOutputSrc, P1);
           P1 := ALpos('TRegTypes.RegisterType(''', LOutputSrc, P1+1);
@@ -303,9 +303,9 @@ begin
         P1 := ALpos(''', TypeInfo(', LOutputSrc);
         while P1 > 0 do begin
           Inc(P1, length(''', TypeInfo('));
-          var P2 := ALpos('JavaInterfaces.', LOutputSrc, P1);
-          if P2 < P1 then raise Exception.Create('Error 6835D5D0-5378-4E10-8148-D8A0DA594988');
-          inc(P2, length('JavaInterfaces'));
+          var P2 := ALpos(')', LOutputSrc, P1);
+          while (P2 > P1) and (LOutputSrc[P2] <> '.') do dec(P2);
+          if (P2 <= P1) then raise Exception.Create('Error 64C351FC-F46F-45E3-A002-E8B1562786C4');
           delete(LOutputSrc, P1, P2-P1);
           insert(ALExtractFileName(ansiString(LMasterFile), true{RemoveFileExt}), LOutputSrc, P1);
           P1 := ALpos(''', TypeInfo(', LOutputSrc, P1+1);
@@ -325,6 +325,40 @@ begin
         //  =>
         // : Boolean;
         LOutputSrc := ALStringReplace(LOutputSrc, ': BOOL;', ': Boolean;', [rfReplaceALL]);
+        {$ENDREGION}
+
+        {$REGION 'Use the same classname in outputsrc than in MasterSrc'}
+        //[JavaSignature('com/google/android/exoplayer2/metadata/Metadata')]
+        //JMetadata = interface(JParcelable)
+        //  ['{B008C3F4-A454-48CD-9DD2-BEF7DB9C313B}']
+        //end;
+        P1 := ALpos('[JavaSignature(''', LMasterSrc);
+        while P1 > 0 do begin
+          inc(P1, length('[JavaSignature('''));
+          var P2 := ALpos('''', LMasterSrc, P1+1);
+          if P2 <= P1 then raise Exception.Create('Error 3E1F807C-5D4E-47A4-A36D-662590F884A3');
+          var LJavaSignature := ALCopyStr(LMasterSrc, P1, P2-P1); // com/google/android/exoplayer2/metadata/Metadata
+          P1 :=  ALpos(']', LMasterSrc, P1+1);
+          if P1 <= 0 then raise Exception.Create('Error E6593142-7025-4F45-84ED-F145060B9968');
+          inc(P1);
+          while (P1 <= length(LMasterSrc)) and (LMasterSrc[P1] in [' ', #13, #10]) do inc(P1);
+          P2 := Alpos(' ', LMasterSrc, P1+1);
+          if P2 <= P1 then raise Exception.Create('Error CF359E96-E61E-4392-939E-117603144BB3');
+          var LMasterClassName := ALCopyStr(LMasterSrc, P1, P2-P1); // JMetadata
+          P1 := ALpos('[JavaSignature(''', LMasterSrc,P1);
+          //----
+          var P3 := Alpos('[JavaSignature('''+LJavaSignature+''')]', LOutputSrc);
+          if P3 <= 0 then continue;
+          P3 :=  ALpos(']', LOutputSrc, P3+1);
+          if P3 <= 0 then raise Exception.Create('Error 270E84AE-C86D-449E-B310-6AF8ADC59E07');
+          inc(P3);
+          while (P3 <= length(LOutputSrc)) and (LOutputSrc[P3] in [' ', #13, #10]) do inc(P3);
+          var P4 := Alpos(' ', LOutputSrc, P3+1);
+          if P4 <= P3 then raise Exception.Create('Error 40FDDD0E-1AF0-4B75-9F21-BFBA2541D670');
+          var LOutputClassName := ALCopyStr(LOutputSrc, P3, P4-P3); // JMetadata
+          //----
+          if LMasterClassName <> LOutputClassName then LOutputSrc := ALStringReplace(LOutputSrc, LOutputClassName, LMasterClassName, [RfReplaceALL]);
+        end;
         {$ENDREGION}
 
         {$REGION 'Make LOutputCompareSrc'}

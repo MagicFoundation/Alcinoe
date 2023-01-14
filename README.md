@@ -4,8 +4,7 @@ Alcinoe
 Alcinoe is a library of visual and non-visual components for
 Delphi. The components can be used in commercial as well as 
 shareware and freeware and open source projects without cost.
-Alcinoe is compatible with <b>Delphi Alexandria 11.2</b>
-
+Alcinoe is compatible with <b>Delphi Alexandria 11.2</b>. 
 Please "star" (like) this project in GitHub! It's cost 
 nothing but help to reference the code
 
@@ -23,20 +22,19 @@ Example of app made with Alcinoe
 Install Alcinoe
 ---------------
 
-Alcinoe update a little the original delphi source code. 
-You will need to go in [{alcinoe}\Embarcadero\Alexandria\11_2](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_2/)
+If you plan to use FMX (Firemonkey) framework with Alcinoe you will need to patch the original delphi source code. To do this you will need to go in [{alcinoe}\Embarcadero\Alexandria\11_2](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_2/)
 and run [update.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_2/update.bat) 
 to retrieve and patch the original delphi source code. The 
 batch file assume that the original source code is located 
 in "c:\Program Files (x86)\Embarcadero\Studio\22.0\source\" 
-and that you have GIT in your path. You will need also to 
+and that you have GIT in your path. Later you will need to 
 include in your project search path all subdirectories 
 located in [{alcinoe}\Embarcadero\Alexandria\11_2](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_2/).
 
-After you will need to run [CompileAll.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/CompileAll.bat)
-to download the iOS/Android libraries, build the Alcinoe Jars, 
-build the BPL, build all tools located in [{alcinoe}\Tools](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/)
-and finally build all demos located in [{alcinoe}\Demos](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/).
+You will need to run [CompileAll.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/CompileAll.bat)
+to download the iOS/Android libraries, to build the Alcinoe Jars, 
+to build the BPL, to build all tools located in [{alcinoe}\Tools](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/)
+and finally to build all demos located in [{alcinoe}\Demos](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/).
 NOTE: Some demos use [devexpress](https://www.devexpress.com/)
 
 If you don't plan to use any Alcinoe visual components at 
@@ -48,13 +46,15 @@ If you plan to use visual components at design time then
 you need to install the bpl. Launch Delphi and go in 
 component > Install Packages... > and choose the BPL located 
 in [{alcinoe}\Libraries\bpl\Alcinoe\Win32\Alexandria\AlcinoeAlexandria.bpl](https://github.com/MagicFoundation/Alcinoe/tree/master/Libraries/bpl/Alcinoe/Win32/Alexandria). 
-You need to add in your search path [{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) 
+You also need to add in your search path [{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) 
 and all subdirectories located in [{alcinoe}\Embarcadero\Alexandria\11_2](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_2/).
 
 
 AndroidMerger: Integrate AAR SDK in FMX Android app
 ---------------------------------------------------
                                  
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-26.jpg?raw=true" alt="video player for FireMonkey" width="540" style="width:540px;"/>
+
 An Android library, also called as Android Archive, includes 
 everything you need to build an app like source files, 
 resource files, manifest etc. This is the reason why AARs are 
@@ -104,11 +104,7 @@ DProjNormalizer
 ---------------
 
 Order all nodes in a DProj so that the Dproj stay consistent 
-between each commit for easy diff compare. It's will also 
-remove from deployement all unnecessary items like all items 
-that are automatiquelly added by the IDE every time you open 
-the DPROJ (icons, launchscreen, binary, etc.)
-Learn more at [{alcinoe}/Tools/DProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DProjNormalizer)
+between each commit for easy diff compare. Learn more at [{alcinoe}/Tools/DProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DProjNormalizer)
 
 
 Opengl video player for FireMonkey
@@ -133,7 +129,8 @@ Under iOS I use AVPlayer with support also HLS like ExoPlayer does
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-3.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
 </p>
 
-Learn more at [{alcinoe}/Source/ALFmxVideoPlayer.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALFmxVideoPlayer.pas)
+Learn more at [{alcinoe}/Source/ALFmxVideoPlayer.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALFmxVideoPlayer.pas) and you can also start exploring this feature 
+with the demo located at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
   
 
 WebRTC Delphi wrapper
@@ -148,16 +145,13 @@ makes it possible to share data and perform teleconferencing
 peer-to-peer, without requiring that the user installs plug-ins 
 or any other third-party software.
 
-TALWebRTC component makes it easy to add video and audio chat 
-into your applications, which opens up a whole new world of 
-interactivity
-
 <p align="center">
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-25.jpg?raw=true" alt="Delphi WebRTC wrapper" />
 </p>
 
-You can start exploring this feature 
-with the demo located at [{alcinoe}/Demos/ALLiveVideoChat](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALLiveVideoChat)
+TALWebRTC component makes it easy to add video and audio chat 
+into your applications, which opens up a whole new world of 
+interactivity. Learn more at [{alcinoe}/Demos/ALLiveVideoChat](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALLiveVideoChat)
   
 
 Firemonkey native iOS/Android TEdit and TMemo
@@ -170,13 +164,6 @@ not to make several distinct forms for several platforms like
 offer for example http://www.turbococoa.com/ (but this option is
 also a good alternative in some way, it's up to you to decide)
 
-In Delphi (berlin) their is already IOS platform control that was 
-quite well implemented but close to none android platform control 
-and so I start to build native android/iOS controls like TEdit/TMemo. 
-These control work mostly like some windows that are placed on The
-top of the form (so off course no z-order with FireMonkey control)
-
-
 <p align="left">
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-20.png?raw=true" alt="Drawing" width="240" style="width:240px;"/>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -185,8 +172,12 @@ top of the form (so off course no z-order with FireMonkey control)
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-22.png?raw=true" alt="Drawing" width="457" style="width:457px;"/>
 
-You can start exploring this feature 
-with the demo located at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
+In Delphi (berlin) their is already IOS platform control that was 
+quite well implemented but close to none android platform control 
+and so I start to build native android/iOS controls like TEdit/TMemo. 
+These control work mostly like some windows that are placed on The
+top of the form (so off course no z-order with FireMonkey control). 
+Learn more at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
 
 
 Fast/double-buffered FireMonkey controls with native draw
@@ -275,16 +266,14 @@ Improved FireMonkey controls
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-16.jpg?raw=true" alt="video player for FireMonkey" width="250" style="width:250px;"/>
 </p>
 
-You can start exploring this feature 
-with the demo located at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
+Learn more at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
   
 
 Confetti Falling Animation
 --------------------------
 
 ALConfetti is a vanilla Delphi library for creating a configurable, 
-high-performance confetti falling animation. You can start exploring 
-this feature with the demo located at [{alcinoe}/Demos/ALConfetti](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALConfetti)
+high-performance confetti falling animation. Learn more at [{alcinoe}/Demos/ALConfetti](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALConfetti)
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
 
@@ -294,8 +283,7 @@ Firebase cloud messaging
 
 Delphi implementation of the latest Firebase cloud messaging (FCM) 
 with HTTP V1 protocol that will permit you to send alert notification 
-with image in Android and iOS. You can start exploring this feature 
-with the demo located at [{alcinoe}\Demos\ALFirebaseMessaging](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFirebaseMessaging)
+with image in Android and iOS. Learn more at [{alcinoe}\Demos\ALFirebaseMessaging](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFirebaseMessaging)
 
   
 Google OAuth 2.0 Access Token
@@ -314,8 +302,7 @@ The VKontakte/Facebook SDK for Android enables people to sign into
 your app with VKontakte/Facebook Login. When people log into your 
 app with VKontakte/Facebook they can grant permissions to your app so 
 you can retrieve information or perform actions on VKontakte/Facebook 
-on their behalf. You can start exploring this feature 
-with the demo located at [{alcinoe}\Demos\ALFacebookLogin](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFacebookLogin)
+on their behalf. Learn more at [{alcinoe}\Demos\ALFacebookLogin](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFacebookLogin)
 
 
 Photo Editor Filters for Android/iOS
@@ -323,8 +310,7 @@ Photo Editor Filters for Android/iOS
 
 With TALColorAdjustEffect, gorgeous photo filters with one-tap auto 
 enhance, make your photos beautiful and expressive in just minutes! 
-You can start exploring this feature with the demo located at 
-[{alcinoe}\Demos\ALFmxFilterEffects](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxFilterEffects)
+Learn more at [{alcinoe}\Demos\ALFmxFilterEffects](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxFilterEffects)
 
 <p align="left">
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-18.jpg?raw=true" alt="video player for FireMonkey" width="320" style="width:320px;"/>
@@ -453,8 +439,7 @@ The WebSocket is a communication protocol, that makes it possible
 to open a two-way interactive communication session between the 
 user’s browser and a server. With this, you can send messages to 
 a server and receive event-driven responses without having to 
-poll the server for a reply. You can start exploring this feature 
-with the demo located at [{alcinoe}\Demos\ALWinHTTPWebSocketClient](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALWinHTTPWebSocketClient)
+poll the server for a reply. Learn more at [{alcinoe}\Demos\ALWinHTTPWebSocketClient](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALWinHTTPWebSocketClient)
 
 
 Fast TStringList
@@ -481,8 +466,7 @@ in Delphi applications. ALPhpRunnerEngine allows to
 execute the PHP scripts within the Delphi program without
 a WebServer. ALPHPRunnerEngine use the CGI/FastCGI
 interface (php-cgi.exe) of PHP to communicate with PHP engine.
-You can start exploring this feature with the demo located at 
-[{alcinoe}\Demos\ALPhpRunner](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALPhpRunner)
+Learn more at [{alcinoe}\Demos\ALPhpRunner](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALPhpRunner)
   
 Memcached Client
 ----------------

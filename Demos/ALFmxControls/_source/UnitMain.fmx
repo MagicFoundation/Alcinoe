@@ -23,7 +23,6 @@ object Form1: TForm1
     VScrollBar.Size.Width = 4.000000000000000000
     VScrollBar.Size.Height = 491.000000000000000000
     VScrollBar.Size.PlatformDefault = False
-    VScrollBar.TabOrder = 3
     AniCalculations.VelocityFactor = 2.000000000000000000
     Align = Client
     Size.Width = 487.000000000000000000
@@ -212,7 +211,7 @@ object Form1: TForm1
       Size.Width = 487.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 34
+      TabOrder = 35
       Text = 'Bench Tline'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button13Click
@@ -247,7 +246,7 @@ object Form1: TForm1
       Size.Width = 487.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 36
+      TabOrder = 37
       Text = 'Bench TALcheckbox (without text)'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button17Click
@@ -260,7 +259,7 @@ object Form1: TForm1
       Size.Width = 487.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 37
+      TabOrder = 38
       Text = 'Bench Tcheckbox (without text)'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button18Click
@@ -278,11 +277,11 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 2809.921875000000000000
+      Position.Y = 2842.921875000000000000
       Size.Width = 487.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 111
+      TabOrder = 112
       Text = 'TALRangeTrackbar'
       TextSettings.Font.Size = 13.000000000000000000
     end
@@ -295,7 +294,7 @@ object Form1: TForm1
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 15.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 2630.000000000000000000
+      Position.Y = 2663.000000000000000000
       Size.Width = 455.000000000000000000
       Size.Height = 31.921875000000000000
       Size.PlatformDefault = False
@@ -342,7 +341,7 @@ object Form1: TForm1
     object ALRectangle9: TALRectangle
       Align = Top
       Fill.Color = claWhite
-      Position.Y = 2315.000000000000000000
+      Position.Y = 2348.000000000000000000
       Size.Width = 487.000000000000000000
       Size.Height = 300.000000000000000000
       Size.PlatformDefault = False
@@ -545,11 +544,11 @@ object Form1: TForm1
       Margins.Top = 8.000000000000000000
       Margins.Right = 25.000000000000000000
       Position.X = 25.000000000000000000
-      Position.Y = 2765.921875000000000000
+      Position.Y = 2798.921875000000000000
       Size.Width = 437.000000000000000000
       Size.Height = 36.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 51
+      TabOrder = 52
     end
     object ALTrackBar1: TALTrackBar
       Thumb.Fill.Color = claWhite
@@ -577,21 +576,21 @@ object Form1: TForm1
       Margins.Left = 25.000000000000000000
       Margins.Right = 25.000000000000000000
       Position.X = 25.000000000000000000
-      Position.Y = 2676.921875000000000000
+      Position.Y = 2709.921875000000000000
       Size.Width = 437.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 57
+      TabOrder = 58
     end
     object Button14: TButton
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 2716.921875000000000000
+      Position.Y = 2749.921875000000000000
       Size.Width = 487.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 53
+      TabOrder = 54
       Text = 'TALTrackbar'
       TextSettings.Font.Size = 13.000000000000000000
     end
@@ -605,7 +604,7 @@ object Form1: TForm1
       Size.Width = 437.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 75
+      TabOrder = 76
     end
     object Layout4: TLayout
       Align = Top
@@ -617,7 +616,7 @@ object Form1: TForm1
       Size.Width = 437.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 62
+      TabOrder = 63
     end
     object Text11: TALText
       Align = Top
@@ -627,7 +626,7 @@ object Form1: TForm1
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 15.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 2914.921875000000000000
+      Position.Y = 2947.921875000000000000
       Size.Width = 455.000000000000000000
       Size.Height = 96.000000000000000000
       Size.PlatformDefault = False
@@ -715,7 +714,6 @@ object Form1: TForm1
       Size.Width = 487.000000000000000000
       Size.Height = 300.000000000000000000
       Size.PlatformDefault = False
-      OnClick = ALVideoPlayerSurface1DblClick
       onVideoSizeChanged = ALVideoPlayerSurface1VideoSizeChanged
       object Text12: TText
         Align = Top
@@ -812,9 +810,9 @@ object Form1: TForm1
       Margins.Right = 15.000000000000000000
       Margins.Bottom = 15.000000000000000000
       Position.X = 15.000000000000000000
-      Position.Y = 2124.000000000000000000
+      Position.Y = 2173.000000000000000000
       Size.Width = 457.000000000000000000
-      Size.Height = 176.000000000000000000
+      Size.Height = 160.000000000000000000
       Size.PlatformDefault = False
       Text = 
         'This video player is fully integrated in the form because it'#39's <' +
@@ -825,13 +823,11 @@ object Form1: TForm1
         'nt windows placed on the top of the form, so without z-order and' +
         ' scrolling animation is disaster. Finally as we have the texture' +
         ' of each frame, we can apply on it all the effect we want (black' +
-        ' and white, noise, etc..) ! You can try to <b>double click</b> o' +
-        'n the video to see the effect in action ... <b>Note: </b> Delphi' +
-        ' berlin do not support GL_TEXTURE_EXTERNAL_OES (requiered by and' +
-        'roid), so we must update the original delphi source code (only f' +
-        'ew lines of code is neccessary to make it working). Also note th' +
-        'at this video player support <b>adaptative streaming (HLS)</b> o' +
-        'n Android/iOs'
+        ' and white, noise, etc..) ! <b>Note: </b> Delphi do not support ' +
+        'GL_TEXTURE_EXTERNAL_OES (requiered by android), so we must updat' +
+        'e the original delphi source code (only few lines of code is nec' +
+        'cessary to make it working). Also note that this video player su' +
+        'pport <b>adaptative streaming (HLS)</b> on Android/iOs'
       TextSettings.WordWrap = True
       TextSettings.HorzAlign = Center
       TextIsHtml = True
@@ -842,7 +838,7 @@ object Form1: TForm1
       Size.Width = 487.000000000000000000
       Size.Height = 78.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 114
+      TabOrder = 118
       object ALAniIndicator1: TALAniIndicator
         Align = Center
         Enabled = True
@@ -901,7 +897,7 @@ object Form1: TForm1
     object ALRectangle3: TALRectangle
       Align = Top
       Fill.Color = claWhite
-      Position.Y = 3170.921875000000000000
+      Position.Y = 3203.921875000000000000
       Size.Width = 487.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
@@ -1078,12 +1074,12 @@ object Form1: TForm1
       Padding.Right = 8.000000000000000000
       Padding.Bottom = 8.000000000000000000
       Margins.Bottom = 25.000000000000000000
-      Position.Y = 3025.921875000000000000
+      Position.Y = 3058.921875000000000000
       Size.Width = 487.000000000000000000
       Size.Height = 120.000000000000000000
       Size.PlatformDefault = False
       DefStyleAttr = 'BlueBGTextViewStyle'
-      TabOrder = 112
+      TabOrder = 113
       TextSettings.Font.Size = 14.000000000000000000
       TextSettings.FontColor = claWhite
       TextPrompt = 'Write multiple lines here'
@@ -1100,7 +1096,7 @@ object Form1: TForm1
       Size.Width = 487.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 45
+      TabOrder = 46
       Text = 'TALSwitch'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button11Click
@@ -1115,7 +1111,7 @@ object Form1: TForm1
       Size.Width = 437.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 54
+      TabOrder = 55
       object ALSwitch1: TALSwitch
         HitTest = True
         Size.Width = 44.000000000000000000
@@ -1146,14 +1142,27 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 2858.921875000000000000
+      Position.Y = 2891.921875000000000000
       Size.Width = 487.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 98
+      TabOrder = 99
       Text = 'TALDatePickerDialog'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button23Click
+    end
+    object Button24: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 2117.000000000000000000
+      Size.Width = 487.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 34
+      Text = 'Apply Effect to the video'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button24Click
     end
   end
 end

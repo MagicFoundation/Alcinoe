@@ -10,8 +10,6 @@ object Form1: TForm1
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
-  OldCreateOrder = False
-  PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
     Left = 24
@@ -104,6 +102,8 @@ object Form1: TForm1
       item
         Width = 100
       end>
+    ExplicitTop = 770
+    ExplicitWidth = 1030
   end
   object ALButton3: TButton
     Left = 24
@@ -250,7 +250,7 @@ object Form1: TForm1
   end
   object Button1: TButton
     Left = 24
-    Top = 140
+    Top = 109
     Width = 140
     Height = 25
     Caption = 'Bench CRC32 (Zlib)'
@@ -259,7 +259,7 @@ object Form1: TForm1
   end
   object Button2: TButton
     Left = 24
-    Top = 171
+    Top = 140
     Width = 140
     Height = 25
     Caption = 'Bench ALCRC32'
@@ -418,20 +418,11 @@ object Form1: TForm1
   end
   object Button9: TButton
     Left = 24
-    Top = 202
+    Top = 171
     Width = 140
     Height = 25
     Caption = 'Bench ALCRC64'
     TabOrder = 35
     OnClick = Button9Click
-  end
-  object Button19: TButton
-    Left = 24
-    Top = 109
-    Width = 140
-    Height = 25
-    Caption = 'Test ALCRC32'
-    TabOrder = 36
-    OnClick = Button19Click
   end
 end

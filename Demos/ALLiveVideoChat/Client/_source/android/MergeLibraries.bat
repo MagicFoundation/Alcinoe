@@ -1,0 +1,13 @@
+@echo off
+
+set ALBaseDir=%~dp0
+
+"%ALBaseDir%\..\..\..\..\..\Tools\AndroidMerger\AndroidMerger.exe"^
+ -LocalMavenRepositoryDir="%ALBaseDir%\..\..\..\..\..\Libraries\jar\"^
+ -Libraries="com.alcinoe:alcinoe-webrtc:1.0.0;%ALBaseDir%\ALLiveVideoChatClientApp\"^
+ -OutputDir="%ALBaseDir%\Merged"^
+ -DProj="%ALBaseDir%\..\ALLiveVideoChatClient.dproj"^
+ -AndroidManifest="%ALBaseDir%\..\AndroidManifest.template.xml"^
+ -DProjNormalizer="%ALBaseDir%\..\..\..\..\..\Tools\DProjNormalizer\DProjNormalizer.exe"^
+ -RJarSwapper="%ALBaseDir%\..\..\..\..\..\Tools\RJarSwapper\RJarSwapper.bat"^
+ -UseGradle=true

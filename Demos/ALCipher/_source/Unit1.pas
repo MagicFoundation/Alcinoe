@@ -50,7 +50,6 @@ type
     Button17: TButton;
     Button18: TButton;
     Button9: TButton;
-    Button19: TButton;
     procedure ALButton1Click(Sender: TObject);
     procedure ALButton3Click(Sender: TObject);
     procedure ALButton4Click(Sender: TObject);
@@ -83,7 +82,6 @@ type
     procedure Button14Click(Sender: TObject);
     procedure Button18Click(Sender: TObject);
     procedure Button9Click(Sender: TObject);
-    procedure Button19Click(Sender: TObject);
   private
   public
   end;
@@ -923,14 +921,6 @@ begin
   end;
 end;
 
-procedure TForm1.Button19Click(Sender: TObject);
-begin
-  if messageDLG('This operation will take a moment to execute, you will need to be patient.',mtConfirmation,[mbOK,MbCancel],0) = mrOK then begin
-    ALTestCRC32Implementation(ALGetModulePath + '..\_source\crc32test.txt');
-    Showmessage('Test passed successfully!');
-  end;
-end;
-
 procedure TForm1.Button1Click(Sender: TObject);
 Var aData: AnsiString;
     aTmpData: ansiString;
@@ -1030,7 +1020,7 @@ begin
     while True do begin
       aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
-      aHash := ALStringHashCRC32(aData);
+      aHash := ALStringHashCrc32c(aData);
       aStopWatch.Stop;
       if aDictionary.TryGetValue(aHash, aTmpData) then begin
         if aTmpData <> aData then begin
@@ -1091,7 +1081,7 @@ begin
     while True do begin
       aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
-      aHash := ALStringHashCRC64(aData);
+      aHash := ALStringHashCrc64c(aData);
       aStopWatch.Stop;
       if aDictionary.TryGetValue(aHash, aTmpData) then begin
         if aTmpData <> aData then begin

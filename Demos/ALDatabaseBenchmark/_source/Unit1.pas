@@ -14,7 +14,7 @@ uses
   cxPCdxBarPopupMenu, cxPC, cxContainer, cxLabel, cxTextEdit, cxMaskEdit,
   cxButtonEdit, cxCheckBox, cxGroupBox, cxRadioGroup, AlMemCachedClient,
   ALMongoDBClient, ALJsonDoc, cxCheckGroup, cxNavigator, Shellapi,
-  dxBarBuiltInMenu, dxDateRanges, dxScrollbarAnnotations;
+  dxBarBuiltInMenu, dxDateRanges, dxScrollbarAnnotations, dxCore;
 
 type
 

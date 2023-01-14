@@ -6,50 +6,65 @@
           android:versionName="%versionName%"
           android:installLocation="%installLocation%">
    
-    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="%targetSdkVersion%" /> <!-- This is the platform API where NativeActivity was introduced. -->
-   
-    <%uses-permission%>
-   
-    <uses-feature android:glEsVersion="0x00020000" android:required="True"/>
-   
-    <application android:persistent="%persistent%" 
-                 android:restoreAnyVersion="%restoreAnyVersion%" 
-                 android:label="%label%" 
-                 android:debuggable="%debuggable%" 
-                 android:largeHeap="%largeHeap%"
-                 android:icon="%icon%"
-                 android:theme="@style/AppTheme"
-                 android:hardwareAccelerated="%hardwareAccelerated%"
-                 android:usesCleartextTraffic="true"
-                 android:resizeableActivity="false">
-   
-        <%application-meta-data%>
-		
-    		<%services%>
-    
-        <!-- Our activity is a subclass of the built-in NativeActivity framework class.
-             This will take care of integrating with our NDK code. -->
-        <activity android:name="com.embarcadero.firemonkey.FMXNativeActivity"
-                  android:label="%activityLabel%"
-                  android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
-                  android:launchMode="singleTask">
-    
-            <!-- Tell NativeActivity the name of our .so -->
-            <meta-data android:name="android.app.lib_name"
-                       android:value="%libNameValue%" />
-    
-            <intent-filter>  
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter> 
-    
-        </activity>
-    
-        <%activity%>
-    
-        <%receivers%>
-    
-    </application>
-    
+  <uses-sdk android:minSdkVersion="21"
+            android:targetSdkVersion="%targetSdkVersion%"/>
+ 
+  <%uses-permission%>
+ 
+  <uses-feature android:glEsVersion="0x00020000"
+                android:required="True"/>
+  
+  <!-- ============================================ -->
+  <!-- AndroidMerger auto-generated section (BEGIN) -->
+  <!-- ============================================ -->
+  
+  <!-- ===== com.google.android.exoplayer2.core ===== -->
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+  
+  <!-- ========================================== -->
+  <!-- AndroidMerger auto-generated section (END) -->
+  <!-- ========================================== -->
+  
+  <!-- android:appComponentFactory from androidx.core -->
+  <application android:persistent="%persistent%"
+               android:restoreAnyVersion="%restoreAnyVersion%"
+               android:label="%label%"
+               android:debuggable="%debuggable%"
+               android:largeHeap="%largeHeap%"
+               android:icon="%icon%"
+               android:theme="@style/AppTheme"
+               android:hardwareAccelerated="%hardwareAccelerated%"
+               android:usesCleartextTraffic="true"
+               android:resizeableActivity="false"
+               android:appComponentFactory="androidx.core.app.CoreComponentFactory">
+ 
+    <%application-meta-data%>
+
+		<%services%>
+
+    <!-- Our activity is a subclass of the built-in NativeActivity framework class.
+         This will take care of integrating with our NDK code. -->
+    <activity android:name="com.embarcadero.firemonkey.FMXNativeActivity"
+              android:label="%activityLabel%"
+              android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
+              android:launchMode="singleTask">
+
+      <!-- Tell NativeActivity the name of our .so -->
+      <meta-data android:name="android.app.lib_name"
+                 android:value="%libNameValue%"/>
+
+      <intent-filter>  
+        <action android:name="android.intent.action.MAIN"/>
+        <category android:name="android.intent.category.LAUNCHER"/>
+      </intent-filter> 
+
+    </activity>
+
+    <%activity%>
+
+    <%receivers%>
+
+  </application>
+  
 </manifest>
 <!-- END_INCLUDE(manifest) -->

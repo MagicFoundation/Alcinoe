@@ -10,10 +10,8 @@ object Form1: TForm1
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
-  PixelsPerInch = 96
   TextHeight = 13
   object PageControl1: TcxPageControl
     Left = 0
@@ -24,6 +22,8 @@ object Form1: TForm1
     TabOrder = 0
     Properties.ActivePage = TabSheet1
     Properties.CustomButtons.Buttons = <>
+    ExplicitWidth = 1004
+    ExplicitHeight = 614
     ClientRectBottom = 610
     ClientRectLeft = 5
     ClientRectRight = 1003
@@ -32,10 +32,8 @@ object Form1: TForm1
       Caption = 'Application'
       Color = 15066860
       ParentColor = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 994
+      ExplicitHeight = 582
       DesignSize = (
         998
         583)
@@ -80,6 +78,7 @@ object Form1: TForm1
           'http://www.pap.fr')
         ParentFont = False
         TabOrder = 0
+        ExplicitWidth = 994
         Height = 124
         Width = 998
       end
@@ -97,6 +96,8 @@ object Form1: TForm1
         Font.Style = []
         ParentFont = False
         TabOrder = 1
+        ExplicitWidth = 994
+        ExplicitHeight = 337
         object TableViewThread: TcxGridTableView
           Navigator.Buttons.CustomButtons = <>
           Navigator.Buttons.First.Visible = False
@@ -279,6 +280,8 @@ object Form1: TForm1
             Width = 50
           end>
         UseSystemFont = False
+        ExplicitTop = 563
+        ExplicitWidth = 994
       end
       object EditMaxHttpRequest: TcxSpinEdit
         Left = 156

@@ -36,7 +36,7 @@ object Form1: TForm1
     Margins.Top = 15.000000000000000000
     Margins.Right = 15.000000000000000000
     Position.X = 15.000000000000000000
-    Position.Y = 142.000000000000000000
+    Position.Y = 86.000000000000000000
     Size.Width = 489.000000000000000000
     Size.Height = 35.000000000000000000
     Size.PlatformDefault = False
@@ -51,7 +51,7 @@ object Form1: TForm1
     Margins.Top = 15.000000000000000000
     Margins.Right = 15.000000000000000000
     Position.X = 15.000000000000000000
-    Position.Y = 192.000000000000000000
+    Position.Y = 136.000000000000000000
     Size.Width = 489.000000000000000000
     Size.Height = 35.000000000000000000
     Size.PlatformDefault = False
@@ -65,7 +65,7 @@ object Form1: TForm1
     TabOrder = 4
     Text = 'http://192.168.0.1:3030'
     Position.X = 15.000000000000000000
-    Position.Y = 242.000000000000000000
+    Position.Y = 186.000000000000000000
     Margins.Left = 15.000000000000000000
     Margins.Top = 15.000000000000000000
     Margins.Right = 15.000000000000000000
@@ -83,13 +83,11 @@ object Form1: TForm1
     Position.X = 15.000000000000000000
     Position.Y = 15.000000000000000000
     Size.Width = 489.000000000000000000
-    Size.Height = 112.000000000000000000
+    Size.Height = 56.000000000000000000
     Size.PlatformDefault = False
     Text = 
-      'On iOS you must manually sign the WebRTC.framework, please read ' +
-      #13#10'.\ios\frameworks\readme.txt.'#13#10#13#10' You must also run '#13#10'Alcinoe\e' +
-      'mbarcadero\<yourDelphiVersion>\update.bat'#13#10' to retrieve and patc' +
-      'h the original delphi source code'
+      'You must also run '#13#10'Alcinoe\embarcadero\<yourDelphiVersion>\upda' +
+      'te.bat'#13#10' to retrieve and patch the original delphi source code'
     TextSettings.Font.Size = 14.000000000000000000
     TextSettings.Font.StyleExt = {00070000000000000004000000}
     TextSettings.FontColor = claCrimson

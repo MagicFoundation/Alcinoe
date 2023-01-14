@@ -3,16 +3,41 @@
 interface
 
 uses
-  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls,
-  FMX.Controls.Presentation, FMX.Objects, ALFmxObjects, FMX.Layouts,
-  ALFmxLayouts, fmx.types3D, ALFmxCommon, System.ImageList,
-  FMX.ImgList, ALFmxStdCtrls, ALFmxTabControl,
-  FMX.ScrollBox, FMX.Edit, ALFmxEdit, ALFmxVideoPlayer, ALFmxDatePickerDialog, FMX.Effects,
+  System.SysUtils,
+  System.Types,
+  System.UITypes,
+  System.Classes,
+  System.Variants,
+  FMX.Types,
+  FMX.Controls,
+  FMX.Forms,
+  FMX.Graphics,
+  FMX.Dialogs,
+  FMX.StdCtrls,
+  FMX.Controls.Presentation,
+  FMX.Objects,
+  ALFmxObjects,
+  FMX.Layouts,
+  ALFmxLayouts,
+  fmx.types3D,
+  ALFmxCommon,
+  System.ImageList,
+  FMX.ImgList,
+  ALFmxStdCtrls,
+  ALFmxTabControl,
+  FMX.ScrollBox,
+  FMX.Edit,
+  ALFmxEdit,
+  ALFmxVideoPlayer,
+  ALFmxDatePickerDialog,
+  FMX.Effects,
   {$IF Defined(IOS) or Defined(ANDROID)}
   Grijjy.ErrorReporting,
   {$ENDIF}
-  FMX.Filter.Effects, system.Messaging, ALFMXAni, alFmxMemo;
+  FMX.Filter.Effects,
+  system.Messaging,
+  ALFMXAni,
+  alFmxMemo;
 
 type
 
@@ -200,6 +225,7 @@ type
     ALSwitch1: TALSwitch;
     Layout5: TLayout;
     Button23: TButton;
+    Button24: TButton;
     procedure Button2Click(Sender: TObject);
     procedure Button255Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
@@ -231,7 +257,7 @@ type
     procedure FormVirtualKeyboardHidden(Sender: TObject; KeyboardVisible: Boolean; const Bounds: TRect);
     procedure FormVirtualKeyboardShown(Sender: TObject; KeyboardVisible: Boolean; const Bounds: TRect);
     procedure ALVertScrollBox1Click(Sender: TObject);
-    procedure ALVideoPlayerSurface1DblClick(Sender: TObject);
+    procedure Button24Click(Sender: TObject);
     procedure ALVertScrollBox1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
     procedure FormResize(Sender: TObject);
     procedure ALEditEnter(Sender: TObject);
@@ -260,7 +286,6 @@ type
     fALCircle1: TALCircleStopWatch;
     fCircle1: TCircleStopWatch;
     FVKKeyboardOpen: boolean;
-    fLastClickDT: TdateTime;
     {$IF Defined(IOS) or Defined(ANDROID)}
     procedure ApplicationExceptionHandler(const Sender: TObject; const M: TMessage);
     {$ENDIF}
@@ -275,13 +300,14 @@ var
 
 implementation
 
-uses system.Diagnostics,
-     system.threading,
-     system.Math,
-     UnitDemo,
-     system.DateUtils,
-     ALFmxInertialMovement,
-     ALCommon;
+uses
+  system.Diagnostics,
+  system.threading,
+  system.Math,
+  UnitDemo,
+  system.DateUtils,
+  ALFmxInertialMovement,
+  ALCommon;
 
 {$R *.fmx}
 
@@ -445,7 +471,7 @@ begin
       http://videos-f.jwpsrv.com/content/conversions/zWLy8Jer/videos/21ETjILN-588477.m4a.m3u8?token=0_5a709f9d_0x160466a864635c5481a5f70c20b15d4bfa2ada9b
       *)
 
-      ALVideoPlayerSurface1.VideoPlayer.prepare('http://ftp.nl.freebsd.org/ftp/graphics/blender/demo/movies/BBB/bbb_sunflower_1080p_30fps_normal.mp4', True{AutoStartWhenPrepared}); // << no sound on ios, don't know why :(
+      ALVideoPlayerSurface1.VideoPlayer.prepare('http://ftp.nl.freebsd.org/ftp/graphics/blender/demo/movies/BBB/bbb_sunflower_1080p_30fps_normal.mp4', True{AutoStartWhenPrepared});
       //ALVideoPlayerSurface1.VideoPlayer.prepare('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_60fps_normal.mp4', True{AutoStartWhenPrepared});
       //ALVideoPlayerSurface1.VideoPlayer.prepare('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_2160p_60fps_normal.mp4', True{AutoStartWhenPrepared});
       //ALVideoPlayerSurface1.VideoPlayer.prepare('http://techslides.com/demos/samples/sample.mp4', True{AutoStartWhenPrepared}); // << this have sound on ios
@@ -476,14 +502,8 @@ begin
 
 end;
 
-procedure TForm1.ALVideoPlayerSurface1DblClick(Sender: TObject);
+procedure TForm1.Button24Click(Sender: TObject);
 begin
-  if milliSecondsBetween(fLastClickDT, NOW) > 300 then begin
-    fLastClickDT := NOW;
-    exit;
-  end;
-  fLastClickDT := Now;
-
   BandedSwirlEffect1.Enabled := false;
   ContrastEffect1.Enabled := false;
   MagnifyEffect1.Enabled := false;
@@ -1186,10 +1206,11 @@ end;
 procedure TForm1.Button23Click(Sender: TObject);
 begin
   ALFreeAndNil(fDatePickerDialog);
-  fDatePickerDialog := TALDatePickerDialog.create('OK', // const aBtnOKCaption: string;
-                                                  'Cancel', // const aBtnCancelCaption: string;
-                                                  '', // const aBtnClearCaption: string
-                                                  'this is a title');// const aTitle: String = ''
+  fDatePickerDialog := TALDatePickerDialog.create(
+                         'OK', // const aBtnOKCaption: string;
+                         'Cancel', // const aBtnCancelCaption: string;
+                         '', // const aBtnClearCaption: string
+                         'Title');// const aTitle: String = ''
   fDatePickerDialog.show(YearOf(now), // const aYear: integer;
                          MonthOf(now), // const aMonth: integer;
                          DayOfTheMonth(now)); // const aDayOfMonth: integer);

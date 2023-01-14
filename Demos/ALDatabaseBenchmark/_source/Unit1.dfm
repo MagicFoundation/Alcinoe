@@ -10,9 +10,7 @@ object Form1: TForm1
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
-  OldCreateOrder = False
   OnClick = FormClick
-  PixelsPerInch = 96
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
@@ -30,6 +28,8 @@ object Form1: TForm1
       item
         Width = 200
       end>
+    ExplicitTop = 744
+    ExplicitWidth = 1003
   end
   object Panel3: TPanel
     Left = 0
@@ -39,6 +39,8 @@ object Form1: TForm1
     Align = alClient
     Caption = 'Panel2'
     TabOrder = 2
+    ExplicitWidth = 1003
+    ExplicitHeight = 415
     object Splitter4: TSplitter
       Left = 709
       Top = 1
@@ -56,6 +58,8 @@ object Form1: TForm1
       Align = alRight
       Caption = 'Panel2'
       TabOrder = 0
+      ExplicitLeft = 708
+      ExplicitHeight = 413
       object ALMemoResult: TcxMemo
         Left = 1
         Top = 1
@@ -71,6 +75,7 @@ object Form1: TForm1
         Style.Font.Style = []
         Style.IsFontAssigned = True
         TabOrder = 0
+        ExplicitHeight = 411
         Height = 412
         Width = 292
       end
@@ -83,6 +88,8 @@ object Form1: TForm1
       Align = alClient
       Caption = 'Panel2'
       TabOrder = 1
+      ExplicitWidth = 704
+      ExplicitHeight = 413
       object GridThread: TcxGrid
         Left = 1
         Top = 1
@@ -96,6 +103,8 @@ object Form1: TForm1
         Font.Style = []
         ParentFont = False
         TabOrder = 0
+        ExplicitWidth = 702
+        ExplicitHeight = 411
         object TableViewThread: TcxGridTableView
           Navigator.Buttons.CustomButtons = <>
           Navigator.Buttons.First.Visible = False
@@ -185,12 +194,15 @@ object Form1: TForm1
     TabOrder = 0
     Properties.ActivePage = Firebird
     Properties.CustomButtons.Buttons = <>
-    ClientRectBottom = 329
-    ClientRectRight = 1007
-    ClientRectTop = 24
+    ExplicitWidth = 1003
+    ClientRectBottom = 324
+    ClientRectLeft = 5
+    ClientRectRight = 1002
+    ClientRectTop = 27
     object Firebird: TcxTabSheet
       Caption = 'Firebird'
       ImageIndex = 2
+      ExplicitWidth = 993
       object Label2: TcxLabel
         Left = 71
         Top = 93
@@ -468,6 +480,10 @@ object Form1: TForm1
     end
     object MySQL: TcxTabSheet
       Caption = 'MySQL'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label3: TcxLabel
         Left = 45
         Top = 74
@@ -694,6 +710,10 @@ object Form1: TForm1
     object SQLLite3: TcxTabSheet
       Caption = 'SQLLite3'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label24: TcxLabel
         Left = 17
         Top = 21
@@ -956,6 +976,10 @@ object Form1: TForm1
     object Sphinx: TcxTabSheet
       Caption = 'Sphinx'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label36: TcxLabel
         Left = 38
         Top = 49
@@ -1127,6 +1151,10 @@ object Form1: TForm1
     object MemCached: TcxTabSheet
       Caption = 'MemCached'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label41: TcxLabel
         Left = 25
         Top = 21
@@ -1373,6 +1401,10 @@ object Form1: TForm1
     object MongoDB: TcxTabSheet
       Caption = 'MongoDB'
       ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object cxLabel3: TcxLabel
         Left = 25
         Top = 21

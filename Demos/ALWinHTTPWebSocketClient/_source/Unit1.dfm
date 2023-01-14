@@ -10,11 +10,9 @@ object Form1: TForm1
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  PixelsPerInch = 96
   TextHeight = 13
   object PageControl1: TcxPageControl
     Left = 0
@@ -25,17 +23,16 @@ object Form1: TForm1
     TabOrder = 0
     Properties.ActivePage = TabSheet1
     Properties.CustomButtons.Buttons = <>
-    ExplicitHeight = 589
+    ExplicitWidth = 792
+    ExplicitHeight = 607
     ClientRectBottom = 603
     ClientRectLeft = 5
     ClientRectRight = 791
     ClientRectTop = 27
     object TabSheet1: TcxTabSheet
       Caption = 'Main'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 557
+      ExplicitWidth = 782
+      ExplicitHeight = 575
       object GroupBox9: TcxGroupBox
         Left = 0
         Top = 10
@@ -49,6 +46,7 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 0
+        ExplicitWidth = 782
         Height = 194
         Width = 786
         object Panel150: TPanel
@@ -59,7 +57,7 @@ object Form1: TForm1
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 1
-          ExplicitTop = -4
+          ExplicitWidth = 776
           DesignSize = (
             780
             45)
@@ -88,11 +86,14 @@ object Form1: TForm1
             Style.Font.Style = []
             Style.IsFontAssigned = True
             TabOrder = 0
-            Text = 'wss://echo.websocket.org'
-            Width = 295
+            Text = 
+              'wss://demo.piesocket.com/v3/channel_123?api_key=VCXCEuvhGcBDP7Xh' +
+              'iJJUDvR1e1D3eiVjgZ9VRiaV&notify_self'
+            ExplicitWidth = 289
+            Width = 293
           end
           object ButtonSend: TcxButton
-            Left = 431
+            Left = 429
             Top = 6
             Width = 50
             Height = 25
@@ -107,9 +108,10 @@ object Form1: TForm1
             Font.Style = []
             ParentFont = False
             OnClick = ButtonSendClick
+            ExplicitLeft = 425
           end
           object ButtonConnect: TcxButton
-            Left = 341
+            Left = 339
             Top = 6
             Width = 83
             Height = 25
@@ -123,6 +125,7 @@ object Form1: TForm1
             Font.Style = []
             ParentFont = False
             OnClick = ButtonConnectClick
+            ExplicitLeft = 335
           end
         end
         object Panel151: TPanel
@@ -133,6 +136,7 @@ object Form1: TForm1
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
+          ExplicitWidth = 776
           object Panel152: TPanel
             Left = 0
             Top = 0
@@ -141,6 +145,7 @@ object Form1: TForm1
             Align = alClient
             BevelOuter = bvNone
             TabOrder = 0
+            ExplicitWidth = 776
             object Label4: TcxLabel
               AlignWithMargins = True
               Left = 8
@@ -159,6 +164,7 @@ object Form1: TForm1
               Style.Font.Style = [fsBold]
               Style.IsFontAssigned = True
               Transparent = True
+              ExplicitWidth = 768
             end
             object MemoMessage: TcxMemo
               AlignWithMargins = True
@@ -179,6 +185,7 @@ object Form1: TForm1
               Style.Font.Style = []
               Style.IsFontAssigned = True
               TabOrder = 1
+              ExplicitWidth = 765
               Height = 105
               Width = 769
             end
@@ -195,6 +202,7 @@ object Form1: TForm1
         Ctl3D = False
         ParentCtl3D = False
         TabOrder = 1
+        ExplicitWidth = 782
       end
       object cxSplitter2: TcxSplitter
         Left = 0
@@ -202,6 +210,7 @@ object Form1: TForm1
         Width = 786
         Height = 7
         AlignSplitter = salTop
+        ExplicitWidth = 782
       end
       object GroupBox10: TcxGroupBox
         Left = 0
@@ -216,6 +225,8 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 3
+        ExplicitWidth = 782
+        ExplicitHeight = 364
         Height = 365
         Width = 786
         object Panel5: TPanel
@@ -226,8 +237,7 @@ object Form1: TForm1
           Align = alLeft
           BevelOuter = bvNone
           TabOrder = 0
-          ExplicitTop = -4
-          ExplicitHeight = 360
+          ExplicitHeight = 340
           DesignSize = (
             267
             341)
@@ -253,8 +263,8 @@ object Form1: TForm1
             Style.Font.Style = []
             Style.IsFontAssigned = True
             TabOrder = 1
-            ExplicitHeight = 210
-            Height = 191
+            ExplicitHeight = 171
+            Height = 172
             Width = 260
           end
         end
@@ -267,8 +277,8 @@ object Form1: TForm1
           BevelOuter = bvNone
           Caption = 'Panel5'
           TabOrder = 1
-          ExplicitTop = -4
-          ExplicitHeight = 360
+          ExplicitWidth = 502
+          ExplicitHeight = 340
           DesignSize = (
             506
             341)
@@ -294,8 +304,9 @@ object Form1: TForm1
             Style.Font.Style = []
             Style.IsFontAssigned = True
             TabOrder = 1
-            ExplicitHeight = 210
-            Height = 191
+            ExplicitWidth = 491
+            ExplicitHeight = 171
+            Height = 172
             Width = 495
           end
         end
@@ -305,7 +316,7 @@ object Form1: TForm1
           Width = 7
           Height = 341
           Control = Panel5
-          ExplicitHeight = 322
+          ExplicitHeight = 340
         end
       end
     end
@@ -478,7 +489,6 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 3
-        ExplicitTop = 408
         Height = 126
         Width = 481
         object CheckBoxInternetOption_BYPASS_PROXY_CACHE: TcxCheckBox

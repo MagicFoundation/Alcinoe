@@ -23,7 +23,7 @@ object Form1: TForm1
     Height = 26
     Caption = 
       'NOTE: to launch this demo be sure that you placed DLLs from the ' +
-      'folder "/Lib/dll/libphonenumber/" in one of your PATH locations '
+      'folder "/Libraries/dll/libphonenumber/" in one of your PATH locations '
     WordWrap = True
   end
   object GroupBox1: TGroupBox

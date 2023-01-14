@@ -10,11 +10,9 @@ object Form1: TForm1
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  PixelsPerInch = 96
   TextHeight = 13
   object GroupBox1: TGroupBox
     Left = 0
@@ -24,6 +22,7 @@ object Form1: TForm1
     Align = alTop
     Caption = 'Actions'
     TabOrder = 0
+    ExplicitWidth = 343
     object Label1: TLabel
       Left = 16
       Top = 80
@@ -188,5 +187,7 @@ object Form1: TForm1
     Align = alClient
     ScrollBars = ssVertical
     TabOrder = 1
+    ExplicitWidth = 343
+    ExplicitHeight = 181
   end
 end

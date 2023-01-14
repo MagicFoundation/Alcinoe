@@ -2,10 +2,8 @@ unit main;
 
 //
 // This demo is very drafty, normally we must not use http server for this and
-// must must use socket client (or similar like notification), but i was lazzy
-// to do for this demo
-//
-// do not forget to launch the ALLiveVideoChatServer
+// must use socket client (or similar like notification), but i was lazzy when
+// doing this demo. do not forget to launch the ALLiveVideoChatServer
 //
 
 interface

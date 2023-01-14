@@ -232,7 +232,7 @@
     <iPhone_Spotlight120>$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png</iPhone_Spotlight120>
     <iPad_AppIcon83_5>$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_83.5x83.5.png</iPad_AppIcon83_5>
     <iPad_AppIcon167>$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png</iPad_AppIcon167>
-    <DCC_LinkerOptions>-ObjC -rpath /usr/lib/swift</DCC_LinkerOptions>
+    <DCC_LinkerOptions>-w -ObjC -rpath /usr/lib/swift</DCC_LinkerOptions>
     <DCC_FrameworkPath>C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\facebook\FBSDKLoginKit.xcframework\ios-arm64;C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\facebook\FBSDKShareKit.xcframework\ios-arm64;C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\facebook\FBSDKCoreKit_Basics.xcframework\ios-arm64;C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\facebook\FBSDKCoreKit.xcframework\ios-arm64;C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\facebook\FBAEMKit.xcframework\ios-arm64;$(DCC_FrameworkPath)</DCC_FrameworkPath>
     <iPhone_Launch2x>$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png</iPhone_Launch2x>
     <iPhone_LaunchDark2x>$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png</iPhone_LaunchDark2x>
@@ -341,7 +341,6 @@
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>com.ALFacebookLogin.app</VerInfo_BundleId>
-    <DCC_LinkerOptions>-ObjC -rpath /usr/lib/swift</DCC_LinkerOptions>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_iOSSimARM64)&#39;!=&#39;&#39;">
     <Cfg_1>true</Cfg_1>
@@ -395,11 +394,6 @@
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>com.ALFacebookLogin.app</VerInfo_BundleId>
-    <iPhone_Notification60>$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_60x60.png</iPhone_Notification60>
-    <iPhone_Setting87>$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_87x87.png</iPhone_Setting87>
-    <iPhone_Notification40>$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png</iPhone_Notification40>
-    <iPhone_Setting58>$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png</iPhone_Setting58>
-    <iPad_Notification40>$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png</iPad_Notification40>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_iOSSimARM64)&#39;!=&#39;&#39;">
     <Cfg_2>true</Cfg_2>

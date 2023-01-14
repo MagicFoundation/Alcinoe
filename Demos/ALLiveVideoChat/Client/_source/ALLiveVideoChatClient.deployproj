@@ -136,32 +136,14 @@
       <RemoteDir>ALLiveVideoChatClient\res\drawable-xlarge\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
-      <DeployClass>AndroidLibnativeArmeabiFile</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\ALLiveVideoChatClient.classes">
+      <DeployClass>AndroidClasses</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>64</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\library\lib\armeabi\</RemoteDir>
-      <RemoteName>libALLiveVideoChatClient.so</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
-      <DeployClass>AndroidLibnativeMipsFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\library\lib\mips\</RemoteDir>
-      <RemoteName>libALLiveVideoChatClient.so</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\..\..\..\Lib\jar\org.webrtc\jni\armeabi-v7a\libjingle_peerconnection_so.so">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libjingle_peerconnection_so.so</RemoteName>
+      <RemoteDir>ALLiveVideoChatClient\classes\</RemoteDir>
+      <RemoteName>ALLiveVideoChatClient.classes</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
@@ -171,15 +153,6 @@
       <RemoteCommand/>
       <RemoteDir>ALLiveVideoChatClient\</RemoteDir>
       <RemoteName>AndroidManifest.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\colors.xml">
-      <DeployClass>Android_Colors</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\values\</RemoteDir>
-      <RemoteName>colors.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\libALLiveVideoChatClient.so">
       <DeployClass>ProjectOutput</DeployClass>
@@ -191,37 +164,82 @@
       <RemoteName>libALLiveVideoChatClient.so</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\splash_image_def.xml">
-      <DeployClass>AndroidSplashImageDef</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\jni\arm64-v8a\libjingle_peerconnection_so.so">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\drawable\</RemoteDir>
-      <RemoteName>splash_image_def.xml</RemoteName>
+      <RemoteDir>ALLiveVideoChatClient\library\lib\arm64-v8a\</RemoteDir>
+      <RemoteName>libjingle_peerconnection_so.so</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\strings.xml">
-      <DeployClass>Android_Strings</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\jni\armeabi-v7a\libjingle_peerconnection_so.so">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\values\</RemoteDir>
-      <RemoteName>strings.xml</RemoteName>
+      <RemoteDir>ALLiveVideoChatClient\library\lib\armeabi-v7a\</RemoteDir>
+      <RemoteName>libjingle_peerconnection_so.so</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\styles-v21.xml">
-      <DeployClass>AndroidSplashStylesV21</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xxxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\values-v21\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALLiveVideoChatClient\res\values-v21\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\styles.xml">
-      <DeployClass>AndroidSplashStyles</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\values\styles.xml">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALLiveVideoChatClient\res\values\</RemoteDir>
@@ -362,32 +380,14 @@
       <RemoteDir>ALLiveVideoChatClient\res\drawable-xlarge\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
-      <DeployClass>AndroidLibnativeArmeabiFile</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\ALLiveVideoChatClient.classes">
+      <DeployClass>AndroidClasses</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>64</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\library\lib\armeabi\</RemoteDir>
-      <RemoteName>libALLiveVideoChatClient.so</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
-      <DeployClass>AndroidLibnativeMipsFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\library\lib\mips\</RemoteDir>
-      <RemoteName>libALLiveVideoChatClient.so</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\..\..\..\Lib\jar\org.webrtc\jni\armeabi-v7a\libjingle_peerconnection_so.so">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libjingle_peerconnection_so.so</RemoteName>
+      <RemoteDir>ALLiveVideoChatClient\classes\</RemoteDir>
+      <RemoteName>ALLiveVideoChatClient.classes</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
@@ -397,24 +397,6 @@
       <RemoteCommand/>
       <RemoteDir>ALLiveVideoChatClient\</RemoteDir>
       <RemoteName>AndroidManifest.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\classes.dex">
-      <DeployClass>AndroidClassesDexFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\classes\</RemoteDir>
-      <RemoteName>classes.dex</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\colors.xml">
-      <DeployClass>Android_Colors</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\values\</RemoteDir>
-      <RemoteName>colors.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\libALLiveVideoChatClient.so">
       <DeployClass>ProjectOutput</DeployClass>
@@ -426,37 +408,82 @@
       <RemoteName>libALLiveVideoChatClient.so</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\splash_image_def.xml">
-      <DeployClass>AndroidSplashImageDef</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\jni\arm64-v8a\libjingle_peerconnection_so.so">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\drawable\</RemoteDir>
-      <RemoteName>splash_image_def.xml</RemoteName>
+      <RemoteDir>ALLiveVideoChatClient\library\lib\arm64-v8a\</RemoteDir>
+      <RemoteName>libjingle_peerconnection_so.so</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\strings.xml">
-      <DeployClass>Android_Strings</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\jni\armeabi-v7a\libjingle_peerconnection_so.so">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\values\</RemoteDir>
-      <RemoteName>strings.xml</RemoteName>
+      <RemoteDir>ALLiveVideoChatClient\library\lib\armeabi-v7a\</RemoteDir>
+      <RemoteName>libjingle_peerconnection_so.so</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\styles-v21.xml">
-      <DeployClass>AndroidSplashStylesV21</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xxxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\values-v21\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALLiveVideoChatClient\res\values-v21\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\styles.xml">
-      <DeployClass>AndroidSplashStyles</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\values\styles.xml">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALLiveVideoChatClient\res\values\</RemoteDir>
@@ -554,41 +581,14 @@
       <RemoteDir>ALLiveVideoChatClient\res\drawable-xlarge\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so">
-      <DeployClass>AndroidLibnativeArmeabiv7aFile</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\ALLiveVideoChatClient.classes">
+      <DeployClass>AndroidClasses</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>64</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libALLiveVideoChatClient.so</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
-      <DeployClass>AndroidLibnativeArmeabiFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\library\lib\armeabi\</RemoteDir>
-      <RemoteName>libALLiveVideoChatClient.so</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
-      <DeployClass>AndroidLibnativeMipsFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\library\lib\mips\</RemoteDir>
-      <RemoteName>libALLiveVideoChatClient.so</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\..\..\..\Lib\jar\org.webrtc\jni\arm64-v8a\libjingle_peerconnection_so.so">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\library\lib\arm64-v8a\</RemoteDir>
-      <RemoteName>libjingle_peerconnection_so.so</RemoteName>
+      <RemoteDir>ALLiveVideoChatClient\classes\</RemoteDir>
+      <RemoteName>ALLiveVideoChatClient.classes</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
@@ -598,24 +598,6 @@
       <RemoteCommand/>
       <RemoteDir>ALLiveVideoChatClient\</RemoteDir>
       <RemoteName>AndroidManifest.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\classes.dex">
-      <DeployClass>AndroidClassesDexFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\classes\</RemoteDir>
-      <RemoteName>classes.dex</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\colors.xml">
-      <DeployClass>Android_Colors</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\values\</RemoteDir>
-      <RemoteName>colors.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\libALLiveVideoChatClient.so">
       <DeployClass>ProjectOutput</DeployClass>
@@ -627,37 +609,82 @@
       <RemoteName>libALLiveVideoChatClient.so</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\splash_image_def.xml">
-      <DeployClass>AndroidSplashImageDef</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\jni\arm64-v8a\libjingle_peerconnection_so.so">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\drawable\</RemoteDir>
-      <RemoteName>splash_image_def.xml</RemoteName>
+      <RemoteDir>ALLiveVideoChatClient\library\lib\arm64-v8a\</RemoteDir>
+      <RemoteName>libjingle_peerconnection_so.so</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\strings.xml">
-      <DeployClass>Android_Strings</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\jni\armeabi-v7a\libjingle_peerconnection_so.so">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\values\</RemoteDir>
-      <RemoteName>strings.xml</RemoteName>
+      <RemoteDir>ALLiveVideoChatClient\library\lib\armeabi-v7a\</RemoteDir>
+      <RemoteName>libjingle_peerconnection_so.so</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\styles-v21.xml">
-      <DeployClass>AndroidSplashStylesV21</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xxxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\values-v21\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALLiveVideoChatClient\res\values-v21\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\styles.xml">
-      <DeployClass>AndroidSplashStyles</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\values\styles.xml">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALLiveVideoChatClient\res\values\</RemoteDir>
@@ -753,41 +780,14 @@
       <RemoteDir>ALLiveVideoChatClient\res\drawable-xlarge\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so">
-      <DeployClass>AndroidLibnativeArmeabiv7aFile</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\ALLiveVideoChatClient.classes">
+      <DeployClass>AndroidClasses</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>64</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libALLiveVideoChatClient.so</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
-      <DeployClass>AndroidLibnativeArmeabiFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\library\lib\armeabi\</RemoteDir>
-      <RemoteName>libALLiveVideoChatClient.so</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
-      <DeployClass>AndroidLibnativeMipsFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\library\lib\mips\</RemoteDir>
-      <RemoteName>libALLiveVideoChatClient.so</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\..\..\..\Lib\jar\org.webrtc\jni\arm64-v8a\libjingle_peerconnection_so.so">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\library\lib\arm64-v8a\</RemoteDir>
-      <RemoteName>libjingle_peerconnection_so.so</RemoteName>
+      <RemoteDir>ALLiveVideoChatClient\classes\</RemoteDir>
+      <RemoteName>ALLiveVideoChatClient.classes</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
@@ -797,24 +797,6 @@
       <RemoteCommand/>
       <RemoteDir>ALLiveVideoChatClient\</RemoteDir>
       <RemoteName>AndroidManifest.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\classes.dex">
-      <DeployClass>AndroidClassesDexFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\classes\</RemoteDir>
-      <RemoteName>classes.dex</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\colors.xml">
-      <DeployClass>Android_Colors</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\values\</RemoteDir>
-      <RemoteName>colors.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\libALLiveVideoChatClient.so">
       <DeployClass>ProjectOutput</DeployClass>
@@ -826,37 +808,82 @@
       <RemoteName>libALLiveVideoChatClient.so</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\splash_image_def.xml">
-      <DeployClass>AndroidSplashImageDef</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\jni\arm64-v8a\libjingle_peerconnection_so.so">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\drawable\</RemoteDir>
-      <RemoteName>splash_image_def.xml</RemoteName>
+      <RemoteDir>ALLiveVideoChatClient\library\lib\arm64-v8a\</RemoteDir>
+      <RemoteName>libjingle_peerconnection_so.so</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\strings.xml">
-      <DeployClass>Android_Strings</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\jni\armeabi-v7a\libjingle_peerconnection_so.so">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\values\</RemoteDir>
-      <RemoteName>strings.xml</RemoteName>
+      <RemoteDir>ALLiveVideoChatClient\library\lib\armeabi-v7a\</RemoteDir>
+      <RemoteName>libjingle_peerconnection_so.so</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\styles-v21.xml">
-      <DeployClass>AndroidSplashStylesV21</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xxxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient\res\mipmap-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\values-v21\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALLiveVideoChatClient\res\values-v21\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\styles.xml">
-      <DeployClass>AndroidSplashStyles</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\values\styles.xml">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALLiveVideoChatClient\res\values\</RemoteDir>
@@ -929,15 +956,6 @@
       <RemoteName>ALLiveVideoChatClient</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSX64\Release\ALLiveVideoChatClient.dSYM">
-      <DeployClass>ProjectOSXDebug</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
-      <RemoteName>ALLiveVideoChatClient</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSX64\Release\ALLiveVideoChatClient.entitlements">
       <DeployClass>ProjectOSXEntitlements</DeployClass>
       <LocalCommand/>
@@ -948,6 +966,91 @@
       <RemoteName>ALLiveVideoChatClient.entitlements</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSX64\Release\ALLiveVideoChatClient.info.plist">
+      <DeployClass>ProjectOSXInfoPList</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient.app\Contents\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+  </ItemGroup>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;OSXARM64&#39;">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
+      <DeployClass>ProjectOSXResource</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient.app\Contents\Resources\</RemoteDir>
+      <RemoteName>ALLiveVideoChatClient.icns</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSXARM64\Debug\ALLiveVideoChatClient">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient.app\Contents\MacOS\</RemoteDir>
+      <RemoteName>ALLiveVideoChatClient</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSXARM64\Debug\ALLiveVideoChatClient.dSYM">
+      <DeployClass>ProjectOSXDebug</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
+      <RemoteName>ALLiveVideoChatClient</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSXARM64\Debug\ALLiveVideoChatClient.entitlements">
+      <DeployClass>ProjectOSXEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient.app\..\</RemoteDir>
+      <RemoteName>ALLiveVideoChatClient.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSXARM64\Debug\ALLiveVideoChatClient.info.plist">
+      <DeployClass>ProjectOSXInfoPList</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient.app\Contents\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
+      <DeployClass>ProjectOSXResource</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient.app\Contents\Resources\</RemoteDir>
+      <RemoteName>ALLiveVideoChatClient.icns</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSXARM64\Release\ALLiveVideoChatClient">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient.app\Contents\MacOS\</RemoteDir>
+      <RemoteName>ALLiveVideoChatClient</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSXARM64\Release\ALLiveVideoChatClient.entitlements">
+      <DeployClass>ProjectOSXEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient.app\..\</RemoteDir>
+      <RemoteName>ALLiveVideoChatClient.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSXARM64\Release\ALLiveVideoChatClient.info.plist">
       <DeployClass>ProjectOSXInfoPList</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1140,6 +1243,24 @@
       <RemoteDir>ALLiveVideoChatClient.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\..\..\..\Libraries\ios\webrtc\WebRTC.framework\Info.plist">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient.app\Frameworks\WebRTC.framework\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\..\..\..\Libraries\ios\webrtc\WebRTC.framework\WebRTC">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient.app\Frameworks\WebRTC.framework\</RemoteDir>
+      <RemoteName>WebRTC</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSDevice64\Debug\ALLiveVideoChatClient">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
@@ -1185,33 +1306,6 @@
       <RemoteCommand/>
       <RemoteDir>ALLiveVideoChatClient.app\..\$(PROJECTNAME).launchscreen\</RemoteDir>
       <RemoteName>ALLiveVideoChatClient.launchscreen</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="ios\frameworks\WebRTC.framework\Info.plist">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient.app\Frameworks\WebRTC.framework\</RemoteDir>
-      <RemoteName>Info.plist</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="ios\frameworks\WebRTC.framework\WebRTC">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient.app\Frameworks\WebRTC.framework\</RemoteDir>
-      <RemoteName>WebRTC</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="ios\frameworks\WebRTC.framework\_CodeSignature\CodeResources">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient.app\Frameworks\WebRTC.framework\_CodeSignature\</RemoteDir>
-      <RemoteName>CodeResources</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
       <DeployClass>iPad_AppIcon152</DeployClass>
@@ -1393,6 +1487,24 @@
       <RemoteDir>ALLiveVideoChatClient.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\..\..\..\Libraries\ios\webrtc\WebRTC.framework\Info.plist">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient.app\Frameworks\WebRTC.framework\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\..\..\..\Libraries\ios\webrtc\WebRTC.framework\WebRTC">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient.app\Frameworks\WebRTC.framework\</RemoteDir>
+      <RemoteName>WebRTC</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSDevice64\Release\ALLiveVideoChatClient">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
@@ -1402,15 +1514,6 @@
       <RemoteDir>ALLiveVideoChatClient.app\</RemoteDir>
       <RemoteName>ALLiveVideoChatClient</RemoteName>
       <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSDevice64\Release\ALLiveVideoChatClient.dSYM">
-      <DeployClass>ProjectiOSDeviceDebug</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
-      <RemoteName>ALLiveVideoChatClient</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSDevice64\Release\ALLiveVideoChatClient.entitlements">
       <DeployClass>ProjectiOSEntitlements</DeployClass>
@@ -1439,35 +1542,8 @@
       <RemoteDir>ALLiveVideoChatClient.app\..\$(PROJECTNAME).launchscreen\</RemoteDir>
       <RemoteName>ALLiveVideoChatClient.launchscreen</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="ios\frameworks\WebRTC.framework\Info.plist">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient.app\Frameworks\WebRTC.framework\</RemoteDir>
-      <RemoteName>Info.plist</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="ios\frameworks\WebRTC.framework\WebRTC">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient.app\Frameworks\WebRTC.framework\</RemoteDir>
-      <RemoteName>WebRTC</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="ios\frameworks\WebRTC.framework\_CodeSignature\CodeResources">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient.app\Frameworks\WebRTC.framework\_CodeSignature\</RemoteDir>
-      <RemoteName>CodeResources</RemoteName>
-    </DeployFile>
   </ItemGroup>
-  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;iOSSimulator&#39;">
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;iOSSimARM64&#39;">
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
       <DeployClass>iPad_AppIcon152</DeployClass>
       <LocalCommand/>
@@ -1530,6 +1606,15 @@
       <RemoteCommand/>
       <RemoteDir>ALLiveVideoChatClient.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png">
+      <DeployClass>iOS_AppStore1024</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_1024x1024.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
       <DeployClass>iPhone_AppIcon120</DeployClass>
@@ -1639,7 +1724,7 @@
       <RemoteDir>ALLiveVideoChatClient.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimulator\Debug\ALLiveVideoChatClient">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimARM64\Debug\ALLiveVideoChatClient">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1649,7 +1734,25 @@
       <RemoteName>ALLiveVideoChatClient</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimulator\Debug\ALLiveVideoChatClient.info.plist">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimARM64\Debug\ALLiveVideoChatClient.dSYM">
+      <DeployClass>ProjectiOSDeviceDebug</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
+      <RemoteName>ALLiveVideoChatClient</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimARM64\Debug\ALLiveVideoChatClient.entitlements">
+      <DeployClass>ProjectiOSEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient.app\..\</RemoteDir>
+      <RemoteName>ALLiveVideoChatClient.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimARM64\Debug\ALLiveVideoChatClient.info.plist">
       <DeployClass>ProjectiOSInfoPList</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1658,7 +1761,7 @@
       <RemoteDir>ALLiveVideoChatClient.app\</RemoteDir>
       <RemoteName>Info.plist</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimulator\Debug\ALLiveVideoChatClient.launchscreen">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimARM64\Debug\ALLiveVideoChatClient.launchscreen">
       <DeployClass>ProjectiOSLaunchScreen</DeployClass>
       <LocalCommand/>
       <Operation>64</Operation>
@@ -1729,6 +1832,15 @@
       <RemoteCommand/>
       <RemoteDir>ALLiveVideoChatClient.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png">
+      <DeployClass>iOS_AppStore1024</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_1024x1024.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
       <DeployClass>iPhone_AppIcon120</DeployClass>
@@ -1838,7 +1950,7 @@
       <RemoteDir>ALLiveVideoChatClient.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimulator\Release\ALLiveVideoChatClient">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimARM64\Release\ALLiveVideoChatClient">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1848,7 +1960,16 @@
       <RemoteName>ALLiveVideoChatClient</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimulator\Release\ALLiveVideoChatClient.info.plist">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimARM64\Release\ALLiveVideoChatClient.entitlements">
+      <DeployClass>ProjectiOSEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALLiveVideoChatClient.app\..\</RemoteDir>
+      <RemoteName>ALLiveVideoChatClient.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimARM64\Release\ALLiveVideoChatClient.info.plist">
       <DeployClass>ProjectiOSInfoPList</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1857,7 +1978,7 @@
       <RemoteDir>ALLiveVideoChatClient.app\</RemoteDir>
       <RemoteName>Info.plist</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimulator\Release\ALLiveVideoChatClient.launchscreen">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimARM64\Release\ALLiveVideoChatClient.launchscreen">
       <DeployClass>ProjectiOSLaunchScreen</DeployClass>
       <LocalCommand/>
       <Operation>64</Operation>
@@ -1865,24 +1986,6 @@
       <RemoteCommand/>
       <RemoteDir>ALLiveVideoChatClient.app\..\$(PROJECTNAME).launchscreen\</RemoteDir>
       <RemoteName>ALLiveVideoChatClient.launchscreen</RemoteName>
-    </DeployFile>
-    <DeployFile Include="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib">
-      <DeployClass>DependencyModule</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient.app\</RemoteDir>
-      <RemoteName>libcgunwind.1.0.dylib</RemoteName>
-    </DeployFile>
-    <DeployFile Include="$(BDS)\Redist\iossimulator\libpcre.dylib">
-      <DeployClass>DependencyModule</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient.app\</RemoteDir>
-      <RemoteName>libpcre.dylib</RemoteName>
     </DeployFile>
   </ItemGroup>
   <ProjectExtensions>

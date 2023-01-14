@@ -136,23 +136,14 @@
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xlarge\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
-      <DeployClass>AndroidLibnativeArmeabiFile</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\ALFmxFilterEffectsDemo.classes">
+      <DeployClass>AndroidClasses</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>64</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\armeabi\</RemoteDir>
-      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
-      <DeployClass>AndroidLibnativeMipsFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\mips\</RemoteDir>
-      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
+      <RemoteDir>ALFmxFilterEffectsDemo\classes\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.classes</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
@@ -163,15 +154,6 @@
       <RemoteDir>ALFmxFilterEffectsDemo\</RemoteDir>
       <RemoteName>AndroidManifest.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\classes.dex">
-      <DeployClass>AndroidClassesDexFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\classes\</RemoteDir>
-      <RemoteName>classes.dex</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\libALFmxFilterEffectsDemo.so">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
@@ -181,6 +163,168 @@
       <RemoteDir>ALFmxFilterEffectsDemo\library\lib\armeabi-v7a\</RemoteDir>
       <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
       <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_middle_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_right_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_middle_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_right_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_middle_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_right_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_middle_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_right_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\values-v21\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\values-v21\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\values\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\values\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
       <DeployClass>Android_LauncherIcon144</DeployClass>
@@ -317,23 +461,14 @@
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xlarge\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
-      <DeployClass>AndroidLibnativeArmeabiFile</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\ALFmxFilterEffectsDemo.classes">
+      <DeployClass>AndroidClasses</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>64</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\armeabi\</RemoteDir>
-      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
-      <DeployClass>AndroidLibnativeMipsFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\mips\</RemoteDir>
-      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
+      <RemoteDir>ALFmxFilterEffectsDemo\classes\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.classes</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
@@ -343,24 +478,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxFilterEffectsDemo\</RemoteDir>
       <RemoteName>AndroidManifest.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\classes.dex">
-      <DeployClass>AndroidClassesDexFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\classes\</RemoteDir>
-      <RemoteName>classes.dex</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\colors.xml">
-      <DeployClass>Android_Colors</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\values\</RemoteDir>
-      <RemoteName>colors.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\libALFmxFilterEffectsDemo.so">
       <DeployClass>ProjectOutput</DeployClass>
@@ -372,37 +489,163 @@
       <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\splash_image_def.xml">
-      <DeployClass>AndroidSplashImageDef</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable\</RemoteDir>
-      <RemoteName>splash_image_def.xml</RemoteName>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\strings.xml">
-      <DeployClass>Android_Strings</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\values\</RemoteDir>
-      <RemoteName>strings.xml</RemoteName>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\styles-v21.xml">
-      <DeployClass>AndroidSplashStylesV21</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_middle_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_right_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_middle_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_right_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_middle_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_right_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_middle_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_right_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\values-v21\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALFmxFilterEffectsDemo\res\values-v21\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\styles.xml">
-      <DeployClass>AndroidSplashStyles</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\values\styles.xml">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALFmxFilterEffectsDemo\res\values\</RemoteDir>
@@ -500,32 +743,14 @@
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xlarge\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so">
-      <DeployClass>AndroidLibnativeArmeabiv7aFile</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\ALFmxFilterEffectsDemo.classes">
+      <DeployClass>AndroidClasses</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>64</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
-      <DeployClass>AndroidLibnativeArmeabiFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\armeabi\</RemoteDir>
-      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
-      <DeployClass>AndroidLibnativeMipsFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\mips\</RemoteDir>
-      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
+      <RemoteDir>ALFmxFilterEffectsDemo\classes\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.classes</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
@@ -536,15 +761,6 @@
       <RemoteDir>ALFmxFilterEffectsDemo\</RemoteDir>
       <RemoteName>AndroidManifest.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\classes.dex">
-      <DeployClass>AndroidClassesDexFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\classes\</RemoteDir>
-      <RemoteName>classes.dex</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\libALFmxFilterEffectsDemo.so">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
@@ -554,6 +770,168 @@
       <RemoteDir>ALFmxFilterEffectsDemo\library\lib\arm64-v8a\</RemoteDir>
       <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
       <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_middle_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_right_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_middle_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_right_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_middle_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_right_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_middle_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_right_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\values-v21\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\values-v21\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\values\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\values\</RemoteDir>
+      <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
       <DeployClass>Android_LauncherIcon144</DeployClass>
@@ -645,32 +1023,14 @@
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xlarge\</RemoteDir>
       <RemoteName>splash_image.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so">
-      <DeployClass>AndroidLibnativeArmeabiv7aFile</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\ALFmxFilterEffectsDemo.classes">
+      <DeployClass>AndroidClasses</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>64</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
-      <DeployClass>AndroidLibnativeArmeabiFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\armeabi\</RemoteDir>
-      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\lib\android\debug\mips\libnative-activity.so">
-      <DeployClass>AndroidLibnativeMipsFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\library\lib\mips\</RemoteDir>
-      <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
+      <RemoteDir>ALFmxFilterEffectsDemo\classes\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.classes</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
@@ -680,24 +1040,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxFilterEffectsDemo\</RemoteDir>
       <RemoteName>AndroidManifest.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\classes.dex">
-      <DeployClass>AndroidClassesDexFile</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\classes\</RemoteDir>
-      <RemoteName>classes.dex</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\colors.xml">
-      <DeployClass>Android_Colors</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\values\</RemoteDir>
-      <RemoteName>colors.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\libALFmxFilterEffectsDemo.so">
       <DeployClass>ProjectOutput</DeployClass>
@@ -709,37 +1051,163 @@
       <RemoteName>libALFmxFilterEffectsDemo.so</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\splash_image_def.xml">
-      <DeployClass>AndroidSplashImageDef</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable\</RemoteDir>
-      <RemoteName>splash_image_def.xml</RemoteName>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\strings.xml">
-      <DeployClass>Android_Strings</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\values\</RemoteDir>
-      <RemoteName>strings.xml</RemoteName>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\styles-v21.xml">
-      <DeployClass>AndroidSplashStylesV21</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_middle_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_right_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_middle_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_right_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_middle_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_right_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_middle_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_right_mtrl_alpha.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\values-v21\styles.xml">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALFmxFilterEffectsDemo\res\values-v21\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\styles.xml">
-      <DeployClass>AndroidSplashStyles</DeployClass>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\values\styles.xml">
+      <DeployClass>File</DeployClass>
       <LocalCommand/>
-      <Operation>1</Operation>
+      <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
       <RemoteDir>ALFmxFilterEffectsDemo\res\values\</RemoteDir>
@@ -812,15 +1280,6 @@
       <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSX64\Release\ALFmxFilterEffectsDemo.dSYM">
-      <DeployClass>ProjectOSXDebug</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
-      <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSX64\Release\ALFmxFilterEffectsDemo.entitlements">
       <DeployClass>ProjectOSXEntitlements</DeployClass>
       <LocalCommand/>
@@ -831,6 +1290,91 @@
       <RemoteName>ALFmxFilterEffectsDemo.entitlements</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSX64\Release\ALFmxFilterEffectsDemo.info.plist">
+      <DeployClass>ProjectOSXInfoPList</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\Contents\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+  </ItemGroup>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;OSXARM64&#39;">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
+      <DeployClass>ProjectOSXResource</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\Contents\Resources\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.icns</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSXARM64\Debug\ALFmxFilterEffectsDemo">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\Contents\MacOS\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSXARM64\Debug\ALFmxFilterEffectsDemo.dSYM">
+      <DeployClass>ProjectOSXDebug</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSXARM64\Debug\ALFmxFilterEffectsDemo.entitlements">
+      <DeployClass>ProjectOSXEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSXARM64\Debug\ALFmxFilterEffectsDemo.info.plist">
+      <DeployClass>ProjectOSXInfoPList</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\Contents\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
+      <DeployClass>ProjectOSXResource</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\Contents\Resources\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.icns</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSXARM64\Release\ALFmxFilterEffectsDemo">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\Contents\MacOS\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSXARM64\Release\ALFmxFilterEffectsDemo.entitlements">
+      <DeployClass>ProjectOSXEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSXARM64\Release\ALFmxFilterEffectsDemo.info.plist">
       <DeployClass>ProjectOSXInfoPList</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1259,15 +1803,6 @@
       <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSDevice64\Release\ALFmxFilterEffectsDemo.dSYM">
-      <DeployClass>ProjectiOSDeviceDebug</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
-      <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSDevice64\Release\ALFmxFilterEffectsDemo.entitlements">
       <DeployClass>ProjectiOSEntitlements</DeployClass>
       <LocalCommand/>
@@ -1296,7 +1831,7 @@
       <RemoteName>ALFmxFilterEffectsDemo.launchscreen</RemoteName>
     </DeployFile>
   </ItemGroup>
-  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;iOSSimulator&#39;">
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;iOSSimARM64&#39;">
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
       <DeployClass>iPad_AppIcon152</DeployClass>
       <LocalCommand/>
@@ -1359,6 +1894,15 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png">
+      <DeployClass>iOS_AppStore1024</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_1024x1024.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
       <DeployClass>iPhone_AppIcon120</DeployClass>
@@ -1468,7 +2012,7 @@
       <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimulator\Debug\ALFmxFilterEffectsDemo">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimARM64\Debug\ALFmxFilterEffectsDemo">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1478,7 +2022,25 @@
       <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimulator\Debug\ALFmxFilterEffectsDemo.info.plist">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimARM64\Debug\ALFmxFilterEffectsDemo.dSYM">
+      <DeployClass>ProjectiOSDeviceDebug</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimARM64\Debug\ALFmxFilterEffectsDemo.entitlements">
+      <DeployClass>ProjectiOSEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimARM64\Debug\ALFmxFilterEffectsDemo.info.plist">
       <DeployClass>ProjectiOSInfoPList</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1487,7 +2049,7 @@
       <RemoteDir>ALFmxFilterEffectsDemo.app\</RemoteDir>
       <RemoteName>Info.plist</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimulator\Debug\ALFmxFilterEffectsDemo.launchscreen">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimARM64\Debug\ALFmxFilterEffectsDemo.launchscreen">
       <DeployClass>ProjectiOSLaunchScreen</DeployClass>
       <LocalCommand/>
       <Operation>64</Operation>
@@ -1558,6 +2120,15 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png">
+      <DeployClass>iOS_AppStore1024</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_1024x1024.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
       <DeployClass>iPhone_AppIcon120</DeployClass>
@@ -1667,7 +2238,7 @@
       <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
       <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimulator\Release\ALFmxFilterEffectsDemo">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimARM64\Release\ALFmxFilterEffectsDemo">
       <DeployClass>ProjectOutput</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1677,7 +2248,16 @@
       <RemoteName>ALFmxFilterEffectsDemo</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimulator\Release\ALFmxFilterEffectsDemo.info.plist">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimARM64\Release\ALFmxFilterEffectsDemo.entitlements">
+      <DeployClass>ProjectiOSEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxFilterEffectsDemo.app\..\</RemoteDir>
+      <RemoteName>ALFmxFilterEffectsDemo.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimARM64\Release\ALFmxFilterEffectsDemo.info.plist">
       <DeployClass>ProjectiOSInfoPList</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -1686,7 +2266,7 @@
       <RemoteDir>ALFmxFilterEffectsDemo.app\</RemoteDir>
       <RemoteName>Info.plist</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimulator\Release\ALFmxFilterEffectsDemo.launchscreen">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimARM64\Release\ALFmxFilterEffectsDemo.launchscreen">
       <DeployClass>ProjectiOSLaunchScreen</DeployClass>
       <LocalCommand/>
       <Operation>64</Operation>
@@ -1694,24 +2274,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxFilterEffectsDemo.app\..\$(PROJECTNAME).launchscreen\</RemoteDir>
       <RemoteName>ALFmxFilterEffectsDemo.launchscreen</RemoteName>
-    </DeployFile>
-    <DeployFile Include="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib">
-      <DeployClass>DependencyModule</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo.app\</RemoteDir>
-      <RemoteName>libcgunwind.1.0.dylib</RemoteName>
-    </DeployFile>
-    <DeployFile Include="$(BDS)\Redist\iossimulator\libpcre.dylib">
-      <DeployClass>DependencyModule</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo.app\</RemoteDir>
-      <RemoteName>libpcre.dylib</RemoteName>
     </DeployFile>
   </ItemGroup>
   <ProjectExtensions>

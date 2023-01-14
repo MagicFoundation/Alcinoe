@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="exo_download_completed">Osatu da deskarga</string>
+    <string name="exo_download_description">Deskargak</string>
+    <string name="exo_download_downloading">Deskargatzen</string>
+    <string name="exo_download_failed">Ezin izan da deskargatu</string>
+    <string name="exo_download_notification_channel_name">Deskargak</string>
+    <string name="exo_download_paused">Deskargak pausatuta daude</string>
+    <string name="exo_download_paused_for_network">Deskargak sare mugikorrera konektatzeko zain daude</string>
+    <string name="exo_download_paused_for_wifi">Deskargak wifira konektatzeko zain daude</string>
+    <string name="exo_download_removing">Deskargak kentzen</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+</resources>

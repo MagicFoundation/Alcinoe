@@ -41,7 +41,7 @@ uses
   cxClasses,
   dxBarBuiltInMenu,
   ALString,
-  AlWinHttpWebSocketClient;
+  AlWinHttpWebSocketClient, dxCore;
 
 type
   TForm1 = class(TForm)

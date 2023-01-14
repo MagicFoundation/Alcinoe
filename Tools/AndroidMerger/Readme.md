@@ -1,5 +1,7 @@
 AndroidMerger: Integrate AAR SDK in FMX Android app
 ===================================================
+
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-26.jpg?raw=true" alt="video player for FireMonkey" width="540" style="width:540px;"/>
                                  
 An Android library, also called as Android Archive, includes 
 everything you need to build an app like source files, 
@@ -13,7 +15,8 @@ manually adding them to Delphi deployment files, compiling
 R.Java class, checking dependancies, etc.
 
 With AndroidMerger all of the above can now be done 
-automatically in a single command line. In brief AndroidMerger will:
+automatically in a single command line. In brief 
+AndroidMerger will:
  
 * Use graddle or internal implementation to list all dependencies.
 * Download libraries and dependancies from local or central maven repository.

@@ -22,7 +22,9 @@ Example of app made with Alcinoe
 Install Alcinoe
 ---------------
 
-If you plan to use FMX (Firemonkey) framework with Alcinoe you will need to patch the original delphi source code. To do this you will need to go in [{alcinoe}\Embarcadero\Alexandria\11_2](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_2/)
+If you plan to use FMX (Firemonkey) framework with Alcinoe 
+you will need to patch the original delphi source code. 
+To do this you will need to go in [{alcinoe}\Embarcadero\Alexandria\11_2](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_2/)
 and run [update.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_2/update.bat) 
 to retrieve and patch the original delphi source code. The 
 batch file assume that the original source code is located 
@@ -42,7 +44,7 @@ design time, then you don't need to install anything, just
 add [{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) 
 in the search path of your project. 
 
-If you plan to use visual components at design time then 
+Else if you want to use visual components at design time then 
 you need to install the bpl. Launch Delphi and go in 
 component > Install Packages... > and choose the BPL located 
 in [{alcinoe}\Libraries\bpl\Alcinoe\Win32\Alexandria\AlcinoeAlexandria.bpl](https://github.com/MagicFoundation/Alcinoe/tree/master/Libraries/bpl/Alcinoe/Win32/Alexandria). 

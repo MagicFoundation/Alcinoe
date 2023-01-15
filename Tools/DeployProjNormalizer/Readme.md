@@ -1,12 +1,12 @@
 DeployProjNormalizer
 ====================
 
-This tool will create from the dproj a new deployproj file
-from scratch and will normalize it (ie: order the node so that you
-can compare different revision with diff compare tools). 
+Create from the dproj a new deployproj file from scratch 
+and normalize it (ie: order the node so that you can 
+compare different revision with diff compare tools).
 
 It's was made to answer this problem: 
-https://quality.embarcadero.com/browse/RSP-27612
+[https://quality.embarcadero.com/browse/RSP-27612](https://quality.embarcadero.com/browse/RSP-27612)
 
 Usage: 
 DeployProjNormalizer.exe -DProj="{DprojFilename}" -CreateBackup={true/false}

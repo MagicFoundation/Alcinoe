@@ -1,11 +1,11 @@
 DeployMan
 =========
                                  
-A tool to simplify the deployment of files and folders for iOS and Android 
-apps written in Delphi. It is especially useful if you need to deploy 
-a lot of files, such as 3rd party SDKs. This tool was inspired by 
-[GrijjyDeployMan](https://github.com/grijjy/GrijjyDeployMan) made by
-Allen Drennan
+Simplify the deployment of files and folders for iOS and 
+Android apps written in Delphi. It is especially useful 
+if you need to deploy a lot of files, such as 3rd party SDKs. 
+This tool was inspired by [GrijjyDeployMan](https://github.com/grijjy/GrijjyDeployMan) 
+made by Allen Drennan
  
 Usage
 -----

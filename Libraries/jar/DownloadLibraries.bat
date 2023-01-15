@@ -1,6 +1,29 @@
 @echo off
 SETLOCAL
 
+REM ----------------
+REM Init Environment
+REM ----------------
+
+if "%ALBaseDir%"=="" (    
+  Set Standalone=1
+  call "..\..\InitEnvironment.bat"
+  IF ERRORLEVEL 1 goto ERROR
+  echo.
+)
+
+
+REM --------------
+REM Security check
+REM --------------
+
+if not exist "%ALBaseDir%\Source\Alcinoe.inc" goto ERROR
+
+
+REM -----------------
+REM Main Instructions
+REM -----------------
+
 Call :DOWNLOAD_LIBRARY "https://artifactory.wetransform.to/artifactory/libs-snapshot" "org.webrtc" "google-webrtc" "1.0.25331"
 
 goto FINISHED
@@ -39,6 +62,7 @@ IF ERRORLEVEL 1 goto ERROR
 
 EXIT /B 0
 
+
 REM -------------------
 REM FINISHED/ERROR/EXIT
 REM -------------------
@@ -47,7 +71,7 @@ REM -------------------
 
 echo.
 echo Android libraries downloaded successfully
-PAUSE 
+if "%Standalone%"=="1" PAUSE 
 goto EXIT
 
 :ERROR

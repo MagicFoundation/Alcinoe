@@ -12,17 +12,6 @@
     <uses-feature android:glEsVersion="0x00020000"
                   android:required="True"/>
   
-  <!-- ============================================ -->
-  <!-- AndroidMerger auto-generated section (BEGIN) -->
-  <!-- ============================================ -->
-  
-  <!-- ===== androidx.core ===== -->
-  <!-- <application android:appComponentFactory="androidx.core.app.CoreComponentFactory"/> -->
-  
-  <!-- ========================================== -->
-  <!-- AndroidMerger auto-generated section (END) -->
-  <!-- ========================================== -->
-  
   <application android:persistent="%persistent%"
                android:restoreAnyVersion="%restoreAnyVersion%"
                android:label="%label%"
@@ -54,25 +43,6 @@
         </activity>
         <%activity%>
         <%receivers%>
-    
-    <!-- ============================================ -->
-    <!-- AndroidMerger auto-generated section (BEGIN) -->
-    <!-- ============================================ -->
-    
-    <!-- ===== androidx.emoji2 ===== -->
-    <provider android:name="androidx.startup.InitializationProvider"
-              android:authorities="%package%.androidx-startup"
-              android:exported="false">
-      <meta-data android:name="androidx.emoji2.text.EmojiCompatInitializer"
-                 android:value="androidx.startup"/>
-      <!-- ===== androidx.lifecycle.process ===== -->
-      <meta-data android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-                 android:value="androidx.startup"/>
-    </provider>
-    
-    <!-- ========================================== -->
-    <!-- AndroidMerger auto-generated section (END) -->
-    <!-- ========================================== -->
     
   </application>
   

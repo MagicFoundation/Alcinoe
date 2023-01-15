@@ -227,24 +227,6 @@
       <RemoteDir>ALLiveVideoChatClient\res\mipmap-xxxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\values-v21\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\values-v21\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\values\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\values\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
       <DeployClass>Android_LauncherIcon144</DeployClass>
       <LocalCommand/>
@@ -471,24 +453,6 @@
       <RemoteDir>ALLiveVideoChatClient\res\mipmap-xxxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\values-v21\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\values-v21\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\values\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\values\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
   </ItemGroup>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Android64&#39;">
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
@@ -672,24 +636,6 @@
       <RemoteDir>ALLiveVideoChatClient\res\mipmap-xxxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\values-v21\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\values-v21\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\values\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\values\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
       <DeployClass>Android_LauncherIcon144</DeployClass>
       <LocalCommand/>
@@ -870,24 +816,6 @@
       <RemoteCommand/>
       <RemoteDir>ALLiveVideoChatClient\res\mipmap-xxxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\values-v21\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\values-v21\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\values\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALLiveVideoChatClient\res\values\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
     </DeployFile>
   </ItemGroup>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;OSX64&#39;">

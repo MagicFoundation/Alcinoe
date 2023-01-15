@@ -173,33 +173,6 @@
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_middle_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_right_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -208,33 +181,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_middle_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_right_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
@@ -245,33 +191,6 @@
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_middle_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_right_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -280,51 +199,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_middle_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_right_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\values-v21\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\values-v21\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\values\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\values\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
       <DeployClass>Android_LauncherIcon144</DeployClass>
@@ -498,33 +372,6 @@
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_middle_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_right_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -533,33 +380,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_middle_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_right_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
@@ -570,33 +390,6 @@
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_middle_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_right_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -605,51 +398,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_middle_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_right_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\values-v21\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\values-v21\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\values\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\values\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
     </DeployFile>
   </ItemGroup>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Android64&#39;">
@@ -780,33 +528,6 @@
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_middle_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_right_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -815,33 +536,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_middle_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_right_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
@@ -852,33 +546,6 @@
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_middle_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_right_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -887,51 +554,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_middle_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_right_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\values-v21\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\values-v21\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\values\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\values\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
       <DeployClass>Android_LauncherIcon144</DeployClass>
@@ -1060,33 +682,6 @@
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_middle_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_right_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -1095,33 +690,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_middle_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_right_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
@@ -1132,33 +700,6 @@
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_middle_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_right_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -1167,51 +708,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_middle_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_right_mtrl_alpha.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\values-v21\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\values-v21\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\values\styles.xml">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxFilterEffectsDemo\res\values\</RemoteDir>
-      <RemoteName>styles.xml</RemoteName>
     </DeployFile>
   </ItemGroup>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;OSX64&#39;">

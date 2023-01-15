@@ -42,7 +42,7 @@
                android:debuggable="%debuggable%"
                android:largeHeap="%largeHeap%"
                android:icon="%icon%"
-               android:theme="%theme%"
+               android:theme="@android:style/Theme.NoTitleBar"
                android:hardwareAccelerated="%hardwareAccelerated%"
                android:resizeableActivity="false"
                android:requestLegacyExternalStorage="true"

@@ -774,42 +774,6 @@
             <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-hdpi</RemoteDir>
-            <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-hdpi</RemoteDir>
-            <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-hdpi\text_select_handle_middle_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-hdpi</RemoteDir>
-            <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-hdpi</RemoteDir>
-            <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-hdpi\text_select_handle_right_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-hdpi</RemoteDir>
-            <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-hdpi</RemoteDir>
-            <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-mdpi\ic_launcher.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -820,42 +784,6 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi</RemoteDir>
             <RemoteName>ic_launcher.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-mdpi</RemoteDir>
-            <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-mdpi</RemoteDir>
-            <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-mdpi\text_select_handle_middle_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-mdpi</RemoteDir>
-            <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-mdpi</RemoteDir>
-            <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-mdpi\text_select_handle_right_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-mdpi</RemoteDir>
-            <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-mdpi</RemoteDir>
-            <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xhdpi\ic_launcher.png">
@@ -870,42 +798,6 @@
             <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xhdpi</RemoteDir>
-            <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xhdpi</RemoteDir>
-            <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xhdpi\text_select_handle_middle_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xhdpi</RemoteDir>
-            <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xhdpi</RemoteDir>
-            <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xhdpi\text_select_handle_right_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xhdpi</RemoteDir>
-            <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xhdpi</RemoteDir>
-            <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -916,66 +808,6 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xxhdpi</RemoteDir>
             <RemoteName>ic_launcher.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
-            <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
-            <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xxhdpi\text_select_handle_middle_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
-            <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
-            <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xxhdpi\text_select_handle_right_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
-            <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
-            <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-v21\styles.xml">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\values-v21</RemoteDir>
-            <RemoteName>styles.xml</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\values-v21</RemoteDir>
-            <RemoteName>styles.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values\styles.xml">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\values</RemoteDir>
-            <RemoteName>styles.xml</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\values</RemoteDir>
-            <RemoteName>styles.xml</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-hdpi\ic_launcher.png">
@@ -990,42 +822,6 @@
             <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-hdpi</RemoteDir>
-            <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-hdpi</RemoteDir>
-            <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-hdpi\text_select_handle_middle_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-hdpi</RemoteDir>
-            <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-hdpi</RemoteDir>
-            <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-hdpi\text_select_handle_right_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-hdpi</RemoteDir>
-            <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-hdpi</RemoteDir>
-            <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-mdpi\ic_launcher.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -1036,42 +832,6 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi</RemoteDir>
             <RemoteName>ic_launcher.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-mdpi</RemoteDir>
-            <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-mdpi</RemoteDir>
-            <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-mdpi\text_select_handle_middle_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-mdpi</RemoteDir>
-            <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-mdpi</RemoteDir>
-            <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-mdpi\text_select_handle_right_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-mdpi</RemoteDir>
-            <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-mdpi</RemoteDir>
-            <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xhdpi\ic_launcher.png">
@@ -1086,42 +846,6 @@
             <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xhdpi</RemoteDir>
-            <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xhdpi</RemoteDir>
-            <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xhdpi\text_select_handle_middle_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xhdpi</RemoteDir>
-            <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xhdpi</RemoteDir>
-            <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xhdpi\text_select_handle_right_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xhdpi</RemoteDir>
-            <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xhdpi</RemoteDir>
-            <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -1132,66 +856,6 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xxhdpi</RemoteDir>
             <RemoteName>ic_launcher.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
-            <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
-            <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xxhdpi\text_select_handle_middle_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
-            <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
-            <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xxhdpi\text_select_handle_right_mtrl_alpha.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
-            <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
-            <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-v21\styles.xml">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\values-v21</RemoteDir>
-            <RemoteName>styles.xml</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\values-v21</RemoteDir>
-            <RemoteName>styles.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values\styles.xml">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\values</RemoteDir>
-            <RemoteName>styles.xml</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\values</RemoteDir>
-            <RemoteName>styles.xml</RemoteName>
           </Platform>
         </DeployFile>
       </Deployment>

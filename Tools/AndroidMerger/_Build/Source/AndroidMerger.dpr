@@ -3340,11 +3340,11 @@ begin
                     if LName = '' then raise Exception.Create('Error 42C3C299-BA31-4B17-9EA4-8320E0048848');
                     if (LPlatforms.IndexOf(LName) >= 0) then begin
                       Var LremoteDirNode := LPlatformNode.ChildNodes.FindNode('RemoteDir');
-                      if LremoteDirNode = nil then raise Exception.Create('Error 5427D8C2-7CC9-45DA-94A2-51B036B7BB50');
-                      if (alposExIgnoreCase('res\', LremoteDirNode.Text) = 1) or
-                         (ALSameText('res', LremoteDirNode.Text)) or
-                         (alposExIgnoreCase('library\lib\arm64-v8a', LremoteDirNode.Text) = 1) or
-                         (alposExIgnoreCase('library\lib\armeabi-v7a', LremoteDirNode.Text) = 1) then begin
+                      if (LremoteDirNode <> nil) and
+                         ((alposExIgnoreCase('res\', LremoteDirNode.Text) = 1) or
+                          (ALSameText('res', LremoteDirNode.Text)) or
+                          (alposExIgnoreCase('library\lib\arm64-v8a', LremoteDirNode.Text) = 1) or
+                          (alposExIgnoreCase('library\lib\armeabi-v7a', LremoteDirNode.Text) = 1)) then begin
                         LDeployFileNode.ChildNodes.Delete(j);
                         continue;
                       end;

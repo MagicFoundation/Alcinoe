@@ -47,7 +47,7 @@ Set groupID4URL=%groupID4URL:.=/%
 Set SrcUrl=%~1/%groupID4URL%/%~3/%~4/%~3-%~4
 Set groupID4DIR=%~2
 Set groupID4DIR=%groupID4DIR:.=\%
-Set DestDIR=%groupID4DIR%\%~3\%~4\
+Set DestDIR=%ALBaseDir%\Libraries\jar\%groupID4DIR%\%~3\%~4\
 IF EXIST "%DestDIR%" rmdir /s /q "%DestDIR%"
 IF EXIST "%DestDIR%" goto ERROR
 mkdir "%DestDIR%"

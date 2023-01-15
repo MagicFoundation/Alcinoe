@@ -17,19 +17,17 @@ to customize and extend.
 
 Under Ios i use AVPlayer with support also HLS like exoplayer do.
 
-Notice: I stop to support delphi berlin with have 2 UI threads on android, it's
-too hard to manage and debug the both compiler
-
-
 INSTALLATION
-1) on android you will need to patch the RTL because it's not support
+1) On android you will need to patch the RTL because it's not support
    GL_TEXTURE_EXTERNAL_OES https://quality.embarcadero.com/browse/RSP-16830
-   see sample of the patched library in Demos\ALFmxControls
-2) on android we use exoplayer so you must add the exoplayer libraries
-   (Lib\jar\exoplayer\exoplayer-core.jar and if you need HLS support
-   Lib\jar\exoplayer\exoplayer-hls.jar) in
-   project manager > target platforms> Android > libraries
-3) after it's must be quite easy, just read the source code or look the sample
+   Run Embarcadero/<YourDelphiVersion>/update.bat and include the generated
+   pas in your search path.
+2) On android we use exoplayer so you must add the exoplayer libraries
+   com.google.android.exoplayer:exoplayer-core:2.18.2 and if you need HLS support
+   com.google.android.exoplayer:exoplayer-hls:2.18.2 with the help of
+   Tools\AndroidMerger. Take a look of how to do with 
+   Demos\ALFmxControls\_source\android\MergeLibraries.bat 
+3) After it's must be quite easy, just read the source code or look the sample
    located at Demos\ALFmxControls
 *******************************************************************************)
 unit ALFmxVideoPlayer;

@@ -43,7 +43,6 @@ dcu
 /Tests/Win32/Release
 /Tests/Win64/Release
 /Tools/**/*.exe
-/Tools/AndroidMerger/_Build/Sample/Merged
 /Tools/AndroidMerger/tmp
 /Tools/NativeBridgeFileGenerator/OutputAndroid
 /Tools/NativeBridgeFileGenerator/OutputIOS

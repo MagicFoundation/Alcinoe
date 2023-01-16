@@ -1,7 +1,7 @@
 download the source of the framework from 
 https://github.com/VKCOM/vk-ios-sdk
 
-DON'T CHOOSE THE MASTER ! select the last release (1.5.1 for example)
+DON'T CHOOSE THE MASTER ! select the last release (1.6.3 for example)
 
 Current version
 vk-ios-sdk-1.6.3

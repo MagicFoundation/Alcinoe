@@ -325,6 +325,7 @@ begin
         //  =>
         // : Boolean;
         LOutputSrc := ALStringReplace(LOutputSrc, ': BOOL;', ': Boolean;', [rfReplaceALL]);
+        LOutputSrc := ALStringReplace(LOutputSrc, ': BOOL)', ': Boolean)', [rfReplaceALL]);
         {$ENDREGION}
 
         {$REGION 'Use the same classname in outputsrc than in MasterSrc'}

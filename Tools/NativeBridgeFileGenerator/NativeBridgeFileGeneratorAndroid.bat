@@ -1,6 +1,10 @@
 @echo off
 SETLOCAL
 
+echo Java2OP require Java 1.8, please set your %%JAVA_HOME%% to
+echo your Java 1.8 bin directory and the same for your %%PATH%%
+echo.
+
 REM ----------------
 REM Init Environment
 REM ----------------

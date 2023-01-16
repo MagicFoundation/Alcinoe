@@ -14,7 +14,7 @@ interface
   //<Alcinoe>\Source\ALAndroidVKontakteApi.pas to build the compare source file. Then make a diff
   //compare between the new generated ALAndroidVKontakteApi.pas and this one to see if the api
   //signature is still the same
-  {$MESSAGE WARN 'Check if the api signature of the last version of VKontakte (android) is still the same'}
+  {$MESSAGE WARN 'Check if the api signature of the last version of VKontakte sdk (android) is still the same'}
 {$IFEND}
 
 uses

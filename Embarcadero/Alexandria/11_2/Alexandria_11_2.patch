@@ -436,6 +436,32 @@ diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Graphics.pas b/Embarcadero/Alex
  {$SCOPEDENUMS ON}
  
  uses
+Index: fmx/FMX.Platform.iOS.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Platform.iOS.pas b/Embarcadero/Alexandria/11_2/fmx/FMX.Platform.iOS.pas
+--- a/Embarcadero/Alexandria/11_2/fmx/FMX.Platform.iOS.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_2/fmx/FMX.Platform.iOS.pas	(working copy)
+@@ -1,4 +1,4 @@
+-{*******************************************************}
++﻿{*******************************************************}
+ {                                                       }
+ {              Delphi FireMonkey Platform               }
+ {                                                       }
+@@ -1522,7 +1522,13 @@
+     WindowManager.NativeWindow.makeKeyAndVisible;
+ 
+     // Post initialization
+-    PlatformCocoaTouch.HandleApplicationEvent(TApplicationEvent.FinishedLaunching, nil);
++    // https://quality.embarcadero.com/browse/RSP-40351
++    Var LContext := TiOSOpenApplicationContext.Create(string.Empty, string.Empty, options);
++    Try
++      PlatformCocoaTouch.HandleApplicationEvent(TApplicationEvent.FinishedLaunching, LContext);
++    finally
++      LContext.Free;
++    End;
+     FMX.Forms.Application.RealCreateForms;
+     TiOSHelper.CurrentDevice.beginGeneratingDeviceOrientationNotifications;
+   finally
 Index: fmx/FMX.Platform.UI.Android.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/Alexandria/11_2/fmx/FMX.Platform.UI.Android.pas

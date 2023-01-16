@@ -25,8 +25,8 @@ INSTALLATION
 2) On android we use exoplayer so you must add the exoplayer libraries
    com.google.android.exoplayer:exoplayer-core:2.18.2 and if you need HLS support
    com.google.android.exoplayer:exoplayer-hls:2.18.2 with the help of
-   Tools\AndroidMerger. Take a look of how to do with 
-   Demos\ALFmxControls\_source\android\MergeLibraries.bat 
+   Tools\AndroidMerger. Take a look of how to do with
+   Demos\ALFmxControls\_source\android\MergeLibraries.bat
 3) After it's must be quite easy, just read the source code or look the sample
    located at Demos\ALFmxControls
 *******************************************************************************)

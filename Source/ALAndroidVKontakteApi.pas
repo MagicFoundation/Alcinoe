@@ -1,21 +1,61 @@
+//
+// Made from com.vk:android-sdk-core:3.5.1
+//
 unit ALAndroidVKontakteApi;
 
 interface
+
+{$I Alcinoe.inc}
+
+{$IFNDEF ALCompilerVersionSupported}
+  //Please run <Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorAndroid.bat
+  //with the library identifiers com.vk:android-sdk-core:xx.xx.xx where xx.xx.xx
+  //is the last version of the VKontakte and gave also the path to
+  //<Alcinoe>\Source\ALAndroidVKontakteApi.pas to build the compare source file. Then make a diff
+  //compare between the new generated ALAndroidVKontakteApi.pas and this one to see if the api
+  //signature is still the same
+  {$MESSAGE WARN 'Check if the api signature of the last version of VKontakte (android) is still the same'}
+{$IFEND}
 
 uses
   Androidapi.JNI.GraphicsContentViewText,
   Androidapi.JNIBridge,
   Androidapi.JNI.JavaTypes,
-  Androidapi.JNI.App;
+  Androidapi.JNI.App,
+  Androidapi.JNI.Os;
 
 type
 
-  {*******************}
+  {******************}
+  JUserId = interface;
+  JVKAuthException = interface;
   JVKScope = interface;
   JVKAccessToken = interface;
   JVKAuthCallback = interface;
   JVK = interface;
-  JVKUtils = interface;
+
+  {****************************************}
+  JUserIdClass = interface(JParcelableClass)
+    ['{3F4AC4F7-0225-4A77-8EC7-7957BBAEB98E}']
+  end;
+  [JavaSignature('com/vk/dto/common/id/UserId')]
+  JUserId = interface(JParcelable)
+    ['{CCE90A13-2538-4413-BD73-B27E5BAA4628}']
+    function toString: JString; cdecl;
+  end;
+  TJUserId = class(TJavaGenericImport<JUserIdClass, JUserId>) end;
+
+  {************************************************}
+  JVKAuthExceptionClass = interface(JExceptionClass)
+    ['{D3099883-E9CD-4B17-BF67-931280B3C2D3}']
+  end;
+  [JavaSignature('com/vk/api/sdk/exceptions/VKAuthException')]
+  JVKAuthException = interface(JException)
+    ['{356CB57F-3E2F-4F84-9767-CC7DA9E4CCB0}']
+    function getAuthError: JString; cdecl;
+    function isCanceled: Boolean; cdecl;
+  end;
+  TJVKAuthException = class(TJavaGenericImport<JVKAuthExceptionClass, JVKAuthException>) end;
 
   {***********************************}
   JVKScopeClass = interface(JEnumClass)
@@ -82,7 +122,7 @@ type
     function getPhone: JString; cdecl;
     function getPhoneAccessKey: JString; cdecl;
     function getSecret: JString; cdecl;
-    function getUserId: Integer; cdecl;
+    function getUserId: JUserId; cdecl;
     function isValid: Boolean; cdecl;
   end;
   TJVKAccessToken = class(TJavaGenericImport<JVKAccessTokenClass, JVKAccessToken>) end;
@@ -90,41 +130,24 @@ type
   {******************************************}
   JVKAuthCallbackClass = interface(IJavaClass)
     ['{85991DF5-2CD9-46BD-B3BC-41373EA0850F}']
-    {class} function _GetAUTH_CANCELED: Integer; cdecl;
-    {class} function _GetUNKNOWN_ERROR: Integer; cdecl;
-    {class} property AUTH_CANCELED: Integer read _GetAUTH_CANCELED;
-    {class} property UNKNOWN_ERROR: Integer read _GetUNKNOWN_ERROR;
   end;
   [JavaSignature('com/vk/api/sdk/auth/VKAuthCallback')]
   JVKAuthCallback = interface(IJavaInstance)
     ['{682834EF-3C5A-40DA-AD7D-30DE4015C2B5}']
     procedure onLogin(token: JVKAccessToken); cdecl;
-    procedure onLoginFailed(errorCode: Integer); cdecl;
+    procedure onLoginFailed(authException: JVKAuthException); cdecl;
   end;
   TJVKAuthCallback = class(TJavaGenericImport<JVKAuthCallbackClass, JVKAuthCallback>) end;
 
   {********************************}
   JVKClass = interface(JObjectClass)
     ['{0450DCD7-E946-43D6-801E-9DAC255B6052}']
-    //{class} function _GetINSTANCE: JVK; cdecl;
-    //{class} function _GetapiManager: JVKApiManager; cdecl;
-    //{class} procedure addTokenExpiredHandler(handler: JVKTokenExpiredHandler); cdecl;
-    {class} procedure clearAccessToken(context: JContext); cdecl;
-    //{class} procedure execute(request: JApiCommand; callback: JVKApiCallback); cdecl;
-    //{class} function executeSync(cmd: JApiCommand): JObject; cdecl;
-    {class} function getApiVersion: JString; cdecl;
-    {class} function getAppId(context: JContext): Integer; cdecl;
-    {class} function getUserId: Integer; cdecl;
+    {class} function getUserId: JUserId; cdecl;
     {class} procedure initialize(context: JContext); cdecl;
-    {class} function isLoggedIn: Boolean; cdecl;
     {class} procedure login(activity: JActivity); cdecl; overload;
     {class} procedure login(activity: JActivity; scopes: JCollection); cdecl; overload;
     {class} procedure logout; cdecl;
     {class} function onActivityResult(requestCode: Integer; resultCode: Integer; data: JIntent; callback: JVKAuthCallback): Boolean; cdecl;
-    //{class} procedure removeTokenExpiredHandler(handler: JVKTokenExpiredHandler); cdecl;
-    //{class} procedure saveAccessToken(context: JContext; userId: Integer; accessToken: JString; secret: JString); cdecl;
-    //{class} procedure setConfig(config: JVKApiConfig); cdecl;
-    //{class} procedure setCredentials(context: JContext; userId: Integer; accessToken: JString; secret: JString; saveAccessTokenToStorage: Boolean); cdecl;
   end;
   [JavaSignature('com/vk/api/sdk/VK')]
   JVK = interface(JObject)
@@ -132,35 +155,16 @@ type
   end;
   TJVK = class(TJavaGenericImport<JVKClass, JVK>) end;
 
-  {*************************************}
-  JVKUtilsClass = interface(JObjectClass)
-    ['{8D1AE62F-18C2-414B-8048-F837494A60B1}']
-    {class} function explodeQueryString(queryString: JString): JMap; cdecl;
-    {class} function getCertificateFingerprint(Context: JContext; packageName: JString): TJavaObjectArray<JString>; cdecl;
-    {class} function isAppInstalled(context: JContext; packageName: JString): Boolean; cdecl;
-    {class} function isIntentAvailable(context: JContext; action: JString): Boolean; cdecl;
-  end;
-  [JavaSignature('com/vk/api/sdk/utils/VKUtils')]
-  JVKUtils = interface(JObject)
-    ['{4830DA3E-0FC5-4B07-9284-4E9B702DDEF7}']
-    procedure clearAllCookies(context: JContext); cdecl;
-    function density: Single; cdecl;
-    function dp(dp: Integer): Integer; cdecl;
-    //function getDisplayMetrics: JDisplayMetrics; cdecl;
-    function height(context: JContext): Integer; cdecl;
-    function width(context: JContext): Integer; cdecl;
-  end;
-  TJVKUtils = class(TJavaGenericImport<JVKUtilsClass, JVKUtils>) end;
-
 implementation
 
 procedure RegisterTypes;
 begin
+  TRegTypes.RegisterType('ALAndroidVKontakteApi.JUserId', TypeInfo(ALAndroidVKontakteApi.JUserId));
+  TRegTypes.RegisterType('ALAndroidVKontakteApi.JVKAuthException', TypeInfo(ALAndroidVKontakteApi.JVKAuthException));
   TRegTypes.RegisterType('ALAndroidVKontakteApi.JVKScope', TypeInfo(ALAndroidVKontakteApi.JVKScope));
   TRegTypes.RegisterType('ALAndroidVKontakteApi.JVKAccessToken', TypeInfo(ALAndroidVKontakteApi.JVKAccessToken));
   TRegTypes.RegisterType('ALAndroidVKontakteApi.JVKAuthCallback', TypeInfo(ALAndroidVKontakteApi.JVKAuthCallback));
   TRegTypes.RegisterType('ALAndroidVKontakteApi.JVK', TypeInfo(ALAndroidVKontakteApi.JVK));
-  TRegTypes.RegisterType('ALAndroidVKontakteApi.JVKUtils', TypeInfo(ALAndroidVKontakteApi.JVKUtils));
 end;
 
 initialization

@@ -33,11 +33,11 @@ type
       {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
       TAuthCallback = class(TJavaLocal, JVKAuthCallback)
       private
-        [Weak] fVKontakteLogin: TALVKontakteLogin;
+        fVKontakteLogin: TALVKontakteLogin;
       public
         constructor Create(const aVKontakteLogin: TALVKontakteLogin);
         procedure onLogin(token: JVKAccessToken); cdecl;
-        procedure onLoginFailed(errorCode: Integer); cdecl;
+        procedure onLoginFailed(authException: JVKAuthException); cdecl;
       end;
 
     {$ENDIF}
@@ -50,7 +50,7 @@ type
       {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
       TSdkDelegate = class(TOCLocal, VKSdkDelegate)
       private
-        [Weak] fVKontakteLogin: TALVKontakteLogin;
+        fVKontakteLogin: TALVKontakteLogin;
       public
         constructor Create(const aVKontakteLogin: TALVKontakteLogin);
         procedure vkSdkAccessAuthorizationFinishedWithResult(result: VKAuthorizationResult); cdecl;
@@ -63,7 +63,7 @@ type
       {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
       TSdkUIDelegate = class(TOCLocal, VKSdkUIDelegate)
       private
-        [Weak] fVKontakteLogin: TALVKontakteLogin;
+        fVKontakteLogin: TALVKontakteLogin;
       public
         constructor Create(const aVKontakteLogin: TALVKontakteLogin);
         procedure vkSdkShouldPresentViewController(controller: UIViewController); cdecl;
@@ -112,9 +112,10 @@ type
   TALVKontakteShareDialog = class(TObject)
   private
   public
-    class function ShowShareLinkDialog(const aLinkUrl: String;
-                                       const aLinkText: String;
-                                       const aLinkImageUrl: String): boolean;
+    class function ShowShareLinkDialog(
+                     const aLinkUrl: String;
+                     const aLinkText: String;
+                     const aLinkImageUrl: String): boolean;
   end;
 
 {**********************************************}
@@ -234,33 +235,17 @@ end;
 
 {***************************************************************}
 procedure TALVKontakteLogin.logIn(const aScopes: TArray<String>);
-
-  {$REGION ' ANDROID'}
-  {$IF defined(android)}
-  var LArrayList: JArrayList;
-      LCollection: JCollection;
-      LString: String;
-      LScope: JVKScope;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION ' IOS'}
-  {$IF defined(IOS)}
-  var LNSPermissions: NSArray;
-  {$ENDIF}
-  {$ENDREGION}
-
 begin
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  LArrayList := TJArrayList.JavaClass.init(Length(aScopes));
-  for LString in aScopes do begin
-    LScope := TJVKScope.JavaClass.valueOf(StringToJString(ALUppercaseU(LString)));
+  var LArrayList := TJArrayList.JavaClass.init(Length(aScopes));
+  for var LString in aScopes do begin
+    var LScope := TJVKScope.JavaClass.valueOf(StringToJString(ALUppercaseU(LString)));
     LArrayList.add(LScope);
   end;
-  LCollection := TJCollection.Wrap((LArrayList as ILocalObject).GetObjectID);
+  var LCollection := TJCollection.Wrap((LArrayList as ILocalObject).GetObjectID);
   TJVK.JavaClass.login(TAndroidHelper.Activity, LCollection);
 
   {$ENDIF}
@@ -269,7 +254,7 @@ begin
   {$REGION ' IOS'}
   {$IF defined(IOS)}
 
-  LNSPermissions := ALStringsToNSArray(aScopes);
+  var LNSPermissions := ALStringsToNSArray(aScopes);
   try
     TVKSdk.OCClass.authorize(LNSPermissions);
   finally
@@ -305,19 +290,12 @@ end;
 
 {***********************************************}
 function TALVKontakteLogin.CurrentUserId: String;
-
-  {$REGION ' IOS'}
-  {$IF defined(ios)}
-  var LToken: VKAccessToken;
-  {$ENDIF}
-  {$ENDREGION}
-
 begin
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  Result := ALIntToStrU(TJVK.JavaClass.getUserId);
+  Result := JStringToString(TJVK.JavaClass.getUserId.toString);
 
   {$ENDIF}
   {$ENDREGION}
@@ -325,7 +303,7 @@ begin
   {$REGION ' IOS'}
   {$IF defined(IOS)}
 
-  LToken := TVKSdk.OCClass.accessToken;
+  var LToken := TVKSdk.OCClass.accessToken;
   if LToken = nil then result := ''
   else result := NSStrToStr(LToken.userID)
 
@@ -365,46 +343,49 @@ end;
 {***********************************************************************}
 procedure TALVKontakteLogin.TAuthCallback.onLogin(token: JVKAccessToken);
 var LTokenStr: String;
-    LUserID: Integer;
+    LUserID: String;
     LEmail: String;
 begin
 
   if (token <> nil) and (token.isValid) then begin
-    LUserID := Token.getUserId;
+    LUserID := JStringToString(Token.getUserId.toString);
     LEmail := JStringToString(Token.getEmail);
     LTokenStr := JStringToString(Token.getAccessToken);
   end
   else begin
-    LUserID := 0;
+    LUserID := '';
     LEmail := '';
     LTokenStr := '';
   end;
   {$IFDEF DEBUG}
-  allog('TALVKontakteLogin.TAuthCallback.onSuccess', 'UserID: ' + ALintToStrU(LUserID) +
-                                                     ' - Email: ' + LEmail +
-                                                     ' - Token: ' + LTokenStr, TalLogType.info);
+  allog(
+    'TALVKontakteLogin.TAuthCallback.onLogin',
+    'UserID: ' + LUserID + ' | ' +
+    'Email: ' + LEmail + ' | ' +
+    'Token: ' + LTokenStr,
+    TalLogType.info);
   {$ENDIF}
 
   if assigned(fVKontakteLogin.fOnsuccess) then
-    fVKontakteLogin.fOnsuccess(ALinttoStrU(LUserID), LEmail, LTokenStr);
+    fVKontakteLogin.fOnsuccess(LUserID, LEmail, LTokenStr);
 
 end;
 
-{**************************************************************************}
-procedure TALVKontakteLogin.TAuthCallback.onLoginFailed(errorCode: Integer);
+{***************************************************************************************}
+procedure TALVKontakteLogin.TAuthCallback.onLoginFailed(authException: JVKAuthException);
 begin
 
   {$IFDEF DEBUG}
-  allog('TALVKontakteLogin.TAuthCallback.onError', 'ErrorCode: ' + ALIntToStrU(errorCode), TalLogType.error);
+  allog('TALVKontakteLogin.TAuthCallback.onError', TalLogType.error);
   {$ENDIF}
 
-  if errorCode = TJVKAuthCallback.javaclass.AUTH_CANCELED then begin
+  if authException.isCanceled then begin
     if assigned(fVKontakteLogin.fOnCancel) then
       fVKontakteLogin.fOnCancel;
   end
   else begin
     if assigned(fVKontakteLogin.fOnError) then
-      fVKontakteLogin.fOnError('');
+      fVKontakteLogin.fOnError(JStringToString(authException.getAuthError));
   end;
 
 end;
@@ -430,21 +411,30 @@ begin
 
   {$IFDEF DEBUG}
   if (result <> nil) and (result.token <> nil) then
-    allog('TALVKontakteLogin.TSdkDelegate.vkSdkAccessAuthorizationFinishedWithResult.onSuccess', 'UserID: ' + NSStrToStr(result.token.userId) +
-                                                                                                 ' - Email: ' + NSStrToStr(result.token.Email) +
-                                                                                                 ' - Token: ' + NSStrToStr(result.token.accessToken), TalLogType.verbose)
+    allog(
+      'TALVKontakteLogin.TSdkDelegate.vkSdkAccessAuthorizationFinishedWithResult.onSuccess',
+      'UserID: ' + NSStrToStr(result.token.userId) + ' | ' +
+      'Email: ' + NSStrToStr(result.token.Email) + ' | ' +
+      'Token: ' + NSStrToStr(result.token.accessToken),
+      TalLogType.verbose)
   else if (result <> nil) and (result.error <> nil) then
-    allog('TALVKontakteLogin.TSdkDelegate.vkSdkAccessAuthorizationFinishedWithResult.onError', 'ErrorCode: ' + ALIntToStrU(result.error.code) +
-                                                                                               ' - ErrorDescription: ' + NSStrToStr(result.error.localizedDescription), TalLogType.error)
+    allog(
+      'TALVKontakteLogin.TSdkDelegate.vkSdkAccessAuthorizationFinishedWithResult.onError',
+      'ErrorCode: ' + ALIntToStrU(result.error.code) + ' | ' +
+      'ErrorDescription: ' + NSStrToStr(result.error.localizedDescription),
+      TalLogType.error)
   else
-    allog('TALVKontakteLogin.TSdkDelegate.vkSdkAccessAuthorizationFinishedWithResult.onError', TalLogType.error);
+    allog(
+      'TALVKontakteLogin.TSdkDelegate.vkSdkAccessAuthorizationFinishedWithResult.onError',
+      TalLogType.error);
   {$ENDIF}
 
   if (result <> nil) and (result.token <> nil) then begin
     if assigned(fVKontakteLogin.fOnsuccess) then
-      fVKontakteLogin.fOnsuccess(NSStrToStr(result.token.userId),
-                                 NSStrToStr(result.token.Email),
-                                 NSStrToStr(result.token.accessToken));
+      fVKontakteLogin.fOnsuccess(
+        NSStrToStr(result.token.userId),
+        NSStrToStr(result.token.Email),
+        NSStrToStr(result.token.accessToken));
   end
   else if (result <> nil) and (result.error <> nil) then begin
     if assigned(fVKontakteLogin.fOnError) then
@@ -509,16 +499,16 @@ end;
 //Pass view controller that should be presented to user. Usually, it's an authorization window.
 //@param controller view controller that must be shown to user
 procedure TALVKontakteLogin.TSdkUIDelegate.vkSdkShouldPresentViewController(controller: UIViewController);
-var LWindow: UIWindow;
 begin
   {$IFDEF DEBUG}
   allog('TALVKontakteLogin.TSdkUIDelegate.vkSdkShouldPresentViewController', TalLogType.error);
   {$ENDIF}
-  LWindow := SharedApplication.keyWindow;
+  var LWindow := SharedApplication.keyWindow;
   if (LWindow <> nil) and (LWindow.rootViewController <> nil) then
-    LWindow.rootViewController.presentViewController(controller, //viewControllerToPresent: UIViewController;
-                                                     true, // animated: Boolean;
-                                                     nil); // completion: TOnUIViewControllerCompletion)
+    LWindow.rootViewController.presentViewController(
+      controller, //viewControllerToPresent: UIViewController;
+      true, // animated: Boolean;
+      nil); // completion: TOnUIViewControllerCompletion)
 end;
 
 {*******************************************}
@@ -553,10 +543,11 @@ end;
 {$ENDIF}
 {$ENDREGION}
 
-{********************************************************************************}
-class function TALVKontakteShareDialog.ShowShareLinkDialog(const aLinkUrl: String;
-                                                           const aLinkText: String;
-                                                           const aLinkImageUrl: String): boolean;
+{*********************************************************}
+class function TALVKontakteShareDialog.ShowShareLinkDialog(
+                                         const aLinkUrl: String;
+                                         const aLinkText: String;
+                                         const aLinkImageUrl: String): boolean;
 begin
 
   // the VK sdk api is a TRUE PIECE OF SHEET regarding
@@ -661,42 +652,27 @@ end;
 {$REGION ' IOS'}
 {$IF defined(IOS)}
 
-Type
-
-  {*******************************************}
-  //if i don't don't this i have internal error
-  _TVKontakteProcOfObjectWrapper = class(Tobject)
-  public
-    class procedure ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
-  end;
-
-{**********************************************************************************************************************}
-class procedure _TVKontakteProcOfObjectWrapper.ApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
+{********************************************************************************************}
+procedure ALVKontakteApplicationEventMessageHandler(const Sender: TObject; const M: TMessage);
 begin
-  if not _ALVKontakteInitialised then exit;
   if M is TApplicationEventMessage then begin
     var LValue := (M as TApplicationEventMessage).value;
     if LValue.Event = TApplicationEvent.OpenURL then begin
-
       var Lcontext := TiOSOpenApplicationContext(LValue.Context);
       {$IFDEF DEBUG}
-      ALLog('_TVKontakteProcOfObjectWrapper.ApplicationEventMessageHandler', 'Url: ' + Lcontext.URL);
+      ALLog(
+        'ALVKontakteApplicationEventMessageHandler',
+        'Event: OpenURL | '+
+        'ALVKontakteInitialised: '+ALBoolToStrU(_ALVKontakteInitialised)+' | '+
+        'Url: ' + Lcontext.URL,
+        TalLogType.VERBOSE);
       {$ENDIF}
-
-      //application:openURL:options: (iOS 9 and up)
-      If TOSVersion.Check(9) then begin
-        if (Lcontext.Context <> nil) then begin
-          var LPointer := TNSDictionary.Wrap(Lcontext.Context).valueForKey(UIApplicationOpenURLOptionsSourceApplicationKey);
-          if LPointer <> nil then TVKSdk.OCClass.processOpenURL(StrToNSUrl(Lcontext.Url), TNSString.Wrap(LPointer))
-          else TVKSdk.OCClass.processOpenURL(StrToNSUrl(Lcontext.Url), nil);
-        end;
-      end
-
-      //application:openURL:sourceApplication:annotation: (iOS 8 and older)
-      else begin
-        TVKSdk.OCClass.processOpenURL(StrToNSUrl(Lcontext.Url), StrToNSStr(Lcontext.SourceApp));
+      if not _ALVKontakteInitialised then exit;
+      if (Lcontext.Context <> nil) then begin
+        var LPointer := TNSDictionary.Wrap(Lcontext.Context).valueForKey(UIApplicationOpenURLOptionsSourceApplicationKey);
+        if LPointer <> nil then TVKSdk.OCClass.processOpenURL(StrToNSUrl(Lcontext.Url), TNSString.Wrap(LPointer))
+        else TVKSdk.OCClass.processOpenURL(StrToNSUrl(Lcontext.Url), nil);
       end;
-
     end;
   end;
 end;
@@ -710,7 +686,7 @@ initialization
 
   {$REGION ' IOS'}
   {$IF defined(IOS)}
-  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, _TVKontakteProcOfObjectWrapper.ApplicationEventMessageHandler);
+  TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ALVKontakteApplicationEventMessageHandler);
   {$ENDIF}
   {$ENDREGION}
 
@@ -719,7 +695,7 @@ finalization
 
   {$REGION ' IOS'}
   {$IF defined(IOS)}
-  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, _TVKontakteProcOfObjectWrapper.ApplicationEventMessageHandler);
+  TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ALVKontakteApplicationEventMessageHandler);
   {$ENDIF}
   {$ENDREGION}
 

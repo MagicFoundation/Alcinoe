@@ -4,23 +4,16 @@
 <dict>
 	
 	<key>application-identifier</key>
-	<string>D2AVVF3775.club.kiskis.app.ios</string>
+	<string>D2AVVF3775.Project1</string>
 	
-	<key>aps-environment</key>
-	<string>development</string>
-	<key>com.apple.developer.associated-domains</key>
-	<string>*</string>
 	<key>get-task-allow</key>
 	<true/>
 	<key>com.apple.developer.team-identifier</key>
 	<string>D2AVVF3775</string>
-	<key>com.apple.developer.applesignin</key>
-	<array>
-	<string>Default</string>
-	</array>
+	
 	<key>keychain-access-groups</key>
 	<array>
-		<string>D2AVVF3775.club.kiskis.app.ios</string>
+		<string>D2AVVF3775.Project1</string>
 		<string>com.apple.token</string>
 	</array>
 </dict>

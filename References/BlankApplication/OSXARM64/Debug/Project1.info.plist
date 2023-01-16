@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>Project1</string>
+	<key>CFBundleDisplayName</key>
+	<string>Project1</string>
+	<key>CFBundleIdentifier</key>
+	<string>Project1</string>
+	<key>CFBundleVersion</key>
+	<string>1.0.0</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.0</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<true/>
+	<key>CFBundleExecutable</key>
+	<string>Project1</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.utilities</string>
+	<key>NSLocationUsageDescription</key>
+	<string>The reason for accessing the location information of the user</string>
+	<key>NSContactsUsageDescription</key>
+	<string>The reason for accessing the contacts</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>The reason for accessing the calendar data</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>The reason for accessing the reminders</string>
+	<key>NSCameraUsageDescription</key>
+	<string>The reason for accessing the camera</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>The reason for accessing the microphone</string>
+	<key>NSMotionUsageDescription</key>
+	<string>The reason for accessing the accelerometer</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>The reason for accessing the Desktop folder</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>The reason for accessing the Documents folder</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>The reason for accessing the Downloads folder</string>
+	<key>NSNetworkVolumesUsageDescription</key>
+	<string>The reason for accessing files on a network volume</string>
+	<key>NSRemovableVolumesUsageDescription</key>
+	<string>The reason for accessing files on a removable volume</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>The reason for requesting to send user data to Apple's speech recognition servers</string>
+
+	<key>CFBundleIconFile</key>
+	<string>Project1.icns</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>MacOSX</string>
+	</array>
+	<key>LSMinimumSystemVersion</key>
+	<string>11.0</string>
+
+</dict>
+</plist>

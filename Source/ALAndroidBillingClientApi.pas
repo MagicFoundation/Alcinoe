@@ -44,13 +44,10 @@ type
   JBillingClient = interface(JObject)
     ['{6730B6D8-9EC6-4754-BD81-EC63724F9A05}']
     procedure acknowledgePurchase(params: JAcknowledgePurchaseParams; listener: JAcknowledgePurchaseResponseListener); cdecl;
-    //procedure consumeAsync(consumeParams: JConsumeParams; listener: JConsumeResponseListener); cdecl;
     procedure endConnection; cdecl;
     function isFeatureSupported(feature: JString): JBillingResult; cdecl;
     function isReady: Boolean; cdecl;
     function launchBillingFlow(activity: JActivity; params: JBillingFlowParams): JBillingResult; cdecl;
-    //procedure launchPriceChangeConfirmationFlow(activity: JActivity; params: JPriceChangeFlowParams; listener: JPriceChangeConfirmationListener); cdecl;
-    //procedure queryPurchaseHistoryAsync(skuType: JString; listener: JPurchaseHistoryResponseListener); cdecl;
     function queryPurchases(skuType: JString): JPurchase_PurchasesResult; cdecl;
     procedure querySkuDetailsAsync(params: JSkuDetailsParams; listener: JSkuDetailsResponseListener); cdecl;
     procedure startConnection(listener: JBillingClientStateListener); cdecl;
@@ -108,18 +105,18 @@ type
     {class} function _GetSERVICE_TIMEOUT: Integer; cdecl;
     {class} function _GetSERVICE_UNAVAILABLE: Integer; cdecl;
     {class} function _GetUSER_CANCELED: Integer; cdecl;
-    {class} property BILLING_UNAVAILABLE: Integer read _GetBILLING_UNAVAILABLE; // 3
-    {class} property DEVELOPER_ERROR: Integer read _GetDEVELOPER_ERROR; // 5
-    {class} property ERROR: Integer read _GetERROR; // 6
-    {class} property FEATURE_NOT_SUPPORTED: Integer read _GetFEATURE_NOT_SUPPORTED; // -2
-    {class} property ITEM_ALREADY_OWNED: Integer read _GetITEM_ALREADY_OWNED; // 7
-    {class} property ITEM_NOT_OWNED: Integer read _GetITEM_NOT_OWNED; // 8
-    {class} property ITEM_UNAVAILABLE: Integer read _GetITEM_UNAVAILABLE; // 4
-    {class} property OK: Integer read _GetOK; // 0
-    {class} property SERVICE_DISCONNECTED: Integer read _GetSERVICE_DISCONNECTED; // -1
-    {class} property SERVICE_TIMEOUT: Integer read _GetSERVICE_TIMEOUT; // -3
-    {class} property SERVICE_UNAVAILABLE: Integer read _GetSERVICE_UNAVAILABLE; // 2
-    {class} property USER_CANCELED: Integer read _GetUSER_CANCELED; // 1
+    {class} property BILLING_UNAVAILABLE: Integer read _GetBILLING_UNAVAILABLE;
+    {class} property DEVELOPER_ERROR: Integer read _GetDEVELOPER_ERROR;
+    {class} property ERROR: Integer read _GetERROR;
+    {class} property FEATURE_NOT_SUPPORTED: Integer read _GetFEATURE_NOT_SUPPORTED;
+    {class} property ITEM_ALREADY_OWNED: Integer read _GetITEM_ALREADY_OWNED;
+    {class} property ITEM_NOT_OWNED: Integer read _GetITEM_NOT_OWNED;
+    {class} property ITEM_UNAVAILABLE: Integer read _GetITEM_UNAVAILABLE;
+    {class} property OK: Integer read _GetOK;
+    {class} property SERVICE_DISCONNECTED: Integer read _GetSERVICE_DISCONNECTED;
+    {class} property SERVICE_TIMEOUT: Integer read _GetSERVICE_TIMEOUT; 
+    {class} property SERVICE_UNAVAILABLE: Integer read _GetSERVICE_UNAVAILABLE;
+    {class} property USER_CANCELED: Integer read _GetUSER_CANCELED;
   end;
   [JavaSignature('com/android/billingclient/api/BillingClient$BillingResponseCode')]
   JBillingClient_BillingResponseCode = interface(JAnnotation)

@@ -1,4 +1,4 @@
-del Unit.dcu /s
+del Unit1.dcu /s
 del classes.dex /s
 del Project1.apk /s
 del Project1.exe /s

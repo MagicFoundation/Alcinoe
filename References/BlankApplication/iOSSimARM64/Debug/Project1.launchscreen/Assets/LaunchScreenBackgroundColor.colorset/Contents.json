@@ -1,0 +1,38 @@
+{
+  "colors" : [
+    {
+      "idiom" : "universal",
+      "color" : {
+        "color-space" : "srgb",
+        "components" : {
+          "alpha" : "255",
+          "blue" : "255",
+          "green" : "255",
+          "red" : "255"
+        }
+      }
+    },
+    {
+      "idiom" : "universal",
+      "color" : {
+        "color-space" : "srgb",
+        "components" : {
+          "alpha" : "255",
+          "blue" : "0",
+          "green" : "0",
+          "red" : "0"
+        }
+      },
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ]
+    }
+  ],
+  "info" : {
+    "version" : 1,
+    "author" : "RAD Studio"
+  }
+}

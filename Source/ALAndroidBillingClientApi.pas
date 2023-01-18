@@ -114,7 +114,7 @@ type
     {class} property ITEM_UNAVAILABLE: Integer read _GetITEM_UNAVAILABLE;
     {class} property OK: Integer read _GetOK;
     {class} property SERVICE_DISCONNECTED: Integer read _GetSERVICE_DISCONNECTED;
-    {class} property SERVICE_TIMEOUT: Integer read _GetSERVICE_TIMEOUT; 
+    {class} property SERVICE_TIMEOUT: Integer read _GetSERVICE_TIMEOUT;
     {class} property SERVICE_UNAVAILABLE: Integer read _GetSERVICE_UNAVAILABLE;
     {class} property USER_CANCELED: Integer read _GetUSER_CANCELED;
   end;

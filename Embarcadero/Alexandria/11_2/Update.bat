@@ -20,6 +20,7 @@ mkdir "%FileName%"
 mkdir "%FileName%\ios"
 mkdir "%FileName%\android"
 mkdir "%FileName%\win"
+mkdir "%FileName%\net"
 
 echo Copy "%EmbSourceDir%\fmx" to "%ProjectDir%\fmx"
 xcopy "%EmbSourceDir%\fmx" "%ProjectDir%\fmx"
@@ -42,6 +43,11 @@ IF EXIST "%EmbSourceDir%\rtl\android" (
 
 echo Copy "%EmbSourceDir%\rtl\win" to "%ProjectDir%\rtl\win"
 xcopy "%EmbSourceDir%\rtl\win" "%ProjectDir%\rtl\win"
+IF ERRORLEVEL 1 goto ERROR
+echo.
+
+echo Copy "%EmbSourceDir%\rtl\net" to "%ProjectDir%\rtl\net"
+xcopy "%EmbSourceDir%\rtl\net" "%ProjectDir%\rtl\net"
 IF ERRORLEVEL 1 goto ERROR
 echo.
 

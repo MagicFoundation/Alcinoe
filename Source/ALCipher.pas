@@ -6164,6 +6164,8 @@ initialization
   _InitCipher;
 
 finalization
+  {$IF defined(MSWINDOWS)}
   AlFreeAndNil(_GoogleOAuth2AccessTokens);
+  {$ENDIF}
 
 end.

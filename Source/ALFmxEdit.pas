@@ -332,7 +332,8 @@ type
 
 type
 
-  {***************************}
+  {*************************}
+  [ComponentPlatforms($FFFF)]
   TALEdit = class(TALRectangle)
   private
     fDefStyleAttr: String;

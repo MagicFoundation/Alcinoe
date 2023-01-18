@@ -224,7 +224,8 @@ type
 
 type
 
-  {***************************}
+  {*************************}
+  [ComponentPlatforms($FFFF)]
   TALMemo = class(TALRectangle)
   private
     fPadding: TBounds;

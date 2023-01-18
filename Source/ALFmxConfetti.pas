@@ -18,7 +18,8 @@ uses
 
 Type
 
-  {*****************************}
+  {*************************}
+  [ComponentPlatforms($FFFF)]
   TALConfetti = Class(TFmxObject)
   public
     type

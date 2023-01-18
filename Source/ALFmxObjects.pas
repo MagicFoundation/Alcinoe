@@ -100,6 +100,7 @@ type
   //also from smartphone to tablet i notice that to keep a good ratio i must increase all the font size, and image by 15%. So using multires
   //bitmap and if i want to avoid any resize (the purpose of multires bitmap as i understand) i must have 10 bitmaps per image !!
   //so all of this to say that multi-res bitmap is a fundamentally wrong concept
+  [ComponentPlatforms($FFFF)]
   TALImage = class(TControl)
   private
     fExifOrientationInfo: TalExifOrientationInfo;
@@ -176,7 +177,8 @@ type
     {$ENDIF}
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
   TALRectangle = class(TRectangle)
   private
     FScreenScale: single;
@@ -206,7 +208,8 @@ type
     property shadow: TALShadow read fshadow write SetShadow;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
   TALCircle = class(TCircle)
   private
     FScreenScale: single;
@@ -236,7 +239,8 @@ type
     property shadow: TALShadow read fshadow write SetShadow;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
   TALLine = class(TLine)
   private
     FScreenScale: single;
@@ -305,16 +309,17 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   // Note: we can use this class in for exemple Tlabel
-  //       by overriding the Tlabel default Style but i
-  //       do not recomend to use Tlabel, because it's simply
-  //       a painless class that is in the top of the TText !
-  //       this class use also it's own TTextLayoutNG to calculate
-  //       the size, making everythink duplicate for .. nothing in fact !
-  //       but i made some test and it's work with tlabel (but check carefully
-  //       that you define well the properties of the TALText in the
-  //       style to not have MakeBufBitmap called several times (applystyle
-  //       don't call beginupdate/endupdate (crazy!!), so everytime a property of the
-  //       TALText is updated, MakeBufBitmap is call again)
+  // by overriding the Tlabel default Style but i
+  // do not recomend to use Tlabel, because it's simply
+  // a painless class that is in the top of the TText !
+  // this class use also it's own TTextLayoutNG to calculate
+  // the size, making everythink duplicate for .. nothing in fact !
+  // but i made some test and it's work with tlabel (but check carefully
+  // that you define well the properties of the TALText in the
+  // style to not have MakeBufBitmap called several times (applystyle
+  // don't call beginupdate/endupdate (crazy!!), so everytime a property of the
+  // TALText is updated, MakeBufBitmap is call again)
+  [ComponentPlatforms($FFFF)]
   TALText = class(TControl)
   private
     fRestoreLayoutUpdateAfterLoaded: boolean;

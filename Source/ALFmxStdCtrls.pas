@@ -36,7 +36,8 @@ uses
 
 type
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
   TALAniIndicator = class(Tcontrol)
   private
     fTimer: TTimer;
@@ -260,7 +261,8 @@ type
     property OnTracking: TNotifyEvent read FOnTracking write FOnTracking;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
   TALTrackBar = class(TALCustomTrack)
   protected
     function GetDefaultSize: TSizeF; override;
@@ -343,7 +345,8 @@ type
     {$ENDIF}
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
   TALScrollBar = class(TALCustomTrack)
   protected
     function GetDefaultSize: TSizeF; override;
@@ -421,7 +424,8 @@ type
     {$ENDIF}
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
   TALRangeTrackBar = class(TALCustomTrack)
   private
     FMaxValueRange: TValueRange;
@@ -521,7 +525,8 @@ type
     {$ENDIF}
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
   TALCheckBox = class(TControl)
   private
     FScreenScale: single;
@@ -622,7 +627,8 @@ type
     {$ENDIF}
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
   TALRadioButton = class(TALCheckBox)
   private
     FGroupName: string;
@@ -662,6 +668,7 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
   TALSwitch = class(TControl)
   public const
     DefaultSwitchAnimationDuration = 0.2;

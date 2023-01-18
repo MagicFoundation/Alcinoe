@@ -230,7 +230,8 @@ type
     procedure Stop; virtual;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
   TALFloatPropertyAnimation = class(TALCustomPropertyAnimation)
   private
     FStartFromCurrent: Boolean;
@@ -297,7 +298,8 @@ type
     property Overshoot: Single read getOvershoot write setOvershoot Stored OvershootStored;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
   TALColorPropertyAnimation = class(TALCustomPropertyAnimation)
   private
     FStartFromCurrent: Boolean;

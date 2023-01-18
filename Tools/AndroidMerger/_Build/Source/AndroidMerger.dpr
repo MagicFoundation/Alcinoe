@@ -218,7 +218,11 @@ begin
                 Var LSrcNode := LSrcXmlDoc.DocumentElement.AttributeNodes[i];
                 var LDestNode := LDestXmlDoc.DocumentElement.AttributeNodes.FindNode(LSrcNode.NodeName);
                 if LDestNode = nil then LDestXmlDoc.DocumentElement.Attributes[LSrcNode.NodeName] := LSrcNode.NodeValue
-                else if LSrcNode.NodeValue <> LDestNode.NodeValue then raise Exception.Create('Merging of documentElement attributes failed!');
+                else if LSrcNode.NodeValue <> LDestNode.NodeValue then begin
+                  if (LSrcNode.NodeName = 'xmlns:ns1') and (LSrcNode.NodeValue='http://schemas.android.com/tools') then continue
+                  else if (LSrcNode.NodeName = 'xmlns:ns1') and (LSrcNode.NodeValue='urn:oasis:names:tc:xliff:document:1.2') then LDestXmlDoc.DocumentElement.Attributes[LSrcNode.NodeName] := LSrcNode.NodeValue
+                  else raise Exception.Createfmt('Merging of documentElement attributes failed!'#13#10'%s=%s'#13#10'%s=%s', [LSrcNode.NodeName, LSrcNode.NodeValue, LDestNode.NodeName, LDestNode.NodeValue]);
+                end;
               end;
 
               //-----
@@ -1954,1648 +1958,1635 @@ begin
     if not AlEmptyDirectoryU(LtmpDirectory, true{SubDirectory}) then raise EALException.CreateFmt('Cannot clear %s', [LtmpDirectory]);
     {$ENDREGION}
 
+    {$REGION 'create the LtmpDirectoryLibraries'}
+    var LtmpDirectoryLibraries := LtmpDirectory + 'Libraries\';
+    TDirectory.CreateDirectory(LtmpDirectoryLibraries);
+    {$ENDREGION}
+
+    {$REGION 'create the LtmpDirectoryRJava'}
+    var LtmpDirectoryRJava := LtmpDirectory + 'RJava\';
+    TDirectory.CreateDirectory(LtmpDirectoryRJava);
+    {$ENDREGION}
+
+    {$REGION 'create the LtmpDirectoryRClass'}
+    var LtmpDirectoryRClass := LtmpDirectory + 'RClass\';
+    TDirectory.CreateDirectory(LtmpDirectoryRClass);
+    {$ENDREGION}
+
+    {$REGION 'create the LtmpDirectoryMaven'}
+    var LtmpDirectoryMaven := LtmpDirectory + 'Maven\';
+    TDirectory.CreateDirectory(LtmpDirectoryMaven);
+    {$ENDREGION}
+
+    {$REGION 'create the LtmpDirectoryGoogleServices'}
+    var LtmpDirectoryGoogleServices := LtmpDirectory + 'GoogleServices\';
+    TDirectory.CreateDirectory(LtmpDirectoryGoogleServices);
+    {$ENDREGION}
+
+    {$REGION 'create the LRFlataFilename'}
+    var LRFlataFilename := LtmpDirectory + 'compiled_res.flata';
+    {$ENDREGION}
+
+    {$REGION 'create local objects'}
+    var LParamLst := TALStringListU.Create;
+    Var LLibraries := TALJsonDocument.Create;
+    var LConfigs := TALStringList.Create;
+    var LPlatforms := TALStringList.Create;
+    var LSupportLibraryToAndroidx := TALStringList.Create;
+    {$ENDREGION}
+
     try
 
-      {$REGION 'create the LtmpDirectoryLibraries'}
-      var LtmpDirectoryLibraries := LtmpDirectory + 'Libraries\';
-      TDirectory.CreateDirectory(LtmpDirectoryLibraries);
+      {$REGION 'Init LParamLst'}
+      for var I := 1 to ParamCount do
+        LParamLst.Add(ParamStr(i));
+      {$IF defined(DEBUG)}
+      LParamLst.Clear;
+      LParamLst.add('-LocalMavenRepositoryDir=..\..\Libraries\jar\');
+      LParamLst.add('-Libraries=.\_Build\Sample\SampleApp;com.alcinoe:alcinoe-firebase-messaging:1.0.0');
+      LParamLst.add('-OutputDir=.\_Build\Sample\Merged\');
+      LParamLst.add('-DProj=_Build\Sample\Sample.dproj');
+      LParamLst.add('-AndroidManifest=_Build\Sample\AndroidManifest.template.xml');
+      LParamLst.add('-DProjNormalizer=..\DProjNormalizer\DProjNormalizer.exe');
+      LParamLst.add('-RJarSwapper=..\RJarSwapper\RJarSwapper.bat');
+      LParamLst.add('-UseGradle=true');
+      LParamLst.add('-GoogleServicesJson=_Build\Sample\google-services.json');
+      {$ENDIF}
       {$ENDREGION}
 
-      {$REGION 'create the LtmpDirectoryRJava'}
-      var LtmpDirectoryRJava := LtmpDirectory + 'RJava\';
-      TDirectory.CreateDirectory(LtmpDirectoryRJava);
+      {$REGION 'Init LDownloadDependencies'}
+      var LtmpParamStr := ALTrimU(LParamLst.Values['-DownloadDependencies']);
+      var LDownloadDependencies := (LtmpParamStr = '') or (AlStrToBoolU(LtmpParamStr));
       {$ENDREGION}
 
-      {$REGION 'create the LtmpDirectoryRClass'}
-      var LtmpDirectoryRClass := LtmpDirectory + 'RClass\';
-      TDirectory.CreateDirectory(LtmpDirectoryRClass);
+      {$REGION 'Init LNoInteraction'}
+      LNoInteraction := AlStrToBoolU(ALTrimU(LParamLst.Values['-NoInteraction']));
       {$ENDREGION}
 
-      {$REGION 'create the LtmpDirectoryMaven'}
-      var LtmpDirectoryMaven := LtmpDirectory + 'Maven\';
-      TDirectory.CreateDirectory(LtmpDirectoryMaven);
+      {$REGION 'Init LGenerateNativeBridgeFile'}
+      var LGenerateNativeBridgeFile := AlStrToBoolU(ALTrimU(LParamLst.Values['-GenerateNativeBridgeFile']));
       {$ENDREGION}
 
-      {$REGION 'create the LtmpDirectoryGoogleServices'}
-      var LtmpDirectoryGoogleServices := LtmpDirectory + 'GoogleServices\';
-      TDirectory.CreateDirectory(LtmpDirectoryGoogleServices);
+      {$REGION 'Init LOutputDir'}
+      var LOutputDir := ExpandFileName(ALTrimU(LParamLst.Values['-OutputDir']));
+      if LOutputDir = '' then raise Exception.Create('OutputDir param is mandatory');
+      LOutputDir := ALIncludeTrailingPathDelimiterU(LOutputDir);
+      if TDirectory.Exists(LOutputDir) then begin
+        if (not LNoInteraction) then begin
+          Write('Empty '+ LOutputDir + ' (Y/N)? ');
+          Var LAnswer: String;
+          ReadLn(LAnswer);
+          if not ALSameTextU(LAnswer, 'Y') then begin
+            Writeln('');
+            Writeln('Press any key to exit');
+            Readln;
+            exit;
+          end;
+        end;
+        if not AlEmptyDirectoryU(LOutputDir, true{SubDirectory}) then raise EALException.CreateFmt('Cannot clear %s', [LOutputDir]);
+      end;
+      TDirectory.CreateDirectory(LOutputDir);
       {$ENDREGION}
 
-      {$REGION 'create the LRFlataFilename'}
-      var LRFlataFilename := LtmpDirectory + 'compiled_res.flata';
+      {$REGION 'Init LLocalMavenRepositoryDir'}
+      var LLocalMavenRepositoryDir := ExpandFileName(ALTrimU(LParamLst.Values['-LocalMavenRepositoryDir']));
+      if LLocalMavenRepositoryDir = '' then LLocalMavenRepositoryDir := LtmpDirectoryMaven;
+      TDirectory.CreateDirectory(LLocalMavenRepositoryDir);
       {$ENDREGION}
 
-      {$REGION 'create local objects'}
-      var LParamLst := TALStringListU.Create;
-      Var LLibraries := TALJsonDocument.Create;
-      var LConfigs := TALStringList.Create;
-      var LPlatforms := TALStringList.Create;
-      var LSupportLibraryToAndroidx := TALStringList.Create;
+      {$REGION 'Init LLibsOutputDir'}
+      var LLibsOutputDir := LOutputDir + 'libs\';
+      TDirectory.CreateDirectory(LLibsOutputDir);
       {$ENDREGION}
 
-      try
+      {$REGION 'Init LJniOutputDir'}
+      var LjniOutputDir := LOutputDir + 'jni\';
+      TDirectory.CreateDirectory(LjniOutputDir);
+      {$ENDREGION}
 
-        {$REGION 'Init LParamLst'}
-        for var I := 1 to ParamCount do
-          LParamLst.Add(ParamStr(i));
-        {$IF defined(DEBUG)}
-        LParamLst.Clear;
-        LParamLst.add('-LocalMavenRepositoryDir=..\..\Libraries\jar\');
-        LParamLst.add('-Libraries=.\_Build\Sample\SampleApp;com.alcinoe:alcinoe-firebase-messaging:1.0.0');
-        LParamLst.add('-OutputDir=.\_Build\Sample\Merged\');
-        LParamLst.add('-DProj=_Build\Sample\Sample.dproj');
-        LParamLst.add('-AndroidManifest=_Build\Sample\AndroidManifest.template.xml');
-        LParamLst.add('-DProjNormalizer=..\DProjNormalizer\DProjNormalizer.exe');
-        LParamLst.add('-RJarSwapper=..\RJarSwapper\RJarSwapper.bat');
-        LParamLst.add('-UseGradle=true');
-        LParamLst.add('-GoogleServicesJson=_Build\Sample\google-services.json');
-        {$ENDIF}
-        {$ENDREGION}
+      {$REGION 'Init LResOutputDir'}
+      var LresOutputDir := LOutputDir + 'res\';
+      TDirectory.CreateDirectory(LresOutputDir);
+      {$ENDREGION}
 
-        {$REGION 'Init LDownloadDependencies'}
-        var LtmpParamStr := ALTrimU(LParamLst.Values['-DownloadDependencies']);
-        var LDownloadDependencies := (LtmpParamStr = '') or (AlStrToBoolU(LtmpParamStr));
-        {$ENDREGION}
+      {$REGION 'Init LAndroidManifest'}
+      var LAndroidManifest := ExpandFileName(ALTrimU(LParamLst.Values['-AndroidManifest']));
+      {$ENDREGION}
 
-        {$REGION 'Init LNoInteraction'}
-        LNoInteraction := AlStrToBoolU(ALTrimU(LParamLst.Values['-NoInteraction']));
-        {$ENDREGION}
+      {$REGION 'Init LDProjFilename'}
+      var LDProjFilename := ExpandFileName(ALTrimU(LParamLst.Values['-DProj']));
+      {$ENDREGION}
 
-        {$REGION 'Init LGenerateNativeBridgeFile'}
-        var LGenerateNativeBridgeFile := AlStrToBoolU(ALTrimU(LParamLst.Values['-GenerateNativeBridgeFile']));
-        {$ENDREGION}
+      {$REGION 'Init LConfigs'}
+      LConfigs.CaseSensitive := False;
+      LConfigs.LineBreak := ';';
+      LConfigs.Text := AnsiString(LParamLst.Values['-Configurations']);
+      if LConfigs.Count = 0 then begin
+        LConfigs.Add('Debug');
+        LConfigs.Add('Release');
+      end;
+      {$ENDREGION}
 
-        {$REGION 'Init LOutputDir'}
-        var LOutputDir := ExpandFileName(ALTrimU(LParamLst.Values['-OutputDir']));
-        if LOutputDir = '' then raise Exception.Create('OutputDir param is mandatory');
-        LOutputDir := ALIncludeTrailingPathDelimiterU(LOutputDir);
-        if TDirectory.Exists(LOutputDir) then begin
-          if (not LNoInteraction) then begin
-            Write('Empty '+ LOutputDir + ' (Y/N)? ');
-            Var LAnswer: String;
-            ReadLn(LAnswer);
-            if not ALSameTextU(LAnswer, 'Y') then begin
-              Writeln('');
-              Writeln('Press any key to exit');
-              Readln;
-              exit;
+      {$REGION 'Init LPlatforms'}
+      LPlatforms.CaseSensitive := False;
+      LPlatforms.LineBreak := ';';
+      LPlatforms.Text := AnsiString(LParamLst.Values['-Platforms']);
+      if LPlatforms.Count = 0 then begin
+        LPlatforms.Add('Android');
+        LPlatforms.Add('Android64');
+      end;
+      for var LPlatform in LPlatforms do begin
+        if (LPlatform <> 'Android') and
+           (LPlatform <> 'Android64') then raise Exception.Create('Invalid Platforms parameter');
+      end;
+      {$ENDREGION}
+
+      {$REGION 'Init LDProjNormalizer'}
+      var LDProjNormalizer := ExpandFileName(ALTrimU(LParamLst.Values['-DProjNormalizer']));
+      {$ENDREGION}
+
+      {$REGION 'Init LGoogleServicesJson'}
+      var LGoogleServicesJson := ExpandFileName(ALTrimU(LParamLst.Values['-GoogleServicesJson']));
+      {$ENDREGION}
+
+      {$REGION 'Init LRJarSwapper'}
+      var LRJarSwapper := ExpandFileName(ALTrimU(LParamLst.Values['-RJarSwapper']));
+      {$ENDREGION}
+
+      {$REGION 'Init LUseGradle'}
+      var LUseGradle := AlStrToBoolU(ALTrimU(LParamLst.Values['-UseGradle']));
+      {$ENDREGION}
+
+      {$REGION 'Init libraries'}
+      Writeln('Init libraries');
+      var LLibrariesLst := TALStringListU.Create;
+      Try
+        LLibrariesLst.LineBreak := ';';
+        LLibrariesLst.Text := LParamLst.Values['-Libraries'];
+        if LLibrariesLst.Count = 0 then raise Exception.Create('Libraries param is mandatory');
+        for var I := 0 to LLibrariesLst.Count - 1 do begin
+
+          //handle case like com.facebook.android:facebook-login:15.1.0
+          var LLibrary := LLibrariesLst[i]; // com.facebook.android:facebook-login:15.1.0
+          if (AlposU('/',LLibrary) <= 0) and
+             (AlposU('\',LLibrary) <= 0) and
+             (LLibrary.CountChar(':') = 2) then begin
+            var LTmpLst := TalStringList.Create;
+            try
+              LTmpLst.LineBreak := ':';
+              LTmpLst.Text := AnsiString(LLibrary);
+              if LTmpLst.Count <> 3 then raise Exception.Createfmt('Invalid library name (%s). Must look like <groupId>:<artifactId>:<version>', [LLibrary]);
+              var LLocalArchivefilename: String;
+              var LLocalpomfilename: String;
+              if not DownloadLibraryFromCentralMavenRepository(
+                       LLocalMavenRepositoryDir, // const ALocalRepositoryBaseDir: String;
+                       LTmpLst[0], // const AGroupID: AnsiString;
+                       LTmpLst[1], // const AArtifactID: AnsiString;
+                       LTmpLst[2], // const AVersion: AnsiString;
+                       LLocalArchivefilename, // out ALocalArchivefilename: String;
+                       LLocalpomfilename) then // out ALocalpomfilename: String)
+                raise Exception.CreateFmt('Could not find %s in central repository', [LLibrary]);
+              if LLocalArchivefilename <>'' then LLibrariesLst[i] := LLocalArchivefilename
+              else LLibrariesLst[i] := LLocalpomfilename;
+            finally
+              ALFreeAndNil(LTmpLst);
             end;
           end;
-          if not AlEmptyDirectoryU(LOutputDir, true{SubDirectory}) then raise EALException.CreateFmt('Cannot clear %s', [LOutputDir]);
+
+          //init LArchiveFilename
+          var LArchiveFilename := ExpandFileName(LLibrariesLst[i]);
+          if LArchiveFilename = '' then continue;
+
+          //get info from the pom
+          var LPomFilename := LArchiveFilename; // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.aar
+          LPomFilename := ALIncludeTrailingPathDelimiterU(ALExtractFilePathU(ALExcludeTrailingPathDelimiterU(LPomFilename))) +
+                          ALExtractFileNameU(ALExcludeTrailingPathDelimiterU(LPomFilename), True{RemoveFileExt}) +
+                          '.pom'; // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.pom
+          var LGroupID: AnsiString := '';
+          var LArtifactId: AnsiString := '';
+          var LVersion: AnsiString := '';
+          if Tfile.Exists(LPomFilename) then begin
+            Var LPomXmlDoc := TalXmlDocument.Create('root');
+            try
+              LPomXmlDoc.LoadFromFile(LPomFilename);
+              ExpandPom(LPomXmlDoc, LLocalMavenRepositoryDir);
+              LGroupID := LPomXmlDoc.DocumentElement.ChildNodes['groupId'].Text;
+              LArtifactId := LPomXmlDoc.DocumentElement.ChildNodes['artifactId'].Text;
+              LVersion := LPomXmlDoc.DocumentElement.ChildNodes['version'].Text;
+              if (LGroupID = '') or (LArtifactId='') or (LVersion='') then
+                raise Exception.Create('Error DD67075B-3B93-4FCD-96C8-D55B931565A5');
+            finally
+              ALFreeAndNil(LPomXmlDoc);
+            end;
+          end
+          else LPomFilename := '';
+
+          //If it's a pom only dependency
+          if ALSameTextU(ALExtractFileExtU(LArchiveFilename), '.pom') then begin
+            LArchiveFilename := '';
+            if LPomFilename = '' then raise Exception.Create('Error 17EA59ED-E5B2-40A0-89AC-6988149B0284');
+          end;
+
+          //update the LLibraries
+          With LLibraries.AddChild('library', ntObject) do begin
+            Addchild('groupid').Text := LGroupID; // com.google.firebase
+            Addchild('artifactid').Text := LArtifactId; // firebase-messaging
+            Addchild('version').Text := LVersion; // 23.1.0
+            Addchild('archivefilename').Text := AnsiString(LArchiveFilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.aar
+            Addchild('pomfilename').Text := AnsiString(LPomFilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.pom
+            With Addchild('dependencyrequirements', ntarray) do begin
+              With addchild(ntobject) do begin
+                with Addchild('version', ntobject) do begin
+                  Addchild('min').text := LVersion;
+                  Addchild('max').text := LVersion;
+                end;
+                with Addchild('by', ntobject) do begin
+                  Addchild('groupid').Text := '';
+                  Addchild('artifactid').Text := '';
+                  Addchild('version').Text := '';
+                end;
+              end;
+            end;
+          end;
+
         end;
-        TDirectory.CreateDirectory(LOutputDir);
-        {$ENDREGION}
+      Finally
+        ALFreeAndNil(LLibrariesLst);
+      End;
+      {$ENDREGION}
 
-        {$REGION 'Init LLocalMavenRepositoryDir'}
-        var LLocalMavenRepositoryDir := ExpandFileName(ALTrimU(LParamLst.Values['-LocalMavenRepositoryDir']));
-        if LLocalMavenRepositoryDir = '' then LLocalMavenRepositoryDir := LtmpDirectoryMaven;
-        TDirectory.CreateDirectory(LLocalMavenRepositoryDir);
-        {$ENDREGION}
-
-        {$REGION 'Init LLibsOutputDir'}
-        var LLibsOutputDir := LOutputDir + 'libs\';
-        TDirectory.CreateDirectory(LLibsOutputDir);
-        {$ENDREGION}
-
-        {$REGION 'Init LJniOutputDir'}
-        var LjniOutputDir := LOutputDir + 'jni\';
-        TDirectory.CreateDirectory(LjniOutputDir);
-        {$ENDREGION}
-
-        {$REGION 'Init LResOutputDir'}
-        var LresOutputDir := LOutputDir + 'res\';
-        TDirectory.CreateDirectory(LresOutputDir);
-        {$ENDREGION}
-
-        {$REGION 'Init LAndroidManifest'}
-        var LAndroidManifest := ExpandFileName(ALTrimU(LParamLst.Values['-AndroidManifest']));
-        {$ENDREGION}
-
-        {$REGION 'Init LDProjFilename'}
-        var LDProjFilename := ExpandFileName(ALTrimU(LParamLst.Values['-DProj']));
-        {$ENDREGION}
-
-        {$REGION 'Init LConfigs'}
-        LConfigs.CaseSensitive := False;
-        LConfigs.LineBreak := ';';
-        LConfigs.Text := AnsiString(LParamLst.Values['-Configurations']);
-        if LConfigs.Count = 0 then begin
-          LConfigs.Add('Debug');
-          LConfigs.Add('Release');
+      {$REGION 'Check all dependancies using Gradle'}
+      if LUseGradle then begin
+        Writeln('Check all dependancies using gradle');
+        var LDependenciesWalkerOriginalDir := ALGetModulePathU + 'DependenciesWalker\';
+        if not TDirectory.Exists(LDependenciesWalkerOriginalDir) then raise EALException.CreateFmt('Directory %s does not exist', [LDependenciesWalkerOriginalDir]);
+        var LDependenciesWalkerTmpDir := LtmpDirectory + 'DependenciesWalker\';
+        TDirectory.CreateDirectory(LDependenciesWalkerTmpDir);
+        //---
+        //copy the DependenciesWalker content in TMP dir
+        if not AlCopyDirectoryU(
+                 LDependenciesWalkerOriginalDir, // SrcDirectory,
+                 LDependenciesWalkerTmpDir, // DestDirectory: ansiString;
+                 true) then // SubDirectory: Boolean;
+          raise Exception.Createfmt('Cannot copy %s to %s', [LDependenciesWalkerOriginalDir, LDependenciesWalkerTmpDir]);
+        //---
+        //Update the build.gradle
+        var LBuildGradleFileName := LDependenciesWalkerTmpDir + 'app\build.gradle';
+        if not Tfile.Exists(LBuildGradleFileName) then raise Exception.CreateFmt('%s does not exist', [LBuildGradleFileName]);
+        Var LBuildGradledependencies: AnsiString := '';
+        for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
+          var LLibrary := LLibraries.ChildNodes[i];
+          Var LGroupID := LLibrary.GetChildNodeValueText('groupid', ''{default});
+          Var Lartifactid := LLibrary.GetChildNodeValueText('artifactid', ''{default});
+          Var LVersion := LLibrary.GetChildNodeValueText('version', ''{default});
+          var LLibraryArchiveFileName := string(LLibrary.GetChildNodeValueText('archivefilename', ''{default}));
+          var LPomFileName := string(LLibrary.GetChildNodeValueText('pomfilename', ''{default}));
+          if (LGroupID <> '') and (Lartifactid <> '') and (LVersion <> '') then begin
+            LBuildGradledependencies := LBuildGradledependencies + '    implementation "'+LGroupID+':'+Lartifactid+':'+LVersion+'"'#13#10;
+            if ((LLibraryArchiveFileName <> '') and
+                (ALposU(LLocalMavenRepositoryDir, LLibraryArchiveFileName) <> 1))  or
+               ((LPomFileName <> '') and
+                (ALposU(LLocalMavenRepositoryDir, LPomFileName) <> 1)) then begin
+              Var LRepositoryDirectory := LDependenciesWalkerTmpDir +
+                                          'localrepository\' +
+                                          ALStringReplaceU(string(LGroupId),'.','\',[RfReplaceALL]) + '\' +
+                                          String(LArtifactId) + '\' +
+                                          string(LVersion) + '\';
+              TDirectory.CreateDirectory(LRepositoryDirectory);
+              if LLibraryArchiveFileName <> '' then
+                Tfile.Copy(LLibraryArchiveFileName, LRepositoryDirectory + string(LArtifactId)+'-'+string(LVersion) + ALExtractFileExtU(LLibraryArchiveFileName));
+              if LPomFileName <> '' then
+                Tfile.Copy(LPomFileName, LRepositoryDirectory + string(LArtifactId)+'-'+string(LVersion) + ALExtractFileExtU(LPomFileName));
+            end;
+          end
+          else begin
+            if LLibraryArchiveFileName = '' then raise Exception.Create('Error 6AF219E0-8FDC-4C2A-A112-BBFDB91B9580');
+            if LPomFileName <> '' then raise Exception.Create('Error 6F7C2A3E-76E2-44A6-A2D5-D0BCA4C2F1EA');
+            Writeln('Skip '+string(LLibraryArchiveFileName) + ' (no pom file found)', TALConsoleColor.ccAqua);
+            continue;
+          end;
         end;
-        {$ENDREGION}
-
-        {$REGION 'Init LPlatforms'}
-        LPlatforms.CaseSensitive := False;
-        LPlatforms.LineBreak := ';';
-        LPlatforms.Text := AnsiString(LParamLst.Values['-Platforms']);
-        if LPlatforms.Count = 0 then begin
-          LPlatforms.Add('Android');
-          LPlatforms.Add('Android64');
+        var LBuildGradleSrc := ALGetStringFromFileU(LBuildGradleFileName, TEncoding.UTF8);
+        LBuildGradleSrc := AlStringReplaceU(LBuildGradleSrc, '%dependencies%', ALTrimRightU(String(LBuildGradledependencies)), [RfIgnoreCase]);
+        ALSaveStringToFileU(LBuildGradleSrc, LBuildGradleFileName, Tencoding.UTF8, false{WriteBOM});
+        //---
+        var LSettingGradleFileName := LDependenciesWalkerTmpDir + 'settings.gradle';
+        var LLocalMavenRepositoryStr := '';
+        if LLocalMavenRepositoryDir <> '' then begin
+          LLocalMavenRepositoryStr := ALStringReplaceU(LLocalMavenRepositoryDir,'\','/',[RfReplaceALL]);
+          LLocalMavenRepositoryStr := 'maven {url uri("file://'+LLocalMavenRepositoryStr+'")}';
         end;
-        for var LPlatform in LPlatforms do begin
-          if (LPlatform <> 'Android') and
-             (LPlatform <> 'Android64') then raise Exception.Create('Invalid Platforms parameter');
+        var LSettingGradleSrc := ALGetStringFromFileU(LSettingGradleFileName, TEncoding.UTF8);
+        LSettingGradleSrc := AlStringReplaceU(LSettingGradleSrc, '%LocalMavenRepository%', LLocalMavenRepositoryStr, [RfIgnoreCase]);
+        ALSaveStringToFileU(LSettingGradleSrc, LSettingGradleFileName, Tencoding.UTF8, false{WriteBOM});
+        //---
+        //run graddle
+        Var LGradleResultSrc: AnsiString;
+        Var LInputStream := TMemorystream.Create;
+        Var LOutputStream := TStringStream.Create;
+        try
+          var LcmdLine := LDependenciesWalkerTmpDir + 'gradlew.bat app:dependencies --configuration releaseRuntimeClasspath --project-dir '+LDependenciesWalkerTmpDir;
+          OverWrite(LcmdLine);
+          Var LCmdLineResult := ALWinExecU(
+                                  LcmdLine, // const aCommandLine: String;
+                                  LDependenciesWalkerTmpDir, // const aCurrentDirectory: AnsiString;
+                                  GetEnvironmentStringWithJavaHomeUpdated, // const aEnvironment: AnsiString;
+                                  LInputStream, // const aInputStream: Tstream;
+                                  LOutputStream); //const aOutputStream: TStream;
+          if LCmdLineResult <> 0 then
+            raise Exception.Createfmt('Failed to execute %s'#13#10'%s', [LcmdLine, LOutputStream.DataString]);
+          LGradleResultSrc := AnsiString(LOutputStream.DataString);
+        finally
+          ALFreeandNil(LInputStream);
+          ALFreeandNil(LOutputStream);
         end;
-        {$ENDREGION}
-
-        {$REGION 'Init LDProjNormalizer'}
-        var LDProjNormalizer := ExpandFileName(ALTrimU(LParamLst.Values['-DProjNormalizer']));
-        {$ENDREGION}
-
-        {$REGION 'Init LGoogleServicesJson'}
-        var LGoogleServicesJson := ExpandFileName(ALTrimU(LParamLst.Values['-GoogleServicesJson']));
-        {$ENDREGION}
-
-        {$REGION 'Init LRJarSwapper'}
-        var LRJarSwapper := ExpandFileName(ALTrimU(LParamLst.Values['-RJarSwapper']));
-        {$ENDREGION}
-
-        {$REGION 'Init LUseGradle'}
-        var LUseGradle := AlStrToBoolU(ALTrimU(LParamLst.Values['-UseGradle']));
-        {$ENDREGION}
-
-        {$REGION 'Init libraries'}
-        Writeln('Init libraries');
-        var LLibrariesLst := TALStringListU.Create;
-        Try
-          LLibrariesLst.LineBreak := ';';
-          LLibrariesLst.Text := LParamLst.Values['-Libraries'];
-          if LLibrariesLst.Count = 0 then raise Exception.Create('Libraries param is mandatory');
-          for var I := 0 to LLibrariesLst.Count - 1 do begin
-
-            //handle case like com.facebook.android:facebook-login:15.1.0
-            var LLibrary := LLibrariesLst[i]; // com.facebook.android:facebook-login:15.1.0
-            if (AlposU('/',LLibrary) <= 0) and
-               (AlposU('\',LLibrary) <= 0) and
-               (LLibrary.CountChar(':') = 2) then begin
-              var LTmpLst := TalStringList.Create;
-              try
-                LTmpLst.LineBreak := ':';
-                LTmpLst.Text := AnsiString(LLibrary);
-                if LTmpLst.Count <> 3 then raise Exception.Createfmt('Invalid library name (%s). Must look like <groupId>:<artifactId>:<version>', [LLibrary]);
+        //analyze LGradleResultSrc
+        var LInDependanciesTree: Boolean := False;
+        Var LGradleResultLst := TALStringList.Create;
+        try
+          LGradleResultLst.Text := LGradleResultSrc;
+          for Var I := 0 to LGradleResultLst.Count - 1 do begin
+            Var LLine := ALTrim(LGradleResultLst[i]); // |    |    |    \--- androidx.annotation:annotation:1.1.0 -> 1.3.0
+            If ALSameText(LLine, 'releaseRuntimeClasspath - Resolved configuration for runtime for variant: release') then begin
+              LInDependanciesTree := True;
+              Continue;
+            end;
+            if not LInDependanciesTree then continue;
+            if LLine = '' then break;
+            if alsametext(LLine, 'No dependencies') then break;
+            while (LLine <> '') and (LLine[low(LLine)] in ['+','|','\','-', ' ']) do
+              delete(LLine, 1, 1); // androidx.annotation:annotation:1.1.0 -> 1.3.0
+            Var LLst := TALstringList.Create;
+            Try
+              LLst.LineBreak := ':';
+              LLst.Text := LLine;
+              if LLst.Count <> 3 then raise Exception.Create('Error 43963A52-56D3-4B57-AA34-816194BCADCE ('+String(LLine)+')');
+              var LDependencyGroupID := LLst[0]; // androidx.annotation
+              var LDependencyArtifactID := LLst[1]; // annotation
+              var LDependencyVersion := LLst[2]; // 1.1.0 -> 1.3.0 (*)
+              Var P := ALpos('->', LDependencyVersion);
+              if P > 0 then begin
+                delete(LDependencyVersion, 1, P+1); //  1.3.0 (*)
+              end;
+              //(*) - dependencies omitted (listed previously)
+              LDependencyVersion := ALStringReplace(LDependencyVersion, '(*)', '', []); //  1.3.0
+              //(c) - dependency constraint
+              LDependencyVersion := ALStringReplace(LDependencyVersion, '(c)', '', []);
+              LDependencyVersion := ALTrim(LDependencyVersion); // 1.3.0
+              if ALPosExIgnoreCase('FAILED', LDependencyVersion) > 0 then begin
+                LDependencyVersion := ALTrim(ALStringReplace(LDependencyVersion, 'FAILED', '', [RfIgnoreCase]));
+                Writeln(
+                  'Cannot resolve '+string(LDependencyGroupID)+':'+string(LDependencyArtifactID)+':'+string(LDependencyVersion),
+                  TALConsoleColor.ccPurple,
+                  true{ASkipDuplicates});
+              end
+              else begin
+                if ALpos(' ', LDependencyVersion) > 0 then raise Exception.Create('Error CD3F7D9C-874C-4089-B674-9CCCE4AFA50E'#13#10+string(LGradleResultSrc));
+                if FindLibraryNode(
+                     LLibraries, // const ALibraries: TALJsonDocument;
+                     LDependencyGroupID, // const AGroupID: AnsiString;
+                     LDependencyArtifactID, // const AArtifactID: AnsiString;
+                     LDependencyVersion) <> nil then continue; // const AVersion: AnsiString): TALJsonNode; then
                 var LLocalArchivefilename: String;
                 var LLocalpomfilename: String;
-                if not DownloadLibraryFromCentralMavenRepository(
-                         LLocalMavenRepositoryDir, // const ALocalRepositoryBaseDir: String;
-                         LTmpLst[0], // const AGroupID: AnsiString;
-                         LTmpLst[1], // const AArtifactID: AnsiString;
-                         LTmpLst[2], // const AVersion: AnsiString;
-                         LLocalArchivefilename, // out ALocalArchivefilename: String;
-                         LLocalpomfilename) then // out ALocalpomfilename: String)
-                  raise Exception.CreateFmt('Could not find %s in central repository', [LLibrary]);
-                if LLocalArchivefilename <>'' then LLibrariesLst[i] := LLocalArchivefilename
-                else LLibrariesLst[i] := LLocalpomfilename;
-              finally
-                ALFreeAndNil(LTmpLst);
-              end;
-            end;
-
-            //init LArchiveFilename
-            var LArchiveFilename := ExpandFileName(LLibrariesLst[i]);
-            if LArchiveFilename = '' then continue;
-
-            //get info from the pom
-            var LPomFilename := LArchiveFilename; // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.aar
-            LPomFilename := ALIncludeTrailingPathDelimiterU(ALExtractFilePathU(ALExcludeTrailingPathDelimiterU(LPomFilename))) +
-                            ALExtractFileNameU(ALExcludeTrailingPathDelimiterU(LPomFilename), True{RemoveFileExt}) +
-                            '.pom'; // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.pom
-            var LGroupID: AnsiString := '';
-            var LArtifactId: AnsiString := '';
-            var LVersion: AnsiString := '';
-            if Tfile.Exists(LPomFilename) then begin
-              Var LPomXmlDoc := TalXmlDocument.Create('root');
-              try
-                LPomXmlDoc.LoadFromFile(LPomFilename);
-                ExpandPom(LPomXmlDoc, LLocalMavenRepositoryDir);
-                LGroupID := LPomXmlDoc.DocumentElement.ChildNodes['groupId'].Text;
-                LArtifactId := LPomXmlDoc.DocumentElement.ChildNodes['artifactId'].Text;
-                LVersion := LPomXmlDoc.DocumentElement.ChildNodes['version'].Text;
-                if (LGroupID = '') or (LArtifactId='') or (LVersion='') then
-                  raise Exception.Create('Error DD67075B-3B93-4FCD-96C8-D55B931565A5');
-              finally
-                ALFreeAndNil(LPomXmlDoc);
-              end;
-            end
-            else LPomFilename := '';
-
-            //If it's a pom only dependency
-            if ALSameTextU(ALExtractFileExtU(LArchiveFilename), '.pom') then begin
-              LArchiveFilename := '';
-              if LPomFilename = '' then raise Exception.Create('Error 17EA59ED-E5B2-40A0-89AC-6988149B0284');
-            end;
-
-            //update the LLibraries
-            With LLibraries.AddChild('library', ntObject) do begin
-              Addchild('groupid').Text := LGroupID; // com.google.firebase
-              Addchild('artifactid').Text := LArtifactId; // firebase-messaging
-              Addchild('version').Text := LVersion; // 23.1.0
-              Addchild('archivefilename').Text := AnsiString(LArchiveFilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.aar
-              Addchild('pomfilename').Text := AnsiString(LPomFilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.pom
-              With Addchild('dependencyrequirements', ntarray) do begin
-                With addchild(ntobject) do begin
-                  with Addchild('version', ntobject) do begin
-                    Addchild('min').text := LVersion;
-                    Addchild('max').text := LVersion;
+                if LDownloadDependencies and
+                   DownloadLibraryFromCentralMavenRepository(
+                     LLocalMavenRepositoryDir, // const ALocalRepositoryBaseDir: String;
+                     LDependencyGroupID, // const AGroupID: AnsiString;
+                     LDependencyArtifactID, // const AArtifactID: AnsiString;
+                     LDependencyVersion, // const AVersion: AnsiString;
+                     LLocalArchivefilename, // out ALocalArchivefilename: String;
+                     LLocalpomfilename) then begin // out ALocalpomfilename: String): Boolean;
+                  With LLibraries.AddChild('library', ntObject) do begin
+                    Addchild('groupid').Text := LDependencyGroupID; // com.google.firebase
+                    Addchild('artifactid').Text := LDependencyArtifactID; // firebase-messaging
+                    Addchild('version').Text := LDependencyVersion; // 23.1.0
+                    Addchild('archivefilename').Text := AnsiString(LLocalArchivefilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.aar
+                    Addchild('pomfilename').Text := AnsiString(LLocalpomfilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.pom
+                    Addchild('dependencyrequirements', ntarray);
                   end;
-                  with Addchild('by', ntobject) do begin
-                    Addchild('groupid').Text := '';
-                    Addchild('artifactid').Text := '';
-                    Addchild('version').Text := '';
-                  end;
-                end;
-              end;
-            end;
-
-          end;
-        Finally
-          ALFreeAndNil(LLibrariesLst);
-        End;
-        {$ENDREGION}
-
-        {$REGION 'Check all dependancies using Gradle'}
-        if LUseGradle then begin
-          Writeln('Check all dependancies using gradle');
-          var LDependenciesWalkerOriginalDir := ALGetModulePathU + 'DependenciesWalker\';
-          if not TDirectory.Exists(LDependenciesWalkerOriginalDir) then raise EALException.CreateFmt('Directory %s does not exist', [LDependenciesWalkerOriginalDir]);
-          var LDependenciesWalkerTmpDir := LtmpDirectory + 'DependenciesWalker\';
-          TDirectory.CreateDirectory(LDependenciesWalkerTmpDir);
-          //---
-          //copy the DependenciesWalker content in TMP dir
-          if not AlCopyDirectoryU(
-                   LDependenciesWalkerOriginalDir, // SrcDirectory,
-                   LDependenciesWalkerTmpDir, // DestDirectory: ansiString;
-                   true) then // SubDirectory: Boolean;
-            raise Exception.Createfmt('Cannot copy %s to %s', [LDependenciesWalkerOriginalDir, LDependenciesWalkerTmpDir]);
-          //---
-          //Update the build.gradle
-          var LBuildGradleFileName := LDependenciesWalkerTmpDir + 'app\build.gradle';
-          if not Tfile.Exists(LBuildGradleFileName) then raise Exception.CreateFmt('%s does not exist', [LBuildGradleFileName]);
-          Var LBuildGradledependencies: AnsiString := '';
-          for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
-            var LLibrary := LLibraries.ChildNodes[i];
-            Var LGroupID := LLibrary.GetChildNodeValueText('groupid', ''{default});
-            Var Lartifactid := LLibrary.GetChildNodeValueText('artifactid', ''{default});
-            Var LVersion := LLibrary.GetChildNodeValueText('version', ''{default});
-            var LLibraryArchiveFileName := string(LLibrary.GetChildNodeValueText('archivefilename', ''{default}));
-            var LPomFileName := string(LLibrary.GetChildNodeValueText('pomfilename', ''{default}));
-            if (LGroupID <> '') and (Lartifactid <> '') and (LVersion <> '') then begin
-              LBuildGradledependencies := LBuildGradledependencies + '    implementation "'+LGroupID+':'+Lartifactid+':'+LVersion+'"'#13#10;
-              if ((LLibraryArchiveFileName <> '') and
-                  (ALposU(LLocalMavenRepositoryDir, LLibraryArchiveFileName) <> 1))  or
-                 ((LPomFileName <> '') and
-                  (ALposU(LLocalMavenRepositoryDir, LPomFileName) <> 1)) then begin
-                Var LRepositoryDirectory := LDependenciesWalkerTmpDir +
-                                            'localrepository\' +
-                                            ALStringReplaceU(string(LGroupId),'.','\',[RfReplaceALL]) + '\' +
-                                            String(LArtifactId) + '\' +
-                                            string(LVersion) + '\';
-                TDirectory.CreateDirectory(LRepositoryDirectory);
-                if LLibraryArchiveFileName <> '' then
-                  Tfile.Copy(LLibraryArchiveFileName, LRepositoryDirectory + string(LArtifactId)+'-'+string(LVersion) + ALExtractFileExtU(LLibraryArchiveFileName));
-                if LPomFileName <> '' then
-                  Tfile.Copy(LPomFileName, LRepositoryDirectory + string(LArtifactId)+'-'+string(LVersion) + ALExtractFileExtU(LPomFileName));
-              end;
-            end
-            else begin
-              if LLibraryArchiveFileName = '' then raise Exception.Create('Error 6AF219E0-8FDC-4C2A-A112-BBFDB91B9580');
-              if LPomFileName <> '' then raise Exception.Create('Error 6F7C2A3E-76E2-44A6-A2D5-D0BCA4C2F1EA');
-              Writeln('Skip '+string(LLibraryArchiveFileName) + ' (no pom file found)', TALConsoleColor.ccAqua);
-              continue;
-            end;
-          end;
-          var LBuildGradleSrc := ALGetStringFromFileU(LBuildGradleFileName, TEncoding.UTF8);
-          LBuildGradleSrc := AlStringReplaceU(LBuildGradleSrc, '%dependencies%', ALTrimRightU(String(LBuildGradledependencies)), [RfIgnoreCase]);
-          ALSaveStringToFileU(LBuildGradleSrc, LBuildGradleFileName, Tencoding.UTF8, false{WriteBOM});
-          //---
-          var LSettingGradleFileName := LDependenciesWalkerTmpDir + 'settings.gradle';
-          var LLocalMavenRepositoryStr := '';
-          if LLocalMavenRepositoryDir <> '' then begin
-            LLocalMavenRepositoryStr := ALStringReplaceU(LLocalMavenRepositoryDir,'\','/',[RfReplaceALL]);
-            LLocalMavenRepositoryStr := 'maven {url uri("file://'+LLocalMavenRepositoryStr+'")}';
-          end;
-          var LSettingGradleSrc := ALGetStringFromFileU(LSettingGradleFileName, TEncoding.UTF8);
-          LSettingGradleSrc := AlStringReplaceU(LSettingGradleSrc, '%LocalMavenRepository%', LLocalMavenRepositoryStr, [RfIgnoreCase]);
-          ALSaveStringToFileU(LSettingGradleSrc, LSettingGradleFileName, Tencoding.UTF8, false{WriteBOM});
-          //---
-          //run graddle
-          Var LGradleResultSrc: AnsiString;
-          Var LInputStream := TMemorystream.Create;
-          Var LOutputStream := TStringStream.Create;
-          try
-            var LcmdLine := LDependenciesWalkerTmpDir + 'gradlew.bat app:dependencies --configuration releaseRuntimeClasspath --project-dir '+LDependenciesWalkerTmpDir;
-            OverWrite(LcmdLine);
-            Var LCmdLineResult := ALWinExecU(
-                                    LcmdLine, // const aCommandLine: String;
-                                    LDependenciesWalkerTmpDir, // const aCurrentDirectory: AnsiString;
-                                    GetEnvironmentStringWithJavaHomeUpdated, // const aEnvironment: AnsiString;
-                                    LInputStream, // const aInputStream: Tstream;
-                                    LOutputStream); //const aOutputStream: TStream;
-            if LCmdLineResult <> 0 then
-              raise Exception.Createfmt('Failed to execute %s'#13#10'%s', [LcmdLine, LOutputStream.DataString]);
-            LGradleResultSrc := AnsiString(LOutputStream.DataString);
-          finally
-            ALFreeandNil(LInputStream);
-            ALFreeandNil(LOutputStream);
-          end;
-          //analyze LGradleResultSrc
-          var LInDependanciesTree: Boolean := False;
-          Var LGradleResultLst := TALStringList.Create;
-          try
-            LGradleResultLst.Text := LGradleResultSrc;
-            for Var I := 0 to LGradleResultLst.Count - 1 do begin
-              Var LLine := ALTrim(LGradleResultLst[i]); // |    |    |    \--- androidx.annotation:annotation:1.1.0 -> 1.3.0
-              If ALSameText(LLine, 'releaseRuntimeClasspath - Resolved configuration for runtime for variant: release') then begin
-                LInDependanciesTree := True;
-                Continue;
-              end;
-              if not LInDependanciesTree then continue;
-              if LLine = '' then break;
-              if alsametext(LLine, 'No dependencies') then break;
-              while (LLine <> '') and (LLine[low(LLine)] in ['+','|','\','-', ' ']) do
-                delete(LLine, 1, 1); // androidx.annotation:annotation:1.1.0 -> 1.3.0
-              Var LLst := TALstringList.Create;
-              Try
-                LLst.LineBreak := ':';
-                LLst.Text := LLine;
-                if LLst.Count <> 3 then raise Exception.Create('Error 43963A52-56D3-4B57-AA34-816194BCADCE ('+String(LLine)+')');
-                var LDependencyGroupID := LLst[0]; // androidx.annotation
-                var LDependencyArtifactID := LLst[1]; // annotation
-                var LDependencyVersion := LLst[2]; // 1.1.0 -> 1.3.0 (*)
-                Var P := ALpos('->', LDependencyVersion);
-                if P > 0 then begin
-                  delete(LDependencyVersion, 1, P+1); //  1.3.0 (*)
-                end;
-                //(*) - dependencies omitted (listed previously)
-                LDependencyVersion := ALStringReplace(LDependencyVersion, '(*)', '', []); //  1.3.0
-                //(c) - dependency constraint
-                LDependencyVersion := ALStringReplace(LDependencyVersion, '(c)', '', []);
-                LDependencyVersion := ALTrim(LDependencyVersion); // 1.3.0
-                if ALPosExIgnoreCase('FAILED', LDependencyVersion) > 0 then begin
-                  LDependencyVersion := ALTrim(ALStringReplace(LDependencyVersion, 'FAILED', '', [RfIgnoreCase]));
-                  Writeln(
-                    'Cannot resolve '+string(LDependencyGroupID)+':'+string(LDependencyArtifactID)+':'+string(LDependencyVersion),
-                    TALConsoleColor.ccPurple,
-                    true{ASkipDuplicates});
                 end
                 else begin
-                  if ALpos(' ', LDependencyVersion) > 0 then raise Exception.Create('Error CD3F7D9C-874C-4089-B674-9CCCE4AFA50E'#13#10+string(LGradleResultSrc));
-                  if FindLibraryNode(
-                       LLibraries, // const ALibraries: TALJsonDocument;
-                       LDependencyGroupID, // const AGroupID: AnsiString;
-                       LDependencyArtifactID, // const AArtifactID: AnsiString;
-                       LDependencyVersion) <> nil then continue; // const AVersion: AnsiString): TALJsonNode; then
-                  var LLocalArchivefilename: String;
-                  var LLocalpomfilename: String;
-                  if LDownloadDependencies and
-                     DownloadLibraryFromCentralMavenRepository(
-                       LLocalMavenRepositoryDir, // const ALocalRepositoryBaseDir: String;
-                       LDependencyGroupID, // const AGroupID: AnsiString;
-                       LDependencyArtifactID, // const AArtifactID: AnsiString;
-                       LDependencyVersion, // const AVersion: AnsiString;
-                       LLocalArchivefilename, // out ALocalArchivefilename: String;
-                       LLocalpomfilename) then begin // out ALocalpomfilename: String): Boolean;
-                    With LLibraries.AddChild('library', ntObject) do begin
-                      Addchild('groupid').Text := LDependencyGroupID; // com.google.firebase
-                      Addchild('artifactid').Text := LDependencyArtifactID; // firebase-messaging
-                      Addchild('version').Text := LDependencyVersion; // 23.1.0
-                      Addchild('archivefilename').Text := AnsiString(LLocalArchivefilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.aar
-                      Addchild('pomfilename').Text := AnsiString(LLocalpomfilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.pom
-                      Addchild('dependencyrequirements', ntarray);
-                    end;
-                  end
-                  else begin
+                  Writeln(
+                    'Missing Dependency '+string(LDependencyGroupID)+':'+string(LDependencyArtifactID)+':'+string(LDependencyVersion),
+                    TALConsoleColor.ccPurple,
+                    true{ASkipDuplicates});
+                end;
+              end;
+            Finally
+              ALFreeAndNil(LLst);
+            End;
+          end;
+        finally
+          ALFreeAndNil(LGradleResultLst);
+        end;
+        if LInDependanciesTree = False then
+          raise Exception.Create('Error FD57344C-9716-421F-B210-6E5E7B367418');
+      end
+      {$ENDREGION}
+
+      {$REGION 'Check all dependancies using internal algorithm'}
+      //https://books.sonatype.com/mvnref-book/reference/pom-relationships-sect-project-dependencies.html#pom-relationships-sect-version-ranges
+      else begin
+        Writeln('Check all dependancies using internal algorithm');
+        var LLibrariesIdx: integer := 0;
+        while LLibrariesIdx <= LLibraries.ChildNodes.Count - 1 do begin
+
+          {$REGION 'init LLibrary'}
+          var LLibrary := LLibraries.ChildNodes[LLibrariesIdx];
+          inc(LLibrariesIdx);
+          {$ENDREGION}
+
+          {$REGION 'Their is a pom'}
+          var LPomFilename := LLibrary.GetChildNodeValueText('pomfilename', '');
+          if LPomFilename <> '' then begin
+            Try
+              Var LPomXmlDoc := TalXmlDocument.Create('root');
+              try
+
+                {$REGION 'load the pom'}
+                LPomXmlDoc.LoadFromFile(LPomFilename);
+                ExpandPom(LPomXmlDoc, LLocalMavenRepositoryDir);
+                {$ENDREGION}
+
+                {$REGION 'init LdependenciesNode'}
+                Var LdependenciesNode := LPomXmlDoc.DocumentElement.ChildNodes.FindNode('dependencies');
+                {$ENDREGION}
+
+                {$REGION 'no dependency in the pom'}
+                if (LdependenciesNode = nil) or
+                   (LdependenciesNode.ChildNodes.Count = 0) then continue;
+                {$ENDREGION}
+
+                {$REGION 'loop on all dependancies in the pom'}
+                For var J := 0 to LdependenciesNode.ChildNodes.Count - 1 do begin
+
+                  {$REGION 'get infos from the dependency'}
+                  var LdependencyNode := LdependenciesNode.ChildNodes[J];
+                  if LdependencyNode.NodeType <> ntElement then continue;
+                  if LdependencyNode.NodeName <> 'dependency' then raise Exception.Create('Error 15D1E7CC-A4D2-49B0-8755-4EFC06296AA2');
+                  //---
+                  //https://maven.apache.org/guides/introduction/introduction-to-optional-and-excludes-dependencies.html
+                  //When optional=true then they are included only if they are a direct dependancy
+                  //in our case direct dependancy are only the one we included in the command line (ie -libraries params)
+                  //all other are transitive to our project and can be ignored
+                  var LdependancyOptionalNode := LdependencyNode.ChildNodes.FindNode('optional');
+                  if (LdependancyOptionalNode <> nil) then begin
+                    if not ALSameText(LdependancyOptionalNode.Text, 'true') then
+                      raise Exception.Create('Error 711FF857-5288-4013-9A2C-861D5C16E007');
+                    continue;
+                  end;
+                  //---
+                  //scope: This element refers to the classpath of the task at hand (compiling and runtime, testing, etc.) as well as how
+                  //to limit the transitivity of a dependency. There are five scopes available:
+                  //compile - this is the default scope, used if none is specified. Compile dependencies are available in all classpaths.
+                  //          Furthermore, those dependencies are propagated to dependent projects.
+                  //provided - this is much like compile, but indicates you expect the JDK or a container to provide it at runtime.
+                  //           It is only available on the compilation and test classpath, and is not transitive.
+                  //runtime - this scope indicates that the dependency is not required for compilation, but is for execution.
+                  //          It is in the runtime and test classpaths, but not the compile classpath.
+                  //test - this scope indicates that the dependency is not required for normal use of the application,
+                  //       and is only available for the test compilation and execution phases. It is not transitive.
+                  //system - this scope is similar to provided except that you have to provide the JAR which contains it
+                  //         explicitly. The artifact is always available and is not looked up in a repository.
+                  var LDependencyScopeNode := LdependencyNode.ChildNodes.FindNode('scope');
+                  var LDependencyScope: AnsiString;
+                  if LDependencyScopeNode = nil then LDependencyScope := 'compile'
+                  else LDependencyScope := LDependencyScopeNode.Text;
+                  if ALSametext(LDependencyScope, 'test') then continue
+                  else if ALSametext(LDependencyScope, 'provided') then continue // I found stuff like com.google.android:android:4.0.0 (in com.squareup.okhttp3:parent:3.12.1 for exemple)
+                  else if ALSametext(LDependencyScope, 'system') then continue // same as provided, I found also stuff like com.google.android:android:4.0.0 in com.google.zxing:zxing-parent:3.3.3
+                  else if (not ALsametext(LDependencyScope, 'compile')) and
+                          (not ALsametext(LDependencyScope, 'runtime')) then raise Exception.Createfmt('Unknown dependency.scope value "%s"', [LDependencyScope]);
+                  //---
+                  var LDependencyGroupId := LdependencyNode.ChildNodes['groupId'].text;  // com.android.support
+                  var LDependencyArtifactId := LdependencyNode.ChildNodes['artifactId'].text; // support-v4
+                  var LDependencyPreferredVersion: AnsiString;
+                  var LDependencyVersionRequirements := ExpandDependencyVersionRequirements(
+                                                          LDependencyGroupId,
+                                                          LDependencyArtifactId,
+                                                          LdependencyNode.ChildNodes['version'].Text, // [1.0]
+                                                          LDependencyPreferredVersion);
+                  if (LDependencyGroupId = '') or (LDependencyArtifactId = '') or (LDependencyPreferredVersion = '') then
+                    raise Exception.Create('Error E911B0CA-007B-4DAD-A90C-5F7117A8407C');
+                  if length(LDependencyVersionRequirements) = 0 then raise Exception.Create('Error 5B1E62D3-527A-4050-BA8D-ADC727E02304');
+                  if length(LDependencyVersionRequirements) > 1 then raise Exception.Create('Error A1F6B447-9276-4247-BE0D-D82E54C23DF0');
+                  //---
+                  //https://maven.apache.org/guides/introduction/introduction-to-optional-and-excludes-dependencies.html
+                  //I do not handle Dependency Exclusions for now
+                  var LdependancyExclusionsNode := LdependencyNode.ChildNodes.FindNode('exclusions');
+                  if (LdependancyOptionalNode <> nil) and (LdependancyOptionalNode.ChildNodes.Count > 0) then begin
                     Writeln(
-                      'Missing Dependency '+string(LDependencyGroupID)+':'+string(LDependencyArtifactID)+':'+string(LDependencyVersion),
-                      TALConsoleColor.ccPurple,
+                      string(LDependencyGroupID)+':'+string(LDependencyArtifactID)+':'+string(LDependencyPreferredVersion) + ' use dependency exclusions. AndroidMerger do not yet support dependency exclusions',
+                      TALConsoleColor.ccaQua,
                       true{ASkipDuplicates});
                   end;
-                end;
-              Finally
-                ALFreeAndNil(LLst);
-              End;
-            end;
-          finally
-            ALFreeAndNil(LGradleResultLst);
-          end;
-          if LInDependanciesTree = False then
-            raise Exception.Create('Error FD57344C-9716-421F-B210-6E5E7B367418');
-        end
-        {$ENDREGION}
-
-        {$REGION 'Check all dependancies using internal algorithm'}
-        //https://books.sonatype.com/mvnref-book/reference/pom-relationships-sect-project-dependencies.html#pom-relationships-sect-version-ranges
-        else begin
-          Writeln('Check all dependancies using internal algorithm');
-          var LLibrariesIdx: integer := 0;
-          while LLibrariesIdx <= LLibraries.ChildNodes.Count - 1 do begin
-
-            {$REGION 'init LLibrary'}
-            var LLibrary := LLibraries.ChildNodes[LLibrariesIdx];
-            inc(LLibrariesIdx);
-            {$ENDREGION}
-
-            {$REGION 'Their is a pom'}
-            var LPomFilename := LLibrary.GetChildNodeValueText('pomfilename', '');
-            if LPomFilename <> '' then begin
-              Try
-                Var LPomXmlDoc := TalXmlDocument.Create('root');
-                try
-
-                  {$REGION 'load the pom'}
-                  LPomXmlDoc.LoadFromFile(LPomFilename);
-                  ExpandPom(LPomXmlDoc, LLocalMavenRepositoryDir);
                   {$ENDREGION}
 
-                  {$REGION 'init LdependenciesNode'}
-                  Var LdependenciesNode := LPomXmlDoc.DocumentElement.ChildNodes.FindNode('dependencies');
+                  {$REGION 'init LAlreadyIncludedDependencyLibrary'}
+                  var LAlreadyIncludedDependencyLibrary := FindLibraryNode(
+                                                             LLibraries, // const ALibraries: TALJsonDocument;
+                                                             LDependencyGroupID, // const AGroupID: AnsiString;
+                                                             LDependencyArtifactID, // const AArtifactID: AnsiString;
+                                                             ''); // const AVersion: AnsiString): TALJsonNode;
                   {$ENDREGION}
 
-                  {$REGION 'no dependency in the pom'}
-                  if (LdependenciesNode = nil) or
-                     (LdependenciesNode.ChildNodes.Count = 0) then continue;
-                  {$ENDREGION}
-
-                  {$REGION 'loop on all dependancies in the pom'}
-                  For var J := 0 to LdependenciesNode.ChildNodes.Count - 1 do begin
-
-                    {$REGION 'get infos from the dependency'}
-                    var LdependencyNode := LdependenciesNode.ChildNodes[J];
-                    if LdependencyNode.NodeType <> ntElement then continue;
-                    if LdependencyNode.NodeName <> 'dependency' then raise Exception.Create('Error 15D1E7CC-A4D2-49B0-8755-4EFC06296AA2');
-                    //---
-                    //https://maven.apache.org/guides/introduction/introduction-to-optional-and-excludes-dependencies.html
-                    //When optional=true then they are included only if they are a direct dependancy
-                    //in our case direct dependancy are only the one we included in the command line (ie -libraries params)
-                    //all other are transitive to our project and can be ignored
-                    var LdependancyOptionalNode := LdependencyNode.ChildNodes.FindNode('optional');
-                    if (LdependancyOptionalNode <> nil) then begin
-                      if not ALSameText(LdependancyOptionalNode.Text, 'true') then
-                        raise Exception.Create('Error 711FF857-5288-4013-9A2C-861D5C16E007');
-                      continue;
-                    end;
-                    //---
-                    //scope: This element refers to the classpath of the task at hand (compiling and runtime, testing, etc.) as well as how
-                    //to limit the transitivity of a dependency. There are five scopes available:
-                    //compile - this is the default scope, used if none is specified. Compile dependencies are available in all classpaths.
-                    //          Furthermore, those dependencies are propagated to dependent projects.
-                    //provided - this is much like compile, but indicates you expect the JDK or a container to provide it at runtime.
-                    //           It is only available on the compilation and test classpath, and is not transitive.
-                    //runtime - this scope indicates that the dependency is not required for compilation, but is for execution.
-                    //          It is in the runtime and test classpaths, but not the compile classpath.
-                    //test - this scope indicates that the dependency is not required for normal use of the application,
-                    //       and is only available for the test compilation and execution phases. It is not transitive.
-                    //system - this scope is similar to provided except that you have to provide the JAR which contains it
-                    //         explicitly. The artifact is always available and is not looked up in a repository.
-                    var LDependencyScopeNode := LdependencyNode.ChildNodes.FindNode('scope');
-                    var LDependencyScope: AnsiString;
-                    if LDependencyScopeNode = nil then LDependencyScope := 'compile'
-                    else LDependencyScope := LDependencyScopeNode.Text;
-                    if ALSametext(LDependencyScope, 'test') then continue
-                    else if ALSametext(LDependencyScope, 'provided') then continue // I found stuff like com.google.android:android:4.0.0 (in com.squareup.okhttp3:parent:3.12.1 for exemple)
-                    else if ALSametext(LDependencyScope, 'system') then continue // same as provided, I found also stuff like com.google.android:android:4.0.0 in com.google.zxing:zxing-parent:3.3.3
-                    else if (not ALsametext(LDependencyScope, 'compile')) and
-                            (not ALsametext(LDependencyScope, 'runtime')) then raise Exception.Createfmt('Unknown dependency.scope value "%s"', [LDependencyScope]);
-                    //---
-                    var LDependencyGroupId := LdependencyNode.ChildNodes['groupId'].text;  // com.android.support
-                    var LDependencyArtifactId := LdependencyNode.ChildNodes['artifactId'].text; // support-v4
-                    var LDependencyPreferredVersion: AnsiString;
-                    var LDependencyVersionRequirements := ExpandDependencyVersionRequirements(
-                                                            LDependencyGroupId,
-                                                            LDependencyArtifactId,
-                                                            LdependencyNode.ChildNodes['version'].Text, // [1.0]
-                                                            LDependencyPreferredVersion);
-                    if (LDependencyGroupId = '') or (LDependencyArtifactId = '') or (LDependencyPreferredVersion = '') then
-                      raise Exception.Create('Error E911B0CA-007B-4DAD-A90C-5F7117A8407C');
-                    if length(LDependencyVersionRequirements) = 0 then raise Exception.Create('Error 5B1E62D3-527A-4050-BA8D-ADC727E02304');
-                    if length(LDependencyVersionRequirements) > 1 then raise Exception.Create('Error A1F6B447-9276-4247-BE0D-D82E54C23DF0');
-                    //---
-                    //https://maven.apache.org/guides/introduction/introduction-to-optional-and-excludes-dependencies.html
-                    //I do not handle Dependency Exclusions for now
-                    var LdependancyExclusionsNode := LdependencyNode.ChildNodes.FindNode('exclusions');
-                    if (LdependancyOptionalNode <> nil) and (LdependancyOptionalNode.ChildNodes.Count > 0) then begin
-                      Writeln(
-                        string(LDependencyGroupID)+':'+string(LDependencyArtifactID)+':'+string(LDependencyPreferredVersion) + ' use dependency exclusions. AndroidMerger do not yet support dependency exclusions',
-                        TALConsoleColor.ccaQua,
-                        true{ASkipDuplicates});
-                    end;
-                    {$ENDREGION}
-
-                    {$REGION 'init LAlreadyIncludedDependencyLibrary'}
-                    var LAlreadyIncludedDependencyLibrary := FindLibraryNode(
-                                                               LLibraries, // const ALibraries: TALJsonDocument;
-                                                               LDependencyGroupID, // const AGroupID: AnsiString;
-                                                               LDependencyArtifactID, // const AArtifactID: AnsiString;
-                                                               ''); // const AVersion: AnsiString): TALJsonNode;
-                    {$ENDREGION}
-
-                    {$REGION 'We do not yet have any version of the dependency already included'}
-                    if (LAlreadyIncludedDependencyLibrary = nil) then begin
-                      var LLocalArchivefilename: String;
-                      var LLocalpomfilename: String;
-                      if LDownloadDependencies and
-                         DownloadLibraryFromCentralMavenRepository(
-                           LLocalMavenRepositoryDir, // const ALocalRepositoryBaseDir: String;
-                           LDependencyGroupID, // const AGroupID: AnsiString;
-                           LDependencyArtifactID, // const AArtifactID: AnsiString;
-                           LDependencyPreferredVersion, // const AVersion: AnsiString;
-                           LLocalArchivefilename, // out ALocalArchivefilename: String;
-                           LLocalpomfilename) then begin // out ALocalpomfilename: String): Boolean;
-                        With LLibraries.AddChild('library', ntObject) do begin
-                          Addchild('groupid').Text := LDependencyGroupID; // com.google.firebase
-                          Addchild('artifactid').Text := LDependencyArtifactID; // firebase-messaging
-                          Addchild('version').Text := LDependencyPreferredVersion; // 23.1.0
-                          Addchild('archivefilename').Text := AnsiString(LLocalArchivefilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.aar
-                          Addchild('pomfilename').Text := AnsiString(LLocalpomfilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.pom
-                          With Addchild('dependencyrequirements', ntarray) do begin
-                            for var K := Low(LDependencyVersionRequirements) to High(LDependencyVersionRequirements) do begin
-                              With addchild(ntobject) do begin
-                                with Addchild('version', ntobject) do begin
-                                  Addchild('min').text := LDependencyVersionRequirements[k].Key;
-                                  Addchild('max').text := LDependencyVersionRequirements[k].value;
-                                end;
-                                with Addchild('by', ntobject) do begin
-                                  Addchild('groupid').Text := LLibrary.GetChildNodeValueText('groupid', ''{default});
-                                  Addchild('artifactid').Text := LLibrary.GetChildNodeValueText('artifactid', ''{default});
-                                  Addchild('version').Text := LLibrary.GetChildNodeValueText('version', ''{default});
-                                end;
+                  {$REGION 'We do not yet have any version of the dependency already included'}
+                  if (LAlreadyIncludedDependencyLibrary = nil) then begin
+                    var LLocalArchivefilename: String;
+                    var LLocalpomfilename: String;
+                    if LDownloadDependencies and
+                       DownloadLibraryFromCentralMavenRepository(
+                         LLocalMavenRepositoryDir, // const ALocalRepositoryBaseDir: String;
+                         LDependencyGroupID, // const AGroupID: AnsiString;
+                         LDependencyArtifactID, // const AArtifactID: AnsiString;
+                         LDependencyPreferredVersion, // const AVersion: AnsiString;
+                         LLocalArchivefilename, // out ALocalArchivefilename: String;
+                         LLocalpomfilename) then begin // out ALocalpomfilename: String): Boolean;
+                      With LLibraries.AddChild('library', ntObject) do begin
+                        Addchild('groupid').Text := LDependencyGroupID; // com.google.firebase
+                        Addchild('artifactid').Text := LDependencyArtifactID; // firebase-messaging
+                        Addchild('version').Text := LDependencyPreferredVersion; // 23.1.0
+                        Addchild('archivefilename').Text := AnsiString(LLocalArchivefilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.aar
+                        Addchild('pomfilename').Text := AnsiString(LLocalpomfilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.pom
+                        With Addchild('dependencyrequirements', ntarray) do begin
+                          for var K := Low(LDependencyVersionRequirements) to High(LDependencyVersionRequirements) do begin
+                            With addchild(ntobject) do begin
+                              with Addchild('version', ntobject) do begin
+                                Addchild('min').text := LDependencyVersionRequirements[k].Key;
+                                Addchild('max').text := LDependencyVersionRequirements[k].value;
+                              end;
+                              with Addchild('by', ntobject) do begin
+                                Addchild('groupid').Text := LLibrary.GetChildNodeValueText('groupid', ''{default});
+                                Addchild('artifactid').Text := LLibrary.GetChildNodeValueText('artifactid', ''{default});
+                                Addchild('version').Text := LLibrary.GetChildNodeValueText('version', ''{default});
                               end;
                             end;
                           end;
                         end;
-                      end
-                      else begin
-                        Writeln(
-                          'Missing Dependency '+string(LDependencyGroupID)+':'+string(LDependencyArtifactID)+':'+string(LDependencyPreferredVersion),
-                          TALConsoleColor.ccPurple,
-                          true{ASkipDuplicates});
                       end;
                     end
+                    else begin
+                      Writeln(
+                        'Missing Dependency '+string(LDependencyGroupID)+':'+string(LDependencyArtifactID)+':'+string(LDependencyPreferredVersion),
+                        TALConsoleColor.ccPurple,
+                        true{ASkipDuplicates});
+                    end;
+                  end
+                  {$ENDREGION}
+
+                  {$REGION 'We do have a version of the dependency already included'}
+                  else begin
+
+                    {$REGION 'Check that the range of DependencyVersionRequirements cross the range of AlreadyIncludedDependencyRequirements'}
+                    //this will not work perfectly with a dependency that have 2 ranges
+                    //for exemple the version xx need the dependency Y with a version between 0 .. 1.1 or 1.2 .. maxint
+                    //I do not complicate my life for now as I think this will never happen
+                    for var K := Low(LDependencyVersionRequirements) to High(LDependencyVersionRequirements) do begin
+                      var LDependencyVersionRequirementMin := LDependencyVersionRequirements[k].Key;
+                      var LDependencyVersionRequirementMax := LDependencyVersionRequirements[k].value;
+                      var LAlreadyIncludedDependencyRequirementsNode := LAlreadyIncludedDependencyLibrary.ChildNodes['dependencyrequirements'];
+                      for var L := 0 to LAlreadyIncludedDependencyRequirementsNode.ChildNodes.Count - 1 do begin
+                        var LAlreadyIncludedDependencyRequirementNode := LAlreadyIncludedDependencyRequirementsNode.ChildNodes[L];
+                        var LVersionRelationShip1: integer;
+                        var LVersionRelationShip2: integer;
+                        if ((CompareVersion(LDependencyVersionRequirementMax, LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'min'], ''{default}), LVersionRelationShip1)) and (LVersionRelationShip1 < 0)) or
+                           ((CompareVersion(LDependencyVersionRequirementMin, LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'max'], ''{default}), LVersionRelationShip2)) and (LVersionRelationShip2 > 0)) then begin
+                          Var LProjectName := LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['by', 'groupid'], ''{default});
+                          if LProjectName <> '' then
+                            LProjectName := LProjectName + ':' +
+                                            LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['by', 'artifactid'], ''{default}) + ':' +
+                                            LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['by', 'version'], ''{default})
+                          else
+                            LProjectName := 'The project';
+                          var LErrorMessage:= 'Dependency version conflicts. ' +
+                                              LProjectName + ' ' +
+                                              'need a version of '+
+                                              LDependencyGroupId + ':' +
+                                              LDependencyGroupID + ' ' +
+                                              'between ' +
+                                              LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'min'], ''{default}) + '..' +
+                                              LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'max'], ''{default}) + ' ' +
+                                              'and ' +
+                                              LLibrary.GetChildNodeValueText('groupid', '') +':'+
+                                              LLibrary.GetChildNodeValueText('artifactid', '') +':'+
+                                              LLibrary.GetChildNodeValueText('version', '') + ' ' +
+                                              'need a version between ' +
+                                              LDependencyVersionRequirementMin + '..' +
+                                              LDependencyVersionRequirementMax;
+                          LErrorMessage := ALStringReplace(LErrorMessage, ALinttostr(ALMaxint64), '<maxint>', [rfReplaceALL]);
+                          LPomFilename := '';
+                          raise EALException.Create(LErrorMessage);
+                        end;
+                      end;
+                    end;
                     {$ENDREGION}
 
-                    {$REGION 'We do have a version of the dependency already included'}
-                    else begin
-
-                      {$REGION 'Check that the range of DependencyVersionRequirements cross the range of AlreadyIncludedDependencyRequirements'}
-                      //this will not work perfectly with a dependency that have 2 ranges
-                      //for exemple the version xx need the dependency Y with a version between 0 .. 1.1 or 1.2 .. maxint
-                      //I do not complicate my life for now as I think this will never happen
+                    {$REGION 'Update the AlreadyIncludedDependencyRequirements'}
+                    With LAlreadyIncludedDependencyLibrary.ChildNodes['dependencyrequirements'] do begin
                       for var K := Low(LDependencyVersionRequirements) to High(LDependencyVersionRequirements) do begin
-                        var LDependencyVersionRequirementMin := LDependencyVersionRequirements[k].Key;
-                        var LDependencyVersionRequirementMax := LDependencyVersionRequirements[k].value;
-                        var LAlreadyIncludedDependencyRequirementsNode := LAlreadyIncludedDependencyLibrary.ChildNodes['dependencyrequirements'];
-                        for var L := 0 to LAlreadyIncludedDependencyRequirementsNode.ChildNodes.Count - 1 do begin
-                          var LAlreadyIncludedDependencyRequirementNode := LAlreadyIncludedDependencyRequirementsNode.ChildNodes[L];
-                          var LVersionRelationShip1: integer;
-                          var LVersionRelationShip2: integer;
-                          if ((CompareVersion(LDependencyVersionRequirementMax, LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'min'], ''{default}), LVersionRelationShip1)) and (LVersionRelationShip1 < 0)) or
-                             ((CompareVersion(LDependencyVersionRequirementMin, LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'max'], ''{default}), LVersionRelationShip2)) and (LVersionRelationShip2 > 0)) then begin
-                            Var LProjectName := LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['by', 'groupid'], ''{default});
-                            if LProjectName <> '' then
-                              LProjectName := LProjectName + ':' +
-                                              LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['by', 'artifactid'], ''{default}) + ':' +
-                                              LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['by', 'version'], ''{default})
-                            else
-                              LProjectName := 'The project';
-                            var LErrorMessage:= 'Dependency version conflicts. ' +
-                                                LProjectName + ' ' +
-                                                'need a version of '+
-                                                LDependencyGroupId + ':' +
-                                                LDependencyGroupID + ' ' +
-                                                'between ' +
-                                                LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'min'], ''{default}) + '..' +
-                                                LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'max'], ''{default}) + ' ' +
-                                                'and ' +
-                                                LLibrary.GetChildNodeValueText('groupid', '') +':'+
-                                                LLibrary.GetChildNodeValueText('artifactid', '') +':'+
-                                                LLibrary.GetChildNodeValueText('version', '') + ' ' +
-                                                'need a version between ' +
-                                                LDependencyVersionRequirementMin + '..' +
-                                                LDependencyVersionRequirementMax;
-                            LErrorMessage := ALStringReplace(LErrorMessage, ALinttostr(ALMaxint64), '<maxint>', [rfReplaceALL]);
-                            LPomFilename := '';
-                            raise EALException.Create(LErrorMessage);
+                        With addchild(ntobject) do begin
+                          with Addchild('version', ntobject) do begin
+                            Addchild('min').text := LDependencyVersionRequirements[k].Key;
+                            Addchild('max').text := LDependencyVersionRequirements[k].value;
+                          end;
+                          with Addchild('by', ntobject) do begin
+                            Addchild('groupid').Text := LLibrary.GetChildNodeValueText('groupid', ''{default});
+                            Addchild('artifactid').Text := LLibrary.GetChildNodeValueText('artifactid', ''{default});
+                            Addchild('version').Text := LLibrary.GetChildNodeValueText('version', ''{default});
                           end;
                         end;
                       end;
-                      {$ENDREGION}
+                    end;
+                    {$ENDREGION}
 
-                      {$REGION 'Update the AlreadyIncludedDependencyRequirements'}
-                      With LAlreadyIncludedDependencyLibrary.ChildNodes['dependencyrequirements'] do begin
-                        for var K := Low(LDependencyVersionRequirements) to High(LDependencyVersionRequirements) do begin
-                          With addchild(ntobject) do begin
-                            with Addchild('version', ntobject) do begin
-                              Addchild('min').text := LDependencyVersionRequirements[k].Key;
-                              Addchild('max').text := LDependencyVersionRequirements[k].value;
-                            end;
-                            with Addchild('by', ntobject) do begin
-                              Addchild('groupid').Text := LLibrary.GetChildNodeValueText('groupid', ''{default});
-                              Addchild('artifactid').Text := LLibrary.GetChildNodeValueText('artifactid', ''{default});
-                              Addchild('version').Text := LLibrary.GetChildNodeValueText('version', ''{default});
-                            end;
-                          end;
-                        end;
-                      end;
-                      {$ENDREGION}
+                    {$REGION 'check if the current preferred version is the most adequate'}
+                    var LVersionRelationShip: integer;
+                    if CompareVersion(
+                         LDependencyPreferredVersion,
+                         LAlreadyIncludedDependencyLibrary.GetChildNodeValueText('version', ''{default}),
+                         LVersionRelationShip) and (LVersionRelationShip > 0) then begin
 
-                      {$REGION 'check if the current preferred version is the most adequate'}
-                      var LVersionRelationShip: integer;
-                      if CompareVersion(
-                           LDependencyPreferredVersion,
-                           LAlreadyIncludedDependencyLibrary.GetChildNodeValueText('version', ''{default}),
-                           LVersionRelationShip) and (LVersionRelationShip > 0) then begin
-
-                        //check that LDependencyPreferredVersion fulfill all the requierement
-                        var LDependencyPreferredVersionFulFillRequierements: Boolean := True;
-                        var LAlreadyIncludedDependencyRequirementsNode := LAlreadyIncludedDependencyLibrary.ChildNodes['dependencyrequirements'];
-                        for var K := 0 to LAlreadyIncludedDependencyRequirementsNode.ChildNodes.Count - 1 do begin
-                          var LAlreadyIncludedDependencyRequirementNode := LAlreadyIncludedDependencyRequirementsNode.ChildNodes[K];
-                          var LVersionRelationShip1: integer;
-                          var LVersionRelationShip2: integer;
-                          if ((CompareVersion(LDependencyPreferredVersion, LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'min'], ''{default}), LVersionRelationShip1)) and (LVersionRelationShip1 < 0)) or
-                             ((CompareVersion(LDependencyPreferredVersion, LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'max'], ''{default}), LVersionRelationShip2)) and (LVersionRelationShip2 > 0)) then begin
-                            LDependencyPreferredVersionFulFillRequierements := False;
-                            break;
-                          end;
-                        end;
-
-                        //The LDependencyPreferredVersion fulfill all requierements
-                        if LDependencyPreferredVersionFulFillRequierements then begin
-
-                          //download the new dependency
-                          var LLocalArchivefilename: String;
-                          var LLocalpomfilename: String;
-                          if LDownloadDependencies and
-                             DownloadLibraryFromCentralMavenRepository(
-                               LLocalMavenRepositoryDir, // const ALocalRepositoryBaseDir: String;
-                               LDependencyGroupID, // const AGroupID: AnsiString;
-                               LDependencyArtifactID, // const AArtifactID: AnsiString;
-                               LDependencyPreferredVersion, // const AVersion: AnsiString;
-                               LLocalArchivefilename, // out ALocalArchivefilename: String;
-                               LLocalpomfilename) then begin // out ALocalpomfilename: String): Boolean;
-
-                            //add the new node
-                            var LTmpNode := LLibraries.AddChild('library', ntObject);
-                            With LTmpNode do begin
-                              Addchild('groupid').Text := LDependencyGroupID; // com.google.firebase
-                              Addchild('artifactid').Text := LDependencyArtifactID; // firebase-messaging
-                              Addchild('version').Text := LDependencyPreferredVersion; // 23.1.0
-                              Addchild('archivefilename').Text := AnsiString(LLocalArchivefilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.aar
-                              Addchild('pomfilename').Text := AnsiString(LLocalpomfilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.pom
-                              With Addchild('dependencyrequirements', ntarray) do begin
-                                While LAlreadyIncludedDependencyRequirementsNode.ChildNodes.Count > 0 do
-                                  Childnodes.Add(LAlreadyIncludedDependencyRequirementsNode.ChildNodes.Extract(0));
-                              end;
-                            end;
-
-                            //delete the old dependency
-                            var LTodeleteGroupID := LAlreadyIncludedDependencyLibrary.GetChildNodeValueText('groupid', ''{default});
-                            var LTodeleteArtifactid := LAlreadyIncludedDependencyLibrary.GetChildNodeValueText('artifactid', ''{default});
-                            var LTodeleteVersion := LAlreadyIncludedDependencyLibrary.GetChildNodeValueText('version', ''{default});
-                            if (LTodeleteGroupID = '') or (LTodeleteArtifactid = '') or (LTodeleteVersion = '') then
-                              raise Exception.Create('Error 47607420-D49C-4D38-9185-A2B597EF7551');
-                            RemoveLibraryNode(
-                              LLibraries, // const ALibraries: TALJsonDocument;
-                              LTodeleteGroupID, // const AGroupID: AnsiString;
-                              LTodeleteArtifactid, // const AArtifactID: AnsiString;
-                              LTodeleteVersion); // const AVersion: AnsiString): TALJsonNode;
-
-                            //update all dependencyrequirements
-                            for var K := LLibraries.ChildNodes.Count - 1 downto 0 do begin
-                              if LLibraries.ChildNodes[K] = LTmpNode then continue;
-                              Var LdependencyrequirementsNode := LLibraries.ChildNodes[K].ChildNodes['dependencyrequirements'];
-                              for var L := LdependencyrequirementsNode.ChildNodes.Count - 1 downto 0 do begin
-                                var LdependencyrequirementNode := LdependencyrequirementsNode.ChildNodes[L];
-                                if (LdependencyrequirementNode.GetChildNodeValueText(['by', 'groupid'], ''{default}) = LTodeleteGroupID) and
-                                   (LdependencyrequirementNode.GetChildNodeValueText(['by', 'artifactid'], ''{default}) = LTodeleteArtifactid) and
-                                   (LdependencyrequirementNode.GetChildNodeValueText(['by', 'version'], ''{default}) = LTodeleteVersion) then
-                                  LdependencyrequirementsNode.ChildNodes.Delete(L);
-                              end;
-                              if LdependencyrequirementsNode.ChildNodes.Count = 0 then
-                                LLibraries.ChildNodes.Delete(K);
-                            end;
-
-                            //update LAlreadyIncludedDependencyLibrary
-                            LAlreadyIncludedDependencyLibrary := LTmpNode;
-
-                            //instruct to restart the main loop from 0 because we don't know
-                            //how many libraries we deleted so LLibrariesIdx is not anymore accurate
-                            //I m a little lazzy I know
-                            LLibrariesIdx := 0;
-
-                          end
-
-                          //could not download the new dependency, just add a warning
-                          else begin
-                            Writeln(
-                              'Dependency out-of-date. '+string(LDependencyGroupID)+':'+string(LDependencyArtifactID)+':'+string(LDependencyPreferredVersion) + ' seam more adequate than the included version ' + string(LAlreadyIncludedDependencyLibrary.GetChildNodeValueText('version', ''{default})),
-                              TALConsoleColor.ccPurple,
-                              true{ASkipDuplicates});
-                          end;
-
-                        end;
-
-                      end;
-                      {$ENDREGION}
-
-                      {$REGION 'check if the dependency version is still inside version requierements'}
+                      //check that LDependencyPreferredVersion fulfill all the requierement
+                      var LDependencyPreferredVersionFulFillRequierements: Boolean := True;
                       var LAlreadyIncludedDependencyRequirementsNode := LAlreadyIncludedDependencyLibrary.ChildNodes['dependencyrequirements'];
-                      var LAlreadyIncludedDependencyVersion := LAlreadyIncludedDependencyLibrary.GetChildNodeValueText('version', ''{default});
                       for var K := 0 to LAlreadyIncludedDependencyRequirementsNode.ChildNodes.Count - 1 do begin
                         var LAlreadyIncludedDependencyRequirementNode := LAlreadyIncludedDependencyRequirementsNode.ChildNodes[K];
                         var LVersionRelationShip1: integer;
                         var LVersionRelationShip2: integer;
-                        if ((CompareVersion(LAlreadyIncludedDependencyVersion, LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'min'], ''{default}), LVersionRelationShip1)) and (LVersionRelationShip1 < 0)) or
-                           ((CompareVersion(LAlreadyIncludedDependencyVersion, LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'max'], ''{default}), LVersionRelationShip2)) and (LVersionRelationShip2 > 0)) then begin
-                          raise EALException.Create('Dependency version conflicts.');
+                        if ((CompareVersion(LDependencyPreferredVersion, LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'min'], ''{default}), LVersionRelationShip1)) and (LVersionRelationShip1 < 0)) or
+                           ((CompareVersion(LDependencyPreferredVersion, LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'max'], ''{default}), LVersionRelationShip2)) and (LVersionRelationShip2 > 0)) then begin
+                          LDependencyPreferredVersionFulFillRequierements := False;
+                          break;
                         end;
                       end;
-                      {$ENDREGION}
 
+                      //The LDependencyPreferredVersion fulfill all requierements
+                      if LDependencyPreferredVersionFulFillRequierements then begin
+
+                        //download the new dependency
+                        var LLocalArchivefilename: String;
+                        var LLocalpomfilename: String;
+                        if LDownloadDependencies and
+                           DownloadLibraryFromCentralMavenRepository(
+                             LLocalMavenRepositoryDir, // const ALocalRepositoryBaseDir: String;
+                             LDependencyGroupID, // const AGroupID: AnsiString;
+                             LDependencyArtifactID, // const AArtifactID: AnsiString;
+                             LDependencyPreferredVersion, // const AVersion: AnsiString;
+                             LLocalArchivefilename, // out ALocalArchivefilename: String;
+                             LLocalpomfilename) then begin // out ALocalpomfilename: String): Boolean;
+
+                          //add the new node
+                          var LTmpNode := LLibraries.AddChild('library', ntObject);
+                          With LTmpNode do begin
+                            Addchild('groupid').Text := LDependencyGroupID; // com.google.firebase
+                            Addchild('artifactid').Text := LDependencyArtifactID; // firebase-messaging
+                            Addchild('version').Text := LDependencyPreferredVersion; // 23.1.0
+                            Addchild('archivefilename').Text := AnsiString(LLocalArchivefilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.aar
+                            Addchild('pomfilename').Text := AnsiString(LLocalpomfilename); // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.pom
+                            With Addchild('dependencyrequirements', ntarray) do begin
+                              While LAlreadyIncludedDependencyRequirementsNode.ChildNodes.Count > 0 do
+                                Childnodes.Add(LAlreadyIncludedDependencyRequirementsNode.ChildNodes.Extract(0));
+                            end;
+                          end;
+
+                          //delete the old dependency
+                          var LTodeleteGroupID := LAlreadyIncludedDependencyLibrary.GetChildNodeValueText('groupid', ''{default});
+                          var LTodeleteArtifactid := LAlreadyIncludedDependencyLibrary.GetChildNodeValueText('artifactid', ''{default});
+                          var LTodeleteVersion := LAlreadyIncludedDependencyLibrary.GetChildNodeValueText('version', ''{default});
+                          if (LTodeleteGroupID = '') or (LTodeleteArtifactid = '') or (LTodeleteVersion = '') then
+                            raise Exception.Create('Error 47607420-D49C-4D38-9185-A2B597EF7551');
+                          RemoveLibraryNode(
+                            LLibraries, // const ALibraries: TALJsonDocument;
+                            LTodeleteGroupID, // const AGroupID: AnsiString;
+                            LTodeleteArtifactid, // const AArtifactID: AnsiString;
+                            LTodeleteVersion); // const AVersion: AnsiString): TALJsonNode;
+
+                          //update all dependencyrequirements
+                          for var K := LLibraries.ChildNodes.Count - 1 downto 0 do begin
+                            if LLibraries.ChildNodes[K] = LTmpNode then continue;
+                            Var LdependencyrequirementsNode := LLibraries.ChildNodes[K].ChildNodes['dependencyrequirements'];
+                            for var L := LdependencyrequirementsNode.ChildNodes.Count - 1 downto 0 do begin
+                              var LdependencyrequirementNode := LdependencyrequirementsNode.ChildNodes[L];
+                              if (LdependencyrequirementNode.GetChildNodeValueText(['by', 'groupid'], ''{default}) = LTodeleteGroupID) and
+                                 (LdependencyrequirementNode.GetChildNodeValueText(['by', 'artifactid'], ''{default}) = LTodeleteArtifactid) and
+                                 (LdependencyrequirementNode.GetChildNodeValueText(['by', 'version'], ''{default}) = LTodeleteVersion) then
+                                LdependencyrequirementsNode.ChildNodes.Delete(L);
+                            end;
+                            if LdependencyrequirementsNode.ChildNodes.Count = 0 then
+                              LLibraries.ChildNodes.Delete(K);
+                          end;
+
+                          //update LAlreadyIncludedDependencyLibrary
+                          LAlreadyIncludedDependencyLibrary := LTmpNode;
+
+                          //instruct to restart the main loop from 0 because we don't know
+                          //how many libraries we deleted so LLibrariesIdx is not anymore accurate
+                          //I m a little lazzy I know
+                          LLibrariesIdx := 0;
+
+                        end
+
+                        //could not download the new dependency, just add a warning
+                        else begin
+                          Writeln(
+                            'Dependency out-of-date. '+string(LDependencyGroupID)+':'+string(LDependencyArtifactID)+':'+string(LDependencyPreferredVersion) + ' seam more adequate than the included version ' + string(LAlreadyIncludedDependencyLibrary.GetChildNodeValueText('version', ''{default})),
+                            TALConsoleColor.ccPurple,
+                            true{ASkipDuplicates});
+                        end;
+
+                      end;
+
+                    end;
+                    {$ENDREGION}
+
+                    {$REGION 'check if the dependency version is still inside version requierements'}
+                    var LAlreadyIncludedDependencyRequirementsNode := LAlreadyIncludedDependencyLibrary.ChildNodes['dependencyrequirements'];
+                    var LAlreadyIncludedDependencyVersion := LAlreadyIncludedDependencyLibrary.GetChildNodeValueText('version', ''{default});
+                    for var K := 0 to LAlreadyIncludedDependencyRequirementsNode.ChildNodes.Count - 1 do begin
+                      var LAlreadyIncludedDependencyRequirementNode := LAlreadyIncludedDependencyRequirementsNode.ChildNodes[K];
+                      var LVersionRelationShip1: integer;
+                      var LVersionRelationShip2: integer;
+                      if ((CompareVersion(LAlreadyIncludedDependencyVersion, LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'min'], ''{default}), LVersionRelationShip1)) and (LVersionRelationShip1 < 0)) or
+                         ((CompareVersion(LAlreadyIncludedDependencyVersion, LAlreadyIncludedDependencyRequirementNode.GetChildNodeValueText(['version', 'max'], ''{default}), LVersionRelationShip2)) and (LVersionRelationShip2 > 0)) then begin
+                        raise EALException.Create('Dependency version conflicts.');
+                      end;
                     end;
                     {$ENDREGION}
 
                   end;
                   {$ENDREGION}
 
-                finally
-                  ALFreeAndNil(LPomXmlDoc);
                 end;
-              Except
-                On E: Exception do begin
-                  if LPomFilename <> '' then
-                    raise Exception.CreateFmt('%s - %s', [E.Message, LPomFilename])
-                  else
-                    raise;
-                end;
-              End;
-            end
-            {$ENDREGION}
+                {$ENDREGION}
 
-            {$REGION 'their is no pom'}
-            //If it's a directory and not an archive (jar/aar) then do no show any warning
-            //because no pom could be associated with a directory
-            else begin
-              Writeln(
-                'Skip ' + String(LLibrary.GetChildNodeValueText('archivefilename', '') + ' (no pom file found)'),
-                TALConsoleColor.ccAqua,
-                true{ASkipDuplicates});
-            end;
-            {$ENDREGION}
+              finally
+                ALFreeAndNil(LPomXmlDoc);
+              end;
+            Except
+              On E: Exception do begin
+                if LPomFilename <> '' then
+                  raise Exception.CreateFmt('%s - %s', [E.Message, LPomFilename])
+                else
+                  raise;
+              end;
+            End;
+          end
+          {$ENDREGION}
 
+          {$REGION 'their is no pom'}
+          //If it's a directory and not an archive (jar/aar) then do no show any warning
+          //because no pom could be associated with a directory
+          else begin
+            Writeln(
+              'Skip ' + String(LLibrary.GetChildNodeValueText('archivefilename', '') + ' (no pom file found)'),
+              TALConsoleColor.ccAqua,
+              true{ASkipDuplicates});
+          end;
+          {$ENDREGION}
+
+        end;
+      end;
+      {$ENDREGION}
+
+      {$REGION 'init LSupportLibraryToAndroidx'}
+      //https://developer.android.com/jetpack/androidx/migrate/artifact-mappings
+      LSupportLibraryToAndroidx.add('android.arch.core:common=androidx.arch.core:core-common');
+      LSupportLibraryToAndroidx.add('android.arch.core:core=androidx.arch.core:core');
+      LSupportLibraryToAndroidx.add('android.arch.core:core-testing=androidx.arch.core:core-testing');
+      LSupportLibraryToAndroidx.add('android.arch.core:runtime=androidx.arch.core:core-runtime');
+      LSupportLibraryToAndroidx.add('android.arch.lifecycle:common=androidx.lifecycle:lifecycle-common');
+      LSupportLibraryToAndroidx.add('android.arch.lifecycle:common-java8=androidx.lifecycle:lifecycle-common-java8');
+      LSupportLibraryToAndroidx.add('android.arch.lifecycle:compiler=androidx.lifecycle:lifecycle-compiler');
+      LSupportLibraryToAndroidx.add('android.arch.lifecycle:extensions=androidx.lifecycle:lifecycle-extensions');
+      LSupportLibraryToAndroidx.add('android.arch.lifecycle:livedata=androidx.lifecycle:lifecycle-livedata');
+      LSupportLibraryToAndroidx.add('android.arch.lifecycle:livedata-core=androidx.lifecycle:lifecycle-livedata-core');
+      LSupportLibraryToAndroidx.add('android.arch.lifecycle:reactivestreams=androidx.lifecycle:lifecycle-reactivestreams');
+      LSupportLibraryToAndroidx.add('android.arch.lifecycle:runtime=androidx.lifecycle:lifecycle-runtime');
+      LSupportLibraryToAndroidx.add('android.arch.lifecycle:viewmodel=androidx.lifecycle:lifecycle-viewmodel');
+      LSupportLibraryToAndroidx.add('android.arch.paging:common=androidx.paging:paging-common');
+      LSupportLibraryToAndroidx.add('android.arch.paging:runtime=androidx.paging:paging-runtime');
+      LSupportLibraryToAndroidx.add('android.arch.paging:rxjava2=androidx.paging:paging-rxjava2');
+      LSupportLibraryToAndroidx.add('android.arch.persistence.room:common=androidx.room:room-common');
+      LSupportLibraryToAndroidx.add('android.arch.persistence.room:compiler=androidx.room:room-compiler');
+      LSupportLibraryToAndroidx.add('android.arch.persistence.room:guava=androidx.room:room-guava');
+      LSupportLibraryToAndroidx.add('android.arch.persistence.room:migration=androidx.room:room-migration');
+      LSupportLibraryToAndroidx.add('android.arch.persistence.room:runtime=androidx.room:room-runtime');
+      LSupportLibraryToAndroidx.add('android.arch.persistence.room:rxjava2=androidx.room:room-rxjava2');
+      LSupportLibraryToAndroidx.add('android.arch.persistence.room:testing=androidx.room:room-testing');
+      LSupportLibraryToAndroidx.add('android.arch.persistence:db=androidx.sqlite:sqlite');
+      LSupportLibraryToAndroidx.add('android.arch.persistence:db-framework=androidx.sqlite:sqlite-framework');
+      LSupportLibraryToAndroidx.add('com.android.support.constraint:constraint-layout=androidx.constraintlayout:constraintlayout');
+      LSupportLibraryToAndroidx.add('com.android.support.constraint:constraint-layout-solver=androidx.constraintlayout:constraintlayout-solver');
+      LSupportLibraryToAndroidx.add('com.android.support.test.espresso.idling:idling-concurrent=androidx.test.espresso.idling:idling-concurrent');
+      LSupportLibraryToAndroidx.add('com.android.support.test.espresso.idling:idling-net=androidx.test.espresso.idling:idling-net');
+      LSupportLibraryToAndroidx.add('com.android.support.test.espresso:espresso-accessibility=androidx.test.espresso:espresso-accessibility');
+      LSupportLibraryToAndroidx.add('com.android.support.test.espresso:espresso-contrib=androidx.test.espresso:espresso-contrib');
+      LSupportLibraryToAndroidx.add('com.android.support.test.espresso:espresso-core=androidx.test.espresso:espresso-core');
+      LSupportLibraryToAndroidx.add('com.android.support.test.espresso:espresso-idling-resource=androidx.test.espresso:espresso-idling-resource');
+      LSupportLibraryToAndroidx.add('com.android.support.test.espresso:espresso-intents=androidx.test.espresso:espresso-intents');
+      LSupportLibraryToAndroidx.add('com.android.support.test.espresso:espresso-remote=androidx.test.espresso:espresso-remote');
+      LSupportLibraryToAndroidx.add('com.android.support.test.espresso:espresso-web=androidx.test.espresso:espresso-web');
+      LSupportLibraryToAndroidx.add('com.android.support.test.janktesthelper:janktesthelper=androidx.test.jank:janktesthelper');
+      LSupportLibraryToAndroidx.add('com.android.support.test.services:test-services=androidx.test:test-services');
+      LSupportLibraryToAndroidx.add('com.android.support.test.uiautomator:uiautomator=androidx.test.uiautomator:uiautomator');
+      LSupportLibraryToAndroidx.add('com.android.support.test:monitor=androidx.test:monitor');
+      LSupportLibraryToAndroidx.add('com.android.support.test:orchestrator=androidx.test:orchestrator');
+      LSupportLibraryToAndroidx.add('com.android.support.test:rules=androidx.test:rules');
+      LSupportLibraryToAndroidx.add('com.android.support.test:runner=androidx.test:runner');
+      LSupportLibraryToAndroidx.add('com.android.support:animated-vector-drawable=androidx.vectordrawable:vectordrawable-animated');
+      LSupportLibraryToAndroidx.add('com.android.support:appcompat-v7=androidx.appcompat:appcompat');
+      LSupportLibraryToAndroidx.add('com.android.support:asynclayoutinflater=androidx.asynclayoutinflater:asynclayoutinflater');
+      LSupportLibraryToAndroidx.add('com.android.support:car=androidx.car:car');
+      LSupportLibraryToAndroidx.add('com.android.support:cardview-v7=androidx.cardview:cardview');
+      LSupportLibraryToAndroidx.add('com.android.support:collections=androidx.collection:collection');
+      LSupportLibraryToAndroidx.add('com.android.support:coordinatorlayout=androidx.coordinatorlayout:coordinatorlayout');
+      LSupportLibraryToAndroidx.add('com.android.support:cursoradapter=androidx.cursoradapter:cursoradapter');
+      LSupportLibraryToAndroidx.add('com.android.support:customtabs=androidx.browser:browser');
+      LSupportLibraryToAndroidx.add('com.android.support:customview=androidx.customview:customview');
+      LSupportLibraryToAndroidx.add('com.android.support:design=com.google.android.material:material');
+      LSupportLibraryToAndroidx.add('com.android.support:documentfile=androidx.documentfile:documentfile');
+      LSupportLibraryToAndroidx.add('com.android.support:drawerlayout=androidx.drawerlayout:drawerlayout');
+      LSupportLibraryToAndroidx.add('com.android.support:exifinterface=androidx.exifinterface:exifinterface');
+      LSupportLibraryToAndroidx.add('com.android.support:gridlayout-v7=androidx.gridlayout:gridlayout');
+      LSupportLibraryToAndroidx.add('com.android.support:heifwriter=androidx.heifwriter:heifwriter');
+      LSupportLibraryToAndroidx.add('com.android.support:interpolator=androidx.interpolator:interpolator');
+      LSupportLibraryToAndroidx.add('com.android.support:leanback-v17=androidx.leanback:leanback');
+      LSupportLibraryToAndroidx.add('com.android.support:loader=androidx.loader:loader');
+      LSupportLibraryToAndroidx.add('com.android.support:localbroadcastmanager=androidx.localbroadcastmanager:localbroadcastmanager');
+      LSupportLibraryToAndroidx.add('com.android.support:media2=androidx.media2:media2');
+      LSupportLibraryToAndroidx.add('com.android.support:media2-exoplayer=androidx.media2:media2-exoplayer');
+      LSupportLibraryToAndroidx.add('com.android.support:mediarouter-v7=androidx.mediarouter:mediarouter');
+      LSupportLibraryToAndroidx.add('com.android.support:multidex=androidx.multidex:multidex');
+      LSupportLibraryToAndroidx.add('com.android.support:multidex-instrumentation=androidx.multidex:multidex-instrumentation');
+      LSupportLibraryToAndroidx.add('com.android.support:palette-v7=androidx.palette:palette');
+      LSupportLibraryToAndroidx.add('com.android.support:percent=androidx.percentlayout:percentlayout');
+      LSupportLibraryToAndroidx.add('com.android.support:preference-leanback-v17=androidx.leanback:leanback-preference');
+      LSupportLibraryToAndroidx.add('com.android.support:preference-v14=androidx.legacy:legacy-preference-v14');
+      LSupportLibraryToAndroidx.add('com.android.support:preference-v7=androidx.preference:preference');
+      LSupportLibraryToAndroidx.add('com.android.support:print=androidx.print:print');
+      LSupportLibraryToAndroidx.add('com.android.support:recommendation=androidx.recommendation:recommendation');
+      LSupportLibraryToAndroidx.add('com.android.support:recyclerview-selection=androidx.recyclerview:recyclerview-selection');
+      LSupportLibraryToAndroidx.add('com.android.support:recyclerview-v7=androidx.recyclerview:recyclerview');
+      LSupportLibraryToAndroidx.add('com.android.support:slices-builders=androidx.slice:slice-builders');
+      LSupportLibraryToAndroidx.add('com.android.support:slices-core=androidx.slice:slice-core');
+      LSupportLibraryToAndroidx.add('com.android.support:slices-view=androidx.slice:slice-view');
+      LSupportLibraryToAndroidx.add('com.android.support:slidingpanelayout=androidx.slidingpanelayout:slidingpanelayout');
+      LSupportLibraryToAndroidx.add('com.android.support:support-annotations=androidx.annotation:annotation');
+      LSupportLibraryToAndroidx.add('com.android.support:support-compat=androidx.core:core');
+      LSupportLibraryToAndroidx.add('com.android.support:support-content=androidx.contentpager:contentpager');
+      LSupportLibraryToAndroidx.add('com.android.support:support-core-ui=androidx.legacy:legacy-support-core-ui');
+      LSupportLibraryToAndroidx.add('com.android.support:support-core-utils=androidx.legacy:legacy-support-core-utils');
+      LSupportLibraryToAndroidx.add('com.android.support:support-dynamic-animation=androidx.dynamicanimation:dynamicanimation');
+      LSupportLibraryToAndroidx.add('com.android.support:support-emoji=androidx.emoji:emoji');
+      LSupportLibraryToAndroidx.add('com.android.support:support-emoji-appcompat=androidx.emoji:emoji-appcompat');
+      LSupportLibraryToAndroidx.add('com.android.support:support-emoji-bundled=androidx.emoji:emoji-bundled');
+      LSupportLibraryToAndroidx.add('com.android.support:support-fragment=androidx.fragment:fragment');
+      LSupportLibraryToAndroidx.add('com.android.support:support-media-compat=androidx.media:media');
+      LSupportLibraryToAndroidx.add('com.android.support:support-tv-provider=androidx.tvprovider:tvprovider');
+      LSupportLibraryToAndroidx.add('com.android.support:support-v13=androidx.legacy:legacy-support-v13');
+      LSupportLibraryToAndroidx.add('com.android.support:support-v4=androidx.legacy:legacy-support-v4');
+      LSupportLibraryToAndroidx.add('com.android.support:support-vector-drawable=androidx.vectordrawable:vectordrawable');
+      LSupportLibraryToAndroidx.add('com.android.support:swiperefreshlayout=androidx.swiperefreshlayout:swiperefreshlayout');
+      LSupportLibraryToAndroidx.add('com.android.support:textclassifier=androidx.textclassifier:textclassifier');
+      LSupportLibraryToAndroidx.add('com.android.support:transition=androidx.transition:transition');
+      LSupportLibraryToAndroidx.add('com.android.support:versionedparcelable=androidx.versionedparcelable:versionedparcelable');
+      LSupportLibraryToAndroidx.add('com.android.support:viewpager=androidx.viewpager:viewpager');
+      LSupportLibraryToAndroidx.add('com.android.support:wear=androidx.wear:wear');
+      LSupportLibraryToAndroidx.add('com.android.support:webkit=androidx.webkit:webkit');
+      {$ENDREGION}
+
+      {$REGION 'Check we use AndroidX instead of old support library'}
+      Writeln('Check AndroidX support');
+      for Var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
+        var LLibraryNode := LLibraries.ChildNodes[i];
+        Var LLibraryID := LLibraryNode.GetChildNodeValueText('groupid', ''{default}) + ':' + LLibraryNode.GetChildNodeValueText('artifactid', ''{default});
+        var J := LSupportLibraryToAndroidx.IndexOfName(LLibraryID);
+        if J >= 0 then
+          Writeln(
+            String(LLibraryID)+' is a deprecated old support library. Please use instead ' + String(LSupportLibraryToAndroidx.ValueFromIndex[J]),
+            TALConsoleColor.ccAqua);
+      end;
+      {$ENDREGION}
+
+      {$REGION 'Uncompress all AAR libraries'}
+      Writeln('Uncompress all AAR libraries');
+      for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
+        var LLibrary := LLibraries.ChildNodes[i];
+        var LLibraryArchiveFileName := string(LLibrary.GetChildNodeValueText('archivefilename', ''{default}));
+        if LLibraryArchiveFileName = '' then continue;
+        Var LUncompressDir := LtmpDirectoryLibraries+
+                              String(LLibrary.GetChildNodeValueText('groupid', ''{default}))+'-'+
+                              String(LLibrary.GetChildNodeValueText('artifactid', ''{default}))+'-'+
+                              String(LLibrary.GetChildNodeValueText('version', ''{default}))+'\';
+        if LUncompressDir = LtmpDirectoryLibraries + '--\' then
+          LUncompressDir := LtmpDirectoryLibraries + ALExtractFilenameU(ALExcludeTrailingPathDelimiterU(LLibraryArchiveFileName), true{RemoveFileExt})+'\';
+        LLibrary.SetChildNodeValueText('uncompressdir', ansiString(LUncompressDir));
+        if TDirectory.Exists(LLibraryArchiveFileName) then begin
+          if not AlCopyDirectoryU(
+                   LLibraryArchiveFileName, // SrcDirectory,
+                   LUncompressDir, // DestDirectory: ansiString;
+                   true) then // SubDirectory: Boolean;
+            raise Exception.Createfmt('Cannot copy %s to %s', [LLibraryArchiveFileName, LUncompressDir]);
+        end
+        else if ALSameTextU(TPath.GetExtension(LLibraryArchiveFileName), '.jar') then begin
+          TDirectory.CreateDirectory(LUncompressDir);
+          TFile.Copy(LLibraryArchiveFileName, LUncompressDir + TPath.GetFileName(LLibraryArchiveFileName));
+        end
+        else if TFile.exists(LLibraryArchiveFileName) then begin
+          if TZipFile.IsValid(LLibraryArchiveFileName) then TZipFile.ExtractZipFile(LLibraryArchiveFileName, LUncompressDir, nil)
+          else raise Exception.CreateFmt('Invalid aar file: %s', [LLibraryArchiveFileName]);
+        end
+        else raise Exception.CreateFmt('Unknown library: %s', [LLibraryArchiveFileName]);
+      end;
+      {$ENDREGION}
+
+      {$REGION 'Copy all jar to <OutputDir>\libs'}
+      Writeln('Copy all jar to <OutputDir>\libs');
+      for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
+        var LUncompressDir := string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}));
+        if LUncompressDir = '' then continue;
+        //--
+        var LJarFiles := TDirectory.GetFiles(LUncompressDir, '*.jar', TSearchOption.soTopDirectoryOnly);
+        if length(LJarFiles) = 0 then continue;
+        //--
+        Var LTmpJarFile: TStringDynArray;
+        Setlength(LTmpJarFile, 0);
+        for Var J := Low(LJarFiles) to High(LJarFiles) do begin
+          if ALSameTextU(ALExtractFilenameU(LJarFiles[J]), 'lint.jar') or
+             ALSameTextU(ALExtractFilenameU(LJarFiles[J]), 'inspector.jar') then continue;
+          Setlength(LTmpJarFile, length(LTmpJarFile) + 1);
+          LTmpJarFile[high(LTmpJarFile)] := LJarFiles[J];
+        end;
+        LJarFiles := LTmpJarFile;
+        //--
+        if length(LJarFiles) = 0 then raise Exception.CreateFmt('Erreur 7E56249A-8B43-411D-9834-9D6334D7226B. %s', [LUncompressDir]);
+        if length(LJarFiles) > 1 then raise Exception.CreateFmt('Their cannot be more than one classes.jar at the root of a library. %s', [LUncompressDir]);
+        //--
+        var LDestFilename := LLibsOutputDir + ALExtractFilenameU(ALExcludeTrailingPathDelimiterU(LUncompressDir)) + '.jar';
+        Tfile.Copy(LJarFiles[0], LDestFilename);
+        if Tdirectory.Exists(LUncompressDir + '\libs') then begin
+          var LlibsFiles := TDirectory.GetFiles(LUncompressDir + '\libs', '*', TSearchOption.soAllDirectories);
+          for var J := Low(LlibsFiles) to High(LlibsFiles) do begin
+            if not ALSameTextU(ALExtractFileExtU(LlibsFiles[j]), '.jar') then raise Exception.Create('Error 1BE76D9D-49BC-4CA7-971C-40B81C01B1C9');
+            Tfile.Copy(LlibsFiles[j], LLibsOutputDir + ALExtractFilenameU(ALExcludeTrailingPathDelimiterU(LUncompressDir)) + '-'+ ALExtractFileNameU(LlibsFiles[j]));
           end;
         end;
-        {$ENDREGION}
+      end;
+      {$ENDREGION}
 
-        {$REGION 'init LSupportLibraryToAndroidx'}
-        //https://developer.android.com/jetpack/androidx/migrate/artifact-mappings
-        LSupportLibraryToAndroidx.add('android.arch.core:common=androidx.arch.core:core-common');
-        LSupportLibraryToAndroidx.add('android.arch.core:core=androidx.arch.core:core');
-        LSupportLibraryToAndroidx.add('android.arch.core:core-testing=androidx.arch.core:core-testing');
-        LSupportLibraryToAndroidx.add('android.arch.core:runtime=androidx.arch.core:core-runtime');
-        LSupportLibraryToAndroidx.add('android.arch.lifecycle:common=androidx.lifecycle:lifecycle-common');
-        LSupportLibraryToAndroidx.add('android.arch.lifecycle:common-java8=androidx.lifecycle:lifecycle-common-java8');
-        LSupportLibraryToAndroidx.add('android.arch.lifecycle:compiler=androidx.lifecycle:lifecycle-compiler');
-        LSupportLibraryToAndroidx.add('android.arch.lifecycle:extensions=androidx.lifecycle:lifecycle-extensions');
-        LSupportLibraryToAndroidx.add('android.arch.lifecycle:livedata=androidx.lifecycle:lifecycle-livedata');
-        LSupportLibraryToAndroidx.add('android.arch.lifecycle:livedata-core=androidx.lifecycle:lifecycle-livedata-core');
-        LSupportLibraryToAndroidx.add('android.arch.lifecycle:reactivestreams=androidx.lifecycle:lifecycle-reactivestreams');
-        LSupportLibraryToAndroidx.add('android.arch.lifecycle:runtime=androidx.lifecycle:lifecycle-runtime');
-        LSupportLibraryToAndroidx.add('android.arch.lifecycle:viewmodel=androidx.lifecycle:lifecycle-viewmodel');
-        LSupportLibraryToAndroidx.add('android.arch.paging:common=androidx.paging:paging-common');
-        LSupportLibraryToAndroidx.add('android.arch.paging:runtime=androidx.paging:paging-runtime');
-        LSupportLibraryToAndroidx.add('android.arch.paging:rxjava2=androidx.paging:paging-rxjava2');
-        LSupportLibraryToAndroidx.add('android.arch.persistence.room:common=androidx.room:room-common');
-        LSupportLibraryToAndroidx.add('android.arch.persistence.room:compiler=androidx.room:room-compiler');
-        LSupportLibraryToAndroidx.add('android.arch.persistence.room:guava=androidx.room:room-guava');
-        LSupportLibraryToAndroidx.add('android.arch.persistence.room:migration=androidx.room:room-migration');
-        LSupportLibraryToAndroidx.add('android.arch.persistence.room:runtime=androidx.room:room-runtime');
-        LSupportLibraryToAndroidx.add('android.arch.persistence.room:rxjava2=androidx.room:room-rxjava2');
-        LSupportLibraryToAndroidx.add('android.arch.persistence.room:testing=androidx.room:room-testing');
-        LSupportLibraryToAndroidx.add('android.arch.persistence:db=androidx.sqlite:sqlite');
-        LSupportLibraryToAndroidx.add('android.arch.persistence:db-framework=androidx.sqlite:sqlite-framework');
-        LSupportLibraryToAndroidx.add('com.android.support.constraint:constraint-layout=androidx.constraintlayout:constraintlayout');
-        LSupportLibraryToAndroidx.add('com.android.support.constraint:constraint-layout-solver=androidx.constraintlayout:constraintlayout-solver');
-        LSupportLibraryToAndroidx.add('com.android.support.test.espresso.idling:idling-concurrent=androidx.test.espresso.idling:idling-concurrent');
-        LSupportLibraryToAndroidx.add('com.android.support.test.espresso.idling:idling-net=androidx.test.espresso.idling:idling-net');
-        LSupportLibraryToAndroidx.add('com.android.support.test.espresso:espresso-accessibility=androidx.test.espresso:espresso-accessibility');
-        LSupportLibraryToAndroidx.add('com.android.support.test.espresso:espresso-contrib=androidx.test.espresso:espresso-contrib');
-        LSupportLibraryToAndroidx.add('com.android.support.test.espresso:espresso-core=androidx.test.espresso:espresso-core');
-        LSupportLibraryToAndroidx.add('com.android.support.test.espresso:espresso-idling-resource=androidx.test.espresso:espresso-idling-resource');
-        LSupportLibraryToAndroidx.add('com.android.support.test.espresso:espresso-intents=androidx.test.espresso:espresso-intents');
-        LSupportLibraryToAndroidx.add('com.android.support.test.espresso:espresso-remote=androidx.test.espresso:espresso-remote');
-        LSupportLibraryToAndroidx.add('com.android.support.test.espresso:espresso-web=androidx.test.espresso:espresso-web');
-        LSupportLibraryToAndroidx.add('com.android.support.test.janktesthelper:janktesthelper=androidx.test.jank:janktesthelper');
-        LSupportLibraryToAndroidx.add('com.android.support.test.services:test-services=androidx.test:test-services');
-        LSupportLibraryToAndroidx.add('com.android.support.test.uiautomator:uiautomator=androidx.test.uiautomator:uiautomator');
-        LSupportLibraryToAndroidx.add('com.android.support.test:monitor=androidx.test:monitor');
-        LSupportLibraryToAndroidx.add('com.android.support.test:orchestrator=androidx.test:orchestrator');
-        LSupportLibraryToAndroidx.add('com.android.support.test:rules=androidx.test:rules');
-        LSupportLibraryToAndroidx.add('com.android.support.test:runner=androidx.test:runner');
-        LSupportLibraryToAndroidx.add('com.android.support:animated-vector-drawable=androidx.vectordrawable:vectordrawable-animated');
-        LSupportLibraryToAndroidx.add('com.android.support:appcompat-v7=androidx.appcompat:appcompat');
-        LSupportLibraryToAndroidx.add('com.android.support:asynclayoutinflater=androidx.asynclayoutinflater:asynclayoutinflater');
-        LSupportLibraryToAndroidx.add('com.android.support:car=androidx.car:car');
-        LSupportLibraryToAndroidx.add('com.android.support:cardview-v7=androidx.cardview:cardview');
-        LSupportLibraryToAndroidx.add('com.android.support:collections=androidx.collection:collection');
-        LSupportLibraryToAndroidx.add('com.android.support:coordinatorlayout=androidx.coordinatorlayout:coordinatorlayout');
-        LSupportLibraryToAndroidx.add('com.android.support:cursoradapter=androidx.cursoradapter:cursoradapter');
-        LSupportLibraryToAndroidx.add('com.android.support:customtabs=androidx.browser:browser');
-        LSupportLibraryToAndroidx.add('com.android.support:customview=androidx.customview:customview');
-        LSupportLibraryToAndroidx.add('com.android.support:design=com.google.android.material:material');
-        LSupportLibraryToAndroidx.add('com.android.support:documentfile=androidx.documentfile:documentfile');
-        LSupportLibraryToAndroidx.add('com.android.support:drawerlayout=androidx.drawerlayout:drawerlayout');
-        LSupportLibraryToAndroidx.add('com.android.support:exifinterface=androidx.exifinterface:exifinterface');
-        LSupportLibraryToAndroidx.add('com.android.support:gridlayout-v7=androidx.gridlayout:gridlayout');
-        LSupportLibraryToAndroidx.add('com.android.support:heifwriter=androidx.heifwriter:heifwriter');
-        LSupportLibraryToAndroidx.add('com.android.support:interpolator=androidx.interpolator:interpolator');
-        LSupportLibraryToAndroidx.add('com.android.support:leanback-v17=androidx.leanback:leanback');
-        LSupportLibraryToAndroidx.add('com.android.support:loader=androidx.loader:loader');
-        LSupportLibraryToAndroidx.add('com.android.support:localbroadcastmanager=androidx.localbroadcastmanager:localbroadcastmanager');
-        LSupportLibraryToAndroidx.add('com.android.support:media2=androidx.media2:media2');
-        LSupportLibraryToAndroidx.add('com.android.support:media2-exoplayer=androidx.media2:media2-exoplayer');
-        LSupportLibraryToAndroidx.add('com.android.support:mediarouter-v7=androidx.mediarouter:mediarouter');
-        LSupportLibraryToAndroidx.add('com.android.support:multidex=androidx.multidex:multidex');
-        LSupportLibraryToAndroidx.add('com.android.support:multidex-instrumentation=androidx.multidex:multidex-instrumentation');
-        LSupportLibraryToAndroidx.add('com.android.support:palette-v7=androidx.palette:palette');
-        LSupportLibraryToAndroidx.add('com.android.support:percent=androidx.percentlayout:percentlayout');
-        LSupportLibraryToAndroidx.add('com.android.support:preference-leanback-v17=androidx.leanback:leanback-preference');
-        LSupportLibraryToAndroidx.add('com.android.support:preference-v14=androidx.legacy:legacy-preference-v14');
-        LSupportLibraryToAndroidx.add('com.android.support:preference-v7=androidx.preference:preference');
-        LSupportLibraryToAndroidx.add('com.android.support:print=androidx.print:print');
-        LSupportLibraryToAndroidx.add('com.android.support:recommendation=androidx.recommendation:recommendation');
-        LSupportLibraryToAndroidx.add('com.android.support:recyclerview-selection=androidx.recyclerview:recyclerview-selection');
-        LSupportLibraryToAndroidx.add('com.android.support:recyclerview-v7=androidx.recyclerview:recyclerview');
-        LSupportLibraryToAndroidx.add('com.android.support:slices-builders=androidx.slice:slice-builders');
-        LSupportLibraryToAndroidx.add('com.android.support:slices-core=androidx.slice:slice-core');
-        LSupportLibraryToAndroidx.add('com.android.support:slices-view=androidx.slice:slice-view');
-        LSupportLibraryToAndroidx.add('com.android.support:slidingpanelayout=androidx.slidingpanelayout:slidingpanelayout');
-        LSupportLibraryToAndroidx.add('com.android.support:support-annotations=androidx.annotation:annotation');
-        LSupportLibraryToAndroidx.add('com.android.support:support-compat=androidx.core:core');
-        LSupportLibraryToAndroidx.add('com.android.support:support-content=androidx.contentpager:contentpager');
-        LSupportLibraryToAndroidx.add('com.android.support:support-core-ui=androidx.legacy:legacy-support-core-ui');
-        LSupportLibraryToAndroidx.add('com.android.support:support-core-utils=androidx.legacy:legacy-support-core-utils');
-        LSupportLibraryToAndroidx.add('com.android.support:support-dynamic-animation=androidx.dynamicanimation:dynamicanimation');
-        LSupportLibraryToAndroidx.add('com.android.support:support-emoji=androidx.emoji:emoji');
-        LSupportLibraryToAndroidx.add('com.android.support:support-emoji-appcompat=androidx.emoji:emoji-appcompat');
-        LSupportLibraryToAndroidx.add('com.android.support:support-emoji-bundled=androidx.emoji:emoji-bundled');
-        LSupportLibraryToAndroidx.add('com.android.support:support-fragment=androidx.fragment:fragment');
-        LSupportLibraryToAndroidx.add('com.android.support:support-media-compat=androidx.media:media');
-        LSupportLibraryToAndroidx.add('com.android.support:support-tv-provider=androidx.tvprovider:tvprovider');
-        LSupportLibraryToAndroidx.add('com.android.support:support-v13=androidx.legacy:legacy-support-v13');
-        LSupportLibraryToAndroidx.add('com.android.support:support-v4=androidx.legacy:legacy-support-v4');
-        LSupportLibraryToAndroidx.add('com.android.support:support-vector-drawable=androidx.vectordrawable:vectordrawable');
-        LSupportLibraryToAndroidx.add('com.android.support:swiperefreshlayout=androidx.swiperefreshlayout:swiperefreshlayout');
-        LSupportLibraryToAndroidx.add('com.android.support:textclassifier=androidx.textclassifier:textclassifier');
-        LSupportLibraryToAndroidx.add('com.android.support:transition=androidx.transition:transition');
-        LSupportLibraryToAndroidx.add('com.android.support:versionedparcelable=androidx.versionedparcelable:versionedparcelable');
-        LSupportLibraryToAndroidx.add('com.android.support:viewpager=androidx.viewpager:viewpager');
-        LSupportLibraryToAndroidx.add('com.android.support:wear=androidx.wear:wear');
-        LSupportLibraryToAndroidx.add('com.android.support:webkit=androidx.webkit:webkit');
-        {$ENDREGION}
-
-        {$REGION 'Check we use AndroidX instead of old support library'}
-        Writeln('Check AndroidX support');
-        for Var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
-          var LLibraryNode := LLibraries.ChildNodes[i];
-          Var LLibraryID := LLibraryNode.GetChildNodeValueText('groupid', ''{default}) + ':' + LLibraryNode.GetChildNodeValueText('artifactid', ''{default});
-          var J := LSupportLibraryToAndroidx.IndexOfName(LLibraryID);
-          if J >= 0 then
-            Writeln(
-              String(LLibraryID)+' is a deprecated old support library. Please use instead ' + String(LSupportLibraryToAndroidx.ValueFromIndex[J]),
-              TALConsoleColor.ccAqua);
+      {$REGION 'Copy all jni to <OutputDir>\jni'}
+      Writeln('Copy all jni to <OutputDir>\jni');
+      for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
+        var LUncompressDir := string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}));
+        if LUncompressDir = '' then continue;
+        if Tdirectory.Exists(LUncompressDir + '\jni\arm64-v8a') then begin
+          var LJniFiles := TDirectory.GetFiles(LUncompressDir + '\jni\arm64-v8a', '*', TSearchOption.soAllDirectories);
+          for var J := Low(LJniFiles) to High(LJniFiles) do begin
+            if not ALSameTextU(ALExtractFileExtU(LJniFiles[j]), '.so') then raise Exception.Create('Error 2FCFB6D0-987A-40EC-BBAC-66D5ADC50DC2');
+            TDirectory.CreateDirectory(LJniOutputDir + '\arm64-v8a\');
+            Tfile.Copy(LJniFiles[j], LJniOutputDir + '\arm64-v8a\' + ALExtractFileNameU(LJniFiles[j]));
+          end;
         end;
-        {$ENDREGION}
+        if Tdirectory.Exists(LUncompressDir + '\jni\armeabi-v7a') then begin
+          var LJniFiles := TDirectory.GetFiles(LUncompressDir + '\jni\armeabi-v7a', '*', TSearchOption.soAllDirectories);
+          for var J := Low(LJniFiles) to High(LJniFiles) do begin
+            if not ALSameTextU(ALExtractFileExtU(LJniFiles[j]), '.so') then raise Exception.Create('Error F6BF26A7-A378-4A94-A8CB-C861DB38E11E');
+            TDirectory.CreateDirectory(LJniOutputDir + '\armeabi-v7a\');
+            Tfile.Copy(LJniFiles[j], LJniOutputDir + '\armeabi-v7a\' + ALExtractFileNameU(LJniFiles[j]));
+          end;
+        end;
+      end;
+      {$ENDREGION}
 
-        {$REGION 'Uncompress all AAR libraries'}
-        Writeln('Uncompress all AAR libraries');
+      {$REGION 'make all AndroidManifest ready'}
+      for var I := 0 to LLibraries.ChildNodes.Count - 1 do
+        MakeAndroidManifestReady(string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}))+'\AndroidManifest.xml');
+      {$ENDREGION}
+
+      {$REGION 'Merge resources in <OutputDir>\res'}
+      Writeln('Merge resources in <OutputDir>\res');
+      for var I := 0 to LLibraries.childNodes.Count - 1 do
+        MergeResources(
+          string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}))+'\res\', // const ASrcDir: String;
+          LResOutputDir, // const ADestDir: String;
+          ''); // const ASubPath: String
+      {$ENDREGION}
+
+      {$REGION 'Merge google-services.json in <OutputDir>\res'}
+      if LGoogleServicesJson <> '' then begin
+        Writeln('Merge google-services.json in <OutputDir>\res');
+        var LGoogleServicesjsonDoc := TalJsonDocument.Create;
+        var LStringsXmlDoc := TalXmlDocument.Create('resources');
+        try
+          LStringsXmlDoc.Options := [doNodeAutoIndent];
+          LGoogleServicesjsonDoc.LoadFromJSONFile(ansistring(LGoogleServicesJson));
+          //---
+          var LClientNode := LGoogleServicesjsonDoc.ChildNodes.FindNode('client');
+          if LClientNode = nil then raise Exception.Create('Could not find client node in google-services.json');
+          if LClientNode.ChildNodes.Count <> 1 then raise Exception.Create('client node must have only 1 child in google-services.json');
+          LClientNode := LClientNode.ChildNodes[0];
+          //---
+          var LOauthClientNode := LClientNode.ChildNodes.FindNode('oauth_client');
+          if LOauthClientNode = nil then raise Exception.Create('Could not find client.oauth_client node in google-services.json');
+          if LOauthClientNode.ChildNodes.Count <> 1 then raise Exception.Create('client.oauth_client node must have only 1 child in google-services.json');
+          LOauthClientNode := LOauthClientNode.ChildNodes[0];
+          if LOauthClientNode.GetChildNodeValueFloat('client_type',0) <> 3 then raise Exception.Create('client.oauth_client node must have client_type=3 child node in google-services.json');
+          //---
+          var LApikeyNode := LClientNode.ChildNodes.FindNode('api_key');
+          if LApikeyNode = nil then raise Exception.Create('Could not find client.api_key node in google-services.json');
+          if LApikeyNode.ChildNodes.Count <> 1 then raise Exception.Create('client.api_key node must have only 1 child in google-services.json');
+          LApikeyNode := LApikeyNode.ChildNodes[0];
+          //---
+          //<?xml version="1.0" encoding="utf-8"?>
+          //<resources>
+          //  <string name="default_web_client_id" translatable="false">473525438998-cfesrloac4k87aam569gnivgdkfvckqo.apps.googleusercontent.com</string> <!-- client/oauth_client/client_id (client_type == 3) -->
+          //  <string name="gcm_defaultSenderId" translatable="false">473525438998</string> <!-- project_info/project_number -->
+          //  <string name="google_api_key" translatable="false">AIzaSyD9y8sPkHve0fsgH11UVgBqcRBTRyqrt7E</string> <!-- client/api_key/current_key -->
+          //  <string name="google_app_id" translatable="false">1:473525438998:android:4de91fba3dae57c7e50337</string> <!-- client/client_info/mobilesdk_app_id -->
+          //  <string name="google_crash_reporting_api_key" translatable="false">AIzaSyD9y8sPkHve0fsgH11UVgBqcRBTRyqrt7E</string> <!-- client/api_key/current_key -->
+          //  <string name="google_storage_bucket" translatable="false">alfirebasemessagingapp.appspot.com</string> <!-- project_info/storage_bucket -->
+          //  <string name="project_id" translatable="false">alfirebasemessagingapp</string> <!-- project_info/project_id -->
+          //</resources>
+          //---
+          with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
+            Attributes['name'] := 'default_web_client_id';
+            Attributes['translatable'] := 'false';
+            text := LOauthClientNode.GetChildNodeValueText('client_id','');
+          end;
+          with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
+            Attributes['name'] := 'gcm_defaultSenderId';
+            Attributes['translatable'] := 'false';
+            text := LGoogleServicesjsonDoc.GetChildNodeValueText(['project_info','project_number'],'');
+          end;
+          with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
+            Attributes['name'] := 'google_api_key';
+            Attributes['translatable'] := 'false';
+            text := LApikeyNode.GetChildNodeValueText('current_key','');
+          end;
+          with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
+            Attributes['name'] := 'google_app_id';
+            Attributes['translatable'] := 'false';
+            text := LClientNode.GetChildNodeValueText(['client_info','mobilesdk_app_id'],'');
+          end;
+          with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
+            Attributes['name'] := 'google_crash_reporting_api_key';
+            Attributes['translatable'] := 'false';
+            text := LApikeyNode.GetChildNodeValueText('current_key','');
+          end;
+          with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
+            Attributes['name'] := 'google_storage_bucket';
+            Attributes['translatable'] := 'false';
+            text := LGoogleServicesjsonDoc.GetChildNodeValueText(['project_info','storage_bucket'],'');
+          end;
+          with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
+            Attributes['name'] := 'project_id';
+            Attributes['translatable'] := 'false';
+            text := LGoogleServicesjsonDoc.GetChildNodeValueText(['project_info','project_id'],'');
+          end;
+          //----
+          var LDirectory := LtmpDirectoryGoogleServices + '\res\values\';
+          TDirectory.CreateDirectory(LDirectory);
+          LStringsXmlDoc.SaveToFile(LDirectory + 'values.xml');
+        finally
+          ALFreeAndNil(LGoogleServicesjsonDoc);
+          ALFreeAndNil(LStringsXmlDoc);
+        end;
+        MergeResources(
+          LtmpDirectoryGoogleServices+'\res\', // const ASrcDir: String;
+          LResOutputDir, // const ADestDir: String;
+          ''); // const ASubPath: String
+      end;
+      {$ENDREGION}
+
+      {$REGION 'Generate Native Bridge File'}
+      if LGenerateNativeBridgeFile then begin
+        Writeln('Generate Native Bridge File');
+        var LcmdLine := LdelphiRootDir + '\bin\converters\java2op\Java2OP.exe -jar';
+        var LJarFiles := TDirectory.GetFiles(LLibsOutputDir, '*.jar', TSearchOption.soTopDirectoryOnly);
+        for var LJarFile in LJarFiles do begin
+          Var LInputStream := TMemorystream.Create;
+          Var LOutputStream := TStringStream.Create;
+          try
+            var LTmpcmdLine := LdelphiRootDir + '\bin\converters\java2op\Java2OP.exe -jar "'+LJarFile+'" -unit "'+LOutputDir+'\JavaInterfaces_'+ALExtractFilenameU(LJarFile, true{RemoveFileExt})+'_'+ALintToStrU(ALDateTimeToUnixMs(Now))+'"';
+            OverWrite(LTmpCmdLine);
+            Var LTmpCmdLineResult := ALWinExecU(
+                                       LTmpcmdLine, // const aCommandLine: String;
+                                       LInputStream, // const aInputStream: Tstream;
+                                       LOutputStream); //const aOutputStream: TStream;
+            if LTmpCmdLineResult <> 0 then
+              Writeln('Skip ' + ALextractFileNameU(LJarFile) + ' (not compatible with Java2OP)', TALConsoleColor.ccAqua)
+            else
+              LcmdLine := LcmdLine+' "'+LJarFile+'"';
+          finally
+            ALFreeandNil(LInputStream);
+            ALFreeandNil(LOutputStream);
+            if TFile.Exists(ALGetModulePathU + 'jar.log') then Tfile.Delete(ALGetModulePathU + 'jar.log');
+          end;
+        end;
+        //--
+        //Var LInputStream := TMemorystream.Create;
+        //Var LOutputStream := TStringStream.Create;
+        //try
+        //  LcmdLine := LcmdLine + ' -unit "'+LOutputDir+'\JavaInterfaces"';
+        //  OverWrite(LcmdLine);
+        //  Var LCmdLineResult := ALWinExecU(
+        //                          LcmdLine, // const aCommandLine: String;
+        //                          '', // const aCurrentDirectory: AnsiString;
+        //                          GetEnvironmentStringWithJavaHomeUpdated, // const aEnvironment: AnsiString;
+        //                          LInputStream, // const aInputStream: Tstream;
+        //                          LOutputStream); //const aOutputStream: TStream;
+        //  if LCmdLineResult <> 0 then
+        //    raise Exception.Createfmt('Failed to execute %s'#13#10'%s', [LcmdLine, LOutputStream.DataString]);
+        //finally
+        //  ALFreeandNil(LInputStream);
+        //  ALFreeandNil(LOutputStream);
+        //  if TFile.Exists(ALGetModulePathU + 'jar.log') then Tfile.Delete(ALGetModulePathU + 'jar.log');
+        //end;
+      end;
+      {$ENDREGION}
+
+      {$REGION 'create r-apk.jar and r-aab.jar'}
+      for var LApk := False to True do begin
+        Writeln('Create r-'+ALIfThenU(LApk, 'apk', 'aab')+'.jar');
+        if not LApk then begin
+          CreateRFlata(
+            LResOutputDir, // const AMergedResPath: String;
+            LRFlataFilename, // const ARFlataPath: String;
+            LAapt2Filename);// const AAaptPath: String);
+        end;
+        //--
+        if not AlEmptyDirectoryU(LtmpDirectoryRClass, true{SubDirectory}) then raise EALException.CreateFmt('Cannot clear %s', [LtmpDirectoryRClass]);
+        for var I := 0 to LLibraries.childnodes.Count - 1 do begin
+          CreateRClasses(
+            ALIncludeTrailingPathDelimiterU(string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}))), // const ALibPath: String;
+            ALIfThenU(LApk, LResOutputDir, LRFlataFilename), // const AMergedResPath: String;
+            LtmpDirectory, // const ATmpDir: String;
+            LtmpDirectoryRJava, // const ARjavaPath: String;
+            LtmpDirectoryRClass, // const ARClassPath: String;
+            AlIfThenU(LApk, LAaptFilename, LAapt2Filename), // const AAaptPath: String;
+            LSDKApiLevelJarFilename, // const ASDKApiLevelJar: String
+            LJavacFilename); // const AJavacPath: String
+        end;
+        //--
+        CreateRJar(
+          LLibsOutputDir + ALIfThenU(LApk, 'r-apk.jar', 'r-aab.jar'), // const aRJarPath: String;
+          LtmpDirectoryRClass, // const ARClassPath: String;
+          LJarExeFilename); // const AJarPath: String);
+      end;
+      {$ENDREGION}
+
+      {$REGION 'create R.Jar'}
+      Var LJarFilename := LLibsOutputDir + 'r.jar';
+      if TFile.Exists(LJarFilename) then raise Exception.Create('Error 7FD3D8B3-1565-4897-8943-1519C302875A');
+      Tfile.Copy(LLibsOutputDir + 'r-apk.jar', LJarFilename);
+      {$ENDREGION}
+
+      {$REGION 'Merge AndroidManifest'}
+      //https://developer.android.com/studio/build/manage-manifests
+      //The problem is that the merging is done one time on the template,
+      //and not on the generated AndroidManifest everytime we compile the project.
+      //so we must introduce a mechanism to remove previously merged node from
+      //the AndroidManifest template. The way I go is to add section identifiers
+      //
+      //  <!-- ============================================ -->
+      //  <!-- AndroidMerger auto-generated section (BEGIN) -->
+      //  <!-- ============================================ -->
+      //
+      //  .............
+      //
+      //  <!-- ========================================== -->
+      //  <!-- AndroidMerger auto-generated section (END) -->
+      //  <!-- ========================================== -->
+      //
+      //So in this way before merging the AndroidManifest I delete thanks to the
+      //section identifiers all previously added node. This work well except for
+      //attributes.
+      if LAndroidManifest <> '' then begin
+        Writeln('Merge AndroidManifest');
+        var LMaxMinSdkVersion: integer := 0;
+        if not Tfile.Exists(LAndroidManifest) then raise Exception.CreateFmt('%s does not exist', [LAndroidManifest]);
+        var LAndroidManifestXmlDoc := TalXmlDocument.Create;
+        Var LDisabledXmlDoc := TalXmlDocument.Create('manifest');
+        try
+
+          var LAndroidManifestSrc := ALGetStringFromFile(LAndroidManifest);
+          if ALPos('%/>', LAndroidManifestSrc) > 0 then raise Exception.Create('Error 7FE78AC6-C0C3-41EC-9E7D-8497FDBE644C');
+          LAndroidManifestSrc := ALStringReplace(LAndroidManifestSrc, '%>', '%/>', [rfReplaceALL]);
+          //--
+          LAndroidManifestXmlDoc.Options := [];
+          LAndroidManifestXmlDoc.ParseOptions := [poPreserveWhiteSpace];
+          LAndroidManifestXmlDoc.LoadFromXML(LAndroidManifestSrc);
+          LAndroidManifestXmlDoc.Options := [DoNodeAutoIndent, doAttributeAutoIndent];
+          //--
+          ExtractAutoGeneratedSectionFromAndroidManifest(
+            LAndroidManifestXmlDoc.DocumentElement,
+            LDisabledXmlDoc);
+          //--
+          for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
+            var LSrcFilename := string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}))+'\AndroidManifest.xml.original';
+            if TFile.Exists(LSrcFilename) then begin
+              Var LSrcXmlDoc := TALXmlDocument.Create;
+              Try
+                LSrcXmlDoc.Options := [doNodeAutoIndent];
+                var LSrcContent := ALgetStringFromFile(LSrcFilename);
+                LSrcContent := ALStringReplace(LSrcContent, '${applicationId}', '%package%', [rfReplaceAll, RfIgnoreCase]);
+                LSrcXmlDoc.LoadFromXML(LSrcContent);
+                MergeAndroidManifest(
+                  LSrcXmlDoc.DocumentElement.Attributes['package'], // const APackageName: AnsiString;
+                  LSrcXmlDoc.DocumentElement, // const ASrcFilename: String;
+                  LAndroidManifestXmlDoc.DocumentElement, // const ADestXmlDoc: TalXmlDocument;
+                  LDisabledXmlDoc.DocumentElement, // const ADisabledNode: TalXmlNode
+                  LMaxMinSdkVersion); // var AMaxMinSdkVersion: integer;
+              finally
+                ALFreeAndNil(LSrcXmlDoc);
+              End;
+            end;
+          end;
+          //--
+          CloseAutoGeneratedSectionInAndroidManifest(LAndroidManifestXmlDoc.DocumentElement);
+          //--
+          //https://developer.android.com/guide/topics/manifest/manifest-intro
+          //Elements at the same level are generally not ordered. For example, the <activity>, <provider>,
+          //and <service> elements can be placed in any order. There are two key exceptions to this rule:
+          //  * An <activity-alias> element must follow the <activity> for which it is an alias.
+          //  * The <application> element must be the last element inside the <manifest> element.
+          if IsAutoGeneratedSectionBeginCommentPresentInAndroidManifest(LAndroidManifestXmlDoc.DocumentElement) then begin
+            var LapplicationNodeIdx := LAndroidManifestXmlDoc.DocumentElement.childnodes.indexOf('application');
+            while (LapplicationNodeIdx < LAndroidManifestXmlDoc.DocumentElement.childnodes.count - 1) and
+                  (LAndroidManifestXmlDoc.DocumentElement.childnodes[LapplicationNodeIdx+1].nodeType = ntText) do
+              LAndroidManifestXmlDoc.DocumentElement.childnodes.delete(LapplicationNodeIdx+1);
+            Var LApplicationCommentNodeIdx := LapplicationNodeIdx;
+            Var LTmpIdx := LApplicationCommentNodeIdx - 1;
+            Var LconcatenatedText: String := '';
+            while LTmpIdx >= 0 do begin
+              case LAndroidManifestXmlDoc.DocumentElement.childnodes[LTmpIdx].nodeType of
+                ntText: begin
+                  LconcatenatedText := LconcatenatedText + string(LAndroidManifestXmlDoc.DocumentElement.childnodes[LTmpIdx].Text);
+                  if LconcatenatedText.CountChar(#10) > 1 then break;
+                  dec(LTmpIdx);
+                end;
+                ntcomment: begin
+                  LApplicationCommentNodeIdx := LTmpIdx;
+                  dec(LTmpIdx);
+                  LconcatenatedText := '';
+                end;
+                else
+                  break;
+              end;
+            end;
+            for var I := LApplicationCommentNodeIdx to LapplicationNodeIdx do begin
+              var LtmpNode := LAndroidManifestXmlDoc.DocumentElement.childnodes.Extract(LApplicationCommentNodeIdx);
+              if LtmpNode.nodetype = ntText then ALFreeAndNil(LtmpNode)
+              else LAndroidManifestXmlDoc.DocumentElement.childnodes.Add(LtmpNode);
+            end;
+            var LBreakLineNode := TALXmlElementNode.Create('br');
+            LAndroidManifestXmlDoc.DocumentElement.ChildNodes.Add(LBreakLineNode);
+            LAndroidManifestXmlDoc.DocumentElement.ChildNodes.Remove(LBreakLineNode);
+          end;
+          //--
+          LAndroidManifestXmlDoc.SaveToXML(LAndroidManifestSrc);
+          LAndroidManifestSrc := ALStringReplace(LAndroidManifestSrc, '%/>', '%>', [rfReplaceALL]);
+          Tfile.Delete(LAndroidManifest);
+          ALSaveStringToFile(LAndroidManifestSrc, LAndroidManifest);
+        finally
+          ALFreeAndNil(LAndroidManifestXmlDoc);
+          ALFreeAndNil(LDisabledXmlDoc);
+        end;
+        if LMaxMinSdkVersion > 0 then
+          Writeln('Max MinSdkVersion found in libraries: ' + ALintToStrU(LMaxMinSdkVersion), TALConsoleColor.ccDarkYellow);
+      end;
+      {$ENDREGION}
+
+      {$REGION 'Update dproj'}
+      if LDProjFilename <> '' then begin
+        Writeln('Update dproj');
+        var LdprojXmlDoc := TalXmlDocument.Create('root');
+        var LDeployFilesToDeactivate := TalStringList.Create;
+        try
+
+          //init LDProjDir
+          var LDProjDir := ALExtractFilePathU(LDProjFilename);
+
+          //init LdprojXmlDoc
+          LdprojXmlDoc.LoadFromFile(LDProjFilename);
+
+          //init LProjectExtensionsNode
+          var LProjectExtensionsNode := LDProjXmlDoc.DocumentElement.ChildNodes.FindNode('ProjectExtensions');
+          if LProjectExtensionsNode = nil then raise Exception.Create('ProjectExtensions node not found!');
+
+          //init LBorlandProjectNode
+          var LBorlandProjectNode := LProjectExtensionsNode.ChildNodes.FindNode('BorlandProject');
+          if LBorlandProjectNode = nil then raise Exception.Create('ProjectExtensions.BorlandProject node not found!');
+
+          //init LDeploymentNode
+          var LDeploymentNode := LBorlandProjectNode.ChildNodes.FindNode('Deployment');
+          if LDeploymentNode = nil then raise Exception.Create('ProjectExtensions.BorlandProject.Deployment node not found!');
+
+          //init LDeployFilesToDeactivate
+          LDeployFilesToDeactivate.Add('Android_Strings');
+          LDeployFilesToDeactivate.Add('Android_Colors');
+          LDeployFilesToDeactivate.Add('AndroidSplashImageDef');
+          LDeployFilesToDeactivate.Add('AndroidSplashStylesV21');
+          LDeployFilesToDeactivate.Add('AndroidSplashStyles');
+          LDeployFilesToDeactivate.Add('Android_LauncherIcon36');
+          LDeployFilesToDeactivate.Add('Android_LauncherIcon48');
+          LDeployFilesToDeactivate.Add('Android_LauncherIcon72');
+          LDeployFilesToDeactivate.Add('Android_LauncherIcon96');
+          LDeployFilesToDeactivate.Add('Android_LauncherIcon144');
+          LDeployFilesToDeactivate.Add('Android_LauncherIcon192');
+          LDeployFilesToDeactivate.Add('Android_SplashImage426');
+          LDeployFilesToDeactivate.Add('Android_SplashImage470');
+          LDeployFilesToDeactivate.Add('Android_SplashImage640');
+          LDeployFilesToDeactivate.Add('Android_SplashImage960');
+          LDeployFilesToDeactivate.Add('Android_NotificationIcon24');
+          LDeployFilesToDeactivate.Add('Android_NotificationIcon36');
+          LDeployFilesToDeactivate.Add('Android_NotificationIcon48');
+          LDeployFilesToDeactivate.Add('Android_NotificationIcon72');
+          LDeployFilesToDeactivate.Add('Android_NotificationIcon96');
+
+          //remove from deployment all items deployed to "res\", "library\lib\arm64-v8a\" and "library\lib\armeabi-v7a\" remote folder
+          //<DeployFile LocalName="android\res\drawable\common_google_signin_btn_icon_disabled.xml" Configuration="Release" Class="File">
+          //    <Platform Name="Android">
+          //        <RemoteDir>res\drawable</RemoteDir>
+          //        <RemoteName>common_google_signin_btn_icon_disabled.xml</RemoteName>
+          //        <Overwrite>true</Overwrite>
+          //    </Platform>
+          //    <Platform Name="Android64">
+          //        <RemoteDir>res\drawable</RemoteDir>
+          //        <RemoteName>common_google_signin_btn_icon_disabled.xml</RemoteName>
+          //        <Overwrite>true</Overwrite>
+          //    </Platform>
+          //</DeployFile>
+          //<DeployFile LocalName="..\..\..\..\..\Alcinoe\lib\jar\org.webrtc\jni\arm64-v8a\libjingle_peerconnection_so.so" Configuration="Release" Class="File">
+          //    <Platform Name="Android">
+          //        <RemoteDir>library\lib\arm64-v8a\</RemoteDir>
+          //        <RemoteName>libjingle_peerconnection_so.so</RemoteName>
+          //        <Overwrite>true</Overwrite>
+          //    </Platform>
+          //    <Platform Name="Android64">
+          //        <RemoteDir>library\lib\arm64-v8a\</RemoteDir>
+          //        <RemoteName>libjingle_peerconnection_so.so</RemoteName>
+          //        <Overwrite>true</Overwrite>
+          //    </Platform>
+          //</DeployFile>
+          for var I := LDeploymentNode.ChildNodes.Count - 1 downto 0 do begin
+            var LDeployFileNode := LDeploymentNode.ChildNodes[i];
+            if ALSameText(LDeployFileNode.NodeName, 'DeployFile') then begin
+              if ALSameText(LDeployFileNode.Attributes['Class'], 'File') then begin
+                if LDeployFileNode.ChildNodes.Count = 0 then raise Exception.Create('Error A892E02E-A8BA-4003-AEF1-A81271AD0A9F');
+                for Var J := LDeployFileNode.ChildNodes.Count - 1 downto 0 do begin
+                  var LPlatformNode := LDeployFileNode.ChildNodes[j];
+                  if not alSameText(LPlatformNode.NodeName, 'Platform') then raise Exception.Create('Error 65714071-86F2-4796-82F8-9F01C5C9824B');
+                  var LName := LPlatformNode.Attributes['Name'];
+                  if LName = '' then raise Exception.Create('Error 42C3C299-BA31-4B17-9EA4-8320E0048848');
+                  if (LPlatforms.IndexOf(LName) >= 0) then begin
+                    Var LremoteDirNode := LPlatformNode.ChildNodes.FindNode('RemoteDir');
+                    if (LremoteDirNode <> nil) and
+                       ((alposExIgnoreCase('res\', LremoteDirNode.Text) = 1) or
+                        (ALSameText('res', LremoteDirNode.Text)) or
+                        (alposExIgnoreCase('library\lib\arm64-v8a', LremoteDirNode.Text) = 1) or
+                        (alposExIgnoreCase('library\lib\armeabi-v7a', LremoteDirNode.Text) = 1)) then begin
+                      LDeployFileNode.ChildNodes.Delete(j);
+                      continue;
+                    end;
+                  end;
+                end;
+                if LDeployFileNode.ChildNodes.Count = 0 then
+                  LDeploymentNode.ChildNodes.Delete(i);
+              end
+              else if LDeployFilesToDeactivate.IndexOf(LDeployFileNode.Attributes['Class']) >= 0 then begin
+                LDeploymentNode.ChildNodes.Delete(i);
+              end;
+            end
+          end;
+
+          //add to deployment all items from local res\ folder
+          var LResFiles := TDirectory.GetFiles(LResOutputDir, '*', TSearchOption.soAllDirectories); // c:\....Android\Merged\res\drawable\common_google_signin_btn_icon_disabled.xml
+          var LResRelativePath := ansiString(ExtractRelativePath(LDProjDir, LResOutputDir)); // Android\Merged\res\
+          for Var I := Low(LResFiles) to High(LResFiles) do begin
+            Var LLocalName := AnsiString(ExtractRelativePath(LDProjDir, LResFiles[i])); // Android\Merged\res\drawable\common_google_signin_btn_icon_disabled.xml
+            for var LConfig in LConfigs do begin
+              With LDeploymentNode.AddChild('DeployFile') do begin
+                Attributes['LocalName'] := LLocalName;
+                Attributes['Configuration'] := LConfig;
+                Attributes['Class'] := 'File';
+                for var LPlatForm in LPlatforms do begin
+                  With AddChild('Platform') do begin
+                    Attributes['Name'] := LPlatForm;
+                    Addchild('RemoteDir').Text := 'res\' + ALStringReplace(ALExcludeTrailingPathDelimiter(ALExtractFilePath(LLocalName)), LResRelativePath, '', [rfIgnoreCase]);
+                    Addchild('RemoteName').Text := ALExtractFileName(LLocalName);
+                    Addchild('Overwrite').Text := 'true';
+                  end;
+                end;
+              end;
+            end;
+          end;
+
+          //deactivate all items in LDeployFilesToDeactivate
+          for Var I := 0 to LDeployFilesToDeactivate.Count-1 do begin
+            for var LConfig in LConfigs do begin
+              With LDeploymentNode.AddChild('DeployFile') do begin
+                Attributes['LocalName'] := 'none';
+                Attributes['Configuration'] := LConfig;
+                Attributes['Class'] := LDeployFilesToDeactivate[i];
+                for var LPlatForm in LPlatforms do begin
+                  With AddChild('Platform') do begin
+                    Attributes['Name'] := LPlatForm;
+                    Addchild('Enabled').Text := 'false';
+                    Addchild('Overwrite').Text := 'true';
+                  end;
+                end;
+              end;
+            end;
+          end;
+
+          //add to deployment all items from local jni\ folder
+          var LJniFiles := TDirectory.GetFiles(LJniOutputDir, '*', TSearchOption.soAllDirectories); // c:\....Android\Merged\jni\arm64-v8a\libjingle_peerconnection_so.so
+          var LJniRelativePath := ansiString(ExtractRelativePath(LDProjDir, LJniOutputDir)); // Android\Merged\jni\
+          for Var I := Low(LJniFiles) to High(LJniFiles) do begin
+            Var LLocalName := AnsiString(ExtractRelativePath(LDProjDir, LJniFiles[i])); // Android\Merged\jni\arm64-v8a\libjingle_peerconnection_so.so
+            for var LConfig in LConfigs do begin
+              With LDeploymentNode.AddChild('DeployFile') do begin
+                Attributes['LocalName'] := LLocalName;
+                Attributes['Configuration'] := LConfig;
+                Attributes['Class'] := 'File';
+                for var LPlatForm in LPlatforms do begin
+                  With AddChild('Platform') do begin
+                    Attributes['Name'] := LPlatForm;
+                    Addchild('RemoteDir').Text := 'library\lib\' + ALStringReplace(ALExcludeTrailingPathDelimiter(ALExtractFilePath(LLocalName)), LJniRelativePath, '', [rfIgnoreCase]); // library\lib\arm64-v8a\libjingle_peerconnection_so.so
+                    Addchild('RemoteName').Text := ALExtractFileName(LLocalName);
+                    Addchild('Overwrite').Text := 'true';
+                  end;
+                end;
+              end;
+            end;
+          end;
+
+          //init LItemGroupNode
+          var LItemGroupNode := LDProjXmlDoc.DocumentElement.ChildNodes.FindNode('ItemGroup');
+          if LItemGroupNode = nil then raise Exception.Create('ItemGroup node not found!');
+
+          //remove from ItemGroup all JavaReference
+          //<JavaReference Include="..\..\..\libraries\jar\android.arch.core\arch-core-common.jar">
+          //  <Disabled/>
+          //</JavaReference>
+          for var I := LItemGroupNode.ChildNodes.Count - 1 downto 0 do begin
+            var LJavaReferenceNode := LItemGroupNode.ChildNodes[i];
+            if ALSameText(LJavaReferenceNode.NodeName, 'JavaReference') then
+              LItemGroupNode.ChildNodes.Delete(i);
+          end;
+
+          //add to ItemGroup all items from local libs\ folder
+          var LLibsFiles := TDirectory.GetFiles(LLibsOutputDir, '*', TSearchOption.soAllDirectories); // c:\....android\libs\r.jar
+          var LLibsRelativePath := ansiString(ExtractRelativePath(LDProjDir, LLibsOutputDir)); // android\libs\
+          for Var I := Low(LLibsFiles) to High(LLibsFiles) do begin
+            if ALSameTextU(AlExtractFilenameU(LLibsFiles[i]), 'r-apk.jar') or
+               ALSameTextU(AlExtractFilenameU(LLibsFiles[i]), 'r-aab.jar') then continue;
+            if not ALSameTextU(AlExtractFileExtU(LLibsFiles[i]),'.jar') then raise Exception.Create('Error E88BE4F0-B6E5-4EC4-B890-B9B6169FC58B');
+            Var LLocalName := AnsiString(ExtractRelativePath(LDProjDir, LLibsFiles[i])); // android\libs\r.jar
+            With LItemGroupNode.AddChild('JavaReference') do Attributes['Include'] := LLocalName;
+          end;
+
+          //Update EnabledSysJars
+          for var I := 0 to LdprojXmlDoc.DocumentElement.ChildNodes.Count - 1 do begin
+            var LPropertyGroupNode := LdprojXmlDoc.DocumentElement.ChildNodes[i];
+            if LPropertyGroupNode.NodeName = 'PropertyGroup' then begin
+              Var LEnabledSysJarsNode := LPropertyGroupNode.ChildNodes.FindNode('EnabledSysJars');
+              if (LEnabledSysJarsNode <> nil) and (LEnabledSysJarsNode.Text <> '') then LEnabledSysJarsNode.Text := 'fmx.dex.jar';
+            end;
+          end;
+
+          //update DisabledSysJars
+          for var I := 0 to LdprojXmlDoc.DocumentElement.ChildNodes.Count - 1 do begin
+            var LPropertyGroupNode := LdprojXmlDoc.DocumentElement.ChildNodes[i];
+            if LPropertyGroupNode.NodeName = 'PropertyGroup' then begin
+              Var LDisabledSysJarsNode := LPropertyGroupNode.ChildNodes.FindNode('DisabledSysJars');
+              if LDisabledSysJarsNode <> nil then LPropertyGroupNode.ChildNodes.Remove(LDisabledSysJarsNode);
+            end;
+          end;
+
+          //add the RJarSwapper command line
+          if LRJarSwapper <> '' then begin
+            var LRJarDir := ExtractRelativePath(ALExtractFilePathU(LDProjDir), LLibsOutputDir);
+            Var LConditions := TALstringList.Create;
+            try
+              if LPlatforms.IndexOf('Android') >= 0 then begin
+                if LConfigs.IndexOf('Debug') >= 0 then LConditions.Add('Android=Debug');
+                if LConfigs.IndexOf('Release') >= 0 then LConditions.Add('Android=Release');
+              end;
+              if LPlatforms.IndexOf('Android64') >= 0 then begin
+                if LConfigs.IndexOf('Debug') >= 0 then LConditions.Add('Android64=Debug');
+                if LConfigs.IndexOf('Release') >= 0 then LConditions.Add('Android64=Release');
+              end;
+              //----
+              for var I := 0 to LdprojXmlDoc.DocumentElement.ChildNodes.Count - 1 do begin
+                var LPropertyGroupNode := LdprojXmlDoc.DocumentElement.ChildNodes[i];
+                if LPropertyGroupNode.NodeName = 'PropertyGroup' then begin
+                  var LCondition := LPropertyGroupNode.Attributes['Condition'];
+                  var LPlatform: AnsiString := '';
+                  if (ALposExIgnoreCase('Android64', LCondition) > 0) then LPlatform := 'Android64'
+                  else if (ALposExIgnoreCase('Android', LCondition) > 0) then LPlatform := 'Android';
+                  if ((LPlatform = 'Android64') and (LPlatforms.IndexOf('Android64') >= 0)) or
+                     ((LPlatform = 'Android') and (LPlatforms.IndexOf('Android') >= 0)) then begin
+                    Var LPreBuildEventNode := LPropertyGroupNode.ChildNodes.FindNode('PreBuildEvent');
+                    var LPreBuildEventXml: ansiString := '';
+                    if (LPreBuildEventNode <> nil) then LPreBuildEventNode.SaveToXML(LPreBuildEventXml, true{SaveOnlyChildNodes});
+                    if (LPreBuildEventXml <> '') and
+                       (alposExIgnoreCase('RJarSwapper.bat', LPreBuildEventXml) <= 0) then
+                      raise Exception.Create('Cannot set RJarSwapper.bat in PreBuildEvent because it''s not empty');
+                    if LPreBuildEventNode <> nil then LPropertyGroupNode.ChildNodes.Remove(LPreBuildEventNode);
+                    Var LIndex := LPropertyGroupNode.ChildNodes.IndexOf('PreBuildEventCancelOnError');
+                    if LIndex >= 0 then LPropertyGroupNode.ChildNodes.Delete(LIndex);
+                    LIndex := LPropertyGroupNode.ChildNodes.IndexOf('PreBuildEventIgnoreExitCode');
+                    if LIndex >= 0 then LPropertyGroupNode.ChildNodes.Delete(LIndex);
+                    LIndex := LPropertyGroupNode.ChildNodes.IndexOf('PreBuildEventExecuteWhen');
+                    if LIndex >= 0 then LPropertyGroupNode.ChildNodes.Delete(LIndex);
+                    var J := LConditions.IndexOf(LPlatform+'=Debug');
+                    if (J >= 0) and
+                       (ALposExIgnoreCase('Debug', LCondition) > 0) then begin
+                      LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="false"';
+                      LConditions.Delete(J);
+                    end
+                    else begin
+                      J := LConditions.IndexOf(LPlatform+'=Release');
+                      if (J >= 0) and
+                         (ALposExIgnoreCase('Release', LCondition) > 0) then begin
+                        LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="true"';
+                        LConditions.Delete(J);
+                      end;
+                    end;
+                  end;
+                end;
+              end;
+              //----
+              for var I := 0 to LConditions.Count - 1 do begin
+                var LPropertyGroupNode := LdprojXmlDoc.DocumentElement.AddChild('PropertyGroup');
+                LPropertyGroupNode.Attributes['Condition'] := '''$(Config)''=='''+LConditions.ValueFromIndex[i]+''' And ''$(Platform)''=='''+LConditions.Names[i]+'''';
+                if ALSameText(LConditions.ValueFromIndex[i], 'Debug') then
+                  LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="false"'
+                else if ALSameText(LConditions.ValueFromIndex[i], 'Release') then
+                  LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="true"';
+              end;
+            finally
+              ALFreeAndNil(LConditions);
+            end;
+          end;
+
+          //save LdprojXmlDoc
+          var LDprojXmlSrc: AnsiString;
+          LdprojXmlDoc.SaveToXML(LDprojXmlSrc);
+          LdprojXmlDoc.Options := [doNodeAutoIndent];
+          LdprojXmlDoc.LoadFromXML(LDprojXmlSrc);
+          LdprojXmlDoc.SaveToFile(LDProjFilename);
+
+          //normalize the LdprojXmlDoc
+          if LDProjNormalizer <> '' then
+            ExecuteCmdLine('"'+LDProjNormalizer+'" "' +LDProjFilename + '" false');
+
+        finally
+          ALFreeAndNil(LdprojXmlDoc);
+          ALFreeAndNil(LDeployFilesToDeactivate);
+        end;
+      end;
+      {$ENDREGION}
+
+      {$REGION 'List imported Libraries'}
+      Writeln('Imported Libraries:');
+      Var LdependenciesLst := TALstringList.Create;
+      Try
         for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
           var LLibrary := LLibraries.ChildNodes[i];
-          var LLibraryArchiveFileName := string(LLibrary.GetChildNodeValueText('archivefilename', ''{default}));
-          if LLibraryArchiveFileName = '' then continue;
-          Var LUncompressDir := LtmpDirectoryLibraries+
-                                String(LLibrary.GetChildNodeValueText('groupid', ''{default}))+'-'+
-                                String(LLibrary.GetChildNodeValueText('artifactid', ''{default}))+'-'+
-                                String(LLibrary.GetChildNodeValueText('version', ''{default}))+'\';
-          if LUncompressDir = LtmpDirectoryLibraries + '--\' then
-            LUncompressDir := LtmpDirectoryLibraries + ALExtractFilenameU(ALExcludeTrailingPathDelimiterU(LLibraryArchiveFileName), true{RemoveFileExt})+'\';
-          LLibrary.SetChildNodeValueText('uncompressdir', ansiString(LUncompressDir));
-          if TDirectory.Exists(LLibraryArchiveFileName) then begin
-            if not AlCopyDirectoryU(
-                     LLibraryArchiveFileName, // SrcDirectory,
-                     LUncompressDir, // DestDirectory: ansiString;
-                     true) then // SubDirectory: Boolean;
-              raise Exception.Createfmt('Cannot copy %s to %s', [LLibraryArchiveFileName, LUncompressDir]);
+          var LgroupID := LLibrary.GetChildNodeValueText('groupid', ''{default});
+          if LgroupID = '' then begin
+            LdependenciesLst.Add(
+              LLibrary.GetChildNodeValueText('archivefilename', ''{default}));
           end
-          else if ALSameTextU(TPath.GetExtension(LLibraryArchiveFileName), '.jar') then begin
-            TDirectory.CreateDirectory(LUncompressDir);
-            TFile.Copy(LLibraryArchiveFileName, LUncompressDir + TPath.GetFileName(LLibraryArchiveFileName));
-          end
-          else if TFile.exists(LLibraryArchiveFileName) then begin
-            if TZipFile.IsValid(LLibraryArchiveFileName) then TZipFile.ExtractZipFile(LLibraryArchiveFileName, LUncompressDir, nil)
-            else raise Exception.CreateFmt('Invalid aar file: %s', [LLibraryArchiveFileName]);
-          end
-          else raise Exception.CreateFmt('Unknown library: %s', [LLibraryArchiveFileName]);
-        end;
-        {$ENDREGION}
-
-        {$REGION 'Copy all jar to <OutputDir>\libs'}
-        Writeln('Copy all jar to <OutputDir>\libs');
-        for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
-          var LUncompressDir := string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}));
-          if LUncompressDir = '' then continue;
-          //--
-          var LJarFiles := TDirectory.GetFiles(LUncompressDir, '*.jar', TSearchOption.soTopDirectoryOnly);
-          if length(LJarFiles) = 0 then continue;
-          //--
-          Var LTmpJarFile: TStringDynArray;
-          Setlength(LTmpJarFile, 0);
-          for Var J := Low(LJarFiles) to High(LJarFiles) do begin
-            if ALSameTextU(ALExtractFilenameU(LJarFiles[J]), 'lint.jar') or
-               ALSameTextU(ALExtractFilenameU(LJarFiles[J]), 'inspector.jar') then continue;
-            Setlength(LTmpJarFile, length(LTmpJarFile) + 1);
-            LTmpJarFile[high(LTmpJarFile)] := LJarFiles[J];
-          end;
-          LJarFiles := LTmpJarFile;
-          //--
-          if length(LJarFiles) = 0 then raise Exception.CreateFmt('Erreur 7E56249A-8B43-411D-9834-9D6334D7226B. %s', [LUncompressDir]);
-          if length(LJarFiles) > 1 then raise Exception.CreateFmt('Their cannot be more than one classes.jar at the root of a library. %s', [LUncompressDir]);
-          //--
-          var LDestFilename := LLibsOutputDir + ALExtractFilenameU(ALExcludeTrailingPathDelimiterU(LUncompressDir)) + '.jar';
-          Tfile.Copy(LJarFiles[0], LDestFilename);
-          if Tdirectory.Exists(LUncompressDir + '\libs') then begin
-            var LlibsFiles := TDirectory.GetFiles(LUncompressDir + '\libs', '*', TSearchOption.soAllDirectories);
-            for var J := Low(LlibsFiles) to High(LlibsFiles) do begin
-              if not ALSameTextU(ALExtractFileExtU(LlibsFiles[j]), '.jar') then raise Exception.Create('Error 1BE76D9D-49BC-4CA7-971C-40B81C01B1C9');
-              Tfile.Copy(LlibsFiles[j], LLibsOutputDir + ALExtractFilenameU(ALExcludeTrailingPathDelimiterU(LUncompressDir)) + '-'+ ALExtractFileNameU(LlibsFiles[j]));
-            end;
+          else begin
+            LdependenciesLst.Add(
+              LLibrary.GetChildNodeValueText('groupid', ''{default}) + ':' +
+              LLibrary.GetChildNodeValueText('artifactid', ''{default}) + ':' +
+              LLibrary.GetChildNodeValueText('version', ''{default}));
           end;
         end;
-        {$ENDREGION}
-
-        {$REGION 'Copy all jni to <OutputDir>\jni'}
-        Writeln('Copy all jni to <OutputDir>\jni');
-        for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
-          var LUncompressDir := string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}));
-          if LUncompressDir = '' then continue;
-          if Tdirectory.Exists(LUncompressDir + '\jni\arm64-v8a') then begin
-            var LJniFiles := TDirectory.GetFiles(LUncompressDir + '\jni\arm64-v8a', '*', TSearchOption.soAllDirectories);
-            for var J := Low(LJniFiles) to High(LJniFiles) do begin
-              if not ALSameTextU(ALExtractFileExtU(LJniFiles[j]), '.so') then raise Exception.Create('Error 2FCFB6D0-987A-40EC-BBAC-66D5ADC50DC2');
-              TDirectory.CreateDirectory(LJniOutputDir + '\arm64-v8a\');
-              Tfile.Copy(LJniFiles[j], LJniOutputDir + '\arm64-v8a\' + ALExtractFileNameU(LJniFiles[j]));
-            end;
-          end;
-          if Tdirectory.Exists(LUncompressDir + '\jni\armeabi-v7a') then begin
-            var LJniFiles := TDirectory.GetFiles(LUncompressDir + '\jni\armeabi-v7a', '*', TSearchOption.soAllDirectories);
-            for var J := Low(LJniFiles) to High(LJniFiles) do begin
-              if not ALSameTextU(ALExtractFileExtU(LJniFiles[j]), '.so') then raise Exception.Create('Error F6BF26A7-A378-4A94-A8CB-C861DB38E11E');
-              TDirectory.CreateDirectory(LJniOutputDir + '\armeabi-v7a\');
-              Tfile.Copy(LJniFiles[j], LJniOutputDir + '\armeabi-v7a\' + ALExtractFileNameU(LJniFiles[j]));
-            end;
-          end;
-        end;
-        {$ENDREGION}
-
-        {$REGION 'make all AndroidManifest ready'}
-        for var I := 0 to LLibraries.ChildNodes.Count - 1 do
-          MakeAndroidManifestReady(string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}))+'\AndroidManifest.xml');
-        {$ENDREGION}
-
-        {$REGION 'Merge resources in <OutputDir>\res'}
-        Writeln('Merge resources in <OutputDir>\res');
-        for var I := 0 to LLibraries.childNodes.Count - 1 do
-          MergeResources(
-            string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}))+'\res\', // const ASrcDir: String;
-            LResOutputDir, // const ADestDir: String;
-            ''); // const ASubPath: String
-        {$ENDREGION}
-
-        {$REGION 'Merge google-services.json in <OutputDir>\res'}
-        if LGoogleServicesJson <> '' then begin
-          Writeln('Merge google-services.json in <OutputDir>\res');
-          var LGoogleServicesjsonDoc := TalJsonDocument.Create;
-          var LStringsXmlDoc := TalXmlDocument.Create('resources');
-          try
-            LStringsXmlDoc.Options := [doNodeAutoIndent];
-            LGoogleServicesjsonDoc.LoadFromJSONFile(ansistring(LGoogleServicesJson));
-            //---
-            var LClientNode := LGoogleServicesjsonDoc.ChildNodes.FindNode('client');
-            if LClientNode = nil then raise Exception.Create('Could not find client node in google-services.json');
-            if LClientNode.ChildNodes.Count <> 1 then raise Exception.Create('client node must have only 1 child in google-services.json');
-            LClientNode := LClientNode.ChildNodes[0];
-            //---
-            var LOauthClientNode := LClientNode.ChildNodes.FindNode('oauth_client');
-            if LOauthClientNode = nil then raise Exception.Create('Could not find client.oauth_client node in google-services.json');
-            if LOauthClientNode.ChildNodes.Count <> 1 then raise Exception.Create('client.oauth_client node must have only 1 child in google-services.json');
-            LOauthClientNode := LOauthClientNode.ChildNodes[0];
-            if LOauthClientNode.GetChildNodeValueFloat('client_type',0) <> 3 then raise Exception.Create('client.oauth_client node must have client_type=3 child node in google-services.json');
-            //---
-            var LApikeyNode := LClientNode.ChildNodes.FindNode('api_key');
-            if LApikeyNode = nil then raise Exception.Create('Could not find client.api_key node in google-services.json');
-            if LApikeyNode.ChildNodes.Count <> 1 then raise Exception.Create('client.api_key node must have only 1 child in google-services.json');
-            LApikeyNode := LApikeyNode.ChildNodes[0];
-            //---
-            //<?xml version="1.0" encoding="utf-8"?>
-            //<resources>
-            //  <string name="default_web_client_id" translatable="false">473525438998-cfesrloac4k87aam569gnivgdkfvckqo.apps.googleusercontent.com</string> <!-- client/oauth_client/client_id (client_type == 3) -->
-            //  <string name="gcm_defaultSenderId" translatable="false">473525438998</string> <!-- project_info/project_number -->
-            //  <string name="google_api_key" translatable="false">AIzaSyD9y8sPkHve0fsgH11UVgBqcRBTRyqrt7E</string> <!-- client/api_key/current_key -->
-            //  <string name="google_app_id" translatable="false">1:473525438998:android:4de91fba3dae57c7e50337</string> <!-- client/client_info/mobilesdk_app_id -->
-            //  <string name="google_crash_reporting_api_key" translatable="false">AIzaSyD9y8sPkHve0fsgH11UVgBqcRBTRyqrt7E</string> <!-- client/api_key/current_key -->
-            //  <string name="google_storage_bucket" translatable="false">alfirebasemessagingapp.appspot.com</string> <!-- project_info/storage_bucket -->
-            //  <string name="project_id" translatable="false">alfirebasemessagingapp</string> <!-- project_info/project_id -->
-            //</resources>
-            //---
-            with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
-              Attributes['name'] := 'default_web_client_id';
-              Attributes['translatable'] := 'false';
-              text := LOauthClientNode.GetChildNodeValueText('client_id','');
-            end;
-            with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
-              Attributes['name'] := 'gcm_defaultSenderId';
-              Attributes['translatable'] := 'false';
-              text := LGoogleServicesjsonDoc.GetChildNodeValueText(['project_info','project_number'],'');
-            end;
-            with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
-              Attributes['name'] := 'google_api_key';
-              Attributes['translatable'] := 'false';
-              text := LApikeyNode.GetChildNodeValueText('current_key','');
-            end;
-            with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
-              Attributes['name'] := 'google_app_id';
-              Attributes['translatable'] := 'false';
-              text := LClientNode.GetChildNodeValueText(['client_info','mobilesdk_app_id'],'');
-            end;
-            with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
-              Attributes['name'] := 'google_crash_reporting_api_key';
-              Attributes['translatable'] := 'false';
-              text := LApikeyNode.GetChildNodeValueText('current_key','');
-            end;
-            with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
-              Attributes['name'] := 'google_storage_bucket';
-              Attributes['translatable'] := 'false';
-              text := LGoogleServicesjsonDoc.GetChildNodeValueText(['project_info','storage_bucket'],'');
-            end;
-            with LStringsXmlDoc.DocumentElement.AddChild('string') do begin
-              Attributes['name'] := 'project_id';
-              Attributes['translatable'] := 'false';
-              text := LGoogleServicesjsonDoc.GetChildNodeValueText(['project_info','project_id'],'');
-            end;
-            //----
-            var LDirectory := LtmpDirectoryGoogleServices + '\res\values\';
-            TDirectory.CreateDirectory(LDirectory);
-            LStringsXmlDoc.SaveToFile(LDirectory + 'values.xml');
-          finally
-            ALFreeAndNil(LGoogleServicesjsonDoc);
-            ALFreeAndNil(LStringsXmlDoc);
-          end;
-          MergeResources(
-            LtmpDirectoryGoogleServices+'\res\', // const ASrcDir: String;
-            LResOutputDir, // const ADestDir: String;
-            ''); // const ASubPath: String
-        end;
-        {$ENDREGION}
-
-        {$REGION 'Generate Native Bridge File'}
-        if LGenerateNativeBridgeFile then begin
-          Writeln('Generate Native Bridge File');
-          var LcmdLine := LdelphiRootDir + '\bin\converters\java2op\Java2OP.exe -jar';
-          var LJarFiles := TDirectory.GetFiles(LLibsOutputDir, '*.jar', TSearchOption.soTopDirectoryOnly);
-          for var LJarFile in LJarFiles do begin
-            Var LInputStream := TMemorystream.Create;
-            Var LOutputStream := TStringStream.Create;
-            try
-              var LTmpcmdLine := LdelphiRootDir + '\bin\converters\java2op\Java2OP.exe -jar "'+LJarFile+'" -unit "'+LOutputDir+'\JavaInterfaces_'+ALExtractFilenameU(LJarFile, true{RemoveFileExt})+'_'+ALintToStrU(ALDateTimeToUnixMs(Now))+'"';
-              OverWrite(LTmpCmdLine);
-              Var LTmpCmdLineResult := ALWinExecU(
-                                         LTmpcmdLine, // const aCommandLine: String;
-                                         LInputStream, // const aInputStream: Tstream;
-                                         LOutputStream); //const aOutputStream: TStream;
-              if LTmpCmdLineResult <> 0 then
-                Writeln('Skip ' + ALextractFileNameU(LJarFile) + ' (not compatible with Java2OP)', TALConsoleColor.ccAqua)
-              else
-                LcmdLine := LcmdLine+' "'+LJarFile+'"';
-            finally
-              ALFreeandNil(LInputStream);
-              ALFreeandNil(LOutputStream);
-              if TFile.Exists(ALGetModulePathU + 'jar.log') then Tfile.Delete(ALGetModulePathU + 'jar.log');
-            end;
-          end;
-          //--
-          //Var LInputStream := TMemorystream.Create;
-          //Var LOutputStream := TStringStream.Create;
-          //try
-          //  LcmdLine := LcmdLine + ' -unit "'+LOutputDir+'\JavaInterfaces"';
-          //  OverWrite(LcmdLine);
-          //  Var LCmdLineResult := ALWinExecU(
-          //                          LcmdLine, // const aCommandLine: String;
-          //                          '', // const aCurrentDirectory: AnsiString;
-          //                          GetEnvironmentStringWithJavaHomeUpdated, // const aEnvironment: AnsiString;
-          //                          LInputStream, // const aInputStream: Tstream;
-          //                          LOutputStream); //const aOutputStream: TStream;
-          //  if LCmdLineResult <> 0 then
-          //    raise Exception.Createfmt('Failed to execute %s'#13#10'%s', [LcmdLine, LOutputStream.DataString]);
-          //finally
-          //  ALFreeandNil(LInputStream);
-          //  ALFreeandNil(LOutputStream);
-          //  if TFile.Exists(ALGetModulePathU + 'jar.log') then Tfile.Delete(ALGetModulePathU + 'jar.log');
-          //end;
-        end;
-        {$ENDREGION}
-
-        {$REGION 'create r-apk.jar and r-aab.jar'}
-        for var LApk := False to True do begin
-          Writeln('Create r-'+ALIfThenU(LApk, 'apk', 'aab')+'.jar');
-          if not LApk then begin
-            CreateRFlata(
-              LResOutputDir, // const AMergedResPath: String;
-              LRFlataFilename, // const ARFlataPath: String;
-              LAapt2Filename);// const AAaptPath: String);
-          end;
-          //--
-          if not AlEmptyDirectoryU(LtmpDirectoryRClass, true{SubDirectory}) then raise EALException.CreateFmt('Cannot clear %s', [LtmpDirectoryRClass]);
-          for var I := 0 to LLibraries.childnodes.Count - 1 do begin
-            CreateRClasses(
-              ALIncludeTrailingPathDelimiterU(string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}))), // const ALibPath: String;
-              ALIfThenU(LApk, LResOutputDir, LRFlataFilename), // const AMergedResPath: String;
-              LtmpDirectory, // const ATmpDir: String;
-              LtmpDirectoryRJava, // const ARjavaPath: String;
-              LtmpDirectoryRClass, // const ARClassPath: String;
-              AlIfThenU(LApk, LAaptFilename, LAapt2Filename), // const AAaptPath: String;
-              LSDKApiLevelJarFilename, // const ASDKApiLevelJar: String
-              LJavacFilename); // const AJavacPath: String
-          end;
-          //--
-          CreateRJar(
-            LLibsOutputDir + ALIfThenU(LApk, 'r-apk.jar', 'r-aab.jar'), // const aRJarPath: String;
-            LtmpDirectoryRClass, // const ARClassPath: String;
-            LJarExeFilename); // const AJarPath: String);
-        end;
-        {$ENDREGION}
-
-        {$REGION 'create R.Jar'}
-        Var LJarFilename := LLibsOutputDir + 'r.jar';
-        if TFile.Exists(LJarFilename) then raise Exception.Create('Error 7FD3D8B3-1565-4897-8943-1519C302875A');
-        Tfile.Copy(LLibsOutputDir + 'r-apk.jar', LJarFilename);
-        {$ENDREGION}
-
-        {$REGION 'Merge AndroidManifest'}
-        //https://developer.android.com/studio/build/manage-manifests
-        //The problem is that the merging is done one time on the template,
-        //and not on the generated AndroidManifest everytime we compile the project.
-        //so we must introduce a mechanism to remove previously merged node from
-        //the AndroidManifest template. The way I go is to add section identifiers
-        //
-        //  <!-- ============================================ -->
-        //  <!-- AndroidMerger auto-generated section (BEGIN) -->
-        //  <!-- ============================================ -->
-        //
-        //  .............
-        //
-        //  <!-- ========================================== -->
-        //  <!-- AndroidMerger auto-generated section (END) -->
-        //  <!-- ========================================== -->
-        //
-        //So in this way before merging the AndroidManifest I delete thanks to the
-        //section identifiers all previously added node. This work well except for
-        //attributes.
-        if LAndroidManifest <> '' then begin
-          Writeln('Merge AndroidManifest');
-          var LMaxMinSdkVersion: integer := 0;
-          if not Tfile.Exists(LAndroidManifest) then raise Exception.CreateFmt('%s does not exist', [LAndroidManifest]);
-          var LAndroidManifestXmlDoc := TalXmlDocument.Create;
-          Var LDisabledXmlDoc := TalXmlDocument.Create('manifest');
-          try
-
-            var LAndroidManifestSrc := ALGetStringFromFile(LAndroidManifest);
-            if ALPos('%/>', LAndroidManifestSrc) > 0 then raise Exception.Create('Error 7FE78AC6-C0C3-41EC-9E7D-8497FDBE644C');
-            LAndroidManifestSrc := ALStringReplace(LAndroidManifestSrc, '%>', '%/>', [rfReplaceALL]);
-            //--
-            LAndroidManifestXmlDoc.Options := [];
-            LAndroidManifestXmlDoc.ParseOptions := [poPreserveWhiteSpace];
-            LAndroidManifestXmlDoc.LoadFromXML(LAndroidManifestSrc);
-            LAndroidManifestXmlDoc.Options := [DoNodeAutoIndent, doAttributeAutoIndent];
-            //--
-            ExtractAutoGeneratedSectionFromAndroidManifest(
-              LAndroidManifestXmlDoc.DocumentElement,
-              LDisabledXmlDoc);
-            //--
-            for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
-              var LSrcFilename := string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}))+'\AndroidManifest.xml.original';
-              if TFile.Exists(LSrcFilename) then begin
-                Var LSrcXmlDoc := TALXmlDocument.Create;
-                Try
-                  LSrcXmlDoc.Options := [doNodeAutoIndent];
-                  var LSrcContent := ALgetStringFromFile(LSrcFilename);
-                  LSrcContent := ALStringReplace(LSrcContent, '${applicationId}', '%package%', [rfReplaceAll, RfIgnoreCase]);
-                  LSrcXmlDoc.LoadFromXML(LSrcContent);
-                  MergeAndroidManifest(
-                    LSrcXmlDoc.DocumentElement.Attributes['package'], // const APackageName: AnsiString;
-                    LSrcXmlDoc.DocumentElement, // const ASrcFilename: String;
-                    LAndroidManifestXmlDoc.DocumentElement, // const ADestXmlDoc: TalXmlDocument;
-                    LDisabledXmlDoc.DocumentElement, // const ADisabledNode: TalXmlNode
-                    LMaxMinSdkVersion); // var AMaxMinSdkVersion: integer;
-                finally
-                  ALFreeAndNil(LSrcXmlDoc);
-                End;
-              end;
-            end;
-            //--
-            CloseAutoGeneratedSectionInAndroidManifest(LAndroidManifestXmlDoc.DocumentElement);
-            //--
-            //https://developer.android.com/guide/topics/manifest/manifest-intro
-            //Elements at the same level are generally not ordered. For example, the <activity>, <provider>,
-            //and <service> elements can be placed in any order. There are two key exceptions to this rule:
-            //  * An <activity-alias> element must follow the <activity> for which it is an alias.
-            //  * The <application> element must be the last element inside the <manifest> element.
-            if IsAutoGeneratedSectionBeginCommentPresentInAndroidManifest(LAndroidManifestXmlDoc.DocumentElement) then begin
-              var LapplicationNodeIdx := LAndroidManifestXmlDoc.DocumentElement.childnodes.indexOf('application');
-              while (LapplicationNodeIdx < LAndroidManifestXmlDoc.DocumentElement.childnodes.count - 1) and
-                    (LAndroidManifestXmlDoc.DocumentElement.childnodes[LapplicationNodeIdx+1].nodeType = ntText) do
-                LAndroidManifestXmlDoc.DocumentElement.childnodes.delete(LapplicationNodeIdx+1);
-              Var LApplicationCommentNodeIdx := LapplicationNodeIdx;
-              Var LTmpIdx := LApplicationCommentNodeIdx - 1;
-              Var LconcatenatedText: String := '';
-              while LTmpIdx >= 0 do begin
-                case LAndroidManifestXmlDoc.DocumentElement.childnodes[LTmpIdx].nodeType of
-                  ntText: begin
-                    LconcatenatedText := LconcatenatedText + string(LAndroidManifestXmlDoc.DocumentElement.childnodes[LTmpIdx].Text);
-                    if LconcatenatedText.CountChar(#10) > 1 then break;
-                    dec(LTmpIdx);
-                  end;
-                  ntcomment: begin
-                    LApplicationCommentNodeIdx := LTmpIdx;
-                    dec(LTmpIdx);
-                    LconcatenatedText := '';
-                  end;
-                  else
-                    break;
-                end;
-              end;
-              for var I := LApplicationCommentNodeIdx to LapplicationNodeIdx do begin
-                var LtmpNode := LAndroidManifestXmlDoc.DocumentElement.childnodes.Extract(LApplicationCommentNodeIdx);
-                if LtmpNode.nodetype = ntText then ALFreeAndNil(LtmpNode)
-                else LAndroidManifestXmlDoc.DocumentElement.childnodes.Add(LtmpNode);
-              end;
-              var LBreakLineNode := TALXmlElementNode.Create('br');
-              LAndroidManifestXmlDoc.DocumentElement.ChildNodes.Add(LBreakLineNode);
-              LAndroidManifestXmlDoc.DocumentElement.ChildNodes.Remove(LBreakLineNode);
-            end;
-            //--
-            LAndroidManifestXmlDoc.SaveToXML(LAndroidManifestSrc);
-            LAndroidManifestSrc := ALStringReplace(LAndroidManifestSrc, '%/>', '%>', [rfReplaceALL]);
-            Tfile.Delete(LAndroidManifest);
-            ALSaveStringToFile(LAndroidManifestSrc, LAndroidManifest);
-          finally
-            ALFreeAndNil(LAndroidManifestXmlDoc);
-            ALFreeAndNil(LDisabledXmlDoc);
-          end;
-          if LMaxMinSdkVersion > 0 then
-            Writeln('Max MinSdkVersion found in libraries: ' + ALintToStrU(LMaxMinSdkVersion), TALConsoleColor.ccDarkYellow);
-        end;
-        {$ENDREGION}
-
-        {$REGION 'Update dproj'}
-        if LDProjFilename <> '' then begin
-          Writeln('Update dproj');
-          var LdprojXmlDoc := TalXmlDocument.Create('root');
-          var LDeployFilesToDeactivate := TalStringList.Create;
-          try
-
-            //init LDProjDir
-            var LDProjDir := ALExtractFilePathU(LDProjFilename);
-
-            //init LdprojXmlDoc
-            LdprojXmlDoc.LoadFromFile(LDProjFilename);
-
-            //init LProjectExtensionsNode
-            var LProjectExtensionsNode := LDProjXmlDoc.DocumentElement.ChildNodes.FindNode('ProjectExtensions');
-            if LProjectExtensionsNode = nil then raise Exception.Create('ProjectExtensions node not found!');
-
-            //init LBorlandProjectNode
-            var LBorlandProjectNode := LProjectExtensionsNode.ChildNodes.FindNode('BorlandProject');
-            if LBorlandProjectNode = nil then raise Exception.Create('ProjectExtensions.BorlandProject node not found!');
-
-            //init LDeploymentNode
-            var LDeploymentNode := LBorlandProjectNode.ChildNodes.FindNode('Deployment');
-            if LDeploymentNode = nil then raise Exception.Create('ProjectExtensions.BorlandProject.Deployment node not found!');
-
-            //init LDeployFilesToDeactivate
-            LDeployFilesToDeactivate.Add('Android_Strings');
-            LDeployFilesToDeactivate.Add('Android_Colors');
-            LDeployFilesToDeactivate.Add('AndroidSplashImageDef');
-            LDeployFilesToDeactivate.Add('AndroidSplashStylesV21');
-            LDeployFilesToDeactivate.Add('AndroidSplashStyles');
-            LDeployFilesToDeactivate.Add('Android_LauncherIcon36');
-            LDeployFilesToDeactivate.Add('Android_LauncherIcon48');
-            LDeployFilesToDeactivate.Add('Android_LauncherIcon72');
-            LDeployFilesToDeactivate.Add('Android_LauncherIcon96');
-            LDeployFilesToDeactivate.Add('Android_LauncherIcon144');
-            LDeployFilesToDeactivate.Add('Android_LauncherIcon192');
-            LDeployFilesToDeactivate.Add('Android_SplashImage426');
-            LDeployFilesToDeactivate.Add('Android_SplashImage470');
-            LDeployFilesToDeactivate.Add('Android_SplashImage640');
-            LDeployFilesToDeactivate.Add('Android_SplashImage960');
-            LDeployFilesToDeactivate.Add('Android_NotificationIcon24');
-            LDeployFilesToDeactivate.Add('Android_NotificationIcon36');
-            LDeployFilesToDeactivate.Add('Android_NotificationIcon48');
-            LDeployFilesToDeactivate.Add('Android_NotificationIcon72');
-            LDeployFilesToDeactivate.Add('Android_NotificationIcon96');
-
-            //remove from deployment all items deployed to "res\", "library\lib\arm64-v8a\" and "library\lib\armeabi-v7a\" remote folder
-            //<DeployFile LocalName="android\res\drawable\common_google_signin_btn_icon_disabled.xml" Configuration="Release" Class="File">
-            //    <Platform Name="Android">
-            //        <RemoteDir>res\drawable</RemoteDir>
-            //        <RemoteName>common_google_signin_btn_icon_disabled.xml</RemoteName>
-            //        <Overwrite>true</Overwrite>
-            //    </Platform>
-            //    <Platform Name="Android64">
-            //        <RemoteDir>res\drawable</RemoteDir>
-            //        <RemoteName>common_google_signin_btn_icon_disabled.xml</RemoteName>
-            //        <Overwrite>true</Overwrite>
-            //    </Platform>
-            //</DeployFile>
-            //<DeployFile LocalName="..\..\..\..\..\Alcinoe\lib\jar\org.webrtc\jni\arm64-v8a\libjingle_peerconnection_so.so" Configuration="Release" Class="File">
-            //    <Platform Name="Android">
-            //        <RemoteDir>library\lib\arm64-v8a\</RemoteDir>
-            //        <RemoteName>libjingle_peerconnection_so.so</RemoteName>
-            //        <Overwrite>true</Overwrite>
-            //    </Platform>
-            //    <Platform Name="Android64">
-            //        <RemoteDir>library\lib\arm64-v8a\</RemoteDir>
-            //        <RemoteName>libjingle_peerconnection_so.so</RemoteName>
-            //        <Overwrite>true</Overwrite>
-            //    </Platform>
-            //</DeployFile>
-            for var I := LDeploymentNode.ChildNodes.Count - 1 downto 0 do begin
-              var LDeployFileNode := LDeploymentNode.ChildNodes[i];
-              if ALSameText(LDeployFileNode.NodeName, 'DeployFile') then begin
-                if ALSameText(LDeployFileNode.Attributes['Class'], 'File') then begin
-                  if LDeployFileNode.ChildNodes.Count = 0 then raise Exception.Create('Error A892E02E-A8BA-4003-AEF1-A81271AD0A9F');
-                  for Var J := LDeployFileNode.ChildNodes.Count - 1 downto 0 do begin
-                    var LPlatformNode := LDeployFileNode.ChildNodes[j];
-                    if not alSameText(LPlatformNode.NodeName, 'Platform') then raise Exception.Create('Error 65714071-86F2-4796-82F8-9F01C5C9824B');
-                    var LName := LPlatformNode.Attributes['Name'];
-                    if LName = '' then raise Exception.Create('Error 42C3C299-BA31-4B17-9EA4-8320E0048848');
-                    if (LPlatforms.IndexOf(LName) >= 0) then begin
-                      Var LremoteDirNode := LPlatformNode.ChildNodes.FindNode('RemoteDir');
-                      if (LremoteDirNode <> nil) and
-                         ((alposExIgnoreCase('res\', LremoteDirNode.Text) = 1) or
-                          (ALSameText('res', LremoteDirNode.Text)) or
-                          (alposExIgnoreCase('library\lib\arm64-v8a', LremoteDirNode.Text) = 1) or
-                          (alposExIgnoreCase('library\lib\armeabi-v7a', LremoteDirNode.Text) = 1)) then begin
-                        LDeployFileNode.ChildNodes.Delete(j);
-                        continue;
-                      end;
-                    end;
-                  end;
-                  if LDeployFileNode.ChildNodes.Count = 0 then
-                    LDeploymentNode.ChildNodes.Delete(i);
-                end
-                else if LDeployFilesToDeactivate.IndexOf(LDeployFileNode.Attributes['Class']) >= 0 then begin
-                  LDeploymentNode.ChildNodes.Delete(i);
-                end;
-              end
-            end;
-
-            //add to deployment all items from local res\ folder
-            var LResFiles := TDirectory.GetFiles(LResOutputDir, '*', TSearchOption.soAllDirectories); // c:\....Android\Merged\res\drawable\common_google_signin_btn_icon_disabled.xml
-            var LResRelativePath := ansiString(ExtractRelativePath(LDProjDir, LResOutputDir)); // Android\Merged\res\
-            for Var I := Low(LResFiles) to High(LResFiles) do begin
-              Var LLocalName := AnsiString(ExtractRelativePath(LDProjDir, LResFiles[i])); // Android\Merged\res\drawable\common_google_signin_btn_icon_disabled.xml
-              for var LConfig in LConfigs do begin
-                With LDeploymentNode.AddChild('DeployFile') do begin
-                  Attributes['LocalName'] := LLocalName;
-                  Attributes['Configuration'] := LConfig;
-                  Attributes['Class'] := 'File';
-                  for var LPlatForm in LPlatforms do begin
-                    With AddChild('Platform') do begin
-                      Attributes['Name'] := LPlatForm;
-                      Addchild('RemoteDir').Text := 'res\' + ALStringReplace(ALExcludeTrailingPathDelimiter(ALExtractFilePath(LLocalName)), LResRelativePath, '', [rfIgnoreCase]);
-                      Addchild('RemoteName').Text := ALExtractFileName(LLocalName);
-                      Addchild('Overwrite').Text := 'true';
-                    end;
-                  end;
-                end;
-              end;
-            end;
-
-            //deactivate all items in LDeployFilesToDeactivate
-            for Var I := 0 to LDeployFilesToDeactivate.Count-1 do begin
-              for var LConfig in LConfigs do begin
-                With LDeploymentNode.AddChild('DeployFile') do begin
-                  Attributes['LocalName'] := 'none';
-                  Attributes['Configuration'] := LConfig;
-                  Attributes['Class'] := LDeployFilesToDeactivate[i];
-                  for var LPlatForm in LPlatforms do begin
-                    With AddChild('Platform') do begin
-                      Attributes['Name'] := LPlatForm;
-                      Addchild('Enabled').Text := 'false';
-                      Addchild('Overwrite').Text := 'true';
-                    end;
-                  end;
-                end;
-              end;
-            end;
-
-            //add to deployment all items from local jni\ folder
-            var LJniFiles := TDirectory.GetFiles(LJniOutputDir, '*', TSearchOption.soAllDirectories); // c:\....Android\Merged\jni\arm64-v8a\libjingle_peerconnection_so.so
-            var LJniRelativePath := ansiString(ExtractRelativePath(LDProjDir, LJniOutputDir)); // Android\Merged\jni\
-            for Var I := Low(LJniFiles) to High(LJniFiles) do begin
-              Var LLocalName := AnsiString(ExtractRelativePath(LDProjDir, LJniFiles[i])); // Android\Merged\jni\arm64-v8a\libjingle_peerconnection_so.so
-              for var LConfig in LConfigs do begin
-                With LDeploymentNode.AddChild('DeployFile') do begin
-                  Attributes['LocalName'] := LLocalName;
-                  Attributes['Configuration'] := LConfig;
-                  Attributes['Class'] := 'File';
-                  for var LPlatForm in LPlatforms do begin
-                    With AddChild('Platform') do begin
-                      Attributes['Name'] := LPlatForm;
-                      Addchild('RemoteDir').Text := 'library\lib\' + ALStringReplace(ALExcludeTrailingPathDelimiter(ALExtractFilePath(LLocalName)), LJniRelativePath, '', [rfIgnoreCase]); // library\lib\arm64-v8a\libjingle_peerconnection_so.so
-                      Addchild('RemoteName').Text := ALExtractFileName(LLocalName);
-                      Addchild('Overwrite').Text := 'true';
-                    end;
-                  end;
-                end;
-              end;
-            end;
-
-            //init LItemGroupNode
-            var LItemGroupNode := LDProjXmlDoc.DocumentElement.ChildNodes.FindNode('ItemGroup');
-            if LItemGroupNode = nil then raise Exception.Create('ItemGroup node not found!');
-
-            //remove from ItemGroup all JavaReference
-            //<JavaReference Include="..\..\..\libraries\jar\android.arch.core\arch-core-common.jar">
-            //  <Disabled/>
-            //</JavaReference>
-            for var I := LItemGroupNode.ChildNodes.Count - 1 downto 0 do begin
-              var LJavaReferenceNode := LItemGroupNode.ChildNodes[i];
-              if ALSameText(LJavaReferenceNode.NodeName, 'JavaReference') then
-                LItemGroupNode.ChildNodes.Delete(i);
-            end;
-
-            //add to ItemGroup all items from local libs\ folder
-            var LLibsFiles := TDirectory.GetFiles(LLibsOutputDir, '*', TSearchOption.soAllDirectories); // c:\....android\libs\r.jar
-            var LLibsRelativePath := ansiString(ExtractRelativePath(LDProjDir, LLibsOutputDir)); // android\libs\
-            for Var I := Low(LLibsFiles) to High(LLibsFiles) do begin
-              if ALSameTextU(AlExtractFilenameU(LLibsFiles[i]), 'r-apk.jar') or
-                 ALSameTextU(AlExtractFilenameU(LLibsFiles[i]), 'r-aab.jar') then continue;
-              if not ALSameTextU(AlExtractFileExtU(LLibsFiles[i]),'.jar') then raise Exception.Create('Error E88BE4F0-B6E5-4EC4-B890-B9B6169FC58B');
-              Var LLocalName := AnsiString(ExtractRelativePath(LDProjDir, LLibsFiles[i])); // android\libs\r.jar
-              With LItemGroupNode.AddChild('JavaReference') do Attributes['Include'] := LLocalName;
-            end;
-
-            //Update EnabledSysJars
-            for var I := 0 to LdprojXmlDoc.DocumentElement.ChildNodes.Count - 1 do begin
-              var LPropertyGroupNode := LdprojXmlDoc.DocumentElement.ChildNodes[i];
-              if LPropertyGroupNode.NodeName = 'PropertyGroup' then begin
-                Var LEnabledSysJarsNode := LPropertyGroupNode.ChildNodes.FindNode('EnabledSysJars');
-                if (LEnabledSysJarsNode <> nil) and (LEnabledSysJarsNode.Text <> '') then LEnabledSysJarsNode.Text := 'fmx.dex.jar';
-              end;
-            end;
-
-            //update DisabledSysJars
-            for var I := 0 to LdprojXmlDoc.DocumentElement.ChildNodes.Count - 1 do begin
-              var LPropertyGroupNode := LdprojXmlDoc.DocumentElement.ChildNodes[i];
-              if LPropertyGroupNode.NodeName = 'PropertyGroup' then begin
-                Var LDisabledSysJarsNode := LPropertyGroupNode.ChildNodes.FindNode('DisabledSysJars');
-                if LDisabledSysJarsNode <> nil then LPropertyGroupNode.ChildNodes.Remove(LDisabledSysJarsNode);
-              end;
-            end;
-
-            //add the RJarSwapper command line
-            if LRJarSwapper <> '' then begin
-              var LRJarDir := ExtractRelativePath(ALExtractFilePathU(LDProjDir), LLibsOutputDir);
-              Var LConditions := TALstringList.Create;
-              try
-                if LPlatforms.IndexOf('Android') >= 0 then begin
-                  if LConfigs.IndexOf('Debug') >= 0 then LConditions.Add('Android=Debug');
-                  if LConfigs.IndexOf('Release') >= 0 then LConditions.Add('Android=Release');
-                end;
-                if LPlatforms.IndexOf('Android64') >= 0 then begin
-                  if LConfigs.IndexOf('Debug') >= 0 then LConditions.Add('Android64=Debug');
-                  if LConfigs.IndexOf('Release') >= 0 then LConditions.Add('Android64=Release');
-                end;
-                //----
-                for var I := 0 to LdprojXmlDoc.DocumentElement.ChildNodes.Count - 1 do begin
-                  var LPropertyGroupNode := LdprojXmlDoc.DocumentElement.ChildNodes[i];
-                  if LPropertyGroupNode.NodeName = 'PropertyGroup' then begin
-                    var LCondition := LPropertyGroupNode.Attributes['Condition'];
-                    var LPlatform: AnsiString := '';
-                    if (ALposExIgnoreCase('Android64', LCondition) > 0) then LPlatform := 'Android64'
-                    else if (ALposExIgnoreCase('Android', LCondition) > 0) then LPlatform := 'Android';
-                    if ((LPlatform = 'Android64') and (LPlatforms.IndexOf('Android64') >= 0)) or
-                       ((LPlatform = 'Android') and (LPlatforms.IndexOf('Android') >= 0)) then begin
-                      Var LPreBuildEventNode := LPropertyGroupNode.ChildNodes.FindNode('PreBuildEvent');
-                      var LPreBuildEventXml: ansiString := '';
-                      if (LPreBuildEventNode <> nil) then LPreBuildEventNode.SaveToXML(LPreBuildEventXml, true{SaveOnlyChildNodes});
-                      if (LPreBuildEventXml <> '') and
-                         (alposExIgnoreCase('RJarSwapper.bat', LPreBuildEventXml) <= 0) then
-                        raise Exception.Create('Cannot set RJarSwapper.bat in PreBuildEvent because it''s not empty');
-                      if LPreBuildEventNode <> nil then LPropertyGroupNode.ChildNodes.Remove(LPreBuildEventNode);
-                      Var LIndex := LPropertyGroupNode.ChildNodes.IndexOf('PreBuildEventCancelOnError');
-                      if LIndex >= 0 then LPropertyGroupNode.ChildNodes.Delete(LIndex);
-                      LIndex := LPropertyGroupNode.ChildNodes.IndexOf('PreBuildEventIgnoreExitCode');
-                      if LIndex >= 0 then LPropertyGroupNode.ChildNodes.Delete(LIndex);
-                      LIndex := LPropertyGroupNode.ChildNodes.IndexOf('PreBuildEventExecuteWhen');
-                      if LIndex >= 0 then LPropertyGroupNode.ChildNodes.Delete(LIndex);
-                      var J := LConditions.IndexOf(LPlatform+'=Debug');
-                      if (J >= 0) and
-                         (ALposExIgnoreCase('Debug', LCondition) > 0) then begin
-                        LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="false"';
-                        LConditions.Delete(J);
-                      end
-                      else begin
-                        J := LConditions.IndexOf(LPlatform+'=Release');
-                        if (J >= 0) and
-                           (ALposExIgnoreCase('Release', LCondition) > 0) then begin
-                          LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="true"';
-                          LConditions.Delete(J);
-                        end;
-                      end;
-                    end;
-                  end;
-                end;
-                //----
-                for var I := 0 to LConditions.Count - 1 do begin
-                  var LPropertyGroupNode := LdprojXmlDoc.DocumentElement.AddChild('PropertyGroup');
-                  LPropertyGroupNode.Attributes['Condition'] := '''$(Config)''=='''+LConditions.ValueFromIndex[i]+''' And ''$(Platform)''=='''+LConditions.Names[i]+'''';
-                  if ALSameText(LConditions.ValueFromIndex[i], 'Debug') then
-                    LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="false"'
-                  else if ALSameText(LConditions.ValueFromIndex[i], 'Release') then
-                    LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="true"';
-                end;
-              finally
-                ALFreeAndNil(LConditions);
-              end;
-            end;
-
-            //save LdprojXmlDoc
-            var LDprojXmlSrc: AnsiString;
-            LdprojXmlDoc.SaveToXML(LDprojXmlSrc);
-            LdprojXmlDoc.Options := [doNodeAutoIndent];
-            LdprojXmlDoc.LoadFromXML(LDprojXmlSrc);
-            LdprojXmlDoc.SaveToFile(LDProjFilename);
-
-            //normalize the LdprojXmlDoc
-            if LDProjNormalizer <> '' then
-              ExecuteCmdLine('"'+LDProjNormalizer+'" "' +LDProjFilename + '" false');
-
-          finally
-            ALFreeAndNil(LdprojXmlDoc);
-            ALFreeAndNil(LDeployFilesToDeactivate);
-          end;
-        end;
-        {$ENDREGION}
-
-        {$REGION 'List imported Libraries'}
-        Writeln('Imported Libraries:');
-        Var LdependenciesLst := TALstringList.Create;
-        Try
-          for var I := 0 to LLibraries.ChildNodes.Count - 1 do begin
-            var LLibrary := LLibraries.ChildNodes[i];
-            var LgroupID := LLibrary.GetChildNodeValueText('groupid', ''{default});
-            if LgroupID = '' then begin
-              LdependenciesLst.Add(
-                LLibrary.GetChildNodeValueText('archivefilename', ''{default}));
-            end
-            else begin
-              LdependenciesLst.Add(
-                LLibrary.GetChildNodeValueText('groupid', ''{default}) + ':' +
-                LLibrary.GetChildNodeValueText('artifactid', ''{default}) + ':' +
-                LLibrary.GetChildNodeValueText('version', ''{default}));
-            end;
-          end;
-          LdependenciesLst.Sorted := True;
-          for var I := 0 to LdependenciesLst.Count - 1 do
-            Writeln(
-              String(LdependenciesLst[i]),
-              TALConsoleColor.ccDarkYellow);
-        finally
-          ALFreeAndNil(LdependenciesLst);
-        End;
-        {$ENDREGION}
-
+        LdependenciesLst.Sorted := True;
+        for var I := 0 to LdependenciesLst.Count - 1 do
+          Writeln(
+            String(LdependenciesLst[i]),
+            TALConsoleColor.ccDarkYellow);
       finally
-
-        {$REGION 'Free local objects'}
-        ALFreeAndNil(LParamLst);
-        ALFreeAndNil(LLibraries);
-        ALFreeAndNil(LConfigs);
-        ALFreeAndNil(LPlatforms);
-        ALFreeAndNil(LSupportLibraryToAndroidx);
-        {$ENDREGION}
-
-      end;
+        ALFreeAndNil(LdependenciesLst);
+      End;
+      {$ENDREGION}
 
     finally
 
-      {$REGION 'Empty tmp directory'}
-      {$IF not defined(DEBUG)}
-      AlEmptyDirectoryU(LtmpDirectory, true{SubDirectory});
-      Tdirectory.Delete(LtmpDirectory);
-      {$ENDIF}
+      {$REGION 'Free local objects'}
+      ALFreeAndNil(LParamLst);
+      ALFreeAndNil(LLibraries);
+      ALFreeAndNil(LConfigs);
+      ALFreeAndNil(LPlatforms);
+      ALFreeAndNil(LSupportLibraryToAndroidx);
       {$ENDREGION}
 
     end;
@@ -3606,6 +3597,13 @@ begin
       Writeln('Press any key to exit');
       Readln;
     end;
+
+    {$REGION 'Empty tmp directory'}
+    {$IF not defined(DEBUG)}
+    AlEmptyDirectoryU(LtmpDirectory, true{SubDirectory});
+    Tdirectory.Delete(LtmpDirectory);
+    {$ENDIF}
+    {$ENDREGION}
 
   except
     on E: Exception do begin

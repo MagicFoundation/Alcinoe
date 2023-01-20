@@ -182,7 +182,7 @@
     <DCC_S>false</DCC_S>
     <DCC_F>false</DCC_F>
     <DCC_K>false</DCC_K>
-    <DCC_UnitSearchPath>..\..\..\Sources;..\..\..\Embarcadero\Alexandria\11_2\fmx;..\..\..\Embarcadero\Alexandria\11_2\rtl\ios;..\..\..\Embarcadero\Alexandria\11_2\rtl\android;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+    <DCC_UnitSearchPath>..\..\..\Source;..\..\..\Embarcadero\Alexandria\11_2\fmx;..\..\..\Embarcadero\Alexandria\11_2\rtl\ios;..\..\..\Embarcadero\Alexandria\11_2\rtl\android;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Android)&#39;!=&#39;&#39;">
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
@@ -192,7 +192,7 @@
     <VerInfo_Build>1</VerInfo_Build>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <EnabledSysJars>fmx.dex.jar</EnabledSysJars>
-    <DCC_LinkerOptions>--version-script=..\..\..\Sources\goExports.vsr</DCC_LinkerOptions>
+    <DCC_LinkerOptions>--version-script=..\..\..\Source\goExports.vsr</DCC_LinkerOptions>
     <Android_NotificationIcon24>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png</Android_NotificationIcon24>
     <Android_NotificationIcon36>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png</Android_NotificationIcon36>
     <Android_NotificationIcon48>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png</Android_NotificationIcon48>
@@ -212,7 +212,7 @@
     <DCC_UsePackage>DBXSqliteDriver;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;tethering;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;FireDACDBXDriver;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;RESTBackendComponents;soapserver;bindengine;CloudService;FireDACCommonDriver;DataSnapClient;inet;bindcompdbx;IndyIPCommon;IndyIPServer;IndySystem;fmxFireDAC;FireDAC;FireDACSqliteDriver;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;FireDACDSDriver;rtl;DbxClientDriver;CustomIPTransport;bindcomp;IndyIPClient;dbxcds;dsnapxml;DataSnapProviderClient;dbrtl;IndyProtocols;$(DCC_UsePackage);$(DCC_UsePackage)</DCC_UsePackage>
     <VerInfo_Build>1</VerInfo_Build>
     <EnabledSysJars>fmx.dex.jar</EnabledSysJars>
-    <DCC_LinkerOptions>--version-script=..\..\..\Sources\goExports.vsr</DCC_LinkerOptions>
+    <DCC_LinkerOptions>--version-script=..\..\..\Source\goExports.vsr</DCC_LinkerOptions>
     <Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
     <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
   </PropertyGroup>
@@ -341,13 +341,13 @@
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
-    <Debugger_DebugSourcePath>C:\Dev\MagicFoundation\Alcinoe\Sources\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
+    <Debugger_DebugSourcePath>C:\Dev\MagicFoundation\Alcinoe\Source\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_iOSSimARM64)&#39;!=&#39;&#39;">
     <Cfg_1>true</Cfg_1>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
-    <Debugger_DebugSourcePath>C:\Dev\MagicFoundation\Alcinoe\Sources\;$(Debugger_DebugSourcePath);$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
+    <Debugger_DebugSourcePath>C:\Dev\MagicFoundation\Alcinoe\Source\;$(Debugger_DebugSourcePath);$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_OSX64)&#39;!=&#39;&#39;">
     <Cfg_1_OSX32>true</Cfg_1_OSX32>

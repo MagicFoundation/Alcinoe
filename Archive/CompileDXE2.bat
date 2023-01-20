@@ -66,7 +66,7 @@ IF ERRORLEVEL 1 goto ERROR
 
 pause
 
-if exist ..\..\BlowPipeEmail\_build\Sources\BlowPipeEmail.dpr (
+if exist ..\..\BlowPipeEmail\_build\Source\BlowPipeEmail.dpr (
 
   del ..\..\BlowPipeEmail\*.rsm /s
   IF ERRORLEVEL 1 goto ERROR
@@ -86,7 +86,7 @@ if exist ..\..\BlowPipeEmail\_build\Sources\BlowPipeEmail.dpr (
   del ..\..\BlowPipeEmail\*.dproj.local /s
   IF ERRORLEVEL 1 goto ERROR
   
-  MSBuild ..\..\BlowPipeEmail\_build\Sources\BlowPipeEmail.dproj /t:build /p:Config=Release /p:Platform=Win32
+  MSBuild ..\..\BlowPipeEmail\_build\Source\BlowPipeEmail.dproj /t:build /p:Config=Release /p:Platform=Win32
   IF ERRORLEVEL 1 goto ERROR
   
   pause
@@ -99,7 +99,7 @@ if exist ..\..\BlowPipeEmail\_build\Sources\BlowPipeEmail.dpr (
 
 )  
 
-if exist ..\..\BlowPipeSMS\_build\Sources\BlowPipeSMS.dpr (
+if exist ..\..\BlowPipeSMS\_build\Source\BlowPipeSMS.dpr (
 
   del ..\..\BlowPipeSMS\*.rsm /s
   IF ERRORLEVEL 1 goto ERROR
@@ -119,7 +119,7 @@ if exist ..\..\BlowPipeSMS\_build\Sources\BlowPipeSMS.dpr (
   del ..\..\BlowPipeSMS\*.dproj.local /s
   IF ERRORLEVEL 1 goto ERROR
   
-  MSBuild ..\..\BlowPipeSMS\_build\Sources\BlowPipeSMS.dproj /t:build /p:Config=Release /p:Platform=Win32
+  MSBuild ..\..\BlowPipeSMS\_build\Source\BlowPipeSMS.dproj /t:build /p:Config=Release /p:Platform=Win32
   IF ERRORLEVEL 1 goto ERROR
   
   pause

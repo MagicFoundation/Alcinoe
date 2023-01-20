@@ -11,7 +11,7 @@ interface
   //Please run <Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorAndroid.bat
   //with the library identifiers com.google.firebase:firebase-messaging:xx.xx.xx where xx.xx.xx
   //is the last version of the firebase-messaging and gave also the path to
-  //<Alcinoe>\Sources\ALAndroidFirebaseApi.pas to build the compare source file. Then make a diff
+  //<Alcinoe>\Source\ALAndroidFirebaseApi.pas to build the compare source file. Then make a diff
   //compare between the new generated ALAndroidFirebaseApi.pas and this one to see if the api
   //signature is still the same. repeat the operation below with the library
   //com.google.firebase:firebase-analytics:xx.xx.xx

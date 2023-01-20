@@ -160,7 +160,7 @@
     <Base>true</Base>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base)&#39;!=&#39;&#39;">
-    <DCC_UnitSearchPath>..\..\..\Sources;..\..\..\Embarcadero\Alexandria\11_2\fmx;..\..\..\Embarcadero\Alexandria\11_2\rtl\ios;..\..\..\Embarcadero\Alexandria\11_2\rtl\android;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+    <DCC_UnitSearchPath>..\..\..\Source;..\..\..\Embarcadero\Alexandria\11_2\fmx;..\..\..\Embarcadero\Alexandria\11_2\rtl\ios;..\..\..\Embarcadero\Alexandria\11_2\rtl\android;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
     <AUP_WRITE_EXTERNAL_STORAGE>true</AUP_WRITE_EXTERNAL_STORAGE>
     <AUP_CALL_PHONE>true</AUP_CALL_PHONE>
@@ -187,7 +187,7 @@
     <DCC_CodePage>65001</DCC_CodePage>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Android)&#39;!=&#39;&#39;">
-    <DCC_LinkerOptions>--version-script=..\..\..\Sources\goExports.vsr</DCC_LinkerOptions>
+    <DCC_LinkerOptions>--version-script=..\..\..\Source\goExports.vsr</DCC_LinkerOptions>
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
     <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;rtl;DbxClientDriver;IndyIPClient;DataSnapProviderClient;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;soapserver;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;FireDACDSDriver;CustomIPTransport;bindcomp;dbxcds;dsnapxml;dbrtl;IndyProtocols;$(DCC_UsePackage)</DCC_UsePackage>
     <EnabledSysJars>fmx.dex.jar</EnabledSysJars>
@@ -210,7 +210,7 @@
     <Base_Android>true</Base_Android>
     <CfgParent>Base</CfgParent>
     <Base>true</Base>
-    <DCC_LinkerOptions>--version-script=..\..\..\Sources\goExports.vsr</DCC_LinkerOptions>
+    <DCC_LinkerOptions>--version-script=..\..\..\Source\goExports.vsr</DCC_LinkerOptions>
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
     <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;rtl;DbxClientDriver;IndyIPClient;DataSnapProviderClient;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;soapserver;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;FireDACDSDriver;CustomIPTransport;bindcomp;dbxcds;dsnapxml;dbrtl;IndyProtocols;$(DCC_UsePackage);$(DCC_UsePackage)</DCC_UsePackage>
     <EnabledSysJars>fmx.dex.jar</EnabledSysJars>

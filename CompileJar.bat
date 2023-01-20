@@ -18,7 +18,7 @@ REM --------------
 REM Security check
 REM --------------
 
-if not exist "%ALBaseDir%\Sources\Alcinoe.inc" goto ERROR
+if not exist "%ALBaseDir%\Source\Alcinoe.inc" goto ERROR
 
 
 REM -----------------
@@ -81,7 +81,7 @@ Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.fragment
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.lifecycle" "lifecycle-common" "2.5.1"
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.lifecycle" "lifecycle-viewmodel" "2.5.1"
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.savedstate" "savedstate" "1.2.0"
-SET SourceFiles=%ALBaseDir%\Sources\java\com\alcinoe\launchscreen\*.java
+SET SourceFiles=%ALBaseDir%\Source\java\com\alcinoe\launchscreen\*.java
 Call :BUILD_JAR "com.alcinoe" "alcinoe-launchscreen" "1.0.0" 
 
 
@@ -92,9 +92,9 @@ REM ------------------------
 echo [36mBuild alcinoe-common[0m
 type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
-SET SourceFiles=%ALBaseDir%\Sources\java\com\alcinoe\util\*.java
-SET SourceFiles=%SourceFiles% %ALBaseDir%\Sources\java\com\alcinoe\content\*.java
-SET SourceFiles=%SourceFiles% %ALBaseDir%\Sources\java\com\alcinoe\location\*.java
+SET SourceFiles=%ALBaseDir%\Source\java\com\alcinoe\util\*.java
+SET SourceFiles=%SourceFiles% %ALBaseDir%\Source\java\com\alcinoe\content\*.java
+SET SourceFiles=%SourceFiles% %ALBaseDir%\Source\java\com\alcinoe\location\*.java
 Call :BUILD_JAR "com.alcinoe" "alcinoe-common" "1.0.0"
 
 
@@ -105,7 +105,7 @@ REM ----------------------------
 echo [36mBuild alcinoe-datepicker[0m
 type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
-SET SourceFiles=%ALBaseDir%\Sources\java\com\alcinoe\datepicker\*.java
+SET SourceFiles=%ALBaseDir%\Source\java\com\alcinoe\datepicker\*.java
 Call :BUILD_JAR "com.alcinoe" "alcinoe-datepicker" "1.0.0"
 
 
@@ -116,7 +116,7 @@ REM --------------------------
 echo [36mBuild alcinoe-edittext[0m
 type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
-SET SourceFiles=%ALBaseDir%\Sources\java\com\alcinoe\edittext\*.java
+SET SourceFiles=%ALBaseDir%\Source\java\com\alcinoe\edittext\*.java
 Call :BUILD_JAR "com.alcinoe" "alcinoe-edittext" "1.0.0"
 
 
@@ -129,7 +129,7 @@ type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.annotation" "annotation" "1.3.0"
 Call :UPDATE_ClASSPATH "https://artifactory.wetransform.to/artifactory/libs-snapshot" "org.webrtc" "google-webrtc" "1.0.25331"
-SET SourceFiles=%ALBaseDir%\Sources\java\com\alcinoe\webrtc\*.java
+SET SourceFiles=%ALBaseDir%\Source\java\com\alcinoe\webrtc\*.java
 Call :BUILD_JAR "com.alcinoe" "alcinoe-webrtc" "1.0.0"
 
 
@@ -144,7 +144,7 @@ Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.lifecycl
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "com.google.android.gms" "play-services-basement" "18.1.0"
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "com.google.firebase" "firebase-messaging" "23.1.0"
 @echo androidx.appcompat:appcompat:1.5.1>> %TMPDependenciesFile%
-SET SourceFiles=%ALBaseDir%\Sources\java\com\alcinoe\firebase\messaging\*.java
+SET SourceFiles=%ALBaseDir%\Source\java\com\alcinoe\firebase\messaging\*.java
 Call :BUILD_JAR "com.alcinoe" "alcinoe-firebase-messaging" "1.0.0"
 
 SET FirebaseMessagingDir=%ALBaseDir%\Libraries\jar\com\alcinoe\alcinoe-firebase-messaging\1.0.0\
@@ -183,7 +183,7 @@ SET ClassPath="%SDKApiLevelPath%\android.jar"
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.annotation" "annotation" "1.1.0"
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.fragment" "fragment" "1.3.0"
 Call :UPDATE_ClASSPATH "https://repo1.maven.org/maven2" "com.facebook.android" "facebook-common" "15.2.0"
-SET SourceFiles=%ALBaseDir%\Sources\java\com\alcinoe\facebook\share\*.java
+SET SourceFiles=%ALBaseDir%\Source\java\com\alcinoe\facebook\share\*.java
 Call :BUILD_JAR "com.alcinoe" "alcinoe-facebook-share" "1.0.0"
 
 
@@ -195,7 +195,7 @@ echo [36mBuild alcinoe-installreferrer[0m
 type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "com.android.installreferrer" "installreferrer" "2.2"
-SET SourceFiles=%ALBaseDir%\Sources\java\com\alcinoe\installreferrer\*.java
+SET SourceFiles=%ALBaseDir%\Source\java\com\alcinoe\installreferrer\*.java
 Call :BUILD_JAR "com.alcinoe" "alcinoe-installreferrer" "1.0.0"
  
  

@@ -4,7 +4,7 @@ program NativeBridgeFileGeneratorHelper;
 
 {$R *.res}
 
-{$I ..\..\..\..\Sources\Alcinoe.inc}
+{$I ..\..\..\..\Source\Alcinoe.inc}
 
 uses
   Winapi.Windows,
@@ -487,7 +487,7 @@ begin
       Writeln('Example:');
       Writeln('  NativeBridgeFileGeneratorHelper.exe^');
       Writeln('    -Action="Compare"^');
-      Writeln('    -MasterFile="..\..\Sources\ALAndroidFacebookApi.pas"^');
+      Writeln('    -MasterFile="..\..\Source\ALAndroidFacebookApi.pas"^');
       Writeln('    -OutputDir=".\OutputAndroid\"');
       Writeln('');
       Writeln('');

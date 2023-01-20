@@ -17,7 +17,7 @@ REM --------------
 REM Security check
 REM --------------
 
-if not exist "%ALBaseDir%\Sources\Alcinoe.inc" goto ERROR
+if not exist "%ALBaseDir%\Source\Alcinoe.inc" goto ERROR
 
 
 REM -----------------

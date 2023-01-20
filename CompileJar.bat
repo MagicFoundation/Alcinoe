@@ -65,6 +65,26 @@ SET TMPOutputDir=%TMPDir%\Output
 SET TMPDependenciesFile=%TMPDir%\Dependencies.txt
 
 
+REM ------------------------------
+REM Build alcinoe-launchscreen.jar
+REM ------------------------------
+
+echo [36mBuild alcinoe-launchscreen[0m
+type nul > %TMPDependenciesFile%
+SET ClassPath="%SDKApiLevelPath%\android.jar";"%FMXJAR%"
+Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.appcompat" "appcompat" "1.5.1"
+Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.activity" "activity" "1.5.1"
+Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.annotation" "annotation" "1.3.0"
+Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.core" "core" "1.8.0"
+Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.drawerlayout" "drawerlayout" "1.0.0"
+Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.fragment" "fragment" "1.3.6"
+Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.lifecycle" "lifecycle-common" "2.5.1"
+Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.lifecycle" "lifecycle-viewmodel" "2.5.1"
+Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.savedstate" "savedstate" "1.2.0"
+SET SourceFiles=%ALBaseDir%\Source\java\com\alcinoe\launchscreen\*.java
+Call :BUILD_JAR "com.alcinoe" "alcinoe-launchscreen" "1.0.0" 
+
+
 REM ------------------------
 REM Build alcinoe-common.jar
 REM ------------------------

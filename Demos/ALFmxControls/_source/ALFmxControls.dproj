@@ -1140,18 +1140,6 @@
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-hdpi\ic_launcher.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-hdpi</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-hdpi</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
-          </Platform>
-        </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -1246,18 +1234,6 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi-v4</RemoteDir>
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-mdpi\ic_launcher.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-mdpi</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-mdpi</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
@@ -1368,18 +1344,6 @@
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xhdpi\ic_launcher.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xhdpi</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xhdpi</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
-          </Platform>
-        </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -1414,18 +1378,6 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi</RemoteDir>
             <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
@@ -1678,6 +1630,54 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\menu</RemoteDir>
             <RemoteName>example_menu2.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-hdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-hdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-mdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-mdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xhdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xhdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-af\values-af.xml">
@@ -2832,18 +2832,6 @@
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-hdpi\ic_launcher.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-hdpi</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-hdpi</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
-          </Platform>
-        </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -2938,18 +2926,6 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi-v4</RemoteDir>
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-mdpi\ic_launcher.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-mdpi</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-mdpi</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
@@ -3060,18 +3036,6 @@
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xhdpi\ic_launcher.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xhdpi</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xhdpi</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
-          </Platform>
-        </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -3106,18 +3070,6 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi</RemoteDir>
             <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
@@ -3370,6 +3322,54 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\menu</RemoteDir>
             <RemoteName>example_menu2.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-hdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-hdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-mdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-mdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xhdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xhdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-af\values-af.xml">

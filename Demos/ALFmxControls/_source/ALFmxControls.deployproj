@@ -74,15 +74,6 @@
       <RemoteDir>ALFmxControls\res\drawable-hdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -154,15 +145,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControls\res\drawable-mdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
       <DeployClass>File</DeployClass>
@@ -245,15 +227,6 @@
       <RemoteDir>ALFmxControls\res\drawable-xhdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -280,15 +253,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControls\res\drawable-xhdpi\</RemoteDir>
       <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
       <DeployClass>File</DeployClass>
@@ -478,6 +442,42 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControls\res\menu\</RemoteDir>
       <RemoteName>example_menu2.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControls\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControls\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControls\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControls\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\values-af\values-af.xml">
       <DeployClass>File</DeployClass>
@@ -1461,15 +1461,6 @@
       <RemoteDir>ALFmxControls\res\drawable-hdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -1541,15 +1532,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControls\res\drawable-mdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
       <DeployClass>File</DeployClass>
@@ -1632,15 +1614,6 @@
       <RemoteDir>ALFmxControls\res\drawable-xhdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -1667,15 +1640,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControls\res\drawable-xhdpi\</RemoteDir>
       <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
       <DeployClass>File</DeployClass>
@@ -1865,6 +1829,42 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControls\res\menu\</RemoteDir>
       <RemoteName>example_menu2.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControls\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControls\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControls\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControls\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\values-af\values-af.xml">
       <DeployClass>File</DeployClass>
@@ -2850,15 +2850,6 @@
       <RemoteDir>ALFmxControls\res\drawable-hdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -2930,15 +2921,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControls\res\drawable-mdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
       <DeployClass>File</DeployClass>
@@ -3021,15 +3003,6 @@
       <RemoteDir>ALFmxControls\res\drawable-xhdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -3056,15 +3029,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControls\res\drawable-xhdpi\</RemoteDir>
       <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
       <DeployClass>File</DeployClass>
@@ -3254,6 +3218,42 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControls\res\menu\</RemoteDir>
       <RemoteName>example_menu2.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControls\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControls\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControls\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControls\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\values-af\values-af.xml">
       <DeployClass>File</DeployClass>
@@ -4237,15 +4237,6 @@
       <RemoteDir>ALFmxControls\res\drawable-hdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -4317,15 +4308,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControls\res\drawable-mdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
       <DeployClass>File</DeployClass>
@@ -4408,15 +4390,6 @@
       <RemoteDir>ALFmxControls\res\drawable-xhdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -4443,15 +4416,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControls\res\drawable-xhdpi\</RemoteDir>
       <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
       <DeployClass>File</DeployClass>
@@ -4641,6 +4605,42 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControls\res\menu\</RemoteDir>
       <RemoteName>example_menu2.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControls\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControls\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControls\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControls\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\values-af\values-af.xml">
       <DeployClass>File</DeployClass>

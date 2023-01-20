@@ -29,49 +29,49 @@
       <RemoteName>libALConfettiDemo.so</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-hdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-hdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-hdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-mdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-mdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-mdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-xhdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-xhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-xxhdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-xxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-xxxhdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xxxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-xxxhdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-xxxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\ALConfettiDemo.classes">
@@ -102,49 +102,49 @@
       <RemoteName>libALConfettiDemo.so</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-hdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-hdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-hdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-mdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-mdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-mdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-xhdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-xhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-xxhdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-xxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-xxxhdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xxxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-xxxhdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-xxxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
   </ItemGroup>
@@ -177,49 +177,49 @@
       <RemoteName>libALConfettiDemo.so</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-hdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-hdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-hdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-mdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-mdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-mdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-xhdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-xhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-xxhdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-xxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-xxxhdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\mipmap-xxxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-xxxhdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-xxxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\ALConfettiDemo.classes">
@@ -250,49 +250,49 @@
       <RemoteName>libALConfettiDemo.so</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-hdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-hdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-hdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-hdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-mdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-mdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-mdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-mdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-xhdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-xhdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-xhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-xxhdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-xxhdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-xxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-xxxhdpi\ic_launcher.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\mipmap-xxxhdpi\ic_launcher.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
       <Operation>0</Operation>
       <Overwrite>True</Overwrite>
       <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\res\drawable-xxxhdpi\</RemoteDir>
+      <RemoteDir>ALConfettiDemo\res\mipmap-xxxhdpi\</RemoteDir>
       <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
   </ItemGroup>

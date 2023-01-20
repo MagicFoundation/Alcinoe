@@ -24,7 +24,7 @@
                android:label="%label%"
                android:debuggable="%debuggable%"
                android:largeHeap="%largeHeap%"
-               android:icon="%icon%"
+               android:icon="@mipmap/ic_launcher"
                android:theme="@android:style/Theme.NoTitleBar"
                android:hardwareAccelerated="%hardwareAccelerated%">
 

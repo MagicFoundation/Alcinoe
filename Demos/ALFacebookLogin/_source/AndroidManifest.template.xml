@@ -55,7 +55,7 @@
                android:debuggable="%debuggable%"
                android:largeHeap="%largeHeap%"
                android:icon="@mipmap/ic_launcher"
-               android:theme="%theme%"
+               android:theme="@android:style/Theme.NoTitleBar"
                android:hardwareAccelerated="%hardwareAccelerated%"
                android:resizeableActivity="false"
                android:requestLegacyExternalStorage="true"

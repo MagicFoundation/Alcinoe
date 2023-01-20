@@ -1028,15 +1028,6 @@
       <RemoteDir>ALFirebaseMessaging\res\drawable-hdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -1486,15 +1477,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFirebaseMessaging\res\drawable-mdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
@@ -1982,15 +1964,6 @@
       <RemoteDir>ALFirebaseMessaging\res\drawable-xhdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -2351,15 +2324,6 @@
       <RemoteDir>ALFirebaseMessaging\res\drawable-xxhdpi-v4\</RemoteDir>
       <RemoteName>googleg_standard_color_18.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -2485,15 +2449,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFirebaseMessaging\res\drawable-xxxhdpi-v4\</RemoteDir>
       <RemoteName>abc_text_select_handle_right_mtrl.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxxhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xxxhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxxhdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
@@ -3646,6 +3601,51 @@
       <RemoteCommand/>
       <RemoteDir>ALFirebaseMessaging\res\layout\</RemoteDir>
       <RemoteName>support_simple_spinner_dropdown_item.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xxxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\raw\firebase_common_keep.xml">
       <DeployClass>File</DeployClass>
@@ -6366,15 +6366,6 @@
       <RemoteDir>ALFirebaseMessaging\res\drawable-hdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -6824,15 +6815,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFirebaseMessaging\res\drawable-mdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
@@ -7320,15 +7302,6 @@
       <RemoteDir>ALFirebaseMessaging\res\drawable-xhdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -7689,15 +7662,6 @@
       <RemoteDir>ALFirebaseMessaging\res\drawable-xxhdpi-v4\</RemoteDir>
       <RemoteName>googleg_standard_color_18.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -7823,15 +7787,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFirebaseMessaging\res\drawable-xxxhdpi-v4\</RemoteDir>
       <RemoteName>abc_text_select_handle_right_mtrl.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxxhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xxxhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxxhdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
@@ -8984,6 +8939,51 @@
       <RemoteCommand/>
       <RemoteDir>ALFirebaseMessaging\res\layout\</RemoteDir>
       <RemoteName>support_simple_spinner_dropdown_item.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xxxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\raw\firebase_common_keep.xml">
       <DeployClass>File</DeployClass>
@@ -11706,15 +11706,6 @@
       <RemoteDir>ALFirebaseMessaging\res\drawable-hdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-hdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -12164,15 +12155,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFirebaseMessaging\res\drawable-mdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-mdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
@@ -12660,15 +12642,6 @@
       <RemoteDir>ALFirebaseMessaging\res\drawable-xhdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xhdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -13029,15 +13002,6 @@
       <RemoteDir>ALFirebaseMessaging\res\drawable-xxhdpi-v4\</RemoteDir>
       <RemoteName>googleg_standard_color_18.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxhdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -13163,15 +13127,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFirebaseMessaging\res\drawable-xxxhdpi-v4\</RemoteDir>
       <RemoteName>abc_text_select_handle_right_mtrl.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxxhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xxxhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\drawable-xxxhdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
@@ -14324,6 +14279,51 @@
       <RemoteCommand/>
       <RemoteDir>ALFirebaseMessaging\res\layout\</RemoteDir>
       <RemoteName>support_simple_spinner_dropdown_item.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xxxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\raw\firebase_common_keep.xml">
       <DeployClass>File</DeployClass>
@@ -17044,15 +17044,6 @@
       <RemoteDir>ALFirebaseMessaging\res\drawable-hdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-hdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -17502,15 +17493,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFirebaseMessaging\res\drawable-mdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-mdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
@@ -17998,15 +17980,6 @@
       <RemoteDir>ALFirebaseMessaging\res\drawable-xhdpi-v4\</RemoteDir>
       <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xhdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -18367,15 +18340,6 @@
       <RemoteDir>ALFirebaseMessaging\res\drawable-xxhdpi-v4\</RemoteDir>
       <RemoteName>googleg_standard_color_18.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxhdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -18501,15 +18465,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFirebaseMessaging\res\drawable-xxxhdpi-v4\</RemoteDir>
       <RemoteName>abc_text_select_handle_right_mtrl.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxxhdpi\ic_launcher.png">
-      <DeployClass>File</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xxxhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\drawable-xxxhdpi\notification_icon.png">
       <DeployClass>File</DeployClass>
@@ -19662,6 +19617,51 @@
       <RemoteCommand/>
       <RemoteDir>ALFirebaseMessaging\res\layout\</RemoteDir>
       <RemoteName>support_simple_spinner_dropdown_item.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xxxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFirebaseMessaging\res\mipmap-xxxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\raw\firebase_common_keep.xml">
       <DeployClass>File</DeployClass>

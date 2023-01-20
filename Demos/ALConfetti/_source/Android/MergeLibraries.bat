@@ -4,7 +4,7 @@ set ALBaseDir=%~dp0
 
 "%ALBaseDir%\..\..\..\..\Tools\AndroidMerger\AndroidMerger.exe"^
  -LocalMavenRepositoryDir="%ALBaseDir%\..\..\..\..\Libraries\jar\"^
- -Libraries="%ALBaseDir%\ALConfettiDemoApp\"^
+ -Libraries="%ALBaseDir%\App\"^
  -OutputDir="%ALBaseDir%\Merged"^
  -DProj="%ALBaseDir%\..\ALConfettiDemo.dproj"^
  -AndroidManifest="%ALBaseDir%\..\AndroidManifest.template.xml"^

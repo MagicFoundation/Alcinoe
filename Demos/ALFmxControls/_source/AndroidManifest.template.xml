@@ -35,7 +35,7 @@
                android:label="%label%"
                android:debuggable="%debuggable%"
                android:largeHeap="%largeHeap%"
-               android:icon="%icon%"
+               android:icon="@mipmap/ic_launcher"
                android:theme="@style/AppTheme"
                android:hardwareAccelerated="%hardwareAccelerated%"
                android:usesCleartextTraffic="true"

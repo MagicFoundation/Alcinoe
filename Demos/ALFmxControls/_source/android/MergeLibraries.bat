@@ -2,7 +2,7 @@
 
 set ALBaseDir=%~dp0
 
-set Libraries=%ALBaseDir%\ALFmxControlsApp
+set Libraries=%ALBaseDir%\App\
 set Libraries=%Libraries%;com.alcinoe:alcinoe-edittext:1.0.0
 set Libraries=%Libraries%;com.alcinoe:alcinoe-datepicker:1.0.0
 set Libraries=%Libraries%;com.alcinoe:alcinoe-common:1.0.0

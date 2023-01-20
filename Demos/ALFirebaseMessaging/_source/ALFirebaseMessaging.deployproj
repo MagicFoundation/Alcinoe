@@ -1,60 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Condition="Exists(&#39;$(BDS)\bin\CodeGear.Deployment.targets&#39;)" Project="$(BDS)\bin\CodeGear.Deployment.targets"/>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Android&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png">
-      <DeployClass>Android_LauncherIcon192</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xxxhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png">
-      <DeployClass>Android_NotificationIcon24</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>ic_notification.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png">
-      <DeployClass>Android_NotificationIcon36</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>ic_notification.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png">
-      <DeployClass>Android_NotificationIcon48</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>ic_notification.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png">
-      <DeployClass>Android_NotificationIcon72</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>ic_notification.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png">
-      <DeployClass>Android_NotificationIcon96</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xxxhdpi\</RemoteDir>
-      <RemoteName>ic_notification.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\ALFirebaseMessaging.classes">
       <DeployClass>AndroidClasses</DeployClass>
       <LocalCommand/>
@@ -5392,60 +5338,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFirebaseMessaging\res\values\</RemoteDir>
       <RemoteName>values.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png">
-      <DeployClass>Android_LauncherIcon192</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xxxhdpi\</RemoteDir>
-      <RemoteName>ic_launcher.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png">
-      <DeployClass>Android_NotificationIcon24</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-mdpi\</RemoteDir>
-      <RemoteName>ic_notification.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png">
-      <DeployClass>Android_NotificationIcon36</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-hdpi\</RemoteDir>
-      <RemoteName>ic_notification.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png">
-      <DeployClass>Android_NotificationIcon48</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xhdpi\</RemoteDir>
-      <RemoteName>ic_notification.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png">
-      <DeployClass>Android_NotificationIcon72</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xxhdpi\</RemoteDir>
-      <RemoteName>ic_notification.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png">
-      <DeployClass>Android_NotificationIcon96</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFirebaseMessaging\res\drawable-xxxhdpi\</RemoteDir>
-      <RemoteName>ic_notification.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\ALFirebaseMessaging.classes">
       <DeployClass>AndroidClasses</DeployClass>

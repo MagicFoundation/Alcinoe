@@ -343,14 +343,12 @@
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>com.ALFirebaseMessaging.app</VerInfo_BundleId>
-    <Debugger_DebugSourcePath>C:\Dev\MagicFoundation\Alcinoe\Source\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
     <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=com.ALFirebaseMessaging.app;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=1.0.0;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_iOSSimARM64)&#39;!=&#39;&#39;">
     <Cfg_1>true</Cfg_1>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
-    <Debugger_DebugSourcePath>C:\Dev\MagicFoundation\Alcinoe\Source\;$(Debugger_DebugSourcePath);$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_OSX64)&#39;!=&#39;&#39;">
     <Cfg_1_OSX32>true</Cfg_1_OSX32>

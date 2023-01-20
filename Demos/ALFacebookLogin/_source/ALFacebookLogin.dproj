@@ -233,7 +233,7 @@
     <iPad_AppIcon83_5>$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_83.5x83.5.png</iPad_AppIcon83_5>
     <iPad_AppIcon167>$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png</iPad_AppIcon167>
     <DCC_LinkerOptions>-w -ObjC -rpath /usr/lib/swift</DCC_LinkerOptions>
-    <DCC_FrameworkPath>C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\facebook\FBSDKLoginKit.xcframework\ios-arm64;C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\facebook\FBSDKShareKit.xcframework\ios-arm64;C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\facebook\FBSDKCoreKit_Basics.xcframework\ios-arm64;C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\facebook\FBSDKCoreKit.xcframework\ios-arm64;C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\facebook\FBAEMKit.xcframework\ios-arm64;$(DCC_FrameworkPath)</DCC_FrameworkPath>
+    <DCC_FrameworkPath>..\..\..\Libraries\ios\facebook\FBSDKLoginKit.xcframework\ios-arm64;..\..\..\Libraries\ios\facebook\FBSDKShareKit.xcframework\ios-arm64;..\..\..\Libraries\ios\facebook\FBSDKCoreKit_Basics.xcframework\ios-arm64;..\..\..\Libraries\ios\facebook\FBSDKCoreKit.xcframework\ios-arm64;..\..\..\Libraries\ios\facebook\FBAEMKit.xcframework\ios-arm64;$(DCC_FrameworkPath)</DCC_FrameworkPath>
     <iPhone_Launch2x>$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png</iPhone_Launch2x>
     <iPhone_LaunchDark2x>$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png</iPhone_LaunchDark2x>
     <iPhone_Launch3x>$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png</iPhone_Launch3x>
@@ -262,7 +262,7 @@
     <iPad_AppIcon83_5>$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_83.5x83.5.png</iPad_AppIcon83_5>
     <iPad_AppIcon167>$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png</iPad_AppIcon167>
     <DCC_LinkerOptions>-w -bequiet -ObjC</DCC_LinkerOptions>
-    <DCC_FrameworkPath>C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\facebook\FBSDKLoginKit.xcframework\ios-arm64;C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\facebook\FBSDKShareKit.xcframework\ios-arm64;C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\facebook\FBSDKCoreKit_Basics.xcframework\ios-arm64;C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\facebook\FBSDKCoreKit.xcframework\ios-arm64;C:\Dev\MagicFoundation\Alcinoe\Libraries\ios\facebook\FBAEMKit.xcframework\ios-arm64;$(DCC_FrameworkPath)</DCC_FrameworkPath>
+    <DCC_FrameworkPath>..\..\..\Libraries\ios\facebook\FBSDKLoginKit.xcframework\ios-arm64;..\..\..\Libraries\ios\facebook\FBSDKShareKit.xcframework\ios-arm64;..\..\..\Libraries\ios\facebook\FBSDKCoreKit_Basics.xcframework\ios-arm64;..\..\..\Libraries\ios\facebook\FBSDKCoreKit.xcframework\ios-arm64;..\..\..\Libraries\ios\facebook\FBAEMKit.xcframework\ios-arm64;$(DCC_FrameworkPath)</DCC_FrameworkPath>
     <iPhone_Launch2x>$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png</iPhone_Launch2x>
     <iPhone_LaunchDark2x>$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png</iPhone_LaunchDark2x>
     <iPhone_Launch3x>$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png</iPhone_Launch3x>

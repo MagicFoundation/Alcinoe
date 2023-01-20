@@ -193,7 +193,6 @@
   <PropertyGroup Condition="&#39;$(Cfg_1_Win32)&#39;!=&#39;&#39;">
     <DCC_RemoteDebug>false</DCC_RemoteDebug>
     <Manifest_File>(None)</Manifest_File>
-    <Debugger_RunParams>C:\Dev\MagicFoundation\Alcinoe false</Debugger_RunParams>
     <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2)&#39;!=&#39;&#39;">

@@ -364,13 +364,11 @@
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
-    <Debugger_DebugSourcePath>C:\Dev\MagicFoundation\Alcinoe\Demos\ALLiveVideoChat\client\_source\Embarcadero\tokyo\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_iOSSimARM64)&#39;!=&#39;&#39;">
     <Cfg_1>true</Cfg_1>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
-    <Debugger_DebugSourcePath>C:\Dev\MagicFoundation\Alcinoe\Demos\ALLiveVideoChat\client\_source\Embarcadero\tokyo\;$(Debugger_DebugSourcePath);$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_OSX64)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>

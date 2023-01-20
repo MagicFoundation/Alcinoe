@@ -11,7 +11,7 @@ interface
   //Please run <Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorAndroid.bat
   //with the library identifiers com.facebook.android:facebook-android-sdk:xx.xx.xx where xx.xx.xx
   //is the last version of the facebook-android-sdk and gave also the path to
-  //<Alcinoe>\Source\ALAndroidFacebookApi.pas to build the compare source file. Then make a diff
+  //<Alcinoe>\Sources\ALAndroidFacebookApi.pas to build the compare source file. Then make a diff
   //compare between the new generated ALAndroidFacebookApi.pas and this one to see if the api
   //signature is still the same
   {$MESSAGE WARN 'Check if the api signature of the last version of facebook sdk (android) is still the same'}

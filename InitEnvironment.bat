@@ -5,7 +5,7 @@ REM Init ALBaseDir
 REM ------------
 
 set ALBaseDir=%~dp0
-if not exist "%ALBaseDir%\Source\Alcinoe.inc" goto ERROR
+if not exist "%ALBaseDir%\Sources\Alcinoe.inc" goto ERROR
 
 
 REM ---------------

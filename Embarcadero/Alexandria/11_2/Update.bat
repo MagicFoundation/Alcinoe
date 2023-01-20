@@ -6,7 +6,7 @@ set EmbSourceDir=%EmbSourceDir:~0,-1%source
 FOR %%a IN ("%%~dp0") DO set "ProjectDir=%%~dpa"
 IF %ProjectDir:~-1%==\ SET ProjectDir=%ProjectDir:~0,-1%
 
-if not exist "%ProjectDir%\..\..\..\Source\Alcinoe.inc" goto ERROR
+if not exist "%ProjectDir%\..\..\..\Sources\Alcinoe.inc" goto ERROR
 
 SET FileName=%ProjectDir%\fmx
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"

@@ -51,7 +51,7 @@ REM --------------
 REM Security check
 REM --------------
 
-if not exist "%ALBaseDir%\Source\Alcinoe.inc" goto ERROR
+if not exist "%ALBaseDir%\Sources\Alcinoe.inc" goto ERROR
 
 
 REM ----------------------
@@ -114,7 +114,7 @@ REM -------------------
 REM Normalize all units
 REM -------------------
 
-call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Source\" -CreateBackup="false"
+call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Sources\" -CreateBackup="false"
 IF ERRORLEVEL 1 goto ERROR
 
 
@@ -163,7 +163,7 @@ SET FileName=%ALBaseDir%\Libraries\bpl\Alcinoe\Win32\%ALDelphiName%
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 
-Call :BUILD_PROJECT "%ALBaseDir%\Source" "" "Alcinoe%ALDelphiName%.dproj" "Win32"
+Call :BUILD_PROJECT "%ALBaseDir%\Sources" "" "Alcinoe%ALDelphiName%.dproj" "Win32"
 IF ERRORLEVEL 1 goto ERROR
 
 
@@ -222,12 +222,12 @@ goto BUILD_TOOLS
 
 :DO_BUILD_TOOLS
 
-Call :BUILD_PROJECT "%ALBaseDir%\Tools\AndroidMerger" "_Build\Source" "AndroidMerger.dproj" "Win64"
-Call :BUILD_PROJECT "%ALBaseDir%\Tools\DeployMan" "_Build\Source" "DeployMan.dproj" "Win64"
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\AndroidMerger" "_Build\Sources" "AndroidMerger.dproj" "Win64"
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\DeployMan" "_Build\Sources" "DeployMan.dproj" "Win64"
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\DeployProjNormalizer" "_Source" "DeployProjNormalizer.dproj" "Win64"
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\DProjNormalizer" "_Source" "DProjNormalizer.dproj" "Win64"
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\DProjVersioning" "_Source" "DProjVersioning.dproj" "Win64"
-Call :BUILD_PROJECT "%ALBaseDir%\Tools\NativeBridgeFileGenerator" "_Build\Source" "NativeBridgeFileGeneratorHelper.dproj" "Win64"
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\NativeBridgeFileGenerator" "_Build\Sources" "NativeBridgeFileGeneratorHelper.dproj" "Win64"
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\UnitNormalizer" "_Source" "UnitNormalizer.dproj" "Win64"
 
 

@@ -11,7 +11,7 @@ interface
   //Please run <Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorAndroid.bat
   //with the library identifiers com.google.android.exoplayer:exoplayer:xx.xx.xx where xx.xx.xx
   //is the last version of the exoplayer and gave also the path to
-  //<Alcinoe>\Source\ALAndroidExoPlayerApi.pas to build the compare source file. Then make a diff
+  //<Alcinoe>\Sources\ALAndroidExoPlayerApi.pas to build the compare source file. Then make a diff
   //compare between the new generated ALAndroidExoPlayerApi.pas and this one to see if the api
   //signature is still the same
   {$MESSAGE WARN 'Check if the api signature of the last version of exoplayer (android) is still the same'}

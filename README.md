@@ -41,14 +41,14 @@ NOTE: Some demos use [devexpress](https://www.devexpress.com/)
 
 If you don't plan to use any Alcinoe visual components at 
 design time, then you don't need to install anything, just 
-add [{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) 
+add [{alcinoe}\Sources](https://github.com/MagicFoundation/Alcinoe/tree/master/Sources) 
 in the search path of your project. 
 
 Else if you want to use visual components at design time then 
 you need to install the bpl. Launch Delphi and go in 
 component > Install Packages... > and choose the BPL located 
 in [{alcinoe}\Libraries\bpl\Alcinoe\Win32\Alexandria\AlcinoeAlexandria.bpl](https://github.com/MagicFoundation/Alcinoe/tree/master/Libraries/bpl/Alcinoe/Win32/Alexandria). 
-You also need to add in your search path [{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) 
+You also need to add in your search path [{alcinoe}\Sources](https://github.com/MagicFoundation/Alcinoe/tree/master/Sources) 
 and all subdirectories located in [{alcinoe}\Embarcadero\Alexandria\11_2](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_2/).
 
 
@@ -131,7 +131,7 @@ Under iOS I use AVPlayer with support also HLS like ExoPlayer does
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-3.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
 </p>
 
-Learn more at [{alcinoe}/Source/ALFmxVideoPlayer.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALFmxVideoPlayer.pas) and you can also start exploring this feature 
+Learn more at [{alcinoe}/Sources/ALFmxVideoPlayer.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Sources/ALFmxVideoPlayer.pas) and you can also start exploring this feature 
 with the demo located at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
   
 
@@ -294,7 +294,7 @@ Google OAuth 2.0 Access Token
 Google APIs use the OAuth 2.0 protocol for authentication and 
 authorization. You can use the function ALGenerateGoogleOAuth2AccessToken 
 to generate an OAuth 2.0 Access Token. Learn more at 
-[{alcinoe}/Source/ALCipher.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALCipher.pas) 
+[{alcinoe}/Sources/ALCipher.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Sources/ALCipher.pas) 
   
 
 Android/iOS VKontakte/Facebook SDK login
@@ -361,7 +361,7 @@ To access the document nodes :
     MyJsonDoc.GetChildNodeValueDateTime('birth', Now{default if node not exists});
 ```
 
-Learn more at [{alcinoe}/Source/ALJSONDoc.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALJSONDoc.pas)
+Learn more at [{alcinoe}/Sources/ALJSONDoc.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Sources/ALJSONDoc.pas)
   
 
 ImageMagick wrapper for Delphi
@@ -415,7 +415,7 @@ Example :
     end;
 ```
 
-Learn more at [{alcinoe}/Source/ALImageMagick.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALImageMagick.pas)
+Learn more at [{alcinoe}/Sources/ALImageMagick.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Sources/ALImageMagick.pas)
 
 MongoDb client
 --------------
@@ -430,7 +430,7 @@ new connection does not have to be established. If all the
 connections are being used, a new connection is made and is
 added to the pool. Connection pooling also cuts down on the
 amount of time a user must wait to establish a connection
-to the database. Learn more at [{alcinoe}/Source/ALMongoDBClient.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALMongoDBClient.pas)
+to the database. Learn more at [{alcinoe}/Sources/ALMongoDBClient.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Sources/ALMongoDBClient.pas)
 
 
 WebSocket client
@@ -477,7 +477,7 @@ What is Memcached? Free & open source, high-performance,
 distributed memory object caching system, generic in
 nature, but intended for use in speeding up dynamic web
 applications by alleviating database load. Learn more at 
-[{alcinoe}/Source/ALMemCachedClient.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALMemCachedClient.pas)
+[{alcinoe}/Sources/ALMemCachedClient.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Sources/ALMemCachedClient.pas)
 
 
 GSM component
@@ -492,7 +492,7 @@ We have tested the Nokia 6230 in-house, but the Nokia 7190,
 8890, 6210 and 9110 models should work as well.  Phones
 from other manufacturers will also work, as long as they
 implement the text-mode interface. Learn more at 
-[{alcinoe}/Source/ALGSMComm.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALGSMComm.pas)
+[{alcinoe}/Sources/ALGSMComm.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Sources/ALGSMComm.pas)
 
 
 SQLite3 Client
@@ -500,7 +500,7 @@ SQLite3 Client
 
 Query Sqlite3 database and get the result In Xml format 
 or in Json/Bson format. Learn more at 
-[{alcinoe}/Source/ALSqlite3Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALSqlite3Client.pas)
+[{alcinoe}/Sources/ALSqlite3Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Sources/ALSqlite3Client.pas)
 
 
 And much more

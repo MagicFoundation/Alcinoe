@@ -14,7 +14,7 @@ program AndroidMerger;
 
 {$R *.res}
 
-{$I ..\..\..\..\Source\Alcinoe.inc}
+{$I ..\..\..\..\Sources\Alcinoe.inc}
 
 uses
   Winapi.Windows,

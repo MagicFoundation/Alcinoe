@@ -931,9 +931,17 @@ begin
                        TSearchOption.soAllDirectories); // const SearchOption: TSearchOption)
   //Their is some libraries that have a res folder with inside just an empty values.xml
   //(like androidx.lifecycle-lifecycle-livedata-core-2.5.1). In that case no java file will be generated
-  if length(LRJavaFiles) = 0 then exit;
-  if length(LRJavaFiles) <> 1 then
-    raise Exception.CreateFmt('Error #46B94E76-4237-4420-913A-24054015B5DB'#13#10'%s',[LCmdLine]);
+  //their is also some library that generate a Manifest.java along the R.java (androidx.core)
+  var LRJavaFile: String := '';
+  for var LTmpRJavaFile in LRJavaFiles do begin
+    if ALSameTextU(AlExtractFileNameU(LTmpRJavaFile), 'R.java') then begin
+      LRJavaFile := LTmpRJavaFile;
+      break;
+    end
+    else if not ALSameTextU(AlExtractFileNameU(LTmpRJavaFile), 'Manifest.java') then
+      raise Exception.CreateFmt('Error E8DEB280-BDD8-4A3D-BBD9-6FE7C13066DE'#13#10'%s',[LCmdLine]);
+  end;
+  if LRJavaFile = '' then exit;
 
   //With the code below I can see a big difference in the size of the generated R.jar
   //but close to no difference with the size of the final APK. So I decide to deactivate it
@@ -944,7 +952,7 @@ begin
   //else LRTxt := '';
 
   //clear the R.java
-  Var LRJavaSrc := ALGetStringFromFile(LRJavaFiles[0]);
+  Var LRJavaSrc := ALGetStringFromFile(LRJavaFile);
   {$IF defined(DEBUG)}
   ALSaveStringToFile(LRJavaSrc, LDebugRJavaOriginalFilename);
   {$ENDIF}
@@ -1023,7 +1031,7 @@ begin
   //  end;
   //end;
   //
-  //ALSaveStringToFile(LRJavaSrc, LRJavaFiles[0]);
+  //ALSaveStringToFile(LRJavaSrc, LRJavaFile);
   //{$IF defined(DEBUG)}
   //ALSaveStringToFile(LRJavaSrc, LDebugRJavaCompressedFilename);
   //{$ENDIF}
@@ -1036,7 +1044,7 @@ begin
   //Compile R.java into R$ classes
   LCmdLine := '"'+AJavacFilename+'" '+
               '-d "'+ALExcludeTrailingPathDelimiterU(ARClassDir)+'" '+  // Specify where to place generated class files
-              '"'+LRJavaFiles[0]+'"'; // input source files
+              '"'+LRJavaFile+'"'; // input source files
   ExecuteCmdLine(LCmdLine);
 
 end;
@@ -3284,26 +3292,26 @@ begin
           if LDeploymentNode = nil then raise Exception.Create('ProjectExtensions.BorlandProject.Deployment node not found!');
 
           //init LDeployFilesToDeactivate
-          LDeployFilesToDeactivate.Add('Android_Strings');
-          LDeployFilesToDeactivate.Add('Android_Colors');
-          LDeployFilesToDeactivate.Add('AndroidSplashImageDef');
-          LDeployFilesToDeactivate.Add('AndroidSplashStylesV21');
-          LDeployFilesToDeactivate.Add('AndroidSplashStyles');
-          LDeployFilesToDeactivate.Add('Android_LauncherIcon36');
-          LDeployFilesToDeactivate.Add('Android_LauncherIcon48');
-          LDeployFilesToDeactivate.Add('Android_LauncherIcon72');
-          LDeployFilesToDeactivate.Add('Android_LauncherIcon96');
-          LDeployFilesToDeactivate.Add('Android_LauncherIcon144');
-          LDeployFilesToDeactivate.Add('Android_LauncherIcon192');
-          LDeployFilesToDeactivate.Add('Android_SplashImage426');
-          LDeployFilesToDeactivate.Add('Android_SplashImage470');
-          LDeployFilesToDeactivate.Add('Android_SplashImage640');
-          LDeployFilesToDeactivate.Add('Android_SplashImage960');
-          LDeployFilesToDeactivate.Add('Android_NotificationIcon24');
-          LDeployFilesToDeactivate.Add('Android_NotificationIcon36');
-          LDeployFilesToDeactivate.Add('Android_NotificationIcon48');
-          LDeployFilesToDeactivate.Add('Android_NotificationIcon72');
-          LDeployFilesToDeactivate.Add('Android_NotificationIcon96');
+          LDeployFilesToDeactivate.Add('Android_Strings=<PlatForm>\<Config>\strings.xml');
+          LDeployFilesToDeactivate.Add('Android_Colors=<PlatForm>\<Config>\colors.xml');
+          LDeployFilesToDeactivate.Add('AndroidSplashImageDef=<PlatForm>\<Config>\splash_image_def.xml');
+          LDeployFilesToDeactivate.Add('AndroidSplashStylesV21=<PlatForm>\<Config>\styles-v21.xml|styles.xml');
+          LDeployFilesToDeactivate.Add('AndroidSplashStyles=<PlatForm>\<Config>\styles.xml');
+          LDeployFilesToDeactivate.Add('Android_LauncherIcon36=$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png|ic_launcher.png');
+          LDeployFilesToDeactivate.Add('Android_LauncherIcon48=$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png|ic_launcher.png');
+          LDeployFilesToDeactivate.Add('Android_LauncherIcon72=$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png|ic_launcher.png');
+          LDeployFilesToDeactivate.Add('Android_LauncherIcon96=$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png|ic_launcher.png');
+          LDeployFilesToDeactivate.Add('Android_LauncherIcon144=$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png|ic_launcher.png');
+          LDeployFilesToDeactivate.Add('Android_LauncherIcon192=$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png|ic_launcher.png');
+          LDeployFilesToDeactivate.Add('Android_SplashImage426=$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png|splash_image.png');
+          LDeployFilesToDeactivate.Add('Android_SplashImage470=$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png|splash_image.png');
+          LDeployFilesToDeactivate.Add('Android_SplashImage640=$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png|splash_image.png');
+          LDeployFilesToDeactivate.Add('Android_SplashImage960=$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png|splash_image.png');
+          LDeployFilesToDeactivate.Add('Android_NotificationIcon24=$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png|ic_notification.png');
+          LDeployFilesToDeactivate.Add('Android_NotificationIcon36=$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png|ic_notification.png');
+          LDeployFilesToDeactivate.Add('Android_NotificationIcon48=$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png|ic_notification.png');
+          LDeployFilesToDeactivate.Add('Android_NotificationIcon72=$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png|ic_notification.png');
+          LDeployFilesToDeactivate.Add('Android_NotificationIcon96=$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png|ic_notification.png');
 
           //remove from deployment all items deployed to "res\", "library\lib\arm64-v8a\" and "library\lib\armeabi-v7a\" remote folder
           //<DeployFile LocalName="android\res\drawable\common_google_signin_btn_icon_disabled.xml" Configuration="Release" Class="File">
@@ -3355,7 +3363,7 @@ begin
                 if LDeployFileNode.ChildNodes.Count = 0 then
                   LDeploymentNode.ChildNodes.Delete(i);
               end
-              else if LDeployFilesToDeactivate.IndexOf(LDeployFileNode.Attributes['Class']) >= 0 then begin
+              else if LDeployFilesToDeactivate.IndexOfName(LDeployFileNode.Attributes['Class']) >= 0 then begin
                 LDeploymentNode.ChildNodes.Delete(i);
               end;
             end
@@ -3386,15 +3394,25 @@ begin
           //deactivate all items in LDeployFilesToDeactivate
           for Var I := 0 to LDeployFilesToDeactivate.Count-1 do begin
             for var LConfig in LConfigs do begin
-              With LDeploymentNode.AddChild('DeployFile') do begin
-                Attributes['LocalName'] := 'none';
-                Attributes['Configuration'] := LConfig;
-                Attributes['Class'] := LDeployFilesToDeactivate[i];
-                for var LPlatForm in LPlatforms do begin
+              for var LPlatForm in LPlatforms do begin
+                Var LLocalName := LDeployFilesToDeactivate.ValueFromIndex[i]; // <PlatForm>\<Config>\styles-v21.xml|styles.xml
+                Var LRemoteName: AnsiString := '';
+                var P := ALpos('|', LLocalName);
+                if P > 0 then begin
+                  LRemoteName := ALCopyStr(LLocalName, P+1, Maxint); // styles.xml
+                  LLocalName :=  ALCopyStr(LLocalName, 1, P-1); // <PlatForm>\<Config>\styles-v21.xml
+                end;
+                LLocalName := ALStringReplace(LLocalName, '<PlatForm>', LPlatForm, [RfIgnoreCase]); // Android64\<Config>\styles-v21.xml
+                LLocalName := ALStringReplace(LLocalName, '<Config>', LConfig, [RfIgnoreCase]); // // Android64\Release\styles-v21.xml
+                With LDeploymentNode.AddChild('DeployFile') do begin
+                  Attributes['LocalName'] := LLocalName;
+                  Attributes['Configuration'] := LConfig;
+                  Attributes['Class'] := LDeployFilesToDeactivate.Names[i];
                   With AddChild('Platform') do begin
                     Attributes['Name'] := LPlatForm;
                     Addchild('Enabled').Text := 'false';
                     Addchild('Overwrite').Text := 'true';
+                    if LRemoteName <> '' then Addchild('RemoteName').Text := LRemoteName;
                   end;
                 end;
               end;
@@ -3487,8 +3505,7 @@ begin
                   var LPlatform: AnsiString := '';
                   if (ALposExIgnoreCase('Android64', LCondition) > 0) then LPlatform := 'Android64'
                   else if (ALposExIgnoreCase('Android', LCondition) > 0) then LPlatform := 'Android';
-                  if ((LPlatform = 'Android64') and (LPlatforms.IndexOf('Android64') >= 0)) or
-                     ((LPlatform = 'Android') and (LPlatforms.IndexOf('Android') >= 0)) then begin
+                  if LPlatforms.IndexOf(LPlatform) >= 0 then begin
                     Var LPreBuildEventNode := LPropertyGroupNode.ChildNodes.FindNode('PreBuildEvent');
                     var LPreBuildEventXml: ansiString := '';
                     if (LPreBuildEventNode <> nil) then LPreBuildEventNode.SaveToXML(LPreBuildEventXml, true{SaveOnlyChildNodes});
@@ -3502,16 +3519,19 @@ begin
                     if LIndex >= 0 then LPropertyGroupNode.ChildNodes.Delete(LIndex);
                     LIndex := LPropertyGroupNode.ChildNodes.IndexOf('PreBuildEventExecuteWhen');
                     if LIndex >= 0 then LPropertyGroupNode.ChildNodes.Delete(LIndex);
+                    //A little (completely) ugly but i considere that
+                    //'$(Cfg_1_Android)'!='' => mean we are in debug
+                    //'$(Cfg_2_Android)'!='' => mean we are in release
                     var J := LConditions.IndexOf(LPlatform+'=Debug');
                     if (J >= 0) and
-                       (ALposExIgnoreCase('Debug', LCondition) > 0) then begin
+                       (ALSameText(LCondition, '''$(Cfg_1_'+LPlatform+')''!=''''')) then begin
                       LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="false"';
                       LConditions.Delete(J);
                     end
                     else begin
                       J := LConditions.IndexOf(LPlatform+'=Release');
                       if (J >= 0) and
-                         (ALposExIgnoreCase('Release', LCondition) > 0) then begin
+                         (ALSameText(LCondition, '''$(Cfg_2_'+LPlatform+')''!=''''')) then begin
                         LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="true"';
                         LConditions.Delete(J);
                       end;
@@ -3520,14 +3540,14 @@ begin
                 end;
               end;
               //----
-              for var I := 0 to LConditions.Count - 1 do begin
-                var LPropertyGroupNode := LdprojXmlDoc.DocumentElement.AddChild('PropertyGroup');
-                LPropertyGroupNode.Attributes['Condition'] := '''$(Config)''=='''+LConditions.ValueFromIndex[i]+''' And ''$(Platform)''=='''+LConditions.Names[i]+'''';
-                if ALSameText(LConditions.ValueFromIndex[i], 'Debug') then
-                  LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="false"'
-                else if ALSameText(LConditions.ValueFromIndex[i], 'Release') then
-                  LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="true"';
-              end;
+              //for var I := 0 to LConditions.Count - 1 do begin
+              //  var LPropertyGroupNode := LdprojXmlDoc.DocumentElement.AddChild('PropertyGroup');
+              //  LPropertyGroupNode.Attributes['Condition'] := '''$(Config)''=='''+LConditions.ValueFromIndex[i]+''' And ''$(Platform)''=='''+LConditions.Names[i]+'''';
+              //  if ALSameText(LConditions.ValueFromIndex[i], 'Debug') then
+              //    LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="false"'
+              //  else if ALSameText(LConditions.ValueFromIndex[i], 'Release') then
+              //    LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="true"';
+              //end;
             finally
               ALFreeAndNil(LConditions);
             end;

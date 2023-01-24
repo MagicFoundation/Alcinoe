@@ -35,7 +35,7 @@ based on win32 ASM). That mean that most of the functions will be around 2x to
 10x more slower. you can try to launch /demo/ALStringBenchMark/ in win64 and
 Win32 to see the difference in speed.
 *******************************************************************************)
-unit ALString;
+unit Alcinoe.StringUtils;
 
 interface
 
@@ -58,8 +58,8 @@ uses
   {$IFDEF MACOS}
   Macapi.CoreFoundation,
   {$ENDIF MACOS}
-  ALStringList,
-  ALCommon;
+  Alcinoe.StringList,
+  Alcinoe.Common;
 
 resourcestring
   SALInvalidFormat = 'Format ''%s'' invalid or incompatible with argument';

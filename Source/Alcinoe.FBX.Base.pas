@@ -2970,7 +2970,7 @@ type
 implementation
 
 uses System.SysUtils,
-     Alcinoe.FBX.Const;
+     Alcinoe.FBX.Consts;
 
 (*******************************************************************************
  *    MACROS                                                                   *

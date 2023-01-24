@@ -114,7 +114,7 @@
 			<DCCReference Include="Alcinoe.Execute.pas"/>
 			<DCCReference Include="Alcinoe.FBX.Lib.pas"/>
 			<DCCReference Include="Alcinoe.FBX.Base.pas"/>
-			<DCCReference Include="Alcinoe.FBX.Const.pas"/>
+			<DCCReference Include="Alcinoe.FBX.Consts.pas"/>
 			<DCCReference Include="Alcinoe.FBX.Error.pas"/>
 			<DCCReference Include="Alcinoe.FTP.Client.WinINet.pas"/>
 			<DCCReference Include="Alcinoe.FTP.Client.pas"/>

@@ -69,7 +69,7 @@ begin
       LUnitsToRename.add('ALExprEval=Alcinoe.ExprEval');
       LUnitsToRename.add('ALFBXBase=Alcinoe.FBX.Base');
       LUnitsToRename.add('ALFBXClient=Alcinoe.FBX.Client');
-      LUnitsToRename.add('ALFBXConst=Alcinoe.FBX.Const');
+      LUnitsToRename.add('ALFBXConst=Alcinoe.FBX.Consts');
       LUnitsToRename.add('ALFBXError=Alcinoe.FBX.Error');
       LUnitsToRename.add('ALFBXLib=Alcinoe.FBX.Lib');
       LUnitsToRename.add('ALFiles=Alcinoe.Files');

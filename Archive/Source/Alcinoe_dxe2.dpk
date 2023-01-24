@@ -58,7 +58,7 @@ contains
   Alcinoe.Execute in 'Alcinoe.Execute.pas',
   Alcinoe.FBX.Lib in 'Alcinoe.FBX.Lib.pas',
   Alcinoe.FBX.Base in 'Alcinoe.FBX.Base.pas',
-  Alcinoe.FBX.Const in 'Alcinoe.FBX.Const.pas',
+  Alcinoe.FBX.Consts in 'Alcinoe.FBX.Consts.pas',
   Alcinoe.FBX.Error in 'Alcinoe.FBX.Error.pas',
   Alcinoe.FTP.Client.WinINet in 'Alcinoe.FTP.Client.WinINet.pas',
   Alcinoe.FTP.Client in 'Alcinoe.FTP.Client.pas',

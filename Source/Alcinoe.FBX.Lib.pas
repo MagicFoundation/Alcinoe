@@ -1161,7 +1161,7 @@ uses System.Math,
      System.Variants,
      System.Ansistrings,
      Alcinoe.FBX.Error,
-     Alcinoe.FBX.Const,
+     Alcinoe.FBX.Consts,
      Alcinoe.Common,
      Alcinoe.StringUtils;
 

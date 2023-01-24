@@ -8,10 +8,10 @@ uses
   System.SysUtils,
   System.ioutils,
   System.types,
-  ALStringList,
-  ALFiles,
-  ALString,
-  ALCommon;
+  Alcinoe.StringList,
+  Alcinoe.Files,
+  Alcinoe.String,
+  Alcinoe.Common;
 
 {*************************************************************}
 Function _FormatFunctionCall(Const aSourceStr: String): String;

@@ -7,13 +7,13 @@ uses
   Controls, Forms, Dialogs, StrUtils, ExtCtrls, StdCtrls, cxStyles,
   cxCustomData, cxGraphics, cxFilter, cxData, cxDataStorage, cxEdit,
   cxGridLevel, cxGridCustomTableView, cxGridTableView, cxClasses, cxControls,
-  cxGridCustomView, cxGrid, ComCtrls, AlSqlite3Client, cxMemo, cxBlobEdit,
-  alFbxClient, almysqlClient, cxDropDownEdit,
-  ALSphinxQLClient, cxLookAndFeels, cxLookAndFeelPainters, dxSkinsCore,
+  cxGridCustomView, cxGrid, ComCtrls, Alcinoe.Sqlite3.Client, cxMemo, cxBlobEdit,
+  Alcinoe.FBX.Client, Alcinoe.MySql.Client, cxDropDownEdit,
+  Alcinoe.SphinxQL.Client, cxLookAndFeels, cxLookAndFeelPainters, dxSkinsCore,
   dxSkinFoggy, dxSkinscxPCPainter, dxSkinsForm, Vcl.Menus, cxButtons,
   cxPCdxBarPopupMenu, cxPC, cxContainer, cxLabel, cxTextEdit, cxMaskEdit,
-  cxButtonEdit, cxCheckBox, cxGroupBox, cxRadioGroup, AlMemCachedClient,
-  ALMongoDBClient, ALJsonDoc, cxCheckGroup, cxNavigator, Shellapi,
+  cxButtonEdit, cxCheckBox, cxGroupBox, cxRadioGroup, Alcinoe.MemCached.Client,
+  Alcinoe.MongoDB.Client, Alcinoe.JSONDoc, cxCheckGroup, cxNavigator, Shellapi,
   dxBarBuiltInMenu, dxDateRanges, dxScrollbarAnnotations, dxCore;
 
 type
@@ -455,16 +455,16 @@ var Form1: TForm1;
 implementation
 
 uses SyncObjs,
-     alWindows,
-     ALFBXBase,
-     ALFBXLib,
-     ALMySqlWrapper,
-     alSqlite3Wrapper,
-     ALAVLBinaryTree,
-     ALCommon,
-     AlXmlDoc,
-     alStringList,
-     ALString;
+     Alcinoe.WinApi.Common,
+     Alcinoe.FBX.Base,
+     Alcinoe.FBX.Lib,
+     Alcinoe.MySql.Wrapper,
+     Alcinoe.Sqlite3.Wrapper,
+     Alcinoe.AVLBinaryTree,
+     Alcinoe.Common,
+     Alcinoe.XMLDoc,
+     Alcinoe.StringList,
+     Alcinoe.String;
 
 {$R *.dfm}
 

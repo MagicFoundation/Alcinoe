@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
-  FMX.Controls.Presentation, FMX.StdCtrls, ALFmxConfetti, FMX.Memo.Types,
+  FMX.Controls.Presentation, FMX.StdCtrls, Alcinoe.FMX.Confetti, FMX.Memo.Types,
   FMX.ScrollBox, FMX.Memo, system.Diagnostics;
 
 type
@@ -53,8 +53,8 @@ implementation
 
 uses
   system.Math,
-  ALCommon,
-  AlString;
+  Alcinoe.Common,
+  Alcinoe.String;
 
 {$R *.fmx}
 

@@ -12,12 +12,12 @@ uses
   System.SysUtils,
   System.IOUtils,
   system.AnsiStrings,
-  ALJsonDoc,
-  ALString,
-  ALExecute,
-  ALCommon,
-  ALXmlDoc,
-  ALStringList;
+  Alcinoe.JSONDoc,
+  Alcinoe.String,
+  Alcinoe.Execute,
+  Alcinoe.Common,
+  Alcinoe.XMLDoc,
+  Alcinoe.StringList;
 
 var
   WritelnDuplicatesToSkip: TalStringListU;

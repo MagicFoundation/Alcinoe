@@ -50,9 +50,9 @@ implementation
 uses
   System.TypInfo,
   system.rtti,
-  ALRtti,
-  alcommon,
-  ALString;
+  Alcinoe.RTTI,
+  Alcinoe.Common,
+  Alcinoe.String;
 
 {$R *.dfm}
 

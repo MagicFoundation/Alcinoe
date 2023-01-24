@@ -16,7 +16,7 @@ uses Windows,
      ExtCtrls,
      ComCtrls,
      SyncObjs,
-     AlSMTPClient;
+     Alcinoe.SMTP.Client;
 
 type
   TForm1 = class(TForm)
@@ -83,10 +83,10 @@ var
 
 implementation
 
-Uses ALString,
-     ALStringList,
-     ALInternetMessages,
-     ALMultiPartParser;
+Uses Alcinoe.String,
+     Alcinoe.StringList,
+     Alcinoe.InternetMessages,
+     Alcinoe.MultiPartParser;
 
 {$R *.DFM}
 

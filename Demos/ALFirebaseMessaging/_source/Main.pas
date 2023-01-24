@@ -24,7 +24,7 @@ uses
   FMX.Memo.Types,
   FMX.Edit,
   {$IF Defined(MSWindows)}
-  ALCipher,
+  Alcinoe.Cipher,
   {$ENDIF}
   {$IF Defined(IOS) or Defined(ANDROID)}
   Grijjy.ErrorReporting,
@@ -41,8 +41,8 @@ uses
   Androidapi.JNI.Os,
   Androidapi.JNI.Media,
   Androidapi.JNI.JavaTypes,
-  ALAndroidApi,
-  ALFmxGraphics,
+  Alcinoe.AndroidApi.Common,
+  Alcinoe.FMX.Graphics,
   {$ENDIF}
   {$IF defined(IOS)}
   iOSapi.UserNotifications,
@@ -52,11 +52,11 @@ uses
   iOSapi.Helpers,
   {$ENDIF}
   system.Messaging,
-  alString,
-  alStringList,
-  ALFmxFirebaseMessaging,
-  alcommon,
-  ALFmxObjects;
+  Alcinoe.String,
+  Alcinoe.StringList,
+  Alcinoe.FMX.FirebaseMessaging,
+  Alcinoe.Common,
+  Alcinoe.FMX.Objects;
 
 type
   TForm1 = class(TForm)

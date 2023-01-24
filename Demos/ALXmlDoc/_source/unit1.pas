@@ -4,8 +4,8 @@ interface
 
 uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls,
      Forms, Dialogs, Contnrs, StdCtrls, xmldom, XMLIntf, msxmldom,
-     XMLDoc, ALString, AlXmlDoc, ExtCtrls, ALFiles,
-     ALStringList, Shellapi;
+     XMLDoc, Alcinoe.String, Alcinoe.XMLDoc, ExtCtrls, Alcinoe.Files,
+     Alcinoe.StringList, Shellapi;
 
 type
 

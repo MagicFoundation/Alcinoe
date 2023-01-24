@@ -183,8 +183,8 @@ begin
             LSourceStr := ALStringReplace(LSourceStr,#10+LOldUnitName+';'    ,     #10+LNewUnitName+';',[rfReplaceALL, RFIgnoreCase]);
             LSourceStr := ALStringReplace(LSourceStr,#10+LOldUnitName+' '    ,     #10+LNewUnitName+' ',[rfReplaceALL, RFIgnoreCase]);
             LSourceStr := ALStringReplace(LSourceStr,#10+LOldUnitName+'.'    ,     #10+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);
-            LSourceStr := ALStringReplace(LSourceStr,''''+LOldUnitName+'.'   ,     ''''+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]); // ALFmxTypes3D in 'ALFmxTypes3D.pas',
-            LSourceStr := ALStringReplace(LSourceStr,'"'+LOldUnitName+'.'    ,     '"'+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);  // <DCCReference Include="ALFmxEdit.pas"/>
+            LSourceStr := ALStringReplace(LSourceStr,''''+LOldUnitName+'.'   ,     ''''+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]); // Alcinoe.FMX.Types3D in 'Alcinoe.FMX.Types3D.pas',
+            LSourceStr := ALStringReplace(LSourceStr,'"'+LOldUnitName+'.'    ,     '"'+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);  // <DCCReference Include="Alcinoe.FMX.Edit.pas"/>
           end;
           if LOriginalSourceStr <> LSourceStr then begin
             ALSaveStringToFile(LSourceStr,LFiles[i]);

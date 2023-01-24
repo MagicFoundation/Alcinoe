@@ -11,8 +11,8 @@ interface
 
 uses
   System.Contnrs,
-  AlStringList,
-  ALFbxClient;
+  Alcinoe.StringList,
+  Alcinoe.FBX.Client;
 
 Type
 
@@ -111,7 +111,7 @@ implementation
 uses
   System.Classes,
   System.Types,
-  AlString;
+  Alcinoe.String;
 
 {************************************}
 constructor TAlSelectSQLClause.Create;

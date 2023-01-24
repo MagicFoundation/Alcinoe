@@ -3,8 +3,8 @@ unit Unit1;
 interface
 
 uses Windows, winapi.winhttp, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-     Dialogs, StdCtrls, shellapi, ExtCtrls, ComCtrls, AlHttpClient, AlWinHttpClient,
-     AlStringList, cxStyles, cxCustomData, cxGraphics, cxFilter,
+     Dialogs, StdCtrls, shellapi, ExtCtrls, ComCtrls, Alcinoe.HTTP.Client, Alcinoe.HTTP.Client.WinHTTP,
+     Alcinoe.StringList, cxStyles, cxCustomData, cxGraphics, cxFilter,
      cxData, cxDataStorage, cxEdit, cxDropDownEdit, cxImageComboBox, cxSpinEdit,
      cxGridLevel, cxGridCustomTableView, cxGridTableView, cxClasses, cxControls,
      cxGridCustomView, cxGrid, Spin, dxSkinsCore, dxSkinFoggy, dxSkinscxPCPainter, cxPCdxBarPopupMenu,
@@ -196,12 +196,12 @@ implementation
 
 Uses Math,
      DateUtils,
-     ALMultiPartParser,
-     AlFiles,
-     AlCommon,
-     ALWindows,
-     AlHtml,
-     ALString;
+     Alcinoe.MultiPartParser,
+     Alcinoe.Files,
+     Alcinoe.Common,
+     Alcinoe.WinApi.Common,
+     Alcinoe.HTML,
+     Alcinoe.String;
 
 {$R *.dfm}
 

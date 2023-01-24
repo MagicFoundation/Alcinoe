@@ -14,7 +14,7 @@ diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.Canvas.GPU.Helpers.pas b/Embarcad
 -  System.Types, System.UITypes, FMX.Types, FMX.Types3D, FMX.Materials.Canvas, FMX.Graphics, 
 -  System.Math.Vectors;
 +  System.Types, System.UITypes, FMX.Types, FMX.Types3D, FMX.Materials.Canvas, FMX.Graphics,
-+  System.Math.Vectors, ALFMXTypes3D;
++  System.Math.Vectors, Alcinoe.FMX.Types3D;
  
  type
    TDrawingMode = (Normal, WriteStencilInvert, ReadStencil, ClearStencil);
@@ -153,7 +153,7 @@ diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.Context.GLES.pas b/Embarcadero/Sy
    Macapi.CoreFoundation,
  {$ENDIF}
 -  FMX.Consts, FMX.Canvas.GPU, FMX.Materials, FMX.Utils;
-+  FMX.Consts, FMX.Canvas.GPU, FMX.Materials, FMX.Utils, ALfmxTypes3D;
++  FMX.Consts, FMX.Canvas.GPU, FMX.Materials, FMX.Utils, Alcinoe.FMX.Types3D;
  
  class procedure TGlesDiagnostic.CollectErrors;
  const
@@ -710,7 +710,7 @@ diff --git a/Embarcadero/Sydney/10_4_2/fmx/FMX.Platform.iOS.pas b/Embarcadero/Sy
    FMX.Helpers.iOS, FMX.Dialogs.iOS, FMX.Platform, FMX.Platform.Timer.iOS, FMX.Platform.SaveState.iOS,
    FMX.MultiTouch.iOS, FMX.Platform.Metrics.iOS, FMX.Platform.Device.iOS, FMX.Platform.Screen.iOS,
 -  FMX.Platform.Logger.iOS, FMX.Controls.Presentation;
-+  FMX.Platform.Logger.iOS, FMX.Controls.Presentation, ALFmxEdit, ALFmxMemo; // // https://quality.embarcadero.com/browse/RSP-33594
++  FMX.Platform.Logger.iOS, FMX.Controls.Presentation, Alcinoe.FMX.Edit, Alcinoe.FMX.Memo; // // https://quality.embarcadero.com/browse/RSP-33594
  
  type
  

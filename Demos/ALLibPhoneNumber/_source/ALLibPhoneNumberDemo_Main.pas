@@ -3,7 +3,7 @@ unit ALLibPhoneNumberDemo_Main;
 interface
 
 uses
-  ALLibPhoneNumber, ALString, Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Alcinoe.LibPhoneNumber, Alcinoe.String, Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
 
 type

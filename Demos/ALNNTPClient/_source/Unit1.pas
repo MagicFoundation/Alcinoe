@@ -16,7 +16,7 @@ uses Windows,
      ExtCtrls,
      ComCtrls,
      SyncObjs,
-     AlNNTPClient;
+     Alcinoe.NNTP.Client;
 
 type
   TForm1 = class(TForm)
@@ -80,9 +80,9 @@ var
 
 implementation
 
-Uses ALString,
-     ALInternetMessages,
-     ALMultiPartParser;
+Uses Alcinoe.String,
+     Alcinoe.InternetMessages,
+     Alcinoe.MultiPartParser;
 
 {$R *.DFM}
 

@@ -17,7 +17,7 @@ uses
   shellapi,
   ExtCtrls,
   ComCtrls,
-  AlWininetHttpClient,
+  Alcinoe.HTTP.Client.WinINet,
   cxPCdxBarPopupMenu,
   cxGraphics,
   cxControls,
@@ -41,7 +41,7 @@ uses
   cxSplitter,
   cxClasses,
   dxBarBuiltInMenu,
-  ALString,
+  Alcinoe.String,
   system.AnsiStrings;
 
 type
@@ -171,12 +171,12 @@ implementation
 Uses
   DateUtils,
   HttpApp,
-  ALMultiPartParser,
-  AlCommon,
-  AlFiles,
-  ALMime,
-  AlStringList,
-  AlHTTPClient;
+  Alcinoe.MultiPartParser,
+  Alcinoe.Common,
+  Alcinoe.Files,
+  Alcinoe.Mime,
+  Alcinoe.StringList,
+  Alcinoe.HTTP.Client;
 
 {$R *.dfm}
 

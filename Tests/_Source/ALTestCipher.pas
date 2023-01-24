@@ -4,8 +4,8 @@ interface
 
 uses
   System.Diagnostics,
-  ALCommon,
-  ALString,
+  Alcinoe.Common,
+  Alcinoe.String,
   DUnitX.TestFramework;
 
 type
@@ -32,7 +32,7 @@ implementation
 uses
   IdHashCRC,
   IDGlobal,
-  ALCipher;
+  Alcinoe.Cipher;
 
 {*******************************}
 constructor TALTestCipher.create;

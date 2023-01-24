@@ -40,8 +40,8 @@ uses
   cxSplitter,
   cxClasses,
   dxBarBuiltInMenu,
-  ALString,
-  AlWinHttpWebSocketClient, dxCore;
+  Alcinoe.String,
+  Alcinoe.WebSocket.Client.WinHTTP, dxCore;
 
 type
   TForm1 = class(TForm)
@@ -138,13 +138,13 @@ Uses
   system.AnsiStrings,
   DateUtils,
   HttpApp,
-  ALMultiPartParser,
-  AlFiles,
-  AlCommon,
-  ALMime,
-  ALWinHttpClient,
-  ALStringList,
-  AlHttpClient;
+  Alcinoe.MultiPartParser,
+  Alcinoe.Files,
+  Alcinoe.Common,
+  Alcinoe.Mime,
+  Alcinoe.HTTP.Client.WinHTTP,
+  Alcinoe.StringList,
+  Alcinoe.HTTP.Client;
 
 {$R *.dfm}
 

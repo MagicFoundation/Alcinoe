@@ -5,11 +5,11 @@ program ALFBXMonitoringStats;
 uses Windows,
      classes,
      SysUtils,
-     ALFbxBase,
-     ALXmldoc,
-     ALString,
-     ALStringList,
-     ALFBXClient;
+     Alcinoe.FBX.Base,
+     Alcinoe.XMLDoc,
+     Alcinoe.String,
+     Alcinoe.StringList,
+     Alcinoe.FBX.Client;
 
 {$R *.res}
 

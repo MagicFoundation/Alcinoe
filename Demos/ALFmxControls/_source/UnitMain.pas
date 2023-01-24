@@ -16,28 +16,28 @@ uses
   FMX.StdCtrls,
   FMX.Controls.Presentation,
   FMX.Objects,
-  ALFmxObjects,
+  Alcinoe.FMX.Objects,
   FMX.Layouts,
-  ALFmxLayouts,
+  Alcinoe.FMX.Layouts,
   fmx.types3D,
-  ALFmxCommon,
+  Alcinoe.FMX.Common,
   System.ImageList,
   FMX.ImgList,
-  ALFmxStdCtrls,
-  ALFmxTabControl,
+  Alcinoe.FMX.StdCtrls,
+  Alcinoe.FMX.TabControl,
   FMX.ScrollBox,
   FMX.Edit,
-  ALFmxEdit,
-  ALFmxVideoPlayer,
-  ALFmxDatePickerDialog,
+  Alcinoe.FMX.Edit,
+  Alcinoe.FMX.VideoPlayer,
+  Alcinoe.FMX.DatePickerDialog,
   FMX.Effects,
   {$IF Defined(IOS) or Defined(ANDROID)}
   Grijjy.ErrorReporting,
   {$ENDIF}
   FMX.Filter.Effects,
   system.Messaging,
-  ALFMXAni,
-  alFmxMemo;
+  Alcinoe.FMX.Ani,
+  Alcinoe.FMX.Memo;
 
 type
 
@@ -306,8 +306,8 @@ uses
   system.Math,
   UnitDemo,
   system.DateUtils,
-  ALFmxInertialMovement,
-  ALCommon;
+  Alcinoe.FMX.InertialMovement,
+  Alcinoe.Common;
 
 {$R *.fmx}
 

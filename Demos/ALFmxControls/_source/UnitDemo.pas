@@ -4,8 +4,8 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, ALFmxLayouts,
-  System.Diagnostics, fmx.layouts, ALFmxObjects, FMX.Controls.Presentation,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, Alcinoe.FMX.Layouts,
+  System.Diagnostics, fmx.layouts, Alcinoe.FMX.Objects, FMX.Controls.Presentation,
   FMX.StdCtrls;
 
 type
@@ -33,8 +33,8 @@ var
 
 implementation
 
-uses alCommon,
-     aLString;
+uses Alcinoe.Common,
+     Alcinoe.String;
 
 {$R *.fmx}
 

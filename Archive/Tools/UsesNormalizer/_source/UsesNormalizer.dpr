@@ -6,11 +6,11 @@ program UsesNormalizer;
 
 uses
   System.SysUtils,
-  ALXmlDoc,
-  ALCommon,
-  ALStringList,
-  ALFiles,
-  ALString;
+  Alcinoe.XMLDoc,
+  Alcinoe.Common,
+  Alcinoe.StringList,
+  Alcinoe.Files,
+  Alcinoe.String;
 
 procedure _cleanUses(Const AFilename: AnsiString; Const ASection: AnsiString);
 begin

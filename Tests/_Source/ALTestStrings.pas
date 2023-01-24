@@ -7,9 +7,9 @@ uses
   System.AnsiStrings,
   System.Diagnostics,
   Winapi.Windows,
-  ALCommon,
-  ALCipher,
-  ALString,
+  Alcinoe.Common,
+  Alcinoe.Cipher,
+  Alcinoe.String,
   DUnitX.TestFramework;
 
 type
@@ -91,7 +91,7 @@ uses
   System.DateUtils,
   System.Character,
   System.StrUtils,
-  ALStringList;
+  Alcinoe.StringList;
 
 {********************************}
 constructor TALTestStrings.create;

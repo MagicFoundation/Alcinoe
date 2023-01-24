@@ -12,11 +12,11 @@ uses Windows,
      ComCtrls,
      Controls,
      Classes,
-     ALStringList,
-     ALHttpClient,
-     ALWinHttpClient,
-     ALWebSpider,
-     AlAVLBinaryTree,
+     Alcinoe.StringList,
+     Alcinoe.HTTP.Client,
+     Alcinoe.HTTP.Client.WinHTTP,
+     Alcinoe.WebSpider,
+     Alcinoe.AVLBinaryTree,
      ExtCtrls,
      Shellapi;
 
@@ -92,9 +92,9 @@ implementation
 uses FileCtrl,
      Masks,
      UrlMon,
-     AlFiles,
-     ALMime,
-     ALString;
+     Alcinoe.Files,
+     Alcinoe.Mime,
+     Alcinoe.String;
 
 Const SplitDirectoryAmount = 5000;
 

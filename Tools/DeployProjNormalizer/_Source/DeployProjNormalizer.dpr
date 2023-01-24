@@ -9,11 +9,11 @@ uses
   System.SysUtils,
   System.Classes,
   system.Math,
-  ALXmlDoc,
-  ALCommon,
-  ALStringList,
-  ALFiles,
-  ALString;
+  Alcinoe.XMLDoc,
+  Alcinoe.Common,
+  Alcinoe.StringList,
+  Alcinoe.Files,
+  Alcinoe.String;
 
 {***********************************************************}
 Procedure _SortAttributesByNodeName(const aNode: TalXmlNode);

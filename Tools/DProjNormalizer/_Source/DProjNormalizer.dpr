@@ -6,11 +6,11 @@ program DProjNormalizer;
 
 uses
   System.SysUtils,
-  ALXmlDoc,
-  ALCommon,
-  ALStringList,
-  ALFiles,
-  ALString;
+  Alcinoe.XMLDoc,
+  Alcinoe.Common,
+  Alcinoe.StringList,
+  Alcinoe.Files,
+  Alcinoe.String;
 
 {***********************************************************}
 Procedure _SortAttributesByNodeName(const aNode: TalXmlNode);

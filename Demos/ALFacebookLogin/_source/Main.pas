@@ -21,14 +21,14 @@ uses
   Grijjy.ErrorReporting,
   {$ENDIF}
   system.Messaging,
-  alString,
-  alStringList,
-  alfmxCommon,
-  alFmxFaceBookLogin,
-  alFmxFaceBookShare,
-  alcommon,
+  Alcinoe.String,
+  Alcinoe.StringList,
+  Alcinoe.FMX.Common,
+  Alcinoe.FMX.FacebookLogin,
+  Alcinoe.FMX.FacebookShare,
+  Alcinoe.Common,
   FMX.Memo.Types,
-  ALFmxObjects;
+  Alcinoe.FMX.Objects;
 
 type
   TForm1 = class(TForm)

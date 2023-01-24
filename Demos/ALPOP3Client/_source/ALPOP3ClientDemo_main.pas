@@ -13,7 +13,7 @@ uses Windows,
      Dialogs,
      StdCtrls,
      ComCtrls,
-     ALPOP3Client;
+     Alcinoe.POP3.Client;
 
 type
   TForm1 = class(TForm)
@@ -61,7 +61,7 @@ var
 
 implementation
 
-uses ALString;
+uses Alcinoe.String;
 
 {$R *.dfm}
 

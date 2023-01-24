@@ -7,10 +7,10 @@ program DProjVersioning;
 uses
   System.SysUtils,
   System.math,
-  ALFiles,
-  ALStringList,
-  ALCommon,
-  ALString;
+  Alcinoe.Files,
+  Alcinoe.StringList,
+  Alcinoe.Common,
+  Alcinoe.String;
 
 {********************************************************************}
 function getdProjVersionName(const aDProjSrc: AnsiString): ansiString;

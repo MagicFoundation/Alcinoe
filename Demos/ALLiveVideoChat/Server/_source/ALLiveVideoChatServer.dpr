@@ -16,7 +16,7 @@ uses System.generics.collections,
      IdTCPServer,
      IdContext,
      IdCustomHTTPServer,
-     alCommon;
+     Alcinoe.Common;
 
 Type
 

@@ -36,10 +36,10 @@ var Form1: TForm1;
 
 implementation
 
-uses ALString,
-     alQuickSortList,
-     ALStringList,
-     alavlBinaryTree;
+uses Alcinoe.String,
+     Alcinoe.QuickSortList,
+     Alcinoe.StringList,
+     Alcinoe.AVLBinaryTree;
 
 {$R *.dfm}
 

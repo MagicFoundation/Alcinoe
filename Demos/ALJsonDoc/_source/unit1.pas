@@ -4,9 +4,9 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  StdCtrls, ALString, ALJsonDoc, ExtCtrls,
-  ALStringList, Shellapi, Vcl.Dialogs,
-  Contnrs, alFiles, diagnostics, superobject, DBXplatform, IOUtils,
+  StdCtrls, Alcinoe.String, Alcinoe.JSONDoc, ExtCtrls,
+  Alcinoe.StringList, Shellapi, Vcl.Dialogs,
+  Contnrs, Alcinoe.Files, diagnostics, superobject, DBXplatform, IOUtils,
   dwsJSON, system.Generics.collections,
   system.UITypes, system.JSON, Vcl.ComCtrls, VclTee.TeeGDIPlus,
   Vcl.Samples.Spin, VCLTee.TeEngine, VCLTee.Series, VCLTee.TeeProcs,

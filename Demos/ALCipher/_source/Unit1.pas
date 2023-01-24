@@ -91,14 +91,14 @@ var Form1: TForm1;
 implementation
 
 uses math,
-     alcommon,
+     Alcinoe.Common,
      system.hash,
      system.netencoding,
      system.uitypes,
-     AlAVLBinaryTree,
-     ALString,
-     ALFiles,
-     alCipher,
+     Alcinoe.AVLBinaryTree,
+     Alcinoe.String,
+     Alcinoe.Files,
+     Alcinoe.Cipher,
      ZlibExApi,
      ZlibEx;
 

@@ -4,9 +4,9 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, ALFmxStdCtrls,
-  FMX.Effects, FMX.Filter.Effects, FMX.Objects, FMX.Layouts, ALFmxLayouts,
-  FMX.Controls.Presentation, FMX.StdCtrls, ALFmxFilterEffects, system.messaging;
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, Alcinoe.FMX.StdCtrls,
+  FMX.Effects, FMX.Filter.Effects, FMX.Objects, FMX.Layouts, Alcinoe.FMX.Layouts,
+  FMX.Controls.Presentation, FMX.StdCtrls, Alcinoe.FMX.FilterEffects, system.messaging;
 
 type
   TForm2 = class(TForm)
@@ -71,7 +71,7 @@ implementation
 {$R *.fmx}
 
 uses Grijjy.ErrorReporting,
-     alcommon;
+     Alcinoe.Common;
 
 procedure TForm2.ALTrackBar2Tracking(Sender: TObject);
 begin

@@ -1,7 +1,7 @@
 program ALDatabaseBenchmark;
 
 uses
-  ALTBBMM,
+  Alcinoe.TbbMM,
   Forms,
   Unit1 in 'Unit1.pas' {Form1};
 

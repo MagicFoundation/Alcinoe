@@ -14,7 +14,7 @@ diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Canvas.GPU.Helpers.pas b/Embarc
 -  System.Types, System.UITypes, FMX.Types, FMX.Types3D, FMX.Materials.Canvas, FMX.Graphics, 
 -  System.Math.Vectors;
 +  System.Types, System.UITypes, FMX.Types, FMX.Types3D, FMX.Materials.Canvas, FMX.Graphics,
-+  System.Math.Vectors, ALFMXTypes3D;
++  System.Math.Vectors, Alcinoe.FMX.Types3D;
  
  type
    TDrawingMode = (Normal, WriteStencilInvert, ReadStencil, ClearStencil);
@@ -96,7 +96,7 @@ diff --git a/Embarcadero/Alexandria/11_2/fmx/FMX.Context.GLES.pas b/Embarcadero/
    Macapi.CoreFoundation,
  {$ENDIF}
 -  FMX.Consts, FMX.Canvas.GPU, FMX.Materials, FMX.Utils;
-+  FMX.Consts, FMX.Canvas.GPU, FMX.Materials, FMX.Utils, ALfmxTypes3D;
++  FMX.Consts, FMX.Canvas.GPU, FMX.Materials, FMX.Utils, Alcinoe.FMX.Types3D;
  
  class procedure TGlesDiagnostic.CollectErrors;
  const

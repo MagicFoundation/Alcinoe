@@ -13,13 +13,13 @@ uses
   System.IOUtils,
   system.AnsiStrings,
   system.Math,
-  ALJsonDoc,
-  ALFiles,
-  ALString,
-  ALExecute,
-  ALCommon,
-  ALXmlDoc,
-  ALStringList;
+  Alcinoe.JSONDoc,
+  Alcinoe.Files,
+  Alcinoe.String,
+  Alcinoe.Execute,
+  Alcinoe.Common,
+  Alcinoe.XMLDoc,
+  Alcinoe.StringList;
 
 
 {******************************************************************************************************}
@@ -289,7 +289,7 @@ begin
         //----
         //TRegTypes.RegisterType('c:\Dev\MagicFoundation\Alcinoe\Tools\NativeBridgeFileGenerator\Tmp\\JavaInterfaces.JAccessibilityServiceInfo', TypeInfo(c:\Dev\MagicFoundation\Alcinoe\Tools\NativeBridgeFileGenerator\Tmp\\JavaInterfaces.JAccessibilityServiceInfo));
         // =>
-        //TRegTypes.RegisterType('ALAndroidFacebookApi.JAccessibilityServiceInfo', TypeInfo(ALAndroidFacebookApi.JAccessibilityServiceInfo));
+        //TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JAccessibilityServiceInfo', TypeInfo(ALAndroidFacebookApi.JAccessibilityServiceInfo));
         P1 := ALpos('TRegTypes.RegisterType(''', LOutputSrc);
         while P1 > 0 do begin
           Inc(P1, length('TRegTypes.RegisterType('''));

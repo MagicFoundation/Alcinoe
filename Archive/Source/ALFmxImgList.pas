@@ -92,11 +92,11 @@ uses system.Math,
      fmx.platform,
      {$IF DEFINED(IOS) or DEFINED(ANDROID)}
      FMX.Canvas.GPU,
-     ALFmxTypes3D,
+     Alcinoe.FMX.Types3D,
      {$ENDIF}
      fmx.controls,
-     alCommon,
-     alFmxCommon;
+     Alcinoe.Common,
+     Alcinoe.FMX.Common;
 
 {**********************************************}
 constructor TALGlyph.Create(AOwner: TComponent);

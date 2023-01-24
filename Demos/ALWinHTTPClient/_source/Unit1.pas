@@ -39,8 +39,8 @@ uses
   cxSplitter,
   cxClasses,
   dxBarBuiltInMenu,
-  ALString,
-  AlWinHttpClient;
+  Alcinoe.String,
+  Alcinoe.HTTP.Client.WinHTTP;
 
 type
   TForm1 = class(TForm)
@@ -161,12 +161,12 @@ Uses
   system.AnsiStrings,
   DateUtils,
   HttpApp,
-  ALMultiPartParser,
-  AlFiles,
-  AlCommon,
-  ALMime,
-  ALStringList,
-  AlHttpClient;
+  Alcinoe.MultiPartParser,
+  Alcinoe.Files,
+  Alcinoe.Common,
+  Alcinoe.Mime,
+  Alcinoe.StringList,
+  Alcinoe.HTTP.Client;
 
 {$R *.dfm}
 

@@ -16,8 +16,8 @@ uses Windows,
      ExtCtrls,
      ComCtrls,
      SyncObjs,
-     AlPhpRunner,
-     ALStringList;
+     Alcinoe.PhpRunner,
+     Alcinoe.StringList;
 
 type
   TForm1 = class(TForm)
@@ -91,11 +91,11 @@ var
 
 implementation
 
-Uses ALMultiPartParser,
-     AlFiles,
-     AlCommon,
-     ALString,
-     AlHttpClient;
+Uses Alcinoe.MultiPartParser,
+     Alcinoe.Files,
+     Alcinoe.Common,
+     Alcinoe.String,
+     Alcinoe.HTTP.Client;
 
 {$R *.dfm}
 {***************************************************}

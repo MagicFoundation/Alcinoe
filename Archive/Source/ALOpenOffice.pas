@@ -34,7 +34,7 @@ interface
 uses
   System.SysUtils,
   System.Variants,
-  ALString;
+  Alcinoe.String;
 
 type
 
@@ -84,7 +84,7 @@ uses
   System.Classes,
   System.StrUtils,
   System.Win.ComObj,
-  ALStringList;
+  Alcinoe.StringList;
 
 const
   cALOpenOfficeUrlProtocols: array[1..7] of AnsiString = ('file:///',

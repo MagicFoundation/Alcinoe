@@ -10,11 +10,11 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, ALFmxWebRTC,
-  FMX.Controls.Presentation, FMX.StdCtrls, ALCommon, ALFMXTypes3D, FMX.Objects,
-  FMX.Canvas.GPU, ALFmxGraphics, FMX.Types3D, FMX.Effects, FMX.Filter.Effects,
-  ALFmxStdCtrls, ALFmxLayouts, FMX.Layouts, system.messaging,
-  IdHTTP, ALFmxFilterEffects, FMX.Edit, ALFmxObjects;
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, Alcinoe.FMX.WebRTC,
+  FMX.Controls.Presentation, FMX.StdCtrls, Alcinoe.Common, Alcinoe.FMX.Types3D, FMX.Objects,
+  FMX.Canvas.GPU, Alcinoe.FMX.Graphics, FMX.Types3D, FMX.Effects, FMX.Filter.Effects,
+  Alcinoe.FMX.StdCtrls, Alcinoe.FMX.Layouts, FMX.Layouts, system.messaging,
+  IdHTTP, Alcinoe.FMX.FilterEffects, FMX.Edit, Alcinoe.FMX.Objects;
 
 type
   TForm1 = class(TForm)
@@ -78,9 +78,9 @@ uses
   FMX.Helpers.Android,
   FMX.Platform.Android,
   fmx.Context.GLES.Android,
-  alAndroidAPI,
+  Alcinoe.AndroidApi.Common,
   {$ENDIF}
-  alString;
+  Alcinoe.String;
 
 {********************************************}
 function _EnableDeviceCameraAndAudio: boolean;

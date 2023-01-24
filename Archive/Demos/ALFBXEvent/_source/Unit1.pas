@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls, ALFBXclient, Shellapi;
+  Dialogs, StdCtrls, ExtCtrls, Alcinoe.FBX.Client, Shellapi;
 
 type
 
@@ -57,8 +57,8 @@ var
 
 implementation
 
-uses ALString,
-     ALFbxBase;
+uses Alcinoe.String,
+     Alcinoe.FBX.Base;
 
 {$R *.dfm}
 

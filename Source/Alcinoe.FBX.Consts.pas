@@ -20,7 +20,7 @@ https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 
 http://www.progdigy.com/modules.php?name=UIB
 *******************************************************************************}
 
-unit Alcinoe.FBX.Const;
+unit Alcinoe.FBX.Consts;
 
 interface
 

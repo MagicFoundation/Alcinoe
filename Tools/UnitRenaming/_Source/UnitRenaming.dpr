@@ -24,7 +24,7 @@ begin
     {$ENDIF}
     SetMultiByteConversionCodePage(CP_UTF8);
 
-    Writeln('This tool will rename the old Alcinoe unit name (e.g. ALHttpClient)');
+    Writeln('This tool will rename the old Alcinoe unit name (e.g. ALHTTPClient)');
     Writeln('to the new Alcinoe unit name (e.g. Alcinoe.Http.Client) in your source code.');
     Writeln('');
     Writeln('Enter the root directory (Please make backup before):');
@@ -124,7 +124,7 @@ begin
       LUnitsToRename.add('ALSphinxQLClient=Alcinoe.SphinxQL.Client');
       LUnitsToRename.add('ALSqlite3Client=Alcinoe.Sqlite3.Client');
       LUnitsToRename.add('ALSqlite3Wrapper=Alcinoe.Sqlite3.Wrapper');
-      LUnitsToRename.add('ALString=Alcinoe.String');
+      LUnitsToRename.add('ALString=Alcinoe.StringUtils');
       LUnitsToRename.add('ALStringList=Alcinoe.StringList');
       LUnitsToRename.add('ALTbbMM=Alcinoe.TbbMM');
       LUnitsToRename.add('ALWebSpider=Alcinoe.WebSpider');
@@ -152,10 +152,15 @@ begin
         for var I := Low(LDprFiles) to High(LDprFiles) do LFiles.Add(LDprFiles[i]);
         var LDprojFiles := TDirectory.GetFiles(string(LRootDirectory), '*.dproj', TSearchOption.soAllDirectories);
         for var I := Low(LDprojFiles) to High(LDprojFiles) do LFiles.Add(LDprojFiles[i]);
+        var LDpkFiles := TDirectory.GetFiles(string(LRootDirectory), '*.dpk', TSearchOption.soAllDirectories);
+        for var I := Low(LDpkFiles) to High(LDpkFiles) do LFiles.Add(LDpkFiles[i]);
         var LpatchFiles := TDirectory.GetFiles(string(LRootDirectory), '*.patch', TSearchOption.soAllDirectories);
         for var I := Low(LpatchFiles) to High(LpatchFiles) do LFiles.Add(LpatchFiles[i]);
+        var LMDFiles := TDirectory.GetFiles(string(LRootDirectory), '*.md', TSearchOption.soAllDirectories);
+        for var I := Low(LMDFiles) to High(LMDFiles) do LFiles.Add(LMDFiles[i]);
 
         for var I := 0 to LFiles.Count - 1 do begin
+          if AlSameTextU(ALExtractFileNameU(LFiles[i]), 'UnitRenaming.dpr') then continue;
           var LSourceStr := ALGetStringFromFile(LFiles[i]);
           var LOriginalSourceStr := LSourceStr;
           for var J := 0 to LUnitsToRename.Count - 1 do begin
@@ -167,24 +172,60 @@ begin
             LSourceStr := ALStringReplace(LSourceStr,','+LOldUnitName+';'    ,     ','+LNewUnitName+';',[rfReplaceALL, RFIgnoreCase]);
             LSourceStr := ALStringReplace(LSourceStr,','+LOldUnitName+' '    ,     ','+LNewUnitName+' ',[rfReplaceALL, RFIgnoreCase]);
             LSourceStr := ALStringReplace(LSourceStr,','+LOldUnitName+'.'    ,     ','+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,','+LOldUnitName+')'    ,     ','+LNewUnitName+')',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,','+LOldUnitName+']'    ,     ','+LNewUnitName+']',[rfReplaceALL, RFIgnoreCase]);
+
+            LSourceStr := ALStringReplace(LSourceStr,'('+LOldUnitName+','    ,     '('+LNewUnitName+',',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'('+LOldUnitName+';'    ,     '('+LNewUnitName+';',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'('+LOldUnitName+' '    ,     '('+LNewUnitName+' ',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'('+LOldUnitName+'.'    ,     '('+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'('+LOldUnitName+')'    ,     '('+LNewUnitName+')',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'('+LOldUnitName+']'    ,     '('+LNewUnitName+']',[rfReplaceALL, RFIgnoreCase]);
+
+            LSourceStr := ALStringReplace(LSourceStr,'/'+LOldUnitName+','    ,     '/'+LNewUnitName+',',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'/'+LOldUnitName+';'    ,     '/'+LNewUnitName+';',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'/'+LOldUnitName+' '    ,     '/'+LNewUnitName+' ',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'/'+LOldUnitName+'.'    ,     '/'+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'/'+LOldUnitName+')'    ,     '/'+LNewUnitName+')',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'/'+LOldUnitName+']'    ,     '/'+LNewUnitName+']',[rfReplaceALL, RFIgnoreCase]);
+
+            LSourceStr := ALStringReplace(LSourceStr,'\'+LOldUnitName+','    ,     '\'+LNewUnitName+',',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'\'+LOldUnitName+';'    ,     '\'+LNewUnitName+';',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'\'+LOldUnitName+' '    ,     '\'+LNewUnitName+' ',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'\'+LOldUnitName+'.'    ,     '\'+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'\'+LOldUnitName+')'    ,     '\'+LNewUnitName+')',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'\'+LOldUnitName+']'    ,     '\'+LNewUnitName+']',[rfReplaceALL, RFIgnoreCase]);
+
             LSourceStr := ALStringReplace(LSourceStr,' '+LOldUnitName+','    ,     ' '+LNewUnitName+',',[rfReplaceALL, RFIgnoreCase]);
             LSourceStr := ALStringReplace(LSourceStr,' '+LOldUnitName+';'    ,     ' '+LNewUnitName+';',[rfReplaceALL, RFIgnoreCase]);
             LSourceStr := ALStringReplace(LSourceStr,' '+LOldUnitName+' '    ,     ' '+LNewUnitName+' ',[rfReplaceALL, RFIgnoreCase]);
             LSourceStr := ALStringReplace(LSourceStr,' '+LOldUnitName+'.'    ,     ' '+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);
-            LSourceStr := ALStringReplace(LSourceStr,#9+LOldUnitName+','    ,     #9+LNewUnitName+',',[rfReplaceALL, RFIgnoreCase]);
-            LSourceStr := ALStringReplace(LSourceStr,#9+LOldUnitName+';'    ,     #9+LNewUnitName+';',[rfReplaceALL, RFIgnoreCase]);
-            LSourceStr := ALStringReplace(LSourceStr,#9+LOldUnitName+' '    ,     #9+LNewUnitName+' ',[rfReplaceALL, RFIgnoreCase]);
-            LSourceStr := ALStringReplace(LSourceStr,#9+LOldUnitName+'.'    ,     #9+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,' '+LOldUnitName+')'    ,     ' '+LNewUnitName+')',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,' '+LOldUnitName+']'    ,     ' '+LNewUnitName+']',[rfReplaceALL, RFIgnoreCase]);
+
+            LSourceStr := ALStringReplace(LSourceStr,#9+LOldUnitName+','     ,     #9+LNewUnitName+',',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,#9+LOldUnitName+';'     ,     #9+LNewUnitName+';',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,#9+LOldUnitName+' '     ,     #9+LNewUnitName+' ',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,#9+LOldUnitName+'.'     ,     #9+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,#9+LOldUnitName+')'     ,     #9+LNewUnitName+')',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,#9+LOldUnitName+']'     ,     #9+LNewUnitName+']',[rfReplaceALL, RFIgnoreCase]);
+
             LSourceStr := ALStringReplace(LSourceStr,#13+LOldUnitName+','    ,     #13+LNewUnitName+',',[rfReplaceALL, RFIgnoreCase]);
             LSourceStr := ALStringReplace(LSourceStr,#13+LOldUnitName+';'    ,     #13+LNewUnitName+';',[rfReplaceALL, RFIgnoreCase]);
             LSourceStr := ALStringReplace(LSourceStr,#13+LOldUnitName+' '    ,     #13+LNewUnitName+' ',[rfReplaceALL, RFIgnoreCase]);
             LSourceStr := ALStringReplace(LSourceStr,#13+LOldUnitName+'.'    ,     #13+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,#13+LOldUnitName+')'    ,     #13+LNewUnitName+')',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,#13+LOldUnitName+']'    ,     #13+LNewUnitName+']',[rfReplaceALL, RFIgnoreCase]);
+
             LSourceStr := ALStringReplace(LSourceStr,#10+LOldUnitName+','    ,     #10+LNewUnitName+',',[rfReplaceALL, RFIgnoreCase]);
             LSourceStr := ALStringReplace(LSourceStr,#10+LOldUnitName+';'    ,     #10+LNewUnitName+';',[rfReplaceALL, RFIgnoreCase]);
             LSourceStr := ALStringReplace(LSourceStr,#10+LOldUnitName+' '    ,     #10+LNewUnitName+' ',[rfReplaceALL, RFIgnoreCase]);
             LSourceStr := ALStringReplace(LSourceStr,#10+LOldUnitName+'.'    ,     #10+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);
-            LSourceStr := ALStringReplace(LSourceStr,''''+LOldUnitName+'.'   ,     ''''+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]); // Alcinoe.FMX.Types3D in 'Alcinoe.FMX.Types3D.pas',
-            LSourceStr := ALStringReplace(LSourceStr,'"'+LOldUnitName+'.'    ,     '"'+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);  // <DCCReference Include="Alcinoe.FMX.Edit.pas"/>
+            LSourceStr := ALStringReplace(LSourceStr,#10+LOldUnitName+')'    ,     #10+LNewUnitName+')',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,#10+LOldUnitName+']'    ,     #10+LNewUnitName+']',[rfReplaceALL, RFIgnoreCase]);
+
+            LSourceStr := ALStringReplace(LSourceStr,''''+LOldUnitName+'.'   ,     ''''+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'"'+LOldUnitName+'.'    ,     '"'+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);
           end;
           if LOriginalSourceStr <> LSourceStr then begin
             ALSaveStringToFile(LSourceStr,LFiles[i]);
@@ -199,6 +240,11 @@ begin
     finally
       ALFreeAndNil(LUnitsToRename);
     end;
+
+    Writeln('');
+    Writeln('Finished');
+    Writeln('Press any key to exit');
+    Readln;
 
   except
     on E: Exception do begin

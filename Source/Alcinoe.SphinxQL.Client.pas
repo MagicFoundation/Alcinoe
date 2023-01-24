@@ -3,13 +3,13 @@ An Object to query Sphinx full text search engine using SphinxQL protocol
 (MySql Clone Protocol)
 *******************************************************************************}
 
-unit ALSphinxQLClient;
+unit Alcinoe.SphinxQL.Client;
 
 interface
 
 uses
-  AlMySqlClient,
-  ALMySqlWrapper;
+  Alcinoe.MySql.Client,
+  Alcinoe.MySql.Wrapper;
 
 Type
 
@@ -43,8 +43,8 @@ function AlSphinxEscapeString(const src: ansiString): ansiString;
 implementation
 
 uses
-  ALCommon,
-  alString;
+  Alcinoe.Common,
+  Alcinoe.String;
 
 {*********************************************************}
 procedure TalSphinxQlClient.Connect(const Host: AnsiString;

@@ -1,10 +1,10 @@
-unit ALMime;
+unit Alcinoe.Mime;
 
 interface
 
 uses
   System.Types,
-  ALStringList;
+  Alcinoe.StringList;
 
 //From indy
 Function  ALGetDefaultFileExtFromMimeContentType(aContentType: AnsiString): AnsiString;
@@ -17,8 +17,8 @@ Var
 implementation
 
 uses
-  ALString,
-  AlCommon;
+  Alcinoe.String,
+  Alcinoe.Common;
 
 {************************************************************************************}
 Function ALGetDefaultFileExtFromMimeContentType(aContentType: AnsiString): AnsiString;

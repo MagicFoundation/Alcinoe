@@ -1,4 +1,4 @@
-unit ALFmxInertialMovement;
+unit Alcinoe.FMX.InertialMovement;
 
 interface
 
@@ -30,7 +30,7 @@ uses
   Androidapi.JNI.GraphicsContentViewText,
   {$ENDIF}
   FMX.Types,
-  ALCommon;
+  Alcinoe.Common;
 
 type
 
@@ -309,7 +309,7 @@ uses
   System.RTLConsts,
   System.Math.Vectors,
   {$IFDEF DEBUG}
-  AlString,
+  Alcinoe.String,
   {$ENDIF}
   {$IFDEF ANDROID}
   Androidapi.AppGlue,

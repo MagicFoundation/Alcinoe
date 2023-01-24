@@ -1,7 +1,7 @@
 //
 // Made from firebase-messaging 23.1.0
 //
-unit ALAndroidFirebaseApi;
+unit Alcinoe.AndroidApi.Firebase;
 
 interface
 
@@ -12,7 +12,7 @@ interface
   //with the library identifiers com.google.firebase:firebase-messaging:xx.xx.xx where xx.xx.xx
   //is the last version of the firebase-messaging and gave also the path to
   //<Alcinoe>\Source\ALAndroidFirebaseApi.pas to build the compare source file. Then make a diff
-  //compare between the new generated ALAndroidFirebaseApi.pas and this one to see if the api
+  //compare between the new generated Alcinoe.AndroidApi.Firebase.pas and this one to see if the api
   //signature is still the same. repeat the operation below with the library
   //com.google.firebase:firebase-analytics:xx.xx.xx
   {$MESSAGE WARN 'Check if the api signature of the last version of firebase sdk (android) is still the same'}
@@ -24,7 +24,7 @@ uses
   Androidapi.JNI.GraphicsContentViewText,
   Androidapi.JNI.JavaTypes,
   Androidapi.JNI.Os,
-  ALAndroidXApi;
+  Alcinoe.AndroidApi.AndroidX;
 
 type
 
@@ -80,9 +80,9 @@ implementation
 {**********************}
 procedure RegisterTypes;
 begin
-  TRegTypes.RegisterType('ALAndroidFirebaseApi.JFirebaseMessaging', TypeInfo(ALAndroidFirebaseApi.JFirebaseMessaging));
-  TRegTypes.RegisterType('ALAndroidFirebaseApi.JALFirebaseMessagingService', TypeInfo(ALAndroidFirebaseApi.JALFirebaseMessagingService));
-  TRegTypes.RegisterType('ALAndroidFirebaseApi.JFirebaseAnalytics', TypeInfo(ALAndroidFirebaseApi.JFirebaseAnalytics));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Firebase.JFirebaseMessaging', TypeInfo(ALAndroidFirebaseApi.JFirebaseMessaging));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Firebase.JALFirebaseMessagingService', TypeInfo(ALAndroidFirebaseApi.JALFirebaseMessagingService));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Firebase.JFirebaseAnalytics', TypeInfo(ALAndroidFirebaseApi.JFirebaseAnalytics));
 end;
 
 initialization

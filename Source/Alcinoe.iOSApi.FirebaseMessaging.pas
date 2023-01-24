@@ -1,7 +1,7 @@
 //
 // Made from firebase-messaging 10.2.0
 //
-unit ALIosFirebaseMessagingApi;
+unit Alcinoe.iOSApi.FirebaseMessaging;
 
 interface
 
@@ -58,7 +58,7 @@ type
 implementation
 
 uses
-  ALiOSFirebaseCoreAPI; // [MANDATORY] Because we need it's initialization/finalization section
+  Alcinoe.iOSApi.FirebaseCore; // [MANDATORY] Because we need it's initialization/finalization section
 
 procedure FirebaseMessagingLoader; cdecl; external framework 'FirebaseMessaging';
 

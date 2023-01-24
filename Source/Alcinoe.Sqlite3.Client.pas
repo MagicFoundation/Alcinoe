@@ -3,7 +3,7 @@ An object to query Sqlite3 database and get the result In Xml format or in
 Json/Bson format
 *******************************************************************************}
 
-unit AlSqlite3Client;
+unit Alcinoe.Sqlite3.Client;
 
 interface
 
@@ -11,11 +11,11 @@ Uses
   System.SysUtils,
   System.Contnrs,
   System.SyncObjs,
-  AlXmlDoc,
-  ALJsonDoc,
-  AlSqlite3Wrapper,
-  ALString,
-  ALStringList;
+  Alcinoe.XMLDoc,
+  Alcinoe.JSONDoc,
+  Alcinoe.Sqlite3.Wrapper,
+  Alcinoe.String,
+  Alcinoe.StringList;
 
 Type
 
@@ -314,8 +314,8 @@ Uses
   Winapi.Windows,
   System.classes,
   System.Diagnostics,
-  ALCipher,
-  ALWindows;
+  Alcinoe.Cipher,
+  Alcinoe.WinApi.Common;
 
 {***********************************************************************************}
 constructor EALSqlite3Error.Create(const aErrorMsg: AnsiString; aErrorCode: Integer);

@@ -234,7 +234,7 @@ ANDROID: alert notification         + app NOT RUNNING   : ALERT    - BADGE    - 
 ANDROID: data + alert notification  + app NOT RUNNING   : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message and the notification message (with notification.presented=1) - via TALFirebaseMessaging.StartupNotificationMessageHandler (TApplicationEventMessage.FinishedLaunching) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
 *******************************************************************************)
 
-unit ALFmxFirebaseMessaging;
+unit Alcinoe.FMX.FirebaseMessaging;
 
 interface
 
@@ -258,18 +258,18 @@ uses
   Androidapi.JNI.PlayServices.Tasks,
   Androidapi.JNI.JavaTypes,
   Androidapi.JNIBridge,
-  ALAndroidXApi,
+  Alcinoe.AndroidApi.AndroidX,
   {$ENDIF}
   {$IF defined(IOS)}
   System.TypInfo,
   iOSapi.Foundation,
   Macapi.ObjectiveC,
   iOSapi.UserNotifications,
-  ALIosFirebaseMessagingApi,
+  Alcinoe.iOSApi.FirebaseMessaging,
   {$ENDIF}
-  ALFmxFirebaseCore, // [MANDATORY] Because we need it's initialization/finalization section
-  alJsonDoc,
-  ALStringList;
+  Alcinoe.FMX.FirebaseCore, // [MANDATORY] Because we need it's initialization/finalization section
+  Alcinoe.JSONDoc,
+  Alcinoe.StringList;
 
 type
 
@@ -442,7 +442,7 @@ uses
   Androidapi.JNI.GraphicsContentViewText,
   Androidapi.JNI.App,
   Androidapi.JNI.Os,
-  ALAndroidFirebaseApi,
+  Alcinoe.AndroidApi.Firebase,
   FMX.platform.Android,
   {$ENDIF}
   {$IF defined(IOS)}
@@ -453,8 +453,8 @@ uses
   Macapi.ObjCRuntime,
   FMX.Helpers.iOS,
   {$ENDIF}
-  AlString,
-  alcommon;
+  Alcinoe.String,
+  Alcinoe.Common;
 
 {**************************************}
 constructor TALFirebaseMessaging.Create;

@@ -2,7 +2,7 @@
 Contributors:
 Igor Ivkin (igor@arkadia.com)
 
-ALLibPhoneNumber is a wrapper for a several functions that use
+Alcinoe.LibPhoneNumber is a wrapper for a several functions that use
 Google's C++ library libphonenumber to parse and format
 phone numbers written in a free form.
 This wrapper requires few DLLs to be working correctly.
@@ -15,7 +15,7 @@ main functions:
 3. To define a type of the phone (landing line, mobile, toll-free etc).
 *******************************************************************************)
 
-unit ALLibPhoneNumber;
+unit Alcinoe.LibPhoneNumber;
 
 interface
 
@@ -45,7 +45,7 @@ const
 implementation
 
 uses
-  alString;
+  Alcinoe.String;
 
 function _StrPhoneNumberToInt64(phoneNumber, countryCode: PAnsiChar): Int64; cdecl; external 'libphonenumber.dll';
 function _Int64PhoneNumberToStr(phoneNumber: Int64; buffer: PAnsiChar): Cardinal; cdecl; external 'libphonenumber.dll';

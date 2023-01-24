@@ -1,4 +1,4 @@
-unit ALFmxMemo;
+unit Alcinoe.FMX.Memo;
 
 interface
 
@@ -9,15 +9,15 @@ uses
   system.Classes,
   System.UITypes,
   {$IF defined(ANDROID)}
-  ALANdroidApi,
+  Alcinoe.AndroidApi.Common,
   {$ELSEIF defined(IOS)}
   System.TypInfo,
   iOSapi.Foundation,
   iOSapi.UIKit,
   Macapi.ObjectiveC,
   Macapi.ObjCRuntime,
-  ALFmxIosNativeView,
-  ALFmxIosScrollBox,
+  Alcinoe.FMX.NativeView.iOS,
+  Alcinoe.FMX.ScrollBox.iOS,
   {$ELSE}
   FMX.StdCtrls,
   FMX.Memo.style,
@@ -26,8 +26,8 @@ uses
   FMX.types,
   Fmx.Graphics,
   Fmx.controls,
-  AlFMXEdit,
-  ALFmxObjects;
+  Alcinoe.FMX.Edit,
+  Alcinoe.FMX.Objects;
 
 {$REGION ' IOS'}
 {$IF defined(ios)}
@@ -367,7 +367,7 @@ uses
   Macapi.Helpers,
   iOSapi.CoreText,
   FMX.Helpers.iOS,
-  ALString,
+  Alcinoe.String,
   {$ELSE}
   FMX.Styles.Objects,
   FMX.BehaviorManager,
@@ -376,8 +376,8 @@ uses
   system.Math,
   system.Math.Vectors,
   fmx.consts,
-  ALCommon,
-  AlFmxCommon;
+  Alcinoe.Common,
+  Alcinoe.FMX.Common;
 
 {**}
 type

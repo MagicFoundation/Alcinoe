@@ -1,4 +1,4 @@
-unit ALFmxIosScrollBox;
+unit Alcinoe.FMX.ScrollBox.iOS;
 
 interface
 
@@ -17,7 +17,7 @@ uses
   iOSapi.UIKit,
   iOSapi.CocoaTypes,
   iOSApi.CoreGraphics,
-  ALFmxIosNativeView;
+  Alcinoe.FMX.NativeView.iOS;
 
 type
 
@@ -84,7 +84,7 @@ uses System.Classes,
      Macapi.ObjCRuntime,
      FMX.Platform.iOS,
      FMX.Types,
-     ALCommon;
+     Alcinoe.Common;
 
 {*********************************}
 constructor TALIosScrollBox.Create;

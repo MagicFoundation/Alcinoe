@@ -1,10 +1,10 @@
 {*******************************************************************************
-ALAVLBinaryTree (Self-Balancing Binary Trees)
+Alcinoe.AVLBinaryTree (Self-Balancing Binary Trees)
 Binary trees that are self-balancing in the AVL sense
 (the depth of any left branch differs by no more than
 one from the depth of the right branch).
 *******************************************************************************}
-unit ALAVLBinaryTree;
+unit Alcinoe.AVLBinaryTree;
 
 interface
 
@@ -215,7 +215,7 @@ implementation
 uses
   System.Contnrs,
   System.sysUtils,
-  ALString;
+  Alcinoe.StringUtils;
 
 {Following stack declarations are used to avoid recursion in all tree
  routines. Because the tree is AVL-balanced, a stack size of 40

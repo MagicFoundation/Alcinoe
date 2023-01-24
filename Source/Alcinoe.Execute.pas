@@ -2,7 +2,7 @@
 Description:  Function to launch executable (and wait for termination)
 *******************************************************************************}
 
-unit ALExecute;
+unit Alcinoe.Execute;
 
 interface
 
@@ -90,8 +90,8 @@ uses
   winapi.messages,
   winapi.winsvc,
   System.Diagnostics,
-  ALWindows,
-  ALCommon;
+  Alcinoe.WinApi.Common,
+  Alcinoe.Common;
 
 {******************************************}
 Function AlGetEnvironmentString: AnsiString;

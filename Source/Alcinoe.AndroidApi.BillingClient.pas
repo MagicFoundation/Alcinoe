@@ -1,4 +1,4 @@
-unit ALAndroidBillingClientApi;
+unit Alcinoe.AndroidApi.BillingClient;
 
 interface
 
@@ -407,28 +407,28 @@ implementation
 {**********************}
 procedure RegisterTypes;
 begin
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JBillingClient', TypeInfo(ALAndroidBillingClientApi.JBillingClient));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JBillingClient_Builder', TypeInfo(ALAndroidBillingClientApi.JBillingClient_Builder));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JPurchasesUpdatedListener', TypeInfo(ALAndroidBillingClientApi.JPurchasesUpdatedListener));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JBillingClientStateListener', TypeInfo(ALAndroidBillingClientApi.JBillingClientStateListener));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JBillingClient_BillingResponseCode', TypeInfo(ALAndroidBillingClientApi.JBillingClient_BillingResponseCode));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JBillingClient_SkuType', TypeInfo(ALAndroidBillingClientApi.JBillingClient_SkuType));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JBillingClient_FeatureType', TypeInfo(ALAndroidBillingClientApi.JBillingClient_FeatureType));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JBillingFlowParams', TypeInfo(ALAndroidBillingClientApi.JBillingFlowParams));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JBillingFlowParams_Builder', TypeInfo(ALAndroidBillingClientApi.JBillingFlowParams_Builder));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JSkuDetails', TypeInfo(ALAndroidBillingClientApi.JSkuDetails));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JSkuDetailsParams', TypeInfo(ALAndroidBillingClientApi.JSkuDetailsParams));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JSkuDetailsParams_Builder', TypeInfo(ALAndroidBillingClientApi.JSkuDetailsParams_Builder));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JSkuDetailsResponseListener', TypeInfo(ALAndroidBillingClientApi.JSkuDetailsResponseListener));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JBillingResult', TypeInfo(ALAndroidBillingClientApi.JBillingResult));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JBillingResult_Builder', TypeInfo(ALAndroidBillingClientApi.JBillingResult_Builder));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JPurchase', TypeInfo(ALAndroidBillingClientApi.JPurchase));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JPurchase_PurchaseState', TypeInfo(ALAndroidBillingClientApi.JPurchase_PurchaseState));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JAcknowledgePurchaseParams', TypeInfo(ALAndroidBillingClientApi.JAcknowledgePurchaseParams));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JAcknowledgePurchaseParams_Builder', TypeInfo(ALAndroidBillingClientApi.JAcknowledgePurchaseParams_Builder));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JAcknowledgePurchaseResponseListener', TypeInfo(ALAndroidBillingClientApi.JAcknowledgePurchaseResponseListener));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JPurchase_PurchasesResult', TypeInfo(ALAndroidBillingClientApi.JPurchase_PurchasesResult));
-  TRegTypes.RegisterType('ALAndroidBillingClientApi.JAccountIdentifiers', TypeInfo(ALAndroidBillingClientApi.JAccountIdentifiers));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JBillingClient', TypeInfo(ALAndroidBillingClientApi.JBillingClient));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JBillingClient_Builder', TypeInfo(ALAndroidBillingClientApi.JBillingClient_Builder));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JPurchasesUpdatedListener', TypeInfo(ALAndroidBillingClientApi.JPurchasesUpdatedListener));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JBillingClientStateListener', TypeInfo(ALAndroidBillingClientApi.JBillingClientStateListener));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JBillingClient_BillingResponseCode', TypeInfo(ALAndroidBillingClientApi.JBillingClient_BillingResponseCode));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JBillingClient_SkuType', TypeInfo(ALAndroidBillingClientApi.JBillingClient_SkuType));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JBillingClient_FeatureType', TypeInfo(ALAndroidBillingClientApi.JBillingClient_FeatureType));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JBillingFlowParams', TypeInfo(ALAndroidBillingClientApi.JBillingFlowParams));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JBillingFlowParams_Builder', TypeInfo(ALAndroidBillingClientApi.JBillingFlowParams_Builder));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JSkuDetails', TypeInfo(ALAndroidBillingClientApi.JSkuDetails));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JSkuDetailsParams', TypeInfo(ALAndroidBillingClientApi.JSkuDetailsParams));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JSkuDetailsParams_Builder', TypeInfo(ALAndroidBillingClientApi.JSkuDetailsParams_Builder));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JSkuDetailsResponseListener', TypeInfo(ALAndroidBillingClientApi.JSkuDetailsResponseListener));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JBillingResult', TypeInfo(ALAndroidBillingClientApi.JBillingResult));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JBillingResult_Builder', TypeInfo(ALAndroidBillingClientApi.JBillingResult_Builder));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JPurchase', TypeInfo(ALAndroidBillingClientApi.JPurchase));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JPurchase_PurchaseState', TypeInfo(ALAndroidBillingClientApi.JPurchase_PurchaseState));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JAcknowledgePurchaseParams', TypeInfo(ALAndroidBillingClientApi.JAcknowledgePurchaseParams));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JAcknowledgePurchaseParams_Builder', TypeInfo(ALAndroidBillingClientApi.JAcknowledgePurchaseParams_Builder));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JAcknowledgePurchaseResponseListener', TypeInfo(ALAndroidBillingClientApi.JAcknowledgePurchaseResponseListener));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JPurchase_PurchasesResult', TypeInfo(ALAndroidBillingClientApi.JPurchase_PurchasesResult));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.BillingClient.JAccountIdentifiers', TypeInfo(ALAndroidBillingClientApi.JAccountIdentifiers));
 end;
 
 initialization

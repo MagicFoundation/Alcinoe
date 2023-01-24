@@ -1,7 +1,7 @@
 ﻿//
 // Made from firebase-messaging 10.2.0
 //
-unit ALIosFirebaseCoreApi;
+unit Alcinoe.iOSApi.FirebaseCore;
 
 interface
 

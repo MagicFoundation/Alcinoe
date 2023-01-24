@@ -4,7 +4,7 @@ TRTTI.getfields and/or the TRTTI.getmethods was very slow and
 even call internally some criticalsections :(
 *******************************************************************************}
 
-unit ALRtti;
+unit Alcinoe.RTTI;
 
 interface
 
@@ -457,8 +457,8 @@ implementation
 uses
   System.sysutils,
   System.Generics.Defaults,
-  AlCommon,
-  ALString;
+  Alcinoe.Common,
+  Alcinoe.String;
 
 {***}
 const

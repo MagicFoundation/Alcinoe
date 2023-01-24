@@ -1,4 +1,4 @@
-unit ALInternetMessages;
+unit Alcinoe.InternetMessages;
 
 interface
 
@@ -7,7 +7,7 @@ interface
 {$IFNDEF ALHideAnsiString}
 uses
   system.Classes,
-  AlStringList;
+  Alcinoe.StringList;
 {$ENDIF}
 
 {$IFNDEF ALHideAnsiString}
@@ -137,11 +137,11 @@ implementation
 uses
   system.Sysutils,
   {$IFNDEF ALHideAnsiString}
-  ALHttpClient,
-  ALWinsock,
+  Alcinoe.HTTP.Client,
+  Alcinoe.WinSock,
   {$ENDIF}
-  ALCommon,
-  ALString;
+  Alcinoe.Common,
+  Alcinoe.String;
 
 {$IFNDEF ALHideAnsiString}
 

@@ -1,10 +1,10 @@
 {*******************************************************************************
-product:      ALFBXClient (Alcinoe FireBird Express Client)
+product:      Alcinoe.FBX.Client (Alcinoe FireBird Express Client)
 Description:  Retrieving Data as XML from Firebird Server.
 Link :        http://www.progdigy.com/modules.php?name=UIB
 *******************************************************************************}
 
-unit ALFBXClient;
+unit Alcinoe.FBX.Client;
 
 interface
 
@@ -14,12 +14,12 @@ uses
   System.SysUtils,
   System.Contnrs,
   System.SyncObjs,
-  AlXmlDoc,
-  ALAVLBinaryTree,
-  ALFBXLib,
-  ALFBXBase,
-  ALString,
-  ALStringList;
+  Alcinoe.XMLDoc,
+  Alcinoe.AVLBinaryTree,
+  Alcinoe.FBX.Lib,
+  Alcinoe.FBX.Base,
+  Alcinoe.String,
+  Alcinoe.StringList;
 
 Type
 
@@ -877,10 +877,10 @@ implementation
 
 uses
   System.Diagnostics,
-  ALCipher,
-  ALWindows,
-  ALCommon,
-  alfbxError;
+  Alcinoe.Cipher,
+  Alcinoe.WinApi.Common,
+  Alcinoe.Common,
+  Alcinoe.FBX.Error;
 
 {***************************************************************}
 class function TALFBXClientSQLParam.Create: TALFBXClientSQLParam;

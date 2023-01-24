@@ -1,4 +1,4 @@
-unit ALNetHttpClient;
+unit Alcinoe.HTTP.Client.Net;
 
 interface
 
@@ -25,8 +25,8 @@ uses
   System.SysUtils,
   System.Types,
   System.Generics.Collections,
-  ALCommon,
-  ALString;
+  Alcinoe.Common,
+  Alcinoe.String;
 
 {*}
 var

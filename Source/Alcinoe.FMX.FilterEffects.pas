@@ -1,4 +1,4 @@
-unit ALFmxFilterEffects;
+unit Alcinoe.FMX.FilterEffects;
 
 interface
 
@@ -662,7 +662,7 @@ implementation
 uses
   system.sysutils,
   System.Math.Vectors,
-  ALString;
+  Alcinoe.String;
 
 {***********************************************}
 constructor TALColorAdjustShaderVariables.Create;

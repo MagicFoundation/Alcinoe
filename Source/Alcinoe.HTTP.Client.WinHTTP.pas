@@ -24,7 +24,7 @@ Know bug :
 UserName and password not work (but you can use the header instead)
 *******************************************************************************}
 
-unit ALWinHttpClient;
+unit Alcinoe.HTTP.Client.WinHTTP;
 
 interface
 
@@ -32,7 +32,7 @@ uses
   Winapi.Windows,
   Winapi.WinHTTP,
   System.Classes,
-  ALHttpClient;
+  Alcinoe.HTTP.Client;
 
 type
 
@@ -208,8 +208,8 @@ implementation
 uses
   System.SysUtils,
   System.Ansistrings,
-  ALCommon,
-  ALString;
+  Alcinoe.Common,
+  Alcinoe.String;
 
 {***********************************************************}
 procedure ALWinHTTPCLientStatusCallback(hInternet: HINTERNET;

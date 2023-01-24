@@ -1,4 +1,4 @@
-unit ALFmxWebRTC;
+unit Alcinoe.FMX.WebRTC;
 
 interface
 
@@ -32,8 +32,8 @@ uses
   Androidapi.JNI.JavaTypes,
   Androidapi.JNIBridge,
   FMX.Types3D,
-  ALAndroidWebRTCApi,
-  ALFmxTypes3D,
+  Alcinoe.AndroidApi.WebRTC,
+  Alcinoe.FMX.Types3D,
   {$ELSEIF defined(IOS)}
   System.syncObjs,
   System.generics.collections,
@@ -44,8 +44,8 @@ uses
   iOSapi.AVFoundation,
   iOSapi.CocoaTypes,
   Macapi.ObjectiveC,
-  ALIosWebRTCApi,
-  ALFmxTypes3D,
+  Alcinoe.iOSApi.WebRTC,
+  Alcinoe.FMX.Types3D,
   {$ELSE}
   FMX.graphics,
   {$ENDIF}
@@ -432,8 +432,8 @@ uses
   FMX.Context.GLES.iOS,
   FMX.Context.GLES,
   {$ENDIF}
-  AlString,
-  alcommon;
+  Alcinoe.String,
+  Alcinoe.Common;
 
 {**********************************************************}
 class function TALWebRTCIceServer.Create(const aUri: String;

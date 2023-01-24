@@ -1,4 +1,4 @@
-unit ALCommon;
+unit Alcinoe.Common;
 
 interface
 
@@ -622,14 +622,14 @@ uses
   Posix.Sched,
   Androidapi.JNI.JavaTypes,
   Androidapi.Helpers,
-  ALAndroidApi,
+  Alcinoe.AndroidApi.Common,
   {$ENDIF}
   {$IF defined(IOS)}
   Posix.Sched,
   Macapi.Helpers,
   {$ENDIF}
   system.DateUtils,
-  ALString;
+  Alcinoe.StringUtils;
 
 {****************************************}
 constructor TALWorkerThreadRequest.Create(

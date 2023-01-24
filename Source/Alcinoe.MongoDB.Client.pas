@@ -79,7 +79,7 @@ aMongoDBTailMonitoringThread := TAlMongoDBTailMonitoringThread.Create(aDBHost,
 aMongoDBTailMonitoringThread.free;
 *******************************************************************************)
 
-unit ALMongoDBClient;
+unit Alcinoe.MongoDB.Client;
 
 interface
 
@@ -89,9 +89,9 @@ uses
   system.Classes,
   System.SyncObjs,
   System.SysUtils,
-  ALCommon,
-  ALStringList,
-  ALJSONDoc;
+  Alcinoe.Common,
+  Alcinoe.StringList,
+  Alcinoe.JSONDoc;
 
 const
   MONGO_OP_REPLY = 1; //Reply to a client request. responseTo is set
@@ -905,10 +905,10 @@ uses
   Winapi.Windows,
   System.Diagnostics,
   System.math,
-  ALCipher,
-  AlWinsock,
-  ALWindows,
-  ALString;
+  Alcinoe.Cipher,
+  Alcinoe.WinSock,
+  Alcinoe.WinApi.Common,
+  Alcinoe.String;
 
 {***************************************************************************************************************************************}
 constructor EAlMongoDBClientException.Create(const aMsg: AnsiString; const aErrorCode: integer; const aCloseConnection: Boolean = False);

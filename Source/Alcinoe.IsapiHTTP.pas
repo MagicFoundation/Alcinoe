@@ -1,4 +1,4 @@
-unit ALIsapiHTTP;
+unit Alcinoe.IsapiHTTP;
 
 interface
 
@@ -13,10 +13,10 @@ uses
   System.Classes,
   System.Types,
   Winapi.Isapi2,
-  ALMultiPartParser,
-  ALHttpClient,
-  ALStringList,
-  ALString;
+  Alcinoe.MultiPartParser,
+  Alcinoe.HTTP.Client,
+  Alcinoe.StringList,
+  Alcinoe.String;
 
 type
 
@@ -271,7 +271,7 @@ uses
   System.DateUtils,
   System.Ansistrings,
   System.math,
-  ALCommon;
+  Alcinoe.Common;
 
 const
   ALWebRequestServerVariables: array[0..28] of AnsiString = (

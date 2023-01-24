@@ -1,7 +1,7 @@
 //
 // Made from VKontakte SDK version 1.6.3
 //
-unit ALIosVKontakteApi;
+unit Alcinoe.iOSApi.VKontakte;
 
 interface
 

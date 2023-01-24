@@ -1,4 +1,4 @@
-unit ALIosImageIOApi;
+unit Alcinoe.iOSApi.ImageIO;
 
 {$WEAKPACKAGEUNIT}
 

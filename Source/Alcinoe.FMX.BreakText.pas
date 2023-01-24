@@ -1,4 +1,4 @@
-﻿unit ALFmxBreakText;
+﻿unit Alcinoe.FMX.BreakText;
 
 interface
 
@@ -17,7 +17,7 @@ uses
   Androidapi.JNI.JavaTypes,
   fmx.types3D,
   {$ENDIF}
-  ALFmxGraphics,
+  Alcinoe.FMX.Graphics,
   Fmx.types,
   FMX.graphics;
 
@@ -317,10 +317,10 @@ uses
   fmx.surfaces,
   {$ENDIF}
   FMX.TextLayout,
-  ALStringList,
-  ALString,
-  ALFmxCommon,
-  AlCommon;
+  Alcinoe.StringList,
+  Alcinoe.String,
+  Alcinoe.FMX.Common,
+  Alcinoe.Common;
 
 {********************}
 {$IF defined(ANDROID)}

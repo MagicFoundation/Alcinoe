@@ -1,4 +1,4 @@
-unit ALFmxStdCtrls;
+unit Alcinoe.FMX.StdCtrls;
 
 interface
 
@@ -29,10 +29,10 @@ uses
   FMX.StdCtrls,
   FMX.actnlist,
   FMX.ImgList,
-  ALFmxAni,
-  ALFmxGraphics,
-  ALFmxInertialMovement,
-  ALFmxObjects;
+  Alcinoe.FMX.Ani,
+  Alcinoe.FMX.Graphics,
+  Alcinoe.FMX.InertialMovement,
+  Alcinoe.FMX.Objects;
 
 type
 
@@ -794,13 +794,13 @@ uses
   {$ENDIF}
   {$IF DEFINED(IOS) or DEFINED(ANDROID)}
   FMX.Canvas.GPU,
-  ALFmxTypes3D,
+  Alcinoe.FMX.Types3D,
   {$ENDIF}
   FMX.Platform,
   fmx.consts,
   fmx.utils,
-  ALCommon,
-  ALFmxCommon;
+  Alcinoe.Common,
+  Alcinoe.FMX.Common;
 
 {*****************************************************}
 constructor TALAniIndicator.Create(AOwner: TComponent);

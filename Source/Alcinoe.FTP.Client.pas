@@ -2,7 +2,7 @@
 TALFTPClient is a ancestor base class of TALWinInetFTPClient
 *******************************************************************************}
 
-unit ALFTPClient;
+unit Alcinoe.FTP.Client;
 
 interface
 
@@ -134,7 +134,7 @@ ResourceString
 implementation
 
 uses
-  ALCommon;
+  Alcinoe.Common;
 
 {******************************}
 constructor TALFTPClient.Create;

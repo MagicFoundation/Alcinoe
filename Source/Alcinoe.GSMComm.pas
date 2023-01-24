@@ -29,13 +29,13 @@ http://rednaxela.net/pdu.php
 http://www.dreamfabric.com/sms/
 *******************************************************************************}
 
-unit ALGSMComm;
+unit Alcinoe.GSMComm;
 
 interface
 
 uses
   Winapi.Windows,
-  AlStringList;
+  Alcinoe.StringList;
 
 Type
 
@@ -83,7 +83,7 @@ implementation
 
 uses
   System.SysUtils,
-  ALString;
+  Alcinoe.String;
 
 {*****************************************************************************************}
 function AlGSMComm_UnicodeToGSM7BitDefaultAlphabet(const aMessage: WideString): AnsiString;

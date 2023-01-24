@@ -1,7 +1,7 @@
 {*******************************************************************************
 TALHttpClient is a ancestor of class like TALWinInetHttpClient or TALWinHttpClient
 *******************************************************************************}
-unit ALHttpClient;
+unit Alcinoe.HTTP.Client;
 
 interface
 
@@ -17,8 +17,8 @@ uses
   {$IFDEF MSWINDOWS}
   Winapi.Wininet,
   {$ENDIF}
-  ALStringList,
-  ALMultiPartParser,
+  Alcinoe.StringList,
+  Alcinoe.MultiPartParser,
   {$ENDIF}
   System.Classes;
 
@@ -527,8 +527,8 @@ uses
   System.SysConst,
   System.Math,
   system.AnsiStrings,
-  AlCommon,
-  ALString;
+  Alcinoe.Common,
+  Alcinoe.String;
 {$ENDIF}
 
 {$IFNDEF ALHideAnsiString}

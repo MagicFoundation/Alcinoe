@@ -13,14 +13,14 @@ TALXMLDocument uses it's own internal parser to analyze
 the XML document.
 *******************************************************************************}
 
-unit ALXmlDoc;
+unit Alcinoe.XMLDoc;
 
 interface
 
 uses
   System.Classes,
   System.sysutils,
-  AlStringList;
+  Alcinoe.StringList;
 
 const
   cALXmlNotActive            = 'No active document';
@@ -716,10 +716,10 @@ implementation
 uses
   System.Math,
   System.Contnrs,
-  AlHTML,
-  ALHttpClient,
-  ALCommon,
-  ALString;
+  Alcinoe.HTML,
+  Alcinoe.HTTP.Client,
+  Alcinoe.Common,
+  Alcinoe.String;
 
 {**********************************}
 {Raises an EALXMLDocError exception.

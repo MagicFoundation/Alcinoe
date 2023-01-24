@@ -1,4 +1,4 @@
-unit ALFmxAndroidNativeView;
+unit Alcinoe.FMX.NativeView.Android;
 
 interface
 
@@ -117,8 +117,8 @@ uses
   FMX.Platform,
   FMX.Platform.Android,
   FMX.Consts,
-  ALString,
-  ALCommon;
+  Alcinoe.String,
+  Alcinoe.Common;
 
 {****************************************************************}
 constructor TALAndroidNativeView.Create(const AControl: TControl);

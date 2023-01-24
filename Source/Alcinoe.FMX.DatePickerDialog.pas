@@ -1,11 +1,11 @@
-unit ALFmxDatePickerDialog;
+unit Alcinoe.FMX.DatePickerDialog;
 
 interface
 
 uses
   {$IF defined(android)}
   Androidapi.JNIBridge,
-  ALAndroidApi,
+  Alcinoe.AndroidApi.Common,
   {$ENDIF}
   {$IF defined(ios)}
   System.TypInfo,
@@ -155,8 +155,8 @@ uses
   FMX.Helpers.iOS,
   FMX.Forms,
   {$ENDIF}
-  alstring,
-  alcommon;
+  Alcinoe.String,
+  Alcinoe.Common;
 
 {$REGION ' ANDROID'}
 {$IF defined(android)}

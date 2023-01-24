@@ -13,15 +13,15 @@ http://www.expita.com/header1.html
 http://cr.yp.to/immhf.html
 *******************************************************************************}
 
-unit ALSMTPClient;
+unit Alcinoe.SMTP.Client;
 
 interface
 
 Uses
   Winapi.WinSock2,
-  ALStringList,
-  ALInternetMessages,
-  ALMultiPartParser;
+  Alcinoe.StringList,
+  Alcinoe.InternetMessages,
+  Alcinoe.MultiPartParser;
 
 type
 
@@ -112,9 +112,9 @@ Uses
   Winapi.Windows,
   System.Classes,
   System.SysUtils,
-  ALWinsock,
-  ALCommon,
-  ALString;
+  Alcinoe.WinSock,
+  Alcinoe.Common,
+  Alcinoe.String;
 
 {*******************************}
 constructor TAlSmtpClient.Create;

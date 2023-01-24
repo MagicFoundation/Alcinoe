@@ -1,7 +1,7 @@
 //
 // Made from com.google.android.exoplayer:exoplayer:2.18.2
 //
-unit ALAndroidExoPlayerApi;
+unit Alcinoe.AndroidApi.ExoPlayer;
 
 interface
 
@@ -12,7 +12,7 @@ interface
   //with the library identifiers com.google.android.exoplayer:exoplayer:xx.xx.xx where xx.xx.xx
   //is the last version of the exoplayer and gave also the path to
   //<Alcinoe>\Source\ALAndroidExoPlayerApi.pas to build the compare source file. Then make a diff
-  //compare between the new generated ALAndroidExoPlayerApi.pas and this one to see if the api
+  //compare between the new generated Alcinoe.AndroidApi.ExoPlayer.pas and this one to see if the api
   //signature is still the same
   {$MESSAGE WARN 'Check if the api signature of the last version of exoplayer (android) is still the same'}
 {$IFEND}
@@ -559,37 +559,37 @@ implementation
 {**********************}
 procedure RegisterTypes;
 begin
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JBundleable', TypeInfo(ALAndroidExoPlayerApi.JBundleable));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JPlayer', TypeInfo(ALAndroidExoPlayerApi.JPlayer));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JExoPlayer', TypeInfo(ALAndroidExoPlayerApi.JExoPlayer));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JExoPlayer_Builder', TypeInfo(ALAndroidExoPlayerApi.JExoPlayer_Builder));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JPlayer_Listener', TypeInfo(ALAndroidExoPlayerApi.JPlayer_Listener));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JPlayer_Events', TypeInfo(ALAndroidExoPlayerApi.JPlayer_Events));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JPlayer_Commands', TypeInfo(ALAndroidExoPlayerApi.JPlayer_Commands));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JPlayer_PositionInfo', TypeInfo(ALAndroidExoPlayerApi.JPlayer_PositionInfo));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JTransferListener', TypeInfo(ALAndroidExoPlayerApi.JTransferListener));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JTimeline', TypeInfo(ALAndroidExoPlayerApi.JTimeline));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JPlaybackException', TypeInfo(ALAndroidExoPlayerApi.JPlaybackException));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JPlaybackParameters', TypeInfo(ALAndroidExoPlayerApi.JPlaybackParameters));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JVideoSize', TypeInfo(ALAndroidExoPlayerApi.JVideoSize));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JTrackSelectionParameters', TypeInfo(ALAndroidExoPlayerApi.JTrackSelectionParameters));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JAudioAttributes', TypeInfo(ALAndroidExoPlayerApi.JAudioAttributes));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JDeviceInfo', TypeInfo(ALAndroidExoPlayerApi.JDeviceInfo));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JCueGroup', TypeInfo(ALAndroidExoPlayerApi.JCueGroup));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JTracks', TypeInfo(ALAndroidExoPlayerApi.JTracks));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JMediaSource', TypeInfo(ALAndroidExoPlayerApi.JMediaSource));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JBaseMediaSource', TypeInfo(ALAndroidExoPlayerApi.JBaseMediaSource));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JProgressiveMediaSource', TypeInfo(ALAndroidExoPlayerApi.JProgressiveMediaSource));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JHlsMediaSource', TypeInfo(ALAndroidExoPlayerApi.JHlsMediaSource));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JMediaSource_Factory', TypeInfo(ALAndroidExoPlayerApi.JMediaSource_Factory));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JMediaSourceFactory', TypeInfo(ALAndroidExoPlayerApi.JMediaSourceFactory));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JProgressiveMediaSource_Factory', TypeInfo(ALAndroidExoPlayerApi.JProgressiveMediaSource_Factory));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JHlsMediaSource_Factory', TypeInfo(ALAndroidExoPlayerApi.JHlsMediaSource_Factory));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JDataSource_Factory', TypeInfo(ALAndroidExoPlayerApi.JDataSource_Factory));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JDefaultDataSource_Factory', TypeInfo(ALAndroidExoPlayerApi.JDefaultDataSource_Factory));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JMediaMetadata', TypeInfo(ALAndroidExoPlayerApi.JMediaMetadata));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JMetadata', TypeInfo(ALAndroidExoPlayerApi.JMetadata));
-  TRegTypes.RegisterType('ALAndroidExoPlayerApi.JMediaItem', TypeInfo(ALAndroidExoPlayerApi.JMediaItem));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JBundleable', TypeInfo(ALAndroidExoPlayerApi.JBundleable));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JPlayer', TypeInfo(ALAndroidExoPlayerApi.JPlayer));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JExoPlayer', TypeInfo(ALAndroidExoPlayerApi.JExoPlayer));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JExoPlayer_Builder', TypeInfo(ALAndroidExoPlayerApi.JExoPlayer_Builder));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JPlayer_Listener', TypeInfo(ALAndroidExoPlayerApi.JPlayer_Listener));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JPlayer_Events', TypeInfo(ALAndroidExoPlayerApi.JPlayer_Events));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JPlayer_Commands', TypeInfo(ALAndroidExoPlayerApi.JPlayer_Commands));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JPlayer_PositionInfo', TypeInfo(ALAndroidExoPlayerApi.JPlayer_PositionInfo));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JTransferListener', TypeInfo(ALAndroidExoPlayerApi.JTransferListener));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JTimeline', TypeInfo(ALAndroidExoPlayerApi.JTimeline));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JPlaybackException', TypeInfo(ALAndroidExoPlayerApi.JPlaybackException));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JPlaybackParameters', TypeInfo(ALAndroidExoPlayerApi.JPlaybackParameters));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JVideoSize', TypeInfo(ALAndroidExoPlayerApi.JVideoSize));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JTrackSelectionParameters', TypeInfo(ALAndroidExoPlayerApi.JTrackSelectionParameters));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JAudioAttributes', TypeInfo(ALAndroidExoPlayerApi.JAudioAttributes));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JDeviceInfo', TypeInfo(ALAndroidExoPlayerApi.JDeviceInfo));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JCueGroup', TypeInfo(ALAndroidExoPlayerApi.JCueGroup));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JTracks', TypeInfo(ALAndroidExoPlayerApi.JTracks));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JMediaSource', TypeInfo(ALAndroidExoPlayerApi.JMediaSource));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JBaseMediaSource', TypeInfo(ALAndroidExoPlayerApi.JBaseMediaSource));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JProgressiveMediaSource', TypeInfo(ALAndroidExoPlayerApi.JProgressiveMediaSource));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JHlsMediaSource', TypeInfo(ALAndroidExoPlayerApi.JHlsMediaSource));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JMediaSource_Factory', TypeInfo(ALAndroidExoPlayerApi.JMediaSource_Factory));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JMediaSourceFactory', TypeInfo(ALAndroidExoPlayerApi.JMediaSourceFactory));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JProgressiveMediaSource_Factory', TypeInfo(ALAndroidExoPlayerApi.JProgressiveMediaSource_Factory));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JHlsMediaSource_Factory', TypeInfo(ALAndroidExoPlayerApi.JHlsMediaSource_Factory));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JDataSource_Factory', TypeInfo(ALAndroidExoPlayerApi.JDataSource_Factory));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JDefaultDataSource_Factory', TypeInfo(ALAndroidExoPlayerApi.JDefaultDataSource_Factory));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JMediaMetadata', TypeInfo(ALAndroidExoPlayerApi.JMediaMetadata));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JMetadata', TypeInfo(ALAndroidExoPlayerApi.JMetadata));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.ExoPlayer.JMediaItem', TypeInfo(ALAndroidExoPlayerApi.JMediaItem));
 end;
 
 initialization

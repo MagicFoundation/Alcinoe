@@ -3,15 +3,15 @@ TALNNTPClient class implements the NNTP protocol (RFC-977 and RFC-850)
 Support authentification (RFC-977 Extension)
 *******************************************************************************}
 
-unit ALNNTPClient;
+unit Alcinoe.NNTP.Client;
 
 interface
 
 Uses
   Winapi.WinSock2,
-  ALInternetMessages,
-  ALMultiPartParser,
-  ALStringList;
+  Alcinoe.InternetMessages,
+  Alcinoe.MultiPartParser,
+  Alcinoe.StringList;
 
 type
 
@@ -115,8 +115,8 @@ Uses
   Winapi.Windows,
   System.SysUtils,
   System.Classes,
-  AlWinsock,
-  ALString;
+  Alcinoe.WinSock,
+  Alcinoe.String;
 
 {*******************************************************************************}
 Procedure ALNNTPClientSplitResponseLine(aResponse: AnsiString; ALst: TALStrings);

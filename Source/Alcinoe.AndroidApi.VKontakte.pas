@@ -1,7 +1,7 @@
 //
 // Made from com.vk:android-sdk-core:3.5.1
 //
-unit ALAndroidVKontakteApi;
+unit Alcinoe.AndroidApi.VKontakte;
 
 interface
 
@@ -12,7 +12,7 @@ interface
   //with the library identifiers com.vk:android-sdk-core:xx.xx.xx where xx.xx.xx
   //is the last version of the VKontakte and gave also the path to
   //<Alcinoe>\Source\ALAndroidVKontakteApi.pas to build the compare source file. Then make a diff
-  //compare between the new generated ALAndroidVKontakteApi.pas and this one to see if the api
+  //compare between the new generated Alcinoe.AndroidApi.VKontakte.pas and this one to see if the api
   //signature is still the same
   {$MESSAGE WARN 'Check if the api signature of the last version of VKontakte sdk (android) is still the same'}
 {$IFEND}
@@ -159,12 +159,12 @@ implementation
 
 procedure RegisterTypes;
 begin
-  TRegTypes.RegisterType('ALAndroidVKontakteApi.JUserId', TypeInfo(ALAndroidVKontakteApi.JUserId));
-  TRegTypes.RegisterType('ALAndroidVKontakteApi.JVKAuthException', TypeInfo(ALAndroidVKontakteApi.JVKAuthException));
-  TRegTypes.RegisterType('ALAndroidVKontakteApi.JVKScope', TypeInfo(ALAndroidVKontakteApi.JVKScope));
-  TRegTypes.RegisterType('ALAndroidVKontakteApi.JVKAccessToken', TypeInfo(ALAndroidVKontakteApi.JVKAccessToken));
-  TRegTypes.RegisterType('ALAndroidVKontakteApi.JVKAuthCallback', TypeInfo(ALAndroidVKontakteApi.JVKAuthCallback));
-  TRegTypes.RegisterType('ALAndroidVKontakteApi.JVK', TypeInfo(ALAndroidVKontakteApi.JVK));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.VKontakte.JUserId', TypeInfo(ALAndroidVKontakteApi.JUserId));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.VKontakte.JVKAuthException', TypeInfo(ALAndroidVKontakteApi.JVKAuthException));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.VKontakte.JVKScope', TypeInfo(ALAndroidVKontakteApi.JVKScope));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.VKontakte.JVKAccessToken', TypeInfo(ALAndroidVKontakteApi.JVKAccessToken));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.VKontakte.JVKAuthCallback', TypeInfo(ALAndroidVKontakteApi.JVKAuthCallback));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.VKontakte.JVK', TypeInfo(ALAndroidVKontakteApi.JVK));
 end;
 
 initialization

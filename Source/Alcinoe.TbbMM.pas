@@ -7,7 +7,7 @@ Usage:
 Put this unit to the very first place on your program in section "uses".
 It should look like:
 
-uses ALTbbMM,
+uses Alcinoe.TbbMM,
      ...,
      System.Classes,
      etc...
@@ -38,7 +38,7 @@ version of visual studio are a little more faster than dll compiled with the fir
 version but you will need to run adequate vcredist
 *******************************************************************************}
 
-unit ALTbbMM;
+unit Alcinoe.TbbMM;
 
 interface
 

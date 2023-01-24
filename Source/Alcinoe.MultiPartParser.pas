@@ -9,14 +9,14 @@ http://www.ietf.org/rfc/rfc1867.txt
 http://www.ietf.org/rfc/rfc2388.txt
 http://www.w3.org/MarkUp/html-spec/html-spec_8.html
 *******************************************************************************}
-unit ALMultiPartParser;
+unit Alcinoe.MultiPartParser;
 
 interface
 
 Uses
   System.Classes,
   System.Contnrs,
-  ALStringList;
+  Alcinoe.StringList;
 
 type
 
@@ -390,8 +390,8 @@ Uses
   System.SysUtils,
   System.Types, // to expand the inline function
   System.AnsiStrings,
-  ALString,
-  ALMime;
+  Alcinoe.String,
+  Alcinoe.Mime;
 
 {*****************************************************************************************************************}
 Function ALMultipartExtractValueFromHeaderLine(const aHeaderLine: AnsiString; const aName: AnsiString): AnsiString;

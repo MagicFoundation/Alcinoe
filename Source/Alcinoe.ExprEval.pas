@@ -27,7 +27,7 @@ details on cmp operator:
 "1.5 cmp 1.5" returns 0.0 because 1.5 = 1.5
 "1.5 cmp 0.0" returns 1.0 because 1.5 > 0.0
 *******************************************************************************}
-unit ALExprEval;
+unit Alcinoe.ExprEval;
 
 interface
 
@@ -40,7 +40,7 @@ interface
 uses
   System.SysUtils,
   System.Classes,
-  ALStringList;
+  Alcinoe.StringList;
 
 type
   EALExprEvalError = class(Exception);
@@ -871,8 +871,8 @@ uses
   System.Types,
   System.Math,
   System.Contnrs,
-  ALString,
-  ALCipher;
+  Alcinoe.String,
+  Alcinoe.Cipher;
 
 {*****************************************************}
 function ALEvaluator_Max(A, B: TALFloat80): TALFloat80;

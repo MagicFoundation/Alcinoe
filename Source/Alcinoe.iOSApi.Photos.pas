@@ -1,4 +1,4 @@
-unit ALIosPhotosApi;
+unit Alcinoe.iOSApi.Photos;
 
 interface
 

@@ -14,7 +14,7 @@ protected directories and supports basic proxy
 authentication scheme.
 *******************************************************************************}
 
-unit ALWininetHttpClient;
+unit Alcinoe.HTTP.Client.WinINet;
 
 interface
 
@@ -22,7 +22,7 @@ uses
   Winapi.Windows,
   System.Classes,
   WinApi.WinInet,
-  ALHttpClient;
+  Alcinoe.HTTP.Client;
 
 const
   INTERNET_STATUS_COOKIE_SENT      = 320;
@@ -200,8 +200,8 @@ implementation
 uses
   System.SysUtils,
   System.Ansistrings,
-  ALCommon,
-  ALString;
+  Alcinoe.Common,
+  Alcinoe.String;
 
 {***************************************************************}
 procedure ALWininetHTTPCLientStatusCallback(hInternet: HINTERNET;

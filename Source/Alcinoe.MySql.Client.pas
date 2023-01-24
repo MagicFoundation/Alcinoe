@@ -4,7 +4,7 @@ http://dev.mysql.com/doc/refman/5.0/en/
 http://dev.mysql.com/doc/refman/5.0/en/string-syntax.html
 *******************************************************************************}
 
-unit AlMySqlClient;
+unit Alcinoe.MySql.Client;
 
 interface
 
@@ -12,11 +12,11 @@ uses
   Winapi.Windows,
   System.Contnrs,
   System.SyncObjs,
-  ALCommon,
-  AlXmlDoc,
-  ALStringList,
-  ALString,
-  AlMySqlWrapper;
+  Alcinoe.Common,
+  Alcinoe.XMLDoc,
+  Alcinoe.StringList,
+  Alcinoe.String,
+  Alcinoe.MySql.Wrapper;
 
 Type
 
@@ -290,8 +290,8 @@ uses
   System.Classes,
   System.SysUtils,
   System.Diagnostics,
-  ALCipher,
-  ALWindows;
+  Alcinoe.Cipher,
+  Alcinoe.WinApi.Common;
 
 {******************************************************************}
 Function AlMySqlClientSlashedStr(Const Str: AnsiString): AnsiString;
@@ -1675,7 +1675,7 @@ begin
         // TODO
         // instead of closing the connection, it's could be better to know
         // if the error is related to the connection, or related to the
-        // SQL (like we do in alFBXclient with GetCloseConnectionByErrCode
+        // SQL (like we do in Alcinoe.FBX.Client with GetCloseConnectionByErrCode
         if LOwnConnection then TransactionRollback(LTmpConnectionHandle, true);
 
         //raise the error
@@ -1831,7 +1831,7 @@ begin
       // TODO
       // instead of closing the connection, it's could be better to know
       // if the error is related to the connection, or related to the
-      // SQL (like we do in alFBXclient with GetCloseConnectionByErrCode
+      // SQL (like we do in Alcinoe.FBX.Client with GetCloseConnectionByErrCode
       if LOwnConnection then TransactionRollback(LTmpConnectionHandle, true);
 
       //raise the error
@@ -1871,7 +1871,7 @@ begin
       // TODO
       // instead of closing the connection, it's could be better to know
       // if the error is related to the connection, or related to the
-      // SQL (like we do in alFBXclient with GetCloseConnectionByErrCode
+      // SQL (like we do in Alcinoe.FBX.Client with GetCloseConnectionByErrCode
       if LOwnConnection then TransactionRollback(LTmpConnectionHandle, true);
 
       //raise the error
@@ -1911,7 +1911,7 @@ begin
       // TODO
       // instead of closing the connection, it's could be better to know
       // if the error is related to the connection, or related to the
-      // SQL (like we do in alFBXclient with GetCloseConnectionByErrCode
+      // SQL (like we do in Alcinoe.FBX.Client with GetCloseConnectionByErrCode
       if LOwnConnection then TransactionRollback(LTmpConnectionHandle, true);
 
       //raise the error
@@ -1959,7 +1959,7 @@ begin
       // TODO
       // instead of closing the connection, it's could be better to know
       // if the error is related to the connection, or related to the
-      // SQL (like we do in alFBXclient with GetCloseConnectionByErrCode
+      // SQL (like we do in Alcinoe.FBX.Client with GetCloseConnectionByErrCode
       if LOwnConnection then TransactionRollback(LTmpConnectionHandle, true);
 
       //raise the error

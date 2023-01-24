@@ -1,15 +1,15 @@
 {*******************************************************************************
 Function to run CGI application like PHP-CGI.exe or Perl.exe
 *******************************************************************************}
-unit ALCGI;
+unit Alcinoe.CGI;
 
 interface
 
 uses
   system.classes,
-  ALIsapiHTTP,
-  AlHttpClient,
-  AlStringList;
+  Alcinoe.IsapiHTTP,
+  Alcinoe.HTTP.Client,
+  Alcinoe.StringList;
 
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest; ServerVariables: TALStrings); overload;
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest;
@@ -38,8 +38,8 @@ implementation
 
 uses
   System.AnsiStrings,
-  AlExecute,
-  ALString;
+  Alcinoe.Execute,
+  Alcinoe.String;
 
 {**************************************************************************************************************}
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest; ServerVariables: TALStrings);

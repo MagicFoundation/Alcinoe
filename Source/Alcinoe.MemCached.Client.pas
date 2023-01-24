@@ -15,7 +15,7 @@ quick deployment, ease of development, and solves many
 problems facing large data caches.
 *******************************************************************************}
 
-unit ALMemCachedClient;
+unit Alcinoe.MemCached.Client;
 
 interface
 
@@ -24,8 +24,8 @@ uses
   System.Contnrs,
   System.SyncObjs,
   System.Diagnostics,
-  ALCommon,
-  ALString;
+  Alcinoe.Common,
+  Alcinoe.String;
 
 type
 
@@ -316,9 +316,9 @@ uses
   Winapi.Windows,
   System.Classes,
   System.SysUtils,
-  ALStringList,
-  AlWinsock,
-  ALWindows;
+  Alcinoe.StringList,
+  Alcinoe.WinSock,
+  Alcinoe.WinApi.Common;
 
 {**************************************************************************************************************}
 constructor EAlMemCachedClientException.Create(const aMsg: AnsiString; const aCloseConnection: Boolean = False);

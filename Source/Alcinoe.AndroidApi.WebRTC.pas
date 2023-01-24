@@ -1,4 +1,4 @@
-unit ALAndroidWebRTCApi;
+unit Alcinoe.AndroidApi.WebRTC;
 
 interface
 
@@ -311,16 +311,16 @@ implementation
 
 procedure RegisterTypes;
 begin
-  TRegTypes.RegisterType('ALAndroidWebRTCApi.JPeerConnection_TlsCertPolicy', TypeInfo(ALAndroidWebRTCApi.JPeerConnection_TlsCertPolicy));
-  TRegTypes.RegisterType('ALAndroidWebRTCApi.JPeerConnection_IceServer', TypeInfo(ALAndroidWebRTCApi.JPeerConnection_IceServer));
-  TRegTypes.RegisterType('ALAndroidWebRTCApi.JPeerConnection_IceServer_Builder', TypeInfo(ALAndroidWebRTCApi.JPeerConnection_IceServer_Builder));
-  TRegTypes.RegisterType('ALAndroidWebRTCApi.JPeerConnection_IceConnectionState', TypeInfo(ALAndroidWebRTCApi.JPeerConnection_IceConnectionState));
-  TRegTypes.RegisterType('ALAndroidWebRTCApi.JIceCandidate', TypeInfo(ALAndroidWebRTCApi.JIceCandidate));
-  TRegTypes.RegisterType('ALAndroidWebRTCApi.JSessionDescription_Type', TypeInfo(ALAndroidWebRTCApi.JSessionDescription_Type));
-  TRegTypes.RegisterType('ALAndroidWebRTCApi.JSessionDescription', TypeInfo(ALAndroidWebRTCApi.JSessionDescription));
-  TRegTypes.RegisterType('ALAndroidWebRTCApi.JALWebRTC_Listener', TypeInfo(ALAndroidWebRTCApi.JALWebRTC_Listener));
-  TRegTypes.RegisterType('ALAndroidWebRTCApi.JALWebRTC_PeerConnectionParameters', TypeInfo(ALAndroidWebRTCApi.JALWebRTC_PeerConnectionParameters));
-  TRegTypes.RegisterType('ALAndroidWebRTCApi.JALWebRTC', TypeInfo(ALAndroidWebRTCApi.JALWebRTC));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.WebRTC.JPeerConnection_TlsCertPolicy', TypeInfo(ALAndroidWebRTCApi.JPeerConnection_TlsCertPolicy));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.WebRTC.JPeerConnection_IceServer', TypeInfo(ALAndroidWebRTCApi.JPeerConnection_IceServer));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.WebRTC.JPeerConnection_IceServer_Builder', TypeInfo(ALAndroidWebRTCApi.JPeerConnection_IceServer_Builder));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.WebRTC.JPeerConnection_IceConnectionState', TypeInfo(ALAndroidWebRTCApi.JPeerConnection_IceConnectionState));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.WebRTC.JIceCandidate', TypeInfo(ALAndroidWebRTCApi.JIceCandidate));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.WebRTC.JSessionDescription_Type', TypeInfo(ALAndroidWebRTCApi.JSessionDescription_Type));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.WebRTC.JSessionDescription', TypeInfo(ALAndroidWebRTCApi.JSessionDescription));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.WebRTC.JALWebRTC_Listener', TypeInfo(ALAndroidWebRTCApi.JALWebRTC_Listener));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.WebRTC.JALWebRTC_PeerConnectionParameters', TypeInfo(ALAndroidWebRTCApi.JALWebRTC_PeerConnectionParameters));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.WebRTC.JALWebRTC', TypeInfo(ALAndroidWebRTCApi.JALWebRTC));
 end;
 
 initialization

@@ -2,7 +2,7 @@
 TALWinInetFTPClient is a is easy to use WinInet-based FTP client component.
 *******************************************************************************}
 
-unit ALWinInetFTPClient;
+unit Alcinoe.FTP.Client.WinINet;
 
 interface
 
@@ -10,7 +10,7 @@ uses
   WinApi.Windows,
   System.Classes,
   Winapi.WinInet,
-  ALFTPClient;
+  Alcinoe.FTP.Client;
 
 type
 
@@ -169,8 +169,8 @@ implementation
 uses
   System.SysUtils,
   System.Ansistrings,
-  ALCommon,
-  ALString;
+  Alcinoe.Common,
+  Alcinoe.String;
 
 {********************************************************************}
 {this procedure produce some strange bug under windows Server 2008 R2}

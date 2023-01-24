@@ -130,7 +130,7 @@ MyJsonDoc.onParseText := procedure (Sender: TObject;
 MyJsonDoc.LoadFromJSON(AJsonStr, true{saxMode});
 *******************************************************************************)
 
-unit ALJSONDoc;
+unit Alcinoe.JSONDoc;
 
 interface
 
@@ -141,10 +141,10 @@ uses
   system.sysutils,
   system.types,
   {$IFNDEF ALHideAnsiString}
-    ALXmlDoc,
+    Alcinoe.XMLDoc,
   {$ENDIF}
-  ALString,
-  AlStringList;
+  Alcinoe.String,
+  Alcinoe.StringList;
 
 const
   cALJSONNotActive              = 'No active document';
@@ -1326,9 +1326,9 @@ uses
   System.Generics.Collections,
   system.IOUtils,
   System.DateUtils,
-  ALquickSortList,
-  AlHTML,
-  ALCommon;
+  Alcinoe.QuickSortList,
+  Alcinoe.HTML,
+  Alcinoe.Common;
 
 {$IFNDEF ALHideAnsiString}
 

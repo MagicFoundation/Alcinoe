@@ -1,4 +1,4 @@
-unit ALFmxFirebaseCore;
+unit Alcinoe.FMX.FirebaseCore;
 
 interface
 
@@ -10,10 +10,10 @@ uses
   system.SysUtils,
   Fmx.Platform,
   {$IF defined(ios)}
-  ALIosFirebaseCoreApi,
+  Alcinoe.iOSApi.FirebaseCore,
   {$ENDIF}
-  ALCommon,
-  ALString;
+  Alcinoe.Common,
+  Alcinoe.String;
 
 
 {*******************************************************************************************}

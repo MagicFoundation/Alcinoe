@@ -1,4 +1,4 @@
-﻿unit ALFmxCommon;
+﻿unit Alcinoe.FMX.Common;
 
 interface
 
@@ -17,7 +17,7 @@ uses
   {$ENDIF}
   {$IF defined(ANDROID)}
   Androidapi.JNI.JavaTypes,
-  ALAndroidApi,
+  Alcinoe.AndroidApi.Common,
   {$ENDIF}
   Fmx.types,
   FMX.TextLayout,
@@ -299,8 +299,8 @@ uses
   Macapi.CoreFoundation,
   Macapi.Helpers,
   {$ENDIF}
-  ALFmxObjects,
-  AlFmxStdCtrls;
+  Alcinoe.FMX.Objects,
+  Alcinoe.FMX.StdCtrls;
 
 {***************************}
 constructor TALShadow.Create;

@@ -1,7 +1,7 @@
 //
 // Made from Facebook SDK version 15.1.0
 //
-unit ALIosFacebookLoginKitApi;
+unit Alcinoe.iOSApi.FacebookLoginKit;
 
 interface
 
@@ -21,7 +21,7 @@ uses
   Macapi.ObjectiveC,
   iOSapi.Foundation,
   iOSapi.UIKit,
-  ALIosFacebookCoreKitApi; // [MANDATORY] Because we need it's initialization/finalization section
+  Alcinoe.iOSApi.FacebookCoreKit; // [MANDATORY] Because we need it's initialization/finalization section
 
 {$M+}
 

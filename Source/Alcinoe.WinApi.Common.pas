@@ -2,7 +2,7 @@
 Description:  Windows API function not (yet) in the windows.pas
 *******************************************************************************}
 
-unit ALWindows;
+unit Alcinoe.WinApi.Common;
 
 interface
 

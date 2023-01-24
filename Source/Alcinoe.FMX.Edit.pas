@@ -1,4 +1,4 @@
-unit ALFmxEdit;
+unit Alcinoe.FMX.Edit;
 
 interface
 
@@ -14,22 +14,22 @@ uses
   Androidapi.JNIBridge,
   Androidapi.JNI.Widget,
   Androidapi.JNI.JavaTypes,
-  ALAndroidApi,
-  ALFmxAndroidNativeView,
+  Alcinoe.AndroidApi.Common,
+  Alcinoe.FMX.NativeView.Android,
   {$ELSEIF defined(IOS)}
   System.TypInfo,
   iOSapi.Foundation,
   iOSapi.UIKit,
   Macapi.ObjectiveC,
   Macapi.ObjCRuntime,
-  ALFmxIosNativeView,
+  Alcinoe.FMX.NativeView.iOS,
   {$ELSE}
   FMX.Edit,
   {$ENDIF}
   FMX.types,
   Fmx.Graphics,
   Fmx.controls,
-  ALFmxObjects;
+  Alcinoe.FMX.Objects;
 
 Type
 
@@ -492,9 +492,9 @@ uses
   FMX.Helpers.iOS,
   FMX.Consts,
   {$endif}
-  ALCommon,
-  ALString,
-  AlFmxCommon;
+  Alcinoe.Common,
+  Alcinoe.String,
+  Alcinoe.FMX.Common;
 
 {**}
 type

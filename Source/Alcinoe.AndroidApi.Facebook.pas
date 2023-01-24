@@ -1,7 +1,7 @@
 //
 // Made from Facebook SDK version 15.2.0
 //
-unit ALAndroidFacebookApi;
+unit Alcinoe.AndroidApi.Facebook;
 
 interface
 
@@ -12,7 +12,7 @@ interface
   //with the library identifiers com.facebook.android:facebook-android-sdk:xx.xx.xx where xx.xx.xx
   //is the last version of the facebook-android-sdk and gave also the path to
   //<Alcinoe>\Source\ALAndroidFacebookApi.pas to build the compare source file. Then make a diff
-  //compare between the new generated ALAndroidFacebookApi.pas and this one to see if the api
+  //compare between the new generated Alcinoe.AndroidApi.Facebook.pas and this one to see if the api
   //signature is still the same
   {$MESSAGE WARN 'Check if the api signature of the last version of facebook sdk (android) is still the same'}
 {$IFEND}
@@ -24,7 +24,7 @@ uses
   Androidapi.JNI.Os,
   Androidapi.JNI.Net,
   Androidapi.JNI.App,
-  ALAndroidApi;
+  Alcinoe.AndroidApi.Common;
 
 type
 
@@ -237,21 +237,21 @@ implementation
 {**********************}
 procedure RegisterTypes;
 begin
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JALFacebookShareLinkDialog', TypeInfo(ALAndroidFacebookApi.JALFacebookShareLinkDialog));
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JFacebookException', TypeInfo(ALAndroidFacebookApi.JFacebookException));
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JFacebookCallback', TypeInfo(ALAndroidFacebookApi.JFacebookCallback));
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JCallbackManager', TypeInfo(ALAndroidFacebookApi.JCallbackManager));
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JCallbackManager_Factory', TypeInfo(ALAndroidFacebookApi.JCallbackManager_Factory));
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JLoginManager', TypeInfo(ALAndroidFacebookApi.JLoginManager));
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JAccessToken', TypeInfo(ALAndroidFacebookApi.JAccessToken));
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JLoginResult', TypeInfo(ALAndroidFacebookApi.JLoginResult));
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JHttpMethod', TypeInfo(ALAndroidFacebookApi.JHttpMethod));
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JGraphRequestAsyncTask', TypeInfo(ALAndroidFacebookApi.JGraphRequestAsyncTask));
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JFacebookRequestError', TypeInfo(ALAndroidFacebookApi.JFacebookRequestError));
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JFacebookSdk', TypeInfo(ALAndroidFacebookApi.JFacebookSdk));
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JGraphResponse', TypeInfo(ALAndroidFacebookApi.JGraphResponse));
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JGraphRequest_Callback', TypeInfo(ALAndroidFacebookApi.JGraphRequest_Callback));
-  TRegTypes.RegisterType('ALAndroidFacebookApi.JGraphRequest', TypeInfo(ALAndroidFacebookApi.JGraphRequest));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JALFacebookShareLinkDialog', TypeInfo(ALAndroidFacebookApi.JALFacebookShareLinkDialog));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JFacebookException', TypeInfo(ALAndroidFacebookApi.JFacebookException));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JFacebookCallback', TypeInfo(ALAndroidFacebookApi.JFacebookCallback));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JCallbackManager', TypeInfo(ALAndroidFacebookApi.JCallbackManager));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JCallbackManager_Factory', TypeInfo(ALAndroidFacebookApi.JCallbackManager_Factory));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JLoginManager', TypeInfo(ALAndroidFacebookApi.JLoginManager));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JAccessToken', TypeInfo(ALAndroidFacebookApi.JAccessToken));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JLoginResult', TypeInfo(ALAndroidFacebookApi.JLoginResult));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JHttpMethod', TypeInfo(ALAndroidFacebookApi.JHttpMethod));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JGraphRequestAsyncTask', TypeInfo(ALAndroidFacebookApi.JGraphRequestAsyncTask));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JFacebookRequestError', TypeInfo(ALAndroidFacebookApi.JFacebookRequestError));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JFacebookSdk', TypeInfo(ALAndroidFacebookApi.JFacebookSdk));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JGraphResponse', TypeInfo(ALAndroidFacebookApi.JGraphResponse));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JGraphRequest_Callback', TypeInfo(ALAndroidFacebookApi.JGraphRequest_Callback));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JGraphRequest', TypeInfo(ALAndroidFacebookApi.JGraphRequest));
 end;
 
 initialization

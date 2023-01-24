@@ -1,7 +1,7 @@
 // Inspired from
 // https://github.com/catdad/canvas-confetti
 
-unit ALFmxConfetti;
+unit Alcinoe.FMX.Confetti;
 
 interface
 
@@ -14,7 +14,7 @@ uses
   FMX.types,
   FMX.controls,
   FMX.Graphics,
-  ALFmxAni;
+  Alcinoe.FMX.Ani;
 
 Type
 
@@ -100,7 +100,7 @@ implementation
 uses
   system.Math,
   FMX.Forms,
-  ALCommon;
+  Alcinoe.Common;
 
 {*************************************************}
 constructor TALConfetti.Create(AOwner: TComponent);

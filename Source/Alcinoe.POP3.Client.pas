@@ -3,14 +3,14 @@ TALPOP3Client class implements the POP3 protocol (Post Office Protocol - Version
 http://www.ietf.org/rfc/rfc1939.txt
 *******************************************************************************}
 
-unit ALPOP3Client;
+unit Alcinoe.POP3.Client;
 
 interface
 
 Uses
   Winapi.WinSock2,
-  ALStringList,
-  ALInternetMessages;
+  Alcinoe.StringList,
+  Alcinoe.InternetMessages;
 
 type
 
@@ -68,8 +68,8 @@ implementation
 Uses
   Winapi.Windows,
   System.SysUtils,
-  AlWinsock,
-  ALString;
+  Alcinoe.WinSock,
+  Alcinoe.String;
 
 {*******************************************************************************}
 Procedure ALPOP3ClientSplitResponseLine(aResponse: AnsiString; ALst: TALStrings);

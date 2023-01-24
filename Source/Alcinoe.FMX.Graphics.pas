@@ -1,4 +1,4 @@
-unit ALFmxGraphics;
+unit Alcinoe.FMX.Graphics;
 
 interface
 
@@ -22,8 +22,8 @@ uses
   {$ENDIF}
   FMX.types,
   FMX.graphics,
-  alFmxCommon,
-  ALCommon;
+  Alcinoe.FMX.Common,
+  Alcinoe.Common;
 
 //get the oritation From Exif
 Type
@@ -350,8 +350,8 @@ uses
   Androidapi.Helpers,
   Androidapi.JNI.Media,
   Androidapi.Bitmap,
-  ALAndroidApi,
-  ALFmxTypes3D,
+  Alcinoe.AndroidApi.Common,
+  Alcinoe.FMX.Types3D,
   {$ENDIF}
   {$IF defined(IOS)}
   iOSapi.UIKit,
@@ -360,8 +360,8 @@ uses
   Macapi.ObjectiveC,
   Macapi.CoreFoundation,
   Macapi.Helpers,
-  ALIosImageIOApi,
-  ALFmxTypes3D,
+  Alcinoe.iOSApi.ImageIO,
+  Alcinoe.FMX.Types3D,
   {$ENDIF}
   {$IFDEF ALUseTexture}
   FMX.Canvas.GPU,

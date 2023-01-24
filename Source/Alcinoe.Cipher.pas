@@ -1,4 +1,4 @@
-unit ALCipher;
+unit Alcinoe.Cipher;
 
 interface
 
@@ -22,7 +22,7 @@ uses
   system.hash,
   {$ENDIF}
   System.Classes,
-  ALCommon;
+  Alcinoe.Common;
 
 {$IF CompilerVersion < 29} {Delphi XE8}
 type
@@ -546,14 +546,14 @@ uses
   System.SysConst,
   System.Threading,
   System.DateUtils,
-  AlWinHTTPClient,
-  ALJsonDoc,
-  ALHTML,
+  Alcinoe.HTTP.Client.WinHTTP,
+  Alcinoe.JSONDoc,
+  Alcinoe.HTML,
   {$IFEND}
   system.Math,
-  ALFiles,
-  ALStringList,
-  ALString;
+  Alcinoe.Files,
+  Alcinoe.StringList,
+  Alcinoe.String;
 
 {***}
 const

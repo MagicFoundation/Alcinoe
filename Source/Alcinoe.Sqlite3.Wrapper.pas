@@ -1,4 +1,4 @@
-unit ALSqlite3Wrapper;
+unit Alcinoe.Sqlite3.Wrapper;
 
 //
 // to make this unit easy to maintain I over simplify it

@@ -19,7 +19,7 @@ https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 
 http://www.progdigy.com/modules.php?name=UIB
 *******************************************************************************}
 
-unit ALFBXError;
+unit Alcinoe.FBX.Error;
 
 interface
 

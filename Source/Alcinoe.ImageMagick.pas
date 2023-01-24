@@ -1,4 +1,4 @@
-unit ALImageMagick;
+unit Alcinoe.ImageMagick;
 
 interface
 
@@ -775,7 +775,7 @@ implementation
 uses
   system.IOUtils,
   system.sysutils,
-  alCommon;
+  Alcinoe.Common;
 
 {*************************}
 {$WARN SYMBOL_PLATFORM OFF}

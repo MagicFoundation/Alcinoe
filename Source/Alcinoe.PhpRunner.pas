@@ -57,7 +57,7 @@ necessary because several PHP functions are known to have memory leaks. If the
 PHP processes were left around forever, they would be become very inefficient.
 *******************************************************************************}
 
-unit ALPhpRunner;
+unit Alcinoe.PhpRunner;
 
 interface
 
@@ -67,9 +67,9 @@ Uses
   System.Classes,
   System.Contnrs,
   System.SyncObjs,
-  ALHttpClient,
-  ALCommon,
-  ALStringList;
+  Alcinoe.HTTP.Client,
+  Alcinoe.Common,
+  Alcinoe.StringList;
 
 {###############################################################################
 Below the list of some server variables.
@@ -347,11 +347,11 @@ implementation
 
 Uses
   system.sysutils,
-  ALWinSock,
-  ALString,
-  AlExecute,
-  ALWindows,
-  AlCGI;
+  Alcinoe.WinSock,
+  Alcinoe.String,
+  Alcinoe.Execute,
+  Alcinoe.WinApi.Common,
+  Alcinoe.CGI;
 
 {*****************************************************************************}
 procedure TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: TALStrings;

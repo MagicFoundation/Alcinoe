@@ -2,7 +2,7 @@
 TALIntegerList or TALDoubleList that work exactly like TstringList but with integer or Double.
 *******************************************************************************}
 
-unit ALQuickSortList;
+unit Alcinoe.QuickSortList;
 
 interface
 
@@ -267,8 +267,8 @@ implementation
 
 uses
   System.Math,
-  ALCommon,
-  ALString;
+  Alcinoe.Common,
+  Alcinoe.StringUtils;
 
 {***********************************************************************************}
 function AlBaseQuickSortListCompare(List: TObject; Index1, Index2: Integer): Integer;

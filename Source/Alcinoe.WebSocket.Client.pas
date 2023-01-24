@@ -2,13 +2,13 @@
 TALWebSocketClient is a ancestor of class like TALWinHTTPWebSocketClient
 *******************************************************************************}
 
-unit ALWebSocketClient;
+unit Alcinoe.WebSocket.Client;
 
 interface
 
 uses
   system.Classes,
-  ALHttpClient;
+  Alcinoe.HTTP.Client;
 
 type
 
@@ -70,7 +70,7 @@ type
 implementation
 
 uses
-  AlCommon;
+  Alcinoe.Common;
 
 {************************************}
 constructor TALWebSocketClient.Create;

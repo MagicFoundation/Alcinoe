@@ -1,4 +1,4 @@
-unit ALFmxAni;
+unit Alcinoe.FMX.Ani;
 
 interface
 
@@ -379,8 +379,8 @@ uses
   FMX.Platform,
   FMX.Ani,
   FMX.Utils,
-  ALString,
-  AlCommon;
+  Alcinoe.String,
+  Alcinoe.Common;
 
 {$IFDEF ANDROID}
 

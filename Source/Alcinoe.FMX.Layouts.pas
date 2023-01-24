@@ -1,4 +1,4 @@
-unit ALFmxLayouts;
+unit Alcinoe.FMX.Layouts;
 
 interface
 
@@ -18,8 +18,8 @@ uses
   FMX.layouts,
   FMX.Types,
   FMX.Controls,
-  ALFmxStdCtrls,
-  ALFmxInertialMovement;
+  Alcinoe.FMX.StdCtrls,
+  Alcinoe.FMX.InertialMovement;
 
 type
 
@@ -399,8 +399,8 @@ uses
   FMX.Effects,
   FMX.utils,
   FMX.Ani,
-  AlFmxCommon,
-  ALCommon;
+  Alcinoe.FMX.Common,
+  Alcinoe.Common;
 
 {*******************************************************************************************************}
 // http://stackoverflow.com/questions/39317984/does-the-delphi-firemonkey-dorealign-implemented-correctly

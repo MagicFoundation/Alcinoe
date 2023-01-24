@@ -21,7 +21,7 @@ https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 
 http://www.progdigy.com/modules.php?name=UIB
 *******************************************************************************}
 
-unit ALFBXBase;
+unit Alcinoe.FBX.Base;
 
 {$IFNDEF CPU64}
   {$ALIGN ON}
@@ -2970,7 +2970,7 @@ type
 implementation
 
 uses System.SysUtils,
-     ALFBXconst;
+     Alcinoe.FBX.Const;
 
 (*******************************************************************************
  *    MACROS                                                                   *

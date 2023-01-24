@@ -3,12 +3,12 @@ Misc function that use winsock (for exempple ALHostToIP, ALIPAddrToName or
 ALgetLocalIPs)
 *******************************************************************************}
 
-unit ALWinSock;
+unit Alcinoe.WinSock;
 
 interface
 
 uses
-  AlStringList;
+  Alcinoe.StringList;
 
 function  ALHostToIP(const HostName: AnsiString; var Ip: AnsiString): Boolean;
 function  ALIPAddrToName(const IPAddr : AnsiString): AnsiString;
@@ -22,8 +22,8 @@ uses
   System.SysUtils,
   Winapi.WinSock2,
   System.Ansistrings,
-  ALCommon,
-  ALString;
+  Alcinoe.Common,
+  Alcinoe.String;
 
 {***************************************************************************}
 function ALHostToIP(const HostName: AnsiString; var Ip: AnsiString): Boolean;

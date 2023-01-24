@@ -10,7 +10,7 @@ http://www.sourceforge.net/projects/zeoslib
 http://dev.mysql.com/doc/refman/5.0/en/c-api-functions.html
 *******************************************************************************}
 
-unit ALMySqlWrapper;
+unit Alcinoe.MySql.Wrapper;
 
 interface
 

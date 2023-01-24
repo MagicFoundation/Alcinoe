@@ -21,7 +21,7 @@ https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 
 http://www.progdigy.com/modules.php?name=UIB
 *******************************************************************************}
 
-unit ALFBXLib;
+unit Alcinoe.FBX.Lib;
 
 {$IFNDEF CPUX64}
   {$ALIGN ON}
@@ -33,7 +33,7 @@ interface
 uses Winapi.Windows,
      System.SysUtils,
      System.Classes,
-     ALFBXbase;
+     Alcinoe.FBX.Base;
 
 type
 
@@ -1160,10 +1160,10 @@ implementation
 uses System.Math,
      System.Variants,
      System.Ansistrings,
-     ALFBXerror,
-     ALFBXConst,
-     ALCommon,
-     ALString;
+     Alcinoe.FBX.Error,
+     Alcinoe.FBX.Const,
+     Alcinoe.Common,
+     Alcinoe.String;
 
 //function ALFBXMBUEncode(const str: UnicodeString; cp: Word): RawByteString;
 //begin

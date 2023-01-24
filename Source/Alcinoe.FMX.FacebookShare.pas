@@ -48,7 +48,7 @@ https://developers.facebook.com/docs/sharing/ios/
 1) follow the step described in ALFmxFacebookCore
 
 *******************************************************************************)
-unit ALFmxFacebookShare;
+unit Alcinoe.FMX.FacebookShare;
 
 interface
 
@@ -68,16 +68,16 @@ implementation
 uses
   system.SysUtils,
   {$IF defined(android)}
-  ALAndroidFacebookApi,
+  Alcinoe.AndroidApi.Facebook,
   Androidapi.Helpers,
   Androidapi.JNI.app,
   Androidapi.JNI.Os,
   Androidapi.JNI.net,
   {$ELSEIF defined(IOS)}
   Macapi.Helpers,
-  ALIosFacebookShareKitApi,
+  Alcinoe.iOSApi.FacebookShareKit,
   {$ENDIF}
-  ALFmxFacebookCore; // [MANDATORY] Because we need it's initialization/finalization section
+  Alcinoe.FMX.FacebookCore; // [MANDATORY] Because we need it's initialization/finalization section
 
 {*****************************************************************************************}
 class function TALFacebookShareDialog.ShowShareLinkDialog(const aLinkUrl: String): boolean;

@@ -1,4 +1,4 @@
-unit ALFmxObjects;
+unit Alcinoe.FMX.Objects;
 
 interface
 
@@ -11,7 +11,7 @@ interface
 uses
   System.Classes,
   System.Types,
-  System.UITypes, // [DCC Hint] ALFmxObjects.pas(1418): H2443 Inline function 'TAlphaColorCGFloat.Create' has not been expanded because unit 'System.UITypes' is not specified in USES list
+  System.UITypes, // [DCC Hint] Alcinoe.FMX.Objects.pas(1418): H2443 Inline function 'TAlphaColorCGFloat.Create' has not been expanded because unit 'System.UITypes' is not specified in USES list
   System.Rtti,
   {$IFDEF DEBUG}
   System.Diagnostics,
@@ -34,8 +34,8 @@ uses
   FMX.textlayout,
   FMX.graphics,
   FMX.objects,
-  ALFmxGraphics,
-  ALFmxCommon;
+  Alcinoe.FMX.Graphics,
+  Alcinoe.FMX.Common;
 
 type
 
@@ -518,10 +518,10 @@ uses
   iOSapi.UIKit,
   FMX.Canvas.GPU,
   FMX.Surfaces,
-  ALFmxTypes3D,
+  Alcinoe.FMX.Types3D,
   {$ENDIF}
-  ALFmxBreakText,
-  ALCommon;
+  Alcinoe.FMX.BreakText,
+  Alcinoe.Common;
 
 {**********************************************}
 constructor TALImage.Create(AOwner: TComponent);

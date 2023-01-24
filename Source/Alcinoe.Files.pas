@@ -1,11 +1,11 @@
-unit ALFiles;
+unit Alcinoe.Files;
 
 interface
 
 {$I Alcinoe.inc}
 
 uses
-  ALCommon;
+  Alcinoe.Common;
 
 {$IFNDEF ALHideAnsiString}
 Function  AlEmptyDirectory(Directory: ansiString;
@@ -96,8 +96,8 @@ uses
   {$ELSE}
   Posix.Unistd,
   {$ENDIF}
-  ALString,
-  ALStringList;
+  Alcinoe.StringUtils,
+  Alcinoe.StringList;
 
 {$IFNDEF ALHideAnsiString}
 

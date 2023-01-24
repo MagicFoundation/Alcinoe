@@ -1,7 +1,7 @@
 //
 // Made from Facebook SDK version 15.1.0
 //
-unit ALIosFacebookCoreKitApi;
+unit Alcinoe.iOSApi.FacebookCoreKit;
 
 interface
 

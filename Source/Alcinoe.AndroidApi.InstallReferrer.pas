@@ -1,4 +1,4 @@
-unit ALAndroidInstallReferrerApi;
+unit Alcinoe.AndroidApi.InstallReferrer;
 
 interface
 
@@ -47,8 +47,8 @@ implementation
 {**********************}
 procedure RegisterTypes;
 begin
-  TRegTypes.RegisterType('ALAndroidApi.JALInstallReferrerListener', TypeInfo(ALAndroidInstallReferrerApi.JALInstallReferrerListener));
-  TRegTypes.RegisterType('ALAndroidApi.JALInstallReferrer', TypeInfo(ALAndroidInstallReferrerApi.JALInstallReferrer));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALInstallReferrerListener', TypeInfo(ALAndroidInstallReferrerApi.JALInstallReferrerListener));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALInstallReferrer', TypeInfo(ALAndroidInstallReferrerApi.JALInstallReferrer));
 end;
 
 initialization

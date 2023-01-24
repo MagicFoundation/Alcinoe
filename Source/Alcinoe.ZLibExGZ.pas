@@ -1,4 +1,4 @@
-unit ALZLibExGZ;
+unit Alcinoe.ZLibExGZ;
 
 interface
 

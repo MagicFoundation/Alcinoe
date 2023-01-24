@@ -1,7 +1,7 @@
 {*******************************************************************************
 Description:  AnsiString version of delphi Unicode Tinifile
 *******************************************************************************}
-unit ALIniFiles;
+unit Alcinoe.IniFiles;
 
 {$R-,T-,H+,X+}
 
@@ -16,8 +16,8 @@ interface
 uses
   System.SysUtils,
   System.Classes,
-  ALString,
-  ALStringList;
+  Alcinoe.String,
+  Alcinoe.StringList;
 
 type
   EALIniFileException = class(Exception);
@@ -80,7 +80,7 @@ uses
   Winapi.Windows,
   System.RTLConsts,
   System.Ansistrings,
-  ALFiles;
+  Alcinoe.Files;
 
 {**************************************************************}
 constructor TALCustomIniFile.Create(const FileName: AnsiString);

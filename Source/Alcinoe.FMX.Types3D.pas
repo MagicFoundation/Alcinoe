@@ -1,4 +1,4 @@
-unit ALFmxTypes3D;
+unit Alcinoe.FMX.Types3D;
 
 interface
 
@@ -15,7 +15,7 @@ uses
   FMX.types,
   FMX.Types3D,
   FMX.Materials.Canvas,
-  ALFmxFilterEffects;
+  Alcinoe.FMX.FilterEffects;
 
 type
 
@@ -193,8 +193,8 @@ uses
   fmx.graphics,
   fmx.surfaces,
   FMX.Consts,
-  AlString,
-  ALCommon;
+  Alcinoe.String,
+  Alcinoe.Common;
 
 {$IFDEF DEBUG}
 var

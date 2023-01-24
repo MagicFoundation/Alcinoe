@@ -17,15 +17,15 @@ with this kind of error... mean that webmaster can make this error
 without seeing it ! so we need to find a way to handle this error
 *******************************************************************************}
 
-unit ALWebSpider;
+unit Alcinoe.WebSpider;
 
 interface
 
 Uses
   System.classes,
-  AlAvlBinaryTree,
-  AlHTTPClient,
-  AlStringList;
+  Alcinoe.AVLBinaryTree,
+  Alcinoe.HTTP.Client,
+  Alcinoe.StringList;
 
 Type
 
@@ -211,10 +211,10 @@ Uses
   System.sysutils,
   Winapi.WinInet,
   Winapi.UrlMon,
-  AlHTML,
-  AlMime,
-  ALCommon,
-  ALString;
+  Alcinoe.HTML,
+  Alcinoe.Mime,
+  Alcinoe.Common,
+  Alcinoe.String;
 
 type
 

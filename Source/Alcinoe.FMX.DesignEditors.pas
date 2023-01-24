@@ -1,4 +1,4 @@
-unit ALFmxDesignEditors;
+unit Alcinoe.FMX.DesignEditors;
 
 interface
 
@@ -102,7 +102,7 @@ uses
   System.SysUtils,
   Vcl.Menus,
   fmx.controls,
-  ALFmxTabControl;
+  Alcinoe.FMX.TabControl;
 
 {********************************************************************}
 constructor TALItemClassDesc.Create(const AItemClass: TFmxObjectClass;

@@ -30,7 +30,7 @@ INSTALLATION
 3) After it's must be quite easy, just read the source code or look the sample
    located at Demos\ALFmxControls
 *******************************************************************************)
-unit ALFmxVideoPlayer;
+unit Alcinoe.FMX.VideoPlayer;
 
 interface
 
@@ -47,21 +47,21 @@ uses
   Androidapi.JNI.GraphicsContentViewText,
   Androidapi.JNIBridge,
   Androidapi.JNI.JavaTypes,
-  ALAndroidExoPlayerApi,
-  AlFmxTypes3D,
+  Alcinoe.AndroidApi.ExoPlayer,
+  Alcinoe.FMX.Types3D,
   {$endIF}
   {$IF defined(IOS)}
   Macapi.ObjectiveC,
   iOSapi.Foundation,
   iOSapi.AVFoundation,
   iOSapi.CoreVideo,
-  AlFmxTypes3D,
+  Alcinoe.FMX.Types3D,
   {$endIF}
   Fmx.types,
   Fmx.graphics,
-  ALFmxGraphics,
-  ALFmxCommon,
-  AlFmxObjects;
+  Alcinoe.FMX.Graphics,
+  Alcinoe.FMX.Common,
+  Alcinoe.FMX.Objects;
 
 type
 
@@ -476,7 +476,7 @@ uses
   Androidapi.Helpers,
   androidapi.jni.net,
   FMX.Canvas.GPU,
-  AlString,
+  Alcinoe.String,
   {$ENDIF}
   {$IF defined(IOS)}
   System.RTLConsts,
@@ -488,10 +488,10 @@ uses
   FMX.Canvas.GPU,
   FMX.Context.GLES.iOS,
   FMX.Types3D,
-  AlString,
+  Alcinoe.String,
   {$ENDIF}
   fmx.controls,
-  AlCommon;
+  Alcinoe.Common;
 
 {$REGION ' ANDROID'}
 {$IF defined(ANDROID)}

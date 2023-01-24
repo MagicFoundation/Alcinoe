@@ -2,7 +2,7 @@
 Description:  TALWinHTTPWebSocketClient is a easy to use WinHTTP-based
 Web Socket client component
 *******************************************************************************}
-unit ALWinHTTPWebSocketClient;
+unit Alcinoe.WebSocket.Client.WinHTTP;
 
 interface
 
@@ -12,10 +12,10 @@ uses
   System.Generics.Collections,
   Winapi.Windows,
   Winapi.WinHTTP,
-  ALStringList,
-  ALWinHttpClient,
-  ALWebSocketClient,
-  ALHttpClient;
+  Alcinoe.StringList,
+  Alcinoe.HTTP.Client.WinHTTP,
+  Alcinoe.WebSocket.Client,
+  Alcinoe.HTTP.Client;
 
 type
 
@@ -125,8 +125,8 @@ implementation
 uses
   System.Classes,
   System.SysUtils,
-  ALCommon,
-  ALString;
+  Alcinoe.Common,
+  Alcinoe.String;
 
 {*********************************************************************************}
 procedure ALWinHTTPWebSocketClientInetWebSocketStatusCallback(hInternet: HINTERNET;

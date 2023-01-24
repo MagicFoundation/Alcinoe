@@ -1,4 +1,4 @@
-unit ALFmxVKontakte;
+unit Alcinoe.FMX.VKontakte;
 
 interface
 
@@ -7,11 +7,11 @@ uses
   {$IF defined(android)}
   Androidapi.JNI.JavaTypes,
   Androidapi.JNIBridge,
-  ALAndroidVKontakteApi,
+  Alcinoe.AndroidApi.VKontakte,
   {$ELSEIF defined(IOS)}
   Macapi.ObjectiveC,
   iOSapi.UIKit,
-  ALIosVKontakteApi,
+  Alcinoe.iOSApi.VKontakte,
   {$ENDIF}
   system.Messaging;
 
@@ -136,10 +136,10 @@ uses
   FMX.Platform,
   FMX.Helpers.iOS,
   FMX.Platform.iOS,
-  ALFmxCommon,
+  Alcinoe.FMX.Common,
   {$ENDIF}
-  AlString,
-  alcommon;
+  Alcinoe.String,
+  Alcinoe.Common;
 
 {*}
 var

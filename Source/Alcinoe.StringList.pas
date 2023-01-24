@@ -36,7 +36,7 @@ performance when the list contains a large number of strings
 is lower than TALStringList because of the cost to calculate the
 hash)
 **************************************************************}
-unit ALStringList;
+unit Alcinoe.StringList;
 
 interface
 
@@ -50,9 +50,9 @@ Uses
   System.Math,
   {$IFNDEF ALHideAnsiString}
   System.Contnrs,
-  AlAvlBinaryTRee,
+  Alcinoe.AVLBinaryTree,
   {$ENDIF}
-  ALQuickSortList;
+  Alcinoe.QuickSortList;
 
 {$IFNDEF ALHideAnsiString}
 
@@ -857,8 +857,8 @@ Uses
   System.Ansistrings,
   System.Hash,
   {$ENDIF}
-  ALString,
-  ALCommon;
+  Alcinoe.StringUtils,
+  Alcinoe.Common;
 
 {$IFNDEF ALHideAnsiString}
 

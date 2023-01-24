@@ -1,4 +1,4 @@
-unit ALFmxIosNativeView;
+unit Alcinoe.FMX.NativeView.iOS;
 
 interface
 
@@ -141,7 +141,7 @@ uses System.UITypes,
      Macapi.Helpers,
      Macapi.ObjCRuntime,
      FMX.Platform.iOS,
-     ALCommon;
+     Alcinoe.Common;
 
 {****************************************************}
 function TALIosNativeView.GetAncestorClipRect: TRectF;

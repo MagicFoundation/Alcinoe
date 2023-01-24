@@ -1,4 +1,4 @@
-unit ALFmxTabControl;
+unit Alcinoe.FMX.TabControl;
 
 interface
 
@@ -17,9 +17,9 @@ uses
   System.Messaging,
   FMX.Types,
   FMX.Controls,
-  ALFMXAni,
-  ALFmxLayouts,
-  ALFmxInertialMovement;
+  Alcinoe.FMX.Ani,
+  Alcinoe.FMX.Layouts,
+  Alcinoe.FMX.InertialMovement;
 
 type
 
@@ -249,8 +249,8 @@ uses
   System.Math.Vectors,
   FMX.Utils,
   FMX.Consts,
-  ALFmxCommon,
-  ALCommon;
+  Alcinoe.FMX.Common,
+  Alcinoe.Common;
 
 {************************************************}
 constructor TALTabItem.Create(AOwner: TComponent);

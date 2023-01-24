@@ -42,7 +42,7 @@ https://developers.facebook.com/docs/facebook-login/ios/
 1) follow the step described in ALFmxFacebookCore
 
 *******************************************************************************)
-unit ALFmxFacebookLogin;
+unit Alcinoe.FMX.FacebookLogin;
 
 interface
 
@@ -56,11 +56,11 @@ uses
   {$IF defined(android)}
   Androidapi.JNI.JavaTypes,
   Androidapi.JNIBridge,
-  ALAndroidFacebookApi,
+  Alcinoe.AndroidApi.Facebook,
   {$ELSEIF defined(IOS)}
   iOSapi.Foundation,
-  ALIosFacebookCoreKitApi,
-  ALIosFacebookLoginKitApi,
+  Alcinoe.iOSApi.FacebookCoreKit,
+  Alcinoe.iOSApi.FacebookLoginKit,
   {$ENDIF}
   system.Messaging;
 
@@ -169,10 +169,10 @@ uses
   Macapi.Helpers,
   FMX.Platform,
   {$ENDIF}
-  ALFmxFacebookCore, // [MANDATORY] Because we need it's initialization/finalization section
-  ALFmxCommon,
-  AlString,
-  alcommon;
+  Alcinoe.FMX.FacebookCore, // [MANDATORY] Because we need it's initialization/finalization section
+  Alcinoe.FMX.Common,
+  Alcinoe.String,
+  Alcinoe.Common;
 
 {**********************************}
 constructor TALFacebookLogin.Create;

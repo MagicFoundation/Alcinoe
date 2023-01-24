@@ -147,7 +147,7 @@ https://developers.facebook.com/docs/ios/getting-started
 
 *******************************************************************************)
 
-unit ALFmxFacebookCore;
+unit Alcinoe.FMX.FacebookCore;
 
 interface
 
@@ -169,7 +169,7 @@ implementation
 uses
   system.Messaging,
   {$IF defined(android)}
-  ALAndroidFacebookApi,
+  Alcinoe.AndroidApi.Facebook,
   Androidapi.Helpers,
   {$ELSEIF defined(IOS)}
   iOSapi.Foundation,
@@ -177,10 +177,10 @@ uses
   iOSapi.Helpers,
   FMX.Platform,
   FMX.Platform.iOS,
-  ALIosFacebookCoreKitApi,
+  Alcinoe.iOSApi.FacebookCoreKit,
   {$ENDIF}
-  ALString,
-  alcommon;
+  Alcinoe.String,
+  Alcinoe.Common;
 
 {*}
 var

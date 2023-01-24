@@ -1,11 +1,11 @@
-unit ALHTML;
+unit Alcinoe.HTML;
 
 interface
 
 {$I Alcinoe.inc}
 
 uses
-  AlStringList;
+  Alcinoe.StringList;
 
 {$IFNDEF ALHideAnsiString}
 
@@ -73,9 +73,9 @@ uses
   Winapi.Ole2,
   Winapi.ActiveX,
   {$ENDIF}
-  ALCommon,
-  ALString,
-  ALQuickSortList;
+  Alcinoe.Common,
+  Alcinoe.String,
+  Alcinoe.QuickSortList;
 
 {$IFNDEF ALHideAnsiString}
 

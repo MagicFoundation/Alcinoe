@@ -1,7 +1,7 @@
 //
 // Made from Facebook SDK version 15.1.0
 //
-unit ALIosFacebookShareKitApi;
+unit Alcinoe.iOSApi.FacebookShareKit;
 
 interface
 
@@ -114,7 +114,7 @@ type
 implementation
 
 uses
-  ALIosFacebookCoreKitApi; // [MANDATORY] Because we need it's initialization/finalization section
+  Alcinoe.iOSApi.FacebookCoreKit; // [MANDATORY] Because we need it's initialization/finalization section
 
 procedure FBSDKShareKitLoader; cdecl; external framework 'FBSDKShareKit';
 

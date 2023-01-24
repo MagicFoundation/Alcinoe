@@ -1,4 +1,4 @@
-unit ALNetHttpClientPool;
+unit Alcinoe.HTTP.Client.Net.Pool;
 
 interface
 
@@ -8,7 +8,7 @@ uses
   System.classes,
   System.Net.HttpClient,
   System.Net.URLClient,
-  ALCommon;
+  Alcinoe.Common;
 
 type
 
@@ -126,10 +126,10 @@ implementation
 
 uses
   system.SysUtils,
-  ALNetHttpClient,
-  ALHttpClient,
-  ALCipher,
-  ALString;
+  Alcinoe.HTTP.Client.Net,
+  Alcinoe.HTTP.Client,
+  Alcinoe.Cipher,
+  Alcinoe.String;
 
 {*********************************************}
 constructor TALNetHttpClientPoolRequest.Create(

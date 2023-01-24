@@ -10,7 +10,7 @@
 { E-mail：1444386932@qq.com                                                     }
 { *****************************************************************************}
 
-unit ALFmxTrayicon;
+unit Alcinoe.FMX.Trayicon;
 
 interface
 

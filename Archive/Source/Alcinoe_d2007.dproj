@@ -112,7 +112,7 @@
     <DCCReference Include="Alcinoe.Sqlite3.Client.pas" />
     <DCCReference Include="Alcinoe.Sqlite3.Wrapper.pas" />
     <DCCReference Include="ALStaticText.pas" />
-    <DCCReference Include="Alcinoe.String.pas" />
+    <DCCReference Include="Alcinoe.StringUtils.pas" />
     <DCCReference Include="Alcinoe.StringList.pas" />
     <DCCReference Include="Alcinoe.WebSpider.pas" />
     <DCCReference Include="Alcinoe.WinApi.Common.pas" />

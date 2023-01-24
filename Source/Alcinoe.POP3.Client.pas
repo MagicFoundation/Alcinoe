@@ -69,7 +69,7 @@ Uses
   Winapi.Windows,
   System.SysUtils,
   Alcinoe.WinSock,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {*******************************************************************************}
 Procedure ALPOP3ClientSplitResponseLine(aResponse: AnsiString; ALst: TALStrings);

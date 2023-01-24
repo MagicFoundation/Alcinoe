@@ -10,7 +10,7 @@ uses
   Alcinoe.Files,
   Alcinoe.StringList,
   Alcinoe.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {********************************************************************}
 function getdProjVersionName(const aDProjSrc: AnsiString): ansiString;

@@ -16,7 +16,7 @@ uses
   Alcinoe.MultiPartParser,
   Alcinoe.HTTP.Client,
   Alcinoe.StringList,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 type
 

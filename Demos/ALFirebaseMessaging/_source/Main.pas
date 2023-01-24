@@ -52,7 +52,7 @@ uses
   iOSapi.Helpers,
   {$ENDIF}
   system.Messaging,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.StringList,
   Alcinoe.FMX.FirebaseMessaging,
   Alcinoe.Common,

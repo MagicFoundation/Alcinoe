@@ -367,7 +367,7 @@ uses
   Macapi.Helpers,
   iOSapi.CoreText,
   FMX.Helpers.iOS,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   {$ELSE}
   FMX.Styles.Objects,
   FMX.BehaviorManager,

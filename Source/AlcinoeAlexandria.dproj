@@ -252,7 +252,7 @@
     <DCCReference Include="Alcinoe.FMX.TabControl.pas"/>
     <DCCReference Include="Alcinoe.FMX.VideoPlayer.pas"/>
     <DCCReference Include="Alcinoe.QuickSortList.pas"/>
-    <DCCReference Include="Alcinoe.String.pas"/>
+    <DCCReference Include="Alcinoe.StringUtils.pas"/>
     <DCCReference Include="Alcinoe.StringList.pas"/>
     <DCCReference Include="DesignIDE.dcp"/>
     <DCCReference Include="fmx.dcp"/>

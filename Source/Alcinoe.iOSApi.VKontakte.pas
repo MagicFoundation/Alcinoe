@@ -10,9 +10,9 @@ interface
 {$IFNDEF ALCompilerVersionSupported}
   //Pleast update <Alcinoe>\Libraries\ios\vkontakte\ to the last one and then run
   //<Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorIOS.bat
-  //and gave the path to <Alcinoe>\Source\ALIosVKontakteApi.pas to build
+  //and gave the path to <Alcinoe>\Source\Alcinoe.iOSApi.VKontakte.pas to build
   //the compare source file. Then make a diff compare between the new generated
-  //ALIosVKontakteApi.pas and this one to see if the api signature is
+  //Alcinoe.iOSApi.VKontakte.pas and this one to see if the api signature is
   //still the same
   {$MESSAGE WARN 'Check if the api signature of the last version of VKontakte sdk (ios) is still the same'}
 {$IFEND}

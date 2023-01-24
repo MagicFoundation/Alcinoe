@@ -34,7 +34,7 @@ var
 implementation
 
 uses Alcinoe.Common,
-     Alcinoe.String;
+     Alcinoe.StringUtils;
 
 {$R *.fmx}
 

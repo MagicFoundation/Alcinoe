@@ -11,7 +11,7 @@ interface
   //Please run <Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorAndroid.bat
   //with the library identifiers com.google.firebase:firebase-messaging:xx.xx.xx where xx.xx.xx
   //is the last version of the firebase-messaging and gave also the path to
-  //<Alcinoe>\Source\ALAndroidFirebaseApi.pas to build the compare source file. Then make a diff
+  //<Alcinoe>\Source\Alcinoe.AndroidApi.Firebase.pas to build the compare source file. Then make a diff
   //compare between the new generated Alcinoe.AndroidApi.Firebase.pas and this one to see if the api
   //signature is still the same. repeat the operation below with the library
   //com.google.firebase:firebase-analytics:xx.xx.xx
@@ -80,9 +80,9 @@ implementation
 {**********************}
 procedure RegisterTypes;
 begin
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Firebase.JFirebaseMessaging', TypeInfo(ALAndroidFirebaseApi.JFirebaseMessaging));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Firebase.JALFirebaseMessagingService', TypeInfo(ALAndroidFirebaseApi.JALFirebaseMessagingService));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Firebase.JFirebaseAnalytics', TypeInfo(ALAndroidFirebaseApi.JFirebaseAnalytics));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Firebase.JFirebaseMessaging', TypeInfo(Alcinoe.AndroidApi.Firebase.JFirebaseMessaging));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Firebase.JALFirebaseMessagingService', TypeInfo(Alcinoe.AndroidApi.Firebase.JALFirebaseMessagingService));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Firebase.JFirebaseAnalytics', TypeInfo(Alcinoe.AndroidApi.Firebase.JFirebaseAnalytics));
 end;
 
 initialization

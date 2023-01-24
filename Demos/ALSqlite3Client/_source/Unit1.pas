@@ -50,7 +50,7 @@ uses Alcinoe.Sqlite3.Client,
      Alcinoe.HTML,
      Alcinoe.XMLDoc,
      Alcinoe.WinApi.Common,
-     Alcinoe.String;
+     Alcinoe.StringUtils;
 
 {$R *.dfm}
 

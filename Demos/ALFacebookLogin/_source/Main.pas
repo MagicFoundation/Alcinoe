@@ -21,7 +21,7 @@ uses
   Grijjy.ErrorReporting,
   {$ENDIF}
   system.Messaging,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.StringList,
   Alcinoe.FMX.Common,
   Alcinoe.FMX.FacebookLogin,

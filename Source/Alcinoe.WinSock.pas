@@ -23,7 +23,7 @@ uses
   Winapi.WinSock2,
   System.Ansistrings,
   Alcinoe.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {***************************************************************************}
 function ALHostToIP(const HostName: AnsiString; var Ip: AnsiString): Boolean;

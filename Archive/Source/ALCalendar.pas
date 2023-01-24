@@ -9,7 +9,7 @@ interface
 uses
   System.types,
   Vcl.Graphics,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 Type
 

@@ -112,7 +112,7 @@ implementation
 uses {$IFDEF UNICODE}
      ansiStrings,
      {$ENDIF}
-     Alcinoe.String;
+     Alcinoe.StringUtils;
 
 {$R *.dfm}
 

@@ -39,7 +39,7 @@ uses
   cxSplitter,
   cxClasses,
   dxBarBuiltInMenu,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.HTTP.Client.WinHTTP;
 
 type

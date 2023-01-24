@@ -871,7 +871,7 @@ uses
   System.Types,
   System.Math,
   System.Contnrs,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.Cipher;
 
 {*****************************************************}

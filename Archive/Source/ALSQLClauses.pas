@@ -111,7 +111,7 @@ implementation
 uses
   System.Classes,
   System.Types,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {************************************}
 constructor TAlSelectSQLClause.Create;

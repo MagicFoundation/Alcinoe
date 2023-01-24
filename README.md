@@ -22,6 +22,10 @@ Example of app made with Alcinoe
 Install Alcinoe
 ---------------
 
+In Alcinoe 1.0.2 there was a major unit renaming. You can use 
+the tool [UnitRenaming](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/UnitRenaming) 
+to automatically rename all old Alcinoe units in your project.
+
 If you plan to use FMX (Firemonkey) framework with Alcinoe 
 you will need to patch the original delphi source code. 
 To do this you will need to go in [{alcinoe}\Embarcadero\Alexandria\11_2](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_2/)
@@ -131,7 +135,7 @@ Under iOS I use AVPlayer with support also HLS like ExoPlayer does
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-3.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
 </p>
 
-Learn more at [{alcinoe}/Source/ALFmxVideoPlayer.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALFmxVideoPlayer.pas) and you can also start exploring this feature 
+Learn more at [{alcinoe}/Source/Alcinoe.FMX.VideoPlayer.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.FMX.VideoPlayer.pas) and you can also start exploring this feature 
 with the demo located at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
   
 
@@ -294,7 +298,7 @@ Google OAuth 2.0 Access Token
 Google APIs use the OAuth 2.0 protocol for authentication and 
 authorization. You can use the function ALGenerateGoogleOAuth2AccessToken 
 to generate an OAuth 2.0 Access Token. Learn more at 
-[{alcinoe}/Source/ALCipher.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALCipher.pas) 
+[{alcinoe}/Source/Alcinoe.Cipher.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.Cipher.pas) 
   
 
 Android/iOS VKontakte/Facebook SDK login
@@ -361,7 +365,7 @@ To access the document nodes :
     MyJsonDoc.GetChildNodeValueDateTime('birth', Now{default if node not exists});
 ```
 
-Learn more at [{alcinoe}/Source/ALJSONDoc.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALJSONDoc.pas)
+Learn more at [{alcinoe}/Source/Alcinoe.JSONDoc.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.JSONDoc.pas)
   
 
 ImageMagick wrapper for Delphi
@@ -415,7 +419,7 @@ Example :
     end;
 ```
 
-Learn more at [{alcinoe}/Source/ALImageMagick.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALImageMagick.pas)
+Learn more at [{alcinoe}/Source/Alcinoe.ImageMagick.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.ImageMagick.pas)
 
 MongoDb client
 --------------
@@ -430,7 +434,7 @@ new connection does not have to be established. If all the
 connections are being used, a new connection is made and is
 added to the pool. Connection pooling also cuts down on the
 amount of time a user must wait to establish a connection
-to the database. Learn more at [{alcinoe}/Source/ALMongoDBClient.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALMongoDBClient.pas)
+to the database. Learn more at [{alcinoe}/Source/Alcinoe.MongoDB.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.MongoDB.Client.pas)
 
 
 WebSocket client
@@ -477,7 +481,7 @@ What is Memcached? Free & open source, high-performance,
 distributed memory object caching system, generic in
 nature, but intended for use in speeding up dynamic web
 applications by alleviating database load. Learn more at 
-[{alcinoe}/Source/ALMemCachedClient.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALMemCachedClient.pas)
+[{alcinoe}/Source/Alcinoe.MemCached.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.MemCached.Client.pas)
 
 
 GSM component
@@ -492,7 +496,7 @@ We have tested the Nokia 6230 in-house, but the Nokia 7190,
 8890, 6210 and 9110 models should work as well.  Phones
 from other manufacturers will also work, as long as they
 implement the text-mode interface. Learn more at 
-[{alcinoe}/Source/ALGSMComm.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALGSMComm.pas)
+[{alcinoe}/Source/Alcinoe.GSMComm.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.GSMComm.pas)
 
 
 SQLite3 Client
@@ -500,7 +504,7 @@ SQLite3 Client
 
 Query Sqlite3 database and get the result In Xml format 
 or in Json/Bson format. Learn more at 
-[{alcinoe}/Source/ALSqlite3Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/ALSqlite3Client.pas)
+[{alcinoe}/Source/Alcinoe.Sqlite3.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.Sqlite3.Client.pas)
 
 
 And much more

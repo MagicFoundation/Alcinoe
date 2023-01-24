@@ -309,7 +309,7 @@ uses
   System.RTLConsts,
   System.Math.Vectors,
   {$IFDEF DEBUG}
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   {$ENDIF}
   {$IFDEF ANDROID}
   Androidapi.AppGlue,

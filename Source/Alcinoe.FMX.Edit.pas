@@ -493,7 +493,7 @@ uses
   FMX.Consts,
   {$endif}
   Alcinoe.Common,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.FMX.Common;
 
 {**}

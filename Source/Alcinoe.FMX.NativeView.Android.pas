@@ -117,7 +117,7 @@ uses
   FMX.Platform,
   FMX.Platform.Android,
   FMX.Consts,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.Common;
 
 {****************************************************************}

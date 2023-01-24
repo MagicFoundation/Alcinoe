@@ -106,11 +106,11 @@ implementation
 {**********************}
 procedure RegisterTypes;
 begin
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JLocalBroadcastManager', TypeInfo(ALAndroidXApi.JLocalBroadcastManager));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JLifecycleOwner', TypeInfo(ALAndroidXApi.JLifecycleOwner));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.Jlifecycle_Observer', TypeInfo(ALAndroidXApi.Jlifecycle_Observer));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JLiveData', TypeInfo(ALAndroidXApi.JLiveData));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JMutableLiveData', TypeInfo(ALAndroidXApi.JMutableLiveData));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JLocalBroadcastManager', TypeInfo(Alcinoe.AndroidApi.AndroidX.JLocalBroadcastManager));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JLifecycleOwner', TypeInfo(Alcinoe.AndroidApi.AndroidX.JLifecycleOwner));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.Jlifecycle_Observer', TypeInfo(Alcinoe.AndroidApi.AndroidX.Jlifecycle_Observer));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JLiveData', TypeInfo(Alcinoe.AndroidApi.AndroidX.JLiveData));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JMutableLiveData', TypeInfo(Alcinoe.AndroidApi.AndroidX.JMutableLiveData));
 end;
 
 initialization

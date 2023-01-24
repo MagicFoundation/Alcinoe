@@ -10,7 +10,7 @@ uses
   Alcinoe.Common,
   Alcinoe.StringList,
   Alcinoe.Files,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 procedure _cleanUses(Const AFilename: AnsiString; Const ASection: AnsiString);
 begin

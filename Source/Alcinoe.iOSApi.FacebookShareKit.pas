@@ -10,9 +10,9 @@ interface
 {$IFNDEF ALCompilerVersionSupported}
   //Pleast update <Alcinoe>\Libraries\ios\facebook\ to the last one and then run
   //<Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorIOS.bat
-  //and gave the path to <Alcinoe>\Source\ALIosFacebookShareKitApi.pas to build
+  //and gave the path to <Alcinoe>\Source\Alcinoe.iOSApi.FacebookShareKit.pas to build
   //the compare source file. Then make a diff compare between the new generated
-  //ALIosFacebookShareKitApi.pas and this one to see if the api signature is
+  //Alcinoe.iOSApi.FacebookShareKit.pas and this one to see if the api signature is
   //still the same
   {$MESSAGE WARN 'Check if the api signature of the last version of facebook ShareKit (ios) is still the same'}
 {$IFEND}

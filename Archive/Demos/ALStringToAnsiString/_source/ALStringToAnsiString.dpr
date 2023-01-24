@@ -8,7 +8,7 @@ uses
   SysUtils,
   Alcinoe.Files,
   Alcinoe.StringList,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {************************************************************}
 function ALStringToAnsiString_UpdateFile(aBodyStr: AnsiString;

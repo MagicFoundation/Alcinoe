@@ -114,7 +114,7 @@ Uses
   System.SysUtils,
   Alcinoe.WinSock,
   Alcinoe.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {*******************************}
 constructor TAlSmtpClient.Create;

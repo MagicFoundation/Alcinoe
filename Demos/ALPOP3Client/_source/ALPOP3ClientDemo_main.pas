@@ -61,7 +61,7 @@ var
 
 implementation
 
-uses Alcinoe.String;
+uses Alcinoe.StringUtils;
 
 {$R *.dfm}
 

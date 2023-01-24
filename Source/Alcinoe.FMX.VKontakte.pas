@@ -138,7 +138,7 @@ uses
   FMX.Platform.iOS,
   Alcinoe.FMX.Common,
   {$ENDIF}
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.Common;
 
 {*}

@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  StdCtrls, Alcinoe.String, Alcinoe.JSONDoc, ExtCtrls,
+  StdCtrls, Alcinoe.StringUtils, Alcinoe.JSONDoc, ExtCtrls,
   Alcinoe.StringList, Shellapi, Vcl.Dialogs,
   Contnrs, Alcinoe.Files, diagnostics, superobject, DBXplatform, IOUtils,
   dwsJSON, system.Generics.collections,

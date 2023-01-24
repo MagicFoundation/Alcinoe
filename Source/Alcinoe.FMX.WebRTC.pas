@@ -432,7 +432,7 @@ uses
   FMX.Context.GLES.iOS,
   FMX.Context.GLES,
   {$ENDIF}
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.Common;
 
 {**********************************************************}

@@ -207,7 +207,7 @@
         <DCCReference Include="Alcinoe.Common.pas"/>
         <DCCReference Include="Alcinoe.FMX.Types3D.pas"/>
         <DCCReference Include="Alcinoe.StringList.pas"/>
-        <DCCReference Include="Alcinoe.String.pas"/>
+        <DCCReference Include="Alcinoe.StringUtils.pas"/>
         <DCCReference Include="Alcinoe.QuickSortList.pas"/>
         <DCCReference Include="Alcinoe.Mime.pas"/>
         <DCCReference Include="Alcinoe.Cipher.pas"/>

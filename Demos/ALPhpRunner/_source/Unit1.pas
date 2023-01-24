@@ -94,7 +94,7 @@ implementation
 Uses Alcinoe.MultiPartParser,
      Alcinoe.Files,
      Alcinoe.Common,
-     Alcinoe.String,
+     Alcinoe.StringUtils,
      Alcinoe.HTTP.Client;
 
 {$R *.dfm}

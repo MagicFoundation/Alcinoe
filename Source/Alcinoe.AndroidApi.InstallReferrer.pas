@@ -47,8 +47,8 @@ implementation
 {**********************}
 procedure RegisterTypes;
 begin
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALInstallReferrerListener', TypeInfo(ALAndroidInstallReferrerApi.JALInstallReferrerListener));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALInstallReferrer', TypeInfo(ALAndroidInstallReferrerApi.JALInstallReferrer));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALInstallReferrerListener', TypeInfo(Alcinoe.AndroidApi.InstallReferrer.JALInstallReferrerListener));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALInstallReferrer', TypeInfo(Alcinoe.AndroidApi.InstallReferrer.JALInstallReferrer));
 end;
 
 initialization

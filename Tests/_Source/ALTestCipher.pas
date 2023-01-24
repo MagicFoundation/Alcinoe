@@ -5,7 +5,7 @@ interface
 uses
   System.Diagnostics,
   Alcinoe.Common,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   DUnitX.TestFramework;
 
 type

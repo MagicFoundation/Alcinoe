@@ -40,7 +40,7 @@ uses
   cxSplitter,
   cxClasses,
   dxBarBuiltInMenu,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.WebSocket.Client.WinHTTP, dxCore;
 
 type

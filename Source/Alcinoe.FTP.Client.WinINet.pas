@@ -170,7 +170,7 @@ uses
   System.SysUtils,
   System.Ansistrings,
   Alcinoe.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {********************************************************************}
 {this procedure produce some strange bug under windows Server 2008 R2}

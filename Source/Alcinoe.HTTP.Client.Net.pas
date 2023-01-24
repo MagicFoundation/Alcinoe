@@ -26,7 +26,7 @@ uses
   System.Types,
   System.Generics.Collections,
   Alcinoe.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {*}
 var

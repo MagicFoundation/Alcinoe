@@ -201,7 +201,7 @@ uses
   System.SysUtils,
   System.Ansistrings,
   Alcinoe.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {***************************************************************}
 procedure ALWininetHTTPCLientStatusCallback(hInternet: HINTERNET;

@@ -201,7 +201,7 @@ Uses Math,
      Alcinoe.Common,
      Alcinoe.WinApi.Common,
      Alcinoe.HTML,
-     Alcinoe.String;
+     Alcinoe.StringUtils;
 
 {$R *.dfm}
 

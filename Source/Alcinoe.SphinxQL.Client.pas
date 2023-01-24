@@ -44,7 +44,7 @@ implementation
 
 uses
   Alcinoe.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {*********************************************************}
 procedure TalSphinxQlClient.Connect(const Host: AnsiString;

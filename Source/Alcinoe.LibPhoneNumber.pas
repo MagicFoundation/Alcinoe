@@ -45,7 +45,7 @@ const
 implementation
 
 uses
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 function _StrPhoneNumberToInt64(phoneNumber, countryCode: PAnsiChar): Int64; cdecl; external 'libphonenumber.dll';
 function _Int64PhoneNumberToStr(phoneNumber: Int64; buffer: PAnsiChar): Cardinal; cdecl; external 'libphonenumber.dll';

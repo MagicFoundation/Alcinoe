@@ -553,7 +553,7 @@ uses
   system.Math,
   Alcinoe.Files,
   Alcinoe.StringList,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {***}
 const

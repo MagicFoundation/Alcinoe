@@ -143,7 +143,7 @@ uses
   {$IFNDEF ALHideAnsiString}
     Alcinoe.XMLDoc,
   {$ENDIF}
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.StringList;
 
 const

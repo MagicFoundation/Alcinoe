@@ -908,7 +908,7 @@ uses
   Alcinoe.Cipher,
   Alcinoe.WinSock,
   Alcinoe.WinApi.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {***************************************************************************************************************************************}
 constructor EAlMongoDBClientException.Create(const aMsg: AnsiString; const aErrorCode: integer; const aCloseConnection: Boolean = False);

@@ -719,7 +719,7 @@ uses
   Alcinoe.HTML,
   Alcinoe.HTTP.Client,
   Alcinoe.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {**********************************}
 {Raises an EALXMLDocError exception.

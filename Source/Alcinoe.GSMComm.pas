@@ -83,7 +83,7 @@ implementation
 
 uses
   System.SysUtils,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {*****************************************************************************************}
 function AlGSMComm_UnicodeToGSM7BitDefaultAlphabet(const aMessage: WideString): AnsiString;

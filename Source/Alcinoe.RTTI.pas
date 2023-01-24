@@ -458,7 +458,7 @@ uses
   System.sysutils,
   System.Generics.Defaults,
   Alcinoe.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {***}
 const

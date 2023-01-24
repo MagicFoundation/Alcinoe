@@ -94,7 +94,7 @@ uses FileCtrl,
      UrlMon,
      Alcinoe.Files,
      Alcinoe.Mime,
-     Alcinoe.String;
+     Alcinoe.StringUtils;
 
 Const SplitDirectoryAmount = 5000;
 

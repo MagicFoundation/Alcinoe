@@ -662,7 +662,7 @@ implementation
 uses
   system.sysutils,
   System.Math.Vectors,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {***********************************************}
 constructor TALColorAdjustShaderVariables.Create;

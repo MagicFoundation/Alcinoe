@@ -126,7 +126,7 @@ uses
   System.Classes,
   System.SysUtils,
   Alcinoe.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {*********************************************************************************}
 procedure ALWinHTTPWebSocketClientInetWebSocketStatusCallback(hInternet: HINTERNET;

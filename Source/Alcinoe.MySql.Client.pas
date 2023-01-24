@@ -15,7 +15,7 @@ uses
   Alcinoe.Common,
   Alcinoe.XMLDoc,
   Alcinoe.StringList,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.MySql.Wrapper;
 
 Type

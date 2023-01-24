@@ -39,7 +39,7 @@ implementation
 uses
   System.AnsiStrings,
   Alcinoe.Execute,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {**************************************************************************************************************}
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest; ServerVariables: TALStrings);

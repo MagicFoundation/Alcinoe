@@ -13,7 +13,7 @@ uses
   System.IOUtils,
   system.AnsiStrings,
   Alcinoe.JSONDoc,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.Execute,
   Alcinoe.Common,
   Alcinoe.XMLDoc,

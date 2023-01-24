@@ -7,7 +7,7 @@ uses Windows,
      SysUtils,
      Alcinoe.FBX.Base,
      Alcinoe.XMLDoc,
-     Alcinoe.String,
+     Alcinoe.StringUtils,
      Alcinoe.StringList,
      Alcinoe.FBX.Client;
 

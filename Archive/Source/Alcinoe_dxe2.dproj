@@ -96,7 +96,7 @@
 			<DCCReference Include="Alcinoe.Mime.pas"/>
 			<DCCReference Include="ALMisc.pas"/>
 			<DCCReference Include="ALSQLClauses.pas"/>
-			<DCCReference Include="Alcinoe.String.pas"/>
+			<DCCReference Include="Alcinoe.StringUtils.pas"/>
 			<DCCReference Include="Alcinoe.WinSock.pas"/>
 			<DCCReference Include="ALGraphic.pas"/>
 			<DCCReference Include="Alcinoe.HTTP.Client.pas"/>

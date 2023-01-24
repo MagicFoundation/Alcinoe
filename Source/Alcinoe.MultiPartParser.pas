@@ -390,7 +390,7 @@ Uses
   System.SysUtils,
   System.Types, // to expand the inline function
   System.AnsiStrings,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.Mime;
 
 {*****************************************************************************************************************}

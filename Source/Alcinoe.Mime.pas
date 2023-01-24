@@ -17,7 +17,7 @@ Var
 implementation
 
 uses
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.Common;
 
 {************************************************************************************}

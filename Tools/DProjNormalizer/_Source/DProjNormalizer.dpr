@@ -10,7 +10,7 @@ uses
   Alcinoe.Common,
   Alcinoe.StringList,
   Alcinoe.Files,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {***********************************************************}
 Procedure _SortAttributesByNodeName(const aNode: TalXmlNode);

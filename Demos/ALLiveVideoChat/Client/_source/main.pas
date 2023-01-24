@@ -80,7 +80,7 @@ uses
   fmx.Context.GLES.Android,
   Alcinoe.AndroidApi.Common,
   {$ENDIF}
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {********************************************}
 function _EnableDeviceCameraAndAudio: boolean;

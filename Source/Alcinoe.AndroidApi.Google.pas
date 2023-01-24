@@ -171,15 +171,15 @@ implementation
 {**********************}
 procedure RegisterTypes;
 begin
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Google.JTask', TypeInfo(ALAndroidGoogleApi.JTask));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Google.JGoogleSignInAccount', TypeInfo(ALAndroidGoogleApi.JGoogleSignInAccount));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Google.JGoogleApi', TypeInfo(ALAndroidGoogleApi.JGoogleApi));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Google.JGoogleSignInClient', TypeInfo(ALAndroidGoogleApi.JGoogleSignInClient));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Google.JGoogleSignInOptions', TypeInfo(ALAndroidGoogleApi.JGoogleSignInOptions));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Google.JGoogleSignInOptions_Builder', TypeInfo(ALAndroidGoogleApi.JGoogleSignInOptions_Builder));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Google.JGoogleSignIn', TypeInfo(ALAndroidGoogleApi.JGoogleSignIn));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Google.JAdvertisingIdClient_Info', TypeInfo(ALAndroidGoogleApi.JAdvertisingIdClient_Info));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Google.JAdvertisingIdClient', TypeInfo(ALAndroidGoogleApi.JAdvertisingIdClient));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Google.JTask', TypeInfo(Alcinoe.AndroidApi.Google.JTask));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Google.JGoogleSignInAccount', TypeInfo(Alcinoe.AndroidApi.Google.JGoogleSignInAccount));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Google.JGoogleApi', TypeInfo(Alcinoe.AndroidApi.Google.JGoogleApi));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Google.JGoogleSignInClient', TypeInfo(Alcinoe.AndroidApi.Google.JGoogleSignInClient));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Google.JGoogleSignInOptions', TypeInfo(Alcinoe.AndroidApi.Google.JGoogleSignInOptions));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Google.JGoogleSignInOptions_Builder', TypeInfo(Alcinoe.AndroidApi.Google.JGoogleSignInOptions_Builder));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Google.JGoogleSignIn', TypeInfo(Alcinoe.AndroidApi.Google.JGoogleSignIn));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Google.JAdvertisingIdClient_Info', TypeInfo(Alcinoe.AndroidApi.Google.JAdvertisingIdClient_Info));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Google.JAdvertisingIdClient', TypeInfo(Alcinoe.AndroidApi.Google.JAdvertisingIdClient));
 end;
 
 initialization

@@ -464,7 +464,7 @@ uses SyncObjs,
      Alcinoe.Common,
      Alcinoe.XMLDoc,
      Alcinoe.StringList,
-     Alcinoe.String;
+     Alcinoe.StringUtils;
 
 {$R *.dfm}
 

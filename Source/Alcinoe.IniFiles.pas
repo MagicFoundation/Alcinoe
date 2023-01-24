@@ -16,7 +16,7 @@ interface
 uses
   System.SysUtils,
   System.Classes,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.StringList;
 
 type

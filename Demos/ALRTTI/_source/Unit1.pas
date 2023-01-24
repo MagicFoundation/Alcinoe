@@ -52,7 +52,7 @@ uses
   system.rtti,
   Alcinoe.RTTI,
   Alcinoe.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {$R *.dfm}
 

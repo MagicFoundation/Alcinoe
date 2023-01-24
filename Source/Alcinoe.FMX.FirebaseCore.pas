@@ -13,7 +13,7 @@ uses
   Alcinoe.iOSApi.FirebaseCore,
   {$ENDIF}
   Alcinoe.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 
 {*******************************************************************************************}

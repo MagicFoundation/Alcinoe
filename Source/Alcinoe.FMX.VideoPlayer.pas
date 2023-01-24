@@ -476,7 +476,7 @@ uses
   Androidapi.Helpers,
   androidapi.jni.net,
   FMX.Canvas.GPU,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   {$ENDIF}
   {$IF defined(IOS)}
   System.RTLConsts,
@@ -488,7 +488,7 @@ uses
   FMX.Canvas.GPU,
   FMX.Context.GLES.iOS,
   FMX.Types3D,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   {$ENDIF}
   fmx.controls,
   Alcinoe.Common;

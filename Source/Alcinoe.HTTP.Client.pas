@@ -528,7 +528,7 @@ uses
   System.Math,
   system.AnsiStrings,
   Alcinoe.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 {$ENDIF}
 
 {$IFNDEF ALHideAnsiString}

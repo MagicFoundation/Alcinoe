@@ -1163,7 +1163,7 @@ uses System.Math,
      Alcinoe.FBX.Error,
      Alcinoe.FBX.Const,
      Alcinoe.Common,
-     Alcinoe.String;
+     Alcinoe.StringUtils;
 
 //function ALFBXMBUEncode(const str: UnicodeString; cp: Word): RawByteString;
 //begin

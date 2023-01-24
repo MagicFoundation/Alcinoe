@@ -25,7 +25,7 @@ uses
   System.SyncObjs,
   System.Diagnostics,
   Alcinoe.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 type
 

@@ -36,7 +36,7 @@ var Form1: TForm1;
 
 implementation
 
-uses Alcinoe.String,
+uses Alcinoe.StringUtils,
      Alcinoe.QuickSortList,
      Alcinoe.StringList,
      Alcinoe.AVLBinaryTree;

@@ -318,7 +318,7 @@ uses
   {$ENDIF}
   FMX.TextLayout,
   Alcinoe.StringList,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.FMX.Common,
   Alcinoe.Common;
 

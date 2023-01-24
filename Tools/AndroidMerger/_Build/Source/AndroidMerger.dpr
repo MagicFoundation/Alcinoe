@@ -30,7 +30,7 @@ uses
   system.UITypes,
   System.Hash,
   Alcinoe.JSONDoc,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.Files,
   Alcinoe.HTTP.Client,
   Alcinoe.HTTP.Client.WinHTTP,

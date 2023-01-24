@@ -116,7 +116,7 @@ Uses
   System.SysUtils,
   System.Classes,
   Alcinoe.WinSock,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {*******************************************************************************}
 Procedure ALNNTPClientSplitResponseLine(aResponse: AnsiString; ALst: TALStrings);

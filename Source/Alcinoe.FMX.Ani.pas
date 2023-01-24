@@ -379,7 +379,7 @@ uses
   FMX.Platform,
   FMX.Ani,
   FMX.Utils,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.Common;
 
 {$IFDEF ANDROID}

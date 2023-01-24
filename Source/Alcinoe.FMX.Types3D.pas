@@ -193,7 +193,7 @@ uses
   fmx.graphics,
   fmx.surfaces,
   FMX.Consts,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.Common;
 
 {$IFDEF DEBUG}

@@ -34,7 +34,7 @@ interface
 uses
   System.SysUtils,
   System.Variants,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 type
 

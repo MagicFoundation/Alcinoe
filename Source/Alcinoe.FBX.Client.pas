@@ -18,7 +18,7 @@ uses
   Alcinoe.AVLBinaryTree,
   Alcinoe.FBX.Lib,
   Alcinoe.FBX.Base,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.StringList;
 
 Type

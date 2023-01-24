@@ -10,7 +10,7 @@ uses
   System.types,
   Alcinoe.StringList,
   Alcinoe.Files,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.Common;
 
 {*************************************************************}

@@ -80,7 +80,7 @@ var
 
 implementation
 
-Uses Alcinoe.String,
+Uses Alcinoe.StringUtils,
      Alcinoe.InternetMessages,
      Alcinoe.MultiPartParser;
 

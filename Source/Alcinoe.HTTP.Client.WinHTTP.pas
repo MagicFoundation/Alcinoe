@@ -209,7 +209,7 @@ uses
   System.SysUtils,
   System.Ansistrings,
   Alcinoe.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {***********************************************************}
 procedure ALWinHTTPCLientStatusCallback(hInternet: HINTERNET;

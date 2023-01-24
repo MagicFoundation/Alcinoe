@@ -73,7 +73,7 @@ implementation
 uses Alcinoe.FBX.Base,
      Alcinoe.WinApi.Common,
      Alcinoe.FBX.Lib,
-     Alcinoe.String,
+     Alcinoe.StringUtils,
      Alcinoe.StringList,
      Alcinoe.HTML,
      Alcinoe.XMLDoc;

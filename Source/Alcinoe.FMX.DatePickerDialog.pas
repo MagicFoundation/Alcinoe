@@ -155,7 +155,7 @@ uses
   FMX.Helpers.iOS,
   FMX.Forms,
   {$ENDIF}
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.Common;
 
 {$REGION ' ANDROID'}

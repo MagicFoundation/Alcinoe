@@ -214,7 +214,7 @@ Uses
   Alcinoe.HTML,
   Alcinoe.Mime,
   Alcinoe.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 type
 

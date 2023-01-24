@@ -10,9 +10,9 @@ interface
 {$IFNDEF ALCompilerVersionSupported}
   //Pleast update <Alcinoe>\Libraries\ios\facebook\ to the last one and then run
   //<Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorIOS.bat
-  //and gave the path to <Alcinoe>\Source\ALIosFacebookLoginKitApi.pas to build
+  //and gave the path to <Alcinoe>\Source\Alcinoe.iOSApi.FacebookLoginKit.pas to build
   //the compare source file. Then make a diff compare between the new generated
-  //ALIosFacebookLoginKitApi.pas and this one to see if the api signature is
+  //Alcinoe.iOSApi.FacebookLoginKit.pas and this one to see if the api signature is
   //still the same
   {$MESSAGE WARN 'Check if the api signature of the last version of facebook LoginKit (ios) is still the same'}
 {$IFEND}

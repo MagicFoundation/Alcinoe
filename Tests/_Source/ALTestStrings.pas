@@ -9,7 +9,7 @@ uses
   Winapi.Windows,
   Alcinoe.Common,
   Alcinoe.Cipher,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   DUnitX.TestFramework;
 
 type

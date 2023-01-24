@@ -41,7 +41,7 @@ uses
   cxSplitter,
   cxClasses,
   dxBarBuiltInMenu,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   system.AnsiStrings;
 
 type

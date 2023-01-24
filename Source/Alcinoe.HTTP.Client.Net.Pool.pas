@@ -129,7 +129,7 @@ uses
   Alcinoe.HTTP.Client.Net,
   Alcinoe.HTTP.Client,
   Alcinoe.Cipher,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {*********************************************}
 constructor TALNetHttpClientPoolRequest.Create(

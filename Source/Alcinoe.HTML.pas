@@ -74,7 +74,7 @@ uses
   Winapi.ActiveX,
   {$ENDIF}
   Alcinoe.Common,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.QuickSortList;
 
 {$IFNDEF ALHideAnsiString}

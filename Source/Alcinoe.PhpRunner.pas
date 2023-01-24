@@ -348,7 +348,7 @@ implementation
 Uses
   system.sysutils,
   Alcinoe.WinSock,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.Execute,
   Alcinoe.WinApi.Common,
   Alcinoe.CGI;

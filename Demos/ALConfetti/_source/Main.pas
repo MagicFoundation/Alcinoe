@@ -54,7 +54,7 @@ implementation
 uses
   system.Math,
   Alcinoe.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {$R *.fmx}
 

@@ -171,7 +171,7 @@ uses
   {$ENDIF}
   Alcinoe.FMX.FacebookCore, // [MANDATORY] Because we need it's initialization/finalization section
   Alcinoe.FMX.Common,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.Common;
 
 {**********************************}

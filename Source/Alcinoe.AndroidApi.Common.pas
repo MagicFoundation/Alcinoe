@@ -767,29 +767,29 @@ implementation
 {**********************}
 procedure RegisterTypes;
 begin
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALFileUtil', TypeInfo(ALAndroidApi.JALFileUtil));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALDatePickerDialogListener', TypeInfo(ALAndroidApi.JALDatePickerDialogListener));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALDatePickerDialog', TypeInfo(ALAndroidApi.JALDatePickerDialog));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALKeyPreImeListener', TypeInfo(ALAndroidApi.JALKeyPreImeListener));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALEditText', TypeInfo(ALAndroidApi.JALEditText));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JLog', TypeInfo(ALAndroidApi.JLog));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JStatFs', TypeInfo(ALAndroidApi.JStatFs));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JPreferenceManager', TypeInfo(ALAndroidApi.JPreferenceManager));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JAsyncTask_Status', TypeInfo(ALAndroidApi.JAsyncTask_Status));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JAsyncTask', TypeInfo(ALAndroidApi.JAsyncTask));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALBroadcastReceiverListener', TypeInfo(ALAndroidApi.JALBroadcastReceiverListener));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALBroadcastReceiver', TypeInfo(ALAndroidApi.JALBroadcastReceiver));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JRuntime', TypeInfo(ALAndroidApi.JRuntime));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JRenderScript', TypeInfo(ALAndroidApi.JRenderScript));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JBaseObj', TypeInfo(ALAndroidApi.JBaseObj));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JAllocation', TypeInfo(ALAndroidApi.JAllocation));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JAllocation_MipmapControl', TypeInfo(ALAndroidApi.JAllocation_MipmapControl));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JType', TypeInfo(ALAndroidApi.JType));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JScript', TypeInfo(ALAndroidApi.JScript));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JScriptIntrinsic', TypeInfo(ALAndroidApi.JScriptIntrinsic));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JScriptIntrinsicBlur', TypeInfo(ALAndroidApi.JScriptIntrinsicBlur));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JElement', TypeInfo(ALAndroidApi.JElement));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JDebug', TypeInfo(ALAndroidApi.JDebug));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALFileUtil', TypeInfo(Alcinoe.AndroidApi.Common.JALFileUtil));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALDatePickerDialogListener', TypeInfo(Alcinoe.AndroidApi.Common.JALDatePickerDialogListener));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALDatePickerDialog', TypeInfo(Alcinoe.AndroidApi.Common.JALDatePickerDialog));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALKeyPreImeListener', TypeInfo(Alcinoe.AndroidApi.Common.JALKeyPreImeListener));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALEditText', TypeInfo(Alcinoe.AndroidApi.Common.JALEditText));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JLog', TypeInfo(Alcinoe.AndroidApi.Common.JLog));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JStatFs', TypeInfo(Alcinoe.AndroidApi.Common.JStatFs));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JPreferenceManager', TypeInfo(Alcinoe.AndroidApi.Common.JPreferenceManager));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JAsyncTask_Status', TypeInfo(Alcinoe.AndroidApi.Common.JAsyncTask_Status));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JAsyncTask', TypeInfo(Alcinoe.AndroidApi.Common.JAsyncTask));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALBroadcastReceiverListener', TypeInfo(Alcinoe.AndroidApi.Common.JALBroadcastReceiverListener));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALBroadcastReceiver', TypeInfo(Alcinoe.AndroidApi.Common.JALBroadcastReceiver));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JRuntime', TypeInfo(Alcinoe.AndroidApi.Common.JRuntime));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JRenderScript', TypeInfo(Alcinoe.AndroidApi.Common.JRenderScript));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JBaseObj', TypeInfo(Alcinoe.AndroidApi.Common.JBaseObj));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JAllocation', TypeInfo(Alcinoe.AndroidApi.Common.JAllocation));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JAllocation_MipmapControl', TypeInfo(Alcinoe.AndroidApi.Common.JAllocation_MipmapControl));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JType', TypeInfo(Alcinoe.AndroidApi.Common.JType));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JScript', TypeInfo(Alcinoe.AndroidApi.Common.JScript));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JScriptIntrinsic', TypeInfo(Alcinoe.AndroidApi.Common.JScriptIntrinsic));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JScriptIntrinsicBlur', TypeInfo(Alcinoe.AndroidApi.Common.JScriptIntrinsicBlur));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JElement', TypeInfo(Alcinoe.AndroidApi.Common.JElement));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JDebug', TypeInfo(Alcinoe.AndroidApi.Common.JDebug));
 end;
 
 initialization

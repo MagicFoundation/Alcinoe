@@ -205,7 +205,7 @@
     <Manifest_File>(None)</Manifest_File>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_Win64)&#39;!=&#39;&#39;">
-    <Debugger_RunParams>-Action=&#34;Compare&#34; -MasterFile=&#34;..\..\Source\ALAndroidExoPlayerApi.pas&#34; -OutputDir=&#34;.\OutputAndroid\&#34;</Debugger_RunParams>
+    <Debugger_RunParams>-Action=&#34;Compare&#34; -MasterFile=&#34;..\..\Source\Alcinoe.AndroidApi.ExoPlayer.pas&#34; -OutputDir=&#34;.\OutputAndroid\&#34;</Debugger_RunParams>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2)&#39;!=&#39;&#39;">
     <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>

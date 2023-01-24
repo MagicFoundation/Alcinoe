@@ -179,7 +179,7 @@ uses
   FMX.Platform.iOS,
   Alcinoe.iOSApi.FacebookCoreKit,
   {$ENDIF}
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.Common;
 
 {*}

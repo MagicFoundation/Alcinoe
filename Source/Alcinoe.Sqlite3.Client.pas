@@ -14,7 +14,7 @@ Uses
   Alcinoe.XMLDoc,
   Alcinoe.JSONDoc,
   Alcinoe.Sqlite3.Wrapper,
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.StringList;
 
 Type

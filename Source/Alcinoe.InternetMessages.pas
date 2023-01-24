@@ -141,7 +141,7 @@ uses
   Alcinoe.WinSock,
   {$ENDIF}
   Alcinoe.Common,
-  Alcinoe.String;
+  Alcinoe.StringUtils;
 
 {$IFNDEF ALHideAnsiString}
 

@@ -453,7 +453,7 @@ uses
   Macapi.ObjCRuntime,
   FMX.Helpers.iOS,
   {$ENDIF}
-  Alcinoe.String,
+  Alcinoe.StringUtils,
   Alcinoe.Common;
 
 {**************************************}

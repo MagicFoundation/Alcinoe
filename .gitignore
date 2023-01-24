@@ -4,6 +4,7 @@ __recovery
 *.dproj.local
 *.groupproj.local
 *.deployproj.local
+*.res
 *.rsm
 dcu
 /Demos/**/*.exe

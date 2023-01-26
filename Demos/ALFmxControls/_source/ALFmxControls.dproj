@@ -175,9 +175,7 @@
     <SanitizedProjectName>ALFmxControls</SanitizedProjectName>
     <AUP_WRITE_CALENDAR>true</AUP_WRITE_CALENDAR>
     <AUP_ACCESS_COARSE_LOCATION>true</AUP_ACCESS_COARSE_LOCATION>
-    <DCC_BplOutput>.\dcu\$(Platform)\$(Config)</DCC_BplOutput>
-    <DCC_DcpOutput>.\dcu\$(Platform)\$(Config)</DCC_DcpOutput>
-    <DCC_DcuOutput>.\dcu\$(Platform)\$(Config)</DCC_DcuOutput>
+    <DCC_DcuOutput>.\Dcu\$(Platform)\$(Config)</DCC_DcuOutput>
     <DCC_ExeOutput>..\$(Platform)\$(Config)</DCC_ExeOutput>
     <DCC_E>false</DCC_E>
     <DCC_N>false</DCC_N>

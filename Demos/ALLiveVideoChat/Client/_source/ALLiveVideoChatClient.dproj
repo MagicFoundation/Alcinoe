@@ -160,7 +160,7 @@
     <Base>true</Base>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base)&#39;!=&#39;&#39;">
-    <DCC_DcuOutput>.\dcu\$(Platform)\$(Config)</DCC_DcuOutput>
+    <DCC_DcuOutput>.\Dcu\$(Platform)\$(Config)</DCC_DcuOutput>
     <DCC_ExeOutput>..\$(Platform)\$(Config)</DCC_ExeOutput>
     <DCC_E>false</DCC_E>
     <DCC_N>false</DCC_N>

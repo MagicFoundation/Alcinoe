@@ -65,7 +65,7 @@
     <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
     <Manifest_File>None</Manifest_File>
     <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
-    <DCC_DcuOutput>.\dcu\$(Platform)\$(Config)</DCC_DcuOutput>
+    <DCC_DcuOutput>.\Dcu\$(Platform)\$(Config)</DCC_DcuOutput>
     <DCC_ExeOutput>..\$(Platform)</DCC_ExeOutput>
     <DCC_E>false</DCC_E>
     <DCC_N>false</DCC_N>

@@ -4,12 +4,10 @@ __recovery
 *.dproj.local
 *.groupproj.local
 *.identcache
+*.exe
 *.res
 *.rsm
 Dcu
-/Demos/**/*.exe
-/Demos/**/*.apk
-/Demos/**/*.dll
 /Demos/**/Android/Debug
 /Demos/**/Android64/Debug
 /Demos/**/iOSDevice64/Debug
@@ -43,7 +41,6 @@ Dcu
 /Tests/Win64/Debug
 /Tests/Win32/Release
 /Tests/Win64/Release
-/Tools/**/*.exe
 /Tools/AndroidMerger/tmp
 /Tools/NativeBridgeFileGenerator/OutputAndroid
 /Tools/NativeBridgeFileGenerator/OutputIOS

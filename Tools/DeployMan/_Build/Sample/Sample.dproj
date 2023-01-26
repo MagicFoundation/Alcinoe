@@ -175,7 +175,7 @@
     <AUP_CALL_PHONE>true</AUP_CALL_PHONE>
     <AUP_READ_EXTERNAL_STORAGE>true</AUP_READ_EXTERNAL_STORAGE>
     <AUP_READ_CALENDAR>true</AUP_READ_CALENDAR>
-    <DCC_DcuOutput>.\dcu\$(Platform)\$(Config)</DCC_DcuOutput>
+    <DCC_DcuOutput>.\Dcu\$(Platform)\$(Config)</DCC_DcuOutput>
     <DCC_ExeOutput>..\$(Platform)\$(Config)</DCC_ExeOutput>
     <DCC_E>false</DCC_E>
     <DCC_N>false</DCC_N>

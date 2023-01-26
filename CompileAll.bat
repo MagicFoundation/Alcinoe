@@ -281,10 +281,10 @@ Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinHTTPWebSocketClient" "_source" "ALW
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinInetHTTPClient" "_source" "ALWinInetHTTPClientDemo.dproj"
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALXmlDoc" "_source" "ALXmlDocDemo.dproj"
 
-xcopy "%ALBaseDir%\Libraries\dll\tbbmalloc\win32\tbbmalloc.dll" "%ALBaseDir%\Demos\ALDatabaseBenchmark\Win32" /s
+xcopy "%ALBaseDir%\Libraries\dll\tbbmalloc\win32\tbbmalloc.dll" "%ALBaseDir%\Demos\ALDatabaseBenchmark\Win32\Release" /s
 IF ERRORLEVEL 1 goto ERROR
 
-xcopy "%ALBaseDir%\Libraries\dll\tbbmalloc\win64\tbbmalloc.dll" "%ALBaseDir%\Demos\ALDatabaseBenchmark\Win64" /s
+xcopy "%ALBaseDir%\Libraries\dll\tbbmalloc\win64\tbbmalloc.dll" "%ALBaseDir%\Demos\ALDatabaseBenchmark\Win64\Release" /s
 IF ERRORLEVEL 1 goto ERROR
 
 goto FINISHED

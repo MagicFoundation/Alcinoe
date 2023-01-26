@@ -40,7 +40,7 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
-			<DCC_DcuOutput>.\dcu\</DCC_DcuOutput>
+			<DCC_DcuOutput>.\Dcu\$(Platform)\$(Config)</DCC_DcuOutput>
 			<Manifest_File>None</Manifest_File>
 			<Icon_MainIcon>ALEditDemo_Icon.ico</Icon_MainIcon>
 			<DCC_CodePage>65001</DCC_CodePage>
@@ -58,10 +58,10 @@
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 			<DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
-			<DCC_ExeOutput>..\win64\</DCC_ExeOutput>
+			<DCC_ExeOutput>..\$(Platform)\$(Config)</DCC_ExeOutput>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base_Win32)'!=''">
-			<DCC_ExeOutput>..\win32\</DCC_ExeOutput>
+			<DCC_ExeOutput>..\$(Platform)\$(Config)</DCC_ExeOutput>
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 			<DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>

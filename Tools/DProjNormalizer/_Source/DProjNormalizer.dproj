@@ -81,7 +81,7 @@
     <Base>true</Base>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base)&#39;!=&#39;&#39;">
-    <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
+    <DCC_DcuOutput>.\Dcu\$(Platform)\$(Config)</DCC_DcuOutput>
     <DCC_ExeOutput>..\</DCC_ExeOutput>
     <DCC_E>false</DCC_E>
     <DCC_N>false</DCC_N>
@@ -91,7 +91,6 @@
     <DCC_UsePackage>RESTComponents;emsclientfiredac;DataSnapFireDAC;FireDACIBDriver;emsclient;FireDACCommon;RESTBackendComponents;soapserver;CloudService;FireDACCommonDriver;inet;FireDAC;FireDACSqliteDriver;soaprtl;soapmidas;$(DCC_UsePackage)</DCC_UsePackage>
     <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
     <SanitizedProjectName>DProjNormalizer</SanitizedProjectName>
-    <DCC_DcpOutput>.\dcu</DCC_DcpOutput>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     <DCC_CodePage>65001</DCC_CodePage>

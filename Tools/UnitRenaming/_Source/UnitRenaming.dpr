@@ -182,19 +182,15 @@ begin
             LSourceStr := ALStringReplace(LSourceStr,'('+LOldUnitName+')'    ,     '('+LNewUnitName+')',[rfReplaceALL, RFIgnoreCase]);
             LSourceStr := ALStringReplace(LSourceStr,'('+LOldUnitName+']'    ,     '('+LNewUnitName+']',[rfReplaceALL, RFIgnoreCase]);
 
-            //LSourceStr := ALStringReplace(LSourceStr,'/'+LOldUnitName+','    ,     '/'+LNewUnitName+',',[rfReplaceALL, RFIgnoreCase]);
-            //LSourceStr := ALStringReplace(LSourceStr,'/'+LOldUnitName+';'    ,     '/'+LNewUnitName+';',[rfReplaceALL, RFIgnoreCase]);
-            //LSourceStr := ALStringReplace(LSourceStr,'/'+LOldUnitName+' '    ,     '/'+LNewUnitName+' ',[rfReplaceALL, RFIgnoreCase]);
-            LSourceStr := ALStringReplace(LSourceStr,'/'+LOldUnitName+'.'    ,     '/'+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);
-            //LSourceStr := ALStringReplace(LSourceStr,'/'+LOldUnitName+')'    ,     '/'+LNewUnitName+')',[rfReplaceALL, RFIgnoreCase]);
-            //LSourceStr := ALStringReplace(LSourceStr,'/'+LOldUnitName+']'    ,     '/'+LNewUnitName+']',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'['+LOldUnitName+','    ,     '['+LNewUnitName+',',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'['+LOldUnitName+';'    ,     '['+LNewUnitName+';',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'['+LOldUnitName+' '    ,     '['+LNewUnitName+' ',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'['+LOldUnitName+'.'    ,     '['+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'['+LOldUnitName+')'    ,     '['+LNewUnitName+')',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'['+LOldUnitName+']'    ,     '['+LNewUnitName+']',[rfReplaceALL, RFIgnoreCase]);
 
-            //LSourceStr := ALStringReplace(LSourceStr,'\'+LOldUnitName+','    ,     '\'+LNewUnitName+',',[rfReplaceALL, RFIgnoreCase]);
-            //LSourceStr := ALStringReplace(LSourceStr,'\'+LOldUnitName+';'    ,     '\'+LNewUnitName+';',[rfReplaceALL, RFIgnoreCase]);
-            //LSourceStr := ALStringReplace(LSourceStr,'\'+LOldUnitName+' '    ,     '\'+LNewUnitName+' ',[rfReplaceALL, RFIgnoreCase]);
+            LSourceStr := ALStringReplace(LSourceStr,'/'+LOldUnitName+'.'    ,     '/'+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);
             LSourceStr := ALStringReplace(LSourceStr,'\'+LOldUnitName+'.'    ,     '\'+LNewUnitName+'.',[rfReplaceALL, RFIgnoreCase]);
-            //LSourceStr := ALStringReplace(LSourceStr,'\'+LOldUnitName+')'    ,     '\'+LNewUnitName+')',[rfReplaceALL, RFIgnoreCase]);
-            //LSourceStr := ALStringReplace(LSourceStr,'\'+LOldUnitName+']'    ,     '\'+LNewUnitName+']',[rfReplaceALL, RFIgnoreCase]);
 
             LSourceStr := ALStringReplace(LSourceStr,' '+LOldUnitName+','    ,     ' '+LNewUnitName+',',[rfReplaceALL, RFIgnoreCase]);
             LSourceStr := ALStringReplace(LSourceStr,' '+LOldUnitName+';'    ,     ' '+LNewUnitName+';',[rfReplaceALL, RFIgnoreCase]);

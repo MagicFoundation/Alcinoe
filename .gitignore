@@ -1,12 +1,12 @@
 __history
 __recovery
-*.identcache
+*.deployproj.local
 *.dproj.local
 *.groupproj.local
-*.deployproj.local
+*.identcache
 *.res
 *.rsm
-dcu
+Dcu
 /Demos/**/*.exe
 /Demos/**/*.apk
 /Demos/**/*.dll

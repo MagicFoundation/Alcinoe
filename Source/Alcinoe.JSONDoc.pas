@@ -397,10 +397,12 @@ type
     function NextSibling: TALJSONNode;
     function PreviousSibling: TALJSONNode;
     procedure SaveToJSONStream(const Stream: TStream);
-    procedure SaveToJSONFile(const FileName: AnsiString);
+    procedure SaveToJSONFile(const FileName: String); overload;
+    procedure SaveToJSONFile(const FileName: AnsiString); overload;
     procedure SaveToJSONString(var Str: AnsiString);
     procedure SaveToBSONStream(const Stream: TStream);
-    procedure SaveToBSONFile(const FileName: AnsiString);
+    procedure SaveToBSONFile(const FileName: String); overload;
+    procedure SaveToBSONFile(const FileName: AnsiString); overload;
     procedure SaveToBSONString(var Str: AnsiString);
     procedure LoadFromJSONString(const Str: AnsiString; Const ClearChildNodes: Boolean = True);
     procedure LoadFromJSONStream(const Stream: TStream; Const ClearChildNodes: Boolean = True);
@@ -621,10 +623,12 @@ type
     procedure LoadFromBSONFile(const FileName: String; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True); overload;
     procedure LoadFromBSONFile(const FileName: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True); overload;
     procedure SaveToJSONStream(const Stream: TStream);
-    procedure SaveToJSONFile(const FileName: AnsiString);
+    procedure SaveToJSONFile(const FileName: String); overload;
+    procedure SaveToJSONFile(const FileName: AnsiString); overload;
     procedure SaveToJSONString(var Str: AnsiString);
     procedure SaveToBSONStream(const Stream: TStream);
-    procedure SaveToBSONFile(const FileName: AnsiString);
+    procedure SaveToBSONFile(const FileName: String); overload;
+    procedure SaveToBSONFile(const FileName: AnsiString); overload;
     procedure SaveToBSONString(var Str: AnsiString);
     property ChildNodes: TALJSONNodeList read GetChildNodes;
     function GetChildNode(const nodeName: ansiString): TALJSONNode; overload;
@@ -4224,10 +4228,16 @@ end;
 {Saves the JSON document to disk.
  Call SaveToFile to save any modifications you have made to the parsed JSON document.
  AFileName is the name of the file to save.}
-procedure TALJSONDocument.SaveToJSONFile(const FileName: AnsiString);
+procedure TALJSONDocument.SaveToJSONFile(const FileName: String);
 begin
   CheckActive;
   node.SaveToJSONFile(FileName);
+end;
+
+{*******************************************************************}
+procedure TALJSONDocument.SaveToJSONFile(const FileName: AnsiString);
+begin
+  SaveToJSONFile(String(FileName));
 end;
 
 {************************************************}
@@ -4248,11 +4258,17 @@ begin
   node.SaveToBsonStream(Stream);
 end;
 
-{*******************************************************************}
-procedure TALJSONDocument.SaveToBsonFile(const FileName: AnsiString);
+{***************************************************************}
+procedure TALJSONDocument.SaveToBsonFile(const FileName: String);
 begin
   CheckActive;
   node.SaveToBsonFile(FileName);
+end;
+
+{*******************************************************************}
+procedure TALJSONDocument.SaveToBsonFile(const FileName: AnsiString);
+begin
+  SaveToBsonFile(String(FileName));
 end;
 
 {**************************************************************}
@@ -6651,16 +6667,16 @@ end;
 {Saves the JSON document to disk.
  Call SaveToFile to save any modifications you have made to the parsed JSON document.
  AFileName is the name of the file to save.}
-procedure TALJSONNode.SaveToJSONFile(const FileName: AnsiString);
+procedure TALJSONNode.SaveToJSONFile(const FileName: String);
 Var LfileStream: TfileStream;
-    LTmpFilename: AnsiString;
+    LTmpFilename: String;
 begin
   if (assigned(FDocument)) and
      (doProtectedSave in fDocument.Options) then LTmpFilename := FileName + '.~tmp'
   else LTmpFilename := FileName;
   try
 
-    LfileStream := TfileStream.Create(String(LTmpFilename),fmCreate);
+    LfileStream := TfileStream.Create(LTmpFilename,fmCreate);
     Try
       SaveToJSONStream(LfileStream);
     finally
@@ -6668,15 +6684,21 @@ begin
     end;
 
     if LTmpFilename <> FileName then begin
-      if TFile.Exists(string(FileName)) then TFile.Delete(string(FileName));
-      TFile.Move(string(LTmpFilename), string(FileName));
+      if TFile.Exists(FileName) then TFile.Delete(FileName);
+      TFile.Move(LTmpFilename, FileName);
     end;
 
   except
     if (LTmpFilename <> FileName) and
-       (TFile.Exists(string(LTmpFilename))) then TFile.Delete(string(LTmpFilename));
+       (TFile.Exists(LTmpFilename)) then TFile.Delete(LTmpFilename);
     raise;
   end;
+end;
+
+{***************************************************************}
+procedure TALJSONNode.SaveToJSONFile(const FileName: AnsiString);
+begin
+  SaveToJSONFile(String(FileName));
 end;
 
 {************************************************}
@@ -7106,17 +7128,17 @@ begin
   SaveToBson(Stream, buffer);
 end;
 
-{***************************************************************}
-procedure TALJSONNode.SaveToBsonFile(const FileName: AnsiString);
+{***********************************************************}
+procedure TALJSONNode.SaveToBsonFile(const FileName: String);
 Var LfileStream: TfileStream;
-    LTmpFilename: AnsiString;
+    LTmpFilename: String;
 begin
   if (assigned(FDocument)) and
      (doProtectedSave in fDocument.Options) then LTmpFilename := FileName + '.~tmp'
   else LTmpFilename := FileName;
   try
 
-    LfileStream := TfileStream.Create(String(LTmpFilename),fmCreate);
+    LfileStream := TfileStream.Create(LTmpFilename,fmCreate);
     Try
       SaveToBsonStream(LfileStream);
     finally
@@ -7124,15 +7146,21 @@ begin
     end;
 
     if LTmpFilename <> FileName then begin
-      if TFile.Exists(string(FileName)) then TFile.Delete(string(FileName));
-      TFile.Move(string(LTmpFilename), string(FileName));
+      if TFile.Exists(FileName) then TFile.Delete(FileName);
+      TFile.Move(LTmpFilename, FileName);
     end;
 
   except
     if (LTmpFilename <> FileName) and
-       (TFile.Exists(string(LTmpFilename))) then TFile.Delete(string(LTmpFilename));
+       (TFile.Exists(LTmpFilename)) then TFile.Delete(LTmpFilename);
     raise;
   end;
+end;
+
+{***************************************************************}
+procedure TALJSONNode.SaveToBsonFile(const FileName: AnsiString);
+begin
+  SaveToBsonFile(String(FileName));
 end;
 
 {**********************************************************}

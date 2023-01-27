@@ -24,6 +24,13 @@ git filter-repo --analyze
 
 
 -----------------------
+MAKE GIT CASE SENSITIVE
+-----------------------
+
+* git config core.ignorecase false
+
+
+-----------------------
 REMAME FILE (case only)
 -----------------------
 

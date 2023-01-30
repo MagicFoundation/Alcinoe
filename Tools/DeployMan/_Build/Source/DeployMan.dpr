@@ -305,12 +305,12 @@ begin
       Writeln('');
       Writeln('Usage:');
       Writeln('  DeployMan.exe');
-      Writeln('    -DProj: Path to the project file (*.dproj).');
-      Writeln('    -Paths: <LocalPath>|<IncludeSubDirs>|<RemotePath>. Separate paths with '';''.');
-      Writeln('    -Configurations: Default Debug;Release. Separate Configurations with '';''.');
-      Writeln('    -Platforms: Default Android;Android64;iOSDevice64;iOSSimARM64. Separate Platforms with '';''.');
-      Writeln('    -DProjNormalizer: Path to the Alcinoe DProjNormalizer tool.');
-      Writeln('    -NoInteraction: Non-interactive mode.');
+      Writeln('    -DProj=Path to the project file (*.dproj).');
+      Writeln('    -Paths=<LocalPath>|<IncludeSubDirs>|<RemotePath>. Separate paths with '';''.');
+      Writeln('    -Configurations=Default Debug;Release. Separate Configurations with '';''.');
+      Writeln('    -Platforms=Default Android;Android64;iOSDevice64;iOSSimARM64. Separate Platforms with '';''.');
+      Writeln('    -DProjNormalizer=Path to the Alcinoe DProjNormalizer tool.');
+      Writeln('    -NoInteraction=Non-interactive mode.');
       Writeln('');
       Writeln('Example:');
       Writeln('  DeployMan.exe^');

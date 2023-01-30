@@ -477,12 +477,12 @@ begin
       Writeln('');
       Writeln('Usage:');
       Writeln('  NativeBridgeFileGeneratorHelper.exe');
-      Writeln('    -Action: Actually only "Compare" and "Copy" is supported.');
-      Writeln('    -MasterFile: Path of the source file to compare with.');
-      Writeln('    -OutputDir: Path where are located all the new generated files.');
-      Writeln('    -CustomFrameworksDir: Path of the Custom Frameworks to copy in Frameworks.');
-      Writeln('    -FrameworksDir: Path of the Frameworks.');
-      Writeln('    -Platform: iOS or MacOS.');
+      Writeln('    -Action=Actually only "Compare" and "Copy" is supported.');
+      Writeln('    -MasterFile=Path of the source file to compare with.');
+      Writeln('    -OutputDir=Path where are located all the new generated files.');
+      Writeln('    -CustomFrameworksDir=Path of the Custom Frameworks to copy in Frameworks.');
+      Writeln('    -FrameworksDir=Path of the Frameworks.');
+      Writeln('    -Platform=iOS or MacOS.');
       Writeln('');
       Writeln('Example:');
       Writeln('  NativeBridgeFileGeneratorHelper.exe^');

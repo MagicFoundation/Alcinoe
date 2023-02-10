@@ -3632,12 +3632,12 @@ var aCipherKey128: TALCipherKey128;
     aCipherKey256: Tbytes;
 {$IFEND}
 begin
-  if keyDerivationFunction = MD5 then begin
+  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
     ALStringHashMD5(aCipherKey128, Key);
     AlRDLEncryptString(InString,OutString, aCipherKey128, 16, Encrypt);
   end
   {$IF CompilerVersion >= 32} // tokyo
-  else if keyDerivationFunction = SHA2 then begin
+  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
     ALStringHashSHA2(aCipherKey256, Key);
     AlRDLEncryptString(InString,OutString, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
@@ -3656,12 +3656,12 @@ var aCipherKey128: TALCipherKey128;
     aCipherKey256: Tbytes;
 {$IFEND}
 begin
-  if keyDerivationFunction = MD5 then begin
+  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
     ALStringHashMD5(aCipherKey128, Key);
     AlRDLEncryptStringCBC(InString, OutString, aCipherKey128, 16, Encrypt);
   end
   {$IF CompilerVersion >= 32} // tokyo
-  else if keyDerivationFunction = SHA2 then begin
+  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
     ALStringHashSHA2(aCipherKey256, Key);
     AlRDLEncryptStringCBC(InString, OutString, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
@@ -3679,12 +3679,12 @@ var aCipherKey128: TALCipherKey128;
     aCipherKey256: Tbytes;
 {$IFEND}
 begin
-  if keyDerivationFunction = MD5 then begin
+  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
     ALStringHashMD5(aCipherKey128, Key);
     Result := AlRDLEncryptString(InString, aCipherKey128, 16, Encrypt);
   end
   {$IF CompilerVersion >= 32} // tokyo
-  else if keyDerivationFunction = SHA2 then begin
+  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
     ALStringHashSHA2(aCipherKey256, Key);
     Result := AlRDLEncryptString(InString, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
@@ -3702,12 +3702,12 @@ var aCipherKey128: TALCipherKey128;
     aCipherKey256: Tbytes;
 {$IFEND}
 begin
-  if keyDerivationFunction = MD5 then begin
+  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
     ALStringHashMD5(aCipherKey128, Key);
     result := AlRDLEncryptStringCBC(InString, aCipherKey128, 16, Encrypt);
   end
   {$IF CompilerVersion >= 32} // tokyo
-  else if keyDerivationFunction = SHA2 then begin
+  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
     ALStringHashSHA2(aCipherKey256, Key);
     result := AlRDLEncryptStringCBC(InString, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
@@ -3725,12 +3725,12 @@ var aCipherKey128: TALCipherKey128;
     aCipherKey256: Tbytes;
 {$IFEND}
 begin
-  if keyDerivationFunction = MD5 then begin
+  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
     ALStringHashMD5(aCipherKey128, Key);
     AlRDLEncryptStream(InStream, OutStream, aCipherKey128, 16, Encrypt);
   end
   {$IF CompilerVersion >= 32} // tokyo
-  else if keyDerivationFunction = SHA2 then begin
+  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
     ALStringHashSHA2(aCipherKey256, Key);
     AlRDLEncryptStream(InStream, OutStream, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
@@ -3748,12 +3748,12 @@ var aCipherKey128: TALCipherKey128;
     aCipherKey256: Tbytes;
 {$IFEND}
 begin
-  if keyDerivationFunction = MD5 then begin
+  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
     ALStringHashMD5(aCipherKey128, Key);
     AlRDLEncryptStreamCBC(InStream, OutStream, aCipherKey128, 16, Encrypt);
   end
   {$IF CompilerVersion >= 32} // tokyo
-  else if keyDerivationFunction = SHA2 then begin
+  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
     ALStringHashSHA2(aCipherKey256, Key);
     AlRDLEncryptStreamCBC(InStream, OutStream, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
@@ -3874,12 +3874,12 @@ var aCipherKey128: TALCipherKey128;
     aCipherKey256: Tbytes;
 {$ENDIF}
 begin
-  if keyDerivationFunction = MD5 then begin
+  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
     ALStringHashMD5U(aCipherKey128, Key, encoding);
     AlRDLEncryptStringU(InString,OutString, aCipherKey128, 16, Encrypt, encoding, UseBase64);
   end
   {$IF CompilerVersion >= 32} // tokyo
-  else if keyDerivationFunction = SHA2 then begin
+  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
     ALStringHashSHA2U(aCipherKey256, Key, encoding);
     AlRDLEncryptStringU(InString,OutString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding, UseBase64);
   end
@@ -3900,12 +3900,12 @@ var aCipherKey128: TALCipherKey128;
     aCipherKey256: Tbytes;
 {$ENDIF}
 begin
-  if keyDerivationFunction = MD5 then begin
+  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
     ALStringHashMD5U(aCipherKey128, Key, encoding);
     AlRDLEncryptStringCBCU(InString, OutString, aCipherKey128, 16, Encrypt, encoding, UseBase64);
   end
   {$IF CompilerVersion >= 32} // tokyo
-  else if keyDerivationFunction = SHA2 then begin
+  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
     ALStringHashSHA2U(aCipherKey256, Key, encoding);
     AlRDLEncryptStringCBCU(InString, OutString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding, UseBase64);
   end
@@ -3925,12 +3925,12 @@ var aCipherKey128: TALCipherKey128;
     aCipherKey256: Tbytes;
 {$ENDIF}
 begin
-  if keyDerivationFunction = MD5 then begin
+  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
     ALStringHashMD5U(aCipherKey128, Key, encoding);
     Result := AlRDLEncryptStringU(InString, aCipherKey128, 16, Encrypt, encoding, UseBase64);
   end
   {$IF CompilerVersion >= 32} // tokyo
-  else if keyDerivationFunction = SHA2 then begin
+  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
     ALStringHashSHA2U(aCipherKey256, Key, encoding);
     Result := AlRDLEncryptStringU(InString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding, UseBase64);
   end
@@ -3950,12 +3950,12 @@ var aCipherKey128: TALCipherKey128;
     aCipherKey256: Tbytes;
 {$ENDIF}
 begin
-  if keyDerivationFunction = MD5 then begin
+  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
     ALStringHashMD5U(aCipherKey128, Key, encoding);
     result := AlRDLEncryptStringCBCU(InString, aCipherKey128, 16, Encrypt, encoding, UseBase64);
   end
   {$IF CompilerVersion >= 32} // tokyo
-  else if keyDerivationFunction = SHA2 then begin
+  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
     ALStringHashSHA2U(aCipherKey256, Key, encoding);
     result := AlRDLEncryptStringCBCU(InString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding, UseBase64);
   end
@@ -3974,12 +3974,12 @@ var aCipherKey128: TALCipherKey128;
     aCipherKey256: Tbytes;
 {$ENDIF}
 begin
-  if keyDerivationFunction = MD5 then begin
+  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
     ALStringHashMD5U(aCipherKey128, Key, encoding);
     AlRDLEncryptStream(InStream, OutStream, aCipherKey128, 16, Encrypt);
   end
   {$IF CompilerVersion >= 32} // tokyo
-  else if keyDerivationFunction = SHA2 then begin
+  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
     ALStringHashSHA2U(aCipherKey256, Key, encoding);
     AlRDLEncryptStream(InStream, OutStream, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
@@ -3998,12 +3998,12 @@ var aCipherKey128: TALCipherKey128;
     aCipherKey256: Tbytes;
 {$ENDIF}
 begin
-  if keyDerivationFunction = MD5 then begin
+  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
     ALStringHashMD5U(aCipherKey128, Key, encoding);
     AlRDLEncryptStreamCBC(InStream, OutStream, aCipherKey128, 16, Encrypt);
   end
   {$IF CompilerVersion >= 32} // tokyo
-  else if keyDerivationFunction = SHA2 then begin
+  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
     ALStringHashSHA2U(aCipherKey256, Key, encoding);
     AlRDLEncryptStreamCBC(InStream, OutStream, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
@@ -5432,7 +5432,7 @@ end;
 
 {**}
 type
-  _TRSAKeyType = (rsaPrivateKey, rsaPublicKey, rsaFullPrivate);
+  _TRSAKeyType = (PrivateKey, PublicKey, FullPrivate);
 
 {**********************}
 {$IF defined(MSWINDOWS)}
@@ -5533,9 +5533,9 @@ begin
 
   RSAKeyBlob.BitLength := APrivateKeyBlob.RSAPubKey.Bitlen;
   case AKeyType of
-    rsaPrivateKey: RSAKeyBlob.Magic :=  BCRYPT_RSAPRIVATE_MAGIC;
-    rsaPublicKey: RSAKeyBlob.Magic :=  BCRYPT_RSAPUBLIC_MAGIC;
-    rsaFullPrivate: RSAKeyBlob.Magic :=  BCRYPT_RSAFULLPRIVATE_MAGIC;
+    _TRSAKeyType.PrivateKey: RSAKeyBlob.Magic :=  BCRYPT_RSAPRIVATE_MAGIC;
+    _TRSAKeyType.PublicKey: RSAKeyBlob.Magic :=  BCRYPT_RSAPUBLIC_MAGIC;
+    _TRSAKeyType.FullPrivate: RSAKeyBlob.Magic :=  BCRYPT_RSAFULLPRIVATE_MAGIC;
     else raise Exception.Create('Key type unknown');
   end;
   RSAKeyBlob.cbPublicExp := CbExp;
@@ -5547,10 +5547,10 @@ begin
   CbResult := SizeOf(RSAKeyBlob) + RSAKeyBlob.cbPublicExp;
 
   inc(CbResult, length(APrivateKeyBlob.Modulus));
-  if AKeyType in [rsaPrivateKey, rsaFullPrivate] then begin
+  if AKeyType in [_TRSAKeyType.PrivateKey, _TRSAKeyType.FullPrivate] then begin
     inc(CbResult, length(APrivateKeyBlob.Prime1));
     inc(CbResult, length(APrivateKeyBlob.Prime2));
-    if AKeyType = rsaFullPrivate then begin
+    if AKeyType = _TRSAKeyType.FullPrivate then begin
       inc(CbResult, length(APrivateKeyBlob.Exponent1));
       inc(CbResult, length(APrivateKeyBlob.Exponent2));
       inc(CbResult, length(APrivateKeyBlob.Coefficient));
@@ -5570,10 +5570,10 @@ begin
 
   // Other components
   _CheckAndCopyToBuffer(APrivateKeyBlob.Modulus, RSACursor);
-  if AKeyType in [rsaPrivateKey, rsaFullPrivate] then begin
+  if AKeyType in [_TRSAKeyType.PrivateKey, _TRSAKeyType.FullPrivate] then begin
     _CheckAndCopyToBuffer(APrivateKeyBlob.Prime1, RSACursor);
     _CheckAndCopyToBuffer(APrivateKeyBlob.Prime2, RSACursor);
-    if AKeyType = rsaFullPrivate then begin
+    if AKeyType = _TRSAKeyType.FullPrivate then begin
       _CheckAndCopyToBuffer(APrivateKeyBlob.Exponent1, RSACursor);
       _CheckAndCopyToBuffer(APrivateKeyBlob.Exponent2, RSACursor);
       _CheckAndCopyToBuffer(APrivateKeyBlob.Coefficient, RSACursor);
@@ -5845,7 +5845,7 @@ begin
   //init RSAKeyBlobAndData
   RSAKeyBlobAndData := _PrivateKeyBlob2BcryptRSAKeyBlobAndData(
                          _PKCS1Blob2PrivateKeyBlob(KeyBlob, cbKeyBlob),
-                         rsaPrivateKey);
+                         _TRSAKeyType.PrivateKey);
 
   //loads and initializes a CNG provider
   _CheckNTStatusResult(

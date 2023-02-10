@@ -135,6 +135,7 @@ unit Alcinoe.JSONDoc;
 interface
 
 {$I Alcinoe.inc}
+{$SCOPEDENUMS OFF}
 
 uses
   system.Classes,

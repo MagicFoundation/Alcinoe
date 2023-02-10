@@ -472,16 +472,16 @@ begin
   { Connect }
   Connect;
 
-  If ProtocolVersion = HTTPpv_1_1 then LStrProtocolVersion := 'HTTP/1.1'
+  If ProtocolVersion = TALHTTPProtocolVersion.v1_1 then LStrProtocolVersion := 'HTTP/1.1'
   else LStrProtocolVersion := 'HTTP/1.0';
 
-  if      aRequestMethod = HTTPmt_Post then    LStrVerb := 'POST'
-  else if aRequestMethod = HTTPmt_Get then     LStrVerb := 'GET'
-  else if aRequestMethod = HTTPmt_head then    LStrVerb := 'HEAD'
-  else if aRequestMethod = HTTPmt_trace then   LStrVerb := 'TRACE'
-  else if aRequestMethod = HTTPmt_Put then     LStrVerb := 'PUT'
-  else if aRequestMethod = HTTPmt_Delete then  LStrVerb := 'DELETE'
-  else if aRequestMethod = HTTPmt_Options then LStrVerb := 'OPTIONS'
+  if      aRequestMethod = TALHTTPMethod.Post then    LStrVerb := 'POST'
+  else if aRequestMethod = TALHTTPMethod.Get then     LStrVerb := 'GET'
+  else if aRequestMethod = TALHTTPMethod.head then    LStrVerb := 'HEAD'
+  else if aRequestMethod = TALHTTPMethod.trace then   LStrVerb := 'TRACE'
+  else if aRequestMethod = TALHTTPMethod.Put then     LStrVerb := 'PUT'
+  else if aRequestMethod = TALHTTPMethod.Delete then  LStrVerb := 'DELETE'
+  else if aRequestMethod = TALHTTPMethod.Options then LStrVerb := 'OPTIONS'
   else raise Exception.Create('Unknown Request Method');
 
   SetLength(LAcceptTypes, 2);

@@ -879,7 +879,7 @@ begin
       end;
     end;
 
-    if (PriorityDirection = GreaterThan) then begin
+    if (PriorityDirection = TPriorityDirection.GreaterThan) then begin
       if LGreaterThanFoundIndex > -1 then result := fRequests.ExtractAt(LGreaterThanFoundIndex)
       else if LLesserThanFoundIndex > -1 then result := fRequests.ExtractAt(LLesserThanFoundIndex)
       else result := nil;

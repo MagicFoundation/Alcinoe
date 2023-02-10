@@ -30,16 +30,16 @@ type
   TALHTTPPropertyChangeEvent = procedure(sender: Tobject; Const PropertyIndex: Integer) of object;
 
   {--protocol version--}
-  TALHTTPProtocolVersion = (HTTPpv_1_0, HTTPpv_1_1);
+  TALHTTPProtocolVersion = (v1_0, v1_1);
 
   {--Request method--}
-  TALHTTPMethod = (HTTPmt_Get,
-                   HTTPmt_Post,
-                   HTTPmt_Head,
-                   HTTPmt_Trace,
-                   HTTPmt_Put,
-                   HTTPmt_Delete,
-                   HTTPmt_Options);
+  TALHTTPMethod = (Get,
+                   Post,
+                   Head,
+                   Trace,
+                   Put,
+                   Delete,
+                   Options);
 
   {--Request header--}
   TALHTTPRequestHeader = Class(TObject)
@@ -400,7 +400,7 @@ type
     property  UploadBufferSize: cardinal read FUploadBufferSize write FUploadBufferSize default $8000;
     property  ProxyParams: TALHTTPClientProxyParams read FProxyParams;
     property  RequestHeader: TALHTTPRequestHeader read FRequestHeader;
-    Property  ProtocolVersion: TALHTTPProtocolVersion read FProtocolVersion write FProtocolVersion default HTTPpv_1_1;
+    Property  ProtocolVersion: TALHTTPProtocolVersion read FProtocolVersion write FProtocolVersion default TALHTTPProtocolVersion.v1_1;
     property  UserName: AnsiString read FUserName write SetUserName;
     property  Password: AnsiString read FPassword write SetPassword;
     property  OnUploadProgress: TALHTTPClientUploadProgressEvent read FOnUploadProgress write FOnUploadProgress;
@@ -2039,7 +2039,7 @@ begin
   FProxyParams.OnChange := OnProxyParamsChange;
   FRequestHeader := TALHTTPRequestHeader.Create;
   FRequestHeader.UserAgent := 'Mozilla/3.0 (compatible; TALHTTPClient)';
-  FProtocolVersion := HTTPpv_1_1;
+  FProtocolVersion := TALHTTPProtocolVersion.v1_1;
 end;
 
 {*******************************}
@@ -2113,7 +2113,7 @@ procedure TALHTTPClient.Get(const aUrl: AnsiString;
                             const ARequestHeaderValues: TALNameValueArray = nil);
 begin
   Execute(aUrl,
-          HTTPmt_get,
+          TALHTTPMethod.get,
           nil,
           ARequestHeaderValues,
           aResponseContent,
@@ -2171,7 +2171,7 @@ begin
     If assigned(aPostDataStream) then FrequestHeader.ContentLength := ALIntToStr(aPostDataStream.Size)
     else FrequestHeader.ContentLength := '0';
     Execute(aURL,
-            HTTPmt_Post,
+            TALHTTPMethod.Post,
             aPostDataStream,
             ARequestHeaderValues,
             aResponseContent,
@@ -2359,7 +2359,7 @@ procedure TALHTTPClient.Head(const aUrl: AnsiString;
                              const ARequestHeaderValues: TALNameValueArray = nil);
 begin
   Execute(aURL,
-          HTTPmt_head,
+          TALHTTPMethod.head,
           nil,
           ARequestHeaderValues,
           aResponseContent,
@@ -2390,7 +2390,7 @@ procedure TALHTTPClient.Trace(const aUrl: AnsiString;
                               const ARequestHeaderValues: TALNameValueArray = nil);
 begin
   Execute(aURL,
-          HTTPmt_Trace,
+          TALHTTPMethod.Trace,
           nil,
           ARequestHeaderValues,
           aResponseContent,
@@ -2427,7 +2427,7 @@ begin
     If assigned(aPutDataStream) then FrequestHeader.ContentLength := ALIntToStr(aPutDataStream.Size)
     else FrequestHeader.ContentLength := '0';
     Execute(aURL,
-            HTTPmt_Put,
+            TALHTTPMethod.Put,
             aPutDataStream,
             ARequestHeaderValues,
             aResponseContent,
@@ -2463,7 +2463,7 @@ procedure TALHTTPClient.Delete(const aUrl: AnsiString;
                                const ARequestHeaderValues: TALNameValueArray = nil);
 begin
   Execute(aURL,
-          HTTPmt_Delete,
+          TALHTTPMethod.Delete,
           nil,
           ARequestHeaderValues,
           aResponseContent,
@@ -2494,7 +2494,7 @@ procedure TALHTTPClient.Options(const aUrl: AnsiString;
                                 const ARequestHeaderValues: TALNameValueArray = nil);
 begin
   Execute(aURL,
-          HTTPmt_Options,
+          TALHTTPMethod.Options,
           nil,
           ARequestHeaderValues,
           aResponseContent,

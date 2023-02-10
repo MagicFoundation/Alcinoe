@@ -74,3 +74,5 @@
 {$IF not defined(MSWINDOWS)}
   {$DEFINE ALHttpGzipAuto}
 {$ENDIF}
+
+{$SCOPEDENUMS ON}

@@ -59,17 +59,29 @@ echo.
 
 FOR %%a IN ("%ProjectDir%\rtl\win\*") DO IF /i NOT "%%~nxa"=="Winapi.Isapi2.pas" DEL "%%a"
 
-REM add <UTF8BOM>{$HINTS OFF}{ at the beginning of each .pas
+for /f "delims=" %%a IN ('dir /b /s %ProjectDir%\*.pas') do Call :ADD_HINTS_OFF "%%a"
+
+goto FINISHED
+
+
+:ADD_HINTS_OFF
+
+REM %~1 the pas file
+
 SET TmpFileName=%ProjectDir%\~temp.pas
-set "RemoveUTF8BOM=(pause & pause & pause)>nul"
-for /f "delims=" %%a IN ('dir /b /s %ProjectDir%\*.pas') do (
-  IF EXIST "%TmpFileName%" del "%TmpFileName%"
-  IF EXIST "%TmpFileName%" goto ERROR
+IF EXIST "%TmpFileName%" del "%TmpFileName%"
+IF EXIST "%TmpFileName%" goto ERROR
+certutil -dump "%~1" | findstr /C:"ef bb bf" > nul
+if %errorlevel% equ 0 (
   echo ﻿{$HINTS OFF}{>"%TmpFileName%"
-  type "%%a">>"%TmpFileName%"
-  del "%%a"
-  move "%TmpFileName%" "%%a" >nul
+) else (
+  echo {$HINTS OFF}>"%TmpFileName%"
 )
+type "%~1">>"%TmpFileName%"
+del "%~1"
+move "%TmpFileName%" "%~1" >nul
+
+EXIT /B 0
 
 :FINISHED
 @echo Finished

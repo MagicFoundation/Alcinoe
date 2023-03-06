@@ -8,8 +8,6 @@ interface
   {$MESSAGE WARN 'Check if FMX.TabControl.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
-{$SCOPEDENUMS ON}
-
 uses
   System.Classes,
   System.UITypes,
@@ -522,8 +520,8 @@ end;
 destructor TALTabControl.Destroy;
 begin
   TMessageManager.DefaultManager.Unsubscribe(TALScrollingAcquiredMessage, fScrollingAcquiredByOtherMessageID);
-  ALFreeAndNil(FAniCalculations); // >> will call disposeOF if necessary
-  ALFreeAndNil(FAniTransition);   // >> will call disposeOF if necessary
+  ALFreeAndNil(FAniCalculations);
+  ALFreeAndNil(FAniTransition);
   inherited;
 end;
 
@@ -677,6 +675,8 @@ procedure TALTabControl.SetTabIndex(const Value: Integer);
 
 begin
   if FTabIndex <> Value then begin
+    if HasActiveTab then
+      ActiveTab.ResetFocus;
     DeselectActiveTab;
     FTabIndex := Value;
     SelectActiveTab;
@@ -1241,7 +1241,7 @@ begin
     else if TabIndex = Index then LTabIndex := Index
     else LTabIndex := -1;
     Obj := (Self as IItemsContainer).GetItem(Index);
-    ALFreeAndNil(Obj); // >> will call disposeOF if necessary
+    ALFreeAndNil(Obj);
     if (LTabIndex >= 0) and FindVisibleTab(LTabIndex, TFindKind.Current) then
       TabIndex := LTabIndex;
   end;

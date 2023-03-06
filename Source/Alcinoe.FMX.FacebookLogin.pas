@@ -48,10 +48,6 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported}
-  {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-27606 is implemented and if yes update the previous documentation regarding "Setup (IOS)"'}
-{$IFEND}
-
 uses
   {$IF defined(android)}
   Androidapi.JNI.JavaTypes,

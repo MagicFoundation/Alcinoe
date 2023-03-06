@@ -172,10 +172,8 @@ type
 
 {$IF CompilerVersion <= 25} // xe4
 type
-  {$SCOPEDENUMS ON}
   THorzRectAlign = (Center, Left, Right);
   TVertRectAlign = (Center, Top, Bottom);
-  {$SCOPEDENUMS OFF}
 {$IFEND}
 
 type

@@ -527,7 +527,7 @@ begin
     CheckError(not Assigned(FInetConnect));
 
     {init ProtocolVersion}
-    If ProtocolVersion = HTTPpv_1_1 then LStrProtocolVersion := 'HTTP/1.1'
+    If ProtocolVersion = TALHTTPProtocolVersion.v1_1 then LStrProtocolVersion := 'HTTP/1.1'
     else LStrProtocolVersion := 'HTTP/1.0';
 
     {init AcceptTypes}

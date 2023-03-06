@@ -1335,7 +1335,6 @@ begin
   Result := TALStringKeyAVLBinaryTreeNode(inherited Prev(aNode));
 end;
 
-
 {****************************************************************************************************}
 function TALStringKeyAVLBinaryTree.CompareKeyCaseInSensitive(const aKey1, aKey2: AnsiString): Integer;
 begin

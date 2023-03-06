@@ -15,7 +15,7 @@ interface
   //Alcinoe.iOSApi.FirebaseMessaging.pas and this one to see if the api signature is
   //still the same
   {$MESSAGE WARN 'Check if the api signature of the last version of Firebase Messaging (ios) is still the same'}
-{$IFEND}
+{$ENDIF}
 
 uses
   Macapi.ObjectiveC,

@@ -15,7 +15,7 @@ interface
   //compare between the new generated Alcinoe.AndroidApi.VKontakte.pas and this one to see if the api
   //signature is still the same
   {$MESSAGE WARN 'Check if the api signature of the last version of VKontakte sdk (android) is still the same'}
-{$IFEND}
+{$ENDIF}
 
 uses
   Androidapi.JNI.GraphicsContentViewText,

@@ -8,8 +8,6 @@ interface
   {$MESSAGE WARN 'Check if FMX.InertialMovement.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
-{$SCOPEDENUMS ON}
-
 uses
   System.Types,
   System.UITypes,
@@ -1667,8 +1665,7 @@ end;
 function TALAniCalculations.GetPositions(const Index: Integer): TALPointD;
 begin
   if (index < 0) or (index >= PositionCount) then
-    raise EListError.CreateFMT(sArgumentOutOfRange_Index,
-      [index, PositionCount]);
+    ListIndexError(Index, PositionCount - 1, Self);
   Result := FPointTime[index].Point;
 end;
 
@@ -1676,8 +1673,7 @@ end;
 function TALAniCalculations.GetPositionTimes(const Index: Integer): TDateTime;
 begin
   if (index < 0) or (index >= PositionCount) then
-    raise EListError.CreateFMT(sArgumentOutOfRange_Index,
-      [index, PositionCount]);
+    ListIndexError(Index, PositionCount - 1, Self);
   Result := FPointTime[index].Time;
 end;
 

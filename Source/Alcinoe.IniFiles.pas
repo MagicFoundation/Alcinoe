@@ -10,7 +10,7 @@ interface
 {$I Alcinoe.inc}
 
 {$IFNDEF ALCompilerVersionSupported}
-  {$MESSAGE WARN 'Check if System.IniFiles still has the exact same fields and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if System.IniFiles was not updated and adjust the IFDEF'}
 {$ENDIF}
 
 uses

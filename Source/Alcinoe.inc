@@ -1,5 +1,5 @@
 //https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Compiler_Versions
-{$IF (CompilerVersion <= 35.0) and (not defined(RTLVersion113))} // This mean <= Delphi Alexandria 11.2
+{$IF (CompilerVersion <= 35.0) and (not declared(RTLVersion114))} // This mean <= Delphi Alexandria 11.3
   //When updating this block then first create the define ALCompilerVersionSupported_TMP that
   //is set for the current compiler version, then progressively replace in all source
   //files ALCompilerVersionSupported by ALCompilerVersionSupported_TMP and when everything done

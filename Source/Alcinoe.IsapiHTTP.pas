@@ -383,13 +383,13 @@ function TALWebRequest.GetMethodType: TALHTTPMethod;
 var LMethodStr : AnsiString;
 begin
   LMethodStr := Method;
-       if ALSameText(LMethodStr, 'GET')     then result := HTTPmt_Get
-  else if ALSameText(LMethodStr, 'POST')    then result := HTTPmt_Post
-  else if ALSameText(LMethodStr, 'PUT')     then result := HTTPmt_Put
-  else if ALSameText(LMethodStr, 'HEAD')    then result := HTTPmt_Head
-  else if ALSameText(LMethodStr, 'TRACE')   then result := HTTPmt_Trace
-  else if ALSameText(LMethodStr, 'DELETE')  then result := HTTPmt_Delete
-  else if ALSameText(LMethodStr, 'OPTIONS') then result := HTTPmt_Options
+       if ALSameText(LMethodStr, 'GET')     then result := TALHTTPMethod.Get
+  else if ALSameText(LMethodStr, 'POST')    then result := TALHTTPMethod.Post
+  else if ALSameText(LMethodStr, 'PUT')     then result := TALHTTPMethod.Put
+  else if ALSameText(LMethodStr, 'HEAD')    then result := TALHTTPMethod.Head
+  else if ALSameText(LMethodStr, 'TRACE')   then result := TALHTTPMethod.Trace
+  else if ALSameText(LMethodStr, 'DELETE')  then result := TALHTTPMethod.Delete
+  else if ALSameText(LMethodStr, 'OPTIONS') then result := TALHTTPMethod.Options
   else raise Exception.Create('Unknown method type');
 end;
 

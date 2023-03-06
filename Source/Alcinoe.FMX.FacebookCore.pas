@@ -77,7 +77,7 @@ Setup (IOS)
 
 https://developers.facebook.com/docs/ios/getting-started
 
-1) follow the step bescribed described in ALFmxFirebaseMessaging
+1) follow the step bescribed described for FIREBASE in Alcinoe.FMX.FirebaseMessaging.pas
      1) : LD linker add -ObjC
      3) : Add the libswift frameworks for ios64 and Ios64 simulator
      4) : LD linker add -rpath /usr/lib/swift
@@ -152,10 +152,6 @@ unit Alcinoe.FMX.FacebookCore;
 interface
 
 {$I Alcinoe.inc}
-
-{$IFNDEF ALCompilerVersionSupported}
-  {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-27606 is implemented and if yes update the previous documentation regarding "Setup (IOS)"'}
-{$IFEND}
 
 {***********************}
 procedure ALInitFacebook;
@@ -258,7 +254,7 @@ begin
         //so for now I simply skip it and I add this warn to verify if one day
         //SceneDelegate will be implemented in delphi
         {$MESSAGE WARN 'Check if SceneDelegate is implemented in Delphi source code'}
-      {$IFEND}
+      {$ENDIF}
       TFBSDKApplicationDelegate.OCClass.sharedInstance.applicationOpenURLOptions(
         TiOSHelper.SharedApplication, // application: UIApplication
         StrToNSUrl(Lcontext.Url),  // openURL: NSURL;
@@ -275,7 +271,7 @@ begin
       {$ENDIF}
       {$IFNDEF ALCompilerVersionSupported}
         {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-40351 is implemented like expected (With TiOSOpenApplicationContext)'}
-      {$IFEND}
+      {$ENDIF}
       var LdidFinishLaunchingWithOptions: NSDictionary;
       if LValue.Context <> nil then LdidFinishLaunchingWithOptions := TNSDictionary.Wrap(TiOSOpenApplicationContext(LValue.Context).Context)
       else LdidFinishLaunchingWithOptions := nil;

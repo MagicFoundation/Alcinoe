@@ -8,8 +8,6 @@ interface
   {$MESSAGE WARN 'Check if FMX.ScrollBox.iOS.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
-{$SCOPEDENUMS ON}
-
 uses
   System.TypInfo,
   Macapi.ObjectiveC,

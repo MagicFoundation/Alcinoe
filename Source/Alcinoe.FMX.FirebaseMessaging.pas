@@ -43,7 +43,6 @@ Setup (IOS)
    c:\SDKs\iPhoneOS16.1.sdk\Applications\Xcode.app\Contents\Developer\Toolchains\XcodeDefault.xctoolchain\usr\lib\swift  to  c:\SDKs\iPhoneOS16.1.sdk\usr\lib\swift
    c:\SDKs\iPhoneOS16.1.sdk\Applications\Xcode.app\Contents\Developer\Toolchains\XcodeDefault.xctoolchain\usr\lib\swift-5.0  to  c:\SDKs\iPhoneOS16.1.sdk\usr\lib\swift-5.0
    c:\SDKs\iPhoneOS16.1.sdk\Applications\Xcode.app\Contents\Developer\Toolchains\XcodeDefault.xctoolchain\usr\lib\swift-5.5  to  c:\SDKs\iPhoneOS16.1.sdk\usr\lib\swift-5.5
-   and then you can delete the folder c:\SDKs\iPhoneOS16.1.sdk\Applications\
 
 4) In the Project > Option > Building > Delphi Compiler > Linking >
    Options passed to the LD linker add -rpath /usr/lib/swift
@@ -239,8 +238,6 @@ unit Alcinoe.FMX.FirebaseMessaging;
 interface
 
 {$I Alcinoe.inc}
-
-{$SCOPEDENUMS ON}
 
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-40216 is implemented and if yes update the previous documentation regarding "Setup (IOS)"'}
@@ -994,7 +991,7 @@ end;
 
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-40134 is corrected and if yes remove the declaration below'}
-{$IFEND}
+{$ENDIF}
 const
   UNNotificationPresentationOptionNone = 0;
 

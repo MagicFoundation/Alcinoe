@@ -83,6 +83,7 @@ implementation
 
 uses
   System.SysUtils,
+  Alcinoe.Common,
   Alcinoe.StringUtils;
 
 {*****************************************************************************************}

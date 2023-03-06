@@ -15,7 +15,7 @@ interface
   //Alcinoe.iOSApi.FacebookCoreKit.pas and this one to see if the api signature is
   //still the same
   {$MESSAGE WARN 'Check if the api signature of the last version of facebook CoreKit (ios) is still the same'}
-{$IFEND}
+{$ENDIF}
 
 uses
   Macapi.ObjectiveC,
@@ -101,7 +101,7 @@ procedure libvMiscLoader; cdecl; external '/System/Library/Frameworks/Accelerate
 
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-38700 is corrected and if yes check if all declarations below are still mandatories.'}
-{$IFEND}
+{$ENDIF}
 procedure libswiftCompatibility50Loader; cdecl; external '/usr/lib/swift/iphoneos/libswiftCompatibility50.a';
 procedure libswiftCompatibility51Loader; cdecl; external '/usr/lib/swift/iphoneos/libswiftCompatibility51.a';
 procedure libswiftCompatibilityConcurrencyLoader; cdecl; external '/usr/lib/swift/iphoneos/libswiftCompatibilityConcurrency.a';

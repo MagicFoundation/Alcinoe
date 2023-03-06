@@ -15,7 +15,7 @@ interface
   //Alcinoe.iOSApi.FacebookShareKit.pas and this one to see if the api signature is
   //still the same
   {$MESSAGE WARN 'Check if the api signature of the last version of facebook ShareKit (ios) is still the same'}
-{$IFEND}
+{$ENDIF}
 
 uses
   Macapi.ObjectiveC,

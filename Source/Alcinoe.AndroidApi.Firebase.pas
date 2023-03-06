@@ -16,7 +16,7 @@ interface
   //signature is still the same. repeat the operation below with the library
   //com.google.firebase:firebase-analytics:xx.xx.xx
   {$MESSAGE WARN 'Check if the api signature of the last version of firebase sdk (android) is still the same'}
-{$IFEND}
+{$ENDIF}
 
 uses
   Androidapi.JNIBridge,

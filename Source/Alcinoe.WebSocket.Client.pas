@@ -59,7 +59,7 @@ type
     property  BufferSize: cardinal read FBufferSize write SetBufferSize default $8000;
     property  ProxyParams: TALHttpClientProxyParams read FProxyParams;
     property  RequestHeader: TALHTTPRequestHeader read FRequestHeader;
-    Property  ProtocolVersion: TALHTTPProtocolVersion read FProtocolVersion write FProtocolVersion default HTTPpv_1_1;
+    Property  ProtocolVersion: TALHTTPProtocolVersion read FProtocolVersion write FProtocolVersion default TALHTTPProtocolVersion.v1_1;
     property  UserName: AnsiString read FUserName write SetUserName;
     property  Password: AnsiString read FPassword write SetPassword;
     property  OnReceive: TALWebSocketClientReceiveEvent read FOnReceive write SetOnReceive;
@@ -90,7 +90,7 @@ begin
   FProxyParams.OnChange := OnProxyParamsChange;
   FRequestHeader := TALHTTPRequestHeader.Create;
   FRequestHeader.UserAgent := 'Mozilla/3.0 (compatible; TALWebSocketClient)';
-  FProtocolVersion := HTTPpv_1_1;
+  FProtocolVersion := TALHTTPProtocolVersion.v1_1;
   fAutoReconnect := True;
 end;
 

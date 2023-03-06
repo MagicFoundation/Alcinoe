@@ -44,7 +44,6 @@ interface
 {.$H+} {Long string}
 {.$B-} {Boolean short-circuit evaluation}
 {.$R-} {Range-Checking}
-{$SCOPEDENUMS ON}
 
 uses
   {$IFDEF MSWINDOWS}
@@ -870,7 +869,7 @@ begin
     if EraInfo[I].EraName = '' then Break;
     if ALPos(EraInfo[I].EraName, Name) > 0 then
     begin
-      Result := EraInfo[I].EraOffset;
+      Result := EraInfo[I].EraOffset - 1;
       Exit;
     end;
   end;
@@ -1305,9 +1304,9 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if System.SysUtils.ConvertErrorFmt is still the same and adjust the IFDEF'}
 {$IFEND}
-procedure ALConvertErrorFmt(ResString: PResStringRec; const Args: array of const); local;
+procedure ALConvertErrorFmt(ResString: PResStringRec; const Args: array of const); {$IFDEF ELF} local; {$ENDIF}
 begin
-  raise EConvertError.CreateResFmt(ResString, Args);
+  raise EConvertError.CreateResFmt(ResString, Args) at ReturnAddress;
 end;
 
 {**********************************}
@@ -2699,7 +2698,7 @@ var
         {$ELSE !MACOS}
         Result := FindEra(Trunc(DateTime));
         if Result > 0 then
-          Result := AFormatSettings.EraInfo[Result].EraOffset;
+          Result := AFormatSettings.EraInfo[Result].EraOffset -1;
         {$ENDIF MACOS}
       end;
     begin
@@ -3455,7 +3454,7 @@ begin
           if EraYearOffset = 0 then
           begin
             if High(AFormatSettings.EraInfo) >= 0 then
-              EraYearOffset := AFormatSettings.EraInfo[High(AFormatSettings.EraInfo)].EraOffset
+              EraYearOffset := AFormatSettings.EraInfo[High(AFormatSettings.EraInfo)].EraOffset - 1
             else
               Exit(False);
           end;
@@ -3671,7 +3670,7 @@ var
 begin
   OrigPos := Pos;
   Result := ALScanTimeRegular(S, Pos, Time, AFormatSettings);
-  if not Result or (Pos <= High(S)) then
+  if not Result or (Pos <= High(S)) and (S[Pos] <> '-') and (S[Pos] <> '+') then
   begin
     Pos := OrigPos;
     Result := ALScanTimeUsingShortTimeFormat(S, Pos, Time, AFormatSettings);

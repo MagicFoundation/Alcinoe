@@ -2319,6 +2319,7 @@ begin
     FLayout.Color := Color;
     FLayout.Font := Font;
     FLayout.Opacity := AbsoluteOpacity;
+    FLayout.RightToLeft := TFillTextFlag.RightToLeft in FillTextFlags;
     FLayout.Trimming := Trimming;
   finally
     FLayout.EndUpdate;
@@ -2372,6 +2373,7 @@ begin
     FLayout.LayoutCanvas := Self.Canvas;
     FLayout.TopLeft := LocalRect.TopLeft;
     FLayout.Opacity := AbsoluteOpacity;
+    FLayout.RightToLeft := TFillTextFlag.RightToLeft in FillTextFlags;
     FLayout.MaxSize := PointF(LocalRect.Width, LocalRect.Height);
   finally
     FLayout.EndUpdate;
@@ -2537,6 +2539,7 @@ begin
           FLayout.TopLeft := R.TopLeft;
           FLayout.MaxSize := PointF(R.Width, R.Height);
           FLayout.Opacity := AbsoluteOpacity;
+          FLayout.RightToLeft := TFillTextFlag.RightToLeft in FillTextFlags;
           FLayout.HorizontalAlign := TTextAlign.Leading;
           FLayout.VerticalAlign := TTextAlign.Leading;
         finally

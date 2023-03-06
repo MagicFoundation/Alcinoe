@@ -103,6 +103,36 @@ msbuild "%ALBaseDir%\Tests\_Source\ALTests.dproj" /p:config=Debug;DCC_MapFile=3 
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
+echo [36mMSBuild ALTests.dproj /p:config=Release /p:Platform=Android[0m
+msbuild "%ALBaseDir%\Tests\_Source\ALTests.dproj" /p:config=Release /p:Platform=Android /t:build /verbosity:minimal
+IF ERRORLEVEL 1 goto ERROR
+
+echo.
+echo [36mMSBuild ALTests.dproj /p:config=Release /p:Platform=Android64[0m
+msbuild "%ALBaseDir%\Tests\_Source\ALTests.dproj" /p:config=Release /p:Platform=Android64 /t:build /verbosity:minimal
+IF ERRORLEVEL 1 goto ERROR
+
+echo.
+echo [36mMSBuild ALTests.dproj /p:config=Release /p:Platform=iOSDevice64[0m
+msbuild "%ALBaseDir%\Tests\_Source\ALTests.dproj" /p:config=Release /p:Platform=iOSDevice64 /t:build /verbosity:minimal
+IF ERRORLEVEL 1 goto ERROR
+
+echo.
+echo [36mMSBuild ALTests.dproj /p:config=Release /p:Platform=iOSSimARM64[0m
+msbuild "%ALBaseDir%\Tests\_Source\ALTests.dproj" /p:config=Release /p:Platform=iOSSimARM64 /t:build /verbosity:minimal
+IF ERRORLEVEL 1 goto ERROR
+
+echo.
+echo [36mMSBuild ALTests.dproj /p:config=Release /p:Platform=OSX64[0m
+msbuild "%ALBaseDir%\Tests\_Source\ALTests.dproj" /p:config=Release /p:Platform=OSX64 /t:build /verbosity:minimal
+IF ERRORLEVEL 1 goto ERROR
+
+echo.
+echo [36mMSBuild ALTests.dproj /p:config=Release /p:Platform=OSXARM64[0m
+msbuild "%ALBaseDir%\Tests\_Source\ALTests.dproj" /p:config=Release /p:Platform=OSXARM64 /t:build /verbosity:minimal
+IF ERRORLEVEL 1 goto ERROR
+
+echo.
 echo [36mMSBuild ALTests.dproj /p:config=Release /p:Platform=Win32[0m
 msbuild "%ALBaseDir%\Tests\_Source\ALTests.dproj" /p:config=Release /p:Platform=Win32 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR

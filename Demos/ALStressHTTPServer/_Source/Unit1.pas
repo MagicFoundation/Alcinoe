@@ -10,7 +10,8 @@ uses Windows, winapi.winhttp, Messages, SysUtils, Variants, Classes, Graphics, C
      cxGridCustomView, cxGrid, Spin, dxSkinsCore, dxSkinFoggy, dxSkinscxPCPainter, cxPCdxBarPopupMenu,
      cxLookAndFeels, cxLookAndFeelPainters, cxContainer, Menus, dxSkinsForm,
      cxRadioGroup, cxGroupBox, cxButtons, cxTextEdit, cxMaskEdit, cxCheckBox,
-     cxMemo, cxLabel, cxPC, uiTypes, cxNavigator, dxBarBuiltInMenu, dxDateRanges, dxScrollbarAnnotations;
+     cxMemo, cxLabel, cxPC, uiTypes, cxNavigator, dxBarBuiltInMenu, dxDateRanges, dxScrollbarAnnotations,
+  dxCore;
 
 Const
   WM_UpdateGUI = WM_User + 1;
@@ -215,8 +216,8 @@ Begin
   HttpClientSendTimeout := StrToInt(EditSendTimeout.Text);
   HttpClientReceiveTimeout := StrToInt(EditReceiveTimeout.Text);
 
-  if RadioButtonProtocolVersion1_0.Checked then HttpClientProtocolVersion := HTTPpv_1_0
-  else HttpClientProtocolVersion := HTTPpv_1_1;
+  if RadioButtonProtocolVersion1_0.Checked then HttpClientProtocolVersion := TALHTTPProtocolVersion.v1_0
+  else HttpClientProtocolVersion := TALHTTPProtocolVersion.v1_1;
 
   HttpClientUploadBufferSize := StrToInt(EditBufferUploadSize.Text);
 

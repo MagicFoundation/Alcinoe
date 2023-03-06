@@ -6,7 +6,7 @@
     <MainSource>ALLiveVideoChatServer.dpr</MainSource>
     <Base>True</Base>
     <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Debug</Config>
-    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Win64</Platform>
+    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Win32</Platform>
     <TargetedPlatforms>3</TargetedPlatforms>
     <AppType>Console</AppType>
   </PropertyGroup>

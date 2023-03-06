@@ -277,8 +277,8 @@ begin
   while True do begin
     Data := ALRandomStr(250);
     Key := AlRandomStr(40);
-    ALRDLEncryptString(Data, Str1, Key, SHA2, True);
-    ALRDLEncryptString(Str1, Str2, Key, SHA2, false);
+    ALRDLEncryptString(Data, Str1, Key, TALkeyDerivationFunction.SHA2, True);
+    ALRDLEncryptString(Str1, Str2, Key, TALkeyDerivationFunction.SHA2, false);
     if str2 <> Data then Raise Exception.Create('!!Abnormal Error!!');
     inc(counter);
     if counter mod 1000 = 0 then begin
@@ -319,8 +319,8 @@ begin
   while True do begin
     Data := ALRandomStr(250);
     Key := AlRandomStr(40);
-    ALRDLEncryptStringCBC(Data, Str1, Key, SHA2, True);
-    ALRDLEncryptStringCBC(Str1, Str2, Key, SHA2, false);
+    ALRDLEncryptStringCBC(Data, Str1, Key, TALkeyDerivationFunction.SHA2, True);
+    ALRDLEncryptStringCBC(Str1, Str2, Key, TALkeyDerivationFunction.SHA2, false);
     if str2 <> Data then Raise Exception.Create('!!Abnormal Error!!');
     inc(counter);
     if counter mod 1000 = 0 then begin
@@ -387,7 +387,7 @@ end;
 procedure TForm1.ALButton6Click(Sender: TObject);
 Var outString: AnsiString;
 begin
-  ALRDLEncryptString(AnsiString(ALMemoDecryptedData.Lines.Text), outString, AnsiString(EditKey.Text), SHA2, True);
+  ALRDLEncryptString(AnsiString(ALMemoDecryptedData.Lines.Text), outString, AnsiString(EditKey.Text), TALkeyDerivationFunction.SHA2, True);
   ALMemoCryptedData.Lines.Text := String(ALBase64EncodeString(outString));
 end;
 
@@ -395,7 +395,7 @@ end;
 procedure TForm1.ALButton7Click(Sender: TObject);
 Var outString: AnsiString;
 begin
-  ALRDLEncryptString(ALBase64DecodeString(ALTrim(ansiString(ALMemocryptedData.Lines.Text))), outString, ansiString(EditKey.Text), SHA2, False);
+  ALRDLEncryptString(ALBase64DecodeString(ALTrim(ansiString(ALMemocryptedData.Lines.Text))), outString, ansiString(EditKey.Text), TALkeyDerivationFunction.SHA2, False);
   ALMemoDeCryptedData.Lines.Text := string(outString);
 end;
 
@@ -403,7 +403,7 @@ end;
 procedure TForm1.ALButton8Click(Sender: TObject);
 Var outString: AnsiString;
 begin
-  ALRDLEncryptStringCBC(AnsiString(ALMemoDecryptedData.Lines.Text), outString, AnsiString(EditKey.Text), SHA2, True);
+  ALRDLEncryptStringCBC(AnsiString(ALMemoDecryptedData.Lines.Text), outString, AnsiString(EditKey.Text), TALkeyDerivationFunction.SHA2, True);
   ALMemoCryptedData.Lines.Text := String(ALBase64EncodeString(outString));
 end;
 
@@ -411,7 +411,7 @@ end;
 procedure TForm1.ALButton9Click(Sender: TObject);
 Var outString: AnsiString;
 begin
-  ALRDLEncryptStringCBC(ALBase64DecodeString(ALTrim(ansiString(ALMemocryptedData.Lines.Text))), outString, ansiString(EditKey.Text), SHA2, False);
+  ALRDLEncryptStringCBC(ALBase64DecodeString(ALTrim(ansiString(ALMemocryptedData.Lines.Text))), outString, ansiString(EditKey.Text), TALkeyDerivationFunction.SHA2, False);
   ALMemoDeCryptedData.Lines.Text := string(outString);
 end;
 

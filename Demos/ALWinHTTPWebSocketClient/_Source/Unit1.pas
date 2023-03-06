@@ -159,8 +159,8 @@ Begin
     if AlIsInteger(AnsiString(EditsendTimeout.Text)) then SendTimeout := StrToInt(EditSendTimeout.Text);
     if AlIsInteger(AnsiString(EditReceiveTimeout.Text)) then ReceiveTimeout := StrToInt(EditReceiveTimeout.Text);
 
-    if RadioButtonProtocolVersion1_0.Checked then ProtocolVersion := HTTPpv_1_0
-    else ProtocolVersion := HTTPpv_1_1;
+    if RadioButtonProtocolVersion1_0.Checked then ProtocolVersion := TALHTTPProtocolVersion.v1_0
+    else ProtocolVersion := TALHTTPProtocolVersion.v1_1;
 
     if AlIsInteger(AnsiString(EditBufferSize.Text)) then BufferSize := StrToInt(EditBufferSize.Text);
 

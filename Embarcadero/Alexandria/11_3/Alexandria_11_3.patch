@@ -1,0 +1,805 @@
+Index: Embarcadero/Alexandria/11_3/fmx/FMX.Canvas.D2D.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Canvas.D2D.pas b/Embarcadero/Alexandria/11_3/fmx/FMX.Canvas.D2D.pas
+--- a/Embarcadero/Alexandria/11_3/fmx/FMX.Canvas.D2D.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/fmx/FMX.Canvas.D2D.pas	(working copy)
+@@ -2897,8 +2897,10 @@
+     HitTestPoint := APoint - TopLeft - TPointF.Create(Padding.Left, Padding.Top);
+     FLayout.HitTestPoint(HitTestPoint.X, HitTestPoint.Y, TrailingHit, Inside, HitTestMetrics);
+     Result := HitTestMetrics.textPosition;
+-    if TrailingHit then
+-      Result := Result + Integer(HitTestMetrics.length);
++    //https://quality.embarcadero.com/browse/RSP-39734
++    if Result >= 0 then Inc(Result); // HitTestMetrics.textPosition look like zero based
++    //if TrailingHit then
++    //  Result := Result + Integer(HitTestMetrics.length);
+   end
+   else if ((APoint.X < LRect.Left) or SameValue(APoint.X, LRect.Left, TEpsilon.Position)) and
+     ((APoint.Y > LRect.Top) or SameValue(APoint.Y, LRect.Top, TEpsilon.Position)) and
+Index: Embarcadero/Alexandria/11_3/fmx/FMX.Canvas.GPU.Helpers.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Canvas.GPU.Helpers.pas b/Embarcadero/Alexandria/11_3/fmx/FMX.Canvas.GPU.Helpers.pas
+--- a/Embarcadero/Alexandria/11_3/fmx/FMX.Canvas.GPU.Helpers.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/fmx/FMX.Canvas.GPU.Helpers.pas	(working copy)
+@@ -15,8 +15,8 @@
+ {$SCOPEDENUMS ON}
+ 
+ uses
+-  System.Types, System.UITypes, FMX.Types, FMX.Types3D, FMX.Materials.Canvas, FMX.Graphics, 
+-  System.Math.Vectors;
++  System.Types, System.UITypes, FMX.Types, FMX.Types3D, FMX.Materials.Canvas, FMX.Graphics,
++  System.Math.Vectors, Alcinoe.FMX.Types3D;
+ 
+ type
+   TDrawingMode = (Normal, WriteStencilInvert, ReadStencil, ClearStencil);
+@@ -313,8 +313,10 @@
+ 
+   if Material <> nil then
+     M := Material
+-  else if Texture <> nil then
+-    M := FTexMat
++  else if Texture <> nil then begin
++    if (Texture is TalTexture) and (TalTexture(Texture).material <> nil) then M := TalTexture(Texture).material  // https://quality.embarcadero.com/browse/RSP-23501
++    else M := FTexMat
++  end
+   else
+     M := FSolidMat;
+ 
+@@ -424,7 +426,8 @@
+ var
+   SolidDecl: TVertexDeclaration;
+ begin
+-  if FCurrentMaterial = FTexMat then
++  if (FCurrentMaterial = FTexMat) or
++     (FCurrentMaterial is TALCanvasTextureMaterial) then // https://quality.embarcadero.com/browse/RSP-23501
+   begin
+     SetLength(SolidDecl, 3);
+     SolidDecl[0].Format := TVertexFormat.Vertex;
+@@ -433,7 +436,8 @@
+     SolidDecl[1].Offset := 12;
+     SolidDecl[2].Format := TVertexFormat.Color0;
+     SolidDecl[2].Offset := 20;
+-    FTexMat.Texture := FCurrentTexture;
++    if (FCurrentMaterial = FTexMat) then FTexMat.Texture := FCurrentTexture
++    else TALCanvasTextureMaterial(FCurrentMaterial).Texture := FCurrentTexture; // https://quality.embarcadero.com/browse/RSP-23501
+     FContext.DrawPrimitives(TPrimitivesKind.Triangles, @FBatchVertexBuffer[0], @FBatchIndexBuffer[0], SolidDecl,
+       SizeOf(TVertexBufferItem), FBatchedVertices, SizeOf(TIndexBufferItem), FBatchedIndices, FCurrentMaterial, 1);
+   end else if FCurrentMaterial <> FSolidMat then
+Index: Embarcadero/Alexandria/11_3/fmx/FMX.Canvas.GPU.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Canvas.GPU.pas b/Embarcadero/Alexandria/11_3/fmx/FMX.Canvas.GPU.pas
+--- a/Embarcadero/Alexandria/11_3/fmx/FMX.Canvas.GPU.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/fmx/FMX.Canvas.GPU.pas	(working copy)
+@@ -72,6 +72,8 @@
+ procedure RegisterCanvasClasses;
+ procedure UnregisterCanvasClasses;
+ 
++function CanvasHelper: TCanvasHelper; // << https://quality.embarcadero.com/browse/RSP-18797
++
+ implementation
+ 
+ uses
+@@ -1212,6 +1214,12 @@
+   TCanvasGpu.FreeResources;
+ end;
+ 
++//https://quality.embarcadero.com/browse/RSP-18797
++function CanvasHelper: TCanvasHelper;
++begin
++  result := TCanvasGpu.FCanvasHelper;
++end;
++
+ initialization
+   TCustomCanvasGpu.ModulateColor := $FFFFFFFF;
+   TCustomCanvasGpu.AlignToPixels := False;
+Index: Embarcadero/Alexandria/11_3/fmx/FMX.Context.GLES.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Context.GLES.pas b/Embarcadero/Alexandria/11_3/fmx/FMX.Context.GLES.pas
+--- a/Embarcadero/Alexandria/11_3/fmx/FMX.Context.GLES.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/fmx/FMX.Context.GLES.pas	(working copy)
+@@ -188,7 +188,7 @@
+ {$IFDEF MACOS}
+   Macapi.CoreFoundation,
+ {$ENDIF}
+-  FMX.Consts, FMX.Canvas.GPU, FMX.Materials, FMX.Utils;
++  FMX.Consts, FMX.Canvas.GPU, FMX.Materials, FMX.Utils, Alcinoe.FMX.Types3D;
+ 
+ class procedure TGlesDiagnostic.CollectErrors;
+ const
+@@ -1312,8 +1312,15 @@
+ 
+         if Texture = nil then
+           glBindTexture(GL_TEXTURE_2D, 0)
+-        else
++        else begin
++          {$IF defined(ANDROID)}
++          // https://quality.embarcadero.com/browse/RSP-16830
++          if (Texture is TalTexture) and (TalTexture(Texture).material is TALCanvasExternalOESTextureMaterial) then
++            glBindTexture(GL_TEXTURE_EXTERNAL_OES, Texture.Handle)
++          else
++          {$ENDIF}
+           glBindTexture(GL_TEXTURE_2D, Texture.Handle);
++        end;
+ 
+         glUniform1i(Variable.Index, Variable.TextureUnit);
+         glActiveTexture(GL_TEXTURE0);
+Index: Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas b/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas
+--- a/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas	(working copy)
+@@ -115,7 +115,7 @@
+     /// <summary>Register a class to create hint instances. When a new THint instance is needed, the registered classes are invoked
+     /// to create the needed instance.</summary>
+     class procedure RegisterClass(const AClass: THintClass);
+-    /// <summary>Returns an instance created by the first available registered class. This method can return nil if there are no classes 
++    /// <summary>Returns an instance created by the first available registered class. This method can return nil if there are no classes
+     /// registered or none of the registered classes can create a THint instance.</summary>
+     class function CreateNewInstance(const AHandle: TWindowHandle): THint;
+     /// <summary>Returns True if there are some THint class registered.</summary>
+@@ -515,6 +515,11 @@
+     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual;
+     procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); virtual;
+     procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual;
++    procedure ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; // https://quality.embarcadero.com/browse/RSP-24397
++    procedure ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single); virtual; // https://quality.embarcadero.com/browse/RSP-24397
++    procedure ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; // https://quality.embarcadero.com/browse/RSP-24397
++    procedure ChildrenMouseEnter(const AObject: TControl); virtual; // https://quality.embarcadero.com/browse/RSP-24397
++    procedure ChildrenMouseLeave(const AObject: TControl); virtual; // https://quality.embarcadero.com/browse/RSP-24397
+     procedure KeyDown(var Key: Word; var KeyChar: WideChar; Shift: TShiftState); virtual;
+     procedure KeyUp(var Key: Word; var KeyChar: WideChar; Shift: TShiftState); virtual;
+     procedure DialogKey(var Key: Word; Shift: TShiftState); virtual;
+@@ -2220,6 +2225,7 @@
+   TabStop: IControl;
+   ChildControl: TControl;
+   NeedRepaint: Boolean;
++  i: integer; // https://quality.embarcadero.com/browse/RSP-21013
+ begin
+   DisableDisappear := True;
+   try
+@@ -2226,7 +2232,10 @@
+     if AObject is TControl then
+     begin
+       ChildControl := TControl(AObject);
+-      ChildControl.FUpdating := FUpdating;
++      //https://quality.embarcadero.com/browse/RSP-21013
++      //ChildControl.FUpdating := FUpdating;
++      for I := 1 to FUpdating do
++        ChildControl.beginUpdate;
+     end
+     else
+       ChildControl := nil;
+@@ -2266,7 +2275,8 @@
+         ChildControl.TempCanvas := TempCanvas;
+       if FInPaintTo then
+         ChildControl.FInPaintTo := True;
+-      ChildControl.FUpdating := FUpdating;
++      //https://quality.embarcadero.com/browse/RSP-21013
++      //ChildControl.FUpdating := FUpdating;
+       if not FSimpleTransform then
+         ChildControl.FSimpleTransform := False;
+       ChildControl.RecalcEnabled;
+@@ -2296,8 +2306,20 @@
+   var
+     I: Integer;
+   begin
+-    for I := 1 to AControl.FUpdating do
+-      AControl.EndUpdate;
++    // https://quality.embarcadero.com/browse/RSP-21013
++    // Also no need to call EndUpdate when we are destroying
++    // AControl because at this level most of the members
++    // of Acontrol have been freed and if we call EndUpdate
++    // with this transient state it's can cause trouble if
++    // AControl have a custom overloaded EndUpdate. Also
++    // in any case endupdate will not be call for any of
++    // the childreen of AControl as the property FControls
++    // of Acontrol used in EndUpdate to enumerate all childreen
++    // of Acontrol is already freed.
++    if (not (csDestroying in ComponentState)) and
++       (not (csDestroying in AControl.ComponentState)) then
++      for I := 1 to FUpdating do
++        AControl.EndUpdate;
+   end;
+ 
+ var
+@@ -3676,7 +3698,7 @@
+   Result := Touch.InteractiveGestures;
+   if Result = [] then
+     if (Parent <> nil) and Supports(Parent, IGestureControl, LGObj) then
+-      Result := LGObj.GetListOfInteractiveGestures;                 
++      Result := LGObj.GetListOfInteractiveGestures;
+ end;
+ 
+ function TControl.GetLocked: Boolean;
+@@ -4122,6 +4144,7 @@
+   ApplyTriggerEffect(Self, 'IsMouseOver');
+   if Assigned(FOnMouseEnter) then
+     FOnMouseEnter(Self);
++  if fparentControl <> nil then fparentControl.ChildrenMouseEnter(Self); // https://quality.embarcadero.com/browse/RSP-24397
+ end;
+ 
+ procedure TControl.DoMouseLeave;
+@@ -4131,6 +4154,7 @@
+   ApplyTriggerEffect(Self, 'IsMouseOver');
+   if Assigned(FOnMouseLeave) then
+     FOnMouseLeave(Self);
++  if fparentControl <> nil then fparentControl.ChildrenMouseLeave(Self); // https://quality.embarcadero.com/browse/RSP-24397
+ end;
+ 
+ function TControl.GetCanFocus: Boolean;
+@@ -4422,7 +4446,7 @@
+     end;
+ 
+   if not Handled and (FParent <> nil) and (EventInfo.GestureID <> sgiNoGesture) and Supports(Parent, IGestureControl, LGObj) then
+-    LGObj.CMGesture(EventInfo);                  
++    LGObj.CMGesture(EventInfo);
+ end;
+ 
+ function TControl.ConvertLocalPointFrom(const AControl: TControl; const AControlLocalPoint: TPointF): TPointF;
+@@ -4547,6 +4571,7 @@
+ 
+   if Assigned(FOnMouseDown) then
+     FOnMouseDown(Self, Button, Shift, X, Y);
++  if fparentControl <> nil then fparentControl.ChildrenMouseDown(Self, Button, Shift, X, Y); // https://quality.embarcadero.com/browse/RSP-24397
+   if FAutoCapture then
+     Capture;
+   if Button = TMouseButton.mbLeft then
+@@ -4569,6 +4594,7 @@
+ begin
+   if Assigned(FOnMouseMove) then
+     FOnMouseMove(Self, Shift, X, Y);
++  if fparentControl <> nil then fparentControl.ChildrenMouseMove(Self, Shift, X, Y); // https://quality.embarcadero.com/browse/RSP-24397
+ end;
+ 
+ procedure TControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+@@ -4577,6 +4603,7 @@
+ 
+   if Assigned(FOnMouseUp) then
+     FOnMouseUp(Self, Button, Shift, X, Y);
++  if fparentControl <> nil then fparentControl.ChildrenMouseUp(Self, Button, Shift, X, Y); // https://quality.embarcadero.com/browse/RSP-24397
+   if FPressed then
+   begin
+     FPressed := False;
+@@ -4591,6 +4618,41 @@
+     FOnMouseWheel(Self, Shift, WheelDelta, Handled)
+ end;
+ 
++// https://quality.embarcadero.com/browse/RSP-24397
++procedure TControl.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
++begin
++  if fParentControl <> nil then
++    fParentControl.ChildrenMouseDown(AObject, Button, Shift, X, Y);
++end;
++
++// https://quality.embarcadero.com/browse/RSP-24397
++procedure TControl.ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);
++begin
++  if fParentControl <> nil then
++    fParentControl.ChildrenMouseMove(AObject, Shift, X, Y);
++end;
++
++// https://quality.embarcadero.com/browse/RSP-24397
++procedure TControl.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
++begin
++  if fParentControl <> nil then
++    fParentControl.ChildrenMouseUp(AObject, Button, Shift, X, Y);
++end;
++
++// https://quality.embarcadero.com/browse/RSP-24397
++procedure TControl.ChildrenMouseEnter(const AObject: TControl);
++begin
++  if fParentControl <> nil then
++    fParentControl.ChildrenMouseEnter(AObject);
++end;
++
++// https://quality.embarcadero.com/browse/RSP-24397
++procedure TControl.ChildrenMouseLeave(const AObject: TControl);
++begin
++  if fParentControl <> nil then
++    fParentControl.ChildrenMouseLeave(AObject);
++end;
++
+ procedure TControl.DragEnter(const Data: TDragObject; const Point: TPointF);
+ var
+   Operation: TDragOperation;
+@@ -6013,7 +6075,7 @@
+   KillResourceLink;
+   if csLoading in ComponentState then
+     Exit;
+-  Repaint;                             
++  Repaint;
+ end;
+ 
+ procedure TStyledControl.AdjustSize;
+@@ -7171,7 +7233,7 @@
+ var
+   LFontColor: TAlphaColor;
+ begin
+-                                                                                          
++
+ {$IFDEF LONGINT64}
+   IdentToAlphaColor(Reader.ReadIdent, Integer(LFontColor));
+ {$ELSE !LONGINT64}
+Index: Embarcadero/Alexandria/11_3/fmx/FMX.Filter.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Filter.pas b/Embarcadero/Alexandria/11_3/fmx/FMX.Filter.pas
+--- a/Embarcadero/Alexandria/11_3/fmx/FMX.Filter.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/fmx/FMX.Filter.pas	(working copy)
+@@ -607,7 +607,7 @@
+     begin
+       if CompareText(FValues[I].Name, 'Output') = 0 then
+       begin
+-        if not FProcessing and FModified then 
++        if not FProcessing and FModified then
+           Apply;
+         Result := TFilterManager.GetTexture(FPass);
+         FValues[I].Value := Result;
+@@ -838,17 +838,19 @@
+ 
+ function TFilter.InputTexture: TTexture;
+ begin
+-  if TCanvasStyle.NeedGPUSurface in TCanvasManager.DefaultCanvas.GetCanvasStyle then
+-    Result := TContextManager.DefaultContextClass.BitmapToTexture(FInputBitmap)
+-  else
++  //https://quality.embarcadero.com/browse/RSP-20825
++  //if TCanvasStyle.NeedGPUSurface in TCanvasManager.DefaultCanvas.GetCanvasStyle then
++  //  Result := TContextManager.DefaultContextClass.BitmapToTexture(FInputBitmap)
++  //else
+     Result := FInput;
+ end;
+ 
+ function TFilter.TargetTexture: TTexture;
+ begin
+-  if TCanvasStyle.NeedGPUSurface in TCanvasManager.DefaultCanvas.GetCanvasStyle then
+-    Result := TContextManager.DefaultContextClass.BitmapToTexture(FTargetBitmap)
+-  else
++  //https://quality.embarcadero.com/browse/RSP-20825
++  //if TCanvasStyle.NeedGPUSurface in TCanvasManager.DefaultCanvas.GetCanvasStyle then
++  //  Result := TContextManager.DefaultContextClass.BitmapToTexture(FTargetBitmap)
++  //else
+     Result := FTarget;
+ end;
+ 
+Index: Embarcadero/Alexandria/11_3/fmx/FMX.Forms.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Forms.pas b/Embarcadero/Alexandria/11_3/fmx/FMX.Forms.pas
+--- a/Embarcadero/Alexandria/11_3/fmx/FMX.Forms.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/fmx/FMX.Forms.pas	(working copy)
+@@ -4374,7 +4374,10 @@
+ 
+ procedure TCommonCustomForm.SetHovered(const Value: IControl);
+ begin
+-  if (Value <> FHovered) then
++  //https://quality.embarcadero.com/browse/RSP-36612
++  if ((Value <> nil) and (FHovered = nil)) or
++     ((Value = nil) and (FHovered <> nil)) or
++     ((Value <> nil) and (FHovered <> nil) and (Value.GetObject <> FHovered.GetObject)) then
+   begin
+     if FHovered <> nil then
+     begin
+@@ -4851,7 +4854,10 @@
+     LControl := AControl
+   else
+     LControl := nil;
+-  if LControl <> FLastHinted then
++  //https://quality.embarcadero.com/browse/RSP-36612
++  if ((LControl <> nil) and (FLastHinted = nil)) or
++     ((LControl = nil) and (FLastHinted <> nil)) or
++     ((LControl <> nil) and (FLastHinted <> nil) and (LControl.GetObject <> FLastHinted.GetObject)) then
+   begin
+     if Application.ShowHint and (LControl <> nil) then
+     begin
+@@ -5628,7 +5634,10 @@
+ 
+ procedure TCommonCustomForm.SetCaptured(const Value: IControl);
+ begin
+-  if FCaptured <> Value then
++  //https://quality.embarcadero.com/browse/RSP-36612
++  if ((Value <> nil) and (FCaptured = nil)) or
++     ((Value = nil) and (FCaptured <> nil)) or
++     ((Value <> nil) and (FCaptured <> nil) and (Value.GetObject <> FCaptured.GetObject)) then
+   begin
+     if FCaptured <> nil then
+     begin
+@@ -5922,7 +5931,10 @@
+ 
+ procedure TCommonCustomForm.SetActiveControl(const AControl: IControl);
+ begin
+-  if AControl <> FActiveControl then
++  //https://quality.embarcadero.com/browse/RSP-36612
++  if ((AControl <> nil) and (FActiveControl = nil)) or
++     ((AControl = nil) and (FActiveControl <> nil)) or
++     ((AControl <> nil) and (FActiveControl <> nil) and (AControl.GetObject <> FActiveControl.GetObject)) then
+   begin
+     if FActiveControl <> nil then
+       FActiveControl.RemoveFreeNotify(Self);
+Index: Embarcadero/Alexandria/11_3/fmx/FMX.Platform.iOS.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Platform.iOS.pas b/Embarcadero/Alexandria/11_3/fmx/FMX.Platform.iOS.pas
+--- a/Embarcadero/Alexandria/11_3/fmx/FMX.Platform.iOS.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/fmx/FMX.Platform.iOS.pas	(working copy)
+@@ -1,4 +1,4 @@
+-{*******************************************************}
++﻿{*******************************************************}
+ {                                                       }
+ {              Delphi FireMonkey Platform               }
+ {                                                       }
+@@ -1526,7 +1526,13 @@
+     WindowManager.NativeWindow.makeKeyAndVisible;
+ 
+     // Post initialization
+-    PlatformCocoaTouch.HandleApplicationEvent(TApplicationEvent.FinishedLaunching, nil);
++    // https://quality.embarcadero.com/browse/RSP-40351
++    Var LContext := TiOSOpenApplicationContext.Create(string.Empty, string.Empty, options);
++    Try
++      PlatformCocoaTouch.HandleApplicationEvent(TApplicationEvent.FinishedLaunching, LContext);
++    finally
++      LContext.Free;
++    End;
+     FMX.Forms.Application.RealCreateForms;
+     TiOSHelper.CurrentDevice.beginGeneratingDeviceOrientationNotifications;
+   finally
+Index: Embarcadero/Alexandria/11_3/fmx/FMX.Platform.UI.Android.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/Alexandria/11_3/fmx/FMX.Platform.UI.Android.pas
+--- a/Embarcadero/Alexandria/11_3/fmx/FMX.Platform.UI.Android.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/fmx/FMX.Platform.UI.Android.pas	(working copy)
+@@ -26,7 +26,7 @@
+   TAndroidMotionManager = class;
+   TTextServiceAndroid = class;
+ 
+-  TRender<T: class> = class(TJavaLocal, JRunnable)
++  TRender<T: class> = class(TJavaLocal, JChoreographer_FrameCallback) // https://quality.embarcadero.com/browse/RSP-38660
+   private
+     [Weak] FContext: T;
+     FIsNeededUpdate: Boolean;
+@@ -41,14 +41,14 @@
+     /// <summary>Posts event to event bus for future rendering.</summary>
+     procedure PostRender;
+ 
+-    { JRunnable }
+-    procedure run; cdecl;
++    { JChoreographer_FrameCallback } // https://quality.embarcadero.com/browse/RSP-38660
++    procedure doFrame(frameTimeNanos: Int64); cdecl; // https://quality.embarcadero.com/browse/RSP-38660
+   public
+     property Context: T read FContext;
+   end;
+ 
+   /// <summary>Render of form. It is responsible for drawing FireMonkey form on native Surface.</summary>
+-  TFormRender = class(TRender<TAndroidWindowHandle>, JRunnable)
++  TFormRender = class(TRender<TAndroidWindowHandle>, JChoreographer_FrameCallback) // https://quality.embarcadero.com/browse/RSP-38660
+   public
+     /// <summary>Renders form Immediately.</summary>
+     procedure Render; override;
+@@ -2776,7 +2776,7 @@
+ begin
+   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
+   AtomicIncrement(FRefCount);
+-  TAndroidHelper.MainHandler.removeCallbacks(Self);
++  TJChoreographer.JavaClass.getInstance.removeFrameCallback(Self); // https://quality.embarcadero.com/browse/RSP-38660
+   AtomicDecrement(FRefCount);
+   inherited;
+ end;
+@@ -2786,7 +2786,7 @@
+   if not FIsNeededUpdate then
+   begin
+     FIsNeededUpdate := True;
+-    TAndroidHelper.MainHandler.post(Self);
++    TJChoreographer.JavaClass.getInstance.postFrameCallback(Self); // https://quality.embarcadero.com/browse/RSP-38660
+   end;
+ end;
+ 
+@@ -2794,7 +2794,7 @@
+ begin
+ end;
+ 
+-procedure TRender<T>.run;
++procedure TRender<T>.doFrame(frameTimeNanos: Int64); // https://quality.embarcadero.com/browse/RSP-38660
+ begin
+   Render;
+   FIsNeededUpdate := False;
+Index: Embarcadero/Alexandria/11_3/fmx/FMX.Presentation.Android.Style.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Presentation.Android.Style.pas b/Embarcadero/Alexandria/11_3/fmx/FMX.Presentation.Android.Style.pas
+--- a/Embarcadero/Alexandria/11_3/fmx/FMX.Presentation.Android.Style.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/fmx/FMX.Presentation.Android.Style.pas	(working copy)
+@@ -71,7 +71,7 @@
+   end;
+ 
+   /// <summary>Render of native view.</summary>
+-  TAndroidPresentationRender = class(TRender<TAndroidNativeScene>, JRunnable)
++  TAndroidPresentationRender = class(TRender<TAndroidNativeScene>, JChoreographer_FrameCallback)
+   public
+     procedure Render; override;
+   end;
+Index: Embarcadero/Alexandria/11_3/fmx/FMX.VirtualKeyboard.Android.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.VirtualKeyboard.Android.pas b/Embarcadero/Alexandria/11_3/fmx/FMX.VirtualKeyboard.Android.pas
+--- a/Embarcadero/Alexandria/11_3/fmx/FMX.VirtualKeyboard.Android.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/fmx/FMX.VirtualKeyboard.Android.pas	(working copy)
+@@ -218,8 +218,15 @@
+   VKRect.TopLeft := ConvertPixelToPoint(TPointF.Create(newFrame.Left, newFrame.Top)).Round;
+   VKRect.BottomRight := ConvertPixelToPoint(TPointF.Create(newFrame.Right, newFrame.Bottom)).Round;
+ 
+-  if (FNeedNotifyAboutFrameChanges or ((MainActivity.getVirtualKeyboard.isVirtualKeyboardShown) and (VKRect.Height > 0)))
+-     and (FPreviousVKRect <> VKRect) then
++  // https://quality.embarcadero.com/browse/RSP-24737
++  // I made the conclusion that the event onVirtualKeyboardWillHidden and onVirtualKeyboardWillShown
++  // are inconsistent. often the onVirtualKeyboardWillHidden is not fired (for exemple when you
++  // click on the return key of the keybord in the bottom left) and sometime (more hard to reproduce
++  // but I guarantee I see it) the onVirtualKeyboardWillShown is not fired. But what seam consistant
++  // is the fire to this function onVirtualKeyboardFrameChanged with good value for VKRect
++  // So I decide to only take care of this event
++
++  if (FPreviousVKRect <> VKRect) then
+     try
+       FKeyboardService.SendNotificationAboutKeyboardEvent(VKRect);
+       FPreviousVKRect := VKRect;
+Index: Embarcadero/Alexandria/11_3/rtl/android/Androidapi.JNI.App.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/rtl/android/Androidapi.JNI.App.pas b/Embarcadero/Alexandria/11_3/rtl/android/Androidapi.JNI.App.pas
+--- a/Embarcadero/Alexandria/11_3/rtl/android/Androidapi.JNI.App.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/rtl/android/Androidapi.JNI.App.pas	(working copy)
+@@ -16,7 +16,8 @@
+   Androidapi.JNI.JavaTypes,
+   Androidapi.JNI.Os,
+   Androidapi.JNI.Util,
+-  Androidapi.JNI.Widget;
++  Androidapi.JNI.Widget,
++  Androidapi.JNI.Net; // https://quality.embarcadero.com/browse/RSP-39511
+ 
+ type
+ // ===== Forward declarations =====
+@@ -76,6 +77,20 @@
+ 
+ // ===== Interface declarations =====
+ 
++  // https://quality.embarcadero.com/browse/RSP-39511
++  // This dummy class is just to avoid circular reference
++  JAudioAttributesClass = interface(JObjectClass)
++    ['{FDBDFCB3-4B3F-4E1B-9007-4E5B9EA6546A}']
++  end;
++
++  // https://quality.embarcadero.com/browse/RSP-39511
++  // This dummy class is just to avoid circular reference
++  [JavaSignature('android/media/AudioAttributes')]
++  JAudioAttributes = interface(JObject)
++    ['{CEC09B65-8360-46BD-A5E8-780E4927C9AA}']
++  end;
++  TJAudioAttributes = class(TJavaGenericImport<JAudioAttributesClass, JAudioAttributes>) end;
++
+   JActionBarClass = interface(JObjectClass)
+     ['{C1A41981-8687-4794-91A5-AA384F60A546}']
+     {class} function _GetDISPLAY_HOME_AS_UP: Integer; cdecl;
+@@ -1469,7 +1484,7 @@
+ 
+   JNotificationClass = interface(JObjectClass)
+     ['{4584515F-7E22-49A9-A55B-A6DE3BFD7E1C}']
+-    //{class} function _GetAUDIO_ATTRIBUTES_DEFAULT: JAudioAttributes; cdecl;
++    {class} function _GetAUDIO_ATTRIBUTES_DEFAULT: JAudioAttributes; cdecl; // https://quality.embarcadero.com/browse/RSP-39511
+     {class} function _GetBADGE_ICON_LARGE: Integer; cdecl;
+     {class} function _GetBADGE_ICON_NONE: Integer; cdecl;
+     {class} function _GetBADGE_ICON_SMALL: Integer; cdecl;
+@@ -1553,7 +1568,7 @@
+     {class} function init: JNotification; cdecl; overload;
+     {class} function init(icon: Integer; tickerText: JCharSequence; when: Int64): JNotification; cdecl; overload;//Deprecated
+     {class} function init(parcel: JParcel): JNotification; cdecl; overload;
+-    //{class} property AUDIO_ATTRIBUTES_DEFAULT: JAudioAttributes read _GetAUDIO_ATTRIBUTES_DEFAULT;
++    {class} property AUDIO_ATTRIBUTES_DEFAULT: JAudioAttributes read _GetAUDIO_ATTRIBUTES_DEFAULT; // https://quality.embarcadero.com/browse/RSP-39511
+     {class} property BADGE_ICON_LARGE: Integer read _GetBADGE_ICON_LARGE;
+     {class} property BADGE_ICON_NONE: Integer read _GetBADGE_ICON_NONE;
+     {class} property BADGE_ICON_SMALL: Integer read _GetBADGE_ICON_SMALL;
+@@ -1813,7 +1828,7 @@
+     procedure setLockscreenVisibility(lockscreenVisibility: Integer); cdecl;
+     procedure setName(name: JCharSequence); cdecl;
+     procedure setShowBadge(showBadge: Boolean); cdecl;
+-    //procedure setSound(sound: Jnet_Uri; audioAttributes: JAudioAttributes); cdecl;
++    procedure setSound(sound: Jnet_Uri; audioAttributes: JAudioAttributes); cdecl; // https://quality.embarcadero.com/browse/RSP-39511
+     procedure setVibrationPattern(vibrationPattern: TJavaArray<Int64>); cdecl;
+     function shouldShowLights: Boolean; cdecl;
+     function shouldVibrate: Boolean; cdecl;
+@@ -2276,6 +2291,7 @@
+ 
+ procedure RegisterTypes;
+ begin
++  TRegTypes.RegisterType('Androidapi.JNI.App.JAudioAttributes', TypeInfo(Androidapi.JNI.App.JAudioAttributes)); // dummy class to avoid circular reference - https://quality.embarcadero.com/browse/RSP-39511
+   TRegTypes.RegisterType('Androidapi.JNI.App.JActionBar', TypeInfo(Androidapi.JNI.App.JActionBar));
+   TRegTypes.RegisterType('Androidapi.JNI.App.JActionBar_LayoutParams', TypeInfo(Androidapi.JNI.App.JActionBar_LayoutParams));
+   TRegTypes.RegisterType('Androidapi.JNI.App.JActionBar_OnMenuVisibilityListener', TypeInfo(Androidapi.JNI.App.JActionBar_OnMenuVisibilityListener));
+Index: Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.AVFoundation.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.AVFoundation.pas b/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.AVFoundation.pas
+--- a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.AVFoundation.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.AVFoundation.pas	(working copy)
+@@ -730,6 +730,8 @@
+     function timedMetadata: NSArray; cdecl;
+     function tracks: NSArray; cdecl;
+     function videoComposition: AVVideoComposition; cdecl;
++    procedure addOutput(output: AVPlayerItemOutput); cdecl; // https://quality.embarcadero.com/browse/RSP-16853
++    procedure removeOutput(output: AVPlayerItemOutput); cdecl; // https://quality.embarcadero.com/browse/RSP-16853
+   end;
+   TAVPlayerItem = class(TOCGenericImport<AVPlayerItemClass, AVPlayerItem>)  end;
+ 
+Index: Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreImage.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreImage.pas b/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreImage.pas
+--- a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreImage.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreImage.pas	(working copy)
+@@ -218,8 +218,25 @@
+   end;
+   TCIFaceFeature = class(TOCGenericImport<CIFaceFeatureClass, CIFaceFeature>)  end;
+ 
++function kCIInputImageKey: NSString; // https://quality.embarcadero.com/browse/RSP-19878
++function kCIInputRadiusKey: NSString; // https://quality.embarcadero.com/browse/RSP-19878
+ 
+-
+ implementation
+ 
++// https://quality.embarcadero.com/browse/RSP-19878
++const
++  CoreImageFwk: string = '/System/Library/Frameworks/CoreImage.framework/CoreImage';
++
++// https://quality.embarcadero.com/browse/RSP-19878
++function kCIInputImageKey: NSString;
++begin
++  result := CocoaNSStringConst(CoreImageFwk, 'kCIInputImageKey');
++end;
++
++// https://quality.embarcadero.com/browse/RSP-19878
++function kCIInputRadiusKey: NSString;
++begin
++  result := CocoaNSStringConst(CoreImageFwk, 'kCIInputRadiusKey');
++end;
++
+ end.
+Index: Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreLocation.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreLocation.pas b/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreLocation.pas
+--- a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreLocation.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreLocation.pas	(working copy)
+@@ -33,7 +33,7 @@
+   kCLAuthorizationStatusNotDetermined = 0;
+   kCLAuthorizationStatusRestricted = 1;
+   kCLAuthorizationStatusAuthorizedAlways  = kCLAuthorizationStatusAuthorized ;
+-  kCLAuthorizationStatusAuthorizedWhenInUse = 4; 
++  kCLAuthorizationStatusAuthorizedWhenInUse = 4;
+   kCLErrorDenied = 1;
+   kCLErrorGeocodeCanceled = 10;
+   kCLErrorGeocodeFoundNoResult = 8;
+@@ -110,6 +110,7 @@
+ 
+   CLPlacemark = interface;
+   CLRegion = interface;
++  CLVisit = interface; // https://quality.embarcadero.com/browse/RSP-18621
+   CLLocationManager = interface;
+   CLGeocoder = interface;
+   CLHeading = interface;
+@@ -144,6 +145,8 @@
+     procedure locationManagerDidResumeLocationUpdates(manager: CLLocationManager); cdecl;
+     [MethodName('locationManager:didFinishDeferredUpdatesWithError:')]
+     procedure locationManagerDidFinishDeferredUpdatesWithError(manager: CLLocationManager; error: NSError); cdecl;
++    [MethodName('locationManager:didVisit:')]                                             // https://quality.embarcadero.com/browse/RSP-18621
++    procedure locationManagerDidVisit(manager: CLLocationManager; visit: CLVisit); cdecl; // https://quality.embarcadero.com/browse/RSP-18621
+   end;
+ 
+ // ===== Interface declarations =====
+@@ -190,6 +193,19 @@
+   end;
+   TCLRegion = class(TOCGenericImport<CLRegionClass, CLRegion>)  end;
+ 
++  // https://quality.embarcadero.com/browse/RSP-18621
++  CLVisitClass = interface(NSObjectClass)
++    ['{8526B69B-5AD8-4B4B-91DC-6C06474BE925}']
++  end;
++  CLVisit = interface(NSObject)
++    ['{BB121072-B081-4C90-BB85-6FCC24DF8223}']
++    function arrivalDate: NSDate; cdecl;
++    function departureDate: NSDate; cdecl;
++    function coordinate: CLLocationCoordinate2D; cdecl;
++    function horizontalAccuracy: CLLocationAccuracy; cdecl;
++  end;
++  TCLVisit = class(TOCGenericImport<CLVisitClass, CLVisit>)  end;
++
+   CLLocationManagerClass = interface(NSObjectClass)
+     ['{4422C248-523F-4237-8966-2A322F58A77C}']
+     {class} function authorizationStatus: CLAuthorizationStatus; cdecl;
+@@ -248,6 +264,8 @@
+     procedure stopRangingBeaconsInRegion(region: CLBeaconRegion); cdecl;
+     procedure stopUpdatingHeading; cdecl;
+     procedure stopUpdatingLocation; cdecl;
++    procedure startMonitoringVisits; cdecl; // https://quality.embarcadero.com/browse/RSP-18621
++    procedure stopMonitoringVisits; cdecl; // https://quality.embarcadero.com/browse/RSP-18621
+   end;
+   TCLLocationManager = class(TOCGenericImport<CLLocationManagerClass, CLLocationManager>)  end;
+ 
+@@ -348,7 +366,7 @@
+ 
+   CLCircularRegion = interface(CLRegion)
+     ['{FF4DCF91-376B-41BB-B60A-880BEBB5B4EE}']
+-    function initWithCenter(center: CLLocationCoordinate2D; radius: CLLocationDistance; identifier: NSString): Pointer; cdecl;
++    function initWithCenter(center: CLLocationCoordinate2D; radius: CLLocationDistance; identifier: pointer): Pointer; cdecl; // https://quality.embarcadero.com/browse/RSP-15717
+     function center: CLLocationCoordinate2D; cdecl;
+     function radius: CLLocationDistance; cdecl;
+     function containsCoordinate(coordinate: CLLocationCoordinate2D): Boolean; cdecl;
+Index: Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.Foundation.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.Foundation.pas b/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.Foundation.pas
+--- a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.Foundation.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.Foundation.pas	(working copy)
+@@ -5566,8 +5566,28 @@
+       downloadTask: NSURLSessionDownloadTask; didResumeAtOffset: Int64; expectedTotalBytes: Int64); cdecl;
+   end;
+ 
++  //https://quality.embarcadero.com/browse/RSP-28096
++  NSPersonNameComponentsClass = interface(NSObjectClass)
++    ['{2EDFEAC4-A0B4-4BB2-BAD9-4581B92DA4C7}']
++  end;
++  NSPersonNameComponents = interface(NSObject)
++    ['{821B6CD5-BE9B-4708-928B-FD5CE5D12788}']
++    procedure setNamePrefix(namePrefix: NSString); cdecl;
++    function namePrefix : NSString; cdecl;
++    procedure setGivenName(givenName: NSString); cdecl;
++    function givenName : NSString; cdecl;
++    procedure setMiddleName(middleName: NSString); cdecl;
++    function middleName : NSString; cdecl;
++    procedure setFamilyName(familyName: NSString); cdecl;
++    function familyName : NSString; cdecl;
++    procedure setNameSuffix(nameSuffix: NSString); cdecl;
++    function nameSuffix : NSString; cdecl;
++    procedure setNickname(nickname: NSString); cdecl;
++    function nickname : NSString; cdecl;
++    procedure setPhoneticRepresentation(phoneticRepresentation: NSPersonNameComponents); cdecl;
++    function phoneticRepresentation : NSPersonNameComponents; cdecl;
++  end;
+ 
+-
+ // Convenience method for creating an NSString from a Delphi Unicode string
+ function NSSTR(const Str: string): NSString; inline; deprecated 'use StrToNSStr instead';
+ 
+Index: Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.Security.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.Security.pas b/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.Security.pas
+--- a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.Security.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.Security.pas	(working copy)
+@@ -622,6 +622,8 @@
+ function kSecAttrKeyClassSymmetric: NSString;
+ function kSecAttrKeyTypeRSA: NSString;
+ function kSecAttrKeyTypeEC: NSString;
++function kSecValueRef: NSString; // https://quality.embarcadero.com/browse/RSP-20279
++function kSecValueData: NSString; // https://quality.embarcadero.com/browse/RSP-20279
+ 
+ 
+ implementation
+@@ -1252,6 +1254,18 @@
+   result := CocoaNSStringConst(libSecurity, 'kSecAttrKeyTypeEC');
+ end;
+ 
++// https://quality.embarcadero.com/browse/RSP-20279
++function kSecValueRef: NSString;
++begin
++  result := CocoaNSStringConst(libSecurity, 'kSecValueRef');
++end;
++
++// https://quality.embarcadero.com/browse/RSP-20279
++function kSecValueData: NSString;
++begin
++  result := CocoaNSStringConst(libSecurity, 'kSecValueData');
++end;
++
+ {$IF defined(IOS) and NOT defined(CPUARM)}
+ 
+ initialization
+Index: Embarcadero/Alexandria/11_3/rtl/win/Winapi.Isapi2.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/rtl/win/Winapi.Isapi2.pas b/Embarcadero/Alexandria/11_3/rtl/win/Winapi.Isapi2.pas
+--- a/Embarcadero/Alexandria/11_3/rtl/win/Winapi.Isapi2.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/rtl/win/Winapi.Isapi2.pas	(working copy)
+@@ -397,7 +397,7 @@
+     dwReserved: DWORD): Pointer; stdcall;
+ 
+   TFilterServerSupportFunctionProc = function (var pfc{: THTTP_FILTER_CONTEXT};
+-    sfReq: DWORD; pData: Pointer; ul1, ul2: DWORD): BOOL; stdcall;
++    sfReq: DWORD; pData: Pointer; ul1, ul2: ULONG_PTR): BOOL; stdcall; // https://quality.embarcadero.com/browse/RSP-33754
+ 
+   PHTTP_FILTER_CONTEXT = ^THTTP_FILTER_CONTEXT;
+   THTTP_FILTER_CONTEXT = record

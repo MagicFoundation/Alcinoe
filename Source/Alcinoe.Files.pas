@@ -7,7 +7,6 @@ interface
 uses
   Alcinoe.Common;
 
-{$IFNDEF ALHideAnsiString}
 Function  AlEmptyDirectory(Directory: ansiString;
                            SubDirectory: Boolean;
                            const IgnoreFiles: Array of AnsiString;
@@ -19,6 +18,7 @@ Function  AlEmptyDirectory(const Directory: ansiString;
                            Const RemoveEmptySubDirectory: Boolean = True;
                            Const FileNameMask: ansiString = '*';
                            Const MinFileAge: TdateTime = ALNullDate): Boolean; overload;
+{$IF defined(MSWINDOWS)}
 Function  AlCopyDirectory(SrcDirectory,
                           DestDirectory: ansiString;
                           SubDirectory: Boolean;
@@ -43,7 +43,7 @@ function  ALCreateDir(const Dir: Ansistring): Boolean;
 function  ALRemoveDir(const Dir: Ansistring): Boolean;
 function  ALDeleteFile(const FileName: Ansistring): Boolean;
 function  ALRenameFile(const OldName, NewName: ansistring): Boolean;
-{$ENDIF !ALHideAnsiString}
+{$ENDIF}
 
 Function  AlEmptyDirectoryU(Directory: String;
                             SubDirectory: Boolean;
@@ -89,7 +89,7 @@ uses
   System.Classes,
   System.sysutils,
   System.Masks,
-  {$IFNDEF ALHideAnsiString}
+  {$IF defined(MSWINDOWS)}
   System.AnsiStrings,
   Winapi.Windows,
   Winapi.ShLwApi,
@@ -98,8 +98,6 @@ uses
   {$ENDIF}
   Alcinoe.StringUtils,
   Alcinoe.StringList;
-
-{$IFNDEF ALHideAnsiString}
 
 {***********************************************}
 Function  AlEmptyDirectory(Directory: ansiString;
@@ -173,7 +171,8 @@ begin
                              MinFileAge);
 end;
 
-{************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 Function AlCopyDirectory(SrcDirectory,
                          DestDirectory: ansiString;
                          SubDirectory: Boolean;
@@ -223,8 +222,10 @@ begin
     end;
   end
 end;
+{$ENDIF}
 
-{**********************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 Function  AlGetFileSize(const AFileName: ansistring): int64;
 var
   Handle: THandle;
@@ -243,8 +244,10 @@ begin
   end;
   Result := -1;
 end;
+{$ENDIF}
 
-{*****************************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 Function AlGetFileVersion(const AFileName: ansiString): ansiString;
 var
   FileName: ansiString;
@@ -268,8 +271,10 @@ begin
     end;
   end;
 end;
+{$ENDIF}
 
-{*******************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 function ALGetModuleFileNameWithoutExtension: ansiString;
 Var Ln: Integer;
 begin
@@ -277,23 +282,29 @@ begin
   ln := Length(ALExtractFileExt(Result));
   if Ln > 0 then delete(Result,length(Result)-ln+1,ln);
 end;
+{$ENDIF}
 
-{***********************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 function ALGetModuleName: ansiString;
 var ModName: array[0..MAX_PATH] of AnsiChar;
 begin
   SetString(Result, ModName, Winapi.Windows.GetModuleFileNameA(HInstance, ModName, SizeOf(ModName)));
   If ALpos('\\?\',result) = 1 then delete(Result,1,4);
 end;
+{$ENDIF}
 
-{***********************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 function ALGetModulePath: ansiString;
 begin
   Result:=ALExtractFilePath(ALGetModuleName);
   If (length(result) > 0) and (result[length(result)] <> '\') then result := result + '\';
 end;
+{$ENDIF}
 
-{**************************************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 function  ALGetFileCreationDateTime(const aFileName: Ansistring): TDateTime;
 var LHandle: THandle;
     LFindData: TWin32FindDataA;
@@ -305,8 +316,10 @@ begin
      (not FileTimeToLocalFileTime(LFindData.ftCreationTime, LLocalFileTime)) then raiselastOsError;
   Result := ALFileTimeToDateTime(LLocalFileTime);
 end;
+{$ENDIF}
 
-{***************************************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 function  ALGetFileLastWriteDateTime(const aFileName: Ansistring): TDateTime;
 var LHandle: THandle;
     LFindData: TWin32FindDataA;
@@ -318,8 +331,10 @@ begin
      (not FileTimeToLocalFileTime(LFindData.ftLastWriteTime, LLocalFileTime)) then raiselastOsError;
   Result := ALFileTimeToDateTime(LLocalFileTime);
 end;
+{$ENDIF}
 
-{****************************************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 function  ALGetFileLastAccessDateTime(const aFileName: Ansistring): TDateTime;
 var LHandle: THandle;
     LFindData: TWin32FindDataA;
@@ -331,8 +346,10 @@ begin
      (not FileTimeToLocalFileTime(LFindData.ftLastAccessTime, LLocalFileTime)) then raiselastOsError;
   Result := ALFileTimeToDateTime(LLocalFileTime);
 end;
+{$ENDIF}
 
-{***************************************************************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 Procedure ALSetFileCreationDateTime(Const aFileName: Ansistring; Const aCreationDateTime: TDateTime);
 Var LHandle: Thandle;
     LSystemTime: TsystemTime;
@@ -349,8 +366,10 @@ Begin
     fileClose(LHandle);
   end;
 End;
+{$ENDIF}
 
-{*****************************************************************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 Procedure ALSetFileLastWriteDateTime(Const aFileName: Ansistring; Const aLastWriteDateTime: TDateTime);
 Var LHandle: Thandle;
     LSystemTime: TsystemTime;
@@ -367,8 +386,10 @@ Begin
     fileClose(LHandle);
   end;
 End;
+{$ENDIF}
 
-{*******************************************************************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 Procedure ALSetFileLastAccessDateTime(Const aFileName: Ansistring; Const aLastAccessDateTime: TDateTime);
 Var LHandle: Thandle;
     LSystemTime: TsystemTime;
@@ -385,50 +406,63 @@ Begin
     fileClose(LHandle);
   end;
 End;
+{$ENDIF}
 
-{****************************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 function ALIsDirectoryEmpty(const directory: ansiString): boolean;
 begin
   Result := PathIsDirectoryEmptyA(PansiChar(directory));
 end;
+{$ENDIF}
 
-{******************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 function  ALFileExists(const Path: ansiString): boolean;
 begin
   result := PathFileExistsA(PansiChar(Path)) and (not PathIsDirectoryA(PansiChar(Path)));
 end;
+{$ENDIF}
 
-{****************************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 function  ALDirectoryExists(const Directory: Ansistring): Boolean;
 begin
   result := PathFileExistsA(PansiChar(Directory)) and (PathIsDirectoryA(PansiChar(Directory)));
 end;
+{$ENDIF}
 
-{****************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 function  ALCreateDir(const Dir: Ansistring): Boolean;
 begin
   Result := CreateDirectoryA(PAnsiChar(Dir), nil);
 end;
+{$ENDIF}
 
-{****************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 function  ALRemoveDir(const Dir: Ansistring): Boolean;
 begin
   Result := RemoveDirectoryA(PansiChar(Dir));
 end;
+{$ENDIF}
 
-{**********************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 function  ALDeleteFile(const FileName: Ansistring): Boolean;
 begin
   Result := DeleteFileA(PAnsiChar(FileName));
 end;
+{$ENDIF}
 
-{******************************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 function  ALRenameFile(const OldName, NewName: ansistring): Boolean;
 begin
   Result := MoveFileA(PansiChar(OldName), PansiChar(NewName));
 end;
-
-{$ENDIF !ALHideAnsiString}
+{$ENDIF}
 
 {********************************************}
 Function  AlEmptyDirectoryU(Directory: String;
@@ -443,7 +477,7 @@ var LSR: TSearchRec;
 begin
   if (Directory = '') or
      (Directory = '.') or
-     (Directory = '..') then raise EALExceptionU.CreateFmt('Wrong directory ("%s")', [Directory]);
+     (Directory = '..') then raise EALException.CreateFmt('Wrong directory ("%s")', [Directory]);
 
   Result := True;
   Directory := ALIncludeTrailingPathDelimiterU(Directory);

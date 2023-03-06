@@ -51,9 +51,7 @@ uses
   {$ENDIF}
   System.SysUtils,
   System.Classes,
-  {$IFNDEF ALHideAnsiString}
   System.Contnrs,
-  {$ENDIF}
   {$IFDEF MACOS}
   Macapi.CoreFoundation,
   {$ENDIF MACOS}
@@ -70,7 +68,6 @@ type
     {$MESSAGE WARN 'Check if System.SysUtils.TFormatSettings is still the same and adjust the IFDEF'}
   {$IFEND}
 
-  {$IFNDEF ALHideAnsiString}
   pALFormatSettings = ^TALFormatSettings;
   TALFormatSettings = record
   public
@@ -120,25 +117,19 @@ type
     class function Create(const LocaleName: AnsiString): TALFormatSettings; overload; static;
     function GetEraYearOffset(const Name: ansistring): Integer;
   end;
-  {$ENDIF !ALHideAnsiString}
 
   pALFormatSettingsU = ^TALFormatSettingsU;
   TALFormatSettingsU = TFormatSettings;
 
-  {$IFNDEF ALHideAnsiString}
   function ALGetFormatSettingsID(const aFormatSettings: TALFormatSettings): AnsiString;
   {$IF defined(MSWINDOWS)}
   procedure ALGetLocaleFormatSettings(Locale: LCID; var AFormatSettings: TALFormatSettings); platform;
   {$IFEND}
-  {$ENDIF !ALHideAnsiString}
 
 var
-  {$IFNDEF ALHideAnsiString}
   ALDefaultFormatSettings: TALformatSettings;
-  {$ENDIF}
   ALDefaultFormatSettingsU: TALformatSettingsU;
 
-{$IFNDEF ALHideAnsiString}
 Const
   cAlUTF8Bom = ansiString(#$EF) + ansiString(#$BB) + ansiString(#$BF);
   cAlUTF16LittleEndianBom = ansiString(#$FF) + ansiString(#$FE);
@@ -414,7 +405,6 @@ procedure ALExtractHeaderFieldsWithQuoteEscaped(Separators,
                                                 Strings: TALStrings;
                                                 HttpDecode: Boolean;
                                                 StripQuotes: Boolean = False);
-{$ENDIF !ALHideAnsiString}
 
 var       ALMatchesMaskU: function(const Filename, Mask: String): Boolean;
 Function  ALNewGUIDBytes: TBytes;
@@ -546,7 +536,6 @@ procedure ALExtractHeaderFieldsWithQuoteEscapedU(Separators,
                                                  StripQuotes: Boolean = False);
 {$WARN SYMBOL_DEPRECATED ON}
 
-{$IFNDEF ALHideAnsiString}
 type
 
   TALTagParamsClass = class of TalStrings;
@@ -625,14 +614,12 @@ function  ALExtractTagParams(Const SourceString, TagStart, TagEnd: AnsiString;
 Procedure ALSplitTextAndTag(Const SourceString, TagStart, TagEnd: AnsiString;
                             SplitTextAndTagLst: TALStrings;
                             IgnoreCase: Boolean);
-{$ENDIF !ALHideAnsiString}
 
 
 ////////////////////////////
 /// deprecated functions ///
 ////////////////////////////
 
-{$IFNDEF ALHideAnsiString}
 Function  ALUTF8Decode(const S: UTF8String; const aCodePage: Word): AnsiString; deprecated 'use ALStringDecode instead';
 Function  ALUTF8TitleCase(const s:AnsiString): AnsiString; deprecated 'use ALTitleCase instead with SetMultiByteConversionCodePage(CP_UTF8)';
 Function  ALUTF8SentenceCase(const s:AnsiString): AnsiString; deprecated 'use ALSentenceCase instead with SetMultiByteConversionCodePage(CP_UTF8)';
@@ -652,7 +639,6 @@ function  ALUTF8LowerCase(const s: AnsiString): AnsiString; deprecated 'use ALUn
 Function  ALUTF8UpperFirstChar(const s:AnsiString): AnsiString; deprecated 'use ALUnicodeUpperFirstChar instead with SetMultiByteConversionCodePage(CP_UTF8)';
 Function  ALUTF8ISO91995CyrillicToLatin(const aCyrillicText: AnsiString): AnsiString; deprecated 'use ALISO91995CyrillicToLatin instead with SetMultiByteConversionCodePage(CP_UTF8)';
 Function  ALUTF8BGNPCGN1947CyrillicToLatin(const aCyrillicText: AnsiString): AnsiString; deprecated 'use ALBGNPCGN1947CyrillicToLatin instead with SetMultiByteConversionCodePage(CP_UTF8)';
-{$ENDIF !ALHideAnsiString}
 
 implementation
 
@@ -664,13 +650,9 @@ uses
   {$IF CompilerVersion >= 31} // berlin
   system.netencoding,
   {$ENDIF}
-  {$IFNDEF ALHideAnsiString}
   System.Ansistrings,
-  {$ENDIF}
   System.Character,
   System.Math;
-
-{$IFNDEF ALHideAnsiString}
 
 {************************************************************}
 constructor TALStringStream.Create(const AString: AnsiString);
@@ -966,8 +948,6 @@ Begin
   Result := ALGUIDToString(LGUID, WithoutBracket, WithoutHyphen);
 End;
 
-{$ENDIF !ALHideAnsiString}
-
 {*******************************}
 Function  ALNewGUIDBytes: TBytes;
 Var LGUID: TGUID;
@@ -1020,8 +1000,6 @@ Begin
   if CreateGUID(LGUID) <> S_OK then RaiseLastOSError;
   Result := ALGUIDToStringU(LGUID, WithoutBracket, WithoutHyphen);
 End;
-
-{$IFNDEF ALHideAnsiString}
 
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if System.Masks.pas is still the same and adjust the IFDEF'}
@@ -1743,7 +1721,7 @@ begin
 end;
 {$IF defined(ALRangeCheckingON)}
   {$R+} {Range-Checking}
-{$IFEND}
+{$ENDIF}
 
 {**********************************}
 {$IFNDEF ALCompilerVersionSupported}
@@ -2231,8 +2209,6 @@ begin
   ALFmtStr(Result, Format, Args, AFormatSettings);
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 {***************************************************************************}
 function ALFormatU(const Format: String; const Args: array of const): String;
 begin
@@ -2257,8 +2233,6 @@ begin
   Result := System.SysUtils.Format(Format, Args, AFormatSettings);
 end;
 
-{$IFNDEF ALHideAnsiString}
-
 {************************************************************************}
 function ALTryStrToBool(const S: AnsiString; out Value: Boolean): Boolean;
 var
@@ -2280,8 +2254,6 @@ begin
     end;
   end;
 end;
-
-{$ENDIF !ALHideAnsiString}
 
 {*********************************************************************}
 function ALTryStrToBoolU(const S: String; out Value: Boolean): Boolean;
@@ -2305,8 +2277,6 @@ begin
   end;
 end;
 
-{$IFNDEF ALHideAnsiString}
-
 {*********************************************}
 Function AlStrToBool(Value:AnsiString):Boolean;
 Begin
@@ -2314,16 +2284,12 @@ Begin
   ALTryStrtoBool(Value,Result);
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 {******************************************}
 Function AlStrToBoolU(Value:String):Boolean;
 Begin
   Result := False;
   ALTryStrtoBoolU(Value,Result);
 end;
-
-{$IFNDEF ALHideAnsiString}
 
 {***********************************************************************************************************}
 function  ALBoolToStr(B: Boolean; const trueStr: ansistring='1'; const falseStr: ansistring='0'): Ansistring;
@@ -2339,8 +2305,6 @@ begin
   else s := falseStr;
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 {************************************************************************************************}
 function  ALBoolToStrU(B: Boolean; const trueStr: String='1'; const falseStr: String='0'): String;
 begin
@@ -2354,8 +2318,6 @@ begin
   if B then s := trueStr
   else s := falseStr;
 end;
-
-{$IFNDEF ALHideAnsiString}
 
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.SysUtils.TCFString is still the same and adjust the IFDEF'}
@@ -2976,8 +2938,6 @@ begin
   ALDateTimeToString(s, '', DateTime, AFormatSettings);
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 {**************************************************}
 function ALDateTimeToStrU(const DateTime: TDateTime;
   const AFormatSettings: TALFormatSettingsU): String;
@@ -2990,8 +2950,6 @@ procedure ALDateTimeToStrU(const DateTime: TDateTime; var s: String; const AForm
 begin
   s := DateTimeToStr(DateTime, AFormatSettings);
 end;
-
-{$IFNDEF ALHideAnsiString}
 
 {**********************************************************************}
 function ALFormatDateTime(const Format: AnsiString; DateTime: TDateTime;
@@ -3821,7 +3779,7 @@ begin
 end;
 {$IF defined(ALRangeCheckingON)}
   {$R+} {Range-Checking}
-{$IFEND}
+{$ENDIF}
 
 {**********************************}
 {$IFNDEF ALCompilerVersionSupported}
@@ -3928,7 +3886,7 @@ begin
 end;
 {$IF defined(ALRangeCheckingON)}
   {$R+} {Range-Checking}
-{$IFEND}
+{$ENDIF}
 
 {**********************************}
 {$IFNDEF ALCompilerVersionSupported}
@@ -4022,7 +3980,7 @@ begin
 end;
 {$IF defined(ALRangeCheckingON)}
   {$R+} {Range-Checking}
-{$IFEND}
+{$ENDIF}
 
 {**********************************}
 {$IFNDEF ALCompilerVersionSupported}
@@ -4109,7 +4067,7 @@ begin
 end;
 {$IF defined(ALRangeCheckingON)}
   {$R+} {Range-Checking}
-{$IFEND}
+{$ENDIF}
 
 {***********************************************************************}
 function ALTryStrToInt(const S: AnsiString; out Value: Integer): Boolean;
@@ -4474,8 +4432,6 @@ begin
   Result := _ALIntToStr64(Value, False);
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 {***************************************************}
 procedure ALIntToStrU(Value: Integer; var s: String);
 begin
@@ -4511,8 +4467,6 @@ function ALUIntToStrU(Value: UInt64): String;
 begin
   Result := UIntToStr(Value);
 end;
-
-{$IFNDEF ALHideAnsiString}
 
 {***}
 const
@@ -4603,8 +4557,6 @@ begin
   Result := _ALIntToHex(Value, digits);
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 {******************************************************************}
 procedure _ALBinToHex(Buffer: PByte; Text: PByte; BufSize: Integer);
 const
@@ -4618,8 +4570,6 @@ begin
     Text[I * 2 + 1] := B2HConvert[Buffer[I] and $0F];
   end;
 end;
-
-{$IFNDEF ALHideAnsiString}
 
 {******************************************************************************}
 Function  ALTryBinToHex(const aBin: AnsiString; out Value: AnsiString): boolean;
@@ -4673,8 +4623,6 @@ begin
   if not ALTryHexToBin(aHex, Result) then
     raise Exception.Create('Bad hex value');
 end;
-
-{$ENDIF !ALHideAnsiString}
 
 {***********************************************************************}
 Function  ALTryBinToHexU(const aBin: TBytes; out Value: String): boolean;
@@ -4751,8 +4699,6 @@ begin
   if not ALTryHexToBinU(aHex, Result) then
     raise Exception.Create('Bad hex value');
 end;
-
-{$IFNDEF ALHideAnsiString}
 
 {***************************************************************}
 function ALIntToBit(value: integer; digits: integer): ansistring;
@@ -5168,8 +5114,6 @@ begin
   result := ALBase64DecodeString(result);
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 ////////////////////////////////////
 ////// Base64 (UnicodeString) //////
 ////////////////////////////////////
@@ -5233,7 +5177,6 @@ end;
 {$ENDIF CompilerVersion >= 31}
 
 {$IF CompilerVersion <= 30} // seattle
-{$IFNDEF ALHideAnsiString}
 
 {*****************************************************************************************}
 function ALBase64EncodeStringU(const S: String; const AEncoding: TEncoding = nil): String;
@@ -5259,10 +5202,7 @@ begin
   result := BytesOf(String(ALBase64DecodeString(AnsiString(S))));
 end;
 
-{$IFEND !ALHideAnsiString}
 {$IFEND}
-
-{$IFNDEF ALHideAnsiString}
 
 {*********************************************************************************************}
 function ALIsDecimal(const S: AnsiString; const RejectPlusMinusSign: boolean = False): boolean;
@@ -5348,8 +5288,6 @@ begin
     Format, Precision, Digits, AFormatSettings));
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 {***************************}
 {$WARN SYMBOL_DEPRECATED OFF}
 function ALIsDecimalU(const S: String; const RejectPlusMinusSign: boolean = False): boolean;
@@ -5421,8 +5359,6 @@ procedure ALFloatToStrU(Value: Extended; var S: String; const AFormatSettings: T
 begin
   S := FloatToStr(Value, AFormatSettings);
 end;
-
-{$IFNDEF ALHideAnsiString}
 
 {*******************************************************************************************}
 function  ALCurrToStr(Value: Currency; const AFormatSettings: TALFormatSettings): AnsiString;
@@ -6670,8 +6606,6 @@ begin
     Value := LValue;
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 {*****************************************************************************************************************}
 function  ALTryStrToFloatU(const S: String; out Value: Single; const AFormatSettings: TALFormatSettingsU): Boolean;
 begin
@@ -6689,8 +6623,6 @@ function  ALTryStrToFloatU(const S: String; out Value: Extended; const AFormatSe
 begin
   Result := TryStrToFloat(S, Value, AFormatSettings);
 end;
-
-{$IFNDEF ALHideAnsiString}
 
 {**********************************}
 {$IFNDEF ALCompilerVersionSupported}
@@ -6784,8 +6716,6 @@ begin
   Result := 0;
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 {*****************************************************************************************}
 {from John O'Harrow (john@elmcrest.demon.co.uk) - original name: StringReplace_JOH_IA32_12}
 function  ALPosExIgnoreCaseU(const SubStr, S: String; Offset: Integer = 1): Integer;
@@ -6833,8 +6763,6 @@ begin
   Result := 0;
 end;
 
-{$IFNDEF ALHideAnsiString}
-
 {***********************************************}
 function  AlUpCase(const Ch: AnsiChar): AnsiChar;
 begin
@@ -6851,8 +6779,6 @@ begin
     Inc(Result, Ord('a')-Ord('A'));
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 {******************************************}
 function  AlLoCaseU(Ch: WideChar): WideChar;
 begin
@@ -6862,8 +6788,6 @@ begin
       Inc(Result, Ord(char('a'))-Ord(char('A')));
   end;
 end;
-
-{$IFNDEF ALHideAnsiString}
 
 {************************************************}
 function  ALTrim(const S: AnsiString): AnsiString;
@@ -6925,8 +6849,6 @@ begin
   Result := Quote + Result + Quote;
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 {************************************************************************}
 function  ALQuotedStrU(const S: String; const Quote: Char = ''''): String;
 var
@@ -6937,8 +6859,6 @@ begin
     if Result.Chars[I] = Quote then Result := Result.Insert(I, Quote);
   Result := Quote + Result + Quote;
 end;
-
-{$IFNDEF ALHideAnsiString}
 
 {***************************************************************************}
 function ALExtractQuotedStr(var Src: PAnsiChar; Quote: AnsiChar): AnsiString;
@@ -6998,15 +6918,11 @@ begin
     Result := S;
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 {****************************************************************}
 function ALExtractQuotedStrU(var Src: PChar; Quote: Char): String;
 begin
   result := AnsiExtractQuotedStr(PWideChar(Src), Quote);
 end;
-
-{$IFNDEF ALHideAnsiString}
 
 {******************************************************************}
 function  ALExtractFilePath(const FileName: AnsiString): AnsiString;
@@ -7090,8 +7006,6 @@ begin
   else result := S;
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 {***********************************************************}
 function  ALExtractFilePathU(const FileName: String): String;
 begin
@@ -7159,8 +7073,6 @@ begin
   else result := S;
 end;
 
-{$IFNDEF ALHideAnsiString}
-
 {***********************************************************************************************}
 // warning ALStrMove inverse the order of the original StrMove (to keep the same order as ALMove)
 procedure ALStrMove(const Source: PAnsiChar; var Dest: PAnsiChar; Count: NativeInt);
@@ -7168,16 +7080,12 @@ begin
   ALMove(Source^, Dest^, Count);
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 {***********************************************************************************************}
 // warning ALStrMove inverse the order of the original StrMove (to keep the same order as ALMove)
 procedure ALStrMoveU(const Source: PChar; var Dest: PChar; Count: NativeInt);
 begin
   ALMove(Source^, Dest^, Count * sizeOf(Char));
 end;
-
-{$IFNDEF ALHideAnsiString}
 
 {****************************************************************************************}
 function ALCopyStr(const aSourceString: AnsiString; aStart, aLength: Integer): AnsiString;
@@ -7247,8 +7155,6 @@ begin
   result := ALCopyStr(aSourceString, P1, P2 - P1);
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 {*********************************************************************************}
 function ALCopyStrU(const aSourceString: String; aStart, aLength: Integer): String;
 var LSourceStringLn: Integer;
@@ -7299,7 +7205,7 @@ var P1, P2: integer;
 begin
   P1 := AlPosExIgnoreCaseU(aStartStr, aSourceString, aOffset);
   if P1 <= 0 then begin
-    if aRaiseExceptionIfNotFound then Raise EALExceptionU.Createfmt('Can not find%s the text %s in %s', [ALIfThenU(aOffset > 1, AlFormatU(' after offset %d', [aOffset])), aStartStr, aSourceString])
+    if aRaiseExceptionIfNotFound then Raise EALException.Createfmt('Can not find%s the text %s in %s', [ALIfThen(aOffset > 1, AlFormatU(' after offset %d', [aOffset])), aStartStr, aSourceString])
     else begin
       result := '';
       exit;
@@ -7308,7 +7214,7 @@ begin
   Inc(P1, Length(aStartStr));
   P2 := AlPosExIgnoreCaseU(aEndStr, aSourceString, P1);
   if P2 <= 0 then begin
-    if aRaiseExceptionIfNotFound then Raise EALExceptionU.Createfmt('Can not find%s the text %s in %s', [ALIfThenU(aOffset > 1, AlFormatU(' after offset %d', [aOffset])), aEndStr, aSourceString])
+    if aRaiseExceptionIfNotFound then Raise EALException.Createfmt('Can not find%s the text %s in %s', [ALIfThen(aOffset > 1, AlFormatU(' after offset %d', [aOffset])), aEndStr, aSourceString])
     else begin
       result := '';
       exit;
@@ -7316,8 +7222,6 @@ begin
   end;
   result := ALCopyStrU(aSourceString, P1, P2 - P1);
 end;
-
-{$IFNDEF ALHideAnsiString}
 
 {*******************************************************************************************}
 function  ALRandomStr(const aLength: Longint; const aCharset: Array of ansiChar): AnsiString;
@@ -7339,8 +7243,6 @@ begin
   Result := ALRandomStr(aLength,['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']);
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 {************************************************************************************}
 function  ALRandomStrU(const aLength: Longint; const aCharset: Array of Char): String;
 var X: Longint;
@@ -7360,8 +7262,6 @@ function ALRandomStrU(const aLength: Longint): String;
 begin
   Result := ALRandomStrU(aLength,['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']);
 end;
-
-{$IFNDEF ALHideAnsiString}
 
 {*********************************************************}
 function ALNEVExtractName(const S: AnsiString): AnsiString;
@@ -8211,8 +8111,6 @@ begin
   ALSaveStringtoFile(Str, String(filename));
 end;
 
-{$ENDIF}
-
 {**************************************************************}
 function  ALGetBytesFromStream(const aStream : TStream): Tbytes;
 var l: Integer;
@@ -8287,8 +8185,6 @@ begin
     ALFreeAndNil(LfileStream);
   end;
 end;
-
-{$IFNDEF ALHideAnsiString}
 
 {**********************}
 {$IF defined(MSWINDOWS)}
@@ -8715,8 +8611,6 @@ begin
                                                     // painfull, so convert to unicode and do the job
 end;
 
-{$ENDIF ALHideAnsiString}
-
 {*********************************************}
 //the first letter of each word is capitalized,
 //the rest are lower case
@@ -8744,8 +8638,6 @@ begin
   if length(Result) = 0 then exit;
   result[low(result)] := Result.Chars[0].ToUpper;
 end;
-
-{$IFNDEF ALHideAnsiString}
 
 {**********************}
 {$IF defined(MSWINDOWS)}
@@ -9907,8 +9799,6 @@ Begin
   until EOS;
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 {**************************************************}
 function  ALHTTPEncodeU(const AStr: String): String;
 // The NoConversion set contains characters as specificed in RFC 1738 and
@@ -10109,8 +9999,6 @@ end;
 /// deprecated ///
 //////////////////
 
-{$IFNDEF ALHideAnsiString}
-
 {**********}
 //deprecated
 Function  ALUTF8Decode(const S: UTF8String; const aCodePage: Word): AnsiString; deprecated 'use ALStringDecode instead';
@@ -10224,17 +10112,11 @@ Begin
   Result := ALBGNPCGN1947CyrillicToLatin(aCyrillicText);
 End;
 
-{$ENDIF !ALHideAnsiString}
-
 
 {********************************}
 Procedure _ALStringInitialization;
-{$IFNDEF ALHideAnsiString}
 var I: integer;
-{$ENDIF}
 begin
-
-  {$IFNDEF ALHideAnsiString}
 
   //
   // Taken from https://github.com/synopse/mORMot.git
@@ -10251,14 +10133,11 @@ begin
     ConvertBase64ToBin[b64enc[i]] := i;
   ConvertBase64ToBin['='] := -2; // special value for '='
 
-  {$ENDIF !ALHideAnsiString}
-
   {$IF CompilerVersion >= 31} // berlin
   _Base64Encoding := nil;
   {$ENDIF}
 
   //https://stackoverflow.com/questions/50590627/tformatsettings-createen-us-returns-different-settings-on-different-platform
-  {$IFNDEF ALHideAnsiString}
   ALPosExIgnoreCaseInitialiseLookupTable;
   ALDefaultFormatSettings := TALFormatSettings.Create('en-US'); // 1033 {en-US}
   ALDefaultFormatSettings.CurrencyString := '$';
@@ -10315,7 +10194,7 @@ begin
   ALDefaultFormatSettings.DecimalSeparator := '.';
   ALDefaultFormatSettings.TwoDigitYearCenturyWindow := 50;
   ALDefaultFormatSettings.NegCurrFormat := 0;
-  {$ENDIF !ALHideAnsiString}
+
   ALDefaultFormatSettingsU := TALFormatSettingsU.Create('en-US'); // 1033 {en-US}
   ALDefaultFormatSettingsU.CurrencyString := '$';
   ALDefaultFormatSettingsU.CurrencyFormat := 0;
@@ -10372,7 +10251,6 @@ begin
   ALDefaultFormatSettingsU.TwoDigitYearCenturyWindow := 50;
   ALDefaultFormatSettingsU.NegCurrFormat := 0;
 
-  {$IFNDEF ALHideAnsiString}
   ALPosEx := ALPos;
   AlUpperCase := System.Ansistrings.UpperCase;
   AlLowerCase := system.AnsiStrings.LowerCase;
@@ -10383,7 +10261,6 @@ begin
   ALMatchText := System.AnsiStrings.MatchText;
   ALMatchStr := System.AnsiStrings.MatchStr;
   ALStringReplace := System.AnsiStrings.StringReplace;
-  {$ENDIF !ALHideAnsiString}
 
   ALMatchesMaskU := System.Masks.MatchesMask;
   ALDateToStrU := system.sysutils.DateToStr;

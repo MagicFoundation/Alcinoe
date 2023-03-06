@@ -475,14 +475,14 @@ function ALRectPlaceInto(const R: TRectf;
 
 type
 
-  {$IFNDEF ALHideAnsiString}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   EALException = class(Exception)
   public
-    constructor Create(const Msg: AnsiString);
-    constructor CreateFmt(const Msg: ansistring; const Args: array of const);
+    constructor Create(const Msg: AnsiString); overload;
+    constructor Create(const Msg: string); overload;
+    constructor CreateFmt(const Msg: ansistring; const Args: array of const); overload;
+    constructor CreateFmt(const Msg: string; const Args: array of const); overload;
   end;
-  {$ENDIF !ALHideAnsiString}
-  EALExceptionU = class(Exception);
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 var ALCallStackCustomLogsMaxCount: integer = 50;
@@ -517,10 +517,8 @@ function  ALIfThen(AValue: Boolean; const ATrue: UInt64; const AFalse: UInt64 = 
 function  ALIfThen(AValue: Boolean; const ATrue: Single; const AFalse: Single = 0): Single; overload; inline;
 function  ALIfThen(AValue: Boolean; const ATrue: Double; const AFalse: Double = 0): Double; overload; inline;
 function  ALIfThen(AValue: Boolean; const ATrue: Extended; const AFalse: Extended = 0): Extended; overload; inline;
-{$IFNDEF ALHideAnsiString}
 function  ALIfThen(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString; overload; inline;
-{$ENDIF !ALHideAnsiString}
-function  ALIfThenU(AValue: Boolean; const ATrue: String; AFalse: String = ''): String; overload; inline;
+function  ALIfThen(AValue: Boolean; const ATrue: String; AFalse: String = ''): String; overload; inline;
 
 {$IFDEF MSWINDOWS}
 {$IFNDEF ALCompilerVersionSupported}
@@ -2314,12 +2312,16 @@ begin
   Result.cy := Size.cy;
 end;
 
-{$IFNDEF ALHideAnsiString}
-
 {*****************************************************}
 constructor EALException.Create(const Msg: AnsiString);
 begin
   inherited create(String(Msg));
+end;
+
+{*************************************************}
+constructor EALException.Create(const Msg: string);
+begin
+  inherited create(Msg);
 end;
 
 {************************************************************************************}
@@ -2328,7 +2330,11 @@ begin
   inherited CreateFmt(String(Msg), Args);
 end;
 
-{$ENDIF !ALHideAnsiString}
+{********************************************************************************}
+constructor EALException.CreateFmt(const Msg: string; const Args: array of const);
+begin
+  inherited CreateFmt(Msg, Args);
+end;
 
 {*****************************************************}
 procedure ALAddCallStackCustomLogU(Const aLog: String);
@@ -2506,8 +2512,6 @@ Begin
   result := (LTotal - (LBorder*2) - LObject) div 2 + LBorder;
 End;
 
-{$IFNDEF ALHideAnsiString}
-
 {***********************************************************************************************}
 function ALIfThen(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString;
 begin
@@ -2517,10 +2521,8 @@ begin
     Result := AFalse;
 end;
 
-{$ENDIF !ALHideAnsiString}
-
-{************************************************************************************}
-function ALIfThenU(AValue: Boolean; const ATrue: String; AFalse: String = ''): String;
+{***********************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: String; AFalse: String = ''): String;
 begin
   if AValue then
     Result := ATrue

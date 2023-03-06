@@ -7,8 +7,6 @@ interface
 uses
   Alcinoe.StringList;
 
-{$IFNDEF ALHideAnsiString}
-
 procedure ALExtractHTMLText(HtmlContent: AnsiString;
                             LstExtractedResourceText: TALStrings;
                             Const DecodeHTMLText: Boolean = True); overload;
@@ -32,9 +30,6 @@ procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(Var HtmlContent: AnsiString
                                                      Const DeleteBodyOfUnwantedTag: Boolean = False;
                                                      const ReplaceUnwantedTagCharBy: AnsiChar = #1);
 procedure ALCompactHtmlTagParams(TagParams: TALStrings);
-
-{$ENDIF}
-
 function  ALJavascriptEncodeU(const Src: String; const useNumericReference: boolean = true): String;
 procedure ALJavascriptDecodeVU(Var Str: String);
 function  ALJavascriptDecodeU(const Src: String): String;
@@ -45,7 +40,6 @@ function  ALJavascriptDecodeU(const Src: String): String;
 /// deprecated functions ///
 ////////////////////////////
 
-{$IFNDEF ALHideAnsiString}
 procedure ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
                                 LstExtractedResourceText: TALStrings;
                                 Const DecodeHTMLText: Boolean = True); overload; deprecated 'use ALExtractHTMLText instead with SetMultiByteConversionCodePage(CP_UTF8)';
@@ -59,7 +53,6 @@ function  ALUTF8HTMLEncode(const Src: AnsiString;
 function  ALUTF8HTMLDecode(const Src: AnsiString): AnsiString; deprecated 'use ALHTMLDecode instead with SetMultiByteConversionCodePage(CP_UTF8)';
 procedure ALUTF8JavascriptDecodeV(Var Str: AnsiString); deprecated 'use ALJavascriptDecodeV instead with SetMultiByteConversionCodePage(CP_UTF8)';
 function  ALUTF8JavascriptDecode(const Src: AnsiString): AnsiString; deprecated 'use ALJavascriptDecode instead with SetMultiByteConversionCodePage(CP_UTF8)';
-{$ENDIF !ALHideAnsiString}
 
 
 implementation
@@ -76,8 +69,6 @@ uses
   Alcinoe.Common,
   Alcinoe.StringUtils,
   Alcinoe.QuickSortList;
-
-{$IFNDEF ALHideAnsiString}
 
 Var
   _ALHtmlEntities: TALStrings;
@@ -1269,8 +1260,6 @@ begin
   ALJavascriptDecodeV(result);
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 {******************************************************************************************}
 // https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Values,_variables,_and_literals
 function  ALJavascriptEncodeU(const Src: String; const useNumericReference: boolean = true): String;
@@ -1437,7 +1426,7 @@ var CurrPos : Integer;
         '0'..'9': Result := I * 16 + Ord(Ch) - Ord('0');
         'a'..'f': Result := I * 16 + Ord(Ch) - Ord('a') + 10;
         'A'..'F': Result := I * 16 + Ord(Ch) - Ord('A') + 10;
-        else raise EALExceptionU.Create('Wrong HEX-character found');
+        else raise EALException.Create('Wrong HEX-character found');
       end;
     end;
 
@@ -1624,8 +1613,6 @@ begin
   result := Src;
   ALJavascriptDecodeVU(result);
 end;
-
-{$IFNDEF ALHideAnsiString}
 
 {****************}
 {$IFDEF MSWINDOWS}
@@ -1925,15 +1912,11 @@ Begin
   end;
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 
 
 ////////////////////////////
 /// deprecated functions ///
 ////////////////////////////
-
-{$IFNDEF ALHideAnsiString}
 
 {**********}
 //deprecated
@@ -1996,11 +1979,7 @@ begin
   result := ALJavascriptDecode(Src);
 end;
 
-{$ENDIF !ALHideAnsiString}
-
 Initialization
-
-{$IFNDEF ALHideAnsiString}
   _ALHtmlEntities := TALStringList.create;
   TALStringList(_ALHtmlEntities).NameValueOptimization := False;
   ALInitHtmlEntities(_ALHtmlEntities);
@@ -2009,11 +1988,8 @@ Initialization
     Duplicates := DupAccept;
     Sorted := True;
   end;
-{$ENDIF}
 
 Finalization
-{$IFNDEF ALHideAnsiString}
   _ALHtmlEntities.Free;
-{$ENDIF}
 
 end.

@@ -12,17 +12,13 @@ interface
 {$IFEND}
 
 uses
-  {$IFNDEF ALHideAnsiString}
   System.SysUtils,
   {$IFDEF MSWINDOWS}
   Winapi.Wininet,
   {$ENDIF}
   Alcinoe.StringList,
   Alcinoe.MultiPartParser,
-  {$ENDIF}
   System.Classes;
-
-{$IFNDEF ALHideAnsiString}
 
 type
 
@@ -475,9 +471,7 @@ const
                                                              'Dec');
 
 function ALGmtDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
-{$IFDEF MSWINDOWS}
 function ALDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
-{$ENDIF}
 function ALTryRfc822StrToGMTDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
 function ALRfc822StrToGMTDateTime(const s: AnsiString): TDateTime;
 
@@ -502,9 +496,6 @@ procedure ALIPv6SplitParts(const aIPv6: TALIPv6Binary;
                            var aHigestPart: UInt64);
 
 procedure ALDecompressHttpResponseContent(const aContentEncoding: AnsiString; var aContentStream: TMemoryStream);
-
-{$ENDIF}
-
 procedure ALDecompressHttpResponseContentU(const aContentEncoding: String; var aContentStream: TMemoryStream);
 
 Const
@@ -514,7 +505,6 @@ Const
 
 implementation
 
-{$IFNDEF ALHideAnsiString}
 uses
   {$IFDEF MSWINDOWS}
   Winapi.Windows,
@@ -529,9 +519,6 @@ uses
   system.AnsiStrings,
   Alcinoe.Common,
   Alcinoe.StringUtils;
-{$ENDIF}
-
-{$IFNDEF ALHideAnsiString}
 
 {************************************************************************************}
 function _AlStringFetch(var AInput: AnsiString; const ADelim: AnsiString): AnsiString;
@@ -1439,14 +1426,12 @@ begin
                       'GMT']);
 end;
 
-{****************}
-{$IFDEF MSWINDOWS}
+{***********************************************************************}
 {aValue is a Local TDateTime - result is "Sun, 06 Nov 1994 08:49:37 GMT"}
 function ALDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
 begin
   Result := ALGMTDateTimeToRfc822Str(AlLocalDateTimeToUTC(aValue));
 end;
-{$ENDIF}
 
 {************************************************************}
 {Sun, 06 Nov 1994 08:49:37 GMT  ; RFC 822, updated by RFC 1123
@@ -1977,8 +1962,6 @@ begin
   aContentStream.Position := 0;
 end;
 
-{$ENDIF}
-
 {************************************************************************************************************}
 procedure ALDecompressHttpResponseContentU(const aContentEncoding: String; var aContentStream: TMemoryStream);
 begin
@@ -2005,8 +1988,6 @@ begin
   {$ENDIF}
   aContentStream.Position := 0;
 end;
-
-{$IFNDEF ALHideAnsiString}
 
 {***********************************************************************************}
 constructor EALHTTPClientException.Create(const Msg: AnsiString; SCode: Integer = 0);
@@ -2597,8 +2578,6 @@ begin
     DoChange(3);
   end;
 end;
-
-{$ENDIF}
 
 end.
 

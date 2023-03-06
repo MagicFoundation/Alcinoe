@@ -141,9 +141,7 @@ uses
   system.Classes,
   system.sysutils,
   system.types,
-  {$IFNDEF ALHideAnsiString}
-    Alcinoe.XMLDoc,
-  {$ENDIF}
+  Alcinoe.XMLDoc,
   Alcinoe.StringUtils,
   Alcinoe.StringList;
 
@@ -229,8 +227,6 @@ type
     preUnGreedy,       // Repeat operators (+, *, ?) are not greedy by default (i.e. they try to match the minimum number of characters instead of the maximum)
     preNoAutoCapture   // (group) is a non-capturing group; only named groups capture
   );
-
-{$IFNDEF ALHideAnsiString}
 
 type
 
@@ -786,8 +782,6 @@ Function ALFindJsonNodeByTextChildNodeValue(const JsonNode:TalJsonNode;
                                             Const ChildNodeValue : AnsiString;
                                             Const Recurse: Boolean = False): TALJsonNode;
 
-{$ENDIF !ALHideAnsiString}
-
 type
 
   {class definition}
@@ -1338,8 +1332,6 @@ uses
   Alcinoe.QuickSortList,
   Alcinoe.HTML,
   Alcinoe.Common;
-
-{$IFNDEF ALHideAnsiString}
 
 {*********************************************************************}
 Function ALFindJsonNodeByInt32ChildNodeValue(const JsonNode:TalJsonNode;
@@ -8138,7 +8130,7 @@ begin
       if aJsonNode.NodeType = ntArray then LTmpPath := aPath + '[' + alinttostr(I) + ']'
       else begin
         if aJsonNode.ChildNodes[I].NodeName = '' then raise Exception.Create('Nodename can not be empty');
-        LTmpPath := aPath + alIfThen(aPath <> '', '.', '') + aJsonNode.ChildNodes[I].NodeName;
+        LTmpPath := aPath + alIfThen(aPath <> '', AnsiString('.'), AnsiString('')) + aJsonNode.ChildNodes[I].NodeName;
       end;
 
       case aJsonNode.ChildNodes[I].NodeType of
@@ -8419,8 +8411,6 @@ begin
     else raise Exception.Create('Unknown Node SubType');
   end;
 end;
-
-{$ENDIF !ALHideAnsiString}
 
 {************************************************************************}
 Function ALFindJsonNodeByInt32ChildNodeValueU(const JsonNode:TalJsonNodeU;
@@ -15101,7 +15091,7 @@ begin
       if aJsonNode.NodeType = ntArray then LTmpPath := aPath + '[' + alinttostrU(I) + ']'
       else begin
         if aJsonNode.ChildNodes[I].NodeName = '' then raise Exception.Create('Nodename can not be empty');
-        LTmpPath := aPath + alIfThenU(aPath <> '', '.', '') + aJsonNode.ChildNodes[I].NodeName;
+        LTmpPath := aPath + alIfThen(aPath <> '', '.', '') + aJsonNode.ChildNodes[I].NodeName;
       end;
 
       case aJsonNode.ChildNodes[I].NodeType of
@@ -15216,7 +15206,7 @@ begin
             if (length(LNames[J]) <= 2) or
                (LNames[J][1] <> '[') or
                (LNames[J][length(LNames[J])] <> ']') or
-               (not ALTryStrToIntU(ALCopyStrU(LNames[J], 2, Length(LNames[J]) - 2), LIndex)) then raise EALExceptionU.CreateFmt('Wrong path: "%s"', [aLst.Names[I]]);
+               (not ALTryStrToIntU(ALCopyStrU(LNames[J], 2, Length(LNames[J]) - 2), LIndex)) then raise EALException.CreateFmt('Wrong path: "%s"', [aLst.Names[I]]);
             while LIndex > LCurrJsonNode.ChildNodes.Count - 1 do begin
               if J = LNames.Count - 1 then LCurrJsonNode.AddChild(ntText)
               else if (LNames[J+1] <> '') and
@@ -15228,7 +15218,7 @@ begin
 
           //if we are not in array
           else begin
-            LLowerName := alifThenU(aNameToLowerCase, allowercaseU(LNames[J]), LNames[J]);
+            LLowerName := alifThen(aNameToLowerCase, allowercaseU(LNames[J]), LNames[J]);
             aTmpJsonNode := LCurrJsonNode.ChildNodes.FindNode(LLowerName);
             if not assigned(aTmpJsonNode) then begin
               if J = LNames.Count - 1 then LCurrJsonNode := LCurrJsonNode.AddChild(LLowerName, ntText)
@@ -15350,14 +15340,12 @@ end;
 
 initialization
 
-{$IFNDEF ALHideAnsiString}
   vALJsonISODateFormatSettings := TalFormatSettings.Create('en-US');
   vALJsonISODateFormatSettings.DateSeparator := '-';
   vALJsonISODateFormatSettings.TimeSeparator := ':';
   vALJsonISODateFormatSettings.ShortDateFormat := 'yyyy-mm-dd';
   vALJsonISODateFormatSettings.ShortTimeFormat := 'hh:nn:ss.zzz';
   vALDefaultNodeIndent := '  '; { 2 spaces }
-{$ENDIF}
 
   vALJsonISODateFormatSettingsU := TalFormatSettingsU.Create('en-US');
   vALJsonISODateFormatSettingsU.DateSeparator := '-';

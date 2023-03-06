@@ -48,13 +48,9 @@ Uses
   System.Generics.Defaults,
   System.Generics.Collections,
   System.Math,
-  {$IFNDEF ALHideAnsiString}
   System.Contnrs,
   Alcinoe.AVLBinaryTree,
-  {$ENDIF}
   Alcinoe.QuickSortList;
-
-{$IFNDEF ALHideAnsiString}
 
 Type
 
@@ -539,8 +535,6 @@ Type
     property OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
   end;
 
-{$ENDIF !ALHideAnsiString}
-
 type
 
   {------------------}
@@ -853,14 +847,10 @@ implementation
 Uses
   System.RTLConsts,
   system.IOUtils,
-  {$IFNDEF ALHideAnsiString}
   System.Ansistrings,
   System.Hash,
-  {$ENDIF}
   Alcinoe.StringUtils,
   Alcinoe.Common;
-
-{$IFNDEF ALHideAnsiString}
 
 {************************************************************}
 constructor TALStringsEnumerator.Create(AStrings: TALStrings);
@@ -5040,8 +5030,6 @@ begin
     Changed;
   end;
 end;
-
-{$ENDIF !ALHideAnsiString}
 
 {**************************************************************}
 constructor TALStringsEnumeratorU.Create(AStrings: TALStringsU);

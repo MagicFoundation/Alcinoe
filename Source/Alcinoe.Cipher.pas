@@ -28,14 +28,11 @@ uses
 type
   FixedInt = LongInt;
   PFixedUInt = PLongword;
-{$IFEND}
+{$ENDIF}
 
 { Cipher exception }
 type
-  {$IFNDEF ALHideAnsiString}
   EALCipherException = class(EALException);
-  {$ENDIF}
-  EALCipherExceptionU = class(EALExceptionU);
 
 { encryption key types }
 type
@@ -51,8 +48,6 @@ type
 //////////////////////
 ////// Blowfish //////
 //////////////////////
-
-{$IFNDEF ALHideAnsiString}
 
 { encryption block types }
 type
@@ -85,8 +80,6 @@ procedure ALBFEncryptStream(InStream, OutStream: TStream; const Key: AnsiString;
 procedure ALBFEncryptStreamCBC(InStream, OutStream : TStream; const Key : TAlCipherKey128; Encrypt : Boolean); overload;
 procedure ALBFEncryptStreamCBC(InStream, OutStream: TStream; const Key: AnsiString; Encrypt : Boolean); overload;
 
-{$ENDIF !ALHideAnsiString}
-
 
 
 ////////////////////////////
@@ -103,7 +96,7 @@ type
   // i64Function return type does not match operand type of return inst!
   //   ret void
   // i64
-  TALRDLVector = {$IF CompilerVersion <= 32} packed {$IFEND} record
+  TALRDLVector = {$IF CompilerVersion <= 32} packed {$ENDIF} record
     case Byte of
       0 : (dw : DWord);
       1 : (bt : array[0..3] of Byte);
@@ -133,7 +126,6 @@ procedure ALEncryptRDL(const Context : TALRDLContext; var Block : TALRDLBlock);
 procedure ALEncryptRDLCBC(const Context : TALRDLContext; const Prev : TALRDLBlock; var Block : TALRDLBlock);
 procedure ALRDLEncryptStream(const InStream, OutStream : TStream; const Key; const KeySize : FixedInt; const Encrypt : Boolean); overload;
 procedure ALRDLEncryptStreamCBC(const InStream, OutStream : TStream; const Key; const KeySize : FixedInt; const Encrypt : Boolean); overload;
-{$IFNDEF ALHideAnsiString}
 procedure ALRDLEncryptString(const InString: AnsiString; var OutString : AnsiString; const Key; const KeySize : FixedInt; const Encrypt : Boolean); overload;
 function  ALRDLEncryptString(const InString: AnsiString; const Key; const KeySize : FixedInt; const Encrypt : Boolean) : AnsiString; overload;
 procedure ALRDLEncryptString(const InString: AnsiString; var OutString : AnsiString; const Key: AnsiString; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean); overload;
@@ -144,7 +136,6 @@ procedure ALRDLEncryptStringCBC(const InString: AnsiString; var OutString : Ansi
 function  ALRDLEncryptStringCBC(const InString: AnsiString; const Key: AnsiString; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean) : AnsiString; overload;
 procedure ALRDLEncryptStream(const InStream, OutStream : TStream; const Key: AnsiString; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean); overload;
 procedure ALRDLEncryptStreamCBC(const InStream, OutStream : TStream; const Key: AnsiString; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean); overload;
-{$ENDIF}
 procedure ALRDLEncryptStringU(const InString: String; var OutString : String; const Key; const KeySize : FixedInt; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false); overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
 procedure ALRDLEncryptStringU(const InString: String; var OutString : String; const Key: String; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false); overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
 function  ALRDLEncryptStringU(const InString: String; const Key; const KeySize : FixedInt; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false) : String; overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
@@ -166,10 +157,8 @@ procedure ALRDLEncryptStreamCBCU(const InStream, OutStream : TStream; const Key:
 type
   TALMD5Digest  = TALCipherKey128;         { 128 bits - MD5 }
 
-{$IFNDEF ALHideAnsiString}
 procedure ALStringHashMD5(var Digest : TALMD5Digest; const Str : AnsiString); overload;
 function  ALStringHashMD5(const Str : AnsiString; const HexEncode: boolean = true): AnsiString; overload;
-{$ENDIF}
 procedure ALStringHashMD5U(var Digest: TALMD5Digest; const Str: String; Const encoding: Tencoding); overload;
 function  ALStringHashMD5U(const Str: String; Const encoding: Tencoding): String; overload; // result will be hexencoded
 
@@ -182,10 +171,8 @@ function  ALStringHashMD5U(const Str: String; Const encoding: Tencoding): String
 type
   TALSHA1Digest = array [0..19] of Byte;         { 160 bits - SHA-1 }
 
-{$IFNDEF ALHideAnsiString}
 procedure ALStringHashSHA1(var Digest: TALSHA1Digest; const Str: AnsiString); overload;
 function  ALStringHashSHA1(const Str: AnsiString; const HexEncode: boolean = true): AnsiString; overload;
-{$ENDIF}
 procedure ALStringHashSHA1U(var Digest: TALSHA1Digest; const Str : String; Const encoding: Tencoding); overload;
 function  ALStringHashSHA1U(const Str: String; Const encoding: Tencoding): String; overload; // result will be hexencoded
 
@@ -197,10 +184,8 @@ function  ALStringHashSHA1U(const Str: String; Const encoding: Tencoding): Strin
 
 {$IF CompilerVersion >= 32} // tokyo
 
-{$IFNDEF ALHideAnsiString}
 procedure ALStringHashSHA2(var Digest: TBytes; const Str: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256); overload;
 function  ALStringHashSHA2(const Str: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const HexEncode: boolean = true): AnsiString; overload;
-{$ENDIF}
 procedure ALStringHashSHA2U(var Digest: Tbytes; const Str: String; Const encoding: Tencoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256); overload;
 function  ALStringHashSHA2U(const Str: String; Const encoding: Tencoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): String; overload; // result will be hexencoded
 
@@ -229,10 +214,8 @@ function ALBCryptSelfTest: Boolean;
 ////// HMAC algorithms //////
 /////////////////////////////
 
-{$IFNDEF ALHideAnsiString}
 function  ALCalcHMACSHA1(const Str, Key : AnsiString): AnsiString;
 function  ALCalcHMACMD5(const Str, Key : AnsiString): AnsiString;
-{$ENDIF}
 
 
 
@@ -248,7 +231,6 @@ function  ALCalcHMACMD5(const Str, Key : AnsiString): AnsiString;
  //function, but as a convenient very fast hashing function at application level.
 
 {$IFDEF ALCPUXASM}
-{$IFNDEF ALHideAnsiString}
 
 /// compute CRC32 checksum on the supplied buffer
 // - this variable will use the fastest mean available, e.g. SSE 4.2
@@ -265,7 +247,6 @@ var ALHashCrc64c: function(buf: PAnsiChar; len: cardinal): int64;
 // test the implementation of the CRC32
 function ALTestCrc32cImplementation: Boolean;
 
-{$ENDIF}
 {$ENDIF ALCPUXASM}
 
 
@@ -288,10 +269,8 @@ var ALRandom64: function(const ARange: UInt64): UInt64;
 ////// Fnv1a //////
 ///////////////////
 
-{$IFNDEF ALHideAnsiString}
 function ALFnv1aInt32(const str: ansiString): int32; inline;
 function ALFnv1aInt64(const str: ansiString): Int64; inline;
-{$ENDIF}
 function ALFnv1aInt32U(const str: String; Const encoding: Tencoding): int32; inline;
 function ALFnv1aInt64U(const str: String; Const encoding: Tencoding): Int64; inline;
 
@@ -308,7 +287,7 @@ function ALVerifyRSA256Signature(const aData: AnsiString; // bytes string
                                  Const aBase64PubKeyExponent: ansiString): boolean;
 function ALRSA256Sign(const aData: AnsiString; // bytes string
                       const aPemPrivateKey: AnsiString): ansiString; // byte string result
-{$IFEND}
+{$ENDIF}
 
 
 
@@ -549,7 +528,7 @@ uses
   Alcinoe.HTTP.Client.WinHTTP,
   Alcinoe.JSONDoc,
   Alcinoe.HTML,
-  {$IFEND}
+  {$ENDIF}
   system.Math,
   Alcinoe.Files,
   Alcinoe.StringList,
@@ -664,7 +643,7 @@ asm
   mov  ecx, edx         {get count to cl}
   rol  eax, cl          {rotate eax by cl}
 end;
-{$ifend}
+{$ENDIF}
 
 {**************************************************************************************}
 procedure ALCipherTransform(var Buffer : array of DWord;  const InBuf : array of DWord);
@@ -930,8 +909,6 @@ begin
   ALFinalizeMD5(Context, Digest);
 end;
 
-{$IFNDEF ALHideAnsiString}
-
 {***************************************************************************}
 procedure ALStringHashMD5(var Digest : TALMD5Digest; const Str : AnsiString);
 begin
@@ -949,8 +926,6 @@ Begin
     ALmove(aMD5Digest, pointer(result)^, length(result));
   end;
 end;
-
-{$ENDIF}
 
 {*************************************************************************************************}
 procedure ALStringHashMD5U(var Digest: TALMD5Digest; const Str: String; Const encoding: Tencoding);
@@ -970,13 +945,11 @@ Begin
   Result := ALBinToHexU(aMD5Digest, SizeOf(aMD5Digest));
 end;
 
-{$IFEND}
+{$ENDIF}
 {$ENDREGION}
 
 {$REGION ' CompilerVersion >= 32'}
 {$IF CompilerVersion >= 32} // tokyo
-
-{$IFNDEF ALHideAnsiString}
 
 {*************************************************************************}
 procedure ALStringHashMD5(var Digest: TALMD5Digest; const Str: AnsiString);
@@ -1003,8 +976,6 @@ begin
     ALMove(PByte(LBytes)^, pointer(result)^, length(LBytes));
   end;
 end;
-
-{$ENDIF}
 
 {*************************************************************************************************}
 procedure ALStringHashMD5U(var Digest: TALMD5Digest; const Str: String; Const encoding: Tencoding);
@@ -1241,8 +1212,6 @@ begin
   ALFinalizeSHA1( Context, Digest );
 end;
 
-{$IFNDEF ALHideAnsiString}
-
 {*****************************************************************************}
 procedure ALStringHashSHA1(var Digest : TALSHA1Digest; const Str : AnsiString);
 begin
@@ -1260,8 +1229,6 @@ Begin
     ALmove(aSHA1Digest, pointer(result)^, length(result));
   end;
 end;
-
-{$ENDIF}
 
 {****************************************************************************************************}
 procedure ALStringHashSHA1U(var Digest: TALSHA1Digest; const Str : String; Const encoding: Tencoding);
@@ -1281,13 +1248,11 @@ Begin
   Result := ALBinToHexU(aSHA1Digest, SizeOf(aSHA1Digest));
 end;
 
-{$IFEND}
+{$ENDIF}
 {$ENDREGION}
 
 {$REGION ' CompilerVersion >= 32'}
 {$IF CompilerVersion >= 32} // tokyo
-
-{$IFNDEF ALHideAnsiString}
 
 {***************************************************************************}
 procedure ALStringHashSHA1(var Digest: TALSHA1Digest; const Str: AnsiString);
@@ -1314,8 +1279,6 @@ begin
     ALMove(PByte(LBytes)^, pointer(result)^, length(LBytes));
   end;
 end;
-
-{$ENDIF}
 
 {****************************************************************************************************}
 procedure ALStringHashSHA1U(var Digest: TALSHA1Digest; const Str : String; Const encoding: Tencoding);
@@ -1350,8 +1313,6 @@ end;
 
 {$IF CompilerVersion >= 32} // tokyo
 
-{$IFNDEF ALHideAnsiString}
-
 {************************************************************************************************************************************************}
 procedure ALStringHashSHA2(var Digest: TBytes; const Str: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256);
 var LSHA2: THashSHA2;
@@ -1375,8 +1336,6 @@ begin
     ALMove(PByte(LBytes)^, pointer(result)^, length(LBytes));
   end;
 end;
-
-{$ENDIF}
 
 {************************************************************************************************************************************************************************}
 procedure ALStringHashSHA2U(var Digest: Tbytes; const Str: String; Const encoding: Tencoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256);
@@ -1695,7 +1654,7 @@ begin
 end;
 {$IF defined(ALOverflowCheckingON)}
   {$Q+} {Overflow Checking}
-{$IFEND}
+{$ENDIF}
 
 {**************************************************************************************}
 class function TBCrypt.CryptCore(const Cost: Integer; key, salt: array of Byte): TBytes;
@@ -2810,8 +2769,6 @@ end;
 ////// HMAC algorithms //////
 /////////////////////////////
 
-{$IFNDEF ALHideAnsiString}
-
 {****************************************************************}
 function  ALCalcHMACSHA1(const Str, Key : AnsiString): AnsiString;
 Const BlockSize = 64; // Blocksize is 64 (bytes) when using one of the following hash functions: SHA-1, MD5, RIPEMD-128/160.[2]
@@ -2893,8 +2850,6 @@ begin
 
   result := ALStringHashMD5(o_key_pad + i_key_pad); // result := hash(o_key_pad + hash(i_key_pad + message))
 end;
-
-{$ENDIF !ALHideAnsiString}
 
 
 
@@ -3422,7 +3377,7 @@ begin
   {process all except the last block}
   for I := 1 to BlockCount - 1 do begin
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
-      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
     ALEncryptRDL(Context, Block);
     OutStream.WriteBuffer(Block, SizeOf(Block));
   end;
@@ -3433,7 +3388,7 @@ begin
     {set actual number of bytes to read}
     I := (InStream.Size mod SizeOf(Block));
     if InStream.Read(Block, I) <> I then
-      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
 
     {store number of bytes as last byte in last block}
     PByteArray(@Block)^[SizeOf(Block)-1] := I;
@@ -3444,7 +3399,7 @@ begin
   end else begin
     {encrypted file is always a multiple of the block size}
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
-      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
     ALEncryptRDL(Context, Block);
 
     {get actual number of bytes encoded}
@@ -3506,7 +3461,7 @@ begin
   {process all except the last block}
   for I := 1 to BlockCount - 1 do begin
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
-      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
 
     if Encrypt then begin
       ALEncryptRDLCBC(Context, IV, Block);
@@ -3526,7 +3481,7 @@ begin
     {set actual number of bytes to read}
     I := (InStream.Size mod SizeOf(Block));
     if InStream.Read(Block, I) <> I then
-      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
 
     {store number of bytes as last byte in last block}
     PByteArray(@Block)^[SizeOf(Block)-1] := I;
@@ -3537,7 +3492,7 @@ begin
   end else begin
     {encrypted file is always a multiple of the block size}
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
-      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
     ALEncryptRDLCBC(Context, IV, Block);
 
     {get actual number of bytes encoded}
@@ -3550,8 +3505,6 @@ end;
 {$IF defined(ALOverflowCheckingON)}
   {$Q+} {Overflow Checking}
 {$ENDIF}
-
-{$IFNDEF ALHideAnsiString}
 
 {******************************************************}
 procedure AlRDLEncryptString(const InString: AnsiString;
@@ -3630,7 +3583,7 @@ procedure AlRDLEncryptString(const InString: AnsiString;
 var aCipherKey128: TALCipherKey128;
 {$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
-{$IFEND}
+{$ENDIF}
 begin
   if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
     ALStringHashMD5(aCipherKey128, Key);
@@ -3641,7 +3594,7 @@ begin
     ALStringHashSHA2(aCipherKey256, Key);
     AlRDLEncryptString(InString,OutString, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
-  {$IFEND}
+  {$ENDIF}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
@@ -3654,7 +3607,7 @@ procedure AlRDLEncryptStringCBC(const InString: AnsiString;
 var aCipherKey128: TALCipherKey128;
 {$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
-{$IFEND}
+{$ENDIF}
 begin
   if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
     ALStringHashMD5(aCipherKey128, Key);
@@ -3665,7 +3618,7 @@ begin
     ALStringHashSHA2(aCipherKey256, Key);
     AlRDLEncryptStringCBC(InString, OutString, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
-  {$IFEND}
+  {$ENDIF}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
@@ -3677,7 +3630,7 @@ function  AlRDLEncryptString(const InString: AnsiString;
 var aCipherKey128: TALCipherKey128;
 {$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
-{$IFEND}
+{$ENDIF}
 begin
   if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
     ALStringHashMD5(aCipherKey128, Key);
@@ -3688,7 +3641,7 @@ begin
     ALStringHashSHA2(aCipherKey256, Key);
     Result := AlRDLEncryptString(InString, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
-  {$IFEND}
+  {$ENDIF}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
@@ -3700,7 +3653,7 @@ function  AlRDLEncryptStringCBC(const InString: AnsiString;
 var aCipherKey128: TALCipherKey128;
 {$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
-{$IFEND}
+{$ENDIF}
 begin
   if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
     ALStringHashMD5(aCipherKey128, Key);
@@ -3711,7 +3664,7 @@ begin
     ALStringHashSHA2(aCipherKey256, Key);
     result := AlRDLEncryptStringCBC(InString, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
-  {$IFEND}
+  {$ENDIF}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
@@ -3723,7 +3676,7 @@ procedure AlRDLEncryptStream(const InStream, OutStream: TStream;
 var aCipherKey128: TALCipherKey128;
 {$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
-{$IFEND}
+{$ENDIF}
 begin
   if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
     ALStringHashMD5(aCipherKey128, Key);
@@ -3734,7 +3687,7 @@ begin
     ALStringHashSHA2(aCipherKey256, Key);
     AlRDLEncryptStream(InStream, OutStream, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
-  {$IFEND}
+  {$ENDIF}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
@@ -3746,7 +3699,7 @@ procedure AlRDLEncryptStreamCBC(const InStream, OutStream: TStream;
 var aCipherKey128: TALCipherKey128;
 {$IF CompilerVersion >= 32} // tokyo
     aCipherKey256: Tbytes;
-{$IFEND}
+{$ENDIF}
 begin
   if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
     ALStringHashMD5(aCipherKey128, Key);
@@ -3757,11 +3710,9 @@ begin
     ALStringHashSHA2(aCipherKey256, Key);
     AlRDLEncryptStreamCBC(InStream, OutStream, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
-  {$IFEND}
+  {$ENDIF}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
-
-{$ENDIF !ALHideAnsiString}
 
 {***************************************************}
 procedure AlRDLEncryptStringU(const InString: String;
@@ -3884,7 +3835,7 @@ begin
     AlRDLEncryptStringU(InString,OutString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding, UseBase64);
   end
   {$ENDIF}
-  else raise EALCipherExceptionU.Create(cAlCryptKDFNotSupported);
+  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
 {******************************************************}
@@ -3910,7 +3861,7 @@ begin
     AlRDLEncryptStringCBCU(InString, OutString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding, UseBase64);
   end
   {$ENDIF}
-  else raise EALCipherExceptionU.Create(cAlCryptKDFNotSupported);
+  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
 {***************************************************}
@@ -3935,7 +3886,7 @@ begin
     Result := AlRDLEncryptStringU(InString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding, UseBase64);
   end
   {$ENDIF}
-  else raise EALCipherExceptionU.Create(cAlCryptKDFNotSupported);
+  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
 {******************************************************}
@@ -3960,7 +3911,7 @@ begin
     result := AlRDLEncryptStringCBCU(InString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding, UseBase64);
   end
   {$ENDIF}
-  else raise EALCipherExceptionU.Create(cAlCryptKDFNotSupported);
+  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
 {***************************************************************}
@@ -3984,7 +3935,7 @@ begin
     AlRDLEncryptStream(InStream, OutStream, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
   {$ENDIF}
-  else raise EALCipherExceptionU.Create(cAlCryptKDFNotSupported);
+  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
 {******************************************************************}
@@ -4008,7 +3959,7 @@ begin
     AlRDLEncryptStreamCBC(InStream, OutStream, aCipherKey256[0], length(aCipherKey256), Encrypt);
   end
   {$ENDIF}
-  else raise EALCipherExceptionU.Create(cAlCryptKDFNotSupported);
+  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
 
@@ -4016,8 +3967,6 @@ end;
 //////////////////////
 ////// Blowfish //////
 //////////////////////
-
-{$IFNDEF ALHideAnsiString}
 
 type
   TALBFBlockEx = packed record
@@ -4461,7 +4410,7 @@ begin
 end;
 {$IF defined(ALOverflowCheckingON)}
   {$Q+} {Overflow Checking}
-{$IFEND}
+{$ENDIF}
 
 {*****************************************************************************}
 procedure ALEncryptBFCBC(const Context : TALBFContext; const Prev : TALBFBlock;
@@ -4565,7 +4514,7 @@ begin
   {process all except the last block}
   for I := 1 to BlockCount - 1 do begin
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
-      raise EALCipherExceptionU.Create(cAlCryptInvalidFileFormat);
+      raise EALCipherException.Create(cAlCryptInvalidFileFormat);
     ALEncryptBF(Context, Block, Encrypt);
     OutStream.WriteBuffer(Block, SizeOf(Block));
   end;
@@ -4576,7 +4525,7 @@ begin
     {set actual number of bytes to read}
     I := (InStream.Size mod SizeOf(Block));
     if InStream.Read(Block, I) <> I then
-      raise EAlCipherExceptionU.Create(cALCryptInvalidFileFormat);
+      raise EAlCipherException.Create(cALCryptInvalidFileFormat);
 
     {store number of bytes as last byte in last block}
     PByteArray(@Block)^[SizeOf(Block)-1] := I;
@@ -4587,7 +4536,7 @@ begin
   end else begin
     {encrypted file is always a multiple of the block size}
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
-      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
     ALEncryptBF(Context, Block, Encrypt);
 
     {get actual number of bytes encoded}
@@ -4621,7 +4570,7 @@ begin
     {$ELSE}
     Block[0] := TThread.GetTickCount;
     Block[1] := TThread.GetTickCount;
-    {$IFEND}
+    {$ENDIF}
     ALEncryptBF(Context, Block, Encrypt);
     OutStream.WriteBuffer(Block, SizeOf(Block));
     IV := Block;
@@ -4640,7 +4589,7 @@ begin
   {process all except the last block}
   for I := 1 to BlockCount - 1 do begin
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
-      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
 
     if Encrypt then begin
       ALEncryptBFCBC(Context, IV, Block, Encrypt);
@@ -4660,7 +4609,7 @@ begin
     {set actual number of bytes to read}
     I := (InStream.Size mod SizeOf(Block));
     if InStream.Read(Block, I) <> I then
-      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
 
     {store number of bytes as last byte in last block}
     PByteArray(@Block)^[SizeOf(Block)-1] := I;
@@ -4671,7 +4620,7 @@ begin
   end else begin
     {encrypted file is always a multiple of the block size}
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
-      raise EALCipherExceptionU.Create(cALCryptInvalidFileFormat);
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
     ALEncryptBFCBC(Context, IV, Block, Encrypt);
 
     {get actual number of bytes encoded}
@@ -4743,8 +4692,6 @@ begin
   ALStringHashMD5(aCipherKey128, Key);
   ALBFEncryptStreamCBC(InStream, OutStream, aCipherKey128, Encrypt);
 end;
-
-{$ENDIF !ALHideAnsiString}
 
 
 
@@ -4941,7 +4888,6 @@ end;
 ///////////////////
 
 {$IFDEF ALCPUXASM}
-{$IFNDEF ALHideAnsiString}
 
 //!!!!! ///////////////////////////////////////////////////////////// !!!!!//
 //!!!!! WARNINGS : DON'T CHANGE THE IMPLEMENTATION OF THE FUNCTIONS   !!!!!//
@@ -4959,7 +4905,7 @@ end;
 
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from References\mORMot\SynCommons.pas and adjust the IFDEF'}
-{$IFEND}
+{$ENDIF}
 
 type
   TCrc32tab = array[0..7,byte] of cardinal;
@@ -5352,7 +5298,6 @@ begin
   Result := true;
 end;
 
-{$ENDIF !ALHideAnsiString}
 {$ENDIF ALCPUXASM}
 
 
@@ -5361,8 +5306,7 @@ end;
 ////// Fnv1a //////
 ///////////////////
 
-{************************}
-{$IFNDEF ALHideAnsiString}
+{***********************}
 {$Q-} {Overflow Checking}
 //http://programmers.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed
 //https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
@@ -5376,7 +5320,6 @@ begin
 end;
 {$IF defined(ALOverflowCheckingON)}
   {$Q+} {Overflow Checking}
-{$IFEND}
 {$ENDIF}
 
 {***********************}
@@ -5394,8 +5337,7 @@ end;
   {$Q+} {Overflow Checking}
 {$ENDIF}
 
-{************************}
-{$IFNDEF ALHideAnsiString}
+{***********************}
 {$Q-} {Overflow Checking}
 function ALFnv1aInt32(const str: ansiString): int32;
 var i : Integer;
@@ -5406,7 +5348,6 @@ begin
 end;
 {$IF defined(ALOverflowCheckingON)}
   {$Q+} {Overflow Checking}
-{$IFEND}
 {$ENDIF}
 
 {***********************}
@@ -5445,7 +5386,7 @@ begin
     raise LError;
   end;
 end;
-{$IFEND}
+{$ENDIF}
 
 {**********************}
 {$IF defined(MSWINDOWS)}
@@ -5485,7 +5426,7 @@ begin
   if Cursor <> AKeyBlobSize then
     raise Exception.Create('Mismatch between the Key blob size and Private key structure size');
 end;
-{$IFEND}
+{$ENDIF}
 
 {**********************}
 {$IF defined(MSWINDOWS)}
@@ -5585,7 +5526,7 @@ begin
     raise Exception.Create('Mismatch between the size of the RSA key blob and the source key blob');
 
 end;
-{$IFEND}
+{$ENDIF}
 
 {**********************}
 {$IF defined(MSWINDOWS)}
@@ -5752,7 +5693,7 @@ begin
     if not CryptReleaseContext(hProv,0) then raiseLastOsError;
   end;
 end;
-{$IFEND}
+{$ENDIF}
 
 {**********************}
 {$IF defined(MSWINDOWS)}
@@ -5907,7 +5848,7 @@ begin
   end;
 
 end;
-{$IFEND}
+{$ENDIF}
 
 
 
@@ -6029,10 +5970,8 @@ end;
 procedure _InitCipher;
 
 {$IFDEF ALCPUXASM}
-{$IFNDEF ALHideAnsiString}
 var i,n: integer;
     crc: cardinal;
-{$ENDIF}
 {$ENDIF}
 
 begin
@@ -6104,9 +6043,8 @@ begin
 
   {$IFNDEF ALCompilerVersionSupported}
     {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from References\mORMot\SynCommons.pas and adjust the IFDEF'}
-  {$IFEND}
+  {$ENDIF}
 
-  {$IFNDEF ALHideAnsiString}
   ALStringHashCrc32c := @Crc32cfast_2;
   ALHashCrc32c := @Crc32cfast_3;
   ALStringHashCrc64c := @Crc64cfast_2;
@@ -6147,7 +6085,6 @@ begin
       crc32ctab[n,i] := crc;
     end;
   end;
-  {$ENDIF !ALHideAnsiString}
 
   {$ENDIF ALCPUXASM}
 

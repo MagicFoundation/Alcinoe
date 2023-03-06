@@ -4,13 +4,9 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALHideAnsiString}
 uses
   system.Classes,
   Alcinoe.StringList;
-{$ENDIF}
-
-{$IFNDEF ALHideAnsiString}
 
 Type
 
@@ -127,23 +123,18 @@ Function ALEncodeRealName4FriendlyEmailAddress(const aRealName: AnsiString): Ans
 Function AlGenerateInternetMessageID: AnsiString; overload;
 Function AlGenerateInternetMessageID(const ahostname: AnsiString): AnsiString; overload;
 function AlIsValidEmail(const Value: AnsiString): boolean;
-
-{$ENDIF !ALHideAnsiString}
-
 function AlIsValidEmailU(const Value: String): boolean;
 
 implementation
 
 uses
   system.Sysutils,
-  {$IFNDEF ALHideAnsiString}
   Alcinoe.HTTP.Client,
+  {$IF defined(MSWINDOWS)}
   Alcinoe.WinSock,
   {$ENDIF}
   Alcinoe.Common,
   Alcinoe.StringUtils;
-
-{$IFNDEF ALHideAnsiString}
 
 {***************************************************************************}
 { FriendlyEmail                  RealName       Result                      }
@@ -332,7 +323,7 @@ end;
 {***********************************************}
 Function AlGenerateInternetMessageID: AnsiString;
 Begin
-  Result := AlStringReplace(ALNewGUIDString(true{WithoutBracket}),'-','',[rfReplaceAll]) + '@' + ALTrim(AlGetLocalHostName);
+  Result := AlStringReplace(ALNewGUIDString(true{WithoutBracket}),'-','',[rfReplaceAll]) {$IF defined(MSWINDOWS)}+ '@' + ALTrim(AlGetLocalHostName){$ENDIF};
 end;
 
 {****************************************************************************}
@@ -760,8 +751,6 @@ end;
 {$IF defined(ALZeroBasedStringsON)}
   {$ZEROBASEDSTRINGS ON}
 {$IFEND}
-
-{$ENDIF !ALHideAnsiString}
 
 {*********************}
 {$ZEROBASEDSTRINGS OFF} // << the guy who introduce zero base string in delphi is just a mix of a Monkey and a Donkey !

@@ -1089,7 +1089,7 @@ var
   P: Integer;
 begin
   Result := S;
-  P := ALPos(NameValueSeparator, Result);
+  P := ALPosA(NameValueSeparator, Result);
 
   // change behavior from original Tstring
   // i thing that if a Tstring have an item
@@ -1213,7 +1213,7 @@ function TALStrings.GetStrictName(Index: Integer): AnsiString;
 var P: Integer;
 begin
   Result := Get(Index);
-  P := ALPos(NameValueSeparator, Result);
+  P := ALPosA(NameValueSeparator, Result);
   if P <> 0 then SetLength(Result, P-1)
   else SetLength(Result, 0);
 end;
@@ -1334,7 +1334,7 @@ begin
   // for Result := 0 to GetCount - 1 do
   // begin
   //   S := Get(Result);
-  //   P := ALPos(NameValueSeparator, S);
+  //   P := ALPosA(NameValueSeparator, S);
   //   if (P <> 0) and (CompareStrings(ALCopyStr(S, 1, P - 1), Name) = 0) then Exit;
   // end;
   // Result := -1;
@@ -1342,7 +1342,7 @@ begin
   for Result := 0 to GetCount - 1 do
   begin
     S := Get(Result);
-    P := ALPos(NameValueSeparator, S);
+    P := ALPosA(NameValueSeparator, S);
     if ((P <> 0) and (CompareStrings(ALCopyStr(S, 1, P - 1), Name) = 0)) or
        ((P = 0) and (CompareStrings(S, Name) = 0)) then Exit;
   end;
@@ -1543,7 +1543,7 @@ begin
     // * sLineBreak - for compatibility with Windows, Posix and old macOS platforms,
     //   we handle #13#10, #10 and #13 as it would be #13#10.
     // * NOT sLineBreak - we use strict checking for LineBreak.
-    if ALCompareStr(LineBreak, sLineBreak) = 0 then
+    if ALCompareStrA(LineBreak, sLineBreak) = 0 then
     begin
       while P < PEndVal do
       begin
@@ -1678,7 +1678,7 @@ end;
 {********************************************************************}
 function TALStrings.CompareStrings(const S1, S2: AnsiString): Integer;
 begin
-  Result := ALCompareText(S1, S2);
+  Result := ALCompareTextA(S1, S2);
 end;
 
 {****************************************************************}
@@ -1689,7 +1689,7 @@ begin
   if Index >= 0 then
   begin
     Result := Get(Index);
-    SepPos := ALPos(NameValueSeparator, Result);
+    SepPos := ALPosA(NameValueSeparator, Result);
     if (SepPos > 0) then
       System.Delete(Result, 1, SepPos)
     else
@@ -2405,7 +2405,7 @@ begin
   //   aaaa      |     aaaa
   //                   => OK, ordered work with findname
   //
-  // but with just Result := ALCompareText(S1, S2)
+  // but with just Result := ALCompareTextA(S1, S2)
   // it's will be ordered like
   //
   //   aaa0      |     aaa0
@@ -2430,9 +2430,9 @@ begin
   end
   else begin
     if CaseSensitive then
-      Result := AlCompareStr(S1, S2)
+      Result := ALCompareStrA(S1, S2)
     else
-      Result := AlCompareText(S1, S2);
+      Result := ALCompareTextA(S1, S2);
   end;
 end;
 
@@ -3334,7 +3334,7 @@ begin
   //   aaaa      |     aaaa
   //                   => OK, ordered work with findname
   //
-  // but with just Result := ALCompareText(S1, S2)
+  // but with just Result := ALCompareTextA(S1, S2)
   // it's will be ordered like
   //
   //   aaa0      |     aaa0
@@ -3344,9 +3344,9 @@ begin
   //
 
   if CaseSensitive then
-    Result := ALCompareStr(S1, S2)
+    Result := ALCompareStrA(S1, S2)
   else
-    Result := ALCompareText(S1, S2);
+    Result := ALCompareTextA(S1, S2);
 
 end;
 
@@ -3398,7 +3398,7 @@ end;
 Function TALNVStringList.ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean;
 Var P1: Integer;
 begin
-  P1 := AlPos(NameValueSeparator,S);
+  P1 := ALPosA(NameValueSeparator,S);
   if P1 > 0 then begin
     result := True;
     Name := AlCopyStr(S,1,P1-1);
@@ -3814,7 +3814,7 @@ begin
         (LNode.Val <> LValue))
        or
        ((not CaseSensitive) and
-        (not ALSametext(LNode.Val, LValue)))
+        (not ALSameTextA(LNode.Val, LValue)))
     then result := -1
     else result := LNode.idx;
   end
@@ -3947,7 +3947,7 @@ begin
   LNewNvs := ExtractNameValue(S, LNewName, LNewValue);
   LOldNode := TALAVLStringListBinaryTreeNode(FNodeList[index]);
   if (CaseSensitive and (LOldNode.ID <> LNewName)) or
-     ((not CaseSensitive) and (not ALSametext(LOldNode.ID, LNewName))) then begin
+     ((not CaseSensitive) and (not ALSameTextA(LOldNode.ID, LNewName))) then begin
     LNewNode := TALAVLStringListBinaryTreeNode.Create;
     LNewNode.Idx := Index;
     LNewNode.ID := LNewName;
@@ -4108,7 +4108,7 @@ end;
 Function TALAVLStringList.ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean;
 Var P1: Integer;
 begin
-  P1 := AlPos(NameValueSeparator,S);
+  P1 := ALPosA(NameValueSeparator,S);
   if P1 > 0 then begin
     result := True;
     Name := AlCopyStr(S,1,P1-1);
@@ -4523,7 +4523,7 @@ begin
         (LNode.Val <> LValue))
        or
        ((not CaseSensitive) and
-        (not ALSametext(LNode.Val, LValue)))
+        (not ALSameTextA(LNode.Val, LValue)))
     then result := -1
     else result := LNode.idx;
   end
@@ -4664,7 +4664,7 @@ begin
   LNewNvs := ExtractNameValue(S, LNewName, LNewValue);
   LOldNode := FNodeList[index];
   if (CaseSensitive and (LOldNode.ID <> LNewName)) or
-     ((not CaseSensitive) and (not ALSametext(LOldNode.ID, LNewName))) then begin
+     ((not CaseSensitive) and (not ALSameTextA(LOldNode.ID, LNewName))) then begin
     LNewNode := TALHashedStringListDictionaryNode.Create;
     LNewNode.Idx := Index;
     LNewNode.ID := LNewName;
@@ -4797,7 +4797,7 @@ begin
                                      TDelegatedEqualityComparer<ansiString>.Create(
                                        function(const Left, Right: ansiString): Boolean
                                        begin
-                                         Result := ALSameText(Left, Right);
+                                         Result := ALSameTextA(Left, Right);
                                        end,
                                        function(const Value: ansiString): Integer
                                        begin
@@ -4809,7 +4809,7 @@ begin
                    TDelegatedEqualityComparer<ansiString>.Create(
                      function(const Left, Right: ansiString): Boolean
                      begin
-                       Result := ALSameText(Left, Right);
+                       Result := ALSameTextA(Left, Right);
                      end,
                      function(const Value: ansiString): Integer
                      var LLowerValue: ansiString;
@@ -4903,7 +4903,7 @@ end;
 Function TALHashedStringList.ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean;
 Var P1: Integer;
 begin
-  P1 := AlPos(NameValueSeparator,S);
+  P1 := ALPosA(NameValueSeparator,S);
   if P1 > 0 then begin
     result := True;
     Name := AlCopyStr(S,1,P1-1);
@@ -5291,7 +5291,7 @@ var
   P: Integer;
 begin
   Result := S;
-  P := ALPosU(NameValueSeparator, Result);
+  P := ALPosW(NameValueSeparator, Result);
 
   // change behavior from original Tstring
   // i thing that if a Tstring have an item
@@ -5392,7 +5392,7 @@ begin
       P := PChar(S);
       while not (P^ in LDelimiters) do
         Inc(P);
-      if (P^ <> #0) then S := ALQuotedStrU(S, QuoteChar);
+      if (P^ <> #0) then S := ALQuotedStr(S, QuoteChar);
       Result := Result + S + Delimiter;
     end;
     System.Delete(Result, Length(Result), 1);
@@ -5417,7 +5417,7 @@ function TALStringsU.GetStrictName(Index: Integer): String;
 var P: Integer;
 begin
   Result := Get(Index);
-  P := ALPosU(NameValueSeparator, Result);
+  P := ALPosW(NameValueSeparator, Result);
   if P <> 0 then SetLength(Result, P-1)
   else SetLength(Result, 0);
 end;
@@ -5472,7 +5472,7 @@ var
 begin
   I := IndexOfName(Name);
   if I >= 0 then
-    Result := ALCopyStrU(Get(I), Length(Name) + 2, MaxInt) else
+    Result := ALCopyStr(Get(I), Length(Name) + 2, MaxInt) else
     Result := '';
 end;
 
@@ -5538,7 +5538,7 @@ begin
   // for Result := 0 to GetCount - 1 do
   // begin
   //   S := Get(Result);
-  //   P := ALPos(NameValueSeparator, S);
+  //   P := ALPosA(NameValueSeparator, S);
   //   if (P <> 0) and (CompareStrings(ALCopyStr(S, 1, P - 1), Name) = 0) then Exit;
   // end;
   // Result := -1;
@@ -5546,8 +5546,8 @@ begin
   for Result := 0 to GetCount - 1 do
   begin
     S := Get(Result);
-    P := ALPosU(NameValueSeparator, S);
-    if ((P <> 0) and (CompareStrings(ALCopyStrU(S, 1, P - 1), Name) = 0)) or
+    P := ALPosW(NameValueSeparator, S);
+    if ((P <> 0) and (CompareStrings(ALCopyStr(S, 1, P - 1), Name) = 0)) or
        ((P = 0) and (CompareStrings(S, Name) = 0)) then Exit;
   end;
   Result := -1;
@@ -5774,7 +5774,7 @@ begin
     // * sLineBreak - for compatibility with Windows, Posix and old macOS platforms,
     //   we handle #13#10, #10 and #13 as it would be #13#10.
     // * NOT sLineBreak - we use strict checking for LineBreak.
-    if ALCompareStrU(LineBreak, sLineBreak) = 0 then
+    if ALCompareStrW(LineBreak, sLineBreak) = 0 then
     begin
       while P < PEndVal do
       begin
@@ -5890,7 +5890,7 @@ begin
     while P^ <> #0 do
     begin
       if P^ = QuoteChar then
-        S := ALExtractQuotedStrU(P, QuoteChar)
+        S := ALExtractQuotedStr(P, QuoteChar)
       else
       begin
         P1 := P;
@@ -5936,7 +5936,7 @@ end;
 {*****************************************************************}
 function TALStringsU.CompareStrings(const S1, S2: String): Integer;
 begin
-  Result := ALCompareTextU(S1, S2);
+  Result := ALCompareTextW(S1, S2);
 end;
 
 {*************************************************************}
@@ -5947,7 +5947,7 @@ begin
   if Index >= 0 then
   begin
     Result := Get(Index);
-    SepPos := ALPosU(NameValueSeparator, Result);
+    SepPos := ALPosW(NameValueSeparator, Result);
     if (SepPos > 0) then
       System.Delete(Result, 1, SepPos)
     else
@@ -6649,7 +6649,7 @@ begin
   //   aaaa      |     aaaa
   //                   => OK, ordered work with findname
   //
-  // but with just Result := ALCompareText(S1, S2)
+  // but with just Result := ALCompareTextA(S1, S2)
   // it's will be ordered like
   //
   //   aaa0      |     aaa0
@@ -6674,9 +6674,9 @@ begin
   end
   else begin
     if CaseSensitive then
-      Result := AlCompareStrU(S1, S2)
+      Result := ALCompareStrW(S1, S2)
     else
-      Result := AlCompareTextU(S1, S2);
+      Result := ALCompareTextW(S1, S2);
   end;
 end;
 
@@ -7564,7 +7564,7 @@ begin
   //   aaaa      |     aaaa
   //                   => OK, ordered work with findname
   //
-  // but with just Result := ALCompareText(S1, S2)
+  // but with just Result := ALCompareTextA(S1, S2)
   // it's will be ordered like
   //
   //   aaa0      |     aaa0
@@ -7574,9 +7574,9 @@ begin
   //
 
   if CaseSensitive then
-    Result := ALCompareStrU(S1, S2)
+    Result := ALCompareStrW(S1, S2)
   else
-    Result := ALCompareTextU(S1, S2);
+    Result := ALCompareTextW(S1, S2);
 
 end;
 
@@ -7628,11 +7628,11 @@ end;
 Function TALNVStringListU.ExtractNameValue(const S: String; var Name, Value: String): Boolean;
 Var P1: Integer;
 begin
-  P1 := AlPosU(NameValueSeparator,S);
+  P1 := ALPosW(NameValueSeparator,S);
   if P1 > 0 then begin
     result := True;
-    Name := AlCopyStrU(S,1,P1-1);
-    Value := AlCopyStrU(S,P1+1, maxint);
+    Name := ALCopyStr(S,1,P1-1);
+    Value := ALCopyStr(S,P1+1, maxint);
   end
   else begin
     Result := False;

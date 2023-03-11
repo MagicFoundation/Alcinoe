@@ -17,6 +17,7 @@ Var
 implementation
 
 uses
+  System.AnsiStrings,
   Alcinoe.StringUtils,
   Alcinoe.Common;
 
@@ -28,7 +29,7 @@ Begin
   Result := '';
 
   aContentType := ALLowerCase(aContentType);
-  P := AlPosEx(';',aContentType);
+  P := ALPosA(';',aContentType);
   if (P > 0) then delete(aContentType,P,MaxInt);
   aContentType := ALTrim(AContentType);
 

@@ -125,6 +125,7 @@ implementation
 uses
   System.Classes,
   System.SysUtils,
+  System.AnsiStrings,
   Alcinoe.Common,
   Alcinoe.StringUtils;
 
@@ -424,8 +425,8 @@ begin
                LExtraInfo, // Var LExtraInfo: AnsiString;
                LPortNumber) then
         raise EALHTTPClientException.CreateFmt(CALHTTPCLient_MsgInvalidURL, [Value]);
-      if ALSameText(LSchemeName, 'wss') then FURLScheme := INTERNET_SCHEME_HTTPS
-      else if ALSameText(LSchemeName, 'ws') then FURLScheme := INTERNET_SCHEME_HTTP
+      if ALSameTextA(LSchemeName, 'wss') then FURLScheme := INTERNET_SCHEME_HTTPS
+      else if ALSameTextA(LSchemeName, 'ws') then FURLScheme := INTERNET_SCHEME_HTTP
       else raise Exception.Createfmt('Unknown scheme (%s)',[LSchemeName]);
       FURLPort := LPortNumber;
       FURLHost := LHostName;
@@ -449,7 +450,7 @@ procedure TALWinHTTPWebSocketClient.Connect(const aUrl:AnsiString);
   Begin
     If (FaccessType <> wHTTPat_NAMED_PROXY) or
        (ProxyParams.ProxyServer = '') then result := WINHTTP_NO_PROXY_NAME
-    else result := PWideChar(string(ProxyParams.ProxyServer) + ':' + String(ALIntToStr(ProxyParams.ProxyPort)));
+    else result := PWideChar(string(ProxyParams.ProxyServer) + ':' + String(ALIntToStrA(ProxyParams.ProxyPort)));
   end;
 
   {-----------------------------------------}

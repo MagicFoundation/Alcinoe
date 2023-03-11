@@ -39,7 +39,7 @@ begin
       if Assigned (hostEnt^.h_addr_list) then begin
         addr := hostEnt^.h_addr_list^;
         if Assigned (addr) then begin
-          IP := ALFormat ('%d.%d.%d.%d', [byte (addr [0]),
+          IP := ALFormatA ('%d.%d.%d.%d', [byte (addr [0]),
           byte (addr [1]), byte (addr [2]), byte (addr [3])]);
           Result := True;
         end

@@ -783,8 +783,8 @@ begin
 
       // ERROR Response
       else if (LResponseStatus = 'ERROR') and (LResponseStatusStartPos=1) then raise EALException.Create('Memcached Error - Nonexistent command')
-      else if (ALpos('SERVER_ERROR', LResponseStatus) = 1) and (LResponseStatusStartPos=1) then raise EALException.Createfmt('Memcached Error - Server error - %s', [LResponseStatus])
-      else if (ALpos('CLIENT_ERROR', LResponseStatus) = 1) and (LResponseStatusStartPos=1) then raise EAlMemCachedClientException.Create(ALformat('Memcached Error - Client error in the input line - %s', [LResponseStatus]));
+      else if (ALPosA('SERVER_ERROR', LResponseStatus) = 1) and (LResponseStatusStartPos=1) then raise EALException.Createfmt('Memcached Error - Server error - %s', [LResponseStatus])
+      else if (ALPosA('CLIENT_ERROR', LResponseStatus) = 1) and (LResponseStatusStartPos=1) then raise EAlMemCachedClientException.Create(ALFormatA('Memcached Error - Client error in the input line - %s', [LResponseStatus]));
 
     end;
 
@@ -982,9 +982,9 @@ begin
   if flags < 0 then raise EAlMemCachedClientException.Create('flags must be upper or equal to 0');
   LResultCode := SendCmd(aSocketDescriptor,
                          'set '+Key+' '+
-                                AlintToStr(flags)+' '+
-                                ALInttostr(exptime) + ' ' +
-                                ALIntToStr(length(data)) + #13#10 +
+                                ALIntToStrA(flags)+' '+
+                                ALIntToStrA(exptime) + ' ' +
+                                ALIntToStrA(length(data)) + #13#10 +
                                 data + #13#10,
                          rpStorage);
   if LResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(LResultCode);
@@ -1004,9 +1004,9 @@ begin
   if flags < 0 then raise EAlMemCachedClientException.Create('flags must be upper or equal to 0');
   LResultCode := SendCmd(aSocketDescriptor,
                          'add '+Key+' '+
-                                AlintToStr(flags)+' '+
-                                ALInttostr(exptime) + ' ' +
-                                ALIntToStr(length(data)) + #13#10 +
+                                ALIntToStrA(flags)+' '+
+                                ALIntToStrA(exptime) + ' ' +
+                                ALIntToStrA(length(data)) + #13#10 +
                                 data + #13#10,
                          rpStorage);
   if LResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(LResultCode);
@@ -1026,9 +1026,9 @@ begin
   if flags < 0 then raise EAlMemCachedClientException.Create('flags must be upper or equal to 0');
   LResultCode := SendCmd(aSocketDescriptor,
                          'replace '+Key+' '+
-                                    AlintToStr(flags)+' '+
-                                    ALInttostr(exptime) + ' ' +
-                                    ALIntToStr(length(data)) + #13#10 +
+                                    ALIntToStrA(flags)+' '+
+                                    ALIntToStrA(exptime) + ' ' +
+                                    ALIntToStrA(length(data)) + #13#10 +
                                     data + #13#10,
                          rpStorage);
   if LResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(LResultCode);
@@ -1049,7 +1049,7 @@ begin
                          'append '+Key+' '+
                                    '0 '+
                                    '0 ' +
-                                   ALIntToStr(length(data)) + #13#10 +
+                                   ALIntToStrA(length(data)) + #13#10 +
                                    data + #13#10,
                          rpStorage);
   if LResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(LResultCode);
@@ -1070,7 +1070,7 @@ begin
                          'prepend '+Key+' '+
                                     '0 '+
                                     '0 ' +
-                                    ALIntToStr(length(data)) + #13#10 +
+                                    ALIntToStrA(length(data)) + #13#10 +
                                     data + #13#10,
                          rpStorage);
   if LResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(LResultCode);
@@ -1091,10 +1091,10 @@ begin
   if flags < 0 then raise EAlMemCachedClientException.Create('flags must be upper or equal to 0');
   LResultCode := SendCmd(aSocketDescriptor,
                          'cas '+Key+' '+
-                                AlintToStr(flags)+' '+
-                                ALInttostr(exptime) + ' ' +
-                                ALIntToStr(length(data)) + ' ' +
-                                ALIntToStr(cas_id) + #13#10 +
+                                ALIntToStrA(flags)+' '+
+                                ALIntToStrA(exptime) + ' ' +
+                                ALIntToStrA(length(data)) + ' ' +
+                                ALIntToStrA(cas_id) + #13#10 +
                                 data + #13#10,
                          rpStorage);
   if LResultCode = 'EXISTS' then result := False
@@ -1181,7 +1181,7 @@ function TAlBaseMemCachedClient.DoIncr(aSocketDescriptor: TSocket;
 var LResultCode: AnsiString;
 begin
   CheckKey(key);
-  LResultCode := SendCmd(aSocketDescriptor, 'incr ' + Key + ' ' + aLintToStr(Value) + #13#10, rpINCRDECR);
+  LResultCode := SendCmd(aSocketDescriptor, 'incr ' + Key + ' ' + ALIntToStrA(Value) + #13#10, rpINCRDECR);
   if not ALTryStrToInt64(LResultCode, Result) then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
@@ -1192,7 +1192,7 @@ function TAlBaseMemCachedClient.DoDecr(aSocketDescriptor: TSocket;
 var LResultCode: AnsiString;
 begin
   CheckKey(key);
-  LResultCode := SendCmd(aSocketDescriptor, 'decr ' + Key + ' ' + aLintToStr(Value) + #13#10, rpINCRDECR);
+  LResultCode := SendCmd(aSocketDescriptor, 'decr ' + Key + ' ' + ALIntToStrA(Value) + #13#10, rpINCRDECR);
   if not ALTryStrToInt64(LResultCode, Result) then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
@@ -1225,7 +1225,7 @@ procedure TAlBaseMemCachedClient.DoTouch(aSocketDescriptor: TSocket;
 var LResultCode: AnsiString;
 begin
   CheckKey(key);
-  LResultCode := SendCmd(aSocketDescriptor, 'touch ' + Key + ' ' + ALInttostr(exptime) + #13#10, rpTOUCH);
+  LResultCode := SendCmd(aSocketDescriptor, 'touch ' + Key + ' ' + ALIntToStrA(exptime) + #13#10, rpTOUCH);
   if LResultCode <> 'TOUCHED' then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
@@ -1256,7 +1256,7 @@ end;
 procedure TAlBaseMemCachedClient.DoFlush_all(aSocketDescriptor: TSocket;
                                              delay: integer);
 begin
-  if delay > 0 then SendCmd(aSocketDescriptor, 'flush_all ' + ALinttostr(delay) + #13#10, rpOK)
+  if delay > 0 then SendCmd(aSocketDescriptor, 'flush_all ' + ALIntToStrA(delay) + #13#10, rpOK)
   else SendCmd(aSocketDescriptor, 'flush_all' + #13#10, rpOK);
 end;
 
@@ -1578,7 +1578,7 @@ end;
 Procedure TAlBaseMemCachedClient.DoVerbosity(aSocketDescriptor: TSocket;
                                              level: integer);
 begin
-  SendCmd(aSocketDescriptor, 'verbosity ' + alinttostr(level) + #13#10, rpOK);
+  SendCmd(aSocketDescriptor, 'verbosity ' + ALIntToStrA(level) + #13#10, rpOK);
 end;
 
 {****************************************************************}

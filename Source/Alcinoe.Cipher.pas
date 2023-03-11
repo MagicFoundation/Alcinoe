@@ -530,6 +530,7 @@ uses
   Alcinoe.HTML,
   {$ENDIF}
   system.Math,
+  System.AnsiStrings,
   Alcinoe.Files,
   Alcinoe.StringList,
   Alcinoe.StringUtils;
@@ -920,7 +921,7 @@ function ALStringHashMD5(const Str : AnsiString; const HexEncode: boolean = true
 Var aMD5Digest: TALMD5Digest;
 Begin
   AlStringHashMD5(aMD5Digest, Str);
-  if HexEncode then Result := ALBinToHex(aMD5Digest, SizeOf(aMD5Digest))
+  if HexEncode then Result := ALBinToHexA(aMD5Digest, SizeOf(aMD5Digest))
   else begin
     SetLength(result, Length(aMD5Digest));
     ALmove(aMD5Digest, pointer(result)^, length(result));
@@ -942,7 +943,7 @@ Var aMD5Digest: TALMD5Digest;
 Begin
   aBytes := encoding.GetBytes(str);
   ALHashMD5(aMD5Digest, pointer(aBytes)^, Length(aBytes));
-  Result := ALBinToHexU(aMD5Digest, SizeOf(aMD5Digest));
+  Result := ALBinToHexW(aMD5Digest, SizeOf(aMD5Digest));
 end;
 
 {$ENDIF}
@@ -970,7 +971,7 @@ begin
   LMD5 := THashMD5.Create;
   LMD5.Update(pointer(Str)^, length(str));
   LBytes := LMD5.HashAsBytes;
-  if HexEncode then result := ALBinToHex(PByte(LBytes)^, length(LBytes))
+  if HexEncode then result := ALBinToHexA(PByte(LBytes)^, length(LBytes))
   else begin
     setlength(result, length(LBytes));
     ALMove(PByte(LBytes)^, pointer(result)^, length(LBytes));
@@ -996,7 +997,7 @@ Begin
   LMD5 := THashMD5.Create;
   LMD5.Update(encoding.GetBytes(str));
   LBytes := LMD5.HashAsBytes;
-  Result := ALBinToHexU(PByte(LBytes)^, length(LBytes));
+  Result := ALBinToHexW(PByte(LBytes)^, length(LBytes));
 end;
 
 {$ENDIF}
@@ -1223,7 +1224,7 @@ function ALStringHashSHA1(const Str : AnsiString; const HexEncode: boolean = tru
 Var aSHA1Digest: TALSHA1Digest;
 Begin
   AlStringHashSHA1(aSHA1Digest, Str);
-  if HexEncode then result := ALBinToHex(ASHA1Digest, SizeOf(aSHA1Digest))
+  if HexEncode then result := ALBinToHexA(ASHA1Digest, SizeOf(aSHA1Digest))
   else begin
     SetLength(result, Length(aSHA1Digest));
     ALmove(aSHA1Digest, pointer(result)^, length(result));
@@ -1245,7 +1246,7 @@ Var aSHA1Digest: TALSHA1Digest;
 Begin
   aBytes := encoding.GetBytes(str);
   ALHashSHA1(aSHA1Digest, pointer(aBytes)^, Length(aBytes));
-  Result := ALBinToHexU(aSHA1Digest, SizeOf(aSHA1Digest));
+  Result := ALBinToHexW(aSHA1Digest, SizeOf(aSHA1Digest));
 end;
 
 {$ENDIF}
@@ -1273,7 +1274,7 @@ begin
   LSHA1 := THashSHA1.Create;
   LSHA1.Update(pointer(Str)^, length(str));
   LBytes := LSHA1.HashAsBytes;
-  if HexEncode then result := ALBinToHex(PByte(LBytes)^, length(LBytes))
+  if HexEncode then result := ALBinToHexA(PByte(LBytes)^, length(LBytes))
   else begin
     setlength(result, length(LBytes));
     ALMove(PByte(LBytes)^, pointer(result)^, length(LBytes));
@@ -1299,7 +1300,7 @@ Begin
   LSHA1 := THashSHA1.Create;
   LSHA1.Update(encoding.GetBytes(str));
   LBytes := LSHA1.HashAsBytes;
-  Result := ALBinToHexU(PByte(LBytes)^, length(LBytes));
+  Result := ALBinToHexW(PByte(LBytes)^, length(LBytes));
 end;
 
 {$ENDIF}
@@ -1330,7 +1331,7 @@ begin
   LSHA2 := THashSHA2.Create(AHashVersion);
   LSHA2.Update(pointer(Str)^, length(str));
   LBytes := LSHA2.HashAsBytes;
-  if HexEncode then result := ALBinToHex(PByte(LBytes)^, length(LBytes))
+  if HexEncode then result := ALBinToHexA(PByte(LBytes)^, length(LBytes))
   else begin
     setlength(result, length(LBytes));
     ALMove(PByte(LBytes)^, pointer(result)^, length(LBytes));
@@ -1354,7 +1355,7 @@ begin
   LSHA2 := THashSHA2.Create(AHashVersion);
   LSHA2.Update(encoding.GetBytes(str));
   LBytes := LSHA2.HashAsBytes;
-  Result := ALBinToHexU(PByte(LBytes)^, length(LBytes));
+  Result := ALBinToHexW(PByte(LBytes)^, length(LBytes));
 end;
 
 {$ENDIF}
@@ -2147,11 +2148,11 @@ end;
 {*************************************************************************}
 class function TBCrypt.BsdStrVersionToInt(const version: ansiString): Byte;
 begin
-  if alSameText(version, '2') then result := BCrypt_Version_2
-  else if alSameText(version, '2a') then result := BCrypt_Version_2a
-  else if alSameText(version, '2x') then result := BCrypt_Version_2x
-  else if alSameText(version, '2y') then result := BCrypt_Version_2y
-  else if alSameText(version, '2b') then result := BCrypt_Version_2b
+  if ALSameTextA(version, '2') then result := BCrypt_Version_2
+  else if ALSameTextA(version, '2a') then result := BCrypt_Version_2a
+  else if ALSameTextA(version, '2x') then result := BCrypt_Version_2x
+  else if ALSameTextA(version, '2y') then result := BCrypt_Version_2y
+  else if ALSameTextA(version, '2b') then result := BCrypt_Version_2b
   else result := 0;
 end;
 
@@ -2174,7 +2175,7 @@ begin
   hashString := BsdBase64Encode(hash, Length(hash)-1); //Yes, everything except the last byte.
                                                        //OpenBSD, in the pseudo-base64 implementation, doesn't include the last byte of the hash
                                                        //Nobody knows why, but that's what all existing tests do - so it's what i do
-  Result := ALFormat('$%s$%.2d$%s%s', [IntVersionToBsdStr(Version), cost, saltString, hashString]);
+  Result := ALFormatA('$%s$%.2d$%s%s', [IntVersionToBsdStr(Version), cost, saltString, hashString]);
 end;
 
 {****************************************************************************************************}
@@ -2595,7 +2596,7 @@ var
 begin
   for i := 0 to 56 do
   begin
-    password := ALCopyStr('The quick brown fox jumped over the lazy dog then sat on a log', 1, i);
+    password := ALCopyStr(AnsiString('The quick brown fox jumped over the lazy dog then sat on a log'), 1, i);
     hash := TBCrypt.HashPassword(password, 4);
     if (hash = '') then
       raise Exception.Create('hash creation failed');
@@ -2656,8 +2657,8 @@ var
     Result := CompareMem(@data1[0], @data2[0], Length(data1))
    end;
 const
-  testPassword = 'The quick brown fox jumped over the lazy dog then sat on a log. The sixth sick';
-  //                                                                   56^               ^72
+  testPassword = AnsiString('The quick brown fox jumped over the lazy dog then sat on a log. The sixth sick');
+  //                                                                              56^               ^72
 begin
   Result := True;
 
@@ -3754,14 +3755,14 @@ begin
   OutStream := TMemoryStream.Create;
   try
     if Encrypt then Bytes := encoding.GetBytes(InString)
-    else if UseBase64 then Bytes := ALBase64DecodeBytesU(InString)
-    else Bytes := ALHexToBinU(InString);
+    else if UseBase64 then Bytes := ALBase64DecodeBytes(InString)
+    else Bytes := ALHexToBin(InString);
     InStream.WriteBuffer(pointer(Bytes)^, Length(Bytes));
     InStream.Position := 0;
     AlRDLEncryptStream(InStream, OutStream, Key, KeySize, Encrypt);
     if Encrypt then begin
-      if UseBase64 then result := ALBase64EncodeBytesU(OutStream.Memory, OutStream.Size)
-      else result := ALbinToHexU(OutStream.Memory^, OutStream.Size)
+      if UseBase64 then result := ALBase64EncodeBytesW(OutStream.Memory, OutStream.Size)
+      else result := ALBinToHexW(OutStream.Memory^, OutStream.Size)
     end
     else begin
       OutStream.Position := 0;
@@ -3791,14 +3792,14 @@ begin
   OutStream := TMemoryStream.Create;
   Try
     if Encrypt then Bytes := encoding.GetBytes(InString)
-    else if UseBase64 then Bytes := ALBase64DecodeBytesU(InString)
-    else Bytes := ALHexToBinU(InString);
+    else if UseBase64 then Bytes := ALBase64DecodeBytes(InString)
+    else Bytes := ALHexToBin(InString);
     InStream.WriteBuffer(pointer(Bytes)^, Length(Bytes));
     InStream.Position := 0;
     AlRDLEncryptStreamCBC(InStream, OutStream, Key, KeySize, Encrypt);
     if Encrypt then begin
-      if UseBase64 then result := ALBase64EncodeBytesU(OutStream.Memory, OutStream.Size)
-      else result := ALbinToHexU(OutStream.Memory^, OutStream.Size)
+      if UseBase64 then result := ALBase64EncodeBytesW(OutStream.Memory, OutStream.Size)
+      else result := ALBinToHexW(OutStream.Memory^, OutStream.Size)
     end
     else begin
       OutStream.Position := 0;
@@ -5285,7 +5286,7 @@ begin
     LCharset[J] := ansichar(J);
   //--
   For var i := 1 to 1000 do begin
-    LData := ALRandomStr(random(65536), LCharset);
+    LData := ALRandomStrA(random(65536), LCharset);
     LCrc32cfastResult:=Crc32cfast(0, Pointer(LData), Length(LData));
     LCrc32csse42Result:=Crc32csse42(0, Pointer(LData), Length(LData));
     LCrc32cfastpurepascalResult:=Crc32cfastpurepascal(0, Pointer(LData), Length(LData));
@@ -5719,16 +5720,16 @@ begin
   //https://tls.mbed.org/kb/cryptography/asn1-key-structures-in-der-and-pem
   //https://stackoverflow.com/questions/64519072/how-to-import-a-pkcs8-with-cryptoapi/64520116#64520116
   //https://docs.microsoft.com/en-us/windows/win32/seccrypto/constants-for-cryptencodeobject-and-cryptdecodeobject
-  if ALPos('-----BEGIN PRIVATE KEY-----', aPemPrivateKey) = 1 then begin
+  if ALPosA('-----BEGIN PRIVATE KEY-----', aPemPrivateKey) = 1 then begin
 
-    P1 := ALPos('-----',aPemPrivateKey);
+    P1 := ALPosA('-----',aPemPrivateKey);
     if P1 <= 0 then raiseLastOsError;
     inc(P1,5{length('-----')});
-    P1 := ALPosEx('-----',aPemPrivateKey, P1);
+    P1 := ALPosA('-----',aPemPrivateKey, P1);
     if P1 <= 0 then raiseLastOsError;
     inc(P1,5{length('-----')});
 
-    P2 := ALPosEx('-----',aPemPrivateKey, P1);
+    P2 := ALPosA('-----',aPemPrivateKey, P1);
     if P2 <= 0 then raiseLastOsError;
 
     S1 := ALCopyStr(aPemPrivateKey, P1, P2-P1);
@@ -5896,8 +5897,8 @@ begin
                        '"iss":"'+ALJavascriptEncode(aServiceAccountEmail)+'",'+ // The email address of the service account
                        '"scope":"'+ALJavascriptEncode(aScope)+'",'+ // A space-delimited list of the permissions that the application requests.
                        '"aud":"https://oauth2.googleapis.com/token",'+ // A descriptor of the intended target of the assertion. When making an access token request this value is always https://oauth2.googleapis.com/token.
-                       '"exp":'+ALIntToStr(DateTimeToUnix(IncHour(LNow,1)))+','+ // The expiration time of the assertion, specified as seconds since 00:00:00 UTC, January 1, 1970. This value has a maximum of 1 hour after the issued time.
-                       '"iat":'+ALIntToStr(DateTimeToUnix(LNow))+ // The time the assertion was issued, specified as seconds since 00:00:00 UTC, January 1, 1970.
+                       '"exp":'+ALIntToStrA(DateTimeToUnix(IncHour(LNow,1)))+','+ // The expiration time of the assertion, specified as seconds since 00:00:00 UTC, January 1, 1970. This value has a maximum of 1 hour after the issued time.
+                       '"iat":'+ALIntToStrA(DateTimeToUnix(LNow))+ // The time the assertion was issued, specified as seconds since 00:00:00 UTC, January 1, 1970.
                      '}';
     LJWT := LJWT + '.' + ALURLBase64EncodeString(LJWTclaim);
 
@@ -6058,7 +6059,7 @@ begin
     ALHashCrc64c := @Crc64csse42_3;
     try
       if crc32cBy4SSE42(0,1)<>3712330424 then
-        raise EALExceptionU.Create('Invalid crc32cBy4SSE42');
+        raise EALException.Create('Invalid crc32cBy4SSE42');
     except
       // disable now on illegal instruction or incorrect result
       ALStringHashCrc32c := @Crc32cfast_2;

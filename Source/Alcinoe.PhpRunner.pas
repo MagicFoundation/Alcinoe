@@ -359,10 +359,10 @@ procedure TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: TALStrings;
                                                    ResponseContentStream: Tstream;
                                                    ResponseHeader: TALHTTPResponseHeader;
                                                    Const EncodeParams: Boolean=True);
-Var LURLEncodedContentStream: TALStringStream;
+Var LURLEncodedContentStream: TALStringStreamA;
     I: Integer;
 begin
-  LURLEncodedContentStream := TALStringStream.create('');
+  LURLEncodedContentStream := TALStringStreamA.create('');
   try
 
     if EncodeParams then ALHTTPEncodeParamNameValues(PostDataStrings);
@@ -385,12 +385,12 @@ end;
 
 {*******************************************************************************************************************}
 function TALPhpRunnerEngine.Execute(ServerVariables: TALStrings; const RequestContentString: AnsiString): AnsiString;
-var ResponseContentStream: TALStringStream;
+var ResponseContentStream: TALStringStreamA;
     ResponseHeader: TALHTTPResponseHeader;
-    RequestContentStream: TALStringStream;
+    RequestContentStream: TALStringStreamA;
 begin
-  RequestContentStream := TALStringStream.Create(RequestContentString);
-  ResponseContentStream := TALStringStream.Create('');
+  RequestContentStream := TALStringStreamA.Create(RequestContentString);
+  ResponseContentStream := TALStringStreamA.Create('');
   ResponseHeader := TALHTTPResponseHeader.Create;
   Try
     Execute(ServerVariables,
@@ -410,9 +410,9 @@ procedure TALPhpRunnerEngine.Execute(ServerVariables: TALStrings;
                                      const RequestContentString: AnsiString;
                                      ResponseContentStream: Tstream;
                                      ResponseHeader: TALHTTPResponseHeader);
-var RequestContentStream: TALStringStream;
+var RequestContentStream: TALStringStreamA;
 begin
-  RequestContentStream := TALStringStream.Create(RequestContentString);
+  RequestContentStream := TALStringStreamA.Create(RequestContentString);
   Try
     Execute(ServerVariables,
             RequestContentStream,
@@ -425,10 +425,10 @@ end;
 
 {**********************************************************************************************************}
 function TALPhpRunnerEngine.Execute(ServerVariables: TALStrings; RequestContentStream: Tstream): AnsiString;
-var ResponseContentStream: TALStringStream;
+var ResponseContentStream: TALStringStreamA;
     ResponseHeader: TALHTTPResponseHeader;
 begin
-  ResponseContentStream := TALStringStream.Create('');
+  ResponseContentStream := TALStringStreamA.Create('');
   ResponseHeader := TALHTTPResponseHeader.Create;
   Try
     Execute(ServerVariables,
@@ -446,10 +446,10 @@ end;
 function TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: TALStrings;
                                                   PostDataStrings: TALStrings;
                                                   Const EncodeParams: Boolean=True): AnsiString;
-var ResponseContentStream: TALStringStream;
+var ResponseContentStream: TALStringStreamA;
     ResponseHeader: TALHTTPResponseHeader;
 begin
-  ResponseContentStream := TALStringStream.Create('');
+  ResponseContentStream := TALStringStreamA.Create('');
   ResponseHeader := TALHTTPResponseHeader.Create;
   Try
     ExecutePostUrlEncoded(ServerVariables,
@@ -655,7 +655,7 @@ begin
     end;
 
     {For securty issue... if content_length badly set then cpu can go to 100%}
-    ServerVariables.Values['CONTENT_LENGTH']  := ALIntToStr(RequestContentStream.Size);
+    ServerVariables.Values['CONTENT_LENGTH']  := ALIntToStrA(RequestContentStream.Size);
 
   end
 
@@ -674,7 +674,7 @@ begin
 
   {----------}
   LResponseStr := ReadResponse;
-  P1 := AlPos(#13#10#13#10,LResponseStr);
+  P1 := ALPosA(#13#10#13#10,LResponseStr);
   if P1 <= 0 then raise Exception.Create('The Php has encountered an error while processing the request!');
   ResponseHeader.RawHeaderText := AlCopyStr(LResponseStr,1,P1-1);
   if P1 + 4 <= length(LResponseStr) then ResponseContentStream.WriteBuffer(LResponseStr[P1 + 4], length(LResponseStr) - P1 - 3);
@@ -868,7 +868,7 @@ begin
   //create the pipepath here because if we do it in the oncreate the
   //fpipepath can survive few seconds after the disconnection, making
   //some trouble in the next execute loop (pipe has been ended)
-  FPipePath := '\\.\pipe\ALPhpFastCGIRunner-' + ALNewGUIDString(true{WithoutBracket});
+  FPipePath := '\\.\pipe\ALPhpFastCGIRunner-' + ALNewGUIDStringA(true{WithoutBracket});
 
   //create the server pipe
   FServerPipe := CreateNamedPipeA(PAnsiChar(fpipePath),                              //lpName
@@ -894,7 +894,7 @@ begin
     Try
 
   		checkerror(not SetHandleInformation(fServerterminationEvent, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT));
-      LEnvironment := AlGetEnvironmentString + '_FCGI_SHUTDOWN_EVENT_' + '=' + ALIntToStr(fServerterminationEvent) + #0#0;
+      LEnvironment := AlGetEnvironmentString + '_FCGI_SHUTDOWN_EVENT_' + '=' + ALIntToStrA(fServerterminationEvent) + #0#0;
 
       // Set up the start up info struct.
       ZeroMemory(@LStartupInfo,sizeof(TStartupInfo));

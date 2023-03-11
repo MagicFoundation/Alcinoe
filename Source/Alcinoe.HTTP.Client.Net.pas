@@ -59,7 +59,7 @@ var LList: TobjectList<THTTPClient>;
 begin
   TMonitor.Enter(_ALNetHttpClientKeepAlives);
   try
-    if _ALNetHttpClientKeepAlives.TryGetValue(alLowerCaseU(aURI.Scheme) + '://' + ALLowerCaseU(aURI.Host) + ':' + alinttostrU(aURI.port), LList) then begin
+    if _ALNetHttpClientKeepAlives.TryGetValue(AlLowerCase(aURI.Scheme) + '://' + AlLowerCase(aURI.Host) + ':' + ALIntToStrW(aURI.port), LList) then begin
       if LList.Count > 0 then result := LList.ExtractItem(LList.Last, TDirection.FromEnd)
       else result := ALCreateKeepAliveNetHTTPClient;
     end
@@ -75,7 +75,7 @@ var LList: TobjectList<THTTPClient>;
 begin
   TMonitor.Enter(_ALNetHttpClientKeepAlives);
   try
-    if _ALNetHttpClientKeepAlives.TryGetValue(alLowerCaseU(aURI.Scheme) + '://' + ALLowerCaseU(aURI.Host) + ':' + alinttostrU(aURI.port), LList) then begin
+    if _ALNetHttpClientKeepAlives.TryGetValue(AlLowerCase(aURI.Scheme) + '://' + AlLowerCase(aURI.Host) + ':' + ALIntToStrW(aURI.port), LList) then begin
       while LList.Count >= ALMaxKeepAliveNetHttpClientPerHost do
         LList.Delete(0);
       LList.Add(aHTTPClient);
@@ -86,7 +86,7 @@ begin
       try
         LList.Add(aHTTPClient);
         aHTTPClient := nil;
-        if not _ALNetHttpClientKeepAlives.TryAdd(alLowerCaseU(aURI.Scheme) + '://' + ALLowerCaseU(aURI.Host) + ':' + alinttostrU(aURI.port), LList) then ALFreeAndNil(LList);
+        if not _ALNetHttpClientKeepAlives.TryAdd(AlLowerCase(aURI.Scheme) + '://' + AlLowerCase(aURI.Host) + ':' + ALIntToStrW(aURI.port), LList) then ALFreeAndNil(LList);
       except
         ALFreeAndNil(LList);
         raise;

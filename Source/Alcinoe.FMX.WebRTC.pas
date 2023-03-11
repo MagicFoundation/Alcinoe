@@ -1072,10 +1072,10 @@ begin
   {$IFDEF DEBUG}
   //allog(
   //  'TALWebRTC.TAndroidWebRTCListener.onLocalFrameAvailable',
-  //  'textureId: ' + alinttostrU(textureId) +
-  //  ' - width: ' + alinttostrU(width) +
-  //  ' - height: ' + alinttostrU(height) +
-  //  ' - rotation: ' + alinttostrU(rotation),
+  //  'textureId: ' + ALIntToStrW(textureId) +
+  //  ' - width: ' + ALIntToStrW(width) +
+  //  ' - height: ' + ALIntToStrW(height) +
+  //  ' - rotation: ' + ALIntToStrW(rotation),
   //  TalLogType.VERBOSE);
   {$ENDIF}
 
@@ -1095,10 +1095,10 @@ begin
   {$IFDEF DEBUG}
   //allog(
   //  'TALWebRTC.TAndroidWebRTCListener.onRemoteFrameAvailable',
-  //  'textureId: ' + alinttostrU(textureId) +
-  //  ' - width: ' + alinttostrU(width) +
-  //  ' - height: ' + alinttostrU(height) +
-  //  ' - rotation: ' + alinttostrU(rotation),
+  //  'textureId: ' + ALIntToStrW(textureId) +
+  //  ' - width: ' + ALIntToStrW(width) +
+  //  ' - height: ' + ALIntToStrW(height) +
+  //  ' - rotation: ' + ALIntToStrW(rotation),
   //  TalLogType.VERBOSE);
   {$ENDIF}
 
@@ -1135,7 +1135,7 @@ procedure TALWebRTC.TAndroidWebRTCListener.onIceCandidate(candidate: JIceCandida
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TAndroidWebRTCListener.onIceCandidate','candidate.sdpMLineIndex: ' + ALinttostrU(candidate.sdpMLineIndex) +
+  allog('TALWebRTC.TAndroidWebRTCListener.onIceCandidate','candidate.sdpMLineIndex: ' + ALIntToStrW(candidate.sdpMLineIndex) +
                                                           ' - candidate.sdpMid: ' + JstringToString(candidate.sdpMid) +
                                                           ' - candidate.serverUrl: ' + JstringToString(candidate.serverUrl) +
                                                           ' - candidate.sdp: ' + JstringToString(candidate.sdp), TalLogType.VERBOSE);
@@ -1201,7 +1201,7 @@ procedure TALWebRTC.TAndroidWebRTCListener.onError(code: Integer; description: J
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TAndroidWebRTCListener.onError','code: ' + ALinttoStrU(code) + ' - description: ' + JstringToString(description), TalLogType.error);
+  allog('TALWebRTC.TAndroidWebRTCListener.onError','code: ' + ALIntToStrW(code) + ' - description: ' + JstringToString(description), TalLogType.error);
   {$ENDIF}
 
   if assigned(fWebRTC.fOnErrorEvent) then
@@ -1478,7 +1478,7 @@ begin
         for I := LSupportedCodecs.count - 1 downto 0 do begin
           LVideoCodecInfo := TRTCVideoCodecInfo.Wrap(TRTCDefaultVideoEncoderFactory.OCClass.supportedCodecs.objectAtIndex(I));
           LVideoCodecName := NSStrToStr(LVideoCodecInfo.name);
-          if ALSameTextU(LVideoCodecName, 'H264') then begin
+          if ALSameTextW(LVideoCodecName, 'H264') then begin
             LH264ProfileLevelId := TRTCH264ProfileLevelId.wrap(
                                      TRTCH264ProfileLevelId.wrap(
                                        TRTCH264ProfileLevelId.OCClass.alloc).
@@ -1493,7 +1493,7 @@ begin
               LH264ProfileLevelId.release;
             end;
           end;
-          if ALSameTextU(LVideoCodecName, fPeerConnectionParameters.videoCodec) then break;
+          if ALSameTextW(LVideoCodecName, fPeerConnectionParameters.videoCodec) then break;
         end;
         if LVideoCodecInfo <> nil then LEncoderFactory.setPreferredCodec(LVideoCodecInfo);
         //-----
@@ -2077,7 +2077,7 @@ begin
   LMandatoryConstraints := TNSMutableDictionary.Create;
   try
     LMandatoryConstraints.setValue((StrToNSStr('true') as ILocalObject).GetObjectID, StrToNSStr('OfferToReceiveAudio'));
-    LMandatoryConstraints.setValue((StrToNSStr(ALIfThenU(fPeerConnectionParameters.videoCallEnabled, 'true', 'false')) as ILocalObject).GetObjectID, StrToNSStr('OfferToReceiveVideo'));
+    LMandatoryConstraints.setValue((StrToNSStr(ALIfThenW(fPeerConnectionParameters.videoCallEnabled, 'true', 'false')) as ILocalObject).GetObjectID, StrToNSStr('OfferToReceiveVideo'));
     result := TRTCMediaConstraints.Wrap(
                 TRTCMediaConstraints.Wrap(
                   TRTCMediaConstraints.OCClass.alloc).
@@ -2418,7 +2418,7 @@ begin
                                                                  @LTextureRefLuma); // textureOut: A pointer to a CVOpenGLESTexture where the newly created texture object will be placed.
     if LReturnValue <> kCVReturnSuccess then begin
       {$IFDEF DEBUG}
-      ALLog('TALWebRTC.renderFrame', alFormatU('CVOpenGLESTextureCacheCreateTextureFromImage (Luma) failed: %d', [LReturnValue]), TalLogType.Error);
+      ALLog('TALWebRTC.renderFrame', ALFormatW('CVOpenGLESTextureCacheCreateTextureFromImage (Luma) failed: %d', [LReturnValue]), TalLogType.Error);
       {$ENDIF}
       exit;
     end;
@@ -2456,7 +2456,7 @@ begin
                                                                  @LTextureRefChroma); // textureOut: A pointer to a CVOpenGLESTexture where the newly created texture object will be placed.
     if LReturnValue <> kCVReturnSuccess then begin
       {$IFDEF DEBUG}
-      ALLog('TALWebRTC.renderFrame', alFormatU('CVOpenGLESTextureCacheCreateTextureFromImage (Chroma) failed: %d', [LReturnValue]), TalLogType.Error);
+      ALLog('TALWebRTC.renderFrame', ALFormatW('CVOpenGLESTextureCacheCreateTextureFromImage (Chroma) failed: %d', [LReturnValue]), TalLogType.Error);
       {$ENDIF}
       cfRElease(pointer(LTextureRefLuma));
       exit;

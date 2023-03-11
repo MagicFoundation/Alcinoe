@@ -118,7 +118,7 @@ Type
                            aDBHandle: IscDbHandle;
                            aTraHandle: IscTrHandle;
                            aIndex: Integer;
-                           const aFormatSettings: TALFormatSettings): AnsiString;
+                           const aFormatSettings: TALFormatSettingsA): AnsiString;
     procedure initObject; virtual;
     procedure OnSelectDataDone(const Query: TALFBXClientSelectDataQUERY;
                                TimeTaken: double); virtual;
@@ -164,56 +164,56 @@ Type
                          XMLDATA: TalXMLNode;
                          OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         const FormatSettings: TALFormatSettings); overload; virtual;
+                         const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(const Query: TALFBXClientSelectDataQUERY;
                          OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         const FormatSettings: TALFormatSettings); overload; virtual;
+                         const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          Skip: integer;
                          First: Integer;
                          OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         const FormatSettings: TALFormatSettings); overload; virtual;
+                         const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         const FormatSettings: TALFormatSettings); overload; virtual;
+                         const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(const Queries: TALFBXClientSelectDataQUERIES;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings); overload; virtual;
+                         const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(const Query: TALFBXClientSelectDataQUERY;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings); overload; virtual;
+                         const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          const RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings); overload; virtual;
+                         const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          const RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings); overload; virtual;
+                         const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings); overload; virtual;
+                         const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          const Params: Array of AnsiString;
                          const RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings); overload; virtual;
+                         const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          const Params: Array of AnsiString;
                          const RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings); overload; virtual;
+                         const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          const Params: Array of AnsiString;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings); overload; virtual;
+                         const FormatSettings: TALFormatSettingsA); overload; virtual;
     procedure UpdateData(const Queries: TALFBXClientUpdateDataQUERIES); overload; virtual;
     procedure UpdateData(const Query: TALFBXClientUpdateDataQUERY); overload; virtual;
     procedure UpdateData(SQLs: TALStrings); overload; virtual;
@@ -352,7 +352,7 @@ Type
                            aDBHandle: IscDbHandle;
                            aTraHandle: IscTrHandle;
                            aIndex: Integer;
-                           const aFormatSettings: TALFormatSettings): AnsiString; virtual;
+                           const aFormatSettings: TALFormatSettingsA): AnsiString; virtual;
     Procedure AcquireConnectionWithStmt(var DBHandle: IscDbHandle;
                                         var StatementPool: TALFBXConnectionStatementPoolBinTree); virtual;
     Procedure ReleaseConnectionWithStmt(var DBHandle: IscDbHandle;
@@ -459,7 +459,7 @@ Type
                          XMLDATA: TalXMLNode;
                          OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         const FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettingsA;
                          const DBHandle: IscDbHandle = nil;
                          const TraHandle: IscTrHandle = nil;
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -467,7 +467,7 @@ Type
     Procedure SelectData(const Query: TALFBXClientSelectDataQUERY;
                          OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         const FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettingsA;
                          const DBHandle: IscDbHandle = nil;
                          const TraHandle: IscTrHandle = nil;
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -477,7 +477,7 @@ Type
                          First: Integer;
                          OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         const FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettingsA;
                          const DBHandle: IscDbHandle = nil;
                          const TraHandle: IscTrHandle = nil;
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -485,21 +485,21 @@ Type
     Procedure SelectData(const SQL: AnsiString;
                          OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         const FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettingsA;
                          const DBHandle: IscDbHandle = nil;
                          const TraHandle: IscTrHandle = nil;
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                          const TPB: AnsiString = ''); overload; virtual;
     Procedure SelectData(const Queries: TALFBXClientSelectDataQUERIES;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettingsA;
                          const DBHandle: IscDbHandle = nil;
                          const TraHandle: IscTrHandle = nil;
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                          const TPB: AnsiString = ''); overload; virtual;
     Procedure SelectData(const Query: TALFBXClientSelectDataQUERY;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettingsA;
                          const DBHandle: IscDbHandle = nil;
                          const TraHandle: IscTrHandle = nil;
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -509,7 +509,7 @@ Type
                          Skip: integer;
                          First: Integer;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettingsA;
                          const DBHandle: IscDbHandle = nil;
                          const TraHandle: IscTrHandle = nil;
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -517,14 +517,14 @@ Type
     Procedure SelectData(const SQL: AnsiString;
                          const RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettingsA;
                          const DBHandle: IscDbHandle = nil;
                          const TraHandle: IscTrHandle = nil;
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                          const TPB: AnsiString = ''); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettingsA;
                          const DBHandle: IscDbHandle = nil;
                          const TraHandle: IscTrHandle = nil;
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -535,7 +535,7 @@ Type
                          Skip: integer;
                          First: Integer;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettingsA;
                          const DBHandle: IscDbHandle = nil;
                          const TraHandle: IscTrHandle = nil;
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -544,7 +544,7 @@ Type
                          const Params: Array of AnsiString;
                          const RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettingsA;
                          const DBHandle: IscDbHandle = nil;
                          const TraHandle: IscTrHandle = nil;
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -552,7 +552,7 @@ Type
     Procedure SelectData(const SQL: AnsiString;
                          const Params: Array of AnsiString;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettingsA;
                          const DBHandle: IscDbHandle = nil;
                          const TraHandle: IscTrHandle = nil;
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -877,6 +877,7 @@ implementation
 
 uses
   System.Diagnostics,
+  System.AnsiStrings,
   Alcinoe.Cipher,
   Alcinoe.WinApi.Common,
   Alcinoe.Common,
@@ -990,11 +991,11 @@ Begin
   if not Connected then raise Exception.Create('Not connected');
 
   //build the aSelectPart;
-  LSelectPart := ALIfThen(not SkipIOStats,     'MON$PAGE_READS as PAGE_READS, '+
+  LSelectPart := ALIfThenA(not SkipIOStats,    'MON$PAGE_READS as PAGE_READS, '+
                                                'MON$PAGE_WRITES as PAGE_WRITES, '+
                                                'MON$PAGE_FETCHES as PAGE_FETCHES, '+
                                                'MON$PAGE_MARKS as PAGE_MARKS, ') +
-                 ALIfThen(not SkipRecordStats, 'MON$RECORD_SEQ_READS as RECORD_SEQ_READS, '+
+                 ALIfThenA(not SkipRecordStats,'MON$RECORD_SEQ_READS as RECORD_SEQ_READS, '+
                                                'MON$RECORD_IDX_READS as RECORD_IDX_READS, '+
                                                'MON$RECORD_INSERTS as RECORD_INSERTS, '+
                                                'MON$RECORD_UPDATES as RECORD_UPDATES, '+
@@ -1002,7 +1003,7 @@ Begin
                                                'MON$RECORD_BACKOUTS as RECORD_BACKOUTS, '+
                                                'MON$RECORD_PURGES as RECORD_PURGES, '+
                                                'MON$RECORD_EXPUNGES as RECORD_EXPUNGES, ') +
-                 ALIfThen(not SkipMemoryUsage, 'MON$MEMORY_USED as MEMORY_USED, '+
+                 ALIfThenA(not SkipMemoryUsage,'MON$MEMORY_USED as MEMORY_USED, '+
                                                'MON$MEMORY_ALLOCATED as MEMORY_ALLOCATED, '+
                                                'MON$MAX_MEMORY_USED as MAX_MEMORY_USED, '+
                                                'MON$MAX_MEMORY_ALLOCATED as MAX_MEMORY_ALLOCATED, ');
@@ -1016,20 +1017,20 @@ Begin
   else                             LFromPart := 'MON$DATABASE';
 
   //build the aJoinPart
-  LJoinPart := ALIfThen(not SkipIOStats,     'JOIN MON$IO_STATS ON MON$IO_STATS.MON$STAT_ID = '        +LFromPart+'.MON$STAT_ID ') +
-               ALIfThen(not SkipRecordStats, 'JOIN MON$RECORD_STATS ON MON$RECORD_STATS.MON$STAT_ID = '+LFromPart+'.MON$STAT_ID ') +
-               ALIfThen(not SkipMemoryUsage, 'JOIN MON$MEMORY_USAGE ON MON$MEMORY_USAGE.MON$STAT_ID = '+LFromPart+'.MON$STAT_ID ');
+  LJoinPart := ALIfThenA(not SkipIOStats,     'JOIN MON$IO_STATS ON MON$IO_STATS.MON$STAT_ID = '        +LFromPart+'.MON$STAT_ID ') +
+               ALIfThenA(not SkipRecordStats, 'JOIN MON$RECORD_STATS ON MON$RECORD_STATS.MON$STAT_ID = '+LFromPart+'.MON$STAT_ID ') +
+               ALIfThenA(not SkipMemoryUsage, 'JOIN MON$MEMORY_USAGE ON MON$MEMORY_USAGE.MON$STAT_ID = '+LFromPart+'.MON$STAT_ID ');
 
   //build the aWherePart
   if StatementSQL <> '' then       LWherePart := 'WHERE '+
                                                  'MON$SQL_TEXT = ' + ALQuotedStr(StatementSQL) +
-                                                 ALIfThen(TransactionID <> -1, ' AND MON$TRANSACTION_ID = '+ALIntToStr(TransactionID)) +
-                                                 ALIfThen(ConnectionID <> -1,  ' AND MON$ATTACHMENT_ID = '+ALIntToStr(ConnectionID))
+                                                 ALIfThenA(TransactionID <> -1, ' AND MON$TRANSACTION_ID = '+ALIntToStrA(TransactionID)) +
+                                                 ALIfThenA(ConnectionID <> -1,  ' AND MON$ATTACHMENT_ID = '+ALIntToStrA(ConnectionID))
   else if TransactionID <> -1 then LWherePart := 'WHERE '+
-                                                 'MON$TRANSACTION_ID = '+ALIntToStr(TransactionID) +
-                                                 ALIfThen(ConnectionID <> -1,  ' AND MON$ATTACHMENT_ID = '+ALIntToStr(ConnectionID))
+                                                 'MON$TRANSACTION_ID = '+ALIntToStrA(TransactionID) +
+                                                 ALIfThenA(ConnectionID <> -1,  ' AND MON$ATTACHMENT_ID = '+ALIntToStrA(ConnectionID))
   else if ConnectionID <> -1 then  LWherePart := 'WHERE '+
-                                                 'MON$ATTACHMENT_ID = '+ALIntToStr(ConnectionID)
+                                                 'MON$ATTACHMENT_ID = '+ALIntToStrA(ConnectionID)
   else                             LWherePart := '';
 
 
@@ -1062,7 +1063,7 @@ Begin
                    LWherePart,
                    'rec',
                    LXMLDATA.DocumentElement,
-                   ALDefaultFormatSettings);
+                   ALDefaultFormatSettingsA);
 
         if LXMLDATA.DocumentElement.ChildNodes.Count <> 1 then raise Exception.Create('Can not get the monitoring stats');
         with LXMLDATA.DocumentElement.ChildNodes[0] do begin
@@ -1147,7 +1148,7 @@ function TALFBXClient.GetFieldValue(aSQLDA:TALFBXSQLResult;
                                     aDBHandle: IscDbHandle;
                                     aTraHandle: IscTrHandle;
                                     aIndex: Integer;
-                                    const aFormatSettings: TALFormatSettings): AnsiString;
+                                    const aFormatSettings: TALFormatSettingsA): AnsiString;
   {-------------------------}
   Procedure InternalReadBlob;
   var BlobHandle: IscBlobHandle;
@@ -1166,16 +1167,16 @@ function TALFBXClient.GetFieldValue(aSQLDA:TALFBXSQLResult;
 Begin
   If not aSQLDA.IsNull[aIndex] then
     Case aSQLDA.SQLType[aIndex] of
-      SQL_TIMESTAMP : Result := ALDatetimetostr(aSQLDA.AsDateTime[aIndex], aFormatSettings);
-      SQL_TYPE_TIME : Result := ALTimetostr(aSQLDA.AsTime[aIndex], aFormatSettings);
-      SQL_TYPE_DATE : Result := ALDatetostr(aSQLDA.AsDate[aIndex], aFormatSettings);
-      SQL_DOUBLE    : Result := ALFloatToStr(aSQLDA.AsDouble[aIndex], aFormatSettings);
+      SQL_TIMESTAMP : Result := ALDateTimeToStrA(aSQLDA.AsDateTime[aIndex], aFormatSettings);
+      SQL_TYPE_TIME : Result := ALTimeToStrA(aSQLDA.AsTime[aIndex], aFormatSettings);
+      SQL_TYPE_DATE : Result := ALDateToStrA(aSQLDA.AsDate[aIndex], aFormatSettings);
+      SQL_DOUBLE    : Result := ALFloatToStrA(aSQLDA.AsDouble[aIndex], aFormatSettings);
       SQL_FLOAT,
-      SQL_D_FLOAT   : Result := ALFloatToStr(aSQLDA.AsSingle[aIndex], aFormatSettings);
+      SQL_D_FLOAT   : Result := ALFloatToStrA(aSQLDA.AsSingle[aIndex], aFormatSettings);
       SQL_INT64,
       SQL_LONG,
       SQL_SHORT     : begin
-                        if aSQLDA.SQLScale[aIndex] < 0 then Result := ALFloatToStr(aSQLDA.asDouble[Aindex],aFormatSettings)
+                        if aSQLDA.SQLScale[aIndex] < 0 then Result := ALFloatToStrA(aSQLDA.asDouble[Aindex],aFormatSettings)
                         else result := aSQLDA.AsAnsiString[Aindex];
                       end;
       SQL_BLOB      : InternalReadBlob;
@@ -1355,7 +1356,7 @@ begin
           Login,
           Password,
           CharSet,
-          'num_buffers = '+ALIntToStr(Numbuffers));
+          'num_buffers = '+ALIntToStrA(Numbuffers));
 end;
 
 {********************************}
@@ -1537,7 +1538,7 @@ procedure TALFBXClient.SelectData(const Queries: TALFBXClientSelectDataQUERIES;
                                   XMLDATA: TalXMLNode;
                                   OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                                   ExtData: Pointer;
-                                  const FormatSettings: TALFormatSettings);
+                                  const FormatSettings: TALFormatSettingsA);
 
 Var LSqlpa: TALFBXSQLParams;
     LParamsIndex: integer;
@@ -1566,7 +1567,7 @@ Var LSqlpa: TALFBXSQLParams;
       else LViewRec := XMLdata;
 
       //init aUpdateRowTagByFieldValue
-      if AlPos('&>',Queries[LQueriesIndex].RowTag) = 1 then begin
+      if ALPosA('&>',Queries[LQueriesIndex].RowTag) = 1 then begin
         delete(Queries[LQueriesIndex].RowTag, 1, 2);
         LUpdateRowTagByFieldValue := Queries[LQueriesIndex].RowTag <> '';
       end
@@ -1662,8 +1663,8 @@ begin
 
         //try to load from from cache
         LCacheKey := ALStringHashSHA1(Queries[LQueriesIndex].RowTag + '#' +
-                                      alinttostr(Queries[LQueriesIndex].Skip) + '#' +
-                                      alinttostr(Queries[LQueriesIndex].First) + '#' +
+                                      ALIntToStrA(Queries[LQueriesIndex].Skip) + '#' +
+                                      ALIntToStrA(Queries[LQueriesIndex].First) + '#' +
                                       ALGetFormatSettingsID(FormatSettings) + '#' +
                                       Queries[LQueriesIndex].SQL);
         if loadcachedData(LCacheKey, LCacheStr) then begin
@@ -1824,7 +1825,7 @@ end;
 procedure TALFBXClient.SelectData(const Query: TALFBXClientSelectDataQUERY;
                                   OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                                   ExtData: Pointer;
-                                  const FormatSettings: TALFormatSettings);
+                                  const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
@@ -1842,7 +1843,7 @@ procedure TALFBXClient.SelectData(const SQL: AnsiString;
                                   First: Integer;
                                   OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                                   ExtData: Pointer;
-                                  const FormatSettings: TALFormatSettings);
+                                  const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
@@ -1861,7 +1862,7 @@ end;
 procedure TALFBXClient.SelectData(const SQL: AnsiString;
                                   OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                                   ExtData: Pointer;
-                                  const FormatSettings: TALFormatSettings);
+                                  const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
@@ -1877,7 +1878,7 @@ end;
 {*****************************************************************************}
 procedure TALFBXClient.SelectData(const Queries: TALFBXClientSelectDataQUERIES;
                                   XMLDATA: TalXMLNode;
-                                  const FormatSettings: TALFormatSettings);
+                                  const FormatSettings: TALFormatSettingsA);
 begin
 
   SelectData(Queries,
@@ -1891,7 +1892,7 @@ end;
 {*************************************************************************}
 procedure TALFBXClient.SelectData(const Query: TALFBXClientSelectDataQUERY;
                                   XMLDATA: TalXMLNode;
-                                  const FormatSettings: TALFormatSettings);
+                                  const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
@@ -1909,7 +1910,7 @@ procedure TALFBXClient.SelectData(const SQL: AnsiString;
                                   Skip: Integer;
                                   First: Integer;
                                   XMLDATA: TalXMLNode;
-                                  const FormatSettings: TALFormatSettings);
+                                  const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
@@ -1929,7 +1930,7 @@ end;
 procedure TALFBXClient.SelectData(const SQL: AnsiString;
                                   const RowTag: AnsiString;
                                   XMLDATA: TalXMLNode;
-                                  const FormatSettings: TALFormatSettings);
+                                  const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
@@ -1946,7 +1947,7 @@ end;
 {******************************************************}
 procedure TALFBXClient.SelectData(const SQL: AnsiString;
                                   XMLDATA: TalXMLNode;
-                                  const FormatSettings: TALFormatSettings);
+                                  const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
@@ -1966,7 +1967,7 @@ procedure TALFBXClient.SelectData(const SQL: AnsiString;
                                   Skip: Integer;
                                   First: Integer;
                                   XMLDATA: TalXMLNode;
-                                  const FormatSettings: TALFormatSettings);
+                                  const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
     I: integer;
 begin
@@ -1994,7 +1995,7 @@ procedure TALFBXClient.SelectData(const SQL: AnsiString;
                                   const Params: Array of AnsiString;
                                   const RowTag: AnsiString;
                                   XMLDATA: TalXMLNode;
-                                  const FormatSettings: TALFormatSettings);
+                                  const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
     I: integer;
 begin
@@ -2019,7 +2020,7 @@ end;
 procedure TALFBXClient.SelectData(const SQL: AnsiString;
                                   const Params: Array of AnsiString;
                                   XMLDATA: TalXMLNode;
-                                  const FormatSettings: TALFormatSettings);
+                                  const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
     I: integer;
 begin
@@ -2275,11 +2276,11 @@ Begin
   //To refresh the snapshot, the current transaction should be finished and the monitoring tables should be queried in a new transaction context.
 
   //build the aSelectPart;
-  LSelectPart := ALIfThen(not SkipIOStats,     'MON$PAGE_READS as PAGE_READS, '+
+  LSelectPart := ALIfThenA(not SkipIOStats,    'MON$PAGE_READS as PAGE_READS, '+
                                                'MON$PAGE_WRITES as PAGE_WRITES, '+
                                                'MON$PAGE_FETCHES as PAGE_FETCHES, '+
                                                'MON$PAGE_MARKS as PAGE_MARKS, ') +
-                 ALIfThen(not SkipRecordStats, 'MON$RECORD_SEQ_READS as RECORD_SEQ_READS, '+
+                 ALIfThenA(not SkipRecordStats,'MON$RECORD_SEQ_READS as RECORD_SEQ_READS, '+
                                                'MON$RECORD_IDX_READS as RECORD_IDX_READS, '+
                                                'MON$RECORD_INSERTS as RECORD_INSERTS, '+
                                                'MON$RECORD_UPDATES as RECORD_UPDATES, '+
@@ -2287,7 +2288,7 @@ Begin
                                                'MON$RECORD_BACKOUTS as RECORD_BACKOUTS, '+
                                                'MON$RECORD_PURGES as RECORD_PURGES, '+
                                                'MON$RECORD_EXPUNGES as RECORD_EXPUNGES, ') +
-                 ALIfThen(not SkipMemoryUsage, 'MON$MEMORY_USED as MEMORY_USED, '+
+                 ALIfThenA(not SkipMemoryUsage,'MON$MEMORY_USED as MEMORY_USED, '+
                                                'MON$MEMORY_ALLOCATED as MEMORY_ALLOCATED, '+
                                                'MON$MAX_MEMORY_USED as MAX_MEMORY_USED, '+
                                                'MON$MAX_MEMORY_ALLOCATED as MAX_MEMORY_ALLOCATED, ');
@@ -2301,20 +2302,20 @@ Begin
   else                             LFromPart := 'MON$DATABASE';
 
   //build the aJoinPart
-  LJoinPart := ALIfThen(not SkipIOStats,     'JOIN MON$IO_STATS ON MON$IO_STATS.MON$STAT_ID = '        +LFromPart+'.MON$STAT_ID ') +
-               ALIfThen(not SkipRecordStats, 'JOIN MON$RECORD_STATS ON MON$RECORD_STATS.MON$STAT_ID = '+LFromPart+'.MON$STAT_ID ') +
-               ALIfThen(not SkipMemoryUsage, 'JOIN MON$MEMORY_USAGE ON MON$MEMORY_USAGE.MON$STAT_ID = '+LFromPart+'.MON$STAT_ID ');
+  LJoinPart := ALIfThenA(not SkipIOStats,     'JOIN MON$IO_STATS ON MON$IO_STATS.MON$STAT_ID = '        +LFromPart+'.MON$STAT_ID ') +
+               ALIfThenA(not SkipRecordStats, 'JOIN MON$RECORD_STATS ON MON$RECORD_STATS.MON$STAT_ID = '+LFromPart+'.MON$STAT_ID ') +
+               ALIfThenA(not SkipMemoryUsage, 'JOIN MON$MEMORY_USAGE ON MON$MEMORY_USAGE.MON$STAT_ID = '+LFromPart+'.MON$STAT_ID ');
 
   //build the aWherePart
   if StatementSQL <> '' then       LWherePart := 'WHERE '+
                                                  'MON$SQL_TEXT = ' + ALQuotedStr(StatementSQL) +
-                                                 ALIfThen(TransactionID <> -1, ' AND MON$TRANSACTION_ID = '+ALIntToStr(TransactionID)) +
-                                                 ALIfThen(ConnectionID <> -1,  ' AND MON$ATTACHMENT_ID = '+ALIntToStr(ConnectionID))
+                                                 ALIfThenA(TransactionID <> -1, ' AND MON$TRANSACTION_ID = '+ALIntToStrA(TransactionID)) +
+                                                 ALIfThenA(ConnectionID <> -1,  ' AND MON$ATTACHMENT_ID = '+ALIntToStrA(ConnectionID))
   else if TransactionID <> -1 then LWherePart := 'WHERE '+
-                                                 'MON$TRANSACTION_ID = '+ALIntToStr(TransactionID) +
-                                                 ALIfThen(ConnectionID <> -1,  ' AND MON$ATTACHMENT_ID = '+ALIntToStr(ConnectionID))
+                                                 'MON$TRANSACTION_ID = '+ALIntToStrA(TransactionID) +
+                                                 ALIfThenA(ConnectionID <> -1,  ' AND MON$ATTACHMENT_ID = '+ALIntToStrA(ConnectionID))
   else if ConnectionID <> -1 then  LWherePart := 'WHERE '+
-                                                 'MON$ATTACHMENT_ID = '+ALIntToStr(ConnectionID)
+                                                 'MON$ATTACHMENT_ID = '+ALIntToStrA(ConnectionID)
   else                             LWherePart := '';
 
 
@@ -2340,7 +2341,7 @@ Begin
                  LWherePart,
                  'rec',
                  LXMLDATA.DocumentElement,
-                 ALDefaultFormatSettings,
+                 ALDefaultFormatSettingsA,
                  LDBHandle,
                  LTraHandle);
 
@@ -2404,7 +2405,7 @@ function TALFBXConnectionPoolClient.GetFieldValue(aSQLDA: TALFBXSQLResult;
                                                   aDBHandle: IscDbHandle;
                                                   aTraHandle: IscTrHandle;
                                                   aIndex: Integer;
-                                                  const aFormatSettings: TALFormatSettings): AnsiString;
+                                                  const aFormatSettings: TALFormatSettingsA): AnsiString;
   {-------------------------}
   Procedure InternalReadBlob;
   var BlobHandle: IscBlobHandle;
@@ -2423,16 +2424,16 @@ function TALFBXConnectionPoolClient.GetFieldValue(aSQLDA: TALFBXSQLResult;
 Begin
   If not aSQLDA.IsNull[aIndex] then begin
     Case aSQLDA.SQLType[aIndex] of
-      SQL_TIMESTAMP : Result := ALDatetimetostr(aSQLDA.AsDateTime[aIndex], aFormatSettings);
-      SQL_TYPE_TIME : Result := ALTimetostr(aSQLDA.AsTime[aIndex], aFormatSettings);
-      SQL_TYPE_DATE : Result := ALDatetostr(aSQLDA.AsDate[aIndex], aFormatSettings);
-      SQL_DOUBLE    : Result := ALFloatToStr(aSQLDA.AsDouble[aIndex], aFormatSettings);
+      SQL_TIMESTAMP : Result := ALDateTimeToStrA(aSQLDA.AsDateTime[aIndex], aFormatSettings);
+      SQL_TYPE_TIME : Result := ALTimeToStrA(aSQLDA.AsTime[aIndex], aFormatSettings);
+      SQL_TYPE_DATE : Result := ALDateToStrA(aSQLDA.AsDate[aIndex], aFormatSettings);
+      SQL_DOUBLE    : Result := ALFloatToStrA(aSQLDA.AsDouble[aIndex], aFormatSettings);
       SQL_FLOAT,
-      SQL_D_FLOAT   : Result := ALFloatToStr(aSQLDA.AsSingle[aIndex], aFormatSettings);
+      SQL_D_FLOAT   : Result := ALFloatToStrA(aSQLDA.AsSingle[aIndex], aFormatSettings);
       SQL_INT64,
       SQL_LONG,
       SQL_SHORT     : begin
-                        if aSQLDA.SQLScale[aIndex] < 0 then Result := ALFloatToStr(aSQLDA.asDouble[Aindex],aFormatSettings)
+                        if aSQLDA.SQLScale[aIndex] < 0 then Result := ALFloatToStrA(aSQLDA.asDouble[Aindex],aFormatSettings)
                         else result := aSQLDA.AsAnsiString[Aindex];
                       end;
       SQL_BLOB      : InternalReadBlob;
@@ -2459,7 +2460,7 @@ begin
   fOpenConnectionParams := 'user_name = '+aLogin+'; '+
                            'password = '+aPassword+'; '+
                            'lc_ctype = '+aCharSet;
-  if aNumbuffers > -1 then fOpenConnectionParams := fOpenConnectionParams + '; num_buffers = ' + ALIntToStr(aNumbuffers);
+  if aNumbuffers > -1 then fOpenConnectionParams := fOpenConnectionParams + '; num_buffers = ' + ALIntToStrA(aNumbuffers);
   if aOpenConnectionExtraParams <> '' then fOpenConnectionParams := fOpenConnectionParams + '; ' + aOpenConnectionExtraParams;
   FSQLDIALECT := 3;
   FConnectionWithStmtPool:= TObjectList.Create(True);
@@ -2998,9 +2999,9 @@ Begin
   //security check, TPB can not be empty and
   //must be only read commited read only
   if (TPB = '') or
-     ((alpos(isc_tpb_read_committed,TPB) <= 0) or
-      (alpos(isc_tpb_read, TPB) <= 0) or
-      (alpos(isc_tpb_write, TPB) > 0))
+     ((ALPosA(isc_tpb_read_committed,TPB) <= 0) or
+      (ALPosA(isc_tpb_read, TPB) <= 0) or
+      (ALPosA(isc_tpb_write, TPB) > 0))
   then raise Exception.Create('Wrong Params');
   if assigned(DBHandle) then raise exception.Create('Connection handle must be null');
   if assigned(TraHandle) then raise exception.Create('Transaction handle must be null');
@@ -3262,9 +3263,9 @@ Begin
   //must be only read commited read only
   if (SQL = '') or
      (TPB = '') or
-     ((alpos(isc_tpb_read_committed,TPB) <= 0) or
-      (alpos(isc_tpb_read, TPB) <= 0) or
-      (alpos(isc_tpb_write, TPB) > 0))
+     ((ALPosA(isc_tpb_read_committed,TPB) <= 0) or
+      (ALPosA(isc_tpb_read, TPB) <= 0) or
+      (ALPosA(isc_tpb_write, TPB) > 0))
   then raise Exception.Create('Wrong Params');
   if assigned(DBHandle) then raise exception.Create('Connection handle must be null');
   if assigned(TraHandle) then raise exception.Create('Transaction handle must be null');
@@ -3373,9 +3374,9 @@ begin
   //must be only read commited read only
   if (SQL = '') or
      (TPB = '') or
-     ((alpos(isc_tpb_read_committed,TPB) <= 0) or
-      (alpos(isc_tpb_read, TPB) <= 0) or
-      (alpos(isc_tpb_write, TPB) > 0))
+     ((ALPosA(isc_tpb_read_committed,TPB) <= 0) or
+      (ALPosA(isc_tpb_read, TPB) <= 0) or
+      (ALPosA(isc_tpb_write, TPB) > 0))
   then raise Exception.Create('Wrong Params');
   if not assigned(DBHandle) then raise exception.Create('Connection handle can not be null');
   if not assigned(TraHandle) then raise exception.Create('Transaction handle can not be null');
@@ -3963,7 +3964,7 @@ procedure TALFBXConnectionPoolClient.SelectData(const Queries: TALFBXClientSelec
                                                 XMLDATA: TalXMLNode;
                                                 OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                                                 ExtData: Pointer;
-                                                const FormatSettings: TALFormatSettings;
+                                                const FormatSettings: TALFormatSettingsA;
                                                 const DBHandle: IscDbHandle = nil;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -4008,7 +4009,7 @@ procedure TALFBXConnectionPoolClient.SelectData(const Queries: TALFBXClientSelec
     else LViewRec := XMLdata;
 
     //init aUpdateRowTagByFieldValue
-    if AlPos('&>',Queries[LQueriesIndex].RowTag) = 1 then begin
+    if ALPosA('&>',Queries[LQueriesIndex].RowTag) = 1 then begin
       delete(Queries[LQueriesIndex].RowTag, 1, 2);
       LUpdateRowTagByFieldValue := Queries[LQueriesIndex].RowTag <> '';
     end
@@ -4114,9 +4115,9 @@ begin
     LTmpSqlda := nil;
     LTmpTPB := TPB;
     if LTmpTPB = '' then LTmpTPB := fDefaultReadTPB;
-    LReadOnlyReadCommitedTPB := (alpos(isc_tpb_read_committed,LTmpTPB) > 0) and
-                                (alpos(isc_tpb_read, LTmpTPB) > 0) and
-                                (alpos(isc_tpb_write, LTmpTPB) <= 0);
+    LReadOnlyReadCommitedTPB := (ALPosA(isc_tpb_read_committed,LTmpTPB) > 0) and
+                                (ALPosA(isc_tpb_read, LTmpTPB) > 0) and
+                                (ALPosA(isc_tpb_write, LTmpTPB) <= 0);
     LConnectionWasAcquiredFromPool := False;
     LTransactionWasAcquiredFromPool := False;
     LStatementWasAcquiredFromPool := False;
@@ -4141,8 +4142,8 @@ begin
 
           //try to load from from cache
           LCacheKey := ALStringHashSHA1(Queries[LQueriesIndex].RowTag + '#' +
-                                        alinttostr(Queries[LQueriesIndex].Skip) + '#' +
-                                        alinttostr(Queries[LQueriesIndex].First) + '#' +
+                                        ALIntToStrA(Queries[LQueriesIndex].Skip) + '#' +
+                                        ALIntToStrA(Queries[LQueriesIndex].First) + '#' +
                                         ALGetFormatSettingsID(FormatSettings) + '#' +
                                         Queries[LQueriesIndex].SQL);
           if loadcachedData(LCacheKey, LCacheStr) then begin
@@ -4542,7 +4543,7 @@ end;
 procedure TALFBXConnectionPoolClient.SelectData(const Query: TALFBXClientSelectDataQUERY;
                                                 OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                                                 ExtData: Pointer;
-                                                const FormatSettings: TALFormatSettings;
+                                                const FormatSettings: TALFormatSettingsA;
                                                 const DBHandle: IscDbHandle = nil;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -4568,7 +4569,7 @@ procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                 First: Integer;
                                                 OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                                                 ExtData: Pointer;
-                                                const FormatSettings: TALFormatSettings;
+                                                const FormatSettings: TALFormatSettingsA;
                                                 const DBHandle: IscDbHandle = nil;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -4595,7 +4596,7 @@ end;
 procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                 OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                                                 ExtData: Pointer;
-                                                const FormatSettings: TALFormatSettings;
+                                                const FormatSettings: TALFormatSettingsA;
                                                 const DBHandle: IscDbHandle = nil;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -4619,7 +4620,7 @@ end;
 {*******************************************************************************************}
 procedure TALFBXConnectionPoolClient.SelectData(const Queries: TALFBXClientSelectDataQUERIES;
                                                 XMLDATA: TalXMLNode;
-                                                const FormatSettings: TALFormatSettings;
+                                                const FormatSettings: TALFormatSettingsA;
                                                 const DBHandle: IscDbHandle = nil;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -4641,7 +4642,7 @@ end;
 {***************************************************************************************}
 procedure TALFBXConnectionPoolClient.SelectData(const Query: TALFBXClientSelectDataQUERY;
                                                 XMLDATA: TalXMLNode;
-                                                const FormatSettings: TALFormatSettings;
+                                                const FormatSettings: TALFormatSettingsA;
                                                 const DBHandle: IscDbHandle = nil;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -4667,7 +4668,7 @@ procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                 Skip: integer;
                                                 First: Integer;
                                                 XMLDATA: TalXMLNode;
-                                                const FormatSettings: TALFormatSettings;
+                                                const FormatSettings: TALFormatSettingsA;
                                                 const DBHandle: IscDbHandle = nil;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -4695,7 +4696,7 @@ end;
 procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                 const RowTag: AnsiString;
                                                 XMLDATA: TalXMLNode;
-                                                const FormatSettings: TALFormatSettings;
+                                                const FormatSettings: TALFormatSettingsA;
                                                 const DBHandle: IscDbHandle = nil;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -4720,7 +4721,7 @@ end;
 {********************************************************************}
 procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                 XMLDATA: TalXMLNode;
-                                                const FormatSettings: TALFormatSettings;
+                                                const FormatSettings: TALFormatSettingsA;
                                                 const DBHandle: IscDbHandle = nil;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -4748,7 +4749,7 @@ procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                 Skip: integer;
                                                 First: Integer;
                                                 XMLDATA: TalXMLNode;
-                                                const FormatSettings: TALFormatSettings;
+                                                const FormatSettings: TALFormatSettingsA;
                                                 const DBHandle: IscDbHandle = nil;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -4784,7 +4785,7 @@ procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                 const Params: array of AnsiString;
                                                 const RowTag: AnsiString;
                                                 XMLDATA: TalXMLNode;
-                                                const FormatSettings: TALFormatSettings;
+                                                const FormatSettings: TALFormatSettingsA;
                                                 const DBHandle: IscDbHandle = nil;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -4817,7 +4818,7 @@ end;
 procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                 const Params: array of AnsiString;
                                                 XMLDATA: TalXMLNode;
-                                                const FormatSettings: TALFormatSettings;
+                                                const FormatSettings: TALFormatSettingsA;
                                                 const DBHandle: IscDbHandle = nil;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -5401,11 +5402,11 @@ begin
   fOpenConnectionParams := 'user_name = '+aLogin+'; '+
                            'password = '+aPassword+'; '+
                            'lc_ctype = '+aCharSet;
-  if aNumbuffers > -1 then fOpenConnectionParams := fOpenConnectionParams + '; num_buffers = ' + ALIntToStr(aNumbuffers);
+  if aNumbuffers > -1 then fOpenConnectionParams := fOpenConnectionParams + '; num_buffers = ' + ALIntToStrA(aNumbuffers);
   if aOpenConnectionExtraParams <> '' then fOpenConnectionParams := fOpenConnectionParams + '; ' + aOpenConnectionExtraParams;
   LLst := TALStringList.Create;
   Try
-    LLst.Text := ALTrim(alStringReplace(aEventNames,';',#13#10,[rfReplaceALL]));
+    LLst.Text := ALTrim(ALStringReplaceA(aEventNames,';',#13#10,[rfReplaceALL]));
     i := 0;
     while (i <= 14) and (i <= LLst.Count - 1) do begin
       fEventNamesArr[i] := ALTrim(LLst[i]);

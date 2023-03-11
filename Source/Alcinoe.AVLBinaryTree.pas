@@ -215,6 +215,7 @@ implementation
 uses
   System.Contnrs,
   System.sysUtils,
+  System.AnsiStrings,
   Alcinoe.StringUtils;
 
 {Following stack declarations are used to avoid recursion in all tree
@@ -1338,13 +1339,13 @@ end;
 {****************************************************************************************************}
 function TALStringKeyAVLBinaryTree.CompareKeyCaseInSensitive(const aKey1, aKey2: AnsiString): Integer;
 begin
-  Result := ALCompareText(aKey1,aKey2);
+  Result := ALCompareTextA(aKey1,aKey2);
 end;
 
 {**************************************************************************************************}
 function TALStringKeyAVLBinaryTree.CompareKeyCaseSensitive(const aKey1, aKey2: AnsiString): Integer;
 begin
-  result := ALCompareStr(aKey1,aKey2);
+  result := ALCompareStrA(aKey1,aKey2);
 end;
 
 {*************************************************************************}

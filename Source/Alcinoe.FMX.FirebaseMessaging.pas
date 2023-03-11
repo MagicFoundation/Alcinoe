@@ -1010,7 +1010,7 @@ begin
   // app is allowed to do.
 
   {$IFDEF DEBUG}
-  allog('TALFirebaseMessaging.UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler', 'granted: ' + ALBoolToStrU(granted), TalLogType.verbose);
+  allog('TALFirebaseMessaging.UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler', 'granted: ' + ALBoolToStrW(granted), TalLogType.verbose);
   {$ENDIF}
 
  if (not granted) then begin

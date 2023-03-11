@@ -518,7 +518,7 @@ begin
   {$IF defined(DEBUG)}
   if (fTotalFramesProcessed mod 1000 = 0) then begin
     fFpsStopWatch.Stop;
-    ALLog('TALAndroidVideoPlayer.TFrameAvailableListener.DoOnFrameAvailable', 'fps: ' + ALFormatFloatU('0.00', (fTotalFramesProcessed) / max(1, (ffpsStopWatch.Elapsed.TotalMilliseconds / 1000)), AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+    ALLog('TALAndroidVideoPlayer.TFrameAvailableListener.DoOnFrameAvailable', 'fps: ' + ALFormatFloatW('0.00', (fTotalFramesProcessed) / max(1, (ffpsStopWatch.Elapsed.TotalMilliseconds / 1000)), ALDefaultFormatSettingsW), TalLogType.VERBOSE);
     fTotalFramesProcessed := 0;
     fFpsStopWatch := TStopWatch.StartNew;
   end;
@@ -555,7 +555,7 @@ begin
   {$IFDEF DEBUG}
   if (fTotalFramesProcessed mod 1000 = 0) then begin
     LStopWatch.Stop;
-    ALLog('TALAndroidVideoPlayer.onFrameAvailable.updateTexImage', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+    ALLog('TALAndroidVideoPlayer.onFrameAvailable.updateTexImage', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
   end;
   {$ENDIF}
 
@@ -695,8 +695,8 @@ begin
   {$IF defined(DEBUG)}
   ALLog(
     'TALAndroidVideoPlayer.onPlayerStateChanged',
-    'playWhenReady: ' + ALBoolToStrU(playWhenReady) + ' | ' +
-    'playbackState: ' + ALIntToStrU(playbackState),
+    'playWhenReady: ' + ALBoolToStrW(playWhenReady) + ' | ' +
+    'playbackState: ' + ALIntToStrW(playbackState),
     TalLogType.verbose);
   {$ENDIF}
 
@@ -896,8 +896,8 @@ begin
   {$IF defined(DEBUG)}
   ALLog(
     'TALAndroidVideoPlayer.onVideoSizeChanged',
-    'width: ' + ALinttostrU(videoSize.width) + ' | ' +
-    'height: ' + ALinttostrU(videoSize.height),
+    'width: ' + ALIntToStrW(videoSize.width) + ' | ' +
+    'height: ' + ALIntToStrW(videoSize.height),
     TalLogType.verbose);
   {$ENDIF}
 
@@ -996,7 +996,7 @@ begin
   //----
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.Create', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog('TALAndroidVideoPlayer.Create', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1042,7 +1042,7 @@ begin
   //----
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.Destroy', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog('TALAndroidVideoPlayer.Destroy', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1106,7 +1106,7 @@ begin
   var LMediaSource: JMediaSource;
 
   //HLS datasource
-  if alSameTextU(ExtractFileExt(aDataSource), '.m3u8') then begin
+  if ALSameTextW(ExtractFileExt(aDataSource), '.m3u8') then begin
     var LHlsMediaSourceFactory := TJHlsMediaSource_Factory.JavaClass.init(fDataSourceFactory);
     LMediaSource := LHlsMediaSourceFactory.createMediaSource(LMediaItem);
   end
@@ -1124,7 +1124,7 @@ begin
   //----
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.prepare', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog('TALAndroidVideoPlayer.prepare', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1142,7 +1142,7 @@ begin
 
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.pause', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog('TALAndroidVideoPlayer.pause', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1160,7 +1160,7 @@ begin
 
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.start', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog('TALAndroidVideoPlayer.start', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1181,7 +1181,7 @@ begin
 
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.stop', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog('TALAndroidVideoPlayer.stop', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1209,8 +1209,8 @@ begin
   {$IFDEF DEBUG}
   ALLog(
     'TALAndroidVideoPlayer.setLooping',
-    'looping: ' + alBoolToStrU(looping) + ' | ' +
-    'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU),
+    'looping: ' + ALBoolToStrW(looping) + ' | ' +
+    'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW),
     TalLogType.VERBOSE);
   {$ENDIF}
 end;
@@ -1231,8 +1231,8 @@ begin
   {$IFDEF DEBUG}
   ALLog(
     'TALAndroidVideoPlayer.setVolume',
-    'Value: ' + alFloattostrU(Value, ALDefaultFormatSettingsU) + ' | ' +
-    'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU),
+    'Value: ' + ALFloatToStrW(Value, ALDefaultFormatSettingsW) + ' | ' +
+    'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW),
     TalLogType.VERBOSE);
   {$ENDIF}
 end;
@@ -1299,7 +1299,7 @@ procedure TALIOSVideoPlayer.TKVODelegate.observeValueForKeyPath(keyPath: NSStrin
 begin
 
   {$IF defined(DEBUG)}
-  allog('TALIOSVideoPlayer.observeValueForKeyPath', 'Status:' +  alinttostrU(TNSNumber.Wrap(change.allvalues.objectAtIndex(0)).integerValue()), TalLogType.VERBOSE);
+  allog('TALIOSVideoPlayer.observeValueForKeyPath', 'Status:' +  ALIntToStrW(TNSNumber.Wrap(change.allvalues.objectAtIndex(0)).integerValue()), TalLogType.VERBOSE);
   {$ENDIF}
 
   fVideoPlayerControl.doOnReady;
@@ -1452,7 +1452,7 @@ begin
   //----
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALIOSVideoPlayer.Create', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog('TALIOSVideoPlayer.Create', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1510,7 +1510,7 @@ begin
   //----
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALIOSVideoPlayer.Destroy', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog('TALIOSVideoPlayer.Destroy', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1587,9 +1587,9 @@ begin
         var LStopWatch := TstopWatch.StartNew;
         {$ENDIF}
 
-        LLowerDataSource := ALLowerCaseU(aDataSource);
-        if (ALPosU('http://',LLowerDataSource) = 1) or
-           (ALPosU('https://',LLowerDataSource) = 1) then P := TNSUrl.OCClass.URLWithString(StrToNSStr(aDataSource)) // Creates and returns an NSURL object initialized with a provided URL string
+        LLowerDataSource := AlLowerCase(aDataSource);
+        if (ALPosW('http://',LLowerDataSource) = 1) or
+           (ALPosW('https://',LLowerDataSource) = 1) then P := TNSUrl.OCClass.URLWithString(StrToNSStr(aDataSource)) // Creates and returns an NSURL object initialized with a provided URL string
         else P := TNSUrl.OCClass.fileURLWithPath(StrToNSStr(aDataSource)); // Initializes and returns a newly created NSURL object as a file URL with a specified path.
         if P = nil then exit; // << we can't call synchronize from here (else possible trouble when we will free the object) so we can't call onErrorEvent :(
         LURL := TNSUrl.Wrap(P);
@@ -1634,9 +1634,9 @@ begin
         LStopWatch.Stop;
         ALLog(
           'TALIOSVideoPlayer.prepare',
-          'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU) + ' | ' +
-          'FPlayer.status: ' + alinttostrU(FPlayer.status) + ' | ' +
-          'FPlayerItem.status: ' + alinttostrU(FPlayerItem.status),
+          'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' | ' +
+          'FPlayer.status: ' + ALIntToStrW(FPlayer.status) + ' | ' +
+          'FPlayerItem.status: ' + ALIntToStrW(FPlayerItem.status),
           TalLogType.VERBOSE);
         {$ENDIF}
 
@@ -1664,7 +1664,7 @@ begin
 
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALIOSVideoPlayer.pause', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog('TALIOSVideoPlayer.pause', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1683,7 +1683,7 @@ begin
 
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALIOSVideoPlayer.start', 'TimeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog('TALIOSVideoPlayer.start', 'TimeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1701,7 +1701,7 @@ begin
 
   {$IFDEF DEBUG}
   LStopWatch.Stop;
-  ALLog('TALIOSVideoPlayer.Stop', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog('TALIOSVideoPlayer.Stop', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1734,8 +1734,8 @@ begin
   {$IFDEF DEBUG}
   ALLog(
     'TALIOSVideoPlayer.setVolume',
-    'Value: ' + alFloattostrU(Value, ALDefaultFormatSettingsU) + ' | ' +
-    'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU),
+    'Value: ' + ALFloatToStrW(Value, ALDefaultFormatSettingsW) + ' | ' +
+    'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW),
     TalLogType.VERBOSE);
   {$ENDIF}
 end;
@@ -1874,7 +1874,7 @@ begin
     if fFrameRefreshCounter mod 1000 = 0 then begin
       LStopWatch.Stop;
       fFrameRefreshCounter := 0;
-      ALLog('TALIOSVideoPlayer.FrameRefreshOnTimer', 'timeTaken: ' + ALFormatFloatU('0.00', LStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+      ALLog('TALIOSVideoPlayer.FrameRefreshOnTimer', 'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW), TalLogType.VERBOSE);
     end;
     {$ENDIF}
 
@@ -1903,7 +1903,7 @@ begin
         'TALIOSVideoPlayer.FrameRefreshOnTimer',
         'hasNewPixelBufferForItemTime:NO ' + ' | ' +
         'Pause and Restart ' + ' | ' +
-        'currentTime: ' + alinttostrU(fPlayer.currentTime.value),
+        'currentTime: ' + ALIntToStrW(fPlayer.currentTime.value),
         TalLogType.VERBOSE);
       {$ENDIF}
       fPlayer.pause;

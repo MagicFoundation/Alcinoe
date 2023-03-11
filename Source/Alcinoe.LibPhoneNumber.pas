@@ -45,6 +45,7 @@ const
 implementation
 
 uses
+  System.AnsiStrings,
   Alcinoe.StringUtils;
 
 function _StrPhoneNumberToInt64(phoneNumber, countryCode: PAnsiChar): Int64; cdecl; external 'libphonenumber.dll';
@@ -85,9 +86,9 @@ begin
                                                                                  // if alTryStrToInt64 not success it's mean it's a tooo big number, so better to return 0
 
   LCountryCode := '';
-  P1 := AlPos('[',PhoneNumber);  // look if their is some prefix or suffix like [FR] to give an hint about the country
+  P1 := ALPosA('[',PhoneNumber);  // look if their is some prefix or suffix like [FR] to give an hint about the country
   while P1 > 0 do begin
-    P2 := ALPosEx(']', PhoneNumber, P1+1);
+    P2 := ALPosA(']', PhoneNumber, P1+1);
     if P2 = P1 + 3 then begin
       LCountryCode := ALUpperCase(ALCopyStr(PhoneNumber, P1+1, 2)); // [FR] 06.34.54.12.22 => FR
       if (length(LCountryCode) = 2) and
@@ -99,7 +100,7 @@ begin
       end
       else LCountryCode := '';
     end;
-    P1 := AlPosEx('[',PhoneNumber, P1+1);
+    P1 := ALPosA('[',PhoneNumber, P1+1);
   end;
   result := ALStrPhoneNumberToInt64(PhoneNumber, LCountryCode); //even if the aPhoneNumber is already an integer we need to format it
                                                                 //because user can gave us +330625142445 but it's must be stored as

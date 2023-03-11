@@ -1855,7 +1855,7 @@ begin
   if LCurrPos <= LMessageLength then begin
 
     //init aUpdateRowTagByFieldValue and aTmpRowTag
-    if AlPos('&>',RowTag) = 1 then begin
+    if ALPosA('&>',RowTag) = 1 then begin
       LTmpRowTag := AlcopyStr(RowTag, 3, maxint);
       LUpdateRowTagByFieldValue := LTmpRowTag <> '';
     end
@@ -2347,7 +2347,7 @@ begin
 
       //try to load from from cache
       LCacheKey := ALStringHashSHA1(
-                     ALFormat('%s#%d#%d#%s#%s#%s',
+                     ALFormatA('%s#%d#%d#%s#%s#%s',
                               [RowTag,
                                Skip,
                                First,
@@ -2810,7 +2810,7 @@ begin
 
       //try to load from from cache
       LCacheKey := ALStringHashSHA1(
-                     ALFormat('%s#%d#%d#%s#%s#%s',
+                     ALFormatA('%s#%d#%d#%s#%s#%s',
                               [RowTag,
                                0,
                                1,
@@ -3371,7 +3371,7 @@ begin
   try
 
     //init aDatabaseName and aCollectionName
-    P1 := AlPos('.',FullCollectionName);
+    P1 := ALPosA('.',FullCollectionName);
     if P1 <= 0 then raise EALException.Create('The full collection name must be the concatenation of the database name with the collection name');
     LDatabaseName := ALCopyStr(FullCollectionName, 1, P1-1);
     LCollectionName := ALCopyStr(FullCollectionName, P1+1, maxint);
@@ -3445,7 +3445,7 @@ begin
       if assigned(LNode1) and (LNode1.NodeType = ntObject) then begin
 
         //init aUpdateRowTagByFieldValue and aTmpRowTag
-        if AlPos('&>',RowTag) = 1 then begin
+        if ALPosA('&>',RowTag) = 1 then begin
           LTmpRowTag := AlcopyStr(RowTag, 3, maxint);
           LUpdateRowTagByFieldValue := LTmpRowTag <> '';
         end
@@ -3889,7 +3889,7 @@ begin
 
       //try to load from from cache
       LCacheKey := ALStringHashSHA1(
-                     ALFormat('%s#%d#%d#%s#%s#%s',
+                     ALFormatA('%s#%d#%d#%s#%s#%s',
                               [RowTag,
                                Skip,
                                First,
@@ -4376,7 +4376,7 @@ begin
 
       //try to load from from cache
       LCacheKey := ALStringHashSHA1(
-                     ALFormat('%s#%d#%d#%s#%s#%s',
+                     ALFormatA('%s#%d#%d#%s#%s#%s',
                               [RowTag,
                                0,
                                1,
@@ -5071,7 +5071,7 @@ begin
     try
 
       //init aDatabaseName and aCollectionName
-      P1 := AlPos('.',FullCollectionName);
+      P1 := ALPosA('.',FullCollectionName);
       if P1 <= 0 then raise EALException.Create('The full collection name must be the concatenation of the database name with the collection name');
       LDatabaseName := ALCopyStr(FullCollectionName, 1, P1-1);
       LCollectionName := ALCopyStr(FullCollectionName, P1+1, maxint);
@@ -5145,7 +5145,7 @@ begin
         if assigned(LNode1) and (LNode1.NodeType = ntObject) then begin
 
           //init aUpdateRowTagByFieldValue and aTmpRowTag
-          if AlPos('&>',RowTag) = 1 then begin
+          if ALPosA('&>',RowTag) = 1 then begin
             LTmpRowTag := AlcopyStr(RowTag, 3, maxint);
             LUpdateRowTagByFieldValue := LTmpRowTag <> '';
           end

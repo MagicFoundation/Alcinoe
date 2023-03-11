@@ -112,6 +112,7 @@ Uses
   Winapi.Windows,
   System.Classes,
   System.SysUtils,
+  System.AnsiStrings,
   Alcinoe.WinSock,
   Alcinoe.Common,
   Alcinoe.StringUtils;
@@ -222,10 +223,10 @@ begin
       Str2 := AlCopyStr(Str1, 1, 5); //AUTH=
       if (str2='AUTH ') or (Str2='AUTH=') then begin
         Str1 := AlCopyStr(Str1, 6, maxint); //LOGIN
-        Str1 := AlStringReplace(Str1, '=', ' ', [rfReplaceAll]); //LOGIN
+        Str1 := ALStringReplaceA(Str1, '=', ' ', [rfReplaceAll]); //LOGIN
         while (str1 <> '') do begin
 
-          K := AlPos(' ', Str1);
+          K := ALPosA(' ', Str1);
           if K <= 0 then begin
             Str2 := ALTrim(Str1);
             Str1 := '';
@@ -283,7 +284,7 @@ end;
 Function TAlSmtpClient.MailFrom(const aSenderEmail: AnsiString): AnsiString;
 begin
   If aSenderEmail = '' then raise EALException.Create('Sender email is empty');
-  If AlPos(#13#10,aSenderEmail) > 0 then raise EALException.Create('Sender email is invalid');
+  If ALPosA(#13#10,aSenderEmail) > 0 then raise EALException.Create('Sender email is invalid');
   Result := SendCmd('MAIL From:<'+aSenderEmail+'>',[250]);
 end;
 
@@ -344,7 +345,7 @@ begin
   if aRcptNameLst.Count <= 0 then raise EALException.Create('RcptName list is empty');
   For I := 0 to aRcptNameLst.Count - 1 do begin
     LRcptNameValue := ALTrim(aRcptNameLst[I]);
-    If (LRcptNameValue = '') or (AlPos(#13#10,LRcptNameValue) > 0) then raise EALException.Create('Bad entry in RcptName list');
+    If (LRcptNameValue = '') or (ALPosA(#13#10,LRcptNameValue) > 0) then raise EALException.Create('Bad entry in RcptName list');
     Result := Result + SendCmd('RCPT To:<'+LRcptNameValue+'>',[250, 251]) + #13#10;
   end;
   If result <> '' then delete(Result,Length(Result)-1,2);

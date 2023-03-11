@@ -873,6 +873,7 @@ uses
   System.Types,
   System.Math,
   System.Contnrs,
+  System.AnsiStrings,
   Alcinoe.StringUtils,
   Alcinoe.Cipher;
 
@@ -1123,7 +1124,7 @@ begin
       etGreaterEqual: // >=
         Result := NodeFactory.CompareGreaterEqual(Result, CompileExprLevel1(True));
       etIdentifier: // cmp
-        if ALSameText(Lexer.TokenAsString, 'cmp') then
+        if ALSameTextA(Lexer.TokenAsString, 'cmp') then
           Result := NodeFactory.Compare(Result, CompileExprLevel1(True))
         else
           Break;
@@ -1144,16 +1145,16 @@ begin
       etMinus:
         Result := NodeFactory.Subtract(Result, CompileExprLevel2(True));
       etIdentifier: // or, xor, bor, bxor
-        if ALSameText(Lexer.TokenAsString, 'or') then
+        if ALSameTextA(Lexer.TokenAsString, 'or') then
           Result := NodeFactory.LogicalOr(Result, CompileExprLevel2(True))
         else
-        if ALSameText(Lexer.TokenAsString, 'xor') then
+        if ALSameTextA(Lexer.TokenAsString, 'xor') then
           Result := NodeFactory.LogicalXor(Result, CompileExprLevel2(True))
         else
-        if ALSameText(Lexer.TokenAsString, 'bor') then
+        if ALSameTextA(Lexer.TokenAsString, 'bor') then
           Result := NodeFactory.BitwiseOr(Result, CompileExprLevel2(True))
         else
-        if ALSameText(Lexer.TokenAsString, 'bxor') then
+        if ALSameTextA(Lexer.TokenAsString, 'bxor') then
           Result := NodeFactory.BitwiseXor(Result, CompileExprLevel2(True))
         else
           Break;
@@ -1181,22 +1182,22 @@ begin
           Lexer.NextTok;             // Other operators calls NextTok via CompileExprLevel3(True)
         end;
       etIdentifier: // div, mod, and, shl, shr, band
-        if ALSameText(Lexer.TokenAsString, 'div') then
+        if ALSameTextA(Lexer.TokenAsString, 'div') then
           Result := NodeFactory.IntegerDivide(Result, CompileExprLevel3(True))
         else
-        if ALSameText(Lexer.TokenAsString, 'mod') then
+        if ALSameTextA(Lexer.TokenAsString, 'mod') then
           Result := NodeFactory.Modulo(Result, CompileExprLevel3(True))
         else
-        if ALSameText(Lexer.TokenAsString, 'and') then
+        if ALSameTextA(Lexer.TokenAsString, 'and') then
           Result := NodeFactory.LogicalAnd(Result, CompileExprLevel3(True))
         else
-        if ALSameText(Lexer.TokenAsString, 'shl') then
+        if ALSameTextA(Lexer.TokenAsString, 'shl') then
           Result := NodeFactory.ShiftLeft(Result, CompileExprLevel3(True))
         else
-        if ALSameText(Lexer.TokenAsString, 'shr') then
+        if ALSameTextA(Lexer.TokenAsString, 'shr') then
           Result := NodeFactory.ShiftRight(Result, CompileExprLevel3(True))
         else
-        if ALSameText(Lexer.TokenAsString, 'band') then
+        if ALSameTextA(Lexer.TokenAsString, 'band') then
           Result := NodeFactory.BitwiseAnd(Result, CompileExprLevel3(True))
         else
           Break;
@@ -1217,10 +1218,10 @@ begin
     etMinus:
       Result := NodeFactory.Negate(CompileExprLevel3(True));
     etIdentifier: // not, bnot
-      if ALSameText(Lexer.TokenAsString, 'not') then
+      if ALSameTextA(Lexer.TokenAsString, 'not') then
         Result := NodeFactory.LogicalNot(CompileExprLevel3(True))
       else
-      if ALSameText(Lexer.TokenAsString, 'bnot') then
+      if ALSameTextA(Lexer.TokenAsString, 'bnot') then
         Result := NodeFactory.BitwiseNot(CompileExprLevel3(True))
       else
         Result := CompileFactor;
@@ -1347,7 +1348,7 @@ begin
         else
           Result := 0.0;
       etIdentifier: // cmp
-        if ALSameText(Lexer.TokenAsString, 'cmp') then
+        if ALSameTextA(Lexer.TokenAsString, 'cmp') then
         begin
           RightValue := EvalExprLevel1(True);
           if Result > RightValue then
@@ -1377,7 +1378,7 @@ begin
       etMinus:
         Result := Result - EvalExprLevel2(True);
       etIdentifier: // or, xor, bor, bxor
-        if ALSameText(Lexer.TokenAsString, 'or') then
+        if ALSameTextA(Lexer.TokenAsString, 'or') then
         begin
           if (EvalExprLevel2(True) <> 0) or (Result <> 0) then // prevent boolean optimisations, EvalTerm must be called
             Result := 1.0
@@ -1385,7 +1386,7 @@ begin
             Result := 0.0;
         end
         else
-        if ALSameText(Lexer.TokenAsString, 'xor') then
+        if ALSameTextA(Lexer.TokenAsString, 'xor') then
         begin
           if (Result <> 0) xor (EvalExprLevel2(True) <> 0) then
             Result := 1.0
@@ -1393,10 +1394,10 @@ begin
             result := 0.0;
         end
         else
-        if ALSameText(Lexer.TokenAsString, 'bor') then
+        if ALSameTextA(Lexer.TokenAsString, 'bor') then
           Result := Round(Result) or Round(EvalExprLevel2(True))
         else
-        if ALSameText(Lexer.TokenAsString, 'bxor') then
+        if ALSameTextA(Lexer.TokenAsString, 'bxor') then
           Result := Round(Result) xor Round(EvalExprLevel2(True))
         else
           Break;
@@ -1427,7 +1428,7 @@ begin
           Lexer.NextTok;        // Other operators calls NextTok via EvalExprLevel3(True)
         end;
       etIdentifier: // div, mod, and, shl, shr, band, in
-        if ALSameText(Lexer.TokenAsString, 'in') then
+        if ALSameTextA(Lexer.TokenAsString, 'in') then
         begin
 
           Lexer.NextTok;
@@ -1479,13 +1480,13 @@ begin
 
         end
         else
-        if ALSameText(Lexer.TokenAsString, 'div') then
+        if ALSameTextA(Lexer.TokenAsString, 'div') then
           Result := Round(Result) div Round(EvalExprLevel3(True))
         else
-        if ALSameText(Lexer.TokenAsString, 'mod') then
+        if ALSameTextA(Lexer.TokenAsString, 'mod') then
           Result := Round(Result) mod Round(EvalExprLevel3(True))
         else
-        if ALSameText(Lexer.TokenAsString, 'and') then
+        if ALSameTextA(Lexer.TokenAsString, 'and') then
         begin
           if (EvalExprLevel3(True) <> 0) and (Result <> 0) then // prevent boolean optimisations, EvalTerm must be called
             Result := 1.0
@@ -1493,13 +1494,13 @@ begin
             Result := 0.0;
         end
         else
-        if ALSameText(Lexer.TokenAsString, 'shl') then
+        if ALSameTextA(Lexer.TokenAsString, 'shl') then
           Result := Round(Result) shl Round(EvalExprLevel3(True))
         else
-        if ALSameText(Lexer.TokenAsString, 'shr') then
+        if ALSameTextA(Lexer.TokenAsString, 'shr') then
           Result := Round(Result) shr Round(EvalExprLevel3(True))
         else
-        if ALSameText(Lexer.TokenAsString, 'band') then
+        if ALSameTextA(Lexer.TokenAsString, 'band') then
           Result := Round(Result) and Round(EvalExprLevel3(True))
         else
           Break;
@@ -1520,7 +1521,7 @@ begin
     etMinus:
       Result := -EvalExprLevel3(True);
     etIdentifier: // not, bnot
-      if ALSameText(Lexer.TokenAsString, 'not') then
+      if ALSameTextA(Lexer.TokenAsString, 'not') then
       begin
         if EvalExprLevel3(True) <> 0.0 then
           Result := 0.0
@@ -1528,7 +1529,7 @@ begin
           Result := 1.0;
       end
       else
-      if ALSameText(Lexer.TokenAsString, 'bnot') then
+      if ALSameTextA(Lexer.TokenAsString, 'bnot') then
         Result := not Round(EvalExprLevel3(True))
       else
         Result := EvalFactor;
@@ -1775,7 +1776,7 @@ begin
         { evaluate number }
         if EvalTok then begin
           SetString(FTokenAsString, start, cp - start);
-          FTokenAsNumber := ALStrToFloat(FTokenAsString, ALDefaultFormatSettings);
+          FTokenAsNumber := ALStrToFloat(FTokenAsString, ALDefaultFormatSettingsA);
         end;
 
         FCurrTok := etNumber;

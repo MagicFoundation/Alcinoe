@@ -113,11 +113,11 @@ MyJsonDoc.onParseText := procedure (Sender: TObject;
                                     NodeSubType: TALJSONNodeSubType)
                          begin
                            case NodeSubType of
-                             nstFloat: Writeln(Path + '=' + ALFloatToStr(Args[0].VExtended^, ALDefaultFormatSettings));
+                             nstFloat: Writeln(Path + '=' + ALFloatToStrA(Args[0].VExtended^, ALDefaultFormatSettingsA));
                              nstText: Writeln(Path + '=' + ansiString(Args[0].VAnsiString));
-                             nstObjectID: Writeln(Path + '=' + 'ObjectId("'+ALBinToHex(ansiString(Args[0].VAnsiString))+'")');
-                             nstBoolean: Writeln(Path + '=' + ALBoolToStr(Args[0].VBoolean,'true','false'));
-                             nstDateTime: Writeln(Path + '=' + ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettings));
+                             nstObjectID: Writeln(Path + '=' + 'ObjectId("'+ALBinToHexA(ansiString(Args[0].VAnsiString))+'")');
+                             nstBoolean: Writeln(Path + '=' + ALBoolToStrA(Args[0].VBoolean,'true','false'));
+                             nstDateTime: Writeln(Path + '=' + ALFormatDateTimeA('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettingsA));
                              nstNull: Writeln(Path + '=' + 'null');
                              nstRegEx: Writeln(Path + '=' + ansiString(Args[0].VAnsiString));
                              nstBinary: Writeln(Path + '=' + 'BinData('+inttostr(Args[1].VInteger)+', "'+ansiString(ALBase64EncodeStringNoCRLF(ansiString(Args[0].VAnsiString)))+'")');
@@ -566,7 +566,7 @@ type
     FonParseEndObject: TAlJSONParseObjectEvent;
     FonParseStartArray: TAlJSONParseArrayEvent;
     FonParseEndArray: TAlJSONParseArrayEvent;
-    fFormatSettings: PALFormatSettings;
+    fFormatSettings: pALFormatSettingsA;
   protected
     procedure CheckActive;
     procedure DoParseStartDocument;
@@ -602,7 +602,7 @@ type
     procedure SetDuplicates(const Value: TDuplicates);
   public
     constructor Create(const aActive: Boolean = True); overload; virtual;
-    constructor Create(const aFormatSettings: TALformatSettings; const aActive: Boolean = True); overload; virtual;
+    constructor Create(const aFormatSettings: TALFormatSettingsA; const aActive: Boolean = True); overload; virtual;
     destructor Destroy; override;
     procedure MultiThreadPrepare(const aOnlyChildList: Boolean = False);
     procedure Clear;
@@ -702,25 +702,25 @@ type
     property onParseEndObject: TAlJSONParseObjectEvent read fonParseEndObject write fonParseEndObject;
     property onParseStartArray: TAlJSONParseArrayEvent read fonParseStartArray write fonParseStartArray;
     property onParseEndArray: TAlJSONParseArrayEvent read fonParseEndArray write fonParseEndArray;
-    property FormatSettings: PALFormatSettings read fFormatSettings; // this is use only on GetText/OnParseText to retrieve float and DateTime formatted according to FormatSettings
+    property FormatSettings: pALFormatSettingsA read fFormatSettings; // this is use only on GetText/OnParseText to retrieve float and DateTime formatted according to FormatSettings
     property Tag: NativeInt read FTag write FTag;
   end;
 
 {misc constants}
 var
   vALDefaultNodeIndent: ansiString;  // var instead of const to avoid new ansitring on assign
-  vALJsonISODateFormatSettings: TALFormatSettings;
+  vALJsonISODateFormatSettings: TALFormatSettingsA;
 
 {misc function}
 Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
-                           const aFormatSettings: TALFormatSettings;
+                           const aFormatSettings: TALFormatSettingsA;
                            const aPath: AnsiString;
                            const aLst: TALStrings;
                            Const aNullStr: AnsiString = 'null';
                            Const aTrueStr: AnsiString = 'true';
                            Const aFalseStr: AnsiString = 'false'); overload;
 Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
-                           const aFormatSettings: TALFormatSettings;
+                           const aFormatSettings: TALFormatSettingsA;
                            const aLst: TALStrings;
                            Const aNullStr: AnsiString = 'null';
                            Const aTrueStr: AnsiString = 'true';
@@ -763,7 +763,7 @@ function ALJsonEncodeInt32WithNodeSubTypeHelper(const aValue: int32): AnsiString
 function ALJsonEncodeNullWithNodeSubTypeHelper: AnsiString;
 function ALJsonEncodeWithNodeSubTypeHelper(const aValue: AnsiString;
                                            const aNodeSubType: TALJSONNodeSubType;
-                                           const aFormatSettings: TALFormatSettings): AnsiString;
+                                           const aFormatSettings: TALFormatSettingsA): AnsiString;
 
 function ALJSONTryStrToRegEx(const S: AnsiString; out RegEx: AnsiString; out RegExOptions: TALPerlRegExOptions): boolean;
 function ALJSONTryStrTobinary(const S: AnsiString; out Data: AnsiString; out Subtype: byte): boolean; // return a "byte" string
@@ -1119,7 +1119,7 @@ type
     FonParseEndObject: TAlJSONParseObjectEventU;
     FonParseStartArray: TAlJSONParseArrayEventU;
     FonParseEndArray: TAlJSONParseArrayEventU;
-    fFormatSettings: PALFormatSettingsU;
+    fFormatSettings: pALFormatSettingsW;
   protected
     procedure CheckActive;
     procedure DoParseStartDocument;
@@ -1153,7 +1153,7 @@ type
     procedure SetDuplicates(const Value: TDuplicates);
   public
     constructor Create(const aActive: Boolean = True); overload; virtual;
-    constructor Create(const aFormatSettings: TALformatSettingsU; const aActive: Boolean = True); overload; virtual;
+    constructor Create(const aFormatSettings: TALFormatSettingsW; const aActive: Boolean = True); overload; virtual;
     destructor Destroy; override;
     procedure MultiThreadPrepare(const aOnlyChildList: Boolean = False);
     procedure Clear;
@@ -1251,25 +1251,25 @@ type
     property onParseEndObject: TAlJSONParseObjectEventU read fonParseEndObject write fonParseEndObject;
     property onParseStartArray: TAlJSONParseArrayEventU read fonParseStartArray write fonParseStartArray;
     property onParseEndArray: TAlJSONParseArrayEventU read fonParseEndArray write fonParseEndArray;
-    property FormatSettings: PALFormatSettingsU read fFormatSettings; // this is use only on GetText/OnParseText to retrieve float and DateTime formatted according to FormatSettings
+    property FormatSettings: pALFormatSettingsW read fFormatSettings; // this is use only on GetText/OnParseText to retrieve float and DateTime formatted according to FormatSettings
     property Tag: NativeInt read FTag write FTag;
   end;
 
 {misc constants}
 var
   vALDefaultNodeIndentU: String;  // var instead of const to avoid new ansitring on assign
-  vALJsonISODateFormatSettingsU: TALFormatSettingsU;
+  vALJsonISODateFormatSettingsU: TALFormatSettingsW;
 
 {misc function}
 Procedure ALJSONToTStringsU(const AJsonStr: String;
-                            const aFormatSettings: TALformatSettingsU;
+                            const aFormatSettings: TALFormatSettingsW;
                             const aPath: String;
                             const aLst: TALStringsU;
                             Const aNullStr: String = 'null';
                             Const aTrueStr: String = 'true';
                             Const aFalseStr: String = 'false'); overload;
 Procedure ALJSONToTStringsU(const AJsonStr: String;
-                            const aFormatSettings: TALformatSettingsU;
+                            const aFormatSettings: TALFormatSettingsW;
                             const aLst: TALStringsU;
                             Const aNullStr: String = 'null';
                             Const aTrueStr: String = 'true';
@@ -1303,7 +1303,7 @@ function ALJsonEncodeInt32WithNodeSubTypeHelperU(const aValue: int32): String;
 function ALJsonEncodeNullWithNodeSubTypeHelperU: String;
 function ALJsonEncodeWithNodeSubTypeHelperU(const aValue: String;
                                             const aNodeSubType: TALJSONNodeSubType;
-                                            const aFormatSettings: TALformatSettingsU): String;
+                                            const aFormatSettings: TALFormatSettingsW): String;
 
 function ALJSONTryStrToRegExU(const S: String; out RegEx: String; out RegExOptions: TALPerlRegExOptions): boolean;
 function ALJSONTryStrTobinaryU(const S: String; out Data: String; out Subtype: byte): boolean; // return a base64 encoded string
@@ -1329,6 +1329,7 @@ uses
   System.Generics.Collections,
   system.IOUtils,
   System.DateUtils,
+  System.AnsiStrings,
   Alcinoe.QuickSortList,
   Alcinoe.HTML,
   Alcinoe.Common;
@@ -1346,7 +1347,7 @@ Begin
     for J := 0 to JsonNode.ChildNodes[I].ChildNodes.Count - 1 do begin
       If (JsonNode.ChildNodes[I].ChildNodes[j].NodeType = nttext) and
          (JsonNode.ChildNodes[I].ChildNodes[j].NodesubType = nstint32) and
-         (ALSametext(JsonNode.ChildNodes[I].ChildNodes[j].NodeName, ChildNodeName)) and
+         (ALSameTextA(JsonNode.ChildNodes[I].ChildNodes[j].NodeName, ChildNodeName)) and
          (JsonNode.ChildNodes[I].ChildNodes[j].int32 = ChildNodeValue) then begin
         result := JsonNode.ChildNodes[I];
         exit;
@@ -1375,7 +1376,7 @@ Begin
     for J := 0 to JsonNode.ChildNodes[I].ChildNodes.Count - 1 do begin
       If (JsonNode.ChildNodes[I].ChildNodes[j].NodeType = nttext) and
          (JsonNode.ChildNodes[I].ChildNodes[j].NodesubType = nstText) and
-         (ALSametext(JsonNode.ChildNodes[I].ChildNodes[j].NodeName, ChildNodeName)) and
+         (ALSameTextA(JsonNode.ChildNodes[I].ChildNodes[j].NodeName, ChildNodeName)) and
          (JsonNode.ChildNodes[I].ChildNodes[j].text = ChildNodeValue) then begin
         result := JsonNode.ChildNodes[I];
         exit;
@@ -1410,7 +1411,7 @@ begin
   // check that first character is /
   if (S <> '') and (S[1] = '/') then begin
 
-    P1 := ALLastDelimiter('/', S);
+    P1 := ALLastDelimiterA('/', S);
     if P1 <> 1 then begin
 
       //init Value
@@ -1539,7 +1540,7 @@ begin
   // ISODate('yyyy-mm-ddThh:nn:ss.zzzZ')
   result := false;
   Ln := length(s);
-  if alpos('new', s) = 1 then P1 := 4{length('new') + 1} // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+  if ALPosA('new', s) = 1 then P1 := 4{length('new') + 1} // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
                                                          //    ^P1
   else P1 := 1;// Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
                // ^P1
@@ -1614,7 +1615,7 @@ begin
   // s must look like
   // ObjectId ( "507f1f77bcf86cd799439011" )
   result := false;
-  if alpos('ObjectId', S) <> 1 then exit;
+  if ALPosA('ObjectId', S) <> 1 then exit;
   Ln := length(s);
   P1 := 9{length('ObjectId') + 1}; // ObjectId ( "507f1f77bcf86cd799439011" )
                                    //         ^P1
@@ -1658,20 +1659,20 @@ begin
   // s must look like
   // Timestamp(0, 0)
   result        := false;
-  if ALPos('Timestamp', S) <> 1 then Exit;
+  if ALPosA('Timestamp', S) <> 1 then Exit;
   Ln := length(s);
   P1 := 10{Length('Timestamp') + 1}; // Timestamp(0, 0)
                                      //          ^
   while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
   if (P1 > ln) or (S[P1] <> '(') then exit; // Timestamp(0, 0)
                                             //          ^P1
-  P2 := ALPosEx(')', S, P1);
+  P2 := ALPosA(')', S, P1);
   if P2 <> ln then exit; // Timestamp(0, 0)
                          //               ^P2
   LArgs := ALCopyStr(S, P1+1, P2 - P1-1); // 0, 0
 
   // take arguments of function Timestamp
-  P1 := ALPos(',', LArgs);
+  P1 := ALPosA(',', LArgs);
   if not ALTryStrToInt(ALTrim(ALCopyStr(LArgs, 1,      P1 - 1)), LArg1) then Exit;
   if not ALTryStrToInt(ALTrim(ALCopyStr(LArgs, P1 + 1, maxint)), LArg2) then Exit;
 
@@ -1695,7 +1696,7 @@ begin
   // 12391293
   result := ALTryStrToInt(S, Value);
   if result then exit;
-  if alpos('NumberInt', S) <> 1 then exit;
+  if ALPosA('NumberInt', S) <> 1 then exit;
   Ln := length(s);
   P1 := 10{length('NumberInt') + 1}; // NumberInt ( "12391293" )
                                      //          ^P1
@@ -1758,7 +1759,7 @@ begin
   // 12391293
   result := ALTryStrToInt64(S, Value);
   if result then exit;
-  if alpos('NumberLong', S) <> 1 then exit;
+  if ALPosA('NumberLong', S) <> 1 then exit;
   Ln := length(s);
   P1 := 11{length('NumberLong') + 1}; // NumberLong ( "12391293" )
                                       //           ^P1
@@ -1863,16 +1864,16 @@ begin
   FonParseEndArray := nil;
   FOptions := [];
   NodeIndentStr := vALDefaultNodeIndent;
-  fFormatSettings := @ALDefaultFormatSettings;
+  fFormatSettings := @ALDefaultFormatSettingsA;
   FTag := 0;
   SetActive(aActive);
 end;
 
 {**********************************************************************************************************}
-constructor TALJSONDocument.Create(const aFormatSettings: TALformatSettings; const aActive: Boolean = True);
+constructor TALJSONDocument.Create(const aFormatSettings: TALFormatSettingsA; const aActive: Boolean = True);
 begin
   create(aActive);
-  if @aFormatSettings <> @ALDefaultFormatSettings then begin
+  if @aFormatSettings <> @ALDefaultFormatSettingsA then begin
     new(fFormatSettings);
     fFormatSettings^ := aFormatSettings;
   end;
@@ -1881,7 +1882,7 @@ end;
 {*********************************}
 destructor TALJSONDocument.Destroy;
 begin
-  if fFormatSettings <> @ALDefaultFormatSettings then dispose(fFormatSettings);
+  if fFormatSettings <> @ALDefaultFormatSettingsA then dispose(fFormatSettings);
   ReleaseDoc;
   inherited;
 end;
@@ -2045,7 +2046,7 @@ Var Buffer: AnsiString;
                                   const Args: array of const;
                                   const NodeSubType: TALJSONNodeSubType);
   begin
-    DoParseText(GetPathStr('[' + alinttostr(index) + ']'), '', Args, NodeSubType)
+    DoParseText(GetPathStr('[' + ALIntToStrA(index) + ']'), '', Args, NodeSubType)
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -2107,7 +2108,7 @@ Var Buffer: AnsiString;
   begin
     setlength(S1,sizeOf(Integer) {div sizeOF(ansiChar)}); // off course sizeOf(Integer) must be a multiple of sizeOf(ansiChar) but it's always the case
     ALmove(index, pointer(S1)^, sizeOf(Integer));
-    NamePaths.AddNameValueObject('[' + alinttostr(Index) + ']', S1, Obj)
+    NamePaths.AddNameValueObject('[' + ALIntToStrA(Index) + ']', S1, Obj)
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -2209,7 +2210,7 @@ Var Buffer: AnsiString;
   var LNode: TALJsonNode;
       LDouble: Double;
   begin
-    if ALTryStrToFloat(value, LDouble, ALDefaultFormatSettings) then begin
+    if ALTryStrToFloat(value, LDouble, ALDefaultFormatSettingsA) then begin
       result := true;
       if NotSaxMode then begin
         if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
@@ -5689,7 +5690,7 @@ begin
 
   case NodeSubType of
     nstFloat: begin // return the formated float
-                if Assigned(FDocument) and (Fdocument.FormatSettings <> @ALDefaultFormatSettings) then result := ALFloatToStr(GetFloat, Fdocument.FormatSettings^)
+                if Assigned(FDocument) and (Fdocument.FormatSettings <> @ALDefaultFormatSettingsA) then result := ALFloatToStrA(GetFloat, Fdocument.FormatSettings^)
                 else result := GetNodeValueStr;
               end;
     nstText: result := GetNodeValueStr;  // return the raw text
@@ -5698,7 +5699,7 @@ begin
     nstObjectID: result := GetNodeValueStr; // error
     nstBoolean: result := GetNodeValueStr;  // return true or false
     nstDateTime: begin // return the formated datetime
-                   if Assigned(FDocument) and (Fdocument.FormatSettings <> @ALDefaultFormatSettings) then result := ALDateTimeToStr(GetDateTime, Fdocument.FormatSettings^)
+                   if Assigned(FDocument) and (Fdocument.FormatSettings <> @ALDefaultFormatSettingsA) then result := ALDateTimeToStrA(GetDateTime, Fdocument.FormatSettings^)
                    else result := GetNodeValueStr;
                  end;
     nstNull: result := GetNodeValueStr; // return null
@@ -5737,20 +5738,20 @@ function TALJSONNode.GetNodeValueInterchange(const SkipNodeSubTypeHelper: boolea
 
   procedure _GetObjectID;
   begin
-    if SkipNodeSubTypeHelper then result := '"'+ALBinToHex(ObjectID)+'"'
-    else result := 'ObjectId("'+ALBinToHex(ObjectID)+'")';
+    if SkipNodeSubTypeHelper then result := '"'+ALBinToHexA(ObjectID)+'"'
+    else result := 'ObjectId("'+ALBinToHexA(ObjectID)+'")';
   end;
 
   procedure _GetBinary;
   begin
     if SkipNodeSubTypeHelper then result := '"'+ALBase64EncodeString(Binary)+'"'
-    else result := 'BinData('+alinttostr(BinarySubType)+', "'+ALBase64EncodeString(Binary)+'")';
+    else result := 'BinData('+ALIntToStrA(BinarySubType)+', "'+ALBase64EncodeString(Binary)+'")';
   end;
 
   procedure _GetDateTime;
   begin
-    if SkipNodeSubTypeHelper then result := ALFormatDateTime('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', DateTime, ALDefaultFormatSettings)
-    else result := ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', DateTime, ALDefaultFormatSettings)
+    if SkipNodeSubTypeHelper then result := ALFormatDateTimeA('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', DateTime, ALDefaultFormatSettingsA)
+    else result := ALFormatDateTimeA('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', DateTime, ALDefaultFormatSettingsA)
   end;
 
   procedure _Getint32;
@@ -5783,8 +5784,8 @@ function TALJSONNode.GetNodeValueInterchange(const SkipNodeSubTypeHelper: boolea
 
   procedure _GetTimestamp;
   begin
-    if SkipNodeSubTypeHelper then result := '"Timestamp('+alinttostr(GetTimeStamp.W1)+', '+alinttostr(GetTimeStamp.W2)+')"'
-    else result := 'Timestamp('+alinttostr(GetTimeStamp.W1)+', '+alinttostr(GetTimeStamp.W2)+')';
+    if SkipNodeSubTypeHelper then result := '"Timestamp('+ALIntToStrA(GetTimeStamp.W1)+', '+ALIntToStrA(GetTimeStamp.W2)+')"'
+    else result := 'Timestamp('+ALIntToStrA(GetTimeStamp.W1)+', '+ALIntToStrA(GetTimeStamp.W2)+')';
   end;
 
 begin
@@ -6749,7 +6750,7 @@ Var NodeStack: Tstack<TALJSONNode>;
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteStr2Buffer(const index:integer); overload;
   Begin
-    _WriteStr2Buffer(alinttostr(index));
+    _WriteStr2Buffer(ALIntToStrA(index));
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -7375,20 +7376,20 @@ begin
     if not (nvInt64 in fRawNodeValueDefined) then ALJsonDocError(CALJsonOperationError,GetNodeType);
 
     case fNodeSubType of
-      nstFloat: ALFloatToStr(GetFloat, fRawNodeValueStr, ALDefaultFormatSettings);
+      nstFloat: ALFloatToStrA(GetFloat, fRawNodeValueStr, ALDefaultFormatSettingsA);
       //nstText: can not be retrieve from int64
       //nstObject: can not be retrieve from int64
       //nstArray: can not be retrieve from int64
       //nstBinary: only the binarysubtype is store in int64
       //nstObjectID: can not be retrieve from int64
-      nstBoolean: ALBoolToStr(fRawNodeValueStr, getBool, 'true', 'false');
-      nstDateTime: ALDateTimeToStr(GetDateTime, fRawNodeValueStr, ALDefaultFormatSettings);
+      nstBoolean: ALBoolToStrA(fRawNodeValueStr, getBool, 'true', 'false');
+      nstDateTime: ALDateTimeToStrA(GetDateTime, fRawNodeValueStr, ALDefaultFormatSettingsA);
       nstNull: fRawNodeValueStr := 'null';
       //nstRegEx: only the regex options is store in the int64
       //nstJavascript: can not be retrieve from int64
-      nstInt32: ALintToStr(GetInt32, fRawNodeValueStr);
-      nstTimestamp: ALformat('Timestamp(%u, %u)', [GetTimestamp.W1,GetTimestamp.W2], fRawNodeValueStr);
-      nstInt64: ALintToStr(GetInt64, fRawNodeValueStr);
+      nstInt32: ALIntToStrA(GetInt32, fRawNodeValueStr);
+      nstTimestamp: ALFormatA('Timestamp(%u, %u)', [GetTimestamp.W1,GetTimestamp.W2], fRawNodeValueStr);
+      nstInt64: ALIntToStrA(GetInt64, fRawNodeValueStr);
       else ALJsonDocError(CALJsonOperationError,GetNodeType);
     end;
 
@@ -7413,7 +7414,7 @@ begin
 
     case fNodeSubType of
       nstFloat: begin
-                  IF not ALTryStrToFloat(fRawNodeValueStr, LDouble, ALDefaultFormatSettings) then ALJSONDocError('%s is not a valid Float', [fRawNodeValueStr]);
+                  IF not ALTryStrToFloat(fRawNodeValueStr, LDouble, ALDefaultFormatSettingsA) then ALJSONDocError('%s is not a valid Float', [fRawNodeValueStr]);
                   fRawNodeValueInt64 := Pint64(@LDouble)^;
                 end;
       //nstText: can not be retrieve from int64
@@ -7426,7 +7427,7 @@ begin
                     fRawNodeValueInt64 := ALBoolToInt(LBool);
                   end;
       nstDateTime: begin
-                     IF not ALTryStrToDateTime(fRawNodeValueStr, LDateTime, ALdefaultFormatSettings) then ALJSONDocError('%s is not a valid Datetime', [fRawNodeValueStr]);
+                     IF not ALTryStrToDateTime(fRawNodeValueStr, LDateTime, ALDefaultFormatSettingsA) then ALJSONDocError('%s is not a valid Datetime', [fRawNodeValueStr]);
                      fRawNodeValueInt64 := Pint64(@LDateTime)^;
                    end;
       nstNull:  begin
@@ -7740,7 +7741,7 @@ end;
 {***************************************************************************}
 function TALJSONNodeList.CompareNodeNames(const S1, S2: AnsiString): Integer;
 begin
-  Result := AlCompareStr(S1, S2)
+  Result := ALCompareStrA(S1, S2)
 end;
 
 {***************************************************************************************}
@@ -8048,7 +8049,7 @@ end;
 
 {****************************************************}
 Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
-                           const aFormatSettings: TALFormatSettings;
+                           const aFormatSettings: TALFormatSettingsA;
                            const aPath: AnsiString;
                            const aLst: TALStrings;
                            Const aNullStr: AnsiString = 'null';
@@ -8063,7 +8064,7 @@ begin
 
     LJsonDocument.onParseText := procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType)
                                  begin
-                                   if (NodeSubType = nstBoolean)   then aLst.Add(aPath + Path + aLst.NameValueSeparator + ALBoolToStr(Args[0].VBoolean,aTrueStr,aFalseStr))
+                                   if (NodeSubType = nstBoolean)   then aLst.Add(aPath + Path + aLst.NameValueSeparator + ALBoolToStrA(Args[0].VBoolean,aTrueStr,aFalseStr))
                                    else if (NodeSubType = nstnull) then aLst.Add(aPath + Path + aLst.NameValueSeparator + aNullStr)
                                    else                                 aLst.Add(aPath + Path + aLst.NameValueSeparator + ansiString(Args[0].VAnsiString));
                                    LContainChilds := True;
@@ -8099,7 +8100,7 @@ end;
 
 {****************************************************}
 Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
-                           const aFormatSettings: TALFormatSettings;
+                           const aFormatSettings: TALFormatSettingsA;
                            const aLst: TALStrings;
                            Const aNullStr: AnsiString = 'null';
                            Const aTrueStr: AnsiString = 'true';
@@ -8127,10 +8128,10 @@ begin
   if aJsonNode.ChildNodes.Count > 0 then begin
     for I := 0 to aJsonNode.ChildNodes.Count - 1 do begin
 
-      if aJsonNode.NodeType = ntArray then LTmpPath := aPath + '[' + alinttostr(I) + ']'
+      if aJsonNode.NodeType = ntArray then LTmpPath := aPath + '[' + ALIntToStrA(I) + ']'
       else begin
         if aJsonNode.ChildNodes[I].NodeName = '' then raise Exception.Create('Nodename can not be empty');
-        LTmpPath := aPath + alIfThen(aPath <> '', AnsiString('.'), AnsiString('')) + aJsonNode.ChildNodes[I].NodeName;
+        LTmpPath := aPath + alIfThenA(aPath <> '', '.', '') + aJsonNode.ChildNodes[I].NodeName;
       end;
 
       case aJsonNode.ChildNodes[I].NodeType of
@@ -8150,7 +8151,7 @@ begin
                                   aFalseStr);
 
         ntText: begin
-                  if (aJsonNode.ChildNodes[I].NodeSubType = nstBoolean) then   aLst.Add(LTmpPath + aLst.NameValueSeparator + ALBoolToStr(aJsonNode.ChildNodes[I].Bool,aTrueStr,aFalseStr))
+                  if (aJsonNode.ChildNodes[I].NodeSubType = nstBoolean) then   aLst.Add(LTmpPath + aLst.NameValueSeparator + ALBoolToStrA(aJsonNode.ChildNodes[I].Bool,aTrueStr,aFalseStr))
                   else if (aJsonNode.ChildNodes[I].NodeSubType = nstnull) then aLst.Add(LTmpPath + aLst.NameValueSeparator + aNullStr)
                   else                                                         aLst.Add(LTmpPath + aLst.NameValueSeparator + aJsonNode.ChildNodes[I].Text);
                 end;
@@ -8215,7 +8216,7 @@ begin
 
       //if it's contain path
       if (aPath = '') or
-         (alposExIgnoreCase(aPath + '.',aLst.Names[I]) = 1) then begin
+         (ALPosIgnoreCaseA(aPath + '.',aLst.Names[I]) = 1) then begin
 
         // path.aggregated_data.properties.types[3].translations.usa =>
         //   aggregated_data
@@ -8224,14 +8225,14 @@ begin
         //   [3]
         //   translations
         //   usa
-        if (aPath <> '') then LNames.Text := ALStringReplace(ALStringReplace(aLst.Names[I],
+        if (aPath <> '') then LNames.Text := ALStringReplaceA(ALStringReplaceA(aLst.Names[I],
                                                                              aPath + '.',
                                                                              '',
                                                                              [rfIgnoreCase]),
                                                              '[',
                                                              '.[',
                                                              [rfReplaceAll])
-        else LNames.Text := ALStringReplace(aLst.Names[I],
+        else LNames.Text := ALStringReplaceA(aLst.Names[I],
                                             '[',
                                             '.[',
                                             [rfReplaceAll]);
@@ -8257,7 +8258,7 @@ begin
 
           //if we are not in array
           else begin
-            LLowerName := alifThen(aNameToLowerCase, allowercase(LNames[J]), LNames[J]);
+            LLowerName := alifThenA(aNameToLowerCase, allowercase(LNames[J]), LNames[J]);
             LTmpJsonNode := LCurrJsonNode.ChildNodes.FindNode(LLowerName);
             if not assigned(LTmpJsonNode) then begin
               if J = LNames.Count - 1 then LCurrJsonNode := LCurrJsonNode.AddChild(LLowerName, ntText)
@@ -8324,7 +8325,7 @@ end;
 {********************************************************************************}
 function ALJsonEncodeFloatWithNodeSubTypeHelper(const aValue: double): AnsiString;
 begin
-  result := ALFloatToStr(aValue, ALDefaultFormatSettings);
+  result := ALFloatToStrA(aValue, ALDefaultFormatSettingsA);
 end;
 
 {***********************************************************************************}
@@ -8342,7 +8343,7 @@ end;
 {***************************************************************************************}
 function ALJsonEncodeObjectIDWithNodeSubTypeHelper(const aValue: AnsiString): AnsiString;
 begin
-  result := 'ObjectId("'+albintohex(aValue)+'")';
+  result := 'ObjectId("'+ALBinToHexA(aValue)+'")';
 end;
 
 {***********************************************************************************}
@@ -8355,7 +8356,7 @@ end;
 {**************************************************************************************}
 function ALJsonEncodeDateTimeWithNodeSubTypeHelper(const aValue: TdateTime): AnsiString;
 begin
-  result := ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', aValue, ALDefaultFormatSettings);
+  result := ALFormatDateTimeA('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', aValue, ALDefaultFormatSettingsA);
 end;
 
 {*****************************************************************************************}
@@ -8367,13 +8368,13 @@ end;
 {*******************************************************************************}
 function ALJsonEncodeInt64WithNodeSubTypeHelper(const aValue: int64): AnsiString;
 begin
-  result := 'NumberLong(' + ALIntToStr(aValue) + ')';
+  result := 'NumberLong(' + ALIntToStrA(aValue) + ')';
 end;
 
 {*******************************************************************************}
 function ALJsonEncodeInt32WithNodeSubTypeHelper(const aValue: int32): AnsiString;
 begin
-  result := 'NumberInt(' + ALIntToStr(aValue) + ')';
+  result := 'NumberInt(' + ALIntToStrA(aValue) + ')';
 end;
 
 {*********************************************************}
@@ -8385,11 +8386,11 @@ end;
 {******************************************************************}
 function ALJsonEncodeWithNodeSubTypeHelper(const aValue: AnsiString;
                                            const aNodeSubType: TALJSONNodeSubType;
-                                           const aFormatSettings: TALFormatSettings): AnsiString;
+                                           const aFormatSettings: TALFormatSettingsA): AnsiString;
 begin
   case aNodeSubType of
     nstFloat:      begin
-                     if @aFormatSettings <> @ALDefaultFormatSettings then result := ALJsonEncodeFloatWithNodeSubTypeHelper(ALStrToFloat(aValue, aFormatSettings))
+                     if @aFormatSettings <> @ALDefaultFormatSettingsA then result := ALJsonEncodeFloatWithNodeSubTypeHelper(ALStrToFloat(aValue, aFormatSettings))
                      else result := aValue;
                    end;
     nstText:       result := ALJsonEncodeTextWithNodeSubTypeHelper(aValue);
@@ -8425,7 +8426,7 @@ Begin
     for J := 0 to JsonNode.ChildNodes[I].ChildNodes.Count - 1 do begin
       If (JsonNode.ChildNodes[I].ChildNodes[j].NodeType = nttext) and
          (JsonNode.ChildNodes[I].ChildNodes[j].NodesubType = nstint32) and
-         (ALSametextU(JsonNode.ChildNodes[I].ChildNodes[j].NodeName, ChildNodeName)) and
+         (ALSameTextW(JsonNode.ChildNodes[I].ChildNodes[j].NodeName, ChildNodeName)) and
          (JsonNode.ChildNodes[I].ChildNodes[j].int32 = ChildNodeValue) then begin
         result := JsonNode.ChildNodes[I];
         exit;
@@ -8454,7 +8455,7 @@ Begin
     for J := 0 to JsonNode.ChildNodes[I].ChildNodes.Count - 1 do begin
       If (JsonNode.ChildNodes[I].ChildNodes[j].NodeType = nttext) and
          (JsonNode.ChildNodes[I].ChildNodes[j].NodesubType = nstText) and
-         (ALSametextU(JsonNode.ChildNodes[I].ChildNodes[j].NodeName, ChildNodeName)) and
+         (ALSameTextW(JsonNode.ChildNodes[I].ChildNodes[j].NodeName, ChildNodeName)) and
          (JsonNode.ChildNodes[I].ChildNodes[j].text = ChildNodeValue) then begin
         result := JsonNode.ChildNodes[I];
         exit;
@@ -8490,11 +8491,11 @@ begin
   // check that first character is /
   if (S <> '') and (S[1] = '/') then begin
 
-    P1 := ALLastDelimiterU('/', S);
+    P1 := ALLastDelimiterW('/', S);
     if P1 <> 1 then begin
 
       //init Value
-      RegEx := ALCopyStrU(S, 2, P1 - 2);
+      RegEx := ALCopyStr(S, 2, P1 - 2);
       RegExOptions := [];
 
       // loop on all the options characters
@@ -8575,7 +8576,7 @@ begin
   while (P2 <= ln) and (S[P2] in ['0'..'9']) do inc(P2); // BinData( 0 , "JliB6gIMRuSphAD2KmhzgQ==")
                                                          //           ^P2
   if P2 > ln then exit;
-  if not ALTryStrToIntU(ALCopyStrU(S,P1,P2-P1), LInt) then Exit;
+  if not ALTryStrToInt(ALCopyStr(S,P1,P2-P1), LInt) then Exit;
   subtype := LInt;
 
   p1 := P2;
@@ -8601,7 +8602,7 @@ begin
                                                //                                     ^P2
 
   inc(p1);
-  Data := ALCopyStrU(s, P1, P2-P1); // notmally i would like to do ALBase64DecodeStringU()
+  Data := ALCopyStr(s, P1, P2-P1); // notmally i would like to do ALBase64DecodeString()
                                     // and return in data the byte string but this is not possible
                                     // because the source byte array is probably not a multiple of 2
                                     // and unicode string is obligatory a multiple of 2
@@ -8633,7 +8634,7 @@ begin
   // ISODate('yyyy-mm-ddThh:nn:ss.zzzZ')
   result := false;
   Ln := length(s);
-  if alposU('new', s) = 1 then P1 := 4{length('new') + 1} // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+  if ALPosW('new', s) = 1 then P1 := 4{length('new') + 1} // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
                                                          //    ^P1
   else P1 := 1;// Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
                // ^P1
@@ -8671,7 +8672,7 @@ begin
                           //                                      ^P1
   dec(P1);
   if S[P1] <> 'Z' then exit;
-  LTmpStr := ALCopyStrU(S,P2,P1-P2); // yyyy-mm-ddThh:nn:ss.zzz
+  LTmpStr := ALCopyStr(S,P2,P1-P2); // yyyy-mm-ddThh:nn:ss.zzz
 
   P2 := 1;
   LTmpLn := length(LTmpStr);
@@ -8679,7 +8680,7 @@ begin
   if P2 > LTmpLn then exit;
   LTmpStr[P2] := ' '; // yyyy-mm-dd hh:nn:ss.zzz
 
-  result := ALTryStrToDateTimeU(LTmpStr, Value, vALJsonISODateFormatSettingsU);
+  result := ALTryStrToDateTime(LTmpStr, Value, vALJsonISODateFormatSettingsU);
   if not result then exit;
 
   inc(p1,2);  // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
@@ -8714,7 +8715,7 @@ begin
   // s must look like
   // ObjectId ( "507f1f77bcf86cd799439011" )
   result := false;
-  if alposU('ObjectId', S) <> 1 then exit;
+  if ALPosW('ObjectId', S) <> 1 then exit;
   Ln := length(s);
   P1 := 9{length('ObjectId') + 1}; // ObjectId ( "507f1f77bcf86cd799439011" )
                                    //         ^P1
@@ -8730,7 +8731,7 @@ begin
   inc(p1); // ObjectId ( "507f1f77bcf86cd799439011" )
            //             ^P1
   if (P1 + 23{(length(aObjectIDhex)) - 1} > ln) then exit;
-  Value := ALCopyStrU(S,P1,24{length(aObjectIDhex)}); // 507f1f77bcf86cd799439011
+  Value := ALCopyStr(S,P1,24{length(aObjectIDhex)}); // 507f1f77bcf86cd799439011
   inc(P1, 24{length(aObjectIDhex)}); // ObjectId ( "507f1f77bcf86cd799439011" )
                                      //                                     ^P1
   if (P1 > ln) or (S[P1] <> LQuoteChar) then exit; // ObjectId ( "507f1f77bcf86cd799439011" )
@@ -8741,7 +8742,7 @@ begin
   if (P1 <> ln) or (S[P1] <> ')') then exit; // ObjectId ( "507f1f77bcf86cd799439011" )
                                              //                                       ^P1
   //check that 507f1f77bcf86cd799439011 is a good hex value
-  result := ALTryHexToBinU(Value, LBinValue) and
+  result := ALTryHexToBin(Value, LBinValue) and
             (length(LBinValue) = 12);
 
 end;
@@ -8764,22 +8765,22 @@ begin
   // s must look like
   // Timestamp(0, 0)
   result        := false;
-  if alposU('Timestamp', S) <> 1 then Exit;
+  if ALPosW('Timestamp', S) <> 1 then Exit;
   Ln := length(s);
   P1 := 10{Length('Timestamp') + 1}; // Timestamp(0, 0)
                                      //          ^
   while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
   if (P1 > ln) or (S[P1] <> '(') then exit; // Timestamp(0, 0)
                                             //          ^P1
-  P2 := ALPosExU(')', S, P1);
+  P2 := ALPosW(')', S, P1);
   if P2 <> ln then exit; // Timestamp(0, 0)
                          //               ^P2
-  LArgs := ALCopyStrU(S, P1+1, P2 - P1-1); // 0, 0
+  LArgs := ALCopyStr(S, P1+1, P2 - P1-1); // 0, 0
 
   // take arguments of function Timestamp
-  P1 := alposU(',', LArgs);
-  if not ALTryStrToIntU(ALTrimU(ALCopyStrU(LArgs, 1,      P1 - 1)), LArg1) then Exit;
-  if not ALTryStrToIntU(ALTrimU(ALCopyStrU(LArgs, P1 + 1, maxint)), LArg2) then Exit;
+  P1 := ALPosW(',', LArgs);
+  if not ALTryStrToInt(ALTrim(ALCopyStr(LArgs, 1,      P1 - 1)), LArg1) then Exit;
+  if not ALTryStrToInt(ALTrim(ALCopyStr(LArgs, P1 + 1, maxint)), LArg2) then Exit;
 
   // build result
   result := true;
@@ -8806,9 +8807,9 @@ begin
   // NumberInt ( "12391293" )
   // NumberInt ( 12391293 )
   // 12391293
-  result := ALTryStrToIntU(S, Value);
+  result := ALTryStrToInt(S, Value);
   if result then exit;
-  if alposU('NumberInt', S) <> 1 then exit;
+  if ALPosW('NumberInt', S) <> 1 then exit;
   Ln := length(s);
   P1 := 10{length('NumberInt') + 1}; // NumberInt ( "12391293" )
                                      //          ^P1
@@ -8825,7 +8826,7 @@ begin
     while (P2 <= ln) and (S[P2] in ['0'..'9']) do inc(P2); // NumberInt ( 12391293 )
                                                            //                     ^P2
     if P2 > ln then exit;
-    LTmpStr := ALCopyStrU(S,P1,P2-P1); // 12391293
+    LTmpStr := ALCopyStr(S,P1,P2-P1); // 12391293
     P1 := P2; // NumberInt ( 12391293 )
               //                     ^P2
 
@@ -8844,7 +8845,7 @@ begin
       if S[P2] = LQuoteChar then break
       else inc(P2);
     if P2 > ln then exit;
-    LTmpStr := ALCopyStrU(S,P1,P2-P1); // 12391293
+    LTmpStr := ALCopyStr(S,P1,P2-P1); // 12391293
     P1 := P2 + 1; // NumberInt ( "12391293" )
                   //                       ^P1
     while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
@@ -8853,7 +8854,7 @@ begin
   end;
 
   //convert 12391293 to integer
-  result := ALTryStrToIntU(LTmpStr, Value);
+  result := ALTryStrToInt(LTmpStr, Value);
 
 end;
 {$WARN WIDECHAR_REDUCED ON}
@@ -8875,9 +8876,9 @@ begin
   // NumberLong ( "12391293" )
   // NumberLong ( 12391293 )
   // 12391293
-  result := ALTryStrToInt64U(S, Value);
+  result := ALTryStrToInt64(S, Value);
   if result then exit;
-  if alposU('NumberLong', S) <> 1 then exit;
+  if ALPosW('NumberLong', S) <> 1 then exit;
   Ln := length(s);
   P1 := 11{length('NumberLong') + 1}; // NumberLong ( "12391293" )
                                       //           ^P1
@@ -8894,7 +8895,7 @@ begin
     while (P2 <= ln) and (S[P2] in ['0'..'9']) do inc(P2); // NumberLong ( 12391293 )
                                                            //                      ^P2
     if P2 > ln then exit;
-    LTmpStr := ALCopyStrU(S,P1,P2-P1); // 12391293
+    LTmpStr := ALCopyStr(S,P1,P2-P1); // 12391293
     P1 := P2; // NumberLong ( 12391293 )
               //                      ^P2
 
@@ -8913,7 +8914,7 @@ begin
       if S[P2] = LQuoteChar then break
       else inc(P2);
     if P2 > ln then exit;
-    LTmpStr := ALCopyStrU(S,P1,P2-P1); // 12391293
+    LTmpStr := ALCopyStr(S,P1,P2-P1); // 12391293
     P1 := P2 + 1; // NumberLong ( "12391293" )
                   //                        ^P1
     while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
@@ -8922,7 +8923,7 @@ begin
   end;
 
   //convert 12391293 to integer
-  result := ALTryStrToInt64U(LTmpStr, Value);
+  result := ALTryStrToInt64(LTmpStr, Value);
 
 end;
 {$WARN WIDECHAR_REDUCED ON}
@@ -8986,16 +8987,16 @@ begin
   FonParseEndArray := nil;
   FOptions := [];
   NodeIndentStr := vALDefaultNodeIndentU;
-  fFormatSettings := @ALDefaultFormatSettingsU;
+  fFormatSettings := @ALDefaultFormatSettingsW;
   FTag := 0;
   SetActive(aActive);
 end;
 
 {************************************************************************************************************}
-constructor TALJSONDocumentU.Create(const aFormatSettings: TALformatSettingsU; const aActive: Boolean = True);
+constructor TALJSONDocumentU.Create(const aFormatSettings: TALFormatSettingsW; const aActive: Boolean = True);
 begin
   create(aActive);
-  if @aFormatSettings <> @ALDefaultFormatSettingsU then begin
+  if @aFormatSettings <> @ALDefaultFormatSettingsW then begin
     new(fFormatSettings);
     fFormatSettings^ := aFormatSettings;
   end;
@@ -9004,7 +9005,7 @@ end;
 {**********************************}
 destructor TALJSONDocumentU.Destroy;
 begin
-  if fFormatSettings <> @ALDefaultFormatSettingsU then dispose(fFormatSettings);
+  if fFormatSettings <> @ALDefaultFormatSettingsW then dispose(fFormatSettings);
   ReleaseDoc;
   inherited;
 end;
@@ -9122,7 +9123,7 @@ Var BufferLength: Integer;
                                   const Args: array of const;
                                   const NodeSubType: TALJSONNodeSubType);
   begin
-    DoParseText(GetPathStr('[' + alinttostrU(index) + ']'), '', Args, NodeSubType)
+    DoParseText(GetPathStr('[' + ALIntToStrW(index) + ']'), '', Args, NodeSubType)
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -9184,7 +9185,7 @@ Var BufferLength: Integer;
   begin
     setlength(S1,sizeOf(Integer) div sizeOF(Char)); // off course sizeOf(Integer) must be a multiple of sizeOf(char) but it's always the case
     ALmove(index, pointer(S1)^, sizeOf(Integer));
-    NamePaths.AddNameValueObject('[' + alinttostrU(Index) + ']', S1, Obj)
+    NamePaths.AddNameValueObject('[' + ALIntToStrW(Index) + ']', S1, Obj)
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -9286,7 +9287,7 @@ Var BufferLength: Integer;
   var LNode: TALJsonNodeU;
       LDouble: Double;
   begin
-    if ALTryStrToFloatU(value, LDouble, ALDefaultFormatSettingsU) then begin
+    if ALTryStrToFloat(value, LDouble, ALDefaultFormatSettingsW) then begin
       result := true;
       if NotSaxMode then begin
         if WorkingNode.nodetype=ntarray then LNode := CreateNode('', nttext)
@@ -9763,7 +9764,7 @@ Var BufferLength: Integer;
           (Buffer[P1 + 1] in ['\', LQuoteChar]) then inc(p1, 2) // ... "...\"..."
                                                                 //         ^^^P1
        else if c = LQuoteChar then begin
-         ALCopyStrU(Buffer,CurrName,BufferPos + 1,P1-BufferPos - 1);
+         ALCopyStr(Buffer,CurrName,BufferPos + 1,P1-BufferPos - 1);
          if DecodeJSONReferences then ALJavascriptDecodeVU(CurrName); // ..."...
          break;
        end
@@ -9826,7 +9827,7 @@ Var BufferLength: Integer;
             If Buffer[P2] <= ' ' then dec(P2)
             else break;
           end;
-          ALCopyStrU(Buffer,CurrName,BufferPos,P2-BufferPos+1); // new Date('Dec 03, 1924')
+          ALCopyStr(Buffer,CurrName,BufferPos,P2-BufferPos+1); // new Date('Dec 03, 1924')
           break;
         end
         else if (c = '"') then begin
@@ -10001,7 +10002,7 @@ Var BufferLength: Integer;
           (Buffer[P1 + 1] in ['\', LQuoteChar]) then inc(p1, 2) // ... "...\"..."
                                                                 //         ^^^P1
        else if c = LQuoteChar then begin
-         ALCopyStrU(Buffer,currValue,BufferPos + 1,P1-BufferPos - 1);
+         ALCopyStr(Buffer,currValue,BufferPos + 1,P1-BufferPos - 1);
          if DecodeJSONReferences then ALJavascriptDecodeVU(currValue); // ..."...
          break;
        end
@@ -10058,7 +10059,7 @@ Var BufferLength: Integer;
             If Buffer[P2] <= ' ' then dec(P2)
             else break;
           end;
-          ALCopyStrU(Buffer,currValue,BufferPos,P2-BufferPos+1); // new Date('Dec 03, 1924')
+          ALCopyStr(Buffer,currValue,BufferPos,P2-BufferPos+1); // new Date('Dec 03, 1924')
           break;
         end
         else if (c = '"') then begin
@@ -10511,7 +10512,7 @@ Var BufferLength: Integer;
     if (BufferPos + LInt32 > BufferLength) then ALJSONDocErrorU(cALBSONParseError);
     setlength(LBinData, LInt32);
     ALMove(Buffer[BufferPos], pointer(LBinData)^, LInt32);
-    LBase64Data := ALBase64EncodeBytesU(LBinData);
+    LBase64Data := ALBase64EncodeBytesW(LBinData);
     BufferPos := BufferPos + LInt32;
 
     //create the node
@@ -10543,7 +10544,7 @@ Var BufferLength: Integer;
     if BufferPos > BufferLength - 12{length(aObjectID)} then ALJSONDocErrorU(cALBSONParseError);
     setlength(LObjectID, 12);
     ALMove(Buffer[BufferPos], pointer(LObjectID)^, 12{length(aObjectID)});
-    LHexData := ALBinToHexU(LObjectID);
+    LHexData := ALBinToHexW(LObjectID);
     BufferPos := BufferPos + 12{length(aObjectID)};
 
     if NotSaxMode then begin
@@ -11100,7 +11101,7 @@ begin
     if ClearChildNodes then releaseDoc;
     SetActive(True);
   end;
-  ParseJSON(ALGetStringFromStreamU(Stream, TEncoding.UTF8), FDocumentNode)
+  ParseJSON(ALGetStringFromStream(Stream, TEncoding.UTF8), FDocumentNode)
 end;
 
 {**************************************}
@@ -12636,7 +12637,7 @@ begin
 
   case NodeSubType of
     nstFloat: begin // return the formated float
-                if Assigned(FDocument) and (Fdocument.FormatSettings <> @ALDefaultFormatSettingsU) then result := ALFloatToStrU(GetFloat, Fdocument.FormatSettings^)
+                if Assigned(FDocument) and (Fdocument.FormatSettings <> @ALDefaultFormatSettingsW) then result := ALFloatToStrW(GetFloat, Fdocument.FormatSettings^)
                 else result := GetNodeValueStr;
               end;
     nstText: result := GetNodeValueStr;  // return the raw text
@@ -12645,7 +12646,7 @@ begin
     nstObjectID: result := GetNodeValueStr; // error
     nstBoolean: result := GetNodeValueStr;  // return true or false
     nstDateTime: begin // return the formated datetime
-                   if Assigned(FDocument) and (Fdocument.FormatSettings <> @ALDefaultFormatSettingsU) then result := ALDateTimeToStrU(GetDateTime, Fdocument.FormatSettings^)
+                   if Assigned(FDocument) and (Fdocument.FormatSettings <> @ALDefaultFormatSettingsW) then result := ALDateTimeToStrW(GetDateTime, Fdocument.FormatSettings^)
                    else result := GetNodeValueStr;
                  end;
     nstNull: result := GetNodeValueStr; // return null
@@ -12691,13 +12692,13 @@ function TALJSONNodeU.GetNodeValueInterchange(const SkipNodeSubTypeHelper: boole
   procedure _GetBinary;
   begin
     if SkipNodeSubTypeHelper then result := '"'+Binary+'"'
-    else result := 'BinData('+alinttostrU(BinarySubType)+', "'+Binary+'")';
+    else result := 'BinData('+ALIntToStrW(BinarySubType)+', "'+Binary+'")';
   end;
 
   procedure _GetDateTime;
   begin
-    if SkipNodeSubTypeHelper then result := ALFormatDateTimeU('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', DateTime, ALDefaultFormatSettingsU)
-    else result := ALFormatDateTimeU('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', DateTime, ALDefaultFormatSettingsU)
+    if SkipNodeSubTypeHelper then result := ALFormatDateTimeW('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', DateTime, ALDefaultFormatSettingsW)
+    else result := ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', DateTime, ALDefaultFormatSettingsW)
   end;
 
   procedure _Getint32;
@@ -12730,8 +12731,8 @@ function TALJSONNodeU.GetNodeValueInterchange(const SkipNodeSubTypeHelper: boole
 
   procedure _GetTimestamp;
   begin
-    if SkipNodeSubTypeHelper then result := '"Timestamp('+alinttostrU(GetTimeStamp.W1)+', '+alinttostrU(GetTimeStamp.W2)+')"'
-    else result := 'Timestamp('+alinttostrU(GetTimeStamp.W1)+', '+alinttostrU(GetTimeStamp.W2)+')';
+    if SkipNodeSubTypeHelper then result := '"Timestamp('+ALIntToStrW(GetTimeStamp.W1)+', '+ALIntToStrW(GetTimeStamp.W2)+')"'
+    else result := 'Timestamp('+ALIntToStrW(GetTimeStamp.W1)+', '+ALIntToStrW(GetTimeStamp.W2)+')';
   end;
 
 begin
@@ -13715,7 +13716,7 @@ Var NodeStack: Tstack<TalJSONNodeU>;
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteUTF8Str2Buffer(const index:integer); overload;
   Begin
-    _WriteUTF8Str2Buffer(alinttostrU(index));
+    _WriteUTF8Str2Buffer(ALIntToStrW(index));
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -13774,7 +13775,7 @@ Var NodeStack: Tstack<TalJSONNodeU>;
       LBinary: Tbytes;
       LBinarySubType: Byte;
   begin
-    LBinary := ALBase64DecodeBytesU(aTextNode.binary);
+    LBinary := ALBase64DecodeBytes(aTextNode.binary);
     LBinarySubType := aTextNode.BinarySubType;
     LInt32 := length(LBinary);
     _Write2Buffer(LInt32, sizeOf(LInt32));
@@ -13786,7 +13787,7 @@ Var NodeStack: Tstack<TalJSONNodeU>;
   // \x07 + name + \x00 + (byte*12)
   Procedure _WriteObjectIDValue2Buffer(aTextNode:TalJSONNodeU);
   begin
-    _WriteBytes2Buffer(ALHexToBinU(aTextNode.ObjectID));
+    _WriteBytes2Buffer(ALHexToBin(aTextNode.ObjectID));
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -14154,7 +14155,7 @@ Begin
   If NodeType <> ntObject then ALJSONDocErrorU(CALJsonOperationError,GetNodeType);
   if ClearChildNodes then ChildNodes.Clear;
   Try
-    FDocument.ParseJSON(ALGetStringFromStreamU(Stream, TEncoding.UTF8), self)
+    FDocument.ParseJSON(ALGetStringFromStream(Stream, TEncoding.UTF8), self)
   except
     ChildNodes.Clear;
     raise;
@@ -14336,20 +14337,20 @@ begin
     if not (nvInt64 in fRawNodeValueDefined) then ALJSONDocErrorU(CALJsonOperationError,GetNodeType);
 
     case fNodeSubType of
-      nstFloat: ALFloatToStrU(GetFloat, fRawNodeValueStr, ALDefaultFormatSettingsU);
+      nstFloat: ALFloatToStrW(GetFloat, fRawNodeValueStr, ALDefaultFormatSettingsW);
       //nstText: can not be retrieve from int64
       //nstObject: can not be retrieve from int64
       //nstArray: can not be retrieve from int64
       //nstBinary: only the binarysubtype is store in int64
       //nstObjectID: can not be retrieve from int64
-      nstBoolean: ALBoolToStrU(fRawNodeValueStr, getBool, 'true', 'false');
-      nstDateTime: ALDateTimeToStrU(GetDateTime, fRawNodeValueStr, ALDefaultFormatSettingsU);
+      nstBoolean: ALBoolToStrW(fRawNodeValueStr, getBool, 'true', 'false');
+      nstDateTime: ALDateTimeToStrW(GetDateTime, fRawNodeValueStr, ALDefaultFormatSettingsW);
       nstNull: fRawNodeValueStr := 'null';
       //nstRegEx: only the regex options is store in the int64
       //nstJavascript: can not be retrieve from int64
-      nstInt32: alinttostrU(GetInt32, fRawNodeValueStr);
-      nstTimestamp: ALformatU('Timestamp(%u, %u)', [GetTimestamp.W1,GetTimestamp.W2], fRawNodeValueStr);
-      nstInt64: alinttostrU(GetInt64, fRawNodeValueStr);
+      nstInt32: ALIntToStrW(GetInt32, fRawNodeValueStr);
+      nstTimestamp: ALFormatW('Timestamp(%u, %u)', [GetTimestamp.W1,GetTimestamp.W2], fRawNodeValueStr);
+      nstInt64: ALIntToStrW(GetInt64, fRawNodeValueStr);
       else ALJSONDocErrorU(CALJsonOperationError,GetNodeType);
     end;
 
@@ -14374,7 +14375,7 @@ begin
 
     case fNodeSubType of
       nstFloat: begin
-                  IF not ALTryStrToFloatU(fRawNodeValueStr, LDouble, ALDefaultFormatSettingsU) then ALJSONDocErrorU('%s is not a valid Float', [fRawNodeValueStr]);
+                  IF not ALTryStrToFloat(fRawNodeValueStr, LDouble, ALDefaultFormatSettingsW) then ALJSONDocErrorU('%s is not a valid Float', [fRawNodeValueStr]);
                   fRawNodeValueInt64 := Pint64(@LDouble)^;
                 end;
       //nstText: can not be retrieve from int64
@@ -14383,11 +14384,11 @@ begin
       //nstBinary: only the binarysubtype is store in int64
       //nstObjectID: can not be retrieve from int64
       nstBoolean: begin
-                    IF not ALTryStrToBoolU(fRawNodeValueStr, LBool) then ALJSONDocErrorU('%s is not a valid Boolean', [fRawNodeValueStr]);
+                    IF not ALTryStrToBool(fRawNodeValueStr, LBool) then ALJSONDocErrorU('%s is not a valid Boolean', [fRawNodeValueStr]);
                     fRawNodeValueInt64 := ALBoolToInt(LBool);
                   end;
       nstDateTime: begin
-                     IF not ALTryStrToDateTimeU(fRawNodeValueStr, LDateTime, ALDefaultFormatSettingsU) then ALJSONDocErrorU('%s is not a valid Datetime', [fRawNodeValueStr]);
+                     IF not ALTryStrToDateTime(fRawNodeValueStr, LDateTime, ALDefaultFormatSettingsW) then ALJSONDocErrorU('%s is not a valid Datetime', [fRawNodeValueStr]);
                      fRawNodeValueInt64 := Pint64(@LDateTime)^;
                    end;
       nstNull:  begin
@@ -14396,7 +14397,7 @@ begin
       //nstRegEx: only the regex options is store in the int64
       //nstJavascript: can not be retrieve from int64
       nstInt32: begin
-                  IF not ALTryStrToIntU(fRawNodeValueStr, LInt32) then ALJSONDocErrorU('%s is not a valid Int32', [fRawNodeValueStr]);
+                  IF not ALTryStrToInt(fRawNodeValueStr, LInt32) then ALJSONDocErrorU('%s is not a valid Int32', [fRawNodeValueStr]);
                   fRawNodeValueInt64 := LInt32;
                 end;
       nstTimestamp: begin
@@ -14404,7 +14405,7 @@ begin
                       fRawNodeValueInt64 := LTimestamp.I64;
                     end;
       nstInt64: begin
-                  IF not ALTryStrToInt64U(fRawNodeValueStr, fRawNodeValueInt64) then ALJSONDocErrorU('%s is not a valid Int64', [fRawNodeValueStr]);
+                  IF not ALTryStrToInt64(fRawNodeValueStr, fRawNodeValueInt64) then ALJSONDocErrorU('%s is not a valid Int64', [fRawNodeValueStr]);
                 end;
       else ALJSONDocErrorU(CALJsonOperationError,GetNodeType);
     end;
@@ -14701,7 +14702,7 @@ end;
 {************************************************************************}
 function TALJSONNodeListU.CompareNodeNames(const S1, S2: String): Integer;
 begin
-  Result := AlCompareStrU(S1, S2)
+  Result := ALCompareStrW(S1, S2)
 end;
 
 {*****************************************************************************************}
@@ -15009,7 +15010,7 @@ end;
 
 {*************************************************}
 Procedure ALJSONToTStringsU(const AJsonStr: String;
-                            const aFormatSettings: TALformatSettingsU;
+                            const aFormatSettings: TALFormatSettingsW;
                             const aPath: String;
                             const aLst: TALStringsU;
                             Const aNullStr: String = 'null';
@@ -15024,7 +15025,7 @@ begin
 
     LJsonDocument.onParseText := procedure (Sender: TObject; const Path: String; const name: String; const Args: array of const; NodeSubType: TALJSONNodeSubType)
                                  begin
-                                   if (NodeSubType = nstBoolean)   then aLst.Add(aPath + Path + aLst.NameValueSeparator + ALBoolToStrU(Args[0].VBoolean,aTrueStr,aFalseStr))
+                                   if (NodeSubType = nstBoolean)   then aLst.Add(aPath + Path + aLst.NameValueSeparator + ALBoolToStrW(Args[0].VBoolean,aTrueStr,aFalseStr))
                                    else if (NodeSubType = nstnull) then aLst.Add(aPath + Path + aLst.NameValueSeparator + aNullStr)
                                    else                                 aLst.Add(aPath + Path + aLst.NameValueSeparator + String(Args[0].VUnicodeString));
                                    LContainChilds := True;
@@ -15060,7 +15061,7 @@ end;
 
 {*************************************************}
 Procedure ALJSONToTStringsU(const AJsonStr: String;
-                            const aFormatSettings: TALformatSettingsU;
+                            const aFormatSettings: TALFormatSettingsW;
                             const aLst: TALStringsU;
                             Const aNullStr: String = 'null';
                             Const aTrueStr: String = 'true';
@@ -15088,10 +15089,10 @@ begin
   if aJsonNode.ChildNodes.Count > 0 then begin
     for I := 0 to aJsonNode.ChildNodes.Count - 1 do begin
 
-      if aJsonNode.NodeType = ntArray then LTmpPath := aPath + '[' + alinttostrU(I) + ']'
+      if aJsonNode.NodeType = ntArray then LTmpPath := aPath + '[' + ALIntToStrW(I) + ']'
       else begin
         if aJsonNode.ChildNodes[I].NodeName = '' then raise Exception.Create('Nodename can not be empty');
-        LTmpPath := aPath + alIfThen(aPath <> '', '.', '') + aJsonNode.ChildNodes[I].NodeName;
+        LTmpPath := aPath + alIfThenW(aPath <> '', '.', '') + aJsonNode.ChildNodes[I].NodeName;
       end;
 
       case aJsonNode.ChildNodes[I].NodeType of
@@ -15111,7 +15112,7 @@ begin
                                    aFalseStr);
 
         ntText: begin
-                  if (aJsonNode.ChildNodes[I].NodeSubType = nstBoolean) then   aLst.Add(LTmpPath + aLst.NameValueSeparator + ALBoolToStrU(aJsonNode.ChildNodes[I].Bool,aTrueStr,aFalseStr))
+                  if (aJsonNode.ChildNodes[I].NodeSubType = nstBoolean) then   aLst.Add(LTmpPath + aLst.NameValueSeparator + ALBoolToStrW(aJsonNode.ChildNodes[I].Bool,aTrueStr,aFalseStr))
                   else if (aJsonNode.ChildNodes[I].NodeSubType = nstnull) then aLst.Add(LTmpPath + aLst.NameValueSeparator + aNullStr)
                   else                                                         aLst.Add(LTmpPath + aLst.NameValueSeparator + aJsonNode.ChildNodes[I].Text);
                 end;
@@ -15176,7 +15177,7 @@ begin
 
       //if it's contain path
       if (aPath = '') or
-         (alposExIgnoreCaseU(aPath + '.',aLst.Names[I]) = 1) then begin
+         (ALPosIgnoreCaseW(aPath + '.',aLst.Names[I]) = 1) then begin
 
         // path.aggregated_data.properties.types[3].translations.usa =>
         //   aggregated_data
@@ -15185,14 +15186,14 @@ begin
         //   [3]
         //   translations
         //   usa
-        if (aPath <> '') then LNames.Text := ALStringReplaceU(ALStringReplaceU(aLst.Names[I],
+        if (aPath <> '') then LNames.Text := ALStringReplaceW(ALStringReplaceW(aLst.Names[I],
                                                                               aPath + '.',
                                                                               '',
                                                                               [rfIgnoreCase]),
                                                               '[',
                                                               '.[',
                                                               [rfReplaceAll])
-        else LNames.Text := ALStringReplaceU(aLst.Names[I],
+        else LNames.Text := ALStringReplaceW(aLst.Names[I],
                                              '[',
                                              '.[',
                                              [rfReplaceAll]);
@@ -15206,7 +15207,7 @@ begin
             if (length(LNames[J]) <= 2) or
                (LNames[J][1] <> '[') or
                (LNames[J][length(LNames[J])] <> ']') or
-               (not ALTryStrToIntU(ALCopyStrU(LNames[J], 2, Length(LNames[J]) - 2), LIndex)) then raise EALException.CreateFmt('Wrong path: "%s"', [aLst.Names[I]]);
+               (not ALTryStrToInt(ALCopyStr(LNames[J], 2, Length(LNames[J]) - 2), LIndex)) then raise EALException.CreateFmt('Wrong path: "%s"', [aLst.Names[I]]);
             while LIndex > LCurrJsonNode.ChildNodes.Count - 1 do begin
               if J = LNames.Count - 1 then LCurrJsonNode.AddChild(ntText)
               else if (LNames[J+1] <> '') and
@@ -15218,7 +15219,7 @@ begin
 
           //if we are not in array
           else begin
-            LLowerName := alifThen(aNameToLowerCase, allowercaseU(LNames[J]), LNames[J]);
+            LLowerName := alifThenW(aNameToLowerCase, AlLowerCase(LNames[J]), LNames[J]);
             aTmpJsonNode := LCurrJsonNode.ChildNodes.FindNode(LLowerName);
             if not assigned(aTmpJsonNode) then begin
               if J = LNames.Count - 1 then LCurrJsonNode := LCurrJsonNode.AddChild(LLowerName, ntText)
@@ -15250,7 +15251,7 @@ end;
 {*****************************************************************************}
 function ALJsonEncodeFloatWithNodeSubTypeHelperU(const aValue: double): String;
 begin
-  result := ALFloatToStrU(aValue, ALDefaultFormatSettingsU);
+  result := ALFloatToStrW(aValue, ALDefaultFormatSettingsW);
 end;
 
 {****************************************************************************}
@@ -15281,7 +15282,7 @@ end;
 {***********************************************************************************}
 function ALJsonEncodeDateTimeWithNodeSubTypeHelperU(const aValue: TdateTime): String;
 begin
-  result := ALFormatDateTimeU('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', aValue, ALDefaultFormatSettingsU);
+  result := ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', aValue, ALDefaultFormatSettingsW);
 end;
 
 {**********************************************************************************}
@@ -15293,13 +15294,13 @@ end;
 {****************************************************************************}
 function ALJsonEncodeInt64WithNodeSubTypeHelperU(const aValue: int64): String;
 begin
-  result := 'NumberLong(' + ALIntToStrU(aValue) + ')';
+  result := 'NumberLong(' + ALIntToStrW(aValue) + ')';
 end;
 
 {****************************************************************************}
 function ALJsonEncodeInt32WithNodeSubTypeHelperU(const aValue: int32): String;
 begin
-  result := 'NumberInt(' + ALIntToStrU(aValue) + ')';
+  result := 'NumberInt(' + ALIntToStrW(aValue) + ')';
 end;
 
 {******************************************************}
@@ -15311,24 +15312,24 @@ end;
 {***************************************************************}
 function ALJsonEncodeWithNodeSubTypeHelperU(const aValue: String;
                                             const aNodeSubType: TALJSONNodeSubType;
-                                            const aFormatSettings: TALformatSettingsU): String;
+                                            const aFormatSettings: TALFormatSettingsW): String;
 begin
   case aNodeSubType of
     nstFloat:      begin
-                     if @aFormatSettings <> @ALDefaultFormatSettingsU then result := ALJsonEncodeFloatWithNodeSubTypeHelperU(ALStrToFloatU(aValue, aFormatSettings))
+                     if @aFormatSettings <> @ALDefaultFormatSettingsW then result := ALJsonEncodeFloatWithNodeSubTypeHelperU(ALStrToFloat(aValue, aFormatSettings))
                      else result := aValue;
                    end;
     nstText:       result := ALJsonEncodeTextWithNodeSubTypeHelperU(aValue);
     nstBinary:     result := ALJsonEncodeBinaryWithNodeSubTypeHelperU(aValue);
     nstObjectID:   result := ALJsonEncodeObjectIDWithNodeSubTypeHelperU(aValue);
-    nstBoolean:    result := ALJsonEncodeBooleanWithNodeSubTypeHelperU(ALStrToBoolU(aValue));
+    nstBoolean:    result := ALJsonEncodeBooleanWithNodeSubTypeHelperU(AlStrToBool(aValue));
     nstDateTime:   begin
                      if aValue = 'NOW' then result := ALJsonEncodeDateTimeWithNodeSubTypeHelperU(ALUtcNow)
-                     else result := ALJsonEncodeDateTimeWithNodeSubTypeHelperU(ALStrToDateTimeU(aValue, aFormatSettings));
+                     else result := ALJsonEncodeDateTimeWithNodeSubTypeHelperU(ALStrToDateTime(aValue, aFormatSettings));
                    end;
     nstJavascript: result := ALJsonEncodeJavascriptWithNodeSubTypeHelperU(aValue);
-    nstInt32:      result := ALJsonEncodeInt32WithNodeSubTypeHelperU(ALstrToIntU(aValue));
-    nstInt64:      result := ALJsonEncodeInt64WithNodeSubTypeHelperU(ALstrToInt64U(aValue));
+    nstInt32:      result := ALJsonEncodeInt32WithNodeSubTypeHelperU(ALStrToInt(aValue));
+    nstInt64:      result := ALJsonEncodeInt64WithNodeSubTypeHelperU(ALStrToInt64(aValue));
     nstNull:       result := ALJsonEncodeNullWithNodeSubTypeHelperU;
     nstObject:     raise Exception.Create('Unsupported Node SubType');
     nstArray:      raise Exception.Create('Unsupported Node SubType');
@@ -15340,14 +15341,14 @@ end;
 
 initialization
 
-  vALJsonISODateFormatSettings := TalFormatSettings.Create('en-US');
+  vALJsonISODateFormatSettings := TALFormatSettingsA.Create('en-US');
   vALJsonISODateFormatSettings.DateSeparator := '-';
   vALJsonISODateFormatSettings.TimeSeparator := ':';
   vALJsonISODateFormatSettings.ShortDateFormat := 'yyyy-mm-dd';
   vALJsonISODateFormatSettings.ShortTimeFormat := 'hh:nn:ss.zzz';
   vALDefaultNodeIndent := '  '; { 2 spaces }
 
-  vALJsonISODateFormatSettingsU := TalFormatSettingsU.Create('en-US');
+  vALJsonISODateFormatSettingsU := TALFormatSettingsW.Create('en-US');
   vALJsonISODateFormatSettingsU.DateSeparator := '-';
   vALJsonISODateFormatSettingsU.TimeSeparator := ':';
   vALJsonISODateFormatSettingsU.ShortDateFormat := 'yyyy-mm-dd';

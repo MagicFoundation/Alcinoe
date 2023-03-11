@@ -164,7 +164,7 @@ const EnvironmentTemplate = '%s=%s'#0;
 
 Var ScriptFileName: AnsiString;
     Environment: AnsiString;
-    LStream: TALStringStream;
+    LStream: TALStringStreamA;
     FreeRequestContentStream: Boolean;
     S1: AnsiString;
     P1: Integer;
@@ -172,7 +172,7 @@ Var ScriptFileName: AnsiString;
 
 begin
 
-  LStream := TALStringStream.Create('');
+  LStream := TALStringStreamA.Create('');
   If not assigned(RequestContentStream) then begin
     RequestContentStream := TmemoryStream.Create;
     FreeRequestContentStream := True;
@@ -184,7 +184,7 @@ begin
     ScriptFileName := ServerVariables.Values['SCRIPT_FILENAME'];
 
     {For securty issue... if content_length badly set then cpu can go to 100%}
-    ServerVariables.Values['CONTENT_LENGTH']  := ALIntToStr(RequestContentStream.Size);
+    ServerVariables.Values['CONTENT_LENGTH']  := ALIntToStrA(RequestContentStream.Size);
 
     {init GATEWAY_INTERFACE}
     ServerVariables.Values['GATEWAY_INTERFACE'] := 'CGI/1.1';
@@ -226,7 +226,7 @@ begin
 
     {----------}
     For I := 0 to serverVariables.Count - 1 do
-      Environment := Environment + ALFormat(EnvironmentTemplate,[ServerVariables.Names[I], ServerVariables.ValueFromIndex[I]]);
+      Environment := Environment + ALFormatA(EnvironmentTemplate,[ServerVariables.Names[I], ServerVariables.ValueFromIndex[I]]);
 
     {----------}
     Environment := Environment + #0;
@@ -240,7 +240,7 @@ begin
 
     {----------}
     S1 := LStream.DataString;
-    P1 := AlPos(#13#10#13#10,S1);
+    P1 := ALPosA(#13#10#13#10,S1);
     ResponseHeader.RawHeaderText := AlCopyStr(S1,1,P1-1);
     S1 := AlCopyStr(S1,P1+4,MaxInt);
     ResponseContentStream.WriteBuffer(pointer(S1)^, length(S1));

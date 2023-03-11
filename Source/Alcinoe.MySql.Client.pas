@@ -66,7 +66,7 @@ Type
     Function  GetFieldValue(aFieldValue: PAnsiChar;
                             aFieldType: TMysqlFieldTypes;
                             aFieldLength: integer;
-                            const aFormatSettings: TALFormatSettings): AnsiString;
+                            const aFormatSettings: TALFormatSettingsA): AnsiString;
     procedure initObject; virtual;
     procedure OnSelectDataDone(const SQL: AnsiString;
                                const RowTag: AnsiString;
@@ -104,30 +104,30 @@ Type
                          XMLDATA: TalXMLNode;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         const FormatSettings: TALFormatSettings); overload; virtual;
+                         const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          Skip: integer;
                          First: Integer;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         const FormatSettings: TALFormatSettings); overload; virtual;
+                         const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         const FormatSettings: TALFormatSettings); overload; virtual;
+                         const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          const RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings); overload; virtual;
+                         const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          const RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings); overload; virtual;
+                         const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings); overload; virtual;
+                         const FormatSettings: TALFormatSettingsA); overload; virtual;
     procedure UpdateData(SQLs: TALStrings); overload; virtual;
     procedure UpdateData(const SQL: AnsiString); overload; virtual;
     procedure UpdateData(const SQLs: array of AnsiString); overload; virtual;
@@ -180,7 +180,7 @@ Type
     Function  GetFieldValue(aFieldValue: PAnsiChar;
                             aFieldType: TMysqlFieldTypes;
                             aFieldLength: integer;
-                            const aFormatSettings: TALFormatSettings): AnsiString;
+                            const aFormatSettings: TALFormatSettingsA): AnsiString;
     Function  AcquireConnection: PMySql; virtual;
     Procedure ReleaseConnection(var ConnectionHandle: PMySql; const CloseConnection: Boolean = False); virtual;
     procedure initObject(const aHost: AnsiString;
@@ -235,35 +235,35 @@ Type
                          XMLDATA: TalXMLNode;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         const FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettingsA;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          Skip: integer;
                          First: Integer;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         const FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettingsA;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         const FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettingsA;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          const RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettingsA;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          const RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettingsA;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettingsA;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
     procedure UpdateData(SQLs: TALStrings; const ConnectionHandle: PMySql = nil); overload; virtual;
     procedure UpdateData(const SQL: AnsiString; const ConnectionHandle: PMySql = nil); overload; virtual;
@@ -282,7 +282,7 @@ Type
 Function AlMySqlClientSlashedStr(Const Str: AnsiString): AnsiString;
 
 var
-  ALMySqlFormatSettings: TALFormatSettings;
+  ALMySqlFormatSettings: TALFormatSettingsA;
 
 implementation
 
@@ -290,6 +290,7 @@ uses
   System.Classes,
   System.SysUtils,
   System.Diagnostics,
+  System.AnsiStrings,
   Alcinoe.Cipher,
   Alcinoe.WinApi.Common;
 
@@ -357,7 +358,7 @@ end;
 function TalMySqlClient.GetFieldValue(aFieldValue: PAnsiChar;
                                       aFieldType: TMysqlFieldTypes;
                                       aFieldLength: integer;
-                                      const aFormatSettings: TALFormatSettings): AnsiString;
+                                      const aFormatSettings: TALFormatSettingsA): AnsiString;
 begin
   //The lengths of the field values in the row may be obtained by calling mysql_fetch_lengths().
   //Empty fields and fields containing NULL both have length 0; you can distinguish these
@@ -369,12 +370,12 @@ begin
       FIELD_TYPE_DECIMAL,
       FIELD_TYPE_NEWDECIMAL,
       FIELD_TYPE_FLOAT,
-      FIELD_TYPE_DOUBLE: result := ALFloatToStr(ALStrToFloat(aFieldValue,ALMySqlFormatSettings),aformatSettings);
-      FIELD_TYPE_DATETIME: Result := ALDateTimeToStr(ALStrToDateTime(aFieldValue,ALMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_DOUBLE: result := ALFloatToStrA(ALStrToFloat(aFieldValue,ALMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_DATETIME: Result := ALDateTimeToStrA(ALStrToDateTime(aFieldValue,ALMySqlFormatSettings),aformatSettings);
       FIELD_TYPE_DATE,
-      FIELD_TYPE_NEWDATE: Result := ALDateToStr(ALStrToDate(aFieldValue,ALMySqlFormatSettings),aformatSettings);
-      FIELD_TYPE_TIME: Result := ALTimeToStr(ALStrToTime(aFieldValue,ALMySqlFormatSettings),aformatSettings);
-      FIELD_TYPE_TIMESTAMP: Result := ALDateTimeToStr(ALStrToDateTime(aFieldValue,ALMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_NEWDATE: Result := ALDateToStrA(ALStrToDate(aFieldValue,ALMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_TIME: Result := ALTimeToStrA(ALStrToTime(aFieldValue,ALMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_TIMESTAMP: Result := ALDateTimeToStrA(ALStrToDateTime(aFieldValue,ALMySqlFormatSettings),aformatSettings);
       FIELD_TYPE_NULL: result := fNullString; // Example: SELECT NULL FROM DUAL
       Else SetString(Result, aFieldValue, aFieldLength);
     end;
@@ -570,7 +571,7 @@ procedure TalMySqlClient.SelectData(const SQL: AnsiString;
                                     XMLDATA: TalXMLNode;
                                     OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                     ExtData: Pointer;
-                                    const FormatSettings: TALFormatSettings);
+                                    const FormatSettings: TALFormatSettingsA);
 Var LMySqlRes: PMYSQL_RES;
     LMySqlRow: PMYSQL_ROW;
     LMySqlFields: array of PMYSQL_FIELD;
@@ -619,8 +620,8 @@ begin
 
       //try to load from from cache
       LCacheKey := ALStringHashSHA1(RowTag + '#' +
-                                    alinttostr(Skip) + '#' +
-                                    alinttostr(First) + '#' +
+                                    ALIntToStrA(Skip) + '#' +
+                                    ALIntToStrA(First) + '#' +
                                     ALGetFormatSettingsID(FormatSettings) + '#' +
                                     SQL);
       if loadcachedData(LCacheKey, LCacheStr) then begin
@@ -664,7 +665,7 @@ begin
       else LViewRec := XMLdata;
 
       //init aUpdateRowTagByFieldValue
-      if AlPos('&>',RowTag) = 1 then begin
+      if ALPosA('&>',RowTag) = 1 then begin
         LTmpRowTag := ALcopyStr(RowTag,3,maxint);
         LUpdateRowTagByFieldValue := LTmpRowTag <> '';
       end
@@ -783,7 +784,7 @@ procedure TalMySqlClient.SelectData(const SQL: AnsiString;
                                     First: Integer;
                                     OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                     ExtData: Pointer;
-                                    const FormatSettings: TALFormatSettings);
+                                    const FormatSettings: TALFormatSettingsA);
 begin
   SelectData(SQL,
              '', // RowTag,
@@ -801,7 +802,7 @@ end;
 procedure TalMySqlClient.SelectData(const SQL: AnsiString;
                                     OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                     ExtData: Pointer;
-                                    const FormatSettings: TALFormatSettings);
+                                    const FormatSettings: TALFormatSettingsA);
 begin
   SelectData(SQL,
              '', // RowTag,
@@ -821,7 +822,7 @@ procedure TalMySqlClient.SelectData(const SQL: AnsiString;
                                     Skip: Integer;
                                     First: Integer;
                                     XMLDATA: TalXMLNode;
-                                    const FormatSettings: TALFormatSettings);
+                                    const FormatSettings: TALFormatSettingsA);
 begin
   SelectData(SQL,
              RowTag,
@@ -839,7 +840,7 @@ end;
 procedure TalMySqlClient.SelectData(const SQL: AnsiString;
                                     const RowTag: AnsiString;
                                     XMLDATA: TalXMLNode;
-                                    const FormatSettings: TALFormatSettings);
+                                    const FormatSettings: TALFormatSettingsA);
 begin
   SelectData(SQL,
              RowTag,
@@ -856,7 +857,7 @@ end;
 {********************************************************}
 procedure TalMySqlClient.SelectData(const SQL: AnsiString;
                                     XMLDATA: TalXMLNode;
-                                    const FormatSettings: TALFormatSettings);
+                                    const FormatSettings: TALFormatSettingsA);
 begin
   SelectData(SQL,
              '', // RowTag,
@@ -982,7 +983,7 @@ end;
 function TalMySqlConnectionPoolClient.GetFieldValue(aFieldValue: PAnsiChar;
                                                     aFieldType: TMysqlFieldTypes;
                                                     aFieldLength: integer;
-                                                    const aFormatSettings: TALFormatSettings): AnsiString;
+                                                    const aFormatSettings: TALFormatSettingsA): AnsiString;
 begin
   //The lengths of the field values in the row may be obtained by calling mysql_fetch_lengths().
   //Empty fields and fields containing NULL both have length 0; you can distinguish these
@@ -994,12 +995,12 @@ begin
       FIELD_TYPE_DECIMAL,
       FIELD_TYPE_NEWDECIMAL,
       FIELD_TYPE_FLOAT,
-      FIELD_TYPE_DOUBLE: result := ALFloatToStr(ALStrToFloat(aFieldValue,ALMySqlFormatSettings),aformatSettings);
-      FIELD_TYPE_DATETIME: Result := ALDateTimeToStr(ALStrToDateTime(aFieldValue,ALMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_DOUBLE: result := ALFloatToStrA(ALStrToFloat(aFieldValue,ALMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_DATETIME: Result := ALDateTimeToStrA(ALStrToDateTime(aFieldValue,ALMySqlFormatSettings),aformatSettings);
       FIELD_TYPE_DATE,
-      FIELD_TYPE_NEWDATE: Result := ALDateToStr(ALStrToDate(aFieldValue,ALMySqlFormatSettings),aformatSettings);
-      FIELD_TYPE_TIME: Result := ALTimeToStr(ALStrToTime(aFieldValue,ALMySqlFormatSettings),aformatSettings);
-      FIELD_TYPE_TIMESTAMP: Result := ALDateTimeToStr(ALStrToDateTime(aFieldValue,ALMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_NEWDATE: Result := ALDateToStrA(ALStrToDate(aFieldValue,ALMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_TIME: Result := ALTimeToStrA(ALStrToTime(aFieldValue,ALMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_TIMESTAMP: Result := ALDateTimeToStrA(ALStrToDateTime(aFieldValue,ALMySqlFormatSettings),aformatSettings);
       FIELD_TYPE_NULL: result := fNullString; // Example: SELECT NULL FROM DUAL
       Else SetString(Result, aFieldValue, aFieldLength);
     end;
@@ -1457,7 +1458,7 @@ procedure TalMySqlConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                   XMLDATA: TalXMLNode;
                                                   OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                                   ExtData: Pointer;
-                                                  const FormatSettings: TALFormatSettings;
+                                                  const FormatSettings: TALFormatSettingsA;
                                                   const ConnectionHandle: PMySql = nil);
 
 Var LMySqlRes: PMYSQL_RES;
@@ -1507,8 +1508,8 @@ begin
 
       //try to load from from cache
       LCacheKey := ALStringHashSHA1(RowTag + '#' +
-                                    alinttostr(Skip) + '#' +
-                                    alinttostr(First) + '#' +
+                                    ALIntToStrA(Skip) + '#' +
+                                    ALIntToStrA(First) + '#' +
                                     ALGetFormatSettingsID(FormatSettings) + '#' +
                                     SQL);
       if loadcachedData(LCacheKey, LCacheStr) then begin
@@ -1558,7 +1559,7 @@ begin
         else LViewRec := XMLdata;
 
         //init aUpdateRowTagByFieldValue
-        if AlPos('&>',RowTag) = 1 then begin
+        if ALPosA('&>',RowTag) = 1 then begin
           LTmpRowTag := ALcopyStr(RowTag,3,maxint);
           LUpdateRowTagByFieldValue := LTmpRowTag <> '';
         end
@@ -1696,7 +1697,7 @@ procedure TalMySqlConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                   First: Integer;
                                                   OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                                   ExtData: Pointer;
-                                                  const FormatSettings: TALFormatSettings;
+                                                  const FormatSettings: TALFormatSettingsA;
                                                   const ConnectionHandle: PMySql = nil);
 begin
   SelectData(SQL,
@@ -1716,7 +1717,7 @@ end;
 procedure TalMySqlConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                   OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                                   ExtData: Pointer;
-                                                  const FormatSettings: TALFormatSettings;
+                                                  const FormatSettings: TALFormatSettingsA;
                                                   const ConnectionHandle: PMySql = nil);
 begin
   SelectData(SQL,
@@ -1738,7 +1739,7 @@ procedure TalMySqlConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                   Skip: Integer;
                                                   First: Integer;
                                                   XMLDATA: TalXMLNode;
-                                                  const FormatSettings: TALFormatSettings;
+                                                  const FormatSettings: TALFormatSettingsA;
                                                   const ConnectionHandle: PMySql = nil);
 begin
   SelectData(SQL,
@@ -1758,7 +1759,7 @@ end;
 procedure TalMySqlConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                   const RowTag: AnsiString;
                                                   XMLDATA: TalXMLNode;
-                                                  const FormatSettings: TALFormatSettings;
+                                                  const FormatSettings: TALFormatSettingsA;
                                                   const ConnectionHandle: PMySql = nil);
 begin
   SelectData(SQL,
@@ -1777,7 +1778,7 @@ end;
 {**********************************************************************}
 procedure TalMySqlConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                   XMLDATA: TalXMLNode;
-                                                  const FormatSettings: TALFormatSettings;
+                                                  const FormatSettings: TALFormatSettingsA;
                                                   const ConnectionHandle: PMySql = nil);
 begin
   SelectData(SQL,
@@ -1993,7 +1994,7 @@ begin
 end;
 
 initialization
-  ALMySQLFormatSettings := TALFormatSettings.Create('en-US'); // 1033 {en-US}
+  ALMySQLFormatSettings := TALFormatSettingsA.Create('en-US'); // 1033 {en-US}
   ALMySQLFormatSettings.DecimalSeparator := '.';
   ALMySQLFormatSettings.ThousandSeparator := ',';
   ALMySQLFormatSettings.DateSeparator := '-';

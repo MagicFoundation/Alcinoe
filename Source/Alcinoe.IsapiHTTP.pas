@@ -47,7 +47,7 @@ type
     function GetStringVariable(Index: Integer): AnsiString; virtual; abstract;
     function GetDateVariable(Index: Integer): TDateTime; virtual; abstract;
     function GetIntegerVariable(Index: Integer): Integer; virtual; abstract;
-    function GetContentStream: TALStringStream; virtual; abstract; // [added from TwebRequest]
+    function GetContentStream: TALStringStreamA; virtual; abstract; // [added from TwebRequest]
   public
     // [Deleted from TwebRequest] procedure ExtractFields(Separators, _WhiteSpace: TSysCharSet; Content: PAnsiChar; Strings: TALStrings); overload; // Utility to extract fields from a given string buffer
     // [Deleted from TwebRequest] procedure ExtractFields(Separators, _WhiteSpace: TSysCharSet; const Content: AnsiString; Strings: TALStrings); overload;
@@ -99,7 +99,7 @@ type
     property ContentLength: Integer index 16 read GetIntegerVariable;
     property ContentVersion: AnsiString index 17 read GetStringVariable;
     Property Content: AnsiString Read GetContent;
-    Property ContentStream: TALStringStream Read GetContentStream; // [added from TwebRequest]
+    Property ContentStream: TALStringStreamA Read GetContentStream; // [added from TwebRequest]
     Property MaxContentSize: Integer Read FMaxContentSize Write FMaxContentSize; // [added from TwebRequest]
     property Connection: AnsiString index 26 read GetStringVariable;
     property DerivedFrom: AnsiString index 18 read GetStringVariable;
@@ -116,7 +116,7 @@ type
   TALISAPIRequest = class(TALWebRequest)
   private
     FECB: PEXTENSION_CONTROL_BLOCK;
-    FcontentStream: TALStringStream;
+    FcontentStream: TALStringStreamA;
     fConnectionClosed: boolean;
     fClientDataExhausted: Boolean;
     function GetHost: AnsiString;
@@ -125,7 +125,7 @@ type
     function GetStringVariable(Index: Integer): AnsiString; override;
     function GetDateVariable(Index: Integer): TDateTime; override;
     function GetIntegerVariable(Index: Integer): Integer; override;
-    function GetContentStream: TALStringStream; override; // [added from TwebRequest]
+    function GetContentStream: TALStringStreamA; override; // [added from TwebRequest]
   public
     constructor Create(AECB: PEXTENSION_CONTROL_BLOCK);
     destructor Destroy; override;
@@ -383,13 +383,13 @@ function TALWebRequest.GetMethodType: TALHTTPMethod;
 var LMethodStr : AnsiString;
 begin
   LMethodStr := Method;
-       if ALSameText(LMethodStr, 'GET')     then result := TALHTTPMethod.Get
-  else if ALSameText(LMethodStr, 'POST')    then result := TALHTTPMethod.Post
-  else if ALSameText(LMethodStr, 'PUT')     then result := TALHTTPMethod.Put
-  else if ALSameText(LMethodStr, 'HEAD')    then result := TALHTTPMethod.Head
-  else if ALSameText(LMethodStr, 'TRACE')   then result := TALHTTPMethod.Trace
-  else if ALSameText(LMethodStr, 'DELETE')  then result := TALHTTPMethod.Delete
-  else if ALSameText(LMethodStr, 'OPTIONS') then result := TALHTTPMethod.Options
+       if ALSameTextA(LMethodStr, 'GET')     then result := TALHTTPMethod.Get
+  else if ALSameTextA(LMethodStr, 'POST')    then result := TALHTTPMethod.Post
+  else if ALSameTextA(LMethodStr, 'PUT')     then result := TALHTTPMethod.Put
+  else if ALSameTextA(LMethodStr, 'HEAD')    then result := TALHTTPMethod.Head
+  else if ALSameTextA(LMethodStr, 'TRACE')   then result := TALHTTPMethod.Trace
+  else if ALSameTextA(LMethodStr, 'DELETE')  then result := TALHTTPMethod.Delete
+  else if ALSameTextA(LMethodStr, 'OPTIONS') then result := TALHTTPMethod.Options
   else raise Exception.Create('Unknown method type');
 end;
 
@@ -414,9 +414,9 @@ begin
 
   //check that unit is bytes
   //Range: bytes=200-1000, 2000-6576, 19000-
-  I := ALPos('=', LRangeHeader); // bytes=200-1000, 2000-6576, 19000-
+  I := ALPosA('=', LRangeHeader); // bytes=200-1000, 2000-6576, 19000-
   if I <= 0 then exit;
-  if not ALSameText(alTrim(alcopyStr(LRangeHeader,1,I-1)), 'bytes') then exit;  // bytes
+  if not ALSameTextA(alTrim(alcopyStr(LRangeHeader,1,I-1)), 'bytes') then exit;  // bytes
   LRangeHeader := alcopyStr(LRangeHeader, I+1, maxint); // 200-1000, 2000-6576, 19000-
 
   //move all ranges in result
@@ -508,8 +508,8 @@ function TALISAPIRequest.GetHost: AnsiString;
 var I, J: Integer;
 begin
   Result := GetFieldByName('HTTP_HOST');
-  J := ALPos(']', Result); // Handle Ipv6 host like [::1]:80
-  I := ALPosEx(':', Result, J+1);
+  J := ALPosA(']', Result); // Handle Ipv6 host like [::1]:80
+  I := ALPosA(':', Result, J+1);
   if I > 0 then Delete(Result, I, MaxInt);
 end;
 
@@ -549,9 +549,9 @@ begin
                                                                                   // all the data as sent by the client. Otherwise, cbTotalBytes will contain the total number of bytes
                                                                                   // of data received. The ISAPI extensions will then need to use the callback function ReadClient to read
                                                                                   // the rest of the data (beginning from an offset of cbAvailable).
-  if aStream is TALStringStream then begin
+  if aStream is TALStringStreamA then begin
     while aStream.Position < aStream.Size do begin
-      LByteRead := ReadClient(Pbyte(TALStringStream(aStream).DataString)[aStream.Position], aStream.Size - aStream.Position);
+      LByteRead := ReadClient(Pbyte(TALStringStreamA(aStream).DataString)[aStream.Position], aStream.Size - aStream.Position);
       if LByteRead <= 0 then break;  // The doc of Delphi say "If no more content is available, ReadClient returns -1."
                                      // but it's false !!
                                      // http://msdn.microsoft.com/en-us/library/ms525214(v=vs.90).aspx
@@ -582,10 +582,10 @@ begin
 end;
 
 {*********************************************************}
-function TALISAPIRequest.GetContentStream: TALStringStream;
+function TALISAPIRequest.GetContentStream: TALStringStreamA;
 begin
   if not assigned(FcontentStream) then begin
-    FcontentStream := TALStringStream.Create('');
+    FcontentStream := TALStringStreamA.Create('');
     ReadClientToStream(FcontentStream);
   end;
   Result := FcontentStream;
@@ -765,7 +765,7 @@ end;
 {*****************************************************}
 function TALWebResponse.FormatAuthenticate: AnsiString;
 begin
-  if Realm <> '' then Result := ALFormat('%s Realm=%s', [WWWAuthenticate, Realm])
+  if Realm <> '' then Result := ALFormatA('%s Realm=%s', [WWWAuthenticate, Realm])
   else Result := WWWAuthenticate;
 end;
 
@@ -934,7 +934,7 @@ var StatusString: AnsiString;
   {---------------------------------------------------------------------------}
   procedure AddHeaderItem(const Item: AnsiString; const FormatStr: AnsiString);
   begin
-    if Item <> '' then Headers := Headers + ALFormat(FormatStr, [Item]);
+    if Item <> '' then Headers := Headers + ALFormatA(FormatStr, [Item]);
   end;
 
 begin
@@ -942,7 +942,7 @@ begin
   if fSent or TALISAPIRequest(FHTTPRequest).ConnectionClosed then exit;
 
   if HTTPRequest.ProtocolVersion <> '' then begin
-    if (ReasonString <> '') and (StatusCode > 0) then StatusString := ALFormat('%d %s', [StatusCode, ReasonString])
+    if (ReasonString <> '') and (StatusCode > 0) then StatusString := ALFormatA('%d %s', [StatusCode, ReasonString])
     else StatusString := '200 OK';
     AddHeaderItem(Location, 'Location: %s'#13#10);
     AddHeaderItem(Allow, 'Allow: %s'#13#10);
@@ -950,16 +950,16 @@ begin
       AddHeaderItem(Cookies[I].HeaderValue, 'Set-Cookie: %s'#13#10);
     AddHeaderItem(DerivedFrom, 'Derived-From: %s'#13#10);
     if Expires > 0 then
-      AddHeaderItem(ALFormat(ALFormatDateTime('"%s", dd "%s" yyyy hh":"nn":"ss "GMT"',
+      AddHeaderItem(ALFormatA(ALFormatDateTimeA('"%s", dd "%s" yyyy hh":"nn":"ss "GMT"',
                                               Expires,
-                                              ALDefaultFormatSettings),
+                                              ALDefaultFormatSettingsA),
                              [AlRfc822DayOfWeekNames[DayOfWeek(Expires)],
                               ALRfc822MonthOfTheYearNames[MonthOf(Expires)]]),
                     'Expires: %s'#13#10);
     if LastModified > 0 then
-      AddHeaderItem(ALFormat(ALFormatDateTime('"%s", dd "%s" yyyy hh":"nn":"ss "GMT"',
+      AddHeaderItem(ALFormatA(ALFormatDateTimeA('"%s", dd "%s" yyyy hh":"nn":"ss "GMT"',
                                               LastModified,
-                                              ALDefaultFormatSettings),
+                                              ALDefaultFormatSettingsA),
                              [AlRfc822DayOfWeekNames[DayOfWeek(LastModified)],
                               ALRfc822MonthOfTheYearNames[MonthOf(LastModified)]]),
                     'Last-Modified: %s'#13#10);

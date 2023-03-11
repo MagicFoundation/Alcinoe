@@ -61,6 +61,7 @@ uses
   System.Math,
   System.Classes,
   System.sysutils,
+  System.AnsiStrings,
   {$IFDEF MSWINDOWS}
   System.Win.Comobj,
   Winapi.Ole2,
@@ -341,7 +342,7 @@ Begin
   //  <![CDATA[]]]]><![CDATA[>]]>
   //  This means that to encode "]]>" in the middle of a CDATA section, replace all occurrences of "]]>" with the following:
   //  ]]]]><![CDATA[>
-  Result := alStringReplace(Src,']]>',']]]]><![CDATA[>',[rfReplaceAll]);
+  Result := ALStringReplaceA(Src,']]>',']]]]><![CDATA[>',[rfReplaceAll]);
 End;
 
 {*************************************************}
@@ -765,15 +766,15 @@ begin
               end;
           else begin
             if (LEntityInt > 127) then begin
-              if useNumericReference then LEntityStr := '&#'+ALIntToStr(LEntityInt)+';'
+              if useNumericReference then LEntityStr := '&#'+ALIntToStrA(LEntityInt)+';'
               else begin
                 LIndex := LstUnicodeEntitiesNumber.IndexOf(LEntityInt);
                 If LIndex >= 0 Then begin
                   LEntityStr := _ALHtmlEntities[integer(LstUnicodeEntitiesNumber.Objects[LIndex])];
                   If LEntityStr <> '' then LEntityStr := '&' + LEntityStr + ';'
-                  else LEntityStr := '&#'+ALIntToStr(LEntityInt)+';'
+                  else LEntityStr := '&#'+ALIntToStrA(LEntityInt)+';'
                 end
-                else LEntityStr := '&#'+ALIntToStr(LEntityInt)+';'
+                else LEntityStr := '&#'+ALIntToStrA(LEntityInt)+';'
               end;
             end
             else LEntityStr := ansistring(LTmpString[i]);
@@ -1279,104 +1280,104 @@ begin
       case ch of
         8: begin // Backspace
              if useNumericReference then begin
-               ALStrMoveU('\u0008', P, 6);
+               ALStrMove('\u0008', P, 6);
                Inc(P, 6);
              end
              else begin
-               ALStrMoveU('\b', P, 2);
+               ALStrMove('\b', P, 2);
                Inc(P, 2);
              end;
            end;
         9: begin // Tab
              if useNumericReference then begin
-               ALStrMoveU('\u0009', P, 6);
+               ALStrMove('\u0009', P, 6);
                Inc(P, 6);
              end
              else begin
-               ALStrMoveU('\t', P, 2);
+               ALStrMove('\t', P, 2);
                Inc(P, 2);
              end;
            end;
         10: begin // New line
               if useNumericReference then begin
-                ALStrMoveU('\u000A', P, 6);
+                ALStrMove('\u000A', P, 6);
                 Inc(P, 6);
               end
               else begin
-                ALStrMoveU('\n', P, 2);
+                ALStrMove('\n', P, 2);
                 Inc(P, 2);
               end;
             end;
         11: begin // Vertical tab
               if useNumericReference then begin
-                ALStrMoveU('\u000B', P, 6);
+                ALStrMove('\u000B', P, 6);
                 Inc(P, 6);
               end
               else begin
-                ALStrMoveU('\v', P, 2);
+                ALStrMove('\v', P, 2);
                 Inc(P, 2);
               end;
             end;
         12: begin // Form feed
               if useNumericReference then begin
-                ALStrMoveU('\u000C', P, 6);
+                ALStrMove('\u000C', P, 6);
                 Inc(P, 6);
               end
               else begin
-                ALStrMoveU('\f', P, 2);
+                ALStrMove('\f', P, 2);
                 Inc(P, 2);
               end;
             end;
         13: begin // Carriage return
               if useNumericReference then begin
-                ALStrMoveU('\u000D', P, 6);
+                ALStrMove('\u000D', P, 6);
                 Inc(P, 6);
               end
               else begin
-                ALStrMoveU('\r', P, 2);
+                ALStrMove('\r', P, 2);
                 Inc(P, 2);
               end;
             end;
         34: begin // Double quote
               if useNumericReference then begin
-                ALStrMoveU('\u0022', P, 6);
+                ALStrMove('\u0022', P, 6);
                 Inc(P, 6);
               end
               else begin
-                ALStrMoveU('\"', P, 2);
+                ALStrMove('\"', P, 2);
                 Inc(P, 2);
               end;
             end;
         38: begin // & ... we need to encode it because in javascript &#39; or &amp; will be converted to ' and error unterminated string
-              ALStrMoveU('\u0026', P, 6);
+              ALStrMove('\u0026', P, 6);
               Inc(P, 6);
             end;
         39: begin // Apostrophe or single quote
               if useNumericReference then begin
-                ALStrMoveU('\u0027', P, 6);
+                ALStrMove('\u0027', P, 6);
                 Inc(P, 6);
               end
               else begin
-                ALStrMoveU('\''', P, 2);
+                ALStrMove('\''', P, 2);
                 Inc(P, 2);
               end;
             end;
         60: begin // < ... mostly to hide all </script> tag inside javascript.
                   // http://www.wwco.com/~wls/blog/2007/04/25/using-script-in-a-javascript-literal/
-              ALStrMoveU('\u003C', P, 6);
+              ALStrMove('\u003C', P, 6);
               Inc(P, 6);
             end;
         62: begin // > ... mostly to hide all HTML tag inside javascript.
-              ALStrMoveU('\u003E', P, 6);
+              ALStrMove('\u003E', P, 6);
               Inc(P, 6);
             end;
         92: begin // Backslash character (\).
               if useNumericReference then begin
-                ALStrMoveU('\u005C', P, 6);
+                ALStrMove('\u005C', P, 6);
                 Inc(P, 6);
               end
               else begin
-                ALStrMoveU('\\', P, 2);
+                ALStrMove('\\', P, 2);
                 Inc(P, 2);
               end;
             end;
@@ -1812,9 +1813,9 @@ Begin
     S2 := TagParams[i+1];
     if i <= TagParams.Count - 3 then S3 := TagParams[i+2]
     else S3 := '';
-    P1 := AlPos('=',S1);
-    P2 := AlPos('=',S2);
-    P3 := AlPos('=',S3);
+    P1 := ALPosA('=',S1);
+    P2 := ALPosA('=',S2);
+    P3 := ALPosA('=',S3);
     Flag2 := (S2 <> '') and (S2[1] in ['''','"']);
     Flag3 := (S3 <> '') and (S3[1] in ['''','"']);
     IF (P1 <= 0) and
@@ -1836,7 +1837,7 @@ Begin
     end
     else if (S1 <> '') and
             (P1 <= 0) and
-            (AlPos('=',S2) = 1)  then begin {<A HREF ="obie2.html">}
+            (ALPosA('=',S2) = 1)  then begin {<A HREF ="obie2.html">}
       TagParams[i] := S1 + S2;
       tagParams.Delete(i+1);
     end;
@@ -1854,11 +1855,11 @@ procedure ALExtractHTMLText(HtmlContent: AnsiString;
   Begin
     If DecodeHTMLText then Begin
       S := alHtmlDecode(ALTrim(S));
-      S := AlStringReplace(S, #13, ' ', [rfreplaceAll]);
-      S := AlStringReplace(S, #10, ' ', [rfreplaceAll]);
-      S := AlStringReplace(S, #9,  ' ', [rfreplaceAll]);
-      While AlPos('  ',S) > 0 Do
-        S := AlStringReplace(S, '  ', ' ', [rfreplaceAll]);
+      S := ALStringReplaceA(S, #13, ' ', [rfreplaceAll]);
+      S := ALStringReplaceA(S, #10, ' ', [rfreplaceAll]);
+      S := ALStringReplaceA(S, #9,  ' ', [rfreplaceAll]);
+      While ALPosA('  ',S) > 0 Do
+        S := ALStringReplaceA(S, '  ', ' ', [rfreplaceAll]);
       S := ALTrim(S);
     end;
     If S <> '' then LstExtractedResourceText.add(S);
@@ -1868,12 +1869,12 @@ Var P1, P2: integer;
 
 Begin
   ALHideHtmlUnwantedTagForHTMLHandleTagfunct(HtmlContent, True);
-  HtmlContent := ALFastTagReplace(HtmlContent,
+  HtmlContent := ALFastTagReplaceA(HtmlContent,
                                   '<',
                                   '>',
                                   #2, {this char is not use in html}
                                   [rfreplaceall]);
-  HtmlContent := ALStringReplace(HtmlContent,
+  HtmlContent := ALStringReplaceA(HtmlContent,
                                  #1, {default ReplaceUnwantedTagCharBy use by ALHideHtmlUnwantedTagForHTMLHandleTagfunct ; this char is not use in html}
                                  '<',
                                  [rfreplaceall]);
@@ -1881,13 +1882,13 @@ Begin
 
   LstExtractedResourceText.Clear;
   P1 := 1;
-  P2 := ALpos(#2,HtmlContent);
+  P2 := ALPosA(#2,HtmlContent);
   While P2 > 0 do begin
     If P2 > P1 then _Add2LstExtractedResourceText(ALCopyStr(HtmlContent,
                                                             P1,
                                                             p2-P1));
     P1 := P2+1;
-    P2 := ALposEX(#2,HtmlContent, P1);
+    P2 := ALPosA(#2,HtmlContent, P1);
   end;
 end;
 
@@ -1902,7 +1903,7 @@ Begin
                       LstExtractedResourceText,
                       DecodeHTMLText);
     Result := ALTrim(
-                AlStringReplace(
+                ALStringReplaceA(
                   LstExtractedResourceText.Text,
                   #13#10,
                   ' ',

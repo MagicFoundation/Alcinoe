@@ -417,7 +417,7 @@ begin
     LLst.Text := aHeaderLine;
 
     For i := 0 to LLst.Count - 1 do
-      If ALSameText(ALTrim(LLst.Names[i]), aName) then begin
+      If ALSameTextA(ALTrim(LLst.Names[i]), aName) then begin
         Result := _RemoveQuoteStr(LLst.ValueFromIndex[i]);
         Break;
       end;
@@ -441,7 +441,7 @@ begin
 
     LFlag := False;
     For I := 0 to LLst.Count - 1 do
-      If AlSameText(ALTrim(LLst.Names[I]), aName) then begin
+      If ALSameTextA(ALTrim(LLst.Names[I]), aName) then begin
         LLst.ValueFromIndex[I] := '"' + AValue + '"';
         LFlag := True;
         Break;
@@ -746,7 +746,7 @@ end;
 {*****************************************************************}
 function TAlMultiPartBaseStream.GenerateUniqueBoundary: AnsiString;
 begin
-  Result := '---------------------------' + ALFormatDateTime('mmddyyhhnnsszzz', Now, ALDefaultFormatSettings);
+  Result := '---------------------------' + ALFormatDateTimeA('mmddyyhhnnsszzz', Now, ALDefaultFormatSettingsA);
 end;
 
 {*********************************************}
@@ -836,7 +836,7 @@ begin
   LLnBoundary := length(aBoundary);
 
   {Find the first Boundary}
-  P1 := AlPos('--'+aBoundary+#13#10, aDataStr);
+  P1 := ALPosA('--'+aBoundary+#13#10, aDataStr);
   LFlag := P1 > 0;
   Dec(P1,2);
 
@@ -852,15 +852,15 @@ begin
       P1 := P1 + LLnBoundary + 6;
 
       {Find the next Boundary}
-      P3 := AlPosEx(#13#10+'--'+aBoundary+#13#10, aDataStr, P1);
+      P3 := ALPosA(#13#10+'--'+aBoundary+#13#10, aDataStr, P1);
       if P3 <= 0 then Begin
         LFlag := False;
-        P3 := AlPosEx(#13#10+'--'+aBoundary+'--', aDataStr, P1);
+        P3 := ALPosA(#13#10+'--'+aBoundary+'--', aDataStr, P1);
         if P3 <= 0 then raise Exception.Create('Wrong MultiPart Content');
       end;
 
       {the the next 2 breakline that show the end of the header}
-      P2 := AlPosEx(#13#10#13#10, aDataStr, P1);
+      P2 := ALPosA(#13#10#13#10, aDataStr, P1);
       IF (P2 <= 0) or (P2 >= P3) then raise Exception.Create('Wrong MultiPart Content');
       RawHeaderText := alcopyStr(aDataStr, P1, P2 - 1);
 
@@ -1085,9 +1085,9 @@ end;
 {***************************************************************************************}
 procedure TAlMultiPartFormDataStream.AddField(const aFieldName, aFieldValue: AnsiString);
 Var LContent: TALMultiPartFormDataContent;
-    LStringStream: TALStringStream;
+    LStringStream: TALStringStreamA;
 begin
-  LStringStream:= TALStringStream.Create(aFieldValue);
+  LStringStream:= TALStringStreamA.Create(aFieldValue);
   LContent := TALMultiPartFormDataContent.Create;
   Try
     LContent.LoadDataFromStream(LStringStream);
@@ -1232,7 +1232,7 @@ begin
   Result := False;
   Lst := TALStringList.Create;
   Try
-    Lst.Text := AlStringReplace(ContentDisposition,';',#13#10,[RfReplaceAll]);
+    Lst.Text := ALStringReplaceA(ContentDisposition,';',#13#10,[RfReplaceAll]);
     For I := 0 to Lst.Count - 1 do
       If AlLowerCase(ALTrim(Lst[I])) = 'attachment' then begin
         Result := True;
@@ -1334,10 +1334,10 @@ end;
 {*************************************************************************************************}
 procedure TAlMultiPartMixedStream.AddInlineTextBase64Encode(const aContentType, aText: AnsiString);
 Var LContent: TALMultiPartMixedContent;
-    LStringStream: TALStringStream;
+    LStringStream: TALStringStreamA;
 begin
   LContent := TALMultiPartMixedContent.Create;
-  LStringStream := TALStringStream.Create(aText);
+  LStringStream := TALStringStreamA.Create(aText);
   Try
     LContent.LoadDataFromStreamBase64Encode(LStringStream);
     LContent.ContentType := aContentType;

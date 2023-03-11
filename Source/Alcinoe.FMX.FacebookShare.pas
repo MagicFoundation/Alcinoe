@@ -7,7 +7,7 @@ Setup (ANDROID)
 
 https://developers.facebook.com/docs/sharing/android/
 
-1) follow the step described in ALFmxFacebookCore
+1) follow the step described in Alcinoe.FMX.FacebookCore
 
 2) On android you just need to include the library
      * com.alcinoe:alcinoe-facebook-share:1.0.0
@@ -45,7 +45,7 @@ Setup (IOS)
 
 https://developers.facebook.com/docs/sharing/ios/
 
-1) follow the step described in ALFmxFacebookCore
+1) follow the step described in Alcinoe.FMX.FacebookCore
 
 *******************************************************************************)
 unit Alcinoe.FMX.FacebookShare;

@@ -140,7 +140,7 @@ begin
               end;
             end
             else If ((FileNameMask = '*') or
-                     ALMatchesMask(AnsiString(LSR.Name), FileNameMask))
+                     ALMatchesMaskA(AnsiString(LSR.Name), FileNameMask))
                     and
                     ((MinFileAge=ALNullDate) or
                      (LSR.TimeStamp < MinFileAge))
@@ -202,7 +202,7 @@ begin
                                                            SkipIfExists);
           end
           else If (FileNameMask = '*') or
-                  (ALMatchesMask(AnsiString(sr.Name), FileNameMask)) then begin
+                  (ALMatchesMaskA(AnsiString(sr.Name), FileNameMask)) then begin
             if SkipIfExists then begin
               if not ALFileExists(DestDirectory + AnsiString(sr.Name)) then
                 Result := CopyfileA(PAnsiChar(SrcDirectory + AnsiString(sr.Name)),
@@ -265,7 +265,7 @@ begin
     try
       if GetFileVersionInfoA(PAnsiChar(FileName), Wnd, InfoSize, VerBuf) then
         if VerQueryValue(VerBuf, '\', Pointer(FI), VerSize) then
-          Result := ALIntToStr(HiWord(FI.dwFileVersionMS)) +'.'+ ALIntToStr(LoWord(FI.dwFileVersionMS)) +'.'+ ALIntToStr(HiWord(FI.dwFileVersionLS)) +'.'+ ALIntToStr(LoWord(FI.dwFileVersionLS));
+          Result := ALIntToStrA(HiWord(FI.dwFileVersionMS)) +'.'+ ALIntToStrA(LoWord(FI.dwFileVersionMS)) +'.'+ ALIntToStrA(HiWord(FI.dwFileVersionLS)) +'.'+ ALIntToStrA(LoWord(FI.dwFileVersionLS));
     finally
       FreeMem(VerBuf);
     end;
@@ -290,7 +290,7 @@ function ALGetModuleName: ansiString;
 var ModName: array[0..MAX_PATH] of AnsiChar;
 begin
   SetString(Result, ModName, Winapi.Windows.GetModuleFileNameA(HInstance, ModName, SizeOf(ModName)));
-  If ALpos('\\?\',result) = 1 then delete(Result,1,4);
+  If ALPosA('\\?\',result) = 1 then delete(Result,1,4);
 end;
 {$ENDIF}
 
@@ -480,10 +480,10 @@ begin
      (Directory = '..') then raise EALException.CreateFmt('Wrong directory ("%s")', [Directory]);
 
   Result := True;
-  Directory := ALIncludeTrailingPathDelimiterU(Directory);
+  Directory := ALIncludeTrailingPathDelimiter(Directory);
   LIgnoreFilesLst := TalStringListU.Create;
   try
-    for I := 0 to length(IgnoreFiles) - 1 do LIgnoreFilesLst.Add(ALExcludeTrailingPathDelimiterU(IgnoreFiles[I]));
+    for I := 0 to length(IgnoreFiles) - 1 do LIgnoreFilesLst.Add(ALExcludeTrailingPathDelimiter(IgnoreFiles[I]));
     LIgnoreFilesLst.Duplicates := DupIgnore;
     LIgnoreFilesLst.Sorted := True;
     if System.sysutils.FindFirst(Directory + '*', faAnyFile	, LSR) = 0 then begin
@@ -561,8 +561,8 @@ Function AlCopyDirectoryU(SrcDirectory,
 var sr: TSearchRec;
 begin
   Result := True;
-  SrcDirectory := ALIncludeTrailingPathDelimiterU(SrcDirectory);
-  DestDirectory := ALIncludeTrailingPathDelimiterU(DestDirectory);
+  SrcDirectory := ALIncludeTrailingPathDelimiter(SrcDirectory);
+  DestDirectory := ALIncludeTrailingPathDelimiter(DestDirectory);
   If not DirectoryExists(DestDirectory) and (not Createdir(DestDirectory)) then begin
     result := False;
     exit;
@@ -581,7 +581,7 @@ begin
                                                             SkipIfExists);
           end
           else If (FileNameMask = '*') or
-                  (ALMatchesMaskU(sr.Name, FileNameMask)) then begin
+                  (ALMatchesMaskW(sr.Name, FileNameMask)) then begin
             if SkipIfExists then begin
               if not ALFileExistsU(DestDirectory + sr.Name) then
                 Result := CopyfileW(PChar(SrcDirectory + sr.Name),
@@ -607,13 +607,13 @@ function ALGetModuleNameU: String;
 var ModName: array[0..MAX_PATH] of Char;
 begin
   SetString(Result, ModName, Winapi.Windows.GetModuleFileNameW(HInstance, ModName, SizeOf(ModName)));
-  If ALposU('\\?\',result) = 1 then delete(Result,1,4);
+  If ALPosW('\\?\',result) = 1 then delete(Result,1,4);
 end;
 
 {********************************}
 function ALGetModulePathU: String;
 begin
-  Result:=ALExtractFilePathU(ALGetModuleNameU);
+  Result:=ALExtractFilePath(ALGetModuleNameU);
   If (length(result) > 0) and (result[length(result)] <> '\') then result := result + '\';
 end;
 

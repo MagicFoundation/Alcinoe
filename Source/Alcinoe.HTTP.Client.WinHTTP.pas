@@ -313,8 +313,8 @@ begin
                LPortNumber) then
         raise EALHTTPClientException.CreateFmt(CALHTTPCLient_MsgInvalidURL, [Value]);
       //-----
-      if ALSameText(LSchemeName, 'https') then LScheme := INTERNET_SCHEME_HTTPS
-      else if ALSameText(LSchemeName, 'http') then LScheme := INTERNET_SCHEME_HTTP
+      if ALSameTextA(LSchemeName, 'https') then LScheme := INTERNET_SCHEME_HTTPS
+      else if ALSameTextA(LSchemeName, 'http') then LScheme := INTERNET_SCHEME_HTTP
       else raise Exception.Createfmt('Unknown scheme (%s)',[LSchemeName]);
       //-----
       { Here we disconnect if a new URL comes in with a
@@ -364,7 +364,7 @@ procedure TALWinHttpClient.Connect;
   Begin
     If (FaccessType <> wHTTPat_NAMED_PROXY) or
        (ProxyParams.ProxyServer = '') then result := WINHTTP_NO_PROXY_NAME
-    else result := PWideChar(string(ProxyParams.ProxyServer) + ':' + String(ALIntToStr(ProxyParams.ProxyPort)));
+    else result := PWideChar(string(ProxyParams.ProxyServer) + ':' + String(ALIntToStrA(ProxyParams.ProxyPort)));
   end;
 
   {-----------------------------------------}

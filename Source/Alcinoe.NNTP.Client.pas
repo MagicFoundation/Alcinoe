@@ -115,6 +115,7 @@ Uses
   Winapi.Windows,
   System.SysUtils,
   System.Classes,
+  System.AnsiStrings,
   Alcinoe.WinSock,
   Alcinoe.StringUtils;
 
@@ -122,9 +123,9 @@ Uses
 Procedure ALNNTPClientSplitResponseLine(aResponse: AnsiString; ALst: TALStrings);
 Begin
   aResponse := ALTrim(aResponse); // 211 111225 12861 362539 nzn.fr.delphi
-  aResponse := AlStringReplace(aResponse,#9,' ',[RfReplaceAll]); // 211 111225 12861 362539 nzn.fr.delphi
-  While alPos('  ',aResponse) > 0 do aResponse := AlStringReplace(aResponse,'  ',' ',[RfReplaceAll]); // 211 111225 12861 362539 nzn.fr.delphi
-  aResponse := ALTrim(AlStringReplace(aResponse,' ',#13#10,[RfReplaceAll])); // 211
+  aResponse := ALStringReplaceA(aResponse,#9,' ',[RfReplaceAll]); // 211 111225 12861 362539 nzn.fr.delphi
+  While ALPosA('  ',aResponse) > 0 do aResponse := ALStringReplaceA(aResponse,'  ',' ',[RfReplaceAll]); // 211 111225 12861 362539 nzn.fr.delphi
+  aResponse := ALTrim(ALStringReplaceA(aResponse,' ',#13#10,[RfReplaceAll])); // 211
                                                                            // 111225
                                                                            // 12861
                                                                            // 362539
@@ -145,7 +146,7 @@ begin
      (Result[ln - 2] = '.') and
      (Result[ln - 3] = #10) and
      (Result[ln - 4] = #13) then delete(Result,LN-4,5);
-  P := AlPos(#13#10,Result);
+  P := ALPosA(#13#10,Result);
   If P > 0 then delete(Result,1,P+1)
   else result := '';
 
@@ -154,7 +155,7 @@ begin
   client must examine the first character of each line received, and
   for those beginning with a period, determine either that this is the
   end of the text or whether to collapse the doubled period to a single one.}
-  Result := AlStringReplace(Result,#13#10'..',#13#10'.', [RfReplaceAll]);
+  Result := ALStringReplaceA(Result,#13#10'..',#13#10'.', [RfReplaceAll]);
 end;
 
 {**************************************************************************************************************}
@@ -617,7 +618,7 @@ end;
  231 list of new newsgroups follows}
 Function TAlNNTPClient.NewsGroups(FromGMTDate: TdateTime; const distributions: AnsiString): AnsiString;
 begin
-  Result := SendCmd('NEWGROUPS ' + ALFormatDateTime('yymmdd" "hhnnss',FromGMTDate, ALDefaultFormatSettings) + ' GMT' + ALNNTPClientEnclosedInAngleBrackets(distributions), [231], True);
+  Result := SendCmd('NEWGROUPS ' + ALFormatDateTimeA('yymmdd" "hhnnss',FromGMTDate, ALDefaultFormatSettingsA) + ' GMT' + ALNNTPClientEnclosedInAngleBrackets(distributions), [231], True);
 end;
 
 {************************************************************************************************************}
@@ -683,7 +684,7 @@ end;
  230 list of new articles by message-id follows}
 Function TAlNNTPClient.NewNews(const Newsgroups: AnsiString; FromGMTDate: TdateTime; const distributions: AnsiString): AnsiString;
 begin
-  Result := SendCmd('NEWNEWS ' + newsgroups + ' ' + ALFormatDateTime('yymmdd" "hhnnss',FromGMTDate, ALDefaultFormatSettings) + ' GMT' + ALNNTPClientEnclosedInAngleBrackets(distributions), [230], True);
+  Result := SendCmd('NEWNEWS ' + newsgroups + ' ' + ALFormatDateTimeA('yymmdd" "hhnnss',FromGMTDate, ALDefaultFormatSettingsA) + ' GMT' + ALNNTPClientEnclosedInAngleBrackets(distributions), [230], True);
 end;
 
 {***************************************************************************************************************************************}
@@ -848,7 +849,7 @@ procedure TAlNNTPClient.ArticleByID(const ArticleID: AnsiString;
 Var P: integer;
 begin
   ArticleBodyContent := ALNNTPClientExtractTextFromMultilineResponse(ArticleByID(ArticleID));
-  P := AlPos(#13#10#13#10,ArticleBodyContent);
+  P := ALPosA(#13#10#13#10,ArticleBodyContent);
   If P <= 0 then raise Exception.Create('Bad formated article!');
   ArticleHeaderContent.RawHeaderText := AlcopyStr(ArticleBodyContent,1,P);
   Delete(ArticleBodyContent,1,P+3);
@@ -857,7 +858,7 @@ end;
 {*************************************************************************}
 function TAlNNTPClient.ArticleByNumber(ArticleNumber: Integer): AnsiString;
 begin
-  Result := SendCmd('ARTICLE ' + ALIntToStr(ArticleNumber),[220], true);
+  Result := SendCmd('ARTICLE ' + ALIntToStrA(ArticleNumber),[220], true);
 end;
 
 {**********************************************************************************************}
@@ -873,7 +874,7 @@ procedure TAlNNTPClient.ArticleByNumber(ArticleNumber: Integer;
 Var P: integer;
 begin
   ArticleBodyContent := ALNNTPClientExtractTextFromMultilineResponse(ArticleByNumber(ArticleNumber));
-  P := AlPos(#13#10#13#10,ArticleBodyContent);
+  P := ALPosA(#13#10#13#10,ArticleBodyContent);
   If P <= 0 then raise Exception.Create('Bad formated article!');
   ArticleHeaderContent.RawHeaderText := AlcopyStr(ArticleBodyContent,1,P);
   Delete(ArticleBodyContent,1,P+3);
@@ -896,7 +897,7 @@ procedure TAlNNTPClient.Article(var ArticleBodyContent: AnsiString; ArticleHeade
 Var P: integer;
 begin
   ArticleBodyContent := ALNNTPClientExtractTextFromMultilineResponse(Article);
-  P := AlPos(#13#10#13#10,ArticleBodyContent);
+  P := ALPosA(#13#10#13#10,ArticleBodyContent);
   If P <= 0 then raise Exception.Create('Bad formated article!');
   ArticleHeaderContent.RawHeaderText := AlcopyStr(ArticleBodyContent,1,P);
   Delete(ArticleBodyContent,1,P+3);
@@ -923,7 +924,7 @@ end;
 {**********************************************************************}
 function TAlNNTPClient.HeadByNumber(ArticleNumber: Integer): AnsiString;
 begin
-  Result := SendCmd('HEAD ' + ALIntToStr(ArticleNumber),[221], true);
+  Result := SendCmd('HEAD ' + ALIntToStrA(ArticleNumber),[221], true);
 end;
 
 {****************************************************************************************}
@@ -971,7 +972,7 @@ end;
 {**********************************************************************}
 function TAlNNTPClient.BodyByNumber(ArticleNumber: Integer): AnsiString;
 begin
-  Result := SendCmd('BODY ' + ALIntToStr(ArticleNumber),[222], true);
+  Result := SendCmd('BODY ' + ALIntToStrA(ArticleNumber),[222], true);
 end;
 
 {****************************************************************************************}
@@ -1015,7 +1016,7 @@ end;
 {**********************************************************************}
 function TAlNNTPClient.StatByNumber(ArticleNumber: Integer): AnsiString;
 begin
-  Result := SendCmd('STAT ' + ALIntToStr(ArticleNumber),[223], False); //223 10110 <23445@sdcsvax.ARPA> status
+  Result := SendCmd('STAT ' + ALIntToStrA(ArticleNumber),[223], False); //223 10110 <23445@sdcsvax.ARPA> status
 end;
 
 {**************************************************************************************}
@@ -1117,7 +1118,7 @@ end;
 {****************************************************************************************************}
 function TAlNNTPClient.XHDRByNumber(const HeaderName: AnsiString; ArticleNumber: integer): AnsiString;
 begin
-  Result := SendCmd('XHDR ' + HeaderName + ' ' + ALIntToStr(ArticleNumber), [221], True);
+  Result := SendCmd('XHDR ' + HeaderName + ' ' + ALIntToStrA(ArticleNumber), [221], True);
 end;
 
 {************************************************************************************************************************}

@@ -242,7 +242,7 @@ begin
 
   var LArrayList := TJArrayList.JavaClass.init(Length(aScopes));
   for var LString in aScopes do begin
-    var LScope := TJVKScope.JavaClass.valueOf(StringToJString(ALUppercaseU(LString)));
+    var LScope := TJVKScope.JavaClass.valueOf(StringToJString(AlUpperCase(LString)));
     LArrayList.add(LScope);
   end;
   var LCollection := TJCollection.Wrap((LArrayList as ILocalObject).GetObjectID);
@@ -420,7 +420,7 @@ begin
   else if (result <> nil) and (result.error <> nil) then
     allog(
       'TALVKontakteLogin.TSdkDelegate.vkSdkAccessAuthorizationFinishedWithResult.onError',
-      'ErrorCode: ' + ALIntToStrU(result.error.code) + ' | ' +
+      'ErrorCode: ' + ALIntToStrW(result.error.code) + ' | ' +
       'ErrorDescription: ' + NSStrToStr(result.error.localizedDescription),
       TalLogType.error)
   else
@@ -584,10 +584,10 @@ begin
     LIntent.setData(
       StrToJURI(
         'http://vk.com/share.php?'+
-          'url=' + ALHttpEncodeU(aLinkUrl)+'&'+    // (string) - URL of the page, the link to which should be published
-          'title=' + ALHttpEncodeU(aLinkText)+'&'+ // (string) - the title of the publication. If the parameter is not specified, the title
+          'url=' + ALHTTPEncode(aLinkUrl)+'&'+    // (string) - URL of the page, the link to which should be published
+          'title=' + ALHTTPEncode(aLinkText)+'&'+ // (string) - the title of the publication. If the parameter is not specified, the title
                                                    //            will be taken from the publication page automatically
-          'image='+ALHttpEncodeU(aLinkImageUrl))); // (string) - URL of the image to publish. If the parameter is not specified, the image
+          'image='+ALHTTPEncode(aLinkImageUrl))); // (string) - URL of the image to publish. If the parameter is not specified, the image
                                                    //            will be taken from the publication page automatically
           //'&noparse='                            // (boolean) - if true is specified in this parameter , the VKontakte server will not make
                                                    //             an additional request to download the missing information from the published page. If
@@ -607,10 +607,10 @@ begin
     result := True;
     var LURL := StrToNSUrl(
                   'http://vk.com/share.php?'+
-                    'url=' + ALHttpEncodeU(aLinkUrl)+'&'+    // (string) - URL of the page, the link to which should be published
-                    'title=' + ALHttpEncodeU(aLinkText)+'&'+ // (string) - the title of the publication. If the parameter is not specified, the title
+                    'url=' + ALHTTPEncode(aLinkUrl)+'&'+    // (string) - URL of the page, the link to which should be published
+                    'title=' + ALHTTPEncode(aLinkText)+'&'+ // (string) - the title of the publication. If the parameter is not specified, the title
                                                              //            will be taken from the publication page automatically
-                    'image='+ALHttpEncodeU(aLinkImageUrl));  // (string) - URL of the image to publish. If the parameter is not specified, the image
+                    'image='+ALHTTPEncode(aLinkImageUrl));  // (string) - URL of the image to publish. If the parameter is not specified, the image
                                                              //            will be taken from the publication page automatically
                     //'&noparse='                            // (boolean) - if true is specified in this parameter , the VKontakte server will not make
                                                              //             an additional request to download the missing information from the published page. If
@@ -663,7 +663,7 @@ begin
       ALLog(
         'ALVKontakteApplicationEventMessageHandler',
         'Event: OpenURL | '+
-        'ALVKontakteInitialised: '+ALBoolToStrU(_ALVKontakteInitialised)+' | '+
+        'ALVKontakteInitialised: '+ALBoolToStrW(_ALVKontakteInitialised)+' | '+
         'Url: ' + Lcontext.URL,
         TalLogType.VERBOSE);
       {$ENDIF}

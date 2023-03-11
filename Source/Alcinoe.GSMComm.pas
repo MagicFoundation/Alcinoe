@@ -83,6 +83,7 @@ implementation
 
 uses
   System.SysUtils,
+  System.AnsiStrings,
   Alcinoe.Common,
   Alcinoe.StringUtils;
 
@@ -306,7 +307,7 @@ Begin
     If not InternalLookupChar(aMessage[i],
                               Result,
                               LResultCurrentIndex) then begin
-      LWideString := ALWideRemoveDiacritic(aMessage[i]);
+      LWideString := ALRemoveDiacritic(aMessage[i]);
       If (LWideString = '') or
          (not InternalLookupChar(LWideString[1],
                                  Result,
@@ -608,8 +609,8 @@ begin
     LLength := 1 + (LLength Div 2); {Length of the SMSC information in octect}
 
     {Write the Length of the SMSC information}
-    If LLength < 10 then result := '0' + ALIntToStr(LLength)
-    else result := ALIntToStr(LLength);
+    If LLength < 10 then result := '0' + ALIntToStrA(LLength)
+    else result := ALIntToStrA(LLength);
 
     {write the Type-of-address of the SMSC. (91 means international format of the phone number)}
     result := result + '91';
@@ -633,7 +634,7 @@ begin
   result := result + '00';
 
   {Write the Address-Length. Length of phone number (11) }
-  result := result + ALFormat ('%02.2x', [Length(aSMSAddress)]);
+  result := result + ALFormatA ('%02.2x', [Length(aSMSAddress)]);
 
   {Write the Type-of-Address. (91 indicates international format of the phone number).}
   result := result + '91';
@@ -661,11 +662,11 @@ begin
   result := result + 'AA';
 
   {Length of SMS message converted to HEX}
-  result := result + ALFormat ('%02.2x', [Length(aMessage)]);
+  result := result + ALFormatA ('%02.2x', [Length(aMessage)]);
 
   {Add SMSMessage after transformation to PDU string}
   S := InternalStringToPDU(aMessage);
-  for I := 1 to Length(S) do result := result + ALIntToHex(Byte(S[I]), 2);
+  for I := 1 to Length(S) do result := result + ALIntToHexA(Byte(S[I]), 2);
 end;
 
 {****************************************}
@@ -773,7 +774,7 @@ begin
   //First octet of this SMS-DELIVER message.
   //Bit no	  7	       6	      5	       4	        3	       2	     1	    0
   //Name	  TP-RP	  TP-UDHI  	TP-SRI	(unused)	(unused)	TP-MMS	TP-MTI	TP-MTI
-  LFirstOctet := ALIntToBit(ALStrToInt('$'+AlCopyStr(aPDUMessage,I,2)), 8);
+  LFirstOctet := ALIntToBitA(ALStrToInt('$'+AlCopyStr(aPDUMessage,I,2)), 8);
   inc(I,2); //0B913386184131F900006040722172728007F43AA87D0AC301
 
   //Address-Length. Length of the sender number (0B hex = 11 dec)
@@ -796,7 +797,7 @@ begin
   inc(I,2); //006040722172728007F43AA87D0AC301
 
   //TP-DCS Data coding scheme
-  LDSCOctet := ALIntToBit(ALStrToInt('$'+AlCopyStr(aPDUMessage,I,2)), 8);
+  LDSCOctet := ALIntToBitA(ALStrToInt('$'+AlCopyStr(aPDUMessage,I,2)), 8);
   inc(I,2); //6040722172728007F43AA87D0AC301
 
   //TP-SCTS. Time stamp (semi-octets)
@@ -1020,7 +1021,7 @@ begin
   If not ALTryStrToInt(str,LLength) then LLength := 0;
   LLength := (Length(aMessage) div 2) - LLength - 1;
 
-  SendCmd('AT+CMGS='+ALIntToStr(LLength)+#13);
+  SendCmd('AT+CMGS='+ALIntToStrA(LLength)+#13);
   GetATCmdlinefeedResponse('AT+CMGS command error!');
   SendCmd(aMessage + #26);
   GetATCmdOkResponse('AT+CMGS command error!');
@@ -1090,23 +1091,23 @@ procedure TAlGSMComm.ListAllSMSinPDUMode(aLstMessage: TALStrings; MemStorage: An
     while LStat <= 1 do begin
 
       {Receive Message}
-      SendCmd('AT+CMGL='+alinttostr(LStat)+#13);
+      SendCmd('AT+CMGL='+ALIntToStrA(LStat)+#13);
       GetATCmdOkResponse(LStr, 'AT+CMGL command error!');
 
       {fullfill aLstMessage}
-      P1 := AlPos('+CMGL: ',LStr);
+      P1 := ALPosA('+CMGL: ',LStr);
       While P1 > 0 do begin
         Inc(P1,7);
-        P2 := AlPosEx(',',LStr,P1);
+        P2 := ALPosA(',',LStr,P1);
         If P2 <= 0 then raise EALException.Create('AT+CMGL parse error!');
         LIndex := ALStrToInt(AlCopyStr(LStr,P1,P2-P1));
-        P1 := ALPosEx(#13#10,LStr,P2);
+        P1 := ALPosA(#13#10,LStr,P2);
         If P1 <= 0 then raise EALException.Create('AT+CMGL parse error!');
         P1 := P1 + 2;
-        P2 := ALPosEx(#13#10,LStr,P1);
+        P2 := ALPosA(#13#10,LStr,P1);
         If P2 <= 0 then raise EALException.Create('AT+CMGL parse error!');
-        if aLstMessage.IndexOfName(ALIntToStr(LIndex)) < 0 then aLstMessage.Add(ALIntToStr(LIndex)+aLstMessage.NameValueSeparator+ALTrim(AlCopyStr(LStr,P1,P2-P1)));
-        P1 := AlPosEx('+CMGL: ',LStr,P2);
+        if aLstMessage.IndexOfName(ALIntToStrA(LIndex)) < 0 then aLstMessage.Add(ALIntToStrA(LIndex)+aLstMessage.NameValueSeparator+ALTrim(AlCopyStr(LStr,P1,P2-P1)));
+        P1 := ALPosA('+CMGL: ',LStr,P2);
       end;
       inc(LStat);
 
@@ -1156,7 +1157,7 @@ begin
   GetATCmdOkResponse('AT+CPMS command error!');
 
   {Message Format}
-  SendCmd('AT+CMGD='+ALIntToStr(aIndex)+#13);
+  SendCmd('AT+CMGD='+ALIntToStrA(aIndex)+#13);
   GetATCmdOkResponse('AT+CMGD command error!');
 end;
 
@@ -1203,9 +1204,9 @@ Var LResponse: AnsiString;
 Begin
   LStart := GetTickCount;
   LResponse := alUppercase(GetResponse);
-  While (Alpos('>'#32, LResponse) <= 0) do Begin
+  While (ALPosA('>'#32, LResponse) <= 0) do Begin
     if (LStart + Ftimeout) < GetTickCount then Raise EALException.Create('Timeout!')
-    else if (Alpos(#13#10'ERROR'#13#10, LResponse) > 0) then raise EALException.Create(ErrorMsg + ' (' + ALTrim(AlStringReplace(LResponse, #13#10, ' ', [rfReplaceALL])) + ')' );
+    else if (ALPosA(#13#10'ERROR'#13#10, LResponse) > 0) then raise EALException.Create(ErrorMsg + ' (' + ALTrim(ALStringReplaceA(LResponse, #13#10, ' ', [rfReplaceALL])) + ')' );
     LResponse := LResponse + alUppercase(GetResponse);
   end;
 end;
@@ -1226,10 +1227,10 @@ Var LStart: Cardinal;
 Begin
   LStart := GetTickCount;
   Response := alUppercase(GetResponse);
-  While (Alpos(#13#10'OK'#13#10, Response) <= 0) do Begin
+  While (ALPosA(#13#10'OK'#13#10, Response) <= 0) do Begin
     if (LStart + Ftimeout) < GetTickCount then Raise EALException.Create('Timeout!')
-    else if (Alpos(#13#10'ERROR'#13#10, Response) > 0) or ALMatchesMask(Response, '*'#13#10'+CMS ERROR: *'#13#10'*') then begin
-      P1 := AlPos(#13#10'+CMS ERROR:', Response);
+    else if (ALPosA(#13#10'ERROR'#13#10, Response) > 0) or ALMatchesMaskA(Response, '*'#13#10'+CMS ERROR: *'#13#10'*') then begin
+      P1 := ALPosA(#13#10'+CMS ERROR:', Response);
       if P1 > 0 then LTmpErrorMsg := ErrorMsg + ' (' +ALTrim(AlCopyStr(Response, P1, Maxint)) + ')' // +CMS ERROR: 38
       else LTmpErrorMsg := ErrorMsg;
       raise EALException.Create(LTmpErrorMsg);

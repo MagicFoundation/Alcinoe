@@ -517,8 +517,8 @@ function  ALIfThen(AValue: Boolean; const ATrue: UInt64; const AFalse: UInt64 = 
 function  ALIfThen(AValue: Boolean; const ATrue: Single; const AFalse: Single = 0): Single; overload; inline;
 function  ALIfThen(AValue: Boolean; const ATrue: Double; const AFalse: Double = 0): Double; overload; inline;
 function  ALIfThen(AValue: Boolean; const ATrue: Extended; const AFalse: Extended = 0): Extended; overload; inline;
-function  ALIfThen(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString; overload; inline;
-function  ALIfThen(AValue: Boolean; const ATrue: String; AFalse: String = ''): String; overload; inline;
+function  ALIfThenA(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString; overload; inline;
+function  ALIfThenW(AValue: Boolean; const ATrue: String; AFalse: String = ''): String; overload; inline;
 
 {$IFDEF MSWINDOWS}
 {$IFNDEF ALCompilerVersionSupported}
@@ -716,8 +716,8 @@ begin
             {$IFDEF DEBUG}
             //ALLog(
             //  ClassName + '.Execute',
-            //  'Request.Priority:' + AlinttostrU(LWorkerThreadRequest.Priority) + ' | ' +
-            //  'PriorityStartingPoint:' + AlinttostrU(FWorkerThreadPool.PriorityStartingPoint) + ' | ' +
+            //  'Request.Priority:' + ALIntToStrW(LWorkerThreadRequest.Priority) + ' | ' +
+            //  'PriorityStartingPoint:' + ALIntToStrW(FWorkerThreadPool.PriorityStartingPoint) + ' | ' +
             //  'PriorityDirection:' + TRttiEnumerationType.GetName(FWorkerThreadPool.PriorityDirection),
             //  TalLogType.verbose);
             {$ENDIF}
@@ -2364,21 +2364,21 @@ begin
   Try
     if aPrependTimeStamp and aPrependThreadID then begin
       for i := _ALCallStackCustomLogsUCurrentIndex downto 0 do
-        Result := Result + ALFormatDateTimeU('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsU) + ' [' + ALIntToStrU(_ALCallStackCustomLogsU[i].ThreadID) + ']: ' + _ALCallStackCustomLogsU[i].log + #13#10;
+        Result := Result + ALFormatDateTimeW('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsW) + ' [' + ALIntToStrW(_ALCallStackCustomLogsU[i].ThreadID) + ']: ' + _ALCallStackCustomLogsU[i].log + #13#10;
       for i := _ALCallStackCustomLogsU.Count - 1 downto _ALCallStackCustomLogsUCurrentIndex + 1 do
-        Result := Result + ALFormatDateTimeU('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsU) + ' [' + ALIntToStrU(_ALCallStackCustomLogsU[i].ThreadID) + ']: ' + _ALCallStackCustomLogsU[i].log + #13#10;
+        Result := Result + ALFormatDateTimeW('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsW) + ' [' + ALIntToStrW(_ALCallStackCustomLogsU[i].ThreadID) + ']: ' + _ALCallStackCustomLogsU[i].log + #13#10;
     end
     else if aPrependTimeStamp then begin
       for i := _ALCallStackCustomLogsUCurrentIndex downto 0 do
-        Result := Result + ALFormatDateTimeU('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsU) + ': ' + _ALCallStackCustomLogsU[i].log + #13#10;
+        Result := Result + ALFormatDateTimeW('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsW) + ': ' + _ALCallStackCustomLogsU[i].log + #13#10;
       for i := _ALCallStackCustomLogsU.Count - 1 downto _ALCallStackCustomLogsUCurrentIndex + 1 do
-        Result := Result + ALFormatDateTimeU('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsU) + ': ' + _ALCallStackCustomLogsU[i].log + #13#10;
+        Result := Result + ALFormatDateTimeW('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsW) + ': ' + _ALCallStackCustomLogsU[i].log + #13#10;
     end
     else if aPrependThreadID then begin
       for i := _ALCallStackCustomLogsUCurrentIndex downto 0 do
-        Result := Result + '[' + ALIntToStrU(_ALCallStackCustomLogsU[i].ThreadID) + ']: ' + _ALCallStackCustomLogsU[i].log + #13#10;
+        Result := Result + '[' + ALIntToStrW(_ALCallStackCustomLogsU[i].ThreadID) + ']: ' + _ALCallStackCustomLogsU[i].log + #13#10;
       for i := _ALCallStackCustomLogsU.Count - 1 downto _ALCallStackCustomLogsUCurrentIndex + 1 do
-        Result := Result + '[' + ALIntToStrU(_ALCallStackCustomLogsU[i].ThreadID) + ']: ' + _ALCallStackCustomLogsU[i].log + #13#10;
+        Result := Result + '[' + ALIntToStrW(_ALCallStackCustomLogsU[i].ThreadID) + ']: ' + _ALCallStackCustomLogsU[i].log + #13#10;
     end
     else begin
       for i := _ALCallStackCustomLogsUCurrentIndex downto 0 do
@@ -2389,7 +2389,7 @@ begin
   Finally
     Tmonitor.exit(_ALCallStackCustomLogsU);
   End;
-  Result := ALTrimU(Result);
+  Result := ALTrim(Result);
 end;
 
 {*********************************************************************************************************}
@@ -2413,7 +2413,7 @@ begin
     var LMsg: String;
     if Msg <> '' then LMsg := msg
     else LMsg := '<empty>';
-    if ThreadID <> MainThreadID then LMsg := '['+alinttostrU(ThreadID)+'] ' + LMsg;
+    if ThreadID <> MainThreadID then LMsg := '['+ALIntToStrW(ThreadID)+'] ' + LMsg;
     case _type of
       TalLogType.VERBOSE: TJLog.JavaClass.v(StringToJString(Tag), StringToJString(LMsg));
       TalLogType.DEBUG: TJLog.JavaClass.d(StringToJString(Tag), StringToJString(LMsg));
@@ -2427,13 +2427,13 @@ begin
     if msg <> '' then LMsg := Tag + ' => ' + msg
     else LMsg := Tag;
     var LThreadID: String;
-    if ThreadID <> MainThreadID then LThreadID := '['+alinttostrU(ThreadID)+']'
+    if ThreadID <> MainThreadID then LThreadID := '['+ALIntToStrW(ThreadID)+']'
     else LThreadID := '';
     //On iOS NSLog is limited to 1024 Bytes so if the
     //message is > 1024 bytes split it
     var P: integer := 1;
     while P <= length(LMsg) do begin
-      var LMsgPart := ALcopyStrU(LMsg, P, 950); // to stay safe
+      var LMsgPart := ALCopyStr(LMsg, P, 950); // to stay safe
       inc(P, 950);
       case _type of
         TalLogType.VERBOSE: NSLog(StringToID('[V]'+LThreadID+' ' + LMsgPart));
@@ -2512,8 +2512,8 @@ Begin
   result := (LTotal - (LBorder*2) - LObject) div 2 + LBorder;
 End;
 
-{***********************************************************************************************}
-function ALIfThen(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString;
+{************************************************************************************************}
+function ALIfThenA(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString;
 begin
   if AValue then
     Result := ATrue
@@ -2521,8 +2521,8 @@ begin
     Result := AFalse;
 end;
 
-{***********************************************************************************}
-function ALIfThen(AValue: Boolean; const ATrue: String; AFalse: String = ''): String;
+{************************************************************************************}
+function ALIfThenW(AValue: Boolean; const ATrue: String; AFalse: String = ''): String;
 begin
   if AValue then
     Result := ATrue
@@ -2615,7 +2615,7 @@ var LDynamicTimeZoneInformations: Tarray<TDynamicTimeZoneInformation>;
 begin
   LDynamicTimeZoneInformations := ALGetDynamicTimeZoneInformations;
   for I := low(LDynamicTimeZoneInformations) to High(LDynamicTimeZoneInformations) do
-    if ALSameTextU(LDynamicTimeZoneInformations[i].TimeZoneKeyName, aTimeZoneKeyName) then begin
+    if ALSameTextW(LDynamicTimeZoneInformations[i].TimeZoneKeyName, aTimeZoneKeyName) then begin
       result := LDynamicTimeZoneInformations[i];
       Exit;
     end;
@@ -2648,7 +2648,7 @@ var LDynamicTimeZoneInformations: Tarray<TDynamicTimeZoneInformation>;
 begin
   LDynamicTimeZoneInformations := ALGetDynamicTimeZoneInformations;
   for I := low(LDynamicTimeZoneInformations) to High(LDynamicTimeZoneInformations) do begin
-    if ALSameTextU(LDynamicTimeZoneInformations[i].TimeZoneKeyName, aTimeZoneKeyName) then begin
+    if ALSameTextW(LDynamicTimeZoneInformations[i].TimeZoneKeyName, aTimeZoneKeyName) then begin
       DecodeDateTime(
         aLocalDateTime,
         LLocalTime.wYear,
@@ -2724,7 +2724,7 @@ var LDynamicTimeZoneInformations: Tarray<TDynamicTimeZoneInformation>;
 begin
   LDynamicTimeZoneInformations := ALGetDynamicTimeZoneInformations;
   for I := low(LDynamicTimeZoneInformations) to High(LDynamicTimeZoneInformations) do begin
-    if ALSameTextU(LDynamicTimeZoneInformations[i].TimeZoneKeyName, aTimeZoneKeyName) then begin
+    if ALSameTextW(LDynamicTimeZoneInformations[i].TimeZoneKeyName, aTimeZoneKeyName) then begin
       DecodeDateTime(
         aUTCDateTime,
         LSystemTime.wYear,

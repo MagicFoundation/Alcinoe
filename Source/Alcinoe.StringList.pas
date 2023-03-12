@@ -535,8 +535,6 @@ Type
     property OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
   end;
 
-type
-
   {------------------}
   TALStringsU = class;
 

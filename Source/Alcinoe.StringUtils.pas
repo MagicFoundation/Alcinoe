@@ -421,7 +421,7 @@ function  ALCopyStr(
             const aOffset: integer = 1;
             const aRaiseExceptionIfNotFound: Boolean = True): String; overload;
 function  ALStringReplaceA(const Source, OldPattern, NewPattern: AnsiString; Flags: TReplaceFlags): AnsiString; inline;
-function  ALStringReplaceW(const S, OldPattern, NewPattern: string; Flags: TReplaceFlags): string; inline;
+function  ALStringReplaceW(const Source, OldPattern, NewPattern: string; Flags: TReplaceFlags): string; inline;
 function  ALRandomStrA(const aLength: Longint; const aCharset: Array of ansiChar): AnsiString; overload;
 function  ALRandomStrA(const aLength: Longint): AnsiString; overload;
 function  ALRandomStrW(const aLength: Longint; const aCharset: Array of Char): String; overload;
@@ -7442,10 +7442,10 @@ begin
   result := System.AnsiStrings.StringReplace(Source, OldPattern, NewPattern, Flags);
 end;
 
-{************************************************************************************************}
-function  ALStringReplaceW(const S, OldPattern, NewPattern: string; Flags: TReplaceFlags): string;
+{*****************************************************************************************************}
+function  ALStringReplaceW(const Source, OldPattern, NewPattern: string; Flags: TReplaceFlags): string;
 begin
-  result := system.sysutils.StringReplace(S, OldPattern, NewPattern, Flags);
+  result := system.sysutils.StringReplace(Source, OldPattern, NewPattern, Flags);
 end;
 
 {********************************************************************************************}

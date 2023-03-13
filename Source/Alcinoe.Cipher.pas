@@ -5908,7 +5908,7 @@ begin
     //Making the access token request
     var LWinHttpClient := TAlWinHTTPClient.Create;
     var LRequestFields := TALStringListA.Create;
-    var LJsonDoc := TalJsonDocument.Create;
+    var LJsonDoc := TALJSONDocumentA.Create;
     try
 
       //init the aWinHttpClient

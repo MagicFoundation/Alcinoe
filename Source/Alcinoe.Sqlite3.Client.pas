@@ -24,7 +24,7 @@ Type
                                                                       const ViewTag: AnsiString;
                                                                       ExtData: Pointer;
                                                                       Var Continue: Boolean);
-  TalSqlite3ClientSelectJSONDataOnNewRowFunct = reference to Procedure(JSONRowData: TALJSONNode;
+  TalSqlite3ClientSelectJSONDataOnNewRowFunct = reference to Procedure(JSONRowData: TALJSONNodeA;
                                                                        const ViewTag: AnsiString;
                                                                        ExtData: Pointer;
                                                                        Var Continue: Boolean);
@@ -86,7 +86,7 @@ Type
                          First: Integer; // used only if value is > 0
                          CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
                                                    // cache or not. Values <= 0 deactivate the cache
-                         JSONDATA: TALJSONNode;
+                         JSONDATA: TALJSONNodeA;
                          OnNewRowFunct: TalSqlite3ClientSelectJSONDataOnNewRowFunct;
                          ExtData: Pointer); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
@@ -101,12 +101,12 @@ Type
                          const RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
-                         JsonDATA: TalJsonNode); overload; virtual;
+                         JsonDATA: TALJSONNodeA); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          const RowTag: AnsiString;
-                         JsonDATA: TalJsonNode); overload; virtual;
+                         JsonDATA: TALJSONNodeA); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
-                         JsonDATA: TalJsonNode); overload; virtual;
+                         JsonDATA: TALJSONNodeA); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          const RowTag: AnsiString;
                          const ViewTag: AnsiString;
@@ -227,7 +227,7 @@ Type
                          First: Integer; // used only if value is > 0
                          CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
                                                    // cache or not. Values <= 0 deactivate the cache
-                         JSONDATA: TALJSONNode;
+                         JSONDATA: TALJSONNodeA;
                          OnNewRowFunct: TalSqlite3ClientSelectJSONDataOnNewRowFunct;
                          ExtData: Pointer;
                          const ConnectionHandle: SQLite3 = nil); overload; virtual;
@@ -245,14 +245,14 @@ Type
                          const RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
-                         JsonDATA: TalJsonNode;
+                         JsonDATA: TALJSONNodeA;
                          const ConnectionHandle: SQLite3 = nil); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          const RowTag: AnsiString;
-                         JsonDATA: TalJsonNode;
+                         JsonDATA: TALJSONNodeA;
                          const ConnectionHandle: SQLite3 = nil); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
-                         JsonDATA: TalJsonNode;
+                         JsonDATA: TALJSONNodeA;
                          const ConnectionHandle: SQLite3 = nil); overload; virtual;
     Procedure SelectData(const SQL: AnsiString;
                          const RowTag: AnsiString;
@@ -652,7 +652,7 @@ Procedure TalSqlite3Client.SelectData(const SQL: AnsiString;
                                       First: Integer; // used only if value is > 0
                                       CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
                                                                 // cache or not. Values <= 0 deactivate the cache
-                                      JSONDATA: TALJSONNode;
+                                      JSONDATA: TALJSONNodeA;
                                       OnNewRowFunct: TalSqlite3ClientSelectJSONDataOnNewRowFunct;
                                       ExtData: Pointer);
 
@@ -661,13 +661,13 @@ Var LStmt: SQLite3_Stmt;
     LColumnCount: Integer;
     LColumnIndex: integer;
     LColumnNames: Array of AnsiString;
-    LNewRec: TalJsonNode;
-    LValueRec: TalJsonNode;
-    LViewRec: TalJsonNode;
+    LNewRec: TALJSONNodeA;
+    LValueRec: TALJSONNodeA;
+    LViewRec: TALJSONNodeA;
     LRecIndex: integer;
     LRecAdded: integer;
     LContinue: Boolean;
-    LJsonDocument: TalJsonDocument;
+    LJsonDocument: TALJSONDocumentA;
     LUpdateRowTagByFieldValue: Boolean;
     LStopWatch: TStopWatch;
     LCacheKey: ansiString;
@@ -685,7 +685,7 @@ begin
   //clear the JsonDATA
   if assigned(JsonDATA) then LJsonDocument := Nil
   else begin
-    LJsonDocument := TALJsonDocument.create;
+    LJsonDocument := TALJSONDocumentA.create;
     JsonDATA := LJsonDocument.Node;
   end;
 
@@ -885,7 +885,7 @@ procedure TalSqlite3Client.SelectData(const SQL: AnsiString;
                                       const RowTag: AnsiString;
                                       Skip: Integer;
                                       First: Integer;
-                                      JsonDATA: TalJsonNode);
+                                      JsonDATA: TALJSONNodeA);
 begin
   SelectData(SQL,
              RowTag,
@@ -901,7 +901,7 @@ end;
 {**********************************************************}
 procedure TalSqlite3Client.SelectData(const SQL: AnsiString;
                                       const RowTag: AnsiString;
-                                      JsonDATA: TalJsonNode);
+                                      JsonDATA: TALJSONNodeA);
 begin
   SelectData(SQL,
              RowTag,
@@ -916,7 +916,7 @@ end;
 
 {**********************************************************}
 procedure TalSqlite3Client.SelectData(const SQL: AnsiString;
-                                      JsonDATA: TalJsonNode);
+                                      JsonDATA: TALJSONNodeA);
 begin
   SelectData(SQL,
              '', // RowTag,
@@ -1718,7 +1718,7 @@ Procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                     First: Integer; // used only if value is > 0
                                                     CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
                                                                               // cache or not. Values <= 0 deactivate the cache
-                                                    JSONDATA: TALJSONNode;
+                                                    JSONDATA: TALJSONNodeA;
                                                     OnNewRowFunct: TalSqlite3ClientSelectJSONDataOnNewRowFunct;
                                                     ExtData: Pointer;
                                                     const ConnectionHandle: SQLite3 = nil);
@@ -1728,15 +1728,15 @@ Var LStmt: SQLite3_Stmt;
     LColumnCount: Integer;
     LColumnIndex: integer;
     LColumnNames: Array of AnsiString;
-    LNewRec: TalJsonNode;
-    LValueRec: TalJsonNode;
-    LViewRec: TalJsonNode;
+    LNewRec: TALJSONNodeA;
+    LValueRec: TALJSONNodeA;
+    LViewRec: TALJSONNodeA;
     LRecIndex: integer;
     LRecAdded: integer;
     LTmpConnectionHandle: SQLite3;
     LOwnConnection: Boolean;
     LContinue: Boolean;
-    LJsonDocument: TalJsonDocument;
+    LJsonDocument: TALJSONDocumentA;
     LUpdateRowTagByFieldValue: Boolean;
     LStopWatch: TStopWatch;
     LCacheKey: ansiString;
@@ -1751,7 +1751,7 @@ begin
   //clear the JsonDATA
   if assigned(JsonDATA) then LJsonDocument := Nil
   else begin
-    LJsonDocument := TALJsonDocument.create;
+    LJsonDocument := TALJSONDocumentA.create;
     JsonDATA := LJsonDocument.Node;
   end;
 
@@ -1976,7 +1976,7 @@ procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                     const RowTag: AnsiString;
                                                     Skip: Integer;
                                                     First: Integer;
-                                                    JsonDATA: TalJsonNode;
+                                                    JsonDATA: TALJSONNodeA;
                                                     const ConnectionHandle: SQLite3 = nil);
 begin
   SelectData(SQL,
@@ -1994,7 +1994,7 @@ end;
 {************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                     const RowTag: AnsiString;
-                                                    JsonDATA: TalJsonNode;
+                                                    JsonDATA: TALJSONNodeA;
                                                     const ConnectionHandle: SQLite3 = nil);
 begin
   SelectData(SQL,
@@ -2011,7 +2011,7 @@ end;
 
 {************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.SelectData(const SQL: AnsiString;
-                                                    JsonDATA: TalJsonNode;
+                                                    JsonDATA: TALJSONNodeA;
                                                     const ConnectionHandle: SQLite3 = nil);
 begin
   SelectData(SQL,

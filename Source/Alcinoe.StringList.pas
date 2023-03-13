@@ -2253,8 +2253,8 @@ begin
   if Updating then Changing else Changed;
 end;
 
-{*****************************************************************************************}
-function ALStringListCompareStrings(List: TALStringListA; Index1, Index2: Integer): Integer;
+{*******************************************************************************************}
+function ALStringListCompareStringsA(List: TALStringListA; Index1, Index2: Integer): Integer;
 begin
   Result := List.CompareStrings(List.FList[Index1].FString,
                                 List.FList[Index2].FString);
@@ -2263,7 +2263,7 @@ end;
 {***************************}
 procedure TALStringListA.Sort;
 begin
-  CustomSort(ALStringListCompareStrings);
+  CustomSort(ALStringListCompareStringsA);
 end;
 
 {********************************************************************}
@@ -3250,8 +3250,8 @@ begin
   if Updating then Changing else Changed;
 end;
 
-{*********************************************************************************************}
-function ALNVStringListCompareStrings(List: TALNVStringListA; Index1, Index2: Integer): Integer;
+{***********************************************************************************************}
+function ALNVStringListCompareStringsA(List: TALNVStringListA; Index1, Index2: Integer): Integer;
 begin
   Result := List.CompareStrings(List.FList[Index1].FName,
                                 List.FList[Index2].FName);  // The return value is less than 0 if List.FList[Index1].FName < List.FList[Index2].FName, 0 if List.FList[Index1].FName = List.FList[Index2].FName, or greater than 0 if List.FList[Index1].FName > List.FList[Index2].FName.
@@ -3274,7 +3274,7 @@ end;
 {*****************************}
 procedure TALNVStringListA.Sort;
 begin
-  CustomSort(ALNVStringListCompareStrings);
+  CustomSort(ALNVStringListCompareStringsA);
 end;
 
 {************************************************************************}
@@ -6498,7 +6498,7 @@ begin
 end;
 
 {*******************************************************************************************}
-function ALStringListCompareStringsU(List: TALStringListW; Index1, Index2: Integer): Integer;
+function ALStringListCompareStringsW(List: TALStringListW; Index1, Index2: Integer): Integer;
 begin
   Result := List.CompareStrings(List.FList[Index1].FString,
                                 List.FList[Index2].FString);
@@ -6507,7 +6507,7 @@ end;
 {****************************}
 procedure TALStringListW.Sort;
 begin
-  CustomSort(ALStringListCompareStringsU);
+  CustomSort(ALStringListCompareStringsW);
 end;
 
 {**********************************************************************}
@@ -7481,7 +7481,7 @@ begin
 end;
 
 {***********************************************************************************************}
-function ALNVStringListCompareStringsU(List: TALNVStringListW; Index1, Index2: Integer): Integer;
+function ALNVStringListCompareStringsW(List: TALNVStringListW; Index1, Index2: Integer): Integer;
 begin
   Result := List.CompareStrings(List.FList[Index1].FName,
                                 List.FList[Index2].FName);  // The return value is less than 0 if List.FList[Index1].FName < List.FList[Index2].FName, 0 if List.FList[Index1].FName = List.FList[Index2].FName, or greater than 0 if List.FList[Index1].FName > List.FList[Index2].FName.
@@ -7504,7 +7504,7 @@ end;
 {******************************}
 procedure TALNVStringListW.Sort;
 begin
-  CustomSort(ALNVStringListCompareStringsU);
+  CustomSort(ALNVStringListCompareStringsW);
 end;
 
 {**************************************************************************}

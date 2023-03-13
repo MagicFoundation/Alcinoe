@@ -7789,8 +7789,8 @@ begin
   end;
 end;
 
-{**********************************************************************************************}
-function ALJSONNodeListCompareNodeName(List: TALJSONNodeListA; Index1, Index2: Integer): Integer;
+{************************************************************************************************}
+function ALJSONNodeListCompareNodeNameA(List: TALJSONNodeListA; Index1, Index2: Integer): Integer;
 begin
   Result := List.CompareNodeNames(
               List[Index1].NodeName,
@@ -7800,7 +7800,7 @@ end;
 {*****************************}
 procedure TALJSONNodeListA.Sort;
 begin
-  CustomSort(ALJSONNodeListCompareNodeName);
+  CustomSort(ALJSONNodeListCompareNodeNameA);
 end;
 
 {************************************************************************}
@@ -14750,7 +14750,7 @@ begin
 end;
 
 {************************************************************************************************}
-function ALJSONNodeListCompareNodeNameU(List: TALJSONNodeListW; Index1, Index2: Integer): Integer;
+function ALJSONNodeListCompareNodeNameA(List: TALJSONNodeListW; Index1, Index2: Integer): Integer;
 begin
   Result := List.CompareNodeNames(
               List[Index1].NodeName,
@@ -14760,7 +14760,7 @@ end;
 {******************************}
 procedure TALJSONNodeListW.Sort;
 begin
-  CustomSort(ALJSONNodeListCompareNodeNameU);
+  CustomSort(ALJSONNodeListCompareNodeNameA);
 end;
 
 {**************************************************************************}

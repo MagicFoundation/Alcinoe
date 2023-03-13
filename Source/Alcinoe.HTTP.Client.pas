@@ -495,8 +495,8 @@ procedure ALIPv6SplitParts(const aIPv6: TALIPv6Binary;
                            var aLowestPart: UInt64;
                            var aHigestPart: UInt64);
 
-procedure ALDecompressHttpResponseContent(const aContentEncoding: AnsiString; var aContentStream: TMemoryStream);
-procedure ALDecompressHttpResponseContentU(const aContentEncoding: String; var aContentStream: TMemoryStream);
+procedure ALDecompressHttpResponseContent(const aContentEncoding: AnsiString; var aContentStream: TMemoryStream); overload;
+procedure ALDecompressHttpResponseContent(const aContentEncoding: String; var aContentStream: TMemoryStream); overload;
 
 Const
   cALHTTPCLient_MsgInvalidURL         = 'Invalid url ''%s'' - only supports ''http'' and ''https'' schemes';
@@ -1941,8 +1941,9 @@ begin
   {$if not defined(ALHttpGzipAuto)}
   if ALSameTextA(aContentEncoding, 'gzip') then begin
     aContentStream.position := 0;
-    var LDecompressionStream := TDecompressionStream.Create(aContentStream, 15 + 16); // 15 is the default mode.
-                                                                                      // 16 is to enable gzip mode.  http://www.zlib.net/manual.html#Advanced
+    // 15 is the default mode.
+    // 16 is to enable gzip mode.  http://www.zlib.net/manual.html#Advanced
+    var LDecompressionStream := TDecompressionStream.Create(aContentStream, 15 + 16);
     try
       var LTmpStream := TmemoryStream.Create;
       try
@@ -1962,14 +1963,15 @@ begin
   aContentStream.Position := 0;
 end;
 
-{************************************************************************************************************}
-procedure ALDecompressHttpResponseContentU(const aContentEncoding: String; var aContentStream: TMemoryStream);
+{***********************************************************************************************************}
+procedure ALDecompressHttpResponseContent(const aContentEncoding: String; var aContentStream: TMemoryStream);
 begin
   {$if not defined(ALHttpGzipAuto)}
   if ALSameTextW(aContentEncoding, 'gzip') then begin
     aContentStream.position := 0;
-    var LDecompressionStream := TDecompressionStream.Create(aContentStream, 15 + 16); // 15 is the default mode.
-                                                                                      // 16 is to enable gzip mode.  http://www.zlib.net/manual.html#Advanced
+    // 15 is the default mode.
+    // 16 is to enable gzip mode.  http://www.zlib.net/manual.html#Advanced
+    var LDecompressionStream := TDecompressionStream.Create(aContentStream, 15 + 16);
     Try
       var LTmpStream := TmemoryStream.Create;
       try

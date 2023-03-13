@@ -207,7 +207,7 @@ begin
         end;
 
         //decode the result if necessary
-        if (LHTTPResponse <> nil) then ALDecompressHttpResponseContentU(LHTTPResponse.ContentEncoding, LResponseContent);
+        if (LHTTPResponse <> nil) then ALDecompressHttpResponseContent(LHTTPResponse.ContentEncoding, LResponseContent);
 
         //fire the OnSuccess
         LNetHttpClientPoolRequest.OnSuccessCallBack(LHTTPResponse, LResponseContent, LNetHttpClientPoolRequest.FExtData);

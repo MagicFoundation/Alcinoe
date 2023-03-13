@@ -122,8 +122,8 @@ Function ALMakeFriendlyEmailAddress(const aRealName, aEmail: AnsiString): AnsiSt
 Function ALEncodeRealName4FriendlyEmailAddress(const aRealName: AnsiString): AnsiString;
 Function AlGenerateInternetMessageID: AnsiString; overload;
 Function AlGenerateInternetMessageID(const ahostname: AnsiString): AnsiString; overload;
-function AlIsValidEmail(const Value: AnsiString): boolean;
-function AlIsValidEmailU(const Value: String): boolean;
+function AlIsValidEmail(const Value: AnsiString): boolean; overload;
+function AlIsValidEmail(const Value: String): boolean; overload;
 
 implementation
 
@@ -756,7 +756,7 @@ end;
 {*********************}
 {$ZEROBASEDSTRINGS OFF} // << the guy who introduce zero base string in delphi is just a mix of a Monkey and a Donkey !
 {$WARN SYMBOL_DEPRECATED OFF}
-function AlIsValidEmailU(const Value: String): boolean;
+function AlIsValidEmail(const Value: String): boolean;
 
  {--------------------------------------------------}
  function CheckAllowedName(const s: String): boolean;

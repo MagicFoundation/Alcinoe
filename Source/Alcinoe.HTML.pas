@@ -20,12 +20,12 @@ function  ALHTMLEncode(const Src: AnsiString;
                        const EncodeASCIIHtmlEntities: Boolean = True;
                        const useNumericReference: boolean = True): AnsiString;
 function  ALHTMLDecode(const Src: AnsiString): AnsiString;
-function  ALJavascriptEncode(const Src: AnsiString; const useNumericReference: boolean = true): AnsiString;
-function  ALJavascriptEncodeU(const Src: String; const useNumericReference: boolean = true): String;
-procedure ALJavascriptDecodeV(Var Str: AnsiString);
-procedure ALJavascriptDecodeVU(Var Str: String);
-function  ALJavascriptDecode(const Src: AnsiString): AnsiString;
-function  ALJavascriptDecodeU(const Src: String): String;
+function  ALJavascriptEncode(const Src: AnsiString; const useNumericReference: boolean = true): AnsiString; overload;
+function  ALJavascriptEncode(const Src: String; const useNumericReference: boolean = true): String; overload;
+procedure ALJavascriptDecodeV(Var Str: AnsiString); overload;
+procedure ALJavascriptDecodeV(Var Str: String); overload;
+function  ALJavascriptDecode(const Src: AnsiString): AnsiString; overload;
+function  ALJavascriptDecode(const Src: String): String; overload;
 {$IFDEF MSWINDOWS}
 function  ALRunJavascript(const aCode: AnsiString): AnsiString;
 {$ENDIF}
@@ -1013,7 +1013,7 @@ end;
 
 {******************************************************************************************}
 // https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Values,_variables,_and_literals
-function  ALJavascriptEncodeU(const Src: String; const useNumericReference: boolean = true): String;
+function  ALJavascriptEncode(const Src: String; const useNumericReference: boolean = true): String;
 var i, l: integer;
     Buf, P: PChar;
     ch: Integer;
@@ -1368,7 +1368,7 @@ end;
 
 {**************************}
 {$WARN WIDECHAR_REDUCED OFF}
-procedure ALJavascriptDecodeVU(Var Str: String);
+procedure ALJavascriptDecodeV(Var Str: String);
 
 var CurrPos : Integer;
     pResTail: PChar;
@@ -1589,10 +1589,10 @@ begin
 end;
 
 {*******************************************************}
-function  ALJavascriptDecodeU(const Src: String): String;
+function  ALJavascriptDecode(const Src: String): String;
 begin
   result := Src;
-  ALJavascriptDecodeVU(result);
+  ALJavascriptDecodeV(result);
 end;
 
 {****************}

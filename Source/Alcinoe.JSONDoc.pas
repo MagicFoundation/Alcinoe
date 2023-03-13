@@ -9763,7 +9763,7 @@ Var BufferLength: Integer;
                                                                 //         ^^^P1
        else if c = LQuoteChar then begin
          ALCopyStr(Buffer,CurrName,BufferPos + 1,P1-BufferPos - 1);
-         if DecodeJSONReferences then ALJavascriptDecodeVU(CurrName); // ..."...
+         if DecodeJSONReferences then ALJavascriptDecodeV(CurrName); // ..."...
          break;
        end
        else inc(P1); // ... "...\"..."
@@ -10001,7 +10001,7 @@ Var BufferLength: Integer;
                                                                 //         ^^^P1
        else if c = LQuoteChar then begin
          ALCopyStr(Buffer,currValue,BufferPos + 1,P1-BufferPos - 1);
-         if DecodeJSONReferences then ALJavascriptDecodeVU(currValue); // ..."...
+         if DecodeJSONReferences then ALJavascriptDecodeV(currValue); // ..."...
          break;
        end
        else inc(P1); // ... "...\"..."
@@ -12724,7 +12724,7 @@ function TALJSONNodeW.GetNodeValueInterchange(const SkipNodeSubTypeHelper: boole
     if preSingleLine in LRegExOptions then LRegExOptionsStr := LRegExOptionsStr + 's';
     //'u':;
     result := '/'+regex+'/' + LRegExOptionsStr;
-    if not SkipNodeSubTypeHelper then result := '"' + ALJavascriptEncodeU(result) + '"'
+    if not SkipNodeSubTypeHelper then result := '"' + ALJavascriptEncode(result) + '"'
   end;
 
   procedure _GetTimestamp;
@@ -13401,7 +13401,7 @@ Var NodeStack: Tstack<TALJSONNodeW>;
          (ParentNode.NodeType <> ntArray) then begin
         if EncodeControlCharacters then begin
            _WriteStr2Buffer('"');
-           _WriteStr2Buffer(ALJavascriptEncodeU(NodeName));
+           _WriteStr2Buffer(ALJavascriptEncode(NodeName));
            _WriteStr2Buffer('":');
         end
         else begin
@@ -13415,7 +13415,7 @@ Var NodeStack: Tstack<TALJSONNodeW>;
          ((NodeSubType = nstInt64) and SaveInt64AsText) then begin
         if (NodeSubType = NstText) and EncodeControlCharacters then begin
           _WriteStr2Buffer('"');
-          _WriteStr2Buffer(ALJavascriptEncodeU(GetText));
+          _WriteStr2Buffer(ALJavascriptEncode(GetText));
           _WriteStr2Buffer('"');
         end
         else begin
@@ -13449,7 +13449,7 @@ Var NodeStack: Tstack<TALJSONNodeW>;
               (ParentNode.NodeType <> ntArray) then begin
         if EncodeControlCharacters then begin
           _WriteStr2Buffer('"');
-          _WriteStr2Buffer(ALJavascriptEncodeU(NodeName));
+          _WriteStr2Buffer(ALJavascriptEncode(NodeName));
           _WriteStr2Buffer('":{')
         end
         else begin
@@ -13508,7 +13508,7 @@ Var NodeStack: Tstack<TALJSONNodeW>;
               (ParentNode.NodeType <> ntArray) then begin
         if EncodeControlCharacters then begin
           _WriteStr2Buffer('"');
-          _WriteStr2Buffer(ALJavascriptEncodeU(NodeName));
+          _WriteStr2Buffer(ALJavascriptEncode(NodeName));
           _WriteStr2Buffer('":[');
         end
         else begin
@@ -15255,7 +15255,7 @@ end;
 {****************************************************************************}
 function ALJsonEncodeTextWithNodeSubTypeHelperW(const aValue: String): String;
 begin
-  result := '"'+ALJavascriptEncodeU(aValue)+'"';
+  result := '"'+ALJavascriptEncode(aValue)+'"';
 end;
 
 {******************************************************************************}

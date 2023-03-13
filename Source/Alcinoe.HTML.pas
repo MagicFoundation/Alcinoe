@@ -21,8 +21,11 @@ function  ALHTMLEncode(const Src: AnsiString;
                        const useNumericReference: boolean = True): AnsiString;
 function  ALHTMLDecode(const Src: AnsiString): AnsiString;
 function  ALJavascriptEncode(const Src: AnsiString; const useNumericReference: boolean = true): AnsiString;
+function  ALJavascriptEncodeU(const Src: String; const useNumericReference: boolean = true): String;
 procedure ALJavascriptDecodeV(Var Str: AnsiString);
+procedure ALJavascriptDecodeVU(Var Str: String);
 function  ALJavascriptDecode(const Src: AnsiString): AnsiString;
+function  ALJavascriptDecodeU(const Src: String): String;
 {$IFDEF MSWINDOWS}
 function  ALRunJavascript(const aCode: AnsiString): AnsiString;
 {$ENDIF}
@@ -30,29 +33,6 @@ procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(Var HtmlContent: AnsiString
                                                      Const DeleteBodyOfUnwantedTag: Boolean = False;
                                                      const ReplaceUnwantedTagCharBy: AnsiChar = #1);
 procedure ALCompactHtmlTagParams(TagParams: TALStringsA);
-function  ALJavascriptEncodeU(const Src: String; const useNumericReference: boolean = true): String;
-procedure ALJavascriptDecodeVU(Var Str: String);
-function  ALJavascriptDecodeU(const Src: String): String;
-
-
-
-////////////////////////////
-/// deprecated functions ///
-////////////////////////////
-
-procedure ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
-                                LstExtractedResourceText: TALStringsA;
-                                Const DecodeHTMLText: Boolean = True); overload; deprecated 'use ALExtractHTMLText instead with SetMultiByteConversionCodePage(CP_UTF8)';
-function  ALUTF8ExtractHTMLText(const HtmlContent: AnsiString;
-                                Const DecodeHTMLText: Boolean = True): AnsiString; overload; deprecated 'use ALExtractHTMLText instead with SetMultiByteConversionCodePage(CP_UTF8)';
-procedure ALUTF8XMLTextElementDecodeV(var Str: AnsiString); deprecated 'use ALXMLTextElementDecodeV instead with SetMultiByteConversionCodePage(CP_UTF8)';
-function  ALUTF8XMLTextElementDecode(const Src: AnsiString): AnsiString; deprecated 'use ALXMLTextElementDecode instead with SetMultiByteConversionCodePage(CP_UTF8)';
-function  ALUTF8HTMLEncode(const Src: AnsiString;
-                           const EncodeASCIIHtmlEntities: Boolean = True;
-                           const useNumericReference: boolean = True): AnsiString; deprecated 'use ALHTMLEncode instead with SetMultiByteConversionCodePage(CP_UTF8)';
-function  ALUTF8HTMLDecode(const Src: AnsiString): AnsiString; deprecated 'use ALHTMLDecode instead with SetMultiByteConversionCodePage(CP_UTF8)';
-procedure ALUTF8JavascriptDecodeV(Var Str: AnsiString); deprecated 'use ALJavascriptDecodeV instead with SetMultiByteConversionCodePage(CP_UTF8)';
-function  ALUTF8JavascriptDecode(const Src: AnsiString): AnsiString; deprecated 'use ALJavascriptDecode instead with SetMultiByteConversionCodePage(CP_UTF8)';
 
 
 implementation
@@ -1031,6 +1011,138 @@ begin
   end;
 end;
 
+{******************************************************************************************}
+// https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Values,_variables,_and_literals
+function  ALJavascriptEncodeU(const Src: String; const useNumericReference: boolean = true): String;
+var i, l: integer;
+    Buf, P: PChar;
+    ch: Integer;
+begin
+  Result := '';
+  L := Length(src);
+  if L = 0 then exit;
+  if useNumericReference then GetMem(Buf, L * 6) // to be on the *very* safe side
+  else GetMem(Buf, L * 2); // to be on the *very* safe side
+  try
+    P := Buf;
+    for i := low(src) to high(src) do begin
+      ch := Ord(src[i]);
+      case ch of
+        8: begin // Backspace
+             if useNumericReference then begin
+               ALStrMove('\u0008', P, 6);
+               Inc(P, 6);
+             end
+             else begin
+               ALStrMove('\b', P, 2);
+               Inc(P, 2);
+             end;
+           end;
+        9: begin // Tab
+             if useNumericReference then begin
+               ALStrMove('\u0009', P, 6);
+               Inc(P, 6);
+             end
+             else begin
+               ALStrMove('\t', P, 2);
+               Inc(P, 2);
+             end;
+           end;
+        10: begin // New line
+              if useNumericReference then begin
+                ALStrMove('\u000A', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMove('\n', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        11: begin // Vertical tab
+              if useNumericReference then begin
+                ALStrMove('\u000B', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMove('\v', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        12: begin // Form feed
+              if useNumericReference then begin
+                ALStrMove('\u000C', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMove('\f', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        13: begin // Carriage return
+              if useNumericReference then begin
+                ALStrMove('\u000D', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMove('\r', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        34: begin // Double quote
+              if useNumericReference then begin
+                ALStrMove('\u0022', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMove('\"', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        38: begin // & ... we need to encode it because in javascript &#39; or &amp; will be converted to ' and error unterminated string
+              ALStrMove('\u0026', P, 6);
+              Inc(P, 6);
+            end;
+        39: begin // Apostrophe or single quote
+              if useNumericReference then begin
+                ALStrMove('\u0027', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMove('\''', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        60: begin // < ... mostly to hide all </script> tag inside javascript.
+                  // http://www.wwco.com/~wls/blog/2007/04/25/using-script-in-a-javascript-literal/
+              ALStrMove('\u003C', P, 6);
+              Inc(P, 6);
+            end;
+        62: begin // > ... mostly to hide all HTML tag inside javascript.
+              ALStrMove('\u003E', P, 6);
+              Inc(P, 6);
+            end;
+        92: begin // Backslash character (\).
+              if useNumericReference then begin
+                ALStrMove('\u005C', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMove('\\', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        else Begin
+          P^:= Char(ch);
+          Inc(P);
+        end;
+      end;
+    end;
+    SetString(Result, Buf, P - Buf);
+  finally
+    FreeMem(Buf);
+  end;
+end;
+
 {*************************************************}
 procedure ALJavascriptDecodeV(Var Str: AnsiString);
 
@@ -1254,145 +1366,6 @@ begin
 
 end;
 
-{**************************************************************}
-function  ALJavascriptDecode(const Src: AnsiString): AnsiString;
-begin
-  result := Src;
-  ALJavascriptDecodeV(result);
-end;
-
-{******************************************************************************************}
-// https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Values,_variables,_and_literals
-function  ALJavascriptEncodeU(const Src: String; const useNumericReference: boolean = true): String;
-var i, l: integer;
-    Buf, P: PChar;
-    ch: Integer;
-begin
-  Result := '';
-  L := Length(src);
-  if L = 0 then exit;
-  if useNumericReference then GetMem(Buf, L * 6) // to be on the *very* safe side
-  else GetMem(Buf, L * 2); // to be on the *very* safe side
-  try
-    P := Buf;
-    for i := low(src) to high(src) do begin
-      ch := Ord(src[i]);
-      case ch of
-        8: begin // Backspace
-             if useNumericReference then begin
-               ALStrMove('\u0008', P, 6);
-               Inc(P, 6);
-             end
-             else begin
-               ALStrMove('\b', P, 2);
-               Inc(P, 2);
-             end;
-           end;
-        9: begin // Tab
-             if useNumericReference then begin
-               ALStrMove('\u0009', P, 6);
-               Inc(P, 6);
-             end
-             else begin
-               ALStrMove('\t', P, 2);
-               Inc(P, 2);
-             end;
-           end;
-        10: begin // New line
-              if useNumericReference then begin
-                ALStrMove('\u000A', P, 6);
-                Inc(P, 6);
-              end
-              else begin
-                ALStrMove('\n', P, 2);
-                Inc(P, 2);
-              end;
-            end;
-        11: begin // Vertical tab
-              if useNumericReference then begin
-                ALStrMove('\u000B', P, 6);
-                Inc(P, 6);
-              end
-              else begin
-                ALStrMove('\v', P, 2);
-                Inc(P, 2);
-              end;
-            end;
-        12: begin // Form feed
-              if useNumericReference then begin
-                ALStrMove('\u000C', P, 6);
-                Inc(P, 6);
-              end
-              else begin
-                ALStrMove('\f', P, 2);
-                Inc(P, 2);
-              end;
-            end;
-        13: begin // Carriage return
-              if useNumericReference then begin
-                ALStrMove('\u000D', P, 6);
-                Inc(P, 6);
-              end
-              else begin
-                ALStrMove('\r', P, 2);
-                Inc(P, 2);
-              end;
-            end;
-        34: begin // Double quote
-              if useNumericReference then begin
-                ALStrMove('\u0022', P, 6);
-                Inc(P, 6);
-              end
-              else begin
-                ALStrMove('\"', P, 2);
-                Inc(P, 2);
-              end;
-            end;
-        38: begin // & ... we need to encode it because in javascript &#39; or &amp; will be converted to ' and error unterminated string
-              ALStrMove('\u0026', P, 6);
-              Inc(P, 6);
-            end;
-        39: begin // Apostrophe or single quote
-              if useNumericReference then begin
-                ALStrMove('\u0027', P, 6);
-                Inc(P, 6);
-              end
-              else begin
-                ALStrMove('\''', P, 2);
-                Inc(P, 2);
-              end;
-            end;
-        60: begin // < ... mostly to hide all </script> tag inside javascript.
-                  // http://www.wwco.com/~wls/blog/2007/04/25/using-script-in-a-javascript-literal/
-              ALStrMove('\u003C', P, 6);
-              Inc(P, 6);
-            end;
-        62: begin // > ... mostly to hide all HTML tag inside javascript.
-              ALStrMove('\u003E', P, 6);
-              Inc(P, 6);
-            end;
-        92: begin // Backslash character (\).
-              if useNumericReference then begin
-                ALStrMove('\u005C', P, 6);
-                Inc(P, 6);
-              end
-              else begin
-                ALStrMove('\\', P, 2);
-                Inc(P, 2);
-              end;
-            end;
-        else Begin
-          P^:= Char(ch);
-          Inc(P);
-        end;
-      end;
-    end;
-    SetString(Result, Buf, P - Buf);
-  finally
-    FreeMem(Buf);
-  end;
-end;
-
 {**************************}
 {$WARN WIDECHAR_REDUCED OFF}
 procedure ALJavascriptDecodeVU(Var Str: String);
@@ -1608,6 +1581,13 @@ begin
 end;
 {$WARN WIDECHAR_REDUCED ON}
 
+{**************************************************************}
+function  ALJavascriptDecode(const Src: AnsiString): AnsiString;
+begin
+  result := Src;
+  ALJavascriptDecodeV(result);
+end;
+
 {*******************************************************}
 function  ALJavascriptDecodeU(const Src: String): String;
 begin
@@ -1624,19 +1604,18 @@ end;
 function ALRunJavascript(const aCode: AnsiString): AnsiString;
 var HandleResult: HResult;
 
-    {$REGION '_MakeExecution'}
-    // see: http://stackoverflow.com/questions/2653797/why-does-couninitialize-cause-an-error-on-exit
-    // we create COM-object with CreateOleObject here to make that its creation is handled inside of
-    // THIS scope (function MakeExecution) and its destroying is handled inside of this function too
-    // on the last "end;" of this function.
-    function _MakeExecution(const aCode: AnsiString): AnsiString;
-    var LJavaScript: OleVariant;
-    begin
-      LJavaScript          := CreateOleObject('ScriptControl');
-      LJavaScript.Language := 'JavaScript';
-      result               := AnsiString(LJavaScript.Eval(String(aCode)));
-    end;
-    {$ENDREGION}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // see: http://stackoverflow.com/questions/2653797/why-does-couninitialize-cause-an-error-on-exit
+  // we create COM-object with CreateOleObject here to make that its creation is handled inside of
+  // THIS scope (function MakeExecution) and its destroying is handled inside of this function too
+  // on the last "end;" of this function.
+  function _MakeExecution(const aCode: AnsiString): AnsiString;
+  var LJavaScript: OleVariant;
+  begin
+    LJavaScript          := CreateOleObject('ScriptControl');
+    LJavaScript.Language := 'JavaScript';
+    result               := AnsiString(LJavaScript.Eval(String(aCode)));
+  end;
 
 begin
   // we create here the COM-server that will be actually destroyed
@@ -1913,72 +1892,6 @@ Begin
   end;
 end;
 
-
-
-////////////////////////////
-/// deprecated functions ///
-////////////////////////////
-
-{**********}
-//deprecated
-procedure ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
-                                LstExtractedResourceText: TALStringsA;
-                                Const DecodeHTMLText: Boolean = True);
-begin
-  ALExtractHTMLText(HtmlContent, LstExtractedResourceText, DecodeHTMLText);
-end;
-
-{**********}
-//deprecated
-function  ALUTF8ExtractHTMLText(const HtmlContent: AnsiString;
-                                Const DecodeHTMLText: Boolean = True): AnsiString;
-begin
-  result := ALExtractHTMLText(HtmlContent, DecodeHTMLText);
-end;
-
-{**********}
-//deprecated
-procedure ALUTF8XMLTextElementDecodeV(var Str: AnsiString);
-begin
-  ALXMLTextElementDecodeV(Str);
-end;
-
-{**********}
-//deprecated
-function  ALUTF8XMLTextElementDecode(const Src: AnsiString): AnsiString;
-begin
-  result := ALXMLTextElementDecode(Src);
-end;
-
-{**********}
-//deprecated
-function  ALUTF8HTMLEncode(const Src: AnsiString;
-                           const EncodeASCIIHtmlEntities: Boolean = True;
-                           const useNumericReference: boolean = True): AnsiString;
-begin
-  result := ALHTMLEncode(Src, EncodeASCIIHtmlEntities, useNumericReference);
-end;
-
-{**********}
-//deprecated
-function  ALUTF8HTMLDecode(const Src: AnsiString): AnsiString;
-begin
-  result := ALHTMLDecode(Src);
-end;
-
-{**********}
-//deprecated
-procedure ALUTF8JavascriptDecodeV(Var Str: AnsiString);
-begin
-  ALJavascriptDecodeV(Str);
-end;
-
-{**********}
-//deprecated
-function  ALUTF8JavascriptDecode(const Src: AnsiString): AnsiString;
-begin
-  result := ALJavascriptDecode(Src);
-end;
 
 Initialization
   _ALHtmlEntities := TALStringListA.create;

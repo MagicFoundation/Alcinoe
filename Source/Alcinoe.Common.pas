@@ -486,8 +486,8 @@ type
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 var ALCallStackCustomLogsMaxCount: integer = 50;
-procedure ALAddCallStackCustomLogU(Const aLog: String);
-function ALGetCallStackCustomLogsU(Const aPrependTimeStamp: boolean = True; Const aPrependThreadID: boolean = True): String;
+procedure ALAddCallStackCustomLog(Const aLog: String);
+function ALGetCallStackCustomLogs(Const aPrependTimeStamp: boolean = True; Const aPrependThreadID: boolean = True): String;
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 Type TalLogType = (VERBOSE, DEBUG, INFO, WARN, ERROR, ASSERT);
@@ -1061,16 +1061,16 @@ end;
 
 type
 
-  {******************************}
-  _TALCallStackCustomLogU = record
+  {*****************************}
+  _TALCallStackCustomLog = record
     ThreadID: TThreadID;
     TimeStamp: TDateTime;
     log: String;
   end;
 
 var
-  _ALCallStackCustomLogsU: TList<_TALCallStackCustomLogU>;
-  _ALCallStackCustomLogsUCurrentIndex: integer = -1;
+  _ALCallStackCustomLogs: TList<_TALCallStackCustomLog>;
+  _ALCallStackCustomLogsCurrentIndex: integer = -1;
 
 type
 
@@ -2337,57 +2337,57 @@ begin
 end;
 
 {*****************************************************}
-procedure ALAddCallStackCustomLogU(Const aLog: String);
-var LCallStackCustomLogU: _TALCallStackCustomLogU;
+procedure ALAddCallStackCustomLog(Const aLog: String);
+var LCallStackCustomLog: _TALCallStackCustomLog;
 begin
-  LCallStackCustomLogU.ThreadID := TThread.Current.ThreadID;
-  LCallStackCustomLogU.TimeStamp := Now;
-  LCallStackCustomLogU.log := aLog;
-  Tmonitor.enter(_ALCallStackCustomLogsU);
+  LCallStackCustomLog.ThreadID := TThread.Current.ThreadID;
+  LCallStackCustomLog.TimeStamp := Now;
+  LCallStackCustomLog.log := aLog;
+  Tmonitor.enter(_ALCallStackCustomLogs);
   Try
-    _ALCallStackCustomLogsUCurrentIndex := (_ALCallStackCustomLogsUCurrentIndex + 1) mod ALCallStackCustomLogsMaxCount;
-    if _ALCallStackCustomLogsUCurrentIndex <= _ALCallStackCustomLogsU.Count - 1 then
-      _ALCallStackCustomLogsU[_ALCallStackCustomLogsUCurrentIndex] := LCallStackCustomLogU
+    _ALCallStackCustomLogsCurrentIndex := (_ALCallStackCustomLogsCurrentIndex + 1) mod ALCallStackCustomLogsMaxCount;
+    if _ALCallStackCustomLogsCurrentIndex <= _ALCallStackCustomLogs.Count - 1 then
+      _ALCallStackCustomLogs[_ALCallStackCustomLogsCurrentIndex] := LCallStackCustomLog
     else
-      _ALCallStackCustomLogsUCurrentIndex := _ALCallStackCustomLogsU.Add(LCallStackCustomLogU);
+      _ALCallStackCustomLogsCurrentIndex := _ALCallStackCustomLogs.Add(LCallStackCustomLog);
   Finally
-    Tmonitor.exit(_ALCallStackCustomLogsU);
+    Tmonitor.exit(_ALCallStackCustomLogs);
   End;
 end;
 
 {**************************************************************************************************************************}
-function ALGetCallStackCustomLogsU(Const aPrependTimeStamp: boolean = True; Const aPrependThreadID: boolean = True): String;
+function ALGetCallStackCustomLogs(Const aPrependTimeStamp: boolean = True; Const aPrependThreadID: boolean = True): String;
 Var i: integer;
 begin
   Result := '';
-  Tmonitor.enter(_ALCallStackCustomLogsU);
+  Tmonitor.enter(_ALCallStackCustomLogs);
   Try
     if aPrependTimeStamp and aPrependThreadID then begin
-      for i := _ALCallStackCustomLogsUCurrentIndex downto 0 do
-        Result := Result + ALFormatDateTimeW('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsW) + ' [' + ALIntToStrW(_ALCallStackCustomLogsU[i].ThreadID) + ']: ' + _ALCallStackCustomLogsU[i].log + #13#10;
-      for i := _ALCallStackCustomLogsU.Count - 1 downto _ALCallStackCustomLogsUCurrentIndex + 1 do
-        Result := Result + ALFormatDateTimeW('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsW) + ' [' + ALIntToStrW(_ALCallStackCustomLogsU[i].ThreadID) + ']: ' + _ALCallStackCustomLogsU[i].log + #13#10;
+      for i := _ALCallStackCustomLogsCurrentIndex downto 0 do
+        Result := Result + ALFormatDateTimeW('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogs[i].TimeStamp), ALDefaultFormatSettingsW) + ' [' + ALIntToStrW(_ALCallStackCustomLogs[i].ThreadID) + ']: ' + _ALCallStackCustomLogs[i].log + #13#10;
+      for i := _ALCallStackCustomLogs.Count - 1 downto _ALCallStackCustomLogsCurrentIndex + 1 do
+        Result := Result + ALFormatDateTimeW('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogs[i].TimeStamp), ALDefaultFormatSettingsW) + ' [' + ALIntToStrW(_ALCallStackCustomLogs[i].ThreadID) + ']: ' + _ALCallStackCustomLogs[i].log + #13#10;
     end
     else if aPrependTimeStamp then begin
-      for i := _ALCallStackCustomLogsUCurrentIndex downto 0 do
-        Result := Result + ALFormatDateTimeW('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsW) + ': ' + _ALCallStackCustomLogsU[i].log + #13#10;
-      for i := _ALCallStackCustomLogsU.Count - 1 downto _ALCallStackCustomLogsUCurrentIndex + 1 do
-        Result := Result + ALFormatDateTimeW('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogsU[i].TimeStamp), ALDefaultFormatSettingsW) + ': ' + _ALCallStackCustomLogsU[i].log + #13#10;
+      for i := _ALCallStackCustomLogsCurrentIndex downto 0 do
+        Result := Result + ALFormatDateTimeW('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogs[i].TimeStamp), ALDefaultFormatSettingsW) + ': ' + _ALCallStackCustomLogs[i].log + #13#10;
+      for i := _ALCallStackCustomLogs.Count - 1 downto _ALCallStackCustomLogsCurrentIndex + 1 do
+        Result := Result + ALFormatDateTimeW('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogs[i].TimeStamp), ALDefaultFormatSettingsW) + ': ' + _ALCallStackCustomLogs[i].log + #13#10;
     end
     else if aPrependThreadID then begin
-      for i := _ALCallStackCustomLogsUCurrentIndex downto 0 do
-        Result := Result + '[' + ALIntToStrW(_ALCallStackCustomLogsU[i].ThreadID) + ']: ' + _ALCallStackCustomLogsU[i].log + #13#10;
-      for i := _ALCallStackCustomLogsU.Count - 1 downto _ALCallStackCustomLogsUCurrentIndex + 1 do
-        Result := Result + '[' + ALIntToStrW(_ALCallStackCustomLogsU[i].ThreadID) + ']: ' + _ALCallStackCustomLogsU[i].log + #13#10;
+      for i := _ALCallStackCustomLogsCurrentIndex downto 0 do
+        Result := Result + '[' + ALIntToStrW(_ALCallStackCustomLogs[i].ThreadID) + ']: ' + _ALCallStackCustomLogs[i].log + #13#10;
+      for i := _ALCallStackCustomLogs.Count - 1 downto _ALCallStackCustomLogsCurrentIndex + 1 do
+        Result := Result + '[' + ALIntToStrW(_ALCallStackCustomLogs[i].ThreadID) + ']: ' + _ALCallStackCustomLogs[i].log + #13#10;
     end
     else begin
-      for i := _ALCallStackCustomLogsUCurrentIndex downto 0 do
-        Result := Result + _ALCallStackCustomLogsU[i].log + #13#10;
-      for i := _ALCallStackCustomLogsU.Count - 1 downto _ALCallStackCustomLogsUCurrentIndex + 1 do
-        Result := Result + _ALCallStackCustomLogsU[i].log + #13#10;
+      for i := _ALCallStackCustomLogsCurrentIndex downto 0 do
+        Result := Result + _ALCallStackCustomLogs[i].log + #13#10;
+      for i := _ALCallStackCustomLogs.Count - 1 downto _ALCallStackCustomLogsCurrentIndex + 1 do
+        Result := Result + _ALCallStackCustomLogs[i].log + #13#10;
     end;
   Finally
-    Tmonitor.exit(_ALCallStackCustomLogsU);
+    Tmonitor.exit(_ALCallStackCustomLogs);
   End;
   Result := ALTrim(Result);
 end;
@@ -3079,12 +3079,12 @@ initialization
   ALCustomDelayedFreeObjectProc := nil;
   ALEnqueueLog := False;
   _ALLogQueue := TList<_TALLogQueueItem>.Create;
-  _ALCallStackCustomLogsU := TList<_TALCallStackCustomLogU>.Create;
+  _ALCallStackCustomLogs := TList<_TALCallStackCustomLog>.Create;
   ALMove := system.Move;
 
 
 Finalization
-  ALFreeAndNil(_ALCallStackCustomLogsU);
+  ALFreeAndNil(_ALCallStackCustomLogs);
   ALFreeAndNil(_ALLogQueue);
 
 end.

@@ -894,7 +894,7 @@ begin
     Try
 
   		checkerror(not SetHandleInformation(fServerterminationEvent, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT));
-      LEnvironment := AlGetEnvironmentString + '_FCGI_SHUTDOWN_EVENT_' + '=' + ALIntToStrA(fServerterminationEvent) + #0#0;
+      LEnvironment := AlGetEnvironmentStringA + '_FCGI_SHUTDOWN_EVENT_' + '=' + ALIntToStrA(fServerterminationEvent) + #0#0;
 
       // Set up the start up info struct.
       ZeroMemory(@LStartupInfo,sizeof(TStartupInfo));

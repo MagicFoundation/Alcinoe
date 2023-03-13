@@ -190,7 +190,7 @@ begin
     ServerVariables.Values['GATEWAY_INTERFACE'] := 'CGI/1.1';
 
     {----------}
-    Environment := AlGetEnvironmentString;  //=C:=C:\Program Files\Borland\Delphi7\Projects
+    Environment := AlGetEnvironmentStringA;  //=C:=C:\Program Files\Borland\Delphi7\Projects
                                             //ALLUSERSPROFILE=C:\Documents and Settings\All Users
                                             //APPDATA=C:\Documents and Settings\loki\Application Data
                                             //CLASSPATH=.;C:\Program Files\Java\jre1.5.0_06\lib\ext\QTJava.zip
@@ -232,7 +232,7 @@ begin
     Environment := Environment + #0;
 
     {----------}
-    ALWinExec(ALQuotedStr(InterpreterFilename,'"') + ' ' + ScriptFileName,
+    ALWinExecA(ALQuotedStr(InterpreterFilename,'"') + ' ' + ScriptFileName,
               ALExtractFileDir(InterpreterFilename),
               Environment,
               RequestContentStream,

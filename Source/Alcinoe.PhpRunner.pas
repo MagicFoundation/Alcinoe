@@ -201,23 +201,23 @@ type
   private
   protected
   public
-    procedure Execute(ServerVariables: TALStrings;
+    procedure Execute(ServerVariables: TALStringsA;
                       RequestContentStream: Tstream;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); overload; virtual; abstract;
-    function  Execute(ServerVariables: TALStrings; RequestContentStream: Tstream): AnsiString; overload; virtual;
-    procedure Execute(ServerVariables: TALStrings;
+    function  Execute(ServerVariables: TALStringsA; RequestContentStream: Tstream): AnsiString; overload; virtual;
+    procedure Execute(ServerVariables: TALStringsA;
                       const RequestContentString: AnsiString;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); overload; virtual;
-    function  Execute(ServerVariables: TALStrings; const RequestContentString: AnsiString): AnsiString; overload; virtual;
-    procedure ExecutePostUrlEncoded(ServerVariables: TALStrings;
-                                    PostDataStrings: TALStrings;
+    function  Execute(ServerVariables: TALStringsA; const RequestContentString: AnsiString): AnsiString; overload; virtual;
+    procedure ExecutePostUrlEncoded(ServerVariables: TALStringsA;
+                                    PostDataStrings: TALStringsA;
                                     ResponseContentStream: Tstream;
                                     ResponseHeader: TALHTTPResponseHeader;
                                     Const EncodeParams: Boolean=True); overload; virtual;
-    function  ExecutePostUrlEncoded(ServerVariables: TALStrings;
-                                    PostDataStrings: TALStrings;
+    function  ExecutePostUrlEncoded(ServerVariables: TALStringsA;
+                                    PostDataStrings: TALStringsA;
                                     Const EncodeParams: Boolean=True): AnsiString; overload; virtual;
   end;
 
@@ -231,7 +231,7 @@ type
     Procedure SendRequest(const aRequest:AnsiString); virtual;
     function  ReadResponse: AnsiString; virtual;
   public
-    procedure Execute(ServerVariables: TALStrings;
+    procedure Execute(ServerVariables: TALStringsA;
                       RequestContentStream: Tstream;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); override;
@@ -291,7 +291,7 @@ type
     destructor  Destroy; override;
     Procedure Connect(const aPhpInterpreterFilename: AnsiString); virtual;
     Procedure Disconnect; virtual;
-    procedure Execute(ServerVariables: TALStrings;
+    procedure Execute(ServerVariables: TALStringsA;
                       RequestContentStream: Tstream;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); override;
@@ -318,7 +318,7 @@ type
     constructor Create; overload; virtual;
     constructor Create(const aPhpInterpreter: AnsiString); overload; virtual;
     destructor  Destroy; override;
-    procedure Execute(ServerVariables: TALStrings;
+    procedure Execute(ServerVariables: TALStringsA;
                       RequestContentStream: Tstream;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); override;
@@ -336,7 +336,7 @@ type
   public
     constructor Create; overload; virtual;
     constructor Create(const aPhpInterpreter: AnsiString); overload; virtual;
-    procedure Execute(ServerVariables: TALStrings;
+    procedure Execute(ServerVariables: TALStringsA;
                       RequestContentStream: Tstream;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); override;
@@ -354,8 +354,8 @@ Uses
   Alcinoe.CGI;
 
 {*****************************************************************************}
-procedure TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: TALStrings;
-                                                   PostDataStrings: TALStrings;
+procedure TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: TALStringsA;
+                                                   PostDataStrings: TALStringsA;
                                                    ResponseContentStream: Tstream;
                                                    ResponseHeader: TALHTTPResponseHeader;
                                                    Const EncodeParams: Boolean=True);
@@ -384,7 +384,7 @@ begin
 end;
 
 {*******************************************************************************************************************}
-function TALPhpRunnerEngine.Execute(ServerVariables: TALStrings; const RequestContentString: AnsiString): AnsiString;
+function TALPhpRunnerEngine.Execute(ServerVariables: TALStringsA; const RequestContentString: AnsiString): AnsiString;
 var ResponseContentStream: TALStringStreamA;
     ResponseHeader: TALHTTPResponseHeader;
     RequestContentStream: TALStringStreamA;
@@ -406,7 +406,7 @@ begin
 end;
 
 {***************************************************************}
-procedure TALPhpRunnerEngine.Execute(ServerVariables: TALStrings;
+procedure TALPhpRunnerEngine.Execute(ServerVariables: TALStringsA;
                                      const RequestContentString: AnsiString;
                                      ResponseContentStream: Tstream;
                                      ResponseHeader: TALHTTPResponseHeader);
@@ -424,7 +424,7 @@ begin
 end;
 
 {**********************************************************************************************************}
-function TALPhpRunnerEngine.Execute(ServerVariables: TALStrings; RequestContentStream: Tstream): AnsiString;
+function TALPhpRunnerEngine.Execute(ServerVariables: TALStringsA; RequestContentStream: Tstream): AnsiString;
 var ResponseContentStream: TALStringStreamA;
     ResponseHeader: TALHTTPResponseHeader;
 begin
@@ -443,8 +443,8 @@ begin
 end;
 
 {****************************************************************************}
-function TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: TALStrings;
-                                                  PostDataStrings: TALStrings;
+function TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: TALStringsA;
+                                                  PostDataStrings: TALStringsA;
                                                   Const EncodeParams: Boolean=True): AnsiString;
 var ResponseContentStream: TALStringStreamA;
     ResponseHeader: TALHTTPResponseHeader;
@@ -562,7 +562,7 @@ begin
 end;
 
 {**********************************************************************}
-procedure TALPhpFastCgiRunnerEngine.Execute(ServerVariables: TALStrings;
+procedure TALPhpFastCgiRunnerEngine.Execute(ServerVariables: TALStringsA;
                                             RequestContentStream: Tstream;
                                             ResponseContentStream: Tstream;
                                             ResponseHeader: TALHTTPResponseHeader);
@@ -1030,7 +1030,7 @@ begin
 end;
 
 {*******************************************************************************}
-procedure TALPhpNamedPipeFastCgiRunnerEngine.Execute(ServerVariables: TALStrings;
+procedure TALPhpNamedPipeFastCgiRunnerEngine.Execute(ServerVariables: TALStringsA;
                                                      RequestContentStream: Tstream;
                                                      ResponseContentStream: Tstream;
                                                      ResponseHeader: TALHTTPResponseHeader);
@@ -1152,7 +1152,7 @@ begin
 end;
 
 {**************************************************************************}
-procedure TALPhpNamedPipeFastCgiManager.Execute(ServerVariables: TALStrings;
+procedure TALPhpNamedPipeFastCgiManager.Execute(ServerVariables: TALStringsA;
                                                 RequestContentStream: Tstream;
                                                 ResponseContentStream: Tstream;
                                                 ResponseHeader: TALHTTPResponseHeader);
@@ -1191,7 +1191,7 @@ begin
 end;
 
 {******************************************************************}
-procedure TALPhpCgiRunnerEngine.Execute(ServerVariables: TALStrings;
+procedure TALPhpCgiRunnerEngine.Execute(ServerVariables: TALStringsA;
                                         RequestContentStream: Tstream;
                                         ResponseContentStream: Tstream;
                                         ResponseHeader: TALHTTPResponseHeader);

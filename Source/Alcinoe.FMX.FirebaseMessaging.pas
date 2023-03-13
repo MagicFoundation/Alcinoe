@@ -272,7 +272,7 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALFirebaseMessagingTokenRefreshEvent = procedure(const aToken: String) of object;
-  TALFirebaseMessagingMessageReceivedEvent = procedure(const aPayload: TAlStringListU) of object;
+  TALFirebaseMessagingMessageReceivedEvent = procedure(const aPayload: TALStringListW) of object;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALFirebaseMessaging = class(TObject)
@@ -384,7 +384,7 @@ type
     class procedure StartupNotificationMessageHandler(const Sender: TObject; const M: TMessage);
     class procedure DeliverStartupNotificationMessages;
     procedure doTokenRefresh(const aToken: String);
-    procedure doMessageReceived(const aPayload: TAlStringListU); overload;
+    procedure doMessageReceived(const aPayload: TALStringListW); overload;
     procedure doMessageReceived(const aPayload: TALJsonNodeU); overload;
     procedure doMessageReceived(const aPayload: String); overload;
   public
@@ -708,7 +708,7 @@ begin
 end;
 
 {*******************************************************************************}
-procedure TALFirebaseMessaging.doMessageReceived(const aPayload: TAlStringListU);
+procedure TALFirebaseMessaging.doMessageReceived(const aPayload: TALStringListW);
 begin
   if assigned(fOnMessageReceived) then begin
     //under ios, when the app is not running and the user click on an alert notification
@@ -743,7 +743,7 @@ end;
 {*****************************************************************************}
 procedure TALFirebaseMessaging.doMessageReceived(const aPayload: TALJsonNodeU);
 begin
-  var LPayload := TalStringListU.Create;
+  var LPayload := TALStringListW.Create;
   try
     ALJSONToTStringsU(aPayload, LPayload);
     doMessageReceived(LPayload);

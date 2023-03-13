@@ -66,7 +66,7 @@ Type
     Procedure GetATCmdlinefeedResponse(Const ErrorMsg: AnsiString);
     procedure SendSMSinPDUMode(const aSMSCenter, aSMSAddress: ansiString; aMessage: AnsiString; const EncodeMessageInPDU: Boolean=True);
     procedure SendSMSinTextMode(const aSMSCenter, aSMSAddress, aMessage, aCharset: AnsiString);
-    procedure ListAllSMSinPDUMode(aLstMessage: TALStrings; MemStorage: AnsiString);
+    procedure ListAllSMSinPDUMode(aLstMessage: TALStringsA; MemStorage: AnsiString);
     procedure DeleteSMS(aIndex: integer; MemStorage: AnsiString);
     property Connected: Boolean read FConnected;
     Property BaudRate: Dword read FBaudRate write SetBaudRate default CBR_2400;
@@ -1067,7 +1067,7 @@ end;
 
 {***********************************************}
 {give result with on each lines Index=PDUMessage}
-procedure TAlGSMComm.ListAllSMSinPDUMode(aLstMessage: TALStrings; MemStorage: AnsiString);
+procedure TAlGSMComm.ListAllSMSinPDUMode(aLstMessage: TALStringsA; MemStorage: AnsiString);
 
   {-----------------------------------}
   Procedure InternalFulfillLstMessage;

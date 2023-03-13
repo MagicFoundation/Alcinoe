@@ -107,7 +107,7 @@ Function  AlEmptyDirectory(Directory: ansiString;
                            const FileNameMask: ansiString = '*';
                            const MinFileAge: TdateTime = ALNullDate): Boolean;
 var LSR: TSearchRec;
-    LIgnoreFilesLst: TalStringList;
+    LIgnoreFilesLst: TALStringListA;
     I: integer;
 begin
   if (Directory = '') or
@@ -116,7 +116,7 @@ begin
 
   Result := True;
   Directory := ALIncludeTrailingPathDelimiter(Directory);
-  LIgnoreFilesLst := TalStringList.Create;
+  LIgnoreFilesLst := TALStringListA.Create;
   try
     for I := 0 to length(IgnoreFiles) - 1 do LIgnoreFilesLst.Add(ALExcludeTrailingPathDelimiter(IgnoreFiles[I]));
     LIgnoreFilesLst.Duplicates := DupIgnore;
@@ -472,7 +472,7 @@ Function  AlEmptyDirectoryU(Directory: String;
                             const FileNameMask: String = '*';
                             const MinFileAge: TdateTime = ALNullDate): Boolean;
 var LSR: TSearchRec;
-    LIgnoreFilesLst: TalStringListU;
+    LIgnoreFilesLst: TALStringListW;
     I: integer;
 begin
   if (Directory = '') or
@@ -481,7 +481,7 @@ begin
 
   Result := True;
   Directory := ALIncludeTrailingPathDelimiter(Directory);
-  LIgnoreFilesLst := TalStringListU.Create;
+  LIgnoreFilesLst := TALStringListW.Create;
   try
     for I := 0 to length(IgnoreFiles) - 1 do LIgnoreFilesLst.Add(ALExcludeTrailingPathDelimiter(IgnoreFiles[I]));
     LIgnoreFilesLst.Duplicates := DupIgnore;

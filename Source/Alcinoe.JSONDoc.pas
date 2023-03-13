@@ -2,7 +2,7 @@
 TALJsonDocument is a Delphi parser/writer for JSON / BSON data
 format. it's support DOM and SAX parser, support BSON format,
 and use a similar syntax than TALXMLDocument / TXMLDocument.
-TALJsonDocument can also export Json / Bson data in TALStringList.
+TALJsonDocument can also export Json / Bson data in TALStringListA.
 
 When it deals with parsing some (textual) content, two directions
 are usually envisaged. In the JSON world, you have usually to
@@ -715,28 +715,28 @@ var
 Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
                            const aFormatSettings: TALFormatSettingsA;
                            const aPath: AnsiString;
-                           const aLst: TALStrings;
+                           const aLst: TALStringsA;
                            Const aNullStr: AnsiString = 'null';
                            Const aTrueStr: AnsiString = 'true';
                            Const aFalseStr: AnsiString = 'false'); overload;
 Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
                            const aFormatSettings: TALFormatSettingsA;
-                           const aLst: TALStrings;
+                           const aLst: TALStringsA;
                            Const aNullStr: AnsiString = 'null';
                            Const aTrueStr: AnsiString = 'true';
                            Const aFalseStr: AnsiString = 'false'); overload;
 Procedure ALJSONToTStrings(const aJsonNode: TAlJsonNode;
                            Const aPath: AnsiString;
-                           const aLst: TALStrings;
+                           const aLst: TALStringsA;
                            Const aNullStr: AnsiString = 'null';
                            Const aTrueStr: AnsiString = 'true';
                            Const aFalseStr: AnsiString = 'false'); overload;
 Procedure ALJSONToTStrings(const aJsonNode: TAlJsonNode;
-                           const aLst: TALStrings;
+                           const aLst: TALStringsA;
                            Const aNullStr: AnsiString = 'null';
                            Const aTrueStr: AnsiString = 'true';
                            Const aFalseStr: AnsiString = 'false'); overload;
-procedure ALTStringsToJson(const aLst: TALStrings;
+procedure ALTStringsToJson(const aLst: TALStringsA;
                            const aJsonNode: TALJSONNode;
                            Const aPath: AnsiString = '';
                            Const aNameToLowerCase: boolean = false;
@@ -744,7 +744,7 @@ procedure ALTStringsToJson(const aLst: TALStrings;
 
 Procedure ALJSONToXML(const aJSONNode: TALJsonNode;
                       const aXMLNode: TALXmlNode;
-                      const aXMLElementNameForJSONArrayEntries: TalStrings; // JSONArrayNodeName=XMLElementName | ex: transactions=transaction
+                      const aXMLElementNameForJSONArrayEntries: TALStringsA; // JSONArrayNodeName=XMLElementName | ex: transactions=transaction
                                                                       //                                  |     features=feature
                       const aDefaultXMLElementNameForJSONArrayEntries: AnsiString = 'rec'); overload;
 Procedure ALJSONToXML(const aJSONNode: TALJsonNode;
@@ -1264,28 +1264,28 @@ var
 Procedure ALJSONToTStringsU(const AJsonStr: String;
                             const aFormatSettings: TALFormatSettingsW;
                             const aPath: String;
-                            const aLst: TALStringsU;
+                            const aLst: TALStringsW;
                             Const aNullStr: String = 'null';
                             Const aTrueStr: String = 'true';
                             Const aFalseStr: String = 'false'); overload;
 Procedure ALJSONToTStringsU(const AJsonStr: String;
                             const aFormatSettings: TALFormatSettingsW;
-                            const aLst: TALStringsU;
+                            const aLst: TALStringsW;
                             Const aNullStr: String = 'null';
                             Const aTrueStr: String = 'true';
                             Const aFalseStr: String = 'false'); overload;
 Procedure ALJSONToTStringsU(const aJsonNode: TALJSONNodeU;
                             Const aPath: String;
-                            const aLst: TALStringsU;
+                            const aLst: TALStringsW;
                             Const aNullStr: String = 'null';
                             Const aTrueStr: String = 'true';
                             Const aFalseStr: String = 'false'); overload;
 Procedure ALJSONToTStringsU(const aJsonNode: TALJSONNodeU;
-                            const aLst: TALStringsU;
+                            const aLst: TALStringsW;
                             Const aNullStr: String = 'null';
                             Const aTrueStr: String = 'true';
                             Const aFalseStr: String = 'false'); overload;
-procedure ALTStringsToJsonU(const aLst: TALStringsU;
+procedure ALTStringsToJsonU(const aLst: TALStringsW;
                             const aJsonNode: TALJSONNodeU;
                             Const aPath: String = '';
                             Const aNameToLowerCase: boolean = false;
@@ -1957,7 +1957,7 @@ Var Buffer: AnsiString;
     CurrValue: ansiString;
     NotSaxMode: Boolean;
     WorkingNode: TALJSONNode;
-    NamePaths: TALNvStringList;
+    NamePaths: TALNVStringListA;
     ObjectPaths: TALIntegerList;
     DecodeJSONReferences: boolean;
 
@@ -3083,7 +3083,7 @@ Begin
   end
   else begin
     ObjectPaths := nil;
-    NamePaths := TALNvStringList.Create;
+    NamePaths := TALNVStringListA.Create;
   end;
   Try
 
@@ -3201,7 +3201,7 @@ Var Buffer: AnsiString;
     CurrName: AnsiString;
     NotSaxMode: Boolean;
     WorkingNode: TALJSONNode;
-    NamePaths: TALStringList;
+    NamePaths: TALStringListA;
     ObjectPaths: TObjectList<TALJSONNode>;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -4056,7 +4056,7 @@ Begin
   end
   else begin
     ObjectPaths := nil;
-    NamePaths := TALStringList.Create;
+    NamePaths := TALStringListA.Create;
   end;
   Try
 
@@ -8051,7 +8051,7 @@ end;
 Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
                            const aFormatSettings: TALFormatSettingsA;
                            const aPath: AnsiString;
-                           const aLst: TALStrings;
+                           const aLst: TALStringsA;
                            Const aNullStr: AnsiString = 'null';
                            Const aTrueStr: AnsiString = 'true';
                            Const aFalseStr: AnsiString = 'false');
@@ -8101,7 +8101,7 @@ end;
 {****************************************************}
 Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
                            const aFormatSettings: TALFormatSettingsA;
-                           const aLst: TALStrings;
+                           const aLst: TALStringsA;
                            Const aNullStr: AnsiString = 'null';
                            Const aTrueStr: AnsiString = 'true';
                            Const aFalseStr: AnsiString = 'false');
@@ -8118,7 +8118,7 @@ end;
 {******************************************************}
 Procedure ALJSONToTStrings(const aJsonNode: TAlJsonNode;
                            Const aPath: AnsiString;
-                           const aLst: TALStrings;
+                           const aLst: TALStringsA;
                            Const aNullStr: AnsiString = 'null';
                            Const aTrueStr: AnsiString = 'true';
                            Const aFalseStr: AnsiString = 'false');
@@ -8169,7 +8169,7 @@ end;
 
 {******************************************************}
 Procedure ALJSONToTStrings(const aJsonNode: TAlJsonNode;
-                           const aLst: TALStrings;
+                           const aLst: TALStringsA;
                            Const aNullStr: AnsiString = 'null';
                            Const aTrueStr: AnsiString = 'true';
                            Const aFalseStr: AnsiString = 'false');
@@ -8183,14 +8183,14 @@ begin
 end;
 
 {************************************************}
-procedure ALTStringsToJson(const aLst: TALStrings;
+procedure ALTStringsToJson(const aLst: TALStringsA;
                            const aJsonNode: TALJSONNode;
                            Const aPath: AnsiString = '';
                            Const aNameToLowerCase: boolean = false;
                            Const aNullStr: AnsiString = 'null');
 
 var LIndex: Integer;
-    LNames:  TALStringList;
+    LNames:  TALStringListA;
     LLowerName: AnsiString;
     LCurrJsonNode, LTmpJsonNode: TALJSONNode;
     I, J: integer;
@@ -8205,7 +8205,7 @@ begin
   //   [3]
   //   translations
   //   usa
-  LNames := TALStringList.Create;
+  LNames := TALStringListA.Create;
   try
 
     //init aNames.linebreak
@@ -8290,7 +8290,7 @@ end;
 {*************************************************}
 Procedure ALJSONToXML(const aJSONNode: TALJsonNode;
                       const aXMLNode: TALXmlNode;
-                      const aXMLElementNameForJSONArrayEntries: TalStrings; // JSONArrayNodeName=XMLElementName | ex: transactions=transaction
+                      const aXMLElementNameForJSONArrayEntries: TALStringsA; // JSONArrayNodeName=XMLElementName | ex: transactions=transaction
                                                                             //                                  |     features=feature
                       const aDefaultXMLElementNameForJSONArrayEntries: AnsiString = 'rec');
 var LNodeName: AnsiString;
@@ -9078,7 +9078,7 @@ Var BufferLength: Integer;
     CurrValue: String;
     NotSaxMode: Boolean;
     WorkingNode: TALJSONNodeU;
-    NamePaths: TALNvStringListU;
+    NamePaths: TALNVStringListW;
     ObjectPaths: TALIntegerList;
     DecodeJSONReferences: boolean;
 
@@ -10153,7 +10153,7 @@ Begin
   end
   else begin
     ObjectPaths := nil;
-    NamePaths := TALNvStringListU.Create;
+    NamePaths := TALNVStringListW.Create;
   end;
   Try
 
@@ -10248,7 +10248,7 @@ Var BufferLength: Integer;
     CurrName: String;
     NotSaxMode: Boolean;
     WorkingNode: TALJsonNodeU;
-    NamePaths: TALStringListU;
+    NamePaths: TALStringListW;
     ObjectPaths: TObjectList<TALJsonNodeU>;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -11024,7 +11024,7 @@ Begin
   end
   else begin
     ObjectPaths := nil;
-    NamePaths := TALStringListU.Create;
+    NamePaths := TALStringListW.Create;
   end;
   Try
 
@@ -15012,7 +15012,7 @@ end;
 Procedure ALJSONToTStringsU(const AJsonStr: String;
                             const aFormatSettings: TALFormatSettingsW;
                             const aPath: String;
-                            const aLst: TALStringsU;
+                            const aLst: TALStringsW;
                             Const aNullStr: String = 'null';
                             Const aTrueStr: String = 'true';
                             Const aFalseStr: String = 'false');
@@ -15062,7 +15062,7 @@ end;
 {*************************************************}
 Procedure ALJSONToTStringsU(const AJsonStr: String;
                             const aFormatSettings: TALFormatSettingsW;
-                            const aLst: TALStringsU;
+                            const aLst: TALStringsW;
                             Const aNullStr: String = 'null';
                             Const aTrueStr: String = 'true';
                             Const aFalseStr: String = 'false');
@@ -15079,7 +15079,7 @@ end;
 {********************************************************}
 Procedure ALJSONToTStringsU(const aJsonNode: TALJSONNodeU;
                             Const aPath: String;
-                            const aLst: TALStringsU;
+                            const aLst: TALStringsW;
                             Const aNullStr: String = 'null';
                             Const aTrueStr: String = 'true';
                             Const aFalseStr: String = 'false');
@@ -15130,7 +15130,7 @@ end;
 
 {********************************************************}
 Procedure ALJSONToTStringsU(const aJsonNode: TALJSONNodeU;
-                            const aLst: TALStringsU;
+                            const aLst: TALStringsW;
                             Const aNullStr: String = 'null';
                             Const aTrueStr: String = 'true';
                             Const aFalseStr: String = 'false');
@@ -15144,14 +15144,14 @@ begin
 end;
 
 {**************************************************}
-procedure ALTStringsToJsonU(const aLst: TALStringsU;
+procedure ALTStringsToJsonU(const aLst: TALStringsW;
                             const aJsonNode: TALJSONNodeU;
                             Const aPath: String = '';
                             Const aNameToLowerCase: boolean = false;
                             Const aNullStr: String = 'null');
 
 var LIndex: Integer;
-    LNames:  TALStringListU;
+    LNames:  TALStringListW;
     LLowerName: String;
     LCurrJsonNode, aTmpJsonNode: TALJSONNodeU;
     I, J: integer;
@@ -15166,7 +15166,7 @@ begin
   //   [3]
   //   translations
   //   usa
-  LNames := TALStringListU.Create;
+  LNames := TALStringListW.Create;
   try
 
     //init aNames.linebreak

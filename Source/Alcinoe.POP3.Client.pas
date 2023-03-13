@@ -41,10 +41,10 @@ type
       function  User(const UserName: AnsiString): AnsiString; virtual;
       function  Pass(const Password: AnsiString): AnsiString; virtual;
       Function  List: AnsiString; overload; virtual;
-      procedure List(ALst: TALStrings); overload; virtual;
+      procedure List(ALst: TALStringsA); overload; virtual;
       Function  List(aMsgNumber: integer): AnsiString; overload; virtual;
       Function  Uidl: AnsiString; overload; virtual;
-      procedure Uidl(ALst: TALStrings); overload; virtual;
+      procedure Uidl(ALst: TALStringsA); overload; virtual;
       Function  Uidl(aMsgNumber: Integer): AnsiString; overload; virtual;
       Procedure Uidl(aMsgNumber: Integer; Var aUniqueIDListing: AnsiString); overload; virtual;
       Function  Quit: AnsiString; virtual;
@@ -73,7 +73,7 @@ Uses
   Alcinoe.StringUtils;
 
 {*******************************************************************************}
-Procedure ALPOP3ClientSplitResponseLine(aResponse: AnsiString; ALst: TALStrings);
+Procedure ALPOP3ClientSplitResponseLine(aResponse: AnsiString; ALst: TALStringsA);
 Begin
   aResponse := ALTrim(aResponse); // +OK 2 320
   aResponse := ALStringReplaceA(aResponse,#9,' ',[RfReplaceAll]); // +OK 2 320
@@ -354,7 +354,7 @@ begin
 end;
 
 {*********************************************}
-procedure TAlPOP3Client.List(ALst: TALStrings);
+procedure TAlPOP3Client.List(ALst: TALStringsA);
 begin
   ALst.Text := ALTrim(ALStringReplaceA(ALPOP3ClientExtractTextFromMultilineResponse(List), ' ', ALst.NameValueSeparator, [rfReplaceAll]));
 end;
@@ -432,7 +432,7 @@ begin
 end;
 
 {*********************************************}
-procedure TAlPOP3Client.UIDL(ALst: TALStrings);
+procedure TAlPOP3Client.UIDL(ALst: TALStringsA);
 begin
   ALst.Text := ALTrim(ALStringReplaceA(ALPOP3ClientExtractTextFromMultilineResponse(Uidl), ' ', ALst.NameValueSeparator, [rfReplaceAll]));
 end;
@@ -445,9 +445,9 @@ end;
 
 {**********************************************************************************}
 Procedure TAlPOP3Client.Uidl(aMsgNumber: Integer; Var aUniqueIDListing: AnsiString);
-Var LLst: TALStringList;
+Var LLst: TALStringListA;
 Begin
-  LLst := TALStringList.Create;
+  LLst := TALStringListA.Create;
   Try
     ALPOP3ClientSplitResponseLine(UIDL(aMsgNumber), LLst);
     If LLst.Count < 3 then raise Exception.Create('UIDL cmd Error');
@@ -502,9 +502,9 @@ end;
 
 {****************************************************************************************************}
 procedure TAlPOP3Client.Stat(Var ANumberofMsgInthemaildrop: Integer; Var aSizeofthemaildrop: integer);
-Var LLst: TALStringList;
+Var LLst: TALStringListA;
 Begin
-  LLst := TALStringList.Create;
+  LLst := TALStringListA.Create;
   Try
     ALPOP3ClientSplitResponseLine(Stat, LLst);
     If LLst.Count < 3 then raise Exception.Create('Stat cmd Error');

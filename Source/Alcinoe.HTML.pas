@@ -8,7 +8,7 @@ uses
   Alcinoe.StringList;
 
 procedure ALExtractHTMLText(HtmlContent: AnsiString;
-                            LstExtractedResourceText: TALStrings;
+                            LstExtractedResourceText: TALStringsA;
                             Const DecodeHTMLText: Boolean = True); overload;
 function  ALExtractHTMLText(const HtmlContent: AnsiString;
                             Const DecodeHTMLText: Boolean = True): AnsiString; overload;
@@ -29,7 +29,7 @@ function  ALRunJavascript(const aCode: AnsiString): AnsiString;
 procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(Var HtmlContent: AnsiString;
                                                      Const DeleteBodyOfUnwantedTag: Boolean = False;
                                                      const ReplaceUnwantedTagCharBy: AnsiChar = #1);
-procedure ALCompactHtmlTagParams(TagParams: TALStrings);
+procedure ALCompactHtmlTagParams(TagParams: TALStringsA);
 function  ALJavascriptEncodeU(const Src: String; const useNumericReference: boolean = true): String;
 procedure ALJavascriptDecodeVU(Var Str: String);
 function  ALJavascriptDecodeU(const Src: String): String;
@@ -41,7 +41,7 @@ function  ALJavascriptDecodeU(const Src: String): String;
 ////////////////////////////
 
 procedure ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
-                                LstExtractedResourceText: TALStrings;
+                                LstExtractedResourceText: TALStringsA;
                                 Const DecodeHTMLText: Boolean = True); overload; deprecated 'use ALExtractHTMLText instead with SetMultiByteConversionCodePage(CP_UTF8)';
 function  ALUTF8ExtractHTMLText(const HtmlContent: AnsiString;
                                 Const DecodeHTMLText: Boolean = True): AnsiString; overload; deprecated 'use ALExtractHTMLText instead with SetMultiByteConversionCodePage(CP_UTF8)';
@@ -72,10 +72,10 @@ uses
   Alcinoe.QuickSortList;
 
 Var
-  _ALHtmlEntities: TALStrings;
+  _ALHtmlEntities: TALStringsA;
 
 {************************************************************}
-procedure ALInitHtmlEntities(const aHtmlEntities: TALStrings);
+procedure ALInitHtmlEntities(const aHtmlEntities: TALStringsA);
 Begin
 
   aHtmlEntities.Clear;
@@ -1801,7 +1801,7 @@ end;
 {*********************************************}
 { because of such link: <A HREF = "obie2.html">
   that is split in 3 line in TagParams}
-Procedure ALCompactHtmlTagParams(TagParams: TALStrings);
+Procedure ALCompactHtmlTagParams(TagParams: TALStringsA);
 Var i: integer;
     S1, S2, S3: AnsiString;
     P1, P2, P3: integer;
@@ -1847,7 +1847,7 @@ end;
 
 {**************************************************}
 procedure ALExtractHTMLText(HtmlContent: AnsiString;
-                            LstExtractedResourceText : TALStrings;
+                            LstExtractedResourceText : TALStringsA;
                             Const DecodeHTMLText: Boolean = True);
 
   {-----------------------------------------------------}
@@ -1895,9 +1895,9 @@ end;
 {********************************************************}
 function  ALExtractHTMLText(const HtmlContent: AnsiString;
                             Const DecodeHTMLText: Boolean = True): AnsiString;
-Var LstExtractedResourceText: TALStrings;
+Var LstExtractedResourceText: TALStringsA;
 Begin
-  LstExtractedResourceText := TALStringList.Create;
+  LstExtractedResourceText := TALStringListA.Create;
   Try
     ALExtractHTMLText(HtmlContent,
                       LstExtractedResourceText,
@@ -1922,7 +1922,7 @@ end;
 {**********}
 //deprecated
 procedure ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
-                                LstExtractedResourceText: TALStrings;
+                                LstExtractedResourceText: TALStringsA;
                                 Const DecodeHTMLText: Boolean = True);
 begin
   ALExtractHTMLText(HtmlContent, LstExtractedResourceText, DecodeHTMLText);
@@ -1981,10 +1981,10 @@ begin
 end;
 
 Initialization
-  _ALHtmlEntities := TALStringList.create;
-  TALStringList(_ALHtmlEntities).NameValueOptimization := False;
+  _ALHtmlEntities := TALStringListA.create;
+  TALStringListA(_ALHtmlEntities).NameValueOptimization := False;
   ALInitHtmlEntities(_ALHtmlEntities);
-  With (_ALHtmlEntities as TALStringList) do begin
+  With (_ALHtmlEntities as TALStringListA) do begin
     CaseSensitive := True;
     Duplicates := DupAccept;
     Sorted := True;

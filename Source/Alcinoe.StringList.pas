@@ -1,39 +1,39 @@
 {*************************************************************
-TALStringList
-TALStringList Work the same as Delphi TstringList except that it's
+TALStringListA
+TALStringListA Work the same as Delphi TstringList except that it's
 allow to search a name=value using a quicksort algorithm when the
-list is sorted. Also TALStringList use a locale independant
+list is sorted. Also TALStringListA use a locale independant
 algorithme (based on the 8-bit ordinal value of each character)
 instead of the AnsiCompareText and AnsiCompareStr used by the
-Delphi TstringList. at the end the sort in TALStringList is up to
-10x more faster than in Delphi TstringList. Also TALStringList is
+Delphi TstringList. at the end the sort in TALStringListA is up to
+10x more faster than in Delphi TstringList. Also TALStringListA is
 not an unicode TstringList but an 100% Ansi StringList
 
-TALStringListU
-TALStringListU is the same as TALStringList but with unicode
+TALStringListW
+TALStringListW is the same as TALStringListA but with unicode
 String
 
-TALNVStringList
-TALNVStringList (NV for NameValue) is same as TALStringList (use
+TALNVStringListA
+TALNVStringListA (NV for NameValue) is same as TALStringListA (use
 also a quicksort algorithme) except that here optimisation is
 oriented for name/value list instead of string list.
 
-TALNVStringListU
-TALNVStringList is the same as TALNVStringListU but with unicode
+TALNVStringListW
+TALNVStringListA is the same as TALNVStringListW but with unicode
 String
 
-TALAVLStringList
-TALAVLStringList is same as TALStringList except that it's use
+TALAVLStringListA
+TALAVLStringListA is same as TALStringListA except that it's use
 internally a self-balancing binary Tree instead of a quicksort
 algorithm
 
-TALHashedStringList
-TALHashedStringList is same as TALStringList except that it's use
+TALHashedStringListA
+TALHashedStringListA is same as TALStringListA except that it's use
 an internal hash table instead of a quicksort algorithm. By using
-TALHashedStringList instead of TALStringList, you can improve
+TALHashedStringListA instead of TALStringListA, you can improve
 performance when the list contains a large number of strings
 (else if your list don't contain a lot of strings the performance
-is lower than TALStringList because of the cost to calculate the
+is lower than TALStringListA because of the cost to calculate the
 hash)
 **************************************************************}
 unit Alcinoe.StringList;
@@ -55,22 +55,22 @@ Uses
 Type
 
   {-----------------}
-  TALStrings = class;
+  TALStringsA = class;
 
   {--------------------------}
-  TALStringsEnumerator = class
+  TALStringsEnumeratorA = class
   private
     FIndex: Integer;
-    FStrings: TALStrings;
+    FStrings: TALStringsA;
   public
-    constructor Create(AStrings: TALStrings);
+    constructor Create(AStrings: TALStringsA);
     function GetCurrent: AnsiString;
     function MoveNext: Boolean; inline;
     property Current: AnsiString read GetCurrent;
   end;
 
   {-----------------------------}
-  TALStrings = class(TPersistent)
+  TALStringsA = class(TPersistent)
   private
     //[deleted from Tstrings] FEncoding: TEncoding;
     //[deleted from Tstrings] FDefaultEncoding: TEncoding;
@@ -134,7 +134,7 @@ Type
     function AddNameValue(const Name, Value: AnsiString): Integer; virtual; // [added from Tstrings]
     function AddNameValueObject(const Name, Value: AnsiString; AObject: TObject): Integer; virtual; // [added from Tstrings]
     procedure Append(const S: AnsiString);
-    procedure AddStrings(Strings: TALStrings); overload; virtual;
+    procedure AddStrings(Strings: TALStringsA); overload; virtual;
     procedure AddStrings(const Strings: array of AnsiString); overload;
     procedure AddStrings(const Strings: array of AnsiString; const Objects: array of TObject); overload;
     procedure Assign(Source: TPersistent); override;
@@ -142,9 +142,9 @@ Type
     procedure Clear; virtual; abstract;
     procedure Delete(Index: Integer); virtual; abstract;
     procedure EndUpdate;
-    function Equals(Strings: TALStrings): Boolean; reintroduce;
+    function Equals(Strings: TALStringsA): Boolean; reintroduce;
     procedure Exchange(Index1, Index2: Integer); virtual;
-    function GetEnumerator: TALStringsEnumerator; inline;
+    function GetEnumerator: TALStringsEnumeratorA; inline;
     function GetText: PAnsiChar; virtual;
     function IndexOf(const S: AnsiString): Integer; virtual;
     function IndexOfName(const Name: AnsiString): Integer; virtual;
@@ -186,23 +186,23 @@ Type
   end;
 
   {--------------------}
-  TALStringList = class;
+  TALStringListA = class;
 
   {-----------------------------}
-  PALStringItem = ^TALStringItem;
-  TALStringItem = record
+  PALStringItemA = ^TALStringItemA;
+  TALStringItemA = record
     FString: AnsiString;
     FObject: TObject;
   end;
 
   {-----------------------------------------}
-  TALStringItemList = array of TALStringItem;
-  TALStringListSortCompare = reference to function(List: TALStringList; Index1, Index2: Integer): Integer;
+  TALStringItemListA = array of TALStringItemA;
+  TALStringListSortCompareA = reference to function(List: TALStringListA; Index1, Index2: Integer): Integer;
 
   {-------------------------------}
-  TALStringList = class(TALStrings)
+  TALStringListA = class(TALStringsA)
   private
-    FList: TALStringItemList;
+    FList: TALStringItemListA;
     FCount: Integer;
     FCapacity: Integer;
     FSorted: Boolean;
@@ -214,7 +214,7 @@ Type
     FNameValueOptimization: Boolean;
     procedure ExchangeItems(Index1, Index2: Integer);
     procedure Grow;
-    procedure QuickSort(L, R: Integer; ACompare: TALStringListSortCompare);
+    procedure QuickSort(L, R: Integer; ACompare: TALStringListSortCompareA);
     procedure SetSorted(Value: Boolean);
     procedure SetCaseSensitive(const Value: Boolean);
   protected
@@ -251,7 +251,7 @@ Type
     procedure InsertObject(Index: Integer; const S: AnsiString; AObject: TObject); override;
     procedure Move(CurIndex, NewIndex: Integer); override;
     procedure Sort; virtual;
-    procedure CustomSort(Compare: TALStringListSortCompare); virtual;
+    procedure CustomSort(Compare: TALStringListSortCompareA); virtual;
     property Duplicates: TDuplicates read FDuplicates write FDuplicates;
     property Sorted: Boolean read FSorted write SetSorted;
     property CaseSensitive: Boolean read FCaseSensitive write SetCaseSensitive;
@@ -262,11 +262,11 @@ Type
   end;
 
   {----------------------}
-  TALNVStringList = class;
+  TALNVStringListA = class;
 
   {---------------------------------}
-  PALNVStringItem = ^TALNVStringItem;
-  TALNVStringItem = record
+  PALNVStringItemA = ^TALNVStringItemA;
+  TALNVStringItemA = record
     FName: AnsiString;
     FValue: AnsiString;
     FNVS: Boolean;
@@ -274,13 +274,13 @@ Type
   end;
 
   {---------------------------------------------}
-  TALNVStringItemList = array of TALNVStringItem;
-  TALNVStringListSortCompare = reference to function(List: TALNVStringList; Index1, Index2: Integer): Integer;
+  TALNVStringItemListA = array of TALNVStringItemA;
+  TALNVStringListSortCompareA = reference to function(List: TALNVStringListA; Index1, Index2: Integer): Integer;
 
   {---------------------------------}
-  TALNVStringList = class(TALStrings)
+  TALNVStringListA = class(TALStringsA)
   private
-    FList: TALNVStringItemList;
+    FList: TALNVStringItemListA;
     FCount: Integer;
     FCapacity: Integer;
     FSorted: Boolean;
@@ -291,7 +291,7 @@ Type
     FOwnsObject: Boolean;
     procedure ExchangeItems(Index1, Index2: Integer);
     procedure Grow;
-    procedure QuickSort(L, R: Integer; ACompare: TALNVStringListSortCompare);
+    procedure QuickSort(L, R: Integer; ACompare: TALNVStringListSortCompareA);
     procedure SetSorted(Value: Boolean);
     procedure SetCaseSensitive(const Value: Boolean);
     Function ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean; //[added from TStringList]
@@ -346,7 +346,7 @@ Type
     procedure InsertNameValueObject(Index: Integer; const Name, Value: AnsiString; AObject: TObject); override; // [added from Tstrings]
     procedure Move(CurIndex, NewIndex: Integer); override;
     procedure Sort; virtual;
-    procedure CustomSort(Compare: TALNVStringListSortCompare); virtual;
+    procedure CustomSort(Compare: TALNVStringListSortCompareA); virtual;
     property Duplicates: TDuplicates read FDuplicates write FDuplicates;
     property Sorted: Boolean read FSorted write SetSorted;
     property CaseSensitive: Boolean read FCaseSensitive write SetCaseSensitive;
@@ -356,11 +356,11 @@ Type
   end;
 
   {-----------------------}
-  TALAVLStringList = class;
-  TALAVLStringListSortCompare = function(List: TALAVLStringList; Index1, Index2: Integer): Integer;
+  TALAVLStringListA = class;
+  TALAVLStringListSortCompareA = function(List: TALAVLStringListA; Index1, Index2: Integer): Integer;
 
   {-------------------------------------------------------------------}
-  TALAVLStringListBinaryTreeNode = class(TALStringKeyAVLBinaryTreeNode)
+  TALAVLStringListBinaryTreeNodeA = class(TALStringKeyAVLBinaryTreeNode)
   Private
   Protected
   Public
@@ -378,7 +378,7 @@ Type
   //we add name1=value3 then if ignore duplicates
   //no error will be raise and the add command
   //will be silently ignored
-  TALAVLStringList = class(TALStrings)
+  TALAVLStringListA = class(TALStringsA)
   private
     FNodeList: TObjectList;
     FAVLBinTree: TALStringKeyAVLBinaryTree;
@@ -387,7 +387,7 @@ Type
     FOnChanging: TNotifyEvent;
     FOwnsObject: Boolean;
     procedure ExchangeItems(Index1, Index2: Integer);
-    procedure QuickSort(L, R: Integer; ACompare: TALAVLStringListSortCompare);
+    procedure QuickSort(L, R: Integer; ACompare: TALAVLStringListSortCompareA);
     procedure SetCaseSensitive(const Value: Boolean);
     function GetCaseSensitive: Boolean;
     Function ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean;
@@ -434,7 +434,7 @@ Type
     procedure InsertNameValue(Index: Integer; const Name, Value: AnsiString); override; // [added from Tstrings]
     procedure InsertNameValueObject(Index: Integer; const Name, Value: AnsiString; AObject: TObject); override; // [added from Tstrings]
     procedure Move(CurIndex, NewIndex: Integer); override;
-    procedure CustomSort(Compare: TALAVLStringListSortCompare); virtual;
+    procedure CustomSort(Compare: TALAVLStringListSortCompareA); virtual;
     property Duplicates: TDuplicates read FDuplicates write SetDuplicates;
     property CaseSensitive: Boolean read GetCaseSensitive write SetCaseSensitive;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
@@ -443,11 +443,11 @@ Type
   end;
 
   {--------------------------}
-  TALHashedStringList = class;
-  TALHashedStringListSortCompare = function(List: TALHashedStringList; Index1, Index2: Integer): Integer;
+  TALHashedStringListA = class;
+  TALHashedStringListSortCompareA = function(List: TALHashedStringListA; Index1, Index2: Integer): Integer;
 
   {-------------------------------------------------}
-  TALHashedStringListDictionaryNode = class(Tobject)
+  TALHashedStringListDictionaryNodeA = class(Tobject)
   Private
   Protected
   Public
@@ -466,22 +466,22 @@ Type
   //we add name1=value3 then if ignore duplicates
   //no error will be raise and the add command
   //will be silently ignored
-  TALHashedStringList = class(TALStrings)
+  TALHashedStringListA = class(TALStringsA)
   private
-    FNodeList: TObjectList<TALHashedStringListDictionaryNode>;
-    FDictionary: TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>;
+    FNodeList: TObjectList<TALHashedStringListDictionaryNodeA>;
+    FDictionary: TObjectDictionary<ansiString, TALHashedStringListDictionaryNodeA>;
     FDuplicates: TDuplicates;
     FOnChange: TNotifyEvent;
     FOnChanging: TNotifyEvent;
     FOwnsObject: Boolean;
     FCaseSensitive: boolean;
     procedure ExchangeItems(Index1, Index2: Integer);
-    procedure QuickSort(L, R: Integer; ACompare: TALHashedStringListSortCompare);
+    procedure QuickSort(L, R: Integer; ACompare: TALHashedStringListSortCompareA);
     procedure SetCaseSensitive(const Value: Boolean);
     function GetCaseSensitive: Boolean;
     Function ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean;
     procedure SetDuplicates(const Value: TDuplicates);
-    function CreateDictionary(ACapacity: integer; aCaseSensitive: boolean): TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>;
+    function CreateDictionary(ACapacity: integer; aCaseSensitive: boolean): TObjectDictionary<ansiString, TALHashedStringListDictionaryNodeA>;
   protected
     function GetName(Index: Integer): AnsiString; override;
     function GetStrictName(Index: Integer): AnsiString; override; // [added from Tstrings]
@@ -527,7 +527,7 @@ Type
     procedure InsertNameValue(Index: Integer; const Name, Value: AnsiString); override; // [added from Tstrings]
     procedure InsertNameValueObject(Index: Integer; const Name, Value: AnsiString; AObject: TObject); override; // [added from Tstrings]
     procedure Move(CurIndex, NewIndex: Integer); override;
-    procedure CustomSort(Compare: TALHashedStringListSortCompare); virtual;
+    procedure CustomSort(Compare: TALHashedStringListSortCompareA); virtual;
     property Duplicates: TDuplicates read FDuplicates write SetDuplicates;
     property CaseSensitive: Boolean read GetCaseSensitive write SetCaseSensitive;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
@@ -536,15 +536,15 @@ Type
   end;
 
   {------------------}
-  TALStringsU = class;
+  TALStringsW = class;
 
   {---------------------------}
-  TALStringsEnumeratorU = class
+  TALStringsEnumeratorW = class
   private
     FIndex: Integer;
-    FStrings: TALStringsU;
+    FStrings: TALStringsW;
   public
-    constructor Create(AStrings: TALStringsU);
+    constructor Create(AStrings: TALStringsW);
     function GetCurrent: String;
     function MoveNext: Boolean; inline;
     property Current: String read GetCurrent;
@@ -554,7 +554,7 @@ Type
   {$IFNDEF ALCompilerVersionSupported}
     {$MESSAGE WARN 'Check if System.classes.TStrings didn''t change and adjust the IFDEF'}
   {$IFEND}
-  TALStringsU = class(TPersistent)
+  TALStringsW = class(TPersistent)
   private
     //[deleted from Tstrings] procedure SetStringsAdapter(const Value: IStringsAdapter);
     //[deleted from Tstrings] FAdapter: IStringsAdapter;
@@ -611,7 +611,7 @@ Type
     function AddNameValue(const Name, Value: String): Integer; virtual; // [added from Tstrings]
     function AddNameValueObject(const Name, Value: String; AObject: TObject): Integer; virtual; // [added from Tstrings]
     procedure Append(const S: String);
-    procedure AddStrings(Strings: TALStringsU); overload; virtual;
+    procedure AddStrings(Strings: TALStringsW); overload; virtual;
     procedure AddStrings(const Strings: array of string); overload;
     procedure AddStrings(const Strings: array of string; const Objects: array of TObject); overload;
     procedure Assign(Source: TPersistent); override;
@@ -619,9 +619,9 @@ Type
     procedure Clear; virtual; abstract;
     procedure Delete(Index: Integer); virtual; abstract;
     procedure EndUpdate;
-    function Equals(Strings: TALStringsU): Boolean; reintroduce;
+    function Equals(Strings: TALStringsW): Boolean; reintroduce;
     procedure Exchange(Index1, Index2: Integer); virtual;
-    function GetEnumerator: TALStringsEnumeratorU; inline;
+    function GetEnumerator: TALStringsEnumeratorW; inline;
     function GetText: PChar; virtual;
     function IndexOf(const S: String): Integer; virtual;
     function IndexOfName(const Name: String): Integer; virtual;
@@ -668,26 +668,26 @@ Type
   end;
 
   {---------------------}
-  TALStringListU = class;
+  TALStringListW = class;
 
   {-------------------------------}
-  PALStringItemU = ^TALStringItemU;
-  TALStringItemU = record
+  PALStringItemW = ^TALStringItemW;
+  TALStringItemW = record
     FString: String;
     FObject: TObject;
   end;
 
   {-------------------------------------------}
-  TALStringItemListU = array of TALStringItemU;
-  TALStringListSortCompareU = reference to function(List: TALStringListU; Index1, Index2: Integer): Integer;
+  TALStringItemListW = array of TALStringItemW;
+  TALStringListSortCompareW = reference to function(List: TALStringListW; Index1, Index2: Integer): Integer;
 
   {----------------------------------}
   {$IFNDEF ALCompilerVersionSupported}
     {$MESSAGE WARN 'Check if System.classes.TStringList didn''t change and adjust the IFDEF'}
   {$IFEND}
-  TALStringListU = class(TALStringsU)
+  TALStringListW = class(TALStringsW)
   private
-    FList: TALStringItemListU;
+    FList: TALStringItemListW;
     FCount: Integer;
     FCapacity: Integer;
     FSorted: Boolean;
@@ -699,7 +699,7 @@ Type
     FNameValueOptimization: Boolean;
     procedure ExchangeItems(Index1, Index2: Integer);
     procedure Grow;
-    procedure QuickSort(L, R: Integer; ACompare: TALStringListSortCompareU);
+    procedure QuickSort(L, R: Integer; ACompare: TALStringListSortCompareW);
     procedure SetSorted(Value: Boolean);
     procedure SetCaseSensitive(const Value: Boolean);
   protected
@@ -736,7 +736,7 @@ Type
     procedure InsertObject(Index: Integer; const S: String; AObject: TObject); override;
     procedure Move(CurIndex, NewIndex: Integer); override;
     procedure Sort; virtual;
-    procedure CustomSort(Compare: TALStringListSortCompareU); virtual;
+    procedure CustomSort(Compare: TALStringListSortCompareW); virtual;
     property Duplicates: TDuplicates read FDuplicates write FDuplicates;
     property Sorted: Boolean read FSorted write SetSorted;
     property CaseSensitive: Boolean read FCaseSensitive write SetCaseSensitive;
@@ -747,11 +747,11 @@ Type
   end;
 
   {-----------------------}
-  TALNVStringListU = class;
+  TALNVStringListW = class;
 
   {-----------------------------------}
-  PALNVStringItemU = ^TALNVStringItemU;
-  TALNVStringItemU = record
+  PALNVStringItemW = ^TALNVStringItemW;
+  TALNVStringItemW = record
     FName: String;
     FValue: String;
     FNVS: Boolean;
@@ -759,13 +759,13 @@ Type
   end;
 
   {-----------------------------------------------}
-  TALNVStringItemListU = array of TALNVStringItemU;
-  TALNVStringListSortCompareU = reference to function(List: TALNVStringListU; Index1, Index2: Integer): Integer;
+  TALNVStringItemListW = array of TALNVStringItemW;
+  TALNVStringListSortCompareW = reference to function(List: TALNVStringListW; Index1, Index2: Integer): Integer;
 
   {-----------------------------------}
-  TALNVStringListU = class(TALStringsU)
+  TALNVStringListW = class(TALStringsW)
   private
-    FList: TALNVStringItemListU;
+    FList: TALNVStringItemListW;
     FCount: Integer;
     FCapacity: Integer;
     FSorted: Boolean;
@@ -776,7 +776,7 @@ Type
     FOwnsObject: Boolean;
     procedure ExchangeItems(Index1, Index2: Integer);
     procedure Grow;
-    procedure QuickSort(L, R: Integer; ACompare: TALNVStringListSortCompareU);
+    procedure QuickSort(L, R: Integer; ACompare: TALNVStringListSortCompareW);
     procedure SetSorted(Value: Boolean);
     procedure SetCaseSensitive(const Value: Boolean);
     Function ExtractNameValue(const S: String; var Name, Value: String): Boolean; //[added from TStringList]
@@ -831,7 +831,7 @@ Type
     procedure InsertNameValueObject(Index: Integer; const Name, Value: String; AObject: TObject); override; // [added from Tstrings]
     procedure Move(CurIndex, NewIndex: Integer); override;
     procedure Sort; virtual;
-    procedure CustomSort(Compare: TALNVStringListSortCompareU); virtual;
+    procedure CustomSort(Compare: TALNVStringListSortCompareW); virtual;
     property Duplicates: TDuplicates read FDuplicates write FDuplicates;
     property Sorted: Boolean read FSorted write SetSorted;
     property CaseSensitive: Boolean read FCaseSensitive write SetCaseSensitive;
@@ -851,7 +851,7 @@ Uses
   Alcinoe.Common;
 
 {************************************************************}
-constructor TALStringsEnumerator.Create(AStrings: TALStrings);
+constructor TALStringsEnumeratorA.Create(AStrings: TALStringsA);
 begin
   inherited Create;
   FIndex := -1;
@@ -859,20 +859,20 @@ begin
 end;
 
 {***************************************************}
-function TALStringsEnumerator.GetCurrent: AnsiString;
+function TALStringsEnumeratorA.GetCurrent: AnsiString;
 begin
   Result := FStrings[FIndex];
 end;
 
 {**********************************************}
-function TALStringsEnumerator.MoveNext: Boolean;
+function TALStringsEnumeratorA.MoveNext: Boolean;
 begin
   Inc(FIndex);
   Result := FIndex < FStrings.Count;
 end;
 
 {****************************}
-constructor TALStrings.Create;
+constructor TALStringsA.Create;
 begin
   inherited Create;
   FDelimiter := ',';
@@ -885,39 +885,39 @@ begin
 end;
 
 {****************************************************}
-function TALStrings.Add(const S: AnsiString): Integer;
+function TALStringsA.Add(const S: AnsiString): Integer;
 begin
   Result := GetCount;
   Insert(Result, S);
 end;
 
 {****************************************************************************}
-function TALStrings.AddObject(const S: AnsiString; AObject: TObject): Integer;
+function TALStringsA.AddObject(const S: AnsiString; AObject: TObject): Integer;
 begin
   Result := Add(S);
   PutObject(Result, AObject);
 end;
 
 {***********************************************************************}
-function TALStrings.AddNameValue(const Name, Value: AnsiString): Integer;
+function TALStringsA.AddNameValue(const Name, Value: AnsiString): Integer;
 begin
   result := add(name + NameValueSeparator + Value);
 end;
 
 {***********************************************************************************************}
-function TALStrings.AddNameValueObject(const Name, Value: AnsiString; AObject: TObject): Integer;
+function TALStringsA.AddNameValueObject(const Name, Value: AnsiString; AObject: TObject): Integer;
 begin
   result := addObject(name + NameValueSeparator + Value, AObject);
 end;
 
 {***********************************************}
-procedure TALStrings.Append(const S: AnsiString);
+procedure TALStringsA.Append(const S: AnsiString);
 begin
   Add(S);
 end;
 
 {***************************************************}
-procedure TALStrings.AddStrings(Strings: TALStrings);
+procedure TALStringsA.AddStrings(Strings: TALStringsA);
 var
   I: Integer;
 begin
@@ -931,7 +931,7 @@ begin
 end;
 
 {******************************************************************}
-procedure TALStrings.AddStrings(const Strings: array of AnsiString);
+procedure TALStringsA.AddStrings(const Strings: array of AnsiString);
 var
   I: Integer;
 begin
@@ -945,7 +945,7 @@ begin
 end;
 
 {***************************************************************************************************}
-procedure TALStrings.AddStrings(const Strings: array of AnsiString; const Objects: array of TObject);
+procedure TALStringsA.AddStrings(const Strings: array of AnsiString; const Objects: array of TObject);
 var
   I: Integer;
 begin
@@ -961,20 +961,20 @@ begin
 end;
 
 {***********************************************}
-procedure TALStrings.Assign(Source: TPersistent);
+procedure TALStringsA.Assign(Source: TPersistent);
 var I: integer;
 begin
-  if Source is TALStrings then
+  if Source is TALStringsA then
   begin
     BeginUpdate;
     try
       Clear;
-      NameValueSeparator := TALStrings(Source).NameValueSeparator;
-      QuoteChar := TALStrings(Source).QuoteChar;
-      Delimiter := TALStrings(Source).Delimiter;
-      LineBreak := TALStrings(Source).LineBreak;
-      StrictDelimiter := TALStrings(Source).StrictDelimiter;
-      AddStrings(TALStrings(Source));
+      NameValueSeparator := TALStringsA(Source).NameValueSeparator;
+      QuoteChar := TALStringsA(Source).QuoteChar;
+      Delimiter := TALStringsA(Source).Delimiter;
+      LineBreak := TALStringsA(Source).LineBreak;
+      StrictDelimiter := TALStringsA(Source).StrictDelimiter;
+      AddStrings(TALStringsA(Source));
     finally
       EndUpdate;
     end;
@@ -1001,7 +1001,7 @@ begin
 end;
 
 {***********************************************}
-procedure TALStrings.AssignTo(Dest: TPersistent);
+procedure TALStringsA.AssignTo(Dest: TPersistent);
 var I: integer;
 begin
   if Dest is TStrings then
@@ -1025,21 +1025,21 @@ begin
 end;
 
 {*******************************}
-procedure TALStrings.BeginUpdate;
+procedure TALStringsA.BeginUpdate;
 begin
   if FUpdateCount = 0 then SetUpdateState(True);
   Inc(FUpdateCount);
 end;
 
 {*****************************}
-procedure TALStrings.EndUpdate;
+procedure TALStringsA.EndUpdate;
 begin
   Dec(FUpdateCount);
   if FUpdateCount = 0 then SetUpdateState(False);
 end;
 
 {*******************************************************}
-function TALStrings.Equals(Strings: TALStrings): Boolean;
+function TALStringsA.Equals(Strings: TALStringsA): Boolean;
 var
   I, Count: Integer;
 begin
@@ -1051,19 +1051,19 @@ begin
 end;
 
 {***********************************************************}
-procedure TALStrings.Error(const Msg: String; Data: Integer);
+procedure TALStringsA.Error(const Msg: String; Data: Integer);
 begin
   raise EStringListError.CreateFmt(Msg, [Data]);
 end;
 
 {************************************************************}
-procedure TALStrings.Error(Msg: PResStringRec; Data: Integer);
+procedure TALStringsA.Error(Msg: PResStringRec; Data: Integer);
 begin
   raise EStringListError.CreateFmt(LoadResString(Msg), [Data]);
 end;
 
 {*****************************************************}
-procedure TALStrings.Exchange(Index1, Index2: Integer);
+procedure TALStringsA.Exchange(Index1, Index2: Integer);
 var
   TempObject: TObject;
   TempString: AnsiString;
@@ -1082,7 +1082,7 @@ begin
 end;
 
 {***************************************************************}
-function TALStrings.ExtractName(const S: AnsiString): AnsiString;
+function TALStringsA.ExtractName(const S: AnsiString): AnsiString;
 var
   P: Integer;
 begin
@@ -1141,13 +1141,13 @@ begin
 end;
 
 {***************************************}
-function TALStrings.GetCapacity: Integer;
+function TALStringsA.GetCapacity: Integer;
 begin  // descendents may optionally override/replace this default implementation
   Result := Count;
 end;
 
 {*******************************************}
-function TALStrings.GetCommaText: AnsiString;
+function TALStringsA.GetCommaText: AnsiString;
 var
   LOldDelimiter: AnsiChar;
   LOldQuoteChar: AnsiChar;
@@ -1165,7 +1165,7 @@ begin
 end;
 
 {***********************************************}
-function TALStrings.GetDelimitedText: AnsiString;
+function TALStringsA.GetDelimitedText: AnsiString;
 var
   S: AnsiString;
   P: PAnsiChar;
@@ -1195,19 +1195,19 @@ begin
 end;
 
 {******************************************************}
-function TALStrings.GetEnumerator: TALStringsEnumerator;
+function TALStringsA.GetEnumerator: TALStringsEnumeratorA;
 begin
-  Result := TALStringsEnumerator.Create(Self);
+  Result := TALStringsEnumeratorA.Create(Self);
 end;
 
 {******************************************************}
-function TALStrings.GetName(Index: Integer): AnsiString;
+function TALStringsA.GetName(Index: Integer): AnsiString;
 begin
   Result := ExtractName(Get(Index));
 end;
 
 {************************************************************}
-function TALStrings.GetStrictName(Index: Integer): AnsiString;
+function TALStringsA.GetStrictName(Index: Integer): AnsiString;
 var P: Integer;
 begin
   Result := Get(Index);
@@ -1217,19 +1217,19 @@ begin
 end;
 
 {*****************************************************}
-function TALStrings.GetObject(Index: Integer): TObject;
+function TALStringsA.GetObject(Index: Integer): TObject;
 begin
   Result := nil;
 end;
 
 {*************************************}
-function TALStrings.GetText: PAnsiChar;
+function TALStringsA.GetText: PAnsiChar;
 begin
   Result := System.Ansistrings.StrNew(PAnsiChar(GetTextStr));
 end;
 
 {*****************************************}
-function TALStrings.GetTextStr: AnsiString;
+function TALStringsA.GetTextStr: AnsiString;
 var
   I, L, Size, Count: Integer;
   P: PAnsiChar;
@@ -1260,7 +1260,7 @@ begin
 end;
 
 {***************************************************************}
-function TALStrings.GetValue(const Name: AnsiString): AnsiString;
+function TALStringsA.GetValue(const Name: AnsiString): AnsiString;
 var
   I: Integer;
 begin
@@ -1271,7 +1271,7 @@ begin
 end;
 
 {********************************************************}
-function TALStrings.IndexOf(const S: AnsiString): Integer;
+function TALStringsA.IndexOf(const S: AnsiString): Integer;
 begin
   for Result := 0 to GetCount - 1 do
     if CompareStrings(Get(Result), S) = 0 then Exit;
@@ -1279,7 +1279,7 @@ begin
 end;
 
 {***************************************************************}
-function TALStrings.IndexOfName(const Name: AnsiString): Integer;
+function TALStringsA.IndexOfName(const Name: AnsiString): Integer;
 var
   P: Integer;
   S: AnsiString;
@@ -1348,7 +1348,7 @@ begin
 end;
 
 {***********************************************************}
-function TALStrings.IndexOfObject(AObject: TObject): Integer;
+function TALStringsA.IndexOfObject(AObject: TObject): Integer;
 begin
   for Result := 0 to GetCount - 1 do
     if GetObject(Result) = AObject then Exit;
@@ -1356,32 +1356,32 @@ begin
 end;
 
 {***************************************************************************************}
-procedure TALStrings.InsertObject(Index: Integer; const S: AnsiString; AObject: TObject);
+procedure TALStringsA.InsertObject(Index: Integer; const S: AnsiString; AObject: TObject);
 begin
   Insert(Index, S);
   PutObject(Index, AObject);
 end;
 
 {**********************************************************************************}
-procedure TALStrings.InsertNameValue(Index: Integer; const Name, Value: AnsiString);
+procedure TALStringsA.InsertNameValue(Index: Integer; const Name, Value: AnsiString);
 begin
   Insert(Index, name + NameValueSeparator + Value);
 end;
 
 {**********************************************************************************************************}
-procedure TALStrings.InsertNameValueObject(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
+procedure TALStringsA.InsertNameValueObject(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
 begin
   InsertObject(Index, name + NameValueSeparator + Value, AObject);
 end;
 
 {************************************************************}
-procedure TALStrings.LoadFromFile(const FileName: AnsiString);
+procedure TALStringsA.LoadFromFile(const FileName: AnsiString);
 begin
   LoadFromFile(String(FileName));
 end;
 
 {********************************************************}
-procedure TALStrings.LoadFromFile(const FileName: String);
+procedure TALStringsA.LoadFromFile(const FileName: String);
 var
   Stream: TStream;
 begin
@@ -1394,7 +1394,7 @@ begin
 end;
 
 {***************************************************}
-procedure TALStrings.LoadFromStream(Stream: TStream);
+procedure TALStringsA.LoadFromStream(Stream: TStream);
 var
   Size: Integer;
   S: AnsiString;
@@ -1411,7 +1411,7 @@ begin
 end;
 
 {*****************************************************}
-procedure TALStrings.Move(CurIndex, NewIndex: Integer);
+procedure TALStringsA.Move(CurIndex, NewIndex: Integer);
 var
   TempObject: TObject;
   TempString: AnsiString;
@@ -1432,23 +1432,23 @@ begin
 end;
 
 {************************************************************}
-procedure TALStrings.Put(Index: Integer; const S: AnsiString);
+procedure TALStringsA.Put(Index: Integer; const S: AnsiString);
 begin
 end;
 
 {***************************************************************}
-procedure TALStrings.PutObject(Index: Integer; AObject: TObject);
+procedure TALStringsA.PutObject(Index: Integer; AObject: TObject);
 begin
 end;
 
 {**********************************************************}
-procedure TALStrings.SaveToFile(const FileName: AnsiString);
+procedure TALStringsA.SaveToFile(const FileName: AnsiString);
 begin
   SaveToFile(String(FileName));
 end;
 
 {******************************************************}
-procedure TALStrings.SaveToFile(const FileName: String);
+procedure TALStringsA.SaveToFile(const FileName: String);
 Var LFileStream: TfileStream;
     LTmpFilename: String;
 begin
@@ -1476,7 +1476,7 @@ begin
 end;
 
 {*************************************************}
-procedure TALStrings.SaveToStream(Stream: TStream);
+procedure TALStringsA.SaveToStream(Stream: TStream);
 var
   S: AnsiString;
 begin
@@ -1485,13 +1485,13 @@ begin
 end;
 
 {*****************************************************}
-procedure TALStrings.SetCapacity(NewCapacity: Integer);
+procedure TALStringsA.SetCapacity(NewCapacity: Integer);
 begin
   // do nothing - descendents may optionally implement this method
 end;
 
 {*********************************************************}
-procedure TALStrings.SetCommaText(const Value: AnsiString);
+procedure TALStringsA.SetCommaText(const Value: AnsiString);
 var
   LOldDelimiter: AnsiChar;
   LOldQuoteChar: AnsiChar;
@@ -1509,13 +1509,13 @@ begin
 end;
 
 {********************************************}
-procedure TALStrings.SetText(Text: PAnsiChar);
+procedure TALStringsA.SetText(Text: PAnsiChar);
 begin
   SetTextStr(Text);
 end;
 
 {*******************************************************}
-procedure TALStrings.SetTextStr(const Value: AnsiString);
+procedure TALStringsA.SetTextStr(const Value: AnsiString);
 var
   P, PCurVal, PCurLB, PStartVal, PEndVal, PStartLB, PEndLB: PAnsiChar;
   S: AnsiString;
@@ -1597,12 +1597,12 @@ begin
 end;
 
 {*****************************************************}
-procedure TALStrings.SetUpdateState(Updating: Boolean);
+procedure TALStringsA.SetUpdateState(Updating: Boolean);
 begin
 end;
 
 {***********************************************************}
-procedure TALStrings.SetValue(const Name, Value: AnsiString);
+procedure TALStringsA.SetValue(const Name, Value: AnsiString);
 var
   I: Integer;
 begin
@@ -1618,7 +1618,7 @@ begin
 end;
 
 {*********************************************************************}
-procedure TALStrings.SetPersistentValue(const Name, Value: AnsiString);
+procedure TALStringsA.SetPersistentValue(const Name, Value: AnsiString);
 var
   I: Integer;
 begin
@@ -1628,7 +1628,7 @@ begin
 end;
 
 {*************************************************************}
-procedure TALStrings.SetDelimitedText(const Value: AnsiString);
+procedure TALStringsA.SetDelimitedText(const Value: AnsiString);
 var
   P, P1: PAnsiChar;
   S: AnsiString;
@@ -1674,13 +1674,13 @@ begin
 end;
 
 {********************************************************************}
-function TALStrings.CompareStrings(const S1, S2: AnsiString): Integer;
+function TALStringsA.CompareStrings(const S1, S2: AnsiString): Integer;
 begin
   Result := ALCompareTextA(S1, S2);
 end;
 
 {****************************************************************}
-function TALStrings.GetValueFromIndex(Index: Integer): AnsiString;
+function TALStringsA.GetValueFromIndex(Index: Integer): AnsiString;
 var
   SepPos: Integer;
 begin
@@ -1698,7 +1698,7 @@ begin
 end;
 
 {******************************************************************************}
-procedure TALStrings.SetValueFromIndex(Index: Integer; const Value: AnsiString);
+procedure TALStringsA.SetValueFromIndex(Index: Integer; const Value: AnsiString);
 begin
   if Value <> '' then
   begin
@@ -1710,14 +1710,14 @@ begin
 end;
 
 {****************************************************************************************}
-procedure TALStrings.SetPersistentValueFromIndex(Index: Integer; const Value: AnsiString);
+procedure TALStringsA.SetPersistentValueFromIndex(Index: Integer; const Value: AnsiString);
 begin
   if Index < 0 then Add(NameValueSeparator + Value)
   else Put(Index, Names[Index] + NameValueSeparator + Value);
 end;
 
 {****************************************************}
-function TALStrings.ToStringArray: TArray<AnsiString>;
+function TALStringsA.ToStringArray: TArray<AnsiString>;
 var
   I: Integer;
 begin
@@ -1727,7 +1727,7 @@ begin
 end;
 
 {*************************************************}
-function TALStrings.ToObjectArray: TArray<TObject>;
+function TALStringsA.ToObjectArray: TArray<TObject>;
 var
   I: Integer;
 begin
@@ -1737,7 +1737,7 @@ begin
 end;
 
 {**************************************************************************}
-function TALStrings.ToNameValueArray: TArray<TPair<AnsiString, AnsiString>>;
+function TALStringsA.ToNameValueArray: TArray<TPair<AnsiString, AnsiString>>;
 var
   I: Integer;
 begin
@@ -1747,7 +1747,7 @@ begin
 end;
 
 {*******************************}
-destructor TALStringList.Destroy;
+destructor TALStringListA.Destroy;
 var
   I: Integer;
   Temp: Array of TObject;
@@ -1774,13 +1774,13 @@ begin
 end;
 
 {*******************************************************}
-function TALStringList.Add(const S: AnsiString): Integer;
+function TALStringListA.Add(const S: AnsiString): Integer;
 begin
   Result := AddObject(S, nil);
 end;
 
 {*******************************************************************************}
-function TALStringList.AddObject(const S: AnsiString; AObject: TObject): Integer;
+function TALStringListA.AddObject(const S: AnsiString; AObject: TObject): Integer;
 begin
   if not Sorted then
     Result := FCount
@@ -1794,34 +1794,34 @@ begin
 end;
 
 {**************************************************}
-procedure TALStringList.Assign(Source: TPersistent);
+procedure TALStringListA.Assign(Source: TPersistent);
 begin
-  if Source is TALStringList then
+  if Source is TALStringListA then
   begin
     Clear;
-    FCaseSensitive := TALStringList(Source).FCaseSensitive;
-    FDuplicates := TALStringList(Source).FDuplicates;
-    FSorted := TALStringList(Source).FSorted;
+    FCaseSensitive := TALStringListA(Source).FCaseSensitive;
+    FDuplicates := TALStringListA(Source).FDuplicates;
+    FSorted := TALStringListA(Source).FSorted;
   end
-  else if Source is TALNVStringList then
+  else if Source is TALNVStringListA then
   begin
     Clear;
-    FCaseSensitive := TALNVStringList(Source).FCaseSensitive;
-    FDuplicates := TALNVStringList(Source).FDuplicates;
-    FSorted := TALNVStringList(Source).FSorted;
+    FCaseSensitive := TALNVStringListA(Source).FCaseSensitive;
+    FDuplicates := TALNVStringListA(Source).FDuplicates;
+    FSorted := TALNVStringListA(Source).FSorted;
   end
-  else if Source is TALHashedStringList then
+  else if Source is TALHashedStringListA then
   begin
     Clear;
-    FCaseSensitive := TALHashedStringList(Source).CaseSensitive;
-    FDuplicates := TALHashedStringList(Source).FDuplicates;
+    FCaseSensitive := TALHashedStringListA(Source).CaseSensitive;
+    FDuplicates := TALHashedStringListA(Source).FDuplicates;
     FSorted := False;
   end
-  else if Source is TALAVLStringList then
+  else if Source is TALAVLStringListA then
   begin
     Clear;
-    FCaseSensitive := TALAVLStringList(Source).CaseSensitive;
-    FDuplicates := TALAVLStringList(Source).FDuplicates;
+    FCaseSensitive := TALAVLStringListA(Source).CaseSensitive;
+    FDuplicates := TALAVLStringListA(Source).FDuplicates;
     FSorted := False;
   end
   else if Source is TStringList then
@@ -1835,7 +1835,7 @@ begin
 end;
 
 {**************************************************}
-procedure TALStringList.AssignTo(Dest: TPersistent);
+procedure TALStringListA.AssignTo(Dest: TPersistent);
 begin
   if Dest is TStringList then
   begin
@@ -1848,21 +1848,21 @@ begin
 end;
 
 {******************************}
-procedure TALStringList.Changed;
+procedure TALStringListA.Changed;
 begin
   if (FUpdateCount = 0) and Assigned(FOnChange) then
     FOnChange(Self);
 end;
 
 {*******************************}
-procedure TALStringList.Changing;
+procedure TALStringListA.Changing;
 begin
   if (FUpdateCount = 0) and Assigned(FOnChanging) then
     FOnChanging(Self);
 end;
 
 {****************************}
-procedure TALStringList.Clear;
+procedure TALStringListA.Clear;
 var
   I: Integer;
   Temp: Array of TObject;
@@ -1892,7 +1892,7 @@ begin
 end;
 
 {*********************************************}
-procedure TALStringList.Delete(Index: Integer);
+procedure TALStringListA.Delete(Index: Integer);
 var
   Obj: TObject;
 begin
@@ -1912,7 +1912,7 @@ begin
   if Index < FCount then
   begin
     ALMove(FList[Index + 1], FList[Index],
-      (FCount - Index) * SizeOf(TALStringItem));
+      (FCount - Index) * SizeOf(TALStringItemA));
     // Make sure there is no danglng pointer in the last (now unused) element
     PPointer(@FList[FCount].FString)^ := nil;
     PPointer(@FList[FCount].FObject)^ := nil;
@@ -1923,7 +1923,7 @@ begin
 end;
 
 {*************************************************************}
-function  TALStringList.ExtractObject(Index: Integer): TObject;
+function  TALStringListA.ExtractObject(Index: Integer): TObject;
 begin
   if (Index < 0) or (Index >= FCount) then Error(@SListIndexError, Index);
   Changing;
@@ -1933,7 +1933,7 @@ begin
 end;
 
 {********************************************************}
-procedure TALStringList.Exchange(Index1, Index2: Integer);
+procedure TALStringListA.Exchange(Index1, Index2: Integer);
 begin
   if (Index1 < 0) or (Index1 >= FCount) then Error(@SListIndexError, Index1);
   if (Index2 < 0) or (Index2 >= FCount) then Error(@SListIndexError, Index2);
@@ -1943,10 +1943,10 @@ begin
 end;
 
 {*************************************************************}
-procedure TALStringList.ExchangeItems(Index1, Index2: Integer);
+procedure TALStringListA.ExchangeItems(Index1, Index2: Integer);
 var
   Temp: Pointer;
-  Item1, Item2: PALStringItem;
+  Item1, Item2: PALStringItemA;
 begin
   Item1 := @FList[Index1];
   Item2 := @FList[Index2];
@@ -1959,7 +1959,7 @@ begin
 end;
 
 {****************************************************************************}
-function TALStringList.Find(const S: AnsiString; var Index: Integer): Boolean;
+function TALStringListA.Find(const S: AnsiString; var Index: Integer): Boolean;
 var
   L, H, I, C: Integer;
 begin
@@ -1984,7 +1984,7 @@ begin
 end;
 
 {********************************************************************************}
-function TALStringList.FindName(const S: AnsiString; var Index: Integer): Boolean;
+function TALStringListA.FindName(const S: AnsiString; var Index: Integer): Boolean;
 var
   L, H, I, C: Integer;
 begin
@@ -2030,7 +2030,7 @@ begin
 end;
 
 {*****************************************************}
-function TALStringList.Get(Index: Integer): AnsiString;
+function TALStringListA.Get(Index: Integer): AnsiString;
 begin
   if Cardinal(Index) >= Cardinal(FCount) then
     Error(@SListIndexError, Index);
@@ -2038,19 +2038,19 @@ begin
 end;
 
 {******************************************}
-function TALStringList.GetCapacity: Integer;
+function TALStringListA.GetCapacity: Integer;
 begin
   Result := FCapacity;
 end;
 
 {***************************************}
-function TALStringList.GetCount: Integer;
+function TALStringListA.GetCount: Integer;
 begin
   Result := FCount;
 end;
 
 {********************************************************}
-function TALStringList.GetObject(Index: Integer): TObject;
+function TALStringListA.GetObject(Index: Integer): TObject;
 begin
   if Cardinal(Index) >= Cardinal(FCount) then
     Error(@SListIndexError, Index);
@@ -2058,7 +2058,7 @@ begin
 end;
 
 {***************************}
-procedure TALStringList.Grow;
+procedure TALStringListA.Grow;
 {$IF CompilerVersion <= 32}{tokyo}
 var
   Delta: Integer;
@@ -2075,27 +2075,27 @@ begin
 end;
 
 {***********************************************************}
-function TALStringList.IndexOf(const S: AnsiString): Integer;
+function TALStringListA.IndexOf(const S: AnsiString): Integer;
 begin
   if not Sorted then Result := inherited IndexOf(S) else
     if not Find(S, Result) then Result := -1;
 end;
 
 {******************************************************************}
-function TALStringList.IndexOfName(const Name: ansistring): Integer;
+function TALStringListA.IndexOfName(const Name: ansistring): Integer;
 begin
   if (not Sorted) or (not FNameValueOptimization) then Result := inherited IndexOfName(Name)
   else if not FindName(Name, Result) then Result := -1;
 end;
 
 {******************************************************************}
-procedure TALStringList.Insert(Index: Integer; const S: AnsiString);
+procedure TALStringListA.Insert(Index: Integer; const S: AnsiString);
 begin
   InsertObject(Index, S, nil);
 end;
 
 {******************************************************************************************}
-procedure TALStringList.InsertObject(Index: Integer; const S: AnsiString; AObject: TObject);
+procedure TALStringListA.InsertObject(Index: Integer; const S: AnsiString; AObject: TObject);
 begin
   if Sorted then Error(@SSortedListError, 0);
   if (Index < 0) or (Index > FCount) then Error(@SListIndexError, Index);
@@ -2103,7 +2103,7 @@ begin
 end;
 
 {********************************************************}
-procedure TALStringList.Move(CurIndex, NewIndex: Integer);
+procedure TALStringListA.Move(CurIndex, NewIndex: Integer);
 var
   TempObject: TObject;
   TempString: AnsiString;
@@ -2124,13 +2124,13 @@ begin
 end;
 
 {****************************************************************************************}
-procedure TALStringList.InsertItem(Index: Integer; const S: AnsiString; AObject: TObject);
+procedure TALStringListA.InsertItem(Index: Integer; const S: AnsiString; AObject: TObject);
 begin
   Changing;
   if FCount = FCapacity then Grow;
   if Index < FCount then
     ALMove(FList[Index], FList[Index + 1],
-      (FCount - Index) * SizeOf(TALStringItem));
+      (FCount - Index) * SizeOf(TALStringItemA));
   Pointer(FList[Index].FString) := nil;
   Pointer(FList[Index].FObject) := nil;
   FList[Index].FObject := AObject;
@@ -2140,7 +2140,7 @@ begin
 end;
 
 {***************************************************************}
-procedure TALStringList.Put(Index: Integer; const S: AnsiString);
+procedure TALStringListA.Put(Index: Integer; const S: AnsiString);
 begin
   if not sorted then begin
     if Cardinal(Index) >= Cardinal(FCount) then
@@ -2156,7 +2156,7 @@ begin
 end;
 
 {******************************************************************}
-procedure TALStringList.PutObject(Index: Integer; AObject: TObject);
+procedure TALStringListA.PutObject(Index: Integer; AObject: TObject);
 var
   Obj: TObject;
 begin
@@ -2180,7 +2180,7 @@ begin
 end;
 
 {***********************************************************************************}
-procedure TALStringList.QuickSort(L, R: Integer; ACompare: TALStringListSortCompare);
+procedure TALStringListA.QuickSort(L, R: Integer; ACompare: TALStringListSortCompareA);
 var
   I, J, P: Integer;
 begin
@@ -2226,7 +2226,7 @@ begin
 end;
 
 {********************************************************}
-procedure TALStringList.SetCapacity(NewCapacity: Integer);
+procedure TALStringListA.SetCapacity(NewCapacity: Integer);
 begin
   if NewCapacity < FCount then
     Error(@SListCapacityError, NewCapacity);
@@ -2238,7 +2238,7 @@ begin
 end;
 
 {************************************************}
-procedure TALStringList.SetSorted(Value: Boolean);
+procedure TALStringListA.SetSorted(Value: Boolean);
 begin
   if FSorted <> Value then
   begin
@@ -2248,26 +2248,26 @@ begin
 end;
 
 {********************************************************}
-procedure TALStringList.SetUpdateState(Updating: Boolean);
+procedure TALStringListA.SetUpdateState(Updating: Boolean);
 begin
   if Updating then Changing else Changed;
 end;
 
 {*****************************************************************************************}
-function ALStringListCompareStrings(List: TALStringList; Index1, Index2: Integer): Integer;
+function ALStringListCompareStrings(List: TALStringListA; Index1, Index2: Integer): Integer;
 begin
   Result := List.CompareStrings(List.FList[Index1].FString,
                                 List.FList[Index2].FString);
 end;
 
 {***************************}
-procedure TALStringList.Sort;
+procedure TALStringListA.Sort;
 begin
   CustomSort(ALStringListCompareStrings);
 end;
 
 {********************************************************************}
-procedure TALStringList.CustomSort(Compare: TALStringListSortCompare);
+procedure TALStringListA.CustomSort(Compare: TALStringListSortCompareA);
 begin
   if not Sorted and (FCount > 1) then
   begin
@@ -2278,7 +2278,7 @@ begin
 end;
 
 {***********************************************************************}
-function TALStringList.CompareStrings(const S1, S2: AnsiString): Integer;
+function TALStringListA.CompareStrings(const S1, S2: AnsiString): Integer;
 
   {-------------------------------------------------------------}
   function internalCompareStr(const S1, S2: AnsiString): Integer;
@@ -2364,7 +2364,7 @@ function TALStringList.CompareStrings(const S1, S2: AnsiString): Integer;
 begin
 
   // Orignial Delphi Code
-  // the difference between TALStringList and TStringList is that
+  // the difference between TALStringListA and TStringList is that
   // TstringList use ansiCompareStr or ansiCompareText that are
   // dependant from the local. I don't like this behavior because
   // as you can read
@@ -2435,7 +2435,7 @@ begin
 end;
 
 {*************************************************}
-procedure TALStringList.init(OwnsObjects: Boolean);
+procedure TALStringListA.init(OwnsObjects: Boolean);
 begin
   setlength(FList, 0);
   FCount := 0;
@@ -2450,21 +2450,21 @@ begin
 end;
 
 {*******************************}
-constructor TALStringList.Create;
+constructor TALStringListA.Create;
 begin
   inherited Create;
   init(False);
 end;
 
 {*****************************************************}
-constructor TALStringList.Create(OwnsObjects: Boolean);
+constructor TALStringListA.Create(OwnsObjects: Boolean);
 begin
   inherited Create;
   init(OwnsObjects);
 end;
 
 {*************************************************************}
-procedure TALStringList.SetCaseSensitive(const Value: Boolean);
+procedure TALStringListA.SetCaseSensitive(const Value: Boolean);
 begin
   if Value <> FCaseSensitive then
   begin
@@ -2480,7 +2480,7 @@ begin
 end;
 
 {*********************************}
-destructor TALNVStringList.Destroy;
+destructor TALNVStringListA.Destroy;
 var
   I: Integer;
   Temp: Array of TObject;
@@ -2507,13 +2507,13 @@ begin
 end;
 
 {*********************************************************}
-function TALNVStringList.Add(const S: AnsiString): Integer;
+function TALNVStringListA.Add(const S: AnsiString): Integer;
 begin
   Result := AddObject(S, nil);
 end;
 
 {*********************************************************************************}
-function TALNVStringList.AddObject(const S: AnsiString; AObject: TObject): Integer;
+function TALNVStringListA.AddObject(const S: AnsiString; AObject: TObject): Integer;
 Var LName, LValue: AnsiString;
 begin
   if not Sorted then begin
@@ -2541,13 +2541,13 @@ begin
 end;
 
 {****************************************************************************}
-function TALNVStringList.AddNameValue(const Name, Value: AnsiString): Integer;
+function TALNVStringListA.AddNameValue(const Name, Value: AnsiString): Integer;
 begin
   Result := AddNameValueObject(Name, Value, nil);
 end;
 
 {****************************************************************************************************}
-function TALNVStringList.AddNameValueObject(const Name, Value: AnsiString; AObject: TObject): Integer;
+function TALNVStringListA.AddNameValueObject(const Name, Value: AnsiString; AObject: TObject): Integer;
 begin
   if not Sorted then begin
     Result := FCount;
@@ -2563,34 +2563,34 @@ begin
 end;
 
 {****************************************************}
-procedure TALNVStringList.Assign(Source: TPersistent);
+procedure TALNVStringListA.Assign(Source: TPersistent);
 begin
-  if Source is TALNVStringList then
+  if Source is TALNVStringListA then
   begin
     Clear;
-    FCaseSensitive := TALNVStringList(Source).FCaseSensitive;
-    FDuplicates := TALNVStringList(Source).FDuplicates;
-    FSorted := TALNVStringList(Source).FSorted;
+    FCaseSensitive := TALNVStringListA(Source).FCaseSensitive;
+    FDuplicates := TALNVStringListA(Source).FDuplicates;
+    FSorted := TALNVStringListA(Source).FSorted;
   end
-  else if Source is TALStringList then
+  else if Source is TALStringListA then
   begin
     Clear;
-    FCaseSensitive := TALStringList(Source).FCaseSensitive;
-    FDuplicates := TALStringList(Source).FDuplicates;
-    FSorted := TALStringList(Source).FSorted;
+    FCaseSensitive := TALStringListA(Source).FCaseSensitive;
+    FDuplicates := TALStringListA(Source).FDuplicates;
+    FSorted := TALStringListA(Source).FSorted;
   end
-  else if Source is TALHashedStringList then
+  else if Source is TALHashedStringListA then
   begin
     Clear;
-    FCaseSensitive := TALHashedStringList(Source).CaseSensitive;
-    FDuplicates := TALHashedStringList(Source).FDuplicates;
+    FCaseSensitive := TALHashedStringListA(Source).CaseSensitive;
+    FDuplicates := TALHashedStringListA(Source).FDuplicates;
     FSorted := False;
   end
-  else if Source is TALAVLStringList then
+  else if Source is TALAVLStringListA then
   begin
     Clear;
-    FCaseSensitive := TALAVLStringList(Source).CaseSensitive;
-    FDuplicates := TALAVLStringList(Source).FDuplicates;
+    FCaseSensitive := TALAVLStringListA(Source).CaseSensitive;
+    FDuplicates := TALAVLStringListA(Source).FDuplicates;
     FSorted := False;
   end
   else if Source is TStringList then
@@ -2604,7 +2604,7 @@ begin
 end;
 
 {****************************************************}
-procedure TALNVStringList.AssignTo(Dest: TPersistent);
+procedure TALNVStringListA.AssignTo(Dest: TPersistent);
 begin
   if Dest is TStringList then
   begin
@@ -2617,21 +2617,21 @@ begin
 end;
 
 {********************************}
-procedure TALNVStringList.Changed;
+procedure TALNVStringListA.Changed;
 begin
   if (FUpdateCount = 0) and Assigned(FOnChange) then
     FOnChange(Self);
 end;
 
 {*********************************}
-procedure TALNVStringList.Changing;
+procedure TALNVStringListA.Changing;
 begin
   if (FUpdateCount = 0) and Assigned(FOnChanging) then
     FOnChanging(Self);
 end;
 
 {******************************}
-procedure TALNVStringList.Clear;
+procedure TALNVStringListA.Clear;
 var
   I: Integer;
   Temp: Array of TObject;
@@ -2661,7 +2661,7 @@ begin
 end;
 
 {***********************************************}
-procedure TALNVStringList.Delete(Index: Integer);
+procedure TALNVStringListA.Delete(Index: Integer);
 var
   Obj: TObject;
 begin
@@ -2681,7 +2681,7 @@ begin
   if Index < FCount then
   begin
     ALMove(FList[Index + 1], FList[Index],
-      (FCount - Index) * SizeOf(TALNVStringItem));
+      (FCount - Index) * SizeOf(TALNVStringItemA));
     // Make sure there is no danglng pointer in the last (now unused) element
     PPointer(@FList[FCount].FName)^   := nil;
     PPointer(@FList[FCount].FValue)^  := nil;
@@ -2693,7 +2693,7 @@ begin
 end;
 
 {***************************************************************}
-function  TALNVStringList.ExtractObject(Index: Integer): TObject;
+function  TALNVStringListA.ExtractObject(Index: Integer): TObject;
 begin
   if (Index < 0) or (Index >= FCount) then Error(@SListIndexError, Index);
   Changing;
@@ -2703,7 +2703,7 @@ begin
 end;
 
 {**********************************************************}
-procedure TALNVStringList.Exchange(Index1, Index2: Integer);
+procedure TALNVStringListA.Exchange(Index1, Index2: Integer);
 begin
   if (Index1 < 0) or (Index1 >= FCount) then Error(@SListIndexError, Index1);
   if (Index2 < 0) or (Index2 >= FCount) then Error(@SListIndexError, Index2);
@@ -2713,10 +2713,10 @@ begin
 end;
 
 {***************************************************************}
-procedure TALNVStringList.ExchangeItems(Index1, Index2: Integer);
+procedure TALNVStringListA.ExchangeItems(Index1, Index2: Integer);
 var
   Temp: Pointer;
-  Item1, Item2: PALNVStringItem;
+  Item1, Item2: PALNVStringItemA;
 begin
   Item1 := @FList[Index1];
   Item2 := @FList[Index2];
@@ -2735,7 +2735,7 @@ begin
 end;
 
 {******************************************************************************}
-function TALNVStringList.Find(const S: AnsiString; var Index: Integer): Boolean;
+function TALNVStringListA.Find(const S: AnsiString; var Index: Integer): Boolean;
 var Name, Value: ansiString;
 begin
   if ExtractNameValue(S, Name, Value) then result := FindNameValue(Name, Value, Index)
@@ -2743,7 +2743,7 @@ begin
 end;
 
 {*************************************************************************************}
-function TALNVStringList.FindName(const Name: AnsiString; var Index: Integer): Boolean;
+function TALNVStringListA.FindName(const Name: AnsiString; var Index: Integer): Boolean;
 var
   L, H, I, C: Integer;
 begin
@@ -2789,7 +2789,7 @@ begin
 end;
 
 {*******************************************************************************************************}
-function TALNVStringList.FindName(const Name: AnsiString; WithNvS: boolean; var Index: Integer): Boolean;
+function TALNVStringListA.FindName(const Name: AnsiString; WithNvS: boolean; var Index: Integer): Boolean;
 var
   L, H, I, C: Integer;
 begin
@@ -2860,7 +2860,7 @@ begin
 end;
 
 {*************************************************************************************************}
-function TALNVStringList.FindNameValue(const Name, Value: AnsiString; var Index: Integer): Boolean;
+function TALNVStringListA.FindNameValue(const Name, Value: AnsiString; var Index: Integer): Boolean;
 var
   L, H, I, C: Integer;
 begin
@@ -2893,7 +2893,7 @@ begin
 end;
 
 {*******************************************************}
-function TALNVStringList.Get(Index: Integer): AnsiString;
+function TALNVStringListA.Get(Index: Integer): AnsiString;
 begin
   if Cardinal(Index) >= Cardinal(FCount) then
     Error(@SListIndexError, Index);
@@ -2902,19 +2902,19 @@ begin
 end;
 
 {********************************************}
-function TALNVStringList.GetCapacity: Integer;
+function TALNVStringListA.GetCapacity: Integer;
 begin
   Result := FCapacity;
 end;
 
 {*****************************************}
-function TALNVStringList.GetCount: Integer;
+function TALNVStringListA.GetCount: Integer;
 begin
   Result := FCount;
 end;
 
 {**********************************************************}
-function TALNVStringList.GetObject(Index: Integer): TObject;
+function TALNVStringListA.GetObject(Index: Integer): TObject;
 begin
   if Cardinal(Index) >= Cardinal(FCount) then
     Error(@SListIndexError, Index);
@@ -2922,7 +2922,7 @@ begin
 end;
 
 {*****************************}
-procedure TALNVStringList.Grow;
+procedure TALNVStringListA.Grow;
 {$IF CompilerVersion <= 32}{tokyo}
 var
   Delta: Integer;
@@ -2939,7 +2939,7 @@ begin
 end;
 
 {**********************************************}
-function TALNVStringList.GetTextStr: AnsiString;
+function TALNVStringListA.GetTextStr: AnsiString;
 var
   I, L, Size: Integer;
   P: PAnsiChar;
@@ -2985,7 +2985,7 @@ begin
 end;
 
 {*************************************************************}
-function TALNVStringList.IndexOf(const S: AnsiString): Integer;
+function TALNVStringListA.IndexOf(const S: AnsiString): Integer;
 Var LName, LValue: AnsiString;
 begin
   if ExtractNameValue(S, LName, LValue) then begin
@@ -3014,7 +3014,7 @@ begin
 end;
 
 {********************************************************************}
-function TALNVStringList.IndexOfName(const Name: ansistring): Integer;
+function TALNVStringListA.IndexOfName(const Name: ansistring): Integer;
 begin
   if not Sorted then begin
     for Result := 0 to FCount - 1 do
@@ -3027,13 +3027,13 @@ begin
 end;
 
 {********************************************************************}
-procedure TALNVStringList.Insert(Index: Integer; const S: AnsiString);
+procedure TALNVStringListA.Insert(Index: Integer; const S: AnsiString);
 begin
   InsertObject(Index, S, nil);
 end;
 
 {********************************************************************************************}
-procedure TALNVStringList.InsertObject(Index: Integer; const S: AnsiString; AObject: TObject);
+procedure TALNVStringListA.InsertObject(Index: Integer; const S: AnsiString; AObject: TObject);
 begin
   if Sorted then Error(@SSortedListError, 0);
   if (Index < 0) or (Index > FCount) then Error(@SListIndexError, Index);
@@ -3041,13 +3041,13 @@ begin
 end;
 
 {***************************************************************************************}
-procedure TALNVStringList.InsertNameValue(Index: Integer; const Name, Value: AnsiString);
+procedure TALNVStringListA.InsertNameValue(Index: Integer; const Name, Value: AnsiString);
 begin
   InsertNameValueObject(Index, Name, Value, nil);
 end;
 
 {***************************************************************************************************************}
-procedure TALNVStringList.InsertNameValueObject(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
+procedure TALNVStringListA.InsertNameValueObject(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
 begin
   if Sorted then Error(@SSortedListError, 0);
   if (Index < 0) or (Index > FCount) then Error(@SListIndexError, Index);
@@ -3055,7 +3055,7 @@ begin
 end;
 
 {**********************************************************}
-procedure TALNVStringList.Move(CurIndex, NewIndex: Integer);
+procedure TALNVStringListA.Move(CurIndex, NewIndex: Integer);
 var
   TempObject: TObject;
   TempName: AnsiString;
@@ -3081,7 +3081,7 @@ begin
 end;
 
 {******************************************************************************************}
-procedure TALNVStringList.InsertItem(Index: Integer; const S: AnsiString; AObject: TObject);
+procedure TALNVStringListA.InsertItem(Index: Integer; const S: AnsiString; AObject: TObject);
 var Name, Value: ansiString;
 begin
   if ExtractNameValue(S, Name, Value) then InsertItem(Index, Name, Value, AObject)
@@ -3089,13 +3089,13 @@ begin
 end;
 
 {****************************************************************************************************}
-procedure TALNVStringList.InsertItem(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
+procedure TALNVStringListA.InsertItem(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
 begin
   Changing;
   if FCount = FCapacity then Grow;
   if Index < FCount then
     ALMove(FList[Index], FList[Index + 1],
-      (FCount - Index) * SizeOf(TALNVStringItem));
+      (FCount - Index) * SizeOf(TALNVStringItemA));
   Pointer(FList[Index].FName) := nil;
   Pointer(FList[Index].FValue) := nil;
   Pointer(FList[Index].FObject) := nil;
@@ -3108,13 +3108,13 @@ begin
 end;
 
 {***************************************************************************************************************}
-procedure TALNVStringList.InsertItem(Index: Integer; const Name: AnsiString; WithNvS: boolean; AObject: TObject);
+procedure TALNVStringListA.InsertItem(Index: Integer; const Name: AnsiString; WithNvS: boolean; AObject: TObject);
 begin
   Changing;
   if FCount = FCapacity then Grow;
   if Index < FCount then
     ALMove(FList[Index], FList[Index + 1],
-      (FCount - Index) * SizeOf(TALNVStringItem));
+      (FCount - Index) * SizeOf(TALNVStringItemA));
   Pointer(FList[Index].FName) := nil;
   Pointer(FList[Index].FValue) := nil;
   Pointer(FList[Index].FObject) := nil;
@@ -3127,7 +3127,7 @@ begin
 end;
 
 {*****************************************************************}
-procedure TALNVStringList.Put(Index: Integer; const S: AnsiString);
+procedure TALNVStringListA.Put(Index: Integer; const S: AnsiString);
 var Name, Value: ansiString;
 begin
   if not sorted then begin
@@ -3153,7 +3153,7 @@ begin
 end;
 
 {********************************************************************}
-procedure TALNVStringList.PutObject(Index: Integer; AObject: TObject);
+procedure TALNVStringListA.PutObject(Index: Integer; AObject: TObject);
 var
   Obj: TObject;
 begin
@@ -3177,7 +3177,7 @@ begin
 end;
 
 {***************************************************************************************}
-procedure TALNVStringList.QuickSort(L, R: Integer; ACompare: TALNVStringListSortCompare);
+procedure TALNVStringListA.QuickSort(L, R: Integer; ACompare: TALNVStringListSortCompareA);
 var
   I, J, P: Integer;
 begin
@@ -3223,7 +3223,7 @@ begin
 end;
 
 {**********************************************************}
-procedure TALNVStringList.SetCapacity(NewCapacity: Integer);
+procedure TALNVStringListA.SetCapacity(NewCapacity: Integer);
 begin
   if NewCapacity < FCount then
     Error(@SListCapacityError, NewCapacity);
@@ -3235,7 +3235,7 @@ begin
 end;
 
 {**************************************************}
-procedure TALNVStringList.SetSorted(Value: Boolean);
+procedure TALNVStringListA.SetSorted(Value: Boolean);
 begin
   if FSorted <> Value then
   begin
@@ -3245,13 +3245,13 @@ begin
 end;
 
 {**********************************************************}
-procedure TALNVStringList.SetUpdateState(Updating: Boolean);
+procedure TALNVStringListA.SetUpdateState(Updating: Boolean);
 begin
   if Updating then Changing else Changed;
 end;
 
 {*********************************************************************************************}
-function ALNVStringListCompareStrings(List: TALNVStringList; Index1, Index2: Integer): Integer;
+function ALNVStringListCompareStrings(List: TALNVStringListA; Index1, Index2: Integer): Integer;
 begin
   Result := List.CompareStrings(List.FList[Index1].FName,
                                 List.FList[Index2].FName);  // The return value is less than 0 if List.FList[Index1].FName < List.FList[Index2].FName, 0 if List.FList[Index1].FName = List.FList[Index2].FName, or greater than 0 if List.FList[Index1].FName > List.FList[Index2].FName.
@@ -3272,13 +3272,13 @@ begin
 end;
 
 {*****************************}
-procedure TALNVStringList.Sort;
+procedure TALNVStringListA.Sort;
 begin
   CustomSort(ALNVStringListCompareStrings);
 end;
 
 {************************************************************************}
-procedure TALNVStringList.CustomSort(Compare: TALNVStringListSortCompare);
+procedure TALNVStringListA.CustomSort(Compare: TALNVStringListSortCompareA);
 begin
   if not Sorted and (FCount > 1) then
   begin
@@ -3289,11 +3289,11 @@ begin
 end;
 
 {*************************************************************************}
-function TALNVStringList.CompareStrings(const S1, S2: AnsiString): Integer;
+function TALNVStringListA.CompareStrings(const S1, S2: AnsiString): Integer;
 begin
 
   // Orignial Delphi Code
-  // the difference between TALNVStringList and TStringList is that
+  // the difference between TALNVStringListA and TStringList is that
   // TstringList use ansiCompareStr or ansiCompareText that are
   // dependant from the local. I don't like this behavior because
   // as you can read
@@ -3349,7 +3349,7 @@ begin
 end;
 
 {***************************************************}
-procedure TALNVStringList.init(OwnsObjects: Boolean);
+procedure TALNVStringListA.init(OwnsObjects: Boolean);
 begin
   setlength(FList, 0);
   FCount := 0;
@@ -3363,21 +3363,21 @@ begin
 end;
 
 {*********************************}
-constructor TALNVStringList.Create;
+constructor TALNVStringListA.Create;
 begin
   inherited Create;
   init(False);
 end;
 
 {*******************************************************}
-constructor TALNVStringList.Create(OwnsObjects: Boolean);
+constructor TALNVStringListA.Create(OwnsObjects: Boolean);
 begin
   inherited Create;
   init(OwnsObjects);
 end;
 
 {***************************************************************}
-procedure TALNVStringList.SetCaseSensitive(const Value: Boolean);
+procedure TALNVStringListA.SetCaseSensitive(const Value: Boolean);
 begin
   if Value <> FCaseSensitive then
   begin
@@ -3393,7 +3393,7 @@ begin
 end;
 
 {***************************************************************************************************}
-Function TALNVStringList.ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean;
+Function TALNVStringListA.ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean;
 Var P1: Integer;
 begin
   P1 := ALPosA(NameValueSeparator,S);
@@ -3410,7 +3410,7 @@ begin
 end;
 
 {***********************************************************}
-function TALNVStringList.GetName(Index: Integer): AnsiString;
+function TALNVStringListA.GetName(Index: Integer): AnsiString;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
     Error(@SListIndexError, Index);
@@ -3418,7 +3418,7 @@ begin
 end;
 
 {*****************************************************************}
-function TALNVStringList.GetStrictName(Index: Integer): AnsiString;
+function TALNVStringListA.GetStrictName(Index: Integer): AnsiString;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
     Error(@SListIndexError, Index);
@@ -3427,7 +3427,7 @@ begin
 end;
 
 {********************************************************************}
-function TALNVStringList.GetValue(const Name: AnsiString): AnsiString;
+function TALNVStringListA.GetValue(const Name: AnsiString): AnsiString;
 var
   I: Integer;
 begin
@@ -3440,7 +3440,7 @@ begin
 end;
 
 {****************************************************************}
-procedure TALNVStringList.SetValue(const Name, Value: AnsiString);
+procedure TALNVStringListA.SetValue(const Name, Value: AnsiString);
 var
   I: Integer;
 begin
@@ -3461,7 +3461,7 @@ begin
 end;
 
 {*********************************************************************}
-function TALNVStringList.GetValueFromIndex(Index: Integer): AnsiString;
+function TALNVStringListA.GetValueFromIndex(Index: Integer): AnsiString;
 begin
   if Index >= 0 then
   begin
@@ -3477,7 +3477,7 @@ begin
 end;
 
 {***********************************************************************************}
-procedure TALNVStringList.SetValueFromIndex(Index: Integer; const Value: AnsiString);
+procedure TALNVStringListA.SetValueFromIndex(Index: Integer; const Value: AnsiString);
 begin
   if Value <> '' then
   begin
@@ -3496,7 +3496,7 @@ begin
 end;
 
 {**************************************************************************}
-procedure TALNVStringList.SetPersistentValue(const Name, Value: AnsiString);
+procedure TALNVStringListA.SetPersistentValue(const Name, Value: AnsiString);
 var
   I: Integer;
 begin
@@ -3511,7 +3511,7 @@ begin
 end;
 
 {*********************************************************************************************}
-procedure TALNVStringList.SetPersistentValueFromIndex(Index: Integer; const Value: AnsiString);
+procedure TALNVStringListA.SetPersistentValueFromIndex(Index: Integer; const Value: AnsiString);
 begin
   if Index < 0 then AddNameValue('', Value)
   else begin
@@ -3525,7 +3525,7 @@ begin
 end;
 
 {**********************************}
-destructor TALAVLStringList.Destroy;
+destructor TALAVLStringListA.Destroy;
 var
   I: Integer;
   Temp: Array of TObject;
@@ -3552,57 +3552,57 @@ begin
 end;
 
 {**********************************************************}
-function TALAVLStringList.Add(const S: AnsiString): Integer;
+function TALAVLStringListA.Add(const S: AnsiString): Integer;
 begin
   Result := AddObject(S, nil);
 end;
 
 {**********************************************************************************}
-function TALAVLStringList.AddObject(const S: AnsiString; AObject: TObject): Integer;
+function TALAVLStringListA.AddObject(const S: AnsiString; AObject: TObject): Integer;
 begin
   Result := Count;
   InsertItem(Result, S, AObject);
 end;
 
 {*****************************************************************************}
-function TALAVLStringList.AddNameValue(const Name, Value: AnsiString): Integer;
+function TALAVLStringListA.AddNameValue(const Name, Value: AnsiString): Integer;
 begin
   Result := AddNameValueObject(Name, Value, nil);
 end;
 
 {*****************************************************************************************************}
-function TALAVLStringList.AddNameValueObject(const Name, Value: AnsiString; AObject: TObject): Integer;
+function TALAVLStringListA.AddNameValueObject(const Name, Value: AnsiString; AObject: TObject): Integer;
 begin
   Result := Count;
   InsertItem(Result, Name, Value, AObject);
 end;
 
 {*****************************************************}
-procedure TALAVLStringList.Assign(Source: TPersistent);
+procedure TALAVLStringListA.Assign(Source: TPersistent);
 begin
-  if Source is TALAVLStringList then
+  if Source is TALAVLStringListA then
   begin
     Clear;
-    CaseSensitive := TALAVLStringList(Source).CaseSensitive;
-    FDuplicates := TALAVLStringList(Source).FDuplicates;
+    CaseSensitive := TALAVLStringListA(Source).CaseSensitive;
+    FDuplicates := TALAVLStringListA(Source).FDuplicates;
   end
-  else if Source is TALStringList then
+  else if Source is TALStringListA then
   begin
     Clear;
-    CaseSensitive := TALStringList(Source).CaseSensitive;
-    FDuplicates := TALStringList(Source).Duplicates;
+    CaseSensitive := TALStringListA(Source).CaseSensitive;
+    FDuplicates := TALStringListA(Source).Duplicates;
   end
-  else if Source is TALNVStringList then
+  else if Source is TALNVStringListA then
   begin
     Clear;
-    CaseSensitive := TALNVStringList(Source).FCaseSensitive;
-    FDuplicates := TALNVStringList(Source).FDuplicates;
+    CaseSensitive := TALNVStringListA(Source).FCaseSensitive;
+    FDuplicates := TALNVStringListA(Source).FDuplicates;
   end
-  else if Source is TALHashedStringList then
+  else if Source is TALHashedStringListA then
   begin
     Clear;
-    CaseSensitive := TALHashedStringList(Source).CaseSensitive;
-    FDuplicates := TALHashedStringList(Source).FDuplicates;
+    CaseSensitive := TALHashedStringListA(Source).CaseSensitive;
+    FDuplicates := TALHashedStringListA(Source).FDuplicates;
   end
   else if Source is TStringList then
   begin
@@ -3614,7 +3614,7 @@ begin
 end;
 
 {*****************************************************}
-procedure TALAVLStringList.AssignTo(Dest: TPersistent);
+procedure TALAVLStringListA.AssignTo(Dest: TPersistent);
 begin
   if Dest is TStringList then
   begin
@@ -3627,21 +3627,21 @@ begin
 end;
 
 {*********************************}
-procedure TALAVLStringList.Changed;
+procedure TALAVLStringListA.Changed;
 begin
   if (FUpdateCount = 0) and Assigned(FOnChange) then
     FOnChange(Self);
 end;
 
 {**********************************}
-procedure TALAVLStringList.Changing;
+procedure TALAVLStringListA.Changing;
 begin
   if (FUpdateCount = 0) and Assigned(FOnChanging) then
     FOnChanging(Self);
 end;
 
 {*******************************}
-procedure TALAVLStringList.Clear;
+procedure TALAVLStringListA.Clear;
 var
   I: Integer;
   Temp: Array of TObject;
@@ -3671,7 +3671,7 @@ begin
 end;
 
 {************************************************}
-procedure TALAVLStringList.Delete(Index: Integer);
+procedure TALAVLStringListA.Delete(Index: Integer);
 var
   Obj: TObject;
   i: integer;
@@ -3684,10 +3684,10 @@ begin
   else
     Obj := nil;
 
-  FAVLBinTree.DeleteNode(TALAVLStringListBinaryTreeNode(FNodelist[Index]).ID);
+  FAVLBinTree.DeleteNode(TALAVLStringListBinaryTreeNodeA(FNodelist[Index]).ID);
   FNodelist.Delete(Index);
   for i := Index to FNodeList.Count - 1 do
-    TALAVLStringListBinaryTreeNode(FNodelist[i]).Idx := i;
+    TALAVLStringListBinaryTreeNodeA(FNodelist[i]).Idx := i;
 
   if Obj <> nil then
     ALFreeAndNil(Obj);
@@ -3695,11 +3695,11 @@ begin
 end;
 
 {****************************************************************}
-function  TALAVLStringList.ExtractObject(Index: Integer): TObject;
+function  TALAVLStringListA.ExtractObject(Index: Integer): TObject;
 begin
   if (Index < 0) or (Index >= Count) then Error(@SListIndexError, Index);
   Changing;
-  with TALAVLStringListBinaryTreeNode(FNodeList[Index]) do begin
+  with TALAVLStringListBinaryTreeNodeA(FNodeList[Index]) do begin
     result := Obj;
     Obj := nil;
   end;
@@ -3707,7 +3707,7 @@ begin
 end;
 
 {***********************************************************}
-procedure TALAVLStringList.Exchange(Index1, Index2: Integer);
+procedure TALAVLStringListA.Exchange(Index1, Index2: Integer);
 begin
   if (Index1 < 0) or (Index1 >= Count) then Error(@SListIndexError, Index1);
   if (Index2 < 0) or (Index2 >= Count) then Error(@SListIndexError, Index2);
@@ -3717,43 +3717,43 @@ begin
 end;
 
 {****************************************************************}
-procedure TALAVLStringList.ExchangeItems(Index1, Index2: Integer);
-var Item1, Item2: TALAVLStringListBinaryTreeNode;
+procedure TALAVLStringListA.ExchangeItems(Index1, Index2: Integer);
+var Item1, Item2: TALAVLStringListBinaryTreeNodeA;
 begin
-  Item1 := TALAVLStringListBinaryTreeNode(FNodelist[Index1]);
-  Item2 := TALAVLStringListBinaryTreeNode(FNodelist[Index2]);
+  Item1 := TALAVLStringListBinaryTreeNodeA(FNodelist[Index1]);
+  Item2 := TALAVLStringListBinaryTreeNodeA(FNodelist[Index2]);
   FNodeList.Exchange(Index1,Index2);
   Item1.idx := Index2;
   Item2.idx := Index1;
 end;
 
 {********************************************************}
-function TALAVLStringList.Get(Index: Integer): AnsiString;
+function TALAVLStringListA.Get(Index: Integer): AnsiString;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
     Error(@SListIndexError, Index);
-  with TALAVLStringListBinaryTreeNode(FNodelist[Index]) do begin
+  with TALAVLStringListBinaryTreeNodeA(FNodelist[Index]) do begin
     if Nvs then Result := ID + NameValueSeparator + Val
     else Result := ID;
   end;
 end;
 
 {******************************************}
-function TALAVLStringList.GetCount: Integer;
+function TALAVLStringListA.GetCount: Integer;
 begin
   Result := FNodeList.Count;
 end;
 
 {***********************************************************}
-function TALAVLStringList.GetObject(Index: Integer): TObject;
+function TALAVLStringListA.GetObject(Index: Integer): TObject;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
     Error(@SListIndexError, Index);
-  Result := TALAVLStringListBinaryTreeNode(FNodelist[Index]).Obj;
+  Result := TALAVLStringListBinaryTreeNodeA(FNodelist[Index]).Obj;
 end;
 
 {***********************************************}
-function TALAVLStringList.GetTextStr: AnsiString;
+function TALAVLStringListA.GetTextStr: AnsiString;
 var
   I, L, Size, Count: Integer;
   P: PAnsiChar;
@@ -3765,24 +3765,24 @@ begin
   LB := LineBreak;
   NvS := nameValueSeparator;
   for I := 0 to Count - 1 do begin
-    if TALAVLStringListBinaryTreeNode(fNodeList[i]).Nvs then Inc(Size, Length(TALAVLStringListBinaryTreeNode(fNodeList[i]).ID) + 1{length(NameValueSeparator)} +  Length(TALAVLStringListBinaryTreeNode(fNodeList[i]).Val) + Length(LB))
-    else Inc(Size, Length(TALAVLStringListBinaryTreeNode(fNodeList[i]).ID) + Length(LB))
+    if TALAVLStringListBinaryTreeNodeA(fNodeList[i]).Nvs then Inc(Size, Length(TALAVLStringListBinaryTreeNodeA(fNodeList[i]).ID) + 1{length(NameValueSeparator)} +  Length(TALAVLStringListBinaryTreeNodeA(fNodeList[i]).Val) + Length(LB))
+    else Inc(Size, Length(TALAVLStringListBinaryTreeNodeA(fNodeList[i]).ID) + Length(LB))
   end;
   SetString(Result, nil, Size);
   P := Pointer(Result);
   for I := 0 to Count - 1 do
   begin
-    S := TALAVLStringListBinaryTreeNode(fNodeList[i]).ID;
+    S := TALAVLStringListBinaryTreeNodeA(fNodeList[i]).ID;
     L := Length(S);
     if L <> 0 then
     begin
       ALMove(Pointer(S)^, P^, L);
       Inc(P, L);
     end;
-    if TALAVLStringListBinaryTreeNode(fNodeList[i]).Nvs then begin
+    if TALAVLStringListBinaryTreeNodeA(fNodeList[i]).Nvs then begin
       ALMove(NvS, P^, 1);
       Inc(P, 1);
-      S := TALAVLStringListBinaryTreeNode(fNodeList[i]).Val;
+      S := TALAVLStringListBinaryTreeNodeA(fNodeList[i]).Val;
       L := Length(S);
       if L <> 0 then
       begin
@@ -3800,12 +3800,12 @@ begin
 end;
 
 {**************************************************************}
-function TALAVLStringList.IndexOf(const S: AnsiString): Integer;
+function TALAVLStringListA.IndexOf(const S: AnsiString): Integer;
 Var LName, LValue: AnsiString;
-    LNode: TALAVLStringListBinaryTreeNode;
+    LNode: TALAVLStringListBinaryTreeNodeA;
 begin
   if ExtractNameValue(S, LName, LValue) then begin
-    LNode := TALAVLStringListBinaryTreeNode(FAVLBinTree.FindNode(LName));
+    LNode := TALAVLStringListBinaryTreeNodeA(FAVLBinTree.FindNode(LName));
     if (not assigned(LNode))
        or
        ((CaseSensitive) and
@@ -3817,49 +3817,49 @@ begin
     else result := LNode.idx;
   end
   else begin
-    LNode := TALAVLStringListBinaryTreeNode(FAVLBinTree.FindNode(S));
+    LNode := TALAVLStringListBinaryTreeNodeA(FAVLBinTree.FindNode(S));
     if (not assigned(LNode)) or (LNode.Nvs) then result := -1
     else result := LNode.idx;
   end;
 end;
 
 {*********************************************************************}
-function TALAVLStringList.IndexOfName(const Name: ansistring): Integer;
-Var LNode: TALAVLStringListBinaryTreeNode;
+function TALAVLStringListA.IndexOfName(const Name: ansistring): Integer;
+Var LNode: TALAVLStringListBinaryTreeNodeA;
 begin
-  LNode := TALAVLStringListBinaryTreeNode(FAVLBinTree.FindNode(Name));
+  LNode := TALAVLStringListBinaryTreeNodeA(FAVLBinTree.FindNode(Name));
   if assigned(LNode) then result := LNode.Idx
   else result := -1;
 end;
 
 {*********************************************************************}
-procedure TALAVLStringList.Insert(Index: Integer; const S: AnsiString);
+procedure TALAVLStringListA.Insert(Index: Integer; const S: AnsiString);
 begin
   InsertObject(Index, S, nil);
 end;
 
 {*********************************************************************************************}
-procedure TALAVLStringList.InsertObject(Index: Integer; const S: AnsiString; AObject: TObject);
+procedure TALAVLStringListA.InsertObject(Index: Integer; const S: AnsiString; AObject: TObject);
 begin
   if (Index < 0) or (Index > Count) then Error(@SListIndexError, Index);
   InsertItem(Index, S, AObject);
 end;
 
 {****************************************************************************************}
-procedure TALAVLStringList.InsertNameValue(Index: Integer; const Name, Value: AnsiString);
+procedure TALAVLStringListA.InsertNameValue(Index: Integer; const Name, Value: AnsiString);
 begin
   InsertNameValueObject(Index, Name, Value, nil);
 end;
 
 {****************************************************************************************************************}
-procedure TALAVLStringList.InsertNameValueObject(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
+procedure TALAVLStringListA.InsertNameValueObject(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
 begin
   if (Index < 0) or (Index > Count) then Error(@SListIndexError, Index);
   InsertItem(Index, Name, Value, AObject);
 end;
 
 {***********************************************************}
-procedure TALAVLStringList.Move(CurIndex, NewIndex: Integer);
+procedure TALAVLStringListA.Move(CurIndex, NewIndex: Integer);
 var i: integer;
 begin
   if CurIndex <> NewIndex then
@@ -3868,7 +3868,7 @@ begin
     try
       FNodeList.Move(CurIndex, NewIndex);
       for i := min(CurIndex, NewIndex) to FNodeList.Count - 1 do
-        TALAVLStringListBinaryTreeNode(FNodelist[i]).Idx := i;
+        TALAVLStringListBinaryTreeNodeA(FNodelist[i]).Idx := i;
     finally
       EndUpdate;
     end;
@@ -3876,13 +3876,13 @@ begin
 end;
 
 {********************************************************************************************************}
-procedure TALAVLStringList.InsertItem(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
-Var LNode: TALAVLStringListBinaryTreeNode;
+procedure TALAVLStringListA.InsertItem(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
+Var LNode: TALAVLStringListBinaryTreeNodeA;
     I: integer;
 begin
   Changing;
 
-  LNode := TALAVLStringListBinaryTreeNode.Create;
+  LNode := TALAVLStringListBinaryTreeNodeA.Create;
   LNode.Idx := Index;
   LNode.ID := Name;
   LNode.Val := Value;
@@ -3897,22 +3897,22 @@ begin
   end;
   FNodeList.Insert(Index, LNode);
   for i := Index + 1 to FNodeList.Count - 1 do
-    TALAVLStringListBinaryTreeNode(FNodelist[i]).Idx := i;
+    TALAVLStringListBinaryTreeNodeA(FNodelist[i]).Idx := i;
 
   Changed;
 end;
 
 {*******************************************************************************************}
-procedure TALAVLStringList.InsertItem(Index: Integer; const S: AnsiString; AObject: TObject);
+procedure TALAVLStringListA.InsertItem(Index: Integer; const S: AnsiString; AObject: TObject);
 Var LName, AValue: AnsiString;
     LNvs: Boolean;
-    LNode: TALAVLStringListBinaryTreeNode;
+    LNode: TALAVLStringListBinaryTreeNodeA;
     I: integer;
 begin
   Changing;
 
   LNvs := ExtractNameValue(S, LName, aValue);
-  LNode := TALAVLStringListBinaryTreeNode.Create;
+  LNode := TALAVLStringListBinaryTreeNodeA.Create;
   LNode.Idx := Index;
   LNode.ID := LName;
   LNode.Val := aValue;
@@ -3927,26 +3927,26 @@ begin
   end;
   FNodeList.Insert(Index, LNode);
   for i := Index + 1 to FNodeList.Count - 1 do
-    TALAVLStringListBinaryTreeNode(FNodelist[i]).Idx := i;
+    TALAVLStringListBinaryTreeNodeA(FNodelist[i]).Idx := i;
 
   Changed;
 end;
 
 {******************************************************************}
-procedure TALAVLStringList.Put(Index: Integer; const S: AnsiString);
+procedure TALAVLStringListA.Put(Index: Integer; const S: AnsiString);
 Var LNewName, LNewValue: AnsiString;
     LNewNvs: Boolean;
-    LNewNode, LOldNode: TALAVLStringListBinaryTreeNode;
+    LNewNode, LOldNode: TALAVLStringListBinaryTreeNodeA;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
     Error(@SListIndexError, Index);
   Changing;
 
   LNewNvs := ExtractNameValue(S, LNewName, LNewValue);
-  LOldNode := TALAVLStringListBinaryTreeNode(FNodeList[index]);
+  LOldNode := TALAVLStringListBinaryTreeNodeA(FNodeList[index]);
   if (CaseSensitive and (LOldNode.ID <> LNewName)) or
      ((not CaseSensitive) and (not ALSameTextA(LOldNode.ID, LNewName))) then begin
-    LNewNode := TALAVLStringListBinaryTreeNode.Create;
+    LNewNode := TALAVLStringListBinaryTreeNodeA.Create;
     LNewNode.Idx := Index;
     LNewNode.ID := LNewName;
     LNewNode.Val := LNewValue;
@@ -3971,7 +3971,7 @@ begin
 end;
 
 {*********************************************************************}
-procedure TALAVLStringList.PutObject(Index: Integer; AObject: TObject);
+procedure TALAVLStringListA.PutObject(Index: Integer; AObject: TObject);
 var
   Obj: TObject;
 begin
@@ -3982,11 +3982,11 @@ begin
   // Change from orignal TStringList
   // If this list owns its objects then free the associated TObject with this index
   if OwnsObjects then
-    Obj := TALAVLStringListBinaryTreeNode(FNodeList[Index]).Obj
+    Obj := TALAVLStringListBinaryTreeNodeA(FNodeList[Index]).Obj
   else
     Obj := nil;
 
-  TALAVLStringListBinaryTreeNode(FNodeList[Index]).Obj := AObject;
+  TALAVLStringListBinaryTreeNodeA(FNodeList[Index]).Obj := AObject;
 
   if Obj <> nil then
     ALFreeAndNil(Obj);
@@ -3995,7 +3995,7 @@ begin
 end;
 
 {*****************************************************************************************}
-procedure TALAVLStringList.QuickSort(L, R: Integer; ACompare: TALAVLStringListSortCompare);
+procedure TALAVLStringListA.QuickSort(L, R: Integer; ACompare: TALAVLStringListSortCompareA);
 var
   I, J, P: Integer;
 begin
@@ -4041,13 +4041,13 @@ begin
 end;
 
 {***********************************************************}
-procedure TALAVLStringList.SetUpdateState(Updating: Boolean);
+procedure TALAVLStringListA.SetUpdateState(Updating: Boolean);
 begin
   if Updating then Changing else Changed;
 end;
 
 {**************************************************************************}
-procedure TALAVLStringList.CustomSort(Compare: TALAVLStringListSortCompare);
+procedure TALAVLStringListA.CustomSort(Compare: TALAVLStringListSortCompareA);
 begin
   if (Count > 1) then
   begin
@@ -4058,7 +4058,7 @@ begin
 end;
 
 {****************************************************}
-procedure TALAVLStringList.init(OwnsObjects: Boolean);
+procedure TALAVLStringListA.init(OwnsObjects: Boolean);
 begin
   FAVLBinTree:= TALStringKeyAVLBinaryTree.Create;
   FAVLBinTree.CaseSensitive := False;
@@ -4070,40 +4070,40 @@ begin
 end;
 
 {**********************************}
-constructor TALAVLStringList.Create;
+constructor TALAVLStringListA.Create;
 begin
   inherited Create;
   init(False);
 end;
 
 {********************************************************}
-constructor TALAVLStringList.Create(OwnsObjects: Boolean);
+constructor TALAVLStringListA.Create(OwnsObjects: Boolean);
 begin
   inherited Create;
   init(OwnsObjects);
 end;
 
 {****************************************************************}
-procedure TALAVLStringList.SetCaseSensitive(const Value: Boolean);
+procedure TALAVLStringListA.SetCaseSensitive(const Value: Boolean);
 begin
   FAVLBinTree.CaseSensitive := Value;
 end;
 
 {**************************************************}
-function TALAVLStringList.GetCaseSensitive: Boolean;
+function TALAVLStringListA.GetCaseSensitive: Boolean;
 begin
   result := FAVLBinTree.CaseSensitive;
 end;
 
 {*****************************************************************}
-procedure TALAVLStringList.SetDuplicates(const Value: TDuplicates);
+procedure TALAVLStringListA.SetDuplicates(const Value: TDuplicates);
 begin
-  if value = dupAccept then raise exception.Create('TALAVLStringList does not support duplicate Names');
+  if value = dupAccept then raise exception.Create('TALAVLStringListA does not support duplicate Names');
   FDuplicates := Value;
 end;
 
 {****************************************************************************************************}
-Function TALAVLStringList.ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean;
+Function TALAVLStringListA.ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean;
 Var P1: Integer;
 begin
   P1 := ALPosA(NameValueSeparator,S);
@@ -4120,37 +4120,37 @@ begin
 end;
 
 {************************************************************}
-function TALAVLStringList.GetName(Index: Integer): AnsiString;
+function TALAVLStringListA.GetName(Index: Integer): AnsiString;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
     Error(@SListIndexError, Index);
-  Result := TALAVLStringListBinaryTreeNode(FNodelist[Index]).ID;
+  Result := TALAVLStringListBinaryTreeNodeA(FNodelist[Index]).ID;
 end;
 
 {******************************************************************}
-function TALAVLStringList.GetStrictName(Index: Integer): AnsiString;
+function TALAVLStringListA.GetStrictName(Index: Integer): AnsiString;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
     Error(@SListIndexError, Index);
-  if TALAVLStringListBinaryTreeNode(FNodelist[Index]).nvs then Result := TALAVLStringListBinaryTreeNode(FNodelist[Index]).ID
+  if TALAVLStringListBinaryTreeNodeA(FNodelist[Index]).nvs then Result := TALAVLStringListBinaryTreeNodeA(FNodelist[Index]).ID
   else result := ''
 end;
 
 {*********************************************************************}
-function TALAVLStringList.GetValue(const Name: AnsiString): AnsiString;
+function TALAVLStringListA.GetValue(const Name: AnsiString): AnsiString;
 var
   I: Integer;
 begin
   I := IndexOfName(Name);
   if I >= 0 then begin
-    if TALAVLStringListBinaryTreeNode(FNodelist[i]).nvs then Result := TALAVLStringListBinaryTreeNode(FNodelist[i]).Val
+    if TALAVLStringListBinaryTreeNodeA(FNodelist[i]).nvs then Result := TALAVLStringListBinaryTreeNodeA(FNodelist[i]).Val
     else Result := '';
   end else
     Result := '';
 end;
 
 {*****************************************************************}
-procedure TALAVLStringList.SetValue(const Name, Value: AnsiString);
+procedure TALAVLStringListA.SetValue(const Name, Value: AnsiString);
 var
   I: Integer;
 begin
@@ -4160,8 +4160,8 @@ begin
     if I < 0 then AddNameValue(Name, Value)
     else begin
       Changing;
-      TALAVLStringListBinaryTreeNode(FNodeList[i]).Val := Value;
-      TALAVLStringListBinaryTreeNode(FNodeList[i]).NVS := True;
+      TALAVLStringListBinaryTreeNodeA(FNodeList[i]).Val := Value;
+      TALAVLStringListBinaryTreeNodeA(FNodeList[i]).NVS := True;
       Changed;
     end
   end else
@@ -4171,14 +4171,14 @@ begin
 end;
 
 {**********************************************************************}
-function TALAVLStringList.GetValueFromIndex(Index: Integer): AnsiString;
+function TALAVLStringListA.GetValueFromIndex(Index: Integer): AnsiString;
 begin
   if Index >= 0 then
   begin
     if Cardinal(Index) >= Cardinal(Count) then
       Error(@SListIndexError, Index);
-    if (TALAVLStringListBinaryTreeNode(FNodeList[index]).Nvs) then
-      result := TALAVLStringListBinaryTreeNode(FNodeList[index]).Val
+    if (TALAVLStringListBinaryTreeNodeA(FNodeList[index]).Nvs) then
+      result := TALAVLStringListBinaryTreeNodeA(FNodeList[index]).Val
     else
       Result := '';
   end
@@ -4187,7 +4187,7 @@ begin
 end;
 
 {************************************************************************************}
-procedure TALAVLStringList.SetValueFromIndex(Index: Integer; const Value: AnsiString);
+procedure TALAVLStringListA.SetValueFromIndex(Index: Integer; const Value: AnsiString);
 begin
   if Value <> '' then
   begin
@@ -4196,8 +4196,8 @@ begin
       if Cardinal(Index) >= Cardinal(Count) then
         Error(@SListIndexError, Index);
       Changing;
-      TALAVLStringListBinaryTreeNode(FNodeList[Index]).Val := Value;
-      TALAVLStringListBinaryTreeNode(FNodeList[Index]).NVS := True;
+      TALAVLStringListBinaryTreeNodeA(FNodeList[Index]).Val := Value;
+      TALAVLStringListBinaryTreeNodeA(FNodeList[Index]).NVS := True;
       Changed;
     end;
   end
@@ -4206,7 +4206,7 @@ begin
 end;
 
 {***************************************************************************}
-procedure TALAVLStringList.SetPersistentValue(const Name, Value: AnsiString);
+procedure TALAVLStringListA.SetPersistentValue(const Name, Value: AnsiString);
 var
   I: Integer;
 begin
@@ -4214,28 +4214,28 @@ begin
   if I < 0 then AddNameValue(Name, Value)
   else begin
     Changing;
-    TALAVLStringListBinaryTreeNode(FNodeList[I]).Val := Value;
-    TALAVLStringListBinaryTreeNode(FNodeList[I]).NVS := True;
+    TALAVLStringListBinaryTreeNodeA(FNodeList[I]).Val := Value;
+    TALAVLStringListBinaryTreeNodeA(FNodeList[I]).NVS := True;
     Changed;
   end
 end;
 
 {**********************************************************************************************}
-procedure TALAVLStringList.SetPersistentValueFromIndex(Index: Integer; const Value: AnsiString);
+procedure TALAVLStringListA.SetPersistentValueFromIndex(Index: Integer; const Value: AnsiString);
 begin
   if Index < 0 then AddNameValue('', Value)
   else begin
     if Cardinal(Index) >= Cardinal(Count) then
       Error(@SListIndexError, Index);
     Changing;
-    TALAVLStringListBinaryTreeNode(FNodeList[Index]).Val := Value;
-    TALAVLStringListBinaryTreeNode(FNodeList[Index]).NVS := True;
+    TALAVLStringListBinaryTreeNodeA(FNodeList[Index]).Val := Value;
+    TALAVLStringListBinaryTreeNodeA(FNodeList[Index]).NVS := True;
     Changed;
   end;
 end;
 
 {*************************************}
-destructor TALHashedStringList.Destroy;
+destructor TALHashedStringListA.Destroy;
 var
   I: Integer;
   Temp: Array of TObject;
@@ -4262,57 +4262,57 @@ begin
 end;
 
 {*************************************************************}
-function TALHashedStringList.Add(const S: AnsiString): Integer;
+function TALHashedStringListA.Add(const S: AnsiString): Integer;
 begin
   Result := AddObject(S, nil);
 end;
 
 {*************************************************************************************}
-function TALHashedStringList.AddObject(const S: AnsiString; AObject: TObject): Integer;
+function TALHashedStringListA.AddObject(const S: AnsiString; AObject: TObject): Integer;
 begin
   Result := Count;
   InsertItem(Result, S, AObject);
 end;
 
 {********************************************************************************}
-function TALHashedStringList.AddNameValue(const Name, Value: AnsiString): Integer;
+function TALHashedStringListA.AddNameValue(const Name, Value: AnsiString): Integer;
 begin
   Result := AddNameValueObject(Name, Value, nil);
 end;
 
 {********************************************************************************************************}
-function TALHashedStringList.AddNameValueObject(const Name, Value: AnsiString; AObject: TObject): Integer;
+function TALHashedStringListA.AddNameValueObject(const Name, Value: AnsiString; AObject: TObject): Integer;
 begin
   Result := Count;
   InsertItem(Result, Name, Value, AObject);
 end;
 
 {********************************************************}
-procedure TALHashedStringList.Assign(Source: TPersistent);
+procedure TALHashedStringListA.Assign(Source: TPersistent);
 begin
-  if Source is TALHashedStringList then
+  if Source is TALHashedStringListA then
   begin
     Clear;
-    CaseSensitive := TALHashedStringList(Source).CaseSensitive;
-    FDuplicates := TALHashedStringList(Source).FDuplicates;
+    CaseSensitive := TALHashedStringListA(Source).CaseSensitive;
+    FDuplicates := TALHashedStringListA(Source).FDuplicates;
   end
-  else if Source is TALStringList then
+  else if Source is TALStringListA then
   begin
     Clear;
-    CaseSensitive := TALStringList(Source).CaseSensitive;
-    FDuplicates := TALStringList(Source).Duplicates;
+    CaseSensitive := TALStringListA(Source).CaseSensitive;
+    FDuplicates := TALStringListA(Source).Duplicates;
   end
-  else if Source is TALNVStringList then
+  else if Source is TALNVStringListA then
   begin
     Clear;
-    FCaseSensitive := TALNVStringList(Source).FCaseSensitive;
-    FDuplicates := TALNVStringList(Source).FDuplicates;
+    FCaseSensitive := TALNVStringListA(Source).FCaseSensitive;
+    FDuplicates := TALNVStringListA(Source).FDuplicates;
   end
-  else if Source is TALAvlStringList then
+  else if Source is TALAVLStringListA then
   begin
     Clear;
-    CaseSensitive := TALAvlStringList(Source).CaseSensitive;
-    FDuplicates := TALAvlStringList(Source).FDuplicates;
+    CaseSensitive := TALAVLStringListA(Source).CaseSensitive;
+    FDuplicates := TALAVLStringListA(Source).FDuplicates;
   end
   else if Source is TStringList then
   begin
@@ -4324,7 +4324,7 @@ begin
 end;
 
 {********************************************************}
-procedure TALHashedStringList.AssignTo(Dest: TPersistent);
+procedure TALHashedStringListA.AssignTo(Dest: TPersistent);
 begin
   if Dest is TStringList then
   begin
@@ -4337,21 +4337,21 @@ begin
 end;
 
 {************************************}
-procedure TALHashedStringList.Changed;
+procedure TALHashedStringListA.Changed;
 begin
   if (FUpdateCount = 0) and Assigned(FOnChange) then
     FOnChange(Self);
 end;
 
 {*************************************}
-procedure TALHashedStringList.Changing;
+procedure TALHashedStringListA.Changing;
 begin
   if (FUpdateCount = 0) and Assigned(FOnChanging) then
     FOnChanging(Self);
 end;
 
 {**********************************}
-procedure TALHashedStringList.Clear;
+procedure TALHashedStringListA.Clear;
 var
   I: Integer;
   Temp: Array of TObject;
@@ -4381,7 +4381,7 @@ begin
 end;
 
 {***************************************************}
-procedure TALHashedStringList.Delete(Index: Integer);
+procedure TALHashedStringListA.Delete(Index: Integer);
 var
   Obj: TObject;
   i: integer;
@@ -4405,7 +4405,7 @@ begin
 end;
 
 {*******************************************************************}
-function  TALHashedStringList.ExtractObject(Index: Integer): TObject;
+function  TALHashedStringListA.ExtractObject(Index: Integer): TObject;
 begin
   if (Index < 0) or (Index >= Count) then Error(@SListIndexError, Index);
   Changing;
@@ -4417,7 +4417,7 @@ begin
 end;
 
 {**************************************************************}
-procedure TALHashedStringList.Exchange(Index1, Index2: Integer);
+procedure TALHashedStringListA.Exchange(Index1, Index2: Integer);
 begin
   if (Index1 < 0) or (Index1 >= Count) then Error(@SListIndexError, Index1);
   if (Index2 < 0) or (Index2 >= Count) then Error(@SListIndexError, Index2);
@@ -4427,8 +4427,8 @@ begin
 end;
 
 {*******************************************************************}
-procedure TALHashedStringList.ExchangeItems(Index1, Index2: Integer);
-var Item1, Item2: TALHashedStringListDictionaryNode;
+procedure TALHashedStringListA.ExchangeItems(Index1, Index2: Integer);
+var Item1, Item2: TALHashedStringListDictionaryNodeA;
 begin
   Item1 := FNodelist[Index1];
   Item2 := FNodelist[Index2];
@@ -4438,7 +4438,7 @@ begin
 end;
 
 {***********************************************************}
-function TALHashedStringList.Get(Index: Integer): AnsiString;
+function TALHashedStringListA.Get(Index: Integer): AnsiString;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
     Error(@SListIndexError, Index);
@@ -4449,13 +4449,13 @@ begin
 end;
 
 {*********************************************}
-function TALHashedStringList.GetCount: Integer;
+function TALHashedStringListA.GetCount: Integer;
 begin
   Result := FNodeList.Count;
 end;
 
 {**************************************************************}
-function TALHashedStringList.GetObject(Index: Integer): TObject;
+function TALHashedStringListA.GetObject(Index: Integer): TObject;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
     Error(@SListIndexError, Index);
@@ -4463,7 +4463,7 @@ begin
 end;
 
 {**************************************************}
-function TALHashedStringList.GetTextStr: AnsiString;
+function TALHashedStringListA.GetTextStr: AnsiString;
 var
   I, L, Size, Count: Integer;
   P: PAnsiChar;
@@ -4510,9 +4510,9 @@ begin
 end;
 
 {*****************************************************************}
-function TALHashedStringList.IndexOf(const S: AnsiString): Integer;
+function TALHashedStringListA.IndexOf(const S: AnsiString): Integer;
 Var LName, LValue: AnsiString;
-    LNode: TALHashedStringListDictionaryNode;
+    LNode: TALHashedStringListDictionaryNodeA;
 begin
   if ExtractNameValue(S, LName, LValue) then begin
     if (not fDictionary.TryGetValue(LName,LNode))
@@ -4532,41 +4532,41 @@ begin
 end;
 
 {************************************************************************}
-function TALHashedStringList.IndexOfName(const Name: ansistring): Integer;
-Var LNode: TALHashedStringListDictionaryNode;
+function TALHashedStringListA.IndexOfName(const Name: ansistring): Integer;
+Var LNode: TALHashedStringListDictionaryNodeA;
 begin
   if fDictionary.TryGetValue(Name,LNode) then result := LNode.Idx
   else result := -1;
 end;
 
 {************************************************************************}
-procedure TALHashedStringList.Insert(Index: Integer; const S: AnsiString);
+procedure TALHashedStringListA.Insert(Index: Integer; const S: AnsiString);
 begin
   InsertObject(Index, S, nil);
 end;
 
 {************************************************************************************************}
-procedure TALHashedStringList.InsertObject(Index: Integer; const S: AnsiString; AObject: TObject);
+procedure TALHashedStringListA.InsertObject(Index: Integer; const S: AnsiString; AObject: TObject);
 begin
   if (Index < 0) or (Index > Count) then Error(@SListIndexError, Index);
   InsertItem(Index, S, AObject);
 end;
 
 {*******************************************************************************************}
-procedure TALHashedStringList.InsertNameValue(Index: Integer; const Name, Value: AnsiString);
+procedure TALHashedStringListA.InsertNameValue(Index: Integer; const Name, Value: AnsiString);
 begin
   InsertNameValueObject(Index, Name, Value, nil);
 end;
 
 {*******************************************************************************************************************}
-procedure TALHashedStringList.InsertNameValueObject(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
+procedure TALHashedStringListA.InsertNameValueObject(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
 begin
   if (Index < 0) or (Index > Count) then Error(@SListIndexError, Index);
   InsertItem(Index, Name, Value, AObject);
 end;
 
 {**************************************************************}
-procedure TALHashedStringList.Move(CurIndex, NewIndex: Integer);
+procedure TALHashedStringListA.Move(CurIndex, NewIndex: Integer);
 var I: integer;
 begin
   if CurIndex <> NewIndex then
@@ -4583,13 +4583,13 @@ begin
 end;
 
 {********************************************************************************************************}
-procedure TALHashedStringList.InsertItem(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
-Var LNode: TALHashedStringListDictionaryNode;
+procedure TALHashedStringListA.InsertItem(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
+Var LNode: TALHashedStringListDictionaryNodeA;
     I: integer;
 begin
   Changing;
 
-  LNode := TALHashedStringListDictionaryNode.Create;
+  LNode := TALHashedStringListDictionaryNodeA.Create;
   LNode.Idx := Index;
   LNode.ID := Name;
   LNode.Val := Value;
@@ -4615,16 +4615,16 @@ begin
 end;
 
 {**********************************************************************************************}
-procedure TALHashedStringList.InsertItem(Index: Integer; const S: AnsiString; AObject: TObject);
+procedure TALHashedStringListA.InsertItem(Index: Integer; const S: AnsiString; AObject: TObject);
 Var LName, LValue: AnsiString;
     LNvs: Boolean;
-    LNode: TALHashedStringListDictionaryNode;
+    LNode: TALHashedStringListDictionaryNodeA;
     I: integer;
 begin
   Changing;
 
   LNvs := ExtractNameValue(S, LName, LValue);
-  LNode := TALHashedStringListDictionaryNode.Create;
+  LNode := TALHashedStringListDictionaryNodeA.Create;
   LNode.Idx := Index;
   LNode.ID := LName;
   LNode.Val := LValue;
@@ -4650,10 +4650,10 @@ begin
 end;
 
 {*********************************************************************}
-procedure TALHashedStringList.Put(Index: Integer; const S: AnsiString);
+procedure TALHashedStringListA.Put(Index: Integer; const S: AnsiString);
 Var LNewName, LNewValue: AnsiString;
     LNewNvs: Boolean;
-    LNewNode, LOldNode: TALHashedStringListDictionaryNode;
+    LNewNode, LOldNode: TALHashedStringListDictionaryNodeA;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
     Error(@SListIndexError, Index);
@@ -4663,7 +4663,7 @@ begin
   LOldNode := FNodeList[index];
   if (CaseSensitive and (LOldNode.ID <> LNewName)) or
      ((not CaseSensitive) and (not ALSameTextA(LOldNode.ID, LNewName))) then begin
-    LNewNode := TALHashedStringListDictionaryNode.Create;
+    LNewNode := TALHashedStringListDictionaryNodeA.Create;
     LNewNode.Idx := Index;
     LNewNode.ID := LNewName;
     LNewNode.Val := LNewValue;
@@ -4693,7 +4693,7 @@ begin
 end;
 
 {************************************************************************}
-procedure TALHashedStringList.PutObject(Index: Integer; AObject: TObject);
+procedure TALHashedStringListA.PutObject(Index: Integer; AObject: TObject);
 var
   Obj: TObject;
 begin
@@ -4717,14 +4717,14 @@ begin
 end;
 
 {**************************************************************}
-procedure TALHashedStringList.SetCapacity(NewCapacity: Integer);
+procedure TALHashedStringListA.SetCapacity(NewCapacity: Integer);
 begin
   if NewCapacity <= FDictionary.Count then FDictionary.TrimExcess;
   FNodeList.Capacity := NewCapacity;
 end;
 
 {***********************************************************************************************}
-procedure TALHashedStringList.QuickSort(L, R: Integer; ACompare: TALHashedStringListSortCompare);
+procedure TALHashedStringListA.QuickSort(L, R: Integer; ACompare: TALHashedStringListSortCompareA);
 var
   I, J, P: Integer;
 begin
@@ -4770,13 +4770,13 @@ begin
 end;
 
 {**************************************************************}
-procedure TALHashedStringList.SetUpdateState(Updating: Boolean);
+procedure TALHashedStringListA.SetUpdateState(Updating: Boolean);
 begin
   if Updating then Changing else Changed;
 end;
 
 {********************************************************************************}
-procedure TALHashedStringList.CustomSort(Compare: TALHashedStringListSortCompare);
+procedure TALHashedStringListA.CustomSort(Compare: TALHashedStringListSortCompareA);
 begin
   if (Count > 1) then
   begin
@@ -4787,9 +4787,9 @@ begin
 end;
 
 {***********************************************************************************************************************************************************}
-function TALHashedStringList.CreateDictionary(ACapacity: integer; aCaseSensitive: boolean): TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>;
+function TALHashedStringListA.CreateDictionary(ACapacity: integer; aCaseSensitive: boolean): TObjectDictionary<ansiString, TALHashedStringListDictionaryNodeA>;
 begin
-  if aCaseSensitive then result := TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>.create(
+  if aCaseSensitive then result := TObjectDictionary<ansiString, TALHashedStringListDictionaryNodeA>.create(
                                      [doOwnsValues],
                                      ACapacity,
                                      TDelegatedEqualityComparer<ansiString>.Create(
@@ -4801,7 +4801,7 @@ begin
                                        begin
                                          Result := THashBobJenkins.GetHashValue(PAnsiChar(Value)^, Length(Value) * SizeOf(AnsiChar));
                                        end))
-  else result := TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>.create(
+  else result := TObjectDictionary<ansiString, TALHashedStringListDictionaryNodeA>.create(
                    [doOwnsValues],
                    ACapacity,
                    TDelegatedEqualityComparer<ansiString>.Create(
@@ -4818,11 +4818,11 @@ begin
 end;
 
 {***************************************************************************}
-procedure TALHashedStringList.init(OwnsObjects: Boolean; ACapacity: Integer);
+procedure TALHashedStringListA.init(OwnsObjects: Boolean; ACapacity: Integer);
 begin
   FDictionary := CreateDictionary(ACapacity, False);
   FCaseSensitive := False;
-  FNodeList := TObjectList<TALHashedStringListDictionaryNode>.Create(False);
+  FNodeList := TObjectList<TALHashedStringListDictionaryNodeA>.Create(False);
   FNodeList.Capacity := ACapacity;
   FDuplicates := dupError;
   FOnChange := nil;
@@ -4831,28 +4831,28 @@ begin
 end;
 
 {*************************************}
-constructor TALHashedStringList.Create;
+constructor TALHashedStringListA.Create;
 begin
   inherited Create;
   init(False, 0);
 end;
 
 {***********************************************************}
-constructor TALHashedStringList.Create(OwnsObjects: Boolean);
+constructor TALHashedStringListA.Create(OwnsObjects: Boolean);
 begin
   inherited Create;
   init(OwnsObjects, 0);
 end;
 
 {*********************************************************}
-constructor TALHashedStringList.Create(ACapacity: Integer);
+constructor TALHashedStringListA.Create(ACapacity: Integer);
 begin
   inherited Create;
   init(False, ACapacity);
 end;
 
 {*******************************************************************************}
-constructor TALHashedStringList.Create(OwnsObjects: Boolean; ACapacity: Integer);
+constructor TALHashedStringListA.Create(OwnsObjects: Boolean; ACapacity: Integer);
 begin
   inherited Create;
   init(OwnsObjects, ACapacity);
@@ -4870,35 +4870,35 @@ type
   end;
 
 {*******************************************************************}
-procedure TALHashedStringList.SetCaseSensitive(const Value: Boolean);
-var LTmpDictionary: TObjectDictionary<ansiString, TALHashedStringListDictionaryNode>;
+procedure TALHashedStringListA.SetCaseSensitive(const Value: Boolean);
+var LTmpDictionary: TObjectDictionary<ansiString, TALHashedStringListDictionaryNodeA>;
     I: integer;
 begin
   if fCaseSensitive <> Value then begin
     LTmpDictionary := CreateDictionary(count, Value);
     for I := 0 to FnodeList.Count - 1 do
       LTmpDictionary.Add(FNodeList[i].ID,FNodeList[i]);
-    _TObjectDictionaryAccessPrivate<ansiString, TALHashedStringListDictionaryNode>(Fdictionary).fOwnerships := [];
+    _TObjectDictionaryAccessPrivate<ansiString, TALHashedStringListDictionaryNodeA>(Fdictionary).fOwnerships := [];
     ALFreeAndNil(Fdictionary);
     FDictionary := LTmpDictionary;
   end;
 end;
 
 {*****************************************************}
-function TALHashedStringList.GetCaseSensitive: Boolean;
+function TALHashedStringListA.GetCaseSensitive: Boolean;
 begin
   result := fCaseSensitive;
 end;
 
 {********************************************************************}
-procedure TALHashedStringList.SetDuplicates(const Value: TDuplicates);
+procedure TALHashedStringListA.SetDuplicates(const Value: TDuplicates);
 begin
-  if value = dupAccept then raise exception.Create('TALHashedStringList does not support duplicate Names');
+  if value = dupAccept then raise exception.Create('TALHashedStringListA does not support duplicate Names');
   FDuplicates := Value;
 end;
 
 {*******************************************************************************************************}
-Function TALHashedStringList.ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean;
+Function TALHashedStringListA.ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean;
 Var P1: Integer;
 begin
   P1 := ALPosA(NameValueSeparator,S);
@@ -4915,7 +4915,7 @@ begin
 end;
 
 {***************************************************************}
-function TALHashedStringList.GetName(Index: Integer): AnsiString;
+function TALHashedStringListA.GetName(Index: Integer): AnsiString;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
     Error(@SListIndexError, Index);
@@ -4923,7 +4923,7 @@ begin
 end;
 
 {*********************************************************************}
-function TALHashedStringList.GetStrictName(Index: Integer): AnsiString;
+function TALHashedStringListA.GetStrictName(Index: Integer): AnsiString;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
     Error(@SListIndexError, Index);
@@ -4932,7 +4932,7 @@ begin
 end;
 
 {************************************************************************}
-function TALHashedStringList.GetValue(const Name: AnsiString): AnsiString;
+function TALHashedStringListA.GetValue(const Name: AnsiString): AnsiString;
 var
   I: Integer;
 begin
@@ -4945,7 +4945,7 @@ begin
 end;
 
 {********************************************************************}
-procedure TALHashedStringList.SetValue(const Name, Value: AnsiString);
+procedure TALHashedStringListA.SetValue(const Name, Value: AnsiString);
 var
   I: Integer;
 begin
@@ -4966,7 +4966,7 @@ begin
 end;
 
 {*************************************************************************}
-function TALHashedStringList.GetValueFromIndex(Index: Integer): AnsiString;
+function TALHashedStringListA.GetValueFromIndex(Index: Integer): AnsiString;
 begin
   if Index >= 0 then
   begin
@@ -4982,7 +4982,7 @@ begin
 end;
 
 {***************************************************************************************}
-procedure TALHashedStringList.SetValueFromIndex(Index: Integer; const Value: AnsiString);
+procedure TALHashedStringListA.SetValueFromIndex(Index: Integer; const Value: AnsiString);
 begin
   if Value <> '' then
   begin
@@ -5001,7 +5001,7 @@ begin
 end;
 
 {******************************************************************************}
-procedure TALHashedStringList.SetPersistentValue(const Name, Value: AnsiString);
+procedure TALHashedStringListA.SetPersistentValue(const Name, Value: AnsiString);
 var
   I: Integer;
 begin
@@ -5016,7 +5016,7 @@ begin
 end;
 
 {*************************************************************************************************}
-procedure TALHashedStringList.SetPersistentValueFromIndex(Index: Integer; const Value: AnsiString);
+procedure TALHashedStringListA.SetPersistentValueFromIndex(Index: Integer; const Value: AnsiString);
 begin
   if Index < 0 then AddNameValue('', Value)
   else begin
@@ -5030,7 +5030,7 @@ begin
 end;
 
 {**************************************************************}
-constructor TALStringsEnumeratorU.Create(AStrings: TALStringsU);
+constructor TALStringsEnumeratorW.Create(AStrings: TALStringsW);
 begin
   inherited Create;
   FIndex := -1;
@@ -5038,20 +5038,20 @@ begin
 end;
 
 {************************************************}
-function TALStringsEnumeratorU.GetCurrent: String;
+function TALStringsEnumeratorW.GetCurrent: String;
 begin
   Result := FStrings[FIndex];
 end;
 
 {***********************************************}
-function TALStringsEnumeratorU.MoveNext: Boolean;
+function TALStringsEnumeratorW.MoveNext: Boolean;
 begin
   Inc(FIndex);
   Result := FIndex < FStrings.Count;
 end;
 
 {*****************************}
-constructor TALStringsU.Create;
+constructor TALStringsW.Create;
 begin
   inherited Create;
   FDefaultEncoding := TEncoding.UTF8;
@@ -5067,7 +5067,7 @@ begin
 end;
 
 {*****************************}
-destructor TALStringsU.Destroy;
+destructor TALStringsW.Destroy;
 begin
   if (FEncoding <> nil) and (not TEncoding.IsStandardEncoding(FEncoding)) then
     ALFreeAndNil(FEncoding);
@@ -5077,39 +5077,39 @@ begin
 end;
 
 {*************************************************}
-function TALStringsU.Add(const S: String): Integer;
+function TALStringsW.Add(const S: String): Integer;
 begin
   Result := GetCount;
   Insert(Result, S);
 end;
 
 {*************************************************************************}
-function TALStringsU.AddObject(const S: String; AObject: TObject): Integer;
+function TALStringsW.AddObject(const S: String; AObject: TObject): Integer;
 begin
   Result := Add(S);
   PutObject(Result, AObject);
 end;
 
 {********************************************************************}
-function TALStringsU.AddNameValue(const Name, Value: String): Integer;
+function TALStringsW.AddNameValue(const Name, Value: String): Integer;
 begin
   result := add(name + NameValueSeparator + Value);
 end;
 
 {********************************************************************************************}
-function TALStringsU.AddNameValueObject(const Name, Value: String; AObject: TObject): Integer;
+function TALStringsW.AddNameValueObject(const Name, Value: String; AObject: TObject): Integer;
 begin
   result := addObject(name + NameValueSeparator + Value, AObject);
 end;
 
 {********************************************}
-procedure TALStringsU.Append(const S: String);
+procedure TALStringsW.Append(const S: String);
 begin
   Add(S);
 end;
 
 {*****************************************************}
-procedure TALStringsU.AddStrings(Strings: TALStringsU);
+procedure TALStringsW.AddStrings(Strings: TALStringsW);
 var
   I: Integer;
 begin
@@ -5123,7 +5123,7 @@ begin
 end;
 
 {***************************************************************}
-procedure TALStringsU.AddStrings(const Strings: array of string);
+procedure TALStringsW.AddStrings(const Strings: array of string);
 var
   I: Integer;
 begin
@@ -5137,7 +5137,7 @@ begin
 end;
 
 {************************************************************************************************}
-procedure TALStringsU.AddStrings(const Strings: array of string; const Objects: array of TObject);
+procedure TALStringsW.AddStrings(const Strings: array of string; const Objects: array of TObject);
 var
   I: Integer;
 begin
@@ -5153,25 +5153,25 @@ begin
 end;
 
 {************************************************}
-procedure TALStringsU.Assign(Source: TPersistent);
+procedure TALStringsW.Assign(Source: TPersistent);
 var I: integer;
 begin
-  if Source is TALStringsU then
+  if Source is TALStringsW then
   begin
     BeginUpdate;
     try
       Clear;
       // Must use property setter for DefaultEncoding
-      DefaultEncoding := TALStringsU(Source).DefaultEncoding;
+      DefaultEncoding := TALStringsW(Source).DefaultEncoding;
       // Must use internal property setter for Encoding
-      SetEncoding(TALStringsU(Source).Encoding);
-      NameValueSeparator := TALStringsU(Source).NameValueSeparator;
-      QuoteChar := TALStringsU(Source).QuoteChar;
-      Delimiter := TALStringsU(Source).Delimiter;
-      LineBreak := TALStringsU(Source).LineBreak;
-      StrictDelimiter := TALStringsU(Source).StrictDelimiter;
-      WriteBOM := TALStringsU(Source).WriteBOM;
-      AddStrings(TALStringsU(Source));
+      SetEncoding(TALStringsW(Source).Encoding);
+      NameValueSeparator := TALStringsW(Source).NameValueSeparator;
+      QuoteChar := TALStringsW(Source).QuoteChar;
+      Delimiter := TALStringsW(Source).Delimiter;
+      LineBreak := TALStringsW(Source).LineBreak;
+      StrictDelimiter := TALStringsW(Source).StrictDelimiter;
+      WriteBOM := TALStringsW(Source).WriteBOM;
+      AddStrings(TALStringsW(Source));
     finally
       EndUpdate;
     end;
@@ -5203,7 +5203,7 @@ begin
 end;
 
 {************************************************}
-procedure TALStringsU.AssignTo(Dest: TPersistent);
+procedure TALStringsW.AssignTo(Dest: TPersistent);
 var I: integer;
 begin
   if Dest is TStrings then
@@ -5227,21 +5227,21 @@ begin
 end;
 
 {********************************}
-procedure TALStringsU.BeginUpdate;
+procedure TALStringsW.BeginUpdate;
 begin
   if FUpdateCount = 0 then SetUpdateState(True);
   Inc(FUpdateCount);
 end;
 
 {******************************}
-procedure TALStringsU.EndUpdate;
+procedure TALStringsW.EndUpdate;
 begin
   Dec(FUpdateCount);
   if FUpdateCount = 0 then SetUpdateState(False);
 end;
 
 {*********************************************************}
-function TALStringsU.Equals(Strings: TALStringsU): Boolean;
+function TALStringsW.Equals(Strings: TALStringsW): Boolean;
 var
   I, Count: Integer;
 begin
@@ -5253,19 +5253,19 @@ begin
 end;
 
 {************************************************************}
-procedure TALStringsU.Error(const Msg: String; Data: Integer);
+procedure TALStringsW.Error(const Msg: String; Data: Integer);
 begin
   raise EStringListError.CreateFmt(Msg, [Data]);
 end;
 
 {*************************************************************}
-procedure TALStringsU.Error(Msg: PResStringRec; Data: Integer);
+procedure TALStringsW.Error(Msg: PResStringRec; Data: Integer);
 begin
   raise EStringListError.CreateFmt(LoadResString(Msg), [Data]);
 end;
 
 {******************************************************}
-procedure TALStringsU.Exchange(Index1, Index2: Integer);
+procedure TALStringsW.Exchange(Index1, Index2: Integer);
 var
   TempObject: TObject;
   TempString: String;
@@ -5284,7 +5284,7 @@ begin
 end;
 
 {********************************************************}
-function TALStringsU.ExtractName(const S: String): String;
+function TALStringsW.ExtractName(const S: String): String;
 var
   P: Integer;
 begin
@@ -5343,13 +5343,13 @@ begin
 end;
 
 {****************************************}
-function TALStringsU.GetCapacity: Integer;
+function TALStringsW.GetCapacity: Integer;
 begin  // descendents may optionally override/replace this default implementation
   Result := Count;
 end;
 
 {****************************************}
-function TALStringsU.GetCommaText: String;
+function TALStringsW.GetCommaText: String;
 var
   LOldDelimiter: Char;
   LOldQuoteChar: Char;
@@ -5368,7 +5368,7 @@ end;
 
 {**************************}
 {$WARN WIDECHAR_REDUCED OFF}
-function TALStringsU.GetDelimitedText: String;
+function TALStringsW.GetDelimitedText: String;
 var
   S: String;
   P: PChar;
@@ -5399,19 +5399,19 @@ end;
 {$WARN WIDECHAR_REDUCED ON}
 
 {********************************************************}
-function TALStringsU.GetEnumerator: TALStringsEnumeratorU;
+function TALStringsW.GetEnumerator: TALStringsEnumeratorW;
 begin
-  Result := TALStringsEnumeratorU.Create(Self);
+  Result := TALStringsEnumeratorW.Create(Self);
 end;
 
 {***************************************************}
-function TALStringsU.GetName(Index: Integer): String;
+function TALStringsW.GetName(Index: Integer): String;
 begin
   Result := ExtractName(Get(Index));
 end;
 
 {*********************************************************}
-function TALStringsU.GetStrictName(Index: Integer): String;
+function TALStringsW.GetStrictName(Index: Integer): String;
 var P: Integer;
 begin
   Result := Get(Index);
@@ -5421,19 +5421,19 @@ begin
 end;
 
 {******************************************************}
-function TALStringsU.GetObject(Index: Integer): TObject;
+function TALStringsW.GetObject(Index: Integer): TObject;
 begin
   Result := nil;
 end;
 
 {**********************************}
-function TALStringsU.GetText: PChar;
+function TALStringsW.GetText: PChar;
 begin
   Result := StrNew(PChar(GetTextStr));
 end;
 
 {**************************************}
-function TALStringsU.GetTextStr: String;
+function TALStringsW.GetTextStr: String;
 var
   I, L, Size, Count: Integer;
   P: PChar;
@@ -5464,7 +5464,7 @@ begin
 end;
 
 {********************************************************}
-function TALStringsU.GetValue(const Name: String): String;
+function TALStringsW.GetValue(const Name: String): String;
 var
   I: Integer;
 begin
@@ -5475,7 +5475,7 @@ begin
 end;
 
 {*****************************************************}
-function TALStringsU.IndexOf(const S: String): Integer;
+function TALStringsW.IndexOf(const S: String): Integer;
 begin
   for Result := 0 to GetCount - 1 do
     if CompareStrings(Get(Result), S) = 0 then Exit;
@@ -5483,7 +5483,7 @@ begin
 end;
 
 {************************************************************}
-function TALStringsU.IndexOfName(const Name: String): Integer;
+function TALStringsW.IndexOfName(const Name: String): Integer;
 var
   P: Integer;
   S: String;
@@ -5552,7 +5552,7 @@ begin
 end;
 
 {************************************************************}
-function TALStringsU.IndexOfObject(AObject: TObject): Integer;
+function TALStringsW.IndexOfObject(AObject: TObject): Integer;
 begin
   for Result := 0 to GetCount - 1 do
     if GetObject(Result) = AObject then Exit;
@@ -5560,32 +5560,32 @@ begin
 end;
 
 {************************************************************************************}
-procedure TALStringsU.InsertObject(Index: Integer; const S: String; AObject: TObject);
+procedure TALStringsW.InsertObject(Index: Integer; const S: String; AObject: TObject);
 begin
   Insert(Index, S);
   PutObject(Index, AObject);
 end;
 
 {*******************************************************************************}
-procedure TALStringsU.InsertNameValue(Index: Integer; const Name, Value: String);
+procedure TALStringsW.InsertNameValue(Index: Integer; const Name, Value: String);
 begin
   Insert(Index, name + NameValueSeparator + Value);
 end;
 
 {*******************************************************************************************************}
-procedure TALStringsU.InsertNameValueObject(Index: Integer; const Name, Value: String; AObject: TObject);
+procedure TALStringsW.InsertNameValueObject(Index: Integer; const Name, Value: String; AObject: TObject);
 begin
   InsertObject(Index, name + NameValueSeparator + Value, AObject);
 end;
 
 {*********************************************************}
-procedure TALStringsU.LoadFromFile(const FileName: String);
+procedure TALStringsW.LoadFromFile(const FileName: String);
 begin
   LoadFromFile(FileName, nil);
 end;
 
 {******************************************************************************}
-procedure TALStringsU.LoadFromFile(const FileName: string; Encoding: TEncoding);
+procedure TALStringsW.LoadFromFile(const FileName: string; Encoding: TEncoding);
 var
   Stream: TStream;
 begin
@@ -5598,13 +5598,13 @@ begin
 end;
 
 {****************************************************}
-procedure TALStringsU.LoadFromStream(Stream: TStream);
+procedure TALStringsW.LoadFromStream(Stream: TStream);
 begin
   LoadFromStream(Stream, nil);
 end;
 
 {*************************************************************************}
-procedure TALStringsU.LoadFromStream(Stream: TStream; Encoding: TEncoding);
+procedure TALStringsW.LoadFromStream(Stream: TStream; Encoding: TEncoding);
 var
   Size: Integer;
   Buffer: TBytes;
@@ -5627,7 +5627,7 @@ begin
 end;
 
 {******************************************************}
-procedure TALStringsU.Move(CurIndex, NewIndex: Integer);
+procedure TALStringsW.Move(CurIndex, NewIndex: Integer);
 var
   TempObject: TObject;
   TempString: String;
@@ -5648,23 +5648,23 @@ begin
 end;
 
 {*********************************************************}
-procedure TALStringsU.Put(Index: Integer; const S: String);
+procedure TALStringsW.Put(Index: Integer; const S: String);
 begin
 end;
 
 {****************************************************************}
-procedure TALStringsU.PutObject(Index: Integer; AObject: TObject);
+procedure TALStringsW.PutObject(Index: Integer; AObject: TObject);
 begin
 end;
 
 {*******************************************************}
-procedure TALStringsU.SaveToFile(const FileName: string);
+procedure TALStringsW.SaveToFile(const FileName: string);
 begin
   SaveToFile(FileName, FEncoding);
 end;
 
 {****************************************************************************}
-procedure TALStringsU.SaveToFile(const FileName: string; Encoding: TEncoding);
+procedure TALStringsW.SaveToFile(const FileName: string; Encoding: TEncoding);
 Var LFileStream: TfileStream;
     LTmpFilename: String;
 begin
@@ -5692,13 +5692,13 @@ begin
 end;
 
 {**************************************************}
-procedure TALStringsU.SaveToStream(Stream: TStream);
+procedure TALStringsW.SaveToStream(Stream: TStream);
 begin
   SaveToStream(Stream, FEncoding);
 end;
 
 {***********************************************************************}
-procedure TALStringsU.SaveToStream(Stream: TStream; Encoding: TEncoding);
+procedure TALStringsW.SaveToStream(Stream: TStream; Encoding: TEncoding);
 var
   Buffer, Preamble: TBytes;
 begin
@@ -5715,13 +5715,13 @@ begin
 end;
 
 {******************************************************}
-procedure TALStringsU.SetCapacity(NewCapacity: Integer);
+procedure TALStringsW.SetCapacity(NewCapacity: Integer);
 begin
   // do nothing - descendents may optionally implement this method
 end;
 
 {******************************************************}
-procedure TALStringsU.SetCommaText(const Value: String);
+procedure TALStringsW.SetCommaText(const Value: String);
 var
   LOldDelimiter: Char;
   LOldQuoteChar: Char;
@@ -5739,14 +5739,14 @@ begin
 end;
 
 {*****************************************}
-procedure TALStringsU.SetText(Text: PChar);
+procedure TALStringsW.SetText(Text: PChar);
 begin
   SetTextStr(Text);
 end;
 
 {**************************}
 {$WARN WIDECHAR_REDUCED OFF}
-procedure TALStringsU.SetTextStr(const Value: String);
+procedure TALStringsW.SetTextStr(const Value: String);
 var
   P, PCurVal, PCurLB, PStartVal, PEndVal, PStartLB, PEndLB: PChar;
   S: string;
@@ -5829,12 +5829,12 @@ end;
 {$WARN WIDECHAR_REDUCED ON}
 
 {******************************************************}
-procedure TALStringsU.SetUpdateState(Updating: Boolean);
+procedure TALStringsW.SetUpdateState(Updating: Boolean);
 begin
 end;
 
 {********************************************************}
-procedure TALStringsU.SetValue(const Name, Value: String);
+procedure TALStringsW.SetValue(const Name, Value: String);
 var
   I: Integer;
 begin
@@ -5850,7 +5850,7 @@ begin
 end;
 
 {******************************************************************}
-procedure TALStringsU.SetPersistentValue(const Name, Value: String);
+procedure TALStringsW.SetPersistentValue(const Name, Value: String);
 var
   I: Integer;
 begin
@@ -5860,7 +5860,7 @@ begin
 end;
 
 {***************************************************************}
-procedure TALStringsU.SetDefaultEncoding(const Value: TEncoding);
+procedure TALStringsW.SetDefaultEncoding(const Value: TEncoding);
 begin
   if (FDefaultEncoding <> nil) and (not TEncoding.IsStandardEncoding(FDefaultEncoding)) then
     ALFreeAndNil(FDefaultEncoding);
@@ -5873,7 +5873,7 @@ begin
 end;
 
 {**********************************************************}
-procedure TALStringsU.SetDelimitedText(const Value: String);
+procedure TALStringsW.SetDelimitedText(const Value: String);
 var
   P, P1: PChar;
   S: String;
@@ -5919,7 +5919,7 @@ begin
 end;
 
 {********************************************************}
-procedure TALStringsU.SetEncoding(const Value: TEncoding);
+procedure TALStringsW.SetEncoding(const Value: TEncoding);
 begin
   if (FEncoding <> nil) and (not TEncoding.IsStandardEncoding(FEncoding)) then
     ALFreeAndNil(FEncoding);
@@ -5932,13 +5932,13 @@ begin
 end;
 
 {*****************************************************************}
-function TALStringsU.CompareStrings(const S1, S2: String): Integer;
+function TALStringsW.CompareStrings(const S1, S2: String): Integer;
 begin
   Result := ALCompareTextW(S1, S2);
 end;
 
 {*************************************************************}
-function TALStringsU.GetValueFromIndex(Index: Integer): String;
+function TALStringsW.GetValueFromIndex(Index: Integer): String;
 var
   SepPos: Integer;
 begin
@@ -5956,7 +5956,7 @@ begin
 end;
 
 {***************************************************************************}
-procedure TALStringsU.SetValueFromIndex(Index: Integer; const Value: String);
+procedure TALStringsW.SetValueFromIndex(Index: Integer; const Value: String);
 begin
   if Value <> '' then
   begin
@@ -5968,14 +5968,14 @@ begin
 end;
 
 {*************************************************************************************}
-procedure TALStringsU.SetPersistentValueFromIndex(Index: Integer; const Value: String);
+procedure TALStringsW.SetPersistentValueFromIndex(Index: Integer; const Value: String);
 begin
   if Index < 0 then Add(NameValueSeparator + Value)
   else Put(Index, Names[Index] + NameValueSeparator + Value);
 end;
 
 {*************************************************}
-function TALStringsU.ToStringArray: TArray<String>;
+function TALStringsW.ToStringArray: TArray<String>;
 var
   I: Integer;
 begin
@@ -5985,7 +5985,7 @@ begin
 end;
 
 {**************************************************}
-function TALStringsU.ToObjectArray: TArray<TObject>;
+function TALStringsW.ToObjectArray: TArray<TObject>;
 var
   I: Integer;
 begin
@@ -5995,7 +5995,7 @@ begin
 end;
 
 {*******************************************************************}
-function TALStringsU.ToNameValueArray: TArray<TPair<String, String>>;
+function TALStringsW.ToNameValueArray: TArray<TPair<String, String>>;
 var
   I: Integer;
 begin
@@ -6005,7 +6005,7 @@ begin
 end;
 
 {********************************}
-destructor TALStringListU.Destroy;
+destructor TALStringListW.Destroy;
 var
   I: Integer;
   Temp: Array of TObject;
@@ -6032,13 +6032,13 @@ begin
 end;
 
 {****************************************************}
-function TALStringListU.Add(const S: String): Integer;
+function TALStringListW.Add(const S: String): Integer;
 begin
   Result := AddObject(S, nil);
 end;
 
 {****************************************************************************}
-function TALStringListU.AddObject(const S: String; AObject: TObject): Integer;
+function TALStringListW.AddObject(const S: String; AObject: TObject): Integer;
 begin
   if not Sorted then
     Result := FCount
@@ -6052,21 +6052,21 @@ begin
 end;
 
 {***************************************************}
-procedure TALStringListU.Assign(Source: TPersistent);
+procedure TALStringListW.Assign(Source: TPersistent);
 begin
-  if Source is TALStringListU then
+  if Source is TALStringListW then
   begin
     Clear;
-    FCaseSensitive := TALStringListU(Source).FCaseSensitive;
-    FDuplicates := TALStringListU(Source).FDuplicates;
-    FSorted := TALStringListU(Source).FSorted;
+    FCaseSensitive := TALStringListW(Source).FCaseSensitive;
+    FDuplicates := TALStringListW(Source).FDuplicates;
+    FSorted := TALStringListW(Source).FSorted;
   end
-  else if Source is TALNVStringListU then
+  else if Source is TALNVStringListW then
   begin
     Clear;
-    FCaseSensitive := TALNVStringListU(Source).FCaseSensitive;
-    FDuplicates := TALNVStringListU(Source).FDuplicates;
-    FSorted := TALNVStringListU(Source).FSorted;
+    FCaseSensitive := TALNVStringListW(Source).FCaseSensitive;
+    FDuplicates := TALNVStringListW(Source).FDuplicates;
+    FSorted := TALNVStringListW(Source).FSorted;
   end
   else if Source is TStringList then
   begin
@@ -6079,7 +6079,7 @@ begin
 end;
 
 {***************************************************}
-procedure TALStringListU.AssignTo(Dest: TPersistent);
+procedure TALStringListW.AssignTo(Dest: TPersistent);
 begin
   if Dest is TStringList then
   begin
@@ -6092,21 +6092,21 @@ begin
 end;
 
 {*******************************}
-procedure TALStringListU.Changed;
+procedure TALStringListW.Changed;
 begin
   if (FUpdateCount = 0) and Assigned(FOnChange) then
     FOnChange(Self);
 end;
 
 {********************************}
-procedure TALStringListU.Changing;
+procedure TALStringListW.Changing;
 begin
   if (FUpdateCount = 0) and Assigned(FOnChanging) then
     FOnChanging(Self);
 end;
 
 {*****************************}
-procedure TALStringListU.Clear;
+procedure TALStringListW.Clear;
 var
   I: Integer;
   Temp: Array of TObject;
@@ -6136,7 +6136,7 @@ begin
 end;
 
 {**********************************************}
-procedure TALStringListU.Delete(Index: Integer);
+procedure TALStringListW.Delete(Index: Integer);
 var
   Obj: TObject;
 begin
@@ -6156,7 +6156,7 @@ begin
   if Index < FCount then
   begin
     ALMove(FList[Index + 1], FList[Index],
-      (FCount - Index) * SizeOf(TALStringItemU));
+      (FCount - Index) * SizeOf(TALStringItemW));
     // Make sure there is no danglng pointer in the last (now unused) element
     PPointer(@FList[FCount].FString)^ := nil;
     PPointer(@FList[FCount].FObject)^ := nil;
@@ -6167,7 +6167,7 @@ begin
 end;
 
 {**************************************************************}
-function  TALStringListU.ExtractObject(Index: Integer): TObject;
+function  TALStringListW.ExtractObject(Index: Integer): TObject;
 begin
   if (Index < 0) or (Index >= FCount) then Error(@SListIndexError, Index);
   Changing;
@@ -6177,7 +6177,7 @@ begin
 end;
 
 {*********************************************************}
-procedure TALStringListU.Exchange(Index1, Index2: Integer);
+procedure TALStringListW.Exchange(Index1, Index2: Integer);
 begin
   if (Index1 < 0) or (Index1 >= FCount) then Error(@SListIndexError, Index1);
   if (Index2 < 0) or (Index2 >= FCount) then Error(@SListIndexError, Index2);
@@ -6187,10 +6187,10 @@ begin
 end;
 
 {**************************************************************}
-procedure TALStringListU.ExchangeItems(Index1, Index2: Integer);
+procedure TALStringListW.ExchangeItems(Index1, Index2: Integer);
 var
   Temp: Pointer;
-  Item1, Item2: PALStringItemU;
+  Item1, Item2: PALStringItemW;
 begin
   Item1 := @FList[Index1];
   Item2 := @FList[Index2];
@@ -6203,7 +6203,7 @@ begin
 end;
 
 {*************************************************************************}
-function TALStringListU.Find(const S: String; var Index: Integer): Boolean;
+function TALStringListW.Find(const S: String; var Index: Integer): Boolean;
 var
   L, H, I, C: Integer;
 begin
@@ -6228,7 +6228,7 @@ begin
 end;
 
 {*****************************************************************************}
-function TALStringListU.FindName(const S: String; var Index: Integer): Boolean;
+function TALStringListW.FindName(const S: String; var Index: Integer): Boolean;
 var
   L, H, I, C: Integer;
 begin
@@ -6274,7 +6274,7 @@ begin
 end;
 
 {**************************************************}
-function TALStringListU.Get(Index: Integer): String;
+function TALStringListW.Get(Index: Integer): String;
 begin
   if Cardinal(Index) >= Cardinal(FCount) then
     Error(@SListIndexError, Index);
@@ -6282,19 +6282,19 @@ begin
 end;
 
 {*******************************************}
-function TALStringListU.GetCapacity: Integer;
+function TALStringListW.GetCapacity: Integer;
 begin
   Result := FCapacity;
 end;
 
 {****************************************}
-function TALStringListU.GetCount: Integer;
+function TALStringListW.GetCount: Integer;
 begin
   Result := FCount;
 end;
 
 {*********************************************************}
-function TALStringListU.GetObject(Index: Integer): TObject;
+function TALStringListW.GetObject(Index: Integer): TObject;
 begin
   if Cardinal(Index) >= Cardinal(FCount) then
     Error(@SListIndexError, Index);
@@ -6302,7 +6302,7 @@ begin
 end;
 
 {****************************}
-procedure TALStringListU.Grow;
+procedure TALStringListW.Grow;
 {$IF CompilerVersion <= 32}{tokyo}
 var
   Delta: Integer;
@@ -6319,27 +6319,27 @@ begin
 end;
 
 {********************************************************}
-function TALStringListU.IndexOf(const S: String): Integer;
+function TALStringListW.IndexOf(const S: String): Integer;
 begin
   if not Sorted then Result := inherited IndexOf(S) else
     if not Find(S, Result) then Result := -1;
 end;
 
 {***************************************************************}
-function TALStringListU.IndexOfName(const Name: String): Integer;
+function TALStringListW.IndexOfName(const Name: String): Integer;
 begin
   if (not Sorted) or (not FNameValueOptimization) then Result := inherited IndexOfName(Name)
   else if not FindName(Name, Result) then Result := -1;
 end;
 
 {***************************************************************}
-procedure TALStringListU.Insert(Index: Integer; const S: String);
+procedure TALStringListW.Insert(Index: Integer; const S: String);
 begin
   InsertObject(Index, S, nil);
 end;
 
 {***************************************************************************************}
-procedure TALStringListU.InsertObject(Index: Integer; const S: String; AObject: TObject);
+procedure TALStringListW.InsertObject(Index: Integer; const S: String; AObject: TObject);
 begin
   if Sorted then Error(@SSortedListError, 0);
   if (Index < 0) or (Index > FCount) then Error(@SListIndexError, Index);
@@ -6347,7 +6347,7 @@ begin
 end;
 
 {*********************************************************}
-procedure TALStringListU.Move(CurIndex, NewIndex: Integer);
+procedure TALStringListW.Move(CurIndex, NewIndex: Integer);
 var
   TempObject: TObject;
   TempString: String;
@@ -6368,13 +6368,13 @@ begin
 end;
 
 {*************************************************************************************}
-procedure TALStringListU.InsertItem(Index: Integer; const S: String; AObject: TObject);
+procedure TALStringListW.InsertItem(Index: Integer; const S: String; AObject: TObject);
 begin
   Changing;
   if FCount = FCapacity then Grow;
   if Index < FCount then
     ALMove(FList[Index], FList[Index + 1],
-      (FCount - Index) * SizeOf(TALStringItemU));
+      (FCount - Index) * SizeOf(TALStringItemW));
   Pointer(FList[Index].FString) := nil;
   Pointer(FList[Index].FObject) := nil;
   FList[Index].FObject := AObject;
@@ -6384,7 +6384,7 @@ begin
 end;
 
 {************************************************************}
-procedure TALStringListU.Put(Index: Integer; const S: String);
+procedure TALStringListW.Put(Index: Integer; const S: String);
 begin
   if not sorted then begin
     if Cardinal(Index) >= Cardinal(FCount) then
@@ -6400,7 +6400,7 @@ begin
 end;
 
 {*******************************************************************}
-procedure TALStringListU.PutObject(Index: Integer; AObject: TObject);
+procedure TALStringListW.PutObject(Index: Integer; AObject: TObject);
 var
   Obj: TObject;
 begin
@@ -6424,7 +6424,7 @@ begin
 end;
 
 {*************************************************************************************}
-procedure TALStringListU.QuickSort(L, R: Integer; ACompare: TALStringListSortCompareU);
+procedure TALStringListW.QuickSort(L, R: Integer; ACompare: TALStringListSortCompareW);
 var
   I, J, P: Integer;
 begin
@@ -6470,7 +6470,7 @@ begin
 end;
 
 {*********************************************************}
-procedure TALStringListU.SetCapacity(NewCapacity: Integer);
+procedure TALStringListW.SetCapacity(NewCapacity: Integer);
 begin
   if NewCapacity < FCount then
     Error(@SListCapacityError, NewCapacity);
@@ -6482,7 +6482,7 @@ begin
 end;
 
 {*************************************************}
-procedure TALStringListU.SetSorted(Value: Boolean);
+procedure TALStringListW.SetSorted(Value: Boolean);
 begin
   if FSorted <> Value then
   begin
@@ -6492,26 +6492,26 @@ begin
 end;
 
 {*********************************************************}
-procedure TALStringListU.SetUpdateState(Updating: Boolean);
+procedure TALStringListW.SetUpdateState(Updating: Boolean);
 begin
   if Updating then Changing else Changed;
 end;
 
 {*******************************************************************************************}
-function ALStringListCompareStringsU(List: TALStringListU; Index1, Index2: Integer): Integer;
+function ALStringListCompareStringsU(List: TALStringListW; Index1, Index2: Integer): Integer;
 begin
   Result := List.CompareStrings(List.FList[Index1].FString,
                                 List.FList[Index2].FString);
 end;
 
 {****************************}
-procedure TALStringListU.Sort;
+procedure TALStringListW.Sort;
 begin
   CustomSort(ALStringListCompareStringsU);
 end;
 
 {**********************************************************************}
-procedure TALStringListU.CustomSort(Compare: TALStringListSortCompareU);
+procedure TALStringListW.CustomSort(Compare: TALStringListSortCompareW);
 begin
   if not Sorted and (FCount > 1) then
   begin
@@ -6522,7 +6522,7 @@ begin
 end;
 
 {********************************************************************}
-function TALStringListU.CompareStrings(const S1, S2: String): Integer;
+function TALStringListW.CompareStrings(const S1, S2: String): Integer;
 
   {---------------------------------------------------------}
   function internalCompareStr(const S1, S2: String): Integer;
@@ -6608,7 +6608,7 @@ function TALStringListU.CompareStrings(const S1, S2: String): Integer;
 begin
 
   // Orignial Delphi Code
-  // the difference between TALStringList and TStringList is that
+  // the difference between TALStringListA and TStringList is that
   // TstringList use ansiCompareStr or ansiCompareText that are
   // dependant from the local. I don't like this behavior because
   // as you can read
@@ -6679,7 +6679,7 @@ begin
 end;
 
 {**************************************************}
-procedure TALStringListU.init(OwnsObjects: Boolean);
+procedure TALStringListW.init(OwnsObjects: Boolean);
 begin
   setlength(FList, 0);
   FCount := 0;
@@ -6694,21 +6694,21 @@ begin
 end;
 
 {********************************}
-constructor TALStringListU.Create;
+constructor TALStringListW.Create;
 begin
   inherited Create;
   init(False);
 end;
 
 {******************************************************}
-constructor TALStringListU.Create(OwnsObjects: Boolean);
+constructor TALStringListW.Create(OwnsObjects: Boolean);
 begin
   inherited Create;
   init(OwnsObjects);
 end;
 
 {**************************************************************}
-procedure TALStringListU.SetCaseSensitive(const Value: Boolean);
+procedure TALStringListW.SetCaseSensitive(const Value: Boolean);
 begin
   if Value <> FCaseSensitive then
   begin
@@ -6724,7 +6724,7 @@ begin
 end;
 
 {**********************************}
-destructor TALNVStringListU.Destroy;
+destructor TALNVStringListW.Destroy;
 var
   I: Integer;
   Temp: Array of TObject;
@@ -6751,13 +6751,13 @@ begin
 end;
 
 {******************************************************}
-function TALNVStringListU.Add(const S: String): Integer;
+function TALNVStringListW.Add(const S: String): Integer;
 begin
   Result := AddObject(S, nil);
 end;
 
 {******************************************************************************}
-function TALNVStringListU.AddObject(const S: String; AObject: TObject): Integer;
+function TALNVStringListW.AddObject(const S: String; AObject: TObject): Integer;
 Var LName, LValue: String;
 begin
   if not Sorted then begin
@@ -6785,13 +6785,13 @@ begin
 end;
 
 {*************************************************************************}
-function TALNVStringListU.AddNameValue(const Name, Value: String): Integer;
+function TALNVStringListW.AddNameValue(const Name, Value: String): Integer;
 begin
   Result := AddNameValueObject(Name, Value, nil);
 end;
 
 {*************************************************************************************************}
-function TALNVStringListU.AddNameValueObject(const Name, Value: String; AObject: TObject): Integer;
+function TALNVStringListW.AddNameValueObject(const Name, Value: String; AObject: TObject): Integer;
 begin
   if not Sorted then begin
     Result := FCount;
@@ -6807,21 +6807,21 @@ begin
 end;
 
 {*****************************************************}
-procedure TALNVStringListU.Assign(Source: TPersistent);
+procedure TALNVStringListW.Assign(Source: TPersistent);
 begin
-  if Source is TALNVStringListU then
+  if Source is TALNVStringListW then
   begin
     Clear;
-    FCaseSensitive := TALNVStringListU(Source).FCaseSensitive;
-    FDuplicates := TALNVStringListU(Source).FDuplicates;
-    FSorted := TALNVStringListU(Source).FSorted;
+    FCaseSensitive := TALNVStringListW(Source).FCaseSensitive;
+    FDuplicates := TALNVStringListW(Source).FDuplicates;
+    FSorted := TALNVStringListW(Source).FSorted;
   end
-  else if Source is TALStringListU then
+  else if Source is TALStringListW then
   begin
     Clear;
-    FCaseSensitive := TALStringListU(Source).FCaseSensitive;
-    FDuplicates := TALStringListU(Source).FDuplicates;
-    FSorted := TALStringListU(Source).FSorted;
+    FCaseSensitive := TALStringListW(Source).FCaseSensitive;
+    FDuplicates := TALStringListW(Source).FDuplicates;
+    FSorted := TALStringListW(Source).FSorted;
   end
   else if Source is TStringList then
   begin
@@ -6834,7 +6834,7 @@ begin
 end;
 
 {*****************************************************}
-procedure TALNVStringListU.AssignTo(Dest: TPersistent);
+procedure TALNVStringListW.AssignTo(Dest: TPersistent);
 begin
   if Dest is TStringList then
   begin
@@ -6847,21 +6847,21 @@ begin
 end;
 
 {*********************************}
-procedure TALNVStringListU.Changed;
+procedure TALNVStringListW.Changed;
 begin
   if (FUpdateCount = 0) and Assigned(FOnChange) then
     FOnChange(Self);
 end;
 
 {**********************************}
-procedure TALNVStringListU.Changing;
+procedure TALNVStringListW.Changing;
 begin
   if (FUpdateCount = 0) and Assigned(FOnChanging) then
     FOnChanging(Self);
 end;
 
 {*******************************}
-procedure TALNVStringListU.Clear;
+procedure TALNVStringListW.Clear;
 var
   I: Integer;
   Temp: Array of TObject;
@@ -6891,7 +6891,7 @@ begin
 end;
 
 {************************************************}
-procedure TALNVStringListU.Delete(Index: Integer);
+procedure TALNVStringListW.Delete(Index: Integer);
 var
   Obj: TObject;
 begin
@@ -6911,7 +6911,7 @@ begin
   if Index < FCount then
   begin
     ALMove(FList[Index + 1], FList[Index],
-      (FCount - Index) * SizeOf(TALNVStringItemU));
+      (FCount - Index) * SizeOf(TALNVStringItemW));
     // Make sure there is no danglng pointer in the last (now unused) element
     PPointer(@FList[FCount].FName)^   := nil;
     PPointer(@FList[FCount].FValue)^  := nil;
@@ -6923,7 +6923,7 @@ begin
 end;
 
 {****************************************************************}
-function  TALNVStringListU.ExtractObject(Index: Integer): TObject;
+function  TALNVStringListW.ExtractObject(Index: Integer): TObject;
 begin
   if (Index < 0) or (Index >= FCount) then Error(@SListIndexError, Index);
   Changing;
@@ -6933,7 +6933,7 @@ begin
 end;
 
 {***********************************************************}
-procedure TALNVStringListU.Exchange(Index1, Index2: Integer);
+procedure TALNVStringListW.Exchange(Index1, Index2: Integer);
 begin
   if (Index1 < 0) or (Index1 >= FCount) then Error(@SListIndexError, Index1);
   if (Index2 < 0) or (Index2 >= FCount) then Error(@SListIndexError, Index2);
@@ -6943,10 +6943,10 @@ begin
 end;
 
 {****************************************************************}
-procedure TALNVStringListU.ExchangeItems(Index1, Index2: Integer);
+procedure TALNVStringListW.ExchangeItems(Index1, Index2: Integer);
 var
   Temp: Pointer;
-  Item1, Item2: PALNVStringItemU;
+  Item1, Item2: PALNVStringItemW;
 begin
   Item1 := @FList[Index1];
   Item2 := @FList[Index2];
@@ -6965,7 +6965,7 @@ begin
 end;
 
 {***************************************************************************}
-function TALNVStringListU.Find(const S: String; var Index: Integer): Boolean;
+function TALNVStringListW.Find(const S: String; var Index: Integer): Boolean;
 var Name, Value: String;
 begin
   if ExtractNameValue(S, Name, Value) then result := FindNameValue(Name, Value, Index)
@@ -6973,7 +6973,7 @@ begin
 end;
 
 {**********************************************************************************}
-function TALNVStringListU.FindName(const Name: String; var Index: Integer): Boolean;
+function TALNVStringListW.FindName(const Name: String; var Index: Integer): Boolean;
 var
   L, H, I, C: Integer;
 begin
@@ -7019,7 +7019,7 @@ begin
 end;
 
 {****************************************************************************************************}
-function TALNVStringListU.FindName(const Name: String; WithNvS: boolean; var Index: Integer): Boolean;
+function TALNVStringListW.FindName(const Name: String; WithNvS: boolean; var Index: Integer): Boolean;
 var
   L, H, I, C: Integer;
 begin
@@ -7090,7 +7090,7 @@ begin
 end;
 
 {**********************************************************************************************}
-function TALNVStringListU.FindNameValue(const Name, Value: String; var Index: Integer): Boolean;
+function TALNVStringListW.FindNameValue(const Name, Value: String; var Index: Integer): Boolean;
 var
   L, H, I, C: Integer;
 begin
@@ -7123,7 +7123,7 @@ begin
 end;
 
 {****************************************************}
-function TALNVStringListU.Get(Index: Integer): String;
+function TALNVStringListW.Get(Index: Integer): String;
 begin
   if Cardinal(Index) >= Cardinal(FCount) then
     Error(@SListIndexError, Index);
@@ -7132,19 +7132,19 @@ begin
 end;
 
 {*********************************************}
-function TALNVStringListU.GetCapacity: Integer;
+function TALNVStringListW.GetCapacity: Integer;
 begin
   Result := FCapacity;
 end;
 
 {******************************************}
-function TALNVStringListU.GetCount: Integer;
+function TALNVStringListW.GetCount: Integer;
 begin
   Result := FCount;
 end;
 
 {***********************************************************}
-function TALNVStringListU.GetObject(Index: Integer): TObject;
+function TALNVStringListW.GetObject(Index: Integer): TObject;
 begin
   if Cardinal(Index) >= Cardinal(FCount) then
     Error(@SListIndexError, Index);
@@ -7152,7 +7152,7 @@ begin
 end;
 
 {******************************}
-procedure TALNVStringListU.Grow;
+procedure TALNVStringListW.Grow;
 {$IF CompilerVersion <= 32}{tokyo}
 var
   Delta: Integer;
@@ -7169,7 +7169,7 @@ begin
 end;
 
 {*******************************************}
-function TALNVStringListU.GetTextStr: String;
+function TALNVStringListW.GetTextStr: String;
 var
   I, L, Size: Integer;
   P: PChar;
@@ -7215,7 +7215,7 @@ begin
 end;
 
 {**********************************************************}
-function TALNVStringListU.IndexOf(const S: String): Integer;
+function TALNVStringListW.IndexOf(const S: String): Integer;
 Var LName, LValue: String;
 begin
   if ExtractNameValue(S, LName, LValue) then begin
@@ -7244,7 +7244,7 @@ begin
 end;
 
 {*****************************************************************}
-function TALNVStringListU.IndexOfName(const Name: String): Integer;
+function TALNVStringListW.IndexOfName(const Name: String): Integer;
 begin
   if not Sorted then begin
     for Result := 0 to FCount - 1 do
@@ -7257,13 +7257,13 @@ begin
 end;
 
 {*****************************************************************}
-procedure TALNVStringListU.Insert(Index: Integer; const S: String);
+procedure TALNVStringListW.Insert(Index: Integer; const S: String);
 begin
   InsertObject(Index, S, nil);
 end;
 
 {*****************************************************************************************}
-procedure TALNVStringListU.InsertObject(Index: Integer; const S: String; AObject: TObject);
+procedure TALNVStringListW.InsertObject(Index: Integer; const S: String; AObject: TObject);
 begin
   if Sorted then Error(@SSortedListError, 0);
   if (Index < 0) or (Index > FCount) then Error(@SListIndexError, Index);
@@ -7271,13 +7271,13 @@ begin
 end;
 
 {************************************************************************************}
-procedure TALNVStringListU.InsertNameValue(Index: Integer; const Name, Value: String);
+procedure TALNVStringListW.InsertNameValue(Index: Integer; const Name, Value: String);
 begin
   InsertNameValueObject(Index, Name, Value, nil);
 end;
 
 {************************************************************************************************************}
-procedure TALNVStringListU.InsertNameValueObject(Index: Integer; const Name, Value: String; AObject: TObject);
+procedure TALNVStringListW.InsertNameValueObject(Index: Integer; const Name, Value: String; AObject: TObject);
 begin
   if Sorted then Error(@SSortedListError, 0);
   if (Index < 0) or (Index > FCount) then Error(@SListIndexError, Index);
@@ -7285,7 +7285,7 @@ begin
 end;
 
 {***********************************************************}
-procedure TALNVStringListU.Move(CurIndex, NewIndex: Integer);
+procedure TALNVStringListW.Move(CurIndex, NewIndex: Integer);
 var
   TempObject: TObject;
   TempName: String;
@@ -7311,7 +7311,7 @@ begin
 end;
 
 {***************************************************************************************}
-procedure TALNVStringListU.InsertItem(Index: Integer; const S: String; AObject: TObject);
+procedure TALNVStringListW.InsertItem(Index: Integer; const S: String; AObject: TObject);
 var Name, Value: String;
 begin
   if ExtractNameValue(S, Name, Value) then InsertItem(Index, Name, Value, AObject)
@@ -7319,13 +7319,13 @@ begin
 end;
 
 {*************************************************************************************************}
-procedure TALNVStringListU.InsertItem(Index: Integer; const Name, Value: String; AObject: TObject);
+procedure TALNVStringListW.InsertItem(Index: Integer; const Name, Value: String; AObject: TObject);
 begin
   Changing;
   if FCount = FCapacity then Grow;
   if Index < FCount then
     ALMove(FList[Index], FList[Index + 1],
-      (FCount - Index) * SizeOf(TALNVStringItemU));
+      (FCount - Index) * SizeOf(TALNVStringItemW));
   Pointer(FList[Index].FName) := nil;
   Pointer(FList[Index].FValue) := nil;
   Pointer(FList[Index].FObject) := nil;
@@ -7338,13 +7338,13 @@ begin
 end;
 
 {************************************************************************************************************}
-procedure TALNVStringListU.InsertItem(Index: Integer; const Name: String; WithNvS: boolean; AObject: TObject);
+procedure TALNVStringListW.InsertItem(Index: Integer; const Name: String; WithNvS: boolean; AObject: TObject);
 begin
   Changing;
   if FCount = FCapacity then Grow;
   if Index < FCount then
     ALMove(FList[Index], FList[Index + 1],
-      (FCount - Index) * SizeOf(TALNVStringItemU));
+      (FCount - Index) * SizeOf(TALNVStringItemW));
   Pointer(FList[Index].FName) := nil;
   Pointer(FList[Index].FValue) := nil;
   Pointer(FList[Index].FObject) := nil;
@@ -7357,7 +7357,7 @@ begin
 end;
 
 {**************************************************************}
-procedure TALNVStringListU.Put(Index: Integer; const S: String);
+procedure TALNVStringListW.Put(Index: Integer; const S: String);
 var Name, Value: String;
 begin
   if not sorted then begin
@@ -7383,7 +7383,7 @@ begin
 end;
 
 {*********************************************************************}
-procedure TALNVStringListU.PutObject(Index: Integer; AObject: TObject);
+procedure TALNVStringListW.PutObject(Index: Integer; AObject: TObject);
 var
   Obj: TObject;
 begin
@@ -7407,7 +7407,7 @@ begin
 end;
 
 {*****************************************************************************************}
-procedure TALNVStringListU.QuickSort(L, R: Integer; ACompare: TALNVStringListSortCompareU);
+procedure TALNVStringListW.QuickSort(L, R: Integer; ACompare: TALNVStringListSortCompareW);
 var
   I, J, P: Integer;
 begin
@@ -7453,7 +7453,7 @@ begin
 end;
 
 {***********************************************************}
-procedure TALNVStringListU.SetCapacity(NewCapacity: Integer);
+procedure TALNVStringListW.SetCapacity(NewCapacity: Integer);
 begin
   if NewCapacity < FCount then
     Error(@SListCapacityError, NewCapacity);
@@ -7465,7 +7465,7 @@ begin
 end;
 
 {***************************************************}
-procedure TALNVStringListU.SetSorted(Value: Boolean);
+procedure TALNVStringListW.SetSorted(Value: Boolean);
 begin
   if FSorted <> Value then
   begin
@@ -7475,13 +7475,13 @@ begin
 end;
 
 {***********************************************************}
-procedure TALNVStringListU.SetUpdateState(Updating: Boolean);
+procedure TALNVStringListW.SetUpdateState(Updating: Boolean);
 begin
   if Updating then Changing else Changed;
 end;
 
 {***********************************************************************************************}
-function ALNVStringListCompareStringsU(List: TALNVStringListU; Index1, Index2: Integer): Integer;
+function ALNVStringListCompareStringsU(List: TALNVStringListW; Index1, Index2: Integer): Integer;
 begin
   Result := List.CompareStrings(List.FList[Index1].FName,
                                 List.FList[Index2].FName);  // The return value is less than 0 if List.FList[Index1].FName < List.FList[Index2].FName, 0 if List.FList[Index1].FName = List.FList[Index2].FName, or greater than 0 if List.FList[Index1].FName > List.FList[Index2].FName.
@@ -7502,13 +7502,13 @@ begin
 end;
 
 {******************************}
-procedure TALNVStringListU.Sort;
+procedure TALNVStringListW.Sort;
 begin
   CustomSort(ALNVStringListCompareStringsU);
 end;
 
 {**************************************************************************}
-procedure TALNVStringListU.CustomSort(Compare: TALNVStringListSortCompareU);
+procedure TALNVStringListW.CustomSort(Compare: TALNVStringListSortCompareW);
 begin
   if not Sorted and (FCount > 1) then
   begin
@@ -7519,11 +7519,11 @@ begin
 end;
 
 {**********************************************************************}
-function TALNVStringListU.CompareStrings(const S1, S2: String): Integer;
+function TALNVStringListW.CompareStrings(const S1, S2: String): Integer;
 begin
 
   // Orignial Delphi Code
-  // the difference between TALNVStringList and TStringList is that
+  // the difference between TALNVStringListA and TStringList is that
   // TstringList use ansiCompareStr or ansiCompareText that are
   // dependant from the local. I don't like this behavior because
   // as you can read
@@ -7579,7 +7579,7 @@ begin
 end;
 
 {****************************************************}
-procedure TALNVStringListU.init(OwnsObjects: Boolean);
+procedure TALNVStringListW.init(OwnsObjects: Boolean);
 begin
   setlength(FList, 0);
   FCount := 0;
@@ -7593,21 +7593,21 @@ begin
 end;
 
 {**********************************}
-constructor TALNVStringListU.Create;
+constructor TALNVStringListW.Create;
 begin
   inherited Create;
   init(False);
 end;
 
 {********************************************************}
-constructor TALNVStringListU.Create(OwnsObjects: Boolean);
+constructor TALNVStringListW.Create(OwnsObjects: Boolean);
 begin
   inherited Create;
   init(OwnsObjects);
 end;
 
 {****************************************************************}
-procedure TALNVStringListU.SetCaseSensitive(const Value: Boolean);
+procedure TALNVStringListW.SetCaseSensitive(const Value: Boolean);
 begin
   if Value <> FCaseSensitive then
   begin
@@ -7623,7 +7623,7 @@ begin
 end;
 
 {********************************************************************************************}
-Function TALNVStringListU.ExtractNameValue(const S: String; var Name, Value: String): Boolean;
+Function TALNVStringListW.ExtractNameValue(const S: String; var Name, Value: String): Boolean;
 Var P1: Integer;
 begin
   P1 := ALPosW(NameValueSeparator,S);
@@ -7640,7 +7640,7 @@ begin
 end;
 
 {********************************************************}
-function TALNVStringListU.GetName(Index: Integer): String;
+function TALNVStringListW.GetName(Index: Integer): String;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
     Error(@SListIndexError, Index);
@@ -7648,7 +7648,7 @@ begin
 end;
 
 {**************************************************************}
-function TALNVStringListU.GetStrictName(Index: Integer): String;
+function TALNVStringListW.GetStrictName(Index: Integer): String;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
     Error(@SListIndexError, Index);
@@ -7657,7 +7657,7 @@ begin
 end;
 
 {*************************************************************}
-function TALNVStringListU.GetValue(const Name: String): String;
+function TALNVStringListW.GetValue(const Name: String): String;
 var
   I: Integer;
 begin
@@ -7670,7 +7670,7 @@ begin
 end;
 
 {*************************************************************}
-procedure TALNVStringListU.SetValue(const Name, Value: String);
+procedure TALNVStringListW.SetValue(const Name, Value: String);
 var
   I: Integer;
 begin
@@ -7691,7 +7691,7 @@ begin
 end;
 
 {******************************************************************}
-function TALNVStringListU.GetValueFromIndex(Index: Integer): String;
+function TALNVStringListW.GetValueFromIndex(Index: Integer): String;
 begin
   if Index >= 0 then
   begin
@@ -7707,7 +7707,7 @@ begin
 end;
 
 {********************************************************************************}
-procedure TALNVStringListU.SetValueFromIndex(Index: Integer; const Value: String);
+procedure TALNVStringListW.SetValueFromIndex(Index: Integer; const Value: String);
 begin
   if Value <> '' then
   begin
@@ -7726,7 +7726,7 @@ begin
 end;
 
 {***********************************************************************}
-procedure TALNVStringListU.SetPersistentValue(const Name, Value: String);
+procedure TALNVStringListW.SetPersistentValue(const Name, Value: String);
 var
   I: Integer;
 begin
@@ -7741,7 +7741,7 @@ begin
 end;
 
 {******************************************************************************************}
-procedure TALNVStringListU.SetPersistentValueFromIndex(Index: Integer; const Value: String);
+procedure TALNVStringListW.SetPersistentValueFromIndex(Index: Integer; const Value: String);
 begin
   if Index < 0 then AddNameValue('', Value)
   else begin

@@ -11,25 +11,25 @@ uses
   Alcinoe.HTTP.Client,
   Alcinoe.StringList;
 
-Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest; ServerVariables: TALStrings); overload;
+Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest; ServerVariables: TALStringsA); overload;
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest;
-                                                        ServerVariables: TALStrings;
+                                                        ServerVariables: TALStringsA;
                                                         const ScriptName,
                                                               ScriptFileName: AnsiString;
                                                         const Url: AnsiString); overload;
-Procedure ALCGIInitDefaultServerVariables(ServerVariables: TALStrings); overload;
-Procedure AlCGIInitDefaultServerVariables(ServerVariables: TALStrings;
+Procedure ALCGIInitDefaultServerVariables(ServerVariables: TALStringsA); overload;
+Procedure AlCGIInitDefaultServerVariables(ServerVariables: TALStringsA;
                                           const ScriptName,
                                                 ScriptFileName: AnsiString;
                                           const Url: AnsiString); overload;
 Procedure AlCGIInitServerVariablesFromWebRequest(WebRequest: TALWebRequest;
-                                                 ServerVariables: TALStrings;
+                                                 ServerVariables: TALStringsA;
                                                  const ScriptName,
                                                        ScriptFileName: AnsiString;
                                                  const Url: AnsiString); overload;
 
 Procedure AlCGIExec(const InterpreterFilename: AnsiString;
-                    ServerVariables: TALStrings;
+                    ServerVariables: TALStringsA;
                     RequestContentStream: Tstream;
                     ResponseContentStream: Tstream;
                     ResponseHeader: TALHTTPResponseHeader); overload;
@@ -42,7 +42,7 @@ uses
   Alcinoe.StringUtils;
 
 {**************************************************************************************************************}
-Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest; ServerVariables: TALStrings);
+Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest; ServerVariables: TALStringsA);
 Begin
   ServerVariables.Clear;
   {----------}
@@ -63,7 +63,7 @@ end;
 
 {********************************************************************************}
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest;
-                                                        ServerVariables: TALStrings;
+                                                        ServerVariables: TALStringsA;
                                                         const ScriptName,
                                                               ScriptFileName: AnsiString;
                                                         const Url: AnsiString);
@@ -80,7 +80,7 @@ Begin
 end;
 
 {*********************************************************************}
-Procedure ALCGIInitDefaultServerVariables(ServerVariables: TALStrings);
+Procedure ALCGIInitDefaultServerVariables(ServerVariables: TALStringsA);
 Begin
   ServerVariables.Clear;
   {----------}
@@ -100,7 +100,7 @@ Begin
 end;
 
 {********************************************************************}
-Procedure AlCGIInitDefaultServerVariables(ServerVariables: TALStrings;
+Procedure AlCGIInitDefaultServerVariables(ServerVariables: TALStringsA;
                                           const ScriptName,
                                                 ScriptFileName: AnsiString;
                                           const Url: AnsiString);
@@ -118,7 +118,7 @@ end;
 
 {*************************************************************************}
 Procedure AlCGIInitServerVariablesFromWebRequest(WebRequest: TALWebRequest;
-                                                 ServerVariables: TALStrings;
+                                                 ServerVariables: TALStringsA;
                                                  const ScriptName,
                                                        ScriptFileName: AnsiString;
                                                  const Url: AnsiString);
@@ -155,7 +155,7 @@ end;
 
 {********************************************************}
 Procedure AlCGIExec(const InterpreterFilename: AnsiString;
-                    ServerVariables: TALStrings;
+                    ServerVariables: TALStringsA;
                     RequestContentStream: Tstream;
                     ResponseContentStream: Tstream;
                     ResponseHeader: TALHTTPResponseHeader);

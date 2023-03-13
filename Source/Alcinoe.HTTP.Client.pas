@@ -40,8 +40,8 @@ type
   {--Request header--}
   TALHTTPRequestHeader = Class(TObject)
   Private
-    fHeaders: TALStrings;
-    FCookies: TALStrings;
+    fHeaders: TALStringsA;
+    FCookies: TALStringsA;
     function GetHeaderValueByPropertyIndex(const Index: Integer): ansiString;
     procedure SetHeaderValueByPropertyIndex(const Index: Integer; const Value: AnsiString);
     Function GetRawHeaderText: AnsiString;
@@ -90,8 +90,8 @@ type
     property UserAgent: AnsiString index 35 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {User-Agent: CERN-LineMode/2.15 libwww/2.17b3}
     property Via: AnsiString index 36 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Via: 1.0 ricky, 1.1 mertz, 1.0 lucy}
     property Warning: AnsiString index 37 read GetHeaderValueByPropertyIndex write SetHeaderValueByPropertyIndex; {Warning: 112 Disconnected Operation}
-    property CustomHeaders: TALStrings read FHeaders;
-    property Cookies: TALStrings read FCookies;
+    property CustomHeaders: TALStringsA read FHeaders;
+    property Cookies: TALStringsA read FCookies;
   end;
 
   {-----------------------}
@@ -181,7 +181,7 @@ type
     FWarning: AnsiString;
     FWWWAuthenticate: AnsiString;
     FRawHeaderText: AnsiString;
-    FCustomHeaders: TALStrings;
+    FCustomHeaders: TALStringsA;
     FCookies: TALHTTPCookieCollection;
     FStatusCode: AnsiString;
     FHttpProtocolVersion: AnsiString;
@@ -220,7 +220,7 @@ type
     property Via: AnsiString read FVia; {Via: 1.0 ricky, 1.1 mertz, 1.0 lucy}
     property Warning: AnsiString read FWarning; {Warning: 112 Disconnected Operation}
     property WWWAuthenticate: AnsiString read FWWWAuthenticate; {WWW-Authenticate: [challenge]}
-    Property CustomHeaders: TALStrings read FCustomHeaders;
+    Property CustomHeaders: TALStringsA read FCustomHeaders;
     Property Cookies: TALHTTPCookieCollection read FCookies;
     property StatusCode: AnsiString read FStatusCode;
     property HttpProtocolVersion: AnsiString read FHttpProtocolVersion;
@@ -300,7 +300,7 @@ type
     destructor Destroy; override;
     //-----
     Procedure Get(const aUrl:AnsiString;
-                  const aRequestFields: TALStrings;
+                  const aRequestFields: TALStringsA;
                   const aResponseContent: TStream;
                   const aResponseHeader: TALHTTPResponseHeader;
                   const ARequestHeaderValues: TALNameValueArray = nil;
@@ -312,7 +312,7 @@ type
     Function  Get(const aUrl:AnsiString;
                   const ARequestHeaderValues: TALNameValueArray = nil): AnsiString; overload;
     Function  Get(const aUrl:AnsiString;
-                  const aRequestFields: TALStrings;
+                  const aRequestFields: TALStringsA;
                   const ARequestHeaderValues: TALNameValueArray = nil;
                   Const aEncodeRequestFields: Boolean=True): AnsiString; overload;
     //-----
@@ -332,24 +332,24 @@ type
                    const ARequestHeaderValues: TALNameValueArray = nil): AnsiString; overload;
     //-----
     Procedure PostUrlEncoded(const aUrl:AnsiString;
-                             const aRequestFields: TALStrings;
+                             const aRequestFields: TALStringsA;
                              const aResponseContent: TStream;
                              const aResponseHeader: TALHTTPResponseHeader;
                              const ARequestHeaderValues: TALNameValueArray = nil;
                              Const aEncodeRequestFields: Boolean=True); overload;
     Function  PostUrlEncoded(const aUrl:AnsiString;
-                             const aRequestFields: TALStrings;
+                             const aRequestFields: TALStringsA;
                              const ARequestHeaderValues: TALNameValueArray = nil;
                              Const aEncodeRequestFields: Boolean=True): AnsiString; overload;
     //-----
     Procedure PostMultipartFormData(const aUrl:AnsiString;
-                                    const aRequestFields: TALStrings;
+                                    const aRequestFields: TALStringsA;
                                     const aRequestFiles: TALMultiPartFormDataContents;
                                     const aResponseContent: TStream;
                                     const aResponseHeader: TALHTTPResponseHeader;
                                     const ARequestHeaderValues: TALNameValueArray = nil); overload;
     Function  PostMultiPartFormData(const aUrl:AnsiString;
-                                    const aRequestFields: TALStrings;
+                                    const aRequestFields: TALStringsA;
                                     const aRequestFiles: TALMultiPartFormDataContents;
                                     const ARequestHeaderValues: TALNameValueArray = nil): AnsiString; overload;
     //-----
@@ -404,12 +404,12 @@ type
     property  OnRedirect: TAlHTTPClientRedirectEvent read FOnRedirect write SetOnRedirect;
   end;
 
-procedure ALHTTPEncodeParamNameValues(const ParamValues: TALStrings);
+procedure ALHTTPEncodeParamNameValues(const ParamValues: TALStringsA);
 procedure ALExtractHTTPFields(Separators,
                               WhiteSpace,
                               Quotes: TSysCharSet;
                               Content: PAnsiChar;
-                              Strings: TALStrings;
+                              Strings: TALStringsA;
                               StripQuotes: Boolean = False);
 Function  AlRemoveShemeFromUrl(const aUrl: AnsiString): ansiString;
 {$IFDEF MSWINDOWS}
@@ -433,11 +433,11 @@ Function  AlInternetCrackUrl(const aUrl: AnsiString;
                                  Password,
                                  UrlPath,
                                  Anchor: AnsiString; // not the anchor is never send to the server ! it's only used on client side
-                             const Query: TALStrings;
+                             const Query: TALStringsA;
                              var PortNumber: integer): Boolean; overload;
 Function  AlInternetCrackUrl(var Url: AnsiString; // if true return UrlPath
                              var Anchor: AnsiString;
-                             const Query: TALStrings): Boolean; overload;
+                             const Query: TALStringsA): Boolean; overload;
 Function  AlRemoveAnchorFromUrl(aUrl: AnsiString; Var aAnchor: AnsiString): AnsiString; overload;
 Function  AlRemoveAnchorFromUrl(const aUrl: AnsiString): AnsiString; overload;
 {$IFDEF MSWINDOWS}
@@ -445,7 +445,7 @@ function  AlCombineUrl(const RelativeUrl, BaseUrl: AnsiString): AnsiString; over
 Function  AlCombineUrl(const RelativeUrl,
                              BaseUrl,
                              Anchor: AnsiString;
-                       const Query: TALStrings): AnsiString; overload;
+                       const Query: TALStringsA): AnsiString; overload;
 {$ENDIF}
 
 const
@@ -591,7 +591,7 @@ end;
 // HSID=AYQEVn….DKrdst; Domain=.foo.com; Path=/; Expires=Wed, 13-Jan-2021 22:23:01 GMT; HttpOnly
 // SSID=Ap4P….GTEq; Domain=.foo.com; Path=/; Expires=Wed, 13-Jan-2021 22:23:01 GMT; Secure; HttpOnly
 procedure TALHTTPCookie.SetHeaderValue(Const aValue: AnsiString);
-Var LCookieProp: TALStringList;
+Var LCookieProp: TALStringListA;
     LCookieStr: AnsiString;
 begin
 
@@ -604,7 +604,7 @@ begin
   FSecure:= False;
   FHttpOnly := False;
 
-  LCookieProp := TALStringList.Create;
+  LCookieProp := TALStringListA.Create;
   try
 
     LCookieStr := ALTrim(AValue);
@@ -680,7 +680,7 @@ end;
 constructor TALHTTPResponseHeader.Create;
 begin
   inherited;
-  FCustomHeaders := TALStringList.create;
+  FCustomHeaders := TALStringListA.create;
   FCustomHeaders.NameValueSeparator := ':';
   FCookies := TALHTTPCookieCollection.Create(TALHTTPCookie);
   clear;
@@ -742,7 +742,7 @@ end;
 {*********************************************************************************}
 procedure TALHTTPResponseHeader.SetRawHeaderText(Const aRawHeaderText: AnsiString);
 
-Var LRawHeaderLst: TALStringList;
+Var LRawHeaderLst: TALStringListA;
     J: integer;
     LStatusLine: AnsiString;
 
@@ -759,7 +759,7 @@ Var LRawHeaderLst: TALStringList;
   end;
 
 begin
-  LRawHeaderLst := TALStringList.create;
+  LRawHeaderLst := TALStringListA.create;
   try
     LRawHeaderLst.NameValueSeparator := ':';
     LRawHeaderLst.Text := aRawHeaderText;
@@ -841,9 +841,9 @@ end;
 constructor TALHTTPRequestHeader.Create;
 Begin
   inherited;
-  fHeaders:= TALNVStringList.create;
+  fHeaders:= TALNVStringListA.create;
   fHeaders.NameValueSeparator := ':';
-  FCookies := TALNVStringList.create;
+  FCookies := TALNVStringListA.create;
   Accept := 'text/html, */*';
 end;
 
@@ -988,10 +988,10 @@ end;
 
 {********************************************************************************}
 procedure TALHTTPRequestHeader.SetRawHeaderText(const aRawHeaderText: AnsiString);
-Var LTmpHeaders: TALStringList;
+Var LTmpHeaders: TALStringListA;
     I: integer;
 begin
-  LTmpHeaders := TALStringList.create;
+  LTmpHeaders := TALStringListA.create;
   try
 
     LTmpHeaders.NameValueSeparator := ':';
@@ -1016,7 +1016,7 @@ begin
 end;
 
 {*******************************************************************}
-procedure ALHTTPEncodeParamNameValues(const ParamValues: TALStrings);
+procedure ALHTTPEncodeParamNameValues(const ParamValues: TALStringsA);
 var I: Integer;
     LPos: integer;
     LStr: AnsiString;
@@ -1043,7 +1043,7 @@ procedure ALExtractHTTPFields(Separators,
                               WhiteSpace,
                               Quotes: TSysCharSet;
                               Content: PAnsiChar;
-                              Strings: TALStrings;
+                              Strings: TALStringsA;
                               StripQuotes: Boolean = False);
 begin
   ALExtractHeaderFields(Separators,
@@ -1238,7 +1238,7 @@ Function AlInternetCrackUrl(const aUrl: AnsiString;
                                 Password,
                                 UrlPath,
                                 Anchor: AnsiString; // not the anchor is never send to the server ! it's only used on client side
-                            const Query: TALStrings;
+                            const Query: TALStringsA;
                             var PortNumber: integer): Boolean;
 var LExtraInfo: AnsiString;
     P1: integer;
@@ -1274,7 +1274,7 @@ end;
 {***********************************************}
 Function  AlInternetCrackUrl(var Url: AnsiString;  // if true return the relative url
                              var Anchor: AnsiString;
-                             const Query: TALStrings): Boolean;
+                             const Query: TALStringsA): Boolean;
 Var SchemeName,
     HostName,
     UserName,
@@ -1371,7 +1371,7 @@ end;
 Function  AlCombineUrl(const RelativeUrl,
                              BaseUrl,
                              Anchor: AnsiString;
-                       const Query: TALStrings): AnsiString;
+                       const Query: TALStringsA): AnsiString;
 Var S1 : AnsiString;
     LBool: Boolean;
 begin
@@ -1473,7 +1473,7 @@ Function  ALTryRfc822StrToGMTDateTime(const S: AnsiString; out Value: TDateTime)
 
 Var P1,P2: Integer;
     LDateStr : AnsiString;
-    LLst: TALStringList;
+    LLst: TALStringListA;
     LMonthLabel: AnsiString;
     LFormatSettings: TALFormatSettingsA;
     LTimeZoneStr: AnsiString;
@@ -1504,7 +1504,7 @@ Begin
                                                                                                    // DD Mon YYYY HH:MM:SS +0200
                                                                                                    // 23 Aug 2004 06:48:46 -0700
 
-  LLst := TALStringList.create;
+  LLst := TALStringListA.create;
   Try
 
     LLst.Text :=  ALStringReplaceA(LDateStr,' ',#13#10,[RfReplaceall]);
@@ -1698,7 +1698,7 @@ end;
 
 {****************************************************************************************}
 Function ALTryIPV6StrToBinary(aIPv6Str: ansiString; var aIPv6Bin: TALIPv6Binary): Boolean;
-var LLstIpv6Part: TALStringList;
+var LLstIpv6Part: TALStringListA;
     S1: ansiString;
     P1: integer;
     i: integer;
@@ -1729,7 +1729,7 @@ begin
   if (P1 > 0) then delete(aIPv6Str,P1,maxint); // fe80:3438:7667:5c77:ce27
 
   //----------
-  LLstIpv6Part := TALStringList.Create;
+  LLstIpv6Part := TALStringListA.Create;
   try
 
     //----------
@@ -2051,7 +2051,7 @@ end;
 
 {************************************************}
 Procedure TALHTTPClient.Get(const aUrl:AnsiString;
-                            const aRequestFields: TALStrings;
+                            const aRequestFields: TALStringsA;
                             const aResponseContent: TStream;
                             const aResponseHeader: TALHTTPResponseHeader;
                             const ARequestHeaderValues: TALNameValueArray = nil;
@@ -2103,7 +2103,7 @@ end;
 
 {***********************************************}
 Function TALHTTPClient.Get(const aUrl:AnsiString;
-                           const aRequestFields: TALStrings;
+                           const aRequestFields: TALStringsA;
                            const ARequestHeaderValues: TALNameValueArray = nil;
                            Const aEncodeRequestFields: Boolean=True): AnsiString;
 var LResponseContent: TALStringStreamA;
@@ -2203,7 +2203,7 @@ end;
 
 {************************************************************}
 procedure TALHTTPClient.PostUrlEncoded(const aUrl: AnsiString;
-                                       const aRequestFields: TALStrings;
+                                       const aRequestFields: TALStringsA;
                                        const aResponseContent: TStream;
                                        const aResponseHeader: TALHTTPResponseHeader;
                                        const ARequestHeaderValues: TALNameValueArray = nil;
@@ -2249,7 +2249,7 @@ end;
 
 {***********************************************************}
 function TALHTTPClient.PostUrlEncoded(const aUrl: AnsiString;
-                                      const aRequestFields: TALStrings;
+                                      const aRequestFields: TALStringsA;
                                       const ARequestHeaderValues: TALNameValueArray = nil;
                                       Const aEncodeRequestFields: Boolean=True): AnsiString;
 Var LURLEncodedContentStream: TALStringStreamA;
@@ -2289,7 +2289,7 @@ end;
 
 {*******************************************************************}
 procedure TALHTTPClient.PostMultiPartFormData(const aUrl: AnsiString;
-                                              const aRequestFields: TALStrings;
+                                              const aRequestFields: TALStringsA;
                                               const aRequestFiles: TALMultiPartFormDataContents;
                                               const aResponseContent: TStream;
                                               const aResponseHeader: TALHTTPResponseHeader;
@@ -2315,7 +2315,7 @@ end;
 
 {******************************************************************}
 function TALHTTPClient.PostMultiPartFormData(const aUrl: AnsiString;
-                                             const aRequestFields: TALStrings;
+                                             const aRequestFields: TALStringsA;
                                              const aRequestFiles: TALMultiPartFormDataContents;
                                              const ARequestHeaderValues: TALNameValueArray = nil): AnsiString;
 Var LMultipartFormDataEncoder: TALMultipartFormDataEncoder;

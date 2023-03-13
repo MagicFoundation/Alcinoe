@@ -141,7 +141,7 @@ Type
     Procedure SelectData(const SQL: AnsiString;
                          XMLDATA: TalXMLNode;
                          const FormatSettings: TALFormatSettingsA); overload; virtual;
-    procedure UpdateData(SQLs: TALStrings); overload; virtual;
+    procedure UpdateData(SQLs: TALStringsA); overload; virtual;
     procedure UpdateData(const SQL: AnsiString); overload; virtual;
     procedure UpdateData(const SQLs: array of AnsiString); overload; virtual;
     Property  Connected: Boolean Read GetConnected;
@@ -174,7 +174,7 @@ Type
     FConnectionMaxIdleTime: integer;
     FDataBaseName: AnsiString;
     FOpenConnectionFlags: integer;
-    FOpenConnectionPragmaStatements: TALStrings;
+    FOpenConnectionPragmaStatements: TALStringsA;
     FNullString: AnsiString;
   Protected
     function loadCachedData(const Key: AnsiString;
@@ -294,7 +294,7 @@ Type
                          XMLDATA: TalXMLNode;
                          const FormatSettings: TALFormatSettingsA;
                          const ConnectionHandle: SQLite3 = nil); overload; virtual;
-    procedure UpdateData(SQLs: TALStrings;
+    procedure UpdateData(SQLs: TALStringsA;
                          const ConnectionHandle: SQLite3 = nil); overload; virtual;
     procedure UpdateData(const SQL: AnsiString;
                          const ConnectionHandle: SQLite3 = nil); overload; virtual;
@@ -1270,7 +1270,7 @@ begin
 end;
 
 {******************************************************}
-procedure TalSqlite3Client.UpdateData(SQLs: TALStrings);
+procedure TalSqlite3Client.UpdateData(SQLs: TALStringsA);
 var I: integer;
 begin
   for I := 0 to sqls.Count - 1 do
@@ -1299,7 +1299,7 @@ procedure TalSqlite3ConnectionPoolClient.initObject(const aDataBaseName: AnsiStr
 begin
   FDataBaseName:= aDataBaseName;
   FOpenConnectionFlags := aOpenConnectionFlags;
-  FOpenConnectionPragmaStatements := TALStringList.Create;
+  FOpenConnectionPragmaStatements := TALStringListA.Create;
   FOpenConnectionPragmaStatements.LineBreak := ';';
   FOpenConnectionPragmaStatements.Text := aOpenConnectionPragmaStatements;
   setlength(FConnectionPool,0);
@@ -2447,7 +2447,7 @@ begin
 end;
 
 {*******************************************************************}
-procedure TalSqlite3ConnectionPoolClient.UpdateData(SQLs: TALStrings;
+procedure TalSqlite3ConnectionPoolClient.UpdateData(SQLs: TALStringsA;
                                                     const ConnectionHandle: SQLite3 = nil);
 Var LTmpConnectionHandle: SQLite3;
     LOwnConnection: Boolean;

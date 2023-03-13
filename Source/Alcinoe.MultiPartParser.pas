@@ -29,7 +29,7 @@ type
     FContentID: AnsiString;
     FContentDescription: AnsiString;
     FDataStream: TStream;
-    FCustomHeaders: TALStrings;
+    FCustomHeaders: TALStringsA;
     Function GetRawHeaderText: AnsiString;
     procedure SetRawHeaderText(const aRawHeaderText: AnsiString);
     function GetDataString: AnsiString;
@@ -53,7 +53,7 @@ type
     property ContentDescription: AnsiString read FContentDescription write FContentDescription; //Content-Description: some text
     property DataStream: TStream read FDataStream;
     property DataString: AnsiString read GetDataString Write SetDataString;
-    property CustomHeaders: TALStrings read FCustomHeaders;
+    property CustomHeaders: TALStringsA read FCustomHeaders;
     property RawHeaderText: AnsiString read GetRawHeaderText write setRawHeaderText;
   end;
 
@@ -267,7 +267,7 @@ type
     Function CreateDataStream: TAlMultiPartBaseStream; override;
     function GetDataStream: TAlMultiPartFormDataStream; reintroduce;
   public
-    procedure Encode(aContentFields: TALStrings; aContentFiles: TALMultiPartFormDataContents);
+    procedure Encode(aContentFields: TALStringsA; aContentFiles: TALMultiPartFormDataContents);
     property  DataStream: TAlMultiPartFormDataStream read GetDataStream;
   end;
 
@@ -275,8 +275,8 @@ type
   TALMultipartFormDataDecoder = class(TALMultipartBaseDecoder)
   private
     FContentFiles: TALMultiPartFormDataContents;
-    FContentFields: TALStrings;
-    function GetContentFields: TALStrings;
+    FContentFields: TALStringsA;
+    function GetContentFields: TALStringsA;
     function GetContentFiles: TALMultiPartFormDataContents;
   protected
     function GetContents: TALMultiPartFormDataContents; reintroduce;
@@ -286,9 +286,9 @@ type
     constructor Create; override;
     destructor  Destroy; override;
     procedure   Decode(const aDataStr, aboundary: AnsiString); overload; Override;
-    procedure   Decode(const aDataStr, aboundary: AnsiString; aContentFields: TALStrings; aContentFiles: TALMultiPartFormDataContents); overload;
+    procedure   Decode(const aDataStr, aboundary: AnsiString; aContentFields: TALStringsA; aContentFiles: TALMultiPartFormDataContents); overload;
     property    ContentFiles: TALMultiPartFormDataContents read GetContentFiles;
-    property    ContentFields: TALStrings read GetContentFields;
+    property    ContentFields: TALStringsA read GetContentFields;
   end;
 
 {Below a sample of multipart/mixed message :
@@ -405,12 +405,12 @@ Function ALMultipartExtractValueFromHeaderLine(const aHeaderLine: AnsiString; co
        (result[1]=result[length(result)]) then result := AlCopyStr(Result,2,length(result)-2);
   end;
 
-Var LLst: TALStringList;
+Var LLst: TALStringListA;
     i: integer;
 
 begin
   Result := '';
-  LLst := TALStringList.Create;
+  LLst := TALStringListA.Create;
   Try
 
     LLst.LineBreak := ';';
@@ -429,11 +429,11 @@ end;
 
 {*******************************************************************************************************************}
 Function ALMultipartSetValueInHeaderLine(const aHeaderLine: AnsiString; const aName, AValue: AnsiString): AnsiString;
-Var LLst: TALStringList;
+Var LLst: TALStringListA;
     LFlag: Boolean;
     I: integer;
 begin
-  LLst := TALStringList.Create;
+  LLst := TALStringListA.Create;
   Try
 
     LLst.LineBreak := ';';
@@ -474,7 +474,7 @@ constructor TALMultiPartBaseContent.Create;
 begin
   inherited;
   FDataStream := TMemoryStream.Create;
-  FCustomHeaders := TALStringList.create;
+  FCustomHeaders := TALStringListA.create;
   FCustomHeaders.NameValueSeparator := ':';
   Clear;
 end;
@@ -517,7 +517,7 @@ end;
 {***********************************************************************************}
 procedure TALMultiPartBaseContent.SetRawHeaderText(const aRawHeaderText: AnsiString);
 
-Var LRawHeaderLst: TALStringList;
+Var LRawHeaderLst: TALStringListA;
 
   {-------------------------------------------------------}
   Function _getHeader(const aName: AnsiString): AnsiString;
@@ -545,7 +545,7 @@ Var Str1, Str2: AnsiString;
 
 begin
   Clear;
-  LRawHeaderLst := TALStringList.create;
+  LRawHeaderLst := TALStringListA.create;
   try
 
     LRawHeaderLst.NameValueSeparator := ':';
@@ -1118,7 +1118,7 @@ begin
 end;
 
 {********************************************************************************************************************}
-procedure TALMultipartFormDataEncoder.Encode(aContentFields: TALStrings; aContentFiles: TALMultiPartFormDataContents);
+procedure TALMultipartFormDataEncoder.Encode(aContentFields: TALStringsA; aContentFiles: TALMultiPartFormDataContents);
 Var I: Integer;
 begin
   with TAlMultiPartFormDataStream(DataStream) do begin
@@ -1139,7 +1139,7 @@ constructor TALMultipartFormDataDecoder.Create;
 begin
   inherited;
   FContentFiles := TALMultiPartFormDataContents.Create(False);
-  FContentFields := TALStringList.Create;
+  FContentFields := TALStringListA.Create;
 end;
 
 {*********************************************}
@@ -1172,7 +1172,7 @@ end;
 
 {*********************************************************************************}
 procedure TALMultipartFormDataDecoder.Decode(const aDataStr, aboundary: AnsiString;
-                                             aContentFields: TALStrings;
+                                             aContentFields: TALStringsA;
                                              aContentFiles: TALMultiPartFormDataContents);
 Var LContents: TALMultiPartFormDataContents;
 begin
@@ -1213,7 +1213,7 @@ begin
 end;
 
 {****************************************************************}
-function TALMultipartFormDataDecoder.GetContentFields: TALStrings;
+function TALMultipartFormDataDecoder.GetContentFields: TALStringsA;
 begin
   Result := fContentFields;
 end;
@@ -1226,11 +1226,11 @@ end;
 
 {*******************************************************}
 function TALMultiPartMixedContent.GetAttachment: Boolean;
-Var Lst: TALStringList;
+Var Lst: TALStringListA;
     I: integer;
 begin
   Result := False;
-  Lst := TALStringList.Create;
+  Lst := TALStringListA.Create;
   Try
     Lst.Text := ALStringReplaceA(ContentDisposition,';',#13#10,[RfReplaceAll]);
     For I := 0 to Lst.Count - 1 do

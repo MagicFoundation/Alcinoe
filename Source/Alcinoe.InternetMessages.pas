@@ -29,7 +29,7 @@ Type
     fReferences: AnsiString;
     fcc: AnsiString;
     fContentType: AnsiString;
-    FCustomHeaders: TALStrings;
+    FCustomHeaders: TALStringsA;
     Function GetRawHeaderText: AnsiString;
     procedure SetRawHeaderText(const aRawHeaderText: AnsiString);
   public
@@ -52,14 +52,14 @@ Type
     property MIMEVersion: AnsiString read fMIMEVersion write fMIMEVersion; {MIME-Version: 1.0 - specifies the version of MIME that the message format complies with RFC 2045: 4}
     property Priority: AnsiString read fPriority write fPriority; {Priority: normal - Priority for message delivery ("normal" / "non-urgent" / "urgent") RFC 2156}
     property DispositionNotificationTo: AnsiString read fDispositionNotificationTo write fDispositionNotificationTo; {Disposition-Notification-To: boss@nil.test - Requests for notification when the message is received, and specifies the address for them RFC 2298}
-    property CustomHeaders: TALStrings read FCustomHeaders;
+    property CustomHeaders: TALStringsA read FCustomHeaders;
     Property RawHeaderText: AnsiString read GetRawHeaderText write SetRawHeaderText;
   end;
 
   {-----------------------------------}
   TALNewsArticleHeader = Class(Tobject)
   Private
-    FCustomHeaders: TALStrings;
+    FCustomHeaders: TALStringsA;
     fExpires: AnsiString;
     fMessageID: AnsiString;
     fReplyTo: AnsiString;
@@ -112,7 +112,7 @@ Type
     property MIMEVersion: AnsiString read fMIMEVersion write fMIMEVersion; {MIME-Version: 1.0 - specifies the version of MIME that the message format complies with RFC 2045: 4}
     property NNTPPostingHost: AnsiString read fNNTPPostingHost write fNNTPPostingHost; {NNTP-Posting-Host: stc92-3-82-245-250-13.fbx.proxad.net}
     property NNTPPostingDate: AnsiString read fNNTPPostingDate write fNNTPPostingDate; {NNTP-Posting-Date: Sun, 30 Sep 2007 20:28:56 +0000 (UTC)}
-    property CustomHeaders: TALStrings read FCustomHeaders;
+    property CustomHeaders: TALStringsA read FCustomHeaders;
     Property RawHeaderText: AnsiString read GetRawHeaderText write SetRawHeaderText;
   end;
 
@@ -362,7 +362,7 @@ end;
 constructor TALEmailHeader.Create;
 begin
   inherited create;
-  FCustomHeaders:= TALStringList.create;
+  FCustomHeaders:= TALStringListA.create;
   FCustomHeaders.NameValueSeparator := ':';
   clear;
   fMessageID := 'AUTO';
@@ -416,7 +416,7 @@ end;
 {**************************************************************************}
 procedure TALEmailHeader.SetRawHeaderText(const aRawHeaderText: AnsiString);
 
-Var LRawHeaderLst: TALStringList;
+Var LRawHeaderLst: TALStringListA;
 
   {-----------------------------------------------------------}
   Function _extractHeader(const aName: AnsiString): AnsiString;
@@ -444,7 +444,7 @@ Var Str1, Str2: AnsiString;
 
 begin
   Clear;
-  LRawHeaderLst := TALStringList.create;
+  LRawHeaderLst := TALStringListA.create;
   try
     LRawHeaderLst.NameValueSeparator := ':';
     LRawHeaderLst.Text := aRawHeaderText;
@@ -524,7 +524,7 @@ end;
 constructor TALNewsArticleHeader.Create;
 begin
   inherited create;
-  FCustomHeaders:= TALStringList.create;
+  FCustomHeaders:= TALStringListA.create;
   FCustomHeaders.NameValueSeparator := ':';
   clear;
   fMessageID := 'AUTO';
@@ -585,7 +585,7 @@ end;
 {********************************************************************************}
 procedure TALNewsArticleHeader.SetRawHeaderText(const aRawHeaderText: AnsiString);
 
-Var LRawHeaderLst: TALStringList;
+Var LRawHeaderLst: TALStringListA;
 
   {-----------------------------------------------------------}
   Function _extractHeader(const aName: AnsiString): AnsiString;
@@ -613,7 +613,7 @@ Var Str1, Str2: AnsiString;
 
 begin
   Clear;
-  LRawHeaderLst := TALStringList.create;
+  LRawHeaderLst := TALStringListA.create;
   try
     LRawHeaderLst.NameValueSeparator := ':';
     LRawHeaderLst.Text := aRawHeaderText;

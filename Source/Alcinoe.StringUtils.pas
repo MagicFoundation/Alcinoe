@@ -528,7 +528,7 @@ procedure ALExtractHeaderFields(
             WhiteSpace,
             Quotes: TSysCharSet;
             Content: PAnsiChar;
-            Strings: TALStrings;
+            Strings: TALStringsA;
             HttpDecode: Boolean;
             StripQuotes: Boolean = False);
 procedure ALExtractHeaderFieldsWithQuoteEscaped(
@@ -536,7 +536,7 @@ procedure ALExtractHeaderFieldsWithQuoteEscaped(
             WhiteSpace,
             Quotes: TSysCharSet;
             Content: PAnsiChar;
-            Strings: TALStrings;
+            Strings: TALStringsA;
             HttpDecode: Boolean;
             StripQuotes: Boolean = False); overload;
 {$WARN SYMBOL_DEPRECATED OFF}
@@ -545,30 +545,30 @@ procedure ALExtractHeaderFieldsWithQuoteEscaped(
             WhiteSpace,
             Quotes: TSysCharSet;
             Content: PChar;
-            Strings: TALStringsU;
+            Strings: TALStringsW;
             HttpDecode: Boolean;
             StripQuotes: Boolean = False); overload;
 {$WARN SYMBOL_DEPRECATED ON}
 
 type
 
-  TALTagParamsClassA = class of TalStrings;
+  TALTagParamsClassA = class of TALStringsA;
 
   TALBasePrecompiledTagA = Class(Tobject)
   private
     fTagString: ansiString;
   protected
-    function GetTagParams: TALStrings; virtual; abstract;
+    function GetTagParams: TALStringsA; virtual; abstract;
   public
     property TagString: ansiString read fTagString write fTagString;
-    property TagParams: TALStrings read GetTagParams;
+    property TagParams: TALStringsA read GetTagParams;
   End;
 
   TALPrecompiledTagA = Class(TALBasePrecompiledTagA)
   private
-    fTagParams: TALStrings;
+    fTagParams: TALStringsA;
   protected
-    function GetTagParams: TALStrings; override;
+    function GetTagParams: TALStringsA; override;
   public
     constructor Create;
     destructor Destroy; override;
@@ -576,13 +576,13 @@ type
 
   TALHandleTagfunctA = function(
                          const TagString: AnsiString;
-                         TagParams: TALStrings;
+                         TagParams: TALStringsA;
                          ExtData: pointer;
                          Var Handled: Boolean): AnsiString;
 
   TALHandleTagExtendedfunctA = function(
                                  const TagString: AnsiString;
-                                 TagParams: TALStrings;
+                                 TagParams: TALStringsA;
                                  ExtData: pointer;
                                  Var Handled: Boolean;
                                  Const SourceString: AnsiString;
@@ -590,7 +590,7 @@ type
 
   TALHandleTagPrecompileFunctA = function(
                                    const TagString: AnsiString;
-                                   TagParams: TALStrings;
+                                   TagParams: TALStringsA;
                                    ExtData: pointer;
                                    Const SourceString: AnsiString;
                                    Var TagPosition, TagLength: integer): TALBasePrecompiledTagA;
@@ -632,11 +632,11 @@ function  ALFastTagReplaceA(
 function  ALExtractTagParamsA(
             Const SourceString, TagStart, TagEnd: AnsiString;
             StripParamQuotes: Boolean;
-            TagParams: TALStrings;
+            TagParams: TALStringsA;
             IgnoreCase: Boolean): Boolean;
 Procedure ALSplitTextAndTagA(
             Const SourceString, TagStart, TagEnd: AnsiString;
-            SplitTextAndTagLst: TALStrings;
+            SplitTextAndTagLst: TALStringsA;
             IgnoreCase: Boolean);
 
 implementation
@@ -2643,7 +2643,7 @@ var
         {$ENDIF MACOS}
       end;
     begin
-      S := ALIntToStr(Year - GetEraOffset);
+      S := ALIntToStrA(Year - GetEraOffset);
       while Length(S) < Count do
         S := '0' + S;
       if Length(S) > Count then
@@ -4865,7 +4865,7 @@ end;
 {************************************************************************************}
 function AlBaseN2Int(const Str: ansiString; const charset: array of ansiChar): UInt64;
 var BaseIn: Byte;
-    Lst: TalStringList;
+    Lst: TALStringListA;
     I,j: integer;
     P: UInt64;
 begin
@@ -4876,7 +4876,7 @@ begin
   // ABCD = (26*26*26) * 0 + (26*26) * 1 + (26) * 2 + 3 = 731
   //                     A             B          C   D
 
-  Lst := TalStringList.Create;
+  Lst := TALStringListA.Create;
   try
 
     Lst.CaseSensitive := True;
@@ -9122,7 +9122,7 @@ procedure ALExtractHeaderFields(
             WhiteSpace,
             Quotes: TSysCharSet;
             Content: PAnsiChar;
-            Strings: TALStrings;
+            Strings: TALStringsA;
             HttpDecode: Boolean;
             StripQuotes: Boolean = False);
 
@@ -9216,7 +9216,7 @@ procedure ALExtractHeaderFieldsWithQuoteEscaped(
             WhiteSpace,
             Quotes: TSysCharSet;
             Content: PAnsiChar;
-            Strings: TALStrings;
+            Strings: TALStringsA;
             HttpDecode: Boolean;
             StripQuotes: Boolean = False);
 
@@ -9320,7 +9320,7 @@ procedure ALExtractHeaderFieldsWithQuoteEscaped(
             WhiteSpace,
             Quotes: TSysCharSet;
             Content: PChar;
-            Strings: TALStringsU;
+            Strings: TALStringsW;
             HttpDecode: Boolean;
             StripQuotes: Boolean = False);
 
@@ -9423,8 +9423,8 @@ end;
 constructor TALPrecompiledTagA.Create;
 begin
   fTagString := '';
-  fTagParams := TALStringList.Create;
-  TALStringList(fTagParams).Duplicates := dupIgnore;
+  fTagParams := TALStringListA.Create;
+  TALStringListA(fTagParams).Duplicates := dupIgnore;
 end;
 
 {************************************}
@@ -9435,7 +9435,7 @@ begin
 end;
 
 {***************************************************}
-function TALPrecompiledTagA.GetTagParams: TALStrings;
+function TALPrecompiledTagA.GetTagParams: TALStringsA;
 begin
   result := fTagParams;
 end;
@@ -9452,7 +9452,7 @@ function ALFastTagReplacePrecompileA(
 var ReplaceString: AnsiString;
     TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;
     TokenStr, ParamStr: AnsiString;
-    ParamList: TALStringList;
+    ParamList: TALStringListA;
     TagStartLength: integer;
     TagEndLength: integer;
     SourceStringLength: Integer;
@@ -9565,7 +9565,7 @@ begin
     If assigned(PrecompileProc) then begin
       TokenStr := _ExtractTokenStr;
       ParamStr := _ExtractParamsStr(TokenStr);
-      ParamList := TALStringList.Create;
+      ParamList := TALStringListA.Create;
       try
         ParamList.Duplicates := dupIgnore;
         ALExtractHeaderFieldsWithQuoteEscaped([' ', #9, #13, #10],
@@ -9668,7 +9668,7 @@ function ALFastTagReplaceA(
 var ReplaceString: AnsiString;
     TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;
     TokenStr, ParamStr: AnsiString;
-    ParamList: TAlStrings;
+    ParamList: TALStringsA;
     TagStartLength: integer;
     TagEndLength: integer;
     SourceStringLength: Integer;
@@ -9922,7 +9922,7 @@ Begin
               StripParamQuotes,
               flags,
               extdata,
-              TALStringList,
+              TALStringListA,
               TagReplaceProcResult);
 end;
 
@@ -9944,13 +9944,13 @@ Begin
               StripParamQuotes,
               flags,
               extdata,
-              TALStringList,
+              TALStringListA,
               TagReplaceProcResult);
 end;
 
 {************************************************************}
 function ALFastTagReplaceWithFunc(const TagString: AnsiString;
-                                  TagParams: TALStrings;
+                                  TagParams: TALStringsA;
                                   ExtData: pointer;
                                   Var Handled: Boolean): AnsiString;
 begin
@@ -9973,7 +9973,7 @@ Begin
               True,
               flags,
               PAnsiChar(ReplaceWith),
-              TalStringList,
+              TALStringListA,
               false);
 end;
 
@@ -9981,12 +9981,12 @@ end;
 //the problem with this function is that if you have
 //<#mytagwww params="xxx"> and
 //<#mytag params="xxx">
-//then the ALExtractTagParams(str, '<#mytag', '>' ... ) will not work like we expect
+//then the ALExtractTagParamsA(str, '<#mytag', '>' ... ) will not work like we expect
 //because it's will extract the params of the <#mytagwww
 function ALExtractTagParamsA(
            Const SourceString, TagStart, TagEnd: AnsiString;
            StripParamQuotes: Boolean;
-           TagParams: TALStrings;
+           TagParams: TALStringsA;
            IgnoreCase: Boolean): Boolean;
 
 var ReplaceString: AnsiString;
@@ -10073,7 +10073,7 @@ end;
 // whouwhouwhou
 Procedure ALSplitTextAndTagA(
             Const SourceString, TagStart, TagEnd: AnsiString;
-            SplitTextAndTagLst: TALStrings;
+            SplitTextAndTagLst: TALStringsA;
             IgnoreCase: Boolean);
 
 var TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;

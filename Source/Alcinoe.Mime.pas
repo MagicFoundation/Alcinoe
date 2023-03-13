@@ -11,8 +11,8 @@ Function  ALGetDefaultFileExtFromMimeContentType(aContentType: AnsiString): Ansi
 Function  ALGetDefaultMIMEContentTypeFromExt(const aExt: AnsiString): AnsiString;
 
 Var
-  AlMimeContentTypeByExtList: TALStrings; {.htm=text/html}
-  AlExtbyMimeContentTypeList: TALStrings; {text/html=.htm}
+  AlMimeContentTypeByExtList: TALStringsA; {.htm=text/html}
+  AlExtbyMimeContentTypeList: TALStringsA; {text/html=.htm}
 
 implementation
 
@@ -485,13 +485,13 @@ begin
 end;
 
 Initialization
-  AlMimeContentTypeByExtList := TALNVStringList.Create;
-  AlExtbyMimeContentTypeList := TALNVStringList.Create;
+  AlMimeContentTypeByExtList := TALNVStringListA.Create;
+  AlExtbyMimeContentTypeList := TALNVStringListA.Create;
   ALFillMimeTable;
-  TALNVStringList(AlMimeContentTypeByExtList).Duplicates := dupAccept;
-  TALNVStringList(AlMimeContentTypeByExtList).Sorted := true;
-  TALNVStringList(AlExtbyMimeContentTypeList).Duplicates := dupAccept;
-  TALNVStringList(AlExtbyMimeContentTypeList).Sorted := true;
+  TALNVStringListA(AlMimeContentTypeByExtList).Duplicates := dupAccept;
+  TALNVStringListA(AlMimeContentTypeByExtList).Sorted := true;
+  TALNVStringListA(AlExtbyMimeContentTypeList).Duplicates := dupAccept;
+  TALNVStringListA(AlExtbyMimeContentTypeList).Sorted := true;
 
 finalization
   AlFreeandNil(AlMimeContentTypeByExtList);

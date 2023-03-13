@@ -128,7 +128,7 @@ Type
     Procedure SelectData(const SQL: AnsiString;
                          XMLDATA: TalXMLNode;
                          const FormatSettings: TALFormatSettingsA); overload; virtual;
-    procedure UpdateData(SQLs: TALStrings); overload; virtual;
+    procedure UpdateData(SQLs: TALStringsA); overload; virtual;
     procedure UpdateData(const SQL: AnsiString); overload; virtual;
     procedure UpdateData(const SQLs: array of AnsiString); overload; virtual;
     function  insert_id(const SQL: AnsiString): ULongLong;
@@ -265,7 +265,7 @@ Type
                          XMLDATA: TalXMLNode;
                          const FormatSettings: TALFormatSettingsA;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
-    procedure UpdateData(SQLs: TALStrings; const ConnectionHandle: PMySql = nil); overload; virtual;
+    procedure UpdateData(SQLs: TALStringsA; const ConnectionHandle: PMySql = nil); overload; virtual;
     procedure UpdateData(const SQL: AnsiString; const ConnectionHandle: PMySql = nil); overload; virtual;
     procedure UpdateData(const SQLs: array of AnsiString; const ConnectionHandle: PMySql = nil); overload; virtual;
     Function  insert_id(const SQL: AnsiString; const ConnectionHandle: PMySql = nil): UlongLong; virtual;
@@ -905,7 +905,7 @@ begin
 end;
 
 {****************************************************}
-procedure TalMySqlClient.UpdateData(SQLs: TALStrings);
+procedure TalMySqlClient.UpdateData(SQLs: TALStringsA);
 var I: integer;
 begin
   for I := 0 to sqls.Count - 1 do
@@ -1884,7 +1884,7 @@ begin
 end;
 
 {*****************************************************************}
-procedure TalMySqlConnectionPoolClient.UpdateData(SQLs: TALStrings;
+procedure TalMySqlConnectionPoolClient.UpdateData(SQLs: TALStringsA;
                                                   const ConnectionHandle: PMySql = nil);
 Var LTmpConnectionHandle: PMySql;
     LOwnConnection: Boolean;

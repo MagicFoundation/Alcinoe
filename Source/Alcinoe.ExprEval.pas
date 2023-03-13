@@ -100,7 +100,7 @@ type
 
   TALExprHashContext = class(TALExprContext)
   private
-    FHashMap: TALAVLStringList;
+    FHashMap: TALAVLStringListA;
   public
     constructor Create(ACaseSensitive: Boolean = False);
     destructor Destroy; override;
@@ -959,7 +959,7 @@ end;
 constructor TALExprHashContext.Create(ACaseSensitive: Boolean);
 begin
   inherited Create;
-  FHashMap := TALAVLStringList.Create(true);
+  FHashMap := TALAVLStringListA.Create(true);
   FHashMap.CaseSensitive := ACaseSensitive;
 end;
 

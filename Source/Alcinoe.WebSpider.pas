@@ -57,7 +57,7 @@ Type
   {----------------------------------------------------------}
   TAlWebSpiderCrawlFindLinkEvent = Procedure (Sender: TObject;
                                               const HtmlTagString: AnsiString;
-                                              HtmlTagParams: TALStrings;
+                                              HtmlTagParams: TALStringsA;
                                               const URL: AnsiString) of object;
 
   {----------------------------------------------------------------}
@@ -81,7 +81,7 @@ Type
   {--------------------------------------------------------------------------}
   TAlWebSpiderUpdateLinkToLocalPathFindLinkEvent = Procedure (Sender: TObject;
                                                               const HtmlTagString: AnsiString;
-                                                              HtmlTagParams: TALStrings;
+                                                              HtmlTagParams: TALStringsA;
                                                               const URL: AnsiString;
                                                               Var LocalPath: AnsiString) of object;
 
@@ -129,7 +129,7 @@ Type
   {-----------------------------------------------------------------}
   TAlTrivialWebSpiderCrawlFindLinkEvent = Procedure (Sender: TObject;
                                                      const HtmlTagString: AnsiString;
-                                                     HtmlTagParams: TALStrings;
+                                                     HtmlTagParams: TALStringsA;
                                                      const URL: AnsiString;
                                                      Var Ignore: Boolean) of object;
 
@@ -138,8 +138,8 @@ Type
   Private
     FWebSpider: TalWebSpider;
     fStartUrl: AnsiString;
-    fLstUrlCrawled: TALStrings;
-    fLstErrorEncountered: TALStrings;
+    fLstUrlCrawled: TALStringsA;
+    fLstErrorEncountered: TALStringsA;
     FPageDownloadedBinTree: TAlStringKeyAVLBinaryTree;
     FPageNotYetDownloadedBinTree: TAlStringKeyAVLBinaryTree;
     FCurrentDeepLevel: Integer;
@@ -161,9 +161,9 @@ Type
     procedure WebSpiderCrawlDownloadError(Sender: TObject; const URL, ErrorMessage: AnsiString; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
     procedure WebSpiderCrawlDownloadRedirect(Sender: TObject; const Url, RedirectedTo: AnsiString; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
     procedure WebSpiderCrawlDownloadSuccess(Sender: TObject; const Url: AnsiString; HTTPResponseHeader: TALHTTPResponseHeader; HttpResponseContent: TStream; var StopCrawling: Boolean);
-    procedure WebSpiderCrawlFindLink(Sender: TObject; const HtmlTagString: AnsiString; HtmlTagParams: TALStrings; const URL: AnsiString);
+    procedure WebSpiderCrawlFindLink(Sender: TObject; const HtmlTagString: AnsiString; HtmlTagParams: TALStringsA; const URL: AnsiString);
     procedure WebSpiderCrawlGetNextLink(Sender: TObject; var Url: AnsiString);
-    procedure WebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject; const HtmlTagString: AnsiString; HtmlTagParams: TALStrings; const URL: AnsiString; var LocalPath: AnsiString);
+    procedure WebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject; const HtmlTagString: AnsiString; HtmlTagParams: TALStringsA; const URL: AnsiString; var LocalPath: AnsiString);
     procedure WebSpiderUpdateLinkToLocalPathGetNextFile(Sender: TObject; var FileName, BaseHref: AnsiString);
     function GetNextLocalFileName(const aContentType: AnsiString): AnsiString;
   Protected
@@ -171,7 +171,7 @@ Type
     Constructor Create;
     Destructor Destroy; override;
     Procedure Crawl(const aUrl: AnsiString); overload; {Launch the Crawling of the page}
-    procedure Crawl(const aUrl: AnsiString; LstUrlCrawled: TALStrings; LstErrorEncountered: TALStrings); overload;
+    procedure Crawl(const aUrl: AnsiString; LstUrlCrawled: TALStringsA; LstErrorEncountered: TALStringsA); overload;
     Property HttpClient: TalHttpClient Read FHttpClient write FHttpClient;
     Property DownloadImage: Boolean read fDownloadImage write fDownloadImage default false;
     Property StayInStartDomain: Boolean read fStayInStartDomain write fStayInStartDomain default true;
@@ -227,7 +227,7 @@ type
 
 {************************************************************************}
 Function _AlWebSpiderExtractUrlHandleTagfunct(const TagString: AnsiString;
-                                              TagParams: TALStrings;
+                                              TagParams: TALStringsA;
                                               ExtData: pointer;
                                               Var Handled: Boolean): AnsiString;
 
@@ -335,7 +335,7 @@ end;
 
 {***********************************************************************************}
 Function _AlWebSpiderUpdateLinkToLocalPathHandleTagfunct(const TagString: AnsiString;
-                                                         TagParams: TALStrings;
+                                                         TagParams: TALStringsA;
                                                          ExtData: pointer;
                                                          Var Handled: Boolean): AnsiString;
 
@@ -674,7 +674,7 @@ begin
 end;
 
 {**********************************************************************************************************************}
-procedure TAlTrivialWebSpider.Crawl(const aUrl: AnsiString; LstUrlCrawled: TALStrings; LstErrorEncountered: TALStrings);
+procedure TAlTrivialWebSpider.Crawl(const aUrl: AnsiString; LstUrlCrawled: TALStringsA; LstErrorEncountered: TALStringsA);
 Var LNode: TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode;
 Begin
   {check the SaveDirectory}
@@ -906,11 +906,11 @@ end;
 {*******************************************************************}
 procedure TAlTrivialWebSpider.WebSpiderCrawlFindLink(Sender: TObject;
                                                      const HtmlTagString: AnsiString;
-                                                     HtmlTagParams: TALStrings;
+                                                     HtmlTagParams: TALStringsA;
                                                      const URL: AnsiString);
 Var LNode: TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode;
     LURLWithoutAnchor: ansiString;
-    Lst: TALStringList;
+    Lst: TALStringListA;
     I: integer;
     Flag1 : Boolean;
     S1: AnsiString;
@@ -935,7 +935,7 @@ begin
 
   {include link(s)}
   If fIncludeMask <> '' then begin
-    Lst := TALStringList.Create;
+    Lst := TALStringListA.Create;
     Try
       Lst.Text := ALTrim(ALStringReplaceA(FIncludeMask,';',#13#10,[RfReplaceall]));
       Flag1 := True;
@@ -954,7 +954,7 @@ begin
 
   {Exclude link(s)}
   If fExcludeMask <> '' then begin
-    Lst := TALStringList.Create;
+    Lst := TALStringListA.Create;
     Try
       Lst.Text := ALTrim(ALStringReplaceA(fExcludeMask,';',#13#10,[RfReplaceall]));
       Flag1 := False;
@@ -1054,7 +1054,7 @@ end;
 {***********************************************************************************}
 procedure TAlTrivialWebSpider.WebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject;
                                                                      const HtmlTagString: AnsiString;
-                                                                     HtmlTagParams: TALStrings;
+                                                                     HtmlTagParams: TALStringsA;
                                                                      const URL: AnsiString;
                                                                      var LocalPath: AnsiString);
 Var LNode: TALStringKeyAVLBinaryTreeNode;

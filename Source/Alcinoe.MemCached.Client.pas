@@ -516,7 +516,7 @@ Var LBytesReceived: Integer;
     LFlags: integer;
     LCasID: Int64;
     LKey: AnsiString;
-    LLst: TalStringList;
+    LLst: TALStringListA;
     LResponseStatus: ansiString;
     LResponseStatusStartPos: integer;
 const LBuffSize: integer = 4096;
@@ -684,7 +684,7 @@ begin
           LDataStartPos := 1;
           while (LDataStartPos < LResultPos) and (Result[LDataStartPos] <> #13) do inc(LDataStartPos); // VALUE hihi 0 4 12\r\nAZER\r\nVALUE hoho 0 10 13\r\nAZDFUJNERT\r\nVALUE haha 0 5 14\r\nAZIUD\r\nEND\r\n
                                                                                                        // ^^^^^^^^^^^^^^^^^^aDataStartPos
-          LLst := TalStringList.Create;
+          LLst := TALStringListA.Create;
           try
             LLst.LineBreak := ' ';
             LLst.Text := ALCopyStr(Result,1, LDataStartPos-1); // VALUE
@@ -726,7 +726,7 @@ begin
           LDataStartPos := LHeaderStartPos;
           while (LDataStartPos < LResultPos) and (Result[LDataStartPos] <> #13) do inc(LDataStartPos); // VALUE hihi 0 4 12\r\nAZER\r\nVALUE hoho 0 10 13\r\nAZDFUJNERT\r\nVALUE haha 0 5 14\r\nAZIUD\r\nEND\r\n
                                                                                                        //                              ^^^^^^^^^^^^^^^^^^^aDataStartPos
-          LLst := TalStringList.Create;
+          LLst := TALStringListA.Create;
           try
             LLst.LineBreak := ' ';
             LLst.Text := ALCopyStr(Result,LHeaderStartPos, LDataStartPos - LHeaderStartPos); // VALUE

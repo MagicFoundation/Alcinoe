@@ -5860,7 +5860,7 @@ end;
 {**********************}
 {$IF defined(MSWINDOWS)}
 var
-  _GoogleOAuth2AccessTokens: TALNVStringList;
+  _GoogleOAuth2AccessTokens: TALNVStringListA;
 {$ENDIF}
 
 {**********************}
@@ -5907,7 +5907,7 @@ begin
 
     //Making the access token request
     var LWinHttpClient := TAlWinHTTPClient.Create;
-    var LRequestFields := TALStringList.Create;
+    var LRequestFields := TALStringListA.Create;
     var LJsonDoc := TalJsonDocument.Create;
     try
 
@@ -6090,7 +6090,7 @@ begin
   {$ENDIF ALCPUXASM}
 
   {$IF defined(MSWINDOWS)}
-  _GoogleOAuth2AccessTokens := TALNVStringList.Create;
+  _GoogleOAuth2AccessTokens := TALNVStringListA.Create;
   _GoogleOAuth2AccessTokens.NameValueSeparator := #31; // Unit separator
   _GoogleOAuth2AccessTokens.Duplicates := DupError;
   _GoogleOAuth2AccessTokens.Sorted := True;

@@ -59,7 +59,7 @@ type
   TAlXMLParseDocument = reference to procedure (Sender: TObject);
   TAlXMLParseProcessingInstructionEvent = reference to procedure (Sender: TObject; const Path, Target, Data: AnsiString);
   TAlXMLParseTextEvent = reference to procedure (Sender: TObject; const Path, Str: AnsiString);
-  TAlXMLParseStartElementEvent = reference to procedure (Sender: TObject; const Path, Name: AnsiString; Attributes: TALStrings);
+  TAlXMLParseStartElementEvent = reference to procedure (Sender: TObject; const Path, Name: AnsiString; Attributes: TALStringsA);
   TAlXMLParseEndElementEvent = reference to procedure (Sender: TObject; const Path, Name: AnsiString);
   TALXMLNodeListSortCompare = reference to function(List: TALXMLNodeList; Index1, Index2: Integer): Integer;
 
@@ -532,7 +532,7 @@ type
     //[Deleted from TXMLDocument] procedure SetDOMVendor(const Value: TDOMVendor);
     //[Deleted from TXMLDocument] function IsXMLStored: Boolean;
     //[Deleted from TXMLDocument] function NodeIndentStored: Boolean;
-    //[Deleted from TXMLDocument] FXMLStrings: TALStringList;
+    //[Deleted from TXMLDocument] FXMLStrings: TALStringListA;
     //[Deleted from TXMLDocument] FFileName: AnsiString;
     //[Deleted from TXMLDocument] FDocSource: TalXMLDocumentSource;
     //[Deleted from TXMLDocument] FSrcStream: TStream;
@@ -597,7 +597,7 @@ type
     procedure DoParseProcessingInstruction(const Path, Target, Data: AnsiString); // [added from TXMLDocument]
     procedure DoParseStartDocument; // [added from TXMLDocument]
     procedure DoParseEndDocument; // [added from TXMLDocument]
-    procedure DoParseStartElement(const Path, Name: AnsiString; Attributes: TALStrings); // [added from TXMLDocument]
+    procedure DoParseStartElement(const Path, Name: AnsiString; Attributes: TALStringsA); // [added from TXMLDocument]
     procedure DoParseEndElement(const Path, Name: AnsiString); // [added from TXMLDocument]
     procedure DoParseText(const Path, Str: AnsiString); // [added from TXMLDocument]
     procedure DoParseComment(const Path, Str: AnsiString); // [added from TXMLDocument]
@@ -618,13 +618,13 @@ type
     procedure SetPathSeparator(const Value: ansiChar);
     function GetStandAlone: AnsiString;
     function GetVersion: AnsiString;
-    function GetXML: AnsiString; //[Replace from TXMLDocument] function GetXML: TALStrings;
+    function GetXML: AnsiString; //[Replace from TXMLDocument] function GetXML: TALStringsA;
     procedure SetDocumentElement(const Value: TALXMLNode);
     procedure SetOptions(const Value: TALXMLDocOptions);
     procedure SetParseOptions(const Value: TALXMLParseOptions);
     procedure SetStandAlone(const Value: AnsiString);
     procedure SetVersion(const Value: AnsiString);
-    procedure SetXML(const Value: ansiString); //[Replace from TXMLDocument] procedure SetXML(const Value: TALStrings);
+    procedure SetXML(const Value: ansiString); //[Replace from TXMLDocument] procedure SetXML(const Value: TALStringsA);
     procedure SetEncoding(const Value: AnsiString);
     procedure SetNodeIndentStr(const Value: AnsiString);
   public
@@ -643,7 +643,7 @@ type
     //[Deleted from TXMLDocument] property NSPrefixBase: AnsiString read FNSPrefixBase write FNSPrefixBase;
     //[Deleted from TXMLDocument] property SchemaRef: AnsiString read GetSchemaRef;
     //[Deleted from TXMLDocument] procedure Refresh;
-    //[Deleted from TXMLDocument] property XML: TALStrings read GetXML write SetXML;
+    //[Deleted from TXMLDocument] property XML: TALStringsA read GetXML write SetXML;
     //[Deleted from TXMLDocument] property FileName: AnsiString read GetFileName write SetFileName;
     //[Deleted from TXMLDocument] procedure parseXML;
     //[Deleted from TXMLDocument] property BeforeOpen: TNotifyEvent read FBeforeOpen write FBeforeOpen;
@@ -968,12 +968,12 @@ Var buffer: AnsiString;
     bufferLength: Integer;
     bufferPos: Integer;
     PreserveWhiteSpace: Boolean;
-    LstParams: TALStringList;
+    LstParams: TALStringListA;
     NotSaxMode: Boolean;
     WorkingNode: TALXmlNode;
     DecodeXmlReferences: Boolean;
     UseContainerNodeInsteadOfAddingChildNode: Boolean;
-    Paths: TALStringList;
+    Paths: TALStringListA;
     CodePage: Word;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -1338,8 +1338,8 @@ Begin
   // NOTE: ContainerNode must be TDocument or TElement or nil (sax mode)
   //
 
-  LstParams := TALStringList.Create;
-  Paths := TALStringList.Create;
+  LstParams := TALStringListA.Create;
+  Paths := TALStringListA.Create;
   Try
 
     DoParseStartDocument;
@@ -1876,7 +1876,7 @@ begin
 end;
 
 {*************************************************************************************************}
-procedure TALXMLDocument.DoParseStartElement(const Path, Name: AnsiString; Attributes: TALStrings);
+procedure TALXMLDocument.DoParseStartElement(const Path, Name: AnsiString; Attributes: TALStringsA);
 begin
   if Assigned(FOnParseStartElement) then FOnParseStartElement(Self, Path, Name, Attributes);
 end;

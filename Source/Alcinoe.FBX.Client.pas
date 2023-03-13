@@ -140,7 +140,7 @@ Type
     function  GetDataBaseInfoInt(const item: Integer): Integer;
     function  GetDataBaseInfoString(const item: Integer): AnsiString;
     function  GetDataBaseInfoDateTime(const item: Integer): TDateTime;
-    procedure GetUserNames(UserNames: TALStrings);
+    procedure GetUserNames(UserNames: TALStringsA);
     procedure CreateDatabase(const SQL: AnsiString);
     procedure DropDatabase;
     Procedure Connect(const DataBaseName,
@@ -216,7 +216,7 @@ Type
                          const FormatSettings: TALFormatSettingsA); overload; virtual;
     procedure UpdateData(const Queries: TALFBXClientUpdateDataQUERIES); overload; virtual;
     procedure UpdateData(const Query: TALFBXClientUpdateDataQUERY); overload; virtual;
-    procedure UpdateData(SQLs: TALStrings); overload; virtual;
+    procedure UpdateData(SQLs: TALStringsA); overload; virtual;
     procedure UpdateData(const SQL: AnsiString); overload; virtual;
     procedure UpdateData(const SQL: AnsiString;
                          const Params: Array of AnsiString); overload; virtual;
@@ -567,7 +567,7 @@ Type
                          const TraHandle: IscTrHandle = nil;
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                          const TPB: AnsiString = ''); overload; virtual;
-    procedure UpdateData(SQLs: TALStrings;
+    procedure UpdateData(SQLs: TALStringsA;
                          const DBHandle: IscDbHandle = nil;
                          const TraHandle: IscTrHandle = nil;
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -1268,7 +1268,7 @@ begin
 end;
 
 {*********************************************************}
-procedure TALFBXClient.GetUserNames(UserNames: TALStrings);
+procedure TALFBXClient.GetUserNames(UserNames: TALStringsA);
 var data: AnsiString;
     p: PAnsiChar;
     len: integer;
@@ -2189,7 +2189,7 @@ begin
 end;
 
 {**************************************************}
-procedure TALFBXClient.UpdateData(SQLs: TALStrings);
+procedure TALFBXClient.UpdateData(SQLs: TALStringsA);
 Var LSQLsIndex : integer;
     LUpdateDataQUERIES: TALFBXClientUpdateDataQUERIES;
 begin
@@ -5126,7 +5126,7 @@ begin
 end;
 
 {***************************************************************}
-procedure TALFBXConnectionPoolClient.UpdateData(SQLs: TALStrings;
+procedure TALFBXConnectionPoolClient.UpdateData(SQLs: TALStringsA;
                                                 const DBHandle: IscDbHandle = nil;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -5378,7 +5378,7 @@ procedure TALFBXEventThread.initObject(const aDataBaseName,
                                        const aOpenConnectionExtraParams: AnsiString;
                                        aOnEvent: TALFBXEventThreadEvent;
                                        aOnException: TALFBXEventThreadException);
-Var LLst: TALStrings;
+Var LLst: TALStringsA;
     i: integer;
 begin
   //if we put lower than tpNormal it seam than the
@@ -5404,7 +5404,7 @@ begin
                            'lc_ctype = '+aCharSet;
   if aNumbuffers > -1 then fOpenConnectionParams := fOpenConnectionParams + '; num_buffers = ' + ALIntToStrA(aNumbuffers);
   if aOpenConnectionExtraParams <> '' then fOpenConnectionParams := fOpenConnectionParams + '; ' + aOpenConnectionExtraParams;
-  LLst := TALStringList.Create;
+  LLst := TALStringListA.Create;
   Try
     LLst.Text := ALTrim(ALStringReplaceA(aEventNames,';',#13#10,[rfReplaceALL]));
     i := 0;

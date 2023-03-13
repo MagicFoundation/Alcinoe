@@ -12,7 +12,7 @@ uses
 
 function  ALHostToIP(const HostName: AnsiString; var Ip: AnsiString): Boolean;
 function  ALIPAddrToName(const IPAddr : AnsiString): AnsiString;
-function  ALgetLocalIPs: TALStrings;
+function  ALgetLocalIPs: TALStringsA;
 function  ALgetLocalHostName: AnsiString;
 
 implementation
@@ -72,7 +72,7 @@ begin
 end;
 
 {*********************************}
-function ALgetLocalIPs: TALStrings;
+function ALgetLocalIPs: TALStringsA;
 type
   TaPInAddr = array[0..10] of PInAddr;
   PaPInAddr = ^TaPInAddr;
@@ -85,7 +85,7 @@ var
 begin
   if WSAStartup(MAKEWORD(2,2), WSAData) <> 0 then raiseLastOsError;
   Try
-    Result := TALStringList.Create;
+    Result := TALStringListA.Create;
     Result.Clear;
     GetHostName(Buffer, SizeOf(Buffer));
     phe := GetHostByName(buffer);

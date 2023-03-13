@@ -2629,9 +2629,9 @@ function  ALDrawMultiLineText(const aText: String; // support only those html ta
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _getInfosFromTag(const aTag: String; // color="#ffffff" id="xxx"
-                             const aSpanIds: TalStringlistU;
+                             const aSpanIds: TALStringListW;
                              const aFontColors: Tlist<TalphaColor>);
-  var LParamList: TAlStringListU;
+  var LParamList: TALStringListW;
       LcolorInt: integer;
       S1: String;
   begin
@@ -2643,7 +2643,7 @@ function  ALDrawMultiLineText(const aText: String; // support only those html ta
       exit;
     end;
 
-    LParamList := TALStringListU.Create;
+    LParamList := TALStringListW.Create;
     try
 
       ALExtractHeaderFieldsWithQuoteEscaped([' ', #9, #13, #10],
@@ -2688,7 +2688,7 @@ function  ALDrawMultiLineText(const aText: String; // support only those html ta
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _getInfosFromImg(const aTag: String; // src="xxx"
                              var aSrc: String);
-  var LParamList: TAlStringListU;
+  var LParamList: TALStringListW;
   begin
 
     if aTag = '' then begin
@@ -2696,7 +2696,7 @@ function  ALDrawMultiLineText(const aText: String; // support only those html ta
       exit;
     end;
 
-    LParamList := TALStringListU.Create;
+    LParamList := TALStringListW.Create;
     try
 
       ALExtractHeaderFieldsWithQuoteEscaped([' ', #9, #13, #10],
@@ -2748,7 +2748,7 @@ var {$IF defined(ANDROID)}
     LMaxHeight: Single;
     LFontColors: Tlist<TalphaColor>;
     LFontColor: TalphaColor;
-    LSpanIDs: TalStringlistU;
+    LSpanIDs: TALStringListW;
     LSpanID: String;
     LFirstLineIndent: TpointF;
     LTmpRect: TrectF;
@@ -2809,7 +2809,7 @@ begin
     LBold := 0;
     LItalic := 0;
     LFontColors := Tlist<TalphaColor>.create;
-    LSpanIDs := TalStringlistU.create;
+    LSpanIDs := TALStringListW.create;
     LBreakedTextItems := TalBreakTextItems.Create(true{aOwnsObjects});
     try
 

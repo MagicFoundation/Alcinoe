@@ -47,7 +47,7 @@ const
   CALXmlDocument        = 'DOCUMENT';
 
 var
-  vALDefaultNodeIndent: ansiString; // var instead of const to avoid new ansitring on assign
+  ALDefaultXMLNodeIndent: ansiString; // var instead of const to avoid new ansitring on assign
 
 type
 
@@ -881,7 +881,7 @@ begin
   FonParseComment:= nil;
   FonParseCData:= nil;
   FOptions := [];
-  NodeIndentStr := vALDefaultNodeIndent;
+  NodeIndentStr := ALDefaultXMLNodeIndent;
   FTag := 0;
   SetActive(aActive);
 end;
@@ -3823,6 +3823,6 @@ Begin
 end;
 
 initialization
-  vALDefaultNodeIndent := '  '; { 2 spaces }
+  ALDefaultXMLNodeIndent := '  '; { 2 spaces }
 
 end.

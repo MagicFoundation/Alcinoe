@@ -80,6 +80,7 @@ uses
   Winapi.Windows,
   System.RTLConsts,
   System.Ansistrings,
+  System.IOUtils,
   Alcinoe.Files;
 
 {**************************************************************}
@@ -417,7 +418,7 @@ begin
 
       // the buffer is too small; approximate the buffer size to fit the contents
       if LCharCount = CStdBufSize - 2 then begin
-        LCharCount := AlGetFileSize(FFileName);
+        LCharCount := Tfile.GetSize(String(FFileName));
         ReallocMem(LBuffer, LCharCount);
         LCharCount := GetPrivateProfileStringA(nil,
                                                nil,

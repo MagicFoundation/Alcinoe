@@ -708,7 +708,7 @@ type
 
 {misc constants}
 var
-  ALDefaultNodeIndentA: ansiString;  // var instead of const to avoid new ansitring on assign
+  ALDefaultJsonNodeIndentA: ansiString;  // var instead of const to avoid new ansitring on assign
   ALJsonISODateFormatSettingsA: TALFormatSettingsA;
 
 {misc function}
@@ -1256,7 +1256,7 @@ type
 
 {misc constants}
 var
-  ALDefaultNodeIndentW: String;  // var instead of const to avoid new ansitring on assign
+  ALDefaultJsonNodeIndentW: String;  // var instead of const to avoid new ansitring on assign
   ALJsonISODateFormatSettingsW: TALFormatSettingsW;
 
 {misc function}
@@ -1862,7 +1862,7 @@ begin
   FonParseStartArray := nil;
   FonParseEndArray := nil;
   FOptions := [];
-  NodeIndentStr := ALDefaultNodeIndentA;
+  NodeIndentStr := ALDefaultJsonNodeIndentA;
   fFormatSettings := @ALDefaultFormatSettingsA;
   FTag := 0;
   SetActive(aActive);
@@ -6611,7 +6611,7 @@ begin
     SaveInt64AsText := SkipNodeSubTypeHelper and (FDocument <> nil) and (poSaveInt64AsText in FDocument.ParseOptions);
     AutoIndentNode := (FDocument <> nil) and (doNodeAutoIndent in FDocument.Options);
     if FDocument <> nil then IndentStr := FDocument.NodeIndentStr
-    else IndentStr := ALDefaultNodeIndentA;
+    else IndentStr := ALDefaultJsonNodeIndentA;
     CurrentIndentStr := '';
 
     {SaveOnlyChildNode}
@@ -8984,7 +8984,7 @@ begin
   FonParseStartArray := nil;
   FonParseEndArray := nil;
   FOptions := [];
-  NodeIndentStr := ALDefaultNodeIndentW;
+  NodeIndentStr := ALDefaultJsonNodeIndentW;
   fFormatSettings := @ALDefaultFormatSettingsW;
   FTag := 0;
   SetActive(aActive);
@@ -13564,7 +13564,7 @@ begin
     SaveInt64AsText := SkipNodeSubTypeHelper and (FDocument <> nil) and (poSaveInt64AsText in FDocument.ParseOptions);
     AutoIndentNode := (FDocument <> nil) and (doNodeAutoIndent in FDocument.Options);
     if FDocument <> nil then IndentStr := FDocument.NodeIndentStr
-    else IndentStr := ALDefaultNodeIndentW;
+    else IndentStr := ALDefaultJsonNodeIndentW;
     CurrentIndentStr := '';
 
     {SaveOnlyChildNode}
@@ -15344,13 +15344,13 @@ initialization
   ALJsonISODateFormatSettingsA.TimeSeparator := ':';
   ALJsonISODateFormatSettingsA.ShortDateFormat := 'yyyy-mm-dd';
   ALJsonISODateFormatSettingsA.ShortTimeFormat := 'hh:nn:ss.zzz';
-  ALDefaultNodeIndentA := '  '; { 2 spaces }
+  ALDefaultJsonNodeIndentA := '  '; { 2 spaces }
 
   ALJsonISODateFormatSettingsW := TALFormatSettingsW.Create('en-US');
   ALJsonISODateFormatSettingsW.DateSeparator := '-';
   ALJsonISODateFormatSettingsW.TimeSeparator := ':';
   ALJsonISODateFormatSettingsW.ShortDateFormat := 'yyyy-mm-dd';
   ALJsonISODateFormatSettingsW.ShortTimeFormat := 'hh:nn:ss.zzz';
-  ALDefaultNodeIndentW := '  '; { 2 spaces }
+  ALDefaultJsonNodeIndentW := '  '; { 2 spaces }
 
 end.

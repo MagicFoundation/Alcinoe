@@ -73,7 +73,7 @@ Var aSqlite3Client: TalSqlite3Client;
     aEndDate: int64;
     aStartCommitDate: int64;
     aEndCommitDate: int64;
-    LstSql: TALStringList;
+    LstSql: TALStringListA;
     S1: AnsiString;
     i: integer;
 begin
@@ -81,7 +81,7 @@ begin
   try
 
     aSqlite3Client := TalSqlite3Client.Create(AnsiString(ALEditSqlite3lib.Text));
-    LstSql := TALStringList.Create;
+    LstSql := TALStringListA.Create;
     Try
 
       //enable or disable the shared cache
@@ -119,14 +119,14 @@ begin
 
       //the sql
       S1 := AnsiString(AlMemoSQLite3Query.Lines.Text);
-      while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
-      while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',ALIntToStr(random(10)),[rfIgnoreCase]);
+      while ALPosA('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := ALStringReplaceA(S1, '<#randomchar>',ALRandomStrA(1),[rfIgnoreCase]);
+      while ALPosA('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := ALStringReplaceA(S1, '<#randomnumber>',ALIntToStrA(random(10)),[rfIgnoreCase]);
       for i := 1 to maxint do begin
-        if AlPos('<#randomnumber'+ALIntToStr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+ALIntToStr(i)+'>',ALIntToStr(random(10)),[rfIgnoreCase, rfReplaceAll])
+        if ALPosA('<#randomnumber'+ALIntToStrA(i)+'>', AlLowerCase(S1)) > 0 then S1 := ALStringReplaceA(S1, '<#randomnumber'+ALIntToStrA(i)+'>',ALIntToStrA(random(10)),[rfIgnoreCase, rfReplaceAll])
         else break;
       end;
-      S1 := AlStringReplace(S1,#13#10,' ',[RfReplaceALL]);
-      LstSql.Text := ALTrim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
+      S1 := ALStringReplaceA(S1,#13#10,' ',[RfReplaceALL]);
+      LstSql.Text := ALTrim(ALStringReplaceA(S1,';',#13#10,[RfReplaceALL]));
 
       //do the job
       aStartDate := GetTickCount64;
@@ -163,11 +163,11 @@ Var aSqlite3Client: TalSqlite3Client;
     aXMLDATA: TalXmlDocument;
     aStartDate: int64;
     aEndDate: int64;
-    aFormatSettings: TALFormatSettings;
+    aFormatSettings: TALFormatSettingsA;
     S1: AnsiString;
     i: integer;
 begin
-  aFormatSettings := ALDefaultFormatSettings;
+  aFormatSettings := ALDefaultFormatSettingsA;
   Screen.Cursor := CrHourGlass;
   try
 
@@ -217,10 +217,10 @@ begin
         end;
 
         S1 := AnsiString(AlMemoSQLite3Query.Lines.Text);
-        while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
-        while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',ALIntToStr(random(10)),[rfIgnoreCase]);
+        while ALPosA('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := ALStringReplaceA(S1, '<#randomchar>',ALRandomStrA(1),[rfIgnoreCase]);
+        while ALPosA('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := ALStringReplaceA(S1, '<#randomnumber>',ALIntToStrA(random(10)),[rfIgnoreCase]);
         for i := 1 to maxint do begin
-          if AlPos('<#randomnumber'+ALIntToStr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+ALIntToStr(i)+'>',ALIntToStr(random(10)),[rfIgnoreCase, rfReplaceAll])
+          if ALPosA('<#randomnumber'+ALIntToStrA(i)+'>', AlLowerCase(S1)) > 0 then S1 := ALStringReplaceA(S1, '<#randomnumber'+ALIntToStrA(i)+'>',ALIntToStrA(random(10)),[rfIgnoreCase, rfReplaceAll])
           else break;
         end;
 

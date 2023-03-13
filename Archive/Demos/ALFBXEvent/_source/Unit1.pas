@@ -82,7 +82,7 @@ begin
                                         AnsiString(ALEditFirebirdLogin.text),
                                         AnsiString(ALEditFirebirdPassword.text),
                                         AnsiString(ALEditFirebirdCharset.text),
-                                        ALStringReplace(ALTrim(AnsiString(ALMemoFireBirdEventName.lines.text)),#13#10,';',[RfReplaceALL]),
+                                        ALStringReplaceA(ALTrim(AnsiString(ALMemoFireBirdEventName.lines.text)),#13#10,';',[RfReplaceALL]),
                                         aFBAPiVersion,
                                         AnsiString(ALEditFirebirdLib.text),
                                         -1,

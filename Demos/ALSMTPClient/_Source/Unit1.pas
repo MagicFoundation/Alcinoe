@@ -140,16 +140,16 @@ end;
 
 {**************************************************}
 procedure TForm1.RcptToButtonClick(Sender: TObject);
-Var ALst: TALStringList;
+Var ALst: TALStringListA;
     Str: AnsiString;
     i: integer;
 begin
-  aLst := TALStringList.Create;
+  aLst := TALStringListA.Create;
   Try
 
     Str := AnsiString(ToEdit.Text) + #13#10 + AnsiString(CcEdit.Text) + #13#10 + AnsiString(BccEdit.text);
-    Str := AlStringReplace(Str,',',#13#10,[RfReplaceall]);
-    Str := AlStringReplace(Str,';',#13#10,[RfReplaceall]);
+    Str := ALStringReplaceA(Str,',',#13#10,[RfReplaceall]);
+    Str := ALStringReplaceA(Str,';',#13#10,[RfReplaceall]);
     aLst.Text := ALTrim(Str);
     i := 0;
     While i <= aLst.Count - 1 do begin
@@ -214,18 +214,18 @@ end;
 procedure TForm1.AllInOneButtonClick(Sender: TObject);
 Var aEmailHeader: TALEmailHeader;
     AMultiPartMixedAttachments : TALMultiPartMixedContents;
-    aLst: TALStringList;
+    aLst: TALStringListA;
     Str: AnsiString;
     i : integer;
 begin
 
-  aLst := TALStringList.Create;
+  aLst := TALStringListA.Create;
   aEmailHeader := TALEmailHeader.Create;
   Try
 
     Str := AnsiString(ToEdit.Text) + #13#10 + AnsiString(CcEdit.Text) + #13#10 + AnsiString(BccEdit.text);
-    Str := AlStringReplace(Str,',',#13#10,[RfReplaceall]);
-    Str := AlStringReplace(Str,';',#13#10,[RfReplaceall]);
+    Str := ALStringReplaceA(Str,',',#13#10,[RfReplaceall]);
+    Str := ALStringReplaceA(Str,';',#13#10,[RfReplaceall]);
     aLst.Text := ALTrim(Str);
     i := 0;
     While i <= aLst.Count - 1 do begin

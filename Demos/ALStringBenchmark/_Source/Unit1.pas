@@ -127,51 +127,51 @@ Var S1: AnsiString;
     StartDate: TdateTime;
 begin
   StartDate := Now;
-  S1 := ALRandomStr(50);
+  S1 := ALRandomStrA(50);
   For i := 0 to 100 do begin
-    S1 := AlStringReplace(S1,AlRandomStr(1),AlRandomStr(8),[]);
-    S1 := AlStringReplace(S1,AlRandomStr(3),AlRandomStr(3),[]);
-    S1 := AlStringReplace(S1,AlRandomStr(4),AlRandomStr(6),[RfReplaceAll]);
-    S1 := AlStringReplace(S1,AlRandomStr(3),AlRandomStr(12),[RfIgnoreCase]);
-    S1 := AlStringReplace(S1,AlRandomStr(2),AlRandomStr(20),[RfReplaceAll, RfIgnoreCase]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(1),ALRandomStrA(8),[]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(3),ALRandomStrA(3),[]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(4),ALRandomStrA(6),[RfReplaceAll]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(3),ALRandomStrA(12),[RfIgnoreCase]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(2),ALRandomStrA(20),[RfReplaceAll, RfIgnoreCase]);
   end;
 
-  S1 := ALRandomStr(200);
+  S1 := ALRandomStrA(200);
   For i := 0 to 100 do begin
-    S1 := AlStringReplace(S1,AlRandomStr(1),AlRandomStr(8),[]);
-    S1 := AlStringReplace(S1,AlRandomStr(15),AlRandomStr(3),[]);
-    S1 := AlStringReplace(S1,AlRandomStr(35),AlRandomStr(6),[RfReplaceAll]);
-    S1 := AlStringReplace(S1,AlRandomStr(12),AlRandomStr(12),[RfIgnoreCase]);
-    S1 := AlStringReplace(S1,AlRandomStr(11),AlRandomStr(20),[RfReplaceAll, RfIgnoreCase]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(1),ALRandomStrA(8),[]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(15),ALRandomStrA(3),[]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(35),ALRandomStrA(6),[RfReplaceAll]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(12),ALRandomStrA(12),[RfIgnoreCase]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(11),ALRandomStrA(20),[RfReplaceAll, RfIgnoreCase]);
   end;
 
-  S1 := ALRandomStr(3000);
+  S1 := ALRandomStrA(3000);
   For i := 0 to 100 do begin
-    S1 := AlStringReplace(S1,AlRandomStr(1),AlRandomStr(8),[]);
-    S1 := AlStringReplace(S1,AlRandomStr(3),AlRandomStr(3),[]);
-    S1 := AlStringReplace(S1,AlRandomStr(4),AlRandomStr(6),[RfReplaceAll]);
-    S1 := AlStringReplace(S1,AlRandomStr(3),AlRandomStr(12),[RfIgnoreCase]);
-    S1 := AlStringReplace(S1,AlRandomStr(2),AlRandomStr(20),[RfReplaceAll, RfIgnoreCase]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(1),ALRandomStrA(8),[]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(3),ALRandomStrA(3),[]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(4),ALRandomStrA(6),[RfReplaceAll]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(3),ALRandomStrA(12),[RfIgnoreCase]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(2),ALRandomStrA(20),[RfReplaceAll, RfIgnoreCase]);
   end;
 
-  S1 := ALRandomStr(4000);
+  S1 := ALRandomStrA(4000);
   For i := 0 to 100 do begin
-    S1 := AlStringReplace(S1,AlRandomStr(1),AlRandomStr(8),[]);
-    S1 := AlStringReplace(S1,AlRandomStr(3),AlRandomStr(3),[]);
-    S1 := AlStringReplace(S1,AlRandomStr(4),AlRandomStr(6),[RfReplaceAll]);
-    S1 := AlStringReplace(S1,AlRandomStr(3),AlRandomStr(12),[RfIgnoreCase]);
-    S1 := AlStringReplace(S1,AlRandomStr(2),AlRandomStr(20),[RfReplaceAll, RfIgnoreCase]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(1),ALRandomStrA(8),[]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(3),ALRandomStrA(3),[]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(4),ALRandomStrA(6),[RfReplaceAll]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(3),ALRandomStrA(12),[RfIgnoreCase]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(2),ALRandomStrA(20),[RfReplaceAll, RfIgnoreCase]);
   end;
 
-  S1 := ALRandomStr(100000);
+  S1 := ALRandomStrA(100000);
   For i := 0 to 100 do begin
-    S1 := AlStringReplace(S1,AlRandomStr(1),AlRandomStr(8),[]);
-    S1 := AlStringReplace(S1,AlRandomStr(3),AlRandomStr(3),[]);
-    S1 := AlStringReplace(S1,AlRandomStr(4),AlRandomStr(6),[RfReplaceAll]);
-    S1 := AlStringReplace(S1,AlRandomStr(3),AlRandomStr(12),[RfIgnoreCase]);
-    S1 := AlStringReplace(S1,AlRandomStr(2),AlRandomStr(20),[RfReplaceAll, RfIgnoreCase]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(1),ALRandomStrA(8),[]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(3),ALRandomStrA(3),[]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(4),ALRandomStrA(6),[RfReplaceAll]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(3),ALRandomStrA(12),[RfIgnoreCase]);
+    S1 := ALStringReplaceA(S1,ALRandomStrA(2),ALRandomStrA(20),[RfReplaceAll, RfIgnoreCase]);
   end;
-  Showmessage('2,500 AlStringReplace in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
+  Showmessage('2,500 ALStringReplaceA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
 procedure TForm1.ALButton2Click(Sender: TObject);
@@ -180,49 +180,49 @@ Var S1: String;
     StartDate: TdateTime;
 begin
   StartDate := Now;
-  S1 := ALRandomStrU(50);
+  S1 := ALRandomStrW(50);
   For i := 0 to 100 do begin
-    S1 := StringReplace(S1,ALRandomStrU(1),ALRandomStrU(8),[]);
-    S1 := StringReplace(S1,ALRandomStrU(3),ALRandomStrU(3),[]);
-    S1 := StringReplace(S1,ALRandomStrU(4),ALRandomStrU(6),[RfReplaceAll]);
-    S1 := StringReplace(S1,ALRandomStrU(3),ALRandomStrU(12),[RfIgnoreCase]);
-    S1 := StringReplace(S1,ALRandomStrU(2),ALRandomStrU(20),[RfReplaceAll, RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrW(1),ALRandomStrW(8),[]);
+    S1 := StringReplace(S1,ALRandomStrW(3),ALRandomStrW(3),[]);
+    S1 := StringReplace(S1,ALRandomStrW(4),ALRandomStrW(6),[RfReplaceAll]);
+    S1 := StringReplace(S1,ALRandomStrW(3),ALRandomStrW(12),[RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrW(2),ALRandomStrW(20),[RfReplaceAll, RfIgnoreCase]);
   end;
 
-  S1 := ALRandomStrU(200);
+  S1 := ALRandomStrW(200);
   For i := 0 to 100 do begin
-    S1 := StringReplace(S1,ALRandomStrU(1),ALRandomStrU(8),[]);
-    S1 := StringReplace(S1,ALRandomStrU(15),ALRandomStrU(3),[]);
-    S1 := StringReplace(S1,ALRandomStrU(35),ALRandomStrU(6),[RfReplaceAll]);
-    S1 := StringReplace(S1,ALRandomStrU(12),ALRandomStrU(12),[RfIgnoreCase]);
-    S1 := StringReplace(S1,ALRandomStrU(11),ALRandomStrU(20),[RfReplaceAll, RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrW(1),ALRandomStrW(8),[]);
+    S1 := StringReplace(S1,ALRandomStrW(15),ALRandomStrW(3),[]);
+    S1 := StringReplace(S1,ALRandomStrW(35),ALRandomStrW(6),[RfReplaceAll]);
+    S1 := StringReplace(S1,ALRandomStrW(12),ALRandomStrW(12),[RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrW(11),ALRandomStrW(20),[RfReplaceAll, RfIgnoreCase]);
   end;
 
-  S1 := ALRandomStrU(3000);
+  S1 := ALRandomStrW(3000);
   For i := 0 to 100 do begin
-    S1 := StringReplace(S1,ALRandomStrU(1),ALRandomStrU(8),[]);
-    S1 := StringReplace(S1,ALRandomStrU(3),ALRandomStrU(3),[]);
-    S1 := StringReplace(S1,ALRandomStrU(4),ALRandomStrU(6),[RfReplaceAll]);
-    S1 := StringReplace(S1,ALRandomStrU(3),ALRandomStrU(12),[RfIgnoreCase]);
-    S1 := StringReplace(S1,ALRandomStrU(2),ALRandomStrU(20),[RfReplaceAll, RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrW(1),ALRandomStrW(8),[]);
+    S1 := StringReplace(S1,ALRandomStrW(3),ALRandomStrW(3),[]);
+    S1 := StringReplace(S1,ALRandomStrW(4),ALRandomStrW(6),[RfReplaceAll]);
+    S1 := StringReplace(S1,ALRandomStrW(3),ALRandomStrW(12),[RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrW(2),ALRandomStrW(20),[RfReplaceAll, RfIgnoreCase]);
   end;
 
-  S1 := ALRandomStrU(4000);
+  S1 := ALRandomStrW(4000);
   For i := 0 to 100 do begin
-    S1 := StringReplace(S1,ALRandomStrU(1),ALRandomStrU(8),[]);
-    S1 := StringReplace(S1,ALRandomStrU(3),ALRandomStrU(3),[]);
-    S1 := StringReplace(S1,ALRandomStrU(4),ALRandomStrU(6),[RfReplaceAll]);
-    S1 := StringReplace(S1,ALRandomStrU(3),ALRandomStrU(12),[RfIgnoreCase]);
-    S1 := StringReplace(S1,ALRandomStrU(2),ALRandomStrU(20),[RfReplaceAll, RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrW(1),ALRandomStrW(8),[]);
+    S1 := StringReplace(S1,ALRandomStrW(3),ALRandomStrW(3),[]);
+    S1 := StringReplace(S1,ALRandomStrW(4),ALRandomStrW(6),[RfReplaceAll]);
+    S1 := StringReplace(S1,ALRandomStrW(3),ALRandomStrW(12),[RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrW(2),ALRandomStrW(20),[RfReplaceAll, RfIgnoreCase]);
   end;
 
-  S1 := ALRandomStrU(100000);
+  S1 := ALRandomStrW(100000);
   For i := 0 to 100 do begin
-    S1 := StringReplace(S1,ALRandomStrU(1),ALRandomStrU(8),[]);
-    S1 := StringReplace(S1,ALRandomStrU(3),ALRandomStrU(3),[]);
-    S1 := StringReplace(S1,ALRandomStrU(4),ALRandomStrU(6),[RfReplaceAll]);
-    S1 := StringReplace(S1,ALRandomStrU(3),ALRandomStrU(12),[RfIgnoreCase]);
-    S1 := StringReplace(S1,ALRandomStrU(2),ALRandomStrU(20),[RfReplaceAll, RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrW(1),ALRandomStrW(8),[]);
+    S1 := StringReplace(S1,ALRandomStrW(3),ALRandomStrW(3),[]);
+    S1 := StringReplace(S1,ALRandomStrW(4),ALRandomStrW(6),[RfReplaceAll]);
+    S1 := StringReplace(S1,ALRandomStrW(3),ALRandomStrW(12),[RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrW(2),ALRandomStrW(20),[RfReplaceAll, RfIgnoreCase]);
   end;
   Showmessage('2,500 StringReplace in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -233,49 +233,49 @@ Var S1: AnsiString;
     StartDate: TdateTime;
 begin
   StartDate := Now;
-  S1 := ALRandomStr(50);
+  S1 := ALRandomStrA(50);
   For i := 0 to 100 do begin
-    S1 := StringReplace(S1,ALRandomStr(1),ALRandomStr(8),[]);
-    S1 := StringReplace(S1,ALRandomStr(3),ALRandomStr(3),[]);
-    S1 := StringReplace(S1,ALRandomStr(4),ALRandomStr(6),[RfReplaceAll]);
-    S1 := StringReplace(S1,ALRandomStr(3),ALRandomStr(12),[RfIgnoreCase]);
-    S1 := StringReplace(S1,ALRandomStr(2),ALRandomStr(20),[RfReplaceAll, RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrA(1),ALRandomStrA(8),[]);
+    S1 := StringReplace(S1,ALRandomStrA(3),ALRandomStrA(3),[]);
+    S1 := StringReplace(S1,ALRandomStrA(4),ALRandomStrA(6),[RfReplaceAll]);
+    S1 := StringReplace(S1,ALRandomStrA(3),ALRandomStrA(12),[RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrA(2),ALRandomStrA(20),[RfReplaceAll, RfIgnoreCase]);
   end;
 
-  S1 := ALRandomStr(200);
+  S1 := ALRandomStrA(200);
   For i := 0 to 100 do begin
-    S1 := StringReplace(S1,ALRandomStr(1),ALRandomStr(8),[]);
-    S1 := StringReplace(S1,ALRandomStr(15),ALRandomStr(3),[]);
-    S1 := StringReplace(S1,ALRandomStr(35),ALRandomStr(6),[RfReplaceAll]);
-    S1 := StringReplace(S1,ALRandomStr(12),ALRandomStr(12),[RfIgnoreCase]);
-    S1 := StringReplace(S1,ALRandomStr(11),ALRandomStr(20),[RfReplaceAll, RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrA(1),ALRandomStrA(8),[]);
+    S1 := StringReplace(S1,ALRandomStrA(15),ALRandomStrA(3),[]);
+    S1 := StringReplace(S1,ALRandomStrA(35),ALRandomStrA(6),[RfReplaceAll]);
+    S1 := StringReplace(S1,ALRandomStrA(12),ALRandomStrA(12),[RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrA(11),ALRandomStrA(20),[RfReplaceAll, RfIgnoreCase]);
   end;
 
-  S1 := ALRandomStr(3000);
+  S1 := ALRandomStrA(3000);
   For i := 0 to 100 do begin
-    S1 := StringReplace(S1,ALRandomStr(1),ALRandomStr(8),[]);
-    S1 := StringReplace(S1,ALRandomStr(3),ALRandomStr(3),[]);
-    S1 := StringReplace(S1,ALRandomStr(4),ALRandomStr(6),[RfReplaceAll]);
-    S1 := StringReplace(S1,ALRandomStr(3),ALRandomStr(12),[RfIgnoreCase]);
-    S1 := StringReplace(S1,ALRandomStr(2),ALRandomStr(20),[RfReplaceAll, RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrA(1),ALRandomStrA(8),[]);
+    S1 := StringReplace(S1,ALRandomStrA(3),ALRandomStrA(3),[]);
+    S1 := StringReplace(S1,ALRandomStrA(4),ALRandomStrA(6),[RfReplaceAll]);
+    S1 := StringReplace(S1,ALRandomStrA(3),ALRandomStrA(12),[RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrA(2),ALRandomStrA(20),[RfReplaceAll, RfIgnoreCase]);
   end;
 
-  S1 := ALRandomStr(4000);
+  S1 := ALRandomStrA(4000);
   For i := 0 to 100 do begin
-    S1 := StringReplace(S1,ALRandomStr(1),ALRandomStr(8),[]);
-    S1 := StringReplace(S1,ALRandomStr(3),ALRandomStr(3),[]);
-    S1 := StringReplace(S1,ALRandomStr(4),ALRandomStr(6),[RfReplaceAll]);
-    S1 := StringReplace(S1,ALRandomStr(3),ALRandomStr(12),[RfIgnoreCase]);
-    S1 := StringReplace(S1,ALRandomStr(2),ALRandomStr(20),[RfReplaceAll, RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrA(1),ALRandomStrA(8),[]);
+    S1 := StringReplace(S1,ALRandomStrA(3),ALRandomStrA(3),[]);
+    S1 := StringReplace(S1,ALRandomStrA(4),ALRandomStrA(6),[RfReplaceAll]);
+    S1 := StringReplace(S1,ALRandomStrA(3),ALRandomStrA(12),[RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrA(2),ALRandomStrA(20),[RfReplaceAll, RfIgnoreCase]);
   end;
 
-  S1 := ALRandomStr(100000);
+  S1 := ALRandomStrA(100000);
   For i := 0 to 100 do begin
-    S1 := StringReplace(S1,ALRandomStr(1),ALRandomStr(8),[]);
-    S1 := StringReplace(S1,ALRandomStr(3),ALRandomStr(3),[]);
-    S1 := StringReplace(S1,ALRandomStr(4),ALRandomStr(6),[RfReplaceAll]);
-    S1 := StringReplace(S1,ALRandomStr(3),ALRandomStr(12),[RfIgnoreCase]);
-    S1 := StringReplace(S1,ALRandomStr(2),ALRandomStr(20),[RfReplaceAll, RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrA(1),ALRandomStrA(8),[]);
+    S1 := StringReplace(S1,ALRandomStrA(3),ALRandomStrA(3),[]);
+    S1 := StringReplace(S1,ALRandomStrA(4),ALRandomStrA(6),[RfReplaceAll]);
+    S1 := StringReplace(S1,ALRandomStrA(3),ALRandomStrA(12),[RfIgnoreCase]);
+    S1 := StringReplace(S1,ALRandomStrA(2),ALRandomStrA(20),[RfReplaceAll, RfIgnoreCase]);
   end;
   Showmessage('2,500 StringReplace in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -286,46 +286,46 @@ Var S1: AnsiString;
     StartDate: TdateTime;
 begin
   StartDate := Now;
-  S1 := ALRandomStr(50);
+  S1 := ALRandomStrA(50);
   For i := 0 to 2000 do begin
-    ALPosEx(AlRandomStr(1),S1,1+random(50));
-    ALPosEx(AlRandomStr(3),S1,1+random(50));
-    ALPosEx(AlRandomStr(8),S1,1+random(50));
-    ALPosEx(AlRandomStr(20),S1,1+random(50));
+    ALPosA(ALRandomStrA(1),S1,1+random(50));
+    ALPosA(ALRandomStrA(3),S1,1+random(50));
+    ALPosA(ALRandomStrA(8),S1,1+random(50));
+    ALPosA(ALRandomStrA(20),S1,1+random(50));
   end;
 
-  S1 := ALRandomStr(200);
+  S1 := ALRandomStrA(200);
   For i := 0 to 2000 do begin
-    ALPosEx(AlRandomStr(1),S1,1+random(50));
-    ALPosEx(AlRandomStr(3),S1,1+random(50));
-    ALPosEx(AlRandomStr(8),S1,1+random(50));
-    ALPosEx(AlRandomStr(20),S1,1+random(50));
+    ALPosA(ALRandomStrA(1),S1,1+random(50));
+    ALPosA(ALRandomStrA(3),S1,1+random(50));
+    ALPosA(ALRandomStrA(8),S1,1+random(50));
+    ALPosA(ALRandomStrA(20),S1,1+random(50));
   end;
 
-  S1 := ALRandomStr(3000);
+  S1 := ALRandomStrA(3000);
   For i := 0 to 2000 do begin
-    ALPosEx(AlRandomStr(1),S1,1+random(50));
-    ALPosEx(AlRandomStr(3),S1,1+random(50));
-    ALPosEx(AlRandomStr(8),S1,1+random(50));
-    ALPosEx(AlRandomStr(20),S1,1+random(50));
+    ALPosA(ALRandomStrA(1),S1,1+random(50));
+    ALPosA(ALRandomStrA(3),S1,1+random(50));
+    ALPosA(ALRandomStrA(8),S1,1+random(50));
+    ALPosA(ALRandomStrA(20),S1,1+random(50));
   end;
 
-  S1 := ALRandomStr(4000);
+  S1 := ALRandomStrA(4000);
   For i := 0 to 2000 do begin
-    ALPosEx(AlRandomStr(1),S1,1+random(50));
-    ALPosEx(AlRandomStr(3),S1,1+random(50));
-    ALPosEx(AlRandomStr(8),S1,1+random(50));
-    ALPosEx(AlRandomStr(20),S1,1+random(50));
+    ALPosA(ALRandomStrA(1),S1,1+random(50));
+    ALPosA(ALRandomStrA(3),S1,1+random(50));
+    ALPosA(ALRandomStrA(8),S1,1+random(50));
+    ALPosA(ALRandomStrA(20),S1,1+random(50));
   end;
 
-  S1 := ALRandomStr(300000);
+  S1 := ALRandomStrA(300000);
   For i := 0 to 2000 do begin
-    ALPosEx(AlRandomStr(1),S1,1+random(50));
-    ALPosEx(AlRandomStr(3),S1,1+random(50));
-    ALPosEx(AlRandomStr(8),S1,1+random(50));
-    ALPosEx(AlRandomStr(20),S1,1+random(50));
+    ALPosA(ALRandomStrA(1),S1,1+random(50));
+    ALPosA(ALRandomStrA(3),S1,1+random(50));
+    ALPosA(ALRandomStrA(8),S1,1+random(50));
+    ALPosA(ALRandomStrA(20),S1,1+random(50));
   end;
-  Showmessage('40,000 ALPosEx in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
+  Showmessage('40,000 ALPosA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
 procedure TForm1.ALButton4Click(Sender: TObject);
@@ -334,44 +334,44 @@ Var S1: String;
     StartDate: TdateTime;
 begin
   StartDate := Now;
-  S1 := AlRandomStrU(50);
+  S1 := ALRandomStrW(50);
   For i := 0 to 2000 do begin
-    PosEx(AlRandomStrU(1),S1,1+random(50));
-    PosEx(AlRandomStrU(3),S1,1+random(50));
-    PosEx(AlRandomStrU(8),S1,1+random(50));
-    PosEx(AlRandomStrU(20),S1,1+random(50));
+    PosEx(ALRandomStrW(1),S1,1+random(50));
+    PosEx(ALRandomStrW(3),S1,1+random(50));
+    PosEx(ALRandomStrW(8),S1,1+random(50));
+    PosEx(ALRandomStrW(20),S1,1+random(50));
   end;
 
-  S1 := AlRandomStrU(200);
+  S1 := ALRandomStrW(200);
   For i := 0 to 2000 do begin
-    PosEx(AlRandomStrU(1),S1,1+random(50));
-    PosEx(AlRandomStrU(3),S1,1+random(50));
-    PosEx(AlRandomStrU(8),S1,1+random(50));
-    PosEx(AlRandomStrU(20),S1,1+random(50));
+    PosEx(ALRandomStrW(1),S1,1+random(50));
+    PosEx(ALRandomStrW(3),S1,1+random(50));
+    PosEx(ALRandomStrW(8),S1,1+random(50));
+    PosEx(ALRandomStrW(20),S1,1+random(50));
   end;
 
-  S1 := AlRandomStrU(3000);
+  S1 := ALRandomStrW(3000);
   For i := 0 to 2000 do begin
-    PosEx(AlRandomStrU(1),S1,1+random(50));
-    PosEx(AlRandomStrU(3),S1,1+random(50));
-    PosEx(AlRandomStrU(8),S1,1+random(50));
-    PosEx(AlRandomStrU(20),S1,1+random(50));
+    PosEx(ALRandomStrW(1),S1,1+random(50));
+    PosEx(ALRandomStrW(3),S1,1+random(50));
+    PosEx(ALRandomStrW(8),S1,1+random(50));
+    PosEx(ALRandomStrW(20),S1,1+random(50));
   end;
 
-  S1 := AlRandomStrU(4000);
+  S1 := ALRandomStrW(4000);
   For i := 0 to 2000 do begin
-    PosEx(AlRandomStrU(1),S1,1+random(50));
-    PosEx(AlRandomStrU(3),S1,1+random(50));
-    PosEx(AlRandomStrU(8),S1,1+random(50));
-    PosEx(AlRandomStrU(20),S1,1+random(50));
+    PosEx(ALRandomStrW(1),S1,1+random(50));
+    PosEx(ALRandomStrW(3),S1,1+random(50));
+    PosEx(ALRandomStrW(8),S1,1+random(50));
+    PosEx(ALRandomStrW(20),S1,1+random(50));
   end;
 
-  S1 := AlRandomStrU(300000);
+  S1 := ALRandomStrW(300000);
   For i := 0 to 2000 do begin
-    PosEx(AlRandomStrU(1),S1,1+random(50));
-    PosEx(AlRandomStrU(3),S1,1+random(50));
-    PosEx(AlRandomStrU(8),S1,1+random(50));
-    PosEx(AlRandomStrU(20),S1,1+random(50));
+    PosEx(ALRandomStrW(1),S1,1+random(50));
+    PosEx(ALRandomStrW(3),S1,1+random(50));
+    PosEx(ALRandomStrW(8),S1,1+random(50));
+    PosEx(ALRandomStrW(20),S1,1+random(50));
   end;
   Showmessage('40,000 PosEx in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -382,44 +382,44 @@ Var S1: AnsiString;
     StartDate: TdateTime;
 begin
   StartDate := Now;
-  S1 := ALRandomStr(50);
+  S1 := ALRandomStrA(50);
   For i := 0 to 2000 do begin
-    PosEx(AlRandomStr(1),S1,1+random(50));
-    PosEx(AlRandomStr(3),S1,1+random(50));
-    PosEx(AlRandomStr(8),S1,1+random(50));
-    PosEx(AlRandomStr(20),S1,1+random(50));
+    PosEx(ALRandomStrA(1),S1,1+random(50));
+    PosEx(ALRandomStrA(3),S1,1+random(50));
+    PosEx(ALRandomStrA(8),S1,1+random(50));
+    PosEx(ALRandomStrA(20),S1,1+random(50));
   end;
 
-  S1 := ALRandomStr(200);
+  S1 := ALRandomStrA(200);
   For i := 0 to 2000 do begin
-    PosEx(AlRandomStr(1),S1,1+random(50));
-    PosEx(AlRandomStr(3),S1,1+random(50));
-    PosEx(AlRandomStr(8),S1,1+random(50));
-    PosEx(AlRandomStr(20),S1,1+random(50));
+    PosEx(ALRandomStrA(1),S1,1+random(50));
+    PosEx(ALRandomStrA(3),S1,1+random(50));
+    PosEx(ALRandomStrA(8),S1,1+random(50));
+    PosEx(ALRandomStrA(20),S1,1+random(50));
   end;
 
-  S1 := ALRandomStr(3000);
+  S1 := ALRandomStrA(3000);
   For i := 0 to 2000 do begin
-    PosEx(AlRandomStr(1),S1,1+random(50));
-    PosEx(AlRandomStr(3),S1,1+random(50));
-    PosEx(AlRandomStr(8),S1,1+random(50));
-    PosEx(AlRandomStr(20),S1,1+random(50));
+    PosEx(ALRandomStrA(1),S1,1+random(50));
+    PosEx(ALRandomStrA(3),S1,1+random(50));
+    PosEx(ALRandomStrA(8),S1,1+random(50));
+    PosEx(ALRandomStrA(20),S1,1+random(50));
   end;
 
-  S1 := ALRandomStr(4000);
+  S1 := ALRandomStrA(4000);
   For i := 0 to 2000 do begin
-    PosEx(AlRandomStr(1),S1,1+random(50));
-    PosEx(AlRandomStr(3),S1,1+random(50));
-    PosEx(AlRandomStr(8),S1,1+random(50));
-    PosEx(AlRandomStr(20),S1,1+random(50));
+    PosEx(ALRandomStrA(1),S1,1+random(50));
+    PosEx(ALRandomStrA(3),S1,1+random(50));
+    PosEx(ALRandomStrA(8),S1,1+random(50));
+    PosEx(ALRandomStrA(20),S1,1+random(50));
   end;
 
-  S1 := ALRandomStr(300000);
+  S1 := ALRandomStrA(300000);
   For i := 0 to 2000 do begin
-    PosEx(AlRandomStr(1),S1,1+random(50));
-    PosEx(AlRandomStr(3),S1,1+random(50));
-    PosEx(AlRandomStr(8),S1,1+random(50));
-    PosEx(AlRandomStr(20),S1,1+random(50));
+    PosEx(ALRandomStrA(1),S1,1+random(50));
+    PosEx(ALRandomStrA(3),S1,1+random(50));
+    PosEx(ALRandomStrA(8),S1,1+random(50));
+    PosEx(ALRandomStrA(20),S1,1+random(50));
   end;
   Showmessage('40,000 PosEx in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -430,66 +430,66 @@ Var S1,S2,S3,S4,S5: AnsiString;
     StartDate: TdateTime;
 begin
   StartDate := Now;
-  S1 := ALRandomStr(50);
-  S2 := ALRandomStr(1);
-  S3 := ALRandomStr(3);
-  S4 := ALRandomStr(8);
-  S5 := ALRandomStr(20);
+  S1 := ALRandomStrA(50);
+  S2 := ALRandomStrA(1);
+  S3 := ALRandomStrA(3);
+  S4 := ALRandomStrA(8);
+  S5 := ALRandomStrA(20);
   For i := 0 to 2000 do begin
-    ALPos(S2,S1);
-    ALPos(S3,S1);
-    ALPos(S4,S1);
-    ALPos(S5,S1);
+    ALPosA(S2,S1);
+    ALPosA(S3,S1);
+    ALPosA(S4,S1);
+    ALPosA(S5,S1);
   end;
 
-  S1 := ALRandomStr(200);
-  S2 := ALRandomStr(1);
-  S3 := ALRandomStr(3);
-  S4 := ALRandomStr(8);
-  S5 := ALRandomStr(20);
+  S1 := ALRandomStrA(200);
+  S2 := ALRandomStrA(1);
+  S3 := ALRandomStrA(3);
+  S4 := ALRandomStrA(8);
+  S5 := ALRandomStrA(20);
   For i := 0 to 2000 do begin
-    ALPos(S2,S1);
-    ALPos(S3,S1);
-    ALPos(S4,S1);
-    ALPos(S5,S1);
+    ALPosA(S2,S1);
+    ALPosA(S3,S1);
+    ALPosA(S4,S1);
+    ALPosA(S5,S1);
   end;
 
-  S1 := ALRandomStr(3000);
-  S2 := ALRandomStr(1);
-  S3 := ALRandomStr(3);
-  S4 := ALRandomStr(8);
-  S5 := ALRandomStr(20);
+  S1 := ALRandomStrA(3000);
+  S2 := ALRandomStrA(1);
+  S3 := ALRandomStrA(3);
+  S4 := ALRandomStrA(8);
+  S5 := ALRandomStrA(20);
   For i := 0 to 2000 do begin
-    ALPos(S2,S1);
-    ALPos(S3,S1);
-    ALPos(S4,S1);
-    ALPos(S5,S1);
+    ALPosA(S2,S1);
+    ALPosA(S3,S1);
+    ALPosA(S4,S1);
+    ALPosA(S5,S1);
   end;
 
-  S1 := ALRandomStr(4000);
-  S2 := ALRandomStr(1);
-  S3 := ALRandomStr(3);
-  S4 := ALRandomStr(8);
-  S5 := ALRandomStr(20);
+  S1 := ALRandomStrA(4000);
+  S2 := ALRandomStrA(1);
+  S3 := ALRandomStrA(3);
+  S4 := ALRandomStrA(8);
+  S5 := ALRandomStrA(20);
   For i := 0 to 2000 do begin
-    ALPos(S2,S1);
-    ALPos(S3,S1);
-    ALPos(S4,S1);
-    ALPos(S5,S1);
+    ALPosA(S2,S1);
+    ALPosA(S3,S1);
+    ALPosA(S4,S1);
+    ALPosA(S5,S1);
   end;
 
-  S1 := ALRandomStr(300000);
-  S2 := ALRandomStr(1);
-  S3 := ALRandomStr(3);
-  S4 := ALRandomStr(8);
-  S5 := ALRandomStr(20);
+  S1 := ALRandomStrA(300000);
+  S2 := ALRandomStrA(1);
+  S3 := ALRandomStrA(3);
+  S4 := ALRandomStrA(8);
+  S5 := ALRandomStrA(20);
   For i := 0 to 2000 do begin
-    ALPos(S2,S1);
-    ALPos(S3,S1);
-    ALPos(S4,S1);
-    ALPos(S5,S1);
+    ALPosA(S2,S1);
+    ALPosA(S3,S1);
+    ALPosA(S4,S1);
+    ALPosA(S5,S1);
   end;
-  Showmessage('40,000 ALPos in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
+  Showmessage('40,000 ALPosA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
 procedure TForm1.ALButton6Click(Sender: TObject);
@@ -498,11 +498,11 @@ Var S1,S2,S3,S4,S5: String;
     StartDate: TdateTime;
 begin
   StartDate := Now;
-  S1 := ALRandomStrU(50);
-  S2 := ALRandomStrU(1);
-  S3 := ALRandomStrU(3);
-  S4 := ALRandomStrU(8);
-  S5 := ALRandomStrU(20);
+  S1 := ALRandomStrW(50);
+  S2 := ALRandomStrW(1);
+  S3 := ALRandomStrW(3);
+  S4 := ALRandomStrW(8);
+  S5 := ALRandomStrW(20);
   For i := 0 to 2000 do begin
     Pos(S2,S1);
     Pos(S3,S1);
@@ -510,11 +510,11 @@ begin
     Pos(S5,S1);
   end;
 
-  S1 := ALRandomStrU(200);
-  S2 := ALRandomStrU(1);
-  S3 := ALRandomStrU(3);
-  S4 := ALRandomStrU(8);
-  S5 := ALRandomStrU(20);
+  S1 := ALRandomStrW(200);
+  S2 := ALRandomStrW(1);
+  S3 := ALRandomStrW(3);
+  S4 := ALRandomStrW(8);
+  S5 := ALRandomStrW(20);
   For i := 0 to 2000 do begin
     Pos(S2,S1);
     Pos(S3,S1);
@@ -522,11 +522,11 @@ begin
     Pos(S5,S1);
   end;
 
-  S1 := ALRandomStrU(3000);
-  S2 := ALRandomStrU(1);
-  S3 := ALRandomStrU(3);
-  S4 := ALRandomStrU(8);
-  S5 := ALRandomStrU(20);
+  S1 := ALRandomStrW(3000);
+  S2 := ALRandomStrW(1);
+  S3 := ALRandomStrW(3);
+  S4 := ALRandomStrW(8);
+  S5 := ALRandomStrW(20);
   For i := 0 to 2000 do begin
     Pos(S2,S1);
     Pos(S3,S1);
@@ -534,11 +534,11 @@ begin
     Pos(S5,S1);
   end;
 
-  S1 := ALRandomStrU(4000);
-  S2 := ALRandomStrU(1);
-  S3 := ALRandomStrU(3);
-  S4 := ALRandomStrU(8);
-  S5 := ALRandomStrU(20);
+  S1 := ALRandomStrW(4000);
+  S2 := ALRandomStrW(1);
+  S3 := ALRandomStrW(3);
+  S4 := ALRandomStrW(8);
+  S5 := ALRandomStrW(20);
   For i := 0 to 2000 do begin
     Pos(S2,S1);
     Pos(S3,S1);
@@ -546,11 +546,11 @@ begin
     Pos(S5,S1);
   end;
 
-  S1 := ALRandomStrU(300000);
-  S2 := ALRandomStrU(1);
-  S3 := ALRandomStrU(3);
-  S4 := ALRandomStrU(8);
-  S5 := ALRandomStrU(20);
+  S1 := ALRandomStrW(300000);
+  S2 := ALRandomStrW(1);
+  S3 := ALRandomStrW(3);
+  S4 := ALRandomStrW(8);
+  S5 := ALRandomStrW(20);
   For i := 0 to 2000 do begin
     Pos(S2,S1);
     Pos(S3,S1);
@@ -566,11 +566,11 @@ Var S1,S2,S3,S4,S5: AnsiString;
     StartDate: TdateTime;
 begin
   StartDate := Now;
-  S1 := ALRandomStr(50);
-  S2 := ALRandomStr(1);
-  S3 := ALRandomStr(3);
-  S4 := ALRandomStr(8);
-  S5 := ALRandomStr(20);
+  S1 := ALRandomStrA(50);
+  S2 := ALRandomStrA(1);
+  S3 := ALRandomStrA(3);
+  S4 := ALRandomStrA(8);
+  S5 := ALRandomStrA(20);
   For i := 0 to 2000 do begin
     Pos(S2,S1);
     Pos(S3,S1);
@@ -578,11 +578,11 @@ begin
     Pos(S5,S1);
   end;
 
-  S1 := ALRandomStr(200);
-  S2 := ALRandomStr(1);
-  S3 := ALRandomStr(3);
-  S4 := ALRandomStr(8);
-  S5 := ALRandomStr(20);
+  S1 := ALRandomStrA(200);
+  S2 := ALRandomStrA(1);
+  S3 := ALRandomStrA(3);
+  S4 := ALRandomStrA(8);
+  S5 := ALRandomStrA(20);
   For i := 0 to 2000 do begin
     Pos(S2,S1);
     Pos(S3,S1);
@@ -590,11 +590,11 @@ begin
     Pos(S5,S1);
   end;
 
-  S1 := ALRandomStr(3000);
-  S2 := ALRandomStr(1);
-  S3 := ALRandomStr(3);
-  S4 := ALRandomStr(8);
-  S5 := ALRandomStr(20);
+  S1 := ALRandomStrA(3000);
+  S2 := ALRandomStrA(1);
+  S3 := ALRandomStrA(3);
+  S4 := ALRandomStrA(8);
+  S5 := ALRandomStrA(20);
   For i := 0 to 2000 do begin
     Pos(S2,S1);
     Pos(S3,S1);
@@ -602,11 +602,11 @@ begin
     Pos(S5,S1);
   end;
 
-  S1 := ALRandomStr(4000);
-  S2 := ALRandomStr(1);
-  S3 := ALRandomStr(3);
-  S4 := ALRandomStr(8);
-  S5 := ALRandomStr(20);
+  S1 := ALRandomStrA(4000);
+  S2 := ALRandomStrA(1);
+  S3 := ALRandomStrA(3);
+  S4 := ALRandomStrA(8);
+  S5 := ALRandomStrA(20);
   For i := 0 to 2000 do begin
     Pos(S2,S1);
     Pos(S3,S1);
@@ -614,11 +614,11 @@ begin
     Pos(S5,S1);
   end;
 
-  S1 := ALRandomStr(300000);
-  S2 := ALRandomStr(1);
-  S3 := ALRandomStr(3);
-  S4 := ALRandomStr(8);
-  S5 := ALRandomStr(20);
+  S1 := ALRandomStrA(300000);
+  S2 := ALRandomStrA(1);
+  S3 := ALRandomStrA(3);
+  S4 := ALRandomStrA(8);
+  S5 := ALRandomStrA(20);
   For i := 0 to 2000 do begin
     Pos(S2,S1);
     Pos(S3,S1);
@@ -631,15 +631,15 @@ end;
 procedure TForm1.ALButton21Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
-    aFormatSettings: TALformatSettings;
+    aFormatSettings: TALFormatSettingsA;
     S1: AnsiString;
 begin
   ALGetLocaleFormatSettings(1033, aFormatSettings);
   StartDate := Now;
   For i := 0 to 1000000 do begin
-    S1 := ALDatetostr(Random(10000), aFormatSettings);
+    S1 := ALDateToStrA(Random(10000), aFormatSettings);
   end;
-  Showmessage('1,000,000 ALDatetostr in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
+  Showmessage('1,000,000 ALDateToStrA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
 procedure TForm1.ALButton22Click(Sender: TObject);
@@ -659,7 +659,7 @@ end;
 procedure TForm1.ALButton27Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
-    aFormatSettings: TALformatSettings;
+    aFormatSettings: TALFormatSettingsA;
     S1: AnsiString;
     D1: TdateTime;
 begin
@@ -695,7 +695,7 @@ var i: integer;
 begin
   StartDate := Now;
   For i := 0 to 10000000 do begin
-    S1 := ALRandomStr(5,['0','1','2','3','4','5','6','7','8','9']);
+    S1 := ALRandomStrA(5,['0','1','2','3','4','5','6','7','8','9']);
     ALStrToInt(S1);
   end;
   Showmessage('10,000,000 ALStrToInt in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
@@ -708,7 +708,7 @@ var i: integer;
 begin
   StartDate := Now;
   For i := 0 to 10000000 do begin
-    S1 := ALRandomStrU(5,['0','1','2','3','4','5','6','7','8','9']);
+    S1 := ALRandomStrW(5,['0','1','2','3','4','5','6','7','8','9']);
     StrToInt(S1);
   end;
   Showmessage('10,000,000 StrToInt in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
@@ -721,7 +721,7 @@ var i: integer;
 begin
   StartDate := Now;
   For i := 0 to 10000000 do begin
-    S1 := ALRandomStr(10,['0','1','2','3','4','5','6','7','8','9']);
+    S1 := ALRandomStrA(10,['0','1','2','3','4','5','6','7','8','9']);
     ALStrToInt64(S1);
   end;
   Showmessage('10,000,000 ALStrToInt64 in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
@@ -734,7 +734,7 @@ var i: integer;
 begin
   StartDate := Now;
   For i := 0 to 10000000 do begin
-    S1 := ALRandomStrU(10,['0','1','2','3','4','5','6','7','8','9']);
+    S1 := ALRandomStrW(10,['0','1','2','3','4','5','6','7','8','9']);
     StrToInt64(S1);
   end;
   Showmessage('10,000,000 StrToInt64 in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
@@ -747,9 +747,9 @@ var i: integer;
 begin
   StartDate := Now;
   For i := 0 to 10000000 do begin
-    S1 := ALInttostr(Random(maxint));
+    S1 := ALIntToStrA(Random(maxint));
   end;
-  Showmessage('10,000,000 ALInttostr in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
+  Showmessage('10,000,000 ALIntToStrA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
 procedure TForm1.ALButton16Click(Sender: TObject);
@@ -770,41 +770,41 @@ Var S1: AnsiString;
     StartDate: TdateTime;
 begin
   StartDate := Now;
-  S1 := ALRandomStr(50);
+  S1 := ALRandomStrA(50);
   For i := 0 to 1000 do begin
-    AlCompareText(S1,AlRandomStr(25));
-    AlCompareText(S1,AlRandomStr(50));
-    AlCompareText(S1,S1);
+    ALCompareTextA(S1,ALRandomStrA(25));
+    ALCompareTextA(S1,ALRandomStrA(50));
+    ALCompareTextA(S1,S1);
   end;
 
-  S1 := ALRandomStr(200);
+  S1 := ALRandomStrA(200);
   For i := 0 to 1000 do begin
-    AlCompareText(S1,AlRandomStr(25));
-    AlCompareText(S1,AlRandomStr(200));
-    AlCompareText(S1,S1);
+    ALCompareTextA(S1,ALRandomStrA(25));
+    ALCompareTextA(S1,ALRandomStrA(200));
+    ALCompareTextA(S1,S1);
   end;
 
-  S1 := ALRandomStr(3000);
+  S1 := ALRandomStrA(3000);
   For i := 0 to 1000 do begin
-    AlCompareText(S1,AlRandomStr(25));
-    AlCompareText(S1,AlRandomStr(3000));
-    AlCompareText(S1,S1);
+    ALCompareTextA(S1,ALRandomStrA(25));
+    ALCompareTextA(S1,ALRandomStrA(3000));
+    ALCompareTextA(S1,S1);
   end;
 
-  S1 := ALRandomStr(4000);
+  S1 := ALRandomStrA(4000);
   For i := 0 to 1000 do begin
-    AlCompareText(S1,AlRandomStr(25));
-    AlCompareText(S1,AlRandomStr(4000));
-    AlCompareText(S1,S1);
+    ALCompareTextA(S1,ALRandomStrA(25));
+    ALCompareTextA(S1,ALRandomStrA(4000));
+    ALCompareTextA(S1,S1);
   end;
 
-  S1 := ALRandomStr(10000);
+  S1 := ALRandomStrA(10000);
   For i := 0 to 1000 do begin
-    AlCompareText(S1,AlRandomStr(25));
-    AlCompareText(S1,AlRandomStr(100000));
-    AlCompareText(S1,S1);
+    ALCompareTextA(S1,ALRandomStrA(25));
+    ALCompareTextA(S1,ALRandomStrA(100000));
+    ALCompareTextA(S1,S1);
   end;
-  Showmessage('15,000 AlCompareText in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
+  Showmessage('15,000 ALCompareTextA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
 procedure TForm1.ALButton8Click(Sender: TObject);
@@ -813,38 +813,38 @@ Var S1: String;
     StartDate: TdateTime;
 begin
   StartDate := Now;
-  S1 := ALrandomStrU(50);
+  S1 := ALRandomStrW(50);
   For i := 0 to 1000 do begin
-    CompareText(S1,ALrandomStrU(25));
-    CompareText(S1,ALrandomStrU(50));
+    CompareText(S1,ALRandomStrW(25));
+    CompareText(S1,ALRandomStrW(50));
     CompareText(S1,S1);
   end;
 
-  S1 := ALrandomStrU(200);
+  S1 := ALRandomStrW(200);
   For i := 0 to 1000 do begin
-    CompareText(S1,ALrandomStrU(25));
-    CompareText(S1,ALrandomStrU(200));
+    CompareText(S1,ALRandomStrW(25));
+    CompareText(S1,ALRandomStrW(200));
     CompareText(S1,S1);
   end;
 
-  S1 := ALrandomStrU(3000);
+  S1 := ALRandomStrW(3000);
   For i := 0 to 1000 do begin
-    CompareText(S1,ALrandomStrU(25));
-    CompareText(S1,ALrandomStrU(3000));
+    CompareText(S1,ALRandomStrW(25));
+    CompareText(S1,ALRandomStrW(3000));
     CompareText(S1,S1);
   end;
 
-  S1 := ALrandomStrU(4000);
+  S1 := ALRandomStrW(4000);
   For i := 0 to 1000 do begin
-    CompareText(S1,ALrandomStrU(25));
-    CompareText(S1,ALrandomStrU(4000));
+    CompareText(S1,ALRandomStrW(25));
+    CompareText(S1,ALRandomStrW(4000));
     CompareText(S1,S1);
   end;
 
-  S1 := ALrandomStrU(10000);
+  S1 := ALRandomStrW(10000);
   For i := 0 to 1000 do begin
-    CompareText(S1,ALrandomStrU(25));
-    CompareText(S1,ALrandomStrU(100000));
+    CompareText(S1,ALRandomStrW(25));
+    CompareText(S1,ALRandomStrW(100000));
     CompareText(S1,S1);
   end;
   Showmessage('15,000 CompareText in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
@@ -856,38 +856,38 @@ Var S1: ansiString;
     StartDate: TdateTime;
 begin
   StartDate := Now;
-  S1 := ALrandomStr(50);
+  S1 := ALRandomStrA(50);
   For i := 0 to 1000 do begin
-    CompareText(S1,ALrandomStr(25));
-    CompareText(S1,ALrandomStr(50));
+    CompareText(S1,ALRandomStrA(25));
+    CompareText(S1,ALRandomStrA(50));
     CompareText(S1,S1);
   end;
 
-  S1 := ALrandomStr(200);
+  S1 := ALRandomStrA(200);
   For i := 0 to 1000 do begin
-    CompareText(S1,ALrandomStr(25));
-    CompareText(S1,ALrandomStr(200));
+    CompareText(S1,ALRandomStrA(25));
+    CompareText(S1,ALRandomStrA(200));
     CompareText(S1,S1);
   end;
 
-  S1 := ALrandomStr(3000);
+  S1 := ALRandomStrA(3000);
   For i := 0 to 1000 do begin
-    CompareText(S1,ALrandomStr(25));
-    CompareText(S1,ALrandomStr(3000));
+    CompareText(S1,ALRandomStrA(25));
+    CompareText(S1,ALRandomStrA(3000));
     CompareText(S1,S1);
   end;
 
-  S1 := ALrandomStr(4000);
+  S1 := ALRandomStrA(4000);
   For i := 0 to 1000 do begin
-    CompareText(S1,ALrandomStr(25));
-    CompareText(S1,ALrandomStr(4000));
+    CompareText(S1,ALRandomStrA(25));
+    CompareText(S1,ALRandomStrA(4000));
     CompareText(S1,S1);
   end;
 
-  S1 := ALrandomStr(10000);
+  S1 := ALRandomStrA(10000);
   For i := 0 to 1000 do begin
-    CompareText(S1,ALrandomStr(25));
-    CompareText(S1,ALrandomStr(100000));
+    CompareText(S1,ALRandomStrA(25));
+    CompareText(S1,ALRandomStrA(100000));
     CompareText(S1,S1);
   end;
   Showmessage('15,000 CompareText in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
@@ -896,15 +896,15 @@ end;
 procedure TForm1.ALButton25Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
-    aFormatSettings: TALformatSettings;
+    aFormatSettings: TALFormatSettingsA;
     S1: AnsiString;
 begin
   ALGetLocaleFormatSettings(1033, aFormatSettings);
   StartDate := Now;
   For i := 0 to 5000000 do begin
-    S1 := ALFloatToStr(random(MaxInt) / random(Maxint), aFormatSettings);
+    S1 := ALFloatToStrA(random(MaxInt) / random(Maxint), aFormatSettings);
   end;
-  Showmessage('5,000,000 ALFloatToStr in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
+  Showmessage('5,000,000 ALFloatToStrA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
 procedure TForm1.ALButton26Click(Sender: TObject);
@@ -927,11 +927,11 @@ Var i: integer;
 begin
   StartDate := Now;
   For i := 0 to 10000 do begin
-    AlUpperCase(AlRandomStr(5));
-    AlUpperCase(AlRandomStr(25));
-    AlUpperCase(AlRandomStr(300));
-    AlUpperCase(AlRandomStr(3000));
-    AlUpperCase(AlRandomStr(10000));
+    AlUpperCase(ALRandomStrA(5));
+    AlUpperCase(ALRandomStrA(25));
+    AlUpperCase(ALRandomStrA(300));
+    AlUpperCase(ALRandomStrA(3000));
+    AlUpperCase(ALRandomStrA(10000));
   end;
   Showmessage('50,000 AlUpperCase in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -942,11 +942,11 @@ Var i: integer;
 begin
   StopWatch := TStopWatch.StartNew;
   For i := 0 to 10000 do begin
-    ALBase64EncodeString(AlRandomStr(5));
-    ALBase64EncodeString(AlRandomStr(25));
-    ALBase64EncodeString(AlRandomStr(300));
-    ALBase64EncodeString(AlRandomStr(3000));
-    ALBase64EncodeString(AlRandomStr(10000));
+    ALBase64EncodeString(ALRandomStrA(5));
+    ALBase64EncodeString(ALRandomStrA(25));
+    ALBase64EncodeString(ALRandomStrA(300));
+    ALBase64EncodeString(ALRandomStrA(3000));
+    ALBase64EncodeString(ALRandomStrA(10000));
   end;
   StopWatch.Stop;
   Showmessage('50,000 Base64Encode in: ' + formatFloat('0.,',StopWatch.Elapsed.TotalMilliseconds) + ' ms');
@@ -977,11 +977,11 @@ Var i: integer;
 begin
   StopWatch := TStopWatch.StartNew;
   For i := 0 to 10000 do begin
-    EncodeString(AlRandomStrU(5));
-    EncodeString(AlRandomStrU(25));
-    EncodeString(AlRandomStrU(300));
-    EncodeString(AlRandomStrU(3000));
-    EncodeString(AlRandomStrU(10000));
+    EncodeString(ALRandomStrW(5));
+    EncodeString(ALRandomStrW(25));
+    EncodeString(ALRandomStrW(300));
+    EncodeString(ALRandomStrW(3000));
+    EncodeString(ALRandomStrW(10000));
   end;
   StopWatch.Stop;
   Showmessage('50,000 Base64Encode in: ' + formatFloat('0.,',StopWatch.Elapsed.TotalMilliseconds) + ' ms');
@@ -993,46 +993,46 @@ Var S1: AnsiString;
     StartDate: TdateTime;
 begin
   StartDate := Now;
-  S1 := ALRandomStr(50, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  S1 := ALRandomStrA(50, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
   For i := 0 to 2000 do begin
-    ALPosExIgnoreCase(AlRandomStr(1),S1,1+random(50));
-    ALPosExIgnoreCase(AlRandomStr(3),S1,1+random(50));
-    ALPosExIgnoreCase(AlRandomStr(8),S1,1+random(50));
-    ALPosExIgnoreCase(AlRandomStr(20),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(1),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(3),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(8),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(20),S1,1+random(50));
   end;
 
-  S1 := ALRandomStr(200, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  S1 := ALRandomStrA(200, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
   For i := 0 to 2000 do begin
-    ALPosExIgnoreCase(AlRandomStr(1),S1,1+random(50));
-    ALPosExIgnoreCase(AlRandomStr(3),S1,1+random(50));
-    ALPosExIgnoreCase(AlRandomStr(8),S1,1+random(50));
-    ALPosExIgnoreCase(AlRandomStr(20),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(1),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(3),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(8),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(20),S1,1+random(50));
   end;
 
-  S1 := ALRandomStr(3000, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  S1 := ALRandomStrA(3000, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
   For i := 0 to 2000 do begin
-    ALPosExIgnoreCase(AlRandomStr(1),S1,1+random(50));
-    ALPosExIgnoreCase(AlRandomStr(3),S1,1+random(50));
-    ALPosExIgnoreCase(AlRandomStr(8),S1,1+random(50));
-    ALPosExIgnoreCase(AlRandomStr(20),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(1),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(3),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(8),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(20),S1,1+random(50));
   end;
 
-  S1 := ALRandomStr(4000, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  S1 := ALRandomStrA(4000, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
   For i := 0 to 2000 do begin
-    ALPosExIgnoreCase(AlRandomStr(1),S1,1+random(50));
-    ALPosExIgnoreCase(AlRandomStr(3),S1,1+random(50));
-    ALPosExIgnoreCase(AlRandomStr(8),S1,1+random(50));
-    ALPosExIgnoreCase(AlRandomStr(20),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(1),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(3),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(8),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(20),S1,1+random(50));
   end;
 
-  S1 := ALRandomStr(300000, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  S1 := ALRandomStrA(300000, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
   For i := 0 to 2000 do begin
-    ALPosExIgnoreCase(AlRandomStr(1),S1,1+random(50));
-    ALPosExIgnoreCase(AlRandomStr(3),S1,1+random(50));
-    ALPosExIgnoreCase(AlRandomStr(8),S1,1+random(50));
-    ALPosExIgnoreCase(AlRandomStr(20),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(1),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(3),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(8),S1,1+random(50));
+    ALPosIgnoreCaseA(ALRandomStrA(20),S1,1+random(50));
   end;
-  Showmessage('40,000 ALPosExIgnoreCase in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
+  Showmessage('40,000 ALPosIgnoreCaseA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
 procedure TForm1.Button4Click(Sender: TObject);
@@ -1041,46 +1041,46 @@ Var S1: String;
     StartDate: TdateTime;
 begin
   StartDate := Now;
-  S1 := ALRandomStrU(50, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  S1 := ALRandomStrW(50, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
   For i := 0 to 2000 do begin
-    ALPosExIgnoreCaseU(AlRandomStrU(1),S1,1+random(50));
-    ALPosExIgnoreCaseU(AlRandomStrU(3),S1,1+random(50));
-    ALPosExIgnoreCaseU(AlRandomStrU(8),S1,1+random(50));
-    ALPosExIgnoreCaseU(AlRandomStrU(20),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(1),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(3),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(8),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(20),S1,1+random(50));
   end;
 
-  S1 := ALRandomStrU(200, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  S1 := ALRandomStrW(200, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
   For i := 0 to 2000 do begin
-    ALPosExIgnoreCaseU(AlRandomStrU(1),S1,1+random(50));
-    ALPosExIgnoreCaseU(AlRandomStrU(3),S1,1+random(50));
-    ALPosExIgnoreCaseU(AlRandomStrU(8),S1,1+random(50));
-    ALPosExIgnoreCaseU(AlRandomStrU(20),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(1),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(3),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(8),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(20),S1,1+random(50));
   end;
 
-  S1 := ALRandomStrU(3000, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  S1 := ALRandomStrW(3000, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
   For i := 0 to 2000 do begin
-    ALPosExIgnoreCaseU(AlRandomStrU(1),S1,1+random(50));
-    ALPosExIgnoreCaseU(AlRandomStrU(3),S1,1+random(50));
-    ALPosExIgnoreCaseU(AlRandomStrU(8),S1,1+random(50));
-    ALPosExIgnoreCaseU(AlRandomStrU(20),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(1),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(3),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(8),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(20),S1,1+random(50));
   end;
 
-  S1 := ALRandomStrU(4000, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  S1 := ALRandomStrW(4000, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
   For i := 0 to 2000 do begin
-    ALPosExIgnoreCaseU(AlRandomStrU(1),S1,1+random(50));
-    ALPosExIgnoreCaseU(AlRandomStrU(3),S1,1+random(50));
-    ALPosExIgnoreCaseU(AlRandomStrU(8),S1,1+random(50));
-    ALPosExIgnoreCaseU(AlRandomStrU(20),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(1),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(3),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(8),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(20),S1,1+random(50));
   end;
 
-  S1 := ALRandomStrU(300000, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+  S1 := ALRandomStrW(300000, ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
   For i := 0 to 2000 do begin
-    ALPosExIgnoreCaseU(AlRandomStrU(1),S1,1+random(50));
-    ALPosExIgnoreCaseU(AlRandomStrU(3),S1,1+random(50));
-    ALPosExIgnoreCaseU(AlRandomStrU(8),S1,1+random(50));
-    ALPosExIgnoreCaseU(AlRandomStrU(20),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(1),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(3),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(8),S1,1+random(50));
+    ALPosIgnoreCaseW(ALRandomStrW(20),S1,1+random(50));
   end;
-  Showmessage('40,000 ALPosExIgnoreCase in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
+  Showmessage('40,000 ALPosIgnoreCaseA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
 procedure TForm1.ALButton10Click(Sender: TObject);
@@ -1089,11 +1089,11 @@ Var i: integer;
 begin
   StartDate := Now;
   For i := 0 to 10000 do begin
-    UpperCase(AlRandomStrU(5));
-    UpperCase(AlRandomStrU(25));
-    UpperCase(AlRandomStrU(300));
-    UpperCase(AlRandomStrU(3000));
-    UpperCase(AlRandomStrU(10000));
+    UpperCase(ALRandomStrW(5));
+    UpperCase(ALRandomStrW(25));
+    UpperCase(ALRandomStrW(300));
+    UpperCase(ALRandomStrW(3000));
+    UpperCase(ALRandomStrW(10000));
   end;
   Showmessage('50,000 UpperCase in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -1104,11 +1104,11 @@ Var i: integer;
 begin
   StartDate := Now;
   For i := 0 to 10000 do begin
-    UpperCase(AlRandomStr(5));
-    UpperCase(AlRandomStr(25));
-    UpperCase(AlRandomStr(300));
-    UpperCase(AlRandomStr(3000));
-    UpperCase(AlRandomStr(10000));
+    UpperCase(ALRandomStrA(5));
+    UpperCase(ALRandomStrA(25));
+    UpperCase(ALRandomStrA(300));
+    UpperCase(ALRandomStrA(3000));
+    UpperCase(ALRandomStrA(10000));
   end;
   Showmessage('50,000 UpperCase in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -1119,11 +1119,11 @@ Var i: integer;
 begin
   StartDate := Now;
   For i := 0 to 10000 do begin
-    AlLowerCase(AlRandomStr(5));
-    AlLowerCase(AlRandomStr(25));
-    AlLowerCase(AlRandomStr(300));
-    AlLowerCase(AlRandomStr(3000));
-    AlLowerCase(AlRandomStr(10000));
+    AlLowerCase(ALRandomStrA(5));
+    AlLowerCase(ALRandomStrA(25));
+    AlLowerCase(ALRandomStrA(300));
+    AlLowerCase(ALRandomStrA(3000));
+    AlLowerCase(ALRandomStrA(10000));
   end;
   Showmessage('50,000 AlLowerCase in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -1134,11 +1134,11 @@ Var i: integer;
 begin
   StartDate := Now;
   For i := 0 to 10000 do begin
-    LowerCase(AlRandomStrU(5));
-    LowerCase(AlRandomStrU(25));
-    LowerCase(AlRandomStrU(300));
-    LowerCase(AlRandomStrU(3000));
-    LowerCase(AlRandomStrU(10000));
+    LowerCase(ALRandomStrW(5));
+    LowerCase(ALRandomStrW(25));
+    LowerCase(ALRandomStrW(300));
+    LowerCase(ALRandomStrW(3000));
+    LowerCase(ALRandomStrW(10000));
   end;
   Showmessage('50,000 LowerCase in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -1149,11 +1149,11 @@ Var i: integer;
 begin
   StartDate := Now;
   For i := 0 to 10000 do begin
-    LowerCase(AlRandomStr(5));
-    LowerCase(AlRandomStr(25));
-    LowerCase(AlRandomStr(300));
-    LowerCase(AlRandomStr(3000));
-    LowerCase(AlRandomStr(10000));
+    LowerCase(ALRandomStrA(5));
+    LowerCase(ALRandomStrA(25));
+    LowerCase(ALRandomStrA(300));
+    LowerCase(ALRandomStrA(3000));
+    LowerCase(ALRandomStrA(10000));
   end;
   Showmessage('50,000 LowerCase in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -1164,7 +1164,7 @@ Var S1: AnsiString;
     StartDate: TdateTime;
 begin
   StartDate := Now;
-  S1 := ALRandomStr(500);
+  S1 := ALRandomStrA(500);
   For i := 0 to 100000 do begin
     AlCopyStr(S1,1+Random(25), 1+Random(10));
     AlCopyStr(S1,1+Random(50), 1+Random(4));
@@ -1172,7 +1172,7 @@ begin
     AlCopyStr(S1,1+Random(40), 1+Random(1));
   end;
 
-  S1 := ALRandomStr(2000);
+  S1 := ALRandomStrA(2000);
   For i := 0 to 100000 do begin
     AlCopyStr(S1,1+Random(60), 1+Random(100));
     AlCopyStr(S1,1+Random(100), 1+Random(15));
@@ -1180,7 +1180,7 @@ begin
     AlCopyStr(S1,1+Random(200), 1+Random(1));
   end;
 
-  S1 := ALRandomStr(30000);
+  S1 := ALRandomStrA(30000);
   For i := 0 to 100000 do begin
     AlCopyStr(S1,1+Random(1000), 1+Random(1000));
     AlCopyStr(S1,1+Random(100), 1+Random(200));
@@ -1188,7 +1188,7 @@ begin
     AlCopyStr(S1,1+Random(200), 1+Random(1));
   end;
 
-  S1 := ALRandomStr(40000);
+  S1 := ALRandomStrA(40000);
   For i := 0 to 100000 do begin
     AlCopyStr(S1,1+Random(2000), 1+Random(1000));
     AlCopyStr(S1,1+Random(500), 1+Random(200));
@@ -1196,7 +1196,7 @@ begin
     AlCopyStr(S1,1+Random(10), 1+Random(1));
   end;
 
-  S1 := ALRandomStr(1000000);
+  S1 := ALRandomStrA(1000000);
   For i := 0 to 100000 do begin
     AlCopyStr(S1,1+Random(80000), 1+Random(1000));
     AlCopyStr(S1,1+Random(500), 1+Random(200));
@@ -1212,7 +1212,7 @@ Var S1: String;
     StartDate: TdateTime;
 begin
   StartDate := Now;
-  S1 := ALRandomStrU(500);
+  S1 := ALRandomStrW(500);
   For i := 0 to 100000 do begin
     Copy(S1,1+Random(25), 1+Random(10));
     Copy(S1,1+Random(50), 1+Random(4));
@@ -1220,7 +1220,7 @@ begin
     Copy(S1,1+Random(40), 1+Random(1));
   end;
 
-  S1 := ALRandomStrU(2000);
+  S1 := ALRandomStrW(2000);
   For i := 0 to 100000 do begin
     Copy(S1,1+Random(60), 1+Random(100));
     Copy(S1,1+Random(100), 1+Random(15));
@@ -1228,7 +1228,7 @@ begin
     Copy(S1,1+Random(200), 1+Random(1));
   end;
 
-  S1 := ALRandomStrU(30000);
+  S1 := ALRandomStrW(30000);
   For i := 0 to 100000 do begin
     Copy(S1,1+Random(1000), 1+Random(1000));
     Copy(S1,1+Random(100), 1+Random(200));
@@ -1236,7 +1236,7 @@ begin
     Copy(S1,1+Random(200), 1+Random(1));
   end;
 
-  S1 := ALRandomStrU(40000);
+  S1 := ALRandomStrW(40000);
   For i := 0 to 100000 do begin
     Copy(S1,1+Random(2000), 1+Random(1000));
     Copy(S1,1+Random(500), 1+Random(200));
@@ -1244,7 +1244,7 @@ begin
     Copy(S1,1+Random(10), 1+Random(1));
   end;
 
-  S1 := ALRandomStrU(1000000);
+  S1 := ALRandomStrW(1000000);
   For i := 0 to 100000 do begin
     Copy(S1,1+Random(80000), 1+Random(1000));
     Copy(S1,1+Random(500), 1+Random(200));
@@ -1260,7 +1260,7 @@ Var S1: ansiString;
     StartDate: TdateTime;
 begin
   StartDate := Now;
-  S1 := ALRandomStr(500);
+  S1 := ALRandomStrA(500);
   For i := 0 to 100000 do begin
     Copy(S1,1+Random(25), 1+Random(10));
     Copy(S1,1+Random(50), 1+Random(4));
@@ -1268,7 +1268,7 @@ begin
     Copy(S1,1+Random(40), 1+Random(1));
   end;
 
-  S1 := ALRandomStr(2000);
+  S1 := ALRandomStrA(2000);
   For i := 0 to 100000 do begin
     Copy(S1,1+Random(60), 1+Random(100));
     Copy(S1,1+Random(100), 1+Random(15));
@@ -1276,7 +1276,7 @@ begin
     Copy(S1,1+Random(200), 1+Random(1));
   end;
 
-  S1 := ALRandomStr(30000);
+  S1 := ALRandomStrA(30000);
   For i := 0 to 100000 do begin
     Copy(S1,1+Random(1000), 1+Random(1000));
     Copy(S1,1+Random(100), 1+Random(200));
@@ -1284,7 +1284,7 @@ begin
     Copy(S1,1+Random(200), 1+Random(1));
   end;
 
-  S1 := ALRandomStr(40000);
+  S1 := ALRandomStrA(40000);
   For i := 0 to 100000 do begin
     Copy(S1,1+Random(2000), 1+Random(1000));
     Copy(S1,1+Random(500), 1+Random(200));
@@ -1292,7 +1292,7 @@ begin
     Copy(S1,1+Random(10), 1+Random(1));
   end;
 
-  S1 := ALRandomStr(1000000);
+  S1 := ALRandomStrA(1000000);
   For i := 0 to 100000 do begin
     Copy(S1,1+Random(80000), 1+Random(1000));
     Copy(S1,1+Random(500), 1+Random(200));
@@ -1366,17 +1366,17 @@ end;
 procedure TForm1.ALButton40Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
-    aFormatSettings: TALformatSettings;
+    aFormatSettings: TALFormatSettingsA;
     S1: AnsiString;
 begin
   ALGetLocaleFormatSettings(1033, aFormatSettings);
   StartDate := Now;
   For i := 0 to 1000000 do begin
-    S1 := ALFormat('xxx %s xxxx %s xxxx', [AlRandomStr(10), AlRandomStr(20)], aFormatSettings);
-    S1 := ALFormat('xxx %*.*f xxx', [random(10), random(5), random(MaxInt) / random(MaxInt)], aFormatSettings);
-    S1 := ALFormat('xxx %12.2m', [random(MaxInt) / random(MaxInt)], aFormatSettings);
+    S1 := ALFormatA('xxx %s xxxx %s xxxx', [ALRandomStrA(10), ALRandomStrA(20)], aFormatSettings);
+    S1 := ALFormatA('xxx %*.*f xxx', [random(10), random(5), random(MaxInt) / random(MaxInt)], aFormatSettings);
+    S1 := ALFormatA('xxx %12.2m', [random(MaxInt) / random(MaxInt)], aFormatSettings);
   end;
-  Showmessage('3,000,000 ALFormat in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
+  Showmessage('3,000,000 ALFormatA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
 procedure TForm1.ALButton43Click(Sender: TObject);
@@ -1388,7 +1388,7 @@ begin
   GetLocaleFormatSettings(1033, aFormatSettings);
   StartDate := Now;
   For i := 0 to 1000000 do begin
-    S1 := Format('xxx %s xxxx %s xxxx', [AlRandomStrU(10), AlRandomStrU(20)], aFormatSettings);
+    S1 := Format('xxx %s xxxx %s xxxx', [ALRandomStrW(10), ALRandomStrW(20)], aFormatSettings);
     S1 := Format('xxx %*.*f xxx', [random(10), random(5), random(MaxInt) / random(MaxInt)], aFormatSettings);
     S1 := Format('xxx %12.2m', [random(MaxInt) / random(MaxInt)], aFormatSettings);
   end;
@@ -1398,7 +1398,7 @@ end;
 procedure TForm1.ALButton45Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
-    aFormatSettings: TALformatSettings;
+    aFormatSettings: TALFormatSettingsA;
     S1: AnsiString;
     E1: Extended;
 begin

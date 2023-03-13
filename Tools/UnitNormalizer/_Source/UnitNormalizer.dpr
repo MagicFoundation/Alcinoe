@@ -26,18 +26,18 @@ begin
     //init LRootDirectory / LCreateBackup
     var LRootDirectory: String;
     var LCreateBackup: Boolean;
-    var LParamLst := TALStringListU.Create;
+    var LParamLst := TALStringListW.Create;
     try
       for var I := 1 to ParamCount do
         LParamLst.Add(ParamStr(i));
-      LRootDirectory := ALTrimU(LParamLst.Values['-Dir']);
-      LCreateBackup := not ALSameTextU(ALTrimU(LParamLst.Values['-CreateBackup']), 'false');
+      LRootDirectory := ALTrim(LParamLst.Values['-Dir']);
+      LCreateBackup := not ALSameTextW(ALTrim(LParamLst.Values['-CreateBackup']), 'false');
     finally
       ALFreeAndNil(LParamLst);
     end;
     if LRootDirectory = '' then begin
-      LRootDirectory := ALTrimU(paramstr(1));
-      LCreateBackup := not ALSameTextU(ALTrimU(paramstr(2)), 'false');
+      LRootDirectory := ALTrim(paramstr(1));
+      LCreateBackup := not ALSameTextW(ALTrim(paramstr(2)), 'false');
     end;
     if LRootDirectory = '' then raise Exception.Create('Usage: UnitNormalizer.exe -Dir="<Directory>" -CreateBackup=<true/false>');
 
@@ -51,7 +51,7 @@ begin
       {$ENDREGION}
 
       {$REGION 'skip unicode file'}
-      if ALpos(#0,LSourceStr) > 0 then begin
+      if ALPosA(#0,LSourceStr) > 0 then begin
         Writeln('Skipped '+LFiles[i]);
         continue;
       end;
@@ -62,27 +62,27 @@ begin
         if J = 9 then continue; // tab
         if j = 10 then continue; // New line
         if j = 13 then continue; // carriage return
-        if ALpos(ansiString(Chr(j)),LSourceStr) > 0 then raise Exception.CreateFmt('%s contain a bad character (%d)', [LFiles[i], j]);
+        if ALPosA(ansiString(Chr(j)),LSourceStr) > 0 then raise Exception.CreateFmt('%s contain a bad character (%d)', [LFiles[i], j]);
       end;
       {$ENDREGION}
 
       {$REGION 'replace #13 by #13#10'}
-      LSourceStr := ALStringReplace(LSourceStr,#13#10,#1,[rfReplaceALL]);
-      LSourceStr := ALStringReplace(LSourceStr,#13,#1,[rfReplaceALL]);
-      LSourceStr := ALStringReplace(LSourceStr,#10,#1,[rfReplaceALL]);
-      LSourceStr := ALStringReplace(LSourceStr,#1,#13#10,[rfReplaceALL]);
+      LSourceStr := ALStringReplaceA(LSourceStr,#13#10,#1,[rfReplaceALL]);
+      LSourceStr := ALStringReplaceA(LSourceStr,#13,#1,[rfReplaceALL]);
+      LSourceStr := ALStringReplaceA(LSourceStr,#10,#1,[rfReplaceALL]);
+      LSourceStr := ALStringReplaceA(LSourceStr,#1,#13#10,[rfReplaceALL]);
       {$ENDREGION}
 
       {$REGION 'replace <space>#13 by #13#10'}
-      while ALpos(' '#13#10,LSourceStr) > 0 do
-        LSourceStr := ALStringReplace(LSourceStr,' '#13#10,#13#10,[rfReplaceALL]);
+      while ALPosA(' '#13#10,LSourceStr) > 0 do
+        LSourceStr := ALStringReplaceA(LSourceStr,' '#13#10,#13#10,[rfReplaceALL]);
       {$ENDREGION}
 
       {$REGION 'Save the file'}
       if LOriginalSourceStr <> LSourceStr then begin
         if LCreateBackup then begin
           if ALFileExists(ansiString(LFiles[i]) + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [ansiString(LFiles[i]) + '.bak']);
-          if not ALrenameFile(ansiString(LFiles[i]), ansiString(LFiles[i]) + '.bak') then raiseLastOsError;
+          if not ALRenameFileA(ansiString(LFiles[i]), ansiString(LFiles[i]) + '.bak') then raiseLastOsError;
         end;
         ALSaveStringToFile(LSourceStr,ansiString(LFiles[i]));
         Writeln('Updated '+ LFiles[i]);

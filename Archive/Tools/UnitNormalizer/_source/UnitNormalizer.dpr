@@ -27,7 +27,7 @@ Begin
   //                                                     //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
   //                                                     //   it's return for exemple 9 when height = 11
 
-  var LSourceLst := TALStringList.create;
+  var LSourceLst := TALStringListA.create;
   Try
     LSourceLst.text := LSourceStr;
     Var LUnclosedParenthese := 0;
@@ -39,7 +39,7 @@ Begin
     var J := 1;
     While J <= LSourceLst.Count - 1 do begin
       Var LSourceLine := LSourceLst[J];
-      if ALSameText(LSourceLine,'implementation') then LAfterImplementation := True;
+      if ALSameTextA(LSourceLine,'implementation') then LAfterImplementation := True;
       if not LAfterImplementation then begin
         inc(J);
         continue;
@@ -114,7 +114,7 @@ begin
     SetMultiByteConversionCodePage(CP_UTF8);
 
     var LProjectDirectory := ansiString(paramstr(1));
-    var LCreateBackup := not ALSameText(ALTrim(ansiString(paramstr(2))), 'false');
+    var LCreateBackup := not ALSameTextA(ALTrim(ansiString(paramstr(2))), 'false');
 
     var LFiles := TDirectory.GetFiles(string(LProjectDirectory), '*.pas', TSearchOption.soAllDirectories);
     for var I := Low(LFiles) to High(LFiles) do begin
@@ -124,7 +124,7 @@ begin
       {$ENDREGION}
 
       {$REGION 'skip unicode file'}
-      if ALpos(#0,LSourceStr) > 0 then begin
+      if ALPosA(#0,LSourceStr) > 0 then begin
         Writeln('Skipped '+LFiles[i]);
         continue;
       end;
@@ -135,44 +135,44 @@ begin
         if J = 9 then continue; // tab
         if j = 10 then continue; // New line
         if j = 13 then continue; // carriage return
-        if ALpos(ansiString(Chr(j)),LSourceStr) > 0 then raise Exception.CreateFmt('%s contain a bad character (%d)', [LFiles[i], j]);
+        if ALPosA(ansiString(Chr(j)),LSourceStr) > 0 then raise Exception.CreateFmt('%s contain a bad character (%d)', [LFiles[i], j]);
       end;
       {$ENDREGION}
 
       {$REGION 'replace #13 by #13#10'}
-      LSourceStr := ALStringReplace(LSourceStr,#13#10,#1,[rfReplaceALL]);
-      LSourceStr := ALStringReplace(LSourceStr,#13,#1,[rfReplaceALL]);
-      LSourceStr := ALStringReplace(LSourceStr,#10,#1,[rfReplaceALL]);
-      LSourceStr := ALStringReplace(LSourceStr,#1,#13#10,[rfReplaceALL]);
+      LSourceStr := ALStringReplaceA(LSourceStr,#13#10,#1,[rfReplaceALL]);
+      LSourceStr := ALStringReplaceA(LSourceStr,#13,#1,[rfReplaceALL]);
+      LSourceStr := ALStringReplaceA(LSourceStr,#10,#1,[rfReplaceALL]);
+      LSourceStr := ALStringReplaceA(LSourceStr,#1,#13#10,[rfReplaceALL]);
       {$ENDREGION}
 
       {$REGION 'replace <space>#13 by #13#10'}
-      while ALpos(' '#13#10,LSourceStr) > 0 do
-        LSourceStr := ALStringReplace(LSourceStr,' '#13#10,#13#10,[rfReplaceALL]);
+      while ALPosA(' '#13#10,LSourceStr) > 0 do
+        LSourceStr := ALStringReplaceA(LSourceStr,' '#13#10,#13#10,[rfReplaceALL]);
       {$ENDREGION}
 
       {$REGION 'Add *** on the top of procedure/function/contructor/destructor'}
-      Var LSourceLst := TALStringList.create;
+      Var LSourceLst := TALStringListA.create;
       Try
         LSourceLst.text := LSourceStr;
         Var LAfterImplementation := False;
         var J := 1;
         While J <= LSourceLst.Count - 1 do begin
           Var LSourceLine := LSourceLst[J];
-          if ALSameText(LSourceLine,'implementation') then LAfterImplementation := True;
+          if ALSameTextA(LSourceLine,'implementation') then LAfterImplementation := True;
           if not LAfterImplementation then begin
             inc(j);
             continue;
           end;
-          if (ALPosExIgnoreCase('Procedure ', LSourceLine) = 1) or
-             (ALPosExIgnoreCase('Function ', LSourceLine) = 1) or
-             (ALPosExIgnoreCase('Class Procedure ', LSourceLine) = 1) or
-             (ALPosExIgnoreCase('Class Function ', LSourceLine) = 1) or
-             (ALPosExIgnoreCase('Constructor ', LSourceLine) = 1) or
-             (ALPosExIgnoreCase('Destructor ', LSourceLine) = 1) then begin
+          if (ALPosIgnoreCaseA('Procedure ', LSourceLine) = 1) or
+             (ALPosIgnoreCaseA('Function ', LSourceLine) = 1) or
+             (ALPosIgnoreCaseA('Class Procedure ', LSourceLine) = 1) or
+             (ALPosIgnoreCaseA('Class Function ', LSourceLine) = 1) or
+             (ALPosIgnoreCaseA('Constructor ', LSourceLine) = 1) or
+             (ALPosIgnoreCaseA('Destructor ', LSourceLine) = 1) then begin
             Var LPreviousSourceLine := LSourceLst[J - 1];
             if (LPreviousSourceLine = '') or
-               (ALPos('{*', LSourceLine) = 1) then begin
+               (ALPosA('{*', LSourceLine) = 1) then begin
               var LNewPreviousSourceLine: AnsiString;
               setlength(LNewPreviousSourceLine, length(LSourceLine));
               FillChar(LNewPreviousSourceLine[low(LNewPreviousSourceLine)], length(LNewPreviousSourceLine), Ord('*'));
@@ -194,25 +194,25 @@ begin
       {$ENDREGION}
 
       {$REGION 'Add ~~~ on the top of procedure/function declared inside a procedure or function'}
-      LSourceLst := TALStringList.create;
+      LSourceLst := TALStringListA.create;
       Try
         LSourceLst.text := LSourceStr;
         Var LAfterImplementation := False;
         var J := 1;
         While J <= LSourceLst.Count - 1 do begin
           Var LSourceLine := LSourceLst[J];
-          if ALSameText(LSourceLine,'implementation') then LAfterImplementation := True;
+          if ALSameTextA(LSourceLine,'implementation') then LAfterImplementation := True;
           if not LAfterImplementation then begin
             inc(J);
             continue;
           end;
-          if (ALPosExIgnoreCase('Procedure ', LSourceLine) <> 1) and
-             (ALPosExIgnoreCase('Function ', LSourceLine) <> 1) and
-             ((ALPosExIgnoreCase('Procedure ', ALTrim(LSourceLine)) = 1) or
-              (ALPosExIgnoreCase('Function ', ALTrim(LSourceLine)) = 1)) then begin
+          if (ALPosIgnoreCaseA('Procedure ', LSourceLine) <> 1) and
+             (ALPosIgnoreCaseA('Function ', LSourceLine) <> 1) and
+             ((ALPosIgnoreCaseA('Procedure ', ALTrim(LSourceLine)) = 1) or
+              (ALPosIgnoreCaseA('Function ', ALTrim(LSourceLine)) = 1)) then begin
             Var LPreviousSourceLine := LSourceLst[J - 1];
             if (LPreviousSourceLine = '') or
-               (ALPos('{~', ALTrim(LSourceLine)) = 1) then begin
+               (ALPosA('{~', ALTrim(LSourceLine)) = 1) then begin
               var LNewPreviousSourceLine: AnsiString;
               setlength(LNewPreviousSourceLine, length(LSourceLine));
               FillChar(LNewPreviousSourceLine[low(LNewPreviousSourceLine)], length(LNewPreviousSourceLine), Ord('~'));
@@ -245,7 +245,7 @@ begin
       {$REGION 'Save the file'}
       if LCreateBackup then begin
         if ALFileExists(ansiString(LFiles[i]) + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [ansiString(LFiles[i]) + '.bak']);
-        if not ALrenameFile(ansiString(LFiles[i]), ansiString(LFiles[i]) + '.bak') then raiseLastOsError;
+        if not ALRenameFileA(ansiString(LFiles[i]), ansiString(LFiles[i]) + '.bak') then raiseLastOsError;
       end;
       ALSaveStringToFile(LSourceStr,ansiString(LFiles[i]));
       Writeln('Updated '+ LFiles[i]);

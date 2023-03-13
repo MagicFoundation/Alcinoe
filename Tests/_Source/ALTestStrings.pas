@@ -135,10 +135,10 @@ begin
   Writeln(ALFormatw('CheckExecutionTime Skipped - %0.0f ms for Alcinoe vs %0.0f ms for Delphi (%0.1fx faster)', [fStopWatchAlcinoe.Elapsed.TotalMilliseconds, fStopWatchDELPHI.Elapsed.TotalMilliseconds, fStopWatchDELPHI.Elapsed.TotalMilliseconds / fStopWatchAlcinoe.Elapsed.TotalMilliseconds], ALDefaultFormatSettingsW));
   {$ELSE}
   if fStopWatchAlcinoe.Elapsed.TotalMilliseconds > fStopWatchDELPHI.Elapsed.TotalMilliseconds * ARatio then
-    Assert.Fail(ALFormatU('Time too long (%0.0f ms for Alcinoe vs %0.0f ms for Delphi)', [fStopWatchAlcinoe.Elapsed.TotalMilliseconds, fStopWatchDELPHI.Elapsed.TotalMilliseconds], ALDefaultFormatSettingsW))
+    Assert.Fail(ALFormatW('Time too long (%0.0f ms for Alcinoe vs %0.0f ms for Delphi)', [fStopWatchAlcinoe.Elapsed.TotalMilliseconds, fStopWatchDELPHI.Elapsed.TotalMilliseconds], ALDefaultFormatSettingsW))
   else
     //https://github.com/VSoftTechnologies/DUnitX/issues/319
-    Writeln(ALFormatU('%0.0f ms for Alcinoe vs %0.0f ms for Delphi (%0.1fx faster)', [fStopWatchAlcinoe.Elapsed.TotalMilliseconds, fStopWatchDELPHI.Elapsed.TotalMilliseconds, fStopWatchDELPHI.Elapsed.TotalMilliseconds / fStopWatchAlcinoe.Elapsed.TotalMilliseconds], ALDefaultFormatSettingsW));
+    Writeln(ALFormatW('%0.0f ms for Alcinoe vs %0.0f ms for Delphi (%0.1fx faster)', [fStopWatchAlcinoe.Elapsed.TotalMilliseconds, fStopWatchDELPHI.Elapsed.TotalMilliseconds, fStopWatchDELPHI.Elapsed.TotalMilliseconds / fStopWatchAlcinoe.Elapsed.TotalMilliseconds], ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -871,7 +871,7 @@ end;
 procedure TALTestStrings.TestALFormatFloatA;
 begin
   //In Win32, delphi RTL use the fastcode ASM that we abandon in alcinoe so
-  //the result given by FormatFloat is often <> from the one given by ALFormatFloat
+  //the result given by FormatFloat is often <> from the one given by ALFormatFloatA
   {$IF defined(WIN64)}
   for var I := 0 to 100000 do begin
     Var LExtendedIn: Extended := ALRandom64(ALMaxInt64) / ALRandom64(ALMaxInt64);
@@ -938,7 +938,7 @@ begin
     var LAlcinoeFormat := AnsiString(LDelphiFormat);
 
     fStopWatchDELPHI.Start; {-} var LDelphiStrOut := FormatFloat(LDelphiFormat, LExtendedIn, LDelphiFormatSettings); {-} fStopWatchDELPHI.Stop;
-    fStopWatchAlcinoe.Start; {-} var LAlcinoeStrOut := ALFormatFloat(LAlcinoeFormat, LExtendedIn, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
+    fStopWatchAlcinoe.Start; {-} var LAlcinoeStrOut := ALFormatFloatA(LAlcinoeFormat, LExtendedIn, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
 
     if LDelphiStrOut <> String(LAlcinoeStrOut) then
       Assert.Fail;
@@ -953,7 +953,7 @@ end;
 procedure TALTestStrings.TestALFormatCurrA;
 begin
   //In Win32, delphi RTL use the fastcode ASM that we abandon in alcinoe so
-  //the result given by FormatFloat is often <> from the one given by ALFormatFloat
+  //the result given by FormatFloat is often <> from the one given by ALFormatFloatA
   {$IF defined(WIN64)}
   for var I := 0 to 100000 do begin
     Var LCurrencyIn: Currency := ALRandom32(ALMaxInt) / ALRandom32(ALMaxInt);
@@ -1020,7 +1020,7 @@ begin
     var LAlcinoeFormat := AnsiString(LDelphiFormat);
 
     fStopWatchDELPHI.Start; {-} var LDelphiStrOut := FormatCurr(LDelphiFormat, LCurrencyIn, LDelphiFormatSettings); {-} fStopWatchDELPHI.Stop;
-    fStopWatchAlcinoe.Start; {-} var LAlcinoeStrOut := ALFormatCurr(LAlcinoeFormat, LCurrencyIn, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
+    fStopWatchAlcinoe.Start; {-} var LAlcinoeStrOut := ALFormatCurrA(LAlcinoeFormat, LCurrencyIn, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
 
     if LDelphiStrOut <> String(LAlcinoeStrOut) then
       Assert.Fail;

@@ -26,21 +26,21 @@ uses
 function MergeInterfaceSrc(const AMasterSrc: AnsiString; const aCompareWithSrc: AnsiString): AnsiString;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  Procedure _InitSignatures(const aSrc: AnsiString; const aSignatures: TALStringList);
+  Procedure _InitSignatures(const aSrc: AnsiString; const aSignatures: TALStringListA);
   begin
-    var LSrcLst := TAlStringList.Create;
+    var LSrcLst := TALStringListA.Create;
     try
       LSrcLst.Text := aSrc;
       for var I := 0 to LSrcLst.Count - 1 do begin
         var LSrcLine := ALTrim(LSrcLst[i]);
         var LSignature: ansiString := '';
-        var LPropertyPos := ALposExIgnoreCase('property',LSrcLine); // {class} property GET: JHttpMethod read _GetGET;
-        var LfunctionPos := ALposExIgnoreCase('function',LSrcLine); // {class} function _GetINSTANCE: JCallbackManager_Factory; cdecl;
-        var LProcedurePos := ALposExIgnoreCase('procedure',LSrcLine); // procedure logInWithReadPermissions(fragment: Jfragment_app_Fragment; collection: JCollection); cdecl; overload;
-        var LinterfacePos := ALposExIgnoreCase(' = interface(',LSrcLine); // FBSDKGraphRequest = interface(NSObject)
-        var LGUIDPos := ALposExIgnoreCase('[''{',LSrcLine); // ['{C964E2C1-1500-4A35-B61D-02F46AF53B3C}']
-        var LMethodNamePos := ALposExIgnoreCase('[MethodName(''',LSrcLine); // [MethodName('initWithGraphPath:HTTPMethod:')]
-        var LENDPos := ALposExIgnoreCase('end;',LSrcLine); // end;
+        var LPropertyPos := ALPosIgnoreCaseA('property',LSrcLine); // {class} property GET: JHttpMethod read _GetGET;
+        var LfunctionPos := ALPosIgnoreCaseA('function',LSrcLine); // {class} function _GetINSTANCE: JCallbackManager_Factory; cdecl;
+        var LProcedurePos := ALPosIgnoreCaseA('procedure',LSrcLine); // procedure logInWithReadPermissions(fragment: Jfragment_app_Fragment; collection: JCollection); cdecl; overload;
+        var LinterfacePos := ALPosIgnoreCaseA(' = interface(',LSrcLine); // FBSDKGraphRequest = interface(NSObject)
+        var LGUIDPos := ALPosIgnoreCaseA('[''{',LSrcLine); // ['{C964E2C1-1500-4A35-B61D-02F46AF53B3C}']
+        var LMethodNamePos := ALPosIgnoreCaseA('[MethodName(''',LSrcLine); // [MethodName('initWithGraphPath:HTTPMethod:')]
+        var LENDPos := ALPosIgnoreCaseA('end;',LSrcLine); // end;
         if (LfunctionPos > 0) or (LProcedurePos > 0) or (LPropertyPos > 0) then begin
           if (LfunctionPos <= 0) then LfunctionPos := Maxint;
           if (LProcedurePos <= 0) then LProcedurePos := Maxint;
@@ -57,11 +57,11 @@ function MergeInterfaceSrc(const AMasterSrc: AnsiString; const aCompareWithSrc: 
             LfunctionPos := -1;
             LProcedurePos := -1;
           end;
-          if ((LfunctionPos > 0) or (LProcedurePos > 0)) and (alpos('; cdecl;', LSrcLine) <= 0) then raise Exception.Create('Error BD102BA5-D235-4A00-A3F4-612C8EE6DD71');
-          var LOpenBracketPos := ALpos('(', LSrcLine);
-          var LCloseBracketPos := ALpos(')', LSrcLine);
-          var LColonPos := ALpos(':', LSrcLine, max(LCloseBracketPos, 1));
-          var LSemiColonPos := ALpos(';', LSrcLine, max(LColonPos,1));
+          if ((LfunctionPos > 0) or (LProcedurePos > 0)) and (ALPosA('; cdecl;', LSrcLine) <= 0) then raise Exception.Create('Error BD102BA5-D235-4A00-A3F4-612C8EE6DD71');
+          var LOpenBracketPos := ALPosA('(', LSrcLine);
+          var LCloseBracketPos := ALPosA(')', LSrcLine);
+          var LColonPos := ALPosA(':', LSrcLine, max(LCloseBracketPos, 1));
+          var LSemiColonPos := ALPosA(';', LSrcLine, max(LColonPos,1));
           if LSemiColonPos <= 0 then raise Exception.Create('Error 22AD5097-FF70-47E5-B3E4-4B78BBE0FF08');
           var LNamePos: integer;
           if LfunctionPos > 0 then begin
@@ -81,7 +81,7 @@ function MergeInterfaceSrc(const AMasterSrc: AnsiString; const aCompareWithSrc: 
             LSignature := LSignature + ':' + ALTrim(ALcopyStr(LSrcLine,LNamePos,LOpenBracketPos-LNamePos)) + '~'; // procedure:logInWithReadPermissions~
             if LCloseBracketPos < LOpenBracketPos then raise Exception.Create('Error B8EBF18A-2AFC-4CF3-8FBE-3AF250A2B08A');
             var LParamsSrc := ALCopyStr(LSrcLine, LOpenBracketPos+1, LCloseBracketPos-LOpenBracketPos-1); // fragment: Jfragment_app_Fragment; collection: JCollection
-            var LParamsLst := TAlStringList.Create;
+            var LParamsLst := TALStringListA.Create;
             try
               LParamsLst.NameValueSeparator := ':';
               LParamsLst.LineBreak := ';';
@@ -107,9 +107,9 @@ function MergeInterfaceSrc(const AMasterSrc: AnsiString; const aCompareWithSrc: 
         end
         else if (LinterfacePos > 0) then begin
           LSignature := 'interface:' + ALTrim(ALcopyStr(LSrcLine,1,LinterfacePos)) + '~'; // interface:FBSDKGraphRequest~
-          var LOpenBracketPos := ALpos('(', LSrcLine);
+          var LOpenBracketPos := ALPosA('(', LSrcLine);
           if LOpenBracketPos < 0 then raise Exception.Create('Error 9CABF6BA-9A40-46F4-A00E-D1E7B637B5E2');
-          var LCloseBracketPos := ALpos(')', LSrcLine);
+          var LCloseBracketPos := ALPosA(')', LSrcLine);
           if LCloseBracketPos < LOpenBracketPos then raise Exception.Create('Error 370F8029-6BDB-4CE4-A009-52492A6B097A');
           LSignature := LSignature + '=' + ALCopyStr(LSrcLine, LOpenBracketPos+1, LCloseBracketPos-LOpenBracketPos-1); // interface:FBSDKGraphRequest~=NSObject
           aSignatures.Add(LSignature + '@' + LSrcLine);
@@ -134,8 +134,8 @@ function MergeInterfaceSrc(const AMasterSrc: AnsiString; const aCompareWithSrc: 
   end;
 
 begin
-  var LMasterSignatures := TALStringList.Create;
-  var LCompareWithSignatures := TALStringList.Create;
+  var LMasterSignatures := TALStringListA.Create;
+  var LCompareWithSignatures := TALStringListA.Create;
   try
     _InitSignatures(AMasterSrc, LMasterSignatures);
     _InitSignatures(aCompareWithSrc, LCompareWithSignatures);
@@ -188,7 +188,7 @@ begin
     SetMultiByteConversionCodePage(CP_UTF8);
 
     {$REGION 'create local objects'}
-    var LParamLst := TALStringListU.Create;
+    var LParamLst := TALStringListW.Create;
     {$ENDREGION}
 
     try
@@ -203,7 +203,7 @@ begin
       {$ENDREGION}
 
       {$REGION 'LAction=Copy'}
-      if ALSameText(LAction, 'copy') then begin
+      if ALSameTextA(LAction, 'copy') then begin
 
         {$REGION 'Init LPlatform'}
         var LPlatform := ALLowerCase(ansiString(LParamLst.Values['-Platform']));
@@ -229,17 +229,17 @@ begin
                               '*.framework', // SearchPattern: string;
                               TSearchOption.soAllDirectories); // const SearchOption: TSearchOption)
         for var LDirectory in LDirectories do begin
-          if (AlposExIgnoreCaseU('.xcframework', LDirectory) <= 0) or
-             ((LPlatform='ios') and (AlposExIgnoreCaseU('\ios-arm64\', LDirectory) > 0)) or
-             ((LPlatform='ios') and (AlposExIgnoreCaseU('\ios-arm64_armv7\', LDirectory) > 0)) then begin
-            var LdestDir := LFrameworksDir + '\' + ALExtractFileNameU(LDirectory);
+          if (ALPosIgnoreCaseW('.xcframework', LDirectory) <= 0) or
+             ((LPlatform='ios') and (ALPosIgnoreCaseW('\ios-arm64\', LDirectory) > 0)) or
+             ((LPlatform='ios') and (ALPosIgnoreCaseW('\ios-arm64_armv7\', LDirectory) > 0)) then begin
+            var LdestDir := LFrameworksDir + '\' + ALExtractFileName(LDirectory);
             if (TDirectory.Exists(LdestDir)) and
-               (not AlEmptyDirectoryU(LdestDir, true)) then RaiseLastOsError;
-            if not AlCopyDirectoryU(
+               (not AlEmptyDirectoryW(LdestDir, true)) then RaiseLastOsError;
+            if not AlCopyDirectoryW(
                  LDirectory, // SrcDirectory,
-                 LFrameworksDir + '\' + ALExtractFileNameU(LDirectory), // DestDirectory: ansiString;
+                 LFrameworksDir + '\' + ALExtractFileName(LDirectory), // DestDirectory: ansiString;
                  true) then // SubDirectory: Boolean;
-            raise Exception.Createfmt('Cannot copy %s to %s', [LDirectory, LFrameworksDir + '\' + ALExtractFileNameU(LDirectory)]);
+            raise Exception.Createfmt('Cannot copy %s to %s', [LDirectory, LFrameworksDir + '\' + ALExtractFileName(LDirectory)]);
           end;
         end;
         {$ENDREGION}
@@ -248,7 +248,7 @@ begin
       {$ENDREGION}
 
       {$REGION 'LAction=Compare'}
-      if ALSameText(LAction, 'Compare') then begin
+      if ALSameTextA(LAction, 'Compare') then begin
 
         {$REGION 'Init LMasterFile/LMasterSrc'}
         var LMasterFile := LParamLst.Values['-MasterFile'];
@@ -258,9 +258,9 @@ begin
         {$ENDREGION}
 
         {$REGION 'Init LOutputDir/LOutputSrc'}
-        var LOutputDir := ExpandFileName(ALTrimU(LParamLst.Values['-OutputDir']));
+        var LOutputDir := ExpandFileName(ALTrim(LParamLst.Values['-OutputDir']));
         if LOutputDir = '' then raise Exception.Create('OutputDir param is mandatory');
-        var LOutputCompareFile := LOutputDir + '\' + ALExtractFileNameU(LMasterFile);
+        var LOutputCompareFile := LOutputDir + '\' + ALExtractFileName(LMasterFile);
         var LOutputCompareSrc: AnsiString := '';
         if TFile.Exists(LOutputCompareFile) then Tfile.Delete(LOutputCompareFile);
         var LPasFiles := TDirectory.GetFiles(
@@ -278,54 +278,54 @@ begin
         //JAccessibilityServiceInfo = interface;//android.accessibilityservice.AccessibilityServiceInfo
         // =>
         //JAccessibilityServiceInfo = interface;
-        Var P1 := ALpos(' = interface;//', LOutputSrc);
+        Var P1 := ALPosA(' = interface;//', LOutputSrc);
         while P1 > 0 do begin
           Inc(P1, length(' = interface;'));
-          var P2 := ALpos(#13#10, LOutputSrc, P1);
+          var P2 := ALPosA(#13#10, LOutputSrc, P1);
           if P2 < P1 then raise Exception.Create('Error 7227FF98-D555-45BB-9CAC-B3FC59190F34');
           delete(LOutputSrc, P1, P2-P1);
-          P1 := ALpos(' = interface;//', LOutputSrc);
+          P1 := ALPosA(' = interface;//', LOutputSrc);
         end;
         //----
         //TRegTypes.RegisterType('c:\Dev\MagicFoundation\Alcinoe\Tools\NativeBridgeFileGenerator\Tmp\\JavaInterfaces.JAccessibilityServiceInfo', TypeInfo(c:\Dev\MagicFoundation\Alcinoe\Tools\NativeBridgeFileGenerator\Tmp\\JavaInterfaces.JAccessibilityServiceInfo));
         // =>
         //TRegTypes.RegisterType('Alcinoe.AndroidApi.Facebook.JAccessibilityServiceInfo', TypeInfo(Alcinoe.AndroidApi.Facebook.JAccessibilityServiceInfo));
-        P1 := ALpos('TRegTypes.RegisterType(''', LOutputSrc);
+        P1 := ALPosA('TRegTypes.RegisterType(''', LOutputSrc);
         while P1 > 0 do begin
           Inc(P1, length('TRegTypes.RegisterType('''));
-          var P2 := ALpos('''', LOutputSrc, P1);
+          var P2 := ALPosA('''', LOutputSrc, P1);
           while (P2 > P1) and (LOutputSrc[P2] <> '.') do dec(P2);
           if (P2 <= P1) then raise Exception.Create('Error 5CB01B8E-AD0B-45CF-B184-427E6EAE2EDB');
           delete(LOutputSrc, P1, P2-P1);
           insert(ALExtractFileName(ansiString(LMasterFile), true{RemoveFileExt}), LOutputSrc, P1);
-          P1 := ALpos('TRegTypes.RegisterType(''', LOutputSrc, P1+1);
+          P1 := ALPosA('TRegTypes.RegisterType(''', LOutputSrc, P1+1);
         end;
-        P1 := ALpos(''', TypeInfo(', LOutputSrc);
+        P1 := ALPosA(''', TypeInfo(', LOutputSrc);
         while P1 > 0 do begin
           Inc(P1, length(''', TypeInfo('));
-          var P2 := ALpos(')', LOutputSrc, P1);
+          var P2 := ALPosA(')', LOutputSrc, P1);
           while (P2 > P1) and (LOutputSrc[P2] <> '.') do dec(P2);
           if (P2 <= P1) then raise Exception.Create('Error 64C351FC-F46F-45E3-A002-E8B1562786C4');
           delete(LOutputSrc, P1, P2-P1);
           insert(ALExtractFileName(ansiString(LMasterFile), true{RemoveFileExt}), LOutputSrc, P1);
-          P1 := ALpos(''', TypeInfo(', LOutputSrc, P1+1);
+          P1 := ALPosA(''', TypeInfo(', LOutputSrc, P1+1);
         end;
         //----
         // : instancetype;
         //  =>
         // : Pointer {instancetype};
-        LOutputSrc := ALStringReplace(LOutputSrc, ': instancetype;', ': Pointer {instancetype};', [rfReplaceALL]);
+        LOutputSrc := ALStringReplaceA(LOutputSrc, ': instancetype;', ': Pointer {instancetype};', [rfReplaceALL]);
         //----
         // TCAAnimation = class(TOCGenericImport<CAAnimationClass, CAAnimation>)  end;
         //  =>
         // TCAAnimation = class(TOCGenericImport<CAAnimationClass, CAAnimation>) end;
-        LOutputSrc := ALStringReplace(LOutputSrc, '>)  end;', '>) end;', [rfReplaceALL]);
+        LOutputSrc := ALStringReplaceA(LOutputSrc, '>)  end;', '>) end;', [rfReplaceALL]);
         //----
         // : BOOL;
         //  =>
         // : Boolean;
-        LOutputSrc := ALStringReplace(LOutputSrc, ': BOOL;', ': Boolean;', [rfReplaceALL]);
-        LOutputSrc := ALStringReplace(LOutputSrc, ': BOOL)', ': Boolean)', [rfReplaceALL]);
+        LOutputSrc := ALStringReplaceA(LOutputSrc, ': BOOL;', ': Boolean;', [rfReplaceALL]);
+        LOutputSrc := ALStringReplaceA(LOutputSrc, ': BOOL)', ': Boolean)', [rfReplaceALL]);
         {$ENDREGION}
 
         {$REGION 'Use the same classname in outputsrc than in MasterSrc'}
@@ -333,37 +333,37 @@ begin
         //JMetadata = interface(JParcelable)
         //  ['{B008C3F4-A454-48CD-9DD2-BEF7DB9C313B}']
         //end;
-        P1 := ALpos('[JavaSignature(''', LMasterSrc);
+        P1 := ALPosA('[JavaSignature(''', LMasterSrc);
         while P1 > 0 do begin
           inc(P1, length('[JavaSignature('''));
-          var P2 := ALpos('''', LMasterSrc, P1+1);
+          var P2 := ALPosA('''', LMasterSrc, P1+1);
           if P2 <= P1 then raise Exception.Create('Error 3E1F807C-5D4E-47A4-A36D-662590F884A3');
           var LJavaSignature := ALCopyStr(LMasterSrc, P1, P2-P1); // com/google/android/exoplayer2/metadata/Metadata
-          P1 :=  ALpos(']', LMasterSrc, P1+1);
+          P1 :=  ALPosA(']', LMasterSrc, P1+1);
           if P1 <= 0 then raise Exception.Create('Error E6593142-7025-4F45-84ED-F145060B9968');
           inc(P1);
           while (P1 <= length(LMasterSrc)) and (LMasterSrc[P1] in [' ', #13, #10]) do inc(P1);
-          P2 := Alpos(' ', LMasterSrc, P1+1);
+          P2 := ALPosA(' ', LMasterSrc, P1+1);
           if P2 <= P1 then raise Exception.Create('Error CF359E96-E61E-4392-939E-117603144BB3');
           var LMasterClassName := ALCopyStr(LMasterSrc, P1, P2-P1); // JMetadata
-          P1 := ALpos('[JavaSignature(''', LMasterSrc,P1);
+          P1 := ALPosA('[JavaSignature(''', LMasterSrc,P1);
           //----
-          var P3 := Alpos('[JavaSignature('''+LJavaSignature+''')]', LOutputSrc);
+          var P3 := ALPosA('[JavaSignature('''+LJavaSignature+''')]', LOutputSrc);
           if P3 <= 0 then continue;
-          P3 :=  ALpos(']', LOutputSrc, P3+1);
+          P3 :=  ALPosA(']', LOutputSrc, P3+1);
           if P3 <= 0 then raise Exception.Create('Error 270E84AE-C86D-449E-B310-6AF8ADC59E07');
           inc(P3);
           while (P3 <= length(LOutputSrc)) and (LOutputSrc[P3] in [' ', #13, #10]) do inc(P3);
-          var P4 := Alpos(' ', LOutputSrc, P3+1);
+          var P4 := ALPosA(' ', LOutputSrc, P3+1);
           if P4 <= P3 then raise Exception.Create('Error 40FDDD0E-1AF0-4B75-9F21-BFBA2541D670');
           var LOutputClassName := ALCopyStr(LOutputSrc, P3, P4-P3); // JMetadata
           //----
-          if LMasterClassName <> LOutputClassName then LOutputSrc := ALStringReplace(LOutputSrc, LOutputClassName, LMasterClassName, [RfReplaceALL]);
+          if LMasterClassName <> LOutputClassName then LOutputSrc := ALStringReplaceA(LOutputSrc, LOutputClassName, LMasterClassName, [RfReplaceALL]);
         end;
         {$ENDREGION}
 
         {$REGION 'Make LOutputCompareSrc'}
-        var LMasterLst := TALStringList.Create;
+        var LMasterLst := TALStringListA.Create;
         try
           LMasterLst.Text := LMasterSrc;
           var I := 0;
@@ -380,40 +380,40 @@ begin
             end;
 
             //LMasterSrcLine= {**..**}
-            if alpos('{**', ALTrim(LMasterSrcLine)) = 1 then begin
+            if ALPosA('{**', ALTrim(LMasterSrcLine)) = 1 then begin
               LOutputCompareSrc := LOutputCompareSrc + LMasterSrcLine + #13#10;
               continue;
             end;
 
             //If the LMasterSrcLine is present in LOutputSrc
-            if (alposExIgnoreCase(' = interface(', LMasterSrcLine) > 0) and (ALpos(';',LMasterSrcLine) <= 0) then begin // FBSDKGraphRequest = interface(IObjectiveC)
-              var P2 := alpos('(', LMasterSrcLine); // FBSDKGraphRequest = interface(
-              P1 := ALPosExIgnoreCase(ALCopyStr(LMasterSrcLine,1,P2), LOutputSrc);
+            if (ALPosIgnoreCaseA(' = interface(', LMasterSrcLine) > 0) and (ALPosA(';',LMasterSrcLine) <= 0) then begin // FBSDKGraphRequest = interface(IObjectiveC)
+              var P2 := ALPosA('(', LMasterSrcLine); // FBSDKGraphRequest = interface(
+              P1 := ALPosIgnoreCaseA(ALCopyStr(LMasterSrcLine,1,P2), LOutputSrc);
             end
-            else if (alposExIgnoreCase(' = procedure(', LMasterSrcLine) > 0) and (ALpos(';',LMasterSrcLine) >= 0) then begin // FBSDKLoginManagerLoginResultBlock = procedure(result: FBSDKLoginManagerLoginResult; error: NSError) of object;
-              P1 := ALPosExIgnoreCase(LMasterSrcLine+#13#10, LOutputSrc);
+            else if (ALPosIgnoreCaseA(' = procedure(', LMasterSrcLine) > 0) and (ALPosA(';',LMasterSrcLine) >= 0) then begin // FBSDKLoginManagerLoginResultBlock = procedure(result: FBSDKLoginManagerLoginResult; error: NSError) of object;
+              P1 := ALPosIgnoreCaseA(LMasterSrcLine+#13#10, LOutputSrc);
               if P1 <= 0 then begin
-                var P2 := alpos('(', LMasterSrcLine); // FBSDKLoginManagerLoginResultBlock = procedure(
-                P1 := ALPosExIgnoreCase(ALCopyStr(LMasterSrcLine,1,P2), LOutputSrc);
+                var P2 := ALPosA('(', LMasterSrcLine); // FBSDKLoginManagerLoginResultBlock = procedure(
+                P1 := ALPosIgnoreCaseA(ALCopyStr(LMasterSrcLine,1,P2), LOutputSrc);
               end;
             end
             else begin
-              if (ALpos(';', LMasterSrcLine) = length(LMasterSrcLine)) then P1 := ALPosExIgnoreCase(LMasterSrcLine, LOutputSrc)
-              else P1 := ALPosExIgnoreCase(LMasterSrcLine+#13#10, LOutputSrc);
+              if (ALPosA(';', LMasterSrcLine) = length(LMasterSrcLine)) then P1 := ALPosIgnoreCaseA(LMasterSrcLine, LOutputSrc)
+              else P1 := ALPosIgnoreCaseA(LMasterSrcLine+#13#10, LOutputSrc);
             end;
             var P2: integer;
             if P1 > 0 then begin
 
               //LMasterSrcLine is an interface
-              if (alposExIgnoreCase(' = interface(', LMasterSrcLine) > 0) and (ALpos(';',LMasterSrcLine) <= 0) then begin
+              if (ALPosIgnoreCaseA(' = interface(', LMasterSrcLine) > 0) and (ALPosA(';',LMasterSrcLine) <= 0) then begin
                 var LMasterInterfaceSrc := LMasterSrcLine;
-                while Not AlSameText(ALTrim(LMasterLst[i]), 'end;') do begin
+                while Not ALSameTextA(ALTrim(LMasterLst[i]), 'end;') do begin
                   LMasterInterfaceSrc := LMasterInterfaceSrc + #13#10 + LMasterLst[i];
                   inc(i);
                 end;
                 LMasterInterfaceSrc := LMasterInterfaceSrc + #13#10 + LMasterLst[i];
                 inc(i);
-                P2 := alposExIgnoreCase('end;', LOutputSrc, P1);
+                P2 := ALPosIgnoreCaseA('end;', LOutputSrc, P1);
                 if P2 <= P1 then raise Exception.Create('Error 91074DDB-8328-45E7-BC44-E0FC375D499C');
                 inc(P2, length('end;'));
                 var LCompareWithInterfaceSrc := ALcopyStr(LOutputSrc, P1, P2-P1);
@@ -423,8 +423,8 @@ begin
 
               //LMasterSrcLine is anything else
               else begin
-                if (ALpos(';', LMasterSrcLine) = length(LMasterSrcLine)) then P2 := alpos(';', LOutputSrc, P1) + 1
-                else P2 := alpos(#13#10, LOutputSrc, P1);
+                if (ALPosA(';', LMasterSrcLine) = length(LMasterSrcLine)) then P2 := ALPosA(';', LOutputSrc, P1) + 1
+                else P2 := ALPosA(#13#10, LOutputSrc, P1);
                 if P2 <= P1 then raise Exception.Create('Error 9856CE29-C4A9-4CA4-91E1-702AF0909E5E');
                 LOutputCompareSrc := LOutputCompareSrc + ALcopyStr(LOutputSrc, P1, P2-P1) + #13#10;
                 delete(LOutputSrc, P1, P2 - P1);
@@ -434,8 +434,8 @@ begin
             else begin
 
               //LMasterSrcLine is an interface
-              if (alposExIgnoreCase(' = interface(', LMasterSrcLine) > 0) and (ALpos(';',LMasterSrcLine) <= 0) then begin
-                while Not AlSameText(ALTrim(LMasterLst[i]), 'end;') do begin
+              if (ALPosIgnoreCaseA(' = interface(', LMasterSrcLine) > 0) and (ALPosA(';',LMasterSrcLine) <= 0) then begin
+                while Not ALSameTextA(ALTrim(LMasterLst[i]), 'end;') do begin
                   inc(i);
                 end;
                 inc(i);
@@ -455,8 +455,8 @@ begin
         {$ENDREGION}
 
         {$REGION 'save LOutputCompare'}
-        while ALPos(#13#10#13#10#13#10, LOutputCompareSrc) > 0 do
-          LOutputCompareSrc := ALStringReplace(LOutputCompareSrc, #13#10#13#10#13#10, #13#10#13#10, [RfReplaceALL]);
+        while ALPosA(#13#10#13#10#13#10, LOutputCompareSrc) > 0 do
+          LOutputCompareSrc := ALStringReplaceA(LOutputCompareSrc, #13#10#13#10#13#10, #13#10#13#10, [RfReplaceALL]);
         ALSaveStringToFile(LOutputCompareSrc, LOutputCompareFile);
         {$ENDREGION}
 

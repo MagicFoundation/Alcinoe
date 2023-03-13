@@ -342,8 +342,8 @@ begin
     Var LText := '';
     if not Confetti.isRunning then LText := 'Pause - '
     else LText := 'Running - ';
-    LText := LText + ALinttostrU(Confetti.ParticuleCount) + ' particules - ';
-    LText := LText + ALFormatFloatU('0.##', LAverageFPS, alDefaultFormatSettingsU) + ' fps';
+    LText := LText + ALIntToStrW(Confetti.ParticuleCount) + ' particules - ';
+    LText := LText + ALFormatFloatW('0.##', LAverageFPS, ALDefaultFormatSettingsW) + ' fps';
     StatusBarLabel.Text := LText;
   end;
 end;
@@ -362,19 +362,19 @@ procedure TTMainForm.BtnFireCustomConfigClick(Sender: TObject);
 
 begin
   Confetti.Fire(
-    ALStrToFloatDefU(ConfigMemo.Lines.Values['OriginX'], 0.5, ALDefaultFormatSettingsU), // const AOriginX: Single = 0.5; // The x position on the page where to start firing confetti from, with 0 being the left edge and 1 being the right edge.
-    ALStrToFloatDefU(ConfigMemo.Lines.Values['OriginY'], 0.5, ALDefaultFormatSettingsU), // const AOriginY: Single = 0.5; // The y position on the page where to start firing confetti from, with 0 being the top edge and 1 being the bottom edge.
-    ALStrToIntDefU(ConfigMemo.Lines.Values['ParticleCount'], 50), // const AParticleCount: Integer = 50; // The number of confetti to launch. More is always fun... but be cool, there's a lot of math involved.
-    ALStrToFloatDefU(ConfigMemo.Lines.Values['Angle'], 90, ALDefaultFormatSettingsU), // const AAngle: Single = 90; // The angle in which to launch the confetti, in degrees. 90 is straight up.
-    ALStrToFloatDefU(ConfigMemo.Lines.Values['Spread'], 45, ALDefaultFormatSettingsU), // const ASpread: Single = 45; // How far off center the confetti can go, in degrees. 45 means the confetti will launch at the defined angle plus or minus 22.5 degrees.
-    ALStrToFloatDefU(ConfigMemo.Lines.Values['StartVelocity'], 45, ALDefaultFormatSettingsU), // const AStartVelocity: Single = 45; // How fast the confetti will start going, in pixels.
+    ALStrToFloatDef(ConfigMemo.Lines.Values['OriginX'], 0.5, ALDefaultFormatSettingsW), // const AOriginX: Single = 0.5; // The x position on the page where to start firing confetti from, with 0 being the left edge and 1 being the right edge.
+    ALStrToFloatDef(ConfigMemo.Lines.Values['OriginY'], 0.5, ALDefaultFormatSettingsW), // const AOriginY: Single = 0.5; // The y position on the page where to start firing confetti from, with 0 being the top edge and 1 being the bottom edge.
+    ALStrToIntDef(ConfigMemo.Lines.Values['ParticleCount'], 50), // const AParticleCount: Integer = 50; // The number of confetti to launch. More is always fun... but be cool, there's a lot of math involved.
+    ALStrToFloatDef(ConfigMemo.Lines.Values['Angle'], 90, ALDefaultFormatSettingsW), // const AAngle: Single = 90; // The angle in which to launch the confetti, in degrees. 90 is straight up.
+    ALStrToFloatDef(ConfigMemo.Lines.Values['Spread'], 45, ALDefaultFormatSettingsW), // const ASpread: Single = 45; // How far off center the confetti can go, in degrees. 45 means the confetti will launch at the defined angle plus or minus 22.5 degrees.
+    ALStrToFloatDef(ConfigMemo.Lines.Values['StartVelocity'], 45, ALDefaultFormatSettingsW), // const AStartVelocity: Single = 45; // How fast the confetti will start going, in pixels.
     _StrToColors(ConfigMemo.Lines.Values['Colors']), // const AColors: TArray<TalphaColor> = []; // An array of color strings, in the HEX format... you know, like #bada55.
     _StrToShapes(ConfigMemo.Lines.Values['Shapes']), // const AShapes: TArray<TParticule.TShape> = []; // An array of shapes for the confetti. The possible values are square and circle. The default is to use both shapes in an even mix. You can even change the mix by providing a value such as ['circle', 'circle', 'square'] to use two third circles and one third squares.
-    ALStrToFloatDefU(ConfigMemo.Lines.Values['Ticks'], 200, ALDefaultFormatSettingsU), // const ATicks: Single = 200; // How many times the confetti will move. This is abstract... but play with it if the confetti disappear too quickly for you.
-    ALStrToFloatDefU(ConfigMemo.Lines.Values['Decay'], 0.9, ALDefaultFormatSettingsU), // const ADecay: Single = 0.9; // How quickly the confetti will lose speed. Keep this number between 0 and 1, otherwise the confetti will gain speed. Better yet, just never change it.
-    ALStrToFloatDefU(ConfigMemo.Lines.Values['Gravity'], 1, ALDefaultFormatSettingsU), // const AGravity: Single = 1; // How quickly the particles are pulled down. 1 is full gravity, 0.5 is half gravity, etc., but there are no limits. You can even make particles go up if you'd like.
-    ALStrToFloatDefU(ConfigMemo.Lines.Values['Drift'], 0, ALDefaultFormatSettingsU), // const ADrift: Single = 0; // How much to the side the confetti will drift. The default is 0, meaning that they will fall straight down. Use a negative number for left and positive number for right.
-    ALStrToFloatDefU(ConfigMemo.Lines.Values['Scalar'], 1, ALDefaultFormatSettingsU)); // const AScalar: Single = 1)
+    ALStrToFloatDef(ConfigMemo.Lines.Values['Ticks'], 200, ALDefaultFormatSettingsW), // const ATicks: Single = 200; // How many times the confetti will move. This is abstract... but play with it if the confetti disappear too quickly for you.
+    ALStrToFloatDef(ConfigMemo.Lines.Values['Decay'], 0.9, ALDefaultFormatSettingsW), // const ADecay: Single = 0.9; // How quickly the confetti will lose speed. Keep this number between 0 and 1, otherwise the confetti will gain speed. Better yet, just never change it.
+    ALStrToFloatDef(ConfigMemo.Lines.Values['Gravity'], 1, ALDefaultFormatSettingsW), // const AGravity: Single = 1; // How quickly the particles are pulled down. 1 is full gravity, 0.5 is half gravity, etc., but there are no limits. You can even make particles go up if you'd like.
+    ALStrToFloatDef(ConfigMemo.Lines.Values['Drift'], 0, ALDefaultFormatSettingsW), // const ADrift: Single = 0; // How much to the side the confetti will drift. The default is 0, meaning that they will fall straight down. Use a negative number for left and positive number for right.
+    ALStrToFloatDef(ConfigMemo.Lines.Values['Scalar'], 1, ALDefaultFormatSettingsW)); // const AScalar: Single = 1)
 end;
 
 end.

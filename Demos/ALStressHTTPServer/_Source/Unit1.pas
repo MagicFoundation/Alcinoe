@@ -175,7 +175,7 @@ type
     StopOnError: Boolean;
     DoLikeaSpider: Boolean;
     DelayBetweenEachCall: integer;
-    LstUrl: TAlAVLstringList;
+    LstUrl: TALAVLStringListA;
     MaxHttpRequest: Integer;
     Rank: integer;
     procedure Execute; override;
@@ -357,7 +357,7 @@ begin
       if not On then begin
         dec(NBActiveThread);
         StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(NBActiveThread);
-        TableViewThread.DataController.SetValue(rank-1,TableViewThreadNumber.Index,ALIntToStr(rank) + ' (off)');
+        TableViewThread.DataController.SetValue(rank-1,TableViewThreadNumber.Index,ALIntToStrA(rank) + ' (off)');
         if NBActiveThread = 0 then begin
           ButtonStart.Tag := 0;
           ButtonStart.Caption := 'Start';
@@ -438,7 +438,7 @@ begin
 
   StatusBar1.Panels[1].Text := '';
   for i := 1 to StrToInt(EditNbThread.Text) do begin
-    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,ALIntToStr(i) + ' (on)');
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,ALIntToStrA(i) + ' (on)');
     TableViewThread.DataController.SetValue(i-1,TableViewThreadRequestCount.Index,0);
     aStressHttpThread := TStressHttpThread.Create(True, i);
     aStressHttpThread.lstUrl.NameValueSeparator := #1;
@@ -468,7 +468,7 @@ begin
   doLikeASpider := False;
   StopOnError := False;
   DelayBetweenEachCall := 0;
-  LstUrl := TALAVLstringList.Create;
+  LstUrl := TALAVLStringListA.Create;
   LstUrl.Duplicates := DupIgnore;
   lstUrl.NameValueSeparator := #1;
   MaxHttpRequest := 0;
@@ -561,11 +561,11 @@ begin
           RequestHeader.RawHeaderText := Form1.HttpClientRawHeaderText;
         end;
 
-        aResponseContentStream:= TALStringStream.create('');
+        aResponseContentStream:= TALStringStreamA.create('');
         aResponseContentHeader := TALHTTPResponseHeader.Create;
         try
           aHttpClient.Get(fUrl, aResponseContentStream, aResponseContentHeader);
-          aBody := TALStringStream(aResponseContentStream).datastring;
+          aBody := TALStringStreamA(aResponseContentStream).datastring;
           FRequestStatus := aResponseContentHeader.StatusCode;
         finally
           aResponseContentStream.free;
@@ -578,44 +578,44 @@ begin
           aLowerCaseBody := AlLowerCase(aBody);
           aHostName := 'http://' + AlLowerCase(AlExtractHostNameFromUrl(fUrl));
 
-          P1 := Alpos('href=''http://',aLowerCaseBody);
+          P1 := ALPosA('href=''http://',aLowerCaseBody);
           while P1 > 0 do begin
             inc(p1,5);
-            P2 := AlPosEx('''',aLowerCaseBody, P1 + 1);
+            P2 := ALPosA('''',aLowerCaseBody, P1 + 1);
             if P2 > P1 then atmpurl := ALHTMLDecode(AlCopyStr(aBody, P1+1, P2 - P1 - 1))
             else break;
-            if (AlPos(aHostName, alLowerCase(atmpUrl))=1) then LstUrl.Add(atmpUrl);
-            P1 := AlposEx('href=''http://',aLowerCaseBody, P2+ 1);
+            if (ALPosA(aHostName, alLowerCase(atmpUrl))=1) then LstUrl.Add(atmpUrl);
+            P1 := ALPosA('href=''http://',aLowerCaseBody, P2+ 1);
           end;
 
-          P1 := Alpos('href="http://',aLowerCaseBody);
+          P1 := ALPosA('href="http://',aLowerCaseBody);
           while P1 > 0 do begin
             inc(p1,5);
-            P2 := AlPosEx('"',aLowerCaseBody, P1 + 1);
+            P2 := ALPosA('"',aLowerCaseBody, P1 + 1);
             if P2 > P1 then atmpurl := ALHTMLDecode(AlCopyStr(aBody, P1+1, P2 - P1 - 1))
             else break;
-            if (AlPos(aHostName, alLowerCase(atmpUrl))=1) then LstUrl.Add(atmpUrl);
-            P1 := AlposEx('href="http://',aLowerCaseBody, P2+ 1);
+            if (ALPosA(aHostName, alLowerCase(atmpUrl))=1) then LstUrl.Add(atmpUrl);
+            P1 := ALPosA('href="http://',aLowerCaseBody, P2+ 1);
           end;
 
-          P1 := Alpos('href=''/',aLowerCaseBody);
+          P1 := ALPosA('href=''/',aLowerCaseBody);
           while P1 > 0 do begin
             inc(p1,5);
-            P2 := AlPosEx('''',aLowerCaseBody, P1 + 1);
+            P2 := ALPosA('''',aLowerCaseBody, P1 + 1);
             if P2 > P1+2 then atmpurl := aHostName + ALHTMLDecode(AlCopyStr(aBody, P1+1, P2 - P1 - 1))
             else break;
-            if (AlPos(aHostName, alLowerCase(atmpUrl))=1) then LstUrl.Add(atmpUrl);
-            P1 := AlposEx('href=''/',aLowerCaseBody, P2+ 1);
+            if (ALPosA(aHostName, alLowerCase(atmpUrl))=1) then LstUrl.Add(atmpUrl);
+            P1 := ALPosA('href=''/',aLowerCaseBody, P2+ 1);
           end;
 
-          P1 := Alpos('href="/',aLowerCaseBody);
+          P1 := ALPosA('href="/',aLowerCaseBody);
           while P1 > 0 do begin
             inc(p1,5);
-            P2 := AlPosEx('"',aLowerCaseBody, P1 + 1);
+            P2 := ALPosA('"',aLowerCaseBody, P1 + 1);
             if P2 > P1+2 then atmpurl := aHostName + ALHTMLDecode(AlCopyStr(aBody, P1+1, P2 - P1 - 1))
             else break;
-            if (AlPos(aHostName, alLowerCase(atmpUrl))=1) then LstUrl.Add(atmpUrl);
-            P1 := AlposEx('href="/',aLowerCaseBody, P2+ 1);
+            if (ALPosA(aHostName, alLowerCase(atmpUrl))=1) then LstUrl.Add(atmpUrl);
+            P1 := ALPosA('href="/',aLowerCaseBody, P2+ 1);
           end;
 
         end;

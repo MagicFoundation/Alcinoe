@@ -42,7 +42,7 @@ type
     procedure ButtonGenerate100000NodeWithXmlDocumentClick(Sender: TObject);
     procedure ALXMLDocumentSaxModeParseComment(Sender: TObject; const Path, Str: AnsiString);
     procedure ALXMLDocumentSaxModeParseProcessingInstruction(Sender: TObject; const Path, Target, Data: AnsiString);
-    procedure ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Path, Name: AnsiString; Attributes: TALStrings);
+    procedure ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Path, Name: AnsiString; Attributes: TALStringsA);
     procedure ALXMLDocumentSaxModeParseText(Sender: TObject; const Path, Str: AnsiString);
     procedure ButtonParseXMLWithALXmlDocumentInSaxModeClick(Sender: TObject);
   private
@@ -179,9 +179,9 @@ begin
         MemoLoadXmlWithALXmlDocument.Lines.Add('Number of nodes created: ' + IntToStr(aNodeCount));
         MemoLoadXmlWithALXmlDocument.Lines.Add('Time to load and scroll all nodes: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
         aStartDate := GetTickCount;
-        aALXMLDocument.SaveToFile(ALGetModulePath + 'sample.xml');
+        aALXMLDocument.SaveToFile(ALGetModulePathA + 'sample.xml');
         MemoLoadXmlWithALXmlDocument.Lines.Add('Time to save the xml to disk: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
-        ALDeleteFile(ALGetModulePath + 'sample.xml');
+        ALDeleteFile(ALGetModulePathA + 'sample.xml');
       finally
         aALXMLDocument.Free;
       end;
@@ -216,9 +216,9 @@ begin
       MemoLoadXmlWithXmlDocument.Lines.Add('Number of nodes created: ' + IntToStr(aNodeCount));
       MemoLoadXmlWithXmlDocument.Lines.Add('Time to load and scroll all nodes: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
       aStartDate := GetTickCount;
-      aXMLDocument.SaveToFile(String(ALGetModulePath + 'sample.xml'));
+      aXMLDocument.SaveToFile(String(ALGetModulePathA + 'sample.xml'));
       MemoLoadXmlWithXmlDocument.Lines.Add('Time to save the xml to disk: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
-      ALDeleteFile(ALGetModulePath + 'sample.xml');
+      ALDeleteFile(ALGetModulePathA + 'sample.xml');
 
     except
       on E: Exception do
@@ -248,12 +248,12 @@ begin
       aALXMLDocument.Active := True;
       aALXMLDocument.AddChild('root');
       For k := 1 to 1000 do begin
-        aNewRec := aALXMLDocument.DocumentElement.AddChild(alRandomStr(8));
-        aNewrec.Attributes[alRandomStr(8)] := alRandomStr(25);
-        aNewrec.Attributes[alRandomStr(8)] := alRandomStr(25);
+        aNewRec := aALXMLDocument.DocumentElement.AddChild(ALRandomStrA(8));
+        aNewrec.Attributes[ALRandomStrA(8)] := ALRandomStrA(25);
+        aNewrec.Attributes[ALRandomStrA(8)] := ALRandomStrA(25);
         For i := 1 to 100 do begin
-          aValueRec := aNewRec.AddChild(alRandomStr(8));
-          aValueRec.Text := alRandomStr(25);
+          aValueRec := aNewRec.AddChild(ALRandomStrA(8));
+          aValueRec.Text := ALRandomStrA(25);
         end;
       end;
 
@@ -261,9 +261,9 @@ begin
       MemoGenerate100000NodeWithAlXmlDocument.Lines.Add('Time to create all nodes: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
 
       aStartDate := GetTickCount;
-      aALXMLDocument.SaveToFile(ALGetModulePath + 'sample.xml');
+      aALXMLDocument.SaveToFile(ALGetModulePathA + 'sample.xml');
       MemoGenerate100000NodeWithAlXmlDocument.Lines.Add('Time to save the xml to disk: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
-      ALDeleteFile(ALGetModulePath + 'sample.xml');
+      ALDeleteFile(ALGetModulePathA + 'sample.xml');
 
     finally
       aALXMLDocument.Free;
@@ -293,21 +293,21 @@ begin
       aXMLDocument.Active := true;
       aXMLDocument.AddChild('root');
       For k := 1 to 1000 do begin
-        aNewRec := aXMLDocument.DocumentElement.AddChild(alRandomStrU(8));
-        aNewrec.Attributes[alRandomStrU(8)] := alRandomStrU(25);
-        aNewrec.Attributes[alRandomStrU(8)] := alRandomStrU(25);
+        aNewRec := aXMLDocument.DocumentElement.AddChild(ALRandomStrW(8));
+        aNewrec.Attributes[ALRandomStrW(8)] := ALRandomStrW(25);
+        aNewrec.Attributes[ALRandomStrW(8)] := ALRandomStrW(25);
         For i := 1 to 100 do begin
-          aValueRec := aNewRec.AddChild(alRandomStrU(8));
-          aValueRec.Text := alRandomStrU(25);
+          aValueRec := aNewRec.AddChild(ALRandomStrW(8));
+          aValueRec.Text := ALRandomStrW(25);
         end;
       end;
       MemoGenerate100000NodeWithXmlDocument.Lines.Add('Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
       MemoGenerate100000NodeWithXmlDocument.Lines.Add('Time to create all nodes: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
 
       aStartDate := GetTickCount;
-      aXMLDocument.SaveToFile(string(ALGetModulePath + 'sample.xml'));
+      aXMLDocument.SaveToFile(string(ALGetModulePathA + 'sample.xml'));
       MemoGenerate100000NodeWithXmlDocument.Lines.Add('Time to save the xml to disk: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
-      ALDeleteFile(ALGetModulePath + 'sample.xml');
+      ALDeleteFile(ALGetModulePathA + 'sample.xml');
 
   except
     on E: Exception do
@@ -328,7 +328,7 @@ begin
 end;
 
 {****************************************************************************************************************************}
-procedure TForm1.ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Path, Name: AnsiString; Attributes: TALStrings);
+procedure TForm1.ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Path, Name: AnsiString; Attributes: TALStringsA);
 begin
   FNodeCount := FNodeCount + 2 * (Attributes.Count) + 1;
 end;

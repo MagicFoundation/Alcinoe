@@ -142,7 +142,7 @@ type
     FDownloadSpeedBytesRead: Integer;
     FDownloadSpeedBytesNotRead: Integer;
     fMustinitWinHTTPClient: Boolean;
-    FHTTPResponseStream: TALStringStream;
+    FHTTPResponseStream: TALStringStreamA;
     procedure initWinHTTPClient;
     function AnsiStrTo8bitUnicodeString(s: AnsiString): String;
   public
@@ -244,7 +244,7 @@ begin
     WINHTTP_CALLBACK_STATUS_SENDREQUEST_COMPLETE: StatusStr := 'The request completed successfully';
     WINHTTP_CALLBACK_STATUS_WRITE_COMPLETE: StatusStr := 'Data was successfully written to the server';
     else
-      StatusStr := 'Unknown status: ' + ALIntToStr(InternetStatus);
+      StatusStr := 'Unknown status: ' + ALIntToStrA(InternetStatus);
    end;
 
  MainStatusBar.Panels[0].Text := String(StatusStr);
@@ -431,10 +431,10 @@ end;
 {************************************************}
 procedure TForm1.ButtonPostClick(Sender: TObject);
 Var AHTTPResponseHeader: TALHTTPResponseHeader;
-    ARawPostDatastream: TALStringStream;
+    ARawPostDatastream: TALStringStreamA;
     AMultiPartFormDataFile: TALMultiPartFormDataContent;
     AMultiPartFormDataFiles: TALMultiPartFormDataContents;
-    aTmpPostDataString: TALStrings;
+    aTmpPostDataString: TALStringsA;
     i: Integer;
 begin
   MainStatusBar.Panels[0].Text := '';
@@ -445,7 +445,7 @@ begin
   MemoResponseRawHeader.Lines.Clear;
   AHTTPResponseHeader := TALHTTPResponseHeader.Create;
   AMultiPartFormDataFiles := TALMultiPartFormDataContents.Create(true);
-  aTmpPostDataString := TALStringList.Create;
+  aTmpPostDataString := TALStringListA.Create;
   try
     fHTTPResponseStream.Size := 0;
     Try
@@ -487,7 +487,7 @@ begin
                                                                                 True)
         else begin
 
-          ARawPostDatastream := TALStringStream.create(aTmpPostDataString.text);
+          ARawPostDatastream := TALStringStreamA.create(aTmpPostDataString.text);
           try
 
             FWinHttpClient.post(AnsiString(editURL.Text),
@@ -523,10 +523,10 @@ end;
 {***********************************************}
 procedure TForm1.ButtonPutClick(Sender: TObject);
 Var AHTTPResponseHeader: TALHTTPResponseHeader;
-    ARawPutDatastream: TALStringStream;
+    ARawPutDatastream: TALStringStreamA;
     AMultiPartFormDataFile: TALMultiPartFormDataContent;
     AMultiPartFormDataFiles: TALMultiPartFormDataContents;
-    aTmpPutDataString: TALStrings;
+    aTmpPutDataString: TALStringsA;
     i: Integer;
 begin
   MainStatusBar.Panels[0].Text := '';
@@ -537,7 +537,7 @@ begin
   MemoResponseRawHeader.Lines.Clear;
   AHTTPResponseHeader := TALHTTPResponseHeader.Create;
   AMultiPartFormDataFiles := TALMultiPartFormDataContents.Create(true);
-  aTmpPutDataString := TALStringList.Create;
+  aTmpPutDataString := TALStringListA.Create;
   try
     fHTTPResponseStream.Size := 0;
     Try
@@ -579,7 +579,7 @@ begin
         //                                                                       True)
         //else begin
 
-          ARawPutDatastream := TALStringStream.create(aTmpPutDataString.text);
+          ARawPutDatastream := TALStringStreamA.create(aTmpPutDataString.text);
           try
 
             FWinHttpClient.Put(AnsiString(editURL.Text),
@@ -643,7 +643,7 @@ procedure TForm1.FormCreate(Sender: TObject);
 begin
   fMustinitWinHTTPClient := True;
   FWinHttpClient := TaLWinHttpClient.Create;
-  fHTTPResponseStream := TALStringStream.Create('');
+  fHTTPResponseStream := TALStringStreamA.Create('');
   with FWinHttpClient do begin
     AccessType := wHttpAt_NO_PROXY;
     InternetOptions := [];

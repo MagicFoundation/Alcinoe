@@ -80,7 +80,7 @@ type
     FBadge: integer;
     FFirebaseMessaging: TALFirebaseMessaging;
     procedure onFCMTokenRefresh(const aToken: String);
-    procedure onFCMMessageReceived(const aPayload: TAlStringListU);
+    procedure onFCMMessageReceived(const aPayload: TALStringListW);
     procedure OnAuthorizationRefused(Sender: TObject);
     procedure OnAuthorizationGranted(Sender: TObject);
     procedure ShowLog(const aLog: String);
@@ -205,7 +205,7 @@ begin
 end;
 
 {********************************************************************}
-procedure TForm1.onFCMMessageReceived(const aPayload: TAlStringListU);
+procedure TForm1.onFCMMessageReceived(const aPayload: TALStringListW);
 begin
   ALLog('onFCMMessageReceived', aPayload.Text);
   ShowLog('onFCMMessageReceived'#13#10+aPayload.Text);
@@ -227,7 +227,7 @@ end;
 {******************************************}
 procedure TForm1.ShowLog(const aLog: String);
 begin
-  MemoLog.text := ALTrimU(aLog) + #13#10 +
+  MemoLog.text := ALTrim(aLog) + #13#10 +
                   #13#10 +
                   '------------------------'#13#10 +
                   #13#10 +
@@ -303,7 +303,7 @@ begin
                          '"apns":{'+
                            '"payload":{'+
                              '"aps":{'+
-                               '"badge": '+ALIntTostrU(FBadge)+
+                               '"badge": '+ALIntToStrW(FBadge)+
                              '}'+
                            '}'+
                          '}'+
@@ -362,7 +362,7 @@ begin
                          '"apns":{'+
                            '"payload":{'+
                              '"aps":{'+
-                               '"badge": '+ALIntTostrU(FBadge)+
+                               '"badge": '+ALIntToStrW(FBadge)+
                              '}'+
                            '}'+
                          '},'+

@@ -79,7 +79,7 @@ type
   Public
     PhpRunnerEngine: TAlPHPRunnerEngine;
     NbCycle: Integer;
-    serverVariable: TALStrings;
+    serverVariable: TALStringsA;
     Destructor Destroy; override;
     procedure Execute; override;
   end;
@@ -101,15 +101,15 @@ Uses Alcinoe.MultiPartParser,
 {***************************************************}
 procedure TForm1.ButtonExecuteClick(Sender: TObject);
 Var AResponseHeader: TALHTTPResponseHeader;
-    AResponseStream: TALStringStream;
+    AResponseStream: TALStringStreamA;
     aPhpRunnerEngine: TalPhpRunnerEngine;
-    aServerVariablesLst: TalStringList;
+    aServerVariablesLst: TALStringListA;
 begin
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
   AResponseHeader := TALHTTPResponseHeader.Create;
-  AResponseStream := TALStringStream.Create('');
-  aServerVariablesLst:= TalStringList.Create;
+  AResponseStream := TALStringStreamA.Create('');
+  aServerVariablesLst:= TALStringListA.Create;
   try
     try
       if RadioButtonPhpCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpCgiRunnerEngine.Create(AnsiString(EditPhpCGIPath.Text))
@@ -142,15 +142,15 @@ end;
 {******************************************************}
 procedure TForm1.ButtonInitAndGetClick(Sender: TObject);
 Var AResponseHeader: TALHTTPResponseHeader;
-    AResponseStream: TALStringStream;
+    AResponseStream: TALStringStreamA;
    aPhpRunnerEngine: TalPhpRunnerEngine;
-    aServerVariablesLst: TalStringList;
+    aServerVariablesLst: TALStringListA;
 begin
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
   AResponseHeader := TALHTTPResponseHeader.Create;
-  AResponseStream := TALStringStream.Create('');
-  aServerVariablesLst:= TalStringList.Create;
+  AResponseStream := TALStringStreamA.Create('');
+  aServerVariablesLst:= TALStringListA.Create;
   try
     try
       MemoServerVariables.Lines.Values['REQUEST_METHOD'] := 'GET';
@@ -191,7 +191,7 @@ end;
 procedure TForm1.ButtonOpenInExplorerClick(Sender: TObject);
 Var AFullPath: AnsiString;
 begin
-  AFullPath := ALGetModulePath + '~tmp.html';
+  AFullPath := ALGetModulePathA + '~tmp.html';
   MemoContentBody.Lines.SaveToFile(String(AFullPath));
   ShellExecuteA(0,'OPEN',PAnsiChar(AFullPath),nil,nil,SW_SHOW)
 end;
@@ -199,17 +199,17 @@ end;
 {*******************************************************}
 procedure TForm1.ButtonInitAndPostClick(Sender: TObject);
 Var AResponseHeader: TALHTTPResponseHeader;
-    AResponseStream: TALStringStream;
+    AResponseStream: TALStringStreamA;
     aPhpRunnerEngine: TalPhpRunnerEngine;
-    aServerVariablesLst: TalStringList;
-    APostDataStrings: TalStringList;
+    aServerVariablesLst: TALStringListA;
+    APostDataStrings: TALStringListA;
 begin
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
   AResponseHeader := TALHTTPResponseHeader.Create;
-  AResponseStream := TALStringStream.Create('');
-  aServerVariablesLst:= TalStringList.Create;
-  APostDataStrings:= TalStringList.Create;
+  AResponseStream := TALStringStreamA.Create('');
+  aServerVariablesLst:= TALStringListA.Create;
+  APostDataStrings:= TALStringListA.Create;
   try
     Try
 
@@ -287,7 +287,7 @@ begin
       if RadioButtonPhpCGIRunnerEngineKind.Checked then aBenchThread.PhpRunnerEngine := TalPhpCgiRunnerEngine.Create(AnsiString(EditPhpCGIPath.Text))
       else if RadioButtonPhpNamedPipeFastCGIRunnerEngineKind.Checked then aBenchThread.PhpRunnerEngine := aPhpNamedPipeFastCgiManager
       else aBenchThread.PhpRunnerEngine := TalPhpSocketFastCgiRunnerEngine.Create(AnsiString(EditPhpFastCgiHost.Text), StrToInt(EditPhpFastCgiPort.text));
-      aBenChThread.serverVariable := TALStringList.Create;
+      aBenChThread.serverVariable := TALStringListA.Create;
       aBenChThread.serverVariable.Assign(MemoServerVariables.Lines);
       aBenchThread.NbCycle := StrToInt(EditCycleCount.Text);
       aBenchThread.FreeOnTerminate := True;
@@ -314,7 +314,7 @@ end;
 {*****************************}
 procedure TBenchThread.Execute;
 Var AResponseHeader: TALHTTPResponseHeader;
-    AResponseStream: TALStringStream;
+    AResponseStream: TALStringStreamA;
     i: integer;
 begin
   Try
@@ -324,7 +324,7 @@ begin
       Try
 
         AResponseHeader := TALHTTPResponseHeader.Create;
-        AResponseStream := TALStringStream.Create('');
+        AResponseStream := TALStringStreamA.Create('');
         try
           PhpRunnerEngine.Execute(serverVariable,
                                   nil,

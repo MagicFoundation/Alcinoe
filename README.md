@@ -332,12 +332,12 @@ Learn more at [{alcinoe}\Demos\ALFmxFilterEffects](https://github.com/MagicFound
 Json Parser
 -----------
 
-TALJsonDocument is a Delphi parser/writer for JSON / BSON data
+TALJSONDocumentA is a Delphi parser/writer for JSON / BSON data
 format. it's support DOM and SAX parser (Note a better name could 
 be SAJ for Simple API for JSON instead of SAX for Simple API for XML 
 but as the concept of SAX is well know I keep this name), support 
 BSON format, and use a similar syntax than TALXMLDocument / TXMLDocument.
-TALJsonDocument can also export Json / Bson data in TALStringList.
+TALJSONDocumentA can also export Json / Bson data in TALStringListA.
 
 Example :
 
@@ -455,13 +455,13 @@ poll the server for a reply. Learn more at [{alcinoe}\Demos\ALWinHTTPWebSocketCl
 Fast TStringList
 ----------------
 
-TALStringList Work the same as Delphi TStringList except that it's
+TALStringListA Work the same as Delphi TStringList except that it's
 allow to search a name=value using a quicksort algorithm when the
-list is sorted. Also TALStringList use a locale independent
+list is sorted. Also TALStringListA use a locale independent
 algorithm (based on the 8-bit ordinal value of each character)
 instead of the AnsiCompareText and AnsiCompareStr used by the
-Delphi TStringList. at the end the sort in TALStringList is up to
-10x more faster than in Delphi TStringList. Also TALStringList is
+Delphi TStringList. at the end the sort in TALStringListA is up to
+10x more faster than in Delphi TStringList. Also TALStringListA is
 not an Unicode TStringList but an 100% Ansi StringList. You can 
 start exploring this feature with the demo located at 
 [{alcinoe}\Demos\ALSortedListBenchmark](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALSortedListBenchmark)
@@ -573,7 +573,7 @@ like a "framework" to help fully support of 8bit string
 
 You can also go in /demo/ALStringBenchMark/ to find an 
 application to benchmark ansiString vs Unicode String and 
-in /demo/ALSortedList/ to see the benchmark of TALStringList 
+in /demo/ALSortedList/ to see the benchmark of TALStringListA 
 (ansiString) vs TStringList (UnicodeString). In fact, most 
 of the Unicode function (when they are implemented correctly, 
 thanks to fastcode) will be close to the same speed as their 

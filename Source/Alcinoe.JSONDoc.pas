@@ -744,8 +744,7 @@ procedure ALTStringsToJson(const aLst: TALStringsA;
 
 Procedure ALJSONToXML(const aJSONNode: TALJsonNode;
                       const aXMLNode: TALXmlNode;
-                      const aXMLElementNameForJSONArrayEntries: TALStringsA; // JSONArrayNodeName=XMLElementName | ex: transactions=transaction
-                                                                      //                                  |     features=feature
+                      const aXMLElementNameForJSONArrayEntries: TALStringsA; // JSONArrayNodeName=XMLElementName
                       const aDefaultXMLElementNameForJSONArrayEntries: AnsiString = 'rec'); overload;
 Procedure ALJSONToXML(const aJSONNode: TALJsonNode;
                       const aXMLNode: TALXmlNode;
@@ -859,7 +858,7 @@ type
     property Nodes[const Index: integer]: TALJSONNodeU read GetNodeByIndex; default;
   end;
 
-  {TALJSONNode}
+  {TALJSONNodeU}
   {TALJSONNodeU represents a node in an JSON document.}
   TALJSONNodeU = class(TObject)
   private
@@ -8290,8 +8289,7 @@ end;
 {*************************************************}
 Procedure ALJSONToXML(const aJSONNode: TALJsonNode;
                       const aXMLNode: TALXmlNode;
-                      const aXMLElementNameForJSONArrayEntries: TALStringsA; // JSONArrayNodeName=XMLElementName | ex: transactions=transaction
-                                                                            //                                  |     features=feature
+                      const aXMLElementNameForJSONArrayEntries: TALStringsA; // JSONArrayNodeName=XMLElementName
                       const aDefaultXMLElementNameForJSONArrayEntries: AnsiString = 'rec');
 var LNodeName: AnsiString;
     I: integer;

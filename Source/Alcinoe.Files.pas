@@ -134,10 +134,10 @@ begin
      (Directory = '..') then raise EALException.CreateFmt('Wrong directory ("%s")', [Directory]);
 
   Result := True;
-  Directory := ALIncludeTrailingPathDelimiter(Directory);
+  Directory := ALIncludeTrailingPathDelimiterW(Directory);
   LIgnoreFilesLst := TALStringListW.Create;
   try
-    for I := 0 to length(IgnoreFiles) - 1 do LIgnoreFilesLst.Add(ALExcludeTrailingPathDelimiter(IgnoreFiles[I]));
+    for I := 0 to length(IgnoreFiles) - 1 do LIgnoreFilesLst.Add(ALExcludeTrailingPathDelimiterW(IgnoreFiles[I]));
     LIgnoreFilesLst.Duplicates := DupIgnore;
     LIgnoreFilesLst.Sorted := True;
     if System.sysutils.FindFirst(Directory + '*', faAnyFile	, LSR) = 0 then begin
@@ -238,8 +238,8 @@ Function AlCopyDirectoryW(SrcDirectory,
 var sr: TSearchRec;
 begin
   Result := True;
-  SrcDirectory := ALIncludeTrailingPathDelimiter(SrcDirectory);
-  DestDirectory := ALIncludeTrailingPathDelimiter(DestDirectory);
+  SrcDirectory := ALIncludeTrailingPathDelimiterW(SrcDirectory);
+  DestDirectory := ALIncludeTrailingPathDelimiterW(DestDirectory);
   If not DirectoryExists(DestDirectory) and (not Createdir(DestDirectory)) then begin
     result := False;
     exit;

@@ -394,14 +394,14 @@ function  ALLastDelimiterA(const Delimiters, S: AnsiString): Integer;
 function  ALLastDelimiterW(const Delimiters, S: string): Integer; inline;
 function  ALIsPathDelimiter(const S: AnsiString; Index: Integer; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): Boolean; overload;
 function  ALIsPathDelimiter(const S: String; Index: Integer; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): Boolean; overload;
-function  ALIncludeTrailingPathDelimiter(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString; overload;
-function  ALIncludeTrailingPathDelimiter(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String; overload;
-function  ALExcludeTrailingPathDelimiter(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString; overload;
-function  ALExcludeTrailingPathDelimiter(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String; overload;
-function  ALIncludeLeadingPathDelimiter(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString; overload;
-function  ALIncludeLeadingPathDelimiter(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String; overload;
-function  ALExcludeLeadingPathDelimiter(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString; overload;
-function  ALExcludeLeadingPathDelimiter(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String; overload;
+function  ALIncludeTrailingPathDelimiterA(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString; overload;
+function  ALIncludeTrailingPathDelimiterW(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String; overload;
+function  ALExcludeTrailingPathDelimiterA(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString; overload;
+function  ALExcludeTrailingPathDelimiterW(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String; overload;
+function  ALIncludeLeadingPathDelimiterA(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString; overload;
+function  ALIncludeLeadingPathDelimiterW(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String; overload;
+function  ALExcludeLeadingPathDelimiterA(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString; overload;
+function  ALExcludeLeadingPathDelimiterW(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String; overload;
 procedure ALStrMove(const Source: PAnsiChar; var Dest: PAnsiChar; Count: NativeInt); overload; inline;
 procedure ALStrMove(const Source: PChar; var Dest: PChar; Count: NativeInt); overload; inline;
 function  ALCopyStr(const aSourceString: AnsiString; aStart, aLength: Integer): AnsiString; overload;
@@ -7224,61 +7224,61 @@ begin
   Result := (Index >= low(s)) and (Index <= high(S)) and (S[low(s) + Index - 1] = PathDelimiter);
 end;
 
-{******************************************************************************************************************************************************}
-function ALIncludeTrailingPathDelimiter(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString;
+{*******************************************************************************************************************************************************}
+function ALIncludeTrailingPathDelimiterA(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString;
 begin
   Result := S;
   if not ALIsPathDelimiter(Result, Length(Result), PathDelimiter) then
     Result := Result + PathDelimiter;
 end;
 
-{******************************************************************************************************************************************}
-function ALIncludeTrailingPathDelimiter(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String;
+{*******************************************************************************************************************************************}
+function ALIncludeTrailingPathDelimiterW(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String;
 begin
   Result := S;
   if not ALIsPathDelimiter(Result, Length(Result), PathDelimiter) then
     Result := Result + PathDelimiter;
 end;
 
-{******************************************************************************************************************************************************}
-function ALExcludeTrailingPathDelimiter(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString;
+{*******************************************************************************************************************************************************}
+function ALExcludeTrailingPathDelimiterA(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString;
 begin
   Result := S;
   while ALIsPathDelimiter(Result, Length(Result), PathDelimiter) do
     SetLength(Result, Length(Result)-1);
 end;
 
-{******************************************************************************************************************************************}
-function ALExcludeTrailingPathDelimiter(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String;
+{*******************************************************************************************************************************************}
+function ALExcludeTrailingPathDelimiterW(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String;
 begin
   Result := S;
   While ALIsPathDelimiter(Result, Length(Result), PathDelimiter) do
     SetLength(Result, Length(Result)-1);
 end;
 
-{*****************************************************************************************************************************************************}
-function ALIncludeLeadingPathDelimiter(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString;
+{******************************************************************************************************************************************************}
+function ALIncludeLeadingPathDelimiterA(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString;
 begin
   if not ALIsPathDelimiter(s, 1, PathDelimiter) then Result := PathDelimiter + s
   else Result := S;
 end;
 
-{*****************************************************************************************************************************************}
-function ALIncludeLeadingPathDelimiter(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String;
+{******************************************************************************************************************************************}
+function ALIncludeLeadingPathDelimiterW(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String;
 begin
   if not ALIsPathDelimiter(s, 1, PathDelimiter) then Result := PathDelimiter + s
   else Result := S;
 end;
 
-{*****************************************************************************************************************************************************}
-function ALExcludeLeadingPathDelimiter(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString;
+{******************************************************************************************************************************************************}
+function ALExcludeLeadingPathDelimiterA(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString;
 begin
   if ALIsPathDelimiter(S, 1, PathDelimiter) then Result := ALcopyStr(S,2,maxint)
   else result := S;
 end;
 
-{*****************************************************************************************************************************************}
-function ALExcludeLeadingPathDelimiter(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String;
+{******************************************************************************************************************************************}
+function ALExcludeLeadingPathDelimiterW(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String;
 begin
   if ALIsPathDelimiter(S, 1, PathDelimiter) then Result := ALcopyStr(S,2,maxint)
   else result := S;

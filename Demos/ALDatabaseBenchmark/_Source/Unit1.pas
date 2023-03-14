@@ -455,6 +455,7 @@ var Form1: TForm1;
 implementation
 
 uses SyncObjs,
+     System.AnsiStrings,
      Alcinoe.WinApi.Common,
      Alcinoe.FBX.Base,
      Alcinoe.FBX.Lib,

@@ -2,25 +2,25 @@ object Form1: TForm1
   Left = 438
   Top = 209
   Caption = 'Form1'
-  ClientHeight = 729
-  ClientWidth = 1028
+  ClientHeight = 728
+  ClientWidth = 1024
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
-  OldCreateOrder = False
-  PixelsPerInch = 96
   TextHeight = 13
   object PageControl1: TPageControl
     Left = 0
     Top = 0
-    Width = 1028
-    Height = 729
+    Width = 1024
+    Height = 728
     ActivePage = TabSheet1
     Align = alClient
     TabOrder = 0
+    ExplicitWidth = 1028
+    ExplicitHeight = 729
     object TabSheet1: TTabSheet
       Caption = 'Main'
       object Label1: TLabel
@@ -147,6 +147,7 @@ object Form1: TForm1
           23)
         ColorPaletteIndex = 7
         object Series1: TBarSeries
+          HoverElement = []
           Legend.Text = 'TALJsonDoc (AnsiString)'
           LegendTitle = 'TALJsonDoc (AnsiString)'
           Marks.Visible = False
@@ -159,6 +160,7 @@ object Form1: TForm1
           YValues.Order = loNone
         end
         object Series2: TBarSeries
+          HoverElement = []
           Legend.Text = 'TALJsonDocU (Unicode)'
           LegendTitle = 'TALJsonDocU (Unicode)'
           Marks.Visible = False
@@ -171,6 +173,7 @@ object Form1: TForm1
           YValues.Order = loNone
         end
         object Series3: TBarSeries
+          HoverElement = []
           Legend.Text = 'System.Json'
           LegendTitle = 'System.Json'
           Marks.Visible = False
@@ -183,6 +186,7 @@ object Form1: TForm1
           YValues.Order = loNone
         end
         object Series4: TBarSeries
+          HoverElement = []
           Legend.Text = 'dwsJSON'
           LegendTitle = 'dwsJSON'
           Marks.Visible = False
@@ -195,6 +199,7 @@ object Form1: TForm1
           YValues.Order = loNone
         end
         object Series5: TBarSeries
+          HoverElement = []
           Legend.Text = 'SuperObject'
           LegendTitle = 'SuperObject'
           Marks.Visible = False

@@ -2,15 +2,16 @@ unit Unit1;
 
 interface
 
-uses Windows, winapi.winhttp, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-     Dialogs, StdCtrls, shellapi, ExtCtrls, ComCtrls, Alcinoe.HTTP.Client, Alcinoe.HTTP.Client.WinHTTP,
-     Alcinoe.StringList, cxStyles, cxCustomData, cxGraphics, cxFilter,
-     cxData, cxDataStorage, cxEdit, cxDropDownEdit, cxImageComboBox, cxSpinEdit,
-     cxGridLevel, cxGridCustomTableView, cxGridTableView, cxClasses, cxControls,
-     cxGridCustomView, cxGrid, Spin, dxSkinsCore, dxSkinFoggy, dxSkinscxPCPainter, cxPCdxBarPopupMenu,
-     cxLookAndFeels, cxLookAndFeelPainters, cxContainer, Menus, dxSkinsForm,
-     cxRadioGroup, cxGroupBox, cxButtons, cxTextEdit, cxMaskEdit, cxCheckBox,
-     cxMemo, cxLabel, cxPC, uiTypes, cxNavigator, dxBarBuiltInMenu, dxDateRanges, dxScrollbarAnnotations,
+uses
+  Windows, winapi.winhttp, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, shellapi, ExtCtrls, ComCtrls, Alcinoe.HTTP.Client, Alcinoe.HTTP.Client.WinHTTP,
+  Alcinoe.StringList, cxStyles, cxCustomData, cxGraphics, cxFilter,
+  cxData, cxDataStorage, cxEdit, cxDropDownEdit, cxImageComboBox, cxSpinEdit,
+  cxGridLevel, cxGridCustomTableView, cxGridTableView, cxClasses, cxControls,
+  cxGridCustomView, cxGrid, Spin, dxSkinsCore, dxSkinFoggy, dxSkinscxPCPainter, cxPCdxBarPopupMenu,
+  cxLookAndFeels, cxLookAndFeelPainters, cxContainer, Menus, dxSkinsForm,
+  cxRadioGroup, cxGroupBox, cxButtons, cxTextEdit, cxMaskEdit, cxCheckBox,
+  cxMemo, cxLabel, cxPC, uiTypes, cxNavigator, dxBarBuiltInMenu, dxDateRanges, dxScrollbarAnnotations,
   dxCore;
 
 Const
@@ -195,14 +196,16 @@ var
 
 implementation
 
-Uses Math,
-     DateUtils,
-     Alcinoe.MultiPartParser,
-     Alcinoe.Files,
-     Alcinoe.Common,
-     Alcinoe.WinApi.Common,
-     Alcinoe.HTML,
-     Alcinoe.StringUtils;
+Uses
+  System.AnsiStrings,
+  Math,
+  DateUtils,
+  Alcinoe.MultiPartParser,
+  Alcinoe.Files,
+  Alcinoe.Common,
+  Alcinoe.WinApi.Common,
+  Alcinoe.HTML,
+  Alcinoe.StringUtils;
 
 {$R *.dfm}
 

@@ -2,21 +2,22 @@ unit Unit1;
 
 interface
 
-uses Windows,
-     Messages,
-     SysUtils,
-     Variants,
-     Classes,
-     Graphics,
-     Controls,
-     Forms,
-     Dialogs,
-     StdCtrls,
-     shellapi,
-     ExtCtrls,
-     ComCtrls,
-     SyncObjs,
-     Alcinoe.SMTP.Client;
+uses
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  StdCtrls,
+  shellapi,
+  ExtCtrls,
+  ComCtrls,
+  SyncObjs,
+  Alcinoe.SMTP.Client;
 
 type
   TForm1 = class(TForm)
@@ -83,10 +84,12 @@ var
 
 implementation
 
-Uses Alcinoe.StringUtils,
-     Alcinoe.StringList,
-     Alcinoe.InternetMessages,
-     Alcinoe.MultiPartParser;
+Uses
+  System.AnsiStrings,
+  Alcinoe.StringUtils,
+  Alcinoe.StringList,
+  Alcinoe.InternetMessages,
+  Alcinoe.MultiPartParser;
 
 {$R *.DFM}
 

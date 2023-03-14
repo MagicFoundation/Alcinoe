@@ -2,10 +2,11 @@ unit Unit1;
 
 interface
 
-uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls,
-     Forms, Dialogs, Contnrs, StdCtrls, xmldom, XMLIntf, msxmldom,
-     XMLDoc, Alcinoe.StringUtils, Alcinoe.XMLDoc, ExtCtrls, Alcinoe.Files,
-     Alcinoe.StringList, Shellapi;
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls,
+  Forms, Dialogs, Contnrs, StdCtrls, xmldom, XMLIntf, msxmldom,
+  XMLDoc, Alcinoe.StringUtils, Alcinoe.XMLDoc, ExtCtrls, Alcinoe.Files,
+  Alcinoe.StringList, Shellapi, system.IOUtils;
 
 type
 
@@ -181,7 +182,7 @@ begin
         aStartDate := GetTickCount;
         aALXMLDocument.SaveToFile(ALGetModulePathA + 'sample.xml');
         MemoLoadXmlWithALXmlDocument.Lines.Add('Time to save the xml to disk: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
-        ALDeleteFile(ALGetModulePathA + 'sample.xml');
+        Tfile.delete(String(ALGetModulePathA + 'sample.xml'));
       finally
         aALXMLDocument.Free;
       end;
@@ -218,7 +219,7 @@ begin
       aStartDate := GetTickCount;
       aXMLDocument.SaveToFile(String(ALGetModulePathA + 'sample.xml'));
       MemoLoadXmlWithXmlDocument.Lines.Add('Time to save the xml to disk: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
-      ALDeleteFile(ALGetModulePathA + 'sample.xml');
+      Tfile.delete(String(ALGetModulePathA + 'sample.xml'));
 
     except
       on E: Exception do
@@ -263,7 +264,7 @@ begin
       aStartDate := GetTickCount;
       aALXMLDocument.SaveToFile(ALGetModulePathA + 'sample.xml');
       MemoGenerate100000NodeWithAlXmlDocument.Lines.Add('Time to save the xml to disk: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
-      ALDeleteFile(ALGetModulePathA + 'sample.xml');
+      Tfile.delete(String(ALGetModulePathA + 'sample.xml'));
 
     finally
       aALXMLDocument.Free;
@@ -307,7 +308,7 @@ begin
       aStartDate := GetTickCount;
       aXMLDocument.SaveToFile(string(ALGetModulePathA + 'sample.xml'));
       MemoGenerate100000NodeWithXmlDocument.Lines.Add('Time to save the xml to disk: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
-      ALDeleteFile(ALGetModulePathA + 'sample.xml');
+      Tfile.delete(String(ALGetModulePathA + 'sample.xml'));
 
   except
     on E: Exception do

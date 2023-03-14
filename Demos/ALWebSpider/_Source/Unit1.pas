@@ -4,21 +4,22 @@ interface
 
 {$WARN UNIT_PLATFORM OFF}
 
-uses Windows,
-     SysUtils,
-     dialogs,
-     Forms,
-     StdCtrls,
-     ComCtrls,
-     Controls,
-     Classes,
-     Alcinoe.StringList,
-     Alcinoe.HTTP.Client,
-     Alcinoe.HTTP.Client.WinHTTP,
-     Alcinoe.WebSpider,
-     Alcinoe.AVLBinaryTree,
-     ExtCtrls,
-     Shellapi;
+uses
+  Windows,
+  SysUtils,
+  dialogs,
+  Forms,
+  StdCtrls,
+  ComCtrls,
+  Controls,
+  Classes,
+  Alcinoe.StringList,
+  Alcinoe.HTTP.Client,
+  Alcinoe.HTTP.Client.WinHTTP,
+  Alcinoe.WebSpider,
+  Alcinoe.AVLBinaryTree,
+  ExtCtrls,
+  Shellapi;
 
 type
 
@@ -89,12 +90,14 @@ implementation
 
 {$R *.dfm}
 
-uses FileCtrl,
-     Masks,
-     UrlMon,
-     Alcinoe.Files,
-     Alcinoe.Mime,
-     Alcinoe.StringUtils;
+uses
+  System.AnsiStrings,
+  FileCtrl,
+  Masks,
+  UrlMon,
+  Alcinoe.Files,
+  Alcinoe.Mime,
+  Alcinoe.StringUtils;
 
 Const SplitDirectoryAmount = 5000;
 

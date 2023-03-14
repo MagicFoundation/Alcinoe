@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 445
   Top = 202
   Caption = 'ALDatabaseBenchmark'
-  ClientHeight = 764
-  ClientWidth = 1007
+  ClientHeight = 763
+  ClientWidth = 1003
   Color = 15986666
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,8 +14,8 @@ object Form1: TForm1
   TextHeight = 13
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 745
-    Width = 1007
+    Top = 744
+    Width = 1003
     Height = 19
     Color = 15525605
     Panels = <
@@ -28,19 +28,15 @@ object Form1: TForm1
       item
         Width = 200
       end>
-    ExplicitTop = 744
-    ExplicitWidth = 1003
   end
   object Panel3: TPanel
     Left = 0
     Top = 329
-    Width = 1007
-    Height = 416
+    Width = 1003
+    Height = 415
     Align = alClient
     Caption = 'Panel2'
     TabOrder = 2
-    ExplicitWidth = 1003
-    ExplicitHeight = 415
     object Splitter4: TSplitter
       Left = 709
       Top = 1
@@ -75,21 +71,18 @@ object Form1: TForm1
         Style.Font.Style = []
         Style.IsFontAssigned = True
         TabOrder = 0
-        ExplicitHeight = 411
-        Height = 412
+        Height = 411
         Width = 292
       end
     end
     object PanelStats: TPanel
       Left = 1
       Top = 1
-      Width = 708
-      Height = 414
+      Width = 704
+      Height = 413
       Align = alClient
       Caption = 'Panel2'
       TabOrder = 1
-      ExplicitWidth = 704
-      ExplicitHeight = 413
       object GridThread: TcxGrid
         Left = 1
         Top = 1
@@ -185,7 +178,7 @@ object Form1: TForm1
   object PageControl1: TcxPageControl
     Left = 0
     Top = 0
-    Width = 1007
+    Width = 1003
     Height = 329
     Align = alTop
     Color = clBtnFace
@@ -194,15 +187,17 @@ object Form1: TForm1
     TabOrder = 0
     Properties.ActivePage = Firebird
     Properties.CustomButtons.Buttons = <>
-    ExplicitWidth = 1003
     ClientRectBottom = 324
     ClientRectLeft = 5
-    ClientRectRight = 1002
+    ClientRectRight = 998
     ClientRectTop = 27
     object Firebird: TcxTabSheet
       Caption = 'Firebird'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 993
+      ExplicitHeight = 0
       object Label2: TcxLabel
         Left = 71
         Top = 93

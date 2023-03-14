@@ -45,12 +45,14 @@ var Form1: TForm1;
 
 implementation
 
-uses Alcinoe.Sqlite3.Client,
-     Alcinoe.StringList,
-     Alcinoe.HTML,
-     Alcinoe.XMLDoc,
-     Alcinoe.WinApi.Common,
-     Alcinoe.StringUtils;
+uses
+  System.AnsiStrings,
+  Alcinoe.Sqlite3.Client,
+  Alcinoe.StringList,
+  Alcinoe.HTML,
+  Alcinoe.XMLDoc,
+  Alcinoe.WinApi.Common,
+  Alcinoe.StringUtils;
 
 {$R *.dfm}
 

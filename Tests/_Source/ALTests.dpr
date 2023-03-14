@@ -1,5 +1,7 @@
 program ALTests;
 
+{$I Alcinoe.inc}
+
 {$IFDEF MSWINDOWS}
   {$IFNDEF TESTINSIGHT}
   {$APPTYPE CONSOLE}
@@ -21,7 +23,44 @@ uses
   //include all units to be sure
   //that everything compile well
   {$IFDEF MSWINDOWS}
-  Alcinoe.AVLBinaryTree,
+  Alcinoe.CGI,
+  Alcinoe.Execute,
+  Alcinoe.FBX.Base,
+  Alcinoe.FBX.Client,
+  Alcinoe.FBX.Consts,
+  Alcinoe.FBX.Error,
+  Alcinoe.FBX.Lib,
+  Alcinoe.FMX.Trayicon,
+  Alcinoe.FTP.Client,
+  Alcinoe.FTP.Client.WinINet,
+  Alcinoe.GSMComm,
+  Alcinoe.HTTP.Client.WinHTTP,
+  Alcinoe.HTTP.Client.WinINet,
+  Alcinoe.ImageMagick,
+  Alcinoe.IniFiles,
+  Alcinoe.IsapiHTTP,
+  Alcinoe.LibPhoneNumber,
+  Alcinoe.MemCached.Client,
+  Alcinoe.MongoDB.Client,
+  Alcinoe.MySql.Client,
+  Alcinoe.MySql.Wrapper,
+  Alcinoe.NNTP.Client,
+  Alcinoe.POP3.Client,
+  Alcinoe.PhpRunner,
+  Alcinoe.SMTP.Client,
+  Alcinoe.SphinxQL.Client,
+  Alcinoe.Sqlite3.Client,
+  Alcinoe.Sqlite3.Wrapper,
+  //Alcinoe.TbbMM,
+  Alcinoe.WebSocket.Client.WinHTTP,
+  Alcinoe.WebSpider,
+  Alcinoe.WinApi.Common,
+  Alcinoe.WinSock,
+  Alcinoe.ZLibEx,
+  Alcinoe.ZLibExGZ,
+  ZLibEx,
+  ZLibExApi,
+  ZLibExGZ,
   {$ENDIF}
   {$IFDEF ANDROID}
   Alcinoe.AndroidApi.AndroidX,
@@ -34,21 +73,51 @@ uses
   Alcinoe.AndroidApi.InstallReferrer,
   Alcinoe.AndroidApi.VKontakte,
   Alcinoe.AndroidApi.WebRTC,
+  Alcinoe.FMX.NativeView.Android,
   {$ENDIF}
-  {$IFDEF MSWINDOWS}
-  Alcinoe.CGI,
+  {$IFDEF iOS}
+  Alcinoe.FMX.NativeView.iOS,
+  Alcinoe.FMX.ScrollBox.iOS,
+  Alcinoe.iOSApi.AdSupport,
+  Alcinoe.iOSApi.AudioToolbox,
+  Alcinoe.iOSApi.AuthenticationServices,
+  Alcinoe.iOSApi.BackgroundTasks,
+  Alcinoe.iOSApi.FacebookCoreKit,
+  Alcinoe.iOSApi.FacebookLoginKit,
+  Alcinoe.iOSApi.FacebookShareKit,
+  Alcinoe.iOSApi.FirebaseCore,
+  Alcinoe.iOSApi.FirebaseMessaging,
+  Alcinoe.iOSApi.ImageIO,
+  Alcinoe.iOSApi.MessageUI,
+  Alcinoe.iOSApi.Photos,
+  {$IFNDEF IOSSIMULATOR}
+  //[DCC Error] E2597 ld: building for iOS Simulator, but linking in dylib built for iOS, for architecture arm64
+  //https://stackoverflow.com/questions/63607158/xcode-building-for-ios-simulator-but-linking-in-an-object-file-built-for-ios-f
+  {$IFNDEF ALCompilerVersionSupported}
+    {$MESSAGE WARN 'Check if a new version of VKontakte/WebRTC are available with a support for IOSSIMULATOR and adjust the IFDEF'}
+  {$IFEND}
+  Alcinoe.iOSApi.VKontakte,
+  Alcinoe.iOSApi.WebRTC,
   {$ENDIF}
+  {$ENDIF}
+  {$IFNDEF IOSSIMULATOR}
+  //[DCC Error] E2597 ld: building for iOS Simulator, but linking in dylib built for iOS, for architecture arm64
+  //https://stackoverflow.com/questions/63607158/xcode-building-for-ios-simulator-but-linking-in-an-object-file-built-for-ios-f
+  {$IFNDEF ALCompilerVersionSupported}
+    {$MESSAGE WARN 'Check if a new version of VKontakte/WebRTC are available with a support for IOSSIMULATOR and adjust the IFDEF'}
+  {$IFEND}
+  Alcinoe.FMX.VKontakte,
+  Alcinoe.FMX.WebRTC,
+  {$ENDIF}
+  Alcinoe.AVLBinaryTree,
+  Alcinoe.ExprEval,
+  Alcinoe.InternetMessages,
+  Alcinoe.Mime,
+  Alcinoe.MultiPartParser,
+  Alcinoe.RTTI,
+  Alcinoe.WebSocket.Client,
   Alcinoe.Cipher,
   Alcinoe.Common,
-  {$IFDEF MSWINDOWS}
-  Alcinoe.Execute,
-  Alcinoe.ExprEval,
-  Alcinoe.FBX.Base,
-  Alcinoe.FBX.Client,
-  Alcinoe.FBX.Consts,
-  Alcinoe.FBX.Error,
-  Alcinoe.FBX.Lib,
-  {$ENDIF}
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.BreakText,
   Alcinoe.FMX.Common,
@@ -66,102 +135,23 @@ uses
   Alcinoe.FMX.InertialMovement,
   Alcinoe.FMX.Layouts,
   Alcinoe.FMX.Memo,
-  {$IFDEF ANDROID}
-  Alcinoe.FMX.NativeView.Android,
-  {$ENDIF}
-  {$IFDEF iOS}
-  Alcinoe.FMX.NativeView.iOS,
-  {$ENDIF}
   Alcinoe.FMX.Objects,
-  {$IFDEF iOS}
-  Alcinoe.FMX.ScrollBox.iOS,
-  {$ENDIF}
   Alcinoe.FMX.StdCtrls,
   Alcinoe.FMX.TabControl,
-  {$IFDEF MSWINDOWS}
-  Alcinoe.FMX.Trayicon,
-  {$ENDIF}
   Alcinoe.FMX.Types3D,
-  Alcinoe.FMX.VKontakte,
   Alcinoe.FMX.VideoPlayer,
-  Alcinoe.FMX.WebRTC,
-  {$IFDEF MSWINDOWS}
-  Alcinoe.FTP.Client,
-  Alcinoe.FTP.Client.WinINet,
-  {$ENDIF}
   Alcinoe.Files,
-  {$IFDEF MSWINDOWS}
-  Alcinoe.GSMComm,
-  {$ENDIF}
   Alcinoe.HTML,
   Alcinoe.HTTP.Client,
   Alcinoe.HTTP.Client.Net,
   Alcinoe.HTTP.Client.Net.Pool,
-  {$IFDEF MSWINDOWS}
-  Alcinoe.HTTP.Client.WinHTTP,
-  Alcinoe.HTTP.Client.WinINet,
-  Alcinoe.ImageMagick,
-  Alcinoe.IniFiles,
-  Alcinoe.InternetMessages,
-  Alcinoe.IsapiHTTP,
-  {$ENDIF}
   Alcinoe.JSONDoc,
-  {$IFDEF MSWINDOWS}
-  Alcinoe.LibPhoneNumber,
-  Alcinoe.MemCached.Client,
-  Alcinoe.Mime,
-  Alcinoe.MongoDB.Client,
-  Alcinoe.MultiPartParser,
-  Alcinoe.MySql.Client,
-  Alcinoe.MySql.Wrapper,
-  Alcinoe.NNTP.Client,
-  Alcinoe.POP3.Client,
-  Alcinoe.PhpRunner,
-  {$ENDIF}
   Alcinoe.QuickSortList,
-  {$IFDEF MSWINDOWS}
-  Alcinoe.RTTI,
-  Alcinoe.SMTP.Client,
-  Alcinoe.SphinxQL.Client,
-  Alcinoe.Sqlite3.Client,
-  Alcinoe.Sqlite3.Wrapper,
-  {$ENDIF}
   Alcinoe.StringList,
   Alcinoe.StringUtils,
-  {$IFDEF MSWINDOWS}
-  //Alcinoe.TbbMM,
-  Alcinoe.WebSocket.Client,
-  Alcinoe.WebSocket.Client.WinHTTP,
-  Alcinoe.WebSpider,
-  Alcinoe.WinApi.Common,
-  Alcinoe.WinSock,
   Alcinoe.XMLDoc,
-  Alcinoe.ZLibEx,
-  Alcinoe.ZLibExGZ,
-  {$ENDIF}
-  {$IFDEF IOS}
-  Alcinoe.iOSApi.AdSupport,
-  Alcinoe.iOSApi.AudioToolbox,
-  Alcinoe.iOSApi.AuthenticationServices,
-  Alcinoe.iOSApi.BackgroundTasks,
-  Alcinoe.iOSApi.FacebookCoreKit,
-  Alcinoe.iOSApi.FacebookLoginKit,
-  Alcinoe.iOSApi.FacebookShareKit,
-  Alcinoe.iOSApi.FirebaseCore,
-  Alcinoe.iOSApi.FirebaseMessaging,
-  Alcinoe.iOSApi.ImageIO,
-  Alcinoe.iOSApi.MessageUI,
-  Alcinoe.iOSApi.Photos,
-  Alcinoe.iOSApi.VKontakte,
-  Alcinoe.iOSApi.WebRTC,
-  {$ENDIF}
   Grijjy.ErrorReporting,
   Grijjy.SymbolTranslator,
-  {$IFDEF MSWINDOWS}
-  ZLibEx,
-  ZLibExApi,
-  ZLibExGZ,
-  {$ENDIF}
   //---------------------
   {$IFDEF MSWINDOWS}
   ALTestStrings in 'ALTestStrings.pas',

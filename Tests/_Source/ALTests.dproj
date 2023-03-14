@@ -4,8 +4,8 @@
     <ProjectVersion>19.5</ProjectVersion>
     <FrameworkType>None</FrameworkType>
     <Base>True</Base>
-    <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Release</Config>
-    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">iOSDevice64</Platform>
+    <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Debug</Config>
+    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Android64</Platform>
     <TargetedPlatforms>693395</TargetedPlatforms>
     <AppType>Console</AppType>
     <MainSource>ALTests.dpr</MainSource>
@@ -250,7 +250,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_Win32)&#39;!=&#39;&#39;">
     <DCC_RemoteDebug>false</DCC_RemoteDebug>
-    <Debugger_RunParams>--run:ALTestStrings.TALTestStrings.TestALFloatToStrF</Debugger_RunParams>
+    <Debugger_RunParams>--run:ALTestStrings.TALTestStrings.TestALFloatToStrFA</Debugger_RunParams>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_Win64)&#39;!=&#39;&#39;">
     <Debugger_RunParams>--run:ALTestCipher.TALTestCipher.TestALStringHashCrc32</Debugger_RunParams>

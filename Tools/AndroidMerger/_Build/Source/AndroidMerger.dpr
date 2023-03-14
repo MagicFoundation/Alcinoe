@@ -828,7 +828,7 @@ begin
   If Tfile.Exists(ARFlataFilename) then TFile.Delete(ARFlataFilename);
   var LCmdLine := '"'+AAaptFilename+'" '+
                   'compile '+ // Compiles resources to be linked into an apk.
-                  '--dir  "'+ALExcludeTrailingPathDelimiter(AMergedResDir)+'" '+ // Directory to scan for resources
+                  '--dir  "'+ALExcludeTrailingPathDelimiterW(AMergedResDir)+'" '+ // Directory to scan for resources
                   '-o "'+ARFlataFilename+'"'; // Output path
   ExecuteCmdLine(LCmdLine);
 end;
@@ -868,11 +868,11 @@ begin
   else LDebugRtxtDir := LDebugRtxtDir + 'Aapt\';
   TDirectory.CreateDirectory(LDebugRtxtDir);
   if LisAapt2 then begin
-    LDebugRtxtDir := LDebugRtxtDir + ALExtractFileName(ALExcludeTrailingPathDelimiter(ALibDir)) + '.R.txt';
+    LDebugRtxtDir := LDebugRtxtDir + ALExtractFileName(ALExcludeTrailingPathDelimiterW(ALibDir)) + '.R.txt';
     if Tfile.Exists(LDebugRtxtDir) then raise Exception.Create('Error EBDF9955-15D3-4B06-AD50-A02805834EE2');
   end
   else begin
-    LDebugRtxtDir := LDebugRtxtDir + ALExtractFileName(ALExcludeTrailingPathDelimiter(ALibDir));
+    LDebugRtxtDir := LDebugRtxtDir + ALExtractFileName(ALExcludeTrailingPathDelimiterW(ALibDir));
     if TDirectory.Exists(LDebugRtxtDir) then raise Exception.Create('Error A612C4A3-8FC8-4420-A945-95BB2DD565D8');
     TDirectory.CreateDirectory(LDebugRtxtDir);
   end;
@@ -884,9 +884,9 @@ begin
   if LisAapt2 then LDebugRJavaFilename := LDebugRJavaFilename + 'Aapt2\'
   else LDebugRJavaFilename := LDebugRJavaFilename + 'Aapt\';
   TDirectory.CreateDirectory(LDebugRJavaFilename);
-  var LDebugRJavaOriginalFilename := LDebugRJavaFilename + ALExtractFileName(ALExcludeTrailingPathDelimiter(ALibDir)) + '.R.java';
+  var LDebugRJavaOriginalFilename := LDebugRJavaFilename + ALExtractFileName(ALExcludeTrailingPathDelimiterW(ALibDir)) + '.R.java';
   if Tfile.Exists(LDebugRJavaOriginalFilename) then raise Exception.Create('Error C0110540-F418-42B3-8230-37314867DDC6');
-  //var LDebugRJavaCompressedFilename := LDebugRJavaFilename + ALExtractFileName(ALExcludeTrailingPathDelimiter(ALibDir)) + '.R.compressed.java';
+  //var LDebugRJavaCompressedFilename := LDebugRJavaFilename + ALExtractFileName(ALExcludeTrailingPathDelimiterW(ALibDir)) + '.R.compressed.java';
   {$ENDIF}
 
   //Create R.java
@@ -898,9 +898,9 @@ begin
                 'link '+ // Links resources into an apk.
                 '--manifest "'+ALibDir+'\AndroidManifest.xml" '+ // Path to the Android manifest to build.
                 '-o "'+LOutputPath+'" '+ // Output path.
-                '-I "'+ALExcludeTrailingPathDelimiter(ASDKApiLevelJarFilename)+'" '+ // Adds an Android APK to link against.
-                '-R "'+ALExcludeTrailingPathDelimiter(AMergedResDir)+'" '+ // Compilation unit to link, using `overlay` semantics. The last conflicting resource given takes precedence.
-                '--java "'+ALExcludeTrailingPathDelimiter(ARJavaDir)+'" '+ // Directory in which to generate R.java.
+                '-I "'+ALExcludeTrailingPathDelimiterW(ASDKApiLevelJarFilename)+'" '+ // Adds an Android APK to link against.
+                '-R "'+ALExcludeTrailingPathDelimiterW(AMergedResDir)+'" '+ // Compilation unit to link, using `overlay` semantics. The last conflicting resource given takes precedence.
+                '--java "'+ALExcludeTrailingPathDelimiterW(ARJavaDir)+'" '+ // Directory in which to generate R.java.
                 {$IF defined(DEBUG)}
                 '--output-text-symbols "'+ LDebugRtxtDir +'" ' + // Generates a text file containing the resource symbols of the R class in the specified file
                 {$ENDIF}
@@ -914,9 +914,9 @@ begin
                 '-f '+ // force overwrite of existing files
                 '-m '+ // make package directories under location specified by -J
                 '-M "'+ALibDir+'\AndroidManifest.xml" '+ // specify full path to AndroidManifest.xml to include in zip
-                '-I "'+ALExcludeTrailingPathDelimiter(ASDKApiLevelJarFilename)+'" '+ // add an existing package to base include set
-                '-S "'+ALExcludeTrailingPathDelimiter(AMergedResDir)+'" '+ // directory in which to find resources.  Multiple directories will be scanned and the first match found (left to right) will take precedence.
-                '-J "'+ALExcludeTrailingPathDelimiter(ARJavaDir)+'" '+ // specify where to output R.java resource constant definitions
+                '-I "'+ALExcludeTrailingPathDelimiterW(ASDKApiLevelJarFilename)+'" '+ // add an existing package to base include set
+                '-S "'+ALExcludeTrailingPathDelimiterW(AMergedResDir)+'" '+ // directory in which to find resources.  Multiple directories will be scanned and the first match found (left to right) will take precedence.
+                '-J "'+ALExcludeTrailingPathDelimiterW(ARJavaDir)+'" '+ // specify where to output R.java resource constant definitions
                 {$IF defined(DEBUG)}
                 '--output-text-symbols '+ LDebugRtxtDir +' ' + // Generates a text file containing the resource symbols of the R class in the specified file
                 {$ENDIF}
@@ -1043,7 +1043,7 @@ begin
 
   //Compile R.java into R$ classes
   LCmdLine := '"'+AJavacFilename+'" '+
-              '-d "'+ALExcludeTrailingPathDelimiter(ARClassDir)+'" '+  // Specify where to place generated class files
+              '-d "'+ALExcludeTrailingPathDelimiterW(ARClassDir)+'" '+  // Specify where to place generated class files
               '"'+LRJavaFile+'"'; // input source files
   ExecuteCmdLine(LCmdLine);
 
@@ -1059,7 +1059,7 @@ begin
   var LCmdLine := '"'+AJarExeFilename+'" '+
                   'cfM '+ // -c  create new archive -f  specify archive file name
                   '"'+aRJarFilename+'" '+
-                  '-C "'+ALExcludeTrailingPathDelimiter(ARClassDir)+'" .';
+                  '-C "'+ALExcludeTrailingPathDelimiterW(ARClassDir)+'" .';
   ExecuteCmdLine(LCmdLine);
 end;
 
@@ -1211,7 +1211,7 @@ begin
         break;
       end;
     end;
-    Result := ALExcludeTrailingPathDelimiter(LLst.Text, '.');
+    Result := ALExcludeTrailingPathDelimiterA(LLst.Text, '.');
   finally
     ALFreeAndNil(LLst);
   end;
@@ -1300,7 +1300,7 @@ begin
   ALocalpomfilename := '';
 
   //init LLocalFilenameWithoutExt
-  var LLocalFilenameWithoutExt := ALIncludeTrailingPathDelimiter(ALocalRepositoryBaseDir) +
+  var LLocalFilenameWithoutExt := ALIncludeTrailingPathDelimiterW(ALocalRepositoryBaseDir) +
                                   ALStringReplaceW(string(AGroupId),'.','\',[RfReplaceALL]) + '\' +
                                   String(AArtifactId) + '\' +
                                   string(AVersion) + '\';
@@ -1942,12 +1942,12 @@ begin
         if not TFile.exists(LAapt2Filename) then raise Exception.CreateFmt('%s does not exist', [LAapt2Filename]);
         LSDKApiLevelDir := LRegistry.ReadString('SDKApiLevelPath');
         if not TDirectory.Exists(LSDKApiLevelDir) then raise Exception.CreateFmt('Directory %s does not exist', [LSDKApiLevelDir]);
-        LSDKApiLevelDir := ALIncludeTrailingPathDelimiter(LSDKApiLevelDir);
+        LSDKApiLevelDir := ALIncludeTrailingPathDelimiterW(LSDKApiLevelDir);
         LSDKApiLevelJarFilename := LSDKApiLevelDir + 'android.jar';
         if not TFile.exists(LSDKApiLevelJarFilename) then raise Exception.CreateFmt('%s does not exist', [LSDKApiLevelJarFilename]);
         JDKDir := LRegistry.ReadString('JDKPath');
         if not TDirectory.Exists(JDKDir) then raise Exception.CreateFmt('Directory %s does not exist', [JDKDir]);
-        JDKDir := ALIncludeTrailingPathDelimiter(JDKDir);
+        JDKDir := ALIncludeTrailingPathDelimiterW(JDKDir);
         LJavacFilename := JDKDir + 'bin\javac.exe';
         if not TFile.exists(LJavacFilename) then raise Exception.CreateFmt('%s does not exist', [LJavacFilename]);
         LJarExeFilename := JDKDir + 'bin\jar.exe';
@@ -2038,7 +2038,7 @@ begin
       {$REGION 'Init LOutputDir'}
       var LOutputDir := ExpandFileName(ALTrim(LParamLst.Values['-OutputDir']));
       if LOutputDir = '' then raise Exception.Create('OutputDir param is mandatory');
-      LOutputDir := ALIncludeTrailingPathDelimiter(LOutputDir);
+      LOutputDir := ALIncludeTrailingPathDelimiterW(LOutputDir);
       if TDirectory.Exists(LOutputDir) then begin
         if (not LNoInteraction) then begin
           Write('Empty '+ LOutputDir + ' (Y/N)? ');
@@ -2167,8 +2167,8 @@ begin
 
           //get info from the pom
           var LPomFilename := LArchiveFilename; // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.aar
-          LPomFilename := ALIncludeTrailingPathDelimiter(ALExtractFilePath(ALExcludeTrailingPathDelimiter(LPomFilename))) +
-                          ALExtractFileName(ALExcludeTrailingPathDelimiter(LPomFilename), True{RemoveFileExt}) +
+          LPomFilename := ALIncludeTrailingPathDelimiterW(ALExtractFilePath(ALExcludeTrailingPathDelimiterW(LPomFilename))) +
+                          ALExtractFileName(ALExcludeTrailingPathDelimiterW(LPomFilename), True{RemoveFileExt}) +
                           '.pom'; // C:\Libraries\jar\com.google.firebase\firebase-messaging-23.1.0.pom
           var LGroupID: AnsiString := '';
           var LArtifactId: AnsiString := '';
@@ -2888,7 +2888,7 @@ begin
                               String(LLibrary.GetChildNodeValueText('artifactid', ''{default}))+'-'+
                               String(LLibrary.GetChildNodeValueText('version', ''{default}))+'\';
         if LUncompressDir = LtmpDirectoryLibraries + '--\' then
-          LUncompressDir := LtmpDirectoryLibraries + ALExtractFileName(ALExcludeTrailingPathDelimiter(LLibraryArchiveFileName), true{RemoveFileExt})+'\';
+          LUncompressDir := LtmpDirectoryLibraries + ALExtractFileName(ALExcludeTrailingPathDelimiterW(LLibraryArchiveFileName), true{RemoveFileExt})+'\';
         LLibrary.SetChildNodeValueText('uncompressdir', ansiString(LUncompressDir));
         if TDirectory.Exists(LLibraryArchiveFileName) then begin
           if not AlCopyDirectoryW(
@@ -2931,13 +2931,13 @@ begin
         if length(LJarFiles) = 0 then raise Exception.CreateFmt('Erreur 7E56249A-8B43-411D-9834-9D6334D7226B. %s', [LUncompressDir]);
         if length(LJarFiles) > 1 then raise Exception.CreateFmt('Their cannot be more than one classes.jar at the root of a library. %s', [LUncompressDir]);
         //--
-        var LDestFilename := LLibsOutputDir + ALExtractFileName(ALExcludeTrailingPathDelimiter(LUncompressDir)) + '.jar';
+        var LDestFilename := LLibsOutputDir + ALExtractFileName(ALExcludeTrailingPathDelimiterW(LUncompressDir)) + '.jar';
         Tfile.Copy(LJarFiles[0], LDestFilename);
         if Tdirectory.Exists(LUncompressDir + '\libs') then begin
           var LlibsFiles := TDirectory.GetFiles(LUncompressDir + '\libs', '*', TSearchOption.soAllDirectories);
           for var J := Low(LlibsFiles) to High(LlibsFiles) do begin
             if not ALSameTextW(ALExtractFileExt(LlibsFiles[j]), '.jar') then raise Exception.Create('Error 1BE76D9D-49BC-4CA7-971C-40B81C01B1C9');
-            Tfile.Copy(LlibsFiles[j], LLibsOutputDir + ALExtractFileName(ALExcludeTrailingPathDelimiter(LUncompressDir)) + '-'+ ALExtractFileName(LlibsFiles[j]));
+            Tfile.Copy(LlibsFiles[j], LLibsOutputDir + ALExtractFileName(ALExcludeTrailingPathDelimiterW(LUncompressDir)) + '-'+ ALExtractFileName(LlibsFiles[j]));
           end;
         end;
       end;
@@ -3127,7 +3127,7 @@ begin
         if not AlEmptyDirectoryW(LtmpDirectoryRClass, true{SubDirectory}) then raise EALException.CreateFmt('Cannot clear %s', [LtmpDirectoryRClass]);
         for var I := 0 to LLibraries.childnodes.Count - 1 do begin
           CreateRClasses(
-            ALIncludeTrailingPathDelimiter(string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}))), // const ALibPath: String;
+            ALIncludeTrailingPathDelimiterW(string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}))), // const ALibPath: String;
             ALIfThenW(LApk, LResOutputDir, LRFlataFilename), // const AMergedResPath: String;
             LtmpDirectory, // const ATmpDir: String;
             LtmpDirectoryRJava, // const ARjavaPath: String;
@@ -3382,7 +3382,7 @@ begin
                 for var LPlatForm in LPlatforms do begin
                   With AddChild('Platform') do begin
                     Attributes['Name'] := LPlatForm;
-                    Addchild('RemoteDir').Text := 'res\' + ALStringReplaceA(ALExcludeTrailingPathDelimiter(ALExtractFilePath(LLocalName)), LResRelativePath, '', [rfIgnoreCase]);
+                    Addchild('RemoteDir').Text := 'res\' + ALStringReplaceA(ALExcludeTrailingPathDelimiterA(ALExtractFilePath(LLocalName)), LResRelativePath, '', [rfIgnoreCase]);
                     Addchild('RemoteName').Text := ALExtractFileName(LLocalName);
                     Addchild('Overwrite').Text := 'true';
                   end;
@@ -3432,7 +3432,7 @@ begin
                 for var LPlatForm in LPlatforms do begin
                   With AddChild('Platform') do begin
                     Attributes['Name'] := LPlatForm;
-                    Addchild('RemoteDir').Text := 'library\lib\' + ALStringReplaceA(ALExcludeTrailingPathDelimiter(ALExtractFilePath(LLocalName)), LJniRelativePath, '', [rfIgnoreCase]); // library\lib\arm64-v8a\libjingle_peerconnection_so.so
+                    Addchild('RemoteDir').Text := 'library\lib\' + ALStringReplaceA(ALExcludeTrailingPathDelimiterA(ALExtractFilePath(LLocalName)), LJniRelativePath, '', [rfIgnoreCase]); // library\lib\arm64-v8a\libjingle_peerconnection_so.so
                     Addchild('RemoteName').Text := ALExtractFileName(LLocalName);
                     Addchild('Overwrite').Text := 'true';
                   end;

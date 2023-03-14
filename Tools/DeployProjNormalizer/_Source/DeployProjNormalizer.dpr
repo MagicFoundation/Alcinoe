@@ -8,6 +8,7 @@ uses
   System.AnsiStrings,
   System.SysUtils,
   System.Classes,
+  System.IOUtils,
   system.Math,
   Alcinoe.XMLDoc,
   Alcinoe.Common,
@@ -78,7 +79,7 @@ function _getProjectRoot(const aProjectName: ansiString;
                          const aPlatFormName: AnsiString): ansiString;
 begin
   result := aProjectName +
-            ALifThen(
+            ALifThenA(
               //----
               (aPlatformName = 'iOSDevice64') or
               (aPlatformName = 'iOSSimulator') or
@@ -1662,8 +1663,8 @@ begin
 
       //save the backup of DeployProj
       if (LCreateBackup) and
-         (ALFileExists(LDeployProjFilename)) and
-         (not ALFileExists(LDeployProjFilename + '.bak')) then begin
+         (Tfile.exists(LDeployProjFilename)) and
+         (not Tfile.exists(LDeployProjFilename + '.bak')) then begin
         var LBackupDeployProjXmlDoc := TALXmlDocument.Create('Project');
         try
           LBackupDeployProjXmlDoc.Options := [];

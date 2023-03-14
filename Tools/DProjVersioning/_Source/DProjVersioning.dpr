@@ -7,6 +7,8 @@ program DProjVersioning;
 uses
   System.SysUtils,
   System.math,
+  System.AnsiStrings,
+  System.IOUtils,
   Alcinoe.Files,
   Alcinoe.StringList,
   Alcinoe.Common,
@@ -70,7 +72,7 @@ begin
     LStringList.Text := ALTrim(Result);
     Result := '';
     for I := 0 to Min(2, LStringList.Count - 1) do
-      Result := result + ALIfThen(i > 0, '.') + LStringList[i];
+      Result := result + ALIfThenA(i > 0, '.') + LStringList[i];
   finally
     ALFreeAndNil(LStringList);
   end;
@@ -271,8 +273,8 @@ begin
                                        LMinorNumber, // Const aMinorNumber: integer;
                                        LPatchOffset); // Const aPatchOffset: integer);
       if LCreateBackup then begin
-        if ALFileExists(LDProjFilename + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [LDProjFilename + '.bak']);
-        if not ALRenameFileW(LDProjFilename, LDProjFilename+ '.bak') then raiseLastOsError;
+        if Tfile.exists(LDProjFilename + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [LDProjFilename + '.bak']);
+        Tfile.move(LDProjFilename, LDProjFilename+ '.bak');
       end;
       AlSaveStringToFile(LSrcStr, LDProjFilename);
     end
@@ -288,8 +290,8 @@ begin
                                        LMinorNumber, // Const aMinorNumber: integer;
                                        LPatchOffset); // Const aPatchOffset: integer);
       if LCreateBackup then begin
-        if ALFileExists(LDProjFilename + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [LDProjFilename + '.bak']);
-        if not ALRenameFileW(LDProjFilename, LDProjFilename+ '.bak') then raiseLastOsError;
+        if Tfile.exists(LDProjFilename + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [LDProjFilename + '.bak']);
+        Tfile.Move(LDProjFilename, LDProjFilename+ '.bak');
       end;
       AlSaveStringToFile(LSrcStr, LDProjFilename);
     end

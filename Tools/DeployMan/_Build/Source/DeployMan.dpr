@@ -158,7 +158,7 @@ begin
             var LLocalPath := ExpandFileName(ALTrim(LPathLst[0])); // C:\Dev\MagicFoundation\Alcinoe\Tools\DeployMan\_Build\Sample\DirA
             var LRemotePath := LPathLst[2]; // .\PlugIns
             if TDirectory.Exists(LLocalPath) then begin
-              LLocalPath := ALIncludeTrailingPathDelimiter(LLocalPath); // C:\Dev\MagicFoundation\Alcinoe\Tools\DeployMan\_Build\Sample\DirA\
+              LLocalPath := ALIncludeTrailingPathDelimiterW(LLocalPath); // C:\Dev\MagicFoundation\Alcinoe\Tools\DeployMan\_Build\Sample\DirA\
               var LSearchOption: TSearchOption;
               if AlStrToBool(LPathLst[1]) then LSearchOption := TSearchOption.soAllDirectories
               else LSearchOption := TSearchOption.soTopDirectoryOnly;
@@ -255,7 +255,7 @@ begin
               for var LPlatForm in LPlatforms do begin
                 With AddChild('Platform') do begin
                   Attributes['Name'] := LPlatForm;
-                  Addchild('RemoteDir').Text := ALExcludeTrailingPathDelimiter(ALExtractFilePath(LRemotePath)); // .\PlugIns\notificationservice.appex
+                  Addchild('RemoteDir').Text := ALExcludeTrailingPathDelimiterA(ALExtractFilePath(LRemotePath)); // .\PlugIns\notificationservice.appex
                   Addchild('RemoteName').Text := ALExtractFileName(LRemotePath); // Info.plist
                   Addchild('Overwrite').Text := 'true';
                 end;

@@ -8,6 +8,7 @@ uses
   System.SysUtils,
   System.ioutils,
   System.types,
+  System.AnsiStrings,
   Alcinoe.StringList,
   Alcinoe.Files,
   Alcinoe.StringUtils,
@@ -81,8 +82,8 @@ begin
       {$REGION 'Save the file'}
       if LOriginalSourceStr <> LSourceStr then begin
         if LCreateBackup then begin
-          if ALFileExists(ansiString(LFiles[i]) + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [ansiString(LFiles[i]) + '.bak']);
-          if not ALRenameFileA(ansiString(LFiles[i]), ansiString(LFiles[i]) + '.bak') then raiseLastOsError;
+          if Tfile.Exists(LFiles[i] + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [ansiString(LFiles[i]) + '.bak']);
+          Tfile.Move(LFiles[i], LFiles[i] + '.bak');
         end;
         ALSaveStringToFile(LSourceStr,ansiString(LFiles[i]));
         Writeln('Updated '+ LFiles[i]);

@@ -190,8 +190,10 @@ begin
       LOldToNewNames.add('ALDateToStr=ALDateToStrA');
       LOldToNewNames.add('ALDateToStrU=ALDateToStrW');
       LOldToNewNames.add('ALDequotedStrU=ALDequotedStr');
-      LOldToNewNames.add('ALExcludeLeadingPathDelimiterU=ALExcludeLeadingPathDelimiter');
-      LOldToNewNames.add('ALExcludeTrailingPathDelimiterU=ALExcludeTrailingPathDelimiter');
+      LOldToNewNames.add('ALExcludeLeadingPathDelimiter=ALExcludeLeadingPathDelimiterA');
+      LOldToNewNames.add('ALExcludeLeadingPathDelimiterU=ALExcludeLeadingPathDelimiterW');
+      LOldToNewNames.add('ALExcludeTrailingPathDelimiter=ALExcludeTrailingPathDelimiterA');
+      LOldToNewNames.add('ALExcludeTrailingPathDelimiterU=ALExcludeTrailingPathDelimiterW');
       LOldToNewNames.add('ALExtractExpression=ALExtractExpressionA');
       LOldToNewNames.add('ALExtractFileDirU=ALExtractFileDir');
       LOldToNewNames.add('ALExtractFileDriveU=ALExtractFileDrive');
@@ -223,8 +225,10 @@ begin
       LOldToNewNames.add('ALHexToBinU=ALHexToBin');
       LOldToNewNames.add('ALHTTPDecodeU=ALHTTPDecode');
       LOldToNewNames.add('ALHTTPEncodeU=ALHTTPEncode');
-      LOldToNewNames.add('ALIncludeLeadingPathDelimiterU=ALIncludeLeadingPathDelimiter');
-      LOldToNewNames.add('ALIncludeTrailingPathDelimiterU=ALIncludeTrailingPathDelimiter');
+      LOldToNewNames.add('ALIncludeLeadingPathDelimiter=ALIncludeLeadingPathDelimiterA');
+      LOldToNewNames.add('ALIncludeLeadingPathDelimiterU=ALIncludeLeadingPathDelimiterW');
+      LOldToNewNames.add('ALIncludeTrailingPathDelimiter=ALIncludeTrailingPathDelimiterA');
+      LOldToNewNames.add('ALIncludeTrailingPathDelimiterU=ALIncludeTrailingPathDelimiterW');
       LOldToNewNames.add('ALIntToBit=ALIntToBitA');
       LOldToNewNames.add('ALIntToHex=ALIntToHexA');
       LOldToNewNames.add('ALIntToStr=ALIntToStrA');

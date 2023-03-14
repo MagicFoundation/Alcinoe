@@ -386,7 +386,7 @@ SET FileName=%~1\*.deployproj.local
 if exist "%FileName%" del "%FileName%" /s
 if exist "%FileName%" goto ERROR
 
-SET FileName=%~1\%~2\dcu\
+SET FileName=%~1\%~2\Dcu\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"
@@ -419,7 +419,7 @@ if "%ALDeploy%"=="Y" (
 
 )
 
-SET FileName=%~1\%~2\dcu\
+SET FileName=%~1\%~2\Dcu\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"

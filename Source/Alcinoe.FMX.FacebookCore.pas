@@ -191,7 +191,7 @@ begin
     {$IF defined(android)}
 
     {$IFDEF DEBUG}
-    allog('ALInitFacebook', 'sdkInitialize | isInitialized: '+ALBoolToStrU(TJFacebookSdk.JavaClass.isInitialized), TalLogType.VERBOSE);
+    allog('ALInitFacebook', 'sdkInitialize | isInitialized: '+ALBoolToStrW(TJFacebookSdk.JavaClass.isInitialized), TalLogType.VERBOSE);
     {$ENDIF}
 
     TJFacebookSdk.JavaClass.sdkInitialize(TAndroidHelper.Context);
@@ -239,7 +239,7 @@ begin
       ALLog(
         'ALFmxFacebookCoreApplicationEventHandler',
         'Event: OpenURL | '+
-        'ALFacebookInitialised: '+ALBoolToStrU(_ALFacebookInitialised)+' | '+
+        'ALFacebookInitialised: '+ALBoolToStrW(_ALFacebookInitialised)+' | '+
         'Url: ' + Lcontext.URL,
         TalLogType.VERBOSE);
       {$ENDIF}

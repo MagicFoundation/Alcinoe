@@ -47,8 +47,8 @@ procedure ALNormalizeImageOrientationV1(const aBitmap: Tbitmap; const aExifOrien
 function  ALNormalizeImageOrientationV2(const aBitmap: TALNativeBitmap; const aExifOrientationInfo: TalExifOrientationInfo): TALNativeBitmap;
 function  AlGetImageSignature(const aStream: TStream; const aSignatureLength: integer = 12): Tbytes; overload;
 function  AlGetImageSignature(const aFileName: string; const aSignatureLength: integer = 12): Tbytes; overload;
-function  AlDetectImageExtensionU(const aStream: TStream): String; overload;
-function  AlDetectImageExtensionU(const aFileName: string): String; overload;
+function  AlDetectImageExtension(const aStream: TStream): String; overload;
+function  AlDetectImageExtension(const aFileName: string): String; overload;
 function  ALPrepareColor(const SrcColor: TAlphaColor; const Opacity: Single): TAlphaColor;
 function  ALAlphaBlendColors(const aBackToFrontColors: array of TAlphaColor): TAlphaColor;
 
@@ -7117,7 +7117,7 @@ end;
 // https://en.wikipedia.org/wiki/List_of_file_signatures
 // https://github.com/strukturag/libheif/issues/83
 // https://nokiatech.github.io/heif/technical.html
-function  AlDetectImageExtensionU(const aStream: Tstream): String;
+function  AlDetectImageExtension(const aStream: Tstream): String;
 var LFirstBytes: Tbytes;
 begin
 
@@ -7180,13 +7180,13 @@ begin
 
 end;
 
-{*****************************************************************}
-function  AlDetectImageExtensionU(const aFileName: string): String;
+{****************************************************************}
+function  AlDetectImageExtension(const aFileName: string): String;
 var LFileStream: TFileStream;
 begin
   LFileStream := TFileStream.Create(aFileName, fmOpenRead);
   try
-    result := AlDetectImageExtensionU(LFileStream);
+    result := AlDetectImageExtension(LFileStream);
   finally
     ALFreeAndNil(LFileStream);
   end;

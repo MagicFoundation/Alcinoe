@@ -1449,7 +1449,7 @@ const
       if (CurStr = '') then Continue;
       begin
         CurValue := '';
-        EqualPos := ALPos(AnsiString('='), CurStr);
+        EqualPos := ALPosA(AnsiString('='), CurStr);
         if EqualPos <> 0 then
         begin
           CurValue := ALCopyStr(CurStr, EqualPos+1, Length(CurStr) - EqualPos);
@@ -2423,7 +2423,7 @@ const
       if (CurStr = '') then Continue;
       begin
         CurValue := '';
-        EqualPos := ALPos(AnsiChar('='), CurStr);
+        EqualPos := ALPosA(AnsiChar('='), CurStr);
         if EqualPos <> 0 then
         begin
           CurValue := ALCopyStr(CurStr, EqualPos+1, Length(CurStr) - EqualPos);
@@ -3256,7 +3256,7 @@ type
   procedure TALFBXSQLDA.ConvertString(const Code: Smallint; Index: Word; out value: Double);
   begin
     //value := StrToFloat(DecodeString(Code, Index));
-    value := ALStrToFloat(DecodeStringA(Code, Index), ALDefaultFormatSettings);
+    value := ALStrToFloat(DecodeStringA(Code, Index), ALDefaultFormatSettingsA);
   end;
 
   procedure TALFBXSQLDA.ConvertString(const Code: Smallint; Index: Word; out value: Integer);
@@ -3268,7 +3268,7 @@ type
   procedure TALFBXSQLDA.ConvertString(const Code: Smallint; Index: Word; out value: Single);
   begin
     //value := StrToFloat(DecodeString(Code, Index));
-    value := ALStrToFloat(DecodeStringA(Code, Index), ALDefaultFormatSettings);
+    value := ALStrToFloat(DecodeStringA(Code, Index), ALDefaultFormatSettingsA);
   end;
 
   procedure TALFBXSQLDA.ConvertString(const Code: Smallint; Index: Word; out value: Smallint);
@@ -3280,13 +3280,13 @@ type
   procedure TALFBXSQLDA.ConvertString(const Code: Smallint; Index: Word; out value: TDateTime);
   begin
     //value := StrToDateTime(DecodeString(Code, Index));
-    value := ALStrToDateTime(DecodeStringA(Code, Index), ALDefaultFormatSettings);
+    value := ALStrToDateTime(DecodeStringA(Code, Index), ALDefaultFormatSettingsA);
   end;
 
   procedure TALFBXSQLDA.ConvertString(const Code: Smallint; Index: Word; out value: Currency);
   begin
     //value := StrToCurr(DecodeString(Code, Index));
-    value := ALStrToCurr(DecodeStringA(Code, Index), ALDefaultFormatSettings);
+    value := ALStrToCurr(DecodeStringA(Code, Index), ALDefaultFormatSettingsA);
   end;
 
   procedure TALFBXSQLDA.ConvertString(const Code: Smallint; Index: Word; out value: boolean);
@@ -3298,7 +3298,7 @@ type
   procedure TALFBXSQLDA.ConvertStringToDate(const Code: Smallint; Index: Word; out value: Integer);
   begin
     //Value := Trunc(StrToDate(DecodeString(Code, Index)));
-    Value := Trunc(ALStrToDate(DecodeStringA(Code, Index), ALDefaultFormatSettings));
+    Value := Trunc(ALStrToDate(DecodeStringA(Code, Index), ALDefaultFormatSettingsA));
   end;
 
   constructor TALFBXSQLDA.Create(aCharacterSet: TALFBXCharacterSet);
@@ -3632,12 +3632,12 @@ type
       if (sqlscale < 0)  then
       begin
         case ASQLCode of
-          SQL_SHORT  : Result := ALFormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale], ALDefaultFormatSettings);
-          SQL_LONG   : Result := ALFormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale], ALDefaultFormatSettings);
+          SQL_SHORT  : Result := ALFormatFloatA(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale], ALDefaultFormatSettingsA);
+          SQL_LONG   : Result := ALFormatFloatA(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale], ALDefaultFormatSettingsA);
           SQL_INT64,
-          SQL_QUAD   : Result := ALFormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale], ALDefaultFormatSettings);
+          SQL_QUAD   : Result := ALFormatFloatA(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale], ALDefaultFormatSettingsA);
           SQL_D_FLOAT,
-          SQL_DOUBLE : Result := ALFormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^, ALDefaultFormatSettings);
+          SQL_DOUBLE : Result := ALFormatFloatA(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^, ALDefaultFormatSettingsA);
         else
           raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
         end;
@@ -3645,15 +3645,15 @@ type
         case ASQLCode of
           SQL_VARYING   : DecodeStringA(SQL_VARYING, Index, Result);
           SQL_TEXT      : DecodeStringA(SQL_TEXT, Index, Result);
-          SQL_TIMESTAMP : Result := ALDateTimeToStr(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata)), ALDefaultFormatSettings);
-          SQL_TYPE_DATE : Result := ALDateToStr(PInteger(sqldata)^ - cAlFBXDateOffset, ALDefaultFormatSettings);
-          SQL_TYPE_TIME : Result := ALTimeToStr(PCardinal(sqldata)^ / cALFBXTimeCoeff, ALDefaultFormatSettings);
+          SQL_TIMESTAMP : Result := ALDateTimeToStrA(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata)), ALDefaultFormatSettingsA);
+          SQL_TYPE_DATE : Result := ALDateToStrA(PInteger(sqldata)^ - cAlFBXDateOffset, ALDefaultFormatSettingsA);
+          SQL_TYPE_TIME : Result := ALTimeToStrA(PCardinal(sqldata)^ / cALFBXTimeCoeff, ALDefaultFormatSettingsA);
           SQL_D_FLOAT,
-          SQL_DOUBLE    : Result := ALFloatToStr(PDouble(sqldata)^, ALDefaultFormatSettings);
-          SQL_LONG      : Result := ALIntToStr(PInteger(sqldata)^);
-          SQL_FLOAT     : Result := ALFloatToStr(PSingle(sqldata)^, ALDefaultFormatSettings);
-          SQL_SHORT     : Result := ALIntToStr(PSmallint(sqldata)^);
-          SQL_INT64     : Result := ALIntToStr(PInt64(sqldata)^);
+          SQL_DOUBLE    : Result := ALFloatToStrA(PDouble(sqldata)^, ALDefaultFormatSettingsA);
+          SQL_LONG      : Result := ALIntToStrA(PInteger(sqldata)^);
+          SQL_FLOAT     : Result := ALFloatToStrA(PSingle(sqldata)^, ALDefaultFormatSettingsA);
+          SQL_SHORT     : Result := ALIntToStrA(PSmallint(sqldata)^);
+          SQL_INT64     : Result := ALIntToStrA(PInt64(sqldata)^);
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4171,8 +4171,8 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := Trunc(Value);
           //SQL_TEXT      : EncodeString(SQL_TEXT, Index, DateTimeToStr(Value));
           //SQL_VARYING   : EncodeString(SQL_VARYING, Index, DateTimeToStr(Value));
-          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALDateTimeToStr(Value, ALDefaultFormatSettings));
-          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALDateTimeToStr(Value, ALDefaultFormatSettings));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALDateTimeToStrA(Value, ALDefaultFormatSettingsA));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALDateTimeToStrA(Value, ALDefaultFormatSettingsA));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4215,8 +4215,8 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := Value;
           //SQL_TEXT      : EncodeString(SQL_TEXT, Index, DateToStr(Value));
           //SQL_VARYING   : EncodeString(SQL_VARYING, Index, DateToStr(Value));
-          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALDateToStr(Value, ALDefaultFormatSettings));
-          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALDateToStr(Value, ALDefaultFormatSettings));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALDateToStrA(Value, ALDefaultFormatSettingsA));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALDateToStrA(Value, ALDefaultFormatSettingsA));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4259,8 +4259,8 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := Value;
           //SQL_TEXT      : EncodeString(SQL_TEXT, Index, TimeToStr(Value));
           //SQL_VARYING   : EncodeString(SQL_VARYING, Index, TimeToStr(Value));
-          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALTimeToStr(Value, ALDefaultFormatSettings));
-          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALTimeToStr(Value, ALDefaultFormatSettings));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALTimeToStrA(Value, ALDefaultFormatSettingsA));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALTimeToStrA(Value, ALDefaultFormatSettingsA));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4300,8 +4300,8 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := ord(Value);
           //SQL_TEXT      : EncodeString(SQL_TEXT, Index, IntToStr(ord(Value)));
           //SQL_VARYING   : EncodeString(SQL_VARYING, Index, IntToStr(ord(Value)));
-          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALIntToStr(ord(Value)));
-          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALIntToStr(ord(Value)));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALIntToStrA(ord(Value)));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALIntToStrA(ord(Value)));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4344,8 +4344,8 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := Value;
           //SQL_TEXT      : EncodeString(SQL_TEXT, Index, IntToStr(Value));
           //SQL_VARYING   : EncodeString(SQL_VARYING, Index, IntToStr(Value));
-          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALIntToStr(Value));
-          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALIntToStr(Value));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALIntToStrA(Value));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALIntToStrA(Value));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4388,8 +4388,8 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := Trunc(Value);
           //SQL_TEXT      : EncodeString(SQL_TEXT, Index, FloatToStr(Value));
           //SQL_VARYING   : EncodeString(SQL_VARYING, Index, FloatToStr(Value));
-          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALFloatToStr(Value, ALDefaultFormatSettings));
-          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALFloatToStr(Value, ALDefaultFormatSettings));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALFloatToStrA(Value, ALDefaultFormatSettingsA));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALFloatToStrA(Value, ALDefaultFormatSettingsA));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4432,8 +4432,8 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := Value;
           //SQL_TEXT      : EncodeString(SQL_TEXT, Index, IntToStr(Value));
           //SQL_VARYING   : EncodeString(SQL_VARYING, Index, IntToStr(Value));
-          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALIntToStr(Value));
-          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALIntToStr(Value));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALIntToStrA(Value));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALIntToStrA(Value));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4464,12 +4464,12 @@ end;
       if (sqlscale < 0)  then
       begin
         case ASQLCode of
-          SQL_SHORT  : PSmallInt(sqldata)^ := Trunc(ALStrToFloat(Value, ALDefaultFormatSettings) * cALFBXScaleDivisor[sqlscale]);
-          SQL_LONG   : PInteger(sqldata)^  := Trunc(ALStrToFloat(Value, ALDefaultFormatSettings) * cALFBXScaleDivisor[sqlscale]);
+          SQL_SHORT  : PSmallInt(sqldata)^ := Trunc(ALStrToFloat(Value, ALDefaultFormatSettingsA) * cALFBXScaleDivisor[sqlscale]);
+          SQL_LONG   : PInteger(sqldata)^  := Trunc(ALStrToFloat(Value, ALDefaultFormatSettingsA) * cALFBXScaleDivisor[sqlscale]);
           SQL_INT64,
-          SQL_QUAD   : PInt64(sqldata)^    := Trunc(ALStrToFloat(Value, ALDefaultFormatSettings) * cALFBXScaleDivisor[sqlscale]);
+          SQL_QUAD   : PInt64(sqldata)^    := Trunc(ALStrToFloat(Value, ALDefaultFormatSettingsA) * cALFBXScaleDivisor[sqlscale]);
           SQL_D_FLOAT,
-          SQL_DOUBLE : PDouble(sqldata)^   := ALStrToFloat(Value, ALDefaultFormatSettings);
+          SQL_DOUBLE : PDouble(sqldata)^   := ALStrToFloat(Value, ALDefaultFormatSettingsA);
         else
           raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
         end;
@@ -4478,12 +4478,12 @@ end;
           SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, Value);
           SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, Value);
           SQL_D_FLOAT,
-          SQL_DOUBLE    : PDouble(sqldata)^   := ALStrToFloat(Value, ALDefaultFormatSettings);
-          SQL_TIMESTAMP : ALFBXEncodeTimeStamp(ALStrToDateTime(Value, ALDefaultFormatSettings), PISCTimeStamp(sqldata));
-          SQL_TYPE_DATE : PInteger(sqldata)^ := Round(int(ALStrToDate(Value, ALDefaultFormatSettings)) + cAlFBXDateOffset);
-          SQL_TYPE_TIME : PCardinal(sqldata)^ := Round(Frac(ALStrToTime(Value, ALDefaultFormatSettings)) * cALFBXTimeCoeff);
+          SQL_DOUBLE    : PDouble(sqldata)^   := ALStrToFloat(Value, ALDefaultFormatSettingsA);
+          SQL_TIMESTAMP : ALFBXEncodeTimeStamp(ALStrToDateTime(Value, ALDefaultFormatSettingsA), PISCTimeStamp(sqldata));
+          SQL_TYPE_DATE : PInteger(sqldata)^ := Round(int(ALStrToDate(Value, ALDefaultFormatSettingsA)) + cAlFBXDateOffset);
+          SQL_TYPE_TIME : PCardinal(sqldata)^ := Round(Frac(ALStrToTime(Value, ALDefaultFormatSettingsA)) * cALFBXTimeCoeff);
           SQL_LONG      : PInteger(sqldata)^ := ALStrToInt(Value);
-          SQL_FLOAT     : PSingle(sqldata)^ := ALStrToFloat(Value, ALDefaultFormatSettings);
+          SQL_FLOAT     : PSingle(sqldata)^ := ALStrToFloat(Value, ALDefaultFormatSettingsA);
           SQL_SHORT     : PSmallint(sqldata)^ := ALStrToInt(Value);
           SQL_INT64     : PInt64(sqldata)^ := ALStrToInt64(Value);
 {FB25_UP}
@@ -4574,8 +4574,8 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := Value;
           //SQL_TEXT      : EncodeString(SQL_TEXT, Index, IntToStr(Value));
           //SQL_VARYING   : EncodeString(SQL_VARYING, Index, IntToStr(Value));
-          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALIntToStr(Value));
-          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALIntToStr(Value));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALIntToStrA(Value));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALIntToStrA(Value));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4618,8 +4618,8 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := Trunc(Value);
           //SQL_TEXT      : EncodeString(SQL_TEXT, Index, FloatToStr(Value));
           //SQL_VARYING   : EncodeString(SQL_VARYING, Index, FloatToStr(Value));
-          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALFloatToStr(Value, ALDefaultFormatSettings));
-          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALFloatToStr(Value, ALDefaultFormatSettings));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALFloatToStrA(Value, ALDefaultFormatSettingsA));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALFloatToStrA(Value, ALDefaultFormatSettingsA));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4667,8 +4667,8 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := Trunc(Value);
           //SQL_TEXT      : EncodeString(SQL_TEXT, Index, FloatToStr(Value));
           //SQL_VARYING   : EncodeString(SQL_VARYING, Index, FloatToStr(Value));
-          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALFloatToStr(Value, ALDefaultFormatSettings));
-          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALFloatToStr(Value, ALDefaultFormatSettings));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALFloatToStrA(Value, ALDefaultFormatSettingsA));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALFloatToStrA(Value, ALDefaultFormatSettingsA));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -5551,26 +5551,26 @@ end;
       if (sqlscale < 0)  then
       begin
         case ASQLCode of
-          SQL_SHORT  : Result := ALFormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale], ALDefaultFormatSettings);
-          SQL_LONG   : Result := ALFormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale], ALDefaultFormatSettings);
+          SQL_SHORT  : Result := ALFormatFloatA(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale], ALDefaultFormatSettingsA);
+          SQL_LONG   : Result := ALFormatFloatA(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale], ALDefaultFormatSettingsA);
           SQL_INT64,
-          SQL_QUAD   : Result := ALFormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale], ALDefaultFormatSettings);
+          SQL_QUAD   : Result := ALFormatFloatA(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale], ALDefaultFormatSettingsA);
           SQL_D_FLOAT,
-          SQL_DOUBLE : Result := ALFormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^, ALDefaultFormatSettings);
+          SQL_DOUBLE : Result := ALFormatFloatA(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^, ALDefaultFormatSettingsA);
         else
           raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
         end;
       end else
         case ASQLCode of
           SQL_D_FLOAT,
-          SQL_DOUBLE    : Result := ALFloatToStr(PDouble(sqldata)^, ALDefaultFormatSettings);
-          SQL_TIMESTAMP : Result := ALDateTimeToStr(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata)), ALDefaultFormatSettings);
-          SQL_TYPE_DATE : Result := ALDateToStr(PInteger(sqldata)^ - cAlFBXDateOffset, ALDefaultFormatSettings);
-          SQL_TYPE_TIME : Result := ALTimeToStr(PCardinal(sqldata)^ / cALFBXTimeCoeff, ALDefaultFormatSettings);
-          SQL_LONG      : Result := ALIntToStr(PInteger(sqldata)^);
-          SQL_FLOAT     : Result := ALFloatToStr(PSingle(sqldata)^, ALDefaultFormatSettings);
-          SQL_SHORT     : Result := ALIntToStr(PSmallint(sqldata)^);
-          SQL_INT64     : Result := ALIntToStr(PInt64(sqldata)^);
+          SQL_DOUBLE    : Result := ALFloatToStrA(PDouble(sqldata)^, ALDefaultFormatSettingsA);
+          SQL_TIMESTAMP : Result := ALDateTimeToStrA(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata)), ALDefaultFormatSettingsA);
+          SQL_TYPE_DATE : Result := ALDateToStrA(PInteger(sqldata)^ - cAlFBXDateOffset, ALDefaultFormatSettingsA);
+          SQL_TYPE_TIME : Result := ALTimeToStrA(PCardinal(sqldata)^ / cALFBXTimeCoeff, ALDefaultFormatSettingsA);
+          SQL_LONG      : Result := ALIntToStrA(PInteger(sqldata)^);
+          SQL_FLOAT     : Result := ALFloatToStrA(PSingle(sqldata)^, ALDefaultFormatSettingsA);
+          SQL_SHORT     : Result := ALIntToStrA(PSmallint(sqldata)^);
+          SQL_INT64     : Result := ALIntToStrA(PInt64(sqldata)^);
           SQL_TEXT      : DecodeStringA(SQL_TEXT, Index, Result);
           SQL_VARYING   : DecodeStringA(SQL_VARYING, Index, Result);
           SQL_BLOB      : ReadBlobA(Index, Result);

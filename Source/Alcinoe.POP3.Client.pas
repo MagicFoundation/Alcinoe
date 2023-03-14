@@ -41,10 +41,10 @@ type
       function  User(const UserName: AnsiString): AnsiString; virtual;
       function  Pass(const Password: AnsiString): AnsiString; virtual;
       Function  List: AnsiString; overload; virtual;
-      procedure List(ALst: TALStrings); overload; virtual;
+      procedure List(ALst: TALStringsA); overload; virtual;
       Function  List(aMsgNumber: integer): AnsiString; overload; virtual;
       Function  Uidl: AnsiString; overload; virtual;
-      procedure Uidl(ALst: TALStrings); overload; virtual;
+      procedure Uidl(ALst: TALStringsA); overload; virtual;
       Function  Uidl(aMsgNumber: Integer): AnsiString; overload; virtual;
       Procedure Uidl(aMsgNumber: Integer; Var aUniqueIDListing: AnsiString); overload; virtual;
       Function  Quit: AnsiString; virtual;
@@ -68,16 +68,17 @@ implementation
 Uses
   Winapi.Windows,
   System.SysUtils,
+  System.AnsiStrings,
   Alcinoe.WinSock,
   Alcinoe.StringUtils;
 
 {*******************************************************************************}
-Procedure ALPOP3ClientSplitResponseLine(aResponse: AnsiString; ALst: TALStrings);
+Procedure ALPOP3ClientSplitResponseLine(aResponse: AnsiString; ALst: TALStringsA);
 Begin
   aResponse := ALTrim(aResponse); // +OK 2 320
-  aResponse := AlStringReplace(aResponse,#9,' ',[RfReplaceAll]); // +OK 2 320
-  While alPos('  ',aResponse) > 0 do aResponse := AlStringReplace(aResponse,'  ',' ',[RfReplaceAll]); // +OK 2 320
-  aResponse := ALTrim(AlStringReplace(aResponse,' ',#13#10,[RfReplaceAll]));  // +OK
+  aResponse := ALStringReplaceA(aResponse,#9,' ',[RfReplaceAll]); // +OK 2 320
+  While ALPosA('  ',aResponse) > 0 do aResponse := ALStringReplaceA(aResponse,'  ',' ',[RfReplaceAll]); // +OK 2 320
+  aResponse := ALTrim(ALStringReplaceA(aResponse,' ',#13#10,[RfReplaceAll]));  // +OK
                                                                               // 2
                                                                               // 320
   aLst.Text := aResponse;
@@ -112,14 +113,14 @@ begin
      (Result[ln - 2] = '.') and
      (Result[ln - 3] = #10) and
      (Result[ln - 4] = #13) then delete(Result,LN-4,5);
-  P := AlPos(#13#10,Result);
+  P := ALPosA(#13#10,Result);
   If P > 0 then delete(Result,1,P+1)
   else result := '';
 
   {If any line of the multi-line response
    begins with the termination octet, the line is "byte-stuffed" by
    pre-pending the termination octet to that line of the response.}
-  Result := AlStringReplace(Result,#13#10'..',#13#10'.', [RfReplaceAll]);
+  Result := ALStringReplaceA(Result,#13#10'..',#13#10'.', [RfReplaceAll]);
 end;
 
 {*******************************}
@@ -353,15 +354,15 @@ begin
 end;
 
 {*********************************************}
-procedure TAlPOP3Client.List(ALst: TALStrings);
+procedure TAlPOP3Client.List(ALst: TALStringsA);
 begin
-  ALst.Text := ALTrim(AlStringReplace(ALPOP3ClientExtractTextFromMultilineResponse(List), ' ', ALst.NameValueSeparator, [rfReplaceAll]));
+  ALst.Text := ALTrim(ALStringReplaceA(ALPOP3ClientExtractTextFromMultilineResponse(List), ' ', ALst.NameValueSeparator, [rfReplaceAll]));
 end;
 
 {***********************************************************}
 Function TAlPOP3Client.List(aMsgNumber: integer): AnsiString;
 begin
-  Result := SendCmd('LIST ' + ALInttostr(aMsgNumber), False);
+  Result := SendCmd('LIST ' + ALIntToStrA(aMsgNumber), False);
 end;
 
 {*********}
@@ -431,22 +432,22 @@ begin
 end;
 
 {*********************************************}
-procedure TAlPOP3Client.UIDL(ALst: TALStrings);
+procedure TAlPOP3Client.UIDL(ALst: TALStringsA);
 begin
-  ALst.Text := ALTrim(AlStringReplace(ALPOP3ClientExtractTextFromMultilineResponse(Uidl), ' ', ALst.NameValueSeparator, [rfReplaceAll]));
+  ALst.Text := ALTrim(ALStringReplaceA(ALPOP3ClientExtractTextFromMultilineResponse(Uidl), ' ', ALst.NameValueSeparator, [rfReplaceAll]));
 end;
 
 {***********************************************************}
 Function TAlPOP3Client.UIDL(aMsgNumber: Integer): AnsiString;
 begin
-  Result := SendCmd('UIDL ' + ALInttostr(aMsgNumber), False);
+  Result := SendCmd('UIDL ' + ALIntToStrA(aMsgNumber), False);
 end;
 
 {**********************************************************************************}
 Procedure TAlPOP3Client.Uidl(aMsgNumber: Integer; Var aUniqueIDListing: AnsiString);
-Var LLst: TALStringList;
+Var LLst: TALStringListA;
 Begin
-  LLst := TALStringList.Create;
+  LLst := TALStringListA.Create;
   Try
     ALPOP3ClientSplitResponseLine(UIDL(aMsgNumber), LLst);
     If LLst.Count < 3 then raise Exception.Create('UIDL cmd Error');
@@ -501,9 +502,9 @@ end;
 
 {****************************************************************************************************}
 procedure TAlPOP3Client.Stat(Var ANumberofMsgInthemaildrop: Integer; Var aSizeofthemaildrop: integer);
-Var LLst: TALStringList;
+Var LLst: TALStringListA;
 Begin
-  LLst := TALStringList.Create;
+  LLst := TALStringListA.Create;
   Try
     ALPOP3ClientSplitResponseLine(Stat, LLst);
     If LLst.Count < 3 then raise Exception.Create('Stat cmd Error');
@@ -542,7 +543,7 @@ end;
      S: .}
 Function TAlPOP3Client.Retr(aMsgNumber: Integer): AnsiString;
 begin
-  Result := SendCmd('RETR ' + ALInttostr(aMsgNumber), True);
+  Result := SendCmd('RETR ' + ALIntToStrA(aMsgNumber), True);
 end;
 
 {********************************************************************************************************************}
@@ -550,7 +551,7 @@ procedure TAlPOP3Client.Retr(aMsgNumber: Integer; var aMsgBodyContent: AnsiStrin
 Var P: integer;
 begin
   aMsgBodyContent := ALPop3ClientExtractTextFromMultilineResponse(Retr(aMsgNumber));
-  P := AlPos(#13#10#13#10,aMsgBodyContent);
+  P := ALPosA(#13#10#13#10,aMsgBodyContent);
   If P > 0 then begin
     aMsgHeaderContent.RawHeaderText := AlcopyStr(aMsgBodyContent,1,P);
     Delete(aMsgBodyContent,1,P+3);
@@ -601,7 +602,7 @@ end;
      S: -ERR no such message}
 Function TAlPOP3Client.Top(aMsgNumber: Integer; aNumberOfLines: integer): AnsiString;
 begin
-  Result := SendCmd('TOP ' + ALInttostr(aMsgNumber) + ' ' + ALInttostr(aNumberOfLines), True);
+  Result := SendCmd('TOP ' + ALIntToStrA(aMsgNumber) + ' ' + ALIntToStrA(aNumberOfLines), True);
 end;
 
 {***}
@@ -656,7 +657,7 @@ end;
      S: -ERR message 2 already deleted}
 Function TAlPOP3Client.Dele(aMsgNumber: Integer): AnsiString;
 begin
-  Result := SendCmd('DELE ' + ALInttostr(aMsgNumber), False);
+  Result := SendCmd('DELE ' + ALIntToStrA(aMsgNumber), False);
 end;
 
 {***}
@@ -803,8 +804,8 @@ begin
     LResponseLength := length(Result);
 
     If LGoodResponse = -1 then begin
-      if ALPos('+OK ', Result) = 1 then LGoodResponse := 1
-      else if ALPos('-ERR ', Result) = 1 then LGoodResponse := 0;
+      if ALPosA('+OK ', Result) = 1 then LGoodResponse := 1
+      else if ALPosA('-ERR ', Result) = 1 then LGoodResponse := 0;
     end;
 
     If (LGoodResponse = 0) or (not MultilineResponse) then begin

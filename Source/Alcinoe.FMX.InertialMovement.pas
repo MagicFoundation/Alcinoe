@@ -1055,7 +1055,7 @@ begin
 
     {$IFDEF DEBUG}
     //fTimerProcStopWatch.stop;
-    //ALLog('TALAniCalculations.TimerProc', 'interval: '  + ALFormatFloatU('0', fTimerProcStopWatch.Elapsed.totalMilliseconds, alDefaultFormatSettingsU), TalLogType.verbose);
+    //ALLog('TALAniCalculations.TimerProc', 'interval: '  + ALFormatFloatW('0', fTimerProcStopWatch.Elapsed.totalMilliseconds, ALDefaultFormatSettingsW), TalLogType.verbose);
     //fTimerProcStopWatch := TstopWatch.StartNew;
     {$ENDIF}
 
@@ -1731,8 +1731,8 @@ var
   P: TALPointD;
 begin
   {$IFDEF DEBUG}
-  //ALLog('TALAniCalculations.MouseMove', 'x: '  + ALFormatFloatU('0', x, alDefaultFormatSettingsU) +
-  //                                      ' - y: '  + ALFormatFloatU('0', y, alDefaultFormatSettingsU), TalLogType.verbose);
+  //ALLog('TALAniCalculations.MouseMove', 'x: '  + ALFormatFloatW('0', x, ALDefaultFormatSettingsW) +
+  //                                      ' - y: '  + ALFormatFloatW('0', y, ALDefaultFormatSettingsW), TalLogType.verbose);
   {$ENDIF}
   if Down and ([ttVertical, ttHorizontal] * TouchTracking <> []) then
   begin

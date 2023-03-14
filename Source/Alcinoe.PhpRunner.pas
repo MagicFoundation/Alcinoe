@@ -201,23 +201,23 @@ type
   private
   protected
   public
-    procedure Execute(ServerVariables: TALStrings;
+    procedure Execute(ServerVariables: TALStringsA;
                       RequestContentStream: Tstream;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); overload; virtual; abstract;
-    function  Execute(ServerVariables: TALStrings; RequestContentStream: Tstream): AnsiString; overload; virtual;
-    procedure Execute(ServerVariables: TALStrings;
+    function  Execute(ServerVariables: TALStringsA; RequestContentStream: Tstream): AnsiString; overload; virtual;
+    procedure Execute(ServerVariables: TALStringsA;
                       const RequestContentString: AnsiString;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); overload; virtual;
-    function  Execute(ServerVariables: TALStrings; const RequestContentString: AnsiString): AnsiString; overload; virtual;
-    procedure ExecutePostUrlEncoded(ServerVariables: TALStrings;
-                                    PostDataStrings: TALStrings;
+    function  Execute(ServerVariables: TALStringsA; const RequestContentString: AnsiString): AnsiString; overload; virtual;
+    procedure ExecutePostUrlEncoded(ServerVariables: TALStringsA;
+                                    PostDataStrings: TALStringsA;
                                     ResponseContentStream: Tstream;
                                     ResponseHeader: TALHTTPResponseHeader;
                                     Const EncodeParams: Boolean=True); overload; virtual;
-    function  ExecutePostUrlEncoded(ServerVariables: TALStrings;
-                                    PostDataStrings: TALStrings;
+    function  ExecutePostUrlEncoded(ServerVariables: TALStringsA;
+                                    PostDataStrings: TALStringsA;
                                     Const EncodeParams: Boolean=True): AnsiString; overload; virtual;
   end;
 
@@ -231,7 +231,7 @@ type
     Procedure SendRequest(const aRequest:AnsiString); virtual;
     function  ReadResponse: AnsiString; virtual;
   public
-    procedure Execute(ServerVariables: TALStrings;
+    procedure Execute(ServerVariables: TALStringsA;
                       RequestContentStream: Tstream;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); override;
@@ -291,7 +291,7 @@ type
     destructor  Destroy; override;
     Procedure Connect(const aPhpInterpreterFilename: AnsiString); virtual;
     Procedure Disconnect; virtual;
-    procedure Execute(ServerVariables: TALStrings;
+    procedure Execute(ServerVariables: TALStringsA;
                       RequestContentStream: Tstream;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); override;
@@ -318,7 +318,7 @@ type
     constructor Create; overload; virtual;
     constructor Create(const aPhpInterpreter: AnsiString); overload; virtual;
     destructor  Destroy; override;
-    procedure Execute(ServerVariables: TALStrings;
+    procedure Execute(ServerVariables: TALStringsA;
                       RequestContentStream: Tstream;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); override;
@@ -336,7 +336,7 @@ type
   public
     constructor Create; overload; virtual;
     constructor Create(const aPhpInterpreter: AnsiString); overload; virtual;
-    procedure Execute(ServerVariables: TALStrings;
+    procedure Execute(ServerVariables: TALStringsA;
                       RequestContentStream: Tstream;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); override;
@@ -354,15 +354,15 @@ Uses
   Alcinoe.CGI;
 
 {*****************************************************************************}
-procedure TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: TALStrings;
-                                                   PostDataStrings: TALStrings;
+procedure TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: TALStringsA;
+                                                   PostDataStrings: TALStringsA;
                                                    ResponseContentStream: Tstream;
                                                    ResponseHeader: TALHTTPResponseHeader;
                                                    Const EncodeParams: Boolean=True);
-Var LURLEncodedContentStream: TALStringStream;
+Var LURLEncodedContentStream: TALStringStreamA;
     I: Integer;
 begin
-  LURLEncodedContentStream := TALStringStream.create('');
+  LURLEncodedContentStream := TALStringStreamA.create('');
   try
 
     if EncodeParams then ALHTTPEncodeParamNameValues(PostDataStrings);
@@ -384,13 +384,13 @@ begin
 end;
 
 {*******************************************************************************************************************}
-function TALPhpRunnerEngine.Execute(ServerVariables: TALStrings; const RequestContentString: AnsiString): AnsiString;
-var ResponseContentStream: TALStringStream;
+function TALPhpRunnerEngine.Execute(ServerVariables: TALStringsA; const RequestContentString: AnsiString): AnsiString;
+var ResponseContentStream: TALStringStreamA;
     ResponseHeader: TALHTTPResponseHeader;
-    RequestContentStream: TALStringStream;
+    RequestContentStream: TALStringStreamA;
 begin
-  RequestContentStream := TALStringStream.Create(RequestContentString);
-  ResponseContentStream := TALStringStream.Create('');
+  RequestContentStream := TALStringStreamA.Create(RequestContentString);
+  ResponseContentStream := TALStringStreamA.Create('');
   ResponseHeader := TALHTTPResponseHeader.Create;
   Try
     Execute(ServerVariables,
@@ -406,13 +406,13 @@ begin
 end;
 
 {***************************************************************}
-procedure TALPhpRunnerEngine.Execute(ServerVariables: TALStrings;
+procedure TALPhpRunnerEngine.Execute(ServerVariables: TALStringsA;
                                      const RequestContentString: AnsiString;
                                      ResponseContentStream: Tstream;
                                      ResponseHeader: TALHTTPResponseHeader);
-var RequestContentStream: TALStringStream;
+var RequestContentStream: TALStringStreamA;
 begin
-  RequestContentStream := TALStringStream.Create(RequestContentString);
+  RequestContentStream := TALStringStreamA.Create(RequestContentString);
   Try
     Execute(ServerVariables,
             RequestContentStream,
@@ -424,11 +424,11 @@ begin
 end;
 
 {**********************************************************************************************************}
-function TALPhpRunnerEngine.Execute(ServerVariables: TALStrings; RequestContentStream: Tstream): AnsiString;
-var ResponseContentStream: TALStringStream;
+function TALPhpRunnerEngine.Execute(ServerVariables: TALStringsA; RequestContentStream: Tstream): AnsiString;
+var ResponseContentStream: TALStringStreamA;
     ResponseHeader: TALHTTPResponseHeader;
 begin
-  ResponseContentStream := TALStringStream.Create('');
+  ResponseContentStream := TALStringStreamA.Create('');
   ResponseHeader := TALHTTPResponseHeader.Create;
   Try
     Execute(ServerVariables,
@@ -443,13 +443,13 @@ begin
 end;
 
 {****************************************************************************}
-function TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: TALStrings;
-                                                  PostDataStrings: TALStrings;
+function TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: TALStringsA;
+                                                  PostDataStrings: TALStringsA;
                                                   Const EncodeParams: Boolean=True): AnsiString;
-var ResponseContentStream: TALStringStream;
+var ResponseContentStream: TALStringStreamA;
     ResponseHeader: TALHTTPResponseHeader;
 begin
-  ResponseContentStream := TALStringStream.Create('');
+  ResponseContentStream := TALStringStreamA.Create('');
   ResponseHeader := TALHTTPResponseHeader.Create;
   Try
     ExecutePostUrlEncoded(ServerVariables,
@@ -562,7 +562,7 @@ begin
 end;
 
 {**********************************************************************}
-procedure TALPhpFastCgiRunnerEngine.Execute(ServerVariables: TALStrings;
+procedure TALPhpFastCgiRunnerEngine.Execute(ServerVariables: TALStringsA;
                                             RequestContentStream: Tstream;
                                             ResponseContentStream: Tstream;
                                             ResponseHeader: TALHTTPResponseHeader);
@@ -655,7 +655,7 @@ begin
     end;
 
     {For securty issue... if content_length badly set then cpu can go to 100%}
-    ServerVariables.Values['CONTENT_LENGTH']  := ALIntToStr(RequestContentStream.Size);
+    ServerVariables.Values['CONTENT_LENGTH']  := ALIntToStrA(RequestContentStream.Size);
 
   end
 
@@ -674,7 +674,7 @@ begin
 
   {----------}
   LResponseStr := ReadResponse;
-  P1 := AlPos(#13#10#13#10,LResponseStr);
+  P1 := ALPosA(#13#10#13#10,LResponseStr);
   if P1 <= 0 then raise Exception.Create('The Php has encountered an error while processing the request!');
   ResponseHeader.RawHeaderText := AlCopyStr(LResponseStr,1,P1-1);
   if P1 + 4 <= length(LResponseStr) then ResponseContentStream.WriteBuffer(LResponseStr[P1 + 4], length(LResponseStr) - P1 - 3);
@@ -868,7 +868,7 @@ begin
   //create the pipepath here because if we do it in the oncreate the
   //fpipepath can survive few seconds after the disconnection, making
   //some trouble in the next execute loop (pipe has been ended)
-  FPipePath := '\\.\pipe\ALPhpFastCGIRunner-' + ALNewGUIDString(true{WithoutBracket});
+  FPipePath := '\\.\pipe\ALPhpFastCGIRunner-' + ALNewGUIDStringA(true{WithoutBracket});
 
   //create the server pipe
   FServerPipe := CreateNamedPipeA(PAnsiChar(fpipePath),                              //lpName
@@ -894,7 +894,7 @@ begin
     Try
 
   		checkerror(not SetHandleInformation(fServerterminationEvent, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT));
-      LEnvironment := AlGetEnvironmentString + '_FCGI_SHUTDOWN_EVENT_' + '=' + ALIntToStr(fServerterminationEvent) + #0#0;
+      LEnvironment := AlGetEnvironmentStringA + '_FCGI_SHUTDOWN_EVENT_' + '=' + ALIntToStrA(fServerterminationEvent) + #0#0;
 
       // Set up the start up info struct.
       ZeroMemory(@LStartupInfo,sizeof(TStartupInfo));
@@ -1030,7 +1030,7 @@ begin
 end;
 
 {*******************************************************************************}
-procedure TALPhpNamedPipeFastCgiRunnerEngine.Execute(ServerVariables: TALStrings;
+procedure TALPhpNamedPipeFastCgiRunnerEngine.Execute(ServerVariables: TALStringsA;
                                                      RequestContentStream: Tstream;
                                                      ResponseContentStream: Tstream;
                                                      ResponseHeader: TALHTTPResponseHeader);
@@ -1152,7 +1152,7 @@ begin
 end;
 
 {**************************************************************************}
-procedure TALPhpNamedPipeFastCgiManager.Execute(ServerVariables: TALStrings;
+procedure TALPhpNamedPipeFastCgiManager.Execute(ServerVariables: TALStringsA;
                                                 RequestContentStream: Tstream;
                                                 ResponseContentStream: Tstream;
                                                 ResponseHeader: TALHTTPResponseHeader);
@@ -1191,7 +1191,7 @@ begin
 end;
 
 {******************************************************************}
-procedure TALPhpCgiRunnerEngine.Execute(ServerVariables: TALStrings;
+procedure TALPhpCgiRunnerEngine.Execute(ServerVariables: TALStringsA;
                                         RequestContentStream: Tstream;
                                         ResponseContentStream: Tstream;
                                         ResponseHeader: TALHTTPResponseHeader);

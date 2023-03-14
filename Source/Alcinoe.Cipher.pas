@@ -18,17 +18,9 @@ uses
   {$ELSE}
   system.types,
   {$ENDIF}
-  {$IF CompilerVersion >= 32} // tokyo
   system.hash,
-  {$ENDIF}
   System.Classes,
   Alcinoe.Common;
-
-{$IF CompilerVersion < 29} {Delphi XE8}
-type
-  FixedInt = LongInt;
-  PFixedUInt = PLongword;
-{$ENDIF}
 
 { Cipher exception }
 type
@@ -88,15 +80,7 @@ procedure ALBFEncryptStreamCBC(InStream, OutStream: TStream; const Key: AnsiStri
 
 type
 
-  // under tokyo :
-  // https://quality.embarcadero.com/browse/RSP-20976
-  // without the keyword packed i have under tokyo ios64 compiler this strange error:
-  // Backend error: Function return type does not match operand type of return inst!
-  //   ret void
-  // i64Function return type does not match operand type of return inst!
-  //   ret void
-  // i64
-  TALRDLVector = {$IF CompilerVersion <= 32} packed {$ENDIF} record
+  TALRDLVector = record
     case Byte of
       0 : (dw : DWord);
       1 : (bt : array[0..3] of Byte);
@@ -126,26 +110,26 @@ procedure ALEncryptRDL(const Context : TALRDLContext; var Block : TALRDLBlock);
 procedure ALEncryptRDLCBC(const Context : TALRDLContext; const Prev : TALRDLBlock; var Block : TALRDLBlock);
 procedure ALRDLEncryptStream(const InStream, OutStream : TStream; const Key; const KeySize : FixedInt; const Encrypt : Boolean); overload;
 procedure ALRDLEncryptStreamCBC(const InStream, OutStream : TStream; const Key; const KeySize : FixedInt; const Encrypt : Boolean); overload;
-procedure ALRDLEncryptString(const InString: AnsiString; var OutString : AnsiString; const Key; const KeySize : FixedInt; const Encrypt : Boolean); overload;
-function  ALRDLEncryptString(const InString: AnsiString; const Key; const KeySize : FixedInt; const Encrypt : Boolean) : AnsiString; overload;
-procedure ALRDLEncryptString(const InString: AnsiString; var OutString : AnsiString; const Key: AnsiString; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean); overload;
-function  ALRDLEncryptString(const InString: AnsiString; const Key: AnsiString; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean) : AnsiString; overload;
-procedure ALRDLEncryptStringCBC(const InString: AnsiString; var OutString : AnsiString; const Key; const KeySize : FixedInt; const Encrypt : Boolean); overload;
-function  ALRDLEncryptStringCBC(const InString: AnsiString; const Key; const KeySize : FixedInt; const Encrypt : Boolean) : AnsiString; overload;
-procedure ALRDLEncryptStringCBC(const InString: AnsiString; var OutString : AnsiString; const Key: AnsiString; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean); overload;
-function  ALRDLEncryptStringCBC(const InString: AnsiString; const Key: AnsiString; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean) : AnsiString; overload;
+procedure ALRDLEncryptStringA(const InString: AnsiString; var OutString : AnsiString; const Key; const KeySize : FixedInt; const Encrypt : Boolean); overload;
+function  ALRDLEncryptStringA(const InString: AnsiString; const Key; const KeySize : FixedInt; const Encrypt : Boolean) : AnsiString; overload;
+procedure ALRDLEncryptStringA(const InString: AnsiString; var OutString : AnsiString; const Key: AnsiString; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean); overload;
+function  ALRDLEncryptStringA(const InString: AnsiString; const Key: AnsiString; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean) : AnsiString; overload;
+procedure ALRDLEncryptStringW(const InString: String; var OutString : String; const Key; const KeySize : FixedInt; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false); overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
+procedure ALRDLEncryptStringW(const InString: String; var OutString : String; const Key: String; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false); overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
+function  ALRDLEncryptStringW(const InString: String; const Key; const KeySize : FixedInt; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false) : String; overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
+function  ALRDLEncryptStringW(const InString: String; const Key: String; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false) : String; overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
+procedure ALRDLEncryptStringCBCA(const InString: AnsiString; var OutString : AnsiString; const Key; const KeySize : FixedInt; const Encrypt : Boolean); overload;
+function  ALRDLEncryptStringCBCA(const InString: AnsiString; const Key; const KeySize : FixedInt; const Encrypt : Boolean) : AnsiString; overload;
+procedure ALRDLEncryptStringCBCA(const InString: AnsiString; var OutString : AnsiString; const Key: AnsiString; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean); overload;
+function  ALRDLEncryptStringCBCA(const InString: AnsiString; const Key: AnsiString; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean) : AnsiString; overload;
+procedure ALRDLEncryptStringCBCW(const InString: String; var OutString : String; const Key; const KeySize : FixedInt; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false); overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
+function  ALRDLEncryptStringCBCW(const InString: String; const Key; const KeySize : FixedInt; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false) : String; overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
+procedure ALRDLEncryptStringCBCW(const InString: String; var OutString : String; const Key: String; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false); overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
+function  ALRDLEncryptStringCBCW(const InString: String; const Key: String; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false) : String; overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
 procedure ALRDLEncryptStream(const InStream, OutStream : TStream; const Key: AnsiString; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean); overload;
+procedure ALRDLEncryptStream(const InStream, OutStream : TStream; const Key: String; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean; Const encoding: Tencoding); overload;
 procedure ALRDLEncryptStreamCBC(const InStream, OutStream : TStream; const Key: AnsiString; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean); overload;
-procedure ALRDLEncryptStringU(const InString: String; var OutString : String; const Key; const KeySize : FixedInt; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false); overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
-procedure ALRDLEncryptStringU(const InString: String; var OutString : String; const Key: String; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false); overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
-function  ALRDLEncryptStringU(const InString: String; const Key; const KeySize : FixedInt; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false) : String; overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
-function  ALRDLEncryptStringU(const InString: String; const Key: String; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false) : String; overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
-procedure ALRDLEncryptStringCBCU(const InString: String; var OutString : String; const Key; const KeySize : FixedInt; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false); overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
-function  ALRDLEncryptStringCBCU(const InString: String; const Key; const KeySize : FixedInt; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false) : String; overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
-procedure ALRDLEncryptStringCBCU(const InString: String; var OutString : String; const Key: String; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false); overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
-function  ALRDLEncryptStringCBCU(const InString: String; const Key: String; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean; Const encoding: Tencoding; const UseBase64: boolean = false) : String; overload; // the encrypted string must be base64 (if UseBase64) or hexencoded
-procedure ALRDLEncryptStreamU(const InStream, OutStream : TStream; const Key: String; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean; Const encoding: Tencoding); overload;
-procedure ALRDLEncryptStreamCBCU(const InStream, OutStream : TStream; const Key: String; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean; Const encoding: Tencoding); overload;
+procedure ALRDLEncryptStreamCBC(const InStream, OutStream : TStream; const Key: String; const KeyDerivationFunction: TALkeyDerivationFunction; const Encrypt : Boolean; Const encoding: Tencoding); overload;
 
 
 
@@ -158,9 +142,9 @@ type
   TALMD5Digest  = TALCipherKey128;         { 128 bits - MD5 }
 
 procedure ALStringHashMD5(var Digest : TALMD5Digest; const Str : AnsiString); overload;
+procedure ALStringHashMD5(var Digest: TALMD5Digest; const Str: String; Const encoding: Tencoding); overload;
 function  ALStringHashMD5(const Str : AnsiString; const HexEncode: boolean = true): AnsiString; overload;
-procedure ALStringHashMD5U(var Digest: TALMD5Digest; const Str: String; Const encoding: Tencoding); overload;
-function  ALStringHashMD5U(const Str: String; Const encoding: Tencoding): String; overload; // result will be hexencoded
+function  ALStringHashMD5(const Str: String; Const encoding: Tencoding): String; overload; // result will be hexencoded
 
 
 
@@ -172,9 +156,9 @@ type
   TALSHA1Digest = array [0..19] of Byte;         { 160 bits - SHA-1 }
 
 procedure ALStringHashSHA1(var Digest: TALSHA1Digest; const Str: AnsiString); overload;
+procedure ALStringHashSHA1(var Digest: TALSHA1Digest; const Str : String; Const encoding: Tencoding); overload;
 function  ALStringHashSHA1(const Str: AnsiString; const HexEncode: boolean = true): AnsiString; overload;
-procedure ALStringHashSHA1U(var Digest: TALSHA1Digest; const Str : String; Const encoding: Tencoding); overload;
-function  ALStringHashSHA1U(const Str: String; Const encoding: Tencoding): String; overload; // result will be hexencoded
+function  ALStringHashSHA1(const Str: String; Const encoding: Tencoding): String; overload; // result will be hexencoded
 
 
 
@@ -182,14 +166,10 @@ function  ALStringHashSHA1U(const Str: String; Const encoding: Tencoding): Strin
 ////// SHA2 //////
 //////////////////
 
-{$IF CompilerVersion >= 32} // tokyo
-
 procedure ALStringHashSHA2(var Digest: TBytes; const Str: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256); overload;
+procedure ALStringHashSHA2(var Digest: Tbytes; const Str: String; Const encoding: Tencoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256); overload;
 function  ALStringHashSHA2(const Str: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256; const HexEncode: boolean = true): AnsiString; overload;
-procedure ALStringHashSHA2U(var Digest: Tbytes; const Str: String; Const encoding: Tencoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256); overload;
-function  ALStringHashSHA2U(const Str: String; Const encoding: Tencoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): String; overload; // result will be hexencoded
-
-{$ENDIF}
+function  ALStringHashSHA2(const Str: String; Const encoding: Tencoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): String; overload; // result will be hexencoded
 
 
 
@@ -269,10 +249,10 @@ var ALRandom64: function(const ARange: UInt64): UInt64;
 ////// Fnv1a //////
 ///////////////////
 
-function ALFnv1aInt32(const str: ansiString): int32; inline;
-function ALFnv1aInt64(const str: ansiString): Int64; inline;
-function ALFnv1aInt32U(const str: String; Const encoding: Tencoding): int32; inline;
-function ALFnv1aInt64U(const str: String; Const encoding: Tencoding): Int64; inline;
+function ALFnv1aInt32(const str: ansiString): int32; overload; inline;
+function ALFnv1aInt32(const str: String; Const encoding: Tencoding): int32; overload; inline;
+function ALFnv1aInt64(const str: ansiString): Int64; overload; inline;
+function ALFnv1aInt64(const str: String; Const encoding: Tencoding): Int64; overload; inline;
 
 
 
@@ -530,6 +510,7 @@ uses
   Alcinoe.HTML,
   {$ENDIF}
   system.Math,
+  System.AnsiStrings,
   Alcinoe.Files,
   Alcinoe.StringList,
   Alcinoe.StringUtils;
@@ -616,341 +597,6 @@ end;
 ////// MD5 //////
 /////////////////
 
-{$REGION ' CompilerVersion < 32'}
-{$IF CompilerVersion < 32} // tokyo
-
-{ message digest context types }
-type
-  TALMD5Context  = array [0..87] of Byte;        { MD5 }
-
-type
-  pALMD5ContextEx = ^TALMD5ContextEx;
-  TALMD5ContextEx = packed record
-    Count : array [0..1] of DWord;  {number of bits handled mod 2^64}
-    State : array [0..3] of DWord;  {scratch buffer}
-    Buf   : array [0..63] of Byte;    {input buffer}
-  end;
-
-{******************************************}
-function ALCipherRolX(I, C : DWord) : DWord;
-{$IF not defined(CPUX86)}
-begin
-   Result := (I shl (C and 31)) or (I shr (32-(C and 31)));
-end;
-{$ELSE}
-register;
-asm
-  mov  ecx, edx         {get count to cl}
-  rol  eax, cl          {rotate eax by cl}
-end;
-{$ENDIF}
-
-{**************************************************************************************}
-procedure ALCipherTransform(var Buffer : array of DWord;  const InBuf : array of DWord);
-const
-  S11 = 7;
-  S12 = 12;
-  S13 = 17;
-  S14 = 22;
-  S21 = 5;
-  S22 = 9;
-  S23 = 14;
-  S24 = 20;
-  S31 = 4;
-  S32 = 11;
-  S33 = 16;
-  S34 = 23;
-  S41 = 6;
-  S42 = 10;
-  S43 = 15;
-  S44 = 21;
-var
-  Buf : array [0..3] of DWord;
-  InA : array [0..15] of DWord;
-var
-  A   : DWord;
-  B   : DWord;
-  C   : DWord;
-  D   : DWord;
-
-  procedure FF(var A : DWord;  B, C, D, X, S, AC : DWord);
-  begin
-    A := ALCipherRolX(A + ((B and C) or (not B and D)) + X + AC, S) + B;
-  end;
-
-  procedure GG(var A : DWord;  B, C, D, X, S, AC : DWord);
-  begin
-    A := ALCipherRolX(A + ((B and D) or (C and not D)) + X + AC, S) + B;
-  end;
-
-  procedure HH(var A : DWord;  B, C, D, X, S, AC : DWord);
-  begin
-    A := ALCipherRolX(A + (B xor C xor D) + X + AC, S) + B;
-  end;
-
-  procedure II(var A : DWord;  B, C, D, X, S, AC : DWord);
-  begin
-    A := ALCipherRolX(A + (C xor (B or not D)) + X + AC, S) + B;
-  end;
-
-begin
-  ALMove(Buffer, Buf, SizeOf(Buf));
-  ALMove(InBuf, InA, SizeOf(InA));
-  A := Buf [0];
-  B := Buf [1];
-  C := Buf [2];
-  D := Buf [3];
-
-
-  {round 1}
-  FF(A, B, C, D, InA [ 0], S11, $D76AA478);  { 1 }
-  FF(D, A, B, C, InA [ 1], S12, $E8C7B756);  { 2 }
-  FF(C, D, A, B, InA [ 2], S13, $242070DB);  { 3 }
-  FF(B, C, D, A, InA [ 3], S14, $C1BDCEEE);  { 4 }
-  FF(A, B, C, D, InA [ 4], S11, $F57C0FAF);  { 5 }
-  FF(D, A, B, C, InA [ 5], S12, $4787C62A);  { 6 }
-  FF(C, D, A, B, InA [ 6], S13, $A8304613);  { 7 }
-  FF(B, C, D, A, InA [ 7], S14, $FD469501);  { 8 }
-  FF(A, B, C, D, InA [ 8], S11, $698098D8);  { 9 }
-  FF(D, A, B, C, InA [ 9], S12, $8B44F7AF);  { 10 }
-  FF(C, D, A, B, InA [10], S13, $FFFF5BB1);  { 11 }
-  FF(B, C, D, A, InA [11], S14, $895CD7BE);  { 12 }
-  FF(A, B, C, D, InA [12], S11, $6B901122);  { 13 }
-  FF(D, A, B, C, InA [13], S12, $FD987193);  { 14 }
-  FF(C, D, A, B, InA [14], S13, $A679438E);  { 15 }
-  FF(B, C, D, A, InA [15], S14, $49B40821);  { 16 }
-
-  {round 2}
-  GG(A, B, C, D, InA [ 1], S21, $F61E2562);  { 17 }
-  GG(D, A, B, C, InA [ 6], S22, $C040B340);  { 18 }
-  GG(C, D, A, B, InA [11], S23, $265E5A51);  { 19 }
-  GG(B, C, D, A, InA [ 0], S24, $E9B6C7AA);  { 20 }
-  GG(A, B, C, D, InA [ 5], S21, $D62F105D);  { 21 }
-  GG(D, A, B, C, InA [10], S22, $02441453);  { 22 }
-  GG(C, D, A, B, InA [15], S23, $D8A1E681);  { 23 }
-  GG(B, C, D, A, InA [ 4], S24, $E7D3FBC8);  { 24 }
-  GG(A, B, C, D, InA [ 9], S21, $21E1CDE6);  { 25 }
-  GG(D, A, B, C, InA [14], S22, $C33707D6);  { 26 }
-  GG(C, D, A, B, InA [ 3], S23, $F4D50D87);  { 27 }
-  GG(B, C, D, A, InA [ 8], S24, $455A14ED);  { 28 }
-  GG(A, B, C, D, InA [13], S21, $A9E3E905);  { 29 }
-  GG(D, A, B, C, InA [ 2], S22, $FCEFA3F8);  { 30 }
-  GG(C, D, A, B, InA [ 7], S23, $676F02D9);  { 31 }
-  GG(B, C, D, A, InA [12], S24, $8D2A4C8A);  { 32 }
-
-  {round 3}
-  HH(A, B, C, D, InA [ 5], S31, $FFFA3942);  { 33 }
-  HH(D, A, B, C, InA [ 8], S32, $8771F681);  { 34 }
-  HH(C, D, A, B, InA [11], S33, $6D9D6122);  { 35 }
-  HH(B, C, D, A, InA [14], S34, $FDE5380C);  { 36 }
-  HH(A, B, C, D, InA [ 1], S31, $A4BEEA44);  { 37 }
-  HH(D, A, B, C, InA [ 4], S32, $4BDECFA9);  { 38 }
-  HH(C, D, A, B, InA [ 7], S33, $F6BB4B60);  { 39 }
-  HH(B, C, D, A, InA [10], S34, $BEBFBC70);  { 40 }
-  HH(A, B, C, D, InA [13], S31, $289B7EC6);  { 41 }
-  HH(D, A, B, C, InA [ 0], S32, $EAA127FA);  { 42 }
-  HH(C, D, A, B, InA [ 3], S33, $D4EF3085);  { 43 }
-  HH(B, C, D, A, InA [ 6], S34,  $4881D05);  { 44 }
-  HH(A, B, C, D, InA [ 9], S31, $D9D4D039);  { 45 }
-  HH(D, A, B, C, InA [12], S32, $E6DB99E5);  { 46 }
-  HH(C, D, A, B, InA [15], S33, $1FA27CF8);  { 47 }
-  HH(B, C, D, A, InA [ 2], S34, $C4AC5665);  { 48 }
-
-  {round 4}
-  II(A, B, C, D, InA [ 0], S41, $F4292244);  { 49 }
-  II(D, A, B, C, InA [ 7], S42, $432AFF97);  { 50 }
-  II(C, D, A, B, InA [14], S43, $AB9423A7);  { 51 }
-  II(B, C, D, A, InA [ 5], S44, $FC93A039);  { 52 }
-  II(A, B, C, D, InA [12], S41, $655B59C3);  { 53 }
-  II(D, A, B, C, InA [ 3], S42, $8F0CCC92);  { 54 }
-  II(C, D, A, B, InA [10], S43, $FFEFF47D);  { 55 }
-  II(B, C, D, A, InA [ 1], S44, $85845DD1);  { 56 }
-  II(A, B, C, D, InA [ 8], S41, $6FA87E4F);  { 57 }
-  II(D, A, B, C, InA [15], S42, $FE2CE6E0);  { 58 }
-  II(C, D, A, B, InA [ 6], S43, $A3014314);  { 59 }
-  II(B, C, D, A, InA [13], S44, $4E0811A1);  { 60 }
-  II(A, B, C, D, InA [ 4], S41, $F7537E82);  { 61 }
-  II(D, A, B, C, InA [11], S42, $BD3AF235);  { 62 }
-  II(C, D, A, B, InA [ 2], S43, $2AD7D2BB);  { 63 }
-  II(B, C, D, A, InA [ 9], S44, $EB86D391);  { 64 }
-
-  Inc(Buf [0], A);
-  Inc(Buf [1], B);
-  Inc(Buf [2], C);
-  Inc(Buf [3], D);
-
-  ALMove(Buf, Buffer, SizeOf(Buffer));
-end;
-
-{***********************************************}
-procedure ALInitMD5(var Context : TALMD5Context);
-var
-  MD5 : TALMD5ContextEx;
-begin
-  ALMove(Context, MD5, SizeOf(MD5));
-  MD5.Count[0] := 0;
-  MD5.Count[1] := 0;
-
-  {load magic initialization constants}
-  MD5.State[0] := $67452301;
-  MD5.State[1] := $EFCDAB89;
-  MD5.State[2] := $98BADCFE;
-  MD5.State[3] := $10325476;
-  ALMove(MD5, Context, SizeOf(Context));
-end;
-
-{**********************************************************************************}
-procedure ALUpdateMD5(var Context : TALMD5Context;  const Buf;  BufSize : FixedInt);
-var
-  MD5    : TALMD5ContextEx;
-  InBuf  : array [0..15] of DWord;
-  BufOfs : FixedInt;
-  MDI    : Word;
-  I      : Word;
-  II     : Word;
-begin
-  ALMove(Context, MD5, SizeOf(MD5));
-
-  {compute number of bytes mod 64}
-  MDI := (MD5.Count[0] shr 3) and $3F;
-
-  {update number of bits}
-  if ((MD5.Count[0] + (DWord(BufSize) shl 3)) < MD5.Count[0]) then
-    Inc(MD5.Count[1]);
-  Inc(MD5.Count[0], BufSize shl 3);
-  Inc(MD5.Count[1], BufSize shr 29);
-
-  {add new byte acters to buffer}
-  BufOfs := 0;
-  while (BufSize > 0) do begin
-    Dec(BufSize);
-    MD5.Buf[MDI] := TByteArray(Buf)[BufOfs];
-    Inc(MDI);
-    Inc(BufOfs);
-    if (MDI = $40) then begin
-      II := 0;
-      for I := 0 to 15 do begin
-        InBuf[I] := FixedInt(MD5.Buf[II + 3]) shl 24 or
-          FixedInt(MD5.Buf[II + 2]) shl 16 or
-          FixedInt(MD5.Buf[II + 1]) shl 8 or
-          FixedInt(MD5.Buf[II]);
-        Inc(II, 4);
-      end;
-      ALCipherTransform(MD5.State, InBuf);
-      ALCipherTransform(TALMD5ContextEx( Context ).State, InBuf);
-      MDI := 0;
-    end;
-  end;
-  ALMove(MD5, Context, SizeOf(Context));
-end;
-
-{******************************************************************************}
-procedure ALFinalizeMD5(var Context : TALMD5Context; var Digest : TALMD5Digest);
-const
-  Padding: array [0..63] of Byte = (
-    $80, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00,
-    $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00,
-    $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00,
-    $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00);
-var
-  MD5    : TALMD5ContextEx;
-  InBuf  : array [0..15] of DWord;
-  MDI    : FixedInt;
-  I      : Word;
-  II     : Word;
-  PadLen : Word;
-begin
-  ALMove(Context, MD5, SizeOf(MD5));
-  {save number of bits}
-  InBuf[14] := MD5.Count[0];
-  InBuf[15] := MD5.Count[1];
-  {compute number of bytes mod 64}
-  MDI := (MD5.Count[0] shr 3) and $3F;
-  {pad out to 56 mod 64}
-  if (MDI < 56) then
-    PadLen := 56 - MDI
-  else
-    PadLen := 120 - MDI;
-  ALUpdateMD5(Context, Padding, PadLen);
-
-  ALMove(Context, MD5, SizeOf(MD5));
-
-  {append length in bits and transform}
-  II := 0;
-  for I := 0 to 13 do begin
-    InBuf[I] :=
-      ( FixedInt( MD5.Buf[ II + 3 ]) shl 24 ) or
-      ( FixedInt( MD5.Buf[ II + 2 ]) shl 16 ) or
-      ( FixedInt( MD5.Buf[ II + 1 ]) shl 8  ) or
-        FixedInt( MD5.Buf[ II     ]);
-    Inc(II, 4);
-  end;
-  ALCipherTransform(MD5.State, InBuf);
-  {store buffer in digest}
-  II := 0;
-  for I := 0 to 3 do begin
-    Digest[II] := Byte(MD5.State[I] and $FF);
-    Digest[II + 1] := Byte((MD5.State[I] shr 8) and $FF);
-    Digest[II + 2] := Byte((MD5.State[I] shr 16) and $FF);
-    Digest[II + 3] := Byte((MD5.State[I] shr 24) and $FF);
-    Inc(II, 4);
-  end;
-  ALMove(MD5, Context, SizeOf(Context));
-end;
-
-{*****************************************************************************}
-procedure ALHashMD5(var Digest : TALMD5Digest; const Buf;  BufSize : FixedInt);
-var
-  Context : TALMD5Context;
-begin
-  fillchar( context, SizeOf( context ), $00 );
-  ALInitMD5(Context);
-  ALUpdateMD5(Context, Buf, BufSize);
-  ALFinalizeMD5(Context, Digest);
-end;
-
-{***************************************************************************}
-procedure ALStringHashMD5(var Digest : TALMD5Digest; const Str : AnsiString);
-begin
-  ALHashMD5(Digest, pointer(Str)^, Length(Str));
-end;
-
-{********************************************************************************************}
-function ALStringHashMD5(const Str : AnsiString; const HexEncode: boolean = true): AnsiString;
-Var aMD5Digest: TALMD5Digest;
-Begin
-  AlStringHashMD5(aMD5Digest, Str);
-  if HexEncode then Result := ALBinToHex(aMD5Digest, SizeOf(aMD5Digest))
-  else begin
-    SetLength(result, Length(aMD5Digest));
-    ALmove(aMD5Digest, pointer(result)^, length(result));
-  end;
-end;
-
-{*************************************************************************************************}
-procedure ALStringHashMD5U(var Digest: TALMD5Digest; const Str: String; Const encoding: Tencoding);
-var abytes: Tbytes;
-begin
-  aBytes := encoding.GetBytes(str);
-  ALHashMD5(Digest, pointer(aBytes)^, Length(aBytes));
-end;
-
-{********************************************************************************}
-function  ALStringHashMD5U(const Str : String; Const encoding: Tencoding): String;
-Var aMD5Digest: TALMD5Digest;
-    abytes: Tbytes;
-Begin
-  aBytes := encoding.GetBytes(str);
-  ALHashMD5(aMD5Digest, pointer(aBytes)^, Length(aBytes));
-  Result := ALBinToHexU(aMD5Digest, SizeOf(aMD5Digest));
-end;
-
-{$ENDIF}
-{$ENDREGION}
-
-{$REGION ' CompilerVersion >= 32'}
-{$IF CompilerVersion >= 32} // tokyo
-
 {*************************************************************************}
 procedure ALStringHashMD5(var Digest: TALMD5Digest; const Str: AnsiString);
 var LMD5: THashMD5;
@@ -962,6 +608,17 @@ begin
   ALMove(PByte(LBytes)^, Digest[0], length(LBytes)); // << LBytes can not be bigger than Digest
 end;
 
+{********************************************************************************}
+function  ALStringHashMD5(const Str: String; Const encoding: Tencoding): String;
+Var LMD5: THashMD5;
+    Lbytes: Tbytes;
+Begin
+  LMD5 := THashMD5.Create;
+  LMD5.Update(encoding.GetBytes(str));
+  LBytes := LMD5.HashAsBytes;
+  Result := ALBinToHexW(PByte(LBytes)^, length(LBytes));
+end;
+
 {********************************************************************************************}
 function  ALStringHashMD5(const Str: AnsiString; const HexEncode: boolean = true): AnsiString;
 var LMD5: THashMD5;
@@ -970,7 +627,7 @@ begin
   LMD5 := THashMD5.Create;
   LMD5.Update(pointer(Str)^, length(str));
   LBytes := LMD5.HashAsBytes;
-  if HexEncode then result := ALBinToHex(PByte(LBytes)^, length(LBytes))
+  if HexEncode then result := ALBinToHexA(PByte(LBytes)^, length(LBytes))
   else begin
     setlength(result, length(LBytes));
     ALMove(PByte(LBytes)^, pointer(result)^, length(LBytes));
@@ -978,7 +635,7 @@ begin
 end;
 
 {*************************************************************************************************}
-procedure ALStringHashMD5U(var Digest: TALMD5Digest; const Str: String; Const encoding: Tencoding);
+procedure ALStringHashMD5(var Digest: TALMD5Digest; const Str: String; Const encoding: Tencoding);
 var LMD5: THashMD5;
     LBytes: Tbytes;
 begin
@@ -988,271 +645,11 @@ begin
   ALMove(PByte(LBytes)^, Digest[0], length(LBytes)); // << LBytes can not be bigger than Digest
 end;
 
-{********************************************************************************}
-function  ALStringHashMD5U(const Str: String; Const encoding: Tencoding): String;
-Var LMD5: THashMD5;
-    Lbytes: Tbytes;
-Begin
-  LMD5 := THashMD5.Create;
-  LMD5.Update(encoding.GetBytes(str));
-  LBytes := LMD5.HashAsBytes;
-  Result := ALBinToHexU(PByte(LBytes)^, length(LBytes));
-end;
-
-{$ENDIF}
-{$ENDREGION}
-
 
 
 //////////////////
 ////// SHA1 //////
 //////////////////
-
-{$REGION ' CompilerVersion < 32'}
-{$IF CompilerVersion < 32} // tokyo
-
-{ message digest context types }
-type
-  TALSHA1Context = record                        { SHA-1 }
-    sdHi    : DWord;
-    sdLo    : DWord;
-    sdIndex : DWord;
-    sdHash  : array [0..4] of DWord;
-    sdBuf   : array [0..63] of Byte;
-  end;
-
-{ SHA-1 constants }
-const
-  { 5 magic numbers }
-  cALSHA1_A = DWORD( $67452301 );
-  cALSHA1_B = DWORD( $EFCDAB89 );
-  cALSHA1_C = DWORD( $98BADCFE );
-  cALSHA1_D = DWORD( $10325476 );
-  cALSHA1_E = DWORD( $C3D2E1F0 );
-  { four rounds consts }
-  cALSHA1_K1 = DWORD( $5A827999 );
-  cALSHA1_K2 = DWORD( $6ED9EBA1 );
-  cALSHA1_K3 = DWORD( $8F1BBCDC );
-  cALSHA1_K4 = DWORD( $CA62C1D6 );
-  { Maskes used in byte swap }
-  cALSHA1_LBMASK_HI = DWORD( $FF0000 );
-  cALSHA1_LBMASK_LO = DWORD( $FF00 );
-
-{****************************************************}
-procedure ALSHA1Clear( var Context : TALSHA1Context );
-begin
-  fillchar( Context, SizeOf( Context ), $00 );
-end;
-
-{************************************************}
-function ALSHA1SwapByteOrder( n : DWORD ) : DWORD;
-begin
-  n := ( n shr 24 ) or (( n shr 8 ) and cALSHA1_LBMASK_LO )
-       or (( n shl 8 ) and cALSHA1_LBMASK_HI ) or ( n shl 24 );
-  Result := n;
-end;
-
-{***************************************************}
-procedure ALSHA1Hash( var Context : TALSHA1Context );
-var
-  A : DWord;
-  B : DWord;
-  C : DWord;
-  D : DWord;
-  E : DWord;
-
-  X : DWord;
-  W : array[ 0..79 ] of DWord;
-
-  i : FixedInt;
-begin
-  with Context do begin
-    sdIndex:= 0;
-    ALMove( sdBuf, W, Sizeof( W ));
-
-    // W := Mt, for t = 0 to 15 : Mt is M sub t
-    for i := 0 to 15 do
-      W[ i ]:= ALSHA1SwapByteOrder( W[ i ] );
-
-    // Transform Message block from 16 32 bit words to 80 32 bit words
-    // Wt, = ( Wt-3 xor Wt-8 xor Wt-13 xor Wt-16 ) rolL 1 : Wt is W sub t
-    for i:= 16 to 79 do
-      W[i]:= ALCipherRolX( W[ i - 3 ] xor W[ i - 8 ] xor W[ i - 14 ] xor W[ i - 16 ], 1 );
-
-    A := sdHash[ 0 ];
-    B := sdHash[ 1 ];
-    C := sdHash[ 2 ];
-    D := sdHash[ 3 ];
-    E := sdHash[ 4 ];
-
-    // the four rounds
-    for i:= 0 to 19 do begin
-      X := ALCipherRolX( A, 5 ) + ( D xor ( B and ( C xor D ))) + E + W[ i ] + cALSHA1_K1;
-      E := D;
-      D := C;
-      C := ALCipherRolX( B, 30 );
-      B := A;
-      A := X;
-    end;
-
-    for i:= 20 to 39 do begin
-      X := ALCipherRolX( A, 5 ) + ( B xor C xor D ) + E + W[ i ] + cALSHA1_K2;
-      E := D;
-      D := C;
-      C := ALCipherRolX( B, 30 );
-      B := A;
-      A := X;
-    end;
-
-    for i:= 40 to 59 do begin
-      X := ALCipherRolX( A, 5 ) + (( B and C ) or ( D and ( B or C ))) + E + W[ i ] + cALSHA1_K3;
-      E := D;
-      D := C;
-      C := ALCipherRolX( B, 30 );
-      B := A;
-      A := X;
-    end;
-
-    for i:= 60 to 79 do
-    begin
-      X := ALCipherRolX( A, 5 ) + ( B xor C xor D ) + E + W[ i ] + cALSHA1_K4;
-      E := D;
-      D := C;
-      C := ALCipherRolX( B, 30 );
-      B := A;
-      A := X;
-    end;
-
-    sdHash[ 0 ]:= sdHash[ 0 ] + A;
-    sdHash[ 1 ]:= sdHash[ 1 ] + B;
-    sdHash[ 2 ]:= sdHash[ 2 ] + C;
-    sdHash[ 3 ]:= sdHash[ 3 ] + D;
-    sdHash[ 4 ]:= sdHash[ 4 ] + E;
-
-    FillChar( W, Sizeof( W ), $00 );
-    FillChar( sdBuf, Sizeof( sdBuf ), $00 );
-  end;
-end;
-
-{*********************************************************************}
-procedure ALSHA1UpdateLen( var Context : TALSHA1Context; Len : DWord );
-begin
-  Inc( Context.sdLo,( Len shl 3 ));
-  if Context.sdLo < ( Len shl 3 ) then
-    Inc( Context.sdHi );
-  Inc( Context.sdHi, Len shr 29 );
-end;
-
-{***************************************************}
-procedure ALInitSHA1( var Context : TALSHA1Context );
-begin
-  ALSHA1Clear( Context );
-  Context.sdHash[ 0 ] := cALSHA1_A;
-  Context.sdHash[ 1 ] := cALSHA1_B;
-  Context.sdHash[ 2 ] := cALSHA1_C;
-  Context.sdHash[ 3 ] := cALSHA1_D;
-  Context.sdHash[ 4 ] := cALSHA1_E;
-end;
-
-{***********************************************************************************}
-procedure ALUpdateSHA1( var Context : TALSHA1Context; const Buf; BufSize: FixedInt );
-var
-  PBuf: ^Byte;
-begin
-  with Context do begin
-    ALSHA1UpdateLen( Context, BufSize );
-    PBuf := @Buf;
-    while BufSize > 0 do begin
-      if ( Sizeof( sdBuf ) - sdIndex ) <= DWord( BufSize ) then begin
-        ALMove( PBuf^, sdBuf[ sdIndex ], Sizeof( sdBuf ) - sdIndex );
-        Dec( BufSize, Sizeof( sdBuf ) - sdIndex );
-        Inc( PBuf, Sizeof( sdBuf ) - sdIndex );
-        ALSHA1Hash( Context );
-      end else begin
-        ALMove( PBuf^, sdBuf[ sdIndex ], BufSize );
-        Inc( sdIndex, BufSize );
-        BufSize := 0;
-      end;
-    end;
-  end;
-end;
-
-{***********************************************************************************}
-procedure ALFinalizeSHA1( var Context : TALSHA1Context; var Digest : TALSHA1Digest );
-begin
-  with Context do begin
-    sdBuf[ sdIndex ] := $80;
-
-    if sdIndex >= 56 then
-      ALSHA1Hash( Context );
-
-    PDWord( @sdBuf[ 56 ])^ := ALSHA1SwapByteOrder( sdHi );
-    PDWord( @sdBuf[ 60 ])^ := ALSHA1SwapByteOrder( sdLo );
-
-    ALSHA1Hash( Context );
-
-    sdHash[ 0 ] := ALSHA1SwapByteOrder( sdHash[ 0 ]);
-    sdHash[ 1 ] := ALSHA1SwapByteOrder( sdHash[ 1 ]);
-    sdHash[ 2 ] := ALSHA1SwapByteOrder( sdHash[ 2 ]);
-    sdHash[ 3 ] := ALSHA1SwapByteOrder( sdHash[ 3 ]);
-    sdHash[ 4 ] := ALSHA1SwapByteOrder( sdHash[ 4 ]);
-
-    ALMove( sdHash, Digest, Sizeof( Digest ));
-    ALSHA1Clear( Context );
-  end;
-end;
-
-{********************************************************************************}
-procedure ALHashSHA1( var Digest : TALSHA1Digest; const Buf; BufSize : FixedInt );
-var
-  Context : TALSHA1Context;
-begin
-  ALInitSHA1( Context );
-  ALUpdateSHA1( Context, Buf, BufSize );
-  ALFinalizeSHA1( Context, Digest );
-end;
-
-{*****************************************************************************}
-procedure ALStringHashSHA1(var Digest : TALSHA1Digest; const Str : AnsiString);
-begin
-  ALHashSHA1(Digest, pointer(Str)^, Length(Str));
-end;
-
-{*********************************************************************************************}
-function ALStringHashSHA1(const Str : AnsiString; const HexEncode: boolean = true): AnsiString;
-Var aSHA1Digest: TALSHA1Digest;
-Begin
-  AlStringHashSHA1(aSHA1Digest, Str);
-  if HexEncode then result := ALBinToHex(ASHA1Digest, SizeOf(aSHA1Digest))
-  else begin
-    SetLength(result, Length(aSHA1Digest));
-    ALmove(aSHA1Digest, pointer(result)^, length(result));
-  end;
-end;
-
-{****************************************************************************************************}
-procedure ALStringHashSHA1U(var Digest: TALSHA1Digest; const Str : String; Const encoding: Tencoding);
-Var abytes: Tbytes;
-Begin
-  aBytes := encoding.GetBytes(str);
-  ALHashSHA1(Digest, pointer(aBytes)^, Length(aBytes));
-end;
-
-{********************************************************************************}
-function ALStringHashSHA1U(const Str : String; Const encoding: Tencoding): String;
-Var aSHA1Digest: TALSHA1Digest;
-    abytes: Tbytes;
-Begin
-  aBytes := encoding.GetBytes(str);
-  ALHashSHA1(aSHA1Digest, pointer(aBytes)^, Length(aBytes));
-  Result := ALBinToHexU(aSHA1Digest, SizeOf(aSHA1Digest));
-end;
-
-{$ENDIF}
-{$ENDREGION}
-
-{$REGION ' CompilerVersion >= 32'}
-{$IF CompilerVersion >= 32} // tokyo
 
 {***************************************************************************}
 procedure ALStringHashSHA1(var Digest: TALSHA1Digest; const Str: AnsiString);
@@ -1265,23 +662,8 @@ begin
   ALMove(PByte(LBytes)^, Digest[0], length(LBytes)); // << LBytes can not be bigger than Digest
 end;
 
-{*********************************************************************************************}
-function  ALStringHashSHA1(const Str: AnsiString; const HexEncode: boolean = true): AnsiString;
-var LSHA1: THashSHA1;
-    LBytes: Tbytes;
-begin
-  LSHA1 := THashSHA1.Create;
-  LSHA1.Update(pointer(Str)^, length(str));
-  LBytes := LSHA1.HashAsBytes;
-  if HexEncode then result := ALBinToHex(PByte(LBytes)^, length(LBytes))
-  else begin
-    setlength(result, length(LBytes));
-    ALMove(PByte(LBytes)^, pointer(result)^, length(LBytes));
-  end;
-end;
-
 {****************************************************************************************************}
-procedure ALStringHashSHA1U(var Digest: TALSHA1Digest; const Str : String; Const encoding: Tencoding);
+procedure ALStringHashSHA1(var Digest: TALSHA1Digest; const Str : String; Const encoding: Tencoding);
 var LSHA1: THashSHA1;
     LBytes: Tbytes;
 begin
@@ -1291,19 +673,31 @@ begin
   ALMove(PByte(LBytes)^, Digest[0], length(LBytes)); // << LBytes can not be bigger than Digest
 end;
 
+{*********************************************************************************************}
+function  ALStringHashSHA1(const Str: AnsiString; const HexEncode: boolean = true): AnsiString;
+var LSHA1: THashSHA1;
+    LBytes: Tbytes;
+begin
+  LSHA1 := THashSHA1.Create;
+  LSHA1.Update(pointer(Str)^, length(str));
+  LBytes := LSHA1.HashAsBytes;
+  if HexEncode then result := ALBinToHexA(PByte(LBytes)^, length(LBytes))
+  else begin
+    setlength(result, length(LBytes));
+    ALMove(PByte(LBytes)^, pointer(result)^, length(LBytes));
+  end;
+end;
+
 {********************************************************************************}
-function  ALStringHashSHA1U(const Str: String; Const encoding: Tencoding): String;
+function  ALStringHashSHA1(const Str: String; Const encoding: Tencoding): String;
 Var LSHA1: THashSHA1;
     Lbytes: Tbytes;
 Begin
   LSHA1 := THashSHA1.Create;
   LSHA1.Update(encoding.GetBytes(str));
   LBytes := LSHA1.HashAsBytes;
-  Result := ALBinToHexU(PByte(LBytes)^, length(LBytes));
+  Result := ALBinToHexW(PByte(LBytes)^, length(LBytes));
 end;
-
-{$ENDIF}
-{$ENDREGION}
 
 
 
@@ -1311,14 +705,21 @@ end;
 ////// SHA2 //////
 //////////////////
 
-{$IF CompilerVersion >= 32} // tokyo
-
 {************************************************************************************************************************************************}
 procedure ALStringHashSHA2(var Digest: TBytes; const Str: AnsiString; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256);
 var LSHA2: THashSHA2;
 begin
   LSHA2 := THashSHA2.Create(AHashVersion);
   LSHA2.Update(pointer(Str)^, length(str));
+  Digest := LSHA2.HashAsBytes;
+end;
+
+{************************************************************************************************************************************************************************}
+procedure ALStringHashSHA2(var Digest: Tbytes; const Str: String; Const encoding: Tencoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256);
+var LSHA2: THashSHA2;
+begin
+  LSHA2 := THashSHA2.Create(AHashVersion);
+  LSHA2.Update(encoding.GetBytes(str));
   Digest := LSHA2.HashAsBytes;
 end;
 
@@ -1330,34 +731,23 @@ begin
   LSHA2 := THashSHA2.Create(AHashVersion);
   LSHA2.Update(pointer(Str)^, length(str));
   LBytes := LSHA2.HashAsBytes;
-  if HexEncode then result := ALBinToHex(PByte(LBytes)^, length(LBytes))
+  if HexEncode then result := ALBinToHexA(PByte(LBytes)^, length(LBytes))
   else begin
     setlength(result, length(LBytes));
     ALMove(PByte(LBytes)^, pointer(result)^, length(LBytes));
   end;
 end;
 
-{************************************************************************************************************************************************************************}
-procedure ALStringHashSHA2U(var Digest: Tbytes; const Str: String; Const encoding: Tencoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256);
-var LSHA2: THashSHA2;
-begin
-  LSHA2 := THashSHA2.Create(AHashVersion);
-  LSHA2.Update(encoding.GetBytes(str));
-  Digest := LSHA2.HashAsBytes;
-end;
-
 {************************************************************************************************************************************************************}
-function  ALStringHashSHA2U(const Str: String; Const encoding: Tencoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): String;
+function  ALStringHashSHA2(const Str: String; Const encoding: Tencoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): String;
 var LSHA2: THashSHA2;
     LBytes: Tbytes;
 begin
   LSHA2 := THashSHA2.Create(AHashVersion);
   LSHA2.Update(encoding.GetBytes(str));
   LBytes := LSHA2.HashAsBytes;
-  Result := ALBinToHexU(PByte(LBytes)^, length(LBytes));
+  Result := ALBinToHexW(PByte(LBytes)^, length(LBytes));
 end;
-
-{$ENDIF}
 
 
 
@@ -2147,11 +1537,11 @@ end;
 {*************************************************************************}
 class function TBCrypt.BsdStrVersionToInt(const version: ansiString): Byte;
 begin
-  if alSameText(version, '2') then result := BCrypt_Version_2
-  else if alSameText(version, '2a') then result := BCrypt_Version_2a
-  else if alSameText(version, '2x') then result := BCrypt_Version_2x
-  else if alSameText(version, '2y') then result := BCrypt_Version_2y
-  else if alSameText(version, '2b') then result := BCrypt_Version_2b
+  if ALSameTextA(version, '2') then result := BCrypt_Version_2
+  else if ALSameTextA(version, '2a') then result := BCrypt_Version_2a
+  else if ALSameTextA(version, '2x') then result := BCrypt_Version_2x
+  else if ALSameTextA(version, '2y') then result := BCrypt_Version_2y
+  else if ALSameTextA(version, '2b') then result := BCrypt_Version_2b
   else result := 0;
 end;
 
@@ -2174,7 +1564,7 @@ begin
   hashString := BsdBase64Encode(hash, Length(hash)-1); //Yes, everything except the last byte.
                                                        //OpenBSD, in the pseudo-base64 implementation, doesn't include the last byte of the hash
                                                        //Nobody knows why, but that's what all existing tests do - so it's what i do
-  Result := ALFormat('$%s$%.2d$%s%s', [IntVersionToBsdStr(Version), cost, saltString, hashString]);
+  Result := ALFormatA('$%s$%.2d$%s%s', [IntVersionToBsdStr(Version), cost, saltString, hashString]);
 end;
 
 {****************************************************************************************************}
@@ -2595,7 +1985,7 @@ var
 begin
   for i := 0 to 56 do
   begin
-    password := ALCopyStr('The quick brown fox jumped over the lazy dog then sat on a log', 1, i);
+    password := ALCopyStr(AnsiString('The quick brown fox jumped over the lazy dog then sat on a log'), 1, i);
     hash := TBCrypt.HashPassword(password, 4);
     if (hash = '') then
       raise Exception.Create('hash creation failed');
@@ -2656,8 +2046,8 @@ var
     Result := CompareMem(@data1[0], @data2[0], Length(data1))
    end;
 const
-  testPassword = 'The quick brown fox jumped over the lazy dog then sat on a log. The sixth sick';
-  //                                                                   56^               ^72
+  testPassword = AnsiString('The quick brown fox jumped over the lazy dog then sat on a log. The sixth sick');
+  //                                                                              56^               ^72
 begin
   Result := True;
 
@@ -3507,27 +2897,51 @@ end;
 {$ENDIF}
 
 {******************************************************}
-procedure AlRDLEncryptString(const InString: AnsiString;
+procedure ALRDLEncryptStringA(const InString: AnsiString;
                              var OutString: AnsiString;
                              const Key;
                              const KeySize : FixedInt;
                              const Encrypt : Boolean);
 begin
-  OutString := AlRDLEncryptString(InString, Key, KeySize, Encrypt);
+  OutString := ALRDLEncryptStringA(InString, Key, KeySize, Encrypt);
+end;
+
+{***************************************************}
+procedure ALRDLEncryptStringW(const InString: String;
+                              var OutString: String;
+                              const Key;
+                              const KeySize : FixedInt;
+                              const Encrypt : Boolean;
+                              const encoding: Tencoding;
+                              const UseBase64: boolean = false);
+begin
+  OutString := ALRDLEncryptStringW(InString, Key, KeySize, Encrypt, encoding, UseBase64);
 end;
 
 {*********************************************************}
-procedure AlRDLEncryptStringCBC(const InString: AnsiString;
+procedure ALRDLEncryptStringCBCA(const InString: AnsiString;
                                 var OutString: AnsiString;
                                 const Key;
                                 const KeySize : FixedInt;
                                 const Encrypt : Boolean);
 begin
-  OutString := AlRDLEncryptStringCBC(InString, Key, KeySize, Encrypt);
+  OutString := ALRDLEncryptStringCBCA(InString, Key, KeySize, Encrypt);
+end;
+
+{******************************************************}
+procedure ALRDLEncryptStringCBCW(const InString: String;
+                                 var OutString: String;
+                                 const Key;
+                                 const KeySize : FixedInt;
+                                 const Encrypt : Boolean;
+                                 const encoding: Tencoding;
+                                 const UseBase64: boolean = false);
+begin
+  OutString := ALRDLEncryptStringCBCW(InString, Key, KeySize, Encrypt, encoding, UseBase64);
 end;
 
 {*****************************************************}
-function AlRDLEncryptString(const InString: AnsiString;
+function ALRDLEncryptStringA(const InString: AnsiString;
                             const Key;
                             const KeySize : FixedInt;
                             const Encrypt : Boolean): AnsiString;
@@ -3550,8 +2964,45 @@ begin
   end;
 end;
 
+{**************************************************}
+function ALRDLEncryptStringW(const InString: String;
+                             const Key;
+                             const KeySize : FixedInt;
+                             const Encrypt : Boolean;
+                             const encoding: Tencoding;
+                             const UseBase64: boolean = false): String;
+var
+  InStream  : TMemoryStream;
+  OutStream : TMemoryStream;
+  Bytes: Tbytes;
+begin
+  InStream := TMemoryStream.Create;
+  OutStream := TMemoryStream.Create;
+  try
+    if Encrypt then Bytes := encoding.GetBytes(InString)
+    else if UseBase64 then Bytes := ALBase64DecodeBytes(InString)
+    else Bytes := ALHexToBin(InString);
+    InStream.WriteBuffer(pointer(Bytes)^, Length(Bytes));
+    InStream.Position := 0;
+    AlRDLEncryptStream(InStream, OutStream, Key, KeySize, Encrypt);
+    if Encrypt then begin
+      if UseBase64 then result := ALBase64EncodeBytesW(OutStream.Memory, OutStream.Size)
+      else result := ALBinToHexW(OutStream.Memory^, OutStream.Size)
+    end
+    else begin
+      OutStream.Position := 0;
+      SetLength(Bytes, OutStream.Size);
+      OutStream.ReadBuffer(pointer(Bytes)^, OutStream.Size);
+      result := encoding.GetString(Bytes);
+    end;
+  finally
+    ALFreeAndNil(InStream);
+    ALFreeAndNil(OutStream);
+  end;
+end;
+
 {********************************************************}
-function AlRDLEncryptStringCBC(const InString: AnsiString;
+function ALRDLEncryptStringCBCA(const InString: AnsiString;
                                const Key;
                                const KeySize : FixedInt;
                                const Encrypt : Boolean) : AnsiString;
@@ -3574,209 +3025,8 @@ begin
   end;
 end;
 
-{******************************************************}
-procedure AlRDLEncryptString(const InString: AnsiString;
-                             var OutString : AnsiString;
-                             const Key: AnsiString;
-                             const KeyDerivationFunction: TALkeyDerivationFunction;
-                             const Encrypt : Boolean);
-var aCipherKey128: TALCipherKey128;
-{$IF CompilerVersion >= 32} // tokyo
-    aCipherKey256: Tbytes;
-{$ENDIF}
-begin
-  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
-    ALStringHashMD5(aCipherKey128, Key);
-    AlRDLEncryptString(InString,OutString, aCipherKey128, 16, Encrypt);
-  end
-  {$IF CompilerVersion >= 32} // tokyo
-  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
-    ALStringHashSHA2(aCipherKey256, Key);
-    AlRDLEncryptString(InString,OutString, aCipherKey256[0], length(aCipherKey256), Encrypt);
-  end
-  {$ENDIF}
-  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
-end;
-
-{*********************************************************}
-procedure AlRDLEncryptStringCBC(const InString: AnsiString;
-                                var OutString : AnsiString;
-                                const Key: AnsiString;
-                                const KeyDerivationFunction: TALkeyDerivationFunction;
-                                const Encrypt : Boolean);
-var aCipherKey128: TALCipherKey128;
-{$IF CompilerVersion >= 32} // tokyo
-    aCipherKey256: Tbytes;
-{$ENDIF}
-begin
-  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
-    ALStringHashMD5(aCipherKey128, Key);
-    AlRDLEncryptStringCBC(InString, OutString, aCipherKey128, 16, Encrypt);
-  end
-  {$IF CompilerVersion >= 32} // tokyo
-  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
-    ALStringHashSHA2(aCipherKey256, Key);
-    AlRDLEncryptStringCBC(InString, OutString, aCipherKey256[0], length(aCipherKey256), Encrypt);
-  end
-  {$ENDIF}
-  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
-end;
-
-{******************************************************}
-function  AlRDLEncryptString(const InString: AnsiString;
-                             const Key: AnsiString;
-                             const KeyDerivationFunction: TALkeyDerivationFunction;
-                             const Encrypt : Boolean) : AnsiString;
-var aCipherKey128: TALCipherKey128;
-{$IF CompilerVersion >= 32} // tokyo
-    aCipherKey256: Tbytes;
-{$ENDIF}
-begin
-  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
-    ALStringHashMD5(aCipherKey128, Key);
-    Result := AlRDLEncryptString(InString, aCipherKey128, 16, Encrypt);
-  end
-  {$IF CompilerVersion >= 32} // tokyo
-  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
-    ALStringHashSHA2(aCipherKey256, Key);
-    Result := AlRDLEncryptString(InString, aCipherKey256[0], length(aCipherKey256), Encrypt);
-  end
-  {$ENDIF}
-  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
-end;
-
-{*********************************************************}
-function  AlRDLEncryptStringCBC(const InString: AnsiString;
-                                const Key: AnsiString;
-                                const KeyDerivationFunction: TALkeyDerivationFunction;
-                                const Encrypt : Boolean) : AnsiString;
-var aCipherKey128: TALCipherKey128;
-{$IF CompilerVersion >= 32} // tokyo
-    aCipherKey256: Tbytes;
-{$ENDIF}
-begin
-  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
-    ALStringHashMD5(aCipherKey128, Key);
-    result := AlRDLEncryptStringCBC(InString, aCipherKey128, 16, Encrypt);
-  end
-  {$IF CompilerVersion >= 32} // tokyo
-  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
-    ALStringHashSHA2(aCipherKey256, Key);
-    result := AlRDLEncryptStringCBC(InString, aCipherKey256[0], length(aCipherKey256), Encrypt);
-  end
-  {$ENDIF}
-  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
-end;
-
-{**************************************************************}
-procedure AlRDLEncryptStream(const InStream, OutStream: TStream;
-                             const Key: AnsiString;
-                             const KeyDerivationFunction: TALkeyDerivationFunction;
-                             const Encrypt : Boolean);
-var aCipherKey128: TALCipherKey128;
-{$IF CompilerVersion >= 32} // tokyo
-    aCipherKey256: Tbytes;
-{$ENDIF}
-begin
-  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
-    ALStringHashMD5(aCipherKey128, Key);
-    AlRDLEncryptStream(InStream, OutStream, aCipherKey128, 16, Encrypt);
-  end
-  {$IF CompilerVersion >= 32} // tokyo
-  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
-    ALStringHashSHA2(aCipherKey256, Key);
-    AlRDLEncryptStream(InStream, OutStream, aCipherKey256[0], length(aCipherKey256), Encrypt);
-  end
-  {$ENDIF}
-  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
-end;
-
-{*****************************************************************}
-procedure AlRDLEncryptStreamCBC(const InStream, OutStream: TStream;
-                                const Key: AnsiString;
-                                const KeyDerivationFunction: TALkeyDerivationFunction;
-                                const Encrypt : Boolean);
-var aCipherKey128: TALCipherKey128;
-{$IF CompilerVersion >= 32} // tokyo
-    aCipherKey256: Tbytes;
-{$ENDIF}
-begin
-  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
-    ALStringHashMD5(aCipherKey128, Key);
-    AlRDLEncryptStreamCBC(InStream, OutStream, aCipherKey128, 16, Encrypt);
-  end
-  {$IF CompilerVersion >= 32} // tokyo
-  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
-    ALStringHashSHA2(aCipherKey256, Key);
-    AlRDLEncryptStreamCBC(InStream, OutStream, aCipherKey256[0], length(aCipherKey256), Encrypt);
-  end
-  {$ENDIF}
-  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
-end;
-
-{***************************************************}
-procedure AlRDLEncryptStringU(const InString: String;
-                              var OutString: String;
-                              const Key;
-                              const KeySize : FixedInt;
-                              const Encrypt : Boolean;
-                              const encoding: Tencoding;
-                              const UseBase64: boolean = false);
-begin
-  OutString := AlRDLEncryptStringU(InString, Key, KeySize, Encrypt, encoding, UseBase64);
-end;
-
-{******************************************************}
-procedure AlRDLEncryptStringCBCU(const InString: String;
-                                 var OutString: String;
-                                 const Key;
-                                 const KeySize : FixedInt;
-                                 const Encrypt : Boolean;
-                                 const encoding: Tencoding;
-                                 const UseBase64: boolean = false);
-begin
-  OutString := AlRDLEncryptStringCBCU(InString, Key, KeySize, Encrypt, encoding, UseBase64);
-end;
-
-{**************************************************}
-function AlRDLEncryptStringU(const InString: String;
-                             const Key;
-                             const KeySize : FixedInt;
-                             const Encrypt : Boolean;
-                             const encoding: Tencoding;
-                             const UseBase64: boolean = false): String;
-var
-  InStream  : TMemoryStream;
-  OutStream : TMemoryStream;
-  Bytes: Tbytes;
-begin
-  InStream := TMemoryStream.Create;
-  OutStream := TMemoryStream.Create;
-  try
-    if Encrypt then Bytes := encoding.GetBytes(InString)
-    else if UseBase64 then Bytes := ALBase64DecodeBytesU(InString)
-    else Bytes := ALHexToBinU(InString);
-    InStream.WriteBuffer(pointer(Bytes)^, Length(Bytes));
-    InStream.Position := 0;
-    AlRDLEncryptStream(InStream, OutStream, Key, KeySize, Encrypt);
-    if Encrypt then begin
-      if UseBase64 then result := ALBase64EncodeBytesU(OutStream.Memory, OutStream.Size)
-      else result := ALbinToHexU(OutStream.Memory^, OutStream.Size)
-    end
-    else begin
-      OutStream.Position := 0;
-      SetLength(Bytes, OutStream.Size);
-      OutStream.ReadBuffer(pointer(Bytes)^, OutStream.Size);
-      result := encoding.GetString(Bytes);
-    end;
-  finally
-    ALFreeAndNil(InStream);
-    ALFreeAndNil(OutStream);
-  end;
-end;
-
 {*****************************************************}
-function AlRDLEncryptStringCBCU(const InString: String;
+function ALRDLEncryptStringCBCW(const InString: String;
                                 const Key;
                                 const KeySize : FixedInt;
                                 const Encrypt : Boolean;
@@ -3791,14 +3041,14 @@ begin
   OutStream := TMemoryStream.Create;
   Try
     if Encrypt then Bytes := encoding.GetBytes(InString)
-    else if UseBase64 then Bytes := ALBase64DecodeBytesU(InString)
-    else Bytes := ALHexToBinU(InString);
+    else if UseBase64 then Bytes := ALBase64DecodeBytes(InString)
+    else Bytes := ALHexToBin(InString);
     InStream.WriteBuffer(pointer(Bytes)^, Length(Bytes));
     InStream.Position := 0;
     AlRDLEncryptStreamCBC(InStream, OutStream, Key, KeySize, Encrypt);
     if Encrypt then begin
-      if UseBase64 then result := ALBase64EncodeBytesU(OutStream.Memory, OutStream.Size)
-      else result := ALbinToHexU(OutStream.Memory^, OutStream.Size)
+      if UseBase64 then result := ALBase64EncodeBytesW(OutStream.Memory, OutStream.Size)
+      else result := ALBinToHexW(OutStream.Memory^, OutStream.Size)
     end
     else begin
       OutStream.Position := 0;
@@ -3812,153 +3062,245 @@ begin
   end;
 end;
 
+{******************************************************}
+procedure ALRDLEncryptStringA(const InString: AnsiString;
+                             var OutString : AnsiString;
+                             const Key: AnsiString;
+                             const KeyDerivationFunction: TALkeyDerivationFunction;
+                             const Encrypt : Boolean);
+var LCipherKey128: TALCipherKey128;
+    LCipherKey256: Tbytes;
+begin
+  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
+    ALStringHashMD5(LCipherKey128, Key);
+    ALRDLEncryptStringA(InString,OutString, LCipherKey128, 16, Encrypt);
+  end
+  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
+    ALStringHashSHA2(LCipherKey256, Key);
+    ALRDLEncryptStringA(InString,OutString, LCipherKey256[0], length(LCipherKey256), Encrypt);
+  end
+  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
+end;
+
 {***************************************************}
-procedure AlRDLEncryptStringU(const InString: String;
+procedure ALRDLEncryptStringW(const InString: String;
                               var OutString : String;
                               const Key: String;
                               const KeyDerivationFunction: TALkeyDerivationFunction;
                               const Encrypt : Boolean;
                               const encoding: Tencoding;
                               const UseBase64: boolean = false);
-var aCipherKey128: TALCipherKey128;
-{$IF CompilerVersion >= 32} // tokyo
-    aCipherKey256: Tbytes;
-{$ENDIF}
+var LCipherKey128: TALCipherKey128;
+    LCipherKey256: Tbytes;
 begin
   if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
-    ALStringHashMD5U(aCipherKey128, Key, encoding);
-    AlRDLEncryptStringU(InString,OutString, aCipherKey128, 16, Encrypt, encoding, UseBase64);
+    ALStringHashMD5(LCipherKey128, Key, encoding);
+    ALRDLEncryptStringW(InString,OutString, LCipherKey128, 16, Encrypt, encoding, UseBase64);
   end
-  {$IF CompilerVersion >= 32} // tokyo
   else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
-    ALStringHashSHA2U(aCipherKey256, Key, encoding);
-    AlRDLEncryptStringU(InString,OutString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding, UseBase64);
+    ALStringHashSHA2(LCipherKey256, Key, encoding);
+    ALRDLEncryptStringW(InString,OutString, LCipherKey256[0], length(LCipherKey256), Encrypt, encoding, UseBase64);
   end
-  {$ENDIF}
+  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
+end;
+
+{*********************************************************}
+procedure ALRDLEncryptStringCBCA(const InString: AnsiString;
+                                var OutString : AnsiString;
+                                const Key: AnsiString;
+                                const KeyDerivationFunction: TALkeyDerivationFunction;
+                                const Encrypt : Boolean);
+var LCipherKey128: TALCipherKey128;
+    LCipherKey256: Tbytes;
+begin
+  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
+    ALStringHashMD5(LCipherKey128, Key);
+    ALRDLEncryptStringCBCA(InString, OutString, LCipherKey128, 16, Encrypt);
+  end
+  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
+    ALStringHashSHA2(LCipherKey256, Key);
+    ALRDLEncryptStringCBCA(InString, OutString, LCipherKey256[0], length(LCipherKey256), Encrypt);
+  end
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
 {******************************************************}
-procedure AlRDLEncryptStringCBCU(const InString: String;
+procedure ALRDLEncryptStringCBCW(const InString: String;
                                  var OutString : String;
                                  const Key: String;
                                  const KeyDerivationFunction: TALkeyDerivationFunction;
                                  const Encrypt : Boolean;
                                  const encoding: Tencoding;
                                  const UseBase64: boolean = false);
-var aCipherKey128: TALCipherKey128;
-{$IF CompilerVersion >= 32} // tokyo
-    aCipherKey256: Tbytes;
-{$ENDIF}
+var LCipherKey128: TALCipherKey128;
+    LCipherKey256: Tbytes;
 begin
   if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
-    ALStringHashMD5U(aCipherKey128, Key, encoding);
-    AlRDLEncryptStringCBCU(InString, OutString, aCipherKey128, 16, Encrypt, encoding, UseBase64);
+    ALStringHashMD5(LCipherKey128, Key, encoding);
+    ALRDLEncryptStringCBCW(InString, OutString, LCipherKey128, 16, Encrypt, encoding, UseBase64);
   end
-  {$IF CompilerVersion >= 32} // tokyo
   else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
-    ALStringHashSHA2U(aCipherKey256, Key, encoding);
-    AlRDLEncryptStringCBCU(InString, OutString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding, UseBase64);
+    ALStringHashSHA2(LCipherKey256, Key, encoding);
+    ALRDLEncryptStringCBCW(InString, OutString, LCipherKey256[0], length(LCipherKey256), Encrypt, encoding, UseBase64);
   end
-  {$ENDIF}
+  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
+end;
+
+{******************************************************}
+function  ALRDLEncryptStringA(const InString: AnsiString;
+                             const Key: AnsiString;
+                             const KeyDerivationFunction: TALkeyDerivationFunction;
+                             const Encrypt : Boolean) : AnsiString;
+var LCipherKey128: TALCipherKey128;
+    LCipherKey256: Tbytes;
+begin
+  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
+    ALStringHashMD5(LCipherKey128, Key);
+    Result := ALRDLEncryptStringA(InString, LCipherKey128, 16, Encrypt);
+  end
+  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
+    ALStringHashSHA2(LCipherKey256, Key);
+    Result := ALRDLEncryptStringA(InString, LCipherKey256[0], length(LCipherKey256), Encrypt);
+  end
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
 {***************************************************}
-function  AlRDLEncryptStringU(const InString: String;
+function  ALRDLEncryptStringW(const InString: String;
                               const Key: String;
                               const KeyDerivationFunction: TALkeyDerivationFunction;
                               const Encrypt : Boolean;
                               const encoding: Tencoding;
                               const UseBase64: boolean = false) : String;
-var aCipherKey128: TALCipherKey128;
-{$IF CompilerVersion >= 32} // tokyo
-    aCipherKey256: Tbytes;
-{$ENDIF}
+var LCipherKey128: TALCipherKey128;
+    LCipherKey256: Tbytes;
 begin
   if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
-    ALStringHashMD5U(aCipherKey128, Key, encoding);
-    Result := AlRDLEncryptStringU(InString, aCipherKey128, 16, Encrypt, encoding, UseBase64);
+    ALStringHashMD5(LCipherKey128, Key, encoding);
+    Result := ALRDLEncryptStringW(InString, LCipherKey128, 16, Encrypt, encoding, UseBase64);
   end
-  {$IF CompilerVersion >= 32} // tokyo
   else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
-    ALStringHashSHA2U(aCipherKey256, Key, encoding);
-    Result := AlRDLEncryptStringU(InString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding, UseBase64);
+    ALStringHashSHA2(LCipherKey256, Key, encoding);
+    Result := ALRDLEncryptStringW(InString, LCipherKey256[0], length(LCipherKey256), Encrypt, encoding, UseBase64);
   end
-  {$ENDIF}
+  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
+end;
+
+{*********************************************************}
+function  ALRDLEncryptStringCBCA(const InString: AnsiString;
+                                const Key: AnsiString;
+                                const KeyDerivationFunction: TALkeyDerivationFunction;
+                                const Encrypt : Boolean) : AnsiString;
+var LCipherKey128: TALCipherKey128;
+    LCipherKey256: Tbytes;
+begin
+  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
+    ALStringHashMD5(LCipherKey128, Key);
+    result := ALRDLEncryptStringCBCA(InString, LCipherKey128, 16, Encrypt);
+  end
+  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
+    ALStringHashSHA2(LCipherKey256, Key);
+    result := ALRDLEncryptStringCBCA(InString, LCipherKey256[0], length(LCipherKey256), Encrypt);
+  end
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
 {******************************************************}
-function  AlRDLEncryptStringCBCU(const InString: String;
+function  ALRDLEncryptStringCBCW(const InString: String;
                                  const Key: String;
                                  const KeyDerivationFunction: TALkeyDerivationFunction;
                                  const Encrypt : Boolean;
                                  const encoding: Tencoding;
                                  const UseBase64: boolean = false) : String;
-var aCipherKey128: TALCipherKey128;
-{$IF CompilerVersion >= 32} // tokyo
-    aCipherKey256: Tbytes;
-{$ENDIF}
+var LCipherKey128: TALCipherKey128;
+    LCipherKey256: Tbytes;
 begin
   if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
-    ALStringHashMD5U(aCipherKey128, Key, encoding);
-    result := AlRDLEncryptStringCBCU(InString, aCipherKey128, 16, Encrypt, encoding, UseBase64);
+    ALStringHashMD5(LCipherKey128, Key, encoding);
+    result := ALRDLEncryptStringCBCW(InString, LCipherKey128, 16, Encrypt, encoding, UseBase64);
   end
-  {$IF CompilerVersion >= 32} // tokyo
   else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
-    ALStringHashSHA2U(aCipherKey256, Key, encoding);
-    result := AlRDLEncryptStringCBCU(InString, aCipherKey256[0], length(aCipherKey256), Encrypt, encoding, UseBase64);
+    ALStringHashSHA2(LCipherKey256, Key, encoding);
+    result := ALRDLEncryptStringCBCW(InString, LCipherKey256[0], length(LCipherKey256), Encrypt, encoding, UseBase64);
   end
-  {$ENDIF}
+  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
+end;
+
+{**************************************************************}
+procedure AlRDLEncryptStream(const InStream, OutStream: TStream;
+                             const Key: AnsiString;
+                             const KeyDerivationFunction: TALkeyDerivationFunction;
+                             const Encrypt : Boolean);
+var LCipherKey128: TALCipherKey128;
+    LCipherKey256: Tbytes;
+begin
+  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
+    ALStringHashMD5(LCipherKey128, Key);
+    AlRDLEncryptStream(InStream, OutStream, LCipherKey128, 16, Encrypt);
+  end
+  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
+    ALStringHashSHA2(LCipherKey256, Key);
+    AlRDLEncryptStream(InStream, OutStream, LCipherKey256[0], length(LCipherKey256), Encrypt);
+  end
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
 {***************************************************************}
-procedure AlRDLEncryptStreamU(const InStream, OutStream: TStream;
+procedure ALRDLEncryptStream(const InStream, OutStream: TStream;
                               const Key: String;
                               const KeyDerivationFunction: TALkeyDerivationFunction;
                               const Encrypt : Boolean;
                               const encoding: Tencoding);
-var aCipherKey128: TALCipherKey128;
-{$IF CompilerVersion >= 32} // tokyo
-    aCipherKey256: Tbytes;
-{$ENDIF}
+var LCipherKey128: TALCipherKey128;
+    LCipherKey256: Tbytes;
 begin
   if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
-    ALStringHashMD5U(aCipherKey128, Key, encoding);
-    AlRDLEncryptStream(InStream, OutStream, aCipherKey128, 16, Encrypt);
+    ALStringHashMD5(LCipherKey128, Key, encoding);
+    AlRDLEncryptStream(InStream, OutStream, LCipherKey128, 16, Encrypt);
   end
-  {$IF CompilerVersion >= 32} // tokyo
   else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
-    ALStringHashSHA2U(aCipherKey256, Key, encoding);
-    AlRDLEncryptStream(InStream, OutStream, aCipherKey256[0], length(aCipherKey256), Encrypt);
+    ALStringHashSHA2(LCipherKey256, Key, encoding);
+    AlRDLEncryptStream(InStream, OutStream, LCipherKey256[0], length(LCipherKey256), Encrypt);
   end
-  {$ENDIF}
+  else raise EALCipherException.Create(cAlCryptKDFNotSupported);
+end;
+
+{*****************************************************************}
+procedure AlRDLEncryptStreamCBC(const InStream, OutStream: TStream;
+                                const Key: AnsiString;
+                                const KeyDerivationFunction: TALkeyDerivationFunction;
+                                const Encrypt : Boolean);
+var LCipherKey128: TALCipherKey128;
+    LCipherKey256: Tbytes;
+begin
+  if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
+    ALStringHashMD5(LCipherKey128, Key);
+    AlRDLEncryptStreamCBC(InStream, OutStream, LCipherKey128, 16, Encrypt);
+  end
+  else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
+    ALStringHashSHA2(LCipherKey256, Key);
+    AlRDLEncryptStreamCBC(InStream, OutStream, LCipherKey256[0], length(LCipherKey256), Encrypt);
+  end
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
 {******************************************************************}
-procedure AlRDLEncryptStreamCBCU(const InStream, OutStream: TStream;
+procedure ALRDLEncryptStreamCBC(const InStream, OutStream: TStream;
                                  const Key: String;
                                  const KeyDerivationFunction: TALkeyDerivationFunction;
                                  const Encrypt : Boolean;
                                  const encoding: Tencoding);
-var aCipherKey128: TALCipherKey128;
-{$IF CompilerVersion >= 32} // tokyo
-    aCipherKey256: Tbytes;
-{$ENDIF}
+var LCipherKey128: TALCipherKey128;
+    LCipherKey256: Tbytes;
 begin
   if keyDerivationFunction = TALkeyDerivationFunction.MD5 then begin
-    ALStringHashMD5U(aCipherKey128, Key, encoding);
-    AlRDLEncryptStreamCBC(InStream, OutStream, aCipherKey128, 16, Encrypt);
+    ALStringHashMD5(LCipherKey128, Key, encoding);
+    AlRDLEncryptStreamCBC(InStream, OutStream, LCipherKey128, 16, Encrypt);
   end
-  {$IF CompilerVersion >= 32} // tokyo
   else if keyDerivationFunction = TALkeyDerivationFunction.SHA2 then begin
-    ALStringHashSHA2U(aCipherKey256, Key, encoding);
-    AlRDLEncryptStreamCBC(InStream, OutStream, aCipherKey256[0], length(aCipherKey256), Encrypt);
+    ALStringHashSHA2(LCipherKey256, Key, encoding);
+    AlRDLEncryptStreamCBC(InStream, OutStream, LCipherKey256[0], length(LCipherKey256), Encrypt);
   end
-  {$ENDIF}
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
@@ -4636,10 +3978,10 @@ procedure ALBFEncryptString(const InString: AnsiString;
                             var OutString : AnsiString;
                             const Key: AnsiString;
                             Encrypt : Boolean);
-var aCipherKey128: TALCipherKey128;
+var LCipherKey128: TALCipherKey128;
 begin
-  ALStringHashMD5(aCipherKey128, Key);
-  ALBFEncryptString(InString,OutString, aCipherKey128, Encrypt);
+  ALStringHashMD5(LCipherKey128, Key);
+  ALBFEncryptString(InString,OutString, LCipherKey128, Encrypt);
 end;
 
 {********************************************************}
@@ -4647,50 +3989,50 @@ procedure ALBFEncryptStringCBC(const InString: AnsiString;
                                var OutString : AnsiString;
                                const Key: AnsiString;
                                Encrypt : Boolean);
-var aCipherKey128: TALCipherKey128;
+var LCipherKey128: TALCipherKey128;
 begin
-  ALStringHashMD5(aCipherKey128, Key);
-  ALBFEncryptStringCBC(InString, OutString, aCipherKey128, Encrypt);
+  ALStringHashMD5(LCipherKey128, Key);
+  ALBFEncryptStringCBC(InString, OutString, LCipherKey128, Encrypt);
 end;
 
 {*****************************************************}
 function  AlBFEncryptString(const InString: AnsiString;
                             const Key: AnsiString;
                             Encrypt : Boolean) : AnsiString;
-var aCipherKey128: TALCipherKey128;
+var LCipherKey128: TALCipherKey128;
 begin
-  ALStringHashMD5(aCipherKey128, Key);
-  Result := AlBFEncryptString(InString, aCipherKey128, Encrypt);
+  ALStringHashMD5(LCipherKey128, Key);
+  Result := AlBFEncryptString(InString, LCipherKey128, Encrypt);
 end;
 
 {********************************************************}
 function  ALBFEncryptStringCBC(const InString: AnsiString;
                                const Key: AnsiString;
                                Encrypt : Boolean) : AnsiString;
-var aCipherKey128: TALCipherKey128;
+var LCipherKey128: TALCipherKey128;
 begin
-  ALStringHashMD5(aCipherKey128, Key);
-  result := ALBFEncryptStringCBC(InString, aCipherKey128, Encrypt);
+  ALStringHashMD5(LCipherKey128, Key);
+  result := ALBFEncryptStringCBC(InString, LCipherKey128, Encrypt);
 end;
 
 {*******************************************************}
 procedure ALBFEncryptStream(InStream, OutStream: TStream;
                             const Key: AnsiString;
                             Encrypt : Boolean);
-var aCipherKey128: TALCipherKey128;
+var LCipherKey128: TALCipherKey128;
 begin
-  ALStringHashMD5(aCipherKey128, Key);
-  ALBFEncryptStream(InStream, OutStream, aCipherKey128, Encrypt);
+  ALStringHashMD5(LCipherKey128, Key);
+  ALBFEncryptStream(InStream, OutStream, LCipherKey128, Encrypt);
 end;
 
 {**********************************************************}
 procedure ALBFEncryptStreamCBC(InStream, OutStream: TStream;
                                const Key: AnsiString;
                                Encrypt : Boolean);
-var aCipherKey128: TALCipherKey128;
+var LCipherKey128: TALCipherKey128;
 begin
-  ALStringHashMD5(aCipherKey128, Key);
-  ALBFEncryptStreamCBC(InStream, OutStream, aCipherKey128, Encrypt);
+  ALStringHashMD5(LCipherKey128, Key);
+  ALBFEncryptStreamCBC(InStream, OutStream, LCipherKey128, Encrypt);
 end;
 
 
@@ -4853,12 +4195,12 @@ end;
 {************************************************************}
 function ALRandom32_Default(const ARange: Cardinal): cardinal;
 {$IFDEF MSWINDOWS}
-var aBytes: Tbytes;
+var LBytes: Tbytes;
 {$ENDIF}
 begin
   {$IFDEF MSWINDOWS}
-  aBytes := ALRandomBytes(sizeOf(result));
-  move(aBytes[0],result,sizeOf(result));
+  LBytes := ALRandomBytes(sizeOf(result));
+  move(LBytes[0],result,sizeOf(result));
   result := result mod ARange;
   {$ELSE}
   result := cardinal(Random(integer(ARange)));
@@ -4868,12 +4210,12 @@ end;
 {********************************************************}
 function ALRandom64_Default(const ARange: UInt64): UInt64;
 {$IFDEF MSWINDOWS}
-var aBytes: Tbytes;
+var LBytes: Tbytes;
 {$ENDIF}
 begin
   {$IFDEF MSWINDOWS}
-  aBytes := ALRandomBytes(sizeOf(result));
-  move(aBytes[0],result,sizeOf(result));
+  LBytes := ALRandomBytes(sizeOf(result));
+  move(LBytes[0],result,sizeOf(result));
   result := result mod ARange;
   {$ELSE}
   Result := (UInt64(Random(ALMAXInt)) shl 32) or ((UInt64(Random(ALMAXInt)) shl 32) shr 32);
@@ -5285,7 +4627,7 @@ begin
     LCharset[J] := ansichar(J);
   //--
   For var i := 1 to 1000 do begin
-    LData := ALRandomStr(random(65536), LCharset);
+    LData := ALRandomStrA(random(65536), LCharset);
     LCrc32cfastResult:=Crc32cfast(0, Pointer(LData), Length(LData));
     LCrc32csse42Result:=Crc32csse42(0, Pointer(LData), Length(LData));
     LCrc32cfastpurepascalResult:=Crc32cfastpurepascal(0, Pointer(LData), Length(LData));
@@ -5324,14 +4666,14 @@ end;
 
 {***********************}
 {$Q-} {Overflow Checking}
-function ALFnv1aInt64U(const str: String; Const encoding: Tencoding): Int64;
-var abytes: Tbytes;
+function ALFnv1aInt64(const str: String; Const encoding: Tencoding): Int64;
+var LBytes: Tbytes;
     i : Integer;
 begin
-  aBytes := encoding.GetBytes(str);
+  LBytes := encoding.GetBytes(str);
   Result := Int64(14695981039346656037);
-  for i:=low(aBytes) to high(aBytes) do
-    Result := (Result xor aBytes[i]) * 10995116282118;
+  for i:=low(LBytes) to high(LBytes) do
+    Result := (Result xor LBytes[i]) * 10995116282118;
 end;
 {$IF defined(ALOverflowCheckingON)}
   {$Q+} {Overflow Checking}
@@ -5352,14 +4694,14 @@ end;
 
 {***********************}
 {$Q-} {Overflow Checking}
-function ALFnv1aInt32U(const str: String; Const encoding: Tencoding): int32;
-var abytes: Tbytes;
+function ALFnv1aInt32(const str: String; Const encoding: Tencoding): int32;
+var LBytes: Tbytes;
     i : Integer;
 begin
-  aBytes := encoding.GetBytes(str);
+  LBytes := encoding.GetBytes(str);
   Result := int32(2166136261);
-  for i:=low(aBytes) to high(aBytes) do
-    Result := (Result xor aBytes[i]) * 16777619;
+  for i:=low(LBytes) to high(LBytes) do
+    Result := (Result xor LBytes[i]) * 16777619;
 end;
 {$IF defined(ALOverflowCheckingON)}
   {$Q+} {Overflow Checking}
@@ -5719,16 +5061,16 @@ begin
   //https://tls.mbed.org/kb/cryptography/asn1-key-structures-in-der-and-pem
   //https://stackoverflow.com/questions/64519072/how-to-import-a-pkcs8-with-cryptoapi/64520116#64520116
   //https://docs.microsoft.com/en-us/windows/win32/seccrypto/constants-for-cryptencodeobject-and-cryptdecodeobject
-  if ALPos('-----BEGIN PRIVATE KEY-----', aPemPrivateKey) = 1 then begin
+  if ALPosA('-----BEGIN PRIVATE KEY-----', aPemPrivateKey) = 1 then begin
 
-    P1 := ALPos('-----',aPemPrivateKey);
+    P1 := ALPosA('-----',aPemPrivateKey);
     if P1 <= 0 then raiseLastOsError;
     inc(P1,5{length('-----')});
-    P1 := ALPosEx('-----',aPemPrivateKey, P1);
+    P1 := ALPosA('-----',aPemPrivateKey, P1);
     if P1 <= 0 then raiseLastOsError;
     inc(P1,5{length('-----')});
 
-    P2 := ALPosEx('-----',aPemPrivateKey, P1);
+    P2 := ALPosA('-----',aPemPrivateKey, P1);
     if P2 <= 0 then raiseLastOsError;
 
     S1 := ALCopyStr(aPemPrivateKey, P1, P2-P1);
@@ -5859,7 +5201,7 @@ end;
 {**********************}
 {$IF defined(MSWINDOWS)}
 var
-  _GoogleOAuth2AccessTokens: TALNVStringList;
+  _GoogleOAuth2AccessTokens: TALNVStringListA;
 {$ENDIF}
 
 {**********************}
@@ -5896,8 +5238,8 @@ begin
                        '"iss":"'+ALJavascriptEncode(aServiceAccountEmail)+'",'+ // The email address of the service account
                        '"scope":"'+ALJavascriptEncode(aScope)+'",'+ // A space-delimited list of the permissions that the application requests.
                        '"aud":"https://oauth2.googleapis.com/token",'+ // A descriptor of the intended target of the assertion. When making an access token request this value is always https://oauth2.googleapis.com/token.
-                       '"exp":'+ALIntToStr(DateTimeToUnix(IncHour(LNow,1)))+','+ // The expiration time of the assertion, specified as seconds since 00:00:00 UTC, January 1, 1970. This value has a maximum of 1 hour after the issued time.
-                       '"iat":'+ALIntToStr(DateTimeToUnix(LNow))+ // The time the assertion was issued, specified as seconds since 00:00:00 UTC, January 1, 1970.
+                       '"exp":'+ALIntToStrA(DateTimeToUnix(IncHour(LNow,1)))+','+ // The expiration time of the assertion, specified as seconds since 00:00:00 UTC, January 1, 1970. This value has a maximum of 1 hour after the issued time.
+                       '"iat":'+ALIntToStrA(DateTimeToUnix(LNow))+ // The time the assertion was issued, specified as seconds since 00:00:00 UTC, January 1, 1970.
                      '}';
     LJWT := LJWT + '.' + ALURLBase64EncodeString(LJWTclaim);
 
@@ -5906,8 +5248,8 @@ begin
 
     //Making the access token request
     var LWinHttpClient := TAlWinHTTPClient.Create;
-    var LRequestFields := TALStringList.Create;
-    var LJsonDoc := TalJsonDocument.Create;
+    var LRequestFields := TALStringListA.Create;
+    var LJsonDoc := TALJSONDocumentA.Create;
     try
 
       //init the aWinHttpClient
@@ -6058,7 +5400,7 @@ begin
     ALHashCrc64c := @Crc64csse42_3;
     try
       if crc32cBy4SSE42(0,1)<>3712330424 then
-        raise EALExceptionU.Create('Invalid crc32cBy4SSE42');
+        raise EALException.Create('Invalid crc32cBy4SSE42');
     except
       // disable now on illegal instruction or incorrect result
       ALStringHashCrc32c := @Crc32cfast_2;
@@ -6089,7 +5431,7 @@ begin
   {$ENDIF ALCPUXASM}
 
   {$IF defined(MSWINDOWS)}
-  _GoogleOAuth2AccessTokens := TALNVStringList.Create;
+  _GoogleOAuth2AccessTokens := TALNVStringListA.Create;
   _GoogleOAuth2AccessTokens.NameValueSeparator := #31; // Unit separator
   _GoogleOAuth2AccessTokens.Duplicates := DupError;
   _GoogleOAuth2AccessTokens.Sorted := True;

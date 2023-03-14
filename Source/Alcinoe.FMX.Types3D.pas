@@ -369,10 +369,10 @@ begin
   if PixelFormat <> TPixelFormat.None then AtomicIncrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
   if TThread.GetTickCount - AtomicCmpExchange(LastTotalMemoryUsedByTexturesLog, 0, 0) > 1000 then begin // every 1 sec
     AtomicExchange(LastTotalMemoryUsedByTexturesLog, TThread.GetTickCount); // oki maybe 2 or 3 log can be show simultaneously. i will not died for this !
-    ALLog('TALTexture', 'TotalMemoryUsedByTextures: ' + ALFormatFloatU('0.##', AtomicCmpExchange(TotalMemoryUsedByTextures, 0, 0) / 1000000, ALDefaultFormatSettingsU) +' MB', TalLogType.verbose);
+    ALLog('TALTexture', 'TotalMemoryUsedByTextures: ' + ALFormatFloatW('0.##', AtomicCmpExchange(TotalMemoryUsedByTextures, 0, 0) / 1000000, ALDefaultFormatSettingsW) +' MB', TalLogType.verbose);
   end;
   if TALTextureAccessPrivate(self).FBits <> nil then
-    ALLog('TALTexture.Assign', 'Bits: ' + ALFormatFloatU('0.##',(Width * Height * BytesPerPixel) / 1000, ALDefaultFormatSettingsU) +' kB', TalLogType.Warn);
+    ALLog('TALTexture.Assign', 'Bits: ' + ALFormatFloatW('0.##',(Width * Height * BytesPerPixel) / 1000, ALDefaultFormatSettingsW) +' kB', TalLogType.Warn);
   {$WARNINGS ON}
   {$ENDIF}
 
@@ -440,7 +440,7 @@ begin
   if PixelFormat <> TPixelFormat.None then AtomicIncrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
   if TThread.GetTickCount - AtomicCmpExchange(LastTotalMemoryUsedByTexturesLog, 0, 0) > 1000 then begin // every 1 sec
     AtomicExchange(LastTotalMemoryUsedByTexturesLog, TThread.GetTickCount); // oki maybe 2 or 3 log can be show simultaneously. i will not died for this !
-    ALLog('TALTexture', 'TotalMemoryUsedByTextures: ' + ALFormatFloatU('0.##', AtomicCmpExchange(TotalMemoryUsedByTextures, 0, 0) / 1000000, ALDefaultFormatSettingsU) +' MB', TalLogType.verbose);
+    ALLog('TALTexture', 'TotalMemoryUsedByTextures: ' + ALFormatFloatW('0.##', AtomicCmpExchange(TotalMemoryUsedByTextures, 0, 0) / 1000000, ALDefaultFormatSettingsW) +' MB', TalLogType.verbose);
   end;
   {$ENDIF}
 
@@ -1031,7 +1031,7 @@ begin
     TContextShaderSource.Create(
       TContextShaderArch.GLSL,
       TEncoding.UTF8.GetBytes(
-        ALFormatU(
+        ALFormatW(
           ALColorAdjustGLSL,
           ['#extension GL_OES_EGL_image_external : require'+#13#10+
            'precision highp float;'+
@@ -1044,7 +1044,7 @@ begin
            'vec4 result = texture2D(_texture0, TEX0.xy);',
            //----
            'result = result * COLOR0;'],
-          AlDefaultFormatSettingsU)),
+          ALDefaultFormatSettingsW)),
       [TContextShaderVariable.Create('Contrast',    TContextShaderVariableKind.Float,   0, 1),
        TContextShaderVariable.Create('Highlights',  TContextShaderVariableKind.Float,   0, 1),
        TContextShaderVariable.Create('Shadows',     TContextShaderVariableKind.Float,   0, 1),
@@ -1600,7 +1600,7 @@ begin
     TContextShaderSource.Create(
       TContextShaderArch.GLSL,
       TEncoding.UTF8.GetBytes(
-        ALFormatU(
+        ALFormatW(
           ALColorAdjustGLSL,
           ['varying vec4 COLOR0;'+
            'varying vec4 TEX0;'+
@@ -1630,7 +1630,7 @@ begin
            'vec4 result = vec4(rgb, 1);',
            //----
            'result = result * COLOR0;'],
-          AlDefaultFormatSettingsU)),
+          ALDefaultFormatSettingsW)),
       [TContextShaderVariable.Create('Contrast',    TContextShaderVariableKind.Float,   0, 1),
        TContextShaderVariable.Create('Highlights',  TContextShaderVariableKind.Float,   0, 1),
        TContextShaderVariable.Create('Shadows',     TContextShaderVariableKind.Float,   0, 1),
@@ -2198,7 +2198,7 @@ begin
     TContextShaderSource.Create(
       TContextShaderArch.GLSL,
       TEncoding.UTF8.GetBytes(
-        ALFormatU(
+        ALFormatW(
           ALColorAdjustGLSL,
           ['varying vec4 COLOR0;'+
            'varying vec4 TEX0;'+
@@ -2230,7 +2230,7 @@ begin
            'vec4 result = vec4(rgb, 1);',
            //----
            'result = result * COLOR0;'],
-          AlDefaultFormatSettingsU)),
+          ALDefaultFormatSettingsW)),
       [TContextShaderVariable.Create('Contrast',    TContextShaderVariableKind.Float,   0, 1),
        TContextShaderVariable.Create('Highlights',  TContextShaderVariableKind.Float,   0, 1),
        TContextShaderVariable.Create('Shadows',     TContextShaderVariableKind.Float,   0, 1),

@@ -149,7 +149,7 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aData := ALRandomStrA(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
       aHash := ALStringHashMD5(aData, true{hexEncode});
       aStopWatch.Stop;
@@ -211,7 +211,7 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aData := ALRandomStrA(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
       aHash := ALStringHashSHA1(aData, true{hexEncode});
       aStopWatch.Stop;
@@ -275,10 +275,10 @@ begin
   StatusBar1.Panels[2].Text := '';
   StartTime := GetTickCount;
   while True do begin
-    Data := ALRandomStr(250);
-    Key := AlRandomStr(40);
-    ALRDLEncryptString(Data, Str1, Key, TALkeyDerivationFunction.SHA2, True);
-    ALRDLEncryptString(Str1, Str2, Key, TALkeyDerivationFunction.SHA2, false);
+    Data := ALRandomStrA(250);
+    Key := ALRandomStrA(40);
+    ALRDLEncryptStringA(Data, Str1, Key, TALkeyDerivationFunction.SHA2, True);
+    ALRDLEncryptStringA(Str1, Str2, Key, TALkeyDerivationFunction.SHA2, false);
     if str2 <> Data then Raise Exception.Create('!!Abnormal Error!!');
     inc(counter);
     if counter mod 1000 = 0 then begin
@@ -317,10 +317,10 @@ begin
   StatusBar1.Panels[2].Text := '';
   StartTime := GetTickCount;
   while True do begin
-    Data := ALRandomStr(250);
-    Key := AlRandomStr(40);
-    ALRDLEncryptStringCBC(Data, Str1, Key, TALkeyDerivationFunction.SHA2, True);
-    ALRDLEncryptStringCBC(Str1, Str2, Key, TALkeyDerivationFunction.SHA2, false);
+    Data := ALRandomStrA(250);
+    Key := ALRandomStrA(40);
+    ALRDLEncryptStringCBCA(Data, Str1, Key, TALkeyDerivationFunction.SHA2, True);
+    ALRDLEncryptStringCBCA(Str1, Str2, Key, TALkeyDerivationFunction.SHA2, false);
     if str2 <> Data then Raise Exception.Create('!!Abnormal Error!!');
     inc(counter);
     if counter mod 1000 = 0 then begin
@@ -359,8 +359,8 @@ begin
   StatusBar1.Panels[2].Text := '';
   StartTime := GetTickCount;
   while True do begin
-    Data := ALRandomStr(250);
-    Key := AlRandomStr(40);
+    Data := ALRandomStrA(250);
+    Key := ALRandomStrA(40);
     ALBFEncryptString(Data, Str1, Key, True);
     ALBFEncryptString(Str1, Str2, Key, false);
     if str2 <> Data then Raise Exception.Create('!!Abnormal Error!!');
@@ -387,7 +387,7 @@ end;
 procedure TForm1.ALButton6Click(Sender: TObject);
 Var outString: AnsiString;
 begin
-  ALRDLEncryptString(AnsiString(ALMemoDecryptedData.Lines.Text), outString, AnsiString(EditKey.Text), TALkeyDerivationFunction.SHA2, True);
+  ALRDLEncryptStringA(AnsiString(ALMemoDecryptedData.Lines.Text), outString, AnsiString(EditKey.Text), TALkeyDerivationFunction.SHA2, True);
   ALMemoCryptedData.Lines.Text := String(ALBase64EncodeString(outString));
 end;
 
@@ -395,7 +395,7 @@ end;
 procedure TForm1.ALButton7Click(Sender: TObject);
 Var outString: AnsiString;
 begin
-  ALRDLEncryptString(ALBase64DecodeString(ALTrim(ansiString(ALMemocryptedData.Lines.Text))), outString, ansiString(EditKey.Text), TALkeyDerivationFunction.SHA2, False);
+  ALRDLEncryptStringA(ALBase64DecodeString(ALTrim(ansiString(ALMemocryptedData.Lines.Text))), outString, ansiString(EditKey.Text), TALkeyDerivationFunction.SHA2, False);
   ALMemoDeCryptedData.Lines.Text := string(outString);
 end;
 
@@ -403,7 +403,7 @@ end;
 procedure TForm1.ALButton8Click(Sender: TObject);
 Var outString: AnsiString;
 begin
-  ALRDLEncryptStringCBC(AnsiString(ALMemoDecryptedData.Lines.Text), outString, AnsiString(EditKey.Text), TALkeyDerivationFunction.SHA2, True);
+  ALRDLEncryptStringCBCA(AnsiString(ALMemoDecryptedData.Lines.Text), outString, AnsiString(EditKey.Text), TALkeyDerivationFunction.SHA2, True);
   ALMemoCryptedData.Lines.Text := String(ALBase64EncodeString(outString));
 end;
 
@@ -411,7 +411,7 @@ end;
 procedure TForm1.ALButton9Click(Sender: TObject);
 Var outString: AnsiString;
 begin
-  ALRDLEncryptStringCBC(ALBase64DecodeString(ALTrim(ansiString(ALMemocryptedData.Lines.Text))), outString, ansiString(EditKey.Text), TALkeyDerivationFunction.SHA2, False);
+  ALRDLEncryptStringCBCA(ALBase64DecodeString(ALTrim(ansiString(ALMemocryptedData.Lines.Text))), outString, ansiString(EditKey.Text), TALkeyDerivationFunction.SHA2, False);
   ALMemoDeCryptedData.Lines.Text := string(outString);
 end;
 
@@ -486,7 +486,7 @@ begin
   randomize;
 
   if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
-  ALMemoCryptedData.Lines.Text := string(ALBinToHex(ansiString(ALMemoDecryptedData.Lines.Text)));
+  ALMemoCryptedData.Lines.Text := string(ALBinToHexA(ansiString(ALMemoDecryptedData.Lines.Text)));
   ALMemoDecryptedData.Lines.Text := string(ALHexToBin(ansiString(ALMemoCryptedData.Lines.Text)));
 
   StatusBar1.Panels[0].Text := 'Bench HexEncode (ansiString)';
@@ -501,7 +501,7 @@ begin
   while True do begin
     aData := ALRandomByteStr(1+random(4096));
     aStopWatch.Start;
-    aHash := ALBinToHex(aData);
+    aHash := ALBinToHexA(aData);
     aStopWatch.Stop;
     if ALHexToBin(aHash) <> aData then
       raise Exception.Create('Test failed!');
@@ -552,7 +552,7 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aData := ALRandomStrA(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
       aHash := ALStringHashSHA2(aData, THashSHA2.TSHA2Version.SHA256, true{hexEncode});
       aStopWatch.Stop;
@@ -598,7 +598,7 @@ begin
   randomize;
 
   if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
-  ALMemoCryptedData.Lines.Text := ALStringHashMD5U(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8);
+  ALMemoCryptedData.Lines.Text := ALStringHashMD5(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8);
 
   StatusBar1.Panels[0].Text := 'ALMD5 (Unicode)';
   StatusBar1.Panels[1].Text := '';
@@ -613,9 +613,9 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStrU(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aData := ALRandomStrW(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
-      aHash := ALStringHashMD5U(aData, Tencoding.UTF8);
+      aHash := ALStringHashMD5(aData, Tencoding.UTF8);
       aStopWatch.Stop;
       if aDictionary.TryGetValue(aHash, aTmpData) then begin
         if aTmpData <> aData then begin
@@ -659,7 +659,7 @@ begin
   randomize;
 
   if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
-  ALMemoCryptedData.Lines.Text := ALStringHashSHA1U(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8);
+  ALMemoCryptedData.Lines.Text := ALStringHashSHA1(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8);
 
   StatusBar1.Panels[0].Text := 'ALSHA1 (Unicode)';
   StatusBar1.Panels[1].Text := '';
@@ -674,9 +674,9 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStrU(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aData := ALRandomStrW(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
-      aHash := ALStringHashSHA1U(aData, Tencoding.UTF8);
+      aHash := ALStringHashSHA1(aData, Tencoding.UTF8);
       aStopWatch.Stop;
       if aDictionary.TryGetValue(aHash, aTmpData) then begin
         if aTmpData <> aData then begin
@@ -717,8 +717,8 @@ begin
   randomize;
 
   if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
-  ALMemoCryptedData.Lines.Text := ALBase64EncodeStringU(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8);
-  ALMemoDecryptedData.Lines.Text := ALBase64DecodeStringU(ALMemoCryptedData.Lines.Text, Tencoding.UTF8);
+  ALMemoCryptedData.Lines.Text := ALBase64EncodeString(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8);
+  ALMemoDecryptedData.Lines.Text := ALBase64DecodeString(ALMemoCryptedData.Lines.Text, Tencoding.UTF8);
 
   StatusBar1.Panels[0].Text := 'Test/Bench ALBase64EncodeU (UNICODE)';
   StatusBar1.Panels[1].Text := '';
@@ -730,10 +730,10 @@ begin
   aLastGUIUpdate := now;
   aStopWatch := TstopWatch.Create;
   while True do begin
-    aData := ALRandomStrU(random(4096));
+    aData := ALRandomStrW(random(4096));
     aStopWatch.Start;
-    aBase64Data := ALBase64EncodeStringU(aData, Tencoding.UTF8);
-    if ALBase64DecodeStringU(aBase64Data, Tencoding.UTF8) <> aData then
+    aBase64Data := ALBase64EncodeString(aData, Tencoding.UTF8);
+    if ALBase64DecodeString(aBase64Data, Tencoding.UTF8) <> aData then
       raise Exception.Create('Test failed!');
     aStopWatch.Stop;
     inc(acounter);
@@ -783,7 +783,7 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aData := ALRandomStrA(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
       aHash := ALStringHashSHA2(aData, THashSHA2.TSHA2Version.SHA512, true{hexEncode});
       aStopWatch.Stop;
@@ -829,7 +829,7 @@ begin
   randomize;
 
   if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
-  ALMemoCryptedData.Lines.Text := ALStringHashSHA2U(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8, THashSHA2.TSHA2Version.SHA256);
+  ALMemoCryptedData.Lines.Text := ALStringHashSHA2(ALMemoDecryptedData.Lines.Text, Tencoding.UTF8, THashSHA2.TSHA2Version.SHA256);
 
   StatusBar1.Panels[0].Text := 'ALSHA2 256 (Unicode)';
   StatusBar1.Panels[1].Text := '';
@@ -844,9 +844,9 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStrU(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aData := ALRandomStrW(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
-      aHash := ALStringHashSHA2U(aData, Tencoding.UTF8, THashSHA2.TSHA2Version.SHA256);
+      aHash := ALStringHashSHA2(aData, Tencoding.UTF8, THashSHA2.TSHA2Version.SHA256);
       aStopWatch.Stop;
       if aDictionary.TryGetValue(aHash, aTmpData) then begin
         if aTmpData <> aData then begin
@@ -888,8 +888,8 @@ begin
   randomize;
 
   if ALMemoDecryptedData.Lines.Text = '' then ALMemoDecryptedData.Lines.Text := '&"''(-_)=$*%!:;,';
-  ALMemoCryptedData.Lines.Text := ALBinToHexU(Tencoding.UTF8.GetBytes(ALMemoDecryptedData.Lines.Text));
-  ALMemoDecryptedData.Lines.Text := Tencoding.UTF8.GetString(ALHexToBinU(ALMemoCryptedData.Lines.Text));
+  ALMemoCryptedData.Lines.Text := ALBinToHexW(Tencoding.UTF8.GetBytes(ALMemoDecryptedData.Lines.Text));
+  ALMemoDecryptedData.Lines.Text := Tencoding.UTF8.GetString(ALHexToBin(ALMemoCryptedData.Lines.Text));
 
   StatusBar1.Panels[0].Text := 'Bench HexEncode (UNICODE)';
   StatusBar1.Panels[1].Text := '';
@@ -903,9 +903,9 @@ begin
   while True do begin
     aData := ALRandomBytes(1+random(4096));
     aStopWatch.Start;
-    aHash := ALBinToHexU(aData);
+    aHash := ALBinToHexW(aData);
     aStopWatch.Stop;
-    aData2 := ALHexToBinU(aHash);
+    aData2 := ALHexToBin(aHash);
     if (length(aData2) <> length(aData)) or
        (not comparemem(@aData2[0], @aData[0], length(aData2))) then
       raise Exception.Create('Test failed!');
@@ -956,7 +956,7 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aData := ALRandomStrA(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
       aHash := ZCrc32(0, aData[1], length(aData));
       aStopWatch.Stop;
@@ -1018,7 +1018,7 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aData := ALRandomStrA(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
       aHash := ALStringHashCrc32c(aData);
       aStopWatch.Stop;
@@ -1079,7 +1079,7 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aData := ALRandomStrA(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
       aHash := ALStringHashCrc64c(aData);
       aStopWatch.Stop;
@@ -1143,7 +1143,7 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aData := ALRandomStrA(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
       aHash := BobJenkinsHash(aData[1], Length(aData) * SizeOf(aData[1]), 0);
       aStopWatch.Stop;
@@ -1205,7 +1205,7 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aData := ALRandomStrA(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
       aHash := ALFnv1aInt64(aData);
       aStopWatch.Stop;
@@ -1267,7 +1267,7 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aData := ALRandomStrA(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
       aHash := ALFnv1aInt32(aData);
       aStopWatch.Stop;
@@ -1474,7 +1474,7 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aData := ALRandomStrA(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
       aHash := ALBCryptHashPassword(aData, 12);
       aStopWatch.Stop;

@@ -2,16 +2,14 @@ object Form1: TForm1
   Left = 445
   Top = 202
   Caption = 'Form1'
-  ClientHeight = 456
-  ClientWidth = 724
+  ClientHeight = 455
+  ClientWidth = 720
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
-  OldCreateOrder = False
-  PixelsPerInch = 96
   TextHeight = 13
   object Label6: TLabel
     Left = 372

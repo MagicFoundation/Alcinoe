@@ -2,16 +2,14 @@ object Form1: TForm1
   Left = 438
   Top = 209
   Caption = 'Form1'
-  ClientHeight = 564
-  ClientWidth = 603
+  ClientHeight = 563
+  ClientWidth = 599
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
-  OldCreateOrder = False
-  PixelsPerInch = 96
   TextHeight = 13
   object ButtonLoadXmlWithALXmlDocument: TButton
     Left = 16

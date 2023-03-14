@@ -29,7 +29,7 @@ Type
     fReferences: AnsiString;
     fcc: AnsiString;
     fContentType: AnsiString;
-    FCustomHeaders: TALStrings;
+    FCustomHeaders: TALStringsA;
     Function GetRawHeaderText: AnsiString;
     procedure SetRawHeaderText(const aRawHeaderText: AnsiString);
   public
@@ -52,14 +52,14 @@ Type
     property MIMEVersion: AnsiString read fMIMEVersion write fMIMEVersion; {MIME-Version: 1.0 - specifies the version of MIME that the message format complies with RFC 2045: 4}
     property Priority: AnsiString read fPriority write fPriority; {Priority: normal - Priority for message delivery ("normal" / "non-urgent" / "urgent") RFC 2156}
     property DispositionNotificationTo: AnsiString read fDispositionNotificationTo write fDispositionNotificationTo; {Disposition-Notification-To: boss@nil.test - Requests for notification when the message is received, and specifies the address for them RFC 2298}
-    property CustomHeaders: TALStrings read FCustomHeaders;
+    property CustomHeaders: TALStringsA read FCustomHeaders;
     Property RawHeaderText: AnsiString read GetRawHeaderText write SetRawHeaderText;
   end;
 
   {-----------------------------------}
   TALNewsArticleHeader = Class(Tobject)
   Private
-    FCustomHeaders: TALStrings;
+    FCustomHeaders: TALStringsA;
     fExpires: AnsiString;
     fMessageID: AnsiString;
     fReplyTo: AnsiString;
@@ -112,7 +112,7 @@ Type
     property MIMEVersion: AnsiString read fMIMEVersion write fMIMEVersion; {MIME-Version: 1.0 - specifies the version of MIME that the message format complies with RFC 2045: 4}
     property NNTPPostingHost: AnsiString read fNNTPPostingHost write fNNTPPostingHost; {NNTP-Posting-Host: stc92-3-82-245-250-13.fbx.proxad.net}
     property NNTPPostingDate: AnsiString read fNNTPPostingDate write fNNTPPostingDate; {NNTP-Posting-Date: Sun, 30 Sep 2007 20:28:56 +0000 (UTC)}
-    property CustomHeaders: TALStrings read FCustomHeaders;
+    property CustomHeaders: TALStringsA read FCustomHeaders;
     Property RawHeaderText: AnsiString read GetRawHeaderText write SetRawHeaderText;
   end;
 
@@ -122,13 +122,14 @@ Function ALMakeFriendlyEmailAddress(const aRealName, aEmail: AnsiString): AnsiSt
 Function ALEncodeRealName4FriendlyEmailAddress(const aRealName: AnsiString): AnsiString;
 Function AlGenerateInternetMessageID: AnsiString; overload;
 Function AlGenerateInternetMessageID(const ahostname: AnsiString): AnsiString; overload;
-function AlIsValidEmail(const Value: AnsiString): boolean;
-function AlIsValidEmailU(const Value: String): boolean;
+function AlIsValidEmail(const Value: AnsiString): boolean; overload;
+function AlIsValidEmail(const Value: String): boolean; overload;
 
 implementation
 
 uses
   system.Sysutils,
+  System.AnsiStrings,
   Alcinoe.HTTP.Client,
   {$IF defined(MSWINDOWS)}
   Alcinoe.WinSock,
@@ -166,10 +167,10 @@ begin
   ln := Length(FriendlyEmail);
 
   //----------
-  if ALMatchesMask(FriendlyEmail, '* <*>') then P1 := Ln-1  // toto <toto@toto.com> | "toto" <toto@toto.com> | (toto) <toto@toto.com>
-  else if ALMatchesMask(FriendlyEmail, '<*> *') then P1 := 2 // <toto@toto.com> toto.com | <toto@toto.com> "toto" | <toto@toto.com> (toto)
-  else if ALMatchesMask(FriendlyEmail, '<*>') then P1 := 2 // <toto@toto.com>
-  else if ALMatchesMask(FriendlyEmail, '* (*)') then P1 := 1 // toto@toto.com (toto)
+  if ALMatchesMaskA(FriendlyEmail, '* <*>') then P1 := Ln-1  // toto <toto@toto.com> | "toto" <toto@toto.com> | (toto) <toto@toto.com>
+  else if ALMatchesMaskA(FriendlyEmail, '<*> *') then P1 := 2 // <toto@toto.com> toto.com | <toto@toto.com> "toto" | <toto@toto.com> (toto)
+  else if ALMatchesMaskA(FriendlyEmail, '<*>') then P1 := 2 // <toto@toto.com>
+  else if ALMatchesMaskA(FriendlyEmail, '* (*)') then P1 := 1 // toto@toto.com (toto)
   else Begin
     RealName := '';
     Result := FriendlyEmail;
@@ -251,9 +252,9 @@ begin
      (RealName[1] = '"') and
      (RealName[ln] = '"') then begin
    RealName := alCopyStr(RealName,2,Ln-2);
-   RealName := alStringReplace(RealName,'\\',#1,[rfIgnoreCase,RfReplaceAll]);
-   RealName := alStringReplace(RealName,'\','',[rfIgnoreCase,RfReplaceAll]);
-   RealName := alStringReplace(RealName,#1,'\',[rfIgnoreCase,RfReplaceAll]);
+   RealName := ALStringReplaceA(RealName,'\\',#1,[rfIgnoreCase,RfReplaceAll]);
+   RealName := ALStringReplaceA(RealName,'\','',[rfIgnoreCase,RfReplaceAll]);
+   RealName := ALStringReplaceA(RealName,#1,'\',[rfIgnoreCase,RfReplaceAll]);
   end
   else if (ln >= 2) and
           (((RealName[1] = '(') and (RealName[ln] = ')')) or
@@ -323,7 +324,7 @@ end;
 {***********************************************}
 Function AlGenerateInternetMessageID: AnsiString;
 Begin
-  Result := AlStringReplace(ALNewGUIDString(true{WithoutBracket}),'-','',[rfReplaceAll]) {$IF defined(MSWINDOWS)}+ '@' + ALTrim(AlGetLocalHostName){$ENDIF};
+  Result := ALStringReplaceA(ALNewGUIDStringA(true{WithoutBracket}),'-','',[rfReplaceAll]) {$IF defined(MSWINDOWS)}+ '@' + ALTrim(AlGetLocalHostName){$ENDIF};
 end;
 
 {****************************************************************************}
@@ -331,7 +332,7 @@ Function AlGenerateInternetMessageID(const ahostname: AnsiString): AnsiString;
 var LTmpHostName: ansiString;
 Begin
   LTmpHostName := ALTrim(ahostname);
-  If LTmpHostName <> '' then Result := AlStringReplace(ALNewGUIDString(true{WithoutBracket}),'-','',[rfReplaceAll]) + '@' + LTmpHostName
+  If LTmpHostName <> '' then Result := ALStringReplaceA(ALNewGUIDStringA(true{WithoutBracket}),'-','',[rfReplaceAll]) + '@' + LTmpHostName
   else Result := AlGenerateInternetMessageID;
 end;
 
@@ -361,7 +362,7 @@ end;
 constructor TALEmailHeader.Create;
 begin
   inherited create;
-  FCustomHeaders:= TALStringList.create;
+  FCustomHeaders:= TALStringListA.create;
   FCustomHeaders.NameValueSeparator := ':';
   clear;
   fMessageID := 'AUTO';
@@ -392,14 +393,14 @@ begin
   If ALTrim(fSubject) <> '' then result := result + 'Subject: ' + ALTrim(fSubject) + #13#10;
   Str := fMessageID;
   If ALTrim(str) <> '' then begin
-    If ALSameText(Str, 'AUTO') then Str := '<' + AlGenerateInternetMessageID + '>';
+    If ALSameTextA(Str, 'AUTO') then Str := '<' + AlGenerateInternetMessageID + '>';
     result := result + 'Message-ID: ' + ALTrim(str) + #13#10;
   end;
   If ALTrim(fReferences) <> '' then result := result + 'References: ' + ALTrim(fReferences) + #13#10;
   If ALTrim(fComments) <> '' then result := result + 'Comments: ' + ALTrim(fComments) + #13#10;
   Str := fDate;
   If ALTrim(str) <> '' then begin
-    If ALSameText(Str, 'NOW') then Str := ALDateTimeToRfc822Str(Now);
+    If ALSameTextA(Str, 'NOW') then Str := ALDateTimeToRfc822Str(Now);
     result := result + 'Date: ' + ALTrim(str) + #13#10;
   end;
   If ALTrim(fContentType) <> '' then result := result + 'Content-Type: ' + ALTrim(fContentType) + #13#10;
@@ -415,7 +416,7 @@ end;
 {**************************************************************************}
 procedure TALEmailHeader.SetRawHeaderText(const aRawHeaderText: AnsiString);
 
-Var LRawHeaderLst: TALStringList;
+Var LRawHeaderLst: TALStringListA;
 
   {-----------------------------------------------------------}
   Function _extractHeader(const aName: AnsiString): AnsiString;
@@ -443,7 +444,7 @@ Var Str1, Str2: AnsiString;
 
 begin
   Clear;
-  LRawHeaderLst := TALStringList.create;
+  LRawHeaderLst := TALStringListA.create;
   try
     LRawHeaderLst.NameValueSeparator := ':';
     LRawHeaderLst.Text := aRawHeaderText;
@@ -523,7 +524,7 @@ end;
 constructor TALNewsArticleHeader.Create;
 begin
   inherited create;
-  FCustomHeaders:= TALStringList.create;
+  FCustomHeaders:= TALStringListA.create;
   FCustomHeaders.NameValueSeparator := ':';
   clear;
   fMessageID := 'AUTO';
@@ -550,14 +551,14 @@ begin
   If ALTrim(fFrom) <> '' then result := result + 'From: ' + ALTrim(fFrom) + #13#10;
   Str := fDate;
   If ALTrim(str) <> '' then begin
-    If ALSameText(Str, 'NOW') then Str := ALDateTimeToRfc822Str(Now);
+    If ALSameTextA(Str, 'NOW') then Str := ALDateTimeToRfc822Str(Now);
     result := result + 'Date: ' + ALTrim(str) + #13#10;
   end;
   If ALTrim(fNewsgroups) <> '' then result := result + 'Newsgroups: ' + ALTrim(fNewsgroups) + #13#10;
   If ALTrim(fSubject) <> '' then result := result + 'Subject: ' + ALTrim(fSubject) + #13#10;
   Str := fMessageID;
   If ALTrim(str) <> '' then begin
-    If ALSameText(Str, 'AUTO') then Str := '<' + AlGenerateInternetMessageID + '>';
+    If ALSameTextA(Str, 'AUTO') then Str := '<' + AlGenerateInternetMessageID + '>';
     result := result + 'Message-ID: ' + ALTrim(str) + #13#10;
   end;
   If ALTrim(fPath) <> '' then result := result + 'Path: ' + ALTrim(fPath) + #13#10;
@@ -584,7 +585,7 @@ end;
 {********************************************************************************}
 procedure TALNewsArticleHeader.SetRawHeaderText(const aRawHeaderText: AnsiString);
 
-Var LRawHeaderLst: TALStringList;
+Var LRawHeaderLst: TALStringListA;
 
   {-----------------------------------------------------------}
   Function _extractHeader(const aName: AnsiString): AnsiString;
@@ -612,7 +613,7 @@ Var Str1, Str2: AnsiString;
 
 begin
   Clear;
-  LRawHeaderLst := TALStringList.create;
+  LRawHeaderLst := TALStringListA.create;
   try
     LRawHeaderLst.NameValueSeparator := ':';
     LRawHeaderLst.Text := aRawHeaderText;
@@ -717,25 +718,25 @@ begin
   if length(Value) < 6 then exit;
 
   // must have the '@' char inside
-  I := AlPos('@', Value);
+  I := ALPosA('@', Value);
   if (I <= 1) or (I > length(Value)-4) then exit;
 
   //can not have @. or .@
   if (value[I-1] = '.') or (value[I+1] = '.') then exit;
 
   //can not have 2 ..
-  If (ALpos('..', Value) > 0) then Exit;
+  If (ALPosA('..', Value) > 0) then Exit;
 
   //extract namePart and serverPart
   namePart:= AlCopyStr(Value, 1, I - 1);
   serverPart:= AlCopyStr(Value, I + 1, Length(Value));
 
   // Extension (.fr, .com, etc..) must be betwen 2 to 6 char
-  I:= AlPos('.', serverPart);
+  I:= ALPosA('.', serverPart);
   J := 0;
   While I > 0 do begin
     J := I;
-    I := AlPosEx('.', serverPart, I + 1);
+    I := ALPosA('.', serverPart, I + 1);
   end;
   if (J <= 1) then Exit; // no dot at all so exit !
   extPart    := AlCopyStr(ServerPart,J+1,Maxint);
@@ -755,7 +756,7 @@ end;
 {*********************}
 {$ZEROBASEDSTRINGS OFF} // << the guy who introduce zero base string in delphi is just a mix of a Monkey and a Donkey !
 {$WARN SYMBOL_DEPRECATED OFF}
-function AlIsValidEmailU(const Value: String): boolean;
+function AlIsValidEmail(const Value: String): boolean;
 
  {--------------------------------------------------}
  function CheckAllowedName(const s: String): boolean;
@@ -803,29 +804,29 @@ begin
   if length(Value) < 6 then exit;
 
   // must have the '@' char inside
-  I := AlPosU('@', Value);
+  I := ALPosW('@', Value);
   if (I <= 1) or (I > length(Value)-4) then exit;
 
   //can not have @. or .@
   if (value[I-1] = '.') or (value[I+1] = '.') then exit;
 
   //can not have 2 ..
-  If (ALposU('..', Value) > 0) then Exit;
+  If (ALPosW('..', Value) > 0) then Exit;
 
   //extract namePart and serverPart
-  namePart:= AlCopyStrU(Value, 1, I - 1);
-  serverPart:= AlCopyStrU(Value, I + 1, Length(Value));
+  namePart:= ALCopyStr(Value, 1, I - 1);
+  serverPart:= ALCopyStr(Value, I + 1, Length(Value));
 
   // Extension (.fr, .com, etc..) must be betwen 2 to 6 char
-  I:= AlPosU('.', serverPart);
+  I:= ALPosW('.', serverPart);
   J := 0;
   While I > 0 do begin
     J := I;
-    I := AlPosExU('.', serverPart, I + 1);
+    I := ALPosW('.', serverPart, I + 1);
   end;
   if (J <= 1) then Exit; // no dot at all so exit !
-  extPart    := AlCopyStrU(ServerPart,J+1,Maxint);
-  serverPart := ALCopyStrU(ServerPart, 1, J - 1);
+  extPart    := ALCopyStr(ServerPart,J+1,Maxint);
+  serverPart := ALCopyStr(ServerPart, 1, J - 1);
   If not (Length(ExtPart) in [2..6]) then exit;
 
   Result:= CheckAllowedname(namePart) and

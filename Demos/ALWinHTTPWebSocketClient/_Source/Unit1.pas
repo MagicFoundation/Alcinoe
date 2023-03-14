@@ -220,7 +220,7 @@ begin
     WINHTTP_CALLBACK_STATUS_SENDREQUEST_COMPLETE: StatusStr := 'The request completed successfully';
     WINHTTP_CALLBACK_STATUS_WRITE_COMPLETE: StatusStr := 'Data was successfully written to the server';
     else
-      StatusStr := 'Unknown status: ' + ALIntToStr(InternetStatus);
+      StatusStr := 'Unknown status: ' + ALIntToStrA(InternetStatus);
   end;
   MemoLogStatus.Lines.Add(String(StatusStr));
 end;
@@ -282,7 +282,7 @@ begin
   end;
   MemoLogStatus.Height := MemoLogStatus.Parent.Height - MemoLogStatus.top - 6;
   MemoLogMsgReceived.Height := MemoLogMsgReceived.Parent.Height - MemoLogMsgReceived.top - 6;
-  MemoMessage.lines.Text := ALTrimU(MemoMessage.lines.Text);
+  MemoMessage.lines.Text := ALTrim(MemoMessage.lines.Text);
 end;
 
 {********************************************}

@@ -2,18 +2,16 @@ object Form1: TForm1
   Left = 473
   Top = 288
   Caption = 'ALWebSpider'
-  ClientHeight = 371
-  ClientWidth = 522
+  ClientHeight = 370
+  ClientWidth = 518
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
-  OldCreateOrder = False
   OnClose = FormClose
   OnCreate = FormCreate
-  PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
     Left = 53
@@ -92,8 +90,8 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 333
-    Width = 522
+    Top = 332
+    Width = 518
     Height = 19
     Panels = <
       item
@@ -102,6 +100,8 @@ object Form1: TForm1
       item
         Width = 100
       end>
+    ExplicitTop = 333
+    ExplicitWidth = 522
   end
   object editURL2Crawl: TEdit
     Left = 136
@@ -209,13 +209,15 @@ object Form1: TForm1
   end
   object StatusBar2: TStatusBar
     Left = 0
-    Top = 352
-    Width = 522
+    Top = 351
+    Width = 518
     Height = 19
     Panels = <
       item
         Width = 50
       end>
+    ExplicitTop = 352
+    ExplicitWidth = 522
   end
   object BtnChooseSaveDirectory: TButton
     Left = 481
@@ -228,8 +230,8 @@ object Form1: TForm1
   end
   object MemoErrorMsg: TMemo
     Left = 0
-    Top = 265
-    Width = 522
+    Top = 264
+    Width = 518
     Height = 68
     Align = alBottom
     Ctl3D = True
@@ -238,6 +240,8 @@ object Form1: TForm1
     ScrollBars = ssVertical
     TabOrder = 9
     WordWrap = False
+    ExplicitTop = 265
+    ExplicitWidth = 522
   end
   object EditIncludeLink: TEdit
     Left = 136

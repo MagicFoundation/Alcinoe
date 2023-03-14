@@ -17,8 +17,8 @@ type
   [TestFixture]
   TALTestStrings = class
   strict private
-    fFullAsciiCharset: TArray<AnsiChar>;
-    fFullAsciiCharsetU: TArray<Char>;
+    fFullAsciiCharsetA: TArray<AnsiChar>;
+    fFullAsciiCharsetW: TArray<Char>;
     FValidLCID: TArray<LCID>;
     fStopWatchAlcinoe: TStopwatch;
     fStopWatchDELPHI: TStopwatch;
@@ -31,51 +31,51 @@ type
     //[TearDown]
     //procedure TearDown;
     [Test]
-    procedure TestALBase64EncodeString;
+    procedure TestALBase64EncodeStringA;
     [Test]
-    procedure TestALPosExIgnoreCase;
+    procedure TestAlposIgnoreCaseA;
     [Test]
-    procedure TestALPosExIgnoreCaseU;
+    procedure TestAlposIgnoreCaseW;
     [Test]
-    procedure TestALTryStrToDate;
+    procedure TestALTryStrToDateA;
     [Test]
-    procedure TestALTryStrToTime;
+    procedure TestALTryStrToTimeA;
     [Test]
-    procedure TestALTryStrToDateTime;
+    procedure TestALTryStrToDateTimeA;
     [Test]
-    procedure TestALDateToStr;
+    procedure TestALDateToStrA;
     [Test]
-    procedure TestALTimeToStr;
+    procedure TestALTimeToStrA;
     [Test]
-    procedure TestALDateTimeToStr;
+    procedure TestALDateTimeToStrA;
     [Test]
-    procedure TestALFormatDateTime;
+    procedure TestALFormatDateTimeA;
     [Test]
-    procedure TestALIntToStr;
+    procedure TestALIntToStrA;
     [Test]
-    procedure TestALStrToInt;
+    procedure TestALStrToIntA;
     [Test]
-    procedure TestALStrToUInt;
+    procedure TestALStrToUIntA;
     [Test]
-    procedure TestALStrToInt64;
+    procedure TestALStrToInt64A;
     [Test]
-    procedure TestALStrToUInt64;
+    procedure TestALStrToUInt64A;
     [Test]
-    procedure TestALFloatToStr;
+    procedure TestALFloatToStrA;
     [Test]
-    procedure TestALFloatToStrF;
+    procedure TestALFloatToStrFA;
     [Test]
-    procedure TestALStrToFloat;
+    procedure TestALStrToFloatA;
     [Test]
-    procedure TestALCurrToStr;
+    procedure TestALCurrToStrA;
     [Test]
-    procedure TestALStrToCurr;
+    procedure TestALStrToCurrA;
     [Test]
-    procedure TestALFormatFloat;
+    procedure TestALFormatFloatA;
     [Test]
-    procedure TestALFormatCurr;
+    procedure TestALFormatCurrA;
     [Test]
-    procedure TestALFormat;
+    procedure TestALFormatA;
     [Test]
     procedure TestALUTF8CharSize;
     [Test]
@@ -96,13 +96,13 @@ uses
 {********************************}
 constructor TALTestStrings.create;
 begin
-  Setlength(fFullAsciiCharset, 255);
-  for var I := Low(fFullAsciiCharset) to High(fFullAsciiCharset) do
-    fFullAsciiCharset[i] := AnsiChar(i); // will contain some invalid UTF-8 chars
+  Setlength(fFullAsciiCharsetA, 255);
+  for var I := Low(fFullAsciiCharsetA) to High(fFullAsciiCharsetA) do
+    fFullAsciiCharsetA[i] := AnsiChar(i); // will contain some invalid UTF-8 chars
   //--
-  Setlength(fFullAsciiCharsetU, 65535);
-  for var I := Low(fFullAsciiCharsetU) to High(fFullAsciiCharsetU) do
-    fFullAsciiCharsetU[i] := Char(i); // will contain some invalid UTF-16 chars
+  Setlength(fFullAsciiCharsetW, 65535);
+  for var I := Low(fFullAsciiCharsetW) to High(fFullAsciiCharsetW) do
+    fFullAsciiCharsetW[i] := Char(i); // will contain some invalid UTF-16 chars
   //--
   setlength(FValidLCID, 0);
   For var i := 0 to 1000000 do
@@ -132,13 +132,13 @@ begin
   //that the execution time will be much slower that the Delphi RTL so skip it
   //In Win32 we remove all ASM (fastcode heritage) than the delphi RTL have
   //so we will be othen much more slower than the Delphi RTL
-  Writeln(ALFormatU('CheckExecutionTime Skipped - %0.0f ms for Alcinoe vs %0.0f ms for Delphi (%0.1fx faster)', [fStopWatchAlcinoe.Elapsed.TotalMilliseconds, fStopWatchDELPHI.Elapsed.TotalMilliseconds, fStopWatchDELPHI.Elapsed.TotalMilliseconds / fStopWatchAlcinoe.Elapsed.TotalMilliseconds], ALDefaultFormatSettingsU));
+  Writeln(ALFormatw('CheckExecutionTime Skipped - %0.0f ms for Alcinoe vs %0.0f ms for Delphi (%0.1fx faster)', [fStopWatchAlcinoe.Elapsed.TotalMilliseconds, fStopWatchDELPHI.Elapsed.TotalMilliseconds, fStopWatchDELPHI.Elapsed.TotalMilliseconds / fStopWatchAlcinoe.Elapsed.TotalMilliseconds], ALDefaultFormatSettingsW));
   {$ELSE}
   if fStopWatchAlcinoe.Elapsed.TotalMilliseconds > fStopWatchDELPHI.Elapsed.TotalMilliseconds * ARatio then
-    Assert.Fail(ALFormatU('Time too long (%0.0f ms for Alcinoe vs %0.0f ms for Delphi)', [fStopWatchAlcinoe.Elapsed.TotalMilliseconds, fStopWatchDELPHI.Elapsed.TotalMilliseconds], ALDefaultFormatSettingsU))
+    Assert.Fail(ALFormatW('Time too long (%0.0f ms for Alcinoe vs %0.0f ms for Delphi)', [fStopWatchAlcinoe.Elapsed.TotalMilliseconds, fStopWatchDELPHI.Elapsed.TotalMilliseconds], ALDefaultFormatSettingsW))
   else
     //https://github.com/VSoftTechnologies/DUnitX/issues/319
-    Writeln(ALFormatU('%0.0f ms for Alcinoe vs %0.0f ms for Delphi (%0.1fx faster)', [fStopWatchAlcinoe.Elapsed.TotalMilliseconds, fStopWatchDELPHI.Elapsed.TotalMilliseconds, fStopWatchDELPHI.Elapsed.TotalMilliseconds / fStopWatchAlcinoe.Elapsed.TotalMilliseconds], ALDefaultFormatSettingsU));
+    Writeln(ALFormatW('%0.0f ms for Alcinoe vs %0.0f ms for Delphi (%0.1fx faster)', [fStopWatchAlcinoe.Elapsed.TotalMilliseconds, fStopWatchDELPHI.Elapsed.TotalMilliseconds, fStopWatchDELPHI.Elapsed.TotalMilliseconds / fStopWatchAlcinoe.Elapsed.TotalMilliseconds], ALDefaultFormatSettingsW));
   {$ENDIF}
 end;
 
@@ -156,11 +156,11 @@ begin
   end;
 end;
 
-{************************************************}
-procedure TALTestStrings.TestALBase64EncodeString;
+{*************************************************}
+procedure TALTestStrings.TestALBase64EncodeStringA;
 begin
   for var I := 0 to 10000 do begin
-    var LStrIn := ALRandomStr(ALRandom32(16384), FFullAsciiCharset);
+    var LStrIn := ALRandomStrA(ALRandom32(16384), fFullAsciiCharsetA);
     var LEncoding := TBase64Encoding.Create(0);
     Try
       fStopWatchDELPHI.Start; {-} var LDelphiStrOut := AnsiString(LEncoding.EncodeBytesToString(BytesOf(LStrIn))); {-} fStopWatchDELPHI.Stop;
@@ -177,66 +177,66 @@ begin
   CheckExecutionTime(0.4{ARatio});
 end;
 
-{*********************************************}
-procedure TALTestStrings.TestALPosExIgnoreCase;
+{**********************************************}
+procedure TALTestStrings.TestAlposIgnoreCaseA;
 begin
   //full random substr
   for var I := 0 to 100000 do begin
-    var LStr := ALRandomStr(ALRandom32(1024), FFullAsciiCharset);
-    var LSubStr := ALRandomStr(ALRandom32(1024), FFullAsciiCharset);
+    var LStr := ALRandomStrA(ALRandom32(1024), fFullAsciiCharsetA);
+    var LSubStr := ALRandomStrA(ALRandom32(1024), fFullAsciiCharsetA);
     var LOffset := ALrandom32(1024);
-    fStopWatchDELPHI.Start; {-} var LDelphiPos := PosEx(Uppercase(LSubStr), Uppercase(LStr), LOffset); {-} fStopWatchDELPHI.Stop;
-    fStopWatchAlcinoe.Start; {-} var LAlcinoePos := ALPosExIgnoreCase(LSubStr, LStr, LOffset); {-} fStopWatchAlcinoe.Stop;
+    fStopWatchDELPHI.Start; {-} var LDelphiPos := Pos(Uppercase(LSubStr), Uppercase(LStr), LOffset); {-} fStopWatchDELPHI.Stop;
+    fStopWatchAlcinoe.Start; {-} var LAlcinoePos := AlposIgnoreCaseA(LSubStr, LStr, LOffset); {-} fStopWatchAlcinoe.Stop;
     if LAlcinoePos <> LDelphiPos then Assert.Fail;
   end;
   //substr inside Str
   for var I := 0 to 100000 do begin
-    var LStr := ALRandomStr(ALRandom32(1024), FFullAsciiCharset);
+    var LStr := ALRandomStrA(ALRandom32(1024), fFullAsciiCharsetA);
     var LSubStr := AlCopyStr(Lstr, ALRandom32(1024), ALRandom32(1024));
     case ALRandom32(2) of
       0: LSubStr := ALLowerCase(LSubStr);
       1: LSubStr := ALUpperCase(LSubStr);
     end;
     var LOffset := ALrandom32(1024);
-    fStopWatchDELPHI.Start; {-} var LDelphiPos := PosEx(Uppercase(LSubStr), Uppercase(LStr), LOffset); {-} fStopWatchDELPHI.Stop;
-    fStopWatchAlcinoe.Start; {-} var LAlcinoePos := ALPosExIgnoreCase(LSubStr, LStr, LOffset); {-} fStopWatchAlcinoe.Stop;
+    fStopWatchDELPHI.Start; {-} var LDelphiPos := Pos(Uppercase(LSubStr), Uppercase(LStr), LOffset); {-} fStopWatchDELPHI.Stop;
+    fStopWatchAlcinoe.Start; {-} var LAlcinoePos := AlposIgnoreCaseA(LSubStr, LStr, LOffset); {-} fStopWatchAlcinoe.Stop;
     if LAlcinoePos <> LDelphiPos then Assert.Fail;
   end;
   //--
   CheckExecutionTime(0.4{ARatio});
 end;
 
-{**********************************************}
-procedure TALTestStrings.TestALPosExIgnoreCaseU;
+{********************************************}
+procedure TALTestStrings.TestAlposIgnoreCaseW;
 begin
   //full random substr
   for var I := 0 to 100000 do begin
-    var LStr := ALRandomStrU(ALRandom32(1024), FFullAsciiCharsetU);
-    var LSubStr := ALRandomStrU(ALRandom32(1024), FFullAsciiCharsetU);
+    var LStr := ALRandomStrW(ALRandom32(1024), fFullAsciiCharsetW);
+    var LSubStr := ALRandomStrW(ALRandom32(1024), fFullAsciiCharsetW);
     var LOffset := ALrandom32(1024);
-    fStopWatchDELPHI.Start; {-} var LDelphiPos := PosEx(Uppercase(LSubStr), Uppercase(LStr), LOffset); {-} fStopWatchDELPHI.Stop;
-    fStopWatchAlcinoe.Start; {-} var LAlcinoePos := ALPosExIgnoreCaseU(LSubStr, LStr, LOffset); {-} fStopWatchAlcinoe.Stop;
+    fStopWatchDELPHI.Start; {-} var LDelphiPos := Pos(Uppercase(LSubStr), Uppercase(LStr), LOffset); {-} fStopWatchDELPHI.Stop;
+    fStopWatchAlcinoe.Start; {-} var LAlcinoePos := AlposIgnoreCaseW(LSubStr, LStr, LOffset); {-} fStopWatchAlcinoe.Stop;
     if LAlcinoePos <> LDelphiPos then Assert.Fail;
   end;
   //substr inside Str
   for var I := 0 to 100000 do begin
-    var LStr := ALRandomStrU(ALRandom32(1024), FFullAsciiCharsetU);
-    var LSubStr := AlCopyStrU(Lstr, ALRandom32(1024), ALRandom32(1024));
+    var LStr := ALRandomStrW(ALRandom32(1024), fFullAsciiCharsetW);
+    var LSubStr := AlCopyStr(Lstr, ALRandom32(1024), ALRandom32(1024));
     case ALRandom32(2) of
-      0: LSubStr := ALLowerCaseU(LSubStr);
-      1: LSubStr := ALUpperCaseU(LSubStr);
+      0: LSubStr := ALLowerCase(LSubStr);
+      1: LSubStr := ALUpperCase(LSubStr);
     end;
     var LOffset := ALrandom32(1024);
-    fStopWatchDELPHI.Start; {-} var LDelphiPos := PosEx(Uppercase(LSubStr), Uppercase(LStr), LOffset); {-} fStopWatchDELPHI.Stop;
-    fStopWatchAlcinoe.Start; {-} var LAlcinoePos := ALPosExIgnoreCaseU(LSubStr, LStr, LOffset); {-} fStopWatchAlcinoe.Stop;
+    fStopWatchDELPHI.Start; {-} var LDelphiPos := Pos(Uppercase(LSubStr), Uppercase(LStr), LOffset); {-} fStopWatchDELPHI.Stop;
+    fStopWatchAlcinoe.Start; {-} var LAlcinoePos := AlposIgnoreCaseW(LSubStr, LStr, LOffset); {-} fStopWatchAlcinoe.Stop;
     if LAlcinoePos <> LDelphiPos then Assert.Fail;
   end;
   //--
   CheckExecutionTime(0.4{ARatio});
 end;
 
-{******************************************}
-procedure TALTestStrings.TestALTryStrToDate;
+{*******************************************}
+procedure TALTestStrings.TestALTryStrToDateA;
 begin
   for var I := 0 to 100000 do begin
 
@@ -254,7 +254,7 @@ begin
     Var LCID := FValidLCID[ALrandom32(length(FValidLCID))];
     {$WARN SYMBOL_PLATFORM OFF}
     Var LDelphiFormatSettings := TformatSettings.Create(LCID);
-    Var LAlcinoeFormatSettings := TALFormatSettings.Create(LCID);
+    Var LAlcinoeFormatSettings := TALFormatSettingsA.Create(LCID);
     {$WARN SYMBOL_PLATFORM ON}
     if ALRandom32(2) = 1 then begin
       LDelphiFormatSettings.ShortDateFormat := LDelphiFormatSettings.LongDateFormat;
@@ -278,8 +278,8 @@ begin
   CheckExecutionTime;
 end;
 
-{******************************************}
-procedure TALTestStrings.TestALTryStrToTime;
+{*******************************************}
+procedure TALTestStrings.TestALTryStrToTimeA;
 begin
   for var I := 0 to 100000 do begin
 
@@ -297,7 +297,7 @@ begin
     Var LCID := FValidLCID[ALrandom32(length(FValidLCID))];
     {$WARN SYMBOL_PLATFORM OFF}
     Var LDelphiFormatSettings := TformatSettings.Create(LCID);
-    Var LAlcinoeFormatSettings := TALFormatSettings.Create(LCID);
+    Var LAlcinoeFormatSettings := TALFormatSettingsA.Create(LCID);
     {$WARN SYMBOL_PLATFORM ON}
     if ALRandom32(2) = 1 then begin
       LDelphiFormatSettings.ShortDateFormat := LDelphiFormatSettings.LongDateFormat;
@@ -321,8 +321,8 @@ begin
   CheckExecutionTime(0.8{ARatio});
 end;
 
-{**********************************************}
-procedure TALTestStrings.TestALTryStrToDateTime;
+{***********************************************}
+procedure TALTestStrings.TestALTryStrToDateTimeA;
 begin
   for var I := 0 to 100000 do begin
 
@@ -340,7 +340,7 @@ begin
     Var LCID := FValidLCID[ALrandom32(length(FValidLCID))];
     {$WARN SYMBOL_PLATFORM OFF}
     Var LDelphiFormatSettings := TformatSettings.Create(LCID);
-    Var LAlcinoeFormatSettings := TALFormatSettings.Create(LCID);
+    Var LAlcinoeFormatSettings := TALFormatSettingsA.Create(LCID);
     {$WARN SYMBOL_PLATFORM ON}
     if ALRandom32(2) = 1 then begin
       LDelphiFormatSettings.ShortDateFormat := LDelphiFormatSettings.LongDateFormat;
@@ -364,8 +364,8 @@ begin
   CheckExecutionTime(0.8{ARatio});
 end;
 
-{***************************************}
-procedure TALTestStrings.TestALDateToStr;
+{****************************************}
+procedure TALTestStrings.TestALDateToStrA;
 begin
   for var I := 0 to 100000 do begin
 
@@ -383,7 +383,7 @@ begin
     Var LCID := FValidLCID[ALrandom32(length(FValidLCID))];
     {$WARN SYMBOL_PLATFORM OFF}
     Var LDelphiFormatSettings := TformatSettings.Create(LCID);
-    Var LAlcinoeFormatSettings := TALFormatSettings.Create(LCID);
+    Var LAlcinoeFormatSettings := TALFormatSettingsA.Create(LCID);
     {$WARN SYMBOL_PLATFORM ON}
     if ALRandom32(2) = 1 then begin
       LDelphiFormatSettings.ShortDateFormat := LDelphiFormatSettings.LongDateFormat;
@@ -411,7 +411,7 @@ begin
     var LDelphiDateStr: String;
     var LAlcinoeDatestr: ansiString;
     fStopWatchDELPHI.Start; {-} LDelphiDateStr := DateToStr(LDate, LDelphiFormatSettings); {-} fStopWatchDELPHI.Stop;
-    fStopWatchAlcinoe.Start; {-} LAlcinoeDatestr := alDateToStr(LDate, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
+    fStopWatchAlcinoe.Start; {-} LAlcinoeDatestr := alDateToStrA(LDate, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
 
     if LAlcinoeDatestr <> AnsiString(LDelphiDateStr) then Assert.Fail;
 
@@ -420,8 +420,8 @@ begin
   CheckExecutionTime;
 end;
 
-{***************************************}
-procedure TALTestStrings.TestALTimeToStr;
+{****************************************}
+procedure TALTestStrings.TestALTimeToStrA;
 begin
   for var I := 0 to 100000 do begin
 
@@ -439,7 +439,7 @@ begin
     Var LCID := FValidLCID[ALrandom32(length(FValidLCID))];
     {$WARN SYMBOL_PLATFORM OFF}
     Var LDelphiFormatSettings := TformatSettings.Create(LCID);
-    Var LAlcinoeFormatSettings := TALFormatSettings.Create(LCID);
+    Var LAlcinoeFormatSettings := TALFormatSettingsA.Create(LCID);
     {$WARN SYMBOL_PLATFORM ON}
     if ALRandom32(2) = 1 then begin
       LDelphiFormatSettings.ShortDateFormat := LDelphiFormatSettings.LongDateFormat;
@@ -467,7 +467,7 @@ begin
     var LDelphiTimeStr: String;
     var LAlcinoeTimestr: ansiString;
     fStopWatchDELPHI.Start; {-} LDelphiTimeStr := TimeToStr(LTime, LDelphiFormatSettings); {-} fStopWatchDELPHI.Stop;
-    fStopWatchAlcinoe.Start; {-} LAlcinoeTimestr := alTimeToStr(LTime, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
+    fStopWatchAlcinoe.Start; {-} LAlcinoeTimestr := alTimeToStrA(LTime, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
 
     if LAlcinoeTimestr <> AnsiString(LDelphiTimeStr) then Assert.Fail;
 
@@ -476,8 +476,8 @@ begin
   CheckExecutionTime;
 end;
 
-{*******************************************}
-procedure TALTestStrings.TestALDateTimeToStr;
+{********************************************}
+procedure TALTestStrings.TestALDateTimeToStrA;
 begin
   for var I := 0 to 100000 do begin
 
@@ -495,7 +495,7 @@ begin
     Var LCID := FValidLCID[ALrandom32(length(FValidLCID))];
     {$WARN SYMBOL_PLATFORM OFF}
     Var LDelphiFormatSettings := TformatSettings.Create(LCID);
-    Var LAlcinoeFormatSettings := TALFormatSettings.Create(LCID);
+    Var LAlcinoeFormatSettings := TALFormatSettingsA.Create(LCID);
     {$WARN SYMBOL_PLATFORM ON}
     if ALRandom32(2) = 1 then begin
       LDelphiFormatSettings.ShortDateFormat := LDelphiFormatSettings.LongDateFormat;
@@ -523,7 +523,7 @@ begin
     var LDelphiDateTimeStr: String;
     var LAlcinoeDateTimestr: ansiString;
     fStopWatchDELPHI.Start; {-} LDelphiDateTimeStr := DateTimeToStr(LDateTime, LDelphiFormatSettings); {-} fStopWatchDELPHI.Stop;
-    fStopWatchAlcinoe.Start; {-} LAlcinoeDateTimestr := alDateTimeToStr(LDateTime, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
+    fStopWatchAlcinoe.Start; {-} LAlcinoeDateTimestr := alDateTimeToStrA(LDateTime, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
 
     if LAlcinoeDateTimestr <> AnsiString(LDelphiDateTimeStr) then
       Assert.Fail;
@@ -533,11 +533,11 @@ begin
   CheckExecutionTime;
 end;
 
-{********************************************}
-procedure TALTestStrings.TestALFormatDateTime;
+{*********************************************}
+procedure TALTestStrings.TestALFormatDateTimeA;
 begin
 
-  Var LSpecifiers := TalStringListU.create;
+  Var LSpecifiers := TalStringListW.create;
   try
 
     LSpecifiers.add('c'); // Displays the date using the format given by the ShortDateFormat global variable, followed by the time using the format given by the LongTimeFormat global variable. The time is not displayed if the date-time value indicates midnight precisely.
@@ -589,7 +589,7 @@ begin
       Var LCID := FValidLCID[ALrandom32(length(FValidLCID))];
       {$WARN SYMBOL_PLATFORM OFF}
       Var LDelphiFormatSettings := TformatSettings.Create(LCID);
-      Var LAlcinoeFormatSettings := TALFormatSettings.Create(LCID);
+      Var LAlcinoeFormatSettings := TALFormatSettingsA.Create(LCID);
       {$WARN SYMBOL_PLATFORM ON}
       if ALRandom32(2) = 1 then begin
         LDelphiFormatSettings.ShortDateFormat := LDelphiFormatSettings.LongDateFormat;
@@ -619,7 +619,7 @@ begin
       Var Lformat := AnsiString(LformatU);
 
       fStopWatchDELPHI.Start; {-} var LDelphiDateTimeStr := FormatDateTime(LformatU, LDateTime, LDelphiFormatSettings); {-} fStopWatchDELPHI.Stop;
-      fStopWatchAlcinoe.Start; {-} var LAlcinoeDateTimestr := ALFormatDateTime(Lformat, LDateTime, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
+      fStopWatchAlcinoe.Start; {-} var LAlcinoeDateTimestr := ALFormatDateTimeA(Lformat, LDateTime, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
 
       if string(LAlcinoeDateTimestr) <> LDelphiDateTimeStr then Assert.Fail;
 
@@ -632,15 +632,15 @@ begin
 
 end;
 
-{**************************************}
-procedure TALTestStrings.TestALIntToStr;
+{***************************************}
+procedure TALTestStrings.TestALIntToStrA;
 begin
   //int32
   for var I := 0 to 1000000 do begin
     var LInt: int32 := integer(ALRandom32(Maxint));
     if ALRandom32(2) = 1 then Lint := Lint * -1;
     fStopWatchDELPHI.Start; {-} var LDELPHIStr := IntToStr(LInt); {-} fStopWatchDELPHI.Stop;
-    fStopWatchAlcinoe.Start; {-} var LAlcinoeStr := ALIntToStr(LInt); {-} fStopWatchAlcinoe.Stop;
+    fStopWatchAlcinoe.Start; {-} var LAlcinoeStr := ALIntToStrA(LInt); {-} fStopWatchAlcinoe.Stop;
     if String(LAlcinoeStr) <> LDELPHIStr then Assert.Fail;
   end;
   //int64
@@ -648,15 +648,15 @@ begin
     var LInt: int64 := int64(ALRandom64(ALMaxint64));
     if ALRandom32(2) = 1 then Lint := Lint * -1;
     fStopWatchDELPHI.Start; {-} var LDELPHIStr := IntToStr(LInt); {-} fStopWatchDELPHI.Stop;
-    fStopWatchAlcinoe.Start; {-} var LAlcinoeStr := ALIntToStr(LInt); {-} fStopWatchAlcinoe.Stop;
+    fStopWatchAlcinoe.Start; {-} var LAlcinoeStr := ALIntToStrA(LInt); {-} fStopWatchAlcinoe.Stop;
     if String(LAlcinoeStr) <> LDELPHIStr then Assert.Fail;
   end;
   //--
   CheckExecutionTime;
 end;
 
-{**************************************}
-procedure TALTestStrings.TestALStrToInt;
+{***************************************}
+procedure TALTestStrings.TestALStrToIntA;
 begin
   for var I := 0 to 1000000 do begin
     Var LIntegerIn: Integer := ALRandom32(ALMaxInt);
@@ -675,8 +675,8 @@ begin
   CheckExecutionTime;
 end;
 
-{***************************************}
-procedure TALTestStrings.TestALStrToUInt;
+{****************************************}
+procedure TALTestStrings.TestALStrToUIntA;
 begin
   for var I := 0 to 1000000 do begin
     Var LIntegerIn: cardinal := ALRandom32(ALMaxUInt);
@@ -694,8 +694,8 @@ begin
   CheckExecutionTime;
 end;
 
-{****************************************}
-procedure TALTestStrings.TestALStrToInt64;
+{*****************************************}
+procedure TALTestStrings.TestALStrToInt64A;
 begin
   for var I := 0 to 1000000 do begin
     Var LIntegerIn: int64 := ALRandom64(ALMaxInt64);
@@ -714,8 +714,8 @@ begin
   CheckExecutionTime;
 end;
 
-{*****************************************}
-procedure TALTestStrings.TestALStrToUInt64;
+{******************************************}
+procedure TALTestStrings.TestALStrToUInt64A;
 begin
   for var I := 0 to 1000000 do begin
     Var LIntegerIn: UInt64 := ALRandom64(ALMaxUInt64);
@@ -733,8 +733,8 @@ begin
   CheckExecutionTime;
 end;
 
-{****************************************}
-procedure TALTestStrings.TestALFloatToStr;
+{*****************************************}
+procedure TALTestStrings.TestALFloatToStrA;
 begin
   for var I := 0 to 100000 do begin
     Var LExtendedIn: Extended := ALRandom64(ALMaxInt64) / ALRandom64(ALMaxInt64);
@@ -744,19 +744,19 @@ begin
     Var LCID := FValidLCID[ALrandom32(length(FValidLCID))];
     {$WARN SYMBOL_PLATFORM OFF}
     Var LDelphiFormatSettings := TformatSettings.Create(LCID);
-    Var LAlcinoeFormatSettings := TALFormatSettings.Create(LCID);
+    Var LAlcinoeFormatSettings := TALFormatSettingsA.Create(LCID);
     {$WARN SYMBOL_PLATFORM ON}
 
     fStopWatchDELPHI.Start; {-} var LDELPHIStr := FloatToStr(LExtendedIn, LDelphiFormatSettings); {-} fStopWatchDELPHI.Stop;
-    fStopWatchAlcinoe.Start; {-} var LAlcinoeStr := ALFloatToStr(LExtendedIn, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
+    fStopWatchAlcinoe.Start; {-} var LAlcinoeStr := ALFloatToStrA(LExtendedIn, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
     if String(LAlcinoeStr) <> LDELPHIStr then Assert.Fail;
   end;
   //--
   CheckExecutionTime;
 end;
 
-{*****************************************}
-procedure TALTestStrings.TestALFloatToStrF;
+{******************************************}
+procedure TALTestStrings.TestALFloatToStrFA;
 begin
   for var I := 0 to 100000 do begin
     Var LExtendedIn: Extended := ALRandom64(ALMaxInt64) / ALRandom64(ALMaxInt64);
@@ -766,7 +766,7 @@ begin
     Var LCID := FValidLCID[ALrandom32(length(FValidLCID))];
     {$WARN SYMBOL_PLATFORM OFF}
     Var LDelphiFormatSettings := TformatSettings.Create(LCID);
-    Var LAlcinoeFormatSettings := TALFormatSettings.Create(LCID);
+    Var LAlcinoeFormatSettings := TALFormatSettingsA.Create(LCID);
     {$WARN SYMBOL_PLATFORM ON}
 
     var LFormat: TFloatFormat;
@@ -782,15 +782,15 @@ begin
     var LDigits := ALRandom32(32);
 
     fStopWatchDELPHI.Start; {-} var LDELPHIStr := FloatToStrF(LExtendedIn, LFormat, LPrecision, LDigits, LDelphiFormatSettings); {-} fStopWatchDELPHI.Stop;
-    fStopWatchAlcinoe.Start; {-} var LAlcinoeStr := ALFloatToStrF(LExtendedIn, LFormat, LPrecision, LDigits, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
+    fStopWatchAlcinoe.Start; {-} var LAlcinoeStr := ALFloatToStrFA(LExtendedIn, LFormat, LPrecision, LDigits, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
     if String(LAlcinoeStr) <> LDELPHIStr then Assert.Fail;
   end;
   //--
   CheckExecutionTime;
 end;
 
-{****************************************}
-procedure TALTestStrings.TestALStrToFloat;
+{*****************************************}
+procedure TALTestStrings.TestALStrToFloatA;
 begin
   for var I := 0 to 100000 do begin
     Var LExtendedIn: Extended := ALRandom64(ALMaxInt64) / ALRandom64(ALMaxInt64);
@@ -800,7 +800,7 @@ begin
     Var LCID := FValidLCID[ALrandom32(length(FValidLCID))];
     {$WARN SYMBOL_PLATFORM OFF}
     Var LDelphiFormatSettings := TformatSettings.Create(LCID);
-    Var LAlcinoeFormatSettings := TALFormatSettings.Create(LCID);
+    Var LAlcinoeFormatSettings := TALFormatSettingsA.Create(LCID);
     {$WARN SYMBOL_PLATFORM ON}
     var LStrU := FloatToStr(LExtendedIn, LDelphiFormatSettings);
     var LStr := AnsiString(LstrU);
@@ -817,8 +817,8 @@ begin
   CheckExecutionTime;
 end;
 
-{***************************************}
-procedure TALTestStrings.TestALCurrToStr;
+{****************************************}
+procedure TALTestStrings.TestALCurrToStrA;
 begin
   for var I := 0 to 100000 do begin
     Var LCurrencyIn: Currency := ALRandom32(ALMaxInt) / ALRandom32(ALMaxInt);
@@ -828,19 +828,19 @@ begin
     Var LCID := FValidLCID[ALrandom32(length(FValidLCID))];
     {$WARN SYMBOL_PLATFORM OFF}
     Var LDelphiFormatSettings := TformatSettings.Create(LCID);
-    Var LAlcinoeFormatSettings := TALFormatSettings.Create(LCID);
+    Var LAlcinoeFormatSettings := TALFormatSettingsA.Create(LCID);
     {$WARN SYMBOL_PLATFORM ON}
 
     fStopWatchDELPHI.Start; {-} var LDELPHIStr := CurrToStr(LCurrencyIn, LDelphiFormatSettings); {-} fStopWatchDELPHI.Stop;
-    fStopWatchAlcinoe.Start; {-} var LAlcinoeStr := ALCurrToStr(LCurrencyIn, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
+    fStopWatchAlcinoe.Start; {-} var LAlcinoeStr := ALCurrToStrA(LCurrencyIn, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
     if String(LAlcinoeStr) <> LDELPHIStr then Assert.Fail;
   end;
   //--
   CheckExecutionTime;
 end;
 
-{***************************************}
-procedure TALTestStrings.TestALStrToCurr;
+{****************************************}
+procedure TALTestStrings.TestALStrToCurrA;
 begin
   for var I := 0 to 100000 do begin
     Var LCurrencyIn: Currency := ALRandom32(ALMaxInt) / ALRandom32(ALMaxInt);
@@ -850,7 +850,7 @@ begin
     Var LCID := FValidLCID[ALrandom32(length(FValidLCID))];
     {$WARN SYMBOL_PLATFORM OFF}
     Var LDelphiFormatSettings := TformatSettings.Create(LCID);
-    Var LAlcinoeFormatSettings := TALFormatSettings.Create(LCID);
+    Var LAlcinoeFormatSettings := TALFormatSettingsA.Create(LCID);
     {$WARN SYMBOL_PLATFORM ON}
     var LStrU := FloatToStr(LCurrencyIn, LDelphiFormatSettings);
     var LStr := AnsiString(LstrU);
@@ -867,11 +867,11 @@ begin
   CheckExecutionTime;
 end;
 
-{*****************************************}
-procedure TALTestStrings.TestALFormatFloat;
+{******************************************}
+procedure TALTestStrings.TestALFormatFloatA;
 begin
   //In Win32, delphi RTL use the fastcode ASM that we abandon in alcinoe so
-  //the result given by FormatFloat is often <> from the one given by ALFormatFloat
+  //the result given by FormatFloat is often <> from the one given by ALFormatFloatA
   {$IF defined(WIN64)}
   for var I := 0 to 100000 do begin
     Var LExtendedIn: Extended := ALRandom64(ALMaxInt64) / ALRandom64(ALMaxInt64);
@@ -881,7 +881,7 @@ begin
     Var LCID := FValidLCID[ALrandom32(length(FValidLCID))];
     {$WARN SYMBOL_PLATFORM OFF}
     Var LDelphiFormatSettings := TformatSettings.Create(LCID);
-    Var LAlcinoeFormatSettings := TALFormatSettings.Create(LCID);
+    Var LAlcinoeFormatSettings := TALFormatSettingsA.Create(LCID);
     {$WARN SYMBOL_PLATFORM ON}
 
     var LDelphiFormat: String;
@@ -938,7 +938,7 @@ begin
     var LAlcinoeFormat := AnsiString(LDelphiFormat);
 
     fStopWatchDELPHI.Start; {-} var LDelphiStrOut := FormatFloat(LDelphiFormat, LExtendedIn, LDelphiFormatSettings); {-} fStopWatchDELPHI.Stop;
-    fStopWatchAlcinoe.Start; {-} var LAlcinoeStrOut := ALFormatFloat(LAlcinoeFormat, LExtendedIn, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
+    fStopWatchAlcinoe.Start; {-} var LAlcinoeStrOut := ALFormatFloatA(LAlcinoeFormat, LExtendedIn, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
 
     if LDelphiStrOut <> String(LAlcinoeStrOut) then
       Assert.Fail;
@@ -949,11 +949,11 @@ begin
   {$ENDIF}
 end;
 
-{****************************************}
-procedure TALTestStrings.TestALFormatCurr;
+{*****************************************}
+procedure TALTestStrings.TestALFormatCurrA;
 begin
   //In Win32, delphi RTL use the fastcode ASM that we abandon in alcinoe so
-  //the result given by FormatFloat is often <> from the one given by ALFormatFloat
+  //the result given by FormatFloat is often <> from the one given by ALFormatFloatA
   {$IF defined(WIN64)}
   for var I := 0 to 100000 do begin
     Var LCurrencyIn: Currency := ALRandom32(ALMaxInt) / ALRandom32(ALMaxInt);
@@ -963,7 +963,7 @@ begin
     Var LCID := FValidLCID[ALrandom32(length(FValidLCID))];
     {$WARN SYMBOL_PLATFORM OFF}
     Var LDelphiFormatSettings := TformatSettings.Create(LCID);
-    Var LAlcinoeFormatSettings := TALFormatSettings.Create(LCID);
+    Var LAlcinoeFormatSettings := TALFormatSettingsA.Create(LCID);
     {$WARN SYMBOL_PLATFORM ON}
 
     var LDelphiFormat: String;
@@ -1020,7 +1020,7 @@ begin
     var LAlcinoeFormat := AnsiString(LDelphiFormat);
 
     fStopWatchDELPHI.Start; {-} var LDelphiStrOut := FormatCurr(LDelphiFormat, LCurrencyIn, LDelphiFormatSettings); {-} fStopWatchDELPHI.Stop;
-    fStopWatchAlcinoe.Start; {-} var LAlcinoeStrOut := ALFormatCurr(LAlcinoeFormat, LCurrencyIn, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
+    fStopWatchAlcinoe.Start; {-} var LAlcinoeStrOut := ALFormatCurrA(LAlcinoeFormat, LCurrencyIn, LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
 
     if LDelphiStrOut <> String(LAlcinoeStrOut) then
       Assert.Fail;
@@ -1031,15 +1031,15 @@ begin
   {$ENDIF}
 end;
 
-{************************************}
-procedure TALTestStrings.TestALFormat;
+{*************************************}
+procedure TALTestStrings.TestALFormatA;
 begin
   for var I := 0 to 10000 do begin
 
     Var LCID := FValidLCID[ALrandom32(length(FValidLCID))];
     {$WARN SYMBOL_PLATFORM OFF}
     Var LDelphiFormatSettings := TformatSettings.Create(LCID);
-    Var LAlcinoeFormatSettings := TALFormatSettings.Create(LCID);
+    Var LAlcinoeFormatSettings := TALFormatSettingsA.Create(LCID);
     {$WARN SYMBOL_PLATFORM ON}
 
     //"%" [index ":"] ["-"] [width] ["." prec] type
@@ -1054,20 +1054,20 @@ begin
     //
     LDelphiFormat := LDelphiFormat + '%';
     if ALRandom32(5)=0 then LDelphiFormat := LDelphiFormat + '-';
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrU(ALRandom32(32));
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrU(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrW(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrW(ALRandom32(32));
     LDelphiFormat := LDelphiFormat + 'd';
-    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceU(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
+    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceW(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
     //--
     var LInt2: int32 := integer(ALRandom32(Maxint));
     if ALRandom32(2) = 1 then Lint2 := Lint2 * -1;
     //
     LDelphiFormat := LDelphiFormat + '%';
     if ALRandom32(5)=0 then LDelphiFormat := LDelphiFormat + '-';
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrU(ALRandom32(32));
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrU(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrW(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrW(ALRandom32(32));
     LDelphiFormat := LDelphiFormat + 'd';
-    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceU(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
+    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceW(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
 
     //u Unsigned decimal. Similar to d, but no sign is output.
     Var LInt3: int64 := ALRandom64(ALMaxInt64);
@@ -1075,20 +1075,20 @@ begin
     //
     LDelphiFormat := LDelphiFormat + '%';
     if ALRandom32(5)=0 then LDelphiFormat := LDelphiFormat + '-';
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrU(ALRandom32(32));
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrU(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrW(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrW(ALRandom32(32));
     LDelphiFormat := LDelphiFormat + 'u';
-    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceU(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
+    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceW(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
     //--
     var LInt4: int32 := integer(ALRandom32(Maxint));
     if ALRandom32(2) = 1 then Lint4 := Lint4 * -1;
     //--
     LDelphiFormat := LDelphiFormat + '%';
     if ALRandom32(5)=0 then LDelphiFormat := LDelphiFormat + '-';
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrU(ALRandom32(32));
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrU(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrW(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrW(ALRandom32(32));
     LDelphiFormat := LDelphiFormat + 'u';
-    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceU(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
+    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceW(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
 
     //e Scientific. The argument must be a floating-point value. The value is converted to a
     //string of the form "-d.ddd...E+ddd". The resulting string starts with a minus sign if
@@ -1103,10 +1103,10 @@ begin
     //
     LDelphiFormat := LDelphiFormat + '%';
     if ALRandom32(5)=0 then LDelphiFormat := LDelphiFormat + '-';
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrU(ALRandom32(32));
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrU(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrW(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrW(ALRandom32(32));
     LDelphiFormat := LDelphiFormat + 'e';
-    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceU(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
+    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceW(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
 
     //f Fixed. The argument must be a floating-point value. The value is converted to a string
     //of the form "-ddd.ddd...". The resulting string starts with a minus sign if the number
@@ -1119,10 +1119,10 @@ begin
     //
     LDelphiFormat := LDelphiFormat + '%';
     if ALRandom32(5)=0 then LDelphiFormat := LDelphiFormat + '-';
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrU(ALRandom32(32));
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrU(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrW(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrW(ALRandom32(32));
     LDelphiFormat := LDelphiFormat + 'f';
-    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceU(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
+    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceW(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
 
     //g General. The argument must be a floating-point value. The value is converted to the
     //shortest possible decimal string using fixed or scientific format. The number of
@@ -1139,10 +1139,10 @@ begin
     //
     LDelphiFormat := LDelphiFormat + '%';
     if ALRandom32(5)=0 then LDelphiFormat := LDelphiFormat + '-';
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrU(ALRandom32(32));
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrU(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrW(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrW(ALRandom32(32));
     LDelphiFormat := LDelphiFormat + 'g';
-    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceU(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
+    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceW(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
 
     //n Number. The argument must be a floating-point value. The value is converted to a
     //string of the form "-d,ddd,ddd.ddd...". The n format corresponds to the f format,
@@ -1153,10 +1153,10 @@ begin
     //
     LDelphiFormat := LDelphiFormat + '%';
     if ALRandom32(5)=0 then LDelphiFormat := LDelphiFormat + '-';
-    if (ALRandom32(2)=0) and (length(LAlcinoeFormatSettings.ThousandSeparator) = length(LDelphiFormatSettings.ThousandSeparator)) then LDelphiFormat := LDelphiFormat + alinttostrU(ALRandom32(32));
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrU(ALRandom32(32));
+    if (ALRandom32(2)=0) and (length(LAlcinoeFormatSettings.ThousandSeparator) = length(LDelphiFormatSettings.ThousandSeparator)) then LDelphiFormat := LDelphiFormat + alinttostrW(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrW(ALRandom32(32));
     LDelphiFormat := LDelphiFormat + 'n';
-    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceU(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
+    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceW(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
 
     //m Money. The argument must be a floating-point value. The value is converted to
     //a string that represents a currency amount. The conversion is controlled by
@@ -1171,34 +1171,34 @@ begin
     //
     LDelphiFormat := LDelphiFormat + '%';
     if ALRandom32(5)=0 then LDelphiFormat := LDelphiFormat + '-';
-    if (ALRandom32(2)=0) and (length(LAlcinoeFormatSettings.ThousandSeparator) = length(LDelphiFormatSettings.ThousandSeparator)) and (length(LAlcinoeFormatSettings.CurrencyString) = length(LDelphiFormatSettings.CurrencyString)) then LDelphiFormat := LDelphiFormat + alinttostrU(ALRandom32(32));
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrU(ALRandom32(32));
+    if (ALRandom32(2)=0) and (length(LAlcinoeFormatSettings.ThousandSeparator) = length(LDelphiFormatSettings.ThousandSeparator)) and (length(LAlcinoeFormatSettings.CurrencyString) = length(LDelphiFormatSettings.CurrencyString)) then LDelphiFormat := LDelphiFormat + alinttostrW(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrW(ALRandom32(32));
     LDelphiFormat := LDelphiFormat + 'm';
-    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceU(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
+    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceW(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
 
     //p Pointer. The argument must be a pointer value. The value is converted
     //to an 8-character string that represents the pointer's value in hexadecimal.
     LDelphiFormat := LDelphiFormat + '%';
     if ALRandom32(5)=0 then LDelphiFormat := LDelphiFormat + '-';
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrU(ALRandom32(32));
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrU(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrW(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrW(ALRandom32(32));
     LDelphiFormat := LDelphiFormat + 'p';
-    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceU(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
+    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceW(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
 
     //s String. The argument must be a character, a string, or a PChar value. The string or
     //character is inserted in place of the format specifier. The precision specifier,
     //if present in the format string, specifies the maximum length of the resulting string.
     //If the argument is a string that is longer than this maximum, the string is truncated.
     var LStrU1 := UnicodeRandomStr(ALRandom32(255));
-    LStrU1 := ALStringReplaceU(LstrU1,'%','%%',[rfReplaceALL]);
+    LStrU1 := ALStringReplaceW(LstrU1,'%','%%',[rfReplaceALL]);
     var Lstr1 := AnsiString(LStrU1);
     //--
     LDelphiFormat := LDelphiFormat + '%';
     if ALRandom32(5)=0 then LDelphiFormat := LDelphiFormat + '-';
-    //if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrU(ALRandom32(32));
-    //if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrU(ALRandom32(32));
+    //if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrW(ALRandom32(32));
+    //if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrW(ALRandom32(32));
     LDelphiFormat := LDelphiFormat + 's';
-    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceU(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
+    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceW(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
 
     //x Hexadecimal. The argument must be an integer value. The value is converted to a string
     //of hexadecimal digits. If the format string contains a precision specifier, it indicates
@@ -1209,15 +1209,15 @@ begin
     //--
     LDelphiFormat := LDelphiFormat + '%';
     if ALRandom32(5)=0 then LDelphiFormat := LDelphiFormat + '-';
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrU(ALRandom32(32));
-    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrU(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + alinttostrW(ALRandom32(32));
+    if ALRandom32(2)=0 then LDelphiFormat := LDelphiFormat + '.' + alinttostrW(ALRandom32(32));
     LDelphiFormat := LDelphiFormat + 'x';
-    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceU(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
+    if ALRandom32(2) = 1 then LDelphiFormat := LDelphiFormat + ALStringReplaceW(UnicodeRandomStr(ALRandom32(10)), '%', '%%',[rfReplaceALL]);
 
     var LAlcinoeFormat := AnsiString(LDelphiFormat);
 
     fStopWatchDELPHI.Start; {-} var LDelphiStrOut := Format(LDelphiFormat, [LInt1, LInt2, LInt3, LInt4, LExtended1, LExtended2, LExtended3, LExtended4, LCurrency1, pointer(self), LStrU1, LInt5], LDelphiFormatSettings); {-} fStopWatchDELPHI.Stop;
-    fStopWatchAlcinoe.Start; {-} var LAlcinoeStrOut := ALFormat(LAlcinoeFormat, [LInt1, LInt2, LInt3, LInt4, LExtended1, LExtended2, LExtended3, LExtended4, LCurrency1, pointer(self), LStr1, LInt5], LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
+    fStopWatchAlcinoe.Start; {-} var LAlcinoeStrOut := ALFormatA(LAlcinoeFormat, [LInt1, LInt2, LInt3, LInt4, LExtended1, LExtended2, LExtended3, LExtended4, LCurrency1, pointer(self), LStr1, LInt5], LAlcinoeFormatSettings); {-} fStopWatchAlcinoe.Stop;
 
     if LDelphiStrOut <> String(LAlcinoeStrOut) then
       Assert.Fail;

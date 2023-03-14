@@ -57,7 +57,7 @@ Type
   {----------------------------------------------------------}
   TAlWebSpiderCrawlFindLinkEvent = Procedure (Sender: TObject;
                                               const HtmlTagString: AnsiString;
-                                              HtmlTagParams: TALStrings;
+                                              HtmlTagParams: TALStringsA;
                                               const URL: AnsiString) of object;
 
   {----------------------------------------------------------------}
@@ -81,7 +81,7 @@ Type
   {--------------------------------------------------------------------------}
   TAlWebSpiderUpdateLinkToLocalPathFindLinkEvent = Procedure (Sender: TObject;
                                                               const HtmlTagString: AnsiString;
-                                                              HtmlTagParams: TALStrings;
+                                                              HtmlTagParams: TALStringsA;
                                                               const URL: AnsiString;
                                                               Var LocalPath: AnsiString) of object;
 
@@ -129,7 +129,7 @@ Type
   {-----------------------------------------------------------------}
   TAlTrivialWebSpiderCrawlFindLinkEvent = Procedure (Sender: TObject;
                                                      const HtmlTagString: AnsiString;
-                                                     HtmlTagParams: TALStrings;
+                                                     HtmlTagParams: TALStringsA;
                                                      const URL: AnsiString;
                                                      Var Ignore: Boolean) of object;
 
@@ -138,8 +138,8 @@ Type
   Private
     FWebSpider: TalWebSpider;
     fStartUrl: AnsiString;
-    fLstUrlCrawled: TALStrings;
-    fLstErrorEncountered: TALStrings;
+    fLstUrlCrawled: TALStringsA;
+    fLstErrorEncountered: TALStringsA;
     FPageDownloadedBinTree: TAlStringKeyAVLBinaryTree;
     FPageNotYetDownloadedBinTree: TAlStringKeyAVLBinaryTree;
     FCurrentDeepLevel: Integer;
@@ -161,9 +161,9 @@ Type
     procedure WebSpiderCrawlDownloadError(Sender: TObject; const URL, ErrorMessage: AnsiString; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
     procedure WebSpiderCrawlDownloadRedirect(Sender: TObject; const Url, RedirectedTo: AnsiString; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
     procedure WebSpiderCrawlDownloadSuccess(Sender: TObject; const Url: AnsiString; HTTPResponseHeader: TALHTTPResponseHeader; HttpResponseContent: TStream; var StopCrawling: Boolean);
-    procedure WebSpiderCrawlFindLink(Sender: TObject; const HtmlTagString: AnsiString; HtmlTagParams: TALStrings; const URL: AnsiString);
+    procedure WebSpiderCrawlFindLink(Sender: TObject; const HtmlTagString: AnsiString; HtmlTagParams: TALStringsA; const URL: AnsiString);
     procedure WebSpiderCrawlGetNextLink(Sender: TObject; var Url: AnsiString);
-    procedure WebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject; const HtmlTagString: AnsiString; HtmlTagParams: TALStrings; const URL: AnsiString; var LocalPath: AnsiString);
+    procedure WebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject; const HtmlTagString: AnsiString; HtmlTagParams: TALStringsA; const URL: AnsiString; var LocalPath: AnsiString);
     procedure WebSpiderUpdateLinkToLocalPathGetNextFile(Sender: TObject; var FileName, BaseHref: AnsiString);
     function GetNextLocalFileName(const aContentType: AnsiString): AnsiString;
   Protected
@@ -171,7 +171,7 @@ Type
     Constructor Create;
     Destructor Destroy; override;
     Procedure Crawl(const aUrl: AnsiString); overload; {Launch the Crawling of the page}
-    procedure Crawl(const aUrl: AnsiString; LstUrlCrawled: TALStrings; LstErrorEncountered: TALStrings); overload;
+    procedure Crawl(const aUrl: AnsiString; LstUrlCrawled: TALStringsA; LstErrorEncountered: TALStringsA); overload;
     Property HttpClient: TalHttpClient Read FHttpClient write FHttpClient;
     Property DownloadImage: Boolean read fDownloadImage write fDownloadImage default false;
     Property StayInStartDomain: Boolean read fStayInStartDomain write fStayInStartDomain default true;
@@ -209,6 +209,7 @@ implementation
 Uses
   Winapi.Windows,
   System.sysutils,
+  System.AnsiStrings,
   Winapi.WinInet,
   Winapi.UrlMon,
   Alcinoe.HTML,
@@ -226,7 +227,7 @@ type
 
 {************************************************************************}
 Function _AlWebSpiderExtractUrlHandleTagfunct(const TagString: AnsiString;
-                                              TagParams: TALStrings;
+                                              TagParams: TALStringsA;
                                               ExtData: pointer;
                                               Var Handled: Boolean): AnsiString;
 
@@ -234,7 +235,7 @@ Function _AlWebSpiderExtractUrlHandleTagfunct(const TagString: AnsiString;
   Procedure FindUrl(aUrl: ansiString; const aBaseHref: AnsiString);
   Begin
     {do not work with anchor in self document}
-    If (aUrl <> '') and (AlPos('#',aUrl) <> 1) then begin
+    If (aUrl <> '') and (ALPosA('#',aUrl) <> 1) then begin
 
       {make url full path}
       aUrl := AlCombineUrl(aUrl, aBaseHref);
@@ -334,7 +335,7 @@ end;
 
 {***********************************************************************************}
 Function _AlWebSpiderUpdateLinkToLocalPathHandleTagfunct(const TagString: AnsiString;
-                                                         TagParams: TALStrings;
+                                                         TagParams: TALStringsA;
                                                          ExtData: pointer;
                                                          Var Handled: Boolean): AnsiString;
 
@@ -347,7 +348,7 @@ Function _AlWebSpiderUpdateLinkToLocalPathHandleTagfunct(const TagString: AnsiSt
     LUrl := ALTrim(TagParams.Values[aParamName]);
 
     {do not work with anchor in self document}
-    If (LUrl <> '') and (AlPos('#',LUrl) <> 1) then begin
+    If (LUrl <> '') and (ALPosA('#',LUrl) <> 1) then begin
 
       {make url full path}
       LUrl := AlCombineUrl(LUrl, aBaseHref);
@@ -458,7 +459,7 @@ begin
     If handled then begin
       Result := '<'+TagString;
       for I := 0 to TagParams.Count - 1 do
-        If TagParams.Names[I] <> '' then Result := Result + ' ' + TagParams.Names[I] + '="'+ alStringReplace(TagParams.ValueFromIndex[I],
+        If TagParams.Names[I] <> '' then Result := Result + ' ' + TagParams.Names[I] + '="'+ ALStringReplaceA(TagParams.ValueFromIndex[I],
                                                                                                              '"',
                                                                                                              '&#34;',
                                                                                                              [rfReplaceAll]) + '"'
@@ -518,7 +519,7 @@ Begin
           on E: Exception do begin
 
             {in case of url redirect}
-            If Alpos('3',CurrentHttpResponseHeader.StatusCode)=1 then begin
+            If ALPosA('3',CurrentHttpResponseHeader.StatusCode)=1 then begin
               UrlRedirect := True;
               If assigned(FOnCrawlDownloadRedirect) then fOnCrawlDownloadRedirect(Self,
                                                                                   CurrentUrl,
@@ -564,7 +565,7 @@ Begin
                                 ) <> NOERROR) then pMimeTypeFromData := PWidechar(WideString(CurrentHttpResponseHeader.ContentType));
 
             {lanche the analyze of the page if content type = text/html}
-            If ALSameText(AnsiString(pMimeTypeFromData),'text/html') and
+            If ALSameTextA(AnsiString(pMimeTypeFromData),'text/html') and
                assigned(FOnCrawlFindLink) then begin
 
               {init the CurrentBaseHref of the aExtData object}
@@ -573,7 +574,7 @@ Begin
 
               {extract the list of url to download}
               ALHideHtmlUnwantedTagForHTMLHandleTagfunct(Str, False, #1);
-              ALFastTagReplace(Str,
+              ALFastTagReplaceA(Str,
                                '<',
                                '>',
                                _AlWebSpiderExtractUrlHandleTagfunct,
@@ -642,7 +643,7 @@ Begin
 
         {Update the link}
         ALHideHtmlUnwantedTagForHTMLHandleTagfunct(str, False, #1);
-        str := ALFastTagReplace(str,
+        str := ALFastTagReplaceA(str,
                                 '<',
                                 '>',
                                 _AlWebSpiderUpdateLinkToLocalPathHandleTagfunct,
@@ -651,7 +652,7 @@ Begin
                                 [rfreplaceall]);
 
         {restore the page to it's original format}
-        str := AlStringReplace(str,
+        str := ALStringReplaceA(str,
                                #1,
                                '<',
                                [rfReplaceAll]);
@@ -673,7 +674,7 @@ begin
 end;
 
 {**********************************************************************************************************************}
-procedure TAlTrivialWebSpider.Crawl(const aUrl: AnsiString; LstUrlCrawled: TALStrings; LstErrorEncountered: TALStrings);
+procedure TAlTrivialWebSpider.Crawl(const aUrl: AnsiString; LstUrlCrawled: TALStringsA; LstErrorEncountered: TALStringsA);
 Var LNode: TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode;
 Begin
   {check the SaveDirectory}
@@ -766,9 +767,9 @@ Var LExt: AnsiString;
   {-----------------------------------------}
   Function SplitPathMakeFilename: AnsiString;
   begin
-    Result := fSaveDirectory + ALIntToStr((FCurrentLocalFileNameIndex div fSplitDirectoryAmount) * fSplitDirectoryAmount + fSplitDirectoryAmount) + '\';
+    Result := fSaveDirectory + ALIntToStrA((FCurrentLocalFileNameIndex div fSplitDirectoryAmount) * fSplitDirectoryAmount + fSplitDirectoryAmount) + '\';
     If (not DirectoryExists(string(Result))) and (not createDir(string(Result))) then raise EALException.CreateFmt('cannot create dir: %s', [Result]);
-    Result := Result + ALIntToStr(FCurrentLocalFileNameIndex) + LExt;
+    Result := Result + ALIntToStrA(FCurrentLocalFileNameIndex) + LExt;
     inc(FCurrentLocalFileNameIndex);
   end;
 
@@ -880,7 +881,7 @@ begin
 
   {If html then add <!-- saved from '+ URL +' -->' at the top of the file}
   if LFileName <> '' then begin
-    If ALSameText(AnsiString(pMimeTypeFromData),'text/html') then begin
+    If ALSameTextA(AnsiString(pMimeTypeFromData),'text/html') then begin
       Str := '<!-- saved from '+ URL+' -->' +#13#10 + Str;
       AlSaveStringToFile(str,LFileName);
     end
@@ -905,11 +906,11 @@ end;
 {*******************************************************************}
 procedure TAlTrivialWebSpider.WebSpiderCrawlFindLink(Sender: TObject;
                                                      const HtmlTagString: AnsiString;
-                                                     HtmlTagParams: TALStrings;
+                                                     HtmlTagParams: TALStringsA;
                                                      const URL: AnsiString);
 Var LNode: TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode;
     LURLWithoutAnchor: ansiString;
-    Lst: TALStringList;
+    Lst: TALStringListA;
     I: integer;
     Flag1 : Boolean;
     S1: AnsiString;
@@ -917,10 +918,10 @@ begin
   {If Check BoxDownload Image}
   IF not fDownloadImage and
      (
-      ALSameText(HtmlTagString,'img') or
+      ALSameTextA(HtmlTagString,'img') or
       (
-       ALSameText(HtmlTagString,'input') and
-       ALSameText(ALTrim(HtmlTagParams.Values['type']),'image')
+       ALSameTextA(HtmlTagString,'input') and
+       ALSameTextA(ALTrim(HtmlTagParams.Values['type']),'image')
       )
      )
     then Exit;
@@ -934,14 +935,14 @@ begin
 
   {include link(s)}
   If fIncludeMask <> '' then begin
-    Lst := TALStringList.Create;
+    Lst := TALStringListA.Create;
     Try
-      Lst.Text := ALTrim(AlStringReplace(FIncludeMask,';',#13#10,[RfReplaceall]));
+      Lst.Text := ALTrim(ALStringReplaceA(FIncludeMask,';',#13#10,[RfReplaceall]));
       Flag1 := True;
       For i := 0 to Lst.Count - 1 do begin
         S1 := ALTrim(Lst[i]);
         If S1 <> '' then begin
-          Flag1 := ALMatchesMask(URL, S1);
+          Flag1 := ALMatchesMaskA(URL, S1);
           If Flag1 then Break;
         end;
       end;
@@ -953,14 +954,14 @@ begin
 
   {Exclude link(s)}
   If fExcludeMask <> '' then begin
-    Lst := TALStringList.Create;
+    Lst := TALStringListA.Create;
     Try
-      Lst.Text := ALTrim(AlStringReplace(fExcludeMask,';',#13#10,[RfReplaceall]));
+      Lst.Text := ALTrim(ALStringReplaceA(fExcludeMask,';',#13#10,[RfReplaceall]));
       Flag1 := False;
       For i := 0 to Lst.Count - 1 do begin
         S1 := ALTrim(Lst[i]);
         If S1 <> '' then begin
-          Flag1 := ALMatchesMask(URL, S1);
+          Flag1 := ALMatchesMaskA(URL, S1);
           If Flag1 then Break;
         end;
       end;
@@ -1053,7 +1054,7 @@ end;
 {***********************************************************************************}
 procedure TAlTrivialWebSpider.WebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject;
                                                                      const HtmlTagString: AnsiString;
-                                                                     HtmlTagParams: TALStrings;
+                                                                     HtmlTagParams: TALStringsA;
                                                                      const URL: AnsiString;
                                                                      var LocalPath: AnsiString);
 Var LNode: TALStringKeyAVLBinaryTreeNode;
@@ -1068,7 +1069,7 @@ begin
       LNode := FPageDownloadedBinTree.FindNode(LTmpUrl);
       If (LNode <> nil) then begin
         LocalPath := TAlTrivialWebSpider_PageDownloadedBinTreeNode(LNode).Data;
-        If AlPos('=>',LocalPath) = 1 then Begin
+        If ALPosA('=>',LocalPath) = 1 then Begin
           LTmpUrl := AlCopyStr(LocalPath,3,MaxInt);
           LocalPath := '';
         end
@@ -1079,7 +1080,7 @@ begin
 
     If LocalPath = '!' then localpath := ''
     else If LocalPath <> '' then begin
-      LocalPath := AlStringReplace(LocalPath,
+      LocalPath := ALStringReplaceA(LocalPath,
                                    '\',
                                    '/',
                                    [RfReplaceall]) + LAnchorValue;
@@ -1096,7 +1097,7 @@ procedure TAlTrivialWebSpider.WebSpiderUpdateLinkToLocalPathGetNextFile(Sender: 
   begin
     If FCurrentLocalFileNameIndex < 0 then result := ''
     else If FCurrentLocalFileNameIndex = 0 then result := fSaveDirectory + 'Start.htm'
-    else Result := fSaveDirectory + ALIntToStr((FCurrentLocalFileNameIndex div SplitDirectoryAmount) * SplitDirectoryAmount + SplitDirectoryAmount) + '\' + ALIntToStr(FCurrentLocalFileNameIndex) + '.htm';
+    else Result := fSaveDirectory + ALIntToStrA((FCurrentLocalFileNameIndex div SplitDirectoryAmount) * SplitDirectoryAmount + SplitDirectoryAmount) + '\' + ALIntToStrA(FCurrentLocalFileNameIndex) + '.htm';
     dec(FCurrentLocalFileNameIndex);
   end;
 
@@ -1118,7 +1119,7 @@ Begin
     BaseHref := AlGetStringFromFile(FileName);
     BaseHref := ALTrim(AlCopyStr(BaseHref,
                                17,                         // '<!-- saved from ' + URL
-                               AlPos(#13,BaseHref) - 21)); // URL + ' -->' +#13#10
+                               ALPosA(#13,BaseHref) - 21)); // URL + ' -->' +#13#10
 
     {update label}
     if assigned(fOnUpdateLinkToLocalPathProgress) then fOnUpdateLinkToLocalPathProgress(self, FileName);

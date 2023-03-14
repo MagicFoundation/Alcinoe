@@ -42,17 +42,17 @@ type
       Function  GetStatusCodeFromResponse(const aResponse: AnsiString): Integer;
       Procedure AUTHINFO(const UserName, Password: AnsiString); virtual;
       Function  List: AnsiString; overload; virtual;
-      procedure List(ALst: TALStrings); overload; virtual;
+      procedure List(ALst: TALStringsA); overload; virtual;
       Function  ListDistributions: AnsiString; overload; virtual;
-      procedure ListDistributions(ALst: TALStrings); overload; virtual;
+      procedure ListDistributions(ALst: TALStringsA); overload; virtual;
       Function  ListNewsGroups(wildmat: AnsiString): AnsiString; overload; virtual;
-      procedure ListNewsGroups(ALst: TALStrings; const wildmat: AnsiString); overload; virtual;
+      procedure ListNewsGroups(ALst: TALStringsA; const wildmat: AnsiString); overload; virtual;
       Function  ListGroup(NewsGroup: AnsiString): AnsiString; overload; virtual;
-      procedure ListGroup(ALst: TALStrings; const NewsGroup: AnsiString); overload; virtual;
+      procedure ListGroup(ALst: TALStringsA; const NewsGroup: AnsiString); overload; virtual;
       Function  NewsGroups(FromGMTDate: TdateTime; const distributions: AnsiString): AnsiString; overload; virtual;
-      procedure NewsGroups(FromGMTDate: TdateTime; const distributions: AnsiString; ALst: TALStrings); overload; virtual;
+      procedure NewsGroups(FromGMTDate: TdateTime; const distributions: AnsiString; ALst: TALStringsA); overload; virtual;
       Function  NewNews(const NewsGroups: AnsiString; FromGMTDate: TdateTime; const distributions: AnsiString): AnsiString; overload; virtual;
-      procedure NewNews(const NewsGroups: AnsiString; FromGMTDate: TdateTime; const distributions: AnsiString; ALst: TALStrings); overload; virtual;
+      procedure NewNews(const NewsGroups: AnsiString; FromGMTDate: TdateTime; const distributions: AnsiString; ALst: TALStringsA); overload; virtual;
       function  Group(const NewsGroupName : AnsiString): AnsiString; overload; virtual;
       Procedure Group(const NewsGroupName: AnsiString; Var EstimatedNumberArticles, FirstArticleNumber, LastArticleNumber: Integer); overload; Virtual;
       Function  ArticleByNumber(ArticleNumber: Integer): AnsiString; overload; virtual;
@@ -115,16 +115,17 @@ Uses
   Winapi.Windows,
   System.SysUtils,
   System.Classes,
+  System.AnsiStrings,
   Alcinoe.WinSock,
   Alcinoe.StringUtils;
 
 {*******************************************************************************}
-Procedure ALNNTPClientSplitResponseLine(aResponse: AnsiString; ALst: TALStrings);
+Procedure ALNNTPClientSplitResponseLine(aResponse: AnsiString; ALst: TALStringsA);
 Begin
   aResponse := ALTrim(aResponse); // 211 111225 12861 362539 nzn.fr.delphi
-  aResponse := AlStringReplace(aResponse,#9,' ',[RfReplaceAll]); // 211 111225 12861 362539 nzn.fr.delphi
-  While alPos('  ',aResponse) > 0 do aResponse := AlStringReplace(aResponse,'  ',' ',[RfReplaceAll]); // 211 111225 12861 362539 nzn.fr.delphi
-  aResponse := ALTrim(AlStringReplace(aResponse,' ',#13#10,[RfReplaceAll])); // 211
+  aResponse := ALStringReplaceA(aResponse,#9,' ',[RfReplaceAll]); // 211 111225 12861 362539 nzn.fr.delphi
+  While ALPosA('  ',aResponse) > 0 do aResponse := ALStringReplaceA(aResponse,'  ',' ',[RfReplaceAll]); // 211 111225 12861 362539 nzn.fr.delphi
+  aResponse := ALTrim(ALStringReplaceA(aResponse,' ',#13#10,[RfReplaceAll])); // 211
                                                                            // 111225
                                                                            // 12861
                                                                            // 362539
@@ -145,7 +146,7 @@ begin
      (Result[ln - 2] = '.') and
      (Result[ln - 3] = #10) and
      (Result[ln - 4] = #13) then delete(Result,LN-4,5);
-  P := AlPos(#13#10,Result);
+  P := ALPosA(#13#10,Result);
   If P > 0 then delete(Result,1,P+1)
   else result := '';
 
@@ -154,7 +155,7 @@ begin
   client must examine the first character of each line received, and
   for those beginning with a period, determine either that this is the
   end of the text or whether to collapse the doubled period to a single one.}
-  Result := AlStringReplace(Result,#13#10'..',#13#10'.', [RfReplaceAll]);
+  Result := ALStringReplaceA(Result,#13#10'..',#13#10'.', [RfReplaceAll]);
 end;
 
 {**************************************************************************************************************}
@@ -470,7 +471,7 @@ begin
 end;
 
 {*********************************************}
-procedure TAlNNTPClient.List(ALst: TALStrings);
+procedure TAlNNTPClient.List(ALst: TALStringsA);
 begin
   ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(List));
 end;
@@ -499,7 +500,7 @@ begin
 end;
 
 {**********************************************************}
-procedure TAlNNTPClient.ListDistributions(ALst: TALStrings);
+procedure TAlNNTPClient.ListDistributions(ALst: TALStringsA);
 begin
   ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(ListDISTRIBUTIONS));
 end;
@@ -535,7 +536,7 @@ begin
 end;
 
 {**********************************************************************************}
-procedure TAlNNTPClient.ListNewsGroups(ALst: TALStrings; const wildmat: AnsiString);
+procedure TAlNNTPClient.ListNewsGroups(ALst: TALStringsA; const wildmat: AnsiString);
 begin
   ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(ListNewsGroups(wildmat)));
 end;
@@ -577,7 +578,7 @@ begin
 end;
 
 {*******************************************************************************}
-procedure TAlNNTPClient.ListGroup(ALst: TALStrings; const NewsGroup: AnsiString);
+procedure TAlNNTPClient.ListGroup(ALst: TALStringsA; const NewsGroup: AnsiString);
 begin
   ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(ListGroup(NewsGroup)));
 end;
@@ -617,11 +618,11 @@ end;
  231 list of new newsgroups follows}
 Function TAlNNTPClient.NewsGroups(FromGMTDate: TdateTime; const distributions: AnsiString): AnsiString;
 begin
-  Result := SendCmd('NEWGROUPS ' + ALFormatDateTime('yymmdd" "hhnnss',FromGMTDate, ALDefaultFormatSettings) + ' GMT' + ALNNTPClientEnclosedInAngleBrackets(distributions), [231], True);
+  Result := SendCmd('NEWGROUPS ' + ALFormatDateTimeA('yymmdd" "hhnnss',FromGMTDate, ALDefaultFormatSettingsA) + ' GMT' + ALNNTPClientEnclosedInAngleBrackets(distributions), [231], True);
 end;
 
 {************************************************************************************************************}
-procedure TAlNNTPClient.NewsGroups(FromGMTDate: TdateTime; const distributions: AnsiString; ALst: TALStrings);
+procedure TAlNNTPClient.NewsGroups(FromGMTDate: TdateTime; const distributions: AnsiString; ALst: TALStringsA);
 begin
   ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(NewsGroups(FromGMTDate,distributions)));
 end;
@@ -683,11 +684,11 @@ end;
  230 list of new articles by message-id follows}
 Function TAlNNTPClient.NewNews(const Newsgroups: AnsiString; FromGMTDate: TdateTime; const distributions: AnsiString): AnsiString;
 begin
-  Result := SendCmd('NEWNEWS ' + newsgroups + ' ' + ALFormatDateTime('yymmdd" "hhnnss',FromGMTDate, ALDefaultFormatSettings) + ' GMT' + ALNNTPClientEnclosedInAngleBrackets(distributions), [230], True);
+  Result := SendCmd('NEWNEWS ' + newsgroups + ' ' + ALFormatDateTimeA('yymmdd" "hhnnss',FromGMTDate, ALDefaultFormatSettingsA) + ' GMT' + ALNNTPClientEnclosedInAngleBrackets(distributions), [230], True);
 end;
 
 {***************************************************************************************************************************************}
-procedure TAlNNTPClient.NewNews(const Newsgroups: AnsiString; FromGMTDate: TdateTime; const distributions: AnsiString; ALst: TALStrings);
+procedure TAlNNTPClient.NewNews(const Newsgroups: AnsiString; FromGMTDate: TdateTime; const distributions: AnsiString; ALst: TALStringsA);
 begin
   ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(NewNews(NewsGroups, FromGMTDate, distributions)));
 end;
@@ -736,9 +737,9 @@ Procedure TAlNNTPClient.Group(const NewsGroupName: AnsiString;
                               Var EstimatedNumberArticles,
                                   FirstArticleNumber,
                                   LastArticleNumber: Integer);
-Var LLst: TALStringList;
+Var LLst: TALStringListA;
 Begin
-  LLst := TALStringList.Create;
+  LLst := TALStringListA.Create;
   Try
     ALNNTPClientSplitResponseLine(Group(NewsGroupName), LLst);
     If LLst.Count < 4 then raise Exception.Create('GROUP cmd Error');
@@ -848,7 +849,7 @@ procedure TAlNNTPClient.ArticleByID(const ArticleID: AnsiString;
 Var P: integer;
 begin
   ArticleBodyContent := ALNNTPClientExtractTextFromMultilineResponse(ArticleByID(ArticleID));
-  P := AlPos(#13#10#13#10,ArticleBodyContent);
+  P := ALPosA(#13#10#13#10,ArticleBodyContent);
   If P <= 0 then raise Exception.Create('Bad formated article!');
   ArticleHeaderContent.RawHeaderText := AlcopyStr(ArticleBodyContent,1,P);
   Delete(ArticleBodyContent,1,P+3);
@@ -857,7 +858,7 @@ end;
 {*************************************************************************}
 function TAlNNTPClient.ArticleByNumber(ArticleNumber: Integer): AnsiString;
 begin
-  Result := SendCmd('ARTICLE ' + ALIntToStr(ArticleNumber),[220], true);
+  Result := SendCmd('ARTICLE ' + ALIntToStrA(ArticleNumber),[220], true);
 end;
 
 {**********************************************************************************************}
@@ -873,7 +874,7 @@ procedure TAlNNTPClient.ArticleByNumber(ArticleNumber: Integer;
 Var P: integer;
 begin
   ArticleBodyContent := ALNNTPClientExtractTextFromMultilineResponse(ArticleByNumber(ArticleNumber));
-  P := AlPos(#13#10#13#10,ArticleBodyContent);
+  P := ALPosA(#13#10#13#10,ArticleBodyContent);
   If P <= 0 then raise Exception.Create('Bad formated article!');
   ArticleHeaderContent.RawHeaderText := AlcopyStr(ArticleBodyContent,1,P);
   Delete(ArticleBodyContent,1,P+3);
@@ -896,7 +897,7 @@ procedure TAlNNTPClient.Article(var ArticleBodyContent: AnsiString; ArticleHeade
 Var P: integer;
 begin
   ArticleBodyContent := ALNNTPClientExtractTextFromMultilineResponse(Article);
-  P := AlPos(#13#10#13#10,ArticleBodyContent);
+  P := ALPosA(#13#10#13#10,ArticleBodyContent);
   If P <= 0 then raise Exception.Create('Bad formated article!');
   ArticleHeaderContent.RawHeaderText := AlcopyStr(ArticleBodyContent,1,P);
   Delete(ArticleBodyContent,1,P+3);
@@ -923,7 +924,7 @@ end;
 {**********************************************************************}
 function TAlNNTPClient.HeadByNumber(ArticleNumber: Integer): AnsiString;
 begin
-  Result := SendCmd('HEAD ' + ALIntToStr(ArticleNumber),[221], true);
+  Result := SendCmd('HEAD ' + ALIntToStrA(ArticleNumber),[221], true);
 end;
 
 {****************************************************************************************}
@@ -971,7 +972,7 @@ end;
 {**********************************************************************}
 function TAlNNTPClient.BodyByNumber(ArticleNumber: Integer): AnsiString;
 begin
-  Result := SendCmd('BODY ' + ALIntToStr(ArticleNumber),[222], true);
+  Result := SendCmd('BODY ' + ALIntToStrA(ArticleNumber),[222], true);
 end;
 
 {****************************************************************************************}
@@ -1000,9 +1001,9 @@ end;
 
 {****************************************************************************************}
 procedure TAlNNTPClient.StatByID(const ArticleID: AnsiString; var ArticleNumber: integer);
-Var LLst: TALStringList;
+Var LLst: TALStringListA;
 Begin
-  LLst := TALStringList.Create;
+  LLst := TALStringListA.Create;
   Try
     ALNNTPClientSplitResponseLine(StatByID(ArticleID), LLst);
     If LLst.Count < 3 then raise Exception.Create('STAT cmd Error');
@@ -1015,14 +1016,14 @@ end;
 {**********************************************************************}
 function TAlNNTPClient.StatByNumber(ArticleNumber: Integer): AnsiString;
 begin
-  Result := SendCmd('STAT ' + ALIntToStr(ArticleNumber),[223], False); //223 10110 <23445@sdcsvax.ARPA> status
+  Result := SendCmd('STAT ' + ALIntToStrA(ArticleNumber),[223], False); //223 10110 <23445@sdcsvax.ARPA> status
 end;
 
 {**************************************************************************************}
 procedure TAlNNTPClient.StatByNumber(ArticleNumber: Integer; var ArticleID: AnsiString);
-Var LLst: TALStringList;
+Var LLst: TALStringListA;
 Begin
-  LLst := TALStringList.Create;
+  LLst := TALStringListA.Create;
   Try
     ALNNTPClientSplitResponseLine(StatByNumber(ArticleNumber), LLst);
     If LLst.Count < 3 then raise Exception.Create('STAT cmd Error');
@@ -1041,9 +1042,9 @@ end;
 
 {**********************************************************************************}
 procedure TAlNNTPClient.Stat(var ArticleID: AnsiString; var ArticleNumber: integer);
-Var LLst: TALStringList;
+Var LLst: TALStringListA;
 Begin
-  LLst := TALStringList.Create;
+  LLst := TALStringListA.Create;
   Try
     ALNNTPClientSplitResponseLine(Stat, LLst);
     If LLst.Count < 3 then raise Exception.Create('STAT cmd Error');
@@ -1117,7 +1118,7 @@ end;
 {****************************************************************************************************}
 function TAlNNTPClient.XHDRByNumber(const HeaderName: AnsiString; ArticleNumber: integer): AnsiString;
 begin
-  Result := SendCmd('XHDR ' + HeaderName + ' ' + ALIntToStr(ArticleNumber), [221], True);
+  Result := SendCmd('XHDR ' + HeaderName + ' ' + ALIntToStrA(ArticleNumber), [221], True);
 end;
 
 {************************************************************************************************************************}
@@ -1169,9 +1170,9 @@ end;
 
 {**********************************************************************************}
 procedure TAlNNTPClient.Next(var ArticleNumber: Integer; var ArticleID: AnsiString);
-Var LLst: TALStringList;
+Var LLst: TALStringListA;
 begin
-  LLst := TALStringList.Create;
+  LLst := TALStringListA.Create;
   Try
     ALNNTPClientSplitResponseLine(SendCmd('NEXT',[223], False), LLst);
     If LLst.Count < 3 then raise Exception.Create('NEXT cmd Error');
@@ -1213,9 +1214,9 @@ end;
 
 {**********************************************************************************}
 procedure TAlNNTPClient.Last(var ArticleNumber: Integer; var ArticleID: AnsiString);
-Var LLst: TALStringList;
+Var LLst: TALStringListA;
 begin
-  LLst := TALStringList.Create;
+  LLst := TALStringListA.Create;
   Try
     ALNNTPClientSplitResponseLine(SendCmd('LAST',[223], False), LLst);
     If LLst.Count < 3 then raise Exception.Create('LAST cmd Error');

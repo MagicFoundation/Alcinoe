@@ -27,15 +27,15 @@ Type
     First: integer;
     Skip: Integer;
     Distinct: Boolean;
-    Select: TALStrings;
-    Where: TALStrings;
-    From: TALStrings;
-    Join: TALStrings;
-    GroupBy: TALStrings;
-    Having: TALStrings;
+    Select: TALStringsA;
+    Where: TALStringsA;
+    From: TALStringsA;
+    Join: TALStringsA;
+    GroupBy: TALStringsA;
+    Having: TALStringsA;
     Plan: ansiString; // dedicated to Firebird
-    OrderBy: TALStrings;
-    Custom: TALStrings;
+    OrderBy: TALStringsA;
+    Custom: TALStringsA;
     FBXClientSQLParams: TALFBXClientSQLParams; // dedicated to Firebird
     Constructor Create; Virtual;
     Destructor Destroy; override;
@@ -72,9 +72,9 @@ Type
     ServerType: TALSQLClauseServerType;
     Kind: TALSQLClauseUpdateKind;
     Table: ansiString;
-    Value: TALStrings;
-    Where: TALStrings;
-    Custom: TALStrings;
+    Value: TALStringsA;
+    Where: TALStringsA;
+    Custom: TALStringsA;
     FBXClientSQLParams: TALFBXClientSQLParams; // dedicated to Firebird
     Constructor Create; Virtual;
     Destructor Destroy; override;
@@ -120,15 +120,15 @@ Begin
   First := -1;
   Skip := -1;
   Distinct := False;
-  Select:= TALStringList.create;
-  Where:= TALStringList.create;
-  From:= TALStringList.create;
-  Join:= TALStringList.create;
-  GroupBy:= TALStringList.create;
-  Having:= TALStringList.create;
+  Select:= TALStringListA.create;
+  Where:= TALStringListA.create;
+  From:= TALStringListA.create;
+  Join:= TALStringListA.create;
+  GroupBy:= TALStringListA.create;
+  Having:= TALStringListA.create;
   Plan := '';
-  OrderBy := TALStringList.create;
-  Custom := TALStringList.create;
+  OrderBy := TALStringListA.create;
+  Custom := TALStringListA.create;
   setlength(FBXClientSQLParams, 0);
 end;
 
@@ -177,8 +177,8 @@ Begin
 
   //first + skip (if server type = ALFirebird)
   if ServerType = alFirebird then begin
-    if First >= 0 then Result := result + 'first ' + ALIntToStr(First) + ' ';
-    if skip >= 0 then Result := result + 'skip ' + ALIntToStr(skip) + ' ';
+    if First >= 0 then Result := result + 'first ' + ALIntToStrA(First) + ' ';
+    if skip >= 0 then Result := result + 'skip ' + ALIntToStrA(skip) + ' ';
   end;
 
   //distinct
@@ -260,9 +260,9 @@ Begin
 
   //first + skip (if server type = ALSphinx)
   if (ServerType in [alSphinx, alMySql]) then begin
-    if (First >= 0) and (skip >= 0) then Result := result + ' Limit ' + ALIntToStr(skip) + ', ' + ALIntToStr(First) // With two arguments, the first argument specifies the offset of the first row to return, and the second specifies the maximum number of rows to return
-    else if (skip >= 0) then             Result := result + ' Limit ' + ALIntToStr(skip) + ', ' + ALIntToStr(Maxint) // To retrieve all rows from a certain offset up to the end of the result set, you can use some large number for the second parameter.
-    else if (First >= 0) then            Result := result + ' Limit 0, '                        + ALIntToStr(First)
+    if (First >= 0) and (skip >= 0) then Result := result + ' Limit ' + ALIntToStrA(skip) + ', ' + ALIntToStrA(First) // With two arguments, the first argument specifies the offset of the first row to return, and the second specifies the maximum number of rows to return
+    else if (skip >= 0) then             Result := result + ' Limit ' + ALIntToStrA(skip) + ', ' + ALIntToStrA(Maxint) // To retrieve all rows from a certain offset up to the end of the result set, you can use some large number for the second parameter.
+    else if (First >= 0) then            Result := result + ' Limit 0, '                        + ALIntToStrA(First)
   end;
 
 End;
@@ -391,9 +391,9 @@ Begin
   ServerType := ALFirebird;
   Kind := AlInsert;
   table:= '';
-  Value:= TALStringList.create;
-  Where:= TALStringList.create;
-  Custom := TALStringList.create;
+  Value:= TALStringListA.create;
+  Where:= TALStringListA.create;
+  Custom := TALStringListA.create;
   setlength(FBXClientSQLParams, 0);
 end;
 

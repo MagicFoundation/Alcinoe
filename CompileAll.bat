@@ -229,7 +229,7 @@ Call :BUILD_PROJECT "%ALBaseDir%\Tools\DProjNormalizer" "_Source" "DProjNormaliz
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\DProjVersioning" "_Source" "DProjVersioning.dproj" "Win64"
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\NativeBridgeFileGenerator" "_Build\Source" "NativeBridgeFileGeneratorHelper.dproj" "Win64"
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\UnitNormalizer" "_Source" "UnitNormalizer.dproj" "Win64"
-Call :BUILD_PROJECT "%ALBaseDir%\Tools\UnitRenaming" "_Source" "UnitRenaming.dproj" "Win64"
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\CodeRenaming" "_Source" "CodeRenaming.dproj" "Win64"
 
 REM -----------
 REM Build demos
@@ -386,7 +386,7 @@ SET FileName=%~1\*.deployproj.local
 if exist "%FileName%" del "%FileName%" /s
 if exist "%FileName%" goto ERROR
 
-SET FileName=%~1\%~2\dcu\
+SET FileName=%~1\%~2\Dcu\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"
@@ -419,7 +419,7 @@ if "%ALDeploy%"=="Y" (
 
 )
 
-SET FileName=%~1\%~2\dcu\
+SET FileName=%~1\%~2\Dcu\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"

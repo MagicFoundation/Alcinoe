@@ -16,10 +16,10 @@ procedure _cleanUses(Const AFilename: AnsiString; Const ASection: AnsiString);
 begin
 
   Var LSrcStr: AnsiString := ALGetStringFromFile(Afilename);
-  Var P1: Integer := ALposExIgnoreCase(#13#10+ASection+#13#10, LSrcStr);
+  Var P1: Integer := ALPosIgnoreCaseA(#13#10+ASection+#13#10, LSrcStr);
   if P1 <= 0 then
     raise Exception.Create('Could not find the section "'+ASection+'" in '+ AFilename);
-  P1 := AlposExIgnoreCase('uses', LSrcStr, P1);
+  P1 := ALPosIgnoreCaseA('uses', LSrcStr, P1);
   if P1 <= 0 then
     raise Exception.Create('Could not find the uses clause after the section "'+ASection+'" in '+ AFilename);
   //
@@ -56,7 +56,7 @@ begin
     //init LDProjFilename / LCreateBackup
     var LDProjFilename := ALTrim(ansiString(paramstr(1)));
     if LDProjFilename = '' then raise Exception.Create('Usage: UsesNormalizer.exe "<DprojFilename>" <createBackup>(ie: true/false)');
-    var LCreateBackup := not ALSameText(ALTrim(ansiString(paramstr(2))), 'false');
+    var LCreateBackup := not ALSameTextA(ALTrim(ansiString(paramstr(2))), 'false');
 
     //create the LDProjXmlDoc
     var LDProjXmlDoc := TALXmlDocument.Create('root');
@@ -128,18 +128,18 @@ begin
       for var I := LDeploymentNode.ChildNodes.Count - 1 downto 0 do begin
         var LEnabledNode: TALXmlNode := nil;
         var LDeployFileNode := LDeploymentNode.ChildNodes[i];
-        if (ALSameText(LDeployFileNode.NodeName, 'DeployFile')) then begin
+        if (ALSameTextA(LDeployFileNode.NodeName, 'DeployFile')) then begin
           for var j := LDeployFileNode.ChildNodes.Count - 1 downto 0 do begin
             LEnabledNode := LDeployFileNode.ChildNodes[j].ChildNodes.FindNode('Enabled');
-            if (LEnabledNode <> nil) and (ALSameText(LEnabledNode.Text,'false')) then break;
+            if (LEnabledNode <> nil) and (ALSameTextA(LEnabledNode.Text,'false')) then break;
           end;
-          if (not ALSameText(LDeployFileNode.attributes['Class'], 'File')) and
+          if (not ALSameTextA(LDeployFileNode.attributes['Class'], 'File')) and
              ((LEnabledNode = nil) or                                           // normally we can also update other properties of a deploy file not only
-              (not ALSameText(LEnabledNode.Text,'false'))) then                 // enabled, but i consider we can only update enabled
+              (not ALSameTextA(LEnabledNode.Text,'false'))) then                 // enabled, but i consider we can only update enabled
             LDeploymentNode.ChildNodes.Delete(i);
         end
-        else if (ALSameText(LDeployFileNode.NodeName, 'DeployClass')) or    // this DeployClass seam not correctly updated
-                (ALSameText(LDeployFileNode.NodeName, 'ProjectRoot')) then  // so I prefer to delete them (don't know what could be the consequence)
+        else if (ALSameTextA(LDeployFileNode.NodeName, 'DeployClass')) or    // this DeployClass seam not correctly updated
+                (ALSameTextA(LDeployFileNode.NodeName, 'ProjectRoot')) then  // so I prefer to delete them (don't know what could be the consequence)
           LDeploymentNode.ChildNodes.Delete(i);                             // and ProjectRoot seam also to be useless
       end;
 
@@ -175,7 +175,7 @@ begin
       //save the dproj
       if LCreateBackup then begin
         if ALFileExists(LDProjFilename + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [LDProjFilename + '.bak']);
-        if not ALrenameFile(LDProjFilename, LDProjFilename+ '.bak') then raiseLastOsError;
+        if not ALRenameFileA(LDProjFilename, LDProjFilename+ '.bak') then raiseLastOsError;
       end;
       ALSaveStringToFile(cAlUTF8Bom + LXmlStr, LDProjFilename);
 

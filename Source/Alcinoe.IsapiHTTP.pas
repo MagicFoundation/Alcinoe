@@ -28,13 +28,13 @@ type
   TALWebRequest = class(TObject)
   private
     // [Deleted from TwebRequest] FContentParser: TALAbstractContentParser;
-    // [Deleted from TwebRequest] FCookieFields: TALStrings;
-    // [Deleted from TwebRequest] FQueryFields: TALStrings;
+    // [Deleted from TwebRequest] FCookieFields: TALStringsA;
+    // [Deleted from TwebRequest] FQueryFields: TALStringsA;
     // [Deleted from TwebRequest] function GetContentParser: TALAbstractContentParser;
     // [Deleted from TwebRequest] function GetFiles: TALAbstractWebRequestFiles;
-    // [Deleted from TwebRequest] function GetContentFields: TALStrings;
-    // [Deleted from TwebRequest] function GetCookieFields: TALStrings;
-    // [Deleted from TwebRequest] function GetQueryFields: TALStrings;
+    // [Deleted from TwebRequest] function GetContentFields: TALStringsA;
+    // [Deleted from TwebRequest] function GetCookieFields: TALStringsA;
+    // [Deleted from TwebRequest] function GetQueryFields: TALStringsA;
     FMaxContentSize: integer; // [added from TwebRequest]
     function GetContent: AnsiString; // [added from TwebRequest]
     function GetMethodType: TALHTTPMethod; // [added from TwebRequest]
@@ -47,29 +47,29 @@ type
     function GetStringVariable(Index: Integer): AnsiString; virtual; abstract;
     function GetDateVariable(Index: Integer): TDateTime; virtual; abstract;
     function GetIntegerVariable(Index: Integer): Integer; virtual; abstract;
-    function GetContentStream: TALStringStream; virtual; abstract; // [added from TwebRequest]
+    function GetContentStream: TALStringStreamA; virtual; abstract; // [added from TwebRequest]
   public
-    // [Deleted from TwebRequest] procedure ExtractFields(Separators, _WhiteSpace: TSysCharSet; Content: PAnsiChar; Strings: TALStrings); overload; // Utility to extract fields from a given string buffer
-    // [Deleted from TwebRequest] procedure ExtractFields(Separators, _WhiteSpace: TSysCharSet; const Content: AnsiString; Strings: TALStrings); overload;
-    // [Deleted from TwebRequest] procedure ExtractContentFields(Strings: TALStrings); // Fills the given string list with the content fields as the result of a POST method
-    // [Deleted from TwebRequest] procedure ExtractCookieFields(Strings: TALStrings); // Fills the given string list with values from the cookie header field
-    // [Deleted from TwebRequest] procedure ExtractQueryFields(Strings: TALStrings); // Fills the given TStrings with the values from the Query data (ie: data following the "?" in the URL)
+    // [Deleted from TwebRequest] procedure ExtractFields(Separators, _WhiteSpace: TSysCharSet; Content: PAnsiChar; Strings: TALStringsA); overload; // Utility to extract fields from a given string buffer
+    // [Deleted from TwebRequest] procedure ExtractFields(Separators, _WhiteSpace: TSysCharSet; const Content: AnsiString; Strings: TALStringsA); overload;
+    // [Deleted from TwebRequest] procedure ExtractContentFields(Strings: TALStringsA); // Fills the given string list with the content fields as the result of a POST method
+    // [Deleted from TwebRequest] procedure ExtractCookieFields(Strings: TALStringsA); // Fills the given string list with values from the cookie header field
+    // [Deleted from TwebRequest] procedure ExtractQueryFields(Strings: TALStringsA); // Fills the given TStrings with the values from the Query data (ie: data following the "?" in the URL)
     // [Deleted from TwebRequest] function ReadUnicodeString(Count: Integer): AnsiString;
     // [Deleted from TwebRequest] property RemoteIP: AnsiString read GetRemoteIP;
     // [Deleted from TwebRequest] property ContentParser: TALAbstractContentParser read GetContentParser;
     // [Deleted from TwebRequest] property Files: TALAbstractWebRequestFiles read GetFiles;
-    // [Deleted from TwebRequest] property ContentFields: TALStrings read GetContentFields;
-    // [Deleted from TwebRequest] property CookieFields: TALStrings read GetCookieFields;
-    // [Deleted from TwebRequest] property QueryFields: TALStrings read GetQueryFields;
+    // [Deleted from TwebRequest] property ContentFields: TALStringsA read GetContentFields;
+    // [Deleted from TwebRequest] property CookieFields: TALStringsA read GetCookieFields;
+    // [Deleted from TwebRequest] property QueryFields: TALStringsA read GetQueryFields;
     // [Deleted from TwebRequest] property RawPathInfo: AnsiString read GetRawPathInfo; // PathInfo that has not been decoded.
     // [Deleted from TwebRequest] property InternalPathInfo: AnsiString read GetInternalPathInfo; // Perform special processing to get normalized PathInfo when using WebAppDbg
     // [Deleted from TwebRequest] property InternalScriptName: AnsiString read GetInternalScriptName; // Perform special processing to get normalized ScriptName when using WebAppDbg
     // [Deleted from TwebRequest] property RawContent: AnsiString index 25 read GetStringVariable;
     constructor Create;
-    procedure ExtractCookieFields(Fields: TALStrings);
-    procedure ExtractQueryFields(Fields: TALStrings);
-    procedure ExtractUrlEncodedContentFields(Fields: TALStrings);
-    procedure ExtractMultipartFormDataFields(Fields: TALStrings; Files: TALMultiPartFormDataContents);
+    procedure ExtractCookieFields(Fields: TALStringsA);
+    procedure ExtractQueryFields(Fields: TALStringsA);
+    procedure ExtractUrlEncodedContentFields(Fields: TALStringsA);
+    procedure ExtractMultipartFormDataFields(Fields: TALStringsA; Files: TALMultiPartFormDataContents);
     function ReadClient(var Buffer; Count: Integer): Integer; virtual; abstract; // Read count bytes from client
     function ReadString(Count: Integer): AnsiString; virtual; abstract; // Read count characters as a string from client
     function TranslateURI(const URI: AnsiString): AnsiString; virtual; abstract; // Translate a relative URI to a local absolute path
@@ -99,7 +99,7 @@ type
     property ContentLength: Integer index 16 read GetIntegerVariable;
     property ContentVersion: AnsiString index 17 read GetStringVariable;
     Property Content: AnsiString Read GetContent;
-    Property ContentStream: TALStringStream Read GetContentStream; // [added from TwebRequest]
+    Property ContentStream: TALStringStreamA Read GetContentStream; // [added from TwebRequest]
     Property MaxContentSize: Integer Read FMaxContentSize Write FMaxContentSize; // [added from TwebRequest]
     property Connection: AnsiString index 26 read GetStringVariable;
     property DerivedFrom: AnsiString index 18 read GetStringVariable;
@@ -116,7 +116,7 @@ type
   TALISAPIRequest = class(TALWebRequest)
   private
     FECB: PEXTENSION_CONTROL_BLOCK;
-    FcontentStream: TALStringStream;
+    FcontentStream: TALStringStreamA;
     fConnectionClosed: boolean;
     fClientDataExhausted: Boolean;
     function GetHost: AnsiString;
@@ -125,7 +125,7 @@ type
     function GetStringVariable(Index: Integer): AnsiString; override;
     function GetDateVariable(Index: Integer): TDateTime; override;
     function GetIntegerVariable(Index: Integer): Integer; override;
-    function GetContentStream: TALStringStream; override; // [added from TwebRequest]
+    function GetContentStream: TALStringStreamA; override; // [added from TwebRequest]
   public
     constructor Create(AECB: PEXTENSION_CONTROL_BLOCK);
     destructor Destroy; override;
@@ -151,10 +151,10 @@ type
     // [Deleted from TWebResponse] FFreeContentStream: Boolean;
     FContentStream: TStream;
     FCookies: TALHttpCookieCollection;
-    procedure SetCustomHeaders(Value: TALStrings);
+    procedure SetCustomHeaders(Value: TALStringsA);
   protected
     FHTTPRequest: TALWebRequest;
-    FCustomHeaders: TALStrings;
+    FCustomHeaders: TALStringsA;
     procedure AddCustomHeaders(var Headers: AnsiString);
     function GetStringVariable(Index: Integer): AnsiString; virtual; abstract;
     procedure SetStringVariable(Index: Integer; const Value: AnsiString); virtual; abstract;
@@ -179,7 +179,7 @@ type
     procedure SendRedirect(const URI: AnsiString); virtual; abstract;
     procedure SendStream(AStream: TStream); virtual; abstract;
     function Sent: Boolean; virtual;
-    procedure SetCookieField(Values: TALStrings;
+    procedure SetCookieField(Values: TALStringsA;
                              const ADomain, APath: AnsiString;
                              AExpires: TDateTime;
                              ASecure: Boolean;
@@ -208,7 +208,7 @@ type
     property Content: AnsiString read GetContent write SetContent;
     property ContentStream: TStream read FContentStream write SetContentStream;
     property LogMessage: AnsiString read GetLogMessage write SetLogMessage;
-    property CustomHeaders: TALStrings read FCustomHeaders write SetCustomHeaders;
+    property CustomHeaders: TALStringsA read FCustomHeaders write SetCustomHeaders;
     // [Deleted from TWebResponse] property FreeContentStream: Boolean read FFreeContentStream write FFreeContentStream;
   end;
 
@@ -313,7 +313,7 @@ begin
 end;
 
 {**************************************************************}
-procedure TALWebRequest.ExtractCookieFields(Fields: TALStrings);
+procedure TALWebRequest.ExtractCookieFields(Fields: TALStringsA);
 begin
   ALExtractHeaderFields([';'],  // Separators
                         [' '],  // WhiteSpace
@@ -333,7 +333,7 @@ begin
 end;
 
 {*************************************************************}
-procedure TALWebRequest.ExtractQueryFields(Fields: TALStrings);
+procedure TALWebRequest.ExtractQueryFields(Fields: TALStringsA);
 begin
   ALExtractHTTPFields(['&'], // Separators
                       [],    // WhiteSpace
@@ -344,7 +344,7 @@ begin
 end;
 
 {*************************************************************************}
-procedure TALWebRequest.ExtractUrlEncodedContentFields(Fields: TALStrings);
+procedure TALWebRequest.ExtractUrlEncodedContentFields(Fields: TALStringsA);
 begin
   ALExtractHTTPFields(['&'], // Separators
                       [],    // WhiteSpace
@@ -355,7 +355,7 @@ begin
 end;
 
 {**************************************************************************************************************}
-procedure TALWebRequest.ExtractMultipartFormDataFields(Fields: TALStrings; Files: TALMultiPartFormDataContents);
+procedure TALWebRequest.ExtractMultipartFormDataFields(Fields: TALStringsA; Files: TALMultiPartFormDataContents);
 var LBoundary: AnsiString;
     LMultipartFormDataDecoder: TALMultipartFormDataDecoder;
 begin
@@ -383,20 +383,20 @@ function TALWebRequest.GetMethodType: TALHTTPMethod;
 var LMethodStr : AnsiString;
 begin
   LMethodStr := Method;
-       if ALSameText(LMethodStr, 'GET')     then result := TALHTTPMethod.Get
-  else if ALSameText(LMethodStr, 'POST')    then result := TALHTTPMethod.Post
-  else if ALSameText(LMethodStr, 'PUT')     then result := TALHTTPMethod.Put
-  else if ALSameText(LMethodStr, 'HEAD')    then result := TALHTTPMethod.Head
-  else if ALSameText(LMethodStr, 'TRACE')   then result := TALHTTPMethod.Trace
-  else if ALSameText(LMethodStr, 'DELETE')  then result := TALHTTPMethod.Delete
-  else if ALSameText(LMethodStr, 'OPTIONS') then result := TALHTTPMethod.Options
+       if ALSameTextA(LMethodStr, 'GET')     then result := TALHTTPMethod.Get
+  else if ALSameTextA(LMethodStr, 'POST')    then result := TALHTTPMethod.Post
+  else if ALSameTextA(LMethodStr, 'PUT')     then result := TALHTTPMethod.Put
+  else if ALSameTextA(LMethodStr, 'HEAD')    then result := TALHTTPMethod.Head
+  else if ALSameTextA(LMethodStr, 'TRACE')   then result := TALHTTPMethod.Trace
+  else if ALSameTextA(LMethodStr, 'DELETE')  then result := TALHTTPMethod.Delete
+  else if ALSameTextA(LMethodStr, 'OPTIONS') then result := TALHTTPMethod.Options
   else raise Exception.Create('Unknown method type');
 end;
 
 {***************************************************}
 function TALWebRequest.GetBytesRange: TInt64DynArray;
 var LRangeHeader: ansiString;
-    LList: TalStringList;
+    LList: TALStringListA;
     LStr: ansiString;
     I: integer;
 begin
@@ -414,15 +414,15 @@ begin
 
   //check that unit is bytes
   //Range: bytes=200-1000, 2000-6576, 19000-
-  I := ALPos('=', LRangeHeader); // bytes=200-1000, 2000-6576, 19000-
+  I := ALPosA('=', LRangeHeader); // bytes=200-1000, 2000-6576, 19000-
   if I <= 0 then exit;
-  if not ALSameText(alTrim(alcopyStr(LRangeHeader,1,I-1)), 'bytes') then exit;  // bytes
+  if not ALSameTextA(alTrim(alcopyStr(LRangeHeader,1,I-1)), 'bytes') then exit;  // bytes
   LRangeHeader := alcopyStr(LRangeHeader, I+1, maxint); // 200-1000, 2000-6576, 19000-
 
   //move all ranges in result
   //200-1000, 2000-6576, 19000- => [200,1000,2000,6576,19000,-1]
   //200-1000, 2000-6576, -19000 => [200,1000,2000,6576,-1,19000]
-  LList := TalStringList.Create;
+  LList := TALStringListA.Create;
   try
     LList.LineBreak := ',';
     LList.NameValueSeparator := '-';
@@ -508,8 +508,8 @@ function TALISAPIRequest.GetHost: AnsiString;
 var I, J: Integer;
 begin
   Result := GetFieldByName('HTTP_HOST');
-  J := ALPos(']', Result); // Handle Ipv6 host like [::1]:80
-  I := ALPosEx(':', Result, J+1);
+  J := ALPosA(']', Result); // Handle Ipv6 host like [::1]:80
+  I := ALPosA(':', Result, J+1);
   if I > 0 then Delete(Result, I, MaxInt);
 end;
 
@@ -549,9 +549,9 @@ begin
                                                                                   // all the data as sent by the client. Otherwise, cbTotalBytes will contain the total number of bytes
                                                                                   // of data received. The ISAPI extensions will then need to use the callback function ReadClient to read
                                                                                   // the rest of the data (beginning from an offset of cbAvailable).
-  if aStream is TALStringStream then begin
+  if aStream is TALStringStreamA then begin
     while aStream.Position < aStream.Size do begin
-      LByteRead := ReadClient(Pbyte(TALStringStream(aStream).DataString)[aStream.Position], aStream.Size - aStream.Position);
+      LByteRead := ReadClient(Pbyte(TALStringStreamA(aStream).DataString)[aStream.Position], aStream.Size - aStream.Position);
       if LByteRead <= 0 then break;  // The doc of Delphi say "If no more content is available, ReadClient returns -1."
                                      // but it's false !!
                                      // http://msdn.microsoft.com/en-us/library/ms525214(v=vs.90).aspx
@@ -582,10 +582,10 @@ begin
 end;
 
 {*********************************************************}
-function TALISAPIRequest.GetContentStream: TALStringStream;
+function TALISAPIRequest.GetContentStream: TALStringStreamA;
 begin
   if not assigned(FcontentStream) then begin
-    FcontentStream := TALStringStream.Create('');
+    FcontentStream := TALStringStreamA.Create('');
     ReadClientToStream(FcontentStream);
   end;
   Result := FcontentStream;
@@ -681,7 +681,7 @@ constructor TALWebResponse.Create(HTTPRequest: TALWebRequest);
 begin
   inherited Create;
   FHTTPRequest := HTTPRequest;
-  FCustomHeaders := TALStringList.Create;
+  FCustomHeaders := TALStringListA.Create;
   FCookies := TALHttpCookieCollection.Create(TALHttpCookie);
 end;
 
@@ -728,7 +728,7 @@ begin
 end;
 
 {*********************************************************}
-procedure TALWebResponse.SetCookieField(Values: TALStrings;
+procedure TALWebResponse.SetCookieField(Values: TALStringsA;
                                         const ADomain, APath: AnsiString;
                                         AExpires: TDateTime;
                                         ASecure: Boolean;
@@ -757,7 +757,7 @@ begin
 end;
 
 {***********************************************************}
-procedure TALWebResponse.SetCustomHeaders(Value: TALStrings);
+procedure TALWebResponse.SetCustomHeaders(Value: TALStringsA);
 begin
   FCustomHeaders.Assign(Value);
 end;
@@ -765,7 +765,7 @@ end;
 {*****************************************************}
 function TALWebResponse.FormatAuthenticate: AnsiString;
 begin
-  if Realm <> '' then Result := ALFormat('%s Realm=%s', [WWWAuthenticate, Realm])
+  if Realm <> '' then Result := ALFormatA('%s Realm=%s', [WWWAuthenticate, Realm])
   else Result := WWWAuthenticate;
 end;
 
@@ -934,7 +934,7 @@ var StatusString: AnsiString;
   {---------------------------------------------------------------------------}
   procedure AddHeaderItem(const Item: AnsiString; const FormatStr: AnsiString);
   begin
-    if Item <> '' then Headers := Headers + ALFormat(FormatStr, [Item]);
+    if Item <> '' then Headers := Headers + ALFormatA(FormatStr, [Item]);
   end;
 
 begin
@@ -942,7 +942,7 @@ begin
   if fSent or TALISAPIRequest(FHTTPRequest).ConnectionClosed then exit;
 
   if HTTPRequest.ProtocolVersion <> '' then begin
-    if (ReasonString <> '') and (StatusCode > 0) then StatusString := ALFormat('%d %s', [StatusCode, ReasonString])
+    if (ReasonString <> '') and (StatusCode > 0) then StatusString := ALFormatA('%d %s', [StatusCode, ReasonString])
     else StatusString := '200 OK';
     AddHeaderItem(Location, 'Location: %s'#13#10);
     AddHeaderItem(Allow, 'Allow: %s'#13#10);
@@ -950,16 +950,16 @@ begin
       AddHeaderItem(Cookies[I].HeaderValue, 'Set-Cookie: %s'#13#10);
     AddHeaderItem(DerivedFrom, 'Derived-From: %s'#13#10);
     if Expires > 0 then
-      AddHeaderItem(ALFormat(ALFormatDateTime('"%s", dd "%s" yyyy hh":"nn":"ss "GMT"',
+      AddHeaderItem(ALFormatA(ALFormatDateTimeA('"%s", dd "%s" yyyy hh":"nn":"ss "GMT"',
                                               Expires,
-                                              ALDefaultFormatSettings),
+                                              ALDefaultFormatSettingsA),
                              [AlRfc822DayOfWeekNames[DayOfWeek(Expires)],
                               ALRfc822MonthOfTheYearNames[MonthOf(Expires)]]),
                     'Expires: %s'#13#10);
     if LastModified > 0 then
-      AddHeaderItem(ALFormat(ALFormatDateTime('"%s", dd "%s" yyyy hh":"nn":"ss "GMT"',
+      AddHeaderItem(ALFormatA(ALFormatDateTimeA('"%s", dd "%s" yyyy hh":"nn":"ss "GMT"',
                                               LastModified,
-                                              ALDefaultFormatSettings),
+                                              ALDefaultFormatSettingsA),
                              [AlRfc822DayOfWeekNames[DayOfWeek(LastModified)],
                               ALRfc822MonthOfTheYearNames[MonthOf(LastModified)]]),
                     'Last-Modified: %s'#13#10);

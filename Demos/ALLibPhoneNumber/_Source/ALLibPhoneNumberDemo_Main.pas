@@ -40,7 +40,7 @@ implementation
 
 procedure TForm1.Button1Click(Sender: TObject);
 begin
-  Edit2.Text := string(ALIntToStr(ALStrPhoneNumberToInt64(ansiString(Edit1.Text), ansiString(Edit3.Text))));
+  Edit2.Text := string(ALIntToStrA(ALStrPhoneNumberToInt64(ansiString(Edit1.Text), ansiString(Edit3.Text))));
   Edit4.Text := Edit2.Text;
 end;
 

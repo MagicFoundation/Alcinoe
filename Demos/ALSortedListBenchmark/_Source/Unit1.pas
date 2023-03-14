@@ -47,12 +47,12 @@ uses Alcinoe.StringUtils,
 procedure TForm1.Button4Click(Sender: TObject);
 
   procedure _DoALAVLStringListBench(Count: integer);
-  Var aLst: TALAVLStringList;
+  Var aLst: TALAVLStringListA;
       aStopWatch: TstopWatch;
       S1, S2: ansiString;
       i,j: integer;
   begin
-    aLst := TALAVLStringList.create;
+    aLst := TALAVLStringListA.create;
     try
       aLst.CaseSensitive := false;
       aLst.duplicates := DupIgnore;
@@ -63,8 +63,8 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStr(Random(30)+1));
-        S1 := AlRandomStr(Random(30)+1);
+          aLst.Add(ALRandomStrA(Random(30)+1));
+        S1 := ALRandomStrA(Random(30)+1);
         aStopWatch.start;
         aLst.IndexOf(S1);
         aStopWatch.Stop;
@@ -77,8 +77,8 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
-        S1 := AlRandomStr(Random(30)+1);
+          aLst.Add(ALRandomStrA(Random(30)+1) + '=' + ALRandomStrA(50));
+        S1 := ALRandomStrA(Random(30)+1);
         aStopWatch.start;
         aLst.IndexOfName(S1);
         aStopWatch.Stop;
@@ -91,8 +91,8 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStr(Random(30)+1));
-        S1 := AlRandomStr(Random(30)+1);
+          aLst.Add(ALRandomStrA(Random(30)+1));
+        S1 := ALRandomStrA(Random(30)+1);
         aStopWatch.start;
         aLst.add(S1);
         aStopWatch.Stop;
@@ -105,9 +105,9 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
-        S1 := AlRandomStr(Random(30)+1);
-        S2 := AlRandomStr(50);
+          aLst.Add(ALRandomStrA(Random(30)+1) + '=' + ALRandomStrA(50));
+        S1 := ALRandomStrA(Random(30)+1);
+        S2 := ALRandomStrA(50);
         aStopWatch.start;
         aLst.Values[S1] := S2;
         aStopWatch.Stop;
@@ -121,12 +121,12 @@ procedure TForm1.Button4Click(Sender: TObject);
   end;
 
   procedure _DoALHashedStringListBench(Count: integer);
-  Var aLst: TALHashedStringList;
+  Var aLst: TALHashedStringListA;
       aStopWatch: TstopWatch;
       S1, S2: ansiString;
       i,j: integer;
   begin
-    aLst := TALHashedStringList.create;
+    aLst := TALHashedStringListA.create;
     try
       aLst.CaseSensitive := false;
       aLst.duplicates := DupIgnore;
@@ -137,8 +137,8 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStr(Random(30)+1));
-        S1 := AlRandomStr(Random(30)+1);
+          aLst.Add(ALRandomStrA(Random(30)+1));
+        S1 := ALRandomStrA(Random(30)+1);
         aStopWatch.start;
         aLst.IndexOf(S1);
         aStopWatch.Stop;
@@ -151,8 +151,8 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
-        S1 := AlRandomStr(Random(30)+1);
+          aLst.Add(ALRandomStrA(Random(30)+1) + '=' + ALRandomStrA(50));
+        S1 := ALRandomStrA(Random(30)+1);
         aStopWatch.start;
         aLst.IndexOfName(S1);
         aStopWatch.Stop;
@@ -165,8 +165,8 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStr(Random(30)+1));
-        S1 := AlRandomStr(Random(30)+1);
+          aLst.Add(ALRandomStrA(Random(30)+1));
+        S1 := ALRandomStrA(Random(30)+1);
         aStopWatch.start;
         aLst.add(S1);
         aStopWatch.Stop;
@@ -179,9 +179,9 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
-        S1 := AlRandomStr(Random(30)+1);
-        S2 := AlRandomStr(50);
+          aLst.Add(ALRandomStrA(Random(30)+1) + '=' + ALRandomStrA(50));
+        S1 := ALRandomStrA(Random(30)+1);
+        S2 := ALRandomStrA(50);
         aStopWatch.start;
         aLst.Values[S1] := S2;
         aStopWatch.Stop;
@@ -195,12 +195,12 @@ procedure TForm1.Button4Click(Sender: TObject);
   end;
 
   procedure _DoALStringListBench(Count: integer);
-  Var aLst: TALStringList;
+  Var aLst: TALStringListA;
       aStopWatch: TstopWatch;
       S1, S2: ansiString;
       i,j: integer;
   begin
-    aLst := TALStringList.create;
+    aLst := TALStringListA.create;
     try
       aLst.CaseSensitive := false;
       aLst.duplicates := DupIgnore;
@@ -212,8 +212,8 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStr(Random(30)+1));
-        S1 := AlRandomStr(Random(30)+1);
+          aLst.Add(ALRandomStrA(Random(30)+1));
+        S1 := ALRandomStrA(Random(30)+1);
         aStopWatch.start;
         aLst.IndexOf(S1);
         aStopWatch.Stop;
@@ -226,8 +226,8 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
-        S1 := AlRandomStr(Random(30)+1);
+          aLst.Add(ALRandomStrA(Random(30)+1) + '=' + ALRandomStrA(50));
+        S1 := ALRandomStrA(Random(30)+1);
         aStopWatch.start;
         aLst.IndexOfName(S1);
         aStopWatch.Stop;
@@ -240,8 +240,8 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStr(Random(30)+1));
-        S1 := AlRandomStr(Random(30)+1);
+          aLst.Add(ALRandomStrA(Random(30)+1));
+        S1 := ALRandomStrA(Random(30)+1);
         aStopWatch.start;
         aLst.add(S1);
         aStopWatch.Stop;
@@ -254,9 +254,9 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
-        S1 := AlRandomStr(Random(30)+1);
-        S2 := AlRandomStr(50);
+          aLst.Add(ALRandomStrA(Random(30)+1) + '=' + ALRandomStrA(50));
+        S1 := ALRandomStrA(Random(30)+1);
+        S2 := ALRandomStrA(50);
         aStopWatch.start;
         aLst.Values[S1] := S2;
         aStopWatch.Stop;
@@ -270,12 +270,12 @@ procedure TForm1.Button4Click(Sender: TObject);
   end;
 
   procedure _DoALNvStringListBench(Count: integer);
-  Var aLst: TALNvStringList;
+  Var aLst: TALNVStringListA;
       aStopWatch: TstopWatch;
       S1, S2: ansiString;
       i,j: integer;
   begin
-    aLst := TALNvStringList.create;
+    aLst := TALNVStringListA.create;
     try
       aLst.CaseSensitive := false;
       aLst.duplicates := DupIgnore;
@@ -287,8 +287,8 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStr(Random(30)+1));
-        S1 := AlRandomStr(Random(30)+1);
+          aLst.Add(ALRandomStrA(Random(30)+1));
+        S1 := ALRandomStrA(Random(30)+1);
         aStopWatch.start;
         aLst.IndexOf(S1);
         aStopWatch.Stop;
@@ -301,8 +301,8 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
-        S1 := AlRandomStr(Random(30)+1);
+          aLst.Add(ALRandomStrA(Random(30)+1) + '=' + ALRandomStrA(50));
+        S1 := ALRandomStrA(Random(30)+1);
         aStopWatch.start;
         aLst.IndexOfName(S1);
         aStopWatch.Stop;
@@ -315,8 +315,8 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStr(Random(30)+1));
-        S1 := AlRandomStr(Random(30)+1);
+          aLst.Add(ALRandomStrA(Random(30)+1));
+        S1 := ALRandomStrA(Random(30)+1);
         aStopWatch.start;
         aLst.add(S1);
         aStopWatch.Stop;
@@ -329,9 +329,9 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
-        S1 := AlRandomStr(Random(30)+1);
-        S2 := AlRandomStr(50);
+          aLst.Add(ALRandomStrA(Random(30)+1) + '=' + ALRandomStrA(50));
+        S1 := ALRandomStrA(Random(30)+1);
+        S2 := ALRandomStrA(50);
         aStopWatch.start;
         aLst.Values[S1] := S2;
         aStopWatch.Stop;
@@ -362,8 +362,8 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStrU(Random(30)+1));
-        S1 := AlRandomStrU(Random(30)+1);
+          aLst.Add(ALRandomStrW(Random(30)+1));
+        S1 := ALRandomStrW(Random(30)+1);
         aStopWatch.start;
         aLst.IndexOf(S1);
         aStopWatch.Stop;
@@ -376,8 +376,8 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStrU(Random(30)+1) + '=' + AlRandomStrU(50));
-        S1 := AlRandomStrU(Random(30)+1);
+          aLst.Add(ALRandomStrW(Random(30)+1) + '=' + ALRandomStrW(50));
+        S1 := ALRandomStrW(Random(30)+1);
         aStopWatch.start;
         aLst.IndexOfName(S1);
         aStopWatch.Stop;
@@ -390,8 +390,8 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStrU(Random(30)+1));
-        S1 := AlRandomStrU(Random(30)+1);
+          aLst.Add(ALRandomStrW(Random(30)+1));
+        S1 := ALRandomStrW(Random(30)+1);
         aStopWatch.start;
         aLst.add(S1);
         aStopWatch.Stop;
@@ -405,9 +405,9 @@ procedure TForm1.Button4Click(Sender: TObject);
       for I := 1 to 1000 do begin
         aLst.Clear;
         for j := 1 to Count do
-          aLst.Add(AlRandomStrU(Random(30)+1) + '=' + AlRandomStrU(50));
-        S1 := AlRandomStrU(Random(30)+1);
-        S2 := AlRandomStrU(50);
+          aLst.Add(ALRandomStrW(Random(30)+1) + '=' + ALRandomStrW(50));
+        S1 := ALRandomStrW(Random(30)+1);
+        S2 := ALRandomStrW(50);
         aStopWatch.start;
         aLst.Values[S1] := S2;
         aStopWatch.Stop;

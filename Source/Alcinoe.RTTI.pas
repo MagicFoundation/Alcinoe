@@ -457,6 +457,7 @@ implementation
 uses
   System.sysutils,
   System.Generics.Defaults,
+  System.AnsiStrings,
   Alcinoe.Common,
   Alcinoe.StringUtils;
 
@@ -489,7 +490,7 @@ var
 begin
   if TypeInfo^.Kind = tkInteger then
   begin
-    Result := ALIntToStr(Value);
+    Result := ALIntToStrA(Value);
     Exit;
   end;
   T := GetTypeData(GetTypeData(TypeInfo)^.BaseType^);
@@ -548,7 +549,7 @@ begin
     begin
       LLen1 := PByte(LName)^; // length is store in First array
       if (LLen1 = LLen2) and
-         ALSameText(PShortString(LName)^, Name) then
+         ALSameTextA(PShortString(LName)^, Name) then
         Exit(I);
       LName := ALAfterString(LName);
     end;
@@ -557,7 +558,7 @@ begin
   //begin
   //  for I := 0 to TypeData^.MaxValue do
   //  begin
-  //    if ALSameText(PShortString(LName)^, Name) then
+  //    if ALSameTextA(PShortString(LName)^, Name) then
   //      Exit(I);
   //    LName := ALAfterString(LName);
   //  end;
@@ -583,11 +584,11 @@ begin
     if (TypeInfo^.Kind <> tkEnumeration) then exit(false);
     if GetTypeData(TypeInfo)^.MinValue < 0 then  // Longbool/wordbool/bytebool
     begin
-      if ALSameText(Name, ALBooleanIdents[False]) then begin
+      if ALSameTextA(Name, ALBooleanIdents[False]) then begin
         EnumValue := 0;
         Result := true;
       end
-      else if ALSameText(Name, ALBooleanIdents[True]) then begin
+      else if ALSameTextA(Name, ALBooleanIdents[True]) then begin
         EnumValue := -1;
         Result := true;
       end
@@ -659,7 +660,7 @@ begin
       begin
         if Result <> '' then
           Result := Result + ',';
-        Result := Result + ALIntToStr(I);
+        Result := Result + ALIntToStrA(I);
       end;
    end;
   if Brackets then
@@ -797,7 +798,7 @@ constructor TALRttiField.Create(const aRttiField: TRttiField);
 begin
   inherited create(aRttiField);
   fRttiField := aRttiField;
-  //ENonPublicType look like :TALFormatSettings.:1
+  //ENonPublicType look like :TALFormatSettingsA.:1
   //This will raise an exception in QualifiedName
   //function TRttiType.GetQualifiedName: string;
   //begin
@@ -806,7 +807,7 @@ begin
   //    raise ENonPublicType.CreateResFmt(@SNonPublicType, [Name]);
   //end;
   if assigned(aRttiField.FieldType) and
-     (alpos(':',aRttiField.FieldType.Handle.Name) <> 1) then fFieldType := ALGetRttiType(ansiString(aRttiField.FieldType.QualifiedName))
+     (ALPosA(':',aRttiField.FieldType.Handle.Name) <> 1) then fFieldType := ALGetRttiType(ansiString(aRttiField.FieldType.QualifiedName))
   else fFieldType := nil;
   fOffset := aRttiField.Offset;
 end;
@@ -1222,7 +1223,7 @@ procedure TALRttiType.init(const aRttiType: TRttiType);
       aArray,
       TDelegatedComparer<TALRttiMember>.Construct(function(const Left, Right: TALRttiMember): Integer
       begin
-        Result := ALCompareText(Left.Name, Right.Name);
+        Result := ALCompareTextA(Left.Name, Right.Name);
         if result = 0 then result := Left.Order - Right.Order;
       end));
   end;
@@ -1338,7 +1339,7 @@ begin
   while L <= H do
   begin
     I := (L + H) shr 1;
-    C := ALCompareText(FromArray[I].fName, S);
+    C := ALCompareTextA(FromArray[I].fName, S);
     if C < 0 then L := I + 1 else
     begin
       H := I - 1;
@@ -1409,13 +1410,13 @@ begin
 
       J := I - 1;
       while J >= 0 do begin
-        if ALSameText(LRttiIndexedProperties[j].Name, AName) then dec(J)
+        if ALSameTextA(LRttiIndexedProperties[j].Name, AName) then dec(J)
         else break;
       end;
 
       K := I + 1;
       while K <= length(LRttiIndexedProperties) - 1 do begin
-        if ALSameText(LRttiIndexedProperties[K].Name, AName) then inc(K)
+        if ALSameTextA(LRttiIndexedProperties[K].Name, AName) then inc(K)
         else break;
       end;
 
@@ -1450,13 +1451,13 @@ begin
 
     J := I - 1;
     while J >= 0 do begin
-      if ALSameText(LRTTIMethods[j].Name, AName) then dec(J)
+      if ALSameTextA(LRTTIMethods[j].Name, AName) then dec(J)
       else break;
     end;
 
     K := I + 1;
     while K <= length(LRTTIMethods) - 1 do begin
-      if ALSameText(LRTTIMethods[K].Name, AName) then inc(K)
+      if ALSameTextA(LRTTIMethods[K].Name, AName) then inc(K)
       else break;
     end;
 
@@ -1529,7 +1530,7 @@ begin
     LContinue := True;
     LQualifiedName := ansiString(LRttiTypes[i].QualifiedName);
     for j := Low(aQualifiedNameToSkip) to High(aQualifiedNameToSkip) do begin
-      if ALMatchesMask(LQualifiedName, aQualifiedNameToSkip[j]) then begin
+      if ALMatchesMaskA(LQualifiedName, aQualifiedNameToSkip[j]) then begin
         LContinue := False;
         break;
       end;

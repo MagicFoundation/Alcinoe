@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 377
   Top = 296
   Caption = 'TALStressHttpServer'
-  ClientHeight = 615
-  ClientWidth = 1008
+  ClientHeight = 614
+  ClientWidth = 1004
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -16,27 +16,27 @@ object Form1: TForm1
   object PageControl1: TcxPageControl
     Left = 0
     Top = 0
-    Width = 1008
-    Height = 615
+    Width = 1004
+    Height = 614
     Align = alClient
     TabOrder = 0
     Properties.ActivePage = TabSheet1
     Properties.CustomButtons.Buttons = <>
-    ExplicitWidth = 1004
-    ExplicitHeight = 614
-    ClientRectBottom = 610
+    ClientRectBottom = 609
     ClientRectLeft = 5
-    ClientRectRight = 1003
+    ClientRectRight = 999
     ClientRectTop = 27
     object TabSheet1: TcxTabSheet
       Caption = 'Application'
       Color = 15066860
       ParentColor = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
       ExplicitWidth = 994
       ExplicitHeight = 582
       DesignSize = (
-        998
-        583)
+        994
+        582)
       object Label4: TcxLabel
         Left = 11
         Top = 8
@@ -78,15 +78,14 @@ object Form1: TForm1
           'http://www.pap.fr')
         ParentFont = False
         TabOrder = 0
-        ExplicitWidth = 994
         Height = 124
-        Width = 998
+        Width = 994
       end
       object GridThread: TcxGrid
         Left = 0
         Top = 226
-        Width = 998
-        Height = 338
+        Width = 994
+        Height = 337
         Align = alBottom
         Anchors = [akLeft, akTop, akRight, akBottom]
         Font.Charset = ANSI_CHARSET
@@ -96,8 +95,6 @@ object Form1: TForm1
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitWidth = 994
-        ExplicitHeight = 337
         object TableViewThread: TcxGridTableView
           Navigator.Buttons.CustomButtons = <>
           Navigator.Buttons.First.Visible = False
@@ -263,8 +260,8 @@ object Form1: TForm1
       end
       object StatusBar1: TStatusBar
         Left = 0
-        Top = 564
-        Width = 998
+        Top = 563
+        Width = 994
         Height = 19
         Color = 15525605
         Font.Charset = DEFAULT_CHARSET
@@ -280,8 +277,6 @@ object Form1: TForm1
             Width = 50
           end>
         UseSystemFont = False
-        ExplicitTop = 563
-        ExplicitWidth = 994
       end
       object EditMaxHttpRequest: TcxSpinEdit
         Left = 156

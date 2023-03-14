@@ -20,7 +20,7 @@ uses
   Alcinoe.StringList;
 
 var
-  WritelnDuplicatesToSkip: TalStringListU;
+  WritelnDuplicatesToSkip: TALStringListW;
 
 {**************************************}
 Procedure OverWrite(const AStr: String);
@@ -32,7 +32,7 @@ begin
   Write(#13);
   if Linfo.dwSize.X - 1 > 0 then Write(StringOfChar(' ', Linfo.dwSize.X - 1));
   Write(#13);
-  if length(AStr) > Linfo.dwSize.X - 1 then System.Write(ALCopyStrU(AStr, 1, Linfo.dwSize.X - 4) + '...')
+  if length(AStr) > Linfo.dwSize.X - 1 then System.Write(ALCopyStr(AStr, 1, Linfo.dwSize.X - 4) + '...')
   else if length(AStr) > 0 then System.Write(AStr);
 end;
 
@@ -56,7 +56,7 @@ begin
   Var LOutputStream := TStringStream.Create;
   try
     OverWrite(ACmdLine);
-    Var LCmdLineResult := ALWinExecU(
+    Var LCmdLineResult := ALWinExecW(
                             ACmdLine, // const aCommandLine: String;
                             LInputStream, // const aInputStream: Tstream;
                             LOutputStream); //const aOutputStream: TStream;
@@ -86,10 +86,10 @@ begin
     {$ENDREGION}
 
     {$REGION 'create local objects'}
-    var LParamLst := TALStringListU.Create;
-    Var LPaths := TALJsonDocumentU.Create;
-    var LConfigs := TALStringList.Create;
-    var LPlatforms := TALStringList.Create;
+    var LParamLst := TALStringListW.Create;
+    Var LPaths := TALJSONDocumentW.Create;
+    var LConfigs := TALStringListA.Create;
+    var LPlatforms := TALStringListA.Create;
     {$ENDREGION}
 
     try
@@ -100,14 +100,14 @@ begin
       {$ENDREGION}
 
       {$REGION 'Init LNoInteraction'}
-      LNoInteraction := AlStrToBoolU(ALTrimU(LParamLst.Values['-NoInteraction']));
+      LNoInteraction := AlStrToBool(ALTrim(LParamLst.Values['-NoInteraction']));
       {$ENDREGION}
 
       {$REGION 'Init LDProjFilename'}
-      var LDProjFilename := ExpandFileName(ALTrimU(LParamLst.Values['-DProj']));
+      var LDProjFilename := ExpandFileName(ALTrim(LParamLst.Values['-DProj']));
       if LDProjFilename = '' then raise Exception.Create('DProj param is mandatory');
       if not Tfile.Exists(LDProjFilename) then raise Exception.Create('DProj file not exists');
-      var LDProjDir := ALExtractFilePathU(LDProjFilename);
+      var LDProjDir := ALExtractFilePath(LDProjFilename);
       {$ENDREGION}
 
       {$REGION 'Init LConfigs'}
@@ -140,27 +140,27 @@ begin
       {$ENDREGION}
 
       {$REGION 'Init LDProjNormalizer'}
-      var LDProjNormalizer := ExpandFileName(ALTrimU(LParamLst.Values['-DProjNormalizer']));
+      var LDProjNormalizer := ExpandFileName(ALTrim(LParamLst.Values['-DProjNormalizer']));
       {$ENDREGION}
 
       {$REGION 'Init LPaths'}
-      var LPathsLst := TALStringListU.Create;
+      var LPathsLst := TALStringListW.Create;
       Try
         LPathsLst.LineBreak := ';';
         LPathsLst.Text := LParamLst.Values['-Paths'];
         if LPathsLst.Count = 0 then raise Exception.Create('Paths param is mandatory');
         for var I := 0 to LPathsLst.Count - 1 do begin
-          Var LPathLst := TalStringListU.Create;
+          Var LPathLst := TALStringListW.Create;
           try
             LPathLst.LineBreak := '|';
             LPathLst.Text := LPathsLst[I]; // .\_Build\Sample\DirA|true|.\PlugIns
             if LPathLst.Count <> 3 then raise Exception.Create('Paths param must be in the format <LocalPath>|<IncludeSubDirs>|<RemotePath>');
-            var LLocalPath := ExpandFileName(ALTrimU(LPathLst[0])); // C:\Dev\MagicFoundation\Alcinoe\Tools\DeployMan\_Build\Sample\DirA
+            var LLocalPath := ExpandFileName(ALTrim(LPathLst[0])); // C:\Dev\MagicFoundation\Alcinoe\Tools\DeployMan\_Build\Sample\DirA
             var LRemotePath := LPathLst[2]; // .\PlugIns
             if TDirectory.Exists(LLocalPath) then begin
-              LLocalPath := ALIncludeTrailingPathDelimiterU(LLocalPath); // C:\Dev\MagicFoundation\Alcinoe\Tools\DeployMan\_Build\Sample\DirA\
+              LLocalPath := ALIncludeTrailingPathDelimiterW(LLocalPath); // C:\Dev\MagicFoundation\Alcinoe\Tools\DeployMan\_Build\Sample\DirA\
               var LSearchOption: TSearchOption;
-              if ALStrToBoolU(LPathLst[1]) then LSearchOption := TSearchOption.soAllDirectories
+              if AlStrToBool(LPathLst[1]) then LSearchOption := TSearchOption.soAllDirectories
               else LSearchOption := TSearchOption.soTopDirectoryOnly;
               var LFiles := TDirectory.GetFiles(LLocalPath, '*', LSearchOption);
               for var Lfile in LFiles do begin
@@ -223,12 +223,12 @@ begin
         //</DeployFile>
         for var I := LDeploymentNode.ChildNodes.Count - 1 downto 0 do begin
           var LDeployFileNode := LDeploymentNode.ChildNodes[i];
-          if ALSameText(LDeployFileNode.NodeName, 'DeployFile') then begin
-            if ALSameText(LDeployFileNode.Attributes['Class'], 'File') then begin
+          if ALSameTextA(LDeployFileNode.NodeName, 'DeployFile') then begin
+            if ALSameTextA(LDeployFileNode.Attributes['Class'], 'File') then begin
               if LDeployFileNode.ChildNodes.Count = 0 then raise Exception.Create('Error A892E02E-A8BA-4003-AEF1-A81271AD0A9F');
               for Var J := LDeployFileNode.ChildNodes.Count - 1 downto 0 do begin
                 var LPlatformNode := LDeployFileNode.ChildNodes[j];
-                if not alSameText(LPlatformNode.NodeName, 'Platform') then raise Exception.Create('Error 65714071-86F2-4796-82F8-9F01C5C9824B');
+                if not ALSameTextA(LPlatformNode.NodeName, 'Platform') then raise Exception.Create('Error 65714071-86F2-4796-82F8-9F01C5C9824B');
                 var LName := LPlatformNode.Attributes['Name'];
                 if LName = '' then raise Exception.Create('Error 42C3C299-BA31-4B17-9EA4-8320E0048848');
                 if (LPlatforms.IndexOfName(LName) >= 0) then begin
@@ -255,7 +255,7 @@ begin
               for var LPlatForm in LPlatforms do begin
                 With AddChild('Platform') do begin
                   Attributes['Name'] := LPlatForm;
-                  Addchild('RemoteDir').Text := ALExcludeTrailingPathDelimiter(ALExtractFilePath(LRemotePath)); // .\PlugIns\notificationservice.appex
+                  Addchild('RemoteDir').Text := ALExcludeTrailingPathDelimiterA(ALExtractFilePath(LRemotePath)); // .\PlugIns\notificationservice.appex
                   Addchild('RemoteName').Text := ALExtractFileName(LRemotePath); // Info.plist
                   Addchild('Overwrite').Text := 'true';
                 end;
@@ -329,7 +329,7 @@ begin
 end;
 
 begin
-  WritelnDuplicatesToSkip := TalStringListU.Create;
+  WritelnDuplicatesToSkip := TALStringListW.Create;
   try
     kickoff;
   finally

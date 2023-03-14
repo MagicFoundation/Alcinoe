@@ -812,7 +812,7 @@ begin
     TContextShaderSource.Create(
       TContextShaderArch.GLSL,
       TEncoding.UTF8.GetBytes(
-        ALFormatU(
+        ALFormatW(
           ALColorAdjustGLSL,
           ['varying vec4 TEX0;'+
            'uniform sampler2D _Input;',
@@ -822,7 +822,7 @@ begin
            'vec4 result = texture2D(_Input, TEX0.xy);',
            //----
            ''],
-          AlDefaultFormatSettingsU)),
+          ALDefaultFormatSettingsW)),
       [TContextShaderVariable.Create('Contrast',    TContextShaderVariableKind.Float, 0, 1),
        TContextShaderVariable.Create('Highlights',  TContextShaderVariableKind.Float, 0, 1),
        TContextShaderVariable.Create('Shadows',     TContextShaderVariableKind.Float, 0, 1),

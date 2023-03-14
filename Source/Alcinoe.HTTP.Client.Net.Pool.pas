@@ -192,8 +192,8 @@ begin
         //get from the url
         if LNetHttpClientPoolRequest.Url <> '' then begin
           var LLowerUrl := LNetHttpClientPoolRequest.Url.ToLower;
-          if (alposU('http://',LLowerUrl) = 1) or
-             (alposU('https://',LLowerUrl) = 1) then begin
+          if (ALPosW('http://',LLowerUrl) = 1) or
+             (ALPosW('https://',LLowerUrl) = 1) then begin
             if LNetHttpClientPoolRequest.UseCache then begin
               if (not assigned(RetrieveCachedData)) or
                  (not RetrieveCachedData(LNetHttpClientPoolRequest.Url, LHTTPResponse, LResponseContent)) then begin
@@ -207,7 +207,7 @@ begin
         end;
 
         //decode the result if necessary
-        if (LHTTPResponse <> nil) then ALDecompressHttpResponseContentU(LHTTPResponse.ContentEncoding, LResponseContent);
+        if (LHTTPResponse <> nil) then ALDecompressHttpResponseContent(LHTTPResponse.ContentEncoding, LResponseContent);
 
         //fire the OnSuccess
         LNetHttpClientPoolRequest.OnSuccessCallBack(LHTTPResponse, LResponseContent, LNetHttpClientPoolRequest.FExtData);

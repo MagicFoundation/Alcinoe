@@ -71,7 +71,7 @@ SET FileName=%ALBaseDir%\Tests\*.deployproj.local
 del "%FileName%" /s
 if exist "%FileName%" goto ERROR
 
-SET FileName=%ALBaseDir%\Tests\_Source\dcu
+SET FileName=%ALBaseDir%\Tests\_Source\Dcu
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"

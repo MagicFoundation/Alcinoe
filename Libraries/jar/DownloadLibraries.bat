@@ -24,7 +24,7 @@ REM -----------------
 REM Main Instructions
 REM -----------------
 
-Call :DOWNLOAD_LIBRARY "https://artifactory.wetransform.to/artifactory/libs-snapshot" "org.webrtc" "google-webrtc" "1.0.25331"
+REM Call :DOWNLOAD_LIBRARY "https://artifactory.wetransform.to/artifactory/libs-snapshot" "org.webrtc" "google-webrtc" "1.0.25331"
 
 goto FINISHED
 

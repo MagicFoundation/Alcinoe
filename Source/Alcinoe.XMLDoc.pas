@@ -47,7 +47,7 @@ const
   CALXmlDocument        = 'DOCUMENT';
 
 var
-  vALDefaultNodeIndent: ansiString; // var instead of const to avoid new ansitring on assign
+  ALDefaultXMLNodeIndent: ansiString; // var instead of const to avoid new ansitring on assign
 
 type
 
@@ -59,7 +59,7 @@ type
   TAlXMLParseDocument = reference to procedure (Sender: TObject);
   TAlXMLParseProcessingInstructionEvent = reference to procedure (Sender: TObject; const Path, Target, Data: AnsiString);
   TAlXMLParseTextEvent = reference to procedure (Sender: TObject; const Path, Str: AnsiString);
-  TAlXMLParseStartElementEvent = reference to procedure (Sender: TObject; const Path, Name: AnsiString; Attributes: TALStrings);
+  TAlXMLParseStartElementEvent = reference to procedure (Sender: TObject; const Path, Name: AnsiString; Attributes: TALStringsA);
   TAlXMLParseEndElementEvent = reference to procedure (Sender: TObject; const Path, Name: AnsiString);
   TALXMLNodeListSortCompare = reference to function(List: TALXMLNodeList; Index1, Index2: Integer): Integer;
 
@@ -532,7 +532,7 @@ type
     //[Deleted from TXMLDocument] procedure SetDOMVendor(const Value: TDOMVendor);
     //[Deleted from TXMLDocument] function IsXMLStored: Boolean;
     //[Deleted from TXMLDocument] function NodeIndentStored: Boolean;
-    //[Deleted from TXMLDocument] FXMLStrings: TALStringList;
+    //[Deleted from TXMLDocument] FXMLStrings: TALStringListA;
     //[Deleted from TXMLDocument] FFileName: AnsiString;
     //[Deleted from TXMLDocument] FDocSource: TalXMLDocumentSource;
     //[Deleted from TXMLDocument] FSrcStream: TStream;
@@ -597,7 +597,7 @@ type
     procedure DoParseProcessingInstruction(const Path, Target, Data: AnsiString); // [added from TXMLDocument]
     procedure DoParseStartDocument; // [added from TXMLDocument]
     procedure DoParseEndDocument; // [added from TXMLDocument]
-    procedure DoParseStartElement(const Path, Name: AnsiString; Attributes: TALStrings); // [added from TXMLDocument]
+    procedure DoParseStartElement(const Path, Name: AnsiString; Attributes: TALStringsA); // [added from TXMLDocument]
     procedure DoParseEndElement(const Path, Name: AnsiString); // [added from TXMLDocument]
     procedure DoParseText(const Path, Str: AnsiString); // [added from TXMLDocument]
     procedure DoParseComment(const Path, Str: AnsiString); // [added from TXMLDocument]
@@ -618,13 +618,13 @@ type
     procedure SetPathSeparator(const Value: ansiChar);
     function GetStandAlone: AnsiString;
     function GetVersion: AnsiString;
-    function GetXML: AnsiString; //[Replace from TXMLDocument] function GetXML: TALStrings;
+    function GetXML: AnsiString; //[Replace from TXMLDocument] function GetXML: TALStringsA;
     procedure SetDocumentElement(const Value: TALXMLNode);
     procedure SetOptions(const Value: TALXMLDocOptions);
     procedure SetParseOptions(const Value: TALXMLParseOptions);
     procedure SetStandAlone(const Value: AnsiString);
     procedure SetVersion(const Value: AnsiString);
-    procedure SetXML(const Value: ansiString); //[Replace from TXMLDocument] procedure SetXML(const Value: TALStrings);
+    procedure SetXML(const Value: ansiString); //[Replace from TXMLDocument] procedure SetXML(const Value: TALStringsA);
     procedure SetEncoding(const Value: AnsiString);
     procedure SetNodeIndentStr(const Value: AnsiString);
   public
@@ -643,7 +643,7 @@ type
     //[Deleted from TXMLDocument] property NSPrefixBase: AnsiString read FNSPrefixBase write FNSPrefixBase;
     //[Deleted from TXMLDocument] property SchemaRef: AnsiString read GetSchemaRef;
     //[Deleted from TXMLDocument] procedure Refresh;
-    //[Deleted from TXMLDocument] property XML: TALStrings read GetXML write SetXML;
+    //[Deleted from TXMLDocument] property XML: TALStringsA read GetXML write SetXML;
     //[Deleted from TXMLDocument] property FileName: AnsiString read GetFileName write SetFileName;
     //[Deleted from TXMLDocument] procedure parseXML;
     //[Deleted from TXMLDocument] property BeforeOpen: TNotifyEvent read FBeforeOpen write FBeforeOpen;
@@ -716,6 +716,7 @@ implementation
 uses
   System.Math,
   System.Contnrs,
+  System.AnsiStrings,
   Alcinoe.HTML,
   Alcinoe.HTTP.Client,
   Alcinoe.Common,
@@ -761,7 +762,7 @@ end;
 function ALExtractPrefix(const AName: AnsiString): AnsiString;
 var LSepPos: Integer;
 begin
-  LSepPos := ALPos(CALNSDelim,Aname);
+  LSepPos := ALPosA(CALNSDelim,Aname);
   if LSepPos > 0 then begin
     setlength(Result,LSepPos - 1);
     ALMove(pointer(aName)^, pointer(Result)^, LSepPos - 1);
@@ -778,7 +779,7 @@ function ALExtractLocalName(const AName: AnsiString): AnsiString;
 var LSepPos: Integer;
     LLength: integer;
 begin
-  LSepPos := ALPos(CALNSDelim,Aname);
+  LSepPos := ALPosA(CALNSDelim,Aname);
   if LSepPos > 0 then begin
     LLength := Length(Aname) - LSepPos;
     setlength(Result,LLength);
@@ -839,7 +840,7 @@ end;
 function ALExtractAttrValue(const AttrName, AttrLine: AnsiString; const Default: AnsiString = ''): AnsiString;
 var LineLen, ItemPos, ItemEnd: Integer;
 begin
-  ItemPos := ALPos(AttrName, AttrLine);
+  ItemPos := ALPosA(AttrName, AttrLine);
   LineLen := Length(AttrLine);
   if ItemPos > 0 then begin
     Inc(ItemPos, Length(AttrName));
@@ -880,7 +881,7 @@ begin
   FonParseComment:= nil;
   FonParseCData:= nil;
   FOptions := [];
-  NodeIndentStr := vALDefaultNodeIndent;
+  NodeIndentStr := ALDefaultXMLNodeIndent;
   FTag := 0;
   SetActive(aActive);
 end;
@@ -967,12 +968,12 @@ Var buffer: AnsiString;
     bufferLength: Integer;
     bufferPos: Integer;
     PreserveWhiteSpace: Boolean;
-    LstParams: TALStringList;
+    LstParams: TALStringListA;
     NotSaxMode: Boolean;
     WorkingNode: TALXmlNode;
     DecodeXmlReferences: Boolean;
     UseContainerNodeInsteadOfAddingChildNode: Boolean;
-    Paths: TALStringList;
+    Paths: TALStringListA;
     CodePage: Word;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -1008,11 +1009,11 @@ Var buffer: AnsiString;
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function PosInXmlString(const Substr: AnsiString; Offset: integer = 1): integer;
   Begin
-    Result := ALPosEx(Substr,buffer,OffSet);
+    Result := ALPosA(Substr,buffer,OffSet);
     While (Result <= 0) do begin
       Offset := bufferlength - bufferPos + 3 - length(Substr);
       If not Expandbuffer then break;
-      Result := ALPosEx(Substr,buffer,offset);
+      Result := ALPosA(Substr,buffer,offset);
     end;
   end;
 
@@ -1337,8 +1338,8 @@ Begin
   // NOTE: ContainerNode must be TDocument or TElement or nil (sax mode)
   //
 
-  LstParams := TALStringList.Create;
-  Paths := TALStringList.Create;
+  LstParams := TALStringListA.Create;
+  Paths := TALStringListA.Create;
   Try
 
     DoParseStartDocument;
@@ -1458,9 +1459,9 @@ end;
  The XML parameter is a string containing the text of an XML document. It should represent the XML text encoded using 8 bits char (utf-8, iso-8859-1, etc)
  After assigning the XML property as the contents of the document, LoadFromXML sets the Active property to true.}
 procedure TALXMLDocument.LoadFromXML(const XML: AnsiString; const saxMode: Boolean = False);
-var StringStream: TALStringStream;
+var StringStream: TALStringStreamA;
 begin
-  StringStream := TALStringStream.Create(XML);
+  StringStream := TALStringStreamA.Create(XML);
   try
     LoadFromStream(StringStream, saxMode);
   finally
@@ -1495,9 +1496,9 @@ end;
  using 8 bits char (utf-8, iso-8859-1, etc) as an encoding system, depending on the type of the XML parameter.
  Unlike the XML property, which lets you write individual lines from the XML document, SaveToXML writes the entire text of the XML document.}
 procedure TALXMLDocument.SaveToXML(var XML: AnsiString);
-Var StringStream: TALStringStream;
+Var StringStream: TALStringStreamA;
 begin
-  StringStream := TALstringStream.Create('');
+  StringStream := TALStringStreamA.Create('');
   Try
     SaveToStream(StringStream);
     XML := StringStream.DataString;
@@ -1875,7 +1876,7 @@ begin
 end;
 
 {*************************************************************************************************}
-procedure TALXMLDocument.DoParseStartElement(const Path, Name: AnsiString; Attributes: TALStrings);
+procedure TALXMLDocument.DoParseStartElement(const Path, Name: AnsiString; Attributes: TALStringsA);
 begin
   if Assigned(FOnParseStartElement) then FOnParseStartElement(Self, Path, Name, Attributes);
 end;
@@ -2294,7 +2295,7 @@ Var NodeStack: Tstack;
     L := Length(Str);
     if l = 0 then exit;
     if AttributeAutoIndent then begin
-      P := ALLastDelimiter(#10, str);
+      P := ALLastDelimiterA(#10, str);
       if P > 0 then CharCountFromLastNewLine := L - P
       else CharCountFromLastNewLine := CharCountFromLastNewLine + L;
     end;
@@ -2325,7 +2326,7 @@ Var NodeStack: Tstack;
         WriteStr2Buffer('"');
       end
       else begin
-        if alpos('"',text) > 0 then begin
+        if ALPosA('"',text) > 0 then begin
           WriteStr2Buffer(NodeName);
           WriteStr2Buffer('=''');
           WriteStr2Buffer(text);
@@ -2559,9 +2560,9 @@ end;
 
 {*******************************************************************************************}
 procedure TALXMLNode.SaveToXML(var Xml: AnsiString; Const SaveOnlyChildNodes: Boolean=False);
-Var LStringStream: TALStringStream;
+Var LStringStream: TALStringStreamA;
 begin
-  LStringStream := TALStringStream.Create('');
+  LStringStream := TALStringStreamA.Create('');
   Try
     SaveToStream(LStringStream, SaveOnlyChildNodes);
     Xml := LStringStream.DataString;
@@ -2574,9 +2575,9 @@ end;
 {load XmlContainOnlyChildNodes mean the the stream contain ONLY the child node, so it's not a valid xml stream
  like <root>...</root> but more like <rec>...</rec><rec>...</rec><rec>...</rec>}
 procedure TALXMLNode.LoadFromXML(const Xml: AnsiString; Const XmlContainOnlyChildNodes: Boolean=False; Const ClearChildNodes: Boolean = True);
-Var LStringStream: TALStringStream;
+Var LStringStream: TALStringStreamA;
 Begin
-  LStringStream := TALStringStream.Create(Xml);
+  LStringStream := TALStringStreamA.Create(Xml);
   Try
     LoadFromStream(LStringStream, XmlContainOnlyChildNodes, ClearChildNodes);
   finally
@@ -3345,7 +3346,7 @@ function TALXMLNodeList.FindNode(const NodeName: AnsiString; NodeAttributes: Arr
   begin
     Result := True;
     for I := low(NodeAttributes) to high(NodeAttributes) do begin
-      P := ALpos('=',NodeAttributes[i]);
+      P := ALPosA('=',NodeAttributes[i]);
       if (P <= 0) or
          (Node.Attributes[AlCopyStr(NodeAttributes[i], 1, P-1)] <> AlCopyStr(NodeAttributes[i], P+1, maxint)) then begin
         Result := False;
@@ -3725,8 +3726,8 @@ Begin
   if not (xmlrec is TalXmlElementNode) then Exit;
   for i := 0 to xmlrec.ChildNodes.Count - 1 do begin
     for J := 0 to xmlrec.ChildNodes[i].ChildNodes.Count - 1 do begin
-      If ALSametext(xmlrec.ChildNodes[i].ChildNodes[j].NodeName,ChildNodeName) and
-         ALSametext(xmlrec.ChildNodes[i].ChildNodes[j].text,ChildNodeValue) then begin
+      If ALSameTextA(xmlrec.ChildNodes[i].ChildNodes[j].NodeName,ChildNodeName) and
+         ALSameTextA(xmlrec.ChildNodes[i].ChildNodes[j].text,ChildNodeValue) then begin
         result := xmlrec.ChildNodes[i];
         exit;
       end;
@@ -3751,10 +3752,10 @@ Begin
   result := nil;
   if not (xmlrec is TalXmlElementNode) then Exit;
   for i := 0 to xmlrec.ChildNodes.Count - 1 do begin
-    if ALSametext(xmlrec.ChildNodes[i].NodeName,NodeName) then begin
+    if ALSameTextA(xmlrec.ChildNodes[i].NodeName,NodeName) then begin
       for J := 0 to xmlrec.ChildNodes[i].ChildNodes.Count - 1 do begin
-        If ALSametext(xmlrec.ChildNodes[i].ChildNodes[j].NodeName,ChildNodeName) and
-           ALSametext(xmlrec.ChildNodes[i].ChildNodes[j].text,ChildNodeValue) then begin
+        If ALSameTextA(xmlrec.ChildNodes[i].ChildNodes[j].NodeName,ChildNodeName) and
+           ALSameTextA(xmlrec.ChildNodes[i].ChildNodes[j].text,ChildNodeValue) then begin
           result := xmlrec.ChildNodes[i];
           exit;
         end;
@@ -3781,7 +3782,7 @@ Begin
   result := nil;
   if not (xmlrec is TalXmlElementNode) then Exit;
   for I := 0 to xmlrec.ChildNodes.Count - 1 do begin
-    If ALSametext(xmlrec.ChildNodes[I].Attributes[AttributeName], AttributeValue) then begin
+    If ALSameTextA(xmlrec.ChildNodes[I].Attributes[AttributeName], AttributeValue) then begin
       result := xmlrec.ChildNodes[I];
       break;
     end;
@@ -3805,8 +3806,8 @@ Begin
   result := nil;
   if not (xmlrec is TalXmlElementNode) then Exit;
   for I := 0 to xmlrec.ChildNodes.Count - 1 do begin
-    If ALSametext(xmlrec.ChildNodes[I].NodeName, NodeName) and
-       ALSametext(xmlrec.ChildNodes[I].Attributes[AttributeName], AttributeValue) then begin
+    If ALSameTextA(xmlrec.ChildNodes[I].NodeName, NodeName) and
+       ALSameTextA(xmlrec.ChildNodes[I].Attributes[AttributeName], AttributeValue) then begin
       result := xmlrec.ChildNodes[I];
       break;
     end;
@@ -3822,6 +3823,6 @@ Begin
 end;
 
 initialization
-  vALDefaultNodeIndent := '  '; { 2 spaces }
+  ALDefaultXMLNodeIndent := '  '; { 2 spaces }
 
 end.

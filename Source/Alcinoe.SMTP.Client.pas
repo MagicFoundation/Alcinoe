@@ -65,7 +65,7 @@ type
       Function Auth(const AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType): AnsiString; virtual;
       Function Vrfy(const aUserName: AnsiString): AnsiString; virtual;
       Function MailFrom(const aSenderEmail: AnsiString): AnsiString; virtual;
-      Function RcptTo(aRcptNameLst: TALStrings): AnsiString; virtual;
+      Function RcptTo(aRcptNameLst: TALStringsA): AnsiString; virtual;
       Function Data(const aMailData: AnsiString): AnsiString; overload; virtual;
       Function Data(const aHeader, aBody: AnsiString): AnsiString; overload; virtual;
       Function Data(aHeader:TALEmailHeader; const aBody: AnsiString): AnsiString; overload; virtual;
@@ -77,21 +77,21 @@ type
       procedure SendMail(const aHost: AnsiString;
                          APort: integer;
                          const aSenderEmail: AnsiString;
-                         aRcptNameLst: TALStrings;
+                         aRcptNameLst: TALStringsA;
                          const AUserName, APassword: AnsiString;
                          aAuthType: TalSmtpClientAuthType;
                          const aMailData: AnsiString); overload; virtual;
       procedure SendMail(const aHost: AnsiString;
                          APort: integer;
                          const aSenderEmail: AnsiString;
-                         aRcptNameLst: TALStrings;
+                         aRcptNameLst: TALStringsA;
                          const AUserName, APassword: AnsiString;
                          aAuthType: TalSmtpClientAuthType;
                          const aHeader, aBody: AnsiString); overload; virtual;
       procedure SendMailMultipartMixed(const aHost: AnsiString;
                                        APort: integer;
                                        const aSenderEmail: AnsiString;
-                                       aRcptNameLst: TALStrings;
+                                       aRcptNameLst: TALStringsA;
                                        const AUserName, APassword: AnsiString;
                                        aAuthType: TalSmtpClientAuthType;
                                        aHeader: TALEmailHeader;
@@ -112,6 +112,7 @@ Uses
   Winapi.Windows,
   System.Classes,
   System.SysUtils,
+  System.AnsiStrings,
   Alcinoe.WinSock,
   Alcinoe.Common,
   Alcinoe.StringUtils;
@@ -210,10 +211,10 @@ end;
 Function TAlSmtpClient.GetAuthTypeFromEhloResponse(const EhloResponse: AnsiString): TAlSmtpClientAuthTypeSet;
 var k, J: Integer;
     Str1, Str2: AnsiString;
-    Lst: TALStringList;
+    Lst: TALStringListA;
 begin
   Result := [];
-  Lst := TALStringList.Create;
+  Lst := TALStringListA.Create;
   Try
     Lst.Text := AlUpperCase(ALTrim(EhloResponse));
     For j := 0 to Lst.Count - 1 do begin
@@ -222,10 +223,10 @@ begin
       Str2 := AlCopyStr(Str1, 1, 5); //AUTH=
       if (str2='AUTH ') or (Str2='AUTH=') then begin
         Str1 := AlCopyStr(Str1, 6, maxint); //LOGIN
-        Str1 := AlStringReplace(Str1, '=', ' ', [rfReplaceAll]); //LOGIN
+        Str1 := ALStringReplaceA(Str1, '=', ' ', [rfReplaceAll]); //LOGIN
         while (str1 <> '') do begin
 
-          K := AlPos(' ', Str1);
+          K := ALPosA(' ', Str1);
           if K <= 0 then begin
             Str2 := ALTrim(Str1);
             Str1 := '';
@@ -283,7 +284,7 @@ end;
 Function TAlSmtpClient.MailFrom(const aSenderEmail: AnsiString): AnsiString;
 begin
   If aSenderEmail = '' then raise EALException.Create('Sender email is empty');
-  If AlPos(#13#10,aSenderEmail) > 0 then raise EALException.Create('Sender email is invalid');
+  If ALPosA(#13#10,aSenderEmail) > 0 then raise EALException.Create('Sender email is invalid');
   Result := SendCmd('MAIL From:<'+aSenderEmail+'>',[250]);
 end;
 
@@ -336,7 +337,7 @@ end;
 {*************************************************************************}
 {This command is used to identify an individual recipient of the mail data;
  multiple recipients are specified by multiple use of this command.}
-Function TAlSmtpClient.RcptTo(aRcptNameLst: TALStrings): AnsiString;
+Function TAlSmtpClient.RcptTo(aRcptNameLst: TALStringsA): AnsiString;
 Var I: integer;
     LRcptNameValue: AnsiString;
 begin
@@ -344,7 +345,7 @@ begin
   if aRcptNameLst.Count <= 0 then raise EALException.Create('RcptName list is empty');
   For I := 0 to aRcptNameLst.Count - 1 do begin
     LRcptNameValue := ALTrim(aRcptNameLst[I]);
-    If (LRcptNameValue = '') or (AlPos(#13#10,LRcptNameValue) > 0) then raise EALException.Create('Bad entry in RcptName list');
+    If (LRcptNameValue = '') or (ALPosA(#13#10,LRcptNameValue) > 0) then raise EALException.Create('Bad entry in RcptName list');
     Result := Result + SendCmd('RCPT To:<'+LRcptNameValue+'>',[250, 251]) + #13#10;
   end;
   If result <> '' then delete(Result,Length(Result)-1,2);
@@ -473,7 +474,7 @@ end;
 procedure TAlSmtpClient.SendMail(const aHost: AnsiString;
                                  APort: integer;
                                  const aSenderEmail: AnsiString;
-                                 aRcptNameLst: TALStrings;
+                                 aRcptNameLst: TALStringsA;
                                  const AUserName, APassword: AnsiString;
                                  aAuthType: TalSmtpClientAuthType;
                                  const aMailData: AnsiString);
@@ -500,7 +501,7 @@ end;
 procedure TAlSmtpClient.SendMail(const aHost: AnsiString;
                                  APort: integer;
                                  const aSenderEmail: AnsiString;
-                                 aRcptNameLst: TALStrings;
+                                 aRcptNameLst: TALStringsA;
                                  const AUserName, APassword: AnsiString;
                                  aAuthType: TalSmtpClientAuthType;
                                  const aHeader, aBody: AnsiString);
@@ -527,7 +528,7 @@ end;
 procedure TAlSmtpClient.SendMailMultipartMixed(const aHost: AnsiString;
                                                APort: integer;
                                                const aSenderEmail: AnsiString;
-                                               aRcptNameLst: TALStrings;
+                                               aRcptNameLst: TALStringsA;
                                                const AUserName, APassword: AnsiString;
                                                aAuthType: TalSmtpClientAuthType;
                                                aHeader: TALEmailHeader;
@@ -658,7 +659,7 @@ Var LBuffStr: AnsiString;
     LResponse: AnsiString;
     LStatusCode: Integer;
     LGoodResponse: Boolean;
-    LLst : TALStringList;
+    LLst : TALStringListA;
     P: PAnsiChar;
     i, j: integer;
 
@@ -684,7 +685,7 @@ begin
      begin with the reply code, followed immediately by a hyphen, "-" (also known as minus),
      followed by text. The last line will begin with the reply code, followed immediately
      by <SP>, optionally some text, and <CRLF>.}
-    LLst := TALStringList.create;
+    LLst := TALStringListA.create;
     Try
       LLst.Text := LResponse;
       If LLst.count = 0 then raise EALException.Create('Emtpy response');

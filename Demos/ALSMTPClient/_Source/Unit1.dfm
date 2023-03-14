@@ -2,25 +2,23 @@ object Form1: TForm1
   Left = 485
   Top = 214
   Caption = 'SMTP Test'
-  ClientHeight = 564
-  ClientWidth = 593
+  ClientHeight = 563
+  ClientWidth = 589
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
-  OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 13
   object MsgMemo: TMemo
     Left = 0
     Top = 191
-    Width = 593
+    Width = 589
     Height = 120
     Hint = 'Enter the message text in this memo'
     Align = alTop
@@ -34,12 +32,13 @@ object Form1: TForm1
     ScrollBars = ssBoth
     ShowHint = True
     TabOrder = 0
+    ExplicitWidth = 593
   end
   object DisplayMemo: TMemo
     Left = 0
     Top = 394
-    Width = 593
-    Height = 170
+    Width = 589
+    Height = 169
     Hint = 'This memo shows info messages'
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
@@ -53,14 +52,17 @@ object Form1: TForm1
     ScrollBars = ssBoth
     ShowHint = True
     TabOrder = 2
+    ExplicitWidth = 593
+    ExplicitHeight = 170
   end
   object ToolsPanel: TPanel
     Left = 0
     Top = 0
-    Width = 593
+    Width = 589
     Height = 191
     Align = alTop
     TabOrder = 3
+    ExplicitWidth = 593
     object Label1: TLabel
       Left = 22
       Top = 11
@@ -390,10 +392,11 @@ object Form1: TForm1
   object AttachPanel: TPanel
     Left = 0
     Top = 311
-    Width = 593
+    Width = 589
     Height = 17
     Align = alTop
     TabOrder = 4
+    ExplicitWidth = 593
     object Label6: TLabel
       Left = 16
       Top = 2
@@ -405,7 +408,7 @@ object Form1: TForm1
   object FileAttachMemo: TMemo
     Left = 0
     Top = 328
-    Width = 593
+    Width = 589
     Height = 49
     Hint = 'Enter the attached file path, one per line'
     Align = alTop
@@ -419,14 +422,16 @@ object Form1: TForm1
     ScrollBars = ssVertical
     ShowHint = True
     TabOrder = 1
+    ExplicitWidth = 593
   end
   object InfoPanel: TPanel
     Left = 0
     Top = 377
-    Width = 593
+    Width = 589
     Height = 17
     Align = alTop
     TabOrder = 5
+    ExplicitWidth = 593
     object Label7: TLabel
       Left = 16
       Top = 2

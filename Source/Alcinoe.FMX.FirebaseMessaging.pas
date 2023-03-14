@@ -272,7 +272,7 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALFirebaseMessagingTokenRefreshEvent = procedure(const aToken: String) of object;
-  TALFirebaseMessagingMessageReceivedEvent = procedure(const aPayload: TAlStringListU) of object;
+  TALFirebaseMessagingMessageReceivedEvent = procedure(const aPayload: TALStringListW) of object;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALFirebaseMessaging = class(TObject)
@@ -384,8 +384,8 @@ type
     class procedure StartupNotificationMessageHandler(const Sender: TObject; const M: TMessage);
     class procedure DeliverStartupNotificationMessages;
     procedure doTokenRefresh(const aToken: String);
-    procedure doMessageReceived(const aPayload: TAlStringListU); overload;
-    procedure doMessageReceived(const aPayload: TALJsonNodeU); overload;
+    procedure doMessageReceived(const aPayload: TALStringListW); overload;
+    procedure doMessageReceived(const aPayload: TALJSONNodeW); overload;
     procedure doMessageReceived(const aPayload: String); overload;
   public
     const MessageIdKeys: Array[0..2] of String = ('google.message_id','gcm.message_id','fcm_options.gcm.message_id');
@@ -708,7 +708,7 @@ begin
 end;
 
 {*******************************************************************************}
-procedure TALFirebaseMessaging.doMessageReceived(const aPayload: TAlStringListU);
+procedure TALFirebaseMessaging.doMessageReceived(const aPayload: TALStringListW);
 begin
   if assigned(fOnMessageReceived) then begin
     //under ios, when the app is not running and the user click on an alert notification
@@ -741,11 +741,11 @@ begin
 end;
 
 {*****************************************************************************}
-procedure TALFirebaseMessaging.doMessageReceived(const aPayload: TALJsonNodeU);
+procedure TALFirebaseMessaging.doMessageReceived(const aPayload: TALJSONNodeW);
 begin
-  var LPayload := TalStringListU.Create;
+  var LPayload := TALStringListW.Create;
   try
-    ALJSONToTStringsU(aPayload, LPayload);
+    ALJSONToTStringsW(aPayload, LPayload);
     doMessageReceived(LPayload);
   finally
     alFreeAndNil(LPayload);
@@ -754,7 +754,7 @@ end;
 {***********************************************************************}
 procedure TALFirebaseMessaging.doMessageReceived(const aPayload: String);
 begin
-  var LJsonDoc := TalJsonDocumentU.create;
+  var LJsonDoc := TALJSONDocumentW.create;
   try
     LJsonDoc.LoadFromJSONString(aPayload);
     doMessageReceived(LJsonDoc.Node);
@@ -806,7 +806,7 @@ begin
     end;
   end;
   if LBundle = nil then exit;
-  var LJsonDoc := TALJsonDocumentU.Create;
+  var LJsonDoc := TALJSONDocumentW.Create;
   try
     var LIterator := LBundle.keySet.iterator;
     while LIterator.hasNext do begin
@@ -860,7 +860,7 @@ begin
   if length(LtmpStartupNotificationMessages) > 0 then begin
     for var LStartupNotificationMessage in LtmpStartupNotificationMessages do begin
       if LStartupNotificationMessage = '' then continue;
-      var LJsonDoc := TalJsonDocumentU.create;
+      var LJsonDoc := TALJSONDocumentW.create;
       try
 
         LJsonDoc.LoadFromJSONString(LStartupNotificationMessage);
@@ -1010,7 +1010,7 @@ begin
   // app is allowed to do.
 
   {$IFDEF DEBUG}
-  allog('TALFirebaseMessaging.UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler', 'granted: ' + ALBoolToStrU(granted), TalLogType.verbose);
+  allog('TALFirebaseMessaging.UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler', 'granted: ' + ALBoolToStrW(granted), TalLogType.verbose);
   {$ENDIF}
 
  if (not granted) then begin
@@ -1063,7 +1063,7 @@ end;
 procedure TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter(center: UNUserNotificationCenter; notification: UNNotification; completionHandler: Pointer);
 var LImp: procedure(aOptions: UNNotificationPresentationOptions); cdecl;
 begin
-  var LJsonDoc := TalJsonDocumentU.create;
+  var LJsonDoc := TALJSONDocumentW.create;
   try
 
     var LJsonStr := _NSDictionaryToJSON(notification.request.content.userInfo);
@@ -1090,7 +1090,7 @@ end;
 procedure TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter(center: UNUserNotificationCenter; response: UNNotificationResponse; completionHandler: Pointer); cdecl;
 var LImp: procedure(); cdecl;
 begin
-  var LJsonDoc := TalJsonDocumentU.create;
+  var LJsonDoc := TALJSONDocumentW.create;
   try
     var LJsonStr := _NSDictionaryToJSON(response.notification.request.content.userInfo);
     if LJsonStr <> '' then LJsonDoc.LoadFromJSONString(LJsonStr);

@@ -1,12 +1,12 @@
 Alcinoe
 =======
 
-Alcinoe is a library of visual and non-visual components for
-Delphi. The components can be used in commercial as well as 
-shareware and freeware and open source projects without cost.
-Alcinoe is compatible with <b>Delphi Alexandria 11.3</b>. 
-Please "star" (like) this project in GitHub! It's cost 
-nothing but help to reference the code
+Alcinoe is a library of visual and non-visual components for 
+Delphi. These components can be used in commercial, shareware, 
+freeware, and open-source projects at no cost. Alcinoe is 
+compatible with Delphi Alexandria 11.3. If you find this 
+project useful, please consider giving it a 'star' on GitHub. 
+It doesn't cost anything, but it helps to promote the code.
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-24.jpg?raw=true" alt="like" />
 
@@ -22,38 +22,42 @@ Example of app made with Alcinoe
 Install Alcinoe
 ---------------
 
-In Alcinoe 1.0.2 there was a major unit renaming. You can use 
-the tool [UnitRenaming](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/UnitRenaming) 
-to automatically rename all old Alcinoe units in your project.
+We need some time to rename unit/class/function names. To 
+help you automatically perform this renaming task in your 
+project to the latest version of Alcinoe, we provide you 
+with the tool called CodeRenaming. You can find this tool 
+at the following link: [CodeRenaming](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/CodeRenaming).
 
-If you plan to use FMX (Firemonkey) framework with Alcinoe 
-you will need to patch the original delphi source code. 
-To do this you will need to go in [{alcinoe}\Embarcadero\Alexandria\11_2](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_2/)
-and run [update.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_2/update.bat) 
-to retrieve and patch the original delphi source code. The 
-batch file assume that the original source code is located 
-in "c:\Program Files (x86)\Embarcadero\Studio\22.0\source\" 
-and that you have GIT in your path. Later you will need to 
-include in your project search path all subdirectories 
-located in [{alcinoe}\Embarcadero\Alexandria\11_2](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_2/).
+If you plan to use the FMX (FireMonkey) framework with 
+Alcinoe, you will need to patch the original Delphi 
+source code. To do this, you need to go to [{alcinoe}\Embarcadero\Alexandria\11_3](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_3/) 
+and run [update.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_3/update.bat) 
+to retrieve and patch the original Delphi source code. 
+The batch file assumes that the original source code is 
+located in c:\Program Files (x86)\Embarcadero\Studio\22.0\source\ 
+and that you have GIT in your path. Later, you will need to 
+include all subdirectories located in [{alcinoe}\Embarcadero\Alexandria\11_3](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_3/).
+in your project search path.
 
-You will need to run [CompileAll.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/CompileAll.bat)
-to download the iOS/Android libraries, to build the Alcinoe Jars, 
-to build the BPL, to build all tools located in [{alcinoe}\Tools](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/)
-and finally to build all demos located in [{alcinoe}\Demos](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/).
-NOTE: Some demos use [devexpress](https://www.devexpress.com/)
+You will also need to run [CompileAll.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/CompileAll.bat) 
+to download the iOS/Android libraries, build the 
+Alcinoe Jars, build the BPL, build all tools located 
+in [{alcinoe}\Tools](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/), 
+and finally build all demos located in [{alcinoe}\Demos](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/). 
+Note that some demos use [devexpress](https://www.devexpress.com/).
 
 If you don't plan to use any Alcinoe visual components at 
-design time, then you don't need to install anything, just 
-add [{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) 
-in the search path of your project. 
+design time, you don't need to install anything. Just add 
+[{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) 
+to the search path of your project.
 
-Else if you want to use visual components at design time then 
-you need to install the bpl. Launch Delphi and go in 
-component > Install Packages... > and choose the BPL located 
+However, if you want to use visual components at design time, 
+you need to install the BPL. Launch Delphi and go to 
+Component > Install Packages... > and choose the BPL located 
 in [{alcinoe}\Libraries\bpl\Alcinoe\Win32\Alexandria\AlcinoeAlexandria.bpl](https://github.com/MagicFoundation/Alcinoe/tree/master/Libraries/bpl/Alcinoe/Win32/Alexandria). 
-You also need to add in your search path [{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) 
-and all subdirectories located in [{alcinoe}\Embarcadero\Alexandria\11_2](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_2/).
+You also need to add [{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) 
+and all subdirectories located in [{alcinoe}\Embarcadero\Alexandria\11_3](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_3/) 
+to your search path.
 
 
 AndroidMerger: Integrate AAR SDK in FMX Android app
@@ -328,12 +332,12 @@ Learn more at [{alcinoe}\Demos\ALFmxFilterEffects](https://github.com/MagicFound
 Json Parser
 -----------
 
-TALJsonDocument is a Delphi parser/writer for JSON / BSON data
+TALJSONDocumentA is a Delphi parser/writer for JSON / BSON data
 format. it's support DOM and SAX parser (Note a better name could 
 be SAJ for Simple API for JSON instead of SAX for Simple API for XML 
 but as the concept of SAX is well know I keep this name), support 
 BSON format, and use a similar syntax than TALXMLDocument / TXMLDocument.
-TALJsonDocument can also export Json / Bson data in TALStringList.
+TALJSONDocumentA can also export Json / Bson data in TALStringListA.
 
 Example :
 
@@ -451,13 +455,13 @@ poll the server for a reply. Learn more at [{alcinoe}\Demos\ALWinHTTPWebSocketCl
 Fast TStringList
 ----------------
 
-TALStringList Work the same as Delphi TStringList except that it's
+TALStringListA Work the same as Delphi TStringList except that it's
 allow to search a name=value using a quicksort algorithm when the
-list is sorted. Also TALStringList use a locale independent
+list is sorted. Also TALStringListA use a locale independent
 algorithm (based on the 8-bit ordinal value of each character)
 instead of the AnsiCompareText and AnsiCompareStr used by the
-Delphi TStringList. at the end the sort in TALStringList is up to
-10x more faster than in Delphi TStringList. Also TALStringList is
+Delphi TStringList. at the end the sort in TALStringListA is up to
+10x more faster than in Delphi TStringList. Also TALStringListA is
 not an Unicode TStringList but an 100% Ansi StringList. You can 
 start exploring this feature with the demo located at 
 [{alcinoe}\Demos\ALSortedListBenchmark](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALSortedListBenchmark)
@@ -569,7 +573,7 @@ like a "framework" to help fully support of 8bit string
 
 You can also go in /demo/ALStringBenchMark/ to find an 
 application to benchmark ansiString vs Unicode String and 
-in /demo/ALSortedList/ to see the benchmark of TALStringList 
+in /demo/ALSortedList/ to see the benchmark of TALStringListA 
 (ansiString) vs TStringList (UnicodeString). In fact, most 
 of the Unicode function (when they are implemented correctly, 
 thanks to fastcode) will be close to the same speed as their 

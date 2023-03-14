@@ -81,51 +81,51 @@ uses Alcinoe.FBX.Base,
 {$R *.dfm}
 
 {****************************************************************************************************************************}
-function SQLFastTagReplaceFunct(const TagString: AnsiString; TagParams: TALStrings; ExtData: pointer; Var Handled: Boolean): AnsiString;
+function SQLFastTagReplaceFunct(const TagString: AnsiString; TagParams: TALStringsA; ExtData: pointer; Var Handled: Boolean): AnsiString;
 Var aMin, aMax, aIndex: integer;
-    aLstSavedData: TALStringList;
+    aLstSavedData: TALStringListA;
 begin
 
   Handled := True;
-  if ALSameText(TagString,'randomchar') then begin
+  if ALSameTextA(TagString,'randomchar') then begin
     if not ALTryStrToInt(TagParams.Values['Index'], aIndex) then aIndex := -1;
     if aIndex >= 0 then begin
-      aLstSavedData := TALStringList(ExtData^);
-      result := aLstSavedData.Values['randomchar_'+ALIntToStr(aIndex)];
+      aLstSavedData := TALStringListA(ExtData^);
+      result := aLstSavedData.Values['randomchar_'+ALIntToStrA(aIndex)];
       if result = '' then begin
-        result := AlRandomStr(1);
-        aLstSavedData.Values['randomchar_'+ALIntToStr(aIndex)] := result;
+        result := ALRandomStrA(1);
+        aLstSavedData.Values['randomchar_'+ALIntToStrA(aIndex)] := result;
       end;
     end
-    else result := AlRandomStr(1);
+    else result := ALRandomStrA(1);
   end
-  else if ALSameText(TagString,'randomstring') then begin
+  else if ALSameTextA(TagString,'randomstring') then begin
     if not ALTryStrToInt(TagParams.Values['MinLength'], aMin) then aMin := 1;
     if not ALTryStrToInt(TagParams.Values['MaxLength'], aMax) then aMax := 255;
     if not ALTryStrToInt(TagParams.Values['Index'], aIndex) then aIndex := -1;
     if aIndex >= 0 then begin
-      aLstSavedData := TALStringList(ExtData^);
-      result := aLstSavedData.Values['randomstring_'+ALIntToStr(aIndex)];
+      aLstSavedData := TALStringListA(ExtData^);
+      result := aLstSavedData.Values['randomstring_'+ALIntToStrA(aIndex)];
       if result = '' then begin
-        result := AlRandomStr(aMin + random(aMax - aMin + 1));
-        aLstSavedData.Values['randomstring_'+ALIntToStr(aIndex)] := result;
+        result := ALRandomStrA(aMin + random(aMax - aMin + 1));
+        aLstSavedData.Values['randomstring_'+ALIntToStrA(aIndex)] := result;
       end;
     end
-    else result := AlRandomStr(aMin + random(aMax - aMin + 1));
+    else result := ALRandomStrA(aMin + random(aMax - aMin + 1));
   end
-  else if ALSameText(TagString,'randomnumber') then begin
+  else if ALSameTextA(TagString,'randomnumber') then begin
     if not ALTryStrToInt(TagParams.Values['Min'], aMin) then aMin := 1;
     if not ALTryStrToInt(TagParams.Values['Max'], aMax) then aMax := Maxint;
     if not ALTryStrToInt(TagParams.Values['Index'], aIndex) then aIndex := -1;
     if aIndex >= 0 then begin
-      aLstSavedData := TALStringList(ExtData^);
-      result := aLstSavedData.Values['randomnumber_'+ALIntToStr(aIndex)];
+      aLstSavedData := TALStringListA(ExtData^);
+      result := aLstSavedData.Values['randomnumber_'+ALIntToStrA(aIndex)];
       if result = '' then begin
-        result := ALIntToStr(aMin + random(aMax - aMin + 1));
-        aLstSavedData.Values['randomnumber_'+ALIntToStr(aIndex)] := result;
+        result := ALIntToStrA(aMin + random(aMax - aMin + 1));
+        aLstSavedData.Values['randomnumber_'+ALIntToStrA(aIndex)] := result;
       end;
     end
-    else result := ALIntToStr(aMin + random(aMax - aMin + 1));
+    else result := ALIntToStrA(aMin + random(aMax - aMin + 1));
   end
   else Handled := False;
 
@@ -252,18 +252,18 @@ begin
   Try
 
     aTPB:= ALTrim(AnsiString(ALMemoFireBirdTPB.Lines.Text));
-    aTPB := AlStringReplace(aTPB, 'isc_tpb_version3', isc_tpb_version3, [rfIgnoreCase]);
-    aTPB := AlStringReplace(aTPB, 'isc_tpb_read_committed', isc_tpb_read_committed, [rfIgnoreCase]);
-    aTPB := AlStringReplace(aTPB, 'isc_tpb_concurrency', isc_tpb_concurrency, [rfIgnoreCase]);
-    aTPB := AlStringReplace(aTPB, 'isc_tpb_consistency', isc_tpb_consistency, [rfIgnoreCase]);
-    aTPB := AlStringReplace(aTPB, 'isc_tpb_no_rec_version', isc_tpb_no_rec_version, [rfIgnoreCase]);
-    aTPB := AlStringReplace(aTPB, 'isc_tpb_rec_version', isc_tpb_rec_version, [rfIgnoreCase]);
-    aTPB := AlStringReplace(aTPB, 'isc_tpb_write', isc_tpb_write, [rfIgnoreCase]);
-    aTPB := AlStringReplace(aTPB, 'isc_tpb_read', isc_tpb_read, [rfIgnoreCase]);
-    aTPB := AlStringReplace(aTPB, 'isc_tpb_nowait', isc_tpb_nowait, [rfIgnoreCase]);
-    aTPB := AlStringReplace(aTPB, 'isc_tpb_wait', isc_tpb_wait, [rfIgnoreCase]);
-    aTPB := AlStringReplace(aTPB, #13#10, '', [rfReplaceALL]);
-    aTPB := AlStringReplace(aTPB, ' ', '', [rfReplaceALL]);
+    aTPB := ALStringReplaceA(aTPB, 'isc_tpb_version3', isc_tpb_version3, [rfIgnoreCase]);
+    aTPB := ALStringReplaceA(aTPB, 'isc_tpb_read_committed', isc_tpb_read_committed, [rfIgnoreCase]);
+    aTPB := ALStringReplaceA(aTPB, 'isc_tpb_concurrency', isc_tpb_concurrency, [rfIgnoreCase]);
+    aTPB := ALStringReplaceA(aTPB, 'isc_tpb_consistency', isc_tpb_consistency, [rfIgnoreCase]);
+    aTPB := ALStringReplaceA(aTPB, 'isc_tpb_no_rec_version', isc_tpb_no_rec_version, [rfIgnoreCase]);
+    aTPB := ALStringReplaceA(aTPB, 'isc_tpb_rec_version', isc_tpb_rec_version, [rfIgnoreCase]);
+    aTPB := ALStringReplaceA(aTPB, 'isc_tpb_write', isc_tpb_write, [rfIgnoreCase]);
+    aTPB := ALStringReplaceA(aTPB, 'isc_tpb_read', isc_tpb_read, [rfIgnoreCase]);
+    aTPB := ALStringReplaceA(aTPB, 'isc_tpb_nowait', isc_tpb_nowait, [rfIgnoreCase]);
+    aTPB := ALStringReplaceA(aTPB, 'isc_tpb_wait', isc_tpb_wait, [rfIgnoreCase]);
+    aTPB := ALStringReplaceA(aTPB, #13#10, '', [rfReplaceALL]);
+    aTPB := ALStringReplaceA(aTPB, ' ', '', [rfReplaceALL]);
 
     FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                     -1,
@@ -332,12 +332,12 @@ var aIOStats_1: TALFBXClientMonitoringIOStats;
     aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
     aTickCount: UInt64;
     aSQl: AnsiString;
-    aLst: TALStringList;
+    aLst: TALStringListA;
 begin
 
-  aLst := TALStringList.create;
+  aLst := TALStringListA.create;
   try
-    aSQl := ALFastTagReplace(AnsiString(AlMemoFireBirdQuery.Lines.Text),
+    aSQl := ALFastTagReplaceA(AnsiString(AlMemoFireBirdQuery.Lines.Text),
                              '<#',
                              '>',
                              SQLFastTagReplaceFunct,
@@ -393,7 +393,7 @@ end;
 {************************************************************}
 procedure TForm1.ALButtonFirebirdSelectClick(Sender: TObject);
 var aXMLDATA: TalXmlDocument;
-    aFormatSettings: TALFormatSettings;
+    aFormatSettings: TALFormatSettingsA;
     aQuery: TALFBXClientSelectDataQuery;
     aIOStats_1: TALFBXClientMonitoringIOStats;
     aRecordStats_1: TALFBXClientMonitoringRecordStats;
@@ -401,11 +401,11 @@ var aXMLDATA: TalXmlDocument;
     aRecordStats_2: TALFBXClientMonitoringRecordStats;
     aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
     aTickCount: UInt64;
-    aLst1: TALStringList;
+    aLst1: TALStringListA;
     i: integer;
 begin
 
-  aFormatSettings := ALDefaultFormatSettings;
+  aFormatSettings := ALDefaultFormatSettingsA;
   aXMLDATA := TALXmlDocument.create('root');
   Try
 
@@ -414,10 +414,10 @@ begin
       ParseOptions := [poPreserveWhiteSpace];
     end;
 
-    aLst1 := TALStringList.create;
+    aLst1 := TALStringListA.create;
     try
       aQuery := TALFBXClientSelectDataQuery.Create;
-      aQuery.SQL := ALFastTagReplace(AnsiString(AlMemoFireBirdQuery.Lines.Text),
+      aQuery.SQL := ALFastTagReplaceA(AnsiString(AlMemoFireBirdQuery.Lines.Text),
                                      '<#',
                                      '>',
                                      SQLFastTagReplaceFunct,
@@ -430,9 +430,9 @@ begin
     if ALMemoFireBirdParams.Lines.Count > 0 then begin
       Setlength(aQuery.Params, ALMemoFireBirdParams.Lines.Count);
       for I := 0 to ALMemoFireBirdParams.Lines.Count - 1 do begin
-        aLst1 := TALStringList.create;
+        aLst1 := TALStringListA.create;
         try
-          aQuery.Params[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
+          aQuery.Params[i].Value := ALFastTagReplaceA(AnsiString(ALMemoFireBirdParams.Lines[i]),
                                                      '<#',
                                                      '>',
                                                      SQLFastTagReplaceFunct,
@@ -508,14 +508,14 @@ var aQuery: TALFBXClientUpdateDataQuery;
     aRecordStats_2: TALFBXClientMonitoringRecordStats;
     aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
     aTickCount: UInt64;
-    aLst1: TALStringList;
+    aLst1: TALStringListA;
     i: integer;
 begin
 
-  aLst1 := TALStringList.create;
+  aLst1 := TALStringListA.create;
   try
     aQuery := TALFBXClientUpdateDataQuery.Create;
-    aQuery.SQL := ALFastTagReplace(AnsiString(AlMemoFireBirdQuery.Lines.Text),
+    aQuery.SQL := ALFastTagReplaceA(AnsiString(AlMemoFireBirdQuery.Lines.Text),
                                    '<#',
                                    '>',
                                    SQLFastTagReplaceFunct,
@@ -528,9 +528,9 @@ begin
   if ALMemoFireBirdParams.Lines.Count > 0 then begin
     Setlength(aQuery.Params, ALMemoFireBirdParams.Lines.Count);
     for I := 0 to ALMemoFireBirdParams.Lines.Count - 1 do begin
-      aLst1 := TALStringList.create;
+      aLst1 := TALStringListA.create;
       try
-        aQuery.Params[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
+        aQuery.Params[i].Value := ALFastTagReplaceA(AnsiString(ALMemoFireBirdParams.Lines[i]),
                                                    '<#',
                                                    '>',
                                                    SQLFastTagReplaceFunct,

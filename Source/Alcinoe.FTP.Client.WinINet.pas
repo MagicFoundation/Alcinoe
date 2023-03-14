@@ -297,7 +297,7 @@ procedure TALWinInetFTPClient.Connect;
   Function InternalGetProxyServerName: PAnsiChar;
   Begin
     If (ProxyParams.ProxyServer = '') then result := nil
-    else result := PAnsiChar(ProxyParams.ProxyServer + ':' + ALIntToStr(ProxyParams.ProxyPort));
+    else result := PAnsiChar(ProxyParams.ProxyServer + ':' + ALIntToStrA(ProxyParams.ProxyPort));
   end;
 
   {-----------------------------------------}

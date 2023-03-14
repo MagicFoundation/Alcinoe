@@ -2629,9 +2629,9 @@ function  ALDrawMultiLineText(const aText: String; // support only those html ta
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _getInfosFromTag(const aTag: String; // color="#ffffff" id="xxx"
-                             const aSpanIds: TalStringlistU;
+                             const aSpanIds: TALStringListW;
                              const aFontColors: Tlist<TalphaColor>);
-  var LParamList: TAlStringListU;
+  var LParamList: TALStringListW;
       LcolorInt: integer;
       S1: String;
   begin
@@ -2643,10 +2643,10 @@ function  ALDrawMultiLineText(const aText: String; // support only those html ta
       exit;
     end;
 
-    LParamList := TALStringListU.Create;
+    LParamList := TALStringListW.Create;
     try
 
-      ALExtractHeaderFieldsWithQuoteEscapedU([' ', #9, #13, #10],
+      ALExtractHeaderFieldsWithQuoteEscaped([' ', #9, #13, #10],
                                              [' ', #9, #13, #10],
                                              ['"', ''''],
                                              PChar(aTag),
@@ -2662,7 +2662,7 @@ function  ALDrawMultiLineText(const aText: String; // support only those html ta
         if S1[low(S1)] = '#' then begin
           S1[low(S1)] := '$';
           if length(S1) = 7 then insert('ff', S1, 2); // $ffffffff
-          if not ALTryStrTointU(S1, LcolorInt) then begin
+          if not ALTryStrToInt(S1, LcolorInt) then begin
             if aFontColors.Count > 0 then aFontColors.Add(aFontColors[aFontColors.Count - 1])
             else aFontColors.Add(aOptions.FontColor);
           end
@@ -2688,7 +2688,7 @@ function  ALDrawMultiLineText(const aText: String; // support only those html ta
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _getInfosFromImg(const aTag: String; // src="xxx"
                              var aSrc: String);
-  var LParamList: TAlStringListU;
+  var LParamList: TALStringListW;
   begin
 
     if aTag = '' then begin
@@ -2696,10 +2696,10 @@ function  ALDrawMultiLineText(const aText: String; // support only those html ta
       exit;
     end;
 
-    LParamList := TALStringListU.Create;
+    LParamList := TALStringListW.Create;
     try
 
-      ALExtractHeaderFieldsWithQuoteEscapedU([' ', #9, #13, #10],
+      ALExtractHeaderFieldsWithQuoteEscaped([' ', #9, #13, #10],
                                              [' ', #9, #13, #10],
                                              ['"', ''''],
                                              PChar(aTag),
@@ -2748,7 +2748,7 @@ var {$IF defined(ANDROID)}
     LMaxHeight: Single;
     LFontColors: Tlist<TalphaColor>;
     LFontColor: TalphaColor;
-    LSpanIDs: TalStringlistU;
+    LSpanIDs: TALStringListW;
     LSpanID: String;
     LFirstLineIndent: TpointF;
     LTmpRect: TrectF;
@@ -2809,7 +2809,7 @@ begin
     LBold := 0;
     LItalic := 0;
     LFontColors := Tlist<TalphaColor>.create;
-    LSpanIDs := TalStringlistU.create;
+    LSpanIDs := TALStringListW.create;
     LBreakedTextItems := TalBreakTextItems.Create(true{aOwnsObjects});
     try
 
@@ -2829,17 +2829,17 @@ begin
             //-----
             LCurrImgSrc := '';
             LCurrText := '';
-            P2 := AlposExU('>', aText, P1+1); // blablabla <font color="#ffffff">bliblibli</font> blobloblo
+            P2 := ALPosW('>', aText, P1+1); // blablabla <font color="#ffffff">bliblibli</font> blobloblo
                                               //           ^P1                  ^P2
             if P2 <= 0 then break;
-            LTag := AlCopyStrU(aText, P1, P2 - P1 + 1); // <font color="#ffffff">
+            LTag := ALCopyStr(aText, P1, P2 - P1 + 1); // <font color="#ffffff">
             P1 := P2 + 1; // blablabla <font color="#ffffff">bliblibli</font> blobloblo
                           //                                 ^P1
 
             //-----
-            if (alposU('<b ', LTag) = 1) or
+            if (ALPosW('<b ', LTag) = 1) or
                (LTag = '<b>') then begin
-              _getInfosFromTag(AlcopyStrU(LTag, 4, length(LTag) - 4), LSpanIDs, LFontColors);
+              _getInfosFromTag(ALCopyStr(LTag, 4, length(LTag) - 4), LSpanIDs, LFontColors);
               inc(LBold);
             end
             else if LTag = '</b>' then begin
@@ -2849,16 +2849,16 @@ begin
             end
 
             //-----
-            else if (alposU('<img ', LTag) = 1) or
+            else if (ALPosW('<img ', LTag) = 1) or
                     (LTag = '<img/>') then begin // <img src="xxx">
-              _getInfosFromImg(AlcopyStrU(LTag, 6, length(LTag) - 6), LCurrImgSrc);
+              _getInfosFromImg(ALCopyStr(LTag, 6, length(LTag) - 6), LCurrImgSrc);
               LCurrText := '⬛';
             end
 
             //-----
-            else if (alposU('<i ', LTag) = 1) or
+            else if (ALPosW('<i ', LTag) = 1) or
                     (LTag = '<i>') then begin
-              _getInfosFromTag(AlcopyStrU(LTag, 4, length(LTag) - 4), LSpanIDs, LFontColors);
+              _getInfosFromTag(ALCopyStr(LTag, 4, length(LTag) - 4), LSpanIDs, LFontColors);
               inc(LItalic)
             end
             else if LTag = '</i>' then begin
@@ -2868,9 +2868,9 @@ begin
             end
 
             //-----
-            else if (alposU('<font ', LTag) = 1) or
+            else if (ALPosW('<font ', LTag) = 1) or
                     (LTag = '<font>')  then begin   // <font color="#ffffff">
-              _getInfosFromTag(AlcopyStrU(LTag, 7, length(LTag) - 7), LSpanIDs, LFontColors);
+              _getInfosFromTag(ALCopyStr(LTag, 7, length(LTag) - 7), LSpanIDs, LFontColors);
             end
             else if LTag = '</font>' then begin
               if LSpanIDs.count > 0 then LSpanIDs.Delete(LSpanIDs.Count - 1);
@@ -2878,9 +2878,9 @@ begin
             end
 
             //-----
-            else if (alposU('<span ', LTag) = 1) or
+            else if (ALPosW('<span ', LTag) = 1) or
                     (LTag = '<span>') then begin // <span id="xxx">
-              _getInfosFromTag(AlcopyStrU(LTag, 7, length(LTag) - 7), LSpanIDs, LFontColors);
+              _getInfosFromTag(ALCopyStr(LTag, 7, length(LTag) - 7), LSpanIDs, LFontColors);
             end
             else if LTag = '</span>' then begin
               if LSpanIDs.count > 0 then LSpanIDs.Delete(LSpanIDs.Count - 1);
@@ -2894,12 +2894,12 @@ begin
           else begin
 
             LCurrImgSrc := '';
-            P2 := AlposExU('<', aText, P1);  // blablabla <font color="#ffffff">bliblibli</font> blobloblo
+            P2 := ALPosW('<', aText, P1);  // blablabla <font color="#ffffff">bliblibli</font> blobloblo
                                              //                                 ^P1      ^P2
             if P2 <= 0 then P2 := Maxint;
-            LCurrText := AlcopyStrU(aText, P1, P2 - P1);  // blablabla
-            LCurrText := ALStringReplaceU(LCurrText, '&gt;', '>', [rfReplaceALL]);
-            LCurrText := ALStringReplaceU(LCurrText, '&lt;', '<', [rfReplaceALL]);
+            LCurrText := ALCopyStr(aText, P1, P2 - P1);  // blablabla
+            LCurrText := ALStringReplaceW(LCurrText, '&gt;', '>', [rfReplaceALL]);
+            LCurrText := ALStringReplaceW(LCurrText, '&lt;', '<', [rfReplaceALL]);
             {$IFDEF IOS}
             //because of this http://stackoverflow.com/questions/41334425/ctframesettercreateframe-and-kctparagraphstylespecifierfirstlineheadindent
             if LWhiteSpace then LCurrText := ' ' + LCurrText;

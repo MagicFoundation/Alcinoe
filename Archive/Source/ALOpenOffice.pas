@@ -178,7 +178,7 @@ end;
 
 {****************************************************************************************}
 function HasUnoInterfaces(aObject: Variant; aInterfaceList: array of AnsiString): boolean;
-var LObjectInterfacesList: TALStringList;
+var LObjectInterfacesList: TALStringListA;
     LInterfaceName: AnsiString;
     LInspection: Variant;
     LInspectionMethods: Variant;
@@ -187,7 +187,7 @@ var LObjectInterfacesList: TALStringList;
     i, j: integer;
 begin
   result := false;
-  LObjectInterfacesList := TALStringlist.Create;
+  LObjectInterfacesList := TALStringListA.Create;
   try
     try
       LInspection := vALOpenOfficeIntrospection.inspect(aObject);
@@ -225,7 +225,7 @@ var LNumberOfProperties: integer;
 begin
   LNumberOfProperties := High(aPropertyList);
   if (not Odd(LNumberOfProperties)) or (LNumberOfProperties < 1) then
-    raise EALOpenOfficeException.CreateFmt('Wrong number of properties: %s', [ALIntToStr(LNumberOfProperties)]);
+    raise EALOpenOfficeException.CreateFmt('Wrong number of properties: %s', [ALIntToStrA(LNumberOfProperties)]);
 
   result := VarArrayCreate([0, LNumberOfProperties shr 1], varVariant);
   i := 0;
@@ -269,7 +269,7 @@ function OpenCalcDocument(const aFileName: AnsiString): Variant;
 var LArgs: Variant;
 begin
   LArgs := VarArrayCreate([0, 0], varVariant);
-  result := vALOpenOfficeStarDesktop.LoadComponentFromURL(String('file:///' + ALStringReplace(aFileName, '\', '/', [rfReplaceAll])),
+  result := vALOpenOfficeStarDesktop.LoadComponentFromURL(String('file:///' + ALStringReplaceA(aFileName, '\', '/', [rfReplaceAll])),
                                                           '_blank',
                                                           0,
                                                           LArgs);
@@ -383,7 +383,7 @@ begin
   LLowWinAddress := ALLowerCase(aWinAddress);
   LPrefix := '';
   for I := 1 to High(cALOpenOfficeUrlProtocols) do begin
-    if ALPos(cALOpenOfficeUrlProtocols[I], LLowWinAddress) = 1 then begin
+    if ALPosA(cALOpenOfficeUrlProtocols[I], LLowWinAddress) = 1 then begin
       aWinAddress := ALCopyStr(aWinAddress, Length(cALOpenOfficeUrlProtocols[I]) + 1, maxint);
       if I > 1 then LPrefix := cALOpenOfficeUrlProtocols[I];  // because prefix file:/// is possible to drop
       break;
@@ -391,7 +391,7 @@ begin
   end;
 
   if (Length(LPrefix) = 0) and
-     (ALPos('@', LLowWinAddress) > 0) then begin
+     (ALPosA('@', LLowWinAddress) > 0) then begin
     result := 'mailto:' + aWinAddress;
   end
   else begin
@@ -414,7 +414,7 @@ begin
   LLowUrlAddress := ALLowerCase(aUrlAddress);
   LPrefix := '';
   for I := 1 to High(cALOpenOfficeUrlProtocols) do begin
-    if ALPos(cALOpenOfficeUrlProtocols[I], LLowUrlAddress) = 1 then begin
+    if ALPosA(cALOpenOfficeUrlProtocols[I], LLowUrlAddress) = 1 then begin
       if I > 1 then begin
         aUrlAddress := ALCopyStr(aUrlAddress, Length(cALOpenOfficeUrlProtocols[I]) + 1, maxint);
         LPrefix := cALOpenOfficeUrlProtocols[I];
@@ -426,7 +426,7 @@ begin
   LFileContentService := CreateUnoService('com.sun.star.ucb.FileContentProvider');
   LWinAddress := AnsiString(LFileContentService.getSystemPathFromFileURL(String(aUrlAddress)));
   if Length(LPrefix) <> 0 then // backslash only with file:///
-    LWinAddress := ALStringReplace(LWinAddress, '\', '/', [rfReplaceAll]);
+    LWinAddress := ALStringReplaceA(LWinAddress, '\', '/', [rfReplaceAll]);
   if Length(LWinAddress) = 0 then
     raise EALOpenOfficeException.CreateFmt('Cannot get address from URL %s', [aUrlAddress]);
   result := LPrefix + LWinAddress;

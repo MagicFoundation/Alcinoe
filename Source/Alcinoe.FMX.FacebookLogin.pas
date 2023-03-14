@@ -8,7 +8,7 @@ Setup (ANDROID)
 
 https://developers.facebook.com/docs/facebook-login/android/
 
-1) follow the step described in ALFmxFacebookCore
+1) follow the step described in Alcinoe.FMX.FacebookCore
 
 2) On android you just need to include the library
      * com.facebook.android:facebook-login:15.2.0
@@ -39,7 +39,7 @@ Setup (IOS)
 
 https://developers.facebook.com/docs/facebook-login/ios/
 
-1) follow the step described in ALFmxFacebookCore
+1) follow the step described in Alcinoe.FMX.FacebookCore
 
 *******************************************************************************)
 unit Alcinoe.FMX.FacebookLogin;
@@ -611,11 +611,11 @@ end;
 Function _ExtractNameValue(const S: String; var aName, aValue: String): Boolean;
 Var P1: Integer;
 begin
-  P1 := AlPosU('=',S);
+  P1 := ALPosW('=',S);
   if P1 > 0 then begin
     result := True;
-    aName := AlCopyStrU(S,1,P1-1);
-    aValue := AlCopyStrU(S, P1+1, maxint);
+    aName := ALCopyStr(S,1,P1-1);
+    aValue := ALCopyStr(S, P1+1, maxint);
   end
   else begin
     Result := False;
@@ -643,7 +643,7 @@ begin
     LBundle.putString(LJName, LJValue);
   end;
   var LJHttpMethod: JHttpMethod;
-  if AlSameTextU(aHttpMethod, 'POST') then LJHttpMethod := TJHttpMethod.JavaClass.POST
+  if ALSameTextW(aHttpMethod, 'POST') then LJHttpMethod := TJHttpMethod.JavaClass.POST
   else LJHttpMethod := TJHttpMethod.JavaClass.GET;
   var LGraphRequest := TJGraphRequest.JavaClass.init(TJAccessToken.JavaClass.getCurrentAccessToken, StringToJstring(aGraphPath), LBundle, LJHttpMethod, FGraphRequestCallback);
   LGraphRequest.executeAsync;
@@ -709,7 +709,7 @@ begin
   allog(
     'TALFacebookGraphRequest.TGraphRequestCallback.onCompleted',
     'response: ' + LRawResponse + ' | ' +
-    'ErrorCode: ' + alinttoStrU(LErrorCode) + ' | ' +
+    'ErrorCode: ' + ALIntToStrW(LErrorCode) + ' | ' +
     'ErrorMsg: ' + LErrorMsg,
     TalLogType.verbose);
   {$ENDIF}
@@ -758,7 +758,7 @@ begin
   allog(
     'TALFacebookGraphRequest.GraphRequestCompletionHandler',
     'response: ' + LRawResponse + ' | ' +
-    'ErrorCode: ' + alinttoStrU(LErrorCode) + ' | ' +
+    'ErrorCode: ' + ALIntToStrW(LErrorCode) + ' | ' +
     'ErrorMsg: ' + LErrorMsg,
     TalLogType.verbose);
   {$ENDIF}

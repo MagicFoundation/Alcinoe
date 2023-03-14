@@ -4,21 +4,22 @@ interface
 
 {$WARN UNIT_PLATFORM OFF}
 
-uses Windows,
-     SysUtils,
-     dialogs,
-     Forms,
-     StdCtrls,
-     ComCtrls,
-     Controls,
-     Classes,
-     Alcinoe.StringList,
-     Alcinoe.HTTP.Client,
-     Alcinoe.HTTP.Client.WinHTTP,
-     Alcinoe.WebSpider,
-     Alcinoe.AVLBinaryTree,
-     ExtCtrls,
-     Shellapi;
+uses
+  Windows,
+  SysUtils,
+  dialogs,
+  Forms,
+  StdCtrls,
+  ComCtrls,
+  Controls,
+  Classes,
+  Alcinoe.StringList,
+  Alcinoe.HTTP.Client,
+  Alcinoe.HTTP.Client.WinHTTP,
+  Alcinoe.WebSpider,
+  Alcinoe.AVLBinaryTree,
+  ExtCtrls,
+  Shellapi;
 
 type
 
@@ -49,9 +50,9 @@ type
     procedure MainWebSpiderCrawlDownloadError(Sender: TObject; const URL, ErrorMessage: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
     procedure MainWebSpiderCrawlDownloadRedirect(Sender: TObject; const Url, RedirectedTo: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
     procedure MainWebSpiderCrawlDownloadSuccess(Sender: TObject; const Url: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HTTPResponseHeader: TALHTTPResponseHeader; HttpResponseContent: TStream; var StopCrawling: Boolean);
-    procedure MainWebSpiderCrawlFindLink(Sender: TObject; const HtmlTagString: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HtmlTagParams: TALStrings; const URL: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
+    procedure MainWebSpiderCrawlFindLink(Sender: TObject; const HtmlTagString: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HtmlTagParams: TALStringsA; const URL: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
     procedure MainWebSpiderCrawlGetNextLink(Sender: TObject; var Url: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
-    procedure MainWebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject; const HtmlTagString: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HtmlTagParams: TALStrings; const URL: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; var LocalPath: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
+    procedure MainWebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject; const HtmlTagString: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HtmlTagParams: TALStringsA; const URL: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; var LocalPath: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
     procedure MainWebSpiderUpdateLinkToLocalPathGetNextFile(Sender: TObject; var FileName, BaseHref: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
     procedure ButtonStopClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -89,12 +90,14 @@ implementation
 
 {$R *.dfm}
 
-uses FileCtrl,
-     Masks,
-     UrlMon,
-     Alcinoe.Files,
-     Alcinoe.Mime,
-     Alcinoe.StringUtils;
+uses
+  System.AnsiStrings,
+  FileCtrl,
+  Masks,
+  UrlMon,
+  Alcinoe.Files,
+  Alcinoe.Mime,
+  Alcinoe.StringUtils;
 
 Const SplitDirectoryAmount = 5000;
 
@@ -205,9 +208,9 @@ Var aExt: AnsiString;
   {-----------------------------------------}
   Function SplitPathMakeFilename: AnsiString;
   begin
-    Result := AnsiString(EditSaveDirectory.Text) + ALIntToStr((FCurrentLocalFileNameIndex div SplitDirectoryAmount) * SplitDirectoryAmount + SplitDirectoryAmount) + '\';
+    Result := AnsiString(EditSaveDirectory.Text) + ALIntToStrA((FCurrentLocalFileNameIndex div SplitDirectoryAmount) * SplitDirectoryAmount + SplitDirectoryAmount) + '\';
     If (not SysUtils.DirectoryExists(String(Result))) and (not createDir(String(Result))) then raise exception.Create('cannot create dir: ' + String(Result));
-    Result := Result + ALIntToStr(FCurrentLocalFileNameIndex) + aExt;
+    Result := Result + ALIntToStrA(FCurrentLocalFileNameIndex) + aExt;
     inc(FCurrentLocalFileNameIndex);
   end;
 
@@ -320,7 +323,7 @@ begin
   aFileName := GetNextLocalFileName(AnsiString(pMimeTypeFromData));
 
   {If html then add <!-- saved from '+ URL +' -->' at the top of the file}
-  If ALSameText(AnsiString(pMimeTypeFromData),'text/html') then begin
+  If ALSameTextA(AnsiString(pMimeTypeFromData),'text/html') then begin
     Str := '<!-- saved from '+ URL+' -->' +#13#10 + Str;
     AlSaveStringToFile(str,aFileName);
   end
@@ -346,11 +349,11 @@ end;
 {**********************************************************}
 procedure TForm1.MainWebSpiderCrawlFindLink(Sender: TObject;
                                             const HtmlTagString: AnsiString;
-                                            HtmlTagParams: TALStrings;
+                                            HtmlTagParams: TALStringsA;
                                             const URL: AnsiString);
 Var aNode: TPageNotYetDownloadedBinTreeNode;
     aURLWithoutAnchor: AnsiString;
-    Lst: TALStringList;
+    Lst: TALStringListA;
     I: integer;
     Flag1 : Boolean;
     S1: AnsiString;
@@ -358,10 +361,10 @@ begin
   {If Check BoxDownload Image}
   IF not CheckBoxDownloadImage.Checked and
      (
-      ALSameText(HtmlTagString,'img') or
+      ALSameTextA(HtmlTagString,'img') or
       (
-       ALSameText(HtmlTagString,'input') and
-       ALSameText(ALTrim(HtmlTagParams.Values['type']),'image')
+       ALSameTextA(HtmlTagString,'input') and
+       ALSameTextA(ALTrim(HtmlTagParams.Values['type']),'image')
       )
      )
     then Exit;
@@ -375,14 +378,14 @@ begin
 
   {include link(s)}
   If EditIncludeLink.Text <> '' then begin
-    Lst := TALStringList.Create;
+    Lst := TALStringListA.Create;
     Try
-      Lst.Text := ALTrim(AlStringReplace(AnsiString(EditIncludeLink.Text),';',#13#10,[RfReplaceall]));
+      Lst.Text := ALTrim(ALStringReplaceA(AnsiString(EditIncludeLink.Text),';',#13#10,[RfReplaceall]));
       Flag1 := True;
       For i := 0 to Lst.Count - 1 do begin
         S1 := ALTrim(Lst[i]);
         If S1 <> '' then begin
-          Flag1 := ALMatchesMask(URL, S1);
+          Flag1 := ALMatchesMaskA(URL, S1);
           If Flag1 then Break;
         end;
       end;
@@ -394,14 +397,14 @@ begin
 
   {Exclude link(s)}
   If EditExcludeLink.Text <> '' then begin
-    Lst := TALStringList.Create;
+    Lst := TALStringListA.Create;
     Try
-      Lst.Text := ALTrim(AlStringReplace(AnsiString(EditExcludeLink.Text),';',#13#10,[RfReplaceall]));
+      Lst.Text := ALTrim(ALStringReplaceA(AnsiString(EditExcludeLink.Text),';',#13#10,[RfReplaceall]));
       Flag1 := False;
       For i := 0 to Lst.Count - 1 do begin
         S1 := ALTrim(Lst[i]);
         If S1 <> '' then begin
-          Flag1 := ALMatchesMask(URL, S1);
+          Flag1 := ALMatchesMaskA(URL, S1);
           If Flag1 then Break;
         end;
       end;
@@ -496,7 +499,7 @@ end;
 {**************************************************************************}
 procedure TForm1.MainWebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject;
                                                             const HtmlTagString: AnsiString;
-                                                            HtmlTagParams: TALStrings;
+                                                            HtmlTagParams: TALStringsA;
                                                             const URL: AnsiString;
                                                             var LocalPath: AnsiString);
 Var aNode: TALStringKeyAVLBinaryTreeNode;
@@ -511,7 +514,7 @@ begin
       aNode := FPageDownloadedBinTree.FindNode(aTmpUrl);
       If (aNode <> nil) then begin
         LocalPath := TPageDownloadedBinTreeNode(aNode).Data;
-        If AlPos('=>',LocalPath) = 1 then Begin
+        If ALPosA('=>',LocalPath) = 1 then Begin
           aTmpUrl := AlCopyStr(LocalPath,3,MaxInt);
           LocalPath := '';
         end
@@ -522,7 +525,7 @@ begin
 
     If LocalPath = '!' then localpath := ''
     else If LocalPath <> '' then begin
-      LocalPath := AlStringReplace(
+      LocalPath := ALStringReplaceA(
                                    LocalPath,
                                    '\',
                                    '/',
@@ -561,7 +564,7 @@ Begin
                      AlCopyStr(
                                BaseHref,
                                17,                        // '<!-- saved from ' + URL
-                               AlPos(#13,BaseHref) - 21    // URL + ' -->' +#13#10
+                               ALPosA(#13,BaseHref) - 21    // URL + ' -->' +#13#10
                               )
                     );
 

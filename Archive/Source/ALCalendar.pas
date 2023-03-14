@@ -48,7 +48,7 @@ Function ALDrawCalendar(Canvas:Tcanvas;
                         DaysHeaderBorderColorBottom: Tcolor;
                         //----
                         Year : Integer;
-                        const FormatSettings: TALFormatSettings; // LongMonthNames and LongDayNames must be in UTF8
+                        const FormatSettings: TALFormatSettingsA; // LongMonthNames and LongDayNames must be in UTF8
                         //----
                         Var CalendarWidth : Integer;
                         Var CalendarHeight : Integer;
@@ -315,7 +315,7 @@ Function ALDrawCalendar(Canvas:Tcanvas;
                         DaysHeaderBorderColorBottom: Tcolor;
                         //----
                         Year : Integer;
-                        const FormatSettings: TALFormatSettings; // LongMonthNames and LongDayNames must be in UTF8
+                        const FormatSettings: TALFormatSettingsA; // LongMonthNames and LongDayNames must be in UTF8
                         //----
                         Var CalendarWidth : Integer;
                         Var CalendarHeight : Integer;

@@ -19,11 +19,12 @@ Uses
 
 Type
 
-  {-----------------------------------------------------------------------------------------}
-  TalSqlite3ClientSelectXMLDataOnNewRowFunct = reference to Procedure(XMLRowData: TalXmlNode;
-                                                                      const ViewTag: AnsiString;
-                                                                      ExtData: Pointer;
-                                                                      Var Continue: Boolean);
+  {------------------------------------------------------------------}
+  TalSqlite3ClientSelectXMLDataOnNewRowFunct = reference to Procedure(
+                                                              XMLRowData: TalXmlNode;
+                                                              const ViewTag: AnsiString;
+                                                              ExtData: Pointer;
+                                                              Var Continue: Boolean);
   TalSqlite3ClientSelectJSONDataOnNewRowFunct = reference to Procedure(JSONRowData: TALJSONNodeA;
                                                                        const ViewTag: AnsiString;
                                                                        ExtData: Pointer;
@@ -1444,7 +1445,9 @@ Begin
           Dec(FConnectionPoolCount);
           if  FConnectionPoolCount > 0 then
           begin
-            System.Move(FConnectionPool[1], FConnectionPool[0],
+            ALMove(
+              FConnectionPool[1],
+              FConnectionPool[0],
               (FConnectionPoolCount) * SizeOf(TalSqlite3ConnectionPoolContainer));
           end;
 

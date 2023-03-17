@@ -1072,10 +1072,10 @@ begin
   {$IFDEF DEBUG}
   //allog(
   //  'TALWebRTC.TAndroidWebRTCListener.onLocalFrameAvailable',
-  //  'textureId: ' + ALIntToStrW(textureId) +
-  //  ' - width: ' + ALIntToStrW(width) +
-  //  ' - height: ' + ALIntToStrW(height) +
-  //  ' - rotation: ' + ALIntToStrW(rotation),
+  //  'textureId: ' + ALIntToStrW(textureId) + ' | ' +
+  //  'width: ' + ALIntToStrW(width) + ' | ' +
+  //  'height: ' + ALIntToStrW(height) + ' | ' +
+  //  'rotation: ' + ALIntToStrW(rotation),
   //  TalLogType.VERBOSE);
   {$ENDIF}
 
@@ -1095,10 +1095,10 @@ begin
   {$IFDEF DEBUG}
   //allog(
   //  'TALWebRTC.TAndroidWebRTCListener.onRemoteFrameAvailable',
-  //  'textureId: ' + ALIntToStrW(textureId) +
-  //  ' - width: ' + ALIntToStrW(width) +
-  //  ' - height: ' + ALIntToStrW(height) +
-  //  ' - rotation: ' + ALIntToStrW(rotation),
+  //  'textureId: ' + ALIntToStrW(textureId) + ' | ' +
+  //  'width: ' + ALIntToStrW(width) + ' | ' +
+  //  'height: ' + ALIntToStrW(height) + ' | ' +
+  //  'rotation: ' + ALIntToStrW(rotation),
   //  TalLogType.VERBOSE);
   {$ENDIF}
 
@@ -1135,10 +1135,13 @@ procedure TALWebRTC.TAndroidWebRTCListener.onIceCandidate(candidate: JIceCandida
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TAndroidWebRTCListener.onIceCandidate','candidate.sdpMLineIndex: ' + ALIntToStrW(candidate.sdpMLineIndex) +
-                                                          ' - candidate.sdpMid: ' + JstringToString(candidate.sdpMid) +
-                                                          ' - candidate.serverUrl: ' + JstringToString(candidate.serverUrl) +
-                                                          ' - candidate.sdp: ' + JstringToString(candidate.sdp), TalLogType.VERBOSE);
+  allog(
+    'TALWebRTC.TAndroidWebRTCListener.onIceCandidate',
+    'candidate.sdpMLineIndex: ' + ALIntToStrW(candidate.sdpMLineIndex) + ' | ' +
+    'candidate.sdpMid: ' + JstringToString(candidate.sdpMid) + ' | ' +
+    'candidate.serverUrl: ' + JstringToString(candidate.serverUrl) + ' | ' +
+    'candidate.sdp: ' + JstringToString(candidate.sdp),
+    TalLogType.VERBOSE);
   {$ENDIF}
 
   if assigned(fWebRTC.fonIceCandidateEvent) then
@@ -1201,7 +1204,7 @@ procedure TALWebRTC.TAndroidWebRTCListener.onError(code: Integer; description: J
 begin
 
   {$IFDEF DEBUG}
-  allog('TALWebRTC.TAndroidWebRTCListener.onError','code: ' + ALIntToStrW(code) + ' - description: ' + JstringToString(description), TalLogType.error);
+  allog('TALWebRTC.TAndroidWebRTCListener.onError','code: ' + ALIntToStrW(code) + ' | description: ' + JstringToString(description), TalLogType.error);
   {$ENDIF}
 
   if assigned(fWebRTC.fOnErrorEvent) then
@@ -1339,7 +1342,7 @@ begin
     Except
       on E: Exception do begin
         {$IFDEF DEBUG}
-        allog('TALiOSWebRTC.Execute.Error','code: 0 - description: ' + e.Message , TalLogType.error);
+        allog('TALiOSWebRTC.Execute.Error','code: 0 | description: ' + e.Message , TalLogType.error);
         {$ENDIF}
         TThread.Synchronize(nil,
           procedure
@@ -1638,7 +1641,7 @@ begin
         LMediaConstraints.release;
       end;
 
-  end);
+    end);
 
   //-----
   result := true;
@@ -1979,7 +1982,7 @@ begin
 
       // We've just set our local SDP so time to send it.
       {$IFDEF DEBUG}
-      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Local SDP set succesfully - sdp.description: ' + NSStrToStr(fLocalSdp.sdp), TalLogType.verbose);
+      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Local SDP set succesfully | sdp.description: ' + NSStrToStr(fLocalSdp.sdp), TalLogType.verbose);
       {$ENDIF}
 
       if fLocalSdp.&type = RTCSdpTypeOffer then LSDPType := TALWebRTCSDPType.OFFER
@@ -2027,7 +2030,7 @@ begin
       // We've just set our local SDP so time to send it, drain
       // remote and send local ICE candidates.
       {$IFDEF DEBUG}
-      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Local SDP set succesfully - sdp.description: ' + NsStrToStr(fLocalSdp.sdp), TalLogType.verbose);
+      allog('TALWebRTC.SetSessionDescriptionCompletionHandler', 'Local SDP set succesfully | sdp.description: ' + NsStrToStr(fLocalSdp.sdp), TalLogType.verbose);
       {$ENDIF}
 
       if fLocalSdp.&type = RTCSdpTypeOffer then LSDPType := TALWebRTCSDPType.OFFER

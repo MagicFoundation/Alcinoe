@@ -839,8 +839,14 @@ procedure TALAniCalculations.DoCalc(const DeltaTime: Double; var NewPoint, NewVe
 var
   EnableTargetX: Boolean;
   EnableTargetY: Boolean;
-  procedure UpdatePhysicalParameters(const Target: Double; var Pos, Velocity: Double; const ADecelerationRate: Double;
-    const EnableTarget: Boolean; const CancelTarget: Boolean; var ElasticityFactor: Integer);
+
+  procedure UpdatePhysicalParameters(
+              const Target: Double;
+              var Pos, Velocity: Double;
+              const ADecelerationRate: Double;
+              const EnableTarget: Boolean;
+              const CancelTarget: Boolean;
+              var ElasticityFactor: Integer);
   var
     dV, DX, aT, aTDecelerationRate, Tmp, R: Double;
     LSign, LSignV: TValueSign;
@@ -901,6 +907,7 @@ var
     else
       Pos := Pos + DX;
   end;
+
   procedure UpdateParams;
   var
     LDecelerationRate: Double;
@@ -912,10 +919,23 @@ var
     else
       LDecelerationRate := DecelerationRate;
 
-    UpdatePhysicalParameters(Target.Point.X, NewPoint.X, NewVelocity.X, Abs(LDecelerationRate * NewVelocity.X),
-      EnableTargetX, CancelTargetX, FElasticityFactor.X);
-    UpdatePhysicalParameters(Target.Point.Y, NewPoint.Y, NewVelocity.Y, Abs(LDecelerationRate * NewVelocity.Y),
-      EnableTargetY, CancelTargetY, FElasticityFactor.Y);
+    UpdatePhysicalParameters(
+      Target.Point.X,
+      NewPoint.X,
+      NewVelocity.X,
+      Abs(LDecelerationRate * NewVelocity.X),
+      EnableTargetX,
+      CancelTargetX,
+      FElasticityFactor.X);
+
+    UpdatePhysicalParameters(
+      Target.Point.Y,
+      NewPoint.Y,
+      NewVelocity.Y,
+      Abs(LDecelerationRate * NewVelocity.Y),
+      EnableTargetY,
+      CancelTargetY,
+      FElasticityFactor.Y);
   end;
 
 begin

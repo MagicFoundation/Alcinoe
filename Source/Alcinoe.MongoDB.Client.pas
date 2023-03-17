@@ -106,11 +106,12 @@ const
 
 type
 
-    {----------------------------------------------------------------------------------------}
-    TALMongoDBClientSelectDataOnNewRowFunct = reference to Procedure(JSONRowData: TALJSONNodeA;
-                                                                     const ViewTag: AnsiString;
-                                                                     ExtData: Pointer;
-                                                                     Var Continue: Boolean);
+    {---------------------------------------------------------------}
+    TALMongoDBClientSelectDataOnNewRowFunct = reference to Procedure(
+                                                             JSONRowData: TALJSONNodeA;
+                                                             const ViewTag: AnsiString;
+                                                             ExtData: Pointer;
+                                                             Var Continue: Boolean);
 
     {-------------------------------------------------------------------------------------}
     TALMongoDBClientRunCommandOnNewBatchRowFunct = TALMongoDBClientSelectDataOnNewRowFunct;
@@ -3659,7 +3660,9 @@ Begin
           Dec(FConnectionPoolCount);
           if  FConnectionPoolCount > 0 then
           begin
-            System.Move(FConnectionPool[1], FConnectionPool[0],
+            ALMove(
+              FConnectionPool[1],
+              FConnectionPool[0],
               (FConnectionPoolCount) * SizeOf(TAlMongoDBConnectionPoolContainer));
           end;
 

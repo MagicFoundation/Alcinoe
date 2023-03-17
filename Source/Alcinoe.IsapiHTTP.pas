@@ -315,21 +315,21 @@ end;
 {**************************************************************}
 procedure TALWebRequest.ExtractCookieFields(Fields: TALStringsA);
 begin
-  ALExtractHeaderFields([';'],  // Separators
-                        [' '],  // WhiteSpace
-                        [],     // Quotes
-                        PAnsiChar(Cookie), // Content
-                        Fields,  // Strings
-                        True);   // Decode - Cookie encoding:
-                                 // There is some confusion over encoding of a cookie value. The commonly held belief
-                                 // is that cookie values must be URL-encoded, but this is a fallacy even though it is
-                                 // the de facto implementation. The original specification indicates that only three
-                                 // types of characters must be encoded: semicolon, comma, and white space. The specification
-                                 // indicates that URL encoding may be used but stops short of requiring it. The RFC makes
-                                 // no mention of encoding whatsoever. Still, almost all implementations perform
-                                 // some sort of URL encoding on cookie values. In the case of name=value formats, the
-                                 // name and value are typically encoded separately while the equals sign is left as is.
-
+  ALExtractHeaderFields(
+    [';'],  // Separators
+    [' '],  // WhiteSpace
+    [],     // Quotes
+    PAnsiChar(Cookie), // Content
+    Fields,  // Strings
+    True);   // Decode - Cookie encoding:
+             // There is some confusion over encoding of a cookie value. The commonly held belief
+             // is that cookie values must be URL-encoded, but this is a fallacy even though it is
+             // the de facto implementation. The original specification indicates that only three
+             // types of characters must be encoded: semicolon, comma, and white space. The specification
+             // indicates that URL encoding may be used but stops short of requiring it. The RFC makes
+             // no mention of encoding whatsoever. Still, almost all implementations perform
+             // some sort of URL encoding on cookie values. In the case of name=value formats, the
+             // name and value are typically encoded separately while the equals sign is left as is.
 end;
 
 {*************************************************************}

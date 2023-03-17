@@ -1989,7 +1989,9 @@ Begin
           Dec(FConnectionPoolCount);
           if  FConnectionPoolCount > 0 then
           begin
-            System.Move(FConnectionPool[1], FConnectionPool[0],
+            ALMove(
+              FConnectionPool[1],
+              FConnectionPool[0],
               (FConnectionPoolCount) * SizeOf(TAlMemCachedConnectionPoolContainer));
           end;
 

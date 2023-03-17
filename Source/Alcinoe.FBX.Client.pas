@@ -991,22 +991,28 @@ Begin
   if not Connected then raise Exception.Create('Not connected');
 
   //build the aSelectPart;
-  LSelectPart := ALIfThenA(not SkipIOStats,    'MON$PAGE_READS as PAGE_READS, '+
-                                               'MON$PAGE_WRITES as PAGE_WRITES, '+
-                                               'MON$PAGE_FETCHES as PAGE_FETCHES, '+
-                                               'MON$PAGE_MARKS as PAGE_MARKS, ') +
-                 ALIfThenA(not SkipRecordStats,'MON$RECORD_SEQ_READS as RECORD_SEQ_READS, '+
-                                               'MON$RECORD_IDX_READS as RECORD_IDX_READS, '+
-                                               'MON$RECORD_INSERTS as RECORD_INSERTS, '+
-                                               'MON$RECORD_UPDATES as RECORD_UPDATES, '+
-                                               'MON$RECORD_DELETES as RECORD_DELETES, '+
-                                               'MON$RECORD_BACKOUTS as RECORD_BACKOUTS, '+
-                                               'MON$RECORD_PURGES as RECORD_PURGES, '+
-                                               'MON$RECORD_EXPUNGES as RECORD_EXPUNGES, ') +
-                 ALIfThenA(not SkipMemoryUsage,'MON$MEMORY_USED as MEMORY_USED, '+
-                                               'MON$MEMORY_ALLOCATED as MEMORY_ALLOCATED, '+
-                                               'MON$MAX_MEMORY_USED as MAX_MEMORY_USED, '+
-                                               'MON$MAX_MEMORY_ALLOCATED as MAX_MEMORY_ALLOCATED, ');
+  LSelectPart := ALIfThenA(
+                   not SkipIOStats,
+                   'MON$PAGE_READS as PAGE_READS, '+
+                   'MON$PAGE_WRITES as PAGE_WRITES, '+
+                   'MON$PAGE_FETCHES as PAGE_FETCHES, '+
+                   'MON$PAGE_MARKS as PAGE_MARKS, ') +
+                 ALIfThenA(
+                   not SkipRecordStats,
+                   'MON$RECORD_SEQ_READS as RECORD_SEQ_READS, '+
+                   'MON$RECORD_IDX_READS as RECORD_IDX_READS, '+
+                   'MON$RECORD_INSERTS as RECORD_INSERTS, '+
+                   'MON$RECORD_UPDATES as RECORD_UPDATES, '+
+                   'MON$RECORD_DELETES as RECORD_DELETES, '+
+                   'MON$RECORD_BACKOUTS as RECORD_BACKOUTS, '+
+                   'MON$RECORD_PURGES as RECORD_PURGES, '+
+                   'MON$RECORD_EXPUNGES as RECORD_EXPUNGES, ') +
+                 ALIfThenA(
+                   not SkipMemoryUsage,
+                   'MON$MEMORY_USED as MEMORY_USED, '+
+                   'MON$MEMORY_ALLOCATED as MEMORY_ALLOCATED, '+
+                   'MON$MAX_MEMORY_USED as MAX_MEMORY_USED, '+
+                   'MON$MAX_MEMORY_ALLOCATED as MAX_MEMORY_ALLOCATED, ');
   if LSelectPart <> '' then delete(LSelectPart,length(LSelectPart) - 1, 1)
   else Exit;
 
@@ -1596,9 +1602,7 @@ Var LSqlpa: TALFBXSQLParams;
                                                                                                                                         fTRAHandle,
                                                                                                                                         LColumnIndex,
                                                                                                                                         FormatSettings),
-                                                                                                                          ntCData
-                                                                                                                         )
-                                                                                       )
+                                                                                                                          ntCData))
             else LValueRec.Text := GetFieldValue(fsqlda,
                                                  fDBHandle,
                                                  fTRAHandle,
@@ -2276,22 +2280,28 @@ Begin
   //To refresh the snapshot, the current transaction should be finished and the monitoring tables should be queried in a new transaction context.
 
   //build the aSelectPart;
-  LSelectPart := ALIfThenA(not SkipIOStats,    'MON$PAGE_READS as PAGE_READS, '+
-                                               'MON$PAGE_WRITES as PAGE_WRITES, '+
-                                               'MON$PAGE_FETCHES as PAGE_FETCHES, '+
-                                               'MON$PAGE_MARKS as PAGE_MARKS, ') +
-                 ALIfThenA(not SkipRecordStats,'MON$RECORD_SEQ_READS as RECORD_SEQ_READS, '+
-                                               'MON$RECORD_IDX_READS as RECORD_IDX_READS, '+
-                                               'MON$RECORD_INSERTS as RECORD_INSERTS, '+
-                                               'MON$RECORD_UPDATES as RECORD_UPDATES, '+
-                                               'MON$RECORD_DELETES as RECORD_DELETES, '+
-                                               'MON$RECORD_BACKOUTS as RECORD_BACKOUTS, '+
-                                               'MON$RECORD_PURGES as RECORD_PURGES, '+
-                                               'MON$RECORD_EXPUNGES as RECORD_EXPUNGES, ') +
-                 ALIfThenA(not SkipMemoryUsage,'MON$MEMORY_USED as MEMORY_USED, '+
-                                               'MON$MEMORY_ALLOCATED as MEMORY_ALLOCATED, '+
-                                               'MON$MAX_MEMORY_USED as MAX_MEMORY_USED, '+
-                                               'MON$MAX_MEMORY_ALLOCATED as MAX_MEMORY_ALLOCATED, ');
+  LSelectPart := ALIfThenA(
+                   not SkipIOStats,
+                   'MON$PAGE_READS as PAGE_READS, '+
+                   'MON$PAGE_WRITES as PAGE_WRITES, '+
+                   'MON$PAGE_FETCHES as PAGE_FETCHES, '+
+                   'MON$PAGE_MARKS as PAGE_MARKS, ') +
+                 ALIfThenA(
+                   not SkipRecordStats,
+                   'MON$RECORD_SEQ_READS as RECORD_SEQ_READS, '+
+                   'MON$RECORD_IDX_READS as RECORD_IDX_READS, '+
+                   'MON$RECORD_INSERTS as RECORD_INSERTS, '+
+                   'MON$RECORD_UPDATES as RECORD_UPDATES, '+
+                   'MON$RECORD_DELETES as RECORD_DELETES, '+
+                   'MON$RECORD_BACKOUTS as RECORD_BACKOUTS, '+
+                   'MON$RECORD_PURGES as RECORD_PURGES, '+
+                   'MON$RECORD_EXPUNGES as RECORD_EXPUNGES, ') +
+                 ALIfThenA(
+                   not SkipMemoryUsage,
+                   'MON$MEMORY_USED as MEMORY_USED, '+
+                   'MON$MEMORY_ALLOCATED as MEMORY_ALLOCATED, '+
+                   'MON$MAX_MEMORY_USED as MAX_MEMORY_USED, '+
+                   'MON$MAX_MEMORY_ALLOCATED as MAX_MEMORY_ALLOCATED, ');
   if LSelectPart <> '' then delete(LSelectPart,length(LSelectPart) - 1, 1)
   else Exit;
 
@@ -4038,9 +4048,7 @@ procedure TALFBXConnectionPoolClient.SelectData(const Queries: TALFBXClientSelec
                                                                                                                                          LTmpTraHandle,
                                                                                                                                          LColumnIndex,
                                                                                                                                          FormatSettings),
-                                                                                                                           ntCData
-                                                                                                                          )
-                                                                                        )
+                                                                                                                           ntCData))
           else LValueRec.Text := GetFieldValue(LTmpSqlda,
                                                LTmpDBHandle,
                                                LTmpTraHandle,

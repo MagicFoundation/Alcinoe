@@ -623,11 +623,14 @@ begin
   if compareValue(LLineHeight, 0, Tepsilon.Position) > 0 then result := round(FTextView.View.contentSize.height / LLineHeight)
   else result := 0;
   {$IF defined(DEBUG)}
-  ALLog('TALIosMemo.getLineCount', 'ContentBounds.Height: ' + floattostr(FTextView.View.contentSize.height) +
-                                   ' - LineHeight: ' + floattostr(LLineHeight) +
-                                   ' - LineCount: ' + inttostr(result) +
-                                   ' - Width: ' + floattostr(Width) +
-                                   ' - Height: ' + floattostr(Height), TalLogType.VERBOSE);
+  ALLog(
+    'TALIosMemo.getLineCount',
+    'ContentBounds.Height: ' + floattostr(FTextView.View.contentSize.height) + ' | ' +
+    'LineHeight: ' + floattostr(LLineHeight) + ' | ' +
+    'LineCount: ' + inttostr(result) + ' | ' +
+    'Width: ' + floattostr(Width) + ' | ' +
+    'Height: ' + floattostr(Height),
+    TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -876,9 +879,12 @@ var LTextAttr: NSMutableAttributedString;
 begin
 
   {$IF defined(DEBUG)}
-  ALLog('TALIosMemo.DoFontChanged', 'TextPromptVisible: ' + BoolToStr(fTextPromptVisible, true) +
-                                    ' - TextPrompt: ' + fTextPrompt +
-                                    ' - TextPromptColor: ' + inttostr(fTextPromptColor), TalLogType.VERBOSE);
+  ALLog(
+    'TALIosMemo.DoFontChanged',
+    'TextPromptVisible: ' + BoolToStr(fTextPromptVisible, true) + ' | ' +
+    'TextPrompt: ' + fTextPrompt + ' | ' +
+    'TextPromptColor: ' + inttostr(fTextPromptColor),
+    TalLogType.VERBOSE);
   {$ENDIF}
 
   if fTextPromptVisible then LStr := StrToNsStr(fTextPrompt)

@@ -305,7 +305,9 @@ procedure TALBaseQuickSortList.InsertItem(Index: Integer; Item: Pointer);
 begin
   if FCount = FCapacity then Grow;
   if Index < FCount then
-    ALMove(FList[Index], FList[Index + 1],
+    ALMove(
+      FList[Index],
+      FList[Index + 1],
       (FCount - Index) * SizeOf(Pointer));
   Pointer(FList[Index]) := nil;
   FList[Index] := Item;
@@ -335,9 +337,10 @@ begin
   Dec(FCount);
   if Index < FCount then begin
     FList[Index] := nil;
-    ALMove(FList[Index + 1],
-           FList[Index],
-          (FCount - Index) * SizeOf(Pointer));
+    ALMove(
+      FList[Index + 1],
+      FList[Index],
+      (FCount - Index) * SizeOf(Pointer));
     Pointer(FList[FCount]) := nil;
   end;
   if (Temp <> nil) then

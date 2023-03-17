@@ -1911,7 +1911,9 @@ begin
   Dec(FCount);
   if Index < FCount then
   begin
-    ALMove(FList[Index + 1], FList[Index],
+    ALMove(
+      FList[Index + 1],
+      FList[Index],
       (FCount - Index) * SizeOf(TALStringItemA));
     // Make sure there is no danglng pointer in the last (now unused) element
     PPointer(@FList[FCount].FString)^ := nil;
@@ -2129,7 +2131,9 @@ begin
   Changing;
   if FCount = FCapacity then Grow;
   if Index < FCount then
-    ALMove(FList[Index], FList[Index + 1],
+    ALMove(
+      FList[Index],
+      FList[Index + 1],
       (FCount - Index) * SizeOf(TALStringItemA));
   Pointer(FList[Index].FString) := nil;
   Pointer(FList[Index].FObject) := nil;
@@ -2680,7 +2684,9 @@ begin
   Dec(FCount);
   if Index < FCount then
   begin
-    ALMove(FList[Index + 1], FList[Index],
+    ALMove(
+      FList[Index + 1],
+      FList[Index],
       (FCount - Index) * SizeOf(TALNVStringItemA));
     // Make sure there is no danglng pointer in the last (now unused) element
     PPointer(@FList[FCount].FName)^   := nil;
@@ -3094,7 +3100,9 @@ begin
   Changing;
   if FCount = FCapacity then Grow;
   if Index < FCount then
-    ALMove(FList[Index], FList[Index + 1],
+    ALMove(
+      FList[Index],
+      FList[Index + 1],
       (FCount - Index) * SizeOf(TALNVStringItemA));
   Pointer(FList[Index].FName) := nil;
   Pointer(FList[Index].FValue) := nil;
@@ -3113,7 +3121,9 @@ begin
   Changing;
   if FCount = FCapacity then Grow;
   if Index < FCount then
-    ALMove(FList[Index], FList[Index + 1],
+    ALMove(
+      FList[Index],
+      FList[Index + 1],
       (FCount - Index) * SizeOf(TALNVStringItemA));
   Pointer(FList[Index].FName) := nil;
   Pointer(FList[Index].FValue) := nil;
@@ -6155,7 +6165,9 @@ begin
   Dec(FCount);
   if Index < FCount then
   begin
-    ALMove(FList[Index + 1], FList[Index],
+    ALMove(
+      FList[Index + 1],
+      FList[Index],
       (FCount - Index) * SizeOf(TALStringItemW));
     // Make sure there is no danglng pointer in the last (now unused) element
     PPointer(@FList[FCount].FString)^ := nil;
@@ -6373,7 +6385,9 @@ begin
   Changing;
   if FCount = FCapacity then Grow;
   if Index < FCount then
-    ALMove(FList[Index], FList[Index + 1],
+    ALMove(
+      FList[Index],
+      FList[Index + 1],
       (FCount - Index) * SizeOf(TALStringItemW));
   Pointer(FList[Index].FString) := nil;
   Pointer(FList[Index].FObject) := nil;
@@ -6910,7 +6924,9 @@ begin
   Dec(FCount);
   if Index < FCount then
   begin
-    ALMove(FList[Index + 1], FList[Index],
+    ALMove(
+      FList[Index + 1],
+      FList[Index],
       (FCount - Index) * SizeOf(TALNVStringItemW));
     // Make sure there is no danglng pointer in the last (now unused) element
     PPointer(@FList[FCount].FName)^   := nil;
@@ -7324,7 +7340,9 @@ begin
   Changing;
   if FCount = FCapacity then Grow;
   if Index < FCount then
-    ALMove(FList[Index], FList[Index + 1],
+    ALMove(
+      FList[Index],
+      FList[Index + 1],
       (FCount - Index) * SizeOf(TALNVStringItemW));
   Pointer(FList[Index].FName) := nil;
   Pointer(FList[Index].FValue) := nil;
@@ -7343,7 +7361,9 @@ begin
   Changing;
   if FCount = FCapacity then Grow;
   if Index < FCount then
-    ALMove(FList[Index], FList[Index + 1],
+    ALMove(
+      FList[Index],
+      FList[Index + 1],
       (FCount - Index) * SizeOf(TALNVStringItemW));
   Pointer(FList[Index].FName) := nil;
   Pointer(FList[Index].FValue) := nil;

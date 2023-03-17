@@ -20,11 +20,12 @@ uses
 
 Type
 
-  {------------------------------------------------------------------------------------}
-  TalMySqlClientSelectDataOnNewRowFunct = reference to Procedure(XMLRowData: TalXmlNode;
-                                                                 const ViewTag: AnsiString;
-                                                                 ExtData: Pointer;
-                                                                 Var Continue: Boolean);
+  {-------------------------------------------------------------}
+  TalMySqlClientSelectDataOnNewRowFunct = reference to Procedure(
+                                                         XMLRowData: TalXmlNode;
+                                                         const ViewTag: AnsiString;
+                                                         ExtData: Pointer;
+                                                         Var Continue: Boolean);
 
   {---------------------------------}
   EALMySqlError = class(EALException)
@@ -716,9 +717,7 @@ begin
                                                                                                                                                         LMySqlFields[LColumnIndex]._type,
                                                                                                                                                         LMySqlFieldLengths[LColumnIndex],
                                                                                                                                                         FormatSettings),
-                                                                                                                                          ntCData
-                                                                                                                                         )
-                                                                                                       )
+                                                                                                                                          ntCData))
               else LValueRec.Text := GetFieldValue(LMySqlRow[LColumnIndex],
                                                    LMySqlFields[LColumnIndex]._type,
                                                    LMySqlFieldLengths[LColumnIndex],
@@ -1160,7 +1159,9 @@ Begin
             Dec(FConnectionPoolCount);
             if  FConnectionPoolCount > 0 then
             begin
-              System.Move(FConnectionPool[1], FConnectionPool[0],
+              ALMove(
+                FConnectionPool[1],
+                FConnectionPool[0],
                 (FConnectionPoolCount) * SizeOf(TalMySqlConnectionPoolContainer));
             end;
 
@@ -1190,19 +1191,22 @@ Begin
 
           // set the options if they are existing
           for i := 0 to length(FOpenConnectionOptions) - 1 do
-            CheckAPIError(Result, FLibrary.mysql_options(Result,
-                                                         FOpenConnectionOptions[i].Option,
-                                                         FOpenConnectionOptions[i].Value) <> 0);
+            CheckAPIError(Result,
+                          FLibrary.mysql_options(Result,
+                                                 FOpenConnectionOptions[i].Option,
+                                                 FOpenConnectionOptions[i].Value) <> 0);
 
           //attempts to establish a connection to a MySQL database engine running on host
-          CheckAPIError(Result, fLibrary.mysql_real_connect(Result,
-                                                            PAnsiChar(Host),
-                                                            PAnsiChar(fLogin),
-                                                            PAnsiChar(fPassword),
-                                                            PAnsiChar(fDatabaseName),
-                                                            Port,
-                                                            nil,
-                                                            fOpenConnectionClientFlag) = nil);
+          CheckAPIError(
+            Result,
+            fLibrary.mysql_real_connect(Result,
+                                        PAnsiChar(Host),
+                                        PAnsiChar(fLogin),
+                                        PAnsiChar(fPassword),
+                                        PAnsiChar(fDatabaseName),
+                                        Port,
+                                        nil,
+                                        fOpenConnectionClientFlag) = nil);
 
         Except
 
@@ -1610,9 +1614,7 @@ begin
                                                                                                                                                           LMySqlFields[LColumnIndex]._type,
                                                                                                                                                           LMySqlFieldLengths[LColumnIndex],
                                                                                                                                                           FormatSettings),
-                                                                                                                                            ntCData
-                                                                                                                                           )
-                                                                                                         )
+                                                                                                                                            ntCData))
                 else LValueRec.Text := GetFieldValue(LMySqlRow[LColumnIndex],
                                                      LMySqlFields[LColumnIndex]._type,
                                                      LMySqlFieldLengths[LColumnIndex],

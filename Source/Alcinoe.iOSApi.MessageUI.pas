@@ -328,10 +328,8 @@ const
 
 implementation
 
-uses {$IF not defined(CPUARM)}
-     Posix.Dlfcn,
-     {$ENDIF}
-     FMX.Helpers.iOS;
+uses
+  FMX.Helpers.iOS;
 
 {**************************************************************************************************************************}
 constructor TMFMessageComposeViewControllerDelegate.Create(aMFMessageComposeViewController: MFMessageComposeViewController);
@@ -342,12 +340,12 @@ end;
 
 {**********************************************************************************************************************************************************************}
 procedure TMFMessageComposeViewControllerDelegate.messageComposeViewController(controller: MFMessageComposeViewController; didFinishWithResult: MFMessageComposeResult);
-var aWindow: UIWindow;
+var LWindow: UIWindow;
 begin
 
-  aWindow := SharedApplication.keyWindow;
-  if Assigned(aWindow) and Assigned(aWindow.rootViewController) then
-    aWindow.rootViewController.dismissModalViewControllerAnimated(True{animated});
+  LWindow := SharedApplication.keyWindow;
+  if Assigned(LWindow) and Assigned(LWindow.rootViewController) then
+    LWindow.rootViewController.dismissModalViewControllerAnimated(True{animated});
 
   fMFMessageComposeViewController.release;
   fMFMessageComposeViewController := nil;
@@ -363,32 +361,19 @@ end;
 
 {**********************************************************************************************************************************************************************}
 procedure TMFMailComposeViewControllerDelegate.mailComposeController(controller: MFMailComposeViewController; didFinishWithResult: MFMailComposeResult; error: NSError);
-var aWindow: UIWindow;
+var LWindow: UIWindow;
 begin
 
-  aWindow := SharedApplication.keyWindow;
-  if Assigned(aWindow) and Assigned(aWindow.rootViewController) then
-    aWindow.rootViewController.dismissModalViewControllerAnimated(True{animated});
+  LWindow := SharedApplication.keyWindow;
+  if Assigned(LWindow) and Assigned(LWindow.rootViewController) then
+    LWindow.rootViewController.dismissModalViewControllerAnimated(True{animated});
 
   fMFMailComposeViewController.release;
   fMFMailComposeViewController := nil;
 
 end;
 
-{$IF defined(CPUARM)}
-
+{*************************************************************}
 procedure LibMessageUIFakeLoader; cdecl; external libMessageUI;
-
-{$ELSE}
-
-var MessageUIModule: THandle;
-
-initialization
-  MessageUIModule := dlopen(MarshaledAString(libMessageUI), RTLD_LAZY);
-
-finalization
-  dlclose(MessageUIModule);
-
-{$ENDIF}
 
 end.

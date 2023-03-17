@@ -114,7 +114,7 @@ function ALBreakText(const aColorSpace: CGColorSpaceRef;
                      const aEllipsisText: string = '…';
                      const aEllipsisFontStyle: TFontStyles = [];
                      const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
-                     const aMaxlines: integer = 0): boolean; overload; // // return true if text was breaked in several lines (truncated or not)
+                     const aMaxlines: integer = 0): boolean; overload; // return true if text was breaked in several lines (truncated or not)
 function ALBreakText(const aColorSpace: CGColorSpaceRef;
                      const aFontColor: TalphaColor;
                      const aFontSize: single;
@@ -131,7 +131,7 @@ function ALBreakText(const aColorSpace: CGColorSpaceRef;
                      const aEllipsisText: string = '…';
                      const aEllipsisFontStyle: TFontStyles = [];
                      const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
-                     const aMaxlines: integer = 0): boolean; inline; overload; // // return true if text was breaked in several lines (truncated or not)
+                     const aMaxlines: integer = 0): boolean; inline; overload; // return true if text was breaked in several lines (truncated or not)
 
 {$ENDIF}
 
@@ -185,7 +185,7 @@ function ALBreakText(const aFontColor: TalphaColor;
                      const aEllipsisText: string = '…';
                      const aEllipsisFontStyle: TFontStyles = [];
                      const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
-                     const aMaxlines: integer = 0): boolean; overload; // // return true if text was breaked in several lines (truncated or not)
+                     const aMaxlines: integer = 0): boolean; overload; // return true if text was breaked in several lines (truncated or not)
 
 {$ENDIF}
 
@@ -534,15 +534,16 @@ begin
           LLineEndWithBreakLine := False;
         end;
 
-        //calculate the number of char in the current line (this work good also if aline is empty)
+        //Calculate the number of char in the current line (this work good also if aline is empty)
+        //http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
+        //* getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
+        //* measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
+        //  bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
+        //  it's return for exemple 9 when height = 11
         LNumberOfChars := aPaint.breakText(LLine {text},
                                            true {measureForwards},
                                            LMaxWidth - LLineIndent, {maxWidth}
-                                           LMeasuredWidth {measuredWidth}); // http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
-                                                                            // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
-                                                                            // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
-                                                                            //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
-                                                                            //   it's return for exemple 9 when height = 11
+                                           LMeasuredWidth {measuredWidth});
        _splitLigature(LMaxWidth - LLineIndent);
 
         //init result
@@ -573,19 +574,21 @@ begin
                                          //-----
                                          _initEllipsis;
                                          //-----
-                                         if (LNumberOfChars < LLine.length) then dec(LNumberOfChars); // (aNumberOfChars < aLine.length) to know that we are not here
-                                                                                                      // because of manual linebreak and dec(aNumberOfChars) because initialy
-                                                                                                      // we considere that aEllipsisText is only one char
+                                         //(aNumberOfChars < aLine.length) to know that we are not here
+                                         //because of manual linebreak and dec(aNumberOfChars) because initialy
+                                         //we considere that aEllipsisText is only one char
+                                         if (LNumberOfChars < LLine.length) then dec(LNumberOfChars);
                                          while LNumberOfChars > 0 do begin
                                            LLine := LLine.substring(0, LNumberOfChars);
+                                           //http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
+                                           //* getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
+                                           //* measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
+                                           //  bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
+                                           //  it's return for exemple 9 when height = 11
                                            LNumberOfChars := aPaint.breakText(LLine {text},
                                                                               true {measureForwards},
                                                                               LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
-                                                                              LMeasuredWidth {measuredWidth}); // http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
-                                                                                                               // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
-                                                                                                               // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
-                                                                                                               //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
-                                                                                                               //   it's return for exemple 9 when height = 11
+                                                                              LMeasuredWidth {measuredWidth});
                                            _splitLigature(LMaxWidth - LEllipsisLineLn - LLineIndent);
                                            if LNumberOfChars >= LLine.length then break;
                                          end;
@@ -614,33 +617,36 @@ begin
                                       //----
                                       else begin
                                         LNumberOfChars := LSaveNumberOfChars;
-                                        if (not LSaveNumberOfCharsIsAccurate) and (LNumberOfChars < LLine.length) then dec(LNumberOfChars); // (aNumberOfChars < aLine.length) to know that we are not here
-                                                                                                                                            // because of manual linebreak and dec(aNumberOfChars) because initialy
-                                                                                                                                            // we considere that aEllipsisText is only one char
+                                        //(aNumberOfChars < aLine.length) to know that we are not here
+                                        //because of manual linebreak and dec(aNumberOfChars) because initialy
+                                        //we considere that aEllipsisText is only one char
+                                        if (not LSaveNumberOfCharsIsAccurate) and (LNumberOfChars < LLine.length) then dec(LNumberOfChars);
                                         while LNumberOfChars > 0 do begin
                                           LLine := LLine.substring(0, LNumberOfChars); // length of aLine is now aNumberOfChars
+                                          //http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
+                                          //* getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
+                                          //* measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
+                                          //  bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
+                                          //  it's return for exemple 9 when height = 11
                                           LNumberOfChars := aPaint.breakText(LLine {text},
                                                                              true {measureForwards},
                                                                              LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
-                                                                             LMeasuredWidth {measuredWidth}); // http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
-                                                                                                              // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
-                                                                                                              // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
-                                                                                                              //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
-                                                                                                              //   it's return for exemple 9 when height = 11
+                                                                             LMeasuredWidth {measuredWidth});
                                           _splitLigature(LMaxWidth - LEllipsisLineLn - LLineIndent);
                                           if LNumberOfChars >= LLine.length then break;
                                         end;
                                         break;
                                       end;
                                       //----
+                                      //http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
+                                      //* getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
+                                      //* measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
+                                      //  bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
+                                      //  it's return for exemple 9 when height = 11
                                       LNumberOfChars := aPaint.breakText(LLine {text},
                                                                          true {measureForwards},
                                                                          LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
-                                                                         LMeasuredWidth {measuredWidth}); // http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
-                                                                                                          // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
-                                                                                                          // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
-                                                                                                          //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
-                                                                                                          //   it's return for exemple 9 when height = 11
+                                                                         LMeasuredWidth {measuredWidth});
                                       _splitLigature(LMaxWidth - LEllipsisLineLn - LLineIndent);
                                       if LNumberOfChars >= LLine.length then break
                                       else begin
@@ -684,33 +690,36 @@ begin
                 //----
                 else begin
                   LNumberOfChars := LSaveNumberOfChars;
-                  if (not LSaveNumberOfCharsIsAccurate) and (LNumberOfChars < LLine.length) then dec(LNumberOfChars); // (aNumberOfChars < aLine.length) to know that we are not here
-                                                                                                                      // because of manual linebreak and dec(aNumberOfChars) because initialy
-                                                                                                                      // we considere that aEllipsisText is only one char
+                  //(aNumberOfChars < aLine.length) to know that we are not here
+                  //because of manual linebreak and dec(aNumberOfChars) because initialy
+                  //we considere that aEllipsisText is only one char
+                  if (not LSaveNumberOfCharsIsAccurate) and (LNumberOfChars < LLine.length) then dec(LNumberOfChars);
                   while LNumberOfChars > 0 do begin
                     LLine := LLine.substring(0, LNumberOfChars); // length of aLine is now aNumberOfChars
+                    //http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
+                    //* getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
+                    //* measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
+                    //  bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
+                    //  it's return for exemple 9 when height = 11
                     LNumberOfChars := aPaint.breakText(LLine {text},
                                                        true {measureForwards},
                                                        LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
-                                                       LMeasuredWidth {measuredWidth}); // http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
-                                                                                        // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
-                                                                                        // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
-                                                                                        //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
-                                                                                        //   it's return for exemple 9 when height = 11
+                                                       LMeasuredWidth {measuredWidth});
                     _splitLigature(LMaxWidth - LEllipsisLineLn - LLineIndent);
                     if LNumberOfChars >= LLine.length then break;
                   end;
                   break;
                 end;
                 //----
+                //http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
+                //* getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
+                //* measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
+                //  bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
+                //  it's return for exemple 9 when height = 11
                 LNumberOfChars := aPaint.breakText(LLine {text},
                                                    true {measureForwards},
                                                    LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
-                                                   LMeasuredWidth {measuredWidth}); // http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
-                                                                                    // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
-                                                                                    // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
-                                                                                    //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
-                                                                                    //   it's return for exemple 9 when height = 11
+                                                   LMeasuredWidth {measuredWidth});
                 _splitLigature(LMaxWidth - LEllipsisLineLn - LLineIndent);
                 if LNumberOfChars >= LLine.length then break
                 else begin
@@ -749,28 +758,30 @@ begin
                   if compareValue(LLineIndent, 0, TEpsilon.position) > 0 then LNumberOfChars := 0;
                   while LNumberOfChars > 0 do begin
                     LLine := LLine.substring(0, LNumberOfChars); // length of aLine is now aNumberOfChars
+                    //http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
+                    //* getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
+                    //* measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
+                    //  bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
+                    //  it's return for exemple 9 when height = 11
                     LNumberOfChars := aPaint.breakText(LLine {text},
                                                        true {measureForwards},
                                                        LMaxWidth - LLineIndent, {maxWidth}
-                                                       LMeasuredWidth {measuredWidth}); // http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
-                                                                                        // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
-                                                                                        // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
-                                                                                        //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
-                                                                                        //   it's return for exemple 9 when height = 11
+                                                       LMeasuredWidth {measuredWidth});
                     _splitLigature(LMaxWidth - LLineIndent);
                     if LNumberOfChars >= LLine.length then break;
                   end;
                   break;
                 end;
                 //-----
+                //http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
+                //* getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
+                //* measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
+                //  bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
+                //  it's return for exemple 9 when height = 11
                 LNumberOfChars := aPaint.breakText(LLine {text},
                                                    true {measureForwards},
                                                    LMaxWidth - LLineIndent, {maxWidth}
-                                                   LMeasuredWidth {measuredWidth}); // http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
-                                                                                    // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
-                                                                                    // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
-                                                                                    //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
-                                                                                    //   it's return for exemple 9 when height = 11
+                                                   LMeasuredWidth {measuredWidth});
                 _splitLigature(LMaxWidth - LLineIndent);
                 if LNumberOfChars >= LLine.length then begin
                   inc(LNumberOfChars); // to skip the separator
@@ -789,17 +800,17 @@ begin
         //init aMaxLineWidth
         LMaxLineWidth := max(LMaxLineWidth, LMeasuredWidth[0] + LEllipsisLineLn + LLineIndent);
 
-        // update aTotalLinesHeight
+        //update aTotalLinesHeight
         LTotalLinesHeight := LCurrLineY + LMetrics.descent;
 
-        // their is not enalf of place to write at least one char or
-        // we are on the #13/#10
-        // NOTE: we need to remove the breakline because for exemple we have
-        // coco sur le cocotier#13#10
-        // then aline will be equal to
-        // coco sur le cocotier
-        // we draw this line, and then we increate aCurrLineY := aCurrLineY + aLineHeight;
-        // so it's mean the #13#10 was already taking in account, so we must delete it
+        //their is not enalf of place to write at least one char or
+        //we are on the #13/#10
+        //NOTE: we need to remove the breakline because for exemple we have
+        //coco sur le cocotier#13#10
+        //then aline will be equal to
+        //coco sur le cocotier
+        //we draw this line, and then we increate aCurrLineY := aCurrLineY + aLineHeight;
+        //so it's mean the #13#10 was already taking in account, so we must delete it
         if LNumberOfChars <= 0 then begin
           if (LTextIdx + 1 < LTextLn) and
              (aText.codePointAt(LTextIdx) = $0D) and
@@ -1082,7 +1093,7 @@ function ALBreakText(const aColorSpace: CGColorSpaceRef;
                      const aEllipsisText: string = '…';
                      const aEllipsisFontStyle: TFontStyles = [];
                      const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
-                     const aMaxlines: integer = 0): boolean; // // return true if text was breaked in several lines (truncated or not)
+                     const aMaxlines: integer = 0): boolean; // return true if text was breaked in several lines (truncated or not)
 
 var LBreakTextItemsStartCount: integer;
     LBreakTextItem: TALBreakTextItem;
@@ -1313,14 +1324,15 @@ begin
             try
 
               //Creates an immutable frame using a framesetter.
-              LFrame := CTFramesetterCreateFrame(LFrameSetter, // framesetter: The framesetter used to create the frame.
-                                                 CFRangeMake(0, 0), // stringRange: The range, of the attributed string that was used to create the framesetter,
-                                                                    // that is to be typeset in lines fitted into the frame. If the length portion of the range is
-                                                                    // set to 0, then the framesetter continues to add lines until it runs out of text or space.
-                                                 LFramePath, // path: A CGPath object that specifies the shape of the frame. The path may be non-rectangular
-                                                             // in versions of OS X v10.7 or later and versions of iOS 4.2 or later.
-                                                 nil); // frameAttributes: Additional attributes that control the frame filling process can be specified here,
-                                                       // or NULL if there are no such attributes.
+              LFrame := CTFramesetterCreateFrame(
+                          LFrameSetter, // framesetter: The framesetter used to create the frame.
+                          CFRangeMake(0, 0), // stringRange: The range, of the attributed string that was used to create the framesetter,
+                                             // that is to be typeset in lines fitted into the frame. If the length portion of the range is
+                                             // set to 0, then the framesetter continues to add lines until it runs out of text or space.
+                          LFramePath, // path: A CGPath object that specifies the shape of the frame. The path may be non-rectangular
+                                      // in versions of OS X v10.7 or later and versions of iOS 4.2 or later.
+                          nil); // frameAttributes: Additional attributes that control the frame filling process can be specified here,
+                                // or NULL if there are no such attributes.
               if LFrame = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end;  // CTFramesetterCreateFrame return NULL if unsuccessful.
               try
 
@@ -1342,11 +1354,12 @@ begin
 
                   //init aline / aMeasuredWidth
                   Lline := CFArrayGetValueAtIndex(Llines, I);
-                  LMeasuredWidth := CTLineGetTypographicBounds(Lline, // line: The line whose typographic bounds are calculated.
-                                                               @LAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
-                                                               @LDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
-                                                               nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
-                                                                     // >> return the typographic width of the line. If the line is invalid, this function returns 0.
+                  LMeasuredWidth := CTLineGetTypographicBounds(
+                                      Lline, // line: The line whose typographic bounds are calculated.
+                                      @LAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
+                                      @LDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
+                                      nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
+                                            // >> return the typographic width of the line. If the line is invalid, this function returns 0.
 
                   //unfortunatly the lines that are wrapped are not trimed with the last space
                   //so aMeasuredWidth is inacurate. so i must trim the trailling char
@@ -1604,11 +1617,12 @@ begin
                               end;
 
                               //init aEllipsisWidth
-                              LEllipsisWidth := CTLineGetTypographicBounds(LEllipsisLine, // line: The line whose typographic bounds are calculated.
-                                                                           @LAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
-                                                                           @LDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
-                                                                           nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
-                                                                                 // >> return the typographic width of the line. If the line is invalid, this function returns 0.
+                              LEllipsisWidth := CTLineGetTypographicBounds(
+                                                  LEllipsisLine, // line: The line whose typographic bounds are calculated.
+                                                  @LAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
+                                                  @LDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
+                                                  nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
+                                                        // >> return the typographic width of the line. If the line is invalid, this function returns 0.
 
                               //Create an immutable path of a rectangle.
                               LFramePath := CGPathCreateWithRect(ALLowerLeftCGRect(tpointf.create(0,0){aUpperLeftOrigin},
@@ -1626,14 +1640,15 @@ begin
                                   try
 
                                     //Creates an immutable frame using a framesetter.
-                                    LFrame := CTFramesetterCreateFrame(LFrameSetter, // framesetter: The framesetter used to create the frame.
-                                                                       CFRangeMake(LStringRange.location, 0), // stringRange: The range, of the attributed string that was used to create the framesetter,
-                                                                                                              // that is to be typeset in lines fitted into the frame. If the length portion of the range is
-                                                                                                              // set to 0, then the framesetter continues to add lines until it runs out of text or space.
-                                                                       LFramePath, // path: A CGPath object that specifies the shape of the frame. The path may be non-rectangular
-                                                                                   // in versions of OS X v10.7 or later and versions of iOS 4.2 or later.
-                                                                       nil); // frameAttributes: Additional attributes that control the frame filling process can be specified here,
-                                                                             // or NULL if there are no such attributes.
+                                    LFrame := CTFramesetterCreateFrame(
+                                                LFrameSetter, // framesetter: The framesetter used to create the frame.
+                                                CFRangeMake(LStringRange.location, 0), // stringRange: The range, of the attributed string that was used to create the framesetter,
+                                                                                       // that is to be typeset in lines fitted into the frame. If the length portion of the range is
+                                                                                       // set to 0, then the framesetter continues to add lines until it runs out of text or space.
+                                                LFramePath, // path: A CGPath object that specifies the shape of the frame. The path may be non-rectangular
+                                                            // in versions of OS X v10.7 or later and versions of iOS 4.2 or later.
+                                                nil); // frameAttributes: Additional attributes that control the frame filling process can be specified here,
+                                                      // or NULL if there are no such attributes.
                                     if LFrame <> nil then begin // CTFramesetterCreateFrame return NULL if unsuccessful.
                                       try
 
@@ -1649,11 +1664,12 @@ begin
 
                                           //init aline / aMeasuredWidth
                                           Lline := CFArrayGetValueAtIndex(Llines, 0);
-                                          LMeasuredWidth := CTLineGetTypographicBounds(Lline, // line: The line whose typographic bounds are calculated.
-                                                                                       @LAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
-                                                                                       @LDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
-                                                                                       nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
-                                                                                            // >> return the typographic width of the line. If the line is invalid, this function returns 0.
+                                          LMeasuredWidth := CTLineGetTypographicBounds(
+                                                              Lline, // line: The line whose typographic bounds are calculated.
+                                                              @LAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
+                                                              @LDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
+                                                              nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
+                                                                    // >> return the typographic width of the line. If the line is invalid, this function returns 0.
 
                                           //init aStringRange
                                           LStringRange := CTLineGetStringRange(Lline); // return a CFRange structure that contains the range over the backing store string that spawned the glyphs
@@ -1859,7 +1875,7 @@ function ALBreakText(const aColorSpace: CGColorSpaceRef;
                      const aEllipsisText: string = '…';
                      const aEllipsisFontStyle: TFontStyles = [];
                      const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
-                     const aMaxlines: integer = 0): boolean; inline; overload; // // return true if text was breaked in several lines (truncated or not)
+                     const aMaxlines: integer = 0): boolean; inline; overload; // return true if text was breaked in several lines (truncated or not)
 var LTotalLines: integer;
     LAllTextDrawed: boolean;
 begin
@@ -1881,7 +1897,7 @@ begin
                         aEllipsisText, // const aEllipsisText: string = '…';
                         aEllipsisFontStyle, // const aEllipsisFontStyle: TFontStyles = [];
                         aEllipsisFontColor, // const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
-                        aMaxlines); // const aMaxlines: integer = 0): boolean; // // return true if text was breaked in several lines (truncated or not)
+                        aMaxlines); // const aMaxlines: integer = 0): boolean; // return true if text was breaked in several lines (truncated or not)
 end;
 {$ENDIF}
 
@@ -1997,7 +2013,7 @@ function ALBreakText(const aFontColor: TalphaColor;
                      const aEllipsisText: string = '…';
                      const aEllipsisFontStyle: TFontStyles = [];
                      const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
-                     const aMaxlines: integer = 0): boolean; // // return true if text was breaked in several lines (truncated or not)
+                     const aMaxlines: integer = 0): boolean; // return true if text was breaked in several lines (truncated or not)
 
 var LBreakTextItemsStartCount: integer;
     LBreakTextItem: TALBreakTextItem;
@@ -2159,9 +2175,10 @@ begin
                                        //-----
                                        _initEllipsis;
                                        //-----
-                                       if (LNumberOfChars < LLine.length) then dec(LNumberOfChars); // (aNumberOfChars < aLine.length) to know that we are not here
-                                                                                                    // because of manual linebreak and dec(aNumberOfChars) because initialy
-                                                                                                    // we considere that aEllipsisText is only one char
+                                       //(aNumberOfChars < aLine.length) to know that we are not here
+                                       //because of manual linebreak and dec(aNumberOfChars) because initialy
+                                       //we considere that aEllipsisText is only one char
+                                       if (LNumberOfChars < LLine.length) then dec(LNumberOfChars);
                                        while LNumberOfChars > 0 do begin
                                          LLine := LLine.substring(0, LNumberOfChars);
                                          LNumberOfChars := ALbreakText(aFontSize,
@@ -2197,9 +2214,10 @@ begin
                                     //----
                                     else begin
                                       LNumberOfChars := LSaveNumberOfChars;
-                                      if (not LSaveNumberOfCharsIsAccurate) and (LNumberOfChars < LLine.length) then dec(LNumberOfChars); // (aNumberOfChars < aLine.length) to know that we are not here
-                                                                                                                                          // because of manual linebreak and dec(aNumberOfChars) because initialy
-                                                                                                                                          // we considere that aEllipsisText is only one char
+                                      //(aNumberOfChars < aLine.length) to know that we are not here
+                                      //because of manual linebreak and dec(aNumberOfChars) because initialy
+                                      //we considere that aEllipsisText is only one char
+                                      if (not LSaveNumberOfCharsIsAccurate) and (LNumberOfChars < LLine.length) then dec(LNumberOfChars);
                                       while LNumberOfChars > 0 do begin
                                         LLine := LLine.substring(0, LNumberOfChars); // length of aLine is now aNumberOfChars
                                         LNumberOfChars := ALbreakText(aFontSize,
@@ -2261,9 +2279,10 @@ begin
               //----
               else begin
                 LNumberOfChars := LSaveNumberOfChars;
-                if (not LSaveNumberOfCharsIsAccurate) and (LNumberOfChars < LLine.length) then dec(LNumberOfChars); // (aNumberOfChars < aLine.length) to know that we are not here
-                                                                                                                    // because of manual linebreak and dec(aNumberOfChars) because initialy
-                                                                                                                    // we considere that aEllipsisText is only one char
+                //(aNumberOfChars < aLine.length) to know that we are not here
+                //because of manual linebreak and dec(aNumberOfChars) because initialy
+                //we considere that aEllipsisText is only one char
+                if (not LSaveNumberOfCharsIsAccurate) and (LNumberOfChars < LLine.length) then dec(LNumberOfChars);
                 while LNumberOfChars > 0 do begin
                   LLine := LLine.substring(0, LNumberOfChars); // length of aLine is now aNumberOfChars
                   LNumberOfChars := ALbreakText(aFontSize,
@@ -2830,7 +2849,7 @@ begin
             LCurrImgSrc := '';
             LCurrText := '';
             P2 := ALPosW('>', aText, P1+1); // blablabla <font color="#ffffff">bliblibli</font> blobloblo
-                                              //           ^P1                  ^P2
+                                            //           ^P1                  ^P2
             if P2 <= 0 then break;
             LTag := ALCopyStr(aText, P1, P2 - P1 + 1); // <font color="#ffffff">
             P1 := P2 + 1; // blablabla <font color="#ffffff">bliblibli</font> blobloblo
@@ -2895,7 +2914,7 @@ begin
 
             LCurrImgSrc := '';
             P2 := ALPosW('<', aText, P1);  // blablabla <font color="#ffffff">bliblibli</font> blobloblo
-                                             //                                 ^P1      ^P2
+                                           //                                 ^P1      ^P2
             if P2 <= 0 then P2 := Maxint;
             LCurrText := ALCopyStr(aText, P1, P2 - P1);  // blablabla
             LCurrText := ALStringReplaceW(LCurrText, '&gt;', '>', [rfReplaceALL]);
@@ -3161,10 +3180,11 @@ begin
                                for I := 1 to LBreakedTextItems.Count do begin
                                  if (I = LBreakedTextItems.Count) or
                                     (compareValue(LCurrentLineY, LBreakedTextItems[I].rect.top, Tepsilon.Position) <> 0) then begin
-                                   LOffset := Floor((aRect.width -
-                                                       LBreakedTextItems[I-1].rect.Right -
-                                                         aOptions.Padding.Left -
-                                                           aOptions.Padding.right) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                                   LOffset := Floor(
+                                                (aRect.width -
+                                                 LBreakedTextItems[I-1].rect.Right -
+                                                 aOptions.Padding.Left -
+                                                 aOptions.Padding.right) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
                                    while J < I do begin
                                      LBreakedTextItems[j].pos.X := LBreakedTextItems[j].pos.X + aOptions.Padding.Left + LOffset;
                                      LBreakedTextItems[j].rect.Offset(aOptions.Padding.Left + LOffset, 0);
@@ -3188,10 +3208,11 @@ begin
                                  for I := 1 to LBreakedTextItems.Count do begin
                                    if (I = LBreakedTextItems.Count) or
                                       (compareValue(LCurrentLineY, LBreakedTextItems[I].rect.top, Tepsilon.Position) <> 0) then begin
-                                     LOffset := Floor((aRect.width -
-                                                         LBreakedTextItems[I-1].rect.Right -
-                                                           aOptions.Padding.Left -
-                                                             aOptions.Padding.right)); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                                     LOffset := Floor(
+                                                  (aRect.width -
+                                                   LBreakedTextItems[I-1].rect.Right -
+                                                   aOptions.Padding.Left -
+                                                   aOptions.Padding.right)); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
                                      while J < I do begin
                                        LBreakedTextItems[j].pos.X := LBreakedTextItems[j].pos.X + aOptions.Padding.Left + LOffset;
                                        LBreakedTextItems[j].rect.Offset(aOptions.Padding.Left + LOffset, 0);
@@ -3205,10 +3226,11 @@ begin
       end;
       case aOptions.VTextAlign of
         TTextAlign.Center: begin
-                             LOffset := Floor((aRect.height -
-                                                 LMaxHeight -
-                                                   aOptions.Padding.top -
-                                                     aOptions.Padding.bottom) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                             LOffset := Floor(
+                                          (aRect.height -
+                                           LMaxHeight -
+                                           aOptions.Padding.top -
+                                           aOptions.Padding.bottom) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
                              for I := 0 to LBreakedTextItems.Count - 1 do begin
                                LBreakedTextItems[I].pos.y := LBreakedTextItems[i].pos.y + aOptions.Padding.top + LOffset;
                                LBreakedTextItems[I].rect.Offset(0, aOptions.Padding.top + LOffset);
@@ -3221,10 +3243,11 @@ begin
                              end;
                            end;
         TTextAlign.Trailing: begin
-                               LOffset := Floor((aRect.height -
-                                                   LMaxHeight -
-                                                     aOptions.Padding.top -
-                                                       aOptions.Padding.bottom)); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                               LOffset := Floor(
+                                            (aRect.height -
+                                             LMaxHeight -
+                                             aOptions.Padding.top -
+                                             aOptions.Padding.bottom)); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
                                for I := 0 to LBreakedTextItems.Count - 1 do begin
                                  LBreakedTextItems[I].pos.y := LBreakedTextItems[i].pos.y + aOptions.Padding.top + LOffset;
                                  LBreakedTextItems[I].rect.Offset(0, aOptions.Padding.top + LOffset);

@@ -871,14 +871,15 @@ begin
   FPipePath := '\\.\pipe\ALPhpFastCGIRunner-' + ALNewGUIDStringA(true{WithoutBracket});
 
   //create the server pipe
-  FServerPipe := CreateNamedPipeA(PAnsiChar(fpipePath),                              //lpName
-                       		        PIPE_ACCESS_DUPLEX,                                //dwOpenMode
-  		                            PIPE_TYPE_BYTE or PIPE_WAIT or PIPE_READMODE_BYTE, //dwPipeMode
-                     		          PIPE_UNLIMITED_INSTANCES,                          //nMaxInstances
-                     		          4096,                                              //nOutBufferSize
-                                  4096,                                              //nInBufferSize
-                                  0,                                                 //nDefaultTimeOut
-                                  NiL);                                              //lpSecurityAttributes
+  FServerPipe := CreateNamedPipeA(
+                   PAnsiChar(fpipePath),                              //lpName
+                   PIPE_ACCESS_DUPLEX,                                //dwOpenMode
+                   PIPE_TYPE_BYTE or PIPE_WAIT or PIPE_READMODE_BYTE, //dwPipeMode
+                   PIPE_UNLIMITED_INSTANCES,                          //nMaxInstances
+                   4096,                                              //nOutBufferSize
+                   4096,                                              //nInBufferSize
+                   0,                                                 //nDefaultTimeOut
+                   NiL);                                              //lpSecurityAttributes
   checkerror(FServerPipe = INVALID_HANDLE_VALUE);
   try
 

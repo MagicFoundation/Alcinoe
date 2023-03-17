@@ -996,8 +996,9 @@ var
 
   procedure InvalidMask;
   begin
-    raise EALMaskException.CreateResFmt(@SInvalidMask, [Mask,
-      P - PansiChar(Mask) + 1]);
+    raise EALMaskException.CreateResFmt(
+            @SInvalidMask,
+            [Mask, P - PansiChar(Mask) + 1]);
   end;
 
   procedure Reset;
@@ -2319,8 +2320,10 @@ type
 {**********************************************}
 constructor TCFString.Create(const Val: string);
 begin
-  Value := CFStringCreateWithCharacters(kCFAllocatorDefault,
-    PChar(Val), Length(Val));
+  Value := CFStringCreateWithCharacters(
+             kCFAllocatorDefault,
+             PChar(Val),
+             Length(Val));
 end;
 
 {************************************************************}
@@ -2428,8 +2431,15 @@ var
   var
     NumBuf: array[0..15] of AnsiChar;
   begin
-    AppendChars(NumBuf, ALFormatBuf(NumBuf, Length(NumBuf), Format,
-      Length(Format), [Digits, Number], AFormatSettings));
+    AppendChars(
+      NumBuf,
+      ALFormatBuf(
+        NumBuf,
+        Length(NumBuf),
+        Format,
+        Length(Format),
+        [Digits, Number],
+        AFormatSettings));
   end;
 
   procedure AppendFormat(Format: PAnsiChar);
@@ -2574,10 +2584,11 @@ var
         DecodeDate(DateTime, LYear, LMonth, LDay);
         LDate.year := LYear; LDate.month := ShortInt(LMonth); LDate.day := ShortInt(LDay);
         LDate.hour := 0; LDate.minute := 0; LDate.second := 0;
-        Result := TCFString(CFDateFormatterCreateStringWithAbsoluteTime(
-                              kCFAllocatorDefault, Formatter,
-                              CFGregorianDateGetAbsoluteTime(LDate, DefaultTZ))
-                           ).AsAnsiString(true);
+        Result := TCFString(
+                    CFDateFormatterCreateStringWithAbsoluteTime(
+                      kCFAllocatorDefault,
+                      Formatter,
+                      CFGregorianDateGetAbsoluteTime(LDate, DefaultTZ))).AsAnsiString(true);
       finally
         if FormatString.Value <> nil then
           CFRelease(FormatString.Value);
@@ -2945,15 +2956,19 @@ begin
 end;
 
 {***********************************************************************}
-function ALFormatDateTimeA(const Format: AnsiString; DateTime: TDateTime;
-  const AFormatSettings: TALFormatSettingsA): AnsiString;
+function ALFormatDateTimeA(
+           const Format: AnsiString;
+           DateTime: TDateTime;
+           const AFormatSettings: TALFormatSettingsA): AnsiString;
 begin
   ALDateTimeToString(Result, Format, DateTime, AFormatSettings);
 end;
 
 {*******************************************************************}
-function ALFormatDateTimeW(const Format: string; DateTime: TDateTime;
-  const AFormatSettings: TALFormatSettingsW): string;
+function ALFormatDateTimeW(
+           const Format: string;
+           DateTime: TDateTime;
+           const AFormatSettings: TALFormatSettingsW): string;
 begin
   result := system.sysutils.FormatDateTime(Format, DateTime, AFormatSettings);
 end;
@@ -3639,8 +3654,10 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.SysUtils.TryStrToDate is still the same and adjust the IFDEF'}
 {$IFEND}
-function ALTryStrToDate(const S: AnsiString; out Value: TDateTime;
-  const AFormatSettings: TALFormatSettingsA): Boolean;
+function ALTryStrToDate(
+           const S: AnsiString;
+           out Value: TDateTime;
+           const AFormatSettings: TALFormatSettingsA): Boolean;
 var
   Pos: Integer;
 begin
@@ -3649,8 +3666,10 @@ begin
 end;
 
 {************************************************************}
-function ALTryStrToDate(const S: string; out Value: TDateTime;
-  const AFormatSettings: TALFormatSettingsW): Boolean;
+function ALTryStrToDate(
+           const S: string;
+           out Value: TDateTime;
+           const AFormatSettings: TALFormatSettingsW): Boolean;
 begin
   result := system.sysutils.TryStrToDate(S, Value, AFormatSettings);
 end;
@@ -3677,8 +3696,10 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.SysUtils.TryStrToTime is still the same and adjust the IFDEF'}
 {$IFEND}
-function ALTryStrToTime(const S: AnsiString; out Value: TDateTime;
-  const AFormatSettings: TALFormatSettingsA): Boolean;
+function ALTryStrToTime(
+           const S: AnsiString;
+           out Value: TDateTime;
+           const AFormatSettings: TALFormatSettingsA): Boolean;
 var
   Pos: Integer;
 begin
@@ -3687,8 +3708,10 @@ begin
 end;
 
 {*************************************************************}
-function  ALTryStrToTime(const S: string; out Value: TDateTime;
-  const AFormatSettings: TALFormatSettingsW): Boolean;
+function  ALTryStrToTime(
+            const S: string;
+            out Value: TDateTime;
+            const AFormatSettings: TALFormatSettingsW): Boolean;
 begin
   result := system.sysutils.TryStrToTime(S, Value, AFormatSettings);
 end;
@@ -3716,8 +3739,10 @@ end;
   {$MESSAGE WARN 'Check if system.SysUtils.TryStrToDateTime is still the same and adjust the IFDEF'}
 {$IFEND}
 {$R-} {Range-Checking}
-function ALTryStrToDateTime(const S: AnsiString; out Value: TDateTime;
-  const AFormatSettings: TALFormatSettingsA): Boolean;
+function ALTryStrToDateTime(
+           const S: AnsiString;
+           out Value: TDateTime;
+           const AFormatSettings: TALFormatSettingsA): Boolean;
 var
   Pos: Integer;
   NumberPos: Integer;
@@ -3810,8 +3835,10 @@ end;
 {$ENDIF}
 
 {****************************************************************}
-function ALTryStrToDateTime(const S: string; out Value: TDateTime;
-  const AFormatSettings: TALFormatSettingsW): Boolean;
+function ALTryStrToDateTime(
+           const S: string;
+           out Value: TDateTime;
+           const AFormatSettings: TALFormatSettingsW): Boolean;
 begin
   result := system.sysutils.TryStrToDateTime(S, Value, AFormatSettings);
 end;
@@ -5387,8 +5414,17 @@ function ALFloatToStrA(Value: Extended; const AFormatSettings: TALFormatSettings
 var
   Buffer: array[0..63] of AnsiChar;
 begin
-  SetString(Result, Buffer, ALInternalFloatToText(PByte(@Buffer), Value, fvExtended,
-    ffGeneral, 15, 0, AFormatSettings));
+  SetString(
+    Result,
+    Buffer,
+    ALInternalFloatToText(
+      PByte(@Buffer),
+      Value,
+      fvExtended,
+      ffGeneral,
+      15,
+      0,
+      AFormatSettings));
 end;
 
 {*****************************************************************************************************}
@@ -5396,8 +5432,17 @@ procedure ALFloatToStrA(Value: Extended; var S: ansiString; const AFormatSetting
 var
   Buffer: array[0..63] of AnsiChar;
 begin
-  SetString(S, Buffer, ALInternalFloatToText(PByte(@Buffer), Value, fvExtended,
-    ffGeneral, 15, 0, AFormatSettings));
+  SetString(
+    S,
+    Buffer,
+    ALInternalFloatToText(
+      PByte(@Buffer),
+      Value,
+      fvExtended,
+      ffGeneral,
+      15,
+      0,
+      AFormatSettings));
 end;
 
 {*****************************************************************************************}
@@ -5413,18 +5458,33 @@ begin
 end;
 
 {************************************************************}
-function ALFloatToStrFA(Value: Extended; Format: TFloatFormat;
-  Precision, Digits: Integer; const AFormatSettings: TALFormatSettingsA): AnsiString;
+function ALFloatToStrFA(
+           Value: Extended;
+           Format: TFloatFormat;
+           Precision, Digits: Integer;
+           const AFormatSettings: TALFormatSettingsA): AnsiString;
 var
   Buffer: array[0..63] of AnsiChar;
 begin
-  SetString(Result, Buffer, ALInternalFloatToText(PByte(@Buffer), Value, fvExtended,
-    Format, Precision, Digits, AFormatSettings));
+  SetString(
+    Result,
+    Buffer,
+    ALInternalFloatToText(
+      PByte(@Buffer),
+      Value,
+      fvExtended,
+      Format,
+      Precision,
+      Digits,
+      AFormatSettings));
 end;
 
 {************************************************************}
-function ALFloatToStrFW(Value: Extended; Format: TFloatFormat;
-  Precision, Digits: Integer; const AFormatSettings: TALFormatSettingsW): String;
+function ALFloatToStrFW(
+           Value: Extended;
+           Format: TFloatFormat;
+           Precision, Digits: Integer;
+           const AFormatSettings: TALFormatSettingsW): String;
 begin
   result := System.sysUtils.FloatToStrF(Value, Format, Precision, Digits, AFormatSettings);
 end;
@@ -5434,8 +5494,17 @@ function  ALCurrToStrA(Value: Currency; const AFormatSettings: TALFormatSettings
 var
   Buffer: array[0..63] of AnsiChar;
 begin
-  SetString(Result, Buffer, ALInternalFloatToText(PByte(@Buffer), Value, fvCurrency,
-    ffGeneral, 0, 0, AFormatSettings));
+  SetString(
+    Result,
+    Buffer,
+    ALInternalFloatToText(
+      PByte(@Buffer),
+      Value,
+      fvCurrency,
+      ffGeneral,
+      0,
+      0,
+      AFormatSettings));
 end;
 
 {*****************************************************************************************}
@@ -6596,18 +6665,31 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.sysUtils.FormatFloat is still the same and adjust the IFDEF'}
 {$IFEND}
-function ALFormatFloatA(const Format: AnsiString; Value: Extended;
-  const AFormatSettings: TALFormatSettingsA): AnsiString;
+function ALFormatFloatA(
+           const Format: AnsiString;
+           Value: Extended;
+           const AFormatSettings: TALFormatSettingsA): AnsiString;
 var
   Buffer: array[0..255] of AnsiChar;
 begin
   if Length(Format) > Length(Buffer) - 32 then ALConvertError(@SFormatTooLong);
-  SetString(Result, Buffer, ALInternalFloatToTextFmt(PByte(@Buffer), Value, fvExtended,
-    PByte(Format), AFormatSettings{, False}));
+  SetString(
+    Result,
+    Buffer,
+    ALInternalFloatToTextFmt(
+      PByte(@Buffer),
+      Value,
+      fvExtended,
+      PByte(Format),
+      AFormatSettings
+      {, False}));
 end;
 
 {****************************************************************************************************************}
-function  ALFormatFloatW(const Format: string; Value: Extended; const AFormatSettings: TALFormatSettingsW): string;
+function  ALFormatFloatW(
+            const Format: string;
+            Value: Extended;
+            const AFormatSettings: TALFormatSettingsW): string;
 begin
   result := system.sysutils.FormatFloat(Format, Value, AFormatSettings);
 end;
@@ -6616,18 +6698,31 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.sysUtils.FormatCurr is still the same and adjust the IFDEF'}
 {$IFEND}
-function ALFormatCurrA(const Format: AnsiString; Value: Currency;
-  const AFormatSettings: TALFormatSettingsA): AnsiString;
+function ALFormatCurrA(
+           const Format: AnsiString;
+           Value: Currency;
+           const AFormatSettings: TALFormatSettingsA): AnsiString;
 var
   Buffer: array[0..255] of AnsiChar;
 begin
   if Length(Format) > Length(Buffer) - 32 then ALConvertError(@SFormatTooLong);
-  SetString(Result, Buffer, ALInternalFloatToTextFmt(PByte(@Buffer), Value, fvCurrency,
-    PByte(Format), AFormatSettings{, False}));
+  SetString(
+    Result,
+    Buffer,
+    ALInternalFloatToTextFmt(
+      PByte(@Buffer),
+      Value,
+      fvCurrency,
+      PByte(Format),
+      AFormatSettings
+      {, False}));
 end;
 
 {***************************************************************************************************************}
-function  ALFormatCurrW(const Format: string; Value: Currency; const AFormatSettings: TALFormatSettingsW): string;
+function  ALFormatCurrW(
+            const Format: string;
+            Value: Currency;
+            const AFormatSettings: TALFormatSettingsW): string;
 begin
   result := system.sysutils.FormatCurr(Format, Value, AFormatSettings);
 end;

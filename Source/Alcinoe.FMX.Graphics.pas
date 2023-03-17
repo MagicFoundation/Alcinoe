@@ -566,7 +566,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -1344,7 +1344,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -1828,7 +1828,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -1930,10 +1930,11 @@ begin
                   CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                   CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
                   CGContextBeginPath(LContext);  // Creates a new empty path in a graphics context.
-                  CGContextAddEllipseInRect(LContext, ALLowerLeftCGRect(TPointF.Create(LDestRect.Left, LDestRect.Top),
-                                                                        LDestRect.Width,
-                                                                        LDestRect.Height,
-                                                                        h)); // Adds an ellipse that fits inside the specified rectangle.
+                  CGContextAddEllipseInRect(LContext,
+                                            ALLowerLeftCGRect(TPointF.Create(LDestRect.Left, LDestRect.Top),
+                                                              LDestRect.Width,
+                                                              LDestRect.Height,
+                                                              h)); // Adds an ellipse that fits inside the specified rectangle.
                   CGContextClosePath(LContext); // Closes and terminates the current path’s subpath.
                   CGContextClip(LContext); // Modifies the current clipping path, using the nonzero winding number rule.
                                            // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
@@ -2077,10 +2078,11 @@ begin
                     CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                     CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
                     CGContextBeginPath(LContext);  // Creates a new empty path in a graphics context.
-                    CGContextAddEllipseInRect(LContext, ALLowerLeftCGRect(TPointF.Create(LDestRect.Left, LDestRect.Top),
-                                                                          LDestRect.Width,
-                                                                          LDestRect.Height,
-                                                                          LBitmapSurface.Height)); // Adds an ellipse that fits inside the specified rectangle.
+                    CGContextAddEllipseInRect(LContext,
+                                              ALLowerLeftCGRect(TPointF.Create(LDestRect.Left, LDestRect.Top),
+                                                                LDestRect.Width,
+                                                                LDestRect.Height,
+                                                                LBitmapSurface.Height)); // Adds an ellipse that fits inside the specified rectangle.
                     CGContextClosePath(LContext); // Closes and terminates the current path’s subpath.
                     CGContextClip(LContext); // Modifies the current clipping path, using the nonzero winding number rule.
                                              // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
@@ -2360,10 +2362,11 @@ begin
               CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
               CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
               CGContextBeginPath(LContext);  // Creates a new empty path in a graphics context.
-              CGContextAddEllipseInRect(LContext, ALLowerLeftCGRect(TPointF.Create(LDestRect.Left, LDestRect.Top),
-                                                                    LDestRect.Width,
-                                                                    LDestRect.Height,
-                                                                    h)); // Adds an ellipse that fits inside the specified rectangle.
+              CGContextAddEllipseInRect(LContext,
+                                        ALLowerLeftCGRect(TPointF.Create(LDestRect.Left, LDestRect.Top),
+                                                          LDestRect.Width,
+                                                          LDestRect.Height,
+                                                          h)); // Adds an ellipse that fits inside the specified rectangle.
               CGContextClosePath(LContext); // Closes and terminates the current path’s subpath.
               CGContextClip(LContext); // Modifies the current clipping path, using the nonzero winding number rule.
                                        // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
@@ -2640,7 +2643,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -2781,7 +2784,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -3299,7 +3302,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -3493,7 +3496,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -4183,7 +4186,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -4334,7 +4337,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -5019,7 +5022,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -5161,7 +5164,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -5731,7 +5734,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -5869,7 +5872,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -6359,7 +6362,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -6675,7 +6678,7 @@ begin
   end;
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then begin
       result := TSize.create(0,0);
@@ -7929,7 +7932,7 @@ begin
           try
             if fill.Bitmap.Bitmap.Map(TMapAccess.Read, LBitmapData) then
             try
-              System.Move(LBitmapData.Data^, LPixelBuffer^, LBitmapData.Pitch * LBitmapData.Height);
+              ALMove(LBitmapData.Data^, LPixelBuffer^, LBitmapData.Pitch * LBitmapData.Height);
             finally
               fill.Bitmap.Bitmap.Unmap(LBitmapData);
             end;
@@ -8374,7 +8377,7 @@ begin
           try
             if fill.Bitmap.Bitmap.Map(TMapAccess.Read, LBitmapData) then
             try
-              System.Move(LBitmapData.Data^, LPixelBuffer^, LBitmapData.Pitch * LBitmapData.Height);
+              ALMove(LBitmapData.Data^, LPixelBuffer^, LBitmapData.Pitch * LBitmapData.Height);
             finally
               fill.Bitmap.Bitmap.Unmap(LBitmapData);
             end;

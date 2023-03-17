@@ -8105,13 +8105,14 @@ Procedure ALJSONToTStringsA(const AJsonStr: AnsiString;
                            Const aTrueStr: AnsiString = 'true';
                            Const aFalseStr: AnsiString = 'false');
 begin
- ALJSONToTStringsA(AJsonStr,
-                  aFormatSettings,
-                  '',
-                  aLst,
-                  aNullStr,
-                  aTrueStr,
-                  aFalseStr);
+  ALJSONToTStringsA(
+    AJsonStr,
+    aFormatSettings,
+    '',
+    aLst,
+    aNullStr,
+    aTrueStr,
+    aFalseStr);
 end;
 
 {******************************************************}

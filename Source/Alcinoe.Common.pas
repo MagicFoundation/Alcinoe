@@ -353,8 +353,10 @@ type
     /// <param name="AVertAlign"> The vertical arrangement, if the height of the rectangle is smaller than the height
     /// of the designated area. The <b>Center</b> by default </param>
     /// <returns> The current rectangle after transformation </returns>
-    function PlaceInto(const ADesignatedArea: TALRectD; const AHorzAlign: THorzRectAlign = THorzRectAlign.Center;
-      const AVertAlign: TVertRectAlign = TVertRectAlign.Center): TALRectD;
+    function PlaceInto(
+               const ADesignatedArea: TALRectD;
+               const AHorzAlign: THorzRectAlign = THorzRectAlign.Center;
+               const AVertAlign: TVertRectAlign = TVertRectAlign.Center): TALRectD;
 
     /// <summary> Rounds the location and size of the current rectangle to the specified value
     /// <param name="AScale"> The scale of scene </param>
@@ -1828,9 +1830,11 @@ begin
   ALRectCenter(Result, ADesignatedArea);
 end;
 
-{********************************************************************************************}
-function TALRectD.PlaceInto(const ADesignatedArea: TALRectD; const AHorzAlign: THorzRectAlign;
-  const AVertAlign: TVertRectAlign): TALRectD;
+{**************************}
+function TALRectD.PlaceInto(
+           const ADesignatedArea: TALRectD;
+           const AHorzAlign: THorzRectAlign;
+           const AVertAlign: TVertRectAlign): TALRectD;
 var
   LLocation: TALPointD;
 begin

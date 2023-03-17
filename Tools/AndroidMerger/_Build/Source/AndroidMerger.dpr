@@ -2046,7 +2046,7 @@ begin
           ReadLn(LAnswer);
           if not ALSameTextW(LAnswer, 'Y') then begin
             Writeln('');
-            Writeln('Press any key to exit');
+            Writeln('Press <Enter> key to quit');
             Readln;
             exit;
           end;
@@ -3611,10 +3611,10 @@ begin
 
     end;
 
-    Writeln('');
-    Writeln('Merge successful');
     if not LNoInteraction then begin
-      Writeln('Press any key to exit');
+      Writeln('');
+      Writeln('Merge successful');
+      Writeln('Press <Enter> key to quit');
       Readln;
     end;
 
@@ -3659,7 +3659,7 @@ begin
       Writeln('');
       Writeln('');
       Writeln('Merge failed!');
-      Writeln('Press any key to exit');
+      Writeln('Press <Enter> key to quit');
       Readln;
       halt(1);
     end;

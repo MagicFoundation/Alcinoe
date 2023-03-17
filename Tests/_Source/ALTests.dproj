@@ -5,7 +5,7 @@
     <FrameworkType>None</FrameworkType>
     <Base>True</Base>
     <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Debug</Config>
-    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Android64</Platform>
+    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Win32</Platform>
     <TargetedPlatforms>693395</TargetedPlatforms>
     <AppType>Console</AppType>
     <MainSource>ALTests.dpr</MainSource>
@@ -271,6 +271,7 @@
     <DelphiCompile Include="$(MainSource)">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
+    <DCCReference Include="ALTestCipher.pas"/>
     <DCCReference Include="ALTestStrings.pas"/>
     <BuildConfiguration Include="Base">
       <Key>Base</Key>

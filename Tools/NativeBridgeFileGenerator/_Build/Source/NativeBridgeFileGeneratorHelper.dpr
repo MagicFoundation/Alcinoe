@@ -492,7 +492,7 @@ begin
       Writeln('');
       Writeln('');
       Writeln('NativeBridgeFileGeneratorHelper failed!');
-      Writeln('Press any key to exit');
+      Writeln('Press <Enter> key to quit');
       Readln;
       halt(1);
     end;

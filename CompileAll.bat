@@ -114,8 +114,14 @@ REM -------------------
 REM Normalize all units
 REM -------------------
 
-call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Source\" -FilesToIgnore="ZLibExGZ.pas;ZLibExApi.pas;ZLibEx.pas;Grijjy.SymbolTranslator.pas;Grijjy.ErrorReporting.pas;Alcinoe.FBX.Lib.pas;Alcinoe.FBX.Base.pas" -CreateBackup="false" -
+echo -------------------
+echo Normalize all units
+echo -------------------
+echo.
+
+call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Source\" -FilesToIgnore="ZLibExGZ.pas;ZLibExApi.pas;ZLibEx.pas;Grijjy.SymbolTranslator.pas;Grijjy.ErrorReporting.pas;Alcinoe.FBX.Lib.pas;Alcinoe.FBX.Base.pas" -CreateBackup="false" -NoInteraction=true
 IF ERRORLEVEL 1 goto ERROR
+echo.
 
 
 REM -----------------

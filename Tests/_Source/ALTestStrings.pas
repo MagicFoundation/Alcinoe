@@ -177,7 +177,7 @@ begin
   CheckExecutionTime(0.4{ARatio});
 end;
 
-{**********************************************}
+{********************************************}
 procedure TALTestStrings.TestAlposIgnoreCaseA;
 begin
   //full random substr

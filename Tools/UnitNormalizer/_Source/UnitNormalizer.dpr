@@ -245,16 +245,16 @@ begin
               while P1 > 0 do begin
                 if (char(LSourceStr[P1]).IsLetterOrDigit) or
                    (LSourceStr[P1] = '_') or
-                   (LSourceStr[P1] = '.') or
-                   (LSourceStr[P1] = '(') or
-                   (LSourceStr[P1] = ')') or
-                   (LSourceStr[P1] = '[') or
-                   (LSourceStr[P1] = ']') then dec(P1)
-                else if (LSourceStr[P1] = '>') then begin
+                   ((LSourceStr[P1] = '.') and (P1 < LRoundBracketStartAt-1)) or
+                   ((LSourceStr[P1] = '(') and (P1 < LRoundBracketStartAt-1)) or
+                   ((LSourceStr[P1] = ')') and (P1 < LRoundBracketStartAt-1)) or
+                   ((LSourceStr[P1] = '[') and (P1 < LRoundBracketStartAt-1)) or
+                   ((LSourceStr[P1] = ']') and (P1 < LRoundBracketStartAt-1)) then dec(P1)
+                else if (LSourceStr[P1] = '>') and (P1 < LRoundBracketStartAt-1) then begin
                   inc(LInLessAndGreaterThanSign);
                   dec(P1);
                 end
-                else if (LSourceStr[P1] = '<') then begin
+                else if (LSourceStr[P1] = '<') and (P1 < LRoundBracketStartAt-1) then begin
                   dec(LInLessAndGreaterThanSign);
                   dec(P1);
                 end
@@ -403,9 +403,11 @@ begin
                     delete(LSourceStr, P0, P2-P0+1);
                     insert(Lstr, LSourceStr, P0);
                     LSourceStrIdx := LRoundBracketStartAt;
-                  end;
+                  end
+                  else LSourceStrIdx := LRoundBracketStartAt;
                 end;
-              end;
+              end
+              else LSourceStrIdx := LRoundBracketStartAt;
             end;
             continue;
           end;
@@ -496,10 +498,10 @@ begin
 
     end;
 
-    Writeln('');
-    Writeln('Finished');
     if not LNoInteraction then begin
-      Writeln('Press any key to exit');
+      Writeln('');
+      Writeln('Finished');
+      Writeln('Press <Enter> key to quit');
       Readln;
     end;
 
@@ -521,7 +523,7 @@ begin
       Writeln('');
       Writeln('');
       Writeln('UnitNormalizer failed!');
-      Writeln('Press any key to exit');
+      Writeln('Press <Enter> key to quit');
       Readln;
       halt(1);
     end;

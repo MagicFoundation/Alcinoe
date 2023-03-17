@@ -58,11 +58,13 @@ uses
 
 {$R *.fmx}
 
+{************************************************}
 function _randomInRange(min, max: single): Single;
 begin
   result := random * (max - min) + min;
 end;
 
+{**********************************************************}
 procedure TTMainForm.BtnFireFireworksClick(Sender: TObject);
 begin
   if FireworksTimer.Enabled then exit;
@@ -71,6 +73,7 @@ begin
   FireworksTimer.Enabled := True;
 end;
 
+{********************************************************}
 procedure TTMainForm.FireworksTimerTimer(Sender: TObject);
 begin
   FireworksTimer.tag := FireworksTimer.tag + NativeInt(FireworksTimer.Interval);
@@ -113,11 +116,13 @@ begin
 
 end;
 
+{************************************************************************************}
 procedure TTMainForm.FormPaint(Sender: TObject; Canvas: TCanvas; const ARect: TRectF);
 begin
   UpdateStatusBar;
 end;
 
+{**************************************************************}
 procedure TTMainForm.BtnFireRealisticLookClick(Sender: TObject);
 begin
   Confetti.Fire(
@@ -197,6 +202,7 @@ begin
 
 end;
 
+{************************************************************}
 procedure TTMainForm.BtnFireSchoolPrideClick(Sender: TObject);
 begin
   if SchoolPrideTimer.Enabled then exit;
@@ -205,6 +211,7 @@ begin
   SchoolPrideTimer.Enabled := True;
 end;
 
+{**********************************************************}
 procedure TTMainForm.SchoolPrideTimerTimer(Sender: TObject);
 begin
 
@@ -247,6 +254,7 @@ begin
 
 end;
 
+{*****************************************************}
 procedure TTMainForm.BtnFireSnowClick(Sender: TObject);
 begin
   if SnowTimer.Enabled then exit;
@@ -257,6 +265,7 @@ begin
   SnowTimer.Enabled := True;
 end;
 
+{************************************************************}
 procedure TTMainForm.BtnRandomDirectionClick(Sender: TObject);
 begin
   Confetti.Fire(
@@ -275,16 +284,18 @@ begin
     1); // const AScalar: Single = 1)
 end;
 
+{***************************************************}
 procedure TTMainForm.ConfettiFinish(Sender: TObject);
 begin
   UpdateStatusBar;
   TThread.ForceQueue(nil,
-  procedure
-  begin
-    invalidate;
-  end);
+    procedure
+    begin
+      invalidate;
+    end);
 end;
 
+{***************************************************}
 procedure TTMainForm.SnowTimerTimer(Sender: TObject);
 begin
 
@@ -316,6 +327,7 @@ begin
 
 end;
 
+{***********************************}
 procedure TTMainForm.UpdateStatusBar;
 begin
   var LAverageFPS: Double := 0;
@@ -348,13 +360,16 @@ begin
   end;
 end;
 
+{*************************************************************}
 procedure TTMainForm.BtnFireCustomConfigClick(Sender: TObject);
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function _StrToColors(const AStr: String): TArray<TalphaColor>;
   begin
     result := []; // Im lazzy
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function _StrToShapes(const AStr: String): TArray<TALConfetti.TParticule.TShape>;
   begin
     result := []; // Im lazzy

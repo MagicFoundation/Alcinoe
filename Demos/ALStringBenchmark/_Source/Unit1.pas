@@ -116,11 +116,13 @@ uses {$IFDEF UNICODE}
 
 {$R *.dfm}
 
+{******************************************}
 procedure TForm1.FormClick(Sender: TObject);
 begin
   Windows.SetFocus(0);
 end;
 
+{***********************************************}
 procedure TForm1.ALButton1Click(Sender: TObject);
 Var S1: AnsiString;
     i: integer;
@@ -174,6 +176,7 @@ begin
   Showmessage('2,500 ALStringReplaceA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{***********************************************}
 procedure TForm1.ALButton2Click(Sender: TObject);
 Var S1: String;
     i: integer;
@@ -227,6 +230,7 @@ begin
   Showmessage('2,500 StringReplace in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton29Click(Sender: TObject);
 Var S1: AnsiString;
     i: integer;
@@ -280,6 +284,7 @@ begin
   Showmessage('2,500 StringReplace in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{***********************************************}
 procedure TForm1.ALButton3Click(Sender: TObject);
 Var S1: AnsiString;
     i: integer;
@@ -328,6 +333,7 @@ begin
   Showmessage('40,000 ALPosA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{***********************************************}
 procedure TForm1.ALButton4Click(Sender: TObject);
 Var S1: String;
     i: integer;
@@ -376,6 +382,7 @@ begin
   Showmessage('40,000 PosEx in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton30Click(Sender: TObject);
 Var S1: AnsiString;
     i: integer;
@@ -424,6 +431,7 @@ begin
   Showmessage('40,000 PosEx in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{***********************************************}
 procedure TForm1.ALButton5Click(Sender: TObject);
 Var S1,S2,S3,S4,S5: AnsiString;
     i: integer;
@@ -492,6 +500,7 @@ begin
   Showmessage('40,000 ALPosA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{***********************************************}
 procedure TForm1.ALButton6Click(Sender: TObject);
 Var S1,S2,S3,S4,S5: String;
     i: integer;
@@ -560,6 +569,7 @@ begin
   Showmessage('40,000 Pos in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton31Click(Sender: TObject);
 Var S1,S2,S3,S4,S5: AnsiString;
     i: integer;
@@ -628,6 +638,7 @@ begin
   Showmessage('40,000 Pos in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton21Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -642,6 +653,7 @@ begin
   Showmessage('1,000,000 ALDateToStrA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton22Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -656,6 +668,7 @@ begin
   Showmessage('1,000,000 Datetostr in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton27Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -672,6 +685,7 @@ begin
   Showmessage('1,000,000 ALTrystrToDateTime in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton28Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -688,6 +702,7 @@ begin
   Showmessage('1,000,000 TrystrToDateTime in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton17Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -701,6 +716,7 @@ begin
   Showmessage('10,000,000 ALStrToInt in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton18Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -714,6 +730,7 @@ begin
   Showmessage('10,000,000 StrToInt in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton19Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -727,6 +744,7 @@ begin
   Showmessage('10,000,000 ALStrToInt64 in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton20Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -740,6 +758,7 @@ begin
   Showmessage('10,000,000 StrToInt64 in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton15Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -752,6 +771,7 @@ begin
   Showmessage('10,000,000 ALIntToStrA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton16Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -764,6 +784,7 @@ begin
   Showmessage('10,000,000 Inttostr in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{***********************************************}
 procedure TForm1.ALButton7Click(Sender: TObject);
 Var S1: AnsiString;
     i: integer;
@@ -807,6 +828,7 @@ begin
   Showmessage('15,000 ALCompareTextA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{***********************************************}
 procedure TForm1.ALButton8Click(Sender: TObject);
 Var S1: String;
     i: integer;
@@ -850,6 +872,7 @@ begin
   Showmessage('15,000 CompareText in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton32Click(Sender: TObject);
 Var S1: ansiString;
     i: integer;
@@ -893,6 +916,7 @@ begin
   Showmessage('15,000 CompareText in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton25Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -907,6 +931,7 @@ begin
   Showmessage('5,000,000 ALFloatToStrA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton26Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -921,6 +946,7 @@ begin
   Showmessage('5,000,000 FloatToStr in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{***********************************************}
 procedure TForm1.ALButton9Click(Sender: TObject);
 Var i: integer;
     StartDate: TdateTime;
@@ -936,6 +962,7 @@ begin
   Showmessage('50,000 AlUpperCase in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{*********************************************}
 procedure TForm1.Button1Click(Sender: TObject);
 Var i: integer;
     StopWatch: TStopWatch;
@@ -952,8 +979,10 @@ begin
   Showmessage('50,000 Base64Encode in: ' + formatFloat('0.,',StopWatch.Elapsed.TotalMilliseconds) + ' ms');
 end;
 
+{*********************************************}
 procedure TForm1.Button2Click(Sender: TObject);
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function EncodeString(const Input: string): string;
   var
     InStr, OutStr: TStringStream;
@@ -987,6 +1016,7 @@ begin
   Showmessage('50,000 Base64Encode in: ' + formatFloat('0.,',StopWatch.Elapsed.TotalMilliseconds) + ' ms');
 end;
 
+{*********************************************}
 procedure TForm1.Button3Click(Sender: TObject);
 Var S1: AnsiString;
     i: integer;
@@ -1035,6 +1065,7 @@ begin
   Showmessage('40,000 ALPosIgnoreCaseA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{*********************************************}
 procedure TForm1.Button4Click(Sender: TObject);
 Var S1: String;
     i: integer;
@@ -1083,6 +1114,7 @@ begin
   Showmessage('40,000 ALPosIgnoreCaseA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton10Click(Sender: TObject);
 Var i: integer;
     StartDate: TdateTime;
@@ -1098,6 +1130,7 @@ begin
   Showmessage('50,000 UpperCase in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton33Click(Sender: TObject);
 Var i: integer;
     StartDate: TdateTime;
@@ -1113,6 +1146,7 @@ begin
   Showmessage('50,000 UpperCase in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton11Click(Sender: TObject);
 Var i: integer;
     StartDate: TdateTime;
@@ -1128,6 +1162,7 @@ begin
   Showmessage('50,000 AlLowerCase in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton12Click(Sender: TObject);
 Var i: integer;
     StartDate: TdateTime;
@@ -1143,6 +1178,7 @@ begin
   Showmessage('50,000 LowerCase in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton34Click(Sender: TObject);
 Var i: integer;
     StartDate: TdateTime;
@@ -1158,6 +1194,7 @@ begin
   Showmessage('50,000 LowerCase in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton13Click(Sender: TObject);
 Var S1: AnsiString;
     i: integer;
@@ -1206,6 +1243,7 @@ begin
   Showmessage('2,000,000 AlCopyStr in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton14Click(Sender: TObject);
 Var S1: String;
     i: integer;
@@ -1254,6 +1292,7 @@ begin
   Showmessage('2,000,000 Copy in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton35Click(Sender: TObject);
 Var S1: ansiString;
     i: integer;
@@ -1319,26 +1358,31 @@ type
   end;
   TProcessMemoryCounters = PROCESS_MEMORY_COUNTERS;
 
+{**********************************************************************************************************************************************}
 function GetProcessMemoryInfo(Process : THandle; var MemoryCounters : TProcessMemoryCounters; cb : DWORD) : BOOL; stdcall; external 'psapi.dll';
 
+{****************************************************}
 function ProcessMemoryUsage(ProcessID : DWORD): DWORD;
 var ProcessHandle : THandle;
     MemCounters   : TProcessMemoryCounters;
 begin
   Result := 0;
-  ProcessHandle := OpenProcess(PROCESS_QUERY_INFORMATION or PROCESS_VM_READ,
-                               false,
-                               ProcessID);
+  ProcessHandle := OpenProcess(
+                     PROCESS_QUERY_INFORMATION or PROCESS_VM_READ,
+                     false,
+                     ProcessID);
   try
-    if GetProcessMemoryInfo(ProcessHandle,
-                            MemCounters,
-                            sizeof(MemCounters))
+    if GetProcessMemoryInfo(
+         ProcessHandle,
+         MemCounters,
+         sizeof(MemCounters))
     then Result := MemCounters.WorkingSetSize;
   finally
     CloseHandle(ProcessHandle);
   end;
 end;
 
+{************************************************}
 procedure TForm1.ALButton23Click(Sender: TObject);
 Var MemUsageAnsiString: AnsiString;
     MemoryUsage: DWORD;
@@ -1351,6 +1395,7 @@ begin
   Showmessage('Memory used by a AnsiString of 10,000,000 low ASCII chars: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)));
 end;
 
+{************************************************}
 procedure TForm1.ALButton24Click(Sender: TObject);
 Var MemUsageString: String;
     MemoryUsage: DWORD;
@@ -1363,6 +1408,7 @@ begin
   Showmessage('Memory used by a String of 10,000,000 low ASCII chars: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)));
 end;
 
+{************************************************}
 procedure TForm1.ALButton40Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -1379,6 +1425,7 @@ begin
   Showmessage('3,000,000 ALFormatA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton43Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -1395,6 +1442,7 @@ begin
   Showmessage('3,000,000 Format in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton45Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -1411,6 +1459,7 @@ begin
   Showmessage('10,000,000 ALTrystrFloat in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
+{************************************************}
 procedure TForm1.ALButton46Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
@@ -1434,4 +1483,3 @@ initialization
   SetMultiByteConversionCodePage(CP_UTF8);
 
 end.
-

@@ -73,13 +73,15 @@ var ProcessHandle : THandle;
     MemCounters   : TProcessMemoryCounters;
 begin
   Result := 0;
-  ProcessHandle := OpenProcess(PROCESS_QUERY_INFORMATION or PROCESS_VM_READ,
-                               false,
-                               ProcessID);
+  ProcessHandle := OpenProcess(
+                     PROCESS_QUERY_INFORMATION or PROCESS_VM_READ,
+                     false,
+                     ProcessID);
   try
-    if GetProcessMemoryInfo(ProcessHandle,
-                            MemCounters,
-                            sizeof(MemCounters))
+    if GetProcessMemoryInfo(
+         ProcessHandle,
+         MemCounters,
+         sizeof(MemCounters))
     then Result := MemCounters.WorkingSetSize;
   finally
     CloseHandle(ProcessHandle);
@@ -328,7 +330,7 @@ begin
   inc(FNodeCount);
 end;
 
-{****************************************************************************************************************************}
+{*****************************************************************************************************************************}
 procedure TForm1.ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Path, Name: AnsiString; Attributes: TALStringsA);
 begin
   FNodeCount := FNodeCount + 2 * (Attributes.Count) + 1;

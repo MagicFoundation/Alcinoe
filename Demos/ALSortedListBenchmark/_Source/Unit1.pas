@@ -46,6 +46,7 @@ uses Alcinoe.StringUtils,
 {*********************************************}
 procedure TForm1.Button4Click(Sender: TObject);
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoALAVLStringListBench(Count: integer);
   Var aLst: TALAVLStringListA;
       aStopWatch: TstopWatch;
@@ -120,6 +121,7 @@ procedure TForm1.Button4Click(Sender: TObject);
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoALHashedStringListBench(Count: integer);
   Var aLst: TALHashedStringListA;
       aStopWatch: TstopWatch;
@@ -194,6 +196,7 @@ procedure TForm1.Button4Click(Sender: TObject);
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoALStringListBench(Count: integer);
   Var aLst: TALStringListA;
       aStopWatch: TstopWatch;
@@ -269,6 +272,7 @@ procedure TForm1.Button4Click(Sender: TObject);
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoALNvStringListBench(Count: integer);
   Var aLst: TALNVStringListA;
       aStopWatch: TstopWatch;
@@ -344,6 +348,7 @@ procedure TForm1.Button4Click(Sender: TObject);
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoStringListBench(Count: integer);
   Var aLst: TStringList;
       aStopWatch: TstopWatch;
@@ -420,6 +425,7 @@ procedure TForm1.Button4Click(Sender: TObject);
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoALIntegerListBench(Count: integer);
   Var aLst: TALIntegerList;
       aStopWatch: TstopWatch;

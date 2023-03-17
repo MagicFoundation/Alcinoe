@@ -227,12 +227,13 @@ begin
         end;
 
         aStartDate := GetTickCount64;
-        aSqlite3Client.SelectData(S1,
-                                  'rec',
-                                   0,
-                                   200,
-                                  aXMLDATA.DocumentElement,
-                                  aFormatSettings);
+        aSqlite3Client.SelectData(
+          S1,
+          'rec',
+           0,
+           200,
+          aXMLDATA.DocumentElement,
+          aFormatSettings);
         aEndDate := GetTickCount64;
 
         ALMemoResult.Lines.Text := 'Time Taken to select the data: ' + IntToStr(aEndDate - aStartDate) + ' ms' + #13#10 +
@@ -323,5 +324,3 @@ initialization
   SetMultiByteConversionCodePage(CP_UTF8);
 
 end.
-
-

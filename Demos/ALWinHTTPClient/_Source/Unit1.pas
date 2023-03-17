@@ -214,11 +214,12 @@ Begin
   end;
 end;
 
-{**************************************************}
-procedure TForm1.OnHttpClientStatus(Sender: Tobject;
-                                    InternetStatus: DWord;
-                                    StatusInformation: Pointer;
-                                    StatusInformationLength: DWord);
+{**********************************}
+procedure TForm1.OnHttpClientStatus(
+            Sender: Tobject;
+            InternetStatus: DWord;
+            StatusInformation: Pointer;
+            StatusInformationLength: DWord);
 var StatusStr: AnsiString;
 begin
   case InternetStatus of
@@ -463,37 +464,41 @@ begin
         end;
 
       if (AMultiPartFormDataFiles.Count > 0) and (CheckBoxURLEncodePostData.Checked) then
-        FWinHttpClient.PostMultiPartFormData(AnsiString(editURL.Text),
-                                             aTmpPostDataString,
-                                             AMultiPartFormDataFiles,
-                                             FHTTPResponseStream,
-                                             AHTTPResponseHeader)
+        FWinHttpClient.PostMultiPartFormData(
+          AnsiString(editURL.Text),
+          aTmpPostDataString,
+          AMultiPartFormDataFiles,
+          FHTTPResponseStream,
+          AHTTPResponseHeader)
 
       else if (AMultiPartFormDataFiles.Count > 0) then begin
 
-        FWinHttpClient.post(AnsiString(editURL.Text),
-                            AMultiPartFormDataFiles.Items[0].DataStream,
-                            FHTTPResponseStream,
-                            AHTTPResponseHeader);
+        FWinHttpClient.post(
+          AnsiString(editURL.Text),
+          AMultiPartFormDataFiles.Items[0].DataStream,
+          FHTTPResponseStream,
+          AHTTPResponseHeader);
 
       end
 
       else if aTmpPostDataString.Count > 0 then begin
-        if CheckBoxUrlEncodePostData.Checked then FWinHttpClient.PostURLEncoded(AnsiString(editURL.Text),
-                                                                                aTmpPostDataString,
-                                                                                FHTTPResponseStream,
-                                                                                AHTTPResponseHeader,
-                                                                                TALNameValueArray.Create(),
-                                                                                True)
+        if CheckBoxUrlEncodePostData.Checked then FWinHttpClient.PostURLEncoded(
+                                                    AnsiString(editURL.Text),
+                                                    aTmpPostDataString,
+                                                    FHTTPResponseStream,
+                                                    AHTTPResponseHeader,
+                                                    TALNameValueArray.Create(),
+                                                    True)
         else begin
 
           ARawPostDatastream := TALStringStreamA.create(aTmpPostDataString.text);
           try
 
-            FWinHttpClient.post(AnsiString(editURL.Text),
-                                ARawPostDatastream,
-                                FHTTPResponseStream,
-                                AHTTPResponseHeader);
+            FWinHttpClient.post(
+              AnsiString(editURL.Text),
+              ARawPostDatastream,
+              FHTTPResponseStream,
+              AHTTPResponseHeader);
 
           finally
             ARawPostDatastream.free;
@@ -502,9 +507,10 @@ begin
         end;
       end
 
-      else FWinHttpClient.Post(AnsiString(editURL.Text),
-                               FHTTPResponseStream,
-                               AHTTPResponseHeader);
+      else FWinHttpClient.Post(
+             AnsiString(editURL.Text),
+             FHTTPResponseStream,
+             AHTTPResponseHeader);
 
       MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
       MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(AHTTPResponseHeader.RawHeaderText);
@@ -563,10 +569,11 @@ begin
 
       if (AMultiPartFormDataFiles.Count > 0) then begin
 
-        FWinHttpClient.Put(AnsiString(editURL.Text),
-                           AMultiPartFormDataFiles.Items[0].DataStream,
-                           FHTTPResponseStream,
-                           AHTTPResponseHeader);
+        FWinHttpClient.Put(
+          AnsiString(editURL.Text),
+          AMultiPartFormDataFiles.Items[0].DataStream,
+          FHTTPResponseStream,
+          AHTTPResponseHeader);
 
       end
 
@@ -582,10 +589,11 @@ begin
           ARawPutDatastream := TALStringStreamA.create(aTmpPutDataString.text);
           try
 
-            FWinHttpClient.Put(AnsiString(editURL.Text),
-                               ARawPutDatastream,
-                               FHTTPResponseStream,
-                               AHTTPResponseHeader);
+            FWinHttpClient.Put(
+              AnsiString(editURL.Text),
+              ARawPutDatastream,
+              FHTTPResponseStream,
+              AHTTPResponseHeader);
 
           finally
             ARawPutDatastream.free;
@@ -594,10 +602,11 @@ begin
         //end;
       end
 
-      else FWinHttpClient.Put(AnsiString(editURL.Text),
-                              nil,
-                              FHTTPResponseStream,
-                              AHTTPResponseHeader);
+      else FWinHttpClient.Put(
+             AnsiString(editURL.Text),
+             nil,
+             FHTTPResponseStream,
+             AHTTPResponseHeader);
 
       MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
       MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(AHTTPResponseHeader.RawHeaderText);

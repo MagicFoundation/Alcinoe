@@ -121,10 +121,11 @@ type
     FWinHttpWebSocketClient: TalWinHttpWebSocketClient;
     procedure initWinHTTPWebSocketClient;
   public
-    procedure OnWebSocketClientStatus(Sender: Tobject;
-                                      InternetStatus: DWord;
-                                      StatusInformation: Pointer;
-                                      StatusInformationLength: DWord);
+    procedure OnWebSocketClientStatus(
+                Sender: Tobject;
+                InternetStatus: DWord;
+                StatusInformation: Pointer;
+                StatusInformationLength: DWord);
     procedure OnWebSocketClientError(sender: Tobject; const &Message: AnsiString);
     procedure OnWebSocketClientReceive(sender: Tobject; const Data: AnsiString; const IsUTF8: Boolean);
   end;
@@ -190,11 +191,12 @@ Begin
   end;
 end;
 
-{*******************************************************}
-procedure TForm1.OnWebSocketClientStatus(Sender: Tobject;
-                                         InternetStatus: DWord;
-                                         StatusInformation: Pointer;
-                                         StatusInformationLength: DWord);
+{***************************************}
+procedure TForm1.OnWebSocketClientStatus(
+            Sender: Tobject;
+            InternetStatus: DWord;
+            StatusInformation: Pointer;
+            StatusInformationLength: DWord);
 var StatusStr: AnsiString;
 begin
   case InternetStatus of

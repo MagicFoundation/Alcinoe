@@ -38,11 +38,13 @@ uses Alcinoe.Common,
 
 {$R *.fmx}
 
+{***********************************************************************}
 procedure TDemoForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   action := TcloseAction.caFree;
 end;
 
+{**********************************************}
 procedure TDemoForm.FormCreate(Sender: TObject);
 begin
   fDebugFpsStarted := false;
@@ -53,8 +55,10 @@ begin
   fDebugAverageFps := 0;
 end;
 
-procedure TDemoForm.FormPaint(Sender: TObject; Canvas: TCanvas;
-  const ARect: TRectF);
+{****************************}
+procedure TDemoForm.FormPaint(
+            Sender: TObject; Canvas: TCanvas;
+            const ARect: TRectF);
 begin
 
   if fALAniCalculations <> nil then begin
@@ -64,8 +68,9 @@ begin
        (abs(fALAniCalculations.CurrentVelocity.y) > 500) and
        (fDebugFpsRenderTimeStopWatch.Elapsed.totalMilliseconds > 18) and
        (fDebugFpsRenderTimeStopWatch.Elapsed.totalMilliseconds < 300) then begin
-      ALLog('FramePaint', 'Slow frame detected - '  + ALFormatFloatW('0.00', fDebugFpsRenderTimeStopWatch.Elapsed.totalMilliseconds, ALDefaultFormatSettingsW) +
-                          ' - Velocity: ' + ALFormatFloatW('0', fALAniCalculations.CurrentVelocity.y, ALDefaultFormatSettingsW), TalLogType.warn);
+      ALLog(
+        'FramePaint', 'Slow frame detected - '  + ALFormatFloatW('0.00', fDebugFpsRenderTimeStopWatch.Elapsed.totalMilliseconds, ALDefaultFormatSettingsW) +
+        ' - Velocity: ' + ALFormatFloatW('0', fALAniCalculations.CurrentVelocity.y, ALDefaultFormatSettingsW), TalLogType.warn);
     end;
     if (abs(fALAniCalculations.CurrentVelocity.y) > 500) then begin
       if not fDebugFpsStarted then begin
@@ -86,9 +91,10 @@ begin
       if fDebugFpsStopWatch.Elapsed.totalMilliseconds > 0 then begin
         fDebugAverageFps := ((fDebugAverageFps * fDebugAverageFpsCount) + ((fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000)) / (fDebugAverageFpsCount + 1);
         inc(fDebugAverageFpsCount);
-        ALLog('FramePaint.fps', ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000, ALDefaultFormatSettingsW) + ' fps' +
-                                ' - average: ' + ALFormatFloatW('0.##', fDebugAverageFps, ALDefaultFormatSettingsW) + ' fps' +
-                                fDebugFpsGraph , TalLogType.verbose);
+        ALLog(
+          'FramePaint.fps', ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000, ALDefaultFormatSettingsW) + ' fps' +
+          ' - average: ' + ALFormatFloatW('0.##', fDebugAverageFps, ALDefaultFormatSettingsW) + ' fps' +
+          fDebugFpsGraph , TalLogType.verbose);
         ALText1.Text := ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000, ALDefaultFormatSettingsW) + ' fps' +
                         ' (average: ' + ALFormatFloatW('0.##', fDebugAverageFps, ALDefaultFormatSettingsW) + ' fps)';
       end;
@@ -103,8 +109,9 @@ begin
        (abs(fAniCalculations.CurrentVelocity.y) > 500) and
        (fDebugFpsRenderTimeStopWatch.Elapsed.totalMilliseconds > 18) and
        (fDebugFpsRenderTimeStopWatch.Elapsed.totalMilliseconds < 300) then begin
-      ALLog('FramePaint', 'Slow frame detected - '  + ALFormatFloatW('0.00', fDebugFpsRenderTimeStopWatch.Elapsed.totalMilliseconds, ALDefaultFormatSettingsW) +
-                          ' - Velocity: ' + ALFormatFloatW('0', fAniCalculations.CurrentVelocity.y, ALDefaultFormatSettingsW), TalLogType.warn);
+      ALLog(
+        'FramePaint', 'Slow frame detected - '  + ALFormatFloatW('0.00', fDebugFpsRenderTimeStopWatch.Elapsed.totalMilliseconds, ALDefaultFormatSettingsW) +
+        ' - Velocity: ' + ALFormatFloatW('0', fAniCalculations.CurrentVelocity.y, ALDefaultFormatSettingsW), TalLogType.warn);
     end;
     if (abs(fAniCalculations.CurrentVelocity.y) > 500) then begin
       if not fDebugFpsStarted then begin
@@ -125,9 +132,10 @@ begin
       if fDebugFpsStopWatch.Elapsed.totalMilliseconds > 0 then begin
         fDebugAverageFps := ((fDebugAverageFps * fDebugAverageFpsCount) + ((fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000)) / (fDebugAverageFpsCount + 1);
         inc(fDebugAverageFpsCount);
-        ALLog('FramePaint.fps', ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000, ALDefaultFormatSettingsW) + ' fps' +
-                                ' - average: ' + ALFormatFloatW('0.##', fDebugAverageFps, ALDefaultFormatSettingsW) + ' fps' +
-                                fDebugFpsGraph , TalLogType.verbose);
+        ALLog(
+          'FramePaint.fps', ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000, ALDefaultFormatSettingsW) + ' fps' +
+          ' - average: ' + ALFormatFloatW('0.##', fDebugAverageFps, ALDefaultFormatSettingsW) + ' fps' +
+          fDebugFpsGraph , TalLogType.verbose);
         ALText1.Text := ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000, ALDefaultFormatSettingsW) + ' fps' +
                         ' (average: ' + ALFormatFloatW('0.##', fDebugAverageFps, ALDefaultFormatSettingsW) + ' fps)';
       end;

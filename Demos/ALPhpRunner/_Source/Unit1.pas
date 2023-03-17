@@ -117,10 +117,11 @@ begin
       else aPhpRunnerEngine := TalPhpSocketFastCgiRunnerEngine.Create(AnsiString(EditPhpFastCgiHost.Text), StrToInt(EditPhpFastCgiPort.text));
       Try
         aServerVariablesLst.Assign(MemoServerVariables.lines);
-        aPhpRunnerEngine.Execute(aServerVariablesLst,
-                                 nil,
-                                 AResponseStream,
-                                 AResponseHeader);
+        aPhpRunnerEngine.Execute(
+          aServerVariablesLst,
+          nil,
+          AResponseStream,
+          AResponseHeader);
       Finally
         aPhpRunnerEngine.Free;
       End;
@@ -165,10 +166,11 @@ begin
       else aPhpRunnerEngine := TalPhpSocketFastCgiRunnerEngine.Create(AnsiString(EditPhpFastCgiHost.Text), StrToInt(EditPhpFastCgiPort.text));
       Try
         aServerVariablesLst.Assign(MemoServerVariables.lines);
-        aPhpRunnerEngine.Execute(aServerVariablesLst,
-                                 nil,
-                                 AResponseStream,
-                                 AResponseHeader);
+        aPhpRunnerEngine.Execute(
+          aServerVariablesLst,
+          nil,
+          AResponseStream,
+          AResponseHeader);
       Finally
         aPhpRunnerEngine.Free;
       End;
@@ -227,15 +229,17 @@ begin
         aServerVariablesLst.Assign(MemoServerVariables.lines);
         APostDataStrings.Assign(MemoPostDataStrings.Lines);
         if MemoPostDataStrings.Lines.Count > 0 then
-          aPhpRunnerEngine.ExecutePostURLEncoded(aServerVariablesLst,
-                                                 APostDataStrings,
-                                                 AResponseStream,
-                                                 AResponseHeader,
-                                                 True)
-        else aPhpRunnerEngine.Execute(aServerVariablesLst,
-                                      nil,
-                                      AResponseStream,
-                                      AResponseHeader);
+          aPhpRunnerEngine.ExecutePostURLEncoded(
+            aServerVariablesLst,
+            APostDataStrings,
+            AResponseStream,
+            AResponseHeader,
+            True)
+        else aPhpRunnerEngine.Execute(
+               aServerVariablesLst,
+               nil,
+               AResponseStream,
+               AResponseHeader);
       finally
         aPhpRunnerEngine.free;
       end;
@@ -326,10 +330,11 @@ begin
         AResponseHeader := TALHTTPResponseHeader.Create;
         AResponseStream := TALStringStreamA.Create('');
         try
-          PhpRunnerEngine.Execute(serverVariable,
-                                  nil,
-                                  AResponseStream,
-                                  AResponseHeader);
+          PhpRunnerEngine.Execute(
+            serverVariable,
+            nil,
+            AResponseStream,
+            AResponseHeader);
         finally
           AResponseHeader.Free;
           AResponseStream.Free;

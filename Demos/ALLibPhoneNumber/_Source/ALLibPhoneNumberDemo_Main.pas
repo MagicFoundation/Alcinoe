@@ -38,17 +38,20 @@ implementation
 
 {$R *.dfm}
 
+{*********************************************}
 procedure TForm1.Button1Click(Sender: TObject);
 begin
   Edit2.Text := string(ALIntToStrA(ALStrPhoneNumberToInt64(ansiString(Edit1.Text), ansiString(Edit3.Text))));
   Edit4.Text := Edit2.Text;
 end;
 
+{*********************************************}
 procedure TForm1.Button2Click(Sender: TObject);
 begin
   Edit2.Text := string(ALInt64PhoneNumberToStr(ALStrToInt64(ansiString(Edit4.Text))));
 end;
 
+{*********************************************}
 procedure TForm1.Button3Click(Sender: TObject);
 begin
   case ALGetPhoneNumberType(ALStrToInt64(ansiString(Edit4.Text))) of

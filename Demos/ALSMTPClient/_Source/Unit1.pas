@@ -254,31 +254,33 @@ begin
           If FileAttachMemo.Lines[i] <> '' then
             AMultiPartMixedAttachments.Add.LoadDataFromFileAsAttachmentBase64Encode(ALTrim(AnsiString(FileAttachMemo.Lines[i])));
 
-          FSmtpClient.SendMailMultipartMixed(AnsiString(HostEdit.Text),
-                                             StrToInt(PortEdit.Text),
-                                             AnsiString(FromEdit.Text),
-                                             aLst,
-                                             AnsiString(UsernameEdit.Text),
-                                             AnsiString(PasswordEdit.Text),
-                                             TAlSmtpClientAuthType(AuthComboBox.ItemIndex),
-                                             aEmailHeader,
-                                             AnsiString(MsgMemo.Lines.Text),
-                                             'text/plain',
-                                             AMultiPartMixedAttachments);
+          FSmtpClient.SendMailMultipartMixed(
+            AnsiString(HostEdit.Text),
+            StrToInt(PortEdit.Text),
+            AnsiString(FromEdit.Text),
+            aLst,
+            AnsiString(UsernameEdit.Text),
+            AnsiString(PasswordEdit.Text),
+            TAlSmtpClientAuthType(AuthComboBox.ItemIndex),
+            aEmailHeader,
+            AnsiString(MsgMemo.Lines.Text),
+            'text/plain',
+            AMultiPartMixedAttachments);
 
       finally
         AMultiPartMixedAttachments.Free;
       end;
     end
-    else FSmtpClient.SendMail(AnsiString(HostEdit.Text),
-                              StrToInt(PortEdit.Text),
-                              AnsiString(FromEdit.Text),
-                              aLst,
-                              AnsiString(UsernameEdit.Text),
-                              AnsiString(PasswordEdit.Text),
-                              TAlSmtpClientAuthType(AuthComboBox.ItemIndex),
-                              aEmailHeader.RawHeaderText,
-                              AnsiString(MsgMemo.Lines.Text));
+    else FSmtpClient.SendMail(
+           AnsiString(HostEdit.Text),
+           StrToInt(PortEdit.Text),
+           AnsiString(FromEdit.Text),
+           aLst,
+           AnsiString(UsernameEdit.Text),
+           AnsiString(PasswordEdit.Text),
+           TAlSmtpClientAuthType(AuthComboBox.ItemIndex),
+           aEmailHeader.RawHeaderText,
+           AnsiString(MsgMemo.Lines.Text));
 
     DisplayMemo.Lines.Add('Success');
 
@@ -302,4 +304,3 @@ initialization
   SetMultiByteConversionCodePage(CP_UTF8);
 
 end.
-

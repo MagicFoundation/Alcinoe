@@ -72,9 +72,10 @@ begin
   with aMemoryState do begin
     // small blocks
     for i := Low(SmallBlockTypeStates) to High(SmallBlockTypeStates) do
-      Inc(Result,
-          SmallBlockTypeStates[i].AllocatedBlockCount *
-          SmallBlockTypeStates[i].UseableBlockSize);
+      Inc(
+        Result,
+        SmallBlockTypeStates[i].AllocatedBlockCount *
+        SmallBlockTypeStates[i].UseableBlockSize);
 
     // medium blocks
     Inc(Result, TotalAllocatedMediumBlockSize);
@@ -333,6 +334,7 @@ procedure TForm1.BtnRunBenchmarkClick(Sender: TObject);
   const
     _iterationcount: integer = 1000000;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _scrollAllNode(aNode: TALJSONNodeA): Integer; overload;
   Var LStack: Tstack;
       i: integer;
@@ -359,6 +361,7 @@ procedure TForm1.BtnRunBenchmarkClick(Sender: TObject);
 
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _scrollAllNode(aNode: TALJSONNodeW): Integer; overload;
   Var LStack: Tstack;
       i: integer;
@@ -385,6 +388,7 @@ procedure TForm1.BtnRunBenchmarkClick(Sender: TObject);
 
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _scrollAllNode(aNode: ISuperObject): Integer; overload;
   Var LStack: Tstack;
       Litem: ISuperObject;
@@ -409,6 +413,7 @@ procedure TForm1.BtnRunBenchmarkClick(Sender: TObject);
 
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _scrollAllNode(aNode: TJSONValue): Integer; overload;
   Var LStack: Tstack;
       Litem: TJSONValue;
@@ -442,6 +447,7 @@ procedure TForm1.BtnRunBenchmarkClick(Sender: TObject);
 
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _scrollAllNode(aNode: TdwsJSONValue): Integer; overload;
   Var LStack: Tstack;
       Litem: TdwsJSONValue;
@@ -474,6 +480,7 @@ procedure TForm1.BtnRunBenchmarkClick(Sender: TObject);
 
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoTALJsonDocJSONBench(Count: integer);
   begin
     //var LMemoryUsage := GetTotalMemoryAllocated;
@@ -537,6 +544,7 @@ procedure TForm1.BtnRunBenchmarkClick(Sender: TObject);
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoTALJsonDocUJSONBench(Count: integer);
   begin
     //var LMemoryUsage := GetTotalMemoryAllocated;
@@ -600,6 +608,7 @@ procedure TForm1.BtnRunBenchmarkClick(Sender: TObject);
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoSystemJSONBench(Count: integer);
   begin
     //var LMemoryUsage := GetTotalMemoryAllocated;
@@ -647,6 +656,7 @@ procedure TForm1.BtnRunBenchmarkClick(Sender: TObject);
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DodwsJSONBench(Count: integer);
   begin
     //var LMemoryUsage := GetTotalMemoryAllocated;
@@ -694,6 +704,7 @@ procedure TForm1.BtnRunBenchmarkClick(Sender: TObject);
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _DoSuperObjectBench(Count: integer);
   begin
     //var LMemoryUsage := GetTotalMemoryAllocated;

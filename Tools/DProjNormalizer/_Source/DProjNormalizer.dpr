@@ -87,7 +87,7 @@ begin
 
   try
 
-    //Init project params 
+    //Init project params
     {$IFDEF DEBUG}
     ReportMemoryleaksOnSHutdown := True;
     {$ENDIF}

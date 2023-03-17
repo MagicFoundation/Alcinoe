@@ -68,7 +68,13 @@ begin
       {$ENDREGION}
 
       //loop on all *.pas in LRootDirectory
-      var LFiles := TDirectory.GetFiles(string(LRootDirectory), '*.pas', TSearchOption.soAllDirectories);
+      var LPasFiles := TDirectory.GetFiles(string(LRootDirectory), '*.pas', TSearchOption.soAllDirectories);
+      var LDprFiles := TDirectory.GetFiles(string(LRootDirectory), '*.dpr', TSearchOption.soAllDirectories);
+      var LFiles := LPasFiles;
+      setlength(LFiles, length(LPasFiles) + length(LDprFiles));
+      for var I := Low(LDprFiles) to High(LDprFiles) do
+        LFiles[length(LPasFiles)+I] := LDprFiles[I];
+
       for var Lfile in LFiles do begin
 
         {$REGION 'skip if Lfile in LFilesToIgnore'}
@@ -262,6 +268,8 @@ begin
                 else break;
               end;
               inc(P1);
+              while (P1 < length(LSourceStr)) and (LSourceStr[P1] in ['.', '(', ')', '[', ']', '>', '<']) do
+                inc(P1);
               var P0 := P1;
               while (P0 > 0) and (LSourceStr[P0] <> #10) do dec(P0);
               inc(P0);

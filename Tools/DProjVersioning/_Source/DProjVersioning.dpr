@@ -107,17 +107,19 @@ begin
     raise Exception.Create('Version Info was not found inside the dproj. Please in project options include version information and choose auto increment build number');
 end;
 
-{*******************************************************************}
-procedure UpdateProjMajorMinorPatchVersion(var aDProjSrc: AnsiString;
-                                           const aBuildNumber: Integer;
-                                           const aMajorNumber: integer;
-                                           Const aMinorNumber: integer;
-                                           Const aPatchOffset: integer);
+{*****************************************}
+procedure UpdateProjMajorMinorPatchVersion(
+            var aDProjSrc: AnsiString;
+            const aBuildNumber: Integer;
+            const aMajorNumber: integer;
+            Const aMinorNumber: integer;
+            Const aPatchOffset: integer);
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _UpdateNameValueInSrcString(var aStrSrc: AnsiString;
-                                        const aName: ansiString;
-                                        const aValue: ansiString);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _UpdateNameValueInSrcString(
+              var aStrSrc: AnsiString;
+              const aName: ansiString;
+              const aValue: ansiString);
   var P1, P2, P3: integer;
   begin
     P1 := ALPosIgnoreCaseA(aName+'=', aStrSrc);
@@ -133,10 +135,11 @@ procedure UpdateProjMajorMinorPatchVersion(var aDProjSrc: AnsiString;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _UpdateXmlNodeValue(var aXmlSrc: AnsiString;
-                                const aName: ansiString;
-                                const aValue: ansiString); overload;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _UpdateXmlNodeValue(
+              var aXmlSrc: AnsiString;
+              const aName: ansiString;
+              const aValue: ansiString); overload;
   var P1, P2: integer;
   begin
     P1 := ALPosIgnoreCaseA('<'+aName+'>', aXmlSrc);
@@ -149,12 +152,13 @@ procedure UpdateProjMajorMinorPatchVersion(var aDProjSrc: AnsiString;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _UpdateXmlNodeValue(var aXmlSrc: AnsiString;
-                                const aNodeName: ansiString;
-                                const aAttributeName: AnsiString;
-                                const aAttributeValue: AnsiString;
-                                Const aNodeValue: ansiString); overload;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _UpdateXmlNodeValue(
+              var aXmlSrc: AnsiString;
+              const aNodeName: ansiString;
+              const aAttributeName: AnsiString;
+              const aAttributeValue: AnsiString;
+              Const aNodeValue: ansiString); overload;
   var P1, P2, P3, P4: integer;
   begin
     P1 := ALPosIgnoreCaseA('<'+aNodeName, aXmlSrc);
@@ -267,11 +271,12 @@ begin
     else If ALSameTextA(LAction, 'incMajorMinorPatchVersion') then begin
       var LSrcStr := AlGetStringFromFile(LDProjFilename);
       var LBuildNumber := getdProjBuildNumber(LSrcStr);
-      UpdateProjMajorMinorPatchVersion(LSrcStr, // var aDProjSrc: AnsiString;
-                                       LBuildNumber + 1, // const aBuildNumber: Integer;
-                                       LMajorNumber, // const aMajorNumber: integer;
-                                       LMinorNumber, // Const aMinorNumber: integer;
-                                       LPatchOffset); // Const aPatchOffset: integer);
+      UpdateProjMajorMinorPatchVersion(
+        LSrcStr, // var aDProjSrc: AnsiString;
+        LBuildNumber + 1, // const aBuildNumber: Integer;
+        LMajorNumber, // const aMajorNumber: integer;
+        LMinorNumber, // Const aMinorNumber: integer;
+        LPatchOffset); // Const aPatchOffset: integer);
       if LCreateBackup then begin
         if Tfile.exists(LDProjFilename + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [LDProjFilename + '.bak']);
         Tfile.move(LDProjFilename, LDProjFilename+ '.bak');
@@ -284,11 +289,12 @@ begin
     else If ALSameTextA(LAction, 'decMajorMinorPatchVersion') then begin
       var LSrcStr := AlGetStringFromFile(LDProjFilename);
       var LBuildNumber := getdProjBuildNumber(LSrcStr);
-      UpdateProjMajorMinorPatchVersion(LSrcStr, // var aDProjSrc: AnsiString;
-                                       max(0, LBuildNumber - 1), // const aBuildNumber: Integer;
-                                       LMajorNumber, // const aMajorNumber: integer;
-                                       LMinorNumber, // Const aMinorNumber: integer;
-                                       LPatchOffset); // Const aPatchOffset: integer);
+      UpdateProjMajorMinorPatchVersion(
+        LSrcStr, // var aDProjSrc: AnsiString;
+        max(0, LBuildNumber - 1), // const aBuildNumber: Integer;
+        LMajorNumber, // const aMajorNumber: integer;
+        LMinorNumber, // Const aMinorNumber: integer;
+        LPatchOffset); // Const aPatchOffset: integer);
       if LCreateBackup then begin
         if Tfile.exists(LDProjFilename + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [LDProjFilename + '.bak']);
         Tfile.Move(LDProjFilename, LDProjFilename+ '.bak');

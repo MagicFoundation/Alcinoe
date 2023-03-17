@@ -1,18 +1,15 @@
 {*******************************************************************************
-TALXmlDocument is exactly like Delphi TXmlDocument
-(Same functions and procedures) but 10 to 100 times more
-faster (see demo) and can work even in sax mode !
+TALXmlDocument is exactly like Delphi TXmlDocument (Same functions and
+procedures) but 10 to 100 times more faster (see demo) and can work even in
+sax mode !
 
-Use TAlXMLDocument to represent an XML document.
-TAlXMLDocument can read an existing XML document from a
-file, it can be associated with an in-memory string that is
-the contents of an XML document, or it can create a new,
-empty XML document.
+Use TAlXMLDocument to represent an XML document. TAlXMLDocument can read an
+existing XML document from a file, it can be associated with an in-memory
+string that is the contents of an XML document, or it can create a new, empty
+XML document.
 
-TALXMLDocument uses it's own internal parser to analyze
-the XML document.
+TALXMLDocument uses it's own internal parser to analyze the XML document.
 *******************************************************************************}
-
 unit Alcinoe.XMLDoc;
 
 interface

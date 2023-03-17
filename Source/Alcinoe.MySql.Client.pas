@@ -1,9 +1,8 @@
-{*******************************************************************************
+{*************************************************************************
 An Object to query MySql Server Version 5 and get the Result In Xml Stream
 http://dev.mysql.com/doc/refman/5.0/en/
 http://dev.mysql.com/doc/refman/5.0/en/string-syntax.html
-*******************************************************************************}
-
+*************************************************************************}
 unit Alcinoe.MySql.Client;
 
 interface

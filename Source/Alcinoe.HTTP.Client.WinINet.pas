@@ -1,19 +1,16 @@
 {*******************************************************************************
-TALWinInetHttpClient is a is easy to use WinInet-based
-HTTP client component which allows to post and get
-any data from the Web via HTTP protocol. TALWinInetHttpClient
-component can retrieve documents or files using HTTP protocol;
-that is connect to a HTTP server also known as a webserver.
-It can also trigger a CGI/ISAPI/NSAPI script and post data
-using either GET or POST method.
+TALWinInetHttpClient is a is easy to use WinInet-based HTTP client component
+which allows to post and get any data from the Web via HTTP protocol.
+TALWinInetHttpClient component can retrieve documents or files using HTTP
+protocol; that is connect to a HTTP server also known as a webserver. It can
+also trigger a CGI/ISAPI/NSAPI script and post data using either GET or POST
+method.
 
-The TALWinInetHttpClient can grab web contents both in binary
-and text formats, supports cache of Internet Explorer,
-can resume broken downloads, read data from password
-protected directories and supports basic proxy
-authentication scheme.
+The TALWinInetHttpClient can grab web contents both in binary and text formats,
+supports cache of Internet Explorer, can resume broken downloads, read data
+from password protected directories and supports basic proxy authentication
+scheme.
 *******************************************************************************}
-
 unit Alcinoe.HTTP.Client.WinINet;
 
 interface

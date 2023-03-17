@@ -1,8 +1,7 @@
-{*******************************************************************************
-TALPOP3Client class implements the POP3 protocol (Post Office Protocol - Version 3)
+{***********************************************
+TALPOP3Client class implements the POP3 protocol
 http://www.ietf.org/rfc/rfc1939.txt
-*******************************************************************************}
-
+***********************************************}
 unit Alcinoe.POP3.Client;
 
 interface

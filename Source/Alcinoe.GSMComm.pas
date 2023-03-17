@@ -1,34 +1,27 @@
 {*******************************************************************************
-The TAlGSMComm component implements SMS text messaging
-through the text-mode interface defined in the GSM
-Technical Specification 07.05, version 5.1.0, dated
-December 1996.  There are several variations of this spec,
-used throughout Nokia, Siemens, Ericsson, etc models.
-We have tested the Nokia 6230 in-house, but the Nokia 7190,
-8890, 6210 and 9110 models should work as well.  Phones
-from other manufacturers will also work, as long as they
-implement the text-mode interface.  About 1/4 of the
-current phones are capable of being connected to a PC
-(through IR or serial cable), about 1/3 of those are
-text-mode only, 1/3 are PDU mode only, and the other 1/3
-support both text and PDU mode.  Some phones (such as the
-Nokia 5190) support SMS, but they use a proprietary protocol,
-which TALGSMComm does not support.
+The TAlGSMComm component implements SMS text messaging through the text-mode
+interface defined in the GSM Technical Specification 07.05, version 5.1.0,
+dated December 1996.  There are several variations of this spec, used
+throughout Nokia, Siemens, Ericsson, etc models. We have tested the Nokia 6230
+in-house, but the Nokia 7190, 8890, 6210 and 9110 models should work as well.
+Phones from other manufacturers will also work, as long as they implement the
+text-mode interface.  About 1/4 of the current phones are capable of being
+connected to a PC (through IR or serial cable), about 1/3 of those are
+text-mode only, 1/3 are PDU mode only, and the other 1/3 support both text and
+PDU mode.  Some phones (such as the Nokia 5190) support SMS, but they use a
+proprietary protocol, which TALGSMComm does not support.
 
-To test your phone, connect the phone to your PC through
-the serial cable or IR device (consult your phone's documentation
-for details on how to connect). Enter "AT"<CR> into a terminal
-window to verify the connection is established (you should receive
-"OK" from the phone), then enter "AT+CMGF=?"<CR>. The response
-should contain a "1", indicating that it supports text-mode.
-If both of these tests pass, then your phone meets the basic
-requirements.
+To test your phone, connect the phone to your PC through the serial cable or
+IR device (consult your phone's documentation for details on how to connect).
+Enter "AT"<CR> into a terminal window to verify the connection is established
+(you should receive "OK" from the phone), then enter "AT+CMGF=?"<CR>. The
+response should contain a "1", indicating that it supports text-mode. If both
+of these tests pass, then your phone meets the basic requirements.
 
 http://www.nobbi.com/pduspy.htm
 http://rednaxela.net/pdu.php
 http://www.dreamfabric.com/sms/
 *******************************************************************************}
-
 unit Alcinoe.GSMComm;
 
 interface

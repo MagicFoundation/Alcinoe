@@ -1,7 +1,6 @@
-{*******************************************************************************
-Description:  Function to launch executable (and wait for termination)
-*******************************************************************************}
-
+{*******************************************************
+Function to launch executable (and wait for termination)
+*******************************************************}
 unit Alcinoe.Execute;
 
 interface

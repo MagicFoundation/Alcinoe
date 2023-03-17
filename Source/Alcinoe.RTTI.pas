@@ -1,9 +1,8 @@
 {*******************************************************************************
-I create the TALRttiType object because i found that the
-TRTTI.getfields and/or the TRTTI.getmethods was very slow and
-even call internally some criticalsections :(
+I create the TALRttiType object because i found that the TRTTI.getfields and/or
+the TRTTI.getmethods was very slow and even call internally some
+criticalsections :(
 *******************************************************************************}
-
 unit Alcinoe.RTTI;
 
 interface

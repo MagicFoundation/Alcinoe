@@ -1,8 +1,7 @@
-{*******************************************************************************
-An object to query Sqlite3 database and get the result In Xml format or in
-Json/Bson format
-*******************************************************************************}
-
+{*****************************************************
+An object to query Sqlite3 database and get the result
+In Xml format or in Json/Bson format
+*****************************************************}
 unit Alcinoe.Sqlite3.Client;
 
 interface
@@ -359,6 +358,7 @@ Uses
   System.classes,
   System.Diagnostics,
   System.AnsiStrings,
+  Alcinoe.Common,
   Alcinoe.Cipher,
   Alcinoe.WinApi.Common;
 

@@ -1,6 +1,7 @@
-{*******************************************************************************
-TALHttpClient is a ancestor of class like TALWinInetHttpClient or TALWinHttpClient
-*******************************************************************************}
+{****************************************
+TALHttpClient is a ancestor of class like
+TALWinInetHttpClient or TALWinHttpClient
+****************************************}
 unit Alcinoe.HTTP.Client;
 
 interface

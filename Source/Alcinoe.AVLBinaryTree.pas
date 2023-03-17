@@ -1,9 +1,9 @@
-{*******************************************************************************
+{****************************************************
 Alcinoe.AVLBinaryTree (Self-Balancing Binary Trees)
 Binary trees that are self-balancing in the AVL sense
 (the depth of any left branch differs by no more than
 one from the depth of the right branch).
-*******************************************************************************}
+****************************************************}
 unit Alcinoe.AVLBinaryTree;
 
 interface

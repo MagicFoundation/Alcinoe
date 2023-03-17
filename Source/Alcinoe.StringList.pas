@@ -1,41 +1,36 @@
-{*************************************************************
+{*******************************************************************************
 TALStringListA
-TALStringListA Work the same as Delphi TstringList except that it's
-allow to search a name=value using a quicksort algorithm when the
-list is sorted. Also TALStringListA use a locale independant
-algorithme (based on the 8-bit ordinal value of each character)
-instead of the AnsiCompareText and AnsiCompareStr used by the
-Delphi TstringList. at the end the sort in TALStringListA is up to
-10x more faster than in Delphi TstringList. Also TALStringListA is
-not an unicode TstringList but an 100% Ansi StringList
+TALStringListA Work the same as Delphi TstringList except that it's allow to
+search a name=value using a quicksort algorithm when the list is sorted. Also
+TALStringListA use a locale independant algorithme (based on the 8-bit ordinal
+value of each character) instead of the AnsiCompareText and AnsiCompareStr used
+by the Delphi TstringList. at the end the sort in TALStringListA is up to 10x
+more faster than in Delphi TstringList. Also TALStringListA is not an unicode
+TstringList but an 100% Ansi StringList
 
 TALStringListW
-TALStringListW is the same as TALStringListA but with unicode
-String
+TALStringListW is the same as TALStringListA but with unicode String
 
 TALNVStringListA
-TALNVStringListA (NV for NameValue) is same as TALStringListA (use
-also a quicksort algorithme) except that here optimisation is
-oriented for name/value list instead of string list.
+TALNVStringListA (NV for NameValue) is same as TALStringListA (use also a
+quicksort algorithme) except that here optimisation is oriented for name/value
+list instead of string list.
 
 TALNVStringListW
-TALNVStringListA is the same as TALNVStringListW but with unicode
-String
+TALNVStringListA is the same as TALNVStringListW but with unicode String
 
 TALAVLStringListA
-TALAVLStringListA is same as TALStringListA except that it's use
-internally a self-balancing binary Tree instead of a quicksort
-algorithm
+TALAVLStringListA is same as TALStringListA except that it's use internally a
+self-balancing binary Tree instead of a quicksort algorithm
 
 TALHashedStringListA
-TALHashedStringListA is same as TALStringListA except that it's use
-an internal hash table instead of a quicksort algorithm. By using
-TALHashedStringListA instead of TALStringListA, you can improve
-performance when the list contains a large number of strings
-(else if your list don't contain a lot of strings the performance
-is lower than TALStringListA because of the cost to calculate the
+TALHashedStringListA is same as TALStringListA except that it's use an internal
+hash table instead of a quicksort algorithm. By using TALHashedStringListA
+instead of TALStringListA, you can improve performance when the list contains a
+large number of strings (else if your list don't contain a lot of strings the
+performance is lower than TALStringListA because of the cost to calculate the
 hash)
-**************************************************************}
+*******************************************************************************}
 unit Alcinoe.StringList;
 
 interface

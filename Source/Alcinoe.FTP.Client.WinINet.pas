@@ -1,7 +1,7 @@
-{*******************************************************************************
-TALWinInetFTPClient is a is easy to use WinInet-based FTP client component.
-*******************************************************************************}
-
+{**************************************
+TALWinInetFTPClient is a is easy to use
+WinInet-based FTP client component.
+**************************************}
 unit Alcinoe.FTP.Client.WinINet;
 
 interface

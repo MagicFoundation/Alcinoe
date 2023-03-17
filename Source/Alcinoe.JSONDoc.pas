@@ -1,34 +1,30 @@
 (*******************************************************************************
-TALJSONDocumentA is a Delphi parser/writer for JSON / BSON data
-format. it's support DOM and SAX parser, support BSON format,
-and use a similar syntax than TALXMLDocument / TXMLDocument.
-TALJSONDocumentA can also export Json / Bson data in TALStringListA.
+TALJSONDocumentA is a Delphi parser/writer for JSON / BSON data format. it's
+support DOM and SAX parser, support BSON format, and use a similar syntax than
+TALXMLDocument / TXMLDocument. TALJSONDocumentA can also export Json / Bson data
+in TALStringListA.
 
-When it deals with parsing some (textual) content, two directions
-are usually envisaged. In the JSON world, you have usually to
-make a choice between:
-- A DOM parser, which creates an in-memory tree structure of
-  objects mapping the JSON content;
-- A SAX parser, which reads the JSON content, then call pre-defined
-  events for each JSON content element.
+When it deals with parsing some (textual) content, two directions are usually
+envisaged. In the JSON world, you have usually to make a choice between:
+- A DOM parser, which creates an in-memory tree structure of objects mapping
+  the JSON content;
+- A SAX parser, which reads the JSON content, then call pre-defined events for
+  each JSON content element.
 
-In fact, DOM parsers use internally a SAX parser to read the JSON
-content. Therefore, with the overhead of object creation and
-their property initialization, DOM parsers are typically three
-to five times slower than SAX (and use much much more memory to
-store all the nodes). But, DOM parsers are much more powerful for
-handling the data: as soon as it's mapped in native objects,
-code can access with no time to any given node, whereas a
-SAX-based access will have to read again the whole JSON content.
+In fact, DOM parsers use internally a SAX parser to read the JSON content.
+Therefore, with the overhead of object creation and their property
+initialization, DOM parsers are typically three to five times slower than SAX
+(and use much much more memory to store all the nodes). But, DOM parsers are
+much more powerful for handling the data: as soon as it's mapped in native
+objects, code can access with no time to any given node, whereas a SAX-based
+access will have to read again the whole JSON content.
 
-Most JSON parser available in Delphi use a DOM-like approach.
-For instance, the DBXJSON unit included since Delphi 2010
-or the SuperObject library create a class instance mapping
-each JSON node. In order to achieve best speed, TALJSONDocumentA
-implement DOM parser and also a SAX parser.
+Most JSON parser available in Delphi use a DOM-like approach. For instance, the
+DBXJSON unit included since Delphi 2010 or the SuperObject library create a
+class instance mapping each JSON node. In order to achieve best speed,
+TALJSONDocumentA implement DOM parser and also a SAX parser.
 
-TALJSONDocumentA syntax is very similar
-to TALXMLdocument / TXMLDocument
+TALJSONDocumentA syntax is very similar to TALXMLdocument / TXMLDocument
 
 exemple :
 
@@ -106,11 +102,12 @@ MyJsonDoc.SaveToFile(aBSONFileName, False{saxMode}, True{BSON});
 ---------------------------------------
 To parse an JSON document in Sax Mode :
 
-MyJsonDoc.onParseText := procedure (Sender: TObject;
-                                    const Path: AnsiString;
-                                    const name: AnsiString;
-                                    const Args: array of const;
-                                    NodeSubType: TALJSONNodeSubType)
+MyJsonDoc.onParseText := procedure(
+                           Sender: TObject;
+                           const Path: AnsiString;
+                           const name: AnsiString;
+                           const Args: array of const;
+                           NodeSubType: TALJSONNodeSubType)
                          begin
                            case NodeSubType of
                              nstFloat: Writeln(Path + '=' + ALFloatToStrA(Args[0].VExtended^, ALDefaultFormatSettingsA));
@@ -129,7 +126,6 @@ MyJsonDoc.onParseText := procedure (Sender: TObject;
                          end;
 MyJsonDoc.LoadFromJSON(AJsonStr, true{saxMode});
 *******************************************************************************)
-
 unit Alcinoe.JSONDoc;
 
 interface

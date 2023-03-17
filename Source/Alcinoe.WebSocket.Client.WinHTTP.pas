@@ -1,7 +1,7 @@
-{*******************************************************************************
-Description:  TALWinHTTPWebSocketClient is a easy to use WinHTTP-based
-Web Socket client component
-*******************************************************************************}
+{*****************************************
+TALWinHTTPWebSocketClient is a easy to use
+WinHTTP-based Web Socket client component
+*****************************************}
 unit Alcinoe.WebSocket.Client.WinHTTP;
 
 interface

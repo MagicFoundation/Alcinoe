@@ -1,29 +1,23 @@
 {*******************************************************************************
-Description:  TALWinHttpClient is a is easy to use WinHTTP-based
-HTTP client component which allows to post and get
-any data from the Web via HTTP protocol.
+Description:  TALWinHttpClient is a is easy to use WinHTTP-based HTTP client
+component which allows to post and get any data from the Web via HTTP protocol.
 
-The TALWinHttpClient use WinHTTP and is recommended in
-server process. In client process (like a browser for
-exemple), you can use TALWinInetHttpClient instead.
+The TALWinHttpClient use WinHTTP and is recommended in server process. In client
+process (like a browser for exemple), you can use TALWinInetHttpClient instead.
 
-Microsoft® Windows® HTTP Services (WinHTTP) provides
-developers with a server-supported, high-level interface
-to the HTTP/1.1 Internet protocol. WinHTTP is designed
-to be used primarily in server-based scenarios by server
-applications that communicate with HTTP servers. WinHTTP
-is also designed for use in system services and HTTP-based
-client applications. WinHTTP is more secure and robust than
-WinInet. However, single-user applications that need FTP or
-gopher functionality, cookie persistence, caching, automatic
-credential dialog handling, Internet Explorer compatibility,
-or downlevel platform support should still consider
-using WinInet.
+Microsoft® Windows® HTTP Services (WinHTTP) provides developers with a
+server-supported, high-level interface to the HTTP/1.1 Internet protocol.
+WinHTTP is designed to be used primarily in server-based scenarios by server
+applications that communicate with HTTP servers. WinHTTP is also designed for
+use in system services and HTTP-based client applications. WinHTTP is more
+secure and robust than WinInet. However, single-user applications that need FTP
+or gopher functionality, cookie persistence, caching, automatic credential
+dialog handling, Internet Explorer compatibility, or downlevel platform support
+should still consider using WinInet.
 
 Know bug :
 UserName and password not work (but you can use the header instead)
 *******************************************************************************}
-
 unit Alcinoe.HTTP.Client.WinHTTP;
 
 interface

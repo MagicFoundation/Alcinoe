@@ -1,22 +1,18 @@
 {*******************************************************************************
-The function in this unit allows you to download a
-World Wide Web site from the Internet to a local directory,
-building recursively all directories, getting HTML, images,
-and other files from the server to your computer. The functions
-arranges the original site's relative link-structure. Simply
-open a page of the "mirrored" website in your browser, and you
-can browse the site from link to link, as if you were viewing it
-online.
+The function in this unit allows you to download a World Wide Web site from the
+Internet to a local directory, building recursively all directories, getting
+HTML, images, and other files from the server to your computer. The functions
+arranges the original site's relative link-structure. Simply open a page of the
+"mirrored" website in your browser, and you can browse the site from link to
+link, as if you were viewing it online.
 
 Know bug :
-Link like :
-<td><img src="/imgmix/situation.php?dept=Corse du Sud&coordx=1149.00&coordy=1657.60&t=1133520053 width="200" height="200" border="0"></td>
-Will be not handle corretly because one " is missed.
-it's not an valide HTML document but unfortunatly ie work correctly
-with this kind of error... mean that webmaster can make this error
-without seeing it ! so we need to find a way to handle this error
+Link like : <td><img src="/imgmix/situation.php?dept=Corse du Sud&coordx=1149.00&coordy=1657.60&t=1133520053 width="200" height="200" border="0"></td>
+Will be not handle corretly because one " is missed. it's not an valide HTML
+document but unfortunatly ie work correctly with this kind of error... mean that
+webmaster can make this error without seeing it ! so we need to find a way to
+handle this error
 *******************************************************************************}
-
 unit Alcinoe.WebSpider;
 
 interface

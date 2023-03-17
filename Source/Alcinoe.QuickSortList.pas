@@ -1,7 +1,7 @@
-{*******************************************************************************
-TALIntegerList or TALDoubleList that work exactly like TstringList but with integer or Double.
-*******************************************************************************}
-
+{************************************************
+TALIntegerList or TALDoubleList that work exactly
+like TstringList but with integer or Double.
+************************************************}
 unit Alcinoe.QuickSortList;
 
 interface

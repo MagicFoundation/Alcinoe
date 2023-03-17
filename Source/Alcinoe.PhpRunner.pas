@@ -1,62 +1,59 @@
 {*******************************************************************************
-ALPHPRunnerEngine is a simple but useful component for
-easily use php (any version) as a scripting language
-in Delphi applications. ALPhpRunnerEngine allows to
-execute the PHP scripts within the Delphi program without
-a WebServer. ALPHPRunnerEngine use the CGI/FastCGI
-interface (php-cgi.exe) of PHP to communicate with PHP engine.
+ALPHPRunnerEngine is a simple but useful component for easily use php (any
+version) as a scripting language in Delphi applications. ALPhpRunnerEngine
+allows to execute the PHP scripts within the Delphi program without a WebServer.
+ALPHPRunnerEngine use the CGI/FastCGI interface (php-cgi.exe) of PHP to
+communicate with PHP engine.
 
 Note :
-If you use fastCGI (Socket) interface, you will need to start
-php-cgi separatly:
+If you use fastCGI (Socket) interface, you will need to start php-cgi
+separatly:
 
 php-cgi.exe -b host:port
 php-cgi.exe -b 127.0.0.1:8002
 
 Security
 --------
-Be sure to run the php binary as an appropriate userid
-Also, firewall out the port that PHP is listening on. In addition,
-you can set the environment variable FCGI_WEB_SERVER_ADDRS to
-control who can connect to the FastCGI.
+Be sure to run the php binary as an appropriate userid Also, firewall out the
+port that PHP is listening on. In addition, you can set the environment
+variable FCGI_WEB_SERVER_ADDRS to control who can connect to the FastCGI.
 Set it to a comma separated list of IP addresses, e.g.:
 
 export FCGI_WEB_SERVER_ADDRS=199.170.183.28,199.170.183.71
 
 Tuning
 ------
-There are a few tuning parameters that can be tweaked to control
-the performance of FastCGI PHP. The following are environment
-variables that can be set before running the PHP binary:
+There are a few tuning parameters that can be tweaked to control the
+performance of FastCGI PHP. The following are environment variables that can
+be set before running the PHP binary:
 
 PHP_FCGI_CHILDREN  (default value: 0)
 !!! NOT WORK ON WINDOWS !!!
 
-This controls how many child processes the PHP process spawns. When the
-fastcgi starts, it creates a number of child processes which handle one
-page request at a time. Value 0 means that PHP willnot start additional
-processes and main process will handle FastCGI requests by itself. Note that
-this process may die (because of PHP_FCGI_MAX_REQUESTS) and it willnot
-respawned automatic. Values 1 and above force PHP start additioanl processes
-those will handle requests. The main process will restart children in case of
-their death. So by default, you will be able to handle 1 concurrent PHP page
-requests. Further requests will be queued. Increasing this number will allow
-for better concurrency, especially if you have pages that take a significant
-time to create, or supply a lot of data (e.g. downloading huge files via PHP).
-On the other hand, having more processes running will use more RAM, and letting
-too many PHP pages be generated concurrently will mean that each request will
-be slow. We recommend a value of 8 for a fairly busy site. If you have many,
-long-running PHP scripts, then you may need to increase this further.
+This controls how many child processes the PHP process spawns. When the fastcgi
+starts, it creates a number of child processes which handle one page request at
+a time. Value 0 means that PHP willnot start additional processes and main
+process will handle FastCGI requests by itself. Note that this process may die
+(because of PHP_FCGI_MAX_REQUESTS) and it willnot respawned automatic. Values 1
+and above force PHP start additioanl processes those will handle requests. The
+main process will restart children in case of their death. So by default, you
+will be able to handle 1 concurrent PHP page requests. Further requests will be
+queued. Increasing this number will allow for better concurrency, especially if
+you have pages that take a significant time to create, or supply a lot of data
+(e.g. downloading huge files via PHP). On the other hand, having more processes
+running will use more RAM, and letting too many PHP pages be generated
+concurrently will mean that each request will be slow. We recommend a value of
+8 for a fairly busy site. If you have many, long-running PHP scripts, then you
+may need to increase this further.
 
 PHP_FCGI_MAX_REQUESTS (default value: 500)
 !!! set MaxRequestCount of TALPhpRunnerEngine < PHP_FCGI_MAX_REQUESTS !!!
 
-This controls how many requests each child process will handle before
-exitting. When one process exits, another will be created. This tuning is
-necessary because several PHP functions are known to have memory leaks. If the
-PHP processes were left around forever, they would be become very inefficient.
+This controls how many requests each child process will handle before exitting.
+When one process exits, another will be created. This tuning is necessary
+because several PHP functions are known to have memory leaks. If the PHP
+processes were left around forever, they would be become very inefficient.
 *******************************************************************************}
-
 unit Alcinoe.PhpRunner;
 
 interface

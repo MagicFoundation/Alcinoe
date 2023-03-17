@@ -12,7 +12,6 @@ http://www.freesoft.org/CIE/RFC/821/
 http://www.expita.com/header1.html
 http://cr.yp.to/immhf.html
 *******************************************************************************}
-
 unit Alcinoe.SMTP.Client;
 
 interface

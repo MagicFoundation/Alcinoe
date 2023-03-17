@@ -1,8 +1,7 @@
-{*******************************************************************************
-An Object to query Sphinx full text search engine using SphinxQL protocol
-(MySql Clone Protocol)
-*******************************************************************************}
-
+{************************************************
+An Object to query Sphinx full text search engine
+using SphinxQL protocol (MySql Clone Protocol)
+************************************************}
 unit Alcinoe.SphinxQL.Client;
 
 interface

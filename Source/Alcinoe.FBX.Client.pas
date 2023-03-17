@@ -3,7 +3,6 @@ product:      Alcinoe.FBX.Client (Alcinoe FireBird Express Client)
 Description:  Retrieving Data as XML from Firebird Server.
 Link :        http://www.progdigy.com/modules.php?name=UIB
 *******************************************************************************}
-
 unit Alcinoe.FBX.Client;
 
 interface

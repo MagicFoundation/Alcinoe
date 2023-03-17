@@ -1,16 +1,13 @@
 (*******************************************************************************
 Delphi Client for MongoDB database.
-A Delphi driver (with connection pool) to access a
-mongoDB server. a connection pool is a cache of database
-connections maintained so that the connections can be reused
-when future requests to the database are required.
-In connection pooling, after a connection is created,
-it is placed in the pool and it is used over again so that a
-new connection does not have to be established. If all the
-connections are being used, a new connection is made and is
-added to the pool. Connection pooling also cuts down on the
-amount of time a user must wait to establish a connection
-to the database.
+A Delphi driver (with connection pool) to access a mongoDB server. a connection
+pool is a cache of database connections maintained so that the connections can
+be reused when future requests to the database are required. In connection
+pooling, after a connection is created, it is placed in the pool and it is used
+over again so that a new connection does not have to be established. If all the
+connections are being used, a new connection is made and is added to the pool.
+Connection pooling also cuts down on the amount of time a user must wait to
+establish a connection to the database.
 
 
 ---------
@@ -20,10 +17,11 @@ aJSONDoc := TALJSONDocumentA.create;
 aMongoDBClient := TAlMongoDBClient.create;
 try
   aMongoDBClient.Connect('', 0);
-  aMongoDBClient.SelectData('test.exemple',
-                            '{fieldA:123}', // the query
-                            '{fieldA:1, fieldB:1}', // the return fields selector
-                            aJSONDoc.node);
+  aMongoDBClient.SelectData(
+    'test.exemple',
+    '{fieldA:123}', // the query
+    '{fieldA:1, fieldB:1}', // the return fields selector
+    aJSONDoc.node);
   aMongoDBClient.disconnect;
   for i := 0 to aJSONDoc.node.childnodes.count - 1 do
     with aJSONDoc.node.childnodes[i] do
@@ -41,16 +39,18 @@ aMongoDBConnectionPoolClient := TAlMongoDBConnectionPoolClient.create(aDBHost, a
 try
 
   ::Thread1::
-  aMongoDBConnectionPoolClient.SelectData('test.exemple',
-                                          '{fieldA:123}', // the query
-                                          '{fieldA:1, fieldB:1}', // the return fields selector
-                                          aLocalVarJSONDOC.node);
+  aMongoDBConnectionPoolClient.SelectData(
+    'test.exemple',
+    '{fieldA:123}', // the query
+    '{fieldA:1, fieldB:1}', // the return fields selector
+    aLocalVarJSONDOC.node);
 
   ::Thread2::
-  aMongoDBConnectionPoolClient.SelectData('test.exemple',
-                                          '{fieldA:999}', // the query
-                                          '{fieldA:1, fieldB:1}', // the return fields selector
-                                          aLocalVarJSONDOC.node);
+  aMongoDBConnectionPoolClient.SelectData(
+    'test.exemple',
+    '{fieldA:999}', // the query
+    '{fieldA:1, fieldB:1}', // the return fields selector
+    aLocalVarJSONDOC.node);
 
 finally
   aMongoDBClient.free;
@@ -60,25 +60,25 @@ end;
 -------------------------
 Exemple tail monitoring :
 
-aMongoDBTailMonitoringThread := TAlMongoDBTailMonitoringThread.Create(aDBHost,
-                                                                      aDBPort,
-                                                                      'test.cappedCollectionExemple'
-                                                                      '{}', // the query
-                                                                      '{fieldA:1, fieldB:1}', // the return fields selector
+aMongoDBTailMonitoringThread := TAlMongoDBTailMonitoringThread.Create(
+                                  aDBHost,
+                                  aDBPort,
+                                  'test.cappedCollectionExemple'
+                                  '{}', // the query
+                                  '{fieldA:1, fieldB:1}', // the return fields selector
 
-                                                                      Procedure (Sender: TObject; JSONRowData: TALJSONNodeA)
-                                                                      begin
-                                                                        writeln('New item added in cappedCollectionExemple: ' + JSONRowData.childnodes['fieldA'].text);
-                                                                      end,
+                                  Procedure (Sender: TObject; JSONRowData: TALJSONNodeA)
+                                  begin
+                                    writeln('New item added in cappedCollectionExemple: ' + JSONRowData.childnodes['fieldA'].text);
+                                  end,
 
-                                                                      procedure (Sender: TObject; Error: Exception)
-                                                                      begin
-                                                                        writeln(Error.message);
-                                                                      end);
+                                  procedure (Sender: TObject; Error: Exception)
+                                  begin
+                                    writeln(Error.message);
+                                  end);
 ....
 aMongoDBTailMonitoringThread.free;
 *******************************************************************************)
-
 unit Alcinoe.MongoDB.Client;
 
 interface
